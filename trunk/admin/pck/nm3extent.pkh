@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE nm3extent IS
   --<PACKAGE>
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3extent.pkh-arc   2.1   Jan 04 2010 16:30:40   cstrettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3extent.pkh-arc   2.2   May 16 2011 14:44:36   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3extent.pkh  $
---       Date into PVCS   : $Date:   Jan 04 2010 16:30:40  $
---       Date fetched Out : $Modtime:   Jan 04 2010 16:29:10  $
---       Version          : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   May 16 2011 14:44:36  $
+--       Date fetched Out : $Modtime:   May 05 2011 07:45:22  $
+--       Version          : $Revision:   2.2  $
 --       Based on SCCS version : 1.38
   --
   --
@@ -21,7 +21,7 @@ CREATE OR REPLACE PACKAGE nm3extent IS
   --</PACKAGE>
   --all global package variables here
   --<GLOBVAR>
-  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.1  $';
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.2  $';
   --  g_sccsid is the SCCS_ID
   --
   --  The following constants are those for the source of the data for the
@@ -242,7 +242,7 @@ CREATE OR REPLACE PACKAGE nm3extent IS
                            (pi_ne_id     IN     nm_members.nm_ne_id_in%TYPE
                            ,pi_begin_mp  IN     nm_members.nm_begin_mp%TYPE     DEFAULT NULL
                            ,pi_end_mp    IN     nm_members.nm_end_mp%TYPE       DEFAULT NULL
-                           ,pi_nse_owner IN     nm_saved_extents.nse_owner%TYPE DEFAULT USER
+                           ,pi_nse_owner IN     nm_saved_extents.nse_owner%TYPE DEFAULT Sys_Context('NM3_SECURITY_CTX','USERNAME')
                            ,pi_nse_name  IN     nm_saved_extents.nse_name%TYPE  DEFAULT NULL
                            ,pi_nse_descr IN     nm_saved_extents.nse_descr%TYPE DEFAULT NULL
                            ,po_nse_id       OUT nm_saved_extents.nse_id%TYPE
@@ -257,7 +257,7 @@ CREATE OR REPLACE PACKAGE nm3extent IS
   --
   PROCEDURE create_saved_ne_from_temp_ne
                            (pi_nte_job_id IN     nm_nw_temp_extents.nte_job_id%TYPE
-                           ,pi_nse_owner  IN     nm_saved_extents.nse_owner%TYPE DEFAULT USER
+                           ,pi_nse_owner  IN     nm_saved_extents.nse_owner%TYPE DEFAULT Sys_Context('NM3_SECURITY_CTX','USERNAME')
                            ,pi_nse_name   IN     nm_saved_extents.nse_name%TYPE
                            ,pi_nse_descr  IN     nm_saved_extents.nse_descr%TYPE
                            ,po_nse_id        OUT nm_saved_extents.nse_id%TYPE
@@ -715,7 +715,7 @@ FUNCTION get_roi_descr (pi_roi_type    IN     varchar2
 -- Creates a saved extent from the specified gazetteer filter query results.
 --
 PROCEDURE create_saved_ne_from_gaz_query(pi_ngq_id     IN     nm_gaz_query.ngq_id%TYPE
-                                        ,pi_nse_owner  IN     nm_saved_extents.nse_owner%TYPE DEFAULT USER
+                                        ,pi_nse_owner  IN     nm_saved_extents.nse_owner%TYPE DEFAULT Sys_Context('NM3_SECURITY_CTX','USERNAME')
                                         ,pi_nse_name   IN     nm_saved_extents.nse_name%TYPE
                                         ,pi_nse_descr  IN     nm_saved_extents.nse_descr%TYPE
                                         ,po_nse_id        OUT nm_saved_extents.nse_id%TYPE

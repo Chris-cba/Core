@@ -1,11 +1,11 @@
 CREATE OR REPLACE PACKAGE BODY nm3eng_dynseg AS
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3eng_dynseg.pkb-arc   2.14   May 18 2010 13:43:30   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3eng_dynseg.pkb-arc   2.15   May 16 2011 14:44:36   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3eng_dynseg.pkb  $
---       Date into PVCS   : $Date:   May 18 2010 13:43:30  $
---       Date fetched Out : $Modtime:   May 18 2010 13:43:02  $
---       PVCS Version     : $Revision:   2.14  $
+--       Date into PVCS   : $Date:   May 16 2011 14:44:36  $
+--       Date fetched Out : $Modtime:   Apr 01 2011 14:40:24  $
+--       PVCS Version     : $Revision:   2.15  $
 --       Based on sccs version : 1.13
 --
 --   Author : Jonathan Mills
@@ -27,7 +27,7 @@ CREATE OR REPLACE PACKAGE BODY nm3eng_dynseg AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.14  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.15  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3eng_dynseg';
@@ -2321,7 +2321,7 @@ PROCEDURE build_sql (pi_inv_type   IN     VARCHAR2
   -- PT 24.07.07 end
   l_inv_attr_col      varchar2(200);
 
-  l_date_mask varchar2(20) :=   nvl(nm3user.get_user_date_mask, 'DD-MON-YYYY'); 
+  l_date_mask varchar2(20) :=   nvl(Sys_Context('NM3CORE','USER_DATE_MASK'), 'DD-MON-YYYY'); 
 
 BEGIN
   nm3dbg.putln(g_package_name||'.build_sql('

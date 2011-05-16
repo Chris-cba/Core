@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3extent IS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3extent.pkb-arc   2.3   Jun 30 2009 09:29:30   lsorathia  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3extent.pkb-arc   2.4   May 16 2011 14:44:36   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3extent.pkb  $
---       Date into SCCS   : $Date:   Jun 30 2009 09:29:30  $
---       Date fetched Out : $Modtime:   Jun 30 2009 09:28:16  $
---       SCCS Version     : $Revision:   2.3  $
+--       Date into SCCS   : $Date:   May 16 2011 14:44:36  $
+--       Date fetched Out : $Modtime:   May 05 2011 07:47:48  $
+--       SCCS Version     : $Revision:   2.4  $
 --       Based on 
 --
 --
@@ -22,7 +22,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3extent IS
   g_package_name CONSTANT VARCHAR2(30) := 'nm3extent';
   --
   --g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"@(#)nm3extent.pkb	1.77 05/02/06"';
-  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.3  $';
+  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.4  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
   g_extent_exception EXCEPTION;
@@ -1277,7 +1277,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3extent IS
                            (pi_ne_id     IN     nm_members.nm_ne_id_in%TYPE
                            ,pi_begin_mp  IN     nm_members.nm_begin_mp%TYPE     DEFAULT NULL
                            ,pi_end_mp    IN     nm_members.nm_end_mp%TYPE       DEFAULT NULL
-                           ,pi_nse_owner IN     NM_SAVED_EXTENTS.nse_owner%TYPE DEFAULT USER
+                           ,pi_nse_owner IN     NM_SAVED_EXTENTS.nse_owner%TYPE DEFAULT Sys_Context('NM3_SECURITY_CTX','USERNAME')
                            ,pi_nse_name  IN     NM_SAVED_EXTENTS.nse_name%TYPE  DEFAULT NULL
                            ,pi_nse_descr IN     NM_SAVED_EXTENTS.nse_descr%TYPE DEFAULT NULL
                            ,po_nse_id       OUT NM_SAVED_EXTENTS.nse_id%TYPE
@@ -1358,7 +1358,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3extent IS
   --
   PROCEDURE create_saved_ne_from_temp_ne
                            (pi_nte_job_id IN     NM_NW_TEMP_EXTENTS.nte_job_id%TYPE
-                           ,pi_nse_owner  IN     NM_SAVED_EXTENTS.nse_owner%TYPE DEFAULT USER
+                           ,pi_nse_owner  IN     NM_SAVED_EXTENTS.nse_owner%TYPE DEFAULT Sys_Context('NM3_SECURITY_CTX','USERNAME')
                            ,pi_nse_name   IN     NM_SAVED_EXTENTS.nse_name%TYPE
                            ,pi_nse_descr  IN     NM_SAVED_EXTENTS.nse_descr%TYPE
                            ,po_nse_id        OUT NM_SAVED_EXTENTS.nse_id%TYPE
@@ -1392,7 +1392,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3extent IS
      po_nse_id           := get_next_nse_id;
   --
      l_rec_nse.nse_id    := po_nse_id;
-     l_rec_nse.nse_owner := NVL(pi_nse_owner,USER);
+     l_rec_nse.nse_owner := NVL(pi_nse_owner,Sys_Context('NM3_SECURITY_CTX','USERNAME'));
      l_rec_nse.nse_name  := pi_nse_name;
      l_rec_nse.nse_descr := NVL(pi_nse_descr
                                ,'Saved extent created from temp_ne'
@@ -1558,7 +1558,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3extent IS
      po_nse_id           := get_next_nse_id;
   --
      l_rec_nse.nse_id    := po_nse_id;
-     l_rec_nse.nse_owner := NVL(pi_nse_owner,USER);
+     l_rec_nse.nse_owner := NVL(pi_nse_owner,Sys_Context('NM3_SECURITY_CTX','USERNAME'));
      IF pi_nse_name IS NOT NULL
       THEN
         l_rec_nse.nse_name  := pi_nse_name;
@@ -1690,7 +1690,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3extent IS
      po_nse_id           := get_next_nse_id;
   --
      l_rec_nse.nse_id    := po_nse_id;
-     l_rec_nse.nse_owner := NVL(pi_nse_owner,USER);
+     l_rec_nse.nse_owner := NVL(pi_nse_owner,Sys_Context('NM3_SECURITY_CTX','USERNAME'));
      IF pi_nse_name IS NOT NULL
       THEN
         l_rec_nse.nse_name  := pi_nse_name;
@@ -3860,7 +3860,7 @@ PROCEDURE create_saved_ne_from_nte_aut(pi_nte_ne_id_of_tab     IN     Nm3type.ta
                                       ,pi_nte_cardinality_tab  IN     Nm3type.tab_number
                                       ,pi_nte_seq_no_tab       IN     Nm3type.tab_number
                                       ,pi_nte_route_ne_id_tab  IN     Nm3type.tab_number
-                                      ,pi_nse_owner            IN     NM_SAVED_EXTENTS.nse_owner%TYPE DEFAULT USER
+                                      ,pi_nse_owner            IN     NM_SAVED_EXTENTS.nse_owner%TYPE DEFAULT Sys_Context('NM3_SECURITY_CTX','USERNAME')
                                       ,pi_nse_name             IN     NM_SAVED_EXTENTS.nse_name%TYPE
                                       ,pi_nse_descr            IN     NM_SAVED_EXTENTS.nse_descr%TYPE
                                       ,po_nse_id                  OUT NM_SAVED_EXTENTS.nse_id%TYPE
@@ -3900,7 +3900,7 @@ END create_saved_ne_from_nte_aut;
 -----------------------------------------------------------------------------
 --
 PROCEDURE create_saved_ne_from_gaz_query(pi_ngq_id     IN     NM_GAZ_QUERY.ngq_id%TYPE
-                                        ,pi_nse_owner  IN     NM_SAVED_EXTENTS.nse_owner%TYPE DEFAULT USER
+                                        ,pi_nse_owner  IN     NM_SAVED_EXTENTS.nse_owner%TYPE DEFAULT Sys_Context('NM3_SECURITY_CTX','USERNAME')
                                         ,pi_nse_name   IN     NM_SAVED_EXTENTS.nse_name%TYPE
                                         ,pi_nse_descr  IN     NM_SAVED_EXTENTS.nse_descr%TYPE
                                         ,po_nse_id        OUT NM_SAVED_EXTENTS.nse_id%TYPE
@@ -3921,7 +3921,7 @@ BEGIN
                      ,p_procedure_name => 'create_saved_ne_from_gaz_query');
 
   l_nte_job_id := Nm3gaz_Qry.perform_query(pi_ngq_id         => pi_ngq_id
-                                          ,pi_effective_date => Nm3user.get_effective_date);
+                                          ,pi_effective_date => To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY'));
 
   copy_nte_into_arrays(pi_nte_id              => l_nte_job_id
                       ,po_nte_job_id_tab      => l_nte_job_id_tab
