@@ -356,7 +356,7 @@ FUNCTION get_nga RETURN nm_saved_extents.nse_id%TYPE;
 --   NORMAL will come out in preference to READONLY
 --
 FUNCTION get_user_mode_for_theme (pi_gt_theme_id gis_theme_roles.gthr_theme_id%TYPE
-                                 ,pi_user        hig_user_roles.hur_username%TYPE DEFAULT USER
+                                 ,pi_user        hig_user_roles.hur_username%TYPE DEFAULT Sys_Context('NM3_SECURITY_CTX','USERNAME')
                                  ) RETURN gis_theme_roles.gthr_mode%TYPE;
 --
 --</PROC>

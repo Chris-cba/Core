@@ -23,7 +23,7 @@ CREATE OR REPLACE PACKAGE BODY higgri AS
 --	Copyright (c) exor corporation ltd, 2000
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  varchar2(80) := '"$Revision:   2.9  $"';
+   g_body_sccsid     CONSTANT  varchar2(80) := '"$Revision:   2.10  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30) := 'higgri';
@@ -429,7 +429,6 @@ CREATE OR REPLACE PACKAGE BODY higgri AS
                  ,gmp_tag_where;
     BEGIN
 	/* Get object column type */
-	l_owner := hig.get_application_owner;
 	OPEN col_type;
 	FETCH col_type INTO l_tag_column_type;
 	IF col_type%NOTFOUND THEN
@@ -903,7 +902,7 @@ CREATE OR REPLACE PACKAGE BODY higgri AS
     FETCH c1 INTO l_job_id;
     CLOSE c1;
 
-    higgri.load_params( l_job_id, USER, l_module, l_descr );
+    higgri.load_params( l_job_id, Sys_Context('NM3_SECURITY_CTX','USERNAME'), l_module, l_descr );
 
     IF l_type = 'svr' THEN
        LOCK TABLE exor_lock IN EXCLUSIVE MODE NOWAIT;
@@ -919,7 +918,7 @@ CREATE OR REPLACE PACKAGE BODY higgri AS
     WHEN send_error THEN
        dbms_output.put_line('error sending job TO the server');
      WHEN table_locked THEN
-       make_report_run ( USER, l_module, l_job_id );
+       make_report_run ( Sys_Context('NM3_SECURITY_CTX','USERNAME'), l_module, l_job_id );
        host_string := p_module||' '||p_username||'/'||p_pwd||' '||TO_CHAR(l_job_id);
        COMMIT;
        hig.pipe_send( host_string, l_lsnr );

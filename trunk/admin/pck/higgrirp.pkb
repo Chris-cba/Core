@@ -1,11 +1,11 @@
 CREATE OR REPLACE PACKAGE BODY higgrirp AS
 --   PVCS Identifiers :-
 --
---       pvcsid               : $Header:   //vm_latest/archives/nm3/admin/pck/higgrirp.pkb-arc   2.1   Dec 18 2007 13:57:16   ptanava  $
+--       pvcsid               : $Header:   //vm_latest/archives/nm3/admin/pck/higgrirp.pkb-arc   2.2   May 16 2011 14:42:22   Steve.Cooper  $
 --       Module Name          : $Workfile:   higgrirp.pkb  $
---       Date into PVCS       : $Date:   Dec 18 2007 13:57:16  $
---       Date fetched Out     : $Modtime:   Dec 18 2007 13:44:18  $
---       PVCS Version         : $Revision:   2.1  $
+--       Date into PVCS       : $Date:   May 16 2011 14:42:22  $
+--       Date fetched Out     : $Modtime:   Apr 20 2011 11:17:48  $
+--       PVCS Version         : $Revision:   2.2  $
 --       Based on SCCS version : 1.5
 --
 --   Author :
@@ -23,7 +23,7 @@ CREATE OR REPLACE PACKAGE BODY higgrirp AS
                 (use dbms_lock.sleep() to give time to ohter sessions if needed)
 */
 
-  g_body_sccsid            constant  varchar2(200) := '"$Revision:   2.1  $"';
+  g_body_sccsid            constant  varchar2(200) := '"$Revision:   2.2  $"';
   g_package_name           constant varchar2(30) := 'higgrirp';
   
   c_reports_file_extension CONSTANT varchar2(4) := '.rep';
@@ -375,12 +375,7 @@ END;
   PROCEDURE init_rpt ( p_module IN  gri_modules.grm_module%TYPE
 		   , p_user   OUT varchar2
 		   , p_client OUT nm_admin_units.nau_name%TYPE
-		   , p_title  OUT hig_modules.hmo_title%TYPE ) IS
-    --
-    CURSOR c_get_user
-	IS
-    SELECT USER
-    FROM dual;
+		   , p_title  OUT hig_modules.hmo_title%TYPE ) IS    
     --
     CURSOR c_get_name
     IS
@@ -388,7 +383,7 @@ END;
     FROM hig_admin_units,
                hig_users
     WHERE hus_admin_unit  = hau_admin_unit
-    AND hus_username = USER;
+    AND hus_username = Sys_Context('NM3_SECURITY_CTX','USERNAME');
     --
     CURSOR c_get_module
     IS
@@ -400,9 +395,7 @@ END;
     --
   BEGIN
     --
-    OPEN c_get_user;
-    FETCH c_get_user INTO p_user;
-    CLOSE c_get_user;
+    p_user:=Sys_Context('NM3_SECURITY_CTX','USERNAME');
     --
     OPEN c_get_name;
     FETCH c_get_name INTO p_client;

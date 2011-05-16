@@ -3,26 +3,22 @@ CREATE OR REPLACE PACKAGE BODY higgis AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/higgis.pkb-arc   2.5   Mar 01 2011 09:25:34   Ade.Edwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/higgis.pkb-arc   2.6   May 16 2011 14:42:22   Steve.Cooper  $
 --       Module Name      : $Workfile:   higgis.pkb  $
---       Date into PVCS   : $Date:   Mar 01 2011 09:25:34  $
---       Date fetched Out : $Modtime:   Mar 01 2011 09:24:58  $
---       Version          : $Revision:   2.5  $
+--       Date into PVCS   : $Date:   May 16 2011 14:42:22  $
+--       Date fetched Out : $Modtime:   Apr 20 2011 10:30:50  $
+--       Version          : $Revision:   2.6  $
 --       Based on SCCS version : 1.39
 -------------------------------------------------------------------------
 --   A GIS package intended to handle all GIS theme and connection information
 --
 --   Author : Rob Coupe
 --
-   g_body_sccsid     CONSTANT  varchar2(80) := '"$Revision:   2.5  $"';
+   g_body_sccsid     CONSTANT  varchar2(80) := '"$Revision:   2.6  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name CONSTANT varchar2(30) := 'higgis';
---
-   c_user_id           CONSTANT hig_users.hus_user_id%TYPE := nm3user.get_user_id;
-   c_app_owner         CONSTANT varchar2(30)               := hig.get_application_owner;
-   c_app_owner_dot     CONSTANT varchar2(31)               := c_app_owner||'.';
-   c_app_owner_dot_len CONSTANT pls_integer                := LENGTH(c_app_owner_dot);
+
 --
 -----------------------------------------------------------------------------
 --
@@ -1155,7 +1151,7 @@ END get_nga;
 ---------------------------------------------------------------------------
 --
 FUNCTION get_user_mode_for_theme (pi_gt_theme_id gis_theme_roles.gthr_theme_id%TYPE
-                                 ,pi_user        hig_user_roles.hur_username%TYPE DEFAULT USER
+                                 ,pi_user        hig_user_roles.hur_username%TYPE DEFAULT Sys_Context('NM3_SECURITY_CTX','USERNAME')
                                  ) RETURN gis_theme_roles.gthr_mode%TYPE IS
 --
    CURSOR cs_gthr (c_theme_id gis_theme_roles.gthr_theme_id%TYPE
@@ -1294,9 +1290,9 @@ BEGIN
 --
    l_table_name := UPPER(p_gt_table_name);
 --
-   IF SUBSTR(l_table_name,1,c_app_owner_dot_len) = c_app_owner_dot
+   IF SUBSTR(l_table_name,1,Length(Sys_Context('NM3CORE','APPLICATION_OWNER')||'.')) = Sys_Context('NM3CORE','APPLICATION_OWNER')||'.'
     THEN
-      l_table_name := SUBSTR(l_table_name,c_app_owner_dot_len+1);
+      l_table_name := SUBSTR(l_table_name,Length(Sys_Context('NM3CORE','APPLICATION_OWNER')||'.')+1);
    END IF;
 --
    IF p_gt_hpr_product = nm3type.c_net

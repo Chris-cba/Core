@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY hig AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/hig.pkb-arc   2.4   Sep 24 2008 17:21:12   gjohnson  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/hig.pkb-arc   2.5   May 16 2011 14:42:22   Steve.Cooper  $
 --       Module Name      : $Workfile:   hig.pkb  $
---       Date into SCCS   : $Date:   Sep 24 2008 17:21:12  $
---       Date fetched Out : $Modtime:   Sep 24 2008 17:18:52  $
---       SCCS Version     : $Revision:   2.4  $
+--       Date into SCCS   : $Date:   May 16 2011 14:42:22  $
+--       Date fetched Out : $Modtime:   Apr 20 2011 09:22:46  $
+--       SCCS Version     : $Revision:   2.5  $
 --       Based on 1.39
 --
 --
@@ -75,18 +75,6 @@ END get_body_version;
    a_product := g_product;
   END get_product;
 
-  ------------------------------------------------------------------
-FUNCTION get_application_owner RETURN varchar2 IS
-BEGIN
-   RETURN hig.g_application_owner;
-END get_application_owner;
-
-  ------------------------------------------------------------------
-FUNCTION is_enterprise_edition RETURN boolean IS
-BEGIN
-   RETURN hig.g_enterprise_edition;
-END is_enterprise_edition;
-
   -----------------------------------------------------------------------------
   FUNCTION get_application_owner_id RETURN number IS
     CURSOR c1 IS
@@ -95,7 +83,7 @@ END is_enterprise_edition;
 	  FROM
 	    hig_users
 	  WHERE
-	    hus_username = get_application_owner;
+	    hus_username = Sys_Context('NM3CORE','APPLICATION_OWNER');
 
 	retval number;
   BEGIN
@@ -564,14 +552,14 @@ END is_enterprise_edition;
       FROM   all_objects
       WHERE  object_name = UPPER( a_object_name)
         AND  object_type <> 'SYNONYM'
-	AND  owner = USER;
+	AND  owner = Sys_Context('NM3_SECURITY_CTX','USERNAME');
 
   /* or user has private synonym to object */
     CURSOR c_us IS
       SELECT table_owner
       FROM   all_synonyms
       WHERE  synonym_name =  UPPER( a_object_name)
-	AND  owner = USER;
+	AND  owner = Sys_Context('NM3_SECURITY_CTX','USERNAME');
 
  /* or user has the use of a synonym for an object owned by another user */
     CURSOR c_as IS
@@ -613,7 +601,7 @@ END is_enterprise_edition;
 PROCEDURE valid_fk_hco
 	(pi_hco_domain     IN     hig_codes.hco_domain%TYPE
 	,pi_hco_code       IN     hig_codes.hco_code%TYPE
-	,pi_effective_date IN     date DEFAULT nm3user.get_effective_date
+	,pi_effective_date IN     date DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
 	,po_hco_meaning       OUT hig_codes.hco_meaning%TYPE
         ) IS
 --
@@ -636,7 +624,7 @@ BEGIN
 --
    OPEN  cs_hco (c_hco_domain => pi_hco_domain
                 ,c_hco_code   => pi_hco_code
-                ,c_eff_date   => NVL(pi_effective_date,nm3user.get_effective_date)
+                ,c_eff_date   => NVL(pi_effective_date,To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY'))
                 );
    FETCH cs_hco INTO po_hco_meaning;
    l_found := cs_hco%FOUND;
@@ -685,7 +673,7 @@ END valid_fk_hco;
      valid_fk_hco
 	(pi_hco_domain     => pi_hco_domain
 	,pi_hco_code       => pi_hco_code
-	,pi_effective_date => nm3user.get_effective_date
+	,pi_effective_date => To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
         );
   END valid_fk_hco;
   --
@@ -704,7 +692,7 @@ END valid_fk_hco;
     valid_fk_hco
 	(pi_hco_domain     => a_hco_domain
 	,pi_hco_code       => a_hco_code
-	,pi_effective_date => nm3user.get_effective_date
+	,pi_effective_date => To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
 	,po_hco_meaning    => a_hco_meaning
         );
   END valid_fk_hco;
@@ -728,7 +716,7 @@ END valid_fk_hco;
      THEN
       l_eff_date := TO_DATE(a_effective,a_date_mask);
     ELSE
-      l_eff_date := nm3user.get_effective_date;
+      l_eff_date := To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY');
     END IF;
     valid_fk_hco
 	(pi_hco_domain     => a_hco_domain
@@ -801,7 +789,7 @@ END code_is_in_domain;
                      FROM nm_admin_groups, hig_users, nm_user_aus
                      WHERE nag_child_admin_unit = nua_admin_unit
                      AND   nag_parent_admin_unit = nau_admin_unit
-                     AND   hus_username = USER
+                     AND   hus_username = Sys_Context('NM3_SECURITY_CTX','USERNAME')
                      AND   hus_user_id = nua_user_id) );
 
   l_exists char(6);
@@ -878,7 +866,7 @@ END code_is_in_domain;
 
   CURSOR c1 IS SELECT hus_agent_code
                FROM hig_users
-               WHERE hus_username = USER;
+               WHERE hus_username = Sys_Context('NM3_SECURITY_CTX','USERNAME');
 
   CURSOR c2 IS SELECT hop_value
                FROM hig_options
@@ -1065,7 +1053,7 @@ FUNCTION date_convert (value_in IN varchar2) RETURN date IS
 --
    CURSOR mask_cur IS
    SELECT *
-    FROM (SELECT nm3user.get_user_date_mask date_mask
+    FROM (SELECT Sys_Context('NM3CORE','USER_DATE_MASK') date_mask
                 ,-1                         date_sequence
            FROM  dual
           UNION
@@ -1267,7 +1255,7 @@ END date_convert;
       AND
         hmr_role = hur.hur_role
       AND
-        hur.hur_username = USER
+        hur.hur_username = Sys_Context('NM3_SECURITY_CTX','USERNAME')
       ORDER BY
         hmr.hmr_mode;
 
@@ -1358,7 +1346,7 @@ END date_convert;
 	                            ) RETURN varchar2 IS
 	BEGIN
 		RETURN NVL(hig.get_useopt(p_option_id => pi_option
-	                           ,p_username  => USER)
+	                           ,p_username  => Sys_Context('NM3_SECURITY_CTX','USERNAME'))
 	            ,hig.get_sysopt(p_option_id => pi_option));
 	END;
   --
@@ -1513,7 +1501,7 @@ END date_convert;
                          ,pi_id   IN nm_errors.ner_id%TYPE
                          ) RETURN boolean IS
 
-    c_nvl varchar2(4) := 'ö$%^';
+    c_nvl varchar2(5) := 'ö$%^';
 
     l_retval boolean;
 
@@ -1658,7 +1646,7 @@ END raise_constraint_violation_ner;
 --
 PROCEDURE check_user_instantiated IS
 BEGIN
-   IF g_application_owner IS NULL
+   IF Sys_Context('NM3CORE','APPLICATION_OWNER') IS NULL
     THEN
       dbms_session.reset_package;
       hig.raise_ner (pi_appl => nm3type.c_hig
@@ -1671,10 +1659,10 @@ END check_user_instantiated;
 --
 PROCEDURE check_user_is_current IS
 --
-   CURSOR cs_hus (c_user_id hig_users.hus_user_id%TYPE) IS
+   CURSOR cs_hus IS
    SELECT *
     FROM  hig_users
-   WHERE  hus_user_id = c_user_id;
+   WHERE  hus_user_id = Sys_Context('NM3CORE','USER_ID');
 --
    l_found                  BOOLEAN;
    l_rec_hus                hig_users%ROWTYPE;
@@ -1684,7 +1672,7 @@ PROCEDURE check_user_is_current IS
 --
 BEGIN
 --
-   OPEN  cs_hus (nm3context.get_context_number(pi_attribute=>'USER_ID'));
+   OPEN  cs_hus;
    FETCH cs_hus INTO l_rec_hus;
    l_found := cs_hus%FOUND;
    CLOSE cs_hus;
@@ -1996,13 +1984,7 @@ END get_huol_all;
 --
 /* MAIN */
 BEGIN  /* hig - automatic variables */
-  /*
-    return the Oracle user who is owner of the HIGHWAYS application
-    (use 'hig_products' as the sample HIGHWAYS object)
-  */
-  g_application_owner  := nm3context.get_context(pi_attribute=>'APPLICATION_OWNER');
-  g_enterprise_edition := (nm3context.get_context(pi_attribute=>'ENTERPRISE_EDITION')=nm3type.c_true);
---  g_application_owner := get_owner( 'hig_products');
+
   check_user_instantiated;
   check_user_is_current;
 /* Commented due to a requirement to set purity levels

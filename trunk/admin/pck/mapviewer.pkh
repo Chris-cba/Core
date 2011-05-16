@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE mapviewer AS
 --   SCCS Identifiers :-
 -----------------------------------------------------------------------------
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/mapviewer.pkh-arc   2.2   Jun 28 2010 11:34:02   cbaugh  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/mapviewer.pkh-arc   2.3   May 16 2011 14:42:22   Steve.Cooper  $
 --       Module Name      : $Workfile:   mapviewer.pkh  $
---       Date into PVCS   : $Date:   Jun 28 2010 11:34:02  $
---       Date fetched Out : $Modtime:   Jun 24 2010 14:52:00  $
---       PVCS Version     : $Revision:   2.2  $
+--       Date into PVCS   : $Date:   May 16 2011 14:42:22  $
+--       Date fetched Out : $Modtime:   May 03 2011 11:04:34  $
+--       PVCS Version     : $Revision:   2.3  $
 --
 -----------------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2004
@@ -17,7 +17,7 @@ CREATE OR REPLACE PACKAGE mapviewer AS
 --<GLOBVAR>
   g_ne_id       NUMBER;
   g_doc_id      NUMBER;
-  g_sccsid      CONSTANT  VARCHAR2(2000) :='"$Revision:   2.2  $"';
+  g_sccsid      CONSTANT  VARCHAR2(2000) :='"$Revision:   2.3  $"';
 
   g_conversion_factor number;
 
@@ -99,7 +99,7 @@ CREATE OR REPLACE PACKAGE mapviewer AS
               , pi_lr_offset    IN  number
               , pi_inv_theme_id IN  nm_themes_all.nth_theme_id%TYPE
               , pi_err_sequence IN  NUMBER
-              , pi_username     IN  hig_users.hus_username%TYPE DEFAULT USER
+              , pi_username     IN  hig_users.hus_username%TYPE DEFAULT Sys_Context('NM3_SECURITY_CTX','USERNAME')
               , pi_session_id   IN  gis_data_objects.gdo_session_id%TYPE) -- clb 21062010 - task 0109021
               ;
 

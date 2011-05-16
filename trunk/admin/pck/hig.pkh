@@ -22,8 +22,7 @@ CREATE OR REPLACE PACKAGE hig AS
 --<GLOBVAR>
   g_sccsid	CONSTANT	varchar2(2000) := '"@(#)hig.pkh	1.24 10/26/05"'; --@(#)hig.pck	1.21 09/22/99"';
 -- g_sccsid is the SCCS_ID
-  g_application_owner		varchar2(30);
-  g_enterprise_edition          boolean;
+
   g_language			varchar2(30);
 --  some common error messages - prevent more than one database lookup
   g_thing_already_exists	varchar2(2000);
@@ -65,23 +64,6 @@ CREATE OR REPLACE PACKAGE hig AS
   PROCEDURE get_product
         ( a_product             OUT      varchar2
   );
---</PROC>
-
-  -----------------------------------------------------------------
---<PROC NAME="get_application_owner">
-  --- Function to return the package level var g_application_onwer
-  --- this overcomes the pl/sql version 1.0 limitation within forms
-  --- for selecting/referencing package variables
-
-  FUNCTION get_application_owner RETURN varchar2;
---</PROC>
-
-  ------------------------------------------------------------------
---<PROC NAME="is_enterprise_edition">
---  This function returns TRUE if the oracle RDBMS is enterprise edition (or Personal)
---   otherwise returns FALSE
---
-FUNCTION is_enterprise_edition RETURN boolean;
 --</PROC>
 
   ----------------------------------------------------------------------------------------------
@@ -190,7 +172,7 @@ FUNCTION is_enterprise_edition RETURN boolean;
   PROCEDURE valid_fk_hco
 	(pi_hco_domain     IN     hig_codes.hco_domain%TYPE
 	,pi_hco_code       IN     hig_codes.hco_code%TYPE
-	,pi_effective_date IN     date DEFAULT nm3user.get_effective_date
+	,pi_effective_date IN     date DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
 	,po_hco_meaning       OUT hig_codes.hco_meaning%TYPE
         );
   --
@@ -556,7 +538,6 @@ PRAGMA RESTRICT_REFERENCES (get_body_version, wnds, wnps);
   PRAGMA RESTRICT_REFERENCES ( get_owner, wnds, wnps );
   PRAGMA RESTRICT_REFERENCES ( get_sysopt,wnds, wnps );
   PRAGMA RESTRICT_REFERENCES ( get_useopt,wnds, wnps );
-  PRAGMA RESTRICT_REFERENCES ( get_application_owner, wnds, wnps );
   PRAGMA RESTRICT_REFERENCES ( date_convert, wnds, wnps );
   PRAGMA RESTRICT_REFERENCES ( get_domain_seq, wnds, wnps );
   PRAGMA RESTRICT_REFERENCES ( domain_exists, wnds, wnps );

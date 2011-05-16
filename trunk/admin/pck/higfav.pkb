@@ -540,7 +540,7 @@ BEGIN
                  HIG_SYSTEM_FAVOURITES
                 ,HIG_USERS
         WHERE
-                 hus_username = Hig.get_application_owner
+                 hus_username = Sys_Context('NM3CORE','APPLICATION_OWNER')
         AND      hsf_user_id = hus_user_id
 --
         AND      hsf_type = 'F'
@@ -583,7 +583,7 @@ BEGIN
                         HIG_SYSTEM_FAVOURITES
                        ,HIG_USERS
                  WHERE
-                        hus_username = Hig.get_application_owner
+                        hus_username = Sys_Context('NM3CORE','APPLICATION_OWNER')
                  AND    hsf_user_id = hus_user_id
 --
                  CONNECT BY PRIOR
@@ -644,14 +644,14 @@ BEGIN
         FROM
                  hig_user_favourites
         WHERE
-                 huf_user_id = nm3user.get_user_id
+                 huf_user_id = To_Number(Sys_Context('NM3CORE','USER_ID'))
         AND      huf_type = 'F'
         START WITH
                  huf_child = 'FAVOURITES'
-        AND      huf_user_id = nm3user.get_user_id
+        AND      huf_user_id = To_Number(Sys_Context('NM3CORE','USER_ID'))
 		CONNECT BY PRIOR
 		         huf_child = huf_parent
-        AND      huf_user_id = nm3user.get_user_id;
+        AND      huf_user_id = To_Number(Sys_Context('NM3CORE','USER_ID'));
 
    ELSE
 
@@ -681,13 +681,13 @@ BEGIN
                  FROM
                         hig_user_favourites
                  WHERE
-                        huf_user_id = nm3user.get_user_id
+                        huf_user_id = To_Number(Sys_Context('NM3CORE','USER_ID'))
                  CONNECT BY PRIOR
 				        huf_child = huf_parent
-                 AND    huf_user_id = nm3user.get_user_id
+                 AND    huf_user_id = To_Number(Sys_Context('NM3CORE','USER_ID'))
                  START WITH
                         huf_parent = 'ROOT'
-                 AND    huf_user_id = nm3user.get_user_id)
+                 AND    huf_user_id = To_Number(Sys_Context('NM3CORE','USER_ID')))
        WHERE     huf_type = 'F'
        OR
                 (huf_child IN (SELECT
@@ -698,7 +698,7 @@ BEGIN
                                WHERE
                                       hmr_role = hur_role
                                AND
-                                      hur_username = USER));
+                                      hur_username = Sys_Context('NM3_SECURITY_CTX','USERNAME')));
 
   END IF;
 

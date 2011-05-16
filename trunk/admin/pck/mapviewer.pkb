@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY Mapviewer AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/mapviewer.pkb-arc   2.5   Nov 19 2010 11:25:56   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/mapviewer.pkb-arc   2.6   May 16 2011 14:42:22   Steve.Cooper  $
 --       Module Name      : $Workfile:   mapviewer.pkb  $
---       Date into PVCS   : $Date:   Nov 19 2010 11:25:56  $
---       Date fetched Out : $Modtime:   Nov 19 2010 11:24:00  $
---       PVCS Version     : $Revision:   2.5  $
+--       Date into PVCS   : $Date:   May 16 2011 14:42:22  $
+--       Date fetched Out : $Modtime:   May 03 2011 11:04:52  $
+--       PVCS Version     : $Revision:   2.6  $
 
 
 --
@@ -15,7 +15,7 @@ CREATE OR REPLACE PACKAGE BODY Mapviewer AS
 --	Copyright (c) exor corporation ltd, 2004
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(30) := '"$Revision:   2.5  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(30) := '"$Revision:   2.6  $"';
 
 
 FUNCTION Get_Scale RETURN NUMBER;
@@ -235,7 +235,7 @@ PROCEDURE create_pem
               , pi_lr_offset    IN  NUMBER
               , pi_inv_theme_id IN  nm_themes_all.nth_theme_id%TYPE
               , pi_err_sequence IN  NUMBER
-              , pi_username     IN  hig_users.hus_username%TYPE DEFAULT USER
+              , pi_username     IN  hig_users.hus_username%TYPE DEFAULT Sys_Context('NM3_SECURITY_CTX','USERNAME')
               , pi_session_id   IN  gis_data_objects.gdo_session_id%TYPE)
    AS -- clb 21062010 - task 0109021
 

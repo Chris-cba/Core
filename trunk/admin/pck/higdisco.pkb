@@ -28,8 +28,6 @@ CREATE OR REPLACE PACKAGE BODY higdisco IS
 --
 -----------------------------------------------------------------------------
 --
-    g_application_owner CONSTANT VARCHAR2(30) := hig.get_application_owner;
---
     g_disco_user        CONSTANT hig_option_values.hov_value%TYPE := hig.get_sysopt('DISCEULUSR');
     g_disco_version     CONSTANT hig_option_values.hov_value%TYPE := hig.get_sysopt('DISCO_VERS');
     g_prefix            CONSTANT VARCHAR2(10)                     := get_prefix;
@@ -190,7 +188,7 @@ PROCEDURE suck_table_into_disco_tables (p_table_name                IN hig_disco
    CURSOR cs_comments (c_table_name VARCHAR2) IS
    SELECT SUBSTR(comments,1,240)
     FROM  all_tab_comments
-   WHERE  owner      = g_application_owner
+   WHERE  owner      = Sys_Context('NM3CORE','APPLICATION_OWNER')
     AND   table_name = c_table_name;
 --
 BEGIN
@@ -251,14 +249,14 @@ BEGIN
          ,data_type
          ,NVL(data_precision,data_length)
     FROM  all_tab_columns
-   WHERE  owner      = g_application_owner
+   WHERE  owner      = Sys_Context('NM3CORE','APPLICATION_OWNER')
     AND   table_name = p_table_name
     AND   data_type IN (nm3type.c_date, nm3type.c_varchar, nm3type.c_number);
 --
    UPDATE hig_disco_tab_columns
     SET   hdtc_description = (SELECT SUBSTR(comments,1,240)
                                FROM  all_col_comments
-                              WHERE  owner       = g_application_owner
+                              WHERE  owner       = Sys_Context('NM3CORE','APPLICATION_OWNER')
                                AND   table_name  = p_table_name
                                AND   column_name = hdtc_column_name
                              )
@@ -503,7 +501,7 @@ BEGIN
    add_value_num  ('OBJ_NDETERMINISTIC',0);
    add_value      ('OBJ_CBO_HINT',Null);
    add_value      ('OBJ_EXT_OBJECT',Null);
-   add_value      ('OBJ_EXT_OWNER',g_application_owner);
+   add_value      ('OBJ_EXT_OWNER',Sys_Context('NM3CORE','APPLICATION_OWNER'));
    add_value      ('OBJ_EXT_DB_LINK',Null);
    add_value      ('OBJ_OBJECT_SQL1',Null);
    add_value      ('OBJ_OBJECT_SQL2',Null);
@@ -712,7 +710,7 @@ BEGIN
       END IF;
       append_tab_vc(' '||NVL(l_rec_hdtc.hdtc_column_source,l_rec_hdtc.hdtc_column_name)||' AS i'||l_tab_exp_id(i));
    END LOOP;
-   append_tab_vc (' FROM '||g_application_owner||'.'||l_rec_hdt.hdt_table_name||')');
+   append_tab_vc (' FROM '||Sys_Context('NM3CORE','APPLICATION_OWNER')||'.'||l_rec_hdt.hdt_table_name||')');
 -- nm3tab_varchar.debug_tab_varchar (l_tab_varchar32767);
    l_tab_varchar250 := chop_up_into_250 (l_tab_varchar32767);
 --
@@ -1330,16 +1328,14 @@ END chop_up_into_250;
 --------------------------------------------------------------------------
 --
 PROCEDURE add_who_columns (p_prefix VARCHAR2) IS
- --  c_user    CONSTANT varchar2(30) := g_disco_user;
-   c_user    CONSTANT varchar2(30) := USER;
    c_sysdate CONSTANT DATE         := SYSDATE;
 BEGIN
 --
    nm_debug.proc_start(g_package_name,'add_who_columns');
 --
-   add_value      (p_prefix||'_CREATED_BY',c_user);
+   add_value      (p_prefix||'_CREATED_BY',Sys_Context('NM3_SECURITY_CTX','USERNAME'));
    add_value_date (p_prefix||'_CREATED_DATE',c_sysdate);
-   add_value      (p_prefix||'_UPDATED_BY',c_user);
+   add_value      (p_prefix||'_UPDATED_BY',Sys_Context('NM3_SECURITY_CTX','USERNAME'));
    add_value_date (p_prefix||'_UPDATED_DATE',c_sysdate);
 --
    nm_debug.proc_end(g_package_name,'add_who_columns');
@@ -1895,7 +1891,7 @@ PROCEDURE add_fk_links_for_table (pi_table_name       VARCHAR2
          ,ac2.table_name
     FROM  all_constraints ac1
          ,all_constraints ac2
-   WHERE  ac1.owner             = g_application_owner
+   WHERE  ac1.owner             = Sys_Context('NM3CORE','APPLICATION_OWNER')
     AND   ac1.table_name        = c_table_name
     AND   ac1.constraint_type   = 'R'
     AND   ac1.r_owner           = ac2.owner
@@ -2100,7 +2096,7 @@ BEGIN
     BULK  COLLECT
     INTO  l_tab_cols
     FROM  all_cons_columns
-   WHERE  owner           = g_application_owner
+   WHERE  owner           = Sys_Context('NM3CORE','APPLICATION_OWNER')
     AND   constraint_name = p_constraint_name
    ORDER BY position;
 --
@@ -2185,7 +2181,7 @@ BEGIN
    l_column  := NVL(p_rec_hdtc.hdtc_column_source,p_rec_hdtc.hdtc_column_name);
 --
    l_sql :=            'SELECT '||l_column
-            ||CHR(10)||' FROM  '||g_application_owner||'.'||l_rec_hdt.hdt_table_name
+            ||CHR(10)||' FROM  '||Sys_Context('NM3CORE','APPLICATION_OWNER')||'.'||l_rec_hdt.hdt_table_name
             ||CHR(10)||'WHERE  ROWNUM=1';
 --
    DECLARE
@@ -2336,7 +2332,7 @@ BEGIN
             ||CHR(10)||'      ,value_col hdcv_value'
             ||CHR(10)||'      ,value_col hdcv_meaning'
             ||CHR(10)||' FROM (SELECT '||l_column||' value_col'
-            ||CHR(10)||'        FROM  '||g_application_owner||'.'||l_rec_hdt.hdt_table_name
+            ||CHR(10)||'        FROM  '||Sys_Context('NM3CORE','APPLICATION_OWNER')||'.'||l_rec_hdt.hdt_table_name
             ||CHR(10)||'       GROUP BY '||l_column
             ||CHR(10)||'      )'
             ||CHR(10)||'WHERE value_col IS NOT NULL'
