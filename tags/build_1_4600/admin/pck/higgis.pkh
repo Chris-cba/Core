@@ -1,0 +1,512 @@
+CREATE OR REPLACE PACKAGE higgis AS
+--<PACKAGE>
+--
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)higgis.pkh	1.23 03/08/06
+--       Module Name      : higgis.pkh
+--       Date into SCCS   : 06/03/08 16:18:44
+--       Date fetched Out : 07/06/13 14:10:34
+--       SCCS Version     : 1.23
+--
+--   A GIS package intended to handle all GIS theme and connection information
+--
+--   Author : Rob Coupe
+--
+--</PACKAGE>
+  /* SCCS ID keyword, do not remove */
+--<GLOBVAR>
+   g_sccsid	CONSTANT	varchar2(2000) := '"@(#)higgis.pkh	1.23 03/08/06"'; --'"@(#)higgis.pck	1.14 01/17/00"';
+-- g_sccsid is the SCCS_ID
+   gis_running_flag boolean := FALSE;
+   gis_appid        number;
+   gis_convid       number;
+
+   TYPE tab_gdo IS TABLE OF gis_data_objects%ROWTYPE INDEX BY binary_integer;
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="set_running">
+   PROCEDURE    set_running( appid IN number, convid IN number ) ;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_running">
+   FUNCTION     get_running RETURN boolean;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="stop_running">
+   PROCEDURE    stop_running;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_gis_dir">
+   FUNCTION     get_gis_dir RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_gis_project">
+   FUNCTION     get_gis_project RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_gis_start_string">
+   FUNCTION     get_gis_start_string RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_gis_prog">
+   FUNCTION     get_gis_prog  RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_gis_topic">
+   FUNCTION     get_gis_topic RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_gis_connection">
+   PROCEDURE    get_gis_connection( appid OUT number, convid OUT number ) ;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_session_id">
+   FUNCTION     get_session_id RETURN number;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_conv_id">
+   FUNCTION     get_conv_id RETURN number ;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="next_theme_id">
+   FUNCTION     next_theme_id RETURN number;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="set_convid">
+   PROCEDURE    set_convid( p_convid IN varchar2 );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_theme_name">
+   FUNCTION     get_theme_name( p_module_name IN varchar2, p_param_name IN varchar2 ) RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_theme_name">
+   FUNCTION     get_theme_name( p_gt_theme_id IN gis_themes_all.gt_theme_id%TYPE ) RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_theme_id">
+   FUNCTION     get_theme_id ( p_theme IN varchar2) RETURN number;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_route_theme">
+   PROCEDURE    get_route_theme( theme_id IN OUT number, theme_name IN OUT varchar2 ) ;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="update_object_ids">
+   PROCEDURE    update_object_ids( p_theme_id IN number, p_session_id IN number );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="update_feature_ids">
+   PROCEDURE    update_feature_ids( p_theme_id IN number, p_session_id IN number ) ;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_object_id">
+-- function     get_object_id ( p_session_id in number, p_f_id in number ) return number;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_feature_id">
+-- function     get_feature_id ( p_session_id in number, p_id in number ) return number ;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="fetch_sql">
+   FUNCTION     fetch_sql ( p_string IN varchar2 ) RETURN number;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="create_objects_from_nw">
+-- procedure    create_objects_from_nw ( p_session_id in number );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="pop_ids_from_feature">
+   PROCEDURE    pop_ids_from_feature (p_session_id IN number,  p_theme IN varchar2,  p_value IN varchar2);
+--
+   PROCEDURE    pop_ids_from_feature (p_session_id IN number,  p_theme_id IN number,  p_value IN varchar2);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="has_shape">
+-- This function returns TRUE if the specified NE_ID has a shape associated
+--  with it, otherwise returns FALSE
+--
+FUNCTION has_shape ( p_ne_id IN number ) RETURN boolean;
+-- Need a restrict_references here because function is overloaded
+PRAGMA RESTRICT_REFERENCES( has_shape, wnds );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="route_has_shape">
+-- This function returns TRUE if the specified route has AT LEAST ONE shape
+-- associated with it's members, otherwise returns FALSE.
+--
+FUNCTION route_has_shape(pi_ne_id IN nm_elements.ne_id%TYPE
+                        ) RETURN boolean;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="num_shapes_on_route">
+-- This function returns the number of sections that have shapes along a route.
+--
+FUNCTION num_shapes_on_route(pi_ne_id IN number
+                            ) RETURN pls_integer;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="num_shapes_in_se">
+-- This function returns the number of sections that have shapes in the
+-- specified saved extent.
+--
+FUNCTION num_shapes_in_se(pi_nse_id IN nm_saved_extents.nse_id%TYPE
+                         ) RETURN pls_integer;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_spatial_table">
+-- This function returns gt_feature_table from gis_themes_all where gt_route_theme = 'Y'
+--
+FUNCTION get_spatial_table RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_spatial_PK_column">
+-- This function returns gt_feature_pk_column from gis_themes_all where gt_route_theme = 'Y'
+--
+FUNCTION get_spatial_pk_column RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_gdo_for_session">
+-- Returns a PL/SQL table with all gis_data_objects rows for the specified
+-- GIS session ID.
+--
+FUNCTION get_gdo_for_session(pi_session_id IN gis_data_objects.gdo_session_id%TYPE
+                            ) RETURN tab_gdo;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_gt">
+PROCEDURE ins_gt (p_rec_gt nm_themes_all%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_gtf">
+PROCEDURE ins_gtf (p_rec_gtf nm_theme_functions_all%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_gthr">
+PROCEDURE ins_gthr (p_rec_gthr nm_theme_roles%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_theme_for_module">
+-- Returns the theme defined for the specified module restricted by pk
+-- membership if required.
+--
+FUNCTION get_theme_for_module(pi_module IN hig_modules.hmo_module%TYPE
+                             ,pi_pk_val IN gis_data_objects.gdo_pk_id%TYPE DEFAULT NULL
+                             ) RETURN gis_themes.gt_theme_id%TYPE;
+--
+-- Errors raised:
+--
+--   -20090, Module has more than 1 theme.
+--   -20091, Module has no themes.
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_theme_for_module">
+-- Returns the theme defined for the specified module.
+--
+FUNCTION get_nt(pi_nth_theme_id IN nm_themes_all.nth_theme_id%TYPE
+               ) RETURN nm_themes_all%ROWTYPE;
+--
+-- Errors raised:
+--
+--   -20092, Record not found
+--   -20001, PK query returned too many rows
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_theme_for_module">
+-- Returns the theme defined for the specified module.
+--
+FUNCTION get_gt(pi_gt_theme_id IN gis_themes.gt_theme_id%TYPE
+               ) RETURN gis_themes%ROWTYPE;
+--
+-- Errors raised:
+--
+--   -20092, Record not found
+--   -20001, PK query returned too many rows
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="pk_is_in_theme">
+-- Returns nm3type.c_true if pi_pk_val is in pi_theme_id, nm3type.c_false if
+-- not.
+--
+FUNCTION pk_is_in_theme(pi_theme_id IN gis_themes.gt_theme_id%TYPE
+                       ,pi_pk_val   IN gis_data_objects.gdo_pk_id%TYPE
+                       ) RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="set_nga">
+-- This procedure sets the current GIS area of interest
+--  (creates a row in nm_gis_area_of_interest)
+-- Pass NULL to specify the entire network as the area of interest
+--
+PROCEDURE set_nga (p_nse_id nm_saved_extents.nse_id%TYPE DEFAULT NULL);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nga">
+-- This function returns the NSE_ID of the saved extent which is
+--  the current GIS area of interest
+-- This will return NULL if there is no current area of interest (i.e. the full network)
+--
+FUNCTION get_nga RETURN nm_saved_extents.nse_id%TYPE;
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_user_mode_for_theme">
+--  This function returns the mode a user has for a specified GIS_THEME
+--   NORMAL will come out in preference to READONLY
+--
+FUNCTION get_user_mode_for_theme (pi_gt_theme_id gis_theme_roles.gthr_theme_id%TYPE
+                                 ,pi_user        hig_user_roles.hur_username%TYPE DEFAULT Sys_Context('NM3_SECURITY_CTX','USERNAME')
+                                 ) RETURN gis_theme_roles.gthr_mode%TYPE;
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="is_product_locatable_from_gis">
+-- Returns Y or N depending on whether or not the specified HIG_PRODUCT has the
+--  required code in nm3homo_gis to allow location of the item from within the GIS
+--
+FUNCTION is_product_locatable_from_gis (pi_hpr_product hig_products.hpr_product%TYPE
+                                       ) RETURN varchar2;
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_roi_name">
+FUNCTION get_roi_name  RETURN varchar2;
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_roi_descr">
+FUNCTION get_roi_descr RETURN varchar2;
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="create_gdo">
+-- Creates GIS_DATA_OBJECT records based on the same parameters as nm3extent.create_temp_ne
+--
+PROCEDURE create_gdo (pi_source_id                 IN     nm_pbi_query_results.nqr_source_id%TYPE
+                     ,pi_source                    IN     nm_pbi_query_results.nqr_source%TYPE
+                     ,pi_begin_mp                  IN     nm_members.nm_begin_mp%TYPE DEFAULT NULL
+                     ,pi_end_mp                    IN     nm_members.nm_end_mp%TYPE DEFAULT NULL
+                     ,pi_default_source_as_parent  IN     boolean DEFAULT FALSE
+                     ,pi_ignore_non_linear_parents IN     boolean DEFAULT FALSE
+                     ,pi_gt_theme_name             IN     gis_themes.gt_theme_name%TYPE
+                     ,po_gdo_session_id               OUT gis_data_objects.gdo_session_id%TYPE
+                     );
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="derive_das_table_from_gt">
+-- works out the DOC_GATEWAY from the GT_TABLE_NAME
+--
+FUNCTION derive_das_table_from_gt (p_gt_table_name  gis_themes.gt_table_name%TYPE
+                                  ,p_gt_hpr_product gis_themes.gt_hpr_product%TYPE
+                                  ) RETURN varchar2;
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_theme_links">
+--
+--  Populates arrays with details of any themes appropriate for the specified
+--  module, table and optionally column.
+--
+PROCEDURE get_theme_links(pi_module           IN     hig_modules.hmo_module%TYPE
+                         ,pi_table_name       IN     varchar2
+                         ,pi_col_name         IN     varchar2 DEFAULT NULL
+                         ,po_theme_id_tab        OUT nm3type.tab_number
+                         ,po_theme_name_tab      OUT nm3type.tab_varchar30
+                         ,po_theme_pk_col_tab    OUT nm3type.tab_varchar30
+                         );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="insert_gis_autonomous">
+--
+--   Inserts a record into gis_data_objects via an autonomous transaction
+--   useful when inserting from a from where yo do not want to commit
+--
+PROCEDURE insert_gis_autonomous(  p_gdo_session_id  IN      gis_data_objects.gdo_session_id%TYPE
+                                , p_gdo_pk_id       IN          gis_data_objects.gdo_pk_id%TYPE
+                                , p_gdo_rse_he_id   IN      gis_data_objects.gdo_rse_he_id%TYPE
+                                , p_gdo_st_chain    IN       gis_data_objects.gdo_st_chain%TYPE
+                                , p_gdo_end_chain   IN    gis_data_objects.gdo_end_chain%TYPE
+                                , p_gdo_x_val       IN         gis_data_objects.gdo_x_val%TYPE
+                                , p_gdo_y_val       IN         gis_data_objects.gdo_y_val%TYPE
+                                , p_gdo_theme_name  IN  gis_data_objects.gdo_theme_name%TYPE
+                                , p_gdo_feature_id  IN    gis_data_objects.gdo_feature_id%TYPE
+                                , p_gdo_xsp         IN           gis_data_objects.gdo_xsp%TYPE
+                                , p_gdo_offset      IN       gis_data_objects.gdo_offset%TYPE
+                                , p_gdo_seq_no      IN       gis_data_objects.gdo_seq_no%TYPE );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--
+--<FUNCTION NAME="get_inv_module_theme">
+--
+--
+FUNCTION get_inv_module_theme ( pi_module IN VARCHAR2,
+                                pi_inv_type IN VARCHAR2 ) RETURN nm_theme_array;
+
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--
+--<FUNCTION NAME="get_dynamic_theme_query">
+--
+--
+FUNCTION get_dynamic_theme_query ( pi_session_id in gis_data_objects.gdo_session_id%type ) return varchar2;
+--
+-----------------------------------------------------------------------------
+--<PROC NAME="get_themes_for_ne_id">
+PROCEDURE get_themes_for_ne_id
+            ( pi_ne_id          IN     nm_elements.ne_id%TYPE
+            , pi_module         IN     hig_modules.hmo_module%TYPE
+            , pi_join_to_msv    IN     BOOLEAN
+            , po_nth_theme_id      OUT NUMBER
+            , po_lov_sql           OUT VARCHAR2
+            , po_found_true_nth    OUT BOOLEAN );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PRAGMA>
+   PRAGMA RESTRICT_REFERENCES( get_version, wnds );
+   PRAGMA RESTRICT_REFERENCES( get_body_version, wnds );
+   PRAGMA RESTRICT_REFERENCES( next_theme_id, wnds );
+   PRAGMA RESTRICT_REFERENCES( get_conv_id, wnds );
+   PRAGMA RESTRICT_REFERENCES( get_session_id, wnds );
+   PRAGMA RESTRICT_REFERENCES( get_gis_start_string, wnds );
+   PRAGMA RESTRICT_REFERENCES( get_gis_project,wnds );
+   PRAGMA RESTRICT_REFERENCES( get_gis_prog, wnds );
+   PRAGMA RESTRICT_REFERENCES( get_gis_topic, wnds );
+   PRAGMA RESTRICT_REFERENCES( get_gis_dir, wnds );
+   PRAGMA RESTRICT_REFERENCES( get_running, wnds );
+   PRAGMA RESTRICT_REFERENCES( get_theme_name, wnds );
+   PRAGMA RESTRICT_REFERENCES( has_shape, wnds );
+   PRAGMA RESTRICT_REFERENCES( num_shapes_on_route, wnds);
+   PRAGMA RESTRICT_REFERENCES( num_shapes_in_se, wnds);
+   PRAGMA RESTRICT_REFERENCES( get_spatial_table, wnds );
+   PRAGMA RESTRICT_REFERENCES( get_spatial_pk_column, wnds );
+   PRAGMA RESTRICT_REFERENCES( get_gdo_for_session, wnds, wnps, rnps);
+   PRAGMA RESTRICT_REFERENCES( get_theme_for_module, wnds);
+   PRAGMA RESTRICT_REFERENCES( get_gt, wnds);
+   PRAGMA RESTRICT_REFERENCES( pk_is_in_theme, wnds);
+   PRAGMA RESTRICT_REFERENCES( get_nga, wnds);
+--</PRAGMA>
+
+END;
+/
