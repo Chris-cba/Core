@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3jobs AS
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3jobs.pkb-arc   3.11   Mar 16 2011 17:34:24   Chris.Strettle  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3jobs.pkb-arc   3.12   May 16 2011 14:44:58   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3jobs.pkb  $
---       Date into PVCS   : $Date:   Mar 16 2011 17:34:24  $
---       Date fetched Out : $Modtime:   Mar 16 2011 17:18:00  $
---       PVCS Version     : $Revision:   3.11  $
+--       Date into PVCS   : $Date:   May 16 2011 14:44:58  $
+--       Date fetched Out : $Modtime:   May 05 2011 09:25:18  $
+--       PVCS Version     : $Revision:   3.12  $
 --
 --   NM3 DBMS_SCHEDULER wrapper
 --
@@ -23,7 +23,7 @@ CREATE OR REPLACE PACKAGE BODY nm3jobs AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid          CONSTANT VARCHAR2(2000) :='"$Revision:   3.11  $"';
+  g_body_sccsid          CONSTANT VARCHAR2(2000) :='"$Revision:   3.12  $"';
   g_package_name         CONSTANT VARCHAR2(30)   := 'nm3jobs';
   ex_resource_busy                EXCEPTION;
   g_default_comment               VARCHAR2(500)  := 'Created by nm3job ';
@@ -81,7 +81,7 @@ CREATE OR REPLACE PACKAGE BODY nm3jobs AS
    WHERE log_id = (SELECT MAX(log_id) 
                      FROM dba_scheduler_job_run_details
                     WHERE job_name = pi_job_name
-                      AND owner = USER);
+                      AND owner = Sys_Context('NM3_SECURITY_CTX','USERNAME'));
     RETURN retval;
   EXCEPTION
     WHEN NO_DATA_FOUND THEN RETURN NULL;
@@ -92,7 +92,7 @@ CREATE OR REPLACE PACKAGE BODY nm3jobs AS
   PROCEDURE create_job
               ( pi_job_name        IN VARCHAR2
               , pi_job_action      IN VARCHAR2
-              , pi_job_owner       IN VARCHAR2  DEFAULT USER
+              , pi_job_owner       IN VARCHAR2  DEFAULT Sys_Context('NM3_SECURITY_CTX','USERNAME')
               , pi_repeat_interval IN VARCHAR2  DEFAULT g_midnight
               , pi_comments        IN VARCHAR2  DEFAULT NULL
               , pi_job_type        IN VARCHAR2  DEFAULT 'PLSQL_BLOCK'
@@ -137,7 +137,7 @@ CREATE OR REPLACE PACKAGE BODY nm3jobs AS
          , auto_drop       => pi_auto_drop
          , comments        => NVL(pi_comments,g_default_comment
                                            ||' at '||SYSDATE
-                                           ||' for '||USER )
+                                           ||' for '||pi_job_owner )
           );
     ELSE
     --
@@ -154,7 +154,7 @@ CREATE OR REPLACE PACKAGE BODY nm3jobs AS
          , auto_drop           => pi_auto_drop
          , comments            => NVL(pi_comments,g_default_comment
                                            ||' at '||SYSDATE
-                                           ||' for '||USER )
+                                           ||' for '||pi_job_owner )
          );
     --
       FOR args IN 1..g_args.COUNT

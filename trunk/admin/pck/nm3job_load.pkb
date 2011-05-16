@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY nm3job_load AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3job_load.pkb-arc   2.1   Jan 06 2010 16:38:36   cstrettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3job_load.pkb-arc   2.2   May 16 2011 14:44:58   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3job_load.pkb  $
---       Date into PVCS   : $Date:   Jan 06 2010 16:38:36  $
---       Date fetched Out : $Modtime:   Jan 06 2010 11:00:12  $
---       Version          : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   May 16 2011 14:44:58  $
+--       Date fetched Out : $Modtime:   Apr 01 2011 13:49:26  $
+--       Version          : $Revision:   2.2  $
 --       Based on SCCS version : 1.2
 -------------------------------------------------------------------------
 --   Author : Jonathan Mills
@@ -22,10 +22,9 @@ CREATE OR REPLACE PACKAGE BODY nm3job_load AS
 --
 --  g_body_sccsid is the SCCS ID for the package body
 --
-   g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.1  $';
+   g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.2  $';
    g_package_name    CONSTANT  varchar2(30)   := 'nm3job_load';
 --
-   c_app_owner       CONSTANT  VARCHAR2(30)   := hig.get_application_owner;
    stp_is_licensed   CONSTANT  BOOLEAN        := hig.is_product_licensed (nm3type.c_stp);
    c_xsp             CONSTANT  VARCHAR2(3)    := 'XSP';
 --
@@ -52,7 +51,7 @@ PROCEDURE load_or_validate_njc (p_rec           IN OUT nm_job_control%ROWTYPE
    l_rec_njt    nm_job_types%ROWTYPE;
    l_nte_job_id nm_nw_temp_extents.nte_job_id%TYPE;
 --
-   c_eff_date CONSTANT DATE := nm3user.get_effective_date;
+   c_eff_date CONSTANT DATE := To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY');
    l_pl_arr   nm_placement_array;
 --
    PROCEDURE set_for_return IS
@@ -249,9 +248,9 @@ BEGIN
 --
    l_rec_nmo := nm3get.get_nmo (pi_nmo_operation => pi_nmo_operation);
 --
-   append_view   ('CREATE OR REPLACE FORCE VIEW '||c_app_owner||'.'||c_view_name||' AS');
-   append_header ('CREATE OR REPLACE PACKAGE '||c_app_owner||'.'||c_package_name||' IS');
-   append_body   ('CREATE OR REPLACE PACKAGE BODY '||c_app_owner||'.'||c_package_name||' IS');
+   append_view   ('CREATE OR REPLACE FORCE VIEW '||Sys_Context('NM3CORE','APPLICATION_OWNER')||'.'||c_view_name||' AS');
+   append_header ('CREATE OR REPLACE PACKAGE '||Sys_Context('NM3CORE','APPLICATION_OWNER')||'.'||c_package_name||' IS');
+   append_body   ('CREATE OR REPLACE PACKAGE BODY '||Sys_Context('NM3CORE','APPLICATION_OWNER')||'.'||c_package_name||' IS');
    append_view   ('SELECT');
    append_header ('--<PACKAGE>');
    append_all_3  ('--');
@@ -641,7 +640,7 @@ BEGIN
    l_rec_nlf.nlf_descr              := l_rec_nmo.nmo_descr;
    l_rec_nlf.nlf_path               := hig.get_sysopt('UTLFILEDIR');
    l_rec_nlf.nlf_delimiter          := get_default_delimiter;
-   l_rec_nlf.nlf_date_format_mask   := nm3user.get_user_date_mask;
+   l_rec_nlf.nlf_date_format_mask   := Sys_Context('NM3CORE','USER_DATE_MASK');
    l_rec_nlf.nlf_holding_table      := Null;
    --
    nm3ins.ins_nlf (p_rec_nlf => l_rec_nlf);
@@ -658,7 +657,7 @@ BEGIN
 --
    FOR cs_rec IN (SELECT *
                    FROM  all_tab_columns
-                  WHERE  owner      = c_app_owner
+                  WHERE  owner      = Sys_Context('NM3CORE','APPLICATION_OWNER')
                    AND   table_name = c_view_name
                   ORDER BY column_id
                  )

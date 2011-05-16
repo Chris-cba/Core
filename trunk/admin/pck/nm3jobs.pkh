@@ -5,11 +5,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3jobs.pkh-arc   3.5   Mar 16 2011 17:34:26   Chris.Strettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3jobs.pkh-arc   3.6   May 16 2011 14:44:58   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3jobs.pkh  $
---       Date into PVCS   : $Date:   Mar 16 2011 17:34:26  $
---       Date fetched Out : $Modtime:   Mar 16 2011 17:31:04  $
---       Version          : $Revision:   3.5  $
+--       Date into PVCS   : $Date:   May 16 2011 14:44:58  $
+--       Date fetched Out : $Modtime:   May 05 2011 09:23:28  $
+--       Version          : $Revision:   3.6  $
 --       Based on SCCS version : 1.21
 -------------------------------------------------------------------------
 --   Author : A Edwards
@@ -25,7 +25,7 @@ AS
 --<GLOBVAR>
 -- g_sccsid is the SCCS_ID
 -- Constants
-  g_sccsid           CONSTANT VARCHAR2(80) := '"$Revision:   3.5  $"';
+  g_sccsid           CONSTANT VARCHAR2(80) := '"$Revision:   3.6  $"';
 --
 -- Some invervals
 --
@@ -81,7 +81,7 @@ AS
   PROCEDURE create_job
               ( pi_job_name        IN VARCHAR2
               , pi_job_action      IN VARCHAR2
-              , pi_job_owner       IN VARCHAR2  DEFAULT USER
+              , pi_job_owner       IN VARCHAR2  DEFAULT Sys_Context('NM3_SECURITY_CTX','USERNAME')
               , pi_repeat_interval IN VARCHAR2  DEFAULT g_midnight
               , pi_comments        IN VARCHAR2  DEFAULT NULL
               , pi_job_type        IN VARCHAR2  DEFAULT 'PLSQL_BLOCK'

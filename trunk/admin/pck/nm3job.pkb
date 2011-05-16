@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3job AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3job.pkb-arc   2.2   Mar 31 2009 10:33:32   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3job.pkb-arc   2.3   May 16 2011 14:44:58   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3job.pkb  $
---       Date into PVCS   : $Date:   Mar 31 2009 10:33:32  $
---       Date fetched Out : $Modtime:   Mar 31 2009 10:33:14  $
---       PVCS Version     : $Revision:   2.2  $
+--       Date into PVCS   : $Date:   May 16 2011 14:44:58  $
+--       Date fetched Out : $Modtime:   May 05 2011 09:21:56  $
+--       PVCS Version     : $Revision:   2.3  $
 
 --       Based on SCCS Version     : 1.19
 --
@@ -25,7 +25,7 @@ CREATE OR REPLACE PACKAGE BODY nm3job AS
 --
 -- g_body_sccsid is the SCCS ID for the package body
 
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.2  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.3  $"';
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3job';
 
@@ -361,7 +361,7 @@ PROCEDURE split_inv_for_njc (pi_njc_job_id nm_job_control.njc_job_id%TYPE) IS
    l_npe_job_id nm_nw_persistent_extents.npe_job_id%TYPE;
    l_rec_njt    nm_job_types%ROWTYPE;
 --
-   c_eff_date   CONSTANT date := nm3user.get_effective_date;
+   c_eff_date   CONSTANT date := To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY');
 --
 BEGIN
 --
@@ -1467,7 +1467,7 @@ END get_max_seq_for_njc;
 --
 FUNCTION get_default_njc_unique(pi_njc_job_id IN nm_job_control.njc_job_id%TYPE
                                ,pi_njt_type   IN nm_job_types.njt_type%TYPE
-                               ,pi_username   IN user_users.username%TYPE DEFAULT USER
+                               ,pi_username   IN user_users.username%TYPE DEFAULT Sys_Context('NM3_SECURITY_CTX','USERNAME')
                                 ) RETURN nm_job_control.njc_unique%TYPE IS
 BEGIN
   nm_debug.proc_start(p_package_name   => g_package_name
@@ -1488,7 +1488,7 @@ PROCEDURE build_and_run_njc (pi_njc_unique         IN     nm_job_control.njc_uni
                             ,pi_njc_route_ne_id    IN     nm_job_control.njc_route_ne_id%TYPE
                             ,pi_njc_route_begin_mp IN     nm_job_control.njc_route_begin_mp%TYPE
                             ,pi_njc_route_end_mp   IN     nm_job_control.njc_route_end_mp%TYPE
-                            ,pi_njc_effective_date IN     nm_job_control.njc_effective_date%TYPE DEFAULT nm3user.get_effective_date
+                            ,pi_njc_effective_date IN     nm_job_control.njc_effective_date%TYPE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                             ,pi_tab_rec_njo        IN     tab_rec_njo
                             ,pi_tab_rec_njv        IN     tab_rec_njv
                             ,po_njc_job_id            OUT nm_job_control.njc_job_id%TYPE
@@ -1554,7 +1554,7 @@ PROCEDURE build_and_run_njc (pi_njc_unique         IN     nm_job_control.njc_uni
                             ,pi_njc_route_ne_id    IN     nm_job_control.njc_route_ne_id%TYPE
                             ,pi_njc_route_begin_mp IN     nm_job_control.njc_route_begin_mp%TYPE
                             ,pi_njc_route_end_mp   IN     nm_job_control.njc_route_end_mp%TYPE
-                            ,pi_njc_effective_date IN     nm_job_control.njc_effective_date%TYPE DEFAULT nm3user.get_effective_date
+                            ,pi_njc_effective_date IN     nm_job_control.njc_effective_date%TYPE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                             ,pi_tab_rec_njo        IN     tab_rec_njo
                             ,pi_tab_rec_njv        IN     tab_rec_njv
                             ) IS
@@ -1581,7 +1581,7 @@ FUNCTION  build_and_run_njc (pi_njc_unique         IN     nm_job_control.njc_uni
                             ,pi_njc_route_ne_id    IN     nm_job_control.njc_route_ne_id%TYPE
                             ,pi_njc_route_begin_mp IN     nm_job_control.njc_route_begin_mp%TYPE
                             ,pi_njc_route_end_mp   IN     nm_job_control.njc_route_end_mp%TYPE
-                            ,pi_njc_effective_date IN     nm_job_control.njc_effective_date%TYPE DEFAULT nm3user.get_effective_date
+                            ,pi_njc_effective_date IN     nm_job_control.njc_effective_date%TYPE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                             ,pi_tab_rec_njo        IN     tab_rec_njo
                             ,pi_tab_rec_njv        IN     tab_rec_njv
                             ) RETURN nm_job_control.njc_job_id%TYPE IS

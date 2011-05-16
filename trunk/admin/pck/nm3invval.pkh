@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE Nm3invval IS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3invval.pkh-arc   2.5   Sep 06 2010 14:07:06   Chris.Strettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3invval.pkh-arc   2.6   May 16 2011 14:44:58   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3invval.pkh  $
---       Date into PVCS   : $Date:   Sep 06 2010 14:07:06  $
---       Date fetched Out : $Modtime:   Sep 06 2010 10:41:58  $
---       Version          : $Revision:   2.5  $
+--       Date into PVCS   : $Date:   May 16 2011 14:44:58  $
+--       Date fetched Out : $Modtime:   Apr 01 2011 09:19:46  $
+--       Version          : $Revision:   2.6  $
 --       Based on SCCS version : 1.13
 -------------------------------------------------------------------------
 --
@@ -22,7 +22,7 @@ CREATE OR REPLACE PACKAGE Nm3invval IS
 --</PACKAGE>
 --
 --<GLOBVAR>
-  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.5  $';
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.6  $';
 --
    TYPE tab_nin IS TABLE OF nm_inv_nw%ROWTYPE INDEX BY BINARY_INTEGER;
 --
@@ -291,7 +291,7 @@ PROCEDURE clear_excl_check_tab;
 --<PROC NAME="datetrack_update_au_for_invmem">
 PROCEDURE datetrack_update_au_for_invmem (p_iit_ne_id      nm_inv_items.iit_ne_id%TYPE
                                          ,p_iit_admin_unit nm_inv_items.iit_admin_unit%TYPE
-                                         ,p_effective_date nm_inv_items.iit_start_date%TYPE DEFAULT nm3user.get_effective_date
+                                         ,p_effective_date nm_inv_items.iit_start_date%TYPE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                                          );
 --</PROC>
 --

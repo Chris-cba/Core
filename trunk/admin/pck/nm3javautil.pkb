@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY nm3javautil AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3javautil.pkb-arc   2.1   Jan 06 2010 16:38:36   cstrettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3javautil.pkb-arc   2.2   May 16 2011 14:44:58   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3javautil.pkb  $
---       Date into PVCS   : $Date:   Jan 06 2010 16:38:36  $
---       Date fetched Out : $Modtime:   Jan 06 2010 11:00:30  $
---       Version          : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   May 16 2011 14:44:58  $
+--       Date fetched Out : $Modtime:   May 05 2011 09:19:44  $
+--       Version          : $Revision:   2.2  $
 --       Based on SCCS version : 1.6
 -------------------------------------------------------------------------
 --   Author : I Turnbull
@@ -21,7 +21,7 @@ CREATE OR REPLACE PACKAGE BODY nm3javautil AS
 --all global package variables here
 
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.1  $';
+  g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.2  $';
   g_package_name CONSTANT VARCHAR2(30) := 'nm3javautil';
 --
    c_dirrepstrn CONSTANT VARCHAR2(1) := hig.get_sysopt(p_option_id => 'DIRREPSTRN');  
@@ -107,7 +107,7 @@ END revoke_exec_privs;
 -----------------------------------------------------------------------------
 --
 PROCEDURE exec_sde_bat_file( pi_filename VARCHAR2
-                            ,pi_username VARCHAR2 DEFAULT USER 
+                            ,pi_username VARCHAR2 DEFAULT Sys_Context('NM3_SECURITY_CTX','USERNAME') 
                            )
 IS 
   l_sdebatdir HIG_OPTIONS.hop_value%TYPE;
