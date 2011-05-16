@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY nm3homo_o AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3homo_o.pkb-arc   2.1   Jan 06 2010 16:38:26   cstrettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3homo_o.pkb-arc   2.2   May 16 2011 14:44:52   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3homo_o.pkb  $
---       Date into PVCS   : $Date:   Jan 06 2010 16:38:26  $
---       Date fetched Out : $Modtime:   Jan 06 2010 11:35:46  $
---       Version          : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   May 16 2011 14:44:52  $
+--       Date fetched Out : $Modtime:   Apr 01 2011 12:01:28  $
+--       Version          : $Revision:   2.2  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --   Author : Jonathan Mills
@@ -21,7 +21,7 @@ CREATE OR REPLACE PACKAGE BODY nm3homo_o AS
 --all global package variables here
 --
 --  g_body_sccsid is the SCCS ID for the package body
-   g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.1  $';
+   g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.2  $';
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3homo_o';
 --
@@ -85,7 +85,7 @@ END get_inv_in_pl_by_obj_type;
 PROCEDURE end_location_by_pl_and_objtype
                        (p_placement_array  nm_placement_array
                        ,p_nm_obj_type      nm_members.nm_obj_type%TYPE
-                       ,p_effective_date   DATE DEFAULT nm3user.get_effective_date
+                       ,p_effective_date   DATE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                        ) IS
 --
    l_tab_ne_id_in nm3type.tab_number;
@@ -109,7 +109,7 @@ END end_location_by_pl_and_objtype;
 --
 PROCEDURE end_inv_location_in_pl (p_nm_ne_id_in      nm_members.nm_ne_id_in%TYPE
                                  ,p_placement_array  nm_placement_array
-                                 ,p_effective_date   DATE DEFAULT nm3user.get_effective_date
+                                 ,p_effective_date   DATE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                                  ) IS
 --
    l_pl_before nm_placement_array := nm3pla.initialise_placement_array;
@@ -165,10 +165,10 @@ END end_inv_location_in_pl;
 --
 PROCEDURE relocate_inv_at_pl (p_nm_ne_id_in      nm_members.nm_ne_id_in%TYPE
                              ,p_placement_array  nm_placement_array
-                             ,p_effective_date   DATE DEFAULT nm3user.get_effective_date
+                             ,p_effective_date   DATE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                              ) IS
 --
-   c_effective_date  CONSTANT DATE := nm3user.get_effective_date;
+   c_effective_date  CONSTANT DATE := To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY');
 --
    l_pl              nm_placement;
    l_rec_iit         nm_inv_items%ROWTYPE;
@@ -322,7 +322,7 @@ END relocate_inv_at_pl;
 --
 FUNCTION future_affected_inv_exists (p_placement_array nm_placement_array
                                     ,p_inv_type        nm_members.nm_obj_type%TYPE
-                                    ,p_effective_date  DATE DEFAULT nm3user.get_effective_date
+                                    ,p_effective_date  DATE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                                     ) RETURN BOOLEAN IS
 BEGIN
 --
@@ -337,7 +337,7 @@ END future_affected_inv_exists;
 --
 FUNCTION future_affected_inv_exists (p_placement_array nm_placement_array
                                     ,p_iit_ne_id       nm_members.nm_ne_id_in%TYPE
-                                    ,p_effective_date  DATE DEFAULT nm3user.get_effective_date
+                                    ,p_effective_date  DATE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                                     ) RETURN BOOLEAN IS
 BEGIN
 --
@@ -352,7 +352,7 @@ END future_affected_inv_exists;
 --
 FUNCTION get_future_affected_inv (p_placement_array nm_placement_array
                                  ,p_inv_type        nm_members.nm_obj_type%TYPE
-                                 ,p_effective_date  DATE DEFAULT nm3user.get_effective_date
+                                 ,p_effective_date  DATE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                                  ) RETURN nm3type.tab_number IS
 --
    CURSOR cs_future_affected_inv
@@ -392,7 +392,7 @@ END get_future_affected_inv;
 --
 FUNCTION get_future_affected_inv (p_placement_array nm_placement_array
                                  ,p_iit_ne_id       nm_members.nm_ne_id_in%TYPE
-                                 ,p_effective_date  DATE DEFAULT nm3user.get_effective_date
+                                 ,p_effective_date  DATE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                                  ) RETURN nm3type.tab_rowid IS
 --
    CURSOR cs_future_affected_inv

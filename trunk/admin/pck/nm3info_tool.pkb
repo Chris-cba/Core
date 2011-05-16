@@ -3,11 +3,11 @@ AS
   -------------------------------------------------------------------------
   --   PVCS Identifiers :-
   --
-  --       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3info_tool.pkb-arc   3.1   May 20 2010 14:07:40   cstrettle  $
+  --       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3info_tool.pkb-arc   3.2   May 16 2011 14:44:52   Steve.Cooper  $
   --       Module Name      : $Workfile:   nm3info_tool.pkb  $
-  --       Date into PVCS   : $Date:   May 20 2010 14:07:40  $
-  --       Date fetched Out : $Modtime:   May 20 2010 14:04:08  $
-  --       Version          : $Revision:   3.1  $
+  --       Date into PVCS   : $Date:   May 16 2011 14:44:52  $
+  --       Date fetched Out : $Modtime:   Apr 01 2011 09:57:24  $
+  --       Version          : $Revision:   3.2  $
   --       Based on SCCS version :
   -------------------------------------------------------------------------
   --
@@ -17,13 +17,11 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid   CONSTANT VARCHAR2(2000) := '$Revision:   3.1  $';
+  g_body_sccsid   CONSTANT VARCHAR2(2000) := '$Revision:   3.2  $';
   g_package_name  CONSTANT VARCHAR2(30) := 'nm3info_tool';
   g_inv_attrs     nm3inv.tab_nita;
   g_is_ft         BOOLEAN; -- is the query a ft query
   l_sql           nm3type.tab_varchar32767;
-  c_date_format CONSTANT VARCHAR2(30)
-      := nm3context.get_context(pi_attribute => 'USER_DATE_MASK') ;
 
   --
   -----------------------------------------------------------------------------
@@ -546,10 +544,10 @@ AS
         END IF;
       ELSIF l_datatype(i) = 'DATE' THEN
         IF i = 1 THEN
-          add('  TO_CHAR(' || l_attrib_name(i) || ', ''' || c_date_format
+          add('  TO_CHAR(' || l_attrib_name(i) || ', ''' || Sys_Context('NM3CORE','USER_DATE_MASK')
               || ''') AS ' || l_attrib_name(i));
         ELSE
-          add(', TO_CHAR(' || l_attrib_name(i) || ', ''' || c_date_format
+          add(', TO_CHAR(' || l_attrib_name(i) || ', ''' || Sys_Context('NM3CORE','USER_DATE_MASK')
               || ''') AS ' || l_attrib_name(i));
         END IF;
       END IF;

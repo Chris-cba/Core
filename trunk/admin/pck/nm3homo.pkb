@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3homo AS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3homo.pkb-arc   2.18   Aug 03 2010 16:25:54   aedwards  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3homo.pkb-arc   2.19   May 16 2011 14:44:52   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3homo.pkb  $
---       Date into PVCS   : $Date:   Aug 03 2010 16:25:54  $
---       Date fetched Out : $Modtime:   Aug 03 2010 16:25:28  $
---       PVCS Version     : $Revision:   2.18  $
+--       Date into PVCS   : $Date:   May 16 2011 14:44:52  $
+--       Date fetched Out : $Modtime:   Apr 01 2011 09:27:48  $
+--       PVCS Version     : $Revision:   2.19  $
 --
 --
 --   Author : Jonathan Mills
@@ -40,7 +40,7 @@ CREATE OR REPLACE PACKAGE BODY nm3homo AS
    
    -- Log 713421
    
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.18  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.19  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3homo';
@@ -104,7 +104,7 @@ PROCEDURE deal_with_hierarchical (p_ne_id          NUMBER
 -----------------------------------------------------------------------------
 --
 PROCEDURE check_item_has_no_future_locs (p_iit_ne_id      nm_inv_items.iit_ne_id%TYPE
-                                        ,p_effective_date DATE DEFAULT nm3user.get_effective_date
+                                        ,p_effective_date DATE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                                         );
 --
 -----------------------------------------------------------------------------
@@ -144,7 +144,7 @@ END hist_loc_enabled;
 --
 PROCEDURE homo_update (p_temp_ne_id_in  IN NUMBER
                       ,p_iit_ne_id      IN NUMBER
-                      ,p_effective_date IN DATE DEFAULT nm3user.get_effective_date
+                      ,p_effective_date IN DATE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                       ) IS
 --
    l_warning_code VARCHAR2(30);
@@ -182,7 +182,7 @@ END homo_update;
 --
 PROCEDURE homo_update_old (p_temp_ne_id_in  IN     NUMBER
                       ,p_iit_ne_id      IN     NUMBER
-                      ,p_effective_date IN     DATE DEFAULT nm3user.get_effective_date
+                      ,p_effective_date IN     DATE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                       ,p_warning_code      OUT VARCHAR2
                       ,p_warning_msg       OUT VARCHAR2
                       ) IS
@@ -250,7 +250,7 @@ PROCEDURE homo_update_old (p_temp_ne_id_in  IN     NUMBER
    l_inv_orig_location NM_PLACEMENT_ARRAY := nm3pla.initialise_placement_array;
    l_new_inv_location  NM_PLACEMENT_ARRAY := nm3pla.initialise_placement_array;
 --
-   c_initial_effective_date CONSTANT DATE := nm3user.get_effective_date;
+   c_initial_effective_date CONSTANT DATE := To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY');
 --
    l_rec_nin    NM_INV_NW%ROWTYPE;
    l_rec_nit    NM_INV_TYPES%ROWTYPE;
@@ -508,7 +508,7 @@ BEGIN
        THEN
          hig.raise_ner (pi_appl               => nm3type.c_hig
                        ,pi_id                 => 67
-                       ,pi_supplementary_info => 'NM_ELEMENTS : Effective Date : '||TO_CHAR(p_effective_date,nm3user.get_user_date_mask)
+                       ,pi_supplementary_info => 'NM_ELEMENTS : Effective Date : '||TO_CHAR(p_effective_date,Sys_Context('NM3CORE','USER_DATE_MASK'))
                        );
 --         g_homo_exc_code := -20510;
 --         g_homo_exc_msg  := 'No NM_ELEMENTS record found for NE_ID "'||l_new_first_pl.pl_ne_id||'"';
@@ -3339,7 +3339,7 @@ END coalesce_members_chunks;
 --
 PROCEDURE homo_update_hist(p_temp_ne_id_in  IN     NUMBER
                           ,p_iit_ne_id      IN     NUMBER
-                          ,p_effective_date IN     DATE DEFAULT nm3user.get_effective_date
+                          ,p_effective_date IN     DATE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                           ,p_warning_code      OUT VARCHAR2
                           ,p_warning_msg       OUT VARCHAR2
                           ) IS
@@ -3348,7 +3348,7 @@ PROCEDURE homo_update_hist(p_temp_ne_id_in  IN     NUMBER
   c_nte_id                    CONSTANT NM_NW_TEMP_EXTENTS.nte_job_id%TYPE := create_duplicate_nte(pi_nte_id => p_temp_ne_id_in);
   c_nte_id_for_unchanged_locs CONSTANT NM_NW_TEMP_EXTENTS.nte_job_id%TYPE := nm3net.get_next_nte_id;
   
-  c_initial_effective_date    CONSTANT date := nm3user.get_effective_date;
+  c_initial_effective_date    CONSTANT date := To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY');
   
   l_inv_orig_location NM_PLACEMENT_ARRAY := nm3pla.initialise_placement_array;
   l_new_inv_location  NM_PLACEMENT_ARRAY := nm3pla.initialise_placement_array;
@@ -3607,7 +3607,7 @@ BEGIN
        THEN
          hig.raise_ner (pi_appl               => nm3type.c_hig
                        ,pi_id                 => 67
-                       ,pi_supplementary_info => 'NM_ELEMENTS : Effective Date : '||TO_CHAR(p_effective_date,nm3user.get_user_date_mask)
+                       ,pi_supplementary_info => 'NM_ELEMENTS : Effective Date : '||TO_CHAR(p_effective_date,Sys_Context('NM3CORE','USER_DATE_MASK'))
                        );
 --         g_homo_exc_code := -20510;
 --         g_homo_exc_msg  := 'No NM_ELEMENTS record found for NE_ID "'||l_new_first_pl.pl_ne_id||'"';
@@ -4224,7 +4224,7 @@ END homo_update_hist;
 --
 PROCEDURE homo_update(p_temp_ne_id_in  IN     number
                      ,p_iit_ne_id      IN     number
-                     ,p_effective_date IN     date DEFAULT nm3user.get_effective_date
+                     ,p_effective_date IN     date DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                      ,p_warning_code      OUT varchar2
                      ,p_warning_msg       OUT varchar2
                      ) IS
@@ -4552,14 +4552,14 @@ END get_seq_no_from_orig;
 -----------------------------------------------------------------------------
 --
 PROCEDURE end_inv_location(pi_iit_ne_id            IN     NM_INV_ITEMS.iit_ne_id%TYPE
-                          ,pi_effective_date       IN     DATE DEFAULT nm3user.get_effective_date
+                          ,pi_effective_date       IN     DATE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                           ,pi_check_for_parent     IN     BOOLEAN DEFAULT TRUE
                           ,pi_ignore_item_loc_mand IN     BOOLEAN DEFAULT FALSE
                           ,po_warning_code            OUT VARCHAR2
                           ,po_warning_msg             OUT VARCHAR2
                           ) IS
 --
-   c_initial_effective_date CONSTANT DATE := nm3user.get_effective_date;
+   c_initial_effective_date CONSTANT DATE := To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY');
 --
    l_nte_job_id NM_NW_TEMP_EXTENTS.nte_job_id%TYPE;
 --
@@ -4605,7 +4605,7 @@ END end_inv_location;
 --
 PROCEDURE end_inv_location_by_temp_ne (pi_iit_ne_id            IN     NM_INV_ITEMS.iit_ne_id%TYPE
                                       ,pi_nte_job_id           IN     NM_NW_TEMP_EXTENTS.nte_job_id%TYPE
-                                      ,pi_effective_date       IN     DATE DEFAULT nm3user.get_effective_date
+                                      ,pi_effective_date       IN     DATE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                                       ,pi_check_for_parent     IN     BOOLEAN DEFAULT TRUE
                                       ,pi_ignore_item_loc_mand IN     BOOLEAN DEFAULT FALSE
                                       ,pi_leave_child_items    IN     BOOLEAN DEFAULT FALSE
@@ -4655,7 +4655,7 @@ PROCEDURE end_inv_location_by_temp_ne (pi_iit_ne_id            IN     NM_INV_ITE
    AND     iig.iig_item_id   = iit_ne_id
    AND     iit_inv_type = nin.nin_nit_inv_code(+);
 --
-   c_initial_effective_date CONSTANT DATE := nm3user.get_effective_date;
+   c_initial_effective_date CONSTANT DATE := To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY');
 --
    l_warning_code VARCHAR2(2000);
    l_warning_msg  VARCHAR2(2000);
@@ -4979,7 +4979,7 @@ END end_inv_location_by_temp_ne;
 --
 FUNCTION future_affected_inv_exists (p_nte_job_id     NM_NW_TEMP_EXTENTS.nte_job_id%TYPE
                                     ,p_inv_type       NM_MEMBERS.nm_obj_type%TYPE
-                                    ,p_effective_date DATE DEFAULT nm3user.get_effective_date
+                                    ,p_effective_date DATE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                                     ) RETURN BOOLEAN IS
 BEGIN
    RETURN get_future_affected_inv (p_nte_job_id
@@ -4992,7 +4992,7 @@ END future_affected_inv_exists;
 --
 FUNCTION get_future_affected_inv (p_nte_job_id     NM_NW_TEMP_EXTENTS.nte_job_id%TYPE
                                  ,p_inv_type       NM_MEMBERS.nm_obj_type%TYPE
-                                 ,p_effective_date DATE DEFAULT nm3user.get_effective_date
+                                 ,p_effective_date DATE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                                  ) RETURN nm3type.tab_number IS
 --
    CURSOR cs_future_affected_inv_cont
@@ -5255,7 +5255,7 @@ END check_temp_ne_for_pnt_or_cont;
 -----------------------------------------------------------------------------
 --
 PROCEDURE check_item_has_no_future_locs (p_iit_ne_id      nm_inv_items.iit_ne_id%TYPE
-                                        ,p_effective_date DATE DEFAULT nm3user.get_effective_date
+                                        ,p_effective_date DATE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                                         ) IS
 --
    CURSOR cs_future_locs (c_nm_ne_id_in    nm_members_all.nm_ne_id_in%TYPE

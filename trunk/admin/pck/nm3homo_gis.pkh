@@ -60,7 +60,7 @@ PROCEDURE locate_item
  , pi_restrict_excl_sub_class IN VARCHAR2                      DEFAULT NULL
  , pi_x_pos                   IN NUMBER                        DEFAULT NULL
  , pi_y_pos                   IN NUMBER                        DEFAULT NULL
- , pi_effective_date          IN DATE                          DEFAULT Nm3user.get_effective_date
+ , pi_effective_date          IN DATE                          DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
  , pi_geom                    IN mdsys.sdo_geometry            DEFAULT NULL
  );
 --
