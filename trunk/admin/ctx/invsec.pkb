@@ -1,11 +1,11 @@
 CREATE OR REPLACE PACKAGE BODY invsec AS
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/ctx/invsec.pkb-arc   2.1   Nov 10 2008 16:04:10   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/ctx/invsec.pkb-arc   2.2   May 16 2011 16:03:54   Steve.Cooper  $
 --       Module Name      : $Workfile:   invsec.pkb  $
---       Date into SCCS   : $Date:   Nov 10 2008 16:04:10  $
---       Date fetched Out : $Modtime:   Nov 10 2008 16:03:00  $
---       SCCS Version     : $Revision:   2.1  $
+--       Date into SCCS   : $Date:   May 16 2011 16:03:54  $
+--       Date fetched Out : $Modtime:   Apr 12 2011 13:28:28  $
+--       SCCS Version     : $Revision:   2.2  $
 --       Based on SCCS Version     : 1.12
 --
 --
@@ -22,18 +22,13 @@ CREATE OR REPLACE PACKAGE BODY invsec AS
 --	Copyright (c) exor corporation ltd, 2000
 ------------------------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.1  $"';
+   g_body_sccsid        CONSTANT  varchar2(2000)                    := '"$Revision:   2.2  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 
-   g_package_name  CONSTANT varchar2(30) := 'invsec';
+   g_package_name       CONSTANT  varchar2(30)                      := 'invsec';
 --
-   g_username        CONSTANT  user_users.username%TYPE   := USER;
-   g_user_id         CONSTANT  hig_users.hus_user_id%TYPE
-                       := nm3context.get_context_number(pi_attribute => 'USER_ID');
-   g_user_unrestricted CONSTANT boolean := (nm3context.get_context (pi_attribute => 'UNRESTRICTED_INVENTORY') = nm3context.c_true);
---
-   c_nit_inv_type CONSTANT user_tab_columns.column_name%TYPE := 'nit_inv_type';
-   c_itg_inv_type CONSTANT user_tab_columns.column_name%TYPE := 'itg_inv_type';
+   c_nit_inv_type       CONSTANT  user_tab_columns.column_name%TYPE := 'nit_inv_type';
+   c_itg_inv_type       CONSTANT  user_tab_columns.column_name%TYPE := 'itg_inv_type';
 --
 ----------------------------------------------------------------------------------------------
 --
@@ -71,7 +66,7 @@ BEGIN
                '         FROM  NM_USER_AUS '||CHR(10)||
                '              ,NM_ADMIN_GROUPS '||CHR(10)||
                '              ,HIG_USERS '||CHR(10)||
-               '        WHERE  HUS_USERNAME         = USER '||CHR(10)||
+               '        WHERE  HUS_USERNAME         = Sys_Context(''NM3_SECURITY_CTX'',''USERNAME'') '||CHR(10)||
                '          AND  NUA_USER_ID          = HUS_USER_ID'||CHR(10);
    IF p_updating
     THEN
@@ -92,7 +87,7 @@ BEGIN
                '              ,NM_INV_TYPE_ROLES '||CHR(10)||
                '         WHERE ITR_INV_TYPE = '||p_inv_type_col||CHR(10)||
                '          AND  ITR_HRO_ROLE = HUR_ROLE '||CHR(10)||
-               '          AND  HUR_USERNAME = USER'||CHR(10);
+               '          AND  HUR_USERNAME = Sys_Context(''NM3_SECURITY_CTX'',''USERNAME'')'||CHR(10);
    IF p_updating
     THEN
       l_retval := l_retval||
@@ -114,8 +109,6 @@ FUNCTION is_inv_item_updatable (p_iit_inv_type           IN nm_inv_types.nit_inv
 --
    CURSOR cs_updatable (c_iit_inv_type   IN nm_inv_types.nit_inv_type%TYPE
                        ,c_iit_admin_unit IN nm_inv_items.iit_admin_unit%TYPE
-                       ,c_user           IN varchar2
-                       ,c_user_id        IN number
                        ,c_mode           IN varchar2
                        ) IS
    SELECT 1
@@ -123,7 +116,7 @@ FUNCTION is_inv_item_updatable (p_iit_inv_type           IN nm_inv_types.nit_inv
    WHERE  EXISTS (SELECT 1
                    FROM  nm_user_aus
                         ,nm_admin_groups
-                  WHERE  nua_user_id          = c_user_id
+                  WHERE  nua_user_id          = Sys_Context('NM3CORE','USER_ID')
                    AND   nua_mode             = c_mode
                    AND   nua_admin_unit       = nag_parent_admin_unit
                    AND   nag_child_admin_unit = c_iit_admin_unit
@@ -133,7 +126,7 @@ FUNCTION is_inv_item_updatable (p_iit_inv_type           IN nm_inv_types.nit_inv
                        ,nm_inv_type_roles
                   WHERE itr_inv_type = c_iit_inv_type
                    AND  itr_hro_role = hur_role
-                   AND  hur_username = c_user
+                   AND  hur_username = Sys_Context('NM3_SECURITY_CTX','USERNAME')
                    AND  itr_mode     = c_mode
                 );
 --
@@ -149,12 +142,12 @@ BEGIN
 --
 -- ################################################################################
 --
-   IF g_user_unrestricted
+   IF Sys_Context('NM3CORE','UNRESTRICTED_INVENTORY') = 'TRUE'
      AND pi_unrestricted_override
     THEN
       l_can_update := TRUE;
    ELSE
-      OPEN  cs_updatable(p_iit_inv_type,p_iit_admin_unit,g_username,g_user_id,c_normal_string);
+      OPEN  cs_updatable(p_iit_inv_type,p_iit_admin_unit,c_normal_string);
       FETCH cs_updatable INTO l_dummy;
       l_can_update := cs_updatable%FOUND;
       CLOSE cs_updatable;
@@ -169,7 +162,7 @@ END is_inv_item_updatable;
 FUNCTION inv_predicate( schema_in varchar2, name_in varchar2) RETURN varchar2 IS
 BEGIN
 --
-    IF g_user_unrestricted
+    IF Sys_Context('NM3CORE','UNRESTRICTED_INVENTORY') = 'TRUE'
      THEN
        RETURN NULL;
     ELSE
@@ -190,7 +183,7 @@ END inv_predicate;
 FUNCTION inv_predicate_read( schema_in varchar2, name_in varchar2) RETURN varchar2 IS
 BEGIN
 --
-    IF g_user_unrestricted
+    IF Sys_Context('NM3CORE','UNRESTRICTED_INVENTORY') = 'TRUE'
      THEN
        RETURN NULL;
     ELSE
@@ -211,7 +204,7 @@ END inv_predicate_read;
 FUNCTION inv_type_predicate( schema_in varchar2, name_in varchar2) RETURN varchar2 IS
 BEGIN
 --
-    IF g_user_unrestricted
+    IF Sys_Context('NM3CORE','UNRESTRICTED_INVENTORY') = 'TRUE'
      THEN
        RETURN NULL;
     ELSE
@@ -229,7 +222,7 @@ END inv_type_predicate;
 FUNCTION inv_type_predicate_read( schema_in varchar2, name_in varchar2) RETURN varchar2 IS
 BEGIN
 --
-    IF g_user_unrestricted
+    IF Sys_Context('NM3CORE','UNRESTRICTED_INVENTORY') = 'TRUE'
      THEN
        RETURN NULL;
     ELSE
@@ -247,7 +240,7 @@ END inv_type_predicate_read;
 FUNCTION inv_itg_predicate( schema_in varchar2, name_in varchar2) RETURN varchar2 IS
 BEGIN
 --
-    IF g_user_unrestricted
+    IF Sys_Context('NM3CORE','UNRESTRICTED_INVENTORY') = 'TRUE'
      THEN
        RETURN NULL;
     ELSE
@@ -265,7 +258,7 @@ END inv_itg_predicate;
 FUNCTION inv_itg_predicate_read( schema_in varchar2, name_in varchar2) RETURN varchar2 IS
 BEGIN
 --
-    IF g_user_unrestricted
+    IF Sys_Context('NM3CORE','UNRESTRICTED_INVENTORY') = 'TRUE'
      THEN
        RETURN NULL;
     ELSE
@@ -289,7 +282,7 @@ FUNCTION chk_inv_type_valid_for_role (p_inv_type IN nm_inv_items.iit_inv_type%TY
          ,nm_inv_type_roles
    WHERE  itr_inv_type = p_inv_type
     AND   itr_hro_role = hur_role
-    AND   hur_username = USER
+    AND   hur_username = Sys_Context('NM3_SECURITY_CTX','USERNAME')
     ORDER BY itr_mode;
 --
 -- Assign FALSE to the return value, then if the cursor is %NOTFOUND then
@@ -298,7 +291,7 @@ FUNCTION chk_inv_type_valid_for_role (p_inv_type IN nm_inv_items.iit_inv_type%TY
    l_retval   nm_inv_type_roles.itr_mode%TYPE := c_false_string;
 --
 BEGIN
-    IF g_user_unrestricted
+    IF Sys_Context('NM3CORE','UNRESTRICTED_INVENTORY') = 'TRUE'
      THEN
        RETURN 'NORMAL';
     END IF;

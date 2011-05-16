@@ -5,11 +5,11 @@ DECLARE
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/ctx/drop_policy.sql-arc   2.0   Jun 14 2007 09:25:04   smarshall  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/ctx/drop_policy.sql-arc   2.1   May 16 2011 16:03:54   Steve.Cooper  $
 --       Module Name      : $Workfile:   drop_policy.sql  $
---       Date into SCCS   : $Date:   Jun 14 2007 09:25:04  $
---       Date fetched Out : $Modtime:   Jun 14 2007 09:24:34  $
---       SCCS Version     : $Revision:   2.0  $
+--       Date into SCCS   : $Date:   May 16 2011 16:03:54  $
+--       Date fetched Out : $Modtime:   Apr 19 2011 09:06:36  $
+--       SCCS Version     : $Revision:   2.1  $
 --       Based on SCCS Version     : 1.9
 --
 --   Drop Inventory/Merge security policies
@@ -28,7 +28,7 @@ DECLARE
    --
 BEGIN
 --
-   FOR cs_rec IN cs_policies_to_drop (nm3context.get_context(pi_attribute=>'APPLICATION_OWNER'))
+   FOR cs_rec IN cs_policies_to_drop (Sys_Context('NM3CORE','APPLICATION_OWNER'))
     LOOP
       BEGIN
          dbms_rls.drop_policy (object_schema => cs_rec.object_owner
