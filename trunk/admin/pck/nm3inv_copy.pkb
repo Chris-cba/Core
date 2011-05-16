@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_copy AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_copy.pkb-arc   2.1   Jan 06 2010 16:38:28   cstrettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_copy.pkb-arc   2.2   May 16 2011 14:44:54   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3inv_copy.pkb  $
---       Date into PVCS   : $Date:   Jan 06 2010 16:38:28  $
---       Date fetched Out : $Modtime:   Jan 06 2010 11:04:32  $
---       Version          : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   May 16 2011 14:44:54  $
+--       Date fetched Out : $Modtime:   Apr 01 2011 13:16:54  $
+--       Version          : $Revision:   2.2  $
 --       Based on SCCS version : 1.2
 -------------------------------------------------------------------------
 --   Author : Jonathan Mills
@@ -22,7 +22,7 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_copy AS
 --
 --  g_body_sccsid is the SCCS ID for the package body
 --
-  g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.1  $';
+  g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.2  $';
   g_package_name    CONSTANT  varchar2(30)   := 'nm3inv_copy';
 --
 --
@@ -94,7 +94,7 @@ PROCEDURE copy_item (pi_old_iit_ne_id  nm_inv_items.iit_ne_id%TYPE
    l_old_rec_iit  nm_inv_items%ROWTYPE;
    l_new_rec_iit  nm_inv_items%ROWTYPE;
 --
-   c_eff_date     CONSTANT DATE        := nm3user.get_effective_date;
+   c_eff_date     CONSTANT DATE        := To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY');
    l_eff_date     CONSTANT DATE        := NVL(pi_effective_date,pi_new_rec_iit.iit_start_date);
 --
    l_block                 nm3type.tab_varchar32767;

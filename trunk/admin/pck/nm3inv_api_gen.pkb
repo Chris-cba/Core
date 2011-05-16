@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_api_gen AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_api_gen.pkb-arc   2.1   Jan 06 2010 16:38:26   cstrettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_api_gen.pkb-arc   2.2   May 16 2011 14:44:54   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3inv_api_gen.pkb  $
---       Date into PVCS   : $Date:   Jan 06 2010 16:38:26  $
---       Date fetched Out : $Modtime:   Jan 06 2010 11:33:06  $
---       Version          : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   May 16 2011 14:44:54  $
+--       Date fetched Out : $Modtime:   Apr 04 2011 13:41:40  $
+--       Version          : $Revision:   2.2  $
 --       Based on SCCS version : 1.15
 -------------------------------------------------------------------------
 --   Author : Jonathan Mills
@@ -22,10 +22,8 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_api_gen AS
 --
 --  g_body_sccsid is the SCCS ID for the package body
 --
-   g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.1  $';
+   g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.2  $';
    g_package_name    CONSTANT  varchar2(30)   := 'nm3inv_api_gen';
---
-   c_app_owner       CONSTANT  VARCHAR2(30)   := hig.get_application_owner;
 --
    g_tab_pkh         nm3type.tab_varchar32767;
    g_tab_pkb         nm3type.tab_varchar32767;
@@ -235,7 +233,7 @@ BEGIN
     THEN
       write_it(l_start||RPAD('p_iit_ne_id',31,' ')||'   OUT nm_inv_items_all.iit_ne_id%TYPE');
    END IF;
-   write_it(l_start||RPAD('p_effective_date',31,' ')||'IN     nm_inv_items_all.iit_start_date%TYPE DEFAULT nm3user.get_effective_date');
+   write_it(l_start||RPAD('p_effective_date',31,' ')||'IN     nm_inv_items_all.iit_start_date%TYPE DEFAULT To_Date(Sys_Context(''NM3CORE'',''EFFECTIVE_DATE''),''DD-MON-YYYY'')');
    write_it(l_start||RPAD('p_admin_unit',31,' ')||'IN     nm_inv_items_all.iit_admin_unit%TYPE');
    IF p_xsp_allowed
     THEN
@@ -339,7 +337,7 @@ BEGIN
 --
    append_both('CREATE OR REPLACE PACKAGE ',FALSE);
    append_body('BODY ',FALSE);
-   append_both(c_app_owner||'.'||l_package_name||' IS',FALSE);
+   append_both(Sys_Context('NM3CORE','APPLICATION_OWNER')||'.'||l_package_name||' IS',FALSE);
    append_sccs(l_rec_nit);
 --
    append_head('--<PROC NAME="get_version">');
@@ -405,7 +403,7 @@ BEGIN
    append_head('--  record as identified by the IIT_PRIMARY_KEY on a given effective date');
    append_head('--');
    append_both('FUNCTION get_iit_ne_id (p_iit_primary_key IN nm_inv_items.iit_primary_key%TYPE');
-   append_both('                       ,p_effective_date  IN DATE DEFAULT nm3user.get_effective_date');
+   append_both('                       ,p_effective_date  IN DATE DEFAULT To_Date(Sys_Context(''NM3CORE'',''EFFECTIVE_DATE''),''DD-MON-YYYY'')');
    append_both('                       ) RETURN nm_inv_items.iit_ne_id%TYPE');
    append_head(';',FALSE);
    append_body(' IS',FALSE);
@@ -433,7 +431,7 @@ BEGIN
       append_head('--  that date onwards');
       append_head('--');
       append_both('PROCEDURE date_track_upd_attr ('||RPAD('p_iit_ne_id',31)||'IN OUT nm_inv_items_all.iit_ne_id%TYPE');
-      append_both('                              ,'||RPAD('p_effective_date',31)||'IN     DATE DEFAULT nm3user.get_effective_date');
+      append_both('                              ,'||RPAD('p_effective_date',31)||'IN     DATE DEFAULT To_Date(Sys_Context(''NM3CORE'',''EFFECTIVE_DATE''),''DD-MON-YYYY'')');
       append_both('                              -- <FLEXIBLE ATTRIBUTES>');
       FOR i IN 1..l_tab_rec_ita.COUNT
        LOOP
@@ -452,7 +450,7 @@ BEGIN
       append_both('                              )');
       append_head(';',FALSE);
       append_body(' IS',FALSE);
-      append_body('   c_eff_date CONSTANT DATE := nm3user.get_effective_date;');
+      append_body('   c_eff_date CONSTANT DATE := To_Date(Sys_Context(''NM3CORE'',''EFFECTIVE_DATE''),''DD-MON-YYYY'');');
       append_body('   l_rec_iit           nm_inv_items%ROWTYPE;');
       append_body('   l_rowid             ROWID;');
       append_body('BEGIN');
@@ -504,7 +502,7 @@ BEGIN
       append_head('--  that date onwards');
       append_head('--');
       append_both('PROCEDURE upd_attr ('||RPAD('p_iit_ne_id',31)||'IN     nm_inv_items_all.iit_ne_id%TYPE');
-      append_both('                   ,'||RPAD('p_effective_date',31)||'IN     DATE DEFAULT nm3user.get_effective_date');
+      append_both('                   ,'||RPAD('p_effective_date',31)||'IN     DATE DEFAULT To_Date(Sys_Context(''NM3CORE'',''EFFECTIVE_DATE''),''DD-MON-YYYY'')');
       append_both('                   -- <FLEXIBLE ATTRIBUTES>');
       FOR i IN 1..l_tab_rec_ita.COUNT
        LOOP
@@ -523,7 +521,7 @@ BEGIN
       append_both('                   )');
       append_head(';',FALSE);
       append_body(' IS',FALSE);
-      append_body('   c_eff_date CONSTANT DATE := nm3user.get_effective_date;');
+      append_body('   c_eff_date CONSTANT DATE := To_Date(Sys_Context(''NM3CORE'',''EFFECTIVE_DATE''),''DD-MON-YYYY'');');
       append_body('   l_rowid ROWID;');
       append_body('BEGIN');
       append_body('--');

@@ -3,11 +3,11 @@ create or replace package nm3inv_composite as
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_composite.pkh-arc   2.1   Jan 12 2010 09:46:36   cstrettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_composite.pkh-arc   2.2   May 16 2011 14:44:54   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3inv_composite.pkh  $
---       Date into PVCS   : $Date:   Jan 12 2010 09:46:36  $
---       Date fetched Out : $Modtime:   Jan 12 2010 09:43:42  $
---       Version          : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   May 16 2011 14:44:54  $
+--       Date fetched Out : $Modtime:   Apr 01 2011 13:16:10  $
+--       Version          : $Revision:   2.2  $
 --       Based on SCCS version : 1.1
 -------------------------------------------------------------------------
 --   Author : Jonathan Mills
@@ -19,7 +19,7 @@ create or replace package nm3inv_composite as
 -----------------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
-   g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.1  $';
+   g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.2  $';
 --  g_sccsid is the SCCS ID for the package
 --
    c_composite_nic_category CONSTANT nm_inv_categories.nic_category%TYPE := 'D';
@@ -137,7 +137,7 @@ FUNCTION get_inv_record_name RETURN VARCHAR2;
 --
 --<PROC NAME="refresh_nmnd">
 PROCEDURE refresh_nmnd (p_nmnd_nit_inv_type  nm_mrg_nit_derivation.nmnd_nit_inv_type%TYPE
-                       ,p_effective_date     DATE    DEFAULT nm3user.get_effective_date
+                       ,p_effective_date     DATE    DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                        ,p_force_full_refresh BOOLEAN DEFAULT FALSE
                        );
 --</PROC>
@@ -181,14 +181,14 @@ FUNCTION get_composite_nic_category RETURN nm_inv_categories.nic_category%TYPE;
 -----------------------------------------------------------------------------
 --
 --<PROC NAME="refresh_pending_nmnd">
-PROCEDURE refresh_pending_nmnd (p_effective_date DATE DEFAULT nm3user.get_effective_date);
+PROCEDURE refresh_pending_nmnd (p_effective_date DATE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY'));
 --</PROC>
 --
 -----------------------------------------------------------------------------
 --
 --<PROC NAME="refresh_nmnd_as_job">
 PROCEDURE refresh_nmnd_as_job (p_nmnd_nit_inv_type  nm_mrg_nit_derivation.nmnd_nit_inv_type%TYPE
-                              ,p_effective_date     DATE    DEFAULT nm3user.get_effective_date
+                              ,p_effective_date     DATE    DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                               ,p_force_full_refresh BOOLEAN DEFAULT FALSE
                               );
 --</PROC>

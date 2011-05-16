@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_ft AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_ft.pkb-arc   2.2   Jun 22 2010 16:37:40   rcoupe  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_ft.pkb-arc   2.3   May 16 2011 14:44:54   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3inv_ft.pkb  $
---       Date into PVCS   : $Date:   Jun 22 2010 16:37:40  $
---       Date fetched Out : $Modtime:   Jun 22 2010 16:36:56  $
---       Version          : $Revision:   2.2  $
+--       Date into PVCS   : $Date:   May 16 2011 14:44:54  $
+--       Date fetched Out : $Modtime:   Apr 04 2011 08:13:22  $
+--       Version          : $Revision:   2.3  $
 --       Based on SCCS version : 1.5
 -------------------------------------------------------------------------
 --   Author : Jonathan Mills
@@ -22,15 +22,13 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_ft AS
 --
 --  g_body_sccsid is the SCCS ID for the package body
 --
-  g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.2  $';
+  g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.3  $';
   g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3inv_ft';
 --
    g_rec_nit         NM_INV_TYPES%ROWTYPE;
    g_tab_nita        nm3inv.tab_nita;
 --
    c_surrogate_pk_col_name CONSTANT VARCHAR2(30) := 'SURROGATE_PK';
---
-   c_app_owner       CONSTANT VARCHAR2(30) := hig.get_application_owner;
 --
 -----------------------------------------------------------------------------
 --
@@ -286,7 +284,7 @@ BEGIN
       l_rec_ft.nit_descr      := g_tab_descr(i);
       l_rec_ft.create_yn      := 'Y';
       l_rec_ft.nit_table_name := g_rec_internal(i).nsv_inv_type;
-      l_rec_ft.view_text      := 'CREATE '||l_obj||' '||c_app_owner||'.'||l_rec_ft.nit_table_name;
+      l_rec_ft.view_text      := 'CREATE '||l_obj||' '||Sys_Context('NM3CORE','APPLICATION_OWNER')||'.'||l_rec_ft.nit_table_name;
       --
       IF p_create_snapshot
        THEN
@@ -376,20 +374,19 @@ BEGIN
        THEN
 --
          DECLARE
-            CURSOR cs_obj (c_owner VARCHAR2
-                          ,c_name  VARCHAR2
+            CURSOR cs_obj (c_name  VARCHAR2
                           ) IS
             SELECT object_type
              FROM  ALL_OBJECTS
-            WHERE  owner       = c_owner
+            WHERE  owner       = Sys_Context('NM3CORE','APPLICATION_OWNER')
              AND   object_name = c_name;
             l_type ALL_OBJECTS.object_type%TYPE;
             PROCEDURE do_drop IS
             BEGIN
-               EXECUTE IMMEDIATE 'DROP '||l_type||' '||c_app_owner||'.'||l_rec_ft.nit_table_name;
+               EXECUTE IMMEDIATE 'DROP '||l_type||' '||Sys_Context('NM3CORE','APPLICATION_OWNER')||'.'||l_rec_ft.nit_table_name;
             END do_drop;
          BEGIN
-            OPEN  cs_obj (c_app_owner, l_rec_ft.nit_table_name);
+            OPEN  cs_obj (l_rec_ft.nit_table_name);
             FETCH cs_obj INTO l_type;
             IF cs_obj%FOUND
              THEN
@@ -439,23 +436,23 @@ BEGIN
             --
             -- If we are creating the snapshot then try to put the security policy on if Enterprise Edn
             --
-            IF hig.is_enterprise_edition
+            IF Sys_Context('NM3CORE','ENTERPRISE_EDITION') = 'TRUE'
              THEN
                dbms_rls.add_policy
-                          (object_schema   => c_app_owner
+                          (object_schema   => Sys_Context('NM3CORE','APPLICATION_OWNER')
                           ,object_name     => l_rec_ft.nit_table_name
                           ,policy_name     => SUBSTR(l_rec_ft.nit_table_name,1,25)||'_POL1'
-                          ,function_schema => c_app_owner
+                          ,function_schema => Sys_Context('NM3CORE','APPLICATION_OWNER')
                           ,policy_function => 'INVSEC.INV_PREDICATE_READ'
                           ,statement_types => 'SELECT'
                           ,update_check    => TRUE
                           ,ENABLE          => TRUE
                           );
                dbms_rls.add_policy
-                          (object_schema   => c_app_owner
+                          (object_schema   => Sys_Context('NM3CORE','APPLICATION_OWNER')
                           ,object_name     => l_rec_ft.nit_table_name
                           ,policy_name     => SUBSTR(l_rec_ft.nit_table_name,1,25)||'_POL2'
-                          ,function_schema => c_app_owner
+                          ,function_schema => Sys_Context('NM3CORE','APPLICATION_OWNER')
                           ,policy_function => 'INVSEC.INV_PREDICATE'
                           ,statement_types => 'INSERT,UPDATE,DELETE'
                           ,update_check    => TRUE

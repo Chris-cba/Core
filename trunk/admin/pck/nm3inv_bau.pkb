@@ -3,11 +3,11 @@ CREATE OR REPLACE package body nm3inv_bau as
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_bau.pkb-arc   2.2   Feb 10 2010 13:55:04   cstrettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_bau.pkb-arc   2.3   May 16 2011 14:44:54   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3inv_bau.pkb  $
---       Date into PVCS   : $Date:   Feb 10 2010 13:55:04  $
---       Date fetched Out : $Modtime:   Feb 10 2010 13:51:42  $
---       Version          : $Revision:   2.2  $
+--       Date into PVCS   : $Date:   May 16 2011 14:44:54  $
+--       Date fetched Out : $Modtime:   Apr 01 2011 14:43:42  $
+--       Version          : $Revision:   2.3  $
 --       Based on SCCS version : 1.3
 -------------------------------------------------------------------------
 --   Author : Priidu Tanava
@@ -18,7 +18,7 @@ CREATE OR REPLACE package body nm3inv_bau as
 --	Copyright (c) exor corporation ltd, 2005
 -----------------------------------------------------------------------------
 --
-  g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.2  $';
+  g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.3  $';
   g_package_name    CONSTANT  varchar2(30)   := 'nm3inv_bau';
 
   m_date_format constant varchar2(20) := 'DD-MON-YYYY';
@@ -97,7 +97,7 @@ CREATE OR REPLACE package body nm3inv_bau as
       p_tbl(i).IIT_DESCRIPTION           := null;
       p_tbl(i).ITA_UPDATE_ALLOWED        := 'Y';
       p_tbl(i).ITA_FORMAT                := nm3type.C_DATE;
-      p_tbl(i).ITA_FORMAT_MASK           := nm3user.get_user_date_mask;
+      p_tbl(i).ITA_FORMAT_MASK           := Sys_Context('NM3CORE','USER_DATE_MASK');
     end if;
     
 

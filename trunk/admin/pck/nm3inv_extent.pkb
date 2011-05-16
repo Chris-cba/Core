@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_extent AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_extent.pkb-arc   2.1   Jan 06 2010 16:38:28   cstrettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_extent.pkb-arc   2.2   May 16 2011 14:44:54   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3inv_extent.pkb  $
---       Date into PVCS   : $Date:   Jan 06 2010 16:38:28  $
---       Date fetched Out : $Modtime:   Jan 06 2010 11:03:50  $
---       Version          : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   May 16 2011 14:44:54  $
+--       Date fetched Out : $Modtime:   Apr 01 2011 13:43:06  $
+--       Version          : $Revision:   2.2  $
 --       Based on SCCS version : 1.2
 -------------------------------------------------------------------------
 --   Author : Kevin Angus
@@ -21,7 +21,7 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_extent AS
 --all global package variables here
 
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.1  $';
+  g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.2  $';
   g_package_name CONSTANT varchar2(30) := 'nm3inv_extent';
 --
 -----------------------------------------------------------------------------
@@ -163,7 +163,6 @@ FUNCTION get_future_inv_au_type_temp_ne
    CURSOR cs_inv (c_nte_job_id nm_nw_temp_extents.nte_job_id%TYPE
                  ,c_admin_type nm_au_types.nat_admin_type%TYPE
                  ,c_nm_type    nm_members.nm_type%TYPE
-                 ,c_eff_date   DATE
                  ) IS
    SELECT /*+ RULE */ nm_ne_id_in, nm_obj_type
     FROM  nm_members_all
@@ -174,7 +173,7 @@ FUNCTION get_future_inv_au_type_temp_ne
     AND   nm_end_mp                          >= nte_begin_mp
     AND   nm_begin_mp                        <= nte_end_mp
     AND   nm3ausec.get_au_type(nm_admin_unit) = c_admin_type
-    AND   nm_start_date                      >  c_eff_date
+    AND   nm_start_date                      >  To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
    GROUP BY nm_ne_id_in, nm_obj_type;
 --
    l_tab_inv_type  nm3type.tab_varchar4;
@@ -184,7 +183,7 @@ BEGIN
 --
    nm_debug.proc_start(g_package_name,'get_future_inv_au_type_temp_ne');
 --
-   OPEN  cs_inv (pi_nte_job_id, pi_admin_type, 'I', nm3user.get_effective_date);
+   OPEN  cs_inv (pi_nte_job_id, pi_admin_type, 'I');
    FETCH cs_inv
     BULK COLLECT INTO l_tab_iit_ne_id,l_tab_inv_type;
    CLOSE cs_inv;

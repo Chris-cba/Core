@@ -1,11 +1,11 @@
 CREATE OR REPLACE PACKAGE BODY nm3inv_composite AS
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_composite.pkb-arc   2.2   Aug 12 2009 10:44:12   rcoupe  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_composite.pkb-arc   2.3   May 16 2011 14:44:54   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3inv_composite.pkb  $
---       Date into PVCS   : $Date:   Aug 12 2009 10:44:12  $
---       Date fetched Out : $Modtime:   Aug 12 2009 10:30:22  $
---       PVCS Version     : $Revision:   2.2  $
+--       Date into PVCS   : $Date:   May 16 2011 14:44:54  $
+--       Date fetched Out : $Modtime:   Apr 01 2011 13:25:24  $
+--       PVCS Version     : $Revision:   2.3  $
 --       Based on SCCS Version: 1.3
 --
 --   Author : Jonathan Mills
@@ -22,13 +22,12 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_composite AS
 */
 
 --
-   g_body_sccsid   constant varchar2(200) :='"$Revision:   2.2  $"';
+   g_body_sccsid   constant varchar2(200) :='"$Revision:   2.3  $"';
    g_package_name    CONSTANT  varchar2(30)   := 'nm3inv_composite';
 --
    g_mrg_results_table VARCHAR2(30);
    g_tab_inv_type_to_validate nm3type.tab_varchar4;
 --
-   c_app_owner  CONSTANT VARCHAR2(30) := hig.get_application_owner;
    c_session_id CONSTANT NUMBER       := USERENV('SESSIONID');
    c_inv_items  CONSTANT VARCHAR2(30) := 'NM_INV_ITEMS_ALL';
    g_ok_to_turn_off_au_security BOOLEAN;
@@ -70,14 +69,14 @@ PROCEDURE get_and_check_results_valid (p_nmnd_nit_inv_type nm_mrg_nit_derivation
 --
 PROCEDURE create_inv_for_nt_type (p_nmnd_nit_inv_type nm_mrg_nit_derivation.nmnd_nit_inv_type%TYPE
                                  ,p_nt_type           nm_types.nt_type%TYPE
-                                 ,p_effective_date    DATE DEFAULT nm3user.get_effective_date
+                                 ,p_effective_date    DATE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                                  );
 --
 -----------------------------------------------------------------------------
 --
 PROCEDURE create_inv_for_temp_ne (p_nmnd_nit_inv_type nm_mrg_nit_derivation.nmnd_nit_inv_type%TYPE
                                  ,p_nte_job_id        nm_nw_temp_extents.nte_job_id%TYPE
-                                 ,p_effective_date    DATE DEFAULT nm3user.get_effective_date
+                                 ,p_effective_date    DATE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                                  );
 --
 -----------------------------------------------------------------------------
@@ -107,14 +106,14 @@ FUNCTION get_temp_ne_subset_nqt (p_nqt_rowid  ROWID
 --
 PROCEDURE create_inv_for_element (p_nmnd_nit_inv_type nm_mrg_nit_derivation.nmnd_nit_inv_type%TYPE
                                  ,p_ne_id             nm_elements.ne_id%TYPE
-                                 ,p_effective_date    DATE DEFAULT nm3user.get_effective_date
+                                 ,p_effective_date    DATE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                                  );
 --
 -----------------------------------------------------------------------------
 --
 FUNCTION get_changed_assets_since_last (p_nmnd_nmq_id    nm_mrg_nit_derivation.nmnd_nmq_id%TYPE
                                        ,p_nte_job_id     nm_nw_temp_extents.nte_job_id%TYPE
-                                       ,p_effective_date DATE DEFAULT nm3user.get_effective_date
+                                       ,p_effective_date DATE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                                        ) RETURN nm_nw_temp_extents.nte_job_id%TYPE;
 --
 -----------------------------------------------------------------------------
@@ -124,7 +123,7 @@ FUNCTION get_changed_asset_area (p_nqt_rowid ROWID) RETURN NUMBER;
 -----------------------------------------------------------------------------
 --
 FUNCTION run_ngq (p_nqg_id         nm_gaz_query.ngq_id%TYPE
-                 ,p_effective_date DATE    DEFAULT nm3user.get_effective_date
+                 ,p_effective_date DATE    DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                  ,p_use_date_based BOOLEAN DEFAULT TRUE
                  ) RETURN NUMBER;
 --
@@ -280,7 +279,7 @@ BEGIN
        BULK  COLLECT
        INTO  l_tab_columns
        FROM  all_tab_columns
-      WHERE  owner      = c_app_owner
+      WHERE  owner      = Sys_Context('NM3CORE','APPLICATION_OWNER')
        AND   table_name = c_inv_items
        AND   nullable   = 'N'
        AND   allowable_inv_column (column_name) = 'TRUE'
@@ -865,7 +864,7 @@ FUNCTION create_tmp_ne_for_items_in_arr (pi_tab_item_id        IN nm3type.tab_nu
    WHERE  nm_ne_id_in = nte_job_id
    ORDER BY nm_ne_id_in, nm_seq_no;
 --
-   CURSOR cs_end_dated_mem (c_eff_date DATE) IS
+   CURSOR cs_end_dated_mem IS
    SELECT /*+ INDEX (nm nm_pk) */
           nm_ne_id_of
          ,nm_begin_mp
@@ -878,8 +877,8 @@ FUNCTION create_tmp_ne_for_items_in_arr (pi_tab_item_id        IN nm3type.tab_nu
          ,nm_mrg_inv_derivation_nte_temp
    WHERE  nm_ne_id_in = nte_job_id
     AND   nm_date_modified >  g_last_update_date
-    AND   nm_start_date    <= c_eff_date
-    AND  NOT (nm_end_date IS NULL OR nm_end_date > c_eff_date)
+    AND   nm_start_date    <= To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
+    AND  NOT (nm_end_date IS NULL OR nm_end_date > To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY'))
    ORDER BY nm_ne_id_in, nm_date_created, nm_seq_no;
 --
 BEGIN
@@ -913,7 +912,7 @@ log_it('before bulk collect for all memberships');
    CLOSE cs_current_mem;
 log_it('after bulk collect for all memberships ('||l_tab_nm_ne_id_of.COUNT||' records)');
 --
-   FOR cs_rec IN cs_end_dated_mem (nm3user.get_effective_date)
+   FOR cs_rec IN cs_end_dated_mem 
     LOOP
       DECLARE
          c CONSTANT PLS_INTEGER := l_tab_nm_ne_id_of.COUNT+1;
@@ -970,9 +969,9 @@ END create_tmp_ne_for_items_in_arr;
 --
 PROCEDURE create_inv_for_nt_type (p_nmnd_nit_inv_type nm_mrg_nit_derivation.nmnd_nit_inv_type%TYPE
                                  ,p_nt_type           nm_types.nt_type%TYPE
-                                 ,p_effective_date    DATE DEFAULT nm3user.get_effective_date
+                                 ,p_effective_date    DATE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                                  ) IS
-   c_eff_date CONSTANT DATE := nm3user.get_effective_date;
+   c_eff_date CONSTANT DATE := To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY');
    l_st_time           NUMBER;
    l_tab_ne_id         nm3type.tab_number;
    l_tab_ne_unique     nm3type.tab_varchar30;
@@ -1035,12 +1034,12 @@ END this_nte_has_inv;
 --
 PROCEDURE create_inv_for_element (p_nmnd_nit_inv_type nm_mrg_nit_derivation.nmnd_nit_inv_type%TYPE
                                  ,p_ne_id             nm_elements.ne_id%TYPE
-                                 ,p_effective_date    DATE DEFAULT nm3user.get_effective_date
+                                 ,p_effective_date    DATE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                                  ) IS
 --
    l_rec_nmnd          nm_mrg_nit_derivation%ROWTYPE;
    l_rec_ne            nm_elements%ROWTYPE;
-   c_eff_date CONSTANT DATE := nm3user.get_effective_date;
+   c_eff_date CONSTANT DATE := To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY');
    l_nte_job_id        nm_nw_temp_extents.nte_job_id%TYPE;
    l_nte_job_id2       nm_nw_temp_extents.nte_job_id%TYPE;
    l_mrg_job_id        nm_mrg_query_results.nqr_mrg_job_id%TYPE;
@@ -1434,7 +1433,7 @@ END get_temp_ne_subset_nqt;
 --
 PROCEDURE end_date_inv_by_nte (p_inv_type       nm_inv_types.nit_inv_type%TYPE
                               ,p_nte_job_id     nm_nw_temp_Extents.nte_job_id%TYPE
-                              ,p_effective_date DATE DEFAULT nm3user.get_effective_date
+                              ,p_effective_date DATE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                               ) IS
 --
    CURSOR cs_items (c_job_id NUMBER) IS
@@ -1535,11 +1534,11 @@ END end_date_inv_by_nte;
 --
 PROCEDURE create_inv_for_temp_ne (p_nmnd_nit_inv_type nm_mrg_nit_derivation.nmnd_nit_inv_type%TYPE
                                  ,p_nte_job_id        nm_nw_temp_extents.nte_job_id%TYPE
-                                 ,p_effective_date    DATE DEFAULT nm3user.get_effective_date
+                                 ,p_effective_date    DATE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                                  ) IS
 --
    l_rec_nmnd          nm_mrg_nit_derivation%ROWTYPE;
-   c_eff_date CONSTANT DATE := nm3user.get_effective_date;
+   c_eff_date CONSTANT DATE := To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY');
    l_mrg_job_id        nm_mrg_query_results.nqr_mrg_job_id%TYPE;
 --
 BEGIN
@@ -1772,7 +1771,7 @@ END check_no_refresh_running;
 -----------------------------------------------------------------------------
 --
 PROCEDURE refresh_nmnd (p_nmnd_nit_inv_type  nm_mrg_nit_derivation.nmnd_nit_inv_type%TYPE
-                       ,p_effective_date     DATE    DEFAULT nm3user.get_effective_date
+                       ,p_effective_date     DATE    DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                        ,p_force_full_refresh BOOLEAN DEFAULT FALSE
                        ) IS
 --
@@ -1952,7 +1951,7 @@ BEGIN
    append (htf.bodyopen);
    append (htf.tableopen (cattributes=>'BORDER=1'));
    append_pair ('Inv Type',p_nmnd_nit_inv_type);
-   append_pair ('Effective Date',TO_CHAR(nm3user.get_effective_date,nm3user.get_user_date_mask));
+   append_pair ('Effective Date',TO_CHAR(To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY'),Sys_Context('NM3CORE','USER_DATE_MASK')));
    append_pair ('Start Time',TO_CHAR(SYSDATE,nm3type.c_full_Date_time_Format));
 --
    l_rec_nmnd := get_nmnd (pi_nmnd_nit_inv_type => p_nmnd_nit_inv_type);
@@ -2108,11 +2107,11 @@ END refresh_nmnd;
 --
 FUNCTION get_changed_assets_since_last (p_nmnd_nmq_id    nm_mrg_nit_derivation.nmnd_nmq_id%TYPE
                                        ,p_nte_job_id     nm_nw_temp_extents.nte_job_id%TYPE
-                                       ,p_effective_date DATE DEFAULT nm3user.get_effective_date
+                                       ,p_effective_date DATE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                                        ) RETURN nm_nw_temp_extents.nte_job_id%TYPE IS
 --
    l_retval nm_nw_temp_extents.nte_job_id%TYPE;
-   c_eff_date CONSTANT DATE := nm3user.get_effective_date;
+   c_eff_date CONSTANT DATE := To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY');
 --
    l_tab_nqt_seq_no   nm3type.tab_number;
    l_tab_nqt_rowid    nm3type.tab_rowid;
@@ -2339,7 +2338,7 @@ END get_composite_nic_category;
 --
 -----------------------------------------------------------------------------
 --
-PROCEDURE refresh_pending_nmnd (p_effective_date DATE DEFAULT nm3user.get_effective_date
+PROCEDURE refresh_pending_nmnd (p_effective_date DATE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                                ) IS
 --
    CURSOR cs_nmnd_rebuild IS
@@ -2432,7 +2431,7 @@ END refresh_pending_nmnd;
 -----------------------------------------------------------------------------
 --
 PROCEDURE refresh_nmnd_as_job (p_nmnd_nit_inv_type  nm_mrg_nit_derivation.nmnd_nit_inv_type%TYPE
-                              ,p_effective_date     DATE    DEFAULT nm3user.get_effective_date
+                              ,p_effective_date     DATE    DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                               ,p_force_full_refresh BOOLEAN DEFAULT FALSE
                               ) IS
    l_block         nm3type.max_varchar2;
@@ -2466,11 +2465,11 @@ END refresh_nmnd_as_job;
 --
 FUNCTION get_nmu_id_for_hig_owner RETURN nm_mail_users.nmu_id%TYPE IS
 --
-   CURSOR cs_nmu (c_user VARCHAR2) IS
+   CURSOR cs_nmu IS
    SELECT nmu_id
     FROM  nm_mail_users
          ,hig_users
-   WHERE  hus_username = c_user
+   WHERE  hus_username = Sys_Context('NM3CORE','APPLICATION_OWNER')
     AND   hus_user_id  = nmu_hus_user_id;
 --
    l_nmu_id nm_mail_users.nmu_id%TYPE;
@@ -2479,7 +2478,7 @@ BEGIN
 --
    nm_debug.proc_start (g_package_name,'get_nmu_id_for_hig_owner');
 --
-   OPEN  cs_nmu (c_app_owner);
+   OPEN  cs_nmu;
    FETCH cs_nmu
     INTO l_nmu_id;
    CLOSE cs_nmu;
@@ -2505,7 +2504,7 @@ FUNCTION does_table_have_locks (p_table_name VARCHAR2) RETURN BOOLEAN IS
       AND lk.id1         = ob.object_id
       AND lk.sid         = se.sid
       AND se.sid        != c_audsid
-      AND ob.owner       = c_app_owner
+      AND ob.owner       = Sys_Context('NM3CORE','APPLICATION_OWNER')
       AND ob.object_name = c_table_name;
    l_dummy       PLS_INTEGER;
    l_lock_exists BOOLEAN;
@@ -2818,7 +2817,7 @@ END get_merge_results_view;
 -----------------------------------------------------------------------------
 --
 FUNCTION run_ngq (p_nqg_id         nm_gaz_query.ngq_id%TYPE
-                 ,p_effective_date DATE    DEFAULT nm3user.get_effective_date
+                 ,p_effective_date DATE    DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                  ,p_use_date_based BOOLEAN DEFAULT TRUE
                  ) RETURN NUMBER IS
    l_job NUMBER;

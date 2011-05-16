@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_composite2 AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_composite2.pkb-arc   2.12   13 May 2010 08:47:04   ptanava  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_composite2.pkb-arc   2.13   May 16 2011 14:44:54   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3inv_composite2.pkb  $
---       Date into PVCS   : $Date:   13 May 2010 08:47:04  $
---       Date fetched Out : $Modtime:   13 May 2010 08:39:46  $
---       PVCS Version     : $Revision:   2.12  $
+--       Date into PVCS   : $Date:   May 16 2011 14:44:54  $
+--       Date fetched Out : $Modtime:   May 05 2011 10:45:46  $
+--       PVCS Version     : $Revision:   2.13  $
 --       Based on sccs version :
 --
 --   Author : Priidu Tanava
@@ -39,7 +39,7 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_composite2 AS
                 NB! requires nm3bulk_mrg_pkh 2.7 or higher (logs 723574, 724275)
 */
 
-  g_body_sccsid   constant  varchar2(30) := '"$Revision:   2.12  $"';
+  g_body_sccsid   constant  varchar2(30) := '"$Revision:   2.13  $"';
   g_package_name  constant  varchar2(30) := 'nm3inv_composite2';
   
   cant_serialize exception;
@@ -560,7 +560,7 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_composite2 AS
     l_sqlcount      number(8);
     l_sqlcount2     number(8);
     t_attr          attrib_tbl := pt_unique_attr;
-    l_effective_date constant date := nm3user.get_effective_date;
+    l_effective_date constant date := To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY');
     t_events        nm3type.tab_varchar32767;
     r_longops       nm3sql.longops_rec;
     l_group_type    nm_group_types_all.ngt_group_type%type;
@@ -1270,8 +1270,8 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_composite2 AS
        from
           (select * from nm_mrg_ita_derivation where nmid_ita_inv_type = p_inv_type) d
          ,( select column_name, column_id
-            from user_tab_cols
-            where table_name = 'NM_INV_ITEMS_ALL'
+            from user_tab_cols            
+            where table_name  = 'NM_INV_ITEMS_ALL'
               and column_name not like 'SYS_%'
           ) tc
        where tc.column_name = d.nmid_ita_attrib_name (+)
@@ -1351,8 +1351,9 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_composite2 AS
        from
           nm_mrg_ita_derivation d
          ,(select column_name, column_id
-          from user_tab_cols
-          where table_name = 'NM_INV_ITEMS_ALL') tc
+          from User_tab_cols
+          where table_name  = 'NM_INV_ITEMS_ALL'
+          ) tc
        where tc.column_name = d.nmid_ita_attrib_name (+)
          and (d.nmid_ita_inv_type = p_inv_type or d.nmid_ita_inv_type is null)
        order by tc.column_id
@@ -1542,7 +1543,7 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_composite2 AS
     --
     putln(htf.tablerowopen);
     putln(htf.tableheader('effective Date'));
-    putln(htf.tabledata(to_char(p_effective_date, nm3user.get_user_date_mask)));
+    putln(htf.tabledata(to_char(p_effective_date, Sys_Context('NM3CORE','USER_DATE_MASK'))));
     putln(htf.tablerowclose);
     
     -- put out the event lines
@@ -1763,7 +1764,7 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_composite2 AS
        nm_mail_users mu
       ,hig_users u
     where u.hus_user_id  = mu.nmu_hus_user_id
-      and u.hus_username = hig.get_application_owner
+      and u.hus_username = Sys_Context('NM3CORE','APPLICATION_OWNER')
     order by mu.nmu_id
     ) where rownum = 1;
     return l_nmu_id;
