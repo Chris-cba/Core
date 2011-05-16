@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3ddl AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ddl.pkb-arc   2.18   Feb 22 2011 14:38:38   Ade.Edwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ddl.pkb-arc   2.19   May 16 2011 14:44:10   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3ddl.pkb  $
---       Date into PVCS   : $Date:   Feb 22 2011 14:38:38  $
---       Date fetched Out : $Modtime:   Feb 22 2011 14:38:08  $
---       PVCS Version     : $Revision:   2.18  $
+--       Date into PVCS   : $Date:   May 16 2011 14:44:10  $
+--       Date fetched Out : $Modtime:   Apr 01 2011 16:11:38  $
+--       PVCS Version     : $Revision:   2.19  $
 --       Based on SCCS Version     : 1.5
 --
 --
@@ -23,7 +23,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3ddl AS
 --
 --all global package variables here
 --
-   g_body_sccsid     constant varchar2(30) :='"$Revision:   2.18  $"';
+   g_body_sccsid     constant varchar2(30) :='"$Revision:   2.19  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3ddl';
@@ -31,8 +31,6 @@ CREATE OR REPLACE PACKAGE BODY Nm3ddl AS
    g_syn_exc_code    NUMBER         := -20001;
    g_syn_exc_msg     VARCHAR2(2000) := 'Unspecified error within nm3ddl';
    g_syn_exception   EXCEPTION;
---
-   g_application_owner USER_USERS.username%TYPE := Hig.get_application_owner;
 --
    c_public   CONSTANT VARCHAR2(6) := 'PUBLIC';
 --
@@ -43,13 +41,13 @@ CREATE OR REPLACE PACKAGE BODY Nm3ddl AS
    SELECT hus_username
     FROM  HIG_USERS
          ,ALL_USERS
-    WHERE hus_username != g_application_owner
+    WHERE hus_username != Sys_Context('NM3CORE','APPLICATION_OWNER')
      AND  username      = hus_username;
 --
    CURSOR cs_objects IS
    SELECT object_name
     FROM  ALL_OBJECTS
-   WHERE  owner = g_application_owner
+   WHERE  owner = Sys_Context('NM3CORE','APPLICATION_OWNER')
     AND  (object_type IN ('TABLE'
                          ,'VIEW'
                          ,'FUNCTION'
@@ -82,7 +80,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3ddl AS
    FROM ALL_TAB_COLUMNS
    WHERE column_name = c_column_name
      AND table_name  = c_table_name
-     AND owner       = g_application_owner;
+     AND owner       = Sys_Context('NM3CORE','APPLICATION_OWNER');
 
 --
 --- LOCAL PROCEDURES --------------------------------------------------------
@@ -339,19 +337,19 @@ IS
 --
    PRAGMA autonomous_transaction;
 --
-   CURSOR check_obj_exists (p_owner VARCHAR2, p_object VARCHAR2) IS
+   CURSOR check_obj_exists (p_object VARCHAR2) IS
    SELECT 'x'
     FROM  ALL_OBJECTS
-   WHERE  owner       = p_owner
+   WHERE  owner       = Sys_Context('NM3CORE','APPLICATION_OWNER')
     AND   object_name = p_object;
 --
   CURSOR get_priv_syns_to_create
            ( cp_object_name IN VARCHAR2 )
   IS
     SELECT 'CREATE SYNONYM ' || hus_username || '.' || cp_object_name
-         ||' FOR '||hig.get_application_owner||'.'|| cp_object_name 
+         ||' FOR '||Sys_Context('NM3CORE','APPLICATION_OWNER')||'.'|| cp_object_name 
       FROM hig_users, all_users
-     WHERE hus_username != hig.get_application_owner
+     WHERE hus_username != Sys_Context('NM3CORE','APPLICATION_OWNER')
        AND username = hus_username
        AND NOT EXISTS
          (SELECT 1 FROM dba_synonyms
@@ -369,13 +367,13 @@ BEGIN
 --
    Nm_Debug.DEBUG(p_object_name);
 --
-   OPEN  check_obj_exists(g_application_owner, p_object_name);
+   OPEN  check_obj_exists( p_object_name);
    FETCH check_obj_exists INTO l_dummy;
    IF check_obj_exists%NOTFOUND
     THEN
       CLOSE check_obj_exists;
       g_syn_exc_code := -20301;
-      g_syn_exc_msg  := 'Object "'||p_object_name||'" does not exist in schema '||g_application_owner;
+      g_syn_exc_msg  := 'Object "'||p_object_name||'" does not exist in schema '||Sys_Context('NM3CORE','APPLICATION_OWNER');
       RAISE g_syn_exception;
    END IF;
    CLOSE check_obj_exists;
@@ -388,7 +386,7 @@ BEGIN
          IF NOT check_syn_exists (c_public,p_object_name)
           THEN
             syn_exec_ddl('CREATE PUBLIC SYNONYM '||p_object_name
-                       ||' FOR '||g_application_owner||'.'||p_object_name
+                       ||' FOR '||Sys_Context('NM3CORE','APPLICATION_OWNER')||'.'||p_object_name
                         );
          END IF;
       ELSIF p_syn_type = 'PRIVATE'
@@ -396,7 +394,7 @@ BEGIN
          IF NOT check_syn_exists (c_public,p_object_name)
           THEN
             syn_exec_ddl('CREATE SYNONYM '||p_object_name
-                       ||' FOR '||g_application_owner||'.'||p_object_name
+                       ||' FOR '||Sys_Context('NM3CORE','APPLICATION_OWNER')||'.'||p_object_name
                         );
          END IF;
    --
@@ -409,7 +407,7 @@ BEGIN
          IF NOT check_syn_exists (c_public,p_object_name)
           THEN
             syn_exec_ddl('CREATE PUBLIC SYNONYM '||p_object_name
-                         ||' FOR '||g_application_owner||'.'||p_object_name
+                         ||' FOR '||Sys_Context('NM3CORE','APPLICATION_OWNER')||'.'||p_object_name
                         );
          END IF;
    --
@@ -471,7 +469,7 @@ PROCEDURE drop_synonym_for_object (p_object_name IN USER_OBJECTS.object_name%TYP
   IS
     SELECT 'DROP SYNONYM ' || hus_username || '.' || synonym_name
       FROM hig_users, all_users, dba_synonyms
-     WHERE hus_username != hig.get_application_owner
+     WHERE hus_username != Sys_Context('NM3CORE','APPLICATION_OWNER')
        AND username = hus_username
        AND owner = hus_username
        AND synonym_name = cp_object_name;
@@ -573,10 +571,10 @@ IS
 --
    PRAGMA autonomous_transaction;
 --
-   CURSOR check_obj_exists (p_owner VARCHAR2, p_object VARCHAR2) IS
+   CURSOR check_obj_exists (p_object VARCHAR2) IS
    SELECT 'x'
     FROM  ALL_OBJECTS
-   WHERE  owner       = p_owner
+   WHERE  owner       = Sys_Context('NM3CORE','APPLICATION_OWNER')
     AND   object_name = p_object;
 --
    l_dummy VARCHAR2(1);
@@ -589,13 +587,13 @@ BEGIN
 --
    Nm_Debug.DEBUG(p_object_name);
 --
-   OPEN  check_obj_exists(g_application_owner, p_object_name);
+   OPEN  check_obj_exists( p_object_name);
    FETCH check_obj_exists INTO l_dummy;
    IF check_obj_exists%NOTFOUND
     THEN
       CLOSE check_obj_exists;
       g_syn_exc_code := -20301;
-      g_syn_exc_msg  := 'Object "'||p_object_name||'" does not exist in schema '||g_application_owner;
+      g_syn_exc_msg  := 'Object "'||p_object_name||'" does not exist in schema '||Sys_Context('NM3CORE','APPLICATION_OWNER');
       RAISE g_syn_exception;
    END IF;
    CLOSE check_obj_exists;
@@ -604,7 +602,7 @@ BEGIN
    LOOP
      BEGIN
        exec_ddl ('CREATE OR REPLACE FORCE VIEW '||cs_rec.hus_username||'.'||p_object_name
-                 ||' AS SELECT * FROM '||g_application_owner||'.'||p_object_name
+                 ||' AS SELECT * FROM '||Sys_Context('NM3CORE','APPLICATION_OWNER')||'.'||p_object_name
                  );
      EXCEPTION
        WHEN OTHERS THEN NULL;
@@ -636,7 +634,7 @@ PROCEDURE create_all_priv_syns (p_user IN USER_USERS.username%TYPE) IS
    IS
      SELECT object_name
        FROM ALL_OBJECTS
-      WHERE owner = g_application_owner
+      WHERE owner = Sys_Context('NM3CORE','APPLICATION_OWNER')
         AND (object_type IN ('TABLE'
                             ,'VIEW'
                             ,'FUNCTION'
@@ -687,7 +685,7 @@ BEGIN
                                ,pi_not_found_sqlcode => -20302
                                );
 --
-   IF p_user = g_application_owner
+   IF p_user = Sys_Context('NM3CORE','APPLICATION_OWNER')
     THEN -- do not create syns for highways owner as they own the objects!
       COMMIT; -- still commit for auton transaction
    ELSE
@@ -707,7 +705,7 @@ BEGIN
      FOR cs_rec IN all_objects ( p_user )
      LOOP
        syn_exec_ddl('CREATE SYNONYM '||p_user||'."'||cs_rec.object_name
-                 ||'" FOR '||g_application_owner||'."'||cs_rec.object_name||'"' );
+                 ||'" FOR '||Sys_Context('NM3CORE','APPLICATION_OWNER')||'."'||cs_rec.object_name||'"' );
      END LOOP;
      
    END IF;
@@ -785,7 +783,7 @@ FUNCTION check_syn_exists (p_owner IN ALL_SYNONYMS.owner%TYPE
     FROM  ALL_SYNONYMS
    WHERE  owner        = p_owner
     AND   synonym_name = p_syn_name
-    AND   table_owner  = g_application_owner;
+    AND   table_owner  = Sys_Context('NM3CORE','APPLICATION_OWNER');
     -- Restrict this so that only SYNS for objects owned by the appl. owner
     --  can be created/dropped so as to prevent possible misuse of this package
 --
@@ -865,7 +863,7 @@ PROCEDURE refresh_public_synonyms IS
 cursor cs_missing_synonyms is
        SELECT object_name
     FROM  ALL_OBJECTS
-    WHERE  owner = hig.get_application_owner
+    WHERE  owner = Sys_Context('NM3CORE','APPLICATION_OWNER')
     AND  (object_type IN ('TABLE'
                          ,'VIEW'
                          ,'FUNCTION'
@@ -893,7 +891,7 @@ cursor cs_missing_synonyms is
     AND   not exists ( select 1 from all_synonyms s
                        where s.synonym_name = object_name
                        and   s.owner = 'PUBLIC'
-                       and   s.table_owner = hig.get_application_owner );
+                       and   s.table_owner = Sys_Context('NM3CORE','APPLICATION_OWNER') );
 BEGIN
 --
    Nm_Debug.proc_start(g_package_name,'refresh_private_synonyms');
@@ -902,7 +900,7 @@ BEGIN
    LOOP
        BEGIN
          syn_exec_ddl('CREATE PUBLIC SYNONYM '||cs_rec.object_name
-                        ||' FOR '||g_application_owner||'.'||cs_rec.object_name
+                        ||' FOR '||Sys_Context('NM3CORE','APPLICATION_OWNER')||'.'||cs_rec.object_name
                        );
        EXCEPTION
          WHEN OTHERS THEN NULL;
@@ -932,7 +930,7 @@ PROCEDURE refresh_private_synonyms IS
 cursor cs_missing_synonyms is
    SELECT hus_username, object_name
     FROM  ALL_OBJECTS, hig_users, all_users
-    WHERE  owner = g_application_owner
+    WHERE  owner = Sys_Context('NM3CORE','APPLICATION_OWNER')
     and hus_is_hig_owner_flag != 'Y'
     and hus_username = username
     AND  (object_type IN ('TABLE'
@@ -962,7 +960,7 @@ cursor cs_missing_synonyms is
     AND   not exists ( select 1 from all_synonyms s
                        where s.synonym_name = object_name
                        and   s.owner = hus_username
-                       and   s.table_owner = g_application_owner );
+                       and   s.table_owner = Sys_Context('NM3CORE','APPLICATION_OWNER') );
 
 BEGIN
 --
@@ -972,7 +970,7 @@ BEGIN
    LOOP
        BEGIN
          syn_exec_ddl('CREATE SYNONYM '||cs_rec.hus_username||'.'||cs_rec.object_name
-                           ||' FOR '||g_application_owner||'.'||cs_rec.object_name
+                           ||' FOR '||Sys_Context('NM3CORE','APPLICATION_OWNER')||'.'||cs_rec.object_name
                      );
        EXCEPTION
          WHEN OTHERS THEN NULL;
@@ -1125,7 +1123,7 @@ BEGIN
       l_ddl := c_revoke;
    END IF;
 --
-   l_ddl  := l_ddl||' '||l_priv||' ON '||g_application_owner||'.'||p_object_name;
+   l_ddl  := l_ddl||' '||l_priv||' ON '||Sys_Context('NM3CORE','APPLICATION_OWNER')||'.'||p_object_name;
 --
    IF l_grant
     THEN
@@ -1158,7 +1156,7 @@ END grant_or_revoke;
 --
 FUNCTION does_object_exist_internal (p_object_name IN VARCHAR2
                                     ,p_object_type IN VARCHAR2 DEFAULT NULL
-                                    ,p_owner       IN VARCHAR2 DEFAULT g_application_owner
+                                    ,p_owner       IN VARCHAR2 DEFAULT Sys_Context('NM3CORE','APPLICATION_OWNER')
                                     ) RETURN BOOLEAN IS
 --
    CURSOR cs_obj (c_owner VARCHAR2
@@ -1197,7 +1195,7 @@ FUNCTION does_object_exist (p_object_name IN VARCHAR2
 BEGIN
    RETURN does_object_exist_internal (p_object_name => p_object_name
                                      ,p_object_type => p_object_type
-                                     ,p_owner       => g_application_owner
+                                     ,p_owner       => Sys_Context('NM3CORE','APPLICATION_OWNER')
                                      );
 END does_object_exist;
 --
@@ -1401,7 +1399,7 @@ PROCEDURE create_user (p_rec_hus            IN OUT HIG_USERS%ROWTYPE
   CURSOR cs_temp_tables_for_user IS
     SELECT object_name
     FROM   ALL_OBJECTS
-    WHERE  owner       = g_application_owner
+    WHERE  owner       = Sys_Context('NM3CORE','APPLICATION_OWNER')
     AND    object_type = 'TABLE'
     AND    object_name LIKE 'TEMP%'
     AND    object_name NOT LIKE 'TEMP_PMS4440%'
@@ -1410,7 +1408,7 @@ PROCEDURE create_user (p_rec_hus            IN OUT HIG_USERS%ROWTYPE
   CURSOR c2 IS
     SELECT object_name
     FROM   ALL_OBJECTS
-    WHERE  owner = g_application_owner
+    WHERE  owner = Sys_Context('NM3CORE','APPLICATION_OWNER')
     AND    object_type = 'VIEW'
     AND    object_name LIKE 'TEMP%';
 --
@@ -1420,18 +1418,18 @@ PROCEDURE create_user (p_rec_hus            IN OUT HIG_USERS%ROWTYPE
   CURSOR c3( c_obj_name VARCHAR2 ) IS
     SELECT 1
      FROM ALL_OBJECTS  -- caters for user objects and synonyms
-    WHERE owner = g_application_owner
+    WHERE owner = Sys_Context('NM3CORE','APPLICATION_OWNER')
     AND    object_name = c_obj_name
     UNION
     SELECT 1
      FROM ALL_SYNONYMS
-    WHERE owner IN ( g_application_owner, 'PUBLIC' )           -- caters for public synonyms
+    WHERE owner IN ( Sys_Context('NM3CORE','APPLICATION_OWNER'), 'PUBLIC' )           -- caters for public synonyms
     AND synonym_name = c_obj_name;
 --
   CURSOR c4 IS
     SELECT 1
     FROM ALL_TABLES
-    WHERE owner = g_application_owner
+    WHERE owner = Sys_Context('NM3CORE','APPLICATION_OWNER')
     AND    table_name = 'INV_TMP'
     UNION
     SELECT 1
@@ -1725,7 +1723,7 @@ IS
    FROM ALL_TAB_COLUMNS
    WHERE column_name = c_column_name
      AND table_name  = c_table_name
-     AND owner       = g_application_owner;
+     AND owner       = Sys_Context('NM3CORE','APPLICATION_OWNER');
 
    retval ALL_TAB_COLUMNS%ROWTYPE;
 BEGIN
@@ -1772,7 +1770,7 @@ BEGIN
 --
    Nm_Debug.proc_start(g_package_name,'get_all_columns_for_table');
 --
-   FOR cs_rec IN cs_cols (p_table_name, g_application_owner)
+   FOR cs_rec IN cs_cols (p_table_name, Sys_Context('NM3CORE','APPLICATION_OWNER'))
     LOOP
       l_tab_atc (cs_cols%rowcount) := cs_rec;
    END LOOP;
@@ -1799,7 +1797,7 @@ BEGIN
     FROM  HIG_SEQUENCE_ASSOCIATIONS
       , all_tables
    WHERE table_name = hsa_table_name
-   and   owner = g_application_owner
+   and   owner = Sys_Context('NM3CORE','APPLICATION_OWNER')
    GROUP BY hsa_sequence_name;
 --
    FOR i IN 1..l_tab_seq.COUNT
@@ -2145,7 +2143,7 @@ IS
 
     EXECUTE IMMEDIATE
       'CREATE OR REPLACE FORCE VIEW '||UPPER(pi_sub_username)||'.user_sdo_maps '||
-      'AS '||'   SELECT * FROM '||Hig.get_application_owner||'.user_sdo_maps';
+      'AS '||'   SELECT * FROM '||Sys_Context('NM3CORE','APPLICATION_OWNER')||'.user_sdo_maps';
   EXCEPTION
     WHEN OTHERS THEN
       -- raise_application_error(-20001,'Failed to create view USER_SDO_MAPS'||chr(10)||nm3flx.parse_error_message(sqlerrm));
@@ -2173,7 +2171,7 @@ IS
 
     EXECUTE IMMEDIATE
       'CREATE OR REPLACE FORCE VIEW '||UPPER(pi_sub_username)||'.user_sdo_themes '||
-      'AS '||'   SELECT * FROM '||Hig.get_application_owner||'.user_sdo_themes';
+      'AS '||'   SELECT * FROM '||Sys_Context('NM3CORE','APPLICATION_OWNER')||'.user_sdo_themes';
   EXCEPTION
     WHEN OTHERS THEN
       -- raise_application_error(-20001,'Failed to create view USER_SDO_THEMES'||chr(10)||nm3flx.parse_error_message(sqlerrm));
@@ -2200,7 +2198,7 @@ IS
 
     EXECUTE IMMEDIATE
       'CREATE OR REPLACE FORCE VIEW '||UPPER(pi_sub_username)||'.user_sdo_styles '||
-      ' AS '||'  SELECT * FROM '||Hig.get_application_owner||'.user_sdo_styles';
+      ' AS '||'  SELECT * FROM '||Sys_Context('NM3CORE','APPLICATION_OWNER')||'.user_sdo_styles';
   EXCEPTION
     WHEN OTHERS THEN
       -- raise_application_error(-20001,'Failed to create view USER_SDO_STYLES'||chr(10)||nm3flx.parse_error_message(sqlerrm));
