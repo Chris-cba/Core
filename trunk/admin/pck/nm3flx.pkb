@@ -2,15 +2,15 @@ CREATE OR REPLACE PACKAGE BODY nm3flx IS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3flx.pkb-arc   2.13   Mar 03 2011 14:08:38   Chris.Strettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3flx.pkb-arc   2.14   May 16 2011 14:44:50   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3flx.pkb  $
---       Date into PVCS   : $Date:   Mar 03 2011 14:08:38  $
---       Date fetched Out : $Modtime:   Mar 03 2011 13:48:40  $
---       Version          : $Revision:   2.13  $
+--       Date into PVCS   : $Date:   May 16 2011 14:44:50  $
+--       Date fetched Out : $Modtime:   Apr 01 2011 07:52:10  $
+--       Version          : $Revision:   2.14  $
 --       Based on SCCS version : 1.47
 -------------------------------------------------------------------------
 --
-  g_body_sccsid      CONSTANT  VARCHAR2(2000) := '$Revision:   2.13  $';
+  g_body_sccsid      CONSTANT  VARCHAR2(2000) := '$Revision:   2.14  $';
 
    g_package_name    CONSTANT varchar2(30) := 'nm3flx';
 -- Package variables
@@ -21,7 +21,9 @@ CREATE OR REPLACE PACKAGE BODY nm3flx IS
    g_desc_tab2 dbms_sql.desc_tab2;
 --
    c_ora_8           CONSTANT VARCHAR2(1) := '8';
-   c_base_db_version CONSTANT VARCHAR2(1) := NVL(SUBSTR(nm3context.get_context(pi_attribute => 'DB_VERSION'), 1, 1), c_ora_8);
+   
+   
+   c_base_db_version CONSTANT VARCHAR2(1) := NVL(SUBSTR(Sys_Context('NM3CORE','DB_VERSION'), 1, 1), c_ora_8);
    
   c_nvl_string       CONSTANT VARCHAR2(30) := Nm3type.c_nvl;
   c_nvl_date         CONSTANT DATE         := Nm3type.c_nvl_date;
@@ -1959,7 +1961,7 @@ END i_t_e;
 -----------------------------------------------------------------------------
 --
 PROCEDURE get_columns_for_table(pi_table_name      IN     varchar2
-                               ,pi_owner           IN     varchar2 DEFAULT hig.get_application_owner
+                               ,pi_owner           IN     varchar2 DEFAULT Sys_Context('NM3CORE','APPLICATION_OWNER')
                                ,pi_column_name     IN     varchar2 DEFAULT NULL
                                ,po_tab_column_name IN OUT nm3type.tab_varchar30
                                ,po_tab_data_type   IN OUT nm3type.tab_varchar30
@@ -2001,7 +2003,7 @@ FUNCTION get_column_datatype(pi_table_name  IN varchar2
 BEGIN
 
     nm3flx.get_columns_for_table(pi_table_name    => pi_table_name
-                              ,pi_owner           => hig.get_application_owner
+                              ,pi_owner           => Sys_Context('NM3CORE','APPLICATION_OWNER')
                               ,pi_column_name     => pi_column_name
                               ,po_tab_column_name => v_tab_column_name
                               ,po_tab_data_type   => v_tab_data_type

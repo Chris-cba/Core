@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY nm3ft_mapping AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ft_mapping.pkb-arc   2.1   Jan 06 2010 22:34:14   cstrettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ft_mapping.pkb-arc   2.2   May 16 2011 14:44:50   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3ft_mapping.pkb  $
---       Date into PVCS   : $Date:   Jan 06 2010 22:34:14  $
---       Date fetched Out : $Modtime:   Jan 06 2010 22:32:42  $
---       Version          : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   May 16 2011 14:44:50  $
+--       Date fetched Out : $Modtime:   Apr 04 2011 08:13:40  $
+--       Version          : $Revision:   2.2  $
 --       Based on SCCS version : 1.2
 -------------------------------------------------------------------------
 --   Author : M Huitson.
@@ -24,7 +24,7 @@ CREATE OR REPLACE PACKAGE BODY nm3ft_mapping AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.1  $';
+  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.2  $';
   g_package_name CONSTANT varchar2(30) := 'nm3ft_mapping';
 --
 -----------------------------------------------------------------------------
@@ -61,7 +61,7 @@ BEGIN
     INTO lt_cols
     FROM all_tab_cols
    WHERE table_name = 'NM_INV_ITEMS_ALL'
-     AND owner = hig.get_application_owner
+     AND owner = Sys_Context('NM3CORE','APPLICATION_OWNER')
    ORDER
       BY column_id
        ;

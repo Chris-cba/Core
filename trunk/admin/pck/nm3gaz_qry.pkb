@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm3gaz_qry AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3gaz_qry.pkb-arc   2.17   Apr 14 2011 10:16:48   Ade.Edwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3gaz_qry.pkb-arc   2.18   May 16 2011 14:44:50   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3gaz_qry.pkb  $
---       Date into PVCS   : $Date:   Apr 14 2011 10:16:48  $
---       Date fetched Out : $Modtime:   Apr 14 2011 10:14:34  $
---       Version          : $Revision:   2.17  $
+--       Date into PVCS   : $Date:   May 16 2011 14:44:50  $
+--       Date fetched Out : $Modtime:   May 05 2011 07:54:46  $
+--       Version          : $Revision:   2.18  $
 --       Based on SCCS version : 1.45
 -------------------------------------------------------------------------
 --   Author : Jonathan Mills
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3gaz_qry AS
 --all global package variables here
 --
    --g_body_sccsid     CONSTANT  varchar2(2000) := '"@(#)nm3gaz_qry.pkb 1.45 05/26/06"';
-   g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.17  $';
+   g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.18  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3gaz_qry';
@@ -296,12 +296,12 @@ END get_erroneous_flex_queries;
 -----------------------------------------------------------------------------
 --
 FUNCTION perform_query (pi_ngq_id         nm_gaz_query.ngq_id%TYPE
-                       ,pi_effective_date date DEFAULT nm3user.get_effective_date
+                       ,pi_effective_date date DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                        ) RETURN nm_nw_temp_extents.nte_job_id%TYPE IS
 --
    e_query_returns_no_network EXCEPTION;
    l_retval                   number;
-   c_init_eff_date   CONSTANT date := nm3user.get_effective_date;
+   c_init_eff_date   CONSTANT date := To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY');
 --
 BEGIN
 --
@@ -2151,7 +2151,7 @@ BEGIN
                                ||CHR(10)||'     nm_admin_units au,'
                                ||CHR(10)||'     nm_admin_groups nag,'
                                ||CHR(10)||'     hig_users hus'
-                               ||CHR(10)||'WHERE hus.hus_username = USER'
+                               ||CHR(10)||'WHERE hus.hus_username = Sys_Context(''NM3_SECURITY_CTX'',''USERNAME'')'
                                ||CHR(10)||'AND ur.hur_role = ir.itr_hro_role'
                                ||CHR(10)||'AND ur.hur_username = hus.hus_username'
                                ||CHR(10)||'AND ir.itr_inv_type = nit_inv_type'

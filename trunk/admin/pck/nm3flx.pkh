@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE nm3flx IS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3flx.pkh-arc   2.7   Apr 11 2011 13:40:46   Chris.Strettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3flx.pkh-arc   2.8   May 16 2011 14:44:50   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3flx.pkh  $
---       Date into PVCS   : $Date:   Apr 11 2011 13:40:46  $
---       Date fetched Out : $Modtime:   Apr 11 2011 12:04:36  $
---       Version          : $Revision:   2.7  $
+--       Date into PVCS   : $Date:   May 16 2011 14:44:50  $
+--       Date fetched Out : $Modtime:   Apr 11 2011 13:56:00  $
+--       Version          : $Revision:   2.8  $
 --       Based on SCCS version : 1.30
 -------------------------------------------------------------------------
 --
@@ -575,7 +575,7 @@ FUNCTION i_t_e(pi_expr IN boolean
 -- column returned
 --
 PROCEDURE get_columns_for_table(pi_table_name      IN     varchar2
-                               ,pi_owner           IN     varchar2 DEFAULT hig.get_application_owner
+                               ,pi_owner           IN     varchar2 DEFAULT Sys_Context('NM3CORE','APPLICATION_OWNER')
                                ,pi_column_name     IN     varchar2 DEFAULT NULL
                                ,po_tab_column_name IN OUT nm3type.tab_varchar30
                                ,po_tab_data_type   IN OUT nm3type.tab_varchar30

@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY nm3group_inv AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3group_inv.pkb-arc   2.2   Jan 06 2010 18:33:10   cstrettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3group_inv.pkb-arc   2.3   May 16 2011 14:44:50   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3group_inv.pkb  $
---       Date into PVCS   : $Date:   Jan 06 2010 18:33:10  $
---       Date fetched Out : $Modtime:   Jan 06 2010 18:32:04  $
---       Version          : $Revision:   2.2  $
+--       Date into PVCS   : $Date:   May 16 2011 14:44:50  $
+--       Date fetched Out : $Modtime:   Apr 01 2011 11:57:14  $
+--       Version          : $Revision:   2.3  $
 --       Based on SCCS version : 1.7
 -------------------------------------------------------------------------
 --   Author : Kevin Angus
@@ -28,7 +28,7 @@ CREATE OR REPLACE PACKAGE BODY nm3group_inv AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-   g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.2  $';
+   g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.3  $';
    g_package_name CONSTANT varchar2(30) := 'nm3group_inv';
    c_nl           CONSTANT varchar2(1) := CHR(10);
   -----------
@@ -415,7 +415,7 @@ BEGIN
          l_rec_nm.nm_type          := 'G';
          l_rec_nm.nm_obj_type      := l_rec_ne.ne_gty_group_type;
          l_rec_nm.nm_begin_mp      := 0;
-         l_rec_nm.nm_start_date    := nm3user.get_effective_date;
+         l_rec_nm.nm_start_date    := To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY');
          l_rec_nm.nm_end_mp        := nm3net.get_ne_length(pi_tab_nm(i));
          l_rec_nm.nm_cardinality   := 1;
          l_rec_nm.nm_admin_unit    := nm3get.get_ne(pi_ne_id => pi_tab_nm(i)).ne_admin_unit;

@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3homo_Gis AS
 --
 -- PVCS Identifiers :-
 --
--- pvcsid : $Header:   //vm_latest/archives/nm3/admin/pck/nm3homo_gis.pkb-arc   2.5   Dec 08 2009 10:44:58   aedwards  $
+-- pvcsid : $Header:   //vm_latest/archives/nm3/admin/pck/nm3homo_gis.pkb-arc   2.6   May 16 2011 14:44:50   Steve.Cooper  $
 -- Module Name : $Workfile:   nm3homo_gis.pkb  $
--- Date into PVCS : $Date:   Dec 08 2009 10:44:58  $
--- Date fetched Out : $Modtime:   Dec 08 2009 10:44:02  $
--- PVCS Version : $Revision:   2.5  $
+-- Date into PVCS : $Date:   May 16 2011 14:44:50  $
+-- Date fetched Out : $Modtime:   Apr 01 2011 14:09:12  $
+-- PVCS Version : $Revision:   2.6  $
 -- Based on SCCS version : 
 --   Author : Jonathan Mills
 --
@@ -24,13 +24,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3homo_Gis AS
 --
 --all global package variables here
 --
-   g_body_sccsid      CONSTANT   VARCHAR2(2000) := '"$Revision:   2.5  $"';
+   g_body_sccsid      CONSTANT   VARCHAR2(2000) := '"$Revision:   2.6  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name     CONSTANT   VARCHAR2(30)   := 'nm3homo_gis';
    c_asset_table      CONSTANT   VARCHAR2(30)   := 'NM_INV_ITEMS';
---
-   c_app_owner        CONSTANT   VARCHAR2(30)   := Hig.get_application_owner;
 --
    l_raise_hig_151               EXCEPTION;
    l_raise_hig_152               EXCEPTION;
@@ -954,12 +952,12 @@ PROCEDURE locate_item
  , pi_restrict_excl_sub_class IN VARCHAR2                      DEFAULT NULL
  , pi_x_pos                   IN NUMBER                        DEFAULT NULL
  , pi_y_pos                   IN NUMBER                        DEFAULT NULL
- , pi_effective_date          IN DATE                          DEFAULT Nm3user.get_effective_date
+ , pi_effective_date          IN DATE                          DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
  , pi_geom                    IN MDSYS.SDO_GEOMETRY            DEFAULT NULL
  ) IS
 
 --
-   c_init_eff_date               CONSTANT DATE := Nm3user.get_effective_date;
+   c_init_eff_date               CONSTANT DATE := To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY');
 --
    l_item_is_inventory           BOOLEAN;
    l_item_is_inv_xy              BOOLEAN;

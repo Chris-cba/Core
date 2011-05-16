@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3get_gen AS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3get_gen.pkb-arc   2.1   Jul 18 2007 15:19:10   smarshall  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3get_gen.pkb-arc   2.2   May 16 2011 14:44:50   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3get_gen.pkb  $
---       Date into PVCS   : $Date:   Jul 18 2007 15:19:10  $
---       Date fetched Out : $Modtime:   Jun 29 2007 16:03:52  $
---       PVCS Version     : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   May 16 2011 14:44:50  $
+--       Date fetched Out : $Modtime:   May 05 2011 08:00:26  $
+--       PVCS Version     : $Revision:   2.2  $
 --
 --
 --   Author : Jonathan Mills
@@ -21,7 +21,7 @@ CREATE OR REPLACE PACKAGE BODY nm3get_gen AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.1  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.2  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3get_gen';
@@ -34,8 +34,6 @@ CREATE OR REPLACE PACKAGE BODY nm3get_gen AS
    g_insert_allowed         boolean;
    --
    g_tab_seq         tab_varchar30;
---
-   c_app_owner       CONSTANT  varchar2(30)   := USER;
 --
    TYPE tab_rec_atc IS TABLE OF all_tab_columns%ROWTYPE INDEX BY binary_integer;
    g_current_tab_vc   tab_varchar32767;
@@ -1406,23 +1404,21 @@ END generate_one;
 --
 FUNCTION create_lock_procedure (p_table_name varchar2) RETURN boolean IS
 --
-   CURSOR cs_at (c_owner varchar2
-                ,c_table varchar2
+   CURSOR cs_at (c_table varchar2
                 ) IS
    SELECT table_name
          ,TEMPORARY
     FROM  all_tables
-   WHERE  owner      = c_owner
+   WHERE  owner      = Sys_Context('NM3_SECURITY_CTX','USERNAME')
     AND   table_name = c_table;
 --
    l_at cs_at%ROWTYPE;
 --
-   CURSOR cs_av (c_owner varchar2
-                ,c_view  varchar2
+   CURSOR cs_av (c_view  varchar2
                 ) IS
    SELECT view_name
     FROM  all_views
-   WHERE  owner     = c_owner
+   WHERE  owner     = Sys_Context('NM3_SECURITY_CTX','USERNAME')
     AND   view_name = c_view;
 --
    l_av     cs_av%ROWTYPE;
@@ -1434,20 +1430,20 @@ BEGIN
 --
    g_insert_allowed := TRUE;
 --
-   OPEN  cs_at (c_app_owner, p_table_name);
+   OPEN  cs_at (p_table_name);
    FETCH cs_at INTO l_at;
    l_found := cs_at%FOUND;
    CLOSE cs_at;
 --
    IF NOT l_found
     THEN
-      OPEN  cs_av (c_app_owner, p_table_name);
+      OPEN  cs_av ( p_table_name);
       FETCH cs_av INTO l_av;
       l_found  := cs_av%FOUND;
       CLOSE cs_av;
       IF NOT l_found
        THEN
-         RAISE_APPLICATION_ERROR(20000,  'Record not found - ALL_TABLES/ALL_VIEWS owner : '||c_app_owner||' name : '||p_table_name);
+         RAISE_APPLICATION_ERROR(20000,  'Record not found - ALL_TABLES/ALL_VIEWS owner : '||Sys_Context('NM3_SECURITY_CTX','USERNAME')||' name : '||p_table_name);
       END IF;
       --
       -- This is a view - see if we can select a rowid from there - if so we will be able to create the lock procedure
@@ -1505,7 +1501,7 @@ BEGIN
             CURSOR cs_trig IS
             SELECT 1
              FROM  all_triggers
-            WHERE  owner        = c_app_owner
+            WHERE  owner        = Sys_Context('NM3_SECURITY_CTX','USERNAME')
              AND   table_name   = p_table_name
              AND   trigger_type = 'INSTEAD OF'
              AND   triggering_event LIKE '%INSERT%';
@@ -1532,22 +1528,20 @@ FUNCTION get_columns (p_table_name varchar2
                      ,p_base_table varchar2
                      ) RETURN tab_rec_atc IS
 --
-   CURSOR cs_columns (c_owner varchar2
-                     ,c_table varchar2
+   CURSOR cs_columns (c_table varchar2
                      ) IS
    SELECT *
     FROM  all_tab_columns
-   WHERE  owner      = c_owner
+   WHERE  owner      = Sys_Context('NM3_SECURITY_CTX','USERNAME')
     AND   table_name = c_table
    ORDER BY column_id;
 --
-   CURSOR cs_col (c_owner varchar2
-                 ,c_table varchar2
+   CURSOR cs_col (c_table varchar2
                  ,c_col   varchar2
                  ) IS
    SELECT data_default
     FROM  all_tab_columns
-   WHERE  owner       = c_owner
+   WHERE  owner       = Sys_Context('NM3_SECURITY_CTX','USERNAME')
     AND   table_name  = c_table
     AND   column_name = c_col;
 --
@@ -1555,7 +1549,7 @@ FUNCTION get_columns (p_table_name varchar2
 --
 BEGIN
 --
-   FOR cs_rec IN cs_columns (c_app_owner, p_table_name)
+   FOR cs_rec IN cs_columns (p_table_name)
     LOOP
       l_retval (cs_columns%rowcount) := cs_rec;
    END LOOP;
@@ -1568,7 +1562,7 @@ BEGIN
       --
       FOR i IN 1..l_retval.COUNT
        LOOP
-         OPEN  cs_col (c_app_owner, p_base_table, l_retval(i).column_name);
+         OPEN  cs_col (p_base_table, l_retval(i).column_name);
          FETCH cs_col INTO l_retval(i).data_default;
          CLOSE cs_col;
       END LOOP;
@@ -1584,12 +1578,11 @@ FUNCTION get_pk_columns (p_constraint_name   varchar2
                         ,p_ignore_start_date boolean DEFAULT FALSE
                         ) RETURN tab_varchar30 IS
 --
-   CURSOR cs_pk_cols (c_owner    varchar2
-                     ,c_con_name varchar2
+   CURSOR cs_pk_cols (c_con_name varchar2
                      ) IS
    SELECT LOWER(column_name)
     FROM  all_cons_columns acc
-   WHERE  owner              = c_owner
+   WHERE  owner              = Sys_Context('NM3_SECURITY_CTX','USERNAME')
     AND   constraint_name    = c_con_name
    ORDER BY position;
 --
@@ -1599,7 +1592,7 @@ FUNCTION get_pk_columns (p_constraint_name   varchar2
 --
 BEGIN
 --
-   OPEN  cs_pk_cols (c_app_owner, p_constraint_name);
+   OPEN  cs_pk_cols ( p_constraint_name);
    FETCH cs_pk_cols BULK COLLECT INTO l_tab_cols;
    CLOSE cs_pk_cols;
 --
@@ -1637,20 +1630,19 @@ PROCEDURE get_primary_unique_cons (pi_table_name           IN     varchar2
                                   ,po_tab_constraint_index    OUT tab_varchar30
                                   ) IS
 --
-   CURSOR cs_pk (c_owner varchar2
-                ,c_table varchar2
+   CURSOR cs_pk (c_table varchar2
                 ) IS
    SELECT constraint_name
          ,index_name
     FROM  all_constraints  ac
-   WHERE  ac.owner           = c_owner
+   WHERE  ac.owner           = Sys_Context('NM3_SECURITY_CTX','USERNAME')
     AND   ac.table_name      = c_table
     AND   ac.constraint_type IN ('P','U')
    ORDER BY ac.constraint_type ASC;
 --
 BEGIN
 --
-   OPEN  cs_pk (c_app_owner, pi_table_name);
+   OPEN  cs_pk (pi_table_name);
    FETCH cs_pk
     BULK COLLECT
     INTO po_tab_constraint_name, po_tab_constraint_index;
