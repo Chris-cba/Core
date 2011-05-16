@@ -1,0 +1,185 @@
+CREATE OR REPLACE PACKAGE nm3api_net as
+--   PVCS Identifiers :-
+--
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3api_net.pkh-arc   2.2   May 16 2011 14:42:26   Steve.Cooper  $
+--       Module Name      : $Workfile:   nm3api_net.pkh  $
+--       Date into PVCS   : $Date:   May 16 2011 14:42:26  $
+--       Date fetched Out : $Modtime:   Apr 01 2011 11:27:26  $
+--       PVCS Version     : $Revision:   2.2  $
+--       Based on SCCS version : 1.2
+--
+--
+--   Author : Rob Coupe
+--
+--   Network API package
+--
+--   This package is a collection of many procedures and functions that are available
+--   elsewhere. The intention is to provide a more concise and more easily accessible
+--   list of programmer interface modules.
+--
+-----------------------------------------------------------------------------
+--	Copyright (c) exor corporation ltd, 2002
+-----------------------------------------------------------------------------
+--<GLOBVAR>
+  g_sccsid      CONSTANT  VARCHAR2(200) :='"$Revision:   2.2  $"';
+--  g_sccsid is the SCCS ID for the package
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version of this package
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body for this package
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="create_node">
+-- This procedure will create a node of the specified node type
+-- If the node type has a NODE_NAME_FORMAT associated with it, then the passed
+--  p_no_node_name MUST be null, otherwise an error will be raised
+--
+FUNCTION  create_node (p_no_node_name   IN     nm_nodes.no_node_name%TYPE   DEFAULT NULL
+                      ,p_no_descr       IN     nm_nodes.no_descr%TYPE
+                      ,p_no_node_type   IN     nm_nodes.no_node_type%TYPE
+                      ,p_effective_date IN     nm_nodes.no_start_date%TYPE  DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
+                      ,p_np_grid_east   IN     nm_points.np_grid_east%TYPE  DEFAULT NULL
+                      ,p_np_grid_north  IN     nm_points.np_grid_north%TYPE DEFAULT NULL
+                      ,p_no_purpose     in     nm_nodes.no_purpose%type default null  -- PT 03.06.08
+                      ) RETURN nm_nodes.no_node_id%TYPE;
+--
+PROCEDURE create_node (p_no_node_name   IN     nm_nodes.no_node_name%TYPE   DEFAULT NULL
+                      ,p_no_descr       IN     nm_nodes.no_descr%TYPE
+                      ,p_no_node_type   IN     nm_nodes.no_node_type%TYPE
+                      ,p_effective_date IN     nm_nodes.no_start_date%TYPE  DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
+                      ,p_np_grid_east   IN     nm_points.np_grid_east%TYPE  DEFAULT NULL
+                      ,p_np_grid_north  IN     nm_points.np_grid_north%TYPE DEFAULT NULL
+                      ,p_no_node_id        OUT nm_nodes.no_node_id%TYPE
+                      ,p_no_purpose     in     nm_nodes.no_purpose%type default null  -- PT 03.06.08
+                      );
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="create_element">
+-- This procedure will create a NM_ELEMENTS record. If the network type of
+--   the element is a child in an auto-inclusion relationship then you can specify
+--   if you wish the cardinality to be forced to be a specific value (+/- 1) or
+--   whether you with the cardinality to be derived based on other connected elements
+--
+PROCEDURE create_element (p_rec_ne         IN OUT nm_elements%ROWTYPE
+                         ,p_effective_date IN     nm_elements.ne_start_date%TYPE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
+                         ,p_nm_cardinality IN     nm_members.nm_cardinality%TYPE DEFAULT NULL
+                         );
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="create_distance_break">
+-- This procedure will create a distance break (DB) record on the specified route, between the
+--   two nodes, with an effective date as passed having the supplied length
+--
+--
+-- 1. Create the DB specifying route by the internal NE_ID, returning the NE_ID and NE_UNIQUE of the
+--     newly created DB record as OUT parameters
+--
+PROCEDURE create_distance_break (pi_route_ne_id      IN     nm_elements.ne_id%TYPE
+                                ,pi_start_node_id    IN     nm_elements.ne_no_start%TYPE
+                                ,pi_end_node_id      IN     nm_elements.ne_no_end%TYPE
+                                ,pi_effective_date   IN     nm_elements.ne_start_date%TYPE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
+                                ,pi_length           IN     nm_elements.ne_length%TYPE     DEFAULT 0
+                                ,po_db_ne_id            OUT nm_elements.ne_id%TYPE
+                                ,po_db_ne_unique        OUT nm_elements.ne_unique%TYPE
+                                );
+--
+-- 2. Create the DB specifying route by the internal NE_ID, without returning any values to identify newly created DB record
+--
+PROCEDURE create_distance_break (pi_route_ne_id      IN     nm_elements.ne_id%TYPE
+                                ,pi_start_node_id    IN     nm_elements.ne_no_start%TYPE
+                                ,pi_end_node_id      IN     nm_elements.ne_no_end%TYPE
+                                ,pi_effective_date   IN     nm_elements.ne_start_date%TYPE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
+                                ,pi_length           IN     nm_elements.ne_length%TYPE     DEFAULT 0
+                                );
+--
+-- 3. Create the DB specifying route by the internal NE_ID, returning the NE_ID of the
+--     newly created DB record as a RETURN from the function
+--
+FUNCTION  create_distance_break (pi_route_ne_id      IN     nm_elements.ne_id%TYPE
+                                ,pi_start_node_id    IN     nm_elements.ne_no_start%TYPE
+                                ,pi_end_node_id      IN     nm_elements.ne_no_end%TYPE
+                                ,pi_effective_date   IN     nm_elements.ne_start_date%TYPE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
+                                ,pi_length           IN     nm_elements.ne_length%TYPE     DEFAULT 0
+                                ) RETURN nm_elements.ne_id%TYPE;
+--
+-- 4. Create the DB specifying route by the NE_UNIQUE, returning the NE_ID and NE_UNIQUE of the
+--     newly created DB record as OUT parameters
+--
+PROCEDURE create_distance_break (pi_route_ne_unique  IN     nm_elements.ne_unique%TYPE
+                                ,pi_route_ne_nt_type IN     nm_elements.ne_nt_type%TYPE    DEFAULT NULL
+                                ,pi_start_node_id    IN     nm_elements.ne_no_start%TYPE
+                                ,pi_end_node_id      IN     nm_elements.ne_no_end%TYPE
+                                ,pi_effective_date   IN     nm_elements.ne_start_date%TYPE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
+                                ,pi_length           IN     nm_elements.ne_length%TYPE     DEFAULT 0
+                                ,po_db_ne_id            OUT nm_elements.ne_id%TYPE
+                                ,po_db_ne_unique        OUT nm_elements.ne_unique%TYPE
+                                );
+--
+-- 5. Create the DB specifying route by the NE_UNIQUE, without returning any values to identify newly created DB record
+--
+PROCEDURE create_distance_break (pi_route_ne_unique  IN     nm_elements.ne_unique%TYPE
+                                ,pi_route_ne_nt_type IN     nm_elements.ne_nt_type%TYPE    DEFAULT NULL
+                                ,pi_start_node_id    IN     nm_elements.ne_no_start%TYPE
+                                ,pi_end_node_id      IN     nm_elements.ne_no_end%TYPE
+                                ,pi_effective_date   IN     nm_elements.ne_start_date%TYPE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
+                                ,pi_length           IN     nm_elements.ne_length%TYPE     DEFAULT 0
+                                );
+--
+-- 6. Create the DB specifying route by the NE_UNIQUE, returning the NE_ID of the
+--     newly created DB record as a RETURN from the function
+--
+FUNCTION  create_distance_break (pi_route_ne_unique  IN     nm_elements.ne_unique%TYPE
+                                ,pi_route_ne_nt_type IN     nm_elements.ne_nt_type%TYPE    DEFAULT NULL
+                                ,pi_start_node_id    IN     nm_elements.ne_no_start%TYPE
+                                ,pi_end_node_id      IN     nm_elements.ne_no_end%TYPE
+                                ,pi_effective_date   IN     nm_elements.ne_start_date%TYPE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
+                                ,pi_length           IN     nm_elements.ne_length%TYPE     DEFAULT 0
+                                ) RETURN nm_elements.ne_id%TYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="close_datum_element">
+PROCEDURE close_datum_element (pi_datum_ne_id     IN nm_elements.ne_id%TYPE
+                              ,pi_close_date      IN DATE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
+                              );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="close_group_of_elements">
+PROCEDURE close_group_of_elements (pi_route_ne_id     IN nm_elements.ne_id%TYPE
+                                  ,pi_close_date      IN DATE     DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
+                                  ,pi_close_all       IN VARCHAR2 DEFAULT 'N'
+                                  );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PRAGMA>
+   PRAGMA RESTRICT_REFERENCES (get_version, RNDS, WNPS, WNDS);
+   PRAGMA RESTRICT_REFERENCES (get_body_version, RNDS, WNPS, WNDS);
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+end nm3api_net;
+/
