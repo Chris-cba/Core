@@ -1,0 +1,280 @@
+CREATE OR REPLACE PACKAGE nm3merge IS
+--<PACKAGE>
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)nm3merge.pkh	1.15 02/18/05
+--       Module Name      : nm3merge.pkh
+--       Date into SCCS   : 05/02/18 11:03:01
+--       Date fetched Out : 07/06/13 14:12:40
+--       SCCS Version     : 1.15
+--
+--   Author : ITurnbull
+--
+--     nm3merge package. Used for Merging two elements
+--
+-----------------------------------------------------------------------------
+--	Copyright (c) exor corporation ltd, 2000
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--all global package variables here
+--<GLOBVAR>
+  g_sccsid      CONSTANT  VARCHAR2(80) := '@(#)nm3merge.pkh	1.15 02/18/05';
+--  g_sccsid is the SCCS_ID
+--
+-- Records used in dynamic SQL
+   g_rec_ne1                    nm_elements%ROWTYPE;
+   g_rec_ne2                    nm_elements%ROWTYPE;
+   g_empty_rec_ne               nm_elements%ROWTYPE;
+   g_node_id                    nm_nodes.no_node_id%TYPE;
+--
+   g_ne_id_1                    nm_elements.ne_id%TYPE;
+   g_ne_id_2                    nm_elements.ne_id%TYPE;
+   g_ne_id_to_flip              nm_elements.ne_id%TYPE;
+   g_ne_1_datum_length          nm_elements.ne_length%TYPE;
+   g_ne_2_datum_length          nm_elements.ne_length%TYPE;
+   g_ne_no_start_new            nm_elements.ne_no_start%TYPE;
+   g_ne_no_end_new              nm_elements.ne_no_end%TYPE;
+--
+   g_tab_nmh_nm_ne_id_in        nm3type.tab_number;
+   g_tab_nmh_nm_ne_id_of_old    nm3type.tab_number;
+   g_tab_nmh_nm_ne_id_of_new    nm3type.tab_number;
+   g_tab_nmh_nm_begin_mp        nm3type.tab_number;
+   g_tab_nmh_nm_start_date      nm3type.tab_date;
+   g_tab_nmh_nm_type            nm3type.tab_varchar4;
+   g_tab_nmh_nm_obj_type        nm3type.tab_varchar4;
+   g_tab_nmh_nm_end_date        nm3type.tab_date;
+--
+--
+-- globals set by can_elements_be_merged function
+--
+   g_ner_appl  nm_errors.ner_appl%TYPE;
+   g_ner_id    nm_errors.ner_id%TYPE;
+   g_supplimentary_info  VARCHAR2(200);
+
+   TYPE rec_common_nodes IS RECORD (no_node_id  nm_nodes.no_node_id%TYPE
+                                   ,on_ne_id_1  VARCHAR2(1)
+                                   ,on_ne_id_2  VARCHAR2(1)
+                                   );
+
+   TYPE tab_rec_common_nodes IS TABLE OF rec_common_nodes INDEX BY BINARY_INTEGER;
+--
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_version">
+-- This function returns the SCCS version information
+  FUNCTION get_version RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="do_merge">
+-- GJ 5-NOV-2004
+-- replaced by do_merge_datum_or_group
+--
+-- create a new element based on two existing elements
+-- merge the nm_members as well
+-- p_ne_id_new will be null if the two elements are not connected
+--   PROCEDURE do_merge (p_ne_id_1           IN     nm_elements.ne_id%TYPE
+--                      ,p_ne_id_2           IN     nm_elements.ne_id%TYPE
+--                      ,p_ne_id_new         IN OUT nm_elements.ne_id%TYPE
+--                      ,p_effective_date    IN     DATE                               DEFAULT nm3user.get_effective_date
+--                      ,p_merge_at_node     IN     nm_elements.ne_no_start%TYPE
+--                      ,p_ne_unique         IN     nm_elements.ne_unique%TYPE         DEFAULT NULL
+--                      ,p_ne_type           IN     nm_elements.ne_type%TYPE           DEFAULT NULL
+--                      ,p_ne_nt_type        IN     nm_elements.ne_nt_type%TYPE        DEFAULT NULL
+--                      ,p_ne_descr          IN     nm_elements.ne_descr%TYPE          DEFAULT NULL
+--                      ,p_ne_length         IN     nm_elements.ne_length%TYPE         DEFAULT NULL
+--                      ,p_ne_admin_unit     IN     nm_elements.ne_admin_unit%TYPE     DEFAULT NULL
+--                      ,p_ne_gty_group_type IN     nm_elements.ne_gty_group_type%TYPE DEFAULT NULL
+--                      ,p_ne_owner          IN     nm_elements.ne_owner%TYPE          DEFAULT NULL
+--                      ,p_ne_name_1         IN     nm_elements.ne_name_1%TYPE         DEFAULT NULL
+--                      ,p_ne_name_2         IN     nm_elements.ne_name_2%TYPE         DEFAULT NULL
+--                      ,p_ne_prefix         IN     nm_elements.ne_prefix%TYPE         DEFAULT NULL
+--                      ,p_ne_number         IN     nm_elements.ne_number%TYPE         DEFAULT NULL
+--                      ,p_ne_sub_type       IN     nm_elements.ne_sub_type%TYPE       DEFAULT NULL
+--                      ,p_ne_group          IN     nm_elements.ne_group%TYPE          DEFAULT NULL
+--                      ,p_ne_no_start       IN     nm_elements.ne_no_start%TYPE       DEFAULT NULL
+--                      ,p_ne_no_end         IN     nm_elements.ne_no_end%TYPE         DEFAULT NULL
+--                      ,p_ne_sub_class      IN     nm_elements.ne_sub_class%TYPE       DEFAULT NULL
+--                      ,p_ne_nsg_ref        IN     nm_elements.ne_nsg_ref%TYPE        DEFAULT NULL
+--                      ,p_ne_version_no     IN     nm_elements.ne_version_no%TYPE     DEFAULT NULL
+--                      ,p_test_poe_at_node  IN     VARCHAR2                           DEFAULT 'N'
+--                      ,p_test_sub_class    IN     VARCHAR2                           DEFAULT 'N'
+--                      );
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="do_merge">
+-- create a new element based on two existing elements
+-- merge the nm_members as well
+-- p_ne_id_new will be null if the two elements are not connected
+-- Use this for SDE only the new ne_id must be supplied.
+   PROCEDURE do_geo_merge (p_ne_id_1           IN nm_elements.ne_id%TYPE
+                          ,p_ne_id_2           IN nm_elements.ne_id%TYPE
+                          ,p_ne_id_new         IN nm_elements.ne_id%TYPE
+                          ,p_effective_date    IN DATE                               DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
+                          ,p_merge_at_node     IN nm_elements.ne_no_start%TYPE
+                          ,p_ne_unique         IN nm_elements.ne_unique%TYPE         DEFAULT NULL
+                          ,p_ne_type           IN nm_elements.ne_type%TYPE           DEFAULT NULL
+                          ,p_ne_nt_type        IN nm_elements.ne_nt_type%TYPE        DEFAULT NULL
+                          ,p_ne_descr          IN nm_elements.ne_descr%TYPE          DEFAULT NULL
+                          ,p_ne_length         IN nm_elements.ne_length%TYPE         DEFAULT NULL
+                          ,p_ne_admin_unit     IN nm_elements.ne_admin_unit%TYPE     DEFAULT NULL
+                          ,p_ne_gty_group_type IN nm_elements.ne_gty_group_type%TYPE DEFAULT NULL
+                          ,p_ne_owner          IN nm_elements.ne_owner%TYPE          DEFAULT NULL
+                          ,p_ne_name_1         IN nm_elements.ne_name_1%TYPE         DEFAULT NULL
+                          ,p_ne_name_2         IN nm_elements.ne_name_2%TYPE         DEFAULT NULL
+                          ,p_ne_prefix         IN nm_elements.ne_prefix%TYPE         DEFAULT NULL
+                          ,p_ne_number         IN nm_elements.ne_number%TYPE         DEFAULT NULL
+                          ,p_ne_sub_type       IN nm_elements.ne_sub_type%TYPE       DEFAULT NULL
+                          ,p_ne_group          IN  nm_elements.ne_group%TYPE         DEFAULT NULL
+                          ,p_ne_no_start       IN nm_elements.ne_no_start%TYPE       DEFAULT NULL
+                          ,p_ne_no_end         IN nm_elements.ne_no_end%TYPE         DEFAULT NULL
+                          ,p_ne_sub_class      IN nm_elements.ne_sub_class%TYPE       DEFAULT NULL
+                          ,p_ne_nsg_ref        IN nm_elements.ne_nsg_ref%TYPE        DEFAULT NULL
+                          ,p_ne_version_no     IN nm_elements.ne_version_no%TYPE     DEFAULT NULL
+                          ,p_test_poe_at_node  IN VARCHAR2                           DEFAULT 'N'
+                          ,p_test_sub_class    IN VARCHAR2                           DEFAULT 'N'
+                          );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="elements_on_same_route">
+-- Checks if the two elements passed are part of the same route.
+-- returns 'Y' if they are
+-- and 'N' if there not
+FUNCTION elements_on_same_route( pi_ne_id_1 NUMBER,pi_ne_id_2 NUMBER) RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="check_for_lost_connectivity">
+-- Checks if any connectivity will be lost by doing the merge
+PROCEDURE check_for_lost_connectivity ( p_ne_id_1 IN NUMBER
+                                       ,p_ne_id_2 IN NUMBER
+                                       );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--<PROC NAME="get_new_chainage">
+-- calculate the new chainage of a defect etc following a merge
+-- amogst other things it takes into consideration whether or not the
+-- defect etc was on the flipped section
+FUNCTION get_new_chainage(pi_rse_length_1          IN nm_elements.ne_length%TYPE
+                         ,pi_rse_length_2          IN nm_elements.ne_length%TYPE
+                         ,pi_rse_sys_flag          IN VARCHAR2
+                         ,pi_chainage_section      IN NUMBER DEFAULT 1  -- either 1 or 2
+						 ,pi_new_starting_section  IN NUMBER DEFAULT 1   -- following a merge which section is the section from which the start should be measured						 
+						 ,pi_original_chainage     IN NUMBER
+						 ,pi_cardinality_flipped   IN VARCHAR2 DEFAULT 'N') RETURN NUMBER;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--<PROC NAME="ins_neh">
+-- This procedure inserts a row into NM_ELEMENT_HISTORY
+--
+PROCEDURE ins_neh (p_rec_neh IN OUT NM_ELEMENT_HISTORY%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE clear_nmh_variables;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE end_date_members (p_nm_ne_id_of_old        nm_members.nm_ne_id_of%TYPE
+                           ,p_nm_ne_id_of_new        nm_members.nm_ne_id_of%TYPE
+                           ,p_effective_date         nm_members.nm_end_date%TYPE
+                           ,p_nm_type                nm_members.nm_type%TYPE     DEFAULT nm3type.c_nvl
+                           );
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE append_nmh_to_variables (p_rec_nmh NM_MEMBER_HISTORY%ROWTYPE);
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_nmh;
+--
+-----------------------------------------------------------------------------
+--
+FUNCTION is_nw_operation_in_progress RETURN BOOLEAN;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE set_nw_operation_in_progress (p_in_progress BOOLEAN DEFAULT TRUE);
+--
+-----------------------------------------------------------------------------
+--
+FUNCTION can_elements_be_merged (pi_ne_id_1 IN nm_elements.ne_id%TYPE
+                                ,pi_ne_id_2 IN nm_elements.ne_id%TYPE
+								,pi_effective_date IN DATE DEFAULT NULL) RETURN BOOLEAN;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE check_elements_can_be_merged (pi_ne_id_1 IN nm_elements.ne_id%TYPE
+                                       ,pi_ne_id_2 IN nm_elements.ne_id%TYPE
+                                       ,pi_effective_date IN DATE DEFAULT NULL);
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE do_merge_datum_or_group (pi_ne_id_1           IN     nm_elements.ne_id%TYPE
+                                  ,pi_ne_id_2           IN     nm_elements.ne_id%TYPE
+                                  ,pi_effective_date    IN     date                               DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
+                                  ,pi_merge_at_node     IN     nm_elements.ne_no_start%TYPE
+                                  ,pi_ne_unique         IN     nm_elements.ne_unique%TYPE         DEFAULT NULL
+                                  ,pi_ne_type           IN     nm_elements.ne_type%TYPE           DEFAULT NULL
+                                  ,pi_ne_nt_type        IN     nm_elements.ne_nt_type%TYPE        DEFAULT NULL
+                                  ,pi_ne_descr          IN     nm_elements.ne_descr%TYPE          DEFAULT NULL
+                                  ,pi_ne_length         IN     nm_elements.ne_length%TYPE         DEFAULT NULL
+                                  ,pi_ne_admin_unit     IN     nm_elements.ne_admin_unit%TYPE     DEFAULT NULL
+                                  ,pi_ne_gty_group_type IN     nm_elements.ne_gty_group_type%TYPE DEFAULT NULL
+                                  ,pi_ne_owner          IN     nm_elements.ne_owner%TYPE          DEFAULT NULL
+                                  ,pi_ne_name_1         IN     nm_elements.ne_name_1%TYPE         DEFAULT NULL
+                                  ,pi_ne_name_2         IN     nm_elements.ne_name_2%TYPE         DEFAULT NULL
+                                  ,pi_ne_prefix         IN     nm_elements.ne_prefix%TYPE         DEFAULT NULL
+                                  ,pi_ne_number         IN     nm_elements.ne_number%TYPE         DEFAULT NULL
+                                  ,pi_ne_sub_type       IN     nm_elements.ne_sub_type%TYPE       DEFAULT NULL
+                                  ,pi_ne_group          IN     nm_elements.ne_group%TYPE          DEFAULT NULL
+                                  ,pi_ne_no_start       IN     nm_elements.ne_no_start%TYPE       DEFAULT NULL
+                                  ,pi_ne_no_end         IN     nm_elements.ne_no_end%TYPE         DEFAULT NULL
+                                  ,pi_ne_sub_class      IN     nm_elements.ne_sub_class%TYPE      DEFAULT NULL
+                                  ,pi_ne_nsg_ref        IN     nm_elements.ne_nsg_ref%TYPE        DEFAULT NULL
+                                  ,pi_ne_version_no     IN     nm_elements.ne_version_no%TYPE     DEFAULT NULL
+                                  ,pi_test_poe_at_node  IN     varchar2                           DEFAULT 'N'
+                                  ,po_ne_id_new         IN OUT nm_elements.ne_id%TYPE
+                                  ,pi_neh_descr         IN     nm_element_history.neh_descr%TYPE  DEFAULT NULL); --CWS 0108990 12/03/2010
+--
+-----------------------------------------------------------------------------
+--
+FUNCTION get_route_common_node(pi_route_ne_id_1          IN nm_elements.ne_id%TYPE
+                              ,pi_route_ne_id_2          IN nm_elements.ne_id%TYPE
+                               ) RETURN tab_rec_common_nodes;
+--
+-----------------------------------------------------------------------------
+--
+FUNCTION route_has_valid_SE_nodes(pi_route_ne_id  IN nm_elements.ne_id%TYPE) RETURN BOOLEAN;
+--
+-----------------------------------------------------------------------------
+--
+--<PRAGMA>
+   PRAGMA RESTRICT_REFERENCES (get_version, rnds, wnps, wnds);
+   PRAGMA RESTRICT_REFERENCES (get_body_version,  wnps, wnds);
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+END nm3merge;
+/

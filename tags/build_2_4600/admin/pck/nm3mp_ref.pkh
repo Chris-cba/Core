@@ -1,0 +1,298 @@
+CREATE OR REPLACE PACKAGE nm3mp_ref AS
+--<PACKAGE>
+-----------------------------------------------------------------------------
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)nm3mp_ref.pkh	1.1 12/22/06
+--       Module Name      : nm3mp_ref.pkh
+--       Date into SCCS   : 06/12/22 15:36:48
+--       Date fetched Out : 07/06/13 14:12:41
+--       SCCS Version     : 1.1
+--
+--
+--   Author : Kevin Angus
+--
+--    nm3mp_ref
+--
+-----------------------------------------------------------------------------
+--	Copyright (c) exor corporation ltd, 2006
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+
+  -----------
+  --constants
+  -----------
+  --g_sccsid is the SCCS ID for the package
+  g_sccsid CONSTANT varchar2(2000) := '"@(#)nm3mp_ref.pkh	1.1 12/22/06"';
+
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_route_offset_for_ref_item">
+--
+-- This function returns the route offset for the supplied reference item.
+--
+FUNCTION get_route_offset_for_ref_item(pi_route_id in nm_elements.ne_id%type
+                                      ,pi_ref_item in nm_inv_items.iit_ne_id%type
+                                      ) RETURN number;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_temp_ne_for_refs">
+--
+-- This function returns the job ID of a temp extent created for the 
+-- continuous portion of the route between the reference/offsets supplied.
+--
+FUNCTION get_temp_ne_for_refs(pi_route_id         in nm_elements.ne_id%type
+                             ,pi_start_ref_item   in nm_inv_items.iit_ne_id%type
+                             ,pi_start_ref_offset in number
+                             ,pi_end_ref_item     in nm_inv_items.iit_ne_id%type default null
+                             ,pi_end_ref_offset   in number default null
+                             ) RETURN nm_nw_temp_extents.nte_job_id%TYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="locate_asset">
+--
+-- This procedure locates the specified asset on the route between the
+-- supplied reference items/offsets.
+--
+-- There are two overloads - one for continuous and one for point items.
+--
+PROCEDURE locate_asset(pi_iit_ne_id        in nm_inv_items.iit_ne_id%type
+                      ,pi_effective_date   IN DATE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
+                      ,pi_route_id         in nm_elements.ne_id%type
+                      ,pi_start_ref_item   in nm_inv_items.iit_ne_id%type
+                      ,pi_start_ref_offset in number
+                      ,pi_end_ref_item     in nm_inv_items.iit_ne_id%type
+                      ,pi_end_ref_offset   in number
+                      );
+PROCEDURE locate_asset(pi_iit_ne_id      in nm_inv_items.iit_ne_id%type
+                      ,pi_effective_date IN DATE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
+                      ,pi_route_id       in nm_elements.ne_id%type
+                      ,pi_ref_item       in nm_inv_items.iit_ne_id%type
+                      ,pi_ref_offset     in number
+                      );
+PROCEDURE locate_asset(pi_rec in v_load_locate_inv_by_ref%ROWTYPE
+                      );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nearest_ref_for_offset">
+--
+-- This procedure returns the nearest preceeding reference item and its 
+-- offset to a given point on the route.
+--
+-- If there is no preceeding item of the requested type on the route then the 
+-- route offset is returned and the reference item will be NULL. 
+--
+PROCEDURE get_nearest_ref_for_offset(pi_route_id       in     nm_elements.ne_id%type
+                                    ,pi_offset         in     number
+                                    ,pi_ref_item_type  in     nm_inv_types.nit_inv_type%type
+                                    ,po_ref_item          out nm_inv_items.iit_ne_id%type
+                                    ,po_ref_label         out varchar2
+                                    ,po_ref_offset        out number
+                                    );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_refs_for_item">
+--
+-- This procedure returns the reference items/offsets for the start and end of
+-- the location of the supplied item on the given route.
+--
+-- Will raise errors if the item is not located on the route or if it has
+-- multiple locations.
+--
+PROCEDURE get_refs_for_item(pi_iit_ne_id        in     nm_inv_items.iit_ne_id%type
+                           ,pi_route_id         in     nm_elements.ne_id%type
+                           ,pi_ref_inv_type     in     nm_inv_types.nit_inv_type%type
+                           ,po_start_ref_item      out nm_inv_items.iit_ne_id%type
+                           ,po_start_ref_label     out varchar2
+                           ,po_start_ref_offset    out number
+                           ,po_end_ref_item        out nm_inv_items.iit_ne_id%type
+                           ,po_end_ref_label       out varchar2
+                           ,po_end_ref_offset      out number
+                           );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_start_ref_item">
+--
+-- This function returns the reference item that is nearest (preceeding) the
+-- start of the location of the supplied asset on the given route.
+--
+-- Will return NULL if the item is not located on the route, if it has
+-- multiple locations.
+--
+FUNCTION get_start_ref_item(pi_iit_ne_id    in nm_inv_items.iit_ne_id%type
+                           ,pi_route_id     in nm_elements.ne_id%type
+                           ,pi_ref_inv_type in nm_inv_types.nit_inv_type%type
+                           ) RETURN nm_inv_items.iit_ne_id%type;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_start_ref_label">
+--
+-- This function returns the label of the reference item that is nearest 
+-- (preceeding) the start of the location of the supplied asset on the given
+-- route.
+--
+FUNCTION get_start_ref_label(pi_iit_ne_id    in nm_inv_items.iit_ne_id%type
+                            ,pi_route_id     in nm_elements.ne_id%type
+                            ,pi_ref_inv_type in nm_inv_types.nit_inv_type%type
+                            ) RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_start_ref_offset">
+--
+-- This function returns the offset from the reference item that is nearest 
+-- (preceeding) the start of the location of the supplied asset on the given
+-- route.
+--
+FUNCTION get_start_ref_offset(pi_iit_ne_id    in nm_inv_items.iit_ne_id%type
+                             ,pi_route_id     in nm_elements.ne_id%type
+                             ,pi_ref_inv_type in nm_inv_types.nit_inv_type%type
+                             ) RETURN number;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_end_ref_item">
+--
+-- This function returns the reference item that is nearest (preceeding)
+-- the end of the location of the supplied asset on the given route.
+--
+FUNCTION get_end_ref_item(pi_iit_ne_id    in nm_inv_items.iit_ne_id%type
+                         ,pi_route_id     in nm_elements.ne_id%type
+                         ,pi_ref_inv_type in nm_inv_types.nit_inv_type%type
+                         ) RETURN nm_inv_items.iit_ne_id%type;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_end_ref_offset">
+--
+-- This function returns the offset from the reference item that is nearest 
+-- (preceeding) the end of the location of the supplied asset on the given 
+-- route.
+--
+FUNCTION get_end_ref_offset(pi_iit_ne_id    in nm_inv_items.iit_ne_id%type
+                           ,pi_route_id     in nm_elements.ne_id%type
+                           ,pi_ref_inv_type in nm_inv_types.nit_inv_type%type
+                           ) RETURN number;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_end_ref_label">
+--
+-- This function returns the lebel of the reference item that is nearest 
+-- (preceeding) the end of the location of the supplied asset on the given 
+-- route. 
+--
+FUNCTION get_end_ref_label(pi_iit_ne_id    in nm_inv_items.iit_ne_id%type
+                          ,pi_route_id     in nm_elements.ne_id%type
+                          ,pi_ref_inv_type in nm_inv_types.nit_inv_type%type
+                          ) RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="validate_element">
+--
+-- This function validates if the supplied element is valid for use when
+-- locating using reference post referencing. Specifically the element should
+-- be a linear, non-partial group of sections. 
+--
+PROCEDURE validate_element(pi_ne_id in nm_elements.ne_id%type
+                          );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="validate_ref_item">
+--
+-- This function validates if the supplied item exists, is of a suitable
+-- type, and is valid on the route specified. 
+--
+PROCEDURE validate_ref_item(pi_iit_ne_id in nm_inv_items.iit_ne_id%type
+                           ,pi_route_id  in nm_elements.ne_id%type
+                           );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--<PROC NAME="validate_ref_type">
+--
+-- This procedure validates if the supplied asset type is valid for use as
+-- a reference type and that it is allowed on the specified route. If it is 
+-- not valid error NET 444 is raised.
+--
+procedure validate_ref_type(pi_ref_type   in nm_inv_types.nit_inv_type%type
+                           ,pi_group_type in nm_group_types.ngt_group_type%type
+                           );
+PROCEDURE validate_ref_type(pi_ref_type in nm_inv_types.nit_inv_type%type
+                           ,pi_route_id in nm_elements.ne_id%type
+                           );
+
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--<PROC NAME="ref_type_is_valid">
+--
+-- This function validates if the supplied asset type is valid for use as
+-- a reference type and that it is allowed on the specified route.
+--
+FUNCTION ref_type_is_valid(pi_ref_type   in nm_inv_types.nit_inv_type%type
+                          ,pi_group_type in nm_group_types.ngt_group_type%type
+                          ) RETURN boolean;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_default_ref_type">
+--
+-- This function returns the default reference asset type, optionally
+-- specific for the supplied inventory and/or network types. 
+--
+FUNCTION get_default_ref_type(pi_inv_type in nm_inv_types.nit_inv_type%type default null
+                             ,pi_nt_type  in nm_types.nt_type%type default null
+                             ) RETURN nm_inv_types.nit_inv_type%TYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PRAGMA>
+  PRAGMA RESTRICT_REFERENCES(get_version, rnds, wnps, wnds);
+  PRAGMA RESTRICT_REFERENCES(get_body_version, rnds, wnps, wnds);
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+END nm3mp_ref;
+/
+
