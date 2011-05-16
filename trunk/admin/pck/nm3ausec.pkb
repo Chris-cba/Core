@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm3ausec AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ausec.pkb-arc   2.3   Oct 23 2009 12:57:36   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ausec.pkb-arc   2.4   May 16 2011 14:44:08   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3ausec.pkb  $
---       Date into PVCS   : $Date:   Oct 23 2009 12:57:36  $
---       Date fetched Out : $Modtime:   Oct 23 2009 12:56:46  $
---       PVCS Version     : $Revision:   2.3  $
+--       Date into PVCS   : $Date:   May 16 2011 14:44:08  $
+--       Date fetched Out : $Modtime:   May 03 2011 11:46:30  $
+--       PVCS Version     : $Revision:   2.4  $
 --       Based on
 --
 --   Author : Rob Coupe
@@ -19,7 +19,7 @@ CREATE OR REPLACE PACKAGE BODY nm3ausec AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.3  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.4  $"';
 
 --  g_body_sccsid is the SCCS ID for the package body
 --
@@ -30,9 +30,6 @@ CREATE OR REPLACE PACKAGE BODY nm3ausec AS
    g_au_sec_exc_msg   varchar2(2000);
 --
    g_security_status  varchar2(3) := nm3type.c_on;
---
-   g_user CONSTANT    varchar2(30) := USER;
-   g_user_is_unrestricted CONSTANT boolean := nm3user.is_user_unrestricted;
 --
    g_last_admin_type      nm_au_types.nat_admin_type%TYPE;
    g_last_admin_unit      nm_admin_units.nau_admin_unit%TYPE;
@@ -385,7 +382,7 @@ BEGIN
     THEN
 --    dbms_output.put_line( 'gaps' );
 -- nm_debug.debug('      IF NOT Nm3user.is_user_unrestricted');
-      IF NOT nm3user.is_user_unrestricted
+      IF NOT Sys_Context('NM3CORE','UNRESTRICTED_INVENTORY') = 'TRUE'
        THEN
 --       dbms_output.put_line( 'NOT privvy');
          -- Check to make sure that this is a Network membership operation
@@ -717,7 +714,7 @@ BEGIN
       RETURN;
    END IF;
 --
-   IF NOT g_user_is_unrestricted
+   IF NOT Sys_Context('NM3CORE','UNRESTRICTED_INVENTORY') = 'TRUE'
     THEN
       -- Set the exception variables
       IF c_updating
@@ -732,7 +729,7 @@ BEGIN
       END IF;
       --
    --
-      IF nm3ausec.get_au_mode( g_user, p_rec.nm_admin_unit_new ) != nm3type.c_normal
+      IF nm3ausec.get_au_mode( Sys_Context('NM3_SECURITY_CTX','USERNAME'), p_rec.nm_admin_unit_new ) != nm3type.c_normal
        THEN
          -- Make Sure that the user has NORMAL access to the AU
          hig.raise_ner (pi_appl               => nm3type.c_net
@@ -799,7 +796,7 @@ END check_each_nm_row;
 -----------------------------------------------------------------------------
 --
 FUNCTION get_highest_au_of_au_type (p_au_type nm_admin_units.nau_admin_type%TYPE DEFAULT NULL
-                                   ,p_user    varchar2                           DEFAULT USER
+                                   ,p_user    varchar2                           DEFAULT Sys_Context('NM3_SECURITY_CTX','USERNAME')
                                    ,p_mode    varchar2                           DEFAULT nm3type.c_normal
                                    ) RETURN nm_admin_units.nau_admin_unit%TYPE IS
 --

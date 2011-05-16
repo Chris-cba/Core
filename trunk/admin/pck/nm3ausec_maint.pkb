@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm3ausec_maint AS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid                 : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ausec_maint.pkb-arc   2.3   Apr 23 2008 17:36:10   ptanava  $
+--       pvcsid                 : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ausec_maint.pkb-arc   2.4   May 16 2011 14:44:08   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3ausec_maint.pkb  $
---       Date into PVCS   : $Date:   Apr 23 2008 17:36:10  $
---       Date fetched Out : $Modtime:   Apr 23 2008 17:27:02  $
---       PVCS Version     : $Revision:   2.3  $
+--       Date into PVCS   : $Date:   May 16 2011 14:44:08  $
+--       Date fetched Out : $Modtime:   Apr 01 2011 11:41:56  $
+--       PVCS Version     : $Revision:   2.4  $
 --       Based on SCCS version : 1.4
 --
 --   Author : Jonathan Mills
@@ -24,7 +24,7 @@ CREATE OR REPLACE PACKAGE BODY nm3ausec_maint AS
 */
 
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.3  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.4  $"';
    g_package_name    CONSTANT  varchar2(30)   := 'nm3ausec_maint';
 --
    TYPE rec_parent IS RECORD
@@ -73,7 +73,7 @@ END get_body_version;
 PROCEDURE update_admin_unit (pi_nte_job_id     IN nm_nw_temp_extents.nte_job_id%TYPE
                             ,pi_admin_type     IN nm_au_types.nat_admin_type%TYPE
                             ,pi_admin_unit     IN nm_admin_units.nau_admin_unit%TYPE
-                            ,pi_effective_date IN date DEFAULT nm3user.get_effective_date
+                            ,pi_effective_date IN date DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                             ) IS
 --
    l_admin_type            nm_au_types.nat_admin_type%TYPE;
@@ -83,7 +83,7 @@ PROCEDURE update_admin_unit (pi_nte_job_id     IN nm_nw_temp_extents.nte_job_id%
 --
    -- Take the initial values of the things i want to set and then reset
    c_ausec_status CONSTANT varchar2(3) := nm3ausec.get_status;
-   c_eff_date     CONSTANT date        := nm3user.get_effective_date;
+   c_eff_date     CONSTANT date        := To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY');
    c_suppress     CONSTANT boolean     := nm3invval.g_suppress_hierarchy_trigger;
 --
    l_rec_iig               nm_inv_item_groupings%ROWTYPE;
@@ -272,7 +272,7 @@ PROCEDURE process_each_inv_item (pi_nte_job_id IN nm_nw_temp_extents.nte_job_id%
    l_warning_msg             varchar2(200);
    l_check_for_inv           boolean;
 --
-   c_effective_date CONSTANT date := nm3user.get_effective_date;
+   c_effective_date CONSTANT date := To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY');
 --
    l_rec_nit                 nm_inv_types%ROWTYPE;
 --

@@ -46,7 +46,7 @@ FUNCTION get_body_version RETURN varchar2;
 PROCEDURE update_admin_unit (pi_nte_job_id     IN nm_nw_temp_extents.nte_job_id%TYPE
                             ,pi_admin_type     IN nm_au_types.nat_admin_type%TYPE
                             ,pi_admin_unit     IN nm_admin_units.nau_admin_unit%TYPE
-                            ,pi_effective_date IN DATE DEFAULT nm3user.get_effective_date
+                            ,pi_effective_date IN DATE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                             );
 --
 --</PROC>
