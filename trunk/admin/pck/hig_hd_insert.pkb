@@ -27,7 +27,6 @@ CREATE OR REPLACE PACKAGE BODY hig_hd_insert AS
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'HIG_HD_INSERT';
-   g_oracle_version  CONSTANT  VARCHAR2(10)   := nm3context.get_context(pi_attribute =>'DB_VERSION');
 --
 -- Global defaults
 --
@@ -269,17 +268,19 @@ END get_top_node;
 FUNCTION get_value(p_node IN xmldom.DOMNode
                   ,p_tag  IN varchar2) RETURN varchar2 IS
 
-  retval nm3type.max_varchar2;
+  retval                  nm3type.max_varchar2;
+  l_db_Version  Constant  V$Instance.Version%Type:=Sys_Context('NM3CORE','DB_VERSION');
 BEGIN
 --
-  g_xmldomnode := p_node;
+  g_xmldomnode := p_node;  
+  
 --
-  IF g_oracle_version LIKE '10.1.%'  THEN
+  IF l_db_Version LIKE '10.1.%'  THEN
     -- Oracle 10g release 1
     EXECUTE IMMEDIATE 'BEGIN xslprocessor.valueof ( '||g_package_name||'.g_xmldomnode, :pattern, :val); END'
     USING IN p_tag, OUT retval;
 --
-  ELSIF g_oracle_version LIKE '9.%'  THEN
+  ELSIF l_db_Version LIKE '9.%'  THEN
     -- Oracle 9i
     EXECUTE IMMEDIATE 'BEGIN xslprocessor.valueOf('||g_package_name||'.g_xmldomnode, :p_tag); END'
     INTO retval
@@ -294,17 +295,20 @@ END get_value;
 --
 FUNCTION get_value(p_doc  IN xmldom.DOMDocument
                   ,p_path IN varchar2) RETURN varchar2 IS
-  retval nm3type.max_varchar2;
+  
+  retval                  nm3type.max_varchar2;
+  l_db_Version  Constant  V$Instance.Version%Type:=Sys_Context('NM3CORE','DB_VERSION');
 BEGIN
   --
+  
   g_xmldomdoc := p_doc;
   --
-  IF g_oracle_version LIKE '10.1.%'  THEN
+  IF l_db_Version LIKE '10.1.%'  THEN
     -- Oracle 10g release 1
     EXECUTE IMMEDIATE 'BEGIN xslprocessor.valueof( xmldom.makeNode('||g_package_name||'.g_xmldomdoc), :pattern, :val); END'
     USING IN p_path, OUT retval;
 --
-  ELSIF g_oracle_version LIKE '9.%'  THEN
+  ELSIF l_db_Version LIKE '9.%'  THEN
     -- Oracle 9i
     EXECUTE IMMEDIATE 'BEGIN xslprocessor.valueOf( xmldom.makeNode('||g_package_name||'.g_xmldomdoc), :p_tag); END'
     INTO retval
@@ -374,7 +378,7 @@ END get_table_values;
 --
 PROCEDURE insert_vals(p_module          IN hig_hd_modules.hhm_module%TYPE
                      ,p_muj_seq         IN hig_hd_mod_uses.hhu_seq%TYPE
-                     ,p_owner           IN all_users.username%TYPE DEFAULT hig.get_application_owner
+                     ,p_owner           IN all_users.username%TYPE DEFAULT Sys_Context('NM3CORE','APPLICATION_OWNER')
                      ,p_commit_per_rows IN pls_integer) IS
 
 CURSOR get_table (p_module   IN hig_hd_modules.hhm_module%TYPE
@@ -557,7 +561,7 @@ PROCEDURE insert_table_details (p_module          IN hig_hd_modules.hhm_module%T
                                ,p_muj_seq         IN hig_hd_mod_uses.hhu_seq%TYPE
                                ,p_base_node       IN xmldom.DOMNode
                                ,p_parent_seq      IN hig_hd_mod_uses.hhu_seq%TYPE DEFAULT NULL
-                               ,p_owner           IN all_users.username%TYPE DEFAULT hig.get_application_owner
+                               ,p_owner           IN all_users.username%TYPE DEFAULT Sys_Context('NM3CORE','APPLICATION_OWNER')
                                ,p_commit_per_rows IN pls_integer DEFAULT NULL) IS
 
 CURSOR get_child_tables (p_module   IN hig_hd_modules.hhm_module%TYPE
@@ -689,7 +693,7 @@ END insert_table_details;
 --
 FUNCTION insert_all_details (p_module          IN hig_hd_modules.hhm_module%TYPE
                             ,p_doc             IN xmldom.DOMDocument
-                            ,p_owner           IN all_users.username%TYPE DEFAULT hig.get_application_owner
+                            ,p_owner           IN all_users.username%TYPE DEFAULT Sys_Context('NM3CORE','APPLICATION_OWNER')
                             ,p_commit_per_rows IN pls_integer DEFAULT 0) RETURN pls_integer IS
 
 CURSOR get_doc_tag (p_module IN hig_hd_modules.hhm_module%TYPE) IS

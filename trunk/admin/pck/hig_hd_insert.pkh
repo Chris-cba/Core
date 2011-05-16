@@ -98,7 +98,7 @@ FUNCTION get_value(p_node IN xmldom.DOMNode
 -- specification detailed in p_module. The number of rows inserted is returned
 FUNCTION insert_all_details (p_module          IN hig_hd_modules.hhm_module%TYPE
                             ,p_doc             IN xmldom.DOMDocument
-                            ,p_owner           IN all_users.username%TYPE DEFAULT hig.get_application_owner
+                            ,p_owner           IN all_users.username%TYPE DEFAULT Sys_Context('NM3CORE','APPLICATION_OWNER')
                             ,p_commit_per_rows IN pls_integer DEFAULT 0) RETURN pls_integer;
 --</PROC>
 --
