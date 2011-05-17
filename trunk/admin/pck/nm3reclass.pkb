@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3reclass AS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3reclass.pkb-arc   2.10   Mar 16 2011 11:26:34   Chris.Strettle  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3reclass.pkb-arc   2.11   May 17 2011 15:12:46   Chris.Strettle  $
 --       Module Name      : $Workfile:   nm3reclass.pkb  $
---       Date into PVCS   : $Date:   Mar 16 2011 11:26:34  $
---       Date fetched Out : $Modtime:   Mar 09 2011 16:21:16  $
---       PVCS Version     : $Revision:   2.10  $
+--       Date into PVCS   : $Date:   May 17 2011 15:12:46  $
+--       Date fetched Out : $Modtime:   May 17 2011 15:07:36  $
+--       PVCS Version     : $Revision:   2.11  $
 --
 --
 --   Author : R.A. Coupe
@@ -21,7 +21,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3reclass AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.10  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.11  $"';
 -- g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3reclass';
@@ -745,6 +745,18 @@ BEGIN
 --    nm3net.ins_ne (new_ne);
     Nm3net.insert_any_element (new_ne);
 --
+   -- CWS 0111024 Lateral Offset Changes
+   --
+   IF NVL(hig.get_sysopt('XSPOFFSET'),'N') = 'Y'
+   THEN
+     EXECUTE IMMEDIATE 'BEGIN ' ||
+                       'xncc_herm_xsp.populate_herm_xsp( p_ne_id          => :p_old_ne_id ' ||
+                                                      ', p_ne_id_new      => :p_new_ne_id ' ||
+                                                      ', p_effective_date => :ne_start_date ' ||
+                                                      '); ' ||
+                       'END;' USING p_old_ne_id, p_new_ne_id, new_ne.ne_start_date;
+   END IF;
+   --
    -- Move AD data to new element
      IF Nm3nwad.ad_data_exist (p_old_ne_id)
      THEN
