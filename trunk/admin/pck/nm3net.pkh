@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE nm3net AS
 --<PACKAGE>
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3net.pkh-arc   2.4   Mar 22 2010 09:25:38   cstrettle  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3net.pkh-arc   2.5   May 17 2011 08:26:22   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3net.pkh  $
---       Date into SCCS   : $Date:   Mar 22 2010 09:25:38  $
---       Date fetched Out : $Modtime:   Mar 22 2010 09:23:26  $
---       SCCS Version     : $Revision:   2.4  $
+--       Date into SCCS   : $Date:   May 17 2011 08:26:22  $
+--       Date fetched Out : $Modtime:   Apr 01 2011 07:55:30  $
+--       SCCS Version     : $Revision:   2.5  $
 --       Based on 
 --
 --
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE nm3net AS
 
 -- 03.06.08 PT added pi_no_purpose parameter to create_node()
 
-  g_sccsid      CONSTANT  varchar2(80) := '"$Revision:   2.4  $"';
+  g_sccsid      CONSTANT  varchar2(80) := '"$Revision:   2.5  $"';
 --  g_sccsid is the SCCS_ID
 --
 
@@ -500,7 +500,7 @@ PROCEDURE insert_any_element (p_rec_ne         IN OUT nm_elements%ROWTYPE
                 ,p_ne_descr          IN     nm_elements.ne_descr%TYPE          DEFAULT NULL
                 ,p_ne_length         IN     nm_elements.ne_length%TYPE         DEFAULT NULL
                 ,p_ne_admin_unit     IN     nm_elements.ne_admin_unit%TYPE     DEFAULT 1
-                ,p_ne_start_date     IN     nm_elements.ne_start_date%TYPE     DEFAULT nm3user.get_effective_date
+                ,p_ne_start_date     IN     nm_elements.ne_start_date%TYPE     DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                 ,p_ne_end_date       IN     nm_elements.ne_end_date%TYPE       DEFAULT NULL
                 ,p_ne_gty_group_type IN     nm_elements.ne_gty_group_type%TYPE DEFAULT NULL
                 ,p_ne_no_start       IN     nm_elements.ne_no_start%TYPE       DEFAULT NULL
@@ -533,7 +533,7 @@ PROCEDURE grp_insert_element
                 ,p_ne_descr          IN     nm_elements.ne_descr%TYPE          DEFAULT NULL
                 ,p_ne_length         IN     nm_elements.ne_length%TYPE         DEFAULT NULL
                 ,p_ne_admin_unit     IN     nm_elements.ne_admin_unit%TYPE     DEFAULT 1
-                ,p_ne_start_date     IN     nm_elements.ne_start_date%TYPE     DEFAULT nm3user.get_effective_date
+                ,p_ne_start_date     IN     nm_elements.ne_start_date%TYPE     DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                 ,p_ne_end_date       IN     nm_elements.ne_end_date%TYPE       DEFAULT NULL
                 ,p_ne_gty_group_type IN     nm_elements.ne_gty_group_type%TYPE DEFAULT NULL
                 ,p_ne_no_start       IN     nm_elements.ne_no_start%TYPE       DEFAULT NULL
@@ -568,7 +568,7 @@ PROCEDURE grp_insert_element
                 ,p_ne_descr          IN     nm_elements.ne_descr%TYPE          DEFAULT NULL
                 ,p_ne_length         IN     nm_elements.ne_length%TYPE         DEFAULT NULL
                 ,p_ne_admin_unit     IN     nm_elements.ne_admin_unit%TYPE     DEFAULT 1
-                ,p_ne_start_date     IN     nm_elements.ne_start_date%TYPE     DEFAULT nm3user.get_effective_date
+                ,p_ne_start_date     IN     nm_elements.ne_start_date%TYPE     DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                 ,p_ne_end_date       IN     nm_elements.ne_end_date%TYPE       DEFAULT NULL
                 ,p_ne_gty_group_type IN     nm_elements.ne_gty_group_type%TYPE DEFAULT NULL
                 ,p_ne_no_start       IN     nm_elements.ne_no_start%TYPE       DEFAULT NULL
@@ -1003,7 +1003,7 @@ FUNCTION get_gty_nt ( pi_gty IN nm_group_types.ngt_group_type%TYPE ) RETURN nm_t
 -- This function returns the true distance of a section along its parent route
 -- on a given date
 FUNCTION get_parent_route_true(pi_ne_id IN nm_elements.ne_id%TYPE
-                              ,pi_date  IN nm_members_all.nm_start_date%TYPE DEFAULT nm3context.get_effective_date
+                              ,pi_date  IN nm_members_all.nm_start_date%TYPE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                               ) RETURN nm_members_all.nm_true%TYPE;
 --</PROC>
 --
@@ -1334,7 +1334,7 @@ FUNCTION get_node_at_point (
 PROCEDURE create_or_reuse_point_and_node(
                                          pi_np_grid_east     IN      nm_points.np_grid_east%TYPE
                                         ,pi_np_grid_north    IN      nm_points.np_grid_north%TYPE
-										,pi_no_start_date    IN      nm_nodes.no_start_date%TYPE     DEFAULT nm3user.get_effective_date
+										,pi_no_start_date    IN      nm_nodes.no_start_date%TYPE     DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
 										,pi_no_node_type     IN      nm_nodes.no_node_type%TYPE
 										,pi_node_descr       IN      nm_nodes.no_descr%TYPE          DEFAULT 'Auto-created'
 										,po_no_node_id       IN OUT  nm_nodes.no_node_id%TYPE
