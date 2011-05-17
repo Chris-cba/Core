@@ -1,0 +1,205 @@
+CREATE OR REPLACE PACKAGE Nm3sde AS
+--<PACKAGE>
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)nm3sde.pkh	1.11 07/31/06
+--       Module Name      : nm3sde.pkh
+--       Date into SCCS   : 06/07/31 11:22:06
+--       Date fetched Out : 07/06/13 14:13:25
+--       SCCS Version     : 1.11
+--
+--
+--   Author : R.A. Coupe
+--
+--   SDE specific package - is dependent on SDE schema being present and accessible
+--
+-----------------------------------------------------------------------------
+--	Copyright (c) exor corporation ltd, 2002
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+  g_sccsid      CONSTANT  VARCHAR2(2000) := '"@(#)nm3sde.pkh	1.11 07/31/06"';
+
+--  g_sccsid is the SCCS ID for the package
+
+--</GLOBVAR>
+--
+  /* Type definitions.required by SDE */
+
+   -- Standard identifier for
+   -- SDE.layers, SDE.table_registry and SDE.geometry_columns
+
+   SUBTYPE layer_record_t        IS sde.layers%ROWTYPE;
+   SUBTYPE geocol_record_t       IS sde.geometry_columns%ROWTYPE;
+   SUBTYPE registration_record_t IS sde.table_registry%ROWTYPE;
+
+   SUBTYPE sref_id_t             IS sde.spatial_references.srid%TYPE;
+   SUBTYPE sref_record_t         IS sde.spatial_references%ROWTYPE;
+
+   sde_config CONSTANT sde.layers.LAYER_CONFIG%TYPE := 'SDO_GEOMETRY';
+
+   --------------------------------------------------------------------------
+-- Private SDE globals
+--------------------------------------------------------------------------
+
+   SE_NIL_TYPE_MASK           	NUMBER := 1;      -- (1L<<0)
+   SE_POINT_TYPE_MASK         	NUMBER := 2;      -- (1L<<1)
+   SE_LINE_TYPE_MASK          	NUMBER := 4;      -- (1L<<2)
+   SE_SIMPLE_LINE_TYPE_MASK   	NUMBER := 8;      -- (1L<<3)
+   SE_AREA_TYPE_MASK          	NUMBER := 16;     --    10 (1L<<4)
+   SE_UNVERIFIED_SHAPE_MASK   	NUMBER := 2048;   --   800 (1L<<11)
+   SE_MULTIPART_TYPE_MASK     	NUMBER := 262144; -- 40000 (1L<<18)
+
+-- ALLOWABLE STORAGE TYPE MASKS FOR LAYERS
+
+   SE_STORAGE_NORMALIZED_TYPE   NUMBER := 8388608;   --   800000 (1L<<23)
+   SE_STORAGE_SDEBINARY_TYPE    NUMBER := 16777216;  --  1000000 (1L<<24)
+   SE_STORAGE_WKB_TYPE          NUMBER := 33554432;  --  2000000 (1L<<25)
+   SE_STORAGE_SQL_TYPE          NUMBER := 67108864;  --  4000000 (1L<<26)
+   SE_STORAGE_SPATIAL_TYPE      NUMBER := 134217728; --  8000000 (1L<<27)
+   SE_STORAGE_LOB_TYPE          NUMBER := 268435456; -- 10000000 (1L<<28)
+
+-- ALLOWABLE LAYER CHARATERISTICS
+
+   SE_LAYER_AUTO_REGISTER       NUMBER := 32;  --  20 (1L<<5)
+   SE_LAYER_HAS_USER_EXTENT     NUMBER := 64;  --  40 (1L<<6)
+
+   SE_LAYER_16                  NUMBER := 65536;    --  10000 (1L<<16)  3D      Z Value
+   SE_LAYER_19                  NUMBER := 524288;   --  80000 (1L<<19)  Measure M Value
+   SE_LAYER_22                  NUMBER := 4194304;  -- 400000 (1L<<22)  No proj system
+   SE_LAYER_29                  NUMBER := 536870912;   -- 20000000 (1L<<29)
+   SE_LAYER_30                  NUMBER := 1073741824;  -- 40000000 (1L<<30) Loading
+
+   SE_MAXINTXYUNITS             NUMBER := 2147483648; -- 80000000 (1L<<31)
+
+-- LAYER storage types
+   SE_LAYER_ST_BIN		        NUMBER := -1;	-- SDE compressed binary
+   SE_LAYER_ST_OGIS_NORM	    NUMBER := 0;	-- OGIS 92 Nprmalized
+   SE_LAYER_ST_OGIS_BIN		    NUMBER := 1; 	-- OGIS 92 binary
+   SE_LAYER_ST_SPATIAL		    NUMBER := 2;	-- Oracle Spatial
+
+------------------------------------------------------------------------------------------------
+-- CURSORS
+------------------------------------------------------------------------------------------------
+
+   CURSOR get_layer (c_table_name  IN VARCHAR2) IS
+     SELECT layer_id,srid
+     FROM   sde.layers
+     WHERE  table_name = UPPER( c_table_name  )
+  	 AND    owner = Sys_Context('NM3CORE','APPLICATION_OWNER');
+
+   CURSOR get_layer_cnt (c_table_name  IN VARCHAR2) IS
+     SELECT t.layer_id, t.srid, s.cnt
+     FROM sde.layers t,
+        (SELECT srid, COUNT(SRID) cnt
+         FROM sde.layers GROUP BY SRID) s
+     WHERE t.table_name = UPPER( c_table_name  )
+     AND   s.srid = t.srid
+     AND   t.owner = Sys_Context('NM3CORE','APPLICATION_OWNER');
+
+   CURSOR get_registry (c_table_name IN VARCHAR2) IS
+     SELECT registration_id
+     FROM   sde.table_registry
+     WHERE  table_name = UPPER( c_table_name )
+ 	 AND    owner = Sys_Context('NM3CORE','APPLICATION_OWNER');
+
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN VARCHAR2;
+--</PROC>
+--
+
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_sde_version RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_SDE_LAYER_FROM_THEME">
+-- This function will return sde layer info
+FUNCTION get_sde_layer_from_theme ( p_theme_id IN nm_themes_all.nth_theme_id%TYPE ) RETURN sde.layers%ROWTYPE;
+--</PROC>
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_SDE_LAYER_ID_FROM_THEME">
+-- This function will return sde layer info
+FUNCTION get_sde_layer_id_from_theme ( p_theme_id IN nm_themes_all.nth_theme_id%TYPE,
+                                      null_exc VARCHAR2 DEFAULT 'FALSE' ) RETURN sde.layers.layer_id%TYPE;
+--</PROC>
+
+FUNCTION generate_sde_layer_from_theme ( p_nth IN nm_themes_all%ROWTYPE ) RETURN sde.layers%ROWTYPE;
+
+PROCEDURE register_sde_layer(  p_theme_id IN nm_themes_all.nth_theme_id%TYPE );
+
+FUNCTION register_SRID_from_theme( p_theme_id IN nm_themes_all.nth_theme_id%TYPE,
+                                   p_base IN nm_theme_array,
+                                   p_srid IN NUMBER DEFAULT NULL ) RETURN NUMBER;
+
+FUNCTION get_srid_by_origin( p_sref IN sref_record_t ) RETURN NUMBER;
+
+
+FUNCTION get_layer( p_layer_id IN sde.layers.layer_id%TYPE ) RETURN layer_record_t;
+FUNCTION get_layer_by_theme( p_theme_id IN NUMBER ) RETURN layer_record_t;
+FUNCTION get_layer( p_table IN VARCHAR2, p_column IN VARCHAR2 )  RETURN layer_record_t;
+
+FUNCTION get_treg( p_table IN VARCHAR2 )RETURN registration_record_t;
+
+PROCEDURE drop_layer_by_theme( p_theme_id IN NUMBER );
+
+PROCEDURE drop_layer_by_table( p_table IN VARCHAR2, p_column IN VARCHAR2 );
+
+PROCEDURE Drop_Layer( p_layer IN sde.layers.layer_id%TYPE );
+
+FUNCTION convert_to_sde_eflag(gtype IN INTEGER, lrs_override IN VARCHAR2 DEFAULT 'Y') RETURN INTEGER;
+
+FUNCTION get_sde_date( p_date IN INTEGER) RETURN DATE;
+
+FUNCTION get_date_for_sde( p_date IN DATE DEFAULT TRUNC(SYSDATE) ) RETURN INTEGER;
+
+FUNCTION  get_sde_type_from_gtype( p_gtype IN INTEGER, p_allow_multi IN VARCHAR2 DEFAULT 'N') RETURN INTEGER;
+
+PROCEDURE regenerate_sde_from_themes;
+
+PROCEDURE create_column_registry(p_table IN VARCHAR2, p_column IN VARCHAR2, p_rowid IN VARCHAR2 );
+
+PROCEDURE remove_column_registry(p_table IN VARCHAR2  );
+
+FUNCTION get_xyunits( p_diminfo IN mdsys.sdo_dim_array ) RETURN NUMBER;
+--FUNCTION get_xyunits( p_layer_id IN sde.layers.layer_id%TYPE) RETURN NUMBER;
+--FUNCTION get_xyunits( xmin IN NUMBER, xmax IN NUMBER, ymin IN NUMBER, ymax IN NUMBER ) RETURN NUMBER;
+
+PROCEDURE drop_sub_layer_by_table
+           ( p_table    IN   VARCHAR2
+           , p_column   IN   VARCHAR2
+           , p_owner    IN   VARCHAR2 DEFAULT NULL);
+
+PROCEDURE del_gcol( p_table IN VARCHAR2, p_column IN VARCHAR2, p_owner IN VARCHAR2);
+
+PROCEDURE del_treg( p_table IN VARCHAR2, p_owner IN VARCHAR2);
+
+PROCEDURE del_layer( p_layer IN NUMBER );
+
+--FUNCTION get_keyword RETURN VARCHAR2;
+
+PROCEDURE create_sub_sde_layer
+            (p_theme_id IN NM_THEMES_ALL.nth_theme_id%TYPE
+            ,p_username IN HIG_USERS.HUS_USERNAME%TYPE);
+
+FUNCTION get_whole_shape_objectids ( p_theme_id IN NUMBER, p_id_array IN int_array ) RETURN int_array;
+
+PROCEDURE debug_layer ( p_layer IN sde.layers%ROWTYPE );
+
+END;
+/

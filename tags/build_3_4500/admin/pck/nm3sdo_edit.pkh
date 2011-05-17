@@ -1,0 +1,235 @@
+CREATE OR REPLACE PACKAGE Nm3sdo_Edit
+AS
+--<PACKAGE>
+-----------------------------------------------------------------------------
+--
+--   SCCS Identifiers :-
+--
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_edit.pkh-arc   2.6   May 17 2011 08:26:26   Steve.Cooper  $
+--       Module Name      : $Workfile:   nm3sdo_edit.pkh  $
+--       Date into SCCS   : $Date:   May 17 2011 08:26:26  $
+--       Date fetched Out : $Modtime:   Apr 01 2011 14:03:24  $
+--       SCCS Version     : $Revision:   2.6  $
+--
+--  Author :  R Coupe
+--            A Edwards
+--
+--  Editing Oracle Spatial features package
+--
+-----------------------------------------------------------------------------
+--  Copyright (c) exor corporation ltd, 2004
+-----------------------------------------------------------------------------
+--
+--</PACKAGE>
+--<GLOBVAR>
+    g_sccsid      CONSTANT  VARCHAR2(2000) := '$Revision:   2.6  $';
+--  g_sccsid is the SCCS ID for the package
+--</GLOBVAR>
+-----------------------------------------------------------------------------
+  TYPE
+    tab_inv       IS TABLE OF nm_inv_items%ROWTYPE INDEX BY BINARY_INTEGER;
+    g_tab_inv     tab_inv;
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--<FUNCTIONS>
+--<PROC NAME="lock_space">
+-- Lock the space and any associated data in the space.
+-- Raise exception if no lock is available.
+FUNCTION lock_space
+          ( pi_shape IN mdsys.sdo_geometry )
+  RETURN NUMBER;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="test_space">
+--Pass in a geometry and test to see if it's been locked in NM_AREA_LOCK
+FUNCTION test_space
+          ( pi_shape IN mdsys.sdo_geometry )
+  RETURN BOOLEAN;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="aset_srid">
+-- Set SRID
+FUNCTION set_srid
+          ( pi_geom IN mdsys.sdo_geometry
+          , pi_srid IN NUMBER )
+  RETURN mdsys.sdo_geometry;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="set_srid">
+-- Set SRID by theme
+FUNCTION set_srid
+          ( pi_theme IN nm_themes_all.nth_theme_id%TYPE,
+            pi_geom IN mdsys.sdo_geometry )
+  RETURN mdsys.sdo_geometry;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="validate_shape">
+-- Pass in a Geometry and a THEME ID and ensure the shape is compatible with the
+-- type of geometries allowed on the Theme. (using NM_THEME_GTYPES)
+FUNCTION validate_shape
+          ( pi_nth_theme_id IN NM_THEMES_ALL.nth_theme_id%TYPE
+          , pi_geom         IN mdsys.sdo_geometry )
+  RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="validate_geometry">
+-- Allows you to validate a geometry against the Diminfo derived from the theme
+FUNCTION validate_geometry
+          ( pi_nth_theme_id IN NM_THEMES_ALL.nth_theme_id%TYPE
+          , pi_geom         IN mdsys.sdo_geometry )
+  RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_fk">
+-- Check PK value
+FUNCTION get_fk
+          ( pi_nth_id IN NUMBER
+          , pi_pk     IN NUMBER )
+  RETURN NUMBER;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="theme_is_inv_theme">
+-- Check if theme has a row in nm_inv_themes
+FUNCTION theme_is_inv_theme (pi_theme_id IN NM_THEMES_ALL.nth_theme_id%TYPE)
+  RETURN BOOLEAN;
+--
+--</FUNCTIONS>
+-----------------------------------------------------------------------------
+--<PROCEDURES>
+--
+--<PROC_NAME="lock_shape">
+-- Pass in a geometry of the feature you wish to edit and lock it
+PROCEDURE lock_shape
+          ( pi_nth_id IN NUMBER
+          , pi_pk     IN NUMBER );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC_NAME="move_reshape">
+-- Moves or Reshapes an object in the appropriate table.
+-- This must consider the appropriate action if date logic is employed.
+-- This should degenerate to a reshape where no date logic is employed.
+PROCEDURE move_reshape
+          ( pi_nth_id IN NUMBER
+          , pi_pk     IN NUMBER
+          , pi_shape  IN mdsys.sdo_geometry
+          , pi_date   IN DATE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY') );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC_NAME="reshape">
+-- Reshapes an object in the appropriate table.
+-- This performs a simple update, no history.
+PROCEDURE reshape
+          ( pi_nth_id IN NUMBER
+          , pi_pk     IN NUMBER
+          , pi_shape  IN mdsys.sdo_geometry );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC_NAME="delete_shape">
+-- Deletes shape from feature table
+PROCEDURE delete_shape
+          ( pi_nth_id IN NUMBER
+          , pi_pk     IN NUMBER);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC_NAME="add_shape">
+-- Adds a new shape for a known identifier in the appropriate table.
+-- It must consider appropriate action when date logic is employed.
+PROCEDURE add_shape
+         ( pi_nth_id IN NUMBER
+         , pi_pk     IN NUMBER
+         , pi_fk     IN NUMBER
+         , pi_shape  IN mdsys.sdo_geometry
+         , pi_start_dt IN DATE DEFAULT NULL);
+--
+-----------------------------------------------------------------------------
+--<PROC_NAME="process_inv_xy_update">
+-- Used to regenerate any shapes and do any snapping for Assets trapped
+-- in the global package array.
+PROCEDURE process_inv_xy_update
+         ( pi_rec_iit IN NM_INV_ITEMS_ALL%ROWTYPE );
+--
+-- Performs the update for the global array in memory populated by the trigger
+--
+PROCEDURE process_inv_xy_update;
+--
+-- Performs the update for the whole asset type - can be used with Refresh too.
+--
+PROCEDURE process_inv_xy_update
+         ( pi_inv_type IN nm_inv_types.nit_inv_type%TYPE );
+--
+-----------------------------------------------------------------------------
+--
+--<PROC_NAME="update_xy">
+-- Generic procedure to allow the updating of a Theme tables XY values
+PROCEDURE update_xy
+            ( pi_table_name IN VARCHAR2
+            , pi_pk_column  IN VARCHAR2
+            , pi_x_column   IN VARCHAR2
+            , pi_y_column   IN VARCHAR2
+            , pi_pk_value   IN VARCHAR2
+            , pi_x_value    IN NUMBER
+            , pi_y_value    IN NUMBER
+            );
+--
+-----------------------------------------------------------------------------
+--
+--<PROC_NAME="update_point_lref">
+-- Generic procedure to allow the updating of a Theme tables LREF values
+PROCEDURE update_point_lref
+            ( pi_table_name IN VARCHAR2
+            , pi_pk_column  IN VARCHAR2
+            , pi_rse_column IN VARCHAR2
+            , pi_st_chain   IN VARCHAR2
+            , pi_lref_value IN nm_lref
+            , pi_pk_value   IN VARCHAR2
+            );
+--
+-----------------------------------------------------------------------------
+--
+--<PROC_NAME="end_date_shape">
+-- End-dates a shape
+PROCEDURE end_date_shape
+          ( pi_nth_id IN NUMBER
+          , pi_pk     IN NUMBER
+          , pi_date   IN DATE );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+END Nm3sdo_Edit;
+/

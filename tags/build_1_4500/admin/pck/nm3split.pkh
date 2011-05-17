@@ -1,0 +1,350 @@
+CREATE OR REPLACE PACKAGE nm3split IS
+--   PVCS Identifiers :-
+--
+--       pvcsid                 : $Header:   //vm_latest/archives/nm3/admin/pck/nm3split.pkh-arc   2.3   May 17 2011 08:26:26   Steve.Cooper  $
+--       Module Name      : $Workfile:   nm3split.pkh  $
+--       Date into PVCS   : $Date:   May 17 2011 08:26:26  $
+--       Date fetched Out : $Modtime:   Apr 01 2011 14:00:16  $
+--       PVCS Version     : $Revision:   2.3  $
+--       Based on SCCS version : 1.7
+--
+--
+--   Author : ITurnbull
+--
+--     nm3split package. Used for
+--
+-----------------------------------------------------------------------------
+--	Copyright (c) exor corporation ltd, 2000
+-----------------------------------------------------------------------------
+
+-- 03.06.08 PT added no_purpose parameter to create_node(), do_split_datum_or_group() and do_geo_split()
+
+  g_sccsid      CONSTANT  VARCHAR2(80)  := '"$Revision:   2.3  $"';
+--
+   g_rec_ne_old   nm_elements%ROWTYPE;
+   g_rec_ne_new_1 nm_elements%ROWTYPE;
+   g_rec_ne_new_2 nm_elements%ROWTYPE;
+--   
+   g_ne_to_split_rec           nm_elements%ROWTYPE;
+   g_ne_to_split_ngt_rec       nm_group_types%ROWTYPE;
+   g_ne_to_split_nt_rec        nm_types%ROWTYPE;   
+--
+-- globals set by can_element_be_split function
+-- 
+   g_ner_appl  nm_errors.ner_appl%TYPE;
+   g_ner_id    nm_errors.ner_id%TYPE;
+   g_supplimentary_info  VARCHAR2(200);
+--
+
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_version">
+-- This function returns the SCCS version information
+  FUNCTION get_version RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN VARCHAR2;
+--</PROC>
+--
+--<PROC NAME="get_g_ne_to_split_rec">
+-- sets values for
+--    g_ne_to_split_rec
+--    g_ne_to_split_ngt_rec
+--    g_ne_to_split_nt_rec
+PROCEDURE set_ne_globals(pi_ne_id IN nm_elements.ne_id%TYPE);
+--</PROC>
+--
+------------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_g_ne_to_split_rec">
+-- return package global rowtype variable
+FUNCTION get_g_ne_to_split_rec RETURN nm_elements%ROWTYPE;
+--</PROC>
+--
+--
+------------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_g_ne_to_split_ngt_rec">
+-- return package global rowtype variable
+FUNCTION get_g_ne_to_split_ngt_rec RETURN nm_group_types%ROWTYPE;
+--</PROC>
+--
+--
+------------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_g_ne_to_split_nt_rec">
+-- return package global rowtype variable
+FUNCTION get_g_ne_to_split_nt_rec RETURN nm_types%ROWTYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--<PROC NAME="do_split_datum_or_group">
+-- depending on ne_type of the element being split either call do_split OR do_split_group
+--
+PROCEDURE do_split_datum_or_group ( pi_ne_id                  IN     nm_elements.ne_id%TYPE -- the element to split
+                                   ,pi_ne_type                IN     nm_elements.ne_type%TYPE -- ne_type of element to be split
+                                   ,pi_ne_id_1                IN OUT nm_elements.ne_id%TYPE  -- the new element ne_id
+                                   ,pi_ne_id_2                IN OUT nm_elements.ne_id%TYPE  -- the 2nd new element ne_id
+                                   ,pi_effective_date         IN     DATE DEFAULT  To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY') -- the date the split is effective from
+                                   ,pi_split_offset           IN     NUMBER
+                                   ,pi_non_ambig_ne_id        IN     nm_elements.ne_id%TYPE
+                                   ,pi_non_ambig_split_offset IN     NUMBER
+                                   ,pi_split_at_node_id       IN     nm_nodes.no_node_id%TYPE
+
+                                   ,pi_create_node            IN     BOOLEAN DEFAULT FALSE
+                                   ,pi_node_id                IN OUT nm_elements.ne_no_start%TYPE -- the node CREATED at the split point
+                                   ,pi_no_node_name           IN     nm_nodes.no_node_name%TYPE DEFAULT NULL
+                                   ,pi_no_descr               IN     nm_nodes.no_descr%TYPE DEFAULT NULL
+                                   ,pi_np_grid_east           IN     nm_points.np_grid_east%TYPE DEFAULT NULL
+                                   ,pi_np_grid_north          IN     nm_points.np_grid_north%TYPE DEFAULT NULL
+                                   ,pi_no_np_id               IN OUT nm_nodes.no_np_id%TYPE
+                                   ,pi_no_purpose             in     nm_nodes.no_purpose%type default null -- PT 03.06.08
+								   
+                                   ,pi_ne_unique_1            IN     nm_elements.ne_unique%TYPE DEFAULT NULL  -- specified attributes for element 1
+                                   ,pi_ne_type_1              IN     nm_elements.ne_type%TYPE DEFAULT NULL
+                                   ,pi_ne_nt_type_1           IN     nm_elements.ne_nt_type%TYPE DEFAULT NULL
+                                   ,pi_ne_descr_1             IN     nm_elements.ne_descr%TYPE DEFAULT NULL
+                                   ,pi_ne_length_1            IN     nm_elements.ne_length%TYPE DEFAULT NULL
+                                   ,pi_ne_admin_unit_1        IN     nm_elements.ne_admin_unit%TYPE DEFAULT NULL
+                                   ,pi_ne_gty_group_type_1    IN     nm_elements.ne_gty_group_type%TYPE DEFAULT NULL
+                                   ,pi_ne_owner_1             IN     nm_elements.ne_owner%TYPE DEFAULT NULL
+                                   ,pi_ne_name_1_1            IN     nm_elements.ne_name_1%TYPE DEFAULT NULL
+                                   ,pi_ne_name_2_1            IN     nm_elements.ne_name_2%TYPE DEFAULT NULL
+                                   ,pi_ne_prefix_1            IN     nm_elements.ne_prefix%TYPE DEFAULT NULL
+                                   ,pi_ne_number_1            IN     nm_elements.ne_number%TYPE DEFAULT NULL
+                                   ,pi_ne_sub_type_1          IN     nm_elements.ne_sub_type%TYPE DEFAULT NULL
+                                   ,pi_ne_group_1             IN     nm_elements.ne_group%TYPE DEFAULT NULL
+                                   ,pi_ne_no_start_1          IN     nm_elements.ne_no_start%TYPE DEFAULT NULL
+                                   ,pi_ne_no_end_1            IN     nm_elements.ne_no_end%TYPE DEFAULT NULL
+                                   ,pi_ne_sub_class_1         IN     nm_elements.ne_sub_class%TYPE DEFAULT NULL
+                                   ,pi_ne_nsg_ref_1           IN     nm_elements.ne_nsg_ref%TYPE DEFAULT NULL
+                                   ,pi_ne_version_no_1        IN     nm_elements.ne_version_no%TYPE DEFAULT NULL
+
+                                   ,pi_ne_unique_2            IN     nm_elements.ne_unique%TYPE DEFAULT NULL  -- specified attributes for element 1
+                                   ,pi_ne_type_2              IN     nm_elements.ne_type%TYPE DEFAULT NULL
+                                   ,pi_ne_nt_type_2           IN     nm_elements.ne_nt_type%TYPE DEFAULT NULL
+                                   ,pi_ne_descr_2             IN     nm_elements.ne_descr%TYPE DEFAULT NULL
+                                   ,pi_ne_length_2            IN     nm_elements.ne_length%TYPE DEFAULT NULL
+                                   ,pi_ne_admin_unit_2        IN     nm_elements.ne_admin_unit%TYPE DEFAULT NULL
+                                   ,pi_ne_gty_group_type_2    IN     nm_elements.ne_gty_group_type%TYPE DEFAULT NULL
+                                   ,pi_ne_owner_2             IN     nm_elements.ne_owner%TYPE DEFAULT NULL
+                                   ,pi_ne_name_1_2            IN     nm_elements.ne_name_1%TYPE DEFAULT NULL
+                                   ,pi_ne_name_2_2            IN     nm_elements.ne_name_2%TYPE DEFAULT NULL
+                                   ,pi_ne_prefix_2            IN     nm_elements.ne_prefix%TYPE DEFAULT NULL
+                                   ,pi_ne_number_2            IN     nm_elements.ne_number%TYPE DEFAULT NULL
+                                   ,pi_ne_sub_type_2          IN     nm_elements.ne_sub_type%TYPE DEFAULT NULL
+                                   ,pi_ne_group_2             IN     nm_elements.ne_group%TYPE DEFAULT NULL
+                                   ,pi_ne_no_start_2          IN     nm_elements.ne_no_start%TYPE DEFAULT NULL
+                                   ,pi_ne_no_end_2            IN     nm_elements.ne_no_end%TYPE DEFAULT NULL
+                                   ,pi_ne_sub_class_2         IN     nm_elements.ne_sub_class%TYPE DEFAULT NULL
+                                   ,pi_ne_nsg_ref_2           IN     nm_elements.ne_nsg_ref%TYPE DEFAULT NULL
+                                   ,pi_ne_version_no_2        IN     nm_elements.ne_version_no%TYPE DEFAULT NULL
+                                   ,pi_neh_descr              IN     nm_element_history.neh_descr%TYPE DEFAULT NULL); --CWS 0108990 12/03/2010
+
+--</PROC>
+--
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="do_split">
+-- Split a DATUM
+-- GJ not now a visible procedure - call split_datum_or_group instead
+--
+--   PROCEDURE do_split ( p_ne_id nm_elements.ne_id%TYPE -- the element to split
+--                       ,p_effective_date DATE DEFAULT  nm3user.get_effective_date-- the date the split is effective from
+--                       ,p_split_measure NUMBER -- the length along the original element
+--                       ,p_ne_id_1 IN OUT nm_elements.ne_id%TYPE -- the new element ne_id
+--                       ,p_ne_id_2 IN OUT nm_elements.ne_id%TYPE -- the 2nd new element ne_id
+--                       ,p_node IN OUT nm_elements.ne_no_start%TYPE -- the node att the split point
+--                       ,p_force_inheritance_of_attribs  IN     VARCHAR2                           DEFAULT 'N' -- force inheritance of all attributes on datums					   
+--                       ,p_create_node BOOLEAN DEFAULT FALSE
+--                       ,p_no_node_name nm_nodes.no_node_name%TYPE DEFAULT NULL
+--                       ,p_no_descr nm_nodes.no_descr%TYPE DEFAULT NULL
+--                       ,p_no_node_type nm_nodes.no_node_type%TYPE DEFAULT NULL
+--                       ,p_no_np_id nm_nodes.no_np_id%TYPE DEFAULT NULL
+--                       ,p_np_grid_east NM_POINTS.np_grid_east%TYPE DEFAULT NULL
+--                       ,p_np_grid_north NM_POINTS.np_grid_north%TYPE DEFAULT NULL
+--                       ,p_ne_unique_1 nm_elements.ne_unique%TYPE DEFAULT NULL
+--                       ,p_ne_type_1 nm_elements.ne_type%TYPE DEFAULT NULL
+--                       ,p_ne_nt_type_1 nm_elements.ne_nt_type%TYPE DEFAULT NULL
+--                       ,p_ne_descr_1 nm_elements.ne_descr%TYPE DEFAULT NULL
+--                       ,p_ne_length_1 nm_elements.ne_length%TYPE DEFAULT NULL
+--                       ,p_ne_admin_unit_1 nm_elements.ne_admin_unit%TYPE DEFAULT NULL
+--                       ,p_ne_gty_group_type_1 nm_elements.ne_gty_group_type%TYPE DEFAULT NULL
+--                       ,p_ne_owner_1 nm_elements.ne_owner%TYPE DEFAULT NULL
+--                       ,p_ne_name_1_1 nm_elements.ne_name_1%TYPE DEFAULT NULL
+--                       ,p_ne_name_2_1 nm_elements.ne_name_2%TYPE DEFAULT NULL
+--                       ,p_ne_prefix_1 nm_elements.ne_prefix%TYPE DEFAULT NULL
+--                       ,p_ne_number_1 nm_elements.ne_number%TYPE DEFAULT NULL
+--                       ,p_ne_sub_type_1 nm_elements.ne_sub_type%TYPE DEFAULT NULL
+--                       ,p_ne_group_1 nm_elements.ne_group%TYPE DEFAULT NULL
+--                       ,p_ne_no_start_1 nm_elements.ne_no_start%TYPE DEFAULT NULL
+--                       ,p_ne_no_end_1 nm_elements.ne_no_end%TYPE DEFAULT NULL
+--                       ,p_ne_sub_class_1 nm_elements.ne_sub_class%TYPE DEFAULT NULL
+--                       ,p_ne_nsg_ref_1 nm_elements.ne_nsg_ref%TYPE DEFAULT NULL
+--                       ,p_ne_version_no_1 nm_elements.ne_version_no%TYPE DEFAULT NULL
+--                       ,p_ne_unique_2 nm_elements.ne_unique%TYPE DEFAULT NULL
+--                       ,p_ne_type_2 nm_elements.ne_type%TYPE DEFAULT NULL
+--                       ,p_ne_nt_type_2 nm_elements.ne_nt_type%TYPE DEFAULT NULL
+--                       ,p_ne_descr_2 nm_elements.ne_descr%TYPE DEFAULT NULL
+--                       ,p_ne_length_2 nm_elements.ne_length%TYPE DEFAULT NULL
+--                       ,p_ne_admin_unit_2 nm_elements.ne_admin_unit%TYPE DEFAULT NULL
+--                       ,p_ne_gty_group_type_2 nm_elements.ne_gty_group_type%TYPE DEFAULT NULL
+--                       ,p_ne_owner_2 nm_elements.ne_owner%TYPE DEFAULT NULL
+--                       ,p_ne_name_1_2 nm_elements.ne_name_1%TYPE DEFAULT NULL
+--                       ,p_ne_name_2_2 nm_elements.ne_name_2%TYPE DEFAULT NULL
+--                       ,p_ne_prefix_2 nm_elements.ne_prefix%TYPE DEFAULT NULL
+--                       ,p_ne_number_2 nm_elements.ne_number%TYPE DEFAULT NULL
+--                       ,p_ne_sub_type_2 nm_elements.ne_sub_type%TYPE DEFAULT NULL
+--                       ,p_ne_group_2 nm_elements.ne_group%TYPE DEFAULT NULL
+--                       ,p_ne_no_start_2 nm_elements.ne_no_start%TYPE DEFAULT NULL
+--                       ,p_ne_no_end_2 nm_elements.ne_no_end%TYPE DEFAULT NULL
+--                       ,p_ne_sub_class_2 nm_elements.ne_sub_class%TYPE DEFAULT NULL
+--                       ,p_ne_nsg_ref_2 nm_elements.ne_nsg_ref%TYPE DEFAULT NULL
+--                       ,p_ne_version_no_2 nm_elements.ne_version_no%TYPE DEFAULT NULL
+--                       ) ;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--
+--<PROC NAME="do_geo_split">
+-- Start the split procedure, create the node if required
+-- This should only be called by SDE
+-- The tow new ne_id's must be passed
+   PROCEDURE do_geo_split ( p_ne_id nm_elements.ne_id%TYPE -- the element to split
+                       ,p_effective_date DATE DEFAULT  To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY') -- the date the split is effective from
+                       ,p_split_measure NUMBER -- the length along the original element
+                       ,p_ne_id_1 IN nm_elements.ne_id%TYPE -- the new element ne_id
+                       ,p_ne_id_2 IN nm_elements.ne_id%TYPE -- the 2nd new element ne_id
+
+                       ,p_node IN nm_elements.ne_no_start%TYPE -- the node att the split point
+                       ,p_create_node BOOLEAN DEFAULT FALSE
+                       ,p_no_node_name nm_nodes.no_node_name%TYPE DEFAULT NULL
+                       ,p_no_descr nm_nodes.no_descr%TYPE DEFAULT NULL
+                       ,p_no_node_type nm_nodes.no_node_type%TYPE DEFAULT NULL
+                       ,p_no_np_id nm_nodes.no_np_id%TYPE DEFAULT NULL
+                       ,p_np_grid_east NM_POINTS.np_grid_east%TYPE DEFAULT NULL
+                       ,p_np_grid_north NM_POINTS.np_grid_north%TYPE DEFAULT NULL
+                       ,p_no_purpose             in     nm_nodes.no_purpose%type default null -- PT 03.06.08
+
+                       ,p_ne_unique_1 nm_elements.ne_unique%TYPE DEFAULT NULL
+                       ,p_ne_type_1 nm_elements.ne_type%TYPE DEFAULT NULL
+                       ,p_ne_nt_type_1 nm_elements.ne_nt_type%TYPE DEFAULT NULL
+                       ,p_ne_descr_1 nm_elements.ne_descr%TYPE DEFAULT NULL
+                       ,p_ne_length_1 nm_elements.ne_length%TYPE DEFAULT NULL
+                       ,p_ne_admin_unit_1 nm_elements.ne_admin_unit%TYPE DEFAULT NULL
+                       ,p_ne_gty_group_type_1 nm_elements.ne_gty_group_type%TYPE DEFAULT NULL
+                       ,p_ne_owner_1 nm_elements.ne_owner%TYPE DEFAULT NULL
+                       ,p_ne_name_1_1 nm_elements.ne_name_1%TYPE DEFAULT NULL
+                       ,p_ne_name_2_1 nm_elements.ne_name_2%TYPE DEFAULT NULL
+                       ,p_ne_prefix_1 nm_elements.ne_prefix%TYPE DEFAULT NULL
+                       ,p_ne_number_1 nm_elements.ne_number%TYPE DEFAULT NULL
+                       ,p_ne_sub_type_1 nm_elements.ne_sub_type%TYPE DEFAULT NULL
+                       ,p_ne_group_1 nm_elements.ne_group%TYPE DEFAULT NULL
+                       ,p_ne_no_start_1 nm_elements.ne_no_start%TYPE DEFAULT NULL
+                       ,p_ne_no_end_1 nm_elements.ne_no_end%TYPE DEFAULT NULL
+                       ,p_ne_sub_class_1 nm_elements.ne_sub_class%TYPE DEFAULT NULL
+                       ,p_ne_nsg_ref_1 nm_elements.ne_nsg_ref%TYPE DEFAULT NULL
+                       ,p_ne_version_no_1 nm_elements.ne_version_no%TYPE DEFAULT NULL
+                       ,p_ne_unique_2 nm_elements.ne_unique%TYPE DEFAULT NULL
+                       ,p_ne_type_2 nm_elements.ne_type%TYPE DEFAULT NULL
+                       ,p_ne_nt_type_2 nm_elements.ne_nt_type%TYPE DEFAULT NULL
+                       ,p_ne_descr_2 nm_elements.ne_descr%TYPE DEFAULT NULL
+                       ,p_ne_length_2 nm_elements.ne_length%TYPE DEFAULT NULL
+                       ,p_ne_admin_unit_2 nm_elements.ne_admin_unit%TYPE DEFAULT NULL
+                       ,p_ne_gty_group_type_2 nm_elements.ne_gty_group_type%TYPE DEFAULT NULL
+                       ,p_ne_owner_2 nm_elements.ne_owner%TYPE DEFAULT NULL
+                       ,p_ne_name_1_2 nm_elements.ne_name_1%TYPE DEFAULT NULL
+                       ,p_ne_name_2_2 nm_elements.ne_name_2%TYPE DEFAULT NULL
+                       ,p_ne_prefix_2 nm_elements.ne_prefix%TYPE DEFAULT NULL
+                       ,p_ne_number_2 nm_elements.ne_number%TYPE DEFAULT NULL
+                       ,p_ne_sub_type_2 nm_elements.ne_sub_type%TYPE DEFAULT NULL
+                       ,p_ne_group_2 nm_elements.ne_group%TYPE DEFAULT NULL
+                       ,p_ne_no_start_2 nm_elements.ne_no_start%TYPE DEFAULT NULL
+                       ,p_ne_no_end_2 nm_elements.ne_no_end%TYPE DEFAULT NULL
+                       ,p_ne_sub_class_2 nm_elements.ne_sub_class%TYPE DEFAULT NULL
+                       ,p_ne_nsg_ref_2 nm_elements.ne_nsg_ref%TYPE DEFAULT NULL
+                       ,p_ne_version_no_2 nm_elements.ne_version_no%TYPE DEFAULT NULL
+                       );
+--</PROC>
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="create_node">
+FUNCTION create_node (p_no_node_name   IN nm_nodes.no_node_name%TYPE   DEFAULT NULL
+                     ,p_no_descr       IN nm_nodes.no_descr%TYPE
+                     ,p_no_node_type   IN nm_nodes.no_node_type%TYPE
+                     ,p_effective_date IN nm_nodes.no_start_date%TYPE  DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
+                     ,p_np_grid_east   IN NM_POINTS.np_grid_east%TYPE  DEFAULT NULL
+                     ,p_np_grid_north  IN NM_POINTS.np_grid_north%TYPE DEFAULT NULL
+                     ,p_no_purpose     in nm_nodes_all.no_purpose%type default null
+                     ) RETURN nm_nodes.no_node_id%TYPE;
+--</PROC>
+--
+------------------------------------------------------------------------------------------------
+--
+--<PROC NAME="can_element_be_split">
+-- check whether an element (datum or group) can be split
+--
+FUNCTION can_element_be_split (pi_ne_rec IN nm_elements%ROWTYPE
+                              ,pi_effective_date IN DATE DEFAULT NULL) RETURN BOOLEAN;
+--</PROC>
+--
+------------------------------------------------------------------------------------------------
+--
+--<PROC NAME="check_element_can_be_split">
+-- calls can_element_be_split and if FALSE then throw the relevant error
+--
+PROCEDURE check_element_can_be_split(pi_ne_id IN nm_elements.ne_id%TYPE DEFAULT NULL
+                                    ,pi_effective_date IN DATE DEFAULT NULL);
+--</PROC>
+--
+------------------------------------------------------------------------------------------------
+--
+--<PROC NAME="validate_split_position">
+-- validate whether the split at an offset or node is a valid point to split at
+--
+PROCEDURE validate_split_position (pi_ne_id                  IN nm_elements.ne_id%TYPE DEFAULT NULL
+                                  ,pi_split_offset           IN NUMBER  
+                                  ,pi_non_ambig_ne_id        IN nm_elements.ne_id%TYPE    -- only applicable when splitting a group 
+                                  ,pi_non_ambig_split_offset IN NUMBER                    -- only applicable when splitting a group
+                                  ,pi_split_at_node          IN nm_nodes.no_node_id%TYPE
+								  ,pi_effective_date         IN DATE);
+
+--</PROC>
+--
+------------------------------------------------------------------------------------------------
+--
+--<PROC NAME="datum_split_required">
+-- validate whether a split of datum is required
+--
+FUNCTION datum_split_required(pi_ne_id                   IN     nm_elements.ne_id%TYPE     DEFAULT NULL
+                             ,pi_split_at_node_id        IN     nm_nodes.no_node_id%TYPE   DEFAULT NULL  						
+                             ) RETURN BOOLEAN;
+--</PROC>
+--
+------------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_lref_at_node">
+-- return lref up to or after a given node on a route
+--
+FUNCTION get_lref_at_node(pi_node_id         IN nm_nodes.no_node_id%TYPE
+                         ,pi_ne_id_in        IN nm_members.nm_ne_id_in%TYPE
+						 ,pi_before_or_after IN VARCHAR2) RETURN nm_lref;
+--</PROC>
+--
+------------------------------------------------------------------------------------------------
+--
+--<PRAGMA>
+   PRAGMA RESTRICT_REFERENCES (get_version, rnds, wnps, wnds);
+   PRAGMA RESTRICT_REFERENCES (get_body_version, rnds, wnps, wnds);
+--</PRAGMA>
+
+END nm3split;
+/

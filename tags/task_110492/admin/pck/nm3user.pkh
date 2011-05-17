@@ -1,0 +1,380 @@
+CREATE OR REPLACE PACKAGE nm3user AS
+--<PACKAGE>
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3user.pkh-arc   2.5   May 17 2011 08:26:26   Steve.Cooper  $
+--       Module Name      : $Workfile:   nm3user.pkh  $
+--       Date into PVCS   : $Date:   May 17 2011 08:26:26  $
+--       Date fetched Out : $Modtime:   May 05 2011 14:36:12  $
+--       Version          : $Revision:   2.5  $
+--       Based on SCCS version : 1.18
+-------------------------------------------------------------------------
+--   Author : Rob Coupe
+--
+--   NM3 user package
+--
+-----------------------------------------------------------------------------
+--	Copyright (c) exor corporation ltd, 2000
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+  g_sccsid      CONSTANT  varchar2(2000) := '$Revision:   2.5  $';
+--  g_sccsid is the SCCS ID for the package
+
+--
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="instantiate_user">
+  PROCEDURE instantiate_user;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="set_effective_date">
+  PROCEDURE set_effective_date( p_date IN date );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="set_user_date_mask">
+  PROCEDURE set_user_date_mask ( p_mask IN varchar2);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="set_user_length_units">
+  PROCEDURE set_user_length_units( p_unit_id IN number );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_history_rec">
+  FUNCTION  get_history_rec ( p_index IN number ) RETURN hig_modules.hmo_module%TYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="set_history_rec">
+  PROCEDURE set_history_rec ( p_module IN varchar2);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="instantiate_user_history">
+  PROCEDURE instantiate_user_history;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="maintain_user_history">
+  PROCEDURE maintain_user_history;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="dump_user_history">
+  PROCEDURE dump_user_history;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="convert_char_date">
+  FUNCTION  convert_char_date ( p_char_date IN varchar2 ) RETURN varchar2 ;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_username">
+  FUNCTION get_username(p_user_id IN hig_users.hus_user_id%TYPE) RETURN hig_users.hus_username%TYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="user_can_run_module">
+-- Returns TRUE if the current user has been assigned a role that is allowed to run the given module.
+-- and the module is owned by a licenced product
+  FUNCTION user_can_run_module(p_module IN hig_module_roles.hmr_module%TYPE) RETURN boolean;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="user_can_run_module">
+-- Returns 'Y' if the current user has been assigned a role that is allowed to run the given module.
+-- and the module is owned by a licenced product
+--
+  FUNCTION user_can_run_module_vc(p_module IN hig_module_roles.hmr_module%TYPE) RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+
+
+--
+--<PROC NAME="get_public_user_details">
+-- Returns the username and name of the public user.
+PROCEDURE get_public_user_details(po_pub_username OUT varchar2
+                                 ,po_pub_name     OUT varchar2
+                                 );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="restricted_user_check">
+-- Checks if the user is unrestricted and raises an application error
+-- if the user is restricted.
+PROCEDURE restricted_user_check ;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="user_has_role">
+-- Returns TRUE if specified user has specified role.
+--
+FUNCTION user_has_role(pi_user IN hig_users.hus_username%TYPE DEFAULT Sys_Context('NM3_SECURITY_CTX','USERNAME')
+                      ,pi_role IN hig_roles.hro_role%TYPE
+                      ) RETURN boolean;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_hus">
+-- This procedure returns the HIG_USERS record for the passed user
+--
+FUNCTION get_hus (pi_hus_user_id IN hig_users.hus_user_id%TYPE) RETURN hig_users%ROWTYPE;
+--
+FUNCTION get_hus (pi_hus_username IN hig_users.hus_username%TYPE DEFAULT Sys_Context('NM3_SECURITY_CTX','USERNAME')) RETURN hig_users%ROWTYPE;
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="user_has_priv">
+--
+-- Returns TRUE if specified user has specified system privilege granted
+-- directly to them.
+--
+FUNCTION user_has_priv(pi_user IN hig_users.hus_username%TYPE DEFAULT Sys_Context('NM3_SECURITY_CTX','USERNAME')
+                      ,pi_priv IN dba_sys_privs.privilege%TYPE
+                      ) RETURN boolean;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="lock_account">
+--
+-- This procedure locks the specified Oracle account.
+--
+PROCEDURE lock_account(pi_username IN hig_users.hus_username%TYPE
+                      );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="unlock_account">
+--
+-- This procedure unlocks the specified Oracle account.
+--
+PROCEDURE unlock_account(pi_username IN hig_users.hus_username%TYPE
+                        );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_du">
+--
+-- This function returns the specified dba_users record.
+--
+FUNCTION get_du(pi_username IN dba_users.username%TYPE
+               ) RETURN dba_users%ROWTYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="set_preferred_lrm">
+--
+-- This procedure sets the specified preferred LRM
+--
+PROCEDURE set_preferred_lrm (pi_group_type   IN nm_group_types.ngt_group_type%TYPE
+                            ,pi_set_user_opt IN boolean DEFAULT TRUE
+                            );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="set_user_option">
+--
+-- This procedure sets a user option
+--
+PROCEDURE set_user_option (pi_huo_hus_user_id        hig_user_options.huo_hus_user_id%TYPE
+                          ,pi_huo_id                 hig_user_options.huo_id%TYPE
+                          ,pi_huo_value              hig_user_options.huo_value%TYPE
+                          );
+--
+PROCEDURE set_user_option (pi_huo_id                 hig_user_options.huo_id%TYPE
+                          ,pi_huo_value              hig_user_options.huo_value%TYPE
+                          );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_user_roi_details">
+--
+FUNCTION get_user_roi_details RETURN nm3extent.rec_roi_details;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_user_roi_name">
+--
+FUNCTION get_user_roi_name RETURN nm_elements.ne_unique%TYPE ;
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_user_roi_descr">
+--
+FUNCTION get_user_roi_descr RETURN nm_elements.ne_descr%TYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_user_roi_id">
+--
+FUNCTION get_user_roi_id RETURN nm_elements.ne_id%TYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_user_roi_type">
+--
+FUNCTION get_user_roi_type RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="set_user_roi_details">
+--
+PROCEDURE set_user_roi_details (pi_roi_id   number
+                               ,pi_roi_type varchar2
+                               );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="set_user_def_inv_attr_set">
+--
+PROCEDURE set_user_def_inv_attr_set(pi_nias_id nm_inv_attribute_sets.nias_id%TYPE
+                                   );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="copy_user">
+-- THis procedure will copy an existing user. It will NOT grant the roles associated
+--  with that user (although it will create the HIG_USER_ROLES records). This is because
+--  any package which is in fact referenced directly by a role privilege which tries
+--  to grant access to itself disappears into a big self-locking hole in the ground.
+-- Roles will need to be granted seperately by calling GRANT_ROLE_TO_USER for each role
+--  in HIG_USER_ROLES. HIG1832 (users form) does it all itself to get around this issue
+--
+PROCEDURE copy_user (pi_hus_user_id_old   IN     hig_users.hus_user_id%TYPE
+                    ,pi_hus_name          IN     hig_users.hus_name%TYPE
+                    ,pi_hus_initials      IN     hig_users.hus_initials%TYPE
+                    ,pi_hus_username      IN     hig_users.hus_username%TYPE
+                    ,pi_password          IN     VARCHAR2
+                    ,pi_hus_start_date    IN     hig_users.hus_start_date%TYPE
+                    ,pi_hus_unrestricted  IN     hig_users.hus_unrestricted%TYPE
+                    ,pi_copy_roles        IN     BOOLEAN DEFAULT TRUE
+                    ,pi_copy_admin_units  IN     BOOLEAN DEFAULT TRUE
+                    ,pi_copy_user_options IN     BOOLEAN DEFAULT TRUE
+                    ,po_hus_user_id_new      OUT hig_users.hus_user_id%TYPE
+                    );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--
+--<PROC NAME="historic_mode">
+-- Returns TRUE if the sysdate <> effective date
+--
+FUNCTION historic_mode RETURN boolean;
+--</PROC>
+--
+FUNCTION user_is_higowner(pi_username IN hig_users.hus_username%TYPE DEFAULT Sys_Context('NM3_SECURITY_CTX','USERNAME')) RETURN BOOLEAN;
+
+FUNCTION user_is_higowner_yn(pi_username IN hig_users.hus_username%TYPE DEFAULT Sys_Context('NM3_SECURITY_CTX','USERNAME')) RETURN VARCHAR2;
+--
+-----------------------------------------------------------------------------
+--
+--
+--<PROC NAME="get_default_temp_tablespace">
+--
+FUNCTION get_default_temp_tablespace 
+RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_default_user_tablespace">
+--
+FUNCTION get_default_user_tablespace 
+RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_default_user_profile">
+--
+FUNCTION get_default_user_profile
+RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PRAGMA>
+  PRAGMA RESTRICT_REFERENCES( get_version, wnds, wnps );
+  PRAGMA RESTRICT_REFERENCES( get_body_version, wnds, wnps );  
+  PRAGMA RESTRICT_REFERENCES( get_history_rec, wnds, wnps );
+  PRAGMA RESTRICT_REFERENCES( convert_char_date, wnds, wnps );
+  PRAGMA RESTRICT_REFERENCES( get_public_user_details, wnds, wnps );
+  PRAGMA RESTRICT_REFERENCES( user_has_role, wnds, wnps );
+  PRAGMA RESTRICT_REFERENCES( user_has_priv, wnds, wnps );
+  PRAGMA RESTRICT_REFERENCES( get_user_roi_details, wnds, wnps );
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+END nm3user;
+/
+
+-- if instantiate user trigger exists then re-compile 
+-- cos it would have been invalidated by running in nm3user package
+--
+DECLARE
+  ex_not_exists EXCEPTION;
+  PRAGMA exception_init(ex_not_exists,-04080);
+
+BEGIN
+ execute immediate ('ALTER TRIGGER instantiate_user COMPILE');
+ 
+EXCEPTION
+  WHEN ex_not_exists THEN
+    Null; 
+END;  
+/
+
