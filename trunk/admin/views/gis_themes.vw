@@ -20,7 +20,7 @@ WHERE EXISTS (SELECT 1
                FROM  gis_theme_roles
                     ,hig_user_roles
                WHERE gthr_theme_id   = gt_theme_id
-                AND  hur_username    = USER
+                AND  hur_username    = Sys_Context('NM3_SECURITY_CTX','USERNAME')
                 AND  gthr_role       = hur_role 
              )
 /
