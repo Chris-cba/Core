@@ -26,6 +26,6 @@ SELECT
 --
        *
  FROM  nm_members_all
-WHERE  nm_start_date <= (select nm3context.get_effective_date from dual)
- AND   NVL(nm_end_date,TO_DATE('99991231','YYYYMMDD')) > (select nm3context.get_effective_date from dual)
+WHERE  nm_start_date                                    <=  To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
+ AND   NVL(nm_end_date,TO_DATE('99991231','YYYYMMDD'))  >   To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
 /

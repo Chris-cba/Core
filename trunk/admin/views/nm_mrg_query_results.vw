@@ -54,14 +54,14 @@ BEGIN
       append ('WHERE EXISTS (SELECT 1 FROM nm_mrg_query_executable WHERE nmq_id = nqr_nmq_id)');
       append (' AND EXISTS (SELECT 1');
       append ('              FROM  hig_users');
-      append ('             WHERE  hus_username     = USER');
+      append ('             WHERE  hus_username     = Sys_Context(''NM3_SECURITY_CTX'',''USERNAME'')');
       append ('              AND   hus_unrestricted = '||CHR(39)||'Y'||CHR(39));
       append ('             UNION');
       append ('             SELECT 1');
       append ('              FROM  nm_user_aus');
       append ('                   ,nm_admin_groups');
       append ('                   ,hig_users');
-      append ('             WHERE  hus_username         = USER');
+      append ('             WHERE  hus_username         = Sys_Context(''NM3_SECURITY_CTX'',''USERNAME'')');
       append ('              AND   nua_user_id          = hus_user_id');
       append ('              AND   nua_admin_unit       = nag_parent_admin_unit');
       append ('              AND   nag_child_admin_unit = nqr_admin_unit');

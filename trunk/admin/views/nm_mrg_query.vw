@@ -60,7 +60,7 @@ BEGIN
       append ('                    ,hig_user_roles');
       append ('              WHERE  nqro_nmq_id  = nmq_id');
       append ('               AND   nqro_role    = hur_role');
-      append ('               AND   hur_username = USER');
+      append ('               AND   hur_username = Sys_Context(''NM3_SECURITY_CTX'',''USERNAME'')');
       append ('             )');
    END IF;
 --

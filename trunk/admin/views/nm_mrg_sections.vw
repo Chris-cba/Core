@@ -53,7 +53,7 @@ BEGIN
 --
       append ('WHERE EXISTS (SELECT 1');
       append ('               FROM  hig_users');
-      append ('              WHERE  hus_username = USER');
+      append ('              WHERE  hus_username = Sys_Context(''NM3_SECURITY_CTX'',''USERNAME'')');
       append ('               AND   hus_unrestricted = '||CHR(39)||'Y'||CHR(39));
       append ('              UNION');
       append ('              SELECT 1');

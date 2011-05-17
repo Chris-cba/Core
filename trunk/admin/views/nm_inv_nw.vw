@@ -15,7 +15,7 @@ SELECT
 --
        *
  FROM  nm_inv_nw_all
-WHERE  nin_start_date <= (select nm3context.get_effective_date from dual)
- AND   NVL(nin_end_date,TO_DATE('99991231','YYYYMMDD')) > (select nm3context.get_effective_date from dual)
+WHERE  nin_start_date                                   <=  To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
+ AND   NVL(nin_end_date,TO_DATE('99991231','YYYYMMDD')) >   To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
 
 /

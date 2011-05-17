@@ -54,8 +54,8 @@ BEGIN
    append ('--');
    append ('       *');
    append (' FROM  nm_inv_types_all');
-   append ('WHERE  nit_start_date <= (select nm3context.get_effective_date from dual)');
-   append (' AND   NVL(nit_end_date,TO_DATE('||CHR(39)||'99991231'||CHR(39)||','||CHR(39)||'YYYYMMDD'||CHR(39)||')) >  (select nm3context.get_effective_date from dual)');
+   append ('WHERE  nit_start_date <= To_Date(Sys_Context(''NM3CORE'',''EFFECTIVE_DATE''),''DD-MON-YYYY'')');
+   append (' AND   NVL(nit_end_date,TO_DATE('||CHR(39)||'99991231'||CHR(39)||','||CHR(39)||'YYYYMMDD'||CHR(39)||')) >  To_Date(Sys_Context(''NM3CORE'',''EFFECTIVE_DATE''),''DD-MON-YYYY'')');
 --
    OPEN  cs_enterprise_edn;
    FETCH cs_enterprise_edn INTO l_dummy;
