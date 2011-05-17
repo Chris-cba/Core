@@ -6,11 +6,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3sde AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sde.pkb-arc   2.11   Mar 09 2011 13:58:00   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sde.pkb-arc   2.12   May 17 2011 08:26:24   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3sde.pkb  $
---       Date into PVCS   : $Date:   Mar 09 2011 13:58:00  $
---       Date fetched Out : $Modtime:   Mar 09 2011 13:56:42  $
---       PVCS Version     : $Revision:   2.11  $
+--       Date into PVCS   : $Date:   May 17 2011 08:26:24  $
+--       Date fetched Out : $Modtime:   May 05 2011 13:39:50  $
+--       PVCS Version     : $Revision:   2.12  $
 --
 --       Based on one of many versions labeled as 1.21
 --
@@ -24,7 +24,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3sde AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.11  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.12  $"';
    g_keyword         CONSTANT  VARCHAR2(30)   := 'SDO_GEOMETRY'; --get_keyword;
 
 
@@ -248,7 +248,7 @@ BEGIN
     p_layer.BASE_LAYER_ID     := p_layer.layer_id;
     p_layer.LAYER_ID          := get_next_sde_layer;
     p_layer.DESCRIPTION       := l_theme.nth_theme_name;
-    p_layer.OWNER             := g_owner;
+    p_layer.OWNER             := Sys_Context('NM3CORE','APPLICATION_OWNER');
     p_layer.TABLE_NAME        := l_theme.nth_feature_table;
     p_layer.SPATIAL_COLUMN    := l_theme.nth_feature_shape_column;
     p_layer.CDATE             := l_date;
@@ -267,11 +267,11 @@ BEGIN
 
 
   p_geocol.F_TABLE_CATALOG  := NULL;
-  p_geocol.F_TABLE_SCHEMA   := g_owner;
+  p_geocol.F_TABLE_SCHEMA   := Sys_Context('NM3CORE','APPLICATION_OWNER');
   p_geocol.F_TABLE_NAME     := l_theme.nth_feature_table;
   p_geocol.F_GEOMETRY_COLUMN:= l_theme.nth_feature_shape_column;
   p_geocol.G_TABLE_CATALOG  := NULL;
-  p_geocol.G_TABLE_SCHEMA   := g_owner;
+  p_geocol.G_TABLE_SCHEMA   := Sys_Context('NM3CORE','APPLICATION_OWNER');
   p_geocol.G_TABLE_NAME     := l_theme.nth_feature_table;
   p_geocol.STORAGE_TYPE     := 2;
   p_geocol.GEOMETRY_TYPE    := l_type;
@@ -282,7 +282,7 @@ BEGIN
 
   p_reg.REGISTRATION_ID     := get_next_sde_table_id;
   p_reg.TABLE_NAME          := l_theme.nth_feature_table;
-  p_reg.OWNER               := g_owner;
+  p_reg.OWNER               := Sys_Context('NM3CORE','APPLICATION_OWNER');
 
   p_reg.ROWID_COLUMN        := get_SDE_pk ( p_nth => l_theme );
 
@@ -345,7 +345,7 @@ CURSOR c1( c_tab IN VARCHAR2, c_col IN VARCHAR2 ) IS
   FROM sde.layers
   WHERE table_name = c_tab
   AND   spatial_column = c_col
-  AND   owner = g_owner;
+  AND   owner = Sys_Context('NM3CORE','APPLICATION_OWNER');
 
 retval sde.layers%ROWTYPE;
 
@@ -445,7 +445,7 @@ BEGIN
     retval.LAYER_ID           := get_next_sde_layer;
     retval.DESCRIPTION        := p_nth.nth_theme_name;
     retval.DATABASE_NAME      := NULL;
-    retval.OWNER              := g_owner;
+    retval.OWNER              := Sys_Context('NM3CORE','APPLICATION_OWNER');
     retval.TABLE_NAME         := p_nth.nth_feature_table;
     retval.SPATIAL_COLUMN     := p_nth.nth_feature_shape_column;
     retval.EFLAGS             := convert_to_sde_eflag( Nm3sdo.get_theme_gtype( p_nth.nth_theme_id ) );
@@ -553,7 +553,7 @@ BEGIN
                p_base,
                p_srid, 
                l_munits,
-               g_owner,
+               Sys_Context('NM3CORE','APPLICATION_OWNER'),
                l_gtype );
 
   fetch c_srid into retval;
@@ -710,7 +710,7 @@ CURSOR c_layer( c_table IN VARCHAR2, c_column IN VARCHAR2 ) IS
   FROM sde.layers
   WHERE table_name = c_table
   AND   spatial_column = c_column
-  AND   owner = g_owner;
+  AND   owner = Sys_Context('NM3CORE','APPLICATION_OWNER');
 
 l_layer layer_record_t;
 
@@ -740,18 +740,18 @@ END;
 
 FUNCTION get_layer( p_table IN VARCHAR2, p_column IN VARCHAR2 )  RETURN layer_record_t IS
 
-CURSOR c_layer( c_table IN VARCHAR2, c_column IN VARCHAR2, c_owner IN VARCHAR2 ) IS
+CURSOR c_layer( c_table IN VARCHAR2, c_column IN VARCHAR2) IS
   SELECT *
   FROM sde.layers
   WHERE table_name = c_table
   AND   spatial_column = c_column
-  AND   owner = c_owner;
+  AND   owner = Sys_Context('NM3CORE','APPLICATION_OWNER');
 
 l_layer layer_record_t;
 
 BEGIN
 
-  OPEN c_layer (p_table, p_column, g_owner );
+  OPEN c_layer (p_table, p_column);
   FETCH c_layer INTO l_layer;
   IF c_layer%NOTFOUND THEN
       CLOSE c_layer;
@@ -773,10 +773,10 @@ END;
 
 FUNCTION get_geocol( p_table IN VARCHAR2, p_column IN VARCHAR2 )  RETURN geocol_record_t  IS
 
-CURSOR c_geocol( c_table IN VARCHAR2, c_column IN VARCHAR2, c_owner IN VARCHAR2 ) IS
+CURSOR c_geocol( c_table IN VARCHAR2, c_column IN VARCHAR2) IS
   SELECT *
   FROM sde.geometry_columns
-  WHERE f_table_schema = c_owner
+  WHERE f_table_schema = Sys_Context('NM3CORE','APPLICATION_OWNER')
   AND   f_table_name = c_table
   AND   f_geometry_column = c_column;
 
@@ -785,7 +785,7 @@ l_geocol geocol_record_t;
 
 BEGIN
 
-  OPEN c_geocol (p_table, p_column, g_owner );
+  OPEN c_geocol (p_table, p_column);
   FETCH c_geocol INTO l_geocol;
   IF c_geocol%NOTFOUND THEN
       CLOSE c_geocol;
@@ -807,17 +807,17 @@ END;
 --
 FUNCTION get_treg( p_table IN VARCHAR2 )  RETURN registration_record_t  IS
 
-CURSOR c_treg( c_table IN VARCHAR2, c_owner IN VARCHAR2 ) IS
+CURSOR c_treg( c_table IN VARCHAR2) IS
   SELECT *
   FROM sde.table_registry
-  WHERE owner = c_owner
+  WHERE owner = Sys_Context('NM3CORE','APPLICATION_OWNER')
   AND   table_name = c_table;
 
 l_treg registration_record_t;
 
 BEGIN
 
-  OPEN c_treg (p_table, g_owner );
+  OPEN c_treg (p_table);
   FETCH c_treg INTO l_treg;
   IF c_treg%NOTFOUND THEN
       CLOSE c_treg;
@@ -1146,13 +1146,13 @@ CURSOR c_nth_tab IS
   AND EXISTS ( SELECT 1 FROM all_tab_columns
                WHERE table_name = nth_feature_table
                AND   column_name = nth_feature_shape_column
-               AND owner = g_owner)
+               AND owner = Sys_Context('NM3CORE','APPLICATION_OWNER'))
   AND nth_base_table_theme IS NULL
   AND NOT EXISTS
     ( SELECT 1
       FROM sde.layers
       WHERE table_name = nth_feature_table
-      AND   owner      = g_owner );
+      AND   owner      = Sys_Context('NM3CORE','APPLICATION_OWNER') );
 
 CURSOR c_nth_view IS
   SELECT nth_theme_id, nth_base_table_theme
@@ -1163,12 +1163,12 @@ CURSOR c_nth_view IS
   AND EXISTS ( SELECT 1 FROM all_tab_columns
                WHERE table_name = nth_feature_table
                AND   column_name = nth_feature_shape_column
-               AND owner = g_owner)
+               AND owner = Sys_Context('NM3CORE','APPLICATION_OWNER'))
   AND NOT EXISTS
     ( SELECT 1
       FROM sde.layers
       WHERE table_name = nth_feature_table
-      AND   owner      = g_owner );
+      AND   owner      = Sys_Context('NM3CORE','APPLICATION_OWNER') );
 
 
 BEGIN
@@ -1258,7 +1258,7 @@ IS
    l_data_precision_tab   nm3type.tab_number;
    l_data_scale_tab       nm3type.tab_number;
    l_nullable_tab         nm3type.tab_varchar1;
-   l_owner                VARCHAR2 (30)         := hig.get_application_owner;
+
    l_obj_id               INTEGER;
    l_obj_flag             NUMBER;
    l_pk_col               VARCHAR2 (30);
@@ -1389,7 +1389,7 @@ BEGIN
                   , object_id
                   )
            VALUES ( p_table
-                  , l_owner
+                  , Sys_Context('NM3CORE','APPLICATION_OWNER')
                   , l_col_tab (i)
                   , l_data_type_tab (i)
                   , l_data_length_tab (i)
@@ -1415,7 +1415,7 @@ BEGIN
 
   EXECUTE IMMEDIATE ' delete from sde.column_registry '||
                     '  where table_name = :table '||
-                    '  and   owner = :owner ' USING p_table, g_owner;
+                    '  and   owner = Sys_Context(''NM3CORE'',''APPLICATION_OWNER'') ' USING p_table;
 END;
 
 --
@@ -1489,7 +1489,7 @@ IS
       SELECT layer_id, owner
         FROM sde.layers, HIG_USERS
        WHERE owner = hus_username
-         AND owner != g_owner
+         AND owner != Sys_Context('NM3CORE','APPLICATION_OWNER')
          AND table_name = c_table
          AND spatial_column = c_column;
 
@@ -1637,7 +1637,7 @@ PROCEDURE copy_sde_obj_from_theme( p_theme_id IN NM_THEMES_ALL.nth_theme_id%TYPE
          , column_size, decimal_digits
          , description, object_flags, object_id
       FROM sde.column_registry a
-     WHERE a.owner = hig.get_application_owner
+     WHERE a.owner = Sys_Context('NM3CORE','APPLICATION_OWNER')
        AND a.table_name = c_table
        AND NOT EXISTS
          (SELECT 1 FROM sde.column_registry b
@@ -1957,7 +1957,7 @@ cursor c1 ( c_theme_id in NM_THEMES_ALL.nth_theme_id%TYPE ) is
   and b.srid = a.srid
   and b.table_name = l.table_name
   and l.srid = r.srid
-  and l.owner = user
+  and l.owner = Sys_Context('NM3_SECURITY_CTX','USERNAME')
   group by srtext;
 
 curstr NM3TYPE.MAX_VARCHAR2 := 'select substr(definition, 1, 1024) '

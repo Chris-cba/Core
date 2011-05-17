@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3nwval AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3nwval.pkb-arc   2.9   Mar 16 2011 13:09:50   Chris.Strettle  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3nwval.pkb-arc   2.10   May 17 2011 08:26:24   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3nwval.pkb  $
---       Date into PVCS   : $Date:   Mar 16 2011 13:09:50  $
---       Date fetched Out : $Modtime:   Mar 16 2011 13:07:34  $
---       PVCS Version     : $Revision:   2.9  $
+--       Date into PVCS   : $Date:   May 17 2011 08:26:24  $
+--       Date fetched Out : $Modtime:   Apr 08 2011 09:05:10  $
+--       PVCS Version     : $Revision:   2.10  $
 --       Based on 1.67
 --
 --
@@ -18,7 +18,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3nwval AS
 --      Copyright (c) exor corporation ltd, 2000
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.9  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.10  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 -----------------------------------------------------------------------------
 --
@@ -39,11 +39,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3nwval AS
    g_ne_group      VARCHAR2(30);
    g_start_node    NUMBER ;
    g_slk           NUMBER ;
-   g_seq_no        NUMBER ;
---
-   c_app_owner CONSTANT VARCHAR2(30) := Hig.get_application_owner;
---
-   c_user CONSTANT user_users.username%TYPE := USER;
+   g_seq_no        NUMBER ;   
 --
    g_tab_nm_elements_cols Nm3type.tab_varchar30;
 --
@@ -136,7 +132,7 @@ BEGIN
    l_rec_nm.nm_type                := 'G';
    l_rec_nm.nm_obj_type            := p_ne_group;
    l_rec_nm.nm_begin_mp            := 0;
-   l_rec_nm.nm_start_date          := Nm3context.get_effective_date;
+   l_rec_nm.nm_start_date          := To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY');
    l_rec_nm.nm_end_date            := NULL;
    l_rec_nm.nm_end_mp              := NULL;
    l_rec_nm.nm_slk                 := p_slk;
@@ -1755,8 +1751,8 @@ PROCEDURE check_members (p_old_nm_ne_id_in   IN     nm_members.nm_ne_id_in%TYPE
 --
    l_ner_id             NM_ERRORS.ner_id%TYPE;
    l_ner_appl           NM_ERRORS.ner_appl%TYPE := Nm3type.c_net;
-   c_date_mask CONSTANT VARCHAR2(500) := Nm3user.get_user_date_mask;
-   l_supplementary_info VARCHAR2(500) := 'NM_MEMBERS_ALL('||p_new_nm_ne_id_in||':'||p_new_nm_ne_id_of||':'||p_new_nm_begin_mp||':'||TO_CHAR(p_new_nm_start_date,c_date_mask)||')';
+
+   l_supplementary_info VARCHAR2(500) := 'NM_MEMBERS_ALL('||p_new_nm_ne_id_in||':'||p_new_nm_ne_id_of||':'||p_new_nm_begin_mp||':'||TO_CHAR(p_new_nm_start_date,Sys_Context('NM3CORE','USER_DATE_MASK'))||')';
    l_parent_text        VARCHAR2(500) := '.NM_NE_ID_OF - NM_ELEMENTS_ALL.NE_ID';
 --
    PROCEDURE validate_dates_against_loc_var IS
@@ -1765,7 +1761,7 @@ PROCEDURE check_members (p_old_nm_ne_id_in   IN     nm_members.nm_ne_id_in%TYPE
      IF p_new_nm_end_date < p_new_nm_start_date
       THEN
         l_ner_id             := 14;
-        l_supplementary_info := l_supplementary_info||TO_CHAR(l_start_date,c_date_mask)||' > '||TO_CHAR(l_end_date,c_date_mask);
+        l_supplementary_info := l_supplementary_info||TO_CHAR(l_start_date,Sys_Context('NM3CORE','USER_DATE_MASK'))||' > '||TO_CHAR(l_end_date,Sys_Context('NM3CORE','USER_DATE_MASK'));
         RAISE l_start_date_gt_end_date;
      END IF;
    --
@@ -1934,13 +1930,13 @@ EXCEPTION
     THEN
       Hig.raise_ner (pi_appl               => l_ner_appl
                     ,pi_id                 => l_ner_id
-                    ,pi_supplementary_info => l_supplementary_info||' '||TO_CHAR(p_new_nm_start_date,c_date_mask)||' > '||TO_CHAR(l_start_date,c_date_mask)
+                    ,pi_supplementary_info => l_supplementary_info||' '||TO_CHAR(p_new_nm_start_date,Sys_Context('NM3CORE','USER_DATE_MASK'))||' > '||TO_CHAR(l_start_date,Sys_Context('NM3CORE','USER_DATE_MASK'))
                     );
    WHEN l_end_date_out_of_range
     THEN
       Hig.raise_ner (pi_appl               => l_ner_appl
                     ,pi_id                 => l_ner_id
-                    ,pi_supplementary_info => l_supplementary_info||' '||NVL(TO_CHAR(p_new_nm_end_date,c_date_mask),'Null')||' > '||TO_CHAR(l_end_date,c_date_mask)
+                    ,pi_supplementary_info => l_supplementary_info||' '||NVL(TO_CHAR(p_new_nm_end_date,Sys_Context('NM3CORE','USER_DATE_MASK')),'Null')||' > '||TO_CHAR(l_end_date,Sys_Context('NM3CORE','USER_DATE_MASK'))
                     );
    WHEN l_parent_not_found_ele
     THEN
@@ -1991,7 +1987,6 @@ PROCEDURE check_member_groups (p_new_nm_ne_id_in   IN     nm_members.nm_ne_id_in
   l_not_a_valid_grouping EXCEPTION;
   l_ner_id             NM_ERRORS.ner_id%TYPE;
   l_ner_appl           NM_ERRORS.ner_appl%TYPE := Nm3type.c_net;
-  c_date_mask CONSTANT VARCHAR2(500) := Nm3user.get_user_date_mask;
   l_supplementary_info VARCHAR2(500);
 
 BEGIN
@@ -2383,7 +2378,7 @@ BEGIN
   END IF;
 --
   IF p_operation IN (c_close, c_unclose, c_closeroute, c_reverse, c_reclass) THEN
-     IF  NOT(nm3user.is_user_unrestricted) 
+     IF  NOT Sys_Context('NM3CORE','UNRESTRICTED_INVENTORY') = 'TRUE' 
      AND NOT(nm3inv_security.can_usr_see_all_inv_on_element(pi_ne_id => p_ne_id_1))
      THEN
        --
@@ -2828,14 +2823,14 @@ BEGIN
        THEN
          Hig.raise_ner(Nm3type.c_net,239); -- AU Update not allowed
       END IF;
-      IF Nm3ausec.get_au_mode( c_user, p_rec_ne_old.ne_admin_unit ) != Invsec.c_normal_string
+      IF Nm3ausec.get_au_mode( Sys_Context('NM3_SECURITY_CTX','USERNAME'), p_rec_ne_old.ne_admin_unit ) != Invsec.c_normal_string
        THEN
          Hig.raise_ner(Nm3type.c_net,240);
          --raise_application_error(-20902, 'You may not change this record');
       END IF;
    END IF;
 --
-   IF Nm3ausec.get_au_mode( c_user, p_rec_ne_new.ne_admin_unit ) != Invsec.c_normal_string
+   IF Nm3ausec.get_au_mode( Sys_Context('NM3_SECURITY_CTX','USERNAME'), p_rec_ne_new.ne_admin_unit ) != Invsec.c_normal_string
     THEN
       Hig.raise_ner(Nm3type.c_net,241);
       --raise_application_error(-20903, 'You may not enter data with this admin unit');
@@ -3465,7 +3460,7 @@ END check_ne_flex_cols_updatable;
 --
 BEGIN
 --
-   OPEN  cs_cols_in_elements (c_app_owner, 'NM_ELEMENTS_ALL');
+   OPEN  cs_cols_in_elements (Sys_Context('NM3CORE','APPLICATION_OWNER'), 'NM_ELEMENTS_ALL');
    FETCH cs_cols_in_elements BULK COLLECT INTO g_tab_nm_elements_cols;
    CLOSE cs_cols_in_elements;
 --

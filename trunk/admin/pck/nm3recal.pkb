@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3recal IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3recal.pkb-arc   2.6   Apr 27 2010 11:27:06   cstrettle  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3recal.pkb-arc   2.7   May 17 2011 08:26:24   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3recal.pkb  $
---       Date into PVCS   : $Date:   Apr 27 2010 11:27:06  $
---       Date fetched Out : $Modtime:   Apr 27 2010 11:24:08  $
---       PVCS Version     : $Revision:   2.6  $
+--       Date into PVCS   : $Date:   May 17 2011 08:26:24  $
+--       Date fetched Out : $Modtime:   Apr 01 2011 13:57:22  $
+--       PVCS Version     : $Revision:   2.7  $
 --
 --
 --   Author : Jonathan Mills
@@ -25,7 +25,7 @@ CREATE OR REPLACE PACKAGE BODY nm3recal IS
   PT 05.12.07 mairecal.recal_data() brough in line with the others in recalibrate_other_products()
 */
 
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.6  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.7  $"';
    g_package_name    CONSTANT  varchar2(30) := 'nm3recal';
 --
    g_tab_rec_nm      nm3type.tab_rec_nm;
@@ -293,7 +293,7 @@ BEGIN
    l_neh_rec.neh_ne_id_old      := pi_ne_id;
    l_neh_rec.neh_ne_id_new      := pi_ne_id;
    l_neh_rec.neh_operation      := nm3net_history.c_neh_op_recalibrate;
-   l_neh_rec.neh_effective_date := nm3user.get_effective_date;
+   l_neh_rec.neh_effective_date := To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY');
    l_neh_rec.neh_old_ne_length  := g_element_length;
    l_neh_rec.neh_new_ne_length  := l_new_length;
    l_neh_rec.neh_param_1        := round(l_begin_mp,g_dec_places); --pi_begin_mp;
@@ -565,7 +565,7 @@ BEGIN
    l_neh_rec.neh_ne_id_old      := pi_ne_id;
    l_neh_rec.neh_ne_id_new      := pi_ne_id;
    l_neh_rec.neh_operation      := nm3net_history.c_neh_op_shift;
-   l_neh_rec.neh_effective_date := nm3user.get_effective_date;
+   l_neh_rec.neh_effective_date := To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY');
    l_neh_rec.neh_old_ne_length  := g_element_length;
    l_neh_rec.neh_new_ne_length  := g_element_length;
    l_neh_rec.neh_param_1        := pi_begin_mp;

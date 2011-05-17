@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3rvrs AS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3rvrs.pkb-arc   2.1   Jul 18 2007 15:23:44   smarshall  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3rvrs.pkb-arc   2.2   May 17 2011 08:26:24   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3rvrs.pkb  $
---       Date into PVCS   : $Date:   Jul 18 2007 15:23:44  $
---       Date fetched Out : $Modtime:   Jul 02 2007 17:11:22  $
---       PVCS Version     : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   May 17 2011 08:26:24  $
+--       Date fetched Out : $Modtime:   Mar 31 2011 14:50:58  $
+--       PVCS Version     : $Revision:   2.2  $
 --
 --
 --   Author : R.A. Coupe
@@ -19,7 +19,7 @@ CREATE OR REPLACE PACKAGE BODY nm3rvrs AS
 --	Copyright (c) exor corporation ltd, 2001
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.1  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.2  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'NM3RVRS';
@@ -71,7 +71,7 @@ END get_g_rvrs_circroute;
 -----------------------------------------------------------------------------
 --
 
-PROCEDURE reverse_other_products ( pi_effective_date DATE DEFAULT nm3context.get_effective_date );
+PROCEDURE reverse_other_products ( pi_effective_date DATE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY') );
 --
 -----------------------------------------------------------------------------
 PROCEDURE reverse_shapes ;
@@ -211,7 +211,7 @@ END leg_reversal;
 -----------------------------------------------------------------------------
 --
 PROCEDURE gis_reverse_route (pi_ne_id          IN nm_elements.ne_id%TYPE
-                            ,pi_effective_date IN DATE DEFAULT nm3context.get_effective_date
+                            ,pi_effective_date IN DATE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                             ) IS
 BEGIN
 --
@@ -231,7 +231,7 @@ END gis_reverse_route;
 --
 -- procedure to reverse the whole route
 PROCEDURE reverse_route (pi_ne_id          IN nm_elements.ne_id%TYPE
-                        ,pi_effective_date IN DATE DEFAULT Nm3context.get_effective_date
+                        ,pi_effective_date IN DATE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                         ) IS
 --
    CURSOR cs_route (c_route_ne_id NUMBER) IS
@@ -381,7 +381,7 @@ PROCEDURE reverse_route (pi_ne_id          IN nm_elements.ne_id%TYPE
    l_nt     NM_TYPES.nt_type%TYPE := Nm3net.get_nt_type( pi_ne_id );
    l_sub_nt NM_TYPES.nt_type%TYPE := Nm3net.get_datum_nt(pi_gty => Nm3net.get_ne_gty( pi_ne_id ));
 --
-   c_initial_effective_date CONSTANT DATE := Nm3context.get_effective_date;
+   c_initial_effective_date CONSTANT DATE := To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY');
    
    c_allow_cardinality_flip CONSTANT BOOLEAN := nm3net.is_gty_reversible 
                                                ( nm3net.get_ne_gty( pi_ne_id ) ) = 'Y';
@@ -1007,7 +1007,7 @@ END reverse_route;
 --
 -----------------------------------------------------------------------------
 --
-PROCEDURE reverse_other_products ( pi_effective_date DATE DEFAULT nm3context.get_effective_date ) IS
+PROCEDURE reverse_other_products ( pi_effective_date DATE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY') ) IS
 --
    PROCEDURE exec_rvrs (p_pack_proc varchar2) IS
    BEGIN

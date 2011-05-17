@@ -4,17 +4,17 @@ AS
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sde_check.pkb-arc   2.1   Jun 19 2008 17:59:16   aedwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sde_check.pkb-arc   2.2   May 17 2011 08:26:24   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3sde_check.pkb  $
---       Date into PVCS   : $Date:   Jun 19 2008 17:59:16  $
---       Date fetched Out : $Modtime:   Jun 19 2008 17:58:52  $
---       PVCS Version     : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   May 17 2011 08:26:24  $
+--       Date fetched Out : $Modtime:   May 05 2011 13:41:58  $
+--       PVCS Version     : $Revision:   2.2  $
 --
 --------------------------------------------------------------------------------
 --
 
   g_package_name          CONSTANT VARCHAR2(30)    := 'nm3sdo_check';
-  g_body_sccsid           CONSTANT VARCHAR2(2000)  := '"$Revision:   2.1  $"';
+  g_body_sccsid           CONSTANT VARCHAR2(2000)  := '"$Revision:   2.2  $"';
   lf                      CONSTANT VARCHAR2(30)    := chr(10);
   g_write_to_file                  BOOLEAN         := FALSE;
   l_results                        nm3type.tab_varchar32767;
@@ -97,7 +97,7 @@ AS
                  , pi_owner         IN hig_users.hus_username%TYPE DEFAULT NULL)
   IS
     b_serverout    BOOLEAN := pi_location IS NULL OR pi_filename IS NULL;
-    l_owner        hig_users.hus_username%TYPE := NVL(pi_owner, USER);
+    l_owner        hig_users.hus_username%TYPE := NVL(pi_owner, Sys_Context('NM3_SECURITY_CTX','USERNAME'));
   BEGIN
   --
   ------------------------------------------------------------------------------
@@ -135,7 +135,7 @@ AS
   --
   ------------------------------------------------------------------------------
   --
-    IF l_owner = hig.get_application_owner
+    IF l_owner = Sys_Context('NM3CORE','APPLICATION_OWNER')
     THEN
     --
       put(lf);

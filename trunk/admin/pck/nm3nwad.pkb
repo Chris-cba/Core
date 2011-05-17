@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3nwad AS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3nwad.pkb-arc   2.11   Sep 28 2010 16:41:30   Chris.Strettle  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3nwad.pkb-arc   2.12   May 17 2011 08:26:24   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3nwad.pkb  $
---       Date into PVCS   : $Date:   Sep 28 2010 16:41:30  $
---       Date fetched Out : $Modtime:   Sep 28 2010 16:38:22  $
---       PVCS Version     : $Revision:   2.11  $
+--       Date into PVCS   : $Date:   May 17 2011 08:26:24  $
+--       Date fetched Out : $Modtime:   Apr 01 2011 09:17:20  $
+--       PVCS Version     : $Revision:   2.12  $
 --
 --
 -- Author : A Edwards/P Stanton/G Johnson
@@ -36,7 +36,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3nwad AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT VARCHAR2(2000) := '"$Revision:   2.11  $"';
+  g_body_sccsid  CONSTANT VARCHAR2(2000) := '"$Revision:   2.12  $"';
 
   g_package_name CONSTANT VARCHAR2(30) := 'nm3nwad';
 
@@ -148,7 +148,7 @@ BEGIN
       l_nadt_rec.nad_nt_type       := pi_nt_type;
       l_nadt_rec.nad_gty_type      := NULL;
       l_nadt_rec.nad_descr         := pi_inv_type||'-'||pi_nt_type||' Link';
-      l_nadt_rec.nad_start_date    := Nm3user.get_effective_date;
+      l_nadt_rec.nad_start_date    := To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY');
       l_nadt_rec.nad_end_date      := NULL;
       l_nadt_rec.nad_primary_ad    := 'Y';
       l_nadt_rec.nad_display_order := 1;
@@ -195,7 +195,7 @@ BEGIN
       l_nadt_rec.nad_nt_type       := l_nt_type;
       l_nadt_rec.nad_gty_type      := pi_group_type;
       l_nadt_rec.nad_descr         := pi_inv_type||'-'||pi_group_type||' Link';
-      l_nadt_rec.nad_start_date    := Nm3user.get_effective_date;
+      l_nadt_rec.nad_start_date    := To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY');
       l_nadt_rec.nad_end_date      := NULL;
       l_nadt_rec.nad_primary_ad    := 'Y';
       l_nadt_rec.nad_display_order := 1;
@@ -1230,12 +1230,12 @@ BEGIN
          -- create a duplicate inv item and associate with new element 1
          l_rec_iit_np_1                := Nm3get.get_iit (l_tab_non_prim_nadl(i).nad_iit_ne_id);
          l_rec_iit_np_1.iit_ne_id      := Nm3seq.next_ne_id_seq;
-         l_rec_iit_np_1.iit_start_date := Nm3user.get_effective_date;
+         l_rec_iit_np_1.iit_start_date := To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY');
 
          -- create a duplicate inv item and associate with new element 2
          l_rec_iit_np_2                := Nm3get.get_iit (l_tab_non_prim_nadl(i).nad_iit_ne_id);
          l_rec_iit_np_2.iit_ne_id      := Nm3seq.next_ne_id_seq;
-         l_rec_iit_np_2.iit_start_date := Nm3user.get_effective_date;
+         l_rec_iit_np_2.iit_start_date := To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY');
 
          IF l_rec_iit_np_1.iit_primary_key IS NOT NULL
           THEN
@@ -1499,7 +1499,7 @@ BEGIN
          l_rec_nadl_non_prim.nad_id         := l_tab_non_prim_nadl1(i).nad_id;
          l_rec_nadl_non_prim.nad_iit_ne_id  := l_rec_iit_non_prim.iit_ne_id; -- l_tab_non_prim_nadl1(i).nad_iit_ne_id;
          l_rec_nadl_non_prim.nad_ne_id      := pi_new_ne_id;
-         l_rec_nadl_non_prim.nad_start_date := Nm3user.get_effective_date;
+         l_rec_nadl_non_prim.nad_start_date := To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY');
          l_rec_nadl_non_prim.nad_end_date   := NULL;
 
          Nm3nwad.ins_nadl(l_rec_nadl_non_prim);
@@ -1518,7 +1518,7 @@ BEGIN
       l_rec_nadl_non_prim.nad_id         := l_tab_non_prim_nadl2(i).nad_id;
       l_rec_nadl_non_prim.nad_iit_ne_id  := l_tab_non_prim_nadl2(i).nad_iit_ne_id;
       l_rec_nadl_non_prim.nad_ne_id      := l_tab_non_prim_nadl2(i).nad_ne_id;
-      l_rec_nadl_non_prim.nad_start_date := Nm3user.get_effective_date;
+      l_rec_nadl_non_prim.nad_start_date := To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY');
       l_rec_nadl_non_prim.nad_end_date   := NULL;
 
          end_date_nadl(pi_rec_nadl       => l_rec_nadl_non_prim
@@ -1840,7 +1840,7 @@ BEGIN
          -- create a duplicate inv item and associate with new element
          l_rec_iit_np                := Nm3get.get_iit (l_tab_non_prim_nadl(i).nad_iit_ne_id);
          l_rec_iit_np.iit_ne_id      := Nm3seq.next_ne_id_seq;
-         l_rec_iit_np.iit_start_date := Nm3user.get_effective_date;
+         l_rec_iit_np.iit_start_date := To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY');
 
          -- end date non primary link
          Nm3nwad.end_date_nadl (pi_rec_nadl => l_tab_non_prim_nadl(i)
@@ -2623,7 +2623,7 @@ END ins_nadl;
 --
 /* End date NM_NW_AD_LINK record */
 PROCEDURE end_date_nadl( pi_rec_nadl IN NM_NW_AD_LINK%ROWTYPE
-                        ,pi_effective_date IN DATE  DEFAULT nm3user.get_effective_date )
+                        ,pi_effective_date IN DATE  DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY') )
 IS
 BEGIN
 --
@@ -2650,7 +2650,7 @@ END end_date_nadl;
 -----------------------------------------------------------------------------
 --
 PROCEDURE end_date_all_ad_for_element(pi_ne_id IN nm_elements_all.ne_id%TYPE
-                                     ,pi_effective_date IN DATE  DEFAULT nm3user.get_effective_date ) IS
+                                     ,pi_effective_date IN DATE  DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY') ) IS
 
 BEGIN
 
@@ -2993,7 +2993,7 @@ BEGIN
            l_rec_nadl.nad_id         := l_rec_nadt.nad_id;
            l_rec_nadl.nad_iit_ne_id  := l_tab_nm(membs).nm_ne_id_in;
            l_rec_nadl.nad_ne_id      := l_tab_nm(membs).nm_ne_id_of;
-           l_rec_nadl.nad_start_date := Nm3user.get_effective_date;
+           l_rec_nadl.nad_start_date := To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY');
 
           Nm3nwad.ins_nadl(l_rec_nadl);
         EXCEPTION
@@ -3393,7 +3393,7 @@ BEGIN
          l_rec_nm.nm_type          := 'G';
          l_rec_nm.nm_obj_type      := l_rec_ne.ne_gty_group_type;
          l_rec_nm.nm_begin_mp      := 0;
-         l_rec_nm.nm_start_date    := Nm3user.get_effective_date;
+         l_rec_nm.nm_start_date    := To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY');
          l_rec_nm.nm_end_mp        := Nm3net.Get_Ne_Length(pi_tab_nm(i));
          l_rec_nm.nm_cardinality   := 1;
          l_rec_nm.nm_admin_unit    := Nm3get.get_ne(pi_ne_id => pi_tab_nm(i)).ne_admin_unit;
@@ -3472,7 +3472,7 @@ BEGIN
       ELSE
 
         IF l_rec_iit.iit_start_date IS NULL
-          THEN l_rec_iit.iit_start_date := Nm3user.get_effective_date;
+          THEN l_rec_iit.iit_start_date := To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY');
         END IF;
 
      -- Initialise server
@@ -3570,7 +3570,7 @@ BEGIN
       ELSE
 
         IF l_rec_iit.iit_start_date IS NULL
-          THEN l_rec_iit.iit_start_date := Nm3user.get_effective_date;
+          THEN l_rec_iit.iit_start_date := To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY');
         END IF;
 
      -- Initialise server
@@ -3781,7 +3781,7 @@ BEGIN
    l_nadl_rec.nad_start_date := i.nad_start_date;
 
    IF pi_end_date_copy THEN
-     l_nadl_rec.nad_end_date   :=  nm3user.get_effective_date;
+     l_nadl_rec.nad_end_date   :=  To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY');
    ELSE
      l_nadl_rec.nad_end_date   :=  Null;
    END IF;
@@ -3790,7 +3790,7 @@ BEGIN
 
    IF pi_end_date_copy THEN
       UPDATE nm_inv_items_all
-	  SET    iit_end_date = nm3user.get_effective_date
+	  SET    iit_end_date = To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
 	  WHERE  iit_ne_id = l_iit_ne_id_new;
    END IF;
 

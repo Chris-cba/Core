@@ -89,7 +89,7 @@ FUNCTION leg_reversal( pi_leg IN number ) RETURN number;
 --<PROC NAME="reverse_route">
 -- procedure to reverse the whole route
 PROCEDURE reverse_route (pi_ne_id          IN nm_elements.ne_id%TYPE
-                        ,pi_effective_date IN DATE DEFAULT nm3context.get_effective_date
+                        ,pi_effective_date IN DATE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                         );
 --
 -----------------------------------------------------------------------------
@@ -97,7 +97,7 @@ PROCEDURE reverse_route (pi_ne_id          IN nm_elements.ne_id%TYPE
 --<PROC NAME="gis_reverse_route">
 -- procedure to reverse the whole route from the GIS
 PROCEDURE gis_reverse_route (pi_ne_id          IN nm_elements.ne_id%TYPE
-                            ,pi_effective_date IN DATE DEFAULT nm3context.get_effective_date
+                            ,pi_effective_date IN DATE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                             );
 --</PROC>
 --

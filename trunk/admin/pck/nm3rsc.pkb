@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY nm3rsc AS
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3rsc.pkb-arc   2.4   Feb 09 2011 09:46:58   Ade.Edwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3rsc.pkb-arc   2.5   May 17 2011 08:26:24   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3rsc.pkb  $
---       Date into PVCS   : $Date:   Feb 09 2011 09:46:58  $
---       Date fetched Out : $Modtime:   Feb 09 2011 09:45:42  $
---       PVCS Version     : $Revision:   2.4  $
+--       Date into PVCS   : $Date:   May 17 2011 08:26:24  $
+--       Date fetched Out : $Modtime:   Apr 01 2011 13:57:06  $
+--       PVCS Version     : $Revision:   2.5  $
 --
 --   Author : R.A. Coupe
 --
@@ -19,7 +19,7 @@ CREATE OR REPLACE PACKAGE BODY nm3rsc AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(30) :='"$Revision:   2.4  $"';
+   g_body_sccsid     CONSTANT  varchar2(30) :='"$Revision:   2.5  $"';
 
 --  g_body_sccsid is the SCCS ID for the package body
 --
@@ -126,7 +126,7 @@ PROCEDURE rescale_route( pi_ne_id          IN nm_elements.ne_id%TYPE,
                          pi_ne_start       IN nm_elements.ne_id%TYPE DEFAULT NULL
                          )IS
 
-   c_initial_effective_date CONSTANT date := nm3context.get_effective_date;
+   c_initial_effective_date CONSTANT date := To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY');
 
 -- AE
 -- RAC
@@ -800,7 +800,7 @@ BEGIN
   instantiate_data(  pi_ne_id => pi_ne_id
                     ,pi_effective_date => NULL );
 
-  empty_route_check( pi_ne_id, nm3user.get_effective_date, 'N', l_empty_flag );
+  empty_route_check( pi_ne_id, To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY'), 'N', l_empty_flag );
 
   IF l_empty_flag = 'N' THEN
 
@@ -833,7 +833,7 @@ BEGIN
   --
     IF l_shape_option != 'N'
     THEN
-      nm3sdm.reshape_route( pi_ne_id, nm3user.get_effective_date, CASE WHEN l_shape_option = 'H' THEN 'Y' ELSE 'N' END );
+      nm3sdm.reshape_route( pi_ne_id, To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY'), CASE WHEN l_shape_option = 'H' THEN 'Y' ELSE 'N' END );
     END IF;
   --
   END IF;
@@ -1986,7 +1986,7 @@ BEGIN
 
     --rescale the route to updates slks
     rescale_route(pi_ne_id          => pi_ne_id
-                 ,pi_effective_date => nm3user.get_effective_date
+                 ,pi_effective_date => To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                  ,pi_offset_st      => 0
                  ,pi_st_element_id  => NULL
                  ,pi_use_history    => 'N'
