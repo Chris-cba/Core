@@ -352,34 +352,6 @@ SELECT
 WHERE RSM_TYPE <> 'P';
 
 
---CREATE OR REPLACE FORCE VIEW gis_themes AS
---SELECT
------------------------------------------------------------------------------
---   SCCS Identifiers :-
---
---       sccsid           : @(#)translation.sql	1.41 11/10/06
---       Module Name      : translation.sql
---       Date into SCCS   : 06/11/10 11:55:59
---       Date fetched Out : 07/06/13 13:59:30
---       SCCS Version     : 1.41
---
--- Translation View
---
------------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2005
------------------------------------------------------------------------------
---       *
- --FROM  gis_themes_all
---WHERE EXISTS (SELECT 1
---               FROM  gis_theme_roles
---                    ,hig_user_roles
---               WHERE gthr_theme_id   = gt_theme_id
---                AND  hur_username    = USER
---                AND  gthr_role       = hur_role
---                AND  hur_start_date <= nm3context.get_effective_date
---             );
-
-
 CREATE OR REPLACE FORCE VIEW frm50_enabled_roles
 ( ROLE, flag )
 AS SELECT
