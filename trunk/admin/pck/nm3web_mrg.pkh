@@ -2,11 +2,11 @@ create or replace package nm3web_mrg as
 --<PACKAGE>
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3web_mrg.pkh-arc   2.1   Dec 16 2008 11:16:44   smarshall  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3web_mrg.pkh-arc   2.2   May 17 2011 08:26:28   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3web_mrg.pkh  $
---       Date into PVCS   : $Date:   Dec 16 2008 11:16:44  $
---       Date fetched Out : $Modtime:   Dec 16 2008 11:11:10  $
---       PVCS Version     : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   May 17 2011 08:26:28  $
+--       Date fetched Out : $Modtime:   Apr 01 2011 14:11:44  $
+--       PVCS Version     : $Revision:   2.2  $
 --       Based on         : 1.1
 --
 --
@@ -19,7 +19,7 @@ create or replace package nm3web_mrg as
 -----------------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
-   g_sccsid      CONSTANT  VARCHAR2(2000) := '"$Revision:   2.1  $"';
+   g_sccsid      CONSTANT  VARCHAR2(2000) := '"$Revision:   2.2  $"';
 --  g_sccsid is the SCCS ID for the package
 --</GLOBVAR>
 --
@@ -54,7 +54,7 @@ PROCEDURE specific_query (p_nmq_id nm_mrg_query.nmq_id%TYPE);
 --<PROC NAME="run_query">
 PROCEDURE run_query (p_nmq_id         nm_mrg_query.nmq_id%TYPE
                     ,p_nmf_id         nm_mrg_output_file.nmf_id%TYPE
-                    ,p_effective_date VARCHAR2 DEFAULT TO_CHAR(nm3user.get_effective_date,'DD-MON-YYYY')
+                    ,p_effective_date VARCHAR2 DEFAULT TO_CHAR(To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY'),'DD-MON-YYYY')
                     ,p_roi_unique     VARCHAR2
                     ,p_roi_type       VARCHAR2
                     ,p_prefix         VARCHAR2

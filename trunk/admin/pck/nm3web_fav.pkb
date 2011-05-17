@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3web_fav AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3web_fav.pkb-arc   2.1   Dec 16 2008 11:17:02   smarshall  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3web_fav.pkb-arc   2.2   May 17 2011 08:26:28   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3web_fav.pkb  $
---       Date into PVCS   : $Date:   Dec 16 2008 11:17:02  $
---       Date fetched Out : $Modtime:   Dec 16 2008 11:12:20  $
---       PVCS Version     : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   May 17 2011 08:26:28  $
+--       Date fetched Out : $Modtime:   May 05 2011 14:44:16  $
+--       PVCS Version     : $Revision:   2.2  $
 --       Based on         : 1.2
 --
 --
@@ -22,7 +22,7 @@ CREATE OR REPLACE PACKAGE BODY nm3web_fav AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.1  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.2  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3web_fav';
@@ -200,7 +200,7 @@ PROCEDURE define_tree_favourites IS
                   AND   hmo_module_type       = c_web
                   AND   hmo_module            = hmr_module
                   AND   hur_role              = hmr_role
-                  AND   hur_username          = USER
+                  AND   hur_username          = Sys_Context('NM3_SECURITY_CTX','USERNAME')
                   AND   hmo_fastpath_invalid != c_y
                   AND   hmo_module           != c_this_module
                 )
@@ -218,7 +218,7 @@ PROCEDURE define_tree_favourites IS
     AND   hmo_module           != c_this_module
     AND   hmo_module            = hmr_module
     AND   hur_role              = hmr_role
-    AND   hur_username          = USER
+    AND   hur_username          = Sys_Context('NM3_SECURITY_CTX','USERNAME')
    GROUP BY hmo_title
            ,hmo_module;
 --

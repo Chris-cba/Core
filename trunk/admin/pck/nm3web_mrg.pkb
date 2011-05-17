@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3web_mrg AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3web_mrg.pkb-arc   2.1   Dec 16 2008 11:16:42   smarshall  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3web_mrg.pkb-arc   2.2   May 17 2011 08:26:28   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3web_mrg.pkb  $
---       Date into PVCS   : $Date:   Dec 16 2008 11:16:42  $
---       Date fetched Out : $Modtime:   Dec 16 2008 11:11:48  $
---       PVCS Version     : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   May 17 2011 08:26:28  $
+--       Date fetched Out : $Modtime:   May 05 2011 14:48:24  $
+--       PVCS Version     : $Revision:   2.2  $
 --       Based on         : 1.3
 --
 --
@@ -22,7 +22,7 @@ CREATE OR REPLACE PACKAGE BODY nm3web_mrg AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.1  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.2  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3web_mrg';
@@ -239,7 +239,7 @@ BEGIN
    --
    htp.tablerowopen;
    htp.tableheader('Filename Prefix', cattributes=>'ALIGN=RIGHT');
-   htp.tabledata(htf.formtext (cname=>'p_prefix',cvalue=>USER||'_', cattributes=>'MAXLENGTH=35'),cattributes=>'COLSPAN=2');
+   htp.tabledata(htf.formtext (cname=>'p_prefix',cvalue=>Sys_Context('NM3_SECURITY_CTX','USERNAME')||'_', cattributes=>'MAXLENGTH=35'),cattributes=>'COLSPAN=2');
    htp.tablerowclose;
    --
 --   htp.tablerowopen;
@@ -309,7 +309,7 @@ BEGIN
    htp.tablerowopen;
    htp.tableheader('Effective Date'||mand_field, cattributes=>'ALIGN=RIGHT');
    htp.tabledata(htf.formtext (cname       => 'p_effective_date'
-                              ,cvalue      => TO_CHAR(nm3user.get_effective_date,nm3user.get_user_date_mask)
+                              ,cvalue      => TO_CHAR(To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY'),Sys_Context('NM3CORE','USER_DATE_MASK'))
                               ,cattributes => 'MAXLENGTH=30'
                               )
 --                 ||'<a href="javascript:show_calendar('||nm3flx.string('run_query.p_effective_date')||');" onmouseover="window.status='||nm3flx.string('Date Picker')||';return true;" onmouseout="window.status='||nm3flx.string('')||';return true;">XX</A>'
@@ -351,7 +351,7 @@ END specific_query;
 --
 PROCEDURE run_query (p_nmq_id         nm_mrg_query.nmq_id%TYPE
                     ,p_nmf_id         nm_mrg_output_file.nmf_id%TYPE
-                    ,p_effective_date varchar2 DEFAULT TO_CHAR(nm3user.get_effective_date,'DD-MON-YYYY')
+                    ,p_effective_date varchar2 DEFAULT TO_CHAR(To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY'),'DD-MON-YYYY')
                     ,p_roi_unique     varchar2
                     ,p_roi_type       varchar2
                     ,p_prefix         varchar2
@@ -504,7 +504,7 @@ BEGIN
               ||CHR(10)||'  nm3mrg.execute_mrg_query'
               ||CHR(10)||'   (pi_query_id  => '||p_nmq_id||' -- '||l_rec_nmq.nmq_unique
               ||CHR(10)||'   ,pi_nte_job_id => l_nte_job_id'
-              ||CHR(10)||'   ,pi_description => '||nm3flx.string('Submitted by '||USER||' at '||TO_CHAR(SYSDATE,nm3type.c_full_date_time_format))
+              ||CHR(10)||'   ,pi_description => '||nm3flx.string('Submitted by '||Sys_Context('NM3_SECURITY_CTX','USERNAME')||' at '||TO_CHAR(SYSDATE,nm3type.c_full_date_time_format))
               ||CHR(10)||'   ,po_result_job_id => l_job_id'
               ||CHR(10)||'   );'
               ||CHR(10)||'  nm3mrg_output.do_txt('||nm3flx.string(p_do_txt)||');'
@@ -559,7 +559,7 @@ BEGIN
               ||CHR(10)||' add_pair ('||nm3flx.string('Completed')||',to_char(SYSDATE,nm3type.c_full_date_time_format));'
 --              ||CHR(10)||' add_pair ('||nm3flx.string(Null)||','||nm3flx.string(Null)||');'
               ||CHR(10)||' add_pair ('||nm3flx.string('Merge Query')||','||nm3flx.string(l_rec_nmq.nmq_unique)||');'
-              ||CHR(10)||' add_pair ('||nm3flx.string('Effective Date')||','||nm3flx.string(TO_CHAR(l_effective_date,nm3user.get_user_date_mask))||');'
+              ||CHR(10)||' add_pair ('||nm3flx.string('Effective Date')||','||nm3flx.string(TO_CHAR(l_effective_date,Sys_Context('NM3CORE','USER_DATE_MASK')))||');'
               ||CHR(10)||' add_pair ('||nm3flx.string('R.O.I.')||','||nm3flx.string(p_roi_unique)||');';
       IF l_produce_server
        THEN

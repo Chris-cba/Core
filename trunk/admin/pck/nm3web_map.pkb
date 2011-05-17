@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3web_map AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3web_map.pkb-arc   2.1   Dec 16 2008 11:16:42   smarshall  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3web_map.pkb-arc   2.2   May 17 2011 08:26:28   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3web_map.pkb  $
---       Date into PVCS   : $Date:   Dec 16 2008 11:16:42  $
---       Date fetched Out : $Modtime:   Dec 16 2008 11:11:30  $
---       PVCS Version     : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   May 17 2011 08:26:28  $
+--       Date fetched Out : $Modtime:   Apr 04 2011 10:20:54  $
+--       PVCS Version     : $Revision:   2.2  $
 --       Based on         : 1.4
 --
 --
@@ -22,12 +22,10 @@ CREATE OR REPLACE PACKAGE BODY nm3web_map AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.1  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.2  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3web_map';
---
-   c_app_owner       CONSTANT  VARCHAR2(30)   := hig.get_application_owner;
 --
    c_this_module  CONSTANT hig_modules.hmo_module%TYPE := 'GISWEB0020';
    c_module_title CONSTANT hig_modules.hmo_title%TYPE  := hig.get_module_title(c_this_module);
@@ -251,7 +249,7 @@ BEGIN
 --   htp.p('// -->');
 --   htp.p('</SCRIPT>');
    l_block :=            'BEGIN'
-              ||CHR(10)||'INSERT INTO '||c_app_owner||'.gis_data_objects'
+              ||CHR(10)||'INSERT INTO '||Sys_Context('NM3CORE','APPLICATION_OWNER')||'.gis_data_objects'
               ||CHR(10)||'      (gdo_session_id'
               ||CHR(10)||'      ,gdo_pk_id'
               ||CHR(10)||'      ,gdo_rse_he_id'
@@ -389,7 +387,7 @@ BEGIN
    l_retval :=  l_url_start||'?'
               ||'Cmd=WHERE'||CHR(38)||'WLayer='||REPLACE(l_rec_gt.nth_theme_name,' ','%20')||CHR(38)||'WWhere='
               ||l_rec_gt.nth_feature_table||'.'||l_rec_gt.nth_feature_pk_column
-              ||'%20IN%20(select%20GDO_PK_ID%20from%20'||c_app_owner||'.GIS_DATA_OBJECTS%20Where%20GDO_SESSION_ID='||p_gdo_session_id||')';
+              ||'%20IN%20(select%20GDO_PK_ID%20from%20'||Sys_Context('NM3CORE','APPLICATION_OWNER')||'.GIS_DATA_OBJECTS%20Where%20GDO_SESSION_ID='||p_gdo_session_id||')';
 --
    nm_debug.proc_end(g_package_name,'get_url');
 --

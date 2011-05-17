@@ -4,7 +4,7 @@ CREATE OR REPLACE PACKAGE BODY nm3web_eng_dynseg AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.9  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.10  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3web_eng_dynseg';
@@ -82,11 +82,11 @@ BEGIN
    htp.p('--');
    htp.p('--   PVCS Identifiers :-');
    htp.p('--');
-   htp.p('--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3web_eng_dynseg.pkb-arc   2.9   Apr 20 2009 16:18:18   aedwards  $');
+   htp.p('--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3web_eng_dynseg.pkb-arc   2.10   May 17 2011 08:26:28   Steve.Cooper  $');
    htp.p('--       Module Name      : $Workfile:   nm3web_eng_dynseg.pkb  $');
-   htp.p('--       Date into PVCS   : $Date:   Apr 20 2009 16:18:18  $');
-   htp.p('--       Date fetched Out : $Modtime:   Apr 20 2009 16:15:28  $');
-   htp.p('--       PVCS Version     : $Revision:   2.9  $');
+   htp.p('--       Date into PVCS   : $Date:   May 17 2011 08:26:28  $');
+   htp.p('--       Date fetched Out : $Modtime:   May 05 2011 14:39:50  $');
+   htp.p('--       PVCS Version     : $Revision:   2.10  $');
    htp.p('--       Based on SCCS Version     : 1.23');
    htp.p('--');
    htp.p('--');
@@ -565,7 +565,7 @@ BEGIN
                ,nse_name||DECODE(nse_owner,'PUBLIC',' ('||nse_owner||')',NULL) nse_name
                ,REPLACE(nse_descr,'"',CHR(39)) nse_descr
           FROM  nm_saved_extents
-         WHERE  nse_owner IN (USER,'PUBLIC')
+         WHERE  nse_owner IN (Sys_Context('NM3_SECURITY_CTX','USERNAME'),'PUBLIC')
          ORDER BY nse_name;
       BEGIN
          OPEN  cs_nse;
@@ -1541,7 +1541,7 @@ PROCEDURE build_function_array IS
    CURSOR cs_available_funcs (p_pack varchar2) IS
    SELECT object_name, type_name
     FROM  all_arguments a1
-   WHERE  owner        = hig.get_application_owner
+   WHERE  owner        = Sys_Context('NM3CORE','APPLICATION_OWNER')
     AND   package_name = p_pack
     AND   position     = 0
     AND   object_name LIKE 'GET%'

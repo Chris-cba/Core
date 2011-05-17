@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3web_load AS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3web_load.pkb-arc   2.3   Nov 14 2008 09:32:00   aedwards  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3web_load.pkb-arc   2.4   May 17 2011 08:26:28   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3web_load.pkb  $
---       Date into PVCS   : $Date:   Nov 14 2008 09:32:00  $
---       Date fetched Out : $Modtime:   Dec 14 2007 06:39:00  $
---       PVCS Version     : $Revision:   2.3  $
+--       Date into PVCS   : $Date:   May 17 2011 08:26:28  $
+--       Date fetched Out : $Modtime:   May 05 2011 14:46:22  $
+--       PVCS Version     : $Revision:   2.4  $
 --       Based on SCCS version : 
 --
 --
@@ -22,7 +22,7 @@ CREATE OR REPLACE PACKAGE BODY nm3web_load AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.3  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.4  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3web_load';
@@ -516,7 +516,7 @@ FUNCTION batch_is_readonly (p_module_is_readonly BOOLEAN
    l_readonly_batch BOOLEAN := FALSE;
 BEGIN
    IF   p_module_is_readonly
-    AND p_nlb_created_by != USER
+    AND p_nlb_created_by != Sys_Context('NM3_SECURITY_CTX','USERNAME')
     THEN
       l_readonly_batch := TRUE;
    END IF;

@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3web_mail AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3web_mail.pkb-arc   2.1   Dec 16 2008 11:16:42   smarshall  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3web_mail.pkb-arc   2.2   May 17 2011 08:26:28   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3web_mail.pkb  $
---       Date into PVCS   : $Date:   Dec 16 2008 11:16:42  $
---       Date fetched Out : $Modtime:   Dec 16 2008 11:12:06  $
---       PVCS Version     : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   May 17 2011 08:26:28  $
+--       Date fetched Out : $Modtime:   Apr 01 2011 10:14:10  $
+--       PVCS Version     : $Revision:   2.2  $
 --       Based on         : 1.4
 --
 --
@@ -22,7 +22,7 @@ CREATE OR REPLACE PACKAGE BODY nm3web_mail AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.1  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.2  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3web_mail';
@@ -393,17 +393,17 @@ END send_mail;
 --
 FUNCTION get_my_nmu (pi_raise_not_found BOOLEAN DEFAULT TRUE) RETURN nm_mail_users%ROWTYPE IS
 --
-   CURSOR cs_my_nmu (c_user_id NUMBER) IS
+   CURSOR cs_my_nmu  IS
    SELECT *
     FROM  nm_mail_users
-   WHERE  nmu_hus_user_id = c_user_id;
+   WHERE  nmu_hus_user_id = To_Number(Sys_Context('NM3CORE','USER_ID'));
 --
    l_rec_nmu nm_mail_users%ROWTYPE;
    l_found   BOOLEAN;
 --
 BEGIN
    --
-   OPEN  cs_my_nmu (nm3context.get_context(pi_attribute=>'USER_ID'));
+   OPEN  cs_my_nmu;
    FETCH cs_my_nmu INTO l_rec_nmu;
    l_found := cs_my_nmu%FOUND;
    CLOSE cs_my_nmu;
