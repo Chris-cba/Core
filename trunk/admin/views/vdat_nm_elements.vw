@@ -32,9 +32,9 @@ select
  NE_NT_TYPE,
  NE_DESCR,
  nm3unit.convert_unit( nm3net.get_nt_units( ne_nt_type ),
-        nm3user.get_user_length_units, NE_LENGTH) ,
- nm3user.get_user_length_units,
- nm3unit.get_unit_name( nm3user.get_user_length_units ),
+        Sys_Context('NM3CORE','USER_LENGTH_UNITS'), NE_LENGTH) ,
+ Sys_Context('NM3CORE','USER_LENGTH_UNITS'),
+ nm3unit.get_unit_name( Sys_Context('NM3CORE','USER_LENGTH_UNITS') ),
  NE_GTY_GROUP_TYPE,
  NE_DATE_CREATED,
  NE_DATE_MODIFIED,
@@ -55,6 +55,6 @@ select
  NE_NSG_REF,
  NE_VERSION_NO
 from nm_elements
-where ne_start_date <= nm3user.get_effective_date
-and   nvl(ne_end_date, nm3user.get_effective_date + 1)   >  nm3user.get_effective_date
+where ne_start_date <= To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
+and   nvl(ne_end_date, To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY') + 1)   >  To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
 /

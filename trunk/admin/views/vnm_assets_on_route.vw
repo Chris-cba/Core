@@ -36,6 +36,6 @@ SELECT
  nar_ref_post,
  nar_ref_pk,
  nar_ref_measure,
- nm3unit.convert_unit( NVL(nm3asset.get_nar_datum_unit,1), nm3user.get_user_length_units, nar_ref_measure ) nar_ref_measure_units
+ nm3unit.convert_unit( NVL(nm3asset.get_nar_datum_unit,1), Sys_Context('NM3CORE','USER_LENGTH_UNITS'), nar_ref_measure ) nar_ref_measure_units
 FROM nm_assets_on_route
 /

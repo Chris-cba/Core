@@ -24,6 +24,6 @@ FROM
   nm_user_aus     nua,
   nm_admin_groups nag
 WHERE
-  nua.nua_user_id = nm3user.get_user_id
+  nua.nua_user_id = To_Number(Sys_Context('NM3CORE','USER_ID'))
 AND
   nua.nua_admin_unit = nag.nag_parent_admin_unit;

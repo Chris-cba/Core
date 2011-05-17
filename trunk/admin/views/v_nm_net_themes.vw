@@ -29,6 +29,6 @@ SELECT "VNNT_NTH_THEME_ID", "VNNT_NTH_THEME_NAME",
             FROM nm_theme_roles, hig_user_roles
            WHERE nthr_role = hur_role
              AND nthr_theme_id = vnnt_nth_theme_id
-             AND hur_username = USER)
+             AND hur_username = Sys_Context('NM3_SECURITY_CTX','USERNAME'))
 /
 

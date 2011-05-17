@@ -30,13 +30,13 @@ SELECT
 				      , hig_users
                   WHERE hag_child_admin_unit = hus_admin_unit
                     AND hag_parent_admin_unit = hau_admin_unit
-                    AND hus_username = USER)
+                    AND hus_username = Sys_Context('NM3_SECURITY_CTX','USERNAME'))
            OR EXISTS (
                  SELECT 'exists'
                    FROM hig_admin_groups
 				      , hig_users
                   WHERE hag_child_admin_unit = hau_admin_unit
                     AND hag_parent_admin_unit = hus_admin_unit
-                    AND hus_username = USER)
+                    AND hus_username = Sys_Context('NM3_SECURITY_CTX','USERNAME'))
           )
 /		  
