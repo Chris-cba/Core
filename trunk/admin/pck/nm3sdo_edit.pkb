@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3sdo_Edit AS
 --
 --   SCCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_edit.pkb-arc   2.11   Apr 18 2011 10:38:28   Ade.Edwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_edit.pkb-arc   2.12   May 17 2011 08:26:26   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3sdo_edit.pkb  $
---       Date into SCCS   : $Date:   Apr 18 2011 10:38:28  $
---       Date fetched Out : $Modtime:   Apr 18 2011 10:35:18  $
---       SCCS Version     : $Revision:   2.11  $
+--       Date into SCCS   : $Date:   May 17 2011 08:26:26  $
+--       Date fetched Out : $Modtime:   May 10 2011 15:00:48  $
+--       SCCS Version     : $Revision:   2.12  $
 --
 --
 --  Author :  R Coupe
@@ -23,7 +23,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3sdo_Edit AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid   CONSTANT  VARCHAR2(2000)  :=  '$Revision:   2.11  $';
+  g_body_sccsid   CONSTANT  VARCHAR2(2000)  :=  '$Revision:   2.12  $';
   g_package_name  CONSTANT  VARCHAR2(30)    :=  'nm3sdo_edit';
 --
 -----------------------------------------------------------------------------
@@ -407,7 +407,7 @@ PROCEDURE move_reshape (
    pi_nth_id   IN   NUMBER,
    pi_pk       IN   NUMBER,
    pi_shape    IN   MDSYS.SDO_GEOMETRY,
-   pi_date     IN   DATE DEFAULT Nm3user.get_effective_date
+   pi_date     IN   DATE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
 )
 IS
    l_nth       NM_THEMES_ALL%ROWTYPE   := Nm3get.get_nth (pi_nth_id);
@@ -664,7 +664,7 @@ BEGIN
 --                              pi_shape.sdo_point.y);
             --
               EXECUTE IMMEDIATE lstr
-                USING pi_pk, pi_fk, nvl(pi_start_dt,nm3user.get_effective_date), pi_shape;
+                USING pi_pk, pi_fk, nvl(pi_start_dt,To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')), pi_shape;
             --
             ELSE
               EXECUTE IMMEDIATE lstr
@@ -682,7 +682,7 @@ BEGIN
 --                              pi_shape.sdo_point.y);
             --
               EXECUTE IMMEDIATE lstr
-              USING pi_pk, nvl(pi_start_dt,nm3user.get_effective_date), pi_shape;
+              USING pi_pk, nvl(pi_start_dt,To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')), pi_shape;
             --
             ELSE
               nm_debug.debug_on;
@@ -853,7 +853,7 @@ BEGIN
               Nm3homo.homo_update
               ( p_temp_ne_id_in  => g_nte_job_id
               , p_iit_ne_id      => l_rec_iit.iit_ne_id
-              , p_effective_date => nm3user.get_effective_date);
+              , p_effective_date => To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY'));
             EXCEPTION
               WHEN OTHERS
               THEN RAISE ;
@@ -908,7 +908,7 @@ IS
          , TABLE ( nm3sdo.get_nw_themes().nta_theme_array ) t
      WHERE sdo_table_name = nth_feature_table
        AND sdo_column_name = nth_feature_shape_column
-       AND sdo_owner = hig.get_application_owner
+       AND sdo_owner = Sys_Context('NM3CORE','APPLICATION_OWNER')
        AND nth_theme_id = t.nthe_id;
 --
   FUNCTION is_located ( pi_inv_type IN nm_inv_types.nit_inv_type%TYPE) RETURN BOOLEAN
@@ -964,7 +964,7 @@ BEGIN
 --
   BEGIN
     SELECT index_name INTO l_spatial_index FROM all_indexes
-     WHERE owner = hig.get_application_owner
+     WHERE owner = Sys_Context('NM3CORE','APPLICATION_OWNER')
        AND index_type = 'DOMAIN'
        AND table_name = l_nth.nth_feature_table;
   EXCEPTION

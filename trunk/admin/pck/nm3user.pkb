@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm3user AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3user.pkb-arc   2.4   Oct 08 2010 16:55:42   Chris.Strettle  $
---       Module Name      : $Workfile:   nm3user.pkb  $
---       Date into PVCS   : $Date:   Oct 08 2010 16:55:42  $
---       Date fetched Out : $Modtime:   Oct 08 2010 16:47:48  $
---       Version          : $Revision:   2.4  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3user.pkb-arc   2.5   May 17 2011 08:26:26   Steve.Cooper  $
+--       Mg_user_id_tabodule Name      : $Workfile:   nm3user.pkb  $
+--       Date into PVCS   : $Date:   May 17 2011 08:26:26  $
+--       Date fetched Out : $Modtime:   May 05 2011 14:33:00  $
+--       Version          : $Revision:   2.5  $
 --       Based on SCCS version : 1.21
 -------------------------------------------------------------------------
 --   Author : Rob Coupe
@@ -16,7 +16,7 @@ CREATE OR REPLACE PACKAGE BODY nm3user AS
 -----------------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2000
 -----------------------------------------------------------------------------
-   g_body_sccsid     CONSTANT  varchar2(2000) := '$Revision:   2.4  $';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '$Revision:   2.5  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name CONSTANT  varchar2(2000) := 'nm3user';
@@ -27,13 +27,11 @@ CREATE OR REPLACE PACKAGE BODY nm3user AS
   -- This is declared here as a constant so that
   --  DML statements do not need to continually hit the database
   --
-  g_user_unrestricted_inv CONSTANT boolean := (nm3context.get_context (pi_attribute => 'UNRESTRICTED_INVENTORY') = nm3context.c_true);
-  g_user_unrestricted_acc CONSTANT boolean := (nm3context.get_context (pi_attribute => 'UNRESTRICTED_ACCIDENTS') = nm3context.c_true);
+  --g_user_unrestricted_inv CONSTANT boolean := (nm3context.get_context (pi_attribute => 'UNRESTRICTED_INVENTORY') = nm3context.c_true);
+  --g_user_unrestricted_acc CONSTANT boolean := (nm3context.get_context (pi_attribute => 'UNRESTRICTED_ACCIDENTS') = nm3context.c_true);
 
   g_public_username CONSTANT hig_users.hus_username%TYPE := 'PUBLIC';
   g_public_name     CONSTANT hig_users.hus_name%TYPE     := 'Public Access';
---
-  c_user            CONSTANT hig_users.hus_username%TYPE := USER;
 --
 -----------------------------------------------------------------------------
 --
@@ -67,24 +65,11 @@ END get_body_version;
                       ,pi_supplementary_info => g_package_name||'.set_effective_date(p_date)'
                       );
      END IF;
-     nm3context.set_context(pi_attribute => 'EFFECTIVE_DATE'
-                           ,pi_value     => TRUNC(p_date)
-                           );
+     nm3ctx.Set_Core_Context  (
+                              p_Attribute =>  'EFFECTIVE_DATE',
+                              p_Value     =>  To_Char(Trunc(p_Date),'DD-MON-YYYY')
+                              );                          
   END set_effective_date;
---
------------------------------------------------------------------------------
---
-  FUNCTION  get_user_id RETURN number IS
-  BEGIN
-    RETURN nm3context.get_context_number(pi_attribute => 'USER_ID');
-  END get_user_id;
---
------------------------------------------------------------------------------
---
-  FUNCTION  get_effective_date RETURN date IS
-  BEGIN
-     RETURN nm3context.get_effective_date;
-  END get_effective_date;
 --
 -----------------------------------------------------------------------------
 --
@@ -107,10 +92,11 @@ END get_body_version;
     OPEN c1;
     FETCH c1 INTO l_date;
     CLOSE c1;
---
-     nm3context.set_context (pi_attribute => 'USER_DATE_MASK'
-                            ,pi_value     => p_mask
-                            );
+
+    nm3ctx.Set_Core_Context (
+                            p_Attribute =>  'USER_DATE_MASK',
+                            p_Value     =>  p_mask
+                            ); 
 --
      set_user_option (pi_huo_id     => 'DATE_MASK'
                      ,pi_huo_value  => p_mask
@@ -125,22 +111,17 @@ END get_body_version;
 --
 -----------------------------------------------------------------------------
 --
-  FUNCTION  get_user_date_mask RETURN varchar2 IS
-  BEGIN
-     RETURN nm3context.get_context (pi_attribute => 'USER_DATE_MASK');
-  END get_user_date_mask;
---
------------------------------------------------------------------------------
---
   PROCEDURE set_user_length_units( p_unit_id IN number ) IS
   BEGIN
 --
     IF nm3unit.unit_exists( 'LENGTH', p_unit_id )
      THEN
 --
-        nm3context.set_context (pi_attribute => 'USER_LENGTH_UNITS'
-                               ,pi_value     => p_unit_id
-                               );
+      nm3ctx.Set_Core_Context (
+                              p_Attribute =>  'USER_LENGTH_UNITS',
+                              p_Value     =>  Ltrim(To_Char(p_unit_id))
+                              );
+                              
         set_user_option (pi_huo_id    => 'PREFUNITS'
                         ,pi_huo_value => p_unit_id
                         );
@@ -153,64 +134,18 @@ END get_body_version;
 --
   END set_user_length_units;
 --
------------------------------------------------------------------------------
---
-  FUNCTION  get_user_length_units RETURN number IS
-  BEGIN
-     RETURN nm3context.get_context_number (pi_attribute => 'USER_LENGTH_UNITS');
-  END get_user_length_units;
---
------------------------------------------------------------------------------
---
-  FUNCTION  is_user_unrestricted RETURN boolean IS
-  BEGIN
-  --
-  -- This is declared as a constant so that
-  --  DML statements do not need to continually hit the database
-  -- It is populated in this package from the value which is in the
-  --  context
-  --
-      RETURN g_user_unrestricted_inv;
---
-  END is_user_unrestricted;
---
------------------------------------------------------------------------------
---
-  FUNCTION  is_user_unrestricted_acc RETURN boolean IS
-  BEGIN
-  --
-  -- This is declared as a constant so that
-  --  DML statements do not need to continually hit the database
-  -- It is populated in this package from the value which is in the
-  --  context
-  --
-      RETURN g_user_unrestricted_acc;
---
-  END is_user_unrestricted_acc;
---
------------------------------------------------------------------------------
---
-  FUNCTION  get_user_length_mask  RETURN varchar2 IS
-  BEGIN
---
-    RETURN NVL(nm3context.get_context (pi_attribute => 'USER_LENGTH_MASK')
-              ,nm3context.get_context (pi_attribute => 'DEFAULT_LENGTH_MASK')
-              );
---
-  END get_user_length_mask;
---
 ----------------------------------------------------------------------------------
 --
   PROCEDURE instantiate_user_history IS
-     CURSOR c1 (c_user_id number) IS
+     CURSOR c1 IS
       SELECT huh_user_history
       FROM hig_user_history
-      WHERE huh_user_id= c_user_id
+      WHERE huh_user_id   = To_Number(Sys_Context('NM3CORE','USER_ID'))
       AND huh_user_history IS NOT NULL;
 --
   BEGIN
 	-- retrieve existing history
-	OPEN  c1 (nm3context.get_context_number(pi_attribute => 'USER_ID'));
+	OPEN  c1;
 	FETCH c1 INTO g_my_user_hist;
 	CLOSE c1;
 --
@@ -248,16 +183,15 @@ END get_body_version;
   PROCEDURE maintain_user_history IS
 --
     PRAGMA autonomous_transaction;
-    l_user_id number := nm3context.get_context_number(pi_attribute => 'USER_ID');
 --
   BEGIN
 --
     DELETE FROM hig_user_history
-    WHERE huh_user_id = l_user_id;
+    WHERE huh_user_id = To_Number(Sys_Context('NM3CORE','USER_ID'));
 --
     INSERT INTO hig_user_history
-    VALUES (l_user_id
-           ,g_my_user_hist
+    VALUES (To_Number(Sys_Context('NM3CORE','USER_ID')),
+           g_my_user_hist
            );
 --
     COMMIT;
@@ -287,7 +221,7 @@ END get_body_version;
   FUNCTION  convert_char_date ( p_char_date IN varchar2 ) RETURN varchar2 IS
   BEGIN
 --
-    RETURN TO_CHAR(hig.date_convert(p_char_date),nm3user.get_user_date_mask );
+    RETURN TO_CHAR(hig.date_convert(p_char_date),Sys_Context('NM3CORE','USER_DATE_MASK') );
 --
   END convert_char_date;
 --
@@ -295,16 +229,16 @@ END get_body_version;
 --
   FUNCTION get_username(p_user_id IN hig_users.hus_user_id%TYPE) RETURN hig_users.hus_username%TYPE IS
 --
-    CURSOR c1 (c_user_id hig_users.hus_user_id%TYPE) IS
+    CURSOR c1 IS
       SELECT hus_username
       FROM   hig_users
-      WHERE  hus_user_id = c_user_id;
+      WHERE  hus_user_id = p_user_id;
 --
     l_retval hig_users.hus_username%TYPE;
 --
   BEGIN
 --
-    OPEN  c1 (p_user_id);
+    OPEN  c1 ;
     FETCH c1 INTO l_retval;
     IF c1%NOTFOUND THEN
       l_retval := 'No DCD inspector';
@@ -320,7 +254,6 @@ END get_body_version;
 FUNCTION user_can_run_module(p_module IN hig_module_roles.hmr_module%TYPE) RETURN boolean IS
 
    CURSOR c1 (c_module  hig_modules.hmo_module%TYPE
-              ,c_user    hig_user_roles.hur_username%TYPE
               ,c_sysdate hig_user_roles.hur_start_date%TYPE
               ) IS
       SELECT 1
@@ -333,7 +266,7 @@ FUNCTION user_can_run_module(p_module IN hig_module_roles.hmr_module%TYPE) RETUR
 	   AND   hpr_key IS NOT NULL
        AND   hmr_module      = hmo_module
        AND   hmr_role        = hur_role
-       AND   hur_username    = c_user
+       AND   hur_username    = Sys_Context('NM3_SECURITY_CTX','USERNAME')
        AND   hur_start_date <= c_sysdate;
 
     l_dummy  pls_integer;
@@ -343,7 +276,6 @@ FUNCTION user_can_run_module(p_module IN hig_module_roles.hmr_module%TYPE) RETUR
   
  
     OPEN  c1 (c_module  => UPPER(p_module)
-             ,c_user    => c_user
              ,c_sysdate => TRUNC(SYSDATE)
              );
     FETCH c1 INTO l_dummy;
@@ -383,7 +315,7 @@ END get_public_user_details;
 PROCEDURE restricted_user_check IS
 BEGIN
   nm_debug.proc_start(g_package_name , 'restricted_user_check');
-  IF NOT nm3user.is_user_unrestricted THEN
+  IF Sys_Context('NM3CORE','UNRESTRICTED_INVENTORY') = 'FALSE'  THEN
     RAISE_APPLICATION_ERROR( -20997, 'USER IS RESTRICTED, You cannot perform this operation.');
  END IF;
   nm_debug.proc_end(g_package_name , 'restricted_user_check');
@@ -391,20 +323,19 @@ END restricted_user_check;
 --
 -----------------------------------------------------------------------------
 --
-FUNCTION user_has_role(pi_user IN hig_users.hus_username%TYPE DEFAULT USER
+FUNCTION user_has_role(pi_user IN hig_users.hus_username%TYPE DEFAULT Sys_Context('NM3_SECURITY_CTX','USERNAME')
                       ,pi_role IN hig_roles.hro_role%TYPE
                       ) RETURN boolean IS
 
-  CURSOR c_hur(p_user hig_users.hus_username%TYPE
-              ,p_role hig_roles.hro_role%TYPE) IS
+  CURSOR c_hur IS
     SELECT
       1
     FROM
       hig_user_roles
     WHERE
-      hur_username = p_user
+      hur_username = pi_user
     AND
-      hur_role = p_role;
+      hur_role = pi_role;
 
   l_dummy pls_integer;
 
@@ -414,8 +345,7 @@ BEGIN
   nm_debug.proc_start(p_package_name   => g_package_name
                      ,p_procedure_name => 'user_has_role');
 
-  OPEN c_hur(p_user => pi_user
-            ,p_role => pi_role);
+  OPEN c_hur;
     FETCH c_hur INTO l_dummy;
     l_retval := c_hur%FOUND;
   CLOSE c_hur;
@@ -429,21 +359,19 @@ END user_has_role;
 --
 -----------------------------------------------------------------------------
 --
-FUNCTION user_has_priv(pi_user IN hig_users.hus_username%TYPE DEFAULT USER
+FUNCTION user_has_priv(pi_user IN hig_users.hus_username%TYPE DEFAULT Sys_Context('NM3_SECURITY_CTX','USERNAME')
                       ,pi_priv IN dba_sys_privs.PRIVILEGE%TYPE
                       ) RETURN boolean IS
 
-  CURSOR c_privs(p_user hig_users.hus_username%TYPE
-                ,p_priv dba_sys_privs.PRIVILEGE%TYPE
-                ) IS
+  CURSOR c_privs IS
     SELECT
       1
     FROM
       dba_sys_privs
     WHERE
-      grantee = p_user
+      grantee = pi_user
     AND
-      PRIVILEGE = p_priv;
+      PRIVILEGE = UPPER(pi_priv);
 
   l_dummy pls_integer;
 
@@ -453,8 +381,7 @@ BEGIN
   nm_debug.proc_start(p_package_name   => g_package_name
                      ,p_procedure_name => 'user_has_priv');
 
-  OPEN c_privs(p_user => pi_user
-              ,p_priv => UPPER(pi_priv));
+  OPEN c_privs;
     FETCH c_privs INTO l_dummy;
     l_retval := c_privs%FOUND;
   CLOSE c_privs;
@@ -498,12 +425,12 @@ END get_hus;
 --
 -----------------------------------------------------------------------------
 --
-FUNCTION get_hus (pi_hus_username IN hig_users.hus_username%TYPE DEFAULT USER) RETURN hig_users%ROWTYPE IS
+FUNCTION get_hus (pi_hus_username IN hig_users.hus_username%TYPE DEFAULT Sys_Context('NM3_SECURITY_CTX','USERNAME') ) RETURN hig_users%ROWTYPE IS
 --
-   CURSOR cs_hus (c_name hig_users.hus_username%TYPE) IS
+   CURSOR cs_hus IS
    SELECT *
     FROM  hig_users
-   WHERE  hus_username = c_name;
+   WHERE  hus_username = pi_hus_username;
 --
    l_rec_hus hig_users%ROWTYPE;
 --
@@ -511,7 +438,7 @@ BEGIN
 --
    nm_debug.proc_start (g_package_name, 'get_hus');
 --
-   OPEN  cs_hus (pi_hus_username);
+   OPEN  cs_hus;
    FETCH cs_hus INTO l_rec_hus;
    IF cs_hus%NOTFOUND
     THEN
@@ -598,15 +525,6 @@ END get_du;
 --
 -----------------------------------------------------------------------------
 --
-FUNCTION get_preferred_lrm RETURN nm_group_types.ngt_group_type%TYPE IS
-BEGIN
---
-  RETURN nm3context.get_context(pi_attribute => 'PREFERRED_LRM');
---
-END get_preferred_lrm;
---
------------------------------------------------------------------------------
---
 PROCEDURE set_preferred_lrm (pi_group_type   IN nm_group_types.ngt_group_type%TYPE
                             ,pi_set_user_opt IN boolean DEFAULT TRUE
                             ) IS
@@ -615,9 +533,10 @@ BEGIN
    IF pi_group_type IS NULL
      OR nm3get.get_ngt (pi_ngt_group_type => pi_group_type).ngt_group_type IS NOT NULL
     THEN
-      nm3context.set_context (pi_attribute => 'PREFERRED_LRM'
-                             ,pi_value     => pi_group_type
-                             );
+      nm3ctx.Set_Core_Context (
+                              p_Attribute =>  'PREFERRED_LRM',
+                              p_Value     =>  pi_group_type
+                              );
       IF pi_set_user_opt
       THEN
         set_user_option (pi_huo_id    => 'PREFLRM'
@@ -669,7 +588,7 @@ PROCEDURE set_user_option (pi_huo_id                 hig_user_options.huo_id%TYP
                           ,pi_huo_value              hig_user_options.huo_value%TYPE
                           ) IS
 BEGIN
-   nm3user.set_user_option (pi_huo_hus_user_id => nm3user.get_user_id
+   nm3user.set_user_option (pi_huo_hus_user_id => To_Number(Sys_Context('NM3CORE','USER_ID'))
                            ,pi_huo_id          => pi_huo_id
                            ,pi_huo_value       => pi_huo_value
                            );
@@ -680,17 +599,13 @@ END set_user_option;
 FUNCTION get_user_roi_details RETURN nm3extent.rec_roi_details IS
 --
    l_rec_roi_details nm3extent.rec_roi_details;
-   l_roi_id          nm_saved_extents.nse_id%TYPE;
-   l_roi_type        varchar2(4);
 --
 BEGIN
---
-   l_roi_id   := nm3context.get_context_number(pi_attribute => 'ROI_ID');
-   l_roi_type := nm3context.get_context(pi_attribute => 'ROI_TYPE');
+
 --
    BEGIN
-      nm3extent.get_roi_details (pi_roi_type    => l_roi_type
-                                ,pi_roi_id      => l_roi_id
+      nm3extent.get_roi_details (pi_roi_type    => Sys_Context('NM3CORE','ROI_TYPE')
+                                ,pi_roi_id      => To_Number(Sys_Context('NM3CORE','ROI_ID'))
                                 ,po_roi_details => l_rec_roi_details
                                 );
    EXCEPTION
@@ -755,16 +670,23 @@ BEGIN
                              ,po_roi_details => l_rec_roi_details
                              );
 --
-   nm3context.set_context    (pi_attribute => 'ROI_ID'
-                             ,pi_value     => pi_roi_id
-                             );
+   nm3ctx.Set_Core_Context  (
+                            p_Attribute =>  'ROI_ID',
+                            p_Value     =>  To_Char(pi_roi_id)
+                            );
+                    
+--   nm3context.set_context    (pi_attribute => 'ROI_ID'
+--                             ,pi_value     => pi_roi_id
+--                             );
    nm3user.set_user_option   (pi_huo_id    => 'ROI_ID'
                              ,pi_huo_value => pi_roi_id
                              );
---
-   nm3context.set_context    (pi_attribute => 'ROI_TYPE'
-                             ,pi_value     => pi_roi_type
-                             );
+--  
+   nm3ctx.Set_Core_Context  (
+                            p_Attribute =>  'ROI_ID',
+                            p_Value     =>  pi_roi_type
+                            );                             
+
    nm3user.set_user_option   (pi_huo_id    => 'ROI_TYPE'
                              ,pi_huo_value => pi_roi_type
                              );
@@ -779,8 +701,10 @@ BEGIN
   nm_debug.proc_start(p_package_name   => g_package_name
                      ,p_procedure_name => 'set_user_def_inv_attr_set');
 
-  nm3context.set_context(pi_attribute => 'DEFAULT_INV_ATTR_SET'
-                        ,pi_value     => pi_nias_id);
+  nm3ctx.Set_Core_Context (
+                          p_Attribute =>  'DEFAULT_INV_ATTR_SET',
+                          p_Value     =>  Ltrim(To_Char(pi_Nias_Id))
+                          ); 
 
   nm3user.set_user_option(pi_huo_id    => 'DEFATTRSET'
                          ,pi_huo_value => pi_nias_id);
@@ -789,25 +713,6 @@ BEGIN
                    ,p_procedure_name => 'set_user_def_inv_attr_set');
 
 END set_user_def_inv_attr_set;
---
------------------------------------------------------------------------------
---
-FUNCTION get_user_def_inv_attr_set RETURN nm_inv_attribute_sets.nias_id%TYPE IS
-
-  l_retval nm_inv_attribute_sets.nias_id%TYPE;
-
-BEGIN
-  nm_debug.proc_start(p_package_name   => g_package_name
-                     ,p_procedure_name => 'get_user_def_inv_attr_set');
-
-  l_retval := nm3context.get_context_number(pi_attribute => 'DEFAULT_INV_ATTR_SET');
-
-  nm_debug.proc_end(p_package_name   => g_package_name
-                   ,p_procedure_name => 'get_user_def_inv_attr_set');
-
-  RETURN l_retval;
-
-END get_user_def_inv_attr_set;
 --
 -----------------------------------------------------------------------------
 --
@@ -965,7 +870,7 @@ FUNCTION historic_mode RETURN boolean IS
   l_retval boolean := FALSE;
 
 BEGIN
-  IF nm3user.get_effective_date <> Trunc(SYSDATE) THEN
+  IF To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY') <> Trunc(SYSDATE) THEN
   	l_retval := TRUE;
   END IF;
   
@@ -974,7 +879,7 @@ END;
 --
 -----------------------------------------------------------------------------
 --
-FUNCTION user_is_higowner(pi_username IN hig_users.hus_username%TYPE DEFAULT USER) RETURN BOOLEAN IS
+FUNCTION user_is_higowner(pi_username IN hig_users.hus_username%TYPE DEFAULT Sys_Context('NM3_SECURITY_CTX','USERNAME')) RETURN BOOLEAN IS
 
 BEGIN
   RETURN(Nm3get.get_hus (pi_hus_username => pi_username ).hus_is_hig_owner_flag = 'Y');
@@ -985,7 +890,7 @@ END user_is_higowner;
 --
 -----------------------------------------------------------------------------
 --
-FUNCTION user_is_higowner_yn(pi_username IN hig_users.hus_username%TYPE DEFAULT USER) RETURN VARCHAR2 IS
+FUNCTION user_is_higowner_yn(pi_username IN hig_users.hus_username%TYPE DEFAULT Sys_Context('NM3_SECURITY_CTX','USERNAME')) RETURN VARCHAR2 IS
 
 BEGIN
   RETURN(Nm3get.get_hus (pi_hus_username => pi_username ).hus_is_hig_owner_flag);

@@ -1,11 +1,11 @@
 CREATE OR REPLACE PACKAGE nm3split IS
 --   PVCS Identifiers :-
 --
---       pvcsid                 : $Header:   //vm_latest/archives/nm3/admin/pck/nm3split.pkh-arc   2.2   Mar 15 2010 15:16:54   cstrettle  $
+--       pvcsid                 : $Header:   //vm_latest/archives/nm3/admin/pck/nm3split.pkh-arc   2.3   May 17 2011 08:26:26   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3split.pkh  $
---       Date into PVCS   : $Date:   Mar 15 2010 15:16:54  $
---       Date fetched Out : $Modtime:   Mar 12 2010 17:39:22  $
---       PVCS Version     : $Revision:   2.2  $
+--       Date into PVCS   : $Date:   May 17 2011 08:26:26  $
+--       Date fetched Out : $Modtime:   Apr 01 2011 14:00:16  $
+--       PVCS Version     : $Revision:   2.3  $
 --       Based on SCCS version : 1.7
 --
 --
@@ -19,7 +19,7 @@ CREATE OR REPLACE PACKAGE nm3split IS
 
 -- 03.06.08 PT added no_purpose parameter to create_node(), do_split_datum_or_group() and do_geo_split()
 
-  g_sccsid      CONSTANT  VARCHAR2(80)  := '"$Revision:   2.2  $"';
+  g_sccsid      CONSTANT  VARCHAR2(80)  := '"$Revision:   2.3  $"';
 --
    g_rec_ne_old   nm_elements%ROWTYPE;
    g_rec_ne_new_1 nm_elements%ROWTYPE;
@@ -91,7 +91,7 @@ PROCEDURE do_split_datum_or_group ( pi_ne_id                  IN     nm_elements
                                    ,pi_ne_type                IN     nm_elements.ne_type%TYPE -- ne_type of element to be split
                                    ,pi_ne_id_1                IN OUT nm_elements.ne_id%TYPE  -- the new element ne_id
                                    ,pi_ne_id_2                IN OUT nm_elements.ne_id%TYPE  -- the 2nd new element ne_id
-                                   ,pi_effective_date         IN     DATE DEFAULT  nm3user.get_effective_date-- the date the split is effective from
+                                   ,pi_effective_date         IN     DATE DEFAULT  To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY') -- the date the split is effective from
                                    ,pi_split_offset           IN     NUMBER
                                    ,pi_non_ambig_ne_id        IN     nm_elements.ne_id%TYPE
                                    ,pi_non_ambig_split_offset IN     NUMBER
@@ -219,7 +219,7 @@ PROCEDURE do_split_datum_or_group ( pi_ne_id                  IN     nm_elements
 -- This should only be called by SDE
 -- The tow new ne_id's must be passed
    PROCEDURE do_geo_split ( p_ne_id nm_elements.ne_id%TYPE -- the element to split
-                       ,p_effective_date DATE DEFAULT  nm3user.get_effective_date-- the date the split is effective from
+                       ,p_effective_date DATE DEFAULT  To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY') -- the date the split is effective from
                        ,p_split_measure NUMBER -- the length along the original element
                        ,p_ne_id_1 IN nm_elements.ne_id%TYPE -- the new element ne_id
                        ,p_ne_id_2 IN nm_elements.ne_id%TYPE -- the 2nd new element ne_id
@@ -280,7 +280,7 @@ PROCEDURE do_split_datum_or_group ( pi_ne_id                  IN     nm_elements
 FUNCTION create_node (p_no_node_name   IN nm_nodes.no_node_name%TYPE   DEFAULT NULL
                      ,p_no_descr       IN nm_nodes.no_descr%TYPE
                      ,p_no_node_type   IN nm_nodes.no_node_type%TYPE
-                     ,p_effective_date IN nm_nodes.no_start_date%TYPE  DEFAULT nm3user.get_effective_date
+                     ,p_effective_date IN nm_nodes.no_start_date%TYPE  DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                      ,p_np_grid_east   IN NM_POINTS.np_grid_east%TYPE  DEFAULT NULL
                      ,p_np_grid_north  IN NM_POINTS.np_grid_north%TYPE DEFAULT NULL
                      ,p_no_purpose     in nm_nodes_all.no_purpose%type default null

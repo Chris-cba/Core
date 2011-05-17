@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3web_apd AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3web_apd.pkb-arc   2.1   Dec 16 2008 11:06:32   smarshall  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3web_apd.pkb-arc   2.2   May 17 2011 08:26:26   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3web_apd.pkb  $
---       Date into PVCS   : $Date:   Dec 16 2008 11:06:32  $
---       Date fetched Out : $Modtime:   Dec 16 2008 11:05:56  $
---       PVCS Version     : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   May 17 2011 08:26:26  $
+--       Date fetched Out : $Modtime:   Apr 01 2011 15:37:28  $
+--       PVCS Version     : $Revision:   2.2  $
 --       Based on         : 1.2
 --
 --
@@ -22,22 +22,19 @@ CREATE OR REPLACE PACKAGE BODY nm3web_apd AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.1  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.2  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3web_apd';
 --
-   c_app_owner    CONSTANT user_users.username%TYPE := hig.get_application_owner;
---
    c_this_module  CONSTANT hig_modules.hmo_module%TYPE := 'NMWEB0005';
    c_module_title CONSTANT hig_modules.hmo_title%TYPE  := hig.get_module_title(c_this_module);
 --
-   CURSOR cs_obj (c_user VARCHAR2
-                 ,c_type VARCHAR2
+   CURSOR cs_obj (c_type VARCHAR2
                  ) IS
    SELECT object_name
     FROM  all_objects
-   WHERE  owner       = c_user
+   WHERE  owner       = Sys_Context('NM3CORE','APPLICATION_OWNER')
     AND   object_type = c_type
    ORDER BY object_name;
 --
@@ -47,8 +44,6 @@ CREATE OR REPLACE PACKAGE BODY nm3web_apd AS
 --
    c_user_opt_depend  CONSTANT hig_user_options.huo_id%TYPE          := 'WEBAPDDEP';
    c_user_opt_radio   CONSTANT hig_user_options.huo_id%TYPE          := 'WEBAPDRAD';
-   c_user             CONSTANT hig_users.hus_username%TYPE           := USER;
-   c_user_id          CONSTANT hig_user_options.huo_hus_user_id%TYPE := nm3user.get_user_id;
    dont_do_it  EXCEPTION;
 --
    c_checked   CONSTANT VARCHAR2(8) := ' CHECKED';
@@ -110,8 +105,7 @@ FUNCTION replace_spaces_and_lf (p_text VARCHAR2) RETURN VARCHAR2;
 --
 -----------------------------------------------------------------------------
 --
-PROCEDURE do_cons_cols (p_owner    VARCHAR2
-                       ,p_con_name VARCHAR2
+PROCEDURE do_cons_cols (p_con_name VARCHAR2
                        ,p_table    VARCHAR2
                        );
 --
@@ -315,7 +309,7 @@ BEGIN
    ELSE
       l_val := 'N';
    END IF;
-   nm3user.set_user_option (pi_huo_hus_user_id => c_user_id
+   nm3user.set_user_option (pi_huo_hus_user_id => To_Number(Sys_Context('NM3CORE','USER_ID'))
                            ,pi_huo_id          => c_user_opt_depend
                            ,pi_huo_value       => l_val
                            );
@@ -325,7 +319,7 @@ BEGIN
    ELSE
       l_val := 'N';
    END IF;
-   nm3user.set_user_option (pi_huo_hus_user_id => c_user_id
+   nm3user.set_user_option (pi_huo_hus_user_id => To_Number(Sys_Context('NM3CORE','USER_ID'))
                            ,pi_huo_id          => c_user_opt_radio
                            ,pi_huo_value       => l_val
                            );
@@ -344,8 +338,7 @@ BEGIN
 --
    nm3web.module_startup(pi_module => c_this_module);
 --
-   OPEN  cs_obj (c_user => c_app_owner
-                ,c_type => 'TABLE'
+   OPEN  cs_obj (c_type => 'TABLE'
                 );
    FETCH cs_obj BULK COLLECT INTO l_tab_tabs;
    CLOSE cs_obj;
@@ -383,8 +376,7 @@ BEGIN
 --
    nm3web.module_startup(pi_module => c_this_module);
 --
-   OPEN  cs_obj (c_user => c_app_owner
-                ,c_type => 'TRIGGER'
+   OPEN  cs_obj (c_type => 'TRIGGER'
                 );
    FETCH cs_obj BULK COLLECT INTO l_tab_trigs;
    CLOSE cs_obj;
@@ -414,8 +406,7 @@ END trigger_details;
 --
 PROCEDURE individual_trigger_detail (p_trigger_name VARCHAR2) IS
 --
-   CURSOR cs_trigger_dets (c_owner VARCHAR2
-                          ,c_trig  VARCHAR2
+   CURSOR cs_trigger_dets (c_trig  VARCHAR2
                           ) IS
    SELECT trigger_type
          ,triggering_event
@@ -429,7 +420,7 @@ PROCEDURE individual_trigger_detail (p_trigger_name VARCHAR2) IS
          ,description
          ,action_type
     FROM  all_triggers
-   WHERE  owner        = c_owner
+   WHERE  owner        = Sys_Context('NM3CORE','APPLICATION_OWNER')
     AND   trigger_name = c_trig;
 --
    l_rec_trg cs_trigger_dets%ROWTYPE;
@@ -445,7 +436,7 @@ BEGIN
    htp.bodyopen;
    nm3web.module_startup(pi_module => c_this_module);
 --
-   OPEN  cs_trigger_dets (c_app_owner, p_trigger_name);
+   OPEN  cs_trigger_dets (p_trigger_name);
    FETCH cs_trigger_dets INTO l_rec_trg;
    CLOSE cs_trigger_dets;
 --
@@ -458,16 +449,15 @@ BEGIN
    DECLARE
       l_too_big EXCEPTION;
       PRAGMA EXCEPTION_INIT (l_too_big,-6502);
-      CURSOR cs_trig_text (c_owner VARCHAR2
-                          ,c_trig  VARCHAR2
+      CURSOR cs_trig_text (c_trig  VARCHAR2
                           ) IS
       SELECT trigger_body
        FROM  all_triggers
-      WHERE  owner        = c_owner
+      WHERE  owner        = Sys_Context('NM3CORE','APPLICATION_OWNER')
        AND   trigger_name = c_trig;
       l_trigger_text VARCHAR2(32767);
    BEGIN
-      OPEN  cs_trig_text (c_app_owner, p_trigger_name);
+      OPEN  cs_trig_text (p_trigger_name);
       FETCH cs_trig_text INTO l_trigger_text;
       CLOSE cs_trig_text;
       output_varchar_as_html_code(l_trigger_text);
@@ -545,8 +535,7 @@ BEGIN
 --
    nm3web.module_startup(pi_module => c_this_module);
 --
-   OPEN  cs_obj (c_user => c_app_owner
-                ,c_type => 'PACKAGE'
+   OPEN  cs_obj (c_type => 'PACKAGE'
                 );
    FETCH cs_obj BULK COLLECT INTO l_tab_packs;
    CLOSE cs_obj;
@@ -807,8 +796,7 @@ BEGIN
 --
    nm3web.module_startup(pi_module => c_this_module);
 --
-   OPEN  cs_obj (c_user => c_app_owner
-                ,c_type => 'VIEW'
+   OPEN  cs_obj (c_type => 'VIEW'
                 );
    FETCH cs_obj BULK COLLECT INTO l_tab_views;
    CLOSE cs_obj;
@@ -838,20 +826,18 @@ END view_details;
 --
 PROCEDURE individual_view_detail (p_view_name VARCHAR2) IS
 --
-   CURSOR cs_view_len (c_owner VARCHAR2
-                      ,c_view  VARCHAR2
+   CURSOR cs_view_len (c_view  VARCHAR2
                       ) IS
    SELECT text_length
     FROM  all_views
-   WHERE  owner     = c_owner
+   WHERE  owner     = Sys_Context('NM3CORE','APPLICATION_OWNER')
     AND   view_name = c_view;
 --
-   CURSOR cs_view_text (c_owner VARCHAR2
-                       ,c_view  VARCHAR2
+   CURSOR cs_view_text (c_view  VARCHAR2
                        ) IS
    SELECT text
     FROM  all_views
-   WHERE  owner     = c_owner
+   WHERE  owner     = Sys_Context('NM3CORE','APPLICATION_OWNER')
     AND   view_name = c_view;
 --
    l_view_text_length PLS_INTEGER;
@@ -871,7 +857,7 @@ BEGIN
 --
    display_table_name_and_comment(p_view_name);
 --
-   OPEN  cs_view_len (c_app_owner, p_view_name);
+   OPEN  cs_view_len (p_view_name);
    FETCH cs_view_len INTO l_view_text_length;
    CLOSE cs_view_len;
 --
@@ -879,7 +865,7 @@ BEGIN
 --
    IF l_view_text_length <= 32767
     THEN
-      OPEN  cs_view_text (c_app_owner, p_view_name);
+      OPEN  cs_view_text (p_view_name);
       FETCH cs_view_text INTO l_view_text;
       CLOSE cs_view_text;
       --
@@ -920,22 +906,20 @@ PROCEDURE get_tab_cols (p_table_name   IN     VARCHAR2
                        ,p_tab_comment     OUT nm3type.tab_varchar32767
                        ) IS
 --
-   CURSOR cs_utc (c_owner    VARCHAR2
-                 ,c_tab_name VARCHAR2
+   CURSOR cs_utc (c_tab_name VARCHAR2
                  ) IS
    SELECT *
     FROM  all_tab_columns
-   WHERE  owner = c_owner
+   WHERE  owner = Sys_Context('NM3CORE','APPLICATION_OWNER')
     AND   table_name = c_tab_name
    ORDER BY column_id;
 --
-   CURSOR cs_comments (c_owner  VARCHAR2
-                      ,c_table  VARCHAR2
+   CURSOR cs_comments (c_table  VARCHAR2
                       ,c_column VARCHAR2
                       ) IS
    SELECT comments
     FROM  all_col_comments
-   WHERE  owner       = c_owner
+   WHERE  owner       = Sys_Context('NM3CORE','APPLICATION_OWNER')
     AND   table_name  = c_table
     AND   column_name = c_column;
 --
@@ -946,7 +930,7 @@ PROCEDURE get_tab_cols (p_table_name   IN     VARCHAR2
 --
 BEGIN
 --
-   FOR cs_rec IN cs_utc (c_app_owner, p_table_name)
+   FOR cs_rec IN cs_utc (p_table_name)
     LOOP
 --
       l_count   := l_count + 1;
@@ -965,7 +949,7 @@ BEGIN
                                              ,p_data_precision => cs_rec.data_precision
                                              ,p_data_scale     => cs_rec.data_scale
                                              );
-      OPEN  cs_comments (c_app_owner, p_table_name, cs_rec.column_name);
+      OPEN  cs_comments (p_table_name, cs_rec.column_name);
       FETCH cs_comments INTO l_comment;
       CLOSE cs_comments;
       IF l_comment IS NOT NULL
@@ -1089,12 +1073,11 @@ END get_and_display_cols;
 --
 PROCEDURE display_table_name_and_comment (p_table_name VARCHAR2) IS
 --
-   CURSOR cs_tab_comments (c_owner VARCHAR2
-                          ,c_table VARCHAR2
+   CURSOR cs_tab_comments (c_table VARCHAR2
                           ) IS
    SELECT comments
     FROM  all_tab_comments
-   WHERE  owner      = c_owner
+   WHERE  owner      = Sys_Context('NM3CORE','APPLICATION_OWNER')
     AND   table_name = c_table;
 --
    l_comments VARCHAR2(4000);
@@ -1103,7 +1086,7 @@ BEGIN
 --
    htp.header(2,p_table_name);
 --
-   OPEN  cs_tab_comments (c_app_owner, p_table_name);
+   OPEN  cs_tab_comments (p_table_name);
    FETCH cs_tab_comments INTO l_comments;
    IF cs_tab_comments%FOUND
     THEN
@@ -1118,13 +1101,12 @@ END display_table_name_and_comment;
 --
 PROCEDURE display_constraints (p_table_name VARCHAR2) IS
 --
-   CURSOR cs_cons (c_owner VARCHAR2
-                  ,c_table VARCHAR2
+   CURSOR cs_cons (c_table VARCHAR2
                   ,c_type  VARCHAR2
                   ) IS
    SELECT *
     FROM  all_constraints
-   WHERE  owner           = c_owner
+   WHERE  owner           = Sys_Context('NM3CORE','APPLICATION_OWNER')
     AND   table_name      = c_table
     AND   constraint_type = NVL(c_type,constraint_type)
     AND   generated       = 'USER NAME';
@@ -1161,7 +1143,7 @@ BEGIN
     LOOP
    --
       l_been_in_loop := FALSE;
-      FOR cs_rec IN cs_cons (c_app_owner, p_table_name, l_tab_type(i))
+      FOR cs_rec IN cs_cons ( p_table_name, l_tab_type(i))
        LOOP
          IF cs_cons%ROWCOUNT = 1
           THEN
@@ -1188,7 +1170,7 @@ BEGIN
          htp.tablerowopen;
          htp.tabledata(htf.small(cs_rec.constraint_name));
          htp.p('<TD>');
-         do_cons_cols (c_app_owner, cs_rec.constraint_name, p_table_name);
+         do_cons_cols (cs_rec.constraint_name, p_table_name);
          htp.p('</TD>');
          IF l_tab_type(i) = 'C'
           THEN
@@ -1201,7 +1183,7 @@ BEGIN
             htp.tabledata(htf.small(cs_rec.r_owner||'.'||l_rec_ac.table_name));
             htp.tabledata(htf.small(cs_rec.r_constraint_name));
             htp.p('<TD>');
-            do_cons_cols (l_rec_ac.owner, l_rec_ac.constraint_name, l_rec_ac.table_name);
+            do_cons_cols (l_rec_ac.constraint_name, l_rec_ac.table_name);
             htp.p('</TD>');
             htp.tabledata(htf.small(cs_rec.delete_rule));
          END IF;
@@ -1222,18 +1204,16 @@ END display_constraints;
 --
 -----------------------------------------------------------------------------
 --
-PROCEDURE do_cons_cols (p_owner    VARCHAR2
-                       ,p_con_name VARCHAR2
+PROCEDURE do_cons_cols (p_con_name VARCHAR2
                        ,p_table    VARCHAR2
                        ) IS
 --
-   CURSOR cs_cons_cols (c_owner VARCHAR2
-                       ,c_table VARCHAR2
+   CURSOR cs_cons_cols (c_table VARCHAR2
                        ,c_con   VARCHAR2
                        ) IS
    SELECT column_name
     FROM  all_cons_columns
-   WHERE  owner           = c_owner
+   WHERE  owner           = Sys_Context('NM3CORE','APPLICATION_OWNER')
     AND   table_name      = c_table
     AND   constraint_name = c_con
    ORDER BY position;
@@ -1241,7 +1221,7 @@ PROCEDURE do_cons_cols (p_owner    VARCHAR2
    l_tab_cons_cols nm3type.tab_varchar30;
 --
 BEGIN
-   OPEN  cs_cons_cols (p_owner, p_table, p_con_name);
+   OPEN  cs_cons_cols (p_table, p_con_name);
    FETCH cs_cons_cols BULK COLLECT INTO l_tab_cons_cols;
    CLOSE cs_cons_cols;
    IF l_tab_cons_cols.COUNT = 0
@@ -1273,19 +1253,18 @@ END replace_spaces_and_lf;
 --
 PROCEDURE display_statistics (p_table_name VARCHAR2) IS
 --
-   CURSOR cs_at (c_owner      VARCHAR2
-                ,c_table_name VARCHAR2
+   CURSOR cs_at (c_table_name VARCHAR2
                 ) IS
    SELECT *
     FROM  all_tables
-   WHERE  owner      = c_owner
+   WHERE  owner      = Sys_Context('NM3CORE','APPLICATION_OWNER')
     AND   table_name = c_table_name;
 --
    l_rec_at all_tables%ROWTYPE;
 --
 BEGIN
 --
-   OPEN  cs_at (c_app_owner, p_table_name);
+   OPEN  cs_at (p_table_name);
    FETCH cs_at INTO l_rec_at;
    CLOSE cs_at;
 --
@@ -1328,13 +1307,12 @@ PROCEDURE do_references (p_name VARCHAR2
                         ,p_type VARCHAR2
                         ) IS
 --
-   CURSOR cs_ad (c_owner VARCHAR2
-                ,c_name  VARCHAR2
+   CURSOR cs_ad (c_name  VARCHAR2
                 ,c_type  VARCHAR2
                 ) IS
    SELECT *
     FROM  all_dependencies
-   WHERE  owner            = c_owner
+   WHERE  owner            = Sys_Context('NM3CORE','APPLICATION_OWNER')
     AND   name             = c_name
     AND   SUBSTR(type,1,7) = SUBSTR(c_type,1,7)
     AND   referenced_type != 'NON-EXISTENT'
@@ -1355,7 +1333,7 @@ BEGIN
       RAISE dont_do_it;
    END IF;
 --
-   FOR cs_rec IN cs_ad (c_app_owner, p_name, p_type)
+   FOR cs_rec IN cs_ad (p_name, p_type)
     LOOP
       IF NOT l_been_in_loop
        THEN
@@ -1372,8 +1350,8 @@ BEGIN
       END IF;
       htp.tablerowopen;
       htp.tabledata(htf.small(cs_rec.referenced_owner));
-      IF  cs_rec.referenced_owner                != c_app_owner
-       OR (cs_rec.referenced_owner                = c_app_owner
+      IF  cs_rec.referenced_owner                != Sys_Context('NM3CORE','APPLICATION_OWNER')
+       OR (cs_rec.referenced_owner                = Sys_Context('NM3CORE','APPLICATION_OWNER')
            AND cs_rec.referenced_name             = p_name
            AND SUBSTR(cs_rec.referenced_type,1,7) = SUBSTR(p_type,1,7)
           )
@@ -1409,15 +1387,14 @@ END do_references;
 --
 FUNCTION proc_exists (p_type VARCHAR2) RETURN BOOLEAN IS
 --
-   CURSOR cs_proc (c_owner   VARCHAR2
-                  ,c_package VARCHAR2
+   CURSOR cs_proc (c_package VARCHAR2
                   ,c_proc    VARCHAR2
                   ) IS
    SELECT 1
     FROM  dual
    WHERE EXISTS (SELECT 1
                   FROM  all_arguments
-                 WHERE  owner        = c_owner
+                 WHERE  owner        = Sys_Context('NM3CORE','APPLICATION_OWNER')
                   AND   package_name = c_package
                   AND   object_name  = c_proc
                 );
@@ -1427,8 +1404,7 @@ FUNCTION proc_exists (p_type VARCHAR2) RETURN BOOLEAN IS
 --
 BEGIN
 --
-   OPEN  cs_proc (c_app_owner
-                 ,UPPER(g_package_name)
+   OPEN  cs_proc (UPPER(g_package_name)
                  ,'INDIVIDUAL_'||p_type||'_DETAIL'
                  );
    FETCH cs_proc INTO l_dummy;
@@ -1445,13 +1421,12 @@ PROCEDURE do_referenced_by (p_name VARCHAR2
                            ,p_type VARCHAR2
                            ) IS
 --
-   CURSOR cs_ad (c_owner VARCHAR2
-                ,c_name  VARCHAR2
+   CURSOR cs_ad (c_name  VARCHAR2
                 ,c_type  VARCHAR2
                 ) IS
    SELECT *
     FROM  all_dependencies
-   WHERE  referenced_owner            = c_owner
+   WHERE  referenced_owner            = Sys_Context('NM3CORE','APPLICATION_OWNER')
     AND   referenced_name             = c_name
     AND   SUBSTR(referenced_type,1,7) = SUBSTR(c_type,1,7)
     AND   type != 'NON-EXISTENT'
@@ -1474,7 +1449,7 @@ BEGIN
       RAISE dont_do_it;
    END IF;
 --
-   FOR cs_rec IN cs_ad (c_app_owner, p_name, p_type)
+   FOR cs_rec IN cs_ad (p_name, p_type)
     LOOP
       IF NOT l_been_in_loop
        THEN
@@ -1498,8 +1473,8 @@ BEGIN
          l_type := cs_rec.type;
       END IF;
 --
-      IF  cs_rec.owner                != c_app_owner
-       OR (cs_rec.owner                = c_app_owner
+      IF  cs_rec.owner                != Sys_Context('NM3CORE','APPLICATION_OWNER')
+       OR (cs_rec.owner                = Sys_Context('NM3CORE','APPLICATION_OWNER')
            AND cs_rec.name             = p_name
            AND SUBSTR(cs_rec.type,1,7) = SUBSTR(p_type,1,7)
           )
@@ -1571,34 +1546,31 @@ END output_varchar_as_html;
 --
 PROCEDURE do_package_procedures (p_package_name VARCHAR2) IS
 --
-   CURSOR cs_distinct (c_owner VARCHAR2
-                      ,c_pack  VARCHAR2
+   CURSOR cs_distinct (c_pack  VARCHAR2
                       ) IS
    SELECT object_name
     FROM  all_arguments
-   WHERE  owner        = c_owner
+   WHERE  owner        = Sys_Context('NM3CORE','APPLICATION_OWNER')
     AND   package_name = c_pack
    GROUP BY object_name;
 --
-   CURSOR cs_overload (c_owner VARCHAR2
-                      ,c_pack  VARCHAR2
+   CURSOR cs_overload (c_pack  VARCHAR2
                       ,c_proc  VARCHAR2
                       ) IS
    SELECT overload
     FROM  all_arguments
-   WHERE  owner        = c_owner
+   WHERE  owner        = Sys_Context('NM3CORE','APPLICATION_OWNER')
     AND   package_name = c_pack
     AND   object_name  = c_proc
    GROUP BY overload;
 --
-   CURSOR cs_args (c_owner VARCHAR2
-                  ,c_pack  VARCHAR2
+   CURSOR cs_args (c_pack  VARCHAR2
                   ,c_proc  VARCHAR2
                   ,c_over  NUMBER
                   ) IS
    SELECT *
     FROM  all_arguments
-   WHERE  owner           = c_owner
+   WHERE  owner           = Sys_Context('NM3CORE','APPLICATION_OWNER')
     AND   package_name    = c_pack
     AND   object_name     = c_proc
     AND   NVL(overload,0) = NVL(c_over,0)
@@ -1613,7 +1585,7 @@ PROCEDURE do_package_procedures (p_package_name VARCHAR2) IS
 --
 BEGIN
 --
-   OPEN  cs_distinct (c_app_owner, p_package_name);
+   OPEN  cs_distinct (p_package_name);
    FETCH cs_distinct BULK COLLECT INTO l_tab_procs;
    CLOSE cs_distinct;
 --
@@ -1622,7 +1594,7 @@ BEGIN
       htp.br;
       htp.bold(l_tab_procs(i));
       l_tab_overload.DELETE;
-      OPEN  cs_overload (c_app_owner, p_package_name, l_tab_procs(i));
+      OPEN  cs_overload (p_package_name, l_tab_procs(i));
       FETCH cs_overload BULK COLLECT INTO l_tab_overload;
       CLOSE cs_overload;
       IF l_tab_overload.COUNT = 0
@@ -1637,7 +1609,7 @@ BEGIN
             htp.italic('Overload '||j||'.');
          END IF;
          l_tab_open := FALSE;
-         FOR cs_rec IN cs_args (c_app_owner, p_package_name, l_tab_procs(i), l_tab_overload(j))
+         FOR cs_rec IN cs_args (p_package_name, l_tab_procs(i), l_tab_overload(j))
           LOOP
             IF   cs_args%ROWCOUNT = 1
              AND cs_rec.data_type IS NOT NULL
@@ -1659,7 +1631,7 @@ BEGIN
                htp.tabledata(htf.small(cs_rec.in_out));
                IF cs_rec.data_type = 'OBJECT'
                 THEN
-                  IF cs_rec.type_owner != c_app_owner
+                  IF cs_rec.type_owner != Sys_Context('NM3CORE','APPLICATION_OWNER')
                    THEN
                      l_data_type := cs_rec.type_owner||'.';
                   ELSE
@@ -1699,13 +1671,12 @@ FUNCTION get_from_source (p_name VARCHAR2
                          ,p_type VARCHAR2 DEFAULT 'PACKAGE'
                          ) RETURN nm3type.tab_varchar4000 IS
 --
-   CURSOR cs_as (c_owner VARCHAR2
-                ,c_name  VARCHAR2
+   CURSOR cs_as (c_name  VARCHAR2
                 ,c_type  VARCHAR2
                 ) IS
    SELECT text
     FROM  all_source
-   WHERE  owner = c_owner
+   WHERE  owner = Sys_Context('NM3CORE','APPLICATION_OWNER')
     AND   name  = c_name
     AND   type  = c_type
    ORDER BY line;
@@ -1714,7 +1685,7 @@ FUNCTION get_from_source (p_name VARCHAR2
 --
 BEGIN
 --
-   OPEN  cs_as (c_app_owner, p_name, p_type);
+   OPEN  cs_as (p_name, p_type);
    FETCH cs_as BULK COLLECT INTO l_tab_text;
    CLOSE cs_as;
 --
@@ -1788,7 +1759,7 @@ FUNCTION do_dependencies RETURN BOOLEAN IS
    l_retval BOOLEAN := FALSE;
    l_opt    VARCHAR2(100);
 BEGIN
-   l_opt    := NVL(hig.get_useopt(c_user_opt_depend,c_user),'N');
+   l_opt    := NVL(hig.get_useopt(c_user_opt_depend,Sys_Context('NM3_SECURITY_CTX','USERNAME')),'N');
    l_retval := (l_opt = 'Y');
    RETURN l_retval;
 END do_dependencies;
@@ -1799,7 +1770,7 @@ FUNCTION do_radio RETURN BOOLEAN IS
    l_retval BOOLEAN := FALSE;
    l_opt    VARCHAR2(100);
 BEGIN
-   l_opt    := NVL(hig.get_useopt(c_user_opt_radio,c_user),'N');
+   l_opt    := NVL(hig.get_useopt(c_user_opt_radio,Sys_Context('NM3_SECURITY_CTX','USERNAME')),'N');
    l_retval := (l_opt = 'Y');
    RETURN l_retval;
 END do_radio;

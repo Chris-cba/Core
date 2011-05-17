@@ -5,16 +5,16 @@ AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_geom.pkb-arc   1.6   Nov 04 2010 14:27:26   Rob.Coupe  $
---       Module Name      : $Workfile:   NM3SDO_GEOM.pkb  $
---       Date into PVCS   : $Date:   Nov 04 2010 14:27:26  $
---       Date fetched Out : $Modtime:   Nov 04 2010 14:27:00  $
---       PVCS Version     : $Revision:   1.6  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_geom.pkb-arc   1.7   May 17 2011 08:26:26   Steve.Cooper  $
+--       Module Name      : $Workfile:   nm3sdo_geom.pkb  $
+--       Date into PVCS   : $Date:   May 17 2011 08:26:26  $
+--       Date fetched Out : $Modtime:   Apr 04 2011 10:19:26  $
+--       PVCS Version     : $Revision:   1.7  $
 --       Based on
 --
 --------------------------------------------------------------------------------
 --
-  g_body_sccsid    CONSTANT VARCHAR2(30) :='"$Revision:   1.6  $"';
+  g_body_sccsid    CONSTANT VARCHAR2(30) :='"$Revision:   1.7  $"';
   g_tab_xys                 nm3sdo_gdo.tab_xys;
  -- g_tab_nm_coords           nm_coords_array := NEW nm_coords_array();
 --
@@ -375,7 +375,7 @@ function  get_tol_from_gdo(p_session_id in gis_data_objects.gdo_session_id%type)
          AND nnth_nth_theme_id = nth_theme_id
          AND nth_feature_table = sdo_table_name
          AND nth_feature_shape_column = sdo_column_name
-         AND sdo_owner = hig.get_application_owner;
+         AND sdo_owner = Sys_Context('NM3CORE','APPLICATION_OWNER');
   --
     l_srid NUMBER;
   --

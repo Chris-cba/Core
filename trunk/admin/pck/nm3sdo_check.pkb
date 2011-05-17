@@ -4,16 +4,16 @@ AS
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_check.pkb-arc   2.12   Mar 08 2011 09:26:26   Ade.Edwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_check.pkb-arc   2.13   May 17 2011 08:26:26   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3sdo_check.pkb  $
---       Date into PVCS   : $Date:   Mar 08 2011 09:26:26  $
---       Date fetched Out : $Modtime:   Mar 08 2011 09:25:30  $
---       PVCS Version     : $Revision:   2.12  $
+--       Date into PVCS   : $Date:   May 17 2011 08:26:26  $
+--       Date fetched Out : $Modtime:   May 05 2011 14:16:18  $
+--       PVCS Version     : $Revision:   2.13  $
 --
 --------------------------------------------------------------------------------
 --
   g_package_name          CONSTANT varchar2(30)    := 'nm3sdo_check';
-  g_body_sccsid           CONSTANT varchar2(2000)  := '"$Revision:   2.12  $"';
+  g_body_sccsid           CONSTANT varchar2(2000)  := '"$Revision:   2.13  $"';
   lf                      CONSTANT VARCHAR2(30)    := chr(10);
   g_write_to_file                  BOOLEAN         := FALSE;
   l_results                        nm3type.tab_varchar32767;
@@ -106,14 +106,14 @@ AS
     put('*');
     put('*     Executed on : '||to_Char(sysdate,'DD-MON-YYYY HH24:MI:SS'));
     put('*');
-    put('*     Running on  : '||user||'@'||get_oracle_summary);
+    put('*     Running on  : '||Sys_Context('NM3_SECURITY_CTX','USERNAME')||'@'||get_oracle_summary);
     put('*');
     put('********************************************************************');
     put(lf);      
   --
     SELECT '    FAIL : '||nth_theme_name||' ['||nth_feature_table||'.'
          ||nth_feature_shape_column||']'||' is missing from '||
-         'USER_SDO_GEOM_METADATA for the Highways Owner schema ['||hig.get_application_owner||']' 
+         'USER_SDO_GEOM_METADATA for the Highways Owner schema ['||Sys_Context('NM3CORE','APPLICATION_OWNER')||']' 
       BULK COLLECT INTO l_results
       FROM nm_themes_all
      WHERE nth_theme_type = 'SDO'
@@ -190,7 +190,7 @@ AS
                          AND nthr_role = hur_role
                          AND hur_username = hus_username
                          AND hus_username = username
-                         AND hus_username != hig.get_application_owner
+                         AND hus_username != Sys_Context('NM3CORE','APPLICATION_OWNER')
                          AND hus_end_date IS NULL
                          AND NOT EXISTS
                          -- Ignore the TMA Webservice schemas
@@ -218,7 +218,7 @@ AS
                        WHERE b.nth_theme_id = a.nth_base_table_theme
                          AND hus_username = username
                          AND hus_end_date IS NULL
-                         AND hus_username != hig.get_application_owner
+                         AND hus_username != Sys_Context('NM3CORE','APPLICATION_OWNER')
                          AND NOT EXISTS
                          -- Ignore the TMA Webservice schemas
                            (SELECT 1 FROM all_objects o
@@ -244,7 +244,7 @@ AS
             GROUP BY hus_username, nth_feature_table, nth_feature_shape_column)
      WHERE u.sdo_table_name = nth_feature_table
        AND u.sdo_column_name = nth_feature_shape_column
-       AND u.sdo_owner = hig.get_application_owner;
+       AND u.sdo_owner = Sys_Context('NM3CORE','APPLICATION_OWNER');
   --
     put(lf);
     put('  ====================================================================');
@@ -268,7 +268,7 @@ AS
   --
     SELECT '    FAIL : '||hus_username||'.'|| nth_feature_table
            ||' view is missing which needs to be based on '
-           || hig.get_application_owner||'.'|| nth_feature_table missing_views
+           || Sys_Context('NM3CORE','APPLICATION_OWNER')||'.'|| nth_feature_table missing_views
       BULK COLLECT INTO l_results
       FROM hig_users
          , all_users
@@ -276,7 +276,7 @@ AS
          , hig_user_roles
          , nm_theme_roles
      WHERE hus_username = username
-       AND hus_username != hig.get_application_owner
+       AND hus_username != Sys_Context('NM3CORE','APPLICATION_OWNER')
        AND nth_theme_type = 'SDO'
        AND nthr_theme_id = nth_theme_id
        AND nthr_role = hur_role
@@ -295,7 +295,7 @@ AS
        AND NOT EXISTS (
               SELECT 1
                 FROM dba_objects
-               WHERE owner != hig.get_application_owner
+               WHERE owner != Sys_Context('NM3CORE','APPLICATION_OWNER')
                  AND owner = hus_username
                  AND object_name = nth_feature_table
                  AND object_type = 'VIEW')
@@ -1038,7 +1038,7 @@ AS
          AND nth_sequence_name IS NOT NULL
          AND EXISTS
          ( SELECT 1 FROM all_tab_columns
-            WHERE owner = hig.get_application_owner 
+            WHERE owner = Sys_Context('NM3CORE','APPLICATION_OWNER') 
               AND table_name = nth_feature_table
               AND column_name = 'OBJECTID'
               AND ( table_name LIKE '%_ONA_%' OR table_name LIKE '%_NIT_%' 
@@ -1342,7 +1342,7 @@ AS
               AND nth_end_date_column IS NOT NULL)
           AND NOT EXISTS
             (SELECT 1 FROM all_tab_columns
-              WHERE owner = hig.get_application_owner
+              WHERE owner = Sys_Context('NM3CORE','APPLICATION_OWNER')
                 AND table_name = nth_feature_table
                 AND column_name = nth_start_date_column )
         UNION
@@ -1355,7 +1355,7 @@ AS
               AND nth_end_date_column IS NOT NULL)
           AND NOT EXISTS
             (SELECT 1 FROM all_tab_columns
-              WHERE owner = hig.get_application_owner
+              WHERE owner = Sys_Context('NM3CORE','APPLICATION_OWNER')
                 AND table_name = nth_feature_table
                 AND column_name = nth_end_date_column ))
         SELECT error_text BULK COLLECT INTO l_results FROM all_data
@@ -1583,7 +1583,7 @@ AS
     put('*');
     put('*     Executed on : '||to_Char(sysdate,'DD-MON-YYYY HH24:MI:SS'));
     put('*');
-    put('*     Running on  : '||user||'@'||get_oracle_summary);
+    put('*     Running on  : '||Sys_Context('NM3_SECURITY_CTX','USERNAME')||'@'||get_oracle_summary);
   --
     IF pi_supress_warnings
     THEN

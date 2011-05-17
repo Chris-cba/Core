@@ -22,10 +22,6 @@ CREATE OR REPLACE PACKAGE Nm3sde AS
 
 --  g_sccsid is the SCCS ID for the package
 
--- Hihways owner
-
-   g_owner hig_users.hus_username%TYPE := Hig.get_application_owner;
-
 --</GLOBVAR>
 --
   /* Type definitions.required by SDE */
@@ -90,7 +86,7 @@ CREATE OR REPLACE PACKAGE Nm3sde AS
      SELECT layer_id,srid
      FROM   sde.layers
      WHERE  table_name = UPPER( c_table_name  )
-  	 AND    owner = g_owner;
+  	 AND    owner = Sys_Context('NM3CORE','APPLICATION_OWNER');
 
    CURSOR get_layer_cnt (c_table_name  IN VARCHAR2) IS
      SELECT t.layer_id, t.srid, s.cnt
@@ -99,13 +95,13 @@ CREATE OR REPLACE PACKAGE Nm3sde AS
          FROM sde.layers GROUP BY SRID) s
      WHERE t.table_name = UPPER( c_table_name  )
      AND   s.srid = t.srid
-     AND   t.owner = g_owner;
+     AND   t.owner = Sys_Context('NM3CORE','APPLICATION_OWNER');
 
    CURSOR get_registry (c_table_name IN VARCHAR2) IS
      SELECT registration_id
      FROM   sde.table_registry
      WHERE  table_name = UPPER( c_table_name )
- 	 AND    owner = g_owner;
+ 	 AND    owner = Sys_Context('NM3CORE','APPLICATION_OWNER');
 
 -----------------------------------------------------------------------------
 --

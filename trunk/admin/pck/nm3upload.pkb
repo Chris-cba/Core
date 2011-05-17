@@ -977,7 +977,7 @@ BEGIN
           INTO  l_tab_foreign_col
                ,l_tab_foreign_data_type
           FROM  all_tab_columns
-         WHERE  owner      = hig.get_application_owner
+         WHERE  owner      = Sys_Context('NM3CORE','APPLICATION_OWNER')
           AND   table_name = c_document_table
           AND   data_type  IN (nm3type.c_varchar, nm3type.c_number, nm3type.c_date)
          ORDER BY column_id;

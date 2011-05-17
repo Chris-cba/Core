@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE nm3user AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3user.pkh-arc   2.4   Oct 08 2010 16:55:42   Chris.Strettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3user.pkh-arc   2.5   May 17 2011 08:26:26   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3user.pkh  $
---       Date into PVCS   : $Date:   Oct 08 2010 16:55:42  $
---       Date fetched Out : $Modtime:   Oct 08 2010 16:47:50  $
---       Version          : $Revision:   2.4  $
+--       Date into PVCS   : $Date:   May 17 2011 08:26:26  $
+--       Date fetched Out : $Modtime:   May 05 2011 14:36:12  $
+--       Version          : $Revision:   2.5  $
 --       Based on SCCS version : 1.18
 -------------------------------------------------------------------------
 --   Author : Rob Coupe
@@ -19,10 +19,9 @@ CREATE OR REPLACE PACKAGE nm3user AS
 -----------------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
-  g_sccsid      CONSTANT  varchar2(2000) := '$Revision:   2.4  $';
+  g_sccsid      CONSTANT  varchar2(2000) := '$Revision:   2.5  $';
 --  g_sccsid is the SCCS ID for the package
 
-  g_user_id_tab nm3type.tab_number;
 --
 --</GLOBVAR>
 --
@@ -54,56 +53,14 @@ FUNCTION get_body_version RETURN varchar2;
 --
 -----------------------------------------------------------------------------
 --
---<PROC NAME="get_user_id">
-  FUNCTION  get_user_id RETURN number;
---</PROC>
---
------------------------------------------------------------------------------
---
---<PROC NAME="get_effective_date">
-  FUNCTION  get_effective_date RETURN date;
---</PROC>
---
------------------------------------------------------------------------------
---
 --<PROC NAME="set_user_date_mask">
   PROCEDURE set_user_date_mask ( p_mask IN varchar2);
 --</PROC>
 --
 -----------------------------------------------------------------------------
 --
---<PROC NAME="get_user_date_mask">
-  FUNCTION  get_user_date_mask RETURN varchar2;
---</PROC>
---
------------------------------------------------------------------------------
---
 --<PROC NAME="set_user_length_units">
   PROCEDURE set_user_length_units( p_unit_id IN number );
---</PROC>
---
------------------------------------------------------------------------------
---
---<PROC NAME="get_user_length_units">
-  FUNCTION  get_user_length_units RETURN number;
---</PROC>
---
------------------------------------------------------------------------------
---
---<PROC NAME="get_user_length_mask">
-  FUNCTION  get_user_length_mask  RETURN varchar2;
---</PROC>
---
------------------------------------------------------------------------------
---
---<PROC NAME="is_user_unrestricted">
-  FUNCTION  is_user_unrestricted RETURN boolean;
---</PROC>
---
------------------------------------------------------------------------------
---
---<PROC NAME="is_user_unrestricted_acc">
-  FUNCTION  is_user_unrestricted_acc RETURN boolean;
 --</PROC>
 --
 -----------------------------------------------------------------------------
@@ -189,7 +146,7 @@ PROCEDURE restricted_user_check ;
 --<PROC NAME="user_has_role">
 -- Returns TRUE if specified user has specified role.
 --
-FUNCTION user_has_role(pi_user IN hig_users.hus_username%TYPE DEFAULT USER
+FUNCTION user_has_role(pi_user IN hig_users.hus_username%TYPE DEFAULT Sys_Context('NM3_SECURITY_CTX','USERNAME')
                       ,pi_role IN hig_roles.hro_role%TYPE
                       ) RETURN boolean;
 --</PROC>
@@ -201,7 +158,7 @@ FUNCTION user_has_role(pi_user IN hig_users.hus_username%TYPE DEFAULT USER
 --
 FUNCTION get_hus (pi_hus_user_id IN hig_users.hus_user_id%TYPE) RETURN hig_users%ROWTYPE;
 --
-FUNCTION get_hus (pi_hus_username IN hig_users.hus_username%TYPE DEFAULT USER) RETURN hig_users%ROWTYPE;
+FUNCTION get_hus (pi_hus_username IN hig_users.hus_username%TYPE DEFAULT Sys_Context('NM3_SECURITY_CTX','USERNAME')) RETURN hig_users%ROWTYPE;
 --
 --</PROC>
 --
@@ -212,7 +169,7 @@ FUNCTION get_hus (pi_hus_username IN hig_users.hus_username%TYPE DEFAULT USER) R
 -- Returns TRUE if specified user has specified system privilege granted
 -- directly to them.
 --
-FUNCTION user_has_priv(pi_user IN hig_users.hus_username%TYPE DEFAULT USER
+FUNCTION user_has_priv(pi_user IN hig_users.hus_username%TYPE DEFAULT Sys_Context('NM3_SECURITY_CTX','USERNAME')
                       ,pi_priv IN dba_sys_privs.privilege%TYPE
                       ) RETURN boolean;
 --</PROC>
@@ -245,15 +202,6 @@ PROCEDURE unlock_account(pi_username IN hig_users.hus_username%TYPE
 --
 FUNCTION get_du(pi_username IN dba_users.username%TYPE
                ) RETURN dba_users%ROWTYPE;
---</PROC>
---
------------------------------------------------------------------------------
---
---<PROC NAME="get_preferred_lrm">
---
--- This function returns the specified preferred LRM
---
-FUNCTION get_preferred_lrm RETURN nm_group_types.ngt_group_type%TYPE;
 --</PROC>
 --
 -----------------------------------------------------------------------------
@@ -336,13 +284,6 @@ PROCEDURE set_user_def_inv_attr_set(pi_nias_id nm_inv_attribute_sets.nias_id%TYP
 --
 -----------------------------------------------------------------------------
 --
---<PROC NAME="get_user_def_inv_attr_set">
---
-FUNCTION get_user_def_inv_attr_set RETURN nm_inv_attribute_sets.nias_id%TYPE;
---</PROC>
---
------------------------------------------------------------------------------
---
 --<PROC NAME="copy_user">
 -- THis procedure will copy an existing user. It will NOT grant the roles associated
 --  with that user (although it will create the HIG_USER_ROLES records). This is because
@@ -374,9 +315,9 @@ PROCEDURE copy_user (pi_hus_user_id_old   IN     hig_users.hus_user_id%TYPE
 FUNCTION historic_mode RETURN boolean;
 --</PROC>
 --
-FUNCTION user_is_higowner(pi_username IN hig_users.hus_username%TYPE DEFAULT USER) RETURN BOOLEAN;
+FUNCTION user_is_higowner(pi_username IN hig_users.hus_username%TYPE DEFAULT Sys_Context('NM3_SECURITY_CTX','USERNAME')) RETURN BOOLEAN;
 
-FUNCTION user_is_higowner_yn(pi_username IN hig_users.hus_username%TYPE DEFAULT USER) RETURN VARCHAR2;
+FUNCTION user_is_higowner_yn(pi_username IN hig_users.hus_username%TYPE DEFAULT Sys_Context('NM3_SECURITY_CTX','USERNAME')) RETURN VARCHAR2;
 --
 -----------------------------------------------------------------------------
 --
@@ -407,23 +348,13 @@ RETURN VARCHAR2;
 --
 --<PRAGMA>
   PRAGMA RESTRICT_REFERENCES( get_version, wnds, wnps );
-  PRAGMA RESTRICT_REFERENCES( get_body_version, wnds, wnps );
-  PRAGMA RESTRICT_REFERENCES( get_effective_date, wnds, wnps);
-  PRAGMA RESTRICT_REFERENCES( get_user_length_units, wnds, wnps);
-  PRAGMA RESTRICT_REFERENCES( get_user_length_mask, wnds, wnps );
---*pragma restrict_references( instantiate_user_history, WNDS );
+  PRAGMA RESTRICT_REFERENCES( get_body_version, wnds, wnps );  
   PRAGMA RESTRICT_REFERENCES( get_history_rec, wnds, wnps );
-  PRAGMA RESTRICT_REFERENCES( get_user_id, wnds, wnps );
-  PRAGMA RESTRICT_REFERENCES( get_user_date_mask, wnds, wnps );
   PRAGMA RESTRICT_REFERENCES( convert_char_date, wnds, wnps );
-  PRAGMA RESTRICT_REFERENCES( is_user_unrestricted, wnds, wnps );
-  PRAGMA RESTRICT_REFERENCES( is_user_unrestricted_acc, wnds, wnps );
   PRAGMA RESTRICT_REFERENCES( get_public_user_details, wnds, wnps );
   PRAGMA RESTRICT_REFERENCES( user_has_role, wnds, wnps );
   PRAGMA RESTRICT_REFERENCES( user_has_priv, wnds, wnps );
   PRAGMA RESTRICT_REFERENCES( get_user_roi_details, wnds, wnps );
-  PRAGMA RESTRICT_REFERENCES( get_preferred_lrm, wnds, wnps );
-  PRAGMA RESTRICT_REFERENCES( get_user_def_inv_attr_set, wnds, wnps );
 --</PRAGMA>
 --
 -----------------------------------------------------------------------------

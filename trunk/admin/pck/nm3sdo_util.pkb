@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_util.pkb-arc   1.5   Nov 12 2010 15:50:42   Chris.Strettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_util.pkb-arc   1.6   May 17 2011 08:26:26   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3sdo_util.pkb  $
---       Date into PVCS   : $Date:   Nov 12 2010 15:50:42  $
---       Date fetched Out : $Modtime:   Nov 12 2010 15:40:12  $
---       Version          : $Revision:   1.5  $
+--       Date into PVCS   : $Date:   May 17 2011 08:26:26  $
+--       Date fetched Out : $Modtime:   Apr 01 2011 14:03:06  $
+--       Version          : $Revision:   1.6  $
 --       Based on SCCS version :
 -------------------------------------------------------------------------
 --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   1.5  $';
+  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   1.6  $';
 
   g_package_name CONSTANT varchar2(30) := 'nm3sdo_util';
 --
@@ -48,7 +48,7 @@ BEGIN
     WHERE ne_id = gdo_pk_id AND gdo_session_id = gis_session_id;
 
    BEGIN
-      NM3SDM.RESHAPE_ROUTE (l_ne, nm3user.get_effective_date, 'Y');
+      NM3SDM.RESHAPE_ROUTE (l_ne, To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY'), 'Y');
    END;
 END reshape_route;
 --
