@@ -26,11 +26,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/imf_net_network.vw-arc   3.0   Mar 10 2009 12:28:14   gjohnson  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/imf_net_network.vw-arc   3.1   May 17 2011 08:32:42   Steve.Cooper  $
 --       Module Name      : $Workfile:   imf_net_network.vw  $
---       Date into PVCS   : $Date:   Mar 10 2009 12:28:14  $
---       Date fetched Out : $Modtime:   Mar 10 2009 12:27:40  $
---       Version          : $Revision:   3.0  $
+--       Date into PVCS   : $Date:   May 17 2011 08:32:42  $
+--       Date fetched Out : $Modtime:   Mar 31 2011 11:02:36  $
+--       Version          : $Revision:   3.1  $
 -- All network elements with an ID, Unique Reference and Description and generic flexible attributes [date tracked]
 -------------------------------------------------------------------------
    ne.ne_id network_element_id,
@@ -61,11 +61,8 @@ AS
    FROM nm_elements_all ne, nm_admin_units_all nau
    WHERE ne.ne_admin_unit = nau.nau_admin_unit
          AND ( (ne_nt_type != 'NSGN'-- if not an NSGN element then no restriction on being the latest version of the element is required
-                AND ne_start_date <= (SELECT nm3context.get_effective_date
-                                      FROM DUAL)
-                AND NVL (ne_end_date, TO_DATE ('99991231', 'YYYYMMDD')) >
-                      (SELECT nm3context.get_effective_date
-                       FROM DUAL) -- only bring the element if it is 'live' on effective date
+                AND ne_start_date                                       <=  To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')                 
+                AND NVL (ne_end_date, TO_DATE ('99991231', 'YYYYMMDD')) >   To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                                  )
               OR (ne_nt_type = 'NSGN'
                   AND (ne_prefix IS NULL

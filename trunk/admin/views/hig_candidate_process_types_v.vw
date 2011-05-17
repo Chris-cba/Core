@@ -4,11 +4,11 @@ SELECT
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/hig_candidate_process_types_v.vw-arc   3.0   Mar 29 2010 17:14:52   gjohnson  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/hig_candidate_process_types_v.vw-arc   3.1   May 17 2011 08:32:42   Steve.Cooper  $
 --       Module Name      : $Workfile:   hig_candidate_process_types_v.vw  $
---       Date into PVCS   : $Date:   Mar 29 2010 17:14:52  $
---       Date fetched Out : $Modtime:   Mar 29 2010 17:14:14  $
---       Version          : $Revision:   3.0  $
+--       Date into PVCS   : $Date:   May 17 2011 08:32:42  $
+--       Date fetched Out : $Modtime:   Apr 04 2011 10:22:36  $
+--       Version          : $Revision:   3.1  $
 -------------------------------------------------------------------------
 --
     job_name
@@ -19,7 +19,7 @@ SELECT
       from hig_scheduling_frequencies
       where lower(hsfr_frequency) = lower(repeat_interval)) hsfr_frequency_id
 from dba_scheduler_jobs
-where owner = hig.get_application_owner
+where owner = Sys_Context('NM3CORE','APPLICATION_OWNER')
 and job_name not like 'PROCESS%'
 and job_type = 'PLSQL_BLOCK'
 and schedule_type = 'CALENDAR'

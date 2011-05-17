@@ -21,11 +21,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/imf_net_network_members.vw-arc   3.0   Mar 10 2009 12:28:14   gjohnson  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/imf_net_network_members.vw-arc   3.1   May 17 2011 08:32:42   Steve.Cooper  $
 --       Module Name      : $Workfile:   imf_net_network_members.vw  $
---       Date into PVCS   : $Date:   Mar 10 2009 12:28:14  $
---       Date fetched Out : $Modtime:   Mar 10 2009 12:27:40  $
---       Version          : $Revision:   3.0  $
+--       Date into PVCS   : $Date:   May 17 2011 08:32:42  $
+--       Date fetched Out : $Modtime:   Mar 31 2011 10:32:10  $
+--       Version          : $Revision:   3.1  $
 -- Parent/Child network element relationships [date tracked]
 -------------------------------------------------------------------------   
    p.network_element_id parent_element_id,
@@ -48,11 +48,8 @@ AS
    WHERE     nm_ne_id_in = p.network_element_id
          AND nm_ne_id_of = c.network_element_id
          AND nm_obj_type = p.group_type
-         AND nm_start_date <= (SELECT nm3context.get_effective_date
-                               FROM DUAL)
-         AND NVL (nm_end_date, TO_DATE ('99991231', 'YYYYMMDD')) >
-               (SELECT nm3context.get_effective_date
-                FROM DUAL) -- only bring the element if it is 'live' on effective date
+         AND nm_start_date                                        <=  To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
+         AND NVL (nm_end_date, TO_DATE ('99991231', 'YYYYMMDD'))  >   To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY') -- only bring the element if it is 'live' on effective date
 WITH READ ONLY
 /
 

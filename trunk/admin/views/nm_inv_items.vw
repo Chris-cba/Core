@@ -34,11 +34,11 @@ BEGIN
    append ('--');
    append ('--   PVCS Identifiers :-');
    append ('--');
-   append ('--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/views/nm_inv_items.vw-arc   2.2   Dec 05 2008 14:01:30   aedwards  $');
+   append ('--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/views/nm_inv_items.vw-arc   2.3   May 17 2011 08:32:42   Steve.Cooper  $');
    append ('--       Module Name      : $Workfile:   nm_inv_items.vw  $');
-   append ('--       Date into PVCS   : $Date:   Dec 05 2008 14:01:30  $');
-   append ('--       Date fetched Out : $Modtime:   Dec 05 2008 14:00:52  $');
-   append ('--       PVCS Version     : $Revision:   2.2  $');
+   append ('--       Date into PVCS   : $Date:   May 17 2011 08:32:42  $');
+   append ('--       Date fetched Out : $Modtime:   Mar 31 2011 12:04:26  $');
+   append ('--       PVCS Version     : $Revision:   2.3  $');
    append ('--       Based on SCCS version : 1.6');
    append ('--');
    append ('-----------------------------------------------------------------------------');
@@ -81,8 +81,8 @@ BEGIN
    append (', iit_num_attrib106, iit_num_attrib107, iit_num_attrib108, iit_num_attrib109, iit_num_attrib110');
    append (', iit_num_attrib111, iit_num_attrib112, iit_num_attrib113, iit_num_attrib114, iit_num_attrib115');
    append (' FROM  nm_inv_items_all');
-   append ('WHERE  iit_start_date <= (select nm3context.get_effective_date from dual)');
-   append (' AND   NVL(iit_end_date,TO_DATE('||CHR(39)||'99991231'||CHR(39)||','||CHR(39)||'YYYYMMDD'||CHR(39)||')) >  (select nm3context.get_effective_date from dual)');
+   append ('WHERE  iit_start_date <= To_Date(Sys_Context(''NM3CORE'',''EFFECTIVE_DATE''),''DD-MON-YYYY'')');
+   append (' AND   NVL(iit_end_date,TO_DATE('||CHR(39)||'99991231'||CHR(39)||','||CHR(39)||'YYYYMMDD'||CHR(39)||')) >  To_Date(Sys_Context(''NM3CORE'',''EFFECTIVE_DATE''),''DD-MON-YYYY'')');
 --
    OPEN  cs_enterprise_edn;
    FETCH cs_enterprise_edn INTO l_dummy;
@@ -97,7 +97,7 @@ BEGIN
       --
       append (' AND   EXISTS (SELECT 1');
       append ('                FROM  hig_users');
-      append ('               WHERE  hus_username     = USER');
+      append ('               WHERE  hus_username     = Sys_Context(''NM3_SECURITY_CTX'',''USERNAME'') ');
       append ('                AND   hus_unrestricted = '||CHR(39)||'Y'||CHR(39));
       append ('               UNION');
       append ('               SELECT 1');
@@ -106,7 +106,7 @@ BEGIN
       append ('                               FROM  NM_USER_AUS');
       append ('                                    ,NM_ADMIN_GROUPS');
       append ('                                    ,HIG_USERS');
-      append ('                              WHERE  HUS_USERNAME         = USER');
+      append ('                              WHERE  HUS_USERNAME         = Sys_Context(''NM3_SECURITY_CTX'',''USERNAME'') ');
       append ('                                AND  NUA_USER_ID          = HUS_USER_ID');
       append ('                               AND   NUA_ADMIN_UNIT       = NAG_PARENT_ADMIN_UNIT');
       append ('                               AND   NAG_CHILD_ADMIN_UNIT = iit_admin_unit');
@@ -117,7 +117,7 @@ BEGIN
       append ('                                    ,NM_INV_TYPE_ROLES');
       append ('                               WHERE ITR_INV_TYPE = iit_inv_type');
       append ('                                AND  ITR_HRO_ROLE = HUR_ROLE');
-      append ('                                AND  HUR_USERNAME = USER');
+      append ('                                AND  HUR_USERNAME = Sys_Context(''NM3_SECURITY_CTX'',''USERNAME'') ');
       append ('                             )');
       append ('              )');
    END IF;

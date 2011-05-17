@@ -4,11 +4,11 @@ SELECT
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/hig_process_type_users_v.vw-arc   3.0   Mar 29 2010 17:14:50   gjohnson  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/hig_process_type_users_v.vw-arc   3.1   May 17 2011 08:32:42   Steve.Cooper  $
 --       Module Name      : $Workfile:   hig_process_type_users_v.vw  $
---       Date into PVCS   : $Date:   Mar 29 2010 17:14:50  $
---       Date fetched Out : $Modtime:   Mar 29 2010 17:14:16  $
---       Version          : $Revision:   3.0  $
+--       Date into PVCS   : $Date:   May 17 2011 08:32:42  $
+--       Date fetched Out : $Modtime:   May 05 2011 15:25:40  $
+--       Version          : $Revision:   3.1  $
 -------------------------------------------------------------------------
        hpt_process_type_id
      , hus_name 
@@ -30,7 +30,7 @@ AND   (
                 )
        )         
       )          
-ORDER BY DECODE(hus_username, USER,1,2),hus_username, hpt_process_type_id
+ORDER BY DECODE(hus_username, Sys_Context('NM3_SECURITY_CTX','USERNAME'),1,2),hus_username, hpt_process_type_id
 /
 
 COMMENT ON TABLE hig_process_type_users_v IS 'Exor Process Framework view.  Process types which are visible to all users.'
