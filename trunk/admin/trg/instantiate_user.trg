@@ -15,6 +15,8 @@ begin
 -----------------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2001
 -----------------------------------------------------------------------------
+
+   nm3security.Set_User;
    nm3context.initialise_context;
    nm3user.instantiate_user;
 exception

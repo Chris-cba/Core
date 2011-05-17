@@ -105,7 +105,7 @@ BEGIN
 --
    IF :new.HUS_UNRESTRICTED != :old.HUS_UNRESTRICTED
     THEN
-      IF NOT nm3user.is_user_unrestricted then
+      IF NOT Sys_Context('NM3CORE','UNRESTRICTED_INVENTORY') = 'TRUE' then
          raise_application_error ( -20002, 'Insufficient Privileges to Update this Record');
       end if;
    end if;
