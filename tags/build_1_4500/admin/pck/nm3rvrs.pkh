@@ -1,0 +1,115 @@
+CREATE OR REPLACE PACKAGE nm3rvrs AS
+--<PACKAGE>
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)nm3rvrs.pkh	1.5 11/22/01
+--       Module Name      : nm3rvrs.pkh
+--       Date into SCCS   : 01/11/22 13:39:25
+--       Date fetched Out : 07/06/13 14:13:24
+--       SCCS Version     : 1.5
+--
+--
+--   Author : R.A. Coupe
+--
+--   Package to reverse a route
+--
+-----------------------------------------------------------------------------
+--	Copyright (c) exor corporation ltd, 2001
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+  g_sccsid      CONSTANT  varchar2(2000) := '"@(#)nm3rvrs.pkh	1.5 11/22/01"';
+--  g_sccsid is the SCCS ID for the package
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_G_RVRS_CIRCROUTE">
+-- This function returns the current state of the global variable g_rvrs_circroute
+FUNCTION get_g_rvrs_circroute RETURN varchar2;
+--</PROC>
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="reverse_xsp">
+-- function to return the reversal of the provided XSP for the given nw type and sub-class
+FUNCTION reverse_xsp (pi_nt_type IN nm_types.nt_type%TYPE,
+                      pi_sub_class  nm_type_subclass.nsc_sub_class%TYPE,
+					  pi_xsp nm_xsp.nwx_x_sect%TYPE,
+					  pi_error_flag varchar2 ) RETURN nm_xsp.nwx_x_sect%TYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="reverse_sub_class">
+-- function to return the element sub-class
+FUNCTION reverse_sub_class ( pi_nt_type IN nm_types.nt_type%TYPE,
+                             pi_sub_class  nm_type_subclass.nsc_sub_class%TYPE,
+                             pi_error_flag varchar2 ) RETURN nm_type_subclass.nsc_sub_class%TYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="reverse_length">
+-- function to return the length compliment of a position along an element of network
+FUNCTION reverse_length ( pi_ne_id IN nm_elements_all.ne_id%TYPE,
+                          pi_offset IN number ) RETURN number;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_iit_sub_class">
+-- function to get the sub-class of the segment that the inv is on
+FUNCTION get_iit_sub_class ( pi_iit_ne_id IN nm_inv_items.iit_ne_id%TYPE )
+      RETURN nm_type_subclass.nsc_sub_class%TYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="leg_reversal">
+-- procedure to reverse the leg number
+FUNCTION leg_reversal( pi_leg IN number ) RETURN number;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="reverse_route">
+-- procedure to reverse the whole route
+PROCEDURE reverse_route (pi_ne_id          IN nm_elements.ne_id%TYPE
+                        ,pi_effective_date IN DATE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
+                        );
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="gis_reverse_route">
+-- procedure to reverse the whole route from the GIS
+PROCEDURE gis_reverse_route (pi_ne_id          IN nm_elements.ne_id%TYPE
+                            ,pi_effective_date IN DATE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
+                            );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PRAGMA>
+   PRAGMA RESTRICT_REFERENCES (get_version, rnds, wnps, wnds);
+   PRAGMA RESTRICT_REFERENCES (get_body_version, rnds, wnps, wnds);
+   PRAGMA RESTRICT_REFERENCES (reverse_sub_class, wnds);
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+END nm3rvrs;
+/
