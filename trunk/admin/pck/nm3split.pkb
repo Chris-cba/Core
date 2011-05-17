@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3split IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3split.pkb-arc   2.12   Mar 04 2011 11:04:38   Ade.Edwards  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3split.pkb-arc   2.13   May 17 2011 15:12:48   Chris.Strettle  $
 --       Module Name      : $Workfile:   nm3split.pkb  $
---       Date into PVCS   : $Date:   Mar 04 2011 11:04:38  $
---       Date fetched Out : $Modtime:   Mar 04 2011 11:04:00  $
---       PVCS Version     : $Revision:   2.12  $
+--       Date into PVCS   : $Date:   May 17 2011 15:12:48  $
+--       Date fetched Out : $Modtime:   May 17 2011 15:08:16  $
+--       PVCS Version     : $Revision:   2.13  $
 --
 --
 --   Author : ITurnbull
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3split IS
 -- 03.06.08 PT added p_no_purpose parameter throughout where node is created.
 
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.12  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.13  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(2000) := 'nm3split';
@@ -1253,6 +1253,23 @@ BEGIN
                  ,p_neh_descr           => p_neh_descr --CWS 0108990 12/03/2010
                  );
 
+    -- CWS 0111024 Lateral Offsets Changes
+  IF NVL(hig.get_sysopt('XSPOFFSET'),'N') = 'Y'
+  THEN
+    EXECUTE IMMEDIATE 'BEGIN ' ||
+                      'xncc_herm_xsp.populate_herm_xsp( p_ne_id => :p_ne_id ' ||
+                                                     ', p_ne_id_new => :p_ne_id_1 ' ||
+                                                     ', p_effective_date => :p_effective_date ' ||
+                                                     '); ' ||
+                     'END;' USING p_ne_id, p_ne_id_1, p_effective_date;
+
+    EXECUTE IMMEDIATE 'BEGIN ' ||
+                      'xncc_herm_xsp.populate_herm_xsp( p_ne_id => :p_ne_id ' ||
+                                                     ', p_ne_id_new => :p_ne_id_2 ' ||
+                                                     ', p_effective_date => :p_effective_date ' ||
+                                                     '); ' || 
+                      'END;' USING p_ne_id, p_ne_id_2, p_effective_date;
+  END IF;
 --
 -- RAC - split the shapes
 -- AE - put changes in

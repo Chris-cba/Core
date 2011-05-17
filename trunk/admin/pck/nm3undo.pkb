@@ -4,11 +4,12 @@ IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3undo.pkb-arc   2.11   Jul 01 2010 12:27:42   cstrettle  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3undo.pkb-arc   2.12   May 17 2011 15:12:48   Chris.Strettle  $
 --       Module Name      : $Workfile:   nm3undo.pkb  $
---       Date into PVCS   : $Date:   Jul 01 2010 12:27:42  $
---       Date fetched Out : $Modtime:   Jul 01 2010 11:47:30  $
---       PVCS Version     : $Revision:   2.11  $
+--       Date into PVCS   : $Date:   May 17 2011 15:12:48  $
+--       Date fetched Out : $Modtime:   May 17 2011 15:08:48  $
+--       PVCS Version     : $Revision:   2.12  $
+--       Norfolk Specific Based on Main Branch revision : 2.11
 --
 --   Author : ITurnbull
 --
@@ -19,7 +20,7 @@ IS
 -- Copyright (c) exor corporation ltd, 2004
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '"$Revision:   2.11  $"';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := 'Norfolk Specific: ' || '"$Revision:   2.12  $"';
 --  g_body_sccsid is the SCCS ID for the package body
    g_package_name   CONSTANT VARCHAR2 (2000) := 'nm3undo';
 --
@@ -1020,10 +1021,6 @@ END undo_scheme;
          BEGIN
             error_loc := 6 ;
 
-            nm_debug.set_level(3);
-            nm_debug.debug_on;
-            nm_debug.debug('pi_ne_id = ' || pi_ne_id || ', pi_ne_id_1 = ' || pi_ne_id_1 || ', pi_ne_id_2 = ' || pi_ne_id_2);
-
             OPEN cs_nmh (pi_ne_id, pi_ne_id_1, pi_ne_id_2);
 
             FETCH cs_nmh
@@ -1095,7 +1092,7 @@ END undo_scheme;
          UPDATE NM_NODE_USAGES_ALL
             SET nnu_end_date = NULL
           WHERE nnu_ne_id = pi_ne_id;
-
+         --
          -- delete the history
          delete_element_history (pi_ne_id, c_split);
 
@@ -1189,13 +1186,11 @@ END undo_scheme;
          Nm3sdm.delete_route_shape (p_ne_id => pi_ne_id_2);
          error_loc := 29 ;
 
-         Nm_Debug.DEBUG ('Checking for AD data to unsplit');
          IF Nm3nwad.ad_data_exist (pi_ne_id)
          -- CWS 01/JUN/2010 0109668
          OR Nm3nwad.ad_data_exist (pi_ne_id_1)
          OR Nm3nwad.ad_data_exist (pi_ne_id_2)
          THEN
-            Nm_Debug.DEBUG ('Unsplitting - '||pi_ne_id_1||'-'||pi_ne_id_2||'-'||pi_ne_id);
             error_loc := 30 ;
             Nm3nwad.do_ad_unsplit (pi_new_ne_id1      => pi_ne_id_1,
                                    pi_new_ne_id2      => pi_ne_id_2,
@@ -1252,6 +1247,14 @@ END undo_scheme;
                              );
 
          error_loc := 43 ;
+         --CWS 0111024 Lateral Offsets
+         IF NVL(hig.get_sysopt('XSPOFFSET'),'N') = 'Y'
+         THEN
+           EXECUTE IMMEDIATE 'BEGIN xncc_herm_xsp.delete_herm_xsp(:l_ne_id_1); END;' USING l_ne_id_1;
+           EXECUTE IMMEDIATE 'BEGIN xncc_herm_xsp.delete_herm_xsp(:l_ne_id_2); END;' USING l_ne_id_2;
+           EXECUTE IMMEDIATE 'BEGIN xncc_herm_xsp.unclose_herm_xsp(:p_ne_id); END;' USING p_ne_id;
+         END IF;
+         --
          IF Nm3net.element_is_a_datum (pi_ne_id => p_ne_id)
          THEN
            error_loc := 44 ;
@@ -1648,7 +1651,14 @@ END undo_scheme;
                               pi_ne_id_new1      => v_ne_id,
                               pi_ne_id_new2      => NULL
                              );
-
+         --CWS 0111024 Lateral Offsets
+         IF NVL(hig.get_sysopt('XSPOFFSET'),'N') = 'Y'
+         THEN
+           EXECUTE IMMEDIATE 'BEGIN xncc_herm_xsp.delete_herm_xsp(:v_ne_id); END;' USING v_ne_id;
+           EXECUTE IMMEDIATE 'BEGIN xncc_herm_xsp.unclose_herm_xsp(:p_ne_id_1); END;' USING p_ne_id_1;
+           EXECUTE IMMEDIATE 'BEGIN xncc_herm_xsp.unclose_herm_xsp(:p_ne_id_2); END;' USING p_ne_id_2;
+         END IF;
+         --
          IF Nm3net.element_is_a_datum (pi_ne_id => v_ne_id)
          THEN
            error_loc := 143 ;
@@ -1796,33 +1806,39 @@ END undo_scheme;
                Nm3nwad.do_ad_unreplace (pi_old_ne_id => v_ne_id);
             END IF;
 
---            UPDATE NM_MEMBERS_ALL
---            SET nm_end_date = NULL
---            WHERE nm_ne_id_of = p_ne_id
---         AND nm_type = 'G'
---              AND TRUNC(nm_date_modified) = ( SELECT MAX(TRUNC(nm_date_modified))
---                                       FROM NM_MEMBERS_ALL
---                                       WHERE nm_ne_id_of = p_ne_id
---                                     );
---
---            -- unclose nm_members p_ne_id
---       -- inv items that are not  closed
---            UPDATE NM_MEMBERS_ALL
---            SET nm_end_date = NULL
---            WHERE nm_ne_id_of = p_ne_id
---         AND nm_type = 'I'
---         AND nm_ne_id_in IN ( SELECT iit_ne_id
---                              FROM NM_INV_ITEMS_ALL
---                         WHERE iit_end_date IS NULL
---                           AND iit_inv_type = nm_obj_type);
+          --            UPDATE NM_MEMBERS_ALL
+          --            SET nm_end_date = NULL
+          --            WHERE nm_ne_id_of = p_ne_id
+          --         AND nm_type = 'G'
+          --              AND TRUNC(nm_date_modified) = ( SELECT MAX(TRUNC(nm_date_modified))
+          --                                       FROM NM_MEMBERS_ALL
+          --                                       WHERE nm_ne_id_of = p_ne_id
+          --                                     );
+          --
+          --            -- unclose nm_members p_ne_id
+          --       -- inv items that are not  closed
+          --            UPDATE NM_MEMBERS_ALL
+          --            SET nm_end_date = NULL
+          --            WHERE nm_ne_id_of = p_ne_id
+          --         AND nm_type = 'I'
+          --         AND nm_ne_id_in IN ( SELECT iit_ne_id
+          --                              FROM NM_INV_ITEMS_ALL
+          --                         WHERE iit_end_date IS NULL
+          --                           AND iit_inv_type = nm_obj_type);
             -- delete the history
             delete_element_history (p_ne_id, c_replace);
-
+            --
             delete_element_history_for_new(pi_ne_id_new => v_ne_id);
-
+            -- CWS 0111024 lateral offsets
+            IF NVL(hig.get_sysopt('XSPOFFSET'),'N') = 'Y'
+            THEN
+              EXECUTE IMMEDIATE 'BEGIN xncc_herm_xsp.delete_herm_xsp(:v_ne_id); END;' USING v_ne_id;
+              EXECUTE IMMEDIATE 'BEGIN xncc_herm_xsp.unclose_herm_xsp(:p_ne_id); END;' USING p_ne_id;
+            END IF;
+            --
             -- delete nm_elements v_ne_id
             delete_element (v_ne_id);
-
+            --
             -- unendate the node_usages
             UPDATE NM_NODE_USAGES_ALL
                SET nnu_end_date = NULL

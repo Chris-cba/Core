@@ -2,11 +2,12 @@ CREATE OR REPLACE PACKAGE BODY nm3replace IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3replace.pkb-arc   2.3   Mar 15 2010 16:22:56   cstrettle  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3replace.pkb-arc   2.4   May 17 2011 15:12:48   Chris.Strettle  $
 --       Module Name      : $Workfile:   nm3replace.pkb  $
---       Date into PVCS   : $Date:   Mar 15 2010 16:22:56  $
---       Date fetched Out : $Modtime:   Mar 12 2010 17:37:16  $
---       PVCS Version     : $Revision:   2.3  $
+--       Date into PVCS   : $Date:   May 17 2011 15:12:48  $
+--       Date fetched Out : $Modtime:   May 17 2011 15:07:12  $
+--       PVCS Version     : $Revision:   2.4  $
+--       Norfolk Specific Based on Main Branch revision : 2.3
 --
 --
 --   Author : ITurnbull
@@ -17,7 +18,7 @@ CREATE OR REPLACE PACKAGE BODY nm3replace IS
 --	Copyright (c) exor corporation ltd, 2000
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.3  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := 'Norfolk Specific: ' || '"$Revision:   2.4  $"';
 --  g_body_sccsid is the SCCS ID for the package body
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3replace';
 ------------------------------------------------------------------------------------------------
@@ -234,6 +235,7 @@ END get_body_version;
          l_rec_neh.neh_old_ne_length  := l_orig_ne_length;
          l_rec_neh.neh_new_ne_length  := v_ne_length;
          l_rec_neh.neh_descr          := p_neh_descr; --CWS 0108990 12/03/2010
+         
          nm3nw_edit.ins_neh(l_rec_neh); --CWS 0108990 12/03/2010
       END;
    END;
@@ -600,9 +602,8 @@ END check_other_products;
                     ,pi_id                 => 3
                     ,pi_supplementary_info => v_err_text
                      );
-   END IF;															 
+   END IF;
 --
-
 --      if check_inv_items_replaceable( p_ne_id ) then
          create_new_element( p_ne_id
                             ,p_ne_id_new
@@ -628,6 +629,23 @@ END check_other_products;
                             ,p_ne_version_no
                             ,p_neh_descr --CWS 0108990 12/03/2010
                            );
+       -- CWS 0111024 lateral offset changes.
+      IF NVL(hig.get_sysopt('XSPOFFSET'),'N') = 'Y'
+      THEN
+           EXECUTE IMMEDIATE 'BEGIN ' ||
+                             'xncc_herm_xsp.populate_herm_xsp( p_ne_id          => :p_ne_id ' || 
+                                                            ', p_ne_id_new      => :p_ne_id_new ' ||
+                                                            ', p_effective_date => :p_effective_date ' ||
+                                                            '); ' || 
+                             'END;' USING p_ne_id, p_ne_id_new, p_effective_date;
+      END IF;
+   /* nm3sdo.change_affected_shapes (p_layer      => g_nth.nth_theme_id,
+                                   p_ne_id      => p_ne_id_new);*/
+       /*IF HIG.GET_SYSOPT(
+       EXECUTE IMMEDIATE 'xncc_herm_xsp.populate_herm_xsp( p_ne_id => p_ne_id 
+                                                         , p_ne_id_new => p_ne_id_new
+                                                         , p_effective_date => p_effective_date
+                                                         );'*/
 
        --RAC - Replicate the shape of the original element.
        --AE - added code
@@ -644,7 +662,7 @@ END check_other_products;
                              ,p_ne_id_new
                              ,p_effective_date
                             );
-
+ 
 	     replace_other_products ( p_ne_id
                                  ,p_ne_id_new
 	        					 ,p_effective_date
@@ -661,7 +679,8 @@ END check_other_products;
          end_date_element ( p_ne_id
                            ,p_effective_date
                           );
-                                 
+        
+        
      -- end if;
      -- Insert the stored NM_MEMBER_HISTORY records   
         nm3merge.ins_nmh;
