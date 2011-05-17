@@ -21,7 +21,7 @@ DECLARE
 BEGIN
 --
    IF DELETING
-    OR (UPDATING AND :NEW.nin_end_date = nm3user.get_effective_date)
+    OR (UPDATING AND :NEW.nin_end_date = To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY'))
     THEN
       nm3invval.pop_nm_inv_nw_child_chk_tab (:OLD.nin_nit_inv_code);
    END IF;

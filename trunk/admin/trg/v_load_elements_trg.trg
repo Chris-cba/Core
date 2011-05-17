@@ -34,7 +34,7 @@ DECLARE
 --
    FUNCTION create_point_node ( pi_no_node_name NM_NODES.no_node_name%TYPE
                                ,pi_nt_type      NM_TYPES.nt_type%TYPE
-                               ,pi_effective_date NM_NODES.no_start_date%TYPE DEFAULT nm3user.get_effective_date )
+                               ,pi_effective_date NM_NODES.no_start_date%TYPE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY') )
    RETURN NM_NODES.no_node_id%TYPE
    IS
       l_np_id      NM_POINTS.np_id%TYPE;
@@ -94,7 +94,7 @@ BEGIN
          CLOSE cs_node_exists;
          l_ne_rec.ne_no_start := create_point_node( pi_no_node_name   => :NEW.ne_no_start
                                                    ,pi_nt_type        => l_ne_rec.ne_nt_type
-                                                   ,pi_effective_date => NVL(:NEW.ne_start_date,nm3user.get_effective_date)
+                                                   ,pi_effective_date => NVL(:NEW.ne_start_date,To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY'))
                                                   );      
       END IF;
    
@@ -106,7 +106,7 @@ BEGIN
          CLOSE cs_node_exists;
          l_ne_rec.ne_no_end := create_point_node( pi_no_node_name   => :NEW.ne_no_end
                                                    ,pi_nt_type        => l_ne_rec.ne_nt_type
-                                                   ,pi_effective_date => NVL(:NEW.ne_start_date,nm3user.get_effective_date)
+                                                   ,pi_effective_date => NVL(:NEW.ne_start_date,To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY'))
                                                   );      
          
       END IF;

@@ -36,7 +36,6 @@ DECLARE
    l_ner_id             nm_errors.ner_id%TYPE;
    l_ner_appl           nm_errors.ner_appl%TYPE := nm3type.c_net;
    l_supplementary_info VARCHAR2(500) := 'NM_INV_ITEMS_ALL('||:new.iit_ne_id||')';
-   c_date_mask CONSTANT VARCHAR2(500) := nm3user.get_user_date_mask;
 --
    l_mode    VARCHAR2(30) := NULL;
 --
@@ -54,7 +53,7 @@ BEGIN
     AND l_end_date IS NOT NULL
     THEN
       l_ner_id             := 14;
-      l_supplementary_info := l_supplementary_info||TO_CHAR(l_start_date,c_date_mask)||' > '||TO_CHAR(l_end_date,c_date_mask);
+      l_supplementary_info := l_supplementary_info||TO_CHAR(l_start_date,Sys_Context('NM3CORE','USER_DATE_MASK'))||' > '||TO_CHAR(l_end_date,Sys_Context('NM3CORE','USER_DATE_MASK'));
       RAISE l_start_date_gt_end_date;
    END IF;
 --

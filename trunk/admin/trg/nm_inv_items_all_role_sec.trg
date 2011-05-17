@@ -6,11 +6,11 @@ DECLARE
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm_inv_items_all_role_sec.trg-arc   2.1   Aug 31 2007 17:14:56   malexander  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm_inv_items_all_role_sec.trg-arc   2.2   May 17 2011 08:32:02   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm_inv_items_all_role_sec.trg  $
---       Date into SCCS   : $Date:   Aug 31 2007 17:14:56  $
---       Date fetched Out : $Modtime:   Aug 31 2007 16:21:20  $
---       SCCS Version     : $Revision:   2.1  $
+--       Date into SCCS   : $Date:   May 17 2011 08:32:02  $
+--       Date fetched Out : $Modtime:   May 05 2011 15:10:24  $
+--       SCCS Version     : $Revision:   2.2  $
 --       Based on 
 --
 --      TRIGGER nm_inv_items_all_role_sec
@@ -30,7 +30,7 @@ BEGIN
   --New functionality to allow override
   If Not nm3inv.bypass_inv_items_all_trgs
   Then 
-    IF nm3user.is_user_unrestricted
+    IF Sys_Context('NM3CORE','UNRESTRICTED_INVENTORY') = 'TRUE'
     THEN
       RETURN;
     END IF;
@@ -42,7 +42,7 @@ BEGIN
        l_inv_type := :NEW.iit_inv_type;
     END IF;
 --
-    IF NVL(nm3inv.get_inv_mode_by_role(l_inv_type,USER),nm3type.c_nvl) != nm3type.c_normal
+    IF NVL(nm3inv.get_inv_mode_by_role(l_inv_type,Sys_Context('NM3_SECURITY_CTX','USERNAME')),nm3type.c_nvl) != nm3type.c_normal
     THEN
       RAISE_APPLICATION_ERROR(-20901,'You do not have permission via NM_INV_TYPE_ROLES to perform this action');
     END IF;

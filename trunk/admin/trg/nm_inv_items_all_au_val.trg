@@ -21,8 +21,6 @@ DECLARE
 -----------------------------------------------------------------------------
 --
 --
-   c_user CONSTANT user_users.username%TYPE := USER;
---
    l_inv_au_type   nm_au_types.nat_admin_type%TYPE;
    l_au_type       nm_au_types.nat_admin_type%TYPE;
 --
@@ -51,20 +49,20 @@ BEGIN
 --      raise_application_error(-20904, 'You may not update the admin unit');
 --   END IF;
 --
-   IF NOT nm3user.is_user_unrestricted
+   IF NOT Sys_Context('NM3CORE','UNRESTRICTED_INVENTORY') = 'TRUE'
     THEN
 --
 --    Only bother doing these checks if the user is restricted
 --
       IF    UPDATING
-       AND  nm3ausec.get_au_mode( c_user, :OLD.iit_admin_unit ) != nm3type.c_normal
+       AND  nm3ausec.get_au_mode( Sys_Context('NM3_SECURITY_CTX','USERNAME'), :OLD.iit_admin_unit ) != nm3type.c_normal
        THEN
          hig.raise_ner (pi_appl               => nm3type.c_net
                        ,pi_id                 => 240
                        ,pi_supplementary_info => nm3ausec.get_unit_code(:OLD.iit_admin_unit)
                        );
 --         raise_application_error(-20902, 'You may not change this record');
-      ELSIF nm3ausec.get_au_mode( c_user, :NEW.iit_admin_unit ) != nm3type.c_normal
+      ELSIF nm3ausec.get_au_mode( Sys_Context('NM3_SECURITY_CTX','USERNAME'), :NEW.iit_admin_unit ) != nm3type.c_normal
        THEN
          hig.raise_ner (pi_appl               => nm3type.c_net
                        ,pi_id                 => 241

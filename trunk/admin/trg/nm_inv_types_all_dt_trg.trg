@@ -15,11 +15,11 @@ DECLARE
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/trg/nm_inv_types_all_dt_trg.trg-arc   2.3   Oct 22 2010 13:45:52   Chris.Strettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/trg/nm_inv_types_all_dt_trg.trg-arc   2.4   May 17 2011 08:32:02   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm_inv_types_all_dt_trg.trg  $
---       Date into PVCS   : $Date:   Oct 22 2010 13:45:52  $
---       Date fetched Out : $Modtime:   Oct 22 2010 13:26:12  $
---       Version          : $Revision:   2.3  $
+--       Date into PVCS   : $Date:   May 17 2011 08:32:02  $
+--       Date fetched Out : $Modtime:   Apr 01 2011 10:16:32  $
+--       Version          : $Revision:   2.4  $
 --
 --
 -----------------------------------------------------------------------------
@@ -131,7 +131,6 @@ BEGIN
          FUNCTION check_table_exists (p_table_name VARCHAR2)
          RETURN BOOLEAN
          IS
-         l_current_user VARCHAR2(100) := HIG.GET_APPLICATION_OWNER;
          l_dummy        VARCHAR2(1);
          l_return_val   BOOLEAN;
          --
@@ -139,12 +138,12 @@ BEGIN
             SELECT 'X'
               FROM all_tables
              WHERE table_name  = c_table_name
-               AND owner = l_current_user
+               AND owner = Sys_Context('NM3CORE','APPLICATION_OWNER')
              UNION
             SELECT 'X'
               FROM all_views
              WHERE view_name  = c_table_name
-               AND owner = l_current_user;
+               AND owner = Sys_Context('NM3CORE','APPLICATION_OWNER');
          BEGIN
          --
            OPEN  cs_ft_tab_check (p_table_name);
@@ -161,7 +160,6 @@ BEGIN
           -- Checks do not take into account
           /*  l_current_user VARCHAR2(100) := nm3get.get_hus(pi_hus_user_id => 
                                             nm3context.get_context(nm3context.get_namespace,'USER_ID')).hus_username;*/
-             l_current_user VARCHAR2(100) := HIG.GET_APPLICATION_OWNER;
             --
             CURSOR cs_ft_col_check (c_table_name VARCHAR2
                                    ,c_col_name   VARCHAR2
@@ -170,7 +168,7 @@ BEGIN
               FROM all_tab_columns
              WHERE table_name  = c_table_name
                AND column_name = c_col_name
-               AND owner = l_current_user;
+               AND owner = Sys_Context('NM3CORE','APPLICATION_OWNER');
             l_data_type all_tab_columns.data_type%TYPE;
          BEGIN
          

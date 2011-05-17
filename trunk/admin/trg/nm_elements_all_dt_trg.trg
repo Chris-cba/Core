@@ -7,11 +7,11 @@ DECLARE
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm_elements_all_dt_trg.trg-arc   2.1   Aug 31 2007 16:52:02   malexander  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm_elements_all_dt_trg.trg-arc   2.2   May 17 2011 08:32:02   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm_elements_all_dt_trg.trg  $
---       Date into SCCS   : $Date:   Aug 31 2007 16:52:02  $
---       Date fetched Out : $Modtime:   Aug 31 2007 15:55:18  $
---       SCCS Version     : $Revision:   2.1  $
+--       Date into SCCS   : $Date:   May 17 2011 08:32:02  $
+--       Date fetched Out : $Modtime:   Apr 01 2011 14:52:16  $
+--       SCCS Version     : $Revision:   2.2  $
 --       Based on 
 --
 -----------------------------------------------------------------------------
@@ -96,7 +96,6 @@ DECLARE
 --
    l_dummy PLS_INTEGER;
    l_found BOOLEAN;
-   c_date_mask CONSTANT VARCHAR2(500) := nm3user.get_user_date_mask;
 --
 BEGIN
 --
@@ -115,7 +114,7 @@ BEGIN
      AND l_end_date IS NOT NULL
      THEN
        l_ner_id             := 14;
-       l_supplementary_info := l_supplementary_info||TO_CHAR(l_start_date,c_date_mask)||' > '||TO_CHAR(l_end_date,c_date_mask);
+       l_supplementary_info := l_supplementary_info||TO_CHAR(l_start_date,Sys_Context('NM3CORE','USER_DATE_MASK'))||' > '||TO_CHAR(l_end_date,Sys_Context('NM3CORE','USER_DATE_MASK'));
        RAISE l_start_date_gt_end_date;
     END IF;
  --
@@ -242,13 +241,13 @@ BEGIN
      THEN
        hig.raise_ner (pi_appl               => l_ner_appl
                      ,pi_id                 => l_ner_id
-                     ,pi_supplementary_info => l_supplementary_info||' '||TO_CHAR(l_start_date,c_date_mask)||' > '||TO_CHAR(l_parent_start_date,c_date_mask)
+                     ,pi_supplementary_info => l_supplementary_info||' '||TO_CHAR(l_start_date,Sys_Context('NM3CORE','USER_DATE_MASK'))||' > '||TO_CHAR(l_parent_start_date,Sys_Context('NM3CORE','USER_DATE_MASK'))
                      );
     WHEN l_end_date_out_of_range
      THEN
        hig.raise_ner (pi_appl               => l_ner_appl
                      ,pi_id                 => l_ner_id
-                     ,pi_supplementary_info => l_supplementary_info||' '||NVL(TO_CHAR(l_end_date,c_date_mask),'Null')||' > '||TO_CHAR(l_parent_end_date,c_date_mask)
+                     ,pi_supplementary_info => l_supplementary_info||' '||NVL(TO_CHAR(l_end_date,Sys_Context('NM3CORE','USER_DATE_MASK')),'Null')||' > '||TO_CHAR(l_parent_end_date,Sys_Context('NM3CORE','USER_DATE_MASK'))
                      );
  --
 END nm_elements_all_dt_trg;

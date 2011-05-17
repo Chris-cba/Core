@@ -25,7 +25,7 @@ DECLARE
 --
 BEGIN
 --
-   IF nm3user.is_user_unrestricted
+   IF Sys_Context('NM3CORE','UNRESTRICTED_INVENTORY') = 'TRUE'
     THEN
       RETURN;
    END IF;
@@ -37,7 +37,7 @@ BEGIN
       l_inv_type := :NEW.nit_inv_type;
    END IF;
 --
-   IF NVL(nm3inv.get_inv_mode_by_role(l_inv_type,USER),nm3type.c_nvl) != nm3type.c_normal
+   IF NVL(nm3inv.get_inv_mode_by_role(l_inv_type,Sys_Context('NM3_SECURITY_CTX','USERNAME')),nm3type.c_nvl) != nm3type.c_normal
     THEN
       RAISE_APPLICATION_ERROR(-20901,'You do not have permission via NM_INV_TYPE_ROLES to perform this action');
    END IF;
