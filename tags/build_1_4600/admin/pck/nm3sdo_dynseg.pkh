@@ -1,0 +1,95 @@
+CREATE OR REPLACE PACKAGE nm3sdo_dynseg
+AS
+--<PACKAGE>
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_dynseg.pkh-arc   3.4   May 18 2011 10:59:06   Ade.Edwards  $
+--       Module Name      : $Workfile:   nm3sdo_dynseg.pkh  $
+--       Date into PVCS   : $Date:   May 18 2011 10:59:06  $
+--       Date fetched Out : $Modtime:   Feb 01 2011 14:13:34  $
+--       Version          : $Revision:   3.4  $
+-------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+
+  -----------
+  --constants
+  -----------
+  --g_sccsid is the SCCS ID for the package
+  g_sccsid      CONSTANT VARCHAR2(2000) := '$Revision:   3.4  $';
+  g_use_offset  BOOLEAN := FALSE;
+  g_base_tol    NUMBER := 0.05; --NM3SDO.GET_TABLE_DIMINFO('NM_NSG_ESU_SHAPES_TABLE', 'SHAPE')(1).sdo_tolerance;
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="CREATE_INV_DATA">
+PROCEDURE create_inv_data (p_table_name    IN VARCHAR2,
+                           p_inv_type      IN VARCHAR2,
+                           p_seq_name      IN VARCHAR2,
+                           p_pnt_or_cont   IN VARCHAR2,
+                           p_job_id        IN NUMBER);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_SHAPE">
+FUNCTION get_shape (p_layer   IN NUMBER,
+                    p_in      IN NUMBER,
+                    p_of      IN NUMBER,
+                    p_begin   IN NUMBER,
+                    p_end     IN NUMBER,
+                    p_xsp     IN VARCHAR2 DEFAULT NULL)
+  RETURN MDSYS.sdo_geometry;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_OFFSET_SHAPE">
+FUNCTION get_offset_shape (p_iit_ne_id   IN NUMBER,
+                           p_ne_id_of    IN NUMBER,
+                           p_begin_mp    IN NUMBER,
+                           p_end_mp      IN NUMBER)
+  RETURN MDSYS.sdo_geometry;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="UPDATE_XSP">
+PROCEDURE update_xsp (p_iit_ne_id        IN nm_inv_items.iit_ne_id%TYPE,
+                      p_iit_inv_type     IN nm_inv_items.iit_inv_type%TYPE,
+                      p_x_sect           IN nm_inv_items.iit_x_sect%TYPE,
+                      p_effective_date   IN DATE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="SET_OFFSET_FLAG_ON">
+PROCEDURE set_offset_flag_on;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="SET_OFFSET_FLAG_OFF">
+PROCEDURE set_offset_flag_off;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+END nm3sdo_dynseg;
+/
