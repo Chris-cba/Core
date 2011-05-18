@@ -5,23 +5,24 @@ AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.39   Mar 14 2011 12:06:32   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.40   May 18 2011 10:05:06   Chris.Strettle  $
 --       Module Name      : $Workfile:   nm3sdm.pkb  $
---       Date into PVCS   : $Date:   Mar 14 2011 12:06:32  $
---       Date fetched Out : $Modtime:   Mar 14 2011 12:05:06  $
---       PVCS Version     : $Revision:   2.39  $
+--       Date into PVCS   : $Date:   May 18 2011 10:05:06  $
+--       Date fetched Out : $Modtime:   May 12 2011 11:14:00  $
+--       PVCS Version     : $Revision:   2.40  $
+--       Norfolk Specific Based on Main Branch revision : 2.37
 --
 --   Author : R.A. Coupe
 --
 --   Spatial Data Manager specific package body
 --
 -----------------------------------------------------------------------------
---  Copyright (c) exor corporation ltd, 2002
+--  Copyright (c) exor corporation ltd, 2011
 -----------------------------------------------------------------------------
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT VARCHAR2 (2000) := '"$Revision:   2.39  $"';
+   g_body_sccsid     CONSTANT VARCHAR2 (2000) := 'Norfolk Specific: ' || '"$Revision:   2.40  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT VARCHAR2 (30)   := 'NM3SDM';
@@ -2956,6 +2957,8 @@ PROCEDURE make_nt_spatial_layer
    l_srid               NUMBER;
 
    l_usgm               user_sdo_geom_metadata%ROWTYPE;
+   
+   l_themes    int_array := NM3ARRAY.INIT_INT_ARRAY;
 
    BEGIN
   -- AE check to make sure user is unrestricted
@@ -3040,6 +3043,8 @@ PROCEDURE make_nt_spatial_layer
                                                       || '_TAB'
                             );
       l_base_table_theme := l_theme_id;
+    
+      l_themes.ia(1) := l_theme_id;
 
 ---------------------------------------------------------------
 -- Create surrogate key sequence if needed
@@ -3066,29 +3071,8 @@ PROCEDURE make_nt_spatial_layer
                              p_base_table_nth      => l_base_table_theme
                             );
 
----------------------------------------------------------------
--- Populate the SDO table and create (clone) the SDO metadata
--- for table and date tracked view
---   (   NM_NIT_<ASSET_TYPE>_SDO )
---   ( V_NM_NIT_<ASSET_TYPE>_SDO )
----------------------------------------------------------------
+      l_themes := l_themes.add_element( l_theme_id );
 
-
-      IF pi_create_flag = 'TRUE'
-      THEN
-         Nm3sdo.create_inv_data (p_table_name      => l_tab,
-                                 p_inv_type        => pi_nit_inv_type,
-                                 p_seq_name        => l_inv_seq,
-         p_pnt_or_cont     => l_nit.nit_pnt_or_cont,
-         p_job_id          => p_job_id
-                                        );
-
-      END IF;
-
----------------------------------------------------------------
--- Table needs a spatial index
----------------------------------------------------------------
-      create_inv_spatial_idx (pi_nit_inv_type, l_tab);
 ---------------------------------------------------------------
 -- Need a join view between spatial table history view and Inv view
 ---------------------------------------------------------------
@@ -3127,8 +3111,31 @@ PROCEDURE make_nt_spatial_layer
                                 p_pk_column           => 'IIT_NE_ID',
                                 p_base_table_nth      => l_base_table_theme
                                );
-      END IF;
 
+                 l_themes := l_themes.add_element( l_theme_id );
+                 
+      END IF;
+---------------------------------------------------------------
+-- Populate the SDO table and create (clone) the SDO metadata
+-- for table and date tracked view
+--   (   NM_NIT_<ASSET_TYPE>_SDO )
+--   ( V_NM_NIT_<ASSET_TYPE>_SDO )
+---------------------------------------------------------------
+
+      IF pi_create_flag = 'TRUE'
+      THEN
+         Nm3sdo.create_inv_data (p_table_name      => l_tab,
+                                 p_inv_type        => pi_nit_inv_type,
+                                 p_seq_name        => l_inv_seq,
+         p_pnt_or_cont     => l_nit.nit_pnt_or_cont,
+         p_job_id          => p_job_id
+                                        );
+
+      END IF;
+---------------------------------------------------------------
+-- Table needs a spatial index
+---------------------------------------------------------------
+      create_inv_spatial_idx (pi_nit_inv_type, l_tab);
 ---------------------------------------------------------------
 -- Analyze spatial table
 ---------------------------------------------------------------
@@ -3143,6 +3150,16 @@ PROCEDURE make_nt_spatial_layer
         THEN
           RAISE e_no_analyse_privs;
       END;
+
+    /*  IF NM3SDO_DYNSEG.G_USE_OFFSET then
+        update nm_themes_all
+        set nth_xsp_column = 'IIT_X_SECT'
+        where nth_theme_id in ( select column_value from table ( l_themes.ia ) );
+        
+        NM3SDO_DYNSEG.SET_OFFSET_FLAG_OFF;
+        
+      END IF;*/
+    
       --
       Nm_Debug.proc_end (g_package_name, 'make_ona_inv_spatial_layer');
    --
@@ -4882,7 +4899,7 @@ end;
       CURSOR c_inv_tab (c_inv_type nm_inv_types.nit_inv_type%TYPE,
                         c_ne_id    nm_elements.ne_id%TYPE
                         )  IS
-         SELECT nth_feature_table, nth_feature_pk_column, nth_feature_fk_column, nbth_base_theme
+         SELECT nth_feature_table, nth_feature_pk_column, nth_feature_fk_column, nbth_base_theme, nth_xsp_column
          FROM NM_THEMES_ALL, NM_INV_THEMES, NM_BASE_THEMES, NM_NW_THEMES, nm_elements, NM_LINEAR_TYPES
          WHERE nth_theme_id = nith_nth_theme_id
          AND nth_theme_id = nbth_theme_id
@@ -4903,7 +4920,7 @@ end;
 --    ' and '||to_char(p_nm_end_mp)|| ' on '||nm3net.get_ne_unique( p_nm_ne_id_of ));
       FOR irec IN c_inv_tab (p_nm_obj_type, p_nm_ne_id_of )
       LOOP
-          upd_string :=
+         upd_string :=
                'update '
             || irec.nth_feature_table
             || ' set geoloc = :newshape, '
@@ -4932,7 +4949,15 @@ end;
                                          p_nm_end_mp
                                         );
          END IF;
+         
+         -- CWS Lateral Offset change.
+         if irec.nth_xsp_column is not null
+         and NVL(hig.get_sysopt('XSPOFFSET'),'N') = 'Y'-- check prod opt  
+         then
 
+           l_geom := nm3sdo_dynseg.get_shape( irec.nbth_base_theme, p_nm_ne_id_in, p_nm_ne_id_of, p_new_begin_mp, p_nm_end_mp );
+
+         end if;
          EXECUTE IMMEDIATE upd_string
                      USING l_geom,
                            p_new_begin_mp,
@@ -5017,11 +5042,11 @@ end;
             || ' and end_date is null';
            l_geom :=
             sdo_lrs.convert_to_std_geom( Nm3sdo.get_shape_from_nm (irec.nbth_base_theme,
-                                      p_nm_ne_id_in,
-                                      p_nm_ne_id_of,
-                                      p_new_begin_mp,
-                                      p_nm_end_mp
-                                     ));
+                                        p_nm_ne_id_in,
+                                        p_nm_ne_id_of,
+                                        p_new_begin_mp,
+                                        p_nm_end_mp
+                                       ));
            EXECUTE IMMEDIATE upd_string
                      USING l_geom,
                            p_new_begin_mp,
@@ -5352,8 +5377,8 @@ end;
       CURSOR c_inv_tab (c_inv_type nm_inv_types.nit_inv_type%TYPE,
                         c_ne_id    nm_elements.ne_id%TYPE)
       IS
-         SELECT nth_theme_id, nth_feature_table, nth_feature_pk_column,
-                nth_feature_fk_column, nbth_base_theme
+         SELECT nth_theme_id, nth_feature_table, nth_feature_pk_column
+                nth_feature_fk_column, nbth_base_theme, nth_xsp_column
            FROM NM_THEMES_ALL, NM_INV_THEMES, NM_BASE_THEMES, NM_NW_THEMES, nm_elements, NM_LINEAR_TYPES
           WHERE nth_theme_id = nith_nth_theme_id
             AND nth_theme_id = nbth_theme_id
@@ -5402,6 +5427,15 @@ end;
                                            );
             END IF;
 
+            -- CWS Lateral Offset change
+            IF irec.nth_xsp_column IS NOT NULL 
+            AND NVL(hig.get_sysopt('XSPOFFSET'),'N') = 'Y'-- check prod opt
+            THEN
+
+               l_geom := nm3sdo_dynseg.get_shape( irec.nbth_base_theme, p_nm_ne_id_in, p_nm_ne_id_of, p_nm_begin_mp, p_nm_end_mp );
+           
+            END IF;
+
             IF l_geom IS NOT NULL
             THEN
                EXECUTE IMMEDIATE ins_string
@@ -5440,6 +5474,18 @@ end;
                                             p_nm_begin_mp,
                                             p_nm_end_mp
                                            );
+            END IF;
+
+            -- CWS Lateral Offset Change
+            IF irec.nth_xsp_column IS NOT NULL 
+            AND NVL(hig.get_sysopt('XSPOFFSET'),'N') = 'Y'-- check prod opt  
+            THEN
+               IF l_nit.nit_pnt_or_cont = 'P' 
+               THEN
+                 l_geom := sdo_lrs.convert_to_std_geom(nm3sdo_dynseg.get_shape( irec.nbth_base_theme, p_nm_ne_id_in, p_nm_ne_id_of, p_nm_begin_mp, p_nm_end_mp ));
+               ELSE
+                 l_geom := nm3sdo_dynseg.get_shape( irec.nbth_base_theme, p_nm_ne_id_in, p_nm_ne_id_of, p_nm_begin_mp, p_nm_end_mp );
+               END IF;
             END IF;
 
             IF l_geom IS NOT NULL
@@ -7613,11 +7659,11 @@ end;
    */
    --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.39   Mar 14 2011 12:06:32   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.40   May 18 2011 10:05:06   Chris.Strettle  $
 --       Module Name      : $Workfile:   nm3sdm.pkb  $
---       Date into PVCS   : $Date:   Mar 14 2011 12:06:32  $
---       Date fetched Out : $Modtime:   Mar 14 2011 12:05:06  $
---       PVCS Version     : $Revision:   2.39  $
+--       Date into PVCS   : $Date:   May 18 2011 10:05:06  $
+--       Date fetched Out : $Modtime:   May 12 2011 11:14:00  $
+--       PVCS Version     : $Revision:   2.40  $
 
       append ('--   PVCS Identifiers :-');
       append ('--');
