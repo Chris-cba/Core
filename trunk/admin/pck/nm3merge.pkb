@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm3merge IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3merge.pkb-arc   2.10   May 17 2011 15:12:48   Chris.Strettle  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3merge.pkb-arc   2.11   May 18 2011 09:24:24   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3merge.pkb  $
---       Date into PVCS   : $Date:   May 17 2011 15:12:48  $
---       Date fetched Out : $Modtime:   May 17 2011 15:09:30  $
---       PVCS Version     : $Revision:   2.10  $
+--       Date into PVCS   : $Date:   May 18 2011 09:24:24  $
+--       Date fetched Out : $Modtime:   May 18 2011 08:49:24  $
+--       PVCS Version     : $Revision:   2.11  $
 --       Norfolk Specific Based on Main Branch revision : 2.9
 --
 --   Author : ITurnbull
@@ -17,7 +17,7 @@ CREATE OR REPLACE PACKAGE BODY nm3merge IS
 --   Copyright (c) exor corporation ltd, 2000
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := 'Norfolk Specific: ' || '"$Revision:   2.10  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := 'Norfolk Specific: ' || '"$Revision:   2.11  $"';
 --  g_body_sccsid is the SCCS ID for the package body
    g_package_name    CONSTANT  varchar2(30)   := 'nm3merge';
 --
@@ -323,7 +323,7 @@ END audit_element_history;
 PROCEDURE merge_elements (p_ne_id_1               IN     nm_elements.ne_id%TYPE
                          ,p_ne_id_2               IN     nm_elements.ne_id%TYPE
                          ,p_ne_id_new             IN OUT nm_elements.ne_id%TYPE
-                         ,p_effective_date        IN     date                               DEFAULT nm3user.get_effective_date
+                         ,p_effective_date        IN     date                               DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                          ,p_merge_at_node         IN     nm_elements.ne_no_start%TYPE       DEFAULT NULL
                          ,p_ne_unique_new         IN     nm_elements.ne_unique%TYPE         DEFAULT NULL
                          ,p_ne_type_new           IN     nm_elements.ne_type%TYPE           DEFAULT NULL
@@ -862,7 +862,7 @@ END check_other_products;
 PROCEDURE do_merge (p_ne_id_1           IN     nm_elements.ne_id%TYPE
                    ,p_ne_id_2           IN     nm_elements.ne_id%TYPE
                    ,p_ne_id_new         IN OUT nm_elements.ne_id%TYPE
-                   ,p_effective_date    IN     date                                DEFAULT nm3user.get_effective_date
+                   ,p_effective_date    IN     date                                DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                    ,p_merge_at_node     IN     nm_elements.ne_no_start%TYPE
                    ,p_ne_unique         IN     nm_elements.ne_unique%TYPE          DEFAULT NULL
                    ,p_ne_type           IN     nm_elements.ne_type%TYPE            DEFAULT NULL
@@ -1071,7 +1071,7 @@ END do_merge;
 PROCEDURE do_geo_merge (p_ne_id_1           IN nm_elements.ne_id%TYPE
                        ,p_ne_id_2           IN nm_elements.ne_id%TYPE
                        ,p_ne_id_new         IN nm_elements.ne_id%TYPE
-                       ,p_effective_date    IN date                               DEFAULT nm3user.get_effective_date
+                       ,p_effective_date    IN date                               DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                        ,p_merge_at_node     IN nm_elements.ne_no_start%TYPE
                        ,p_ne_unique         IN nm_elements.ne_unique%TYPE         DEFAULT NULL
                        ,p_ne_type           IN nm_elements.ne_type%TYPE           DEFAULT NULL
@@ -2189,7 +2189,7 @@ PROCEDURE merge_group_elements (pi_route_ne_rec_1        IN     nm_elements%ROWT
                                ,po_route_ne_id_new       IN OUT nm_elements.ne_id%TYPE
                                ,pi_length_1              in     nm_elements.ne_length%type
                                ,pi_length_2              in     nm_elements.ne_length%type
-                               ,pi_effective_date        IN     DATE                               DEFAULT nm3user.get_effective_date
+                               ,pi_effective_date        IN     DATE                               DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                                ,pi_ne_unique_new         IN     nm_elements.ne_unique%TYPE         DEFAULT NULL
                                ,pi_ne_owner_new          IN     nm_elements.ne_owner%TYPE          DEFAULT NULL
                                ,pi_ne_name_1_new         IN     nm_elements.ne_name_1%TYPE         DEFAULT NULL
@@ -2480,7 +2480,7 @@ END merge_group_memberships;
 PROCEDURE do_merge_group (pi_route_ne_id_1     IN     nm_elements.ne_id%TYPE
                          ,pi_route_ne_id_2     IN     nm_elements.ne_id%TYPE
                          ,po_route_ne_id_new   IN OUT nm_elements.ne_id%TYPE
-                         ,pi_effective_date    IN     DATE                               DEFAULT nm3user.get_effective_date
+                         ,pi_effective_date    IN     DATE                               DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                          ,pi_ne_unique         IN     nm_elements.ne_unique%TYPE         DEFAULT NULL
                          ,pi_ne_owner          IN     nm_elements.ne_owner%TYPE          DEFAULT NULL
                          ,pi_ne_name_1         IN     nm_elements.ne_name_1%TYPE         DEFAULT NULL
@@ -2635,7 +2635,7 @@ END do_merge_group;
 --
 PROCEDURE do_merge_datum_or_group (pi_ne_id_1           IN     nm_elements.ne_id%TYPE
                                   ,pi_ne_id_2           IN     nm_elements.ne_id%TYPE
-                                  ,pi_effective_date    IN     date                               DEFAULT nm3user.get_effective_date
+                                  ,pi_effective_date    IN     date                               DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                                   ,pi_merge_at_node     IN     nm_elements.ne_no_start%TYPE
                                   ,pi_ne_unique         IN     nm_elements.ne_unique%TYPE         DEFAULT NULL
                                   ,pi_ne_type           IN     nm_elements.ne_type%TYPE           DEFAULT NULL
