@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 --
 ---   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.56   Apr 20 2011 15:42:16   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.57   May 18 2011 09:56:12   Chris.Strettle  $
 --       Module Name      : $Workfile:   nm3sdo.pkb  $
---       Date into PVCS   : $Date:   Apr 20 2011 15:42:16  $
---       Date fetched Out : $Modtime:   Apr 20 2011 15:23:34  $
---       PVCS Version     : $Revision:   2.56  $
+--       Date into PVCS   : $Date:   May 18 2011 09:56:12  $
+--       Date fetched Out : $Modtime:   May 10 2011 10:53:02  $
+--       PVCS Version     : $Revision:   2.57  $
 --       Based on
 
 --
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 -- Copyright (c) RAC
 -----------------------------------------------------------------------------
 
-   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.56  $"';
+   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.57  $"';
    g_package_name    CONSTANT VARCHAR2 (30)  := 'NM3SDO';
    g_batch_size      INTEGER                 := NVL( TO_NUMBER(Hig.get_sysopt('SDOBATSIZE')), 10);
    g_clip_type       VARCHAR2(30)            := NVL(Hig.get_sysopt('SDOCLIPTYP'),'SDO');
@@ -1448,8 +1448,6 @@ BEGIN
 RETURN get_projection_to_nearest( p_layer, p_pt_geom.sdo_point.X,  p_pt_geom.sdo_point.Y);
 
 END;
-
-
 --
 --------------------------------------------------------------------------------------------------------------------
 --
@@ -2837,231 +2835,254 @@ END;
 BEGIN
 
 --  Nm_Debug.debug_on;
-
-  IF l_nit.nit_table_name IS NULL THEN
-
-     cur_string1 :=  ' select ptr( rownum, m.nm_ne_id_in), ptr( rownum, m.nm_ne_id_of), nm_placement( m.nm_ne_id_of, m.nm_begin_mp, m.nm_end_mp, 0), m.nm_start_date, nm_end_date '||
-                        '  from nm_members_all m where nm_type = '||''''||'I'||''''||' and nm_obj_type = '||''''||l_nit.nit_inv_type||'''';
+  IF NM3SDO_DYNSEG.G_USE_OFFSET
+  AND NVL(hig.get_sysopt('XSPOFFSET'),'N') = 'Y'
+  THEN
+     NM3SDO_DYNSEG.CREATE_INV_DATA( p_table_name => p_table_name
+                                   ,p_inv_type      => p_inv_type
+                                   ,p_seq_name      => p_seq_name
+                                   ,p_pnt_or_cont   => p_pnt_or_cont
+                                   ,p_job_id        => p_job_id );
+  --
+    update nm_themes_all
+    set nth_xsp_column = 'IIT_X_SECT'
+    where nth_theme_id in (SELECT nth_theme_id 
+                             FROM nm_themes_all
+                            WHERE nth_feature_table = p_table_name
+                        UNION ALL
+                           SELECT b.nth_theme_id 
+                             FROM nm_themes_all a, nm_themes_all b
+                            WHERE a.nth_feature_table = p_table_name
+                              AND b.nth_base_table_theme = a.nth_theme_id);
+  --
+    NM3SDO_DYNSEG.SET_OFFSET_FLAG_OFF;
+  --
   ELSE
+    --
+    IF NVL(hig.get_sysopt('XSPOFFSET'),'N') = 'Y'
+    THEN
+      UPDATE nm_themes_all
+      SET nth_xsp_column = NULL
+      WHERE nth_theme_id in (SELECT nth_theme_id 
+                               FROM nm_themes_all
+                              WHERE nth_feature_table = p_table_name
+                          UNION ALL
+                             SELECT b.nth_theme_id 
+                               FROM nm_themes_all a, nm_themes_all b
+                              WHERE a.nth_feature_table = p_table_name
+                                AND b.nth_base_table_theme = a.nth_theme_id);
+    END IF;
+    --
+    IF l_nit.nit_table_name IS NULL THEN
 
-     cur_string1 :=  ' select ptr( rownum, a.'||l_nit.nit_foreign_pk_column||' ), ptr( rownum, a.'|| l_nit.nit_lr_ne_column_name||
-                      '), nm_placement( '||l_nit.nit_lr_ne_column_name||
-      ', '||l_nit.nit_lr_st_chain||
-      ', '||NVL(l_nit.nit_lr_end_chain,l_nit.nit_lr_st_chain)||', 0), trunc(sysdate), null '||
-                        '  from '||l_nit.nit_table_name||' a ';
-  END IF;
+       cur_string1 :=  ' select ptr( rownum, m.nm_ne_id_in), ptr( rownum, m.nm_ne_id_of), nm_placement( m.nm_ne_id_of, m.nm_begin_mp, m.nm_end_mp, 0), m.nm_start_date, nm_end_date '||
+                          '  from nm_members_all m where nm_type = '||''''||'I'||''''||' and nm_obj_type = '||''''||l_nit.nit_inv_type||'''';
+    ELSE
 
-  ins_string := 'insert into '||p_table_name||
-                ' ( objectid, ne_id, ne_id_of, nm_begin_mp, nm_end_mp, start_date, end_date, geoloc ) '||
-                '  values ( :l_objectid, :lne, :l_ne_id_of, :l_begin_mp, :l_end_mp, :start_date, :end_date, :lgeom )';
+       cur_string1 :=  ' select ptr( rownum, a.'||l_nit.nit_foreign_pk_column||' ), ptr( rownum, a.'|| l_nit.nit_lr_ne_column_name||
+                        '), nm_placement( '||l_nit.nit_lr_ne_column_name||
+        ', '||l_nit.nit_lr_st_chain||
+        ', '||NVL(l_nit.nit_lr_end_chain,l_nit.nit_lr_st_chain)||', 0), trunc(sysdate), null '||
+                          '  from '||l_nit.nit_table_name||' a ';
+    END IF;
 
-  cur_string2 := ' select '||p_seq_name||'.nextval from nm_members';
+    ins_string := 'insert into '||p_table_name||
+                  ' ( objectid, ne_id, ne_id_of, nm_begin_mp, nm_end_mp, start_date, end_date, geoloc ) '||
+                  '  values ( :l_objectid, :lne, :l_ne_id_of, :l_begin_mp, :l_end_mp, :start_date, :end_date, :lgeom )';
 
--- Nm_Debug.DEBUG(cur_string1);
-  OPEN ref_cur FOR cur_string1;
+    cur_string2 := ' select '||p_seq_name||'.nextval from nm_members';
 
-  FETCH ref_cur BULK COLLECT INTO  v_it.pa, v_ne.pa, v_pl.npa_placement_array, l_date_tab, l_end_date_tab LIMIT l_limit;
+  -- Nm_Debug.DEBUG(cur_string1);
+    OPEN ref_cur FOR cur_string1;
 
---nm_debug.debug( 'Fetched batch'||' count = '||to_char( v_ne.pa.last ));
+    FETCH ref_cur BULK COLLECT INTO  v_it.pa, v_ne.pa, v_pl.npa_placement_array, l_date_tab, l_end_date_tab LIMIT l_limit;
 
-  WHILE v_it.pa.LAST IS NOT NULL AND v_it.pa.LAST > 0 LOOP
+  --nm_debug.debug( 'Fetched batch'||' count = '||to_char( v_ne.pa.last ));
 
-    l_temp := v_it.pa.LAST;
+    WHILE v_it.pa.LAST IS NOT NULL AND v_it.pa.LAST > 0 LOOP
 
--- nm_debug.debug('count = '||to_char(l_temp));
+      l_temp := v_it.pa.LAST;
 
-/*
-    for j in 1..v_it.pa.last loop
+  -- nm_debug.debug('count = '||to_char(l_temp));
 
-   nm_debug.debug(to_char(v_it.pa(j).ptr_value)||','||to_char(v_ne.pa(j).ptr_value));
+  /*
+      for j in 1..v_it.pa.last loop
 
- end loop;
-*/
---  nm_debug.debug('Retrieve distinct ne');
+     nm_debug.debug(to_char(v_it.pa(j).ptr_value)||','||to_char(v_ne.pa(j).ptr_value));
 
--- l_pt := v_ne.get_distinct_ptr;
+   end loop;
+  */
+  --  nm_debug.debug('Retrieve distinct ne');
 
- l_pt := get_distinct_ptr(v_ne);
+  -- l_pt := v_ne.get_distinct_ptr;
 
+   l_pt := get_distinct_ptr(v_ne);
 
-    OPEN ref_cur2 FOR cur_string2;
 
- FETCH ref_cur2 BULK COLLECT INTO v_sq.ia LIMIT v_it.pa.LAST;
+      OPEN ref_cur2 FOR cur_string2;
 
- CLOSE ref_cur2;
+   FETCH ref_cur2 BULK COLLECT INTO v_sq.ia LIMIT v_it.pa.LAST;
 
---  nm_debug.debug('Distinct ne_id');
+   CLOSE ref_cur2;
 
-/*
-    for j in 1..l_pt.pa.last loop
+  --  nm_debug.debug('Distinct ne_id');
 
-      nm_debug.debug( to_char( l_pt.pa(j).ptr_id )||','||to_char( l_pt.pa(j).ptr_value ));
+  /*
+      for j in 1..l_pt.pa.last loop
 
-    end loop;
-*/
+        nm_debug.debug( to_char( l_pt.pa(j).ptr_id )||','||to_char( l_pt.pa(j).ptr_value ));
 
---  nm_debug.debug('Done - now get themes and lengths');
+      end loop;
+  */
 
- set_theme_and_length( l_pt, l_th, l_len );
+  --  nm_debug.debug('Done - now get themes and lengths');
 
---  nm_debug.debug('Done - now get distinct themes');
+   set_theme_and_length( l_pt, l_th, l_len );
 
-/*
+  --  nm_debug.debug('Done - now get distinct themes');
 
-    insert into rob_dbug(p1,p2,p3,p4)
- values ( v_it, v_ne, l_pt, l_len );
+  /*
 
-*/
+      insert into rob_dbug(p1,p2,p3,p4)
+   values ( v_it, v_ne, l_pt, l_len );
 
---  l_th_id := l_th.get_distinct_ptr;
-    l_th_id := get_distinct_ptr(l_th);
+  */
 
---  nm_debug.debug('Done - now loop over each base theme - in this batch there are '||to_char( l_th_id.pa.last ));
+  --  l_th_id := l_th.get_distinct_ptr;
+      l_th_id := get_distinct_ptr(l_th);
 
-    IF NOT l_th_id.Is_Empty  THEN
+  --  nm_debug.debug('Done - now loop over each base theme - in this batch there are '||to_char( l_th_id.pa.last ));
 
-      FOR i IN 1..l_th_id.pa.LAST LOOP
+      IF NOT l_th_id.Is_Empty  THEN
 
---     nm_debug.debug('Distinct theme '||to_char( l_th_id.pa(i).ptr_id)||' = '||to_char( l_th_id.pa(i).ptr_value) );
+        FOR i IN 1..l_th_id.pa.LAST LOOP
 
---      nm_debug.debug('Get the shapes of the distinct ne records');
+  --     nm_debug.debug('Distinct theme '||to_char( l_th_id.pa(i).ptr_id)||' = '||to_char( l_th_id.pa(i).ptr_value) );
 
-     l_ge := Get_Ne_Shapes ( l_pt, l_th_id.pa(i).ptr_value );
+  --      nm_debug.debug('Get the shapes of the distinct ne records');
 
-        IF l_ge.nga.LAST > 0 THEN
+       l_ge := Get_Ne_Shapes ( l_pt, l_th_id.pa(i).ptr_value );
 
---        nm_debug.debug('WE have the geometries - if none here then do nothing - count = '||to_char(l_ge.nga.last)||' value = '||to_char( l_ge.nga(l_ge.nga.last).ng_ne_id ) );
+          IF l_ge.nga.LAST > 0 THEN
 
+  --        nm_debug.debug('WE have the geometries - if none here then do nothing - count = '||to_char(l_ge.nga.last)||' value = '||to_char( l_ge.nga(l_ge.nga.last).ng_ne_id ) );
 
-       l_usgm := Nm3sdo.get_theme_metadata( l_th_id.pa(i).ptr_value );
 
---        we now have an array of geometries representing the shapes of the elements from the given theme
---        for each of the inventory in the main driving arrays, dyn-seg each if the element has got a shape.
+         l_usgm := Nm3sdo.get_theme_metadata( l_th_id.pa(i).ptr_value );
 
---        nm_debug.debug('Done - now get the dynsegged shapes for theme '||to_char(l_th_id.pa(i).ptr_value)||' - j is going from 1 to '||to_char( l_temp));
+  --        we now have an array of geometries representing the shapes of the elements from the given theme
+  --        for each of the inventory in the main driving arrays, dyn-seg each if the element has got a shape.
 
-         FOR j IN 1..l_temp LOOP
+  --        nm_debug.debug('Done - now get the dynsegged shapes for theme '||to_char(l_th_id.pa(i).ptr_value)||' - j is going from 1 to '||to_char( l_temp));
 
-            BEGIN
+           FOR j IN 1..l_temp LOOP
 
---            nm_debug.debug('Lookup '||to_char(v_ne.pa(j).ptr_value));
+              BEGIN
 
---           l_p := l_pt.get_id( v_ne.pa(j).ptr_value );
-           l_p := get_id( l_pt, v_ne.pa(j).ptr_value );
+  --            nm_debug.debug('Lookup '||to_char(v_ne.pa(j).ptr_value));
 
-              l_t := get_idx_from_id(l_th,l_p);
+  --           l_p := l_pt.get_id( v_ne.pa(j).ptr_value );
+             l_p := get_id( l_pt, v_ne.pa(j).ptr_value );
 
-              IF l_t IS NULL OR l_t < 0 THEN
+                l_t := get_idx_from_id(l_th,l_p);
 
-                NULL; -- there is no theme shape - ignore this
+                IF l_t IS NULL OR l_t < 0 THEN
 
-              ELSE
+                  NULL; -- there is no theme shape - ignore this
 
---              ensure that the element in question is the correct theme
+                ELSE
 
---              nm_debug.debug(to_char(l_th.pa(get_idx_from_id(l_th,l_p)).ptr_value)||' compared to '||to_char(l_th_id.pa(i).ptr_value));
+  --              ensure that the element in question is the correct theme
 
-          IF l_th.pa(get_idx_from_id(l_th,l_p)).ptr_value = l_th_id.pa(i).ptr_value THEN
+  --              nm_debug.debug(to_char(l_th.pa(get_idx_from_id(l_th,l_p)).ptr_value)||' compared to '||to_char(l_th_id.pa(i).ptr_value));
 
---            if l_th.pa(l_p).ptr_value = l_th_id.pa(i).ptr_value then
+            IF l_th.pa(get_idx_from_id(l_th,l_p)).ptr_value = l_th_id.pa(i).ptr_value THEN
 
---             l_l_p := l_len.get_idx_from_id( l_p );
-             l_l_p := get_idx_from_id(l_len, l_p );
+  --            if l_th.pa(l_p).ptr_value = l_th_id.pa(i).ptr_value then
 
-                  IF l_ge.nga.LAST IS NOT NULL THEN
+  --             l_l_p := l_len.get_idx_from_id( l_p );
+               l_l_p := get_idx_from_id(l_len, l_p );
 
---              l_g_p := l_ge.get_idx ( l_p );
-              l_g_p := get_idx ( l_ge, l_p );
+                    IF l_ge.nga.LAST IS NOT NULL THEN
 
-                  ELSE
+  --              l_g_p := l_ge.get_idx ( l_p );
+                l_g_p := get_idx ( l_ge, l_p );
 
-              l_g_p := 0;
+                    ELSE
 
-            END IF;
+                l_g_p := 0;
 
-              IF l_g_p > 0 THEN
+              END IF;
 
---               nm_debug.debug('ptr for '||to_char(j)||' = '||to_char(l_p)||', '||to_char(l_l_p)||', '||to_char(l_g_p));
+                IF l_g_p > 0 THEN
 
---                 nm_debug.debug( 'I = '||to_char( v_it.pa(j).ptr_value)||' E = '||to_char( v_ne.pa(j).ptr_value)||
---                              ' idx = '||to_char(l_p)||' idxlup = '||to_char(l_pt.pa(l_p).ptr_value));
+  --               nm_debug.debug('ptr for '||to_char(j)||' = '||to_char(l_p)||', '||to_char(l_l_p)||', '||to_char(l_g_p));
 
---                  nm_debug.debug( 'Geometry type = '||to_char( l_ge.nga(l_g_p).ng_geometry.sdo_gtype ));
+  --                 nm_debug.debug( 'I = '||to_char( v_it.pa(j).ptr_value)||' E = '||to_char( v_ne.pa(j).ptr_value)||
+  --                              ' idx = '||to_char(l_p)||' idxlup = '||to_char(l_pt.pa(l_p).ptr_value));
 
-                    l_g_len := sdo_lrs.geom_segment_end_measure( l_ge.nga(l_g_p).ng_geometry );
+  --                  nm_debug.debug( 'Geometry type = '||to_char( l_ge.nga(l_g_p).ng_geometry.sdo_gtype ));
 
-                    IF l_g_len != l_len.pa(l_l_p).ptr_value THEN
+                      l_g_len := sdo_lrs.geom_segment_end_measure( l_ge.nga(l_g_p).ng_geometry );
 
-                IF p_job_id IS NULL THEN
+                      IF l_g_len != l_len.pa(l_l_p).ptr_value THEN
 
-                        Nm_Debug.DEBUG( 'mismatch length I = '||TO_CHAR( v_it.pa(j).ptr_value )||' e = '||TO_CHAR(v_ne.pa(j).ptr_value)||
-                                     ' shape len = '||TO_CHAR(l_g_len)||' and elen = '||TO_CHAR(l_len.pa(l_l_p).ptr_value));
-
-                      ELSE
-
-                  add_dyn_seg_exception( 297, p_job_id, v_it.pa(j).ptr_value, v_ne.pa(j).ptr_value, l_g_len, l_len.pa(l_l_p).ptr_value );
-
-                      END IF;
-
-                    ELSIF v_pl.npa_placement_array(j).pl_start < 0 OR
-                          v_pl.npa_placement_array(j).pl_end > l_len.pa(l_l_p).ptr_value THEN
-
-                IF p_job_id IS NULL THEN
-
-                   Nm_Debug.DEBUG('from '||TO_CHAR(v_pl.npa_placement_array(j).pl_start)||' to '||
-                                  TO_CHAR(v_pl.npa_placement_array(j).pl_end)||' l = '||TO_CHAR(l_g_len));
-                      ELSE
-
-                  add_dyn_seg_exception( 298, p_job_id, v_it.pa(j).ptr_value, v_ne.pa(j).ptr_value, l_g_len, l_len.pa(l_l_p).ptr_value,
-                                    v_pl.npa_placement_array(j).pl_start, v_pl.npa_placement_array(j).pl_end );
-
-                  END IF;
-
-                    ELSIF p_pnt_or_cont = 'C' and v_pl.npa_placement_array(j).pl_start >= v_pl.npa_placement_array(j).pl_end THEN
-
-                IF p_job_id IS NULL THEN
-
-                   Nm_Debug.DEBUG('from '||TO_CHAR(v_pl.npa_placement_array(j).pl_start)||' to '||
-                                  TO_CHAR(v_pl.npa_placement_array(j).pl_end)||' l = '||TO_CHAR(l_g_len));
-                      ELSE
-
-                  add_dyn_seg_exception( 299, p_job_id, v_it.pa(j).ptr_value, v_ne.pa(j).ptr_value, l_g_len, l_len.pa(l_l_p).ptr_value,
-                                    v_pl.npa_placement_array(j).pl_start, v_pl.npa_placement_array(j).pl_end, 'Point in Linear Feature Set');
-
-                  END IF;
-
-                    ELSE --lengths should be OK - go and get the shape
-
---                l_geom := l_ge.nga(l_g_p).ng_geometry;
-
-                      l_time1 := DBMS_UTILITY.GET_TIME;
-
-                      BEGIN
-
-                     IF p_pnt_or_cont = 'C' THEN
-
-                          l_geom :=  sdo_lrs.Clip_Geom_segment( l_ge.nga(l_g_p).ng_geometry,
-                                                        l_usgm.diminfo,
-                                                        v_pl.npa_placement_array(j).pl_start,
-                                                        v_pl.npa_placement_array(j).pl_end );
-
-                        ELSE
-
-                          l_geom :=  sdo_lrs.locate_pt( l_ge.nga(l_g_p).ng_geometry,
-                                        l_usgm.diminfo,
-                                  v_pl.npa_placement_array(j).pl_start );
-
+                        IF p_job_id IS NOT NULL THEN
+                        --
+                          add_dyn_seg_exception( 297, p_job_id, v_it.pa(j).ptr_value, v_ne.pa(j).ptr_value, l_g_len, l_len.pa(l_l_p).ptr_value );
+                        --
                         END IF;
 
-                      EXCEPTION
-                  WHEN OTHERS THEN
+                      ELSIF v_pl.npa_placement_array(j).pl_start < 0 OR
+                            v_pl.npa_placement_array(j).pl_end > l_len.pa(l_l_p).ptr_value THEN
+                      --
+                        IF p_job_id IS NOT NULL THEN
+                        --
+                          add_dyn_seg_exception( 298, p_job_id, v_it.pa(j).ptr_value, v_ne.pa(j).ptr_value, l_g_len, l_len.pa(l_l_p).ptr_value,
+                                            v_pl.npa_placement_array(j).pl_start, v_pl.npa_placement_array(j).pl_end );
+                        --
+                        END IF;
+                      --
+                      ELSIF p_pnt_or_cont = 'C' and v_pl.npa_placement_array(j).pl_start >= v_pl.npa_placement_array(j).pl_end THEN
+
+                        IF p_job_id IS NOT NULL THEN
+
+                          add_dyn_seg_exception( 299, p_job_id, v_it.pa(j).ptr_value, v_ne.pa(j).ptr_value, l_g_len, l_len.pa(l_l_p).ptr_value,
+                                            v_pl.npa_placement_array(j).pl_start, v_pl.npa_placement_array(j).pl_end, 'Point in Linear Feature Set');
+                          END IF;
+
+                      ELSE --lengths should be OK - go and get the shape
+
+  --                l_geom := l_ge.nga(l_g_p).ng_geometry;
+
+                        l_time1 := DBMS_UTILITY.GET_TIME;
+
+                        BEGIN
+
+                          IF p_pnt_or_cont = 'C' THEN
+
+                            l_geom :=  sdo_lrs.Clip_Geom_segment( l_ge.nga(l_g_p).ng_geometry,
+                                                          l_usgm.diminfo,
+                                                          v_pl.npa_placement_array(j).pl_start,
+                                                          v_pl.npa_placement_array(j).pl_end );
+
+                          ELSE
+
+                            l_geom :=  sdo_lrs.locate_pt( l_ge.nga(l_g_p).ng_geometry,
+                                          l_usgm.diminfo,
+                                    v_pl.npa_placement_array(j).pl_start );
+
+                          END IF;
+
+                        EXCEPTION
+                        WHEN OTHERS THEN
                           IF p_job_id IS NULL THEN
                             Hig.raise_ner(pi_appl                => Nm3type.c_hig
                                          ,pi_id                 => 282
                                          ,pi_sqlcode            => -20001
-                     ,pi_supplementary_info => TO_CHAR(  v_ne.pa(j).ptr_value )||' from '||
-                                                    TO_CHAR(v_pl.npa_placement_array(j).pl_start)||' to '||
-                                                 TO_CHAR(v_pl.npa_placement_array(j).pl_end)
+                                         ,pi_supplementary_info => TO_CHAR(  v_ne.pa(j).ptr_value )||' from '||
+                                                        TO_CHAR(v_pl.npa_placement_array(j).pl_start)||' to '||
+                                                        TO_CHAR(v_pl.npa_placement_array(j).pl_end)
                                          );
                           ELSE
 
@@ -3070,71 +3091,66 @@ BEGIN
                                                      v_pl.npa_placement_array(j).pl_end, SQLERRM );
                           END IF;
 
---                 RAISE_APPLICATION_ERROR(-20001, 'Problem with '||to_char(  v_ne.pa(j).ptr_value )||' from '||
---                     to_char(v_pl.npa_placement_array(j).pl_start)||' to '||
---                  to_char(v_pl.npa_placement_array(j).pl_end));
-                END;
+                        --                 RAISE_APPLICATION_ERROR(-20001, 'Problem with '||to_char(  v_ne.pa(j).ptr_value )||' from '||
+                        --                     to_char(v_pl.npa_placement_array(j).pl_start)||' to '||
+                        --                  to_char(v_pl.npa_placement_array(j).pl_end));
+                        END;
 
-                      l_time2 := DBMS_UTILITY.GET_TIME - l_time1;
+                        l_time2 := DBMS_UTILITY.GET_TIME - l_time1;
 
-                      l_time1 := DBMS_UTILITY.GET_TIME;
+                        l_time1 := DBMS_UTILITY.GET_TIME;
 
-                      IF p_pnt_or_cont = 'C' THEN
-                        l_geom.sdo_gtype := 3302;
-                ELSE
-                  l_geom := get_2d_pt( l_geom );
-                END IF;
+                        IF p_pnt_or_cont = 'C' THEN
+                          l_geom.sdo_gtype := 3302;
+                        ELSE
+                          l_geom := get_2d_pt( l_geom );
+                        END IF;
 
-                      EXECUTE IMMEDIATE ins_string USING v_sq.ia(j),
-                                                 v_it.pa(j).ptr_value,
-                             v_ne.pa(j).ptr_value,
-                       v_pl.npa_placement_array(j).pl_start,
-                                                    v_pl.npa_placement_array(j).pl_end,
-                      l_date_tab(j),
-                      l_end_date_tab(j),
-                      l_geom;
+                        EXECUTE IMMEDIATE ins_string USING v_sq.ia(j),
+                                                   v_it.pa(j).ptr_value,
+                               v_ne.pa(j).ptr_value,
+                         v_pl.npa_placement_array(j).pl_start,
+                                                      v_pl.npa_placement_array(j).pl_end,
+                        l_date_tab(j),
+                        l_end_date_tab(j),
+                        l_geom;
 
-                      l_time3 := DBMS_UTILITY.GET_TIME - l_time1;
+                        l_time3 := DBMS_UTILITY.GET_TIME - l_time1;
 
-/*
-
-                    insert into rob_test
-                values ( v_pl.npa_placement_array(j).pl_ne_id, l_time2, v_pl.npa_placement_array(j).pl_start,
-               v_pl.npa_placement_array(j).pl_end, l_time3 );
-
-*/
-                      COMMIT;
+                        COMMIT;
+                      END IF;
                     END IF;
                   END IF;
+  --              nm_debug.debug('Done - loop over next id');
+
                 END IF;
---              nm_debug.debug('Done - loop over next id');
 
-              END IF;
+              EXCEPTION
+                WHEN OTHERS THEN NULL; -- there is no theme to represent the network - so no chance of clipping.
+              END;
 
-            EXCEPTION
-              WHEN OTHERS THEN NULL; -- there is no theme to represent the network - so no chance of clipping.
-            END;
+            END LOOP; -- use another item
 
-          END LOOP; -- use another item
-
-        END IF;
+          END IF;
 
 
---      nm_debug.debug('Done - do it over the next theme ');
+  --      nm_debug.debug('Done - do it over the next theme ');
 
-      END LOOP; -- next theme
+        END LOOP; -- next theme
 
-    END IF;
+      END IF;
 
-    FETCH ref_cur BULK COLLECT INTO v_it.pa, v_ne.pa, v_pl.npa_placement_array, l_date_tab, l_end_date_tab LIMIT l_limit;
+      FETCH ref_cur BULK COLLECT INTO v_it.pa, v_ne.pa, v_pl.npa_placement_array, l_date_tab, l_end_date_tab LIMIT l_limit;
 
---  nm_debug.debug('Next batch - go back to top of loop');
+    --  nm_debug.debug('Next batch - go back to top of loop');
 
-  END LOOP; --over all fetched buffers
+    END LOOP; --over all fetched buffers
 
---nm_debug.debug( 'Fetched '||to_char(ic)||' batch'||' count = '||to_char( v_ne.ia.last ));
+    --nm_debug.debug( 'Fetched '||to_char(ic)||' batch'||' count = '||to_char( v_ne.ia.last ));
 
-  CLOSE ref_cur;
+    CLOSE ref_cur;
+  
+  END IF;
 
 END;
 
@@ -5845,6 +5861,8 @@ CURSOR c1( c_nth_id IN NUMBER ) IS
 
 -- AE
 -- Task 0108674 - Add MDSYS prefix
+-- NOTE: this will not compile in TOAD this this a TOAD bug not an issue with the package
+-- Execute it in SQL*PLUS to get it to compile.
 dummy  mdsys.sdo_geom_metadata_table%ROWTYPE; -- assumes synonym exists
 
 retval user_sdo_geom_metadata%ROWTYPE;
@@ -7132,7 +7150,7 @@ END;
 PROCEDURE Change_Affected_Shapes (p_layer IN NUMBER, p_ne_id IN nm_elements.ne_id%TYPE ) IS
 
 CURSOR c_themes ( c_layer IN NUMBER ) IS
-     SELECT nth.nth_theme_id, nth.nth_feature_table, nat_gty_group_type objtype, 2 dim_setting, 'G' g_or_i
+     SELECT nth.nth_theme_id, nth.nth_feature_table, nat_gty_group_type objtype, 2 dim_setting, 'G' g_or_i, nth_xsp_column, nth_sequence_name
      FROM NM_THEMES_ALL nth, NM_AREA_THEMES, NM_AREA_TYPES, NM_BASE_THEMES
     WHERE nbth_base_theme = c_layer
    AND nbth_theme_id = nth_theme_id
@@ -7141,7 +7159,7 @@ CURSOR c_themes ( c_layer IN NUMBER ) IS
       AND nat_id = nath_nat_id
    UNION
    SELECT nth.nth_theme_id, nth.nth_feature_table, nith_nit_id objtype,
-          DECODE (nit_pnt_or_cont, 'P', 2, 'C', 3) dim_setting, 'I' g_or_i
+          DECODE (nit_pnt_or_cont, 'P', 2, 'C', 3) dim_setting, 'I' g_or_i, nth_xsp_column, nth_sequence_name
      FROM NM_THEMES_ALL nth, NM_INV_THEMES, nm_inv_types, NM_BASE_THEMES
     WHERE nbth_base_theme = c_layer
    AND nbth_theme_id = nth_theme_id
@@ -7150,7 +7168,7 @@ CURSOR c_themes ( c_layer IN NUMBER ) IS
       AND nith_nit_id = nit_inv_type
       AND nit_table_name IS NULL
    UNION
-   SELECT nth.nth_theme_id, nth.nth_feature_table, nlt_gty_type objtype, 3 dim_setting, 'G' g_or_i
+   SELECT nth.nth_theme_id, nth.nth_feature_table, nlt_gty_type objtype, 3 dim_setting, 'G' g_or_i, NULL nth_xsp_column, nth_sequence_name
      FROM NM_THEMES_ALL nth, NM_NW_THEMES, NM_LINEAR_TYPES, NM_BASE_THEMES
     WHERE nbth_base_theme = c_layer
    AND nbth_theme_id = nth_theme_id
@@ -7159,7 +7177,7 @@ CURSOR c_themes ( c_layer IN NUMBER ) IS
       AND nlt_id = nnth_nlt_id
    UNION
    SELECT nth.nth_theme_id, nth.nth_feature_table, nith_nit_id objtype,
-          DECODE (nit_pnt_or_cont, 'P', 2, 'C', 3) dim_setting, 'F' g_or_i
+          DECODE (nit_pnt_or_cont, 'P', 2, 'C', 3) dim_setting, 'F' g_or_i, NULL nth_xsp_column, nth_sequence_name
      FROM NM_THEMES_ALL nth, NM_INV_THEMES, nm_inv_types, NM_BASE_THEMES
     WHERE nbth_base_theme = c_layer
    AND nbth_theme_id = nth_theme_id
@@ -7210,9 +7228,21 @@ BEGIN
 --       Nm_Debug.DEBUG('Inventory/Group');
 
        IF irec.dim_setting = 2 THEN
-          get_shape_str := 'sdo_lrs.convert_to_std_geom(nm3sdo.get_shape_from_nm( '||TO_CHAR(p_layer)||', nm_ne_id_in, nm_ne_id_of, nm_begin_mp, nm_end_mp ))';
+         if irec.nth_xsp_column is null 
+         and NVL(hig.get_sysopt('XSPOFFSET'),'N') = 'N'-- check prod opt 
+         then
+           get_shape_str := 'sdo_lrs.convert_to_std_geom(nm3sdo.get_shape_from_nm( '||TO_CHAR(p_layer)||', nm_ne_id_in, nm_ne_id_of, nm_begin_mp, nm_end_mp ))';
+         else
+           get_shape_str := 'sdo_lrs.convert_to_std_geom(nm3sdo_dynseg.get_shape( '||TO_CHAR(p_layer)||', nm_ne_id_in, nm_ne_id_of, nm_begin_mp, nm_end_mp ))';
+         end if;
        ELSE
-          get_shape_str := 'nm3sdo.get_shape_from_nm( '||TO_CHAR(p_layer)||', nm_ne_id_in, nm_ne_id_of, nm_begin_mp, nm_end_mp )';
+          if irec.nth_xsp_column is null 
+          and NVL(hig.get_sysopt('XSPOFFSET'),'N') = 'N'-- check prod opt 
+          then
+            get_shape_str := 'nm3sdo.get_shape_from_nm( '||TO_CHAR(p_layer)||', nm_ne_id_in, nm_ne_id_of, nm_begin_mp, nm_end_mp )';
+          else
+            get_shape_str := 'nm3sdo_dynseg.get_shape( '||TO_CHAR(p_layer)||', nm_ne_id_in, nm_ne_id_of, nm_begin_mp, nm_end_mp )';
+          end if;
        END IF;
 
        EXECUTE IMMEDIATE 'delete from '||irec.nth_feature_table||
@@ -7232,7 +7262,7 @@ BEGIN
                           ' from nm_members_all '||
                           ' where nm_ne_id_of = :ne_id '||
                           ' and nm_obj_type = :objtype'||
-        ' and nm_type = :b_nm_type';
+                          ' and nm_type = :b_nm_type';
 
 --         Nm_Debug.DEBUG(lstr);
          EXECUTE IMMEDIATE lstr USING p_ne_id, irec.objtype, irec.g_or_i;
