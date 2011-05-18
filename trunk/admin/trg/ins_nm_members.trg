@@ -8,11 +8,11 @@ DECLARE
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/trg/ins_nm_members.trg-arc   2.1   May 17 2011 16:52:22   Chris.Strettle  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/trg/ins_nm_members.trg-arc   2.2   May 18 2011 10:25:06   Chris.Strettle  $
 --       Module Name      : $Workfile:   ins_nm_members.trg  $
---       Date into PVCS   : $Date:   May 17 2011 16:52:22  $
---       Date fetched Out : $Modtime:   May 17 2011 16:46:42  $
---       PVCS Version     : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   May 18 2011 10:25:06  $
+--       Date fetched Out : $Modtime:   May 18 2011 10:15:38  $
+--       PVCS Version     : $Revision:   2.2  $
 --       Norfolk Specific Based on Main Branch revision : 2.0
 --
 --   Author : Chris Strettle
@@ -72,7 +72,7 @@ IF :new.nm_obj_type = 'SECT'
 AND NVL(hig.get_sysopt('XSPOFFSET'),'N') = 'Y'
 THEN
 
-  IF UPDATING and :old.nm_cardinality != :new.nm_cardinality 
+  IF UPDATING and :OLD.nm_cardinality != :NEW.nm_cardinality 
   THEN
   --
     EXECUTE IMMEDIATE 
@@ -88,13 +88,9 @@ THEN
     
     'end;' USING :NEW.nm_cardinality, :NEW.nm_ne_id_of;
   --
-    
+  ELSIF INSERTING THEN
   --
-  elsif INSERTING then
-  NM_DEBUG.DEBUG_ON;
-  NM_DEBUG.DEBUG('INSERT MEM');
-  NM_DEBUG.DEBUG_OFF;
-    begin
+    BEGIN
     --
     EXECUTE IMMEDIATE
     'begin ' ||
@@ -108,11 +104,11 @@ THEN
     
     'end; ' USING :new.nm_ne_id_in, :new.nm_ne_id_of, :new.nm_cardinality, :new.nm_start_date;
     --
-    --  
-    exception
-      when others then 
+    EXCEPTION
+      WHEN OTHERS THEN 
         nm_debug.debug(sqlerrm);
-    end;
+    END;
+  --
   END IF;
   --
   IF UPDATING
