@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY nm3invval IS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3invval.pkb-arc   2.12   Sep 06 2010 14:07:06   Chris.Strettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3invval.pkb-arc   2.13   May 19 2011 12:07:08   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3invval.pkb  $
---       Date into PVCS   : $Date:   Sep 06 2010 14:07:06  $
---       Date fetched Out : $Modtime:   Sep 06 2010 10:41:48  $
---       Version          : $Revision:   2.12  $
+--       Date into PVCS   : $Date:   May 19 2011 12:07:08  $
+--       Date fetched Out : $Modtime:   May 19 2011 09:36:26  $
+--       Version          : $Revision:   2.13  $
 --       Based on SCCS version : 1.30
 -------------------------------------------------------------------------
 --
@@ -19,7 +19,7 @@ CREATE OR REPLACE PACKAGE BODY nm3invval IS
 --	Copyright (c) exor corporation ltd, 2000
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.12  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.13  $"';
 --  g_body_sccsid is the SCCS ID for the package body
    g_package_name    CONSTANT  varchar2(30)   := 'nm3invval';
 --
@@ -800,7 +800,6 @@ PROCEDURE check_inv_dates ( p_rec_nii    rec_date_chk) IS
    l_ner_id             nm_errors.ner_id%TYPE;
    l_ner_appl           nm_errors.ner_appl%TYPE := nm3type.c_net;
    l_supplementary_info VARCHAR2(500) := 'NM_INV_ITEMS_ALL('||p_rec_nii.ne_id||')';
-   c_date_mask CONSTANT VARCHAR2(500) := nm3user.get_user_date_mask;
 --
 BEGIN
 --
@@ -1039,14 +1038,14 @@ EXCEPTION
       g_process_update_trigger := TRUE;
       hig.raise_ner (pi_appl               => l_ner_appl
                     ,pi_id                 => l_ner_id
-                    ,pi_supplementary_info => l_supplementary_info||' '||TO_CHAR(p_rec_nii.start_date,c_date_mask)||' > '||TO_CHAR(l_parent_start_date,c_date_mask)
+                    ,pi_supplementary_info => l_supplementary_info||' '||TO_CHAR(p_rec_nii.start_date,Sys_Context('NM3CORE','USER_DATE_MASK'))||' > '||TO_CHAR(l_parent_start_date,Sys_Context('NM3CORE','USER_DATE_MASK'))
                     );
    WHEN l_end_date_out_of_range
     THEN
       g_process_update_trigger := TRUE;
       hig.raise_ner (pi_appl               => l_ner_appl
                     ,pi_id                 => l_ner_id
-                    ,pi_supplementary_info => l_supplementary_info||' '||NVL(TO_CHAR(p_rec_nii.end_date,c_date_mask),'Null')||' > '||TO_CHAR(l_parent_end_date,c_date_mask)
+                    ,pi_supplementary_info => l_supplementary_info||' '||NVL(TO_CHAR(p_rec_nii.end_date,Sys_Context('NM3CORE','USER_DATE_MASK')),'Null')||' > '||TO_CHAR(l_parent_end_date,Sys_Context('NM3CORE','USER_DATE_MASK'))
                     );
 --
 END check_inv_dates;
@@ -1387,7 +1386,7 @@ END clear_excl_check_tab;
 --
 PROCEDURE datetrack_update_au_for_invmem (p_iit_ne_id      nm_inv_items.iit_ne_id%TYPE
                                          ,p_iit_admin_unit nm_inv_items.iit_admin_unit%TYPE
-                                         ,p_effective_date nm_inv_items.iit_start_date%TYPE DEFAULT nm3user.get_effective_date
+                                         ,p_effective_date nm_inv_items.iit_start_date%TYPE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                                          ) IS
 --
    CURSOR cs_mem (c_ne_id_in nm_members.nm_ne_id_in%TYPE) IS
@@ -1417,7 +1416,7 @@ PROCEDURE datetrack_update_au_for_invmem (p_iit_ne_id      nm_inv_items.iit_ne_i
 --
    l_count                 PLS_INTEGER;
 --
-   c_eff_date     CONSTANT DATE := nm3user.get_effective_date;
+   c_eff_date     CONSTANT DATE := To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY');
 --
 BEGIN
 --

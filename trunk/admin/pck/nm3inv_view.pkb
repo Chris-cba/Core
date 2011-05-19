@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_view AS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid                 : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_view.pkb-arc   2.12   Apr 08 2011 10:46:54   Chris.Strettle  $
+--       pvcsid                 : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_view.pkb-arc   2.13   May 19 2011 12:07:08   Steve.Cooper  $
 --       Module Name      	: $Workfile:   nm3inv_view.pkb  $
---       Date into PVCS   	: $Date:   Apr 08 2011 10:46:54  $
---       Date fetched Out 	: $Modtime:   Apr 08 2011 10:10:36  $
---       PVCS Version     	: $Revision:   2.12  $
+--       Date into PVCS   	: $Date:   May 19 2011 12:07:08  $
+--       Date fetched Out 	: $Modtime:   May 19 2011 10:38:04  $
+--       PVCS Version     	: $Revision:   2.13  $
 --       Based on SCCS version 	: 1.56
 --
 --
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_view AS
 --      Copyright (c) exor corporation ltd, 2001
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  varchar2(80) := '$Revision::   2.12     $';
+   g_body_sccsid     CONSTANT  varchar2(80) := '$Revision::   2.13     $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
 --all global package variables here
@@ -30,8 +30,6 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_view AS
    g_inv_view_exception EXCEPTION;
    g_inv_view_exc_code  number;
    g_inv_view_exc_msg   varchar2(4000);
---
-   c_application_owner CONSTANT varchar2(30) := hig.get_application_owner;
 --
    g_attr_prefix                        varchar2(8) := 'ATTRIB';
 
@@ -370,7 +368,7 @@ BEGIN
    END IF;
    add_col_to_arrays ('iit_end_date');
 --
-   l_create_view_sql := 'CREATE OR REPLACE FORCE VIEW '||hig.get_application_owner||'.'||l_view_name||c_new_line||' AS ';
+   l_create_view_sql := 'CREATE OR REPLACE FORCE VIEW '||Sys_Context('NM3CORE','APPLICATION_OWNER')||'.'||l_view_name||c_new_line||' AS ';
    l_create_view_sql := l_create_view_sql||'SELECT ';
    IF    p_join_to_network
     AND l_get_route_measures
@@ -1042,8 +1040,6 @@ PROCEDURE create_ft_inv_for_nt_type (pi_nt_type                  IN varchar2
    c_varchar CONSTANT varchar2(8) := 'VARCHAR2';
    c_date    CONSTANT varchar2(8) := 'DATE';
 --
-   c_owner   CONSTANT varchar2(30) := hig.get_application_owner;
---
    l_tab_vc   nm3type.tab_varchar32767;
 --
 -- CWS 703001
@@ -1070,13 +1066,12 @@ PROCEDURE create_ft_inv_for_nt_type (pi_nt_type                  IN varchar2
                       ,p_static_col boolean DEFAULT TRUE
                       ) IS
       --
-      CURSOR cs_atc (c_owner       varchar2
-                    ,c_table_name  varchar2
+      CURSOR cs_atc (c_table_name  varchar2
                     ,c_column_name varchar2
                     ) IS
       SELECT *
        FROM  all_tab_columns
-      WHERE  owner      = c_owner
+      WHERE  owner      = Sys_Context('NM3CORE','APPLICATION_OWNER')
        AND   table_name = c_table_name
        AND   column_name = c_column_name;
       --
@@ -1102,7 +1097,7 @@ PROCEDURE create_ft_inv_for_nt_type (pi_nt_type                  IN varchar2
          l_col_name := l_rec_ntc.ntc_column_name;
       END IF;
       --
-      OPEN  cs_atc (c_owner, 'NM_ELEMENTS_ALL',l_col_name);
+      OPEN  cs_atc ('NM_ELEMENTS_ALL',l_col_name);
       FETCH cs_atc INTO l_rec_atc;
       CLOSE cs_atc;
       --
@@ -1261,7 +1256,7 @@ BEGIN
    OPEN  cs_nat (l_rec_nt.nt_admin_type);
    FETCH cs_nat INTO l_rec_nit.nit_start_date;
    CLOSE cs_nat;
-   l_rec_nit.nit_start_date        := NVL(l_rec_nit.nit_start_date,nm3user.get_effective_date);
+   l_rec_nit.nit_start_date        := NVL(l_rec_nit.nit_start_date,To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY'));
    l_rec_nit.nit_end_date          := NULL;
    l_rec_nit.nit_short_descr       := NVL(l_rec_ngt.ngt_descr, l_rec_nt.nt_unique);
    l_rec_nit.nit_flex_item_flag    := 'N';
@@ -1474,8 +1469,6 @@ PROCEDURE create_view_for_nt_type (pi_nt_type  IN VARCHAR2) IS
    c_varchar CONSTANT varchar2(8) := 'VARCHAR2';
    c_date    CONSTANT varchar2(8) := 'DATE';
 --
-   c_owner   CONSTANT varchar2(30) := hig.get_application_owner;
---
    l_tab_vc   nm3type.tab_varchar32767;
 --
    l_primary VARCHAR2(1);
@@ -1486,13 +1479,12 @@ PROCEDURE create_view_for_nt_type (pi_nt_type  IN VARCHAR2) IS
                       ,p_static_col boolean DEFAULT TRUE
                       ) IS
       --
-      CURSOR cs_atc (c_owner       varchar2
-                    ,c_table_name  varchar2
+      CURSOR cs_atc (c_table_name  varchar2
                     ,c_column_name varchar2
                     ) IS
       SELECT *
        FROM  all_tab_columns
-      WHERE  owner      = c_owner
+      WHERE  owner      = Sys_Context('NM3CORE','APPLICATION_OWNER')
        AND   table_name = c_table_name
        AND   column_name = c_column_name;
       --
@@ -1515,7 +1507,7 @@ PROCEDURE create_view_for_nt_type (pi_nt_type  IN VARCHAR2) IS
          l_col_name := l_rec_ntc.ntc_column_name;
       END IF;
       --
-      OPEN  cs_atc (c_owner, 'NM_ELEMENTS_ALL',l_col_name);
+      OPEN  cs_atc ('NM_ELEMENTS_ALL',l_col_name);
       FETCH cs_atc INTO l_rec_atc;
       CLOSE cs_atc;
       --
@@ -1692,9 +1684,9 @@ BEGIN
       add_data ('NE_NO_END','END_NODE_ID');
    END IF;*/
    --
-   nm_debug.debug('CREATE OR REPLACE VIEW '||c_owner||'.'||'V_NM_'||pi_nt_type||'_NT');
+   nm_debug.debug('CREATE OR REPLACE VIEW '||Sys_Context('NM3CORE','APPLICATION_OWNER')||'.'||'V_NM_'||pi_nt_type||'_NT');
    l_tab_vc.DELETE;
-   nm3ddl.append_tab_varchar(l_tab_vc,'CREATE OR REPLACE VIEW '||c_owner||'.'||'V_NM_'||pi_nt_type||'_NT'||' AS',FALSE);
+   nm3ddl.append_tab_varchar(l_tab_vc,'CREATE OR REPLACE VIEW '||Sys_Context('NM3CORE','APPLICATION_OWNER')||'.'||'V_NM_'||pi_nt_type||'_NT'||' AS',FALSE);
    nm3ddl.append_tab_varchar(l_tab_vc,'SELECT ');
    nm3ddl.append_tab_varchar(l_tab_vc,'--');
    nm3ddl.append_tab_varchar(l_tab_vc,'-----------------------------------------------------------------------------');
@@ -1803,8 +1795,6 @@ PROCEDURE create_view_for_nt_type (pi_nt_type  IN varchar2,
    c_varchar CONSTANT varchar2(8) := 'VARCHAR2';
    c_date    CONSTANT varchar2(8) := 'DATE';
 --
-   c_owner   CONSTANT varchar2(30) := hig.get_application_owner;
---
    l_tab_vc   nm3type.tab_varchar32767;
 --
    l_primary          varchar2(1);
@@ -1815,13 +1805,12 @@ PROCEDURE create_view_for_nt_type (pi_nt_type  IN varchar2,
                       ,p_static_col boolean DEFAULT TRUE
                       ) IS
       --
-      CURSOR cs_atc (c_owner       varchar2
-                    ,c_table_name  varchar2
+      CURSOR cs_atc (c_table_name  varchar2
                     ,c_column_name varchar2
                     ) IS
       SELECT *
        FROM  all_tab_columns
-      WHERE  owner      = c_owner
+      WHERE  owner      = Sys_Context('NM3CORE','APPLICATION_OWNER')
        AND   table_name = c_table_name
        AND   column_name = c_column_name;
       --
@@ -1842,7 +1831,7 @@ PROCEDURE create_view_for_nt_type (pi_nt_type  IN varchar2,
          l_col_name := l_rec_ntc.ntc_column_name;
       END IF;
       --
-      OPEN  cs_atc (c_owner, 'NM_ELEMENTS_ALL',l_col_name);
+      OPEN  cs_atc ('NM_ELEMENTS_ALL',l_col_name);
       FETCH cs_atc INTO l_rec_atc;
       CLOSE cs_atc;
       --
@@ -2012,7 +2001,7 @@ BEGIN
 --
    --nm_debug.debug('CREATE OR REPLACE VIEW '||c_owner||'.'||'V_NM_'||pi_nt_type||'_'||pi_gty_type||'_NT');
    l_tab_vc.DELETE;
-   nm3ddl.append_tab_varchar(l_tab_vc,'CREATE OR REPLACE VIEW '||c_owner||'.'||'V_NM_'||pi_nt_type||'_'||pi_gty_type||'_NT AS ',FALSE);
+   nm3ddl.append_tab_varchar(l_tab_vc,'CREATE OR REPLACE VIEW '||Sys_Context('NM3CORE','APPLICATION_OWNER')||'.'||'V_NM_'||pi_nt_type||'_'||pi_gty_type||'_NT AS ',FALSE);
    nm3ddl.append_tab_varchar(l_tab_vc,'SELECT ');
    nm3ddl.append_tab_varchar(l_tab_vc,'--');
    nm3ddl.append_tab_varchar(l_tab_vc,'-----------------------------------------------------------------------------');
@@ -2104,7 +2093,7 @@ FUNCTION get_nt_view_name (pi_nt_type  IN VARCHAR2,
    AND   object_name = p_object;
 
    --
-   g_application_owner user_users.username%TYPE := Hig.get_application_owner;
+   g_application_owner user_users.username%TYPE := Sys_Context('NM3CORE','APPLICATION_OWNER');
 
    lc_view_name all_objects.object_name%TYPE;
 
@@ -2336,13 +2325,13 @@ BEGIN
    --  they could by put in here by looping through l_tab_rec_cols
    --
    nm3ddl.delete_tab_varchar;
-   append ('CREATE OR REPLACE TRIGGER '||c_application_owner||'.'||l_instead_of_insert_trig_name);
+   append ('CREATE OR REPLACE TRIGGER '||Sys_Context('NM3CORE','APPLICATION_OWNER')||'.'||l_instead_of_insert_trig_name);
    append (' INSTEAD OF INSERT');
    IF l_nm_inv_type_rec.nit_use_xy = 'Y'
     THEN
       append ('         OR UPDATE');
    END IF;
-   append (' ON '||c_application_owner||'.'||l_view_name);
+   append (' ON '||Sys_Context('NM3CORE','APPLICATION_OWNER')||'.'||l_view_name);
    append (' FOR EACH ROW');
    append ('DECLARE');
    append_comment_block('Instead Of Trigger',l_instead_of_insert_trig_name);
@@ -2600,9 +2589,9 @@ BEGIN
    nm_debug.proc_start(g_package_name , 'create_inv_instead_of_trigger');
 --
    l_tab_vc.DELETE;
-   nm3ddl.append_tab_varchar(l_tab_vc,'CREATE OR REPLACE TRIGGER '||c_application_owner||'.'||c_trigger_name,FALSE);
+   nm3ddl.append_tab_varchar(l_tab_vc,'CREATE OR REPLACE TRIGGER '||Sys_Context('NM3CORE','APPLICATION_OWNER')||'.'||c_trigger_name,FALSE);
    nm3ddl.append_tab_varchar(l_tab_vc,' INSTEAD OF INSERT OR UPDATE OR DELETE');
-   nm3ddl.append_tab_varchar(l_tab_vc,'  ON '||c_application_owner||'.'||c_view_name);
+   nm3ddl.append_tab_varchar(l_tab_vc,'  ON '||Sys_Context('NM3CORE','APPLICATION_OWNER')||'.'||c_view_name);
    nm3ddl.append_tab_varchar(l_tab_vc,' FOR EACH ROW');
    nm3ddl.append_tab_varchar(l_tab_vc,'DECLARE');
    nm3ddl.append_tab_varchar(l_tab_vc,'   l_rec_iit nm_inv_items%ROWTYPE;');
@@ -2738,7 +2727,7 @@ BEGIN
    END IF;
 --
    l_ddl.DELETE;
-   append ('CREATE OR REPLACE FORCE VIEW '||hig.get_application_owner||'.'||l_view_name||' AS ');
+   append ('CREATE OR REPLACE FORCE VIEW '||Sys_Context('NM3CORE','APPLICATION_OWNER')||'.'||l_view_name||' AS ');
 --
    append ('SELECT ');
    append_comment_block('View',l_view_name);
