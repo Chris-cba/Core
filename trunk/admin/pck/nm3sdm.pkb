@@ -5,11 +5,11 @@ AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.40   May 18 2011 10:05:06   Chris.Strettle  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.41   May 19 2011 12:07:10   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3sdm.pkb  $
---       Date into PVCS   : $Date:   May 18 2011 10:05:06  $
---       Date fetched Out : $Modtime:   May 12 2011 11:14:00  $
---       PVCS Version     : $Revision:   2.40  $
+--       Date into PVCS   : $Date:   May 19 2011 12:07:10  $
+--       Date fetched Out : $Modtime:   May 19 2011 11:11:40  $
+--       PVCS Version     : $Revision:   2.41  $
 --       Norfolk Specific Based on Main Branch revision : 2.37
 --
 --   Author : R.A. Coupe
@@ -22,7 +22,7 @@ AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT VARCHAR2 (2000) := 'Norfolk Specific: ' || '"$Revision:   2.40  $"';
+   g_body_sccsid     CONSTANT VARCHAR2 (2000) := 'Norfolk Specific: ' || '"$Revision:   2.41  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT VARCHAR2 (30)   := 'NM3SDM';
@@ -187,7 +187,7 @@ AS
 --
    FUNCTION user_is_unrestricted RETURN BOOLEAN IS
    BEGIN
-     RETURN nm3user.is_user_unrestricted;
+     RETURN Sys_Context('NM3CORE','UNRESTRICTED_INVENTORY') = 'Y' ;
    END;
 --
    FUNCTION get_asset_modules RETURN ptr_vc_array IS
@@ -411,11 +411,11 @@ AS
 
       INSERT INTO mdsys.sdo_geom_metadata_table
                   (sdo_table_name, sdo_column_name, sdo_diminfo, sdo_srid, sdo_owner)
-         SELECT l_node_view, 'GEOLOC', sdo_diminfo, sdo_srid, Hig.get_application_owner
+         SELECT l_node_view, 'GEOLOC', sdo_diminfo, sdo_srid, Sys_Context('NM3CORE','APPLICATION_OWNER')
            FROM mdsys.sdo_geom_metadata_table
           WHERE sdo_table_name = 'NM_POINT_LOCATIONS'
             AND sdo_column_name = 'NPL_LOCATION'
-            AND sdo_owner = Hig.get_application_owner;
+            AND sdo_owner = Sys_Context('NM3CORE','APPLICATION_OWNER');
 
       retval := register_node_theme (p_node_type, l_node_view, 'GEOLOC');
       RETURN retval;
@@ -471,7 +471,7 @@ PROCEDURE make_nt_spatial_layer
       cur_string2          VARCHAR2 (4000);
       l_tab                VARCHAR2 (30);
       l_view               VARCHAR2 (30);
-      l_effective_date     DATE                 := Nm3user.get_effective_date;
+      l_effective_date     DATE                 := To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY');
       l_usgm               user_sdo_geom_metadata%ROWTYPE;
       l_diminfo            mdsys.sdo_dim_array;
       l_srid               NUMBER;
@@ -614,7 +614,7 @@ PROCEDURE make_nt_spatial_layer
       BEGIN
 --    EXECUTE IMMEDIATE 'analyze table '||l_tab||' compute statistics';
         Nm3ddl.analyse_table (pi_table_name          => l_tab
-                            , pi_schema              => hig.get_application_owner
+                            , pi_schema              => Sys_Context('NM3CORE','APPLICATION_OWNER')
                             , pi_estimate_percentage => NULL
                             , pi_auto_sample_size    => FALSE);
       EXCEPTION
@@ -886,7 +886,7 @@ PROCEDURE make_nt_spatial_layer
                    sdo_diminfo, sdo_srid, sdo_owner
                   )
            VALUES (pi_rec_usgm.table_name, pi_rec_usgm.column_name,
-                   pi_rec_usgm.diminfo, pi_rec_usgm.srid, Hig.get_application_owner
+                   pi_rec_usgm.diminfo, pi_rec_usgm.srid, Sys_Context('NM3CORE','APPLICATION_OWNER')
                   )
         RETURNING sdo_table_name, sdo_column_name,
                   sdo_diminfo, sdo_srid
@@ -2116,7 +2116,7 @@ PROCEDURE make_nt_spatial_layer
    IS
       retval                    NUMBER;
       l_nat_id                  NUMBER;
-      l_effective_date          DATE            := Nm3user.get_effective_date;
+      l_effective_date          DATE            := To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY');
       l_name                    VARCHAR2 (30)   := NVL (p_name, p_table_name);
       l_immediate_or_deferred   VARCHAR2 (1)                      := 'I';
       l_fk_column               VARCHAR2 (30)                     := 'NE_ID';
@@ -2899,7 +2899,7 @@ PROCEDURE make_nt_spatial_layer
 ---------------------------------------------------------------
       BEGIN
         Nm3ddl.analyse_table (pi_table_name          => l_rec_nth.nth_feature_table
-                            , pi_schema              => hig.get_application_owner
+                            , pi_schema              => Sys_Context('NM3CORE','APPLICATION_OWNER')
                             , pi_estimate_percentage => NULL
                             , pi_auto_sample_size    => FALSE);
       EXCEPTION
@@ -3142,7 +3142,7 @@ PROCEDURE make_nt_spatial_layer
 --    EXECUTE IMMEDIATE 'analyze table ' || l_tab || ' compute statistics';
       BEGIN
         Nm3ddl.analyse_table (pi_table_name          => l_tab
-                            , pi_schema              => hig.get_application_owner
+                            , pi_schema              => Sys_Context('NM3CORE','APPLICATION_OWNER')
                             , pi_estimate_percentage => NULL
                             , pi_auto_sample_size    => FALSE);
       EXCEPTION
@@ -6200,7 +6200,7 @@ end;
       l_begin_mp         nm_members.nm_begin_mp%TYPE;
       l_end_mp           nm_members.nm_begin_mp%TYPE;
       l_start_date       nm_members.nm_start_date%TYPE;
-      l_effective_date   DATE                   := Nm3user.get_effective_date;
+      l_effective_date   DATE                   := To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY');
       qq                 CHAR (1)                               := CHR (39);
       l_dummy            NUMBER;
 
@@ -6394,7 +6394,7 @@ end;
       BEGIN
 --   EXECUTE IMMEDIATE 'analyze table ' || l_tab || ' compute statistics';
         Nm3ddl.analyse_table (pi_table_name          => l_tab
-                            , pi_schema              => hig.get_application_owner
+                            , pi_schema              => Sys_Context('NM3CORE','APPLICATION_OWNER')
                             , pi_estimate_percentage => NULL
                             , pi_auto_sample_size    => FALSE);
       EXCEPTION
@@ -6772,7 +6772,7 @@ end;
    FUNCTION get_object_type (p_object IN VARCHAR2)
       RETURN VARCHAR2
    IS
-      l_owner   VARCHAR2 (30) := Hig.get_application_owner;
+      l_owner   VARCHAR2 (30) := Sys_Context('NM3CORE','APPLICATION_OWNER');
 
       CURSOR c1 (c_object IN VARCHAR2, c_owner IN VARCHAR2)
       IS
@@ -7016,7 +7016,7 @@ end;
     END;
     BEGIN
       EXECUTE IMMEDIATE 'CREATE OR REPLACE VIEW '||pi_owner||'.'||pi_view_name
-                        ||' AS SELECT * FROM '||hig.get_application_owner||'.'||pi_view_name;
+                        ||' AS SELECT * FROM '||Sys_Context('NM3CORE','APPLICATION_OWNER')||'.'||pi_view_name;
     EXCEPTION
       WHEN OTHERS THEN NULL;
     END;
@@ -7060,7 +7060,7 @@ end;
                            AND hur_role     = pi_role
                            AND hur_username = hus_username
                            AND hus_username = username
-                           AND hus_username != hig.get_application_owner
+                           AND hus_username != Sys_Context('NM3CORE','APPLICATION_OWNER')
                            AND NOT EXISTS (
                                   SELECT 1
                                     FROM MDSYS.sdo_geom_metadata_table g1
@@ -7079,7 +7079,7 @@ end;
                          WHERE b.nth_theme_id = a.nth_base_table_theme
                            AND a.nth_theme_id = pi_theme_id
                            AND hus_username = username
-                           AND hus_username != hig.get_application_owner
+                           AND hus_username != Sys_Context('NM3CORE','APPLICATION_OWNER')
                            AND NOT EXISTS (
                                   SELECT 1
                                     FROM MDSYS.sdo_geom_metadata_table g1
@@ -7089,7 +7089,7 @@ end;
                 GROUP BY hus_username, nth_feature_table, nth_feature_shape_column)
          WHERE u.sdo_table_name = nth_feature_table
            AND u.sdo_column_name = nth_feature_shape_column
-           AND u.sdo_owner = hig.get_application_owner;
+           AND u.sdo_owner = Sys_Context('NM3CORE','APPLICATION_OWNER');
 
 --         nm_debug.debug('Inserted '||SQL%ROWCOUNT||' SDO metadata rows');
       --
@@ -7109,7 +7109,7 @@ end;
                  AND hur_role     = pi_role
                  AND hur_username = hus_username
                  AND hus_username = username
-                 AND hus_username != hig.get_application_owner
+                 AND hus_username != Sys_Context('NM3CORE','APPLICATION_OWNER')
               UNION ALL
               -- Base table themes
               SELECT hus_username,
@@ -7122,7 +7122,7 @@ end;
                WHERE b.nth_theme_id = a.nth_base_table_theme
                  AND a.nth_theme_id = pi_theme_id
                  AND hus_username = username
-                 AND hus_username != hig.get_application_owner)
+                 AND hus_username != Sys_Context('NM3CORE','APPLICATION_OWNER'))
           GROUP BY hus_username, nth_feature_table, nth_feature_shape_column)
         LOOP
         --
@@ -7175,7 +7175,7 @@ end;
                            AND hur_role     = pi_role
                            AND hur_username = hus_username
                            AND hus_username = username
-                           AND hus_username != hig.get_application_owner
+                           AND hus_username != Sys_Context('NM3CORE','APPLICATION_OWNER')
                            AND NOT EXISTS
                               (SELECT 1 FROM hig_user_roles, nm_theme_roles r
                                  WHERE hur_username = hus_username
@@ -7329,7 +7329,7 @@ end;
                  GROUP BY nth_feature_table, nth_feature_shape_column)
           WHERE u.sdo_table_name = nth_feature_table
             AND u.sdo_column_name = nth_feature_shape_column
-            AND u.sdo_owner = hig.get_application_owner;
+            AND u.sdo_owner = Sys_Context('NM3CORE','APPLICATION_OWNER');
      --
 --       nm_debug.debug('Inserted '||SQL%ROWCOUNT||' rows for role '||pi_role||' on user '||pi_username);
      --
@@ -7400,7 +7400,7 @@ end;
                            AND nthr_role     = pi_role
                            AND hus_username  = username
                            AND username      = pi_username
-                           AND hus_username != hig.get_application_owner
+                           AND hus_username != Sys_Context('NM3CORE','APPLICATION_OWNER')
                            AND NOT EXISTS
                               (SELECT 1 FROM hig_user_roles, nm_theme_roles r
                                  WHERE hur_username = pi_username
@@ -7659,11 +7659,11 @@ end;
    */
    --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.40   May 18 2011 10:05:06   Chris.Strettle  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.41   May 19 2011 12:07:10   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3sdm.pkb  $
---       Date into PVCS   : $Date:   May 18 2011 10:05:06  $
---       Date fetched Out : $Modtime:   May 12 2011 11:14:00  $
---       PVCS Version     : $Revision:   2.40  $
+--       Date into PVCS   : $Date:   May 19 2011 12:07:10  $
+--       Date fetched Out : $Modtime:   May 19 2011 11:11:40  $
+--       PVCS Version     : $Revision:   2.41  $
 
       append ('--   PVCS Identifiers :-');
       append ('--');
@@ -8984,7 +8984,7 @@ PROCEDURE create_msv_feature_views
 --
    AS
 --
-      l_higowner       VARCHAR2 (30)         := Hig.get_application_owner;
+      l_higowner       VARCHAR2 (30)         := Sys_Context('NM3CORE','APPLICATION_OWNER');
       l_tab_username   Nm3type.tab_varchar30;
       l_tab_ftabs      Nm3type.tab_varchar30;
       l_nl             VARCHAR2 (10)         := CHR (10);

@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY nm3mail AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mail.pkb-arc   2.10   Apr 14 2011 11:10:18   Ade.Edwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mail.pkb-arc   2.11   May 19 2011 12:07:10   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3mail.pkb  $
---       Date into PVCS   : $Date:   Apr 14 2011 11:10:18  $
---       Date fetched Out : $Modtime:   Apr 14 2011 11:09:50  $
---       Version          : $Revision:   2.10  $
+--       Date into PVCS   : $Date:   May 19 2011 12:07:10  $
+--       Date fetched Out : $Modtime:   May 19 2011 10:13:14  $
+--       Version          : $Revision:   2.11  $
 --       Based on SCCS version : 1.12
 -------------------------------------------------------------------------
 --   Author : Jonathan Mills
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3mail AS
 --
 --all global package variables here
 --
-  g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.10  $';
+  g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.11  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3mail';
@@ -29,8 +29,6 @@ CREATE OR REPLACE PACKAGE BODY nm3mail AS
 --
    g_mail_conn        utl_smtp.connection;
    g_rec_vi           v$instance%ROWTYPE;
---
-   c_user_id CONSTANT hig_users.hus_user_id%TYPE := nm3user.get_user_id;
 --
    g_include_sender_info_in_title CONSTANT BOOLEAN := NVL(hig.get_sysopt('SMTPAUDTIT'),'Y') = 'Y';
 --
@@ -427,8 +425,8 @@ BEGIN
 --
    nm_debug.proc_start(g_package_name,'ins_nmm');
 --
-   IF  USER = hig.get_application_owner
-    OR get_nmu(p_rec_nmm.nmm_from_nmu_id).nmu_hus_user_id = c_user_id
+   IF  USER = Sys_Context('NM3CORE','APPLICATION_OWNER')
+    OR get_nmu(p_rec_nmm.nmm_from_nmu_id).nmu_hus_user_id = To_Number(Sys_Context('NM3CORE','USER_ID'))
     THEN
       IF g_include_sender_info_in_title
        THEN
@@ -922,11 +920,11 @@ FUNCTION nmm_predicate ( schema_in varchar2, name_in varchar2) RETURN varchar2 I
    l_predicate nm3type.max_varchar2;
 BEGIN
 --
-   IF nm3user.is_user_unrestricted
+   IF Sys_Context('NM3CORE','UNRESTRICTED_INVENTORY') = 'Y'
     THEN
       l_predicate := Null;
    ELSE
-      l_predicate := 'EXISTS (SELECT 1 FROM nm_mail_users WHERE nmu_id = nmm_from_nmu_id AND nmu_hus_user_id = nm3user.get_user_id)';
+      l_predicate := 'EXISTS (SELECT 1 FROM nm_mail_users WHERE nmu_id = nmm_from_nmu_id AND nmu_hus_user_id = To_Number(Sys_Context(''NM3CORE'',''USER_ID'')))';
    END IF;
    RETURN l_predicate;
 --
@@ -1050,7 +1048,7 @@ BEGIN
   FROM
     nm_mail_users nmu
   WHERE
-    nmu.nmu_hus_user_id = c_user_id;
+    nmu.nmu_hus_user_id = To_Number(Sys_Context('NM3CORE','USER_ID'));
 
   nm_debug.proc_end(p_package_name   => g_package_name
                    ,p_procedure_name => 'get_current_nmu_id');
@@ -1095,7 +1093,7 @@ IS
    SELECT nmu_name||' <'||nmu_email_address||'>' sender_name
          ,nmu_email_address sender_email
    FROM  nm_mail_users
-   WHERE nmu_hus_user_id = nm3user.get_user_id ;
+   WHERE nmu_hus_user_id = To_Number(Sys_Context('NM3CORE','USER_ID'));
    l_sender_rec cs_sender%ROWTYPE;
    PROCEDURE send_header(name IN VARCHAR2, header IN VARCHAR2)
    IS

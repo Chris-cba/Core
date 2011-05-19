@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 --
 ---   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.57   May 18 2011 09:56:12   Chris.Strettle  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.58   May 19 2011 12:07:10   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3sdo.pkb  $
---       Date into PVCS   : $Date:   May 18 2011 09:56:12  $
---       Date fetched Out : $Modtime:   May 10 2011 10:53:02  $
---       PVCS Version     : $Revision:   2.57  $
+--       Date into PVCS   : $Date:   May 19 2011 12:07:10  $
+--       Date fetched Out : $Modtime:   May 19 2011 10:56:44  $
+--       PVCS Version     : $Revision:   2.58  $
 --       Based on
 
 --
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 -- Copyright (c) RAC
 -----------------------------------------------------------------------------
 
-   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.57  $"';
+   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.58  $"';
    g_package_name    CONSTANT VARCHAR2 (30)  := 'NM3SDO';
    g_batch_size      INTEGER                 := NVL( TO_NUMBER(Hig.get_sysopt('SDOBATSIZE')), 10);
    g_clip_type       VARCHAR2(30)            := NVL(Hig.get_sysopt('SDOCLIPTYP'),'SDO');
@@ -257,7 +257,7 @@ CURSOR get_srids ( c_themes IN nm_theme_array ) IS
   WHERE t.nthe_id = nth_theme_id
   AND   nth_feature_table = sdo_table_name
   AND   nth_feature_shape_column = sdo_column_name
-  AND   sdo_owner = Hig.get_application_owner;
+  AND   sdo_owner = Sys_Context('NM3CORE','APPLICATION_OWNER');
 
 BEGIN
 --nm_debug.debug_on;
@@ -339,14 +339,13 @@ END;
       --
       Nm_Debug.proc_start (g_package_name, 'ins_usgm');
 
---   Nm_Debug.DEBUG('inserting '||pi_rec_usgm.table_name||','||pi_rec_usgm.column_name||','||Hig.get_application_owner);
-      --
+     --
       INSERT INTO mdsys.sdo_geom_metadata_table
                   (sdo_table_name, sdo_column_name,
                    sdo_diminfo, sdo_srid, sdo_owner
                   )
            VALUES (pi_rec_usgm.table_name, pi_rec_usgm.column_name,
-                   pi_rec_usgm.diminfo, pi_rec_usgm.srid, Hig.get_application_owner
+                   pi_rec_usgm.diminfo, pi_rec_usgm.srid, Sys_Context('NM3CORE','APPLICATION_OWNER')
                   );
       --
       Nm_Debug.proc_end (g_package_name, 'ins_usgm');
@@ -1195,7 +1194,7 @@ CURSOR c1 ( c_table IN VARCHAR2,
    SELECT sdo_diminfo
    FROM mdsys.sdo_geom_metadata_table
    WHERE sdo_table_name = c_table
-   AND   sdo_owner  = Hig.get_application_owner
+   AND   sdo_owner  = Sys_Context('NM3CORE','APPLICATION_OWNER')
    AND NVL( c_column, 'A') = DECODE( c_column, NULL, 'A', sdo_column_name  );
 
 BEGIN
@@ -2474,7 +2473,7 @@ END;
 FUNCTION get_shape_from_ne( p_ne_id IN nm_elements.ne_id%TYPE,
                             p_effective_date IN DATE ) RETURN mdsys.sdo_geometry IS
 
-l_stored_date DATE := Nm3user.get_effective_date;
+l_stored_date DATE := To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY');
 
 retval mdsys.sdo_geometry;
 
@@ -2746,7 +2745,7 @@ l_start_date  nm_members.nm_start_date%TYPE;
 l_geom        mdsys.sdo_geometry;
 l_objectid    NUMBER;
 
-l_effective_date DATE := Nm3user.GET_EFFECTIVE_DATE;
+l_effective_date DATE := To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY');
 
 l_nit   nm_inv_types%ROWTYPE := Nm3get.get_nit( p_inv_type );
 
@@ -3176,7 +3175,7 @@ l_nlt           NM_LINEAR_TYPES%ROWTYPE;
 
 l_geom          mdsys.sdo_geometry;
 
-l_effective_date DATE := Nm3user.get_effective_date;
+l_effective_date DATE := To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY');
 
 l_ptr ptr_array;
 
@@ -3272,7 +3271,6 @@ BEGIN
       begin
         nm3user.set_effective_date( nvl(l_date_saved, trunc(sysdate)) );
 
---      nm_debug.debug('Loop it = '||get_routes%rowcount||' retrieve shape, date is '||to_char(nm3user.get_effective_date));
 
         l_geom  :=    get_route_shape( p_ne_id   => irec.ne_id, -- l_ga.nga(i).ng_ne_id,
                                        p_nt      => l_nt,
@@ -3336,7 +3334,7 @@ l_start_date  nm_members.nm_start_date%TYPE;
 l_geom        mdsys.sdo_geometry;
 l_objectid    NUMBER;
 
-l_effective_date DATE := Nm3user.GET_EFFECTIVE_DATE;
+l_effective_date DATE := To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY');
 
 l_usgm  user_sdo_geom_metadata%ROWTYPE;
 
@@ -4311,7 +4309,7 @@ CURSOR c1 IS
   FROM mdsys.sdo_geom_metadata_table, NM_THEMES_ALL, TABLE ( Nm3sdo.get_nw_themes().nta_theme_array ) t
   WHERE sdo_table_name = nth_feature_table
   AND   sdo_column_name = nth_feature_shape_column
-  AND   sdo_owner       = Hig.get_application_owner
+  AND   sdo_owner       = Sys_Context('NM3CORE','APPLICATION_OWNER')
   AND   nth_theme_id = t.nthe_id;
 BEGIN
   OPEN c1;
@@ -4755,7 +4753,7 @@ END;
       DELETE mdsys.sdo_geom_metadata_table
        WHERE sdo_table_name = l_rec_usgm.table_name
          AND sdo_column_name = l_rec_usgm.column_name
-   AND sdo_owner       = Hig.get_application_owner;
+   AND sdo_owner       = Sys_Context('NM3CORE','APPLICATION_OWNER');
 
       ins_usgm( l_rec_usgm.table_name, l_rec_usgm.column_name, l_rec_usgm.diminfo, l_rec_usgm.srid);
 
@@ -5082,7 +5080,7 @@ END;
     FROM mdsys.sdo_geom_metadata_table
     WHERE sdo_table_name = c_tab
     AND   sdo_column_name = c_col
- AND   sdo_owner       = Hig.get_application_owner;
+ AND   sdo_owner       = Sys_Context('NM3CORE','APPLICATION_OWNER');
   retval NUMBER;
   BEGIN
     OPEN c1( p_table_name, p_column_name );
@@ -5822,7 +5820,7 @@ CURSOR c1( c_nth_id IN NUMBER ) IS
   FROM NM_THEMES_ALL, mdsys.sdo_geom_metadata_table
   WHERE nth_feature_table = sdo_table_name
   AND   nth_feature_shape_column = sdo_column_name
-  AND   sdo_owner = Hig.get_application_owner
+  AND   sdo_owner = Sys_Context('NM3CORE','APPLICATION_OWNER')
   AND   nth_theme_id = c_nth_id;
 
 retval mdsys.sdo_dim_array;
@@ -5856,7 +5854,7 @@ CURSOR c1( c_nth_id IN NUMBER ) IS
   FROM NM_THEMES_ALL, mdsys.sdo_geom_metadata_table m
   WHERE nth_feature_table = sdo_table_name
   AND   nth_feature_shape_column = sdo_column_name
-  AND   sdo_owner = Hig.get_application_owner
+  AND   sdo_owner = Sys_Context('NM3CORE','APPLICATION_OWNER')
   AND   nth_theme_id = c_nth_id;
 
 -- AE
@@ -6216,7 +6214,7 @@ BEGIN
   SELECT 1 INTO l_dummy FROM mdsys.sdo_geom_metadata_table
   WHERE sdo_table_name = p_feature_table
   AND sdo_column_name = p_col
-  AND sdo_owner = Hig.get_application_owner;
+  AND sdo_owner = Sys_Context('NM3CORE','APPLICATION_OWNER');
 
   RETURN TRUE;
 
@@ -6907,7 +6905,7 @@ BEGIN
 
   EXECUTE IMMEDIATE 'update mdsys.sdo_geom_metadata_table set sdo_srid = '||l_srid||' where sdo_table_name = '||
                     ''''||p_table||''''||' and sdo_column_name = '||''''||p_column||''''||
-     ' and sdo_owner = '||''''||Hig.get_application_owner||'''';
+     ' and sdo_owner = '||''''||Sys_Context('NM3CORE','APPLICATION_OWNER')||'''';
 
 --needs to use all users in hig_users table
 
@@ -6989,7 +6987,7 @@ BEGIN
   EXECUTE IMMEDIATE 'update mdsys.sdo_geom_metadata_table set sdo_srid = '||TO_CHAR(p_new_srid)||','||
                     ' sdo_diminfo =  nm3sdo.calculate_table_diminfo('||''''||p_table||''''||','||''''||p_column||''''||')'||
      ' where sdo_table_name = '||''''||p_table||''''||' and sdo_column_name = '||''''||p_column||''''||
-     ' and sdo_owner = '||Hig.get_application_owner||'''';
+     ' and sdo_owner = '||Sys_Context('NM3CORE','APPLICATION_OWNER')||'''';
 
 /*
   EXECUTE IMMEDIATE 'update user_sdo_geom_metadata set diminfo = nm3sdo.calculate_table_diminfo('||''''||p_table||''''||','||''''||p_column||''''||')'||
@@ -7552,7 +7550,7 @@ BEGIN
        DELETE FROM mdsys.sdo_geom_metadata_table
        WHERE sdo_table_name = p_table
     AND   sdo_column_name = p_shape_col
-    AND   sdo_owner = Hig.get_application_owner;
+    AND   sdo_owner = Sys_Context('NM3CORE','APPLICATION_OWNER');
 
        l_create := TRUE;
 
@@ -8343,7 +8341,7 @@ BEGIN
 
     DELETE FROM mdsys.sdo_geom_metadata_table
     WHERE sdo_table_name = p_object_name
- AND   sdo_owner = Hig.get_application_owner;
+ AND   sdo_owner = Sys_Context('NM3CORE','APPLICATION_OWNER');
 
 END;
 
@@ -8515,13 +8513,11 @@ IS
         FROM NM_THEMES_ALL, all_sdo_geom_metadata s
        WHERE nth_feature_table = table_name
          AND nth_theme_id = p_theme_id
-         AND owner = Hig.get_application_owner;
+         AND owner = Sys_Context('NM3CORE','APPLICATION_OWNER');
 --
    l_nth           NM_THEMES_ALL%ROWTYPE;
    l_user          HIG_USERS.hus_username%TYPE   := UPPER (p_username);
-   l_owner         VARCHAR2 (30)
-      := Nm3context.get_context (Nm3context.get_namespace,
-                                 'APPLICATION_OWNER');
+   l_owner         VARCHAR2 (30) := Sys_Context('NM3CORE','APPLICATION_OWNER');
 --
    PROCEDURE check_user (pi_username IN HIG_USERS.HUS_USERNAME%TYPE)
    IS
@@ -8655,7 +8651,7 @@ IS
      SELECT owner
        FROM all_sdo_geom_metadata, HIG_USERS
       WHERE owner  = hus_username
-        AND owner != Hig.get_application_owner
+        AND owner != Sys_Context('NM3CORE','APPLICATION_OWNER')
         AND table_name = cp_table
         AND column_name = cp_column;
 
@@ -9659,7 +9655,7 @@ END;
         FROM mdsys.sdo_geom_metadata_table
        WHERE sdo_table_name = pi_table_name
     AND sdo_column_name = pi_column_name
-    AND sdo_owner = Hig.get_application_owner;
+    AND sdo_owner = Sys_Context('NM3CORE','APPLICATION_OWNER');
 
       l_rec_usgm.table_name := dummy.sdo_table_name;
       l_rec_usgm.column_name := dummy.sdo_column_name;
@@ -10334,7 +10330,7 @@ CURSOR c1 IS
   AND   nnth_nth_theme_id = nth_theme_id
   AND   nth_feature_table = sdo_table_name
   AND   nth_feature_shape_column = sdo_column_name
-  AND   sdo_owner = Hig.get_application_owner;
+  AND   sdo_owner = Sys_Context('NM3CORE','APPLICATION_OWNER');
 
 l_srid NUMBER;
 
