@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3_bulk_attrib_upd.pkb-arc   3.8   Apr 15 2011 15:32:14   Chris.Strettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3_bulk_attrib_upd.pkb-arc   3.9   May 20 2011 15:47:46   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3_bulk_attrib_upd.pkb  $
---       Date into PVCS   : $Date:   Apr 15 2011 15:32:14  $
---       Date fetched Out : $Modtime:   Apr 15 2011 14:17:06  $
---       Version          : $Revision:   3.8  $
+--       Date into PVCS   : $Date:   May 20 2011 15:47:46  $
+--       Date fetched Out : $Modtime:   May 20 2011 15:46:42  $
+--       Version          : $Revision:   3.9  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.8  $';
+  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.9  $';
 
   g_package_name CONSTANT varchar2(30) := 'nm3_bulk_attrib_upd';
 --
@@ -220,7 +220,7 @@ BEGIN
                         , nm_type
                         , nm_obj_type
                         , nm_begin_mp
-                        , nm3user.get_effective_date
+                        , To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                         , nm_end_date
                         , nm_end_mp
                         , nm_slk
@@ -246,7 +246,7 @@ BEGIN
                    -- End date all members in the tab 
                    FORALL ne_tab_count IN 1..l_ne_tab.COUNT
                    UPDATE  nm_members 
-                   SET     nm_end_date = nm3user.get_effective_date
+                   SET     nm_end_date = To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                    WHERE   nm_ne_id_in = l_ne_tab(ne_tab_count)
                    AND     nm_obj_type = l_nti_rec_tab(i).nti_nw_parent_type;
                    -- Insert new members for autoinclusion
@@ -257,7 +257,7 @@ BEGIN
                    -- End date all members in the tab 
                    FORALL ne_tab_count in 1..l_ne_tab.COUNT
                      UPDATE  nm_members 
-                     SET     nm_end_date = nm3user.get_effective_date 
+                     SET     nm_end_date = To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY') 
                      WHERE   nm_ne_id_in = l_ne_tab(ne_tab_count)
                      AND     nm_obj_type = l_nti_rec_tab(i).nti_nw_parent_type;
                END IF;
@@ -284,7 +284,7 @@ BEGIN
                          'G',
                          l_parent_rec.ne_gty_group_type,
                          0,
-                         nm3user.get_effective_date,
+                         To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY'),
                          NULL,
                          ne.ne_length,
                          NULL,
@@ -307,7 +307,7 @@ BEGIN
                       
                    FORALL i in 1..l_ne_tab.Count
                    UPDATE  nm_members 
-                   SET     nm_end_date = nm3user.get_effective_date
+                   SET     nm_end_date = To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                    WHERE   nm_ne_id_of = l_ne_tab(i) 
                    AND     nm_obj_type = l_parent_rec.ne_gty_group_type ;
                               
@@ -332,7 +332,7 @@ BEGIN
                                          
                FORALL i in 1..l_ne_tab.Count
                UPDATE  nm_members 
-               SET     nm_end_date = nm3user.get_effective_date
+               SET     nm_end_date = To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                WHERE   nm_ne_id_of = l_ne_tab(i) 
                AND     nm_obj_type = l_gty_rec.ngt_group_type ; 
            END IF ;
@@ -693,7 +693,7 @@ BEGIN
        THEN
            FORALL i IN 1..l_ne_id.Count
            UPDATE nm_members
-           SET    nm_end_date = nm3user.get_effective_date
+           SET    nm_end_date = To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
            WHERE  nm_ne_id_of = l_ne_id(i)
            AND    nm_obj_type = l_group_type 
            AND    nm_type     = 'G' ;
@@ -745,7 +745,7 @@ BEGIN
                    THEN
                        FORALL i IN 1..l_ne_id.Count
                        UPDATE nm_members
-                       SET    nm_end_date = nm3user.get_effective_date
+                       SET    nm_end_date = To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                        WHERE  nm_ne_id_of = l_ne_id(i)
                        AND    nm_obj_type = l_group_type ;
                    END IF ;
