@@ -22,11 +22,11 @@ SELECT
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/sql/bulk_update_ddl_script.sql-arc   3.1   Jun 04 2009 16:17:18   lsorathia  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/sql/bulk_update_ddl_script.sql-arc   3.2   May 23 2011 11:32:20   Chris.Strettle  $
 --       Module Name      : $Workfile:   bulk_update_ddl_script.sql  $
---       Date into PVCS   : $Date:   Jun 04 2009 16:17:18  $
---       Date fetched Out : $Modtime:   Jun 04 2009 16:14:38  $
---       Version          : $Revision:   3.1  $
+--       Date into PVCS   : $Date:   May 23 2011 11:32:20  $
+--       Date fetched Out : $Modtime:   May 23 2011 11:30:12  $
+--       Version          : $Revision:   3.2  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -43,8 +43,6 @@ FROM   nm_elements ne
       ,nm_admin_units nau
 WHERE  ne.ne_admin_unit = nau.nau_admin_unit
 /
-
-
 
 DECLARE
 --
@@ -67,9 +65,7 @@ BEGIN
             ' nav_col_seq_no, '||
             ' nav_gty_type , '||
             ' nav_parent_type_inc, '||
-            ' nav_child_type_inc, '||
-            ' nav_child_col, '||
-            ' nav_parent_col '||
+            ' nav_child_type_inc '||
             ' ) '||
             ' AS '||
             ' SELECT '||
@@ -78,11 +74,11 @@ BEGIN
             ' ------------------------------------------------------------------------- '||Chr(10)||
             ' --   PVCS Identifiers :- '||Chr(10)||
             ' -- '||Chr(10)||
-            ' --       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/sql/bulk_update_ddl_script.sql-arc   3.1   Jun 04 2009 16:17:18   lsorathia  $ '||Chr(10)||
+            ' --       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/sql/bulk_update_ddl_script.sql-arc   3.2   May 23 2011 11:32:20   Chris.Strettle  $ '||Chr(10)||
             ' --       Module Name      : $Workfile:   bulk_update_ddl_script.sql  $ '||Chr(10)||
-            ' --       Date into PVCS   : $Date:   Jun 04 2009 16:17:18  $ '||Chr(10)||
-            ' --       Date fetched Out : $Modtime:   Jun 04 2009 16:14:38  $ '||Chr(10)||
-            ' --       Version          : $Revision:   3.1  $ '||Chr(10)||
+            ' --       Date into PVCS   : $Date:   May 23 2011 11:32:20  $ '||Chr(10)||
+            ' --       Date fetched Out : $Modtime:   May 23 2011 11:30:12  $ '||Chr(10)||
+            ' --       Version          : $Revision:   3.2  $ '||Chr(10)||
             ' --       Based on SCCS version :  '||Chr(10)||
             ' ------------------------------------------------------------------------- '||Chr(10)||
             ' --  '||Chr(10)||
@@ -98,13 +94,9 @@ BEGIN
             '        ntc_prompt, '||
             '        ntc_format, '||
             '        ntc_seq_no, '||
-            '        Null , '||
+            '        Null, '||
             '        nm3_bulk_attrib_upd.parent_inclusion_type(ntc_column_name,ntc_nt_type) parent_type_inc, '||
-            '        nm3_bulk_attrib_upd.child_inclusion_type(ntc_column_name,ntc_nt_type)  child_type_inc, '||
-            '        (SELECT nti_child_column FROM nm_type_inclusion WHERE  nti_nw_parent_type = ntc_nt_type  '||
-            '                                                      ) child_col, '||
-            '        (SELECT nti_parent_column FROM nm_type_inclusion WHERE  nti_nw_child_type = ntc_nt_type AND nti_child_column = ntc_column_name  '||
-            '                                                      ) parent_col '||
+            '        nm3_bulk_attrib_upd.child_inclusion_type(ntc_column_name,ntc_nt_type)  child_type_inc '||
             ' FROM   nm_type_columns ntc '||
             ' union '||
             ' select 2 disp_ord, '||
@@ -120,19 +112,13 @@ BEGIN
             '        ita_disp_seq_no  , '||
             '        nad_gty_type   , '||
             '        Null , '||
-            '        Null, '||
-            '        Null, '||
-            '        Null  '||
+            '        Null '||
             ' FROM   nm_inv_type_attribs ita,nm_nw_ad_types nad '||
             ' WHERE  ita.ita_inv_type =  nad.nad_inv_type '||
             ' AND    nad_primary_ad   = ''Y'' ' ;
    Execute Immediate l_sql;
-EXCEPTION
-   When Others THEN
-   NUll;
 END ;
 /
-
 
 INSERT INTO nm_errors
 SELECT 'NET'
