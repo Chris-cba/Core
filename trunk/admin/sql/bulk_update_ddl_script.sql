@@ -22,11 +22,11 @@ SELECT
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/sql/bulk_update_ddl_script.sql-arc   3.2   May 23 2011 11:32:20   Chris.Strettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/sql/bulk_update_ddl_script.sql-arc   3.3   May 23 2011 11:34:46   Chris.Strettle  $
 --       Module Name      : $Workfile:   bulk_update_ddl_script.sql  $
---       Date into PVCS   : $Date:   May 23 2011 11:32:20  $
---       Date fetched Out : $Modtime:   May 23 2011 11:30:12  $
---       Version          : $Revision:   3.2  $
+--       Date into PVCS   : $Date:   May 23 2011 11:34:46  $
+--       Date fetched Out : $Modtime:   May 23 2011 11:33:28  $
+--       Version          : $Revision:   3.3  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -74,11 +74,11 @@ BEGIN
             ' ------------------------------------------------------------------------- '||Chr(10)||
             ' --   PVCS Identifiers :- '||Chr(10)||
             ' -- '||Chr(10)||
-            ' --       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/sql/bulk_update_ddl_script.sql-arc   3.2   May 23 2011 11:32:20   Chris.Strettle  $ '||Chr(10)||
+            ' --       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/sql/bulk_update_ddl_script.sql-arc   3.3   May 23 2011 11:34:46   Chris.Strettle  $ '||Chr(10)||
             ' --       Module Name      : $Workfile:   bulk_update_ddl_script.sql  $ '||Chr(10)||
-            ' --       Date into PVCS   : $Date:   May 23 2011 11:32:20  $ '||Chr(10)||
-            ' --       Date fetched Out : $Modtime:   May 23 2011 11:30:12  $ '||Chr(10)||
-            ' --       Version          : $Revision:   3.2  $ '||Chr(10)||
+            ' --       Date into PVCS   : $Date:   May 23 2011 11:34:46  $ '||Chr(10)||
+            ' --       Date fetched Out : $Modtime:   May 23 2011 11:33:28  $ '||Chr(10)||
+            ' --       Version          : $Revision:   3.3  $ '||Chr(10)||
             ' --       Based on SCCS version :  '||Chr(10)||
             ' ------------------------------------------------------------------------- '||Chr(10)||
             ' --  '||Chr(10)||
@@ -117,6 +117,9 @@ BEGIN
             ' WHERE  ita.ita_inv_type =  nad.nad_inv_type '||
             ' AND    nad_primary_ad   = ''Y'' ' ;
    Execute Immediate l_sql;
+EXCEPTION
+   When Others THEN
+   NUll;
 END ;
 /
 
