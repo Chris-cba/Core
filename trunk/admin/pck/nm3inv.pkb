@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3inv AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv.pkb-arc   2.28   May 16 2011 14:44:56   Steve.Cooper  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv.pkb-arc   2.29   May 23 2011 11:17:30   Chris.Strettle  $
 --       Module Name      : $Workfile:   nm3inv.pkb  $
---       Date into SCCS   : $Date:   May 16 2011 14:44:56  $
---       Date fetched Out : $Modtime:   May 05 2011 08:58:12  $
---       SCCS Version     : $Revision:   2.28  $
+--       Date into SCCS   : $Date:   May 23 2011 11:17:30  $
+--       Date fetched Out : $Modtime:   May 23 2011 11:13:40  $
+--       SCCS Version     : $Revision:   2.29  $
 --       Based on --
 --
 --   nm3inv package body
@@ -30,7 +30,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3inv AS
 --all global package variables here
 --
 --  g_body_sccsid is the SCCS ID for the package body
-   g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.28  $';
+   g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.29  $';
    g_package_name   CONSTANT VARCHAR2(30) := 'nm3inv';
 --
    --<USED BY validate_rec_iit>
@@ -3359,12 +3359,16 @@ END is_column_allowable_for_flex;
 --
 ----------------------------------------------------------------------------------------------
 --
-FUNCTION get_tab_ita (p_inv_type NM_INV_TYPES.nit_inv_type%TYPE) RETURN tab_nita IS
+FUNCTION get_tab_ita (p_inv_type nm_inv_types.nit_inv_type%TYPE) RETURN tab_nita IS
 --
-   CURSOR cs_ita (c_inv_type NM_INV_TYPES.nit_inv_type%TYPE) IS
+   CURSOR cs_ita (c_inv_type nm_inv_types.nit_inv_type%TYPE) IS
    SELECT *
-    FROM  NM_INV_TYPE_ATTRIBS
-   WHERE  ita_inv_type = c_inv_type;
+     FROM nm_inv_type_attribs
+    WHERE ita_inv_type = c_inv_type
+ ORDER BY ita_disp_seq_no, ita_mandatory_yn DESC, ita_attrib_name;
+ -- CWS 0111102 23/5/11 order by added, as there is no constraint to have a 
+ -- unique sequence I have added the mandatory flag and atribute name into the 
+ --order by also to increase the chances of having a consistent list order. 
 --
    l_tab_ita tab_nita;
 --
