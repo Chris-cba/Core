@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_view AS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid                 : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_view.pkb-arc   2.13   May 19 2011 12:07:08   Steve.Cooper  $
+--       pvcsid                 : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_view.pkb-arc   2.14   May 24 2011 15:42:34   Chris.Strettle  $
 --       Module Name      	: $Workfile:   nm3inv_view.pkb  $
---       Date into PVCS   	: $Date:   May 19 2011 12:07:08  $
---       Date fetched Out 	: $Modtime:   May 19 2011 10:38:04  $
---       PVCS Version     	: $Revision:   2.13  $
+--       Date into PVCS   	: $Date:   May 24 2011 15:42:34  $
+--       Date fetched Out 	: $Modtime:   May 24 2011 13:43:06  $
+--       PVCS Version     	: $Revision:   2.14  $
 --       Based on SCCS version 	: 1.56
 --
 --
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_view AS
 --      Copyright (c) exor corporation ltd, 2001
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  varchar2(80) := '$Revision::   2.13     $';
+   g_body_sccsid     CONSTANT  varchar2(80) := '$Revision::   2.14     $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
 --all global package variables here
@@ -2381,7 +2381,7 @@ BEGIN
       append ('       nm3homo.homo_update');
       append ('                   (p_temp_ne_id_in  => l_temp_ne_id');
       append ('                   ,p_iit_ne_id      => NVL(:NEW.iit_ne_id,:OLD.iit_ne_id)');
-      append ('                   ,p_effective_date => nm3user.get_effective_date');
+      append ('                   ,p_effective_date => To_Date(Sys_Context(''NM3CORE'',''EFFECTIVE_DATE''),''DD-MON-YYYY'')');
       append ('                   );');
       append ('   END IF;');
       append ('ELSIF INSERTING');
@@ -2409,7 +2409,7 @@ BEGIN
    append ('--');
    append ('   IF l_rec_iit.iit_start_date IS NULL');
    append ('    THEN');
-   append ('      l_rec_iit.iit_start_date := nm3user.get_effective_date;');
+   append ('      l_rec_iit.iit_start_date := To_Date(Sys_Context(''NM3CORE'',''EFFECTIVE_DATE''),''DD-MON-YYYY'');');
    append ('   END IF;');
    --
    append ('--');
@@ -2425,7 +2425,7 @@ BEGIN
    append ('   END IF;');
    --
    append ('--');
-   append ('   l_effective_date := nm3user.get_effective_date;');
+   append ('   l_effective_date := To_Date(Sys_Context(''NM3CORE'',''EFFECTIVE_DATE''),''DD-MON-YYYY'');');
    append ('   nm3user.set_effective_date(l_rec_iit.iit_start_date);');
    --
    append ('--');
