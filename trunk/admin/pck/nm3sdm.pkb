@@ -5,11 +5,11 @@ AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.41   May 19 2011 12:07:10   Steve.Cooper  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.42   May 24 2011 15:42:36   Chris.Strettle  $
 --       Module Name      : $Workfile:   nm3sdm.pkb  $
---       Date into PVCS   : $Date:   May 19 2011 12:07:10  $
---       Date fetched Out : $Modtime:   May 19 2011 11:11:40  $
---       PVCS Version     : $Revision:   2.41  $
+--       Date into PVCS   : $Date:   May 24 2011 15:42:36  $
+--       Date fetched Out : $Modtime:   May 24 2011 14:02:24  $
+--       PVCS Version     : $Revision:   2.42  $
 --       Norfolk Specific Based on Main Branch revision : 2.37
 --
 --   Author : R.A. Coupe
@@ -22,7 +22,7 @@ AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT VARCHAR2 (2000) := 'Norfolk Specific: ' || '"$Revision:   2.41  $"';
+   g_body_sccsid     CONSTANT VARCHAR2 (2000) := 'Norfolk Specific: ' || '"$Revision:   2.42  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT VARCHAR2 (30)   := 'NM3SDM';
@@ -187,7 +187,7 @@ AS
 --
    FUNCTION user_is_unrestricted RETURN BOOLEAN IS
    BEGIN
-     RETURN Sys_Context('NM3CORE','UNRESTRICTED_INVENTORY') = 'Y' ;
+     RETURN Sys_Context('NM3CORE','UNRESTRICTED_INVENTORY') = 'TRUE';
    END;
 --
    FUNCTION get_asset_modules RETURN ptr_vc_array IS
@@ -405,8 +405,9 @@ AS
       -- AE 23-SEP-2008
       -- We will now use views instead of synonyms to provide subordinate user access
       -- to spatial objects
-      nm3ddl.create_object_and_views (l_node_view, cur_string);
-
+      --nm3ddl.create_object_and_views (l_node_view, cur_string);
+      -- CWS 0108742 Change back to using synonyms
+      Nm3ddl.create_object_and_syns( l_node_view, cur_string );
 --    EXECUTE IMMEDIATE cur_string;
 
       INSERT INTO mdsys.sdo_geom_metadata_table
@@ -4021,7 +4022,7 @@ end;
          || p_table
          || ' where  '
          || l_start_date_col
-         || ' <= (select nm3context.get_effective_date from dual) '
+         || ' <= (select Sys_Context(''NM3CORE'',''APPLICATION_OWNER'') from dual) '
          || ' and  NVL('
          || l_end_date_col
          || ',TO_DATE('
@@ -4032,16 +4033,14 @@ end;
          || qq
          || 'YYYYMMDD'
          || qq
-         || ')) > (select nm3context.get_effective_date from dual)';
-
+         || ')) > (select Sys_Context(''NM3CORE'',''APPLICATION_OWNER'') from dual)';
       --
-      --Nm3ddl.create_object_and_syns( 'V_'||p_table, cur_string );
-
-
       -- AE 23-SEP-2008
       -- We will now use views instead of synonyms to provide subordinate user access
       -- to spatial objects
-      nm3ddl.create_object_and_views ('V_'||p_table, cur_string);
+      -- CWS 0108742 Change back to using synonyms
+      Nm3ddl.create_object_and_syns( 'V_'||p_table, cur_string );
+      --nm3ddl.create_object_and_views ('V_'||p_table, cur_string);
    --
    EXCEPTION
       WHEN OTHERS
@@ -4151,7 +4150,7 @@ end;
                || ' i,'
                || p_table
                || ' s where i.iit_ne_id = s.ne_id '
-               || ' and s.'||l_start_date_column||' <= (select nm3context.get_effective_date from dual) '
+               || ' and s.'||l_start_date_column||' <= (select Sys_Context(''NM3CORE'',''APPLICATION_OWNER'') from dual) '
                || ' and  NVL(s.'||l_end_date_column||',TO_DATE('
                || qq
                || '99991231'
@@ -4160,7 +4159,7 @@ end;
                || qq
                || 'YYYYMMDD'
                || qq
-               || ')) > (select nm3context.get_effective_date from dual) ';
+               || ')) > (select Sys_Context(''NM3CORE'',''APPLICATION_OWNER'') from dual) ';
          ELSE
             l_inv := l_nit.nit_table_name;
             cur_string :=
@@ -4175,7 +4174,7 @@ end;
                || ' s where i.'
                || l_nit.nit_foreign_pk_column
                || ' = s.ne_id '
-               || ' and s.'||l_start_date_column||' <= (select nm3context.get_effective_date from dual) '
+               || ' and s.'||l_start_date_column||' <= (select Sys_Context(''NM3CORE'',''APPLICATION_OWNER'') from dual) '
                || ' and  NVL(s.'||l_end_date_column||',TO_DATE('
                || qq
                || '99991231'
@@ -4184,7 +4183,7 @@ end;
                || qq
                || 'YYYYMMDD'
                || qq
-               || ')) > (select nm3context.get_effective_date from dual) ';
+               || ')) > (select Sys_Context(''NM3CORE'',''APPLICATION_OWNER'') from dual) ';
          END IF;
       ELSE
          -- AE
@@ -4214,7 +4213,7 @@ end;
             || ' i,'
             || p_table
             || ' s where i.iit_ne_id = s.ne_id '
-            || ' and s.'||l_start_date_column||' <= (select nm3context.get_effective_date from dual) '
+            || ' and s.'||l_start_date_column||' <= (select Sys_Context(''NM3CORE'',''APPLICATION_OWNER'') from dual) '
             || ' and  NVL(s.'||l_end_date_column||',TO_DATE('
             || qq
             || '99991231'
@@ -4223,7 +4222,7 @@ end;
             || qq
             || 'YYYYMMDD'
             || qq
-            || ')) > (select nm3context.get_effective_date from dual)';
+            || ')) > (select Sys_Context(''NM3CORE'',''APPLICATION_OWNER'') from dual)';
       END IF;
 
 --    execute immediate cur_string;
@@ -4233,8 +4232,10 @@ end;
       -- AE 23-SEP-2008
       -- We will now use views instead of synonyms to provide subordinate user access
       -- to spatial objects
-      nm3ddl.create_object_and_views ('V_'||p_table||'_DT', cur_string);
-
+      --nm3ddl.create_object_and_views ('V_'||p_table||'_DT', cur_string);
+      -- CWS 0108742 Change back to using synonyms
+      Nm3ddl.create_object_and_syns( 'V_'||p_table||'_DT', cur_string );
+      
       RETURN 'V_' || p_table || '_DT';
 
    END;
@@ -4360,7 +4361,7 @@ end;
          || ' n,'
          || p_table
          || ' s where n.ne_id = s.ne_id '
-         || ' and s.start_date <= (select nm3context.get_effective_date from dual) '
+         || ' and s.start_date <= (select Sys_Context(''NM3CORE'',''APPLICATION_OWNER'') from dual) '
          || ' and  NVL(s.end_date,TO_DATE('
          || qq
          || '99991231'
@@ -4369,7 +4370,7 @@ end;
          || qq
          || 'YYYYMMDD'
          || qq
-         || ')) > (select nm3context.get_effective_date from dual)';
+         || ')) > (select Sys_Context(''NM3CORE'',''APPLICATION_OWNER'') from dual)';
 
 --      IF p_nlt.nlt_gty_type IS NOT NULL
 --      THEN
@@ -4388,8 +4389,9 @@ end;
       -- AE 23-SEP-2008
       -- We will now use views instead of synonyms to provide subordinate user access
       -- to spatial objects
-      nm3ddl.create_object_and_views ('V_'||p_table||'_DT', cur_string);
-
+      --nm3ddl.create_object_and_views ('V_'||p_table||'_DT', cur_string);
+      -- CWS 0108742 Change back to using synonyms
+      Nm3ddl.create_object_and_syns( 'V_'||p_table||'_DT', cur_string );
 --  execute immediate cur_string;
   --   nm_debug.debug_off;
       RETURN 'V_' || p_table || '_DT';
@@ -4730,7 +4732,7 @@ end;
             AND a.nith_nit_id = c_obj_type
             AND nth_feature_table = get_inv_spatial_table (c_obj_type);
 
-      l_effective_date   DATE               := nm3user.get_effective_date;
+      l_effective_date   DATE               := To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY');
       l_geom             MDSYS.SDO_GEOMETRY;
    BEGIN
       --   nm_debug.debug_on;
@@ -4958,6 +4960,7 @@ end;
            l_geom := nm3sdo_dynseg.get_shape( irec.nbth_base_theme, p_nm_ne_id_in, p_nm_ne_id_of, p_new_begin_mp, p_nm_end_mp );
 
          end if;
+
          EXECUTE IMMEDIATE upd_string
                      USING l_geom,
                            p_new_begin_mp,
@@ -6253,7 +6256,7 @@ end;
             || ' n,'
             || p_table
             || ' s where n.ne_id = s.ne_id '
-            || ' and s.start_date <= (select nm3context.get_effective_date from dual) '
+            || ' and s.start_date <= (select Sys_Context(''NM3CORE'',''APPLICATION_OWNER'') from dual) '
             || ' and  NVL(s.end_date,TO_DATE('
             || qq
             || '99991231'
@@ -6262,7 +6265,7 @@ end;
             || qq
             || 'YYYYMMDD'
             || qq
-            || ')) > (select nm3context.get_effective_date from dual)';
+            || ')) > (select Sys_Context(''NM3CORE'',''APPLICATION_OWNER'') from dual)';
           --  || ' and n.ne_gty_group_type = '
           --  || ''''
           --  || p_gty_type
@@ -6272,7 +6275,9 @@ end;
           -- AE 23-SEP-2008
           -- We will now use views instead of synonyms to provide subordinate user access
           -- to spatial objects
-          nm3ddl.create_object_and_views ('V_'||p_table||'_DT', cur_string);
+          --nm3ddl.create_object_and_views ('V_'||p_table||'_DT', cur_string);
+          -- CWS 0108742 Change back to using synonyms
+          Nm3ddl.create_object_and_syns( 'V_'||p_table||'_DT', cur_string );
 
          RETURN 'V_' || p_table || '_DT';
      END;
@@ -6705,6 +6710,17 @@ end;
             --    problem in privileges on the development schema - dropping synonyms failed - needs further investigation.
             END;
 
+            BEGIN
+               --cws
+               Nm3ddl.drop_synonym_for_object (l_nth.nth_feature_table);
+
+            EXCEPTION
+               WHEN OTHERS
+               THEN
+                  NULL;
+            --    problem in privileges on the development schema - dropping synonyms failed - needs further investigation.
+            END;
+
             drop_object (l_nth.nth_feature_table);
             Nm3sdo.drop_metadata (l_nth.nth_feature_table);
 
@@ -6998,9 +7014,17 @@ end;
   IS
     PRAGMA autonomous_transaction;
   BEGIN
+  BEGIN
     EXECUTE IMMEDIATE 'DROP VIEW '||pi_owner||'.'||pi_view_name;
   EXCEPTION
     WHEN OTHERS THEN NULL;
+  END;
+
+  BEGIN
+    EXECUTE IMMEDIATE 'DROP SYNONYM '||pi_owner||'.'||pi_view_name;
+  EXCEPTION
+    WHEN OTHERS THEN NULL;
+  END;
   END drop_feature_view;
 --
 ---------------------------------------------------------------------------------------------------------------------------------
@@ -7010,13 +7034,17 @@ end;
     PRAGMA autonomous_transaction;
   BEGIN
     BEGIN
-      EXECUTE IMMEDIATE 'DROP SYNONYM '|| pi_owner||'.'|| pi_view_name;
+      -- CWS
+      --EXECUTE IMMEDIATE 'DROP SYNONYM '|| pi_owner||'.'|| pi_view_name;
+      EXECUTE IMMEDIATE 'DROP VIEW '|| pi_owner||'.'|| pi_view_name;
     EXCEPTION
       WHEN OTHERS THEN NULL;
     END;
     BEGIN
-      EXECUTE IMMEDIATE 'CREATE OR REPLACE VIEW '||pi_owner||'.'||pi_view_name
-                        ||' AS SELECT * FROM '||Sys_Context('NM3CORE','APPLICATION_OWNER')||'.'||pi_view_name;
+      -- CWS
+      --EXECUTE IMMEDIATE 'CREATE OR REPLACE VIEW '||pi_owner||'.'||pi_view_name
+      --                  ||' AS SELECT * FROM '||Sys_Context('NM3CORE','APPLICATION_OWNER')||'.'||pi_view_name;
+      EXECUTE IMMEDIATE ('CREATE OR REPLACE SYNONYM '|| pi_owner ||'.'|| pi_view_name || ' FOR ' || Sys_Context('NM3CORE','APPLICATION_OWNER') || '.' || pi_view_name);
     EXCEPTION
       WHEN OTHERS THEN NULL;
     END;
@@ -7659,11 +7687,11 @@ end;
    */
    --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.41   May 19 2011 12:07:10   Steve.Cooper  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.42   May 24 2011 15:42:36   Chris.Strettle  $
 --       Module Name      : $Workfile:   nm3sdm.pkb  $
---       Date into PVCS   : $Date:   May 19 2011 12:07:10  $
---       Date fetched Out : $Modtime:   May 19 2011 11:11:40  $
---       PVCS Version     : $Revision:   2.41  $
+--       Date into PVCS   : $Date:   May 24 2011 15:42:36  $
+--       Date fetched Out : $Modtime:   May 24 2011 14:02:24  $
+--       PVCS Version     : $Revision:   2.42  $
 
       append ('--   PVCS Identifiers :-');
       append ('--');
@@ -8779,7 +8807,7 @@ end;
 --
 --     -- Build output
 --     append ('================================================');
---     append (''||Nm3user.get_effective_date);
+--     append (''||To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY'));
 --     append ('');
 --     append ('Validate Theme '||l_rec_nth.nth_theme_name);
 --     append ('================================================');
@@ -8989,9 +9017,9 @@ PROCEDURE create_msv_feature_views
       l_tab_ftabs      Nm3type.tab_varchar30;
       l_nl             VARCHAR2 (10)         := CHR (10);
 --
-      FUNCTION is_priv_syn (
-         pi_syn_name   IN   dba_synonyms.synonym_name%TYPE,
-         pi_owner      IN   dba_synonyms.owner%TYPE
+      FUNCTION is_priv_view (
+         pi_view_name   IN   dba_views.view_name%TYPE,
+         pi_owner      IN   dba_views.owner%TYPE
       )
          RETURN BOOLEAN
       IS
@@ -9001,15 +9029,15 @@ PROCEDURE create_msv_feature_views
          --
          SELECT 'exists'
            INTO l_var
-           FROM dba_synonyms
-          WHERE synonym_name = pi_syn_name AND owner = pi_owner;
+           FROM dba_views
+          WHERE view_name = pi_view_name AND owner = pi_owner;
          --
          RETURN TRUE;
       --
       EXCEPTION
          WHEN OTHERS THEN RETURN FALSE;
       --
-      END is_priv_syn;
+      END is_priv_view;
 --
    BEGIN
 --
@@ -9054,11 +9082,11 @@ PROCEDURE create_msv_feature_views
         LOOP
           FOR t IN 1 .. l_tab_ftabs.COUNT
           LOOP
-            IF is_priv_syn (l_tab_ftabs (t), l_tab_username (i))
+            IF is_priv_view (l_tab_ftabs (t), l_tab_username (i))
             THEN
               BEGIN
 
-                EXECUTE IMMEDIATE    'DROP SYNONYM '
+                EXECUTE IMMEDIATE    'DROP VIEW '
                                   || l_tab_username (i)
                                   || '.'
                                   || l_tab_ftabs (t);
@@ -9068,9 +9096,9 @@ PROCEDURE create_msv_feature_views
             END IF;
 
             BEGIN
-
-              EXECUTE IMMEDIATE
-                                   'CREATE OR REPLACE FORCE VIEW '
+              EXECUTE IMMEDIATE ('CREATE OR REPLACE SYNONYM '||l_tab_username(i)||'.'||l_tab_ftabs (t) || 
+                                 ' FOR ' || Sys_Context('NM3CORE','APPLICATION_OWNER') || '.' || l_tab_ftabs (t));
+              /*EXECUTE IMMEDIATE 'CREATE OR REPLACE FORCE VIEW '
                                 || l_tab_username (i)
                                 || '.'
                                 || l_tab_ftabs (t)
@@ -9080,7 +9108,7 @@ PROCEDURE create_msv_feature_views
                                 || '  SELECT * FROM '
                                 || l_higowner
                                 || '.'
-                                || l_tab_ftabs (t);
+                                || l_tab_ftabs (t);*/
 
             EXCEPTION
                WHEN OTHERS
@@ -9119,7 +9147,7 @@ PROCEDURE create_msv_feature_views
 --      l_sql :=
 --            'SELECT table_name, column_name, diminfo, srid '|| nl
 --         || '  FROM all_sdo_geom_metadata '|| nl
---         || ' WHERE owner = Hig.get_application_owner ';
+--         || ' WHERE owner = Sys_Context(''NM3CORE'',''APPLICATION_OWNER'') ';
 --      --
 --      IF pi_role_restrict
 --      THEN
@@ -9170,7 +9198,7 @@ PROCEDURE create_msv_feature_views
         ' sdo_srid ) '||nl||
         'SELECT '''||pi_sub_username||''', sdo_table_name, sdo_column_name, sdo_diminfo, sdo_srid '||nl||
         '  FROM mdsys.sdo_geom_metadata_table a'||nl||
-        ' WHERE sdo_owner = hig.get_application_owner '||nl||
+        ' WHERE sdo_owner = Sys_Context(''NM3CORE'',''APPLICATION_OWNER'') '||nl||
         '   AND NOT EXISTS '||nl||
         '     (SELECT 1 FROM mdsys.sdo_geom_metadata_table b '||nl||
         '       WHERE '''||pi_sub_username||'''  = b.sdo_owner '||nl||
@@ -9183,7 +9211,7 @@ PROCEDURE create_msv_feature_views
         ' sdo_srid ) '||nl||
         'SELECT :pi_sub_username, sdo_table_name, sdo_column_name, sdo_diminfo, sdo_srid '||nl||
         '  FROM mdsys.sdo_geom_metadata_table a'||nl||
-        ' WHERE sdo_owner = hig.get_application_owner '||nl||
+        ' WHERE sdo_owner = Sys_Context(''NM3CORE'',''APPLICATION_OWNER'') '||nl||
         '   AND NOT EXISTS '||nl||
         '     (SELECT 1 FROM mdsys.sdo_geom_metadata_table b '||nl||
         '       WHERE :pi_sub_username  = b.sdo_owner '||nl||
@@ -9259,7 +9287,9 @@ BEGIN
   -- AE 23-SEP-2008
   -- We will now use views instead of synonyms to provide subordinate user access
   -- to spatial objects
-  nm3ddl.create_object_and_views (l_vw, l_ddl_text);
+  --nm3ddl.create_object_and_views (l_vw, l_ddl_text);
+  -- CWS 0108742 Change back to using synonyms
+  Nm3ddl.create_object_and_syns( l_vw, l_ddl_text );
 
 
 END;
