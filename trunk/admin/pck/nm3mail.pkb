@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY nm3mail AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mail.pkb-arc   2.11   May 19 2011 12:07:10   Steve.Cooper  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mail.pkb-arc   2.12   May 25 2011 09:05:16   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3mail.pkb  $
---       Date into PVCS   : $Date:   May 19 2011 12:07:10  $
---       Date fetched Out : $Modtime:   May 19 2011 10:13:14  $
---       Version          : $Revision:   2.11  $
+--       Date into PVCS   : $Date:   May 25 2011 09:05:16  $
+--       Date fetched Out : $Modtime:   May 25 2011 08:45:10  $
+--       Version          : $Revision:   2.12  $
 --       Based on SCCS version : 1.12
 -------------------------------------------------------------------------
 --   Author : Jonathan Mills
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3mail AS
 --
 --all global package variables here
 --
-  g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.11  $';
+  g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.12  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3mail';
@@ -920,7 +920,7 @@ FUNCTION nmm_predicate ( schema_in varchar2, name_in varchar2) RETURN varchar2 I
    l_predicate nm3type.max_varchar2;
 BEGIN
 --
-   IF Sys_Context('NM3CORE','UNRESTRICTED_INVENTORY') = 'Y'
+   IF Sys_Context('NM3CORE','UNRESTRICTED_INVENTORY') = 'TRUE'
     THEN
       l_predicate := Null;
    ELSE
