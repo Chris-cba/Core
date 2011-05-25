@@ -6,11 +6,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3sde AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sde.pkb-arc   2.12   May 17 2011 08:26:24   Steve.Cooper  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sde.pkb-arc   2.13   May 25 2011 17:23:18   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3sde.pkb  $
---       Date into PVCS   : $Date:   May 17 2011 08:26:24  $
---       Date fetched Out : $Modtime:   May 05 2011 13:39:50  $
---       PVCS Version     : $Revision:   2.12  $
+--       Date into PVCS   : $Date:   May 25 2011 17:23:18  $
+--       Date fetched Out : $Modtime:   May 25 2011 17:21:50  $
+--       PVCS Version     : $Revision:   2.13  $
 --
 --       Based on one of many versions labeled as 1.21
 --
@@ -24,7 +24,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3sde AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.12  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.13  $"';
    g_keyword         CONSTANT  VARCHAR2(30)   := 'SDO_GEOMETRY'; --get_keyword;
 
 
@@ -541,7 +541,7 @@ BEGIN
 
     l_length_unit := get_length_unit_from_theme( p_theme_id );
 
-    l_munits := POWER ( 10, nm3unit.get_rounding(nm3unit.get_tol_from_unit_mask(l_length_unit)));
+    l_munits := POWER ( 10, nm3unit.get_rounding(nm3unit.get_tol_from_unit_mask(nvl(l_length_unit, 1))));
     
   else
     
