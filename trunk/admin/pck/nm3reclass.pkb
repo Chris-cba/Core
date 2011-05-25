@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3reclass AS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3reclass.pkb-arc   2.12   May 18 2011 09:27:46   Steve.Cooper  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3reclass.pkb-arc   2.13   May 25 2011 09:05:14   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3reclass.pkb  $
---       Date into PVCS   : $Date:   May 18 2011 09:27:46  $
---       Date fetched Out : $Modtime:   May 18 2011 09:26:58  $
---       PVCS Version     : $Revision:   2.12  $
+--       Date into PVCS   : $Date:   May 25 2011 09:05:14  $
+--       Date fetched Out : $Modtime:   May 25 2011 09:03:02  $
+--       PVCS Version     : $Revision:   2.13  $
 --
 --
 --   Author : R.A. Coupe
@@ -21,7 +21,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3reclass AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.12  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.13  $"';
 -- g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3reclass';
@@ -243,7 +243,7 @@ BEGIN
      RETURN(FALSE);					  
   END IF;
   --
-  IF  NOT Sys_Context('NM3CORE','UNRESTRICTED_INVENTORY') = 'Y' 
+  IF  NOT Sys_Context('NM3CORE','UNRESTRICTED_INVENTORY') = 'TRUE' 
   AND NOT(nm3inv_security.can_usr_see_all_inv_on_element(pi_ne_id => pi_ne_rec.ne_id))
   THEN
     set_output_params( nm3type.c_net 
