@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.38.1.0   May 20 2011 09:17:50   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.38.1.1   May 25 2011 15:15:24   Mike.Alexander  $
 --       Module Name      : $Workfile:   nm3bulk_mrg.pkb  $
---       Date into PVCS   : $Date:   May 20 2011 09:17:50  $
---       Date fetched Out : $Modtime:   May 20 2011 09:10:20  $
---       PVCS Version     : $Revision:   2.38.1.0  $
+--       Date into PVCS   : $Date:   May 25 2011 15:15:24  $
+--       Date fetched Out : $Modtime:   May 25 2011 15:13:16  $
+--       PVCS Version     : $Revision:   2.38.1.1  $
 --
 --
 --   Author : Priidu Tanava
@@ -124,7 +124,7 @@ No query types defined.
         add nm_route_connect_tmp_ordered view with the next schema change
         in nm3dynsql replace the use of nm3sql.set_context_value() with that of nm3ctx
 */
-  g_body_sccsid     constant  varchar2(40)  :='"$Revision:   2.38.1.0  $"';
+  g_body_sccsid     constant  varchar2(40)  :='"$Revision:   2.38.1.1  $"';
   g_package_name    constant  varchar2(30)  := 'nm3bulk_mrg';
 
   cr  constant varchar2(1) := chr(10);
@@ -956,7 +956,6 @@ No query types defined.
     ||cr||'  ,nm_inv_items_all i'
         ||sql_ft_sources
     ||cr||'where t.nm_obj_type = i.iit_inv_type (+)'
---  ||cr||'  and t.iit_rowid = i.rowid (+)'
     ||cr||'  and t.nm_ne_id_in = i.iit_ne_id (+)'
         ||sql_ft_outer_joins
     ||cr||') q'
@@ -2462,7 +2461,6 @@ No query types defined.
     ||cr||' and t.nm_end_mp != t.nm_begin_mp  ))'   -- exclusde all point data in the linear section  
 --    ||cr||'  and ((m.nsm_end_mp > m.nsm_begin_mp and t.nm_end_mp > t.nm_begin_mp)'
 --    ||cr||'    or (m.nsm_end_mp = m.nsm_begin_mp and t.nm_end_mp = t.nm_begin_mp))'
---    ||cr||'  and t.iit_rowid = i.rowid (+)'
     ||cr||'  and t.nm_ne_id_in = i.iit_ne_id (+)'    
         ||sql_ft_outer_joins
     ||cr||') q'
