@@ -3,17 +3,17 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3layer_tool.pkb-arc   2.28   May 16 2011 14:45:00   Steve.Cooper  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3layer_tool.pkb-arc   2.29   May 27 2011 10:20:58   Chris.Strettle  $
 --       Module Name      : $Workfile:   nm3layer_tool.pkb  $
---       Date into PVCS   : $Date:   May 16 2011 14:45:00  $
---       Date fetched Out : $Modtime:   May 05 2011 11:01:06  $
---       Version          : $Revision:   2.28  $
+--       Date into PVCS   : $Date:   May 27 2011 10:20:58  $
+--       Date fetched Out : $Modtime:   May 27 2011 10:03:12  $
+--       Version          : $Revision:   2.29  $
 --       Based on SCCS version : 1.11
 -------------------------------------------------------------------------
 --
 --all global package variables here
 --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000)       := '$Revision:   2.28  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000)       := '$Revision:   2.29  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name   CONSTANT VARCHAR2 (30)         := 'NM3LAYER_TOOL';
@@ -5253,7 +5253,7 @@ BEGIN
   END IF;
 --
   INSERT INTO mdsys.sdo_geom_metadata_table
-  SELECT Sys_Context('NM3CORE','APPLICATION_OWNER')
+SELECT Sys_Context('NM3CORE','APPLICATION_OWNER')
        , nth_feature_table
        , nth_feature_shape_column
        , CASE 
@@ -5267,52 +5267,24 @@ BEGIN
                ELSE sdo_diminfo
              END
          END
---       , CASE 
---           WHEN ntg_gtype LIKE '3%'
---           THEN l_diminfo
---           ELSE 
---             CASE 
---               WHEN nm3sdo.get_dimension( l_diminfo ) = 3
---               THEN l_2d_diminfo
---               ELSE l_diminfo
---             END
---         END
-        --, DECODE ( ntg_gtype, 3302, l_diminfo, l_2d_diminfo )
---       , l_diminfo
-       , NVL(nm3layer_tool.get_srid(nth_theme_id),l_srid)
-    FROM nm_themes_all
-       , nm_theme_gtypes
-       , (SELECT sdo_diminfo FROM mdsys.sdo_geom_metadata_table
-           WHERE sdo_owner = Sys_Context('NM3CORE','APPLICATION_OWNER')
-             AND sdo_table_name = l_rec_base_nth.nth_feature_table
-             AND sdo_column_name = l_rec_base_nth.nth_feature_shape_column)
-   WHERE ntg_theme_id = nth_theme_id
-     AND nth_theme_id IN
-     (
-  --
-  -- Already populated the highways owners base table data
-  --
-  --      -- Get theme details
-  --      SELECT nth_theme_id FROM nm_themes_all
-  --       WHERE nth_theme_id = 582
-  --      UNION
---
-  --      -- Get any view based themes
-  --
-        /*SELECT nth_theme_id FROM nm_themes_all
-         WHERE nth_base_table_theme = pi_nth_theme_id
-        UNION
-        -- Get any dependent themes
-        SELECT nth_theme_id FROM nm_themes_all
-         WHERE nth_theme_id IN
-           ( SELECT nbth_theme_id
-               FROM nm_base_themes 
-              WHERE nbth_base_theme = pi_nth_theme_id )
-        */
-         SELECT ne_id FROM TABLE ( g_tab_themes )
-          WHERE ne_id != pi_nth_theme_id
-      )
-  AND NOT EXISTS
+      , srid
+   FROM
+  (SELECT DISTINCT nth_feature_table
+        , nth_feature_shape_column
+        , ntg_gtype
+        , NVL(nm3layer_tool.get_srid(nth_theme_id),l_srid) srid
+     FROM nm_themes_all
+        , nm_theme_gtypes
+   WHERE  nth_theme_id IN (SELECT ne_id 
+                             FROM TABLE (g_tab_themes) 
+                            WHERE ne_id != pi_nth_theme_id)
+   AND ntg_theme_id = nth_theme_id) a
+  ,(SELECT sdo_diminfo 
+      FROM mdsys.sdo_geom_metadata_table
+     WHERE sdo_owner = Sys_Context('NM3CORE','APPLICATION_OWNER')
+       AND sdo_table_name = l_rec_base_nth.nth_feature_table
+       AND sdo_column_name = l_rec_base_nth.nth_feature_shape_column) b
+   WHERE NOT EXISTS
   ( SELECT 1 FROM mdsys.sdo_geom_metadata_table
      WHERE sdo_owner = Sys_Context('NM3CORE','APPLICATION_OWNER')
        AND sdo_table_name = nth_feature_table
