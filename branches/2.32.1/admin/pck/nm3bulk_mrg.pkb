@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.32.1.15   23 Aug 2010 14:35:10   ptanava  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.32.1.16   May 27 2011 10:57:06   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3bulk_mrg.pkb  $
---       Date into PVCS   : $Date:   23 Aug 2010 14:35:10  $
---       Date fetched Out : $Modtime:   23 Aug 2010 07:58:36  $
---       PVCS Version     : $Revision:   2.32.1.15  $
+--       Date into PVCS   : $Date:   May 27 2011 10:57:06  $
+--       Date fetched Out : $Modtime:   May 03 2011 11:56:52  $
+--       PVCS Version     : $Revision:   2.32.1.16  $
 --
 --
 --   Author : Priidu Tanava
@@ -124,7 +124,7 @@ No query types defined.
         add nm_route_connect_tmp_ordered view with the next schema change
         in nm3dynsql replace the use of nm3sql.set_context_value() with that of nm3ctx
 */
-  g_body_sccsid     constant  varchar2(40)  :='"$Revision:   2.32.1.15  $"';
+  g_body_sccsid     constant  varchar2(40)  :='"$Revision:   2.32.1.16  $"';
   g_package_name    constant  varchar2(30)  := 'nm3bulk_mrg';
 
   cr  constant varchar2(1) := chr(10);
@@ -380,8 +380,8 @@ No query types defined.
           for j in 1 .. pt_attr.count loop
             if pt_attr(j).inv_type = pt_attr(i).inv_type then
               if pt_attr(j).where_sql is not null then
-                l_sql_tmp := l_sql_tmp
-                  ||' and i.'||pt_attr(j).where_sql;
+                -- CWS 23/OCT/2009 
+                l_sql_tmp := l_sql_tmp || ' and ' || pt_attr(j).where_sql;
               end if;
             end if;
 
@@ -531,9 +531,9 @@ No query types defined.
           ||cr||'  ,null iit_rowid'
           ||cr||'  ,cast(null as date) iit_date_modified'
           ||cr||'from'
-          ||cr||'   '||t_ft(i).table_name
+          ||cr||'   '||t_ft(i).table_name ||' i '
           ||cr||'  ,nm_datum_criteria_tmp x'
-              ||sql_datum_tbl_join(t_ft(i).table_ne_column, 'where ')
+              ||sql_datum_tbl_join(t_ft(i).table_ne_column, 'where ', 'i')
               ||sql_ft_criteria(l_where_and, t_ft(i).where_sql);
 
       end if;
@@ -1036,39 +1036,69 @@ No query types defined.
       q2 := ''', '''||m_mrg_date_format||''')';
 
     end if;
-
-
-    case
-    when p_operator is null then
-      return null;
-
-    when p_operator in ('IN','NOT IN') then
-      select q1||nqv_value||q2 value
-      bulk collect into t
-      from nm_mrg_query_values
-      where nqv_nmq_id = p_nmq_id
-        and nqv_nqt_seq_no = p_nqt_seq_no
-        and nqv_attrib_name = p_attrib_name
-      order by nqv_sequence;
-      for i in 1 .. t.count loop
-        l_sql := l_sql||l_comma||t(i);
-        l_comma := ', ';
-      end loop;
-      l_sql := p_attrib_name||' '||lower(p_operator)||' ('||l_sql||')';
-
-    when p_operator in ('BETWEEN', 'NOT BETWEEN') then
-      l_sql := p_attrib_name||' '||lower(p_operator)||' '||q1||p_value1||q2||' and '||q1||p_value2||q2;
-
-    when p_operator in ('IS NULL', 'IS NOT NULL') then
-      l_sql := p_attrib_name||' '||lower(p_operator);
-
-    else
-      l_sql := p_attrib_name||' '||lower(p_operator)||' '||q1||p_value1||q2;
-
-    end case;
-
+     -- CWS 23/OCT/2009 
+     if nm3gaz_qry.get_ignore_case and p_ita_format = 'VARCHAR2' then  
+        case
+        when p_operator is null then
+          return null;
+          
+        when p_operator in ('IN','NOT IN') then
+          select q1||nqv_value||q2 value
+          bulk collect into t
+          from nm_mrg_query_values
+          where nqv_nmq_id = p_nmq_id
+            and nqv_nqt_seq_no = p_nqt_seq_no
+            and nqv_attrib_name = p_attrib_name
+          order by nqv_sequence;
+          for i in 1 .. t.count loop
+            l_sql := l_sql||l_comma|| ' UPPER(' ||t(i) || ') ';
+            l_comma := ', ';
+          end loop;
+          l_sql := ' UPPER(i.'|| p_attrib_name||') '||lower(p_operator)||' ('||l_sql||')';
+        
+        when p_operator in ('BETWEEN', 'NOT BETWEEN') then
+          l_sql := ' UPPER(i.'||p_attrib_name||') '||lower(p_operator)||' UPPER( '||q1||p_value1||q2||') and UPPER('||q1||p_value2||q2||') ';
+        
+        when p_operator in ('IS NULL', 'IS NOT NULL') then
+          l_sql := ' i.'||p_attrib_name||' '||lower(p_operator);
+        
+        else
+          l_sql := ' UPPER(i.'||p_attrib_name||') '||lower(p_operator)||' UPPER( '||q1||p_value1||q2||') ';
+        end case;     
+     
+     else
+        case
+        when p_operator is null then
+          return null;
+          
+        when p_operator in ('IN','NOT IN') then
+          select q1||nqv_value||q2 value
+          bulk collect into t
+          from nm_mrg_query_values
+          where nqv_nmq_id = p_nmq_id
+            and nqv_nqt_seq_no = p_nqt_seq_no
+            and nqv_attrib_name = p_attrib_name
+          order by nqv_sequence;
+          for i in 1 .. t.count loop
+            l_sql := l_sql||l_comma||t(i);
+            l_comma := ', ';
+          end loop;
+          l_sql := ' i.'||p_attrib_name||' '||lower(p_operator)||' ('||l_sql||')';
+        
+        when p_operator in ('BETWEEN', 'NOT BETWEEN') then
+          l_sql := ' i.'||p_attrib_name||' '||lower(p_operator)||' '||q1||p_value1||q2||' and '||q1||p_value2||q2;
+        
+        when p_operator in ('IS NULL', 'IS NOT NULL') then
+          l_sql := ' i.'||p_attrib_name||' '||lower(p_operator);
+        
+        else
+          l_sql := ' i.'||p_attrib_name||' '||lower(p_operator)||' '||q1||p_value1||q2;
+        
+        end case;
+    end if;
+    --
     return l_sql;
-
+  --
   end;
 
 
@@ -1090,7 +1120,7 @@ No query types defined.
     k   binary_integer := 0;
     l_where_attrib varchar2(30);
     l_nmq_inner_outer_join nm_mrg_query_all.nmq_inner_outer_join%type;
-    l_hig_owner constant varchar2(30) := hig.get_application_owner;
+    l_hig_owner constant varchar2(30) := Sys_Context('NM3CORE','APPLICATION_OWNER');
 
   begin
     nm3dbg.putln(g_package_name||'.load_attrib_metadata('
@@ -1766,7 +1796,7 @@ No query types defined.
     t_inv               ita_mapping_tbl;
     t_idt               itd_tbl;
     l_inner_join        boolean;
-    l_effective_date    constant date := nm3user.get_effective_date;
+    l_effective_date    constant date := To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY');
     l_splits_rowcount   integer;
     l_homo_rowcount     integer;
     l_connect_rowcount  integer;
@@ -1971,7 +2001,7 @@ No query types defined.
     i             binary_integer;
     l_splits_cardinality      integer;
     l_sql_ial_effective_date  constant varchar2(200) := nm3dynsql.sql_effective_date(
-       p_date               => nm3user.get_effective_date
+       p_date               => To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
       ,p_start_date_column  => 'ial_start_date'
       ,p_end_date_column    => 'ial_end_date'
     );
@@ -2023,7 +2053,7 @@ No query types defined.
         elsif pt_attr(i).ita_format = 'DATE' then
           s := s||cr||'  ,case t.nm_obj_type'
           ||cr||'    when '''||pt_attr(i).inv_type||''''
-          ||cr||'    then to_char('||l_inv_alias||'.'||l_attrib||', '''|| nm3user.get_user_date_mask ||''') end NSV_ATTRIB'||j;
+          ||cr||'    then to_char('||l_inv_alias||'.'||l_attrib||', '''|| Sys_Context('NM3CORE','USER_DATE_MASK') ||''') end NSV_ATTRIB'||j;
 
         -- normal attribute with banding
         elsif b is not null then
@@ -2204,7 +2234,7 @@ No query types defined.
             -- domain lookup date formatting inferred from nm3inv.get_inv_domain_meaning()
             --  (no domain lookup formatting for numbers)
             if pt_attr(i).ita_format = 'DATE' then
-              l_ita_format_mask := nvl(nm3user.get_user_date_mask, l_def_user_date_format);
+              l_ita_format_mask := nvl(Sys_Context('NM3CORE','USER_DATE_MASK'), l_def_user_date_format);
 
             end if;
 
@@ -2402,7 +2432,7 @@ No query types defined.
     ||cr||'  ,q3.*'
     ||cr||'from ('
     ||cr||'select'
-    ||cr||'   dense_rank() over (order by q2.min_ne_id_in) value_id'
+    ||cr||'   dense_rank() over (order by q2.min_ne_id_in, q2.inv_type) value_id'
     ||cr||'  ,q2.*'
     ||cr||'from ('
     ||cr||'select'
@@ -2424,9 +2454,13 @@ No query types defined.
         ||sql_ft_sources
     ||cr||'where m.nsm_mrg_job_id = :p_mrg_job_id'
     ||cr||'  and m.nsm_ne_id = t.nm_ne_id_of'
-    ||cr||'  and m.nsm_begin_mp = t.nm_begin_mp'
-    ||cr||'  and ((m.nsm_end_mp > m.nsm_begin_mp and t.nm_end_mp > t.nm_begin_mp)'
-    ||cr||'    or (m.nsm_end_mp = m.nsm_begin_mp and t.nm_end_mp = t.nm_begin_mp))'
+    ||cr||'  and ( (  (m.nsm_end_mp =  m.nsm_begin_mp)'   -- a point section 
+    ||cr||'       and (t.nm_end_mp >= m.nsm_begin_mp and t.nm_begin_mp <= m.nsm_end_mp ))'   -- include all intersecting data at a point 
+    ||cr||' or ( ( m.nsm_end_mp != m.nsm_begin_mp )  '  -- a line section 
+    ||cr||'  and (m.nsm_end_mp > t.nm_begin_mp and t.nm_end_mp > m.nsm_begin_mp)' 
+    ||cr||' and t.nm_end_mp != t.nm_begin_mp  ))'   -- exclusde all point data in the linear section  
+--    ||cr||'  and ((m.nsm_end_mp > m.nsm_begin_mp and t.nm_end_mp > t.nm_begin_mp)'
+--    ||cr||'    or (m.nsm_end_mp = m.nsm_begin_mp and t.nm_end_mp = t.nm_begin_mp))'
     ||cr||'  and t.iit_rowid = i.rowid (+)'
         ||sql_ft_outer_joins
     ||cr||') q'
@@ -2466,7 +2500,7 @@ No query types defined.
     l_group_type        nm_group_types.ngt_group_type%type;
     l_ne_type           nm_elements.ne_type%type;
     l_ngt_linear_flag   nm_group_types.ngt_linear_flag%type;
-    l_effective_date    constant date := nm3context.get_effective_date;
+    l_effective_date    constant date := To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY');
     l_group_id_linear   boolean := false;
 
   begin
@@ -2519,7 +2553,7 @@ No query types defined.
       -- p_group_type not given or not linear
       -- use PREFLRM
       if l_group_type is null then
-        l_group_type := hig.get_useopt('PREFLRM', user);
+        l_group_type := hig.get_useopt('PREFLRM', Sys_Context('NM3_SECURITY_CTX','USERNAME'));
         ensure_group_type_linear(
            p_group_type_in  => l_group_type
           ,p_group_type_out => l_group_type
@@ -2639,7 +2673,7 @@ No query types defined.
           ||cr||'    where d.nsd_nse_id = :p_nse_id'
       );
     l_group_type      nm_group_types.ngt_group_type%type;
-    l_effective_date  constant date := nm3context.get_effective_date;
+    l_effective_date  constant date := To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY');
 
   begin
     nm3dbg.putln(g_package_name||'.load_extent_datums('
@@ -2656,7 +2690,7 @@ No query types defined.
     );
     -- preferred lrm
     if l_group_type is null then
-      l_group_type := hig.get_useopt('PREFLRM', user);
+      l_group_type := hig.get_useopt('PREFLRM', Sys_Context('NM3_SECURITY_CTX','USERNAME'));
       ensure_group_type_linear(
          p_group_type_in  => l_group_type
         ,p_group_type_out => l_group_type
@@ -2711,7 +2745,7 @@ No query types defined.
         ||cr||'    where d.nte_job_id = :p_nte_job_id'
       );
     l_group_type      nm_group_types.ngt_group_type%type;
-    l_effective_date  constant date := nm3context.get_effective_date;
+    l_effective_date  constant date := To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY');
     l_sqlcount        pls_integer;
 
   begin
@@ -2756,7 +2790,7 @@ No query types defined.
     );
     -- preferred lrm
     if l_group_type is null then
-      l_group_type := hig.get_useopt('PREFLRM', user);
+      l_group_type := hig.get_useopt('PREFLRM', Sys_Context('NM3_SECURITY_CTX','USERNAME'));
       ensure_group_type_linear(
          p_group_type_in  => l_group_type
         ,p_group_type_out => l_group_type
@@ -2814,7 +2848,7 @@ No query types defined.
           ||cr||'      and nm_type = ''G'''
       );
     l_group_type      nm_group_types.ngt_group_type%type;
-    l_effective_date  constant date := nm3context.get_effective_date;
+    l_effective_date  constant date := To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY');
 
   begin
     nm3dbg.putln(g_package_name||'.load_group_type_datums('
@@ -2840,7 +2874,7 @@ No query types defined.
     end if;
     -- preferred lrm
     if l_group_type is null then
-      l_group_type := hig.get_useopt('PREFLRM', user);
+      l_group_type := hig.get_useopt('PREFLRM', Sys_Context('NM3_SECURITY_CTX','USERNAME'));
       ensure_group_type_linear(
          p_group_type_in  => l_group_type
         ,p_group_type_out => l_group_type
@@ -2903,7 +2937,7 @@ No query types defined.
           ||cr||'    )'
       );
     l_group_type      nm_group_types.ngt_group_type%type;
-    l_effective_date  constant date := nm3context.get_effective_date;
+    l_effective_date  constant date := To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY');
 
   begin
     nm3dbg.putln(g_package_name||'.load_nt_type_datums('
@@ -2932,7 +2966,7 @@ No query types defined.
     );
     -- preferred lrm
     if l_group_type is null then
-      l_group_type := hig.get_useopt('PREFLRM', user);
+      l_group_type := hig.get_useopt('PREFLRM', Sys_Context('NM3_SECURITY_CTX','USERNAME'));
       ensure_group_type_linear(
          p_group_type_in  => l_group_type
         ,p_group_type_out => l_group_type
@@ -2993,7 +3027,7 @@ No query types defined.
           ||cr||'    )'
       );
     l_group_type      nm_group_types.ngt_group_type%type;
-    l_effective_date  constant date := nm3context.get_effective_date;
+    l_effective_date  constant date := To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY');
 
   begin
     nm3dbg.putln(g_package_name||'.load_all_network_datums('
@@ -3010,7 +3044,7 @@ No query types defined.
     );
     -- preferred lrm
     if l_group_type is null then
-      l_group_type := hig.get_useopt('PREFLRM', user);
+      l_group_type := hig.get_useopt('PREFLRM', Sys_Context('NM3_SECURITY_CTX','USERNAME'));
       ensure_group_type_linear(
          p_group_type_in  => l_group_type
         ,p_group_type_out => l_group_type
@@ -3070,7 +3104,7 @@ No query types defined.
     l_gg_count    pls_integer;
 
     l_ne_type     nm_elements.ne_type%type;
-    l_effective_date  constant date := nm3context.get_effective_date;
+    l_effective_date  constant date := To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY');
 
   begin
     nm3dbg.putln(g_package_name||'.load_gaz_list_datums('
@@ -3089,7 +3123,7 @@ No query types defined.
     );
     -- preferred lrm
     if l_group_type is null then
-      l_group_type := hig.get_useopt('PREFLRM', user);
+      l_group_type := hig.get_useopt('PREFLRM', Sys_Context('NM3_SECURITY_CTX','USERNAME'));
       ensure_group_type_linear(
          p_group_type_in  => l_group_type
         ,p_group_type_out => l_group_type
@@ -3537,7 +3571,7 @@ No query types defined.
 
   procedure clear_datum_criteria_pre_tmp
   is
-    pragma autonomous_transaction;
+  --  pragma autonomous_transaction;
   begin
     execute immediate 'truncate table nm_datum_criteria_pre_tmp drop storage';
     commit;
@@ -3548,7 +3582,7 @@ No query types defined.
 
   procedure clear_datum_criteria_tmp
   is
-    pragma autonomous_transaction;
+  --  pragma autonomous_transaction;
   begin
     execute immediate 'truncate table nm_datum_criteria_tmp drop storage';
     commit;
@@ -3559,7 +3593,7 @@ No query types defined.
 
   procedure clear_route_connectivity_tmp
   is
-    pragma autonomous_transaction;
+  --  pragma autonomous_transaction;
   begin
     execute immediate 'truncate table nm_route_connectivity_tmp drop storage';
     commit;
@@ -3570,7 +3604,7 @@ No query types defined.
   
   procedure clear_splits_tmp
   is
-    pragma autonomous_transaction;
+  --  pragma autonomous_transaction;
   begin
     execute immediate 'truncate table nm_mrg_split_results_tmp drop storage';
     commit;
@@ -3581,7 +3615,7 @@ No query types defined.
   
   procedure clear_homo_chunks_tmp
   is
-    pragma autonomous_transaction;
+  --  pragma autonomous_transaction;
   begin
     execute immediate 'truncate table nm_mrg_datum_homo_chunks_tmp drop storage';
     commit;
