@@ -5,12 +5,11 @@ AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.42   May 24 2011 15:42:36   Chris.Strettle  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.43   May 31 2011 16:43:52   Chris.Strettle  $
 --       Module Name      : $Workfile:   nm3sdm.pkb  $
---       Date into PVCS   : $Date:   May 24 2011 15:42:36  $
---       Date fetched Out : $Modtime:   May 24 2011 14:02:24  $
---       PVCS Version     : $Revision:   2.42  $
---       Norfolk Specific Based on Main Branch revision : 2.37
+--       Date into PVCS   : $Date:   May 31 2011 16:43:52  $
+--       Date fetched Out : $Modtime:   May 31 2011 16:40:46  $
+--       PVCS Version     : $Revision:   2.43  $
 --
 --   Author : R.A. Coupe
 --
@@ -22,7 +21,7 @@ AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT VARCHAR2 (2000) := 'Norfolk Specific: ' || '"$Revision:   2.42  $"';
+   g_body_sccsid     CONSTANT VARCHAR2 (2000) := '"$Revision:   2.43  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT VARCHAR2 (30)   := 'NM3SDM';
@@ -7687,11 +7686,11 @@ end;
    */
    --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.42   May 24 2011 15:42:36   Chris.Strettle  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.43   May 31 2011 16:43:52   Chris.Strettle  $
 --       Module Name      : $Workfile:   nm3sdm.pkb  $
---       Date into PVCS   : $Date:   May 24 2011 15:42:36  $
---       Date fetched Out : $Modtime:   May 24 2011 14:02:24  $
---       PVCS Version     : $Revision:   2.42  $
+--       Date into PVCS   : $Date:   May 31 2011 16:43:52  $
+--       Date fetched Out : $Modtime:   May 31 2011 16:40:46  $
+--       PVCS Version     : $Revision:   2.43  $
 
       append ('--   PVCS Identifiers :-');
       append ('--');
