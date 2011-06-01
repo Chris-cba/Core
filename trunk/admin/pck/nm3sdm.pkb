@@ -5,11 +5,11 @@ AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.44   Jun 01 2011 11:28:22   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.45   Jun 01 2011 11:37:48   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3sdm.pkb  $
---       Date into PVCS   : $Date:   Jun 01 2011 11:28:22  $
---       Date fetched Out : $Modtime:   Jun 01 2011 11:26:22  $
---       PVCS Version     : $Revision:   2.44  $
+--       Date into PVCS   : $Date:   Jun 01 2011 11:37:48  $
+--       Date fetched Out : $Modtime:   Jun 01 2011 11:36:44  $
+--       PVCS Version     : $Revision:   2.45  $
 --
 --   Author : R.A. Coupe
 --
@@ -21,7 +21,7 @@ AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT VARCHAR2 (2000) := '"$Revision:   2.44  $"';
+   g_body_sccsid     CONSTANT VARCHAR2 (2000) := '"$Revision:   2.45  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT VARCHAR2 (30)   := 'NM3SDM';
@@ -5266,8 +5266,21 @@ end;
       -- Include begin_mp and only operate on open shapes
       -- End of changes
 
+		--RAC - Task 0111157 - the update string must update the shape end date on the basis
+		--      of the actual start-date for the specific mamber that is targetted.
+		--      Without this, the end-date of an asset  (hence members) will update the end-date on
+		--      all shape records that have the same begin-mp - including those that are already ended.
+		
+           if p_nm_end_date is not null then
+             upd_string := upd_string ||' and end_date is null and start_date = :start_date';
+           else
+             upd_string := upd_string ||' and start_date = :start_date';
+           end if;
+		
+--         nm_debug.debug('End date string '||upd_string);
            EXECUTE IMMEDIATE upd_string
-                     USING p_nm_end_date, p_nm_ne_id_in, p_nm_ne_id_of, p_nm_begin_mp;
+                     USING p_nm_end_date, p_nm_ne_id_in, p_nm_ne_id_of, p_nm_begin_mp, p_nm_start_date;
+	  
       --
          ELSE
       --
@@ -5290,8 +5303,22 @@ end;
       -- AE 27-MAR-2009
       -- Pass in nm_begin_mp !!
       --
-          EXECUTE IMMEDIATE upd_string
-                    USING p_nm_end_date, p_nm_ne_id_of, p_nm_begin_mp, p_nm_obj_type, irec.obj_type, p_nm_ne_id_in, '1';
+
+      --RAC - Task 0111157 - the update string must update the shape end date on the basis
+      --      of the actual start-date for the specific mamber that is targetted.
+      --      Without this, the end-date of an asset  (hence members) will update the end-date on
+      --      all shape records that have the same begin-mp - including those that are already ended.
+        
+           if p_nm_end_date is not null then
+             upd_string := upd_string ||' and end_date is null and start_date = :start_date';
+           else
+             upd_string := upd_string ||' and start_date = :start_date';
+           end if;
+        
+--         nm_debug.debug('End date string '||upd_string);
+
+           EXECUTE IMMEDIATE upd_string
+                    USING p_nm_end_date, p_nm_ne_id_of, p_nm_begin_mp, p_nm_obj_type, irec.obj_type, p_nm_ne_id_in, '1', p_nm_start_date;
       --
          END IF;
       --
@@ -7697,11 +7724,11 @@ end;
    */
    --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.44   Jun 01 2011 11:28:22   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.45   Jun 01 2011 11:37:48   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3sdm.pkb  $
---       Date into PVCS   : $Date:   Jun 01 2011 11:28:22  $
---       Date fetched Out : $Modtime:   Jun 01 2011 11:26:22  $
---       PVCS Version     : $Revision:   2.44  $
+--       Date into PVCS   : $Date:   Jun 01 2011 11:37:48  $
+--       Date fetched Out : $Modtime:   Jun 01 2011 11:36:44  $
+--       PVCS Version     : $Revision:   2.45  $
 
       append ('--   PVCS Identifiers :-');
       append ('--');
