@@ -2,12 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm3merge IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3merge.pkb-arc   2.11   May 18 2011 09:24:24   Steve.Cooper  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3merge.pkb-arc   2.12   Jun 01 2011 10:05:34   Chris.Strettle  $
 --       Module Name      : $Workfile:   nm3merge.pkb  $
---       Date into PVCS   : $Date:   May 18 2011 09:24:24  $
---       Date fetched Out : $Modtime:   May 18 2011 08:49:24  $
---       PVCS Version     : $Revision:   2.11  $
---       Norfolk Specific Based on Main Branch revision : 2.9
+--       Date into PVCS   : $Date:   Jun 01 2011 10:05:34  $
+--       Date fetched Out : $Modtime:   Jun 01 2011 09:53:58  $
+--       PVCS Version     : $Revision:   2.12  $
 --
 --   Author : ITurnbull
 --
@@ -17,7 +16,7 @@ CREATE OR REPLACE PACKAGE BODY nm3merge IS
 --   Copyright (c) exor corporation ltd, 2000
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := 'Norfolk Specific: ' || '"$Revision:   2.11  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.12  $"';
 --  g_body_sccsid is the SCCS ID for the package body
    g_package_name    CONSTANT  varchar2(30)   := 'nm3merge';
 --
