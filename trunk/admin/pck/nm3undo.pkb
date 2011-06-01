@@ -4,12 +4,11 @@ IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3undo.pkb-arc   2.12   May 17 2011 15:12:48   Chris.Strettle  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3undo.pkb-arc   2.13   Jun 01 2011 10:10:40   Chris.Strettle  $
 --       Module Name      : $Workfile:   nm3undo.pkb  $
---       Date into PVCS   : $Date:   May 17 2011 15:12:48  $
---       Date fetched Out : $Modtime:   May 17 2011 15:08:48  $
---       PVCS Version     : $Revision:   2.12  $
---       Norfolk Specific Based on Main Branch revision : 2.11
+--       Date into PVCS   : $Date:   Jun 01 2011 10:10:40  $
+--       Date fetched Out : $Modtime:   Jun 01 2011 10:05:54  $
+--       PVCS Version     : $Revision:   2.13  $
 --
 --   Author : ITurnbull
 --
@@ -20,7 +19,7 @@ IS
 -- Copyright (c) exor corporation ltd, 2004
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := 'Norfolk Specific: ' || '"$Revision:   2.12  $"';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '"$Revision:   2.13  $"';
 --  g_body_sccsid is the SCCS ID for the package body
    g_package_name   CONSTANT VARCHAR2 (2000) := 'nm3undo';
 --

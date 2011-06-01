@@ -8,12 +8,11 @@ DECLARE
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/trg/ins_nm_members.trg-arc   2.2   May 18 2011 10:25:06   Chris.Strettle  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/trg/ins_nm_members.trg-arc   2.3   Jun 01 2011 10:10:40   Chris.Strettle  $
 --       Module Name      : $Workfile:   ins_nm_members.trg  $
---       Date into PVCS   : $Date:   May 18 2011 10:25:06  $
---       Date fetched Out : $Modtime:   May 18 2011 10:15:38  $
---       PVCS Version     : $Revision:   2.2  $
---       Norfolk Specific Based on Main Branch revision : 2.0
+--       Date into PVCS   : $Date:   Jun 01 2011 10:10:40  $
+--       Date fetched Out : $Modtime:   Jun 01 2011 10:07:04  $
+--       PVCS Version     : $Revision:   2.3  $
 --
 --   Author : Chris Strettle
 --
