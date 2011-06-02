@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm0575
 AS
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm0575.pkb-arc   2.8   May 16 2011 14:42:24   Steve.Cooper  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm0575.pkb-arc   2.9   Jun 02 2011 10:52:04   Ade.Edwards  $
 --       Module Name      : $Workfile:   nm0575.pkb  $
---       Date into PVCS   : $Date:   May 16 2011 14:42:24  $
---       Date fetched Out : $Modtime:   Apr 01 2011 10:40:02  $
---       PVCS Version     : $Revision:   2.8  $
+--       Date into PVCS   : $Date:   Jun 02 2011 10:52:04  $
+--       Date fetched Out : $Modtime:   Jun 02 2011 10:50:14  $
+--       PVCS Version     : $Revision:   2.9  $
 --       Based on SCCS version : 1.6
 
 --   Author : Graeme Johnson
@@ -23,7 +23,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000)  := '"$Revision:   2.8  $"';
+  g_body_sccsid  CONSTANT varchar2(2000)  := '"$Revision:   2.9  $"';
   g_package_name CONSTANT varchar2(30)    := 'nm0575';
   
   subtype id_type is nm_members.nm_ne_id_in%type;
@@ -81,6 +81,38 @@ END get_body_version;
 -----------------------------------------------------------------------------
 --
 
+
+PROCEDURE log_event(pi_log_iit_inv_type      IN nm0575_event_log.LOG_IIT_INV_TYPE%TYPE
+                   ,pi_log_action            IN nm0575_event_log.log_action%TYPE
+                   ,pi_log_iit_ne_id         IN nm0575_event_log.log_iit_ne_id%TYPE
+                   ,pi_log_iit_primary_key   IN nm0575_event_log.log_iit_primary_key%TYPE
+                   ,pi_log_iit_descr         IN nm0575_event_log.log_iit_descr%TYPE
+                   ,pi_log_message           IN nm0575_event_log.log_message%TYPE
+                   ,pi_log_error_flag        IN nm0575_event_log.log_error_flag%TYPE) IS 
+                      
+BEGIN    
+   
+  INSERT INTO NM0575_EVENT_LOG(log_iit_inv_type
+                              ,log_action
+                              ,log_iit_ne_id
+                              ,log_iit_primary_key
+                              ,log_iit_descr
+                              ,log_message
+                              ,log_error_flag)
+  VALUES (pi_log_iit_inv_type                            
+         ,pi_log_action
+         ,pi_log_iit_ne_id
+         ,pi_log_iit_primary_key
+         ,pi_log_iit_descr
+         ,pi_log_message
+         ,pi_log_error_flag);
+
+
+END log_event; 
+
+--
+-----------------------------------------------------------------------------
+--
 
 -- this populates the nm0575_possible_xsps temp table
 -- called in the form when the Asset Category Selected flag is changed in the second tab
@@ -591,9 +623,13 @@ PROCEDURE process_tab_asset_types(pi_tab_asset_types  IN nm3type.tab_varchar4
   l_main_count      pls_integer := 0;
   l_partial_count   pls_integer := 0;
   l_child_count     pls_integer := 0;
+  
+  l_log_message     nm3type.max_varchar2;
+  
   --r_log           nm0575_event_log%rowtype;
   l_action        varchar2(20);
- 
+  
+  c_end_location_only BOOLEAN := UPPER(pi_action) = 'C';
 
 
 BEGIN
@@ -648,6 +684,8 @@ BEGIN
           from (
           select distinct
              q.iit_ne_id nm_ne_id_in
+            ,q.iit_primary_key
+            ,q.iit_descr
             ,q.nm_ne_id_of
             ,q.nm_begin_mp
             ,q.nm_end_mp
@@ -687,6 +725,8 @@ BEGIN
              (
               select
                  i.iit_ne_id
+                ,i.iit_primary_key
+                ,i.iit_descr
                 ,im.nm_ne_id_of
                 ,im.nm_begin_mp
                 ,im.nm_end_mp
@@ -733,174 +773,206 @@ BEGIN
     
     -- start of the main asset placements loop
     loop
-      --nm_debug.debug_on;
-      l_main_count := l_main_count + 1;
-      nm3dbg.putln(l_main_count||'=(nm_ne_id_in='||r.nm_ne_id_in
-        ||', nm_ne_id_of='||r.nm_ne_id_of
-        ||', nm_begin_mp='||r.nm_begin_mp
-        ||', nm_end_mp='||r.nm_end_mp
-        ||', excluded_member_count='||r.excluded_member_count
-        ||', iig_parent_id='||r.iig_parent_id
-        ||', keep_begin_mp='||r.keep_begin_mp
-        ||', keep_end_mp='||r.keep_end_mp
-        ||', keep_begin_mp2='||r.keep_begin_mp2
-        ||', keep_end_mp2='||r.keep_end_mp2
-        ||')');
+    
+      BEGIN
 
-      -- close the current asset placement
-      close_member_record(
-         p_action   => pi_action
-        ,p_effective_date => l_effective_date
-        ,p_ne_id_in => r.nm_ne_id_in
-        ,p_ne_id_of => r.nm_ne_id_of
-        ,p_begin_mp => r.nm_begin_mp
-        ,p_start_date => r.nm_start_date
-      );
-        
-      
-      -- create the first not included part
-      if r.keep_begin_mp is not null then
-        insert into nm_members_all (
-          nm_ne_id_in, nm_ne_id_of, nm_type, nm_obj_type, nm_begin_mp
-          , nm_start_date, nm_end_mp, nm_cardinality, nm_admin_unit, nm_seq_no, nm_seg_no
-        )
-        values (
-          r.nm_ne_id_in, r.nm_ne_id_of, r.nm_type, r.nm_obj_type, r.keep_begin_mp
-          , l_effective_date, r.keep_end_mp, r.nm_cardinality, r.nm_admin_unit, r.nm_seq_no, r.nm_seg_no
-        );
-      end if;
-      
-      -- create the second not included part
-      if r.keep_begin_mp2 is not null then
-        insert into nm_members_all (
-          nm_ne_id_in, nm_ne_id_of, nm_type, nm_obj_type, nm_begin_mp
-          , nm_start_date, nm_end_mp, nm_cardinality, nm_admin_unit, nm_seq_no, nm_seg_no
-        )
-        values (
-          r.nm_ne_id_in, r.nm_ne_id_of, r.nm_type, r.nm_obj_type, r.keep_begin_mp2
-          , l_effective_date, r.keep_end_mp2, r.nm_cardinality, r.nm_admin_unit, r.nm_seq_no, r.nm_seg_no
-        );
-      end if;
-      
-      
-      
-      
-      -- asset (and child assets) processing continues here for wholly closed assets
-      
-      -- the asset is wholly closed
-      if r.excluded_member_count = 0
-        and r.keep_begin_mp is null
-        and r.keep_begin_mp2 is null
-        and r.iit_rownum = 1
-      then
-      
-         -- store the parent asset id for later forall closure of the inv_items records
-        t_iit_id.extend;
-        t_iit_id(t_iit_id.last) := r.nm_ne_id_in;
-        
-        
-        -- it is a parent asset
-        if r.iig_parent_id is not null then        
-          
-          --Log 717947:Linesh:20-Feb-2009:Start
-          -- bulk collect all the child item ids
-          --select g.iig_item_id, g.iig_top_id
-          --bulk collect into t_iig_item_id, t_iig_top_id
-          --from nm_inv_item_groupings g
-          --connect by prior g.iig_item_id = g.iig_parent_id
-          --start with g.iig_parent_id = r.iig_parent_id;
+        --nm_debug.debug_on;
+        l_main_count := l_main_count + 1;
+        nm3dbg.putln(l_main_count||'=(nm_ne_id_in='||r.nm_ne_id_in
+          ||', nm_ne_id_of='||r.nm_ne_id_of
+          ||', nm_begin_mp='||r.nm_begin_mp
+          ||', nm_end_mp='||r.nm_end_mp
+          ||', excluded_member_count='||r.excluded_member_count
+          ||', iig_parent_id='||r.iig_parent_id
+          ||', keep_begin_mp='||r.keep_begin_mp
+          ||', keep_end_mp='||r.keep_end_mp
+          ||', keep_begin_mp2='||r.keep_begin_mp2
+          ||', keep_end_mp2='||r.keep_end_mp2
+          ||')');
 
-          SELECT  iig.iig_item_id, iig.iig_top_id
-          bulk    collect into t_iig_item_id, t_iig_top_id
-          FROM    nm_inv_item_groupings iig
-                 ,nm_inv_items_all iit
-                 ,nm_inv_type_groupings itg
-          WHERE   iig.iig_item_id       = iit.iit_ne_id
-          AND     iit.iit_inv_type      = itg.itg_inv_type
-          AND     itg.itg_mandatory     = 'Y'                                    
-          CONNECT By PRIOR iig_item_id = iig_parent_id
-          START   WITH iig_parent_id   = r.iig_parent_id ;
-          --Log 717947:Linesh:20-Feb-2009:End
+        -- close the current asset placement
+        close_member_record(
+           p_action   => pi_action
+          ,p_effective_date => l_effective_date
+          ,p_ne_id_in => r.nm_ne_id_in
+          ,p_ne_id_of => r.nm_ne_id_of
+          ,p_begin_mp => r.nm_begin_mp
+          ,p_start_date => r.nm_start_date
+        );
           
-          l_child_count := l_child_count + t_iig_item_id.count;
+        
+        -- create the first not included part
+        if r.keep_begin_mp is not null then
+          insert into nm_members_all (
+            nm_ne_id_in, nm_ne_id_of, nm_type, nm_obj_type, nm_begin_mp
+            , nm_start_date, nm_end_mp, nm_cardinality, nm_admin_unit, nm_seq_no, nm_seg_no
+          )
+          values (
+            r.nm_ne_id_in, r.nm_ne_id_of, r.nm_type, r.nm_obj_type, r.keep_begin_mp
+            , l_effective_date, r.keep_end_mp, r.nm_cardinality, r.nm_admin_unit, r.nm_seq_no, r.nm_seg_no
+          );
+        end if;
+        
+        -- create the second not included part
+        if r.keep_begin_mp2 is not null then
+          insert into nm_members_all (
+            nm_ne_id_in, nm_ne_id_of, nm_type, nm_obj_type, nm_begin_mp
+            , nm_start_date, nm_end_mp, nm_cardinality, nm_admin_unit, nm_seq_no, nm_seg_no
+          )
+          values (
+            r.nm_ne_id_in, r.nm_ne_id_of, r.nm_type, r.nm_obj_type, r.keep_begin_mp2
+            , l_effective_date, r.keep_end_mp2, r.nm_cardinality, r.nm_admin_unit, r.nm_seq_no, r.nm_seg_no
+          );
+        end if;
+      
+      
+      
+      
+        -- asset (and child assets) processing continues here for wholly closed assets
+        
+        -- the asset is wholly closed
+        if r.excluded_member_count = 0
+          and r.keep_begin_mp is null
+          and r.keep_begin_mp2 is null
+          and r.iit_rownum = 1
+        then
+        
+           -- store the parent asset id for later forall closure of the inv_items records
+          t_iit_id.extend;
+          t_iit_id(t_iit_id.last) := r.nm_ne_id_in;
           
           
-          -- close the hierarchy definitions
-          if pi_action = 'C' then
-            --Log 717947:Linesh:20-Feb-2009:As this now handled through API
-            --forall i in 1 .. t_iig_item_id.count  
-            --update nm_inv_item_groupings_all g
-            --set g.iig_end_date = l_effective_date
-            --where g.iig_item_id = t_iig_item_id(i)
-            --and g.iig_top_id = t_iig_top_id(i)
-            --and g.iig_end_date is null;
-            Null ;     
-          else
+          -- it is a parent asset
+          if r.iig_parent_id is not null then        
+            
+            --Log 717947:Linesh:20-Feb-2009:Start
+            -- bulk collect all the child item ids
+            --select g.iig_item_id, g.iig_top_id
+            --bulk collect into t_iig_item_id, t_iig_top_id
+            --from nm_inv_item_groupings g
+            --connect by prior g.iig_item_id = g.iig_parent_id
+            --start with g.iig_parent_id = r.iig_parent_id;
+
+            SELECT  iig.iig_item_id, iig.iig_top_id
+            bulk    collect into t_iig_item_id, t_iig_top_id
+            FROM    nm_inv_item_groupings iig
+                   ,nm_inv_items_all iit
+                   ,nm_inv_type_groupings itg
+            WHERE   iig.iig_item_id       = iit.iit_ne_id
+            AND     iit.iit_inv_type      = itg.itg_inv_type
+            AND     itg.itg_mandatory     = 'Y'                                    
+            CONNECT By PRIOR iig_item_id = iig_parent_id
+            START   WITH iig_parent_id   = r.iig_parent_id ;
+            --Log 717947:Linesh:20-Feb-2009:End
+            
+            l_child_count := l_child_count + t_iig_item_id.count;
+            
+            
+            -- close the hierarchy definitions
+            if pi_action = 'C' then
+              --Log 717947:Linesh:20-Feb-2009:As this now handled through API
+              --forall i in 1 .. t_iig_item_id.count  
+              --update nm_inv_item_groupings_all g
+              --set g.iig_end_date = l_effective_date
+              --where g.iig_item_id = t_iig_item_id(i)
+              --and g.iig_top_id = t_iig_top_id(i)
+              --and g.iig_end_date is null;
+              Null ;     
+            else
+              forall i in 1 .. t_iig_item_id.count
+              delete from nm_inv_item_groupings_all g
+              where g.iig_item_id = t_iig_item_id(i)
+                and g.iig_top_id = t_iig_top_id(i)
+                and g.iig_end_date is null;
+            
+            end if;
+            
+            
+            -- close the child placements
+            if pi_action = 'C' then
+              --Log 717947:Linesh:20-Feb-2009:As this now handled through API
+              --forall i in 1 .. t_iig_item_id.count  
+              --update nm_members_all m
+              --set m.nm_end_date = l_effective_date
+              --where m.nm_ne_id_in = t_iig_item_id(i)
+              --and m.nm_end_date is null;
+              Null ;
+            else
+              forall i in 1 .. t_iig_item_id.count  
+              delete from nm_members_all m
+              where m.nm_ne_id_in = t_iig_item_id(i)
+                and m.nm_end_date is null;
+            
+            end if;
+            
+            -- close the child invitem records
+            if pi_action = 'C' then
+              --Log 717947:Linesh:20-Feb-2009:As this now handled through API
+              --forall i in 1 .. t_iig_item_id.count
+              --update nm_inv_items_all i
+              --set i.iit_end_date = l_effective_date
+              --where i.iit_ne_id = t_iig_item_id(i)
+              --and i.iit_end_date is null;
+              Null ;       
+            else
+              forall i in 1 .. t_iig_item_id.count  
+              delete from nm_inv_items_all i
+              where i.iit_ne_id = t_iig_item_id(i)
+                and i.iit_end_date is null;
+            
+            end if;
+            
+            -- close child doc assocs
             forall i in 1 .. t_iig_item_id.count
-            delete from nm_inv_item_groupings_all g
-            where g.iig_item_id = t_iig_item_id(i)
-              and g.iig_top_id = t_iig_top_id(i)
-              and g.iig_end_date is null;
+            delete from doc_assocs
+            where das_rec_id = to_char(t_iig_item_id(i))
+              and das_table_name in ('NM_INV_ITEMS_ALL','NM_INV_ITEMS','INV_ITEMS_ALL','INV_ITEMS');
+            
+            
+          end if; -- it is a parent asset
           
-          end if;
-          
-          
-          -- close the child placements
-          if pi_action = 'C' then
-            --Log 717947:Linesh:20-Feb-2009:As this now handled through API
-            --forall i in 1 .. t_iig_item_id.count  
-            --update nm_members_all m
-            --set m.nm_end_date = l_effective_date
-            --where m.nm_ne_id_in = t_iig_item_id(i)
-            --and m.nm_end_date is null;
-            Null ;
-          else
-            forall i in 1 .. t_iig_item_id.count  
-            delete from nm_members_all m
-            where m.nm_ne_id_in = t_iig_item_id(i)
-              and m.nm_end_date is null;
-          
-          end if;
-          
-          -- close the child invitem records
-          if pi_action = 'C' then
-            --Log 717947:Linesh:20-Feb-2009:As this now handled through API
-            --forall i in 1 .. t_iig_item_id.count
-            --update nm_inv_items_all i
-            --set i.iit_end_date = l_effective_date
-            --where i.iit_ne_id = t_iig_item_id(i)
-            --and i.iit_end_date is null;
-            Null ;       
-          else
-            forall i in 1 .. t_iig_item_id.count  
-            delete from nm_inv_items_all i
-            where i.iit_ne_id = t_iig_item_id(i)
-              and i.iit_end_date is null;
-          
-          end if;
-          
-          -- close child doc assocs
-          forall i in 1 .. t_iig_item_id.count
+            
+          -- close current record doc assocs
           delete from doc_assocs
-          where das_rec_id = to_char(t_iig_item_id(i))
-            and das_table_name in ('NM_INV_ITEMS_ALL','NM_INV_ITEMS','INV_ITEMS_ALL','INV_ITEMS');
-          
-          
-        end if; -- it is a parent asset
+          where das_rec_id = to_char(r.iig_parent_id)
+            and das_table_name in ('NM_INV_ITEMS_ALL','NM_INV_ITEMS','INV_ITEMS_ALL','INV_ITEMS'); 
+            
+            
+        else
+          l_partial_count := l_partial_count + 1;
         
           
-        -- close current record doc assocs
-        delete from doc_assocs
-        where das_rec_id = to_char(r.iig_parent_id)
-          and das_table_name in ('NM_INV_ITEMS_ALL','NM_INV_ITEMS','INV_ITEMS_ALL','INV_ITEMS'); 
-          
-          
-      else
-        l_partial_count := l_partial_count + 1;
+        end if; -- wholly closed asset
       
+        IF c_end_location_only THEN
+          l_log_message := g_success_message||' [Location only]';
+        ELSE
+          l_log_message := g_success_message;
+        END IF; 
+
+        log_event(pi_log_iit_inv_type     => r.nm_obj_type
+                 ,pi_log_action           => pi_action
+                 ,pi_log_iit_ne_id        => r.nm_ne_id_in
+                 ,pi_log_iit_primary_key  => r.iit_primary_key
+                 ,pi_log_iit_descr        => r.iit_descr
+                 ,pi_log_message          => l_log_message
+                 ,pi_log_error_flag       => 'N' );
+            
+      EXCEPTION
+        WHEN OTHERS 
+        THEN
         
-      end if; -- wholly closed asset
+        l_log_message := substr(SQLERRM,0,500);
+        
+        log_event(pi_log_iit_inv_type     => r.nm_obj_type
+                 ,pi_log_action           => pi_action
+                 ,pi_log_iit_ne_id        => r.nm_ne_id_in
+                 ,pi_log_iit_primary_key  => r.iit_primary_key
+                 ,pi_log_iit_descr        => r.iit_descr
+                 ,pi_log_message          => l_log_message
+                 ,pi_log_error_flag       => 'Y' );
       
+      END;
       
     end loop;
     nm3dbg.putln('l_main_count='||l_main_count);
@@ -912,6 +984,8 @@ BEGIN
       
       CURSOR full_net_cur IS
        SELECT iit_ne_id
+             ,iit_primary_key
+             ,iit_descr
              ,nm_ne_id_of 
              ,nm_ne_id_in
              ,nm_begin_mp
@@ -935,68 +1009,100 @@ BEGIN
     BEGIN 
     --
       FOR FULL_NET_REC IN FULL_NET_CUR LOOP    
-        --
-        -- close the current asset placement
-        close_member_record (p_action         => pi_action
-                            ,p_effective_date => l_effective_date
-                            ,p_ne_id_in       => full_net_rec.nm_ne_id_in
-                            ,p_ne_id_of       => full_net_rec.nm_ne_id_of
-                            ,p_begin_mp       => full_net_rec.nm_begin_mp
-                            ,p_start_date     => full_net_rec.nm_start_date
-        );
-        --
-        -- store the parent asset id for later forall closure of the inv_items records
-        t_iit_id.extend;
-        t_iit_id(t_iit_id.last) := full_net_rec.iit_ne_id;
-        --
-        -- it is a parent asset
-        IF full_net_rec.iig_parent_id is not null THEN        
-        --
-          SELECT  iig.iig_item_id, iig.iig_top_id
-          BULK COLLECT INTO t_iig_item_id, t_iig_top_id
-          FROM    nm_inv_item_groupings iig
-                 ,nm_inv_items_all iit
-                 ,nm_inv_type_groupings itg
-          WHERE   iig.iig_item_id       = iit.iit_ne_id
-          AND     iit.iit_inv_type      = itg.itg_inv_type
-          AND     itg.itg_mandatory     = 'Y'                                    
-          CONNECT BY PRIOR iig_item_id = iig_parent_id
-          START   WITH iig_parent_id   = full_net_rec.iig_parent_id ;
-        --
-          l_child_count := l_child_count + t_iig_item_id.count;
-        --
-        -- close the hierarchy definitions
-          IF pi_action <> 'C' THEN
+      
+        BEGIN
+      
           --
-              FORALL i IN 1 .. t_iig_item_id.count
-              DELETE FROM nm_inv_item_groupings_all g
-              WHERE g.iig_item_id = t_iig_item_id(i)
-                AND g.iig_top_id = t_iig_top_id(i)
-                AND g.iig_end_date IS NULL;
-            
-              FORALL i in 1 .. t_iig_item_id.count  
-              DELETE FROM nm_members_all m
-               WHERE m.nm_ne_id_in = t_iig_item_id(i)
-                 AND m.nm_end_date IS NULL;
-                      
-              FORALL i IN 1 .. t_iig_item_id.count  
-              DELETE FROM nm_inv_items_all i
-               WHERE i.iit_ne_id = t_iig_item_id(i)
-                 AND i.iit_end_date IS NULL;
+          -- close the current asset placement
+          close_member_record (p_action         => pi_action
+                              ,p_effective_date => l_effective_date
+                              ,p_ne_id_in       => full_net_rec.nm_ne_id_in
+                              ,p_ne_id_of       => full_net_rec.nm_ne_id_of
+                              ,p_begin_mp       => full_net_rec.nm_begin_mp
+                              ,p_start_date     => full_net_rec.nm_start_date
+          );
+          --
+          -- store the parent asset id for later forall closure of the inv_items records
+          t_iit_id.extend;
+          t_iit_id(t_iit_id.last) := full_net_rec.iit_ne_id;
+          --
+          -- it is a parent asset
+          IF full_net_rec.iig_parent_id is not null THEN        
+          --
+            SELECT  iig.iig_item_id, iig.iig_top_id
+            BULK COLLECT INTO t_iig_item_id, t_iig_top_id
+            FROM    nm_inv_item_groupings iig
+                   ,nm_inv_items_all iit
+                   ,nm_inv_type_groupings itg
+            WHERE   iig.iig_item_id       = iit.iit_ne_id
+            AND     iit.iit_inv_type      = itg.itg_inv_type
+            AND     itg.itg_mandatory     = 'Y'                                    
+            CONNECT BY PRIOR iig_item_id = iig_parent_id
+            START   WITH iig_parent_id   = full_net_rec.iig_parent_id ;
+          --
+            l_child_count := l_child_count + t_iig_item_id.count;
+          --
+          -- close the hierarchy definitions
+            IF pi_action <> 'C' THEN
+            --
+                FORALL i IN 1 .. t_iig_item_id.count
+                DELETE FROM nm_inv_item_groupings_all g
+                WHERE g.iig_item_id = t_iig_item_id(i)
+                  AND g.iig_top_id = t_iig_top_id(i)
+                  AND g.iig_end_date IS NULL;
+              
+                FORALL i in 1 .. t_iig_item_id.count  
+                DELETE FROM nm_members_all m
+                 WHERE m.nm_ne_id_in = t_iig_item_id(i)
+                   AND m.nm_end_date IS NULL;
+                        
+                FORALL i IN 1 .. t_iig_item_id.count  
+                DELETE FROM nm_inv_items_all i
+                 WHERE i.iit_ne_id = t_iig_item_id(i)
+                   AND i.iit_end_date IS NULL;
+            --  
+            END IF;
           --  
-          END IF;
-        --  
-        -- close child doc assocs
-          FORALL i IN 1 .. t_iig_item_id.count
+          -- close child doc assocs
+            FORALL i IN 1 .. t_iig_item_id.count
+            DELETE FROM doc_assocs
+            WHERE das_rec_id = to_char(t_iig_item_id(i))
+              AND das_table_name in ('NM_INV_ITEMS_ALL','NM_INV_ITEMS','INV_ITEMS_ALL','INV_ITEMS');            
+          --  
+          END IF; -- it is a parent asset                  
+          -- close current record doc assocs
           DELETE FROM doc_assocs
-          WHERE das_rec_id = to_char(t_iig_item_id(i))
-            AND das_table_name in ('NM_INV_ITEMS_ALL','NM_INV_ITEMS','INV_ITEMS_ALL','INV_ITEMS');            
-        --  
-        END IF; -- it is a parent asset                  
-        -- close current record doc assocs
-        DELETE FROM doc_assocs
-         WHERE das_rec_id = to_char(FULL_NET_REC.iig_parent_id)
-           AND das_table_name in ('NM_INV_ITEMS_ALL','NM_INV_ITEMS','INV_ITEMS_ALL','INV_ITEMS'); 
+           WHERE das_rec_id = to_char(FULL_NET_REC.iig_parent_id)
+             AND das_table_name in ('NM_INV_ITEMS_ALL','NM_INV_ITEMS','INV_ITEMS_ALL','INV_ITEMS'); 
+          IF c_end_location_only THEN
+            l_log_message := g_success_message||' [Location only]';
+          ELSE
+            l_log_message := g_success_message;
+          END IF; 
+
+          log_event(pi_log_iit_inv_type     => full_net_rec.nm_obj_type
+                   ,pi_log_action           => pi_action
+                   ,pi_log_iit_ne_id        => full_net_rec.nm_ne_id_in
+                   ,pi_log_iit_primary_key  => full_net_rec.iit_primary_key
+                   ,pi_log_iit_descr        => full_net_rec.iit_descr
+                   ,pi_log_message          => l_log_message
+                   ,pi_log_error_flag       => 'N' );
+              
+        EXCEPTION
+          WHEN OTHERS 
+          THEN
+          
+          l_log_message := substr(SQLERRM,0,500);
+          
+          log_event(pi_log_iit_inv_type     => full_net_rec.nm_obj_type
+                   ,pi_log_action           => pi_action
+                   ,pi_log_iit_ne_id        => full_net_rec.nm_ne_id_in
+                   ,pi_log_iit_primary_key  => full_net_rec.iit_primary_key
+                   ,pi_log_iit_descr        => full_net_rec.iit_descr
+                   ,pi_log_message          => l_log_message
+                   ,pi_log_error_flag       => 'Y' );
+        
+        END;
       --
       END LOOP;
       
