@@ -1,5 +1,5 @@
 REM SCCS ID Keyword, do no remove
-define sccsid = '"$Revision::   2.14     $"';
+define sccsid = '"$Revision::   2.15     $"';
 clear screen
 -- creates the following tables
 -- HIG_USERS
@@ -801,17 +801,6 @@ DECLARE
 --
 --------------------------------------------------------------------------------
 --
-  PROCEDURE cre_context( p_user varchar2 )
-  IS
-  BEGIN
-     -- Create the context in a bit of dynamic sql to allow the context
-     -- to be created with the username as part of the context name
-     -- This should only be run as the highways owner
-     EXECUTE IMMEDIATE 'CREATE CONTEXT nm3_'||p_user||' USING '||p_user||'.nm3context';
-  END;
---
---------------------------------------------------------------------------------
---
   PROCEDURE create_mdsys_synonym
   IS
   BEGIN
@@ -857,8 +846,6 @@ BEGIN
 --
   create_views ( p_user
                 ,p_admin_type );
---
-  cre_context( p_user );
 --
   create_mdsys_synonym;
 --
