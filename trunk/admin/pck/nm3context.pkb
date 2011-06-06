@@ -5,11 +5,11 @@ As
 --
 -- PVCS Identifiers :-
 --
--- pvcsid : $Header:   //vm_latest/archives/nm3/admin/pck/nm3context.pkb-arc   2.5   May 16 2011 14:44:10   Steve.Cooper  $
+-- pvcsid : $Header:   //vm_latest/archives/nm3/admin/pck/nm3context.pkb-arc   2.6   Jun 06 2011 14:38:26   Steve.Cooper  $
 -- Module Name : $Workfile:   nm3context.pkb  $
--- Date into PVCS : $Date:   May 16 2011 14:44:10  $
--- Date fetched Out : $Modtime:   Apr 01 2011 09:50:42  $
--- PVCS Version : $Revision:   2.5  $
+-- Date into PVCS : $Date:   Jun 06 2011 14:38:26  $
+-- Date fetched Out : $Modtime:   Jun 06 2011 11:28:00  $
+-- PVCS Version : $Revision:   2.6  $
 -- Based on SCCS version : 
 --
 --
@@ -21,7 +21,7 @@ As
 --	Copyright (c) exor corporation ltd, 2001
 -----------------------------------------------------------------------------
 --
-  g_Body_Sccsid       Constant  Varchar2(2000)  :='"$Revision:   2.5  $"';
+  g_Body_Sccsid       Constant  Varchar2(2000)  :='"$Revision:   2.6  $"';
 
   c_True              Constant  Varchar2(5)     := 'TRUE';
   c_False             Constant  Varchar2(5)     := 'FALSE';
@@ -274,6 +274,11 @@ Begin
                                                             p_Useopt  => 'DEFATTRSET'
                                                             )
                             );
+   
+  nm3Security.Set_Hig_Owner (
+                            p_Is_Hig_Owner  =>  Sys_Context('NM3CORE','APPLICATION_OWNER') = Sys_Context('NM3_SECURITY_CTX','USERNAME')
+                            );
+                            
   --Lock down the core contexts from being changed where they are flagged as readonly.
   Nm3Security.Lock_Core_Context;
 
