@@ -2,11 +2,11 @@
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm3trg.sql-arc   2.18   Jan 14 2011 13:58:50   Chris.Baugh  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm3trg.sql-arc   2.19   Jun 06 2011 09:42:30   Chris.Strettle  $
 --       Module Name      : $Workfile:   nm3trg.sql  $
---       Date into PVCS   : $Date:   Jan 14 2011 13:58:50  $
---       Date fetched Out : $Modtime:   Jan 14 2011 13:56:56  $
---       PVCS Version     : $Revision:   2.18  $
+--       Date into PVCS   : $Date:   Jun 06 2011 09:42:30  $
+--       Date fetched Out : $Modtime:   Jun 06 2011 09:28:16  $
+--       PVCS Version     : $Revision:   2.19  $
 --
 --
 --   Author : Graeme Johnson
@@ -1909,7 +1909,16 @@ start '&run_file'
 --
 -----------------------------------------------------------------------------------------
 --
-
-
+SET TERM ON 
+PROMPT doc_locations_b_upd_del_chk.trg
+SET TERM OFF
+SET DEFINE ON 
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'trg'||'&terminator'||'doc_locations_b_upd_del_chk.trg' run_file 
+FROM dual 
+/ 
+start '&run_file' 
+--
+-----------------------------------------------------------------------------------------
+--
 -- new triggers above this
 SET TERM ON
