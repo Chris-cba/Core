@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.32.1.3.1.18   Apr 21 2011 15:08:22   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.32.1.3.1.19   Jun 06 2011 11:57:08   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3bulk_mrg.pkb  $
---       Date into PVCS   : $Date:   Apr 21 2011 15:08:22  $
---       Date fetched Out : $Modtime:   Apr 21 2011 14:57:12  $
---       PVCS Version     : $Revision:   2.32.1.3.1.18  $
+--       Date into PVCS   : $Date:   Jun 06 2011 11:57:08  $
+--       Date fetched Out : $Modtime:   Jun 06 2011 11:56:04  $
+--       PVCS Version     : $Revision:   2.32.1.3.1.19  $
 --
 --
 --   Author : Priidu Tanava
@@ -113,7 +113,7 @@ No query types defined.
         in nm3dynsql replace the use of nm3sql.set_context_value() with that of nm3ctx
         add p_group_type variable to load_group_datums() to specify driving group type when loaded group is non-linear
 */
-  g_body_sccsid     constant  varchar2(40)  :='"$Revision:   2.32.1.3.1.18  $"';
+  g_body_sccsid     constant  varchar2(40)  :='"$Revision:   2.32.1.3.1.19  $"';
   g_package_name    constant  varchar2(30)  := 'nm3bulk_mrg';
 
   cr  constant varchar2(1) := chr(10);
@@ -496,7 +496,7 @@ No query types defined.
           ||cr||'  ,nm_datum_criteria_tmp x'
           ||cr||'where '||a1||'.nm_ne_id_in = '||a2||'.'||t_ft(i).table_pk_column
               ||sql_datum_tbl_join('nm_ne_id_of', '  and ', a1)
-          ||cr||'  and '||l_sql_nm_effective_date
+          ||cr||'  and '||nm3dynsql.sql_effective_date(l_effective_date, 'm'||i||'.nm_start_date', 'm'||i||'.nm_end_date' )
               ||sql_ft_criteria(l_where_and, t_ft(i).where_sql, a2);
 
 
