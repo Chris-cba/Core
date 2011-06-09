@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3pla AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3pla.pkb-arc   2.5   Sep 06 2010 14:05:26   Chris.Strettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3pla.pkb-arc   2.6   Jun 09 2011 11:35:16   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3pla.pkb  $
---       Date into PVCS   : $Date:   Sep 06 2010 14:05:26  $
---       Date fetched Out : $Modtime:   Sep 06 2010 10:32:34  $
---       Version          : $Revision:   2.5  $
+--       Date into PVCS   : $Date:   Jun 09 2011 11:35:16  $
+--       Date fetched Out : $Modtime:   Jun 09 2011 11:34:20  $
+--       Version          : $Revision:   2.6  $
 --       Based on SCCS version : 1.61
 ------------------------------------------------------------------------
 --
@@ -19,7 +19,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3pla AS
 -------------------------------------------------------------------------------------------
 -- Global variables - tree definitions etc.
    --g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"@(#)nm3pla.pkb	1.61 11/29/06"';
-   g_body_sccsid     CONSTANT varchar2(2000) := '$Revision:   2.5  $';
+   g_body_sccsid     CONSTANT varchar2(2000) := '$Revision:   2.6  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT VARCHAR2(30) := 'nm3pla';
@@ -3371,7 +3371,7 @@ FUNCTION defrag_connectivity
      FROM nm_node_usages a1, nm_node_usages a2
      WHERE a1.nnu_ne_id = c_ne_1
      AND   a2.nnu_ne_id = c_ne_2
-     AND   a1.nnu_no_node_id = a2.nnu_no_node_id;
+     AND   a1.nnu_no_node_id = a2.nnu_no_node_id order by 2;
 
    l_type1 nm_node_usages.nnu_node_type%TYPE;
 
