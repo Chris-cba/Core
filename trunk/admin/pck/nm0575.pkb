@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm0575
 AS
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm0575.pkb-arc   2.9   Jun 02 2011 10:52:04   Ade.Edwards  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm0575.pkb-arc   2.10   Jun 09 2011 12:13:58   Ade.Edwards  $
 --       Module Name      : $Workfile:   nm0575.pkb  $
---       Date into PVCS   : $Date:   Jun 02 2011 10:52:04  $
---       Date fetched Out : $Modtime:   Jun 02 2011 10:50:14  $
---       PVCS Version     : $Revision:   2.9  $
+--       Date into PVCS   : $Date:   Jun 09 2011 12:13:58  $
+--       Date fetched Out : $Modtime:   Jun 09 2011 12:09:40  $
+--       PVCS Version     : $Revision:   2.10  $
 --       Based on SCCS version : 1.6
 
 --   Author : Graeme Johnson
@@ -23,7 +23,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000)  := '"$Revision:   2.9  $"';
+  g_body_sccsid  CONSTANT varchar2(2000)  := '"$Revision:   2.10  $"';
   g_package_name CONSTANT varchar2(30)    := 'nm0575';
   
   subtype id_type is nm_members.nm_ne_id_in%type;
@@ -642,12 +642,12 @@ BEGIN
   nm3dbg.ind;
   
   -- effective date check
-  if l_effective_date = trunc(sysdate) then
-    null;
-  else
-    raise_application_error(-20001,
-      'Effective date must be current date');
-  end if;
+--  if l_effective_date = trunc(sysdate) then
+--    null;
+--  else
+--    raise_application_error(-20001,
+--      'Effective date must be current date');
+--  end if;
 
   
   
@@ -882,8 +882,8 @@ BEGIN
               forall i in 1 .. t_iig_item_id.count
               delete from nm_inv_item_groupings_all g
               where g.iig_item_id = t_iig_item_id(i)
-                and g.iig_top_id = t_iig_top_id(i)
-                and g.iig_end_date is null;
+                and g.iig_top_id = t_iig_top_id(i);
+              --  and g.iig_end_date is null;
             
             end if;
             
@@ -900,8 +900,9 @@ BEGIN
             else
               forall i in 1 .. t_iig_item_id.count  
               delete from nm_members_all m
-              where m.nm_ne_id_in = t_iig_item_id(i)
-                and m.nm_end_date is null;
+              where m.nm_ne_id_in = t_iig_item_id(i);
+              -- Allow to operate on any effective date
+                --and m.nm_end_date is null;
             
             end if;
             
@@ -917,8 +918,9 @@ BEGIN
             else
               forall i in 1 .. t_iig_item_id.count  
               delete from nm_inv_items_all i
-              where i.iit_ne_id = t_iig_item_id(i)
-                and i.iit_end_date is null;
+              where i.iit_ne_id = t_iig_item_id(i);
+               -- and i.iit_end_date is null;
+               -- Allow to operate on any effective date
             
             end if;
             
@@ -1048,18 +1050,19 @@ BEGIN
                 FORALL i IN 1 .. t_iig_item_id.count
                 DELETE FROM nm_inv_item_groupings_all g
                 WHERE g.iig_item_id = t_iig_item_id(i)
-                  AND g.iig_top_id = t_iig_top_id(i)
-                  AND g.iig_end_date IS NULL;
+                  AND g.iig_top_id = t_iig_top_id(i);
+                --  AND g.iig_end_date IS NULL;
               
                 FORALL i in 1 .. t_iig_item_id.count  
                 DELETE FROM nm_members_all m
-                 WHERE m.nm_ne_id_in = t_iig_item_id(i)
-                   AND m.nm_end_date IS NULL;
+                 WHERE m.nm_ne_id_in = t_iig_item_id(i);
+                   --AND m.nm_end_date IS NULL;
                         
                 FORALL i IN 1 .. t_iig_item_id.count  
                 DELETE FROM nm_inv_items_all i
-                 WHERE i.iit_ne_id = t_iig_item_id(i)
-                   AND i.iit_end_date IS NULL;
+                 WHERE i.iit_ne_id = t_iig_item_id(i);
+                   --AND i.iit_end_date IS NULL;
+                   -- Allow to operate on any effective date
             --  
             END IF;
           --  
@@ -1118,15 +1121,15 @@ BEGIN
     forall i in 1 .. t_iit_id.count
     update nm_inv_item_groupings_all g
     set g.iig_end_date = l_effective_date
-    where g.iig_item_id = t_iit_id(i)
-    and g.iig_end_date is null ;         
+    where g.iig_item_id = t_iit_id(i);
+    --and g.iig_end_date is null ;         
     --Log 717947:Linesh:20-Feb-2009:End
 
     forall i in 1 .. t_iit_id.count
     update nm_inv_items_all
     set iit_end_date = l_effective_date
-    where iit_ne_id = t_iit_id(i)
-      and iit_end_date is null;
+    where iit_ne_id = t_iit_id(i);
+      --and iit_end_date is null;
   
   -- delete
   elsif pi_action = 'D' then
@@ -1148,9 +1151,10 @@ BEGIN
     forall i in 1 .. t_iit_id.count
     delete from nm_inv_items_all
     where iit_ne_id = t_iit_id(i)
-      and iit_end_date is null
+      --and iit_end_date is null
+      -- Allow to operate on any effective date
       and not exists
-        (select 1 from nm_members
+        (select 1 from nm_members_all
           where iit_ne_id = nm_ne_id_in
             and nm_ne_id_in = t_iit_id(i) );
       
@@ -1253,8 +1257,8 @@ END tidy_up;
       where nm_ne_id_in = p_ne_id_in
         and nm_ne_id_of = p_ne_id_of
         and nm_begin_mp = p_begin_mp
-        and nm_start_date = p_start_date
-        and nm_end_date is null;
+        and nm_start_date = p_start_date;
+        --and nm_end_date is null;
       if sql%rowcount = 0 then
         nm3dbg.putln('update no_data_found: close_member_record('||p_action
           ||', '||p_ne_id_in||', '||p_ne_id_of||', '||p_begin_mp||', '||p_start_date||')');
@@ -1268,8 +1272,9 @@ END tidy_up;
       where nm_ne_id_in = p_ne_id_in
         and nm_ne_id_of = p_ne_id_of
         and nm_begin_mp = p_begin_mp
-        and nm_start_date = p_start_date
-        and nm_end_date is null;
+        and nm_start_date = p_start_date;
+        -- Allow to operate on any effective date
+        --and nm_end_date is null;
       if sql%rowcount = 0 then
         nm3dbg.putln('delete no_data_found: close_member_record('||p_action
           ||', '||p_ne_id_in||', '||p_ne_id_of||', '||p_begin_mp||', '||p_start_date||')');
