@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm0575
 AS
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm0575.pkb-arc   2.7.1.0   Jun 02 2011 10:44:20   Ade.Edwards  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm0575.pkb-arc   2.7.1.1   Jun 09 2011 11:43:18   Ade.Edwards  $
 --       Module Name      : $Workfile:   nm0575.pkb  $
---       Date into PVCS   : $Date:   Jun 02 2011 10:44:20  $
---       Date fetched Out : $Modtime:   Jun 02 2011 10:42:10  $
---       PVCS Version     : $Revision:   2.7.1.0  $
+--       Date into PVCS   : $Date:   Jun 09 2011 11:43:18  $
+--       Date fetched Out : $Modtime:   Jun 09 2011 11:39:48  $
+--       PVCS Version     : $Revision:   2.7.1.1  $
 --       Based on SCCS version : 1.6
 
 --   Author : Graeme Johnson
@@ -23,7 +23,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000)  := '"$Revision:   2.7.1.0  $"';
+  g_body_sccsid  CONSTANT varchar2(2000)  := '"$Revision:   2.7.1.1  $"';
   g_package_name CONSTANT varchar2(30)    := 'nm0575';
   
   subtype id_type is nm_members.nm_ne_id_in%type;
@@ -62,7 +62,7 @@ AS
      pt_1 in nm3type.tab_varchar4
     ,pt_2 in nm3type.tab_varchar4
   ) return boolean;
-                                                                                 
+
 --
 -----------------------------------------------------------------------------
 --
@@ -147,7 +147,6 @@ BEGIN
      nm_inv_types t
   where t.nit_category in (select column_value from table(cast(get_inv_categories_tbl as nm_code_tbl)));
   
-  
   -- xsp temp table
   delete from nm0575_possible_xsps
   where xsp_value not in (
@@ -193,6 +192,97 @@ exception
     raise;
   
 END set_g_tab_selected_categories;
+--PROCEDURE set_g_tab_selected_categories(pi_tab_selected_categories IN nm3type.tab_varchar4) IS
+--
+--    PROCEDURE populate_nm0575_possible_xsps IS 
+--
+--    --
+--    -- for our given list of asset categories
+--    -- insert into a global temp table a list of xsp_restraints
+--    -- that could be applied to asset types within those categories
+--    --
+--    -- This global temp table is used by for NM0575 as the basis of a block
+--    -- that the punters can select from
+--
+--     l_sql         varchar2(2000);
+--     l_cat_restr   varchar2(100);
+--
+--    BEGIN
+--
+--    --
+--    -- add any records that are not already there for our given asset categories
+--    --
+--     IF g_tab_selected_categories.COUNT = 0 THEN
+--     
+--         delete from nm0575_possible_xsps;
+--         
+--     ELSE
+--     
+--         FOR i IN 1..g_tab_selected_categories.COUNT LOOP
+--           IF i = 1 THEN
+--             l_cat_restr := 'AND nit_category IN ('||nm3flx.string(g_tab_selected_categories(i));
+--           ELSE     
+--             l_cat_restr := l_cat_restr ||','||nm3flx.string(g_tab_selected_categories(i));
+--           END IF;
+--       
+--           IF i = g_tab_selected_categories.COUNT THEN
+--              l_cat_restr := l_cat_restr ||')'||chr(10);
+--           END IF;       
+--         END LOOP;
+--     
+--         l_sql :=                        'INSERT INTO nm0575_possible_xsps(xsp_value'||chr(10);
+--         l_sql := l_sql||   '                                ,xsp_restraint_count)'||chr(10);
+--         l_sql := l_sql||   'SELECT xsr_x_sect_value'||chr(10);
+--         l_sql := l_sql||   '     , count(*) '||chr(10);
+--         l_sql := l_sql||   'FROM   nm_xsp_restraints'||chr(10);
+--         l_sql := l_sql||   '       , nm_inv_types'||chr(10);
+--         l_sql := l_sql||   'WHERE xsr_ity_inv_code = nit_inv_type'||chr(10);
+--
+--         l_sql := l_sql||   l_cat_restr; 
+--
+--         l_sql := l_sql||   'AND NOT EXISTS (select 1'||chr(10);
+--         l_sql := l_sql||   '                from nm0575_possible_xsps'||chr(10);
+--         l_sql := l_sql||   '                where xsp_value = xsr_x_sect_value)'||chr(10);
+--         l_sql := l_sql||   'GROUP BY xsr_x_sect_value'||chr(10);
+--
+--        --nm_debug.debug(l_sql);
+--         execute immediate(l_sql);
+--
+----
+---- now that we have possible xsps we need
+---- to throw something into the description field
+---- if all of this were done as part of the initial
+---- inserts we would potentially have had duplicate records xsp_value with different xsp descriptions
+---- 
+--         update nm0575_possible_xsps
+--         set xsp_descr = (select min(nwx_descr)
+--                          from   nm_nw_xsp
+--                          where  nwx_x_sect = xsp_value);
+--
+--        --
+--        -- remove any records that are there for previously selected asset categories
+--        --
+--
+--         l_sql :=         'delete from nm0575_possible_xsps'||chr(10);
+--         l_sql := l_sql ||'where not exists (select 1'||chr(10);
+--         l_sql := l_sql ||'from nm_xsp_restraints, nm_inv_types_all'||chr(10);
+--    --     l_sql := l_sql ||'where xsr_x_sect_value = nwx_x_sect'||chr(10);
+--         l_sql := l_sql ||'where xsr_ity_inv_code = nit_inv_type'||chr(10);
+--         l_sql := l_sql||   l_cat_restr; 
+--         l_sql := l_sql ||'and xsr_x_sect_value = xsp_value)'||chr(10);
+--
+--         nm_debug.debug(l_sql);
+--         execute immediate(l_sql); 
+--
+--    END IF;
+--
+--
+--    END populate_nm0575_possible_xsps;
+--
+--BEGIN
+-- g_tab_selected_categories := pi_tab_selected_categories;
+-- populate_nm0575_possible_xsps;
+--END set_g_tab_selected_categories;
 --
 -----------------------------------------------------------------------------------------------------------------------
 --
@@ -399,6 +489,10 @@ BEGIN
 --           t.nit_category
 --          ,t.nit_inv_type
 --          ,t.nit_descr;
+
+
+
+
 --
 --
       INSERT INTO nm0575_matching_records ( asset_category
@@ -644,12 +738,12 @@ BEGIN
   nm3dbg.ind;
   
   -- effective date check
-  if l_effective_date = trunc(sysdate) then
-    null;
-  else
-    raise_application_error(-20001,
-      'Effective date must be current date');
-  end if;
+--  if l_effective_date = trunc(sysdate) then
+--    null;
+--  else
+--    raise_application_error(-20001,
+--      'Effective date must be current date');
+--  end if;
 
   
   
@@ -884,8 +978,8 @@ BEGIN
               forall i in 1 .. t_iig_item_id.count
               delete from nm_inv_item_groupings_all g
               where g.iig_item_id = t_iig_item_id(i)
-                and g.iig_top_id = t_iig_top_id(i)
-                and g.iig_end_date is null;
+                and g.iig_top_id = t_iig_top_id(i);
+              --  and g.iig_end_date is null;
             
             end if;
             
@@ -902,8 +996,9 @@ BEGIN
             else
               forall i in 1 .. t_iig_item_id.count  
               delete from nm_members_all m
-              where m.nm_ne_id_in = t_iig_item_id(i)
-                and m.nm_end_date is null;
+              where m.nm_ne_id_in = t_iig_item_id(i);
+              -- Allow to operate on any effective date
+                --and m.nm_end_date is null;
             
             end if;
             
@@ -919,8 +1014,9 @@ BEGIN
             else
               forall i in 1 .. t_iig_item_id.count  
               delete from nm_inv_items_all i
-              where i.iit_ne_id = t_iig_item_id(i)
-                and i.iit_end_date is null;
+              where i.iit_ne_id = t_iig_item_id(i);
+               -- and i.iit_end_date is null;
+               -- Allow to operate on any effective date
             
             end if;
             
@@ -1048,18 +1144,20 @@ BEGIN
                 FORALL i IN 1 .. t_iig_item_id.count
                 DELETE FROM nm_inv_item_groupings_all g
                 WHERE g.iig_item_id = t_iig_item_id(i)
-                  AND g.iig_top_id = t_iig_top_id(i)
-                  AND g.iig_end_date IS NULL;
+                  AND g.iig_top_id = t_iig_top_id(i);
+                --  AND g.iig_end_date IS NULL;
               
                 FORALL i in 1 .. t_iig_item_id.count  
                 DELETE FROM nm_members_all m
-                 WHERE m.nm_ne_id_in = t_iig_item_id(i)
-                   AND m.nm_end_date IS NULL;
+                 WHERE m.nm_ne_id_in = t_iig_item_id(i);
+                 -- Allow to operate on any effective date
+                   --AND m.nm_end_date IS NULL;
                         
                 FORALL i IN 1 .. t_iig_item_id.count  
                 DELETE FROM nm_inv_items_all i
-                 WHERE i.iit_ne_id = t_iig_item_id(i)
-                   AND i.iit_end_date IS NULL;
+                 WHERE i.iit_ne_id = t_iig_item_id(i);
+                   --AND i.iit_end_date IS NULL;
+                   -- Allow to operate on any effective date
             --  
             END IF;
           --  
@@ -1119,15 +1217,15 @@ BEGIN
     forall i in 1 .. t_iit_id.count
     update nm_inv_item_groupings_all g
     set g.iig_end_date = l_effective_date
-    where g.iig_item_id = t_iit_id(i)
-    and g.iig_end_date is null ;         
+    where g.iig_item_id = t_iit_id(i);
+   -- and g.iig_end_date is null ;         
     --Log 717947:Linesh:20-Feb-2009:End
 
     forall i in 1 .. t_iit_id.count
     update nm_inv_items_all
     set iit_end_date = l_effective_date
-    where iit_ne_id = t_iit_id(i)
-      and iit_end_date is null;
+    where iit_ne_id = t_iit_id(i);
+    --  and iit_end_date is null;
   
   -- delete
   elsif pi_action = 'D' then
@@ -1149,13 +1247,17 @@ BEGIN
     forall i in 1 .. t_iit_id.count
     delete from nm_inv_items_all
     where iit_ne_id = t_iit_id(i)
-      and iit_end_date is null
+      --and iit_end_date is null
+      -- Allow to operate on any effective date
       and not exists
-        (select 1 from nm_members
+        (select 1 from nm_members_all
           where iit_ne_id = nm_ne_id_in
             and nm_ne_id_in = t_iit_id(i) );
       
   end if;
+  
+--  nm_debug.debug_on;
+--  nm_debug.debug('Count = '||l_main_count);
   
   nm3dbg.putln('l_whole_count='||t_iit_id.count);
   nm3dbg.putln('l_partial_count='||l_partial_count);
@@ -1254,8 +1356,8 @@ END tidy_up;
       where nm_ne_id_in = p_ne_id_in
         and nm_ne_id_of = p_ne_id_of
         and nm_begin_mp = p_begin_mp
-        and nm_start_date = p_start_date
-        and nm_end_date is null;
+        and nm_start_date = p_start_date;
+        --and nm_end_date is null;
       if sql%rowcount = 0 then
         nm3dbg.putln('update no_data_found: close_member_record('||p_action
           ||', '||p_ne_id_in||', '||p_ne_id_of||', '||p_begin_mp||', '||p_start_date||')');
@@ -1269,8 +1371,9 @@ END tidy_up;
       where nm_ne_id_in = p_ne_id_in
         and nm_ne_id_of = p_ne_id_of
         and nm_begin_mp = p_begin_mp
-        and nm_start_date = p_start_date
-        and nm_end_date is null;
+        and nm_start_date = p_start_date;
+        -- Allow to operate on any effective date
+        --and nm_end_date is null;
       if sql%rowcount = 0 then
         nm3dbg.putln('delete no_data_found: close_member_record('||p_action
           ||', '||p_ne_id_in||', '||p_ne_id_of||', '||p_begin_mp||', '||p_start_date||')');
