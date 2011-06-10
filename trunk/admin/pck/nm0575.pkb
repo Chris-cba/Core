@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm0575
 AS
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm0575.pkb-arc   2.10   Jun 09 2011 12:13:58   Ade.Edwards  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm0575.pkb-arc   2.11   Jun 10 2011 12:15:02   Ade.Edwards  $
 --       Module Name      : $Workfile:   nm0575.pkb  $
---       Date into PVCS   : $Date:   Jun 09 2011 12:13:58  $
---       Date fetched Out : $Modtime:   Jun 09 2011 12:09:40  $
---       PVCS Version     : $Revision:   2.10  $
+--       Date into PVCS   : $Date:   Jun 10 2011 12:15:02  $
+--       Date fetched Out : $Modtime:   Jun 10 2011 12:10:32  $
+--       PVCS Version     : $Revision:   2.11  $
 --       Based on SCCS version : 1.6
 
 --   Author : Graeme Johnson
@@ -23,7 +23,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000)  := '"$Revision:   2.10  $"';
+  g_body_sccsid  CONSTANT varchar2(2000)  := '"$Revision:   2.11  $"';
   g_package_name CONSTANT varchar2(30)    := 'nm0575';
   
   subtype id_type is nm_members.nm_ne_id_in%type;
@@ -802,28 +802,92 @@ BEGIN
           
         
         -- create the first not included part
-        if r.keep_begin_mp is not null then
-          insert into nm_members_all (
-            nm_ne_id_in, nm_ne_id_of, nm_type, nm_obj_type, nm_begin_mp
-            , nm_start_date, nm_end_mp, nm_cardinality, nm_admin_unit, nm_seq_no, nm_seg_no
-          )
-          values (
-            r.nm_ne_id_in, r.nm_ne_id_of, r.nm_type, r.nm_obj_type, r.keep_begin_mp
-            , l_effective_date, r.keep_end_mp, r.nm_cardinality, r.nm_admin_unit, r.nm_seq_no, r.nm_seg_no
-          );
-        end if;
+        IF r.keep_begin_mp IS NOT NULL 
+        THEN
+          BEGIN
+            INSERT INTO nm_members_all 
+              ( nm_ne_id_in
+              , nm_ne_id_of
+              , nm_type
+              , nm_obj_type
+              , nm_begin_mp
+              , nm_start_date
+              , nm_end_mp
+              , nm_cardinality
+              , nm_admin_unit
+              , nm_seq_no
+              , nm_seg_no
+              )
+            VALUES 
+              ( r.nm_ne_id_in
+              , r.nm_ne_id_of
+              , r.nm_type
+              , r.nm_obj_type
+              , r.keep_begin_mp
+              , r.nm_start_date
+              --, l_effective_date
+              , r.keep_end_mp
+              , r.nm_cardinality
+              , r.nm_admin_unit
+              , r.nm_seq_no
+              , r.nm_seg_no );
+          EXCEPTION
+            WHEN DUP_VAL_ON_INDEX
+            THEN
+              UPDATE nm_members_all
+                 SET nm_begin_mp   = r.keep_begin_mp
+                   , nm_end_mp     = r.keep_end_mp
+                   , nm_end_date   = NULL
+               WHERE nm_ne_id_in   = r.nm_ne_id_in
+                 AND nm_ne_id_of   = r.nm_ne_id_of
+                 AND nm_begin_mp   = r.keep_begin_mp
+                 AND nm_start_date = r.nm_start_date; 
+          END;
+        END IF;
         
         -- create the second not included part
-        if r.keep_begin_mp2 is not null then
-          insert into nm_members_all (
-            nm_ne_id_in, nm_ne_id_of, nm_type, nm_obj_type, nm_begin_mp
-            , nm_start_date, nm_end_mp, nm_cardinality, nm_admin_unit, nm_seq_no, nm_seg_no
-          )
-          values (
-            r.nm_ne_id_in, r.nm_ne_id_of, r.nm_type, r.nm_obj_type, r.keep_begin_mp2
-            , l_effective_date, r.keep_end_mp2, r.nm_cardinality, r.nm_admin_unit, r.nm_seq_no, r.nm_seg_no
-          );
-        end if;
+        IF r.keep_begin_mp2 IS NOT NULL 
+        THEN
+          BEGIN
+            INSERT INTO nm_members_all 
+              ( nm_ne_id_in
+              , nm_ne_id_of
+              , nm_type
+              , nm_obj_type
+              , nm_begin_mp
+              , nm_start_date
+              , nm_end_mp
+              , nm_cardinality
+              , nm_admin_unit
+              , nm_seq_no
+              , nm_seg_no
+              )
+            VALUES 
+              ( r.nm_ne_id_in
+              , r.nm_ne_id_of
+              , r.nm_type
+              , r.nm_obj_type
+              , r.keep_begin_mp2
+              , r.nm_start_date
+              --, l_effective_date
+              , r.keep_end_mp2
+              , r.nm_cardinality
+              , r.nm_admin_unit
+              , r.nm_seq_no
+              , r.nm_seg_no );
+          EXCEPTION
+            WHEN DUP_VAL_ON_INDEX
+            THEN
+              UPDATE nm_members_all
+                 SET nm_begin_mp   = r.keep_begin_mp2
+                   , nm_end_mp     = r.keep_end_mp2
+                   , nm_end_date   = NULL
+               WHERE nm_ne_id_in   = r.nm_ne_id_in
+                 AND nm_ne_id_of   = r.nm_ne_id_of
+                 AND nm_begin_mp   = r.keep_begin_mp2
+                 AND nm_start_date = r.nm_start_date; 
+          END;
+        END IF;
       
       
       
