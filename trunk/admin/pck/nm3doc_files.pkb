@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3doc_files.pkb-arc   2.11   Jun 11 2010 11:24:20   aedwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3doc_files.pkb-arc   2.12   Jun 13 2011 10:11:32   Ade.Edwards  $
 --       Module Name      : $Workfile:   nm3doc_files.pkb  $
---       Date into PVCS   : $Date:   Jun 11 2010 11:24:20  $
---       Date fetched Out : $Modtime:   Jun 11 2010 11:23:50  $
---       Version          : $Revision:   2.11  $
+--       Date into PVCS   : $Date:   Jun 13 2011 10:11:32  $
+--       Date fetched Out : $Modtime:   Jun 13 2011 10:08:52  $
+--       Version          : $Revision:   2.12  $
 --       Based on SCCS version :
 -------------------------------------------------------------------------
 --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid     CONSTANT VARCHAR2(2000) := '$Revision:   2.11  $';
+  g_body_sccsid     CONSTANT VARCHAR2(2000) := '$Revision:   2.12  $';
   g_package_name    CONSTANT VARCHAR2(30)   := 'nm3doc_files';
 --
   g_sep                      VARCHAR2(1)    := NVL(hig.get_sysopt('DIRREPSTRN'),'\');
@@ -139,6 +139,26 @@ AS
     l_rec_dlt   doc_location_tables%ROWTYPE;
     l_rec_dlc   doc_locations%ROWTYPE := doc_locations_api.get_dlc(pi_doc_id=>pi_doc_id);
     vblob       BLOB;
+  --
+  -- Task 0111178
+  -- Get file extension
+  --
+    FUNCTION get_doc_extension ( pi_dlc_id IN doc_locations.dlc_id%TYPE ) 
+      RETURN VARCHAR2 IS
+      retval doc_media.dmd_file_extension%TYPE;
+    BEGIN
+    --
+      SELECT dmd_file_extension INTO retval
+        FROM doc_media, doc_locations
+       WHERE dlc_dmd_id = dmd_id
+         AND dlc_id = pi_dlc_id;
+      RETURN retval;
+    EXCEPTION
+      WHEN NO_DATA_FOUND 
+      THEN RAISE_APPLICATION_ERROR (-20101,'Cannot derive file extension');
+    --
+    END get_doc_extension;
+  --
   BEGIN
   --
     l_rec_dlt := doc_locations_api.get_dlt(pi_doc_id => pi_doc_id );
@@ -185,6 +205,14 @@ AS
       SELECT doc_file INTO filename
         FROM docs
        WHERE doc_id = pi_doc_id;
+    --
+    -- Task 0111178
+    -- Get file extension
+    -- 
+      IF INSTR(filename,'.') = 0
+      THEN
+        filename := filename||'.'||get_doc_extension ( pi_dlc_id => l_rec_dlc.dlc_id );
+      END IF; 
     --
       local_debug_on;
       local_debug( pi_doc_id||' : '||l_rec_dlc.dlc_location_name||'\'|| filename );
