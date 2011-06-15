@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3asset AS
 --
 --   SCCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3asset.pkb-arc   2.22   May 16 2011 14:42:26   Steve.Cooper  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3asset.pkb-arc   2.23   Jun 15 2011 17:54:54   Chris.Strettle  $
 --       Module Name      : $Workfile:   nm3asset.pkb  $
---       Date into PVCS   : $Date:   May 16 2011 14:42:26  $
---       Date fetched Out : $Modtime:   Apr 01 2011 10:26:54  $
---       PVCS Version     : $Revision:   2.22  $
+--       Date into PVCS   : $Date:   Jun 15 2011 17:54:54  $
+--       Date fetched Out : $Modtime:   Jun 15 2011 17:48:26  $
+--       PVCS Version     : $Revision:   2.23  $
 --
 --
 --   Author : Rob Coupe
@@ -21,7 +21,7 @@ CREATE OR REPLACE PACKAGE BODY nm3asset AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.22  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.23  $"';
    g_gos_ne_id                    nm_members_all.nm_ne_id_in%type ;
 --  g_body_sccsid is the SCCS ID for the package body
 --
@@ -2027,7 +2027,7 @@ BEGIN
      append ('   EXCEPTION');
      append ('      WHEN others');
      append ('       THEN');
-     append ('         po_value   := TO_CHAR(pi_value,nm3user.get_user_date_mask);');
+     append ('         po_value   := TO_CHAR(pi_value,Sys_Context(''NM3CORE'',''USER_DATE_MASK''));');
      append ('         po_meaning := Null;');
      append ('   END local_validate_flex;');
      append ('BEGIN');
