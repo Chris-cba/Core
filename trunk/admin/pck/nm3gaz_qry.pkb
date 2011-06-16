@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm3gaz_qry AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3gaz_qry.pkb-arc   2.18   May 16 2011 14:44:50   Steve.Cooper  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3gaz_qry.pkb-arc   2.19   Jun 16 2011 10:22:58   Chris.Strettle  $
 --       Module Name      : $Workfile:   nm3gaz_qry.pkb  $
---       Date into PVCS   : $Date:   May 16 2011 14:44:50  $
---       Date fetched Out : $Modtime:   May 05 2011 07:54:46  $
---       Version          : $Revision:   2.18  $
+--       Date into PVCS   : $Date:   Jun 16 2011 10:22:58  $
+--       Date fetched Out : $Modtime:   Jun 16 2011 10:19:32  $
+--       Version          : $Revision:   2.19  $
 --       Based on SCCS version : 1.45
 -------------------------------------------------------------------------
 --   Author : Jonathan Mills
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3gaz_qry AS
 --all global package variables here
 --
    --g_body_sccsid     CONSTANT  varchar2(2000) := '"@(#)nm3gaz_qry.pkb 1.45 05/26/06"';
-   g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.18  $';
+   g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.19  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3gaz_qry';
@@ -343,7 +343,9 @@ BEGIN
          nm3extent.remove_db_from_temp_ne (pi_job_id => g_nte_job_id);
       END IF;
    --
-   
+      -- CWS 0108192 Added to prevent no network found issue.
+      validate_query (pi_ngq_id);
+      
        -- perform all of the inv based deletes
       perform_inv_temp_ne_creation;
    
