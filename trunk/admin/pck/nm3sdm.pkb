@@ -5,11 +5,11 @@ AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.45   Jun 01 2011 11:37:48   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.46   Jun 17 2011 10:53:30   Chris.Strettle  $
 --       Module Name      : $Workfile:   nm3sdm.pkb  $
---       Date into PVCS   : $Date:   Jun 01 2011 11:37:48  $
---       Date fetched Out : $Modtime:   Jun 01 2011 11:36:44  $
---       PVCS Version     : $Revision:   2.45  $
+--       Date into PVCS   : $Date:   Jun 17 2011 10:53:30  $
+--       Date fetched Out : $Modtime:   Jun 17 2011 09:51:24  $
+--       PVCS Version     : $Revision:   2.46  $
 --
 --   Author : R.A. Coupe
 --
@@ -21,7 +21,7 @@ AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT VARCHAR2 (2000) := '"$Revision:   2.45  $"';
+   g_body_sccsid     CONSTANT VARCHAR2 (2000) := '"$Revision:   2.46  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT VARCHAR2 (30)   := 'NM3SDM';
@@ -6684,28 +6684,8 @@ end;
    IS
       l_nth         NM_THEMES_ALL%ROWTYPE;
       l_seq         VARCHAR2 (30);
-      l_trig_name   VARCHAR2 (250);
-
---
-      FUNCTION check_for_trigger
-         RETURN VARCHAR2
-      IS
-         l_temp   VARCHAR2 (250) := NULL;
-      BEGIN
-         SELECT trigger_name
-           INTO l_temp
-           FROM user_triggers
-          WHERE trigger_name LIKE 'NM_NTH_' || p_nth_id || '_SDO_A_ROW_TRG';
-
-         RETURN l_temp;
-      EXCEPTION
-         WHEN NO_DATA_FOUND
-         THEN
-            RETURN l_temp;
-      END;
 --
    BEGIN
---  Nm_Debug.debug_on;
       l_nth := Nm3get.get_nth (p_nth_id);
 
       drop_trigger_by_theme_id( p_nth_id );
@@ -6781,25 +6761,12 @@ end;
          -- keep feature table end if
          END IF;
       END IF;
-
 --
       IF p_keep_theme_data = 'N'
       THEN
          DELETE FROM NM_THEMES_ALL
                WHERE nth_theme_id = p_nth_id;
-
---         Nm_Debug.DEBUG ('Deleted theme ' || p_nth_id);
       END IF;
-
---
-      l_trig_name := check_for_trigger;
-
-/*
-      IF l_trig_name IS NOT NULL
-      THEN
-         EXECUTE IMMEDIATE 'DROP TRIGGER ' || l_trig_name;
-      END IF;
-*/
 --
    END Drop_Layer;
 
@@ -6859,19 +6826,26 @@ end;
 ---------------------------------------------------------------------------------------------------------------------------------
 --
    PROCEDURE drop_trigger_by_theme_id ( p_nth_id IN nm_themes_all.nth_theme_id%TYPE ) IS
+   
+    -- CWS 0110345 Trigger changed to ignore nm_themes_all. Table nm_themes_all 
+    -- is no longer referenced in cursor and any exception raised by dynamic sql
+    -- will be caught. 
    CURSOR c_trig (c_nth_id IN nm_themes_all.nth_theme_id%TYPE ) IS
      SELECT trigger_name
-     FROM user_triggers, nm_themes_all
-     WHERE nth_table_name = table_name
-     AND nth_theme_id = c_nth_id
-     AND trigger_name LIKE 'NM_NTH_'||TO_CHAR(nth_theme_id)||'_SDO%';
-
+     FROM user_triggers
+     WHERE trigger_name LIKE 'NM_NTH_' || TO_CHAR(c_nth_id) || '_SDO%';
+   --
    BEGIN
+     
      FOR irec IN c_trig( p_nth_id ) LOOP
-       EXECUTE IMMEDIATE 'drop trigger '||irec.trigger_name;
+       BEGIN
+         EXECUTE IMMEDIATE 'DROP TRIGGER '||irec.trigger_name;
+       EXCEPTION
+       WHEN OTHERS THEN
+         NULL;
+       END;
      END LOOP;
    END;
-
 --
 ---------------------------------------------------------------------------------------------------------------------------------
 --
@@ -7724,11 +7698,11 @@ end;
    */
    --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.45   Jun 01 2011 11:37:48   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.46   Jun 17 2011 10:53:30   Chris.Strettle  $
 --       Module Name      : $Workfile:   nm3sdm.pkb  $
---       Date into PVCS   : $Date:   Jun 01 2011 11:37:48  $
---       Date fetched Out : $Modtime:   Jun 01 2011 11:36:44  $
---       PVCS Version     : $Revision:   2.45  $
+--       Date into PVCS   : $Date:   Jun 17 2011 10:53:30  $
+--       Date fetched Out : $Modtime:   Jun 17 2011 09:51:24  $
+--       PVCS Version     : $Revision:   2.46  $
 
       append ('--   PVCS Identifiers :-');
       append ('--');
