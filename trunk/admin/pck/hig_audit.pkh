@@ -4,11 +4,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_audit.pkh-arc   3.0   Apr 14 2010 10:42:32   malexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_audit.pkh-arc   3.1   Jun 20 2011 11:40:46   Linesh.Sorathia  $
 --       Module Name      : $Workfile:   hig_audit.pkh  $
---       Date into PVCS   : $Date:   Apr 14 2010 10:42:32  $
---       Date fetched Out : $Modtime:   Apr 14 2010 10:42:08  $
---       Version          : $Revision:   3.0  $
+--       Date into PVCS   : $Date:   Jun 20 2011 11:40:46  $
+--       Date fetched Out : $Modtime:   Jun 20 2011 10:04:02  $
+--       Version          : $Revision:   3.1  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --</PACKAGE>
@@ -18,7 +18,7 @@ AS
   --constants
   -----------
   --g_sccsid is the SCCS ID for the package
-  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.0  $';
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.1  $';
 
 --</GLOBVAR>
 --
@@ -55,7 +55,7 @@ FUNCTION get_body_version RETURN varchar2;
 --
 -----------------------------------------------------------------------------
 --
---<PROC NAME="get_column_datatype">
+--<PROC NAME="audit_available">
 -- This functions checks if audit is available for the passed table/id
 FUNCTION audit_available (pi_table_name IN Varchar2,pi_pk_id Varchar2)  
 RETURN Boolean;
@@ -63,7 +63,18 @@ RETURN Boolean;
 --
 -----------------------------------------------------------------------------
 --
---<PROC NAME="GET_BODY_VERSION">
+--<PROC NAME="security_check">
+-- This functions checks if the given PK ID can be views by the user
+FUNCTION security_check(pi_category       IN Varchar2
+                       ,pi_table_name     IN Varchar2
+                       ,pi_pk_column_name IN Varchar2
+                       ,pi_pk_id          IN Varchar2)  
+RETURN Number;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_trigger_statu">
 -- This function returns the trigger status
 FUNCTION get_trigger_status(pi_trigger_name hig_audit_types.haut_trigger_name%TYPE) RETURN varchar2;
 --</PROC>
