@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_audit.pkb-arc   3.6   May 16 2011 14:42:10   Steve.Cooper  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_audit.pkb-arc   3.7   Jun 20 2011 12:53:48   Linesh.Sorathia  $
 --       Module Name      : $Workfile:   hig_audit.pkb  $
---       Date into PVCS   : $Date:   May 16 2011 14:42:10  $
---       Date fetched Out : $Modtime:   Apr 20 2011 16:07:14  $
---       Version          : $Revision:   3.6  $
+--       Date into PVCS   : $Date:   Jun 20 2011 12:53:48  $
+--       Date fetched Out : $Modtime:   Jun 20 2011 11:46:20  $
+--       Version          : $Revision:   3.7  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.6  $';
+  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.7  $';
 
   g_package_name CONSTANT varchar2(30) := 'hig_audit';
   c_date_format  CONSTANT varchar2(30) := 'DD-Mon-YYYY HH24:MI:SS';
@@ -402,6 +402,32 @@ BEGIN
 
    Return l_found ;
 END audit_available ;
+--
+FUNCTION security_check(pi_category       IN Varchar2
+                       ,pi_table_name     IN Varchar2
+                       ,pi_pk_column_name IN Varchar2
+                       ,pi_pk_id          IN Varchar2)  
+RETURN Number
+IS
+--
+   l_cnt Number := 0 ;  
+--
+BEGIN
+   IF pi_category = 'I'
+   THEN
+       EXECUTE IMMEDIATE 'SELECT Count(0) FROM nm_inv_item_all WHERE iit_ne_id = :1 ' INTO l_cnt USING pi_pk_id;
+   ELSIF pi_table_name IS NOT NULL AND pi_pk_column_name IS NOT NULL
+   THEN
+       EXECUTE IMMEDIATE 'SELECT Count(0) FROM '||pi_table_name||' WHERE '||pi_pk_column_name||' = :1 ' INTO l_cnt USING pi_pk_id;
+   ELSE
+       l_cnt := 0;
+   END IF ;
+   
+   Return l_cnt ;
+EXCEPTION
+   WHEN OTHERS THEN
+   Return 0;
+END security_check;
 --
 END hig_audit;
 /
