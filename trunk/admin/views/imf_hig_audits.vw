@@ -19,11 +19,11 @@ SELECT
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --          
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/views/imf_hig_audits.vw-arc   3.0   Oct 11 2010 10:23:20   Mike.Alexander  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/views/imf_hig_audits.vw-arc   3.1   Jun 20 2011 11:40:48   Linesh.Sorathia  $
 --       Module Name      : $Workfile:   imf_hig_audits.vw  $
---       Date into PVCS   : $Date:   Oct 11 2010 10:23:20  $
---       Date fetched Out : $Modtime:   Oct 11 2010 10:22:52  $
---       PVCS Version     : $Revision:   3.0  $
+--       Date into PVCS   : $Date:   Jun 20 2011 11:40:48  $
+--       Date fetched Out : $Modtime:   Jun 20 2011 11:08:42  $
+--       PVCS Version     : $Revision:   3.1  $
 --            
 --------------------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2010
@@ -45,7 +45,11 @@ SELECT
        ,haud_os_user
 FROm    hig_audits
        ,hig_users
+       ,nm_inv_types      
 WHERE   haud_hus_user_id = hus_user_id
+AND     haud_nit_inv_type   = nit_inv_type
+AND     haud_table_name = nit_table_name
+AND     1 = hig_audit.security_check(nit_category,nit_table_name,nit_foreign_pk_column,haud_pk_id)
 WITH READ ONLY
 /
 

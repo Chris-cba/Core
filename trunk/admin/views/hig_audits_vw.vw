@@ -22,11 +22,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/hig_audits_vw.vw-arc   3.1   Aug 25 2010 09:37:54   Linesh.Sorathia  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/hig_audits_vw.vw-arc   3.2   Jun 20 2011 11:40:48   Linesh.Sorathia  $
 --       Module Name      : $Workfile:   hig_audits_vw.vw  $
---       Date into PVCS   : $Date:   Aug 25 2010 09:37:54  $
---       Date fetched Out : $Modtime:   Aug 23 2010 10:15:28  $
---       Version          : $Revision:   3.1  $
+--       Date into PVCS   : $Date:   Jun 20 2011 11:40:48  $
+--       Date fetched Out : $Modtime:   Jun 20 2011 10:05:44  $
+--       Version          : $Revision:   3.2  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 -- 
@@ -55,6 +55,6 @@ AND    haud_table_name = nit_table_name
 AND    haud_attribute_name = ita_attrib_name
 AND    haud_nit_inv_type   = ita_inv_type
 AND    haud_hus_user_id = hus_user_id
+AND    1 = hig_audit.security_check(nit_category,nit_table_name,nit_foreign_pk_column,haud_pk_id)
 /
-
 
