@@ -6,11 +6,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3sde AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sde.pkb-arc   2.13   May 25 2011 17:23:18   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sde.pkb-arc   2.14   Jun 23 2011 15:16:08   Chris.Strettle  $
 --       Module Name      : $Workfile:   nm3sde.pkb  $
---       Date into PVCS   : $Date:   May 25 2011 17:23:18  $
---       Date fetched Out : $Modtime:   May 25 2011 17:21:50  $
---       PVCS Version     : $Revision:   2.13  $
+--       Date into PVCS   : $Date:   Jun 23 2011 15:16:08  $
+--       Date fetched Out : $Modtime:   Jun 23 2011 15:12:44  $
+--       PVCS Version     : $Revision:   2.14  $
 --
 --       Based on one of many versions labeled as 1.21
 --
@@ -24,7 +24,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3sde AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.13  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.14  $"';
    g_keyword         CONSTANT  VARCHAR2(30)   := 'SDO_GEOMETRY'; --get_keyword;
 
 
@@ -117,8 +117,6 @@ l_geocol geocol_record_t;
 l_reg    registration_record_t;
 
 BEGIN
-
---nm_debug.debug_on;
 
   l_theme := Nm3sdm.get_nth( p_theme_id );
 
@@ -218,8 +216,6 @@ l_type NUMBER;
 
 BEGIN
 
---Nm_Debug.debug_on;
-
   l_theme := Nm3get.get_nth( p_theme_id );
 
   IF p_parent_id IS NOT NULL THEN
@@ -233,8 +229,8 @@ BEGIN
       Nm_Debug.DEBUG('Parent = '||p_parent_id );
       p_layer  := get_sde_layer_from_theme(p_theme_id => p_parent_id );
       p_geocol := get_geocol( l_parent.nth_feature_table, l_parent.nth_feature_shape_column );
-   p_reg    := get_treg( l_parent.nth_feature_table );
-
+      p_reg    := get_treg( l_parent.nth_feature_table );
+      Nm_Debug.DEBUG('No Error');
     EXCEPTION
       WHEN NO_DATA_FOUND THEN
        Nm_Debug.DEBUG('No parent layer');
@@ -292,9 +288,6 @@ BEGIN
   p_reg.CONFIG_KEYWORD      := 'SDO_GEOMETRY';
   p_reg.MINIMUM_ID          := 1;
   p_reg.IMV_VIEW_NAME       := NULL;
-
---  nm_debug.debug_on;
---  nm_debug.debug( 'SRID = '||to_char( p_layer.srid ));
 
   IF INSTR( p_layer.table_name, '@') = 0 THEN
 
@@ -421,7 +414,7 @@ BEGIN
     END IF;
 
     IF p_nth.nth_base_table_theme IS NOT NULL THEN
-
+      
       BEGIN
         l_base_lyr := get_layer_by_theme(  p_nth.nth_base_table_theme );
       EXCEPTION
@@ -429,14 +422,12 @@ BEGIN
           retval.srid          := register_SRID_from_theme( p_nth.nth_theme_id, l_base, l_srid );
           retval.base_layer_id := 0;
       END;
-
 --    no need to try and find an appropriate srid - use the base table
 
       retval.srid          := l_base_lyr.srid;
       retval.base_layer_id := l_base_lyr.layer_id;
 
     ELSE
-
       retval.srid          := register_SRID_from_theme( p_nth.nth_theme_id, l_base, l_srid );
       retval.base_layer_id := 0;
 
@@ -470,7 +461,7 @@ END;
 ---------------------------------------------------------------------------------------------------------------
 --
 
-FUNCTION register_SRID_from_theme( p_theme_id IN nm_themes_all.nth_theme_id%TYPE,
+FUNCTION register_srid_from_theme( p_theme_id IN nm_themes_all.nth_theme_id%TYPE,
                                    p_base     IN nm_theme_array,
                                    p_srid     IN NUMBER ) RETURN NUMBER IS
 
@@ -557,14 +548,11 @@ BEGIN
                l_gtype );
 
   fetch c_srid into retval;
-  if not c_srid%found then
 
+  if c_srid%notfound then
     close c_srid;
-
     raise no_data_found;
-
   end if;
-    
   
   close c_srid;
   
@@ -576,7 +564,6 @@ exception
 --
 --  no suitable spatial reference exists, we need to create one
 --
-
      l_mbr := Nm3sdo.get_theme_mbr( p_theme_id );
 
      l_sref.srid          := get_next_srid;
@@ -588,8 +575,8 @@ exception
      l_sref.falsem        := 0;
 
      l_sref.munits        := l_munits;
-
-     l_sref.srtext        := get_srtext(p_theme_id); -- NVL(Nm3sdo.get_srs_text( p_theme_id ), 'UNKNOWN');
+     
+     l_sref.srtext        := get_srtext(p_theme_id);
 
      l_sref.description   := NULL;
      l_sref.auth_name     := NULL;
@@ -599,11 +586,7 @@ exception
 
 --   needs to retrieve the spatial reference ID for the table, possibly by entering a new SRID record.
 
---   Nm_Debug.DEBUG( 'Set the srid by origin');
-     
 	 retval := get_srid_by_origin( l_sref );
-
---   Nm_Debug.DEBUG('returned '||retval);
 
      IF retval IS NULL THEN
 
@@ -613,11 +596,9 @@ exception
 
      END IF;
 
---   Nm_Debug.DEBUG('returned '||retval);
-
    RETURN retval;
  
-end;       
+end register_srid_from_theme;
 
 --
 ---------------------------------------------------------------------------------------------------------------
@@ -1175,7 +1156,6 @@ BEGIN
 
 --Loop over all base tables and register them in sde
 
---nm_debug.debug_on;
   FOR irec IN c_nth_tab LOOP
 
     register_sde_layer ( irec.nth_theme_id );
@@ -1401,27 +1381,20 @@ BEGIN
    END LOOP;
 --
 END create_column_registry;
-
 --
 ---------------------------------------------------------------------------------------------------------------
 --
-
---
----------------------------------------------------------------------------------------------------------------
---
-
 PROCEDURE remove_column_registry(p_table IN VARCHAR2 )  IS
 BEGIN
-
+--
   EXECUTE IMMEDIATE ' delete from sde.column_registry '||
                     '  where table_name = :table '||
                     '  and   owner = Sys_Context(''NM3CORE'',''APPLICATION_OWNER'') ' USING p_table;
+--
 END;
-
 --
 ---------------------------------------------------------------------------------------------------------------
 --
-
 FUNCTION Get_Xyunits( p_diminfo IN mdsys.sdo_dim_array ) RETURN NUMBER IS
 mintol NUMBER;
 BEGIN
@@ -1732,8 +1705,6 @@ BEGIN
 --
   IF l_tab_col_reg.COUNT > 0
   THEN
---    nm_debug.debug_on;
---    nm_debug.debug('Create '||l_tab_col_reg.COUNT||' rows of Col Reg for '||p_owner||'.'||p_table);
     FORALL i IN 1..l_tab_col_reg.COUNT
       INSERT INTO sde.column_registry
       VALUES l_tab_col_reg(i);
@@ -1773,7 +1744,6 @@ END;
      IF l_sde_cnt > 0 THEN
        NULL;
      --Nm_Debug.DEBUG ('Multiple layers with same feature name');
-
      ELSE
 
       --Nm_Debug.DEBUG ('Leaving Create_sde_lyr_theme_by_user');
@@ -1804,8 +1774,8 @@ geocur Nm3type.ref_cursor;
 l_base NM_THEMES_ALL%ROWTYPE;
 
 FUNCTION join_int_array( p_nth IN NM_THEMES_ALL%ROWTYPE, p_ia IN int_array ) RETURN int_array IS
-curstr VARCHAR2(2000);
-retval int_array := int_array( int_array_type( NULL ));
+  curstr VARCHAR2(2000);
+  retval int_array := int_array( int_array_type( NULL ));
 BEGIN
   curstr := 'select /*cardinality( t '||to_char(p_ia.ia.last)||')*/ t.column_value from table ( :p_ia.ia ) t, '||p_nth.nth_feature_table||
             ' where t.column_value  = '||l_reg.rowid_column;
@@ -1816,7 +1786,7 @@ nm_debug.debug( curstr );
   EXECUTE IMMEDIATE curstr BULK COLLECT INTO retval.ia USING p_ia;
 
   RETURN retval;
-END;
+END join_int_array;
 
 
 BEGIN
@@ -1854,7 +1824,7 @@ BEGIN
 
   RETURN retval;
 
-END;
+END Get_Whole_Shape_Objectids;
 
 --
 -------------------------------------------------------------------------------------------------------------------------------
@@ -1944,11 +1914,11 @@ BEGIN
    END IF;
 
    RETURN retval;
-END;
+END get_sde_pk;
 --
 -------------------------------------------------------------------------------------------------------------------------------
 --
-function get_srtext ( p_theme_id in NM_THEMES_ALL.nth_theme_id%TYPE ) return varchar2 is
+FUNCTION get_srtext ( p_theme_id in NM_THEMES_ALL.nth_theme_id%TYPE ) RETURN varchar2 IS
 
 cursor c1 ( c_theme_id in NM_THEMES_ALL.nth_theme_id%TYPE ) is
   select srtext from sde.spatial_references r, sde.layers l, user_sdo_geom_metadata a, user_sdo_geom_metadata b, nm_themes_all t
@@ -1968,79 +1938,63 @@ curstr NM3TYPE.MAX_VARCHAR2 := 'select substr(definition, 1, 1024) '
 
 l_version varchar2(30) := NM3SDE.GET_SDE_VERSION;
 
-retval sde.spatial_references.srtext%type;
-dummy  sde.spatial_references.srtext%type;
-
-begin
-
-  if l_version = '9.1' then
+retval sde.spatial_references.srtext%TYPE;
+-- CWS 0111258 Changes made so that 9.2 and 9.3 versions uses the 
+-- spatial_references table in the event there is no record in 
+-- st_coordinate_systems
+BEGIN
+  IF l_version IN ('9.2' ,'9.3') 
+  THEN
+    BEGIN
+      EXECUTE IMMEDIATE curstr INTO retval USING p_theme_id;
+    EXCEPTION
+      WHEN others THEN
+        retval := NULL;
+    END;
+  END IF;
   
-    open c1( p_theme_id );
-    fetch c1 into retval;
-    if c1%notfound then
---    no other themes exist as layers with a valid srtext - all we can do is return UNKNOWN    
-      close c1;
+  IF retval IS NULL 
+  THEN 
+    OPEN c1( p_theme_id );
+    FETCH c1 INTO retval;
+    --
+    IF c1%NOTFOUND THEN
+      --    no other themes exist as layers with a valid srtext - all we can do is return UNKNOWN    
       retval := 'UNKNOWN';
-    else
-      fetch c1 into dummy;
-      if c1%notfound then
-        -- we have one and only one row returned. Use it.
-        null;
-      else
---      we have more than one sde srtext for layers that have the same Oracle SRID, choose the first        
-        null;
-      end if;
-
-      close c1;
-    end if;
+    END IF;
+    --
+    CLOSE c1;
+  END IF;
+  RETURN retval;
     
-  elsif l_version = '9.2' or l_version = '9.3' then
-  
-    begin
-      execute immediate curstr into retval using p_theme_id;
-    exception
-      when no_data_found then
-        retval := 'UNKNOWN';
-      when others then
-        retval := 'UNKNOWN';
-    end;
-    
-  end if;
-  
-  return retval;     
-    
-end;
-
-
+END get_srtext;
 --
 -------------------------------------------------------------------------------------------------------------------------------
 --
-
-
 PROCEDURE debug_layer ( p_layer IN sde.layers%ROWTYPE ) IS
 BEGIN
-Nm_Debug.DEBUG( 'LAYER_ID '||TO_CHAR( p_layer.LAYER_ID ));
-Nm_Debug.DEBUG( 'DESCRIPTION '|| p_layer.DESCRIPTION );
-Nm_Debug.DEBUG( 'DATABASE_NAME '|| p_layer.DATABASE_NAME );
-Nm_Debug.DEBUG( 'OWNER '|| p_layer.OWNER );
-Nm_Debug.DEBUG( 'TABLE_NAME '|| p_layer.TABLE_NAME );
-Nm_Debug.DEBUG( 'SPATIAL_COLUMN '|| p_layer.SPATIAL_COLUMN );
-Nm_Debug.DEBUG( 'EFLAGS '||TO_CHAR( p_layer.EFLAGS ));
-Nm_Debug.DEBUG( 'LAYER_MASK '||TO_CHAR( p_layer.LAYER_MASK ));
-Nm_Debug.DEBUG( 'GSIZE1 '||TO_CHAR( p_layer.GSIZE1 ));
-Nm_Debug.DEBUG( 'GSIZE2 '||TO_CHAR( p_layer.GSIZE2 ));
-Nm_Debug.DEBUG( 'GSIZE3 '||TO_CHAR( p_layer.GSIZE3 ));
-Nm_Debug.DEBUG( 'MINX '||TO_CHAR( p_layer.MINX ));
-Nm_Debug.DEBUG( 'MINY '||TO_CHAR( p_layer.MINY ));
-Nm_Debug.DEBUG( 'MAXX '||TO_CHAR( p_layer.MAXX ));
-Nm_Debug.DEBUG( 'MAXY '||TO_CHAR( p_layer.MAXY ));
-Nm_Debug.DEBUG( 'CDATE '||TO_CHAR( p_layer.CDATE ));
-Nm_Debug.DEBUG( 'LAYER_CONFIG '|| p_layer.LAYER_CONFIG );
-Nm_Debug.DEBUG( 'OPTIMAL_ARRAY_SIZE '||TO_CHAR( p_layer.OPTIMAL_ARRAY_SIZE ));
-Nm_Debug.DEBUG( 'STATS_DATE '||TO_CHAR( p_layer.STATS_DATE ));
-Nm_Debug.DEBUG( 'MINIMUM_ID '||TO_CHAR( p_layer.MINIMUM_ID ));
-Nm_Debug.DEBUG( 'SRID '||TO_CHAR( p_layer.SRID ));
-Nm_Debug.DEBUG( 'BASE_LAYER_ID'||TO_CHAR( p_layer.BASE_LAYER_ID));
-END;
+  Nm_Debug.DEBUG( 'LAYER_ID '||TO_CHAR( p_layer.LAYER_ID ));
+  Nm_Debug.DEBUG( 'DESCRIPTION '|| p_layer.DESCRIPTION );
+  Nm_Debug.DEBUG( 'DATABASE_NAME '|| p_layer.DATABASE_NAME );
+  Nm_Debug.DEBUG( 'OWNER '|| p_layer.OWNER );
+  Nm_Debug.DEBUG( 'TABLE_NAME '|| p_layer.TABLE_NAME );
+  Nm_Debug.DEBUG( 'SPATIAL_COLUMN '|| p_layer.SPATIAL_COLUMN );
+  Nm_Debug.DEBUG( 'EFLAGS '||TO_CHAR( p_layer.EFLAGS ));
+  Nm_Debug.DEBUG( 'LAYER_MASK '||TO_CHAR( p_layer.LAYER_MASK ));
+  Nm_Debug.DEBUG( 'GSIZE1 '||TO_CHAR( p_layer.GSIZE1 ));
+  Nm_Debug.DEBUG( 'GSIZE2 '||TO_CHAR( p_layer.GSIZE2 ));
+  Nm_Debug.DEBUG( 'GSIZE3 '||TO_CHAR( p_layer.GSIZE3 ));
+  Nm_Debug.DEBUG( 'MINX '||TO_CHAR( p_layer.MINX ));
+  Nm_Debug.DEBUG( 'MINY '||TO_CHAR( p_layer.MINY ));
+  Nm_Debug.DEBUG( 'MAXX '||TO_CHAR( p_layer.MAXX ));
+  Nm_Debug.DEBUG( 'MAXY '||TO_CHAR( p_layer.MAXY ));
+  Nm_Debug.DEBUG( 'CDATE '||TO_CHAR( p_layer.CDATE ));
+  Nm_Debug.DEBUG( 'LAYER_CONFIG '|| p_layer.LAYER_CONFIG );
+  Nm_Debug.DEBUG( 'OPTIMAL_ARRAY_SIZE '||TO_CHAR( p_layer.OPTIMAL_ARRAY_SIZE ));
+  Nm_Debug.DEBUG( 'STATS_DATE '||TO_CHAR( p_layer.STATS_DATE ));
+  Nm_Debug.DEBUG( 'MINIMUM_ID '||TO_CHAR( p_layer.MINIMUM_ID ));
+  Nm_Debug.DEBUG( 'SRID '||TO_CHAR( p_layer.SRID ));
+  Nm_Debug.DEBUG( 'BASE_LAYER_ID'||TO_CHAR( p_layer.BASE_LAYER_ID));
+END debug_layer;
 END;
 /
