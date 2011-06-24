@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 --
 ---   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.33.1.5   Mar 14 2011 17:23:36   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.33.1.6   Jun 24 2011 09:58:40   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3sdo.pkb  $
---       Date into PVCS   : $Date:   Mar 14 2011 17:23:36  $
---       Date fetched Out : $Modtime:   Mar 14 2011 17:22:36  $
---       PVCS Version     : $Revision:   2.33.1.5  $
+--       Date into PVCS   : $Date:   Jun 24 2011 09:58:40  $
+--       Date fetched Out : $Modtime:   Jun 24 2011 09:40:52  $
+--       PVCS Version     : $Revision:   2.33.1.6  $
 --       Based on
 
 --
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 -- Copyright (c) RAC
 -----------------------------------------------------------------------------
 
-   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.33.1.5  $"';
+   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.33.1.6  $"';
    g_package_name    CONSTANT VARCHAR2 (30)  := 'NM3SDO';
    g_batch_size      INTEGER                 := NVL( TO_NUMBER(Hig.get_sysopt('SDOBATSIZE')), 10);
    g_clip_type       VARCHAR2(30)            := NVL(Hig.get_sysopt('SDOCLIPTYP'),'SDO');
@@ -9117,26 +9117,40 @@ FUNCTION get_nw_snaps_at_xy( p_nth_id IN NUMBER, p_geom IN mdsys.sdo_geometry ) 
 retval nm_theme_list := nm_theme_list( nm_theme_list_type(nm_theme_detail( NULL, NULL, NULL, NULL, NULL, NULL, NULL)));
 l_detail nm_theme_detail;
 
-CURSOR c1 (c_theme IN NUMBER) IS
+CURSOR c1 (c_theme IN NUMBER ) IS
   SELECT nts_snap_to
-  FROM NM_THEME_SNAPS, NM_NW_THEMES
+  FROM NM_THEME_SNAPS, NM_NW_THEMES a
   WHERE nts_theme_id = c_theme
-  AND  nts_snap_to = nnth_nth_theme_id
+  AND  nts_snap_to = a.nnth_nth_theme_id
   AND  EXISTS ( SELECT 1 FROM NM_THEME_ROLES, HIG_USER_ROLES
                 WHERE hur_username = USER
-    AND hur_role = nthr_role
-    AND nthr_theme_id = nnth_nth_theme_id )
+                AND hur_role = nthr_role
+                AND nthr_theme_id = a.nnth_nth_theme_id )
   ORDER BY nts_priority;
 
 CURSOR c2 (c_theme IN NUMBER) IS
-  SELECT nbth_base_theme
-  FROM NM_BASE_THEMES, NM_NW_THEMES
+  SELECT b.nnth_nth_theme_id
+  FROM NM_BASE_THEMES, NM_NW_THEMES a, nm_nw_themes b
   WHERE nbth_theme_id = c_theme
-  AND  nbth_base_theme = nnth_nth_theme_id
+  AND  nbth_base_theme = a.nnth_nth_theme_id
   AND  EXISTS ( SELECT 1 FROM NM_THEME_ROLES, HIG_USER_ROLES
                 WHERE hur_username = USER
-    AND hur_role = nthr_role
-    AND nthr_theme_id = nnth_nth_theme_id );
+                AND hur_role = nthr_role
+                AND nthr_theme_id = b.nnth_nth_theme_id ) 
+  AND a.nnth_nlt_id = b.nnth_nlt_id;
+
+CURSOR c3 (c_theme IN NUMBER) is
+SELECT a.nnth_nth_theme_id
+  FROM nm_inv_themes, nm_inv_nw, nm_linear_types, NM_NW_THEMES a
+  WHERE nith_nth_theme_id = c_theme
+  and nith_nit_id = nin_nit_inv_code
+  and nlt_nt_type = nin_nw_type
+  and nlt_g_i_d = 'D'
+  and nnth_nlt_id = nlt_id
+  and exists ( select 1 from hig_user_roles, nm_theme_roles
+               WHERE hur_username = USER
+               AND hur_role = nthr_role
+               AND nthr_theme_id = a.nnth_nth_theme_id );
 
 l_theme_list Nm3type.tab_number;
 
@@ -9164,7 +9178,15 @@ BEGIN
     FETCH c2 BULK COLLECT INTO l_theme_list;
     CLOSE c2;
 
---    RAISE_APPLICATION_ERROR(-20001,'No snapping themes');
+    IF l_theme_list.COUNT = 0 THEN
+
+--    No base themes to snap to - find the network theme that the inventory theme can relate to and find one that has roles against it. 
+
+      OPEN c3( p_nth.nth_theme_id );
+      FETCH c3 BULK COLLECT INTO l_theme_list;
+      CLOSE c3;
+      
+    END IF;
 
   END IF;
 
@@ -9174,44 +9196,41 @@ BEGIN
 
     FOR i IN 1..l_theme_list.COUNT LOOP
 
---      Nm_Debug.DEBUG('Snapping to theme '||TO_CHAR(l_theme_list(i)));
+--    Nm_Debug.DEBUG('Snapping to theme '||TO_CHAR(l_theme_list(i)));
 
-   l_nth := Nm3get.get_nth( l_theme_list(i));
+      l_nth := Nm3get.get_nth( l_theme_list(i));
 
---      Nm_Debug.DEBUG('calling get objects ');
+--    Nm_Debug.DEBUG('calling get objects ');
 
-      IF Nm3nta.g_theme_array_flag AND Nm3nta.theme_in_array( l_nth.nth_theme_id, Nm3nta.g_theme_array ) OR
-      NOT Nm3nta.g_theme_array_flag THEN
+--    Nm_Debug.DEBUG('In theme array');
 
---      Nm_Debug.DEBUG('In theme array');
+      l_ntl := Get_Objects_In_Buffer( l_nth.nth_theme_id, p_geom, l_nth.nth_tolerance, l_nth.nth_tol_units, l_get_projection );
 
-  l_ntl := Get_Objects_In_Buffer( l_nth.nth_theme_id, p_geom, l_nth.nth_tolerance, l_nth.nth_tol_units, l_get_projection );
+--    Nm_Debug.debug_on;
 
---     Nm_Debug.debug_on;
+--    Nm_Debug.DEBUG('returned from get objects ');
 
---        Nm_Debug.DEBUG('returned from get objects ');
+      IF l_ntl.ntl_theme_list.COUNT > 0 THEN
 
-     IF l_ntl.ntl_theme_list.COUNT > 0 THEN
+--      Nm_Debug.DEBUG('Snapped and retrieved '||l_ntl.ntl_theme_list.COUNT||' rows');
 
---        Nm_Debug.DEBUG('Snapped and retrieved '||l_ntl.ntl_theme_list.COUNT||' rows');
+        IF l_ntl.ntl_theme_list(1).ntd_pk_id IS NOT NULL THEN
 
-       IF l_ntl.ntl_theme_list(1).ntd_pk_id IS NOT NULL THEN
+          IF retval.ntl_theme_list(1).ntd_theme_id IS NULL THEN
+             retval := l_ntl;
+          ELSE
+             retval := retval.add_theme_list(l_ntl);
+          END IF;
+        END IF;
+     
+     ELSE
 
-         IF retval.ntl_theme_list(1).ntd_theme_id IS NULL THEN
-           retval := l_ntl;
-         ELSE
-           retval := retval.add_theme_list(l_ntl);
-         END IF;
-    END IF;
-        ELSE
-
---        Nm_Debug.DEBUG('No rows found');
-          NULL;
+--      Nm_Debug.DEBUG('No rows found');
+        NULL;
 
      END IF;
-      END IF;
 
- END LOOP;
+   END LOOP;
 
   END IF;
 
@@ -9228,26 +9247,27 @@ FUNCTION get_nw_snaps_at_xy( p_nth_id IN NUMBER,
 retval nm_theme_list := nm_theme_list( nm_theme_list_type(nm_theme_detail( NULL, NULL, NULL, NULL, NULL, NULL, NULL)));
 l_detail nm_theme_detail;
 
-CURSOR c1 (c_theme IN NUMBER) IS
+CURSOR c1 (c_theme IN NUMBER ) IS
   SELECT nts_snap_to
-  FROM NM_THEME_SNAPS, NM_NW_THEMES
+  FROM NM_THEME_SNAPS, NM_NW_THEMES a
   WHERE nts_theme_id = c_theme
-  AND  nts_snap_to = nnth_nth_theme_id
+  AND  nts_snap_to = a.nnth_nth_theme_id
   AND  EXISTS ( SELECT 1 FROM NM_THEME_ROLES, HIG_USER_ROLES
                 WHERE hur_username = USER
-    AND hur_role = nthr_role
-    AND nthr_theme_id = nnth_nth_theme_id )
+                AND hur_role = nthr_role
+                AND nthr_theme_id = a.nnth_nth_theme_id )
   ORDER BY nts_priority;
 
 CURSOR c2 (c_theme IN NUMBER) IS
-  SELECT nbth_base_theme
-  FROM NM_BASE_THEMES, NM_NW_THEMES
+  SELECT b.nnth_nth_theme_id
+  FROM NM_BASE_THEMES, NM_NW_THEMES a, nm_nw_themes b
   WHERE nbth_theme_id = c_theme
-  AND  nbth_base_theme = nnth_nth_theme_id
+  AND  nbth_base_theme = a.nnth_nth_theme_id
   AND  EXISTS ( SELECT 1 FROM NM_THEME_ROLES, HIG_USER_ROLES
                 WHERE hur_username = USER
-    AND hur_role = nthr_role
-    AND nthr_theme_id = nnth_nth_theme_id );
+                AND hur_role = nthr_role
+                AND nthr_theme_id = b.nnth_nth_theme_id ) 
+  AND a.nnth_nlt_id = b.nnth_nlt_id;
 
 l_theme_list Nm3type.tab_number;
 
@@ -9322,99 +9342,110 @@ END;
 
 BEGIN
 
---  Nm_Debug.debug_on;
---  Nm_Debug.DEBUG('Getting themes to snap to for theme = '||TO_CHAR(p_nth_id));
+--Nm_Debug.debug_on;
 
-  OPEN c1( p_nth.nth_theme_id );
-  FETCH c1 BULK COLLECT INTO l_theme_list;
-  CLOSE c1;
+  IF p_theme_txt IS NOT NULL THEN
 
+    p_theme_array := get_list( p_theme_txt );
+    
+    select t.nthe_id
+    bulk collect into l_theme_list
+    from table ( p_theme_array.nta_theme_array ) t;
+    
+  ELSE
+  
+    p_theme_array := NM3ARRAY.INIT_NM_THEME_ARRAY;
+  
+    --_Debug.DEBUG('Getting themes to snap to for theme = '||TO_CHAR(p_nth_id));
 
-  IF l_theme_list.COUNT = 0 THEN
+    OPEN c1( p_nth.nth_theme_id );
+    FETCH c1 BULK COLLECT INTO l_theme_list;
+    CLOSE c1;
 
---  No snapping themes so use the base themes of the given layer
+    IF l_theme_list.COUNT = 0 THEN
 
-    OPEN c2( p_nth.nth_theme_id );
-    FETCH c2 BULK COLLECT INTO l_theme_list;
-    CLOSE c2;
+      -- nm_debug.debug('No snapping themes so use the base themes of the given layer');
+
+      OPEN c2( p_nth.nth_theme_id );
+      FETCH c2 BULK COLLECT INTO l_theme_list;
+      CLOSE c2;
 
 --    RAISE_APPLICATION_ERROR(-20001,'No snapping themes');
 
+    END IF;
+    
   END IF;
 
   IF l_theme_list.COUNT > 0 THEN
 
-    IF p_theme_txt IS NOT NULL THEN
-
-      p_theme_array := get_list( p_theme_txt );
-
-    END IF;
-
---    Nm_Debug.DEBUG('Looping through, count = '||TO_CHAR(l_theme_list.COUNT));
+    --Nm_Debug.DEBUG('Looping through, count = '||TO_CHAR(l_theme_list.COUNT));
 
     IF p_theme_array.nta_theme_array(1).nthe_id IS NOT NULL THEN
 
-    FOR i IN 1..l_theme_list.COUNT LOOP
+      FOR i IN 1..l_theme_list.COUNT LOOP
 
---      Nm_Debug.DEBUG('Snapping to theme '||TO_CHAR(l_theme_list(i)));
+        --Nm_Debug.DEBUG('Snapping to theme '||TO_CHAR(l_theme_list(i)));
 
-   l_nth := Nm3get.get_nth( l_theme_list(i));
+        l_nth := Nm3get.get_nth( l_theme_list(i));
 
---      Nm_Debug.DEBUG('calling get objects ');
+        --Nm_Debug.DEBUG('calling get objects ');
+
+
 /*
+        IF p_theme_array.nta_theme_array(1).nthe_id IS NULL THEN
+          Nm_Debug.DEBUG('Theme array is null');
+        ELSE
+          Nm_Debug.DEBUG('Theme array is not null - '||TO_CHAR(p_theme_array.nta_theme_array(1).nthe_id));
+        END IF;
 
-      IF p_theme_array.nta_theme_array(1).nthe_id IS NULL THEN
-        Nm_Debug.DEBUG('Theme array is null');
-      ELSE
-        Nm_Debug.DEBUG('Theme array is not null - '||TO_CHAR(p_theme_array.nta_theme_array(1).nthe_id));
-      END IF;
+        nm_debug.debug( 'test '||p_theme_array.nta_theme_array(1).nthe_id||' is not null and in array '||l_nth.nth_theme_id );
+
+        Nm_Debug.DEBUG('In theme array');
 */
-      IF ( p_theme_array.nta_theme_array(1).nthe_id IS NOT NULL AND Nm3nta.theme_in_array( l_nth.nth_theme_id, p_theme_array )) OR
-      ( p_theme_array.nta_theme_array(1).nthe_id IS NULL ) THEN
 
-  --      Nm_Debug.DEBUG('In theme array');
-
-  l_ntl := Get_Objects_In_Buffer( l_nth.nth_theme_id, p_geom, l_nth.nth_tolerance, l_nth.nth_tol_units, l_get_projection );
-
---     nm_debug.debug_on;
+          l_ntl := Get_Objects_In_Buffer( l_nth.nth_theme_id, p_geom, l_nth.nth_tolerance, l_nth.nth_tol_units, l_get_projection );
 
 --        Nm_Debug.DEBUG('returned from get objects ');
 
-     IF l_ntl.ntl_theme_list.COUNT > 0 THEN
+          IF l_ntl.ntl_theme_list.COUNT > 0 THEN
 
-        nm_debug.debug('Snapped and retrieved '||l_ntl.ntl_theme_list.count||' rows');
+--          nm_debug.debug('Snapped and retrieved '||l_ntl.ntl_theme_list.count||' rows');
+
 
 /*
-        FOR i IN l_ntl.ntl_theme_list.FIRST .. l_ntl.ntl_theme_list.LAST
-        LOOP
-          nm_debug.debug('Retrived PK = '||l_ntl.ntl_theme_list(i).ntd_pk_id);
-          nm_debug.debug('Retrived Name = '||l_ntl.ntl_theme_list(i).ntd_name);
-        END LOOP;
+            FOR i IN l_ntl.ntl_theme_list.FIRST .. l_ntl.ntl_theme_list.LAST
+            LOOP
+              nm_debug.debug('Retrived PK = '||l_ntl.ntl_theme_list(i).ntd_pk_id);
+              nm_debug.debug('Retrived Name = '||l_ntl.ntl_theme_list(i).ntd_name);
+            END LOOP;
 */
 
-       IF l_ntl.ntl_theme_list(1).ntd_pk_id IS NOT NULL THEN
+             IF l_ntl.ntl_theme_list(1).ntd_pk_id IS NOT NULL THEN
 
-         IF retval.ntl_theme_list(1).ntd_theme_id IS NULL THEN
-           retval := l_ntl;
-         ELSE
-           retval := retval.add_theme_list(l_ntl);
-         END IF;
-    END IF;
-        ELSE
+               IF retval.ntl_theme_list(1).ntd_theme_id IS NULL THEN
+                 retval := l_ntl;
+               ELSE
+                 retval := retval.add_theme_list(l_ntl);
+               END IF;
+         
+             END IF;
 
---        nm_debug.debug('No rows found');
-          NULL;
+          ELSE
 
-     END IF;
-      END IF;
+             --nm_debug.debug('No rows found');
+         
+             NULL;
 
- END LOOP;
+          END IF;
+         
+     END LOOP;
+          
 
-  END IF;
+   END IF;
 
  END IF;
 
-  RETURN retval;
+ RETURN retval;
 
 END;
 
