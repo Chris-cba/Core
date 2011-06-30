@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 --
 ---   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.59   Jun 24 2011 10:53:12   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.60   Jun 30 2011 15:35:50   Ade.Edwards  $
 --       Module Name      : $Workfile:   nm3sdo.pkb  $
---       Date into PVCS   : $Date:   Jun 24 2011 10:53:12  $
---       Date fetched Out : $Modtime:   Jun 24 2011 10:50:58  $
---       PVCS Version     : $Revision:   2.59  $
+--       Date into PVCS   : $Date:   Jun 30 2011 15:35:50  $
+--       Date fetched Out : $Modtime:   Jun 30 2011 15:26:52  $
+--       PVCS Version     : $Revision:   2.60  $
 --       Based on
 
 --
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 -- Copyright (c) RAC
 -----------------------------------------------------------------------------
 
-   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.59  $"';
+   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.60  $"';
    g_package_name    CONSTANT VARCHAR2 (30)  := 'NM3SDO';
    g_batch_size      INTEGER                 := NVL( TO_NUMBER(Hig.get_sysopt('SDOBATSIZE')), 10);
    g_clip_type       VARCHAR2(30)            := NVL(Hig.get_sysopt('SDOCLIPTYP'),'SDO');
@@ -6790,91 +6790,186 @@ END;
 
 --------------------------------------------------------------------------------------------------------------
 
-FUNCTION create_spatial_extent ( p_theme_id IN NM_THEMES_ALL.nth_theme_id%TYPE,
-                                 p_nsperow  NM_SPATIAL_EXTENTS%ROWTYPE,
-                                 p_whole_flag IN VARCHAR2 DEFAULT 'Y' ) RETURN NUMBER IS
-
-  nserow   NM_SAVED_EXTENTS%ROWTYPE;
-  nsperow  NM_SPATIAL_EXTENTS%ROWTYPE;
-  nthrow   NM_THEMES_ALL%ROWTYPE;
-
-  lf     VARCHAR2(1) := CHR(13);
-
-  cur_string Nm3type.max_varchar2;
-
+FUNCTION create_spatial_extent ( p_theme_id   IN nm_themes_all.nth_theme_id%TYPE,
+                                 p_nsperow       nm_spatial_extents%ROWTYPE,
+                                 p_whole_flag IN VARCHAR2 DEFAULT 'Y' )
+  RETURN NUMBER IS
+--
+  nserow            nm_saved_extents%ROWTYPE;
+  nsperow           nm_spatial_extents%ROWTYPE;
+  nthrow            nm_themes_all%ROWTYPE;
+--
+  lf                VARCHAR2(1) := CHR(13);
+  cur_string        nm3type.max_varchar2;
+  l_mask            VARCHAR2(100);
+  l_group_or_datum  VARCHAR2(1);
+--
 BEGIN
-
+--
+-- Get theme rowtype
+--
    nthrow := Nm3get.get_nth( p_theme_id );
 
-   nserow.nse_id := Nm3seq.next_nse_id_seq;
+--
+-- Determine the Theme type
+--
+   BEGIN
+     SELECT vnnt_lr_type INTO l_group_or_datum
+       FROM v_nm_net_themes_all
+      WHERE vnnt_nth_theme_id = p_theme_id;
+   EXCEPTION
+     WHEN NO_DATA_FOUND THEN 
+       RAISE_APPLICATION_ERROR (-20101,'Cannot find a network theme for '||p_theme_id);
+   END; 
+
+--
+-- Build nm_saved_extents rowtype
+--
+   nserow.nse_id    := Nm3seq.next_nse_id_seq;
    nserow.nse_owner := USER;
    nserow.nse_name  := 'Spatial Extent '||TO_CHAR(nserow.nse_id)||' from '||TO_CHAR(p_nsperow.nspe_id);
    nserow.nse_descr := NULL;
    nserow.nse_pbi   := 'N';
    Nm3extent.ins_nse( nserow );
+--
+-- Set the interaction mask
+--
+   --l_mask := CASE WHEN p_whole_flag = 'Y' THEN 'INSIDE' ELSE 'INSIDE+TOUCH' END;
+   l_mask := CASE WHEN p_whole_flag = 'Y' THEN 'INSIDE' ELSE 'ANYINTERACT' END;
+--
+   cur_string := ' INSERT INTO NM_SAVED_EXTENT_MEMBERS '||lf||
+                 ' ( '||lf||
+                   ' nsm_nse_id,  '||lf||
+                   ' nsm_id,  '||lf||
+                   ' nsm_ne_id,  '||lf||
+                   ' nsm_begin_mp,  '||lf||
+                   ' nsm_end_mp,  '||lf||
+                   ' nsm_seq_no, '||lf||
+                   ' nsm_datum,  '||lf||
+                   ' nsm_restrict_excl_sub_class'||lf||
+                   ') '||lf||
+                   ' SELECT nsm_nse_id '||lf||
+                       ' , nsm_id '||lf||
+                       ' , nsm_ne_id '||lf||
+                       ' , to_number(nsm_begin_mp) '||lf||
+                       ' , to_number(nsm_end_mp) '||lf||
+                       ' , nsm_seq_no '||lf||
+                       ' , nsm_datum '||lf||
+                       ' , nsm_restrict_excl_sub_class '||lf||
+                     ' FROM '||lf|| 
+                     ' ( '||lf||
+                        'SELECT :nse_id nsm_nse_id,'||lf||
+                              ' nm3ddl.sequence_nextval(''nsm_id_seq'') nsm_id, '||lf||
+                              ' s.ne_id nsm_ne_id, '||
+                              ' nm3unit.get_formatted_value( sdo_lrs.geom_segment_start_measure(intersection), 1) nsm_begin_mp,'||lf||
+                              ' nm3unit.get_formatted_value( sdo_lrs.geom_segment_end_measure(intersection), 1) nsm_end_mp,'||lf||
+                              ' rownum nsm_seq_no, '||lf||
+                              ''''||CASE WHEN l_group_or_datum = 'D' THEN 'Y' ELSE 'N' END||''''||' nsm_datum,'||lf||
+                              ' '||''''||'N'||''' nsm_restrict_excl_sub_class'||lf||
+                         ' FROM '||lf||
+                           ' ( '||lf||
+                            ' WITH all_results '||lf||
+                            ' AS '||lf||
+                            '  ( '||lf||
+                              ' SELECT s.'||nthrow.nth_feature_pk_column||' ne_id '||lf||
+                                    ', s.'||nthrow.nth_feature_shape_column||' shape '||lf||
+                                    ', nspe_boundary '||lf||
+                                ' FROM '||nthrow.nth_feature_table||' s, nm_spatial_extents '||lf||
+                               ' WHERE sdo_relate ( s.'||nthrow.nth_feature_shape_column||lf||
+                                               '  , nspe_boundary '||
+                                               '  , ''mask='||l_mask||' querytype=WINDOW'||''''||') = '||''''||'TRUE'||''''||lf||
+                                  'AND nspe_id = :nspe_id '||lf||
+                              ' ) '||lf||
+                              ' SELECT ne_id, sdo_lrs.lrs_intersection( all_results.shape, nspe_boundary, 0.05) intersection '||lf||
+                                ' FROM all_results '||lf||
+                            ') s '||lf||
+                         ' ) ';
 
-   IF p_whole_flag = 'Y' THEN
-     cur_string := ' INSERT INTO NM_SAVED_EXTENT_MEMBERS ( '||lf||
-       ' NSM_NSE_ID, NSM_ID, NSM_NE_ID,  '||lf||
-       ' NSM_BEGIN_MP, NSM_END_MP, NSM_BEGIN_NO, '||lf||
-       ' NSM_END_NO, NSM_BEGIN_SECT, NSM_BEGIN_SECT_OFFSET, '||lf||
-       ' NSM_END_SECT, NSM_END_SECT_OFFSET, NSM_SEQ_NO, '||lf||
-       ' NSM_DATUM, NSM_DATE_CREATED, NSM_DATE_MODIFIED, '||lf||
-       ' NSM_CREATED_BY, NSM_MODIFIED_BY, NSM_SUB_CLASS, '||lf||
-       ' NSM_SUB_CLASS_EXCL, NSM_RESTRICT_EXCL_SUB_CLASS) '||lf||
-       ' select :nse_id, nsm_id_seq.nextval, s.ne_id, 0, nm3net.get_ne_length( s.ne_id ),'||lf||
-       ' null, null, null, null, null, null, rownum,'||''''||'Y'||''''||','||lf||
-    ' sysdate, sysdate, user, user, null, null, '||''''||'N'||''''||lf||
-     ' from '||nthrow.nth_feature_table||'  s,  nm_spatial_extents '||lf||
-     ' where nspe_id = :nspe_id '||
-     ' and sdo_relate(  s.'||nthrow.nth_feature_shape_column||' , nspe_boundary, '||''''||'mask=INSIDE querytype=WINDOW'||''''||') = '||''''||'TRUE'||'''';
-
-
-   ELSE
-
-     cur_string := ' INSERT INTO NM_SAVED_EXTENT_MEMBERS ( '||lf||
-       ' NSM_NSE_ID, NSM_ID, NSM_NE_ID,  '||lf||
-       ' NSM_BEGIN_MP, NSM_END_MP, NSM_BEGIN_NO, '||lf||
-       ' NSM_END_NO, NSM_BEGIN_SECT, NSM_BEGIN_SECT_OFFSET, '||lf||
-       ' NSM_END_SECT, NSM_END_SECT_OFFSET, NSM_SEQ_NO, '||lf||
-       ' NSM_DATUM, NSM_DATE_CREATED, NSM_DATE_MODIFIED, '||lf||
-       ' NSM_CREATED_BY, NSM_MODIFIED_BY, NSM_SUB_CLASS, '||lf||
-       ' NSM_SUB_CLASS_EXCL, NSM_RESTRICT_EXCL_SUB_CLASS) '||lf||
-       ' select :nse_id, nsm_id_seq.nextval, s.ne_id, '||lf||
-       ' sdo_lrs.geom_segment_start_measure(  sdo_geom.sdo_intersection( s.'||nthrow.nth_feature_shape_column||',nspe_boundary, .05)),'||lf||
-       ' sdo_lrs.geom_segment_end_measure(  sdo_geom.sdo_intersection( s.'||nthrow.nth_feature_shape_column||',nspe_boundary, .05)),'||lf||
-       ' null, null, null, null, null, null, rownum,'||''''||'Y'||''''||','||lf||
-    ' sysdate, sysdate, user, user, null, null, '||''''||'N'||''''||lf||
-     ' from '||nthrow.nth_feature_table||'  s,  nm_spatial_extents '||lf||
-     ' where nspe_id = :nspe_id '||
-     ' and sdo_relate(  s.'||nthrow.nth_feature_shape_column||' , nspe_boundary, '||''''||'mask=INSIDE+TOUCH querytype=WINDOW'||''''||') = '||''''||'TRUE'||'''';
-
-
-   END IF;
+--
+--  My original simple approach has problems when inserting the data - the end_mps always come out as null, but the SELECT statement works fine!
+--  Recoding as above seemed to work around this.
+--
+--
+--                   'SELECT :nse_id nsm_nse_id,'||lf||
+--                          ' nm3ddl.sequence_nextval(''nsm_id_seq'') nsm_id, '||lf||
+--                          ' s.'||nthrow.nth_feature_pk_column||' nsm_ne_id, '||lf||
+--                          ' to_number(nm3unit.get_formatted_value(sdo_lrs.geom_segment_start_measure(  sdo_lrs.lrs_intersection ( s.'||nthrow.nth_feature_shape_column||', nspe_boundary, 0.05) ),1)) begin_mp, '||lf||
+--                          ' to_number(nm3unit.get_formatted_value(sdo_lrs.geom_segment_end_measure  (  sdo_lrs.lrs_intersection ( s.'||nthrow.nth_feature_shape_column||', nspe_boundary, 0.05) ),1)) end_mp, '||lf||
+--                          ' rownum nsm_seq_no, '||lf||
+--                          ''''||'Y'||''''||' nsm_datum,'||lf||
+--                          ' '||''''||'N'||''' nsm_restrict_excl_sub_class'||lf||
+--                    ' FROM  '||nthrow.nth_feature_table||' s, nm_spatial_extents '||lf||
+--                   ' WHERE nspe_id = :nspe_id '||lf||
+--                     ' AND sdo_relate ( s.'||nthrow.nth_feature_shape_column||',nspe_boundary ,''mask='||l_mask||' querytype=WINDOW'||''''||') = '||''''||'TRUE'||'''';
 
 --   nm_debug.debug_on;
 --   nm_debug.debug( cur_string );
 --   nm_debug.debug_off;
-   EXECUTE IMMEDIATE cur_string
-   USING nserow.nse_id, p_nsperow.nspe_id;
+--   return nserow.nse_id;
+   EXECUTE IMMEDIATE cur_string USING nserow.nse_id, p_nsperow.nspe_id;
 
--- Only valid when members are datums - needs extraction of datums from generic member set - not enough time.
-
-   INSERT INTO NM_SAVED_EXTENT_MEMBER_DATUMS
-   (
-     NSD_NSE_ID, NSD_NSM_ID, NSD_NE_ID,
-     NSD_BEGIN_MP, NSD_END_MP, NSD_SEQ_NO,
-     NSD_CARDINALITY)
-   SELECT nsm_nse_id, nsm_id, nsm_ne_id,
-     nsm_begin_mp, nsm_end_mp, nsm_seq_no,
-     1
-   FROM NM_SAVED_EXTENT_MEMBERS
-   WHERE nsm_nse_id = nserow.nse_id;
-
-
-   RETURN nserow.nse_id;
-
-END ;
+--
+-- Migrate the results into NM_SAVED_EXTENT_MEMBERS_SETS from NM_SAVED_EXTENTS
+--
+   IF l_group_or_datum = 'D'
+   THEN
+   -- 
+   -- DATUM saved extent members
+   --
+     INSERT INTO nm_saved_extent_member_datums
+       ( nsd_nse_id
+       , nsd_nsm_id
+       , nsd_ne_id
+       , nsd_begin_mp
+       , nsd_end_mp
+       , nsd_seq_no
+       , nsd_cardinality
+       )
+     SELECT nsm_nse_id
+          , nsm_id
+          , nsm_ne_id
+          , nsm_begin_mp
+          , nsm_end_mp
+          , nsm_seq_no
+          , 1
+       FROM nm_saved_extent_members
+      WHERE nsm_nse_id = nserow.nse_id;
+--
+  ELSIF l_group_or_datum = 'G'
+  THEN
+  --
+  -- GROUP saved extent members
+  --   Derive the child datum members from the (partial) route information in the Saved Extent
+  --
+      BEGIN
+        FOR i IN ( SELECT * FROM nm_saved_extent_members
+                    WHERE nsm_nse_id = nserow.nse_id )
+        LOOP
+        --
+          DECLARE
+            l_job_id NUMBER;
+          BEGIN
+            nm3extent.create_temp_ne
+                       ( pi_source_id => i.nsm_ne_id
+                       , pi_source    => 'ROUTE'
+                       , pi_begin_mp  => i.nsm_begin_mp
+                       , pi_end_mp    => i.nsm_end_mp
+                       , po_job_id    => l_job_id);
+          --
+            INSERT INTO nm_saved_extent_member_datums
+                  (nsd_nse_id, nsd_nsm_id, nsd_ne_id, nsd_begin_mp, nsd_end_mp, nsd_seq_no, nsd_cardinality)
+            SELECT i.nsm_nse_id, i.nsm_id, nte_ne_id_of, nte_begin_mp, nte_end_mp, nte_seq_no, nte_cardinality
+              FROM nm_nw_temp_extents
+             WHERE nte_job_id = l_job_id;
+           END;
+        --
+        END LOOP;
+      END;
+  END IF;
+--
+  RETURN nserow.nse_id;
+--
+END create_spatial_extent ;
 
 --
 --------------------------------------------------------------------------------------------------------------
