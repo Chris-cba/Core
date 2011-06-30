@@ -1,14 +1,14 @@
-CREATE OR REPLACE PACKAGE BODY nm3close AS
+CREATE OR REPLACE PACKAGE BODY HIGHWAYS.nm3close AS
 --
 -----------------------------------------------------------------------------
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3close.pkb-arc   2.8   May 16 2011 14:44:10   Steve.Cooper  $
---       Module Name      : $Workfile:   nm3close.pkb  $
---       Date into PVCS   : $Date:   May 16 2011 14:44:10  $
---       Date fetched Out : $Modtime:   Apr 01 2011 11:50:36  $
---       PVCS Version     : $Revision:   2.8  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3close.pkb-arc   2.9   Jun 30 2011 16:34:20   Chris.Strettle  $
+--       Module Name      : $Workfile:   nm3close_ckout.pkb  $
+--       Date into PVCS   : $Date:   Jun 30 2011 16:34:20  $
+--       Date fetched Out : $Modtime:   Jun 30 2011 11:29:24  $
+--       PVCS Version     : $Revision:   2.9  $
 --
 --
 --   Author : I Turnbull
@@ -21,7 +21,7 @@ CREATE OR REPLACE PACKAGE BODY nm3close AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.8  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.9  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3close';
@@ -196,16 +196,16 @@ PROCEDURE close_groups ( p_ne_id NM_ELEMENTS.ne_id%TYPE
                         ,p_effective_date DATE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                        )
 IS
+
 BEGIN
     nm_debug.proc_start(g_package_name , 'close_groups');
     UPDATE NM_MEMBERS
     SET nm_end_date = TRUNC(p_effective_date)
     WHERE nm_type = 'G'
-      AND nm_ne_id_of = p_ne_id;
+    AND nm_ne_id_of = p_ne_id;
 
     nm_debug.proc_end(g_package_name , 'close_groups');
-    
-    
+
 END close_groups;
 --
 -----------------------------------------------------------------------------
@@ -796,10 +796,6 @@ BEGIN
    END LOOP;
 
    CLOSE l_ref_cursor;
-
---   FOR i IN 1..g_tab_rte_memb_depth.COUNT LOOP
---      nm_debug.debug('RECORD '||TO_CHAR(i)||' '||g_tab_rte_memb_depth(i)||' '||g_tab_rte_memb_label(i)||' '||g_tab_rte_memb_child_ne_type(i)||' '||g_tab_rte_memb_child_ne_id(i)||' '||g_tab_rte_memb_end_date_flag(i));
---   END LOOP;
 --
    nm_debug.proc_end(g_package_name,'get_membership_hierarchy');
 --
@@ -880,8 +876,7 @@ BEGIN
   ------------------------------------------------------------------
   UPDATE NM_MEMBERS
   SET    nm_end_date = pi_effective_date
-  WHERE  nm_ne_id_in    = pi_ne_id;
-
+  WHERE  nm_ne_id_in = pi_ne_id;
 
   --------------------------------------------------------------------
   -- end-date the membership of all data where this route is a member!
@@ -1004,7 +999,11 @@ BEGIN
                      WHERE  nm_ne_id_in = pi_route_id)
   AND     ne_type= 'D' ;
   --
---
+-- CWS 0111307 Add element history
+  insert_nm_element_history ( p_ne_id          => pi_route_id
+                            , p_effective_date => pi_effective_date
+                            , p_neh_descr      => null
+                            );
 --
 --  RAC - if the group is linear, it may have a shape - just reshape it
 --
@@ -1063,6 +1062,8 @@ IS
    WHERE  iit_ne_id = c_iit_ne_id
    FOR UPDATE OF iit_end_date NOWAIT;
 --
+  TYPE l_rec_nmh_tab IS TABLE OF nm_member_history%rowtype INDEX BY BINARY_INTEGER;
+  l_rec_nmh       l_rec_nmh_tab;
 BEGIN
 --
    nm_debug.proc_start(g_package_name , 'close_temp_extent');
@@ -1091,12 +1092,29 @@ BEGIN
    FETCH cs_elements BULK COLLECT INTO l_tab_ne_rowid;
    CLOSE cs_elements;
 --
+   -- CWS 0111307 Membership history record added.
    -- end date the locations of groups and inv
    FORALL i IN 1..l_tab_nm_rowid.COUNT
     UPDATE NM_MEMBERS
      SET   nm_end_date = pi_effective_date
-    WHERE  ROWID       = l_tab_nm_rowid(i);
+    WHERE  ROWID       = l_tab_nm_rowid(i)
+    RETURNING
+      NM_NE_ID_IN
+    , NM_NE_ID_OF
+    , NM_NE_ID_OF
+    , NM_BEGIN_MP
+    , NM_START_DATE
+    , NM_TYPE
+    , NM_OBJ_TYPE
+    , NULL
+    BULK COLLECT INTO
+    l_rec_nmh;
 --
+    FOR i IN 1.. l_rec_nmh.count LOOP
+      nm3ins.ins_nmh(p_rec_nmh => l_rec_nmh(i));
+    END LOOP;
+
+
    -- end date the elements
    FORALL i IN 1..l_tab_ne_rowid.COUNT
     UPDATE NM_ELEMENTS
