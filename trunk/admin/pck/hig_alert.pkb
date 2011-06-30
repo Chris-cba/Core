@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --3
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_alert.pkb-arc   3.14   May 16 2011 14:42:10   Steve.Cooper  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_alert.pkb-arc   3.15   Jun 30 2011 15:48:06   Chris.Strettle  $
 --       Module Name      : $Workfile:   hig_alert.pkb  $
---       Date into PVCS   : $Date:   May 16 2011 14:42:10  $
---       Date fetched Out : $Modtime:   Apr 20 2011 11:26:20  $
---       Version          : $Revision:   3.14  $
+--       Date into PVCS   : $Date:   Jun 30 2011 15:48:06  $
+--       Date fetched Out : $Modtime:   Jun 30 2011 15:41:20  $
+--       Version          : $Revision:   3.15  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid   CONSTANT varchar2(2000) := '$Revision:   3.14  $';
+  g_body_sccsid   CONSTANT varchar2(2000) := '$Revision:   3.15  $';
 
   c_date_format   CONSTANT varchar2(30) := 'DD-Mon-YYYY HH24:MI:SS';
   g_trigger_text  clob;
@@ -2173,11 +2173,12 @@ FUNCTION get_trigger_status(pi_trigger_name hig_alert_types.halt_trigger_name%TY
 RETURN varchar2
 IS
 --
-   CURSOR c_get_status
-   IS
-  Select  Initcap(dt.Status)
-  From    Dba_Triggers  dt
-  Where   dt.Trigger_Name   = Upper(Pi_Trigger_Name);
+  CURSOR c_get_status
+  IS
+  SELECT  INITCAP(dt.status)
+  FROM    dba_triggers  dt
+  WHERE   dt.trigger_name   = UPPER(pi_trigger_name)
+  AND     owner = sys_context('NM3CORE','APPLICATION_OWNER');
  
    l_status Varchar2(50);
 --
