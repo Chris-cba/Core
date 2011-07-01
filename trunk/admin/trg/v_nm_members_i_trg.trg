@@ -5,13 +5,14 @@ CREATE OR REPLACE TRIGGER V_NM_MEMBERS_I_TRG
 DECLARE
 -----------------------------------------------------------------------------
 --
---   SCCS Identifiers :-
+--   PVCS Identifiers :-
 --
---       sccsid           : %W% %G%
---       Module Name      : %M%
---       Date into SCCS   : %E% %U%
---       Date fetched Out : %D% %T%
---       SCCS Version     : %I%
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/trg/v_nm_members_i_trg.trg-arc   2.1   Jul 01 2011 10:39:34   Chris.Strettle  $
+--       Module Name      : $Workfile:   v_nm_members_i_trg.trg  $
+--       Date into PVCS   : $Date:   Jul 01 2011 10:39:34  $
+--       Date fetched Out : $Modtime:   Jul 01 2011 10:36:46  $
+--       Version          : $Revision:   2.1  $
+--
 --
 -----------------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2004
