@@ -5,11 +5,11 @@ AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.46   Jun 17 2011 10:53:30   Chris.Strettle  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.47   Jul 04 2011 16:51:38   Chris.Strettle  $
 --       Module Name      : $Workfile:   nm3sdm.pkb  $
---       Date into PVCS   : $Date:   Jun 17 2011 10:53:30  $
---       Date fetched Out : $Modtime:   Jun 17 2011 09:51:24  $
---       PVCS Version     : $Revision:   2.46  $
+--       Date into PVCS   : $Date:   Jul 04 2011 16:51:38  $
+--       Date fetched Out : $Modtime:   Jul 04 2011 16:13:14  $
+--       PVCS Version     : $Revision:   2.47  $
 --
 --   Author : R.A. Coupe
 --
@@ -21,7 +21,7 @@ AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT VARCHAR2 (2000) := '"$Revision:   2.46  $"';
+   g_body_sccsid     CONSTANT VARCHAR2 (2000) := '"$Revision:   2.47  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT VARCHAR2 (30)   := 'NM3SDM';
@@ -623,7 +623,7 @@ PROCEDURE make_nt_spatial_layer
           RAISE e_no_analyse_privs;
       END;
       --
-      Nm_Debug.proc_end (g_package_name, 'make_ona_inv_spatial_layer');
+      Nm_Debug.proc_end (g_package_name, 'make_nt_spatial_layer');
    --
   EXCEPTION
     WHEN e_not_unrestricted
@@ -2933,12 +2933,11 @@ PROCEDURE make_nt_spatial_layer
    (
       pi_nit_inv_type   IN   nm_inv_types.nit_inv_type%TYPE,
       pi_create_flag    IN   VARCHAR2 DEFAULT 'TRUE',
-   p_job_id          IN   NUMBER DEFAULT NULL
+      p_job_id          IN   NUMBER DEFAULT NULL
    )
    IS
       l_nit                nm_inv_types%ROWTYPE;
       lcur                 Nm3type.ref_cursor;
-
       l_base               NM_THEMES_ALL.nth_theme_id%TYPE;
       l_tab                VARCHAR2 (30);
       l_base_table         VARCHAR2 (30);
@@ -2948,17 +2947,13 @@ PROCEDURE make_nt_spatial_layer
       l_geom               MDSYS.SDO_GEOMETRY;
       l_ne                 nm_elements.ne_id%TYPE;
       l_theme_id           NM_THEMES_ALL.nth_theme_id%TYPE;
-
       l_base_themes        nm_theme_array;
-
       l_theme_name         NM_THEMES_ALL.nth_theme_name%TYPE;
-
-   l_diminfo            mdsys.sdo_dim_array;
-   l_srid               NUMBER;
-
-   l_usgm               user_sdo_geom_metadata%ROWTYPE;
-   
-   l_themes    int_array := NM3ARRAY.INIT_INT_ARRAY;
+      l_diminfo            mdsys.sdo_dim_array;
+      l_srid               NUMBER;
+      l_usgm               user_sdo_geom_metadata%ROWTYPE;
+      l_themes             int_array := NM3ARRAY.INIT_INT_ARRAY;
+      l_inv_view_name      VARCHAR2(30);
 
    BEGIN
   -- AE check to make sure user is unrestricted
@@ -2981,13 +2976,21 @@ PROCEDURE make_nt_spatial_layer
 
       l_base_themes := Get_Inv_Base_Themes( pi_nit_inv_type );
 
-   Nm3sdo.set_diminfo_and_srid( l_base_themes, l_diminfo, l_srid );
+      Nm3sdo.set_diminfo_and_srid( l_base_themes, l_diminfo, l_srid );
 
       IF l_nit.nit_pnt_or_cont = 'P' THEN
 
-     l_diminfo := sdo_lrs.convert_to_std_dim_array(l_diminfo);
+        l_diminfo := sdo_lrs.convert_to_std_dim_array(l_diminfo);
 
       END IF;
+
+      IF NOT nm3ddl.does_object_exist( nm3inv_view.derive_inv_type_view_name(pi_nit_inv_type)
+                                     , 'VIEW'
+                                     , Sys_Context('NM3CORE','APPLICATION_OWNER') )
+      THEN
+        Nm3inv_View.create_inv_view(pi_nit_inv_type, FALSE, l_inv_view_name);
+      END IF;
+
 
 ---------------------------------------------------------------
 -- Create the table and history view
@@ -6191,7 +6194,11 @@ end;
 
       IF NOT Nm3ddl.does_object_exist (l_view, 'VIEW')
       THEN
-         Nm3inv_View.create_view_for_nt_type (p_nt_type);
+         nm3inv_view.create_view_for_nt_type (p_nt_type);
+         nm3inv_view.create_ft_inv_for_nt_type (pi_nt_type                  => p_gty_type
+                                               ,pi_inv_type                 => NULL
+                                               ,pi_delete_existing_inv_type => TRUE
+                                               );
       END IF;
 
       IF Nm3net.is_gty_linear (p_gty_type) = 'Y'
@@ -7698,11 +7705,11 @@ end;
    */
    --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.46   Jun 17 2011 10:53:30   Chris.Strettle  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.47   Jul 04 2011 16:51:38   Chris.Strettle  $
 --       Module Name      : $Workfile:   nm3sdm.pkb  $
---       Date into PVCS   : $Date:   Jun 17 2011 10:53:30  $
---       Date fetched Out : $Modtime:   Jun 17 2011 09:51:24  $
---       PVCS Version     : $Revision:   2.46  $
+--       Date into PVCS   : $Date:   Jul 04 2011 16:51:38  $
+--       Date fetched Out : $Modtime:   Jul 04 2011 16:13:14  $
+--       PVCS Version     : $Revision:   2.47  $
 
       append ('--   PVCS Identifiers :-');
       append ('--');
