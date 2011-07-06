@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE Nm3sdm AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkh-arc   2.4   Apr 09 2010 16:21:20   cstrettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkh-arc   2.5   Jul 06 2011 13:39:40   Chris.Strettle  $
 --       Module Name      : $Workfile:   nm3sdm.pkh  $
---       Date into PVCS   : $Date:   Apr 09 2010 16:21:20  $
---       Date fetched Out : $Modtime:   Apr 09 2010 16:14:42  $
---       Version          : $Revision:   2.4  $
+--       Date into PVCS   : $Date:   Jul 06 2011 13:39:40  $
+--       Date fetched Out : $Modtime:   Jul 06 2011 10:59:06  $
+--       Version          : $Revision:   2.5  $
 --       Based on SCCS version : 1.25 
 -------------------------------------------------------------------------
 --
@@ -19,7 +19,7 @@ CREATE OR REPLACE PACKAGE Nm3sdm AS
 -----------------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
-  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.4  $';
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.5  $';
 
   g_date_views  CONSTANT   VARCHAR2(1) := NVL(Hig.get_sysopt('SDODATEVW'),'N');
 
@@ -1052,16 +1052,22 @@ PROCEDURE create_theme_xy_view ( p_theme_id IN NUMBER );
 --Retrieves the current unit factor used in registration of meaure units
 FUNCTION get_global_unit_factor RETURN NUMBER;
 --</PROC>
------------------------------------------------------------------------------
 --
 -----------------------------------------------------------------------------
 --
---<PROC NAME=""MAINTAIN_NTV>
+--<PROC NAME="MAINTAIN_NTV">
 -- Triggered from nm_themes_all, maintains visible themes
   PROCEDURE maintain_ntv 
              ( pi_theme_id IN nm_themes_all.nth_theme_id%TYPE
              , pi_mode     IN VARCHAR2);
 --</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="SET_THEME_SRID_CTX">
+  PROCEDURE set_theme_srid_ctx( pi_theme_id IN nm_themes_all.nth_theme_id%TYPE);
+--</PROC>
+--
 -----------------------------------------------------------------------------
 --
 --<PRAGMA>
