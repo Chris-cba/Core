@@ -1,0 +1,1083 @@
+CREATE OR REPLACE PACKAGE Nm3sdm AS
+--<PACKAGE>
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkh-arc   2.5   Jul 06 2011 13:39:40   Chris.Strettle  $
+--       Module Name      : $Workfile:   nm3sdm.pkh  $
+--       Date into PVCS   : $Date:   Jul 06 2011 13:39:40  $
+--       Date fetched Out : $Modtime:   Jul 06 2011 10:59:06  $
+--       Version          : $Revision:   2.5  $
+--       Based on SCCS version : 1.25 
+-------------------------------------------------------------------------
+--
+--   Author : R.A. Coupe
+--
+--   SDM specific package
+-----------------------------------------------------------------------------
+--  Copyright (c) exor corporation ltd, 2004
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.5  $';
+
+  g_date_views  CONSTANT   VARCHAR2(1) := NVL(Hig.get_sysopt('SDODATEVW'),'N');
+
+  g_units               NUMBER := 1;				
+  g_unit_conv     NUMBER := 1;				  
+  
+--  g_sccsid is the SCCS ID for the package
+
+--</GLOBVAR>
+--
+     g_role_idx            BINARY_INTEGER;
+     g_role_array          Nm3type.tab_varchar30;
+     g_username_array      Nm3type.tab_varchar30;
+     g_theme_role          Nm3type.tab_number;
+     g_role_op             Nm3type.tab_varchar1;
+--   single_shape_inv constant varchar2(3) := nm3type.c_off;
+
+     g_del_theme           BOOLEAN := FALSE;
+
+  -- used in nm0410 to deliver network layers for an asset type
+  TYPE rec_nin_sdo
+    IS RECORD ( p_layer_id  NUMBER
+              , p_location  VARCHAR2(4) );
+
+  TYPE rec_r_asset
+    IS RECORD ( p_rownum    NUMBER
+              , p_entity    NUMBER
+              , p_pk        VARCHAR2(30)
+              , p_descr     VARCHAR2(250) );
+
+  -- used in gis0010 - delivers linear details to form
+  TYPE rec_nlt_block
+    IS RECORD ( nlt_nth_theme_id      NM_THEMES_ALL.nth_theme_id%TYPE
+              , nlt_id                NM_LINEAR_TYPES.nlt_id%TYPE
+              , nlt_seq_no            NM_LINEAR_TYPES.nlt_seq_no%TYPE
+              , nlt_descr             NM_LINEAR_TYPES.nlt_descr%TYPE
+              , nlt_nt_type           NM_LINEAR_TYPES.nlt_nt_type%TYPE
+              , nlt_gty_type          NM_LINEAR_TYPES.nlt_gty_type%TYPE
+              , nlt_admin_type        NM_LINEAR_TYPES.nlt_admin_type%TYPE
+              , nlt_start_date        NM_LINEAR_TYPES.nlt_start_date%TYPE
+              , nlt_end_date          NM_LINEAR_TYPES.nlt_end_date%TYPE
+              , nlt_units             NM_LINEAR_TYPES.nlt_units%TYPE
+              , nlt_units_descr       NM_UNITS.un_unit_name%TYPE );
+
+  -- used in gis0010 - delivers area details to form
+  TYPE rec_nat_block
+    IS RECORD ( nat_nth_theme_id      NM_THEMES_ALL.nth_theme_id%TYPE
+              , nat_seq_no            NM_AREA_TYPES.nat_seq_no%TYPE
+              , nat_descr             NM_AREA_TYPES.nat_descr%TYPE
+              , nat_nt_type           NM_AREA_TYPES.nat_nt_Type%TYPE
+              , nat_gty_group_type    NM_AREA_TYPES.nat_gty_group_type%TYPE
+              , nat_start_date        NM_AREA_TYPES.nat_start_date%TYPE
+              , nat_end_date          NM_AREA_TYPES.nat_end_date%TYPE
+              , nat_shape_type        NM_AREA_TYPES.nat_shape_Type%TYPE);
+
+  -- used in gis0010 - delivers asset details to form
+  TYPE rec_nit_block
+    IS RECORD ( nit_nth_theme_id      NM_THEMES_ALL.nth_theme_id%TYPE
+              , nit_inv_type          nm_inv_types.nit_inv_type%TYPE
+              , nit_descr             nm_inv_types.nit_descr%TYPE
+              , nit_view_name         nm_inv_types.nit_view_name%TYPE
+              , nit_use_xy            nm_inv_types.nit_use_xy%TYPE
+              , nit_pnt_or_cont       nm_inv_types.nit_pnt_or_cont%TYPE
+              , nit_linear            nm_inv_types.nit_linear%TYPE
+              , nit_table_name        nm_inv_types.nit_table_name%TYPE
+              , nit_lr_st_chain       nm_inv_types.nit_lr_st_chain%TYPE
+              , nit_lr_end_chain      nm_inv_types.nit_lr_end_chain%TYPE
+              , nit_lr_ne_column_name nm_inv_types.nit_lr_ne_column_name%TYPE
+              );
+
+  -- used in gis0010 - delivers theme validation details to from
+  TYPE rec_validate_theme
+    IS RECORD ( p_output              VARCHAR2(32767) );
+
+  TYPE tab_nin_sdo
+    IS TABLE OF rec_nin_sdo                          INDEX BY BINARY_INTEGER;
+
+  TYPE tab_r_asset
+    IS TABLE OF rec_r_asset                          INDEX BY BINARY_INTEGER;
+
+  TYPE tab_nth
+    IS TABLE OF NM_THEMES_ALL%ROWTYPE                INDEX BY BINARY_INTEGER;
+
+  TYPE tab_nlt_block
+    IS TABLE OF rec_nlt_block                        INDEX BY BINARY_INTEGER;
+
+  TYPE tab_nat_block
+    IS TABLE OF rec_nat_block                        INDEX BY BINARY_INTEGER;
+
+  TYPE tab_nit_block
+    IS TABLE OF rec_nit_block                        INDEX BY BINARY_INTEGER;
+
+  TYPE tab_validate_theme
+    IS TABLE OF rec_validate_theme                   INDEX BY BINARY_INTEGER;
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+  FUNCTION get_version
+    RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+  FUNCTION get_body_version
+    RETURN VARCHAR2;
+--</PROC>
+--
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BASE_THEMES">
+-- This function returns the base themes from a given theme id
+  FUNCTION get_base_themes( p_theme_id IN nm_themes_all.nth_theme_id%TYPE) RETURN nm_theme_array;
+--</PROC>
+--
+
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_THEME_NT">
+-- This function returns the nt for a specified theme. The specified theme is
+-- not related to a network then an error is raised
+  FUNCTION get_theme_nt
+           ( p_theme_id IN NM_THEMES_ALL.nth_theme_id%TYPE)
+    RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_NODE_TABLE">
+-- This function returns the table name which is used to hold spatial nodes
+  FUNCTION get_node_table
+           ( p_node_type IN NM_NODE_TYPES.nnt_type%TYPE)
+    RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_NODE_TYPE">
+-- This function returns the node type for a given network type
+  FUNCTION get_node_type
+           ( p_nt_type IN NM_TYPES.nt_type%TYPE)
+    RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_NODE_TYPE">
+-- This function returns the node type for a given theme
+  FUNCTION get_node_type
+           ( p_theme_id IN NM_THEMES_ALL.nth_theme_id%TYPE)
+    RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="CREATE_9i_NODE_METADATA">
+-- This function creates the view for nodes of a given node type, creates the
+-- spatial indexing etc. return the theme id. It is dependent on 9i indexing of
+-- deterministic functions
+--  FUNCTION create_9i_node_metadata
+--           ( p_node_type IN NM_NODE_TYPES.nnt_type%TYPE)
+--    RETURN NUMBER;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="CREATE_NODE_METADATA">
+-- This function creates a join view of a specified node type with locations found
+-- from point-locations. Th eview is then registered in SDE and SDO metadata tables.
+  FUNCTION create_node_metadata
+           ( p_node_type IN NM_NODE_TYPES.nnt_type%TYPE)
+    RETURN NUMBER;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_DETAILS">
+-- This function returns details of an object as an XML Clob.
+  FUNCTION get_details
+           ( p_theme_id IN NM_THEMES_ALL.nth_theme_id%TYPE
+           , p_ne_id    IN NUMBER )
+    RETURN CLOB;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_DETAILS">
+-- This function returns details of an object as an XML Clob.
+  FUNCTION get_details
+           ( p_ne_id IN NUMBER )
+    RETURN CLOB;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_NLT">
+-- This function return the NM_LINEAR_TYPES rowtype, given the PK.
+  FUNCTION get_nlt
+           ( pi_nlt_id IN NM_LINEAR_TYPES.nlt_id%TYPE )
+    RETURN NM_LINEAR_TYPES%ROWTYPE;
+--</PROC>
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_NTH">
+-- This function returns the NM_THEMES_ALL rowtype, given the PK
+  FUNCTION get_nth
+           ( pi_nth_theme_id IN NM_THEMES_ALL.nth_theme_id%TYPE )
+    RETURN NM_THEMES_ALL%ROWTYPE;
+--</PROC>
+
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="MAKE_NT_SPATIAL_LAYER">
+-- Procedure to generate a dependent spatial layer based on a group LRM. The
+-- procedure will generate the spatial data by tracing and concatenating the datum
+-- elements. The tables are registered in SDE and SDO metadata and indexes are created.
+-- In 8i, the quadtree index is created otherwise an RTREE index is used.
+-- The p_gen parameters are supplied to allow a generalised shape to be constructed.
+  PROCEDURE make_nt_spatial_layer
+            ( pi_nlt_id IN NM_LINEAR_TYPES.nlt_id%TYPE
+            , p_gen_pt  IN NUMBER DEFAULT 0
+            , p_gen_tol IN NUMBER DEFAULT 0
+			, p_job_id  IN NUMBER DEFAULT NULL );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="CREATE_ELEMENT_SHAPE_FROM_XML">
+-- This procedure takes an XML clob containing the GML specification of a shape
+-- and associates the shape to an element in the given layer
+  PROCEDURE create_element_shape_from_xml
+            ( p_layer IN NUMBER
+            , p_ne_id IN nm_elements.ne_id%TYPE
+            , p_xml   IN CLOB );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_NT_THEME">
+-- This function returns the theme that is used to hold the spatial data for a
+-- given group type and network type
+  FUNCTION get_nt_theme
+           ( p_nt IN NM_TYPES.nt_type%TYPE
+           , p_gt IN nm_group_types.ngt_group_type%TYPE DEFAULT NULL)
+    RETURN NM_THEMES_ALL.nth_theme_id%TYPE;
+
+--</PROC>
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="SPLIT_ELEMENT_SHAPES">
+-- A procedure to split each spatial representation of an element into
+-- two new spatial representations of the replacement elements by splitting the shapes at
+-- the appointed measure.
+PROCEDURE split_element_shapes (
+      p_ne_id     IN   nm_elements.ne_id%TYPE,
+      p_measure   IN   NUMBER,
+      p_ne_id_1   IN   nm_elements.ne_id%TYPE,
+      p_ne_id_2   IN   nm_elements.ne_id%TYPE,
+      p_x         IN   NUMBER DEFAULT NULL,
+      p_y         IN   NUMBER DEFAULT NULL 
+   );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="MERGE_ELEMENT_SHAPES">
+-- Procedure to merge two shapes into a single one.
+  PROCEDURE merge_element_shapes
+            ( p_ne_id         IN nm_elements.ne_id%TYPE
+            , p_ne_id_1       IN nm_elements.ne_id%TYPE
+            , p_ne_id_2       IN nm_elements.ne_id%TYPE
+            , p_ne_id_to_flip IN nm_elements.ne_id%TYPE );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="REPLACE_ELEMENT_SHAPE">
+-- Procedure to replace an element with a new one. The procedure will inherit the
+-- original shape onto the new element.
+  PROCEDURE replace_element_shape
+            ( p_ne_id_old   IN nm_elements.ne_id%TYPE
+            , p_ne_id_new   IN nm_elements.ne_id%TYPE );
+--
+--</PROC>
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="RESHAPE_ELEMENT">
+-- The element shape is replaced with the new one.
+  PROCEDURE reshape_element
+            ( p_ne_id IN nm_elements.ne_id%TYPE
+            , p_geom  IN MDSYS.SDO_GEOMETRY );
+--
+--</PROC>
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="MOVE_NODE">
+-- A procedure to re-locate a node at a new X,Y location
+  PROCEDURE move_node
+            ( p_no_node_id IN nm_nodes.no_node_id%TYPE
+            , p_x          IN NUMBER
+            , p_y          IN NUMBER );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="REVERSE_ELEMENT_SHAPE">
+-- The procedure to replace an element and modify its shape to its reversed shape
+--
+  PROCEDURE reverse_element_shape
+            ( p_ne_id_old IN nm_elements.ne_id%TYPE
+            , p_ne_id_new IN nm_elements.ne_id%TYPE);
+
+--</PROC>
+
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="RECALIBRATE_ELEMENT_SHAPE">
+-- This procedure will re-calibrate the shape of an element by allocating a new measure
+-- at the defined position and thereafter on each vertex until the end.
+  PROCEDURE recalibrate_element_shape
+            ( p_ne_id             IN nm_elements.ne_id%TYPE
+            , p_measure           IN NUMBER
+            , p_new_length_to_end IN nm_elements.ne_length%TYPE );
+--</PROC>
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="REGISTER_NODE_THEME">
+--Procedure to register the node layer in the various metadata repositories
+  FUNCTION register_node_theme
+           ( p_node_type IN VARCHAR2
+           , p_table_name IN VARCHAR2
+           , p_column_name IN VARCHAR2 )
+    RETURN NUMBER;
+--</PROC>
+  PROCEDURE register_npl_theme;
+
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="REGISTER_LRM_THEME">
+--Procedure to register the LRM layer in the various metadata repositories
+  FUNCTION register_lrm_theme
+           ( p_nlt_id         IN NUMBER
+           , p_base           IN NM_THEME_ARRAY
+           , p_table_name     IN VARCHAR2
+           , p_column_name    IN VARCHAR2
+           , p_name           IN VARCHAR2 DEFAULT NULL
+           , p_view_flag      IN VARCHAR2 DEFAULT 'N'
+           , p_base_table_nth IN NM_THEMES_ALL.nth_theme_id%TYPE DEFAULT NULL )
+    RETURN NUMBER;
+--</PROC>
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="REGISTER_INV_THEME">
+--Procedure to register the INV layer in the various metadata repositories
+  FUNCTION register_inv_theme
+           ( pi_nit           IN nm_inv_types%ROWTYPE
+           , p_base_themes    IN NM_THEME_ARRAY
+           , p_table_name     IN VARCHAR2
+           , p_spatial_column IN VARCHAR2 DEFAULT 'GEOLOC'
+           , p_fk_column      IN VARCHAR2 DEFAULT 'NE_ID'
+           , p_name           IN VARCHAR2 DEFAULT NULL
+           , p_view_flag      IN VARCHAR2 DEFAULT 'N'
+           , p_pk_column      IN VARCHAR2 DEFAULT 'NE_ID'
+           , p_base_table_nth IN NM_THEMES_ALL.nth_theme_id%TYPE DEFAULT NULL )
+
+    RETURN NUMBER;
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="REGISTER_INV_INDEPENDENT_THEME">
+  FUNCTION register_ona_theme
+           ( pi_nit           IN nm_inv_types%ROWTYPE
+           , p_table_name     IN VARCHAR2
+           , p_spatial_column IN VARCHAR2 DEFAULT 'GEOLOC'
+           , p_fk_column      IN VARCHAR2 DEFAULT 'NE_ID'
+           , p_name           IN VARCHAR2 DEFAULT NULL
+           , p_view_flag      IN VARCHAR2 DEFAULT 'N'
+           , p_pk_column      IN VARCHAR2 DEFAULT 'NE_ID'
+           , p_base_table_nth IN NM_THEMES_ALL.nth_theme_id%TYPE DEFAULT NULL )
+    RETURN NUMBER;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="MAKE_INV_SPATIAL_LAYER">
+-- A procedure to generate a new spatial table to hold the traced shapes of all
+-- assets of the given type. The new table is registered with SDO and SDE
+  PROCEDURE make_inv_spatial_layer
+             ( pi_nit_inv_type  IN nm_inv_types.nit_inv_type%TYPE,
+               pi_create_flag   IN VARCHAR2 DEFAULT 'TRUE',
+               p_job_id         IN NUMBER   DEFAULT NULL
+              );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="MAKE_ONA_INV_SPATIAL_LAYER">
+  PROCEDURE make_ona_inv_spatial_layer
+              ( pi_nit_inv_type  IN nm_inv_types.nit_inv_type%TYPE
+              , pi_nth_theme_id  IN NM_THEMES_ALL.nth_theme_id%TYPE DEFAULT NULL
+              , pi_create_flag   IN VARCHAR2                        DEFAULT 'TRUE'
+              , pi_nth_gtype     IN NM_THEME_GTYPES.ntg_gtype%TYPE  DEFAULT NULL );
+--</PROC>
+--
+---------------------------------------------------------------------------------------------------
+--
+--<PROC NAME="MAKE_ONA_INV_SPATIAL_LAYER">
+  PROCEDURE make_ona_inv_spatial_layer 
+              ( pi_nit_inv_type IN nm_inv_types.nit_inv_type%TYPE
+              , pi_nth_gtype    IN nm_theme_gtypes.ntg_gtype%TYPE    DEFAULT NULL
+              , pi_s_date_col   IN user_tab_columns.column_name%TYPE DEFAULT NULL
+              , pi_e_date_col   IN user_tab_columns.column_name%TYPE DEFAULT NULL );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="MAKE_DATUM_LAYER_DT">
+-- This procedure is designed to create a date tracked view of a given Datum
+-- SDO layer. It creates the view, metadata, theme. Renames base table to _TABLE.
+-- This is required so that MSV can display current shapes, as it is unable
+-- to perform a join back to nm_elements
+  PROCEDURE make_datum_layer_dt
+              ( pi_nth_theme_id      IN nm_themes_all.nth_theme_id%TYPE
+              , pi_new_feature_table IN nm_themes_all.nth_feature_table%TYPE DEFAULT NULL );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="MAKE_ALL_DATUM_LAYERS_DT">
+  PROCEDURE make_all_datum_layers_dt;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_DATUM_LAYER_FROM_GTY">
+-- This function returns the datum theme that is currently used to build a given group type theme
+  FUNCTION get_datum_layer_from_gty
+             ( p_gty IN NM_LINEAR_TYPES.NLT_GTY_TYPE%TYPE  )
+    RETURN NM_THEME_ARRAY;
+
+--</PROC>
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_DATUM_LAYER_FROM_ROUTE">
+-- This function return the datum theme in which a given route element is represented
+  FUNCTION get_datum_layer_from_route
+             ( p_ne_id IN nm_elements.ne_id%TYPE )
+    RETURN NM_THEME_ARRAY;
+--</PROC>
+
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_DATUM_LAYER_FROM_NLT">
+-- This function return the datum layer which i sused to construct a route layer
+  FUNCTION get_datum_layer_from_nlt
+             ( p_nlt_id IN NM_LINEAR_TYPES.nlt_id%TYPE)
+    RETURN NM_THEME_ARRAY;
+--</PROC>
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="PREVENT_OPERATION">
+-- Returns true if the element should not be operated on by an outside function
+-- such as forms or SQL*Plus. The decision is based on whether the element is represented
+-- spatially in a non-SDO layer such as SDE long columns.
+  FUNCTION prevent_operation
+             ( p_ne_id IN nm_elements.ne_id%TYPE )
+    RETURN BOOLEAN;
+--</PROC>
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="REMOVE_ELEMENT_SHAPES">
+-- This procedure wil lremove all accessible spatial represenatations of the element.
+  PROCEDURE remove_element_shapes
+             ( p_ne_id IN nm_elements.ne_id%TYPE );
+--</PROC>
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="HAS_SHAPE">
+-- This function returns true if a spatial representation of the object exists.
+-- The second parameter is irrelevant if the element is a datum, otherwise a route
+-- object or inventory object may be tested. The third argument is either a D for datum,
+-- a G for Group or an I for Inventory
+  FUNCTION has_shape
+              ( p_ne_id    IN nm_elements.ne_id%TYPE
+              , p_obj_type IN nm_members.nm_obj_type%TYPE
+              , p_type     IN nm_members.nm_type%TYPE DEFAULT 'I' )
+    RETURN BOOLEAN;
+--</PROC>
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_INV_SPATIAL_TABLE">
+-- This function returns the table name used to hold the shapes of a specified
+-- inventory item type
+  FUNCTION get_inv_spatial_table
+             ( p_nit IN nm_inv_types.nit_inv_type%TYPE )
+    RETURN VARCHAR2;
+--</PROC>
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="SET_OBJECT_SHAPE_END_DATE">
+-- Procedure to set the end-date on spatial representations of an object
+  PROCEDURE set_obj_shape_end_date
+             ( p_obj_type IN nm_members.nm_obj_type%TYPE
+             , p_ne_id    IN nm_members.nm_ne_id_in%TYPE
+             , p_end_date IN  nm_members.nm_start_date%TYPE );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="INSERT_OBJ_SHAPE">
+-- This procedure will insert a spatial representation of the specified object
+  PROCEDURE insert_obj_shape
+             ( p_obj_type   IN nm_members.nm_obj_type%TYPE
+             , p_ne_id      IN nm_members.nm_ne_id_in%TYPE
+             , p_start_date IN  nm_members.nm_start_date%TYPE
+             , p_end_date   IN  nm_members.nm_start_date%TYPE DEFAULT NULL
+             , p_geom       IN mdsys.sdo_geometry );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="UPDATE_MEMBER_SHAPE">
+-- A Procedure to update the shape of a known object.
+PROCEDURE update_member_shape(
+                            p_nm_ne_id_in    IN nm_members.nm_ne_id_in%TYPE,
+                            p_nm_ne_id_of    IN nm_members.nm_ne_id_of%TYPE,
+                            p_nm_obj_type    IN nm_members.nm_obj_type%TYPE,
+                            p_old_begin_mp   IN nm_members.nm_begin_mp%TYPE,
+                            p_new_begin_mp   IN nm_members.nm_begin_mp%TYPE,
+                            p_nm_end_mp      IN nm_members.nm_end_mp%TYPE,
+                            p_old_start_date IN nm_members.nm_start_date%TYPE,
+                            p_new_start_date IN nm_members.nm_start_date%TYPE,
+                            p_nm_end_date    IN nm_members.nm_end_date%TYPE,
+                            p_nm_type        IN nm_members.nm_type%TYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="UPDATE_INV_SHAPE">
+-- A Procedure to update the shape of a known object.
+  PROCEDURE update_inv_shape
+             ( p_nm_ne_id_in    IN nm_members.nm_ne_id_in%TYPE
+             , p_nm_ne_id_of    IN nm_members.nm_ne_id_of%TYPE
+             , p_nm_obj_type    IN nm_members.nm_obj_type%TYPE
+             , p_old_begin_mp    IN nm_members.nm_begin_mp%TYPE
+             , p_new_begin_mp    IN nm_members.nm_begin_mp%TYPE
+             , p_nm_end_mp      IN nm_members.nm_end_mp%TYPE
+             , p_old_start_date  IN nm_members.nm_start_date%TYPE
+             , p_new_start_date  IN nm_members.nm_start_date%TYPE
+             , p_nm_end_date    IN nm_members.nm_end_date%TYPE);
+--</PROC>
+
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="UPDATE_GTY_SHAPE">
+-- A Procedure to update the shape of a known object.
+  PROCEDURE update_gty_shape
+             ( p_nm_ne_id_in    IN nm_members.nm_ne_id_in%TYPE
+             , p_nm_ne_id_of    IN nm_members.nm_ne_id_of%TYPE
+             , p_nm_obj_type    IN nm_members.nm_obj_type%TYPE
+             , p_old_begin_mp    IN nm_members.nm_begin_mp%TYPE
+             , p_new_begin_mp    IN nm_members.nm_begin_mp%TYPE
+             , p_nm_end_mp      IN nm_members.nm_end_mp%TYPE
+             , p_old_start_date  IN nm_members.nm_start_date%TYPE
+             , p_new_start_date  IN nm_members.nm_start_date%TYPE
+             , p_nm_end_date    IN nm_members.nm_end_date%TYPE);
+--</PROC>
+
+--
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="END_INV_SHAPE">
+-- This procedure will close (end-date) the shape of the specified object.
+  PROCEDURE end_member_shape
+              ( p_nm_ne_id_in    IN nm_members.nm_ne_id_in%TYPE
+              , p_nm_ne_id_of    IN nm_members.nm_ne_id_of%TYPE
+              , p_nm_obj_type    IN nm_members.nm_obj_type%TYPE
+              , p_nm_begin_mp    IN nm_members.nm_begin_mp%TYPE
+              , p_nm_end_mp      IN nm_members.nm_end_mp%TYPE
+              , p_nm_start_date  IN nm_members.nm_start_date%TYPE
+              , p_nm_end_date    IN nm_members.nm_end_date%TYPE
+              , p_nm_type        IN nm_members.nm_type%TYPE);
+--</PROC>
+
+--
+-----------------------------------------------------------------------------
+
+--
+--<PROC NAME="END_INV_SHAPE">
+-- This procedure will close (end-date) the shape of the specified object.
+  PROCEDURE end_inv_shape
+              ( p_nm_ne_id_in    IN nm_members.nm_ne_id_in%TYPE
+              , p_nm_ne_id_of    IN nm_members.nm_ne_id_of%TYPE
+              , p_nm_obj_type    IN nm_members.nm_obj_type%TYPE
+              , p_nm_begin_mp    IN nm_members.nm_begin_mp%TYPE
+              , p_nm_end_mp      IN nm_members.nm_end_mp%TYPE
+              , p_nm_start_date  IN nm_members.nm_start_date%TYPE
+              , p_nm_end_date    IN nm_members.nm_end_date%TYPE );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="END_GTY_SHAPE">
+-- This procedure will close (end-date) the shape of the specified object.
+  PROCEDURE end_gty_shape
+              ( p_nm_ne_id_in    IN nm_members.nm_ne_id_in%TYPE
+              , p_nm_ne_id_of    IN nm_members.nm_ne_id_of%TYPE
+              , p_nm_obj_type    IN nm_members.nm_obj_type%TYPE
+              , p_nm_begin_mp    IN nm_members.nm_begin_mp%TYPE
+              , p_nm_end_mp      IN nm_members.nm_end_mp%TYPE
+              , p_nm_start_date  IN nm_members.nm_start_date%TYPE
+              , p_nm_end_date    IN nm_members.nm_end_date%TYPE );
+--</PROC>
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ADD_MEMBER_SHAPE">
+-- A new shape representing the object between the known measures is added to the
+-- feature table.
+  PROCEDURE add_member_shape
+               ( p_nm_ne_id_in    IN nm_members.nm_ne_id_in%TYPE
+               , p_nm_ne_id_of    IN nm_members.nm_ne_id_of%TYPE
+               , p_nm_obj_type    IN nm_members.nm_obj_type%TYPE
+               , p_nm_begin_mp    IN nm_members.nm_begin_mp%TYPE
+               , p_nm_end_mp      IN nm_members.nm_end_mp%TYPE
+               , p_nm_start_date  IN nm_members.nm_start_date%TYPE
+               , p_nm_end_date    IN nm_members.nm_end_date%TYPE
+               , p_nm_type        IN nm_members.nm_type%TYPE);
+
+--</PROC>
+
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="REMOVE_MEMBER_SHAPE">
+-- A new shape representing the object between the known measures is removed from the
+-- feature table.
+  PROCEDURE remove_member_shape
+               ( p_nm_ne_id_in    IN nm_members.nm_ne_id_in%TYPE
+               , p_nm_ne_id_of    IN nm_members.nm_ne_id_of%TYPE
+               , p_nm_obj_type    IN nm_members.nm_obj_type%TYPE
+               , p_nm_begin_mp    IN nm_members.nm_begin_mp%TYPE
+               , p_nm_end_mp      IN nm_members.nm_end_mp%TYPE
+               , p_nm_start_date  IN nm_members.nm_start_date%TYPE
+               , p_nm_end_date    IN nm_members.nm_end_date%TYPE
+               , p_nm_type        IN nm_members.nm_type%TYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ADD_INV_SHAPE">
+-- A new shape representing the object between the known measures is added to the
+-- feature table.
+  PROCEDURE add_inv_shape
+               ( p_nm_ne_id_in    IN nm_members.nm_ne_id_in%TYPE
+               , p_nm_ne_id_of    IN nm_members.nm_ne_id_of%TYPE
+               , p_nm_obj_type    IN nm_members.nm_obj_type%TYPE
+               , p_nm_begin_mp    IN nm_members.nm_begin_mp%TYPE
+               , p_nm_end_mp      IN nm_members.nm_end_mp%TYPE
+               , p_nm_start_date  IN nm_members.nm_start_date%TYPE
+               , p_nm_end_date IN nm_members.nm_end_date%TYPE );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="REMOVE_INV_SHAPE">
+-- The shape that represents the object between the given measures is removed.
+  PROCEDURE remove_inv_shape
+               ( p_nm_ne_id_in    IN nm_members.nm_ne_id_in%TYPE
+               , p_nm_ne_id_of    IN nm_members.nm_ne_id_of%TYPE
+               , p_nm_obj_type    IN nm_members.nm_obj_type%TYPE
+               , p_nm_begin_mp    IN nm_members.nm_begin_mp%TYPE
+               , p_nm_end_mp      IN nm_members.nm_end_mp%TYPE
+               , p_nm_start_date  IN nm_members.nm_start_date%TYPE
+               , p_nm_end_date    IN nm_members.nm_end_date%TYPE );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ADD_GTY_SHAPE">
+-- A new shape representing the object between the known measures is added to the
+-- feature table.
+    PROCEDURE add_gty_shape
+               ( p_nm_ne_id_in    IN nm_members.nm_ne_id_in%TYPE
+               , p_nm_ne_id_of    IN nm_members.nm_ne_id_of%TYPE
+               , p_nm_obj_type    IN nm_members.nm_obj_type%TYPE
+               , p_nm_begin_mp    IN nm_members.nm_begin_mp%TYPE
+               , p_nm_end_mp      IN nm_members.nm_end_mp%TYPE
+               , p_nm_start_date  IN nm_members.nm_start_date%TYPE
+               , p_nm_end_date    IN nm_members.nm_end_date%TYPE );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="REMOVE_GTY_SHAPE">
+-- The shape that represents the object between the given measures is removed.
+  PROCEDURE remove_gty_shape
+              ( p_nm_ne_id_in    IN nm_members.nm_ne_id_in%TYPE
+              , p_nm_ne_id_of    IN nm_members.nm_ne_id_of%TYPE
+              , p_nm_obj_type    IN nm_members.nm_obj_type%TYPE
+              , p_nm_begin_mp    IN nm_members.nm_begin_mp%TYPE
+              , p_nm_end_mp      IN nm_members.nm_end_mp%TYPE
+              , p_nm_start_date  IN nm_members.nm_start_date%TYPE
+              , p_nm_end_date    IN nm_members.nm_end_date%TYPE );
+
+--</PROC>
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="RESHAPE_ROUTE">
+-- This procedure will generate a new route shape based on the provided effective
+-- date.
+  PROCEDURE reshape_route
+            ( pi_ne_id          IN nm_elements.ne_id%TYPE
+            , pi_effective_date IN DATE
+            , pi_use_history    IN VARCHAR2  );
+--</PROC>
+
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="REFRESH_NT_VIEWS">
+-- This procedure will re-generate all the views that are used to show a network
+-- type flexible attributes as the user would like to see them.
+  PROCEDURE refresh_nt_views;
+--</PROC>
+
+
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="MAKE_GROUP_LAYER">
+-- Creates a spatial layer for a group type. If the group is linear a lrs layer
+-- will be created otherwise a simple polyyline layer will result.
+  PROCEDURE make_group_layer
+            ( p_nt_type            IN NM_TYPES.nt_type%TYPE
+            , p_gty_type           IN nm_group_types.ngt_group_type%TYPE
+            , linear_flag_override IN VARCHAR2 DEFAULT 'N'
+			, p_job_id             IN NUMBER   DEFAULT NULL);
+
+--</PROC>
+
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="CREATE_NON_LINEAR_GROUP_LAYER">
+-- Creates a simple polyline layer based on a group type.
+  PROCEDURE create_non_linear_group_layer
+            ( p_nt_type   IN NM_TYPES.nt_type%TYPE
+            , p_gty_type  IN nm_group_types.ngt_group_type%TYPE
+			, p_job_id    IN NUMBER DEFAULT NULL );
+
+--</PROC>
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_THEME_FROM_FEATURE_TABLE">
+-- return theme id for a given shape table
+  FUNCTION get_theme_from_feature_table
+           ( p_table IN NM_THEMES_ALL.nth_feature_table%TYPE )
+    RETURN NUMBER;
+
+  FUNCTION get_theme_from_feature_table
+           ( p_table IN NM_THEMES_ALL.nth_feature_table%TYPE 
+           , p_theme_table IN nm_themes_all.nth_table_name%TYPE)
+    RETURN NUMBER;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="DROP_UNUSED_SEQUENCES">
+-- Any sequences that were associated to a theme that has now been removed
+-- are dropped.Make sure that this does not include any sequence of a
+-- similar naming convention before it is used.
+  PROCEDURE drop_unused_sequences;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_UPDATE_FLAG">
+  FUNCTION get_update_flag
+           ( p_type        IN VARCHAR2
+           , p_obj_type    IN VARCHAR2
+           , p_update_flag IN VARCHAR2 DEFAULT NULL )
+    RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ATTACH_THEME_TO_FT">
+-- Attach a theme to FT asset
+  PROCEDURE attach_theme_to_ft
+           ( p_nth_id IN NUMBER
+           , p_ft_nit IN VARCHAR2 );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="REGISTER_SDO_TABLE_AS_FT_THEME">
+-- Register table as a FT asset theme
+  PROCEDURE register_sdo_table_as_FT_theme
+            ( p_nit_type         IN nm_inv_types.nit_inv_type%TYPE
+            , p_shape_col        IN VARCHAR2
+            , p_tol              IN NUMBER   DEFAULT 0.005
+            , p_cre_idx          IN VARCHAR2 DEFAULT 'N'
+            , p_estimate_new_tol IN VARCHAR2 DEFAULT 'N');
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="DROP_LAYER">
+-- Drop SDO and SDE layer metadata + objects. New parameter to allow the user
+-- to leave the Theme details behind.
+  PROCEDURE Drop_Layer
+            ( p_nth_id             IN NM_THEMES_ALL.nth_theme_id%TYPE
+            , p_keep_theme_data    IN VARCHAR2 DEFAULT 'N'
+            , p_keep_feature_table IN VARCHAR2 DEFAULT 'N');
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+  PROCEDURE drop_layers_by_node_type
+            ( pi_node_type         IN nm_node_types.nnt_type%TYPE );
+--
+-----------------------------------------------------------------------------
+--
+  PROCEDURE refresh_node_layers;
+--
+-----------------------------------------------------------------------------
+--<PROC NAME="DROP_OBJECT">
+-- DDL drop object
+  PROCEDURE drop_object
+            ( p_object_name IN VARCHAR2 );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="DROP_LAYERS_BY_INV_TYPE">
+-- Drop SDO and SDE layer metadata + objects for a given Inventory Type
+PROCEDURE drop_layers_by_inv_type
+            ( p_nit_id     IN  nm_inv_types.nit_inv_type%TYPE
+            , p_keep_table IN  BOOLEAN DEFAULT FALSE) ;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="DROP_LAYERS_BY_GTY_TYPE">
+-- Drop SDO and SDE layer metadata + objects for a given Group Type
+  PROCEDURE drop_layers_by_gty_type
+           ( p_gty IN nm_group_types.ngt_group_type%TYPE );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="TYPE_HAS_SHAPE">
+-- Function to test to see if type has shape
+  FUNCTION type_has_shape
+           ( p_type IN VARCHAR2 )
+    RETURN BOOLEAN;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="PROCESS_SUB_USER_VARS">
+-- Processes subordinate user SDO/SDE layer registration from nm_theme_roles
+  PROCEDURE process_subuser_nthr;
+--</PROC>
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="PROCESS_SUB_USER_VARS">
+-- Processes subordinate user SDO/SDE layer registration from hig_user_roles
+  PROCEDURE process_subuser_hur;
+--</PROC>
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="SET_SUB_USER_VARS">
+-- Sets globals for nm_theme_roles
+  PROCEDURE set_subuser_globals_nthr
+             ( pi_role     IN NM_THEME_ROLES.nthr_role%TYPE
+             , pi_theme_id IN NM_THEME_ROLES.nthr_theme_id%TYPE
+             , pi_mode     IN VARCHAR2);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="SET_SUB_USER_VARS_HUR">
+-- Sets globals for hig_user_roles
+  PROCEDURE set_subuser_globals_hur
+             ( pi_role     IN NM_THEME_ROLES.nthr_role%TYPE
+             , pi_username IN HIG_USER_ROLES.hur_username%TYPE
+             , pi_mode     IN VARCHAR2);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="DELETE_ROUTE_SHAPE">
+--
+  PROCEDURE delete_route_shape( p_ne_id IN NUMBER );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="DELETE_ROUTE_SHAPE">
+--
+  PROCEDURE restore_route_shape( p_ne_id IN NUMBER, p_date IN DATE );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="CREATE_NTH_SDO_TRIGGER>
+--
+  PROCEDURE Create_Nth_Sdo_Trigger
+             ( p_nth_theme_id IN NM_THEMES_ALL.nth_theme_id%TYPE 
+             , p_restrict     IN   VARCHAR2 DEFAULT NULL);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+-- <PROC NAME="GET_DYNSEG_NT_TYPE">
+-- Returns a PL/SQL table of availible NT layers for use in dynsegging assets
+-- For use in NM0410
+  PROCEDURE get_dynseg_nt_types
+             ( pi_asset_type  IN     nm_inv_types.nit_inv_type%TYPE
+             , po_locations   IN OUT tab_nin_sdo);
+--</PROC>
+--
+----------------------------------------------------------------------------
+--
+-- <PROC NAME="GET_EXISTING_THEMES_FOR_TABLE">
+-- Returns a PL/SQL table of availible themes for a given theme table
+-- For use in NM0410
+  PROCEDURE get_existing_themes_for_table
+             ( pi_theme_table IN     NM_THEMES_ALL.nth_theme_name%TYPE
+             , po_themes      IN OUT tab_nth ) ;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+-- <PROC NAME="GET_EXISTING_THEMES_FOR_TABLE">
+-- Returns a PL/SQL table of availible themes for a given theme table
+-- For use in GIS0010
+--   PROCEDURE get_rouge_asset_metadata
+--              ( pi_asset_type  IN      nm_inv_types.nit_inv_type%TYPE
+--              , po_results     IN OUT  tab_r_asset);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+-- <PROC NAME="GET_NLT_BLOCK">
+-- For use in GIS0010
+  PROCEDURE get_nlt_block
+             ( pi_theme_id    IN      NM_THEMES_ALL.nth_theme_id%TYPE
+             , po_results     IN OUT  tab_nlt_block);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+-- <PROC NAME="GET_NAT_BLOCK">
+-- For use in GIS0010
+  PROCEDURE get_nat_block
+             ( pi_theme_id    IN      NM_THEMES_ALL.nth_theme_id%TYPE
+             , po_results     IN OUT  tab_nat_block);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+-- <PROC NAME="GET_NIT_BLOCK">
+-- For use in GIS0010
+  PROCEDURE get_nit_block
+             ( pi_theme_id    IN      NM_THEMES_ALL.nth_theme_id%TYPE
+             , po_results     IN OUT  tab_nit_block);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+-- <PROC NAME="VALIDATE_THEME">
+-- For use in GIS0010
+--   PROCEDURE validate_theme
+--              ( pi_theme_id    IN      NM_THEMES_ALL.nth_theme_id%TYPE
+--              , po_results     IN OUT  tab_validate_theme);
+--</PROC>
+-----------------------------------------------------------------------------
+--
+--
+  FUNCTION get_ona_spatial_table
+             ( p_nit       IN nm_inv_types.nit_inv_type%TYPE )
+  RETURN VARCHAR2;
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="CREATE_MSV_THEMES">
+-- Creates any USER_SDO_THEMES in nm themes where they don't exist.
+-- Required for new mapviewer security - every layer (expect WMS) need a theme
+  PROCEDURE create_msv_themes;
+--
+-----------------------------------------------------------------------------
+--<PROC NAME="CREATE_MSV_FEATURE_VIEWS">
+-- Creates a feature table view for a subordinate user where SRIDS are used
+-- Only required for Mapviewer
+  PROCEDURE Create_Msv_Feature_Views
+               ( pi_username  IN   hig_users.hus_username%TYPE DEFAULT NULL );
+--
+-----------------------------------------------------------------------------
+--<PROC NAME="REFRESH_USGM">
+-- Refreshes user_sdo_geom_metadata for a given subordinate user
+   PROCEDURE refresh_usgm
+               ( pi_sub_username  IN HIG_USERS.hus_username%TYPE
+               , pi_role_restrict IN BOOLEAN DEFAULT TRUE);
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_DATUM_XY_FROM_MEASURE">
+-- The datum base shape is interrogated for the given element to provide the x,y
+-- co-ordinates at the given measure. This is used to provide grid-co-ordinates
+-- for nodes/points that are derived on the fly.
+  PROCEDURE get_datum_xy_from_measure
+            ( p_ne_id    IN NUMBER
+            , p_measure  IN NUMBER
+            , p_x       OUT NUMBER
+            , p_y       OUT NUMBER );
+--</PROC>
+-----------------------------------------------------------------------------
+--
+--
+--<PROC NAME="CREATE_THEME_XY_VIEW">
+--Creates a view from the join of the layer feature table and the co-ordinates of the shape.
+PROCEDURE create_theme_xy_view ( p_theme_id IN NUMBER );
+--</PROC>
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_GLOBAL_UNIT_FACTOR">
+--Retrieves the current unit factor used in registration of meaure units
+FUNCTION get_global_unit_factor RETURN NUMBER;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="MAINTAIN_NTV">
+-- Triggered from nm_themes_all, maintains visible themes
+  PROCEDURE maintain_ntv 
+             ( pi_theme_id IN nm_themes_all.nth_theme_id%TYPE
+             , pi_mode     IN VARCHAR2);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="SET_THEME_SRID_CTX">
+  PROCEDURE set_theme_srid_ctx( pi_theme_id IN nm_themes_all.nth_theme_id%TYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PRAGMA>
+   PRAGMA RESTRICT_REFERENCES (get_version, RNDS, WNPS, WNDS);
+   PRAGMA RESTRICT_REFERENCES (get_body_version, RNDS, WNPS, WNDS);
+   PRAGMA RESTRICT_REFERENCES (prevent_operation, WNDS, TRUST );
+   PRAGMA RESTRICT_REFERENCES (get_inv_spatial_table, WNDS, WNPS, TRUST );
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+END Nm3sdm;
+/
