@@ -5,11 +5,11 @@ AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.47   Jul 04 2011 16:51:38   Chris.Strettle  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.48   Jul 06 2011 13:39:44   Chris.Strettle  $
 --       Module Name      : $Workfile:   nm3sdm.pkb  $
---       Date into PVCS   : $Date:   Jul 04 2011 16:51:38  $
---       Date fetched Out : $Modtime:   Jul 04 2011 16:13:14  $
---       PVCS Version     : $Revision:   2.47  $
+--       Date into PVCS   : $Date:   Jul 06 2011 13:39:44  $
+--       Date fetched Out : $Modtime:   Jul 06 2011 13:34:06  $
+--       PVCS Version     : $Revision:   2.48  $
 --
 --   Author : R.A. Coupe
 --
@@ -21,7 +21,7 @@ AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT VARCHAR2 (2000) := '"$Revision:   2.47  $"';
+   g_body_sccsid     CONSTANT VARCHAR2 (2000) := '"$Revision:   2.48  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT VARCHAR2 (30)   := 'NM3SDM';
@@ -7550,13 +7550,11 @@ end;
       lq                    VARCHAR2 (1)                     := CHR (39);
       l_update_str          VARCHAR2 (2000);
       l_comma               VARCHAR2 (1)                     := NULL;
-      l_srid                VARCHAR2 (10);
       l_trg_name            VARCHAR2 (30);
       l_tab_or_view         VARCHAR2 (5);
       l_date                VARCHAR2 (100);
       l_nth                 NM_THEMES_ALL%ROWTYPE;
       l_base_table_nth      NM_THEMES_ALL%ROWTYPE;
-      l_sdo                 user_sdo_geom_metadata%ROWTYPE;
       l_tab_vc              Nm3type.tab_varchar32767;
 
       CURSOR c1 (objname IN VARCHAR2)
@@ -7618,8 +7616,8 @@ end;
                Nm3get.get_nth (pi_nth_theme_id      => l_nth.nth_base_table_theme);
       END IF;
 
-      l_sdo := Nm3sdo.get_theme_metadata (l_base_table_nth.nth_theme_id);
-      l_srid := NVL (TO_CHAR (l_sdo.srid), 'NULL');
+--      l_sdo := Nm3sdo.get_theme_metadata (l_base_table_nth.nth_theme_id);
+--      l_srid := NVL (TO_CHAR (l_sdo.srid), 'NULL');
 
       OPEN c1 (l_base_table_nth.nth_table_name);
 
@@ -7694,23 +7692,6 @@ end;
          ('--------------------------------------------------------------------------'
          );
       append ('--');
-  /*    append ('--   SCCS Identifiers :- ');
-      append ('--');
-      append ('--       sccsid           : @(#)nm3sdm.pkb 1.25 06/10/05');
-      append ('--       Module Name      : nm3sdm.pkb');
-      append ('--       Date into SCCS   : 05/06/10 09:15:36');
-      append ('--       Date fetched Out : 05/06/21 09:36:13');
-      append ('--       SCCS Version     : 1.25');
-      append ('--');
-   */
-   --   PVCS Identifiers :-
---
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.47   Jul 04 2011 16:51:38   Chris.Strettle  $
---       Module Name      : $Workfile:   nm3sdm.pkb  $
---       Date into PVCS   : $Date:   Jul 04 2011 16:51:38  $
---       Date fetched Out : $Modtime:   Jul 04 2011 16:13:14  $
---       PVCS Version     : $Revision:   2.47  $
-
       append ('--   PVCS Identifiers :-');
       append ('--');
       append ('--       PVCS id          : $Header::   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   '|| get_body_version);
@@ -7820,7 +7801,7 @@ end;
       THEN
          append ('    , mdsys.sdo_geometry');
          append ('       ( 2001');
-         append ('       , ' || l_srid);
+         append ('       , sys_context(''NM3CORE'',''THEME' || l_base_table_nth.nth_theme_id || 'SRID'')');
          append ('       , mdsys.sdo_point_type');
          append ('          ( :NEW.' || LOWER (l_base_table_nth.nth_x_column));
          append ('           ,:NEW.' || LOWER (l_base_table_nth.nth_y_column));
@@ -7971,7 +7952,7 @@ end;
                  || ' = mdsys.sdo_geometry'
                 );
          append ('                          ( 2001 ');
-         append ('                          , ' || l_srid || ' ');
+         append ('                          , sys_context(''NM3CORE'',''THEME' || l_base_table_nth.nth_theme_id || 'SRID'')');
          append ('                          , mdsys.sdo_point_type');
          append (   '                             ( :NEW.'
                  || LOWER (l_base_table_nth.nth_x_column)
@@ -8107,11 +8088,13 @@ end;
          ('--------------------------------------------------------------------------'
          );
       append ('--');
-      append ('BEGIN' || lf);
+      append ('BEGIN');
+      append ('--');
       IF p_restrict IS NOT NULL THEN
         append ('IF ' ||p_restrict || ' THEN');
       END IF;
-      
+      append ('   nm3sdm.set_theme_srid_ctx( pi_theme_id => ' || l_base_table_nth.nth_theme_id || ');');
+      append ('--');
       append ('   IF DELETING THEN');
       append ('        del;');
       append ('   ELSIF INSERTING THEN');
@@ -9463,6 +9446,25 @@ END;
     END IF;
   --
   END maintain_ntv;
+--
+------------------------------------------------------------------------------
+--
+  PROCEDURE set_theme_srid_ctx( pi_theme_id IN nm_themes_all.nth_theme_id%TYPE)
+  IS
+  l_srid                VARCHAR2 (10);
+  l_sdo                 user_sdo_geom_metadata%ROWTYPE;
+  --
+  BEGIN
+    IF sys_context('NM3CORE', 'THEME'|| pi_theme_id ||'SRID') IS NULL
+    THEN 
+      l_sdo := Nm3sdo.get_theme_metadata (pi_theme_id);
+      l_srid := NVL (TO_CHAR (l_sdo.srid), 'NULL');
+    --
+      nm3ctx.set_core_context  (p_Attribute   => 'THEME'|| pi_theme_id || 'SRID'
+                               ,p_Value       => l_srid
+                               );
+    END IF;
+  END;
 --
 ------------------------------------------------------------------------------
 --
