@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 --
 ---   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.56.1.0   Jun 24 2011 10:45:54   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.56.1.1   Jul 11 2011 11:11:00   Chris.Strettle  $
 --       Module Name      : $Workfile:   nm3sdo.pkb  $
---       Date into PVCS   : $Date:   Jun 24 2011 10:45:54  $
---       Date fetched Out : $Modtime:   Jun 24 2011 10:36:42  $
---       PVCS Version     : $Revision:   2.56.1.0  $
+--       Date into PVCS   : $Date:   Jul 11 2011 11:11:00  $
+--       Date fetched Out : $Modtime:   Jul 11 2011 10:01:18  $
+--       PVCS Version     : $Revision:   2.56.1.1  $
 --       Based on
 
 --
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 -- Copyright (c) RAC
 -----------------------------------------------------------------------------
 
-   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.56.1.0  $"';
+   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.56.1.1  $"';
    g_package_name    CONSTANT VARCHAR2 (30)  := 'NM3SDO';
    g_batch_size      INTEGER                 := NVL( TO_NUMBER(Hig.get_sysopt('SDOBATSIZE')), 10);
    g_clip_type       VARCHAR2(30)            := NVL(Hig.get_sysopt('SDOCLIPTYP'),'SDO');
@@ -9056,7 +9056,7 @@ BEGIN
 
   IF l_nth.nth_feature_table = l_nth.nth_table_name THEN
 
-     cur_string := 'select distinct t.'||l_nth.nth_pk_column||',t.'||SUBSTR(l_nth.nth_label_column,1,100)||', null'||', t.'||l_nth.nth_pk_column;
+     cur_string := 'select distinct t.'||l_nth.nth_pk_column||',SUBSTR(t.'||SUBSTR(l_nth.nth_label_column,1,100)||',1,100), null'||', t.'||l_nth.nth_pk_column;
 
      IF l_get_projection THEN
 
@@ -9097,7 +9097,7 @@ BEGIN
 
   ELSIF p_nth.nth_feature_fk_column IS NOT NULL THEN
 
-     cur_string := 'select distinct t.'||l_nth.nth_pk_column||',t.'||SUBSTR(l_nth.nth_label_column,1,100)||', null'||', f.'||l_nth.nth_feature_pk_column;
+     cur_string := 'select distinct t.'||l_nth.nth_pk_column||',SUBSTR(t.'||SUBSTR(l_nth.nth_label_column,1,100)||',1,100), null'||', f.'||l_nth.nth_feature_pk_column;
 
      IF l_get_projection THEN
 
@@ -9142,7 +9142,7 @@ BEGIN
 
    ELSE
 
-     cur_string := 'select distinct t.'||l_nth.nth_pk_column||',t.'||SUBSTR(l_nth.nth_label_column,1,100)||', null'||', f.'||l_nth.nth_feature_pk_column;
+     cur_string := 'select distinct t.'||l_nth.nth_pk_column||',SUBSTR(t.'||SUBSTR(l_nth.nth_label_column,1,100)||',1,100), null'||', f.'||l_nth.nth_feature_pk_column;
 
      IF l_get_projection THEN
 
@@ -10414,7 +10414,7 @@ BEGIN
   if p_nth.nth_table_name = p_nth.nth_feature_table then
 
     curstr := 'select /*+cardinality( a '||to_char( p_ntl.ntl_theme_list.last)||') */ '||
-              ' nm_theme_detail( :new_theme, a.ntd_pk_id, a.ntd_fk_id,  t.'||p_nth.nth_label_column||', a.ntd_distance, a.ntd_measure, :new_descr )   '||
+              ' nm_theme_detail( :new_theme, a.ntd_pk_id, a.ntd_fk_id,  SUBSTR(t.'||p_nth.nth_label_column||',1,100), a.ntd_distance, a.ntd_measure, :new_descr )   '||
               ' FROM TABLE ( :p_ntl.ntl_theme_list ) a, '||p_nth.nth_feature_table||' t '||
               ' where a.ntd_pk_id  =  t.'||p_nth.nth_feature_pk_column||
               ' group by :new_theme, a.ntd_pk_id, a.ntd_fk_id,  t.'||p_nth.nth_label_column||', a.ntd_distance, a.ntd_measure, :new_descr '||
@@ -10432,7 +10432,7 @@ BEGIN
 -- AE 4100
 
     curstr := 'select /*+cardinality( a '||to_char( p_ntl.ntl_theme_list.last)||') */ '||
-              ' nm_theme_detail( :new_theme, a.ntd_pk_id, a.ntd_fk_id,  t.'||p_nth.nth_label_column||', a.ntd_distance, a.ntd_measure, :new_descr )   '||
+              ' nm_theme_detail( :new_theme, a.ntd_pk_id, a.ntd_fk_id,  SUBSTR(t.'||p_nth.nth_label_column||',1,100), a.ntd_distance, a.ntd_measure, :new_descr )   '||
               ' FROM TABLE ( :p_ntl.ntl_theme_list ) a, '||p_nth.nth_feature_table||' f,'||p_nth.nth_table_name||' t'||
               ' where a.ntd_pk_id  = f.'||p_nth.nth_feature_pk_column||
               ' and   f.'||NVL(p_nth.nth_feature_fk_column,p_nth.nth_feature_pk_column)||' =  t.'||p_nth.nth_pk_column||
