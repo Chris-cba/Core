@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_security AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_security.pkb-arc   2.5   May 16 2011 14:44:56   Steve.Cooper  $
---       Module Name      : $Workfile:   nm3inv_security.pkb  $
---       Date into PVCS   : $Date:   May 16 2011 14:44:56  $
---       Date fetched Out : $Modtime:   May 05 2011 09:14:34  $
---       Version          : $Revision:   2.5  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_security.pkb-arc   2.6   Jul 12 2011 15:01:58   Chris.Strettle  $
+--       Module Name      : $Workfile:   nm3inv_security_co.pkb  $
+--       Date into PVCS   : $Date:   Jul 12 2011 15:01:58  $
+--       Date fetched Out : $Modtime:   Jul 12 2011 14:53:56  $
+--       Version          : $Revision:   2.6  $
 --       Based on SCCS version : 1.1
 -------------------------------------------------------------------------
 --
@@ -23,7 +23,7 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_security AS
 --
 --  g_body_sccsid is the SCCS ID for the package body
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '$Revision:   2.5  $';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '$Revision:   2.6  $';
    g_package_name    CONSTANT  varchar2(30)   := 'nm3inv_security';
 --
    l_dummy_package_variable number;
@@ -50,16 +50,16 @@ FUNCTION can_usr_see_all_inv_on_element ( pi_ne_id IN nm_members.nm_ne_id_of%TYP
                                         --, pi_check_datum BOOLEAN DEFAULT FALSE
                                         ) RETURN BOOLEAN IS
 --
-  CURSOR  cur_dat_missing (c_ne_id_of nm_members.nm_ne_id_of%TYPE) IS
+  CURSOR  cur_dat_missing (c_ne_id_of nm_members.nm_ne_id_of%TYPE, p_usegrpsec VARCHAR2) IS
   SELECT  1
     FROM  nm_members
    WHERE  nm_ne_id_of = c_ne_id_of
-     AND  nm_type     = 'I'
+     AND  (nm_type = 'I' OR p_usegrpsec = 'Y')
      AND  NOT EXISTS (SELECT  1
                         FROM  nm_inv_items
                        WHERE  iit_ne_id = nm_ne_id_in);
   --
-  CURSOR cur_missing_children(c_ne_id_of  nm_members.nm_ne_id_of%TYPE)
+  CURSOR cur_missing_children(c_ne_id_of  nm_members.nm_ne_id_of%TYPE, p_usegrpsec VARCHAR2)
   IS
 -- Check the users admin unit is allowed
   WITH all_visable_au AS
@@ -79,10 +79,10 @@ FUNCTION can_usr_see_all_inv_on_element ( pi_ne_id IN nm_members.nm_ne_id_of%TYP
   -- Check the members admin units are allowed
     SELECT 1
       FROM nm_members a
-         , nm_members b
+         , nm_elements b
      WHERE a.nm_ne_id_in = c_ne_id_of
-       AND b.nm_ne_id_of = a.nm_ne_id_of
-       AND NOT EXISTS (SELECT 'X' FROM all_visable_au where nag_child_admin_unit = b.nm_admin_unit)
+       AND b.ne_id = a.nm_ne_id_of
+       AND NOT EXISTS (SELECT 'X' FROM all_visable_au where nag_child_admin_unit = b.ne_admin_unit)
     UNION
   -- Check the inventory items belonging to these members are allowed
     SELECT 1
@@ -90,10 +90,10 @@ FUNCTION can_usr_see_all_inv_on_element ( pi_ne_id IN nm_members.nm_ne_id_of%TYP
          , nm_members b
      WHERE a.nm_ne_id_in = c_ne_id_of
        AND b.nm_ne_id_of = a.nm_ne_id_of
-       AND b.nm_type = 'I'
+       AND (b.nm_type = 'I' OR p_usegrpsec = 'Y')
        AND NOT EXISTS (SELECT 'X' FROM all_visable_au WHERE nag_child_admin_unit = b.nm_admin_unit);
         --
-  CURSOR cur_missing_grandchildren(c_ne_id_of  nm_members.nm_ne_id_of%TYPE) 
+  CURSOR cur_missing_grandchildren(c_ne_id_of  nm_members.nm_ne_id_of%TYPE, p_usegrpsec VARCHAR2) 
   IS
   WITH 
   -- A list of all the children members
@@ -113,7 +113,7 @@ FUNCTION can_usr_see_all_inv_on_element ( pi_ne_id IN nm_members.nm_ne_id_of%TYP
      WHERE nua_admin_unit = nag_parent_admin_unit
        AND nua_mode = 'NORMAL'
        AND nua_user_id = hus_user_id
-       AND hus_username = Sys_Context('NM3_SECURITY_CTX','USERNAME'))
+       AND hus_username = sys_context('NM3_SECURITY_CTX','USERNAME'))
   -- Check the users admin unit is allowed
     SELECT 1
       FROM nm_elements
@@ -123,24 +123,24 @@ FUNCTION can_usr_see_all_inv_on_element ( pi_ne_id IN nm_members.nm_ne_id_of%TYP
   -- Check the members admin units are allowed
     SELECT 1
       FROM all_children_members a
-         , nm_members b
-     WHERE b.nm_ne_id_of = a.nm_ne_id_of
-       AND NOT EXISTS (SELECT 'X' FROM all_visable_au where nag_child_admin_unit = b.nm_admin_unit)
+         , nm_elements b
+     WHERE b.ne_id = a.nm_ne_id_of
+       AND NOT EXISTS (SELECT 'X' FROM all_visable_au where nag_child_admin_unit = b.ne_admin_unit)
     UNION
   -- Check the inventory items belonging to these members are allowed
     SELECT 1
       FROM all_children_members a
          , nm_members b
      WHERE b.nm_ne_id_of = a.nm_ne_id_of
-       AND b.nm_type = 'I'
+       AND (b.nm_type = 'I' OR p_usegrpsec = 'Y')
        AND NOT EXISTS
       (SELECT *
          FROM nm_inv_type_roles, hig_user_roles
         WHERE hur_role = itr_hro_role
           AND b.nm_obj_type = itr_inv_type
           AND itr_mode = 'NORMAL'
-          AND hur_username = Sys_Context('NM3_SECURITY_CTX','USERNAME'))
-       AND NOT EXISTS (SELECT 'X' FROM all_visable_au WHERE nag_child_admin_unit = b.nm_admin_unit);
+          AND hur_username = sys_context('NM3_SECURITY_CTX','USERNAME'))
+          AND NOT EXISTS (SELECT 'X' FROM all_visable_au WHERE nag_child_admin_unit = b.nm_admin_unit);
 --
    l_dummy  BINARY_INTEGER;
 --
@@ -148,6 +148,8 @@ FUNCTION can_usr_see_all_inv_on_element ( pi_ne_id IN nm_members.nm_ne_id_of%TYP
 --
    l_ne_rec nm_elements%ROWTYPE := Nm3get.get_ne_all( pi_ne_id => pi_ne_id
                                                     , pi_raise_not_found => FALSE);
+--
+   l_usegrpsec VARCHAR2(1):= NVL(HIG.GET_SYSOPT(p_option_id => 'USEGRPSEC'), 'N');
 --
 BEGIN
 --
@@ -158,13 +160,13 @@ BEGIN
       l_retval := TRUE;
    ELSIF l_ne_rec.ne_type = 'S' 
    THEN
-        OPEN  cur_dat_missing (pi_ne_id);
+        OPEN  cur_dat_missing (pi_ne_id, l_usegrpsec);
         FETCH cur_dat_missing INTO l_dummy;
           l_retval := cur_dat_missing%NOTFOUND;
         CLOSE cur_dat_missing;
    ELSIF l_ne_rec.ne_type = 'G'
    THEN
-        OPEN  cur_missing_children (pi_ne_id);
+        OPEN  cur_missing_children (pi_ne_id, l_usegrpsec);
         FETCH cur_missing_children INTO l_dummy;
           l_retval := cur_missing_children%NOTFOUND;
         CLOSE cur_missing_children;
@@ -172,12 +174,12 @@ BEGIN
    THEN
      IF pi_check_grandchildren 
      THEN
-        OPEN  cur_missing_grandchildren (pi_ne_id);
+        OPEN  cur_missing_grandchildren (pi_ne_id, l_usegrpsec);
         FETCH cur_missing_grandchildren INTO l_dummy;
           l_retval := cur_missing_grandchildren%NOTFOUND;
         CLOSE cur_missing_grandchildren;
      ELSE
-        OPEN  cur_missing_children (pi_ne_id);
+        OPEN  cur_missing_children (pi_ne_id, l_usegrpsec);
         FETCH cur_missing_children INTO l_dummy;
           l_retval := cur_missing_children%NOTFOUND;
         CLOSE cur_missing_children;
