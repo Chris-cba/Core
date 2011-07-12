@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 --
 ---   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.61   Jul 08 2011 16:27:22   Chris.Strettle  $
---       Module Name      : $Workfile:   nm3sdo.pkb  $
---       Date into PVCS   : $Date:   Jul 08 2011 16:27:22  $
---       Date fetched Out : $Modtime:   Jul 08 2011 15:52:58  $
---       PVCS Version     : $Revision:   2.61  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.62   Jul 12 2011 16:50:44   Chris.Strettle  $
+--       Module Name      : $Workfile:   nm3sdo_co.pkb  $
+--       Date into PVCS   : $Date:   Jul 12 2011 16:50:44  $
+--       Date fetched Out : $Modtime:   Jul 12 2011 16:42:24  $
+--       PVCS Version     : $Revision:   2.62  $
 --       Based on
 
 --
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 -- Copyright (c) RAC
 -----------------------------------------------------------------------------
 
-   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.61  $"';
+   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.62  $"';
    g_package_name    CONSTANT VARCHAR2 (30)  := 'NM3SDO';
    g_batch_size      INTEGER                 := NVL( TO_NUMBER(Hig.get_sysopt('SDOBATSIZE')), 10);
    g_clip_type       VARCHAR2(30)            := NVL(Hig.get_sysopt('SDOCLIPTYP'),'SDO');
@@ -6230,40 +6230,87 @@ END;
 --
 --------------------------------------------------------------------------------------------------------------
 --
-
 FUNCTION validate_theme ( p_theme IN NUMBER, ex_table IN VARCHAR2 DEFAULT NULL ) RETURN NUMBER IS
 
-nth NM_THEMES_ALL%ROWTYPE := Nm3get.get_nth( p_theme );
-retval NUMBER;
-l_ex_table VARCHAR2(30);
-
+  TYPE geom_tab IS TABLE OF SDO_GEOMETRY;
+  
+  nth NM_THEMES_ALL%ROWTYPE := Nm3get.get_nth( p_theme );
+  retval NUMBER;
+  l_ex_table VARCHAR2(30);
+  c_default_tolerance CONSTANT NUMBER:= 0.05;
+  l_tolerance NUMBER;
+  l_rowid nm3type.tab_rowid;
+  l_shape geom_tab;
+  l_result VARCHAR2(100);
+  
+  already_exists EXCEPTION;
+  PRAGMA EXCEPTION_INIT ( already_exists, -00955);
+  
+  CURSOR diminfo_cur(p_table_name VARCHAR2, p_column_name VARCHAR2) IS 
+  SELECT dim.sdo_tolerance
+  FROM all_sdo_geom_metadata usgm
+     , TABLE(usgm.diminfo) dim
+  WHERE owner = Sys_Context('NM3CORE','APPLICATION_OWNER')
+  AND table_name = UPPER(p_table_name)
+  AND column_name = UPPER(p_column_name);
+  
 BEGIN
-
   l_ex_table := ex_table;
 
   IF ex_table IS NULL THEN
     l_ex_table := SUBSTR(nth.nth_feature_table, 1, 27)||'_EX';
-    EXECUTE IMMEDIATE 'create table '||l_ex_table||' ( sdo_rowid ROWID, result varchar2(1000))';
+    
+    BEGIN
+      --
+      EXECUTE IMMEDIATE 'create table '||l_ex_table||' ( sdo_rowid ROWID, result varchar2(1000))';
+      --
+    EXCEPTION WHEN already_exists THEN
+      EXECUTE IMMEDIATE 'truncate table '||l_ex_table;
+    END;
 
   END IF;
 
-  sdo_geom.validate_layer_with_context( nth.nth_feature_table, nth.nth_feature_shape_column, l_ex_table, -1, 'TRUE', 'TRUE' );
+  OPEN diminfo_cur(nth.nth_feature_table, nth.nth_feature_shape_column);
+  FETCH diminfo_cur INTO l_tolerance;
+  CLOSE diminfo_cur;
 
-  EXECUTE IMMEDIATE 'select count(*) from '||l_ex_table INTO retval;
+  IF l_tolerance IS NULL THEN
+    l_tolerance := c_default_tolerance;
+  END IF;
 
---This utility posts a comment on the number of rows processed.
-
-  RETURN retval - 1;
+  EXECUTE IMMEDIATE 'SELECT ROWID, ' || nth.nth_feature_shape_column || ' FROM ' || nth.nth_feature_table 
+  BULK COLLECT INTO l_rowid, l_shape;
+  
+  FOR i IN 1..l_rowid.COUNT
+  LOOP
+    --
+    BEGIN
+      l_result:= SDO_GEOM.VALIDATE_GEOMETRY_WITH_CONTEXT(l_shape(i), l_tolerance, null, 'TRUE');
+      --
+    EXCEPTION 
+    WHEN OTHERS THEN
+      l_result:= 'FAILURE: ' || SQLERRM;
+    END;
+    --
+    IF l_result <> 'TRUE'
+    THEN
+      EXECUTE IMMEDIATE 'INSERT INTO ' || Sys_Context('NM3CORE','APPLICATION_OWNER') || '.' || l_ex_table || ' VALUES (''' || l_rowid(i) || ''', substr(''' || l_result || ''',1,1000))';
+    END IF;
+    --
+  retval:= NVL(retval, 0) +1;
+  END LOOP;
+  --
+  COMMIT;
+  --This utility posts a comment on the number of rows processed.
+  RETURN retval;
 
 EXCEPTION
   WHEN NO_DATA_FOUND THEN
     RETURN 0;
-END;
-
+END validate_theme;
 --
 --------------------------------------------------------------------------------------------------------------
 --
-
 FUNCTION get_shape_from_gdo ( p_session_id IN NUMBER ) RETURN mdsys.sdo_geometry IS
 
 
