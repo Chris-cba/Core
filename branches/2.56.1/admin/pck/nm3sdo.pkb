@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 --
 ---   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.56.1.1   Jul 11 2011 11:11:00   Chris.Strettle  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.56.1.2   Jul 14 2011 16:37:44   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3sdo.pkb  $
---       Date into PVCS   : $Date:   Jul 11 2011 11:11:00  $
---       Date fetched Out : $Modtime:   Jul 11 2011 10:01:18  $
---       PVCS Version     : $Revision:   2.56.1.1  $
+--       Date into PVCS   : $Date:   Jul 14 2011 16:37:44  $
+--       Date fetched Out : $Modtime:   Jul 14 2011 16:23:38  $
+--       PVCS Version     : $Revision:   2.56.1.2  $
 --       Based on
 
 --
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 -- Copyright (c) RAC
 -----------------------------------------------------------------------------
 
-   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.56.1.1  $"';
+   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.56.1.2  $"';
    g_package_name    CONSTANT VARCHAR2 (30)  := 'NM3SDO';
    g_batch_size      INTEGER                 := NVL( TO_NUMBER(Hig.get_sysopt('SDOBATSIZE')), 10);
    g_clip_type       VARCHAR2(30)            := NVL(Hig.get_sysopt('SDOCLIPTYP'),'SDO');
@@ -1505,15 +1505,32 @@ BEGIN
       and b.nth_theme_id = nbth_base_theme
       and nvl(a.nth_base_table_theme, a.nth_theme_id) = b.nth_theme_id
       and exists ( select 1 from nm_theme_roles where nthr_theme_id = a.nth_theme_id );
-      
+	  
       if l_base_themes.nta_theme_array.count = 0 then
-      
-        Hig.raise_ner(pi_appl                => Nm3type.c_hig
-                    ,pi_id                 => 286
-                    ,pi_sqlcode            => -20001
-                    );
-      end if;
 
+        SELECT nm_theme_entry(a.nnth_nth_theme_id)
+		bulk collect
+        into l_base_themes.nta_theme_array
+        FROM nm_inv_themes, nm_inv_nw, nm_linear_types, NM_NW_THEMES a
+        WHERE nith_nth_theme_id = p_theme
+        and nith_nit_id = nin_nit_inv_code
+        and nlt_nt_type = nin_nw_type
+        and nnth_nlt_id = nlt_id
+        and exists ( select 1 from hig_user_roles, nm_theme_roles
+                     WHERE hur_username = user
+                     AND hur_role = nthr_role
+                     AND nthr_theme_id = a.nnth_nth_theme_id );
+	  
+      
+        if l_base_themes.nta_theme_array.count = 0 then
+      
+          Hig.raise_ner(pi_appl                => Nm3type.c_hig
+                       ,pi_id                 => 286
+                       ,pi_sqlcode            => -20001
+                        );
+        end if;
+
+      end if;
 
     end if;
     
