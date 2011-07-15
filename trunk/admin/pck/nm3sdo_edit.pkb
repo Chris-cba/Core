@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3sdo_Edit AS
 --
 --   SCCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_edit.pkb-arc   2.12   May 17 2011 08:26:26   Steve.Cooper  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_edit.pkb-arc   2.13   Jul 15 2011 12:23:46   Chris.Strettle  $
 --       Module Name      : $Workfile:   nm3sdo_edit.pkb  $
---       Date into SCCS   : $Date:   May 17 2011 08:26:26  $
---       Date fetched Out : $Modtime:   May 10 2011 15:00:48  $
---       SCCS Version     : $Revision:   2.12  $
+--       Date into SCCS   : $Date:   Jul 15 2011 12:23:46  $
+--       Date fetched Out : $Modtime:   Jul 15 2011 12:14:14  $
+--       SCCS Version     : $Revision:   2.13  $
 --
 --
 --  Author :  R Coupe
@@ -23,7 +23,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3sdo_Edit AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid   CONSTANT  VARCHAR2(2000)  :=  '$Revision:   2.12  $';
+  g_body_sccsid   CONSTANT  VARCHAR2(2000)  :=  '$Revision:   2.13  $';
   g_package_name  CONSTANT  VARCHAR2(30)    :=  'nm3sdo_edit';
 --
 -----------------------------------------------------------------------------
@@ -738,10 +738,10 @@ IS
    l_rec_nth         NM_THEMES_ALL%ROWTYPE;
    g_nte_job_id      NM_NW_TEMP_EXTENTS.nte_job_id%TYPE;
    l_nte_job_id      NM_NW_TEMP_EXTENTS.nte_job_id%TYPE;
-   l_rec_iit         nm_inv_items%ROWTYPE;
    l_tab_nith        tab_nith;
    l_geom            mdsys.sdo_geometry;
    l_lref            nm_lref;
+   l_homo_touch_flag BOOLEAN := nm3homo.g_homo_touch_flag;
 --
    FUNCTION get_theme_gtype
       (pi_theme_id IN NUMBER) RETURN NUMBER
@@ -796,14 +796,14 @@ IS
 BEGIN
 --
 --  Nm_Debug.debug_on;
+-- 0111341 CWS 15/7/11
+  nm3homo.g_homo_touch_flag:= FALSE;
 --
-  FOR i IN g_tab_inv.FIRST..g_tab_inv.LAST
+  FOR g_tab_inv_count IN g_tab_inv.FIRST..g_tab_inv.LAST
   LOOP
   --
-    l_rec_iit := g_tab_inv(i);
-  --
   -- Get all nm_inv_theme records for inv type
-    OPEN  check_for_layer (l_rec_iit.iit_inv_type);
+    OPEN  check_for_layer (g_tab_inv(g_tab_inv_count).iit_inv_type);
     FETCH check_for_layer BULK COLLECT INTO l_tab_nith;
     CLOSE check_for_layer;
 --
@@ -811,9 +811,9 @@ BEGIN
 --
     IF l_tab_nith.COUNT > 0
     THEN
-      FOR i IN 1..l_tab_nith.COUNT
+      FOR l_tab_nith_count IN 1..l_tab_nith.COUNT
       LOOP
-        l_rec_nth := Nm3get.get_nth (pi_nth_theme_id => l_tab_nith(i).nith_nth_theme_id);
+        l_rec_nth := Nm3get.get_nth (pi_nth_theme_id => l_tab_nith(l_tab_nith_count).nith_nth_theme_id);
 
         -- make sure we are acting on base table theme, location updatable flag is Y
         -- theme type is SDO, X and Y columns set on theme and check that inv type is XY
@@ -823,20 +823,20 @@ BEGIN
         AND l_rec_nth.nth_theme_type = Nm3sdo.c_sdo
         AND l_rec_nth.nth_x_column IS NOT NULL
         AND l_rec_nth.nth_y_column IS NOT NULL
-        AND Nm3get.get_nit(pi_nit_inv_type => l_rec_iit.iit_inv_type).nit_use_xy = 'Y'
+        AND Nm3get.get_nit(pi_nit_inv_type => g_tab_inv(g_tab_inv_count).iit_inv_type).nit_use_xy = 'Y'
         AND get_theme_gtype(l_rec_nth.nth_theme_id) = 2001
         THEN
           -- construct a new point shape
-          l_geom := nm3sdo.get_2d_pt(l_rec_iit.iit_x, l_rec_iit.iit_y);
+          l_geom := nm3sdo.get_2d_pt(g_tab_inv(g_tab_inv_count).iit_x, g_tab_inv(g_tab_inv_count).iit_y);
 
-          IF is_located ( pi_inv_type => l_rec_iit.iit_inv_type)
+          IF is_located ( pi_inv_type => g_tab_inv(g_tab_inv_count).iit_inv_type)
           THEN
           --
           --<RAC - 3.2.1.1
             l_lref := nm3sdo.get_nearest_lref( l_rec_nth.nth_theme_id, l_geom );
 
             IF  l_lref.lr_ne_id IS NULL
-            AND is_inv_loc_mandatory( l_rec_iit.iit_inv_type)
+            AND is_inv_loc_mandatory( g_tab_inv(g_tab_inv_count).iit_inv_type)
             THEN
               RAISE_APPLICATION_ERROR( -20001, 'Failure to locate mandatory inventory type');
             END IF;
@@ -852,7 +852,7 @@ BEGIN
             BEGIN
               Nm3homo.homo_update
               ( p_temp_ne_id_in  => g_nte_job_id
-              , p_iit_ne_id      => l_rec_iit.iit_ne_id
+              , p_iit_ne_id      => g_tab_inv(g_tab_inv_count).iit_ne_id
               , p_effective_date => To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY'));
             EXCEPTION
               WHEN OTHERS
@@ -862,11 +862,11 @@ BEGIN
           END IF;
          --
           add_shape
-           ( pi_nth_id   => l_tab_nith(i).nith_nth_theme_id
-           , pi_pk       => l_rec_iit.iit_ne_id
+           ( pi_nth_id   => l_tab_nith(l_tab_nith_count).nith_nth_theme_id
+           , pi_pk       => g_tab_inv(g_tab_inv_count).iit_ne_id
            , pi_fk       => NULL
            , pi_shape    => l_geom
-           , pi_start_dt => l_rec_iit.iit_start_date
+           , pi_start_dt => g_tab_inv(g_tab_inv_count).iit_start_date
            );
         -- theme checks
         END IF;
@@ -876,6 +876,8 @@ BEGIN
     END IF;
   --g_tab_inv loop
   END LOOP;
+--
+  nm3homo.g_homo_touch_flag := l_homo_touch_flag;
 --
 END process_inv_xy_update;
 --
