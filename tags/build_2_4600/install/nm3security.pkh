@@ -1,0 +1,46 @@
+Create or Replace Package Exor_Core.nm3Security
+As
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3security.pkh-arc   3.0   Jul 15 2011 09:05:54   Steve.Cooper  $
+--       Module Name      : $Workfile:   nm3security.pkh  $
+--       Date into PVCS   : $Date:   Jul 15 2011 09:05:54  $
+--       Date fetched Out : $Modtime:   Apr 08 2011 08:06:26  $
+--       Version          : $Revision:   3.0  $
+--       Based on SCCS version :
+-------------------------------------------------------------------------
+  
+  gc_Sccsid Constant Varchar2(2000) := '$Revision:   3.0  $';
+  
+  gc_Package_Name   Constant Varchar2(30)  :='Nm3security';
+  
+  
+  -- This function returns the current SCCS version
+  Function Get_Version Return Varchar2;
+  
+  
+  -- This function returns the current SCCS version of the package body
+  Function Get_Body_Version Return Varchar2;  
+  
+  
+  -- This procedures sets the username context used throughout nm3.
+  Procedure Set_User  (
+                      p_Username    In    Varchar2   Default Null
+                      );
+  
+  -- This procedure sets the Effective date context that is used throughout nm3.
+  Procedure Set_Effective_Date    (
+                                  p_Effective_Date   In    Date  Default Sysdate
+                                  );
+  
+  -- This procedure sets the hig Owner Flag context. (once set it can not be changed for the life of the session.)
+  Procedure Set_Hig_Owner   (
+                            p_Is_Hig_Owner    In    Boolean
+                            );
+
+  --  This procedure sets the nm3ctx package to only allow updates to the nm3core context attributes where they are not explicitly set as readonly attributes.
+  Procedure Lock_Core_Context;
+
+End Nm3Security;
+/
