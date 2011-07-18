@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.40   Jun 06 2011 11:52:56   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.41   Jul 18 2011 15:51:30   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3bulk_mrg.pkb  $
---       Date into PVCS   : $Date:   Jun 06 2011 11:52:56  $
---       Date fetched Out : $Modtime:   Jun 06 2011 11:50:48  $
---       PVCS Version     : $Revision:   2.40  $
+--       Date into PVCS   : $Date:   Jul 18 2011 15:51:30  $
+--       Date fetched Out : $Modtime:   Jul 18 2011 15:48:50  $
+--       PVCS Version     : $Revision:   2.41  $
 --
 --
 --   Author : Priidu Tanava
@@ -124,7 +124,7 @@ No query types defined.
         add nm_route_connect_tmp_ordered view with the next schema change
         in nm3dynsql replace the use of nm3sql.set_context_value() with that of nm3ctx
 */
-  g_body_sccsid     constant  varchar2(40)  :='"$Revision:   2.40  $"';
+  g_body_sccsid     constant  varchar2(40)  :='"$Revision:   2.41  $"';
   g_package_name    constant  varchar2(30)  := 'nm3bulk_mrg';
 
   cr  constant varchar2(1) := chr(10);
@@ -457,7 +457,11 @@ No query types defined.
         ||cr||'  and '||l_sql_iit_effective_date
         ||cr||'  and ('
             ||l_sql_iit_criteria
-        ||cr||'    )';
+        ||cr||'    )'
+        ||cr||' and ( '
+        ||cr||' ( m.nm_begin_mp = m.nm_end_mp and x.begin_mp = x.end_mp and m.nm_begin_mp = x.begin_mp ) OR '
+        ||cr||' ( m.nm_end_mp > x.begin_mp and m.nm_begin_mp < x.end_mp ) '
+        ||cr||' ) ';
       l_union_all := cr||'union all';
 
     end if;
@@ -490,7 +494,11 @@ No query types defined.
         l_sql_ft := l_sql_ft
               ||l_union_all
           ||cr||'select'||l_sql_cardinality
-          ||cr||'    '''||t_ft(i).inv_type||''' nm_obj_type, '||a1||'.nm_ne_id_in, '||a1||'.nm_ne_id_of, '||a1||'.nm_begin_mp, '||a1||'.nm_end_mp'
+          ||cr||'    '''||t_ft(i).inv_type||''' nm_obj_type, '||a1||'.nm_ne_id_in, '||a1||'.nm_ne_id_of, '
+--          ||a1||'.nm_begin_mp, '||a1||'.nm_end_mp'
+          ||cr||'  greatest('||a1||'.nm_begin_mp, x.begin_mp) nm_begin_mp,'
+          ||cr||'  least('||a1||'.nm_end_mp, x.end_mp) nm_end_mp'
+--
           ||cr||'  , '||a1||'.nm_date_modified, '||a1||'.nm_type, null iit_rowid, cast(null as date) iit_date_modified'
           ||cr||'from'
           ||cr||'   nm_members_all '||a1
@@ -498,6 +506,10 @@ No query types defined.
           ||cr||'  ,nm_datum_criteria_tmp x'
           ||cr||'where '||a1||'.nm_ne_id_in = '||a2||'.'||t_ft(i).table_pk_column
               ||sql_datum_tbl_join('nm_ne_id_of', '  and ', a1)
+         ||cr||' and ( '
+          ||cr||'  ( '||a1||'.nm_begin_mp = '||a1||'.nm_end_mp and x.begin_mp = x.end_mp and '||a1||'.nm_begin_mp = x.begin_mp ) OR ' 
+          ||cr||'  ( '||a1||'.nm_end_mp > x.begin_mp and '||a1||'.nm_begin_mp < x.end_mp ) '
+          ||cr||'  )'               
           ||cr||'  and '||nm3dynsql.sql_effective_date(l_effective_date, 'm'||i||'.nm_start_date', 'm'||i||'.nm_end_date' )
               ||sql_ft_criteria(l_where_and, t_ft(i).where_sql, a2);
 
