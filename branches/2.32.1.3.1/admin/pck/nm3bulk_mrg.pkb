@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.32.1.3.1.19   Jun 06 2011 11:57:08   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.32.1.3.1.20   Jul 18 2011 14:43:24   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3bulk_mrg.pkb  $
---       Date into PVCS   : $Date:   Jun 06 2011 11:57:08  $
---       Date fetched Out : $Modtime:   Jun 06 2011 11:56:04  $
---       PVCS Version     : $Revision:   2.32.1.3.1.19  $
+--       Date into PVCS   : $Date:   Jul 18 2011 14:43:24  $
+--       Date fetched Out : $Modtime:   Jul 18 2011 14:42:04  $
+--       PVCS Version     : $Revision:   2.32.1.3.1.20  $
 --
 --
 --   Author : Priidu Tanava
@@ -113,7 +113,7 @@ No query types defined.
         in nm3dynsql replace the use of nm3sql.set_context_value() with that of nm3ctx
         add p_group_type variable to load_group_datums() to specify driving group type when loaded group is non-linear
 */
-  g_body_sccsid     constant  varchar2(40)  :='"$Revision:   2.32.1.3.1.19  $"';
+  g_body_sccsid     constant  varchar2(40)  :='"$Revision:   2.32.1.3.1.20  $"';
   g_package_name    constant  varchar2(30)  := 'nm3bulk_mrg';
 
   cr  constant varchar2(1) := chr(10);
@@ -455,7 +455,11 @@ No query types defined.
         ||cr||'  and '||l_sql_iit_effective_date
         ||cr||'  and ('
             ||l_sql_iit_criteria
-        ||cr||'    )';
+       ||cr||'    )'
+        ||cr||' and ( '
+        ||cr||' ( m.nm_begin_mp = m.nm_end_mp and x.begin_mp = x.end_mp and m.nm_begin_mp = x.begin_mp ) OR '
+        ||cr||' ( m.nm_end_mp > x.begin_mp and m.nm_begin_mp < x.end_mp ) '
+         ||cr||'    )';
       l_union_all := cr||'union all';
 
     end if;
@@ -488,7 +492,11 @@ No query types defined.
         l_sql_ft := l_sql_ft
               ||l_union_all
           ||cr||'select'||l_sql_cardinality
-          ||cr||'    '''||t_ft(i).inv_type||''' nm_obj_type, '||a1||'.nm_ne_id_in, '||a1||'.nm_ne_id_of, '||a1||'.nm_begin_mp, '||a1||'.nm_end_mp'
+          ||cr||'    '''||t_ft(i).inv_type||''' nm_obj_type, '||a1||'.nm_ne_id_in, '||a1||'.nm_ne_id_of, '
+--          ||a1||'.nm_begin_mp, '||a1||'.nm_end_mp'
+          ||cr||'  greatest('||a1||'.nm_begin_mp, x.begin_mp) nm_begin_mp,'
+          ||cr||'  least('||a1||'.nm_end_mp, x.end_mp) nm_end_mp'
+--
           ||cr||'  , '||a1||'.nm_date_modified, '||a1||'.nm_type, null iit_rowid, cast(null as date) iit_date_modified'
           ||cr||'from'
           ||cr||'   nm_members_all '||a1
