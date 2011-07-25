@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --3
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_alert.pkb-arc   3.15   Jun 30 2011 15:48:06   Chris.Strettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_alert.pkb-arc   3.16   Jul 25 2011 10:18:14   linesh.sorathia  $
 --       Module Name      : $Workfile:   hig_alert.pkb  $
---       Date into PVCS   : $Date:   Jun 30 2011 15:48:06  $
---       Date fetched Out : $Modtime:   Jun 30 2011 15:41:20  $
---       Version          : $Revision:   3.15  $
+--       Date into PVCS   : $Date:   Jul 25 2011 10:18:14  $
+--       Date fetched Out : $Modtime:   Jul 25 2011 10:17:16  $
+--       Version          : $Revision:   3.16  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid   CONSTANT varchar2(2000) := '$Revision:   3.15  $';
+  g_body_sccsid   CONSTANT varchar2(2000) := '$Revision:   3.16  $';
 
   c_date_format   CONSTANT varchar2(30) := 'DD-Mon-YYYY HH24:MI:SS';
   g_trigger_text  clob;
@@ -2008,7 +2008,7 @@ BEGIN
         append('ON '||l_halt_rec.halt_table_name);
         append('For Each Row');
         l_cnt := 0 ;
-        FOR hatc IN (SELECT * FROM hig_alert_type_conditions WHERE hatc_halt_id = pi_halt_id)
+        FOR hatc IN (SELECT * FROM hig_alert_type_conditions WHERE hatc_halt_id = pi_halt_id ORDER BY hatc_id)
         LOOP
             l_when_condition := True;
             l_cnt := l_cnt + 1;
@@ -2017,7 +2017,7 @@ BEGIN
                 append('WHEN');  
                 append('('); 
             ELSE
-                append('AND');
+                append(hatc.hatc_operator);
             END IF ; 
             IF hatc.hatc_old_new_type = 'O'
             THEN
