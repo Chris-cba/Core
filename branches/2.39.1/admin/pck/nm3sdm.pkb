@@ -5,11 +5,11 @@ AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.39.1.1   Jul 27 2011 09:45:36   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.39.1.2   Jul 27 2011 10:00:22   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3sdm.pkb  $
---       Date into PVCS   : $Date:   Jul 27 2011 09:45:36  $
---       Date fetched Out : $Modtime:   Jul 27 2011 09:43:34  $
---       PVCS Version     : $Revision:   2.39.1.1  $
+--       Date into PVCS   : $Date:   Jul 27 2011 10:00:22  $
+--       Date fetched Out : $Modtime:   Jul 27 2011 09:59:26  $
+--       PVCS Version     : $Revision:   2.39.1.2  $
 --
 --   Author : R.A. Coupe
 --
@@ -21,7 +21,7 @@ AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT VARCHAR2 (2000) := '"$Revision:   2.39.1.1  $"';
+   g_body_sccsid     CONSTANT VARCHAR2 (2000) := '"$Revision:   2.39.1.2  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT VARCHAR2 (30)   := 'NM3SDM';
@@ -5697,7 +5697,7 @@ end;
       CURSOR c_gty_tab (c_gty_type nm_inv_types.nit_inv_type%TYPE)
       IS
          SELECT nth_theme_id, nth_feature_table, nth_feature_pk_column,
-                nth_feature_fk_column
+                nth_feature_fk_column, 'G' ad_flag
            FROM NM_THEMES_ALL, NM_AREA_THEMES, NM_AREA_TYPES
           WHERE nth_theme_id = nath_nth_theme_id
             AND nath_nat_id = nat_id
@@ -5705,7 +5705,7 @@ end;
             AND nth_update_on_edit = 'I'
          UNION
          SELECT nth_theme_id, nth_feature_table, nth_feature_pk_column,
-                nth_feature_fk_column
+                nth_feature_fk_column, 'I'
            FROM NM_THEMES_ALL, nm_nw_ad_types, nm_inv_themes
           WHERE nth_theme_id = nith_nth_theme_id
             AND nith_nit_id = nad_inv_type
@@ -7660,11 +7660,11 @@ end;
    */
    --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.39.1.1   Jul 27 2011 09:45:36   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.39.1.2   Jul 27 2011 10:00:22   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3sdm.pkb  $
---       Date into PVCS   : $Date:   Jul 27 2011 09:45:36  $
---       Date fetched Out : $Modtime:   Jul 27 2011 09:43:34  $
---       PVCS Version     : $Revision:   2.39.1.1  $
+--       Date into PVCS   : $Date:   Jul 27 2011 10:00:22  $
+--       Date fetched Out : $Modtime:   Jul 27 2011 09:59:26  $
+--       PVCS Version     : $Revision:   2.39.1.2  $
 
       append ('--   PVCS Identifiers :-');
       append ('--');
