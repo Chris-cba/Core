@@ -5,11 +5,11 @@ AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.48   Jul 06 2011 13:39:44   Chris.Strettle  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.49   Jul 27 2011 10:08:42   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3sdm.pkb  $
---       Date into PVCS   : $Date:   Jul 06 2011 13:39:44  $
---       Date fetched Out : $Modtime:   Jul 06 2011 13:34:06  $
---       PVCS Version     : $Revision:   2.48  $
+--       Date into PVCS   : $Date:   Jul 27 2011 10:08:42  $
+--       Date fetched Out : $Modtime:   Jul 27 2011 10:04:10  $
+--       PVCS Version     : $Revision:   2.49  $
 --
 --   Author : R.A. Coupe
 --
@@ -21,7 +21,7 @@ AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT VARCHAR2 (2000) := '"$Revision:   2.48  $"';
+   g_body_sccsid     CONSTANT VARCHAR2 (2000) := '"$Revision:   2.49  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT VARCHAR2 (30)   := 'NM3SDM';
@@ -5749,7 +5749,7 @@ end;
       CURSOR c_gty_tab (c_gty_type nm_inv_types.nit_inv_type%TYPE)
       IS
          SELECT nth_theme_id, nth_feature_table, nth_feature_pk_column,
-                nth_feature_fk_column
+                nth_feature_fk_column, 'G' ad_flag
            FROM NM_THEMES_ALL, NM_AREA_THEMES, NM_AREA_TYPES
           WHERE nth_theme_id = nath_nth_theme_id
             AND nath_nat_id = nat_id
@@ -5757,7 +5757,7 @@ end;
             AND nth_update_on_edit = 'I'
          UNION
          SELECT nth_theme_id, nth_feature_table, nth_feature_pk_column,
-                nth_feature_fk_column
+                nth_feature_fk_column, 'I'
            FROM NM_THEMES_ALL, nm_nw_ad_types, nm_inv_themes
           WHERE nth_theme_id = nith_nth_theme_id
             AND nith_nit_id = nad_inv_type
@@ -5771,15 +5771,25 @@ end;
 --  nm_debug.debug('Removing shape of '||p_nm_obj_type||' between '||to_char(p_nm_begin_mp)||
 --    ' and '||to_char(p_nm_end_mp)|| ' on '||nm3net.get_ne_unique( p_nm_ne_id_of ));
       FOR irec IN c_gty_tab (p_nm_obj_type)
-      LOOP
+     LOOP
 --  nm_debug.debug('delete - '||irec.nth_feature_table);
-         del_string :=
+         if irec.ad_flag = 'G' then
+           del_string :=
                'delete from '
             || irec.nth_feature_table
             || ' where ne_id = :ne_id'
             || ' and ne_id_of = :ne_id_of '
             || ' and nm_begin_mp = :ne_begin_mp '
             || ' and start_date = :start_date';
+         else		
+           del_string :=
+               'delete from '
+            || irec.nth_feature_table
+            || ' where ne_id in ( select nad_iit_ne_id from nm_nw_ad_link where nad_ne_id =  :ne_id )'
+            || ' and ne_id_of = :ne_id_of '
+            || ' and nm_begin_mp = :ne_begin_mp '
+            || ' and start_date = :start_date';
+         end if;
 
 --nm_debug.debug( del_string );
          EXECUTE IMMEDIATE del_string
