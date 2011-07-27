@@ -5,11 +5,11 @@ AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.39.1.0   Jun 01 2011 12:22:12   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.39.1.1   Jul 27 2011 09:45:36   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3sdm.pkb  $
---       Date into PVCS   : $Date:   Jun 01 2011 12:22:12  $
---       Date fetched Out : $Modtime:   Jun 01 2011 12:15:04  $
---       PVCS Version     : $Revision:   2.39.1.0  $
+--       Date into PVCS   : $Date:   Jul 27 2011 09:45:36  $
+--       Date fetched Out : $Modtime:   Jul 27 2011 09:43:34  $
+--       PVCS Version     : $Revision:   2.39.1.1  $
 --
 --   Author : R.A. Coupe
 --
@@ -21,7 +21,7 @@ AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT VARCHAR2 (2000) := '"$Revision:   2.39.1.0  $"';
+   g_body_sccsid     CONSTANT VARCHAR2 (2000) := '"$Revision:   2.39.1.1  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT VARCHAR2 (30)   := 'NM3SDM';
@@ -5719,15 +5719,25 @@ end;
 --  nm_debug.debug('Removing shape of '||p_nm_obj_type||' between '||to_char(p_nm_begin_mp)||
 --    ' and '||to_char(p_nm_end_mp)|| ' on '||nm3net.get_ne_unique( p_nm_ne_id_of ));
       FOR irec IN c_gty_tab (p_nm_obj_type)
-      LOOP
+     LOOP
 --  nm_debug.debug('delete - '||irec.nth_feature_table);
-         del_string :=
+         if irec.ad_flag = 'G' then
+           del_string :=
                'delete from '
             || irec.nth_feature_table
             || ' where ne_id = :ne_id'
             || ' and ne_id_of = :ne_id_of '
             || ' and nm_begin_mp = :ne_begin_mp '
             || ' and start_date = :start_date';
+         else		
+           del_string :=
+               'delete from '
+            || irec.nth_feature_table
+            || ' where ne_id in ( select nad_iit_ne_id from nm_nw_ad_link where nad_ne_id =  :ne_id )'
+            || ' and ne_id_of = :ne_id_of '
+            || ' and nm_begin_mp = :ne_begin_mp '
+            || ' and start_date = :start_date';
+         end if;
 
 --nm_debug.debug( del_string );
          EXECUTE IMMEDIATE del_string
@@ -7650,11 +7660,11 @@ end;
    */
    --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.39.1.0   Jun 01 2011 12:22:12   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.39.1.1   Jul 27 2011 09:45:36   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3sdm.pkb  $
---       Date into PVCS   : $Date:   Jun 01 2011 12:22:12  $
---       Date fetched Out : $Modtime:   Jun 01 2011 12:15:04  $
---       PVCS Version     : $Revision:   2.39.1.0  $
+--       Date into PVCS   : $Date:   Jul 27 2011 09:45:36  $
+--       Date fetched Out : $Modtime:   Jul 27 2011 09:43:34  $
+--       PVCS Version     : $Revision:   2.39.1.1  $
 
       append ('--   PVCS Identifiers :-');
       append ('--');
