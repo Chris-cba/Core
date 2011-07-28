@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm3gaz_qry AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3gaz_qry.pkb-arc   2.3.1.0   Mar 10 2011 14:02:42   Ade.Edwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3gaz_qry.pkb-arc   2.3.1.1   Jul 28 2011 13:45:04   steve.cooper  $
 --       Module Name      : $Workfile:   nm3gaz_qry.pkb  $
---       Date into PVCS   : $Date:   Mar 10 2011 14:02:42  $
---       Date fetched Out : $Modtime:   Mar 10 2011 14:00:58  $
---       Version          : $Revision:   2.3.1.0  $
+--       Date into PVCS   : $Date:   Jul 28 2011 13:45:04  $
+--       Date fetched Out : $Modtime:   Jul 28 2011 13:44:10  $
+--       Version          : $Revision:   2.3.1.1  $
 --       Based on SCCS version : 1.45
 -------------------------------------------------------------------------
 --   Author : Jonathan Mills
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3gaz_qry AS
 --all global package variables here
 --
    --g_body_sccsid     CONSTANT  varchar2(2000) := '"@(#)nm3gaz_qry.pkb	1.45 05/26/06"';
-   g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.3.1.0  $';
+   g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.3.1.1  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3gaz_qry';
@@ -758,8 +758,8 @@ BEGIN
        THEN
          append_both (p_ngqt_index,'        AND   '||l_begin_mp_col||' BETWEEN nte.nte_begin_mp AND nte.nte_end_mp');
       ELSE
-         append_both (p_ngqt_index,'        AND   '||l_begin_mp_col||' <= nte.nte_end_mp');
-         append_both (p_ngqt_index,'        AND   '||l_end_mp_col||' >= nte.nte_begin_mp');
+         append_both (p_ngqt_index,'        AND   '||l_begin_mp_col||' < nte.nte_end_mp');
+         append_both (p_ngqt_index,'        AND   '||l_end_mp_col||' > nte.nte_begin_mp');
       END IF;
    ELSE
       IF l_rec_nit.nit_table_name IS NULL
