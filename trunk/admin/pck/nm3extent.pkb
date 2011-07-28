@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3extent IS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3extent.pkb-arc   2.4   May 16 2011 14:44:36   Steve.Cooper  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3extent.pkb-arc   2.5   Jul 28 2011 09:39:36   steve.cooper  $
 --       Module Name      : $Workfile:   nm3extent.pkb  $
---       Date into SCCS   : $Date:   May 16 2011 14:44:36  $
---       Date fetched Out : $Modtime:   May 05 2011 07:47:48  $
---       SCCS Version     : $Revision:   2.4  $
+--       Date into SCCS   : $Date:   Jul 28 2011 09:39:36  $
+--       Date fetched Out : $Modtime:   Jul 28 2011 09:20:28  $
+--       SCCS Version     : $Revision:   2.5  $
 --       Based on 
 --
 --
@@ -22,7 +22,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3extent IS
   g_package_name CONSTANT VARCHAR2(30) := 'nm3extent';
   --
   --g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"@(#)nm3extent.pkb	1.77 05/02/06"';
-  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.4  $';
+  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.5  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
   g_extent_exception EXCEPTION;
@@ -4234,227 +4234,255 @@ END remove_overlaps;
 --
 -----------------------------------------------------------------------------
 -- This assumes that the smallest and largest NTE's have been set
-PROCEDURE nte_intx_nte(pi_smallest_nte   IN OUT NOCOPY tab_nte
-                      ,pi_largest_nte    IN OUT NOCOPY tab_nte
-                      ,po_nte_result     IN OUT NOCOPY tab_nte
-                      ) IS
-  l_nte_from_list t_tab_of_tab_number ;
-  l_of_list Nm3type.tab_number ;
-  l_common_elements Nm3type.tab_number ;
-  l_nte_a NM_NW_TEMP_EXTENTS%ROWTYPE ;
-  l_nte_b NM_NW_TEMP_EXTENTS%ROWTYPE ;
-  l_nte_result NM_NW_TEMP_EXTENTS.nte_job_id%TYPE;
-  l_overlaps_expanded BOOLEAN ;
-  l_of NUMBER ;
+Procedure Nte_Intx_Nte(
+                      pi_Smallest_Nte   In Out Nocopy Tab_Nte,
+                      pi_Largest_Nte    In Out Nocopy Tab_Nte,
+                      po_Nte_Result     In Out Nocopy Tab_Nte
+                      ) 
+Is
+  l_nte_from_list       t_tab_of_tab_number ;
+  l_Of_List             Nm3type.Tab_Number ;
+  l_Common_Elements     Nm3type.Tab_Number ;
+  l_Nte_A               Nm_Nw_Temp_Extents%Rowtype ;
+  l_Nte_B               Nm_Nw_Temp_Extents%Rowtype ;
+  l_Nte_Result          Nm_Nw_Temp_Extents.Nte_Job_Id%Type;
+  l_Overlaps_Expanded   Boolean ;
+  l_Of                  Number ;
+  
+  -- Copy the Parameters so when we call Expand_Overlaps the changed arrays are not passed all the way back out of Nte_Intx_Nte, 
+  --   corrupting the assest and route data. for the next interation
+  l_Smallest_Nte      Tab_Nte :=pi_Smallest_Nte;
+  l_Largest_Nte       Tab_Nte :=pi_Largest_Nte;
+  
   --
-  FUNCTION nte_is_common
-    ( p_nte_1 IN NM_NW_TEMP_EXTENTS%ROWTYPE
-    , p_nte_2 IN NM_NW_TEMP_EXTENTS%ROWTYPE
-    ) RETURN BOOLEAN
-  IS
-  BEGIN
+  --
+  --
+  Function Nte_Is_Common  (
+                          p_Nte_1 In Nm_Nw_Temp_Extents%Rowtype,
+                          p_Nte_2 In Nm_Nw_Temp_Extents%Rowtype
+                          ) Return Boolean
+  Is
+  Begin
     -- We have already checked that the 'of' values are the same
     -- Nodes have been expanded so all we need to worry
     -- about is equality
-    RETURN ( p_nte_1.nte_end_mp = p_nte_2.nte_end_mp
-       AND p_nte_1.nte_begin_mp = p_nte_2.nte_begin_mp ) ;
-  END nte_is_common ;
+    Return  (    p_Nte_1.Nte_End_Mp   = p_Nte_2.Nte_End_Mp
+            And  p_Nte_1.Nte_Begin_Mp = p_Nte_2.Nte_Begin_Mp
+            );
+  End Nte_Is_Common ;
   --
-  PROCEDURE expand_overlaps
-    ( p_nte_1            IN OUT NOCOPY NM_NW_TEMP_EXTENTS%ROWTYPE
-    , p_nte_2            IN OUT NOCOPY NM_NW_TEMP_EXTENTS%ROWTYPE
-    , p_overlap_expanded IN OUT NOCOPY BOOLEAN
-    ) IS
-  l_new_rec_nte NM_NW_TEMP_EXTENTS%ROWTYPE ;
-  BEGIN
+  --
+  --
+  Procedure Expand_Overlaps
+    ( p_Nte_1            In Out Nocopy Nm_Nw_Temp_Extents%Rowtype
+    , p_Nte_2            In Out Nocopy Nm_Nw_Temp_Extents%Rowtype
+    , p_Overlap_Expanded In Out Nocopy Boolean
+    ) Is
+  
+  l_New_Rec_Nte   Nm_Nw_Temp_Extents%Rowtype ;
+  
+  Begin
     -- Code adapted from remove_rec_nte_from_nte
     -- We have already checked that the 'of' values are the same
-    IF    p_nte_1.nte_begin_mp = p_nte_2.nte_begin_mp
-     AND  p_nte_1.nte_end_mp  = p_nte_2.nte_end_mp
-     THEN
-      db('1');
-       RETURN ;
-    ELSIF p_nte_1.nte_end_mp < p_nte_2.nte_begin_mp
-     THEN
-       --
-       -- This placement ends before the start of the chunk to remove
-       --
-      db('2');
-       RETURN ;
-    ELSIF p_nte_1.nte_begin_mp > p_nte_2.nte_end_mp
-     THEN
-       --
-       -- This placement starts after the end of the chunk to remove
-       --
-       RETURN ;
-    ELSE
-       --null ;
-       --
-       -- This placement is affected
-       --
-       l_new_rec_nte     := p_nte_1;
-       --
-       IF p_nte_1.nte_begin_mp < p_nte_2.nte_begin_mp
-       THEN
-          --
-          -- This placement starts before the one to remove
-          --
-          l_new_rec_nte.nte_begin_mp   := p_nte_1.nte_begin_mp;
-          l_new_rec_nte.nte_end_mp     := p_nte_2.nte_begin_mp;
-          db('3');
-       END IF;
-       --
-       IF p_nte_1.nte_end_mp > p_nte_2.nte_end_mp
-       THEN
-          --
-          -- This placement ends after the one to remove
-          --
-          l_new_rec_nte.nte_begin_mp   := p_nte_2.nte_end_mp;
-          l_new_rec_nte.nte_end_mp     := p_nte_1.nte_end_mp;
-          db('4');
-       END IF;
-       --
-       p_nte_1 := l_new_rec_nte ;
-       p_nte_2 := l_new_rec_nte ;
-       p_overlap_expanded := TRUE ;
-      db('5');
-
-     END IF ;
-  END expand_overlaps ;
+    If        p_Nte_1.Nte_Begin_Mp  =   p_Nte_2.Nte_Begin_Mp
+        And   p_Nte_1.Nte_End_Mp    =   p_Nte_2.Nte_End_Mp  Then
+      
+      Db('1');
+      Return ;
+      
+    Elsif   p_Nte_1.Nte_End_Mp  <   p_Nte_2.Nte_Begin_Mp  Then
+      --
+      -- This placement ends before the start of the chunk to remove
+      --
+      Db('2');
+      Return ;
+    
+    Elsif p_Nte_1.Nte_Begin_Mp  >   p_Nte_2.Nte_End_Mp  Then
+      --
+      -- This placement starts after the end of the chunk to remove
+      --
+      Return ;
+    Else
+      --null ;
+      --
+      -- This placement is affected
+      --
+      l_New_Rec_Nte     := p_Nte_1;
+      --
+      If P_Nte_1.Nte_Begin_Mp < P_Nte_2.Nte_Begin_Mp  Then
+        --
+        -- This placement starts before the one to remove
+        --
+        l_New_Rec_Nte.Nte_Begin_Mp   := p_Nte_1.Nte_Begin_Mp;
+        l_New_Rec_Nte.Nte_End_Mp     := p_Nte_2.Nte_Begin_Mp;
+        Db('3');
+      End If;
+      --
+      If P_Nte_1.Nte_End_Mp > P_Nte_2.Nte_End_Mp  Then
+        --
+        -- This placement ends after the one to remove
+        --
+        l_New_Rec_Nte.Nte_Begin_Mp   := p_Nte_2.Nte_End_Mp;
+        l_New_Rec_Nte.Nte_End_Mp     := p_Nte_1.Nte_End_Mp;
+        Db('4');
+      End If;
+      --
+      p_Nte_1             :=  l_New_Rec_Nte ;
+      p_Nte_2             :=  l_New_Rec_Nte ;
+      p_Overlap_Expanded  :=  True ;
+      Db('5');
+    End If ;
+  End Expand_Overlaps ;
+  --
+  --
   -- Debug and unit test harness code
-  PROCEDURE dump_of_list( nam VARCHAR2, l t_tab_of_tab_number ) IS
-    l_of INTEGER ;
-  BEGIN
-   db('dump ' || nam );
-   l_of := l.FIRST ;
-   LOOP
-     EXIT WHEN l_of IS NULL ;
-     FOR i IN 1..l(l_of).COUNT
-     LOOP
-       db('l_of,i,val ' ||l_of  || ',' || i || ',' || l(l_of)(i));
-     END LOOP ;
-     l_of := l.NEXT(l_of) ;
-   END LOOP ;
-   db('dump ' || nam || ' finished ' );
+  Procedure Dump_Of_List  (
+                          Nam   Varchar2, 
+                          L     T_Tab_Of_Tab_Number
+                          )
+  Is
+    l_Of  Integer ;
+  Begin
+    Db('dump ' || Nam );
+    l_Of := L.First ;
+    Loop
+      Exit When l_Of Is Null ;
+      
+      For i In 1..L(l_Of).Count
+      Loop
+        Db('l_of,i,val ' ||l_Of  || ',' || i || ',' || L(l_Of)(i));
+      End Loop ;
+      
+      l_Of := L.Next(l_Of) ;
+      
+    End Loop ;
+    
+    Db('dump ' || Nam || ' finished ' );
+    
+  End Dump_Of_List ;
+  --
+  --
+  --  
+  Procedure Dump_List (
+                      Nam                 Varchar2,
+                      L     In Out Nocopy Tab_Nte
+                      )
+  Is
+  Begin
+    Db('dump ' || Nam );
 
-  END dump_of_list ;
-  PROCEDURE dump_list( nam VARCHAR2, l IN OUT NOCOPY tab_nte ) IS
-  BEGIN
-   db('dump ' || nam );
+    Db('i,NTE_JOB_ID,NTE_NE_ID_OF,NTE_BEGIN_MP,NTE_END_MP,NTE_CARDINALITY,NTE_SEQ_NO,NTE_ROUTE_NE_ID');
+    For i In 1..L.Count
+    Loop
+      Db(i|| ',' ||L(i).Nte_Job_Id||',' ||L(i).Nte_Ne_Id_Of||',' ||L(i).Nte_Begin_Mp||',' ||L(i).Nte_End_Mp||',' ||L(i).Nte_Cardinality||',' ||L(i).Nte_Seq_No||',' ||L(i).Nte_Route_Ne_Id);
+    End Loop ;
 
-   db('i,NTE_JOB_ID,NTE_NE_ID_OF,NTE_BEGIN_MP,NTE_END_MP,NTE_CARDINALITY,NTE_SEQ_NO,NTE_ROUTE_NE_ID');
-   FOR i IN 1..l.COUNT
-   LOOP
-     db(i|| ',' ||l(i).NTE_JOB_ID||',' ||l(i).NTE_NE_ID_OF||',' ||l(i).NTE_BEGIN_MP||',' ||l(i).NTE_END_MP||',' ||l(i).NTE_CARDINALITY||',' ||l(i).NTE_SEQ_NO||',' ||l(i).NTE_ROUTE_NE_ID);
-   END LOOP ;
+    Db('dump ' || Nam || ' finished ' );
 
-   db('dump ' || nam || ' finished ' );
+  End Dump_List ;
+  --
+  --
+  --
+Begin -- main program
+  Nm_Debug.Proc_Start (G_Package_Name,'nte_intx_nte');
+  po_Nte_Result.Delete;
 
-  END dump_list ;
-BEGIN -- main program
-   Nm_Debug.proc_start (g_package_name,'nte_intx_nte');
+  If     l_Smallest_Nte.Count = 0   
+     Or  l_Largest_Nte.Count  = 0   Then
+    Return ;
+  End If ;
 
-   IF pi_smallest_nte.COUNT = 0 OR pi_largest_nte.COUNT = 0
-   THEN
-     RETURN ;
-   END IF ;
+  If l_Smallest_Nte.Count > l_Largest_Nte.Count  Then
+    Raise_Application_Error(-20193,'Smallest and largest NTE tables are the wrong way round - giving up');
+  End If ;
 
-   IF pi_smallest_nte.COUNT > pi_largest_nte.COUNT
-   THEN
-     RAISE_APPLICATION_ERROR(-20193,'Smallest and largest NTE tables are the wrong way round - giving up');
-   END IF ;
+  l_Nte_Result := Nm3net.Get_Next_Nte_Id;
 
-   l_nte_result := Nm3net.get_next_nte_id;
+  -- Pre-process the from list for the larger table
+  -- this will give us a list of lists of the indicies of the nte
+  -- indexed by the 'of' id of each ne
 
-   -- Pre-process the from list for the larger table
-   -- this will give us a list of lists of the indicies of the nte
-   -- indexed by the 'of' id of each ne
+  For i In 1..l_Largest_Nte.Count
+  Loop
+    l_Of := l_Largest_Nte(I).Nte_Ne_Id_Of ;
+    Db( 'processing ' || I || ' l_of = ' || l_Of ) ;
+    If Not L_Nte_From_List.Exists(l_Of) Then
+      l_Nte_From_List(l_Of)(1) := i ;
+    Else
+      l_Nte_From_List(l_Of)(l_Nte_From_List(l_Of).Count+1) := i;
+    End If ;
+  End Loop ;
 
-   FOR i IN 1..pi_largest_nte.COUNT
-   LOOP
-     l_of := pi_largest_nte(i).nte_ne_id_of ;
-     db( 'processing ' || i || ' l_of = ' || l_of ) ;
-     IF NOT l_nte_from_list.EXISTS(l_of)
-     THEN
-       l_nte_from_list(l_of)(1) := i ;
-     ELSE
-       l_nte_from_list(l_of)(l_nte_from_list(l_of).COUNT+1) := i ;
-     END IF ;
-   END LOOP ;
+  Dump_Of_List( 'l_nte_from_list', L_Nte_From_List ) ;
+  Dump_List( 'pi_largest_nte', l_Largest_Nte ) ;
+  Dump_List( 'pi_smallest_nte', l_Smallest_Nte ) ;
 
-   dump_of_list( 'l_nte_from_list', l_nte_from_list ) ;
-   dump_list( 'pi_largest_nte', pi_largest_nte ) ;
-   dump_list( 'pi_smallest_nte', pi_smallest_nte ) ;
+  Db('!');
+  -- return ;
 
-   db('!');
-   -- return ;
+  l_Overlaps_Expanded := True ;
+  -- Keep going around until there are no overlaps to expand
+  -- l_of is being used as a marker to stop infinite loops
+  -- (which should never happen but ...)
+  l_Of := 1 ;
+  While l_Overlaps_Expanded   And   l_Of < 20
+  Loop
+    l_Overlaps_Expanded := False ;
+    For i_Small In 1..l_Smallest_Nte.Count
+    Loop
+      If L_Nte_From_List.Exists(l_Smallest_Nte(i_Small).Nte_Ne_Id_Of)  Then
+        l_Of_List := l_Nte_From_List(l_Smallest_Nte(i_Small).Nte_Ne_Id_Of) ;
+        l_Nte_A := l_Smallest_Nte(i_Small) ;
+        For i_Large In 1..l_Of_List.Count
+        Loop
+          Expand_Overlaps( l_Smallest_Nte(i_Small), l_Largest_Nte( l_Of_List( i_Large ) ), l_Overlaps_Expanded ) ;
+        End Loop ;
+      End If ;
+    End Loop ;
+    l_Of := l_Of + 1 ;
+  End Loop ;
+   
+  Db('l_of is ' || L_Of ) ;
 
-   l_overlaps_expanded := TRUE ;
-   -- Keep going around until there are no overlaps to expand
-   -- l_of is being used as a marker to stop infinite loops
-   -- (which should never happen but ...)
-   l_of := 1 ;
-   WHILE l_overlaps_expanded AND l_of < 20
-   LOOP
-     l_overlaps_expanded := FALSE ;
-     FOR i_small IN 1..pi_smallest_nte.COUNT
-     LOOP
-       IF l_nte_from_list.EXISTS(pi_smallest_nte(i_small).nte_ne_id_of)
-       THEN
-         l_of_list := l_nte_from_list(pi_smallest_nte(i_small).nte_ne_id_of) ;
-         l_nte_a := pi_smallest_nte(i_small) ;
-         FOR i_large IN 1..l_of_list.COUNT
-         LOOP
-           expand_overlaps( pi_smallest_nte(i_small), pi_largest_nte( l_of_list( i_large ) ), l_overlaps_expanded ) ;
-         END LOOP ;
-       END IF ;
-     END LOOP ;
-     l_of := l_of + 1 ;
-   END LOOP ;
-   db('l_of is ' || l_of ) ;
+  -- because overlaps have been expanded then the membership becomes a simple equality test
+  For i_Small In 1..l_Smallest_Nte.Count
+  Loop
+    -- If we have a common 'of' then check to see if it's a true
+    -- intersection
+    Db(1) ;
+    l_Of := l_Smallest_Nte(i_Small).Nte_Ne_Id_Of ;
+    -- Do we have a list of 'of' records for the current nte?
+    If l_Nte_From_List.Exists(l_Of) Then
+      Db(2) ;
+      l_Of_List   :=  l_Nte_From_List(l_Of) ;
+      l_Nte_A     :=  l_Smallest_Nte(i_Small) ;
+      
+      For i_Large In 1..l_Of_List.Count
+      Loop
+        Db('i_large ' || i_Large ) ;
+        -- if an item exists in l_common_elements then we've already
+        -- included it so don't bother including it again
+        If Not l_Common_Elements.Exists(l_Of_List(i_Large)) Then
+          Db('not exists');
+          l_Nte_B := l_Largest_Nte(l_Of_List(i_Large));
+          -- Do the nte's intersect?
+          If Nte_Is_Common(l_Nte_A,l_Nte_B) Then
+            Db('common_nte');
+            Po_Nte_Result(po_Nte_Result.Count+1) :=l_Nte_B ;
+            Po_Nte_Result(po_Nte_Result.Count).Nte_Job_Id := l_Nte_Result;
+            -- This is a marker to say we've already identified this one
+            l_Common_Elements(l_Of_List(i_Large)) := 1 ;
+          End If ;
+        End If ;
+      End Loop ;
+    End If ;
+  End Loop ;
 
-   -- because overlaps have been expanded then the membership becomes a simple equality test
-   FOR i_small IN 1..pi_smallest_nte.COUNT
-   LOOP
-     -- If we have a common 'of' then check to see if it's a true
-     -- intersection
-     db(1) ;
-     l_of := pi_smallest_nte(i_small).nte_ne_id_of ;
-     -- Do we have a list of 'of' records for the current nte?
-     IF l_nte_from_list.EXISTS(l_of)
-     THEN
-       db(2) ;
-       l_of_list := l_nte_from_list(l_of) ;
-       l_nte_a := pi_smallest_nte(i_small) ;
-       FOR i_large IN 1..l_of_list.COUNT
-       LOOP
-         db('i_large ' || i_large ) ;
-         -- if an item exists in l_common_elements then we've already
-         -- included it so don't bother including it again
-         IF NOT l_common_elements.EXISTS(l_of_list(i_large))
-         THEN
-           db('not exists');
-           l_nte_b := pi_largest_nte(l_of_list(i_large));
-           -- Do the nte's intersect?
-           IF nte_is_common(l_nte_a,l_nte_b)
-           THEN
-             db('common_nte');
-             po_nte_result(po_nte_result.COUNT+1) := l_nte_b ;
-             po_nte_result(po_nte_result.COUNT).nte_job_id := l_nte_result;
-             -- This is a marker to say we've already identified this one
-             l_common_elements(l_of_list(i_large)) := 1 ;
-           END IF ;
-         END IF ;
+  --
+  Nm_Debug.Proc_End (G_Package_Name,'nte_intx_nte');
+  --
 
-       END LOOP ;
-     END IF ;
-   END LOOP ;
-
-   --
-   Nm_Debug.proc_end (g_package_name,'nte_intx_nte');
-   --
-
-END nte_intx_nte ;
+End Nte_Intx_Nte ;
 --
 -----------------------------------------------------------------------------
 --
