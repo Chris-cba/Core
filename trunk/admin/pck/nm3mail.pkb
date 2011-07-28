@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY nm3mail AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mail.pkb-arc   2.12   May 25 2011 09:05:16   Steve.Cooper  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mail.pkb-arc   2.13   Jul 28 2011 16:07:48   Ade.Edwards  $
 --       Module Name      : $Workfile:   nm3mail.pkb  $
---       Date into PVCS   : $Date:   May 25 2011 09:05:16  $
---       Date fetched Out : $Modtime:   May 25 2011 08:45:10  $
---       Version          : $Revision:   2.12  $
+--       Date into PVCS   : $Date:   Jul 28 2011 16:07:48  $
+--       Date fetched Out : $Modtime:   Jul 28 2011 16:00:40  $
+--       Version          : $Revision:   2.13  $
 --       Based on SCCS version : 1.12
 -------------------------------------------------------------------------
 --   Author : Jonathan Mills
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3mail AS
 --
 --all global package variables here
 --
-  g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.12  $';
+  g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.13  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3mail';
@@ -219,7 +219,11 @@ BEGIN
    --nm_debug.debug('   utl_smtp.open_data (g_mail_conn);');
    utl_smtp.open_data (g_mail_conn);
 --
-   write_data('Date:' || TO_CHAR(p_rec_nmm.nmm_date_created, 'dd Mon yyyy hh24:mi:ss'));
+-- Task 0111359
+-- Use systimestamp to get around DST problems
+--   write_data('Date:' || TO_CHAR(p_rec_nmm.nmm_date_created, 'dd Mon yyyy hh24:mi:ss'));
+   write_data('Date:' || TO_CHAR(systimestamp, 'dd Mon yyyy hh24:mi:ss tzhtzm'));
+--
    write_data('Subject:' || p_rec_nmm.nmm_subject);
    write_data('From:' || l_sender_full);
 --
@@ -282,8 +286,11 @@ BEGIN
    --nm_debug.debug('   utl_smtp.close_data (g_mail_conn);');
    utl_smtp.close_data (g_mail_conn);
    utl_smtp.quit(g_mail_conn);
---
-   p_rec_nmm.nmm_status := 'Sent '||TO_CHAR(SYSDATE,'DD Mon YYYY HH24:MI:SS');
+
+-- Task 0111359
+-- Use systimestamp to get around DST problems
+--   p_rec_nmm.nmm_status := 'Sent '||TO_CHAR(SYSDATE,'DD Mon YYYY HH24:MI:SS');
+   p_rec_nmm.nmm_status := 'Sent '||TO_CHAR(systimestamp, 'DD Mon YYYY hh24:mi:ss tzhtzm');
 --
    --nm_debug.proc_end(g_package_name,'send_individual');
 --
