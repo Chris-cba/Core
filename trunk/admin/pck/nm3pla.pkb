@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3pla AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3pla.pkb-arc   2.7   Aug 12 2011 11:31:10   Rob.Coupe  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3pla.pkb-arc   2.8   Aug 12 2011 12:44:56   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3pla.pkb  $
---       Date into PVCS   : $Date:   Aug 12 2011 11:31:10  $
---       Date fetched Out : $Modtime:   Aug 12 2011 11:28:58  $
---       Version          : $Revision:   2.7  $
+--       Date into PVCS   : $Date:   Aug 12 2011 12:44:56  $
+--       Date fetched Out : $Modtime:   Aug 12 2011 12:34:12  $
+--       Version          : $Revision:   2.8  $
 --       Based on SCCS version : 1.61
 ------------------------------------------------------------------------
 --
@@ -19,7 +19,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3pla AS
 -------------------------------------------------------------------------------------------
 -- Global variables - tree definitions etc.
    --g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"@(#)nm3pla.pkb	1.61 11/29/06"';
-   g_body_sccsid     CONSTANT varchar2(2000) := '$Revision:   2.7  $';
+   g_body_sccsid     CONSTANT varchar2(2000) := '$Revision:   2.8  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT VARCHAR2(30) := 'nm3pla';
@@ -74,6 +74,19 @@ g_pla_exc_msg     VARCHAR2(2000) := 'Unspecified exception within NM3PLA';
 --------------------------------------------------------------------------------------------------------------------
 --
 FUNCTION local_connected_chunks RETURN nm_placement_array;
+--
+-------------------------------------------------------------------------------------------
+--
+
+FUNCTION partial_chunk_connectivity(rvrs IN BOOLEAN,
+                             p1 IN NUMBER,
+                             d1 in integer,
+                             p2 IN NUMBER,
+                             d2 in integer,
+                             s1 IN NUMBER,
+                             e1 IN NUMBER,
+                             s2 IN NUMBER,
+                             e2 IN NUMBER  ) RETURN integer;
 --
 -------------------------------------------------------------------------------------------
 --
@@ -2413,12 +2426,12 @@ BEGIN
 --
 
           IF partial_chunk_connectivity(rvrs,
-	                                      l_prior_ne,
+	                                    l_prior_ne,
                                         TO_NUMBER(pi_iof_tab(l_i)),
-								                        l_prior_begin,
+								        l_prior_begin,
                                         l_prior_end,
-                      								  TO_NUMBER(pi_ibegin_tab(l_i)),
-                      								  TO_NUMBER(pi_iend_tab(l_i)))
+                      					TO_NUMBER(pi_ibegin_tab(l_i)),
+                      					TO_NUMBER(pi_iend_tab(l_i)))
           THEN
 --          make sure that the end meausre of the prior chunk is the end of the element and that the
 --          start measure of the current chunk is zero. Otherwise they are not connected.
@@ -2597,7 +2610,7 @@ BEGIN
     ORDER BY
       r.nm_obj_type,
       r.nm_ne_id_in,
-      r.nm_seq_no;
+      r.nm_seq_no,  i.nm_begin_mp * r.nm_cardinality;
 
     l_retval := get_connected_chunks_internal(pi_iof_tab    => l_iof_tab
                                              ,pi_ibegin_tab => l_ibegin_tab
@@ -2706,7 +2719,8 @@ BEGIN
   ORDER BY
     r.nm_obj_type,
     r.nm_ne_id_in,
-    r.nm_seq_no;
+    r.nm_seq_no,
+	i.nte_begin_mp;
 
   l_retval := get_connected_chunks_internal(pi_iof_tab    => l_iof_tab
                                            ,pi_ibegin_tab => l_ibegin_tab
@@ -2867,11 +2881,10 @@ l_retval BOOLEAN;
 
 BEGIN
 
-   l_retval := Nm3pla.partial_chunk_connectivity ( TRUE,
-	 p_pl_1.pl_ne_id, p_pl_2.pl_ne_id,
-	 p_pl_1.pl_start, p_pl_1.pl_end,
-	 p_pl_2.pl_start, p_pl_2.pl_end );
-
+   l_retval := partial_chunk_connectivity ( TRUE,
+	                                        p_pl_1.pl_ne_id, p_pl_2.pl_ne_id,
+	                                        p_pl_1.pl_start, p_pl_1.pl_end,
+	                                        p_pl_2.pl_start, p_pl_2.pl_end );
    RETURN l_retval;
 --
 END are_placements_connected;
@@ -3365,6 +3378,63 @@ END IF;
   RETURN retval;
 END;
 --
+FUNCTION partial_chunk_connectivity(rvrs IN BOOLEAN,
+                             p1 IN NUMBER,
+                             d1 in integer,
+                             p2 IN NUMBER,
+                             d2 in integer,
+                             s1 IN NUMBER,
+                             e1 IN NUMBER,
+                             s2 IN NUMBER,
+                             e2 IN NUMBER  ) RETURN integer IS
+
+
+cursor c_connectivity ( c_ne_1 nm_elements.ne_id%TYPE,
+            c_ne_2 nm_elements.ne_id%TYPE,
+            d1 in integer,
+            d2 in integer,
+            s1 in number,
+            e1 in number,
+            s2 in number,
+            e2 in number ) is 
+select 1 from 
+(
+select t.*,
+  case e1dir
+    when 1 then s1
+    else   e1
+    end ep1,
+  case e2dir
+    when 1 then s2
+    else   e2
+    end ep2
+from (     
+     SELECT Nm3net.get_type_sign( a1.nnu_node_type ) e1dir,
+            Nm3net.get_type_sign( a2.nnu_node_type ) e2dir, 
+            a1.nnu_chain n1m, a2.nnu_chain n2m
+     FROM nm_node_usages a1, nm_node_usages a2
+     WHERE a1.nnu_ne_id = c_ne_1
+     AND   a2.nnu_ne_id = c_ne_2
+     AND   a1.nnu_no_node_id = a2.nnu_no_node_id ) t )
+--where  (e1dir * d1 ) = (e2dir * d2 )
+where e2dir * d2 > 0
+and n1m = ep1
+and n2m = ep2;      
+
+retval integer := 0;
+
+BEGIN
+
+  open c_connectivity(p1, p2, d1, d2, s1, e1, s2, e2);
+  fetch c_connectivity into retval;
+  if c_connectivity%notfound then
+    retval := 0;
+  end if;
+  close c_connectivity;
+  return retval;
+end;  
+--
+
 FUNCTION partial_chunk_connectivity( rvrs IN BOOLEAN,
                              p1 IN NUMBER,
                              p2 IN NUMBER,
