@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3pla AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3pla.pkb-arc   2.6   Jun 09 2011 11:35:16   Rob.Coupe  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3pla.pkb-arc   2.7   Aug 12 2011 11:31:10   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3pla.pkb  $
---       Date into PVCS   : $Date:   Jun 09 2011 11:35:16  $
---       Date fetched Out : $Modtime:   Jun 09 2011 11:34:20  $
---       Version          : $Revision:   2.6  $
+--       Date into PVCS   : $Date:   Aug 12 2011 11:31:10  $
+--       Date fetched Out : $Modtime:   Aug 12 2011 11:28:58  $
+--       Version          : $Revision:   2.7  $
 --       Based on SCCS version : 1.61
 ------------------------------------------------------------------------
 --
@@ -19,7 +19,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3pla AS
 -------------------------------------------------------------------------------------------
 -- Global variables - tree definitions etc.
    --g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"@(#)nm3pla.pkb	1.61 11/29/06"';
-   g_body_sccsid     CONSTANT varchar2(2000) := '$Revision:   2.6  $';
+   g_body_sccsid     CONSTANT varchar2(2000) := '$Revision:   2.7  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT VARCHAR2(30) := 'nm3pla';
@@ -721,12 +721,13 @@ l_p_unit    NUMBER := Nm3net.get_nt_units( p_type );
 l_c_unit    NUMBER;
 
 CURSOR c1( c_ne_id NUMBER, c_type VARCHAR2) IS
-  SELECT nm_ne_id_in, nm_slk, nm_cardinality, s.ne_no_start, s.ne_no_end, s.ne_nt_type
+  SELECT nm_ne_id_in, nm_slk, nm_cardinality, s.ne_no_start, s.ne_no_end, s.ne_nt_type, s.ne_length
   FROM nm_members, nm_elements r, nm_elements s
   WHERE nm_ne_id_of = c_ne_id
   AND   s.ne_id = c_ne_id
   AND   r.ne_nt_type = c_type
-  AND   r.ne_id  = nm_ne_id_in;
+  AND   r.ne_id  = nm_ne_id_in
+  order by r.ne_id;
 
 l_ne_id_of     NUMBER;
 l_ne_id_in1    NUMBER;
@@ -735,6 +736,8 @@ l_cardinality1 NUMBER;
 l_st_node1     NUMBER;
 l_end_node1    NUMBER;
 l_nt_type1     VARCHAR2(4);
+l_length1    number;
+
 
 l_ne_id_in2    NUMBER;
 l_slk2         NUMBER;
@@ -742,16 +745,16 @@ l_cardinality2 NUMBER;
 l_st_node2     NUMBER;
 l_end_node2    NUMBER;
 l_nt_type2     VARCHAR2(4);
-
+l_length2    number;
 l_connected BOOLEAN := FALSE;
 
 l_pl_index NUMBER := 1;
 
 BEGIN
---nm_debug.debug_on;
+--  nm_debug.debug_on;
   Nm_Debug.proc_start(g_package_name,'get_super_placement');
-  l_pl       := initialise_placement;          --nm_placement(null, null, null, null);
-  l_pl_array := initialise_placement_array;
+  l_pl       := nm3pla.initialise_placement;          --nm_placement(null, null, null, null);
+  l_pl_array := nm3pla.initialise_placement_array;
 
   FOR ip IN 1..p_pl_array.placement_count LOOP
 
@@ -763,7 +766,7 @@ BEGIN
 --    This is only valid for exclusive set types.
 
       OPEN c1 (l_ne_id_of, p_type);
-      FETCH c1 INTO l_ne_id_in1, l_slk1, l_cardinality1, l_st_node1, l_end_node1, l_nt_type1;
+      FETCH c1 INTO l_ne_id_in1, l_slk1, l_cardinality1, l_st_node1, l_end_node1, l_nt_type1, l_length1;
       IF c1%NOTFOUND THEN
         CLOSE c1;
         RAISE_APPLICATION_ERROR( -20001, 'First element of placement is not included in a set of this type' );
@@ -772,13 +775,19 @@ BEGIN
 --
       l_c_unit := Nm3net.get_nt_units( l_nt_type1 );
 
-      l_st  := l_slk1 + Nm3unit.convert_unit( l_c_unit, l_p_unit, p_pl_array.npa_placement_array(ip).pl_start );
-      l_end := l_slk1 +  Nm3unit.convert_unit( l_c_unit, l_p_unit, p_pl_array.npa_placement_array(ip).pl_end  );
+      if l_cardinality1 > 0 then
+        l_st  := l_slk1  + Nm3unit.convert_unit( l_c_unit, l_p_unit, p_pl_array.npa_placement_array(ip).pl_start );
+        l_end := l_slk1 +  Nm3unit.convert_unit( l_c_unit, l_p_unit, p_pl_array.npa_placement_array(ip).pl_end  );
+      else
+        l_st  := l_slk1 + Nm3unit.convert_unit( l_c_unit, l_p_unit, l_length1 - p_pl_array.npa_placement_array(ip).pl_end );
+        l_end := l_slk1 +  Nm3unit.convert_unit( l_c_unit, l_p_unit, l_length1 -  p_pl_array.npa_placement_array(ip).pl_start  );
+      end if;
+            
       l_measure := 0;
 
       l_pl := nm_placement( l_ne_id_in1, l_st, l_end, l_measure );
 
---    dbms_output.put_line( 'First array element ar start = '||to_char( l_ne_id_in1 )||','||to_char(l_st)||
+--     nm_debug.debug( 'First array element ar start = '||to_char( l_ne_id_in1 )||','||to_char(l_st)||
 --                          ','||to_char(l_end)||','||to_char(l_measure));
 
 --
@@ -789,7 +798,7 @@ BEGIN
 --    placement element.
 
       OPEN c1 ( l_ne_id_of, p_type);
-      FETCH c1 INTO l_ne_id_in2, l_slk2, l_cardinality2, l_st_node2, l_end_node2, l_nt_type2;
+      FETCH c1 INTO l_ne_id_in2, l_slk2, l_cardinality2, l_st_node2, l_end_node2, l_nt_type2, l_length2;
       IF c1%NOTFOUND THEN
         CLOSE c1;
         RAISE_APPLICATION_ERROR( -20001, 'Element '||TO_CHAR(ip)||' of placement is not included in a set of this type' );
@@ -832,26 +841,63 @@ BEGIN
 --
 --        extend placement
 --
-          l_end := l_slk2 +  Nm3unit.convert_unit( l_c_unit, l_p_unit, p_pl_array.npa_placement_array(ip).pl_end  );
+          l_end := l_slk2 +  Nm3unit.convert_unit( l_c_unit, l_p_unit, p_pl_array.npa_placement_array(ip).pl_end - p_pl_array.npa_placement_array(ip).pl_start  );
 
           l_pl := nm_placement( l_ne_id_in1, l_st, l_end, l_measure );
---        dbms_output.put_line( 'Connected - array element = '||to_char( l_ne_id_in1 )||','||to_char(l_st)||
+--        nm_debug.debug( 'Connected - array element = '||to_char( l_ne_id_in1 )||','||to_char(l_st)||0||
 --                              ','||to_char(l_end)||','||to_char(l_measure));
 
         ELSE
 
 --
---        start new placement
+          nm_debug.debug('start new placement');
 --
-          NULL;
+          if l_pl_array.npa_placement_array.count < l_pl_index then
+          
+             l_pl_array.npa_placement_array.extend;
+
+          end if;
+          
+          l_pl_array.npa_placement_array( l_pl_index ) := l_pl;
+        
+          l_pl_index := l_pl_index + 1;
+        
+          if l_cardinality1 > 0 then
+            l_st  := l_slk2  + Nm3unit.convert_unit( l_c_unit, l_p_unit, p_pl_array.npa_placement_array(ip).pl_start );
+            l_end := l_slk2 +  Nm3unit.convert_unit( l_c_unit, l_p_unit, p_pl_array.npa_placement_array(ip).pl_end  );
+          else
+            l_st  := l_slk2 + Nm3unit.convert_unit( l_c_unit, l_p_unit, l_length2 - p_pl_array.npa_placement_array(ip).pl_end );
+            l_end := l_slk2+  Nm3unit.convert_unit( l_c_unit, l_p_unit, l_length2 -  p_pl_array.npa_placement_array(ip).pl_start  );
+         end if;
+
+          l_pl := nm_placement( l_ne_id_in2, l_st, l_end, l_measure );
 --
         END IF;
       ELSE
 --
---      loss of connectivity - start a new array element.
+          if l_pl_array.npa_placement_array.count < l_pl_index then
+          
+             l_pl_array.npa_placement_array.extend;
+
+          end if;
+
+          l_pl_array.npa_placement_array( l_pl_index ) := l_pl;
+        
+          l_pl_index := l_pl_index + 1;
+        
+           if l_cardinality1 > 0 then
+             l_st  := l_slk2  + Nm3unit.convert_unit( l_c_unit, l_p_unit, p_pl_array.npa_placement_array(ip).pl_start );
+             l_end := l_slk2 +  Nm3unit.convert_unit( l_c_unit, l_p_unit, p_pl_array.npa_placement_array(ip).pl_end  );
+           else
+             l_st  := l_slk2 + Nm3unit.convert_unit( l_c_unit, l_p_unit, l_length2 - p_pl_array.npa_placement_array(ip).pl_end );
+             l_end := l_slk2 +  Nm3unit.convert_unit( l_c_unit, l_p_unit, l_length2 -  p_pl_array.npa_placement_array(ip).pl_start  );
+          end if;
+
+          l_pl := nm_placement( l_ne_id_in2, l_st, l_end, l_measure );
+
+--      nm_debug.debug('loss of connectivity - start a new array element');
 --
-        NULL;
-        l_pl_array.npa_placement_array( l_pl_index ) := l_pl;
+        
       END IF;
     END IF;
 
@@ -864,18 +910,27 @@ BEGIN
       l_cardinality1 := l_cardinality2;
       l_st_node1     := l_st_node2;
       l_end_node1    := l_end_node2;
+      l_length1     := l_length2;
     END IF;
 --
   END LOOP;
 --
 --if we are here, we have to set the last element of the array.
 --
+  if l_pl_array.npa_placement_array.count < l_pl_index then
+          
+     l_pl_array.npa_placement_array.extend;
+
+  end if;
+
+
   l_pl_array.npa_placement_array( l_pl_index ) := l_pl;
 --
   Nm_Debug.proc_end(g_package_name,'get_super_placement');
   RETURN l_pl_array;
 --
 END;
+--
 --
 -------------------------------------------------------------------------------------------
 --
