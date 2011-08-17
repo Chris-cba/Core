@@ -4,11 +4,11 @@ IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3undo.pkb-arc   2.15   Jul 05 2011 14:40:26   Chris.Strettle  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3undo.pkb-arc   2.16   Aug 17 2011 11:01:08   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3undo.pkb  $
---       Date into PVCS   : $Date:   Jul 05 2011 14:40:26  $
---       Date fetched Out : $Modtime:   Jul 05 2011 14:34:52  $
---       PVCS Version     : $Revision:   2.15  $
+--       Date into PVCS   : $Date:   Aug 17 2011 11:01:08  $
+--       Date fetched Out : $Modtime:   Aug 17 2011 11:00:26  $
+--       PVCS Version     : $Revision:   2.16  $
 --
 --   Author : ITurnbull
 --
@@ -19,7 +19,7 @@ IS
 -- Copyright (c) exor corporation ltd, 2004
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '"$Revision:   2.15  $"';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '"$Revision:   2.16  $"';
 --  g_body_sccsid is the SCCS ID for the package body
    g_package_name   CONSTANT VARCHAR2 (2000) := 'nm3undo';
 --
@@ -1389,6 +1389,22 @@ END undo_scheme;
                                      );
             END IF;
 
+            error_loc := 1031 ;
+
+            -- unclose any nodes that underpin the elements.
+
+            UPDATE NM_NODES_ALL
+               SET no_end_date = NULL
+             WHERE no_node_id in ( select ne_no_start
+                                   from nm_elements_all
+                                   where ne_id in (pi_ne_id_1, pi_ne_id_2)
+                                   union
+                                   select ne_no_end
+                                   from nm_elements_all
+                                   where ne_id in (pi_ne_id_1, pi_ne_id_2)
+                                 );
+
+
             error_loc := 103 ;
             -- unclose nm_elements
             UPDATE NM_ELEMENTS_ALL
@@ -1951,7 +1967,19 @@ END undo_scheme;
             NULL;
       END;
 --
---  unclose element
+--    unclose any nodes that underpin the elements.
+
+      UPDATE NM_NODES_ALL
+           SET no_end_date = NULL
+        WHERE no_node_id in ( select ne_no_start
+                               from nm_elements_all
+                               where ne_id = p_ne_id
+                               union
+                               select ne_no_end
+                               from nm_elements_all
+                               where ne_id = p_ne_id
+                             );
+--   unclose element
       UPDATE nm_elements_all
          SET ne_end_date = NULL
        WHERE ne_id = p_ne_id;
