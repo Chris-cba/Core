@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.38.1.3   Jul 18 2011 15:32:22   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.38.1.4   Aug 18 2011 15:33:34   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3bulk_mrg.pkb  $
---       Date into PVCS   : $Date:   Jul 18 2011 15:32:22  $
---       Date fetched Out : $Modtime:   Jul 18 2011 15:19:16  $
---       PVCS Version     : $Revision:   2.38.1.3  $
+--       Date into PVCS   : $Date:   Aug 18 2011 15:33:34  $
+--       Date fetched Out : $Modtime:   Aug 18 2011 15:31:58  $
+--       PVCS Version     : $Revision:   2.38.1.4  $
 --
 --
 --   Author : Priidu Tanava
@@ -124,7 +124,7 @@ No query types defined.
         add nm_route_connect_tmp_ordered view with the next schema change
         in nm3dynsql replace the use of nm3sql.set_context_value() with that of nm3ctx
 */
-  g_body_sccsid     constant  varchar2(40)  :='"$Revision:   2.38.1.3  $"';
+  g_body_sccsid     constant  varchar2(40)  :='"$Revision:   2.38.1.4  $"';
   g_package_name    constant  varchar2(30)  := 'nm3bulk_mrg';
 
   cr  constant varchar2(1) := chr(10);
@@ -462,7 +462,6 @@ No query types defined.
         ||cr||' ( m.nm_begin_mp = m.nm_end_mp and x.begin_mp = x.end_mp and m.nm_begin_mp = x.begin_mp ) OR '
         ||cr||' ( m.nm_end_mp > x.begin_mp and m.nm_begin_mp < x.end_mp ) '
         ||cr||' ) ';
-        ||cr||'    )';
       l_union_all := cr||'union all';
 
     end if;
