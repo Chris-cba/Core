@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3lrs.pkb-arc   2.5   Jul 01 2010 12:13:10   lsorathia  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3lrs.pkb-arc   2.6   Aug 19 2011 16:45:02   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3lrs.pkb  $
---       Date into PVCS   : $Date:   Jul 01 2010 12:13:10  $
---       Date fetched Out : $Modtime:   Jul 01 2010 12:02:20  $
---       Version          : $Revision:   2.5  $
+--       Date into PVCS   : $Date:   Aug 19 2011 16:45:02  $
+--       Date fetched Out : $Modtime:   Aug 19 2011 16:39:18  $
+--       Version          : $Revision:   2.6  $
 --       Based on SCCS version : 1.45
 -------------------------------------------------------------------------
 --   Author : Rob Coupe
@@ -18,7 +18,7 @@ AS
 --	Copyright (c) exor corporation ltd, 2000
 -----------------------------------------------------------------------------
    --g_body_sccsid     CONSTANT  varchar2(2000) := '"@(#)nm3lrs.pkb	1.45 09/25/06"';
-   g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.5  $';
+   g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.6  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3lrs';
@@ -397,13 +397,24 @@ FUNCTION get_datum_offset( p_parent_lr IN nm_lref ) RETURN nm_lref IS
 --
    l_offset       number;
    l_ne_id        number;
+   
+   l_ne_row       nm_elements%rowtype;
 --
+   retval         nm_lref;
 BEGIN
 --
-   l_parent_units := nm3net.get_nt_units_from_ne (p_parent_lr.lr_ne_id);
---
-   BEGIN
-      SELECT nm_ne_id_of
+   l_ne_row       := nm3get.get_ne(p_parent_lr.lr_ne_id);
+   
+   if NM3NET.IS_NT_DATUM( l_ne_row.ne_nt_type ) = 'Y' then
+   
+      retval := p_parent_lr;  -- return self;
+      
+   else
+   
+     l_parent_units := nm3net.get_nt_units (l_ne_row.ne_nt_type );
+
+     BEGIN
+       SELECT nm_ne_id_of
             ,DECODE(nm_cardinality
                    ,1,child_offset + nm_begin_mp
                    ,nm_end_mp - child_offset
@@ -427,22 +438,26 @@ BEGIN
               AND   nm_ne_id_of = ne_id
               AND   ne_nt_type  = nt_type
             );
-   EXCEPTION
-      WHEN no_data_found
+     EXCEPTION
+       WHEN no_data_found
        THEN -- No translation for linear reference
          hig.raise_ner (pi_appl    => nm3type.c_net
                        ,pi_id      => 85
                        ,pi_sqlcode => -20001
                        );
-      WHEN too_many_rows
+       WHEN too_many_rows
        THEN -- Ambiguous linear reference
          hig.raise_ner (pi_appl    => nm3type.c_net
                        ,pi_id      => 312
                        ,pi_sqlcode => -20002
                        );
-   END;
+     END;
+   
+     retval := nm_lref(l_ne_id,l_offset);
+  
+   END IF;
 --
-   RETURN nm_lref(l_ne_id,l_offset);
+   RETURN retval; 
 --
 END get_datum_offset;
 --
