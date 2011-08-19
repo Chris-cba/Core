@@ -2,11 +2,11 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm_4200_fix50.sql-arc   3.0   Aug 18 2011 12:30:54   Mike.Alexander  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm_4200_fix50.sql-arc   3.1   Aug 19 2011 09:53:22   Mike.Alexander  $
 --       Module Name      : $Workfile:   nm_4200_fix50.sql  $
---       Date into PVCS   : $Date:   Aug 18 2011 12:30:54  $
---       Date fetched Out : $Modtime:   Aug 18 2011 12:29:32  $
---       PVCS Version     : $Revision:   3.0  $
+--       Date into PVCS   : $Date:   Aug 19 2011 09:53:22  $
+--       Date fetched Out : $Modtime:   Aug 19 2011 09:52:30  $
+--       PVCS Version     : $Revision:   3.1  $
 --
 --------------------------------------------------------------------------------
 --   Copyright (c) exor corporation ltd, 2011
@@ -92,7 +92,7 @@ SET TERM ON
 PROMPT log_nm_4200_fix50.sql 
 --
 SET FEEDBACK ON
-start log_nm_4200_fix49.sql
+start log_nm_4200_fix50.sql
 SET FEEDBACK OFF
 SPOOL OFF
 EXIT
