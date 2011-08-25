@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3ddl AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ddl.pkb-arc   2.19   May 16 2011 14:44:10   Steve.Cooper  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ddl.pkb-arc   2.20   Aug 25 2011 14:39:58   Ade.Edwards  $
 --       Module Name      : $Workfile:   nm3ddl.pkb  $
---       Date into PVCS   : $Date:   May 16 2011 14:44:10  $
---       Date fetched Out : $Modtime:   Apr 01 2011 16:11:38  $
---       PVCS Version     : $Revision:   2.19  $
+--       Date into PVCS   : $Date:   Aug 25 2011 14:39:58  $
+--       Date fetched Out : $Modtime:   Aug 25 2011 14:39:44  $
+--       PVCS Version     : $Revision:   2.20  $
 --       Based on SCCS Version     : 1.5
 --
 --
@@ -23,7 +23,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3ddl AS
 --
 --all global package variables here
 --
-   g_body_sccsid     constant varchar2(30) :='"$Revision:   2.19  $"';
+   g_body_sccsid     constant varchar2(30) :='"$Revision:   2.20  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3ddl';
@@ -808,10 +808,11 @@ PROCEDURE change_user_password(pi_user       IN VARCHAR2
                               ,pi_new_passwd IN VARCHAR2
                               ) IS
 BEGIN
-  exec_ddl('ALTER USER ' || pi_user || ' IDENTIFIED BY "' || pi_new_passwd||'"');
   --
-  -- Task 0110737
+  -- Task 0111425
   -- Create mcp password metadata
+  -- Ammended to occur before the password is changed as the Form HIG1833 does not 
+  -- issue a commit before exiting.
   --
   IF hig.is_product_licensed('MCP')
   THEN
@@ -825,6 +826,8 @@ BEGIN
       WHEN OTHERS THEN NULL;
     END;
   END IF;
+--
+  exec_ddl('ALTER USER ' || pi_user || ' IDENTIFIED BY "' || pi_new_passwd||'"');
 --
 END;
 --
