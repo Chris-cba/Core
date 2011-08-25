@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY nm3mail AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mail.pkb-arc   2.7.1.2   Aug 17 2011 11:26:00   Rob.Coupe  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mail.pkb-arc   2.7.1.3   Aug 25 2011 10:56:24   Ade.Edwards  $
 --       Module Name      : $Workfile:   nm3mail.pkb  $
---       Date into PVCS   : $Date:   Aug 17 2011 11:26:00  $
---       Date fetched Out : $Modtime:   Aug 17 2011 11:25:18  $
---       Version          : $Revision:   2.7.1.2  $
+--       Date into PVCS   : $Date:   Aug 25 2011 10:56:24  $
+--       Date fetched Out : $Modtime:   Aug 25 2011 10:53:18  $
+--       Version          : $Revision:   2.7.1.3  $
 --       Based on SCCS version : 1.12
 -------------------------------------------------------------------------
 --   Author : Jonathan Mills
@@ -15,12 +15,12 @@ CREATE OR REPLACE PACKAGE BODY nm3mail AS
 --   nm3mail package
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2002
+-- Copyright (c) exor corporation ltd, 2002
 -----------------------------------------------------------------------------
 --
 --all global package variables here
 --
-  g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.7.1.2  $';
+  g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.7.1.3  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3mail';
@@ -45,6 +45,14 @@ PROCEDURE send_individual (p_rec_nmm IN OUT nm_mail_message%ROWTYPE);
 ----------------------------------------------------------------------------------------
 --
 PROCEDURE write_data (p_text     IN varchar2,p_crlf boolean DEFAULT TRUE);
+
+PROCEDURE quit ( pi_connection IN OUT utl_smtp.connection )
+IS
+BEGIN
+  utl_smtp.quit(pi_connection);
+EXCEPTION
+  WHEN OTHERS THEN NULL;
+END quit;
 --
 -----------------------------------------------------------------------------
 --
@@ -111,7 +119,7 @@ BEGIN
    IF l_open_connection
     THEN
       --nm_debug.debug('Closing connection');
-      utl_smtp.quit(g_mail_conn);
+      quit(g_mail_conn);
       l_open_connection := FALSE;
       --nm_debug.debug('Connection closed');
    END IF;
@@ -120,8 +128,13 @@ BEGIN
 --
 EXCEPTION
   WHEN OTHERS
-  THEN utl_smtp.quit(g_mail_conn);
-       RAISE;
+  THEN
+    IF l_open_connection
+    THEN 
+      quit(g_mail_conn);
+      l_open_connection := FALSE;
+    END IF;
+    RAISE;
 END send_stored_mail;
 --
 -----------------------------------------------------------------------------
@@ -278,7 +291,7 @@ BEGIN
 --
    --nm_debug.debug('   utl_smtp.close_data (g_mail_conn);');
    utl_smtp.close_data (g_mail_conn);
-   utl_smtp.quit(g_mail_conn);
+   quit(g_mail_conn);
 --
 -- Task 0111408
 -- Use systimestamp to get around DST problems
@@ -774,7 +787,7 @@ BEGIN
              ||CHR(10)||'--'
              ||CHR(10)||'--   SCCS Identifiers :-'
              ||CHR(10)||'--'
-             ||CHR(10)||'--       sccsid           : @(#)nm3mail.pkb	1.12 01/05/05'
+             ||CHR(10)||'--       sccsid           : @(#)nm3mail.pkb 1.12 01/05/05'
              ||CHR(10)||'--       Module Name      : nm3mail.pkb'
              ||CHR(10)||'--       Date into SCCS   : 05/01/05 22:09:16'
              ||CHR(10)||'--       Date fetched Out : 07/06/13 14:12:34'
@@ -786,7 +799,7 @@ BEGIN
              ||CHR(10)||'--   nm3mail sending job'
              ||CHR(10)||'--'
              ||CHR(10)||'-----------------------------------------------------------------------------'
-             ||CHR(10)||'--	Copyright (c) exor corporation ltd, 2004'
+             ||CHR(10)||'-- Copyright (c) exor corporation ltd, 2004'
              ||CHR(10)||'-----------------------------------------------------------------------------'
              ||CHR(10)||'--'
              ||CHR(10)||'   l_server_not_there EXCEPTION;'
@@ -1240,13 +1253,13 @@ BEGIN
      END LOOP;
    END ;
    utl_smtp.close_data(g_mail_conn);
-   utl_smtp.quit(g_mail_conn);
+   quit(g_mail_conn);
    RETURN  TRUE;
 EXCEPTION
   WHEN utl_smtp.transient_error OR utl_smtp.permanent_error 
   THEN           
       po_error_text := sqlerrm; --'SMTP server is down or unavailable';
-      utl_smtp.quit(g_mail_conn);
+      quit(g_mail_conn);
       RETURN  FALSE;
 
   WHEN OTHERS 
@@ -1255,12 +1268,12 @@ EXCEPTION
       BEGIN
       --
          utl_smtp.close_data(g_mail_conn); 
-         utl_smtp.quit(g_mail_conn);
+         quit(g_mail_conn);
       --
       EXCEPTION
           WHEN OTHERS 
           THEN
-              utl_smtp.quit(g_mail_conn);
+              quit(g_mail_conn);
               NULL;
       END ;
       RETURN  FALSE;
