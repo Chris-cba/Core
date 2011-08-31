@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm3gaz_qry AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3gaz_qry.pkb-arc   2.17.1.0   Jun 15 2011 15:41:34   Chris.Strettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3gaz_qry.pkb-arc   2.17.1.1   Aug 31 2011 15:37:46   Ade.Edwards  $
 --       Module Name      : $Workfile:   nm3gaz_qry.pkb  $
---       Date into PVCS   : $Date:   Jun 15 2011 15:41:34  $
---       Date fetched Out : $Modtime:   Jun 15 2011 15:32:42  $
---       Version          : $Revision:   2.17.1.0  $
+--       Date into PVCS   : $Date:   Aug 31 2011 15:37:46  $
+--       Date fetched Out : $Modtime:   Aug 31 2011 15:35:20  $
+--       Version          : $Revision:   2.17.1.1  $
 --       Based on SCCS version : 1.45
 -------------------------------------------------------------------------
 --   Author : Jonathan Mills
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3gaz_qry AS
 --all global package variables here
 --
    --g_body_sccsid     CONSTANT  varchar2(2000) := '"@(#)nm3gaz_qry.pkb 1.45 05/26/06"';
-   g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.17.1.0  $';
+   g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.17.1.1  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3gaz_qry';
@@ -862,11 +862,11 @@ BEGIN
      --
         append_both (p_ngqt_index,'        AND   '||l_ne_id_col||' = nte.nte_ne_id_of||null');
       --
-        -- Task 0109984
+        -- Task 0109984/0111431/0111432
         -- Don't attempt to use the chainage columns if they are not set on the metamodel
         --
-        --IF l_rec_nit.nit_lr_st_chain IS NOT NULL
-        IF l_begin_mp_col IS NOT NULL
+        IF ( l_rec_nit.nit_table_name IS NOT NULL AND l_rec_nit.nit_lr_st_chain IS NOT NULL )
+          OR ( l_rec_nit.nit_table_name IS NULL AND l_begin_mp_col IS NOT NULL )
         THEN
           IF g_tab_is_point_inv(p_ngqt_index)
           THEN
@@ -948,11 +948,11 @@ BEGIN
           append_both (p_ngqt_index,'        AND   '||l_ne_id_col ||' = ex.nm_ne_id_in');
           append_both (p_ngqt_index,'        AND   ex.nm_type = ''G''');
   --
-      -- Task 0109984
+      -- Task 0109984/0111431/0111432
       -- Don't attempt to use the chainage columns if they are not set on the metamodel
       --
-        --IF l_rec_nit.nit_lr_st_chain IS NOT NULL
-        IF l_begin_mp_col  IS NOT NULL
+        IF ( l_rec_nit.nit_table_name IS NOT NULL AND l_rec_nit.nit_lr_st_chain IS NOT NULL )
+          OR ( l_rec_nit.nit_table_name IS NULL AND l_begin_mp_col IS NOT NULL )
         THEN
           IF g_tab_is_point_inv(p_ngqt_index)
           THEN
