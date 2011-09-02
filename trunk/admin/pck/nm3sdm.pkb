@@ -1,15 +1,15 @@
-CREATE OR REPLACE PACKAGE BODY Nm3sdm
-AS
+Create Or Replace Package Body Nm3Sdm
+As
 --
 -----------------------------------------------------------------------------
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.49   Jul 27 2011 10:08:42   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.50   Sep 02 2011 11:45:42   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3sdm.pkb  $
---       Date into PVCS   : $Date:   Jul 27 2011 10:08:42  $
---       Date fetched Out : $Modtime:   Jul 27 2011 10:04:10  $
---       PVCS Version     : $Revision:   2.49  $
+--       Date into PVCS   : $Date:   Sep 02 2011 11:45:42  $
+--       Date fetched Out : $Modtime:   Sep 02 2011 09:29:58  $
+--       PVCS Version     : $Revision:   2.50  $
 --
 --   Author : R.A. Coupe
 --
@@ -21,687 +21,1273 @@ AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT VARCHAR2 (2000) := '"$Revision:   2.49  $"';
+  g_Body_Sccsid     Constant Varchar2 (2000) := '"$Revision:   2.50  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
-   g_package_name    CONSTANT VARCHAR2 (30)   := 'NM3SDM';
+  g_Package_Name    Constant Varchar2 (30)   := 'NM3SDM';
 --
-   l_dummy_package_variable   NUMBER;
---
-   qq                         CHAR (1)        := CHR (39);
 
 -- nw modules - use 1 for all, 2 for GoG and 3 for GoS
-   g_network_modules  ptr_vc_array := ptr_vc_array ( ptr_vc_array_type(
-                                           ptr_vc( 1, 'NM0105' ) -- elements
-                                          ,ptr_vc( 2, 'NM0115' ) -- GOG
-                                          ,ptr_vc( 3, 'NM0110' ) -- GOS
-                                          ,ptr_vc( 1, 'NM1100' ) -- Gazetteer
-                                          ));
-
--- inv modules - use 1 for all, 2 where not applicable to FT
-   g_asset_modules    ptr_vc_array := ptr_vc_array ( ptr_vc_array_type(
-                                           ptr_vc( 2, 'NM0510' ) -- assets
-                                          ,ptr_vc( 2, 'NM0570' ) -- find asset
-                                          ,ptr_vc( 2, 'NM0572' ) -- Locator
-                                          ,ptr_vc( 2, 'NM0535' ) -- BAU
-                                          ,ptr_vc( 2, 'NM0590' ) -- Asset Maintenance
-                                          ,ptr_vc( 2, 'NM0560' ) -- Assets on a Route -- AE 4053
-                                          ,ptr_vc( 2, 'NM0573' ) -- Asset Grid - AE 4100
-));
-
---
-  e_not_unrestricted EXCEPTION;
-  e_no_analyse_privs EXCEPTION;
---
------------------------------------------------------------------------------
--- <PRIVATE FUNCTIONS>
-   FUNCTION get_nlt_descr (p_nlt_id IN NUMBER)
-      RETURN VARCHAR2;
-
---
-   FUNCTION create_inv_sdo_join_view (
-      p_nit               IN   nm_inv_types.nit_inv_type%TYPE,
-      p_table             IN   VARCHAR2
-    , p_start_date_column IN VARCHAR2 DEFAULT NULL
-    , p_end_date_column   IN VARCHAR2 DEFAULT NULL
-   )
-      RETURN VARCHAR2;
-
---
-   FUNCTION get_nlt_spatial_table (p_nlt IN NM_LINEAR_TYPES%ROWTYPE)
-      RETURN VARCHAR2;
-
---
-   FUNCTION get_nt_spatial_table (
-      p_nt_type    IN   NM_TYPES.nt_type%TYPE,
-      p_gty_type   IN   nm_group_types.ngt_group_type%TYPE DEFAULT NULL
-   )
-      RETURN VARCHAR2;
-
---
-   FUNCTION get_nt_view_name (
-      p_nt_type    IN   NM_TYPES.nt_type%TYPE,
-      p_gty_type   IN   nm_group_types.ngt_group_type%TYPE
-   )
-      RETURN VARCHAR2;
-
---
-   FUNCTION create_nlt_sdo_join_view (
-      p_nlt     IN   NM_LINEAR_TYPES%ROWTYPE,
-      p_table   IN   VARCHAR2
-   )
-      RETURN VARCHAR2;
-
---
-   FUNCTION get_nlt_id_from_gty (
-      pi_gty   IN   nm_group_types.ngt_group_type%TYPE
-   )
-      RETURN NM_LINEAR_TYPES.nlt_id%TYPE;
-
---
-   FUNCTION get_nat_id_from_gty (
-      pi_gty   IN   nm_group_types.ngt_group_type%TYPE
-   )
-      RETURN NM_AREA_TYPES.nat_id%TYPE;
-
---
-   FUNCTION get_object_type (p_object IN VARCHAR2)
-      RETURN VARCHAR2;
---
-
-   FUNCTION get_nlt_base_themes ( p_nlt_id IN NM_LINEAR_TYPES.nlt_id%TYPE )
-     RETURN nm_theme_array;
---
-
-   FUNCTION Get_Inv_Base_Themes ( p_inv_type IN nm_inv_nw.nin_nit_inv_code%TYPE )
-     RETURN nm_theme_array;
---
-
-   FUNCTION get_nat_base_themes ( p_nt_type  IN NM_AREA_TYPES.NAT_NT_TYPE%TYPE,
-                                  p_gty_type IN NM_AREA_TYPES.NAT_GTY_GROUP_TYPE%TYPE )
-     RETURN nm_theme_array;
-
-   FUNCTION get_asset_modules RETURN ptr_vc_array;
-
-   PROCEDURE create_theme_functions( p_theme IN NUMBER, p_pa IN ptr_vc_array, p_exclude IN NUMBER );
-
-   PROCEDURE drop_trigger_by_theme_id ( p_nth_id IN nm_themes_all.nth_theme_id%TYPE );
-
---
------------------------------------------------------------------------------
--- <PRIVATE PROCEDURES>
-   PROCEDURE create_spatial_table (
-      p_table               IN   VARCHAR2,
-      p_mp_flag             IN   BOOLEAN DEFAULT FALSE,
-      p_start_date_column   IN   VARCHAR2 DEFAULT NULL,
-      p_end_date_column     IN   VARCHAR2 DEFAULT NULL
-   );
-
---
-   PROCEDURE create_spatial_date_view (
-      p_table            IN   VARCHAR2,
-      p_start_date_col   IN   VARCHAR2 DEFAULT NULL,
-      p_end_date_col     IN   VARCHAR2 DEFAULT NULL
-   );
-
---
-   PROCEDURE create_inv_spatial_idx (
-      p_nit     IN   nm_inv_types.nit_inv_type%TYPE,
-      p_table   IN   VARCHAR2
-   );
-
---
-   PROCEDURE create_ona_spatial_idx (
-      p_nit     IN   nm_inv_types.nit_inv_type%TYPE,
-      p_table   IN   VARCHAR2
-   );
---
-   PROCEDURE create_nlt_spatial_idx (
-      p_nlt     IN   NM_LINEAR_TYPES%ROWTYPE,
-      p_table   IN   VARCHAR2
-   );
-
---
-   PROCEDURE ins_usgm (pi_rec_usgm IN OUT user_sdo_geom_metadata%ROWTYPE);
-
---
-   PROCEDURE  split_element_at_xy (p_layer IN NUMBER,
-                                   p_ne_id  IN NUMBER,
-                                   p_measure IN NUMBER,
-                                   p_x IN NUMBER,
-                                   p_y IN NUMBER,
-                                   p_ne_id_1 IN NUMBER,
-                                   p_ne_id_2 IN NUMBER,
-                                   p_geom_1  OUT mdsys.sdo_geometry,
-                                   p_geom_2  OUT mdsys.sdo_geometry );
-
-
-
---
-   PROCEDURE create_base_themes(
-      p_theme_id    IN NUMBER,
-   p_base        IN nm_theme_array );
---
-   FUNCTION user_is_unrestricted RETURN BOOLEAN;
---
-   FUNCTION user_is_unrestricted RETURN BOOLEAN IS
-   BEGIN
-     RETURN Sys_Context('NM3CORE','UNRESTRICTED_INVENTORY') = 'TRUE';
-   END;
---
-   FUNCTION get_asset_modules RETURN ptr_vc_array IS
-   BEGIN
-     RETURN g_asset_modules;
-   END;
-
-   PROCEDURE create_theme_functions( p_theme IN NUMBER, p_pa IN ptr_vc_array, p_exclude IN NUMBER ) IS
-   CURSOR c1 ( c_theme IN NUMBER, c_pa IN ptr_vc_array, c_excl IN NUMBER ) IS
-     SELECT f.ptr_value module, hmo_title
-     FROM HIG_MODULES, TABLE ( c_pa.pa ) f
-     WHERE f.ptr_value = hmo_module
-  AND   NVL(c_excl, -999) != DECODE( c_excl, NULL, 0, f.ptr_id );
-
-   BEGIN
---    failure of 9i to perform insert in an efficient way using ptrs - needs simple loop
-
-      FOR ntf IN c1( p_theme, p_pa, p_exclude ) LOOP
-
-        INSERT INTO NM_THEME_FUNCTIONS_ALL (
-           NTF_NTH_THEME_ID, NTF_HMO_MODULE, NTF_PARAMETER,
-           NTF_MENU_OPTION, NTF_SEEN_IN_GIS)
-        VALUES
-          ( p_theme, ntf.module, 'GIS_SESSION_ID'
-          , ntf.hmo_title, DECODE( ntf.module, 'NM0572', 'N', 'Y' ));
-
-      END LOOP;
-
-   END;
-
---
------------------------------------------------------------------------------
---
-   FUNCTION get_version
-      RETURN VARCHAR2
-   IS
-   BEGIN
-      RETURN g_sccsid;
-   END get_version;
-
---
------------------------------------------------------------------------------
---
-   FUNCTION get_body_version
-      RETURN VARCHAR2
-   IS
-   BEGIN
-      RETURN g_body_sccsid;
-   END get_body_version;
-
---
------------------------------------------------------------------------------
---
-   FUNCTION get_base_themes( p_theme_id IN NM_THEMES_ALL.nth_theme_id%TYPE)
-   RETURN nm_theme_array IS
-     retval nm_theme_array := Nm3array.init_nm_theme_array;
-     CURSOR c_nbth ( c_theme_id IN NM_THEMES_ALL.nth_theme_id%TYPE) IS
-       SELECT nm_theme_entry( nbth_base_theme )
-         FROM NM_BASE_THEMES
-        WHERE nbth_theme_id = c_theme_id;
-   BEGIN
-     OPEN c_nbth( p_theme_id );
-     FETCH c_nbth BULK COLLECT INTO retval.nta_theme_array;
-     CLOSE c_nbth;
-     RETURN retval;
-   END;
-
---
------------------------------------------------------------------------------
---
-
-   FUNCTION get_theme_nt (p_theme_id IN NM_THEMES_ALL.nth_theme_id%TYPE)
-      RETURN VARCHAR2
-   IS
-      CURSOR c1 (c_theme_id IN NM_THEMES_ALL.nth_theme_id%TYPE)
-      IS
-         SELECT nlt_nt_type
-           FROM NM_THEMES_ALL, NM_NW_THEMES, NM_LINEAR_TYPES
-          WHERE nlt_id = nnth_nlt_id
-            AND nnth_nth_theme_id = nth_theme_id
-            AND nth_theme_id = c_theme_id
-            AND nth_theme_type = 'SDO';
-
-      retval   NM_TYPES.nt_type%TYPE;
-   BEGIN
-      OPEN c1 (p_theme_id);
-      FETCH c1
-       INTO retval;
-      IF c1%NOTFOUND
-      THEN
-         CLOSE c1;
-
-         Hig.raise_ner (pi_appl         => Nm3type.c_hig,
-                        pi_id           => 192,
-                        pi_sqlcode      => -20001
-                       );
-      --    raise_application_error(-20001,'Theme is not related to a network');
-      END IF;
-
-      CLOSE c1;
-
-      RETURN retval;
-   END get_theme_nt;
-
---
------------------------------------------------------------------------------
---
-   FUNCTION get_node_table (p_node_type IN NM_NODE_TYPES.nnt_type%TYPE)
-      RETURN VARCHAR2
-   IS
-   BEGIN
-      RETURN 'V_NM_NO_' || p_node_type || '_SDO';
-   END get_node_table;
-
---
------------------------------------------------------------------------------
---
-   FUNCTION get_node_type (p_nt_type IN NM_TYPES.nt_type%TYPE)
-      RETURN VARCHAR2
-   IS
-   BEGIN
-      RETURN Nm3get.get_nt (pi_nt_type => p_nt_type).nt_node_type;
-   END get_node_type;
-
---
------------------------------------------------------------------------------
---
-   FUNCTION get_node_type (p_theme_id IN NM_THEMES_ALL.nth_theme_id%TYPE)
-      RETURN VARCHAR2
-   IS
-   BEGIN
-      RETURN get_node_type
-                         (p_nt_type      => get_theme_nt
-                                                     (p_theme_id      => p_theme_id)
-                         );
-   END get_node_type;
-
---
------------------------------------------------------------------------------
---
-/*
-   FUNCTION create_9i_node_metadata (
-      p_node_type   IN   nm_node_types.nnt_type%TYPE
-   )
-      RETURN NUMBER
-   IS
-      cur_string   VARCHAR2 (4000);
-      l_rec_usgm   rec_usgm;
-   BEGIN
-      --create node view based on points - this assumes that the points are either
-      --held as a geo-enabled column or through the use of Oracle 9i function based index
-      --this work on 8i but it will not register in the metadata
-      cur_string :=
-            'create or replace view v_nm_no_'
-         || p_node_type
-         || '_sdo '
-         || ' as select n.*, p.np_grid_east, p.np_grid_north, '
-         || ' nm3sdo.get_sdo_pt( 1, p.np_grid_east, p.np_grid_north) geoloc '
-         || 'from nm_nodes n, nm_points p '
-         || 'where n.NO_NP_ID = p.NP_ID '
-         || 'and   n.no_node_type = '
-         || ''''
-         || p_node_type
-         || '''';
-      nm3ddl.create_object_and_syns ('V_NM_NO_' || p_node_type || '_SDO',
-                                     cur_string
-                                    );
-
-      --  execute immediate cur_string;
-      INSERT INTO user_sdo_geom_metadata
-                  (table_name, column_name, diminfo, srid)
-         SELECT 'V_NM_NO_' || p_node_type || '_SDO', 'GEOLOC', diminfo, srid
-           FROM user_sdo_geom_metadata
-          WHERE table_name = 'NM_POINTS';
-
-      --create theme info for nodes? and return theme id
-      RETURN 1;
-   END create_9i_node_metadata;
-*/
---
------------------------------------------------------------------------------
---
-   FUNCTION create_node_metadata (p_node_type IN NM_NODE_TYPES.nnt_type%TYPE)
-      RETURN NUMBER
-   IS
-      cur_string    VARCHAR2 (4000);
-      l_node_view   VARCHAR2 (30);
-      retval        NUMBER;
-   BEGIN
-    -- AE check to make sure user is unrestricted
-      IF NOT user_is_unrestricted
-      THEN
-        RAISE e_not_unrestricted;
-      END IF;
-      --create node view based on points - this assumes that the points are either
-      --held as a geo-enabled column this work on 8i by cloning the point-locations table
-      --
-      l_node_view := get_node_table (p_node_type);
-      cur_string :=
-            'create or replace view '
-         || l_node_view
-         || ' as select /*+INDEX( NM_NODES_ALL,NN_NP_FK_IND)*/ p.npl_id, n.*, p.npl_location geoloc '
-         || 'from nm_nodes n, nm_point_locations p '
-         || 'where n.NO_NP_ID = p.NPL_ID '
-         || 'and   n.no_node_type = '
-         || ''''
-         || p_node_type
-         || '''';
-
---         Nm_Debug.debug_on;
---         Nm_Debug.DEBUG( cur_string );
-
-      --Nm3ddl.create_object_and_syns( l_node_view, cur_string );
-
-      -- AE 23-SEP-2008
-      -- We will now use views instead of synonyms to provide subordinate user access
-      -- to spatial objects
-      --nm3ddl.create_object_and_views (l_node_view, cur_string);
-      -- CWS 0108742 Change back to using synonyms
-      Nm3ddl.create_object_and_syns( l_node_view, cur_string );
---    EXECUTE IMMEDIATE cur_string;
-
-      INSERT INTO mdsys.sdo_geom_metadata_table
-                  (sdo_table_name, sdo_column_name, sdo_diminfo, sdo_srid, sdo_owner)
-         SELECT l_node_view, 'GEOLOC', sdo_diminfo, sdo_srid, Sys_Context('NM3CORE','APPLICATION_OWNER')
-           FROM mdsys.sdo_geom_metadata_table
-          WHERE sdo_table_name = 'NM_POINT_LOCATIONS'
-            AND sdo_column_name = 'NPL_LOCATION'
-            AND sdo_owner = Sys_Context('NM3CORE','APPLICATION_OWNER');
-
-      retval := register_node_theme (p_node_type, l_node_view, 'GEOLOC');
-      RETURN retval;
-
-   END create_node_metadata;
-
---
------------------------------------------------------------------------------
---
-   FUNCTION get_details (
-      p_theme_id   IN   NM_THEMES_ALL.nth_theme_id%TYPE,
-      p_ne_id      IN   NUMBER
-   )
-      RETURN CLOB
-   IS
-   BEGIN
-      RETURN Nm3xmlqry.get_theme_details_as_xml_clob (p_theme_id, p_ne_id);
-   END get_details;
-
------------------------------------------------------------------------------
---
-   FUNCTION get_details (p_ne_id IN NUMBER)
-      RETURN CLOB
-   IS
-   BEGIN
-      RETURN Nm3xmlqry.get_obj_details_as_xml_clob (p_ne_id);
-   END get_details;
-
---
------------------------------------------------------------------------------
---
-PROCEDURE make_nt_spatial_layer
-            ( pi_nlt_id   IN   NM_LINEAR_TYPES.nlt_id%TYPE,
-              p_gen_pt    IN   NUMBER DEFAULT 0,
-              p_gen_tol   IN   NUMBER DEFAULT 0,
-              p_job_id    IN   NUMBER DEFAULT NULL )
-   IS
-      /*
-      ** not expected to be used for datum layers
-      */
-      l_geom               MDSYS.SDO_GEOMETRY;
-      lcur                 Nm3type.ref_cursor;
-      l_nlt                NM_LINEAR_TYPES%ROWTYPE     := Nm3get.get_nlt (pi_nlt_id);
-      l_nlt_seq            VARCHAR2(30);
-      l_base_themes        nm_theme_array;
-      l_theme_id           NM_THEMES_ALL.nth_theme_id%TYPE;
-      l_theme_name         NM_THEMES_ALL.nth_theme_name%TYPE;
-      l_base_table_theme   NM_THEMES_ALL.nth_theme_id%TYPE;
-      l_ne                 nm_elements.ne_id%TYPE;
-      l_objectid           NUMBER;
-      l_dummy              NUMBER;
-      cur_string1          VARCHAR2 (4000);
-      cur_string2          VARCHAR2 (4000);
-      l_tab                VARCHAR2 (30);
-      l_view               VARCHAR2 (30);
-      l_effective_date     DATE                 := To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY');
-      l_usgm               user_sdo_geom_metadata%ROWTYPE;
-      l_diminfo            mdsys.sdo_dim_array;
-      l_srid               NUMBER;
-   --
-   BEGIN
-     -- AE check to make sure user is unrestricted
-     IF NOT user_is_unrestricted
-     THEN
-       RAISE e_not_unrestricted;
-     END IF;
---
------------------------------------------------------------------------
--- Table name is the is derived based on nt/gty
------------------------------------------------------------------------
-
-      l_tab := Nm3sdm.get_nlt_spatial_table (l_nlt);
-
------------------------------------------------------------------------
--- Will always be a group according to Linear types..
------------------------------------------------------------------------
-      IF l_nlt.nlt_g_i_d = 'G'
-      THEN
-         l_base_themes := get_nlt_base_themes( pi_nlt_id );
-      END IF;
-
-      IF l_base_themes.nta_theme_array(1).nthe_id IS NULL THEN
-         Hig.raise_ner (pi_appl         => Nm3type.c_hig,
-                        pi_id           => 266,
-                        pi_sqlcode      => -20001
-                       );
-
---      raise_application_error(-2001, 'No base themes for this route type');
-      END IF;
-
------------------------------------------------------------------------
--- Create the nt view if not already there
------------------------------------------------------------------------
-      IF NOT Nm3ddl.does_object_exist (l_view, 'VIEW')
-      THEN
-         Nm3inv_View.create_view_for_nt_type (l_nlt.nlt_nt_type);
-      END IF;
-
------------------------------------------------------------------------
--- Create spatial data in table + create date tracked view
------------------------------------------------------------------------
-      create_spatial_table (l_tab, TRUE, 'START_DATE', 'END_DATE');
-      create_spatial_date_view (l_tab);
------------------------------------------------------------------------
--- Clone SDO metadata from it's base layer
------------------------------------------------------------------------
-      Nm3sdo.set_diminfo_and_srid( l_base_themes, l_diminfo, l_srid );
-
-      l_diminfo(3).sdo_tolerance := NM3UNIT.GET_TOL_FROM_UNIT_MASK(NM3NET.GET_NT_UNITS(l_nlt.nlt_nt_type));
-      l_usgm.table_name  := l_tab;
-      l_usgm.column_name := 'GEOLOC';
-      l_usgm.diminfo     := l_diminfo;
-      l_usgm.srid        := l_srid;
-
-      Nm3sdo.ins_usgm ( l_usgm );
-
-      l_usgm.table_name := 'V_'|| l_tab;
-
-      Nm3sdo.ins_usgm ( l_usgm );
-
------------------------------------------------------------------------
--- Register Theme for table
------------------------------------------------------------------------
-      l_theme_name := SUBSTR (l_nlt.nlt_descr, 1, 26);
-
-
-      l_theme_id :=
-         Nm3sdm.register_lrm_theme (p_nlt_id           => pi_nlt_id,
-                             p_base             => l_base_themes,
-                             p_table_name       => l_tab,
-                             p_column_name      => 'GEOLOC',
-                             p_name             => l_theme_name || '_TAB'
+   
+  g_Network_Modules  Ptr_Vc_Array := Ptr_Vc_Array ( Ptr_Vc_Array_Type(
+                                                                     Ptr_Vc( 1, 'NM0105' ) -- elements
+                                                                    ,Ptr_Vc( 2, 'NM0115' ) -- GOG
+                                                                    ,Ptr_Vc( 3, 'NM0110' ) -- GOS
+                                                                    ,Ptr_Vc( 1, 'NM1100' ) -- Gazetteer
+                                                                    ));
+
+  -- inv modules - use 1 for all, 2 where not applicable to FT
+
+  g_Asset_Modules    Ptr_Vc_Array := Ptr_Vc_Array ( Ptr_Vc_Array_Type  (
+                                                                       Ptr_Vc( 2, 'NM0510' ) -- assets
+                                                                      ,Ptr_Vc( 2, 'NM0570' ) -- find asset
+                                                                      ,Ptr_Vc( 2, 'NM0572' ) -- Locator
+                                                                      ,Ptr_Vc( 2, 'NM0535' ) -- BAU
+                                                                      ,Ptr_Vc( 2, 'NM0590' ) -- Asset Maintenance
+                                                                      ,Ptr_Vc( 2, 'NM0560' ) -- Assets on a Route -- AE 4053
+                                                                      ,Ptr_Vc( 2, 'NM0573' ) -- Asset Grid - AE 4100
+                                                                      ));
+  e_Not_Unrestricted Exception;
+  e_No_Analyse_Privs Exception;
+    
+  Type t_View_Rec Is Record (
+                            View_Name       User_Views.View_Name%Type,
+                            View_Text       Varchar2(4000),
+                            View_Comments   User_Tab_Comments.Comments%Type
                             );
-      l_base_table_theme := l_theme_id;
+                          
+  Type t_View_Tab Is Table Of t_View_Rec Index By Binary_Integer;  
+  
+--
+-----------------------------------------------------------------------------
+--
+Function User_Is_Unrestricted Return Boolean
+Is
+Begin
+ Return Sys_Context('NM3CORE','UNRESTRICTED_INVENTORY') = 'TRUE';
+End User_Is_Unrestricted;
+--
+-----------------------------------------------------------------------------
+--
+Function Get_Asset_Modules Return Ptr_Vc_Array
+Is
+Begin
+ Return G_Asset_Modules;
+End Get_Asset_Modules;
+--
+-----------------------------------------------------------------------------
+--
+Procedure  Create_Theme_Functions (
+                                  p_Theme   In  Number,
+                                  p_Pa      In  Ptr_Vc_Array,
+                                  p_Exclude In  Number
+                                  )
+Is
+  Cursor C1 ( 
+            c_Theme In Number,
+            c_Pa    In Ptr_Vc_Array,
+            c_Excl  In Number
+            )
+  Is
+    Select  f.Ptr_Value Module,
+            hm.Hmo_Title
+    From    Hig_Modules hm,
+            Table ( c_Pa.Pa ) f
+    Where   f.Ptr_Value         =   hm.Hmo_Module
+    And     Nvl(C_Excl, -999)   !=  Decode( c_Excl, Null, 0, f.Ptr_Id );
 
-      l_nlt_seq := Nm3sdo.create_spatial_seq (l_theme_id);
+Begin
+  --  failure of 9i to perform insert in an efficient way using ptrs - needs simple loop
 
------------------------------------------------------------------------
--- Register Theme for date view
------------------------------------------------------------------------
+  For Ntf In C1( p_Theme, p_Pa, p_Exclude )
+  Loop
+    Insert Into Nm_Theme_Functions_All
+    (
+    Ntf_Nth_Theme_Id,
+    Ntf_Hmo_Module,
+    Ntf_Parameter,
+    Ntf_Menu_Option,
+    Ntf_Seen_In_Gis
+    )
+    Values
+    (
+    p_Theme,
+    Ntf.Module,
+    'GIS_SESSION_ID',
+    Ntf.Hmo_Title,
+    Decode( Ntf.Module, 'NM0572', 'N', 'Y' )
+    );
+  End Loop;
 
-      l_theme_id :=
-            register_lrm_theme (p_nlt_id              => pi_nlt_id,
-                                p_base                => l_base_themes,
-                                p_table_name          => 'V_' || l_tab,
-                                p_column_name         => 'GEOLOC',
-                                p_name                => l_theme_name,
-                                p_view_flag           => 'Y',
-                                p_base_table_nth      => l_base_table_theme
-                               );
+End Create_Theme_Functions;
+--
+-----------------------------------------------------------------------------
+--
+Function Get_Version Return Varchar2
+Is
+Begin
+  Return G_Sccsid;
+End Get_Version;
+--
+-----------------------------------------------------------------------------
+--
+Function Get_Body_Version Return Varchar2
+Is
+Begin
+  Return G_Body_Sccsid;
+End Get_Body_Version;
+--
+-----------------------------------------------------------------------------
+--
+Function Get_Base_Themes  (
+                          p_Theme_Id In Nm_Themes_All.Nth_Theme_Id%Type
+                          ) Return Nm_Theme_Array
+Is
+  Retval Nm_Theme_Array := Nm3Array.Init_Nm_Theme_Array;
+         
+Begin
+  Select   Nm_Theme_Entry( nbt.Nbth_Base_Theme )
+  Bulk Collect 
+  Into    Retval.Nta_Theme_Array      
+  From    Nm_Base_Themes  nbt
+  Where   nbt.Nbth_Theme_Id = p_Theme_Id;
+               
+  Return Retval;
+     
+End Get_Base_Themes;
+--
+-------------------------------------------------------------------------------------------------------------------------------------
+--
+Procedure Process_View_DDL  (
+                            p_View_Rec    In    t_View_Rec  
+                            )
+Is
+Begin  
+  Nm_Debug.Debug('Nm3Sdm.Process_View_DDL - Called');
+    
+  Nm_Debug.Debug('Processing :' || p_View_Rec.View_Name);      
+  Nm_Debug.Debug(Substr('DDL:'  || p_View_Rec.View_Text,1,4000) );
+    
+  Begin
 
------------------------------------------------------------------------
--- Need a join view between spatial table and NT view
------------------------------------------------------------------------
+    Nm3Ddl.Create_Object_And_Syns( p_View_Rec.View_Name, p_View_Rec.View_Text );
+        
+    Nm_Debug.Debug('View Comments:' || p_View_Rec.View_Comments);
 
-      l_view := create_nlt_sdo_join_view (l_nlt, l_tab);
+    Execute Immediate (p_View_Rec.View_Comments);
+       
+  Exception
+      When Others Then
+        Nm_Debug.Debug('EXCEPTION - When Others:' || Sqlcode || ':' || Sqlerrm );
+        Raise_Application_Error (-20001,'Unable to create view ' || p_View_Rec.View_Name || ':' || Chr(10) || p_View_Rec.View_Text || Chr(10) || Sqlcode || ':' || Sqlerrm);
+  End;
+  Nm_Debug.Debug('Nm3Sdm.Process_View_DDL - Finished');
+End Process_View_DDL;
+--
+------------------------------------------------------------------------------
+--
+Function Build_Nat_Sdo_Join_View Return User_Views.View_Name%Type
+Is
 
------------------------------------------------------------------------
--- Create the spatial data
------------------------------------------------------------------------
+  l_View_Tab    t_View_Tab;
 
-      Nm3sdo.create_nt_data( Nm3get.get_nth(l_base_table_theme), pi_nlt_id, l_base_themes, p_job_id );
+Begin
+  Nm_Debug.Debug('Nm3Sdm.Build_Nat_Sdo_Join_View - Called');
+    
+  Select        View_Name,
+                View_Text,
+                View_Comments 
+  Bulk Collect    
+  Into          l_View_Tab
+  From          V_Nm_Rebuild_All_Nat_Sdo_Join;
+    
+  For x In  1 .. l_View_Tab.Count
+  Loop
+    Process_View_DDL (p_View_Rec=> l_View_Tab(x));                                             
+  End Loop;
+       
+  Nm_Debug.Debug('Nm3Sdm.Build_Nat_Sdo_Join_View - Finished');
+    
+  --Only return a view name if we only processed one view.
+  Return ((Case When l_View_Tab.Count = 1 Then l_View_Tab(1).View_Name Else Null End) );
+    
+End Build_Nat_Sdo_Join_View;
+--
+------------------------------------------------------------------------------
+--
+Function Create_Nat_Sdo_Join_View (
+                                  p_Feature_Table_Name  In    Varchar2
+                                  ) Return User_Views.View_Name%Type
+Is
+  l_View_Name   User_Views.View_Name%Type; 
+Begin
+  Nm_Debug.Debug('Nm3Sdm.Create_Nat_Sdo_Join_View - Called');
+  Nm_Debug.Debug('Parameter - p_Feature_Table_Name:' || p_Feature_Table_Name);
 
------------------------------------------------------------------------
--- Table needs a spatial index
------------------------------------------------------------------------
+  Nm3Ctx.Set_Context('THEME_API_FEATURE_TAB',p_Feature_Table_Name );
+   
+  l_View_Name:=Build_Nat_Sdo_Join_View;
 
-      Nm3sdm.create_nlt_spatial_idx (l_nlt, l_tab);
+  Nm3Ctx.Set_Context('THEME_API_FEATURE_TAB',Null );
+            
+  Nm_Debug.Debug('Nm3Sdm.Create_Nat_Sdo_Join_View - Finished - Returning:');
+    
+  Return l_View_Name;
+End Create_Nat_Sdo_Join_View;
+--
+------------------------------------------------------------------------------
+--
+Procedure Rebuild_All_NAT_Sdo_Join_View
+Is
+  l_View_Name   User_Views.View_Name%Type;    
+Begin
+  Nm_Debug.Debug('nm3sdm.Rebuild_All_NAT_Sdo_Join_View - Called');
+    
+  --This limits the rows returned by the V_Nm_Rebuild_All_Nat_Sdo_Join view, which is used by Build_Nat_Sdo_Join_View.
+  Nm3Ctx.Set_Context('THEME_API_FEATURE_TAB','V_NM_%DT');
+    
+  l_View_Name:=Build_Nat_Sdo_Join_View;
+    
+  Nm3Ctx.Set_Context('THEME_API_FEATURE_TAB',Null );
 
------------------------------------------------------------------------
--- Register theme for _DT attribute view
------------------------------------------------------------------------
+  Nm_Debug.Debug('nm3sdm.Rebuild_All_NAT_Sdo_Join_View - Finished');              
+End Rebuild_All_NAT_Sdo_Join_View;  
+--
+-------------------------------------------------------------------------------------------------------------------------------------
+--
+Function Build_Nlt_Sdo_Join_View Return User_Views.View_Name%Type
+Is
 
-      IF g_date_views = 'Y'
-      THEN
+  l_View_Tab    t_View_Tab;
 
-        l_usgm.table_name := l_view;
+Begin
+  Nm_Debug.Debug('Nm3Sdm.Build_Nlt_Sdo_Join_View - Called');
+    
+  Select        View_Name,
+                View_Text,
+                View_Comments 
+  Bulk Collect    
+  Into          l_View_Tab
+  From          V_Nm_Rebuild_All_Nlt_Sdo_Join;
+    
+  For x In  1 .. l_View_Tab.Count
+  Loop
+    Process_View_DDL (p_View_Rec=> l_View_Tab(x));                                            
+  End Loop;
+       
+  Nm_Debug.Debug('Nm3Sdm.Build_Nlt_Sdo_Join_View - Finished');
+    
+  --Only return a view name if we only processed one view.
+  Return ((Case When l_View_Tab.Count = 1 Then l_View_Tab(1).View_Name Else Null End) );
+    
+End Build_Nlt_Sdo_Join_View;
+--
+-------------------------------------------------------------------------------------------------------------------------------------
+--
+Function Create_Nlt_Sdo_Join_View (
+                                  p_Feature_Table_Name         In    Varchar2
+                                  ) Return User_Views.View_Name%Type
+Is
 
-        Nm3sdo.ins_usgm ( l_usgm );
+  l_View_Name   User_Views.View_Name%Type;
+    
+Begin
+  Nm_Debug.Debug('Nm3Sdm.Create_Nlt_Sdo_Join_View - Called');
+  Nm_Debug.Debug('Parameter - p_Feature_Table_Name:'              || p_Feature_Table_Name);
 
-        l_theme_name := SUBSTR (l_nlt.nlt_descr, 1, 27) || '_DT';
-        l_theme_id := Nm3sdm.register_lrm_theme
-                          (p_nlt_id              => pi_nlt_id,
-                           p_base                => l_base_themes,
-                           p_table_name          => l_view,
-                           p_column_name         => 'GEOLOC',
-                           p_name                => l_theme_name,
-                           p_view_flag           => 'Y',
-                           p_base_table_nth      => l_base_table_theme
+  Nm3Ctx.Set_Context('THEME_API_FEATURE_TAB',p_Feature_Table_Name );
+   
+  l_View_Name:=Build_Nlt_Sdo_Join_View;
+
+  Nm3Ctx.Set_Context('THEME_API_FEATURE_TAB',Null );
+            
+  Nm_Debug.Debug('Nm3Sdm.Create_Nlt_Sdo_Join_View - Finished - Returning:');
+    
+  Return l_View_Name;
+      
+ End Create_Nlt_Sdo_Join_View;
+--
+------------------------------------------------------------------------------
+--
+Procedure Rebuild_All_NLT_Sdo_Join_Views
+Is
+  l_View_Name   User_Views.View_Name%Type;    
+Begin
+  Nm_Debug.Debug('nm3sdm.Rebuild_All_NLT_Sdo_Join_Views - Called');
+    
+  --This limits the rows returned by the V_Nm_Rebuild_All_Nlt_Sdo_Join view, which is used by Build_nlt_Sdo_Join_View.
+  Nm3Ctx.Set_Context('THEME_API_FEATURE_TAB','V_NM_%DT');
+    
+  l_View_Name:=Build_Nlt_Sdo_Join_View;
+    
+  Nm3Ctx.Set_Context('THEME_API_FEATURE_TAB',Null );
+
+  Nm_Debug.Debug('nm3sdm.Rebuild_All_NLT_Sdo_Join_Views - Finished');
+End Rebuild_All_NLT_Sdo_Join_Views;  
+--
+-----------------------------------------------------------------------------
+--
+Function Get_Theme_Nt (
+                      p_Theme_Id In Nm_Themes_All.Nth_Theme_Id%Type
+                      ) Return Nm_Linear_Types.Nlt_Nt_Type%Type
+Is
+
+  Retval   Nm_Linear_Types.Nlt_Nt_Type%Type;
+    
+Begin
+  Begin
+    Select  nlt.Nlt_Nt_Type
+    Into    Retval
+    From    Nm_Themes_All     nta,
+            Nm_Nw_Themes      nnt,
+            Nm_Linear_Types   nlt
+    Where   nlt.Nlt_Id              =   Nnth_Nlt_Id
+    And     nnt.Nnth_Nth_Theme_Id   =   nta.Nth_Theme_Id
+    And     nta.Nth_Theme_Id        =   p_Theme_Id
+    And     nta.Nth_Theme_Type      =   'SDO'
+    And     Rownum                  =   1;
+  Exception
+    When No_Data_Found Then
+      Hig.Raise_Ner (
+                    pi_Appl         => Nm3Type.C_Hig,
+                    pi_Id           => 192,
+                    pi_Sqlcode      => -20001
+                    );
+  End;
+
+  Return Retval;
+End Get_Theme_Nt;
+--
+-----------------------------------------------------------------------------
+--
+Function Get_Node_Table (
+                        p_Node_Type In Nm_Node_Types.Nnt_Type%Type
+                        ) Return Varchar2
+Is
+Begin
+  Return 'V_NM_NO_' || p_Node_Type || '_SDO';
+End Get_Node_Table;
+--
+---------------------------------------------------------------------------------------------------
+--
+Procedure Register_Npl_Theme
+Is
+  l_Rec_Nth Nm_Themes_All%Rowtype;
+  l_Rec_Ntg Nm_Theme_Gtypes%Rowtype;
+Begin
+  l_Rec_Nth.Nth_Theme_Id             := Nm3Seq.Next_Nth_Theme_Id_Seq;
+  l_Rec_Nth.Nth_Theme_Name           := 'POINT_LOCATIONS';
+  l_Rec_Nth.Nth_Table_Name           := 'NM_POINT_LOCATIONS';
+  l_Rec_Nth.Nth_Pk_Column            := 'NPL_ID';
+  l_Rec_Nth.Nth_Label_Column         := 'NPL_ID';
+  l_Rec_Nth.Nth_Feature_Table        := 'NM_POINT_LOCATIONS';
+  l_Rec_Nth.Nth_Feature_Shape_Column := 'NPL_LOCATION';
+  l_Rec_Nth.Nth_Feature_Pk_Column    := 'NPL_ID';
+  l_Rec_Nth.Nth_Use_History          := 'N';
+  l_Rec_Nth.Nth_Hpr_Product          := 'NET';
+  l_Rec_Nth.Nth_Theme_Type           := 'SDO';
+  l_Rec_Nth.Nth_Location_Updatable   := 'N';
+  l_Rec_Nth.Nth_Dependency           := 'I';
+  l_Rec_Nth.Nth_Storage              := 'S';
+  l_Rec_Nth.Nth_Update_On_Edit       := 'N';
+  l_Rec_Nth.Nth_Use_History          := 'N';
+  l_Rec_Nth.Nth_Snap_To_Theme        := 'N';
+  l_Rec_Nth.Nth_Lref_Mandatory       := 'N';
+  l_Rec_Nth.Nth_Tolerance            := 10;
+  l_Rec_Nth.Nth_Tol_Units            := 1;
+  l_Rec_Nth.Nth_Dynamic_Theme        := 'N';
+    
+  Nm3Ins.Ins_Nth(l_Rec_Nth);
+  --
+  l_Rec_Ntg.Ntg_Theme_Id  :=  l_Rec_Nth.Nth_Theme_Id;
+  l_Rec_Ntg.Ntg_Seq_No    :=  1;
+  l_Rec_Ntg.Ntg_Xml_Url   :=  Null;
+  l_Rec_Ntg.Ntg_Gtype     :=  '2001';
+    
+  Nm3Ins.Ins_Ntg (p_Rec_Ntg => l_Rec_Ntg);
+    
+  --
+  If Hig.Get_Sysopt ('REGSDELAY') = 'Y' Then
+    Execute Immediate (   ' begin  '
+                      || '    nm3sde.register_sde_layer( p_theme_id => '||To_Char( l_Rec_Nth.Nth_Theme_Id)||')'
+                      || '; end;'
+                      );
+  End If;
+End Register_Npl_Theme;
+--
+----------------------------------------------------------------------------------------
+--
+-- The registration of a node theme depends on the existence of the nm_point_locations registry entry
+-- If it is not present, then register this first.
+-- RAC December 2005
+Function Register_Node_Theme  (
+                              p_Node_Type     In   Varchar2,
+                              p_Table_Name    In   Varchar2,
+                              p_Column_Name   In   Varchar2
+                              ) Return Number
+Is
+  Retval      Number;
+  l_Nth       Nm_Themes_All%Rowtype;
+  l_Rec_Ntg   Nm_Theme_Gtypes%Rowtype;
+Begin
+  Retval := Higgis.Next_Theme_Id;
+
+  l_Nth.Nth_Base_Table_Theme := Get_Theme_From_Feature_Table ('NM_POINT_LOCATIONS'
+                                                            , 'NM_POINT_LOCATIONS' );
+  If l_Nth.Nth_Base_Table_Theme Is Null Then
+    --
+    Register_Npl_Theme;
+  End If;
+
+  l_Nth.Nth_Theme_Id              := Retval;
+  l_Nth.Nth_Theme_Name            := 'NODE_' || p_Node_Type;
+  l_Nth.Nth_Table_Name            := p_Table_Name;
+  l_Nth.Nth_Where                 := Null;
+  l_Nth.Nth_Pk_Column             := 'NO_NODE_ID';
+  l_Nth.Nth_Label_Column          := 'NO_NODE_NAME';
+  l_Nth.Nth_Rse_Table_Name        := 'NM_ELEMENTS';
+  l_Nth.Nth_Rse_Fk_Column         := Null;
+  l_Nth.Nth_St_Chain_Column       := Null;
+  l_Nth.Nth_End_Chain_Column      := Null;
+  l_Nth.Nth_Offset_Field          := Null;
+  l_Nth.Nth_Feature_Table         := 'V_NM_NO_'||p_Node_Type||'_SDO';
+  l_Nth.Nth_Feature_Pk_Column     := 'NPL_ID';
+  l_Nth.Nth_Feature_Fk_Column     := Null;
+  l_Nth.Nth_Xsp_Column            := Null;
+  l_Nth.Nth_Feature_Shape_Column  := 'GEOLOC';
+  l_Nth.Nth_Hpr_Product           := 'NET';
+  l_Nth.Nth_Location_Updatable    := 'N';
+  l_Nth.Nth_Theme_Type            := 'SDO';
+  l_Nth.Nth_Dependency            := 'I';
+  l_Nth.Nth_Storage               := 'S';
+  l_Nth.Nth_Update_On_Edit        := 'N';
+  l_Nth.Nth_Use_History           := 'N';
+  l_Nth.Nth_Lref_Mandatory        := 'N';
+  l_Nth.Nth_Tolerance             := 10;
+  l_Nth.Nth_Tol_Units             := 1;
+
+  Nm3Ins.Ins_Nth (L_Nth);
+  --
+  --  Build theme gtype rowtype
+  l_Rec_Ntg.Ntg_Theme_Id  := L_Nth.Nth_Theme_Id;
+  l_Rec_Ntg.Ntg_Seq_No    := 1;
+  l_Rec_Ntg.Ntg_Xml_Url   := Null;
+  l_Rec_Ntg.Ntg_Gtype     := '2001';
+
+  Nm3Ins.Ins_Ntg (p_Rec_Ntg => l_Rec_Ntg);
+
+  Commit;
+
+  If Hig.Get_Sysopt ('REGSDELAY') = 'Y' Then
+      
+    Execute Immediate (   ' begin  '
+                      || '    nm3sde.register_sde_layer( p_theme_id => '||To_Char( L_Nth.Nth_Theme_Id )||')'
+                      || '; end;'
+                      );
+  --  place exception into dynamic sql ananymous block. This is dynamic sql to avoid compilation probs
+  End If;
+
+  Return Retval;
+
+Exception
+  When No_Data_Found  Then
+    Hig.Raise_Ner (
+                  pi_Appl         => Nm3Type.C_Hig,
+                  pi_Id           => 193,
+                  pi_Sqlcode      => -20003
+                  );
+End Register_Node_Theme;
+--
+-----------------------------------------------------------------------------
+--
+Function Create_Node_Metadata (
+                              p_Node_Type In Nm_Node_Types.Nnt_Type%Type
+                              ) Return Number
+Is
+  Cur_String    Varchar2 (4000);
+  l_Node_View   Varchar2 (30);
+  Retval        Number;
+Begin
+  -- AE check to make sure user is unrestricted
+  If Not User_Is_Unrestricted Then
+    Raise E_Not_Unrestricted;
+  End If;
+      
+  --create node view based on points - this assumes that the points are either
+  --held as a geo-enabled column this work on 8i by cloning the point-locations table
+  --
+  l_Node_View := Get_Node_Table (p_Node_Type);
+  Cur_String  := 'create or replace view '
+               || l_Node_View
+               || ' as select /*+INDEX( NM_NODES_ALL,NN_NP_FK_IND)*/ p.npl_id, n.*, p.npl_location geoloc '
+               || 'from nm_nodes n, nm_point_locations p '
+               || 'where n.NO_NP_ID = p.NPL_ID '
+               || 'and   n.no_node_type = '
+               || ''''
+               || p_Node_Type
+               || '''';
+     
+  Nm3Ddl.Create_Object_And_Syns( l_Node_View, Cur_String );
+
+  Insert Into Mdsys.Sdo_Geom_Metadata_Table
+  (
+  Sdo_Table_Name,
+  Sdo_Column_Name,
+  Sdo_Diminfo,
+  Sdo_Srid,
+  Sdo_Owner
+  )
+  Select  l_Node_View,
+          'GEOLOC',
+          Sdo_Diminfo,
+          Sdo_Srid,
+          Sys_Context('NM3CORE','APPLICATION_OWNER')
+  From    Mdsys.Sdo_Geom_Metadata_Table
+  Where   Sdo_Table_Name  =   'NM_POINT_LOCATIONS'
+  And     Sdo_Column_Name =   'NPL_LOCATION'
+  And     Sdo_Owner       =   Sys_Context('NM3CORE','APPLICATION_OWNER');
+
+  Retval := Register_Node_Theme (p_Node_Type, l_Node_View, 'GEOLOC');
+    
+  Return Retval;
+
+End Create_Node_Metadata;
+--
+-------------------------------------------------------------------------------------------------------------------------------------
+--
+Function Get_Nlt_Spatial_Table  (
+                                p_Nlt In Nm_Linear_Types%Rowtype
+                                ) Return Varchar2
+Is
+  Retval   Varchar2 (30);
+Begin
+  Retval := 'NM_NLT_' || p_Nlt.Nlt_Nt_Type;
+
+  If p_Nlt.Nlt_Gty_Type Is Not Null
+  Then
+     Retval := Retval || '_' || p_Nlt.Nlt_Gty_Type;
+  End If;
+
+  Retval := Retval || '_SDO';
+    
+  Return Retval;
+End Get_Nlt_Spatial_Table;
+--
+---------------------------------------------------------------------------------------------------
+--
+Function Get_Nlt_Base_Themes  (
+                              p_Nlt_Id In Nm_Linear_Types.Nlt_Id%Type
+                              ) Return Nm_Theme_Array
+Is
+  Retval Nm_Theme_Array := Nm3Array.Init_Nm_Theme_Array;
+
+Begin
+  Select  Nm_Theme_Entry(Nnth_Nth_Theme_Id)
+  Bulk Collect
+  Into    Retval.Nta_Theme_Array    
+  From    Nm_Nw_Themes      nnt,
+          Nm_Linear_Types   nlt1,
+          Nm_Nt_Groupings   nng,
+          Nm_Linear_Types   nlt2,
+          Nm_Themes_All     nta
+  Where   nlt2.Nlt_Id               =   p_Nlt_Id
+  And     nlt1.Nlt_Id               =   nnt.Nnth_Nlt_Id
+  And     nng.Nng_Group_Type        =   nlt2.Nlt_Gty_Type
+  And     nng.Nng_Nt_Type           =   nlt1.Nlt_Nt_Type
+  And     nta.Nth_Theme_Id          =   nnt.Nnth_Nth_Theme_Id
+  And     nta.Nth_Base_Table_Theme  Is  Null
+  And     nlt1.Nlt_G_I_D            =   'D';
+
+  If Retval.Nta_Theme_Array.Last Is Null  Then
+    Hig.Raise_Ner (
+                  pi_Appl               =>  Nm3Type.C_Hig,
+                  pi_Id                 =>  267,
+                  pi_Sqlcode            =>  -20003,
+                  pi_Supplementary_Info =>  To_Char( P_Nlt_Id )
+                  );
+  End If;
+    
+  Return Retval;
+    
+End Get_Nlt_Base_Themes;
+--
+-----------------------------------------------------------------------------
+--
+Procedure Create_Spatial_Table  (
+                                p_Table               In   Varchar2,
+                                p_Mp_Flag             In   Boolean Default False,
+                                p_Start_Date_Column   In   Varchar2 Default Null,
+                                p_End_Date_Column     In   Varchar2 Default Null
+                                )
+Is
+  Cur_String            Varchar2 (2000);
+  Con_String            Varchar2 (2000);
+  Uk_String             Varchar2 (2000);
+  b_Use_History         Constant Boolean :=p_Start_Date_Column Is Not Null And p_End_Date_Column Is Not Null;
+Begin
+  --
+
+  If p_Mp_Flag Then
+    If Nm3Sdo.Use_Surrogate_Key = 'N' Then
+      If b_Use_History  Then
+        Cur_String := 'create table '
+                    || p_Table
+                    || ' ( ne_id number(38) not null, '
+                    || '   geoloc mdsys.sdo_geometry not null,'
+                    || '   '
+                    || p_Start_Date_Column
+                    || ' date, '
+                    || p_End_Date_Column
+                    || ' date, '
+                    || 'date_created date, date_modified date,'
+                    || '   modified_by varchar2(30), created_by varchar2(30) )';
+        Con_String := 'alter table '
+                    || p_Table
+                    || ' ADD CONSTRAINT '
+                    || p_Table
+                    || '_PK PRIMARY KEY '
+                    || ' ( ne_id, '
+                    || p_Start_Date_Column
+                    || ' start_date )';
+      Else
+        Cur_String := 'create table '
+                    || p_Table
+                    || ' ( ne_id number(38) not null, '
+                    || '   geoloc mdsys.sdo_geometry not null,'
+                    || '   date_created date, date_modified date,'
+                    || '   modified_by varchar2(30), created_by varchar2(30) )';
+        Con_String := 'alter table '
+                    || p_Table
+                    || ' ADD CONSTRAINT '
+                    || p_Table
+                    || '_PK PRIMARY KEY '
+                    || ' ( ne_id )';
+      End If;
+
+      Execute Immediate Cur_String;
+
+      Execute Immediate Con_String;
+    Else   -- surrogate key = Y
+      If b_Use_History Then
+        Cur_String :=  'create table '
+                    || p_Table
+                    || ' ( objectid number(38) not null, '
+                    || '   ne_id number(38) not null, '
+                    || '   geoloc mdsys.sdo_geometry not null,'
+                    || '   '
+                    || p_Start_Date_Column
+                    || ' date, '
+                    || '   '
+                    || p_End_Date_Column
+                    || ' date, date_created date, date_modified date,'
+                    || '   modified_by varchar2(30), created_by varchar2(30) )';
+        Con_String :=  'alter table '
+                    || p_Table
+                    || ' ADD CONSTRAINT '
+                    || p_Table
+                    || '_PK PRIMARY KEY '
+                    || ' ( ne_id, '
+                    || p_Start_Date_Column
+                    || ' )';
+      Else  -- no history
+        Cur_String :=  'create table '
+                    || p_Table
+                    || ' ( objectid number(38) not null, '
+                    || '   ne_id number(38) not null, '
+                    || '   geoloc mdsys.sdo_geometry not null,'
+                    || '   date_created date, date_modified date,'
+                    || '   modified_by varchar2(30), created_by varchar2(30) )';
+        Con_String :=  'alter table '
+                    || p_Table
+                    || ' ADD CONSTRAINT '
+                    || p_Table
+                    || '_PK PRIMARY KEY '
+                    || ' ( ne_id )';
+      End If; -- history
+
+      Uk_String :=  'alter table '
+                 || p_Table
+                 || ' ADD ( CONSTRAINT '
+                 || p_Table
+                 || '_UK UNIQUE '
+                 || ' (objectid))';
+
+      Execute Immediate Cur_String;
+
+      Execute Immediate Con_String;
+
+    End If;
+  Else --single part - assumed multi-row
+    If Nm3Sdo.Use_Surrogate_Key = 'N' Then
+      If B_Use_History  Then
+        Cur_String :=  'create table '
+                    || p_Table
+                    || ' ( ne_id number(38) not null, '
+                    || '   ne_id_of number(9) not null, '
+                    || '   nm_begin_mp number not null, '
+                    || '   nm_end_mp number not null, '
+                    || '   geoloc mdsys.sdo_geometry not null,'
+                    || '   '
+                    || p_Start_Date_Column
+                    || ' date, '
+                    || p_End_Date_Column
+                    || ' date, date_created date, date_modified date,'
+                    || '   modified_by varchar2(30), created_by varchar2(30) )';
+      Else -- no history
+        Cur_String :=  'create table '
+                    || p_Table
+                    || ' ( ne_id number(38) not null, '
+                    || '   ne_id_of number(9) not null, '
+                    || '   nm_begin_mp number not null, '
+                    || '   nm_end_mp number not null, '
+                    || '   geoloc mdsys.sdo_geometry not null,'
+                    || '   date_created date, date_modified date,'
+                    || '   modified_by varchar2(30), created_by varchar2(30) )';
+      End If; --history
+
+     Execute Immediate Cur_String;
+       
+    Else -- surrogate key = Y
+      If b_Use_History Then
+        Cur_String :=  'create table '
+                    || p_Table
+                    || ' ( objectid number(38) not null, '
+                    || '   ne_id number(38) not null, '
+                    || '   ne_id_of number(9) not null, '
+                    || '   nm_begin_mp number not null, '
+                    || '   nm_end_mp number not null, '
+                    || '   geoloc mdsys.sdo_geometry not null,'
+                    || '   '
+                    || p_Start_Date_Column
+                    || ' date, '
+                    || p_End_Date_Column
+                    || ' date, date_created date, date_modified date,'
+                    || '   modified_by varchar2(30), created_by varchar2(30) )';
+      Else --no history
+        Cur_String :=  'create table '
+                    || p_Table
+                    || ' ( objectid number(38) not null, '
+                    || '   ne_id number(38) not null, '
+                    || '   ne_id_of number(9) not null, '
+                    || '   nm_begin_mp number not null, '
+                    || '   nm_end_mp number not null, '
+                    || '   geoloc mdsys.sdo_geometry not null,'
+                    || '   date_created date, date_modified date,'
+                    || '   modified_by varchar2(30), created_by varchar2(30) )';
+      End If; --history
+
+      Execute Immediate Cur_String;
+
+    End If; -- surrogate key
+
+    If b_Use_History Then
+      Cur_String := 'alter table '
+                 || p_Table
+                 || ' ADD CONSTRAINT '
+                 || p_Table
+                 || '_PK PRIMARY KEY '
+                 || ' ( ne_id, ne_id_of, nm_begin_mp, '
+                 || p_Start_Date_Column
+                 || ' )';
+    Else
+      Cur_String := 'alter table '
+                 || p_Table
+                 || ' ADD CONSTRAINT '
+                 || p_Table
+                 || '_PK PRIMARY KEY '
+                 || ' ( ne_id, ne_id_of, nm_begin_mp )';
+    End If;
+
+    Execute Immediate Cur_String;
+
+    If Nm3Sdo.Use_Surrogate_Key = 'Y' Then
+      Cur_String := 'alter table '
+                 || p_Table
+                 || ' ADD ( CONSTRAINT '
+                 || p_Table
+                 || '_UK UNIQUE '
+                 || ' ( objectid ))';
+
+      Execute Immediate Cur_String;
+
+     End If; -- surrogate key
+
+     Cur_String := 'create index '|| p_Table
+                || '_NW_IDX'|| ' on '|| p_Table|| ' ( ne_id_of, nm_begin_mp )';
+
+     Execute Immediate Cur_String;
+
+  End If; --single-part or multi-part
+
+End Create_Spatial_Table;
+--
+-------------------------------------------------------------------------------------------------------------------------------------
+--
+Procedure Create_Spatial_Date_View  (
+                                    p_Table            In   Varchar2,
+                                    p_Start_Date_Col   In   Varchar2 Default Null,
+                                    p_End_Date_Col     In   Varchar2 Default Null
+                                    )
+Is
+  Cur_String         Varchar2 (2000);
+  l_Start_Date_Col   Varchar2 (30)   := 'start_date';
+  l_End_Date_Col     Varchar2 (30)   := 'end_date';
+Begin
+  --
+  If p_Start_Date_Col Is Not Null Then
+    l_Start_Date_Col := p_Start_Date_Col;
+  End If;
+
+  If p_End_Date_Col Is Not Null Then
+    l_End_Date_Col := p_End_Date_Col;
+  End If;
+
+  --
+  Cur_String := 'create or replace force view v_'
+             || p_Table
+             || ' as select * from '
+             || p_Table
+             || ' where  '
+             || l_Start_Date_Col
+             || ' <= Sys_Context(''NM3CORE'',''EFFECTIVE_DATE'') '
+             || ' and  NVL('
+             || l_End_Date_Col
+             || ',TO_DATE(''99991231'',''YYYYMMDD'')) > Sys_Context(''NM3CORE'',''EFFECTIVE_DATE'') ';
+  --
+  -- AE 23-SEP-2008
+  -- We will now use views instead of synonyms to provide subordinate user access
+  -- to spatial objects
+  -- CWS 0108742 Change back to using synonyms
+  Nm3Ddl.Create_Object_And_Syns( 'V_'||P_Table, Cur_String );
+
+End Create_Spatial_Date_View;
+--
+-------------------------------------------------------------------------------------------------------------------------------------
+--
+Procedure Create_Nlt_Spatial_Idx  (
+                                  p_Nlt     In   Nm_Linear_Types%Rowtype,
+                                  p_Table   In   Varchar2
+                                  )
+Is
+  --bug in oracle 8 - spatial index name can only be 18 chars
+  --best kept to a quadtree in Oracle 8, Rtree in 9i
+  Cur_String   Varchar2 (2000);
+Begin
+  Cur_String :=
+                'create index NLT_'
+             || p_Nlt.Nlt_Nt_Type
+             || '_'
+             || p_Nlt.Nlt_Gty_Type
+             || '_spidx on '
+             || p_Table
+             || ' ( geoloc ) indextype is mdsys.spatial_index';
+               
+  Execute Immediate Cur_String;
+End Create_Nlt_Spatial_Idx;
+--
+-----------------------------------------------------------------------------
+--
+--temp function until the DB design is finished and the gets can be
+--generated
+  
+Function Get_Nlt  (
+                  pi_Nlt_Id In Nm_Linear_Types.Nlt_Id%Type
+                  ) Return Nm_Linear_Types%Rowtype
+Is
+  Retval   Nm_Linear_Types%Rowtype;
+Begin
+  Begin
+    Select  *
+    Into    Retval
+    From    Nm_Linear_Types   nlt
+    Where   nlt.Nlt_Id = pi_Nlt_Id;
+  Exception
+   When No_Data_Found Then
+     Null;
+  End;
+
+ Return Retval;
+End Get_Nlt; 
+--
+---------------------------------------------------------------------------------------------------
+--
+Procedure Create_Base_Themes  (
+                              p_Theme_Id    In Number,
+                              p_Base        In Nm_Theme_Array
+                              )
+Is
+Begin
+  If P_Base.Nta_Theme_Array(1).Nthe_Id Is Null Then
+    Null;
+  Else
+    For i In 1..p_Base.Nta_Theme_Array.Last
+    Loop
+
+      Insert Into Nm_Base_Themes
+      (
+      Nbth_Theme_Id,
+      Nbth_Base_Theme
+      )
+      Values
+      (
+      p_Theme_Id,
+      p_Base.Nta_Theme_Array(i).Nthe_Id
+      );
+        
+    End Loop;
+  End If;
+End Create_Base_Themes;
+--
+---------------------------------------------------------------------------------------------------
+--
+Function Register_Lrm_Theme (
+                            p_Nlt_Id           In   Number,
+                            p_Base             In   Nm_Theme_Array,
+                            p_Table_Name       In   Varchar2,
+                            p_Column_Name      In   Varchar2,
+                            p_Name             In   Varchar2 Default Null,
+                            p_View_Flag        In   Varchar2 Default 'N',
+                            p_Base_Table_Nth   In   Nm_Themes_All.Nth_Theme_Id%Type Default Null
+                            ) Return Number
+Is
+  Retval        Number;
+  l_D_Or_S      Varchar2 (1);
+  l_View_Name   Varchar2 (30);
+  l_Pk_Col      Varchar2 (30)                       := 'NE_ID';
+  l_Nth         Nm_Themes_All%Rowtype;
+  l_Nlt         Nm_Linear_Types%Rowtype;
+  l_Name        Nm_Themes_All.Nth_Theme_Name%Type   := Upper (p_Name);
+  l_Rec_Nnth    Nm_Nw_Themes%Rowtype;
+  l_Rec_Ntg     Nm_Theme_Gtypes%Rowtype;
+  l_Mp_Gtype    Number := To_Number(Nvl(Hig.Get_Sysopt('SDOMPGTYPE'),'3302'));
+
+Begin
+  l_Nlt := Get_Nlt (p_Nlt_Id);
+  g_Units := Nm3Net.Get_Nt_Units( l_Nlt.Nlt_Nt_Type);
+
+  If g_Units = 1 Then
+    g_Unit_Conv := 1;
+  Else
+    g_Unit_Conv := Nm3Get.Get_Uc ( g_Units, 1).Uc_Conversion_Factor;
+  End If;
+
+  If l_Name Is Null Then
+     l_Name := Upper (Substr (l_Nlt.Nlt_Descr, 1, 30));
+  End If;
+
+  If Nm3Sdo.Use_Surrogate_Key = 'Y' Then
+    l_Pk_Col := 'OBJECTID';
+    --  to make sm work we need to use NE_ID
+    l_Pk_Col := 'NE_ID';
+  End If;
+
+  Retval                := Higgis.Next_Theme_Id;
+  l_Nth.Nth_Theme_Id    := Retval;
+  l_Nth.Nth_Theme_Name  := l_Name;
+  l_Nth.Nth_Table_Name  := p_Table_Name;
+  l_Nth.Nth_Where       := Null;
+  l_Nth.Nth_Pk_Column   := 'NE_ID';
+  --
+  -- Task ID 0107889 - Set Label Column to NE_ID for Group layer base table themes
+  -- 05/10/09 AE Further restrict on the non DT theme 
+  --
+  If      p_Base_Table_Nth      Is        Null
+      Or  l_Nth.Nth_Theme_Name  Not Like  '%DT' Then
+    l_Nth.Nth_Label_Column := 'NE_ID';
+  Else
+    l_Nth.Nth_Label_Column := 'NE_UNIQUE';
+  End If;
+  --
+  l_Nth.Nth_Rse_Table_Name        := 'NM_ELEMENTS';
+  l_Nth.Nth_Rse_Fk_Column         := 'NE_ID';
+  l_Nth.Nth_St_Chain_Column       := Null;
+  l_Nth.Nth_End_Chain_Column      := Null;
+  l_Nth.Nth_X_Column              := Null;
+  l_Nth.Nth_Y_Column              := Null;
+  l_Nth.Nth_Offset_Field          := Null;
+  l_Nth.Nth_Feature_Table         := p_Table_Name;
+  l_Nth.Nth_Feature_Pk_Column     := l_Pk_Col;
+  l_Nth.Nth_Feature_Fk_Column     := 'NE_ID';
+  l_Nth.Nth_Xsp_Column            := Null;
+  l_Nth.Nth_Feature_Shape_Column  := 'GEOLOC';
+  l_Nth.Nth_Hpr_Product           := 'NET';
+  l_Nth.Nth_Location_Updatable    := 'N';
+  l_Nth.Nth_Theme_Type            := 'SDO';
+  l_Nth.Nth_Dependency            := 'D';
+  l_Nth.Nth_Storage               := 'S';
+  l_Nth.Nth_Update_On_Edit        := 'D';
+  l_Nth.Nth_Use_History           := 'Y';
+  l_Nth.Nth_Start_Date_Column     := 'START_DATE';
+  l_Nth.Nth_End_Date_Column       := 'END_DATE';
+  l_Nth.Nth_Base_Table_Theme      := p_Base_Table_Nth;
+  l_Nth.Nth_Sequence_Name         := 'NTH_' || Nvl(p_Base_Table_Nth,Retval) || '_SEQ';
+  l_Nth.Nth_Snap_To_Theme         := 'N';
+  l_Nth.Nth_Lref_Mandatory        := 'N';
+  l_Nth.Nth_Tolerance             := 10;
+  l_Nth.Nth_Tol_Units             := 1;
+
+  Nm3Ins.Ins_Nth (l_Nth);
+
+  l_Rec_Nnth.Nnth_Nlt_Id        := p_Nlt_Id;
+  l_Rec_Nnth.Nnth_Nth_Theme_Id  := Retval;
+
+  Nm3Ins.Ins_Nnth (l_Rec_Nnth);
+  --
+  --  Build theme gtype rowtype
+
+  l_Rec_Ntg.Ntg_Theme_Id := Retval;
+  l_Rec_Ntg.Ntg_Seq_No   := 1;
+  l_Rec_Ntg.Ntg_Xml_Url  := Null;
+  l_Rec_Ntg.Ntg_Gtype    := l_Mp_Gtype;
+
+  Nm3Ins.Ins_Ntg (p_Rec_Ntg => l_Rec_Ntg);
+
+  --  Build the base themes
+
+  Create_Base_Themes( Retval, p_Base );
+
+    --
+  If Hig.Get_Sysopt ('REGSDELAY') = 'Y' Then
+    Execute Immediate (   ' begin  '
+                      || '    nm3sde.register_sde_layer( p_theme_id => '||To_Char( L_Nth.Nth_Theme_Id )||');'
+                      || ' end;'
+                     );
+  End If;
+
+  If P_View_Flag = 'Y'  Then
+    Declare
+      l_Role   Varchar2 (30);
+    Begin
+      l_Role := Hig.Get_Sysopt ('SDONETROLE');
+
+      If l_Role Is Not Null Then
+        Insert Into Nm_Theme_Roles
+        (
+        Nthr_Theme_Id,
+        Nthr_Role,
+        Nthr_Mode
+        )
+        Values
+        (
+        Retval,
+        l_Role,
+        'NORMAL'
+        );
+      End If;
+    End;
+  End If;
+  --
+  -- create the theme functions - exclude gog
+  --
+  Create_Theme_Functions( p_Theme => l_Nth.Nth_Theme_Id, p_Pa => g_Network_Modules, p_Exclude => 2 );
+
+  Return Retval;
+
+End Register_Lrm_Theme;
+--
+-----------------------------------------------------------------------------
+--
+Procedure Make_Nt_Spatial_Layer (
+                                pi_Nlt_Id   In   Nm_Linear_Types.Nlt_Id%Type,
+                                p_Gen_Pt    In   Number Default 0,
+                                p_Gen_Tol   In   Number Default 0,
+                                p_Job_Id    In   Number Default Null
+                                )
+Is
+  /*
+  ** not expected to be used for datum layers
+  */
+  l_Nlt                Nm_Linear_Types%Rowtype     := Nm3Get.Get_Nlt (Pi_Nlt_Id);
+  l_Nlt_Seq            Varchar2(30);
+  l_Base_Themes        Nm_Theme_Array;
+  l_Theme_Id           Nm_Themes_All.Nth_Theme_Id%Type;
+  l_Theme_Name         Nm_Themes_All.Nth_Theme_Name%Type;
+  l_Base_Table_Theme   Nm_Themes_All.Nth_Theme_Id%Type;
+  l_Tab                Varchar2 (30);
+  l_View               Varchar2 (30);
+  l_Usgm               User_Sdo_Geom_Metadata%Rowtype;
+  l_Diminfo            Mdsys.Sdo_Dim_Array;
+  l_Srid               Number;
+  --
+Begin
+  -- AE check to make sure user is unrestricted
+  If Not User_Is_Unrestricted Then
+    Raise E_Not_Unrestricted;
+  End If;
+  --
+  -----------------------------------------------------------------------
+  -- Table name is the is derived based on nt/gty
+  -----------------------------------------------------------------------
+
+  l_Tab := Get_Nlt_Spatial_Table (l_Nlt);
+
+  -----------------------------------------------------------------------
+  -- Will always be a group according to Linear types..
+  -----------------------------------------------------------------------
+  If l_Nlt.Nlt_G_I_D = 'G'  Then
+    l_Base_Themes := Get_Nlt_Base_Themes( pi_Nlt_Id );
+  End If;
+
+  If L_Base_Themes.Nta_Theme_Array(1).Nthe_Id Is Null Then
+    Hig.Raise_Ner (
+                  pi_Appl         => Nm3Type.C_Hig,
+                  pi_Id           => 266,
+                  pi_Sqlcode      => -20001
+                  );
+  End If;
+
+  -----------------------------------------------------------------------
+  -- Create the nt view if not already there
+  -----------------------------------------------------------------------
+    
+  If Not Nm3Ddl.Does_Object_Exist (l_View, 'VIEW') Then
+    Nm3Inv_View.Create_View_For_Nt_Type (l_Nlt.Nlt_Nt_Type);
+  End If;
+
+  -----------------------------------------------------------------------
+  -- Create spatial data in table + create date tracked view
+  -----------------------------------------------------------------------
+  Create_Spatial_Table (l_Tab, True, 'START_DATE', 'END_DATE');
+    
+  Create_Spatial_Date_View (l_Tab);
+    
+  -----------------------------------------------------------------------
+  -- Clone SDO metadata from it's base layer
+  -----------------------------------------------------------------------
+    
+  Nm3Sdo.Set_Diminfo_And_Srid( l_Base_Themes, l_Diminfo, l_Srid );
+
+  l_Diminfo(3).Sdo_Tolerance := Nm3Unit.Get_Tol_From_Unit_Mask(Nm3Net.Get_Nt_Units(l_Nlt.Nlt_Nt_Type));
+  l_Usgm.Table_Name  := l_Tab;
+  l_Usgm.Column_Name := 'GEOLOC';
+  l_Usgm.Diminfo     := l_Diminfo;
+  l_Usgm.Srid        := l_Srid;
+
+  Nm3Sdo.Ins_Usgm ( l_Usgm );
+
+  l_Usgm.Table_Name := 'V_'|| l_Tab;
+
+  Nm3Sdo.Ins_Usgm ( l_Usgm );
+
+  -----------------------------------------------------------------------
+  -- Register Theme for table
+  -----------------------------------------------------------------------
+
+  l_Theme_Name := Substr (l_Nlt.Nlt_Descr, 1, 26);
+
+
+  l_Theme_Id := Register_Lrm_Theme  (
+                                    p_Nlt_Id           => pi_Nlt_Id,
+                                    p_Base             => l_Base_Themes,
+                                    p_Table_Name       => l_Tab,
+                                    p_Column_Name      => 'GEOLOC',
+                                    p_Name             => l_Theme_Name || '_TAB'
+                                    );
+  l_Base_Table_Theme := l_Theme_Id;
+
+  l_Nlt_Seq := Nm3Sdo.Create_Spatial_Seq (l_Theme_Id);
+
+  -----------------------------------------------------------------------
+  -- Register Theme for date view
+  -----------------------------------------------------------------------
+
+  l_Theme_Id := Register_Lrm_Theme  (
+                                    p_Nlt_Id              => pi_Nlt_Id,
+                                    p_Base                => l_Base_Themes,
+                                    p_Table_Name          => 'V_' || l_Tab,
+                                    p_Column_Name         => 'GEOLOC',
+                                    p_Name                => l_Theme_Name,
+                                    p_View_Flag           => 'Y',
+                                    p_Base_Table_Nth      => l_Base_Table_Theme
+                                   );
+
+  -----------------------------------------------------------------------
+  -- Need a join view between spatial table and NT view
+  -----------------------------------------------------------------------
+
+  l_View := Create_Nlt_Sdo_Join_View  (
+                                      p_Feature_Table_Name  =>  l_Tab
+                                      );
+
+  -----------------------------------------------------------------------
+  -- Create the spatial data
+  -----------------------------------------------------------------------
+
+  Nm3Sdo.Create_Nt_Data( Nm3Get.Get_Nth(l_Base_Table_Theme), pi_Nlt_Id, l_Base_Themes, p_Job_Id );
+
+  -----------------------------------------------------------------------
+  -- Table needs a spatial index
+  -----------------------------------------------------------------------
+
+  Create_Nlt_Spatial_Idx (l_Nlt, l_Tab);
+
+  -----------------------------------------------------------------------
+  -- Register theme for _DT attribute view
+  -----------------------------------------------------------------------
+
+  If G_Date_Views = 'Y' Then
+
+    l_Usgm.Table_Name := l_View;
+
+    Nm3Sdo.Ins_Usgm ( l_Usgm );
+
+    l_Theme_Name := Substr (l_Nlt.Nlt_Descr, 1, 27) || '_DT';
+    l_Theme_Id := Register_Lrm_Theme  (
+                                      p_Nlt_Id              => pi_Nlt_Id,
+                                      p_Base                => l_Base_Themes,
+                                      p_Table_Name          => l_View,
+                                      p_Column_Name         => 'GEOLOC',
+                                      p_Name                => l_Theme_Name,
+                                      p_View_Flag           => 'Y',
+                                      p_Base_Table_Nth      => l_Base_Table_Theme
+                                      );
+  End If;
+
+  -----------------------------------------------------------------------
+  -- Analyse table
+  -----------------------------------------------------------------------
+  Begin
+    Nm3Ddl.Analyse_Table  (
+                          pi_Table_Name          => l_Tab,
+                          pi_Schema              => Sys_Context('NM3CORE','APPLICATION_OWNER'),
+                          pi_Estimate_Percentage => Null,
+                          pi_Auto_Sample_Size    => False
                           );
-      END IF;
-
-    -----------------------------------------------------------------------
-    -- Analyse table
-    -----------------------------------------------------------------------
-      BEGIN
---    EXECUTE IMMEDIATE 'analyze table '||l_tab||' compute statistics';
-        Nm3ddl.analyse_table (pi_table_name          => l_tab
-                            , pi_schema              => Sys_Context('NM3CORE','APPLICATION_OWNER')
-                            , pi_estimate_percentage => NULL
-                            , pi_auto_sample_size    => FALSE);
-      EXCEPTION
-        WHEN OTHERS
-        THEN
-          RAISE e_no_analyse_privs;
-      END;
-      --
-      Nm_Debug.proc_end (g_package_name, 'make_nt_spatial_layer');
-   --
-  EXCEPTION
-    WHEN e_not_unrestricted
-    THEN
-      RAISE_APPLICATION_ERROR (-20777,'Restricted users are not permitted to create SDO layers');
-    WHEN e_no_analyse_privs
-    THEN
-      RAISE_APPLICATION_ERROR (-20778,'Layer created - but user does not have ANALYZE ANY granted. '||
-                                      'Please ensure the correct role/privs are applied to the user');
-
-   END;
+  Exception
+    When Others Then
+      Raise E_No_Analyse_Privs;
+  End;
+  --
+  Nm_Debug.Proc_End (G_Package_Name, 'make_nt_spatial_layer');
+  --
+Exception
+  When E_Not_Unrestricted Then
+    Raise_Application_Error (-20777,'Restricted users are not permitted to create SDO layers');
+  When E_No_Analyse_Privs Then
+    Raise_Application_Error (-20778,'Layer created - but user does not have ANALYZE ANY granted. '||
+                                    'Please ensure the correct role/privs are applied to the user');
+End Make_Nt_Spatial_Layer; 
 --
 -----------------------------------------------------------------------------
 --
-  --temp function until the DB design is finished and the gets can be
-  --generated
-   FUNCTION get_nlt (pi_nlt_id IN NM_LINEAR_TYPES.nlt_id%TYPE)
-      RETURN NM_LINEAR_TYPES%ROWTYPE
-   IS
-      CURSOR c1 (c_nlt_id IN NM_LINEAR_TYPES.nlt_id%TYPE)
-      IS
-         SELECT *
-           FROM NM_LINEAR_TYPES
-          WHERE nlt_id = c_nlt_id;
+Function Get_Nth (
+                 pi_Nth_Theme_Id In Nm_Themes_All.Nth_Theme_Id%Type
+                 ) Return Nm_Themes_All%Rowtype
+Is
+  Retval   Nm_Themes_All%Rowtype;
+Begin
+  Begin
+    Select  *
+    Into    Retval
+    From    Nm_Themes_All
+    Where   Nth_Theme_Id = pi_Nth_Theme_Id;
+  Exception
+    When No_Data_Found Then
+      Null;
+  End;
 
-      retval   NM_LINEAR_TYPES%ROWTYPE;
-   BEGIN
-      OPEN c1 (pi_nlt_id);
-      FETCH c1
-       INTO retval;
-      CLOSE c1;
-      RETURN retval;
-   END get_nlt;
-
---
------------------------------------------------------------------------------
---
-   FUNCTION get_nth (pi_nth_theme_id IN NM_THEMES_ALL.nth_theme_id%TYPE)
-      RETURN NM_THEMES_ALL%ROWTYPE
-   IS
-      CURSOR c1 (c_nth_theme_id NM_THEMES_ALL.nth_theme_id%TYPE)
-      IS
-         SELECT *
-           FROM NM_THEMES_ALL
-          WHERE nth_theme_id = pi_nth_theme_id;
-
-      retval   NM_THEMES_ALL%ROWTYPE;
-   BEGIN
-      OPEN c1 (pi_nth_theme_id);
-      FETCH c1
-       INTO retval;
-      CLOSE c1;
-      RETURN retval;
-   END get_nth;
-
---
------------------------------------------------------------------------------
---
-   PROCEDURE create_element_shape_from_xml (
-      p_layer   IN   NUMBER,
-      p_ne_id   IN   nm_elements.ne_id%TYPE,
-      p_xml     IN   CLOB
-   )
-   IS
-      l_geom   MDSYS.SDO_GEOMETRY;
-   BEGIN
-      ----   nm_debug.debug_on;
-      ----   nm_debug.delete_debug(TRUE);
-
-      ----   nm_debug.DEBUG_CLOB( P_CLOB => p_xml );
-      l_geom := Nm3sdo_Xml.load_shape (p_xml            => p_xml,
-                                       p_file_type      => 'datum');
-      Nm3sdo.insert_element_shape (p_layer      => p_layer,
-                                   p_ne_id      => p_ne_id,
-                                   p_geom       => l_geom
-                                  );
-   END;
-
+  Return Retval;
+End Get_Nth;
 --
 -----------------------------------------------------------------------------
 --Note that this is temporary - theoretically, the function needs to be
@@ -709,4546 +1295,3186 @@ PROCEDURE make_nt_spatial_layer
 --schematics etc.
 --Also, for now it assumes it is a base datum for use in the split/merge routines
 --
-   FUNCTION get_nt_theme (
-      p_nt   IN   NM_TYPES.nt_type%TYPE,
-      p_gt   IN   nm_group_types.ngt_group_type%TYPE DEFAULT NULL
-   )
-      RETURN NM_THEMES_ALL.nth_theme_id%TYPE
-   IS
-      CURSOR c1 (
-         c_nt   NM_TYPES.nt_type%TYPE,
-         c_gt   nm_group_types.ngt_group_type%TYPE
-      )
-      IS
-         SELECT nth_theme_id
-           FROM NM_THEMES_ALL, NM_NW_THEMES, NM_LINEAR_TYPES
-          WHERE nlt_id = nnth_nlt_id
-            AND nnth_nth_theme_id = nth_theme_id
-            AND nlt_nt_type = c_nt
-            AND nth_theme_type = 'SDO'
-            AND nth_base_table_theme IS NULL
-            AND NOT EXISTS ( SELECT 1 FROM NM_BASE_THEMES
-                              WHERE nbth_theme_id = nth_theme_id );
-
-      retval   NM_THEMES_ALL.nth_theme_id%TYPE;
-   BEGIN
-      OPEN c1 (p_nt, p_gt);
-      FETCH c1
-       INTO retval;
-      CLOSE c1;
-      RETURN retval;
-   END get_nt_theme;
-
---
------------------------------------------------------------------------------
---
-
-   PROCEDURE  split_element_at_xy (p_layer IN NUMBER,
-                                   p_ne_id  IN NUMBER,
-                                   p_measure IN NUMBER,
-                                   p_x IN NUMBER,
-                                   p_y IN NUMBER,
-                                   p_ne_id_1 IN NUMBER,
-                                   p_ne_id_2 IN NUMBER,
-                                   p_geom_1  OUT mdsys.sdo_geometry,
-                                   p_geom_2  OUT mdsys.sdo_geometry ) IS
-
-      l_geom    mdsys.sdo_geometry := Nm3sdo.Get_Layer_Element_Geometry( p_layer, p_ne_id );
-
-      l_geom_1 mdsys.sdo_geometry;
-      l_geom_2 mdsys.sdo_geometry;
-      l_measure NUMBER;
-      l_usgm   user_sdo_geom_metadata%ROWTYPE;
-      l_end    NUMBER;
-
-    BEGIN
-
-      l_usgm := Nm3sdo.get_theme_metadata( p_layer );
-
-      IF Nm3sdo.element_has_shape( p_layer, p_ne_id ) = 'TRUE'
-      THEN
-
-        l_measure := Nm3sdo.get_measure ( p_layer, p_ne_id, p_x, p_y ).lr_offset;
-
-        sdo_lrs.split_geom_segment( l_geom, l_usgm.diminfo, l_measure, p_geom_1, p_geom_2 );
-
-        if p_measure is not null then
-          l_measure := p_measure;
-        end if;
-
-        p_geom_1 := sdo_lrs.scale_geom_segment
-                       ( geom_segment  => p_geom_1
-                       , dim_array     => l_usgm.diminfo
-                       , start_measure => 0
-                       , end_measure   => l_measure
-                       , shift_measure => 0 );
-
-        l_end   := Nm3net.get_datum_element_length( p_ne_id ) - l_measure;
-
-        p_geom_2 := sdo_lrs.scale_geom_segment
-                       ( geom_segment  => p_geom_2
-                       , dim_array     => l_usgm.diminfo
-                       , start_measure => 0
-                       , end_measure   => l_end
-                       , shift_measure => 0 );
-      ELSE
-
-        p_geom_1 := NULL;
-        p_geom_2 := NULL;
-
-      END IF;
-
-    END;
-
---
------------------------------------------------------------------------------
---
-  PROCEDURE split_element_shapes (
-      p_ne_id     IN   nm_elements.ne_id%TYPE,
-      p_measure   IN   NUMBER,
-      p_ne_id_1   IN   nm_elements.ne_id%TYPE,
-      p_ne_id_2   IN   nm_elements.ne_id%TYPE,
-      p_x         IN   NUMBER DEFAULT NULL,
-      p_y         IN   NUMBER DEFAULT NULL
-   )
-   IS
-      l_layer   NUMBER;
-      l_geom1   MDSYS.SDO_GEOMETRY;
-      l_geom2   MDSYS.SDO_GEOMETRY;
-   BEGIN
-
---     nm_debug.debug_on;
---     Nm_Debug.DEBUG('Split element shapes');
-
-      l_layer := Nm3sdm.get_nt_theme (Nm3get.get_ne (p_ne_id).ne_nt_type);
-
-      IF Nm3sdo.element_has_shape (l_layer, p_ne_id) = 'TRUE'
-      THEN
---        Nm_Debug.DEBUG('element has shape');
-
-         IF p_x IS NULL AND p_y IS NULL THEN
-
---           Nm_Debug.DEBUG(' and no xy - use measure of '||p_measure);
-
-            Nm3sdo.split_element_at_measure (p_layer        => l_layer,
-                                             p_ne_id        => p_ne_id,
-                                             p_measure      => p_measure,
-                                             p_ne_id_1      => p_ne_id_1,
-                                             p_ne_id_2      => p_ne_id_2,
-                                             p_geom1        => l_geom1,
-                                             p_geom2        => l_geom2
-                                            );
-         ELSIF p_x IS NOT NULL
-           AND p_y IS NOT NULL
-         THEN
-
---           Nm_Debug.DEBUG(' and xy - use  '||p_x||','||p_y);
-
-            split_element_at_xy (  p_layer        => l_layer,
-                                   p_ne_id        => p_ne_id,
-                                   p_measure      => p_measure,
-                                   p_x            => p_x,
-                                   p_y            => p_y,
-                                   p_ne_id_1      => p_ne_id_1,
-                                   p_ne_id_2      => p_ne_id_2,
-                                   p_geom_1        => l_geom1,
-                                   p_geom_2        => l_geom2 );
-
-         ELSE
-
-           RAISE_APPLICATION_ERROR(-20001, 'Incompatible values');
-
-         END IF;
-
-         Nm3sdo.insert_element_shape (p_layer      => l_layer,
-                                      p_ne_id      => p_ne_id_1,
-                                      p_geom       => l_geom1
-                                     );
-         Nm3sdo.insert_element_shape (p_layer      => l_layer,
-                                      p_ne_id      => p_ne_id_2,
-                                      p_geom       => l_geom2
-                                     );
-      END IF;
-
-   END;
---
------------------------------------------------------------------------------
---
-   PROCEDURE ins_usgm (pi_rec_usgm IN OUT user_sdo_geom_metadata%ROWTYPE)
-   IS
-   BEGIN
-      --
-      Nm_Debug.proc_start (g_package_name, 'ins_usgm');
-
-      --
-      INSERT INTO mdsys.sdo_geom_metadata_table
-                  (sdo_table_name, sdo_column_name,
-                   sdo_diminfo, sdo_srid, sdo_owner
-                  )
-           VALUES (pi_rec_usgm.table_name, pi_rec_usgm.column_name,
-                   pi_rec_usgm.diminfo, pi_rec_usgm.srid, Sys_Context('NM3CORE','APPLICATION_OWNER')
-                  )
-        RETURNING sdo_table_name, sdo_column_name,
-                  sdo_diminfo, sdo_srid
-             INTO pi_rec_usgm.table_name, pi_rec_usgm.column_name,
-                  pi_rec_usgm.diminfo, pi_rec_usgm.srid;
-
-      --
-      Nm_Debug.proc_end (g_package_name, 'ins_usgm');
-   --
-   END ins_usgm;
-
---
------------------------------------------------------------------------------
---
-   PROCEDURE merge_element_shapes (
-      p_ne_id           IN   nm_elements.ne_id%TYPE,
-      p_ne_id_1         IN   nm_elements.ne_id%TYPE,
-      p_ne_id_2         IN   nm_elements.ne_id%TYPE,
-      p_ne_id_to_flip   IN   nm_elements.ne_id%TYPE
-   )
-   IS
-      l_layer   NUMBER;
-      l_geom    MDSYS.SDO_GEOMETRY;
-   BEGIN
-      l_layer := get_nt_theme (Nm3get.get_ne (p_ne_id).ne_nt_type);
-
-      IF     Nm3sdo.element_has_shape (l_layer, p_ne_id_1) = 'TRUE'
-         AND Nm3sdo.element_has_shape (l_layer, p_ne_id_2) = 'TRUE'
-      THEN
-         Nm3sdo.merge_element_shapes (p_layer              => l_layer,
-                                      p_ne_id_1            => p_ne_id_1,
-                                      p_ne_id_2            => p_ne_id_2,
-                                      p_ne_id_to_flip      => p_ne_id_to_flip,
-                                      p_geom               => l_geom
-                                     );
-
-         IF l_geom IS NOT NULL
-         THEN
-            Nm3sdo.insert_element_shape (p_layer      => l_layer,
-                                         p_ne_id      => p_ne_id,
-                                         p_geom       => l_geom
-                                        );
-         END IF;
-      END IF;
-   END;
-
---
------------------------------------------------------------------------------
---
-   PROCEDURE replace_element_shape (
-      p_ne_id_old   IN   nm_elements.ne_id%TYPE,
-      p_ne_id_new   IN   nm_elements.ne_id%TYPE
-   )
-   IS
-      l_layer_old   NUMBER;
-      l_layer_new   NUMBER;
-      l_geom        MDSYS.SDO_GEOMETRY;
-   BEGIN
-
---    nm_debug.debug('Replace shape for '||to_char(p_ne_id_old)||' into '||to_char(p_ne_id_new));
-
-      l_layer_old := get_nt_theme (Nm3get.get_ne_all (p_ne_id_old).ne_nt_type);
-      l_layer_new := get_nt_theme (Nm3get.get_ne (p_ne_id_new).ne_nt_type);
-
-      IF Nm3sdo.element_has_shape (l_layer_old, p_ne_id_old) = 'TRUE' AND l_layer_new IS NOT NULL
-      THEN
-         l_geom := Nm3sdo.get_layer_element_geometry (l_layer_old, p_ne_id_old);
-         --  The old element shape must be end-dated
-         --  The new one must be created
-         --  All affected shapes inside asset layers must be regenerated
-         Nm3sdo.insert_element_shape (p_layer      => l_layer_new,
-                                      p_ne_id      => p_ne_id_new,
-                                      p_geom       => l_geom
-                                     );
-      END IF;
-   --
-   END;
-
---
------------------------------------------------------------------------------
---
---
-
-   PROCEDURE reshape_element (
-      p_ne_id   IN   nm_elements.ne_id%TYPE,
-      p_geom    IN   MDSYS.SDO_GEOMETRY
-   )
-   IS
-      l_layer    NUMBER;
-      l_old_geom mdsys.sdo_geometry;
-      l_new_geom mdsys.sdo_geometry;
-      l_length   NUMBER;
-      l_usgm     user_sdo_geom_metadata%ROWTYPE;
-      l_rec_nth  nm_themes_all%ROWTYPE;
-   BEGIN
-      --nm_debug.debug_on;
-      --nm_debug.debug('changing shapes');
-      l_layer := get_nt_theme (Nm3get.get_ne (p_ne_id).ne_nt_type);
-      l_rec_nth := nm3get.get_nth(l_layer);
-
-      IF Nm3sdo.element_has_shape (l_layer, p_ne_id) = 'TRUE'
-      THEN
-
-         -- AE 09-FEB-2009
-         -- Brought across the code from 2.10.1.1 branch into the mainstream
-         -- version so that the SRID is set on the reshape
-
-         l_old_geom := nm3sdo.get_layer_element_geometry( l_layer, p_ne_id );
-
-         l_new_geom := p_geom;
-
-         IF NVL(l_old_geom.sdo_srid, -9999)  != NVL( l_new_geom.sdo_srid, -9999)
-         THEN
-           l_new_geom.sdo_srid := l_old_geom.sdo_srid;
-         END IF;
-      --
-      -- Task 0110101
-      -- Bring code across from NM3SDO insert_element_shape to validate the
-      -- length of the geometry being passed into this procedure
-      --
-         l_usgm := nm3sdo.get_usgm ( pi_table_name  => l_rec_nth.nth_feature_table
-                                   , pi_column_name => l_rec_nth.nth_feature_shape_column );
-      --
-         l_length := nm3net.get_ne_length ( p_ne_id );
-      --
-         IF NVL(sdo_lrs.geom_segment_end_measure ( l_new_geom, l_usgm.diminfo ), -9999) != l_length 
-         THEN
-            sdo_lrs.redefine_geom_segment ( l_new_geom, l_usgm.diminfo, 0, l_length );
-         END IF;
-      --
-         IF sdo_lrs.geom_segment_end_measure ( l_new_geom, l_usgm.diminfo ) != l_length
-         THEN
-           hig.raise_ner(pi_appl    => nm3type.c_hig
-                        ,pi_id      => 204
-                        ,pi_sqlcode => -20001 );
-         END IF;
-      --
-      -- Task 0110101 Done
-      --
-         nm3sdo_edit.reshape ( l_layer, p_ne_id, l_new_geom );
-      --
-         nm3sdo.change_affected_shapes (p_layer      => l_layer,
-                                        p_ne_id      => p_ne_id);
-      ELSE
-         nm3sdo.insert_element_shape (p_layer      => l_layer,
-                                      p_ne_id      => p_ne_id,
-                                      p_geom       => p_geom
-                                     );
-         nm3sdo.change_affected_shapes (p_layer      => l_layer,
-                                        p_ne_id      => p_ne_id);
-      END IF;
-
-   END;
---
------------------------------------------------------------------------------
---
-   PROCEDURE move_node (
-      p_no_node_id   IN   nm_nodes.no_node_id%TYPE,
-      p_x            IN   NUMBER,
-      p_y            IN   NUMBER
-   )
-   IS
-      l_np_id   NM_POINTS.np_id%TYPE;
-   BEGIN
-      l_np_id := Nm3get.get_no (pi_no_node_id => p_no_node_id).no_np_id;
-      UPDATE NM_POINTS np
-         SET np.np_grid_east = p_x,
-             np.np_grid_north = p_y
-       WHERE np.np_id = l_np_id;
-   END;
-
---
------------------------------------------------------------------------------
---
-   PROCEDURE reverse_element_shape (
-      p_ne_id_old   IN   nm_elements.ne_id%TYPE,
-      p_ne_id_new   IN   nm_elements.ne_id%TYPE
-   )
-   IS
-      l_layer   NUMBER;
-      l_geom    MDSYS.SDO_GEOMETRY;
-   BEGIN
-      l_layer := get_nt_theme (Nm3get.get_ne_all (p_ne_id_old).ne_nt_type);
-
-      IF Nm3sdo.element_has_shape (l_layer, p_ne_id_old) = 'TRUE'
-      THEN
-         l_geom := Nm3sdo.get_layer_element_geometry (l_layer, p_ne_id_old);
-         l_geom := Nm3sdo.reverse_geometry (p_geom => l_geom);
-         Nm3sdo.insert_element_shape (p_layer      => l_layer,
-                                      p_ne_id      => p_ne_id_new,
-                                      p_geom       => l_geom
-                                     );
-      END IF;
-   END;
-
---
------------------------------------------------------------------------------
---
-   PROCEDURE recalibrate_element_shape (
-      p_ne_id               IN   nm_elements.ne_id%TYPE,
-      p_measure             IN   NUMBER,
-      p_new_length_to_end   IN   nm_elements.ne_length%TYPE
-   )
-   IS
-      l_layer     NUMBER;
-      l_pt_geom   MDSYS.SDO_GEOMETRY;
-      l_geom      MDSYS.SDO_GEOMETRY;
-   BEGIN
-      ----   nm_debug.delete_debug(true);
-      ----   nm_debug.debug_on;
-      l_layer := get_nt_theme (Nm3get.get_ne (p_ne_id).ne_nt_type);
-
-      IF Nm3sdo.element_has_shape (l_layer, p_ne_id) = 'TRUE'
-      THEN
-         ----   nm_debug.debug('get old geometry');
-         l_geom := Nm3sdo.get_layer_element_geometry (l_layer, p_ne_id);
-         --  nm_debug.debug('recalibrate');
-         l_geom :=
-            Nm3sdo.recalibrate_geometry
-                                      (p_layer              => l_layer,
-                                       p_ne_id              => p_ne_id,
-                                       p_geom               => l_geom,
-                                       p_measure            => p_measure,
-                                       p_length_to_end      => p_new_length_to_end
+Function Get_Nt_Theme (
+                      p_Nt   In   Nm_Types.Nt_Type%Type
+                      ) Return Nm_Themes_All.Nth_Theme_Id%Type
+Is
+  Retval   Nm_Themes_All.Nth_Theme_Id%Type;
+Begin
+  Begin 
+    Select  Nth_Theme_Id
+    Into    Retval
+    From    Nm_Themes_All     nta,
+            Nm_Nw_Themes      nnt,
+            Nm_Linear_Types   nlt
+    Where   nlt.Nlt_Id                =   nnt.Nnth_Nlt_Id
+    And     nnt.Nnth_Nth_Theme_Id     =   nta.Nth_Theme_Id
+    And     nlt.Nlt_Nt_Type           =   p_Nt
+    And     nta.Nth_Theme_Type        =   'SDO'
+    And     nta.Nth_Base_Table_Theme  Is  Null
+    And     Not Exists                (
+                                      Select  Null
+                                      From    Nm_Base_Themes    nbt
+                                      Where   nbt.Nbth_Theme_Id = nta.Nth_Theme_Id
                                       );
-         --  nm_debug.debug('Remove old shape');
-         Nm3sdo.delete_layer_shape (p_layer => l_layer, p_ne_id => p_ne_id);
-         --  nm_debug.debug('Insert new shape');
-         Nm3sdo.insert_element_shape (p_layer      => l_layer,
-                                      p_ne_id      => p_ne_id,
-                                      p_geom       => l_geom
-                                     );
-      --  The measures on the routes will be affected
-      --  However, the nm_true will be out of step - this should be done on a resequence
+  Exception
+    When No_Data_Found Then
+      Null;
+  End;
 
-      --  The other layers are also affected, but since the calling process will affect the members, best left to
-      --  the trigger to deal with it.
-      END IF;
+ Return Retval;
+   
+ End Get_Nt_Theme;
+--
+-----------------------------------------------------------------------------
+--
+Procedure  Split_Element_At_Xy (
+                               p_Layer   In      Number,
+                               p_Ne_Id   In      Number,
+                               p_Measure In      Number,
+                               p_X       In      Number,
+                               p_Y       In      Number,
+                               p_Ne_Id_1 In      Number,
+                               p_Ne_Id_2 In      Number,
+                               p_Geom_1      Out Mdsys.Sdo_Geometry,
+                               p_Geom_2      Out Mdsys.Sdo_Geometry
+                               )
+Is
+  l_Geom    Mdsys.Sdo_Geometry := Nm3Sdo.Get_Layer_Element_Geometry( p_Layer, p_Ne_Id );
 
-   END;
+  l_Measure Number;
+  l_Usgm    User_Sdo_Geom_Metadata%Rowtype;
+  l_End     Number;
 
+Begin
+  l_Usgm := Nm3Sdo.Get_Theme_Metadata( p_Layer );
+  If Nm3Sdo.Element_Has_Shape( p_Layer, p_Ne_Id ) = 'TRUE'  Then
+    l_Measure := Nm3Sdo.Get_Measure ( p_Layer, p_Ne_Id, p_X, p_Y ).Lr_Offset;
+
+    Sdo_Lrs.Split_Geom_Segment( l_Geom, l_Usgm.Diminfo, l_Measure, p_Geom_1, p_Geom_2 );
+
+    If p_Measure Is Not Null Then
+      l_Measure := p_Measure;        
+    End If;
+      
+
+    p_Geom_1 := Sdo_Lrs.Scale_Geom_Segment  (
+                                            Geom_Segment  => p_Geom_1,
+                                            Dim_Array     => l_Usgm.Diminfo,
+                                            Start_Measure => 0,
+                                            End_Measure   => l_Measure,
+                                            Shift_Measure => 0 
+                                            );
+
+    l_End   := Nm3Net.Get_Datum_Element_Length( p_Ne_Id ) - l_Measure;
+
+    p_Geom_2 := Sdo_Lrs.Scale_Geom_Segment  (
+                                            Geom_Segment  => p_Geom_2,
+                                            Dim_Array     => l_Usgm.Diminfo,
+                                            Start_Measure => 0,
+                                            End_Measure   => l_End,
+                                            Shift_Measure => 0
+                                            );
+  Else
+    p_Geom_1 := Null;
+    p_Geom_2 := Null;
+
+  End If;
+
+End Split_Element_At_Xy;
+--
+-----------------------------------------------------------------------------
+--
+Procedure Split_Element_Shapes  (
+                                p_Ne_Id     In   Nm_Elements.Ne_Id%Type,
+                                p_Measure   In   Number,
+                                p_Ne_Id_1   In   Nm_Elements.Ne_Id%Type,
+                                p_Ne_Id_2   In   Nm_Elements.Ne_Id%Type,
+                                p_X         In   Number Default Null,
+                                p_Y         In   Number Default Null
+                                )
+Is
+  l_Layer   Number;
+  l_Geom1   Mdsys.Sdo_Geometry;
+  l_Geom2   Mdsys.Sdo_Geometry;
+Begin
+  l_Layer := Get_Nt_Theme (Nm3Get.Get_Ne (p_Ne_Id).Ne_Nt_Type);
+
+  If Nm3Sdo.Element_Has_Shape (L_Layer, P_Ne_Id) = 'TRUE' Then
+    If p_X Is Null And p_Y Is Null Then
+
+      Nm3Sdo.Split_Element_At_Measure (
+                                      p_Layer        => l_Layer,
+                                      p_Ne_Id        => p_Ne_Id,
+                                      p_Measure      => p_Measure,
+                                      p_Ne_Id_1      => p_Ne_Id_1,
+                                      p_Ne_Id_2      => p_Ne_Id_2,
+                                      p_Geom1        => l_Geom1,
+                                      p_Geom2        => l_Geom2
+                                      );
+    Elsif p_X Is Not Null And p_Y Is Not Null Then
+
+      Split_Element_At_Xy (
+                          p_Layer        =>   l_Layer,
+                          p_Ne_Id        =>   p_Ne_Id,
+                          p_Measure      =>   p_Measure,
+                          p_X            =>   p_X,
+                          p_Y            =>   p_Y,
+                          p_Ne_Id_1      =>   p_Ne_Id_1,
+                          p_Ne_Id_2      =>   p_Ne_Id_2,
+                          p_Geom_1       =>   l_Geom1,
+                          p_Geom_2       =>   l_Geom2
+                          );
+
+    Else
+      Raise_Application_Error(-20001, 'Incompatible values');
+
+    End If;
+
+    Nm3Sdo.Insert_Element_Shape (
+                                p_Layer      => l_Layer,
+                                p_Ne_Id      => p_Ne_Id_1,
+                                p_Geom       => l_Geom1
+                                );
+         
+    Nm3Sdo.Insert_Element_Shape (
+                                p_Layer      => l_Layer,
+                                p_Ne_Id      => p_Ne_Id_2,
+                                p_Geom       => l_Geom2
+                                );
+  End If;
+
+End Split_Element_Shapes;
+--
+-----------------------------------------------------------------------------
+--
+Procedure Ins_Usgm (Pi_Rec_Usgm In Out User_Sdo_Geom_Metadata%Rowtype)
+Is
+Begin
+  Nm_Debug.Proc_Start (G_Package_Name, 'ins_usgm');
+
+  Insert Into Mdsys.Sdo_Geom_Metadata_Table
+  (
+  Sdo_Table_Name,
+  Sdo_Column_Name,
+  Sdo_Diminfo,
+  Sdo_Srid,
+  Sdo_Owner
+  )
+  Values
+  (
+  pi_Rec_Usgm.Table_Name,
+  pi_Rec_Usgm.Column_Name,
+  pi_Rec_Usgm.Diminfo,
+  pi_Rec_Usgm.Srid,
+  Sys_Context('NM3CORE','APPLICATION_OWNER')
+  )
+  Returning 
+  Sdo_Table_Name,
+  Sdo_Column_Name,
+  Sdo_Diminfo,
+  Sdo_Srid
+  Into
+  pi_Rec_Usgm.Table_Name,
+  pi_Rec_Usgm.Column_Name,
+  pi_Rec_Usgm.Diminfo,
+  pi_Rec_Usgm.Srid;
+
+  Nm_Debug.Proc_End (G_Package_Name, 'ins_usgm');
+    
+End Ins_Usgm;
+--
+-----------------------------------------------------------------------------
+--
+Procedure Merge_Element_Shapes  (
+                                p_Ne_Id           In   Nm_Elements.Ne_Id%Type,
+                                p_Ne_Id_1         In   Nm_Elements.Ne_Id%Type,
+                                p_Ne_Id_2         In   Nm_Elements.Ne_Id%Type,
+                                p_Ne_Id_To_Flip   In   Nm_Elements.Ne_Id%Type
+                                )
+Is
+  l_Layer   Number;
+  l_Geom    Mdsys.Sdo_Geometry;
+Begin
+  l_Layer := Get_Nt_Theme (Nm3Get.Get_Ne (P_Ne_Id).Ne_Nt_Type);
+
+  If      Nm3Sdo.Element_Has_Shape (L_Layer, P_Ne_Id_1) = 'TRUE'
+      And Nm3Sdo.Element_Has_Shape (L_Layer, P_Ne_Id_2) = 'TRUE'  Then
+        
+    Nm3Sdo.Merge_Element_Shapes (
+                                p_Layer              => l_Layer,
+                                p_Ne_Id_1            => p_Ne_Id_1,
+                                p_Ne_Id_2            => p_Ne_Id_2,
+                                p_Ne_Id_To_Flip      => p_Ne_Id_To_Flip,
+                                p_Geom               => l_Geom
+                                );
+
+    If L_Geom Is Not Null Then
+      Nm3Sdo.Insert_Element_Shape (
+                                  p_Layer      => l_Layer,
+                                  p_Ne_Id      => p_Ne_Id,
+                                  p_Geom       => l_Geom
+                                  );
+    End If;
+  End If;
+End Merge_Element_Shapes;
+--
+-----------------------------------------------------------------------------
+--
+Procedure Replace_Element_Shape (
+                                p_Ne_Id_Old   In   Nm_Elements.Ne_Id%Type,
+                                p_Ne_Id_New   In   Nm_Elements.Ne_Id%Type
+                                )
+Is
+  l_Layer_Old   Number;
+  l_Layer_New   Number;
+  l_Geom        Mdsys.Sdo_Geometry;
+Begin
+  l_Layer_Old := Get_Nt_Theme (Nm3Get.Get_Ne_All (p_Ne_Id_Old).Ne_Nt_Type);
+  l_Layer_New := Get_Nt_Theme (Nm3Get.Get_Ne (p_Ne_Id_New).Ne_Nt_Type);
+
+  If      Nm3Sdo.Element_Has_Shape (l_Layer_Old, p_Ne_Id_Old) = 'TRUE' 
+      And l_Layer_New Is Not Null Then
+    l_Geom := Nm3Sdo.Get_Layer_Element_Geometry (l_Layer_Old, p_Ne_Id_Old);
+    --  The old element shape must be end-dated
+    --  The new one must be created
+    --  All affected shapes inside asset layers must be regenerated
+    Nm3Sdo.Insert_Element_Shape (
+                                p_Layer      => l_Layer_New,
+                                p_Ne_Id      => p_Ne_Id_New,
+                                p_Geom       => l_Geom
+                                );
+    End If;   
+End Replace_Element_Shape;
+--
+-----------------------------------------------------------------------------
+--
+Procedure Reverse_Element_Shape (
+                                p_Ne_Id_Old   In   Nm_Elements.Ne_Id%Type,
+                                p_Ne_Id_New   In   Nm_Elements.Ne_Id%Type
+                                )
+Is
+  l_Layer   Number;
+  l_Geom    Mdsys.Sdo_Geometry;
+Begin
+  l_Layer := Get_Nt_Theme (Nm3Get.Get_Ne_All (p_Ne_Id_Old).Ne_Nt_Type);
+
+  If Nm3Sdo.Element_Has_Shape (l_Layer, p_Ne_Id_Old) = 'TRUE' Then
+      
+    l_Geom := Nm3Sdo.Get_Layer_Element_Geometry (l_Layer, p_Ne_Id_Old);
+      
+    l_Geom := Nm3Sdo.Reverse_Geometry (p_Geom => l_Geom);
+      
+    Nm3Sdo.Insert_Element_Shape (
+                                p_Layer      => l_Layer,
+                                p_Ne_Id      => p_Ne_Id_New,
+                                p_Geom       => l_Geom
+                                );
+    End If;
+End Reverse_Element_Shape;
+--
+-----------------------------------------------------------------------------
+--
+Procedure Recalibrate_Element_Shape (
+                                    p_Ne_Id               In   Nm_Elements.Ne_Id%Type,
+                                    p_Measure             In   Number,
+                                    p_New_Length_To_End   In   Nm_Elements.Ne_Length%Type
+                                    )
+Is
+  l_Layer     Number;
+  l_Pt_Geom   Mdsys.Sdo_Geometry;
+  l_Geom      Mdsys.Sdo_Geometry;
+Begin  
+  l_Layer := Get_Nt_Theme (Nm3Get.Get_Ne (p_Ne_Id).Ne_Nt_Type);
+
+  If Nm3Sdo.Element_Has_Shape (l_Layer, p_Ne_Id) = 'TRUE' Then
+
+    l_Geom := Nm3Sdo.Get_Layer_Element_Geometry (l_Layer, p_Ne_Id);
+
+    l_Geom := Nm3Sdo.Recalibrate_Geometry (
+                                          p_Layer              => l_Layer,
+                                          p_Ne_Id              => p_Ne_Id,
+                                          p_Geom               => l_Geom,
+                                          p_Measure            => p_Measure,
+                                          p_Length_To_End      => p_New_Length_To_End
+                                          );
+    Nm3Sdo.Delete_Layer_Shape (
+                              p_Layer => l_Layer,
+                              p_Ne_Id => p_Ne_Id
+                              );
+
+    Nm3Sdo.Insert_Element_Shape (
+                                p_Layer      => l_Layer,
+                                p_Ne_Id      => p_Ne_Id,
+                                p_Geom       => l_Geom
+                                );
+    --  The measures on the routes will be affected
+    --  However, the nm_true will be out of step - this should be done on a resequence
+
+    --  The other layers are also affected, but since the calling process will affect the members, best left to
+    --  the trigger to deal with it.
+  End If;
+End Recalibrate_Element_Shape;
 --
 -------------------------------------------------------------------------------------------------------------------
 --
-   PROCEDURE shift_asset_shapes (
-      p_ne_id               IN   nm_elements.ne_id%TYPE,
-      p_measure             IN   NUMBER,
-      p_new_length_to_end   IN   nm_elements.ne_length%TYPE
-   )
-   IS
-      --
-      --NOT finished!!!
-      --
-      l_layer     NUMBER;
-      l_pt_geom   MDSYS.SDO_GEOMETRY;
-      l_geom      MDSYS.SDO_GEOMETRY;
-   BEGIN
-      l_layer := get_nt_theme (Nm3get.get_ne (p_ne_id).ne_nt_type);
+Procedure Shift_Asset_Shapes  (
+                              p_Ne_Id               In   Nm_Elements.Ne_Id%Type,
+                              p_Measure             In   Number,
+                              p_New_Length_To_End   In   Nm_Elements.Ne_Length%Type
+                              )
+Is
+  l_Layer     Number;
+  l_Pt_Geom   Mdsys.Sdo_Geometry;
+  l_Geom      Mdsys.Sdo_Geometry;
+Begin
+  l_Layer := Get_Nt_Theme (Nm3Get.Get_Ne (p_Ne_Id).Ne_Nt_Type);
 
-      IF Nm3sdo.element_has_shape (l_layer, p_ne_id) = 'TRUE'
-      THEN
-         --  nm_debug.debug('get old geometry');
+  If Nm3Sdo.Element_Has_Shape (l_Layer, p_Ne_Id) = 'TRUE' Then
 
-         --  remove all existing shapes - they will move with the shift
-         Nm3sdo.add_new_inv_shapes (p_layer      => l_layer,
-                                    p_ne_id      => p_ne_id,
-                                    p_geom       => l_geom
-                                   );
-      END IF;
-   END;
-
---
-----------------------------------------------------------------------------------------
---
--- The registration of a node theme depends on the existence of the nm_point_locations registry entry
--- If it is not present, then register this first.
--- RAC December 2005
-
-   FUNCTION register_node_theme (
-      p_node_type     IN   VARCHAR2,
-      p_table_name    IN   VARCHAR2,
-      p_column_name   IN   VARCHAR2
-   )
-      RETURN NUMBER
-   IS
-      retval      NUMBER;
-      l_nth       NM_THEMES_ALL%ROWTYPE;
-      l_rec_ntg   NM_THEME_GTYPES%ROWTYPE;
-   BEGIN
-      retval := Higgis.next_theme_id;
-
-      l_nth.nth_base_table_theme := get_theme_from_feature_table ('NM_POINT_LOCATIONS'
-                                                                , 'NM_POINT_LOCATIONS' );
-      IF l_nth.nth_base_table_theme IS NULL
-      THEN
-        --
-        register_npl_theme;
-        -- raise_application_error(-20001, 'register the nm_point_locations table first');
-
-      END IF;
-
-      l_nth.nth_theme_id := retval;
-      l_nth.nth_theme_name := 'NODE_' || p_node_type;
-      l_nth.nth_table_name := p_table_name;
-      l_nth.nth_where := NULL;
-      l_nth.nth_pk_column := 'NO_NODE_ID';
-      l_nth.nth_label_column := 'NO_NODE_NAME';
-      l_nth.nth_rse_table_name := 'NM_ELEMENTS';
-      l_nth.nth_rse_fk_column := NULL;
-      l_nth.nth_st_chain_column := NULL;
-      l_nth.nth_end_chain_column := NULL;
---    l_nth.nth_x_column := 'NO_GRID_EAST';
---    l_nth.nth_y_column := 'NO_GRID_NORTH';
-      l_nth.nth_offset_field := NULL;
-      l_nth.nth_feature_table := 'V_NM_NO_'||p_node_type||'_SDO';
-      l_nth.nth_feature_pk_column := 'NPL_ID';
-      l_nth.nth_feature_fk_column := NULL;
-      l_nth.nth_xsp_column := NULL;
-      l_nth.nth_feature_shape_column := 'GEOLOC';
-      l_nth.nth_hpr_product := 'NET';
-      l_nth.nth_location_updatable := 'N';
-      l_nth.nth_theme_type := 'SDO';
---    l_nth.nth_base_theme := NULL;
-      l_nth.nth_dependency := 'I';
-      l_nth.nth_storage := 'S';
-      l_nth.nth_update_on_edit := 'N';
-      l_nth.nth_use_history := 'N';
-      l_nth.nth_lref_mandatory := 'N';
-      l_nth.nth_tolerance := 10;
-      l_nth.nth_tol_units := 1;
-
-      Nm3ins.ins_nth (l_nth);
-      --
-      --  Build theme gtype rowtype
-      l_rec_ntg.ntg_theme_id := l_nth.nth_theme_id;
-      l_rec_ntg.ntg_seq_no := 1;
-      l_rec_ntg.ntg_xml_url := NULL;
-      l_rec_ntg.ntg_gtype := '2001';
-
-      Nm3ins.ins_ntg (p_rec_ntg => l_rec_ntg);
-
-   COMMIT;
-
-      IF Hig.get_sysopt ('REGSDELAY') = 'Y'
-      THEN
-         EXECUTE IMMEDIATE (   ' begin  '
-                            || '    nm3sde.register_sde_layer( p_theme_id => '||TO_CHAR( l_nth.nth_theme_id )||')'
-                            || '; end;'
-                           );
-      --  place exception into dynamic sql ananymous block. This is dynamic sql to avoid compilation probs
-      END IF;
-
-      RETURN retval;
-   EXCEPTION
-      WHEN NO_DATA_FOUND
-      THEN
-         Hig.raise_ner (pi_appl         => Nm3type.c_hig,
-                        pi_id           => 193,
-                        pi_sqlcode      => -20003
-                       );
-   --    raise_application_error( -20003, 'Point location data not found - clone is not possible');
-   END;
-
+    --  remove all existing shapes - they will move with the shift
+    Nm3Sdo.Add_New_Inv_Shapes (
+                              p_Layer      => l_Layer,
+                              p_Ne_Id      => p_Ne_Id,
+                              p_Geom       => l_Geom
+                              );
+  End If;
+End Shift_Asset_Shapes;
 --
 ---------------------------------------------------------------------------------------------------
 --
-  PROCEDURE register_npl_theme
-  IS
-    l_rec_nth NM_THEMES_ALL%ROWTYPE;
-    l_rec_ntg NM_THEME_GTYPES%ROWTYPE;
-  BEGIN
-    l_rec_nth.nth_theme_id             := Nm3seq.next_nth_theme_id_seq;
-    l_rec_nth.nth_theme_name           := 'POINT_LOCATIONS';
-    l_rec_nth.nth_table_name           := 'NM_POINT_LOCATIONS';
-    l_rec_nth.nth_pk_column            := 'NPL_ID';
-    l_rec_nth.nth_label_column         := 'NPL_ID';
-    l_rec_nth.nth_feature_table        := 'NM_POINT_LOCATIONS';
-    l_rec_nth.nth_feature_shape_column := 'NPL_LOCATION';
-    l_rec_nth.nth_feature_pk_column    := 'NPL_ID';
-    l_rec_nth.nth_use_history          := 'N';
-    l_rec_nth.nth_hpr_product          := 'NET';
-    l_rec_nth.nth_theme_type           := 'SDO';
-    l_rec_nth.nth_location_updatable   := 'N';
-    l_rec_nth.nth_dependency           := 'I';
-    l_rec_nth.nth_storage              := 'S';
-    l_rec_nth.nth_update_on_edit       := 'N';
-    l_rec_nth.nth_use_history          := 'N';
-    l_rec_nth.nth_snap_to_theme        := 'N';
-    l_rec_nth.nth_lref_mandatory       := 'N';
-    l_rec_nth.nth_tolerance            := 10;
-    l_rec_nth.nth_tol_units            := 1;
-    l_rec_nth.nth_dynamic_theme        := 'N';
-    Nm3ins.ins_nth(l_rec_nth);
-    --
-    l_rec_ntg.ntg_theme_id := l_rec_nth.nth_theme_id;
-    l_rec_ntg.ntg_seq_no := 1;
-    l_rec_ntg.ntg_xml_url := NULL;
-    l_rec_ntg.ntg_gtype := '2001';
-    Nm3ins.ins_ntg (p_rec_ntg => l_rec_ntg);
-    --
-    IF Hig.get_sysopt ('REGSDELAY') = 'Y'
-    THEN
-       EXECUTE IMMEDIATE
-         (   ' begin  '
-          || '    nm3sde.register_sde_layer( p_theme_id => '||TO_CHAR( l_rec_nth.nth_theme_id)||')'
-          || '; end;'
-          );
-    END IF;
-  END register_npl_theme;
---
----------------------------------------------------------------------------------------------------
---
+Function Get_Inv_Base_Themes  (
+                              p_Inv_Type In Nm_Inv_Nw.Nin_Nit_Inv_Code%Type
+                              ) Return Nm_Theme_Array
+Is
+  Retval Nm_Theme_Array := Nm3Array.Init_Nm_Theme_Array;
+Begin
+  Select  Nm_Theme_Entry(nta.Nth_Theme_Id)
+  Bulk Collect 
+  Into    Retval.Nta_Theme_Array
+  From    Nm_Nw_Themes    nnt,
+          Nm_Themes_All   nta,
+          Nm_Linear_Types nlt,
+          Nm_Inv_Nw       nin
+  Where   nin.Nin_Nit_Inv_Code      =   p_Inv_Type
+  And     nin.Nin_Nw_Type           =   nlt.Nlt_Nt_Type
+  And     nlt.Nlt_Id                =   nnt.Nnth_Nlt_Id
+  And     nta.Nth_Base_Table_Theme  Is  Null
+  And     nnt.Nnth_Nth_Theme_Id     =   nta.Nth_Theme_Id
+  And     Not Exists            (   Select  Null
+                                    From    Nm_Base_Themes  nbt
+                                    Where   nta.Nth_Theme_Id = nbt.Nbth_Theme_Id
+                                );
 
-   FUNCTION get_nlt_base_themes ( p_nlt_id IN NM_LINEAR_TYPES.nlt_id%TYPE ) RETURN nm_theme_array IS
-
-      retval nm_theme_array := Nm3array.init_nm_theme_array;
-
-      CURSOR c_nth ( c_nlt_id IN nm_linear_types.nlt_id%TYPE ) IS
-        SELECT nm_theme_entry(nnth_nth_theme_id)
-          FROM nm_nw_themes d
-              ,nm_linear_types dl
-              ,nm_nt_groupings g
-              ,nm_linear_types gl
-              ,nm_themes_all
-         WHERE gl.nlt_id = c_nlt_id
-           AND dl.nlt_id = nnth_nlt_id
-           AND g.nng_group_type = gl.nlt_gty_type
-           AND g.nng_nt_type = dl.nlt_nt_type
-           AND nth_theme_id = nnth_nth_theme_id
-           AND nth_base_table_theme IS NULL
-           AND dl.nlt_g_i_d = 'D';
-
-   BEGIN
-
-     OPEN c_nth ( p_nlt_id );
-     FETCH c_nth BULK COLLECT INTO retval.nta_theme_array;
-     CLOSE c_nth;
-
-     IF retval.nta_theme_array.LAST IS NULL
-     THEN
-         Hig.raise_ner (pi_appl         => Nm3type.c_hig,
-                        pi_id           => 267,
-                        pi_sqlcode      => -20003,
-                        pi_supplementary_info => TO_CHAR( p_nlt_id )
-                       );
---    raise_application_error (-20001, 'No themes for linear type '||to_char( p_nlt_id ));
-     ELSE
-       RETURN retval;
-     END IF;
-
-   END;
---
----------------------------------------------------------------------------------------------------
---
-
-  PROCEDURE create_base_themes ( p_theme_id    IN NUMBER
-                                ,p_base        IN nm_theme_array ) IS
-  BEGIN
---  Nm_Debug.debug_on;
-    IF p_base.nta_theme_array(1).nthe_id IS NULL THEN
-      NULL;
-    ELSE
- /*
-      FOR i IN 1..p_base.nta_theme_array.LAST LOOP
-        Nm_Debug.DEBUG('Base '||TO_CHAR( p_base.nta_theme_array(i).nthe_id ));
-      END LOOP;
-
-      insert into nm_base_themes
-      ( nbth_theme_id, nbth_base_theme )
-      select p_theme_id, t.nthe_id
-   from table ( p_base.nta_theme_array ) t;
-*/
-
-      FOR i IN 1..p_base.nta_theme_array.LAST LOOP
-
-        INSERT INTO NM_BASE_THEMES
-            ( nbth_theme_id, nbth_base_theme )
-        VALUES ( p_theme_id, p_base.nta_theme_array(i).nthe_id );
-      END LOOP;
-
-    END IF;
-  END;
-
-
----------------------------------------------------------------------------------------------------
---
-
-
-   FUNCTION register_lrm_theme (
-      p_nlt_id           IN   NUMBER,
-      p_base             IN   nm_theme_array,
-      p_table_name       IN   VARCHAR2,
-      p_column_name      IN   VARCHAR2,
-      p_name             IN   VARCHAR2 DEFAULT NULL,
-      p_view_flag        IN   VARCHAR2 DEFAULT 'N',
-      p_base_table_nth   IN   NM_THEMES_ALL.nth_theme_id%TYPE DEFAULT NULL
-   )
-      RETURN NUMBER
-   IS
-      retval        NUMBER;
-      l_d_or_s      VARCHAR2 (1);
-      l_view_name   VARCHAR2 (30);
-      l_pk_col      VARCHAR2 (30)                       := 'NE_ID';
-      l_nth         NM_THEMES_ALL%ROWTYPE;
-      l_nlt         NM_LINEAR_TYPES%ROWTYPE;
-      l_name        NM_THEMES_ALL.nth_theme_name%TYPE   := UPPER (p_name);
-      l_rec_nnth    NM_NW_THEMES%ROWTYPE;
-      l_rec_ntg     NM_THEME_GTYPES%ROWTYPE;
-      l_mp_gtype    NUMBER := TO_NUMBER(NVL(Hig.get_sysopt('SDOMPGTYPE'),'3302'));
-
-   BEGIN
-
-      l_nlt := get_nlt (p_nlt_id);
-      g_units := Nm3net.get_nt_units( l_nlt.nlt_nt_type);
-
-      IF g_units = 1 THEN
-        g_unit_conv := 1;
-      ELSE
-        g_unit_conv := Nm3get.get_uc ( g_units, 1).uc_conversion_factor;
-      END IF;
-
-      IF l_name IS NULL
-      THEN
-         l_name := UPPER (SUBSTR (l_nlt.nlt_descr, 1, 30));
-      END IF;
-
-      IF Nm3sdo.use_surrogate_key = 'Y'
-      THEN
-         l_pk_col := 'OBJECTID';
-         --  to make sm work we need to use NE_ID
-         l_pk_col := 'NE_ID';
-      END IF;
-
-      retval := Higgis.next_theme_id;
-      l_nth.nth_theme_id := retval;
-      l_nth.nth_theme_name := l_name;
-      l_nth.nth_table_name := p_table_name;
-      l_nth.nth_where := NULL;
-      l_nth.nth_pk_column := 'NE_ID';
-    --
-    -- Task ID 0107889 - Set Label Column to NE_ID for Group layer base table themes
-    -- 05/10/09 AE Further restrict on the non DT theme 
-    --
-      IF p_base_table_nth IS NULL
-      OR l_nth.nth_theme_name NOT LIKE '%DT'
-      THEN
-        l_nth.nth_label_column := 'NE_ID';
-      ELSE
-        l_nth.nth_label_column := 'NE_UNIQUE';
-      END IF;
-    --
-      l_nth.nth_rse_table_name := 'NM_ELEMENTS';
-      l_nth.nth_rse_fk_column := 'NE_ID';
-      l_nth.nth_st_chain_column := NULL;
-      l_nth.nth_end_chain_column := NULL;
-      l_nth.nth_x_column := NULL;
-      l_nth.nth_y_column := NULL;
-      l_nth.nth_offset_field := NULL;
-      l_nth.nth_feature_table := p_table_name;
-      l_nth.nth_feature_pk_column := l_pk_col;
-      l_nth.nth_feature_fk_column := 'NE_ID';
-      l_nth.nth_xsp_column := NULL;
-      l_nth.nth_feature_shape_column := 'GEOLOC';
-      l_nth.nth_hpr_product := 'NET';
-      l_nth.nth_location_updatable := 'N';
-      l_nth.nth_theme_type := 'SDO';
-      l_nth.nth_dependency := 'D';
-      l_nth.nth_storage := 'S';
-      l_nth.nth_update_on_edit := 'D';
-      l_nth.nth_use_history := 'Y';
-      l_nth.nth_start_date_column := 'START_DATE';
-      l_nth.nth_end_date_column := 'END_DATE';
-      l_nth.nth_base_table_theme := p_base_table_nth;
-      l_nth.nth_sequence_name := 'NTH_' || NVL(p_base_table_nth,retval) || '_SEQ';
-      l_nth.nth_snap_to_theme := 'N';
-      l_nth.nth_lref_mandatory := 'N';
-      l_nth.nth_tolerance := 10;
-      l_nth.nth_tol_units := 1;
-
-      Nm3ins.ins_nth (l_nth);
-
-      l_rec_nnth.nnth_nlt_id := p_nlt_id;
-      l_rec_nnth.nnth_nth_theme_id := retval;
-
-      Nm3ins.ins_nnth (l_rec_nnth);
-      --
-      --  Build theme gtype rowtype
-      l_rec_ntg.ntg_theme_id := retval;
-      l_rec_ntg.ntg_seq_no   := 1;
-      l_rec_ntg.ntg_xml_url  := NULL;
-      l_rec_ntg.ntg_gtype    := l_mp_gtype;
-
-      Nm3ins.ins_ntg (p_rec_ntg => l_rec_ntg);
-
-      --  Build the base themes
-
-      create_base_themes( retval, p_base );
-
-      --
-      IF Hig.get_sysopt ('REGSDELAY') = 'Y'
-      THEN
-         EXECUTE IMMEDIATE (   ' begin  '
-                            || '    nm3sde.register_sde_layer( p_theme_id => '||TO_CHAR( l_nth.nth_theme_id )||');'
-                            || ' end;'
-                           );
-      END IF;
-
-      IF p_view_flag = 'Y'
-      THEN
-         DECLARE
-            l_role   VARCHAR2 (30);
-         BEGIN
-            l_role := Hig.get_sysopt ('SDONETROLE');
-
-            IF l_role IS NOT NULL
-            THEN
-               INSERT INTO NM_THEME_ROLES
-                           (nthr_theme_id, nthr_role, nthr_mode
-                           )
-                    VALUES (retval, l_role, 'NORMAL'
-                           );
-            END IF;
-         END;
-      END IF;
---
--- create the theme functions - exclude gog
---
-      create_theme_functions( p_theme => l_nth.nth_theme_id, p_pa => g_network_modules, p_exclude => 2 );
-
-      RETURN retval;
-
-   END register_lrm_theme;
-
---
----------------------------------------------------------------------------------------------------
---
-
-   FUNCTION Get_Inv_Base_Themes ( p_inv_type IN nm_inv_nw.nin_nit_inv_code%TYPE ) RETURN nm_theme_array IS
-
-      retval nm_theme_array := Nm3array.init_nm_theme_array;
-
-      CURSOR c_nth ( c_inv_type IN nm_inv_nw.nin_nit_inv_code%TYPE ) IS
-        SELECT nm_theme_entry(nth_theme_id)
-        FROM NM_NW_THEMES
-            ,NM_THEMES_ALL
-            ,NM_LINEAR_TYPES
-            ,nm_inv_nw
-        WHERE nin_nit_inv_code = c_inv_type
-          AND nin_nw_type = nlt_nt_type
-          AND nlt_id = nnth_nlt_id
-          AND nth_base_table_theme IS NULL
-          AND nnth_nth_theme_id = nth_theme_id
-          AND NOT EXISTS ( SELECT 1 FROM NM_BASE_THEMES
-                            WHERE nth_theme_id = nbth_theme_id );
-
-   BEGIN
-
-       OPEN c_nth ( p_inv_type );
-      FETCH c_nth BULK COLLECT INTO retval.nta_theme_array;
-      CLOSE c_nth;
-
-      IF retval.nta_theme_array.LAST IS NULL
-      THEN
-        -- no base theme availible
-        Hig.raise_ner (pi_appl         => Nm3type.c_hig,
-                       pi_id           => 194,
-                       pi_sqlcode      => -20001
-                      );
-      ELSE
-        RETURN retval;
-      END IF;
-
-   END;
-
---
----------------------------------------------------------------------------------------------------
---
-
-   FUNCTION register_inv_theme (
-      pi_nit             IN   nm_inv_types%ROWTYPE,
-      p_base_themes      IN   NM_THEME_ARRAY,
-      p_table_name       IN   VARCHAR2,
-      p_spatial_column   IN   VARCHAR2 DEFAULT 'GEOLOC',
-      p_fk_column        IN   VARCHAR2 DEFAULT 'NE_ID',
-      p_name             IN   VARCHAR2 DEFAULT NULL,
-      p_view_flag        IN   VARCHAR2 DEFAULT 'N',
-      p_pk_column        IN   VARCHAR2 DEFAULT 'NE_ID',
-      p_base_table_nth   IN   NM_THEMES_ALL.nth_theme_id%TYPE DEFAULT NULL
-   )
-      RETURN NUMBER
-   IS
-      l_immediate_or_deferred   VARCHAR2 (1)              := 'I';
-      l_fk_column               VARCHAR2 (30)             := 'NE_ID';
-      l_f_fk_column             VARCHAR2 (30)             := 'NE_ID';
-      l_pk_column               VARCHAR2 (30);
-      l_name                    VARCHAR2 (30);
-      l_t_pk_column             VARCHAR2 (30);
-      l_t_fk_column             VARCHAR2 (30);
-      l_t_uk_column             VARCHAR2 (30);
-      l_t_begin_col             VARCHAR2 (30);
-      l_t_end_col               VARCHAR2 (30);
-      l_tab                     VARCHAR2 (30);
-      l_end_mp                  VARCHAR2 (30)             := NULL;
-      retval                    NUMBER;
-      l_nth                     NM_THEMES_ALL%ROWTYPE;
-      l_rec_nith                NM_INV_THEMES%ROWTYPE;
-      l_rec_ntg                 NM_THEME_GTYPES%ROWTYPE;
-      l_base_themes             nm_theme_array;
-   BEGIN
-      l_name := UPPER (p_name);
-
-      IF l_name IS NULL
-      THEN
-         l_name :=
-            UPPER (NVL (pi_nit.nit_short_descr,
-                        SUBSTR (pi_nit.nit_inv_type || '-' || pi_nit.nit_descr,
-                                1,
-                                30
-                               )
-                       )
+  If Retval.Nta_Theme_Array.Last Is Null  Then
+    -- no base theme availible
+    Hig.Raise_Ner (Pi_Appl         => Nm3Type.C_Hig,
+                   Pi_Id           => 194,
+                   Pi_Sqlcode      => -20001
                   );
-      END IF;
+  End If;
+    
+  Return Retval;
+End Get_Inv_Base_Themes;
+--
+---------------------------------------------------------------------------------------------------
+--
+Function Register_Inv_Theme (
+                            pi_Nit             In   Nm_Inv_Types%Rowtype,
+                            p_Base_Themes      In   Nm_Theme_Array,
+                            p_Table_Name       In   Varchar2,
+                            p_Spatial_Column   In   Varchar2 Default 'GEOLOC',
+                            p_Fk_Column        In   Varchar2 Default 'NE_ID',
+                            p_Name             In   Varchar2 Default Null,
+                            p_View_Flag        In   Varchar2 Default 'N',
+                            p_Pk_Column        In   Varchar2 Default 'NE_ID',
+                            p_Base_Table_Nth   In   Nm_Themes_All.Nth_Theme_Id%Type Default Null
+                            ) Return Number
+Is
+  l_Immediate_Or_Deferred   Varchar2 (1)              := 'D';
+  l_F_Fk_Column             Varchar2 (30)             := 'NE_ID';
+  l_Pk_Column               Varchar2 (30);
+  l_Name                    Varchar2 (30);
+  l_T_Pk_Column             Varchar2 (30);
+  l_T_Fk_Column             Varchar2 (30);
+  l_T_Uk_Column             Varchar2 (30);
+  l_T_Begin_Col             Varchar2 (30);
+  l_Tab                     Varchar2 (30);
+  l_End_Mp                  Varchar2 (30)             := Null;
+  Retval                    Number;
+  l_Nth                     Nm_Themes_All%Rowtype;
+  l_Rec_Nith                Nm_Inv_Themes%Rowtype;
+  l_Rec_Ntg                 Nm_Theme_Gtypes%Rowtype;
 
-      l_immediate_or_deferred := 'D';
+Begin
+  l_Name := Upper (p_Name);
 
-      IF p_view_flag = 'Y'
-      THEN
-         l_immediate_or_deferred := 'N';
-         l_f_fk_column := NULL;
-      END IF;
+  If l_Name Is Null Then
+    l_Name :=  Upper (Nvl  (  pi_Nit.Nit_Short_Descr,
+                              Substr (Pi_Nit.Nit_Inv_Type || '-' || pi_Nit.Nit_Descr,1,30)
+                           )
+                      );
+  End If;
 
-      l_pk_column := p_fk_column;
+  If p_View_Flag = 'Y'  Then
+    l_Immediate_Or_Deferred := 'N';
+    l_F_Fk_Column           := Null;
+  End If;
 
-      IF Nm3sdo.use_surrogate_key = 'Y'
-      THEN
-         l_pk_column := 'OBJECTID';
-         --  to make SM work for now we have to put the NE_ID in!
-         l_pk_column := 'NE_ID';
+  l_Pk_Column := p_Fk_Column;
 
-         IF p_pk_column IS NOT NULL
-         THEN
-            l_pk_column := p_pk_column;
-         END IF;
-      END IF;
+  If Nm3Sdo.Use_Surrogate_Key = 'Y' Then
+    If p_Pk_Column Is Not Null Then      
+      l_Pk_Column := p_Pk_Column;
+    Else
+      --  to make SM work for now we have to put the NE_ID in!
+      l_Pk_Column := 'NE_ID';
+    End If;
+  End If;
 
-      retval := Higgis.next_theme_id;
+  Retval := Higgis.Next_Theme_Id;
 
-      IF pi_nit.nit_pnt_or_cont = 'C'
-      THEN
-         l_end_mp := 'NM_END_MP';
-      END IF;
+  If Pi_Nit.Nit_Pnt_Or_Cont = 'C' Then
+    l_End_Mp := 'NM_END_MP';
+  End If;
 
-      IF pi_nit.nit_table_name IS NOT NULL
-      THEN
-         --  Foreign table
-         l_tab := pi_nit.nit_table_name;
-         l_t_pk_column := pi_nit.nit_foreign_pk_column;
-         l_t_fk_column := pi_nit.nit_lr_ne_column_name;
-         l_t_uk_column := pi_nit.nit_foreign_pk_column;
-         l_t_begin_col := pi_nit.nit_lr_st_chain;
+  If Pi_Nit.Nit_Table_Name Is Not Null  Then
+    --  Foreign table
+    l_Tab         := pi_Nit.Nit_Table_Name;
+    l_T_Pk_Column := pi_Nit.Nit_Foreign_Pk_Column;
+    l_T_Fk_Column := pi_Nit.Nit_Lr_Ne_Column_Name;
+    l_T_Uk_Column := pi_Nit.Nit_Foreign_Pk_Column;
+    l_T_Begin_Col := pi_Nit.Nit_Lr_St_Chain;
 
-         IF pi_nit.nit_pnt_or_cont = 'C'
-         THEN
-            l_end_mp := pi_nit.nit_lr_end_chain;
-         END IF;
-      ELSE
-         l_tab :=
-                Nm3inv_View.work_out_inv_type_view_name (pi_nit.nit_inv_type);
-         l_t_pk_column := 'IIT_NE_ID';
-         l_t_fk_column := 'NE_ID_OF';
-         l_t_uk_column := 'IIT_PRIMARY_KEY';
-         l_t_begin_col := 'NM_BEGIN_MP';
+    If pi_Nit.Nit_Pnt_Or_Cont = 'C' Then
+      l_End_Mp := pi_Nit.Nit_Lr_End_Chain;
+    End If;
+  Else
+    l_Tab :=  Nm3Inv_View.Work_Out_Inv_Type_View_Name (pi_Nit.Nit_Inv_Type);
+    l_T_Pk_Column := 'IIT_NE_ID';
+    l_T_Fk_Column := 'NE_ID_OF';
+    l_T_Uk_Column := 'IIT_PRIMARY_KEY';
+    l_T_Begin_Col := 'NM_BEGIN_MP';
 
-         IF pi_nit.nit_pnt_or_cont = 'C'
-         THEN
-            l_end_mp := 'NM_END_MP';
-         END IF;
-      END IF;
+    If pi_Nit.Nit_Pnt_Or_Cont = 'C'  Then
+      l_End_Mp := 'NM_END_MP';
+    End If;
+  End If;
 
 --  Build theme rowtype
-      l_nth.nth_theme_id               := retval;
-      l_nth.nth_theme_name             := l_name;
-      l_nth.nth_table_name             := l_tab;
-      l_nth.nth_where                  := NULL;
-      l_nth.nth_pk_column              := l_t_pk_column;
-      l_nth.nth_label_column           := l_t_uk_column;
-      l_nth.nth_rse_table_name         := 'NM_ELEMENTS';
-      l_nth.nth_rse_fk_column          := l_t_fk_column;
-      l_nth.nth_st_chain_column        := l_t_begin_col;
-      l_nth.nth_end_chain_column       := l_end_mp;
-      l_nth.nth_x_column               := NULL;
-      l_nth.nth_y_column               := NULL;
-      l_nth.nth_offset_field           := NULL;
-      l_nth.nth_feature_table          := p_table_name;
-      l_nth.nth_feature_pk_column      := l_pk_column;
-      l_nth.nth_feature_fk_column      := l_f_fk_column;
-      l_nth.nth_xsp_column             := NULL;
-      l_nth.nth_feature_shape_column   := p_spatial_column;
-      l_nth.nth_hpr_product            := 'NET';
-      l_nth.nth_location_updatable     := 'N';
-      l_nth.nth_theme_type             := 'SDO';
---    l_nth.nth_base_theme             := p_base_theme;
-      l_nth.nth_dependency             := 'D';
-      l_nth.nth_storage                := 'S';
-      l_nth.nth_update_on_edit         := l_immediate_or_deferred;
-      l_nth.nth_use_history            := 'Y';
-      l_nth.nth_start_date_column      := 'START_DATE';
-      l_nth.nth_end_date_column        := 'END_DATE';
-      l_nth.nth_base_table_theme       := p_base_table_nth;
-      l_nth.nth_sequence_name          := 'NTH_' || NVL(p_base_table_nth,retval) || '_SEQ';
-      l_nth.nth_snap_to_theme          := 'N';
-      l_nth.nth_lref_mandatory         := 'N';
-      l_nth.nth_tolerance              := 10;
-      l_nth.nth_tol_units              := 1;
-      --
-      Nm3ins.ins_nth (l_nth);
-      --  Build inv theme link
-      l_rec_nith.nith_nit_id := pi_nit.nit_inv_type;
-      l_rec_nith.nith_nth_theme_id := retval;
-      --
-      Nm3ins.ins_nith (l_rec_nith);
-      --  Build theme gtype rowtype
-      l_rec_ntg.ntg_theme_id := l_nth.nth_theme_id;
-      l_rec_ntg.ntg_seq_no := 1;
-      l_rec_ntg.ntg_xml_url := NULL;
+  l_Nth.Nth_Theme_Id               := Retval;
+  l_Nth.Nth_Theme_Name             := l_Name;
+  l_Nth.Nth_Table_Name             := l_Tab;
+  l_Nth.Nth_Where                  := Null;
+  l_Nth.Nth_Pk_Column              := l_T_Pk_Column;
+  l_Nth.Nth_Label_Column           := l_T_Uk_Column;
+  l_Nth.Nth_Rse_Table_Name         := 'NM_ELEMENTS';
+  l_Nth.Nth_Rse_Fk_Column          := l_T_Fk_Column;
+  l_Nth.Nth_St_Chain_Column        := l_T_Begin_Col;
+  l_Nth.Nth_End_Chain_Column       := l_End_Mp;
+  l_Nth.Nth_X_Column               := Null;
+  l_Nth.Nth_Y_Column               := Null;
+  l_Nth.Nth_Offset_Field           := Null;
+  l_Nth.Nth_Feature_Table          := p_Table_Name;
+  l_Nth.Nth_Feature_Pk_Column      := l_Pk_Column;
+  l_Nth.Nth_Feature_Fk_Column      := l_F_Fk_Column;
+  l_Nth.Nth_Xsp_Column             := Null;
+  l_Nth.Nth_Feature_Shape_Column   := p_Spatial_Column;
+  l_Nth.Nth_Hpr_Product            := 'NET';
+  l_Nth.Nth_Location_Updatable     := 'N';
+  l_Nth.Nth_Theme_Type             := 'SDO';
+  l_Nth.Nth_Dependency             := 'D';
+  l_Nth.Nth_Storage                := 'S';
+  l_Nth.Nth_Update_On_Edit         := l_Immediate_Or_Deferred;
+  l_Nth.Nth_Use_History            := 'Y';
+  l_Nth.Nth_Start_Date_Column      := 'START_DATE';
+  l_Nth.Nth_End_Date_Column        := 'END_DATE';
+  l_Nth.Nth_Base_Table_Theme       := p_Base_Table_Nth;
+  l_Nth.Nth_Sequence_Name          := 'NTH_' || Nvl(p_Base_Table_Nth,Retval) || '_SEQ';
+  l_Nth.Nth_Snap_To_Theme          := 'N';
+  l_Nth.Nth_Lref_Mandatory         := 'N';
+  l_Nth.Nth_Tolerance              := 10;
+  l_Nth.Nth_Tol_Units              := 1;
+  --
+  Nm3Ins.Ins_Nth (L_Nth);
+  --  Build inv theme link
+  l_Rec_Nith.Nith_Nit_Id        := pi_Nit.Nit_Inv_Type;
+  l_Rec_Nith.Nith_Nth_Theme_Id  := Retval;
+  --
+  Nm3Ins.Ins_Nith (L_Rec_Nith);
+  --  Build theme gtype rowtype
+  l_Rec_Ntg.Ntg_Theme_Id  := l_Nth.Nth_Theme_Id;
+  l_Rec_Ntg.Ntg_Seq_No    := 1;
+  l_Rec_Ntg.Ntg_Xml_Url   := Null;
 
-      IF pi_nit.nit_pnt_or_cont = 'P'
-      THEN
-         l_rec_ntg.ntg_gtype := '2001';
-      ELSIF pi_nit.nit_pnt_or_cont = 'C'
-      THEN
-         l_rec_ntg.ntg_gtype := 3302;
-      END IF;
+  If pi_Nit.Nit_Pnt_Or_Cont = 'P' Then
+    l_Rec_Ntg.Ntg_Gtype := '2001';
+  Elsif pi_Nit.Nit_Pnt_Or_Cont = 'C'  Then
+     l_Rec_Ntg.Ntg_Gtype := 3302;
+  End If;
 
-      Nm3ins.ins_ntg (p_rec_ntg => l_rec_ntg);
+  Nm3Ins.Ins_Ntg (p_Rec_Ntg => l_Rec_Ntg);
 
-      create_base_themes( retval, p_base_themes );
---
-      IF Hig.get_sysopt ('REGSDELAY') = 'Y'
-      THEN
-         EXECUTE IMMEDIATE (   'begin '
-                            || '    nm3sde.register_sde_layer( p_theme_id => '||TO_CHAR( l_nth.nth_theme_id )||')'
-                            || '; end;'
-                           );
-      END IF;
+  Create_Base_Themes( Retval, p_Base_Themes );
+  --
+  If Hig.Get_Sysopt ('REGSDELAY') = 'Y' Then
+     Execute Immediate (   'begin '
+                        || '    nm3sde.register_sde_layer( p_theme_id => '||To_Char( l_Nth.Nth_Theme_Id )||')'
+                        || '; end;'
+                       );
+  End If;
 
-      IF p_view_flag = 'Y'
-      THEN
-         INSERT INTO NM_THEME_ROLES
-                     (nthr_theme_id, nthr_role, nthr_mode)
-            SELECT retval, itr_hro_role, itr_mode
-              FROM NM_INV_TYPE_ROLES
-             WHERE itr_inv_type = pi_nit.nit_inv_type;
-      END IF;
---
--- register the theme functions
---
+  If p_View_Flag = 'Y'  Then
+    Insert Into Nm_Theme_Roles
+    (
+    Nthr_Theme_Id,
+    Nthr_Role,
+    Nthr_Mode
+    )
+    Select  Retval,
+            nitr.Itr_Hro_Role,
+            nitr.Itr_Mode
+    From    Nm_Inv_Type_Roles nitr
+    Where   Itr_Inv_Type = pi_Nit.Nit_Inv_Type;
+  End If;
+  --
+  -- register the theme functions
+  --
 
-      IF pi_nit.nit_table_name IS NULL THEN
+  If pi_Nit.Nit_Table_Name Is Null Then
+    Create_Theme_Functions( p_Theme => l_Nth.Nth_Theme_Id, p_Pa => g_Asset_Modules, p_Exclude => Null );
+  Else
+    -- FT exclude data with a 2
+    Create_Theme_Functions( p_Theme => l_Nth.Nth_Theme_Id, p_Pa => g_Asset_Modules, p_Exclude => 2 );
+  End If;
 
-        create_theme_functions( p_theme => l_nth.nth_theme_id, p_pa => g_asset_modules, p_exclude => NULL );
-
-      ELSE
---      FT exclude data with a 2
-        create_theme_functions( p_theme => l_nth.nth_theme_id, p_pa => g_asset_modules, p_exclude => 2 );
-
-      END IF;
-
-      RETURN retval;
-   END register_inv_theme;
-
+  Return Retval;
+    
+End Register_Inv_Theme;
 --
 ---------------------------------------------------------------------------------------------------
 --
-   FUNCTION register_ona_theme (
-      pi_nit             IN   nm_inv_types%ROWTYPE,
-      p_table_name       IN   VARCHAR2,
-      p_spatial_column   IN   VARCHAR2 DEFAULT 'GEOLOC',
-      p_fk_column        IN   VARCHAR2 DEFAULT 'NE_ID',
-      p_name             IN   VARCHAR2 DEFAULT NULL,
-      p_view_flag        IN   VARCHAR2 DEFAULT 'N',
-      p_pk_column        IN   VARCHAR2 DEFAULT 'NE_ID',
-      p_base_table_nth   IN   NM_THEMES_ALL.nth_theme_id%TYPE DEFAULT NULL
-   )
-      RETURN NUMBER
-   IS
-      l_immediate_or_deferred   VARCHAR2 (1)                           := 'N';
---    l_fk_column             VARCHAR2(30) := 'NE_ID';
---    l_f_fk_column           VARCHAR2(30) := 'NE_ID';
-      l_pk_column               VARCHAR2 (30);
-      l_name                    VARCHAR2 (30);
-      l_t_pk_column             VARCHAR2 (30);
-      l_t_fk_column             VARCHAR2 (30);
-      l_t_uk_column             VARCHAR2 (30);
-      l_t_begin_col             VARCHAR2 (30);
-      l_t_end_col               VARCHAR2 (30);
-      l_t_x_col                 VARCHAR2 (30);
-      l_t_y_col                 VARCHAR2 (30);
-      --
-      l_tab                     VARCHAR2 (30);
-      l_end_mp                  VARCHAR2 (10)                         := NULL;
-      retval                    NUMBER;
-      l_nth                     NM_THEMES_ALL%ROWTYPE;
-      l_rec_base_nth            NM_THEMES_ALL%ROWTYPE;
-      l_rec_nith                NM_INV_THEMES%ROWTYPE;
-      l_rec_ntg                 NM_THEME_GTYPES%ROWTYPE;
-      l_nth_start_date_column   NM_THEMES_ALL.nth_start_date_column%TYPE;
-      l_nth_end_date_column     NM_THEMES_ALL.nth_end_date_column%TYPE;
-      l_nth_base_table_theme    NM_THEMES_ALL.nth_base_table_theme%TYPE;
-      l_nth_sequence_name       NM_THEMES_ALL.nth_sequence_name%TYPE;
-      l_nth_snap_to_theme       NM_THEMES_ALL.nth_snap_to_theme%TYPE;
-      l_nth_lref_mandatory      NM_THEMES_ALL.nth_lref_mandatory%TYPE;
-      l_nth_tolerance           NM_THEMES_ALL.nth_tolerance%TYPE;
-      l_nth_tol_units           NM_THEMES_ALL.nth_tol_units%TYPE;
-      e_dup_nth                 EXCEPTION;
-      e_dup_nith                EXCEPTION;
-      e_dup_ntg                 EXCEPTION;
+Function Register_Ona_Theme (
+                            pi_Nit             In   Nm_Inv_Types%Rowtype,
+                            p_Table_Name       In   Varchar2,
+                            p_Spatial_Column   In   Varchar2 Default 'GEOLOC',
+                            p_Fk_Column        In   Varchar2 Default 'NE_ID',
+                            p_Name             In   Varchar2 Default Null,
+                            p_View_Flag        In   Varchar2 Default 'N',
+                            p_Pk_Column        In   Varchar2 Default 'NE_ID',
+                            p_Base_Table_Nth   In   Nm_Themes_All.Nth_Theme_Id%Type Default Null
+                            ) Return Number
+Is
+  l_Immediate_Or_Deferred   Varchar2 (1)                           := 'N';
+  l_Pk_Column               Varchar2 (30);
+  l_Name                    Varchar2 (30);
+  l_T_Pk_Column             Varchar2 (30);
+  l_T_Fk_Column             Varchar2 (30);
+  l_T_Uk_Column             Varchar2 (30);
+  l_T_Begin_Col             Varchar2 (30);
+  l_T_End_Col               Varchar2 (30);
+  l_T_X_Col                 Varchar2 (30);
+  l_T_Y_Col                 Varchar2 (30);
+  --
+  l_Tab                     Varchar2 (30);
+  l_End_Mp                  Varchar2 (10)                         := Null;
+  Retval                    Number;
+  l_Nth                     Nm_Themes_All%Rowtype;
+  l_Rec_Base_Nth            Nm_Themes_All%Rowtype;
+  l_Rec_Nith                Nm_Inv_Themes%Rowtype;
+  l_Rec_Ntg                 Nm_Theme_Gtypes%Rowtype;
+  l_Nth_Start_Date_Column   Nm_Themes_All.Nth_Start_Date_Column%Type;
+  l_Nth_End_Date_Column     Nm_Themes_All.Nth_End_Date_Column%Type;
+  l_Nth_Base_Table_Theme    Nm_Themes_All.Nth_Base_Table_Theme%Type;
+  l_Nth_Sequence_Name       Nm_Themes_All.Nth_Sequence_Name%Type;
+  l_Nth_Snap_To_Theme       Nm_Themes_All.Nth_Snap_To_Theme%Type;
+  l_Nth_Lref_Mandatory      Nm_Themes_All.Nth_Lref_Mandatory%Type;
+  l_Nth_Tolerance           Nm_Themes_All.Nth_Tolerance%Type;
+  l_Nth_Tol_Units           Nm_Themes_All.Nth_Tol_Units%Type;
+  e_Dup_Nth                 Exception;
+  e_Dup_Nith                Exception;
+  e_Dup_Ntg                 Exception;
 
-      --
-      FUNCTION get_base_gtype (cp_theme_id IN NUMBER)
-         RETURN NUMBER
-      IS
-         retval   NUMBER;
-      BEGIN
-         SELECT MAX (ntg_gtype)
-           INTO retval
-           FROM NM_THEME_GTYPES
-          WHERE ntg_theme_id = cp_theme_id;
+  --
+  Function Get_Base_Gtype (
+                          Cp_Theme_Id In Number
+                          ) Return Number
+  Is
+     Retval   Number;
+  Begin
+    Select  Max (Ntg_Gtype)
+    Into    Retval
+    From    Nm_Theme_Gtypes
+    Where   Ntg_Theme_Id = Cp_Theme_Id;
 
-         RETURN retval;
-      EXCEPTION
-         WHEN OTHERS
-         THEN
-            Hig.raise_ner (pi_appl         => Nm3type.c_hig,
-                           pi_id           => 268,
-                           pi_sqlcode      => -20001
-                          );
+    Return Retval;
+      
+  Exception
+    When Others
+    Then
+      Hig.Raise_Ner (Pi_Appl         => Nm3Type.C_Hig,
+                     Pi_Id           => 268,
+                     Pi_Sqlcode      => -20001
+                    );
+  End Get_Base_Gtype;
+------------
+--
+------------
+Begin
+    --
+  Nm_Debug.Proc_Start (G_Package_Name, 'register_ona_theme');
+  --
+  l_Name := Upper (p_Name);
 
---          raise_application_error (-20001,  'Cannot derive Gtype from base theme'  );
-      END get_base_gtype;
-   --
-   BEGIN
-      --
-      Nm_Debug.proc_start (g_package_name, 'register_ona_theme');
-      --
-      l_name := UPPER (p_name);
+  If l_Name Is Null Then
+       
+     l_Name :=  Upper (Nvl (pi_Nit.Nit_Short_Descr,
+                        Substr (pi_Nit.Nit_Inv_Type || '-' || pi_Nit.Nit_Descr,1,30)
+                      ));
+  End If;
 
-      IF l_name IS NULL
-      THEN
-         l_name :=
-            UPPER (NVL (pi_nit.nit_short_descr,
-                        SUBSTR (pi_nit.nit_inv_type || '-' || pi_nit.nit_descr,
-                                1,
-                                30
-                               )
-                       )
+  If pi_Nit.Nit_Table_Name Is Not Null  Then
+     l_Pk_Column := pi_Nit.Nit_Foreign_Pk_Column;
+  Else
+     L_Pk_Column := 'IIT_NE_ID';
+  End If;
+  --
+  If Nm3Sdo.Use_Surrogate_Key = 'Y' Then
+     l_Pk_Column := 'IIT_NE_ID';
+  End If;
+  --
+  Retval := Higgis.Next_Theme_Id;
+
+  If pi_Nit.Nit_Table_Name Is Not Null  Then
+     --  Foreign table
+     l_Tab          :=  pi_Nit.Nit_Table_Name;
+     l_T_Pk_Column  :=  pi_Nit.Nit_Foreign_Pk_Column;
+     l_T_Uk_Column  :=  pi_Nit.Nit_Foreign_Pk_Column;
+  Else
+    l_Tab           := Nm3Inv_View.Work_Out_Inv_Type_View_Name (pi_Nit.Nit_Inv_Type);
+    l_T_Pk_Column   := 'IIT_NE_ID';
+    l_T_Uk_Column   := 'IIT_PRIMARY_KEY';
+
+     If Pi_Nit.Nit_Use_Xy = 'Y'
+     Then
+        L_T_X_Col := 'IIT_X';
+        L_T_Y_Col := 'IIT_Y';
+     End If;
+  End If;
+
+  --
+  If p_Base_Table_Nth Is Not Null Then
+    l_Rec_Base_Nth :=  Nm3Get.Get_Nth (pi_Nth_Theme_Id => p_Base_Table_Nth);
+  End If;
+
+  --
+  l_Nth.Nth_Theme_Id               := Retval;
+  l_Nth.Nth_Theme_Name             := l_Name;
+  l_Nth.Nth_Table_Name             := l_Tab;
+  l_Nth.Nth_Where                  := Null;
+  l_Nth.Nth_Pk_Column              := l_T_Pk_Column;
+  l_Nth.Nth_Label_Column           := l_T_Uk_Column;
+  l_Nth.Nth_X_Column               := l_T_X_Col;
+  l_Nth.Nth_Y_Column               := l_T_Y_Col;
+  l_Nth.Nth_Feature_Table          := p_Table_Name;
+  l_Nth.Nth_Feature_Pk_Column      := Nvl (p_Pk_Column,l_Rec_Base_Nth.Nth_Feature_Pk_Column);
+  l_Nth.Nth_Feature_Shape_Column   := p_Spatial_Column;
+  l_Nth.Nth_Hpr_Product            := 'NET';
+  l_Nth.Nth_Location_Updatable     := Nvl (l_Rec_Base_Nth.Nth_Location_Updatable, 'N');
+  l_Nth.Nth_Theme_Type             := 'SDO';
+  l_Nth.Nth_Dependency             := 'I';
+  l_Nth.Nth_Storage                := 'S';
+  l_Nth.Nth_Update_On_Edit         := l_Immediate_Or_Deferred;
+  l_Nth.Nth_Use_History            := 'Y';
+  l_Nth.Nth_Start_Date_Column      := Nvl (l_Rec_Base_Nth.Nth_Start_Date_Column, 'START_DATE');
+  l_Nth.Nth_End_Date_Column        := Nvl (l_Rec_Base_Nth.Nth_End_Date_Column, 'END_DATE');
+  l_Nth.Nth_Base_Table_Theme       := p_Base_Table_Nth;
+  l_Nth.Nth_Sequence_Name          := Nvl (l_Rec_Base_Nth.Nth_Sequence_Name, 'NTH_' || Retval || '_SEQ');
+  l_Nth.Nth_Snap_To_Theme          := Nvl (l_Rec_Base_Nth.Nth_Snap_To_Theme, 'N');
+  l_Nth.Nth_Lref_Mandatory         := Nvl (l_Rec_Base_Nth.Nth_Lref_Mandatory, 'N');
+  l_Nth.Nth_Tolerance              := Nvl (l_Rec_Base_Nth.Nth_Tolerance, 10);
+  l_Nth.Nth_Tol_Units              := 1;
+  --
+  Begin
+    Nm3Ins.Ins_Nth (l_Nth);
+  Exception
+    When Dup_Val_On_Index Then
+      Raise E_Dup_Nth;
+  End;
+  --
+  l_Rec_Nith.Nith_Nit_Id        := pi_Nit.Nit_Inv_Type;
+  l_Rec_Nith.Nith_Nth_Theme_Id  := Retval;
+
+  Begin
+    Nm3Ins.Ins_Nith (l_Rec_Nith);
+  Exception
+    When Dup_Val_On_Index Then
+      Raise E_Dup_Nith;
+  End;
+
+  -- Create GTYPE record
+  l_Rec_Ntg.Ntg_Gtype := Get_Base_Gtype (l_Rec_Base_Nth.Nth_Theme_Id);
+
+  If l_Rec_Ntg.Ntg_Gtype Is Not Null  Then
+    l_Rec_Ntg.Ntg_Theme_Id  := l_Nth.Nth_Theme_Id;
+    l_Rec_Ntg.Ntg_Seq_No    := 1;
+  End If;
+
+  Begin
+    Nm3Ins.Ins_Ntg (P_Rec_Ntg => L_Rec_Ntg);
+  Exception
+    When Dup_Val_On_Index Then
+      Raise E_Dup_Ntg;
+  End;
+
+  If p_View_Flag = 'Y'  Then
+    Insert Into Nm_Theme_Roles
+    (
+    Nthr_Theme_Id,
+    Nthr_Role,
+    Nthr_Mode
+    )
+    Select  Retval,
+            nitr.Itr_Hro_Role,
+            nitr.Itr_Mode
+    From    Nm_Inv_Type_Roles   nitr
+    Where   nitr.Itr_Inv_Type   =   pi_Nit.Nit_Inv_Type;
+  End If;
+
+  --
+  -- create the theme functions
+  --
+  If Pi_Nit.Nit_Table_Name Is Null Then
+
+    Create_Theme_Functions( p_Theme => l_Nth.Nth_Theme_Id, p_Pa => g_Asset_Modules, p_Exclude => Null );
+
+  Else
+
+    Create_Theme_Functions( p_Theme => l_Nth.Nth_Theme_Id, p_Pa => g_Asset_Modules, p_Exclude => 2 );
+
+  End If;
+
+  --
+  Return Retval;
+  --
+  Nm_Debug.Proc_End (G_Package_Name, 'register_ona_theme');
+ --
+Exception
+  When E_Dup_Nth  Then
+    Hig.Raise_Ner (
+                  pi_Appl         => Nm3Type.C_Hig,
+                  pi_Id           => 269,
+                  pi_Sqlcode      => -20001
                   );
-      END IF;
-
-      IF pi_nit.nit_table_name IS NOT NULL
-      THEN
-         l_pk_column := pi_nit.nit_foreign_pk_column;
-      ELSE
-         l_pk_column := 'IIT_NE_ID';
-      END IF;
---
-      IF Nm3sdo.use_surrogate_key = 'Y'
-      THEN
-         l_pk_column := 'OBJECTID';
-         --  to make SM work for now we have to put the NE_ID in!
-         --  l_pk_column := 'NE_ID';
-         l_pk_column := 'IIT_NE_ID';
-      END IF;
---
-      retval := Higgis.next_theme_id;
-
-      IF pi_nit.nit_table_name IS NOT NULL
-      THEN
-         --  Foreign table
-         l_tab := pi_nit.nit_table_name;
-         l_t_pk_column := pi_nit.nit_foreign_pk_column;
-         l_t_uk_column := pi_nit.nit_foreign_pk_column;
-      ELSE
-         l_tab := Nm3inv_View.work_out_inv_type_view_name (pi_nit.nit_inv_type);
-         l_t_pk_column := 'IIT_NE_ID';
-         l_t_uk_column := 'IIT_PRIMARY_KEY';
-
-         IF pi_nit.nit_use_xy = 'Y'
-         THEN
-            l_t_x_col := 'IIT_X';
-            l_t_y_col := 'IIT_Y';
-         END IF;
-      END IF;
-
-      --
-      IF p_base_table_nth IS NOT NULL
-      THEN
-         l_rec_base_nth :=  Nm3get.get_nth (pi_nth_theme_id => p_base_table_nth);
-      END IF;
-
-      --
-      l_nth.nth_theme_id               := retval;
-      l_nth.nth_theme_name             := l_name;
-      l_nth.nth_table_name             := l_tab;
-      l_nth.nth_where                  := NULL;
-      l_nth.nth_pk_column              := l_t_pk_column;
-      l_nth.nth_label_column           := l_t_uk_column;
-      l_nth.nth_x_column               := l_t_x_col;
-      l_nth.nth_y_column               := l_t_y_col;
-      l_nth.nth_feature_table          := p_table_name;
-      l_nth.nth_feature_pk_column      := NVL (p_pk_column,l_rec_base_nth.nth_feature_pk_column);
-      l_nth.nth_feature_shape_column   := p_spatial_column;
-      l_nth.nth_hpr_product            := 'NET';
-      l_nth.nth_location_updatable     := NVL (l_rec_base_nth.nth_location_updatable, 'N');
-      l_nth.nth_theme_type             := 'SDO';
-      l_nth.nth_dependency             := 'I';
-      l_nth.nth_storage                := 'S';
-      l_nth.nth_update_on_edit         := l_immediate_or_deferred;
-      l_nth.nth_use_history            := 'Y';
-      l_nth.nth_start_date_column      := NVL (l_rec_base_nth.nth_start_date_column, 'START_DATE');
-      l_nth.nth_end_date_column        := NVL (l_rec_base_nth.nth_end_date_column, 'END_DATE');
-      l_nth.nth_base_table_theme       := p_base_table_nth;
-      l_nth.nth_sequence_name          := NVL (l_rec_base_nth.nth_sequence_name, 'NTH_' || retval || '_SEQ');
-      l_nth.nth_snap_to_theme          := NVL (l_rec_base_nth.nth_snap_to_theme, 'N');
-      l_nth.nth_lref_mandatory         := NVL (l_rec_base_nth.nth_lref_mandatory, 'N');
-      l_nth.nth_tolerance              := NVL (l_rec_base_nth.nth_tolerance, 10);
-      l_nth.nth_tol_units              := 1;
-      --
---      Nm_Debug.DEBUG ('Creating NTH');
-      BEGIN
-         Nm3ins.ins_nth (l_nth);
-      EXCEPTION
-         WHEN DUP_VAL_ON_INDEX
-         THEN
-            RAISE e_dup_nth;
-         WHEN OTHERS
-         THEN
-            RAISE;
-      END;
-
-      --
-      l_rec_nith.nith_nit_id := pi_nit.nit_inv_type;
-      l_rec_nith.nith_nth_theme_id := retval;
-      --
---      Nm_Debug.DEBUG ('Creating NITH');
-
-      BEGIN
-         Nm3ins.ins_nith (l_rec_nith);
-      EXCEPTION
-         WHEN DUP_VAL_ON_INDEX
-         THEN
-            RAISE e_dup_nith;
-         WHEN OTHERS
-         THEN
-            RAISE;
-      END;
-
-      --
-/*
-      Nm_Debug.DEBUG (   'Creating GType Link - '
-                      || l_nth.nth_feature_table
-                      || ' - '
-                      || l_nth.nth_feature_shape_column
-                     );
-*/
-      -- Create GTYPE record
-      --l_rec_ntg.ntg_gtype    := Nm3sdo.get_table_gtype (l_nth.nth_feature_table,l_nth.nth_feature_shape_column);
-      l_rec_ntg.ntg_gtype := get_base_gtype (l_rec_base_nth.nth_theme_id);
-
-      IF l_rec_ntg.ntg_gtype IS NOT NULL
-      THEN
-         l_rec_ntg.ntg_theme_id := l_nth.nth_theme_id;
-         l_rec_ntg.ntg_seq_no := 1;
---     ELSIF pi_nit.nit_pnt_or_cont = 'P'
---     THEN
---       Nm_Debug.DEBUG ('Creating GType Link - POINT');
---       l_rec_ntg.ntg_gtype    := '2001';
---       l_rec_ntg.ntg_theme_id := l_nth.nth_theme_id;
---       l_rec_ntg.ntg_seq_no   := 1;
---     ELSIF pi_nit.nit_pnt_or_cont = 'C'
---     THEN
---       l_rec_ntg.ntg_gtype    := '3002';
---       l_rec_ntg.ntg_theme_id := l_nth.nth_theme_id;
---       l_rec_ntg.ntg_seq_no   := 1;
-      END IF;
-
-      --
-      BEGIN
-         Nm3ins.ins_ntg (p_rec_ntg => l_rec_ntg);
-      EXCEPTION
-         WHEN DUP_VAL_ON_INDEX
-         THEN
-            RAISE e_dup_ntg;
-         WHEN OTHERS
-         THEN
-            RAISE;
-      END;
-
-      --
---      Nm_Debug.DEBUG ('Creating GType - DONE');
-
---     IF Hig.get_sysopt('REGSDELAY') = 'Y'
---     THEN
---
---       EXECUTE IMMEDIATE
---           ( 'begin '||
---   --        '  nm_debug.debug_on;'||
---             '  nm3sde.clone_sde_layer( p_theme_id   => '||TO_CHAR(retval)||
---                                     ', p_pnt_or_cnt => '||''''||pi_nit.nit_pnt_or_cont||''''||
---                                     ' );'||
---             'end;' );
---
---     END IF;
-      IF p_view_flag = 'Y'
-      THEN
-         INSERT INTO NM_THEME_ROLES
-                     (nthr_theme_id, nthr_role, nthr_mode)
-            SELECT retval, itr_hro_role, itr_mode
-              FROM NM_INV_TYPE_ROLES
-             WHERE itr_inv_type = pi_nit.nit_inv_type;
-      END IF;
-
---
--- create the theme functions
---
-      IF pi_nit.nit_table_name IS NULL THEN
-
-        create_theme_functions( p_theme => l_nth.nth_theme_id, p_pa => g_asset_modules, p_exclude => NULL );
-
-      ELSE
-
-        create_theme_functions( p_theme => l_nth.nth_theme_id, p_pa => g_asset_modules, p_exclude => 2 );
-
-      END IF;
-
-      --
-      RETURN retval;
-      --
-      Nm_Debug.proc_end (g_package_name, 'register_ona_theme');
-   --
-   EXCEPTION
-      WHEN e_dup_nth
-      THEN
-         Hig.raise_ner (pi_appl         => Nm3type.c_hig,
-                        pi_id           => 269,
-                        pi_sqlcode      => -20001
-                       );
-
---         raise_application_error (-20101, 'Duplicate Theme or Theme Name Found'  );
-      WHEN e_dup_nith
-      THEN
-         Hig.raise_ner (pi_appl         => Nm3type.c_hig,
-                        pi_id           => 270,
-                        pi_sqlcode      => -20001
-                       );
---       raise_application_error (-20102, 'Theme is already registered');
-      WHEN e_dup_ntg
-      THEN
-         Hig.raise_ner (pi_appl         => Nm3type.c_hig,
-                        pi_id           => 271,
-                        pi_sqlcode      => -20001
-                       );
---       raise_application_error (-20103, 'Error associating Geometry Type with Theme' );
-      WHEN OTHERS
-      THEN
-         RAISE;
-   END register_ona_theme;
-
---
----------------------------------------------------------------------------------------------------
---
-
-   FUNCTION get_nat_base_themes ( p_nt_type  IN NM_AREA_TYPES.NAT_NT_TYPE%TYPE,
-                                  p_gty_type IN NM_AREA_TYPES.NAT_GTY_GROUP_TYPE%TYPE )
-     RETURN nm_theme_array IS
-      retval nm_theme_array := Nm3array.init_nm_theme_array;
-
-      CURSOR c_nth ( c_gty_type  IN nm_area_types.nat_gty_group_type%TYPE ) IS
-        SELECT nm_theme_entry(nth_theme_id)
-          FROM nm_nw_themes
-              ,nm_linear_types
-              ,nm_themes_all
-              ,nm_nt_groupings
-         WHERE nng_group_type = c_gty_type
-           AND nng_nt_type = nlt_nt_type
-           AND nlt_g_i_d = 'D'
-           AND nth_base_table_theme IS NULL
-           AND nlt_gty_type IS NULL
-           AND nlt_id = nnth_nlt_id
-           AND nnth_nth_theme_id = nth_theme_id
-           AND NOT EXISTS ( SELECT 1 FROM nm_base_themes
-                             WHERE nth_theme_id = nbth_theme_id );
-
-   BEGIN
-
-     OPEN c_nth ( p_gty_type );
-     FETCH c_nth BULK COLLECT INTO retval.nta_theme_array;
-     CLOSE c_nth;
-
-     IF retval.nta_theme_array.LAST IS NULL THEN
-         Hig.raise_ner (pi_appl         => Nm3type.c_hig,
-                        pi_id           => 272,
-                        pi_sqlcode      => -20001,
-                        pi_supplementary_info => p_gty_type
-                       );
- --  raise_application_error (-20001, 'No themes for linear type '||p_gty_type);
-     ELSE
-       RETURN retval;
-     END IF;
-   END;
-
---
----------------------------------------------------------------------------------------------------
---
-   FUNCTION register_nat_theme (
-      p_nt_type          IN   NM_TYPES.nt_type%TYPE,
-      p_gty_type         IN   nm_group_types.ngt_group_type%TYPE,
-      p_base_themes      IN   nm_theme_array,
-      p_table_name       IN   VARCHAR2,
-      p_spatial_column   IN   VARCHAR2 DEFAULT 'GEOLOC',
-      p_fk_column        IN   VARCHAR2 DEFAULT 'NE_ID',
-      p_name             IN   VARCHAR2 DEFAULT NULL,
-      p_view_flag        IN   VARCHAR2 DEFAULT 'N',
-      p_base_table_nth   IN   NM_THEMES_ALL.nth_theme_id%TYPE DEFAULT NULL
-   )
-      RETURN NUMBER
-   IS
-      retval                    NUMBER;
-      l_nat_id                  NUMBER;
-      l_effective_date          DATE            := To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY');
-      l_name                    VARCHAR2 (30)   := NVL (p_name, p_table_name);
-      l_immediate_or_deferred   VARCHAR2 (1)                      := 'I';
-      l_fk_column               VARCHAR2 (30)                     := 'NE_ID';
-      l_pk_column               VARCHAR2 (30);
-      l_nat                     NM_AREA_TYPES%ROWTYPE;
-      l_nth_id                  NM_THEMES_ALL.nth_theme_id%TYPE;
-      l_nth                     NM_THEMES_ALL%ROWTYPE;
-      l_rec_ntg                 NM_THEME_GTYPES%ROWTYPE;
-      l_base_themes             nm_theme_array;
-
-   BEGIN
-
-      IF p_view_flag = 'Y'
-      THEN
-         l_immediate_or_deferred := 'N';                --no update for views
-      END IF;
-
-      SELECT nat_id_seq.NEXTVAL
-        INTO l_nat_id
-        FROM DUAL;
-
-      l_nat.nat_id := l_nat_id;
-      l_nat.nat_nt_type := p_nt_type;
-      l_nat.nat_gty_group_type := p_gty_type;
-      l_nat.nat_descr := 'Spatial Representation of ' || p_gty_type || ' Groups';
-      l_nat.nat_seq_no := 1;
-      l_nat.nat_start_date := l_effective_date;
-      l_nat.nat_end_date := NULL;
-      l_nat.nat_shape_type := 'TRACED';
-
-      BEGIN
-         INSERT INTO NM_AREA_TYPES
-                     (nat_id, nat_nt_type,
-                      nat_gty_group_type, nat_descr,
-                      nat_seq_no, nat_start_date,
-                      nat_end_date, nat_shape_type
-                     )
-              VALUES (l_nat.nat_id, l_nat.nat_nt_type,
-                      l_nat.nat_gty_group_type, l_nat.nat_descr,
-                      l_nat.nat_seq_no, l_nat.nat_start_date,
-                      l_nat.nat_end_date, l_nat.nat_shape_type
-                     );
-      EXCEPTION
-         WHEN DUP_VAL_ON_INDEX
-         THEN
-            SELECT nat_id
-              INTO l_nat_id
-              FROM NM_AREA_TYPES
-             WHERE nat_nt_type = p_nt_type AND nat_gty_group_type = p_gty_type;
-      END;
-
-
-      retval := Nm3seq.next_nth_theme_id_seq;
-      -- generate the theme
-      l_nth_id := retval;
-      l_nth.nth_theme_id := l_nth_id;
-      l_nth.nth_theme_name := l_name;
-      l_nth.nth_table_name := p_table_name;
-      l_nth.nth_where := NULL;
-      l_nth.nth_pk_column := 'NE_ID';
-    --
-    -- Task ID 0107889 - Set Label Column to NE_ID for Group layer base table themes
-    -- 05/10/09 AE Further restrict on the non DT theme 
-    --
-      IF p_base_table_nth IS NULL
-      OR l_nth.nth_theme_name NOT LIKE '%DT'
-      THEN
-        l_nth.nth_label_column := 'NE_ID';
-      ELSE
-        l_nth.nth_label_column := 'NE_UNIQUE';
-      END IF;
-    --
-      l_nth.nth_rse_table_name := 'NM_ELEMENTS';
-      l_nth.nth_rse_fk_column := NULL;
-      l_nth.nth_st_chain_column := NULL;
-      l_nth.nth_end_chain_column := NULL;
-      l_nth.nth_x_column := NULL;
-      l_nth.nth_y_column := NULL;
-      l_nth.nth_offset_field := NULL;
-      l_nth.nth_feature_table := p_table_name;
-      l_nth.nth_feature_pk_column := 'NE_ID';
-      l_nth.nth_feature_fk_column := p_fk_column;
-      l_nth.nth_xsp_column := NULL;
-      l_nth.nth_feature_shape_column := p_spatial_column;
-      l_nth.nth_hpr_product := 'NET';
-      l_nth.nth_location_updatable := 'N';
-      l_nth.nth_theme_type := 'SDO';
-      l_nth.nth_dependency := 'D';
-      l_nth.nth_storage := 'S';
-      l_nth.nth_update_on_edit := l_immediate_or_deferred;
-      l_nth.nth_use_history := 'Y';
-      l_nth.nth_start_date_column := 'START_DATE';
-      l_nth.nth_end_date_column := 'END_DATE';
-      l_nth.nth_base_table_theme := p_base_table_nth;
-      l_nth.nth_sequence_name := 'NTH_' || NVL(p_base_table_nth,retval) || '_SEQ';
-      l_nth.nth_snap_to_theme := 'N';
-      l_nth.nth_lref_mandatory := 'N';
-      l_nth.nth_tolerance := 10;
-      l_nth.nth_tol_units := 1;
-      Nm3ins.ins_nth (l_nth);
-      --
-      --  Build theme gtype rowtype
-      l_rec_ntg.ntg_theme_id := l_nth_id;
-      l_rec_ntg.ntg_seq_no := 1;
-      l_rec_ntg.ntg_xml_url := NULL;
-      l_rec_ntg.ntg_gtype := '2002';
-      Nm3ins.ins_ntg (p_rec_ntg => l_rec_ntg);
-
-      -- generate the link
-      INSERT INTO NM_AREA_THEMES
-                  (nath_nat_id, nath_nth_theme_id
-                  )
-           VALUES (l_nat_id, l_nth_id
+  When E_Dup_Nith Then
+    Hig.Raise_Ner (
+                  pi_Appl         => Nm3Type.C_Hig,
+                  pi_Id           => 270,
+                  pi_Sqlcode      => -20001
                   );
-      create_base_themes( l_nth_id, p_base_themes );
---
-
-
-      IF Hig.get_sysopt ('REGSDELAY') = 'Y'
-      THEN
---         nm_debug.debug_on;
---         nm_debug.debug('** Creating SDE Layer for - '||l_nth.nth_theme_id);
-         EXECUTE IMMEDIATE (   'begin '
-                            || '    nm3sde.register_sde_layer( p_theme_id => '||TO_CHAR( l_nth.nth_theme_id )||');'
-                            || 'end;'
-                           );
---         nm_debug.debug('** Done creating SDE Layer for - '||l_nth.nth_theme_id);
-      END IF;
-
-      IF p_view_flag = 'N'
-      THEN
-         DECLARE
-            l_role   VARCHAR2 (30);
-         BEGIN
-            l_role := Hig.get_sysopt ('SDONETROLE');
-
-            IF l_role IS NOT NULL
-            THEN
-               INSERT INTO NM_THEME_ROLES
-                           (nthr_theme_id, nthr_role, nthr_mode
-                           )
-                    VALUES (l_nth_id, l_role, 'NORMAL'
-                           );
-            END IF;
-         END;
-      END IF;
-
-      DECLARE
-        l_type NUMBER;
-      BEGIN
-        IF Nm3net.get_gty_sub_group_allowed( p_gty_type ) = 'Y'
-        THEN
-          l_type := 3;
-        ELSE
-          l_type := 2;
-        END IF;
-        create_theme_functions( p_theme => l_nth.nth_theme_id, p_pa => g_network_modules, p_exclude => l_type );
-      END;
-
-      RETURN l_nth_id;
-   END register_nat_theme;
-
+  When E_Dup_Ntg  Then
+    Hig.Raise_Ner (
+                  pi_Appl         => Nm3Type.C_Hig,
+                  pi_Id           => 271,
+                  pi_Sqlcode      => -20001
+                  );
+End Register_Ona_Theme;
 --
 ---------------------------------------------------------------------------------------------------
 --
-   FUNCTION get_nlt_descr (p_nlt_id IN NUMBER)
-      RETURN VARCHAR2
-   IS
-      CURSOR c1 (c_nlt_id NUMBER)
-      IS
-         SELECT nlt_descr
-           FROM NM_LINEAR_TYPES
-          WHERE nlt_id = c_nlt_id;
-      retval   NM_LINEAR_TYPES.nlt_descr%TYPE;
-   BEGIN
-      OPEN c1 (p_nlt_id);
-      FETCH c1
-       INTO retval;
-      CLOSE c1;
-      RETURN retval;
-   END;
+Function Get_Nat_Base_Themes  (
+                              p_Gty_Type In Nm_Area_Types.Nat_Gty_Group_Type%Type
+                              ) Return Nm_Theme_Array 
+Is
+  Retval Nm_Theme_Array := Nm3Array.Init_Nm_Theme_Array;
+
+Begin
+  Select  Nm_Theme_Entry(nta.Nth_Theme_Id)
+  Bulk Collect 
+  Into    Retval.Nta_Theme_Array
+  From    Nm_Nw_Themes      nnt,
+          Nm_Linear_Types   nlt,
+          Nm_Themes_All     nta,
+          Nm_Nt_Groupings   nng
+  Where   nng.Nng_Group_Type        =   p_Gty_Type
+  And     nng.Nng_Nt_Type           =   nlt.Nlt_Nt_Type
+  And     nlt.Nlt_G_I_D             =   'D'
+  And     nta.Nth_Base_Table_Theme  Is  Null
+  And     nlt.Nlt_Gty_Type          Is  Null
+  And     nlt.Nlt_Id                =   nnt.Nnth_Nlt_Id
+  And     nnt.Nnth_Nth_Theme_Id     =   nta.Nth_Theme_Id
+  And     Not Exists                (   Select  Null 
+                                        From    Nm_Base_Themes  nbt
+                                        Where   nta.Nth_Theme_Id = nbt.Nbth_Theme_Id
+                                    );
+
+  If Retval.Nta_Theme_Array.Last Is Null Then
+    Hig.Raise_Ner   (
+                    pi_Appl               =>  Nm3Type.C_Hig,
+                    pi_Id                 =>  272,
+                    pi_Sqlcode            =>  -20001,
+                    pi_Supplementary_Info =>  p_Gty_Type
+                    );
+  End If;
+  Return Retval;
+End Get_Nat_Base_Themes;
+--
+---------------------------------------------------------------------------------------------------
+--
+Function Register_Nat_Theme (
+                            p_Nt_Type          In   Nm_Types.Nt_Type%Type,
+                            p_Gty_Type         In   Nm_Group_Types.Ngt_Group_Type%Type,
+                            p_Base_Themes      In   Nm_Theme_Array,
+                            p_Table_Name       In   Varchar2,
+                            p_Spatial_Column   In   Varchar2 Default 'GEOLOC',
+                            p_Fk_Column        In   Varchar2 Default 'NE_ID',
+                            p_Name             In   Varchar2 Default Null,
+                            p_View_Flag        In   Varchar2 Default 'N',
+                            p_Base_Table_Nth   In   Nm_Themes_All.Nth_Theme_Id%Type Default Null
+                            ) Return Number
+Is
+  Retval                    Number;
+  l_Nat_Id                  Number;
+  l_Name                    Varchar2 (30)                     := Nvl (p_Name, p_Table_Name);
+  l_Immediate_Or_Deferred   Varchar2 (1)                      := 'I';
+  l_Nat                     Nm_Area_Types%Rowtype;
+  l_Nth_Id                  Nm_Themes_All.Nth_Theme_Id%Type;
+  l_Nth                     Nm_Themes_All%Rowtype;
+  l_Rec_Ntg                 Nm_Theme_Gtypes%Rowtype;
+
+Begin
+
+  If p_View_Flag = 'Y'  Then
+    l_Immediate_Or_Deferred := 'N';                --no update for views
+  End If;
+
+  Select  Nat_Id_Seq.Nextval
+  Into    l_Nat_Id
+  From    Dual;
+
+  l_Nat.Nat_Id              :=  l_Nat_Id;
+  l_Nat.Nat_Nt_Type         :=  p_Nt_Type;
+  l_Nat.Nat_Gty_Group_Type  :=  p_Gty_Type;
+  l_Nat.Nat_Descr           :=  'Spatial Representation of ' || p_Gty_Type || ' Groups';
+  l_Nat.Nat_Seq_No          :=  1;
+  l_Nat.Nat_Start_Date      :=  To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY');
+  l_Nat.Nat_End_Date        :=  Null;
+  l_Nat.Nat_Shape_Type      :=  'TRACED';
+
+  Begin
+    Insert Into Nm_Area_Types
+    (
+    Nat_Id,
+    Nat_Nt_Type,
+    Nat_Gty_Group_Type,
+    Nat_Descr,
+    Nat_Seq_No,
+    Nat_Start_Date,
+    Nat_End_Date,
+    Nat_Shape_Type
+    )
+    Values
+    (
+    l_Nat.Nat_Id,
+    l_Nat.Nat_Nt_Type,
+    l_Nat.Nat_Gty_Group_Type,
+    l_Nat.Nat_Descr,
+    l_Nat.Nat_Seq_No,
+    l_Nat.Nat_Start_Date,
+    l_Nat.Nat_End_Date,
+    l_Nat.Nat_Shape_Type
+    );
+  Exception
+    When Dup_Val_On_Index Then
+      Select  nat.Nat_Id
+      Into    l_Nat_Id
+      From    Nm_Area_Types nat
+      Where   nat.Nat_Nt_Type         =   p_Nt_Type
+      And     nat.Nat_Gty_Group_Type  =   p_Gty_Type;
+  End;
+
+  Retval := Nm3Seq.Next_Nth_Theme_Id_Seq;
+
+  -- generate the theme
+  l_Nth_Id              :=  Retval;
+  l_Nth.Nth_Theme_Id    :=  l_Nth_Id;
+  l_Nth.Nth_Theme_Name  :=  l_Name;
+  l_Nth.Nth_Table_Name  :=  p_Table_Name;
+  l_Nth.Nth_Where       :=  Null;
+  l_Nth.Nth_Pk_Column   :=  'NE_ID';
+  --
+  -- Task ID 0107889 - Set Label Column to NE_ID for Group layer base table themes
+  -- 05/10/09 AE Further restrict on the non DT theme 
+  --
+    
+  If      p_Base_Table_Nth      Is        Null
+      Or  l_Nth.Nth_Theme_Name  Not Like  '%DT' Then
+    l_Nth.Nth_Label_Column := 'NE_ID';
+  Else
+    l_Nth.Nth_Label_Column := 'NE_UNIQUE';
+  End If;
+  --
+  
+  l_Nth.Nth_Rse_Table_Name        :=  'NM_ELEMENTS';
+  l_Nth.Nth_Rse_Fk_Column         :=  Null;
+  l_Nth.Nth_St_Chain_Column       :=  Null;
+  l_Nth.Nth_End_Chain_Column      :=  Null;
+  l_Nth.Nth_X_Column              :=  Null;
+  l_Nth.Nth_Y_Column              :=  Null;
+  l_Nth.Nth_Offset_Field          :=  Null;
+  l_Nth.Nth_Feature_Table         :=  p_Table_Name;
+  l_Nth.Nth_Feature_Pk_Column     :=  'NE_ID';
+  l_Nth.Nth_Feature_Fk_Column     :=  P_Fk_Column;
+  l_Nth.Nth_Xsp_Column            :=  Null;
+  l_Nth.Nth_Feature_Shape_Column  :=  p_Spatial_Column;
+  l_Nth.Nth_Hpr_Product           :=  'NET';
+  l_Nth.Nth_Location_Updatable    :=  'N';
+  l_Nth.Nth_Theme_Type            :=  'SDO';
+  l_Nth.Nth_Dependency            :=  'D';
+  l_Nth.Nth_Storage               :=  'S';
+  l_Nth.Nth_Update_On_Edit        :=  l_Immediate_Or_Deferred;
+  l_Nth.Nth_Use_History           :=  'Y';
+  l_Nth.Nth_Start_Date_Column     :=  'START_DATE';
+  l_Nth.Nth_End_Date_Column       :=  'END_DATE';
+  l_Nth.Nth_Base_Table_Theme      :=  p_Base_Table_Nth;
+  l_Nth.Nth_Sequence_Name         :=  'NTH_' || Nvl(p_Base_Table_Nth,Retval) || '_SEQ';
+  l_Nth.Nth_Snap_To_Theme         :=  'N';
+  l_Nth.Nth_Lref_Mandatory        :=  'N';
+  l_Nth.Nth_Tolerance             :=  10;
+  l_Nth.Nth_Tol_Units             :=  1;
+  Nm3Ins.Ins_Nth (l_Nth);
+  --
+  --  Build theme gtype rowtype
+  l_Rec_Ntg.Ntg_Theme_Id  :=  l_Nth_Id;
+  l_Rec_Ntg.Ntg_Seq_No    :=  1;
+  l_Rec_Ntg.Ntg_Xml_Url   :=  Null;
+  l_Rec_Ntg.Ntg_Gtype     :=  '2002';
+  Nm3Ins.Ins_Ntg (p_Rec_Ntg => l_Rec_Ntg);
+
+  -- generate the link
+  Insert Into Nm_Area_Themes
+  (
+  Nath_Nat_Id,
+  Nath_Nth_Theme_Id
+  )
+  Values
+  (
+  l_Nat_Id,
+  l_Nth_Id
+  );
+    
+  Create_Base_Themes( l_Nth_Id, p_Base_Themes );
+
+  If Hig.Get_Sysopt ('REGSDELAY') = 'Y' Then 
+    Execute Immediate (   'begin '
+                      || '    nm3sde.register_sde_layer( p_theme_id => '||To_Char( l_Nth.Nth_Theme_Id )||');'
+                      || 'end;'
+                      );
+  End If;
+
+  If p_View_Flag = 'N'  Then
+      
+    Declare
+      l_Role   Varchar2 (30);
+    Begin
+      l_Role := Hig.Get_Sysopt ('SDONETROLE');
+
+      If l_Role Is Not Null Then
+          
+        Insert Into Nm_Theme_Roles
+        (
+        Nthr_Theme_Id,
+        Nthr_Role,
+        Nthr_Mode
+        )
+        Values
+        (
+        l_Nth_Id,
+        l_Role,
+        'NORMAL'
+        );
+          
+      End If;
+    End;
+  End If;
+
+  Declare
+    l_Type Number;
+  Begin
+    If Nm3Net.Get_Gty_Sub_Group_Allowed( p_Gty_Type ) = 'Y' Then
+      l_Type := 3;
+    Else
+      l_Type := 2;
+    End If;
+      
+    Create_Theme_Functions( p_Theme => l_Nth.Nth_Theme_Id, p_Pa => g_Network_Modules, p_Exclude => l_Type );
+      
+  End;
+
+  Return l_Nth_Id;
+End Register_Nat_Theme;
+--
+---------------------------------------------------------------------------------------------------
+--
+Function Get_Nlt_Descr  (
+                        p_Nlt_Id In Number
+                        ) Return Varchar2
+Is
+  Retval   Nm_Linear_Types.Nlt_Descr%Type;
+Begin
+  Begin
+    Select  Nlt_Descr
+    Into    Retval
+    From    Nm_Linear_Types
+    Where   Nlt_Id = p_Nlt_Id;
+  Exception
+    When No_Data_Found Then
+      Null;
+  End;
+  Return Retval;
+End Get_Nlt_Descr;
 --
 -----------------------------------------------------------------------------
 --
 -- Task 0108731
 -- 
-  FUNCTION register_ona_base_theme 
-    ( pi_asset_type IN nm_inv_types.nit_inv_type%TYPE
-    , pi_gtype      IN nm_theme_gtypes.ntg_gtype%TYPE
-    , pi_s_date_col IN user_tab_columns.column_name%TYPE DEFAULT NULL
-    , pi_e_date_col IN user_tab_columns.column_name%TYPE DEFAULT NULL)
-  RETURN nm_themes_all%ROWTYPE
-  IS
-    l_rec_nit    nm_inv_types%ROWTYPE;
-    l_rec_nth    nm_themes_all%ROWTYPE;
-    l_rec_nthr   nm_theme_roles%ROWTYPE;
-    l_rec_ntg    nm_theme_gtypes%ROWTYPE;
+Function Register_Ona_Base_Theme  ( 
+                                  pi_Asset_Type   In  Nm_Inv_Types.Nit_Inv_Type%Type,
+                                  pi_Gtype        In  Nm_Theme_Gtypes.Ntg_Gtype%Type,
+                                  pi_S_Date_Col   In  User_Tab_Columns.Column_Name%Type Default Null,
+                                  pi_E_Date_Col   In  User_Tab_Columns.Column_Name%Type Default Null
+                                  ) Return Nm_Themes_All%Rowtype
+Is
+  l_Rec_Nit    Nm_Inv_Types%Rowtype;
+  l_Rec_Nth    Nm_Themes_All%Rowtype;
+  l_Rec_Nthr   Nm_Theme_Roles%Rowtype;
+  l_Rec_Ntg    Nm_Theme_Gtypes%Rowtype;
+--
+  Function Derive_Shape_Col (
+                            pi_Table_Name In User_Tab_Cols.Table_Name%Type
+                            ) Return User_Tab_Cols.Column_Name%Type
+  Is
+    l_Retval User_Tab_Cols.Column_Name%Type;
+  Begin
+    Begin
+      Select utc.Column_Name
+      Into   l_Retval
+      From   User_Tab_Cols  utc
+      Where  utc.Table_Name  =   pi_Table_Name
+      And    utc.Data_Type   =   'SDO_GEOMETRY';
+
+    Exception
+      When No_Data_Found Or Too_Many_Rows Then
+        l_Retval:='UNKNOWN';
+    End;       
+    Return l_Retval;      
+  End Derive_Shape_Col;
+--
+Begin
   --
-    FUNCTION derive_shape_col
-             ( pi_table_name IN user_tab_cols.table_name%TYPE )
-    RETURN user_tab_cols.column_name%TYPE
-    IS
-      l_retval user_tab_cols.column_name%TYPE;
-    BEGIN
-     SELECT column_name INTO l_retval
-        FROM user_tab_cols
-       WHERE table_name = pi_table_name
-         AND data_type = 'SDO_GEOMETRY';
-      RETURN l_retval;
-    EXCEPTION
-     WHEN OTHERS
-     THEN RETURN 'UNKNOWN';
-    END derive_shape_col;
+  l_Rec_Nit := Nm3Get.Get_Nit (pi_Nit_Inv_Type => pi_Asset_Type);
   --
-  BEGIN
+  l_Rec_Nth.Nth_Theme_Id   := Nm3Seq.Next_Nth_Theme_Id_Seq;
+  l_Rec_Nth.Nth_Theme_Name := Upper(Substr(l_Rec_Nit.Nit_Inv_Type||'-'
+                              ||l_Rec_Nit.Nit_Descr, 1, 26)||'_TAB');
   --
-   l_rec_nit := nm3get.get_nit (pi_nit_inv_type => pi_asset_type);
+  If l_Rec_Nit.Nit_Category = 'F' Then
+    -- foreign table asset type
+    l_Rec_Nth.Nth_Table_Name             := l_Rec_Nit.Nit_Table_Name;
+    l_Rec_Nth.Nth_Pk_Column              := l_Rec_Nit.Nit_Foreign_Pk_Column;
+    l_Rec_Nth.Nth_Label_Column           := l_Rec_Nit.Nit_Foreign_Pk_Column;
+    l_Rec_Nth.Nth_Feature_Table          := l_Rec_Nit.Nit_Table_Name;
+    l_Rec_Nth.Nth_Feature_Pk_Column      := l_Rec_Nit.Nit_Foreign_Pk_Column;
+    l_Rec_Nth.Nth_Feature_Shape_Column   := Derive_Shape_Col (l_Rec_Nit.Nit_Table_Name);
+  Else
+    -- nm_inv_items_all asset type
+    l_Rec_Nth.Nth_Table_Name             := l_Rec_Nit.Nit_View_Name;
+    l_Rec_Nth.Nth_Pk_Column              := 'IIT_NE_ID';
+    l_Rec_Nth.Nth_Label_Column           := 'IIT_NE_ID';
+    l_Rec_Nth.Nth_Feature_Table          := Nm3Sdm.Get_Ona_Spatial_Table (l_Rec_Nit.Nit_Inv_Type);
+    l_Rec_Nth.Nth_Feature_Pk_Column      := 'NE_ID';
+    l_Rec_Nth.Nth_Feature_Shape_Column   := 'GEOLOC';
+  End If;
   --
-    l_rec_nth.nth_theme_id   := nm3seq.next_nth_theme_id_seq;
-    l_rec_nth.nth_theme_name := UPPER(SUBSTR(l_rec_nit.nit_inv_type||'-'
-                                ||l_rec_nit.nit_descr, 1, 26)||'_TAB');
-  --
-    IF l_rec_nit.nit_category = 'F'
-     THEN
-     -- foreign table asset type
-      l_rec_nth.nth_table_name             := l_rec_nit.nit_table_name;
-      l_rec_nth.nth_pk_column              := l_rec_nit.nit_foreign_pk_column;
-      l_rec_nth.nth_label_column           := l_rec_nit.nit_foreign_pk_column;
-      l_rec_nth.nth_feature_table          := l_rec_nit.nit_table_name;
-      l_rec_nth.nth_feature_pk_column      := l_rec_nit.nit_foreign_pk_column;
-      l_rec_nth.nth_feature_shape_column   := derive_shape_col (l_rec_nit.nit_table_name);
-    ELSE
-     -- nm_inv_items_all asset type
-     l_rec_nth.nth_table_name             := l_rec_nit.nit_view_name;
-     l_rec_nth.nth_pk_column              := 'IIT_NE_ID';
-     l_rec_nth.nth_label_column           := 'IIT_NE_ID';
-     l_rec_nth.nth_feature_table          := nm3sdm.get_ona_spatial_table (l_rec_nit.nit_inv_type);
-     l_rec_nth.nth_feature_pk_column      := 'NE_ID';
-     l_rec_nth.nth_feature_shape_column   := 'GEOLOC';
-    END IF;
-  --
-    l_rec_nth.nth_dependency               := 'I';
-    l_rec_nth.nth_update_on_edit           := 'N';
-  --
-    IF l_rec_nit.nit_use_xy = 'Y'
-     THEN
-    l_rec_nth.nth_x_column               := 'IIT_X';
-    l_rec_nth.nth_y_column               := 'IIT_Y';
-    END IF;
-  --
-    l_rec_nth.nth_hpr_product              := 'NET';
-    l_rec_nth.nth_storage                  := 'S';
-    l_rec_nth.nth_location_updatable       := 'Y';
-    l_rec_nth.nth_tolerance                := 10;
-    l_rec_nth.nth_tol_units                := 1;
-    l_rec_nth.nth_snap_to_theme            := 'N';
-    l_rec_nth.nth_lref_mandatory           := 'N';
-    l_rec_nth.nth_theme_type               := 'SDO';
-  -- 
-    IF l_rec_nit.nit_table_name IS NULL
-      THEN
-      l_rec_nth.nth_use_history            := 'Y';
-      l_rec_nth.nth_start_date_column      := NVL(pi_s_date_col,'START_DATE');
-      l_rec_nth.nth_end_date_column        := NVL(pi_e_date_col,'END_DATE');
-    ELSE
-      IF (pi_s_date_col IS NOT NULL
-        AND pi_e_date_col IS NOT NULL)
-      THEN
-        l_rec_nth.nth_use_history            := 'Y';
-        l_rec_nth.nth_start_date_column      := pi_s_date_col;
-        l_rec_nth.nth_end_date_column        := pi_e_date_col;
-      ELSE
-        l_rec_nth.nth_use_history            := 'N';
-        l_rec_nth.nth_start_date_column      := NULL;
-        l_rec_nth.nth_end_date_column        := NULL;
-      END IF;
-    END IF;
+  l_Rec_Nth.Nth_Dependency               := 'I';
+  l_Rec_Nth.Nth_Update_On_Edit           := 'N';
+--
+  If l_Rec_Nit.Nit_Use_Xy = 'Y' Then
+    l_Rec_Nth.Nth_X_Column               := 'IIT_X';
+    l_Rec_Nth.Nth_Y_Column               := 'IIT_Y';
+  End If;
+--
+  l_Rec_Nth.Nth_Hpr_Product              := 'NET';
+  l_Rec_Nth.Nth_Storage                  := 'S';
+  l_Rec_Nth.Nth_Location_Updatable       := 'Y';
+  l_Rec_Nth.Nth_Tolerance                := 10;
+  l_Rec_Nth.Nth_Tol_Units                := 1;
+  l_Rec_Nth.Nth_Snap_To_Theme            := 'N';
+  l_Rec_Nth.Nth_Lref_Mandatory           := 'N';
+  l_Rec_Nth.Nth_Theme_Type               := 'SDO';
+-- 
+  If L_Rec_Nit.Nit_Table_Name Is Null Then
+    l_Rec_Nth.Nth_Use_History            := 'Y';
+    l_Rec_Nth.Nth_Start_Date_Column      := Nvl(pi_S_Date_Col,'START_DATE');
+    l_Rec_Nth.Nth_End_Date_Column        := Nvl(pi_E_Date_Col,'END_DATE');
+  Else
+    If    (pi_S_Date_Col Is Not Null
+      And  pi_E_Date_Col Is Not Null) Then
+      l_Rec_Nth.Nth_Use_History            := 'Y';
+      l_Rec_Nth.Nth_Start_Date_Column      := pi_S_Date_Col;
+      l_Rec_Nth.Nth_End_Date_Column        := pi_E_Date_Col;
+    Else
+      l_Rec_Nth.Nth_Use_History            := 'N';
+      l_Rec_Nth.Nth_Start_Date_Column      := Null;
+      l_Rec_Nth.Nth_End_Date_Column        := Null;
+    End If;
+  End If;
   -- Insert new theme
-    nm3ins.ins_nth (l_rec_nth);
+  Nm3Ins.Ins_Nth (L_Rec_Nth);
   -- Insert theme gtype
-    l_rec_ntg.ntg_theme_id                 := l_rec_nth.nth_theme_id;
-    l_rec_ntg.ntg_gtype                    := pi_gtype;
-    l_rec_ntg.ntg_seq_no                   := 1;
-    nm3ins.ins_ntg (l_rec_ntg);
+  l_Rec_Ntg.Ntg_Theme_Id                 := l_Rec_Nth.Nth_Theme_Id;
+  l_Rec_Ntg.Ntg_Gtype                    := pi_Gtype;
+  l_Rec_Ntg.Ntg_Seq_No                   := 1;
+  Nm3Ins.Ins_Ntg (l_Rec_Ntg);
   --
-    RETURN l_rec_nth;
+  Return L_Rec_Nth;
   --
-  END register_ona_base_theme;
+End Register_Ona_Base_Theme;
 --
 ---------------------------------------------------------------------------------------------------
 --
 -- Task 0108731
 --
-  PROCEDURE make_ona_inv_spatial_layer (
-      pi_nit_inv_type   IN nm_inv_types.nit_inv_type%TYPE,
-      pi_nth_gtype      IN nm_theme_gtypes.ntg_gtype%TYPE    DEFAULT NULL,
-      pi_s_date_col     IN user_tab_columns.column_name%TYPE DEFAULT NULL,
-      pi_e_date_col     IN user_tab_columns.column_name%TYPE DEFAULT NULL)
-   IS
-   BEGIN
-   --
-     make_ona_inv_spatial_layer 
-        ( pi_nit_inv_type => pi_nit_inv_type
-        , pi_nth_theme_id => register_ona_base_theme
-                               ( pi_nit_inv_type
-                                ,pi_nth_gtype
-                                ,pi_s_date_col
-                                ,pi_e_date_col).nth_theme_id
-        , pi_nth_gtype    => pi_nth_gtype );
-   --
-   END make_ona_inv_spatial_layer;
+Procedure Make_Ona_Inv_Spatial_Layer  (
+                                      pi_Nit_Inv_Type   In  Nm_Inv_Types.Nit_Inv_Type%Type,
+                                      pi_Nth_Gtype      In  Nm_Theme_Gtypes.Ntg_Gtype%Type    Default Null,
+                                      pi_S_Date_Col     In  User_Tab_Columns.Column_Name%Type Default Null,
+                                      pi_E_Date_Col     In  User_Tab_Columns.Column_Name%Type Default Null
+                                      )
+Is
+Begin
+  --
+  Make_Ona_Inv_Spatial_Layer (
+                             pi_Nit_Inv_Type => pi_Nit_Inv_Type,
+                             pi_Nth_Theme_Id => Register_Ona_Base_Theme  (
+                                                                         pi_Nit_Inv_Type,
+                                                                         pi_Nth_Gtype,
+                                                                         pi_S_Date_Col,
+                                                                         pi_E_Date_Col).Nth_Theme_Id,
+                             pi_Nth_Gtype    => pi_Nth_Gtype
+                             );
+ --
+End Make_Ona_Inv_Spatial_Layer;
+--
+-------------------------------------------------------------------------------------------------------------------------------------
+--
+Procedure Create_Ona_Spatial_Idx  (
+                                  p_Nit     In   Nm_Inv_Types.Nit_Inv_Type%Type,
+                                  p_Table   In   Varchar2
+                                  )
+Is
+--bug in oracle 8 - spatial index name can only be 18 chars
+    Cur_String   Varchar2 (2000);
+Begin
+  Cur_String := 'create index ONA_'
+               || P_Nit
+               || '_spidx on '
+               || P_Table
+               || ' ( geoloc ) indextype is mdsys.spatial_index'
+               || ' parameters ('
+               || ''''
+               || 'sdo_indx_dims=2'
+               || ''''
+               || ')';
+  Execute Immediate Cur_String;
+End Create_Ona_Spatial_Idx;
 --
 ---------------------------------------------------------------------------------------------------
 --
-   PROCEDURE make_ona_inv_spatial_layer (
-      pi_nit_inv_type   IN   nm_inv_types.nit_inv_type%TYPE,
-      pi_nth_theme_id   IN   NM_THEMES_ALL.nth_theme_id%TYPE DEFAULT NULL,
-      pi_create_flag    IN   VARCHAR2 DEFAULT 'TRUE',
-      pi_nth_gtype      IN   NM_THEME_GTYPES.ntg_gtype%TYPE DEFAULT NULL
-   )
-   /*
-      Create a non-dynsegged SDO Spatial Layer for a given
-        pi_nit_inv_type   => Asset Type
-        pi_create_flag    => Create Asset SDO feature table
-   */
-   IS
-      l_nit              nm_inv_types%ROWTYPE;
-      l_rec_nith         NM_INV_THEMES%ROWTYPE;
-      l_rec_nth          NM_THEMES_ALL%ROWTYPE;
-      l_tab              VARCHAR2 (30);
-      b_create_tab       BOOLEAN                   := pi_create_flag = 'TRUE';
-      l_theme_id         NM_THEMES_ALL.nth_theme_id%TYPE;
-      l_theme_name       NM_THEMES_ALL.nth_theme_name%TYPE;
-      l_inv_seq          VARCHAR2 (30);
-      l_dummy            NUMBER;
-      l_base_table_nth   NM_THEMES_ALL.nth_theme_id%TYPE;
-      l_rec_nth_base     NM_THEMES_ALL%ROWTYPE;
-      l_start_date_col   VARCHAR2 (30);
-      l_end_date_col     VARCHAR2 (30);
-      l_view             VARCHAR2 (30);
-      l_dt_view_pk_col   VARCHAR2 (30);
-      l_base_themes      nm_theme_array;
-      has_network        BOOLEAN;
-      --
-      FUNCTION has_nin RETURN BOOLEAN
-      IS
-        l_dummy VARCHAR2(10);
-      BEGIN
-        SELECT 'exists' INTO l_dummy FROM nm_inv_nw
-         WHERE nin_nit_inv_code = pi_nit_inv_type
-           AND ROWNUM = 1;
-        RETURN TRUE;
-      EXCEPTION
-        WHEN NO_DATA_FOUND
-        THEN RETURN FALSE;
-      END has_nin;
-      --
-      PROCEDURE create_objectid_trigger (
-         pi_table_name   IN   NM_THEMES_ALL.nth_feature_table%TYPE,
-         pi_theme_id     IN   NM_THEMES_ALL.nth_theme_id%TYPE
+Procedure Make_Ona_Inv_Spatial_Layer  (
+                                      pi_Nit_Inv_Type   In   Nm_Inv_Types.Nit_Inv_Type%Type,
+                                      pi_Nth_Theme_Id   In   Nm_Themes_All.Nth_Theme_Id%Type Default Null,
+                                      pi_Create_Flag    In   Varchar2 Default 'TRUE',
+                                      pi_Nth_Gtype      In   Nm_Theme_Gtypes.Ntg_Gtype%Type Default Null
+                                      )
+ /*
+Create a non-dynsegged SDO Spatial Layer for a given
+pi_nit_inv_type   => Asset Type
+pi_create_flag    => Create Asset SDO feature table
+*/
+Is
+  l_Nit              Nm_Inv_Types%Rowtype;
+  l_Rec_Nith         Nm_Inv_Themes%Rowtype;
+  l_Rec_Nth          Nm_Themes_All%Rowtype;
+  l_Tab              Varchar2 (30);
+  b_Create_Tab       Boolean                   := Pi_Create_Flag = 'TRUE';
+  l_Theme_Id         Nm_Themes_All.Nth_Theme_Id%Type;
+  l_Theme_Name       Nm_Themes_All.Nth_Theme_Name%Type;
+  l_Inv_Seq          Varchar2 (30);
+  l_Dummy            Number;
+  l_Base_Table_Nth   Nm_Themes_All.Nth_Theme_Id%Type;
+  l_Rec_Nth_Base     Nm_Themes_All%Rowtype;
+  l_Start_Date_Col   Varchar2 (30);
+  l_End_Date_Col     Varchar2 (30);
+  l_View             Varchar2 (30);
+  l_Dt_View_Pk_Col   Varchar2 (30);
+  l_Base_Themes      Nm_Theme_Array;
+  Has_Network        Boolean;
+  --
+  Function Has_Nin Return Boolean
+  Is
+    l_Retval  Boolean;
+    l_Dummy   Varchar2(10);
+  Begin
+    Begin
+      Select  'exists' 
+      Into    l_Dummy
+      From    Nm_Inv_Nw
+      Where   Nin_Nit_Inv_Code = Pi_Nit_Inv_Type
+      And     Rownum = 1;
+        
+      l_Retval:=True;
+        
+    Exception
+      When No_Data_Found Then
+      l_Retval:=False;
+    End;
+    Return(l_Retval);
+  End Has_Nin;
+  --
+  Procedure Create_Objectid_Trigger   (
+                                      p_Table_Name   In   Nm_Themes_All.Nth_Feature_Table%Type,
+                                      p_Theme_Id     In   Nm_Themes_All.Nth_Theme_Id%Type
+                                      )
+  Is
+    l_Temp          Varchar2 (1);
+    l_Trigger_Name  Constant User_Triggers.Trigger_Name%Type  := p_Table_Name|| '_BI_TRG'  ;
+  --
+  Begin
+    Begin
+      Select  Null
+      Into    l_Temp
+      From    User_Tab_Cols   utc
+      Where   utc.Table_Name    =   p_Table_Name
+      And     utc.Column_Name   =   'OBJECTID';
+
+      Execute Immediate
+      'Create Or Replace Trigger '|| l_Trigger_Name                   || Chr (10) ||
+      'Before Insert On '|| p_Table_Name                              || Chr (10) ||
+      'For Each Row '                                                 || Chr (10) ||
+      'Begin'                                                         || Chr (10) ||  
+      '  --Created By :nm3sdm.Create_Objectid_Trigger '               || Chr (10) ||
+      '  --Created On :' || To_Char(Sysdate,'dd-mm-yyyy hh24:mi.ss')  || Chr (10) ||
+      '  --Version    :' || g_Body_Sccsid                             || Chr (10) ||
+      '  Select   NTH_'|| p_Theme_Id|| '_SEQ.Nextval '                || Chr (10) ||
+      '  Into     :NEW.Objectid'                                      || Chr (10) ||
+      '  From     Dual;'                                              || Chr (10) ||
+      'End ' || l_Trigger_Name || ';';
+        
+    Exception
+      When No_Data_Found Then
+        Null;
+    End;
+
+  End Create_Objectid_Trigger; 
+    --
+  Procedure Populate_Xy_Sdo_Data  (
+                                  p_Asset_Type In Nm_Inv_Types.Nit_Inv_Type%Type 
+                                  )
+  Is
+  Begin
+    -- Task 0108731
+    -- Populate the XY data using the Asset type rather than 
+    -- row by row
+    Nm3Sdo_Edit.Process_Inv_Xy_Update(pi_Inv_Type=>p_Asset_Type);
+  End Populate_Xy_Sdo_Data;
+    --
+  Procedure Populate_Nm_Base_Themes (
+                                    p_Nth_Theme_Id In Nm_Themes_All.Nth_Theme_Id%Type
+                                    )
+  Is
+  Begin
+    For i In 1..l_Base_Themes.Nta_Theme_Array.Last
+    Loop
+      Insert Into Nm_Base_Themes
+      (
+      Nbth_Theme_Id,
+      Nbth_Base_Theme
       )
-      IS
-         nl       VARCHAR2 (10) := CHR (10);
-
-         CURSOR check_for_objectid (cp_table_name IN VARCHAR2)
-         IS
-            SELECT 'x'
-              FROM user_tab_cols
-             WHERE table_name = cp_table_name AND column_name = 'OBJECTID';
-
-         l_temp   VARCHAR2 (1);
-      --
-      BEGIN
-         --
-         OPEN check_for_objectid (pi_table_name);
-         FETCH check_for_objectid
-          INTO l_temp;
-         CLOSE check_for_objectid;
-
-         IF l_temp IS NOT NULL
-         THEN
-
-            EXECUTE IMMEDIATE
-               'CREATE OR REPLACE TRIGGER '|| pi_table_name|| '_BI_TRG'|| nl
-             || 'BEFORE INSERT ON '|| pi_table_name                       || nl
-             || 'FOR EACH ROW '                                           || nl
-             || 'DECLARE '                                                || nl
-             || '  CURSOR get_objectid '                                  || nl
-             || '  IS '                                                   || nl
-             || '  SELECT NTH_'|| pi_theme_id|| '_SEQ.NEXTVAL FROM DUAL; '|| nl
-             || '  l_temp NUMBER; '                                       || nl
-             || 'BEGIN '                                                  || nl
-             || '  OPEN  get_objectid; '                                  || nl
-             || '  FETCH get_objectid INTO l_temp; '                      || nl
-             || '  CLOSE get_objectid; '                                  || nl
-             || '  :NEW.objectid := l_temp; '                             || nl
-             || 'END '||pi_table_name|| '_BI_TRG;';
-         END IF;
-
-      END create_objectid_trigger;
-      --
-      PROCEDURE populate_xy_sdo_data
-         ( pi_asset_type IN nm_inv_types.nit_inv_type%TYPE )
-      IS
---         l_rec_iit nm_inv_items%ROWTYPE;
---      BEGIN
---        FOR i IN (SELECT * FROM nm_inv_items
---                  WHERE iit_inv_type = pi_asset_type)
---        LOOP
---          BEGIN
---            Nm3sdo_Edit.process_inv_xy_update (i);
---          EXCEPTION WHEN OTHERS THEN NULL;
---          END;
---        END LOOP;
-      BEGIN
-        -- Task 0108731
-        -- Populate the XY data using the Asset type rather than 
-        -- row by row
-        nm3sdo_edit.process_inv_xy_update(pi_inv_type=>pi_asset_type);
-      END populate_xy_sdo_data;
-      --
-      PROCEDURE populate_nm_base_themes
-                  (pi_nth_theme_id IN NM_THEMES_ALL.nth_theme_id%TYPE)
-      IS
-      BEGIN
-        FOR i IN 1..l_base_themes.nta_theme_array.LAST
-        LOOP
-          INSERT INTO NM_BASE_THEMES
-            (NBTH_THEME_ID, NBTH_BASE_THEME)
-          VALUES
-            (pi_nth_theme_id, l_base_themes.nta_theme_array(i).nthe_id);
-        END LOOP;
-      END populate_nm_base_themes;
-      --
-   --
-   BEGIN
-       -- AE check to make sure user is unrestricted
-      IF NOT user_is_unrestricted
-      THEN
-        RAISE e_not_unrestricted;
-      END IF;
-      --
-      Nm_Debug.proc_start (g_package_name, 'make_ona_inv_spatial_layer');
-      --
-      l_rec_nth := Nm3get.get_nth (pi_nth_theme_id => pi_nth_theme_id);
-      --
-      -- Task 0108890 - GIS0020 - Error when creating ONA layer
-      -- Ensure the Asset views are in place
-      DECLARE
-        view_name user_views.view_name%TYPE;
-      BEGIN
-        nm3inv_view.create_inv_view(pi_nit_inv_type,TRUE,view_name);
-      END;
+      Values
+      (
+      p_Nth_Theme_Id,
+      l_Base_Themes.Nta_Theme_Array(i).Nthe_Id
+      );
+    End Loop;
+  End Populate_Nm_Base_Themes;
+  --
+  --
+   
+Begin
+  -- AE check to make sure user is unrestricted
+  If Not User_Is_Unrestricted Then
+    Raise E_Not_Unrestricted;
+  End If;
+  --
+  Nm_Debug.Proc_Start (G_Package_Name, 'make_ona_inv_spatial_layer');
+  --
+  l_Rec_Nth := Nm3Get.Get_Nth (Pi_Nth_Theme_Id => Pi_Nth_Theme_Id);
+  --
+  -- Task 0108890 - GIS0020 - Error when creating ONA layer
+  -- Ensure the Asset views are in place
+  Declare
+    View_Name User_Views.View_Name%Type;
+  Begin
+    Nm3Inv_View.Create_Inv_View(Pi_Nit_Inv_Type,True,View_Name);
+  End;
   --
   --  Nm_Debug.debug_on;
+  ---------------------------------------------------------------
+  -- Validate asset type
+  ---------------------------------------------------------------
+  l_Nit := Nm3Get.Get_Nit (pi_Nit_Inv_Type => pi_Nit_Inv_Type);
+  ---------------------------------------------------------------
+  -- Set has network associated flag
+  ---------------------------------------------------------------
+  Has_Network := Has_Nin;
+      
+  If Has_Network  Then
+    l_Base_Themes := Get_Inv_Base_Themes ( Pi_Nit_Inv_Type );
+  End If;
+  ---------------------------------------------------------------
+  -- Derive SDO table name
+  ---------------------------------------------------------------
+  If B_Create_Tab Then
+    --  Nm_Debug.DEBUG ('create table for ' || l_nit.nit_inv_type);
+    l_Tab := Get_Ona_Spatial_Table (l_Nit.Nit_Inv_Type);
+
+    --
+    If     l_Rec_Nth.Nth_Use_History        =   'Y'
+      And l_Rec_Nth.Nth_Start_Date_Column   Is  Not Null
+      And l_Rec_Nth.Nth_End_Date_Column     Is  Not Null  Then
+        
+      l_Start_Date_Col  := l_Rec_Nth.Nth_Start_Date_Column;
+      l_End_Date_Col    := l_Rec_Nth.Nth_End_Date_Column;
+        
+    End If;
+
+    --
+    -- mp flag set
+    Create_Spatial_Table (L_Tab, True, l_Start_Date_Col, l_End_Date_Col);
+
+    -- if gtype is provided, then use it to register SDO metadata
+    -- TOLERANCE???
+     If Pi_Nth_Gtype Is Not Null  Then
+      l_Dummy :=  Nm3Sdo.Create_Sdo_Layer (
+                                          Pi_Table_Name       => l_Tab,
+                                          Pi_Column_Name      => 'GEOLOC',
+                                          Pi_Gtype            => Pi_Nth_Gtype
+                                          );
+     End If;
+
     ---------------------------------------------------------------
-    -- Validate asset type
+    -- Table needs a spatial index
     ---------------------------------------------------------------
-      l_nit := Nm3get.get_nit (pi_nit_inv_type => pi_nit_inv_type);
+    Create_Ona_Spatial_Idx (Pi_Nit_Inv_Type, L_Tab);
+    -- Table already exists - check to see if it's registered
+  Else
+    If Pi_Nth_Theme_Id Is Not Null And Pi_Nth_Gtype Is Not Null Then
+      If Not Nm3Sdo.Is_Table_Regd
+                       (P_Feature_Table      => L_Rec_Nth.Nth_Feature_Table,
+                        P_Col                => L_Rec_Nth.Nth_Feature_Shape_Column
+                       )  Then
+          
+        l_Dummy :=  Nm3Sdo.Create_Sdo_Layer (
+                                            Pi_Table_Name       => l_Rec_Nth.Nth_Feature_Table,
+                                            Pi_Column_Name      => l_Rec_Nth.Nth_Feature_Shape_Column,
+                                            Pi_Gtype            => Pi_Nth_Gtype
+                                            );
+      End If;
+    End If;
+  End If;
+
+  --
+  If Hig.Get_Sysopt ('REGSDELAY') = 'Y' Then
+      
+    Begin
+      Execute Immediate (   'begin '
+                        || '    nm3sde.register_sde_layer( p_theme_id => '||To_Char( Pi_Nth_Theme_Id )||');'
+                        || 'end;'
+                        );
+    Exception
+      When Others Then
+        Null;
+    End;
+  End If;
+  --
+  ---------------------------------------------------------------
+  -- Populate base themes for current theme
+  ---------------------------------------------------------------
+  If Has_Network  Then
+    Populate_Nm_Base_Themes( p_Nth_Theme_Id => Pi_Nth_Theme_Id);
+  End If;
+  --
+  If Pi_Nth_Theme_Id Is Null  Then
     ---------------------------------------------------------------
-    -- Set has network associated flag
+    -- Derive theme name
     ---------------------------------------------------------------
-      has_network := has_nin;
-      IF has_network
-      THEN
-        l_base_themes := Get_Inv_Base_Themes ( pi_nit_inv_type );
-      END IF;
----------------------------------------------------------------
--- Derive SDO table name
----------------------------------------------------------------
-      IF b_create_tab
-      THEN
---         Nm_Debug.DEBUG ('create table for ' || l_nit.nit_inv_type);
-         l_tab := get_ona_spatial_table (l_nit.nit_inv_type);
+    l_Theme_Name := Nvl (l_Nit.Nit_Short_Descr,Substr (l_Nit.Nit_Inv_Type || '-' || L_Nit.Nit_Descr,1,30)|| '_TAB');
+    ---------------------------------------------------------------
+    -- Create the theme for table
+    -- ( NM_NIT_<ASSET_TYPE>_SDO )
+    ---------------------------------------------------------------
+    l_Theme_Id := Register_Ona_Theme  (
+                                      l_Nit,
+                                      l_Tab,
+                                      'GEOLOC',
+                                      Null,
+                                      Substr (l_Theme_Name, 1, 26) || '_TAB'
+                                      );
 
-         --
-         IF     l_rec_nth.nth_use_history = 'Y'
-            AND l_rec_nth.nth_start_date_column IS NOT NULL
-            AND l_rec_nth.nth_end_date_column IS NOT NULL
-         THEN
-            l_start_date_col := l_rec_nth.nth_start_date_column;
-            l_end_date_col := l_rec_nth.nth_end_date_column;
-         END IF;
+    Begin
+      If Nm3Sdo.Use_Surrogate_Key = 'Y' Then
 
-         --
-           -- mp flag set
-         create_spatial_table (l_tab, TRUE, l_start_date_col, l_end_date_col);
+        l_Inv_Seq := Nm3Sdo.Create_Spatial_Seq (Pi_Nth_Theme_Id);
+        Create_Objectid_Trigger (
+                                p_Table_Name      => l_Tab,
+                                p_Theme_Id        => pi_Nth_Theme_Id
+                                );
+      End If;
+    Exception
+      When Others Then
 
-         -- if gtype is provided, then use it to register SDO metadata
-         -- TOLERANCE???
-         IF pi_nth_gtype IS NOT NULL
-         THEN
---            Nm_Debug.DEBUG ('create sdo layer');
-            l_dummy :=
-               Nm3sdo.create_sdo_layer (pi_table_name       => l_tab,
-                                        pi_column_name      => 'GEOLOC',
-                                        pi_gtype            => pi_nth_gtype
-                                       );
-         END IF;
+        Hig.Raise_Ner (
+                      pi_Appl               =>  Nm3Type.C_Hig,
+                      pi_Id                 =>  273,
+                      pi_Sqlcode            =>  -20001,
+                      pi_Supplementary_Info =>  'NTH_'||To_Char(L_Theme_Id)||'_SEQ'
+                      );
+    End;
+    Else
+      -- Just link the theme to the inv type
+      l_Rec_Nith.Nith_Nit_Id        := l_Nit.Nit_Inv_Type;
+      l_Rec_Nith.Nith_Nth_Theme_Id  := pi_Nth_Theme_Id;
+      Nm3Ins.Ins_Nith (L_Rec_Nith);
 
----------------------------------------------------------------
--- Table needs a spatial index
----------------------------------------------------------------
-         create_ona_spatial_idx (pi_nit_inv_type, l_tab);
-      -- Table already exists - check to see if it's registered
-      ELSE
-         IF pi_nth_theme_id IS NOT NULL AND pi_nth_gtype IS NOT NULL
-         THEN
-            IF NOT Nm3sdo.is_table_regd
-                             (p_feature_table      => l_rec_nth.nth_feature_table,
-                              p_col                => l_rec_nth.nth_feature_shape_column
-                             )
-            THEN
-               l_dummy :=
-                  Nm3sdo.create_sdo_layer
-                       (pi_table_name       => l_rec_nth.nth_feature_table,
-                        pi_column_name      => l_rec_nth.nth_feature_shape_column,
-                        pi_gtype            => pi_nth_gtype
-                       );
-            END IF;
-         END IF;
-      END IF;
-
-      --
-      IF Hig.get_sysopt ('REGSDELAY') = 'Y'
-      THEN
-         BEGIN
-         EXECUTE IMMEDIATE (   'begin '
-                            || '    nm3sde.register_sde_layer( p_theme_id => '||TO_CHAR( pi_nth_theme_id )||');'
-                            || 'end;'
-                           );
-         EXCEPTION
-            WHEN OTHERS
-            THEN
-               NULL;
-         END;
-      END IF;
-      --
----------------------------------------------------------------
--- Populate base themes for current theme
----------------------------------------------------------------
-      IF has_network
-      THEN
-        populate_nm_base_themes
-         ( pi_nth_theme_id => pi_nth_theme_id);
-      END IF;
-      --
-      IF pi_nth_theme_id IS NULL
-      THEN
---         Nm_Debug.DEBUG ('creating theme for base table');
----------------------------------------------------------------
--- Derive theme name
----------------------------------------------------------------
-         l_theme_name :=
-            NVL (l_nit.nit_short_descr,
-                    SUBSTR (l_nit.nit_inv_type || '-' || l_nit.nit_descr,
-                            1,
-                            30
-                           )
-                 || '_TAB'
-                );
----------------------------------------------------------------
--- Create the theme for table
--- ( NM_NIT_<ASSET_TYPE>_SDO )
----------------------------------------------------------------
-         l_theme_id :=
-            register_ona_theme (l_nit,
-                                l_tab,
-                                'GEOLOC',
-                                NULL,
-                                SUBSTR (l_theme_name, 1, 26) || '_TAB'
-                               );
-
-         BEGIN
-            IF Nm3sdo.use_surrogate_key = 'Y'
-            THEN
-               l_inv_seq := Nm3sdo.create_spatial_seq (pi_nth_theme_id);
-               create_objectid_trigger (pi_table_name      => l_tab,
-                                        pi_theme_id        => pi_nth_theme_id
-                                       );
-            END IF;
-         EXCEPTION
-            WHEN OTHERS
-            THEN
-         Hig.raise_ner (pi_appl         => Nm3type.c_hig,
-                        pi_id           => 273,
-                        pi_sqlcode      => -20001,
-                        pi_supplementary_info => 'NTH_'||TO_CHAR(l_theme_id)||'_SEQ'
-                       );
---             raise_application_error  (-20009, 'Error creating spatial sequence NTH_'|| l_theme_id|| '_SEQ ');
-         END;
-      ELSE
---         Nm_Debug.DEBUG ('base table theme exists');
---         Nm_Debug.DEBUG ('create nith');
-         -- Just link the theme to the inv type
-         l_rec_nith.nith_nit_id := l_nit.nit_inv_type;
-         l_rec_nith.nith_nth_theme_id := pi_nth_theme_id;
-         Nm3ins.ins_nith (l_rec_nith);
-
----------------------------------------------------------------
--- Create surrogate key sequence if needed
----------------------------------------------------------------
-         BEGIN
-            IF Nm3sdo.use_surrogate_key = 'Y'
-            THEN
-               l_inv_seq := Nm3sdo.create_spatial_seq (pi_nth_theme_id);
-               create_objectid_trigger (pi_table_name      => l_tab,
-                                        pi_theme_id        => pi_nth_theme_id
-                                       );
-            END IF;
-         EXCEPTION
-            WHEN OTHERS
-            THEN
-         Hig.raise_ner (pi_appl         => Nm3type.c_hig,
-                        pi_id           => 273,
-                        pi_sqlcode      => -20001
-                       );
---             raise_application_error (-20009,  'Error creating spatial sequence NTH_'|| pi_nth_theme_id|| '_SEQ ' );
-         END;
-      END IF;
-
-      --
-      IF     l_rec_nth.nth_use_history = 'Y'
-         AND l_rec_nth.nth_start_date_column IS NOT NULL
-         AND l_rec_nth.nth_end_date_column IS NOT NULL
-      THEN
----------------------------------------------------------------
--- Create spatial date view
----------------------------------------------------------------
---         Nm_Debug.DEBUG ('create date view');
-         create_spatial_date_view (l_rec_nth.nth_feature_table,
-                                   l_rec_nth.nth_start_date_column,
-                                   l_rec_nth.nth_end_date_column
+      ---------------------------------------------------------------
+      -- Create surrogate key sequence if needed
+      ---------------------------------------------------------------
+      Begin
+        If Nm3Sdo.Use_Surrogate_Key = 'Y' Then
+            
+          l_Inv_Seq := Nm3Sdo.Create_Spatial_Seq (pi_Nth_Theme_Id);
+          Create_Objectid_Trigger (
+                                  p_Table_Name      => l_Tab,
+                                  p_Theme_Id        => pi_Nth_Theme_Id
                                   );
----------------------------------------------------------------
--- Get rowtype of the base theme
----------------------------------------------------------------
-         l_rec_nth_base := Nm3get.get_nth (pi_nth_theme_id      => pi_nth_theme_id);
----------------------------------------------------------------
--- Create theme for View
--- ( V_NM_ONA_<ASSET_TYPE>_SDO )
----------------------------------------------------------------
---         Nm_Debug.DEBUG ('create theme for date view');
-         l_theme_id :=
-            register_ona_theme
-                 (pi_nit                => l_nit,
-                  p_table_name          => 'V_'||l_rec_nth_base.nth_feature_table,
-                  p_spatial_column      => l_rec_nth_base.nth_feature_shape_column,
-                  p_fk_column           => l_rec_nth_base.nth_feature_pk_column,
-                  p_view_flag           => 'Y',
-                  p_pk_column           => l_rec_nth_base.nth_feature_pk_column,
-                  p_base_table_nth      => l_rec_nth_base.nth_theme_id );
+        End If;
+      Exception
+        When Others Then
+          Hig.Raise_Ner (
+                        pi_Appl         => Nm3Type.C_Hig,
+                        pi_Id           => 273,
+                        pi_Sqlcode      => -20001
+                        );
+      End;
+  End If;
 
-         IF NOT Nm3sdo.is_table_regd
-                  (p_feature_table      =>    'V_'|| l_rec_nth_base.nth_feature_table,
-                   p_col                => l_rec_nth_base.nth_feature_shape_column )
-         THEN
-            l_dummy :=
-               Nm3sdo.create_sdo_layer
-                  (pi_table_name       => 'V_'|| l_rec_nth_base.nth_feature_table,
-                   pi_column_name      => l_rec_nth_base.nth_feature_shape_column,
-                   pi_gtype            => pi_nth_gtype );
-         END IF;
+  --
+  If     l_Rec_Nth.Nth_Use_History        =   'Y'
+     And l_Rec_Nth.Nth_Start_Date_Column  Is  Not Null
+     And l_Rec_Nth.Nth_End_Date_Column    Is  Not Null  Then
+       
+    ---------------------------------------------------------------
+    -- Create spatial date view
+    ---------------------------------------------------------------
+    Create_Spatial_Date_View  (
+                              l_Rec_Nth.Nth_Feature_Table,
+                              l_Rec_Nth.Nth_Start_Date_Column,
+                              l_Rec_Nth.Nth_End_Date_Column
+                              );
+    ---------------------------------------------------------------
+    -- Get rowtype of the base theme
+    ---------------------------------------------------------------
+    l_Rec_Nth_Base := Nm3Get.Get_Nth (pi_Nth_Theme_Id      => pi_Nth_Theme_Id);
+    ---------------------------------------------------------------
+    -- Create theme for View
+    -- ( V_NM_ONA_<ASSET_TYPE>_SDO )
+    ---------------------------------------------------------------
+    l_Theme_Id := Register_Ona_Theme  (
+                                      pi_Nit                =>  l_Nit,
+                                      p_Table_Name          =>  'V_'||L_Rec_Nth_Base.Nth_Feature_Table,
+                                      p_Spatial_Column      =>  l_Rec_Nth_Base.Nth_Feature_Shape_Column,
+                                      p_Fk_Column           =>  l_Rec_Nth_Base.Nth_Feature_Pk_Column,
+                                      p_View_Flag           =>  'Y',
+                                      p_Pk_Column           =>  l_Rec_Nth_Base.Nth_Feature_Pk_Column,
+                                      p_Base_Table_Nth      =>  l_Rec_Nth_Base.Nth_Theme_Id
+                                      );
 
-         --
-         IF Hig.get_sysopt ('REGSDELAY') = 'Y'
-         THEN
-            BEGIN
-         EXECUTE IMMEDIATE (   ' begin  '
-                            || '    nm3sde.register_sde_layer( p_theme_id => '||TO_CHAR( l_theme_id )||')'
-                            || '; end;'
-                           );
-            EXCEPTION
-               WHEN OTHERS
-               THEN NULL;
-            END;
-         END IF;
-      --
-      END IF;
+    If Not Nm3Sdo.Is_Table_Regd (
+                                p_Feature_Table      =>   'V_'|| L_Rec_Nth_Base.Nth_Feature_Table,
+                                p_Col                =>   l_Rec_Nth_Base.Nth_Feature_Shape_Column
+                                ) Then
+      l_Dummy :=  Nm3Sdo.Create_Sdo_Layer (
+                                          pi_Table_Name       =>  'V_'|| L_Rec_Nth_Base.Nth_Feature_Table,
+                                          pi_Column_Name      =>  l_Rec_Nth_Base.Nth_Feature_Shape_Column,
+                                          pi_Gtype            =>  pi_Nth_Gtype
+                                          );
+    End If;
 
----------------------------------------------------------------
--- Populate base themes for current theme
----------------------------------------------------------------
---       IF has_network
---       THEN
---         populate_nm_base_themes
---          ( pi_nth_theme_id => l_theme_id);
---       END IF;
+    --
+    If Hig.Get_Sysopt ('REGSDELAY') = 'Y' Then
+      Begin
+        Execute Immediate (   ' begin  '
+                      || '    nm3sde.register_sde_layer( p_theme_id => '||To_Char( L_Theme_Id )||')'
+                      || '; end;'
+                     );
+      Exception
+         When Others
+         Then Null;
+      End;
+    End If;
+    --
+  End If;
 
-      IF g_date_views = 'Y'
-      AND l_rec_nth.nth_use_history = 'Y'
-      AND l_rec_nth.nth_start_date_column IS NOT NULL
-      AND l_rec_nth.nth_end_date_column IS NOT NULL
+  ---------------------------------------------------------------
+  -- Populate base themes for current theme
+  ---------------------------------------------------------------
+
+  If      g_Date_Views                    =   'Y'
+      And l_Rec_Nth.Nth_Use_History       =   'Y'
+      And l_Rec_Nth.Nth_Start_Date_Column Is  Not Null
+      And l_Rec_Nth.Nth_End_Date_Column   Is  Not Null  Then
+        
       ---------------------------------------------------------------
       -- Create _DT view for attributes for Asset type
       ---------------------------------------------------------------
-      THEN
---        Nm_Debug.DEBUG('Create inv sdo join view');
-        l_view := create_inv_sdo_join_view
-                 ( p_nit               => pi_nit_inv_type
-                 , p_table             => l_rec_nth_base.nth_feature_table
-                 , p_start_date_column => l_rec_nth_base.nth_start_date_column
-                 , p_end_date_column   => l_rec_nth_base.nth_end_date_column);
 
-        IF l_nit.nit_table_name IS NULL
-        THEN
-          l_dt_view_pk_col := 'IIT_NE_ID';
-        ELSE
-          l_dt_view_pk_col := l_rec_nth_base.nth_feature_pk_column;
-        END IF;
---        Nm_Debug.DEBUG('Register joined view');
-        l_theme_id := register_ona_theme
-                      ( pi_nit             => l_nit
-                      , p_table_name       => l_view
-                      , p_spatial_column   => l_rec_nth_base.nth_feature_shape_column
-                      , p_fk_column        => l_rec_nth_base.nth_feature_fk_column
-                      , p_name             => RTRIM(l_rec_nth_base.nth_theme_name,'_TAB')||'_DT'
-                      , p_view_flag        => 'Y'
-                      , p_pk_column        => l_dt_view_pk_col
-                      , p_base_table_nth   => l_rec_nth_base.nth_theme_id ) ;
+    l_View := Create_Inv_Sdo_Join_View  ( 
+                                        p_Feature_Table_Name => l_Rec_Nth_Base.Nth_Feature_Table
+                                        );
+    If L_Nit.Nit_Table_Name Is Null Then
+      l_Dt_View_Pk_Col := 'IIT_NE_ID';
+    Else
+      l_Dt_View_Pk_Col := l_Rec_Nth_Base.Nth_Feature_Pk_Column;
+    End If;
 
-         IF NOT Nm3sdo.is_table_regd
-                   (p_feature_table => l_view,
-                    p_col           => l_rec_nth_base.nth_feature_shape_column)
-         THEN
---            Nm_Debug.DEBUG('Register joined view in SDO');
-            l_dummy :=
-               Nm3sdo.create_sdo_layer
-                  (pi_table_name       => l_view,
-                   pi_column_name      => l_rec_nth_base.nth_feature_shape_column,
-                   pi_gtype            => pi_nth_gtype );
-         END IF;
+    l_Theme_Id := Register_Ona_Theme  (
+                                      pi_Nit             => l_Nit,
+                                      p_Table_Name       => l_View,
+                                      p_Spatial_Column   => l_Rec_Nth_Base.Nth_Feature_Shape_Column,
+                                      p_Fk_Column        => l_Rec_Nth_Base.Nth_Feature_Fk_Column,
+                                      p_Name             => Rtrim(L_Rec_Nth_Base.Nth_Theme_Name,'_TAB')||'_DT',
+                                      p_View_Flag        => 'Y',
+                                      p_Pk_Column        => l_Dt_View_Pk_Col,
+                                      p_Base_Table_Nth   => l_Rec_Nth_Base.Nth_Theme_Id
+                                      ) ;
 
-         --
-         IF Hig.get_sysopt ('REGSDELAY') = 'Y'
-         THEN
-            BEGIN
-                EXECUTE IMMEDIATE (   ' begin  '
-                                   || '    nm3sde.register_sde_layer( p_theme_id => '||TO_CHAR( l_theme_id )||');'
-                                   || ' end;'
-                                  );
-            EXCEPTION
-               WHEN OTHERS
-               THEN
-                  NULL;
-            END;
-         END IF;
----------------------------------------------------------------
--- Populate base themes for current theme
----------------------------------------------------------------
-         IF has_network
-         THEN
-           populate_nm_base_themes
-            ( pi_nth_theme_id => l_theme_id);
-         END IF;
-      --
-      END IF;
-      --
----------------------------------------------------------------
--- Populate Layer table (if any data availible)
----------------------------------------------------------------
-      IF l_nit.nit_use_xy = 'Y'
-      THEN
-        -- Task 0108731
-        -- Populate the XY data using the Asset type rather than 
-        -- row by row
-        populate_xy_sdo_data ( pi_asset_type => l_nit.nit_inv_type );
-      END IF;
+    If Not Nm3Sdo.Is_Table_Regd (
+                                p_Feature_Table => l_View,
+                                p_Col           => l_Rec_Nth_Base.Nth_Feature_Shape_Column
+                                ) Then
+      l_Dummy :=  Nm3Sdo.Create_Sdo_Layer (
+                                          pi_Table_Name       =>  l_View,
+                                          pi_Column_Name      =>  l_Rec_Nth_Base.Nth_Feature_Shape_Column,
+                                          pi_Gtype            =>  pi_Nth_Gtype
+                                          );
+    End If;
 
----------------------------------------------------------------
--- Create nm_base_theme entries
----------------------------------------------------------------
---       INSERT INTO nm_base_themes
---         ( nbth_theme_id, nbth_base_theme )
---       SELECT 1, t.nthe_id
---         FROM TABLE ( get_inv_base_themes ( l_nit.nit_inv_type ).nta_theme_array ) t;
+    --
+    If Hig.Get_Sysopt ('REGSDELAY') = 'Y' Then
 
----------------------------------------------------------------
--- Analyze spatial table
----------------------------------------------------------------
-      BEGIN
-        Nm3ddl.analyse_table (pi_table_name          => l_rec_nth.nth_feature_table
-                            , pi_schema              => Sys_Context('NM3CORE','APPLICATION_OWNER')
-                            , pi_estimate_percentage => NULL
-                            , pi_auto_sample_size    => FALSE);
-      EXCEPTION
-        WHEN OTHERS
-        THEN
-          RAISE e_no_analyse_privs;
-      END;
-      --
-      Nm_Debug.proc_end (g_package_name, 'make_ona_inv_spatial_layer');
-   --
-  EXCEPTION
-    WHEN e_not_unrestricted
-    THEN
-      RAISE_APPLICATION_ERROR (-20777,'Restricted users are not permitted to create SDO layers');
-    WHEN e_no_analyse_privs
-    THEN
-      RAISE_APPLICATION_ERROR (-20778,'Layer created - but user does not have ANALYZE ANY granted. '||
-                                      'Please ensure the correct role/privs are applied to the user');
-   --
-   END make_ona_inv_spatial_layer;
+      Begin
+        Execute Immediate (   ' begin  '
+                          || '    nm3sde.register_sde_layer( p_theme_id => '||To_Char( L_Theme_Id )||');'
+                          || ' end;'
+                          );
+      Exception
+        When Others  Then
+          Null;
+      End;
+    End If;
+    ---------------------------------------------------------------
+    -- Populate base themes for current theme
+    ---------------------------------------------------------------
+    If Has_Network  Then
+      Populate_Nm_Base_Themes( p_Nth_Theme_Id => l_Theme_Id);
+    End If;
+    --
+  End If;
+  --
+  ---------------------------------------------------------------
+  -- Populate Layer table (if any data availible)
+  ---------------------------------------------------------------
+  If l_Nit.Nit_Use_Xy = 'Y' Then
+    -- Task 0108731
+    -- Populate the XY data using the Asset type rather than 
+    -- row by row
+    Populate_Xy_Sdo_Data ( p_Asset_Type => l_Nit.Nit_Inv_Type );
+  End If;
+  ---------------------------------------------------------------
+  -- Analyze spatial table
+  ---------------------------------------------------------------
+  Begin
+    Nm3Ddl.Analyse_Table  (
+                          pi_Table_Name          =>   l_Rec_Nth.Nth_Feature_Table,
+                          pi_Schema              =>   Sys_Context('NM3CORE','APPLICATION_OWNER'),
+                          pi_Estimate_Percentage =>   Null,
+                          pi_Auto_Sample_Size    =>   False
+                          );
+  Exception
+    When Others Then
+      Raise E_No_Analyse_Privs;
+  End;
+  --
+  Nm_Debug.Proc_End (G_Package_Name, 'make_ona_inv_spatial_layer');
+  --
+Exception
+  When E_Not_Unrestricted Then
+    Raise_Application_Error (-20777,'Restricted users are not permitted to create SDO layers');
+  When E_No_Analyse_Privs Then
+    Raise_Application_Error (-20778,'Layer created - but user does not have ANALYZE ANY granted. '||
+                                    'Please ensure the correct role/privs are applied to the user');
+  --
+End Make_Ona_Inv_Spatial_Layer;
+--
+-------------------------------------------------------------------------------------------------------------------------------------
+--
+Procedure Create_Inv_Spatial_Idx  (
+                                  p_Nit     In   Nm_Inv_Types.Nit_Inv_Type%Type,
+                                  p_Table   In   Varchar2
+                                  )
+Is
+  --bug in oracle 8 - spatial index name can only be 18 chars
+  Cur_String   Varchar2 (2000);
+Begin
+  Cur_String := 'create index NIT_'
+             || p_Nit
+             || '_spidx on '
+             || p_Table
+             || ' ( geoloc ) indextype is mdsys.spatial_index'
+             || ' parameters ('
+             || ''''
+             || 'sdo_indx_dims=2'
+             || ''''
+             || ')';
+  Execute Immediate Cur_String;
+End Create_Inv_Spatial_Idx;
 --
 ---------------------------------------------------------------------------------------------------
 --
-   PROCEDURE make_inv_spatial_layer
-                                    /*
-                                        Create a dynsegged SDO Spatial layer for a given
-                                          pi_nit_inv_type  => Asset type
-                                          pi_create_flag   => Create Asset SDO feature table flag
-                                          pi_base_layer    => Layer to dynseg to
-                                    */
-   (
-      pi_nit_inv_type   IN   nm_inv_types.nit_inv_type%TYPE,
-      pi_create_flag    IN   VARCHAR2 DEFAULT 'TRUE',
-      p_job_id          IN   NUMBER DEFAULT NULL
-   )
-   IS
-      l_nit                nm_inv_types%ROWTYPE;
-      lcur                 Nm3type.ref_cursor;
-      l_base               NM_THEMES_ALL.nth_theme_id%TYPE;
-      l_tab                VARCHAR2 (30);
-      l_base_table         VARCHAR2 (30);
-      l_view               VARCHAR2 (30);
-      l_inv_seq            VARCHAR2 (30);
-      l_base_table_theme   NM_THEMES_ALL.nth_theme_id%TYPE;
-      l_geom               MDSYS.SDO_GEOMETRY;
-      l_ne                 nm_elements.ne_id%TYPE;
-      l_theme_id           NM_THEMES_ALL.nth_theme_id%TYPE;
-      l_base_themes        nm_theme_array;
-      l_theme_name         NM_THEMES_ALL.nth_theme_name%TYPE;
-      l_diminfo            mdsys.sdo_dim_array;
-      l_srid               NUMBER;
-      l_usgm               user_sdo_geom_metadata%ROWTYPE;
-      l_themes             int_array := NM3ARRAY.INIT_INT_ARRAY;
-      l_inv_view_name      VARCHAR2(30);
 
-   BEGIN
+--  Create a dynsegged SDO Spatial layer for a given
+--  pi_nit_inv_type  => Asset type
+--  pi_create_flag   => Create Asset SDO feature table flag
+--  pi_base_layer    => Layer to dynseg to
+ 
+Procedure Make_Inv_Spatial_Layer  (
+                                  pi_Nit_Inv_Type   In   Nm_Inv_Types.Nit_Inv_Type%Type,
+                                  pi_Create_Flag    In   Varchar2 Default 'TRUE',
+                                  p_Job_Id          In   Number Default Null
+                                  )
+Is
+  l_Nit                Nm_Inv_Types%Rowtype;
+  lcur                 Nm3Type.Ref_Cursor;
+  l_Base               Nm_Themes_All.Nth_Theme_Id%Type;
+  l_Tab                Varchar2 (30);
+  l_Base_Table         Varchar2 (30);
+  l_View               Varchar2 (30);
+  l_Inv_Seq            Varchar2 (30);
+  l_Base_Table_Theme   Nm_Themes_All.Nth_Theme_Id%Type;
+  l_Geom               Mdsys.Sdo_Geometry;
+  l_Ne                 Nm_Elements.Ne_Id%Type;
+  l_Theme_Id           Nm_Themes_All.Nth_Theme_Id%Type;
+  l_Base_Themes        Nm_Theme_Array;
+  l_Theme_Name         Nm_Themes_All.Nth_Theme_Name%Type;
+  l_Diminfo            Mdsys.Sdo_Dim_Array;
+  l_Srid               Number;
+  l_Usgm               User_Sdo_Geom_Metadata%Rowtype;
+  l_Themes             Int_Array := Nm3Array.Init_Int_Array;
+  l_Inv_View_Name      Varchar2(30);
+
+Begin
   -- AE check to make sure user is unrestricted
-    IF NOT user_is_unrestricted
-    THEN
-      RAISE e_not_unrestricted;
-    END IF;
----------------------------------------------------------------
--- Validate asset type
----------------------------------------------------------------
-      l_nit := Nm3get.get_nit (pi_nit_inv_type => pi_nit_inv_type);
----------------------------------------------------------------
--- Derive SDO table name
----------------------------------------------------------------
-      l_tab := get_inv_spatial_table (l_nit.nit_inv_type);
+  If Not User_Is_Unrestricted  Then
+    Raise E_Not_Unrestricted;
+  End If;
+  ---------------------------------------------------------------
+  -- Validate asset type
+  ---------------------------------------------------------------
+  l_Nit := Nm3Get.Get_Nit (pi_Nit_Inv_Type => pi_Nit_Inv_Type);
+  ---------------------------------------------------------------
+  -- Derive SDO table name
+  ---------------------------------------------------------------
+  l_Tab := Get_Inv_Spatial_Table (l_Nit.Nit_Inv_Type);
 
----------------------------------------------------------------
--- Derive base layers to dynseg and Validate base layer
----------------------------------------------------------------
+  ---------------------------------------------------------------
+  -- Derive base layers to dynseg and Validate base layer
+  ---------------------------------------------------------------
 
-      l_base_themes := Get_Inv_Base_Themes( pi_nit_inv_type );
+  l_Base_Themes := Get_Inv_Base_Themes( pi_Nit_Inv_Type );
 
-      Nm3sdo.set_diminfo_and_srid( l_base_themes, l_diminfo, l_srid );
+  Nm3Sdo.Set_Diminfo_And_Srid( l_Base_Themes, l_Diminfo, l_Srid );
 
-      IF l_nit.nit_pnt_or_cont = 'P' THEN
+  If l_Nit.Nit_Pnt_Or_Cont = 'P' Then
 
-        l_diminfo := sdo_lrs.convert_to_std_dim_array(l_diminfo);
+    l_Diminfo := Sdo_Lrs.Convert_To_Std_Dim_Array(l_Diminfo);
 
-      END IF;
+  End If;
 
-      IF NOT nm3ddl.does_object_exist( nm3inv_view.derive_inv_type_view_name(pi_nit_inv_type)
-                                     , 'VIEW'
-                                     , Sys_Context('NM3CORE','APPLICATION_OWNER') )
-      THEN
-        Nm3inv_View.create_inv_view(pi_nit_inv_type, FALSE, l_inv_view_name);
-      END IF;
+  If Not Nm3Ddl.Does_Object_Exist( Nm3Inv_View.Derive_Inv_Type_View_Name(Pi_Nit_Inv_Type)
+                                 , 'VIEW'
+                                 , Sys_Context('NM3CORE','APPLICATION_OWNER') ) Then
+    Nm3Inv_View.Create_Inv_View(Pi_Nit_Inv_Type, False, L_Inv_View_Name);
+  End If;
 
+  ---------------------------------------------------------------
+  -- Create the table and history view
+  ---------------------------------------------------------------
+  If pi_Create_Flag = 'TRUE'  Then
+    If l_Nit.Nit_Table_Name Is Not Null Then
+      Create_Spatial_Table (l_Tab, False, 'START_DATE', 'END_DATE');
+    Else
+      Create_Spatial_Table (l_Tab, False, 'START_DATE', 'END_DATE');
+    End If;
+  End If;
 
----------------------------------------------------------------
--- Create the table and history view
----------------------------------------------------------------
-      IF pi_create_flag = 'TRUE'
-      THEN
-         IF l_nit.nit_table_name IS NOT NULL
-         THEN
---          create_spatial_table (l_tab, TRUE, 'START_DATE', 'END_DATE');
-            create_spatial_table (l_tab, FALSE, 'START_DATE', 'END_DATE');
-         ELSE
-            create_spatial_table (l_tab, FALSE, 'START_DATE', 'END_DATE');
-         END IF;
-      END IF;
+  ---------------------------------------------------------------
+  -- Create spatial date view
+  ---------------------------------------------------------------
+  Create_Spatial_Date_View (l_Tab);
+  ---------------------------------------------------------------
+  -- Derive theme name
+  ---------------------------------------------------------------
+  l_Theme_Name := Nvl (l_Nit.Nit_Short_Descr,Substr (l_Nit.Nit_Inv_Type || '-' || l_Nit.Nit_Descr, 1, 30));
 
----------------------------------------------------------------
--- Create spatial date view
----------------------------------------------------------------
-      create_spatial_date_view (l_tab);
----------------------------------------------------------------
--- Derive theme name
----------------------------------------------------------------
-      l_theme_name :=
-         NVL (l_nit.nit_short_descr,
-              SUBSTR (l_nit.nit_inv_type || '-' || l_nit.nit_descr, 1, 30)
-             );
+  ---------------------------------------------------------------
+  -- Set the registration of metadata
+  ---------------------------------------------------------------
+  l_Usgm.Table_Name  :=   l_Tab;
+  l_Usgm.Column_Name :=   'GEOLOC';
+  l_Usgm.Diminfo     :=   l_Diminfo;
+  l_Usgm.Srid        :=   l_Srid;
 
----------------------------------------------------------------
--- Set the registration of metadata
----------------------------------------------------------------
-      l_usgm.table_name  := l_tab;
-   l_usgm.column_name := 'GEOLOC';
-   l_usgm.diminfo     := l_diminfo;
-   l_usgm.srid        := l_srid;
-
-   Nm3sdo.ins_usgm ( l_usgm );
-
-
----------------------------------------------------------------
--- Create the theme for table
--- ( NM_NIT_<ASSET_TYPE>_SDO )
----------------------------------------------------------------
-      l_theme_id :=
-         register_inv_theme (pi_nit                => l_nit,
-                             p_base_themes         => l_base_themes,
-                             p_table_name          => l_tab,
-                             p_spatial_column      => 'GEOLOC',
-                             p_fk_column           => 'NE_ID',
-                             p_name                =>    SUBSTR (l_theme_name,
-                                                                 1,
-                                                                 26
-                                                                )
-                                                      || '_TAB'
-                            );
-      l_base_table_theme := l_theme_id;
+  Nm3Sdo.Ins_Usgm ( l_Usgm );
+  ---------------------------------------------------------------
+  -- Create the theme for table
+  -- ( NM_NIT_<ASSET_TYPE>_SDO )
+  ---------------------------------------------------------------
+  l_Theme_Id := Register_Inv_Theme  (
+                                    pi_Nit                =>  l_Nit,
+                                    p_Base_Themes         =>  l_Base_Themes,
+                                    p_Table_Name          =>  l_Tab,
+                                    p_Spatial_Column      =>  'GEOLOC',
+                                    p_Fk_Column           =>  'NE_ID',
+                                    p_Name                =>  Substr (l_Theme_Name,1,26)|| '_TAB'
+                                    );
+  l_Base_Table_Theme := l_Theme_Id;
     
-      l_themes.ia(1) := l_theme_id;
+  l_Themes.Ia(1) := l_Theme_Id;
 
----------------------------------------------------------------
--- Create surrogate key sequence if needed
----------------------------------------------------------------
-      IF Nm3sdo.use_surrogate_key = 'Y'
-      THEN
-         l_inv_seq := Nm3sdo.create_spatial_seq (l_theme_id);
-      END IF;
+  ---------------------------------------------------------------
+  -- Create surrogate key sequence if needed
+  ---------------------------------------------------------------
+  If Nm3Sdo.Use_Surrogate_Key = 'Y' Then
+    l_Inv_Seq := Nm3Sdo.Create_Spatial_Seq (l_Theme_Id);
+  End If;
 
----------------------------------------------------------------
--- Create theme for View
--- ( V_NM_NIT_<ASSET_TYPE>_SDO )
----------------------------------------------------------------
-      l_theme_id := Nm3sdo.clone_layer (l_base_table_theme, 'V_' || l_tab, 'GEOLOC');
+  ---------------------------------------------------------------
+  -- Create theme for View
+  -- ( V_NM_NIT_<ASSET_TYPE>_SDO )
+  ---------------------------------------------------------------
+  l_Theme_Id := Nm3Sdo.Clone_Layer (l_Base_Table_Theme, 'V_' || l_Tab, 'GEOLOC');
 
-      l_theme_id :=
-         register_inv_theme (pi_nit                => l_nit,
-                             p_base_themes         => l_base_themes,
-                             p_table_name          => 'V_' || l_tab,
-                             p_spatial_column      => 'GEOLOC',
-                             p_fk_column           => 'NE_ID',
-                             p_name                => l_theme_name,
-                             p_view_flag           => 'Y',
-                             p_base_table_nth      => l_base_table_theme
-                            );
+  l_Theme_Id := Register_Inv_Theme  (
+                                    pi_Nit                =>  l_Nit,
+                                    p_Base_Themes         =>  l_Base_Themes,
+                                    p_Table_Name          =>  'V_' || l_Tab,
+                                    p_Spatial_Column      =>  'GEOLOC',
+                                    p_Fk_Column           =>  'NE_ID',
+                                    p_Name                =>  l_Theme_Name,
+                                    p_View_Flag           =>  'Y',
+                                    p_Base_Table_Nth      =>  l_Base_Table_Theme
+                                    );
 
-      l_themes := l_themes.add_element( l_theme_id );
+  l_Themes := l_Themes.Add_Element( l_Theme_Id );
 
----------------------------------------------------------------
--- Need a join view between spatial table history view and Inv view
----------------------------------------------------------------
-      l_view := create_inv_sdo_join_view (pi_nit_inv_type, l_tab);
+  ---------------------------------------------------------------
+  -- Need a join view between spatial table history view and Inv view
+  ---------------------------------------------------------------
+  l_View := Create_Inv_Sdo_Join_View (l_Tab);
 
----------------------------------------------------------------
--- Create SDO metadata for the attribute joined view
---  ( V_NM_NIT_<ASSET_TYPE>_SDO_DT )
----------------------------------------------------------------
-      l_theme_id := Nm3sdo.clone_layer (l_base_table_theme, l_view, 'GEOLOC');
----------------------------------------------------------------
--- For now, register both the join view and the base layer
----------------------------------------------------------------
-      l_theme_name :=
-            SUBSTR (NVL (l_nit.nit_short_descr,
-                         l_nit.nit_inv_type || '-' || l_nit.nit_descr
-                        ),
-                    1,
-                    27
-                   )
-         || '_DT';
+  ---------------------------------------------------------------
+  -- Create SDO metadata for the attribute joined view
+  --  ( V_NM_NIT_<ASSET_TYPE>_SDO_DT )
+  ---------------------------------------------------------------
+  l_Theme_Id := Nm3Sdo.Clone_Layer (l_Base_Table_Theme, l_View, 'GEOLOC');
+  ---------------------------------------------------------------
+  -- For now, register both the join view and the base layer
+  ---------------------------------------------------------------
+  l_Theme_Name := Substr (Nvl (l_Nit.Nit_Short_Descr,l_Nit.Nit_Inv_Type || '-' || L_Nit.Nit_Descr),1,27)|| '_DT';
 
----------------------------------------------------------------
--- Make the view layer dependent on the parent asset shape
----------------------------------------------------------------
-      IF g_date_views = 'Y'
-      THEN
-         l_theme_id :=
-            register_inv_theme (pi_nit                => l_nit,
-                                p_base_themes         => l_base_themes,
-                                p_table_name          => l_view,
-                                p_spatial_column      => 'GEOLOC',
-                                p_fk_column           => 'IIT_NE_ID',
-                                p_name                => l_theme_name,
-                                p_view_flag           => 'Y',
-                                p_pk_column           => 'IIT_NE_ID',
-                                p_base_table_nth      => l_base_table_theme
-                               );
+  ---------------------------------------------------------------
+  -- Make the view layer dependent on the parent asset shape
+  ---------------------------------------------------------------
+  If g_Date_Views = 'Y' Then
 
-                 l_themes := l_themes.add_element( l_theme_id );
+    l_Theme_Id := Register_Inv_Theme  (
+                                      pi_Nit                =>  l_Nit,
+                                      p_Base_Themes         =>  l_Base_Themes,
+                                      p_Table_Name          =>  l_View,
+                                      p_Spatial_Column      =>  'GEOLOC',
+                                      p_Fk_Column           =>  'IIT_NE_ID',
+                                      p_Name                =>  l_Theme_Name,
+                                      p_View_Flag           =>  'Y',
+                                      p_Pk_Column           =>  'IIT_NE_ID',
+                                      p_Base_Table_Nth      =>  l_Base_Table_Theme
+                                      );
+
+    l_Themes := l_Themes.Add_Element( l_Theme_Id );
                  
-      END IF;
----------------------------------------------------------------
--- Populate the SDO table and create (clone) the SDO metadata
--- for table and date tracked view
---   (   NM_NIT_<ASSET_TYPE>_SDO )
---   ( V_NM_NIT_<ASSET_TYPE>_SDO )
----------------------------------------------------------------
+  End If;
+  ---------------------------------------------------------------
+  -- Populate the SDO table and create (clone) the SDO metadata
+  -- for table and date tracked view
+  --   (   NM_NIT_<ASSET_TYPE>_SDO )
+  --   ( V_NM_NIT_<ASSET_TYPE>_SDO )
+  ---------------------------------------------------------------
 
-      IF pi_create_flag = 'TRUE'
-      THEN
-         Nm3sdo.create_inv_data (p_table_name      => l_tab,
-                                 p_inv_type        => pi_nit_inv_type,
-                                 p_seq_name        => l_inv_seq,
-         p_pnt_or_cont     => l_nit.nit_pnt_or_cont,
-         p_job_id          => p_job_id
-                                        );
+  If pi_Create_Flag = 'TRUE'  Then
+    Nm3Sdo.Create_Inv_Data  (
+                            p_Table_Name      =>  l_Tab,
+                            p_Inv_Type        =>  pi_Nit_Inv_Type,
+                            p_Seq_Name        =>  l_Inv_Seq,
+                            p_Pnt_Or_Cont     =>  l_Nit.Nit_Pnt_Or_Cont,
+                            p_Job_Id          =>  p_Job_Id
+                            );
+  End If;
+  ---------------------------------------------------------------
+  -- Table needs a spatial index
+  ---------------------------------------------------------------
+  Create_Inv_Spatial_Idx (pi_Nit_Inv_Type, l_Tab);
+  ---------------------------------------------------------------
+  -- Analyze spatial table
+  ---------------------------------------------------------------
 
-      END IF;
----------------------------------------------------------------
--- Table needs a spatial index
----------------------------------------------------------------
-      create_inv_spatial_idx (pi_nit_inv_type, l_tab);
----------------------------------------------------------------
--- Analyze spatial table
----------------------------------------------------------------
---    EXECUTE IMMEDIATE 'analyze table ' || l_tab || ' compute statistics';
-      BEGIN
-        Nm3ddl.analyse_table (pi_table_name          => l_tab
-                            , pi_schema              => Sys_Context('NM3CORE','APPLICATION_OWNER')
-                            , pi_estimate_percentage => NULL
-                            , pi_auto_sample_size    => FALSE);
-      EXCEPTION
-        WHEN OTHERS
-        THEN
-          RAISE e_no_analyse_privs;
-      END;
-
-    /*  IF NM3SDO_DYNSEG.G_USE_OFFSET then
-        update nm_themes_all
-        set nth_xsp_column = 'IIT_X_SECT'
-        where nth_theme_id in ( select column_value from table ( l_themes.ia ) );
-        
-        NM3SDO_DYNSEG.SET_OFFSET_FLAG_OFF;
-        
-      END IF;*/
-    
-      --
-      Nm_Debug.proc_end (g_package_name, 'make_ona_inv_spatial_layer');
-   --
-  EXCEPTION
-    WHEN e_not_unrestricted
-    THEN
-      RAISE_APPLICATION_ERROR (-20777,'Restricted users are not permitted to create SDO layers');
-    WHEN e_no_analyse_privs
-    THEN
-      RAISE_APPLICATION_ERROR (-20778,'Layer created - but user does not have ANALYZE ANY granted. '||
+  Begin
+    Nm3Ddl.Analyse_Table  (
+                          pi_Table_Name          => l_Tab,
+                          pi_Schema              => Sys_Context('NM3CORE','APPLICATION_OWNER'),
+                          pi_Estimate_Percentage => Null,
+                          pi_Auto_Sample_Size    => False
+                          );
+  Exception
+    When Others Then
+      Raise E_No_Analyse_Privs;
+  End;
+  --
+  Nm_Debug.Proc_End (G_Package_Name, 'make_ona_inv_spatial_layer');
+  --
+  Exception
+    When E_Not_Unrestricted Then
+      Raise_Application_Error (-20777,'Restricted users are not permitted to create SDO layers');
+    When E_No_Analyse_Privs Then
+      Raise_Application_Error (-20778,'Layer created - but user does not have ANALYZE ANY granted. '||
                                       'Please ensure the correct role/privs are applied to the user');
 
-   END make_inv_spatial_layer;
-
+  End Make_Inv_Spatial_Layer;
 --
 ---------------------------------------------------------------------------------------------------
 --
-   FUNCTION get_datum_layer_from_gty (
-      p_gty   IN   NM_LINEAR_TYPES.nlt_gty_type%TYPE
-   )
-      RETURN nm_theme_array
-   IS
-      retval   nm_theme_array := Nm3array.INIT_NM_THEME_ARRAY;
+Function Get_Datum_Layer_From_Gty (
+                                  p_Gty   In   Nm_Linear_Types.Nlt_Gty_Type%Type
+                                  ) Return Nm_Theme_Array
+Is
+  Retval   Nm_Theme_Array := Nm3Array.Init_Nm_Theme_Array;
 
-      CURSOR c1 (c_gty NM_LINEAR_TYPES.nlt_gty_type%TYPE)
-      IS
-         SELECT nm_theme_entry(nnth_nth_theme_id)
-           FROM NM_NW_THEMES nnt,
-                NM_LINEAR_TYPES nlt,
-                NM_NT_GROUPINGS_ALL nng
-          WHERE nlt.nlt_id = nnt.nnth_nlt_id
-            AND nlt.nlt_nt_type = nng.nng_nt_type
-            AND nng.nng_group_type = c_gty;
-   BEGIN
-      OPEN c1 (p_gty);
+Begin
+  Select  Nm_Theme_Entry(Nnth_Nth_Theme_Id)
+  Bulk Collect Into Retval.Nta_Theme_Array
+  From    Nm_Nw_Themes Nnt,
+          Nm_Linear_Types Nlt,
+          Nm_Nt_Groupings_All Nng
+  Where   Nlt.Nlt_Id          =   Nnt.Nnth_Nlt_Id
+  And     Nlt.Nlt_Nt_Type     =   Nng.Nng_Nt_Type
+  And     Nng.Nng_Group_Type  =   p_Gty;
 
-      FETCH c1 BULK COLLECT INTO retval.nta_theme_array;
+  If Retval.Nta_Theme_Array(1).Nthe_Id Is Null Then
+     Hig.Raise_Ner (Pi_Appl         => Nm3Type.C_Hig,
+                    Pi_Id           => 195,
+                    Pi_Sqlcode      => -20001
+                   );
+  End If;
 
-      CLOSE c1;
-
-      IF retval.nta_theme_array(1).nthe_id IS NULL THEN
-         Hig.raise_ner (pi_appl         => Nm3type.c_hig,
-                        pi_id           => 195,
-                        pi_sqlcode      => -20001
-                       );
-      --    raise_application_error( -20001, 'No datum theme found');
-      END IF;
-
-      RETURN retval;
-   END;
-
+  Return Retval;
+End Get_Datum_Layer_From_Gty;
 --
 ---------------------------------------------------------------------------------------------------
 --
-  PROCEDURE make_datum_layer_dt
-                                ( pi_nth_theme_id       IN NM_THEMES_ALL.nth_theme_id%TYPE
-                                , pi_new_feature_table  IN NM_THEMES_ALL.nth_feature_table%TYPE DEFAULT NULL)
-  IS
-    ---------------------------------------------------------------------------
-   /* This procedure is designed to create a date tracked view of a given Datum
-      SDO layer.
-      It creates the view, metadata, theme. Renames base table to _TABLE.
-      This is required so that MSV can display current shapes, as it is unable
-      to perform a join back to nm_elements
-   */
-    ---------------------------------------------------------------------------
+Procedure Make_Datum_Layer_Dt (
+                              pi_Nth_Theme_Id       In Nm_Themes_All.Nth_Theme_Id%Type,
+                              pi_New_Feature_Table  In Nm_Themes_All.Nth_Feature_Table%Type Default Null
+                              )
+Is
+  ---------------------------------------------------------------------------
+  -- This procedure is designed to create a date tracked view of a given Datum
+  --SDO layer.
+  --It creates the view, metadata, theme. Renames base table to _TABLE.
+  --This is required so that MSV can display current shapes, as it is unable
+  --to perform a join back to nm_elements
+  ---------------------------------------------------------------------------
   --
-    e_not_datum_layer       EXCEPTION;
-    e_new_ft_exists         EXCEPTION;
-    e_already_base_theme    EXCEPTION;
-    e_used_as_base_theme    EXCEPTION;
+  e_Not_Datum_Layer       Exception;
+  e_New_Ft_Exists         Exception;
+  e_Already_Base_Theme    Exception;
+  e_Used_As_Base_Theme    Exception;
   --
-    lf                      VARCHAR2(5) := CHR(10);
-    l_new_table_name        NM_THEMES_ALL.nth_feature_table%TYPE;
-    l_view_sql              Nm3type.max_varchar2;
-    l_rec_nth               NM_THEMES_ALL%ROWTYPE;
-    l_rec_new_nth           NM_THEMES_ALL%ROWTYPE;
-    l_rec_nthr              NM_THEME_ROLES%ROWTYPE;
+  lf                      Varchar2(5) := Chr(10);
+  l_New_Table_Name        Nm_Themes_All.Nth_Feature_Table%Type;
+  l_View_Sql              Nm3Type.Max_Varchar2;
+  l_Rec_Nth               Nm_Themes_All%Rowtype;
+  l_Rec_New_Nth           Nm_Themes_All%Rowtype;
+  l_Rec_Nthr              Nm_Theme_Roles%Rowtype;
   --
-    FUNCTION is_datum_layer
-               ( pi_nth_theme_id IN NM_THEMES_ALL.nth_theme_id%TYPE ) RETURN BOOLEAN
-    IS
-      l_dummy PLS_INTEGER;
-    BEGIN
+  Function Is_Datum_Layer (
+                          pi_Nth_Theme_Id In Nm_Themes_All.Nth_Theme_Id%Type
+                          ) Return Boolean
+  Is
+    l_Dummy   Pls_Integer;
+    l_Retval  Boolean:=True;
+  Begin
+    Begin
+      --
+      Select  nta.Nth_Theme_Id
+      Into    l_Dummy
+      From    Nm_Themes_All   nta
+      Where   Exists    (
+                        Select  Null
+                        From    Nm_Nw_Themes  nnt
+                        Where   nta.Nth_Theme_Id  =   nnt.Nnth_Nth_Theme_Id
+                        And     Exists            (   Select  Null
+                                                      From    Nm_Linear_Types
+                                                      Where   Nlt_Id    = Nnth_Nlt_Id
+                                                      And     Nlt_G_I_D = 'D'
+                                                  )
+                        )
+      And     Nth_Theme_Id = pi_Nth_Theme_Id;
+      --
+      Exception
+        When No_Data_Found  Then
+          l_Retval:=False;
+      End;
+      Return(l_Retval);        
+    End Is_Datum_Layer;
+  --
+  Function Used_As_A_Base_Theme (
+                                pi_Theme_Id In Nm_Themes_All.Nth_Theme_Id%Type
+                                ) Return Boolean
+  Is
+    l_Dummy   Varchar2(1);
+    l_Retval  Boolean:=True;
+  Begin
+    Begin
+      Select  Null
+      Into    l_Dummy
+      From    Nm_Themes_All
+      Where   Nth_Base_Table_Theme  =   pi_Theme_Id;    
+    Exception
+      When No_Data_Found  Then
+        l_Retval := False;
+    End;
+    Return(l_Retval);        
+  End Used_As_A_Base_Theme;
+  --
+Begin
+  ---------------------------------------------------------------------------
+  -- Check to make sure user is unrestricted
+  ---------------------------------------------------------------------------
+  If Not User_Is_Unrestricted Then
+    Raise e_Not_Unrestricted;
+  End If;
+  ---------------------------------------------------------------------------
+  -- Make sure theme passed in is a datum layer
+  ---------------------------------------------------------------------------
+  l_Rec_Nth := Nm3Get.Get_Nth ( pi_Nth_Theme_Id => pi_Nth_Theme_Id );
+
+  If Not Is_Datum_Layer ( pi_Nth_Theme_Id ) Then
+    Raise e_Not_Datum_Layer;
+  End If;
+  ---------------------------------------------------------------------------
+  -- Check to make sure the Theme passed in a view based theme!
+  ---------------------------------------------------------------------------
+  If l_Rec_Nth.Nth_Base_Table_Theme Is Not Null Then
+    Raise e_Already_Base_Theme;
+  End If;
+
+  If Used_As_A_Base_Theme ( pi_Nth_Theme_Id ) Then
+    Raise e_Used_As_Base_Theme;
+  End If;
+  --
+  ---------------------------------------------------------------------------
+  -- Rename datum table
+  ---------------------------------------------------------------------------
+  l_New_Table_Name := Nvl( pi_New_Feature_Table, Upper(l_Rec_Nth.Nth_Feature_Table)||'_TABLE');
+
+  If Nm3Ddl.Does_Object_Exist (l_New_Table_Name)  Then
+    Raise e_New_Ft_Exists;
+  End If;
+
+  Execute Immediate 'RENAME '||l_Rec_Nth.Nth_Feature_Table||' TO '||l_New_Table_Name;
+  ---------------------------------------------------------------------------
+  --Create SDO metadata for renamed feature table
+  ---------------------------------------------------------------------------
+  Execute Immediate
+    'INSERT INTO user_sdo_geom_metadata'                                      ||Lf||
+    ' (SELECT '||Nm3Flx.String(l_New_Table_Name)                              ||Lf||
+    '       , column_name, diminfo, srid '                                    ||Lf||
+    '    FROM user_sdo_geom_metadata '                                        ||Lf||
+    '   WHERE table_name  = '||Nm3Flx.String(l_Rec_Nth.Nth_Feature_Table)     ||Lf||
+    '     AND column_name = '||Nm3Flx.String(l_Rec_Nth.Nth_Feature_Shape_Column)||')';
+
+  ---------------------------------------------------------------------------
+  -- Create date based view
+  ---------------------------------------------------------------------------
+  l_View_Sql :=
+    'CREATE OR REPLACE FORCE VIEW '||l_Rec_Nth.Nth_Feature_Table              ||Lf||
+    'AS'                                                                      ||Lf||
+    'SELECT sdo.*'                                                            ||Lf||
+    '  FROM '||l_New_Table_Name||' sdo '                                      ||Lf||
+    ' WHERE EXISTS ( SELECT 1 FROM nm_elements ne '                           ||Lf||
+                    ' WHERE ne.ne_id = sdo.'||l_Rec_Nth.Nth_Feature_Pk_Column||')';
+
+  Execute Immediate L_View_Sql;
+
+  ---------------------------------------------------------------------------
+  -- Create new theme - but to maintain foreign keys, we need to update the old one
+  -- so that it points to the new feature table using base theme
+  ---------------------------------------------------------------------------
+
+  l_Rec_New_Nth                    := l_Rec_Nth;
+  l_Rec_New_Nth.Nth_Theme_Id       := Nm3Seq.Next_Nth_Theme_Id_Seq;
+  l_Rec_New_Nth.Nth_Theme_Name     := l_Rec_New_Nth.Nth_Theme_Name||'_TAB';
+  l_Rec_New_Nth.Nth_Feature_Table  := l_New_Table_Name;
+
+  Nm3Ins.Ins_Nth(l_Rec_New_Nth);
+
+  Insert Into Nm_Nw_Themes
+  (
+  Nnth_Nlt_Id,
+  Nnth_Nth_Theme_Id
+  )
+  Select  Nnth_Nlt_Id,
+          l_Rec_New_Nth.Nth_Theme_Id
+  From    Nm_Nw_Themes
+  Where   Nnth_Nth_Theme_Id = l_Rec_Nth.Nth_Theme_Id;
+
+  ---------------------------------------------------------------------------
+  -- Update (now the) view theme to point to new table
+  ---------------------------------------------------------------------------
+  Begin
+    Update  Nm_Themes_All
+       Set  Nth_Base_Table_Theme  =   l_Rec_New_Nth.Nth_Theme_Id
+     Where  Nth_Theme_Id          =   pi_Nth_Theme_Id;
+  End;
+
+  ---------------------------------------------------------------------------
+  --  Update the NM_BASE_THEME record to point at the base table theme
+  --  where the base theme is incorrectly set to a view based theme
+  ---------------------------------------------------------------------------
+  Update Nm_Base_Themes
+  Set   Nbth_Base_Theme =   (
+                            Select Nth_Base_Table_Theme
+                            From Nm_Themes_All
+                            Where Nth_Theme_Id  = Nbth_Base_Theme
+                            )
+  Where Exists          (   Select  1
+                            From    Nm_Themes_All
+                            Where   Nth_Theme_Id          = Nbth_Base_Theme
+                            And     Nth_Base_Table_Theme Is Not Null
+                        );
+  ---------------------------------------------------------------------------
+  -- Create SDE layer if needed
+  ---------------------------------------------------------------------------
+  If Hig.Get_User_Or_Sys_Opt('REGSDELAY') = 'Y' Then
+    Execute Immediate (   ' begin  '
+                      || '    nm3sde.register_sde_layer( p_theme_id => '||To_Char( l_Rec_New_Nth.Nth_Theme_Id )||')'
+                      || '; end;'
+                      );
+  End If;
+  ---------------------------------------------------------------------------
+  -- Touch the nm_theme_roles to action creation of subuser views + metadata
+  ---------------------------------------------------------------------------
+  Update  Nm_Theme_Roles
+  Set     Nthr_Role     = Nthr_Role
+  Where   Nthr_Theme_Id = pi_Nth_Theme_Id;
+
+  --
+Exception
+  When E_Not_Datum_Layer  Then
+    Hig.Raise_Ner (
+                  pi_Appl               =>  Nm3Type.C_Hig,
+                  pi_Id                 =>  274,
+                  pi_Sqlcode            =>  -20001,
+                  pi_Supplementary_Info =>  l_Rec_Nth.Nth_Theme_Name
+                  );
+
+  When E_New_Ft_Exists  Then
+    Hig.Raise_Ner (
+                  pi_Appl               =>  Nm3Type.C_Hig,
+                  pi_Id                 =>  275,
+                  pi_Sqlcode            =>  -20001,
+                  pi_Supplementary_Info =>  l_New_Table_Name
+                  );
+
+  When E_Already_Base_Theme Then
+    Raise_Application_Error(-20101 ,l_Rec_Nth.Nth_Theme_Name||' is not a base table theme');
+
+  When E_Used_As_Base_Theme Then
+    Raise_Application_Error(-20102 ,pi_Nth_Theme_Id||' is already setup as a base table theme');
+
+  When Others Then
+
+    Begin
+      Execute Immediate 'RENAME '||l_New_Table_Name||' to '||l_Rec_Nth.Nth_Feature_Table;
+    Exception
+      When Others Then Null;
+    End;
     --
-      SELECT nth_theme_id INTO l_dummy FROM NM_THEMES_ALL
-       WHERE EXISTS
-         (SELECT 1 FROM NM_NW_THEMES
-           WHERE nth_theme_id = nnth_nth_theme_id
-             AND EXISTS
-            (SELECT 1 FROM NM_LINEAR_TYPES
-              WHERE nlt_id = nnth_nlt_id
-                AND nlt_g_i_d = 'D'))
-         AND nth_theme_id = pi_nth_theme_id;
+    Begin
+      Execute Immediate 'DROP VIEW '||l_Rec_Nth.Nth_Feature_Table;
+    Exception
+      When Others Then Null;
+    End;
     --
-      RETURN TRUE;
+    Begin
+      Delete 
+      From    User_Sdo_Geom_Metadata
+      Where   Table_Name  = l_New_Table_Name
+      And     Column_Name = l_Rec_Nth.Nth_Feature_Shape_Column;
+    Exception
+      When Others Then Null;
+    End;
     --
-    EXCEPTION
-      WHEN NO_DATA_FOUND
-        THEN RETURN FALSE;
-      WHEN OTHERS
-        THEN RAISE;
-    END is_datum_layer;
-  --
-    FUNCTION used_as_a_base_theme (pi_theme_id IN nm_themes_all.nth_theme_id%TYPE)
-    RETURN BOOLEAN
-    IS
-      l_dummy NUMBER;
-    BEGIN
-      SELECT count(*) INTO l_dummy FROM nm_themes_all
-       WHERE nth_base_table_theme = pi_theme_id;
-      IF l_dummy > 0
-        THEN RETURN TRUE;
-        ELSE RETURN FALSE;
-      END IF;
-    EXCEPTION
-      WHEN NO_DATA_FOUND
-      THEN RETURN FALSE;
-    END used_as_a_base_theme;
-  --
-  BEGIN
-    ---------------------------------------------------------------------------
-    -- Check to make sure user is unrestricted
-    ---------------------------------------------------------------------------
-    IF NOT user_is_unrestricted
-    THEN
-      RAISE e_not_unrestricted;
-    END IF;
-
-    ---------------------------------------------------------------------------
-    -- Make sure theme passed in is a datum layer
-    ---------------------------------------------------------------------------
-    l_rec_nth := Nm3get.get_nth ( pi_nth_theme_id => pi_nth_theme_id );
-
-    IF NOT is_datum_layer ( pi_nth_theme_id )
-    THEN
-      RAISE e_not_datum_layer;
-    END IF;
-
-    ---------------------------------------------------------------------------
-    -- Check to make sure the Theme passed in a view based theme!
-    ---------------------------------------------------------------------------
-    IF l_rec_nth.nth_base_table_theme IS NOT NULL
-    THEN
-      RAISE e_already_base_theme;
-    END IF;
-
-    IF used_as_a_base_theme ( pi_nth_theme_id )
-    THEN
-      RAISE e_used_as_base_theme;
-    END IF;
-  --
-    ---------------------------------------------------------------------------
-    -- Rename datum table
-    ---------------------------------------------------------------------------
-    l_new_table_name := NVL( pi_new_feature_table, UPPER(l_rec_nth.nth_feature_table)||'_TABLE');
-
-    IF Nm3ddl.does_object_exist (l_new_table_name)
-    THEN
-      RAISE e_new_ft_exists;
-    END IF;
-
-    EXECUTE IMMEDIATE
-      'RENAME '||l_rec_nth.nth_feature_table||' TO '||l_new_table_name;
-
-    ---------------------------------------------------------------------------
-    --Create SDO metadata for renamed feature table
-    ---------------------------------------------------------------------------
-    EXECUTE IMMEDIATE
-      'INSERT INTO user_sdo_geom_metadata'||lf||
-      ' (SELECT '||Nm3flx.string(l_new_table_name)||lf||
-      '       , column_name, diminfo, srid '||lf||
-      '    FROM user_sdo_geom_metadata '||lf||
-      '   WHERE table_name  = '||Nm3flx.string(l_rec_nth.nth_feature_table)||lf||
-      '     AND column_name = '||Nm3flx.string(l_rec_nth.nth_feature_shape_column)||')';
-
-    ---------------------------------------------------------------------------
-    -- Create date based view
-    ---------------------------------------------------------------------------
-    l_view_sql :=
-      'CREATE OR REPLACE FORCE VIEW '||l_rec_nth.nth_feature_table||lf||
-      'AS'||lf||
-      'SELECT sdo.*'||lf||
-      '  FROM '||l_new_table_name||' sdo '||lf||
-      ' WHERE EXISTS ( SELECT 1 FROM nm_elements ne '||lf||
-                      ' WHERE ne.ne_id = sdo.'||l_rec_nth.nth_feature_pk_column||')';
-
-    --Nm3ddl.create_object_and_syns( l_rec_nth.nth_feature_table, l_view_sql);
-    EXECUTE IMMEDIATE l_view_sql;
-
-    ---------------------------------------------------------------------------
-    -- Create new theme - but to maintain foreign keys, we need to update the old one
-    -- so that it points to the new feature table using base theme
-    ---------------------------------------------------------------------------
-
-    l_rec_new_nth                    := l_rec_nth;
-    l_rec_new_nth.nth_theme_id       := Nm3seq.next_nth_theme_id_seq;
-    l_rec_new_nth.nth_theme_name     := l_rec_new_nth.nth_theme_name||'_TAB';
-    l_rec_new_nth.nth_feature_table  := l_new_table_name;
-
-    Nm3ins.ins_nth(l_rec_new_nth);
-
-    INSERT INTO NM_NW_THEMES
-      ( nnth_nlt_id, nnth_nth_theme_id )
-    SELECT nnth_nlt_id, l_rec_new_nth.nth_theme_id
-      FROM nm_nw_themes
-     WHERE nnth_nth_theme_id = l_rec_nth.nth_theme_id;
-
-    ---------------------------------------------------------------------------
-    -- Update (now the) view theme to point to new table
-    ---------------------------------------------------------------------------
-    BEGIN
-      UPDATE NM_THEMES_ALL
-         SET nth_base_table_theme = l_rec_new_nth.nth_theme_id
-       WHERE nth_theme_id = pi_nth_theme_id;
-    EXCEPTION
-      WHEN OTHERS
-        THEN RAISE;
-    END;
-
-    ---------------------------------------------------------------------------
-    --  Update the NM_BASE_THEME record to point at the base table theme
-    --  where the base theme is incorrectly set to a view based theme
-    ---------------------------------------------------------------------------
-    UPDATE nm_base_themes
-       SET nbth_base_theme =(SELECT nth_base_table_theme
-                               FROM nm_themes_all
-                              WHERE nth_theme_id = nbth_base_theme)
-     WHERE EXISTS
-      (SELECT 1 FROM nm_themes_all
-        WHERE nth_theme_id = nbth_base_theme
-          AND nth_base_table_theme IS NOT NULL);
-
-    ---------------------------------------------------------------------------
-    -- Create SDE layer if needed
-    ---------------------------------------------------------------------------
-    IF Hig.get_user_or_sys_opt('REGSDELAY') = 'Y'
-    THEN
-         EXECUTE IMMEDIATE (   ' begin  '
-                            || '    nm3sde.register_sde_layer( p_theme_id => '||TO_CHAR( l_rec_new_nth.nth_theme_id )||')'
-                            || '; end;'
-                           );
-    END IF;
-
-    ---------------------------------------------------------------------------
-    -- Touch the nm_theme_roles to action creation of subuser views + metadata
-    ---------------------------------------------------------------------------
-    UPDATE nm_theme_roles
-       SET nthr_role = nthr_role
-     WHERE nthr_theme_id = pi_nth_theme_id;
-
-  --
-  EXCEPTION
-    WHEN e_not_datum_layer
-      THEN
-         Hig.raise_ner (pi_appl         => Nm3type.c_hig,
-                        pi_id           => 274,
-                        pi_sqlcode      => -20001,
-                        pi_supplementary_info => l_rec_nth.nth_theme_name
-                       );
-    WHEN e_new_ft_exists
-      THEN
-         Hig.raise_ner (pi_appl         => Nm3type.c_hig,
-                        pi_id           => 275,
-                        pi_sqlcode      => -20001,
-                        pi_supplementary_info => l_new_table_name
-                       );
-    WHEN e_already_base_theme
-      THEN
-       RAISE_APPLICATION_ERROR(-20101 ,l_rec_nth.nth_Theme_name||' is not a base table theme');
-
-    WHEN e_used_as_base_theme
-      THEN
-      RAISE_APPLICATION_ERROR(-20102 ,pi_nth_theme_id||' is already setup as a base table theme');
-
-    WHEN OTHERS
-      THEN
-
-      BEGIN
-        EXECUTE IMMEDIATE
-         'RENAME '||l_new_table_name||' to '||l_rec_nth.nth_feature_table;
-      EXCEPTION
-        WHEN OTHERS THEN NULL;
-      END;
-    --
-      BEGIN
-        EXECUTE IMMEDIATE
-         'DROP VIEW '||l_rec_nth.nth_feature_table;
-      EXCEPTION
-        WHEN OTHERS THEN NULL;
-      END;
-    --
-      BEGIN
-        DELETE FROM user_sdo_geom_metadata
-         WHERE table_name = l_new_table_name
-           AND column_name = l_rec_nth.nth_feature_shape_column;
-      EXCEPTION
-        WHEN OTHERS THEN NULL;
-      END;
-    --
-      RAISE;
-  --
-  END make_datum_layer_dt;
+    Raise;
+--
+End Make_Datum_Layer_Dt;
 --
 ---------------------------------------------------------------------------------------------------
 --
-  PROCEDURE make_all_datum_layers_dt
-  IS
-  BEGIN
-    FOR i IN (SELECT *
-                FROM NM_THEMES_ALL a
-               WHERE EXISTS
-               (SELECT 1 FROM NM_NW_THEMES
-                 WHERE a.nth_theme_id = nnth_nth_theme_id
-                   AND EXISTS
-                  (SELECT 1 FROM NM_LINEAR_TYPES
-                    WHERE nlt_id = nnth_nlt_id
-                      AND nlt_g_i_d = 'D'))
-                 AND a.nth_base_table_theme IS NULL
-                 -- AE
-                 -- Make sure we don't pick up themes that are already
-                 -- used as base table themes - i.e. they don't need this
-                 -- running again !
-                 AND NOT EXISTS
-                   (SELECT 1 FROM nm_themes_all z
-                     WHERE a.nth_theme_id = z.nth_base_table_theme)
-              )
-    LOOP
-      make_datum_layer_dt ( pi_nth_theme_id => i.nth_theme_id );
-    END LOOP;
-  END make_all_datum_layers_dt;
+Procedure Make_All_Datum_Layers_Dt
+Is
+Begin
+  For i In  (
+            Select  *
+            From    Nm_Themes_All nta
+            Where   Exists      (
+                                Select  Null
+                                From    Nm_Nw_Themes  nnt
+                                Where   nta.Nth_Theme_Id  =   nnt.Nnth_Nth_Theme_Id
+                                And     Exists          (   Select  Null
+                                                            From    Nm_Linear_Types nlt
+                                                            Where   nlt.Nlt_Id    =   nnt.Nnth_Nlt_Id
+                                                            And     nlt.Nlt_G_I_D =   'D'
+                                                        )
+                                )
+            And     nta.Nth_Base_Table_Theme Is Null
+            -- AE
+            -- Make sure we don't pick up themes that are already
+            -- used as base table themes - i.e. they don't need this
+            -- running again !
+            And     Not Exists  (
+                                Select  Null
+                                From    Nm_Themes_All nta2
+                                Where   nta.Nth_Theme_Id = nta2.Nth_Base_Table_Theme
+                                )
+            )
+  Loop
+    Make_Datum_Layer_Dt ( pi_Nth_Theme_Id => i.Nth_Theme_Id );
+  End Loop;
+End Make_All_Datum_Layers_Dt;
 --
 ---------------------------------------------------------------------------------------------------
 --
-   FUNCTION get_datum_layer_from_route (p_ne_id IN nm_elements.ne_id%TYPE)
-      RETURN nm_theme_array
-   IS
-   BEGIN
-      RETURN get_datum_layer_from_gty
-                                    (Nm3get.get_ne (p_ne_id).ne_gty_group_type
-                                    );
-   END;
-
------------------------------------------------------------------------------
-   FUNCTION get_datum_layer_from_nlt (p_nlt_id IN NM_LINEAR_TYPES.nlt_id%TYPE)
-      RETURN nm_theme_array
-   IS
-      nltrow   NM_LINEAR_TYPES%ROWTYPE   := Nm3get.get_nlt (p_nlt_id);
-   BEGIN
-      RETURN get_datum_layer_from_gty (nltrow.nlt_gty_type);
-   END;
-
------------------------------------------------------------------------------
-   FUNCTION element_exists_in_theme (
-      p_ne_id               IN   nm_elements.ne_id%TYPE,
-      p_feature_table       IN   VARCHAR2,
-      p_feature_fk_column   IN   VARCHAR2
-   )
-      RETURN BOOLEAN;
-
-   FUNCTION element_exists_in_theme (
-      p_ne_id               IN   nm_elements.ne_id%TYPE,
-      p_feature_table       IN   VARCHAR2,
-      p_feature_fk_column   IN   VARCHAR2
-   )
-      RETURN BOOLEAN
-   IS
-      TYPE curtyp IS REF CURSOR;
-
-      in_theme     curtyp;
-      cur_string   VARCHAR2 (2000)
-         :=    'select 1 from '
-            || p_feature_table
-            || ' where '
-            || p_feature_fk_column
-            || ' = :c_ne_id';
-      l_dummy      NUMBER;
-      retval       BOOLEAN;
-   BEGIN
-      OPEN in_theme FOR cur_string USING p_ne_id;
-
-      FETCH in_theme
-       INTO l_dummy;
-
-      retval := in_theme%FOUND;
-
-      CLOSE in_theme;
-
-      RETURN retval;
-   END;
-
---
--------------------------------------------------------------------------------------------------------------------------------------
---
-   FUNCTION prevent_operation (p_ne_id IN nm_elements.ne_id%TYPE)
-      RETURN BOOLEAN
-   IS
-      retval   BOOLEAN := FALSE;
-
-      -- look for an independent SDE theme for this network type
-      CURSOR c2 (c_ne_id IN nm_elements.ne_id%TYPE)
-      IS
-         SELECT nth.nth_theme_id, nth.nth_feature_table,
-                nth.nth_feature_fk_column
-           FROM NM_NW_THEMES nwt,
-                NM_ELEMENTS_ALL ne,
-                NM_THEMES_ALL nth,
-                NM_LINEAR_TYPES nlt
-          WHERE ne.ne_id = c_ne_id
-            AND nwt.nnth_nlt_id = nlt.nlt_id
-            AND nwt.nnth_nth_theme_id = nth.nth_theme_id
-            AND nlt.nlt_nt_type = ne.ne_nt_type
-            AND DECODE (nlt.nlt_g_i_d,
-                        'D', 'NOT_USED',
-                        'G', ne.ne_gty_group_type
-                       ) =
-                   DECODE (nlt.nlt_g_i_d,
-                           'D', 'NOT_USED',
-                           'G', nlt.nlt_gty_type
-                          )
-            AND nth.nth_theme_type = 'SDE'
-            AND nth.nth_storage = 'S'
-            AND nth.nth_dependency = 'I';
-   --
-   BEGIN
-      FOR irec IN c2 (p_ne_id)
-      LOOP
-         IF element_exists_in_theme
-                           (p_ne_id                  => p_ne_id,
-                            p_feature_table          => irec.nth_feature_table,
-                            p_feature_fk_column      => irec.nth_feature_fk_column
-                           )
-         THEN
-            retval := TRUE;
-            EXIT;
-         END IF;
-      END LOOP;
-
-      RETURN retval;
-   END;
-
---
--------------------------------------------------------------------------------------------------------------------------------------
---
-   PROCEDURE remove_element_shapes (p_ne_id IN nm_elements.ne_id%TYPE)
-   IS
-      --
-      CURSOR get_theme (c_ne_id IN nm_elements.ne_id%TYPE)
-      IS
-         SELECT nth_theme_id, nth_feature_table, nth_feature_pk_column
-           FROM NM_THEMES_ALL, NM_NW_THEMES, NM_LINEAR_TYPES, nm_elements
-          WHERE nlt_id = nnth_nlt_id
-            AND nth_theme_id = nnth_nth_theme_id
-            AND nlt_nt_type = ne_nt_type
-            AND NVL (nlt_gty_type, Nm3type.get_nvl) =
-                                      NVL (ne_gty_group_type, Nm3type.get_nvl)
-            AND ne_id = c_ne_id;
-   --
-   BEGIN
-      --
-      FOR irec IN get_theme (p_ne_id)
-      LOOP
-         --
-         EXECUTE IMMEDIATE    'DELETE FROM '
-                           || irec.nth_feature_table
-                           || ' WHERE '
-                           || irec.nth_feature_pk_column
-                           || ' = :ne_id'
-                     USING p_ne_id;
-      END LOOP;
-   --
-   END;
-
---
--------------------------------------------------------------------------------------------------------------------------------------
---
-   PROCEDURE regenerate_affected_shapes (
-      p_nm_type       IN   nm_members.nm_type%TYPE,
-      p_nm_obj_type   IN   nm_members.nm_obj_type%TYPE,
-      p_ne_id         IN   nm_elements.ne_id%TYPE
-   )
-   IS
-      CURSOR c_inv_layers (c_nm_obj_type IN nm_members.nm_obj_type%TYPE)
-      IS
-         SELECT nth_theme_id, nth_feature_table, nth_feature_shape_column,
-                nth_feature_fk_column
-           FROM NM_INV_THEMES, NM_THEMES_ALL
-          WHERE nith_nth_theme_id = nth_theme_id
-            AND nith_nit_id = c_nm_obj_type;
-
-      CURSOR c_nw_layers (c_nm_obj_type IN nm_members.nm_obj_type%TYPE)
-      IS
-         SELECT nth_theme_id, nth_feature_table, nth_feature_shape_column,
-                nth_feature_fk_column
-           FROM NM_NW_THEMES, NM_THEMES_ALL, NM_LINEAR_TYPES
-          WHERE nnth_nth_theme_id = nth_theme_id
-            AND nlt_id = nnth_nlt_id
-            AND nlt_gty_type = c_nm_obj_type;
-
-      inv_upd   VARCHAR2 (2000)
-         :=    'update :table_name '
-            || 'set :shape_col = nm3sdm.get_shape_from_ne( :ne_id ) '
-            || 'where :ne_col = :ne_id';
-      nw_upd    VARCHAR2 (2000)
-         :=    'update :table_name '
-            || 'set :shape_col = nm3sdm.get_route_shape( :ne_id ) '
-            || 'where :ne_col = :ne_id';
-   BEGIN
-      IF p_nm_type = 'I'
-      THEN
-         FOR irec IN c_inv_layers (p_nm_obj_type)
-         LOOP
-            EXECUTE IMMEDIATE inv_upd
-                        USING irec.nth_feature_table,
-                              irec.nth_feature_shape_column,
-                              p_ne_id,
-                              irec.nth_feature_fk_column,
-                              p_ne_id;
-         END LOOP;
-      ELSE
-         FOR irec IN c_nw_layers (p_nm_obj_type)
-         LOOP
-            EXECUTE IMMEDIATE nw_upd
-                        USING irec.nth_feature_table,
-                              irec.nth_feature_shape_column,
-                              p_ne_id,
-                              irec.nth_feature_fk_column,
-                              p_ne_id;
-         END LOOP;
-      END IF;
-   END;
-
---
--------------------------------------------------------------------------------------------------------------------------------------
---
-   FUNCTION get_ona_spatial_table (p_nit IN nm_inv_types.nit_inv_type%TYPE)
-      RETURN VARCHAR2
-   IS
-      retval   VARCHAR2 (30) := 'NM_ONA_' || p_nit || '_SDO';
-   BEGIN
-      RETURN retval;
-   END;
-
---
--------------------------------------------------------------------------------------------------------
---
-   FUNCTION get_inv_spatial_table (p_nit IN nm_inv_types.nit_inv_type%TYPE)
-      RETURN VARCHAR2
-   IS
-      retval   VARCHAR2 (30) := 'NM_NIT_' || p_nit || '_SDO';
-   BEGIN
-      RETURN retval;
-   END;
-
---
--------------------------------------------------------------------------------------------------------
---
-/*
-function get_inv_spatial_seq( p_nit in nm_inv_types.nit_inv_type%type ) return varchar2 is
-retval varchar2(30) := 'NM_NIT_'||p_nit||'_SDO_SEQ';
-begin
-  return retval;
-end;
-
--------------------------------------------------------------------------------------------------------
-
-function get_nlt_spatial_seq( p_nlt_id in nm_linear_types.nlt_id%type )return varchar2 is
-l_nlt  nm_linear_types%rowtype;
-retval varchar2(30);
-begin
-  l_nlt := nm3get.get_nlt( p_nlt_id );
-  retval :=  'NM_NLT_'||l_nlt.nlt_nt_type||'_'||l_nlt.nlt_gty_type||'_SDO_SEQ';
-  return retval;
-end;
-*/
--------------------------------------------------------------------------------------------------------
-   PROCEDURE create_spatial_table (
-      p_table               IN   VARCHAR2,
-      p_mp_flag             IN   BOOLEAN DEFAULT FALSE,
-      p_start_date_column   IN   VARCHAR2 DEFAULT NULL,
-      p_end_date_column     IN   VARCHAR2 DEFAULT NULL
-   )
-   IS
-      cur_string            VARCHAR2 (2000);
-      con_string            VARCHAR2 (2000);
-      uk_string             VARCHAR2 (2000);
-      l_start_date_column   VARCHAR2 (30);
-      l_end_date_column     VARCHAR2 (30);
-      b_use_history         BOOLEAN;
-   BEGIN
-      --
-      IF p_start_date_column IS NOT NULL
-      THEN
-         l_start_date_column := p_start_date_column;
-      END IF;
-
-      --
-      IF p_end_date_column IS NOT NULL
-      THEN
-         l_end_date_column := p_end_date_column;
-      END IF;
-
-      --
---      Nm_Debug.DEBUG ('In create spatial table');
-      --
-      b_use_history :=
-             l_start_date_column IS NOT NULL AND l_end_date_column IS NOT NULL;
-
-      IF p_mp_flag
-      THEN
-         IF Nm3sdo.use_surrogate_key = 'N'
-         THEN
-            IF b_use_history
-            THEN
-               cur_string :=
-                     'create table '
-                  || p_table
-                  || ' ( ne_id number(38) not null, '
-                  || '   geoloc mdsys.sdo_geometry not null,'
-                  || '   '
-                  || l_start_date_column
-                  || ' date, '
-                  || l_end_date_column
-                  || ' date, '
-                  || 'date_created date, date_modified date,'
-                  || '   modified_by varchar2(30), created_by varchar2(30) )';
-               con_string :=
-                     'alter table '
-                  || p_table
-                  || ' ADD CONSTRAINT '
-                  || p_table
-                  || '_PK PRIMARY KEY '
-                  || ' ( ne_id, '
-                  || l_start_date_column
-                  || ' start_date )';
-            ELSE
-               cur_string :=
-                     'create table '
-                  || p_table
-                  || ' ( ne_id number(38) not null, '
-                  || '   geoloc mdsys.sdo_geometry not null,'
-                  || '   date_created date, date_modified date,'
-                  || '   modified_by varchar2(30), created_by varchar2(30) )';
-               con_string :=
-                     'alter table '
-                  || p_table
-                  || ' ADD CONSTRAINT '
-                  || p_table
-                  || '_PK PRIMARY KEY '
-                  || ' ( ne_id )';
-            END IF;
-
-            EXECUTE IMMEDIATE cur_string;
-
-            EXECUTE IMMEDIATE con_string;
-         ELSE   -- surrogate key = Y
-            IF b_use_history
-            THEN
-               cur_string :=
-                     'create table '
-                  || p_table
-                  || ' ( objectid number(38) not null, '
-                  || '   ne_id number(38) not null, '
-                  || '   geoloc mdsys.sdo_geometry not null,'
-                  || '   '
-                  || l_start_date_column
-                  || ' date, '
-                  || '   '
-                  || l_end_date_column
-                  || ' date, date_created date, date_modified date,'
-                  || '   modified_by varchar2(30), created_by varchar2(30) )';
-               con_string :=
-                     'alter table '
-                  || p_table
-                  || ' ADD CONSTRAINT '
-                  || p_table
-                  || '_PK PRIMARY KEY '
-                  || ' ( ne_id, '
-                  || l_start_date_column
-                  || ' )';
-            ELSE  -- no history
-               cur_string :=
-                     'create table '
-                  || p_table
-                  || ' ( objectid number(38) not null, '
-                  || '   ne_id number(38) not null, '
-                  || '   geoloc mdsys.sdo_geometry not null,'
-                  || '   date_created date, date_modified date,'
-                  || '   modified_by varchar2(30), created_by varchar2(30) )';
-               con_string :=
-                     'alter table '
-                  || p_table
-                  || ' ADD CONSTRAINT '
-                  || p_table
-                  || '_PK PRIMARY KEY '
-                  || ' ( ne_id )';
-            END IF; -- history
-
-            uk_string :=
-                  'alter table '
-               || p_table
-               || ' ADD ( CONSTRAINT '
-               || p_table
-               || '_UK UNIQUE '
-               || ' (objectid))';
---            Nm_Debug.DEBUG (cur_string);
---            Nm_Debug.DEBUG (con_string);
---            Nm_Debug.DEBUG (uk_string);
-
-            EXECUTE IMMEDIATE cur_string;
-
-            EXECUTE IMMEDIATE con_string;
-
---          EXECUTE IMMEDIATE uk_string;
-         END IF;
-      ELSE --single part - assumed multi-row
-         IF Nm3sdo.use_surrogate_key = 'N'
-         THEN
-            IF b_use_history
-            THEN
-               cur_string :=
-                     'create table '
-                  || p_table
-                  || ' ( ne_id number(38) not null, '
-                  || '   ne_id_of number(9) not null, '
-                  || '   nm_begin_mp number not null, '
-                  || '   nm_end_mp number not null, '
-                  || '   geoloc mdsys.sdo_geometry not null,'
-                  || '   '
-                  || l_start_date_column
-                  || ' date, '
-                  || l_end_date_column
-                  || ' date, date_created date, date_modified date,'
-                  || '   modified_by varchar2(30), created_by varchar2(30) )';
-            ELSE -- no history
-               cur_string :=
-                     'create table '
-                  || p_table
-                  || ' ( ne_id number(38) not null, '
-                  || '   ne_id_of number(9) not null, '
-                  || '   nm_begin_mp number not null, '
-                  || '   nm_end_mp number not null, '
-                  || '   geoloc mdsys.sdo_geometry not null,'
-                  || '   date_created date, date_modified date,'
-                  || '   modified_by varchar2(30), created_by varchar2(30) )';
-            END IF; --history
-
-            EXECUTE IMMEDIATE cur_string;
-         ELSE -- surrogate key = Y
-            IF b_use_history
-            THEN
-               cur_string :=
-                     'create table '
-                  || p_table
-                  || ' ( objectid number(38) not null, '
-                  || '   ne_id number(38) not null, '
-                  || '   ne_id_of number(9) not null, '
-                  || '   nm_begin_mp number not null, '
-                  || '   nm_end_mp number not null, '
-                  || '   geoloc mdsys.sdo_geometry not null,'
-                  || '   '
-                  || l_start_date_column
-                  || ' date, '
-                  || l_end_date_column
-                  || ' date, date_created date, date_modified date,'
-                  || '   modified_by varchar2(30), created_by varchar2(30) )';
-            ELSE --no history
-               cur_string :=
-                     'create table '
-                  || p_table
-                  || ' ( objectid number(38) not null, '
-                  || '   ne_id number(38) not null, '
-                  || '   ne_id_of number(9) not null, '
-                  || '   nm_begin_mp number not null, '
-                  || '   nm_end_mp number not null, '
-                  || '   geoloc mdsys.sdo_geometry not null,'
-                  || '   date_created date, date_modified date,'
-                  || '   modified_by varchar2(30), created_by varchar2(30) )';
-            END IF; --history
-
-            EXECUTE IMMEDIATE cur_string;
-         END IF; -- surrogate key
-
-         IF b_use_history
-         THEN
-            cur_string :=
-                  'alter table '
-               || p_table
-               || ' ADD CONSTRAINT '
-               || p_table
-               || '_PK PRIMARY KEY '
-               || ' ( ne_id, ne_id_of, nm_begin_mp, '
-               || l_start_date_column
-               || ' )';
-         ELSE
-            cur_string :=
-                  'alter table '
-               || p_table
-               || ' ADD CONSTRAINT '
-               || p_table
-               || '_PK PRIMARY KEY '
-               || ' ( ne_id, ne_id_of, nm_begin_mp )';
-         END IF;
-
-         EXECUTE IMMEDIATE cur_string;
-
-         IF Nm3sdo.use_surrogate_key = 'Y'
-         THEN
-            cur_string :=
-                  'alter table '
-               || p_table
-               || ' ADD ( CONSTRAINT '
-               || p_table
-               || '_UK UNIQUE '
-               || ' ( objectid ))';
-
-          EXECUTE IMMEDIATE cur_string;
-
-         END IF; -- surrogate key
-
-         cur_string := 'create index '|| p_table
-                    || '_NW_IDX'|| ' on '|| p_table|| ' ( ne_id_of, nm_begin_mp )';
-
-         EXECUTE IMMEDIATE cur_string;
-
-      END IF; --single-part or multi-part
-   --
-   END create_spatial_table;
-
---
--------------------------------------------------------------------------------------------------------------------------------------
---
-   PROCEDURE create_spatial_date_view (
-      p_table            IN   VARCHAR2,
-      p_start_date_col   IN   VARCHAR2 DEFAULT NULL,
-      p_end_date_col     IN   VARCHAR2 DEFAULT NULL
-   )
-   IS
-      cur_string         VARCHAR2 (2000);
-      l_start_date_col   VARCHAR2 (30)   := 'start_date';
-      l_end_date_col     VARCHAR2 (30)   := 'end_date';
-   BEGIN
-      --
-      IF p_start_date_col IS NOT NULL
-      THEN
-         l_start_date_col := p_start_date_col;
-      END IF;
-
-      IF p_end_date_col IS NOT NULL
-      THEN
-         l_end_date_col := p_end_date_col;
-      END IF;
-
-      --
-      cur_string :=
-            'create or replace force view v_'
-         || p_table
-         || ' as select * from '
-         || p_table
-         || ' where  '
-         || l_start_date_col
-         || ' <= (select Sys_Context(''NM3CORE'',''APPLICATION_OWNER'') from dual) '
-         || ' and  NVL('
-         || l_end_date_col
-         || ',TO_DATE('
-         || qq
-         || '99991231'
-         || qq
-         || ','
-         || qq
-         || 'YYYYMMDD'
-         || qq
-         || ')) > (select Sys_Context(''NM3CORE'',''APPLICATION_OWNER'') from dual)';
-      --
-      -- AE 23-SEP-2008
-      -- We will now use views instead of synonyms to provide subordinate user access
-      -- to spatial objects
-      -- CWS 0108742 Change back to using synonyms
-      Nm3ddl.create_object_and_syns( 'V_'||p_table, cur_string );
-      --nm3ddl.create_object_and_views ('V_'||p_table, cur_string);
-   --
-   EXCEPTION
-      WHEN OTHERS
-      THEN
---         Nm_Debug.DEBUG (cur_string);
-         RAISE;
-   --RAISE_APPLICATION_ERROR (-20201,'Error creating spatial date view '||p_table);
-   END;
-
---
--------------------------------------------------------------------------------------------------------------------------------------
---
-   PROCEDURE create_inv_spatial_idx (
-      p_nit     IN   nm_inv_types.nit_inv_type%TYPE,
-      p_table   IN   VARCHAR2
-   )
-   IS
---bug in oracle 8 - spatial index name can only be 18 chars
-      cur_string   VARCHAR2 (2000);
-   BEGIN
-      cur_string :=
-            'create index NIT_'
-         || p_nit
-         || '_spidx on '
-         || p_table
-         || ' ( geoloc ) indextype is mdsys.spatial_index'
-         || ' parameters ('
-         || ''''
-         || 'sdo_indx_dims=2'
-         || ''''
-         || ')';
-
-/*
-  if substr(nm3context.get_context(nm3context.get_namespace, 'DB_VERSION'), 1, 1 ) = '8' then
-    cur_string := cur_string||' parameters ('||''''||'sdo_level=6'||''''||')';
-  end if;
-*/
---  nm_debug.debug_on;
---  nm_debug.debug( cur_string );
---  nm_debug.debug_off;
-
-      EXECUTE IMMEDIATE cur_string;
-   END;
---
--------------------------------------------------------------------------------------------------------------------------------------
---
-   PROCEDURE create_ona_spatial_idx (
-      p_nit     IN   nm_inv_types.nit_inv_type%TYPE,
-      p_table   IN   VARCHAR2
-   )
-   IS
---bug in oracle 8 - spatial index name can only be 18 chars
-      cur_string   VARCHAR2 (2000);
-   BEGIN
-      cur_string :=
-            'create index ONA_'
-         || p_nit
-         || '_spidx on '
-         || p_table
-         || ' ( geoloc ) indextype is mdsys.spatial_index'
-         || ' parameters ('
-         || ''''
-         || 'sdo_indx_dims=2'
-         || ''''
-         || ')';
-      EXECUTE IMMEDIATE cur_string;
-   END;
---
--------------------------------------------------------------------------------------------------------------------------------------
---
-   FUNCTION create_inv_sdo_join_view (
-      p_nit               IN   nm_inv_types.nit_inv_type%TYPE,
-      p_table             IN   VARCHAR2
-    , p_start_date_column IN VARCHAR2 DEFAULT NULL
-    , p_end_date_column   IN VARCHAR2 DEFAULT NULL
-
-   )
-      RETURN VARCHAR2
-   IS
-      cur_string   VARCHAR2 (2000);
-      l_inv        VARCHAR2 (30);
-      l_nit        nm_inv_types%ROWTYPE   := Nm3get.get_nit (p_nit);
-      l_obj        VARCHAR2 (30);
-      s_col_list   VARCHAR2 (100)         := 's.geoloc';
-      l_start_date_column VARCHAR2(30)    := NVL(p_start_date_column,'start_date');
-      l_end_date_column   VARCHAR2(30)    := NVL(p_end_date_column,'end_date');
-   BEGIN
-    --
-      IF Nm3sdo.use_surrogate_key = 'Y'
-      THEN
-         s_col_list := 's.objectid, s.geoloc';
-      END IF;
-
-      IF Nm3sdo.single_shape_inv = 'Y' OR l_nit.nit_table_name IS NOT NULL
-      THEN
-         IF l_nit.nit_table_name IS NULL
-         THEN
-            l_inv :=
-                 Nm3inv_View.derive_inv_type_view_name (pi_inv_type      => p_nit);
-            cur_string :=
-                  'create or replace view v_'
-               || p_table
-               || '_DT as select i.*, '
-               || s_col_list
-               || '  from '
-               || l_inv
-               || ' i,'
-               || p_table
-               || ' s where i.iit_ne_id = s.ne_id '
-               || ' and s.'||l_start_date_column||' <= (select Sys_Context(''NM3CORE'',''APPLICATION_OWNER'') from dual) '
-               || ' and  NVL(s.'||l_end_date_column||',TO_DATE('
-               || qq
-               || '99991231'
-               || qq
-               || ','
-               || qq
-               || 'YYYYMMDD'
-               || qq
-               || ')) > (select Sys_Context(''NM3CORE'',''APPLICATION_OWNER'') from dual) ';
-         ELSE
-            l_inv := l_nit.nit_table_name;
-            cur_string :=
-                  'create or replace view v_'
-               || p_table
-               || '_DT as select i.*, '
-               || s_col_list
-               || ' from '
-               || l_inv
-               || ' i,'
-               || p_table
-               || ' s where i.'
-               || l_nit.nit_foreign_pk_column
-               || ' = s.ne_id '
-               || ' and s.'||l_start_date_column||' <= (select Sys_Context(''NM3CORE'',''APPLICATION_OWNER'') from dual) '
-               || ' and  NVL(s.'||l_end_date_column||',TO_DATE('
-               || qq
-               || '99991231'
-               || qq
-               || ','
-               || qq
-               || 'YYYYMMDD'
-               || qq
-               || ')) > (select Sys_Context(''NM3CORE'',''APPLICATION_OWNER'') from dual) ';
-         END IF;
-      ELSE
-         -- AE
-         -- Remove the use of Network joined Inventory view as this is NOT keypreserved.
-         -- This causes problems in Oracle Mapviewer, where it expects a keypreserved object registered
-         -- as an SDO layer. This fix would involve joining to the non-network attribute inventory view.
-         -- Downside is, we loose the extra Route attributes
-
-         --      l_inv := nm3inv_view.DERIVE_NW_INV_TYPE_VIEW_NAME( PI_INV_TYPE=>p_nit);
---
---      cur_string := 'create or replace view v_'||p_table||'_DT as select i.*, '||s_col_list||' from '||
---                     l_inv||' i,'||
---                     p_table||' s where i.iit_ne_id = s.ne_id '||
---                     ' and i.ne_id_of = s.ne_id_of '||
---                     ' and i.nm_begin_mp = s.nm_begin_mp '||
---                     ' and s.start_date <= nm3context.get_effective_date '||
---                     ' and  NVL(s.end_date,TO_DATE('||qq||'99991231'||qq||
---                            ','||qq||'YYYYMMDD'||qq||')) > nm3context.get_effective_date';
-         l_inv :=  Nm3inv_View.derive_inv_type_view_name (pi_inv_type      => p_nit);
-         cur_string :=
-               'create or replace view v_'
-            || p_table
-            || '_DT as select i.*, '
-            || s_col_list
-            || '  from '
-            || l_inv
-            || ' i,'
-            || p_table
-            || ' s where i.iit_ne_id = s.ne_id '
-            || ' and s.'||l_start_date_column||' <= (select Sys_Context(''NM3CORE'',''APPLICATION_OWNER'') from dual) '
-            || ' and  NVL(s.'||l_end_date_column||',TO_DATE('
-            || qq
-            || '99991231'
-            || qq
-            || ','
-            || qq
-            || 'YYYYMMDD'
-            || qq
-            || ')) > (select Sys_Context(''NM3CORE'',''APPLICATION_OWNER'') from dual)';
-      END IF;
-
---    execute immediate cur_string;
-
-      --Nm3ddl.create_object_and_syns ('V_' || p_table || '_DT', cur_string);
-
-      -- AE 23-SEP-2008
-      -- We will now use views instead of synonyms to provide subordinate user access
-      -- to spatial objects
-      --nm3ddl.create_object_and_views ('V_'||p_table||'_DT', cur_string);
-      -- CWS 0108742 Change back to using synonyms
-      Nm3ddl.create_object_and_syns( 'V_'||p_table||'_DT', cur_string );
-      
-      RETURN 'V_' || p_table || '_DT';
-
-   END;
-
---
--------------------------------------------------------------------------------------------------------------------------------------
---
-   FUNCTION get_nlt_spatial_table (p_nlt IN NM_LINEAR_TYPES%ROWTYPE)
-      RETURN VARCHAR2
-   IS
-      retval   VARCHAR2 (30);
-   BEGIN
-      retval := 'NM_NLT_' || p_nlt.nlt_nt_type;
-
-      IF p_nlt.nlt_gty_type IS NOT NULL
-      THEN
-         retval := retval || '_' || p_nlt.nlt_gty_type;
-      END IF;
-
-      retval := retval || '_SDO';
-      RETURN retval;
-   END;
-
---
--------------------------------------------------------------------------------------------------------------------------------------
---
-   FUNCTION get_nt_spatial_table (
-      p_nt_type    IN   NM_TYPES.nt_type%TYPE,
-      p_gty_type   IN   nm_group_types.ngt_group_type%TYPE DEFAULT NULL
-   )
-      RETURN VARCHAR2
-   IS
-      retval   VARCHAR2 (30);
-   BEGIN
-      retval := 'NM_NLT_' || p_nt_type;
-
-      IF p_gty_type IS NOT NULL
-      THEN
-         retval := retval || '_' || p_gty_type;
-      END IF;
-
-      retval := retval || '_SDO';
-      RETURN retval;
-   END;
-
---
--------------------------------------------------------------------------------------------------------------------------------------
---
-   FUNCTION get_nt_view_name (
-      p_nt_type    IN   NM_TYPES.nt_type%TYPE,
-      p_gty_type   IN   nm_group_types.ngt_group_type%TYPE
-   )
-      RETURN VARCHAR2
-   IS
-   BEGIN
-      IF p_gty_type IS NOT NULL
-      THEN
-        RETURN 'V_NM_' || p_nt_type ||'_'|| p_gty_type|| '_NT';
-      ELSE
-        RETURN 'V_NM_' || p_nt_type || '_NT';
-      END IF;
-   END;
-
---
--------------------------------------------------------------------------------------------------------------------------------------
---
-   PROCEDURE create_nlt_spatial_idx (
-      p_nlt     IN   NM_LINEAR_TYPES%ROWTYPE,
-      p_table   IN   VARCHAR2
-   )
-   IS
---bug in oracle 8 - spatial index name can only be 18 chars
---best kept to a quadtree in Oracle 8, Rtree in 9i
-      cur_string   VARCHAR2 (2000);
-   BEGIN
-      cur_string :=
-            'create index NLT_'
-         || p_nlt.nlt_nt_type
-         || '_'
-         || p_nlt.nlt_gty_type
-         || '_spidx on '
-         || p_table
-         || ' ( geoloc ) indextype is mdsys.spatial_index';               --||
-
---                ' parameters ('||''''||'sdo_level=6'||''''||')';
-
-      /*
-  if substr(nm3context.get_context(nm3context.get_namespace, 'DB_VERSION'), 1, 1 ) = '8' then
-    cur_string := cur_string||' parameters ('||''''||'sdo_level=6'||''''||')';
-  end if;
-*/
-      EXECUTE IMMEDIATE cur_string;
-   END;
-
---
--------------------------------------------------------------------------------------------------------------------------------------
---
-      FUNCTION create_nlt_sdo_join_view (
-      p_nlt     IN   NM_LINEAR_TYPES%ROWTYPE,
-      p_table   IN   VARCHAR2
-   )
-      RETURN VARCHAR2
-   IS
-      cur_string   VARCHAR2 (2000);
-      s_col_list   VARCHAR2 (100)  := 's.geoloc';
-   BEGIN
-      IF Nm3sdo.use_surrogate_key = 'Y'
-      THEN
-         s_col_list := 's.objectid, s.geoloc';
-      END IF;
-
-      cur_string :=
-            'create or replace view v_'
-         || p_table
-         || '_DT as select n.*, '
-         || s_col_list
-         || ' from '
-         || ' V_NM_'
-         || p_nlt.nlt_nt_type
-         || '_'
-         || p_nlt.nlt_gty_type
-         || '_NT'
-         || ' n,'
-         || p_table
-         || ' s where n.ne_id = s.ne_id '
-         || ' and s.start_date <= (select Sys_Context(''NM3CORE'',''APPLICATION_OWNER'') from dual) '
-         || ' and  NVL(s.end_date,TO_DATE('
-         || qq
-         || '99991231'
-         || qq
-         || ','
-         || qq
-         || 'YYYYMMDD'
-         || qq
-         || ')) > (select Sys_Context(''NM3CORE'',''APPLICATION_OWNER'') from dual)';
-
---      IF p_nlt.nlt_gty_type IS NOT NULL
---      THEN
---         cur_string :=
---               cur_string
---            || ' and n.ne_gty_group_type = '
---            || ''''
---            || p_nlt.nlt_gty_type
---            || '''';
---      END IF;
-
---         Nm_Debug.debug_on;
---         Nm_Debug.DEBUG( cur_string );
---      Nm3ddl.create_object_and_syns ('V_' || p_table || '_DT', cur_string);
-
-      -- AE 23-SEP-2008
-      -- We will now use views instead of synonyms to provide subordinate user access
-      -- to spatial objects
-      --nm3ddl.create_object_and_views ('V_'||p_table||'_DT', cur_string);
-      -- CWS 0108742 Change back to using synonyms
-      Nm3ddl.create_object_and_syns( 'V_'||p_table||'_DT', cur_string );
---  execute immediate cur_string;
-  --   nm_debug.debug_off;
-      RETURN 'V_' || p_table || '_DT';
-   END;
-
---
----------------------------------------------------------------------------------------------------
---
-   FUNCTION inv_has_shape (
-      p_ne_id      IN   nm_elements.ne_id%TYPE,
-      p_obj_type   IN   nm_members.nm_obj_type%TYPE
-   )
-      RETURN BOOLEAN
-   IS
-      CURSOR c_inv (c_nit_type IN nm_inv_types.nit_inv_type%TYPE)
-      IS
-         SELECT a.nith_nth_theme_id nth_theme_id
-           FROM NM_INV_THEMES a
-          WHERE a.nith_nit_id = c_nit_type;
-
-      nthrec       NM_THEMES_ALL%ROWTYPE;
-      rcur         Nm3type.ref_cursor;
-      cur_string   VARCHAR2 (2000);
-      dummy        INTEGER;
-      retval       BOOLEAN                 := FALSE;
-   BEGIN
-      FOR irec IN c_inv (p_obj_type)
-      LOOP
-         nthrec := get_nth (irec.nth_theme_id);
-
-         IF Nm3ddl.does_object_exist
-                                   (p_object_name      => nthrec.nth_feature_table)
-         THEN
-            cur_string :=
-                  'select 1 from '
-               || nthrec.nth_feature_table
-               || ' where '
-               || nthrec.nth_feature_pk_column
-               || ' = :ne_val';
-
-            OPEN rcur FOR cur_string USING p_ne_id;
-
-            FETCH rcur
-             INTO dummy;
-
-            IF rcur%FOUND
-            THEN
-               retval := TRUE;
-               EXIT;
-            END IF;
-         END IF;
-      END LOOP;
-
-      RETURN retval;
-   END;
-
---
----------------------------------------------------------------------------------------------------
---
-   FUNCTION nlt_has_shape (
-      p_ne_id    IN   nm_elements.ne_id%TYPE,
-      p_nlt_id   IN   NM_LINEAR_TYPES.nlt_id%TYPE
-   )
-      RETURN BOOLEAN
-   IS
-      CURSOR c_nlt (c_nlt_id IN NM_LINEAR_TYPES.nlt_id%TYPE)
-      IS
-         SELECT nnth.nnth_nth_theme_id nth_theme_id
-           FROM NM_NW_THEMES nnth
-          WHERE nnth.nnth_nlt_id = c_nlt_id;
-
-      nthrec       NM_THEMES_ALL%ROWTYPE;
-      rcur         Nm3type.ref_cursor;
-      cur_string   VARCHAR2 (2000);
-      dummy        INTEGER;
-      retval       BOOLEAN                 := FALSE;
-   BEGIN
-      FOR irec IN c_nlt (p_nlt_id)
-      LOOP
-         nthrec := get_nth (irec.nth_theme_id);
-
-         IF Nm3ddl.does_object_exist
-                                   (p_object_name      => nthrec.nth_feature_table)
-         THEN
-            cur_string :=
-                  'select 1 from '
-               || nthrec.nth_feature_table
-               || ' where '
-               || nthrec.nth_feature_pk_column
-               || ' = :ne_val';
-
-            OPEN rcur FOR cur_string USING p_ne_id;
-
-            FETCH rcur
-             INTO dummy;
-
-            IF rcur%FOUND
-            THEN
-               retval := TRUE;
-               EXIT;
-            END IF;
-         END IF;
-      END LOOP;
-
-      RETURN retval;
-   END;
-
---
----------------------------------------------------------------------------------------------------
---
-   FUNCTION area_has_shape (
-      p_ne_id    IN   nm_elements.ne_id%TYPE,
-      p_nat_id   IN   NM_AREA_TYPES.nat_id%TYPE
-   )
-      RETURN BOOLEAN
-   IS
-      CURSOR c_nat (c_nat_id IN NM_AREA_TYPES.nat_id%TYPE)
-      IS
-         SELECT nath.nath_nth_theme_id nth_theme_id
-           FROM NM_AREA_THEMES nath
-          WHERE nath.nath_nat_id = c_nat_id;
-
-      nthrec       NM_THEMES_ALL%ROWTYPE;
-      rcur         Nm3type.ref_cursor;
-      cur_string   VARCHAR2 (2000);
-      dummy        INTEGER;
-      retval       BOOLEAN                 := FALSE;
-   BEGIN
-      FOR irec IN c_nat (p_nat_id)
-      LOOP
-         nthrec := get_nth (irec.nth_theme_id);
-
-         IF Nm3ddl.does_object_exist
-                                   (p_object_name      => nthrec.nth_feature_table)
-         THEN
-            cur_string :=
-                  'select 1 from '
-               || nthrec.nth_feature_table
-               || ' where '
-               || nthrec.nth_feature_pk_column
-               || ' = :ne_val';
-
-            OPEN rcur FOR cur_string USING p_ne_id;
-
-            FETCH rcur
-             INTO dummy;
-
-            IF rcur%FOUND
-            THEN
-               retval := TRUE;
-               EXIT;
-            END IF;
-         END IF;
-      END LOOP;
-
-      RETURN retval;
-   END;
-
---
----------------------------------------------------------------------------------------------------
---
-   FUNCTION datum_has_shape (p_ne_id IN nm_elements.ne_id%TYPE)
-      RETURN BOOLEAN
-   IS
-      lnerec       nm_elements%ROWTYPE     := Nm3get.get_ne (p_ne_id);
-
-      CURSOR c_nlt (c_ne_nt_type IN NM_TYPES.nt_type%TYPE)
-      IS
-         SELECT nnth.nnth_nth_theme_id nth_theme_id
-           FROM NM_NW_THEMES nnth, NM_LINEAR_TYPES
-          WHERE nnth.nnth_nlt_id = nlt_id AND nlt_nt_type = c_ne_nt_type;
-
-      nthrec       NM_THEMES_ALL%ROWTYPE;
-      rcur         Nm3type.ref_cursor;
-      cur_string   VARCHAR2 (2000);
-      dummy        INTEGER;
-      retval       BOOLEAN                 := FALSE;
-   BEGIN
-      FOR irec IN c_nlt (lnerec.ne_nt_type)
-      LOOP
-         nthrec := get_nth (irec.nth_theme_id);
-
-         IF Nm3ddl.does_object_exist
-                                   (p_object_name      => nthrec.nth_feature_table)
-         THEN
-            cur_string :=
-                  'select 1 from '
-               || nthrec.nth_feature_table
-               || ' where '
-               || nthrec.nth_feature_pk_column
-               || ' = :ne_val';
-
-            OPEN rcur FOR cur_string USING p_ne_id;
-
-            FETCH rcur
-             INTO dummy;
-
-            IF rcur%FOUND
-            THEN
-               retval := TRUE;
-               EXIT;
-            END IF;
-         END IF;
-      END LOOP;
-
-      RETURN retval;
-   END;
-
---
----------------------------------------------------------------------------------------------------
---
-   FUNCTION has_shape (
-      p_ne_id      IN   nm_elements.ne_id%TYPE,
-      p_obj_type   IN   nm_members.nm_obj_type%TYPE,
-      p_type       IN   nm_members.nm_type%TYPE DEFAULT 'I'
-   )
-      RETURN BOOLEAN
-   IS
-      l_nlt_id   NM_LINEAR_TYPES.nlt_id%TYPE;
-      l_nat_id   NM_AREA_TYPES.nat_id%TYPE;
-      retval     BOOLEAN                       := FALSE;
-   BEGIN
-      IF p_type = 'I'
-      THEN
-         retval := inv_has_shape (p_ne_id, p_obj_type);
-      ELSIF p_type = 'G'
-      THEN
-         l_nlt_id := get_nlt_id_from_gty (p_obj_type);
-
-         IF l_nlt_id IS NOT NULL
-         THEN
-            retval := nlt_has_shape (p_ne_id, l_nlt_id);
-         ELSE
-            l_nat_id := get_nat_id_from_gty (p_obj_type);
-
-            IF l_nat_id IS NOT NULL
-            THEN
-               retval := area_has_shape (p_ne_id, l_nat_id);
-            END IF;
-         END IF;
-      ELSIF p_type = 'G' OR p_type = 'P'
-      THEN   -- just a group of elements or group of groups - could be an area
-         NULL;
-      ELSIF p_type = 'D'
-      THEN                                                            -- datum
-         retval := datum_has_shape (p_ne_id);
-      END IF;
-
-      RETURN retval;
-   END;
---
----------------------------------------------------------------------------------------------------
---
-   PROCEDURE set_obj_shape_end_date (
-      p_obj_type   IN   nm_members.nm_obj_type%TYPE,
-      p_ne_id      IN   nm_members.nm_ne_id_in%TYPE,
-      p_end_date   IN   nm_members.nm_start_date%TYPE
-   )
-   IS
-      cur_string   VARCHAR2 (2000);
-   BEGIN
-      cur_string :=
-            'update '
-         || get_inv_spatial_table (p_obj_type)
-         || ' set end_date = :p_end_date '
-         || ' where ne_id = :ne ';
-
-      EXECUTE IMMEDIATE cur_string
-                  USING p_end_date, p_ne_id;
-   END;
-
---
------------------------------------------------------------------------------
---
-   PROCEDURE insert_obj_shape (
-      p_obj_type     IN   nm_members.nm_obj_type%TYPE,
-      p_ne_id        IN   nm_members.nm_ne_id_in%TYPE,
-      p_start_date   IN   nm_members.nm_start_date%TYPE,
-      p_end_date     IN   nm_members.nm_start_date%TYPE DEFAULT NULL,
-      p_geom         IN   MDSYS.SDO_GEOMETRY
-   )
-   IS
-      cur_string   VARCHAR2 (2000);
-   BEGIN
-      cur_string :=
-            'insert into '
-         || get_inv_spatial_table (p_obj_type)
-         || ' ( ne_id, geoloc, start_date, end_date )'
-         || ' values ( :p_ne_id, :p_geom, :p_start_date, :p_end_date )';
-
-      EXECUTE IMMEDIATE cur_string
-                  USING p_ne_id, p_geom, p_start_date, p_end_date;
-   EXCEPTION
-      WHEN DUP_VAL_ON_INDEX
-      THEN
-         cur_string :=
-               'delete from '
-            || get_inv_spatial_table (p_obj_type)
-            || ' where ne_id = :p_ne_id and start_date = :p_start_date';
-
-         EXECUTE IMMEDIATE cur_string
-                     USING p_ne_id, p_start_date;
-
-         cur_string :=
-               'insert into '
-            || get_inv_spatial_table (p_obj_type)
-            || ' ( ne_id, geoloc, start_date, end_date )'
-            || ' values ( :p_ne_id, :p_geom, :p_start_date, :p_end_date )';
-
-         EXECUTE IMMEDIATE cur_string
-                     USING p_ne_id, p_geom, p_start_date, p_end_date;
-   END;
-
---
----------------------------------------------------------------------------------------------------
---
-/*
-   PROCEDURE process_inv_sdo_data_ne (
-      p_ne_id   IN   nm_members.nm_ne_id_of%TYPE,
-      p_date    IN   DATE
-   )
-   IS
--- This process is designed to handle all asset changes after re-shape
---
-      CURSOR c1 (c_ne_id IN nm_members.nm_ne_id_of%TYPE)
-      IS                 --cursor to retrieve all affected inventory objects
-         SELECT nm_ne_id_in, nm_obj_type, nit_pnt_or_cont, nm_begin_mp
-           FROM nm_members_all, nm_inv_types, nm_inv_themes
-          WHERE nm_obj_type = nit_inv_type
-            AND nit_inv_type = nith_nit_id
-            AND nm_ne_id_of = c_ne_id;
-
-      CURSOR c2 (c_obj_type nm_members.nm_obj_type%TYPE)
-      IS
-         SELECT nth_base_theme
-           FROM nm_themes_all, nm_inv_themes a
-          WHERE a.nith_nth_theme_id = nth_theme_id
-            AND a.nith_nit_id = c_obj_type
-            AND nth_feature_table = get_inv_spatial_table (c_obj_type);
-
-      l_effective_date   DATE               := To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY');
-      l_geom             MDSYS.SDO_GEOMETRY;
-   BEGIN
-      --   nm_debug.debug_on;
-      --   nm_debug.delete_debug(true);
-      --   nm_debug.debug('Processing the sdo data');
-      FOR irec IN c1 (p_ne_id)
-      LOOP
---   nm3user.set_effective_date( irec.nm_start_date );
-
-         --   the object has changed by date or by location - end date the shape
-
-         --   nm_debug.debug('End-date the previous shape');
-         set_obj_shape_end_date (irec.nm_obj_type, irec.nm_ne_id_in, p_date);
-
-         --   nm_debug.debug('Affected object '||irec.nm_obj_type||' Id - '||to_char(irec.nm_ne_id_in) );
-         FOR jrec IN c2 (irec.nm_obj_type)
-         LOOP
-            --   nm_debug.debug('get new object shape'||irec.nm_obj_type||' Id - '||to_char(irec.nm_ne_id_in) );
-            IF irec.nit_pnt_or_cont = 'P'
-            THEN
-               l_geom :=
-                  nm3sdo.get_pt_shape_from_ne (jrec.nth_base_theme,
-                                               irec.nm_ne_id_in,
-                                               p_ne_id,
-                                               irec.nm_begin_mp
-                                              );
-            ELSE
-               l_geom :=
-                  nm3sdo.get_shape_from_ne (jrec.nth_base_theme,
-                                            irec.nm_ne_id_in
-                                           );
-            END IF;
-
-            IF l_geom IS NOT NULL
-            THEN
-               --   nm_debug.debug('Insert new object shape'||irec.nm_obj_type||' Id - '||to_char(irec.nm_ne_id_in) );
-               insert_obj_shape (irec.nm_obj_type,
-                                 irec.nm_ne_id_in,
-                                 p_date,
-                                 NULL,
-                                 l_geom
+Function Get_Datum_Layer_From_Route (
+                                    p_Ne_Id In Nm_Elements.Ne_Id%Type
+                                    )  Return Nm_Theme_Array
+Is
+Begin
+  Return Get_Datum_Layer_From_Gty
+                                (Nm3Get.Get_Ne (p_Ne_Id).Ne_Gty_Group_Type
                                 );
-            END IF;
-         END LOOP;
-      END LOOP;
-   END;
-*/
+End Get_Datum_Layer_From_Route;
+--
+---------------------------------------------------------------------------------------------------
+--
+Function Get_Datum_Layer_From_Nlt (
+                                  p_Nlt_Id In Nm_Linear_Types.Nlt_Id%Type
+                                  )  Return Nm_Theme_Array
+Is
+  Nltrow   Nm_Linear_Types%Rowtype   := Nm3Get.Get_Nlt (p_Nlt_Id);
+Begin
+  Return Get_Datum_Layer_From_Gty (Nltrow.Nlt_Gty_Type);
+End Get_Datum_Layer_From_Nlt;
+--
+---------------------------------------------------------------------------------------------------
+--
+Function Element_Exists_In_Theme  (
+                                  p_Ne_Id               In   Nm_Elements.Ne_Id%Type,
+                                  p_Feature_Table       In   Varchar2,
+                                  p_Feature_Fk_Column   In   Varchar2
+                                  ) Return Boolean
+Is
+  Type Curtyp Is Ref Cursor;
+
+  In_Theme     Curtyp;
+  Cur_String   Varchar2 (2000)
+     :=    'select 1 from '
+        || P_Feature_Table
+        || ' where '
+        || P_Feature_Fk_Column
+        || ' = :c_ne_id';
+  l_Dummy      Number;
+  Retval       Boolean;
+Begin
+  Open In_Theme For Cur_String Using p_Ne_Id;
+
+  Fetch In_Theme
+  Into  l_Dummy;
+
+  Retval := In_Theme%Found;
+
+  Close In_Theme;
+
+  Return Retval;
+End Element_Exists_In_Theme;
+--
+-------------------------------------------------------------------------------------------------------------------------------------
+--
+Function Prevent_Operation  (
+                            p_Ne_Id In Nm_Elements.Ne_Id%Type
+                            ) Return Boolean
+Is
+  Retval   Boolean := False;
+--
+Begin
+  -- look for an independent SDE theme for this network type
+  For Irec In (
+              Select  Nth.Nth_Theme_Id,
+                      Nth.Nth_Feature_Table,
+                      Nth.Nth_Feature_Fk_Column
+              From    Nm_Nw_Themes      Nwt,
+                      Nm_Elements_All   Ne,
+                      Nm_Themes_All     Nth,
+                      Nm_Linear_Types   Nlt
+              Where   Ne.Ne_Id              =   p_Ne_Id
+              And     Nwt.Nnth_Nlt_Id       =   Nlt.Nlt_Id
+              And     Nwt.Nnth_Nth_Theme_Id =   Nth.Nth_Theme_Id
+              And     Nlt.Nlt_Nt_Type       =   Ne.Ne_Nt_Type
+              And     Decode (Nlt.Nlt_G_I_D,
+                             'D', 'NOT_USED',
+                             'G', Ne.Ne_Gty_Group_Type
+                              )             
+                      =
+                      Decode (Nlt.Nlt_G_I_D,
+                             'D', 'NOT_USED',
+                             'G', Nlt.Nlt_Gty_Type
+                             )
+              And     Nth.Nth_Theme_Type  = 'SDE'
+              And     Nth.Nth_Storage     = 'S'
+              And     Nth.Nth_Dependency  = 'I'
+              )
+  Loop
+    If Element_Exists_In_Theme (
+                               p_Ne_Id                  => p_Ne_Id,
+                               p_Feature_Table          => Irec.Nth_Feature_Table,
+                               p_Feature_Fk_Column      => Irec.Nth_Feature_Fk_Column
+                               )  Then
+      Retval := True;
+      Exit;
+    End If;
+  End Loop;
+
+  Return Retval;
+End Prevent_Operation;
+
+--
+-------------------------------------------------------------------------------------------------------------------------------------
+--
+Procedure Remove_Element_Shapes (
+                                p_Ne_Id In Nm_Elements.Ne_Id%Type
+                                )
+Is
+--
+Begin
+  --
+  For Irec In (
+              Select  nta.Nth_Theme_Id,
+                      nta.Nth_Feature_Table,
+                      nta.Nth_Feature_Pk_Column
+              From    Nm_Themes_All     nta,
+                      Nm_Nw_Themes      nnt,
+                      Nm_Linear_Types   nlt,
+                      Nm_Elements       ne
+              Where   nlt.Nlt_Id                              =   nnt.Nnth_Nlt_Id
+              And     nta.Nth_Theme_Id                        =   nnt.Nnth_Nth_Theme_Id
+              And     nlt.Nlt_Nt_Type                         =   ne.Ne_Nt_Type
+              And     Nvl (nlt.Nlt_Gty_Type, Nm3Type.Get_Nvl) =   Nvl (ne.Ne_Gty_Group_Type, Nm3Type.Get_Nvl)
+              And     ne.Ne_Id                                =   p_Ne_Id
+              ) 
+  Loop
+     --
+     Execute Immediate    'DELETE FROM '
+                       || Irec.Nth_Feature_Table
+                       || ' WHERE '
+                       || Irec.Nth_Feature_Pk_Column
+                       || ' = :ne_id'
+                 Using p_Ne_Id;
+  End Loop;
+  --
+End Remove_Element_Shapes;
+--
+-------------------------------------------------------------------------------------------------------------------------------------
+--
+Procedure Regenerate_Affected_Shapes  (
+                                      p_Nm_Type       In   Nm_Members.Nm_Type%Type,
+                                      p_Nm_Obj_Type   In   Nm_Members.Nm_Obj_Type%Type,
+                                      p_Ne_Id         In   Nm_Elements.Ne_Id%Type
+                                      )
+Is
+  Inv_Upd   Varchar2 (2000)
+     :=    'update :table_name '
+        || 'set :shape_col = nm3sdm.get_shape_from_ne( :ne_id ) '
+        || 'where :ne_col = :ne_id';
+  Nw_Upd    Varchar2 (2000)
+     :=    'update :table_name '
+        || 'set :shape_col = nm3sdm.get_route_shape( :ne_id ) '
+        || 'where :ne_col = :ne_id';
+Begin
+  If P_Nm_Type = 'I'  Then
+    For Irec In (
+                Select  nta.Nth_Theme_Id,
+                        nta.Nth_Feature_Table,
+                        nta.Nth_Feature_Shape_Column,
+                        nta.Nth_Feature_Fk_Column
+                 From   Nm_Inv_Themes   nit,
+                        Nm_Themes_All   nta
+                Where   nit.Nith_Nth_Theme_Id =   nta.Nth_Theme_Id
+                And     nit.Nith_Nit_Id       =   p_Nm_Obj_Type           
+                )
+    Loop
+      Execute Immediate Inv_Upd
+                  Using Irec.Nth_Feature_Table,
+                        Irec.Nth_Feature_Shape_Column,
+                        p_Ne_Id,
+                        Irec.Nth_Feature_Fk_Column,
+                        p_Ne_Id;
+    End Loop;
+  Else
+    For Irec In  (
+                 Select  nta.Nth_Theme_Id,
+                         nta.Nth_Feature_Table,
+                         nta.Nth_Feature_Shape_Column,
+                         nta.Nth_Feature_Fk_Column
+                 From    Nm_Nw_Themes       nnt,
+                         Nm_Themes_All      nta,
+                         Nm_Linear_Types    nlt
+                 Where   nnt.Nnth_Nth_Theme_Id  =   nta.Nth_Theme_Id
+                 And     nlt.Nlt_Id             =   nnt.Nnth_Nlt_Id
+                 And     nlt.Nlt_Gty_Type       =   p_Nm_Obj_Type
+                 )
+    Loop
+      Execute Immediate Nw_Upd
+                  Using Irec.Nth_Feature_Table,
+                        Irec.Nth_Feature_Shape_Column,
+                        p_Ne_Id,
+                        Irec.Nth_Feature_Fk_Column,
+                        p_Ne_Id;
+    End Loop;
+  End If;
+End Regenerate_Affected_Shapes;
+--
+-------------------------------------------------------------------------------------------------------------------------------------
+--
+Function Get_Ona_Spatial_Table  (
+                                p_Nit In Nm_Inv_Types.Nit_Inv_Type%Type
+                                ) Return Varchar2
+Is  
+Begin
+  Return 'NM_ONA_' || p_Nit || '_SDO';
+End Get_Ona_Spatial_Table;
+--
+-------------------------------------------------------------------------------------------------------
+--
+Function Get_Inv_Spatial_Table  (
+                                p_Nit In Nm_Inv_Types.Nit_Inv_Type%Type
+                                ) Return Varchar2
+Is
+Begin
+  Return 'NM_NIT_' || P_Nit || '_SDO';
+End Get_Inv_Spatial_Table;
+--
+-------------------------------------------------------------------------------------------------------------------------------------
+--
+Function Get_Nt_Spatial_Table (
+                              p_Nt_Type    In   Nm_Types.Nt_Type%Type,
+                              p_Gty_Type   In   Nm_Group_Types.Ngt_Group_Type%Type Default Null
+                              ) Return Varchar2
+Is
+  Retval   Varchar2 (30) := 'NM_NLT_' || p_Nt_Type;
+Begin
+
+  If p_Gty_Type Is Not Null Then
+    Retval := Retval || '_' || p_Gty_Type;
+  End If;
+
+  Retval := Retval || '_SDO';
+  
+  Return Retval;
+End Get_Nt_Spatial_Table;
+
+--
+-------------------------------------------------------------------------------------------------------------------------------------
+--
+Function Get_Nt_View_Name (
+                          p_Nt_Type    In   Nm_Types.Nt_Type%Type,
+                          p_Gty_Type   In   Nm_Group_Types.Ngt_Group_Type%Type
+                          ) Return Varchar2
+Is
+  l_Retval  Varchar2(30);
+Begin
+  If p_Gty_Type Is Not Null Then
+    l_Retval:= 'V_NM_' || p_Nt_Type ||'_'|| p_Gty_Type|| '_NT';
+  Else
+    l_Retval:= 'V_NM_' || p_Nt_Type || '_NT';
+  End If;
+  Return(l_Retval);
+End Get_Nt_View_Name;
+--
+---------------------------------------------------------------------------------------------------
+--
+Function Inv_Has_Shape  (
+                        p_Ne_Id      In   Nm_Elements.Ne_Id%Type,
+                        p_Obj_Type   In   Nm_Members.Nm_Obj_Type%Type
+                        ) Return Boolean
+Is
+  Nthrec       Nm_Themes_All%Rowtype;
+  Rcur         Nm3Type.Ref_Cursor;
+  Cur_String   Varchar2 (2000);
+  Dummy        Integer;
+  Retval       Boolean                 := False;
+Begin
+  For Irec In (
+              Select  nit.Nith_Nth_Theme_Id Nth_Theme_Id
+              From    Nm_Inv_Themes nit
+              Where   nit.Nith_Nit_Id = p_Obj_Type
+              )
+  Loop
+    Nthrec := Get_Nth (Irec.Nth_Theme_Id);
+
+    If Nm3Ddl.Does_Object_Exist  (p_Object_Name      => Nthrec.Nth_Feature_Table)  Then
+      Cur_String :=
+                    'select 1 from '
+                 || Nthrec.Nth_Feature_Table
+                 || ' where '
+                 || Nthrec.Nth_Feature_Pk_Column
+                 || ' = :ne_val';
+
+      Open Rcur For Cur_String Using p_Ne_Id;
+
+      Fetch Rcur
+      Into Dummy;
+
+      If Rcur%Found Then
+        Retval := True;
+        Exit;
+      End If;
+    End If;
+  End Loop;
+
+  Return Retval;
+End Inv_Has_Shape;
+--
+---------------------------------------------------------------------------------------------------
+--
+Function Nlt_Has_Shape  (
+                        p_Ne_Id    In   Nm_Elements.Ne_Id%Type,
+                        p_Nlt_Id   In   Nm_Linear_Types.Nlt_Id%Type
+                        ) Return Boolean
+Is
+  Nthrec       Nm_Themes_All%Rowtype;
+  Rcur         Nm3Type.Ref_Cursor;
+  Cur_String   Varchar2 (2000);
+  Dummy        Integer;
+  Retval       Boolean                 := False;
+Begin
+  For Irec In (
+              Select  nnt.Nnth_Nth_Theme_Id  Nth_Theme_Id
+              From    Nm_Nw_Themes  nnt
+              Where   nnt.Nnth_Nlt_Id = p_Nlt_Id
+              )
+  Loop
+    Nthrec := Get_Nth (Irec.Nth_Theme_Id);
+
+    If Nm3Ddl.Does_Object_Exist (p_Object_Name      => Nthrec.Nth_Feature_Table)  Then
+
+      Cur_String :=
+                    'select 1 from '
+                 || Nthrec.Nth_Feature_Table
+                 || ' where '
+                 || Nthrec.Nth_Feature_Pk_Column
+                 || ' = :ne_val';
+
+      Open Rcur For Cur_String Using p_Ne_Id;
+      Fetch Rcur
+      Into Dummy;
+
+      If Rcur%Found Then
+        Retval := True;
+        Exit;
+      End If;
+    End If;
+  End Loop;
+
+  Return Retval;
+End Nlt_Has_Shape;
+--
+---------------------------------------------------------------------------------------------------
+--
+Function Area_Has_Shape (
+                        p_Ne_Id    In   Nm_Elements.Ne_Id%Type,
+                        p_Nat_Id   In   Nm_Area_Types.Nat_Id%Type
+                        ) Return Boolean
+Is
+  Nthrec       Nm_Themes_All%Rowtype;
+  Rcur         Nm3Type.Ref_Cursor;
+  Cur_String   Varchar2 (2000);
+  Dummy        Integer;
+  Retval       Boolean                 := False;
+Begin
+  For Irec In (
+              Select  nat.Nath_Nth_Theme_Id Nth_Theme_Id
+              From    Nm_Area_Themes  nat
+              Where   nat.Nath_Nat_Id = p_Nat_Id
+              )
+  Loop
+    Nthrec := Get_Nth (Irec.Nth_Theme_Id);
+
+    If Nm3Ddl.Does_Object_Exist (p_Object_Name      => Nthrec.Nth_Feature_Table)  Then
+      Cur_String :=
+                    'select 1 from '
+                 || Nthrec.Nth_Feature_Table
+                 || ' where '
+                 || Nthrec.Nth_Feature_Pk_Column
+                 || ' = :ne_val';
+
+      Open Rcur For Cur_String Using P_Ne_Id;
+
+      Fetch Rcur
+      Into Dummy;
+
+      If Rcur%Found Then
+        Retval := True;
+        Exit;
+      End If;
+    End If;
+  End Loop;
+
+  Return Retval;
+End Area_Has_Shape;
+--
+---------------------------------------------------------------------------------------------------
+--
+Function Datum_Has_Shape  (
+                          p_Ne_Id In Nm_Elements.Ne_Id%Type
+                          ) Return Boolean
+Is
+  Lnerec       Nm_Elements%Rowtype     := Nm3Get.Get_Ne (p_Ne_Id);
+
+  Nthrec       Nm_Themes_All%Rowtype;
+  Rcur         Nm3Type.Ref_Cursor;
+  Cur_String   Varchar2 (2000);
+  Dummy        Integer;
+  Retval       Boolean                 := False;
+Begin
+  For Irec In (
+              Select  nnt.Nnth_Nth_Theme_Id Nth_Theme_Id
+              From    Nm_Nw_Themes    nnt,
+                      Nm_Linear_Types nlt
+              Where   nnt.Nnth_Nlt_Id   = nlt.Nlt_Id
+              And     nlt.Nlt_Nt_Type   = Lnerec.Ne_Nt_Type
+              )
+  Loop
+    Nthrec := Get_Nth (Irec.Nth_Theme_Id);
+
+    If Nm3Ddl.Does_Object_Exist (p_Object_Name      => Nthrec.Nth_Feature_Table)  Then
+      Cur_String :=
+                    'select 1 from '
+                 || Nthrec.Nth_Feature_Table
+                 || ' where '
+                 || Nthrec.Nth_Feature_Pk_Column
+                 || ' = :ne_val';
+
+      Open Rcur For Cur_String Using P_Ne_Id;
+
+      Fetch Rcur
+      Into Dummy;
+
+      If Rcur%Found Then
+        Retval := True;
+        Exit;
+      End If;
+    End If;
+  End Loop;
+
+  Return Retval;
+End Datum_Has_Shape;
+--
+---------------------------------------------------------------------------------------------------
+--
+Function Get_Nlt_Id_From_Gty  (
+                              pi_Gty In Nm_Group_Types.Ngt_Group_Type%Type
+                              )  Return Nm_Linear_Types.Nlt_Id%Type
+Is
+  Retval   Nm_Linear_Types.Nlt_Id%Type;
+Begin
+  Begin
+    Select  Nlt_Id
+    Into    Retval
+    From    Nm_Linear_Types nlt
+    Where   nlt.Nlt_Gty_Type =  pi_Gty
+    And     Rownum           =  1;
+  Exception
+    When No_Data_Found Then
+      Null;
+  End;
+
+  Return Retval;
+End Get_Nlt_Id_From_Gty;
 --
 -----------------------------------------------------------------------------
 --
-   FUNCTION get_nlt_id_from_gty (pi_gty IN nm_group_types.ngt_group_type%TYPE)
-      RETURN NM_LINEAR_TYPES.nlt_id%TYPE
-   IS
-      CURSOR c1 (c_gty IN nm_group_types.ngt_group_type%TYPE)
-      IS
-         SELECT nlt_id
-           FROM NM_LINEAR_TYPES
-          WHERE nlt_gty_type = c_gty;
+Function Get_Nat_Id_From_Gty  (
+                              pi_Gty In Nm_Group_Types.Ngt_Group_Type%Type
+                              ) Return Nm_Area_Types.Nat_Id%Type
+Is
+  Retval   Nm_Area_Types.Nat_Id%Type;
+Begin
+  Begin
+    Select  nat.Nat_Id
+    Into    Retval
+    From    Nm_Area_Types   nat
+    Where   nat.Nat_Gty_Group_Type = pi_Gty;
+    
+  Exception
+    When No_Data_Found Then
+      Null;
+  End;
+  
+  Return Retval;
+End Get_Nat_Id_From_Gty;
+--
+-----------------------------------------------------------------------------
+--  
+Function Has_Shape  (
+                    p_Ne_Id      In   Nm_Elements.Ne_Id%Type,
+                    p_Obj_Type   In   Nm_Members.Nm_Obj_Type%Type,
+                    p_Type       In   Nm_Members.Nm_Type%Type Default 'I'
+                    ) Return Boolean
+Is
+  l_Nlt_Id   Nm_Linear_Types.Nlt_Id%Type;
+  l_Nat_Id   Nm_Area_Types.Nat_Id%Type;
+  Retval     Boolean                       := False;
+Begin
+  If p_Type = 'I' Then
+    Retval := Inv_Has_Shape (p_Ne_Id, p_Obj_Type);
+  Elsif p_Type = 'G'  Then
+    l_Nlt_Id := Get_Nlt_Id_From_Gty (p_Obj_Type);
 
-      retval   NM_LINEAR_TYPES.nlt_id%TYPE;
-   BEGIN
-      OPEN c1 (pi_gty);
-      FETCH c1
-       INTO retval;
+    If l_Nlt_Id Is Not Null Then
+      Retval := Nlt_Has_Shape (p_Ne_Id, l_Nlt_Id);
+    Else
+      l_Nat_Id := Get_Nat_Id_From_Gty (p_Obj_Type);
 
-      IF c1%NOTFOUND
-      THEN
-         CLOSE c1;
-         retval := NULL;
-      ELSE
-         CLOSE c1;
-      END IF;
+      If L_Nat_Id Is Not Null Then
+        Retval := Area_Has_Shape (p_Ne_Id, l_Nat_Id);
+      End If;
+    End If;
+  Elsif p_Type = 'D'  Then
+    -- datum
+    Retval := Datum_Has_Shape (p_Ne_Id);
+  End If;
 
-      RETURN retval;
-   END get_nlt_id_from_gty;
+  Return Retval;
+End Has_Shape;
+--
+---------------------------------------------------------------------------------------------------
+--
+Procedure Set_Obj_Shape_End_Date  (
+                                  p_Obj_Type   In   Nm_Members.Nm_Obj_Type%Type,
+                                  p_Ne_Id      In   Nm_Members.Nm_Ne_Id_In%Type,
+                                  p_End_Date   In   Nm_Members.Nm_Start_Date%Type
+                                  )
+Is
+  Cur_String   Varchar2 (2000);
+Begin
+  Cur_String :=
+                'update '
+             || Get_Inv_Spatial_Table (p_Obj_Type)
+             || ' set end_date = :p_end_date '
+             || ' where ne_id = :ne ';
+
+  Execute Immediate Cur_String
+              Using p_End_Date, p_Ne_Id;
+End Set_Obj_Shape_End_Date;
+--
+-----------------------------------------------------------------------------
+--
+Procedure Insert_Obj_Shape  (
+                            p_Obj_Type     In   Nm_Members.Nm_Obj_Type%Type,
+                            p_Ne_Id        In   Nm_Members.Nm_Ne_Id_In%Type,
+                            p_Start_Date   In   Nm_Members.Nm_Start_Date%Type,
+                            p_End_Date     In   Nm_Members.Nm_Start_Date%Type Default Null,
+                            p_Geom         In   Mdsys.Sdo_Geometry
+                            )
+Is
+  Cur_String   Varchar2 (2000);
+Begin
+  Cur_String := 'insert into '
+             || Get_Inv_Spatial_Table (p_Obj_Type)
+             || ' ( ne_id, geoloc, start_date, end_date )'
+             || ' values ( :p_ne_id, :p_geom, :p_start_date, :p_end_date )';
+
+  Execute Immediate Cur_String  Using p_Ne_Id, p_Geom, p_Start_Date, p_End_Date;
+  
+Exception
+  When Dup_Val_On_Index Then
+    Cur_String  :=
+                   'delete from '
+                || Get_Inv_Spatial_Table (P_Obj_Type)
+                || ' where ne_id = :p_ne_id and start_date = :p_start_date';
+
+    Execute Immediate Cur_String  Using P_Ne_Id, P_Start_Date;
+
+    Cur_String  := 'insert into '
+                || Get_Inv_Spatial_Table (P_Obj_Type)
+                || ' ( ne_id, geoloc, start_date, end_date )'
+                || ' values ( :p_ne_id, :p_geom, :p_start_date, :p_end_date )';
+
+    Execute Immediate Cur_String Using P_Ne_Id, P_Geom, P_Start_Date, P_End_Date;
+End Insert_Obj_Shape;
+--
+-----------------------------------------------------------------------------
+--
+Procedure Update_Member_Shape (
+                              p_Nm_Ne_Id_In      In   Nm_Members.Nm_Ne_Id_In%Type,
+                              p_Nm_Ne_Id_Of      In   Nm_Members.Nm_Ne_Id_Of%Type,
+                              p_Nm_Obj_Type      In   Nm_Members.Nm_Obj_Type%Type,
+                              p_Old_Begin_Mp     In   Nm_Members.Nm_Begin_Mp%Type,
+                              p_New_Begin_Mp     In   Nm_Members.Nm_Begin_Mp%Type,
+                              p_Nm_End_Mp        In   Nm_Members.Nm_End_Mp%Type,
+                              p_Old_Start_Date   In   Nm_Members.Nm_Start_Date%Type,
+                              p_New_Start_Date   In   Nm_Members.Nm_Start_Date%Type,
+                              p_Nm_End_Date      In   Nm_Members.Nm_End_Date%Type,
+                              p_Nm_Type          In   Nm_Members.Nm_Type%Type
+                              )
+Is
+Begin
+  If p_Nm_Type = 'I'  Then
+    Update_Inv_Shape  (
+                      p_Nm_Ne_Id_In         => p_Nm_Ne_Id_In,
+                      p_Nm_Ne_Id_Of         => p_Nm_Ne_Id_Of,
+                      p_Nm_Obj_Type         => p_Nm_Obj_Type,
+                      p_Old_Begin_Mp        => p_Old_Begin_Mp,
+                      p_New_Begin_Mp        => p_New_Begin_Mp,
+                      p_Nm_End_Mp           => p_Nm_End_Mp,
+                      p_Old_Start_Date      => p_Old_Start_Date,
+                      p_New_Start_Date      => p_New_Start_Date,
+                      p_Nm_End_Date         => p_Nm_End_Date
+                      );
+  Elsif p_Nm_Type = 'G' Then
+    Update_Gty_Shape  (
+                      p_Nm_Ne_Id_In         => p_Nm_Ne_Id_In,
+                      p_Nm_Ne_Id_Of         => p_Nm_Ne_Id_Of,
+                      p_Nm_Obj_Type         => p_Nm_Obj_Type,
+                      p_Old_Begin_Mp        => p_Old_Begin_Mp,
+                      p_New_Begin_Mp        => p_New_Begin_Mp,
+                      p_Nm_End_Mp           => p_Nm_End_Mp,
+                      p_Old_Start_Date      => p_Old_Start_Date,
+                      p_New_Start_Date      => p_New_Start_Date,
+                      p_Nm_End_Date         => p_Nm_End_Date
+                      );
+  End If;
+End Update_Member_Shape;
 
 --
 -----------------------------------------------------------------------------
 --
-   FUNCTION get_nat_id_from_gty (pi_gty IN nm_group_types.ngt_group_type%TYPE)
-      RETURN NM_AREA_TYPES.nat_id%TYPE
-   IS
-      CURSOR c1 (c_gty IN nm_group_types.ngt_group_type%TYPE)
-      IS
-         SELECT nat_id
-           FROM NM_AREA_TYPES
-          WHERE nat_gty_group_type = c_gty;
+Procedure Update_Inv_Shape  (
+                            p_Nm_Ne_Id_In      In   Nm_Members.Nm_Ne_Id_In%Type,
+                            p_Nm_Ne_Id_Of      In   Nm_Members.Nm_Ne_Id_Of%Type,
+                            p_Nm_Obj_Type      In   Nm_Members.Nm_Obj_Type%Type,
+                            p_Old_Begin_Mp     In   Nm_Members.Nm_Begin_Mp%Type,
+                            p_New_Begin_Mp     In   Nm_Members.Nm_Begin_Mp%Type,
+                            p_Nm_End_Mp        In   Nm_Members.Nm_End_Mp%Type,
+                            p_Old_Start_Date   In   Nm_Members.Nm_Start_Date%Type,
+                            p_New_Start_Date   In   Nm_Members.Nm_Start_Date%Type,
+                            p_Nm_End_Date      In   Nm_Members.Nm_End_Date%Type
+                            )
+Is
+  Upd_String   Varchar2 (2000);
+  l_Geom       Mdsys.Sdo_Geometry;
+  l_Nit        Nm_Inv_Types%Rowtype   := Nm3Get.Get_Nit (P_Nm_Obj_Type);
+Begin
+  --  allow for many layers of the same asset type
+  For Irec In   (
+                Select  nta.Nth_Feature_Table,
+                        nta.Nth_Feature_Pk_Column,
+                        nta.Nth_Feature_Fk_Column,
+                        nbt.Nbth_Base_Theme,
+                        nta.Nth_Xsp_Column
+                From    Nm_Themes_All     nta,
+                        Nm_Inv_Themes     nit,
+                        Nm_Base_Themes    nbt,
+                        Nm_Nw_Themes      nnt,
+                        Nm_Elements       ne,
+                        Nm_Linear_Types   nlt
+                Where   nta.Nth_Theme_Id        =   nit.Nith_Nth_Theme_Id
+                And     nta.Nth_Theme_Id        =   nbt.Nbth_Theme_Id
+                And     nit.Nith_Nit_Id         =   p_Nm_Obj_Type
+                And     nta.Nth_Update_On_Edit  =   'I'
+                And     ne.Ne_Id                =   p_Nm_Ne_Id_Of
+                And     ne.Ne_Nt_Type           =   nlt.Nlt_Nt_Type
+                And     nnt.Nnth_Nth_Theme_Id   =   nbt.Nbth_Base_Theme
+                And     nlt.Nlt_Id              =   nnt.Nnth_Nlt_Id
+                )
+  Loop
+     Upd_String :=  'update '
+                || Irec.Nth_Feature_Table
+                || ' set geoloc = :newshape, '
+                || '     nm_begin_mp = :new_begin_mp,'
+                || '     nm_end_mp   = :new_end_mp, '
+                || '     start_date = :new_start_date, '
+                || '     end_date   = :new_end_date '
+                || '  where ne_id = :ne_id'
+                || ' and ne_id_of = :ne_id_of '
+                || ' and nm_begin_mp = :nm_begin_mp '
+                || ' and start_date  = :old_start_date ';
 
-      retval   NM_AREA_TYPES.nat_id%TYPE;
-   BEGIN
-      OPEN c1 (pi_gty);
-      FETCH c1
-       INTO retval;
+    If l_Nit.Nit_Pnt_Or_Cont = 'P'  Then
+      l_Geom := Nm3Sdo.Get_Pt_Shape_From_Ne (
+                                            Irec.Nbth_Base_Theme,
+                                            p_Nm_Ne_Id_Of,
+                                            p_New_Begin_Mp
+                                            );
+    Else
+      l_Geom := Nm3Sdo.Get_Shape_From_Nm    (
+                                            Irec.Nbth_Base_Theme,
+                                            p_Nm_Ne_Id_In,
+                                            p_Nm_Ne_Id_Of,
+                                            p_New_Begin_Mp,
+                                            p_Nm_End_Mp
+                                            );
+    End If;
 
-      IF c1%NOTFOUND
-      THEN
-         CLOSE c1;
+     -- CWS Lateral Offset change.
+    If        Irec.Nth_Xsp_Column Is Not Null
+        And   Nvl(Hig.Get_Sysopt('XSPOFFSET'),'N') = 'Y'   Then
 
-         retval := NULL;
-      ELSE
-         CLOSE c1;
-      END IF;
+       l_Geom := Nm3Sdo_Dynseg.Get_Shape( Irec.Nbth_Base_Theme, p_Nm_Ne_Id_In, p_Nm_Ne_Id_Of, p_New_Begin_Mp, p_Nm_End_Mp );
 
-      RETURN retval;
-   END get_nat_id_from_gty;
+    End If;
 
+    Execute Immediate Upd_String
+    Using l_Geom,
+          p_New_Begin_Mp,
+          p_Nm_End_Mp,
+          p_New_Start_Date,
+          p_Nm_End_Date,
+          p_Nm_Ne_Id_In,
+          p_Nm_Ne_Id_Of,
+          p_Old_Begin_Mp,
+          p_Old_Start_Date;
+  End Loop;
+End Update_Inv_Shape;
 --
 -----------------------------------------------------------------------------
 --
-   PROCEDURE update_member_shape (
-      p_nm_ne_id_in      IN   nm_members.nm_ne_id_in%TYPE,
-      p_nm_ne_id_of      IN   nm_members.nm_ne_id_of%TYPE,
-      p_nm_obj_type      IN   nm_members.nm_obj_type%TYPE,
-      p_old_begin_mp     IN   nm_members.nm_begin_mp%TYPE,
-      p_new_begin_mp     IN   nm_members.nm_begin_mp%TYPE,
-      p_nm_end_mp        IN   nm_members.nm_end_mp%TYPE,
-      p_old_start_date   IN   nm_members.nm_start_date%TYPE,
-      p_new_start_date   IN   nm_members.nm_start_date%TYPE,
-      p_nm_end_date      IN   nm_members.nm_end_date%TYPE,
-      p_nm_type          IN   nm_members.nm_type%TYPE
-   )
-   IS
-   BEGIN
-      IF p_nm_type = 'I'
-      THEN
-         update_inv_shape (p_nm_ne_id_in         => p_nm_ne_id_in,
-                           p_nm_ne_id_of         => p_nm_ne_id_of,
-                           p_nm_obj_type         => p_nm_obj_type,
-                           p_old_begin_mp        => p_old_begin_mp,
-                           p_new_begin_mp        => p_new_begin_mp,
-                           p_nm_end_mp           => p_nm_end_mp,
-                           p_old_start_date      => p_old_start_date,
-                           p_new_start_date      => p_new_start_date,
-                           p_nm_end_date         => p_nm_end_date
-                          );
-      ELSIF p_nm_type = 'G'
-      THEN
-         update_gty_shape (p_nm_ne_id_in         => p_nm_ne_id_in,
-                           p_nm_ne_id_of         => p_nm_ne_id_of,
-                           p_nm_obj_type         => p_nm_obj_type,
-                           p_old_begin_mp        => p_old_begin_mp,
-                           p_new_begin_mp        => p_new_begin_mp,
-                           p_nm_end_mp           => p_nm_end_mp,
-                           p_old_start_date      => p_old_start_date,
-                           p_new_start_date      => p_new_start_date,
-                           p_nm_end_date         => p_nm_end_date
-                          );
-      END IF;
-   END;
+Procedure Update_Gty_Shape  (
+                            p_Nm_Ne_Id_In      In   Nm_Members.Nm_Ne_Id_In%Type,
+                            p_Nm_Ne_Id_Of      In   Nm_Members.Nm_Ne_Id_Of%Type,
+                            p_Nm_Obj_Type      In   Nm_Members.Nm_Obj_Type%Type,
+                            p_Old_Begin_Mp     In   Nm_Members.Nm_Begin_Mp%Type,
+                            p_New_Begin_Mp     In   Nm_Members.Nm_Begin_Mp%Type,
+                            p_Nm_End_Mp        In   Nm_Members.Nm_End_Mp%Type,
+                            p_Old_Start_Date   In   Nm_Members.Nm_Start_Date%Type,
+                            p_New_Start_Date   In   Nm_Members.Nm_Start_Date%Type,
+                            p_Nm_End_Date      In   Nm_Members.Nm_End_Date%Type
+                            )
+Is
 
+  Upd_String   Varchar2 (2000);
+  l_Geom       Mdsys.Sdo_Geometry;
+Begin
+  --allow for many layers of the same gty type
+  For Irec In   (
+                Select  Nth_Feature_Table,
+                        Nth_Feature_Pk_Column,
+                        Nth_Feature_Fk_Column,
+                        Nbth_Base_Theme,
+                        'G' I_Or_G,
+                        p_Nm_Obj_Type Obj_Type
+                From    Nm_Themes_All     nta,
+                        Nm_Area_Types     nat,
+                        Nm_Area_Themes    nath,
+                        Nm_Base_Themes    nbt,
+                        Nm_Nw_Themes      nnt,
+                        Nm_Elements       ne,
+                        Nm_Linear_Types   nlt
+                Where   nta.Nth_Theme_Id        =   nath.Nath_Nth_Theme_Id
+                And     nta.Nth_Theme_Id        =   nbt.Nbth_Theme_Id
+                And     nath.Nath_Nat_Id        =   nat.Nat_Id
+                And     nat.Nat_Gty_Group_Type  =   p_Nm_Obj_Type
+                And     nta.Nth_Theme_Type      =   'SDO'
+                And     ne.Ne_Id                =   p_Nm_Ne_Id_Of
+                And     ne.Ne_Nt_Type           =   nlt.Nlt_Nt_Type
+                And     nnt.Nnth_Nth_Theme_Id   =   nbt.Nbth_Base_Theme
+                And     nlt.Nlt_Id              =   nnt.Nnth_Nlt_Id
+                And     nta.Nth_Update_On_Edit  =   'I'
+                Union
+                Select  Nth_Feature_Table,
+                        Nth_Feature_Pk_Column,
+                        Nth_Feature_Fk_Column,
+                        Nbth_Base_Theme,
+                        'I',
+                        Nad_Inv_Type
+                From    Nm_Themes_All   nta,
+                        Nm_Inv_Themes   nit,
+                        Nm_Base_Themes  nbt,
+                        Nm_Nw_Themes    nnt,
+                        Nm_Elements     ne,
+                        Nm_Linear_Types nlt,
+                        Nm_Nw_Ad_Types  nnat
+                Where   nta.Nth_Theme_Id        =   nit.Nith_Nth_Theme_Id
+                And     nta.Nth_Theme_Id        =   nbt.Nbth_Theme_Id
+                And     nnat.Nad_Gty_Type       =   p_Nm_Obj_Type
+                And     nnat.Nad_Inv_Type       =   nit.Nith_Nit_Id
+                And     nta.Nth_Theme_Type      =   'SDO'
+                And     ne.Ne_Id                =   p_Nm_Ne_Id_Of
+                And     ne.Ne_Nt_Type           =   nlt.Nlt_Nt_Type
+                And     nnt.Nnth_Nth_Theme_Id   =   nbt.Nbth_Base_Theme
+                And     nlt.Nlt_Id              =   nnt.Nnth_Nlt_Id
+                And     nta.Nth_Update_On_Edit  =   'I'
+                )
+  Loop
+    If Irec.I_Or_G = 'G' Then
+      Upd_String := 'update '
+                  || Irec.Nth_Feature_Table
+                  || ' set geoloc = :newshape, '
+                  || '     nm_begin_mp = :new_begin_mp,'
+                  || '     nm_end_mp   = :new_end_mp '
+                  || '  where ne_id = :ne_id'
+                  || ' and ne_id_of = :ne_id_of '
+                  || ' and nm_begin_mp = :nm_begin_mp '
+                  || ' and end_date is null';
+      l_Geom := Sdo_Lrs.Convert_To_Std_Geom( Nm3Sdo.Get_Shape_From_Nm (
+                                                                      Irec.Nbth_Base_Theme,
+                                                                      p_Nm_Ne_Id_In,
+                                                                      p_Nm_Ne_Id_Of,
+                                                                      p_New_Begin_Mp,
+                                                                      p_Nm_End_Mp
+                                                                     ));
+      Execute Immediate Upd_String
+      Using   l_Geom,
+              p_New_Begin_Mp,
+              p_Nm_End_Mp,
+              p_Nm_Ne_Id_In,
+              p_Nm_Ne_Id_Of,
+              p_Old_Begin_Mp;
+    Else
+      Upd_String := 'update '
+                  || Irec.Nth_Feature_Table
+                  || ' set geoloc = :newshape, '
+                  || '     nm_begin_mp = :new_begin_mp,'
+                  || '     nm_end_mp   = :new_end_mp '
+                  || '  where ne_id in ( select nad_iit_ne_id '
+                  ||                   ' from nm_nw_ad_link '
+                  ||                   ' where nad_ne_id = :ne_id'
+                  ||                   ' and nad_gty_type =  :gty_type '
+                  ||                   ' and nad_inv_type =  :obj_type '
+                  ||                   ' and nad_whole_road = :whole_road  ) '
+                  || ' and ne_id_of = :ne_id_of '
+                  || ' and nm_begin_mp = :nm_begin_mp '
+                  || ' and end_date is null';
+      l_Geom := Nm3Sdo.Get_Shape_From_Nm  (
+                                          Irec.Nbth_Base_Theme,
+                                          p_Nm_Ne_Id_In,
+                                          p_Nm_Ne_Id_Of,
+                                          p_New_Begin_Mp,
+                                          p_Nm_End_Mp
+                                          );
+
+      Execute Immediate Upd_String
+      Using l_Geom,
+            p_New_Begin_Mp,
+            p_Nm_End_Mp,
+            p_Nm_Ne_Id_In,
+            p_Nm_Obj_Type,
+            Irec.Obj_Type,
+            '1',
+            p_Nm_Ne_Id_Of,
+            p_Old_Begin_Mp;
+    End If;
+  End Loop;
+End Update_Gty_Shape;
 --
 -----------------------------------------------------------------------------
 --
-   PROCEDURE update_inv_shape (
-      p_nm_ne_id_in      IN   nm_members.nm_ne_id_in%TYPE,
-      p_nm_ne_id_of      IN   nm_members.nm_ne_id_of%TYPE,
-      p_nm_obj_type      IN   nm_members.nm_obj_type%TYPE,
-      p_old_begin_mp     IN   nm_members.nm_begin_mp%TYPE,
-      p_new_begin_mp     IN   nm_members.nm_begin_mp%TYPE,
-      p_nm_end_mp        IN   nm_members.nm_end_mp%TYPE,
-      p_old_start_date   IN   nm_members.nm_start_date%TYPE,
-      p_new_start_date   IN   nm_members.nm_start_date%TYPE,
-      p_nm_end_date      IN   nm_members.nm_end_date%TYPE
-   )
-   IS
-      CURSOR c_inv_tab (c_inv_type nm_inv_types.nit_inv_type%TYPE,
-                        c_ne_id    nm_elements.ne_id%TYPE
-                        )  IS
-         SELECT nth_feature_table, nth_feature_pk_column, nth_feature_fk_column, nbth_base_theme, nth_xsp_column
-         FROM NM_THEMES_ALL, NM_INV_THEMES, NM_BASE_THEMES, NM_NW_THEMES, nm_elements, NM_LINEAR_TYPES
-         WHERE nth_theme_id = nith_nth_theme_id
-         AND nth_theme_id = nbth_theme_id
-         AND nith_nit_id = c_inv_type
-         AND nth_update_on_edit = 'I'
-         AND ne_id = c_ne_id
-         AND ne_nt_type = nlt_nt_type
-         AND nnth_nth_theme_id = nbth_base_theme
-         AND nlt_id = nnth_nlt_id;
-
---     allow for many layers of the same asset type
-
-      upd_string   VARCHAR2 (2000);
-      l_geom       MDSYS.SDO_GEOMETRY;
-      l_nit        nm_inv_types%ROWTYPE   := Nm3get.get_nit (p_nm_obj_type);
-   BEGIN
---  nm_debug.debug('Updating shape of '||p_nm_obj_type||' between '||to_char(p_nm_begin_mp)||
---    ' and '||to_char(p_nm_end_mp)|| ' on '||nm3net.get_ne_unique( p_nm_ne_id_of ));
-      FOR irec IN c_inv_tab (p_nm_obj_type, p_nm_ne_id_of )
-      LOOP
-         upd_string :=
-               'update '
-            || irec.nth_feature_table
-            || ' set geoloc = :newshape, '
-            || '     nm_begin_mp = :new_begin_mp,'
-            || '     nm_end_mp   = :new_end_mp, '
-            || '     start_date = :new_start_date, '
-            || '     end_date   = :new_end_date '
-            || '  where ne_id = :ne_id'
-            || ' and ne_id_of = :ne_id_of '
-            || ' and nm_begin_mp = :nm_begin_mp '
-            || ' and start_date  = :old_start_date ';
-
-         IF l_nit.nit_pnt_or_cont = 'P'
-         THEN
-            l_geom :=
-               Nm3sdo.get_pt_shape_from_ne (irec.nbth_base_theme,
-                                            p_nm_ne_id_of,
-                                            p_new_begin_mp
-                                           );
-         ELSE
-            l_geom :=
-               Nm3sdo.get_shape_from_nm (irec.nbth_base_theme,
-                                         p_nm_ne_id_in,
-                                         p_nm_ne_id_of,
-                                         p_new_begin_mp,
-                                         p_nm_end_mp
-                                        );
-         END IF;
-         
-         -- CWS Lateral Offset change.
-         if irec.nth_xsp_column is not null
-         and NVL(hig.get_sysopt('XSPOFFSET'),'N') = 'Y'-- check prod opt  
-         then
-
-           l_geom := nm3sdo_dynseg.get_shape( irec.nbth_base_theme, p_nm_ne_id_in, p_nm_ne_id_of, p_new_begin_mp, p_nm_end_mp );
-
-         end if;
-
-         EXECUTE IMMEDIATE upd_string
-                     USING l_geom,
-                           p_new_begin_mp,
-                           p_nm_end_mp,
-                           p_new_start_date,
-                           p_nm_end_date,
-                           p_nm_ne_id_in,
-                           p_nm_ne_id_of,
-                           p_old_begin_mp,
-                           p_old_start_date;
-      END LOOP;
-   END;
-
-
+Procedure End_Member_Shape  (
+                            p_Nm_Ne_Id_In     In   Nm_Members.Nm_Ne_Id_In%Type,
+                            p_Nm_Ne_Id_Of     In   Nm_Members.Nm_Ne_Id_Of%Type,
+                            p_Nm_Obj_Type     In   Nm_Members.Nm_Obj_Type%Type,
+                            p_Nm_Begin_Mp     In   Nm_Members.Nm_Begin_Mp%Type,
+                            p_Nm_End_Mp       In   Nm_Members.Nm_End_Mp%Type,
+                            p_Nm_Start_Date   In   Nm_Members.Nm_Start_Date%Type,
+                            p_Nm_End_Date     In   Nm_Members.Nm_End_Date%Type,
+                            p_Nm_Type         In   Nm_Members.Nm_Type%Type
+                            )
+Is
+Begin
+  If p_Nm_Type = 'I'  Then
+    End_Inv_Shape (
+                  p_Nm_Ne_Id_In        => p_Nm_Ne_Id_In,
+                  p_Nm_Ne_Id_Of        => p_Nm_Ne_Id_Of,
+                  p_Nm_Obj_Type        => p_Nm_Obj_Type,
+                  p_Nm_Begin_Mp        => p_Nm_Begin_Mp,
+                  p_Nm_End_Mp          => p_Nm_End_Mp,
+                  p_Nm_Start_Date      => p_Nm_Start_Date,
+                  p_Nm_End_Date        => p_Nm_End_Date
+                  );
+  Elsif p_Nm_Type = 'G' Then
+    End_Gty_Shape (
+                  p_Nm_Ne_Id_In        => p_Nm_Ne_Id_In,
+                  p_Nm_Ne_Id_Of        => p_Nm_Ne_Id_Of,
+                  p_Nm_Obj_Type        => p_Nm_Obj_Type,
+                  p_Nm_Begin_Mp        => p_Nm_Begin_Mp,
+                  p_Nm_End_Mp          => p_Nm_End_Mp,
+                  p_Nm_Start_Date      => p_Nm_Start_Date,
+                  p_Nm_End_Date        => p_Nm_End_Date
+                  );
+  End If;
+End End_Member_Shape;
 --
 -----------------------------------------------------------------------------
 --
-   PROCEDURE update_gty_shape (
-      p_nm_ne_id_in      IN   nm_members.nm_ne_id_in%TYPE,
-      p_nm_ne_id_of      IN   nm_members.nm_ne_id_of%TYPE,
-      p_nm_obj_type      IN   nm_members.nm_obj_type%TYPE,
-      p_old_begin_mp     IN   nm_members.nm_begin_mp%TYPE,
-      p_new_begin_mp     IN   nm_members.nm_begin_mp%TYPE,
-      p_nm_end_mp        IN   nm_members.nm_end_mp%TYPE,
-      p_old_start_date   IN   nm_members.nm_start_date%TYPE,
-      p_new_start_date   IN   nm_members.nm_start_date%TYPE,
-      p_nm_end_date      IN   nm_members.nm_end_date%TYPE
-   )
-   IS
+Procedure End_Inv_Shape (
+                        p_Nm_Ne_Id_In     In   Nm_Members.Nm_Ne_Id_In%Type,
+                        p_Nm_Ne_Id_Of     In   Nm_Members.Nm_Ne_Id_Of%Type,
+                        p_Nm_Obj_Type     In   Nm_Members.Nm_Obj_Type%Type,
+                        p_Nm_Begin_Mp     In   Nm_Members.Nm_Begin_Mp%Type,
+                        p_Nm_End_Mp       In   Nm_Members.Nm_End_Mp%Type,
+                        p_Nm_Start_Date   In   Nm_Members.Nm_Start_Date%Type,
+                        p_Nm_End_Date     In   Nm_Members.Nm_End_Date%Type
+                        )
+Is
+  Upd_String   Varchar2 (2000);
+  l_Geom       Mdsys.Sdo_Geometry;
+Begin
+  --allow for many layers of the same asset type
+  For Irec In (
+              Select    Nth_Feature_Table,
+                        Nth_Feature_Pk_Column,
+                        Nth_Feature_Fk_Column
+              From      Nm_Themes_All   nta,
+                        Nm_Inv_Themes   nit
+              Where     nta.Nth_Theme_Id        =   nit.Nith_Nth_Theme_Id
+              And       nit.Nith_Nit_Id         =   p_Nm_Obj_Type
+              And       nta.Nth_Update_On_Edit  =   'I'
+              )
+  Loop
+    -- AE - 718333
+    -- Include begin_mp and only operate on open shapes
+    --
+    -- Later change (30-MAR-09) remove the end_date check because this procedure
+    -- is used for un-endating too
+     Upd_String :=
+           'update '
+        || Irec.Nth_Feature_Table
+        || '  set end_date    = :end_date '
+        || 'where ne_id       = :ne_id '
+        || '  and ne_id_of    = :ne_id_of '
+        || '  and nm_begin_mp = :nm_begin_mp ';
 
-      CURSOR c_gty_tab (c_gty_type nm_group_types.ngt_group_type%TYPE,
-                        c_ne_id IN nm_elements.ne_id%TYPE,
-                        c_nm_ne_id_in in nm_members.nm_ne_id_in%type )
-      IS
-         SELECT nth_feature_table, nth_feature_pk_column,
-                nth_feature_fk_column, nbth_base_theme, 'G' I_or_G, c_gty_type obj_type
-           FROM NM_THEMES_ALL, NM_AREA_TYPES, NM_AREA_THEMES, NM_BASE_THEMES, NM_NW_THEMES, nm_elements, NM_LINEAR_TYPES
-          WHERE nth_theme_id = nath_nth_theme_id
-            AND nth_theme_id = nbth_theme_id
-            AND nath_nat_id = nat_id
-            AND nat_gty_group_type = c_gty_type
-            AND nth_theme_type = 'SDO'
-            AND ne_id = c_ne_id
-            AND ne_nt_type = nlt_nt_type
-            AND nnth_nth_theme_id = nbth_base_theme
-            AND nlt_id = nnth_nlt_id
-            AND nth_update_on_edit = 'I'
-         UNION
-         SELECT nth_feature_table, nth_feature_pk_column,
-                nth_feature_fk_column, nbth_base_theme, 'I', nad_inv_type
-           FROM NM_THEMES_ALL, NM_INV_THEMES, NM_BASE_THEMES, NM_NW_THEMES, nm_elements, NM_LINEAR_TYPES, nm_nw_ad_types
-          WHERE nth_theme_id = nith_nth_theme_id
-            AND nth_theme_id = nbth_theme_id
-            AND nad_gty_type = c_gty_type
-            and nad_inv_type = nith_nit_id
---          and nad_ne_id = c_nm_ne_id_in
-            AND nth_theme_type = 'SDO'
-            AND ne_id = c_ne_id
-            AND ne_nt_type = nlt_nt_type
-            AND nnth_nth_theme_id = nbth_base_theme
-            AND nlt_id = nnth_nlt_id
-            AND nth_update_on_edit = 'I';
-
---allow for many layers of the same gty type
-      upd_string   VARCHAR2 (2000);
-      l_geom       MDSYS.SDO_GEOMETRY;
-   BEGIN
---  nm_debug.debug('Updating shape of '||p_nm_obj_type||' between '||to_char(p_nm_begin_mp)||
---    ' and '||to_char(p_nm_end_mp)|| ' on '||nm3net.get_ne_unique( p_nm_ne_id_of ));
-      FOR irec IN c_gty_tab (p_nm_obj_type, p_nm_ne_id_of, p_nm_ne_id_in )
-      LOOP
-         if irec.i_or_g = 'G' then
-           upd_string :=
-               'update '
-            || irec.nth_feature_table
-            || ' set geoloc = :newshape, '
-            || '     nm_begin_mp = :new_begin_mp,'
-            || '     nm_end_mp   = :new_end_mp '
-            || '  where ne_id = :ne_id'
-            || ' and ne_id_of = :ne_id_of '
-            || ' and nm_begin_mp = :nm_begin_mp '
-            || ' and end_date is null';
-           l_geom :=
-            sdo_lrs.convert_to_std_geom( Nm3sdo.get_shape_from_nm (irec.nbth_base_theme,
-                                        p_nm_ne_id_in,
-                                        p_nm_ne_id_of,
-                                        p_new_begin_mp,
-                                        p_nm_end_mp
-                                       ));
-           EXECUTE IMMEDIATE upd_string
-                     USING l_geom,
-                           p_new_begin_mp,
-                           p_nm_end_mp,
-                           p_nm_ne_id_in,
-                           p_nm_ne_id_of,
-                           p_old_begin_mp;
-        else
-           upd_string :=
-               'update '
-            || irec.nth_feature_table
-            || ' set geoloc = :newshape, '
-            || '     nm_begin_mp = :new_begin_mp,'
-            || '     nm_end_mp   = :new_end_mp '
-            || '  where ne_id in ( select nad_iit_ne_id '
-            ||                   ' from nm_nw_ad_link '
-            ||                   ' where nad_ne_id = :ne_id'
-            ||                   ' and nad_gty_type =  :gty_type '
-            ||                   ' and nad_inv_type =  :obj_type '
-            ||                   ' and nad_whole_road = :whole_road  ) '
-            || ' and ne_id_of = :ne_id_of '
-            || ' and nm_begin_mp = :nm_begin_mp '
-            || ' and end_date is null';
-
-        -- AE set l_geom
-        -- 4054
-
-        l_geom :=
-            Nm3sdo.get_shape_from_nm (irec.nbth_base_theme,
-                                      p_nm_ne_id_in,
-                                      p_nm_ne_id_of,
-                                      p_new_begin_mp,
-                                      p_nm_end_mp
-                                     );
-
-           EXECUTE IMMEDIATE upd_string
-                     USING l_geom,
-                           p_new_begin_mp,
-                           p_nm_end_mp,
-                           p_nm_ne_id_in,
-                           p_nm_obj_type,
-                           irec.obj_type,
-                           '1',
-                           p_nm_ne_id_of,
-                           p_old_begin_mp;
-        end if;
-      END LOOP;
-   END;
-
---
------------------------------------------------------------------------------
---
-   PROCEDURE end_member_shape (
-      p_nm_ne_id_in     IN   nm_members.nm_ne_id_in%TYPE,
-      p_nm_ne_id_of     IN   nm_members.nm_ne_id_of%TYPE,
-      p_nm_obj_type     IN   nm_members.nm_obj_type%TYPE,
-      p_nm_begin_mp     IN   nm_members.nm_begin_mp%TYPE,
-      p_nm_end_mp       IN   nm_members.nm_end_mp%TYPE,
-      p_nm_start_date   IN   nm_members.nm_start_date%TYPE,
-      p_nm_end_date     IN   nm_members.nm_end_date%TYPE,
-      p_nm_type         IN   nm_members.nm_type%TYPE
-   )
-   IS
-   BEGIN
-      IF p_nm_type = 'I'
-      THEN
-         end_inv_shape (p_nm_ne_id_in        => p_nm_ne_id_in,
-                        p_nm_ne_id_of        => p_nm_ne_id_of,
-                        p_nm_obj_type        => p_nm_obj_type,
-                        p_nm_begin_mp        => p_nm_begin_mp,
-                        p_nm_end_mp          => p_nm_end_mp,
-                        p_nm_start_date      => p_nm_start_date,
-                        p_nm_end_date        => p_nm_end_date
-                       );
-      ELSIF p_nm_type = 'G'
-      THEN
-         end_gty_shape (p_nm_ne_id_in        => p_nm_ne_id_in,
-                        p_nm_ne_id_of        => p_nm_ne_id_of,
-                        p_nm_obj_type        => p_nm_obj_type,
-                        p_nm_begin_mp        => p_nm_begin_mp,
-                        p_nm_end_mp          => p_nm_end_mp,
-                        p_nm_start_date      => p_nm_start_date,
-                        p_nm_end_date        => p_nm_end_date
-                       );
-      END IF;
-   END;
-
---
------------------------------------------------------------------------------
---
-   PROCEDURE end_inv_shape (
-      p_nm_ne_id_in     IN   nm_members.nm_ne_id_in%TYPE,
-      p_nm_ne_id_of     IN   nm_members.nm_ne_id_of%TYPE,
-      p_nm_obj_type     IN   nm_members.nm_obj_type%TYPE,
-      p_nm_begin_mp     IN   nm_members.nm_begin_mp%TYPE,
-      p_nm_end_mp       IN   nm_members.nm_end_mp%TYPE,
-      p_nm_start_date   IN   nm_members.nm_start_date%TYPE,
-      p_nm_end_date     IN   nm_members.nm_end_date%TYPE
-   )
-   IS
-      CURSOR c_inv_tab (c_inv_type nm_inv_types.nit_inv_type%TYPE)
-      IS
-         SELECT nth_feature_table, nth_feature_pk_column,
-                nth_feature_fk_column
-           FROM NM_THEMES_ALL, NM_INV_THEMES
-          WHERE nth_theme_id = nith_nth_theme_id
-            AND nith_nit_id = c_inv_type
-            AND nth_update_on_edit = 'I';
-
---allow for many layers of the same asset type
-      upd_string   VARCHAR2 (2000);
-      l_geom       MDSYS.SDO_GEOMETRY;
-   BEGIN
---  nm_debug.debug('Ending shape of '||p_nm_obj_type||' between '||to_char(p_nm_begin_mp)||
---    ' and '||to_char(p_nm_end_mp)|| ' on '||nm3net.get_ne_unique( p_nm_ne_id_of ));
-      FOR irec IN c_inv_tab (p_nm_obj_type)
-      LOOP
-        -- AE - 718333
-        -- Include begin_mp and only operate on open shapes
-        --
-        -- Later change (30-MAR-09) remove the end_date check because this procedure
-        -- is used for un-endating too
-         upd_string :=
-               'update '
-            || irec.nth_feature_table
-            || '  set end_date    = :end_date '
-            || 'where ne_id       = :ne_id '
-            || '  and ne_id_of    = :ne_id_of '
-            || '  and nm_begin_mp = :nm_begin_mp ';
-
---            || '  and end_date IS NULL';
-
-        -- AE - 718333
-        -- Include begin_mp and only operate on open shapes
-        -- End of changes
-        --
-		--RAC - Task 0111157 - the update string must update the shape end date on the basis
-		--      of the actual start-date for the specific mamber that is targetted.
-		--      Without this, the end-date of an asset  (hence members) will update the end-date on
-		--      all shape records that have the same begin-mp - including those that are already ended.
+    -- AE - 718333
+    -- Include begin_mp and only operate on open shapes
+    -- End of changes
+    --
+    --RAC - Task 0111157 - the update string must update the shape end date on the basis
+    --      of the actual start-date for the specific mamber that is targetted.
+    --      Without this, the end-date of an asset  (hence members) will update the end-date on
+    --      all shape records that have the same begin-mp - including those that are already ended.
 		
-        if p_nm_end_date is not null then
-           upd_string := upd_string ||' and end_date is null and start_date = :start_date';
-        else
-           upd_string := upd_string ||' and start_date = :start_date';
-        end if;
+    If p_Nm_End_Date Is Not Null Then
+       Upd_String := Upd_String ||' and end_date is null and start_date = :start_date';
+    Else
+       Upd_String := Upd_String ||' and start_date = :start_date';
+    End If;
 		
---    nm_debug.debug('End date string '||upd_string);
-         EXECUTE IMMEDIATE upd_string
-                     USING p_nm_end_date, p_nm_ne_id_in, p_nm_ne_id_of, p_nm_begin_mp, p_nm_start_date;
-      END LOOP;
-   END;
-
+    Execute Immediate Upd_String
+    Using p_Nm_End_Date,
+          p_Nm_Ne_Id_In,
+          p_Nm_Ne_Id_Of,
+          p_Nm_Begin_Mp,
+          p_Nm_Start_Date;
+  End Loop;
+End End_Inv_Shape;
 --
 -----------------------------------------------------------------------------
 --
-   PROCEDURE end_gty_shape (
-      p_nm_ne_id_in     IN   nm_members.nm_ne_id_in%TYPE,
-      p_nm_ne_id_of     IN   nm_members.nm_ne_id_of%TYPE,
-      p_nm_obj_type     IN   nm_members.nm_obj_type%TYPE,
-      p_nm_begin_mp     IN   nm_members.nm_begin_mp%TYPE,
-      p_nm_end_mp       IN   nm_members.nm_end_mp%TYPE,
-      p_nm_start_date   IN   nm_members.nm_start_date%TYPE,
-      p_nm_end_date     IN   nm_members.nm_end_date%TYPE
-   )
-   IS
-      CURSOR c_gty_tab (c_gty_type nm_group_types.ngt_group_type%TYPE)
-      IS
-         SELECT nth_feature_table, nth_feature_pk_column,
-                nth_feature_fk_column, 'G' g_or_i, p_nm_obj_type obj_type
-           FROM NM_THEMES_ALL, NM_AREA_TYPES, NM_AREA_THEMES
-          WHERE nth_theme_id = nath_nth_theme_id
-            AND nath_nat_id = nat_id
-            AND nat_gty_group_type = c_gty_type
-            AND nth_theme_type = 'SDO'
-            AND nth_update_on_edit = 'I'
-         UNION
-         SELECT nth_feature_table, nth_feature_pk_column,
-                nth_feature_fk_column, 'I' g_or_i, nith_nit_id
-           FROM NM_THEMES_ALL, nm_nw_ad_types, nm_inv_themes
-          WHERE nth_theme_id = nith_nth_theme_id
-            AND nith_nit_id = nad_inv_type
-            AND nad_gty_type = c_gty_type
-            AND nth_update_on_edit = 'I';
-
---allow for many layers of the same asset type
-      upd_string   VARCHAR2 (2000);
-      l_geom       MDSYS.SDO_GEOMETRY;
-      l_ne_id      number;
-   BEGIN
---   nm_debug.debug_on;
---   nm_debug.debug('Ending shape of '||p_nm_obj_type||' between '||to_char(p_nm_begin_mp)||
---                  ' and '||to_char(p_nm_end_mp)|| ' on '||nm3net.get_ne_unique( p_nm_ne_id_of ));
-      FOR irec IN c_gty_tab (p_nm_obj_type)
-      LOOP
-         IF irec.g_or_i = 'G'
-         THEN
+Procedure End_Gty_Shape (
+                        p_Nm_Ne_Id_In     In   Nm_Members.Nm_Ne_Id_In%Type,
+                        p_Nm_Ne_Id_Of     In   Nm_Members.Nm_Ne_Id_Of%Type,
+                        p_Nm_Obj_Type     In   Nm_Members.Nm_Obj_Type%Type,
+                        p_Nm_Begin_Mp     In   Nm_Members.Nm_Begin_Mp%Type,
+                        p_Nm_End_Mp       In   Nm_Members.Nm_End_Mp%Type,
+                        p_Nm_Start_Date   In   Nm_Members.Nm_Start_Date%Type,
+                        p_Nm_End_Date     In   Nm_Members.Nm_End_Date%Type
+                        )
+Is
+  
+  Upd_String   Varchar2 (2000);
+  l_Geom       Mdsys.Sdo_Geometry;
+  l_Ne_Id      Number;
+Begin
+  --allow for many layers of the same asset type
+  For Irec In   (
+                Select  nta.Nth_Feature_Table,
+                        nta.Nth_Feature_Pk_Column,
+                        nta.Nth_Feature_Fk_Column,
+                        'G' G_Or_I,
+                        p_Nm_Obj_Type Obj_Type
+                From    Nm_Themes_All   nta,
+                        Nm_Area_Types   nat,
+                        Nm_Area_Themes  nath
+                Where   nta.Nth_Theme_Id        =   nath.Nath_Nth_Theme_Id
+                And     nath.Nath_Nat_Id        =   nat.Nat_Id
+                And     nat.Nat_Gty_Group_Type  =   p_Nm_Obj_Type
+                And     nta.Nth_Theme_Type      =   'SDO'
+                And     nta.Nth_Update_On_Edit  =   'I'
+                Union
+                Select  nta.Nth_Feature_Table,
+                        nta.Nth_Feature_Pk_Column,
+                        nta.Nth_Feature_Fk_Column,
+                        'I' G_Or_I,
+                        nit.Nith_Nit_Id
+                From    Nm_Themes_All   nta,
+                        Nm_Nw_Ad_Types  nat,
+                        Nm_Inv_Themes   nit
+                Where   nta.Nth_Theme_Id        =   nit.Nith_Nth_Theme_Id
+                And     nit.Nith_Nit_Id         =   nat.Nad_Inv_Type
+                And     nat.Nad_Gty_Type        =   p_Nm_Obj_Type
+                And     nta.Nth_Update_On_Edit  =   'I'
+                )
+  Loop
+    If Irec.G_Or_I = 'G' Then
       --
       -- AE - 718333
       -- Include begin_mp and only operate on open shapes
@@ -5256,52 +4482,48 @@ end;
       -- Later change (30-MAR-09) remove the end_date check because this procedure
       -- is used for un-endating too
       --
-           upd_string :=
-               'update '|| irec.nth_feature_table
-            || '  set end_date    = :end_date '
-            || 'where ne_id       = :ne_id '
-            || '  and ne_id_of    = :ne_id_of '
-            || '  and nm_begin_mp = :nm_begin_mp ';
-
---            || '  and end_date IS NULL';
+      Upd_String := 'update '|| Irec.Nth_Feature_Table
+                  || '  set end_date    = :end_date '
+                  || 'where ne_id       = :ne_id '
+                  || '  and ne_id_of    = :ne_id_of '
+                  || '  and nm_begin_mp = :nm_begin_mp ';
 
       -- AE - 718333
       -- Include begin_mp and only operate on open shapes
       -- End of changes
 
-		--RAC - Task 0111157 - the update string must update the shape end date on the basis
-		--      of the actual start-date for the specific mamber that is targetted.
-		--      Without this, the end-date of an asset  (hence members) will update the end-date on
-		--      all shape records that have the same begin-mp - including those that are already ended.
-		
-           if p_nm_end_date is not null then
-             upd_string := upd_string ||' and end_date is null and start_date = :start_date';
-           else
-             upd_string := upd_string ||' and start_date = :start_date';
-           end if;
-		
---         nm_debug.debug('End date string '||upd_string);
-           EXECUTE IMMEDIATE upd_string
-                     USING p_nm_end_date, p_nm_ne_id_in, p_nm_ne_id_of, p_nm_begin_mp, p_nm_start_date;
-	  
-      --
-         ELSE
+      --RAC - Task 0111157 - the update string must update the shape end date on the basis
+      --      of the actual start-date for the specific mamber that is targetted.
+      --      Without this, the end-date of an asset  (hence members) will update the end-date on
+      --      all shape records that have the same begin-mp - including those that are already ended.
+
+      If P_Nm_End_Date Is Not Null Then
+        Upd_String := Upd_String ||' and end_date is null and start_date = :start_date';
+      Else
+        Upd_String := Upd_String ||' and start_date = :start_date';
+      End If;
+
+      Execute Immediate Upd_String
+      Using   p_Nm_End_Date,
+              p_Nm_Ne_Id_In,
+              p_Nm_Ne_Id_Of,
+              p_Nm_Begin_Mp,
+              p_Nm_Start_Date;
+    Else
       --
       -- Later change (30-MAR-09) remove the end_date check because this procedure
       -- is used for un-endating too
 
-          upd_string :=
-               'update '|| irec.nth_feature_table
-            || '   set end_date = :end_date '
-            || ' where ne_id_of = :ne_id_of '
-            ||   ' and nm_begin_mp = :nm_begin_mp '
-          --||   ' and end_date IS NULL '
-            ||   ' and ne_id in ( select nad_iit_ne_id '
-                               || ' from nm_nw_ad_link '
-                               ||' where nad_gty_type   = :p_gty_type '
-                                || ' and nad_inv_type   = :obj_type '
-                                || ' and nad_ne_id      = :nm_ne_id_in '
-                                || ' and nad_whole_road = :whole_road )';
+      Upd_String := 'update '|| Irec.Nth_Feature_Table
+                || '   set end_date = :end_date '
+                || ' where ne_id_of = :ne_id_of '
+                ||   ' and nm_begin_mp = :nm_begin_mp '
+                ||   ' and ne_id in ( select nad_iit_ne_id '
+                                   || ' from nm_nw_ad_link '
+                                   ||' where nad_gty_type   = :p_gty_type '
+                                    || ' and nad_inv_type   = :obj_type '
+                                    || ' and nad_ne_id      = :nm_ne_id_in '
+                                    || ' and nad_whole_road = :whole_road )';
       --
       -- AE 27-MAR-2009
       -- Pass in nm_begin_mp !!
@@ -5312,4171 +4534,3452 @@ end;
       --      Without this, the end-date of an asset  (hence members) will update the end-date on
       --      all shape records that have the same begin-mp - including those that are already ended.
         
-           if p_nm_end_date is not null then
-             upd_string := upd_string ||' and end_date is null and start_date = :start_date';
-           else
-             upd_string := upd_string ||' and start_date = :start_date';
-           end if;
+      If P_Nm_End_Date Is Not Null Then
+        Upd_String := Upd_String ||' and end_date is null and start_date = :start_date';
+      Else
+        Upd_String := Upd_String ||' and start_date = :start_date';
+      End If;
         
---         nm_debug.debug('End date string '||upd_string);
-
-           EXECUTE IMMEDIATE upd_string
-                    USING p_nm_end_date, p_nm_ne_id_of, p_nm_begin_mp, p_nm_obj_type, irec.obj_type, p_nm_ne_id_in, '1', p_nm_start_date;
-      --
-         END IF;
-      --
-      END LOOP;
-   END;
-
+      Execute Immediate Upd_String
+      Using   p_Nm_End_Date,
+              p_Nm_Ne_Id_Of,
+              p_Nm_Begin_Mp,
+              p_Nm_Obj_Type,
+              Irec.Obj_Type,
+              p_Nm_Ne_Id_In,
+              '1',
+              p_Nm_Start_Date;
+    End If;
+  End Loop;
+End End_Gty_Shape;
 --
 -----------------------------------------------------------------------------
 --
-   PROCEDURE add_member_shape (
-      p_nm_ne_id_in     IN   nm_members.nm_ne_id_in%TYPE,
-      p_nm_ne_id_of     IN   nm_members.nm_ne_id_of%TYPE,
-      p_nm_obj_type     IN   nm_members.nm_obj_type%TYPE,
-      p_nm_begin_mp     IN   nm_members.nm_begin_mp%TYPE,
-      p_nm_end_mp       IN   nm_members.nm_end_mp%TYPE,
-      p_nm_start_date   IN   nm_members.nm_start_date%TYPE,
-      p_nm_end_date     IN   nm_members.nm_end_date%TYPE,
-      p_nm_type         IN   nm_members.nm_type%TYPE
-   )
-   IS
-   BEGIN
-      IF p_nm_type = 'I'
-      THEN
-         add_inv_shape (p_nm_ne_id_in        => p_nm_ne_id_in,
-                        p_nm_ne_id_of        => p_nm_ne_id_of,
-                        p_nm_obj_type        => p_nm_obj_type,
-                        p_nm_begin_mp        => p_nm_begin_mp,
-                        p_nm_end_mp          => p_nm_end_mp,
-                        p_nm_start_date      => p_nm_start_date,
-                        p_nm_end_date        => p_nm_end_date
-                       );
-      ELSIF p_nm_type = 'G'
-      THEN
-         add_gty_shape (p_nm_ne_id_in        => p_nm_ne_id_in,
-                        p_nm_ne_id_of        => p_nm_ne_id_of,
-                        p_nm_obj_type        => p_nm_obj_type,
-                        p_nm_begin_mp        => p_nm_begin_mp,
-                        p_nm_end_mp          => p_nm_end_mp,
-                        p_nm_start_date      => p_nm_start_date,
-                        p_nm_end_date        => p_nm_end_date
-                       );
-      END IF;
-   END;
-
+Procedure Add_Member_Shape  (
+                            p_Nm_Ne_Id_In     In   Nm_Members.Nm_Ne_Id_In%Type,
+                            p_Nm_Ne_Id_Of     In   Nm_Members.Nm_Ne_Id_Of%Type,
+                            p_Nm_Obj_Type     In   Nm_Members.Nm_Obj_Type%Type,
+                            p_Nm_Begin_Mp     In   Nm_Members.Nm_Begin_Mp%Type,
+                            p_Nm_End_Mp       In   Nm_Members.Nm_End_Mp%Type,
+                            p_Nm_Start_Date   In   Nm_Members.Nm_Start_Date%Type,
+                            p_Nm_End_Date     In   Nm_Members.Nm_End_Date%Type,
+                            p_Nm_Type         In   Nm_Members.Nm_Type%Type
+                            )
+Is
+Begin
+  If P_Nm_Type = 'I'  Then
+    Add_Inv_Shape (
+                  p_Nm_Ne_Id_In        => p_Nm_Ne_Id_In,
+                  p_Nm_Ne_Id_Of        => p_Nm_Ne_Id_Of,
+                  p_Nm_Obj_Type        => p_Nm_Obj_Type,
+                  p_Nm_Begin_Mp        => p_Nm_Begin_Mp,
+                  p_Nm_End_Mp          => p_Nm_End_Mp,
+                  p_Nm_Start_Date      => p_Nm_Start_Date,
+                  p_Nm_End_Date        => p_Nm_End_Date
+                  );
+  Elsif P_Nm_Type = 'G' Then
+    Add_Gty_Shape (
+                  p_Nm_Ne_Id_In        => p_Nm_Ne_Id_In,
+                  p_Nm_Ne_Id_Of        => p_Nm_Ne_Id_Of,
+                  p_Nm_Obj_Type        => p_Nm_Obj_Type,
+                  p_Nm_Begin_Mp        => p_Nm_Begin_Mp,
+                  p_Nm_End_Mp          => p_Nm_End_Mp,
+                  p_Nm_Start_Date      => p_Nm_Start_Date,
+                  p_Nm_End_Date        => p_Nm_End_Date
+                 );
+  End If;
+End Add_Member_Shape;
 --
 -----------------------------------------------------------------------------
 --
-   PROCEDURE remove_member_shape (
-      p_nm_ne_id_in     IN   nm_members.nm_ne_id_in%TYPE,
-      p_nm_ne_id_of     IN   nm_members.nm_ne_id_of%TYPE,
-      p_nm_obj_type     IN   nm_members.nm_obj_type%TYPE,
-      p_nm_begin_mp     IN   nm_members.nm_begin_mp%TYPE,
-      p_nm_end_mp       IN   nm_members.nm_end_mp%TYPE,
-      p_nm_start_date   IN   nm_members.nm_start_date%TYPE,
-      p_nm_end_date     IN   nm_members.nm_end_date%TYPE,
-      p_nm_type         IN   nm_members.nm_type%TYPE
-   )
-   IS
-   BEGIN
-      IF p_nm_type = 'I'
-      THEN
-         remove_inv_shape (p_nm_ne_id_in        => p_nm_ne_id_in,
-                           p_nm_ne_id_of        => p_nm_ne_id_of,
-                           p_nm_obj_type        => p_nm_obj_type,
-                           p_nm_begin_mp        => p_nm_begin_mp,
-                           p_nm_end_mp          => p_nm_end_mp,
-                           p_nm_start_date      => p_nm_start_date,
-                           p_nm_end_date        => p_nm_end_date
-                          );
-      ELSIF p_nm_type = 'G'
-      THEN
-         remove_gty_shape (p_nm_ne_id_in        => p_nm_ne_id_in,
-                           p_nm_ne_id_of        => p_nm_ne_id_of,
-                           p_nm_obj_type        => p_nm_obj_type,
-                           p_nm_begin_mp        => p_nm_begin_mp,
-                           p_nm_end_mp          => p_nm_end_mp,
-                           p_nm_start_date      => p_nm_start_date,
-                           p_nm_end_date        => p_nm_end_date
-                          );
-      END IF;
-   END;
-
+Procedure Remove_Member_Shape (
+                              p_Nm_Ne_Id_In     In   Nm_Members.Nm_Ne_Id_In%Type,
+                              p_Nm_Ne_Id_Of     In   Nm_Members.Nm_Ne_Id_Of%Type,
+                              p_Nm_Obj_Type     In   Nm_Members.Nm_Obj_Type%Type,
+                              p_Nm_Begin_Mp     In   Nm_Members.Nm_Begin_Mp%Type,
+                              p_Nm_End_Mp       In   Nm_Members.Nm_End_Mp%Type,
+                              p_Nm_Start_Date   In   Nm_Members.Nm_Start_Date%Type,
+                              p_Nm_End_Date     In   Nm_Members.Nm_End_Date%Type,
+                              p_Nm_Type         In   Nm_Members.Nm_Type%Type
+                              )
+Is
+Begin
+  If P_Nm_Type = 'I'  Then
+   Remove_Inv_Shape (
+                    p_Nm_Ne_Id_In        => p_Nm_Ne_Id_In,
+                    p_Nm_Ne_Id_Of        => p_Nm_Ne_Id_Of,
+                    p_Nm_Obj_Type        => p_Nm_Obj_Type,
+                    p_Nm_Begin_Mp        => p_Nm_Begin_Mp,
+                    p_Nm_End_Mp          => p_Nm_End_Mp,
+                    p_Nm_Start_Date      => p_Nm_Start_Date,
+                    p_Nm_End_Date        => p_Nm_End_Date
+                    );
+  Elsif P_Nm_Type = 'G' Then
+    Remove_Gty_Shape  (
+                      p_Nm_Ne_Id_In        => p_Nm_Ne_Id_In,
+                      p_Nm_Ne_Id_Of        => p_Nm_Ne_Id_Of,
+                      p_Nm_Obj_Type        => p_Nm_Obj_Type,
+                      p_Nm_Begin_Mp        => p_Nm_Begin_Mp,
+                      p_Nm_End_Mp          => p_Nm_End_Mp,
+                      p_Nm_Start_Date      => p_Nm_Start_Date,
+                      p_Nm_End_Date        => p_Nm_End_Date
+                      );
+  End If;
+End Remove_Member_Shape;
 --
 -----------------------------------------------------------------------------
 --
-   PROCEDURE add_inv_shape (
-      p_nm_ne_id_in     IN   nm_members.nm_ne_id_in%TYPE,
-      p_nm_ne_id_of     IN   nm_members.nm_ne_id_of%TYPE,
-      p_nm_obj_type     IN   nm_members.nm_obj_type%TYPE,
-      p_nm_begin_mp     IN   nm_members.nm_begin_mp%TYPE,
-      p_nm_end_mp       IN   nm_members.nm_end_mp%TYPE,
-      p_nm_start_date   IN   nm_members.nm_start_date%TYPE,
-      p_nm_end_date     IN   nm_members.nm_end_date%TYPE
-   )
-   IS
-      CURSOR c_inv_tab (c_inv_type nm_inv_types.nit_inv_type%TYPE,
-                        c_ne_id    nm_elements.ne_id%TYPE)
-      IS
-         SELECT nth_theme_id, nth_feature_table, nth_feature_pk_column
-                nth_feature_fk_column, nbth_base_theme, nth_xsp_column
-           FROM NM_THEMES_ALL, NM_INV_THEMES, NM_BASE_THEMES, NM_NW_THEMES, nm_elements, NM_LINEAR_TYPES
-          WHERE nth_theme_id = nith_nth_theme_id
-            AND nth_theme_id = nbth_theme_id
-            AND nith_nit_id = c_inv_type
-            AND nth_update_on_edit = 'I'
-            AND ne_id = c_ne_id
-            AND ne_nt_type = nlt_nt_type
-            AND nnth_nth_theme_id = nbth_base_theme
-            AND nlt_id = nnth_nlt_id;
+Procedure Add_Inv_Shape (
+                        p_Nm_Ne_Id_In     In   Nm_Members.Nm_Ne_Id_In%Type,
+                        p_Nm_Ne_Id_Of     In   Nm_Members.Nm_Ne_Id_Of%Type,
+                        p_Nm_Obj_Type     In   Nm_Members.Nm_Obj_Type%Type,
+                        p_Nm_Begin_Mp     In   Nm_Members.Nm_Begin_Mp%Type,
+                        p_Nm_End_Mp       In   Nm_Members.Nm_End_Mp%Type,
+                        p_Nm_Start_Date   In   Nm_Members.Nm_Start_Date%Type,
+                        p_Nm_End_Date     In   Nm_Members.Nm_End_Date%Type
+                        )
+Is
+  Ins_String   Varchar2 (2000);
+  l_Geom       Mdsys.Sdo_Geometry;
+  l_Nit        Nm_Inv_Types%Rowtype   := Nm3Get.Get_Nit (p_Nm_Obj_Type);
+  l_Objid      Number;
+Begin
+  --allow for many layers of the same asset type, only deal with immediate themes
+  For Irec In   (
+                Select    nta.Nth_Theme_Id,
+                          nta.Nth_Feature_Table,
+                          nta.Nth_Feature_Pk_Column,
+                          nta.Nth_Feature_Fk_Column,
+                          nbt.Nbth_Base_Theme,
+                          nta.Nth_Xsp_Column
+                From      Nm_Themes_All     nta,
+                          Nm_Inv_Themes     nit,
+                          Nm_Base_Themes    nbt,
+                          Nm_Nw_Themes      nnt,
+                          Nm_Elements       ne,
+                          Nm_Linear_Types   nlt
+                Where     nta.Nth_Theme_Id        =   nit.Nith_Nth_Theme_Id
+                And       nta.Nth_Theme_Id        =   nbt.Nbth_Theme_Id
+                And       nit.Nith_Nit_Id         =   p_Nm_Obj_Type
+                And       nta.Nth_Update_On_Edit  =   'I'
+                And       ne.Ne_Id                =   p_Nm_Ne_Id_Of
+                And       ne.Ne_Nt_Type           =   nlt.Nlt_Nt_Type
+                And       nnt.Nnth_Nth_Theme_Id   =   nbt.Nbth_Base_Theme
+                And       nlt.Nlt_Id              =   nnt.Nnth_Nlt_Id
+                )
+  Loop
+    If Nm3Sdo.Use_Surrogate_Key = 'N' Then
+      Ins_String := 'insert into '
+                 || Irec.Nth_Feature_Table
+                 || ' ( ne_id, ne_id_of, nm_begin_mp, nm_end_mp, geoloc, start_date, end_date )'
+                 || ' values (:ne_id, :ne_id_of, :nm_begin_mp, :nm_end_mp, :geoloc, :start_date, :end_date )';
 
-
---allow for many layers of the same asset type, only deal with immediate themes
-      ins_string   VARCHAR2 (2000);
-      l_geom       MDSYS.SDO_GEOMETRY;
-      l_nit        nm_inv_types%ROWTYPE   := Nm3get.get_nit (p_nm_obj_type);
-      l_objid      NUMBER;
-   BEGIN
---  nm_debug.debug('Adding shape of '||p_nm_obj_type||' between '||to_char(p_nm_begin_mp)||
---    ' and '||to_char(p_nm_end_mp)|| ' on '||nm3net.get_ne_unique( p_nm_ne_id_of )||' start @ '||
---    to_char( p_nm_start_date, 'DD-MON-YYYY')||' end @ '||to_char( p_nm_end_date, 'DD-MON-YYYY'));
-      FOR irec IN c_inv_tab (p_nm_obj_type, p_nm_ne_id_of )
-      LOOP
---    nm_debug.debug('insert - '||irec.nth_feature_table);
-         IF Nm3sdo.use_surrogate_key = 'N'
-         THEN
-            ins_string :=
-                  'insert into '
-               || irec.nth_feature_table
-               || ' ( ne_id, ne_id_of, nm_begin_mp, nm_end_mp, geoloc, start_date, end_date )'
-               || ' values (:ne_id, :ne_id_of, :nm_begin_mp, :nm_end_mp, :geoloc, :start_date, :end_date )';
-
-            IF l_nit.nit_pnt_or_cont = 'P'
-            THEN
-               l_geom :=
-                  Nm3sdo.get_pt_shape_from_ne (irec.nbth_base_theme,
-                                               p_nm_ne_id_of,
-                                               p_nm_begin_mp
+      If L_Nit.Nit_Pnt_Or_Cont = 'P'  Then
+        l_Geom := Nm3Sdo.Get_Pt_Shape_From_Ne (
+                                              Irec.Nbth_Base_Theme,
+                                              p_Nm_Ne_Id_Of,
+                                              p_Nm_Begin_Mp
                                               );
-            ELSE
-               l_geom :=
-                  Nm3sdo.get_shape_from_nm (irec.nbth_base_theme,
-                                            p_nm_ne_id_in,
-                                            p_nm_ne_id_of,
-                                            p_nm_begin_mp,
-                                            p_nm_end_mp
-                                           );
-            END IF;
+      Else
+        l_Geom := Nm3Sdo.Get_Shape_From_Nm  (
+                                            Irec.Nbth_Base_Theme,
+                                            p_Nm_Ne_Id_In,
+                                            p_Nm_Ne_Id_Of,
+                                            p_Nm_Begin_Mp,
+                                            p_Nm_End_Mp
+                                            );
+      End If;
 
-            -- CWS Lateral Offset change
-            IF irec.nth_xsp_column IS NOT NULL 
-            AND NVL(hig.get_sysopt('XSPOFFSET'),'N') = 'Y'-- check prod opt
-            THEN
+      If      Irec.Nth_Xsp_Column                   Is  Not Null 
+          And Nvl(Hig.Get_Sysopt('XSPOFFSET'),'N')  =   'Y' Then
 
-               l_geom := nm3sdo_dynseg.get_shape( irec.nbth_base_theme, p_nm_ne_id_in, p_nm_ne_id_of, p_nm_begin_mp, p_nm_end_mp );
+        l_Geom := Nm3Sdo_Dynseg.Get_Shape( Irec.Nbth_Base_Theme, P_Nm_Ne_Id_In, P_Nm_Ne_Id_Of, P_Nm_Begin_Mp, P_Nm_End_Mp );
            
-            END IF;
+      End If;
 
-            IF l_geom IS NOT NULL
-            THEN
-               EXECUTE IMMEDIATE ins_string
-                           USING p_nm_ne_id_in,
-                                 p_nm_ne_id_of,
-                                 p_nm_begin_mp,
-                                 p_nm_end_mp,
-                                 l_geom,
-                                 p_nm_start_date,
-                                 p_nm_end_date;
-            END IF;
-         ELSE
-            EXECUTE IMMEDIATE    'select '
-                              || Nm3sdo.get_spatial_seq (irec.nth_theme_id)
-                              || '.nextval from dual'
-                         INTO l_objid;
+      If l_Geom Is Not Null Then
+        
+        Execute Immediate Ins_String
+        Using   p_Nm_Ne_Id_In,
+                p_Nm_Ne_Id_Of,
+                p_Nm_Begin_Mp,
+                p_Nm_End_Mp,
+                l_Geom,
+                p_Nm_Start_Date,
+                p_Nm_End_Date;
+      End If;
+    Else
+      Execute Immediate    'select '
+                          || Nm3Sdo.Get_Spatial_Seq (Irec.Nth_Theme_Id)
+                          || '.nextval from dual'
+      Into  l_Objid;
 
-            ins_string :=
-                  'insert into '
-               || irec.nth_feature_table
-               || ' ( objectid, ne_id, ne_id_of, nm_begin_mp, nm_end_mp, geoloc, start_date, end_date )'
-               || ' values (:objectid, :ne_id, :ne_id_of, :nm_begin_mp, :nm_end_mp, :geoloc, :start_date, :end_date )';
+      Ins_String := 'insert into '
+                 || Irec.Nth_Feature_Table
+                 || ' ( objectid, ne_id, ne_id_of, nm_begin_mp, nm_end_mp, geoloc, start_date, end_date )'
+                 || ' values (:objectid, :ne_id, :ne_id_of, :nm_begin_mp, :nm_end_mp, :geoloc, :start_date, :end_date )';
 
-            IF l_nit.nit_pnt_or_cont = 'P'
-            THEN
-               l_geom :=
-                  Nm3sdo.get_pt_shape_from_ne (irec.nbth_base_theme,
-                                               p_nm_ne_id_of,
-                                               p_nm_begin_mp
-                                              );
-            ELSE
-               l_geom :=
-                  Nm3sdo.get_shape_from_nm (irec.nbth_base_theme,
-                                            p_nm_ne_id_in,
-                                            p_nm_ne_id_of,
-                                            p_nm_begin_mp,
-                                            p_nm_end_mp
+      If l_Nit.Nit_Pnt_Or_Cont = 'P'  Then
+          l_Geom := Nm3Sdo.Get_Pt_Shape_From_Ne (
+                                                Irec.Nbth_Base_Theme,
+                                                p_Nm_Ne_Id_Of,
+                                                p_Nm_Begin_Mp
+                                                );
+      Else
+        l_Geom := Nm3Sdo.Get_Shape_From_Nm  (
+                                            Irec.Nbth_Base_Theme,
+                                            p_Nm_Ne_Id_In,
+                                            p_Nm_Ne_Id_Of,
+                                            p_Nm_Begin_Mp,
+                                            p_Nm_End_Mp
                                            );
-            END IF;
+      End If;
 
-            -- CWS Lateral Offset Change
-            IF irec.nth_xsp_column IS NOT NULL 
-            AND NVL(hig.get_sysopt('XSPOFFSET'),'N') = 'Y'-- check prod opt  
-            THEN
-               IF l_nit.nit_pnt_or_cont = 'P' 
-               THEN
-                 l_geom := sdo_lrs.convert_to_std_geom(nm3sdo_dynseg.get_shape( irec.nbth_base_theme, p_nm_ne_id_in, p_nm_ne_id_of, p_nm_begin_mp, p_nm_end_mp ));
-               ELSE
-                 l_geom := nm3sdo_dynseg.get_shape( irec.nbth_base_theme, p_nm_ne_id_in, p_nm_ne_id_of, p_nm_begin_mp, p_nm_end_mp );
-               END IF;
-            END IF;
+      If      Irec.Nth_Xsp_Column                   Is  Not Null 
+          And Nvl(Hig.Get_Sysopt('XSPOFFSET'),'N')  =   'Y'   Then
 
-            IF l_geom IS NOT NULL
-            THEN
-               EXECUTE IMMEDIATE ins_string
-                           USING l_objid,
-                                 p_nm_ne_id_in,
-                                 p_nm_ne_id_of,
-                                 p_nm_begin_mp,
-                                 p_nm_end_mp,
-                                 l_geom,
-                                 p_nm_start_date,
-                                 p_nm_end_date;
-            END IF;
-         END IF;
-      END LOOP;
-   END;
+        If l_Nit.Nit_Pnt_Or_Cont = 'P'  Then
+             l_Geom := Sdo_Lrs.Convert_To_Std_Geom(Nm3Sdo_Dynseg.Get_Shape  (
+                                                                            Irec.Nbth_Base_Theme,
+                                                                            p_Nm_Ne_Id_In,
+                                                                            p_Nm_Ne_Id_Of,
+                                                                            p_Nm_Begin_Mp,P_Nm_End_Mp 
+                                                                            ));
+        Else
+             l_Geom := Nm3Sdo_Dynseg.Get_Shape  (
+                                                Irec.Nbth_Base_Theme,
+                                                p_Nm_Ne_Id_In,
+                                                p_Nm_Ne_Id_Of,
+                                                p_Nm_Begin_Mp,
+                                                p_Nm_End_Mp
+                                                );
+        End If;
+      End If;
 
+      If l_Geom Is Not Null Then
+        Execute Immediate Ins_String
+        Using   l_Objid,
+                p_Nm_Ne_Id_In,
+                p_Nm_Ne_Id_Of,
+                p_Nm_Begin_Mp,
+                p_Nm_End_Mp,
+                l_Geom,
+                p_Nm_Start_Date,
+                p_Nm_End_Date;
+      End If;
+    End If;
+  End Loop;
+End Add_Inv_Shape;
 --
 ---------------------------------------------------------------------------------------------------
 --
-   PROCEDURE remove_inv_shape (
-      p_nm_ne_id_in     IN   nm_members.nm_ne_id_in%TYPE,
-      p_nm_ne_id_of     IN   nm_members.nm_ne_id_of%TYPE,
-      p_nm_obj_type     IN   nm_members.nm_obj_type%TYPE,
-      p_nm_begin_mp     IN   nm_members.nm_begin_mp%TYPE,
-      p_nm_end_mp       IN   nm_members.nm_end_mp%TYPE,
-      p_nm_start_date   IN   nm_members.nm_start_date%TYPE,
-      p_nm_end_date     IN   nm_members.nm_end_date%TYPE
-   )
-   IS
-      CURSOR c_inv_tab (c_inv_type nm_inv_types.nit_inv_type%TYPE)
-      IS
-         SELECT nth_feature_table, nth_feature_pk_column,
-                nth_feature_fk_column
-           FROM NM_THEMES_ALL, NM_INV_THEMES
-          WHERE nth_theme_id = nith_nth_theme_id
-            AND nith_nit_id = c_inv_type
-            AND nth_update_on_edit = 'I';
+Procedure Remove_Inv_Shape  (
+                            p_Nm_Ne_Id_In     In   Nm_Members.Nm_Ne_Id_In%Type,
+                            p_Nm_Ne_Id_Of     In   Nm_Members.Nm_Ne_Id_Of%Type,
+                            p_Nm_Obj_Type     In   Nm_Members.Nm_Obj_Type%Type,
+                            p_Nm_Begin_Mp     In   Nm_Members.Nm_Begin_Mp%Type,
+                            p_Nm_End_Mp       In   Nm_Members.Nm_End_Mp%Type,
+                            p_Nm_Start_Date   In   Nm_Members.Nm_Start_Date%Type,
+                            p_Nm_End_Date     In   Nm_Members.Nm_End_Date%Type
+                            )
+Is
+  
+  Del_String   Varchar2 (2000);
+  l_Geom       Mdsys.Sdo_Geometry;
+  l_Nit        Nm_Inv_Types%Rowtype   := Nm3Get.Get_Nit (p_Nm_Obj_Type);
+Begin
+  --allow for many layers of the same asset type, only address immediate themes
+  For Irec In (
+              Select  nta.Nth_Feature_Table,
+                      nta.Nth_Feature_Pk_Column,
+                      nta.Nth_Feature_Fk_Column
+              From    Nm_Themes_All   nta,
+                      Nm_Inv_Themes   nit
+              Where   nta.Nth_Theme_Id        =   nit.Nith_Nth_Theme_Id
+              And     nit.Nith_Nit_Id         =   p_Nm_Obj_Type
+              And     nta.Nth_Update_On_Edit  =   'I'
+              )
+  Loop
+    Del_String :=  'delete from '
+                || Irec.Nth_Feature_Table
+                || ' where ne_id = :ne_id'
+                || ' and ne_id_of = :ne_id_of '
+                || ' and nm_begin_mp = :ne_begin_mp '
+                || ' and start_date = :start_date';
 
---allow for many layers of the same asset type, only address immediate themes
-      del_string   VARCHAR2 (2000);
-      l_geom       MDSYS.SDO_GEOMETRY;
-      l_nit        nm_inv_types%ROWTYPE   := Nm3get.get_nit (p_nm_obj_type);
-   BEGIN
---  nm_debug.debug('Removing shape of '||p_nm_obj_type||' between '||to_char(p_nm_begin_mp)||
---    ' and '||to_char(p_nm_end_mp)|| ' on '||nm3net.get_ne_unique( p_nm_ne_id_of ));
-      FOR irec IN c_inv_tab (p_nm_obj_type)
-      LOOP
---  nm_debug.debug('delete - '||irec.nth_feature_table);
-         del_string :=
-               'delete from '
-            || irec.nth_feature_table
-            || ' where ne_id = :ne_id'
-            || ' and ne_id_of = :ne_id_of '
-            || ' and nm_begin_mp = :ne_begin_mp '
-            || ' and start_date = :start_date';
-
--- nm_debug.debug( del_string );
-         EXECUTE IMMEDIATE del_string
-                     USING p_nm_ne_id_in,
-                           p_nm_ne_id_of,
-                           p_nm_begin_mp,
-                           p_nm_start_date;
-      END LOOP;
-   END;
-
+    Execute Immediate Del_String
+    Using   p_Nm_Ne_Id_In,
+            p_Nm_Ne_Id_Of,
+            p_Nm_Begin_Mp,
+            p_Nm_Start_Date;
+  End Loop;
+End Remove_Inv_Shape;
 --
 -----------------------------------------------------------------------------
 --
-   PROCEDURE add_gty_shape (
-      p_nm_ne_id_in     IN   nm_members.nm_ne_id_in%TYPE,
-      p_nm_ne_id_of     IN   nm_members.nm_ne_id_of%TYPE,
-      p_nm_obj_type     IN   nm_members.nm_obj_type%TYPE,
-      p_nm_begin_mp     IN   nm_members.nm_begin_mp%TYPE,
-      p_nm_end_mp       IN   nm_members.nm_end_mp%TYPE,
-      p_nm_start_date   IN   nm_members.nm_start_date%TYPE,
-      p_nm_end_date     IN   nm_members.nm_end_date%TYPE
-   )
-   IS
-      CURSOR c_gty_tab (c_gty_type nm_inv_types.nit_inv_type%TYPE,
-                        c_ne_id IN nm_elements.ne_id%TYPE,
-                        c_nm_ne_id_in in nm_members.nm_ne_id_in%type )
-      IS
-         SELECT nth_theme_id, nth_feature_table, nth_feature_pk_column, nth_feature_shape_column,
-                nth_feature_fk_column, nbth_base_theme, 'G' G_or_I, c_gty_type OBJ_TYPE
-           FROM NM_THEMES_ALL, NM_AREA_THEMES, NM_AREA_TYPES, NM_BASE_THEMES, NM_NW_THEMES, nm_elements, NM_LINEAR_TYPES
-          WHERE nth_theme_id = nath_nth_theme_id
-            AND nth_theme_id = nbth_theme_id
-            AND nath_nat_id = nat_id
-            AND nat_gty_group_type = c_gty_type
-            AND nth_update_on_edit = 'I'
-            AND ne_id = c_ne_id
-            AND ne_nt_type = nlt_nt_type
-            AND nnth_nth_theme_id = nbth_base_theme
-            AND nlt_id = nnth_nlt_id
-         UNION
-         SELECT nth_theme_id, nth_feature_table, nth_feature_pk_column, nth_feature_shape_column,
-                nth_feature_fk_column, nbth_base_theme, 'I', nad_inv_type
-           FROM NM_THEMES_ALL, NM_INV_THEMES, NM_BASE_THEMES, NM_NW_THEMES, NM_ELEMENTS, NM_LINEAR_TYPES, NM_NW_AD_LINK
-          WHERE nth_theme_id = nith_nth_theme_id
-            AND nth_theme_id = nbth_theme_id
-            and nad_inv_type = nith_nit_id
-            AND nad_gty_type = c_gty_type
-            AND nth_update_on_edit = 'I'
-            AND ne_id = c_ne_id
-            AND ne_nt_type = nlt_nt_type
-            AND nnth_nth_theme_id = nbth_base_theme
-            AND nlt_id = nnth_nlt_id
-            and nad_ne_id = c_nm_ne_id_in;
+Procedure Add_Gty_Shape (
+                        p_Nm_Ne_Id_In     In   Nm_Members.Nm_Ne_Id_In%Type,
+                        p_Nm_Ne_Id_Of     In   Nm_Members.Nm_Ne_Id_Of%Type,
+                        p_Nm_Obj_Type     In   Nm_Members.Nm_Obj_Type%Type,
+                        p_Nm_Begin_Mp     In   Nm_Members.Nm_Begin_Mp%Type,
+                        p_Nm_End_Mp       In   Nm_Members.Nm_End_Mp%Type,
+                        p_Nm_Start_Date   In   Nm_Members.Nm_Start_Date%Type,
+                        p_Nm_End_Date     In   Nm_Members.Nm_End_Date%Type
+                        )
+Is
+  Ins_String   Varchar2 (2000);
+  l_Geom       Mdsys.Sdo_Geometry;
+  l_Objid      Number;
+  l_Seq_Name   Varchar2(30);
+Begin
+  --allow for many layers of the same group type, only deal with immediate themes
+  For Irec In (
+              Select  nta.Nth_Theme_Id,
+                      nta.Nth_Feature_Table,
+                      nta.Nth_Feature_Pk_Column,
+                      nta.Nth_Feature_Shape_Column,
+                      nta.Nth_Feature_Fk_Column,
+                      nbt.Nbth_Base_Theme,
+                      'G' G_Or_I,
+                      p_Nm_Obj_Type Obj_Type
+              From    Nm_Themes_All     nta,
+                      Nm_Area_Themes    nat,
+                      Nm_Area_Types     naty,
+                      Nm_Base_Themes    nbt,
+                      Nm_Nw_Themes      nnt,
+                      Nm_Elements       ne,
+                      Nm_Linear_Types   nlt
+              Where   nta.Nth_Theme_Id        =   nat.Nath_Nth_Theme_Id
+              And     nta.Nth_Theme_Id        =   nbt.Nbth_Theme_Id
+              And     nat.Nath_Nat_Id         =   naty.Nat_Id
+              And     naty.Nat_Gty_Group_Type =   p_Nm_Obj_Type
+              And     nta.Nth_Update_On_Edit  =   'I'
+              And     ne.Ne_Id                =   p_Nm_Ne_Id_Of
+              And     ne.Ne_Nt_Type           =   nlt.Nlt_Nt_Type
+              And     nnt.Nnth_Nth_Theme_Id   =   nbt.Nbth_Base_Theme
+              And     nlt.Nlt_Id              =   nnt.Nnth_Nlt_Id
+              Union
+              Select  nta.Nth_Theme_Id,
+                      nta.Nth_Feature_Table,
+                      nta.Nth_Feature_Pk_Column,
+                      nta.Nth_Feature_Shape_Column,
+                      nta.Nth_Feature_Fk_Column,
+                      nbt.Nbth_Base_Theme,
+                      'I',
+                      nal.Nad_Inv_Type
+              From    Nm_Themes_All   nta,
+                      Nm_Inv_Themes   nit,
+                      Nm_Base_Themes  nbt,
+                      Nm_Nw_Themes    nnt,
+                      Nm_Elements     ne,
+                      Nm_Linear_Types nlt,
+                      Nm_Nw_Ad_Link   nal
+              Where   nta.Nth_Theme_Id        =   nit.Nith_Nth_Theme_Id
+              And     nta.Nth_Theme_Id        =   nbt.Nbth_Theme_Id
+              And     nal.Nad_Inv_Type        =   nit.Nith_Nit_Id
+              And     nal.Nad_Gty_Type        =   p_Nm_Obj_Type
+              And     nta.Nth_Update_On_Edit  =   'I'
+              And     ne.Ne_Id                =   p_Nm_Ne_Id_Of
+              And     ne.Ne_Nt_Type           =   nlt.Nlt_Nt_Type
+              And     nnt.Nnth_Nth_Theme_Id   =   nbt.Nbth_Base_Theme
+              And     nlt.Nlt_Id              =   nnt.Nnth_Nlt_Id
+              And     nal.Nad_Ne_Id           =   p_Nm_Ne_Id_In
+              )
+  Loop
+    If Irec.G_Or_I = 'G' Then
+      Execute Immediate    'select '
+                          || Nm3Sdo.Get_Spatial_Seq (Irec.Nth_Theme_Id)
+                          || '.nextval FROM DUAL'
+      Into l_Objid;
 
+      Ins_String := 'insert into '
+                 || Irec.Nth_Feature_Table
+                 || ' ( objectid, ne_id, ne_id_of, nm_begin_mp, nm_end_mp, geoloc, start_date, end_date )'
+                 || ' values (:objectid, :ne_id, :ne_id_of, :nm_begin_mp, :nm_end_mp, :geoloc, :start_date, :end_date )';
 
---allow for many layers of the same group type, only deal with immediate themes
-      ins_string   VARCHAR2 (2000);
-      l_geom       MDSYS.SDO_GEOMETRY;
-      l_objid      NUMBER;
-      l_seq_name   varchar2(30);
-   BEGIN
---      nm_debug.debug('Adding shape of '||p_nm_obj_type||' between '||to_char(p_nm_begin_mp)||
---      ' and '||to_char(p_nm_end_mp)|| ' on '||nm3net.get_ne_unique( p_nm_ne_id_of )||' start @ '||
---      to_char( p_nm_start_date, 'DD-MON-YYYY')||' end @ '||to_char( p_nm_end_date, 'DD-MON-YYYY'));
+      l_Geom := Sdo_Lrs.Convert_To_Std_Geom (
+                                            Nm3Sdo.Get_Shape_From_Nm  (
+                                                                      Irec.Nbth_Base_Theme,
+                                                                      p_Nm_Ne_Id_In,
+                                                                      p_Nm_Ne_Id_Of,
+                                                                      p_Nm_Begin_Mp,
+                                                                      p_Nm_End_Mp
+                                                                      ));
+      --
+      -- Task 0108237
+      -- AE don't process this insert if the shape is null
+      --
+      If l_Geom Is Not Null Then
+        Execute Immediate Ins_String
+        Using   l_Objid,
+                p_Nm_Ne_Id_In,
+                p_Nm_Ne_Id_Of,
+                p_Nm_Begin_Mp,
+                p_Nm_End_Mp,
+                l_Geom,
+                p_Nm_Start_Date,
+                p_Nm_End_Date;
+      End If;
+    Else
 
-      FOR irec IN c_gty_tab (p_nm_obj_type, p_nm_ne_id_of, p_nm_ne_id_in)
-      LOOP
---      nm_debug.debug('insert - '||irec.nth_feature_table);
-        if irec.g_or_i = 'G' then
+      l_Seq_Name := Nm3Sdo.Get_Spatial_Seq (Irec.Nth_Theme_Id);
 
-          EXECUTE IMMEDIATE    'select '
-                              || Nm3sdo.get_spatial_seq (irec.nth_theme_id)
-                              || '.nextval FROM DUAL'
-                         INTO l_objid;
+      Ins_String := 'insert into '
+                || Irec.Nth_Feature_Table
+                ||' ( objectid, ne_id, ne_id_of, nm_begin_mp, nm_end_mp, geoloc, start_date, end_date )'
+                ||' select '||L_Seq_Name||'.nextval, nad_iit_ne_id, :ne_id_of, :nm_begin_mp, :nm_end_mp, '
+                ||' Nm3sdo.get_shape_from_nm ('||To_Char(Irec.Nbth_Base_Theme)||', '
+                ||' :group_ne_id, '
+                ||' :ne_id_of, '
+                ||' :nm_begin_mp, '
+                ||' :nm_end_mp ), :start_date, :end_date '
+                ||' from nm_nw_ad_link where nad_ne_id = :group_ne_id '
+                ||' and nad_inv_type = :obj_type '
+                ||' and nad_whole_road = '||''''||'1'||'''';
 
-          ins_string :=
-                  'insert into '
-               || irec.nth_feature_table
-               || ' ( objectid, ne_id, ne_id_of, nm_begin_mp, nm_end_mp, geoloc, start_date, end_date )'
-               || ' values (:objectid, :ne_id, :ne_id_of, :nm_begin_mp, :nm_end_mp, :geoloc, :start_date, :end_date )';
-
-          l_geom :=
-               sdo_lrs.convert_to_std_geom
-                               (Nm3sdo.get_shape_from_nm (irec.nbth_base_theme,
-                                                          p_nm_ne_id_in,
-                                                          p_nm_ne_id_of,
-                                                          p_nm_begin_mp,
-                                                          p_nm_end_mp
-                                                         )
-                               );
-
-          --
-          -- Task 0108237
-          -- AE don't process this insert if the shape is null
-          --
-
-          IF l_geom IS NOT NULL
-          THEN
-            EXECUTE IMMEDIATE ins_string
-                        USING l_objid,
-                              p_nm_ne_id_in,
-                              p_nm_ne_id_of,
-                              p_nm_begin_mp,
-                              p_nm_end_mp,
-                              l_geom,
-                              p_nm_start_date,
-                              p_nm_end_date;
-          END IF;
-
-
-        ELSE
-
-          l_seq_name := Nm3sdo.get_spatial_seq (irec.nth_theme_id);
-
-          ins_string := 'insert into '
-              || irec.nth_feature_table
-              ||' ( objectid, ne_id, ne_id_of, nm_begin_mp, nm_end_mp, geoloc, start_date, end_date )'
-              ||' select '||l_seq_name||'.nextval, nad_iit_ne_id, :ne_id_of, :nm_begin_mp, :nm_end_mp, '
-              ||' Nm3sdo.get_shape_from_nm ('||to_char(irec.nbth_base_theme)||', '
-              ||' :group_ne_id, '
-              ||' :ne_id_of, '
-              ||' :nm_begin_mp, '
-              ||' :nm_end_mp ), :start_date, :end_date '
-              ||' from nm_nw_ad_link where nad_ne_id = :group_ne_id '
-              ||' and nad_inv_type = :obj_type '
-              ||' and nad_whole_road = '||''''||'1'||'''';
-
-          EXECUTE IMMEDIATE ins_string
-                           USING p_nm_ne_id_of,
-                                 p_nm_begin_mp,
-                                 p_nm_end_mp,
-                                 p_nm_ne_id_in,
-                                 p_nm_ne_id_of,
-                                 p_nm_begin_mp,
-                                 p_nm_end_mp,
-                                 p_nm_start_date,
-                                 p_nm_end_date,
-                                 p_nm_ne_id_in,
-                                 irec.obj_type;
-
-
-
-        END IF;
-
-      END LOOP;
-   END;
-
+      Execute Immediate Ins_String
+      Using   p_Nm_Ne_Id_Of,
+              p_Nm_Begin_Mp,
+              p_Nm_End_Mp,
+              p_Nm_Ne_Id_In,
+              p_Nm_Ne_Id_Of,
+              p_Nm_Begin_Mp,
+              p_Nm_End_Mp,
+              p_Nm_Start_Date,
+              p_Nm_End_Date,
+              p_Nm_Ne_Id_In,
+              Irec.Obj_Type;
+    End If;
+  End Loop;
+End Add_Gty_Shape;
 --
 ---------------------------------------------------------------------------------------------------
 --
-   PROCEDURE remove_gty_shape (
-      p_nm_ne_id_in     IN   nm_members.nm_ne_id_in%TYPE,
-      p_nm_ne_id_of     IN   nm_members.nm_ne_id_of%TYPE,
-      p_nm_obj_type     IN   nm_members.nm_obj_type%TYPE,
-      p_nm_begin_mp     IN   nm_members.nm_begin_mp%TYPE,
-      p_nm_end_mp       IN   nm_members.nm_end_mp%TYPE,
-      p_nm_start_date   IN   nm_members.nm_start_date%TYPE,
-      p_nm_end_date     IN   nm_members.nm_end_date%TYPE
-   )
-   IS
-      CURSOR c_gty_tab (c_gty_type nm_inv_types.nit_inv_type%TYPE)
-      IS
-         SELECT nth_theme_id, nth_feature_table, nth_feature_pk_column,
-                nth_feature_fk_column, 'G' ad_flag
-           FROM NM_THEMES_ALL, NM_AREA_THEMES, NM_AREA_TYPES
-          WHERE nth_theme_id = nath_nth_theme_id
-            AND nath_nat_id = nat_id
-            AND nat_gty_group_type = c_gty_type
-            AND nth_update_on_edit = 'I'
-         UNION
-         SELECT nth_theme_id, nth_feature_table, nth_feature_pk_column,
-                nth_feature_fk_column, 'I'
-           FROM NM_THEMES_ALL, nm_nw_ad_types, nm_inv_themes
-          WHERE nth_theme_id = nith_nth_theme_id
-            AND nith_nit_id = nad_inv_type
-            AND nad_gty_type = c_gty_type
-            AND nth_update_on_edit = 'I';
+Procedure Remove_Gty_Shape  (
+                            p_Nm_Ne_Id_In     In   Nm_Members.Nm_Ne_Id_In%Type,
+                            p_Nm_Ne_Id_Of     In   Nm_Members.Nm_Ne_Id_Of%Type,
+                            p_Nm_Obj_Type     In   Nm_Members.Nm_Obj_Type%Type,
+                            p_Nm_Begin_Mp     In   Nm_Members.Nm_Begin_Mp%Type,
+                            p_Nm_End_Mp       In   Nm_Members.Nm_End_Mp%Type,
+                            p_Nm_Start_Date   In   Nm_Members.Nm_Start_Date%Type,
+                            p_Nm_End_Date     In   Nm_Members.Nm_End_Date%Type
+                            )
+Is
+  Del_String   Varchar2 (2000);
+  l_Geom       Mdsys.Sdo_Geometry;
+Begin
 
---
-      del_string   VARCHAR2 (2000);
-      l_geom       MDSYS.SDO_GEOMETRY;
-   BEGIN
---  nm_debug.debug('Removing shape of '||p_nm_obj_type||' between '||to_char(p_nm_begin_mp)||
---    ' and '||to_char(p_nm_end_mp)|| ' on '||nm3net.get_ne_unique( p_nm_ne_id_of ));
-      FOR irec IN c_gty_tab (p_nm_obj_type)
-     LOOP
---  nm_debug.debug('delete - '||irec.nth_feature_table);
-         if irec.ad_flag = 'G' then
-           del_string :=
-               'delete from '
-            || irec.nth_feature_table
-            || ' where ne_id = :ne_id'
-            || ' and ne_id_of = :ne_id_of '
-            || ' and nm_begin_mp = :ne_begin_mp '
-            || ' and start_date = :start_date';
-         else		
-           del_string :=
-               'delete from '
-            || irec.nth_feature_table
-            || ' where ne_id in ( select nad_iit_ne_id from nm_nw_ad_link where nad_ne_id =  :ne_id )'
-            || ' and ne_id_of = :ne_id_of '
-            || ' and nm_begin_mp = :ne_begin_mp '
-            || ' and start_date = :start_date';
-         end if;
+  For Irec In (
+              Select  nta.Nth_Theme_Id,
+                      nta.Nth_Feature_Table,
+                      nta.Nth_Feature_Pk_Column,
+                      nta.Nth_Feature_Fk_Column,
+                      'G' Ad_Flag
+              From    Nm_Themes_All   nta,
+                      Nm_Area_Themes  nat,
+                      Nm_Area_Types   naty
+              Where   nta.Nth_Theme_Id          =   nat.Nath_Nth_Theme_Id
+              And     nat.Nath_Nat_Id           =   naty.Nat_Id
+              And     naty.Nat_Gty_Group_Type   =   p_Nm_Obj_Type
+              And     nta.Nth_Update_On_Edit    =   'I'
+              Union
+              Select  nta.Nth_Theme_Id,
+                      nta.Nth_Feature_Table,
+                      Nth_Feature_Pk_Column,
+                      nta.Nth_Feature_Fk_Column,
+                      'I'
+              From    Nm_Themes_All   nta,
+                      Nm_Nw_Ad_Types  nat,
+                      Nm_Inv_Themes   nit
+              Where   nta.Nth_Theme_Id        =   nit.Nith_Nth_Theme_Id
+              And     nit.Nith_Nit_Id         =   nat.Nad_Inv_Type
+              And     nat.Nad_Gty_Type        =   p_Nm_Obj_Type
+              And     nta.Nth_Update_On_Edit  =   'I'
+              )
+  Loop
+  If Irec.Ad_Flag = 'G' Then
+    Del_String := 'delete from '
+              || Irec.Nth_Feature_Table
+              || ' where ne_id = :ne_id'
+              || ' and ne_id_of = :ne_id_of '
+              || ' and nm_begin_mp = :ne_begin_mp '
+              || ' and start_date = :start_date';
+  Else		
+    Del_String := 'delete from '
+              || Irec.Nth_Feature_Table
+              || ' where ne_id in ( select nad_iit_ne_id from nm_nw_ad_link where nad_ne_id =  :ne_id )'
+              || ' and ne_id_of = :ne_id_of '
+              || ' and nm_begin_mp = :ne_begin_mp '
+              || ' and start_date = :start_date';
+  End If;
 
---nm_debug.debug( del_string );
-         EXECUTE IMMEDIATE del_string
-                     USING p_nm_ne_id_in,
-                           p_nm_ne_id_of,
-                           p_nm_begin_mp,
-                           p_nm_start_date;
-      END LOOP;
-   END;
-
+  Execute Immediate Del_String
+  Using   p_Nm_Ne_Id_In,
+          p_Nm_Ne_Id_Of,
+          p_Nm_Begin_Mp,
+          p_Nm_Start_Date;
+  End Loop;
+End Remove_Gty_Shape;
 --
 ---------------------------------------------------------------------------------------------------
 --
-   PROCEDURE reshape_route (
-      pi_ne_id            IN   nm_elements.ne_id%TYPE,
-      pi_effective_date   IN   DATE,
-      pi_use_history      IN   VARCHAR2
-   )
-   IS
-      CURSOR c_route_tab (c_ne_id IN nm_elements.ne_id%TYPE)
-      IS
-         SELECT nth_theme_id, nth_feature_table, nth_feature_pk_column,
-                nth_feature_fk_column, nth_feature_shape_column
-      FROM NM_THEMES_ALL,
-                NM_NW_THEMES,
-                user_tables,
-                NM_LINEAR_TYPES,
-                NM_ELEMENTS_ALL
-          WHERE nth_theme_id = nnth_nth_theme_id
-            AND table_name = nth_feature_table
-            AND nnth_nlt_id = nlt_id
-            AND nlt_gty_type = ne_gty_group_type
-            AND nlt_nt_type = ne_nt_type
-            AND ne_id = c_ne_id;
+Procedure Reshape_Route (
+                        pi_Ne_Id            In   Nm_Elements.Ne_Id%Type,
+                        pi_Effective_Date   In   Date,
+                        pi_Use_History      In   Varchar2
+                        )
+Is
+  l_Nlt_Id     Nm_Linear_Types.Nlt_Id%Type;
+  l_Nlt        Nm_Linear_Types%Rowtype;
+  Cur_String   Varchar2 (2000);
+  l_Base_Nth   Nm_Themes_All%Rowtype;
+  l_Count      Number;
+  l_Shape      Mdsys.Sdo_Geometry;
+  l_Next       Number;
+  l_Date       Date;
 
-      l_nlt_id     NM_LINEAR_TYPES.nlt_id%TYPE;
-      l_nlt        NM_LINEAR_TYPES%ROWTYPE;
-      cur_string   VARCHAR2 (2000);
-      l_base_nth   NM_THEMES_ALL%ROWTYPE;
-      l_count      NUMBER;
-      l_shape      MDSYS.SDO_GEOMETRY;
-      l_next       NUMBER;
-      l_date       DATE;
+  --------------------
+  Function Get_Shape_Start_Date (
+                                p_Table    In   Varchar2,
+                                p_Column   In   Varchar2,
+                                p_Value    In   Number
+                                ) Return Date
+  Is
+    Retval   Date;
+  Begin
+    Begin
+      Execute Immediate    'select start_date from '
+                       || p_Table
+                       || ' where '
+                       || p_Column
+                       || ' = :ne_id '
+                       || ' and end_date is null'
+      Into  Retval
+      Using p_Value;
 
---------------------
-      FUNCTION get_shape_start_date (
-         p_table    IN   VARCHAR2,
-         p_column   IN   VARCHAR2,
-         p_value    IN   NUMBER
-      )
-         RETURN DATE
-      IS
-         retval   DATE;
-      BEGIN
-         EXECUTE IMMEDIATE    'select start_date from '
-                           || p_table
-                           || ' where '
-                           || p_column
-                           || ' = :ne_id '
-                           || ' and end_date is null'
-                      INTO retval
-                     USING p_value;
+       Return Retval;
+    Exception
+      When No_Data_Found Then
+        Retval:=Null;
+    End;
+    Return(Retval);          
+  End Get_Shape_Start_Date;
+  --------------------
+  Procedure End_Shape (
+                      p_Table       In        Varchar2,
+                      p_Column      In        Varchar2,
+                      p_Value       In        Number,
+                      p_Effective   In        Date,
+                      p_Count           Out   Number
+                      )
+  Is
+  Begin
+    Execute Immediate    'update '
+                       || p_Table
+                       || ' set end_date = :effective '
+                       || ' where '
+                       || p_Column
+                       || ' = :ne_id'
+                       || ' and end_date is null'
+    Using p_Effective,
+          p_Value;
 
-         RETURN retval;
-      EXCEPTION
-         WHEN NO_DATA_FOUND
-         THEN
-            RETURN NULL;
-      END;
+     p_Count := Sql%Rowcount;
+  End End_Shape;
+  --------------------
+  Function Get_Next_Theme_Seq (
+                              p_Theme In Number
+                              ) Return Number
+  Is
+    Retval   Number;
+  Begin
+     Execute Immediate    'select '
+                       || Nm3Sdo.Get_Spatial_Seq (p_Theme)
+                       || '.nextval from dual'
+                  Into Retval;
+     Return Retval;
+  End Get_Next_Theme_Seq;
+  --------------------
+  Procedure Update_Shape (
+                         p_Table          In        Varchar2,
+                         p_Column         In        Varchar2,
+                         p_Value          In        Number,
+                         p_Shape_Column   In        Varchar2,
+                         p_Shape          In        Mdsys.Sdo_Geometry,
+                         p_Count              Out   Number
+  )
+  Is
+  Begin
+    Execute Immediate    'update '
+                     || p_Table
+                     || ' set '
+                     || p_Shape_Column
+                     || ' = :shape '
+                     || ' where '
+                     || p_Column
+                     || ' = :ne_id'
+                     || ' and end_date is null'
+    Using p_Shape, 
+          p_Value;
 
---------------------
-      PROCEDURE end_shape (
-         p_table       IN       VARCHAR2,
-         p_column      IN       VARCHAR2,
-         p_value       IN       NUMBER,
-         p_effective   IN       DATE,
-         p_count       OUT      NUMBER
-      )
-      IS
-      BEGIN
-         EXECUTE IMMEDIATE    'update '
-                           || p_table
-                           || ' set end_date = :effective '
-                           || ' where '
-                           || p_column
-                           || ' = :ne_id'
-                           || ' and end_date is null'
-                     USING p_effective, p_value;
+    p_Count := Sql%Rowcount;
+  End Update_Shape;
+  --------------------
+  Procedure Delete_Shape  (
+                          p_Table    In       Varchar2,
+                          p_Column   In       Varchar2,
+                          p_Value    In       Number,
+                          p_Count       Out   Number
+                          )
+  Is
+  Begin
+    Execute Immediate    'delete from '
+                     || p_Table
+                     || ' where '
+                     || p_Column
+                     || ' = :ne_id'
+                     || ' and end_date is null'
+                 Using p_Value;
 
-         p_count := SQL%ROWCOUNT;
-      END;
+    p_Count := Sql%Rowcount;
+  End Delete_Shape;
+  --------------------
+  Procedure Insert_Shape  (
+                          p_Table          In       Varchar2,
+                          p_Column         In       Varchar2,
+                          p_Value          In       Number,
+                          p_Shape_Column   In       Varchar2,
+                          p_Shape          In       Mdsys.Sdo_Geometry,
+                          p_Seq_No         In       Number,
+                          p_Effective      In       Date,
+                          p_Count             Out   Number
+                          )
+  Is
+  Begin
+     If Nm3Sdo.Use_Surrogate_Key = 'N'  Then
+        Execute Immediate    'insert into '
+                          || p_Table
+                          || '( '
+                          || p_Column
+                          || ','
+                          || p_Shape_Column
+                          || ','
+                          || 'start_date )'
+                          || ' values (:ne_id, :shape, :start_date) '
+        Using p_Value,
+              p_Shape,
+              p_Effective;
 
---------------------
-      FUNCTION get_next_theme_seq (p_theme IN NUMBER)
-         RETURN NUMBER
-      IS
-         retval   NUMBER;
-      BEGIN
-         EXECUTE IMMEDIATE    'select '
-                           || Nm3sdo.get_spatial_seq (p_theme)
-                           || '.nextval from dual'
-                      INTO retval;
+        p_Count := Sql%Rowcount;
+     Else
+      Execute Immediate    'insert into '
+                         || p_Table
+                         || '( objectid, '
+                         || p_Column
+                         || ','
+                         || p_Shape_Column
+                         || ','
+                         || 'start_date )'
+                         || ' values (:objectid, :ne_id, :shape, :start_date) '
+      Using   p_Seq_No,
+              p_Value,
+              p_Shape,
+              p_Effective;
 
-         RETURN retval;
-      END;
+      p_Count := Sql%Rowcount;
+     End If;
+  End Insert_Shape;
+  ---------------------
+Begin
+  For Irec In (
+              Select  nta.Nth_Theme_Id,
+                      nta.Nth_Feature_Table,
+                      nta.Nth_Feature_Pk_Column,
+                      nta.Nth_Feature_Fk_Column,
+                      nta.Nth_Feature_Shape_Column
+              From    Nm_Themes_All     nta,
+                      Nm_Nw_Themes      nnt,
+                      User_Tables       ut,
+                      Nm_Linear_Types   nlt,
+                      Nm_Elements_All   nea
+              Where   nta.Nth_Theme_Id  =   nnt.Nnth_Nth_Theme_Id
+              And     ut.Table_Name     =   nta.Nth_Feature_Table
+              And     nnt.Nnth_Nlt_Id   =   nlt.Nlt_Id
+              And     nlt.Nlt_Gty_Type  =   nea.Ne_Gty_Group_Type
+              And     nlt.Nlt_Nt_Type   =   nea.Ne_Nt_Type
+              And     nea.Ne_Id         =   pi_Ne_Id
+              )
+  Loop
+    --only operate on base table data
+    l_Shape := Nm3Sdo.Get_Route_Shape (pi_Ne_Id);
 
---------------------
-      PROCEDURE update_shape (
-         p_table          IN       VARCHAR2,
-         p_column         IN       VARCHAR2,
-         p_value          IN       NUMBER,
-         p_shape_column   IN       VARCHAR2,
-         p_shape          IN       MDSYS.SDO_GEOMETRY,
-         p_count          OUT      NUMBER
-      )
-      IS
-      BEGIN
-         EXECUTE IMMEDIATE    'update '
-                           || p_table
-                           || ' set '
-                           || p_shape_column
-                           || ' = :shape '
-                           || ' where '
-                           || p_column
-                           || ' = :ne_id'
-                           || ' and end_date is null'
-                     USING p_shape, p_value;
-
-         p_count := SQL%ROWCOUNT;
-      END;
-
---------------------
-      PROCEDURE delete_shape (
-         p_table    IN       VARCHAR2,
-         p_column   IN       VARCHAR2,
-         p_value    IN       NUMBER,
-         p_count    OUT      NUMBER
-      )
-      IS
-      BEGIN
-         EXECUTE IMMEDIATE    'delete from '
-                           || p_table
-                           || ' where '
-                           || p_column
-                           || ' = :ne_id'
-                           || ' and end_date is null'
-                     USING p_value;
-
-         p_count := SQL%ROWCOUNT;
-      END;
-
---------------------
-      PROCEDURE insert_shape (
-         p_table          IN       VARCHAR2,
-         p_column         IN       VARCHAR2,
-         p_value          IN       NUMBER,
-         p_shape_column   IN       VARCHAR2,
-         p_shape          IN       MDSYS.SDO_GEOMETRY,
-         p_seq_no         IN       NUMBER,
-         p_effective      IN       DATE,
-         p_count          OUT      NUMBER
-      )
-      IS
-      BEGIN
-         IF Nm3sdo.use_surrogate_key = 'N'
-         THEN
-            EXECUTE IMMEDIATE    'insert into '
-                              || p_table
-                              || '( '
-                              || p_column
-                              || ','
-                              || p_shape_column
-                              || ','
-                              || 'start_date )'
-                              || ' values (:ne_id, :shape, :start_date) '
-                        USING p_value, p_shape, p_effective;
-
-            p_count := SQL%ROWCOUNT;
-         ELSE
-            EXECUTE IMMEDIATE    'insert into '
-                              || p_table
-                              || '( objectid, '
-                              || p_column
-                              || ','
-                              || p_shape_column
-                              || ','
-                              || 'start_date )'
-                              || ' values (:objectid, :ne_id, :shape, :start_date) '
-                        USING p_seq_no, p_value, p_shape, p_effective;
-
-            p_count := SQL%ROWCOUNT;
-         END IF;
-      END;
----------------------
-   BEGIN
---nm_debug.debug_on;
-      FOR irec IN c_route_tab (pi_ne_id)
-      LOOP
---  only operate on base table data
-         l_shape := Nm3sdo.get_route_shape (pi_ne_id);
-
---  nm_debug.debug('Table - '||irec.nth_feature_table );
-         IF pi_use_history = 'Y'
-         THEN
---    nm_debug.debug('using history');
-
-            --    first check the start date of the current shape if one exists.
-            l_date :=
-               get_shape_start_date (irec.nth_feature_table,
-                                     irec.nth_feature_pk_column,
-                                     pi_ne_id
+    If pi_Use_History = 'Y' Then
+      -- first check the start date of the current shape if one exists.
+      l_Date :=Get_Shape_Start_Date (
+                                    Irec.Nth_Feature_Table,
+                                    Irec.Nth_Feature_Pk_Column,
+                                    pi_Ne_Id
                                     );
 
-            IF l_shape IS NOT NULL AND l_date = pi_effective_date
-            THEN
---      nm_debug.debug(' Not null shape and l_date is effective date');
---      this will violate the pk - we must update without history (sorry - no way past this)
-               update_shape (irec.nth_feature_table,
-                             irec.nth_feature_pk_column,
-                             pi_ne_id,
-                             irec.nth_feature_shape_column,
-                             l_shape,
-                             l_count
-                            );
-            ELSE
---      nm_debug.debug(' Either null shape or l_date is not effective date');
-               IF l_date IS NOT NULL
-               THEN
---        nm_debug.debug(' End shape');
-                  end_shape (irec.nth_feature_table,
-                             irec.nth_feature_pk_column,
-                             pi_ne_id,
-                             pi_effective_date,
-                             l_count
-                            );
-               END IF;
+      If l_Shape Is Not Null And L_Date = Pi_Effective_Date Then
+        --this will violate the pk - we must update without history (sorry - no way past this)
+           Update_Shape (Irec.Nth_Feature_Table,
+                         Irec.Nth_Feature_Pk_Column,
+                         pi_Ne_Id,
+                         Irec.Nth_Feature_Shape_Column,
+                         l_Shape,
+                         l_Count
+                        );
+      Else
+        If l_Date Is Not Null Then
+          End_Shape (
+                    Irec.Nth_Feature_Table,
+                    Irec.Nth_Feature_Pk_Column,
+                    pi_Ne_Id,
+                    pi_Effective_Date,
+                    l_Count
+                    );
+        End If;
 
-               IF l_shape IS NOT NULL
-               THEN
---        nm_debug.debug('Creating new shape, if it is null then just end-date the old');
-                  IF Nm3sdo.use_surrogate_key = 'Y'
-                  THEN
-                     l_next := get_next_theme_seq (irec.nth_theme_id);
-                  END IF;
+        If l_Shape Is Not Null  Then
+          If Nm3Sdo.Use_Surrogate_Key = 'Y' Then
+            l_Next := Get_Next_Theme_Seq (Irec.Nth_Theme_Id);
+          End If;
 
-                  insert_shape (irec.nth_feature_table,
-                                irec.nth_feature_pk_column,
-                                pi_ne_id,
-                                irec.nth_feature_shape_column,
-                                l_shape,
-                                l_next,
-                                pi_effective_date,
-                                l_count
-                               );
-               END IF;
-            END IF;
-         ELSE
---    nm_debug.debug('Not using history');
-            IF l_shape IS NOT NULL
-            THEN
-               update_shape (irec.nth_feature_table,
-                             irec.nth_feature_pk_column,
-                             pi_ne_id,
-                             irec.nth_feature_shape_column,
-                             l_shape,
-                             l_count
-                            );
+          Insert_Shape  (
+                        Irec.Nth_Feature_Table,
+                        Irec.Nth_Feature_Pk_Column,
+                        pi_Ne_Id,
+                        Irec.Nth_Feature_Shape_Column,
+                        l_Shape,
+                        l_Next,
+                        pi_Effective_Date,
+                        l_Count
+                        );
+        End If;
+      End If;
+    Else
+      If l_Shape Is Not Null  Then
+           Update_Shape (
+                        Irec.Nth_Feature_Table,
+                        Irec.Nth_Feature_Pk_Column,
+                        pi_Ne_Id,
+                        Irec.Nth_Feature_Shape_Column,
+                        l_Shape,
+                        l_Count
+                        );
 
-               IF l_count = 0
-               THEN
---        nm_debug.debug('Update no good - Creating new shape');
-                  IF Nm3sdo.use_surrogate_key = 'Y'
-                  THEN
-                     l_next := get_next_theme_seq (irec.nth_theme_id);
-                  END IF;
+        If l_Count = 0  Then
+          If Nm3Sdo.Use_Surrogate_Key = 'Y' Then
+            l_Next := Get_Next_Theme_Seq (Irec.Nth_Theme_Id);
+          End If;
 
-                  insert_shape (irec.nth_feature_table,
-                                irec.nth_feature_pk_column,
-                                pi_ne_id,
-                                irec.nth_feature_shape_column,
-                                l_shape,
-                                l_next,
-                                pi_effective_date,
-                                l_count
-                               );
-               END IF;
-            ELSE
---       nm_debug.debug('Delete shape');
-               delete_shape (irec.nth_feature_table,
-                             irec.nth_feature_pk_column,
-                             pi_ne_id,
-                             l_count
-                            );
-            END IF;                            -- null shape or not null shape
-         END IF;                                                    -- history
-      END LOOP;
-   END reshape_route;
-
+          Insert_Shape  (
+                        Irec.Nth_Feature_Table,
+                        Irec.Nth_Feature_Pk_Column,
+                        pi_Ne_Id,
+                        Irec.Nth_Feature_Shape_Column,
+                        l_Shape,
+                        l_Next,
+                        pi_Effective_Date,
+                        l_Count
+                        );
+        End If;
+      Else
+        Delete_Shape  (
+                      Irec.Nth_Feature_Table,
+                      Irec.Nth_Feature_Pk_Column,
+                      pi_Ne_Id,
+                      l_Count
+                      );
+        End If; -- null shape or not null shape
+     End If;  -- history
+  End Loop;
+End Reshape_Route;
 --
 -----------------------------------------------------------------------------
 --
-   PROCEDURE delete_route_shape (p_ne_id IN NUMBER)
-   IS
-      CURSOR c_route_tab (c_ne_id IN nm_elements.ne_id%TYPE)
-      IS
-         SELECT nth_theme_id, nth_feature_table, nth_feature_pk_column,
-                nth_feature_fk_column, nth_feature_shape_column
-           FROM NM_THEMES_ALL,
-                NM_NW_THEMES,
-                user_tables,
-                NM_LINEAR_TYPES,
-                nm_elements
-          WHERE nth_theme_id = nnth_nth_theme_id
-            AND table_name = nth_feature_table
-            AND nnth_nlt_id = nlt_id
-            AND nlt_gty_type = ne_gty_group_type
-            AND nlt_nt_type = ne_nt_type
-            AND ne_id = c_ne_id;
-   BEGIN
-      FOR irec IN c_route_tab (p_ne_id)
-      LOOP
-         EXECUTE IMMEDIATE    'delete from '
-                           || irec.nth_feature_table
-                           || ' where '
-                           || irec.nth_feature_pk_column
-                           || ' = :ne_id'
-                     USING p_ne_id;
-      END LOOP;
-   END;
+Procedure Delete_Route_Shape  (
+                              p_Ne_Id In Number
+                              )
+Is
 
+Begin
+  For Irec In (
+              Select  nta.Nth_Theme_Id,
+                      nta.Nth_Feature_Table,
+                      nta.Nth_Feature_Pk_Column,
+                      nta.Nth_Feature_Fk_Column,
+                      nta.Nth_Feature_Shape_Column
+              From    Nm_Themes_All     nta,
+                      Nm_Nw_Themes      nnt,
+                      User_Tables       ut,
+                      Nm_Linear_Types   nlt,
+                      Nm_Elements       ne
+              Where   nta.Nth_Theme_Id  =   nnt.Nnth_Nth_Theme_Id
+              And     ut.Table_Name     =   nta.Nth_Feature_Table
+              And     nnt.Nnth_Nlt_Id   =   nlt.Nlt_Id
+              And     nlt.Nlt_Gty_Type  =   ne.Ne_Gty_Group_Type
+              And     nlt.Nlt_Nt_Type   =   ne.Ne_Nt_Type
+              And     ne.Ne_Id          =   p_Ne_Id
+              )
+  Loop
+    Execute Immediate    'delete from '
+                     || Irec.Nth_Feature_Table
+                     || ' where '
+                     || Irec.Nth_Feature_Pk_Column
+                     || ' = :ne_id'
+    Using p_Ne_Id;
+  End Loop;
+End Delete_Route_Shape;
 --
 -----------------------------------------------------------------------------
 --
-   PROCEDURE restore_route_shape (p_ne_id IN NUMBER, p_date IN DATE)
-   IS
-      CURSOR c_route_tab (c_ne_id IN nm_elements.ne_id%TYPE)
-      IS
-         SELECT nth_theme_id, nth_feature_table, nth_feature_pk_column,
-                nth_feature_fk_column, nth_feature_shape_column
-           FROM NM_THEMES_ALL,
-                NM_NW_THEMES,
-                user_tables,
-                NM_LINEAR_TYPES,
-                nm_elements
-          WHERE nth_theme_id = nnth_nth_theme_id
-            AND table_name = nth_feature_table
-            AND nnth_nlt_id = nlt_id
-            AND nlt_gty_type = ne_gty_group_type
-            AND nlt_nt_type = ne_nt_type
-            AND ne_id = c_ne_id;
+Procedure Restore_Route_Shape (P_Ne_Id In Number, P_Date In Date)
+Is
+  C_Str   Varchar2 (2000);
+Begin
+  For Irec In (
+              Select  nta.Nth_Theme_Id,
+                      nta.Nth_Feature_Table,
+                      nta.Nth_Feature_Pk_Column,
+                      nta.Nth_Feature_Fk_Column,
+                      nta.Nth_Feature_Shape_Column
+              From    Nm_Themes_All     nta,
+                      Nm_Nw_Themes      nnt,
+                      User_Tables       ut,
+                      Nm_Linear_Types   nlt,
+                      Nm_Elements       ne
+              Where   nta.Nth_Theme_Id  =   nnt.Nnth_Nth_Theme_Id
+              And     ut.Table_Name     =   nta.Nth_Feature_Table
+              And     nnt.Nnth_Nlt_Id   =   nlt.Nlt_Id
+              And     nlt.Nlt_Gty_Type  =   ne.Ne_Gty_Group_Type
+              And     nlt.Nlt_Nt_Type   =   ne.Ne_Nt_Type
+              And     ne.Ne_Id          =   p_Ne_Id
+              )
+  Loop
+    C_Str :=  'update '
+          || Irec.Nth_Feature_Table
+          || ' set end_date = null where '
+          || Irec.Nth_Feature_Pk_Column
+          || ' = :ne_id and end_date = :end_date '
+          || ' and start_date = ( select max (start_date) '
+          || '  from '
+          || Irec.Nth_Feature_Table
+          || ' where ne_id = :ne_id '
+          || '  and end_date = :end_date ) ';
 
-      c_str   VARCHAR2 (2000);
-   BEGIN
-      FOR irec IN c_route_tab (p_ne_id)
-      LOOP
-         c_str :=
-               'update '
-            || irec.nth_feature_table
-            || ' set end_date = null where '
-            || irec.nth_feature_pk_column
-            || ' = :ne_id and end_date = :end_date '
-            || ' and start_date = ( select max (start_date) '
-            || '  from '
-            || irec.nth_feature_table
-            || ' where ne_id = :ne_id '
-            || '  and end_date = :end_date ) ';
-
-/*
---    nm_debug.debug_on;
-    nm_debug.delete_debug(true);
-    nm_debug.debug(c_str);
-*/
-         EXECUTE IMMEDIATE c_str
-                     USING p_ne_id, p_date, p_ne_id, p_date;
-      END LOOP;
-   END;
-
+    Execute Immediate C_Str
+    Using   p_Ne_Id,
+            p_Date,
+            p_Ne_Id,
+            p_Date;
+  End Loop;
+End Restore_Route_Shape;
 --
 -----------------------------------------------------------------------------
 --
-   PROCEDURE refresh_nt_views
-   IS
-      CURSOR c1
-      IS
-         SELECT nt_type
-           FROM NM_TYPES;
-   BEGIN
-      FOR irec IN c1
-      LOOP
-         Nm3inv_View.create_view_for_nt_type (pi_nt_type => irec.nt_type);
-      END LOOP;
-   END;
-
-
---
------------------------------------------------------------------------------------------------------------------------------------
-   PROCEDURE make_group_layer (
-      p_nt_type              IN   NM_TYPES.nt_type%TYPE,
-      p_gty_type             IN   nm_group_types.ngt_group_type%TYPE,
-      linear_flag_override   IN   VARCHAR2   DEFAULT 'N',
-   p_job_id               IN   NUMBER     DEFAULT NULL
-   )
-   AS
-      l_nlt    NM_LINEAR_TYPES.nlt_id%TYPE;
-      l_view   VARCHAR2 (30)      := get_nt_view_name (p_nt_type, p_gty_type);
-   BEGIN
-     -- AE check to make sure user is unrestricted
-      IF NOT user_is_unrestricted
-      THEN
-        RAISE e_not_unrestricted;
-      END IF;
-
-      IF NOT Nm3ddl.does_object_exist (l_view, 'VIEW')
-      THEN
-         nm3inv_view.create_view_for_nt_type (p_nt_type);
-         nm3inv_view.create_ft_inv_for_nt_type (pi_nt_type                  => p_gty_type
-                                               ,pi_inv_type                 => NULL
-                                               ,pi_delete_existing_inv_type => TRUE
-                                               );
-      END IF;
-
-      IF Nm3net.is_gty_linear (p_gty_type) = 'Y'
-         AND linear_flag_override = 'N'
-      THEN
-         l_nlt := get_nlt_id_from_gty (p_gty_type);
-         make_nt_spatial_layer (pi_nlt_id =>l_nlt, p_job_id => p_job_id );
-      ELSE
-         create_non_linear_group_layer (p_nt_type => p_nt_type, p_gty_type => p_gty_type, p_job_id => p_job_id );
-      END IF;
-  EXCEPTION
-    WHEN e_not_unrestricted
-    THEN
-      RAISE_APPLICATION_ERROR (-20777,'Restricted users are not permitted to create SDO layers');
-   END;
-
+Procedure Refresh_Nt_Views
+Is
+Begin
+  For Irec In (
+              Select  nt.Nt_Type
+              From    Nm_Types  nt
+              )
+  Loop
+    Nm3Inv_View.Create_View_For_Nt_Type (pi_Nt_Type => Irec.Nt_Type);
+  End Loop;
+End Refresh_Nt_Views;
 --
 -----------------------------------------------------------------------------------------------------------------------------------
 --
-   PROCEDURE create_non_linear_group_layer (
-      p_nt_type    IN   NM_TYPES.nt_type%TYPE,
-      p_gty_type   IN   nm_group_types.ngt_group_type%TYPE,
-   p_job_id     IN   NUMBER DEFAULT NULL
-   )
-   AS
--- l_gty    nm_group_types%rowtype := nm3get.get_gty( p_gty_type );
-      l_tab              NM_THEMES_ALL.nth_feature_table%TYPE;
-      l_view             NM_THEMES_ALL.nth_table_name%TYPE;
-      l_seq              VARCHAR2 (30);
+Procedure Make_Group_Layer  (
+                            p_Nt_Type              In   Nm_Types.Nt_Type%Type,
+                            p_Gty_Type             In   Nm_Group_Types.Ngt_Group_Type%Type,
+                            Linear_Flag_Override   In   Varchar2   Default 'N',
+                            p_Job_Id               In   Number     Default Null
+                            )
+As
+  l_Nlt    Nm_Linear_Types.Nlt_Id%Type;
+  l_View   Varchar2 (30)      := Get_Nt_View_Name (p_Nt_Type, p_Gty_Type);
+Begin
+  If Not User_Is_Unrestricted Then
+    Raise E_Not_Unrestricted;
+  End If;
 
-      l_base_themes      NM_THEME_ARRAY;
-   l_diminfo          MDSYS.SDO_DIM_ARRAY;
-   l_srid             NUMBER;
+  If Not Nm3Ddl.Does_Object_Exist (l_View, 'VIEW')  Then
+     Nm3Inv_View.Create_View_For_Nt_Type (p_Nt_Type);
+     Nm3Inv_View.Create_Ft_Inv_For_Nt_Type  (
+                                            pi_Nt_Type                  => p_Gty_Type,
+                                            pi_Inv_Type                 => Null,
+                                            pi_Delete_Existing_Inv_Type => True
+                                            );
+  End If;
 
-   l_usgm             user_sdo_geom_metadata%ROWTYPE;
+  If      Nm3Net.Is_Gty_Linear (p_Gty_Type)   = 'Y'
+     And  Linear_Flag_Override                = 'N' Then
+     
+    l_Nlt := Get_Nlt_Id_From_Gty (p_Gty_Type);
+    Make_Nt_Spatial_Layer (
+                          pi_Nlt_Id =>  l_Nlt,
+                          p_Job_Id  =>  p_Job_Id
+                          );     
+  Else
+    Create_Non_Linear_Group_Layer (
+                                  p_Nt_Type   =>  p_Nt_Type,
+                                  p_Gty_Type  =>  p_Gty_Type,
+                                  p_Job_Id    =>  p_Job_Id
+                                  );
+  End If;
+Exception
+  When E_Not_Unrestricted Then
+    Raise_Application_Error (-20777,'Restricted users are not permitted to create SDO layers');
+End Make_Group_Layer;
+--
+-----------------------------------------------------------------------------------------------------------------------------------
+--
+Procedure Create_Non_Linear_Group_Layer (
+                                        p_Nt_Type    In   Nm_Types.Nt_Type%Type,
+                                        p_Gty_Type   In   Nm_Group_Types.Ngt_Group_Type%Type,
+                                        p_Job_Id     In   Number Default Null
+                                        )
+As
+  l_Tab              Nm_Themes_All.Nth_Feature_Table%Type;
+  l_View             Nm_Themes_All.Nth_Table_Name%Type;
+  l_Seq              Varchar2 (30);
 
-      lcur               Nm3type.ref_cursor;
-      cur_string1        VARCHAR2 (2000);
-      cur_string2        VARCHAR2 (2000);
-      l_geom             MDSYS.SDO_GEOMETRY;
-      l_ne               nm_elements.ne_id%TYPE;
-      l_theme_id         NM_THEMES_ALL.nth_theme_id%TYPE;
-      l_v_theme_id       NM_THEMES_ALL.nth_theme_id%TYPE;
-      l_objectid         NUMBER;
-      l_ne_id_of         nm_elements.ne_id%TYPE;
-      l_begin_mp         nm_members.nm_begin_mp%TYPE;
-      l_end_mp           nm_members.nm_begin_mp%TYPE;
-      l_start_date       nm_members.nm_start_date%TYPE;
-      l_effective_date   DATE                   := To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY');
-      qq                 CHAR (1)                               := CHR (39);
-      l_dummy            NUMBER;
+  l_Base_Themes      Nm_Theme_Array;
+  l_Diminfo          Mdsys.Sdo_Dim_Array;
+  l_Srid             Number;
+
+  l_Usgm             User_Sdo_Geom_Metadata%Rowtype;
+
+  l_Theme_Id         Nm_Themes_All.Nth_Theme_Id%Type;
+  l_V_Theme_Id       Nm_Themes_All.Nth_Theme_Id%Type;
 
 -----------------------------------------------------------------------------------------------------------------
-      FUNCTION get_nat_feature_table_name (
-         p_nt_type    IN   NM_TYPES.nt_type%TYPE,
-         p_gty_type   IN   nm_group_types.ngt_group_type%TYPE
-      )
-         RETURN VARCHAR2
-      IS
-      BEGIN
-         RETURN 'NM_NAT_' || p_nt_type || '_' || p_gty_type || '_SDO';
-      END;
+  Function Get_Nat_Feature_Table_Name (
+                                      p_Nt_Type    In   Nm_Types.Nt_Type%Type,
+                                      p_Gty_Type   In   Nm_Group_Types.Ngt_Group_Type%Type
+                                      ) Return Varchar2
+  Is
+  Begin
+    Return 'NM_NAT_' || p_Nt_Type || '_' || p_Gty_Type || '_SDO';
+  End Get_Nat_Feature_Table_Name;
 
 -----------------------------------------------------------------------------------------------------------------
-      FUNCTION create_sdo_join_view (
-         p_nt_type    IN   NM_TYPES.nt_type%TYPE,
-         p_gty_type   IN   nm_group_types.ngt_group_type%TYPE,
-         p_table      IN   VARCHAR2,
-         p_singshp    IN   VARCHAR2 DEFAULT 'N'
-      )
-         RETURN VARCHAR2
-      IS
-         cur_string   VARCHAR2 (2000);
-         s_col_list   VARCHAR2 (100);
-      BEGIN
-         IF p_singshp = 'Y'
-         THEN
-            s_col_list := 's.geoloc';
-         ELSE
-            s_col_list := 's.ne_id_of, s.nm_begin_mp, s.nm_end_mp, s.geoloc';
-         END IF;
-
-         IF Nm3sdo.use_surrogate_key = 'Y'
-         THEN
-            s_col_list := 's.objectid, ' || s_col_list;
-         END IF;
-
-         cur_string :=
-               'create or replace view v_'
-            || p_table
-            || '_DT as select n.*, '
-            || s_col_list
-            || ' from '
-            || ' V_NM_'
-            || p_nt_type
-            || '_'
-            || p_gty_type
-            || '_NT'
-            || ' n,'
-            || p_table
-            || ' s where n.ne_id = s.ne_id '
-            || ' and s.start_date <= (select Sys_Context(''NM3CORE'',''APPLICATION_OWNER'') from dual) '
-            || ' and  NVL(s.end_date,TO_DATE('
-            || qq
-            || '99991231'
-            || qq
-            || ','
-            || qq
-            || 'YYYYMMDD'
-            || qq
-            || ')) > (select Sys_Context(''NM3CORE'',''APPLICATION_OWNER'') from dual)';
-          --  || ' and n.ne_gty_group_type = '
-          --  || ''''
-          --  || p_gty_type
-          --  || '''';
-         --Nm3ddl.create_object_and_syns ('V_' || p_table || '_DT', cur_string);
-
-          -- AE 23-SEP-2008
-          -- We will now use views instead of synonyms to provide subordinate user access
-          -- to spatial objects
-          --nm3ddl.create_object_and_views ('V_'||p_table||'_DT', cur_string);
-          -- CWS 0108742 Change back to using synonyms
-          Nm3ddl.create_object_and_syns( 'V_'||p_table||'_DT', cur_string );
-
-         RETURN 'V_' || p_table || '_DT';
-     END;
 -----------------------------------------------------------------------------------------------------------------
-   BEGIN
+Begin
+  l_Tab   := Get_Nat_Feature_Table_Name (p_Nt_Type, p_Gty_Type);
+  l_View  := Get_Nt_View_Name (p_Nt_Type, p_Gty_Type);
 
---    Nm_Debug.debug_on;
+  l_Base_Themes := Get_Nat_Base_Themes(p_Gty_Type);
 
-      l_tab := get_nat_feature_table_name (p_nt_type, p_gty_type);
-      l_view := get_nt_view_name (p_nt_type, p_gty_type);
+  Nm3Sdo.Set_Diminfo_And_Srid( l_Base_Themes, l_Diminfo, l_Srid );
 
-      l_base_themes := get_nat_base_themes( p_nt_type, p_gty_type);
+  l_Diminfo := Sdo_Lrs.Convert_To_Std_Dim_Array(l_Diminfo);
 
---    Nm_Debug.DEBUG('base themes found, get diminfo ');
+  --check tha the effective date is today - otherwise the layer will be out of step already!
+  --generate the area type
+  --
+  Create_Spatial_Table (l_Tab, False, 'START_DATE', 'END_DATE');
+  
+  ---------------------------------------------------------------
+  -- Set the registration of metadata
+  ---------------------------------------------------------------
+  l_Usgm.Table_Name  := l_Tab;
+  l_Usgm.Column_Name := 'GEOLOC';
+  l_Usgm.Diminfo     := l_Diminfo;
+  l_Usgm.Srid        := l_Srid;
 
-     Nm3sdo.set_diminfo_and_srid( l_base_themes, l_diminfo, l_srid );
+  Nm3Sdo.Ins_Usgm ( l_Usgm );
 
-      l_diminfo := sdo_lrs.convert_to_std_dim_array(l_diminfo);
+  l_Theme_Id := Register_Nat_Theme  (
+                                    p_Nt_Type,
+                                    p_Gty_Type,
+                                    l_Base_Themes,
+                                    l_Tab,
+                                    'GEOLOC',
+                                    'NE_ID',
+                                    Null,
+                                    'N'
+                                    );
+  l_Seq := Nm3Sdo.Create_Spatial_Seq (l_Theme_Id);
 
+  If Not Nm3Ddl.Does_Object_Exist (l_View, 'VIEW')  Then
+    Nm3Inv_View.Create_View_For_Nt_Type (p_Nt_Type, p_Gty_Type);
+  End If;
 
---     check tha the effective date is today - otherwise the layer will be out of step already!
+  Create_Spatial_Date_View (l_Tab);
 
-      -- generate the area type
+  l_Usgm.Table_Name  := 'V_' || l_Tab;
+  Nm3Sdo.Ins_Usgm ( l_Usgm );
 
-      --
---    Nm_Debug.DEBUG('create spatial table');
-      Nm3sdm.create_spatial_table (l_tab, FALSE, 'START_DATE', 'END_DATE');
-                                                                  --, TRUE );
----------------------------------------------------------------
--- Set the registration of metadata
----------------------------------------------------------------
-      l_usgm.table_name  := l_tab;
-      l_usgm.column_name := 'GEOLOC';
-      l_usgm.diminfo     := l_diminfo;
-      l_usgm.srid        := l_srid;
+  l_V_Theme_Id := Register_Nat_Theme  (
+                                      p_Nt_Type,
+                                      p_Gty_Type,
+                                      l_Base_Themes,
+                                      'V_' || L_Tab,
+                                      'GEOLOC',
+                                      'NE_ID',
+                                      Null,
+                                      'Y',
+                                      l_Theme_Id
+                                      );
+  Nm3Sdo.Create_Non_Linear_Data (
+                                p_Table_Name    => l_Tab,
+                                p_Gty_Type      => p_Gty_Type,
+                                p_Seq_Name      => l_Seq,
+                                p_Job_Id        => p_Job_Id
+                                );
+  --table needs a spatial index
 
-      Nm3sdo.ins_usgm ( l_usgm );
+  Nm3Sdo.Create_Spatial_Idx (l_Tab);
 
-      l_theme_id := register_nat_theme (p_nt_type,
-                                        p_gty_type,
-                                        l_base_themes,
-                                        l_tab,
+  --need a join view between spatial table and NT view
+
+  l_View := Create_Nat_Sdo_Join_View  (
+                                      p_Feature_Table_Name  => l_Tab
+                                      ); 
+  l_Usgm.Table_Name  := l_View;
+
+  Nm3Sdo.Ins_Usgm ( l_Usgm );
+
+  If G_Date_Views = 'Y' Then
+    L_V_Theme_Id := Register_Nat_Theme  (
+                                        p_Nt_Type,
+                                        p_Gty_Type,
+                                        l_Base_Themes,
+                                        l_View,
                                         'GEOLOC',
                                         'NE_ID',
-                                        NULL,
-                                        'N'
+                                        Null,
+                                        'Y',
+                                        l_Theme_Id
                                        );
+  End If;
 
---    Nm_Debug.DEBUG('Theme = '||TO_CHAR(l_theme_id));
+  Begin
+    Nm3Ddl.Analyse_Table  (
+                          pi_Table_Name          => l_Tab,
+                          pi_Schema              => Sys_Context('NM3CORE','APPLICATION_OWNER'),
+                          pi_Estimate_Percentage => Null,
+                          pi_Auto_Sample_Size    => False
+                          );
+  Exception
+    When Others Then
+      Raise E_No_Analyse_Privs;
+  End;
+  --
+  Nm_Debug.Proc_End (G_Package_Name, 'make_ona_inv_spatial_layer');
+  --
+Exception
+  When E_Not_Unrestricted Then
+    Raise_Application_Error (-20777,'Restricted users are not permitted to create SDO layers');
+  
+  When E_No_Analyse_Privs Then
+    Raise_Application_Error (-20778,'Layer created - but user does not have ANALYZE ANY granted. '||
+                                    'Please ensure the correct role/privs are applied to the user');
 
-      l_seq := Nm3sdo.create_spatial_seq (l_theme_id);
-
-      IF NOT Nm3ddl.does_object_exist (l_view, 'VIEW')
-      THEN
-         Nm3inv_View.create_view_for_nt_type (p_nt_type, p_gty_type);
-      END IF;
-
---    Nm_Debug.DEBUG('Create spatial view');
-
-      create_spatial_date_view (l_tab);
-
---    Nm_Debug.DEBUG('reg the view');
-
-      l_usgm.table_name  := 'V_' || l_tab;
-      Nm3sdo.ins_usgm ( l_usgm );
-
---    Nm_Debug.DEBUG('reg the view theme');
-
-      l_v_theme_id := register_nat_theme (p_nt_type,
-                                          p_gty_type,
-                                          l_base_themes,
-                                          'V_' || l_tab,
-                                          'GEOLOC',
-                                          'NE_ID',
-                                          NULL,
-                                          'Y', l_theme_id
-                                         );
-
---    Nm_Debug.DEBUG('Create the data');
-
-      Nm3sdo.create_non_linear_data ( p_table_name    => l_tab,
-                                      p_gty_type      => p_gty_type,
-                                      p_seq_name      => l_seq,
-                                      p_job_id        => p_job_id );
-
-
---table needs a spatial index
-
-      Nm3sdo.create_spatial_idx (l_tab);
-
---need a join view between spatial table and NT view
-
-      l_view := create_sdo_join_view (p_nt_type,
-                                      p_gty_type,
-                                      l_tab,
-                                      Nm3sdo.single_shape_inv );
-
-      l_usgm.table_name  := l_view;
-
-      Nm3sdo.ins_usgm ( l_usgm );
-
-      IF g_date_views = 'Y'
-      THEN
-         l_v_theme_id :=
-            register_nat_theme (p_nt_type,
-                                p_gty_type,
-                                l_base_themes,
-                                l_view,
-                                'GEOLOC',
-                                'NE_ID',
-                                NULL,
-                                'Y', l_theme_id
-                               );
-
-
-      END IF;
-
-
-      BEGIN
---   EXECUTE IMMEDIATE 'analyze table ' || l_tab || ' compute statistics';
-        Nm3ddl.analyse_table (pi_table_name          => l_tab
-                            , pi_schema              => Sys_Context('NM3CORE','APPLICATION_OWNER')
-                            , pi_estimate_percentage => NULL
-                            , pi_auto_sample_size    => FALSE);
-      EXCEPTION
-        WHEN OTHERS
-        THEN
-          RAISE e_no_analyse_privs;
-      END;
-      --
-      Nm_Debug.proc_end (g_package_name, 'make_ona_inv_spatial_layer');
-   --
-  EXCEPTION
-    WHEN e_not_unrestricted
-    THEN
-      RAISE_APPLICATION_ERROR (-20777,'Restricted users are not permitted to create SDO layers');
-    WHEN e_no_analyse_privs
-    THEN
-      RAISE_APPLICATION_ERROR (-20778,'Layer created - but user does not have ANALYZE ANY granted. '||
-                                      'Please ensure the correct role/privs are applied to the user');
-
-   END create_non_linear_group_layer;
-
+End Create_Non_Linear_Group_Layer;
 --
 ----------------------------------------------------------------------------------------------------------------------------------
 --
-   FUNCTION get_theme_from_feature_table (
-      p_table   IN   NM_THEMES_ALL.nth_feature_table%TYPE
-   )
-      RETURN NUMBER
-   IS
-      CURSOR c1 (c_tab IN VARCHAR2)
-      IS
-         SELECT nth_theme_id
-           FROM NM_THEMES_ALL
-          WHERE nth_feature_table = c_tab;
+Function Get_Theme_From_Feature_Table (
+                                      p_Table   In   Nm_Themes_All.Nth_Feature_Table%Type
+                                      ) Return Number
+Is
+  Retval   Number;
+Begin
+  Begin
+    Select  nta.Nth_Theme_Id
+    Into    Retval
+    From    Nm_Themes_All   nta
+    Where   nta.Nth_Feature_Table =   p_Table
+    And     rownum                =   1;
+  Exception
+    When No_Data_Found Then 
+      Retval := Null;
+  End;
 
-      retval   NUMBER;
-   BEGIN
-      OPEN c1 (p_table);
-      FETCH c1
-       INTO retval;
-      IF c1%NOTFOUND
-      THEN
-         retval := NULL;
-      END IF;
-      CLOSE c1;
-      RETURN retval;
-   END get_theme_from_feature_table;
-   ------------------------------------------------------------------------
-   FUNCTION get_theme_from_feature_table (
-      p_table         IN   NM_THEMES_ALL.nth_feature_table%TYPE
-     ,p_theme_table   IN   NM_THEMES_ALL.nth_table_name%TYPE
-   )
-     RETURN NUMBER
-   IS
-      CURSOR c1 (c_feature_tab IN VARCHAR2
-                ,c_theme_tab IN VARCHAR )
-      IS
-         SELECT nth_theme_id
-           FROM NM_THEMES_ALL
-          WHERE nth_feature_table = c_feature_tab
-            AND nth_table_name    = c_theme_tab;
-
-      retval   NUMBER;
-   BEGIN
-      OPEN c1 (p_table, p_theme_table);
-      FETCH c1
-       INTO retval;
-      IF c1%NOTFOUND
-      THEN
-         retval := NULL;
-      END IF;
-      CLOSE c1;
-      RETURN retval;
-   END get_theme_from_feature_table;
+  Return Retval;
+End Get_Theme_From_Feature_Table;
+------------------------------------------------------------------------
+Function Get_Theme_From_Feature_Table (
+                                      p_Table         In   Nm_Themes_All.Nth_Feature_Table%Type,
+                                      p_Theme_Table   In   Nm_Themes_All.Nth_Table_Name%Type
+                                      ) Return Number
+Is
+  Retval   Number;
+Begin
+  Begin
+    Select  nta.Nth_Theme_Id
+    Into    Retval
+    From    Nm_Themes_All   nta
+    Where   nta.Nth_Feature_Table = p_Table
+    And     nta.Nth_Table_Name    = p_Theme_Table;
+  Exception
+    When No_Data_Found Then
+      Retval:=Null;
+  End;
+  Return Retval;
+End Get_Theme_From_Feature_Table;
 --
 ----------------------------------------------------------------------------------------------------------------------------------
 --
-   PROCEDURE drop_unused_sequences
-   AS
-      CURSOR c1
-      IS
-         SELECT sequence_name
-           FROM user_sequences
-          WHERE sequence_name LIKE 'NTH%'
-            AND NOT EXISTS (
-                   SELECT 1
-                     FROM NM_THEMES_ALL
-                    WHERE TO_CHAR (nth_theme_id) =
-                             SUBSTR (sequence_name,
-                                     5,
-                                     INSTR (SUBSTR (sequence_name, 5), '_')
-                                     - 1
-                                    ))
-            AND sequence_name != 'NTH_THEME_ID_SEQ';
-   BEGIN
-      FOR irec IN c1
-      LOOP
-         Nm3ddl.drop_synonym_for_object (irec.sequence_name);
-         EXECUTE IMMEDIATE 'drop sequence ' || irec.sequence_name;
-      END LOOP;
-   END;
-
+Procedure Drop_Unused_Sequences
+Is
+Begin
+  For Irec In (
+              Select  usq.Sequence_Name
+              From    User_Sequences    usq
+              Where   usq.Sequence_Name   Like 'NTH%'
+              And     Not Exists          (
+                                          Select  Null
+                                          From    Nm_Themes_All nta
+                                          Where   To_Char (nta.Nth_Theme_Id) =  Substr (usq.Sequence_Name,5,Instr (Substr (usq.Sequence_Name, 5), '_')- 1)
+                                          )
+              And     usq.Sequence_Name   !=  'NTH_THEME_ID_SEQ'
+              )
+  Loop
+    Nm3Ddl.Drop_Synonym_For_Object (Irec.Sequence_Name);
+    Execute Immediate 'drop sequence ' || Irec.Sequence_Name;
+  End Loop;
+End Drop_Unused_Sequences;
 --
 ----------------------------------------------------------------------------------------------------------------------------------
 --
 -- When updating members, test to see if a theme is immediate - not appropriate to linear layers
 --
-   FUNCTION get_update_flag (
-      p_type          IN   VARCHAR2,
-      p_obj_type      IN   VARCHAR2,
-      p_update_flag   IN   VARCHAR2 DEFAULT NULL
-   )
-      RETURN VARCHAR2
-   IS
-      retval   VARCHAR2 (1) := 'N';
+Function Get_Update_Flag  (
+                          p_Type          In   Varchar2,
+                          p_Obj_Type      In   Varchar2,
+                          p_Update_Flag   In   Varchar2 Default Null
+                          ) Return Varchar2
+Is
+  Retval   Nm_Themes_All.Nth_Update_On_Edit%Type:= 'N';
 
-      CURSOR c_inv (c_obj_type IN VARCHAR2, c_flag IN VARCHAR2)
-      IS
-         SELECT nth_update_on_edit
-           FROM NM_THEMES_ALL, NM_INV_THEMES
-          WHERE nth_theme_id = nith_nth_theme_id
-            AND nith_nit_id = c_obj_type
-            AND nth_update_on_edit =
-                             DECODE (c_flag,
-                                     NULL, nth_update_on_edit,
-                                     c_flag
-                                    );
+Begin
+  If p_Type = 'I' Then
+    Begin
+      Select  nta.Nth_Update_On_Edit
+      Into    Retval
+      From    Nm_Themes_All   nta,
+              Nm_Inv_Themes   nit
+      Where   nta.Nth_Theme_Id        =   nit.Nith_Nth_Theme_Id
+      And     nit.Nith_Nit_Id         =   p_Obj_Type
+      And     nta.Nth_Update_On_Edit  =   Decode (p_Update_Flag,Null, nta.Nth_Update_On_Edit,p_Update_Flag)
+      And     rownum                  =   1;
+    Exception
+      When No_Data_Found Then
+        Retval := 'N';        
+    End;
 
-      CURSOR c_area (c_obj_type IN VARCHAR2, c_flag IN VARCHAR2)
-      IS
-         SELECT nth_update_on_edit
-           FROM NM_THEMES_ALL, NM_AREA_THEMES, NM_AREA_TYPES
-          WHERE nth_theme_id = nath_nth_theme_id
-            AND nath_nat_id = nat_id
-            AND nat_gty_group_type = c_obj_type
-            AND nth_update_on_edit =
-                             DECODE (c_flag,
-                                     NULL, nth_update_on_edit,
-                                     c_flag
-                                    );
-   BEGIN
-      IF p_type = 'I'
-      THEN
-         OPEN c_inv (p_obj_type, p_update_flag);
+  Elsif p_Type = 'G'  Then
+    Begin     
+      Select  nta.Nth_Update_On_Edit
+      Into    Retval
+      From    Nm_Themes_All   nta,
+              Nm_Area_Themes  nat,
+              Nm_Area_Types   naty
+      Where   nta.Nth_Theme_Id        =   nat.Nath_Nth_Theme_Id
+      And     nat.Nath_Nat_Id         =   naty.Nat_Id
+      And     naty.Nat_Gty_Group_Type =   p_Obj_Type
+      And     nta.Nth_Update_On_Edit  =   Decode (p_Update_Flag,Null, nta.Nth_Update_On_Edit,p_Update_Flag)
+      And     Rownum                  =   1;
+    Exception
+      When No_Data_Found Then 
+        Retval := 'N';
+    End;
+  End If;
 
-         FETCH c_inv
-          INTO retval;
-
-         IF c_inv%NOTFOUND
-         THEN
-            retval := 'N';
-         END IF;
-
-         CLOSE c_inv;
-      ELSIF p_type = 'G'
-      THEN
-         OPEN c_area (p_obj_type, p_update_flag);
-
-         FETCH c_area
-          INTO retval;
-
-         IF c_area%NOTFOUND
-         THEN
-            retval := 'N';
-         END IF;
-
-         CLOSE c_area;
-      END IF;
-
-      RETURN retval;
-   END;
-
+  Return Retval;
+End Get_Update_Flag;
 --
 -------------------------------------------------------------------------------------------------------------------------------
 --
-   PROCEDURE attach_theme_to_ft (p_nth_id IN NUMBER, p_ft_nit IN VARCHAR2)
-   IS
-      l_nth   NM_THEMES_ALL%ROWTYPE;
-      l_nit   nm_inv_types%ROWTYPE;
-   BEGIN
-      l_nth := Nm3get.get_nth (p_nth_id);
-      l_nit := Nm3get.get_nit (p_ft_nit);
+Procedure Attach_Theme_To_Ft  (
+                              p_Nth_Id In Number,
+                              p_Ft_Nit In Varchar2
+                              )
+Is
+  l_Nth   Nm_Themes_All%Rowtype;
+  l_Nit   Nm_Inv_Types%Rowtype;
+Begin
+  l_Nth := Nm3Get.Get_Nth (p_Nth_Id);
+  l_Nit := Nm3Get.Get_Nit (p_Ft_Nit);
 
-      IF l_nth.nth_table_name != l_nit.nit_table_name
-      THEN
-         Hig.raise_ner (pi_appl         => Nm3type.c_hig,
-                        pi_id           => 249,
-                        pi_sqlcode      => -20001
-                       );
---  raise_application_error(-20001,'FT and theme do not match');
-      ELSE
-         INSERT INTO NM_INV_THEMES
-                     (nith_nit_id, nith_nth_theme_id
-                     )
-              VALUES (l_nit.nit_inv_type, l_nth.nth_theme_id
-                     );
-      END IF;
-   END;
-
+  If l_Nth.Nth_Table_Name != l_Nit.Nit_Table_Name Then
+    Hig.Raise_Ner (
+                  pi_Appl         =>  Nm3Type.C_Hig,
+                  pi_Id           =>  249,
+                  pi_Sqlcode      =>  -20001
+                  );
+    --  raise_application_error(-20001,'FT and theme do not match');
+  Else
+    Insert Into Nm_Inv_Themes
+    (
+    Nith_Nit_Id,
+    Nith_Nth_Theme_Id
+    )
+    Values
+    (
+    l_Nit.Nit_Inv_Type,
+    l_Nth.Nth_Theme_Id
+    );
+  End If;
+End Attach_Theme_To_Ft;
 --
 -------------------------------------------------------------------------------------------------------------------------------
 --
-   PROCEDURE register_sdo_table_as_ft_theme (
-      p_nit_type           IN   nm_inv_types.nit_inv_type%TYPE,
-      p_shape_col          IN   VARCHAR2,
-      p_tol                IN   NUMBER DEFAULT 0.005,
-      p_cre_idx            IN   VARCHAR2 DEFAULT 'N',
-      p_estimate_new_tol   IN   VARCHAR2 DEFAULT 'N'
-   )
-   IS
-      l_nit      nm_inv_types%ROWTYPE;
-      l_nth_id   NUMBER;
-   BEGIN
-      l_nit := Nm3get.get_nit (p_nit_type);
+Procedure Register_Sdo_Table_As_Ft_Theme  (
+                                          p_Nit_Type           In   Nm_Inv_Types.Nit_Inv_Type%Type,
+                                          p_Shape_Col          In   Varchar2,
+                                          p_Tol                In   Number Default 0.005,
+                                          p_Cre_Idx            In   Varchar2 Default 'N',
+                                          p_Estimate_New_Tol   In   Varchar2 Default 'N'
+                                          )
+Is
+  l_Nit      Nm_Inv_Types%Rowtype;
+  l_Nth_Id   Number;
+Begin
+  l_Nit := Nm3Get.Get_Nit (p_Nit_Type);
 
-      IF l_nit.nit_table_name IS NULL
-      THEN
-         Hig.raise_ner (pi_appl         => Nm3type.c_hig,
-                        pi_id           => 250,
-                        pi_sqlcode      => -20001
-                       );
---  raise_application_error( -20001, 'Inventory type is not a foreign table');
-      END IF;
+  If L_Nit.Nit_Table_Name Is Null Then
+    
+    Hig.Raise_Ner (
+                  pi_Appl         =>  Nm3Type.C_Hig,
+                  pi_Id           =>  250,
+                  pi_Sqlcode      =>  -20001
+                  );
+    --  raise_application_error( -20001, 'Inventory type is not a foreign table');
+  End If;
 
-      Nm3sdo.register_sdo_table_as_theme (l_nit.nit_table_name,
-                                          l_nit.nit_foreign_pk_column,
-                                          l_nit.nit_foreign_pk_column,
-                                          p_shape_col,
-                                          p_tol,
-                                          p_cre_idx,
-                                          p_estimate_new_tol
-                                         );
-      l_nth_id := get_theme_from_feature_table (l_nit.nit_table_name);
-      attach_theme_to_ft (l_nth_id, l_nit.nit_inv_type);
-   END;
-
+  Nm3Sdo.Register_Sdo_Table_As_Theme  (
+                                      l_Nit.Nit_Table_Name,
+                                      l_Nit.Nit_Foreign_Pk_Column,
+                                      l_Nit.Nit_Foreign_Pk_Column,
+                                      p_Shape_Col,
+                                      p_Tol,
+                                      p_Cre_Idx,
+                                      p_Estimate_New_Tol
+                                      );
+  l_Nth_Id := Get_Theme_From_Feature_Table  (
+                                            l_Nit.Nit_Table_Name
+                                            );
+  Attach_Theme_To_Ft  (
+                      l_Nth_Id,
+                      l_Nit.Nit_Inv_Type
+                      );
+  
+End Register_Sdo_Table_As_Ft_Theme;
 --
 ---------------------------------------------------------------------------------------------------------------------------------
 --
-   PROCEDURE Drop_Layer (
-      p_nth_id               IN   NM_THEMES_ALL.nth_theme_id%TYPE,
-      p_keep_theme_data      IN   VARCHAR2 DEFAULT 'N',
-      p_keep_feature_table   IN   VARCHAR2 DEFAULT 'N'
-   )
-   IS
-      l_nth         NM_THEMES_ALL%ROWTYPE;
-      l_seq         VARCHAR2 (30);
---
-   BEGIN
-      l_nth := Nm3get.get_nth (p_nth_id);
-
-      drop_trigger_by_theme_id( p_nth_id );
-
-      IF l_nth.nth_feature_table IS NOT NULL
-      THEN
-         IF Hig.get_sysopt ('REGSDELAY') = 'Y'
-         THEN
-            DECLARE
-               not_there   EXCEPTION;
-               PRAGMA EXCEPTION_INIT (not_there, -20001);
-            BEGIN
-               EXECUTE IMMEDIATE (   'begin '
-                                  || '   nm3sde.drop_layer_by_theme( p_theme_id => '
-                                  || TO_CHAR (l_nth.nth_theme_id)
-                                  || ');'
-                                  || 'end;'
-                                 );
-            EXCEPTION
-               WHEN not_there
-               THEN
-                  NULL;
-            END;
-         END IF;
-
-         IF p_keep_feature_table = 'N'
-         THEN
-            BEGIN
-               --Nm3ddl.drop_synonym_for_object (l_nth.nth_feature_table);
-
-               -- AE 23-SEP-2008
-               -- Drop views instead of synonyms
-               Nm3ddl.drop_views_for_object (l_nth.nth_feature_table);
-
-            EXCEPTION
-               WHEN OTHERS
-               THEN
-                  NULL;
-            --    problem in privileges on the development schema - dropping synonyms failed - needs further investigation.
-            END;
-
-            BEGIN
-               --cws
-               Nm3ddl.drop_synonym_for_object (l_nth.nth_feature_table);
-
-            EXCEPTION
-               WHEN OTHERS
-               THEN
-                  NULL;
-            --    problem in privileges on the development schema - dropping synonyms failed - needs further investigation.
-            END;
-
-            drop_object (l_nth.nth_feature_table);
-            Nm3sdo.drop_metadata (l_nth.nth_feature_table);
-
-            IF Nm3sdo.use_surrogate_key = 'Y'
-            THEN
-               l_seq := Nm3sdo.get_spatial_seq (p_nth_id);
-
-               IF Nm3ddl.does_object_exist (l_seq)
-               THEN
-                  BEGIN
-                     Nm3ddl.drop_synonym_for_object (l_seq);
-                  EXCEPTION
-                     WHEN OTHERS
-                     THEN
-                        NULL;
-                  END;
-
-                  drop_object (l_seq);
-               END IF;
-            END IF;
-         -- keep feature table end if
-         END IF;
-      END IF;
---
-      IF p_keep_theme_data = 'N'
-      THEN
-         DELETE FROM NM_THEMES_ALL
-               WHERE nth_theme_id = p_nth_id;
-      END IF;
---
-   END Drop_Layer;
-
---
----------------------------------------------------------------------------------------------------------------------------------
---
-   PROCEDURE drop_object (p_object_name IN VARCHAR2)
-   IS
-      l_obj_type   VARCHAR2 (30);
-      PRAGMA AUTONOMOUS_TRANSACTION;
-   BEGIN
-      IF Nm3ddl.does_object_exist (p_object_name)
-      THEN
-         l_obj_type := get_object_type (p_object_name);
-
-         EXECUTE IMMEDIATE 'drop ' || l_obj_type || ' ' || p_object_name;
-      END IF;
-   END;
-
---
----------------------------------------------------------------------------------------------------------------------------------
---
-   FUNCTION get_object_type (p_object IN VARCHAR2)
-      RETURN VARCHAR2
-   IS
-      l_owner   VARCHAR2 (30) := Sys_Context('NM3CORE','APPLICATION_OWNER');
-
-      CURSOR c1 (c_object IN VARCHAR2, c_owner IN VARCHAR2)
-      IS
-         SELECT object_type
-           FROM all_objects
-          WHERE owner = c_owner AND object_name = c_object;
-
-      retval    VARCHAR2 (30);
-   BEGIN
-      OPEN c1 (p_object, l_owner);
-
-      FETCH c1
-       INTO retval;
-
-      IF c1%NOTFOUND
-      THEN
-         CLOSE c1;
-
-         Hig.raise_ner (pi_appl         => Nm3type.c_hig,
-                        pi_id           => 257,
-                        pi_sqlcode      => -20001
-                       );
-      END IF;
-
-      CLOSE c1;
-
-      RETURN retval;
-   END;
-
---
----------------------------------------------------------------------------------------------------------------------------------
---
-   PROCEDURE drop_trigger_by_theme_id ( p_nth_id IN nm_themes_all.nth_theme_id%TYPE ) IS
-   
-    -- CWS 0110345 Trigger changed to ignore nm_themes_all. Table nm_themes_all 
-    -- is no longer referenced in cursor and any exception raised by dynamic sql
-    -- will be caught. 
-   CURSOR c_trig (c_nth_id IN nm_themes_all.nth_theme_id%TYPE ) IS
-     SELECT trigger_name
-     FROM user_triggers
-     WHERE trigger_name LIKE 'NM_NTH_' || TO_CHAR(c_nth_id) || '_SDO%';
-   --
-   BEGIN
-     
-     FOR irec IN c_trig( p_nth_id ) LOOP
-       BEGIN
-         EXECUTE IMMEDIATE 'DROP TRIGGER '||irec.trigger_name;
-       EXCEPTION
-       WHEN OTHERS THEN
-         NULL;
-       END;
-     END LOOP;
-   END;
---
----------------------------------------------------------------------------------------------------------------------------------
---
-   PROCEDURE drop_layers_by_inv_type (
-      p_nit_id       IN   nm_inv_types.nit_inv_type%TYPE,
-      p_keep_table   IN   BOOLEAN DEFAULT FALSE
-   )
-   IS
-      CURSOR c1 (c_nit IN nm_inv_types.nit_inv_type%TYPE)
-      IS
-         SELECT nith_nth_theme_id
-           FROM NM_INV_THEMES, NM_THEMES_ALL
-          WHERE nith_nit_id = c_nit
-    AND   nth_theme_id = nith_nth_theme_id
-    ORDER BY DECODE(nth_base_table_theme, NULL, 'B', 'A') ;
-
-      l_tab_nth_id   Nm3type.tab_number;
-      l_keep_table   VARCHAR2 (1);
-   BEGIN
-      IF p_keep_table
-      THEN
-         l_keep_table := 'Y';
-      ELSE
-         l_keep_table := 'N';
-      END IF;
-
-      OPEN c1 (p_nit_id);
-
-      FETCH c1
-      BULK COLLECT INTO l_tab_nth_id;
-
-      CLOSE c1;
-
---   Nm_Debug.debug_on;
-         FOR i IN 1 .. l_tab_nth_id.COUNT
-      LOOP
---Nm_Debug.DEBUG('drop '||TO_CHAR(l_tab_nth_id (i)));
-         Nm3sdm.Drop_Layer (p_nth_id                  => l_tab_nth_id (i),
-                            p_keep_feature_table      => l_keep_table
-                           );
-      END LOOP;
-   END drop_layers_by_inv_type;
-
---
----------------------------------------------------------------------------------------------------------------------------------
---
-   PROCEDURE drop_layers_by_gty_type (
-      p_gty   IN   nm_group_types.ngt_group_type%TYPE
-   )
-   IS
-      CURSOR c1 (c_gty IN nm_group_types.ngt_group_type%TYPE)
-      IS
-         SELECT nnth_nth_theme_id, DECODE(nth_base_table_theme, NULL, 'A', 'B')
-           FROM NM_NW_THEMES, NM_LINEAR_TYPES, NM_THEMES_ALL
-          WHERE nnth_nlt_id = nlt_id
-            AND nlt_gty_type = c_gty
-            AND nnth_nth_theme_id = nth_theme_id
-         UNION
-         SELECT nath_nth_theme_id, DECODE(nth_base_table_theme, NULL, 'A', 'B')
-           FROM NM_AREA_THEMES, NM_AREA_TYPES, NM_THEMES_ALL
-          WHERE nath_nat_id = nat_id
-            AND nat_gty_group_type = c_gty
-            AND nath_nth_theme_id = nth_theme_id
-          ORDER BY 2 DESC;
- --
-   l_tab_nth_id   Nm3type.tab_number;
-   l_tab_order    Nm3type.tab_varchar1;
- --
-   BEGIN
-      OPEN c1 (p_gty);
-      FETCH c1
-      BULK COLLECT INTO l_tab_nth_id, l_tab_order;
-      CLOSE c1;
-      FOR i IN 1 .. l_tab_nth_id.COUNT
-      LOOP
-         Nm3sdm.Drop_Layer (p_nth_id => l_tab_nth_id (i));
-      END LOOP;
-   END;
-
---
----------------------------------------------------------------------------------------------------------------------------------
---
-   FUNCTION type_has_shape (p_type IN VARCHAR2)
-      RETURN BOOLEAN
-   IS
-      CURSOR c1 (c_type IN VARCHAR2)
-      IS
-         SELECT 1
-           FROM DUAL
-          WHERE EXISTS (
-                   SELECT 1
-                     FROM NM_AREA_TYPES
-                    WHERE nat_gty_group_type = c_type
-                   UNION
-                   SELECT 1
-                     FROM NM_INV_THEMES
-                    WHERE nith_nit_id = c_type);
-
-      retval   BOOLEAN;
-      dummy    NUMBER;
-   BEGIN
-      OPEN c1 (p_type);
-
-      FETCH c1
-       INTO dummy;
-
-      retval := c1%FOUND;
-
-      CLOSE c1;
-
-      RETURN retval;
-   END;
-
---
----------------------------------------------------------------------------------------------------------------------------------
---
-   FUNCTION theme_is_ft (p_nth_theme_id IN NM_THEMES_ALL.nth_theme_id%TYPE)
-      RETURN BOOLEAN
-   IS
-      CURSOR c1 (c_nth IN NM_THEMES_ALL.nth_theme_id%TYPE)
-      IS
-         SELECT nth_theme_id
-           FROM NM_THEMES_ALL, NM_INV_THEMES, nm_inv_types
-          WHERE nth_theme_id = nith_nth_theme_id
-            AND nith_nit_id = nit_inv_type
-            AND nit_table_name IS NOT NULL;
-
-      retval    BOOLEAN := FALSE;
-      l_dummy   NUMBER;
-   BEGIN
-      OPEN c1 (p_nth_theme_id);
-
-      FETCH c1
-       INTO l_dummy;
-
-      retval := c1%FOUND;
-
-      CLOSE c1;
-
-      RETURN retval;
-   END;
-
---
----------------------------------------------------------------------------------------------------------------------------------
---
-   PROCEDURE set_subuser_globals_nthr (
-      pi_role       IN   NM_THEME_ROLES.nthr_role%TYPE,
-      pi_theme_id   IN   NM_THEME_ROLES.nthr_theme_id%TYPE,
-      pi_mode       IN   VARCHAR2
-   )
-   IS
-   BEGIN
-      Nm3sdm.g_role_array (Nm3sdm.g_role_idx) := pi_role;
-      Nm3sdm.g_theme_role (Nm3sdm.g_role_idx) := pi_theme_id;
-      Nm3sdm.g_role_op (Nm3sdm.g_role_idx)    := pi_mode;
-   END set_subuser_globals_nthr;
-
---
----------------------------------------------------------------------------------------------------------------------------------
---
-   PROCEDURE set_subuser_globals_hur (
-      pi_role       IN   NM_THEME_ROLES.nthr_role%TYPE,
-      pi_username   IN   HIG_USER_ROLES.hur_username%TYPE,
-      pi_mode       IN   VARCHAR2
-   )
-   IS
-   BEGIN
-      Nm3sdm.g_role_array (Nm3sdm.g_role_idx)     := pi_role;
-      Nm3sdm.g_username_array (Nm3sdm.g_role_idx) := pi_username;
-      Nm3sdm.g_role_op (Nm3sdm.g_role_idx)        := pi_mode;
-   END set_subuser_globals_hur;
-
---
----------------------------------------------------------------------------------------------------------------------------------
---
-  PROCEDURE drop_feature_view (pi_owner IN VARCHAR2, pi_view_name IN VARCHAR2 )
-  IS
-    PRAGMA autonomous_transaction;
-  BEGIN
-  BEGIN
-    EXECUTE IMMEDIATE 'DROP VIEW '||pi_owner||'.'||pi_view_name;
-  EXCEPTION
-    WHEN OTHERS THEN NULL;
-  END;
-
-  BEGIN
-    EXECUTE IMMEDIATE 'DROP SYNONYM '||pi_owner||'.'||pi_view_name;
-  EXCEPTION
-    WHEN OTHERS THEN NULL;
-  END;
-  END drop_feature_view;
---
----------------------------------------------------------------------------------------------------------------------------------
---
-  PROCEDURE create_feature_view (pi_owner IN VARCHAR2, pi_view_name IN VARCHAR2 )
-  IS
-    PRAGMA autonomous_transaction;
-  BEGIN
-    BEGIN
-      -- CWS
-      --EXECUTE IMMEDIATE 'DROP SYNONYM '|| pi_owner||'.'|| pi_view_name;
-      EXECUTE IMMEDIATE 'DROP VIEW '|| pi_owner||'.'|| pi_view_name;
-    EXCEPTION
-      WHEN OTHERS THEN NULL;
-    END;
-    BEGIN
-      -- CWS
-      --EXECUTE IMMEDIATE 'CREATE OR REPLACE VIEW '||pi_owner||'.'||pi_view_name
-      --                  ||' AS SELECT * FROM '||Sys_Context('NM3CORE','APPLICATION_OWNER')||'.'||pi_view_name;
-      EXECUTE IMMEDIATE ('CREATE OR REPLACE SYNONYM '|| pi_owner ||'.'|| pi_view_name || ' FOR ' || Sys_Context('NM3CORE','APPLICATION_OWNER') || '.' || pi_view_name);
-    EXCEPTION
-      WHEN OTHERS THEN NULL;
-    END;
-  EXCEPTION
-    WHEN OTHERS THEN NULL;
-  END create_feature_view;
---
----------------------------------------------------------------------------------------------------------------------------------
---
-   PROCEDURE process_subuser_nthr
-/* Procedure to deal with creating subordinate user metadata triggered on
-   nm_theme_roles data */
-   IS
-   --
-      PROCEDURE create_sub_sdo_layer
-                    ( pi_theme_id IN nm_themes_all.nth_theme_id%TYPE
-                    , pi_role     IN nm_theme_roles.nthr_role%TYPE )
-      IS
-      BEGIN
-      --
-      -- Insert the USGM based on current theme and role
-      --
-        INSERT INTO MDSYS.sdo_geom_metadata_table g
-          (sdo_owner, sdo_table_name, sdo_column_name, sdo_diminfo, sdo_srid)
-        SELECT hus_username, nth_feature_table, nth_feature_shape_column, sdo_diminfo, sdo_srid
-          FROM MDSYS.sdo_geom_metadata_table u,
-               (SELECT hus_username, nth_feature_table, nth_feature_shape_column
-                  FROM
-                       -- Layers based on role - more than likely views
-                       (SELECT hus_username,
-                               a.nth_feature_table,
-                               a.nth_feature_shape_column
-                          FROM nm_themes_all a,
-                               nm_theme_roles,
-                               hig_user_roles,
-                               hig_users,
-                               all_users
-                         WHERE nthr_theme_id = a.nth_theme_id
-                           AND a.nth_theme_id = pi_theme_id
-                           AND nthr_role    = hur_role
-                           AND hur_role     = pi_role
-                           AND hur_username = hus_username
-                           AND hus_username = username
-                           AND hus_username != Sys_Context('NM3CORE','APPLICATION_OWNER')
-                           AND NOT EXISTS (
-                                  SELECT 1
-                                    FROM MDSYS.sdo_geom_metadata_table g1
-                                   WHERE g1.sdo_owner = hus_username
-                                     AND g1.sdo_table_name = nth_feature_table
-                                     AND g1.sdo_column_name = nth_feature_shape_column)
-                        UNION ALL
-                        -- Base table themes
-                        SELECT hus_username,
-                               b.nth_feature_table,
-                               b.nth_feature_shape_column
-                          FROM nm_themes_all a,
-                               hig_users,
-                               all_users,
-                               nm_themes_all b
-                         WHERE b.nth_theme_id = a.nth_base_table_theme
-                           AND a.nth_theme_id = pi_theme_id
-                           AND hus_username = username
-                           AND hus_username != Sys_Context('NM3CORE','APPLICATION_OWNER')
-                           AND NOT EXISTS (
-                                  SELECT 1
-                                    FROM MDSYS.sdo_geom_metadata_table g1
-                                   WHERE g1.sdo_owner = hus_username
-                                     AND g1.sdo_table_name = b.nth_feature_table
-                                     AND g1.sdo_column_name = b.nth_feature_shape_column))
-                GROUP BY hus_username, nth_feature_table, nth_feature_shape_column)
-         WHERE u.sdo_table_name = nth_feature_table
-           AND u.sdo_column_name = nth_feature_shape_column
-           AND u.sdo_owner = Sys_Context('NM3CORE','APPLICATION_OWNER');
-
---         nm_debug.debug('Inserted '||SQL%ROWCOUNT||' SDO metadata rows');
-      --
-        FOR i IN
-         (SELECT hus_username, nth_feature_table, nth_feature_shape_column
-            FROM
-             -- Layers based on role - more than likely views
-             (SELECT hus_username, nth_feature_table,  nth_feature_shape_column
-                FROM nm_themes_all a,
-                     nm_theme_roles,
-                     hig_user_roles,
-                     hig_users,
-                     all_users
-               WHERE nthr_theme_id = a.nth_theme_id
-                 AND a.nth_theme_id = pi_theme_id
-                 AND nthr_role    = hur_role
-                 AND hur_role     = pi_role
-                 AND hur_username = hus_username
-                 AND hus_username = username
-                 AND hus_username != Sys_Context('NM3CORE','APPLICATION_OWNER')
-              UNION ALL
-              -- Base table themes
-              SELECT hus_username,
-                     b.nth_feature_table,
-                     b.nth_feature_shape_column
-                FROM nm_themes_all a,
-                     hig_users,
-                     all_users,
-                     nm_themes_all b
-               WHERE b.nth_theme_id = a.nth_base_table_theme
-                 AND a.nth_theme_id = pi_theme_id
-                 AND hus_username = username
-                 AND hus_username != Sys_Context('NM3CORE','APPLICATION_OWNER'))
-          GROUP BY hus_username, nth_feature_table, nth_feature_shape_column)
-        LOOP
-        --
-          create_feature_view (i.hus_username, i.nth_feature_table);
-          --
-          --nm_debug.debug('SDE = '||TO_CHAR (nm3sdm.g_theme_role (i))||' - '||u.hus_username);
-          IF hig.get_user_or_sys_opt('REGSDELAY') = 'Y'
-            THEN
-            BEGIN
-              EXECUTE IMMEDIATE
-                (' begin '||
-                    'nm3sde.create_sub_sde_layer ( p_theme_id => '|| pi_theme_id
-                                              || ',p_username => '''|| i.hus_username
-                                           || ''');'||
-                 ' end;');
-            EXCEPTION
-              WHEN OTHERS THEN NULL;
-            END;
-          --
-          END IF;
-        --
-        END LOOP;
-    --
-      END create_sub_sdo_layer;
-    --
-    --------------------------------------------------------------------------
-    --
-      PROCEDURE delete_sub_sdo_layer
-                  ( pi_theme_id IN nm_themes_all.nth_theme_id%TYPE
-                  , pi_role     IN nm_theme_roles.nthr_role%TYPE )
-      IS
-        l_tab_owner       nm3type.tab_varchar30;
-        l_tab_table_name  nm3type.tab_varchar30;
-        l_tab_column_name nm3type.tab_varchar30;
-
-      --
-      BEGIN
-      --
-        SELECT hus_username, nth_feature_table, nth_feature_shape_column
-          BULK COLLECT INTO l_tab_owner, l_tab_table_name, l_tab_column_name
-          FROM (SELECT hus_username, nth_feature_table, nth_feature_shape_column
-                  FROM (SELECT hus_username,
-                               a.nth_feature_table,
-                               a.nth_feature_shape_column
-                          FROM nm_themes_all a,
-                               hig_user_roles,
-                               hig_users,
-                               all_users
-                         WHERE a.nth_theme_id = pi_theme_id
-                           AND hur_role     = pi_role
-                           AND hur_username = hus_username
-                           AND hus_username = username
-                           AND hus_username != Sys_Context('NM3CORE','APPLICATION_OWNER')
-                           AND NOT EXISTS
-                              (SELECT 1 FROM hig_user_roles, nm_theme_roles r
-                                 WHERE hur_username = hus_username
-                                   and hur_role    = nthr_role
-                                   and nthr_theme_id = a.nth_theme_id
-                                   AND hur_role    != pi_role)
-                GROUP BY hus_username, nth_feature_table, nth_feature_shape_column)) layers;
-      --
-        IF l_tab_owner.COUNT > 0
-        THEN
-          FORALL i IN 1..l_tab_owner.COUNT
-            DELETE mdsys.sdo_geom_metadata_table
-             WHERE sdo_owner       = l_tab_owner(i)
-               AND sdo_table_name  = l_tab_table_name(i)
-               AND sdo_column_name = l_tab_column_name(i);
-
-        -----------------------------------
-        -- Drop subordinate feature views
-        -----------------------------------
-
-          FOR i IN 1..l_tab_owner.COUNT LOOP
-
-            drop_feature_view (l_tab_owner(i), l_tab_table_name(i));
-
-          -----------------------------------------
-          -- Drop SDE layers for subordinate users
-          -----------------------------------------
-
-            IF hig.get_user_or_sys_opt('REGSDELAY') = 'Y'
-            THEN
-              BEGIN
-                EXECUTE IMMEDIATE 'begin '||
-                                     'nm3sde.drop_sub_layer_by_table( '
-                                                ||Nm3flx.string(l_tab_table_name(i))||','
-                                                ||Nm3flx.string(l_tab_column_name(i))||','
-                                                ||Nm3flx.string(l_tab_owner(i))||');'
-                               ||' end;';
-            --
-              EXCEPTION
-                WHEN OTHERS THEN NULL;
-              END;
-            END IF;
-
-          END LOOP;
-
-        END IF;
-
---        nm_debug.debug('Deleted '||l_tab_owner.COUNT||' SDO metadata rows');
-      --
-      END delete_sub_sdo_layer;
+Procedure Drop_Trigger_By_Theme_Id  (
+                                    p_Nth_Id In Nm_Themes_All.Nth_Theme_Id%Type
+                                    )
+Is
+  -- CWS 0110345 Trigger changed to ignore nm_themes_all. Table nm_themes_all 
+  -- is no longer referenced in cursor and any exception raised by dynamic sql
+  -- will be caught. 
   --
-   BEGIN
+Begin
+  For Irec In (
+              Select  ut.Trigger_Name
+              From    User_Triggers     ut
+              Where   ut.Trigger_Name   Like 'NM_NTH_' || To_Char(p_Nth_Id) || '_SDO%'
+              )
+  Loop
+    Begin
+      Execute Immediate 'DROP TRIGGER '||Irec.Trigger_Name;
+    Exception
+      When Others Then
+        Null;
+    End;
+ End Loop;
+End Drop_Trigger_By_Theme_Id;
+--
+---------------------------------------------------------------------------------------------------------------------------------
+--
+Procedure Drop_Layer  (
+                      p_Nth_Id               In   Nm_Themes_All.Nth_Theme_Id%Type,
+                      p_Keep_Theme_Data      In   Varchar2 Default 'N',
+                      p_Keep_Feature_Table   In   Varchar2 Default 'N'
+                      )
+Is
+  l_Nth         Nm_Themes_All%Rowtype;
+  l_Seq         Varchar2 (30);
+--
+Begin
+  l_Nth := Nm3Get.Get_Nth (p_Nth_Id);
+
+  Drop_Trigger_By_Theme_Id( p_Nth_Id );
+
+  If l_Nth.Nth_Feature_Table Is Not Null  Then
+    If Hig.Get_Sysopt ('REGSDELAY') = 'Y' Then
+      
+      Declare             
+       Not_There   Exception;
+        Pragma Exception_Init (Not_There, -20001);
+      Begin
+        Execute Immediate (  'begin '
+                          || '   nm3sde.drop_layer_by_theme( p_theme_id => '
+                          || To_Char (L_Nth.Nth_Theme_Id)
+                          || ');'
+                          || 'end;'
+                          );
+      Exception
+        When Not_There  Then
+          Null;
+      End;
+      
+    End If;
+
+    If p_Keep_Feature_Table = 'N' Then
+      Begin
+        -- AE 23-SEP-2008
+        -- Drop views instead of synonyms
+        Nm3Ddl.Drop_Views_For_Object (l_Nth.Nth_Feature_Table);
+
+      Exception
+        When Others Then
+          Null;
+        --    problem in privileges on the development schema - dropping synonyms failed - needs further investigation.
+      End;
+
+      Begin
+        --cws
+        Nm3Ddl.Drop_Synonym_For_Object (l_Nth.Nth_Feature_Table);
+
+      Exception
+        When Others  Then
+          Null;
+          --    problem in privileges on the development schema - dropping synonyms failed - needs further investigation.
+      End;
+
+      Drop_Object (l_Nth.Nth_Feature_Table);
+      Nm3Sdo.Drop_Metadata (l_Nth.Nth_Feature_Table);
+
+      If Nm3Sdo.Use_Surrogate_Key = 'Y' Then
+        l_Seq := Nm3Sdo.Get_Spatial_Seq (p_Nth_Id);
+
+        If Nm3Ddl.Does_Object_Exist (l_Seq) Then
+          Begin
+            Nm3Ddl.Drop_Synonym_For_Object (l_Seq);
+          Exception
+            When Others Then
+              Null;
+          End;
+          Drop_Object (l_Seq);
+        End If;
+      End If;     
+    End If; -- keep feature table end if
+  End If;
+  --
+  If p_Keep_Theme_Data = 'N'  Then
+    Delete
+    From  Nm_Themes_All nta
+    Where nta.Nth_Theme_Id = p_Nth_Id;
+  End If;
+  --
+End Drop_Layer;
+--
+---------------------------------------------------------------------------------------------------------------------------------
+--
+Function Get_Object_Type  (
+                          p_Object In Varchar2
+                          ) Return Varchar2
+Is
+  Retval    Varchar2 (30);
+Begin
+  Begin
+    Select  ao.Object_Type
+    Into    Retval
+    From    All_Objects   ao
+    Where   ao.Owner        =   Sys_Context('NM3CORE','APPLICATION_OWNER')
+    And     ao.Object_Name  =   p_Object
+    And     Rownum          =   1;
+  Exception
+    When No_Data_Found Then
+      Hig.Raise_Ner (
+                    pi_Appl         =>  Nm3Type.C_Hig,
+                    pi_Id           =>  257,
+                    pi_Sqlcode      =>  -20001
+                    );
+  End;
+  
+  Return Retval;
+End Get_Object_Type;
+--
+---------------------------------------------------------------------------------------------------------------------------------
+--
+Procedure Drop_Object (
+                      p_Object_Name In Varchar2
+                      )
+Is
+  l_Obj_Type   Varchar2 (30);
+  Pragma Autonomous_Transaction;
+Begin
+  If Nm3Ddl.Does_Object_Exist (p_Object_Name) Then
+    l_Obj_Type := Get_Object_Type (p_Object_Name);
+    
+    Execute Immediate 'drop ' || l_Obj_Type || ' ' || p_Object_Name;
+    
+  End If;
+End Drop_Object;
+--
+---------------------------------------------------------------------------------------------------------------------------------
+--
+Procedure Drop_Layers_By_Inv_Type (
+                                  p_Nit_Id       In   Nm_Inv_Types.Nit_Inv_Type%Type,
+                                  p_Keep_Table   In   Boolean Default False
+                                  )
+Is
+  l_Tab_Nth_Id   Nm3Type.Tab_Number;
+  l_Keep_Table   Varchar2 (1);
+  
+Begin
+  If p_Keep_Table Then
+     l_Keep_Table := 'Y';
+  Else
+     l_Keep_Table := 'N';
+  End If;
+
+  Select      nit.Nith_Nth_Theme_Id
+  Bulk Collect
+  Into        l_Tab_Nth_Id
+  From        Nm_Inv_Themes   nit,
+              Nm_Themes_All   nta
+  Where       nit.Nith_Nit_Id   =   p_Nit_Id
+  And         nta.Nth_Theme_Id  =   nit.Nith_Nth_Theme_Id
+  Order By    Decode(Nth_Base_Table_Theme, Null, 'B', 'A');
+
+  For i In 1 .. l_Tab_Nth_Id.Count
+  Loop
+    Nm3Sdm.Drop_Layer (
+                      p_Nth_Id                  => l_Tab_Nth_Id (i),
+                      p_Keep_Feature_Table      => l_Keep_Table
+                      );
+  End Loop;
+End Drop_Layers_By_Inv_Type;
+--
+---------------------------------------------------------------------------------------------------------------------------------
+--
+Procedure Drop_Layers_By_Gty_Type (
+                                  p_Gty   In   Nm_Group_Types.Ngt_Group_Type%Type
+                                  )
+Is
+  --
+  l_Tab_Nth_Id   Nm3Type.Tab_Number;
+  l_Tab_Order    Nm3Type.Tab_Varchar1;
+  --
+Begin
+  Select        nnt.Nnth_Nth_Theme_Id,
+                Decode(nta.Nth_Base_Table_Theme, Null, 'A', 'B')
+  Bulk Collect 
+  Into          l_Tab_Nth_Id,
+                l_Tab_Order
+  From          Nm_Nw_Themes      nnt,
+                Nm_Linear_Types   nlt,
+                Nm_Themes_All     nta
+  Where         nnt.Nnth_Nlt_Id       =    nlt.Nlt_Id
+  And           nlt.Nlt_Gty_Type      =   p_Gty
+  And           nnt.Nnth_Nth_Theme_Id =   nta.Nth_Theme_Id
+  Union
+  Select        Nath_Nth_Theme_Id,
+                Decode(Nth_Base_Table_Theme, Null, 'A', 'B')
+  From          Nm_Area_Themes    nat,
+                Nm_Area_Types     naty,
+                Nm_Themes_All     nta
+  Where         nat.Nath_Nat_Id           =   naty.Nat_Id
+  And           naty.Nat_Gty_Group_Type   =   p_Gty
+  And           nat.Nath_Nth_Theme_Id     =   nta.Nth_Theme_Id
+  Order By 2 Desc;
+
+  For i In 1 .. l_Tab_Nth_Id.Count
+  Loop
+     Drop_Layer (p_Nth_Id => l_Tab_Nth_Id (i));
+  End Loop;
+End Drop_Layers_By_Gty_Type;
+--
+---------------------------------------------------------------------------------------------------------------------------------
+--
+Function Type_Has_Shape (
+                        p_Type In Varchar2
+                        )  Return Boolean
+Is
+  Retval   Boolean;
+  Dummy   Varchar2(1);
+Begin
+  Begin
+    Select  Null
+    Into    Dummy
+    From    Dual
+    Where   Exists (
+                   Select Null
+                   From   Nm_Area_Types
+                   Where  Nat_Gty_Group_Type = p_Type
+                   Union
+                   Select Null
+                   From   Nm_Inv_Themes
+                   Where  Nith_Nit_Id = p_Type
+                   );
+    Retval:=True;                   
+  Exception
+    When No_Data_Found Then
+      Retval:=False;
+  End;
+
+  Return Retval;
+End Type_Has_Shape;
+--
+---------------------------------------------------------------------------------------------------------------------------------
+--
+Function Theme_Is_Ft  (
+                      P_Nth_Theme_Id In Nm_Themes_All.Nth_Theme_Id%Type
+                      ) Return Boolean
+Is
+  Retval    Boolean := False;
+  l_Dummy   Number;
+Begin
+  Begin
+    Select  Null
+    Into    l_Dummy
+    From    Nm_Themes_All   nta,
+            Nm_Inv_Themes   nith,
+            Nm_Inv_Types    nit
+    Where   nta.Nth_Theme_Id    =   nith.Nith_Nth_Theme_Id
+    And     nith.Nith_Nit_Id    =   Nit_Inv_Type
+    And     nit.Nit_Table_Name  Is  Not Null
+    And     rownum              =   1;
+    
+    Retval:=True;
+    
+  Exception
+    When No_Data_Found Then
+      Retval:=False;
+  End;          
+
+  Return Retval;
+End Theme_Is_Ft;
+--
+---------------------------------------------------------------------------------------------------------------------------------
+--
+Procedure Set_Subuser_Globals_Nthr  (
+                                    pi_Role       In   Nm_Theme_Roles.Nthr_Role%Type,
+                                    pi_Theme_Id   In   Nm_Theme_Roles.Nthr_Theme_Id%Type,
+                                    pi_Mode       In   Varchar2
+                                    )
+Is
+Begin
+  g_Role_Array (g_Role_Idx) := pi_Role;
+  g_Theme_Role (g_Role_Idx) := pi_Theme_Id;
+  g_Role_Op (g_Role_Idx)    := pi_Mode;
+End Set_Subuser_Globals_Nthr;
+--
+---------------------------------------------------------------------------------------------------------------------------------
+--
+Procedure Set_Subuser_Globals_Hur (
+                                  pi_Role       In   Nm_Theme_Roles.Nthr_Role%Type,
+                                  pi_Username   In   Hig_User_Roles.Hur_Username%Type,
+                                  pi_Mode       In   Varchar2
+                                  )
+Is
+Begin
+  g_Role_Array (g_Role_Idx)     := pi_Role;
+  g_Username_Array (g_Role_Idx) := pi_Username;
+  g_Role_Op (g_Role_Idx)        := pi_Mode;
+End Set_Subuser_Globals_Hur;
+--
+---------------------------------------------------------------------------------------------------------------------------------
+--
+Procedure Drop_Feature_View (
+                            pi_Owner In Varchar2,
+                            pi_View_Name In Varchar2
+                            )
+Is
+  Pragma Autonomous_Transaction;
+Begin
+  Begin
+    Execute Immediate 'DROP VIEW '||pi_Owner||'.'||pi_View_Name;
+  Exception
+    When Others Then
+      Null;
+  End;
+
+  Begin
+    Execute Immediate 'DROP SYNONYM '||pi_Owner||'.'||pi_View_Name;
+  Exception
+    When Others Then
+    Null;
+  End;
+End Drop_Feature_View;
+--
+---------------------------------------------------------------------------------------------------------------------------------
+--
+Procedure Create_Feature_View (
+                              pi_Owner In Varchar2,
+                              pi_View_Name In Varchar2
+                              )
+Is
+  Pragma Autonomous_Transaction;
+Begin
+  Begin
+    -- CWS
+    Execute Immediate 'DROP VIEW '|| pi_Owner||'.'|| pi_View_Name;
+  Exception
+    When Others Then
+      Null;
+  End;
+  
+  Begin
+    -- CWS
+    Execute Immediate ('CREATE OR REPLACE SYNONYM '|| pi_Owner ||'.'|| pi_View_Name || ' FOR ' || Sys_Context('NM3CORE','APPLICATION_OWNER') || '.' || pi_View_Name);
+  Exception
+    When Others Then
+      Null;
+  End;
+End Create_Feature_View;
+--
+---------------------------------------------------------------------------------------------------------------------------------
+--
+Procedure Process_Subuser_Nthr
+  /* Procedure to deal with creating subordinate user metadata triggered on
+   nm_theme_roles data */
+Is
+  --
+  Procedure Create_Sub_Sdo_Layer  (
+                                  pi_Theme_Id In Nm_Themes_All.Nth_Theme_Id%Type,
+                                  pi_Role     In Nm_Theme_Roles.Nthr_Role%Type
+                                  )
+  Is
+  Begin
+    --
+    -- Insert the USGM based on current theme and role
+    --
+    Insert Into Mdsys.Sdo_Geom_Metadata_Table G
+    (
+    Sdo_Owner,
+    Sdo_Table_Name,
+    Sdo_Column_Name,
+    Sdo_Diminfo,
+    Sdo_Srid
+    )
+    Select  x.Hus_Username,
+            x.Nth_Feature_Table,
+            x.Nth_Feature_Shape_Column,
+            u.Sdo_Diminfo,
+            u.Sdo_Srid
+    From    Mdsys.Sdo_Geom_Metadata_Table u,
+            (
+            Select  y.Hus_Username,
+                    y.Nth_Feature_Table,
+                    y.Nth_Feature_Shape_Column
+            From   -- Layers based on role - more than likely views
+                   (
+                   Select   hu.Hus_Username,
+                            nta.Nth_Feature_Table,
+                            nta.Nth_Feature_Shape_Column
+                   From     Nm_Themes_All     nta,
+                            Nm_Theme_Roles    ntr,
+                            Hig_User_Roles    hur,
+                            Hig_Users         hu,
+                            All_Users         au
+                  Where     Nthr_Theme_Id     =       nta.Nth_Theme_Id
+                  And       nta.Nth_Theme_Id  =       pi_Theme_Id
+                  And       ntr.Nthr_Role     =       hur.Hur_Role
+                  And       hur.Hur_Role      =       pi_Role
+                  And       hur.Hur_Username  =       hu.Hus_Username
+                  And       hu.Hus_Username   =       au.Username
+                  And       hu.Hus_Username   !=      Sys_Context('NM3CORE','APPLICATION_OWNER')
+                  And       Not               Exists  (
+                                                      Select  Null
+                                                      From    Mdsys.Sdo_Geom_Metadata_Table g1
+                                                      Where   g1.Sdo_Owner        =   hu.Hus_Username
+                                                      And     g1.Sdo_Table_Name   =   nta.Nth_Feature_Table
+                                                      And     g1.Sdo_Column_Name  =   nta.Nth_Feature_Shape_Column
+                                                      )
+                  Union All
+                  -- Base table themes
+                  Select  hu.Hus_Username,
+                          nta2.Nth_Feature_Table,
+                          nta2.Nth_Feature_Shape_Column
+                  From    Nm_Themes_All   nta,
+                          Hig_Users       hu,
+                          All_Users       au,
+                          Nm_Themes_All   nta2
+                  Where   nta2.Nth_Theme_Id   =       nta.Nth_Base_Table_Theme
+                  And     nta.Nth_Theme_Id    =       Pi_Theme_Id
+                  And     hu.Hus_Username     =       au.Username
+                  And     hu.Hus_Username     !=      Sys_Context('NM3CORE','APPLICATION_OWNER')
+                  And     Not                 Exists  (
+                                                      Select  Null
+                                                      From    Mdsys.Sdo_Geom_Metadata_Table G1
+                                                      Where   g1.Sdo_Owner        =   hu.Hus_Username
+                                                      And     g1.Sdo_Table_Name   =   nta2.Nth_Feature_Table
+                                                      And     g1.Sdo_Column_Name  =   nta2.Nth_Feature_Shape_Column
+                                                      )
+                  ) y
+                  Group By  y.Hus_Username,
+                            y.Nth_Feature_Table,
+                            y.Nth_Feature_Shape_Column
+            ) x
+    Where   u.Sdo_Table_Name    =   x.Nth_Feature_Table
+    And     u.Sdo_Column_Name   =   x.Nth_Feature_Shape_Column
+    And     u.Sdo_Owner         =   Sys_Context('NM3CORE','APPLICATION_OWNER');
+
+    For i In  (
+              Select  x.Hus_Username,
+                      x.Nth_Feature_Table,
+                      x.Nth_Feature_Shape_Column
+              From    -- Layers based on role - more than likely views
+                      (
+                      Select  hu.Hus_Username,
+                              nta.Nth_Feature_Table,
+                              nta.Nth_Feature_Shape_Column
+                      From    Nm_Themes_All     nta,
+                              Nm_Theme_Roles    ntr,
+                              Hig_User_Roles    hur,
+                              Hig_Users         hu,
+                              All_Users         au
+                      Where   ntr.Nthr_Theme_Id   =   nta.Nth_Theme_Id
+                      And     nta.Nth_Theme_Id    =   pi_Theme_Id
+                      And     ntr.Nthr_Role       =   hur.Hur_Role
+                      And     hur.Hur_Role        =   pi_Role
+                      And     hur.Hur_Username    =   hu.Hus_Username
+                      And     hu.Hus_Username     =   au.Username
+                      And     hu.Hus_Username     !=  Sys_Context('NM3CORE','APPLICATION_OWNER')
+                      Union All
+                      -- Base table themes
+                      Select  Hus_Username,
+                              nta2.Nth_Feature_Table,
+                              nta2.Nth_Feature_Shape_Column
+                      From    Nm_Themes_All   nta,
+                              Hig_Users       hu,
+                              All_Users       au,
+                              Nm_Themes_All   nta2
+                      Where   nta2.Nth_Theme_Id   =   nta.Nth_Base_Table_Theme
+                      And     nta.Nth_Theme_Id    =   Pi_Theme_Id
+                      And     hu.Hus_Username     =   au.Username
+                      And     hu.Hus_Username     !=  Sys_Context('NM3CORE','APPLICATION_OWNER')
+                      ) x
+              Group By  x.Hus_Username,
+                        x.Nth_Feature_Table,
+                        x.Nth_Feature_Shape_Column
+              )
+  Loop
+    --
+    Create_Feature_View (I.Hus_Username, I.Nth_Feature_Table);
+    
+    If Hig.Get_User_Or_Sys_Opt('REGSDELAY') = 'Y' Then
+      Begin
+        Execute Immediate(' begin '||
+                            'nm3sde.create_sub_sde_layer ( p_theme_id => '|| pi_Theme_Id
+                                                      || ',p_username => '''|| i.Hus_Username
+                                                      || ''');'||
+                                                        ' end;');
+      Exception
+        When Others Then
+          Null;
+      End;
+
+    End If;
+
+  End Loop;
+
+  End Create_Sub_Sdo_Layer;
+  --
+  --------------------------------------------------------------------------
+  --
+  Procedure Delete_Sub_Sdo_Layer  (
+                                  pi_Theme_Id In Nm_Themes_All.Nth_Theme_Id%Type,
+                                  pi_Role     In Nm_Theme_Roles.Nthr_Role%Type
+                                  )
+  Is
+    l_Tab_Owner       Nm3Type.Tab_Varchar30;
+    l_Tab_Table_Name  Nm3Type.Tab_Varchar30;
+    l_Tab_Column_Name Nm3Type.Tab_Varchar30;
+  --
+  Begin
+  --
+    Select        Hus_Username,
+                  Nth_Feature_Table,
+                  Nth_Feature_Shape_Column
+    Bulk Collect 
+    Into          l_Tab_Owner,
+                  l_Tab_Table_Name,
+                  l_Tab_Column_Name
+    From          (
+                  Select  Hus_Username,
+                          Nth_Feature_Table,
+                          Nth_Feature_Shape_Column
+                  From    (
+                          Select  hu.Hus_Username,
+                                  nta.Nth_Feature_Table,
+                                  nta.Nth_Feature_Shape_Column
+                          From    Nm_Themes_All     nta,
+                                  Hig_User_Roles    hur,
+                                  Hig_Users         hu,
+                                  All_Users         au
+                          Where   nta.Nth_Theme_Id    =   pi_Theme_Id
+                          And     hur.Hur_Role        =   pi_Role
+                          And     hur.Hur_Username    =   hu.Hus_Username
+                          And     hu.Hus_Username     =   au.Username
+                          And     hu.Hus_Username     !=  Sys_Context('NM3CORE','APPLICATION_OWNER')
+                          And     Not Exists          (   Select  Null
+                                                          From    Hig_User_Roles  hur2,
+                                                                  Nm_Theme_Roles  ntr
+                                                          Where   hur2.Hur_Username     =   hu.Hus_Username
+                                                          And     hur2.Hur_Role         =   ntr.Nthr_Role
+                                                          And     ntr.Nthr_Theme_Id     =   nta.Nth_Theme_Id
+                                                          And     hur2.Hur_Role         !=  Pi_Role
+                                                      )
+                          Group By  hu.Hus_Username,
+                                    nta.Nth_Feature_Table,
+                                    nta.Nth_Feature_Shape_Column
+                          )
+                  ) Layers;
+  --
+  If l_Tab_Owner.Count > 0  Then
+    
+    Forall i In 1..l_Tab_Owner.Count
+      Delete  Mdsys.Sdo_Geom_Metadata_Table
+      Where   Sdo_Owner         = l_Tab_Owner(i)
+      And     Sdo_Table_Name    = l_Tab_Table_Name(i)
+      And     Sdo_Column_Name   = l_Tab_Column_Name(i);
+
+    -----------------------------------
+    -- Drop subordinate feature views
+    -----------------------------------
+
+    For i In 1..l_Tab_Owner.Count Loop
+
+      Drop_Feature_View (l_Tab_Owner(i), l_Tab_Table_Name(i));
+
+      -----------------------------------------
+      -- Drop SDE layers for subordinate users
+      -----------------------------------------
+
+      If Hig.Get_User_Or_Sys_Opt('REGSDELAY') = 'Y' Then
+        
+        Begin
+          Execute Immediate 'begin '||
+                              'nm3sde.drop_sub_layer_by_table( '
+                            ||Nm3Flx.String(l_Tab_Table_Name(i))||','
+                            ||Nm3Flx.String(l_Tab_Column_Name(i))||','
+                            ||Nm3Flx.String(l_Tab_Owner(i))||');'
+                           ||' end;';
+        Exception
+          When Others Then
+            Null;
+        End;
+      End If;
+      End Loop;
+    End If;
+  End Delete_Sub_Sdo_Layer;
+  --
+Begin
   --
   --------------------------------------------------------------
   -- Loop through the rows being processed from nm_theme_roles
   --------------------------------------------------------------
 
-    -----------
-    -- INSERTS
-    -----------
+  -----------
+  -- INSERTS
+  -----------
 
-     FOR i IN 1 .. Nm3sdm.g_role_idx
-     LOOP
+  For i In 1 .. G_Role_Idx
+  Loop
 
-       BEGIN
---         nm_debug.debug('Role op for '||i||' is '||Nm3sdm.g_role_op (i));
+    Begin
+      If g_Role_Op (i) = 'I' Then
 
-         IF Nm3sdm.g_role_op (i) = 'I'
-         THEN
-
---           nm_debug.debug('Create '||nm3sdm.g_theme_role (i));
-
-           create_sub_sdo_layer
-              ( pi_theme_id => nm3sdm.g_theme_role (i)
-              , pi_role     => nm3sdm.g_role_array (i) );
-       --
+        Create_Sub_Sdo_Layer  (
+                              pi_Theme_Id => g_Theme_Role (i),
+                              pi_Role     => g_Role_Array (i)
+                              );
        ----------
        -- DELETES
        ----------
+      Elsif g_Role_Op (i) = 'D'  Then
+        Delete_Sub_Sdo_Layer  (
+                              pi_Theme_Id =>  g_Theme_Role (i),
+                              pi_Role     =>  g_Role_Array (i)
+                              );
+      End If;
 
-         ELSIF Nm3sdm.g_role_op (i) = 'D'
-         THEN
---           nm_debug.debug('Delete '||nm3sdm.g_theme_role (i));
-           delete_sub_sdo_layer
-              ( pi_theme_id =>  nm3sdm.g_theme_role (i)
-              , pi_role     =>  nm3sdm.g_role_array (i) );
-         --
-         END IF;
+    Exception
+      When No_Data_Found Then
+        Null;
+    End;
+ End Loop;
 
-       EXCEPTION
-         WHEN NO_DATA_FOUND THEN NULL;
-       END;
+Exception
+ When No_Data_Found Then
+  Null;
 
-     END LOOP;
-
-   --
-   EXCEPTION
-     WHEN NO_DATA_FOUND THEN NULL;
-   --
-   END process_subuser_nthr;
-
+End Process_Subuser_Nthr;
 --
 ---------------------------------------------------------------------------------------------------------------------------------
 --
-   PROCEDURE process_subuser_hur
+ Procedure Process_Subuser_Hur
 /* Procedure to deal with creating subordinate user metadata triggered on
-   nm_theme_roles data */
-   IS
-   --
-     PROCEDURE create_sub_sdo_layers (pi_username IN hig_users.hus_username%TYPE
-                                     ,pi_role     IN nm_theme_roles.nthr_role%TYPE )
-     IS
-       l_user hig_users.hus_username%TYPE := pi_username;
-     BEGIN
-     --
-       INSERT INTO MDSYS.sdo_geom_metadata_table g
-             (sdo_owner, sdo_table_name, sdo_column_name, sdo_diminfo, sdo_srid)
-         SELECT l_user, nth_feature_table, nth_feature_shape_column, sdo_diminfo, sdo_srid
-           FROM MDSYS.sdo_geom_metadata_table u,
-                (SELECT nth_feature_table, nth_feature_shape_column
-                   FROM
-                        -- Layers based on role - more than likely views
-                        (SELECT a.nth_feature_table,
-                                a.nth_feature_shape_column
-                           FROM nm_themes_all a,
-                                nm_theme_roles
-                          WHERE nthr_theme_id = a.nth_theme_id
-                            AND nthr_role    = pi_role
-                            AND NOT EXISTS (
-                                   SELECT 1
-                                     FROM MDSYS.sdo_geom_metadata_table g1
-                                    WHERE g1.sdo_owner = l_user
-                                      AND g1.sdo_table_name = nth_feature_table
-                                      AND g1.sdo_column_name = nth_feature_shape_column)
-                         UNION ALL
-                         -- Base table themes
-                         SELECT b.nth_feature_table,
-                                b.nth_feature_shape_column
-                           FROM nm_themes_all a,
-                                nm_theme_roles,
-                                nm_themes_all b
-                          WHERE b.nth_theme_id = a.nth_base_table_theme
-                            AND nthr_theme_id = a.nth_theme_id
-                            AND nthr_role    = pi_role
-                            AND NOT EXISTS (
-                                   SELECT 1
-                                     FROM MDSYS.sdo_geom_metadata_table g1
-                                    WHERE g1.sdo_owner = l_user
-                                      AND g1.sdo_table_name = b.nth_feature_table
-                                      AND g1.sdo_column_name = b.nth_feature_shape_column))
-                 GROUP BY nth_feature_table, nth_feature_shape_column)
-          WHERE u.sdo_table_name = nth_feature_table
-            AND u.sdo_column_name = nth_feature_shape_column
-            AND u.sdo_owner = Sys_Context('NM3CORE','APPLICATION_OWNER');
-     --
---       nm_debug.debug('Inserted '||SQL%ROWCOUNT||' rows for role '||pi_role||' on user '||pi_username);
-     --
-       FOR i IN
-         (SELECT * FROM
-           (SELECT nth_theme_id, nth_feature_table, nth_feature_shape_column
-             FROM
-                  -- Layers based on role - more than likely views
-                  (SELECT a.nth_theme_id, a.nth_feature_table,
-                          a.nth_feature_shape_column
-                     FROM nm_themes_all a,
-                          nm_theme_roles
-                    WHERE nthr_theme_id = a.nth_theme_id
-                      AND nthr_role    = pi_role
-                   UNION ALL
-                   -- Base table themes
-                   SELECT b.nth_theme_id, b.nth_feature_table,
-                          b.nth_feature_shape_column
-                     FROM nm_themes_all a,
-                          nm_theme_roles,
-                          nm_themes_all b
-                    WHERE b.nth_theme_id = a.nth_base_table_theme
-                      AND nthr_theme_id = a.nth_theme_id
-                      AND nthr_role    = pi_role)
-           GROUP BY nth_theme_id, nth_feature_table, nth_feature_shape_column))
-       LOOP
-       --
-         create_feature_view (pi_username, i.nth_feature_table);
-       --
-         IF hig.get_user_or_sys_opt('REGSDELAY') = 'Y'
-         THEN
-         --
-           BEGIN
-             EXECUTE IMMEDIATE
-               (' begin '||
-                   'nm3sde.create_sub_sde_layer ( p_theme_id => '|| TO_CHAR (i.nth_theme_id)
-                                             || ',p_username => '''|| pi_username
-                                          || ''');'||
-                ' end;');
-           EXCEPTION
-             WHEN OTHERS THEN NULL;
-           END;
-         END IF;
-       END LOOP;
-     EXCEPTION
-       WHEN OTHERS
-       THEN NULL;
-     END create_sub_sdo_layers;
-   --
-     PROCEDURE delete_sdo_layers_by_role ( pi_username IN hig_users.hus_username%TYPE
-                                         , pi_role     IN nm_theme_roles.nthr_role%TYPE )
-     IS
-        l_tab_owner       nm3type.tab_varchar30;
-        l_tab_table_name  nm3type.tab_varchar30;
-        l_tab_column_name nm3type.tab_varchar30;
-     BEGIN
-       SELECT hus_username, nth_feature_table, nth_feature_shape_column
-          BULK COLLECT INTO l_tab_owner, l_tab_table_name, l_tab_column_name
-          FROM (SELECT hus_username, nth_feature_table, nth_feature_shape_column
-                  FROM (SELECT hus_username,
-                               a.nth_feature_table,
-                               a.nth_feature_shape_column
-                          FROM nm_themes_all a,
-                               nm_theme_roles,
-                               hig_users,
-                               all_users
-                         WHERE nthr_theme_id = a.nth_theme_id
-                           AND nthr_role     = pi_role
-                           AND hus_username  = username
-                           AND username      = pi_username
-                           AND hus_username != Sys_Context('NM3CORE','APPLICATION_OWNER')
-                           AND NOT EXISTS
-                              (SELECT 1 FROM hig_user_roles, nm_theme_roles r
-                                 WHERE hur_username = pi_username
-                                   and hur_role    = nthr_role
-                                   and nthr_theme_id = a.nth_theme_id
-                                   AND hur_role    != pi_role)
-                GROUP BY hus_username, nth_feature_table, nth_feature_shape_column)) layers;
-     --
-        IF l_tab_owner.COUNT > 0
-        THEN
+ nm_theme_roles data */
+Is
+  --
+  Procedure Create_Sub_Sdo_Layers (
+                                  pi_Username In Hig_Users.Hus_Username%Type,
+                                  pi_Role     In Nm_Theme_Roles.Nthr_Role%Type
+                                  )
+  Is
+    l_User Hig_Users.Hus_Username%Type := pi_Username;
+  Begin
+    --
+    Insert Into Mdsys.Sdo_Geom_Metadata_Table g
+    (
+    Sdo_Owner,
+    Sdo_Table_Name,
+    Sdo_Column_Name,
+    Sdo_Diminfo,
+    Sdo_Srid
+    )
+    Select  l_User,
+            y.Nth_Feature_Table,
+            y.Nth_Feature_Shape_Column,
+            u.Sdo_Diminfo,
+            u.Sdo_Srid
+    From    Mdsys.Sdo_Geom_Metadata_Table u,
+            (
+            Select  x.Nth_Feature_Table,
+                    x.Nth_Feature_Shape_Column
+            From    -- Layers based on role - more than likely views
+                    (
+                    Select  nta.Nth_Feature_Table,
+                            nta.Nth_Feature_Shape_Column
+                    From    Nm_Themes_All   nta,
+                            Nm_Theme_Roles  ntr
+                    Where   ntr.Nthr_Theme_Id   =     nta.Nth_Theme_Id
+                    And     ntr.Nthr_Role       =     pi_Role
+                    And     Not Exists          (
+                                                Select  Null
+                                                From    Mdsys.Sdo_Geom_Metadata_Table g1
+                                                Where   g1.Sdo_Owner        = l_User
+                                                And     g1.Sdo_Table_Name   = nta.Nth_Feature_Table
+                                                And     g1.Sdo_Column_Name  = nta.Nth_Feature_Shape_Column
+                                                )
+                    Union All
+                    -- Base table themes
+                    Select  nta2.Nth_Feature_Table,
+                            nta2.Nth_Feature_Shape_Column
+                    From    Nm_Themes_All     nta,
+                            Nm_Theme_Roles    ntr,
+                            Nm_Themes_All     nta2
+                    Where   nta2.Nth_Theme_Id   =   nta.Nth_Base_Table_Theme
+                    And     Nthr_Theme_Id       =   nta.Nth_Theme_Id
+                    And     Nthr_Role           =   pi_Role
+                    And     Not Exists          (   Select  Null
+                                                    From    Mdsys.Sdo_Geom_Metadata_Table g1
+                                                    Where   g1.Sdo_Owner        =   l_User
+                                                    And     g1.Sdo_Table_Name   =   nta2.Nth_Feature_Table
+                                                    And     g1.Sdo_Column_Name  =   nta2.Nth_Feature_Shape_Column
+                                                 )
+                    ) x
+                    Group By  Nth_Feature_Table,
+                              Nth_Feature_Shape_Column
+            ) y
+    Where   u.Sdo_Table_Name    =   y.Nth_Feature_Table
+    And     u.Sdo_Column_Name   =   y.Nth_Feature_Shape_Column
+    And     u.Sdo_Owner         =   Sys_Context('NM3CORE','APPLICATION_OWNER');
 
-          FORALL i IN 1..l_tab_owner.COUNT
-            DELETE mdsys.sdo_geom_metadata_table
-             WHERE sdo_owner       = l_tab_owner(i)
-               AND sdo_table_name  = l_tab_table_name(i)
-               AND sdo_column_name = l_tab_column_name(i);
+    For i In  (
+              Select  y.Nth_Theme_Id,
+                      y.Nth_Feature_Table,
+                      y.Nth_Feature_Shape_Column
+              From    (
+                      Select  x.Nth_Theme_Id,
+                              x.Nth_Feature_Table,
+                              x.Nth_Feature_Shape_Column
+                      From    -- Layers based on role - more than likely views
+                              (
+                              Select  nta.Nth_Theme_Id,
+                                      nta.Nth_Feature_Table,
+                                      nta.Nth_Feature_Shape_Column
+                              From    Nm_Themes_All   nta,
+                                      Nm_Theme_Roles  ntr
+                              Where   ntr.Nthr_Theme_Id   =   nta.Nth_Theme_Id
+                              And     ntr.Nthr_Role       =   pi_Role
+                              Union All
+                              -- Base table themes
+                              Select  nta2.Nth_Theme_Id,
+                                      nta2.Nth_Feature_Table,
+                                      nta2.Nth_Feature_Shape_Column
+                              From    Nm_Themes_All   nta,
+                                      Nm_Theme_Roles  ntr,
+                                      Nm_Themes_All   nta2
+                              Where   nta2.Nth_Theme_Id   =   nta.Nth_Base_Table_Theme
+                              And     ntr.Nthr_Theme_Id   =   nta.Nth_Theme_Id
+                              And     ntr.Nthr_Role       =   pi_Role
+                              ) x
+                      Group By  x.Nth_Theme_Id,
+                                x.Nth_Feature_Table,
+                                x.Nth_Feature_Shape_Column
+                      ) y
+              )
+    Loop
+      --
+      Create_Feature_View (Pi_Username, I.Nth_Feature_Table);
+      --
+      If Hig.Get_User_Or_Sys_Opt('REGSDELAY') = 'Y' Then
+        Begin
+          Execute Immediate (' begin '||
+                             'nm3sde.create_sub_sde_layer ( p_theme_id => '|| To_Char (I.Nth_Theme_Id)
+                                                       || ',p_username => '''|| Pi_Username
+                                                    || ''');'||
+                          ' end;');
+        Exception
+          When Others Then 
+            Null;
+        End;
+      End If;
+    End Loop;
+  Exception
+    When Others Then
+      Null;
+  End Create_Sub_Sdo_Layers;
+  --
+  Procedure Delete_Sdo_Layers_By_Role (
+                                      pi_Username In Hig_Users.Hus_Username%Type,
+                                      pi_Role     In Nm_Theme_Roles.Nthr_Role%Type
+                                      )
+  Is
+    l_Tab_Owner       Nm3Type.Tab_Varchar30;
+    l_Tab_Table_Name  Nm3Type.Tab_Varchar30;
+    l_Tab_Column_Name Nm3Type.Tab_Varchar30;
+  Begin
+    Select        Layers.Hus_Username,
+                  Layers.Nth_Feature_Table,
+                  Layers.Nth_Feature_Shape_Column
+    Bulk Collect 
+    Into          l_Tab_Owner,
+                  l_Tab_Table_Name,
+                  l_Tab_Column_Name
+    From          (
+                  Select    x.Hus_Username,
+                            x.Nth_Feature_Table,
+                            x.Nth_Feature_Shape_Column
+                  From      (
+                            Select  hu.Hus_Username,
+                                    nta.Nth_Feature_Table,
+                                    nta.Nth_Feature_Shape_Column
+                            From    Nm_Themes_All   nta,
+                                    Nm_Theme_Roles  ntr,
+                                    Hig_Users       hu,
+                                    All_Users       au
+                            Where   ntr.Nthr_Theme_Id =   nta.Nth_Theme_Id
+                            And     ntr.Nthr_Role     =   pi_Role
+                            And     hu.Hus_Username   =   au.Username
+                            And     au.Username       =   pi_Username
+                            And     hu.Hus_Username   !=  Sys_Context('NM3CORE','APPLICATION_OWNER')
+                            And     Not Exists    ( 
+                                                  Select  Null
+                                                  From    Hig_User_Roles  hur,
+                                                          Nm_Theme_Roles  ntr2
+                                                  Where   hur.Hur_Username      =   pi_Username
+                                                  And     hur.Hur_Role          =   ntr2.Nthr_Role
+                                                  And     ntr2.Nthr_Theme_Id    =   nta.Nth_Theme_Id
+                                                  And     hur.Hur_Role          !=  pi_Role
+                                                  )
+                            Group By  hu.Hus_Username,
+                                      nta.Nth_Feature_Table,
+                                      nta.Nth_Feature_Shape_Column
+                            ) x
+                  ) Layers;
 
-        -----------------------------------
-        -- Drop subordinate feature views
-        -----------------------------------
+    If l_Tab_Owner.Count > 0  Then
 
-          FOR i IN 1..l_tab_owner.COUNT LOOP
+      Forall i In 1..l_Tab_Owner.Count
+        Delete Mdsys.Sdo_Geom_Metadata_Table
+        Where   Sdo_Owner         = l_Tab_Owner(i)
+        And     Sdo_Table_Name    = l_Tab_Table_Name(i)
+        And     Sdo_Column_Name   = l_Tab_Column_Name(i);
 
-            drop_feature_view (l_tab_owner(i), l_tab_table_name(i));
+      -----------------------------------
+      -- Drop subordinate feature views
+      -----------------------------------
+
+      For i In 1..l_Tab_Owner.Count Loop
+
+        Drop_Feature_View (l_Tab_Owner(i), l_Tab_Table_Name(i));
 
         -----------------------------------------
         -- Drop SDE layers for subordinate users
         -----------------------------------------
 
-            IF hig.get_user_or_sys_opt('REGSDELAY') = 'Y'
-            THEN
-             --
-                 BEGIN
-                   EXECUTE IMMEDIATE 'begin '||
-                                        'nm3sde.drop_sub_layer_by_table( '
-                                                   ||Nm3flx.string(l_tab_table_name(i))||','
-                                                   ||Nm3flx.string(l_tab_column_name(i))||','
-                                                   ||Nm3flx.string(l_tab_owner(i))||');'
-                                  ||' end;';
-               --
-                 EXCEPTION
-                   WHEN OTHERS THEN NULL;
-                 END;
-             --
-            END IF;
+        If Hig.Get_User_Or_Sys_Opt('REGSDELAY') = 'Y' Then
 
-          END LOOP;
-
-        END IF;
-     --
-     END delete_sdo_layers_by_role;
+          Begin
+            Execute Immediate 'begin '||
+                                'nm3sde.drop_sub_layer_by_table( '
+                                           ||Nm3Flx.String(L_Tab_Table_Name(I))||','
+                                           ||Nm3Flx.String(L_Tab_Column_Name(I))||','
+                                           ||Nm3Flx.String(L_Tab_Owner(I))||');'
+                          ||' end;';
+           --
+          Exception
+            When Others Then
+              Null;
+          End;
+        End If;
+      End Loop;
+    End If;
   --
-   BEGIN
+  End Delete_Sdo_Layers_By_Role;
   --
-     FOR i IN 1 .. Nm3sdm.g_role_idx
-     LOOP
+Begin
+  For i In 1 .. g_Role_Idx
+  Loop
+    Begin
+      --
+      -- INSERTS
+      --
+      If g_Role_Op (g_Role_Idx) = 'I' Then
+          
+        Create_Sub_Sdo_Layers (
+                              pi_Username => g_Username_Array (i),
+                              pi_Role     => g_Role_Array (i)
+                              );
+        --
+        --
+        -- DELETES
+        --
+      Elsif g_Role_Op (g_Role_Idx) = 'D'  Then
 
-       BEGIN
-     --
-     -- INSERTS
-     --
-          IF Nm3sdm.g_role_op (Nm3sdm.g_role_idx) = 'I'
-          THEN
-          --
-            create_sub_sdo_layers
-              ( pi_username => nm3sdm.g_username_array (i)
-              , pi_role     => nm3sdm.g_role_array (i)  );
+        Delete_Sdo_Layers_By_Role (
+                                  pi_Username =>  g_Username_Array (i),
+                                  pi_Role     =>  g_Role_Array (i)
+                                  );
+       End If;
 
-       --
-       --
-       -- DELETES
-       --
-          ELSIF Nm3sdm.g_role_op (Nm3sdm.g_role_idx) = 'D'
-          THEN
-          --
-            delete_sdo_layers_by_role
-              ( pi_username =>  nm3sdm.g_username_array (i)
-              , pi_role     =>  nm3sdm.g_role_array (i) );
-         --
-         END IF;
-
-       EXCEPTION
-         WHEN NO_DATA_FOUND THEN NULL;
-       END;
-     --
-     END LOOP;
-   --
-   EXCEPTION
-      WHEN NO_DATA_FOUND THEN NULL;
-   --
-   END process_subuser_hur;
+    Exception
+      When No_Data_Found Then
+        Null;
+    End;
+  End Loop;
+Exception
+  When No_Data_Found Then
+    Null;
+End Process_Subuser_Hur;
 --
 ---------------------------------------------------------------------------------------------------------------------------------
 --
+Procedure Create_Nth_Sdo_Trigger  (
+                                  p_Nth_Theme_Id   In   Nm_Themes_All.Nth_Theme_Id%Type,
+                                  p_Restrict       In   Varchar2 Default Null
+                                  )
+Is
+  lf                    Varchar2 (1)                     := Chr (10);
+  lq                    Varchar2 (1)                     := Chr (39);
+  l_Update_Str          Varchar2 (2000);
+  l_Comma               Varchar2 (1)                     := Null;
+  l_Trg_Name            Varchar2 (30);
+  l_Tab_Or_View         Varchar2 (5);
+  l_Date                Varchar2 (100);
+  l_Nth                 Nm_Themes_All%Rowtype;
+  l_Base_Table_Nth      Nm_Themes_All%Rowtype;
+  l_Tab_Vc              Nm3Type.Tab_Varchar32767;
 
-   PROCEDURE create_nth_sdo_trigger (p_nth_theme_id   IN   NM_THEMES_ALL.nth_theme_id%TYPE
-                                    ,p_restrict       IN   VARCHAR2 DEFAULT NULL
-   )
-   IS
-      lf                    VARCHAR2 (1)                     := CHR (10);
-      lq                    VARCHAR2 (1)                     := CHR (39);
-      l_update_str          VARCHAR2 (2000);
-      l_comma               VARCHAR2 (1)                     := NULL;
-      l_trg_name            VARCHAR2 (30);
-      l_tab_or_view         VARCHAR2 (5);
-      l_date                VARCHAR2 (100);
-      l_nth                 NM_THEMES_ALL%ROWTYPE;
-      l_base_table_nth      NM_THEMES_ALL%ROWTYPE;
-      l_tab_vc              Nm3type.tab_varchar32767;
+  Cursor C1 (Objname In Varchar2)
+  Is
+  Select  uo.Object_Type
+  From    User_Objects  uo
+  Where   uo.Object_Name = Objname;
 
-      CURSOR c1 (objname IN VARCHAR2)
-      IS
-         SELECT object_type
-           FROM user_objects
-          WHERE object_name = objname;
+  Ex_Invalid_Sequence   Exception;
 
-      ex_invalid_sequence   EXCEPTION;
+  --
+  --
+  -- Function eventually needs to go into nm3sdo package
+  --
+  Function Get_Sdo_Trg_Name_A (
+                              p_Nth_Id   In   Nm_Themes_All.Nth_Theme_Id%Type
+                              ) Return Varchar2
+  Is
+  Begin
+    Return ('NM_NTH_' || To_Char (p_Nth_Id) || '_SDO_A_ROW_TRG');
+  End Get_Sdo_Trg_Name_A;
+  --
+  --
+  -- Function eventually needs to go into nm3sdo package
+  --
+  Function Get_Sdo_Trg_Name_B (
+                              p_Nth_Id   In   Nm_Themes_All.Nth_Theme_Id%Type
+                              ) Return Varchar2
+  Is
+  Begin
+    Return ('NM_NTH_' || To_Char (p_Nth_Id) || '_SDO_B_ROW_TRG');
+  End Get_Sdo_Trg_Name_B;
 
+  Procedure Append  (
+                    Pi_Text In Nm3Type.Max_Varchar2
+                    )
+  Is
+  Begin
+    Nm3Ddl.Append_Tab_Varchar (l_Tab_Vc, pi_Text);
+  End Append;
 --
-   --
-   -- Function eventually needs to go into nm3sdo package
-   --
-      FUNCTION get_sdo_trg_name_a (
-         p_nth_id   IN   NM_THEMES_ALL.nth_theme_id%TYPE
-      )
-         RETURN VARCHAR2
-      IS
-      BEGIN
-         RETURN ('NM_NTH_' || TO_CHAR (p_nth_id) || '_SDO_A_ROW_TRG');
-      END get_sdo_trg_name_a;
-
---
-   --
-   -- Function eventually needs to go into nm3sdo package
-   --
-      FUNCTION get_sdo_trg_name_b (
-         p_nth_id   IN   NM_THEMES_ALL.nth_theme_id%TYPE
-      )
-         RETURN VARCHAR2
-      IS
-      BEGIN
-         RETURN ('NM_NTH_' || TO_CHAR (p_nth_id) || '_SDO_B_ROW_TRG');
-      END get_sdo_trg_name_b;
-
---
-      PROCEDURE append (pi_text IN Nm3type.max_varchar2)
-      IS
-      BEGIN
-         Nm3ddl.append_tab_varchar (l_tab_vc, pi_text);
-      END append;
---
-   BEGIN
---
+Begin
+  --
   --
   -- Driving Theme
   --
-      l_nth := Nm3get.get_nth (pi_nth_theme_id => p_nth_theme_id);
+  l_Nth := Nm3Get.Get_Nth (pi_Nth_Theme_Id => p_Nth_Theme_Id);
+  --
+  -- Base Table Theme
+  --
+  
+  If l_Nth.Nth_Base_Table_Theme Is Null Then
+    l_Base_Table_Nth := l_Nth;        -- base theme is the driving theme
+  Else
+    l_Base_Table_Nth := Nm3Get.Get_Nth (pi_Nth_Theme_Id      => l_Nth.Nth_Base_Table_Theme);
+  End If;
 
-      --
-      -- Base Table Theme
-      --
-      IF l_nth.nth_base_table_theme IS NULL
-      THEN
-         l_base_table_nth := l_nth;        -- base theme is the driving theme
-      ELSE
-         l_base_table_nth :=
-               Nm3get.get_nth (pi_nth_theme_id      => l_nth.nth_base_table_theme);
-      END IF;
 
---      l_sdo := Nm3sdo.get_theme_metadata (l_base_table_nth.nth_theme_id);
---      l_srid := NVL (TO_CHAR (l_sdo.srid), 'NULL');
+  Open C1 (L_Base_Table_Nth.Nth_Table_Name);
 
-      OPEN c1 (l_base_table_nth.nth_table_name);
+  Fetch C1
+   Into L_Tab_Or_View;
 
-      FETCH c1
-       INTO l_tab_or_view;
+  Close C1;
 
-      CLOSE c1;
+  -- If the theme has an associated sequence then ensure that the sequence
+  -- actually exists - cos we are about to reference it in our generated trigger
+  --
+  If l_Base_Table_Nth.Nth_Sequence_Name Is Not Null Then
+    
+    If Not Nm3Ddl.Does_Object_Exist (
+                                    p_Object_Name      => l_Base_Table_Nth.Nth_Sequence_Name,
+                                    p_Object_Type      => 'SEQUENCE'
+                                    ) Then
+        Raise Ex_Invalid_Sequence;
+    End If;
+  End If;
 
-      -- If the theme has an associated sequence then ensure that the sequence
-      -- actually exists - cos we are about to reference it in our generated trigger
-      --
-      IF l_base_table_nth.nth_sequence_name IS NOT NULL
-      THEN
-         IF NOT Nm3ddl.does_object_exist
-                        (p_object_name      => l_base_table_nth.nth_sequence_name,
-                         p_object_type      => 'SEQUENCE'
+  --    we need to differentiate between join FT data and single table FT data. The first needs an after trigger the second should not be using this
+  --    approach - it just needs a theme trigger to set the column, no insert/update/delete.
+
+  l_Trg_Name := Get_Sdo_Trg_Name_A (l_Base_Table_Nth.Nth_Theme_Id);
+
+  If l_Base_Table_Nth.Nth_Rse_Fk_Column Is Not Null Then
+     l_Update_Str := l_Base_Table_Nth.Nth_Rse_Fk_Column;
+     l_Comma := ',';
+  End If;
+
+  If L_Base_Table_Nth.Nth_St_Chain_Column Is Not Null Then
+     
+     l_Update_Str :=  l_Update_Str || l_Comma || l_Base_Table_Nth.Nth_St_Chain_Column;
+     l_Comma := ',';
+  End If;
+
+  If l_Base_Table_Nth.Nth_End_Chain_Column Is Not Null  Then
+     l_Update_Str :=  l_Update_Str || l_Comma || l_Base_Table_Nth.Nth_End_Chain_Column;
+     l_Comma := ',';
+  End If;
+
+  -- if the x and y column are used as drivers, there should be no triggering
+  -- when the element FK or offsets are changed.
+  If l_Base_Table_Nth.Nth_X_Column Is Not Null  Then
+     l_Update_Str := l_Base_Table_Nth.Nth_X_Column;
+     l_Comma := ',';
+  End If;
+
+  If l_Base_Table_Nth.Nth_Y_Column Is Not Null  Then
+    l_Update_Str :=
+    l_Update_Str || l_Comma || l_Base_Table_Nth.Nth_Y_Column;
+  End If;
+  --
+  l_Tab_Vc.Delete;
+  -- This is the more common trigger - a theme by pure XY or by LRef.
+  -- The trigger is an after row trigger and will fire on either update
+  -- of XY or on update of LRef columns.
+  Append ('CREATE OR REPLACE TRIGGER ' || Lower (l_Trg_Name));
+  l_Date := To_Char (Sysdate, 'DD-MON-YYYY HH:MI');
+  Append ('--');
+  Append
+     ('--------------------------------------------------------------------------'
+     );
+  Append ('--');
+  Append ('--   PVCS Identifiers :-');
+  Append ('--');
+  Append ('--       PVCS id          : $Header::   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   '|| Get_Body_Version);
+  Append ('--       Module Name      : $Workfile:   nm3sdm.pkb  $');
+  Append ('--       Version          : ' || G_Body_Sccsid);
+  Append ('--');
+  Append ('-----------------------------------------------------------------------------');
+  Append ('--    Copyright (c) exor corporation ltd, 2010');
+  Append ('-----------------------------------------------------------------------------');
+  Append ('-- Author : R Coupe');
+  Append ('--          G Johnson / A Edwards');
+  Append ('--');
+  Append ('--  #################');
+  Append ('--  # DO NOT MODIFY #');
+  Append ('--  #################');
+  Append ('--');
+  Append (   '-- Trigger is built dynamically from the theme '
+          || l_Nth.Nth_Theme_Id
+          || ' on '
+          || l_Nth.Nth_Theme_Name
+         );
+  Append ('--');
+  Append ('-- Generated on ' || l_Date);
+  Append ('--');
+  Append (' ');
+
+  -- Need to cater for views or tables
+  -- difficulty with views is that the update seldom occurs on the view!
+  If l_Tab_Or_View = 'TABLE'  Then
+    Append ('AFTER');
+  Else
+    Append ('INSTEAD OF ');
+  End If;
+
+  Append ('DELETE OR INSERT OR UPDATE of ' || Lower (l_Update_Str));
+  Append ('ON ' || l_Base_Table_Nth.Nth_Table_Name);
+  Append ('FOR EACH ROW');
+  Append ('DECLARE' || Lf);
+  Append (' l_geom mdsys.sdo_geometry;');
+  Append (' l_lref nm_lref;' || Lf);
+  Append ('--');
+  Append
+     ('--------------------------------------------------------------------------'
+     );
+  Append ('--');
+  --
+  -- DELETE PROCEDURE
+  --
+  Append (' PROCEDURE del IS ');
+  Append (' BEGIN');
+  Append ('');
+  Append (   '    -- Delete from feature table '
+          || Lower (l_Base_Table_Nth.Nth_Feature_Table)
+         );
+  Append ('    DELETE FROM ' || Lower (l_Base_Table_Nth.Nth_Feature_Table));
+  Append (   '          WHERE '
+          || Lower (Nvl(l_Base_Table_Nth.Nth_Feature_Fk_Column, l_Base_Table_Nth.Nth_Feature_Pk_Column))
+          || ' = :OLD.'
+          || Lower (l_Base_Table_Nth.Nth_Pk_Column)
+          || ';'
+         );
+  Append (' ');
+  Append
+     (' EXCEPTION -- when others to cater for attempted delete where no geom values supplied e.g. no x/y'
+     );
+  Append ('     WHEN others THEN');
+  Append ('       Null;');
+  Append (' END del;');
+  Append ('--');
+  Append
+     ('--------------------------------------------------------------------------'
+     );
+  Append ('--');
+  --
+  -- INSERT PROCEDURE
+  --
+  Append (' PROCEDURE ins IS ');
+  Append (' BEGIN');
+  Append ('');
+  Append (   '   -- Insert into feature table '
+          || Lower (l_Base_Table_Nth.Nth_Feature_Table)
+         );
+  Append ('    INSERT INTO ' || Lower (l_Base_Table_Nth.Nth_Feature_Table));
+  Append ('    ( ' || Lower (l_Base_Table_Nth.Nth_Feature_Pk_Column));
+  Append ('    , ' || Lower (l_Base_Table_Nth.Nth_Feature_Shape_Column));
+
+  If l_Base_Table_Nth.Nth_Sequence_Name Is Not Null Then
+    Append ('    , objectid');
+  End If;
+
+  Append ('    )');
+  Append ('    VALUES ');
+  Append ('    ( :NEW.' || Lower (l_Base_Table_Nth.Nth_Pk_Column));
+
+  --------------------------------------------------------------------------------------
+  -- POINT X,Y ITEM
+  --------------------------------------------------------------------------------------
+  If     l_Base_Table_Nth.Nth_X_Column Is Not Null
+     And l_Base_Table_Nth.Nth_Y_Column Is Not Null  Then
+     
+    Append ('    , mdsys.sdo_geometry');
+    Append ('       ( 2001');
+    Append ('       , sys_context(''NM3CORE'',''THEME' || l_Base_Table_Nth.Nth_Theme_Id || 'SRID'')');
+    Append ('       , mdsys.sdo_point_type');
+    Append ('          ( :NEW.' || Lower (l_Base_Table_Nth.Nth_X_Column));
+    Append ('           ,:NEW.' || Lower (l_Base_Table_Nth.Nth_Y_Column));
+    Append ('           , NULL)');
+    Append ('       , NULL');
+    Append ('       , NULL) -- geometry derived from X,Y values');
+    --------------------------------------------------------------------------------------
+    -- POINT Linear Reference ITEM
+    --------------------------------------------------------------------------------------
+  Elsif     l_Base_Table_Nth.Nth_St_Chain_Column  Is Not Null
+        And l_Base_Table_Nth.Nth_End_Chain_Column Is Null Then
+    
+    Append (  ',nm3sdo.get_pt_shape_from_ne ( ');
+    Append (   '                                 :NEW.'
+           || Lower (l_Base_Table_Nth.Nth_Rse_Fk_Column)
+          );
+    Append (   '                                 ,:NEW.'
+           || Lower (l_Base_Table_Nth.Nth_St_Chain_Column)
+           || ') -- geometry derived from start chainage reference'
+          );
+    --------------------------------------------------------------------------------------
+    -- CONTINUOUS Linear Reference ITEM
+    --------------------------------------------------------------------------------------
+  Elsif     l_Base_Table_Nth.Nth_St_Chain_Column  Is Not Null
+        And l_Base_Table_Nth.Nth_End_Chain_Column Is Not Null Then
+    -- Assume that the XY are not populated and that the theme table is linearly referenced.
+    Append ('    , nm3sdo.get_placement_geometry');
+    Append (   '              ( ');
+    Append ('                 nm_placement ');
+    Append (   '                   ( :NEW.'
+           || Lower (l_Base_Table_Nth.Nth_Rse_Fk_Column)
+          );
+    Append (   '                   , :NEW.'
+           || Lower (l_Base_Table_Nth.Nth_St_Chain_Column)
+          );
+    Append (   '                   , :NEW.'
+           || Lower (l_Base_Table_Nth.Nth_End_Chain_Column)
+          );
+    Append
+       ('              , 0))  -- geometry derived from linear reference');
+  End If;
+
+  If l_Base_Table_Nth.Nth_Sequence_Name Is Not Null Then
+    Append (   '    , '
+           || Lower (L_Base_Table_Nth.Nth_Sequence_Name)
+           || '.NEXTVAL'
+          );
+  End If;
+
+  Append ('    );');
+
+  -----------------------------------------------------------------------------------
+  -- If Start Chain and LR columns are defined too, then re-project xy onto
+  -- Road to work out LR NE ID and Offset values
+  -----------------------------------------------------------------------------------
+  If     l_Base_Table_Nth.Nth_X_Column          Is Not Null
+     And l_Base_Table_Nth.Nth_Y_Column          Is Not Null
+     And l_Base_Table_Nth.Nth_St_Chain_Column   Is Not Null
+     And l_Base_Table_Nth.Nth_Rse_Fk_Column     Is Not Null
+     And l_Base_Table_Nth.Nth_End_Chain_Column  Is Null  Then
+     
+    Append(   Lf
+         || Lf
+         || '    -- Network and Chainage supplied - so derive LR from XY values and update'
+         || Lf
+         || '    l_lref := nm3sdo.nm3sdo.get_nw_snaps_at_xy '
+        );
+    Append ('               ( '||To_Char(L_Base_Table_Nth.Nth_Theme_Id));
+    Append (   '               , :NEW.'
+           || Lower (L_Base_Table_Nth.Nth_X_Column)
+          );
+    Append (   '               , :NEW.'
+           || Lower (L_Base_Table_Nth.Nth_Y_Column)
+           || ');'
+          );
+    Append (   Lf
+           || '    :NEW.'
+           || Lower (L_Base_Table_Nth.Nth_Rse_Fk_Column)
+           || ' := l_lref.lr_ne_id;'
+           || Lf
+          );
+    Append (   '    :NEW.'
+           || Lower (L_Base_Table_Nth.Nth_St_Chain_Column)
+           || ' := nm3unit.get_formatted_value '
+          );
+    Append ('               ( l_lref.lr_offset');
+    Append
+        ('               , nm3net.get_nt_units_from_ne(l_lref.lr_ne_id)');
+    Append ('               );');
+  End If;
+
+  Append (' ');
+  Append
+     (' EXCEPTION -- when others to cater for attempted insert where no geom values supplied e.g. no x/y'
+     );
+  Append ('    WHEN others THEN');
+  Append ('       Null;');
+  Append (' END ins;');
+  Append ('--');
+  Append
+     ('--------------------------------------------------------------------------'
+     );
+  Append ('--');
+  --
+  -- UPDATE PROCEDURE
+  --
+  Append (' PROCEDURE upd IS ');
+  Append (' BEGIN');
+  Append ('');
+  Append (   '    -- Update feature table '
+          || Lower (l_Base_Table_Nth.Nth_Feature_Table)
+         );
+  --
+  --
+  -- 04-FEB-2009
+  -- AE Make sure the X and Y columns are not null before updating.. otherwise we'll delete
+  --
+  If     l_Base_Table_Nth.Nth_X_Column Is Not Null
+     And l_Base_Table_Nth.Nth_Y_Column Is Not Null  Then
+
+    Append ('--');
+    Append (' IF :NEW.'||Lower (l_Base_Table_Nth.Nth_X_Column)|| ' IS NOT NULL');
+    Append ('    AND :NEW.'||Lower (l_Base_Table_Nth.Nth_Y_Column)|| ' IS NOT NULL');
+    Append (' THEN ');
+
+  End If;
+
+  Append ('--');
+  Append ('    UPDATE ' || Lower (l_Base_Table_Nth.Nth_Feature_Table));
+  Append (   '       SET '
+          || Lower (l_Base_Table_Nth.Nth_Feature_Pk_Column)
+          || ' = :NEW.'
+          || Lower (l_Base_Table_Nth.Nth_Pk_Column)
+         );
+
+  --------------------------------------------------------------------------------------
+  -- POINT X,Y ITEM
+  --------------------------------------------------------------------------------------
+  If     l_Base_Table_Nth.Nth_X_Column Is Not Null
+     And l_Base_Table_Nth.Nth_Y_Column Is Not Null  Then
+
+    Append (   '         , '
+           || Lower (l_Base_Table_Nth.Nth_Feature_Shape_Column)
+           || ' = mdsys.sdo_geometry'
+          );
+    Append ('                          ( 2001 ');
+    Append ('                          , sys_context(''NM3CORE'',''THEME' || l_Base_Table_Nth.Nth_Theme_Id || 'SRID'')');
+    Append ('                          , mdsys.sdo_point_type');
+    Append (   '                             ( :NEW.'
+           || Lower (l_Base_Table_Nth.Nth_X_Column)
+          );
+    Append (   '                             , :NEW.'
+           || Lower (l_Base_Table_Nth.Nth_Y_Column)
+          );
+    Append ('                             ,  NULL)');
+    Append ('                          , NULL ');
+    Append
+      ('                          , NULL)  -- geometry derived from X,Y values'
+      );
+    --------------------------------------------------------------------------------------
+    -- POINT Linear Reference ITEM
+    --------------------------------------------------------------------------------------
+  Elsif     l_Base_Table_Nth.Nth_St_Chain_Column  Is Not Null
+        And l_Base_Table_Nth.Nth_End_Chain_Column Is Null Then
+    
+    Append (   '              ,'
+           || l_Base_Table_Nth.Nth_Feature_Shape_Column
+           || '=nm3sdo.get_pt_shape_from_ne('
+           || ':new.'
+           || l_Base_Table_Nth.Nth_Rse_Fk_Column
+           || ',:new.'
+           || l_Base_Table_Nth.Nth_St_Chain_Column
+           || ')'
+          );
+    --------------------------------------------------------------------------------------
+    -- CONTINUOUS Linear Reference ITEM
+    --------------------------------------------------------------------------------------
+  Elsif     l_Base_Table_Nth.Nth_St_Chain_Column Is Not Null
+        And l_Base_Table_Nth.Nth_End_Chain_Column Is Not Null Then
+    
+    -- Assume that the XY are not populated and that the theme table is linearly referenced.
+    Append (   '         , '
+           || (   Lower (l_Base_Table_Nth.Nth_Feature_Shape_Column)
+               || ' = nm3sdo.get_placement_geometry ('
+              )
+          );
+    Append ('                               ' || 'nm_placement');
+    Append (   '                                 ( :NEW.'
+           || Lower (l_Base_Table_Nth.Nth_Rse_Fk_Column)
+          );
+    Append (   '                                 , :NEW.'
+           || Lower (l_Base_Table_Nth.Nth_St_Chain_Column)
+          );
+    Append (   '                                 , :NEW.'
+           || Lower (l_Base_Table_Nth.Nth_End_Chain_Column)
+          );
+    Append
+      ('                             , 0)) -- geometry derived from linear reference'
+      );
+  End If;
+
+  Append (   '     WHERE '
+          || Lower (l_Base_Table_Nth.Nth_Feature_Pk_Column)
+          || ' = :OLD.'
+          || l_Base_Table_Nth.Nth_Pk_Column
+          || ';'
+          || Lf
+         );
+  Append ('    IF SQL%ROWCOUNT=0 THEN');
+  Append ('       ins;');
+
+  -----------------------------------------------------------------------------------
+  -- If Start Chain and LR columns are defined too, then re-project xy onto
+  -- Road to work out LR NE ID and Offset values
+  -----------------------------------------------------------------------------------
+  If     l_Base_Table_Nth.Nth_X_Column          Is Not Null
+     And l_Base_Table_Nth.Nth_Y_Column          Is Not Null
+     And l_Base_Table_Nth.Nth_St_Chain_Column   Is Not Null
+     And l_Base_Table_Nth.Nth_Rse_Fk_Column     Is Not Null
+     And l_Base_Table_Nth.Nth_End_Chain_Column  Is Null  Then
+
+     Append ('    ELSE');
+     Append
+        (   '    -- Network and Chainage supplied - so derive LR from XY values and update'
+         || Lf
+         || '       l_lref := nm3sdo.get_nw_snaps_at_xy ' );
+     Append ('                  '||To_Char( l_Base_Table_Nth.Nth_Theme_Id));
+     Append (   '                  , :NEW.'
+             || Lower (l_Base_Table_Nth.Nth_X_Column)
+            );
+     Append (   '                  , :NEW.'
+             || Lower (l_Base_Table_Nth.Nth_Y_Column)
+             || ');'
+            );
+     Append (   Lf
+             || '       :NEW.'
+             || Lower (l_Base_Table_Nth.Nth_Rse_Fk_Column)
+             || ' := l_lref.lr_ne_id;'
+             || Lf
+            );
+     Append (   '       :NEW.'
+             || Lower (l_Base_Table_Nth.Nth_St_Chain_Column)
+             || ' := nm3unit.get_formatted_value '
+            );
+     Append ('                  ( l_lref.lr_offset');
+     Append
+        ('                  , nm3net.get_nt_units_from_ne(l_lref.lr_ne_id)'
+        );
+     Append ('                  );');
+     Append ('    END IF;' || Lf);
+  Else
+     Append ('    END IF;' || Lf);
+  End If;
+
+  -- 04-FEB-2009
+  -- AE Make sure the X and Y columns are not null before updating.. otherwise we'll delete
+  --
+  If     l_Base_Table_Nth.Nth_X_Column Is Not Null
+     And l_Base_Table_Nth.Nth_Y_Column Is Not Null  Then
+
+    Append ('--');
+    Append (' ELSE');
+    Append ('--');
+    Append ('    del; ');
+    Append ('--');
+    Append (' END IF; ');
+  End If;
+
+  Append (' ');
+  Append
+     (' EXCEPTION -- when others to cater for attempted update where no geom values supplied e.g. no x/y'
+     );
+  Append ('     WHEN others THEN');
+  Append ('       Null;');
+  Append (' END upd;');
+  Append ('--');
+  Append
+     ('--------------------------------------------------------------------------'
+     );
+  Append ('--');
+  Append ('BEGIN');
+  Append ('--');
+  
+  If p_Restrict Is Not Null Then
+    Append ('IF ' ||p_Restrict || ' THEN');
+  End If;
+  
+  Append ('   nm3sdm.set_theme_srid_ctx( pi_theme_id => ' || l_Base_Table_Nth.Nth_Theme_Id || ');');
+  Append ('--');
+  Append ('   IF DELETING THEN');
+  Append ('        del;');
+  Append ('   ELSIF INSERTING THEN');
+  Append ('        ins;');
+  Append ('   ELSIF UPDATING THEN');
+  Append ('        upd;');
+  Append ('   END IF;');
+  If p_Restrict Is Not Null Then
+    Append ('END IF;');
+  End If;
+  Append ('EXCEPTION');
+  Append ('   WHEN NO_DATA_FOUND THEN');
+  Append ('     NULL; -- no data in spatial table to update or delete');
+  Append ('   WHEN OTHERS THEN');
+  Append ('     RAISE;');
+  Append ('END ' || Lower (l_Trg_Name) || ';');
+  Append ('--');
+  Append
+     ('--------------------------------------------------------------------------'
+     );
+  Append ('--');
+  Nm3Ddl.Execute_Tab_Varchar (L_Tab_Vc);
+Exception
+  When Ex_Invalid_Sequence  Then
+    Hig.Raise_Ner (
+                  pi_Appl                    =>   Nm3Type.C_Hig,
+                  pi_Id                      =>   257,
+                  pi_Sqlcode                 =>   -20001,
+                  pi_Supplementary_Info      =>   l_Base_Table_Nth.Nth_Sequence_Name
+                                                  || Chr (10)
+                                                  || 'Please check your theme.'
+                  );
+End Create_Nth_Sdo_Trigger;
+--
+-----------------------------------------------------------------------------
+--
+Procedure Get_Dynseg_Nt_Types (
+                              Pi_Asset_Type   In       Nm_Inv_Types.Nit_Inv_Type%Type,
+                              Po_Locations    In Out   Tab_Nin_Sdo
+                              )
+Is
+  l_Tab_Layer      Nm3Type.Tab_Number;
+  l_Tab_Location   Nm3Type.Tab_Varchar4;
+  l_Retval         Tab_Nin_Sdo;
+Begin
+  Nm_Debug.Proc_Start (G_Package_Name, 'get_dynseg_nt_type');
+
+  Select        nlt.Nlt_Nt_Type,
+                nta.Nth_Theme_Id Base_Theme
+  Bulk Collect 
+  Into          l_Tab_Location,
+                l_Tab_Layer
+  From    Nm_Inv_Nw         nin,
+          Nm_Themes_All     nta,
+          Nm_Nw_Themes      nnt,
+          Nm_Linear_Types   nlt
+  Where   nlt.Nlt_Id              =   nnt.Nnth_Nlt_Id
+  And     nnt.Nnth_Nth_Theme_Id   =   nta.Nth_Theme_Id
+  And     nlt.Nlt_Nt_Type         =   nin.Nin_Nw_Type
+  And     nta.Nth_Theme_Type      =   'SDO'
+  And     nin.Nin_Nit_Inv_Code    =   pi_Asset_Type;
+
+  For i In 1 .. l_Tab_Layer.Count
+  Loop
+    l_Retval (i).p_Layer_Id := l_Tab_Layer (i);
+    l_Retval (i).p_Location := l_Tab_Location (i);
+  End Loop;
+
+  po_Locations := l_Retval;
+  Nm_Debug.Proc_End (G_Package_Name, 'get_dynseg_nt_type');
+
+Exception
+  When No_Data_Found  Then
+    po_Locations := l_Retval;
+End Get_Dynseg_Nt_Types;
+--
+-----------------------------------------------------------------------------
+--
+Procedure Get_Existing_Themes_For_Table (
+                                        pi_Theme_Table   In       Nm_Themes_All.Nth_Theme_Name%Type,
+                                        po_Themes        In Out   Tab_Nth
+                                        )
+Is
+  l_Retval   Tab_Nth;
+Begin
+  Nm_Debug.Proc_End (G_Package_Name, 'get_existing_themes_for_table');
+
+  Select        *
+  Bulk Collect
+  Into          l_Retval
+  From          Nm_Themes_All nta
+  Where         nta.Nth_Table_Name  =   pi_Theme_Table
+  And           nta.Nth_Theme_Type  =   'SDO';
+
+  po_Themes := l_Retval;
+  --
+  Nm_Debug.Proc_End (G_Package_Name, 'get_existing_themes_for_table');
+  --
+Exception
+  When No_Data_Found  Then
+    po_Themes := l_Retval;
+End Get_Existing_Themes_For_Table;
+--
+-----------------------------------------------------------------------------
+--
+Procedure Get_Nlt_Block (
+                        pi_Theme_Id   In       Nm_Themes_All.Nth_Theme_Id%Type,
+                        po_Results    In Out   Tab_Nlt_Block
                         )
-         THEN
-            RAISE ex_invalid_sequence;
-         END IF;
-      END IF;
+Is
+  Type Tab_Nlt Is Table Of Nm_Linear_Types%Rowtype Index By Binary_Integer;
 
---    we need to differentiate between join FT data and single table FT data. The first needs an after trigger the second should not be using this
---    approach - it just needs a theme trigger to set the column, no insert/update/delete.
+  l_Tab_Nlt      Tab_Nlt;
+  l_Retval       Tab_Nlt_Block;
+  l_Unit_Descr   Nm_Units.Un_Unit_Name%Type;
+  
+Begin
+  Select        *
+  Bulk Collect
+  Into          l_Tab_Nlt
+  From          Nm_Linear_Types nlt
+  Where         nlt.Nlt_Id  In  (
+                                Select  nnt.Nnth_Nlt_Id
+                                From    Nm_Nw_Themes    nnt
+                                Where   nnt.Nnth_Nth_Theme_Id = pi_Theme_Id
+                                );
 
+  For i In 1 .. l_Tab_Nlt.Count
+  Loop
+     l_Unit_Descr :=  Nm3Get.Get_Un (
+                                    pi_Un_Unit_Id           => l_Tab_Nlt (i).Nlt_Units,
+                                    pi_Raise_Not_Found      => False
+                                    ).Un_Unit_Name;
+                                    
+     l_Retval (i).Nlt_Nth_Theme_Id  :=  pi_Theme_Id;
+     l_Retval (i).Nlt_Id            :=  l_Tab_Nlt (i).Nlt_Id;
+     l_Retval (i).Nlt_Seq_No        :=  l_Tab_Nlt (i).Nlt_Seq_No;
+     l_Retval (i).Nlt_Descr         :=  l_Tab_Nlt (i).Nlt_Descr;
+     l_Retval (i).Nlt_Nt_Type       :=  l_Tab_Nlt (i).Nlt_Nt_Type;
+     l_Retval (i).Nlt_Gty_Type      :=  l_Tab_Nlt (i).Nlt_Gty_Type;
+     l_Retval (i).Nlt_Admin_Type    :=  l_Tab_Nlt (i).Nlt_Admin_Type;
+     l_Retval (i).Nlt_Start_Date    :=  l_Tab_Nlt (i).Nlt_Start_Date;
+     l_Retval (i).Nlt_End_Date      :=  l_Tab_Nlt (i).Nlt_End_Date;
+     l_Retval (i).Nlt_Units         :=  l_Tab_Nlt (i).Nlt_Units;
+     l_Retval (i).Nlt_Units_Descr   :=  l_Unit_Descr;
+  End Loop;
 
-      l_trg_name := get_sdo_trg_name_a (l_base_table_nth.nth_theme_id);
-
-      IF l_base_table_nth.nth_rse_fk_column IS NOT NULL
-      THEN
-         l_update_str := l_base_table_nth.nth_rse_fk_column;
-         l_comma := ',';
-      END IF;
-
-      IF l_base_table_nth.nth_st_chain_column IS NOT NULL
-      THEN
-         l_update_str :=
-              l_update_str || l_comma || l_base_table_nth.nth_st_chain_column;
-         l_comma := ',';
-      END IF;
-
-      IF l_base_table_nth.nth_end_chain_column IS NOT NULL
-      THEN
-         l_update_str :=
-             l_update_str || l_comma || l_base_table_nth.nth_end_chain_column;
-         l_comma := ',';
-      END IF;
-
-      -- if the x and y column are used as drivers, there should be no triggering
-      -- when the element FK or offsets are changed.
-      IF l_base_table_nth.nth_x_column IS NOT NULL
-      THEN
-         l_update_str := l_base_table_nth.nth_x_column;
-         l_comma := ',';
-      END IF;
-
-      IF l_base_table_nth.nth_y_column IS NOT NULL
-      THEN
-         l_update_str :=
-                     l_update_str || l_comma || l_base_table_nth.nth_y_column;
-      END IF;
-
---
-      l_tab_vc.DELETE;
--- This is the more common trigger - a theme by pure XY or by LRef.
--- The trigger is an after row trigger and will fire on either update
--- of XY or on update of LRef columns.
-      append ('CREATE OR REPLACE TRIGGER ' || LOWER (l_trg_name));
-      l_date := TO_CHAR (SYSDATE, 'DD-MON-YYYY HH:MI');
-      append ('--');
-      append
-         ('--------------------------------------------------------------------------'
-         );
-      append ('--');
-      append ('--   PVCS Identifiers :-');
-      append ('--');
-      append ('--       PVCS id          : $Header::   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   '|| get_body_version);
-      append ('--       Module Name      : $Workfile:   nm3sdm.pkb  $');
-      append ('--       Version          : ' || g_body_sccsid);
-      append ('--');
-      append ('-----------------------------------------------------------------------------');
-      append ('--    Copyright (c) exor corporation ltd, 2010');
-      append ('-----------------------------------------------------------------------------');
-      append ('-- Author : R Coupe');
-      append ('--          G Johnson / A Edwards');
-      append ('--');
-      append ('--  #################');
-      append ('--  # DO NOT MODIFY #');
-      append ('--  #################');
-      append ('--');
-      append (   '-- Trigger is built dynamically from the theme '
-              || l_nth.nth_theme_id
-              || ' on '
-              || l_nth.nth_theme_name
-             );
-      append ('--');
-      append ('-- Generated on ' || l_date);
-      append ('--');
-      append (' ');
-
--- Need to cater for views or tables
--- difficulty with views is that the update seldom occurs on the view!
-      IF l_tab_or_view = 'TABLE'
-      THEN
-         append ('AFTER');
-      ELSE
-         append ('INSTEAD OF ');
-      END IF;
-
-      append ('DELETE OR INSERT OR UPDATE of ' || LOWER (l_update_str));
-      append ('ON ' || l_base_table_nth.nth_table_name);
-      append ('FOR EACH ROW');
-      -- CWS task 0108359
-    /*  IF p_restrict IS NOT NULL THEN
-        append ('WHEN (OLD.' ||p_restrict || ' )');
-      END IF;*/
-      --
-      append ('DECLARE' || lf);
-      append (' l_geom mdsys.sdo_geometry;');
-      append (' l_lref nm_lref;' || lf);
-      append ('--');
-      append
-         ('--------------------------------------------------------------------------'
-         );
-      append ('--');
---
--- DELETE PROCEDURE
---
-      append (' PROCEDURE del IS ');
-      append (' BEGIN');
-      append ('');
-      append (   '    -- Delete from feature table '
-              || LOWER (l_base_table_nth.nth_feature_table)
-             );
-      append ('    DELETE FROM ' || LOWER (l_base_table_nth.nth_feature_table));
-      append (   '          WHERE '
-              || LOWER (NVL(l_base_table_nth.nth_feature_fk_column, l_base_table_nth.nth_feature_pk_column))
-              || ' = :OLD.'
-              || LOWER (l_base_table_nth.nth_pk_column)
-              || ';'
-             );
-      append (' ');
-      append
-         (' EXCEPTION -- when others to cater for attempted delete where no geom values supplied e.g. no x/y'
-         );
-      append ('     WHEN others THEN');
-      append ('       Null;');
-      append (' END del;');
-      append ('--');
-      append
-         ('--------------------------------------------------------------------------'
-         );
-      append ('--');
---
--- INSERT PROCEDURE
---
-      append (' PROCEDURE ins IS ');
-      append (' BEGIN');
-      append ('');
-      append (   '   -- Insert into feature table '
-              || LOWER (l_base_table_nth.nth_feature_table)
-             );
-      append ('    INSERT INTO ' || LOWER (l_base_table_nth.nth_feature_table));
-      append ('    ( ' || LOWER (l_base_table_nth.nth_feature_pk_column));
-      append ('    , ' || LOWER (l_base_table_nth.nth_feature_shape_column));
-
-      IF l_base_table_nth.nth_sequence_name IS NOT NULL
-      THEN
-         append ('    , objectid');
-      END IF;
-
-      append ('    )');
-      append ('    VALUES ');
-      append ('    ( :NEW.' || LOWER (l_base_table_nth.nth_pk_column));
-
---------------------------------------------------------------------------------------
--- POINT X,Y ITEM
---------------------------------------------------------------------------------------
-      IF     l_base_table_nth.nth_x_column IS NOT NULL
-         AND l_base_table_nth.nth_y_column IS NOT NULL
-      THEN
-         append ('    , mdsys.sdo_geometry');
-         append ('       ( 2001');
-         append ('       , sys_context(''NM3CORE'',''THEME' || l_base_table_nth.nth_theme_id || 'SRID'')');
-         append ('       , mdsys.sdo_point_type');
-         append ('          ( :NEW.' || LOWER (l_base_table_nth.nth_x_column));
-         append ('           ,:NEW.' || LOWER (l_base_table_nth.nth_y_column));
-         append ('           , NULL)');
-         append ('       , NULL');
-         append ('       , NULL) -- geometry derived from X,Y values');
---------------------------------------------------------------------------------------
--- POINT Linear Reference ITEM
---------------------------------------------------------------------------------------
-      ELSIF     l_base_table_nth.nth_st_chain_column IS NOT NULL
-            AND l_base_table_nth.nth_end_chain_column IS NULL
-      THEN
-         append (  ',nm3sdo.get_pt_shape_from_ne ( ');
-         append (   '                                 :NEW.'
-                 || LOWER (l_base_table_nth.nth_rse_fk_column)
-                );
-         append (   '                                 ,:NEW.'
-                 || LOWER (l_base_table_nth.nth_st_chain_column)
-                 || ') -- geometry derived from start chainage reference'
-                );
---------------------------------------------------------------------------------------
--- CONTINUOUS Linear Reference ITEM
---------------------------------------------------------------------------------------
-      ELSIF     l_base_table_nth.nth_st_chain_column IS NOT NULL
-            AND l_base_table_nth.nth_end_chain_column IS NOT NULL
-      THEN
-         -- Assume that the XY are not populated and that the theme table is linearly referenced.
-         append ('    , nm3sdo.get_placement_geometry');
-         append (   '              ( ');
-         append ('                 nm_placement ');
-         append (   '                   ( :NEW.'
-                 || LOWER (l_base_table_nth.nth_rse_fk_column)
-                );
-         append (   '                   , :NEW.'
-                 || LOWER (l_base_table_nth.nth_st_chain_column)
-                );
-         append (   '                   , :NEW.'
-                 || LOWER (l_base_table_nth.nth_end_chain_column)
-                );
-         append
-             ('              , 0))  -- geometry derived from linear reference');
-      END IF;
-
-      IF l_base_table_nth.nth_sequence_name IS NOT NULL
-      THEN
-         append (   '    , '
-                 || LOWER (l_base_table_nth.nth_sequence_name)
-                 || '.NEXTVAL'
-                );
-      END IF;
-
-      append ('    );');
-
------------------------------------------------------------------------------------
--- If Start Chain and LR columns are defined too, then re-project xy onto
--- Road to work out LR NE ID and Offset values
------------------------------------------------------------------------------------
-      IF     l_base_table_nth.nth_x_column IS NOT NULL
-         AND l_base_table_nth.nth_y_column IS NOT NULL
-         AND l_base_table_nth.nth_st_chain_column IS NOT NULL
-         AND l_base_table_nth.nth_rse_fk_column IS NOT NULL
-         AND l_base_table_nth.nth_end_chain_column IS NULL
-      THEN
-         append
-            (   lf
-             || lf
-             || '    -- Network and Chainage supplied - so derive LR from XY values and update'
-             || lf
-             || '    l_lref := nm3sdo.nm3sdo.get_nw_snaps_at_xy '
-            );
-         append ('               ( '||TO_CHAR(l_base_table_nth.nth_theme_id));
-         append (   '               , :NEW.'
-                 || LOWER (l_base_table_nth.nth_x_column)
-                );
-         append (   '               , :NEW.'
-                 || LOWER (l_base_table_nth.nth_y_column)
-                 || ');'
-                );
-         append (   lf
-                 || '    :NEW.'
-                 || LOWER (l_base_table_nth.nth_rse_fk_column)
-                 || ' := l_lref.lr_ne_id;'
-                 || lf
-                );
-         append (   '    :NEW.'
-                 || LOWER (l_base_table_nth.nth_st_chain_column)
-                 || ' := nm3unit.get_formatted_value '
-                );
-         append ('               ( l_lref.lr_offset');
-         append
-              ('               , nm3net.get_nt_units_from_ne(l_lref.lr_ne_id)');
-         append ('               );');
-      END IF;
-
-      append (' ');
-      append
-         (' EXCEPTION -- when others to cater for attempted insert where no geom values supplied e.g. no x/y'
-         );
-      append ('    WHEN others THEN');
-      append ('       Null;');
-      append (' END ins;');
-      append ('--');
-      append
-         ('--------------------------------------------------------------------------'
-         );
-      append ('--');
---
--- UPDATE PROCEDURE
---
-      append (' PROCEDURE upd IS ');
-      append (' BEGIN');
-      append ('');
-      append (   '    -- Update feature table '
-              || LOWER (l_base_table_nth.nth_feature_table)
-             );
-    --
-    --
-    -- 04-FEB-2009
-    -- AE Make sure the X and Y columns are not null before updating.. otherwise we'll delete
-    --
-      IF     l_base_table_nth.nth_x_column IS NOT NULL
-         AND l_base_table_nth.nth_y_column IS NOT NULL
-      THEN
-    --
-        append ('--');
-        append (' IF :NEW.'||LOWER (l_base_table_nth.nth_x_column)|| ' IS NOT NULL');
-        append ('    AND :NEW.'||LOWER (l_base_table_nth.nth_y_column)|| ' IS NOT NULL');
-        append (' THEN ');
-    --
-      END IF;
-    --
-      append ('--');
-      append ('    UPDATE ' || LOWER (l_base_table_nth.nth_feature_table));
-      append (   '       SET '
-              || LOWER (l_base_table_nth.nth_feature_pk_column)
-              || ' = :NEW.'
-              || LOWER (l_base_table_nth.nth_pk_column)
-             );
-
---------------------------------------------------------------------------------------
--- POINT X,Y ITEM
---------------------------------------------------------------------------------------
-      IF     l_base_table_nth.nth_x_column IS NOT NULL
-         AND l_base_table_nth.nth_y_column IS NOT NULL
-      THEN
-         append (   '         , '
-                 || LOWER (l_base_table_nth.nth_feature_shape_column)
-                 || ' = mdsys.sdo_geometry'
-                );
-         append ('                          ( 2001 ');
-         append ('                          , sys_context(''NM3CORE'',''THEME' || l_base_table_nth.nth_theme_id || 'SRID'')');
-         append ('                          , mdsys.sdo_point_type');
-         append (   '                             ( :NEW.'
-                 || LOWER (l_base_table_nth.nth_x_column)
-                );
-         append (   '                             , :NEW.'
-                 || LOWER (l_base_table_nth.nth_y_column)
-                );
-         append ('                             ,  NULL)');
-         append ('                          , NULL ');
-         append
-            ('                          , NULL)  -- geometry derived from X,Y values'
-            );
---------------------------------------------------------------------------------------
--- POINT Linear Reference ITEM
---------------------------------------------------------------------------------------
-      ELSIF     l_base_table_nth.nth_st_chain_column IS NOT NULL
-            AND l_base_table_nth.nth_end_chain_column IS NULL
-      THEN
-         append (   '              ,'
-                 || l_base_table_nth.nth_feature_shape_column
-                 || '=nm3sdo.get_pt_shape_from_ne('
-                 || ':new.'
-                 || l_base_table_nth.nth_rse_fk_column
-                 || ',:new.'
-                 || l_base_table_nth.nth_st_chain_column
-                 || ')'
-                );
---------------------------------------------------------------------------------------
--- CONTINUOUS Linear Reference ITEM
---------------------------------------------------------------------------------------
-      ELSIF     l_base_table_nth.nth_st_chain_column IS NOT NULL
-            AND l_base_table_nth.nth_end_chain_column IS NOT NULL
-      THEN
--- Assume that the XY are not populated and that the theme table is linearly referenced.
-         append (   '         , '
-                 || (   LOWER (l_base_table_nth.nth_feature_shape_column)
-                     || ' = nm3sdo.get_placement_geometry ('
-                    )
-                );
-         append ('                               ' || 'nm_placement');
-         append (   '                                 ( :NEW.'
-                 || LOWER (l_base_table_nth.nth_rse_fk_column)
-                );
-         append (   '                                 , :NEW.'
-                 || LOWER (l_base_table_nth.nth_st_chain_column)
-                );
-         append (   '                                 , :NEW.'
-                 || LOWER (l_base_table_nth.nth_end_chain_column)
-                );
-         append
-            ('                             , 0)) -- geometry derived from linear reference'
-            );
-      END IF;
-
-      append (   '     WHERE '
-              || LOWER (l_base_table_nth.nth_feature_pk_column)
-              || ' = :OLD.'
-              || l_base_table_nth.nth_pk_column
-              || ';'
-              || lf
-             );
-      append ('    IF SQL%ROWCOUNT=0 THEN');
-      append ('       ins;');
-
------------------------------------------------------------------------------------
--- If Start Chain and LR columns are defined too, then re-project xy onto
--- Road to work out LR NE ID and Offset values
------------------------------------------------------------------------------------
-      IF     l_base_table_nth.nth_x_column IS NOT NULL
-         AND l_base_table_nth.nth_y_column IS NOT NULL
-         AND l_base_table_nth.nth_st_chain_column IS NOT NULL
-         AND l_base_table_nth.nth_rse_fk_column IS NOT NULL
-         AND l_base_table_nth.nth_end_chain_column IS NULL
-      THEN
-         append ('    ELSE');
-         append
-            (   '    -- Network and Chainage supplied - so derive LR from XY values and update'
-             || lf
-             || '       l_lref := nm3sdo.get_nw_snaps_at_xy ' );
-         append ('                  '||TO_CHAR( l_base_table_nth.nth_theme_id));
-         append (   '                  , :NEW.'
-                 || LOWER (l_base_table_nth.nth_x_column)
-                );
-         append (   '                  , :NEW.'
-                 || LOWER (l_base_table_nth.nth_y_column)
-                 || ');'
-                );
-         append (   lf
-                 || '       :NEW.'
-                 || LOWER (l_base_table_nth.nth_rse_fk_column)
-                 || ' := l_lref.lr_ne_id;'
-                 || lf
-                );
-         append (   '       :NEW.'
-                 || LOWER (l_base_table_nth.nth_st_chain_column)
-                 || ' := nm3unit.get_formatted_value '
-                );
-         append ('                  ( l_lref.lr_offset');
-         append
-            ('                  , nm3net.get_nt_units_from_ne(l_lref.lr_ne_id)'
-            );
-         append ('                  );');
-         append ('    END IF;' || lf);
-      ELSE
-         append ('    END IF;' || lf);
-      END IF;
-
-    -- 04-FEB-2009
-    -- AE Make sure the X and Y columns are not null before updating.. otherwise we'll delete
-    --
-      IF     l_base_table_nth.nth_x_column IS NOT NULL
-         AND l_base_table_nth.nth_y_column IS NOT NULL
-      THEN
-    --
-        append ('--');
-        append (' ELSE');
-        append ('--');
-        append ('    del; ');
-        append ('--');
-        append (' END IF; ');
-    --
-      END IF;
-
-      append (' ');
-      append
-         (' EXCEPTION -- when others to cater for attempted update where no geom values supplied e.g. no x/y'
-         );
-      append ('     WHEN others THEN');
-      append ('       Null;');
-      append (' END upd;');
-      append ('--');
-      append
-         ('--------------------------------------------------------------------------'
-         );
-      append ('--');
-      append ('BEGIN');
-      append ('--');
-      IF p_restrict IS NOT NULL THEN
-        append ('IF ' ||p_restrict || ' THEN');
-      END IF;
-      append ('   nm3sdm.set_theme_srid_ctx( pi_theme_id => ' || l_base_table_nth.nth_theme_id || ');');
-      append ('--');
-      append ('   IF DELETING THEN');
-      append ('        del;');
-      append ('   ELSIF INSERTING THEN');
-      append ('        ins;');
-      append ('   ELSIF UPDATING THEN');
-      append ('        upd;');
-      append ('   END IF;');
-      IF p_restrict IS NOT NULL THEN
-        append ('END IF;');
-      END IF;
-      append ('EXCEPTION');
-      append ('   WHEN NO_DATA_FOUND THEN');
-      append ('     NULL; -- no data in spatial table to update or delete');
-      append ('   WHEN OTHERS THEN');
-      append ('     RAISE;');
-      append ('END ' || LOWER (l_trg_name) || ';');
-      append ('--');
-      append
-         ('--------------------------------------------------------------------------'
-         );
-      append ('--');
-      Nm3ddl.execute_tab_varchar (l_tab_vc);
-   EXCEPTION
-      WHEN ex_invalid_sequence
-      THEN
-         Hig.raise_ner
-              (pi_appl                    => Nm3type.c_hig,
-               pi_id                      => 257,
-               pi_sqlcode                 => -20001,
-               pi_supplementary_info      =>    l_base_table_nth.nth_sequence_name
-                                             || CHR (10)
-                                             || 'Please check your theme.'
-              );
-      WHEN OTHERS
-      THEN
-         RAISE;
-   END Create_Nth_Sdo_Trigger;
+  po_Results := l_Retval;
+Exception
+  When No_Data_Found  Then
+    po_Results := l_Retval;
+End Get_Nlt_Block;
 --
 -----------------------------------------------------------------------------
 --
-   PROCEDURE get_dynseg_nt_types (
-      pi_asset_type   IN       nm_inv_types.nit_inv_type%TYPE,
-      po_locations    IN OUT   tab_nin_sdo
-   )
-   IS
-      l_tab_layer      Nm3type.tab_number;
-      l_tab_location   Nm3type.tab_varchar4;
-      l_retval         tab_nin_sdo;
-   --
-   BEGIN
-      --
-      Nm_Debug.proc_start (g_package_name, 'get_dynseg_nt_type');
+Procedure Get_Nat_Block (
+                        pi_Theme_Id   In       Nm_Themes_All.Nth_Theme_Id%Type,
+                        po_Results    In Out   Tab_Nat_Block
+                        )
+Is
+  Type Tab_Nat Is Table Of Nm_Area_Types%Rowtype  Index By Binary_Integer;
 
-      --  Nm_Debug.debug_on;
-      --  Nm_Debug.DEBUG('Asset type = '||pi_asset_type);
-      SELECT nlt_nt_type, b.nth_theme_id base_theme
-      BULK COLLECT INTO l_tab_location, l_tab_layer
-        FROM nm_inv_nw a, NM_THEMES_ALL b, NM_NW_THEMES, NM_LINEAR_TYPES
-       WHERE nlt_id = nnth_nlt_id
-         AND nnth_nth_theme_id = nth_theme_id
-         AND nlt_nt_type = a.nin_nw_type
-         AND b.nth_theme_type = 'SDO'
-         AND a.nin_nit_inv_code = pi_asset_type;
+  l_Tab_Nat   Tab_Nat;
+  l_Retval    Tab_Nat_Block;
+Begin
+  Select        naty.*
+  Bulk Collect 
+  Into          l_Tab_Nat
+  From          Nm_Area_Types naty
+  Where         naty.Nat_Id  In   (
+                                  Select  nat.Nath_Nat_Id
+                                  From    Nm_Area_Themes  nat
+                                  Where   nat.Nath_Nth_Theme_Id   =   pi_Theme_Id
+                                  );
 
-      FOR i IN 1 .. l_tab_layer.COUNT
-      LOOP
-         --    Nm_Debug.DEBUG('In Loop - '||l_tab_location(i));
-         l_retval (i).p_layer_id := l_tab_layer (i);
-         l_retval (i).p_location := l_tab_location (i);
-      END LOOP;
+  For i In 1 .. l_Tab_Nat.Count
+  Loop
+    l_Retval (i).Nat_Nth_Theme_Id     :=  pi_Theme_Id;
+    l_Retval (i).Nat_Seq_No           :=  l_Tab_Nat (i).Nat_Seq_No;
+    l_Retval (i).Nat_Descr            :=  l_Tab_Nat (i).Nat_Descr;
+    l_Retval (i).Nat_Nt_Type          :=  l_Tab_Nat (i).Nat_Nt_Type;
+    l_Retval (i).Nat_Gty_Group_Type   :=  l_Tab_Nat (i).Nat_Gty_Group_Type;
+    l_Retval (i).Nat_Start_Date       :=  l_Tab_Nat (i).Nat_Start_Date;
+    l_Retval (i).Nat_End_Date         :=  l_Tab_Nat (i).Nat_End_Date;
+    l_Retval (i).Nat_Shape_Type       :=  l_Tab_Nat (i).Nat_Shape_Type;
+  End Loop;
 
-      po_locations := l_retval;
-      Nm_Debug.proc_end (g_package_name, 'get_dynseg_nt_type');
-   --
-   EXCEPTION
-      --
-      WHEN NO_DATA_FOUND
-      THEN
-         po_locations := l_retval;
-      WHEN OTHERS
-      THEN
-         RAISE;
-   --
-   END get_dynseg_nt_types;
-
+  po_Results := l_Retval;
+  
+Exception
+  When No_Data_Found  Then
+    po_Results := l_Retval;
+End Get_Nat_Block;
 --
 -----------------------------------------------------------------------------
 --
-   PROCEDURE get_existing_themes_for_table (
-      pi_theme_table   IN       NM_THEMES_ALL.nth_theme_name%TYPE,
-      po_themes        IN OUT   tab_nth
-   )
-   IS
-      l_retval   tab_nth;
-   BEGIN
-      Nm_Debug.proc_end (g_package_name, 'get_existing_themes_for_table');
+Procedure Get_Nit_Block (
+                        pi_Theme_Id   In       Nm_Themes_All.Nth_Theme_Id%Type,
+                        po_Results    In Out   Tab_Nit_Block
+                        )
+Is
+  Type Tab_Nit Is Table Of Nm_Inv_Types%Rowtype Index By Binary_Integer;
 
-      --
-      SELECT *
-      BULK COLLECT INTO l_retval
-        FROM NM_THEMES_ALL
-       WHERE nth_table_name = pi_theme_table AND nth_theme_type = 'SDO';
+  l_Tab_Nit   Tab_Nit;
+  l_Retval    Tab_Nit_Block;
+Begin
+  Select        nity.*
+  Bulk Collect 
+  Into          l_Tab_Nit
+  From          Nm_Inv_Types    nity,
+                Nm_Inv_Themes   nith
+  Where         nity.Nit_Inv_Type       =   nith.Nith_Nit_Id
+  And           nith.Nith_Nth_Theme_Id  =   pi_Theme_Id;
 
-      po_themes := l_retval;
-      --
-      Nm_Debug.proc_end (g_package_name, 'get_existing_themes_for_table');
-   --
-   EXCEPTION
-      --
-      WHEN NO_DATA_FOUND
-      THEN
-         po_themes := l_retval;
-      WHEN OTHERS
-      THEN
-         RAISE;
-   --
-   END get_existing_themes_for_table;
+  For i In 1 .. l_Tab_Nit.Count
+  Loop
+    l_Retval (i).Nit_Nth_Theme_Id       :=  pi_Theme_Id;
+    l_Retval (i).Nit_Inv_Type           :=  l_Tab_Nit (i).Nit_Inv_Type;
+    l_Retval (i).Nit_Descr              :=  l_Tab_Nit (i).Nit_Descr;
+    l_Retval (i).Nit_View_Name          :=  l_Tab_Nit (i).Nit_View_Name;
+    l_Retval (i).Nit_Use_Xy             :=  l_Tab_Nit (i).Nit_Use_Xy;
+    l_Retval (i).Nit_Pnt_Or_Cont        :=  l_Tab_Nit (i).Nit_Pnt_Or_Cont;
+    l_Retval (i).Nit_Linear             :=  l_Tab_Nit (i).Nit_Linear;
+    l_Retval (i).Nit_Table_Name         :=  l_Tab_Nit (i).Nit_Table_Name;
+    l_Retval (i).Nit_Lr_St_Chain        :=  l_Tab_Nit (i).Nit_Lr_St_Chain;
+    l_Retval (i).Nit_Lr_End_Chain       :=  l_Tab_Nit (i).Nit_Lr_End_Chain;
+    l_Retval (i).Nit_Lr_Ne_Column_Name  :=  l_Tab_Nit (i).Nit_Lr_Ne_Column_Name;
+  End Loop;
 
+  po_Results := l_Retval;
+Exception
+  When No_Data_Found  Then
+    po_Results := l_Retval;
+End Get_Nit_Block;
 --
 -----------------------------------------------------------------------------
 --
---   PROCEDURE get_rouge_asset_metadata
---              ( pi_asset_type  IN      nm_inv_types.nit_inv_type%TYPE
---              , po_results     IN OUT  tab_r_asset)
---   IS
---    TYPE tab_nth            IS TABLE OF NM_THEMES_ALL%ROWTYPE
---                               INDEX BY BINARY_INTEGER;
---
---    TYPE tab_usgm           IS TABLE OF user_sdo_geom_metadata%ROWTYPE
---                               INDEX BY BINARY_INTEGER;
---
---    TYPE tab_ust            IS TABLE OF user_sdo_themes%ROWTYPE
---                               INDEX BY BINARY_INTEGER;
---
---    TYPE tab_layers         IS TABLE OF sde.layers%ROWTYPE
---                               INDEX BY BINARY_INTEGER;
---
---    TYPE tab_gcols          IS TABLE OF sde.geometry_columns%ROWTYPE
---                               INDEX BY BINARY_INTEGER;
---
---    TYPE tab_treg           IS TABLE OF sde.table_registry%ROWTYPE
---                               INDEX BY BINARY_INTEGER;
---
---    TYPE tab_seqs           IS TABLE OF USER_SEQUENCES%ROWTYPE
---                               INDEX BY BINARY_INTEGER;
---
---     l_tab_nth_results          tab_nth;
---     l_tab_usgm_results         tab_usgm;
---     l_tab_ust_results          tab_ust;
---     l_tab_layers_results       tab_layers;
---     l_tab_gcols_results        tab_gcols;
---     l_tab_treg_results         tab_treg;
---     l_tab_seqs_results         tab_seqs;
---     l_tab_results              tab_r_asset;
---
---     l_rec_nit                  nm_inv_types%ROWTYPE;
---
---     l_object_name              VARCHAR2(30);
---     l_string                   Nm3type.max_varchar2;
---     l_count                    PLS_INTEGER := 0;
---
---     b_ft_asset                 BOOLEAN;
---     b_use_sde                  BOOLEAN :=   Hig.get_sysopt('REGSDELAY') = 'Y';
---
---     e_invalid_asset_type       EXCEPTION;
---   --
---     PROCEDURE put_line (pi_entity IN VARCHAR2
---                        ,pi_pk     IN VARCHAR2
---                        ,pi_descr  IN VARCHAR2)
---     IS
---       l_ind   NUMBER   := l_tab_results.COUNT;
---     BEGIN
---       l_tab_results(l_ind+1).p_rownum := l_ind;
---       l_tab_results(l_ind+1).p_entity := pi_entity;
---       l_tab_results(l_ind+1).p_pk     := pi_pk;
---       l_tab_results(l_ind+1).p_descr  := pi_descr;
--- --       l_tmp :=       'BEGIN dbms_output.put_line ('
--- --        ||''''||(pi_entity)
--- --        ||' exists - '
--- --        ||pi_pk
--- --        ||' - '
--- --        ||pi_descr||''''||'); END;';
--- --      EXECUTE IMMEDIATE l_tmp;
---     END put_line;
---   --
---   -----------------------------------------------------------------------------
---   BEGIN
---   -----------------------------------------------------------------------------
---   --
---     Nm_Debug.delete_debug;
--- --    Nm_Debug.debug_on;
---     Nm_Debug.DEBUG('** STARTED ROUGE ASSET METADATA SEARCH **');
---   --
---     l_rec_nit := Nm3get.get_nit (pi_nit_inv_type => pi_asset_type);
---   --
---     IF l_rec_nit.nit_inv_type
---       IS NULL THEN
---         RAISE e_invalid_asset_type;
---     END IF;
---   --
---     IF l_rec_nit.nit_table_name IS NOT NULL
---     THEN
---       b_ft_asset := TRUE;
---     END IF;
---   --
---     /*
---      --------------------------------------------------------------------------
---        CHECK FOR OLD themes
---      --------------------------------------------------------------------------
---     */
---
--- --     IF b_ft_asset
--- --     THEN
--- --         l_object_name := nm3flx.string(l_rec_nit.nit_table_name);
--- --     ELSE
--- --       l_object_name := nm3flx.string('%_'||upper(pi_asset_type));
--- --     END IF;
--- --
--- --     l_string :=
--- --     'SELECT * FROM nm_themes_all WHERE nth_table_name like '||l_object_name;
--- --
--- --     EXECUTE IMMEDIATE l_string
--- --        BULK COLLECT INTO l_tab_nth_results;
--- --
--- --     FOR i IN 1..l_tab_nth_results.COUNT
--- --      LOOP
--- --        l_count := l_count + 1;
--- --        put_line('Theme',l_tab_nth_results(i).nth_theme_id
--- --                        ,l_tab_nth_results(i).nth_theme_name);
--- --     END LOOP;
---   --
---     /*
---      --------------------------------------------------------------------------
---        CHECK FOR OLD sdo metadata
---      --------------------------------------------------------------------------
---     */
---     IF b_ft_asset
---     THEN
---       l_object_name := Nm3flx.string(l_rec_nit.nit_table_name);
---     ELSE
---       l_object_name := Nm3flx.string('%_'||UPPER(pi_asset_type)||'_SDO%');
---     END IF;
---
---     l_string :=
---     'SELECT * FROM user_sdo_geom_metadata WHERE table_name like '||l_object_name;
---
---     EXECUTE IMMEDIATE l_string
---        BULK COLLECT INTO l_tab_usgm_results;
---
---     FOR i IN 1..l_tab_usgm_results.COUNT
---      LOOP
---        l_count := l_count + 1;
---        put_line(1
---                ,l_tab_usgm_results(i).table_name
---                ,l_tab_usgm_results(i).column_name);
---     END LOOP;
---   --
---       /*
---      --------------------------------------------------------------------------
---        CHECK FOR OLD sdo themes (Mapviewer)
---      --------------------------------------------------------------------------
---     */
---     IF b_ft_asset
---     THEN
---       l_object_name := Nm3flx.string(l_rec_nit.nit_table_name);
---     ELSE
---       l_object_name := Nm3flx.string('%_'||UPPER(pi_asset_type)||'_SDO%');
---     END IF;
---
---     l_string :=
---     'SELECT * FROM user_sdo_themes WHERE base_table like '||l_object_name;
---
---     EXECUTE IMMEDIATE l_string
---        BULK COLLECT INTO l_tab_ust_results;
---
---     FOR i IN 1..l_tab_ust_results.COUNT
---      LOOP
---        l_count := l_count + 1;
---        put_line(2
---                ,l_tab_ust_results(i).name
---                ,l_tab_ust_results(i).description);
---     END LOOP;
---   --
---     /*
---      --------------------------------------------------------------------------
---        CHECK FOR OLD sde layers
---      --------------------------------------------------------------------------
---     */
---     IF b_use_sde
---     THEN
---
---       IF b_ft_asset
---       THEN
---         l_object_name := Nm3flx.string(l_rec_nit.nit_table_name);
---       ELSE
---         l_object_name := Nm3flx.string('%_'||UPPER(pi_asset_type)||'_SDO%');
---       END IF;
---
---       l_string :=
---       'SELECT * FROM sde.layers WHERE owner = user '||
---       'and table_name like '||l_object_name;
---
---       EXECUTE IMMEDIATE l_string
---          BULK COLLECT INTO l_tab_layers_results;
---
---       FOR i IN 1..l_tab_layers_results.COUNT
---        LOOP
---          l_count := l_count + 1;
---          put_line(3
---                  ,l_tab_layers_results(i).layer_id
---                  ,NVL(l_tab_layers_results(i).description
---                  ,l_tab_layers_results(i).table_name));
---       END LOOP;
---     --
---       /*
---        --------------------------------------------------------------------------
---          CHECK FOR OLD sde geometry_columns
---        --------------------------------------------------------------------------
---       */
---       IF b_ft_asset
---       THEN
---         l_object_name := Nm3flx.string(l_rec_nit.nit_table_name);
---       ELSE
---         l_object_name := Nm3flx.string('%_'||UPPER(pi_asset_type)||'_SDO%');
---       END IF;
---
---       l_string :=
---       'SELECT * FROM sde.geometry_columns WHERE f_table_schema = user '||
---       'and f_table_name like '||l_object_name;
---
---       EXECUTE IMMEDIATE l_string
---          BULK COLLECT INTO l_tab_gcols_results;
---
---       FOR i IN 1..l_tab_gcols_results.COUNT
---        LOOP
---          l_count := l_count + 1;
---          put_line(4
---                  ,l_tab_gcols_results(i).f_table_name
---                  ,l_tab_gcols_results(i).f_geometry_column);
---       END LOOP;
---     --
---         /*
---        --------------------------------------------------------------------------
---          CHECK FOR OLD sde table_registry
---        --------------------------------------------------------------------------
---       */
---       IF b_ft_asset
---       THEN
---         l_object_name := Nm3flx.string(l_rec_nit.nit_table_name);
---       ELSE
---         l_object_name := Nm3flx.string('%_'||UPPER(pi_asset_type)||'_SDO%');
---       END IF;
---
---       l_string :=
---       'SELECT * FROM sde.table_registry WHERE owner = user '||
---       'and table_name like '||l_object_name;
---
---       --nm_debug.debug(l_string);
---       EXECUTE IMMEDIATE l_string
---          BULK COLLECT INTO l_tab_treg_results;
---
---       FOR i IN 1..l_tab_treg_results.COUNT
---        LOOP
---          l_count := l_count + 1;
---          put_line(5
---                  ,l_tab_treg_results(i).registration_id
---                  ,NVL(l_tab_treg_results(i).description
---                  ,l_tab_treg_results(i).table_name));
---       END LOOP;
---     --
---     END IF;
---     --
---       /*
---      --------------------------------------------------------------------------
---        CHECK FOR OLD sequences
---      --------------------------------------------------------------------------
---     */
---
---     IF l_tab_nth_Results.COUNT > 0
---     THEN
---       FOR i IN 1..l_tab_nth_results.COUNT
---        LOOP
---          l_string :=
---          'select * from user_sequences '||
---          ' where sequence_name like '||Nm3flx.string('NTH_%_SEQ')||
---          '   and sequence_name != '||Nm3flx.string('NTH_THEME_ID_SEQ')||
---          '   and substr(sequence_name,5,(instr(sequence_name,'
---            ||Nm3flx.string('_SEQ')||')-5)) = '||Nm3flx.string(l_tab_nth_results(i).nth_theme_id);
---          Nm_Debug.DEBUG(l_string);
---          EXECUTE IMMEDIATE l_string
---          BULK COLLECT INTO l_tab_seqs_results;
---
---          FOR i IN 1..l_tab_seqs_results.COUNT
---           LOOP
---            l_count := l_count + 1;
---            put_line(6
---                     ,l_tab_seqs_results(i).sequence_name
---                     ,l_tab_seqs_results(i).last_number);
---          END LOOP;
---
---       END LOOP;
---     END IF;
---   --
---     po_results := l_tab_results;
---   --
---     Nm_Debug.DEBUG('** COMPLETED ROUGE ASSET METADATA SEARCH **');
---     Nm_Debug.DEBUG('** '||l_count||' OBJECTS FOUND **');
---   --
---   EXCEPTION
---     WHEN e_invalid_asset_type
---     THEN
---       Nm_Debug.DEBUG('** INVALID ASSET TYPE '||pi_asset_type||' **');
---
---     WHEN OTHERS THEN RAISE;
---   END get_rouge_asset_metadata;
---
------------------------------------------------------------------------------
---
-   PROCEDURE get_nlt_block (
-      pi_theme_id   IN       NM_THEMES_ALL.nth_theme_id%TYPE,
-      po_results    IN OUT   tab_nlt_block
-   )
-   IS
-      TYPE tab_nlt IS TABLE OF NM_LINEAR_TYPES%ROWTYPE
-         INDEX BY BINARY_INTEGER;
+Procedure Create_Msv_Themes
+As
+  l_Rec_Nth    Nm_Themes_All%Rowtype;
+  l_Rec_Nthr   Nm_Theme_Roles%Rowtype;
 
-      l_tab_nlt      tab_nlt;
-      l_retval       tab_nlt_block;
-      l_unit_descr   NM_UNITS.un_unit_name%TYPE;
-   BEGIN
-      SELECT *
-      BULK COLLECT INTO l_tab_nlt
-        FROM NM_LINEAR_TYPES
-       WHERE nlt_id IN (SELECT nnth_nlt_id
-                          FROM NM_NW_THEMES
-                         WHERE nnth_nth_theme_id = pi_theme_id);
+  Function Get_Pk_Column  (
+                          pi_Table_Name In Varchar2
+                          ) Return Varchar2
+  Is
+    l_Col   Varchar2 (30);
+  Begin
+    Begin
+      Select  Ucc.Column_Name
+      Into    L_Col
+      From    User_Constraints    Uco,
+              User_Cons_Columns   Ucc
+      Where   Uco.Owner           =   User
+      And     Ucc.Owner           =   User
+      And     Uco.Table_Name      =   pi_Table_Name
+      And     Uco.Constraint_Type =   'P'
+      And     Uco.Constraint_Name =   Ucc.Constraint_Name
+      And     Uco.Table_Name      =   Ucc.Table_Name;
 
-      FOR i IN 1 .. l_tab_nlt.COUNT
-      LOOP
-         l_unit_descr :=
-            Nm3get.get_un (pi_un_unit_id           => l_tab_nlt (i).nlt_units,
-                           pi_raise_not_found      => FALSE
-                          ).un_unit_name;
-         l_retval (i).nlt_nth_theme_id := pi_theme_id;
-         l_retval (i).nlt_id := l_tab_nlt (i).nlt_id;
-         l_retval (i).nlt_seq_no := l_tab_nlt (i).nlt_seq_no;
-         l_retval (i).nlt_descr := l_tab_nlt (i).nlt_descr;
-         l_retval (i).nlt_nt_type := l_tab_nlt (i).nlt_nt_type;
-         l_retval (i).nlt_gty_type := l_tab_nlt (i).nlt_gty_type;
-         l_retval (i).nlt_admin_type := l_tab_nlt (i).nlt_admin_type;
-         l_retval (i).nlt_start_date := l_tab_nlt (i).nlt_start_date;
-         l_retval (i).nlt_end_date := l_tab_nlt (i).nlt_end_date;
-         l_retval (i).nlt_units := l_tab_nlt (i).nlt_units;
-         l_retval (i).nlt_units_descr := l_unit_descr;
-      END LOOP;
+    Exception
+      When Others  Then
+        l_Col:= 'UNKNOWN';
+    End;
+    
+    Return(l_Col);
+            
+  End Get_Pk_Column;
+--
+Begin
+  For i In  (
+            Select  ust.*
+            From    User_Sdo_Themes   ust
+            Where   Not Exists  (
+                                Select  Null
+                                From    Nm_Themes_All   nta
+                                Where   nta.Nth_Theme_Name  =   ust.Name
+                                And     nta.Nth_Theme_Type  =   'SDO'
+                                )
+            )
+  Loop
+    Begin
+      l_Rec_Nth.Nth_Theme_Id                := Nm3Seq.Next_Nth_Theme_Id_Seq;
+      l_Rec_Nth.Nth_Theme_Name              := i.Name;
+      l_Rec_Nth.Nth_Table_Name              := i.Base_Table;
+      l_Rec_Nth.Nth_Pk_Column               := Get_Pk_Column (i.Base_Table);
+      l_Rec_Nth.Nth_Label_Column            := l_Rec_Nth.Nth_Pk_Column;
+      l_Rec_Nth.Nth_Hpr_Product             := Nm3Type.C_Net;
+      l_Rec_Nth.Nth_Location_Updatable      := 'N';
+      l_Rec_Nth.Nth_Dependency              := 'I';
+      l_Rec_Nth.Nth_Storage                 := 'S';
+      l_Rec_Nth.Nth_Update_On_Edit          := 'N';
+      l_Rec_Nth.Nth_Use_History             := 'N';
+      l_Rec_Nth.Nth_Snap_To_Theme           := 'N';
+      l_Rec_Nth.Nth_Lref_Mandatory          := 'N';
+      l_Rec_Nth.Nth_Tolerance               := 10;
+      l_Rec_Nth.Nth_Tol_Units               := 1;
+      l_Rec_Nth.Nth_Theme_Type              := 'SDO';
+      l_Rec_Nth.Nth_Feature_Table           := i.Base_Table;
+      l_Rec_Nth.Nth_Feature_Shape_Column    := i.Geometry_Column;
+      l_Rec_Nth.Nth_Feature_Pk_Column       := l_Rec_Nth.Nth_Pk_Column;
+      Nm3Ins.Ins_Nth (l_Rec_Nth);
 
-      po_results := l_retval;
-   EXCEPTION
-      WHEN NO_DATA_FOUND
-      THEN
-         po_results := l_retval;
-      WHEN OTHERS
-      THEN
-         RAISE;
-   END get_nlt_block;
+      l_Rec_Nthr.Nthr_Theme_Id := l_Rec_Nth.Nth_Theme_Id;
+      l_Rec_Nthr.Nthr_Role := 'HIG_USER';
+      l_Rec_Nthr.Nthr_Mode := 'NORMAL';
+      Nm3Ins.Ins_Nthr (l_Rec_Nthr);
 
---
------------------------------------------------------------------------------
---
-   PROCEDURE get_nat_block (
-      pi_theme_id   IN       NM_THEMES_ALL.nth_theme_id%TYPE,
-      po_results    IN OUT   tab_nat_block
-   )
-   IS
-      TYPE tab_nat IS TABLE OF NM_AREA_TYPES%ROWTYPE
-         INDEX BY BINARY_INTEGER;
+    Exception
+      When Others Then
+         Nm_Debug.Debug (   'Unable to create theme for '
+                         || I.Name
+                         || ' - '
+                         || Sqlerrm
+                        );
+    End;
+  End Loop;
 
-      l_tab_nat   tab_nat;
-      l_retval    tab_nat_block;
-   BEGIN
-      SELECT *
-      BULK COLLECT INTO l_tab_nat
-        FROM NM_AREA_TYPES
-       WHERE nat_id IN (SELECT nath_nat_id
-                          FROM NM_AREA_THEMES
-                         WHERE nath_nth_theme_id = pi_theme_id);
-
-      FOR i IN 1 .. l_tab_nat.COUNT
-      LOOP
-         l_retval (i).nat_nth_theme_id := pi_theme_id;
-         l_retval (i).nat_seq_no := l_tab_nat (i).nat_seq_no;
-         l_retval (i).nat_descr := l_tab_nat (i).nat_descr;
-         l_retval (i).nat_nt_type := l_tab_nat (i).nat_nt_type;
-         l_retval (i).nat_gty_group_type := l_tab_nat (i).nat_gty_group_type;
-         l_retval (i).nat_start_date := l_tab_nat (i).nat_start_date;
-         l_retval (i).nat_end_date := l_tab_nat (i).nat_end_date;
-         l_retval (i).nat_shape_type := l_tab_nat (i).nat_shape_type;
-      END LOOP;
-
-      po_results := l_retval;
-   EXCEPTION
-      WHEN NO_DATA_FOUND
-      THEN
-         po_results := l_retval;
-      WHEN OTHERS
-      THEN
-         RAISE;
-   END get_nat_block;
-
---
------------------------------------------------------------------------------
---
-   PROCEDURE get_nit_block (
-      pi_theme_id   IN       NM_THEMES_ALL.nth_theme_id%TYPE,
-      po_results    IN OUT   tab_nit_block
-   )
-   IS
-      TYPE tab_nit IS TABLE OF nm_inv_types%ROWTYPE
-         INDEX BY BINARY_INTEGER;
-
-      l_tab_nit   tab_nit;
-      l_retval    tab_nit_block;
-   BEGIN
-      SELECT nm_inv_types.*
-      BULK COLLECT INTO l_tab_nit
-        FROM nm_inv_types, NM_INV_THEMES
-       WHERE nit_inv_type = nith_nit_id AND nith_nth_theme_id = pi_theme_id;
-
-      FOR i IN 1 .. l_tab_nit.COUNT
-      LOOP
-         l_retval (i).nit_nth_theme_id := pi_theme_id;
-         l_retval (i).nit_inv_type := l_tab_nit (i).nit_inv_type;
-         l_retval (i).nit_descr := l_tab_nit (i).nit_descr;
-         l_retval (i).nit_view_name := l_tab_nit (i).nit_view_name;
-         l_retval (i).nit_use_xy := l_tab_nit (i).nit_use_xy;
-         l_retval (i).nit_pnt_or_cont := l_tab_nit (i).nit_pnt_or_cont;
-         l_retval (i).nit_linear := l_tab_nit (i).nit_linear;
-         l_retval (i).nit_table_name := l_tab_nit (i).nit_table_name;
-         l_retval (i).nit_lr_st_chain := l_tab_nit (i).nit_lr_st_chain;
-         l_retval (i).nit_lr_end_chain := l_tab_nit (i).nit_lr_end_chain;
-         l_retval (i).nit_lr_ne_column_name :=
-                                          l_tab_nit (i).nit_lr_ne_column_name;
-      END LOOP;
-
-      po_results := l_retval;
-   EXCEPTION
-      WHEN NO_DATA_FOUND
-      THEN
-         po_results := l_retval;
-      WHEN OTHERS
-      THEN
-         RAISE;
-   END get_nit_block;
-
---
------------------------------------------------------------------------------
---
---   PROCEDURE validate_theme
---              ( pi_theme_id   IN     NM_THEMES_ALL.nth_theme_id%TYPE
---              , po_results    IN OUT tab_validate_theme)
---     /*
---        FOR a given theme, this PROCEDURE RETURN a TABLE OF results
---     */
---   IS
---   --
---     TYPE tab_nth            IS TABLE OF NM_THEMES_ALL%ROWTYPE
---                                INDEX BY BINARY_INTEGER;
---     TYPE tab_usgm           IS TABLE OF user_sdo_geom_metadata%ROWTYPE
---                                INDEX BY BINARY_INTEGER;
---     TYPE tab_ust            IS TABLE OF user_sdo_themes%ROWTYPE
---                                INDEX BY BINARY_INTEGER;
---     TYPE tab_layers         IS TABLE OF sde.layers%ROWTYPE
---                                INDEX BY BINARY_INTEGER;
---     TYPE tab_gcols          IS TABLE OF sde.geometry_columns%ROWTYPE
---                                INDEX BY BINARY_INTEGER;
---     TYPE tab_treg           IS TABLE OF sde.table_registry%ROWTYPE
---                                INDEX BY BINARY_INTEGER;
---     TYPE tab_seqs           IS TABLE OF USER_SEQUENCES%ROWTYPE
---                                INDEX BY BINARY_INTEGER;
---   --
---     l_tab_ust                  tab_ust;
---     l_rec_nth                  NM_THEMES_ALL%ROWTYPE;
---     l_base_table_nth           NM_THEMES_ALL%ROWTYPE;
---     l_rec_usgm                 user_sdo_geom_metadata%ROWTYPE;
---     l_rec_ut                   USER_TABLES%ROWTYPE;
---     l_var_output               VARCHAR2(32767);
---     l_tab_output               tab_validate_theme;
---   --
---     b_use_surkey               BOOLEAN  := Hig.get_user_or_sys_opt ('SDOSURKEY') = 'Y';
---     b_objectid_missing         BOOLEAN  := FALSE;
---     b_objectid_uk_missing      BOOLEAN  := FALSE;
---   --
---     e_not_sdo_theme            EXCEPTION;
---     e_no_feature_table         EXCEPTION;
---     e_feature_table_no_exist   EXCEPTION;
---     e_feature_shp_col_no_exist EXCEPTION;
---     e_no_feature_shape_col     EXCEPTION;
---   --
---     FUNCTION no_index_on_objectid
---       RETURN BOOLEAN
---     IS
---       l_temp PLS_INTEGER := NULL;
---     BEGIN
---       SELECT 1
---         INTO l_temp
---         FROM USER_IND_COLUMNS
---        WHERE index_name = l_rec_nth.nth_feature_table||'_UK'
---          AND table_name = l_rec_nth.nth_feature_table
---          AND column_name = 'OBJECTID';
---       RETURN TRUE;
---     EXCEPTION
---       WHEN OTHERS THEN RETURN FALSE;
---     END no_index_on_objectid;
---   --
---     PROCEDURE append (p_text IN VARCHAR2
---                      ,p_nl   IN BOOLEAN DEFAULT TRUE)
---     IS
--- --      l_i NUMBER := l_tab_output.COUNT;
---     BEGIN
---       Nm_Debug.debug_on;
---       Nm_Debug.DEBUG((l_var_output));
---       Nm_Debug.DEBUG(LENGTH(l_var_output));
---       IF p_nl
---       THEN
---         l_var_output := l_var_output||p_text||CHR(10);
---       ELSE
---         l_var_output := l_var_output||p_text;
---       END IF;
---     END append;
---   --
---   BEGIN
---   --
---     -- Validate theme
---     l_rec_nth := Nm3get.get_nth ( pi_nth_theme_id => pi_theme_id );
---
---     -- Base Table Theme
---     IF l_rec_nth.nth_base_table_theme IS NULL
---     THEN
---       l_base_table_nth := l_rec_nth; -- base theme is the driving theme
---     ELSE
---       l_base_table_nth :=  Nm3get.get_nth(pi_nth_theme_id => l_rec_nth.nth_base_table_theme);
---     END IF;
---
---     IF l_rec_nth.nth_theme_type != 'SDO'
---       THEN
---       RAISE e_not_sdo_theme;
---     ELSIF l_rec_nth.nth_feature_table IS NULL
---     THEN
---       RAISE e_no_feature_table;
---     ELSIF l_rec_nth.nth_feature_shape_column IS NULL
---     THEN
---       RAISE e_no_feature_shape_col;
---     ELSIF NOT Nm3ddl.does_object_exist(l_rec_nth.nth_feature_table)
---     THEN
---       RAISE e_feature_table_no_exist;
---     ELSIF Nm3ddl.get_column_details
---            ( p_column_name => l_rec_nth.nth_feature_shape_column
---            , p_table_name  => l_rec_nth.nth_feature_table ).column_name IS NULL
---     THEN
---       RAISE e_feature_shp_col_no_exist;
---     END IF;
---
---     -- Check for user_sdo_geom_metadata
---     BEGIN
---       SELECT *
---         INTO l_rec_usgm
---         FROM user_sdo_geom_metadata
---        WHERE table_name = l_rec_nth.nth_feature_table
---          AND column_name = l_rec_nth.nth_feature_shape_column;
---     EXCEPTION
---       WHEN NO_DATA_FOUND THEN NULL;
---       WHEN OTHERS        THEN RAISE;
---     END;
---
---     -- Check for user_sdo_themes (mapviewer metadata)
---     BEGIN
---       SELECT *
---         BULK COLLECT INTO l_tab_ust
---         FROM user_sdo_themes
---        WHERE BASE_TABLE = l_rec_nth.nth_feature_table;
---     EXCEPTION
---       WHEN NO_DATA_FOUND THEN NULL;
---       WHEN OTHERS        THEN RAISE;
---     END;
---
---     -- Check for surrogate key column and sequence (if applicable)
---     IF b_use_surkey
---     THEN
---       DECLARE
---         e_not_found EXCEPTION;
---         PRAGMA      EXCEPTION_INIT (e_not_found,-20200);
---       BEGIN
---         IF Nm3ddl.get_column_details
---              ( p_column_name => 'OBJECTID'
---              , p_table_name  => l_rec_nth.nth_feature_table ).column_name IS NOT NULL
---         THEN
---           NULL;
---         END IF;
---       EXCEPTION
---         WHEN e_not_found
---         THEN b_objectid_missing := TRUE;
---       END;
---
---       IF no_index_on_objectid
---       THEN
---         -- NO UK INDEX ON OBJECTID
---         b_objectid_uk_missing := TRUE;
---       END IF;
---
---     END IF;
---
---     -- Build output
---     append ('================================================');
---     append (''||To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY'));
---     append ('');
---     append ('Validate Theme '||l_rec_nth.nth_theme_name);
---     append ('================================================');
---     append ('');
---     append ('');
---     append ('  ================================================');
---     append ('  SDO Metadata');
---     append ('  ================================================');
---     append ('  (user_sdo_geom_metadata)');
---     append ('');
---
---     IF l_rec_usgm.table_name IS NULL
---     THEN
---       append ('  ** No SDO Metadata Exists ! ** ');
---     ELSE
--- --      append ('   TABLE NAME        = '||l_rec_usgm.table_name);
---       append ('   GEOMETRY COLUMN   = '||l_rec_usgm.column_name);
--- --      append ('   DIMINFO       = '||l_rec_usgm.diminfo);
---       append ('   SRID              = '||NVL(l_rec_usgm.srid,'NOT SET'));
---     END IF;
---     append ('');
---     append ('');
---     append ('  ================================================');
---     append ('  SDO Themes Metadata');
---     append ('  ================================================');
---     append ('  (user_sdo_themes)');
---     append ('');
---
---     IF l_tab_ust.COUNT = 0
---     THEN
---       append ('  ** No SDO Theme Metadata Exists ! **');
---     ELSE
---       FOR i IN 1..l_tab_ust.COUNT
---       LOOP
---         append ('   THEME NAME       = '||l_tab_ust(i).name);
---         append ('   DESCRIPTION      = '||l_tab_ust(i).description);
---         append ('   BASE TABLE       = '||l_tab_ust(i).BASE_TABLE);
---         append ('   GEOMETRY COLUMN  = '||l_tab_ust(i).geometry_column);
---         append ('');
---       END LOOP;
---     END IF;
---
---     append ('');
---     append ('');
---     append ('  ================================================');
---     IF  b_use_surkey
---     THEN
---       append ('  System is using Surrogate Key option (SDOSURKEY)');
---       append ('  ================================================');
---
---       IF b_objectid_missing
---       THEN
---         append ('');
---         append ('   Surrogate Key Column (OBJECTID) is MISSING from ');
---         append ('    '||l_base_table_nth.nth_Feature_table);
---       ELSE
---         append ('');
---         append ('   Surrogate Key Column (OBJECTID) exists on ');
---         append ('    '||l_base_table_nth.nth_Feature_table);
---       END IF;
---
---       IF b_objectid_uk_missing
---       THEN
---         append ('');
---         append ('   Unique Index on Column (OBJECTID) is MISSING');
---       ELSE
---         append ('');
---         append ('   Unique Index on Column (OBJECTID) exists');
---       END IF;
---
---     ELSE
---       append ('  System is NOT using Surrogate Key option (SDOSURKEY)');
---       append ('  ================================================');
---     END IF;
---
---     Nm_Debug.DEBUG(l_tab_output(1).p_output);
---     l_tab_output(1).p_output := l_var_output;
---     po_results               := l_tab_output;
---
---   EXCEPTION
---     WHEN e_not_sdo_theme
---       THEN RAISE_APPLICATION_ERROR
---              (-20101, 'Theme '||l_rec_nth.nth_theme_name
---                               ||' is not an SDO theme');
---     WHEN e_no_feature_table
---       THEN RAISE_APPLICATION_ERROR
---              (-20102, 'Theme must have a feature table');
---     WHEN e_no_feature_shape_col
---       THEN RAISE_APPLICATION_ERROR
---              (-20103, 'Theme must have a feature shape column');
---     WHEN e_feature_table_no_exist
---       THEN RAISE_APPLICATION_ERROR
---              (-20104, 'Feature table '||l_rec_nth.nth_feature_table
---                                       ||' does not exist');
---     WHEN e_feature_shp_col_no_exist
---       THEN RAISE_APPLICATION_ERROR
---              (-20105, 'Feature shape column '||l_rec_nth.nth_feature_shape_column
---                                              ||' does not exist');
---     WHEN OTHERS
---       THEN RAISE;
---   END validate_theme;
---
------------------------------------------------------------------------------
---
-   PROCEDURE create_msv_themes
-   AS
-      l_rec_nth    NM_THEMES_ALL%ROWTYPE;
-      l_rec_nthr   NM_THEME_ROLES%ROWTYPE;
-
-      FUNCTION get_pk_column (pi_table_name IN VARCHAR2)
-         RETURN VARCHAR2
-      IS
-         l_col   VARCHAR2 (30);
-      BEGIN
-         SELECT ucc.column_name
-           INTO l_col
-           FROM user_constraints uco, user_cons_columns ucc
-          WHERE uco.owner = USER
-            AND ucc.owner = USER
-            AND uco.table_name = pi_table_name
-            AND uco.constraint_type = 'P'
-            AND uco.constraint_name = ucc.constraint_name
-            AND uco.table_name = ucc.table_name;
-
-         RETURN l_col;
-      EXCEPTION
-         WHEN OTHERS
-         THEN
-            -- couldn't find a column
---            Nm_Debug.DEBUG ('Couldnt derive PK column for ' || pi_table_name);
-            RETURN 'UNKNOWN';
-      END get_pk_column;
---
-   BEGIN
---
---  Nm_Debug.debug_on;
---
-      FOR i IN (SELECT *
-                  FROM user_sdo_themes
-                 WHERE NOT EXISTS (
-                          SELECT 1
-                            FROM NM_THEMES_ALL
-                           WHERE nth_theme_name = NAME
-                             AND nth_theme_type = 'SDO'))
-      LOOP
-         BEGIN
-            l_rec_nth.nth_theme_id := Nm3seq.next_nth_theme_id_seq;
-            l_rec_nth.nth_theme_name := i.NAME;
-            l_rec_nth.nth_table_name := i.BASE_TABLE;
-            l_rec_nth.nth_pk_column := get_pk_column (i.BASE_TABLE);
-            l_rec_nth.nth_label_column := l_rec_nth.nth_pk_column;
-            l_rec_nth.nth_hpr_product := Nm3type.c_net;
-            l_rec_nth.nth_location_updatable := 'N';
-            l_rec_nth.nth_dependency := 'I';
-            l_rec_nth.nth_storage := 'S';
-            l_rec_nth.nth_update_on_edit := 'N';
-            l_rec_nth.nth_use_history := 'N';
-            l_rec_nth.nth_snap_to_theme := 'N';
-            l_rec_nth.nth_lref_mandatory := 'N';
-            l_rec_nth.nth_tolerance := 10;
-            l_rec_nth.nth_tol_units := 1;
-            l_rec_nth.nth_theme_type := 'SDO';
-            l_rec_nth.nth_feature_table := i.BASE_TABLE;
-            l_rec_nth.nth_feature_shape_column := i.geometry_column;
-            l_rec_nth.nth_feature_pk_column := l_rec_nth.nth_pk_column;
-            Nm3ins.ins_nth (l_rec_nth);
---            Nm_Debug.DEBUG ('Created theme ' || i.NAME);
-            l_rec_nthr.nthr_theme_id := l_rec_nth.nth_theme_id;
-            l_rec_nthr.nthr_role := 'HIG_USER';
-            l_rec_nthr.nthr_mode := 'NORMAL';
-            Nm3ins.ins_nthr (l_rec_nthr);
---            Nm_Debug.DEBUG ('Created theme role ' || i.NAME);
-         EXCEPTION
-            WHEN OTHERS
-            THEN
-               Nm_Debug.DEBUG (   'Unable to create theme for '
-                               || i.NAME
-                               || ' - '
-                               || SQLERRM
-                              );
-         END;
-      END LOOP;
-
-      --
---      Nm_Debug.debug_off;
-   --
-   END create_msv_themes;
-
+End Create_Msv_Themes;
 --
 ------------------------------------------------------------------------------
 --
-PROCEDURE create_msv_feature_views
-               ( pi_username  IN   hig_users.hus_username%TYPE DEFAULT NULL)
---
--- View created for subordinate users that need access to the Highways owner
--- SDO layers when using Mapviewer
---
--- This is due to Mapviewer requiring the object to exist as a view, rather
--- than access it via via synonyms
---
--- USER_SDO_GEOM_METADATA still needs to exist for each subordinate user
---
-   AS
---
-      l_higowner       VARCHAR2 (30)         := Sys_Context('NM3CORE','APPLICATION_OWNER');
-      l_tab_username   Nm3type.tab_varchar30;
-      l_tab_ftabs      Nm3type.tab_varchar30;
-      l_nl             VARCHAR2 (10)         := CHR (10);
---
-      FUNCTION is_priv_view (
-         pi_view_name   IN   dba_views.view_name%TYPE,
-         pi_owner      IN   dba_views.owner%TYPE
-      )
-         RETURN BOOLEAN
-      IS
-         l_var   VARCHAR2 (10);
-      --
-      BEGIN
-         --
-         SELECT 'exists'
-           INTO l_var
-           FROM dba_views
-          WHERE view_name = pi_view_name AND owner = pi_owner;
-         --
-         RETURN TRUE;
-      --
-      EXCEPTION
-         WHEN OTHERS THEN RETURN FALSE;
-      --
-      END is_priv_view;
---
-   BEGIN
---
---  Nm_Debug.debug_on;
-  -- Collect subordinate users (that actually exist)
-      BEGIN
-         SELECT hus_username
-         BULK COLLECT INTO l_tab_username
-           FROM HIG_USERS
-          WHERE hus_is_hig_owner_flag = 'N'
-            AND EXISTS (SELECT 1
-                          FROM dba_users
-                         WHERE username = hus_username
-                           AND NVL(pi_username,'^$^') = NVL(hus_username,'^$^'));
-      EXCEPTION
-         WHEN OTHERS THEN NULL;
-      END;
+Procedure Create_Msv_Feature_Views  (
+                                    pi_Username  In   Hig_Users.Hus_Username%Type Default Null
+                                    )
+  --
+  -- View created for subordinate users that need access to the Highways owner
+  -- SDO layers when using Mapviewer
+  --
+  -- This is due to Mapviewer requiring the object to exist as a view, rather
+  -- than access it via via synonyms
+  --
+  -- USER_SDO_GEOM_METADATA still needs to exist for each subordinate user
+  --
+As
+  l_Higowner       Varchar2 (30)         := Sys_Context('NM3CORE','APPLICATION_OWNER');
+  l_Tab_Username   Nm3Type.Tab_Varchar30;
+  l_Tab_Ftabs      Nm3Type.Tab_Varchar30;
+  l_Nl             Varchar2 (10)         := Chr (10);
+  --
+  Function Is_Priv_View (
+                        pi_View_Name    In   Dba_Views.View_Name%Type,
+                        pi_Owner        In   Dba_Views.Owner%Type
+                        ) Return Boolean
+  Is
+     l_Var    Varchar2 (10);
+     l_Retval Boolean;
 
---
+  Begin
+    Begin
+      Select  Null
+      Into    l_Var
+      From    Dba_Views dv
+      Where   dv.View_Name   =   pi_View_Name
+      And     dv.Owner       =   pi_Owner;
+
+      l_Retval :=True;
+
+    Exception
+      When No_Data_Found Then
+        l_Retval:= False;
+    End;
+
+    Return (l_Retval);
+
+  End Is_Priv_View;
+
+Begin
+  -- Collect subordinate users (that actually exist)
+  Begin
+    Select        hu.Hus_Username
+    Bulk Collect 
+    Into          l_Tab_Username
+    From          Hig_Users   hu
+    Where         hu.Hus_Is_Hig_Owner_Flag  =   'N'
+    And           Exists                    (   Select  Null
+                                                From    Dba_Users du
+                                                Where   du.Username             =   hu.Hus_Username
+                                                And     Nvl(pi_Username,'^$^')  =   Nvl(hu.Hus_Username,'^$^'));
+  Exception
+    When No_Data_Found Then
+      Null;
+  End;
+
+  --
   -- Find which feature tables we need to create views for
   -- We only need views for feature tables that contain SRIDS
 
   -- not longer the case - will create views for all feature tables
   --
-      BEGIN
-        SELECT nth_feature_table
-          BULK COLLECT INTO l_tab_ftabs
-          FROM nm_themes_all
-         WHERE nth_theme_type = 'SDO'
-           AND EXISTS
-           (SELECT 1 FROM user_sdo_geom_metadata
-             WHERE table_name = nth_feature_table);
-      EXCEPTION
-         WHEN OTHERS THEN NULL;
-      END;
+  Begin
+    Select        nta.Nth_Feature_Table
+    Bulk Collect
+    Into          l_Tab_Ftabs
+    From          Nm_Themes_All   nta
+    Where         nta.Nth_Theme_Type  =   'SDO'
+    And           Exists              (   Select  Null
+                                          From    User_Sdo_Geom_Metadata  usgm
+                                          Where   usgm.Table_Name   =   nta.Nth_Feature_Table
+                                      );
+  Exception
+     When No_Data_Found Then
+      Null;
+  End;
+  
+  If      l_Tab_Username.Count  > 0
+      And l_Tab_Ftabs.Count     > 0 Then
+    
+    -- Create views for subordiate user(s)
+    
+    For i In 1 .. l_Tab_Username.Count
+    Loop
+      For t In 1 .. l_Tab_Ftabs.Count
+      Loop
+        If Is_Priv_View (l_Tab_Ftabs (t), l_Tab_Username (i)) Then
+          Begin
+            Execute Immediate    'DROP VIEW '
+                              || l_Tab_Username (i)
+                              || '.'
+                              || l_Tab_Ftabs (t);
+          Exception
+             When Others Then
+              Null;
+          End;
+        End If;
+
+        Begin
+          Execute Immediate ('CREATE OR REPLACE SYNONYM '|| l_Tab_Username(i)||'.'||l_Tab_Ftabs (t) || 
+                             ' FOR ' || Sys_Context('NM3CORE','APPLICATION_OWNER') || '.' || l_Tab_Ftabs (t));
+        Exception
+           When Others  Then
+            Null;
+        End;
+      End Loop;
+    End Loop;
+  End If;
 --
-      IF l_tab_username.COUNT > 0
-      AND l_tab_ftabs.COUNT > 0
-      THEN
-  -- Create views for subordiate user(s)
-        FOR i IN 1 .. l_tab_username.COUNT
-        LOOP
-          FOR t IN 1 .. l_tab_ftabs.COUNT
-          LOOP
-            IF is_priv_view (l_tab_ftabs (t), l_tab_username (i))
-            THEN
-              BEGIN
-
-                EXECUTE IMMEDIATE    'DROP VIEW '
-                                  || l_tab_username (i)
-                                  || '.'
-                                  || l_tab_ftabs (t);
-              EXCEPTION
-                 WHEN OTHERS THEN NULL;
-              END;
-            END IF;
-
-            BEGIN
-              EXECUTE IMMEDIATE ('CREATE OR REPLACE SYNONYM '||l_tab_username(i)||'.'||l_tab_ftabs (t) || 
-                                 ' FOR ' || Sys_Context('NM3CORE','APPLICATION_OWNER') || '.' || l_tab_ftabs (t));
-              /*EXECUTE IMMEDIATE 'CREATE OR REPLACE FORCE VIEW '
-                                || l_tab_username (i)
-                                || '.'
-                                || l_tab_ftabs (t)
-                                || l_nl
-                                || 'AS'
-                                || l_nl
-                                || '  SELECT * FROM '
-                                || l_higowner
-                                || '.'
-                                || l_tab_ftabs (t);*/
-
-            EXCEPTION
-               WHEN OTHERS
-               THEN NULL;
-            END;
-          END LOOP;
-        END LOOP;
-      END IF;
---
-   EXCEPTION
-      WHEN OTHERS
-      THEN
-         NULL;
-   END create_msv_feature_views;
-
+Exception
+  When Others Then
+     Null;
+End Create_Msv_Feature_Views;
 --
 -----------------------------------------------------------------------------
 --
 -- Refreshes user_sdo_geom_metadata for a given subordinate user
 --
-   PROCEDURE refresh_usgm (
-      pi_sub_username    IN   HIG_USERS.hus_username%TYPE,
-      pi_role_restrict   IN   BOOLEAN DEFAULT TRUE
-   )
-   IS
-      TYPE tab_usgm IS TABLE OF user_sdo_geom_metadata%ROWTYPE
-         INDEX BY BINARY_INTEGER;
+Procedure Refresh_Usgm  (
+                        pi_Sub_Username    In   Hig_Users.Hus_Username%Type,
+                        pi_Role_Restrict   In   Boolean Default True
+                        )
+Is
+  Type Tab_Usgm Is Table Of User_Sdo_Geom_Metadata%Rowtype  Index By Binary_Integer;
 
-      l_tab_usgm   tab_usgm;
-      l_sql        Nm3type.max_varchar2;
-      nl           VARCHAR2 (10)        := CHR (10);
-      e_no_data    EXCEPTION;
-   --
-   BEGIN
-      --
---      l_sql :=
---            'SELECT table_name, column_name, diminfo, srid '|| nl
---         || '  FROM all_sdo_geom_metadata '|| nl
---         || ' WHERE owner = Sys_Context(''NM3CORE'',''APPLICATION_OWNER'') ';
---      --
---      IF pi_role_restrict
---      THEN
---         l_sql :=
---               l_sql
---            || nl
---            || '    AND EXISTS '|| nl
---            || '    (SELECT 1 ' || nl
---            || '       FROM gis_themes ' || nl
---            || '      WHERE gt_feature_table = table_name)';
---      END IF;
+  l_Tab_Usgm   Tab_Usgm;
+  l_Sql        Nm3Type.Max_Varchar2;
+  Nl           Varchar2 (10)        := Chr (10);
 
---      --
---      BEGIN
---         EXECUTE IMMEDIATE l_sql
---         BULK COLLECT INTO l_tab_usgm;
---      EXCEPTION
---         WHEN NO_DATA_FOUND
---         THEN
---            RAISE e_no_data;
---      END;
+Begin
+  l_Sql :=  'INSERT INTO mdsys.sdo_geom_metadata_table '||Nl||
+            '(sdo_owner, sdo_table_name, '||Nl||
+            ' sdo_column_name, sdo_diminfo, '||Nl||
+            ' sdo_srid ) '||Nl||
+            'SELECT '''||Pi_Sub_Username||''', sdo_table_name, sdo_column_name, sdo_diminfo, sdo_srid '||Nl||
+            '  FROM mdsys.sdo_geom_metadata_table a'||Nl||
+            ' WHERE sdo_owner = Sys_Context(''NM3CORE'',''APPLICATION_OWNER'') '||Nl||
+            '   AND NOT EXISTS '||Nl||
+            '     (SELECT 1 FROM mdsys.sdo_geom_metadata_table b '||Nl||
+            '       WHERE '''||Pi_Sub_Username||'''  = b.sdo_owner '||Nl||
+            '         AND a.sdo_table_name  = b.sdo_table_name '||Nl||
+            '         AND a.sdo_column_name = b.sdo_column_name ) ';
+  
+  If Pi_Role_Restrict Then
+    l_Sql :=  l_Sql
+          || Nl
+          || 'AND EXISTS '|| Nl
+          || ' (SELECT 1 ' || Nl
+          || '    FROM gis_themes ' || Nl
+          || '   WHERE gt_feature_table = sdo_table_name)';
+  End If;
 
---      --
---      FOR i IN 1 .. l_tab_usgm.COUNT
---      LOOP
---         BEGIN
---            INSERT INTO mdsys.sdo_geom_metadata_table
---                        (sdo_owner, sdo_table_name,
---                         sdo_column_name, sdo_diminfo,
---                         sdo_srid
---                        )
---                 VALUES (pi_sub_username, l_tab_usgm (i).table_name,
---                         l_tab_usgm (i).column_name, l_tab_usgm (i).diminfo,
---                         l_tab_usgm (i).srid
---                        );
---         EXCEPTION
---            WHEN OTHERS
---            THEN
---               Nm_Debug.DEBUG (SQLERRM);
---         END;
---      END LOOP;
-   --
-     -- MJA 24-Sep_2007: using In causing bind errors
-     l_sql :=
-        'INSERT INTO mdsys.sdo_geom_metadata_table '||nl||
-        '(sdo_owner, sdo_table_name, '||nl||
-        ' sdo_column_name, sdo_diminfo, '||nl||
-        ' sdo_srid ) '||nl||
-        'SELECT '''||pi_sub_username||''', sdo_table_name, sdo_column_name, sdo_diminfo, sdo_srid '||nl||
-        '  FROM mdsys.sdo_geom_metadata_table a'||nl||
-        ' WHERE sdo_owner = Sys_Context(''NM3CORE'',''APPLICATION_OWNER'') '||nl||
-        '   AND NOT EXISTS '||nl||
-        '     (SELECT 1 FROM mdsys.sdo_geom_metadata_table b '||nl||
-        '       WHERE '''||pi_sub_username||'''  = b.sdo_owner '||nl||
-        '         AND a.sdo_table_name  = b.sdo_table_name '||nl||
-        '         AND a.sdo_column_name = b.sdo_column_name ) ';
-       -- MJA 24-Sep_2007: using In causing bind errors
-       /*'INSERT INTO mdsys.sdo_geom_metadata_table '||nl||
-        '(sdo_owner, sdo_table_name, '||nl||
-        ' sdo_column_name, sdo_diminfo, '||nl||
-        ' sdo_srid ) '||nl||
-        'SELECT :pi_sub_username, sdo_table_name, sdo_column_name, sdo_diminfo, sdo_srid '||nl||
-        '  FROM mdsys.sdo_geom_metadata_table a'||nl||
-        ' WHERE sdo_owner = Sys_Context(''NM3CORE'',''APPLICATION_OWNER'') '||nl||
-        '   AND NOT EXISTS '||nl||
-        '     (SELECT 1 FROM mdsys.sdo_geom_metadata_table b '||nl||
-        '       WHERE :pi_sub_username  = b.sdo_owner '||nl||
-        '         AND a.sdo_table_name  = b.sdo_table_name '||nl||
-        '         AND a.sdo_column_name = b.sdo_column_name ) ';*/
-   --
-      IF pi_role_restrict
-      THEN
-         l_sql :=
-               l_sql
-            || nl
-            || 'AND EXISTS '|| nl
-            || ' (SELECT 1 ' || nl
-            || '    FROM gis_themes ' || nl
-            || '   WHERE gt_feature_table = sdo_table_name)';
-      END IF;
-   --
---     nm_debug.debug_on;
---     nm_debug.debug(l_sql);
-   --
-     -- MJA 24-Sep_2007: using In causing bind errors
-     EXECUTE IMMEDIATE l_sql; -- USING IN pi_sub_username;
-     --EXECUTE IMMEDIATE l_sql USING IN pi_sub_username;
-   --
-   EXCEPTION
-      WHEN e_no_data
-      THEN
-         Hig.raise_ner (pi_appl         => Nm3type.c_hig,
-                        pi_id           => 279,
-                        pi_sqlcode      => -20001
-                       );
---       raise_application_error (-20101, 'No USGM data to process!');
-      WHEN OTHERS
-      THEN
-         RAISE;
-   END refresh_usgm;
+ Execute Immediate l_Sql;
+
+Exception
+  When No_Data_Found  Then
+     Hig.Raise_Ner (Pi_Appl         => Nm3Type.C_Hig,
+                    Pi_Id           => 279,
+                    Pi_Sqlcode      => -20001
+                   );
+ 
+End Refresh_Usgm;
 --
 --
 -----------------------------------------------------------------------------
 --
-PROCEDURE get_datum_xy_from_measure (
-      p_ne_id     IN       NUMBER,
-      p_measure   IN       NUMBER,
-      p_x         OUT      NUMBER,
-      p_y         OUT      NUMBER
-   )
-   IS
-BEGIN
-  Nm3sdo.get_datum_xy_from_measure( p_ne_id, p_measure, p_x, p_y );
-END;
+Procedure Get_Datum_Xy_From_Measure (
+                                    p_Ne_Id     In        Number,
+                                    p_Measure   In        Number,
+                                    p_X             Out   Number,
+                                    p_Y             Out   Number
+                                    )
+Is
+Begin
+  Nm3Sdo.Get_Datum_Xy_From_Measure( p_Ne_Id, p_Measure, p_X, p_Y );
+End Get_Datum_Xy_From_Measure;
 -----------------------------------------------------------------------------
 --
+Procedure Create_Theme_Xy_View  (
+                                p_Theme_Id  In  Number
+                                )
+Is
+  l_Th       Nm_Themes_All%Rowtype;
+  l_Vw       Varchar2(34);
+  l_Ddl_Text Varchar2(2000);
+Begin
+  l_Th := Nm3Get.Get_Nth( p_Theme_Id );
+  
+  If Substr(l_Th.Nth_Feature_Table, 1 ) = 'V' Then
+    l_Vw := l_Th.Nth_Feature_Table||'_XY';
+  Else
+    l_Vw := 'V_NM_'||l_Th.Nth_Feature_Table||'_XY';
+  End If;
 
-PROCEDURE create_theme_xy_view ( p_theme_id IN NUMBER ) IS
-l_th       NM_THEMES_ALL%ROWTYPE;
-l_vw       VARCHAR2(34);
-l_ddl_text VARCHAR2(2000);
-BEGIN
-  l_th := Nm3get.get_nth( p_theme_id );
-  IF SUBSTR(l_th.nth_feature_table, 1 ) = 'V' THEN
-    l_vw := l_th.nth_feature_table||'_XY';
-  ELSE
-    l_vw := 'V_NM_'||l_th.nth_feature_table||'_XY';
-  END IF;
+  l_Vw := Substr( l_Vw, 1, 30);
 
-  l_vw := SUBSTR( l_vw, 1, 30);
+  l_Ddl_Text := 'create or replace view '||l_Vw||' as select t.*, v.x, v.y, v.z '||
+                ' from '||l_Th.Nth_Feature_Table||' t, table ( sdo_util.getvertices( t.'||l_Th.Nth_Feature_Shape_Column||' ) ) v ';
 
-  l_ddl_text := 'create or replace view '||l_vw||' as select t.*, v.x, v.y, v.z '||
-                ' from '||l_th.nth_feature_table||' t, table ( sdo_util.getvertices( t.'||l_th.nth_feature_shape_column||' ) ) v ';
-
---  Nm3ddl.create_object_and_syns(l_vw, l_ddl_text );
-
-  -- AE 23-SEP-2008
-  -- We will now use views instead of synonyms to provide subordinate user access
-  -- to spatial objects
-  --nm3ddl.create_object_and_views (l_vw, l_ddl_text);
-  -- CWS 0108742 Change back to using synonyms
-  Nm3ddl.create_object_and_syns( l_vw, l_ddl_text );
-
-
-END;
+  Nm3Ddl.Create_Object_And_Syns( l_Vw, l_Ddl_Text );
+End Create_Theme_Xy_View;
 --
 -----------------------------------------------------------------------------
 --
-  PROCEDURE drop_layers_by_node_type
-            ( pi_node_type         IN NM_NODE_TYPES.nnt_type%TYPE )
-  IS
-    l_view_name    user_views.view_name%TYPE;
-    l_nth_theme_id NM_THEMES_ALL.nth_theme_id%TYPE;
-    l_column_name  user_tab_columns.column_name%TYPE := 'GEOLOC';
-    l_rec_nth      NM_THEMES_ALL%ROWTYPE;
-    l_sql          Nm3type.max_varchar2;
-    lf             VARCHAR2(4)  := CHR(10);
-  BEGIN
-  --
-    Nm_Debug.proc_start(g_package_name,'drop_layers_by_node_type');
-  --
-    l_view_name     := get_node_table(pi_node_type);
-    l_nth_theme_id  := get_theme_from_feature_table(l_view_name);
-    IF l_nth_theme_id IS NULL
-    THEN
-      -- If no theme exists by feature table (i.e. V_NM_NO_ROAD_<>) then
-      -- try and derive by theme name.
-      -- These might be old node layers (pre 3211) where feature table
-      -- was set to nm_point_locations.
-      l_nth_theme_id := Nm3get.get_nth
-                          (pi_nth_theme_name  => 'NODE_'||pi_node_type
-                          ,pi_raise_not_found => FALSE).nth_theme_id;
-    END IF;
-  --
-    IF l_nth_theme_id IS NOT NULL
-    THEN
-      -- Theme exists, so use it
-      l_rec_nth := Nm3get.get_nth (l_nth_theme_id);
-      IF l_rec_nth.nth_feature_table = 'NM_POINT_LOCATIONS'
-      THEN
-        Drop_Layer
-          ( p_nth_id             => l_rec_nth.nth_theme_id
-          , p_keep_theme_data    => 'N'
-          , p_keep_feature_table => 'Y' );
-      ELSE
-        Drop_Layer
-          ( p_nth_id             => l_nth_theme_id);
-      END IF;
-    ELSE
-      -- No theme, so attempt to clear up
-      Nm3sdo.drop_metadata(l_view_name);
+Procedure Drop_Layers_By_Node_Type  (
+                                    pi_Node_Type         In Nm_Node_Types.Nnt_Type%Type
+                                    )
+Is
+  l_View_Name    User_Views.View_Name%Type;
+  l_Nth_Theme_Id Nm_Themes_All.Nth_Theme_Id%Type;
+  l_Column_Name  User_Tab_Columns.Column_Name%Type := 'GEOLOC';
+  l_Rec_Nth      Nm_Themes_All%Rowtype;
+  l_Sql          Nm3Type.Max_Varchar2;
+  lf             Varchar2(4)  := Chr(10);
+Begin
+  Nm_Debug.Proc_Start(G_Package_Name,'drop_layers_by_node_type');
 
-      BEGIN
-        Nm3sdo.drop_sub_layer_by_table(l_view_name,'GEOLOC');
-      EXCEPTION WHEN OTHERS THEN NULL;
-      END;
+  l_View_Name     := Get_Node_Table(pi_Node_Type);
+  l_Nth_Theme_Id  := Get_Theme_From_Feature_Table(l_View_Name);
+    
+  If l_Nth_Theme_Id Is Null Then
+    -- If no theme exists by feature table (i.e. V_NM_NO_ROAD_<>) then
+    -- try and derive by theme name.
+    -- These might be old node layers (pre 3211) where feature table
+    -- was set to nm_point_locations.
+    l_Nth_Theme_Id := Nm3Get.Get_Nth  (
+                                      pi_Nth_Theme_Name  => 'NODE_'||pi_Node_Type,
+                                      pi_Raise_Not_Found => False
+                                      ).Nth_Theme_Id;
+  End If;
 
-      drop_object(l_view_name);
+  If l_Nth_Theme_Id Is Not Null Then
+    -- Theme exists, so use it
+    l_Rec_Nth := Nm3Get.Get_Nth (l_Nth_Theme_Id);
+      
+    If L_Rec_Nth.Nth_Feature_Table = 'NM_POINT_LOCATIONS' Then
+      Drop_Layer  (
+                  p_Nth_Id             => l_Rec_Nth.Nth_Theme_Id,
+                  p_Keep_Theme_Data    => 'N',
+                  p_Keep_Feature_Table => 'Y'
+                  );
+    Else
+      Drop_Layer  (
+                  p_Nth_Id             => l_Nth_Theme_Id
+                  );
+    End If;
+  Else
+    -- No theme, so attempt to clear up
+    Nm3Sdo.Drop_Metadata(l_View_Name);
 
-      DECLARE
-        no_public_syn_exists EXCEPTION;
-        PRAGMA EXCEPTION_INIT ( no_public_syn_exists, -20304 );
-        no_private_syn_exists EXCEPTION;
-        PRAGMA EXCEPTION_INIT ( no_private_syn_exists, -1434 );
-      BEGIN
---        Nm3ddl.drop_synonym_for_object(l_view_name);
+    Begin
+      Nm3Sdo.Drop_Sub_Layer_By_Table(l_View_Name,'GEOLOC');
 
-        -- AE 23-SEP-2008
-        -- Drop views instead of synonyms
-        Nm3ddl.drop_views_for_object (l_view_name);
-      EXCEPTION
-        WHEN no_public_syn_exists THEN
-          NULL; -- we don't care - as long as it does not exist now.
-        WHEN no_private_syn_exists THEN
-          NULL; -- we don't care - as long as it does not exist now.
-        WHEN OTHERS THEN
-          RAISE;
-      END;
+    Exception 
+      When Others Then
+        Null;
+    End;
 
-      BEGIN
-        EXECUTE IMMEDIATE
-          'BEGIN '||CHR(10)||
-          '  Nm3sde.drop_layer_by_table(l_view_name, '||Nm3flx.string('GEOLOC')||');'||CHR(10)||
-          'END';
-      EXCEPTION
-        WHEN OTHERS THEN NULL;
-      END;
-    --
-    END IF;
-  --
-    Nm_Debug.proc_end(g_package_name,'drop_layers_by_node_type');
-  --
-  END drop_layers_by_node_type;
+    Drop_Object(l_View_Name);
+
+    Declare
+      No_Public_Syn_Exists Exception;
+      Pragma Exception_Init ( No_Public_Syn_Exists, -20304 );
+        
+      No_Private_Syn_Exists Exception;
+      Pragma Exception_Init ( No_Private_Syn_Exists, -1434 );
+        
+    Begin
+      -- AE 23-SEP-2008
+      -- Drop views instead of synonyms
+      Nm3Ddl.Drop_Views_For_Object (l_View_Name);
+    Exception
+      When No_Public_Syn_Exists Then
+        Null; -- we don't care - as long as it does not exist now.
+          
+      When No_Private_Syn_Exists Then
+        Null; -- we don't care - as long as it does not exist now.
+    End;
+
+    Begin
+      Execute Immediate
+        'BEGIN '||Chr(10)||
+        '  Nm3sde.drop_layer_by_table(l_view_name, '||Nm3Flx.String('GEOLOC')||');'||Chr(10)||
+        'END';
+    Exception
+      When Others Then
+        Null;
+    End;
+  End If;
+
+  Nm_Debug.Proc_End(G_Package_Name,'drop_layers_by_node_type');
+--
+End Drop_Layers_By_Node_Type;
 --
 -----------------------------------------------------------------------------
 --
-  PROCEDURE refresh_node_layers
-  IS
-    l_int           INTEGER;
-    l_rec_nth       NM_THEMES_ALL%ROWTYPE;
-    l_rec_npl_nth   NM_THEMES_ALL%ROWTYPE;
-    l_theme_id      NM_THEMES_ALL.nth_theme_id%TYPE;
-  BEGIN
-  --
+Procedure Refresh_Node_Layers
+Is
+  l_Int           Integer;
+  l_Rec_Nth       Nm_Themes_All%Rowtype;
+  l_Rec_Npl_Nth   Nm_Themes_All%Rowtype;
+  l_Theme_Id      Nm_Themes_All.Nth_Theme_Id%Type;
+Begin
   -- Test for nm_point_locations theme
-    l_theme_id := get_theme_from_feature_table ('NM_POINT_LOCATIONS'
-                                              , 'NM_POINT_LOCATIONS' );
-  --
-    IF l_theme_id IS NULL
-    THEN
-      register_npl_theme;
-    END IF;
-  --
-    FOR i IN
-      (SELECT * FROM NM_NODE_TYPES)
-      LOOP
-        drop_layers_by_node_type (i.nnt_type);
-        l_int := create_node_metadata (i.nnt_type);
-    END LOOP;
-  --
-  END refresh_node_layers;
+  l_Theme_Id := Get_Theme_From_Feature_Table  (
+                                              'NM_POINT_LOCATIONS',
+                                              'NM_POINT_LOCATIONS'
+                                              );
+  If l_Theme_Id Is Null Then
+    Register_Npl_Theme;
+  End If;
+
+  For i In  (
+            Select  *
+            From    Nm_Node_Types
+            )
+  Loop
+    Drop_Layers_By_Node_Type (i.Nnt_Type);
+    l_Int := Create_Node_Metadata (i.Nnt_Type);
+  End Loop;
+--
+End Refresh_Node_Layers;
 --
 -----------------------------------------------------------------------------
 --
-  FUNCTION get_global_unit_factor RETURN NUMBER IS
-  BEGIN
-    RETURN g_unit_conv;
-  END;
-
+Function Get_Global_Unit_Factor Return Number Is
+Begin
+  Return G_Unit_Conv;
+End Get_Global_Unit_Factor;
 --
 ------------------------------------------------------------------------------
 -- AE Added new procedure to maintain visable themes
 -- very basic version to start with, it doesn't deal with it on a user basis,
 -- so changes affect all users
 --
-  PROCEDURE maintain_ntv
-             ( pi_theme_id IN nm_themes_all.nth_theme_id%TYPE
-             , pi_mode     IN VARCHAR2)
-  IS
-    l_default_vis VARCHAR2(1) := nvl(hig.get_user_or_sys_opt('DEFVISNTH'),'N');
-  BEGIN
-  --
-    IF pi_mode = 'INSERTING'
-    THEN
-    --
-      INSERT INTO nm_themes_visible (ntv_nth_theme_id,ntv_visible)
-      VALUES (pi_theme_id, l_default_vis);
-    --
-    -- Delete maintained via FK
---    ELSIF pi_mode = 'DELETING'
---    THEN
---    --
---      DELETE nm_themes_visible
---      WHERE ntv_nth_theme_id = pi_theme_id;
-    END IF;
-  --
-  END maintain_ntv;
+Procedure Maintain_Ntv  (
+                        pi_Theme_Id In Nm_Themes_All.Nth_Theme_Id%Type,
+                        pi_Mode     In Varchar2
+                        )
+Is
+  l_Default_Vis Varchar2(1) := Nvl(Hig.Get_User_Or_Sys_Opt('DEFVISNTH'),'N');
+Begin
+  If pi_Mode = 'INSERTING'  Then
+
+    Insert Into Nm_Themes_Visible
+    (
+    Ntv_Nth_Theme_Id,
+    Ntv_Visible
+    )
+    Values
+    (
+    pi_Theme_Id,
+    l_Default_Vis
+    );
+  End If;
+
+End Maintain_Ntv;
 --
 ------------------------------------------------------------------------------
 --
-  PROCEDURE set_theme_srid_ctx( pi_theme_id IN nm_themes_all.nth_theme_id%TYPE)
-  IS
-  l_srid                VARCHAR2 (10);
-  l_sdo                 user_sdo_geom_metadata%ROWTYPE;
+Procedure Set_Theme_Srid_Ctx  (
+                              pi_Theme_Id In Nm_Themes_All.Nth_Theme_Id%Type
+                              )
+Is
+  l_Srid                Varchar2 (10);
+  l_Sdo                 User_Sdo_Geom_Metadata%Rowtype;
   --
-  BEGIN
-    IF sys_context('NM3CORE', 'THEME'|| pi_theme_id ||'SRID') IS NULL
-    THEN 
-      l_sdo := Nm3sdo.get_theme_metadata (pi_theme_id);
-      l_srid := NVL (TO_CHAR (l_sdo.srid), 'NULL');
-    --
-      nm3ctx.set_core_context  (p_Attribute   => 'THEME'|| pi_theme_id || 'SRID'
-                               ,p_Value       => l_srid
-                               );
-    END IF;
-  END;
+Begin
+  If Sys_Context('NM3CORE', 'THEME'|| pi_Theme_Id ||'SRID') Is Null Then 
+    l_Sdo := Nm3Sdo.Get_Theme_Metadata (pi_Theme_Id);
+    l_Srid := Nvl (To_Char (l_Sdo.Srid), 'NULL');
+
+    Nm3Ctx.Set_Core_Context (
+                            p_Attribute   => 'THEME'|| pi_Theme_Id || 'SRID',
+                            p_Value       => l_Srid
+                            );
+  End If;
+End Set_Theme_Srid_Ctx;
 --
 ------------------------------------------------------------------------------
 --
-END Nm3sdm;
+Function Build_Inv_Sdo_Join_View Return User_Views.View_Name%Type
+Is
+
+  l_View_Tab    t_View_Tab;
+
+Begin
+  Nm_Debug.Debug('Nm3Sdm.Build_Inv_Sdo_Join_View - Called');
+    
+  Select        View_Name,
+                View_Text,
+                View_Comments 
+  Bulk Collect    
+  Into          l_View_Tab
+  From          V_Nm_Rebuild_All_Inv_Sdo_Join;
+    
+  For x In  1 .. l_View_Tab.Count
+  Loop
+    Process_View_DDL (p_View_Rec=> l_View_Tab(x));                                             
+  End Loop;
+       
+  Nm_Debug.Debug('Nm3Sdm.Build_Inv_Sdo_Join_View - Finished');
+    
+  --Only return a view name if we only processed one view.
+  Return ((Case When l_View_Tab.Count = 1 Then l_View_Tab(1).View_Name Else Null End) );
+    
+End Build_Inv_Sdo_Join_View;
+--
+-------------------------------------------------------------------------------------------------------------------------------------
+--
+Function Create_Inv_Sdo_Join_View (
+                                  p_Feature_Table_Name  In    Varchar2
+                                  ) Return  User_Views.View_Name%Type
+Is
+  l_View_Name   User_Views.View_Name%Type; 
+Begin
+  Nm_Debug.Debug('Nm3Sdm.Create_Inv_Sdo_Join_View - Called');
+  Nm_Debug.Debug('Parameter - p_Feature_Table_Name:'              || p_Feature_Table_Name);
+
+  Nm3Ctx.Set_Context('THEME_API_FEATURE_TAB',p_Feature_Table_Name );
+   
+  l_View_Name:=Build_Inv_Sdo_Join_View;
+
+  Nm3Ctx.Set_Context('THEME_API_FEATURE_TAB',Null );
+            
+  Nm_Debug.Debug('Nm3Sdm.Create_Inv_Sdo_Join_View - Finished - Returning:');
+    
+  Return l_View_Name;
+
+End Create_Inv_Sdo_Join_View;
+--
+------------------------------------------------------------------------------
+--
+Procedure Rebuild_All_Inv_Sdo_Join_View
+Is
+  l_View_Name   User_Views.View_Name%Type;    
+Begin
+  Nm_Debug.Debug('nm3sdm.Rebuild_All_Inv_Sdo_Join_View - Called');
+    
+  --This limits the rows returned by the V_Nm_Rebuild_All_Inv_Sdo_Join view, which is used by Build_Inv_Sdo_Join_View.
+  Nm3Ctx.Set_Context('THEME_API_FEATURE_TAB','V_NM_%DT');
+    
+  l_View_Name:=Build_Inv_Sdo_Join_View;
+    
+  Nm3Ctx.Set_Context('THEME_API_FEATURE_TAB',Null );
+
+  Nm_Debug.Debug('nm3sdm.Rebuild_All_Inv_Sdo_Join_View - Finished');
+End Rebuild_All_Inv_Sdo_Join_View;
+--
+------------------------------------------------------------------------------
+--
+End Nm3Sdm;
 /
+
