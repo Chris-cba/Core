@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY nm3rsc AS
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3rsc.pkb-arc   2.5   May 17 2011 08:26:24   Steve.Cooper  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3rsc.pkb-arc   2.6   Sep 05 2011 15:17:46   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3rsc.pkb  $
---       Date into PVCS   : $Date:   May 17 2011 08:26:24  $
---       Date fetched Out : $Modtime:   Apr 01 2011 13:57:06  $
---       PVCS Version     : $Revision:   2.5  $
+--       Date into PVCS   : $Date:   Sep 05 2011 15:17:46  $
+--       Date fetched Out : $Modtime:   Sep 05 2011 15:17:04  $
+--       PVCS Version     : $Revision:   2.6  $
 --
 --   Author : R.A. Coupe
 --
@@ -19,7 +19,7 @@ CREATE OR REPLACE PACKAGE BODY nm3rsc AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(30) :='"$Revision:   2.5  $"';
+   g_body_sccsid     CONSTANT  varchar2(30) :='"$Revision:   2.6  $"';
 
 --  g_body_sccsid is the SCCS ID for the package body
 --
@@ -612,7 +612,9 @@ CURSOR c2 IS
   AND   b.nnu_node_type = DECODE( b1.nm_cardinality, 1, 'E', -1, 'S', 'E' )
   AND   a.nnu_node_type = DECODE( a1.nm_cardinality, 1, 'S', -1, 'E', 'S' )
   AND   a1.ne_id = pi_ne_id
-  order by b1.s_ne_id, nm3net.route_direction( b.nnu_no_node_id, b1.nm_cardinality ) desc;
+  AND   decode( a.nnu_node_type, 'S', a1.nm_begin_mp ,'E', a1.nm_end_mp ) = a.nnu_chain 
+  AND   decode( b.nnu_node_type, 'S', b1.nm_begin_mp ,'E', b1.nm_end_mp ) = b.nnu_chain
+  order by decode( b1.s_ne_id, -1, -1, 1) asc, nm3net.route_direction( b.nnu_no_node_id, b1.nm_cardinality ) desc;
 
 
 CURSOR c3 IS
