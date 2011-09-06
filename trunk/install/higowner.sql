@@ -1,5 +1,5 @@
 REM SCCS ID Keyword, do no remove
-define sccsid = '"$Revision::   2.15     $"';
+define sccsid = '"$Revision::   2.16     $"';
 clear screen
 -- creates the following tables
 -- HIG_USERS
@@ -393,6 +393,7 @@ DECLARE
     EXECUTE IMMEDIATE 'GRANT CREATE USER TO  ' || p_user;
     EXECUTE IMMEDIATE 'GRANT CREATE VIEW TO  ' || p_user;
     EXECUTE IMMEDIATE 'GRANT CREATE ANY VIEW TO  ' || p_user;
+    EXECUTE IMMEDIATE 'GRANT DROP ANY VIEW TO  ' || p_user;    
     EXECUTE IMMEDIATE 'GRANT DROP PUBLIC SYNONYM TO  ' || p_user;
     EXECUTE IMMEDIATE 'GRANT DROP ANY TABLE TO  ' || p_user;
     EXECUTE IMMEDIATE 'GRANT DROP USER TO  ' || p_user;
@@ -404,7 +405,6 @@ DECLARE
     EXECUTE IMMEDIATE 'GRANT SELECT ANY TABLE TO  ' || p_user;
     EXECUTE IMMEDIATE 'GRANT SELECT ANY SEQUENCE TO  ' || p_user;
     EXECUTE IMMEDIATE 'GRANT UPDATE ANY TABLE TO  ' || p_user;
-    EXECUTE IMMEDIATE 'GRANT DROP ANY TABLE TO  ' || p_user;
     EXECUTE IMMEDIATE 'GRANT CREATE ANY TYPE TO  ' || p_user;
     EXECUTE IMMEDIATE 'GRANT DROP ANY TYPE TO  ' || p_user;
     --EXECUTE IMMEDIATE 'GRANT ADMINISTER DATABASE TRIGGER TO  ' || p_user;
