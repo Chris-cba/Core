@@ -2,13 +2,13 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data7.sql-arc   2.22   Mar 25 2011 09:35:34   Mike.Alexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data7.sql-arc   2.23   Sep 09 2011 11:16:32   Mike.Alexander  $
 --       Module Name      : $Workfile:   nm3data7.sql  $
---       Date into PVCS   : $Date:   Mar 25 2011 09:35:34  $
---       Date fetched Out : $Modtime:   Mar 25 2011 09:31:52  $
---       Version          : $Revision:   2.22  $
+--       Date into PVCS   : $Date:   Sep 09 2011 11:16:32  $
+--       Date fetched Out : $Modtime:   Sep 09 2011 11:12:22  $
+--       Version          : $Revision:   2.23  $
 --       Table Owner      : NM3_METADATA
---       Generation Date  : 25-MAR-2011 09:31
+--       Generation Date  : 09-SEP-2011 11:12
 --
 --   Product metadata script
 --   As at Release 4.4.0.0
@@ -9544,7 +9544,7 @@ SELECT
         'NET'
        ,172
        ,null
-       ,'User does not have access to all asset on the element'
+       ,'User does not have access to all assets on the element'
        ,'' FROM DUAL;
 --
 DELETE FROM NM_ERRORS
@@ -14783,6 +14783,24 @@ SELECT
        ,555
        ,null
        ,'The password you have entered is invalid.'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'NET'
+  AND  NER_ID = 556;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'NET'
+       ,556
+       ,null
+       ,'Update is not possible. This inventory and network type combination has child records.'
        ,'' FROM DUAL;
 --
 --
