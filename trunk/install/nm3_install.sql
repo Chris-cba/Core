@@ -1,11 +1,11 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3_install.sql-arc   2.34   Sep 09 2011 12:14:08   Mike.Alexander  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3_install.sql-arc   2.35   Sep 09 2011 16:22:14   Mike.Alexander  $
 --       Module Name      : $Workfile:   nm3_install.sql  $
---       Date into PVCS   : $Date:   Sep 09 2011 12:14:08  $
---       Date fetched Out : $Modtime:   Sep 09 2011 12:12:00  $
---       PVCS Version     : $Revision:   2.34  $
+--       Date into PVCS   : $Date:   Sep 09 2011 16:22:14  $
+--       Date fetched Out : $Modtime:   Sep 09 2011 16:19:20  $
+--       PVCS Version     : $Revision:   2.35  $
 --
 --------------------------------------------------------------------------------
 --   Copyright (c) Exor Corporation Ltd, 2011
@@ -314,6 +314,7 @@ SET TERM ON
 prompt Set Context Values...
 SET TERM OFF
 SET DEFINE ON
+exec nm3security.set_user;
 exec nm3context.initialise_context;
 
 commit;
@@ -456,20 +457,21 @@ Exception When view_not_exist
 End;
 /
 --
+-- This is not the case any more so shouldn't need to happen
 ---------------------------------------------------------------------------------------------------
 --                        ****************   CONTEXT   *******************
 -- The compile_all will have reset the user context so we must reinitialise it
 --
-SET FEEDBACK OFF
-
-SET TERM ON
-PROMPT Reinitialising Context...
-SET TERM OFF
-BEGIN
-  nm3context.initialise_context;
-  nm3user.instantiate_user;
-END;
-/
+--SET FEEDBACK OFF
+--
+--SET TERM ON
+--PROMPT Reinitialising Context...
+--SET TERM OFF
+--BEGIN
+--  nm3context.initialise_context;
+--  nm3user.instantiate_user;
+--END;
+--/
 --
 ---------------------------------------------------------------------------------------------------
 --                        ****************   META-DATA  *******************
@@ -550,7 +552,7 @@ SET TERM ON
 Prompt Creating Unit Conversion Functions...
 SET TERM OFF
 SET DEFINE ON
-exec nm3context.initialise_context
+--exec nm3context.initialise_context --shouldn'tt need to happen at 4500
 exec nm3unit.build_all_unit_conv_functions
 --
 ---------------------------------------------------------------------------------------------------
