@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3ddl AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ddl.pkb-arc   2.20   Aug 25 2011 14:39:58   Ade.Edwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ddl.pkb-arc   2.21   Sep 09 2011 15:12:42   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3ddl.pkb  $
---       Date into PVCS   : $Date:   Aug 25 2011 14:39:58  $
---       Date fetched Out : $Modtime:   Aug 25 2011 14:39:44  $
---       PVCS Version     : $Revision:   2.20  $
+--       Date into PVCS   : $Date:   Sep 09 2011 15:12:42  $
+--       Date fetched Out : $Modtime:   Sep 09 2011 14:46:04  $
+--       PVCS Version     : $Revision:   2.21  $
 --       Based on SCCS Version     : 1.5
 --
 --
@@ -23,7 +23,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3ddl AS
 --
 --all global package variables here
 --
-   g_body_sccsid     constant varchar2(30) :='"$Revision:   2.20  $"';
+   g_body_sccsid     constant varchar2(30) :='"$Revision:   2.21  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3ddl';
@@ -33,46 +33,21 @@ CREATE OR REPLACE PACKAGE BODY Nm3ddl AS
    g_syn_exception   EXCEPTION;
 --
    c_public   CONSTANT VARCHAR2(6) := 'PUBLIC';
+   c_private  Constant varchar2(7) := 'PRIVATE';
 --
    c_grant  CONSTANT VARCHAR2(5) := 'GRANT';
    c_revoke CONSTANT VARCHAR2(6) := 'REVOKE';
 --
+
    CURSOR cs_users IS
    SELECT hus_username
     FROM  HIG_USERS
          ,ALL_USERS
     WHERE hus_username != Sys_Context('NM3CORE','APPLICATION_OWNER')
      AND  username      = hus_username;
+
 --
-   CURSOR cs_objects IS
-   SELECT object_name
-    FROM  ALL_OBJECTS
-   WHERE  owner = Sys_Context('NM3CORE','APPLICATION_OWNER')
-    AND  (object_type IN ('TABLE'
-                         ,'VIEW'
-                         ,'FUNCTION'
-                         ,'PACKAGE'
-                         ,'PROCEDURE'
-                         ,'SEQUENCE'
-                         ,'TYPE'
-                         )
-          OR object_name IN ('RSE_HE_ID_SEQ','ROAD_SEG_MEMBS_PARTIAL','ROAD_SEGS_PARTIAL')
-         )
-    AND   object_name NOT IN ('SDE_EXCEPTIONS'
-                             ,'SDE_LOGFILES'
-                             ,'SDE_LOGFILE_DATA'
-                             ,'SDE_LOGFILE_LID_GEN' -- Omit SDE_ tables
-                             ,'INV_TMP'
-                             ,'TEMP_ADMIN_GROUPS'
-                             ,'TEMP_STR5080'
-                             ,'TEMP_STR5084' -- Exclude tables created by HIG1832 (create user)
-                             ,'TEMP_REPLACE_DEFECTS'   -- temp table created for MAI to support network edits
-                             ,'TEMP_UNREPLACE_DEFECTS' -- temp table created for MAI to support network edits
-                             ,'TEMP_UNSPLIT_DEFECTS'   -- temp table created for MAI to support network edits
-                             ,'TEMP_UNMERGE_DEFECTS'   -- temp table created for MAI to support network edits
-                             )
-    AND   object_name NOT LIKE 'BIN$%';       -- AE ommit 10g recycle tables
---
+
    CURSOR cs_col_det ( c_column_name ALL_TAB_COLUMNS.column_name%TYPE
                       ,c_table_name  ALL_TAB_COLUMNS.table_name%TYPE)
    IS
@@ -331,132 +306,138 @@ END use_pub_syn;
 --
 -----------------------------------------------------------------------------
 --
-PROCEDURE create_synonym_for_object (p_object_name IN USER_OBJECTS.object_name%TYPE
-                                    ,p_syn_type    IN VARCHAR2 DEFAULT NULL)
-IS
---
-   PRAGMA autonomous_transaction;
---
-   CURSOR check_obj_exists (p_object VARCHAR2) IS
-   SELECT 'x'
-    FROM  ALL_OBJECTS
-   WHERE  owner       = Sys_Context('NM3CORE','APPLICATION_OWNER')
-    AND   object_name = p_object;
---
-  CURSOR get_priv_syns_to_create
-           ( cp_object_name IN VARCHAR2 )
-  IS
-    SELECT 'CREATE SYNONYM ' || hus_username || '.' || cp_object_name
-         ||' FOR '||Sys_Context('NM3CORE','APPLICATION_OWNER')||'.'|| cp_object_name 
-      FROM hig_users, all_users
-     WHERE hus_username != Sys_Context('NM3CORE','APPLICATION_OWNER')
-       AND username = hus_username
-       AND NOT EXISTS
-         (SELECT 1 FROM dba_synonyms
-           WHERE owner = hus_username
-             AND synonym_name = cp_object_name);
---
-   l_dummy     VARCHAR2(1);
-   l_tab_ddl   nm3type.tab_varchar32767;
---
-BEGIN
---
---   Output a debug message to say entering procedure
---
-   Nm_Debug.proc_start(g_package_name,'create_synonym_for_object');
---
-   Nm_Debug.DEBUG(p_object_name);
---
-   OPEN  check_obj_exists( p_object_name);
-   FETCH check_obj_exists INTO l_dummy;
-   IF check_obj_exists%NOTFOUND
-    THEN
-      CLOSE check_obj_exists;
-      g_syn_exc_code := -20301;
-      g_syn_exc_msg  := 'Object "'||p_object_name||'" does not exist in schema '||Sys_Context('NM3CORE','APPLICATION_OWNER');
-      RAISE g_syn_exception;
-   END IF;
-   CLOSE check_obj_exists;
---
-   IF p_syn_type IS NOT NULL
-    THEN
-   --
-      IF p_syn_type = 'PUBLIC'
-       THEN
-         IF NOT check_syn_exists (c_public,p_object_name)
-          THEN
-            syn_exec_ddl('CREATE PUBLIC SYNONYM '||p_object_name
-                       ||' FOR '||Sys_Context('NM3CORE','APPLICATION_OWNER')||'.'||p_object_name
-                        );
-         END IF;
-      ELSIF p_syn_type = 'PRIVATE'
-       THEN
-         IF NOT check_syn_exists (c_public,p_object_name)
-          THEN
-            syn_exec_ddl('CREATE SYNONYM '||p_object_name
-                       ||' FOR '||Sys_Context('NM3CORE','APPLICATION_OWNER')||'.'||p_object_name
-                        );
-         END IF;
-   --
-      END IF;
-   --
-   ELSE
-      IF use_pub_syn
-       THEN
-   --
-         IF NOT check_syn_exists (c_public,p_object_name)
-          THEN
-            syn_exec_ddl('CREATE PUBLIC SYNONYM '||p_object_name
-                         ||' FOR '||Sys_Context('NM3CORE','APPLICATION_OWNER')||'.'||p_object_name
-                        );
-         END IF;
-   --
-      ELSE
-   --
---         FOR cs_rec IN cs_users
---          LOOP
---            IF NOT check_syn_exists (cs_rec.hus_username,p_object_name)
---             THEN
---               syn_exec_ddl ('CREATE SYNONYM '||cs_rec.hus_username||'.'||p_object_name
---                            ||' FOR '||g_application_owner||'.'||p_object_name
---                            );
---            END IF;
---         END LOOP;
-
-        -- AE 24-SEP-2008
-        -- Rewrite creation of priv synonyms for performance reasons
+Procedure Create_Syn  (
+                      p_Synonym_Name            In    Dba_Synonyms.Synonym_name%Type,
+                      p_Synonym_Owner           In    Dba_Synonyms.Owner%Type,
+                      p_Referenced_Object_Name  In    Dba_Synonyms.Table_Name%Type,
+                      p_Referenced_Owner        In    Dba_Synonyms.Table_Owner%Type    
+                      )
+Is
+  l_No_Privs    Exception;
+  Pragma Exception_Init (l_No_Privs, -1031);
+  l_Ddl Varchar2(4000);   
+Begin
+  Nm_Debug.Debug('Nm3ddl.Create_Syn - Called');
+  Nm_Debug.Debug('Parameter - p_Synonym_Name :'           || p_Synonym_Name);
+  Nm_Debug.Debug('Parameter - p_Synonym_Owner :'          || p_Synonym_Owner);
+  Nm_Debug.Debug('Parameter - p_Referenced_Object_Name :' || p_Referenced_Object_Name);
+  Nm_Debug.Debug('Parameter - p_Referenced_Owner :'       || p_Referenced_Owner);  
+  
+  If      p_Synonym_Name            Is  Not Null 
+    And   p_Synonym_Owner           Is  Not Null
+    And   p_Referenced_Object_Name  Is  Not Null
+    And   p_Referenced_Owner        Is  Not Null  Then
+    
+    If p_Synonym_Owner = c_public Then
+      l_Ddl:='CREATE OR REPLACE PUBLIC SYNONYM '|| p_Synonym_Name  ||' FOR '|| p_Referenced_Owner ||'.'|| p_Referenced_Object_Name;
+    Else
+      l_Ddl:='CREATE OR REPLACE SYNONYM '|| p_Synonym_Owner || '.' || p_Synonym_Name  ||' FOR '|| p_Referenced_Owner ||'.'|| p_Referenced_Object_Name;
+    End If;
+    
+    Nm_Debug.Debug('DDL:' || l_Ddl );
+    
+    Execute Immediate (l_Ddl);
         
-        OPEN get_priv_syns_to_create ( p_object_name );
-        FETCH get_priv_syns_to_create BULK COLLECT INTO l_tab_ddl;
-        CLOSE get_priv_syns_to_create;
-      --
-        IF l_tab_ddl.COUNT > 0
-        THEN
-          FOR i IN l_tab_ddl.FIRST .. l_tab_ddl.LAST
-          LOOP
-            EXECUTE IMMEDIATE l_tab_ddl(i);
-          END LOOP;
-        END IF;
-   --
-      END IF;
-   --
+  Else
+    Nm_Debug.Debug('Parameters null');
+    Raise_Application_Error( -20001, 'Parameters can not be null in call to nm3ddl.Create_Syn');
+  End If;
+  Nm_Debug.Debug('Nm3ddl.Create_Syn - Finished');  
+Exception
+  When l_No_Privs Then
+    Nm_Debug.Debug('Nm3ddl.Create_Syn - Finished - Exception (l_No_Privs) ');
+    Raise_Application_Error( -20303, 'User "'||User||'" does not have permission to create this synonym -' || p_Synonym_Name );    
+End Create_Syn;
 --
-   END IF;
+-----------------------------------------------------------------------------
+--
+Procedure Create_Synonym_For_Object (
+                                    p_Object_Name In  User_Objects.Object_Name%Type,
+                                    p_Syn_Type    In  Varchar2 Default Null
+                                    )
+Is
+  Pragma Autonomous_Transaction;
+  l_Dummy     VARCHAR2(1);
+  l_Syn_Type  Varchar2(7);
+--
+Begin
+  Nm_Debug.Debug('nm3ddl.Create_Synonym_For_Object - Called');
+  Nm_Debug.Debug('Parameter - p_Object_Name :' || p_Object_Name);
+  Nm_Debug.Debug('Parameter - p_Syn_Type :'    || p_Syn_Type);
+  
+  l_Syn_Type:=Upper(p_Syn_Type);
+  
+  If      ( l_Syn_Type  Is  Null Or
+            l_Syn_Type  In  (c_public,c_private)      
+          )
+      And (p_Object_Name Is Not Null)  Then
+        
+    Select  Null
+    Into    l_Dummy
+    From    All_Objects ao
+    Where   Owner       =   Sys_Context('NM3CORE','APPLICATION_OWNER')
+    And     Object_Name =   p_Object_Name
+    And     Not Exists  (
+                        --Objects that we don't want synonyms built for regardless.
+                        Select  Null
+                        From    Nm_Syn_Exempt
+                        Where   ao.Object_Name      Like  Nsyn_Object_Name     
+                        And     ao.Object_Type      Like  Nsyn_Object_Type                    
+                        );
 
-   commit; --sscanlon fix 38046 26-SEP-2006
-
---   Output a debug message to say leaving procedure
-   Nm_Debug.proc_end(g_package_name,'create_synonym_for_object');
---
-
-EXCEPTION
---
-   WHEN g_syn_exception
-    THEN
-      commit; --sscanlon fix 38046 26-SEP-2006
-      RAISE_APPLICATION_ERROR(g_syn_exc_code, g_syn_exc_msg);
---
-END create_synonym_for_object;
+    -- If Private or Public is specified then create a single synonym for the given user/object. 
+    -- If Private then it is assumed that the synonym is for the current user. 
+    If ((p_Syn_Type Is Not Null) Or (   p_Syn_Type Is Null  And Use_Pub_Syn )) Then
+      Nm_Debug.Debug('Single Public or Private');
+      Create_Syn  (
+                  p_Synonym_Name            => p_Object_Name,
+                  p_Synonym_Owner           =>  (                                                
+                                                Case 
+                                                  When p_Syn_Type = c_private Then  Sys_Context('NM3_SECURITY_CTX','USERNAME')
+                                                  Else c_public
+                                                  End
+                                                ),
+                  p_Referenced_Object_Name  => p_Object_Name,
+                  p_Referenced_Owner        => Sys_Context('NM3CORE','APPLICATION_OWNER')
+                  );
+    Else    
+      --Private (for all sub users)
+      Nm_Debug.Debug('All sub users Private');
+      For x In  (
+                Select  hu.Hus_Username  Synonym_Owner
+                From    Hig_Users   hu,
+                        All_Users   au
+                Where   hu.Hus_Username   !=    Sys_Context('NM3CORE','APPLICATION_OWNER')
+                And     au.Username       =     hu.Hus_Username
+                And     Not Exists        (     Select  Null
+                                                From    Dba_Synonyms  ds
+                                                Where   ds.Owner         =   hu.hus_username
+                                                And     ds.Synonym_Name  =   p_Object_Name
+                                          )
+                )    
+      Loop
+        Create_Syn  (
+                    p_Synonym_Name            =>  p_Object_Name,
+                    p_Synonym_Owner           =>  x.Synonym_Owner,
+                    p_Referenced_Object_Name  =>  p_Object_Name,
+                    p_Referenced_Owner        =>  Sys_Context('NM3CORE','APPLICATION_OWNER')
+                    );
+      End Loop;
+    End If;
+  Else
+    Raise Value_Error;
+  End If;
+  Nm_Debug.Debug('nm3ddl.Create_Synonym_For_Object - Finished');
+  
+Exception
+  When Value_Error Then
+    nm_Debug.Debug('nm3ddl.Create_Synonym_For_Object - Finished - Exception (Value_Error)');
+    Raise_Application_Error(-20001,'Parameter p_Syn_Type is Invalid, should be either Null, PRIVATE or PUBLIC and p_Object_Name should not be null.');
+  When No_Data_Found Then
+    nm_Debug.Debug('nm3ddl.Create_Synonym_For_Object - Finished - Exception (No_Data_Found)');
+    Raise_Application_Error(-20301,'Object "'||p_Object_Name||'" does not exist in schema '||Sys_Context('NM3CORE','APPLICATION_OWNER') 
+                                    || ' or object is listed as Exempt from synonym creation. ');
+End Create_Synonym_For_Object;
 --
 -----------------------------------------------------------------------------
 --
@@ -633,7 +614,7 @@ PROCEDURE create_all_priv_syns (p_user IN USER_USERS.username%TYPE) IS
    CURSOR all_objects (cp_user IN VARCHAR2) 
    IS
      SELECT object_name
-       FROM ALL_OBJECTS
+       FROM ALL_OBJECTS ao
       WHERE owner = Sys_Context('NM3CORE','APPLICATION_OWNER')
         AND (object_type IN ('TABLE'
                             ,'VIEW'
@@ -666,7 +647,14 @@ PROCEDURE create_all_priv_syns (p_user IN USER_USERS.username%TYPE) IS
       AND NOT EXISTS
         ( SELECT 1 FROM dba_views
            WHERE owner = cp_user
-             AND view_name = object_name );
+             AND view_name = object_name )
+      --exempt certain objects from synonyms both public and private from being created.
+      And     Not Exists  (
+                          Select  Null
+                          From    Nm_Syn_Exempt   nse
+                          Where   ao.Object_Name      Like  nse.Nsyn_Object_Name     
+                          And     ao.Object_Type      Like  nse.Nsyn_Object_Type                    
+                          );
 --
 BEGIN
 --
