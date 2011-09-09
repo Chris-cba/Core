@@ -1,11 +1,11 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3_install.sql-arc   2.33   May 09 2011 10:30:34   Mike.Alexander  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3_install.sql-arc   2.34   Sep 09 2011 12:14:08   Mike.Alexander  $
 --       Module Name      : $Workfile:   nm3_install.sql  $
---       Date into PVCS   : $Date:   May 09 2011 10:30:34  $
---       Date fetched Out : $Modtime:   May 09 2011 10:28:24  $
---       PVCS Version     : $Revision:   2.33  $
+--       Date into PVCS   : $Date:   Sep 09 2011 12:14:08  $
+--       Date fetched Out : $Modtime:   Sep 09 2011 12:12:00  $
+--       PVCS Version     : $Revision:   2.34  $
 --
 --------------------------------------------------------------------------------
 --   Copyright (c) Exor Corporation Ltd, 2011
@@ -434,9 +434,27 @@ FROM v$instance
 
 START compile_all.sql
 --
-alter view network_node compile;
---
-alter synonym road_seg_membs_partial compile;
+Declare
+  view_not_exist Exception;
+  Pragma Exception_Init( view_not_exist, -942);
+Begin
+  Execute Immediate 'alter view network_node compile';
+Exception When view_not_exist
+  Then
+    Null;
+End;
+/
+
+Declare
+  view_not_exist Exception;
+  Pragma Exception_Init( view_not_exist, -942);
+Begin
+  Execute Immediate 'alter synonym road_seg_membs_partial compile';
+Exception When view_not_exist
+  Then
+    Null;
+End;
+/
 --
 ---------------------------------------------------------------------------------------------------
 --                        ****************   CONTEXT   *******************
@@ -587,11 +605,11 @@ SET TERM ON
 Prompt Setting The Version Number...
 SET TERM OFF
 BEGIN
-      hig2.upgrade('HIG','nm3_install.sql','Installed','4.4.0.0');
-      hig2.upgrade('NET','nm3_install.sql','Installed','4.4.0.0');
-      hig2.upgrade('DOC','nm3_install.sql','Installed','4.4.0.0');
-      hig2.upgrade('AST','nm3_install.sql','Installed','4.4.0.0');
-      hig2.upgrade('WMP','nm3_install.sql','Installed','4.4.0.0');
+      hig2.upgrade('HIG','nm3_install.sql','Installed','4.5.0.0');
+      hig2.upgrade('NET','nm3_install.sql','Installed','4.5.0.0');
+      hig2.upgrade('DOC','nm3_install.sql','Installed','4.5.0.0');
+      hig2.upgrade('AST','nm3_install.sql','Installed','4.5.0.0');
+      hig2.upgrade('WMP','nm3_install.sql','Installed','4.5.0.0');
 END;
 /
 COMMIT;
