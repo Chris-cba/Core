@@ -1,14 +1,14 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.con-arc   2.33   Mar 31 2011 17:04:36   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.con-arc   2.34   Sep 09 2011 11:37:08   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3.con  $
---       Date into PVCS   : $Date:   Mar 31 2011 17:04:36  $
---       Date fetched Out : $Modtime:   Mar 31 2011 16:59:40  $
---       PVCS Version     : $Revision:   2.33  $
+--       Date into PVCS   : $Date:   Sep 09 2011 11:37:08  $
+--       Date fetched Out : $Modtime:   Sep 09 2011 11:36:28  $
+--       PVCS Version     : $Revision:   2.34  $
 --
 --------------------------------------------------------------------------------
 --
--- Generated for Oracle 10g on Thu Mar 31  16:45:13 2011 by Server Generator 10.1.2.9.28
+-- Generated for Oracle 10g on Fri Sep 09  11:26:38 2011 by Server Generator 10.1.2.9.28
   
 PROMPT Creating Primary Key on 'ANALYSE_ALL_TABS_LOG'
 ALTER TABLE ANALYSE_ALL_TABS_LOG
@@ -3595,13 +3595,6 @@ ALTER TABLE NM_INV_TYPES_ALL
  
 PROMPT Creating Check Constraint on 'NM_INV_TYPE_ATTRIBS_ALL'
 ALTER TABLE NM_INV_TYPE_ATTRIBS_ALL
-
-
-
-
-
-
-
  ADD (CONSTRAINT ITA_COL_IIT_PK_MAND_CHK CHECK (DECODE(ita_attrib_name,'IIT_PRIMARY_KEY'
  ,4,0)+DECODE(ita_mandatory_yn,'Y',1,0) IN (0,1,5)))
 /
@@ -4063,6 +4056,16 @@ ALTER TABLE NM_RESERVE_WORDS_EX
  ADD (CONSTRAINT NRWE_KEYWORD_UPPER_CHK CHECK (NRWE_KEYWORD = UPPER(NRWE_KEYWORD)))
 /
        
+PROMPT Creating Check Constraint on 'NM_SYN_EXEMPT'
+ALTER TABLE NM_SYN_EXEMPT
+ ADD (CONSTRAINT NSYN_OBJ_NAME_UPP_CHK CHECK (Nsyn_Object_Name = Upper(Nsyn_Object_Name)))
+/
+
+PROMPT Creating Check Constraint on 'NM_SYN_EXEMPT'
+ALTER TABLE NM_SYN_EXEMPT
+ ADD (CONSTRAINT NSYN_OBJ_TYPE_UPP_CHK CHECK (Nsyn_Object_Type = Upper(Nsyn_Object_Type)))
+/
+ 
 PROMPT Creating Check Constraint on 'NM_TEMP_INV_ITEMS'
 ALTER TABLE NM_TEMP_INV_ITEMS
  ADD (CONSTRAINT TII_END_DATE_TCHK CHECK (TII_END_DATE=TRUNC(TII_END_DATE)))
