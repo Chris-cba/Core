@@ -1,17 +1,17 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.tab-arc   2.36   Apr 07 2011 11:39:56   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.tab-arc   2.37   Sep 09 2011 11:32:28   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3.tab  $
---       Date into PVCS   : $Date:   Apr 07 2011 11:39:56  $
---       Date fetched Out : $Modtime:   Apr 07 2011 11:38:32  $
---       PVCS Version     : $Revision:   2.36  $
+--       Date into PVCS   : $Date:   Sep 09 2011 11:32:28  $
+--       Date fetched Out : $Modtime:   Sep 09 2011 11:32:02  $
+--       PVCS Version     : $Revision:   2.37  $
 --
 --------------------------------------------------------------------------------
 --
-
-
-
+-- Generated for Oracle 10g on Fri Sep 09  11:26:34 2011 by Server Generator 10.1.2.9.28
+ 
+ 
 PROMPT Creating Table 'ANALYSE_ALL_TABS_LOG'
 CREATE TABLE ANALYSE_ALL_TABS_LOG
  (ID NUMBER NOT NULL
@@ -9836,6 +9836,17 @@ CREATE TABLE NM_SPATIAL_EXTENTS
  ,NSPE_CREATED_BY VARCHAR2(30) NOT NULL
  ,MP_IDX NUMBER(11)
  )
+/
+
+PROMPT Creating Table 'NM_SYN_EXEMPT'
+CREATE TABLE NM_SYN_EXEMPT
+ (NSYN_OBJECT_NAME VARCHAR2(128) NOT NULL
+ ,NSYN_OBJECT_TYPE VARCHAR2(19) NOT NULL
+ ,CONSTRAINT NSYN_PK PRIMARY KEY 
+  (NSYN_OBJECT_NAME
+  ,NSYN_OBJECT_TYPE)
+ )
+ ORGANIZATION INDEX
 /
 
 PROMPT Creating Table 'NM_TEMP_INV_ITEMS'
