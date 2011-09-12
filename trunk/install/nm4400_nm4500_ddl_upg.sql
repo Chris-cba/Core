@@ -8,11 +8,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4400_nm4500_ddl_upg.sql-arc   3.0   Sep 09 2011 10:39:08   Mike.Alexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4400_nm4500_ddl_upg.sql-arc   3.1   Sep 12 2011 10:09:32   Mike.Alexander  $
 --       Module Name      : $Workfile:   nm4400_nm4500_ddl_upg.sql  $
---       Date into PVCS   : $Date:   Sep 09 2011 10:39:08  $
---       Date fetched Out : $Modtime:   Sep 09 2011 10:09:54  $
---       Version          : $Revision:   3.0  $
+--       Date into PVCS   : $Date:   Sep 12 2011 10:09:32  $
+--       Date fetched Out : $Modtime:   Sep 12 2011 10:06:54  $
+--       Version          : $Revision:   3.1  $
 --
 ------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2011
@@ -44,6 +44,7 @@ SET TERM OFF
 Begin
   EXECUTE IMMEDIATE 'GRANT DROP ANY VIEW TO  ' || User;
 End;
+/
 ------------------------------------------------------------------
 
 
