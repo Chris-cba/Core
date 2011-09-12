@@ -4,11 +4,11 @@
 -----------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       pvcsid                     : $Header:   //vm_latest/archives/nm3/admin/trg/who_trg.sql-arc   2.3   Jan 11 2008 14:58:58   sscanlon  $
+--       pvcsid                     : $Header:   //vm_latest/archives/nm3/admin/trg/who_trg.sql-arc   2.4   Sep 12 2011 15:34:06   Steve.Cooper  $
 --       Module Name                : $Workfile:   who_trg.sql  $
---       Date into PVCS             : $Date:   Jan 11 2008 14:58:58  $
---       Date fetched Out           : $Modtime:   Jan 11 2008 14:56:24  $
---       PVCS Version               : $Revision:   2.3  $
+--       Date into PVCS             : $Date:   Sep 12 2011 15:34:06  $
+--       Date fetched Out           : $Modtime:   Sep 12 2011 14:47:10  $
+--       PVCS Version               : $Revision:   2.4  $
 --       Based on SCCS version      : 1.4
 -----------------------------------------------------------------------------
 -- Copyright (c) exor corporation ltd, 2007
@@ -44,11 +44,11 @@ BEGIN
    l_tab_comments(1)  := '--';
    l_tab_comments(2)  := '--   SCCS Identifiers :-';
    l_tab_comments(3)  := '--';
-   l_tab_comments(4)  := '--       pvcsid                     : $Header:   //vm_latest/archives/nm3/admin/trg/who_trg.sql-arc   2.3   Jan 11 2008 14:58:58   sscanlon  $';
+   l_tab_comments(4)  := '--       pvcsid                     : $Header:   //vm_latest/archives/nm3/admin/trg/who_trg.sql-arc   2.4   Sep 12 2011 15:34:06   Steve.Cooper  $';
    l_tab_comments(5)  := '--       Module Name                : $Workfile:   who_trg.sql  $';
-   l_tab_comments(6)  := '--       Date into PVCS             : $Date:   Jan 11 2008 14:58:58  $';
-   l_tab_comments(7)  := '--       Date fetched Out           : $Modtime:   Jan 11 2008 14:56:24  $';
-   l_tab_comments(8)  := '--       PVCS Version               : $Revision:   2.3  $';
+   l_tab_comments(6)  := '--       Date into PVCS             : $Date:   Sep 12 2011 15:34:06  $';
+   l_tab_comments(7)  := '--       Date fetched Out           : $Modtime:   Sep 12 2011 14:47:10  $';
+   l_tab_comments(8)  := '--       PVCS Version               : $Revision:   2.4  $';
    l_tab_comments(9)  := '--';
    l_tab_comments(10) := '--   table_name_WHO trigger';
    l_tab_comments(11) := '--';
@@ -97,7 +97,7 @@ BEGIN
       l_sql := l_sql||CHR(10)||'-- Generated '||to_char(sysdate,'HH24:MI:SS DD-MON-YYYY');
       l_sql := l_sql||CHR(10)||'--';
       l_sql := l_sql||CHR(10)||'   SELECT sysdate';
-      l_sql := l_sql||CHR(10)||'         ,user';
+      l_sql := l_sql||CHR(10)||'         ,Sys_Context(''NM3_SECURITY_CTX'',''USERNAME'')';
       l_sql := l_sql||CHR(10)||'    INTO  l_sysdate';
       l_sql := l_sql||CHR(10)||'         ,l_user';
       l_sql := l_sql||CHR(10)||'    FROM  dual;';
