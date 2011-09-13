@@ -3,11 +3,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4400_nm4500_upg.sql-arc   3.1   Sep 12 2011 15:03:38   Mike.Alexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4400_nm4500_upg.sql-arc   3.2   Sep 13 2011 12:03:34   Mike.Alexander  $
 --       Module Name      : $Workfile:   nm4400_nm4500_upg.sql  $
---       Date into PVCS   : $Date:   Sep 12 2011 15:03:38  $
---       Date fetched Out : $Modtime:   Sep 12 2011 15:01:16  $
---       Version          : $Revision:   3.1  $
+--       Date into PVCS   : $Date:   Sep 13 2011 12:03:34  $
+--       Date fetched Out : $Modtime:   Sep 13 2011 12:00:58  $
+--       Version          : $Revision:   3.2  $
 --
 --   Product upgrade script
 --
@@ -265,18 +265,18 @@ End;
 /
 ---------------------------------------------------------------------------------------------------
 --                        ****************   CONTEXT   *******************
--- This has been phased out
 --The compile_all will have reset the user context so we must reinitialise it
 --
---SET FEEDBACK OFF
---SET TERM ON
---PROMPT Reinitialising Context...
---SET TERM OFF
---BEGIN
---  nm3context.initialise_context;
---  nm3user.instantiate_user;
---END;
---/
+SET FEEDBACK OFF
+SET TERM ON
+PROMPT Re-initialising Context...
+SET TERM OFF
+BEGIN
+   nm3security.Set_User;
+   nm3context.initialise_context;
+   nm3user.instantiate_user;
+END;
+/
 ---------------------------------------------------------------------------------------------------
 --                        **************** ADD POLICIES *******************
 -- re-create the policies that were dropped at the beginning of the upgrade
