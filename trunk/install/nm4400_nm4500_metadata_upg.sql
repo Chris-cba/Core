@@ -8,11 +8,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4400_nm4500_metadata_upg.sql-arc   3.0   Sep 09 2011 10:39:08   Mike.Alexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4400_nm4500_metadata_upg.sql-arc   3.1   Sep 13 2011 11:42:24   Mike.Alexander  $
 --       Module Name      : $Workfile:   nm4400_nm4500_metadata_upg.sql  $
---       Date into PVCS   : $Date:   Sep 09 2011 10:39:08  $
---       Date fetched Out : $Modtime:   Sep 09 2011 10:09:54  $
---       Version          : $Revision:   3.0  $
+--       Date into PVCS   : $Date:   Sep 13 2011 11:42:24  $
+--       Date fetched Out : $Modtime:   Sep 13 2011 11:38:48  $
+--       Version          : $Revision:   3.1  $
 --
 ------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2011
@@ -78,6 +78,54 @@ SELECT 'NET'
                        WHERE NER_APPL = 'NET'
                        AND NER_ID = 556)
 /
+------------------------------------------------------------------
+
+
+------------------------------------------------------------------
+SET TERM ON
+PROMPT Load the Synonym exemption table
+SET TERM OFF
+
+------------------------------------------------------------------
+-- 
+-- DEVELOPMENT COMMENTS (STEVEN COOPER)
+-- Loads the synonym exemption table with the default exemptions.
+-- 
+------------------------------------------------------------------
+Insert Into
+Nm_Syn_Exempt
+(
+Nsyn_Object_Name,
+Nsyn_Object_Type
+)
+Select    'V_MCP_EXTRACT%',
+          'VIEW'
+From      Dual
+Where     Not Exists  (
+                      Select  Null
+                      From    Nm_Syn_Exempt
+                      Where   Nsyn_Object_Name    =   'V_MCP_EXTRACT%'
+                      And     Nsyn_Object_Type    =   'VIEW'
+                      )          
+/
+
+Insert Into
+Nm_Syn_Exempt
+(
+Nsyn_Object_Name,
+Nsyn_Object_Type
+)
+Select    'V_MCP_UPLOAD%',
+          'VIEW'
+From      Dual
+Where     Not Exists  (
+                      Select  Null
+                      From    Nm_Syn_Exempt
+                      Where   Nsyn_Object_Name    =   'V_MCP_UPLOAD%'
+                      And     Nsyn_Object_Type    =   'VIEW'
+                      )
+/           
+
 ------------------------------------------------------------------
 
 
