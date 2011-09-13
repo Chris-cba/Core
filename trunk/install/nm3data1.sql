@@ -2,13 +2,13 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data1.sql-arc   2.52   Sep 09 2011 11:16:28   Mike.Alexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data1.sql-arc   2.53   Sep 13 2011 09:37:34   Mike.Alexander  $
 --       Module Name      : $Workfile:   nm3data1.sql  $
---       Date into PVCS   : $Date:   Sep 09 2011 11:16:28  $
---       Date fetched Out : $Modtime:   Sep 09 2011 11:12:20  $
---       Version          : $Revision:   2.52  $
+--       Date into PVCS   : $Date:   Sep 13 2011 09:37:34  $
+--       Date fetched Out : $Modtime:   Sep 13 2011 09:30:40  $
+--       Version          : $Revision:   2.53  $
 --       Table Owner      : NM3_METADATA
---       Generation Date  : 09-SEP-2011 11:12
+--       Generation Date  : 13-SEP-2011 09:30
 --
 --   Product metadata script
 --   As at Release 4.4.0.0
@@ -30,6 +30,7 @@
 --   HIG_SEQUENCE_ASSOCIATIONS
 --   HIG_CHECK_CONSTRAINT_ASSOCS
 --   HIG_USER_OPTION_LIST
+--   NM_SYN_EXEMPT
 --
 -----------------------------------------------------------------------------
 
@@ -46214,6 +46215,46 @@ SELECT
        ,1 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_USER_OPTION_LIST
                    WHERE HUOL_ID = 'WEBAPDRAD');
+--
+--
+--
+----------------------------------------------------------------------------------------
+
+
+----------------------------------------------------------------------------------------
+-- NM_SYN_EXEMPT
+--
+-- select * from nm3_metadata.nm_syn_exempt
+-- order by nsyn_object_name
+--         ,nsyn_object_type
+--
+----------------------------------------------------------------------------------------
+
+SET TERM ON
+PROMPT nm_syn_exempt
+SET TERM OFF
+
+INSERT INTO NM_SYN_EXEMPT
+       (NSYN_OBJECT_NAME
+       ,NSYN_OBJECT_TYPE
+       )
+SELECT 
+        'V_MCP_EXTRACT%'
+       ,'VIEW' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_SYN_EXEMPT
+                   WHERE NSYN_OBJECT_NAME = 'V_MCP_EXTRACT%'
+                    AND  NSYN_OBJECT_TYPE = 'VIEW');
+--
+INSERT INTO NM_SYN_EXEMPT
+       (NSYN_OBJECT_NAME
+       ,NSYN_OBJECT_TYPE
+       )
+SELECT 
+        'V_MCP_UPLOAD%'
+       ,'VIEW' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_SYN_EXEMPT
+                   WHERE NSYN_OBJECT_NAME = 'V_MCP_UPLOAD%'
+                    AND  NSYN_OBJECT_TYPE = 'VIEW');
 --
 --
 --
