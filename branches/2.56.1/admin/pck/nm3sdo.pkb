@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 --
 ---   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.56.1.2   Jul 14 2011 16:37:44   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.56.1.3   Sep 14 2011 17:36:44   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3sdo.pkb  $
---       Date into PVCS   : $Date:   Jul 14 2011 16:37:44  $
---       Date fetched Out : $Modtime:   Jul 14 2011 16:23:38  $
---       PVCS Version     : $Revision:   2.56.1.2  $
+--       Date into PVCS   : $Date:   Sep 14 2011 17:36:44  $
+--       Date fetched Out : $Modtime:   Sep 14 2011 17:31:22  $
+--       PVCS Version     : $Revision:   2.56.1.3  $
 --       Based on
 
 --
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 -- Copyright (c) RAC
 -----------------------------------------------------------------------------
 
-   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.56.1.2  $"';
+   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.56.1.3  $"';
    g_package_name    CONSTANT VARCHAR2 (30)  := 'NM3SDO';
    g_batch_size      INTEGER                 := NVL( TO_NUMBER(Hig.get_sysopt('SDOBATSIZE')), 10);
    g_clip_type       VARCHAR2(30)            := NVL(Hig.get_sysopt('SDOCLIPTYP'),'SDO');
@@ -10286,52 +10286,87 @@ FUNCTION coalesce_nw_diminfo( p_pct_increase IN NUMBER DEFAULT 0,
   ex_3d_diminfo  EXCEPTION; 
   PRAGMA         EXCEPTION_INIT(  ex_3d_diminfo,-06533 );  --ORA-06533: Subscript beyond count
 
-BEGIN
-   SELECT sdo_aggr_mbr(Convert_Dim_Array_To_Mbr( Get_Theme_Diminfo(nth_theme_id)))
-   INTO l_mbr
-   FROM NM_NW_THEMES, NM_THEMES_ALL, NM_LINEAR_TYPES
+cursor c_dim ( c_pct in number, c_tol in number, c_m_tol in number ) is
+with sdo_data as
+( 
+select row_num, min(sdo_lb) lb, max(sdo_ub) ub, min(sdo_tolerance) tol, srid
+from (
+select table_name, dim_row, row_number () over (partition by table_name order by table_name, dim_row ) row_num,
+       sdo_lb*(1-nvl(c_pct,0)/100) sdo_lb, sdo_ub*(1+nvl(c_pct,0)/100) sdo_ub, 
+       decode( dim_row, 3, nvl(p_m_tol, nvl(p_tol, sdo_tolerance)),
+                           nvl(p_tol, sdo_tolerance)) sdo_tolerance, srid
+from (
+SELECT table_name, rownum dim_row,
+sdo_lb, sdo_ub, sdo_tolerance, srid 
+   FROM NM_NW_THEMES, NM_THEMES_ALL, NM_LINEAR_TYPES, user_sdo_geom_metadata, table(diminfo)
    WHERE nnth_nth_theme_id = nth_theme_id
+   and table_name = nth_feature_table
    AND   nnth_nlt_id = nlt_id
-   AND   nlt_g_i_d = 'D';
-
-   l_mbr.sdo_ordinates(1) := l_mbr.sdo_ordinates(1) - ( l_mbr.sdo_ordinates(4) - l_mbr.sdo_ordinates(1)) * p_pct_increase/100;
-
-   l_mbr.sdo_ordinates(2) := l_mbr.sdo_ordinates(2) - ( l_mbr.sdo_ordinates(5) - l_mbr.sdo_ordinates(2)) * p_pct_increase/100;
-
-   l_mbr.sdo_ordinates(4) := l_mbr.sdo_ordinates(4) + ( l_mbr.sdo_ordinates(4) - l_mbr.sdo_ordinates(1)) * p_pct_increase/100;
-
-   l_mbr.sdo_ordinates(5) := l_mbr.sdo_ordinates(5) + ( l_mbr.sdo_ordinates(5) - l_mbr.sdo_ordinates(2)) * p_pct_increase/100;
-
-
-   IF p_tol IS NULL THEN
-
-      SELECT MIN( LEAST( Get_Dim_Element( 1, Get_Theme_Diminfo(nth_theme_id)).sdo_tolerance ,
-                         Get_Dim_Element( 2, Get_Theme_Diminfo(nth_theme_id)).sdo_tolerance )) l1
-      INTO l_tol
-      FROM NM_NW_THEMES, NM_THEMES_ALL, NM_LINEAR_TYPES
-      WHERE nnth_nth_theme_id = nth_theme_id
-      AND   nnth_nlt_id = nlt_id
-      AND   nlt_g_i_d = 'D';
+   AND   nlt_g_i_d = 'D')
+   order by dim_row   
+   )
+group by row_num, srid
+order by 1
+ )
+select cast ( collect(mdsys.sdo_dim_element( to_char(row_num), lb, ub, tol)) as mdsys.sdo_dim_array )
+--, srid 
+from sdo_data
+group by srid;
 
 
-   END IF;
+BEGIN
 
-   IF p_m_tol IS NULL THEN
-
-      SELECT MIN( Get_Dim_Element( 3, Get_Theme_Diminfo(nth_theme_id)).sdo_tolerance )
-      INTO l_m_tol
-      FROM NM_NW_THEMES, NM_THEMES_ALL, NM_LINEAR_TYPES
-      WHERE nnth_nth_theme_id = nth_theme_id
-      AND   nnth_nlt_id = nlt_id
-      AND   nlt_g_i_d = 'D';
-
-
-   END IF;
-
-   retval := mdsys.sdo_dim_array(
-               mdsys.sdo_dim_element( 'X', l_mbr.sdo_ordinates(1), l_mbr.sdo_ordinates(4), l_tol ),
-               mdsys.sdo_dim_element( 'Y', l_mbr.sdo_ordinates(2), l_mbr.sdo_ordinates(5), l_tol ),
-               mdsys.sdo_dim_element( 'M', 0, Nm3type.c_big_number, l_m_tol ));
+  open c_dim (p_pct_increase, p_tol, p_m_tol );
+  fetch c_dim into retval;
+  close c_dim;
+  
+  return retval; 
+--   
+--   SELECT sdo_aggr_mbr(Convert_Dim_Array_To_Mbr( Get_Theme_Diminfo(nth_theme_id)))
+--   INTO l_mbr
+--   FROM NM_NW_THEMES, NM_THEMES_ALL, NM_LINEAR_TYPES
+--   WHERE nnth_nth_theme_id = nth_theme_id
+--   AND   nnth_nlt_id = nlt_id
+--   AND   nlt_g_i_d = 'D';
+--
+--   l_mbr.sdo_ordinates(1) := l_mbr.sdo_ordinates(1) - ( l_mbr.sdo_ordinates(4) - l_mbr.sdo_ordinates(1)) * p_pct_increase/100;
+--
+--   l_mbr.sdo_ordinates(2) := l_mbr.sdo_ordinates(2) - ( l_mbr.sdo_ordinates(5) - l_mbr.sdo_ordinates(2)) * p_pct_increase/100;
+--
+--   l_mbr.sdo_ordinates(4) := l_mbr.sdo_ordinates(4) + ( l_mbr.sdo_ordinates(4) - l_mbr.sdo_ordinates(1)) * p_pct_increase/100;
+--
+--   l_mbr.sdo_ordinates(5) := l_mbr.sdo_ordinates(5) + ( l_mbr.sdo_ordinates(5) - l_mbr.sdo_ordinates(2)) * p_pct_increase/100;
+--
+--
+--   IF p_tol IS NULL THEN
+--
+--      SELECT MIN( LEAST( Get_Dim_Element( 1, Get_Theme_Diminfo(nth_theme_id)).sdo_tolerance ,
+--                         Get_Dim_Element( 2, Get_Theme_Diminfo(nth_theme_id)).sdo_tolerance )) l1
+--      INTO l_tol
+--      FROM NM_NW_THEMES, NM_THEMES_ALL, NM_LINEAR_TYPES
+--      WHERE nnth_nth_theme_id = nth_theme_id
+--      AND   nnth_nlt_id = nlt_id
+--      AND   nlt_g_i_d = 'D';
+--
+--
+--   END IF;
+--
+--   IF p_m_tol IS NULL THEN
+--
+--      SELECT MIN( Get_Dim_Element( 3, Get_Theme_Diminfo(nth_theme_id)).sdo_tolerance )
+--      INTO l_m_tol
+--      FROM NM_NW_THEMES, NM_THEMES_ALL, NM_LINEAR_TYPES
+--      WHERE nnth_nth_theme_id = nth_theme_id
+--      AND   nnth_nlt_id = nlt_id
+--      AND   nlt_g_i_d = 'D';
+--
+--
+--   END IF;
+--
+--   retval := mdsys.sdo_dim_array(
+--               mdsys.sdo_dim_element( 'X', l_mbr.sdo_ordinates(1), l_mbr.sdo_ordinates(4), l_tol ),
+--               mdsys.sdo_dim_element( 'Y', l_mbr.sdo_ordinates(2), l_mbr.sdo_ordinates(5), l_tol ),
+--               mdsys.sdo_dim_element( 'M', 0, Nm3type.c_big_number, l_m_tol ));
 
    RETURN retval;
 EXCEPTION
