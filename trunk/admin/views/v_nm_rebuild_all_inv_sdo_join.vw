@@ -10,11 +10,11 @@ Select
           -------------------------------------------------------------------------
           --   PVCS Identifiers :-
           --
-          --       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/v_nm_rebuild_all_inv_sdo_join.vw-arc   3.0   Sep 02 2011 11:49:00   Steve.Cooper  $
+          --       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/v_nm_rebuild_all_inv_sdo_join.vw-arc   3.1   Sep 14 2011 10:09:18   Steve.Cooper  $
           --       Module Name      : $Workfile:   v_nm_rebuild_all_inv_sdo_join.vw  $
-          --       Date into PVCS   : $Date:   Sep 02 2011 11:49:00  $
-          --       Date fetched Out : $Modtime:   Aug 16 2011 14:09:24  $
-          --       Version          : $Revision:   3.0  $
+          --       Date into PVCS   : $Date:   Sep 14 2011 10:09:18  $
+          --       Date fetched Out : $Modtime:   Sep 14 2011 09:51:00  $
+          --       Version          : $Revision:   3.1  $
           -------------------------------------------------------------------------
           --
           rais.View_Name                                                                                                                                                                View_Name,
@@ -36,12 +36,12 @@ Select
           || Chr(10)  ||  'From   '   || nit.Inv_Table    || ' i,'
           || Chr(10)  ||  '       '   || rais.Table_Name     || ' s'
           || Chr(10)  ||  'Where  i.' || nit.Join_Column  || '  =     s.Ne_Id '
-          || Chr(10)  ||  'And    s.'     || Initcap(Nvl(rais.Start_Date_Column,'Start_Date')) || '  <=    Sys_Context(''NM3CORE'',''APPLICATION_OWNER'')'
-          || Chr(10)  ||  'And    Nvl(s.' || Initcap(Nvl(rais.End_Date_Column,'End_Date')) || ',TO_DATE(''99991231'',''YYYYMMDD'')) >  Sys_Context(''NM3CORE'',''APPLICATION_OWNER'')'  View_Text,
+          || Chr(10)  ||  'And    s.'     || Initcap(Nvl(rais.Start_Date_Column,'Start_Date')) || '  <=    To_Date(Sys_Context(''NM3CORE'',''EFFECTIVE_DATE''),''DD-MON-YYYY'')'
+          || Chr(10)  ||  'And    Nvl(s.' || Initcap(Nvl(rais.End_Date_Column,'End_Date')) || ',TO_DATE(''99991231'',''YYYYMMDD'')) >  To_Date(Sys_Context(''NM3CORE'',''EFFECTIVE_DATE''),''DD-MON-YYYY'')'  View_Text,
           --
           'Comment on Table ' || rais.View_Name  ||    ' Is ''Created By :V_Nm_Rebuild_All_Inv_Sdo_Join ' 
                                                  || Chr(10) || 'Created On :' || To_Char(Sysdate,'dd-mm-yyyy hh24:mi.ss') 
-                                                 || Chr(10) || 'Version    :$Revision:   3.0  $'''                                                                                              View_Comments         
+                                                 || Chr(10) || 'Version    :$Revision:   3.1  $'''                                                                                              View_Comments         
 From    (
         --Gets the Inventory views that can be rebuilt.
         Select    Nit.Nith_Nit_Id                                                             Inv_Type,

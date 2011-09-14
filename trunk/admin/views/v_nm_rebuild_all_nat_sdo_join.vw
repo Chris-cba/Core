@@ -10,11 +10,11 @@ Select
           -------------------------------------------------------------------------
           --   PVCS Identifiers :-
           --
-          --       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/v_nm_rebuild_all_nat_sdo_join.vw-arc   3.0   Sep 02 2011 11:49:00   Steve.Cooper  $
+          --       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/v_nm_rebuild_all_nat_sdo_join.vw-arc   3.1   Sep 14 2011 10:09:18   Steve.Cooper  $
           --       Module Name      : $Workfile:   v_nm_rebuild_all_nat_sdo_join.vw  $
-          --       Date into PVCS   : $Date:   Sep 02 2011 11:49:00  $
-          --       Date fetched Out : $Modtime:   Aug 16 2011 16:19:00  $
-          --       Version          : $Revision:   3.0  $
+          --       Date into PVCS   : $Date:   Sep 14 2011 10:09:18  $
+          --       Date fetched Out : $Modtime:   Sep 14 2011 09:50:32  $
+          --       Version          : $Revision:   3.1  $
           -------------------------------------------------------------------------
           --
           vw.View_Name                                                                                                                  View_Name,
@@ -43,12 +43,12 @@ Select
           || Chr(10) || 'From     V_NM_' || vw.Nat_Nt_Type || '_' || vw.Nat_Gty_Group_Type || '_NT n,' 
           || Chr(10) || '         ' || vw.Table_Name || ' s'  
           || Chr(10) || 'Where    n.Ne_Id                                        =   s.Ne_Id'
-          || Chr(10) || 'And      s.Start_Date                                   <=  Sys_Context(''NM3CORE'',''EFFECTIVE_DATE'')'
-          || Chr(10) || 'And      Nvl(s.End_Date,TO_DATE(''99991231'',''YYYYMMDD'')) >   Sys_Context(''NM3CORE'',''EFFECTIVE_DATE'')'   View_Text,
+          || Chr(10) || 'And      s.Start_Date                                   <=  To_Date(Sys_Context(''NM3CORE'',''EFFECTIVE_DATE''),''DD-MON-YYYY'')'
+          || Chr(10) || 'And      Nvl(s.End_Date,TO_DATE(''99991231'',''YYYYMMDD'')) >   To_Date(Sys_Context(''NM3CORE'',''EFFECTIVE_DATE''),''DD-MON-YYYY'')'   View_Text,
           --
           'Comment on Table ' || vw.View_Name ||     ' Is ''Created By :V_Nm_Rebuild_All_Nlt_Sdo_Join ' 
                                                 || Chr(10) || 'Created On :' || To_Char(Sysdate,'dd-mm-yyyy hh24:mi.ss') 
-                                                || Chr(10) || 'Version    :$Revision:   3.0  $'''                                               View_Comments         
+                                                || Chr(10) || 'Version    :$Revision:   3.1  $'''                                               View_Comments         
 From    (        
         --Gets Linear views that can be rebuilt.
         Select  naty.Nat_Nt_Type,
