@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3ddl AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ddl.pkb-arc   2.21   Sep 09 2011 15:12:42   Steve.Cooper  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ddl.pkb-arc   2.22   Sep 15 2011 11:40:46   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3ddl.pkb  $
---       Date into PVCS   : $Date:   Sep 09 2011 15:12:42  $
---       Date fetched Out : $Modtime:   Sep 09 2011 14:46:04  $
---       PVCS Version     : $Revision:   2.21  $
+--       Date into PVCS   : $Date:   Sep 15 2011 11:40:46  $
+--       Date fetched Out : $Modtime:   Sep 15 2011 11:36:08  $
+--       PVCS Version     : $Revision:   2.22  $
 --       Based on SCCS Version     : 1.5
 --
 --
@@ -23,7 +23,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3ddl AS
 --
 --all global package variables here
 --
-   g_body_sccsid     constant varchar2(30) :='"$Revision:   2.21  $"';
+   g_body_sccsid     constant varchar2(30) :='"$Revision:   2.22  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3ddl';
@@ -383,7 +383,8 @@ Begin
                         From    Nm_Syn_Exempt
                         Where   ao.Object_Name      Like  Nsyn_Object_Name     
                         And     ao.Object_Type      Like  Nsyn_Object_Type                    
-                        );
+                        )
+    And     Rownum      =   1;                        
 
     -- If Private or Public is specified then create a single synonym for the given user/object. 
     -- If Private then it is assumed that the synonym is for the current user. 
