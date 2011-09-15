@@ -5,11 +5,11 @@ DECLARE
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/ctx/drop_user_policy.sql-arc   3.0   Sep 15 2011 09:43:22   Mike.Alexander  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/ctx/drop_user_policy.sql-arc   3.1   Sep 15 2011 11:35:14   Mike.Alexander  $
 --       Module Name      : $Workfile:   drop_user_policy.sql  $
---       Date into SCCS   : $Date:   Sep 15 2011 09:43:22  $
---       Date fetched Out : $Modtime:   Sep 15 2011 09:38:42  $
---       SCCS Version     : $Revision:   3.0  $
+--       Date into SCCS   : $Date:   Sep 15 2011 11:35:14  $
+--       Date fetched Out : $Modtime:   Sep 15 2011 11:33:18  $
+--       SCCS Version     : $Revision:   3.1  $
 --
 --   Drop Inventory/Merge security policies using user for 4500 upgrade
 --    this script is for use wit 4500 upgrade only and will be made redundant 
@@ -29,7 +29,7 @@ DECLARE
    --
 BEGIN
 --
-   FOR cs_rec IN cs_policies_to_drop (Sys_Context('NM3CORE', User))
+   FOR cs_rec IN cs_policies_to_drop (User)
     LOOP
       BEGIN
          dbms_rls.drop_policy (object_schema => cs_rec.object_owner
