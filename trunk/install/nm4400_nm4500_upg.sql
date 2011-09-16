@@ -3,11 +3,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4400_nm4500_upg.sql-arc   3.3   Sep 15 2011 09:45:32   Mike.Alexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4400_nm4500_upg.sql-arc   3.4   Sep 16 2011 10:36:10   Mike.Alexander  $
 --       Module Name      : $Workfile:   nm4400_nm4500_upg.sql  $
---       Date into PVCS   : $Date:   Sep 15 2011 09:45:32  $
---       Date fetched Out : $Modtime:   Sep 15 2011 09:42:32  $
---       Version          : $Revision:   3.3  $
+--       Date into PVCS   : $Date:   Sep 16 2011 10:36:10  $
+--       Date fetched Out : $Modtime:   Sep 16 2011 09:45:10  $
+--       Version          : $Revision:   3.4  $
 --
 --   Product upgrade script
 --
@@ -277,6 +277,23 @@ BEGIN
    nm3user.instantiate_user;
 END;
 /
+--
+---------------------------------------------------------------------------------------------------
+--        ****************   REGENERATE SYSTEM BUILT OBJECTS  *******************
+--
+--
+SET TERM ON
+PROMPT Regenerate system built objects with new context functionality
+SET TERM OFF
+SET DEFINE ON
+select '&exor_base'||'nm3'||'&terminator'||'install'||
+        '&terminator'||'regen.sql' run_file
+from dual
+/
+SET FEEDBACK ON
+start '&&run_file'
+SET FEEDBACK OFF
+--
 ---------------------------------------------------------------------------------------------------
 --                        **************** ADD POLICIES *******************
 -- re-create the policies that were dropped at the beginning of the upgrade
