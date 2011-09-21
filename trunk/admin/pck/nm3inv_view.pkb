@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_view AS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid                 : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_view.pkb-arc   2.14   May 24 2011 15:42:34   Chris.Strettle  $
+--       pvcsid                 : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_view.pkb-arc   2.15   Sep 21 2011 18:10:50   Rob.Coupe  $
 --       Module Name      	: $Workfile:   nm3inv_view.pkb  $
---       Date into PVCS   	: $Date:   May 24 2011 15:42:34  $
---       Date fetched Out 	: $Modtime:   May 24 2011 13:43:06  $
---       PVCS Version     	: $Revision:   2.14  $
+--       Date into PVCS   	: $Date:   Sep 21 2011 18:10:50  $
+--       Date fetched Out 	: $Modtime:   Sep 21 2011 18:05:34  $
+--       PVCS Version     	: $Revision:   2.15  $
 --       Based on SCCS version 	: 1.56
 --
 --
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_view AS
 --      Copyright (c) exor corporation ltd, 2001
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  varchar2(80) := '$Revision::   2.14     $';
+   g_body_sccsid     CONSTANT  varchar2(80) := '$Revision::   2.15     $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
 --all global package variables here
@@ -2551,11 +2551,12 @@ END create_inv_nw_trigger;
 PROCEDURE create_all_inv_nw_trigger( pi_attr_prefix varchar2 DEFAULT NULL )
 IS
 
-   CURSOR cs_inv_types IS
+CURSOR cs_inv_types IS
    SELECT nit_inv_type
    FROM nm_inv_types
-   WHERE nit_table_name IS NULL;
-
+   WHERE nit_table_name IS NULL
+   and exists ( select 1 from user_views where view_name = 'V_NM_'||nit_inv_type||'_NW' );
+   
 BEGIN
    nm_debug.proc_start(g_package_name , 'create_all_inv_nw_trigger');
 
