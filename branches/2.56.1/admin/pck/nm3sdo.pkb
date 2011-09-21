@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 --
 ---   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.56.1.4   Sep 19 2011 12:11:32   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.56.1.5   Sep 21 2011 09:00:12   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3sdo.pkb  $
---       Date into PVCS   : $Date:   Sep 19 2011 12:11:32  $
---       Date fetched Out : $Modtime:   Sep 19 2011 11:43:28  $
---       PVCS Version     : $Revision:   2.56.1.4  $
+--       Date into PVCS   : $Date:   Sep 21 2011 09:00:12  $
+--       Date fetched Out : $Modtime:   Sep 21 2011 08:55:56  $
+--       PVCS Version     : $Revision:   2.56.1.5  $
 --       Based on
 
 --
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 -- Copyright (c) RAC
 -----------------------------------------------------------------------------
 
-   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.56.1.4  $"';
+   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.56.1.5  $"';
    g_package_name    CONSTANT VARCHAR2 (30)  := 'NM3SDO';
    g_batch_size      INTEGER                 := NVL( TO_NUMBER(Hig.get_sysopt('SDOBATSIZE')), 10);
    g_clip_type       VARCHAR2(30)            := NVL(Hig.get_sysopt('SDOCLIPTYP'),'SDO');
@@ -6630,7 +6630,7 @@ BEGIN
   l_diminfo := get_table_diminfo(p_table, p_column);
 
   IF l_diminfo(3).sdo_lb IS NOT NULL THEN
-      retval := mdsys.sdo_geometry( 3003, NULL, NULL, mdsys.sdo_elem_info_array( 1,3,3),
+      retval := mdsys.sdo_geometry( 3303, NULL, NULL, mdsys.sdo_elem_info_array( 1,3,3),
                         mdsys.sdo_ordinate_array( l_diminfo(1).sdo_lb, l_diminfo(2).sdo_lb, l_diminfo(3).sdo_lb,
                                        l_diminfo(1).sdo_ub, l_diminfo(2).sdo_ub, l_diminfo(3).sdo_ub ));
   ELSE
@@ -7484,7 +7484,7 @@ BEGIN
                                                              p_diminfo(2).sdo_ub));
   ELSIF p_diminfo.LAST = 3 THEN
 
-    retval := mdsys.sdo_geometry( 3003, p_srid, NULL, mdsys.sdo_elem_info_array( 1, 1003, 3),
+    retval := mdsys.sdo_geometry( 3303, p_srid, NULL, mdsys.sdo_elem_info_array( 1, 1003, 3),
                                   mdsys.sdo_ordinate_array(  p_diminfo(1).sdo_lb,
                                                              p_diminfo(2).sdo_lb,
                                                              p_diminfo(3).sdo_lb,
