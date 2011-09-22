@@ -3,11 +3,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/regen.sql-arc   3.1   Sep 22 2011 10:22:06   Mike.Alexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/regen.sql-arc   3.2   Sep 22 2011 14:29:40   Mike.Alexander  $
 --       Module Name      : $Workfile:   regen.sql  $
---       Date into PVCS   : $Date:   Sep 22 2011 10:22:06  $
---       Date fetched Out : $Modtime:   Sep 22 2011 10:10:38  $
---       Version          : $Revision:   3.1  $
+--       Date into PVCS   : $Date:   Sep 22 2011 14:29:40  $
+--       Date fetched Out : $Modtime:   Sep 22 2011 14:27:08  $
+--       Version          : $Revision:   3.2  $
 --
 --   Product upgrade script
 --
@@ -67,7 +67,11 @@ Begin
             And     ut.Table_Name         =   'V_NM_'|| nita.Nit_Inv_Type||'_NW'
             )
   Loop
-    Nm3Inv_View.Create_Inv_Nw_Trigger(pi_Inv_Type =>  x.Nit_Inv_Type);
+    Begin
+      Nm3Inv_View.Create_Inv_Nw_Trigger(pi_Inv_Type =>  x.Nit_Inv_Type);
+    Exception When Others
+      dbms_output.put_line('Failed to create trigger for inv type: '||x.Nit_Inv_Type);
+    End;
   End Loop;
   --
   For x In  (
