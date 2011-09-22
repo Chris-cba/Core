@@ -3,11 +3,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/regen.sql-arc   3.0   Sep 16 2011 10:38:18   Mike.Alexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/regen.sql-arc   3.1   Sep 22 2011 10:22:06   Mike.Alexander  $
 --       Module Name      : $Workfile:   regen.sql  $
---       Date into PVCS   : $Date:   Sep 16 2011 10:38:18  $
---       Date fetched Out : $Modtime:   Sep 16 2011 10:26:50  $
---       Version          : $Revision:   3.0  $
+--       Date into PVCS   : $Date:   Sep 22 2011 10:22:06  $
+--       Date fetched Out : $Modtime:   Sep 22 2011 10:10:38  $
+--       Version          : $Revision:   3.1  $
 --
 --   Product upgrade script
 --
@@ -44,9 +44,14 @@ Begin
   --
   For i In 1..l_Tab_View_Name.Count
   Loop
-    l_Tab_View_Source(i) := Replace ( Upper(l_Tab_View_Source(i)), 'NM3CONTEXT.GET_EFFECTIVE_DATE' , 'to_date(sys_context(''NM3CORE'',''EFFECTIVE_DATE''),''DD-MON-YYYY'')');
-    --
-    Execute Immediate 'CREATE OR REPLACE FORCE VIEW '|| l_Tab_View_Name(i)||' As '|| l_Tab_View_Source(i);
+    Begin
+      l_Tab_View_Source(i) := Replace ( Upper(l_Tab_View_Source(i)), 'NM3CONTEXT.GET_EFFECTIVE_DATE' , 'to_date(sys_context(''NM3CORE'',''EFFECTIVE_DATE''),''DD-MON-YYYY'')');
+      --
+      Execute Immediate 'CREATE OR REPLACE FORCE VIEW '|| l_Tab_View_Name(i)||' As '|| l_Tab_View_Source(i);
+    Exception When Others
+    Then
+      dbms_output.put_line(l_Tab_View_Name(i)||' - Creation Failed.');
+    End;
   End Loop;
 --
 End;
@@ -74,7 +79,12 @@ Begin
             And     uo.Object_Name    =     'NM3API_INV_'|| nita.Nit_Inv_Type
             )
   Loop
-    Nm3Inv_Api_Gen.Build_One(p_Inv_Type => x.Nit_Inv_Type );
+    Begin
+      Nm3Inv_Api_Gen.Build_One(p_Inv_Type => x.Nit_Inv_Type );
+    Exception When Others
+    Then
+      dbms_output.put_line('Failed to create package for inv type: '||x.Nit_Inv_Type);
+    End;
   End Loop; 
 
 End;
