@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_audit.pkb-arc   3.7   Jun 20 2011 12:53:48   Linesh.Sorathia  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_audit.pkb-arc   3.8   Sep 27 2011 11:17:48   Rob.Coupe  $
 --       Module Name      : $Workfile:   hig_audit.pkb  $
---       Date into PVCS   : $Date:   Jun 20 2011 12:53:48  $
---       Date fetched Out : $Modtime:   Jun 20 2011 11:46:20  $
---       Version          : $Revision:   3.7  $
+--       Date into PVCS   : $Date:   Sep 27 2011 11:17:48  $
+--       Date fetched Out : $Modtime:   Sep 27 2011 11:04:18  $
+--       Version          : $Revision:   3.8  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.7  $';
+  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.8  $';
 
   g_package_name CONSTANT varchar2(30) := 'hig_audit';
   c_date_format  CONSTANT varchar2(30) := 'DD-Mon-YYYY HH24:MI:SS';
@@ -93,7 +93,7 @@ BEGIN
        append  ('Null,');
        append  ('Sysdate,');
        append  ('''D'',');
-       append  ('nm3user.get_user_id,');
+       append  ('sys_context(''NM3CORE'',''USER_ID''),');
        append  ('sys_context(''USERENV'',''TERMINAL''),');
        append  ('sys_context(''USERENV'',''OS_USER''),');
        append  (''''||pi_haut_descr||''');');
@@ -115,7 +115,7 @@ BEGIN
        END IF ;
        append  ('Sysdate,');
        append  ('''U'',');
-       append  ('nm3user.get_user_id,');
+       append  ('sys_context(''NM3CORE'',''USER_ID''),');
        append  ('sys_context(''USERENV'',''TERMINAL''),');
        append  ('sys_context(''USERENV'',''OS_USER''),');
        append  (''''||pi_haut_descr||''');');
