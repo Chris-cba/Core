@@ -1380,6 +1380,27 @@ SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'views'||'&te
 FROM dual 
 / 
 start '&run_file'
-
+--
+----------------------------------------------------------------------------------------- 
+--
+SET TERM ON 
+PROMPT v_nm_hig_users.vw
+SET TERM OFF
+SET DEFINE ON 
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'views'||'&terminator'||'v_nm_hig_users.vw' run_file 
+FROM dual 
+/ 
+start '&run_file'
+--
+----------------------------------------------------------------------------------------- 
+--
+SET TERM ON 
+PROMPT v_nm_hig1832_user_ts_rg.vw
+SET TERM OFF
+SET DEFINE ON 
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'views'||'&terminator'||'v_nm_hig1832_user_ts_rg.vw' run_file 
+FROM dual 
+/ 
+start '&run_file'
 
 
