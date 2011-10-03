@@ -4,21 +4,22 @@ AS
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_check.pkb-arc   2.13   May 17 2011 08:26:26   Steve.Cooper  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_check.pkb-arc   2.14   Oct 03 2011 16:42:34   Ade.Edwards  $
 --       Module Name      : $Workfile:   nm3sdo_check.pkb  $
---       Date into PVCS   : $Date:   May 17 2011 08:26:26  $
---       Date fetched Out : $Modtime:   May 05 2011 14:16:18  $
---       PVCS Version     : $Revision:   2.13  $
+--       Date into PVCS   : $Date:   Oct 03 2011 16:42:34  $
+--       Date fetched Out : $Modtime:   Oct 03 2011 16:39:24  $
+--       PVCS Version     : $Revision:   2.14  $
 --
 --------------------------------------------------------------------------------
 --
   g_package_name          CONSTANT varchar2(30)    := 'nm3sdo_check';
-  g_body_sccsid           CONSTANT varchar2(2000)  := '"$Revision:   2.13  $"';
+  g_body_sccsid           CONSTANT varchar2(2000)  := '"$Revision:   2.14  $"';
   lf                      CONSTANT VARCHAR2(30)    := chr(10);
   g_write_to_file                  BOOLEAN         := FALSE;
   l_results                        nm3type.tab_varchar32767;
   g_location                       VARCHAR2(1000);
   g_filename                       VARCHAR2(1000);
+  g_pub_syn               CONSTANT BOOLEAN         := hig.get_sysopt('HIGPUBSYN') = 'Y';
 --
 -----------------------------------------------------------------------------
 --
@@ -263,60 +264,157 @@ AS
     END IF;
   --
   ------------------------------------------------------------------------------
-  -- Report missing feature views for subordinate users
+  -- Report missing synonyms for subordinate users objects
   ------------------------------------------------------------------------------
   --
-    SELECT '    FAIL : '||hus_username||'.'|| nth_feature_table
-           ||' view is missing which needs to be based on '
-           || Sys_Context('NM3CORE','APPLICATION_OWNER')||'.'|| nth_feature_table missing_views
-      BULK COLLECT INTO l_results
-      FROM hig_users
-         , all_users
-         , nm_themes_all
-         , hig_user_roles
-         , nm_theme_roles
-     WHERE hus_username = username
-       AND hus_username != Sys_Context('NM3CORE','APPLICATION_OWNER')
-       AND nth_theme_type = 'SDO'
-       AND nthr_theme_id = nth_theme_id
-       AND nthr_role = hur_role
-       AND hur_username = hus_username
-       AND hus_end_date IS NULL
-       AND EXISTS
-         (SELECT * FROM dba_role_privs
-           WHERE grantee = hus_username
-             AND granted_role = nthr_role)
-       AND NOT EXISTS
-           -- Ignore the TMA Webservice schemas
-             (SELECT 1 FROM all_objects o
-               WHERE o.object_name = 'GET_RECIPIENTS'
-                 AND o.object_type = 'PROCEDURE'
-                 AND o.owner = hus_username)
-       AND NOT EXISTS (
-              SELECT 1
-                FROM dba_objects
-               WHERE owner != Sys_Context('NM3CORE','APPLICATION_OWNER')
-                 AND owner = hus_username
-                 AND object_name = nth_feature_table
-                 AND object_type = 'VIEW')
-     ORDER BY hus_username, nth_feature_table;
+    IF g_pub_syn
+      THEN
+    --
+    -- Make sure there is a public synonym in existance for each theme feature object
+    --
+      SELECT '    FAIL : '|| nth_feature_table
+             ||' public synonym is missing which needs to be based on '
+             || Sys_Context('NM3CORE','APPLICATION_OWNER')||'.'|| nth_feature_table missing_views
+        BULK COLLECT INTO l_results
+        FROM nm_themes_all
+       WHERE nth_theme_type = 'SDO'
+         AND NOT EXISTS (
+                SELECT 1
+                  FROM dba_objects
+                 WHERE owner = 'PUBLIC'
+                   AND object_name = nth_feature_table
+                   AND object_type = 'SYNONYM')
+       ORDER BY nth_feature_table;
+    --
+      ELSE
+    --
+    -- Make sure there is a private synonym in existance for each theme feature object
+    --
+        SELECT '    FAIL : '||hus_username||'.'|| nth_feature_table
+               ||' private synonym is missing which needs to be based on '
+               || Sys_Context('NM3CORE','APPLICATION_OWNER')||'.'|| nth_feature_table missing_views
+          BULK COLLECT INTO l_results
+          FROM hig_users
+             , all_users
+             , nm_themes_all
+             , hig_user_roles
+             , nm_theme_roles
+         WHERE hus_username = username
+           AND hus_username != Sys_Context('NM3CORE','APPLICATION_OWNER')
+           AND nth_theme_type = 'SDO'
+           AND nthr_theme_id = nth_theme_id
+           AND nthr_role = hur_role
+           AND hur_username = hus_username
+           AND hus_end_date IS NULL
+           AND EXISTS
+             (SELECT * FROM dba_role_privs
+               WHERE grantee = hus_username
+                 AND granted_role = nthr_role)
+           AND NOT EXISTS
+               -- Ignore the TMA Webservice schemas
+                 (SELECT 1 FROM all_objects o
+                   WHERE o.object_name = 'GET_RECIPIENTS'
+                     AND o.object_type = 'PROCEDURE'
+                     AND o.owner = hus_username)
+           AND NOT EXISTS (
+                  SELECT 1
+                    FROM dba_objects
+                   WHERE owner != Sys_Context('NM3CORE','APPLICATION_OWNER')
+                     AND owner != 'PUBLIC'
+                     AND object_name = nth_feature_table
+                     AND object_type = 'SYNONYM')
+         ORDER BY hus_username, nth_feature_table;
+    --
+    END IF;
   --
   --
     put(lf);
     put('  ====================================================================');
-    put('  =  Missing feature views for Subordinate users ');
-    put('  =  based on Themes accessed via roles');
+    put('  =  Missing '|| CASE WHEN g_pub_syn
+                          THEN 'public synonyms.' 
+                          ELSE 'private synonyms for subordinate users ' 
+                          END);
+  --
+    IF NOT g_pub_syn 
+    THEN put( '  =  based on Themes accessed via roles' ); 
+    END IF;
+  --
     put('  ====================================================================');
     put(lf);
   --
     IF l_results.COUNT = 0
     THEN
-      put('    PASS : All Subordinate users have feature views for Themes accessed via roles');
+      put('    PASS : All Subordinate users have access to theme feature objects via the appropriate synonyms');
     ELSE 
       FOR i IN 1..l_results.COUNT LOOP
          put(l_results(i));
       END LOOP;
     END IF;
+  --
+  ------------------------------------------------------------------------------
+  -- Report missing feature views for subordinate users for MCI objects
+  ------------------------------------------------------------------------------
+  --
+    IF hig.is_product_licensed ('MCP')
+    THEN
+    --
+      SELECT '    FAIL : '||hus_username||'.'|| nth_feature_table
+             ||' MCI view is missing which needs to be based on '
+             || Sys_Context('NM3CORE','APPLICATION_OWNER')||'.'|| nth_feature_table missing_views
+        BULK COLLECT INTO l_results
+        FROM hig_users
+           , all_users
+           , nm_themes_all
+           , hig_user_roles
+           , nm_theme_roles
+       WHERE hus_username = username
+         AND hus_username != Sys_Context('NM3CORE','APPLICATION_OWNER')
+         AND nth_theme_type = 'SDO'
+         AND ( nth_feature_table LIKE 'V_MCP_EXTRACT%'
+            OR nth_feature_table LIKE 'V_MCP_UPLOAD%' )
+         AND nthr_theme_id = nth_theme_id
+         AND nthr_role = hur_role
+         AND hur_username = hus_username
+         AND hus_end_date IS NULL
+         AND EXISTS
+           (SELECT * FROM dba_role_privs
+             WHERE grantee = hus_username
+               AND granted_role = nthr_role)
+         AND NOT EXISTS
+             -- Ignore the TMA Webservice schemas
+               (SELECT 1 FROM all_objects o
+                 WHERE o.object_name = 'GET_RECIPIENTS'
+                   AND o.object_type = 'PROCEDURE'
+                   AND o.owner = hus_username)
+         AND NOT EXISTS (
+                SELECT 1
+                  FROM dba_objects
+                 WHERE owner != Sys_Context('NM3CORE','APPLICATION_OWNER')
+                   AND owner = hus_username
+                   AND object_name = nth_feature_table
+                   AND object_type = 'VIEW')
+       ORDER BY hus_username, nth_feature_table;
+    --
+  --
+       put(lf);
+       put('  ====================================================================');
+       put('  =  Missing MCI feature views for Subordinate users ');
+       put('  =  based on Themes accessed via roles');
+       put('  ====================================================================');
+       put(lf);
+     --
+       IF l_results.COUNT = 0
+       THEN
+         put('    PASS : All Subordinate users have MCI feature views for Themes accessed via roles');
+       ELSE 
+         FOR i IN 1..l_results.COUNT LOOP
+            put(l_results(i));
+         END LOOP;
+       END IF;
+       
+    END IF;
+  --
+
     
   --
 --
@@ -1669,7 +1767,7 @@ AS
       put(' *    These checks are warnings and should not have a serious ');
       put(' *    impact on the functionality of the product.'); 
       put(' *    However, they should be addressed for completeness and for ');
-      put(' *    compatability with possible future product changes. ');
+      put(' *    compatibility with possible future product changes. ');
       put(' *');
       put(' ********************************************************************');
       put(lf);
