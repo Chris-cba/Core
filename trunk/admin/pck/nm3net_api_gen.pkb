@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY nm3net_api_gen AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3net_api_gen.pkb-arc   2.2   May 16 2011 14:45:04   Steve.Cooper  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3net_api_gen.pkb-arc   2.3   Oct 04 2011 15:43:44   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3net_api_gen.pkb  $
---       Date into PVCS   : $Date:   May 16 2011 14:45:04  $
---       Date fetched Out : $Modtime:   Apr 01 2011 13:54:04  $
---       Version          : $Revision:   2.2  $
+--       Date into PVCS   : $Date:   Oct 04 2011 15:43:44  $
+--       Date fetched Out : $Modtime:   Oct 04 2011 15:43:18  $
+--       Version          : $Revision:   2.3  $
 --       Based on SCCS version : 1.7
 ---------------------------------------------------------------------------
 --   Author : Jonathan Mills
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3net_api_gen AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '$Revision:   2.2  $';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '$Revision:   2.3  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3net_api_gen';
@@ -300,12 +300,12 @@ BEGIN
    append_head('--  of type "'||p_nt_type||'"');
    append_head('--');
    append_both('FUNCTION get_ne_id (pi_ne_unique      nm_elements.ne_unique%TYPE');
-   append_both('                   ,pi_effective_date DATE DEFAULT nm3user.get_effective_date');
+   append_both('                   ,pi_effective_date DATE DEFAULT To_Date(Sys_Context(''NM3CORE'',''EFFECTIVE_DATE''),''DD-MON-YYYY'')');
    append_both('                   ) RETURN nm_elements.ne_id%TYPE');
    append_head(';',FALSE);
    append_body(' IS',FALSE);
    append_body('--');
-   append_body('   c_init_eff_date CONSTANT DATE := nm3user.get_effective_date;');
+   append_body('   c_init_eff_date CONSTANT DATE := To_Date(Sys_Context(''NM3CORE'',''EFFECTIVE_DATE''),''DD-MON-YYYY'');');
    append_body('--');
    append_body('   l_retval nm_elements.ne_id%TYPE;');
    append_body('--');
@@ -347,7 +347,7 @@ BEGIN
    ELSE
       append_both('                         ,po_ne_unique                      OUT nm_elements.ne_unique%TYPE');
    END IF;
-   append_both('                         ,pi_start_date                  IN     nm_elements.ne_start_date%TYPE DEFAULT nm3user.get_effective_date');
+   append_both('                         ,pi_start_date                  IN     nm_elements.ne_start_date%TYPE DEFAULT To_Date(Sys_Context(''NM3CORE'',''EFFECTIVE_DATE''),''DD-MON-YYYY'')');
    append_both('                         ,pi_ne_admin_unit               IN     nm_elements.ne_admin_unit%TYPE');
    IF l_rec_nt.nt_node_type IS NOT NULL
     THEN
@@ -401,7 +401,7 @@ BEGIN
    append_head(';',FALSE);
    append_body(' IS',FALSE);
    append_body('--');
-   append_body('   c_init_eff_date CONSTANT DATE := nm3user.get_effective_date;');
+   append_body('   c_init_eff_date CONSTANT DATE := To_Date(Sys_Context(''NM3CORE'',''EFFECTIVE_DATE''),''DD-MON-YYYY'');');
    append_body('--');
    append_body('   l_rec_ne nm_elements_all%ROWTYPE;');
    append_body('--');
