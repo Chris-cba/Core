@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY nm3job_load AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3job_load.pkb-arc   2.2   May 16 2011 14:44:58   Steve.Cooper  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3job_load.pkb-arc   2.3   Oct 04 2011 15:18:46   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3job_load.pkb  $
---       Date into PVCS   : $Date:   May 16 2011 14:44:58  $
---       Date fetched Out : $Modtime:   Apr 01 2011 13:49:26  $
---       Version          : $Revision:   2.2  $
+--       Date into PVCS   : $Date:   Oct 04 2011 15:18:46  $
+--       Date fetched Out : $Modtime:   Oct 04 2011 15:18:06  $
+--       Version          : $Revision:   2.3  $
 --       Based on SCCS version : 1.2
 -------------------------------------------------------------------------
 --   Author : Jonathan Mills
@@ -22,7 +22,7 @@ CREATE OR REPLACE PACKAGE BODY nm3job_load AS
 --
 --  g_body_sccsid is the SCCS ID for the package body
 --
-   g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.2  $';
+   g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.3  $';
    g_package_name    CONSTANT  varchar2(30)   := 'nm3job_load';
 --
    stp_is_licensed   CONSTANT  BOOLEAN        := hig.is_product_licensed (nm3type.c_stp);
@@ -327,7 +327,7 @@ BEGIN
    append_body ('   TYPE tab_njv IS TABLE OF nm_job_operation_data_values%ROWTYPE INDEX BY BINARY_INTEGER;');
    append_body ('   g_tab_njv tab_njv;');
    append_body ('   g_rec_njc nm_job_control%ROWTYPE;');
-   append_body ('   c_user_date_mask CONSTANT VARCHAR2(30) := nm3user.get_user_date_mask;');
+   append_body ('   c_user_date_mask CONSTANT VARCHAR2(30) := Sys_Context(''NM3CORE'',''USER_DATE_MASK'');');
    append_body ('--');
    append_body ('-----------------------------------------------------------------------------');
    append_body ('--');
