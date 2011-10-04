@@ -10,11 +10,11 @@ Select
           -------------------------------------------------------------------------
           --   PVCS Identifiers :-
           --
-          --       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/v_nm_rebuild_all_inv_sdo_join.vw-arc   3.1   Sep 14 2011 10:09:18   Steve.Cooper  $
+          --       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/v_nm_rebuild_all_inv_sdo_join.vw-arc   3.2   Oct 04 2011 09:32:02   Steve.Cooper  $
           --       Module Name      : $Workfile:   v_nm_rebuild_all_inv_sdo_join.vw  $
-          --       Date into PVCS   : $Date:   Sep 14 2011 10:09:18  $
-          --       Date fetched Out : $Modtime:   Sep 14 2011 09:51:00  $
-          --       Version          : $Revision:   3.1  $
+          --       Date into PVCS   : $Date:   Oct 04 2011 09:32:02  $
+          --       Date fetched Out : $Modtime:   Oct 04 2011 09:31:14  $
+          --       Version          : $Revision:   3.2  $
           -------------------------------------------------------------------------
           --
           rais.View_Name                                                                                                                                                                View_Name,
@@ -41,19 +41,18 @@ Select
           --
           'Comment on Table ' || rais.View_Name  ||    ' Is ''Created By :V_Nm_Rebuild_All_Inv_Sdo_Join ' 
                                                  || Chr(10) || 'Created On :' || To_Char(Sysdate,'dd-mm-yyyy hh24:mi.ss') 
-                                                 || Chr(10) || 'Version    :$Revision:   3.1  $'''                                                                                              View_Comments         
+                                                 || Chr(10) || 'Version    :$Revision:   3.2  $'''                                                                                              View_Comments         
 From    (
         --Gets the Inventory views that can be rebuilt.
         Select    Nit.Nith_Nit_Id                                                             Inv_Type,
-                  --Remove the suffix and prefix to get the base object name, assumes prefix V_ and suffix _DT.
-                  Substr(Substr(Nta.Nth_Feature_Table,1,Length(Nta.Nth_Feature_Table)-3 ),3)  Table_Name,
-                  Nta.Nth_Feature_Table                                                       View_Name,
+                  Nta.Nth_Feature_Table                                                       Table_Name,
+                   'V_'||Nta.Nth_Feature_Table||'_DT'                                         View_Name,
                   nta.Nth_Start_Date_Column                                                   Start_Date_Column,
                   nta.Nth_End_Date_Column                                                     End_Date_Column
         From      Nm_Themes_All     Nta,
                   Nm_Inv_Themes     Nit
         Where     Nit.Nith_Nth_Theme_Id     =       Nta.Nth_Theme_Id
-        And       Nta.Nth_Base_Table_Theme  Is      Not Null
+        And       Nta.Nth_Base_Table_Theme  Is      Null
         And       Nta.Nth_Feature_Table     Like    Sys_Context ('NM3SQL', 'THEME_API_FEATURE_TAB')        
         And       Not Exists                (       Select  Null
                                                     From    Nm_Nw_Ad_Types    Nnat
