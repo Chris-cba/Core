@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY nm3mail AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mail.pkb-arc   2.13   Jul 28 2011 16:07:48   Ade.Edwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mail.pkb-arc   2.14   Oct 04 2011 15:30:14   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3mail.pkb  $
---       Date into PVCS   : $Date:   Jul 28 2011 16:07:48  $
---       Date fetched Out : $Modtime:   Jul 28 2011 16:00:40  $
---       Version          : $Revision:   2.13  $
+--       Date into PVCS   : $Date:   Oct 04 2011 15:30:14  $
+--       Date fetched Out : $Modtime:   Oct 04 2011 15:28:50  $
+--       Version          : $Revision:   2.14  $
 --       Based on SCCS version : 1.12
 -------------------------------------------------------------------------
 --   Author : Jonathan Mills
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3mail AS
 --
 --all global package variables here
 --
-  g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.13  $';
+  g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.14  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3mail';
@@ -1023,7 +1023,11 @@ BEGIN
   FROM
     nm_mail_users nmu
   WHERE
-    nmu.nmu_hus_user_id = hig.get_application_owner_id;
+    nmu.nmu_hus_user_id = (
+                          Select    hu.Hus_User_Id
+                          From      Hig_Users hu
+                          Where     hu.Hus_Username = Sys_Context('NM3CORE','APPLICATION_OWNER')
+                          );
 
   nm_debug.proc_end(p_package_name   => g_package_name
                    ,p_procedure_name => 'get_default_nmu_id');
