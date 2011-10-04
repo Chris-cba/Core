@@ -3,17 +3,17 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3layer_tool.pkb-arc   2.29   May 27 2011 10:20:58   Chris.Strettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3layer_tool.pkb-arc   2.30   Oct 04 2011 15:23:28   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3layer_tool.pkb  $
---       Date into PVCS   : $Date:   May 27 2011 10:20:58  $
---       Date fetched Out : $Modtime:   May 27 2011 10:03:12  $
---       Version          : $Revision:   2.29  $
+--       Date into PVCS   : $Date:   Oct 04 2011 15:23:28  $
+--       Date fetched Out : $Modtime:   Oct 04 2011 15:21:50  $
+--       Version          : $Revision:   2.30  $
 --       Based on SCCS version : 1.11
 -------------------------------------------------------------------------
 --
 --all global package variables here
 --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000)       := '$Revision:   2.29  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000)       := '$Revision:   2.30  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name   CONSTANT VARCHAR2 (30)         := 'NM3LAYER_TOOL';
@@ -4960,13 +4960,13 @@ END get_nsg_label;
          ||lf||'BEGIN '
          ||lf||'  SELECT COUNT(*) INTO l_total '
          ||lf||  '  FROM sde.layers '
-         ||lf||  ' WHERE owner != hig.get_application_owner '
+         ||lf||  ' WHERE owner != Sys_Context(''NM3CORE'',''APPLICATION_OWNER'') '
          ||lf||  '   AND table_name = :table_name '
          ||lf||  '   AND spatial_column = :column_name; '
          ||lf||'-- '
          ||lf||'  FOR i IN (SELECT owner, table_name, spatial_column '
          ||lf||            '  FROM sde.layers '
-         ||lf||            ' WHERE owner != hig.get_application_owner '
+         ||lf||            ' WHERE owner != Sys_Context(''NM3CORE'',''APPLICATION_OWNER'') '
          ||lf||            '   AND table_name = :table_name '
          ||lf||            '   AND spatial_column = :column_name ) '
          ||lf|| ' LOOP '
