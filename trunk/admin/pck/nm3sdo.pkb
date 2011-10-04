@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 --
 ---   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.64   Sep 21 2011 10:38:30   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.65   Oct 04 2011 10:12:44   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3sdo.pkb  $
---       Date into PVCS   : $Date:   Sep 21 2011 10:38:30  $
---       Date fetched Out : $Modtime:   Sep 21 2011 10:30:10  $
---       PVCS Version     : $Revision:   2.64  $
+--       Date into PVCS   : $Date:   Oct 04 2011 10:12:44  $
+--       Date fetched Out : $Modtime:   Oct 04 2011 10:09:42  $
+--       PVCS Version     : $Revision:   2.65  $
 --       Based on
 
 --
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 -- Copyright (c) RAC
 -----------------------------------------------------------------------------
 
-   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.64  $"';
+   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.65  $"';
    g_package_name    CONSTANT VARCHAR2 (30)  := 'NM3SDO';
    g_batch_size      INTEGER                 := NVL( TO_NUMBER(Hig.get_sysopt('SDOBATSIZE')), 10);
    g_clip_type       VARCHAR2(30)            := NVL(Hig.get_sysopt('SDOCLIPTYP'),'SDO');
@@ -7746,7 +7746,14 @@ BEGIN
         THEN
           -- if it fails to calculate - the table is empty.
           -- revert to using base layer for now.
-          l_diminfo := sdo_lrs.convert_to_std_dim_array(coalesce_nw_diminfo);
+          l_diminfo :=  coalesce_nw_diminfo;
+          
+          if l_diminfo.last is null then
+            raise_application_error(-20001, 'No data on which to base initial extent of the table' );
+          else
+            l_diminfo :=  sdo_lrs.convert_to_std_dim_array(l_diminfo);
+          end if;
+
       END;
    --
      curstring := 'select a.'||p_shape_col||' from '||p_table||' a where rownum = 1';
