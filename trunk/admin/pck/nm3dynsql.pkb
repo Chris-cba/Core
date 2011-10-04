@@ -2,11 +2,11 @@ CREATE OR REPLACE package body nm3dynsql as
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3dynsql.pkb-arc   2.11   May 16 2011 14:44:34   Steve.Cooper  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3dynsql.pkb-arc   2.12   Oct 04 2011 14:58:50   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3dynsql.pkb  $
---       Date into PVCS   : $Date:   May 16 2011 14:44:34  $
---       Date fetched Out : $Modtime:   Apr 01 2011 11:55:12  $
---       PVCS Version     : $Revision:   2.11  $
+--       Date into PVCS   : $Date:   Oct 04 2011 14:58:50  $
+--       Date fetched Out : $Modtime:   Oct 04 2011 14:58:22  $
+--       PVCS Version     : $Revision:   2.12  $
 --       Based on sccs version :
 --
 --
@@ -38,7 +38,7 @@ CREATE OR REPLACE package body nm3dynsql as
                 in sql_route_connectivity() added connectivity check to ensure pieces of same datum are connected
 */
 
-  g_body_sccsid     constant  varchar2(30) := '"$Revision:   2.11  $"';
+  g_body_sccsid     constant  varchar2(30) := '"$Revision:   2.12  $"';
   g_package_name    constant  varchar2(30) := 'nm3dynsql';
 
 
@@ -120,7 +120,7 @@ CREATE OR REPLACE package body nm3dynsql as
   function sql_effective_date_tbl return varchar2
   is
   begin
-    return '(select /*+ cardinality(dd 1) */ nm3user.get_effective_date effective_date from dual dd)';
+    return '(select /*+ cardinality(dd 1) */ To_Date(Sys_Context(''NM3CORE'',''EFFECTIVE_DATE''),''DD-MON-YYYY'') effective_date from dual dd)';
   end;
 
 
