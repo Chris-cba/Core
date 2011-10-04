@@ -10,11 +10,11 @@ Select
           -------------------------------------------------------------------------
           --   PVCS Identifiers :-
           --
-          --       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/v_nm_rebuild_all_nat_sdo_join.vw-arc   3.1   Sep 14 2011 10:09:18   Steve.Cooper  $
+          --       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/v_nm_rebuild_all_nat_sdo_join.vw-arc   3.2   Oct 04 2011 09:25:26   Steve.Cooper  $
           --       Module Name      : $Workfile:   v_nm_rebuild_all_nat_sdo_join.vw  $
-          --       Date into PVCS   : $Date:   Sep 14 2011 10:09:18  $
-          --       Date fetched Out : $Modtime:   Sep 14 2011 09:50:32  $
-          --       Version          : $Revision:   3.1  $
+          --       Date into PVCS   : $Date:   Oct 04 2011 09:25:26  $
+          --       Date fetched Out : $Modtime:   Oct 04 2011 09:16:28  $
+          --       Version          : $Revision:   3.2  $
           -------------------------------------------------------------------------
           --
           vw.View_Name                                                                                                                  View_Name,
@@ -48,22 +48,20 @@ Select
           --
           'Comment on Table ' || vw.View_Name ||     ' Is ''Created By :V_Nm_Rebuild_All_Nlt_Sdo_Join ' 
                                                 || Chr(10) || 'Created On :' || To_Char(Sysdate,'dd-mm-yyyy hh24:mi.ss') 
-                                                || Chr(10) || 'Version    :$Revision:   3.1  $'''                                               View_Comments         
+                                                || Chr(10) || 'Version    :$Revision:   3.2  $'''                                               View_Comments         
 From    (        
         --Gets Linear views that can be rebuilt.
         Select  naty.Nat_Nt_Type,
                 naty.Nat_Gty_Group_Type,
-                --Remove the suffix and prefix to get the base object name, assumes prefix V_ and suffix _DT.
-                Substr(Substr(nta.Nth_Feature_Table,1,Length(nta.Nth_Feature_Table)-3 ),3)  Table_Name,
-                nta.Nth_Feature_Table                                                       View_Name
+                nta.Nth_Feature_Table                                                       Table_Name,
+                'V_'||nta.Nth_Feature_table||'_DT'                                          View_Name
         From    Nm_Themes_All   nta,
                 Nm_Area_Themes  nat,
                 Nm_Area_Types   naty
-        Where   nta.Nth_Base_Table_Theme    Is      Not Null
+        Where   nta.Nth_Base_Table_Theme    Is      Null
         And     nat.Nath_Nth_Theme_Id       =       nta.Nth_Theme_Id 
         And     nat.Nath_Nat_Id             =       naty.Nat_Id             
         And     nta.Nth_Feature_Table       Like    Sys_Context ('NM3SQL', 'THEME_API_FEATURE_TAB')
-        And     naty.Nat_Nt_Type            !=      'NSGN'             
         ) vw
 With Read Only
 /             
