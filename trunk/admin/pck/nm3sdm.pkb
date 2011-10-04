@@ -5,11 +5,11 @@ As
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.50   Sep 02 2011 11:45:42   Steve.Cooper  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.51   Oct 04 2011 16:27:56   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3sdm.pkb  $
---       Date into PVCS   : $Date:   Sep 02 2011 11:45:42  $
---       Date fetched Out : $Modtime:   Sep 02 2011 09:29:58  $
---       PVCS Version     : $Revision:   2.50  $
+--       Date into PVCS   : $Date:   Oct 04 2011 16:27:56  $
+--       Date fetched Out : $Modtime:   Oct 04 2011 16:27:20  $
+--       PVCS Version     : $Revision:   2.51  $
 --
 --   Author : R.A. Coupe
 --
@@ -21,7 +21,7 @@ As
 --
 --all global package variables here
 --
-  g_Body_Sccsid     Constant Varchar2 (2000) := '"$Revision:   2.50  $"';
+  g_Body_Sccsid     Constant Varchar2 (2000) := '"$Revision:   2.51  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
   g_Package_Name    Constant Varchar2 (30)   := 'NM3SDM';
@@ -244,7 +244,7 @@ Begin
   Nm_Debug.Debug('nm3sdm.Rebuild_All_NAT_Sdo_Join_View - Called');
     
   --This limits the rows returned by the V_Nm_Rebuild_All_Nat_Sdo_Join view, which is used by Build_Nat_Sdo_Join_View.
-  Nm3Ctx.Set_Context('THEME_API_FEATURE_TAB','V_NM_%DT');
+  Nm3Ctx.Set_Context('THEME_API_FEATURE_TAB','NM_%_SDO');
     
   l_View_Name:=Build_Nat_Sdo_Join_View;
     
@@ -316,7 +316,7 @@ Begin
   Nm_Debug.Debug('nm3sdm.Rebuild_All_NLT_Sdo_Join_Views - Called');
     
   --This limits the rows returned by the V_Nm_Rebuild_All_Nlt_Sdo_Join view, which is used by Build_nlt_Sdo_Join_View.
-  Nm3Ctx.Set_Context('THEME_API_FEATURE_TAB','V_NM_%DT');
+  Nm3Ctx.Set_Context('THEME_API_FEATURE_TAB','NM_%_SDO');
     
   l_View_Name:=Build_Nlt_Sdo_Join_View;
     
@@ -7969,7 +7969,7 @@ Begin
   Nm_Debug.Debug('nm3sdm.Rebuild_All_Inv_Sdo_Join_View - Called');
     
   --This limits the rows returned by the V_Nm_Rebuild_All_Inv_Sdo_Join view, which is used by Build_Inv_Sdo_Join_View.
-  Nm3Ctx.Set_Context('THEME_API_FEATURE_TAB','V_NM_%DT');
+  Nm3Ctx.Set_Context('THEME_API_FEATURE_TAB','NM_%_SDO');
     
   l_View_Name:=Build_Inv_Sdo_Join_View;
     
