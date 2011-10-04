@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3ddl AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ddl.pkb-arc   2.22   Sep 15 2011 11:40:46   Steve.Cooper  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ddl.pkb-arc   2.23   Oct 04 2011 09:43:58   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3ddl.pkb  $
---       Date into PVCS   : $Date:   Sep 15 2011 11:40:46  $
---       Date fetched Out : $Modtime:   Sep 15 2011 11:36:08  $
---       PVCS Version     : $Revision:   2.22  $
+--       Date into PVCS   : $Date:   Oct 04 2011 09:43:58  $
+--       Date fetched Out : $Modtime:   Oct 04 2011 09:42:06  $
+--       PVCS Version     : $Revision:   2.23  $
 --       Based on SCCS Version     : 1.5
 --
 --
@@ -23,7 +23,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3ddl AS
 --
 --all global package variables here
 --
-   g_body_sccsid     constant varchar2(30) :='"$Revision:   2.22  $"';
+   g_body_sccsid     constant varchar2(30) :='"$Revision:   2.23  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3ddl';
@@ -360,11 +360,7 @@ Is
   l_Dummy     VARCHAR2(1);
   l_Syn_Type  Varchar2(7);
 --
-Begin
-  Nm_Debug.Debug('nm3ddl.Create_Synonym_For_Object - Called');
-  Nm_Debug.Debug('Parameter - p_Object_Name :' || p_Object_Name);
-  Nm_Debug.Debug('Parameter - p_Syn_Type :'    || p_Syn_Type);
-  
+Begin  
   l_Syn_Type:=Upper(p_Syn_Type);
   
   If      ( l_Syn_Type  Is  Null Or
@@ -389,7 +385,6 @@ Begin
     -- If Private or Public is specified then create a single synonym for the given user/object. 
     -- If Private then it is assumed that the synonym is for the current user. 
     If ((p_Syn_Type Is Not Null) Or (   p_Syn_Type Is Null  And Use_Pub_Syn )) Then
-      Nm_Debug.Debug('Single Public or Private');
       Create_Syn  (
                   p_Synonym_Name            => p_Object_Name,
                   p_Synonym_Owner           =>  (                                                
@@ -403,7 +398,6 @@ Begin
                   );
     Else    
       --Private (for all sub users)
-      Nm_Debug.Debug('All sub users Private');
       For x In  (
                 Select  hu.Hus_Username  Synonym_Owner
                 From    Hig_Users   hu,
@@ -428,14 +422,11 @@ Begin
   Else
     Raise Value_Error;
   End If;
-  Nm_Debug.Debug('nm3ddl.Create_Synonym_For_Object - Finished');
   
 Exception
   When Value_Error Then
-    nm_Debug.Debug('nm3ddl.Create_Synonym_For_Object - Finished - Exception (Value_Error)');
     Raise_Application_Error(-20001,'Parameter p_Syn_Type is Invalid, should be either Null, PRIVATE or PUBLIC and p_Object_Name should not be null.');
   When No_Data_Found Then
-    nm_Debug.Debug('nm3ddl.Create_Synonym_For_Object - Finished - Exception (No_Data_Found)');
     Raise_Application_Error(-20301,'Object "'||p_Object_Name||'" does not exist in schema '||Sys_Context('NM3CORE','APPLICATION_OWNER') 
                                     || ' or object is listed as Exempt from synonym creation. ');
 End Create_Synonym_For_Object;
