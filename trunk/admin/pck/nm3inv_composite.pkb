@@ -1,11 +1,11 @@
 CREATE OR REPLACE PACKAGE BODY nm3inv_composite AS
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_composite.pkb-arc   2.3   May 16 2011 14:44:54   Steve.Cooper  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_composite.pkb-arc   2.4   Oct 04 2011 15:04:40   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3inv_composite.pkb  $
---       Date into PVCS   : $Date:   May 16 2011 14:44:54  $
---       Date fetched Out : $Modtime:   Apr 01 2011 13:25:24  $
---       PVCS Version     : $Revision:   2.3  $
+--       Date into PVCS   : $Date:   Oct 04 2011 15:04:40  $
+--       Date fetched Out : $Modtime:   Oct 04 2011 15:03:58  $
+--       PVCS Version     : $Revision:   2.4  $
 --       Based on SCCS Version: 1.3
 --
 --   Author : Jonathan Mills
@@ -22,7 +22,7 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_composite AS
 */
 
 --
-   g_body_sccsid   constant varchar2(200) :='"$Revision:   2.3  $"';
+   g_body_sccsid   constant varchar2(200) :='"$Revision:   2.4  $"';
    g_package_name    CONSTANT  varchar2(30)   := 'nm3inv_composite';
 --
    g_mrg_results_table VARCHAR2(30);
@@ -222,7 +222,7 @@ BEGIN
    append ('       THEN');
    append ('         '||g_inv_record_name||'.iit_ne_id      := nm3seq.next_ne_id_seq;');
    append ('         '||g_inv_record_name||'.iit_inv_type   := '||g_package_name||'.g_nmnd_nit_inv_type;');
-   append ('         '||g_inv_record_name||'.iit_start_date := nm3user.get_effective_date;');
+   append ('         '||g_inv_record_name||'.iit_start_date := To_Date(Sys_Context(''NM3CORE'',''EFFECTIVE_DATE''),''DD-MON-YYYY'');');
    append ('      END IF;');
    append ('--');
    append ('   END IF;');
@@ -585,7 +585,7 @@ BEGIN
         ||CHR(10)||' END add_it;'
         ||CHR(10)||' PROCEDURE add_it(p_head VARCHAR2,p_body DATE) IS'
         ||CHR(10)||' BEGIN'
-        ||CHR(10)||'  add_it (p_head,TO_CHAR(p_body,nm3user.get_user_date_mask));'
+        ||CHR(10)||'  add_it (p_head,TO_CHAR(p_body,Sys_Context(''NM3CORE'',''USER_DATE_MASK'')));'
         ||CHR(10)||' END add_it;'
         ||CHR(10)||'BEGIN';
 --
@@ -1077,67 +1077,7 @@ END create_inv_for_element;
 --
 -----------------------------------------------------------------------------
 --
---FUNCTION get_changed_assets_for_nte_nmq (p_nmnd_nmq_id    nm_mrg_nit_derivation.nmnd_nmq_id%TYPE
---                                        ,p_nte_job_id     nm_nw_temp_extents.nte_job_id%TYPE
---                                        ,p_effective_date DATE DEFAULT nm3user.get_effective_date
---                                        ) RETURN nm_nw_temp_extents.nte_job_id%TYPE IS
-----
---   l_retval nm_nw_temp_extents.nte_job_id%TYPE;
---   c_eff_date CONSTANT DATE := nm3user.get_effective_date;
-----
---   l_tab_nqt_seq_no nm3type.tab_number;
---   l_tab_nqt_rowid  nm3type.tab_rowid;
---   l_tab_nte_job_id nm3type.tab_number;
---   l_nte_job_id_tmp nm_nw_temp_extents.nte_job_id%TYPE;
-----
---BEGIN
-----
---   nm_debug.proc_start (g_package_name,'get_changed_assets_for_nte_nmq');
-----
---   nm3user.set_effective_date (p_effective_date);
-----
---   SELECT nqt_seq_no
---         ,ROWID
---    BULK  COLLECT
---    INTO  l_tab_nqt_seq_no
---         ,l_tab_nqt_rowid
---    FROM  nm_mrg_query_types
---   WHERE  nqt_nmq_id = p_nmnd_nmq_id;
-----
---   FOR i IN 1..l_tab_nqt_seq_no.COUNT
---    LOOP
-----      log_it('Before get_temp_ne_subset_nqt-'||i||' of '||l_tab_nqt_seq_no.COUNT);
---      l_nte_job_id_tmp    := get_temp_ne_subset_nqt (p_nqt_rowid  => l_tab_nqt_rowid(i)
---                                                    ,p_nte_job_id => p_nte_job_id
---                                                    );
-----      log_it('After get_temp_ne_subset_nqt-'||i||' of '||l_tab_nqt_seq_no.COUNT);
---      IF l_nte_job_id_tmp IS NOT NULL
---       THEN
---         l_tab_nte_job_id(l_tab_nte_job_id.COUNT+1) := l_nte_job_id_tmp;
---      END IF;
---   END LOOP;
-----
-----   log_it('Before get_union_of_nte');
---   l_retval := get_union_of_nte (p_nte_job_id_parent     => p_nte_job_id
---                                ,p_tab_nte_job_id_subset => l_tab_nte_job_id
---                                );
-----   log_it('After get_union_of_nte');
-----
---   nm3user.set_effective_date (c_eff_date);
-----
---   nm_debug.proc_end (g_package_name,'get_changed_assets_for_nte_nmq');
-----
---   RETURN l_retval;
-----
-----EXCEPTION
-----   WHEN others
-----    THEN
-----      nm3user.set_effective_date (c_eff_date);
-----      RAISE;
---END get_changed_assets_for_nte_nmq;
---
------------------------------------------------------------------------------
---
+
 FUNCTION get_union_of_nte (p_nte_job_id_parent     nm_nw_temp_extents.nte_job_id%TYPE
                           ,p_tab_nte_job_id_subset nm3type.tab_number
                           ) RETURN nm_nw_temp_extents.nte_job_id%TYPE IS
