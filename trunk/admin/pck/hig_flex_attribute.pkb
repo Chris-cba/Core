@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_flex_attribute.pkb-arc   3.4   May 16 2011 14:42:10   Steve.Cooper  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_flex_attribute.pkb-arc   3.5   Oct 04 2011 11:04:44   Steve.Cooper  $
 --       Module Name      : $Workfile:   hig_flex_attribute.pkb  $
---       Date into PVCS   : $Date:   May 16 2011 14:42:10  $
---       Date fetched Out : $Modtime:   Apr 01 2011 14:38:52  $
---       Version          : $Revision:   3.4  $
+--       Date into PVCS   : $Date:   Oct 04 2011 11:04:44  $
+--       Date fetched Out : $Modtime:   Oct 04 2011 11:04:12  $
+--       Version          : $Revision:   3.5  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.4  $';
+  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.5  $';
 
   g_package_name CONSTANT varchar2(30) := 'hig_flex_attribute';
 --
@@ -231,7 +231,7 @@ BEGIN
                               ,pi_ita_attrib_name => pi_attrib_name);
    IF l_ita_rec.ita_format = 'DATE'
    THEN
-       EXECUTE IMMEDIATE ' SELECT  To_Char('||pi_attrib_name ||',Nvl('||nm3flx.string(l_ita_rec.ita_format_mask)||',nm3user.get_user_date_mask))'||Chr(10)||
+       EXECUTE IMMEDIATE ' SELECT  To_Char('||pi_attrib_name ||',Nvl('||nm3flx.string(l_ita_rec.ita_format_mask)||',Sys_Context(''NM3CORE'',''USER_DATE_MASK'')))'||Chr(10)||
                          ' FROM    '||l_nit_rec.nit_table_name  ||Chr(10)||
                          ' WHERE  '||l_nit_rec.nit_foreign_pk_column||' = :1 ' INTO l_value USING pi_pk_col ;
    ELSE
