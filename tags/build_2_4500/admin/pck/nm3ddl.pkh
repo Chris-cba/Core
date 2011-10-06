@@ -1,0 +1,450 @@
+CREATE OR REPLACE PACKAGE Nm3ddl AS
+--<PACKAGE>
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)nm3ddl.pkh	1.26 08/17/06
+--       Module Name      : nm3ddl.pkh
+--       Date into SCCS   : 06/08/17 15:51:24
+--       Date fetched Out : 07/06/13 14:11:16
+--       SCCS Version     : 1.26
+--
+--
+--   Author : Jonathan Mills
+--
+--   NM3 DDL package
+--
+-----------------------------------------------------------------------------
+--	Copyright (c) exor corporation ltd, 2001
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+  g_sccsid      CONSTANT  VARCHAR2(2000) := '@(#)nm3ddl.pkh	1.26 08/17/06';
+--  g_sccsid is the SCCS ID for the package
+--
+  -- This is an array of varchar2(32767) used for building big sql statements (>32K)
+  --  only 1 of these can be used at once in each session, given that it'd overwrite
+  --  itself
+   g_tab_varchar Nm3type.tab_varchar32767;
+--
+   g_tab_varchar_temp_store Nm3type.tab_varchar32767;
+--
+   TYPE tab_atc IS TABLE OF ALL_TAB_COLUMNS%ROWTYPE INDEX BY BINARY_INTEGER;
+--
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="create_object_and_syns">
+-- This procedure creates the object specified in p_ddl_text and creates
+--  the relevant synonyms
+--
+PROCEDURE create_object_and_syns (p_object_name  IN USER_OBJECTS.object_name%TYPE
+                                 ,p_ddl_text     IN VARCHAR2
+                                 );
+--
+PROCEDURE create_object_and_syns (p_object_name  IN USER_OBJECTS.object_name%TYPE
+                                 ,p_ddl_text     IN CLOB
+                                 );
+PROCEDURE create_object_and_syns (p_object_name  IN USER_OBJECTS.object_name%TYPE);
+PROCEDURE create_object_and_syns (p_object_name  IN USER_OBJECTS.object_name%TYPE
+                                 ,p_tab_ddl_text IN Nm3type.tab_varchar32767
+                                 );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="create_object_and_views">
+-- This procedure creates the object specified in p_ddl_text and creates
+--  the relevant views
+--
+PROCEDURE create_object_and_views (p_object_name  IN USER_OBJECTS.object_name%TYPE
+                                  ,p_ddl_text     IN VARCHAR2
+                                  );
+--
+PROCEDURE create_object_and_views (p_object_name  IN USER_OBJECTS.object_name%TYPE
+                                  ,p_ddl_text     IN CLOB
+                                  );
+PROCEDURE create_object_and_views (p_object_name  IN USER_OBJECTS.object_name%TYPE);
+PROCEDURE create_object_and_views (p_object_name  IN USER_OBJECTS.object_name%TYPE
+                                  ,p_tab_ddl_text IN Nm3type.tab_varchar32767
+                                  );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="use_pub_syn">
+-- This function returns TRUE is the system is configured to use PUBLIC synonyms
+--  otherwise FALSE
+--  (System option 'HIGPUBSYN')
+--
+FUNCTION use_pub_syn RETURN BOOLEAN;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="create_user">
+PROCEDURE create_user (p_rec_hus            IN OUT HIG_USERS%ROWTYPE
+                      ,p_password           IN     VARCHAR2
+                      ,p_default_tablespace IN     VARCHAR2
+                      ,p_temp_tablespace    IN     VARCHAR2
+                      ,p_default_quota      IN     VARCHAR2
+                      ,p_profile            IN     VARCHAR2
+                      );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="create_synonym_for_object">
+-- This procedure creates all of the synonyms necessary for the specified object.
+-- It will create either a PUBLIC synonym, or private synonyms for all application
+--  users specified in HIG_USERS depending on how the system is configured
+--
+PROCEDURE create_synonym_for_object
+           ( p_object_name IN USER_OBJECTS.object_name%TYPE
+           , p_syn_type    IN VARCHAR2 DEFAULT NULL );
+-- Possible errors raised are -
+-- -20301  Object does not exist in schema of application_owner
+-- -20303  User does not have permission to create this synonym
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="drop_synonym_for_object">
+-- This procedure drops all of the synonyms for the specified object, either the PUBLIC
+--  synonym or all of the private synonyms,  depending on how the system is configured
+--
+PROCEDURE drop_synonym_for_object (p_object_name IN USER_OBJECTS.object_name%TYPE);
+-- Possible errors raised are -
+-- -20304  There is no PUBLIC synonym in exisitence for object
+-- -20303  User does not have permission to drop this synonym
+--</PROC>
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="drop_synonym_for_object">
+PROCEDURE drop_views_for_object (p_object_name IN USER_OBJECTS.object_name%TYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="create_all_priv_syns">
+-- This procedure creates all PRIVATE synoynms for the specified user for all
+--  relevant objects owned by the APPLICATION_OWNER (if the application is configured
+--  to use private synonyms
+--
+PROCEDURE create_all_priv_syns (p_user IN USER_USERS.username%TYPE);
+-- Possible errors raised are -
+-- -20305  Application is configured to run using PUBLIC synonyms. Not creating private synonyms
+-- -20303  User does not have permission to create this synonym
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="check_syn_exists">
+-- This function returns TRUE if the specified synonym exists and the object
+--   which the synonym is pointing to is owned by the APPLICATION_OWNER
+--
+FUNCTION check_syn_exists (p_owner IN ALL_SYNONYMS.owner%TYPE
+                          ,p_name  IN ALL_SYNONYMS.synonym_name%TYPE
+                          ) RETURN BOOLEAN;
+--<PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="change_user_password">
+-- This procedure changes the password for a user.
+--
+PROCEDURE change_user_password(pi_user       IN VARCHAR2
+                              ,pi_new_passwd IN VARCHAR2
+                              );
+--<PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="refresh_public_synonyms">
+-- This procedure creates any extra required PUBLIC synonyms
+--
+PROCEDURE refresh_public_synonyms;
+-- Possible errors raised are -
+-- -20307  Application is configured to run using PRIVATE synonyms. Not creating PUBLIC synonyms
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="refresh_private_synonyms">
+-- This procedure creates any extra required PRIVATE synonyms for all users
+--
+PROCEDURE refresh_private_synonyms;
+-- Possible errors raised are -
+-- -20305  Application is configured to run using PUBLIC synonyms. Not creating private synonyms
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="refresh_all_synonyms">
+-- This procedure creates any extra required PUBLIC or PRIVATE synonyms depending on system config
+--
+PROCEDURE refresh_all_synonyms;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="grant_on_object">
+-- This procedure GRANTs the specified privileges on the specified object to the user specified
+--
+PROCEDURE grant_on_object (p_grant_to     IN VARCHAR2
+                          ,p_object_name  IN VARCHAR2
+                          ,p_grant_select IN BOOLEAN DEFAULT TRUE
+                          ,p_grant_insert IN BOOLEAN DEFAULT FALSE
+                          ,p_grant_update IN BOOLEAN DEFAULT FALSE
+                          ,p_grant_delete IN BOOLEAN DEFAULT FALSE
+                          ,p_with_admin   IN BOOLEAN DEFAULT FALSE
+                          );
+-- Possible errors raised are -
+-- -20308 Must be at least one of SELECT, UPDATE, DELETE, INSERT
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="revoke_from_object">
+-- This procedure REVOKESs the specified privileges on the specified object from the user specified
+--
+PROCEDURE revoke_from_object (p_revoke_from   IN VARCHAR2
+                             ,p_object_name   IN VARCHAR2
+                             ,p_revoke_select IN BOOLEAN DEFAULT TRUE
+                             ,p_revoke_insert IN BOOLEAN DEFAULT FALSE
+                             ,p_revoke_update IN BOOLEAN DEFAULT FALSE
+                             ,p_revoke_delete IN BOOLEAN DEFAULT FALSE
+                             );
+-- Possible errors raised are -
+-- -20308 Must be at least one of SELECT, UPDATE, DELETE, INSERT
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="does_object_exist">
+-- This function returns TRUE if the specified object exists. If object_type
+--  is passed in as NULL (default) then it looks for the existance of any
+--  object with that name (owned by the application owner).
+--
+FUNCTION does_object_exist (p_object_name IN VARCHAR2
+                           ,p_object_type IN VARCHAR2 DEFAULT NULL
+                           ) RETURN BOOLEAN;
+
+FUNCTION does_object_exist (p_object_name  IN VARCHAR2
+                           ,p_object_type  IN VARCHAR2 DEFAULT NULL
+                           ,p_object_owner IN VARCHAR2
+                           ) RETURN BOOLEAN;
+
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="append_tab_varchar">
+-- This procedure appends the passed string into g_tab_varchar
+--
+PROCEDURE append_tab_varchar (p_text VARCHAR2
+                             ,p_nl   BOOLEAN DEFAULT TRUE
+                             );
+--
+PROCEDURE append_tab_varchar (p_tab  IN OUT Nm3type.tab_varchar32767
+                             ,p_text IN     VARCHAR2
+                             ,p_nl   IN     BOOLEAN DEFAULT TRUE
+                             );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="delete_tab_varchar">
+-- This procedure deletes all rows from g_tab_varchar
+--
+PROCEDURE delete_tab_varchar;
+--
+PROCEDURE delete_tab_varchar(p_tab  IN OUT Nm3type.tab_varchar32767);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="execute_tab_varchar">
+-- This procedure does an EXECUTE IMMEDIATE with the contents of g_tab_varchar
+--
+PROCEDURE execute_tab_varchar (p_debug       BOOLEAN DEFAULT FALSE
+                              ,p_debug_level NUMBER  DEFAULT NULL
+                              );
+--
+PROCEDURE execute_tab_varchar (p_tab_varchar Nm3type.tab_varchar32767
+                              ,p_debug       BOOLEAN DEFAULT FALSE
+                              ,p_debug_level NUMBER  DEFAULT NULL
+                              );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_tab_varchar">
+-- This procedure writes the contents of g_tab_varchar using the nm_debug package
+--
+PROCEDURE debug_tab_varchar (p_level NUMBER DEFAULT NULL);
+--
+PROCEDURE debug_tab_varchar (p_tab_varchar Nm3type.tab_varchar32767
+                            ,p_level       NUMBER DEFAULT NULL
+                            );
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_column_details">
+-- function returns the data dictionary details for the named column, table
+-- combination
+--
+FUNCTION get_column_details( p_column_name ALL_TAB_COLUMNS.column_name%TYPE
+                           , p_table_name  ALL_TAB_COLUMNS.table_name%TYPE
+                           )RETURN ALL_TAB_COLUMNS%ROWTYPE;
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_all_columns_for_table">
+-- Function returns a PL/SQL table of column details for a table
+--
+FUNCTION get_all_columns_for_table (p_table_name ALL_TAB_COLUMNS.table_name%TYPE
+                                   ) RETURN tab_atc;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="rebuild_all_sequences">
+-- Rebuilds all sequences where the detail of it's usage is in HIG_SEQUENCE_ASSOCIATIONS
+--
+PROCEDURE rebuild_all_sequences;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="rebuild_sequence">
+-- Rebuilds the specified sequence where the detail of it's usage is in HIG_SEQUENCE_ASSOCIATIONS
+--
+-- Sequence value will be moved up or down so it is just higher than the maximum
+-- of the associated column value. If the table is empty this is 0.
+--
+PROCEDURE rebuild_sequence (pi_hsa_sequence_name HIG_SEQUENCE_ASSOCIATIONS.hsa_sequence_name%TYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="refresh_materialized_views">
+-- Rebuilds any materialized views owned by the current user where the view name
+-- matches that pi_mask - if null then all will be refreshed
+--
+PROCEDURE refresh_materialized_views(pi_mask  IN VARCHAR2);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="column_exists">
+-- return true if given column exists in given table/view
+--
+FUNCTION column_exists(pi_table_view_name IN VARCHAR2
+                      ,pi_column_name     IN VARCHAR2) RETURN BOOLEAN;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="analyse_table">
+-- uses dbms_stats to gather stats (analyze) for a given table
+--
+PROCEDURE analyse_table
+            ( pi_table_name          IN USER_TABLES.table_name%TYPE );
+
+PROCEDURE analyse_table
+            ( pi_table_name          IN USER_TABLES.table_name%TYPE
+            , pi_schema              IN ALL_USERS.USERNAME%TYPE
+            , pi_estimate_percentage IN NUMBER                       DEFAULT NULL
+            , pi_auto_sample_size    IN VARCHAR2                     DEFAULT 'FALSE' );
+
+PROCEDURE analyse_table
+            ( pi_table_name          IN USER_TABLES.table_name%TYPE
+            , pi_schema              IN ALL_USERS.USERNAME%TYPE
+            , pi_estimate_percentage IN NUMBER                       DEFAULT NULL
+            , pi_auto_sample_size    IN BOOLEAN                      DEFAULT FALSE );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="Create_Sub_Sdo_Views">
+-- Create SDO views required by subordinate users
+PROCEDURE create_sub_sdo_views
+            ( pi_sub_username IN VARCHAR2);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="create_all_sdo_styles">
+-- Create ALL_SDO_STYLES view for an instance bringing together all styles
+-- for each Highways owner / sub user
+PROCEDURE create_all_styles_view;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_pck_referenced_col_diffs">
+-- Write a file to UTLFILEDIR giving a list of referenced columns in a package that differ
+-- in type, column position between a baseline schema (pi_schema1) and a secondary schema
+-- Useful when tracing causes of forms signature issues
+--
+PROCEDURE get_pck_referenced_col_diffs(pi_package_name    IN VARCHAR2
+                                      ,pi_schema1         IN VARCHAR2
+                                      ,pi_schema2         IN VARCHAR2);
+--
+-----------------------------------------------------------------------------
+--
+FUNCTION get_sccs_comments
+          ( pi_sccs_id   IN  VARCHAR2  DEFAULT NULL
+          , pi_w         IN  VARCHAR2  DEFAULT NULL
+          , pi_g         IN  VARCHAR2  DEFAULT NULL
+          , pi_m         IN  VARCHAR2  DEFAULT NULL
+          , pi_e         IN  VARCHAR2  DEFAULT NULL
+          , pi_u         IN  VARCHAR2  DEFAULT NULL
+          , pi_d         IN  VARCHAR2  DEFAULT NULL
+          , pi_t         IN  VARCHAR2  DEFAULT NULL
+          , pi_i         IN  VARCHAR2  DEFAULT NULL
+          , pi_copyright IN  VARCHAR2  DEFAULT NULL )
+RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--<PROC NAME="sequence_nextval">
+-- supply it with the name of a sequence and it'll give you the nextval back
+FUNCTION sequence_nextval(pi_sequence_name IN VARCHAR2) RETURN PLS_INTEGER;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PRAGMA>
+   PRAGMA RESTRICT_REFERENCES (get_version, wnps, wnds);
+   PRAGMA RESTRICT_REFERENCES (get_body_version, wnps, wnds);
+   PRAGMA RESTRICT_REFERENCES (use_pub_syn, wnps, wnds);
+   PRAGMA RESTRICT_REFERENCES (check_syn_exists, wnps, wnds);
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+END Nm3ddl;
+/
