@@ -137,11 +137,6 @@ PROCEDURE drop_synonym_for_object (p_object_name IN USER_OBJECTS.object_name%TYP
 --<PROC NAME="drop_synonym_for_object">
 PROCEDURE drop_views_for_object (p_object_name IN USER_OBJECTS.object_name%TYPE);
 --</PROC>
------------------------------------------------------------------------------
---
---<PROC NAME="create_views_for_object">
-PROCEDURE create_views_for_object (p_object_name IN USER_OBJECTS.object_name%TYPE);
---</PROC>
 --
 -----------------------------------------------------------------------------
 --
