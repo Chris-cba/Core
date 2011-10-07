@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_process_framework.pkb-arc   3.11   May 16 2011 14:42:20   Steve.Cooper  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_process_framework.pkb-arc   3.12   Oct 07 2011 11:54:08   Steve.Cooper  $
 --       Module Name      : $Workfile:   hig_process_framework.pkb  $
---       Date into PVCS   : $Date:   May 16 2011 14:42:20  $
---       Date fetched Out : $Modtime:   May 03 2011 10:58:50  $
---       Version          : $Revision:   3.11  $
+--       Date into PVCS   : $Date:   Oct 07 2011 11:54:08  $
+--       Date fetched Out : $Modtime:   Oct 07 2011 11:53:56  $
+--       Version          : $Revision:   3.12  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.11  $';
+  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.12  $';
 
   g_package_name CONSTANT varchar2(30) := 'hig_process_framework';
 
@@ -1065,7 +1065,6 @@ BEGIN
  
  hig_process_api.create_and_schedule_process(pi_process_type_id           => l_process_type_id
                                            , pi_initiators_ref            => Null
---                                           , pi_job_owner                 => hig.get_application_owner
                                            , pi_start_date                => sysdate
                                            , pi_frequency_id              => pi_frequency_id
                                            , po_process_id                => l_process_id  
