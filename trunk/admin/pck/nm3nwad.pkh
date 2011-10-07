@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE Nm3nwad AS
 -----------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3nwad.pkh-arc   2.2   May 17 2011 08:26:24   Steve.Cooper  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3nwad.pkh-arc   2.3   Oct 07 2011 14:47:04   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3nwad.pkh  $
---       Date into SCCS   : $Date:   May 17 2011 08:26:24  $
---       Date fetched Out : $Modtime:   Apr 01 2011 09:15:36  $
---       SCCS Version     : $Revision:   2.2  $
+--       Date into SCCS   : $Date:   Oct 07 2011 14:47:04  $
+--       Date fetched Out : $Modtime:   Oct 07 2011 14:46:12  $
+--       SCCS Version     : $Revision:   2.3  $
 --       Based on 
 --
 -- Author : A Edwards/P Stanton/G Johnson
@@ -17,8 +17,7 @@ CREATE OR REPLACE PACKAGE Nm3nwad AS
 -- 12-MAY-2006      GJ   Date logic changed for Primary AD Types
 --                       nm_nw_ad_link_all.nad_start_date and nm_inv_items_all.iit_start_date
 --                       must equal the start date of the element that the AD relates to
---                       Also amended end_date_date_nadl to accept effective date parameter.
---                       Was previously assuming that end dating was always on nm3user.get_effective_date                   
+--                       Also amended end_date_date_nadl to accept effective date parameter.                  
 --
 --
 -----------------------------------------------------------------------------

@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3nwad AS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3nwad.pkb-arc   2.12   May 17 2011 08:26:24   Steve.Cooper  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3nwad.pkb-arc   2.13   Oct 07 2011 14:47:04   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3nwad.pkb  $
---       Date into PVCS   : $Date:   May 17 2011 08:26:24  $
---       Date fetched Out : $Modtime:   Apr 01 2011 09:17:20  $
---       PVCS Version     : $Revision:   2.12  $
+--       Date into PVCS   : $Date:   Oct 07 2011 14:47:04  $
+--       Date fetched Out : $Modtime:   Oct 07 2011 14:46:50  $
+--       PVCS Version     : $Revision:   2.13  $
 --
 --
 -- Author : A Edwards/P Stanton/G Johnson
@@ -18,7 +18,6 @@ CREATE OR REPLACE PACKAGE BODY Nm3nwad AS
 --                       nm_nw_ad_link_all.nad_start_date and nm_inv_items_all.iit_start_date
 --                       must equal the start date of the element that the AD relates to
 --                       Also amended end_date_date_nadl to accept effective date parameter.
---                       Was previously assuming that end dating was always on nm3user.get_effective_date
 --
 -----------------------------------------------------------------------------
 --  Copyright (c) exor corporation ltd, 2004
@@ -36,7 +35,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3nwad AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT VARCHAR2(2000) := '"$Revision:   2.12  $"';
+  g_body_sccsid  CONSTANT VARCHAR2(2000) := '"$Revision:   2.13  $"';
 
   g_package_name CONSTANT VARCHAR2(30) := 'nm3nwad';
 
@@ -625,7 +624,6 @@ BEGIN
            l_rec_nm.nm_obj_type      := pi_rec_ne.ne_gty_group_type;
            l_rec_nm.nm_begin_mp      := 0;
            l_rec_nm.nm_start_date    := greatest(pi_rec_ne.ne_start_date, l_rec_ne.ne_start_date );
-  --       l_rec_nm.nm_start_date    := Nm3user.get_effective_date;
            l_rec_nm.nm_end_mp        := Nm3net.Get_Ne_Length(pi_tab_nm(i));
            l_rec_nm.nm_cardinality   := 1;
            l_rec_nm.nm_admin_unit    := Nm3get.get_ne(pi_ne_id => pi_tab_nm(i)).ne_admin_unit;
@@ -1722,7 +1720,6 @@ BEGIN
              -- create a duplicate inv item and associate with new element 1
              l_rec_iit_np                := Nm3get.get_iit_all (l_tab_non_prim_nadl(i).nad_iit_ne_id);
              l_rec_iit_np.iit_ne_id      := Nm3seq.next_ne_id_seq;
---             l_rec_iit_np.iit_start_date := Nm3user.get_effective_date;
 
              IF l_rec_iit_np.iit_primary_key IS NOT NULL
               THEN
@@ -3704,7 +3701,7 @@ BEGIN
   ELSE
 
     IF l_rec_iit.iit_start_date IS NULL
-      THEN l_rec_iit.iit_start_date := l_rec_ne.ne_start_date; -- Nm3user.get_effective_date;
+      THEN l_rec_iit.iit_start_date := l_rec_ne.ne_start_date; 
     END IF;
 
     IF l_rec_iit.iit_admin_unit IS NULL
@@ -3726,7 +3723,7 @@ BEGIN
    -- l_rec_nadl.nad_id := l_rec_nadt.nad_id;
     l_rec_nadl.nad_ne_id := l_ne_id;
     l_rec_nadl.nad_iit_ne_id  := l_tmp_iit_rec.iit_ne_id;
-    l_rec_nadl.nad_start_date := greatest(l_rec_ne.ne_start_date, l_rec_iit.iit_start_date); -- RAC task 0109340 - did use  Nm3user.get_effective_date;
+    l_rec_nadl.nad_start_date := greatest(l_rec_ne.ne_start_date, l_rec_iit.iit_start_date);
 
     Nm3nwad.ins_nadl(l_rec_nadl);
 
