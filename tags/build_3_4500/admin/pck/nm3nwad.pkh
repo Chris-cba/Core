@@ -1,0 +1,706 @@
+CREATE OR REPLACE PACKAGE Nm3nwad AS
+--<PACKAGE>
+-----------------------------------------------------------------------------
+--   PVCS Identifiers :-
+--
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3nwad.pkh-arc   2.3   Oct 07 2011 14:47:04   Steve.Cooper  $
+--       Module Name      : $Workfile:   nm3nwad.pkh  $
+--       Date into SCCS   : $Date:   Oct 07 2011 14:47:04  $
+--       Date fetched Out : $Modtime:   Oct 07 2011 14:46:12  $
+--       SCCS Version     : $Revision:   2.3  $
+--       Based on 
+--
+-- Author : A Edwards/P Stanton/G Johnson
+--
+-- NM3NWAD - Additional Data link package
+--
+-- 12-MAY-2006      GJ   Date logic changed for Primary AD Types
+--                       nm_nw_ad_link_all.nad_start_date and nm_inv_items_all.iit_start_date
+--                       must equal the start date of the element that the AD relates to
+--                       Also amended end_date_date_nadl to accept effective date parameter.                  
+--
+--
+-----------------------------------------------------------------------------
+--  Copyright (c) exor corporation ltd, 2004
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+    g_sccsid      CONSTANT  VARCHAR2(2000) := '@(#)nm3nwad.pkh	1.12 07/18/06';
+    
+  -- MJA add 31-Aug-07
+  -- Globals for use in bypassing triggers
+  g_bypass_nw_ad_link_all BOOLEAN := FALSE;
+
+TYPE rec_link IS RECORD
+       ( pi_inv_type NM_NW_AD_TYPES.nad_inv_type%TYPE
+       , pi_nad_id   NM_NW_AD_LINK.nad_id%TYPE
+       , pi_ne_id    NM_NW_AD_LINK.nad_ne_id%TYPE) ;
+       
+    g_rec_link rec_link;
+
+TYPE NadtCurTyp IS REF CURSOR 
+  RETURN NM_NW_AD_TYPES%ROWTYPE;
+
+TYPE NadlCurTyp   IS REF CURSOR 
+  RETURN nm_nw_ad_link%ROWTYPE;
+--  g_sccsid is the SCCS ID for the package
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN VARCHAR2;
+--</PROC>
+--
+  -----------
+  --variables
+  -----------
+TYPE 
+  tab_nadt IS TABLE OF NM_NW_AD_TYPES%ROWTYPE 
+     INDEX BY BINARY_INTEGER;
+
+TYPE 
+  tab_nadl IS TABLE OF NM_NW_AD_LINK_ALL%ROWTYPE 
+     INDEX BY BINARY_INTEGER;
+
+  -- Use these global plsql tables for validation triggers
+  g_tab_nadt tab_nadt;
+  g_tab_nadl tab_nadl;
+
+  g_tab_nadt_exception EXCEPTION;
+  g_tab_nadt_exc_code  NUMBER;
+  g_tab_nadt_exc_msg   VARCHAR2(2000);
+  
+  g_iit_rec NM_INV_ITEMS%ROWTYPE;
+  
+-----------------------------------------------------------------------------
+-- Procedures below are brought acress from nm3group_inv package and renamed
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="grp_check_link_types">
+--
+-- This procedure raises an error if the types of the items to be linked are
+-- invalid (according to the data in nm_group_inv_types).
+--
+PROCEDURE check_link_types
+            ( pi_ne_id     IN NM_NW_AD_LINK.nad_ne_id%TYPE
+            , pi_iit_ne_id IN NM_NW_AD_LINK.nad_iit_ne_id%TYPE
+            );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="set_link_for_datum">
+--
+-- Updates/inserts a link between the nt type and the inventory type.
+--
+PROCEDURE set_link_for_datum
+              ( pi_nt_type  IN NM_NW_AD_TYPES.nad_nt_type%TYPE
+              , pi_inv_type IN NM_NW_AD_TYPES.nad_inv_type%TYPE
+              );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="set_link_for_group">
+--
+-- Updates/inserts a link between the group type and the inventory type.
+--
+PROCEDURE set_link_for_group
+              ( pi_group_type IN NM_NW_AD_TYPES.nad_gty_type%TYPE
+              , pi_inv_type   IN NM_NW_AD_TYPES.nad_inv_type%TYPE
+              );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="grp_get_inv_item_for_element">
+--
+-- This procedure returns the inventory item (and its type) associated with
+-- the supplied group (and type).
+--
+PROCEDURE get_inv_item_for_element
+            ( pi_ne_id              IN     NM_NW_AD_LINK.nad_ne_id%TYPE
+            , pi_raise_if_not_found IN      BOOLEAN DEFAULT TRUE
+            , po_iit_ne_id             OUT NM_NW_AD_LINK.nad_iit_ne_id%TYPE
+            , po_inv_type              OUT NM_NW_AD_TYPES.nad_inv_type%TYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_prim_inv_item_for_element">
+--
+-- This procedure returns the inventory item (and its type) associated with
+-- the supplied group (and type).
+--
+PROCEDURE get_prim_inv_item_for_element
+            ( pi_ne_id              IN     NM_NW_AD_LINK.nad_ne_id%TYPE
+            , pi_raise_if_not_found IN      BOOLEAN DEFAULT TRUE
+            , po_iit_ne_id             OUT NM_NW_AD_LINK.nad_iit_ne_id%TYPE
+            , po_inv_type              OUT NM_NW_AD_TYPES.nad_inv_type%TYPE
+            , po_nad_id                OUT NM_NW_AD_TYPES.nad_id%TYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--<PROC NAME="create_grp_with_inv">
+--
+-- Pass in a group and inv flex attribs
+--
+PROCEDURE create_grp_with_inv 
+              ( pi_rec_ne  IN NM_ELEMENTS%ROWTYPE
+              , pi_rec_inv IN NM_INV_ITEMS%ROWTYPE
+              );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="create_grp_with_inv">
+--
+-- Pass in a group and inv flex attribs and members
+--
+PROCEDURE create_grp_with_inv 
+              ( pi_rec_ne  IN NM_ELEMENTS%ROWTYPE
+              , pi_rec_inv IN NM_INV_ITEMS%ROWTYPE
+              , pi_tab_nm  IN Nm3type.tab_number
+               );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="grp_end_date_linked_inv">
+--
+-- End dates inv item linked to element.
+--
+PROCEDURE end_date_linked_inv
+              ( pi_ne_id            IN NM_ELEMENTS.ne_id%TYPE
+              , pi_nt_type          IN NM_ELEMENTS.ne_nt_type%TYPE
+              , pi_group_type       IN NM_ELEMENTS.ne_gty_group_type%TYPE
+              , pi_end_date         IN NM_ELEMENTS.ne_end_date%TYPE
+              , pi_raise_if_no_link IN BOOLEAN DEFAULT TRUE
+              );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="grp_iit_rec_init">
+--
+-- Initialises a package record to store an inventory item in.
+--
+PROCEDURE iit_rec_init
+              ( pi_inv_type   IN NM_INV_ITEMS.iit_inv_type%TYPE DEFAULT NULL
+              , pi_admin_unit IN NM_INV_ITEMS.iit_admin_unit%TYPE DEFAULT NULL
+              );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="grp_iit_rec_update">
+--
+-- Updates the specified field in the package inventory record.
+--
+PROCEDURE iit_rec_update
+              ( pi_column_name IN VARCHAR2
+              , pi_value       IN VARCHAR2
+              );
+PROCEDURE iit_rec_update
+              ( pi_column_name IN VARCHAR2
+              , pi_value       IN NUMBER
+              );
+PROCEDURE iit_rec_update
+              ( pi_column_name IN VARCHAR2
+              , pi_value       IN DATE
+              );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="grp_iit_rec_insert">
+--
+-- Inserts the package inv record into the inventory table..
+--
+FUNCTION iit_rec_insert 
+  RETURN NM_INV_ITEMS.iit_ne_id%TYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_inv_type_for_gty_type">
+--
+-- For a given network element group type return a corresponding inventory type
+FUNCTION get_prim_inv_type_for_ne_id
+           ( pi_ne_id IN NM_ELEMENTS_ALL.ne_id%TYPE)
+  RETURN NM_NW_AD_TYPES.nad_inv_type%TYPE ;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_prim_nadl_from_ne_id">
+--
+-- For a given network element get the id of the 
+-- corresponding prim inventory item that is used to store associated attributes
+--
+FUNCTION get_prim_nadl_from_ne_id
+           ( pi_nadl_ne_id        NM_NW_AD_LINK.nad_ne_id%TYPE
+           , pi_end_dated         BOOLEAN     DEFAULT FALSE
+           , pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+           , pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000) 
+  RETURN NM_NW_AD_LINK%ROWTYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+-- <PROC NAME="get_non_prim_nadl_from_iit_ne_id">
+--
+-- For a given network element get the id of the 
+-- corresponding non prim inventory item that is used to store associated attributes
+--
+FUNCTION get_non_prim_nadl_from_ne_id
+           ( pi_nadl_ne_id        NM_NW_AD_LINK.nad_ne_id%TYPE
+           , pi_end_dated         BOOLEAN     DEFAULT FALSE
+           , pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+           , pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000) 
+  RETURN tab_nadl;
+--</PROC>  
+
+-----------------------------------------------------------------------------
+-- Procedures below are new and associated with nm3nwad
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_next_nad_id">
+-- get next nad id sequence value
+--
+FUNCTION get_next_nad_id 
+  RETURN PLS_INTEGER;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--<PROC NAME="do_ad_split">
+-- Performs SPLIT of Additional Data on given NE_IDs
+PROCEDURE do_ad_split 
+              ( pi_old_ne_id  IN NM_ELEMENTS.ne_id%TYPE
+              , pi_new_ne_id1 IN NM_ELEMENTS.ne_id%TYPE
+              , pi_new_ne_id2 IN NM_ELEMENTS.ne_id%TYPE
+              );
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="do_ad_unsplit">
+-- Performs UNSPLIT of Additional Data on given NE_IDs
+PROCEDURE do_ad_unsplit( pi_new_ne_id1  IN NM_ELEMENTS.ne_id%TYPE
+                       , pi_new_ne_id2  IN NM_ELEMENTS.ne_id%TYPE
+                       , pi_old_ne_id   IN NM_ELEMENTS.ne_id%TYPE);
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="do_ad_merge">
+-- Performs MERGE of Additional Data on given NE_IDs 
+PROCEDURE do_ad_merge 
+              ( pi_new_ne_id   IN NM_ELEMENTS.ne_id%TYPE
+              , pi_old_ne_id1  IN NM_ELEMENTS.ne_id%TYPE
+              , pi_old_ne_id2  IN NM_ELEMENTS.ne_id%TYPE
+              , pi_effective_date IN DATE);
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="do_ad_unmerge">
+-- Performs UNMERGE of Additional Data on given NE_IDs
+PROCEDURE do_ad_unmerge
+              ( pi_new_ne_id   IN NM_ELEMENTS.ne_id%TYPE
+              , pi_old_ne_id1  IN NM_ELEMENTS.ne_id%TYPE
+              , pi_old_ne_id2  IN NM_ELEMENTS.ne_id%TYPE);
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="do_ad_reclass">
+-- Performs RECLASSIFY of Additional Data on given NE_IDs
+PROCEDURE do_ad_reclass
+             ( pi_new_ne_id   IN NM_ELEMENTS.ne_id%TYPE
+             , pi_old_ne_id   IN NM_ELEMENTS.ne_id%TYPE
+			 , pi_new_ne_nt_type        IN nm_elements.ne_nt_type%TYPE
+             , pi_new_ne_gty_group_type IN nm_elements.ne_gty_group_type%TYPE
+			 );
+
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="do_ad_replace">
+-- Performs REPLACE of Additional Data on given NE_IDs 
+PROCEDURE do_ad_replace
+              ( pi_old_ne_id IN NM_ELEMENTS.ne_id%TYPE
+              , pi_new_ne_id IN NM_ELEMENTS.ne_id%TYPE
+              );
+--
+-----------------------------------------------------------------------------
+--              
+--<PROC NAME="do_ad_unreplace">
+-- Performs unREPLACE of Additional Data on given NE_IDs 
+PROCEDURE do_ad_unreplace
+              ( pi_old_ne_id IN NM_ELEMENTS.ne_id%TYPE
+              );
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="un_end_date">
+-- Updates the given nm_nw_ad_link row setting the end date to null 
+PROCEDURE un_end_date( pi_nm_nw_ad_link IN NM_NW_AD_LINK%ROWTYPE );
+--
+-----------------------------------------------------------------------------
+-- 
+--
+--<PROC NAME="del_prim_nadl">
+-- Deletes the given nm_nw_ad_link record  
+PROCEDURE del_nadl( pi_nm_nw_ad_link IN NM_NW_AD_LINK%ROWTYPE );
+--
+-----------------------------------------------------------------------------
+--                                 
+--
+--<PROC NAME="get_nadt">
+-- Fetches a rowtype for nm_nw_ad_types based on PK
+FUNCTION get_nadt
+              ( pi_nad_id           IN NM_NW_AD_TYPES.nad_id%TYPE)
+  RETURN NM_NW_AD_TYPES%ROWTYPE;
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nadt">
+-- Fetches a rowtype for nm_nw_ad_types based on PK
+FUNCTION get_nadt
+              ( pi_nt_type          IN NM_NW_AD_TYPES.nad_nt_type%TYPE
+              , pi_gty_type         IN NM_NW_AD_TYPES.nad_gty_type%TYPE)
+  RETURN NM_NW_AD_TYPES%ROWTYPE;
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nadt">
+-- Fetches a rowtype for nm_nw_ad_types based on PK
+FUNCTION get_nadt
+              ( pi_nt_type          IN NM_NW_AD_TYPES.nad_nt_type%TYPE)
+  RETURN NM_NW_AD_TYPES%ROWTYPE;
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ad_data_exist">
+-- return true if ad_data exists for the given ne_id 
+FUNCTION ad_data_exist ( pi_ne_id IN NM_ELEMENTS.ne_id%TYPE 
+                       , pi_undo  IN BOOLEAN DEFAULT FALSE )
+
+   RETURN BOOLEAN;
+-- 
+-----------------------------------------------------------------------------
+-- 
+PROCEDURE get_nadt_tab
+              ( pi_nt_type          IN NM_NW_AD_TYPES.nad_nt_type%TYPE
+              , po_type_tab        OUT Nm3type.tab_varchar4
+              , po_nad_id_tab      OUT Nm3type.tab_number);
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE get_nadt_tab
+              ( pi_nt_type          IN NM_NW_AD_TYPES.nad_nt_type%TYPE
+              , pi_gty_type         IN NM_NW_AD_TYPES.nad_gty_type%TYPE
+              , po_type_tab        OUT Nm3type.tab_varchar4
+              , po_nad_id_tab      OUT Nm3type.tab_number);
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE get_non_prim_nadt_tab
+              ( pi_nt_type          IN NM_NW_AD_TYPES.nad_nt_type%TYPE
+              , po_type_tab        OUT Nm3type.tab_varchar4
+              , po_nad_id_tab      OUT Nm3type.tab_number);
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE get_non_prim_nadt_tab
+              ( pi_nt_type          IN NM_NW_AD_TYPES.nad_nt_type%TYPE
+              , pi_gty_type         IN NM_NW_AD_TYPES.nad_gty_type%TYPE
+              , po_type_tab        OUT Nm3type.tab_varchar4
+              , po_nad_id_tab      OUT Nm3type.tab_number);
+--
+-----------------------------------------------------------------------------
+--
+FUNCTION get_prim_nadt
+              ( pi_nt_type          IN NM_NW_AD_TYPES.nad_nt_type%TYPE)
+  RETURN NM_NW_AD_TYPES%ROWTYPE;
+--
+-----------------------------------------------------------------------------
+--
+FUNCTION get_prim_nadt
+              ( pi_nt_type          IN NM_NW_AD_TYPES.nad_nt_type%TYPE
+              , pi_gty_type         IN NM_NW_AD_TYPES.nad_gty_type%TYPE)
+  RETURN NM_NW_AD_TYPES%ROWTYPE;
+--
+-----------------------------------------------------------------------------
+--
+
+FUNCTION get_non_prim_nadt_tab
+              ( pi_nt_type      IN NM_NW_AD_TYPES.nad_nt_type%TYPE)
+  RETURN Nm3type.tab_varchar4;
+--
+-----------------------------------------------------------------------------
+--
+FUNCTION get_non_prim_nadt_tab
+              ( pi_nt_type      IN NM_NW_AD_TYPES.nad_nt_type%TYPE
+              , pi_gty_type     IN NM_NW_AD_TYPES.nad_gty_type%TYPE)
+  RETURN Nm3type.tab_varchar4;
+--
+-----------------------------------------------------------------------------
+--
+FUNCTION get_non_prim_nadt_sql
+              ( pi_nt_type      IN NM_NW_AD_TYPES.nad_nt_type%TYPE)
+  RETURN Nm3type.max_varchar2;
+--
+-----------------------------------------------------------------------------
+--
+FUNCTION get_non_prim_nadt_sql
+              ( pi_nt_type      IN NM_NW_AD_TYPES.nad_nt_type%TYPE
+              , pi_gty_type     IN NM_NW_AD_TYPES.nad_gty_type%TYPE)
+  RETURN Nm3type.max_varchar2;
+--
+-----------------------------------------------------------------------------
+--
+FUNCTION get_nadt_sql
+              ( pi_nt_type          IN NM_NW_AD_TYPES.nad_nt_type%TYPE)
+  RETURN Nm3type.max_varchar2;
+--
+-----------------------------------------------------------------------------
+--
+FUNCTION get_nadt_sql
+              ( pi_nt_type          IN NM_NW_AD_TYPES.nad_nt_type%TYPE
+              , pi_gty_type         IN NM_NW_AD_TYPES.nad_gty_type%TYPE)
+  RETURN Nm3type.max_varchar2;
+--
+-----------------------------------------------------------------------------
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nadl">
+-- Fetches a rowtype for nm_nw_ad_link based on PK
+FUNCTION get_nadl
+              ( pi_nad_id           IN NM_NW_AD_LINK.nad_id%TYPE
+              , pi_ne_id            IN NM_NW_AD_LINK.nad_ne_id%TYPE
+              , pi_iit_ne_id        IN NM_NW_AD_LINK.nad_iit_ne_id%TYPE)
+  RETURN NM_NW_AD_LINK%ROWTYPE;
+--
+-----------------------------------------------------------------------------
+--<PROC NAME="get_nadl">
+-- Fetches a rowtype for nm_nw_ad_link based on PK
+--
+FUNCTION get_nadl
+              ( pi_nad_id           IN NM_NW_AD_LINK.nad_id%TYPE
+              , pi_ne_id            IN NM_NW_AD_LINK.nad_ne_id%TYPE)
+  RETURN NM_NW_AD_LINK%ROWTYPE;
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nadt">
+-- Creates a row for nm_nw_ad_types
+PROCEDURE ins_nadt
+              ( pi_nadt_rec    IN OUT NM_NW_AD_TYPES%ROWTYPE);
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nadl">
+-- Creates a row for nm_nw_ad_link
+PROCEDURE ins_nadl
+              ( pi_nadl_rec    IN OUT NM_NW_AD_LINK%ROWTYPE);
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="end_date_nadl">
+-- 
+PROCEDURE end_date_nadl
+              ( pi_rec_nadl    IN     NM_NW_AD_LINK%ROWTYPE
+               ,pi_effective_date IN DATE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY'));
+--
+-----------------------------------------------------------------------------  
+--
+--
+--<PROC NAME="end_date_all_ad_for_element">
+-- 
+PROCEDURE end_date_all_ad_for_element(pi_ne_id IN nm_elements_all.ne_id%TYPE
+                                     ,pi_effective_date IN DATE  DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY') );
+--
+-----------------------------------------------------------------------------  
+--
+--<PROC NAME="process_table_nwad_types">
+-- Performs validation on nm_nw_ad_types table 
+PROCEDURE process_table_nwad_types;
+--
+-----------------------------------------------------------------------------  
+--
+--<PROC NAME="process_table_nwad_link">
+-- Performs validation on nm_nw_ad_link table 
+PROCEDURE process_table_nwad_link;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE set_rec_link 
+            ( pi_rec_link IN rec_link );
+--
+-----------------------------------------------------------------------------
+--
+FUNCTION return_global_inv_type RETURN NM_INV_TYPES.nit_inv_type%TYPE;
+--
+-----------------------------------------------------------------------------
+--
+FUNCTION return_global_record RETURN NM_NW_AD_LINK%ROWTYPE;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE create_links_from_membs 
+            ( pi_nad_id IN NM_NW_AD_TYPES.nad_id%TYPE);
+--
+-----------------------------------------------------------------------------
+-- SM API
+-----------------------------------------------------------------------------
+-- Return a REFCURSOR for SM.
+PROCEDURE get_prim_nadt_rc
+           ( pi_nt_type   IN NM_NW_AD_TYPES.nad_nt_type%TYPE
+           , pi_gty_type  IN NM_NW_AD_TYPES.nad_gty_type%TYPE
+           , po_results  OUT nadtcurtyp
+           );
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE get_prim_nadl_from_ne_id_rc
+           ( pi_nadl_ne_id         IN NM_NW_AD_LINK.nad_ne_id%TYPE
+           , pi_end_dated          IN BOOLEAN     DEFAULT FALSE
+           , pi_raise_not_found    IN BOOLEAN     DEFAULT FALSE
+           , pi_not_found_sqlcode  IN PLS_INTEGER DEFAULT -20000
+           , po_results           OUT nadlcurtyp
+           );
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE get_non_prim_nadt_rc
+              ( pi_nt_type          IN NM_NW_AD_TYPES.nad_nt_type%TYPE
+              , pi_gty_type         IN NM_NW_AD_TYPES.nad_gty_type%TYPE
+              , po_results         OUT nadtcurtyp);
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE get_non_prim_nadl_rc
+           ( pi_nadl_ne_id        IN  NM_NW_AD_LINK.nad_ne_id%TYPE
+           , pi_end_dated         IN  BOOLEAN     DEFAULT FALSE
+           , pi_raise_not_found   IN  BOOLEAN     DEFAULT FALSE
+           , pi_not_found_sqlcode IN  PLS_INTEGER DEFAULT -20000
+           , po_results           OUT nadlcurtyp);
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="CREATE_DATUM_WITH_PRIM_AD">
+PROCEDURE create_datum_with_prim_ad
+            ( pi_rec_ne     IN nm_elements%ROWTYPE
+            , pi_rec_iit    IN nm_inv_items%ROWTYPE );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="CREATE_GROUP_WITH_PRIM_AD">
+PROCEDURE create_group_with_prim_ad
+            ( pi_rec_ne     IN nm_elements%ROWTYPE
+            , pi_rec_iit    IN nm_inv_items%ROWTYPE
+            , pi_tab_nm     IN Nm3type.tab_number );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="APPEND_DATUM_WITH_NON_PRIM_AD">
+PROCEDURE append_datum_with_non_prim_ad
+            ( pi_rec_ne     IN nm_elements%ROWTYPE
+            , pi_rec_iit    IN nm_inv_items%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="APPEND_GROUP_WITH_NON_PRIM_AD">
+PROCEDURE append_group_with_non_prim_ad
+            ( pi_rec_ne     IN nm_elements%ROWTYPE
+            , pi_rec_iit    IN nm_inv_items%ROWTYPE);
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ADD_INV_AD_TO_NE"
+PROCEDURE add_inv_ad_to_ne
+            ( pi_ne_id   IN     nm_elements.ne_id%TYPE
+            , pi_rec_iit IN OUT nm_inv_items%ROWTYPE );
+--</PROC>
+--  nm_elements_all
+-----------------------------------------------------------------------------
+--
+--<PROC NAME='copy_ad_to_another_ne'
+-- used in nsg when a versioned street is created the ad data from live street is copied
+-- over and end dated at the same time
+PROCEDURE copy_ad_to_another_ne(pi_nad_inv_type       IN nm_nw_ad_types.nad_inv_type%TYPE
+                               ,pi_ne_id_from         IN nm_elements_all.ne_id%TYPE
+                               ,pi_ne_id_to           IN nm_elements_all.ne_id%TYPE
+							   ,pi_end_date_copy      IN BOOLEAN DEFAULT FALSE);
+--</PROC>
+-----------------------------------------------------------------------------
+--<PROC NAME='get_nadt_for_ne'
+-- for a given element get the nad id to be used when wanting to create a 
+-- nm_nw_ad_link_all record of the given inventory type
+FUNCTION get_nadt_for_ne(pi_ne_id         IN nm_elements_all.ne_id%TYPE 
+                        ,pi_nad_inv_type  IN nm_nw_ad_types.nad_inv_type%TYPE) RETURN nm_nw_ad_types%ROWTYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--<PROC NAME='lock_ad'
+-- lock the inventory record associated to the AD record
+-- use this routine rather than nm3lock_gen.lock_iit - cos it doens't
+-- return any errors relating to inventory records i.e. the user does not
+-- need to know that AD is actually inventory
+PROCEDURE lock_ad(pi_nad_iit_ne_id IN nm_nw_ad_link_all.nad_iit_ne_id%TYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--<PROC NAME='ad_is_valid_on_new_ne'
+-- designed to be called by do_ad_reclass
+-- to see if the old ad can be moved to a new element
+-- where potentially the network type and group type of the element
+-- are different
+FUNCTION ad_is_valid_on_new_ne(pi_old_nad_id            IN nm_nw_ad_types.nad_id%TYPE
+                              ,pi_new_ne_nt_type        IN nm_elements.ne_nt_type%TYPE
+                              ,pi_new_ne_gty_group_type IN nm_elements.ne_gty_group_type%TYPE
+      						  ,po_new_nad_id            OUT nm_nw_ad_types.nad_id%TYPE) RETURN BOOLEAN;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--<PROC NAME='primary_ad_link_start_date'
+FUNCTION primary_ad_link_start_date(pi_nad_ne_id      IN nm_nw_ad_link_all.nad_ne_id%TYPE) RETURN nm_nw_ad_link_all.nad_start_date%TYPE;
+--</PROC>
+----------------------------------------------------------------------------------
+--
+--<PROC NAME="bypass_nw_ad_link_all">
+-- MJA add 31-Aug-07
+-- Speaks for itself.  If true then bypass triggers.
+-- To be called in NM_NW_AD_LINK_AS, NM_NW_AD_LINK_BR triggers to see if 
+--  bypass required
+FUNCTION bypass_nw_ad_link_all RETURN BOOLEAN;
+--</PROC>
+--
+----------------------------------------------------------------------------------
+--
+--<PROC NAME="bypass_nw_ad_link_all">
+-- MJA add 31-Aug-07
+-- Sets global g_bypass_nw_ad_link_all true or false.
+PROCEDURE bypass_nw_ad_link_all ( pi_mode IN BOOLEAN );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PRAGMA>
+  PRAGMA RESTRICT_REFERENCES(get_version, rnds, wnps, wnds);
+  PRAGMA RESTRICT_REFERENCES(get_body_version, rnds, wnps, wnds);
+--
+-----------------------------------------------------------------------------
+--
+END Nm3nwad;
+/
