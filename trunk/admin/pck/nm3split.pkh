@@ -1,11 +1,11 @@
 CREATE OR REPLACE PACKAGE nm3split IS
 --   PVCS Identifiers :-
 --
---       pvcsid                 : $Header:   //vm_latest/archives/nm3/admin/pck/nm3split.pkh-arc   2.3   May 17 2011 08:26:26   Steve.Cooper  $
+--       pvcsid                 : $Header:   //vm_latest/archives/nm3/admin/pck/nm3split.pkh-arc   2.4   Oct 07 2011 14:56:34   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3split.pkh  $
---       Date into PVCS   : $Date:   May 17 2011 08:26:26  $
---       Date fetched Out : $Modtime:   Apr 01 2011 14:00:16  $
---       PVCS Version     : $Revision:   2.3  $
+--       Date into PVCS   : $Date:   Oct 07 2011 14:56:34  $
+--       Date fetched Out : $Modtime:   Oct 07 2011 14:54:04  $
+--       PVCS Version     : $Revision:   2.4  $
 --       Based on SCCS version : 1.7
 --
 --
@@ -19,7 +19,7 @@ CREATE OR REPLACE PACKAGE nm3split IS
 
 -- 03.06.08 PT added no_purpose parameter to create_node(), do_split_datum_or_group() and do_geo_split()
 
-  g_sccsid      CONSTANT  VARCHAR2(80)  := '"$Revision:   2.3  $"';
+  g_sccsid      CONSTANT  VARCHAR2(80)  := '"$Revision:   2.4  $"';
 --
    g_rec_ne_old   nm_elements%ROWTYPE;
    g_rec_ne_new_1 nm_elements%ROWTYPE;
@@ -147,68 +147,6 @@ PROCEDURE do_split_datum_or_group ( pi_ne_id                  IN     nm_elements
                                    ,pi_ne_version_no_2        IN     nm_elements.ne_version_no%TYPE DEFAULT NULL
                                    ,pi_neh_descr              IN     nm_element_history.neh_descr%TYPE DEFAULT NULL); --CWS 0108990 12/03/2010
 
---</PROC>
---
---
------------------------------------------------------------------------------
---
---<PROC NAME="do_split">
--- Split a DATUM
--- GJ not now a visible procedure - call split_datum_or_group instead
---
---   PROCEDURE do_split ( p_ne_id nm_elements.ne_id%TYPE -- the element to split
---                       ,p_effective_date DATE DEFAULT  nm3user.get_effective_date-- the date the split is effective from
---                       ,p_split_measure NUMBER -- the length along the original element
---                       ,p_ne_id_1 IN OUT nm_elements.ne_id%TYPE -- the new element ne_id
---                       ,p_ne_id_2 IN OUT nm_elements.ne_id%TYPE -- the 2nd new element ne_id
---                       ,p_node IN OUT nm_elements.ne_no_start%TYPE -- the node att the split point
---                       ,p_force_inheritance_of_attribs  IN     VARCHAR2                           DEFAULT 'N' -- force inheritance of all attributes on datums					   
---                       ,p_create_node BOOLEAN DEFAULT FALSE
---                       ,p_no_node_name nm_nodes.no_node_name%TYPE DEFAULT NULL
---                       ,p_no_descr nm_nodes.no_descr%TYPE DEFAULT NULL
---                       ,p_no_node_type nm_nodes.no_node_type%TYPE DEFAULT NULL
---                       ,p_no_np_id nm_nodes.no_np_id%TYPE DEFAULT NULL
---                       ,p_np_grid_east NM_POINTS.np_grid_east%TYPE DEFAULT NULL
---                       ,p_np_grid_north NM_POINTS.np_grid_north%TYPE DEFAULT NULL
---                       ,p_ne_unique_1 nm_elements.ne_unique%TYPE DEFAULT NULL
---                       ,p_ne_type_1 nm_elements.ne_type%TYPE DEFAULT NULL
---                       ,p_ne_nt_type_1 nm_elements.ne_nt_type%TYPE DEFAULT NULL
---                       ,p_ne_descr_1 nm_elements.ne_descr%TYPE DEFAULT NULL
---                       ,p_ne_length_1 nm_elements.ne_length%TYPE DEFAULT NULL
---                       ,p_ne_admin_unit_1 nm_elements.ne_admin_unit%TYPE DEFAULT NULL
---                       ,p_ne_gty_group_type_1 nm_elements.ne_gty_group_type%TYPE DEFAULT NULL
---                       ,p_ne_owner_1 nm_elements.ne_owner%TYPE DEFAULT NULL
---                       ,p_ne_name_1_1 nm_elements.ne_name_1%TYPE DEFAULT NULL
---                       ,p_ne_name_2_1 nm_elements.ne_name_2%TYPE DEFAULT NULL
---                       ,p_ne_prefix_1 nm_elements.ne_prefix%TYPE DEFAULT NULL
---                       ,p_ne_number_1 nm_elements.ne_number%TYPE DEFAULT NULL
---                       ,p_ne_sub_type_1 nm_elements.ne_sub_type%TYPE DEFAULT NULL
---                       ,p_ne_group_1 nm_elements.ne_group%TYPE DEFAULT NULL
---                       ,p_ne_no_start_1 nm_elements.ne_no_start%TYPE DEFAULT NULL
---                       ,p_ne_no_end_1 nm_elements.ne_no_end%TYPE DEFAULT NULL
---                       ,p_ne_sub_class_1 nm_elements.ne_sub_class%TYPE DEFAULT NULL
---                       ,p_ne_nsg_ref_1 nm_elements.ne_nsg_ref%TYPE DEFAULT NULL
---                       ,p_ne_version_no_1 nm_elements.ne_version_no%TYPE DEFAULT NULL
---                       ,p_ne_unique_2 nm_elements.ne_unique%TYPE DEFAULT NULL
---                       ,p_ne_type_2 nm_elements.ne_type%TYPE DEFAULT NULL
---                       ,p_ne_nt_type_2 nm_elements.ne_nt_type%TYPE DEFAULT NULL
---                       ,p_ne_descr_2 nm_elements.ne_descr%TYPE DEFAULT NULL
---                       ,p_ne_length_2 nm_elements.ne_length%TYPE DEFAULT NULL
---                       ,p_ne_admin_unit_2 nm_elements.ne_admin_unit%TYPE DEFAULT NULL
---                       ,p_ne_gty_group_type_2 nm_elements.ne_gty_group_type%TYPE DEFAULT NULL
---                       ,p_ne_owner_2 nm_elements.ne_owner%TYPE DEFAULT NULL
---                       ,p_ne_name_1_2 nm_elements.ne_name_1%TYPE DEFAULT NULL
---                       ,p_ne_name_2_2 nm_elements.ne_name_2%TYPE DEFAULT NULL
---                       ,p_ne_prefix_2 nm_elements.ne_prefix%TYPE DEFAULT NULL
---                       ,p_ne_number_2 nm_elements.ne_number%TYPE DEFAULT NULL
---                       ,p_ne_sub_type_2 nm_elements.ne_sub_type%TYPE DEFAULT NULL
---                       ,p_ne_group_2 nm_elements.ne_group%TYPE DEFAULT NULL
---                       ,p_ne_no_start_2 nm_elements.ne_no_start%TYPE DEFAULT NULL
---                       ,p_ne_no_end_2 nm_elements.ne_no_end%TYPE DEFAULT NULL
---                       ,p_ne_sub_class_2 nm_elements.ne_sub_class%TYPE DEFAULT NULL
---                       ,p_ne_nsg_ref_2 nm_elements.ne_nsg_ref%TYPE DEFAULT NULL
---                       ,p_ne_version_no_2 nm_elements.ne_version_no%TYPE DEFAULT NULL
---                       ) ;
 --</PROC>
 --
 -----------------------------------------------------------------------------

@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm3user AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3user.pkb-arc   2.5   May 17 2011 08:26:26   Steve.Cooper  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3user.pkb-arc   2.6   Oct 07 2011 14:56:34   Steve.Cooper  $
 --       Mg_user_id_tabodule Name      : $Workfile:   nm3user.pkb  $
---       Date into PVCS   : $Date:   May 17 2011 08:26:26  $
---       Date fetched Out : $Modtime:   May 05 2011 14:33:00  $
---       Version          : $Revision:   2.5  $
+--       Date into PVCS   : $Date:   Oct 07 2011 14:56:34  $
+--       Date fetched Out : $Modtime:   Oct 07 2011 14:55:38  $
+--       Version          : $Revision:   2.6  $
 --       Based on SCCS version : 1.21
 -------------------------------------------------------------------------
 --   Author : Rob Coupe
@@ -16,19 +16,13 @@ CREATE OR REPLACE PACKAGE BODY nm3user AS
 -----------------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2000
 -----------------------------------------------------------------------------
-   g_body_sccsid     CONSTANT  varchar2(2000) := '$Revision:   2.5  $';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '$Revision:   2.6  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name CONSTANT  varchar2(2000) := 'nm3user';
 --
   g_my_user_hist user_hist_item := user_hist_item (user_hist_modules (user_hist_module (NULL, NULL)));
   --
-  --
-  -- This is declared here as a constant so that
-  --  DML statements do not need to continually hit the database
-  --
-  --g_user_unrestricted_inv CONSTANT boolean := (nm3context.get_context (pi_attribute => 'UNRESTRICTED_INVENTORY') = nm3context.c_true);
-  --g_user_unrestricted_acc CONSTANT boolean := (nm3context.get_context (pi_attribute => 'UNRESTRICTED_ACCIDENTS') = nm3context.c_true);
 
   g_public_username CONSTANT hig_users.hus_username%TYPE := 'PUBLIC';
   g_public_name     CONSTANT hig_users.hus_name%TYPE     := 'Public Access';
@@ -675,9 +669,6 @@ BEGIN
                             p_Value     =>  To_Char(pi_roi_id)
                             );
                     
---   nm3context.set_context    (pi_attribute => 'ROI_ID'
---                             ,pi_value     => pi_roi_id
---                             );
    nm3user.set_user_option   (pi_huo_id    => 'ROI_ID'
                              ,pi_huo_value => pi_roi_id
                              );
