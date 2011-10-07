@@ -15,11 +15,11 @@ DECLARE
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/trg/nm_inv_types_all_dt_trg.trg-arc   2.4   May 17 2011 08:32:02   Steve.Cooper  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/trg/nm_inv_types_all_dt_trg.trg-arc   2.5   Oct 07 2011 12:14:18   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm_inv_types_all_dt_trg.trg  $
---       Date into PVCS   : $Date:   May 17 2011 08:32:02  $
---       Date fetched Out : $Modtime:   Apr 01 2011 10:16:32  $
---       Version          : $Revision:   2.4  $
+--       Date into PVCS   : $Date:   Oct 07 2011 12:14:18  $
+--       Date fetched Out : $Modtime:   Oct 07 2011 12:14:06  $
+--       Version          : $Revision:   2.5  $
 --
 --
 -----------------------------------------------------------------------------
@@ -157,9 +157,6 @@ BEGIN
          PROCEDURE check_exists (p_table_name VARCHAR2
                                 ,p_col_name   VARCHAR2
                                 ) IS
-          -- Checks do not take into account
-          /*  l_current_user VARCHAR2(100) := nm3get.get_hus(pi_hus_user_id => 
-                                            nm3context.get_context(nm3context.get_namespace,'USER_ID')).hus_username;*/
             --
             CURSOR cs_ft_col_check (c_table_name VARCHAR2
                                    ,c_col_name   VARCHAR2
