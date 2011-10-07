@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm3ausec AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ausec.pkb-arc   2.4   May 16 2011 14:44:08   Steve.Cooper  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ausec.pkb-arc   2.5   Oct 07 2011 14:34:46   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3ausec.pkb  $
---       Date into PVCS   : $Date:   May 16 2011 14:44:08  $
---       Date fetched Out : $Modtime:   May 03 2011 11:46:30  $
---       PVCS Version     : $Revision:   2.4  $
+--       Date into PVCS   : $Date:   Oct 07 2011 14:34:46  $
+--       Date fetched Out : $Modtime:   Oct 07 2011 14:34:26  $
+--       PVCS Version     : $Revision:   2.5  $
 --       Based on
 --
 --   Author : Rob Coupe
@@ -19,7 +19,7 @@ CREATE OR REPLACE PACKAGE BODY nm3ausec AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.4  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.5  $"';
 
 --  g_body_sccsid is the SCCS ID for the package body
 --
@@ -381,7 +381,6 @@ BEGIN
    IF l_gaps_exist
     THEN
 --    dbms_output.put_line( 'gaps' );
--- nm_debug.debug('      IF NOT Nm3user.is_user_unrestricted');
       IF NOT Sys_Context('NM3CORE','UNRESTRICTED_INVENTORY') = 'TRUE'
        THEN
 --       dbms_output.put_line( 'NOT privvy');
