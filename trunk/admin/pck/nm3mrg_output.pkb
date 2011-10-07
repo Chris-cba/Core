@@ -3,11 +3,11 @@ create or replace package body nm3mrg_output as
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mrg_output.pkb-arc   2.3   May 16 2011 14:45:02   Steve.Cooper  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mrg_output.pkb-arc   2.4   Oct 07 2011 14:41:48   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3mrg_output.pkb  $
---       Date into PVCS   : $Date:   May 16 2011 14:45:02  $
---       Date fetched Out : $Modtime:   Apr 04 2011 09:53:32  $
---       Version          : $Revision:   2.3  $
+--       Date into PVCS   : $Date:   Oct 07 2011 14:41:48  $
+--       Date fetched Out : $Modtime:   Oct 07 2011 14:41:38  $
+--       Version          : $Revision:   2.4  $
 --       Based on SCCS version : 1.22
 -------------------------------------------------------------------------
 --   Author : Jonathan Mills
@@ -20,7 +20,7 @@ create or replace package body nm3mrg_output as
 --
 --all global package variables here
 --
-   g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.3  $';
+   g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.4  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3mrg_output';
@@ -490,8 +490,6 @@ PROCEDURE dump_merge_def (p_nmq_id   IN nm_mrg_query.nmq_id%TYPE
    l_rec_nmq nm_mrg_query%ROWTYPE := nm3mrg_supplementary.select_mrg_query(p_nmq_id);
 --
    l_filename VARCHAR2(100) := NVL(p_filename,LOWER(l_rec_nmq.nmq_unique)||'_merge_defn.sql');
---
-   --l_app_owner VARCHAR2(30) := hig.get_application_owner;
 --
    c_date_format CONSTANT VARCHAR2(40) := 'DD-Mon-YYYY HH24:MI:SS';
 --
