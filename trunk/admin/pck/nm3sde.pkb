@@ -6,11 +6,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3sde AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sde.pkb-arc   2.14   Jun 23 2011 15:16:08   Chris.Strettle  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sde.pkb-arc   2.15   Oct 07 2011 14:51:18   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3sde.pkb  $
---       Date into PVCS   : $Date:   Jun 23 2011 15:16:08  $
---       Date fetched Out : $Modtime:   Jun 23 2011 15:12:44  $
---       PVCS Version     : $Revision:   2.14  $
+--       Date into PVCS   : $Date:   Oct 07 2011 14:51:18  $
+--       Date fetched Out : $Modtime:   Oct 07 2011 14:50:36  $
+--       PVCS Version     : $Revision:   2.15  $
 --
 --       Based on one of many versions labeled as 1.21
 --
@@ -24,7 +24,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3sde AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.14  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.15  $"';
    g_keyword         CONSTANT  VARCHAR2(30)   := 'SDO_GEOMETRY'; --get_keyword;
 
 
@@ -1617,53 +1617,7 @@ PROCEDURE copy_sde_obj_from_theme( p_theme_id IN NM_THEMES_ALL.nth_theme_id%TYPE
            WHERE b.owner = c_for_owner
              AND b.table_name = a.table_name
              AND b.column_name = a.column_name );
---
---
---  PROCEDURE create_sub_column_registry (
---     p_table    IN   VARCHAR2,
---     p_owner    IN   VARCHAR2
---  )
---  IS
---  --
---    TYPE             tab_col_reg
---      IS TABLE OF sde.column_registry%ROWTYPE INDEX BY BINARY_INTEGER;
---  --
---    l_tab_col_reg    tab_col_reg;
---  --
---    CURSOR get_col_reg ( c_table      IN VARCHAR2
---                       , c_for_owner  IN VARCHAR2)
---    IS
---      SELECT table_name, c_for_owner, column_name, sde_type
---           , column_size, decimal_digits
---           , description, object_flags, object_id
---        FROM sde.column_registry a
---       WHERE a.owner = hig.get_application_owner
---         AND a.table_name = c_table
---         AND NOT EXISTS
---           (SELECT 1 FROM sde.column_registry b
---             WHERE b.owner = c_for_owner
---               AND b.table_name = a.table_name
---               AND b.column_name = a.column_name );
---  --
---  BEGIN
---  --
---     OPEN  get_col_reg (p_table, p_owner);
---     FETCH get_col_reg BULK COLLECT INTO l_tab_col_reg;
---     CLOSE get_col_reg;
---  --
---     IF l_tab_col_reg.COUNT > 0
---     THEN
---       nm_debug.debug_on;
---       nm_debug.debug('Create '||l_tab_col_reg.COUNT||' rows of Col Reg for '||p_owner||'.'||p_table);
---       FORALL i IN 1..l_tab_col_reg.COUNT
---         INSERT INTO sde.column_registry
---         VALUES l_tab_col_reg(i);
---     END IF;
---  --
---  EXCEPTION
---    WHEN OTHERS
---    THEN nm_debug.debug('Error in col reg - '||SQLERRM);
---  END create_sub_column_registry;
+
 --
   PRAGMA   autonomous_transaction;
 --

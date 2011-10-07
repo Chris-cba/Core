@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3sdo_Edit AS
 --
 --   SCCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_edit.pkb-arc   2.13   Jul 15 2011 12:23:46   Chris.Strettle  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_edit.pkb-arc   2.14   Oct 07 2011 14:51:18   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3sdo_edit.pkb  $
---       Date into SCCS   : $Date:   Jul 15 2011 12:23:46  $
---       Date fetched Out : $Modtime:   Jul 15 2011 12:14:14  $
---       SCCS Version     : $Revision:   2.13  $
+--       Date into SCCS   : $Date:   Oct 07 2011 14:51:18  $
+--       Date fetched Out : $Modtime:   Oct 07 2011 14:51:02  $
+--       SCCS Version     : $Revision:   2.14  $
 --
 --
 --  Author :  R Coupe
@@ -23,7 +23,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3sdo_Edit AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid   CONSTANT  VARCHAR2(2000)  :=  '$Revision:   2.13  $';
+  g_body_sccsid   CONSTANT  VARCHAR2(2000)  :=  '$Revision:   2.14  $';
   g_package_name  CONSTANT  VARCHAR2(30)    :=  'nm3sdo_edit';
 --
 -----------------------------------------------------------------------------
@@ -1165,7 +1165,6 @@ BEGIN
               -- Task 0108731
               -- Use asset start date
               , p_effective_date => l_tab_lrefs(i).iit_start_date);
-              --, p_effective_date => nm3user.get_effective_date);
           --
           EXCEPTION
             WHEN OTHERS 
