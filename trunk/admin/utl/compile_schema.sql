@@ -47,7 +47,7 @@ create or replace force view ord_obj_by_depend as
 select max(level) dlevel
       ,object_id
 from temp_depend
-connect by object_id = prior referenced_object_id
+connect by nocycle object_id = prior referenced_object_id
 group by object_id
 /
 set term on
