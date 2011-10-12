@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE nm3user AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3user.pkh-arc   2.5   May 17 2011 08:26:26   Steve.Cooper  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3user.pkh-arc   2.6   Oct 12 2011 10:23:42   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3user.pkh  $
---       Date into PVCS   : $Date:   May 17 2011 08:26:26  $
---       Date fetched Out : $Modtime:   May 05 2011 14:36:12  $
---       Version          : $Revision:   2.5  $
+--       Date into PVCS   : $Date:   Oct 12 2011 10:23:42  $
+--       Date fetched Out : $Modtime:   Oct 12 2011 10:18:00  $
+--       Version          : $Revision:   2.6  $
 --       Based on SCCS version : 1.18
 -------------------------------------------------------------------------
 --   Author : Rob Coupe
@@ -19,7 +19,7 @@ CREATE OR REPLACE PACKAGE nm3user AS
 -----------------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
-  g_sccsid      CONSTANT  varchar2(2000) := '$Revision:   2.5  $';
+  g_sccsid      CONSTANT  varchar2(2000) := '$Revision:   2.6  $';
 --  g_sccsid is the SCCS ID for the package
 
 --
@@ -343,6 +343,12 @@ RETURN VARCHAR2;
 FUNCTION get_default_user_profile
 RETURN VARCHAR2;
 --</PROC>
+--
+-----------------------------------------------------------------------------
+--
+Function Get_Default_User_Tablesp_Quota (
+                                        p_User    In    Dba_Ts_Quotas.Username%Type
+                                        ) Return Dba_Ts_Quotas.Max_Bytes%Type;
 --
 -----------------------------------------------------------------------------
 --

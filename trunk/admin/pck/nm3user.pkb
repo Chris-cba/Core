@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm3user AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3user.pkb-arc   2.6   Oct 07 2011 14:56:34   Steve.Cooper  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3user.pkb-arc   2.7   Oct 12 2011 10:23:42   Steve.Cooper  $
 --       Mg_user_id_tabodule Name      : $Workfile:   nm3user.pkb  $
---       Date into PVCS   : $Date:   Oct 07 2011 14:56:34  $
---       Date fetched Out : $Modtime:   Oct 07 2011 14:55:38  $
---       Version          : $Revision:   2.6  $
+--       Date into PVCS   : $Date:   Oct 12 2011 10:23:42  $
+--       Date fetched Out : $Modtime:   Oct 12 2011 10:17:38  $
+--       Version          : $Revision:   2.7  $
 --       Based on SCCS version : 1.21
 -------------------------------------------------------------------------
 --   Author : Rob Coupe
@@ -16,7 +16,7 @@ CREATE OR REPLACE PACKAGE BODY nm3user AS
 -----------------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2000
 -----------------------------------------------------------------------------
-   g_body_sccsid     CONSTANT  varchar2(2000) := '$Revision:   2.6  $';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '$Revision:   2.7  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name CONSTANT  varchar2(2000) := 'nm3user';
@@ -990,5 +990,29 @@ BEGIN
 RETURN retval;
 END get_default_user_profile;
 --
+----------------------------------------------------------------------------------------------------------
+--
+Function Get_Default_User_Tablesp_Quota (
+                                        p_User    In    Dba_Ts_Quotas.Username%Type
+                                        ) Return Dba_Ts_Quotas.Max_Bytes%Type
+Is
+  l_Quota   Dba_Ts_Quotas.Max_Bytes%Type;
+Begin
+  Select  dtq.Max_Bytes
+  Into    l_Quota
+  From    Dba_Ts_Quotas   dtq,
+          Dba_Users       du
+  Where   du.Username           =   dtq.Username    
+  And     dtq.Tablespace_Name   =   du.Default_Tablespace
+  And     dtq.Username          =   p_User;
+  
+  Return(l_Quota);
+  
+Exception
+  When No_Data_Found Then
+    Raise_Application_Error(-20001,'User ' || p_User || ' has no quota on their default tablespace.');
+
+End Get_Default_User_Tablesp_Quota;
+                                                    
 END nm3user;
 /
