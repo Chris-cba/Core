@@ -2,13 +2,13 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data1.sql-arc   2.53   Sep 13 2011 09:37:34   Mike.Alexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data1.sql-arc   2.54   Oct 12 2011 15:39:44   Mike.Alexander  $
 --       Module Name      : $Workfile:   nm3data1.sql  $
---       Date into PVCS   : $Date:   Sep 13 2011 09:37:34  $
---       Date fetched Out : $Modtime:   Sep 13 2011 09:30:40  $
---       Version          : $Revision:   2.53  $
+--       Date into PVCS   : $Date:   Oct 12 2011 15:39:44  $
+--       Date fetched Out : $Modtime:   Oct 12 2011 15:36:12  $
+--       Version          : $Revision:   2.54  $
 --       Table Owner      : NM3_METADATA
---       Generation Date  : 13-SEP-2011 09:30
+--       Generation Date  : 12-OCT-2011 15:36
 --
 --   Product metadata script
 --   As at Release 4.4.0.0
@@ -14610,6 +14610,40 @@ SELECT
  WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
                    WHERE NER_APPL = 'NET'
                     AND  NER_ID = 556);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'NET'
+       ,557
+       ,null
+       ,'The user you are trying to disable has active job(s), do you want to disable these jobs?'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'NET'
+                    AND  NER_ID = 557);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'NET'
+       ,558
+       ,null
+       ,'The user has no quota on their default tablespace.'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'NET'
+                    AND  NER_ID = 558);
 --
 --
 --

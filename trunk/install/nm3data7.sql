@@ -2,13 +2,13 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data7.sql-arc   2.23   Sep 09 2011 11:16:32   Mike.Alexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data7.sql-arc   2.24   Oct 12 2011 15:39:44   Mike.Alexander  $
 --       Module Name      : $Workfile:   nm3data7.sql  $
---       Date into PVCS   : $Date:   Sep 09 2011 11:16:32  $
---       Date fetched Out : $Modtime:   Sep 09 2011 11:12:22  $
---       Version          : $Revision:   2.23  $
+--       Date into PVCS   : $Date:   Oct 12 2011 15:39:44  $
+--       Date fetched Out : $Modtime:   Oct 12 2011 15:36:12  $
+--       Version          : $Revision:   2.24  $
 --       Table Owner      : NM3_METADATA
---       Generation Date  : 09-SEP-2011 11:12
+--       Generation Date  : 12-OCT-2011 15:36
 --
 --   Product metadata script
 --   As at Release 4.4.0.0
@@ -14801,6 +14801,42 @@ SELECT
        ,556
        ,null
        ,'Update is not possible. This inventory and network type combination has child records.'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'NET'
+  AND  NER_ID = 557;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'NET'
+       ,557
+       ,null
+       ,'The user you are trying to disable has active job(s), do you want to disable these jobs?'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'NET'
+  AND  NER_ID = 558;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'NET'
+       ,558
+       ,null
+       ,'The user has no quota on their default tablespace.'
        ,'' FROM DUAL;
 --
 --
