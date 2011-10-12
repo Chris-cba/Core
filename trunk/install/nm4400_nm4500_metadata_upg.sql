@@ -8,11 +8,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4400_nm4500_metadata_upg.sql-arc   3.1   Sep 13 2011 11:42:24   Mike.Alexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4400_nm4500_metadata_upg.sql-arc   3.2   Oct 12 2011 15:37:16   Mike.Alexander  $
 --       Module Name      : $Workfile:   nm4400_nm4500_metadata_upg.sql  $
---       Date into PVCS   : $Date:   Sep 13 2011 11:42:24  $
---       Date fetched Out : $Modtime:   Sep 13 2011 11:38:48  $
---       Version          : $Revision:   3.1  $
+--       Date into PVCS   : $Date:   Oct 12 2011 15:37:16  $
+--       Date fetched Out : $Modtime:   Oct 12 2011 15:29:00  $
+--       Version          : $Revision:   3.2  $
 --
 ------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2011
@@ -278,6 +278,58 @@ Begin
     Raise_Application_Error(-20001,'Missing privileges whilst trying to drop redundant objects.' );
   End If;  
   w('Dropping Sub-User Views and Synonyms - Finished');
+End;
+/
+
+------------------------------------------------------------------
+
+
+------------------------------------------------------------------
+SET TERM ON
+PROMPT New messages for Hig1832
+SET TERM OFF
+
+------------------------------------------------------------------
+-- 
+-- DEVELOPMENT COMMENTS (STEVEN COOPER)
+-- new messages to support hig1832
+-- 
+------------------------------------------------------------------
+Begin
+  Insert Into Nm_Errors 
+  (
+  Ner_Appl,
+  Ner_Id,
+  Ner_Descr
+  )
+  Values
+  (
+  'NET',
+  557,
+  'The user you are trying to disable has active job(s), do you want to disable these jobs?'
+  );
+Exception
+  When Dup_Val_On_Index Then
+    Null;
+End;
+/
+
+Begin
+  Insert Into Nm_Errors 
+  (
+  Ner_Appl,
+  Ner_Id,
+  Ner_Descr
+  )
+  Values
+  (
+  'NET',
+  558,
+  'The user has no quota on their default tablespace.'
+  );
+Exception
+  When Dup_Val_On_Index Then
+    Null;
 End;
 /
 
