@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3ddl AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ddl.pkb-arc   2.23   Oct 04 2011 09:43:58   Steve.Cooper  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ddl.pkb-arc   2.24   Oct 12 2011 12:49:28   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3ddl.pkb  $
---       Date into PVCS   : $Date:   Oct 04 2011 09:43:58  $
---       Date fetched Out : $Modtime:   Oct 04 2011 09:42:06  $
---       PVCS Version     : $Revision:   2.23  $
+--       Date into PVCS   : $Date:   Oct 12 2011 12:49:28  $
+--       Date fetched Out : $Modtime:   Oct 12 2011 12:48:52  $
+--       PVCS Version     : $Revision:   2.24  $
 --       Based on SCCS Version     : 1.5
 --
 --
@@ -23,7 +23,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3ddl AS
 --
 --all global package variables here
 --
-   g_body_sccsid     constant varchar2(30) :='"$Revision:   2.23  $"';
+   g_body_sccsid     constant varchar2(30) :='"$Revision:   2.24  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3ddl';
@@ -191,6 +191,64 @@ EXCEPTION
       RAISE_APPLICATION_ERROR(g_syn_exc_code, g_syn_exc_msg);
 --
 END create_object_and_syns;
+--
+--------------------------------------------------------------------------------
+--
+PROCEDURE create_views_for_object (p_object_name IN USER_OBJECTS.object_name%TYPE)
+IS
+--
+   PRAGMA autonomous_transaction;
+--
+   CURSOR check_obj_exists (p_object VARCHAR2) IS
+   SELECT 'x'
+    FROM  ALL_OBJECTS
+   WHERE  owner       = Sys_Context('NM3CORE','APPLICATION_OWNER')
+    AND   object_name = p_object;
+--
+   l_dummy VARCHAR2(1);
+--
+BEGIN
+--
+--   Output a debug message to say entering procedure
+--
+   Nm_Debug.proc_start(g_package_name,'create_views_for_object');
+--
+   Nm_Debug.DEBUG(p_object_name);
+--
+   OPEN  check_obj_exists( p_object_name);
+   FETCH check_obj_exists INTO l_dummy;
+   IF check_obj_exists%NOTFOUND
+    THEN
+      CLOSE check_obj_exists;
+      g_syn_exc_code := -20301;
+      g_syn_exc_msg  := 'Object "'||p_object_name||'" does not exist in schema '||Sys_Context('NM3CORE','APPLICATION_OWNER');
+      RAISE g_syn_exception;
+   END IF;
+   CLOSE check_obj_exists;
+--
+   FOR cs_rec IN cs_users
+   LOOP
+     BEGIN
+       exec_ddl ('CREATE OR REPLACE FORCE VIEW '||cs_rec.hus_username||'.'||p_object_name
+                 ||' AS SELECT * FROM '||Sys_Context('NM3CORE','APPLICATION_OWNER')||'.'||p_object_name
+                 );
+     EXCEPTION
+       WHEN OTHERS THEN NULL;
+     END;
+   END LOOP;
+--
+   COMMIT;
+-- 
+   Nm_Debug.proc_end(g_package_name,'create_views_for_object');
+--
+EXCEPTION
+--
+   WHEN g_syn_exception
+    THEN
+      COMMIT;
+      RAISE_APPLICATION_ERROR(g_syn_exc_code, g_syn_exc_msg);
+--
+END create_views_for_object;
 --
 -----------------------------------------------------------------------------
 --
@@ -536,64 +594,6 @@ EXCEPTION
       RAISE_APPLICATION_ERROR(g_syn_exc_code, g_syn_exc_msg);
 --
 END drop_views_for_object;
---
---------------------------------------------------------------------------------
---
-PROCEDURE create_views_for_object (p_object_name IN USER_OBJECTS.object_name%TYPE)
-IS
---
-   PRAGMA autonomous_transaction;
---
-   CURSOR check_obj_exists (p_object VARCHAR2) IS
-   SELECT 'x'
-    FROM  ALL_OBJECTS
-   WHERE  owner       = Sys_Context('NM3CORE','APPLICATION_OWNER')
-    AND   object_name = p_object;
---
-   l_dummy VARCHAR2(1);
---
-BEGIN
---
---   Output a debug message to say entering procedure
---
-   Nm_Debug.proc_start(g_package_name,'create_views_for_object');
---
-   Nm_Debug.DEBUG(p_object_name);
---
-   OPEN  check_obj_exists( p_object_name);
-   FETCH check_obj_exists INTO l_dummy;
-   IF check_obj_exists%NOTFOUND
-    THEN
-      CLOSE check_obj_exists;
-      g_syn_exc_code := -20301;
-      g_syn_exc_msg  := 'Object "'||p_object_name||'" does not exist in schema '||Sys_Context('NM3CORE','APPLICATION_OWNER');
-      RAISE g_syn_exception;
-   END IF;
-   CLOSE check_obj_exists;
---
-   FOR cs_rec IN cs_users
-   LOOP
-     BEGIN
-       exec_ddl ('CREATE OR REPLACE FORCE VIEW '||cs_rec.hus_username||'.'||p_object_name
-                 ||' AS SELECT * FROM '||Sys_Context('NM3CORE','APPLICATION_OWNER')||'.'||p_object_name
-                 );
-     EXCEPTION
-       WHEN OTHERS THEN NULL;
-     END;
-   END LOOP;
---
-   COMMIT;
--- 
-   Nm_Debug.proc_end(g_package_name,'create_views_for_object');
---
-EXCEPTION
---
-   WHEN g_syn_exception
-    THEN
-      COMMIT;
-      RAISE_APPLICATION_ERROR(g_syn_exc_code, g_syn_exc_msg);
---
-END create_views_for_object;
 --
 --------------------------------------------------------------------------------
 --
