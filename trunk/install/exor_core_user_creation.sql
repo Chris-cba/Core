@@ -9,11 +9,11 @@ SET serveroutput ON
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/exor_core_user_creation.sql-arc   3.2   Jul 14 2009 12:03:54   lsorathia  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/exor_core_user_creation.sql-arc   3.3   Oct 12 2011 13:54:40   Steve.Cooper  $
 --       Module Name      : $Workfile:   exor_core_user_creation.sql  $
---       Date into PVCS   : $Date:   Jul 14 2009 12:03:54  $
---       Date fetched Out : $Modtime:   Jul 14 2009 12:00:50  $
---       Version          : $Revision:   3.2  $
+--       Date into PVCS   : $Date:   Oct 12 2011 13:54:40  $
+--       Date fetched Out : $Modtime:   Oct 12 2011 13:51:50  $
+--       Version          : $Revision:   3.3  $
 --       Based on SCCS version : 1.1
 --       This scripts creates new user EXOR_CORE 
 -------------------------------------------------------------------------
@@ -34,6 +34,8 @@ BEGIN
    EXECUTE IMMEDIATE 'GRANT CREATE ANY CONTEXT TO exor_core' ;   
 
    EXECUTE IMMEDIATE 'GRANT Create Public Synonym TO exor_core' ; 
+   
+   EXECUTE IMMEDIATE 'Grant Select on Sys.Dba_Scheduler_Jobs To Exor_Core';
    
    Dbms_Output.Put_Line('User Exor_CORE created successfully');
 --
