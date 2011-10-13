@@ -3,11 +3,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4400_nm4500_upg.sql-arc   3.4   Sep 16 2011 10:36:10   Mike.Alexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4400_nm4500_upg.sql-arc   3.5   Oct 13 2011 14:35:18   Mike.Alexander  $
 --       Module Name      : $Workfile:   nm4400_nm4500_upg.sql  $
---       Date into PVCS   : $Date:   Sep 16 2011 10:36:10  $
---       Date fetched Out : $Modtime:   Sep 16 2011 09:45:10  $
---       Version          : $Revision:   3.4  $
+--       Date into PVCS   : $Date:   Oct 13 2011 14:35:18  $
+--       Date fetched Out : $Modtime:   Oct 13 2011 14:32:18  $
+--       Version          : $Revision:   3.5  $
 --
 --   Product upgrade script
 --
@@ -208,6 +208,22 @@ FROM dual
 /
 SET FEEDBACK ON
 start &&run_file
+SET FEEDBACK OFF
+--
+---------------------------------------------------------------------------------------------------
+--                ****************   CREATE SDO VIEWS  *******************
+--
+--
+SET TERM ON
+PROMPT Create User SDO Views
+SET TERM OFF
+SET DEFINE ON
+select '&exor_base'||'nm3'||'&terminator'||'install'||
+        '&terminator'||'create_usdo_views.sql' run_file
+from dual
+/
+SET FEEDBACK ON
+start '&&run_file'
 SET FEEDBACK OFF
 --
 ---------------------------------------------------------------------------------------------------
