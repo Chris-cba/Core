@@ -5,11 +5,11 @@ As
 --
 -- PVCS Identifiers :-
 --
--- pvcsid : $Header:   //vm_latest/archives/nm3/admin/pck/nm3context.pkb-arc   2.6.1.0   Oct 12 2011 11:59:20   Steve.Cooper  $
+-- pvcsid : $Header:   //vm_latest/archives/nm3/admin/pck/nm3context.pkb-arc   2.6.1.1   Oct 13 2011 08:57:32   Steve.Cooper  $
 -- Module Name : $Workfile:   nm3context.pkb  $
--- Date into PVCS : $Date:   Oct 12 2011 11:59:20  $
--- Date fetched Out : $Modtime:   Oct 12 2011 09:53:10  $
--- PVCS Version : $Revision:   2.6.1.0  $
+-- Date into PVCS : $Date:   Oct 13 2011 08:57:32  $
+-- Date fetched Out : $Modtime:   Oct 12 2011 16:23:34  $
+-- PVCS Version : $Revision:   2.6.1.1  $
 -- Based on SCCS version : 
 --
 --
@@ -21,7 +21,7 @@ As
 --	Copyright (c) exor corporation ltd, 2001
 -----------------------------------------------------------------------------
 --
-  g_Body_Sccsid       Constant  Varchar2(2000)  :='"$Revision:   2.6.1.0  $"';
+  g_Body_Sccsid       Constant  Varchar2(2000)  :='"$Revision:   2.6.1.1  $"';
 
   c_True              Constant  Varchar2(5)     := 'TRUE';
   c_False             Constant  Varchar2(5)     := 'FALSE';
@@ -471,7 +471,7 @@ Begin
   --  this function should not be used for any new development and will be removed in a future release.
   
   --This is the static namespace from 4500 for most core related atributes
-   Return (To_Date(Sys_Context(Get_Namespace,'EFFECTIVE_DATE'),'DD-MON-YYYY') );
+   Return (To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY') );
 --
 End Get_Effective_Date;
 --
