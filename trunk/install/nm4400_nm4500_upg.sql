@@ -3,11 +3,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4400_nm4500_upg.sql-arc   3.5   Oct 13 2011 14:35:18   Mike.Alexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4400_nm4500_upg.sql-arc   3.6   Oct 17 2011 16:07:40   Mike.Alexander  $
 --       Module Name      : $Workfile:   nm4400_nm4500_upg.sql  $
---       Date into PVCS   : $Date:   Oct 13 2011 14:35:18  $
---       Date fetched Out : $Modtime:   Oct 13 2011 14:32:18  $
---       Version          : $Revision:   3.5  $
+--       Date into PVCS   : $Date:   Oct 17 2011 16:07:40  $
+--       Date fetched Out : $Modtime:   Oct 17 2011 16:05:04  $
+--       Version          : $Revision:   3.6  $
 --
 --   Product upgrade script
 --
@@ -211,22 +211,6 @@ start &&run_file
 SET FEEDBACK OFF
 --
 ---------------------------------------------------------------------------------------------------
---                ****************   CREATE SDO VIEWS  *******************
---
---
-SET TERM ON
-PROMPT Create User SDO Views
-SET TERM OFF
-SET DEFINE ON
-select '&exor_base'||'nm3'||'&terminator'||'install'||
-        '&terminator'||'create_usdo_views.sql' run_file
-from dual
-/
-SET FEEDBACK ON
-start '&&run_file'
-SET FEEDBACK OFF
---
----------------------------------------------------------------------------------------------------
 --                ****************   MERGE ANY VIEW  *******************
 --
 --
@@ -258,27 +242,6 @@ spool &logfile2
 SET TERM ON
 start compile_all.sql
 --
-Declare
-  view_not_exist Exception;
-  Pragma Exception_Init( view_not_exist, -942);
-Begin
-  Execute Immediate 'alter view network_node compile';
-Exception When view_not_exist
-  Then
-    Null;
-End;
-/
-
-Declare
-  view_not_exist Exception;
-  Pragma Exception_Init( view_not_exist, -942);
-Begin
-  Execute Immediate 'alter synonym road_seg_membs_partial compile';
-Exception When view_not_exist
-  Then
-    Null;
-End;
-/
 ---------------------------------------------------------------------------------------------------
 --                        ****************   CONTEXT   *******************
 --The compile_all will have reset the user context so we must reinitialise it
@@ -293,6 +256,22 @@ BEGIN
    nm3user.instantiate_user;
 END;
 /
+--
+---------------------------------------------------------------------------------------------------
+--                ****************   CREATE SDO VIEWS  *******************
+--
+--
+SET TERM ON
+PROMPT Create User SDO Views
+SET TERM OFF
+SET DEFINE ON
+select '&exor_base'||'nm3'||'&terminator'||'install'||
+        '&terminator'||'create_usdo_views.sql' run_file
+from dual
+/
+SET FEEDBACK ON
+start '&&run_file'
+SET FEEDBACK OFF
 --
 ---------------------------------------------------------------------------------------------------
 --        ****************   REGENERATE SYSTEM BUILT OBJECTS  *******************
