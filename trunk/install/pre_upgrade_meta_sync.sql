@@ -3,11 +3,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/pre_upgrade_meta_sync.sql-arc   3.0   Oct 19 2011 11:54:42   Mike.Alexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/pre_upgrade_meta_sync.sql-arc   3.1   Oct 19 2011 11:57:02   Mike.Alexander  $
 --       Module Name      : $Workfile:   pre_upgrade_meta_sync.sql  $
---       Date into PVCS   : $Date:   Oct 19 2011 11:54:42  $
---       Date fetched Out : $Modtime:   Oct 19 2011 11:49:32  $
---       Version          : $Revision:   3.0  $
+--       Date into PVCS   : $Date:   Oct 19 2011 11:57:02  $
+--       Date fetched Out : $Modtime:   Oct 19 2011 11:54:08  $
+--       Version          : $Revision:   3.1  $
 --
 --   Product upgrade script
 --
@@ -130,7 +130,7 @@ begin
     end;
   end loop;
 end;      
-
+/
 
 
 
