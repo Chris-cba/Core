@@ -1,0 +1,1026 @@
+CREATE OR REPLACE PACKAGE Nm3layer_Tool AS
+--<PACKAGE>
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3layer_tool.pkh-arc   2.12   Oct 26 2011 10:07:02   Ade.Edwards  $
+--       Module Name      : $Workfile:   nm3layer_tool.pkh  $
+--       Date into PVCS   : $Date:   Oct 26 2011 10:07:02  $
+--       Date fetched Out : $Modtime:   Oct 25 2011 16:37:30  $
+--       Version          : $Revision:   2.12  $
+--       Based on SCCS version : 1.6
+-------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+    g_sccsid      CONSTANT  VARCHAR2(2000) := '$Revision:   2.12  $';
+    g_boolean               BOOLEAN        := FALSE;
+    g_x_column    CONSTANT  user_tab_columns.column_name%TYPE := 'IIT_X';
+    g_y_column    CONSTANT  user_tab_columns.column_name%TYPE := 'IIT_Y';
+--  g_sccsid is the SCCS ID for the package
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--nm_inv_nw
+--<TYPES>
+  SUBTYPE rec_nth  IS NM_THEMES_ALL%ROWTYPE;
+  SUBTYPE rec_usgm IS user_sdo_geom_metadata%ROWTYPE;
+--
+  TYPE rec_nwinv
+  IS RECORD ( c_nt_type      NM_TYPES.nt_type%TYPE
+            , c_nt_descr     NM_TYPES.nt_descr%TYPE
+            , c_nt_unit_type NM_UNITS.un_unit_name%TYPE );
+
+  TYPE rec_nit
+  IS RECORD ( c_nit_inv_type           NM_INV_TYPES.nit_inv_type%TYPE
+            , c_nit_pnt_or_cont        NM_INV_TYPES.nit_pnt_or_cont%TYPE
+            , c_nit_x_sect_allow_flag  NM_INV_TYPES.nit_x_sect_allow_flag%TYPE
+            , c_nit_elec_drain_carr    NM_INV_TYPES.nit_elec_drain_carr%TYPE
+            , c_nit_contiguous         NM_INV_TYPES.nit_contiguous%TYPE
+            , c_nit_replaceable        NM_INV_TYPES.nit_replaceable%TYPE
+            , c_nit_exclusive          NM_INV_TYPES.nit_exclusive%TYPE
+            , c_nit_category           NM_INV_TYPES.nit_category%TYPE
+            , c_nit_descr              NM_INV_TYPES.nit_descr%TYPE
+            , c_nit_linear             NM_INV_TYPES.nit_linear%TYPE
+            , c_nit_use_xy             NM_INV_TYPES.nit_use_xy%TYPE
+            , c_nit_multiple_allowed   NM_INV_TYPES.nit_multiple_allowed%TYPE
+            , c_nit_end_loc_only       NM_INV_TYPES.nit_end_loc_only%TYPE
+            , c_nit_screen_seq         NM_INV_TYPES.nit_screen_seq%TYPE
+            , c_nit_view_name          NM_INV_TYPES.nit_view_name%TYPE
+            , c_nit_start_date         NM_INV_TYPES.nit_start_date%TYPE
+            , c_nit_end_date           NM_INV_TYPES.nit_end_date%TYPE
+            , c_nit_short_descr        NM_INV_TYPES.nit_short_descr%TYPE
+            , c_nit_flex_item_flag     NM_INV_TYPES.nit_flex_item_flag%TYPE
+            , c_nit_table_name         NM_INV_TYPES.nit_table_name%TYPE
+            , c_nit_lr_ne_column_name  NM_INV_TYPES.nit_lr_ne_column_name%TYPE
+            , c_nit_lr_st_chain        NM_INV_TYPES.nit_lr_st_chain%TYPE
+            , c_nit_lr_end_chain       NM_INV_TYPES.nit_lr_end_chain%TYPE
+            , c_nit_admin_type         NM_INV_TYPES.nit_admin_type%TYPE
+            , c_nit_icon_name          NM_INV_TYPES.nit_icon_name%TYPE
+            , c_nit_top                NM_INV_TYPES.nit_top%TYPE
+            , c_nit_foreign_pk_column  NM_INV_TYPES.nit_foreign_pk_column%TYPE
+            , c_nit_update_allowed     NM_INV_TYPES.nit_update_allowed%TYPE
+            , c_nit_notes              NM_INV_TYPES.nit_notes%TYPE);
+
+  TYPE rec_theme_results
+  IS RECORD
+            ( -- nm_themes_all
+              c_nth_theme_id               NM_THEMES_ALL.nth_theme_id%TYPE
+            , c_nth_theme_name             NM_THEMES_ALL.nth_theme_name%TYPE
+            , c_nth_table_name             NM_THEMES_ALL.nth_table_name%TYPE
+            , c_nth_where                  NM_THEMES_ALL.nth_where%TYPE
+            , c_nth_pk_column              NM_THEMES_ALL.nth_pk_column%TYPE
+            , c_nth_label_column           NM_THEMES_ALL.nth_label_column%TYPE
+            , c_nth_rse_table_name         NM_THEMES_ALL.nth_rse_table_name%TYPE
+            , c_nth_rse_fk_column          NM_THEMES_ALL.nth_rse_fk_column%TYPE
+            , c_nth_st_chain_column        NM_THEMES_ALL.nth_st_chain_column%TYPE
+            , c_nth_end_chain_column       NM_THEMES_ALL.nth_end_chain_column%TYPE
+            , c_nth_x_column               NM_THEMES_ALL.nth_x_column%TYPE
+            , c_nth_y_column               NM_THEMES_ALL.nth_y_column%TYPE
+            , c_nth_offset_field           NM_THEMES_ALL.nth_offset_field%TYPE
+            , c_nth_feature_table          NM_THEMES_ALL.nth_feature_table%TYPE
+            , c_nth_ft_last_analysed       DATE
+            , c_nth_feature_pk_column      NM_THEMES_ALL.nth_feature_pk_column%TYPE
+            , c_nth_feature_fk_column      NM_THEMES_ALL.nth_feature_fk_column%TYPE
+            , c_nth_xsp_column             NM_THEMES_ALL.nth_xsp_column%TYPE
+            , c_nth_feature_shape_column   NM_THEMES_ALL.nth_feature_shape_column%TYPE
+            , c_nth_hpr_product            NM_THEMES_ALL.nth_hpr_product%TYPE
+            , c_nth_location_updatable     NM_THEMES_ALL.nth_location_updatable%TYPE
+            , c_nth_theme_type             NM_THEMES_ALL.nth_theme_type%TYPE
+--            , c_nth_base_theme             nm_themes_all.nth_base_theme%TYPE
+            , c_nth_dependency             NM_THEMES_ALL.nth_dependency%TYPE
+            , c_nth_storage                NM_THEMES_ALL.nth_storage%TYPE
+            , c_nth_update_on_edit         NM_THEMES_ALL.nth_update_on_edit%TYPE
+            , c_nth_use_history            NM_THEMES_ALL.nth_use_history%TYPE
+            , c_nth_start_date_column      NM_THEMES_ALL.nth_start_date_column%TYPE
+            , c_nth_end_date_column        NM_THEMES_ALL.nth_end_date_column%TYPE
+            , c_nth_base_table_theme       NM_THEMES_ALL.nth_base_table_theme%TYPE
+            , c_nth_sequence_name          NM_THEMES_ALL.nth_sequence_name%TYPE
+            , c_nth_snap_to_theme          NM_THEMES_ALL.nth_snap_to_theme%TYPE
+            , c_nth_lref_mandatory         NM_THEMES_ALL.nth_lref_mandatory%TYPE
+            , c_nth_tolerance              NM_THEMES_ALL.nth_tolerance%TYPE
+            , c_nth_tol_units              NM_THEMES_ALL.nth_tol_units%TYPE
+            , c_ntg_gtype                  NM_THEME_GTYPES.ntg_gtype%TYPE
+            , c_ntg_gtype_meaning          HIG_CODES.hco_meaning%TYPE
+            , c_key_preserved              VARCHAR2(1)
+            , c_object_status              user_objects.status%TYPE );
+
+  TYPE rec_sdo_results
+  IS RECORD
+            (
+            --mdsys.user_sdo_geom_metadata
+              c_usgm_table_name            user_sdo_geom_metadata.table_name%TYPE
+            , c_usgm_column_name           user_sdo_geom_metadata.column_name%TYPE
+            , c_usgm_x_label               VARCHAR2(1000)
+            , c_usgm_y_label               VARCHAR2(1000)
+            , c_usgm_z_label               VARCHAR2(1000)
+            , c_usgm_x_tolerance           NUMBER
+            , c_usgm_y_tolerance           NUMBER
+            , c_usgm_z_tolerance           NUMBER
+            , c_usgm_max_x                 NUMBER
+            , c_usgm_max_y                 NUMBER
+            , c_usgm_max_z                 NUMBER
+            , c_usgm_min_x                 NUMBER
+            , c_usgm_min_y                 NUMBER
+            , c_usgm_min_z                 NUMBER
+            , c_usgm_srid                  NUMBER
+            , c_usgm_srid_meaning          VARCHAR2(3000)
+            , c_sdo_index_owner            VARCHAR2(32)
+            , c_sdo_index_type             VARCHAR2(32)
+            , c_sdo_index_mrtable          VARCHAR2(32)
+            , c_sdo_index_name             VARCHAR2(32)
+            , c_sdo_column_name            VARCHAR2(2048)
+            , c_sdo_index_status           VARCHAR2(32)
+            , c_sdo_index_table            VARCHAR2(32)
+            );
+
+  TYPE rec_sde_results
+  IS RECORD
+            (
+            --sde.layers
+              c_sdelay_layer_id            NUMBER
+            , c_sdelay_layer_name          VARCHAR2 (65)
+            , c_sdelay_database_name       VARCHAR2 (32)
+            , c_sdelay_owner               VARCHAR2 (32)
+            , c_sdelay_table_name          VARCHAR2 (160)
+            , c_sdelay_spatial_column      VARCHAR2 (32)
+            , c_sdelay_eflags              NUMBER
+            , c_sdelay_layer_mask          NUMBER
+            , c_sdelay_gsize1              FLOAT(64)
+            , c_sdelay_gsize2              FLOAT(64)
+            , c_sdelay_gsize3              FLOAT(64)
+            , c_sdelay_minx                FLOAT(64)
+            , c_sdelay_miny                FLOAT(64)
+            , c_sdelay_maxx                FLOAT(64)
+            , c_sdelay_maxy                FLOAT(64)
+            , c_sdelay_cdate               NUMBER
+            , c_sdelay_layer_config        VARCHAR2 (32)
+            , c_sdelay_optimal_array_size  NUMBER
+            , c_sdelay_stats_date          NUMBER
+            , c_sdelay_minimum_id          NUMBER
+            , c_sdelay_srid                NUMBER
+            , c_sdelay_base_layer_id       NUMBER
+            -- sde.table_registry
+            , c_sdetab_registration_id     NUMBER
+            , c_sdetab_table_name          VARCHAR2(160)
+            , c_sdetab_owner               VARCHAR2(32)
+            , c_sdetab_rowid_column        VARCHAR2(32)
+            , c_sdetab_description         VARCHAR2(65)
+            , c_sdetab_object_flags        NUMBER
+            , c_sdetab_registration_date   NUMBER
+            , c_sdetab_config_keyword      VARCHAR2(32)
+            , c_sdetab_minimum_id          NUMBER
+            , c_sdetab_imv_view_name       VARCHAR2(32)
+            -- sde.geometry_columns
+            , c_sdegeo_f_table_catalog     VARCHAR2(32)
+            , c_sdegeo_f_table_schema      VARCHAR2(32)
+            , c_sdegeo_f_table_name        VARCHAR2(160)
+            , c_sdegeo_f_geometry_column   VARCHAR2(32)
+            , c_sdegeo_g_table_catalog     VARCHAR2(32)
+            , c_sdegeo_g_table_schema      VARCHAR2(32)
+            , c_sdegeo_g_table_name        VARCHAR2(160)
+            , c_sdegeo_storage_type        NUMBER
+            , c_sdegeo_geometry_type       NUMBER
+            , c_sdegeo_coord_dimension     NUMBER
+            , c_sdegeo_max_ppr             NUMBER
+            , c_sdegeo_srid                NUMBER
+            -- sde.spatial_references
+            , c_sdesrd_srid                NUMBER
+            , c_sdesrd_description         VARCHAR2(64)
+            , c_sdesrd_auth_name           VARCHAR2(256)
+            , c_sdesrd_auth_srid           NUMBER
+            , c_sdesrd_falsex              FLOAT(64)
+            , c_sdesrd_falsey              FLOAT(64)
+            , c_sdesrd_xyunits             FLOAT(64)
+            , c_sdesrd_falsez              FLOAT(64)
+            , c_sdesrd_zunits              FLOAT(64)
+            , c_sdesrd_falsem              FLOAT(64)
+            , c_sdesrd_munits              FLOAT(64)
+            , c_sdesrd_srtext              VARCHAR2(1025)
+            );
+  --
+  TYPE rec_msv_maps
+  IS RECORD --user_sdo_maps
+            (
+              c_map_name                   VARCHAR2(32)
+            , c_map_description            VARCHAR2(4000)
+            );
+  --
+  TYPE rec_msv_themes
+  IS RECORD --user_sdo_themes
+            (
+              c_map_name                   VARCHAR2(32)
+            , c_theme_name                 VARCHAR2(32)
+            , c_theme_min_scale            VARCHAR2(32)
+            , c_theme_max_scale            VARCHAR2(32)
+            );
+  --
+  TYPE rec_msv_theme_details
+  IS RECORD --user_sdo_themes with style info user_sdo_styles
+            (
+              c_theme_name                 VARCHAR2(32)
+            , c_base_table                 VARCHAR2(32)
+            , c_geometry_column            VARCHAR2(2048)
+            , c_rule_column                VARCHAR2(2048)
+            , c_feature_style              VARCHAR2(500)
+            , c_label_column               VARCHAR2(2048)
+            , c_label_style                VARCHAR2(500)
+            );
+  --
+  TYPE rec_refresh_themes
+  IS RECORD
+            (
+              c_seq                        NUMBER
+            , c_nth_theme_id               NUMBER
+            , c_text                       nm3type.max_varchar2 
+            );
+  --
+  TYPE tab_usgm                     IS TABLE OF user_sdo_geom_metadata%ROWTYPE
+    INDEX BY BINARY_INTEGER;
+  TYPE tab_nth                      IS TABLE OF NM_THEMES_ALL%ROWTYPE
+    INDEX BY BINARY_INTEGER;
+  TYPE tab_nwinv                    IS TABLE OF rec_nwinv
+    INDEX BY BINARY_INTEGER;
+  TYPE tab_nit                      IS TABLE OF rec_nit
+    INDEX BY BINARY_INTEGER;
+  TYPE tab_theme_results            IS TABLE OF rec_theme_results
+    INDEX BY BINARY_INTEGER;
+  TYPE tab_sdo_results              IS TABLE OF rec_sdo_results
+    INDEX BY BINARY_INTEGER;
+  TYPE tab_sde_results              IS TABLE OF rec_sde_results
+    INDEX BY BINARY_INTEGER;
+  TYPE tab_msv_maps                 IS TABLE OF rec_msv_maps
+    INDEX BY BINARY_INTEGER;
+  TYPE tab_msv_themes               IS TABLE OF rec_msv_themes
+    INDEX BY BINARY_INTEGER;
+  TYPE tab_msv_theme_details        IS TABLE OF rec_msv_theme_details
+    INDEX BY BINARY_INTEGER;
+  TYPE tab_refresh_themes           IS TABLE OF rec_refresh_themes
+    INDEX BY BINARY_INTEGER;
+--</TYPES>
+
+--
+  ex_no_spdix        EXCEPTION;
+--
+
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+  FUNCTION get_version
+    RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+  FUNCTION get_body_version
+    RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+/*
+   *************************
+     GIS0020 BLOCK QUERIES
+   *************************
+*/
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="DELIVER_TREE">
+-- Returns data needed to build Tree in GIS0020
+  PROCEDURE deliver_tree
+             ( po_tab_initial_state    IN OUT Nm3type.tab_number
+              ,po_tab_depth            IN OUT Nm3type.tab_number
+              ,po_tab_label            IN OUT Nm3type.tab_varchar80
+              ,po_tab_icon             IN OUT Nm3type.tab_varchar30
+              ,po_tab_data             IN OUT Nm3type.tab_varchar30
+              ,po_tab_parent           IN OUT Nm3type.tab_varchar30);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_NETWORKS_FOR_ASSET_TYPE">
+-- Returns table of records for network types associated with asset type
+  PROCEDURE get_networks_for_asset_type
+              ( pi_asset_type          IN     NM_INV_TYPES.nit_inv_type%TYPE
+              , po_results             IN OUT tab_nwinv );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_ASSET_TYPE">
+-- Returns table of records for a given asset type
+  PROCEDURE get_asset_type
+              ( pi_asset_type          IN     NM_INV_TYPES.nit_inv_type%TYPE
+              , po_results             IN OUT tab_nit );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_THEME_DETAILS">
+-- For a given layer type and entity, return table of results
+-- Layer types:
+-- i.e.       B   =   Base Datum Layer
+--            G   =   Group Layer
+--            N   =   Node Layer
+--            I   =   Asset Layer
+--            D   =   Defects Layer
+--            E   =   Enquiries Layer
+  PROCEDURE get_theme_details
+              ( pi_layer_type          IN     VARCHAR2
+              , pi_type                IN     VARCHAR2
+              , po_results             IN OUT tab_theme_results);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_SDO_DETAILS">
+-- Returns a table of records of SDO metadata to GIS0020
+  PROCEDURE get_sdo_details
+              ( pi_nth_theme_id        IN     NM_THEMES_ALL.nth_theme_id%TYPE
+              , po_results             IN OUT tab_sdo_results);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_SDE_DETAILS">
+-- Returns a table of records of SDE metadata to GIS0020
+  PROCEDURE get_sde_details
+              ( pi_nth_theme_id        IN     NM_THEMES_ALL.nth_theme_id%TYPE
+              , po_results             IN OUT tab_sde_results);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+-- <PROC NAME="GET_SDE_VERSION">
+-- Returns current version of SDE from SDE schema
+  FUNCTION get_sde_version
+    RETURN VARCHAR2;
+--
+-----------------------------------------------------------------------------
+--
+ PROCEDURE get_msv_usm
+              ( pi_table_name   IN VARCHAR2
+              , po_results      IN OUT tab_msv_maps);
+--
+  PROCEDURE get_msv_ust
+              ( pi_map_name     IN VARCHAR2
+              , po_results      IN OUT tab_msv_themes);
+--
+  PROCEDURE get_msv_ustd
+              ( pi_theme_name   IN VARCHAR2
+              , po_results      IN OUT tab_msv_theme_details );
+--
+  PROCEDURE populate_msv_tables;
+--
+-----------------------------------------------------------------------------
+--
+  PROCEDURE insert_usm
+ --user_sdo_maps
+             ( pi_map_name       IN VARCHAR2
+             , pi_description    IN VARCHAR2
+             , pi_tab_theme_name IN Nm3type.tab_varchar80
+             , pi_tab_min_scale  IN Nm3type.tab_varchar80
+             , pi_tab_max_scale  IN Nm3type.tab_varchar80 );
+
+  PROCEDURE insert_ust
+  --user_sdo_themes
+             ( pi_theme_name        IN VARCHAR2
+             , pi_description       IN VARCHAR2
+             , pi_base_table        IN VARCHAR2
+             , pi_geometry_column   IN VARCHAR2
+             , pi_tab_rule_column   IN Nm3type.tab_varchar80
+             , pi_tab_feature_style IN Nm3type.tab_varchar80
+             , pi_tab_label_column  IN Nm3type.tab_varchar80
+             , pi_tab_label_style   IN Nm3type.tab_varchar80);
+--
+-----------------------------------------------------------------------------
+--
+  PROCEDURE make_layer_where
+             ( pi_base_theme        IN NM_THEMES_ALL.nth_theme_id%TYPE
+             , pi_where_clause      IN NM_THEMES_ALL.nth_where%TYPE
+             , pi_view_name         IN NM_THEMES_ALL.nth_table_name%TYPE );
+--
+-----------------------------------------------------------------------------
+--
+  FUNCTION parse_where_clause
+             ( pi_base_theme        IN NM_THEMES_ALL.nth_theme_id%TYPE
+             , pi_where_clause      IN NM_THEMES_ALL.nth_where%TYPE )
+  RETURN BOOLEAN;
+--
+-----------------------------------------------------------------------------
+--
+/*
+   **************************
+     NET RELATED FUNCTIONS
+   **************************
+*/
+--
+-----------------------------------------------------------------------------
+--
+--</PROC>
+--<PROC NAME="DOES_GROUP_LAYER_EXIST">
+-- Check for an asset layer
+  FUNCTION does_group_layer_exist
+              ( pi_group_type          IN     NM_GROUP_TYPES.ngt_group_type%TYPE )
+   RETURN  BOOLEAN;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--</PROC>
+--<PROC NAME="HOW_MANY_ELEMENTS">
+-- Returns a count of elements for a given network/group type
+  FUNCTION how_many_elements
+              ( pi_nt_type             IN     NM_GROUP_TYPES.ngt_nt_type%TYPE
+              , pi_group_type          IN     NM_GROUP_TYPES.ngt_group_type%TYPE )
+   RETURN  NUMBER;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--</PROC>
+--<PROC NAME="DOES_NODE_LAYER_EXIST">
+-- Check for node layer
+  FUNCTION does_node_layer_exist
+              ( pi_node_type           IN     NM_NODE_TYPES.nnt_type%TYPE )
+   RETURN  BOOLEAN;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="DROP_NODE_LAYER">
+-- Drop SDO layer for given node type
+  PROCEDURE drop_node_layer
+              ( pi_node_type           IN     NM_NODE_TYPES.nnt_type%TYPE );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="CREATE_NODE_LAYER">
+-- Create SDO node layer for a given type
+  PROCEDURE create_node_layer
+              ( pi_node_type           IN     NM_NODE_TYPES.nnt_type%TYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="REFRESH_GTY_LAYER">
+-- Create SDO node layer for a given type
+ PROCEDURE refresh_gty_layer ( pi_gty_type IN NM_GROUP_TYPES.ngt_group_type%type
+                               , pi_linear   IN BOOLEAN
+                               , pi_job_id   IN NUMBER DEFAULT NULL);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+/*
+   **************************
+     ASSET RELATED FUNCTIONS
+   **************************
+*/
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="DOES_ASSET_LAYER_EXIST">
+-- Check for SDO asset layer for a given type
+  FUNCTION does_asset_layer_exist
+              ( pi_asset_type          IN     NM_INV_TYPES.nit_inv_type%TYPE )
+   RETURN  BOOLEAN;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="HOW_MANY_ASSETS">
+-- Returns count of Assets for a given type
+  FUNCTION how_many_assets
+              ( pi_asset_type          IN     NM_INV_TYPES.nit_inv_type%TYPE )
+   RETURN  NUMBER;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+  FUNCTION get_x_column
+  RETURN user_tab_columns.column_name%TYPE;
+
+  FUNCTION get_y_column
+  RETURN user_tab_columns.column_name%TYPE;
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="REFRESH_ASSET_LAYER">
+-- Refreshes the asset spatial data when called from the GIS0020 form.
+   PROCEDURE refresh_asset_layer( pi_inv_type IN nm_inv_types.nit_inv_type%TYPE
+                                , pi_job_id   IN NUMBER DEFAULT NULL);
+--</PROC>                                
+--
+-----------------------------------------------------------------------------
+--
+/*
+   **************************
+     MAI RELATED FUNCTIONS
+   **************************
+*/
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="CREATE_DEFECT_LAYER">
+-- Creates a standard Defect SDO layer
+  PROCEDURE create_defect_layer
+              ( pi_theme_name    IN nm_themes_all.nth_theme_name%TYPE
+              , pi_asset_type    IN nm_inv_types.nit_inv_type%TYPE
+              , pi_asset_descr   IN nm_inv_types.nit_descr%TYPE
+              , pi_x_column      IN user_tab_columns.column_name%TYPE
+              , pi_y_column      IN user_tab_columns.column_name%TYPE
+              , pi_lr_ne_column  IN user_tab_columns.column_name%TYPE
+              , pi_lr_st_chain   IN user_tab_columns.column_name%TYPE
+              , pi_snapping_trig IN VARCHAR2 DEFAULT 'TRUE');
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="CREATE_WOL_LAYER">
+-- Creates a standard Work Order Lines SDO layer
+  PROCEDURE create_wol_layer
+              ( pi_theme_name    IN nm_themes_all.nth_theme_name%TYPE
+              , pi_asset_type    IN nm_inv_types.nit_inv_type%TYPE
+              , pi_asset_descr   IN nm_inv_types.nit_descr%TYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="DROP_WOL_LAYER">
+-- Drops a standard Work Order Lines SDO layer
+  PROCEDURE drop_wol_layer ( pi_theme_id IN nm_themes_all.nth_theme_id%TYPE );
+--
+-----------------------------------------------------------------------------
+--
+/*
+   **************************
+     ACC RELATED FUNCTIONS
+   **************************
+*/
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="CREATE_ACC_LAYER">
+-- Creates a standard Accidents SDO layer
+  PROCEDURE create_acc_layer
+              ( pi_theme_name    IN nm_themes_all.nth_theme_name%TYPE
+              , pi_asset_type    IN nm_inv_types.nit_inv_type%TYPE
+              , pi_asset_descr   IN nm_inv_types.nit_descr%TYPE
+              , pi_x_column      IN user_tab_columns.column_name%TYPE
+              , pi_y_column      IN user_tab_columns.column_name%TYPE
+              , pi_lr_ne_column  IN user_tab_columns.column_name%TYPE
+              , pi_lr_st_chain   IN user_tab_columns.column_name%TYPE);
+--
+-----------------------------------------------------------------------------
+--
+/*
+   **************************
+     ENQ RELATED FUNCTIONS
+   **************************
+*/
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="CREATE_ENQ_LAYER">
+-- Creates a standard Enquiries SDO layer
+  PROCEDURE create_enq_layer
+              ( pi_theme_name    IN nm_themes_all.nth_theme_name%TYPE
+              , pi_asset_type    IN nm_inv_types.nit_inv_type%TYPE
+              , pi_asset_descr   IN nm_inv_types.nit_descr%TYPE
+              , pi_x_column      IN user_tab_columns.column_name%TYPE
+              , pi_y_column      IN user_tab_columns.column_name%TYPE
+              , pi_lr_ne_column  IN user_tab_columns.column_name%TYPE
+              , pi_lr_st_chain   IN user_tab_columns.column_name%TYPE
+              , pi_snapping_trig IN VARCHAR2 DEFAULT 'TRUE');
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+/*
+   **************************
+     DOC RELATED FUNCTIONS
+   **************************
+*/
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="CREATE_DOC_LAYER">
+-- Creates a standard Enquiries SDO layer
+  PROCEDURE create_doc_layer
+              ( pi_theme_name    IN nm_themes_all.nth_theme_name%TYPE
+              , pi_asset_type    IN nm_inv_types.nit_inv_type%TYPE
+              , pi_asset_descr   IN nm_inv_types.nit_descr%TYPE
+              , pi_lr_ne_column  IN user_tab_columns.column_name%TYPE
+              , pi_lr_st_chain   IN user_tab_columns.column_name%TYPE
+              , pi_snapping_trig IN VARCHAR2 DEFAULT 'TRUE');
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+/*
+   **************************
+     CLM RELATED FUNCTIONS
+   **************************
+*/
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="CREATE_CLM_LAYER">
+-- Creates a standard Street lighting SDO layer
+  PROCEDURE create_clm_layer
+              ( pi_theme_name    IN nm_themes_all.nth_theme_name%TYPE
+              , pi_asset_type    IN nm_inv_types.nit_inv_type%TYPE
+              , pi_asset_descr   IN nm_inv_types.nit_descr%TYPE
+              , pi_x_column      IN user_tab_columns.column_name%TYPE
+              , pi_y_column      IN user_tab_columns.column_name%TYPE
+              , pi_lr_ne_column  IN user_tab_columns.column_name%TYPE
+              , pi_lr_st_chain   IN user_tab_columns.column_name%TYPE
+              , pi_snapping_trig IN VARCHAR2 DEFAULT 'TRUE');
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+/*
+   **************************
+     SWR RELATED FUNCTIONS
+   **************************
+*/
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="CREATE_SWR_LAYER">
+-- Creates a standard Streetworks Sites SDO layer
+  PROCEDURE create_swr_layer
+              ( pi_theme_name    IN nm_themes_all.nth_theme_name%TYPE
+              , pi_asset_type    IN nm_inv_types.nit_inv_type%TYPE
+              , pi_asset_descr   IN nm_inv_types.nit_descr%TYPE
+              , pi_x_column      IN user_tab_columns.column_name%TYPE
+              , pi_y_column      IN user_tab_columns.column_name%TYPE
+              , pi_lr_ne_column  IN user_tab_columns.column_name%TYPE
+              , pi_lr_st_chain   IN user_tab_columns.column_name%TYPE
+              , pi_snapping_trig IN VARCHAR2 DEFAULT 'TRUE');
+--</PROC>
+--
+--
+-----------------------------------------------------------------------------
+--
+/*
+   **************************
+     STR RELATED FUNCTIONS
+   **************************
+*/
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="CREATE_STR_LAYER">
+-- Creates a standard Structure SDO layer
+  PROCEDURE create_str_layer
+              ( pi_theme_name    IN nm_themes_all.nth_theme_name%TYPE
+              , pi_asset_type    IN nm_inv_types.nit_inv_type%TYPE
+              , pi_asset_descr   IN nm_inv_types.nit_descr%TYPE
+              , pi_x_column      IN user_tab_columns.column_name%TYPE
+              , pi_y_column      IN user_tab_columns.column_name%TYPE
+              , pi_lr_ne_column  IN user_tab_columns.column_name%TYPE
+              , pi_lr_st_chain   IN user_tab_columns.column_name%TYPE
+              , pi_snapping_trig IN VARCHAR2 DEFAULT 'TRUE');
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="DROP_ENQ_LAYER">
+-- Drop structures SDO layer
+  PROCEDURE drop_str_layer
+              ( pi_nth_theme_id        IN     NM_THEMES_ALL.nth_theme_id%TYPE);
+--</PROC>
+--
+--
+-----------------------------------------------------------------------------
+--
+/*
+   **************************
+     STP RELATED FUNCTIONS
+   **************************
+*/
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="CREATE_STP_LAYER">
+--
+  PROCEDURE create_stp_layer
+              ( pi_scheme_type     IN   nm_job_types.njt_type%TYPE
+              , pi_asset_type      IN   nm_inv_types.nit_inv_type%TYPE
+              , pi_asset_descr     IN   nm_inv_types.nit_descr%TYPE
+              , pi_snapping_trig   IN   VARCHAR2 DEFAULT 'TRUE');
+--</PROC>
+--
+-----------------------------------------------------------------------------
+
+
+/*
+   **************************
+     NSG RELATED FUNCTIONS
+   **************************
+*/
+
+
+--
+--<PROC NAME="CREATE_NSGN_LAYER">
+  PROCEDURE create_nsgn_layer
+              ( pi_street_type   IN  nm_group_types.ngt_group_type%TYPE  
+              , pi_job_id IN NUMBER DEFAULT NULL);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="CREATE_NSGN_ASD_LAYER">
+  PROCEDURE create_nsgn_asd_layer
+              ( pi_type    IN  nm_inv_types.nit_inv_type%TYPE  
+              , pi_job_id IN NUMBER DEFAULT NULL);
+--</PROC>
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ENGLAND_WALES_ASD_IN_USE">
+-- function called from GIS0020 to determined if certain NSG ASD record type should be processed
+FUNCTION england_wales_asd_in_use RETURN BOOLEAN;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="SCOTLAND_ASD_IN_USE">
+-- function called from GIS0020 to determined if certain NSG ASD record type should be processed
+FUNCTION scotland_asd_in_use RETURN BOOLEAN;
+--</PROC>
+--
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="REFRESH_ASD_LAYER">
+-- Refreshes the ASD asset spatial data when called from the GIS0020 form.
+   PROCEDURE refresh_asd_layer( pi_inv_type IN nm_inv_types.nit_inv_type%TYPE
+                              , pi_job_id   IN NUMBER DEFAULT NULL);
+--</PROC>
+-----------------------------------------------------------------------------
+--
+-----------------------------------------------------------------------------
+--
+/*
+   **************************
+     TMA RELATED FUNCTIONS
+   **************************
+*/
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="CREATE_TMA_LAYER">
+--
+  PROCEDURE create_tma_layer( p_theme_type varchar2
+                            , p_layer_name nm_themes_all.nth_theme_name%TYPE
+                            , p_asset_type nm_inv_types.nit_inv_type%TYPE
+                            , p_asset_type_descr nm_inv_types.nit_descr%TYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+/*
+   **************************
+     REGISTER TABLE RELATED FUNCTIONS
+   **************************
+*/
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="REGISTER_TABLE">
+--
+  FUNCTION register_table( p_table IN VARCHAR2
+                                         , p_theme_name IN VARCHAR2
+                                         , p_pk_col IN VARCHAR2
+                                         , p_fk_col IN VARCHAR2
+                                         , p_shape_col IN VARCHAR2
+                                         , p_tol NUMBER DEFAULT 0.005
+                                         , p_cre_idx IN VARCHAR2 DEFAULT 'N'
+                                         , p_estimate_new_tol IN VARCHAR2 DEFAULT 'N'
+                                         , p_override_sdo_meta IN VARCHAR2 DEFAULT 'I'
+                                         , p_asset_type IN VARCHAR2
+                                         , p_asset_descr IN VARCHAR2
+                                         , p_gtype IN VARCHAR2
+                                         , p_error OUT VARCHAR2
+                                         ) return BOOLEAN;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+/*
+   **************************
+     GENERAL PROCS/FUNCTIONS
+   **************************
+*/
+
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="set_global_boolean">
+  PROCEDURE set_global_boolean
+              ( pi_value IN BOOLEAN);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_global_boolean">
+  FUNCTION get_global_boolean RETURN BOOLEAN;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--<PROC NAME="IS_KEY_PRESERVED">
+-- Check to see if object is key preserved for compatability with MSV
+  FUNCTION is_key_preserved
+               ( pi_object_name IN VARCHAR2 )
+    RETURN BOOLEAN;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--<PROC NAME="IS_OBJECT_VALID">
+--Check to see if an object (views) are valid
+  FUNCTION is_object_valid
+               ( pi_object_name IN VARCHAR2 )
+    RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="DROP_SPATIAL_INDEX">
+-- Drop a spatial index
+  PROCEDURE drop_spatial_index
+               ( pi_index_name         IN     user_indexes.index_name%TYPE
+               , pi_raise_not_found    IN     BOOLEAN DEFAULT FALSE );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_SPATIAL_INDEX">
+-- Returns the name of a spatial index given the table and shape column
+     FUNCTION get_spatial_index (pi_table_name  IN nm_themes_all.nth_feature_table%TYPE
+                               , pi_column_name IN nm_themes_all.nth_feature_shape_column%TYPE)
+       RETURN user_indexes.index_name%TYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="REBUILD_SPATIAL_INDEX">
+-- Rebuild a spatial index
+  PROCEDURE rebuild_spatial_index
+               ( pi_index_name         IN     user_indexes.index_name%TYPE
+               , pi_table_name         IN     user_tables.table_name%TYPE
+               , pi_column_name        IN     user_tab_columns.column_name%TYPE
+               , pi_index_type         IN     VARCHAR2 DEFAULT 'RTREE' );
+--</PROC>
+--
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="SET_CANCEL_FLAG">
+-- Set cancel flag proc
+   PROCEDURE set_cancel_flag (pi_value    IN VARCHAR2,
+                              pi_user_key IN VARCHAR2);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_USER_KEY">
+-- Set cancel flag proc
+  FUNCTION get_user_key
+    RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="CLEARDOWN_LOG_TABLE">
+-- Truncate log table
+  PROCEDURE cleardown_log_table;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--
+--<PROC NAME="ASSOCIATE_BASE_LINEAR_THEMES">
+-- Associates all linear network themes with given theme id
+  PROCEDURE associate_base_linear_themes
+              ( pi_nth_theme_id IN nm_themes_all.nth_theme_id%TYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="CREATE_MSV_FEATURE_VIEWS">
+-- Create feature views for subusers with SRIDs
+  PROCEDURE create_msv_feature_views
+              ( pi_username  IN   hig_users.hus_username%TYPE DEFAULT NULL);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="BUILD_NPL_DATA">
+-- Build the nm_point_locations data
+  PROCEDURE build_npl_data;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="RUN_HEALTHCHECK">
+  FUNCTION run_healthcheck( pi_location         IN VARCHAR2
+                          , pi_theme_filename   IN VARCHAR2
+                          , pi_sdo_filename     IN VARCHAR2
+                          , pi_sde_filename     IN VARCHAR2
+                          , pi_ignore_warnings  IN BOOLEAN DEFAULT TRUE
+                          , po_summary         OUT VARCHAR2
+                          , po_theme_batch_no  OUT NUMBER
+                          , po_sdo_batch_no    OUT NUMBER
+                          , po_sde_batch_no    OUT NUMBER
+                          ) 
+  RETURN BOOLEAN;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="CLEANUP_IDX">
+FUNCTION cleanup_idx(pi_index_name IN VARCHAR2, po_error_message OUT VARCHAR2) 
+RETURN BOOLEAN;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_NSG_LABEL">
+FUNCTION get_nsg_label(pi_nit_inv_type IN nm_inv_types.nit_inv_type%type) 
+RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+  PROCEDURE submit_job
+              ( pi_job_type IN VARCHAR2 
+              , pi_arg_1    IN VARCHAR2 DEFAULT NULL
+              , pi_arg_2    IN VARCHAR2 DEFAULT NULL
+              , pi_arg_3    IN VARCHAR2 DEFAULT NULL
+              , pi_arg_4    IN VARCHAR2 DEFAULT NULL
+              , pi_arg_5    IN VARCHAR2 DEFAULT NULL
+              , po_out_1   OUT VARCHAR2
+              , po_out_2   OUT VARCHAR2
+              );
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="REFRESH_SDE_METADATA">
+PROCEDURE refresh_sde_metadata 
+             ( pi_nth_theme_id  IN nm_themes_all.nth_theme_id%TYPE
+             , pi_dependency    IN VARCHAR2 DEFAULT 'ALL_DATA' );
+--
+PROCEDURE refresh_sde_metadata 
+             ( pi_nth_theme_id  IN nm_themes_all.nth_theme_id%TYPE
+             , pi_dependency    IN VARCHAR2 DEFAULT 'ALL_DATA'
+             , pi_progress_id   IN nm_progress.prg_progress_id%TYPE );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="REFRESH_SDO_METADATA">
+PROCEDURE refresh_sdo_metadata
+             ( pi_nth_theme_id  IN nm_themes_all.nth_theme_id%TYPE
+             , pi_dependency    IN VARCHAR2 DEFAULT 'ALL_DATA'
+             , pi_clone_parent  IN VARCHAR2 DEFAULT 'CLONE');
+--
+PROCEDURE refresh_sdo_metadata
+             ( pi_nth_theme_id  IN nm_themes_all.nth_theme_id%TYPE
+             , pi_dependency    IN VARCHAR2 DEFAULT 'ALL_DATA'
+             , pi_clone_parent  IN VARCHAR2 DEFAULT 'CLONE'
+             , pi_progress_id   IN nm_progress.prg_progress_id%TYPE
+             , pi_run_sde       IN BOOLEAN DEFAULT FALSE );
+--</PROC> 
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_SRID">
+FUNCTION get_srid ( pi_nth_theme_id IN nm_themes_all.nth_theme_id%TYPE )
+  RETURN INTEGER;
+--</PROC> 
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_REFRESH_THEMES">
+  PROCEDURE get_refresh_themes
+              ( pi_nth_theme_id        IN     nm_themes_all.nth_theme_id%TYPE
+              , pi_metadata_option     IN     VARCHAR2
+              , pi_dependency_option   IN     VARCHAR2
+              , po_results             IN OUT tab_refresh_themes);
+--</PROC> 
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="SDE_AVAILABLE">
+  FUNCTION sde_available RETURN BOOLEAN;
+--</PROC> 
+--
+-----------------------------------------------------------------------------
+--
+END Nm3layer_Tool;
+/
+
