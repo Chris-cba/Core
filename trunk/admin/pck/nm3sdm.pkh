@@ -3,11 +3,11 @@ Create Or Replace Package Nm3Sdm As
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkh-arc   2.6   Sep 02 2011 11:44:44   Steve.Cooper  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkh-arc   2.7   Oct 26 2011 11:17:14   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3sdm.pkh  $
---       Date into PVCS   : $Date:   Sep 02 2011 11:44:44  $
---       Date fetched Out : $Modtime:   Sep 01 2011 16:22:26  $
---       Version          : $Revision:   2.6  $
+--       Date into PVCS   : $Date:   Oct 26 2011 11:17:14  $
+--       Date fetched Out : $Modtime:   Oct 26 2011 10:51:22  $
+--       Version          : $Revision:   2.7  $
 --       Based on SCCS version : 1.25 
 -------------------------------------------------------------------------
 --
@@ -19,7 +19,7 @@ Create Or Replace Package Nm3Sdm As
 -----------------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
-  g_Sccsid      Constant    Varchar2(2000) := '$Revision:   2.6  $';
+  g_Sccsid      Constant    Varchar2(2000) := '$Revision:   2.7  $';
 
   g_Date_Views  Constant    Varchar2(1) := Nvl(Hig.Get_Sysopt('SDODATEVW'),'N');
 
@@ -173,8 +173,10 @@ Create Or Replace Package Nm3Sdm As
 --<PROC NAME="GET_NT_THEME">
 -- This function returns the theme that is used to hold the spatial data for a
 -- given group type and network type
+-- The p_Gt Parameter is not used and is included just to keep the header signature the same.
   Function Get_Nt_Theme (
-                        p_Nt In Nm_Types.Nt_Type%Type
+                        p_Nt In Nm_Types.Nt_Type%Type,
+                        p_Gt In Nm_Group_Types.Ngt_Group_Type%Type Default Null
                         ) Return Nm_Themes_All.Nth_Theme_Id%Type;
 
 --</PROC>
@@ -244,22 +246,18 @@ Procedure Split_Element_Shapes  (
 --<PROC NAME="REGISTER_NODE_THEME">
 --Procedure to register the node layer in the various metadata repositories
 
-/*  Depricated for 4500  
   Function Register_Node_Theme  (
                                 p_Node_Type   In Varchar2,
                                 p_Table_Name  In Varchar2,
                                 p_Column_Name In Varchar2
                                 ) Return Number;
-*/                                
+
 --</PROC>
-/*  Depricated for 4500  
   Procedure Register_Npl_Theme;
-*/
 -----------------------------------------------------------------------------
 --
 --<PROC NAME="REGISTER_LRM_THEME">
 --Procedure to register the LRM layer in the various metadata repositories
-/*  Depricated for 4500
   Function Register_Lrm_Theme (
                               p_Nlt_Id         In Number,
                               p_Base           In Nm_Theme_Array,
@@ -269,13 +267,12 @@ Procedure Split_Element_Shapes  (
                               p_View_Flag      In Varchar2 Default 'N',
                               p_Base_Table_Nth In Nm_Themes_All.Nth_Theme_Id%Type Default Null
                               ) Return Number;
-*/
 --</PROC>
 -----------------------------------------------------------------------------
 --
 --<PROC NAME="REGISTER_INV_THEME">
 --Procedure to register the INV layer in the various metadata repositories
-/*  Depricated for 4500  
+
   Function Register_Inv_Theme (
                               Pi_Nit           In Nm_Inv_Types%Rowtype,
                               p_Base_Themes    In Nm_Theme_Array,
@@ -287,12 +284,12 @@ Procedure Split_Element_Shapes  (
                               p_Pk_Column      In Varchar2 Default 'NE_ID',
                               p_Base_Table_Nth In Nm_Themes_All.Nth_Theme_Id%Type Default Null
                               )  Return Number;
-*/                              
+
 --
 -----------------------------------------------------------------------------
 --
 --<PROC NAME="REGISTER_INV_INDEPENDENT_THEME">
-/*  Depricated for 4500
+
   Function Register_Ona_Theme (
                               pi_Nit           In Nm_Inv_Types%Rowtype,
                               p_Table_Name     In Varchar2,
@@ -303,7 +300,6 @@ Procedure Split_Element_Shapes  (
                               p_Pk_Column      In Varchar2 Default 'NE_ID',
                               p_Base_Table_Nth In Nm_Themes_All.Nth_Theme_Id%Type Default Null
                              ) Return Number;
-*/                             
 --</PROC>
 --
 -----------------------------------------------------------------------------
@@ -1022,6 +1018,118 @@ Function Get_Global_Unit_Factor Return Number;
 --
 --<PROC NAME="Rebuild_All_Nlt_Sdo_Join_View">
   Procedure Rebuild_All_Nlt_Sdo_Join_Views;
+--</PROC>
+--
+
+-----------------------------------------------------------------------------
+--Added these functions / procedure back in due to SM impact.
+-----------------------------------------------------------------------------
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_THEME_NT">
+-- This function returns the nt for a specified theme. The specified theme is
+-- not related to a network then an error is raised
+Function Get_Theme_Nt (
+                      p_Theme_Id In Nm_Themes_All.Nth_Theme_Id%Type
+                      ) Return Nm_Linear_Types.Nlt_Nt_Type%Type;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_NODE_TABLE">
+-- This function returns the table name which is used to hold spatial nodes
+  FUNCTION get_node_table
+           ( p_node_type IN NM_NODE_TYPES.nnt_type%TYPE)
+    RETURN VARCHAR2;
+--</PROC> 
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_NODE_TYPE">
+-- This function returns the node type for a given network type
+  FUNCTION get_node_type
+           ( p_nt_type IN NM_TYPES.nt_type%TYPE)
+    RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_NODE_TYPE">
+-- This function returns the node type for a given theme
+  FUNCTION get_node_type
+           ( p_theme_id IN NM_THEMES_ALL.nth_theme_id%TYPE)
+    RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_DETAILS">
+-- This function returns details of an object as an XML Clob.
+  FUNCTION get_details
+           ( p_theme_id IN NM_THEMES_ALL.nth_theme_id%TYPE
+           , p_ne_id    IN NUMBER )
+    RETURN CLOB;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_DETAILS">
+-- This function returns details of an object as an XML Clob.
+  FUNCTION get_details
+           ( p_ne_id IN NUMBER )
+    RETURN CLOB;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_NLT">
+-- This function return the NM_LINEAR_TYPES rowtype, given the PK.
+  FUNCTION get_nlt
+           ( pi_nlt_id IN NM_LINEAR_TYPES.nlt_id%TYPE )
+    RETURN NM_LINEAR_TYPES%ROWTYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="CREATE_ELEMENT_SHAPE_FROM_XML">
+-- This procedure takes an XML clob containing the GML specification of a shape
+-- and associates the shape to an element in the given layer
+  PROCEDURE create_element_shape_from_xml
+            ( p_layer IN NUMBER
+            , p_ne_id IN nm_elements.ne_id%TYPE
+            , p_xml   IN CLOB );
+--</PROC>
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="MAKE_NT_SPATIAL_LAYER">
+-- Procedure to generate a dependent spatial layer based on a group LRM. The
+-- procedure will generate the spatial data by tracing and concatenating the datum
+-- elements. The tables are registered in SDE and SDO metadata and indexes are created.
+-- In 8i, the quadtree index is created otherwise an RTREE index is used.
+-- The p_gen parameters are supplied to allow a generalised shape to be constructed.
+  PROCEDURE make_nt_spatial_layer
+            ( pi_nlt_id IN NM_LINEAR_TYPES.nlt_id%TYPE
+            , p_gen_pt  IN NUMBER DEFAULT 0
+            , p_gen_tol IN NUMBER DEFAULT 0
+			, p_job_id  IN NUMBER DEFAULT NULL );
+--</PROC>
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="RESHAPE_ELEMENT">
+-- The element shape is replaced with the new one.
+  PROCEDURE reshape_element
+            ( p_ne_id IN nm_elements.ne_id%TYPE
+            , p_geom  IN MDSYS.SDO_GEOMETRY );
+--
+--</PROC>
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="MOVE_NODE">
+-- A procedure to re-locate a node at a new X,Y location
+  PROCEDURE move_node
+            ( p_no_node_id IN nm_nodes.no_node_id%TYPE
+            , p_x          IN NUMBER
+            , p_y          IN NUMBER );
 --</PROC>
 --
 -----------------------------------------------------------------------------

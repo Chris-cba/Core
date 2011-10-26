@@ -5,11 +5,11 @@ As
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.51   Oct 04 2011 16:27:56   Steve.Cooper  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.52   Oct 26 2011 11:17:14   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3sdm.pkb  $
---       Date into PVCS   : $Date:   Oct 04 2011 16:27:56  $
---       Date fetched Out : $Modtime:   Oct 04 2011 16:27:20  $
---       PVCS Version     : $Revision:   2.51  $
+--       Date into PVCS   : $Date:   Oct 26 2011 11:17:14  $
+--       Date fetched Out : $Modtime:   Oct 26 2011 10:51:50  $
+--       PVCS Version     : $Revision:   2.52  $
 --
 --   Author : R.A. Coupe
 --
@@ -21,7 +21,7 @@ As
 --
 --all global package variables here
 --
-  g_Body_Sccsid     Constant Varchar2 (2000) := '"$Revision:   2.51  $"';
+  g_Body_Sccsid     Constant Varchar2 (2000) := '"$Revision:   2.52  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
   g_Package_Name    Constant Varchar2 (30)   := 'NM3SDM';
@@ -1295,8 +1295,10 @@ End Get_Nth;
 --schematics etc.
 --Also, for now it assumes it is a base datum for use in the split/merge routines
 --
+-- The p_Gt Parameter is not used and is included just to keep the header signature the same.
 Function Get_Nt_Theme (
-                      p_Nt   In   Nm_Types.Nt_Type%Type
+                      p_Nt   In   Nm_Types.Nt_Type%Type,
+                      p_Gt In Nm_Group_Types.Ngt_Group_Type%Type Default Null
                       ) Return Nm_Themes_All.Nth_Theme_Id%Type
 Is
   Retval   Nm_Themes_All.Nth_Theme_Id%Type;
@@ -7977,6 +7979,170 @@ Begin
 
   Nm_Debug.Debug('nm3sdm.Rebuild_All_Inv_Sdo_Join_View - Finished');
 End Rebuild_All_Inv_Sdo_Join_View;
+
+--
+-----------------------------------------------------------------------------
+--Added these functions / procedure back in due to SM, impact.
+-----------------------------------------------------------------------------
+--
+ 
+--
+-----------------------------------------------------------------------------
+--
+   FUNCTION get_node_type (p_nt_type IN NM_TYPES.nt_type%TYPE)
+      RETURN VARCHAR2
+   IS
+   BEGIN
+      RETURN Nm3get.get_nt (pi_nt_type => p_nt_type).nt_node_type;
+   END get_node_type;
+
+--
+-----------------------------------------------------------------------------
+--
+   FUNCTION get_node_type (p_theme_id IN NM_THEMES_ALL.nth_theme_id%TYPE)
+      RETURN VARCHAR2
+   IS
+   BEGIN
+      RETURN get_node_type
+                         (p_nt_type      => get_theme_nt
+                                                     (p_theme_id      => p_theme_id)
+                         );
+   END get_node_type;   
+--
+-----------------------------------------------------------------------------
+--
+   FUNCTION get_details (
+      p_theme_id   IN   NM_THEMES_ALL.nth_theme_id%TYPE,
+      p_ne_id      IN   NUMBER
+   )
+      RETURN CLOB
+   IS
+   BEGIN
+      RETURN Nm3xmlqry.get_theme_details_as_xml_clob (p_theme_id, p_ne_id);
+   END get_details;
+
+-----------------------------------------------------------------------------
+--
+   FUNCTION get_details (p_ne_id IN NUMBER)
+      RETURN CLOB
+   IS
+   BEGIN
+      RETURN Nm3xmlqry.get_obj_details_as_xml_clob (p_ne_id);
+   END get_details;
+--
+-----------------------------------------------------------------------------
+--
+   PROCEDURE create_element_shape_from_xml (
+      p_layer   IN   NUMBER,
+      p_ne_id   IN   nm_elements.ne_id%TYPE,
+      p_xml     IN   CLOB
+   )
+   IS
+      l_geom   MDSYS.SDO_GEOMETRY;
+   BEGIN
+      ----   nm_debug.debug_on;
+      ----   nm_debug.delete_debug(TRUE);
+
+      ----   nm_debug.DEBUG_CLOB( P_CLOB => p_xml );
+      l_geom := Nm3sdo_Xml.load_shape (p_xml            => p_xml,
+                                       p_file_type      => 'datum');
+      Nm3sdo.insert_element_shape (p_layer      => p_layer,
+                                   p_ne_id      => p_ne_id,
+                                   p_geom       => l_geom
+                                  );
+   END;
+--
+-----------------------------------------------------------------------------
+--
+--
+
+   PROCEDURE reshape_element (
+      p_ne_id   IN   nm_elements.ne_id%TYPE,
+      p_geom    IN   MDSYS.SDO_GEOMETRY
+   )
+   IS
+      l_layer    NUMBER;
+      l_old_geom mdsys.sdo_geometry;
+      l_new_geom mdsys.sdo_geometry;
+      l_length   NUMBER;
+      l_usgm     user_sdo_geom_metadata%ROWTYPE;
+      l_rec_nth  nm_themes_all%ROWTYPE;
+   BEGIN
+      --nm_debug.debug_on;
+      --nm_debug.debug('changing shapes');
+      l_layer := get_nt_theme (Nm3get.get_ne (p_ne_id).ne_nt_type);
+      l_rec_nth := nm3get.get_nth(l_layer);
+
+      IF Nm3sdo.element_has_shape (l_layer, p_ne_id) = 'TRUE'
+      THEN
+
+         -- AE 09-FEB-2009
+         -- Brought across the code from 2.10.1.1 branch into the mainstream
+         -- version so that the SRID is set on the reshape
+
+         l_old_geom := nm3sdo.get_layer_element_geometry( l_layer, p_ne_id );
+
+         l_new_geom := p_geom;
+
+         IF NVL(l_old_geom.sdo_srid, -9999)  != NVL( l_new_geom.sdo_srid, -9999)
+         THEN
+           l_new_geom.sdo_srid := l_old_geom.sdo_srid;
+         END IF;
+      --
+      -- Task 0110101
+      -- Bring code across from NM3SDO insert_element_shape to validate the
+      -- length of the geometry being passed into this procedure
+      --
+         l_usgm := nm3sdo.get_usgm ( pi_table_name  => l_rec_nth.nth_feature_table
+                                   , pi_column_name => l_rec_nth.nth_feature_shape_column );
+      --
+         l_length := nm3net.get_ne_length ( p_ne_id );
+      --
+         IF NVL(sdo_lrs.geom_segment_end_measure ( l_new_geom, l_usgm.diminfo ), -9999) != l_length 
+         THEN
+            sdo_lrs.redefine_geom_segment ( l_new_geom, l_usgm.diminfo, 0, l_length );
+         END IF;
+      --
+         IF sdo_lrs.geom_segment_end_measure ( l_new_geom, l_usgm.diminfo ) != l_length
+         THEN
+           hig.raise_ner(pi_appl    => nm3type.c_hig
+                        ,pi_id      => 204
+                        ,pi_sqlcode => -20001 );
+         END IF;
+      --
+      -- Task 0110101 Done
+      --
+         nm3sdo_edit.reshape ( l_layer, p_ne_id, l_new_geom );
+      --
+         nm3sdo.change_affected_shapes (p_layer      => l_layer,
+                                        p_ne_id      => p_ne_id);
+      ELSE
+         nm3sdo.insert_element_shape (p_layer      => l_layer,
+                                      p_ne_id      => p_ne_id,
+                                      p_geom       => p_geom
+                                     );
+         nm3sdo.change_affected_shapes (p_layer      => l_layer,
+                                        p_ne_id      => p_ne_id);
+      END IF;
+
+   END reshape_element;
+--
+-----------------------------------------------------------------------------
+--
+   PROCEDURE move_node (
+      p_no_node_id   IN   nm_nodes.no_node_id%TYPE,
+      p_x            IN   NUMBER,
+      p_y            IN   NUMBER
+   )
+   IS
+      l_np_id   NM_POINTS.np_id%TYPE;
+   BEGIN
+      l_np_id := Nm3get.get_no (pi_no_node_id => p_no_node_id).no_np_id;
+      UPDATE NM_POINTS np
+         SET np.np_grid_east = p_x,
+             np.np_grid_north = p_y
+       WHERE np.np_id = l_np_id;
+   END;   
 --
 ------------------------------------------------------------------------------
 --
