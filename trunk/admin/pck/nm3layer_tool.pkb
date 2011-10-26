@@ -3,17 +3,17 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3layer_tool.pkb-arc   2.30   Oct 04 2011 15:23:28   Steve.Cooper  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3layer_tool.pkb-arc   2.31   Oct 26 2011 10:07:02   Ade.Edwards  $
 --       Module Name      : $Workfile:   nm3layer_tool.pkb  $
---       Date into PVCS   : $Date:   Oct 04 2011 15:23:28  $
---       Date fetched Out : $Modtime:   Oct 04 2011 15:21:50  $
---       Version          : $Revision:   2.30  $
+--       Date into PVCS   : $Date:   Oct 26 2011 10:07:02  $
+--       Date fetched Out : $Modtime:   Oct 25 2011 16:37:38  $
+--       Version          : $Revision:   2.31  $
 --       Based on SCCS version : 1.11
 -------------------------------------------------------------------------
 --
 --all global package variables here
 --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000)       := '$Revision:   2.30  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000)       := '$Revision:   2.31  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name   CONSTANT VARCHAR2 (30)         := 'NM3LAYER_TOOL';
@@ -4564,6 +4564,9 @@ FUNCTION run_healthcheck( pi_location        IN VARCHAR2
                         , pi_sde_filename    IN VARCHAR2
                         , pi_ignore_warnings IN BOOLEAN DEFAULT TRUE
                         , po_summary        OUT VARCHAR2
+                        , po_theme_batch_no OUT NUMBER
+                        , po_sdo_batch_no   OUT NUMBER
+                        , po_sde_batch_no   OUT NUMBER
                         ) 
 RETURN BOOLEAN IS
 --
@@ -4574,10 +4577,30 @@ BEGIN
   IF pi_location IS NOT NULL THEN
    --
      IF pi_theme_filename IS NOT NULL THEN
+       DECLARE
+          l_tab_files      hig_file_transfer_api.g_tab_files;
+          l_file_list      nm3file.file_list;
+          l_htfq_batch_no  hig_file_transfer_queue.hftq_batch_no%TYPE;
        BEGIN
          EXECUTE IMMEDIATE 'BEGIN nm3sdo_check.run_theme_check(:pi_location, :pi_theme_filename, '||l_supress_warnings||'); END;'
            USING pi_location, pi_theme_filename;
          po_summary:= po_summary || pi_theme_filename || ' Created. ' || CHR (10);
+       --
+         l_tab_files(1).source                 := pi_location;     -- source oracle directory
+         l_tab_files(1).source_type            := 'DB_SERVER';   -- source type - ie ORACLE_DIRECTORY
+         l_tab_files(1).source_filename        := pi_theme_filename; 
+         l_tab_files(1).destination            := 'HIG_FILE_TRANSFER_QUEUE';    -- dlt_table
+         l_tab_files(1).destination_column     := 'HFTQ_CONTENT';       -- dlt_content_col
+         l_tab_files(1).destination_type       := 'TABLE';              -- destination type - ie TABLE
+         l_tab_files(1).condition              := '1=2';  -- condition -  
+         l_tab_files(1).content                := nm3file.file_to_blob(pi_location,pi_theme_filename);
+         l_tab_files(1).comments               := 'Queued';
+        --
+         hig_file_transfer_api.add_files_to_queue ( pi_tab_files     => l_tab_files 
+                                                  , po_hftq_batch_no => l_htfq_batch_no);
+        --
+          po_theme_batch_no := l_htfq_batch_no;
+        --
        EXCEPTION WHEN OTHERS THEN
          l_success := FALSE;
          po_summary:= po_summary || pi_theme_filename || ' Failed. ' || SQLERRM || CHR (10);
@@ -4585,10 +4608,30 @@ BEGIN
     END IF;
     --
     IF pi_sdo_filename IS NOT NULL THEN 
+       DECLARE
+         l_tab_files      hig_file_transfer_api.g_tab_files;
+         l_file_list      nm3file.file_list;
+         l_htfq_batch_no  hig_file_transfer_queue.hftq_batch_no%TYPE;
        BEGIN
          EXECUTE IMMEDIATE 'BEGIN nm3sdo_check.run_sdo_check(:pi_location, :pi_sdo_filename); END;'
            USING pi_location, pi_sdo_filename;
          po_summary:= po_summary || pi_sdo_filename || ' Created. ' || CHR (10);
+       --
+         l_tab_files(1).source                 := pi_location;     -- source oracle directory
+         l_tab_files(1).source_type            := 'DB_SERVER';   -- source type - ie ORACLE_DIRECTORY
+         l_tab_files(1).source_filename        := pi_sdo_filename; 
+         l_tab_files(1).destination            := 'HIG_FILE_TRANSFER_QUEUE';    -- dlt_table
+         l_tab_files(1).destination_column     := 'HFTQ_CONTENT';       -- dlt_content_col
+         l_tab_files(1).destination_type       := 'TABLE';              -- destination type - ie TABLE
+         l_tab_files(1).condition              := '1=2';  -- condition -  
+         l_tab_files(1).content                := nm3file.file_to_blob(pi_location,pi_sdo_filename);
+         l_tab_files(1).comments               := 'Queued';
+        --
+         hig_file_transfer_api.add_files_to_queue ( pi_tab_files     => l_tab_files 
+                                                  , po_hftq_batch_no => l_htfq_batch_no);
+        --
+          po_sdo_batch_no := l_htfq_batch_no;
+        --
        EXCEPTION WHEN OTHERS THEN
          po_summary:= po_summary ||  pi_sdo_filename || ' Failed. ' || SQLERRM || CHR (10);
          l_success := FALSE;
@@ -4597,10 +4640,29 @@ BEGIN
     
     --
     IF pi_sde_filename IS NOT NULL THEN
-       
+      DECLARE
+         l_tab_files      hig_file_transfer_api.g_tab_files;
+         l_file_list      nm3file.file_list;
+         l_htfq_batch_no  hig_file_transfer_queue.hftq_batch_no%TYPE;
       BEGIN
         EXECUTE IMMEDIATE 'BEGIN nm3sde_check.run_sde_check(:pi_location, :pi_sde_filename); END;'
           USING pi_location, pi_sde_filename;
+        --
+         l_tab_files(1).source                 := pi_location;     -- source oracle directory
+         l_tab_files(1).source_type            := 'DB_SERVER';   -- source type - ie ORACLE_DIRECTORY
+         l_tab_files(1).source_filename        := pi_sde_filename; 
+         l_tab_files(1).destination            := 'HIG_FILE_TRANSFER_QUEUE';    -- dlt_table
+         l_tab_files(1).destination_column     := 'HFTQ_CONTENT';       -- dlt_content_col
+         l_tab_files(1).destination_type       := 'TABLE';              -- destination type - ie TABLE
+         l_tab_files(1).condition              := '1=2';  -- condition -  
+         l_tab_files(1).content                := nm3file.file_to_blob(pi_location,pi_sde_filename);
+         l_tab_files(1).comments               := 'Queued';
+        --
+         hig_file_transfer_api.add_files_to_queue ( pi_tab_files     => l_tab_files 
+                                                  , po_hftq_batch_no => l_htfq_batch_no);
+        --
+          po_sde_batch_no := l_htfq_batch_no;
+        --
         po_summary:= po_summary || pi_sde_filename || ' Created. ' || CHR (10);
       EXCEPTION WHEN OTHERS THEN
         l_success := FALSE;
