@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3ddl AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ddl.pkb-arc   2.18.1.0   Aug 25 2011 14:36:48   Ade.Edwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ddl.pkb-arc   2.18.1.1   Oct 27 2011 12:42:44   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3ddl.pkb  $
---       Date into PVCS   : $Date:   Aug 25 2011 14:36:48  $
---       Date fetched Out : $Modtime:   Aug 25 2011 14:35:44  $
---       PVCS Version     : $Revision:   2.18.1.0  $
+--       Date into PVCS   : $Date:   Oct 27 2011 12:42:44  $
+--       Date fetched Out : $Modtime:   Oct 27 2011 12:42:18  $
+--       PVCS Version     : $Revision:   2.18.1.1  $
 --       Based on SCCS Version     : 1.5
 --
 --
@@ -23,7 +23,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3ddl AS
 --
 --all global package variables here
 --
-   g_body_sccsid     constant varchar2(30) :='"$Revision:   2.18.1.0  $"';
+   g_body_sccsid     constant varchar2(30) :='"$Revision:   2.18.1.1  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3ddl';
@@ -510,7 +510,8 @@ BEGIN
         FETCH get_priv_syns_to_drop BULK COLLECT INTO l_tab_ddl;
         CLOSE get_priv_syns_to_drop;
       --
-        IF l_tab_ddl.COUNT > 1
+-- task 0111578 - remove all private syns to the object
+	  IF l_tab_ddl.COUNT > 0
         THEN
           FOR i IN l_tab_ddl.FIRST .. l_tab_ddl.LAST
           LOOP
