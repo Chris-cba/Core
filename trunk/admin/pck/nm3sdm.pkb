@@ -5,11 +5,11 @@ As
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.52   Oct 26 2011 11:17:14   Steve.Cooper  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.53   Oct 27 2011 13:23:22   Ade.Edwards  $
 --       Module Name      : $Workfile:   nm3sdm.pkb  $
---       Date into PVCS   : $Date:   Oct 26 2011 11:17:14  $
---       Date fetched Out : $Modtime:   Oct 26 2011 10:51:50  $
---       PVCS Version     : $Revision:   2.52  $
+--       Date into PVCS   : $Date:   Oct 27 2011 13:23:22  $
+--       Date fetched Out : $Modtime:   Oct 27 2011 10:49:18  $
+--       PVCS Version     : $Revision:   2.53  $
 --
 --   Author : R.A. Coupe
 --
@@ -21,7 +21,7 @@ As
 --
 --all global package variables here
 --
-  g_Body_Sccsid     Constant Varchar2 (2000) := '"$Revision:   2.52  $"';
+  g_Body_Sccsid     Constant Varchar2 (2000) := '"$Revision:   2.53  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
   g_Package_Name    Constant Varchar2 (30)   := 'NM3SDM';
@@ -818,6 +818,8 @@ Begin
      Execute Immediate Cur_String;
 
   End If; --single-part or multi-part
+  
+  nm3ddl.create_synonym_for_object(p_object_name => p_Table);
 
 End Create_Spatial_Table;
 --
@@ -4413,13 +4415,13 @@ Begin
     --      of the actual start-date for the specific mamber that is targetted.
     --      Without this, the end-date of an asset  (hence members) will update the end-date on
     --      all shape records that have the same begin-mp - including those that are already ended.
-		
+  
     If p_Nm_End_Date Is Not Null Then
        Upd_String := Upd_String ||' and end_date is null and start_date = :start_date';
     Else
        Upd_String := Upd_String ||' and start_date = :start_date';
     End If;
-		
+  
     Execute Immediate Upd_String
     Using p_Nm_End_Date,
           p_Nm_Ne_Id_In,
@@ -5006,7 +5008,7 @@ Begin
               || ' and ne_id_of = :ne_id_of '
               || ' and nm_begin_mp = :ne_begin_mp '
               || ' and start_date = :start_date';
-  Else		
+  Else  
     Del_String := 'delete from '
               || Irec.Nth_Feature_Table
               || ' where ne_id in ( select nad_iit_ne_id from nm_nw_ad_link where nad_ne_id =  :ne_id )'
@@ -6160,6 +6162,8 @@ Is
     --
     -- Insert the USGM based on current theme and role
     --
+    nm_debug.debug_on;
+    nm_debug.debug('Running Create_Sub_Sdo_Layer from Process_Subuser_Nthr for '||pi_theme_id||' - '||pi_role);
     Insert Into Mdsys.Sdo_Geom_Metadata_Table G
     (
     Sdo_Owner,
@@ -6272,7 +6276,8 @@ Is
               )
   Loop
     --
-    Create_Feature_View (I.Hus_Username, I.Nth_Feature_Table);
+    -- No longer required.
+    --Create_Feature_View (I.Hus_Username, I.Nth_Feature_Table);
     
     If Hig.Get_User_Or_Sys_Opt('REGSDELAY') = 'Y' Then
       Begin
@@ -6438,6 +6443,9 @@ Is
     l_User Hig_Users.Hus_Username%Type := pi_Username;
   Begin
     --
+    nm_debug.debug_on;
+    nm_debug.debug('Running Create_Sub_Sdo_Layer from Process_Subuser_Hur for '||pi_Username||' - '||pi_role);
+    
     Insert Into Mdsys.Sdo_Geom_Metadata_Table g
     (
     Sdo_Owner,
@@ -6530,7 +6538,8 @@ Is
               )
     Loop
       --
-      Create_Feature_View (Pi_Username, I.Nth_Feature_Table);
+      -- No longer required
+      -- Create_Feature_View (Pi_Username, I.Nth_Feature_Table);
       --
       If Hig.Get_User_Or_Sys_Opt('REGSDELAY') = 'Y' Then
         Begin
