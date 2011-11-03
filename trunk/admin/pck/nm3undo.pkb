@@ -4,11 +4,11 @@ IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3undo.pkb-arc   2.16   Aug 17 2011 11:01:08   Rob.Coupe  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3undo.pkb-arc   2.17   Nov 03 2011 12:25:06   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3undo.pkb  $
---       Date into PVCS   : $Date:   Aug 17 2011 11:01:08  $
---       Date fetched Out : $Modtime:   Aug 17 2011 11:00:26  $
---       PVCS Version     : $Revision:   2.16  $
+--       Date into PVCS   : $Date:   Nov 03 2011 12:25:06  $
+--       Date fetched Out : $Modtime:   Nov 03 2011 12:06:54  $
+--       PVCS Version     : $Revision:   2.17  $
 --
 --   Author : ITurnbull
 --
@@ -19,7 +19,7 @@ IS
 -- Copyright (c) exor corporation ltd, 2004
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '"$Revision:   2.16  $"';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '"$Revision:   2.17  $"';
 --  g_body_sccsid is the SCCS ID for the package body
    g_package_name   CONSTANT VARCHAR2 (2000) := 'nm3undo';
 --
@@ -2171,32 +2171,38 @@ END undo_scheme;
       END IF;
       -- Task 0111307 End
       --
---  UPDATE NM_MEMBERS_ALL
---  SET nm_end_date = NULL
---  WHERE nm_ne_id_of = p_ne_id
---  AND nm_type = 'G'
---  AND TRUNC(nm_date_modified) = ( SELECT MAX(TRUNC(nm_date_modified))
---                           FROM NM_MEMBERS_ALL
---                           WHERE nm_ne_id_of = p_ne_id
---                         )  ;
+--RC> Problems here - code has been uncommented since group members and assets were not being unlcosed.      
+--    Also, added the v_close_date below because otherwise, a member that was closed at the max date (not at the close date of the element) would be unclosed!      --
+--
+	  
+    UPDATE NM_MEMBERS_ALL
+    SET nm_end_date = NULL
+    WHERE nm_ne_id_of = p_ne_id
+    AND nm_type = 'G'
+    AND TRUNC(nm_date_modified) = ( SELECT MAX(TRUNC(nm_date_modified))
+                             FROM NM_MEMBERS_ALL
+                             WHERE nm_ne_id_of = p_ne_id
+                         )  ;
 ----
 ---- unclose inv_items closed on the day the element was closed
 ---- that are on the element
---  UPDATE NM_INV_ITEMS_ALL
---  SET iit_end_date = NULL
---  WHERE iit_end_date = v_close_date
---  AND iit_ne_id IN ( SELECT nm_ne_id_in
---                     FROM NM_MEMBERS_ALL
---              WHERE nm_ne_id_of = p_ne_id
---                AND nm_type = 'I');
+    UPDATE NM_INV_ITEMS_ALL
+    SET iit_end_date = NULL
+    WHERE iit_end_date = v_close_date
+    AND iit_ne_id IN ( SELECT nm_ne_id_in
+                       FROM NM_MEMBERS_ALL
+                WHERE nm_ne_id_of = p_ne_id
+                  AND nm_type = 'I'
+				  AND nm_end_date = v_close_date );
 ----
 ---- unclose inv_items locations closed on the day the element was closed
 ---- could cause problems if inv_items are closed on same day that
 ---- are not related to the element being closed
---  UPDATE NM_MEMBERS_ALL
---  SET nm_end_date = NULL
---  WHERE nm_ne_id_of = p_ne_id
---    AND nm_type = 'I';
+  UPDATE NM_MEMBERS_ALL
+    SET nm_end_date = NULL
+    WHERE nm_ne_id_of = p_ne_id
+      AND nm_type = 'I'
+      AND nm_end_date = v_close_date;
 --
 -- unendate the node_usages
       UPDATE NM_NODE_USAGES_ALL
