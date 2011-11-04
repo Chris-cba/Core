@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm3merge IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3merge.pkb-arc   2.12   Jun 01 2011 10:05:34   Chris.Strettle  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3merge.pkb-arc   2.13   Nov 04 2011 09:44:44   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3merge.pkb  $
---       Date into PVCS   : $Date:   Jun 01 2011 10:05:34  $
---       Date fetched Out : $Modtime:   Jun 01 2011 09:53:58  $
---       PVCS Version     : $Revision:   2.12  $
+--       Date into PVCS   : $Date:   Nov 04 2011 09:44:44  $
+--       Date fetched Out : $Modtime:   Nov 04 2011 09:43:34  $
+--       PVCS Version     : $Revision:   2.13  $
 --
 --   Author : ITurnbull
 --
@@ -16,7 +16,7 @@ CREATE OR REPLACE PACKAGE BODY nm3merge IS
 --   Copyright (c) exor corporation ltd, 2000
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.12  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.13  $"';
 --  g_body_sccsid is the SCCS ID for the package body
    g_package_name    CONSTANT  varchar2(30)   := 'nm3merge';
 --
@@ -389,10 +389,14 @@ BEGIN
    g_rec_ne2.ne_version_no     := p_ne_version_no_new;
 --
    -- if p_merge_at_node is null then work out what the connecting node is
-   IF v_merge_at_node IS NULL
-    THEN
-      v_merge_at_node := nm3net.get_element_shared_node (p_ne_id_1,p_ne_id_2);
-   END IF;
+--RC> Task 0111189  - allowing a choice of the node on which to merge can be at odds with the choice of direction derived from the order of the merge elements.
+--    Ignore the merge node.
+   v_merge_at_node := nm3net.get_element_shared_node (p_ne_id_1,p_ne_id_2);
+--   IF v_merge_at_node IS NULL
+--    THEN
+--      v_merge_at_node := nm3net.get_element_shared_node (p_ne_id_1,p_ne_id_2);
+--   END IF;
+--RC> End of task 0111189
 --
    -- get the start and end nodes
    organise_nodes(p_ne_id_1, p_ne_id_2, v_merge_at_node, g_rec_ne2.ne_no_start, g_rec_ne2.ne_no_end);
@@ -529,15 +533,15 @@ BEGIN
     -- CWS 0111024 lateral offsets
    IF NVL(hig.get_sysopt('XSPOFFSET'),'N') = 'Y'
    THEN
-     EXECUTE IMMEDIATE 'xncc_herm_xsp.populate_herm_xsp( p_ne_id          => :p_ne_id_1 ' ||
+     EXECUTE IMMEDIATE 'begin xncc_herm_xsp.populate_herm_xsp( p_ne_id          => :p_ne_id_1 ' ||
                                                       ', p_ne_id_new      => :p_ne_id_new ' ||
                                                       ', p_effective_date => :p_effective_date ' ||
-                                                      ');' USING p_ne_id_1, p_ne_id_new, p_effective_date;
+                                                      '); end;' USING p_ne_id_1, p_ne_id_new, p_effective_date;
    --
-     EXECUTE IMMEDIATE 'xncc_herm_xsp.populate_herm_xsp( p_ne_id          => :p_ne_id_2 ' ||
+     EXECUTE IMMEDIATE 'begin xncc_herm_xsp.populate_herm_xsp( p_ne_id          => :p_ne_id_2 ' ||
                                                       ', p_ne_id_new      => :p_ne_id_new ' ||
                                                       ', p_effective_date => :p_effective_date ' ||
-                                                      ');' USING p_ne_id_1, p_ne_id_new, p_effective_date;
+                                                      '); end;' USING p_ne_id_1, p_ne_id_new, p_effective_date;
    --
    END IF;
    set_leg_numbers( p_ne_id_1, p_ne_id_2, p_ne_id_new );
