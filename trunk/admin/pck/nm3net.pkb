@@ -1,11 +1,11 @@
 CREATE OR REPLACE PACKAGE BODY Nm3net AS
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3net.pkb-arc   2.7   May 16 2011 14:45:04   Steve.Cooper  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3net.pkb-arc   2.8   Nov 07 2011 10:59:02   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3net.pkb  $
---       Date into SCCS   : $Date:   May 16 2011 14:45:04  $
---       Date fetched Out : $Modtime:   Apr 01 2011 07:57:02  $
---       SCCS Version     : $Revision:   2.7  $
+--       Date into SCCS   : $Date:   Nov 07 2011 10:59:02  $
+--       Date fetched Out : $Modtime:   Nov 07 2011 10:57:50  $
+--       SCCS Version     : $Revision:   2.8  $
 --       Based on 
 --
 --
@@ -21,7 +21,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3net AS
 --              (create_or_reuse_point_and_node() also creates nodes, this sets null no_purpose)
 
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(200) := '"$Revision:   2.7  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(200) := '"$Revision:   2.8  $"';
 --  g_body_sccsid is the SCCS ID for the package body
   g_package_name CONSTANT  VARCHAR2(30) := 'nm3net';
 --
@@ -1117,7 +1117,8 @@ FUNCTION get_element_shared_node
          ,nm_node_usages nnu2
    WHERE  nnu1.nnu_ne_id      = p_ne_id_1
     AND   nnu2.nnu_ne_id      = p_ne_id_2
-    AND   nnu1.nnu_no_node_id = nnu2.nnu_no_node_id;
+    AND   nnu1.nnu_no_node_id = nnu2.nnu_no_node_id
+   ORDER BY nnu1.nnu_node_type;
 --
    l_retval nm_node_usages.nnu_no_node_id%TYPE;
 --
