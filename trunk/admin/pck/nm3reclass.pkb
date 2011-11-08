@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3reclass AS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3reclass.pkb-arc   2.13   May 25 2011 09:05:14   Steve.Cooper  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3reclass.pkb-arc   2.14   Nov 08 2011 16:45:28   Ade.Edwards  $
 --       Module Name      : $Workfile:   nm3reclass.pkb  $
---       Date into PVCS   : $Date:   May 25 2011 09:05:14  $
---       Date fetched Out : $Modtime:   May 25 2011 09:03:02  $
---       PVCS Version     : $Revision:   2.13  $
+--       Date into PVCS   : $Date:   Nov 08 2011 16:45:28  $
+--       Date fetched Out : $Modtime:   Nov 08 2011 16:44:18  $
+--       PVCS Version     : $Revision:   2.14  $
 --
 --
 --   Author : R.A. Coupe
@@ -21,7 +21,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3reclass AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.13  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.14  $"';
 -- g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3reclass';
@@ -1711,7 +1711,7 @@ BEGIN
         Nm3ausec.set_status(Nm3type.c_on);
      --
      -- CWS 0110555 Parent members were not being recreated during reclassify
-     /*  INSERT INTO NM_MEMBER_HISTORY
+       INSERT INTO NM_MEMBER_HISTORY
              (nmh_nm_ne_id_in
              ,nmh_nm_ne_id_of_old
              ,nmh_nm_ne_id_of_new
@@ -1748,7 +1748,7 @@ BEGIN
       UPDATE nm_members
        SET   nm_end_date = p_new_ne.ne_start_date
       WHERE  nm_ne_id_of = p_old_ne.ne_id;
-*/
+
        ----------------------
        --end date old element
        ----------------------
