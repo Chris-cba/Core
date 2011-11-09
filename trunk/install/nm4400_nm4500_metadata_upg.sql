@@ -8,11 +8,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4400_nm4500_metadata_upg.sql-arc   3.2   Oct 12 2011 15:37:16   Mike.Alexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4400_nm4500_metadata_upg.sql-arc   3.3   Nov 09 2011 14:23:52   Mike.Alexander  $
 --       Module Name      : $Workfile:   nm4400_nm4500_metadata_upg.sql  $
---       Date into PVCS   : $Date:   Oct 12 2011 15:37:16  $
---       Date fetched Out : $Modtime:   Oct 12 2011 15:29:00  $
---       Version          : $Revision:   3.2  $
+--       Date into PVCS   : $Date:   Nov 09 2011 14:23:52  $
+--       Date fetched Out : $Modtime:   Nov 09 2011 14:09:32  $
+--       Version          : $Revision:   3.3  $
 --
 ------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2011
@@ -333,6 +333,40 @@ Exception
 End;
 /
 
+------------------------------------------------------------------
+
+
+------------------------------------------------------------------
+SET TERM ON
+PROMPT New process frequency
+SET TERM OFF
+
+------------------------------------------------------------------
+-- 
+-- DEVELOPMENT COMMENTS (STEVEN COOPER)
+-- New process frequency of 30 seconds.
+-- 
+------------------------------------------------------------------
+Begin
+  Insert Into Hig_Scheduling_Frequencies
+  (
+  Hsfr_Frequency_Id,
+  Hsfr_Meaning,
+  Hsfr_Frequency,
+  Hsfr_Interval_In_Mins
+  )
+  Values
+  (
+  -2,
+  '30 Seconds',
+  'freq=secondly; interval=30;',
+  Null
+  );
+Exception
+  When Dup_Val_On_Index Then
+    Null;
+End;
+/
 ------------------------------------------------------------------
 
 
