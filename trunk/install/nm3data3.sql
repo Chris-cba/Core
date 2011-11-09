@@ -2,13 +2,13 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data3.sql-arc   2.27   Mar 31 2011 16:44:00   Mike.Alexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data3.sql-arc   2.28   Nov 09 2011 14:29:38   Mike.Alexander  $
 --       Module Name      : $Workfile:   nm3data3.sql  $
---       Date into PVCS   : $Date:   Mar 31 2011 16:44:00  $
---       Date fetched Out : $Modtime:   Mar 31 2011 16:41:24  $
---       Version          : $Revision:   2.27  $
+--       Date into PVCS   : $Date:   Nov 09 2011 14:29:38  $
+--       Date fetched Out : $Modtime:   Nov 09 2011 14:25:06  $
+--       Version          : $Revision:   2.28  $
 --       Table Owner      : NM3_METADATA
---       Generation Date  : 31-MAR-2011 16:41
+--       Generation Date  : 09-NOV-2011 14:25
 --
 --   Product metadata script
 --   As at Release 4.4.0.0
@@ -5005,6 +5005,20 @@ SELECT
        ,5 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_SCHEDULING_FREQUENCIES
                    WHERE HSFR_FREQUENCY_ID = -3);
+--
+INSERT INTO HIG_SCHEDULING_FREQUENCIES
+       (HSFR_FREQUENCY_ID
+       ,HSFR_MEANING
+       ,HSFR_FREQUENCY
+       ,HSFR_INTERVAL_IN_MINS
+       )
+SELECT 
+        -2
+       ,'30 Seconds'
+       ,'freq=secondly; interval=30;'
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_SCHEDULING_FREQUENCIES
+                   WHERE HSFR_FREQUENCY_ID = -2);
 --
 INSERT INTO HIG_SCHEDULING_FREQUENCIES
        (HSFR_FREQUENCY_ID
