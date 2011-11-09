@@ -3,11 +3,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4400_nm4500_upg.sql-arc   3.7   Oct 19 2011 12:10:12   Mike.Alexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4400_nm4500_upg.sql-arc   3.8   Nov 09 2011 11:29:02   Mike.Alexander  $
 --       Module Name      : $Workfile:   nm4400_nm4500_upg.sql  $
---       Date into PVCS   : $Date:   Oct 19 2011 12:10:12  $
---       Date fetched Out : $Modtime:   Oct 19 2011 12:07:20  $
---       Version          : $Revision:   3.7  $
+--       Date into PVCS   : $Date:   Nov 09 2011 11:29:02  $
+--       Date fetched Out : $Modtime:   Nov 09 2011 11:26:06  $
+--       Version          : $Revision:   3.8  $
 --
 --   Product upgrade script
 --
@@ -227,7 +227,7 @@ start '&&run_file'
 SET FEEDBACK OFF
 --
 ---------------------------------------------------------------------------------------------------
---                ****************   MERGE ANY VIEW  *******************
+--                ****************   PRE_UPG_META_SYNC  *******************
 --
 --
 SET TERM ON
@@ -321,6 +321,7 @@ FROM dual
 SET FEEDBACK ON
 start &&run_file
 SET FEEDBACK OFF
+--
 ---------------------------------------------------------------------------------------------------
 --                  ****************   METADATA  *******************
 SET TERM ON
@@ -383,6 +384,22 @@ SET TERM ON
 Prompt Creating ACLs...
 SET TERM OFF
 EXECUTE nm3acl.create_standard_acls;
+--
+---------------------------------------------------------------------------------------------------
+--                ****************   POST_UPG_META_SYNC  *******************
+--
+--
+SET TERM ON
+PROMPT resynchronize asset metamodel related objects
+SET TERM OFF
+SET DEFINE ON
+select '&exor_base'||'nm3'||'&terminator'||'install'||
+        '&terminator'||'pre_upgrade_meta_sync.sql' run_file
+from dual
+/
+SET FEEDBACK ON
+start '&&run_file'
+SET FEEDBACK OFF
 --
 ---------------------------------------------------------------------------------------------------
 --                        ****************   VERSION NUMBER   *******************
