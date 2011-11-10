@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3inv AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv.pkb-arc   2.29   May 23 2011 11:17:30   Chris.Strettle  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv.pkb-arc   2.30   Nov 10 2011 10:22:14   Ade.Edwards  $
 --       Module Name      : $Workfile:   nm3inv.pkb  $
---       Date into SCCS   : $Date:   May 23 2011 11:17:30  $
---       Date fetched Out : $Modtime:   May 23 2011 11:13:40  $
---       SCCS Version     : $Revision:   2.29  $
+--       Date into SCCS   : $Date:   Nov 10 2011 10:22:14  $
+--       Date fetched Out : $Modtime:   Nov 10 2011 10:20:24  $
+--       SCCS Version     : $Revision:   2.30  $
 --       Based on --
 --
 --   nm3inv package body
@@ -30,7 +30,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3inv AS
 --all global package variables here
 --
 --  g_body_sccsid is the SCCS ID for the package body
-   g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.29  $';
+   g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.30  $';
    g_package_name   CONSTANT VARCHAR2(30) := 'nm3inv';
 --
    --<USED BY validate_rec_iit>
@@ -2029,6 +2029,17 @@ BEGIN
             append ('  l_fail_msg := '||Nm3flx.string('cannot be null')||'; RAISE l_missing_mand;');
             append (' END IF;');
          END IF;
+
+       -- Task 0111531
+       -- Only set the IIT_PRIMARY_KEY to IIT_NE_ID if it's optional, defined as a flexible attribute and it NULL.
+       --
+         IF NOT l_mandatory
+         AND cs_rec.ita_attrib_name = 'IIT_PRIMARY_KEY'
+         THEN
+           append (' IF '||g_package_name||'.g_rec_iit.'||cs_rec.ita_attrib_name||' IS NULL THEN');
+           append ('   '||g_package_name||'.g_rec_iit.'||cs_rec.ita_attrib_name||' := '||g_package_name||'.g_rec_iit.iit_ne_id;');
+           append (' END IF;');
+         END IF;
    --
          IF cs_rec.ita_id_domain IS NOT NULL
           THEN
@@ -2183,6 +2194,15 @@ BEGIN
 --
       END LOOP;
 --
+      -- Task 0111531
+      -- If IIT_PRIMARY_KEY is NULL then it has to be set to IIT_NE_ID at this point.
+      -- This is because it would have already been checked in the Attributes loop if defined as flexible attribute.
+      -- If it's not defined as Flex attribute then set it to IIT_NE_ID if null. 
+      --
+      append (' IF '||g_package_name||'.g_rec_iit.iit_primary_key IS NULL THEN');
+      append ('   '||g_package_name||'.g_rec_iit.iit_primary_key'||' := '||g_package_name||'.g_rec_iit.iit_ne_id;');
+      append (' END IF;');
+
       IF g_xav_procedure_exists
        THEN
          append ('--');
