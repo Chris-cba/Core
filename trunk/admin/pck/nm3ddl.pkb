@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3ddl AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ddl.pkb-arc   2.25   Oct 27 2011 12:44:36   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ddl.pkb-arc   2.26   Nov 10 2011 14:00:40   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3ddl.pkb  $
---       Date into PVCS   : $Date:   Oct 27 2011 12:44:36  $
---       Date fetched Out : $Modtime:   Oct 27 2011 12:43:54  $
---       PVCS Version     : $Revision:   2.25  $
+--       Date into PVCS   : $Date:   Nov 10 2011 14:00:40  $
+--       Date fetched Out : $Modtime:   Nov 10 2011 13:55:46  $
+--       PVCS Version     : $Revision:   2.26  $
 --       Based on SCCS Version     : 1.5
 --
 --
@@ -23,7 +23,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3ddl AS
 --
 --all global package variables here
 --
-   g_body_sccsid     constant varchar2(30) :='"$Revision:   2.25  $"';
+   g_body_sccsid     constant varchar2(30) :='"$Revision:   2.26  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3ddl';
@@ -2200,8 +2200,11 @@ BEGIN
     create_user_sdo_themes;
 
     create_user_sdo_styles;
-
-    nm3sdm.create_msv_feature_views ( pi_username => pi_sub_username );
+--
+--RC> Task 0108742 - we do not want subordinate user views or synonyms - these can be created when a user is allocated
+--    a role or a role is allocated to a theme. The code in nm3sdm was modified to create the synonyms rather than views
+--    but neither are required here.
+--     nm3sdm.create_msv_feature_views ( pi_username => pi_sub_username );
 
  END IF;
 
