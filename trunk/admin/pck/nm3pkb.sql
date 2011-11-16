@@ -2,11 +2,11 @@
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3pkb.sql-arc   2.36   Oct 20 2011 08:52:40   Steve.Cooper  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3pkb.sql-arc   2.37   Nov 16 2011 15:07:34   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3pkb.sql  $
---       Date into PVCS   : $Date:   Oct 20 2011 08:52:40  $
---       Date fetched Out : $Modtime:   Oct 20 2011 08:51:26  $
---       PVCS Version     : $Revision:   2.36  $
+--       Date into PVCS   : $Date:   Nov 16 2011 15:07:34  $
+--       Date fetched Out : $Modtime:   Nov 16 2011 15:06:14  $
+--       PVCS Version     : $Revision:   2.37  $
 --
 --
 --   Author : Graeme Johnson
@@ -2311,7 +2311,20 @@ start '&run_file'
 --
 ----------------------------------------------------------------------------------------- 
 --
+SET TERM ON 
+PROMPT hig_router_params_utils.pkw
+SET TERM OFF
+SET DEFINE ON 
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'pck'||'&terminator'||'hig_router_params_utils.pkw' run_file
+FROM dual 
+/ 
+start '&run_file'
+--
+----------------------------------------------------------------------------------------- 
+--
 --
 -- New PACKAGE BODIES above here
 --
 SET term on
+
+
