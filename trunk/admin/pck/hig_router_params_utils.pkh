@@ -1,0 +1,41 @@
+Create Or Replace Package Hig_Router_Params_Utils
+Is
+  Type t_Param_Rec  
+  Is
+  Record
+  (
+  p_Param_Name    Hig_Router_Params.Param_Name%Type,
+  p_Param_Value   Varchar2(100)
+  );
+  
+  Type t_Param_Tab Is Table Of t_Param_Rec Index By Binary_Integer;
+  
+  Function  Get_New_Router_Id Return Hig_Router_Params.Router_Id%Type;
+  --
+  Procedure Add_Param (
+                      p_Router_Id     In  Hig_Router_Params.Router_Id%Type,
+                      p_Param_Name    In  Hig_Router_Params.Param_Name%Type,
+                      p_Param_Value   In  Hig_Router_Params.Param_Value_Varchar%Type
+                      );
+  --
+  Procedure Add_Param (
+                      p_Router_Id     In  Hig_Router_Params.Router_Id%Type,
+                      p_Param_Name    In  Hig_Router_Params.Param_Name%Type,
+                      p_Param_Value   In  Hig_Router_Params.Param_Value_Number%Type
+                      );
+  --                      
+  Procedure Add_Param (
+                      p_Router_Id     In  Hig_Router_Params.Router_Id%Type,
+                      p_Param_Name    In  Hig_Router_Params.Param_Name%Type,
+                      p_Param_Value   In  Hig_Router_Params.Param_Value_Date%Type
+                      );
+
+  Function Get_Params (
+                      p_Router_Id   In  Hig_Router_Params.Router_Id%Type
+                      ) Return t_Param_Tab;
+
+  Procedure Clear_Down_Old_Params (
+                                  p_Clear_Down_Date   In  Date  Default Trunc(Sysdate-1)
+                                  );
+
+End Hig_Router_Params_Utils;
