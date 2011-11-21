@@ -1402,5 +1402,26 @@ SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'views'||'&te
 FROM dual 
 / 
 start '&run_file'
-
+--
+----------------------------------------------------------------------------------------- 
+--
+SET TERM ON 
+PROMPT v_hig_module_info.vw
+SET TERM OFF
+SET DEFINE ON 
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'views'||'&terminator'||'v_hig_module_info.vw' run_file 
+FROM dual 
+/ 
+start '&run_file'
+--
+----------------------------------------------------------------------------------------- 
+--
+SET TERM ON 
+PROMPT v_hig_router_params.vw
+SET TERM OFF
+SET DEFINE ON 
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'views'||'&terminator'||'v_hig_router_params.vw' run_file 
+FROM dual 
+/ 
+start '&run_file'
 
