@@ -2,7 +2,7 @@ Create Or Replace Package Body Hig_Router_Params_Utils
 Is
     
   --g_body_sccsid is the SCCS ID for the package body
-  g_Body_Sccsid             Constant  Varchar2(2000)              :=  '$Revision:   5.3  $';
+  g_Body_Sccsid             Constant  Varchar2(2000)              :=  '$Revision:   5.4  $';
   --
   -----------------------------------------------------------------------------
   --
@@ -59,6 +59,7 @@ Is
       p_Param_Name,
       p_Param_Value
       );
+      Commit;
       Nm_Debug.Debug('Inserted Parameter');
     End If;
     Nm_Debug.Debug('Hig_Router_Params_Utils.Add_Param - Finished');
@@ -75,11 +76,23 @@ Is
     Nm_Debug.Debug('Parameter - p_Router_Id :'    || To_Char(p_Router_Id));
     Nm_Debug.Debug('Parameter - p_Param_Name :'   || p_Param_Name);
     Nm_Debug.Debug('Parameter - p_Param_Value :'  || To_Char(p_Param_Value));
-    Add_Param (
-              p_Router_Id     =>  p_Router_Id,
-              p_Param_Name    =>  p_Param_Name,
-              p_Param_Value   =>  To_Char(p_Param_Value)
-              );
+    If p_Param_Name Is Not Null Then
+      Insert Into Hig_Router_Params
+      (
+      Hrp_Router_Id,
+      Hrp_Param_Name,
+      Hrp_Param_Value_Number
+      )
+      Values
+      (
+      p_Router_Id,
+      p_Param_Name,
+      p_Param_Value
+      );
+      Commit;
+      Nm_Debug.Debug('Inserted Parameter');
+    End If;
+
     Nm_Debug.Debug('Hig_Router_Params_Utils.Add_Param (Overloaded (Number)) - Finished');              
   End Add_Param;                      
   --                      
@@ -94,11 +107,22 @@ Is
     Nm_Debug.Debug('Parameter - p_Router_Id :'    || To_Char(p_Router_Id));
     Nm_Debug.Debug('Parameter - p_Param_Name :'   || p_Param_Name);
     Nm_Debug.Debug('Parameter - p_Param_Value :'  || To_Char(p_Param_Value,'DD-MM-YYYY HH24:MI.SS'));  
-    Add_Param (
-              p_Router_Id     =>  p_Router_Id,
-              p_Param_Name    =>  p_Param_Name,
-              p_Param_Value   =>  To_Char(p_Param_Value,'DD-MM-YYYY HH24:MI.SS')
-              );
+    If p_Param_Name Is Not Null Then
+      Insert Into Hig_Router_Params
+      (
+      Hrp_Router_Id,
+      Hrp_Param_Name,
+      Hrp_Param_Value_Date
+      )
+      Values
+      (
+      p_Router_Id,
+      p_Param_Name,
+      p_Param_Value
+      );
+      Commit;
+      Nm_Debug.Debug('Inserted Parameter');
+    End If;
     Nm_Debug.Debug('Hig_Router_Params_Utils.Add_Param (Overloaded (Date)) - Finished');              
   End Add_Param;
   --
