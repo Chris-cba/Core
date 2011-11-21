@@ -1,9 +1,9 @@
 Create Or Replace Package Body Hig_Router_Params_Utils
 Is
     
-  Function  Get_New_Router_Id Return Hig_Router_Params.Router_Id%Type
+  Function  Get_New_Router_Id Return Hig_Router_Params.Hrp_Router_Id%Type
   Is
-    l_Router_Id   Hig_Router_Params.Router_Id%Type;
+    l_Router_Id   Hig_Router_Params.Hrp_Router_Id%Type;
   Begin
     Nm_Debug.Debug('Hig_Router_Params_Utils.Get_New_Router_Id - Called');
     Select  Hig_Router_Params_Seq.Nextval
@@ -15,9 +15,9 @@ Is
   End Get_New_Router_Id;
   --
   Procedure Add_Param (
-                      p_Router_Id     In  Hig_Router_Params.Router_Id%Type,
-                      p_Param_Name    In  Hig_Router_Params.Param_Name%Type,
-                      p_Param_Value   In  Hig_Router_Params.Param_Value_Varchar%Type
+                      p_Router_Id     In  Hig_Router_Params.Hrp_Router_Id%Type,
+                      p_Param_Name    In  Hig_Router_Params.Hrp_Param_Name%Type,
+                      p_Param_Value   In  Hig_Router_Params.Hrp_Param_Value_Varchar%Type
                       )
   Is
   Begin
@@ -28,9 +28,9 @@ Is
     If p_Param_Name Is Not Null Then
       Insert Into Hig_Router_Params
       (
-      Router_Id,
-      Param_Name,
-      Param_Value_Varchar
+      Hrp_Router_Id,
+      Hrp_Param_Name,
+      Hrp_Param_Value_Varchar
       )
       Values
       (
@@ -44,9 +44,9 @@ Is
   End Add_Param;
   --
   Procedure Add_Param (
-                      p_Router_Id     In  Hig_Router_Params.Router_Id%Type,
-                      p_Param_Name    In  Hig_Router_Params.Param_Name%Type,
-                      p_Param_Value   In  Hig_Router_Params.Param_Value_Number%Type
+                      p_Router_Id     In  Hig_Router_Params.Hrp_Router_Id%Type,
+                      p_Param_Name    In  Hig_Router_Params.Hrp_Param_Name%Type,
+                      p_Param_Value   In  Hig_Router_Params.Hrp_Param_Value_Number%Type
                       )
   Is
   Begin
@@ -63,9 +63,9 @@ Is
   End Add_Param;                      
   --                      
   Procedure Add_Param (
-                      p_Router_Id     In  Hig_Router_Params.Router_Id%Type,
-                      p_Param_Name    In  Hig_Router_Params.Param_Name%Type,
-                      p_Param_Value   In  Hig_Router_Params.Param_Value_Date%Type
+                      p_Router_Id     In  Hig_Router_Params.Hrp_Router_Id%Type,
+                      p_Param_Name    In  Hig_Router_Params.Hrp_Param_Name%Type,
+                      p_Param_Value   In  Hig_Router_Params.Hrp_Param_Value_Date%Type
                       )
   Is
   Begin
@@ -82,7 +82,7 @@ Is
   End Add_Param;
   --
   Function Get_Params (
-                      p_Router_Id   In  Hig_Router_Params.Router_Id%Type
+                      p_Router_Id   In  Hig_Router_Params.Hrp_Router_Id%Type
                       ) Return t_Param_Tab
   Is
   l_Param_Tab  t_Param_Tab;
@@ -111,7 +111,7 @@ Is
     Nm_Debug.Debug('Hig_Router_Params_Utils.Clear_Down_Old_Params - Called');  
     Delete 
     From    Hig_Router_Params
-    Where   Param_Created < p_Clear_Down_Date;
+    Where   Hrp_Param_Created < p_Clear_Down_Date;
     Nm_Debug.Debug('Parameters cleared :' || Sql%Rowcount);
     Nm_Debug.Debug('Hig_Router_Params_Utils.Clear_Down_Old_Params - Finished');
   End Clear_Down_Old_Params;
