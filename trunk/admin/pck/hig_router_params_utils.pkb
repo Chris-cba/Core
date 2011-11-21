@@ -1,6 +1,27 @@
 Create Or Replace Package Body Hig_Router_Params_Utils
 Is
     
+  --g_body_sccsid is the SCCS ID for the package body
+  g_Body_Sccsid             Constant  Varchar2(2000)              :=  '$Revision:   5.3  $';
+  --
+  -----------------------------------------------------------------------------
+  --
+  Function Get_Version Return Varchar2 
+  Is
+  Begin
+    Return g_Sccsid;
+  End Get_Version;
+  --
+  -----------------------------------------------------------------------------
+  --
+  Function Get_Body_Version Return Varchar2
+  Is
+  Begin
+    Return g_Body_Sccsid;
+  End Get_Body_Version;
+  --
+  -----------------------------------------------------------------------------
+  --
   Function  Get_New_Router_Id Return Hig_Router_Params.Hrp_Router_Id%Type
   Is
     l_Router_Id   Hig_Router_Params.Hrp_Router_Id%Type;

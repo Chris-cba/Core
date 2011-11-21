@@ -1,5 +1,9 @@
 Create Or Replace Package Hig_Router_Params_Utils
 Is
+
+  --g_sccsid is the SCCS ID for the package
+  g_Sccsid Constant Varchar2(2000) := '$Revision:   5.3  $';
+  
   Type t_Param_Rec  
   Is
   Record
@@ -9,6 +13,10 @@ Is
   );
   
   Type t_Param_Tab Is Table Of t_Param_Rec Index By Binary_Integer;
+  
+  Function Get_Version Return Varchar2; 
+
+  Function Get_Body_Version Return Varchar2;
   
   Function  Get_New_Router_Id Return Hig_Router_Params.Hrp_Router_Id%Type;
   --
