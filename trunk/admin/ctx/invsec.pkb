@@ -1,11 +1,11 @@
 CREATE OR REPLACE PACKAGE BODY invsec AS
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/ctx/invsec.pkb-arc   2.2   May 16 2011 16:03:54   Steve.Cooper  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/ctx/invsec.pkb-arc   2.3   Nov 25 2011 12:14:10   Rob.Coupe  $
 --       Module Name      : $Workfile:   invsec.pkb  $
---       Date into SCCS   : $Date:   May 16 2011 16:03:54  $
---       Date fetched Out : $Modtime:   Apr 12 2011 13:28:28  $
---       SCCS Version     : $Revision:   2.2  $
+--       Date into SCCS   : $Date:   Nov 25 2011 12:14:10  $
+--       Date fetched Out : $Modtime:   Nov 25 2011 12:13:18  $
+--       SCCS Version     : $Revision:   2.3  $
 --       Based on SCCS Version     : 1.12
 --
 --
@@ -22,7 +22,7 @@ CREATE OR REPLACE PACKAGE BODY invsec AS
 --	Copyright (c) exor corporation ltd, 2000
 ------------------------------------------------------------------------------------
 --
-   g_body_sccsid        CONSTANT  varchar2(2000)                    := '"$Revision:   2.2  $"';
+   g_body_sccsid        CONSTANT  varchar2(2000)                    := '"$Revision:   2.3  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 
    g_package_name       CONSTANT  varchar2(30)                      := 'invsec';
@@ -142,7 +142,7 @@ BEGIN
 --
 -- ################################################################################
 --
-   IF Sys_Context('NM3CORE','UNRESTRICTED_INVENTORY') = 'TRUE'
+   IF Sys_Context('NM3CORE','UNRESTRICTED_INVENTORY') = 'TRUE' and Sys_Context('NM3_SECURITY_CTX','USERNAME') = Sys_Context('NM3_SECURITY_CTX','ACTUAL_USERNAME')
      AND pi_unrestricted_override
     THEN
       l_can_update := TRUE;
@@ -162,7 +162,7 @@ END is_inv_item_updatable;
 FUNCTION inv_predicate( schema_in varchar2, name_in varchar2) RETURN varchar2 IS
 BEGIN
 --
-    IF Sys_Context('NM3CORE','UNRESTRICTED_INVENTORY') = 'TRUE'
+    IF Sys_Context('NM3CORE','UNRESTRICTED_INVENTORY') = 'TRUE' and Sys_Context('NM3_SECURITY_CTX','USERNAME') = Sys_Context('NM3_SECURITY_CTX','ACTUAL_USERNAME')
      THEN
        RETURN NULL;
     ELSE
@@ -183,7 +183,7 @@ END inv_predicate;
 FUNCTION inv_predicate_read( schema_in varchar2, name_in varchar2) RETURN varchar2 IS
 BEGIN
 --
-    IF Sys_Context('NM3CORE','UNRESTRICTED_INVENTORY') = 'TRUE'
+    IF Sys_Context('NM3CORE','UNRESTRICTED_INVENTORY') = 'TRUE' and Sys_Context('NM3_SECURITY_CTX','USERNAME') = Sys_Context('NM3_SECURITY_CTX','ACTUAL_USERNAME')
      THEN
        RETURN NULL;
     ELSE
@@ -204,7 +204,7 @@ END inv_predicate_read;
 FUNCTION inv_type_predicate( schema_in varchar2, name_in varchar2) RETURN varchar2 IS
 BEGIN
 --
-    IF Sys_Context('NM3CORE','UNRESTRICTED_INVENTORY') = 'TRUE'
+    IF Sys_Context('NM3CORE','UNRESTRICTED_INVENTORY') = 'TRUE' and Sys_Context('NM3_SECURITY_CTX','USERNAME') = Sys_Context('NM3_SECURITY_CTX','ACTUAL_USERNAME')
      THEN
        RETURN NULL;
     ELSE
@@ -222,7 +222,7 @@ END inv_type_predicate;
 FUNCTION inv_type_predicate_read( schema_in varchar2, name_in varchar2) RETURN varchar2 IS
 BEGIN
 --
-    IF Sys_Context('NM3CORE','UNRESTRICTED_INVENTORY') = 'TRUE'
+    IF Sys_Context('NM3CORE','UNRESTRICTED_INVENTORY') = 'TRUE' and Sys_Context('NM3_SECURITY_CTX','USERNAME') = Sys_Context('NM3_SECURITY_CTX','ACTUAL_USERNAME')
      THEN
        RETURN NULL;
     ELSE
@@ -240,7 +240,7 @@ END inv_type_predicate_read;
 FUNCTION inv_itg_predicate( schema_in varchar2, name_in varchar2) RETURN varchar2 IS
 BEGIN
 --
-    IF Sys_Context('NM3CORE','UNRESTRICTED_INVENTORY') = 'TRUE'
+    IF Sys_Context('NM3CORE','UNRESTRICTED_INVENTORY') = 'TRUE' and Sys_Context('NM3_SECURITY_CTX','USERNAME') = Sys_Context('NM3_SECURITY_CTX','ACTUAL_USERNAME')
      THEN
        RETURN NULL;
     ELSE
@@ -258,7 +258,7 @@ END inv_itg_predicate;
 FUNCTION inv_itg_predicate_read( schema_in varchar2, name_in varchar2) RETURN varchar2 IS
 BEGIN
 --
-    IF Sys_Context('NM3CORE','UNRESTRICTED_INVENTORY') = 'TRUE'
+    IF Sys_Context('NM3CORE','UNRESTRICTED_INVENTORY') = 'TRUE' and Sys_Context('NM3_SECURITY_CTX','USERNAME') = Sys_Context('NM3_SECURITY_CTX','ACTUAL_USERNAME')
      THEN
        RETURN NULL;
     ELSE
@@ -291,7 +291,7 @@ FUNCTION chk_inv_type_valid_for_role (p_inv_type IN nm_inv_items.iit_inv_type%TY
    l_retval   nm_inv_type_roles.itr_mode%TYPE := c_false_string;
 --
 BEGIN
-    IF Sys_Context('NM3CORE','UNRESTRICTED_INVENTORY') = 'TRUE'
+    IF Sys_Context('NM3CORE','UNRESTRICTED_INVENTORY') = 'TRUE' and Sys_Context('NM3_SECURITY_CTX','USERNAME') = Sys_Context('NM3_SECURITY_CTX','ACTUAL_USERNAME')
      THEN
        RETURN 'NORMAL';
     END IF;
