@@ -5,11 +5,11 @@ As
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.53   Oct 27 2011 13:23:22   Ade.Edwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.54   Dec 01 2011 16:21:24   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3sdm.pkb  $
---       Date into PVCS   : $Date:   Oct 27 2011 13:23:22  $
---       Date fetched Out : $Modtime:   Oct 27 2011 10:49:18  $
---       PVCS Version     : $Revision:   2.53  $
+--       Date into PVCS   : $Date:   Dec 01 2011 16:21:24  $
+--       Date fetched Out : $Modtime:   Dec 01 2011 16:19:00  $
+--       PVCS Version     : $Revision:   2.54  $
 --
 --   Author : R.A. Coupe
 --
@@ -21,7 +21,7 @@ As
 --
 --all global package variables here
 --
-  g_Body_Sccsid     Constant Varchar2 (2000) := '"$Revision:   2.53  $"';
+  g_Body_Sccsid     Constant Varchar2 (2000) := '"$Revision:   2.54  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
   g_Package_Name    Constant Varchar2 (30)   := 'NM3SDM';
@@ -7910,7 +7910,8 @@ Is
 Begin
   If Sys_Context('NM3CORE', 'THEME'|| pi_Theme_Id ||'SRID') Is Null Then 
     l_Sdo := Nm3Sdo.Get_Theme_Metadata (pi_Theme_Id);
-    l_Srid := Nvl (To_Char (l_Sdo.Srid), 'NULL');
+--    l_Srid :=  Nvl (To_Char (l_Sdo.Srid), 'NULL');
+    l_Srid :=  To_Char (l_Sdo.Srid);
 
     Nm3Ctx.Set_Core_Context (
                             p_Attribute   => 'THEME'|| pi_Theme_Id || 'SRID',
