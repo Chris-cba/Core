@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 --
 ---   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.22.1.5   Feb 03 2011 15:20:14   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.22.1.6   Dec 13 2011 13:13:50   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3sdo.pkb  $
---       Date into PVCS   : $Date:   Feb 03 2011 15:20:14  $
---       Date fetched Out : $Modtime:   Feb 03 2011 15:19:52  $
---       PVCS Version     : $Revision:   2.22.1.5  $
+--       Date into PVCS   : $Date:   Dec 13 2011 13:13:50  $
+--       Date fetched Out : $Modtime:   Dec 13 2011 13:12:26  $
+--       PVCS Version     : $Revision:   2.22.1.6  $
 --       Based on
 
 --
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 -- Copyright (c) RAC
 -----------------------------------------------------------------------------
 
-   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.22.1.5  $"';
+   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.22.1.6  $"';
    g_package_name    CONSTANT VARCHAR2 (30)  := 'NM3SDO';
    g_batch_size      INTEGER                 := NVL( TO_NUMBER(Hig.get_sysopt('SDOBATSIZE')), 10);
    g_clip_type       VARCHAR2(30)            := NVL(Hig.get_sysopt('SDOCLIPTYP'),'SDO');
@@ -80,6 +80,8 @@ FUNCTION Get_Parts ( p_shape IN mdsys.sdo_geometry ) RETURN nm_geom_array;
 FUNCTION compare_pt ( p_geom1 mdsys.sdo_geometry, p_geom2 mdsys.sdo_geometry, tol IN NUMBER ) RETURN VARCHAR2;
 
 function local_join_ptr_array( p_pa in ptr_array, p_table in varchar2, p_key in varchar2 ) return ptr_array;
+--
+FUNCTION LOCAL_JOIN_NN_PTR_ARRAY( p_nth in nm_themes_all%rowtype, p_geom in mdsys.sdo_geometry, p_pa in ptr_array ) return ptr_array;
 --
 PROCEDURE add_segments_m ( p_geom1 IN OUT NOCOPY mdsys.sdo_geometry, p_geom2 IN mdsys.sdo_geometry,
                            p_diminfo IN mdsys.sdo_dim_array,
@@ -9359,13 +9361,14 @@ BEGIN
 
   IF nthrow.nth_feature_table != nthrow.nth_table_name THEN
 
-    retval := local_join_ptr_array(retval, nthrow.nth_feature_table, nthrow.nth_feature_pk_column );
+--  retval := local_join_ptr_array(retval, nthrow.nth_feature_table, nthrow.nth_feature_pk_column );
+    retval := local_join_ptr_array(retval, nthrow.nth_table_name, nthrow.nth_pk_column );
 
   END IF;
 
   IF nthbas.nth_base_table_theme IS NOT NULL THEN
 
-    retval := join_ptr_array(nthbas, retval);
+    retval := local_join_nn_ptr_array(nthbas, p_geom, retval);
 
   END IF;
 
@@ -10081,6 +10084,19 @@ BEGIN
   RETURN retval;
 END;
 --
+
+FUNCTION LOCAL_JOIN_NN_PTR_ARRAY( p_nth in nm_themes_all%rowtype, p_geom in mdsys.sdo_geometry, p_pa in ptr_array ) return ptr_array is
+retval ptr_array := NM3ARRAY.INIT_PTR_ARRAY;
+begin
+    execute immediate 'select cast ( multiset (  select ptr( ptr_id, ptr_value ) from ( '||
+                      '  select /*+cardinality(p, 10)*/ p.*, sdo_geom.sdo_distance( '||p_nth.nth_feature_shape_column||', :geom, 0.005 ) dist '||
+                      '  from '||p_nth.nth_feature_table||', table ( :pa ) p '||
+                      '  where p.ptr_value = '||p_nth.nth_feature_pk_column||
+                      '  order by dist, ptr_id )'||
+                      'where rownum < '||g_batch_size||' ) as ptr_array_type ) from dual' into retval.pa using p_geom, p_pa.pa;
+                          
+     return retval;
+end;
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------
 --
 --
