@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3nwad AS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3nwad.pkb-arc   2.13   Oct 07 2011 14:47:04   Steve.Cooper  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3nwad.pkb-arc   2.14   Dec 15 2011 16:55:42   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3nwad.pkb  $
---       Date into PVCS   : $Date:   Oct 07 2011 14:47:04  $
---       Date fetched Out : $Modtime:   Oct 07 2011 14:46:50  $
---       PVCS Version     : $Revision:   2.13  $
+--       Date into PVCS   : $Date:   Dec 15 2011 16:55:42  $
+--       Date fetched Out : $Modtime:   Dec 15 2011 16:54:58  $
+--       PVCS Version     : $Revision:   2.14  $
 --
 --
 -- Author : A Edwards/P Stanton/G Johnson
@@ -35,7 +35,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3nwad AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT VARCHAR2(2000) := '"$Revision:   2.13  $"';
+  g_body_sccsid  CONSTANT VARCHAR2(2000) := '"$Revision:   2.14  $"';
 
   g_package_name CONSTANT VARCHAR2(30) := 'nm3nwad';
 
@@ -1727,9 +1727,10 @@ BEGIN
              END IF;
 
             l_rec_nadl_non_prim := l_tab_non_prim_nadl(i);
-            l_rec_nadl_non_prim.nad_id        := l_new_nad_id;
-            l_rec_nadl_non_prim.nad_ne_id     := pi_new_ne_id;
-            l_rec_nadl_non_prim.nad_iit_ne_id := l_rec_iit_np.iit_ne_id;
+            l_rec_nadl_non_prim.nad_id          := l_new_nad_id;
+            l_rec_nadl_non_prim.nad_ne_id       := pi_new_ne_id;
+            l_rec_nadl_non_prim.nad_iit_ne_id   := l_rec_iit_np.iit_ne_id;
+            l_rec_nadl_non_prim.nad_start_date  := l_effective_date;
 
             --		 nm3debug.debug_iit(l_rec_iit_np);
             Nm3nwad.end_date_nadl (pi_rec_nadl => l_tab_non_prim_nadl(i)
