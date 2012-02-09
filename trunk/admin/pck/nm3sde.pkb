@@ -6,11 +6,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3sde AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sde.pkb-arc   2.15   Oct 07 2011 14:51:18   Steve.Cooper  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sde.pkb-arc   2.16   Feb 09 2012 14:01:16   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3sde.pkb  $
---       Date into PVCS   : $Date:   Oct 07 2011 14:51:18  $
---       Date fetched Out : $Modtime:   Oct 07 2011 14:50:36  $
---       PVCS Version     : $Revision:   2.15  $
+--       Date into PVCS   : $Date:   Feb 09 2012 14:01:16  $
+--       Date fetched Out : $Modtime:   Feb 09 2012 13:57:04  $
+--       PVCS Version     : $Revision:   2.16  $
 --
 --       Based on one of many versions labeled as 1.21
 --
@@ -24,7 +24,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3sde AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.15  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.16  $"';
    g_keyword         CONSTANT  VARCHAR2(30)   := 'SDO_GEOMETRY'; --get_keyword;
 
 
@@ -51,10 +51,10 @@ PROCEDURE del_creg( p_table IN VARCHAR2, p_owner IN VARCHAR2);
 
 -----------------------------------------------------------------------------
 --
--- Function to return the srtext for a theme 
+-- Function to return the srtext for a theme
 --
 
-function get_srtext ( p_theme_id in NM_THEMES_ALL.nth_theme_id%TYPE ) return varchar2;
+function get_srtext ( p_theme_id in NM_THEMES_ALL.nth_theme_id%TYPE, p_base in nm_theme_array  ) return varchar2;
 
 --
 FUNCTION get_version RETURN VARCHAR2 IS
@@ -86,7 +86,7 @@ BEGIN
   SELECT major||'.'||minor
     INTO retval
     FROM sde.version
-   WHERE rownum=1 ; -- just incase anyone has been hacking about 
+   WHERE rownum=1 ; -- just incase anyone has been hacking about
 --
   IF SQL%NOTFOUND THEN
     RAISE_APPLICATION_ERROR( -20001, 'Version not found');
@@ -226,22 +226,17 @@ BEGIN
     l_parent := Nm3get.get_nth( p_parent_id);
 
     BEGIN
-      Nm_Debug.DEBUG('Parent = '||p_parent_id );
       p_layer  := get_sde_layer_from_theme(p_theme_id => p_parent_id );
       p_geocol := get_geocol( l_parent.nth_feature_table, l_parent.nth_feature_shape_column );
       p_reg    := get_treg( l_parent.nth_feature_table );
-      Nm_Debug.DEBUG('No Error');
     EXCEPTION
       WHEN NO_DATA_FOUND THEN
-       Nm_Debug.DEBUG('No parent layer');
        p_layer := generate_sde_layer_from_theme( l_theme );
 
     WHEN OTHERS THEN
-      Nm_Debug.DEBUG('Others');
       p_layer := generate_sde_layer_from_theme( l_theme );
     END;
 
-    p_layer.BASE_LAYER_ID     := p_layer.layer_id;
     p_layer.LAYER_ID          := get_next_sde_layer;
     p_layer.DESCRIPTION       := l_theme.nth_theme_name;
     p_layer.OWNER             := Sys_Context('NM3CORE','APPLICATION_OWNER');
@@ -253,7 +248,6 @@ BEGIN
 --  RAC - FK issue still unresolved.
 
   ELSE
-
     p_layer := generate_sde_layer_from_theme( l_theme );
 
   END IF;
@@ -320,8 +314,6 @@ BEGIN
                    );
 --    raise_application_error (-20001, 'Table is not registered or SDE schema cannot see it');
   END;
-
-  Nm_Debug.DEBUG('Creating column reg');
 
   create_column_registry( p_layer.table_name, p_geocol.f_geometry_column, p_reg.rowid_column );
 
@@ -410,22 +402,30 @@ BEGIN
 
       l_diminfo := l_usgm.diminfo;
       l_srid    := l_usgm.srid;
-
+     
     END IF;
 
     IF p_nth.nth_base_table_theme IS NOT NULL THEN
-      
+
       BEGIN
         l_base_lyr := get_layer_by_theme(  p_nth.nth_base_table_theme );
+        if l_base_lyr.layer_id is null then
+          raise no_data_found;
+        end if;
+--          
       EXCEPTION
         WHEN OTHERS THEN
-          retval.srid          := register_SRID_from_theme( p_nth.nth_theme_id, l_base, l_srid );
           retval.base_layer_id := 0;
+          retval.srid          := register_SRID_from_theme( p_nth.nth_theme_id, l_base, l_srid );
       END;
 --    no need to try and find an appropriate srid - use the base table
 
-      retval.srid          := l_base_lyr.srid;
-      retval.base_layer_id := l_base_lyr.layer_id;
+      if l_base_lyr.srid is not null and l_base_lyr.layer_id > 0 then
+      
+        retval.srid          := l_base_lyr.srid;
+        retval.base_layer_id := l_base_lyr.layer_id;
+        
+      end if;
 
     ELSE
       retval.srid          := register_SRID_from_theme( p_nth.nth_theme_id, l_base, l_srid );
@@ -472,7 +472,7 @@ FUNCTION register_srid_from_theme( p_theme_id IN nm_themes_all.nth_theme_id%TYPE
   l_length_unit  NUMBER;
   l_munits       NUMBER;
   l_gtype        NUMBER;
-  
+
   cursor c_srid ( c_theme_id in nm_themes_all.nth_theme_id%type,
                   c_base     in nm_theme_array,
                   c_srid     in number,
@@ -480,10 +480,10 @@ FUNCTION register_srid_from_theme( p_theme_id IN nm_themes_all.nth_theme_id%TYPE
                   c_owner    in varchar2,
                   c_gtype    in number ) is
   select distinct r.srid
-  from sde.layers l, 
-       nm_themes_all, 
+  from sde.layers l,
+       nm_themes_all,
        nm_base_themes,
-       table ( c_base.nta_theme_array ) t, 
+       table ( c_base.nta_theme_array ) t,
        user_sdo_geom_metadata m,
        sde.spatial_references r
   where nbth_base_theme = t.nthe_id
@@ -491,13 +491,13 @@ FUNCTION register_srid_from_theme( p_theme_id IN nm_themes_all.nth_theme_id%TYPE
   and l.table_name = nth_feature_table
   and l.table_name = m.table_name
   and m.column_name = l.spatial_column
-  and m.srid = c_srid
+  and nvl(m.srid, -999) = nvl(c_srid, -999)
   and l.srid = r.srid
   and owner = c_owner
   and decode( c_gtype,  3302, nvl(c_munits, -999),
                         3002, nvl(c_munits, -999),
                               nvl(c_munits, -999 )) = nvl(munits, -999 );
-                  
+
   FUNCTION get_length_unit_from_theme ( pi_nth_theme_id IN nm_themes_all.nth_theme_id%TYPE )
     RETURN nm_units.un_unit_id%TYPE
   IS
@@ -505,19 +505,19 @@ FUNCTION register_srid_from_theme( p_theme_id IN nm_themes_all.nth_theme_id%TYPE
   BEGIN
     SELECT nt_length_unit INTO retval
       FROM v_nm_net_themes_all
-         , nm_types 
+         , nm_types
      WHERE vnnt_nth_theme_id = pi_nth_theme_id
        AND vnnt_nt_type = nt_type
     UNION ALL
     SELECT nt_length_unit
-      FROM nm_inv_themes, 
-           nm_types, 
+      FROM nm_inv_themes,
+           nm_types,
            nm_inv_nw
      WHERE nin_nit_inv_code = nith_nit_id
        AND nith_nth_theme_id = pi_nth_theme_id
        AND nin_nw_type = nt_type
        AND rownum = 1;
-     
+
     RETURN retval;
   EXCEPTION
     WHEN NO_DATA_FOUND
@@ -533,16 +533,16 @@ BEGIN
     l_length_unit := get_length_unit_from_theme( p_theme_id );
 
     l_munits := POWER ( 10, nm3unit.get_rounding(nm3unit.get_tol_from_unit_mask(nvl(l_length_unit, 1))));
-    
+
   else
-    
+
     l_munits := 1; --null;
-    
+
   end if;
-  
+
   open c_srid( p_theme_id,
                p_base,
-               p_srid, 
+               p_srid,
                l_munits,
                Sys_Context('NM3CORE','APPLICATION_OWNER'),
                l_gtype );
@@ -553,16 +553,14 @@ BEGIN
     close c_srid;
     raise no_data_found;
   end if;
-  
+
   close c_srid;
-  
+ 
   return retval;
-  
+
 exception
 
   when no_data_found then
---
---  no suitable spatial reference exists, we need to create one
 --
      l_mbr := Nm3sdo.get_theme_mbr( p_theme_id );
 
@@ -575,8 +573,8 @@ exception
      l_sref.falsem        := 0;
 
      l_sref.munits        := l_munits;
-     
-     l_sref.srtext        := get_srtext(p_theme_id);
+
+     l_sref.srtext        := get_srtext(p_theme_id, p_base);
 
      l_sref.description   := NULL;
      l_sref.auth_name     := NULL;
@@ -597,7 +595,7 @@ exception
      END IF;
 
    RETURN retval;
- 
+
 end register_srid_from_theme;
 
 --
@@ -1314,7 +1312,7 @@ BEGIN
       --
       --------------------------------------------------------------------------
       -- AE  19-FEB-2009
-      -- Quick fix for SDE 9.1 
+      -- Quick fix for SDE 9.1
       -- Ensure any number with precision and scale is set to an SDE_TYPE of 3
       --
          ELSIF l_data_type_tab (i) = 4
@@ -1326,7 +1324,7 @@ BEGIN
          --   l_data_type_tab (i)      := 3; -- CWS 0109471 NO NEED TO CHANGE AN 8 BIT TO A 4 BIT. THIS CAUSES ISSUES
             l_data_length_tab (i)    := l_data_precision_tab (i);
             l_data_precision_tab (i) := l_data_scale_tab (i);
-          -- 
+          --
       --
       -- AE  19-FEB-2009
       -- End of changes
@@ -1728,14 +1726,14 @@ geocur Nm3type.ref_cursor;
 l_base NM_THEMES_ALL%ROWTYPE;
 
 FUNCTION join_int_array( p_nth IN NM_THEMES_ALL%ROWTYPE, p_ia IN int_array ) RETURN int_array IS
-  curstr VARCHAR2(2000);
+  curstr VARCHAR2(4000);
   retval int_array := int_array( int_array_type( NULL ));
 BEGIN
   curstr := 'select /*cardinality( t '||to_char(p_ia.ia.last)||')*/ t.column_value from table ( :p_ia.ia ) t, '||p_nth.nth_feature_table||
             ' where t.column_value  = '||l_reg.rowid_column;
 
 --nm_debug.debug_on;
-nm_debug.debug( curstr );
+--nm_debug.debug( curstr );
 
   EXECUTE IMMEDIATE curstr BULK COLLECT INTO retval.ia USING p_ia;
 
@@ -1758,15 +1756,14 @@ BEGIN
 
     cur_str := 'select DISTINCT f1.'||l_reg.rowid_column||
                ' from '||l_nth.nth_feature_table||' f1, '||l_nth.nth_feature_table||' f2 where f1.'||l_nth.nth_feature_pk_column||' = '||
-        ' f2.'||l_nth.nth_feature_pk_column||' and f2.'||l_reg.rowid_column||' in ( '||p_id_array.array_to_list||')';
-
+        ' f2.'||l_nth.nth_feature_pk_column||' and f2.'||l_reg.rowid_column||' in ( select column_value from table( :b_int_array ))';
 
 
   --Nm_Debug.debug_on;
 
-  Nm_Debug.DEBUG(cur_str);
+--  Nm_Debug.DEBUG(cur_str);
 
-  OPEN geocur FOR cur_str; -- using p_id_array;
+  OPEN geocur FOR cur_str using p_id_array.ia;
   FETCH geocur BULK COLLECT INTO retval.ia;
   CLOSE geocur;
 
@@ -1872,13 +1869,13 @@ END get_sde_pk;
 --
 -------------------------------------------------------------------------------------------------------------------------------
 --
-FUNCTION get_srtext ( p_theme_id in NM_THEMES_ALL.nth_theme_id%TYPE ) RETURN varchar2 IS
+FUNCTION get_srtext ( p_theme_id in NM_THEMES_ALL.nth_theme_id%TYPE, p_base in nm_theme_array ) RETURN varchar2 IS
 
 cursor c1 ( c_theme_id in NM_THEMES_ALL.nth_theme_id%TYPE ) is
   select srtext from sde.spatial_references r, sde.layers l, user_sdo_geom_metadata a, user_sdo_geom_metadata b, nm_themes_all t
   where nth_theme_id = c_theme_id
   and a.table_name = nth_feature_table
-  and b.srid = a.srid
+  and nvl(b.srid, -999) = nvl(a.srid, -999)
   and b.table_name = l.table_name
   and l.srid = r.srid
   and l.owner = Sys_Context('NM3_SECURITY_CTX','USERNAME')
@@ -1888,39 +1885,45 @@ curstr NM3TYPE.MAX_VARCHAR2 := 'select substr(definition, 1, 1024) '
                               ||' from sde.st_coordinate_systems r, user_sdo_geom_metadata b, nm_themes_all t '
                               ||'  where nth_theme_id = :theme_id '
                               ||'  and b.table_name = nth_feature_table '
-                              ||'  and b.srid = r.id ';
+                              ||'  and b.srid = r.id and rownum = 1';
 
 l_version varchar2(30) := NM3SDE.GET_SDE_VERSION;
 
 retval sde.spatial_references.srtext%TYPE;
--- CWS 0111258 Changes made so that 9.2 and 9.3 versions uses the 
--- spatial_references table in the event there is no record in 
+-- CWS 0111258 Changes made so that 9.2 and 9.3 versions uses the
+-- spatial_references table in the event there is no record in
 -- st_coordinate_systems
 BEGIN
-  IF l_version IN ('9.2' ,'9.3') 
+  IF l_version IN ('9.2' ,'9.3')
   THEN
     BEGIN
+--      nm_debug.debug('get srtext from primary theme');
       EXECUTE IMMEDIATE curstr INTO retval USING p_theme_id;
     EXCEPTION
       WHEN others THEN
+        if p_base.nta_theme_array.last is not null then
+
+          EXECUTE IMMEDIATE curstr INTO retval USING p_base.nta_theme_array(1).nthe_id;
+
+        end if;
+        
         retval := NULL;
     END;
   END IF;
-  
-  IF retval IS NULL 
-  THEN 
+
+  IF retval IS NULL
+  THEN
     OPEN c1( p_theme_id );
     FETCH c1 INTO retval;
     --
     IF c1%NOTFOUND THEN
-      --    no other themes exist as layers with a valid srtext - all we can do is return UNKNOWN    
       retval := 'UNKNOWN';
     END IF;
     --
     CLOSE c1;
   END IF;
   RETURN retval;
-    
+
 END get_srtext;
 --
 -------------------------------------------------------------------------------------------------------------------------------
