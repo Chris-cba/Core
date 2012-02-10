@@ -6,11 +6,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3sde AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sde.pkb-arc   2.11.1.1   Feb 09 2012 14:32:40   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sde.pkb-arc   2.11.1.2   Feb 10 2012 09:49:36   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3sde.pkb  $
---       Date into PVCS   : $Date:   Feb 09 2012 14:32:40  $
---       Date fetched Out : $Modtime:   Feb 09 2012 14:25:38  $
---       PVCS Version     : $Revision:   2.11.1.1  $
+--       Date into PVCS   : $Date:   Feb 10 2012 09:49:36  $
+--       Date fetched Out : $Modtime:   Feb 10 2012 09:48:32  $
+--       PVCS Version     : $Revision:   2.11.1.2  $
 --
 --       Based on one of many versions labeled as 1.21
 --
@@ -24,7 +24,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3sde AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.11.1.1  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.11.1.2  $"';
    g_keyword         CONSTANT  VARCHAR2(30)   := 'SDO_GEOMETRY'; --get_keyword;
 
 
@@ -1983,12 +1983,17 @@ BEGIN
     EXCEPTION
       WHEN others THEN
         if p_base.nta_theme_array.last is not null then
-
-          EXECUTE IMMEDIATE curstr INTO retval USING p_base.nta_theme_array(1).nthe_id;
-
-        end if;
-        
-        retval := NULL;
+		
+		  begin
+  		    EXECUTE IMMEDIATE curstr INTO retval USING p_base.nta_theme_array(1).nthe_id;
+		  exception
+		    when no_data_found then
+			  retval := null;
+		  end;
+        else       
+          retval := NULL;
+		  
+		end if;
     END;
   END IF;
 
