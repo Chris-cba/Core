@@ -6,11 +6,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3sde AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sde.pkb-arc   2.16   Feb 09 2012 14:01:16   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sde.pkb-arc   2.17   Feb 10 2012 09:56:14   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3sde.pkb  $
---       Date into PVCS   : $Date:   Feb 09 2012 14:01:16  $
---       Date fetched Out : $Modtime:   Feb 09 2012 13:57:04  $
---       PVCS Version     : $Revision:   2.16  $
+--       Date into PVCS   : $Date:   Feb 10 2012 09:56:14  $
+--       Date fetched Out : $Modtime:   Feb 10 2012 09:55:26  $
+--       PVCS Version     : $Revision:   2.17  $
 --
 --       Based on one of many versions labeled as 1.21
 --
@@ -24,7 +24,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3sde AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.16  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.17  $"';
    g_keyword         CONSTANT  VARCHAR2(30)   := 'SDO_GEOMETRY'; --get_keyword;
 
 
@@ -1897,17 +1897,23 @@ BEGIN
   IF l_version IN ('9.2' ,'9.3')
   THEN
     BEGIN
---      nm_debug.debug('get srtext from primary theme');
+--    nm_debug.debug('get srtext from primary theme');
+
       EXECUTE IMMEDIATE curstr INTO retval USING p_theme_id;
     EXCEPTION
       WHEN others THEN
         if p_base.nta_theme_array.last is not null then
 
-          EXECUTE IMMEDIATE curstr INTO retval USING p_base.nta_theme_array(1).nthe_id;
-
-        end if;
-        
-        retval := NULL;
+		  begin
+  		    EXECUTE IMMEDIATE curstr INTO retval USING p_base.nta_theme_array(1).nthe_id;
+		  exception
+		    when no_data_found then
+			  retval := null;
+		  end;
+        else       
+          retval := NULL;
+		  
+		end if;
     END;
   END IF;
 
