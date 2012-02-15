@@ -6,11 +6,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3sde AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sde.pkb-arc   2.17   Feb 10 2012 09:56:14   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sde.pkb-arc   2.18   Feb 15 2012 10:21:40   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3sde.pkb  $
---       Date into PVCS   : $Date:   Feb 10 2012 09:56:14  $
---       Date fetched Out : $Modtime:   Feb 10 2012 09:55:26  $
---       PVCS Version     : $Revision:   2.17  $
+--       Date into PVCS   : $Date:   Feb 15 2012 10:21:40  $
+--       Date fetched Out : $Modtime:   Feb 15 2012 10:15:38  $
+--       PVCS Version     : $Revision:   2.18  $
 --
 --       Based on one of many versions labeled as 1.21
 --
@@ -24,7 +24,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3sde AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.17  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.18  $"';
    g_keyword         CONSTANT  VARCHAR2(30)   := 'SDO_GEOMETRY'; --get_keyword;
 
 
@@ -229,6 +229,8 @@ BEGIN
       p_layer  := get_sde_layer_from_theme(p_theme_id => p_parent_id );
       p_geocol := get_geocol( l_parent.nth_feature_table, l_parent.nth_feature_shape_column );
       p_reg    := get_treg( l_parent.nth_feature_table );
+      p_layer.BASE_LAYER_ID     := p_layer.layer_id;
+
     EXCEPTION
       WHEN NO_DATA_FOUND THEN
        p_layer := generate_sde_layer_from_theme( l_theme );
