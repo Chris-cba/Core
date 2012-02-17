@@ -5,11 +5,11 @@ As
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.54   Dec 01 2011 16:21:24   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.55   Feb 17 2012 12:01:48   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3sdm.pkb  $
---       Date into PVCS   : $Date:   Dec 01 2011 16:21:24  $
---       Date fetched Out : $Modtime:   Dec 01 2011 16:19:00  $
---       PVCS Version     : $Revision:   2.54  $
+--       Date into PVCS   : $Date:   Feb 17 2012 12:01:48  $
+--       Date fetched Out : $Modtime:   Feb 17 2012 12:01:12  $
+--       PVCS Version     : $Revision:   2.55  $
 --
 --   Author : R.A. Coupe
 --
@@ -21,7 +21,7 @@ As
 --
 --all global package variables here
 --
-  g_Body_Sccsid     Constant Varchar2 (2000) := '"$Revision:   2.54  $"';
+  g_Body_Sccsid     Constant Varchar2 (2000) := '"$Revision:   2.55  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
   g_Package_Name    Constant Varchar2 (30)   := 'NM3SDM';
@@ -1695,7 +1695,7 @@ Function Register_Inv_Theme (
                             p_Base_Table_Nth   In   Nm_Themes_All.Nth_Theme_Id%Type Default Null
                             ) Return Number
 Is
-  l_Immediate_Or_Deferred   Varchar2 (1)              := 'D';
+  l_Immediate_Or_Deferred   Varchar2 (1)              := 'I';
   l_F_Fk_Column             Varchar2 (30)             := 'NE_ID';
   l_Pk_Column               Varchar2 (30);
   l_Name                    Varchar2 (30);
@@ -1750,6 +1750,8 @@ Begin
     l_T_Uk_Column := pi_Nit.Nit_Foreign_Pk_Column;
     l_T_Begin_Col := pi_Nit.Nit_Lr_St_Chain;
 
+    l_immediate_or_deferred := 'N';
+	
     If pi_Nit.Nit_Pnt_Or_Cont = 'C' Then
       l_End_Mp := pi_Nit.Nit_Lr_End_Chain;
     End If;
