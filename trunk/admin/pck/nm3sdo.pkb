@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 --
 ---   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.66   Nov 04 2011 14:12:52   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.67   Feb 17 2012 12:03:56   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3sdo.pkb  $
---       Date into PVCS   : $Date:   Nov 04 2011 14:12:52  $
---       Date fetched Out : $Modtime:   Nov 04 2011 14:05:50  $
---       PVCS Version     : $Revision:   2.66  $
+--       Date into PVCS   : $Date:   Feb 17 2012 12:03:56  $
+--       Date fetched Out : $Modtime:   Feb 17 2012 12:03:30  $
+--       PVCS Version     : $Revision:   2.67  $
 --       Based on
 
 --
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 -- Copyright (c) RAC
 -----------------------------------------------------------------------------
 
-   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.66  $"';
+   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.67  $"';
    g_package_name    CONSTANT VARCHAR2 (30)  := 'NM3SDO';
    g_batch_size      INTEGER                 := NVL( TO_NUMBER(Hig.get_sysopt('SDOBATSIZE')), 10);
    g_clip_type       VARCHAR2(30)            := NVL(Hig.get_sysopt('SDOCLIPTYP'),'SDO');
@@ -8504,9 +8504,29 @@ PROCEDURE drop_metadata ( p_object_name IN VARCHAR2 ) IS
 
 BEGIN
 
-    DELETE FROM mdsys.sdo_geom_metadata_table
-    WHERE sdo_table_name = p_object_name
- AND   sdo_owner = Sys_Context('NM3CORE','APPLICATION_OWNER');
+declare
+owner_tab   nm3type.tab_varchar30;    
+table_tab   nm3type.tab_varchar30;
+column_tab  nm3type.tab_varchar30;
+begin
+    select hus_username, sdo_table_name, sdo_column_name
+    bulk collect into owner_tab, table_tab, column_tab
+    from hig_users, mdsys.sdo_geom_metadata_table
+    where sdo_owner = hus_username
+    and sdo_table_name = p_object_name;
+--    
+    if owner_tab.count > 0 then
+      forall i in 1..owner_tab.count 
+        delete from mdsys.sdo_geom_metadata_table
+        where sdo_owner = owner_tab(i)
+        and sdo_table_name = table_tab(i)
+        and sdo_column_name = column_tab(i);
+    end if;
+end;
+
+--    DELETE FROM mdsys.sdo_geom_metadata_table
+--    WHERE sdo_table_name = p_object_name
+--    AND   sdo_owner = Sys_Context('NM3CORE','APPLICATION_OWNER');
 
 END;
 
