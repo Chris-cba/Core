@@ -5,11 +5,11 @@ AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.39.1.2   Jul 27 2011 10:00:22   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.39.1.3   Feb 17 2012 10:51:38   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3sdm.pkb  $
---       Date into PVCS   : $Date:   Jul 27 2011 10:00:22  $
---       Date fetched Out : $Modtime:   Jul 27 2011 09:59:26  $
---       PVCS Version     : $Revision:   2.39.1.2  $
+--       Date into PVCS   : $Date:   Feb 17 2012 10:51:38  $
+--       Date fetched Out : $Modtime:   Feb 17 2012 10:50:02  $
+--       PVCS Version     : $Revision:   2.39.1.3  $
 --
 --   Author : R.A. Coupe
 --
@@ -21,7 +21,7 @@ AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT VARCHAR2 (2000) := '"$Revision:   2.39.1.2  $"';
+   g_body_sccsid     CONSTANT VARCHAR2 (2000) := '"$Revision:   2.39.1.3  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT VARCHAR2 (30)   := 'NM3SDM';
@@ -1609,8 +1609,6 @@ PROCEDURE make_nt_spatial_layer
                   );
       END IF;
 
-      l_immediate_or_deferred := 'D';
-
       IF p_view_flag = 'Y'
       THEN
          l_immediate_or_deferred := 'N';
@@ -1646,6 +1644,8 @@ PROCEDURE make_nt_spatial_layer
          l_t_fk_column := pi_nit.nit_lr_ne_column_name;
          l_t_uk_column := pi_nit.nit_foreign_pk_column;
          l_t_begin_col := pi_nit.nit_lr_st_chain;
+
+         l_immediate_or_deferred := 'N';
 
          IF pi_nit.nit_pnt_or_cont = 'C'
          THEN
@@ -7660,11 +7660,11 @@ end;
    */
    --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.39.1.2   Jul 27 2011 10:00:22   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.39.1.3   Feb 17 2012 10:51:38   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3sdm.pkb  $
---       Date into PVCS   : $Date:   Jul 27 2011 10:00:22  $
---       Date fetched Out : $Modtime:   Jul 27 2011 09:59:26  $
---       PVCS Version     : $Revision:   2.39.1.2  $
+--       Date into PVCS   : $Date:   Feb 17 2012 10:51:38  $
+--       Date fetched Out : $Modtime:   Feb 17 2012 10:50:02  $
+--       PVCS Version     : $Revision:   2.39.1.3  $
 
       append ('--   PVCS Identifiers :-');
       append ('--');
