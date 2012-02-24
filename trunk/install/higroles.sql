@@ -2,11 +2,11 @@
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/higroles.sql-arc   2.11   May 18 2011 16:27:32   Steve.Cooper  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/higroles.sql-arc   2.12   Feb 24 2012 15:44:16   Steve.Cooper  $
 --       Module Name      : $Workfile:   higroles.sql  $
---       Date into PVCS   : $Date:   May 18 2011 16:27:32  $
---       Date fetched Out : $Modtime:   May 18 2011 16:13:26  $
---       Version          : $Revision:   2.11  $
+--       Date into PVCS   : $Date:   Feb 24 2012 15:44:16  $
+--       Date fetched Out : $Modtime:   Feb 24 2012 15:24:00  $
+--       Version          : $Revision:   2.12  $
 --
 -------------------------------------------------------------------------
 --  Copyright (c) exor corporation ltd, 2009
@@ -56,6 +56,7 @@ GRANT EXECUTE ANY PROCEDURE TO hig_admin;
 GRANT EXECUTE ANY TYPE TO hig_admin;
 GRANT SELECT ANY SEQUENCE TO hig_admin;
 GRANT CREATE SESSION TO hig_admin;
+GRANT CREATE JOB TO hig_admin;
 
 GRANT ALTER SESSION TO hig_admin;
 GRANT CREATE PUBLIC SYNONYM TO hig_admin;
