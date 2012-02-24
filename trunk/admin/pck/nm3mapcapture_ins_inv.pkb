@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY nm3mapcapture_ins_inv AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mapcapture_ins_inv.pkb-arc   2.6   May 16 2011 14:45:00   Steve.Cooper  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mapcapture_ins_inv.pkb-arc   2.7   Feb 24 2012 10:52:20   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3mapcapture_ins_inv.pkb  $
---       Date into PVCS   : $Date:   May 16 2011 14:45:00  $
---       Date fetched Out : $Modtime:   Apr 01 2011 13:48:16  $
---       Version          : $Revision:   2.6  $
+--       Date into PVCS   : $Date:   Feb 24 2012 10:52:20  $
+--       Date fetched Out : $Modtime:   Feb 24 2012 10:48:22  $
+--       Version          : $Revision:   2.7  $
 --       Based on SCCS version : 1.15
 -------------------------------------------------------------------------
 --   Author : Darren Cope
@@ -21,7 +21,7 @@ CREATE OR REPLACE PACKAGE BODY nm3mapcapture_ins_inv AS
 --all global package variables here
 --
    --g_body_sccsid     CONSTANT  varchar2(2000) := '"@(#)nm3mapcapture_ins_inv.pkb	1.15 09/09/05"';
-   g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.6  $';
+   g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.7  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3mapcapture_ins_inv';
@@ -42,6 +42,46 @@ FUNCTION get_body_version RETURN varchar2 IS
 BEGIN
    RETURN g_body_sccsid;
 END get_body_version;
+--
+procedure get_parent_info ( p_foreign_key in nm_inv_items.iit_foreign_key%type,
+                            p_child_type  in nm_inv_items.iit_inv_type%type,
+                            p_itg_row out nm_inv_type_groupings%rowtype,
+                            p_parent_id out nm_inv_items.iit_ne_id%type ) is 
+--
+                            
+begin
+   select g.itg_inv_type,
+          g.itg_parent_inv_type,
+          g.itg_mandatory,
+          g.itg_relation,
+          g.itg_start_date,
+          g.itg_end_date,
+          g.itg_date_created,
+          g.itg_date_modified,
+          g.itg_modified_by,
+          g.itg_created_by,
+          i.iit_ne_id
+   into p_itg_row.itg_inv_type,
+        p_itg_row.itg_parent_inv_type,
+        p_itg_row.itg_mandatory,
+        p_itg_row.itg_relation,
+        p_itg_row.itg_start_date,
+        p_itg_row.itg_end_date,
+        p_itg_row.itg_date_created,
+        p_itg_row.itg_date_modified,
+        p_itg_row.itg_modified_by,
+        p_itg_row.itg_created_by,
+        p_parent_id  
+   from nm_inv_type_groupings g, nm_inv_items i
+   where itg_inv_type = p_child_type
+   and iit_primary_key = p_foreign_key
+   and itg_parent_inv_type = iit_inv_type;
+exception
+  when no_data_found then
+    p_parent_id := NULL;
+  when others then
+    raise_application_error( -20001, 'Hierarchy problem'); 
+end;
 --
 -----------------------------------------------------------------------------
 --
@@ -633,6 +673,12 @@ PROCEDURE ins_inv (p_inv_rec IN nm_ld_mc_all_inv_tmp%ROWTYPE) IS
    -- LS
    l_iit_tab nm3type.tab_rec_iit ;
    l_iit_rec nm_inv_items%ROWTYPE ;
+   l_nit_rec nm_inv_types%rowtype;   
+--
+   l_itg_row    nm_inv_type_groupings%rowtype;
+   l_parent_id  nm_inv_items.iit_ne_id%type;
+   
+   l_locate_flag Boolean := TRUE;
 --
 BEGIN
    nm_debug.proc_start(p_package_name   => g_package_name
@@ -845,14 +891,52 @@ BEGIN
       END ;
   --
   END IF ;
+
+  l_nit_rec := nm3get.get_nit( p_inv_rec.iit_inv_type );
+
+  l_parent_id := NULL;
+  
+  if p_inv_rec.iit_foreign_key is not null then 
+
+    get_parent_info ( p_foreign_key => p_inv_rec.iit_foreign_key,
+                      p_child_type  => p_inv_rec.iit_inv_type,
+                      p_itg_row     => l_itg_row,
+                      p_parent_id   => l_parent_id );
+  end if;
+  
+  if p_inv_rec.ne_id is null then  -- no nw - can we get it from the hierarchy
+  
+    if l_parent_id is null and nm3inv.inv_location_is_mandatory(p_inv_rec.iit_inv_type) then
+  
+      raise_application_error( -20001, 'Failure - no hierarchy or location and location is mandatory');
+
+    else
+    
+      l_locate_flag := FALSE;
+      
+    end if;
+
+  else
+--  we have a location - but it should be overridden by parent where it exists 
+
+    if l_parent_id is not null and l_itg_row.itg_relation = 'AT' then
+      
+      l_locate_flag := FALSE;
+      
+    end if;
+  end if;
+
+  IF l_locate_flag THEN
  
-  nm3extent.create_temp_ne
-      (pi_source_id => p_inv_rec.ne_id
-      ,pi_source    => nm3extent.c_route
-      ,pi_begin_mp  => p_inv_rec.nm_start
-      ,pi_end_mp    => p_inv_rec.nm_end
-      ,po_job_id    => l_temp_ne_id
-      );
+    nm3extent.create_temp_ne
+        (pi_source_id => p_inv_rec.ne_id
+        ,pi_source    => nm3extent.c_route
+        ,pi_begin_mp  => p_inv_rec.nm_start
+        ,pi_end_mp    => p_inv_rec.nm_end
+        ,po_job_id    => l_temp_ne_id
+        );
+
+  END IF;		
    
   IF g_inv.iit_ne_id = -1 THEN 
     nm_debug.debug('Insert Inv Item');
@@ -951,27 +1035,32 @@ BEGIN
 --
   END IF;
 --
-  IF l_temp_ne_id = -1 THEN
-    nm_debug.debug('ne_id is -1');
-    nm3homo.end_inv_location( pi_iit_ne_id      => g_inv.iit_ne_id
-                             ,pi_effective_date => l_effective_date
-                             ,po_warning_code   => l_warning_code 
-                             ,po_warning_msg    => l_warning_msg
-                             ,pi_ignore_item_loc_mand => TRUE
-                            );
-  ELSE   
-    nm_debug.debug('Ne_id is something, doing update');
-    nm3homo.homo_update
-      (p_temp_ne_id_in  => l_temp_ne_id
-      ,p_iit_ne_id      => g_inv.iit_ne_id
-      ,p_effective_date => l_effective_date
-      ,p_warning_code   => l_warning_code
-      ,p_warning_msg    => l_warning_msg);
+  IF l_locate_flag THEN
+
+    IF l_temp_ne_id = -1 THEN
+      nm_debug.debug('ne_id is -1');
+      nm3homo.end_inv_location( pi_iit_ne_id      => g_inv.iit_ne_id
+                               ,pi_effective_date => l_effective_date
+                               ,po_warning_code   => l_warning_code 
+                               ,po_warning_msg    => l_warning_msg
+                               ,pi_ignore_item_loc_mand => TRUE
+                              );
+    ELSE   
+      nm_debug.debug('Ne_id is something, doing update');
+      nm3homo.homo_update
+        (p_temp_ne_id_in  => l_temp_ne_id
+        ,p_iit_ne_id      => g_inv.iit_ne_id
+        ,p_effective_date => l_effective_date
+        ,p_warning_code   => l_warning_code
+        ,p_warning_msg    => l_warning_msg);
+    END IF;
+  
   END IF;
   
   IF p_inv_rec.iit_end_date IS NOT NULL THEN
     nm3api_inv.end_date_item(p_iit_ne_id      => g_inv.iit_ne_id
                             ,p_effective_date => To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY'));
+
   END IF;
 
 -- no errors then clear the error flag
