@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3pla AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3pla.pkb-arc   2.2.1.0   Jun 09 2011 11:33:36   Rob.Coupe  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3pla.pkb-arc   2.2.1.1   Feb 27 2012 14:50:46   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3pla.pkb  $
---       Date into PVCS   : $Date:   Jun 09 2011 11:33:36  $
---       Date fetched Out : $Modtime:   Jun 09 2011 11:31:02  $
---       Version          : $Revision:   2.2.1.0  $
+--       Date into PVCS   : $Date:   Feb 27 2012 14:50:46  $
+--       Date fetched Out : $Modtime:   Feb 27 2012 14:46:58  $
+--       Version          : $Revision:   2.2.1.1  $
 --       Based on SCCS version : 1.61
 ------------------------------------------------------------------------
 --
@@ -19,7 +19,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3pla AS
 -------------------------------------------------------------------------------------------
 -- Global variables - tree definitions etc.
    --g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"@(#)nm3pla.pkb	1.61 11/29/06"';
-   g_body_sccsid     CONSTANT varchar2(2000) := '$Revision:   2.2.1.0  $';
+   g_body_sccsid     CONSTANT varchar2(2000) := '$Revision:   2.2.1.1  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT VARCHAR2(30) := 'nm3pla';
@@ -75,6 +75,16 @@ g_pla_exc_msg     VARCHAR2(2000) := 'Unspecified exception within NM3PLA';
 --
 FUNCTION local_connected_chunks RETURN nm_placement_array;
 --
+FUNCTION partial_chunk_connectivity(rvrs IN integer,
+                             p1 IN NUMBER,
+                             p2 IN NUMBER,
+                             d1 in integer,
+                             d2 in integer,
+                             s1 IN NUMBER,
+                             e1 IN NUMBER,
+                             s2 IN NUMBER,
+                             e2 IN NUMBER  ) RETURN integer;
+
 -------------------------------------------------------------------------------------------
 --
 FUNCTION get_version RETURN VARCHAR2 IS
@@ -2276,6 +2286,7 @@ FUNCTION get_connected_chunks_internal(pi_iof_tab    IN Nm3type.tab_number
   l_r_end      NUMBER;
 
   rvrs BOOLEAN;
+  rvrsi        INTEGER;  
 
   l_iit_rec nm_inv_items%ROWTYPE;
 
@@ -2293,6 +2304,12 @@ BEGIN
       l_prior_end   := pi_iend_tab(l_i);
 
       rvrs := (Nm3net.is_gty_reversible( Nm3net.get_gty_type(pi_rin_tab(l_i))) = 'Y');
+
+      if rvrs then
+        rvrsi := 1;
+      else
+        rvrsi := 0;
+      end if;      
 
       IF pi_rdir_tab(l_i) = 1
       THEN
@@ -2355,14 +2372,27 @@ BEGIN
 --                           ' old end = '||TO_CHAR(l_prior_end));
 --
 
-          IF partial_chunk_connectivity(rvrs,
-	                                      l_prior_ne,
-                                        TO_NUMBER(pi_iof_tab(l_i)),
-								                        l_prior_begin,
-                                        l_prior_end,
-                      								  TO_NUMBER(pi_ibegin_tab(l_i)),
-                      								  TO_NUMBER(pi_iend_tab(l_i)))
-          THEN
+          if partial_chunk_connectivity( rvrsi, 
+                   l_prior_ne, 
+                   TO_NUMBER(pi_iof_tab(l_i)),
+                   l_prior_rdir,
+                   pi_rdir_tab(l_i),
+                   l_prior_begin,
+                   l_prior_end,
+                   TO_NUMBER(pi_ibegin_tab(l_i)),
+                   TO_NUMBER(pi_iend_tab(l_i))) = 1 then
+
+
+
+                   
+--          IF partial_chunk_connectivity(rvrs,
+--	                                      l_prior_ne,
+--                                        TO_NUMBER(pi_iof_tab(l_i)),
+--								                        l_prior_begin,
+--                                        l_prior_end,
+--                      								  TO_NUMBER(pi_ibegin_tab(l_i)),
+--                      								  TO_NUMBER(pi_iend_tab(l_i)))
+--          THEN
 --          make sure that the end meausre of the prior chunk is the end of the element and that the
 --          start measure of the current chunk is zero. Otherwise they are not connected.
 
@@ -2540,8 +2570,8 @@ BEGIN
     ORDER BY
       r.nm_obj_type,
       r.nm_ne_id_in,
-      r.nm_seq_no;
-
+      r.nm_seq_no,  i.nm_begin_mp * r.nm_cardinality;
+	  
     l_retval := get_connected_chunks_internal(pi_iof_tab    => l_iof_tab
                                              ,pi_ibegin_tab => l_ibegin_tab
                                              ,pi_iend_tab   => l_iend_tab
@@ -2649,7 +2679,8 @@ BEGIN
   ORDER BY
     r.nm_obj_type,
     r.nm_ne_id_in,
-    r.nm_seq_no;
+    r.nm_seq_no,
+	i.nte_begin_mp;
 
   l_retval := get_connected_chunks_internal(pi_iof_tab    => l_iof_tab
                                            ,pi_ibegin_tab => l_ibegin_tab
@@ -3307,6 +3338,96 @@ END IF;
   END IF;
   RETURN retval;
 END;
+--
+--Internal version of partial_chunk_connectivity avoiding impact.Use integer rvrs for testing in SQL
+--
+FUNCTION partial_chunk_connectivity(rvrs IN integer,
+                             p1 IN NUMBER,
+                             p2 IN NUMBER,
+                             d1 in integer,
+                             d2 in integer,
+                             s1 IN NUMBER,
+                             e1 IN NUMBER,
+                             s2 IN NUMBER,
+                             e2 IN NUMBER  ) RETURN integer IS
+
+
+cursor c_connectivity ( 
+            p1 in number,
+            p2 in number,
+            d1 in integer,
+            d2 in integer,
+            s1 in number,
+            e1 in number,
+            s2 in number,
+            e2 in number ) is 
+select 
+--decode( stype1||etype1, 'ES', 1, 'EE', 2, 'SE' -1, 'SS' -2, -99 )  retval1
+--     t.*,
+--     decode( stype||etype, 'ES', 1, 'EE', 2, 'SE' -1, 'SS' -2 )  retval,  
+  case  stype1 
+    when etype1 then
+      case stype1
+        when 'E' then 2
+        else -2
+      end
+    else
+      case stype1
+        when 'E' then 1
+        else -1
+      end
+  end retval1
+from (     
+     SELECT a1.nnu_node_type stype,
+            case nvl(d1, -99)
+              when -99 then a1.nnu_node_type
+              when 1    then a1.nnu_node_type
+              when -1   then decode (a1.nnu_node_type, 'S', 'E', 'E', 'S' )
+            end stype1,
+            case a1.nnu_node_type
+              when 'S' then s1
+              else e1
+              end m1,
+            a2.nnu_node_type etype,
+            case nvl(d2, -99)
+              when -99 then a2.nnu_node_type
+              when 1    then a2.nnu_node_type
+              when -1   then decode (a2.nnu_node_type, 'S', 'E', 'E', 'S' )
+            end etype1,
+            case a2.nnu_node_type
+              when 'S' then s2
+              else e2
+              end m2,
+            a1.nnu_chain n1m, a2.nnu_chain n2m
+     FROM nm_node_usages a1, nm_node_usages a2
+     WHERE a1.nnu_ne_id = p1
+     AND   a2.nnu_ne_id = p2
+     AND   a1.nnu_no_node_id = a2.nnu_no_node_id         
+     ) t     
+where n1m = nvl(m1, n1m)
+  and n2m = nvl(m2, n2m)
+order by decode (retval1, 1, 1, -1, 2, 3 );
+
+retval integer := 0;
+
+BEGIN
+/*
+nm_debug.debug_on;
+nm_debug.debug(p1||','||p2||','||d1||','||d2||','||s1||','||e1||','||s2||','||e2);
+*/
+  open c_connectivity(p1, p2, d1, d2, s1, e1, s2, e2);
+  fetch c_connectivity into retval;
+  if c_connectivity%notfound then
+    retval := 0;
+  end if;
+  close c_connectivity;
+  if rvrs = 0 and retval != 1 then
+    retval := 0;
+  end if; 
+  return retval;
+end;
+--
+
 --
 FUNCTION partial_chunk_connectivity( rvrs IN BOOLEAN,
                              p1 IN NUMBER,
