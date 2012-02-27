@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3api_inv AS
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3api_inv.pkb-arc   2.5   May 16 2011 14:42:24   Steve.Cooper  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3api_inv.pkb-arc   2.6   Feb 27 2012 12:03:16   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3api_inv.pkb  $
---       Date into PVCS   : $Date:   May 16 2011 14:42:24  $
---       Date fetched Out : $Modtime:   Apr 01 2011 11:35:48  $
---       Version          : $Revision:   2.5  $
+--       Date into PVCS   : $Date:   Feb 27 2012 12:03:16  $
+--       Date fetched Out : $Modtime:   Feb 27 2012 12:02:04  $
+--       Version          : $Revision:   2.6  $
 --
 --   Author : Jonathan Mills
 --
@@ -22,7 +22,7 @@ CREATE OR REPLACE PACKAGE BODY nm3api_inv AS
 --
 
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.5  $';
+  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.6  $';
   
 --   g_body_sccsid     CONSTANT  varchar2(2000) := '"@(#)nm3api_inv.pkb	1.6 12/18/03"';
 --  g_body_sccsid is the SCCS ID for the package body
@@ -44,6 +44,44 @@ PROCEDURE homo_update_internal (p_iit_ne_id      IN     nm_inv_items.iit_ne_id%T
 --
 -----------------------------------------------------------------------------
 --
+PROCEDURE check_item_has_no_future_locs (p_iit_ne_id      nm_inv_items.iit_ne_id%TYPE
+                                        ,p_effective_date DATE DEFAULT nm3user.get_effective_date
+                                        ) is
+                                        
+--
+   CURSOR cs_future_locs (c_nm_ne_id_in    nm_members_all.nm_ne_id_in%TYPE
+                         ,c_effective_date DATE
+                         ) IS
+   SELECT 1
+    FROM  nm_members_all nm
+   WHERE  nm_ne_id_in   = c_nm_ne_id_in
+    AND   nm_start_date > c_effective_date
+    AND   ROWNUM        = 1;
+--
+   l_dummy PLS_INTEGER;
+   l_found BOOLEAN;
+--
+BEGIN
+--
+   nm_debug.proc_start (g_package_name,'check_item_has_no_future_locs');
+--
+   OPEN  cs_future_locs (p_iit_ne_id, p_effective_date);
+   FETCH cs_future_locs INTO l_dummy;
+   l_found := cs_future_locs%FOUND;
+   CLOSE cs_future_locs;
+--
+   IF l_found
+    THEN
+      hig.raise_ner (pi_appl => nm3type.c_net
+                    ,pi_id   => 355
+                    );
+   END IF;
+--
+   nm_debug.proc_end (g_package_name,'check_item_has_no_future_locs');
+--
+END check_item_has_no_future_locs;
+--
+
 FUNCTION get_version RETURN varchar2 IS
 BEGIN
    RETURN g_sccsid;
@@ -861,11 +899,25 @@ PROCEDURE end_date_item_location (p_iit_ne_id                  IN     nm_inv_ite
                                  ,p_effective_date             IN     nm_inv_items.iit_start_date%TYPE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                                  ) IS
 --
+   future_dated exception;
+   pragma exception_init( future_dated, -20000 );    
+--
+
    c_init_eff_date CONSTANT date := To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY');
 --
 BEGIN
 --
    nm_debug.proc_start(g_package_name,'end_date_item_location');
+--
+   begin
+     check_item_has_no_future_locs(p_iit_ne_id, p_effective_date );
+   exception
+     when future_dated then
+        hig.raise_ner (pi_appl => nm3type.c_net
+                      ,pi_id   => 178
+                      );
+   end;
+   
 --
    nm3user.set_effective_date (p_effective_date);
 --
@@ -889,6 +941,7 @@ EXCEPTION
       RAISE;
 --
 END end_date_item_location;
+--
 --
 -----------------------------------------------------------------------------
 --
