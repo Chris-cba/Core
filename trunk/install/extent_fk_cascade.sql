@@ -10,16 +10,28 @@ Ticket number 8001269723.
 */
 
 
-delete from nm_saved_extent_member_datums
-where not exists ( select 1 from nm_saved_extent_members  where nsm_id = nsd_nsm_id and nsm_nse_id = nsd_nse_id )
+begin
+  delete from nm_saved_extent_member_datums
+  where not exists ( select 1 from nm_saved_extent_members  where nsm_id = nsd_nsm_id and nsm_nse_id = nsd_nse_id );
+exception
+  when no_data_found then null;
+end;
 /
 
-delete from nm_saved_extent_member_datums
-where not exists ( select 1 from nm_saved_extents where nsd_nse_id = nsd_nse_id )
+begin
+  delete from nm_saved_extent_member_datums
+  where not exists ( select 1 from nm_saved_extents where nsd_nse_id = nsd_nse_id );
+exception
+  when no_data_found then null;
+end;
 /
 
-delete from nm_saved_extent_members
-where not exists ( select 1 from nm_saved_extents where nse_id = nsm_nse_id )
+begin
+  delete from nm_saved_extent_members
+  where not exists ( select 1 from nm_saved_extents where nse_id = nsm_nse_id );
+exception
+  when no_data_found then null;
+end;
 /
 
 alter table NM_SAVED_EXTENT_MEMBERS drop constraint nsu_nse_fk;
