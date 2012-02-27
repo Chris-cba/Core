@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3homo AS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3homo.pkb-arc   2.19   May 16 2011 14:44:52   Steve.Cooper  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3homo.pkb-arc   2.20   Feb 27 2012 11:38:54   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3homo.pkb  $
---       Date into PVCS   : $Date:   May 16 2011 14:44:52  $
---       Date fetched Out : $Modtime:   Apr 01 2011 09:27:48  $
---       PVCS Version     : $Revision:   2.19  $
+--       Date into PVCS   : $Date:   Feb 27 2012 11:38:54  $
+--       Date fetched Out : $Modtime:   Feb 27 2012 11:33:56  $
+--       PVCS Version     : $Revision:   2.20  $
 --
 --
 --   Author : Jonathan Mills
@@ -40,7 +40,7 @@ CREATE OR REPLACE PACKAGE BODY nm3homo AS
    
    -- Log 713421
    
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.19  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.20  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3homo';
@@ -4562,10 +4562,22 @@ PROCEDURE end_inv_location(pi_iit_ne_id            IN     NM_INV_ITEMS.iit_ne_id
    c_initial_effective_date CONSTANT DATE := To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY');
 --
    l_nte_job_id NM_NW_TEMP_EXTENTS.nte_job_id%TYPE;
+
+   future_dated exception;
+   pragma exception_init( future_dated, -20000 );    
 --
 BEGIN
 --
    nm_debug.proc_start(g_package_name,'end_inv_location');
+--  
+   begin
+     check_item_has_no_future_locs(pi_iit_ne_id, pi_effective_date );
+   exception
+     when future_dated then
+        hig.raise_ner (pi_appl => nm3type.c_net
+                      ,pi_id   => 178
+                      );
+   end;
 --
    --set effective date for this operation
    nm3user.set_effective_date(p_date => pi_effective_date);
