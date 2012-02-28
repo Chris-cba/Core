@@ -9,7 +9,8 @@ Ticket number 8001269723.
 
 */
 
-alter table NM_SAVED_EXTENT_MEMBERS drop constraint nsu_nse_fk;
+alter table nm_saved_extent_member_datums
+drop constraint nsd_nsm_fk;
 
 alter table NM_SAVED_EXTENT_MEMBERS drop constraint nsu_nse_fk;
 
@@ -44,9 +45,6 @@ REFERENCES NM_SAVED_EXTENTS (NSE_ID)
 ON DELETE CASCADE
 ENABLE
 VALIDATE;
-
-alter table nm_saved_extent_member_datums
-drop constraint nsd_nsm_fk;
 
 ALTER TABLE NM_SAVED_EXTENT_MEMBER_DATUMS ADD 
 CONSTRAINT nsd_nsm_fk
