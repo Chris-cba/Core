@@ -2,11 +2,11 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm_4500_fix1.sql-arc   3.0   Mar 02 2012 09:31:00   Mike.Alexander  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm_4500_fix1.sql-arc   3.1   Mar 02 2012 10:52:02   Mike.Alexander  $
 --       Module Name      : $Workfile:   nm_4500_fix1.sql  $
---       Date into PVCS   : $Date:   Mar 02 2012 09:31:00  $
---       Date fetched Out : $Modtime:   Mar 02 2012 09:25:26  $
---       PVCS Version     : $Revision:   3.0  $
+--       Date into PVCS   : $Date:   Mar 02 2012 10:52:02  $
+--       Date fetched Out : $Modtime:   Mar 02 2012 10:46:50  $
+--       PVCS Version     : $Revision:   3.1  $
 --
 --------------------------------------------------------------------------------
 --   Copyright (c) 2012 Bentley Systems Incorporated.
@@ -124,10 +124,10 @@ SET FEEDBACK OFF
 --------------------------------------------------------------------------------
 --
 SET TERM ON 
-PROMPT log_nm_4400_fix11.sql 
+PROMPT log_nm_4500_fix1.sql 
 --
 SET FEEDBACK ON
-start log_nm_4400_fix11.sql
+start log_nm_4500_fix1.sql
 SET FEEDBACK OFF
 SPOOL OFF
 EXIT
