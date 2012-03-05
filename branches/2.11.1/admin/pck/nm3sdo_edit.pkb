@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3sdo_Edit AS
 --
 --   SCCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_edit.pkb-arc   2.11.1.0   Jul 15 2011 12:22:16   Chris.Strettle  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_edit.pkb-arc   2.11.1.1   Mar 05 2012 16:28:44   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3sdo_edit.pkb  $
---       Date into SCCS   : $Date:   Jul 15 2011 12:22:16  $
---       Date fetched Out : $Modtime:   Jul 15 2011 12:15:04  $
---       SCCS Version     : $Revision:   2.11.1.0  $
+--       Date into SCCS   : $Date:   Mar 05 2012 16:28:44  $
+--       Date fetched Out : $Modtime:   Mar 05 2012 16:22:10  $
+--       SCCS Version     : $Revision:   2.11.1.1  $
 --
 --
 --  Author :  R Coupe
@@ -23,7 +23,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3sdo_Edit AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid   CONSTANT  VARCHAR2(2000)  :=  '$Revision:   2.11.1.0  $';
+  g_body_sccsid   CONSTANT  VARCHAR2(2000)  :=  '$Revision:   2.11.1.1  $';
   g_package_name  CONSTANT  VARCHAR2(30)    :=  'nm3sdo_edit';
 --
 -----------------------------------------------------------------------------
@@ -570,6 +570,48 @@ END;
 --
 -----------------------------------------------------------------------------
 --
+PROCEDURE add_sub_shape (
+   pi_inv_type   IN nm_inv_types.nit_inv_type%TYPE,
+   pi_pk       IN   NUMBER,
+   pi_x        IN   NUMBER,
+   pi_y        IN   NUMBER,
+   pi_shape    IN   MDSYS.SDO_GEOMETRY,
+   pi_start_dt IN   DATE DEFAULT NULL
+) is
+cursor c1 ( c_inv_type in nm_inv_types.nit_inv_type%TYPE,
+            c_pk       in NUMBER ) is
+select iig_item_id, nth_theme_id
+from nm_themes_all, nm_inv_type_groupings, nm_inv_themes, nm_inv_types, nm_inv_item_groupings, nm_inv_items
+where nth_base_table_theme IS NULL
+        AND nth_location_updatable = 'Y'
+        AND nth_theme_type         = nm3sdo.c_sdo
+        AND nit_use_xy             = 'Y'
+        and nit_inv_type           = nith_nit_id
+        and itg_parent_inv_type    = c_inv_type
+        and nith_nit_id            = itg_inv_type
+        and itg_relation           = 'AT'
+        and nith_nth_theme_id      = nth_theme_id
+        and iig_parent_id          = c_pk
+        and iit_ne_id              = iig_item_id
+        and iit_inv_type           = nith_nit_id
+        AND nth_x_column IS NOT NULL
+        AND nth_y_column IS NOT NULL;
+begin
+--  
+  for irec in c1 ( pi_inv_type, pi_pk ) loop
+
+    update nm_inv_items
+    set iit_x = pi_x,
+        iit_y = pi_y
+    where iit_ne_id = irec.iig_item_id;
+    
+    add_shape(irec.nth_theme_id, irec.iig_item_id, null, pi_shape, pi_start_dt );
+    
+  end loop;
+
+end;
+
+
 /* Update or insert a geometry for a given shape/pk value and theme
  */
 PROCEDURE add_shape (
@@ -867,6 +909,18 @@ BEGIN
            , pi_start_dt => g_tab_inv(g_tab_inv_count).iit_start_date
            );
         -- theme checks
+        
+          begin
+            add_sub_shape
+             ( pi_inv_type => l_tab_nith(l_tab_nith_count).nith_nit_id
+             , pi_pk       => g_tab_inv(g_tab_inv_count).iit_ne_id
+             , pi_x        => g_tab_inv(g_tab_inv_count).iit_x 
+             , pi_y        => g_tab_inv(g_tab_inv_count).iit_y
+             , pi_shape    => l_geom
+             , pi_start_dt => g_tab_inv(g_tab_inv_count).iit_start_date
+             );
+          end;
+          
         END IF;
       -- tab_nith loop
       END LOOP;
