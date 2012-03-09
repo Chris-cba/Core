@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm3gaz_qry AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3gaz_qry.pkb-arc   2.17.1.1   Aug 31 2011 15:37:46   Ade.Edwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3gaz_qry.pkb-arc   2.17.1.2   Mar 09 2012 16:10:32   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3gaz_qry.pkb  $
---       Date into PVCS   : $Date:   Aug 31 2011 15:37:46  $
---       Date fetched Out : $Modtime:   Aug 31 2011 15:35:20  $
---       Version          : $Revision:   2.17.1.1  $
+--       Date into PVCS   : $Date:   Mar 09 2012 16:10:32  $
+--       Date fetched Out : $Modtime:   Mar 09 2012 16:06:40  $
+--       Version          : $Revision:   2.17.1.2  $
 --       Based on SCCS version : 1.45
 -------------------------------------------------------------------------
 --   Author : Jonathan Mills
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3gaz_qry AS
 --all global package variables here
 --
    --g_body_sccsid     CONSTANT  varchar2(2000) := '"@(#)nm3gaz_qry.pkb 1.45 05/26/06"';
-   g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.17.1.1  $';
+   g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.17.1.2  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3gaz_qry';
@@ -808,197 +808,201 @@ BEGIN
         downwards, stopping before it hits the datum locations (already dealt
         with in the temp_extend above
       ***********************************************************************/
-      IF l_rec_ngq.ngq_source = nm3extent.c_route
-      THEN
-        append_list (p_ngqt_index,'     UNION ');
-        append_list (p_ngqt_index,'       SELECT '||g_package_name||'.get_g_ngqi_job_id ngqi_job_id');
-        append_list (p_ngqt_index,'             ,'||nm3flx.string(l_rec_ngqt.ngqt_item_type_type)||' ngqi_item_type_type');
-        append_list (p_ngqt_index,'             ,'||nm3flx.string(l_rec_ngqt.ngqt_item_type)||' ngqi_item_type');
-        append_list (p_ngqt_index,'             ,'||l_item_pk_col||' ngqi_item_id');
-        append_both (p_ngqt_index,'        FROM  '||l_tables||', (WITH net_members AS ');
-        append_both (p_ngqt_index,'       (');
-        append_both (p_ngqt_index,'                  SELECT -1 ');
-        append_both (p_ngqt_index,'                       , '||l_rec_ngq.ngq_source_id||'                       nte_ne_id_of ');
-        append_both (p_ngqt_index,'                       , 0                                nte_begin_mp ');
-        append_both (p_ngqt_index,'                       , nm3net.get_ne_length('||l_rec_ngq.ngq_source_id||') nte_end_mp ');
-        append_both (p_ngqt_index,'                       , 1                                nte_seq_no ');
-        append_both (p_ngqt_index,'                    FROM DUAL ');
-        append_both (p_ngqt_index,'                 UNION ');
-        append_both (p_ngqt_index,'                  SELECT level ');
-        append_both (p_ngqt_index,'                       , nm_ne_id_of                       nte_ne_id_of ');
-  --      append_both (p_ngqt_index,'                       , NVL(nm_slk,    nm_begin_mp)      nte_begin_mp ');
-  --      append_both (p_ngqt_index,'                       , NVL(nm_end_slk,nm_end_mp)        nte_end_mp');
-        --append_both (p_ngqt_index,'                       , 0                                 nte_begin_mp ');
---        append_both (p_ngqt_index,'                       , nm3net.get_ne_length(nm_ne_id_of) nte_end_mp');
-        append_both (p_ngqt_index,'                       , nvl(nm_begin_mp,0)                nte_begin_mp ');
-        append_both (p_ngqt_index,'                       , nvl(nm_end_mp, nm3net.get_ne_length(nm_ne_id_of)) nte_end_mp ');
-        append_both (p_ngqt_index,'                       , nm_seq_no                         nte_seq_no ');
-        append_both (p_ngqt_index,'                    FROM nm_members ');
-        --
-        -- Task 0110484
-        --
-        IF l_rec_ngq.ngq_begin_mp IS NOT NULL
-        AND l_rec_ngq.ngq_end_mp IS NOT NULL
-        THEN
---          append_both (p_ngqt_index,'                   WHERE nm_slk <= '||l_rec_ngq.ngq_end_mp);
---          append_both (p_ngqt_index,'                     AND '||l_rec_ngq.ngq_begin_mp||' >= nm_end_slk');
-          append_both (p_ngqt_index,'                   WHERE nm_slk < '||l_rec_ngq.ngq_end_mp);
-          append_both (p_ngqt_index,'                     AND '||l_rec_ngq.ngq_begin_mp||' > nm_end_slk');
-        END IF;
-        append_both (p_ngqt_index,'                 CONNECT BY PRIOR nm_ne_id_of = nm_ne_id_in ');
-        append_both (p_ngqt_index,'                   START WITH nm_ne_id_in = '||l_rec_ngq.ngq_source_id||' ');
-        append_both (p_ngqt_index,'               ) ');
-        append_both (p_ngqt_index,'               SELECT * FROM net_members) nte ');
-        --append_both (p_ngqt_index,'       WHERE  nte.nte_job_id = '||g_package_name||'.get_g_nte_job_id');
-        append_both (p_ngqt_index,'       WHERE  1=1');
-     --
-        IF l_rec_nit.nit_table_name IS NULL
-         THEN
-           -- This is standard - i.e. NOT FT inventory
-           append_both (p_ngqt_index,'        AND   '||c_table_alias||'.iit_ne_id = nm.nm_ne_id_in');
-           append_both (p_ngqt_index,'        AND    nm.nm_type = '||nm3flx.string('I')||' AND nm.nm_obj_type = '||nm3flx.string(l_rec_ngqt.ngqt_item_type));
-           append_both (p_ngqt_index,'        AND   '||c_table_alias||'.iit_inv_type||Null = '||nm3flx.string(l_rec_ngqt.ngqt_item_type)); -- Suppress index
-        END IF;
-     --
-        append_both (p_ngqt_index,'        AND   '||l_ne_id_col||' = nte.nte_ne_id_of||null');
-      --
-        -- Task 0109984/0111431/0111432
-        -- Don't attempt to use the chainage columns if they are not set on the metamodel
-        --
-        IF ( l_rec_nit.nit_table_name IS NOT NULL AND l_rec_nit.nit_lr_st_chain IS NOT NULL )
-          OR ( l_rec_nit.nit_table_name IS NULL AND l_begin_mp_col IS NOT NULL )
-        THEN
-          IF g_tab_is_point_inv(p_ngqt_index)
-          THEN
-             append_both (p_ngqt_index,'        AND   '||l_begin_mp_col||' BETWEEN nte.nte_begin_mp AND nte.nte_end_mp');
-           ELSE
---             append_both (p_ngqt_index,'        AND   '||l_begin_mp_col||' <= nte.nte_end_mp');
+--   RAC _ comment out aberlour for time being
+--  from here
+--      IF l_rec_ngq.ngq_source = nm3extent.c_route
+--      THEN
+--        append_list (p_ngqt_index,'     UNION ');
+--        append_list (p_ngqt_index,'       SELECT '||g_package_name||'.get_g_ngqi_job_id ngqi_job_id');
+--        append_list (p_ngqt_index,'             ,'||nm3flx.string(l_rec_ngqt.ngqt_item_type_type)||' ngqi_item_type_type');
+--        append_list (p_ngqt_index,'             ,'||nm3flx.string(l_rec_ngqt.ngqt_item_type)||' ngqi_item_type');
+--        append_list (p_ngqt_index,'             ,'||l_item_pk_col||' ngqi_item_id');
+--        append_both (p_ngqt_index,'        FROM  '||l_tables||', (WITH net_members AS ');
+--        append_both (p_ngqt_index,'       (');
+--        append_both (p_ngqt_index,'                  SELECT -1 ');
+--        append_both (p_ngqt_index,'                       , '||l_rec_ngq.ngq_source_id||'                       nte_ne_id_of ');
+--        append_both (p_ngqt_index,'                       , 0                                nte_begin_mp ');
+--        append_both (p_ngqt_index,'                       , nm3net.get_ne_length('||l_rec_ngq.ngq_source_id||') nte_end_mp ');
+--        append_both (p_ngqt_index,'                       , 1                                nte_seq_no ');
+--        append_both (p_ngqt_index,'                    FROM DUAL ');
+--        append_both (p_ngqt_index,'                 UNION ');
+--        append_both (p_ngqt_index,'                  SELECT level ');
+--        append_both (p_ngqt_index,'                       , nm_ne_id_of                       nte_ne_id_of ');
+--  --      append_both (p_ngqt_index,'                       , NVL(nm_slk,    nm_begin_mp)      nte_begin_mp ');
+--  --      append_both (p_ngqt_index,'                       , NVL(nm_end_slk,nm_end_mp)        nte_end_mp');
+--        --append_both (p_ngqt_index,'                       , 0                                 nte_begin_mp ');
+----        append_both (p_ngqt_index,'                       , nm3net.get_ne_length(nm_ne_id_of) nte_end_mp');
+--        append_both (p_ngqt_index,'                       , nvl(nm_begin_mp,0)                nte_begin_mp ');
+--        append_both (p_ngqt_index,'                       , nvl(nm_end_mp, nm3net.get_ne_length(nm_ne_id_of)) nte_end_mp ');
+--        append_both (p_ngqt_index,'                       , nm_seq_no                         nte_seq_no ');
+--        append_both (p_ngqt_index,'                    FROM nm_members ');
+--        --
+--        -- Task 0110484
+--        --
+--        IF l_rec_ngq.ngq_begin_mp IS NOT NULL
+--        AND l_rec_ngq.ngq_end_mp IS NOT NULL
+--        THEN
+----          append_both (p_ngqt_index,'                   WHERE nm_slk <= '||l_rec_ngq.ngq_end_mp);
+----          append_both (p_ngqt_index,'                     AND '||l_rec_ngq.ngq_begin_mp||' >= nm_end_slk');
+--          append_both (p_ngqt_index,'                   WHERE nm_slk < '||l_rec_ngq.ngq_end_mp);
+--          append_both (p_ngqt_index,'                     AND '||l_rec_ngq.ngq_begin_mp||' > nm_end_slk');
+--        END IF;
+--        append_both (p_ngqt_index,'                 CONNECT BY PRIOR nm_ne_id_of = nm_ne_id_in ');
+--        append_both (p_ngqt_index,'                   START WITH nm_ne_id_in = '||l_rec_ngq.ngq_source_id||' ');
+--        append_both (p_ngqt_index,'               ) ');
+--        append_both (p_ngqt_index,'               SELECT * FROM net_members) nte ');
+--        --append_both (p_ngqt_index,'       WHERE  nte.nte_job_id = '||g_package_name||'.get_g_nte_job_id');
+--        append_both (p_ngqt_index,'       WHERE  1=1');
+--     --
+--        IF l_rec_nit.nit_table_name IS NULL
+--         THEN
+--           -- This is standard - i.e. NOT FT inventory
+--           append_both (p_ngqt_index,'        AND   '||c_table_alias||'.iit_ne_id = nm.nm_ne_id_in');
+--           append_both (p_ngqt_index,'        AND    nm.nm_type = '||nm3flx.string('I')||' AND nm.nm_obj_type = '||nm3flx.string(l_rec_ngqt.ngqt_item_type));
+--           append_both (p_ngqt_index,'        AND   '||c_table_alias||'.iit_inv_type||Null = '||nm3flx.string(l_rec_ngqt.ngqt_item_type)); -- Suppress index
+--        END IF;
+--     --
+--        append_both (p_ngqt_index,'        AND   '||l_ne_id_col||' = nte.nte_ne_id_of||null');
+--      --
+--        -- Task 0109984/0111431/0111432
+--        -- Don't attempt to use the chainage columns if they are not set on the metamodel
+--        --
+--        IF ( l_rec_nit.nit_table_name IS NOT NULL AND l_rec_nit.nit_lr_st_chain IS NOT NULL )
+--          OR ( l_rec_nit.nit_table_name IS NULL AND l_begin_mp_col IS NOT NULL )
+--        THEN
+--          IF g_tab_is_point_inv(p_ngqt_index)
+--          THEN
+--             append_both (p_ngqt_index,'        AND   '||l_begin_mp_col||' BETWEEN nte.nte_begin_mp AND nte.nte_end_mp');
+--           ELSE
+----             append_both (p_ngqt_index,'        AND   '||l_begin_mp_col||' <= nte.nte_end_mp');
+----             append_both (p_ngqt_index,'        AND   '||CASE WHEN l_rec_nit.nit_lr_end_chain IS NOT NULL 
+----                                                           THEN l_end_mp_col
+----                                                           ELSE l_begin_mp_col
+----                                                         END||' >= nte.nte_begin_mp');
+--        -- Task 0110467
+--        -- Don't include line items which just butt upto the end / start
+--             append_both (p_ngqt_index,'        AND   '||l_begin_mp_col||' < nte.nte_end_mp');
 --             append_both (p_ngqt_index,'        AND   '||CASE WHEN l_rec_nit.nit_lr_end_chain IS NOT NULL 
 --                                                           THEN l_end_mp_col
 --                                                           ELSE l_begin_mp_col
---                                                         END||' >= nte.nte_begin_mp');
-        -- Task 0110467
-        -- Don't include line items which just butt upto the end / start
-             append_both (p_ngqt_index,'        AND   '||l_begin_mp_col||' < nte.nte_end_mp');
-             append_both (p_ngqt_index,'        AND   '||CASE WHEN l_rec_nit.nit_lr_end_chain IS NOT NULL 
-                                                           THEN l_end_mp_col
-                                                           ELSE l_begin_mp_col
-                                                         END||' > nte.nte_begin_mp');
-          END IF;
-          -- nm_gaz_query
-          IF  l_rec_ngq.ngq_begin_mp IS NOT NULL
-          AND l_rec_ngq.ngq_end_mp   IS NOT NULL
-          THEN
-            IF g_tab_is_point_inv(p_ngqt_index)
-            THEN
-              append_both (p_ngqt_index,'        AND   '||l_begin_mp_col||' BETWEEN '||l_rec_ngq.ngq_begin_mp||' and '||l_rec_ngq.ngq_end_mp );
-            ELSE
---              append_both (p_ngqt_index,'        AND   '||l_begin_mp_col||' <= '||l_rec_ngq.ngq_end_mp);
+--                                                         END||' > nte.nte_begin_mp');
+--          END IF;
+--          -- nm_gaz_query
+--          IF  l_rec_ngq.ngq_begin_mp IS NOT NULL
+--          AND l_rec_ngq.ngq_end_mp   IS NOT NULL
+--          THEN
+--            IF g_tab_is_point_inv(p_ngqt_index)
+--            THEN
+--              append_both (p_ngqt_index,'        AND   '||l_begin_mp_col||' BETWEEN '||l_rec_ngq.ngq_begin_mp||' and '||l_rec_ngq.ngq_end_mp );
+--            ELSE
+----              append_both (p_ngqt_index,'        AND   '||l_begin_mp_col||' <= '||l_rec_ngq.ngq_end_mp);
+----              append_both (p_ngqt_index,'        AND   '||CASE WHEN l_rec_nit.nit_lr_end_chain IS NOT NULL 
+----                                                            THEN l_end_mp_col
+----                                                            ELSE l_begin_mp_col
+----                                                          END||' >= '||l_rec_ngq.ngq_begin_mp);
+--            -- Task 0110467
+--            -- Don't include line items which just butt upto the end / start
+--              append_both (p_ngqt_index,'        AND   '||l_begin_mp_col||' < '||l_rec_ngq.ngq_end_mp);
 --              append_both (p_ngqt_index,'        AND   '||CASE WHEN l_rec_nit.nit_lr_end_chain IS NOT NULL 
 --                                                            THEN l_end_mp_col
 --                                                            ELSE l_begin_mp_col
---                                                          END||' >= '||l_rec_ngq.ngq_begin_mp);
-            -- Task 0110467
-            -- Don't include line items which just butt upto the end / start
-              append_both (p_ngqt_index,'        AND   '||l_begin_mp_col||' < '||l_rec_ngq.ngq_end_mp);
-              append_both (p_ngqt_index,'        AND   '||CASE WHEN l_rec_nit.nit_lr_end_chain IS NOT NULL 
-                                                            THEN l_end_mp_col
-                                                            ELSE l_begin_mp_col
-                                                          END||' > '||l_rec_ngq.ngq_begin_mp);
-            END IF;
-          END IF;
-        END IF;
-        
-        build_flexible_where (l_rec_ngqt, p_ngqt_index);
-        
-        /***********************************************************************
-          Code for filtering on any Group data immediatly above the datum leve
-          that shares the same datums. This helps identify assets where the
-          ROI has been passed in as a Street (for example) and the assets are
-          located on Sections - same datums, but differnt groups
-        ***********************************************************************/
-       append_list (p_ngqt_index,'     UNION ');
-       append_list (p_ngqt_index,'       SELECT '||g_package_name||'.get_g_ngqi_job_id ngqi_job_id');
-       append_list (p_ngqt_index,'             ,'||nm3flx.string(l_rec_ngqt.ngqt_item_type_type)||' ngqi_item_type_type');
-       append_list (p_ngqt_index,'             ,'||nm3flx.string(l_rec_ngqt.ngqt_item_type)||' ngqi_item_type');
-       append_list (p_ngqt_index,'             ,'||l_item_pk_col||' ngqi_item_id');
-  --  --
-  --     IF  g_area_based_query
-  --      OR g_roi_restricted_item_query
-  --      THEN
-        append_both (p_ngqt_index,'        FROM  '||l_tables||', nm_nw_temp_extents nte , nm_members ex');
-        --
-        -- Task 0110799
-        -- Hard bind the job_id to stop it being looked up on execution time which causes a performance issue by
-        -- forcing the use of the wrong index on some configurations.
-        --
-        --append_both (p_ngqt_index,'       WHERE  nte.nte_job_id = '||g_package_name||'.get_g_nte_job_id');
-        append_both (p_ngqt_index,'       WHERE  nte.nte_job_id = '||NVL(nm3gaz_qry.get_g_nte_job_id,-1));
-     --
-        IF l_rec_nit.nit_table_name IS NULL
-         THEN
-           -- This is standard - i.e. NOT FT inventory
-           append_both (p_ngqt_index,'        AND   '||c_table_alias||'.iit_ne_id = nm.nm_ne_id_in');
-           append_both (p_ngqt_index,'        AND    nm.nm_type = '||nm3flx.string('I')||' AND nm.nm_obj_type = '||nm3flx.string(l_rec_ngqt.ngqt_item_type));
-           append_both (p_ngqt_index,'        AND   '||c_table_alias||'.iit_inv_type||Null = '||nm3flx.string(l_rec_ngqt.ngqt_item_type)); -- Suppress index
-        END IF;
-     --
-        --append_both (p_ngqt_index,'        AND   '||l_ne_id_col||' = nte.nte_ne_id_of /*gj*/');
-          append_both (p_ngqt_index,'        AND   ex.nm_ne_id_of = nte_ne_id_of||null' );
-          append_both (p_ngqt_index,'        AND   '||l_ne_id_col ||' = ex.nm_ne_id_in');
-          append_both (p_ngqt_index,'        AND   ex.nm_type = ''G''');
-  --
-      -- Task 0109984/0111431/0111432
-      -- Don't attempt to use the chainage columns if they are not set on the metamodel
-      --
-        IF ( l_rec_nit.nit_table_name IS NOT NULL AND l_rec_nit.nit_lr_st_chain IS NOT NULL )
-          OR ( l_rec_nit.nit_table_name IS NULL AND l_begin_mp_col IS NOT NULL )
-        THEN
-          IF g_tab_is_point_inv(p_ngqt_index)
-          THEN
-             append_both (p_ngqt_index,'        AND   '||l_begin_mp_col||' BETWEEN ex.nm_slk AND ex.nm_end_slk');
-           ELSE
---             append_both (p_ngqt_index,'        AND   '||l_begin_mp_col||' <= ex.nm_end_slk');
+--                                                          END||' > '||l_rec_ngq.ngq_begin_mp);
+--            END IF;
+--          END IF;
+--        END IF;
+--        
+--        build_flexible_where (l_rec_ngqt, p_ngqt_index);
+--        
+--        /***********************************************************************
+--          Code for filtering on any Group data immediatly above the datum leve
+--          that shares the same datums. This helps identify assets where the
+--          ROI has been passed in as a Street (for example) and the assets are
+--          located on Sections - same datums, but differnt groups
+--        ***********************************************************************/
+--       append_list (p_ngqt_index,'     UNION ');
+--       append_list (p_ngqt_index,'       SELECT '||g_package_name||'.get_g_ngqi_job_id ngqi_job_id');
+--       append_list (p_ngqt_index,'             ,'||nm3flx.string(l_rec_ngqt.ngqt_item_type_type)||' ngqi_item_type_type');
+--       append_list (p_ngqt_index,'             ,'||nm3flx.string(l_rec_ngqt.ngqt_item_type)||' ngqi_item_type');
+--       append_list (p_ngqt_index,'             ,'||l_item_pk_col||' ngqi_item_id');
+--  --  --
+--  --     IF  g_area_based_query
+--  --      OR g_roi_restricted_item_query
+--  --      THEN
+--        append_both (p_ngqt_index,'        FROM  '||l_tables||', nm_nw_temp_extents nte , nm_members ex');
+--        --
+--        -- Task 0110799
+--        -- Hard bind the job_id to stop it being looked up on execution time which causes a performance issue by
+--        -- forcing the use of the wrong index on some configurations.
+--        --
+--        --append_both (p_ngqt_index,'       WHERE  nte.nte_job_id = '||g_package_name||'.get_g_nte_job_id');
+--        append_both (p_ngqt_index,'       WHERE  nte.nte_job_id = '||NVL(nm3gaz_qry.get_g_nte_job_id,-1));
+--     --
+--        IF l_rec_nit.nit_table_name IS NULL
+--         THEN
+--           -- This is standard - i.e. NOT FT inventory
+--           append_both (p_ngqt_index,'        AND   '||c_table_alias||'.iit_ne_id = nm.nm_ne_id_in');
+--           append_both (p_ngqt_index,'        AND    nm.nm_type = '||nm3flx.string('I')||' AND nm.nm_obj_type = '||nm3flx.string(l_rec_ngqt.ngqt_item_type));
+--           append_both (p_ngqt_index,'        AND   '||c_table_alias||'.iit_inv_type||Null = '||nm3flx.string(l_rec_ngqt.ngqt_item_type)); -- Suppress index
+--        END IF;
+--     --
+--        --append_both (p_ngqt_index,'        AND   '||l_ne_id_col||' = nte.nte_ne_id_of /*gj*/');
+--          append_both (p_ngqt_index,'        AND   ex.nm_ne_id_of = nte_ne_id_of||null' );
+--          append_both (p_ngqt_index,'        AND   '||l_ne_id_col ||' = ex.nm_ne_id_in');
+--          append_both (p_ngqt_index,'        AND   ex.nm_type = ''G''');
+--  --
+--      -- Task 0109984/0111431/0111432
+--      -- Don't attempt to use the chainage columns if they are not set on the metamodel
+--      --
+--        IF ( l_rec_nit.nit_table_name IS NOT NULL AND l_rec_nit.nit_lr_st_chain IS NOT NULL )
+--          OR ( l_rec_nit.nit_table_name IS NULL AND l_begin_mp_col IS NOT NULL )
+--        THEN
+--          IF g_tab_is_point_inv(p_ngqt_index)
+--          THEN
+--             append_both (p_ngqt_index,'        AND   '||l_begin_mp_col||' BETWEEN ex.nm_slk AND ex.nm_end_slk');
+--           ELSE
+----             append_both (p_ngqt_index,'        AND   '||l_begin_mp_col||' <= ex.nm_end_slk');
+----             append_both (p_ngqt_index,'        AND   '||CASE WHEN l_rec_nit.nit_lr_end_chain IS NOT NULL 
+----                                                           THEN l_end_mp_col
+----                                                           ELSE l_begin_mp_col
+----                                                         END||' >= ex.nm_slk');
+--            -- Task 0110467
+--            -- Don't include line items which just butt upto the end / start
+--             append_both (p_ngqt_index,'        AND   '||l_begin_mp_col||' < ex.nm_end_slk');
 --             append_both (p_ngqt_index,'        AND   '||CASE WHEN l_rec_nit.nit_lr_end_chain IS NOT NULL 
 --                                                           THEN l_end_mp_col
 --                                                           ELSE l_begin_mp_col
---                                                         END||' >= ex.nm_slk');
-            -- Task 0110467
-            -- Don't include line items which just butt upto the end / start
-             append_both (p_ngqt_index,'        AND   '||l_begin_mp_col||' < ex.nm_end_slk');
-             append_both (p_ngqt_index,'        AND   '||CASE WHEN l_rec_nit.nit_lr_end_chain IS NOT NULL 
-                                                           THEN l_end_mp_col
-                                                           ELSE l_begin_mp_col
-                                                         END||' > ex.nm_slk');
-          END IF;
-      -- nm_gaz_query
-          IF  l_rec_ngq.ngq_begin_mp IS NOT NULL
-          AND l_rec_ngq.ngq_end_mp   IS NOT NULL
-          THEN
-            IF g_tab_is_point_inv(p_ngqt_index)
-            THEN
-              append_both (p_ngqt_index,'        AND   '||l_begin_mp_col||' BETWEEN '||l_rec_ngq.ngq_begin_mp||' and '||l_rec_ngq.ngq_end_mp );
-            ELSE
---              append_both (p_ngqt_index,'        AND   '||l_begin_mp_col||' <= '||l_rec_ngq.ngq_end_mp);
+--                                                         END||' > ex.nm_slk');
+--          END IF;
+--      -- nm_gaz_query
+--          IF  l_rec_ngq.ngq_begin_mp IS NOT NULL
+--          AND l_rec_ngq.ngq_end_mp   IS NOT NULL
+--          THEN
+--            IF g_tab_is_point_inv(p_ngqt_index)
+--            THEN
+--              append_both (p_ngqt_index,'        AND   '||l_begin_mp_col||' BETWEEN '||l_rec_ngq.ngq_begin_mp||' and '||l_rec_ngq.ngq_end_mp );
+--            ELSE
+----              append_both (p_ngqt_index,'        AND   '||l_begin_mp_col||' <= '||l_rec_ngq.ngq_end_mp);
+----              append_both (p_ngqt_index,'        AND   '||CASE WHEN l_rec_nit.nit_lr_end_chain IS NOT NULL 
+----                                                            THEN l_end_mp_col
+----                                                            ELSE l_begin_mp_col
+----                                                          END||' >= '||l_rec_ngq.ngq_begin_mp);
+--            -- Task 0110467
+--            -- Don't include line items which just butt upto the end / start
+--              append_both (p_ngqt_index,'        AND   '||l_begin_mp_col||' < '||l_rec_ngq.ngq_end_mp);
 --              append_both (p_ngqt_index,'        AND   '||CASE WHEN l_rec_nit.nit_lr_end_chain IS NOT NULL 
 --                                                            THEN l_end_mp_col
 --                                                            ELSE l_begin_mp_col
---                                                          END||' >= '||l_rec_ngq.ngq_begin_mp);
-            -- Task 0110467
-            -- Don't include line items which just butt upto the end / start
-              append_both (p_ngqt_index,'        AND   '||l_begin_mp_col||' < '||l_rec_ngq.ngq_end_mp);
-              append_both (p_ngqt_index,'        AND   '||CASE WHEN l_rec_nit.nit_lr_end_chain IS NOT NULL 
-                                                            THEN l_end_mp_col
-                                                            ELSE l_begin_mp_col
-                                                          END||' > '||l_rec_ngq.ngq_begin_mp);
-            END IF;
-          END IF;
-        END IF;
-      --
-        build_flexible_where (l_rec_ngqt, p_ngqt_index);
-      --
-      END IF;
-   --
+--                                                          END||' > '||l_rec_ngq.ngq_begin_mp);
+--            END IF;
+--          END IF;
+--        END IF;
+--      --
+--        build_flexible_where (l_rec_ngqt, p_ngqt_index);
+--      --
+--      END IF;
+--   --
+--
+-- RAC - comment to here
     /*<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
                                     ABERLOUR END
     <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
