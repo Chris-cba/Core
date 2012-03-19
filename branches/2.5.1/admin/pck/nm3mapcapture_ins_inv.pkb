@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY nm3mapcapture_ins_inv AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mapcapture_ins_inv.pkb-arc   2.5.1.0   Feb 24 2012 10:09:24   Rob.Coupe  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mapcapture_ins_inv.pkb-arc   2.5.1.1   Mar 19 2012 13:09:36   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3mapcapture_ins_inv.pkb  $
---       Date into PVCS   : $Date:   Feb 24 2012 10:09:24  $
---       Date fetched Out : $Modtime:   Feb 24 2012 09:56:16  $
---       Version          : $Revision:   2.5.1.0  $
+--       Date into PVCS   : $Date:   Mar 19 2012 13:09:36  $
+--       Date fetched Out : $Modtime:   Mar 19 2012 13:08:44  $
+--       Version          : $Revision:   2.5.1.1  $
 --       Based on SCCS version : 1.15
 -------------------------------------------------------------------------
 --   Author : Darren Cope
@@ -21,7 +21,7 @@ CREATE OR REPLACE PACKAGE BODY nm3mapcapture_ins_inv AS
 --all global package variables here
 --
    --g_body_sccsid     CONSTANT  varchar2(2000) := '"@(#)nm3mapcapture_ins_inv.pkb	1.15 09/09/05"';
-   g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.5.1.0  $';
+   g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.5.1.1  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3mapcapture_ins_inv';
@@ -683,6 +683,13 @@ PROCEDURE ins_inv (p_inv_rec IN nm_ld_mc_all_inv_tmp%ROWTYPE) IS
 BEGIN
    nm_debug.proc_start(p_package_name   => g_package_name
                       ,p_procedure_name => 'ins_inv');   
+  --
+  -- RC> Task 0111859 - the CSV loader using the same API as the batch loader needs to be set to say that this is a mapcapture run
+  --     In this way, triggers and other APIS will not try to repeat the handling of subordinate data.
+
+  nm3mapcapture_ins_inv.l_mapcap_run := 'Y';
+
+  -- RC> End of task 0111859 although exceptions and other processes must ensure the flag is set back  
   
   -- set the items survey date to be the effective date
   nm3user.set_effective_date(l_effective_date);
@@ -964,7 +971,7 @@ BEGIN
                    nm3ins.ins_iit_all (l_iit_rec);
                 EXCEPTION
                 WHEN OTHERS 
-                THEN
+                THEN				
                     nm_debug.debug('Error While loading Mandatory Child records '||SQLERRM||' Primary Key - '||l_iit_rec.iit_primary_key||' Start Date '||l_iit_rec.iit_start_date) ;   
                     Raise ;        
                 END ;
@@ -1016,7 +1023,7 @@ BEGIN
                           nm3ins.ins_iit_all (l_iit_rec);
                        EXCEPTION
                        WHEN OTHERS 
-                       THEN
+                       THEN					   
                            nm_debug.debug('Error While loading Mandatory Child records '||SQLERRM||' Primary Key - '||l_iit_rec.iit_primary_key||' Start Date '||l_iit_rec.iit_start_date) ;   
                            Raise ;        
                        END ;
@@ -1067,6 +1074,8 @@ BEGIN
                    ,p_record_no => p_inv_rec.record_no);
 
   nm3user.set_effective_date(c_eff_date);
+  nm3mapcapture_ins_inv.l_mapcap_run := 'N';
+  
   nm_debug.proc_end(p_package_name   => g_package_name
                    ,p_procedure_name => 'ins_inv');
 --
@@ -1076,6 +1085,7 @@ EXCEPTION
                         ,p_record_no => p_inv_rec.record_no);
 
     nm3user.set_effective_date(c_eff_date);
+    nm3mapcapture_ins_inv.l_mapcap_run := 'N';
     RAISE_APPLICATION_ERROR(-20000, hig.raise_and_catch_ner(pi_appl => nm3type.c_hig
                                                            ,pi_id   => 208));
     
@@ -1083,6 +1093,7 @@ EXCEPTION
     general_batch_error(p_batch_no  => p_inv_rec.batch_no
                        ,p_record_no => p_inv_rec.record_no);
 
+    nm3mapcapture_ins_inv.l_mapcap_run := 'N';
     nm3user.set_effective_date(c_eff_date);
     RAISE; 
 END ins_inv;
