@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3homo AS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3homo.pkb-arc   2.20   Feb 27 2012 11:38:54   Rob.Coupe  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3homo.pkb-arc   2.21   Mar 19 2012 16:03:56   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3homo.pkb  $
---       Date into PVCS   : $Date:   Feb 27 2012 11:38:54  $
---       Date fetched Out : $Modtime:   Feb 27 2012 11:33:56  $
---       PVCS Version     : $Revision:   2.20  $
+--       Date into PVCS   : $Date:   Mar 19 2012 16:03:56  $
+--       Date fetched Out : $Modtime:   Mar 19 2012 16:02:06  $
+--       PVCS Version     : $Revision:   2.21  $
 --
 --
 --   Author : Jonathan Mills
@@ -40,7 +40,7 @@ CREATE OR REPLACE PACKAGE BODY nm3homo AS
    
    -- Log 713421
    
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.20  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.21  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3homo';
@@ -4374,28 +4374,32 @@ BEGIN
    l_par_iit_tab(l_par_iit_tab.count+1) := l_rec ;   -- Log 713421
    IF has_children (p_ne_id)
     THEN
-      FOR cs_rec IN (SELECT iit.iit_ne_id
-                           ,iit.iit_admin_unit
-                           ,iit.iit_inv_type
-                           ,itg_relation
-                           ,nin_loc_mandatory             -- LOG 713421
-                           ,iit_p.iit_inv_type parent_obj -- LOG 713421
-                           ,itg_mandatory                 -- LOG 713421
-                      FROM  NM_INV_ITEMS iit
-                           ,NM_INV_ITEMS iit_p
-                           ,NM_INV_TYPE_GROUPINGS
-                           ,NM_INV_ITEM_GROUPINGS
-                           ,nm_inv_nw   nin    -- LOG 713421         
-                     WHERE  iit.iit_ne_id IN (SELECT iig_item_id
-                                               FROM  NM_INV_ITEM_GROUPINGS
-                                              START WITH iig_parent_id = p_ne_id
-                                              CONNECT BY iig_parent_id = PRIOR iig_item_id
-                                             )
-                      AND   iig_parent_id      = iit_p.iit_ne_id
-                      AND   iig_item_id        = iit.iit_ne_id
-                      AND   iit.iit_inv_type   = itg_inv_type
-                      AND   iit_p.iit_inv_type = itg_parent_inv_type
-                      AND   iit.iit_inv_type   = nin_nit_inv_code(+)  -- LOG 713421
+      FOR cs_rec IN (  with items as ( SELECT iig_item_id
+                                       FROM NM_INV_ITEM_GROUPINGS
+                                       START WITH iig_parent_id = p_ne_id
+                                       CONNECT BY iig_parent_id = PRIOR iig_item_id)
+                       SELECT /*+INDEX(iit,INV_ITEMS_ALL_PK) */
+                           iit.iit_ne_id,
+                           iit.iit_admin_unit,
+                           iit.iit_inv_type,
+                           itg_relation,
+                           nin_loc_mandatory,
+                           iit_p.iit_inv_type parent_obj,
+                           itg_mandatory 
+                         FROM NM_INV_ITEMS iit,
+                              NM_INV_ITEMS iit_p,
+                              NM_INV_TYPE_GROUPINGS itg,
+--                            NM_INV_ITEM_GROUPINGS iig,
+                              nm_inv_nw nin, items
+                        WHERE     iit.iit_ne_id      = items.iig_item_id   
+
+
+--                              AND iig_parent_id      = iit_p.iit_ne_id
+--                              AND iig.iig_item_id    = iit.iit_ne_id
+                              AND iit.iit_inv_type   = itg_inv_type
+                              AND iit_p.iit_ne_id = p_ne_id
+                              AND iit_p.iit_inv_type = itg_parent_inv_type
+                              AND iit.iit_inv_type   = nin_nit_inv_code(+)
                       FOR UPDATE OF iit.iit_ne_id NOWAIT
                     ) -- Get details of all the inv which is located lower in the hierarchy
        LOOP
