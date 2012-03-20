@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm3gaz_qry AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3gaz_qry.pkb-arc   2.3.1.1   Jul 28 2011 13:45:04   steve.cooper  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3gaz_qry.pkb-arc   2.3.1.2   Mar 20 2012 17:59:22   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3gaz_qry.pkb  $
---       Date into PVCS   : $Date:   Jul 28 2011 13:45:04  $
---       Date fetched Out : $Modtime:   Jul 28 2011 13:44:10  $
---       Version          : $Revision:   2.3.1.1  $
+--       Date into PVCS   : $Date:   Mar 20 2012 17:59:22  $
+--       Date fetched Out : $Modtime:   Mar 20 2012 17:58:20  $
+--       Version          : $Revision:   2.3.1.2  $
 --       Based on SCCS version : 1.45
 -------------------------------------------------------------------------
 --   Author : Jonathan Mills
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3gaz_qry AS
 --all global package variables here
 --
    --g_body_sccsid     CONSTANT  varchar2(2000) := '"@(#)nm3gaz_qry.pkb	1.45 05/26/06"';
-   g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.3.1.1  $';
+   g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.3.1.2  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3gaz_qry';
@@ -335,6 +335,9 @@ BEGIN
    --
    
        -- perform all of the inv based deletes
+	   --RC> Task 0111807 - same as 0111053 - added extra line to validate query.
+      validate_query (pi_ngq_id);
+	   
       perform_inv_temp_ne_creation;
 	  
       --
