@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY nm3invval IS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3invval.pkb-arc   2.13   May 19 2011 12:07:08   Steve.Cooper  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3invval.pkb-arc   2.14   Mar 20 2012 09:33:22   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3invval.pkb  $
---       Date into PVCS   : $Date:   May 19 2011 12:07:08  $
---       Date fetched Out : $Modtime:   May 19 2011 09:36:26  $
---       Version          : $Revision:   2.13  $
+--       Date into PVCS   : $Date:   Mar 20 2012 09:33:22  $
+--       Date fetched Out : $Modtime:   Mar 19 2012 17:38:54  $
+--       Version          : $Revision:   2.14  $
 --       Based on SCCS version : 1.30
 -------------------------------------------------------------------------
 --
@@ -19,7 +19,7 @@ CREATE OR REPLACE PACKAGE BODY nm3invval IS
 --	Copyright (c) exor corporation ltd, 2000
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.13  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.14  $"';
 --  g_body_sccsid is the SCCS ID for the package body
    g_package_name    CONSTANT  varchar2(30)   := 'nm3invval';
 --
@@ -419,6 +419,9 @@ PROCEDURE process_insert_for_child (pi_rec_nii rec_nii) IS
 --
    l_rec_iig    nm_inv_item_groupings%ROWTYPE;
 
+   l_nit        nm_inv_types%rowtype;
+   l_parent_nit nm_inv_types%rowtype;
+   
    --Log 697651:LS:21/04/09
    --Added this check to stop creation of duplicate Child if It is Exclusive and relationship is AT
    FUNCTION does_relation_exist (p_inv_type IN VARCHAR2
@@ -496,10 +499,13 @@ BEGIN
    CLOSE cs_get_parent;
    --
    --Log 697651:LS:21/04/09
+   l_parent_nit := nm3get.get_nit(nm3get.get_iit(l_rec_parent.iit_ne_id).iit_inv_type);
+   l_nit        := nm3get.get_nit(pi_rec_nii.inv_type);
+   
    IF   does_relation_exist(pi_rec_nii.inv_type,c_at_relation)
    AND  has_parent (l_rec_parent.iit_ne_id,pi_rec_nii.inv_type,nm3get.get_iit(pi_rec_nii.ne_id).iit_x_sect)
-   AND  nm3get.get_nit(nm3get.get_iit(l_rec_parent.iit_ne_id).iit_inv_type).nit_exclusive = 'Y'
-
+   AND  l_nit.nit_exclusive = 'Y' 
+   AND  l_parent_nit.nit_exclusive = 'Y' 
    -- AE
    -- Task 0108660 / ECDM Log 722948
    -- Allow more than one Child asset to be located with a mandatory AT relationship
@@ -536,6 +542,13 @@ BEGIN
                     );
    END IF;
    --
+   IF does_relation_exist(pi_rec_nii.inv_type,c_at_relation) and l_nit.nit_use_xy = 'Y' and l_parent_nit.nit_use_xy = 'Y' 
+    THEN
+      update nm_inv_items
+      set iit_x = l_rec_parent.iit_x,
+          iit_y = l_rec_parent.iit_y
+      where iit_ne_id = pi_rec_nii.ne_id;
+   END IF;
    -- Create the NM_INV_ITEM_GROUPINGS record
    --
    l_rec_iig.iig_top_id     := get_iig_top_id (l_rec_parent.iit_ne_id);
