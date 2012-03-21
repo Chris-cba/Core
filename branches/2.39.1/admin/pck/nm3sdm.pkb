@@ -5,11 +5,11 @@ AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.39.1.3   Feb 17 2012 10:51:38   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.39.1.4   Mar 21 2012 16:32:04   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3sdm.pkb  $
---       Date into PVCS   : $Date:   Feb 17 2012 10:51:38  $
---       Date fetched Out : $Modtime:   Feb 17 2012 10:50:02  $
---       PVCS Version     : $Revision:   2.39.1.3  $
+--       Date into PVCS   : $Date:   Mar 21 2012 16:32:04  $
+--       Date fetched Out : $Modtime:   Mar 21 2012 16:29:38  $
+--       PVCS Version     : $Revision:   2.39.1.4  $
 --
 --   Author : R.A. Coupe
 --
@@ -21,7 +21,7 @@ AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT VARCHAR2 (2000) := '"$Revision:   2.39.1.3  $"';
+   g_body_sccsid     CONSTANT VARCHAR2 (2000) := '"$Revision:   2.39.1.4  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT VARCHAR2 (30)   := 'NM3SDM';
@@ -5751,290 +5751,494 @@ end;
 --
 ---------------------------------------------------------------------------------------------------
 --
-   PROCEDURE reshape_route (
-      pi_ne_id            IN   nm_elements.ne_id%TYPE,
-      pi_effective_date   IN   DATE,
-      pi_use_history      IN   VARCHAR2
-   )
-   IS
-      CURSOR c_route_tab (c_ne_id IN nm_elements.ne_id%TYPE)
-      IS
-         SELECT nth_theme_id, nth_feature_table, nth_feature_pk_column,
-                nth_feature_fk_column, nth_feature_shape_column
-      FROM NM_THEMES_ALL,
-                NM_NW_THEMES,
-                user_tables,
-                NM_LINEAR_TYPES,
-                NM_ELEMENTS_ALL
-          WHERE nth_theme_id = nnth_nth_theme_id
-            AND table_name = nth_feature_table
-            AND nnth_nlt_id = nlt_id
-            AND nlt_gty_type = ne_gty_group_type
-            AND nlt_nt_type = ne_nt_type
-            AND ne_id = c_ne_id;
+Procedure Reshape_Route (
+                        pi_Ne_Id            In   Nm_Elements.Ne_Id%Type,
+                        pi_Effective_Date   In   Date,
+                        pi_Use_History      In   Varchar2
+                        )
+Is
+  l_Nlt_Id     Nm_Linear_Types.Nlt_Id%Type;
+  l_Nlt        Nm_Linear_Types%Rowtype;
+  Cur_String   Varchar2 (2000);
+  l_Base_Nth   Nm_Themes_All%Rowtype;
+  l_Count      Number;
+  l_Shape      Mdsys.Sdo_Geometry;
+  l_Next       Number;
+  l_Date       Date;
 
-      l_nlt_id     NM_LINEAR_TYPES.nlt_id%TYPE;
-      l_nlt        NM_LINEAR_TYPES%ROWTYPE;
-      cur_string   VARCHAR2 (2000);
-      l_base_nth   NM_THEMES_ALL%ROWTYPE;
-      l_count      NUMBER;
-      l_shape      MDSYS.SDO_GEOMETRY;
-      l_next       NUMBER;
-      l_date       DATE;
+  --------------------
+  Function Get_Shape_Start_Date (
+                                p_Table    In   Varchar2,
+                                p_Column   In   Varchar2,
+                                p_Value    In   Number
+                                ) Return Date
+  Is
+    Retval   Date;
+  Begin
+    Begin
+      Execute Immediate    'select start_date from '
+                       || p_Table
+                       || ' where '
+                       || p_Column
+                       || ' = :ne_id '
+                       || ' and end_date is null'
+      Into  Retval
+      Using p_Value;
 
---------------------
-      FUNCTION get_shape_start_date (
-         p_table    IN   VARCHAR2,
-         p_column   IN   VARCHAR2,
-         p_value    IN   NUMBER
-      )
-         RETURN DATE
-      IS
-         retval   DATE;
-      BEGIN
-         EXECUTE IMMEDIATE    'select start_date from '
-                           || p_table
-                           || ' where '
-                           || p_column
-                           || ' = :ne_id '
-                           || ' and end_date is null'
-                      INTO retval
-                     USING p_value;
+       Return Retval;
+    Exception
+      When No_Data_Found Then
+        Retval:=Null;
+    End;
+    Return(Retval);          
+  End Get_Shape_Start_Date;
+  --------------------
+  Procedure End_Shape (
+                      p_Table       In        Varchar2,
+                      p_Column      In        Varchar2,
+                      p_Value       In        Number,
+                      p_Effective   In        Date,
+                      p_Count           Out   Number
+                      )
+  Is
+  Begin
+    Execute Immediate    'update '
+                       || p_Table
+                       || ' set end_date = :effective '
+                       || ' where '
+                       || p_Column
+                       || ' = :ne_id'
+                       || ' and end_date is null'
+    Using p_Effective,
+          p_Value;
 
-         RETURN retval;
-      EXCEPTION
-         WHEN NO_DATA_FOUND
-         THEN
-            RETURN NULL;
-      END;
+     p_Count := Sql%Rowcount;
+  End End_Shape;
+  --------------------
+  Function Get_Next_Theme_Seq (
+                              p_Theme In Number
+                              ) Return Number
+  Is
+    Retval   Number;
+  Begin
+     Execute Immediate    'select '
+                       || Nm3Sdo.Get_Spatial_Seq (p_Theme)
+                       || '.nextval from dual'
+                  Into Retval;
+     Return Retval;
+  End Get_Next_Theme_Seq;
+  --------------------
+  Procedure Update_Shape (
+                         p_Table          In        Varchar2,
+                         p_Column         In        Varchar2,
+                         p_Value          In        Number,
+                         p_Shape_Column   In        Varchar2,
+                         p_Shape          In        Mdsys.Sdo_Geometry,
+                         p_Count              Out   Number
+  )
+  Is
+  Begin
+    Execute Immediate    'update '
+                     || p_Table
+                     || ' set '
+                     || p_Shape_Column
+                     || ' = :shape '
+                     || ' where '
+                     || p_Column
+                     || ' = :ne_id'
+                     || ' and end_date is null'
+    Using p_Shape, 
+          p_Value;
 
---------------------
-      PROCEDURE end_shape (
-         p_table       IN       VARCHAR2,
-         p_column      IN       VARCHAR2,
-         p_value       IN       NUMBER,
-         p_effective   IN       DATE,
-         p_count       OUT      NUMBER
-      )
-      IS
-      BEGIN
-         EXECUTE IMMEDIATE    'update '
-                           || p_table
-                           || ' set end_date = :effective '
-                           || ' where '
-                           || p_column
-                           || ' = :ne_id'
-                           || ' and end_date is null'
-                     USING p_effective, p_value;
+    p_Count := Sql%Rowcount;
+  End Update_Shape;
+  --------------------
+  Procedure Update_Shape_and_Date (
+                         p_Table          In        Varchar2,
+                         p_Column         In        Varchar2,
+                         p_Value          In        Number,
+                         p_Effective      In        Date,
+                         p_Shape_Column   In        Varchar2,
+                         p_Shape          In        Mdsys.Sdo_Geometry,
+                         p_Count              Out   Number
+  )
+  Is
+  l_date date;
+  Begin 
+  
+    p_Count := 0;
+   
+    Begin 
+      Execute Immediate 'select last_start from ( select first_value (start_date) over (order by start_date desc RANGE BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) last_start '||
+                        ' from '||p_Table||' where ne_id = :ne ) where rownum = 1 ' into l_date using p_Value;
+    Exception
+      When no_data_found then
+        l_date := null;  -- if no data then no update can be performed
+    End;
+    
+    if l_date is not null then
+    
+      Execute Immediate    'update '
+                       || p_Table
+                       || ' set '
+                       || p_Shape_Column
+                       || ' = :shape ,'
+                       || 'start_date = :effective,'
+                       || 'end_date   =  NULL '
+                       || ' where '
+                       || p_Column
+                       || ' = :ne_id'
+                       || ' and start_date = :st_date'
+      Using p_Shape, 
+            p_Effective,
+            p_Value,
+            l_date;
+            
 
-         p_count := SQL%ROWCOUNT;
-      END;
+      p_Count := Sql%Rowcount;
+    End If;
+  End Update_Shape_and_Date;
+  
+  Procedure Update_End_Date (
+                         p_Table          In        Varchar2,
+                         p_Column         In        Varchar2,
+                         p_Value          In        Number,
+                         p_Effective      In        Date,
+                         p_Shape_Column   In        Varchar2,
+                         p_Shape          In        Mdsys.Sdo_Geometry,
+                         p_Count              Out   Number
+  )
+  Is
+  l_date date;
+  Begin 
+  
+    p_Count := 0;
+   
+    Begin 
+      Execute Immediate 'select last_start from ( select first_value (start_date) over (order by start_date desc RANGE BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) last_start '||
+                        ' from '||p_Table||' where ne_id = :ne ) where rownum = 1 ' into l_date using p_Value;
+    Exception
+      When no_data_found then
+        l_date := null;  -- if no data then no update can be performed
+    End;
+    
+    if l_date is not null then
+    
+      Execute Immediate    'update '
+                       || p_Table
+                       || ' set end_date = :effective '
+                       || ' where '
+                       || p_Column
+                       || ' = :ne_id'
+                       || ' and start_date = :st_date'
+      Using p_Effective,
+            p_Value,
+            l_date;
+            
 
---------------------
-      FUNCTION get_next_theme_seq (p_theme IN NUMBER)
-         RETURN NUMBER
-      IS
-         retval   NUMBER;
-      BEGIN
-         EXECUTE IMMEDIATE    'select '
-                           || Nm3sdo.get_spatial_seq (p_theme)
-                           || '.nextval from dual'
-                      INTO retval;
+      p_Count := Sql%Rowcount;
+    End If;
+  End Update_End_Date;
+  
+  Procedure Delete_Shape  (
+                          p_Table    In       Varchar2,
+                          p_Column   In       Varchar2,
+                          p_Value    In       Number,
+                          p_Count       Out   Number
+                          )
+  Is
+  Begin
+    Execute Immediate    'delete from '
+                     || p_Table
+                     || ' where '
+                     || p_Column
+                     || ' = :ne_id'
+                     || ' and end_date is null'
+                 Using p_Value;
 
-         RETURN retval;
-      END;
+    p_Count := Sql%Rowcount;
+  End Delete_Shape;
+  --------------------
+  Procedure Delete_Extraneous_Shapes  (
+                          p_Table    In       Varchar2,
+                          p_Column   In       Varchar2,
+                          p_Value    In       Number,
+                          p_Date     In       Date,
+                          p_Count       Out   Number
+                          )
+  Is
+  Begin
+    Execute Immediate    'delete from '
+                     || p_Table
+                     || ' where '
+                     || p_Column
+                     || ' = :ne_id'
+                     || ' and start_date > :st_date '
+                 Using p_Value, p_Date;
 
---------------------
-      PROCEDURE update_shape (
-         p_table          IN       VARCHAR2,
-         p_column         IN       VARCHAR2,
-         p_value          IN       NUMBER,
-         p_shape_column   IN       VARCHAR2,
-         p_shape          IN       MDSYS.SDO_GEOMETRY,
-         p_count          OUT      NUMBER
-      )
-      IS
-      BEGIN
-         EXECUTE IMMEDIATE    'update '
-                           || p_table
-                           || ' set '
-                           || p_shape_column
-                           || ' = :shape '
-                           || ' where '
-                           || p_column
-                           || ' = :ne_id'
-                           || ' and end_date is null'
-                     USING p_shape, p_value;
+    p_Count := Sql%Rowcount;
+  End Delete_Extraneous_Shapes;
+  --------------------
+  
+  Procedure Insert_Shape  (
+                          p_Table          In       Varchar2,
+                          p_Column         In       Varchar2,
+                          p_Value          In       Number,
+                          p_Shape_Column   In       Varchar2,
+                          p_Shape          In       Mdsys.Sdo_Geometry,
+                          p_Seq_No         In       Number,
+                          p_Effective      In       Date,
+                          p_Count             Out   Number
+                          )
+  Is
+  Begin
+     If Nm3Sdo.Use_Surrogate_Key = 'N'  Then
+        Execute Immediate    'insert into '
+                          || p_Table
+                          || '( '
+                          || p_Column
+                          || ','
+                          || p_Shape_Column
+                          || ','
+                          || 'start_date )'
+                          || ' values (:ne_id, :shape, :start_date) '
+        Using p_Value,
+              p_Shape,
+              p_Effective;
 
-         p_count := SQL%ROWCOUNT;
-      END;
+        p_Count := Sql%Rowcount;
+     Else
+      Execute Immediate    'insert into '
+                         || p_Table
+                         || '( objectid, '
+                         || p_Column
+                         || ','
+                         || p_Shape_Column
+                         || ','
+                         || 'start_date )'
+                         || ' values (:objectid, :ne_id, :shape, :start_date) '
+      Using   p_Seq_No,
+              p_Value,
+              p_Shape,
+              p_Effective;
 
---------------------
-      PROCEDURE delete_shape (
-         p_table    IN       VARCHAR2,
-         p_column   IN       VARCHAR2,
-         p_value    IN       NUMBER,
-         p_count    OUT      NUMBER
-      )
-      IS
-      BEGIN
-         EXECUTE IMMEDIATE    'delete from '
-                           || p_table
-                           || ' where '
-                           || p_column
-                           || ' = :ne_id'
-                           || ' and end_date is null'
-                     USING p_value;
+      p_Count := Sql%Rowcount;
+     End If;
+  End Insert_Shape;
+  ---------------------
+Begin
+  For Irec In (
+              Select  nta.Nth_Theme_Id,
+                      nta.Nth_Feature_Table,
+                      nta.Nth_Feature_Pk_Column,
+                      nta.Nth_Feature_Fk_Column,
+                      nta.Nth_Feature_Shape_Column
+              From    Nm_Themes_All     nta,
+                      Nm_Nw_Themes      nnt,
+                      User_Tables       ut,
+                      Nm_Linear_Types   nlt,
+                      Nm_Elements_All   nea
+              Where   nta.Nth_Theme_Id  =   nnt.Nnth_Nth_Theme_Id
+              And     ut.Table_Name     =   nta.Nth_Feature_Table
+              And     nnt.Nnth_Nlt_Id   =   nlt.Nlt_Id
+              And     nlt.Nlt_Gty_Type  =   nea.Ne_Gty_Group_Type
+              And     nlt.Nlt_Nt_Type   =   nea.Ne_Nt_Type
+              And     nea.Ne_Id         =   pi_Ne_Id
+              )
+  Loop
+    
+    --only operate on base table data
+    
+    l_Shape := Nm3Sdo.Get_Route_Shape (pi_Ne_Id);
 
-         p_count := SQL%ROWCOUNT;
-      END;
-
---------------------
-      PROCEDURE insert_shape (
-         p_table          IN       VARCHAR2,
-         p_column         IN       VARCHAR2,
-         p_value          IN       NUMBER,
-         p_shape_column   IN       VARCHAR2,
-         p_shape          IN       MDSYS.SDO_GEOMETRY,
-         p_seq_no         IN       NUMBER,
-         p_effective      IN       DATE,
-         p_count          OUT      NUMBER
-      )
-      IS
-      BEGIN
-         IF Nm3sdo.use_surrogate_key = 'N'
-         THEN
-            EXECUTE IMMEDIATE    'insert into '
-                              || p_table
-                              || '( '
-                              || p_column
-                              || ','
-                              || p_shape_column
-                              || ','
-                              || 'start_date )'
-                              || ' values (:ne_id, :shape, :start_date) '
-                        USING p_value, p_shape, p_effective;
-
-            p_count := SQL%ROWCOUNT;
-         ELSE
-            EXECUTE IMMEDIATE    'insert into '
-                              || p_table
-                              || '( objectid, '
-                              || p_column
-                              || ','
-                              || p_shape_column
-                              || ','
-                              || 'start_date )'
-                              || ' values (:objectid, :ne_id, :shape, :start_date) '
-                        USING p_seq_no, p_value, p_shape, p_effective;
-
-            p_count := SQL%ROWCOUNT;
-         END IF;
-      END;
----------------------
-   BEGIN
---nm_debug.debug_on;
-      FOR irec IN c_route_tab (pi_ne_id)
-      LOOP
---  only operate on base table data
-         l_shape := Nm3sdo.get_route_shape (pi_ne_id);
-
---  nm_debug.debug('Table - '||irec.nth_feature_table );
-         IF pi_use_history = 'Y'
-         THEN
---    nm_debug.debug('using history');
-
-            --    first check the start date of the current shape if one exists.
-            l_date :=
-               get_shape_start_date (irec.nth_feature_table,
-                                     irec.nth_feature_pk_column,
-                                     pi_ne_id
+      -- first check the start date of the current shape if one exists.
+    l_Date := Get_Shape_Start_Date (
+                                    Irec.Nth_Feature_Table,
+                                    Irec.Nth_Feature_Pk_Column,
+                                    pi_Ne_Id
                                     );
 
-            IF l_shape IS NOT NULL AND l_date = pi_effective_date
-            THEN
---      nm_debug.debug(' Not null shape and l_date is effective date');
---      this will violate the pk - we must update without history (sorry - no way past this)
-               update_shape (irec.nth_feature_table,
-                             irec.nth_feature_pk_column,
-                             pi_ne_id,
-                             irec.nth_feature_shape_column,
-                             l_shape,
-                             l_count
-                            );
-            ELSE
---      nm_debug.debug(' Either null shape or l_date is not effective date');
-               IF l_date IS NOT NULL
-               THEN
---        nm_debug.debug(' End shape');
-                  end_shape (irec.nth_feature_table,
-                             irec.nth_feature_pk_column,
-                             pi_ne_id,
-                             pi_effective_date,
-                             l_count
-                            );
-               END IF;
+    if l_shape is not null and l_date is not null then 
 
-               IF l_shape IS NOT NULL
-               THEN
---        nm_debug.debug('Creating new shape, if it is null then just end-date the old');
-                  IF Nm3sdo.use_surrogate_key = 'Y'
-                  THEN
-                     l_next := get_next_theme_seq (irec.nth_theme_id);
-                  END IF;
+      If L_Date = Pi_Effective_Date Then
 
-                  insert_shape (irec.nth_feature_table,
-                                irec.nth_feature_pk_column,
-                                pi_ne_id,
-                                irec.nth_feature_shape_column,
-                                l_shape,
-                                l_next,
-                                pi_effective_date,
-                                l_count
-                               );
-               END IF;
-            END IF;
-         ELSE
---    nm_debug.debug('Not using history');
-            IF l_shape IS NOT NULL
-            THEN
-               update_shape (irec.nth_feature_table,
-                             irec.nth_feature_pk_column,
-                             pi_ne_id,
-                             irec.nth_feature_shape_column,
-                             l_shape,
-                             l_count
-                            );
+        Update_Shape (Irec.Nth_Feature_Table,
+                      Irec.Nth_Feature_Pk_Column,
+                      pi_Ne_Id,
+                      Irec.Nth_Feature_Shape_Column,
+                      l_Shape,
+                      l_Count
+                    );
+                    
+      Elsif L_Date > Pi_Effective_Date Then
+--
+--     Test to see if these shapes are valid - if they are just frm some useless resequence from SM then we can trash them
+--      
+        declare 
+          l_last_date date; 
+        begin
+          select max(greatest(nm_start_date, nvl(nm_end_date, to_date('01-jan-1000', 'DD-MON-YYYY'))))
+          into l_last_date
+          from nm_members_all
+          where nm_ne_id_in =  pi_Ne_Id; 
+          
+--        nm_debug.debug('Max date of all members is '||l_last_date );
+          
+          if l_last_date >= l_date then      
+      
+--          nm_debug.debug('update shape and date');
+            
+            Update_shape_and_Date(
+                       Irec.Nth_Feature_Table,
+                       Irec.Nth_Feature_Pk_Column,
+                       pi_Ne_Id,
+                       l_last_date,
+                       Irec.Nth_Feature_Shape_Column,
+                       l_Shape,
+                       l_count );
+          Else
+          
+--          nm_debug.debug('deleting extraneous shapes' );
+            
+            Delete_Extraneous_Shapes (
+                       Irec.Nth_Feature_Table,
+                       Irec.Nth_Feature_Pk_Column,
+                       pi_Ne_Id,
+                       l_last_date,
+                       l_count );
 
-               IF l_count = 0
-               THEN
---        nm_debug.debug('Update no good - Creating new shape');
-                  IF Nm3sdo.use_surrogate_key = 'Y'
-                  THEN
-                     l_next := get_next_theme_seq (irec.nth_theme_id);
-                  END IF;
+--          nm_debug.debug('update shape and date 2');
+                    
+            Update_End_Date(
+                       Irec.Nth_Feature_Table,
+                       Irec.Nth_Feature_Pk_Column,
+                       pi_Ne_Id,
+                       l_last_date,
+                       Irec.Nth_Feature_Shape_Column,
+                       l_Shape,
+                       l_count );                       
+            
+            If Nm3Sdo.Use_Surrogate_Key = 'Y' Then
+              l_Next := Get_Next_Theme_Seq (Irec.Nth_Theme_Id);
+            End If;
 
-                  insert_shape (irec.nth_feature_table,
-                                irec.nth_feature_pk_column,
-                                pi_ne_id,
-                                irec.nth_feature_shape_column,
-                                l_shape,
-                                l_next,
-                                pi_effective_date,
-                                l_count
-                               );
-               END IF;
-            ELSE
---       nm_debug.debug('Delete shape');
-               delete_shape (irec.nth_feature_table,
-                             irec.nth_feature_pk_column,
-                             pi_ne_id,
-                             l_count
-                            );
-            END IF;                            -- null shape or not null shape
-         END IF;                                                    -- history
-      END LOOP;
-   END reshape_route;
+--          nm_debug.debug('Inserting new shape');   
+ 
+            Insert_Shape  (
+                      Irec.Nth_Feature_Table,
+                      Irec.Nth_Feature_Pk_Column,
+                      pi_Ne_Id,
+                      Irec.Nth_Feature_Shape_Column,
+                      l_Shape,
+                      l_Next,
+                      pi_Effective_Date,
+                      l_Count
+                      );
+          End If;  
+        End;      
+
+      Else
+       
+        -- existing date is less than effective date - check history flags                  
+      
+        If pi_Use_History = 'Y' Then
+        
+  --      nm_debug.debug('Ending existing shape');   
+          End_Shape (
+                    Irec.Nth_Feature_Table,
+                    Irec.Nth_Feature_Pk_Column,
+                    pi_Ne_Id,
+                    pi_Effective_Date,
+                    l_Count
+                    );
+          If Nm3Sdo.Use_Surrogate_Key = 'Y' Then
+            l_Next := Get_Next_Theme_Seq (Irec.Nth_Theme_Id);
+          End If;
+
+--        nm_debug.debug('Inserting new shape');   
+          Insert_Shape  (
+                        Irec.Nth_Feature_Table,
+                        Irec.Nth_Feature_Pk_Column,
+                        pi_Ne_Id,
+                        Irec.Nth_Feature_Shape_Column,
+                        l_Shape,
+                        l_Next,
+                        pi_Effective_Date,
+                        l_Count
+                        );
+--        nm_debug.debug('Inserted - count = '||l_count );                        
+        Else
+        
+--        nm_debug.debug('No history');   
+
+          -- Not using history but there is an existing shape to be swapped - just update
+          
+          Update_Shape (Irec.Nth_Feature_Table,
+                        Irec.Nth_Feature_Pk_Column,
+                        pi_Ne_Id,
+                        Irec.Nth_Feature_Shape_Column,
+                        l_Shape,
+                        l_Count
+                       );
+                                
+        End If;-- history
+      End If; -- dates
+      
+    Else  -- either existing date is null or new shape is null
+    
+--    nm_debug.debug('either existing date is null or new shape is null');
+      
+      If l_Shape Is Not Null  Then
+           Update_Shape (
+                        Irec.Nth_Feature_Table,
+                        Irec.Nth_Feature_Pk_Column,
+                        pi_Ne_Id,
+                        Irec.Nth_Feature_Shape_Column,
+                        l_Shape,
+                        l_Count
+                        );
+
+        If l_Count = 0  Then
+          If Nm3Sdo.Use_Surrogate_Key = 'Y' Then
+            l_Next := Get_Next_Theme_Seq (Irec.Nth_Theme_Id);
+          End If;
+
+--        nm_debug.debug('Inserting new shape');
+          Insert_Shape  (
+                        Irec.Nth_Feature_Table,
+                        Irec.Nth_Feature_Pk_Column,
+                        pi_Ne_Id,
+                        Irec.Nth_Feature_Shape_Column,
+                        l_Shape,
+                        l_Next,
+                        pi_Effective_Date,
+                        l_Count
+                        );
+        End If;
+      Else  -- existing date is not null but new shape is null
+--      nm_debug.debug(' existing date is not null but new shape is null');
+        
+        If pi_Use_History = 'Y' then
+          End_Shape (
+                    Irec.Nth_Feature_Table,
+                    Irec.Nth_Feature_Pk_Column,
+                    pi_Ne_Id,
+                    pi_Effective_Date,
+                    l_Count
+                    );
+        Else                
+          Delete_Shape (
+                      Irec.Nth_Feature_Table,
+                      Irec.Nth_Feature_Pk_Column,
+                      pi_Ne_Id,
+                      l_Count
+                      );
+        End If; -- new shape is null and existing shape exists
+      End If;
+    End If;  
+  End Loop;
+  nm_debug.debug_off;
+End Reshape_Route;
 
 --
 -----------------------------------------------------------------------------
@@ -7660,11 +7864,11 @@ end;
    */
    --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.39.1.3   Feb 17 2012 10:51:38   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.39.1.4   Mar 21 2012 16:32:04   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3sdm.pkb  $
---       Date into PVCS   : $Date:   Feb 17 2012 10:51:38  $
---       Date fetched Out : $Modtime:   Feb 17 2012 10:50:02  $
---       PVCS Version     : $Revision:   2.39.1.3  $
+--       Date into PVCS   : $Date:   Mar 21 2012 16:32:04  $
+--       Date fetched Out : $Modtime:   Mar 21 2012 16:29:38  $
+--       PVCS Version     : $Revision:   2.39.1.4  $
 
       append ('--   PVCS Identifiers :-');
       append ('--');
