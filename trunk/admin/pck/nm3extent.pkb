@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3extent IS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3extent.pkb-arc   2.5   Jul 28 2011 09:39:36   steve.cooper  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3extent.pkb-arc   2.6   Mar 26 2012 13:02:32   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3extent.pkb  $
---       Date into SCCS   : $Date:   Jul 28 2011 09:39:36  $
---       Date fetched Out : $Modtime:   Jul 28 2011 09:20:28  $
---       SCCS Version     : $Revision:   2.5  $
+--       Date into SCCS   : $Date:   Mar 26 2012 13:02:32  $
+--       Date fetched Out : $Modtime:   Mar 26 2012 12:58:48  $
+--       SCCS Version     : $Revision:   2.6  $
 --       Based on 
 --
 --
@@ -22,7 +22,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3extent IS
   g_package_name CONSTANT VARCHAR2(30) := 'nm3extent';
   --
   --g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"@(#)nm3extent.pkb	1.77 05/02/06"';
-  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.5  $';
+  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.6  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
   g_extent_exception EXCEPTION;
@@ -57,6 +57,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3extent IS
   --
   -----------------------------------------------------------------------------
   --
+  PROCEDURE nte_intx_nte(p_nte1           IN nm_nw_temp_extents.nte_job_id%type
+                        ,p_nte2           IN nm_nw_temp_extents.nte_job_id%type
+                        ,p_nte3           OUT nm_nw_temp_extents.nte_job_id%type
+                        ) ;
+-- 
   PROCEDURE nte_intx_nte(pi_smallest_nte   IN OUT NOCOPY tab_nte
                         ,pi_largest_nte    IN OUT NOCOPY tab_nte
                         ,po_nte_result     IN OUT NOCOPY tab_nte
@@ -3003,14 +3008,20 @@ PROCEDURE create_temp_ne_intx_of_temp_ne
                       ,pi_resultant_nte_job_id    OUT NM_NW_TEMP_EXTENTS.nte_job_id%TYPE
                       ) IS
 --
-   l_tab_a         tab_nte;
-   l_tab_b         tab_nte;
-   l_tab_a_intx_b  tab_nte;
+--   l_tab_a         tab_nte;
+--   l_tab_b         tab_nte;
+--   l_tab_a_intx_b  tab_nte;
 --
 BEGIN
  --
    Nm_Debug.proc_start (g_package_name,'create_temp_ne_intx_of_temp_ne');
  --
+ --RC Task 0111807 - this code is not ideal. The data in the existing extents is perfectly formed to allow a direct query to generate a resultant extent. 
+ --Original commented out until proper regression testing is completed. Perhaps there may be a reason why this is coded in this way but I can't see it.
+ --It is likely to result in poor performance as well.
+ --
+ 
+ /* Task 0111881
    l_tab_a := get_tab_nte (pi_nte_job_id_1);
    l_tab_b := get_tab_nte (pi_nte_job_id_2);
  --
@@ -3028,6 +3039,12 @@ BEGIN
    l_tab_b.DELETE ;
    l_tab_a_intx_b.DELETE ;
  --
+*/ -- end  Task 0111881
+
+   Nte_Intx_Nte(  p_nte1  => pi_nte_job_id_1
+                 ,p_nte2  => pi_nte_job_id_2
+                 ,p_nte3  => pi_resultant_nte_job_id ); 
+                  
    Nm_Debug.proc_end (g_package_name,'create_temp_ne_intx_of_temp_ne');
  --
 END create_temp_ne_intx_of_temp_ne;
@@ -4231,6 +4248,27 @@ EXCEPTION
   WHEN nothing_to_do THEN
     RETURN pi_nte_id;
 END remove_overlaps;
+--
+-- RC Task 0111811 - problem in the Nte_Intx_Nte procedure - it is not commutative - different results are created as
+-- the order of arguments changes. The original procedure exits but a new one has been created which operates directly on
+-- the extent and not the tab_nte arguments..
+--
+Procedure Nte_Intx_Nte( p_nte1 in nm_nw_temp_extents.nte_job_id%type, 
+                        p_nte2 in nm_nw_temp_extents.nte_job_id%type, 
+                        p_nte3 out nm_nw_temp_extents.nte_job_id%type ) is
+begin
+p_nte3 := Nm3net.get_next_nte_id;
+insert into nm_nw_temp_extents
+( nte_job_id, nte_ne_id_of, nte_begin_mp, nte_end_mp, nte_cardinality, nte_seq_no, nte_route_ne_id )
+select p_nte3, a.nte_ne_id_of, greatest( a.nte_begin_mp, b.nte_begin_mp ), least( a.nte_end_mp, b.nte_end_mp ), a.nte_cardinality, a.nte_seq_no, a.nte_route_ne_id
+from nm_nw_temp_extents a,  nm_nw_temp_extents b
+where a.nte_job_id = p_nte1
+and   b.nte_job_id = p_nte2
+and   a.nte_begin_mp <= b.nte_end_mp
+and   b.nte_begin_mp <= a.nte_end_mp
+and a.nte_ne_id_of = b.nte_ne_id_of;
+end;
+
 --
 -----------------------------------------------------------------------------
 -- This assumes that the smallest and largest NTE's have been set
