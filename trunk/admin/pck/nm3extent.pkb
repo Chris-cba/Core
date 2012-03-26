@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3extent IS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3extent.pkb-arc   2.6   Mar 26 2012 13:02:32   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3extent.pkb-arc   2.7   Mar 26 2012 17:55:42   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3extent.pkb  $
---       Date into SCCS   : $Date:   Mar 26 2012 13:02:32  $
---       Date fetched Out : $Modtime:   Mar 26 2012 12:58:48  $
---       SCCS Version     : $Revision:   2.6  $
+--       Date into SCCS   : $Date:   Mar 26 2012 17:55:42  $
+--       Date fetched Out : $Modtime:   Mar 26 2012 17:53:20  $
+--       SCCS Version     : $Revision:   2.7  $
 --       Based on 
 --
 --
@@ -22,7 +22,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3extent IS
   g_package_name CONSTANT VARCHAR2(30) := 'nm3extent';
   --
   --g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"@(#)nm3extent.pkb	1.77 05/02/06"';
-  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.6  $';
+  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.7  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
   g_extent_exception EXCEPTION;
@@ -4260,13 +4260,32 @@ begin
 p_nte3 := Nm3net.get_next_nte_id;
 insert into nm_nw_temp_extents
 ( nte_job_id, nte_ne_id_of, nte_begin_mp, nte_end_mp, nte_cardinality, nte_seq_no, nte_route_ne_id )
-select p_nte3, a.nte_ne_id_of, greatest( a.nte_begin_mp, b.nte_begin_mp ), least( a.nte_end_mp, b.nte_end_mp ), a.nte_cardinality, a.nte_seq_no, a.nte_route_ne_id
+select p_nte3, nte_ne_id_of, begin_mp, end_mp, nte_cardinality, nte_seq_no, nte_route_ne_id
+from (select nte_ne_id_of, begin_mp, end_mp, nte_cardinality, nte_seq_no, nte_route_ne_id, previous_begin, previous_end, previous_ne
+from (
+select a.*,
+lag( begin_mp, 1) over (partition by nte_ne_id_of order by nte_ne_id_of, begin_mp, end_mp  ) previous_begin,
+lag( end_mp, 1) over (partition by nte_ne_id_of order by nte_ne_id_of, begin_mp, end_mp  ) previous_end,
+lag( nte_ne_id_of, 1) over (partition by nte_ne_id_of order by nte_ne_id_of, begin_mp, end_mp ) previous_ne
+from (
+select distinct a.nte_ne_id_of, --a.nte_begin_mp a_begin, a.nte_end_mp a_end, b.nte_begin_mp b_begin,  b.nte_end_mp b_end,
+greatest( a.nte_begin_mp, b.nte_begin_mp ) begin_mp, least( a.nte_end_mp, b.nte_end_mp ) end_mp, a.nte_cardinality, a.nte_seq_no, a.nte_route_ne_id
 from nm_nw_temp_extents a,  nm_nw_temp_extents b
 where a.nte_job_id = p_nte1
 and   b.nte_job_id = p_nte2
+and   a.nte_ne_id_of = b.nte_ne_id_of
+and ( 
+   ( ( a.nte_begin_mp < a.nte_end_mp and b.nte_begin_mp < b.nte_end_mp ) 
+and   a.nte_begin_mp < b.nte_end_mp
+and   b.nte_begin_mp < a.nte_end_mp )
+or
+   ( ( a.nte_begin_mp = a.nte_end_mp or b.nte_begin_mp = b.nte_end_mp ) 
 and   a.nte_begin_mp <= b.nte_end_mp
-and   b.nte_begin_mp <= a.nte_end_mp
-and a.nte_ne_id_of = b.nte_ne_id_of;
+and   b.nte_begin_mp <= a.nte_end_mp )
+)
+) a 
+)
+where ( previous_begin > begin_mp or previous_end < end_mp ) or  previous_ne is null );
 end;
 
 --
