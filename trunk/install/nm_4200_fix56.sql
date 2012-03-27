@@ -2,11 +2,11 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm_4200_fix56.sql-arc   3.0   Mar 22 2012 10:25:00   Mike.Alexander  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm_4200_fix56.sql-arc   3.1   Mar 27 2012 09:38:00   Mike.Alexander  $
 --       Module Name      : $Workfile:   nm_4200_fix56.sql  $
---       Date into PVCS   : $Date:   Mar 22 2012 10:25:00  $
---       Date fetched Out : $Modtime:   Mar 22 2012 10:19:06  $
---       PVCS Version     : $Revision:   3.0  $
+--       Date into PVCS   : $Date:   Mar 27 2012 09:38:00  $
+--       Date fetched Out : $Modtime:   Mar 27 2012 09:32:00  $
+--       PVCS Version     : $Revision:   3.1  $
 --
 --------------------------------------------------------------------------------
 --   Copyright (c) 2012 Bentley Systems Incorporated
@@ -82,6 +82,15 @@ SET TERM OFF
 --
 SET FEEDBACK ON
 start nm3gaz_qry.pkw
+SET FEEDBACK OFF
+--
+--
+SET TERM ON 
+PROMPT nm3extent.pkw
+SET TERM OFF
+--
+SET FEEDBACK ON
+start nm3extent.pkw
 SET FEEDBACK OFF
 --
 --------------------------------------------------------------------------------
