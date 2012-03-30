@@ -2,11 +2,11 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm_4400_fix11.sql-arc   3.0   Mar 01 2012 10:50:50   Mike.Alexander  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm_4400_fix11.sql-arc   3.1   Mar 30 2012 11:07:40   Mike.Alexander  $
 --       Module Name      : $Workfile:   nm_4400_fix11.sql  $
---       Date into PVCS   : $Date:   Mar 01 2012 10:50:50  $
---       Date fetched Out : $Modtime:   Mar 01 2012 10:45:18  $
---       PVCS Version     : $Revision:   3.0  $
+--       Date into PVCS   : $Date:   Mar 30 2012 11:07:40  $
+--       Date fetched Out : $Modtime:   Mar 30 2012 11:01:44  $
+--       PVCS Version     : $Revision:   3.1  $
 --
 --------------------------------------------------------------------------------
 --   Copyright (c) 2012 Bentley Systems Incorporated.
@@ -31,7 +31,7 @@ set term on
 --
 -- Spool to Logfile
 --
-define logfile1='nm_4400_fix9_&log_extension'
+define logfile1='nm_4400_fix11_&log_extension'
 spool &logfile1
 --
 --------------------------------------------------------------------------------
@@ -108,6 +108,60 @@ SET TERM OFF
 --
 SET FEEDBACK ON
 start nm3api_inv.pkw
+SET FEEDBACK OFF
+--
+--
+SET TERM ON 
+PROMPT nm3extent.pkw
+SET TERM OFF
+--
+SET FEEDBACK ON
+start nm3extent.pkw
+SET FEEDBACK OFF
+--
+--
+SET TERM ON 
+PROMPT nm3invval.pkw
+SET TERM OFF
+--
+SET FEEDBACK ON
+start nm3invval.pkw
+SET FEEDBACK OFF
+--
+--
+SET TERM ON 
+PROMPT nm3rsc.pkw
+SET TERM OFF
+--
+SET FEEDBACK ON
+start nm3rsc.pkw
+SET FEEDBACK OFF
+--
+--
+SET TERM ON 
+PROMPT nm3sdm.pkw
+SET TERM OFF
+--
+SET FEEDBACK ON
+start nm3sdm.pkw
+SET FEEDBACK OFF
+--
+--
+SET TERM ON 
+PROMPT nm3sdo_edit.pkw
+SET TERM OFF
+--
+SET FEEDBACK ON
+start nm3sdo_edit.pkw
+SET FEEDBACK OFF
+--
+--
+SET TERM ON 
+PROMPT nm0575.pkw
+SET TERM OFF
+--
+SET FEEDBACK ON
+start nm0575.pkw
 SET FEEDBACK OFF
 --
 --------------------------------------------------------------------------------
