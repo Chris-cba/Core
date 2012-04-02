@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 --
 ---   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.67   Feb 17 2012 12:03:56   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.68   Apr 02 2012 18:03:50   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3sdo.pkb  $
---       Date into PVCS   : $Date:   Feb 17 2012 12:03:56  $
---       Date fetched Out : $Modtime:   Feb 17 2012 12:03:30  $
---       PVCS Version     : $Revision:   2.67  $
+--       Date into PVCS   : $Date:   Apr 02 2012 18:03:50  $
+--       Date fetched Out : $Modtime:   Apr 02 2012 18:02:20  $
+--       PVCS Version     : $Revision:   2.68  $
 --       Based on
 
 --
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 -- Copyright (c) RAC
 -----------------------------------------------------------------------------
 
-   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.67  $"';
+   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.68  $"';
    g_package_name    CONSTANT VARCHAR2 (30)  := 'NM3SDO';
    g_batch_size      INTEGER                 := NVL( TO_NUMBER(Hig.get_sysopt('SDOBATSIZE')), 10);
    g_clip_type       VARCHAR2(30)            := NVL(Hig.get_sysopt('SDOCLIPTYP'),'SDO');
@@ -10536,6 +10536,7 @@ order by 1
 select cast ( multiset( select mdsys.sdo_dim_element( to_char(row_num), lb, ub, tol) from sdo_data order by row_num) as mdsys.sdo_dim_array )
 from dual;
 
+l_lb number;
 
 BEGIN
 
@@ -10543,9 +10544,14 @@ BEGIN
   fetch c_dim into retval;
   close c_dim;
   
+  l_lb := retval(1).sdo_lb;
+  
   return retval; 
 
   EXCEPTION
+  WHEN NO_DATA_FOUND then
+    close c_dim;
+    raise_application_error ( -20001, 'No Network metadata available' );
   WHEN ex_3d_diminfo
   THEN
     hig.raise_ner(pi_appl => nm3type.c_net, pi_id => 468 );
