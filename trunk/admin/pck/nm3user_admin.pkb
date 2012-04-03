@@ -3,11 +3,11 @@ As
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3user_admin.pkb-arc   3.0   Oct 03 2011 09:36:44   Steve.Cooper  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3user_admin.pkb-arc   3.1   Apr 03 2012 13:23:46   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3user_admin.pkb  $
---       Date into PVCS   : $Date:   Oct 03 2011 09:36:44  $
---       Date fetched Out : $Modtime:   Sep 27 2011 13:20:54  $
---       Version          : $Revision:   3.0  $
+--       Date into PVCS   : $Date:   Apr 03 2012 13:23:46  $
+--       Date fetched Out : $Modtime:   Apr 03 2012 13:12:30  $
+--       Version          : $Revision:   3.1  $
 -------------------------------------------------------------------------
 --   Author : Steven Cooper
 --
@@ -17,7 +17,7 @@ As
 --  Copyright (c) exor corporation ltd, 2000
 -----------------------------------------------------------------------------
 
-  gc_Body_Version  Constant  Varchar2(100) := '$Revision:   3.0  $';
+  gc_Body_Version  Constant  Varchar2(100) := '$Revision:   3.1  $';
 
   gc_Package_Name  Constant  Varchar2(30)  := 'nm3User_Admin';
  
@@ -218,12 +218,40 @@ Procedure Set_User_Password (
                             )
 Is
  --This is running in an invokers rights package so only inf the invoker has permission to alter user will this work, otherwise an Insufficient Privilege error will be raised.
+ 
+  p_Reason              Varchar2(2000);
+  Invalid_Char          Exception;
+  Missing_Option        Exception;
+  End_Of_Sql            Exception;
+  Missing_Pass          Exception;
+  Zero_Len_Identifier   Exception;
+  Bad_Comments          Exception;
+  
+  Pragma Exception_Init(Invalid_Char,-911);
+  Pragma Exception_Init(End_Of_Sql,-921);
+  Pragma Exception_Init(Missing_Option,-922);
+  Pragma Exception_Init(Missing_Pass,-988);
+  Pragma Exception_Init(Zero_Len_Identifier,-1741);
+  Pragma Exception_Init(Bad_Comments,-1742);  
+  
 Begin
   Nm_Debug.Debug('nm3User_Admin.Set_User_Password - Called');
-  If  Valid_User(p_User => p_User) Then
-    Execute Immediate ('Alter User ' || p_User || ' Identified By '  || p_Password);
+  If  Valid_User(p_User => p_User)  Then   
+    If  nm3flx.Is_String_Valid_For_Password (
+                                            pi_Password   =>  p_Password,
+                                            po_Reason     =>  p_Reason
+                                            ) Then 
+      Begin
+        Execute Immediate ('Alter User ' || p_User || ' Identified By '  || p_Password);
+      Exception
+        When Invalid_Char Or Missing_Option Or End_Of_Sql Or Zero_Len_Identifier Or Missing_Pass Or Bad_Comments Then
+          Raise_Application_Error(-20002,'Invalid Password in call to Set_User_Password.');
+      End;
+    Else
+      Raise_Application_Error(-20002,'Invalid Password in call to Set_User_Password. :' || p_Reason);
+    End If;
   Else
-    Raise_Application_Error(-20001,'Invalid Username in call to Set_User_Password.');
+    Raise_Application_Error(-20001,'Invalid Username in call to Set_User_Password. ');
   End If;
   Nm_Debug.Debug('nm3User_Admin.Set_User_Password - Finished');  
 End Set_User_Password;                              
