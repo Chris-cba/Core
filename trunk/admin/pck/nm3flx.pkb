@@ -2,15 +2,15 @@ CREATE OR REPLACE PACKAGE BODY nm3flx IS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3flx.pkb-arc   2.14   May 16 2011 14:44:50   Steve.Cooper  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3flx.pkb-arc   2.15   Apr 03 2012 13:22:08   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3flx.pkb  $
---       Date into PVCS   : $Date:   May 16 2011 14:44:50  $
---       Date fetched Out : $Modtime:   Apr 01 2011 07:52:10  $
---       Version          : $Revision:   2.14  $
+--       Date into PVCS   : $Date:   Apr 03 2012 13:22:08  $
+--       Date fetched Out : $Modtime:   Apr 03 2012 07:57:48  $
+--       Version          : $Revision:   2.15  $
 --       Based on SCCS version : 1.47
 -------------------------------------------------------------------------
 --
-  g_body_sccsid      CONSTANT  VARCHAR2(2000) := '$Revision:   2.14  $';
+  g_body_sccsid      CONSTANT  VARCHAR2(2000) := '$Revision:   2.15  $';
 
    g_package_name    CONSTANT varchar2(30) := 'nm3flx';
 -- Package variables
@@ -2331,44 +2331,44 @@ END;
 --
 -----------------------------------------------------------------------------
 --
-FUNCTION is_string_valid_for_password (pi_password IN varchar2, po_reason OUT varchar2) 
-RETURN BOOLEAN 
-IS
 --
-   l_string_length binary_integer := LENGTH(pi_password);
-   --l_invalid_chars nm3type.tab_varchar1;
+-----------------------------------------------------------------------------
 --
-   l_retval boolean := TRUE;
+Function Is_String_Valid_For_Password (
+                                      pi_Password   In        Varchar2,
+                                      po_Reason         Out   Varchar2
+                                      )   Return Boolean 
+Is
+  l_Password_Length   Integer   :=  Nvl(Length(pi_Password),0);
+  l_Ret_Val           Boolean   :=  True;
+  x                   Integer   :=  1;
+
+Begin
+  Nm_Debug.Debug('nm3flx.Is_String_Valid_For_Password - Called');
+  If l_Password_Length Between 1 And 30  Then
+    While (x <= g_Invalid_Chars.Count) And (l_Ret_Val)  
+    Loop
+      If Nvl(Instr(pi_Password,g_Invalid_Chars(x)),0) > 0 Then
+        Nm_Debug.Debug('Invalid Character :' || g_Invalid_Chars(x) );
+        po_Reason:= 'The character ''' || g_Invalid_Chars(x) || ''' cannot be used in a password.';
+        l_Ret_Val:=False;
+      End If;
+      x:=x+1;
+    End Loop;
+  Elsif l_Password_Length = 0 Then       
+    Nm_Debug.Debug('Password was Null');
+    po_Reason:=  'Password was Null';    
+    l_Ret_Val:=  False;
+  Else
+    l_Ret_Val:=  False;
+    Nm_Debug.Debug('Password was greater than 30 characters');
+    po_Reason:=  'Password was greater than 30 characters';
+  End If;
 --
-BEGIN
-   -- Checks password is not too large
-   l_retval := (l_string_length BETWEEN 1 AND 30);
-   -- Check for invalid characters defined above.
-   IF NOT l_retval
-   THEN
-     po_reason:= 'Password was greater than 30 characters';
-   ELSE
-      FOR lic IN 1..g_invalid_chars.COUNT 
-      LOOP
-        FOR l_count IN 1..l_string_length
-        LOOP
-           IF  SUBSTR(pi_password,l_count,1) = g_invalid_chars(lic)
-           THEN
-             l_retval := FALSE;
-             po_reason:= 'The character ''' || g_invalid_chars(lic) || ''' cannot be used in a password.'; 
-             EXIT;
-           END IF;
-        END LOOP;
-       --
-        IF l_retval = FALSE THEN
-          EXIT;
-        END IF;
-      END LOOP;
-   END IF;
+  Nm_Debug.Debug('nm3flx.Is_String_Valid_For_Password - Finished - Returning:' || (Case When l_Ret_Val Then 'True' Else 'False' End));
+  Return l_Ret_Val;
 --
-   RETURN l_retval;
---
-END is_string_valid_for_password;
+End Is_String_Valid_For_Password;
 --
 -----------------------------------------------------------------------------
 --
