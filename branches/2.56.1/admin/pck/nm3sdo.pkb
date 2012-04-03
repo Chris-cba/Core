@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 --
 ---   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.56.1.7   Feb 17 2012 11:19:30   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.56.1.8   Apr 03 2012 13:49:58   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3sdo.pkb  $
---       Date into PVCS   : $Date:   Feb 17 2012 11:19:30  $
---       Date fetched Out : $Modtime:   Feb 17 2012 10:57:20  $
---       PVCS Version     : $Revision:   2.56.1.7  $
+--       Date into PVCS   : $Date:   Apr 03 2012 13:49:58  $
+--       Date fetched Out : $Modtime:   Apr 03 2012 13:47:12  $
+--       PVCS Version     : $Revision:   2.56.1.8  $
 --       Based on
 
 --
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 -- Copyright (c) RAC
 -----------------------------------------------------------------------------
 
-   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.56.1.7  $"';
+   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.56.1.8  $"';
    g_package_name    CONSTANT VARCHAR2 (30)  := 'NM3SDO';
    g_batch_size      INTEGER                 := NVL( TO_NUMBER(Hig.get_sysopt('SDOBATSIZE')), 10);
    g_clip_type       VARCHAR2(30)            := NVL(Hig.get_sysopt('SDOCLIPTYP'),'SDO');
@@ -10361,12 +10361,15 @@ order by 1
 select cast ( multiset( select mdsys.sdo_dim_element( to_char(row_num), lb, ub, tol) from sdo_data order by row_num) as mdsys.sdo_dim_array )
 from dual;
 
+l_lb number;
 
 BEGIN
 
   open c_dim (p_pct_increase, p_tol, p_m_tol );
   fetch c_dim into retval;
   close c_dim;
+
+  l_lb := retval(1).sdo_lb;  
   
   return retval; 
 --   
