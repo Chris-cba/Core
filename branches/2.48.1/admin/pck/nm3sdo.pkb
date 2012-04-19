@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 --
 ---   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.48.1.10   Jul 14 2011 16:19:42   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.48.1.11   Apr 19 2012 12:31:52   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3sdo.pkb  $
---       Date into PVCS   : $Date:   Jul 14 2011 16:19:42  $
---       Date fetched Out : $Modtime:   Jul 14 2011 16:17:58  $
---       PVCS Version     : $Revision:   2.48.1.10  $
+--       Date into PVCS   : $Date:   Apr 19 2012 12:31:52  $
+--       Date fetched Out : $Modtime:   Apr 19 2012 12:30:52  $
+--       PVCS Version     : $Revision:   2.48.1.11  $
 --       Based on
 
 --
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 -- Copyright (c) RAC
 -----------------------------------------------------------------------------
 
-   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.48.1.10  $"';
+   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.48.1.11  $"';
    g_package_name    CONSTANT VARCHAR2 (30)  := 'NM3SDO';
    g_batch_size      INTEGER                 := NVL( TO_NUMBER(Hig.get_sysopt('SDOBATSIZE')), 10);
    g_clip_type       VARCHAR2(30)            := NVL(Hig.get_sysopt('SDOCLIPTYP'),'SDO');
@@ -5793,6 +5793,15 @@ BEGIN
 
   RETURN retval;
 
+EXCEPTION
+  when too_many_rows then
+    cur_string := 'select sdo_aggr_union(sdoaggrtype('||nth_rec.nth_feature_shape_column||', 0.005)) from '||nth_rec.nth_feature_table||
+                  ' where '||nth_rec.nth_feature_pk_column||' = :PK_VAL';
+
+    EXECUTE IMMEDIATE cur_string INTO retval USING p_pk_id;
+
+    RETURN retval;
+
 END;
 --
 --------------------------------------------------------------------------------------
@@ -5817,6 +5826,16 @@ BEGIN
   EXECUTE IMMEDIATE cur_string INTO retval USING p_pk_id;
 
   RETURN retval;
+
+EXCEPTION
+  when too_many_rows then
+    cur_string := 'select sdo_aggr_union(sdoaggrtype('||nth_rec.nth_feature_shape_column||', 0.005)) from '||nth_rec.nth_feature_table||
+                  ' where '||nth_rec.nth_feature_pk_column||' = :PK_VAL';
+
+    EXECUTE IMMEDIATE cur_string INTO retval USING p_pk_id;
+
+    RETURN retval;
+
 
 END;
 
