@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 --
 ---   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.69   Apr 19 2012 12:22:36   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.70   Apr 19 2012 14:34:16   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3sdo.pkb  $
---       Date into PVCS   : $Date:   Apr 19 2012 12:22:36  $
---       Date fetched Out : $Modtime:   Apr 19 2012 12:21:08  $
---       PVCS Version     : $Revision:   2.69  $
+--       Date into PVCS   : $Date:   Apr 19 2012 14:34:16  $
+--       Date fetched Out : $Modtime:   Apr 19 2012 14:22:50  $
+--       PVCS Version     : $Revision:   2.70  $
 --       Based on
 
 --
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 -- Copyright (c) RAC
 -----------------------------------------------------------------------------
 
-   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.69  $"';
+   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.70  $"';
    g_package_name    CONSTANT VARCHAR2 (30)  := 'NM3SDO';
    g_batch_size      INTEGER                 := NVL( TO_NUMBER(Hig.get_sysopt('SDOBATSIZE')), 10);
    g_clip_type       VARCHAR2(30)            := NVL(Hig.get_sysopt('SDOCLIPTYP'),'SDO');
@@ -10548,6 +10548,7 @@ sdo_lb, sdo_ub, sdo_tolerance, srid
    AND   nlt_g_i_d = 'D')
    order by dim_row   
    )
+where sdo_lb is not null   
 group by row_num, srid
 order by 1
  )
