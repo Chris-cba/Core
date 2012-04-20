@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 --
 ---   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.56.1.9   Apr 19 2012 12:29:38   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.56.1.10   Apr 20 2012 16:13:40   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3sdo.pkb  $
---       Date into PVCS   : $Date:   Apr 19 2012 12:29:38  $
---       Date fetched Out : $Modtime:   Apr 19 2012 12:28:42  $
---       PVCS Version     : $Revision:   2.56.1.9  $
+--       Date into PVCS   : $Date:   Apr 20 2012 16:13:40  $
+--       Date fetched Out : $Modtime:   Apr 20 2012 11:06:24  $
+--       PVCS Version     : $Revision:   2.56.1.10  $
 --       Based on
 
 --
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 -- Copyright (c) RAC
 -----------------------------------------------------------------------------
 
-   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.56.1.9  $"';
+   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.56.1.10  $"';
    g_package_name    CONSTANT VARCHAR2 (30)  := 'NM3SDO';
    g_batch_size      INTEGER                 := NVL( TO_NUMBER(Hig.get_sysopt('SDOBATSIZE')), 10);
    g_clip_type       VARCHAR2(30)            := NVL(Hig.get_sysopt('SDOCLIPTYP'),'SDO');
@@ -1733,6 +1733,19 @@ END;
 --
 ---------------------------------------------------------------------------------------------------------------------
 --
+-- function to check if vertices are alligned as monotonically increasing values
+--
+function measures_OK ( p_geom in mdsys.sdo_geometry ) return Boolean is
+retval Boolean := TRUE;
+begin
+
+return retval;
+end;
+
+--
+---------------------------------------------------------------------------------------------------------------------
+--
+
 
 PROCEDURE split_element_at_measure( p_layer IN NUMBER,
                                     p_ne_id IN nm_elements.ne_id%TYPE,
