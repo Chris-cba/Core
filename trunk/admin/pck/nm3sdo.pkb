@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 --
 ---   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.70   Apr 19 2012 14:34:16   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.71   Apr 20 2012 16:30:48   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3sdo.pkb  $
---       Date into PVCS   : $Date:   Apr 19 2012 14:34:16  $
---       Date fetched Out : $Modtime:   Apr 19 2012 14:22:50  $
---       PVCS Version     : $Revision:   2.70  $
+--       Date into PVCS   : $Date:   Apr 20 2012 16:30:48  $
+--       Date fetched Out : $Modtime:   Apr 20 2012 16:19:56  $
+--       PVCS Version     : $Revision:   2.71  $
 --       Based on
 
 --
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 -- Copyright (c) RAC
 -----------------------------------------------------------------------------
 
-   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.70  $"';
+   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.71  $"';
    g_package_name    CONSTANT VARCHAR2 (30)  := 'NM3SDO';
    g_batch_size      INTEGER                 := NVL( TO_NUMBER(Hig.get_sysopt('SDOBATSIZE')), 10);
    g_clip_type       VARCHAR2(30)            := NVL(Hig.get_sysopt('SDOCLIPTYP'),'SDO');
@@ -1729,6 +1729,53 @@ END;
 --
 ---------------------------------------------------------------------------------------------------------------------
 --
+-- function to check if vertices are alligned as monotonically increasing values
+--
+FUNCTION measures_OK (p_geom IN MDSYS.sdo_geometry)
+   RETURN VARCHAR2
+IS
+   retval    BOOLEAN := TRUE;
+   retchar   VARCHAR2 (10);
+
+   CURSOR c1 (c_geom IN MDSYS.sdo_geometry)
+   IS
+      SELECT 1
+        FROM (SELECT t.x,
+                     t.y,
+                     t.z z1,
+                     LEAD (t.z, 1) OVER (ORDER BY t.id) z2
+                FROM TABLE (SDO_UTIL.getvertices (c_geom)) t)
+       WHERE z2 <= z1;
+
+   l_dummy   INTEGER;
+--
+BEGIN
+   OPEN c1 (p_geom);
+
+   FETCH c1 INTO l_dummy;
+
+   retval := c1%NOTFOUND;
+
+   CLOSE c1;
+
+   IF retval
+   THEN
+      RETURN 'TRUE';
+   ELSE
+      RETURN 'FALSE';
+   END IF;
+EXCEPTION
+   WHEN NO_DATA_FOUND
+   THEN
+      RETURN 'TRUE';
+   WHEN OTHERS
+   THEN
+      RETURN 'FALSE';
+END;
+--
+--
+---------------------------------------------------------------------------------------------------------------------
+--
 
 PROCEDURE split_element_at_measure( p_layer IN NUMBER,
                                     p_ne_id IN nm_elements.ne_id%TYPE,
@@ -1749,6 +1796,12 @@ BEGIN
   IF set_theme( p_layer ) THEN
     set_theme_metadata( p_layer );
   END IF;
+
+  if measures_ok(l_geom) = 'FALSE' then
+  
+    l_geom := rescale_geometry(p_layer, p_ne_id, l_geom );
+    
+  end if;    
 
   IF element_has_shape( p_layer, p_ne_id ) = 'TRUE' THEN
 
