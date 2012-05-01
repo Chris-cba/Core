@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY Mapviewer AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/mapviewer.pkb-arc   2.6   May 16 2011 14:42:22   Steve.Cooper  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/mapviewer.pkb-arc   2.7   May 01 2012 12:33:48   Rob.Coupe  $
 --       Module Name      : $Workfile:   mapviewer.pkb  $
---       Date into PVCS   : $Date:   May 16 2011 14:42:22  $
---       Date fetched Out : $Modtime:   May 03 2011 11:04:52  $
---       PVCS Version     : $Revision:   2.6  $
+--       Date into PVCS   : $Date:   May 01 2012 12:33:48  $
+--       Date fetched Out : $Modtime:   May 01 2012 12:33:24  $
+--       PVCS Version     : $Revision:   2.7  $
 
 
 --
@@ -15,7 +15,7 @@ CREATE OR REPLACE PACKAGE BODY Mapviewer AS
 --	Copyright (c) exor corporation ltd, 2004
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(30) := '"$Revision:   2.6  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(30) := '"$Revision:   2.7  $"';
 
 
 FUNCTION Get_Scale RETURN NUMBER;
@@ -101,10 +101,19 @@ PROCEDURE set_cent_size_theme AS
 
 BEGIN
 
-   Nm3sdo.set_diminfo_and_srid( Nm3sdo.get_nw_themes, l_diminfo, l_srid );
+   BEGIN
+     execute immediate 'select nae_extent from hig_users, nm_admin_extents where hus_user_id = nm3user.get_user_id and nae_admin_unit = hus_admin_unit' into l_geom;
+     
+   exception
+     when others then   
+   
+       Nm3sdo.set_diminfo_and_srid( Nm3sdo.get_nw_themes, l_diminfo, l_srid );
 
-   l_geom := Nm3sdo.get_centre_and_size( Nm3sdo.convert_dim_array_to_mbr( l_diminfo ));
-
+       l_geom := Nm3sdo.convert_dim_array_to_mbr( l_diminfo );
+       
+   END;       
+   
+   l_geom := Nm3sdo.get_centre_and_size(l_geom); 
 --   IF l_srid IS NULL THEN
 
      BEGIN
