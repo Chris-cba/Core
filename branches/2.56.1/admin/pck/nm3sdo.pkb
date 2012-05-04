@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 --
 ---   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.56.1.10   Apr 20 2012 16:13:40   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.56.1.11   May 04 2012 13:08:14   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3sdo.pkb  $
---       Date into PVCS   : $Date:   Apr 20 2012 16:13:40  $
---       Date fetched Out : $Modtime:   Apr 20 2012 11:06:24  $
---       PVCS Version     : $Revision:   2.56.1.10  $
+--       Date into PVCS   : $Date:   May 04 2012 13:08:14  $
+--       Date fetched Out : $Modtime:   May 04 2012 13:05:38  $
+--       PVCS Version     : $Revision:   2.56.1.11  $
 --       Based on
 
 --
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 -- Copyright (c) RAC
 -----------------------------------------------------------------------------
 
-   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.56.1.10  $"';
+   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.56.1.11  $"';
    g_package_name    CONSTANT VARCHAR2 (30)  := 'NM3SDO';
    g_batch_size      INTEGER                 := NVL( TO_NUMBER(Hig.get_sysopt('SDOBATSIZE')), 10);
    g_clip_type       VARCHAR2(30)            := NVL(Hig.get_sysopt('SDOCLIPTYP'),'SDO');
@@ -1735,12 +1735,48 @@ END;
 --
 -- function to check if vertices are alligned as monotonically increasing values
 --
-function measures_OK ( p_geom in mdsys.sdo_geometry ) return Boolean is
-retval Boolean := TRUE;
-begin
+FUNCTION measures_OK (p_geom IN MDSYS.sdo_geometry)
+   RETURN VARCHAR2
+IS
+   retval    BOOLEAN := TRUE;
+   retchar   VARCHAR2 (10);
 
-return retval;
-end;
+   CURSOR c1 (c_geom IN MDSYS.sdo_geometry)
+   IS
+      SELECT 1
+        FROM (SELECT t.x,
+                     t.y,
+                     t.z z1,
+                     LEAD (t.z, 1) OVER (ORDER BY t.id) z2
+                FROM TABLE (SDO_UTIL.getvertices (c_geom)) t)
+       WHERE z2 <= z1;
+
+   l_dummy   INTEGER;
+--
+BEGIN
+   OPEN c1 (p_geom);
+
+   FETCH c1 INTO l_dummy;
+
+   retval := c1%NOTFOUND;
+
+   CLOSE c1;
+
+   IF retval
+   THEN
+      RETURN 'TRUE';
+   ELSE
+      RETURN 'FALSE';
+   END IF;
+EXCEPTION
+   WHEN NO_DATA_FOUND
+   THEN
+      RETURN 'TRUE';
+   WHEN OTHERS
+   THEN
+      RETURN 'FALSE';
+END;
+
 
 --
 ---------------------------------------------------------------------------------------------------------------------
@@ -1768,6 +1804,20 @@ BEGIN
   END IF;
 
   IF element_has_shape( p_layer, p_ne_id ) = 'TRUE' THEN
+
+    if measures_ok(l_geom) = 'FALSE' then
+  
+      l_geom := rescale_geometry(p_layer, p_ne_id, l_geom );
+
+      if measures_ok(l_geom) = 'FALSE' then
+   
+        l_geom := sdo_util.simplify(l_geom, 0.1, g_usgm.diminfo(1).sdo_tolerance );
+	   
+	    if measures_ok(l_geom) = 'FALSE' then
+	       raise_application_error(-200010, 'Geometry is invalid for split - check the measure values' );
+        end if;
+	  end if;
+    end if;    
 
     sdo_lrs.split_geom_segment( l_geom, g_usgm.diminfo, p_measure, p_geom1, p_geom2 );
 
