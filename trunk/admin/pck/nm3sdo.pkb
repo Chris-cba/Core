@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 --
 ---   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.71   Apr 20 2012 16:30:48   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.72   May 04 2012 13:01:54   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3sdo.pkb  $
---       Date into PVCS   : $Date:   Apr 20 2012 16:30:48  $
---       Date fetched Out : $Modtime:   Apr 20 2012 16:19:56  $
---       PVCS Version     : $Revision:   2.71  $
+--       Date into PVCS   : $Date:   May 04 2012 13:01:54  $
+--       Date fetched Out : $Modtime:   May 04 2012 12:59:20  $
+--       PVCS Version     : $Revision:   2.72  $
 --       Based on
 
 --
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 -- Copyright (c) RAC
 -----------------------------------------------------------------------------
 
-   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.71  $"';
+   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.72  $"';
    g_package_name    CONSTANT VARCHAR2 (30)  := 'NM3SDO';
    g_batch_size      INTEGER                 := NVL( TO_NUMBER(Hig.get_sysopt('SDOBATSIZE')), 10);
    g_clip_type       VARCHAR2(30)            := NVL(Hig.get_sysopt('SDOCLIPTYP'),'SDO');
@@ -1797,13 +1797,21 @@ BEGIN
     set_theme_metadata( p_layer );
   END IF;
 
-  if measures_ok(l_geom) = 'FALSE' then
-  
-    l_geom := rescale_geometry(p_layer, p_ne_id, l_geom );
-    
-  end if;    
-
   IF element_has_shape( p_layer, p_ne_id ) = 'TRUE' THEN
+
+    if measures_ok(l_geom) = 'FALSE' then
+  
+      l_geom := rescale_geometry(p_layer, p_ne_id, l_geom );
+
+      if measures_ok(l_geom) = 'FALSE' then
+   
+        l_geom := sdo_util.simplify(l_geom, 0.1, g_usgm.diminfo(1).sdo_tolerance );
+	   
+	    if measures_ok(l_geom) = 'FALSE' then
+	       raise_application_error(-200010, 'Geometry is invalid for split - check the measure values' );
+        end if;
+	  end if;
+    end if;    
 
     sdo_lrs.split_geom_segment( l_geom, g_usgm.diminfo, p_measure, p_geom1, p_geom2 );
 
