@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm0575
 AS
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm0575.pkb-arc   2.7.1.3   Mar 26 2012 16:48:42   Ade.Edwards  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm0575.pkb-arc   2.7.1.4   May 08 2012 16:58:24   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm0575.pkb  $
---       Date into PVCS   : $Date:   Mar 26 2012 16:48:42  $
---       Date fetched Out : $Modtime:   Mar 26 2012 16:44:52  $
---       PVCS Version     : $Revision:   2.7.1.3  $
+--       Date into PVCS   : $Date:   May 08 2012 16:58:24  $
+--       Date fetched Out : $Modtime:   May 08 2012 16:57:30  $
+--       PVCS Version     : $Revision:   2.7.1.4  $
 --       Based on SCCS version : 1.6
 
 --   Author : Graeme Johnson
@@ -23,7 +23,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000)  := '"$Revision:   2.7.1.3  $"';
+  g_body_sccsid  CONSTANT varchar2(2000)  := '"$Revision:   2.7.1.4  $"';
   g_package_name CONSTANT varchar2(30)    := 'nm0575';
   
   subtype id_type is nm_members.nm_ne_id_in%type;
@@ -68,6 +68,18 @@ AS
 --
 -----------------------------------------------------------------------------
 --
+  PROCEDURE check_no_future_locs (p_nte_job_id  nm_nw_temp_extents.nte_job_id%type
+                               ,p_effective_date DATE DEFAULT nm3user.get_effective_date
+                               );
+--
+-----------------------------------------------------------------------------
+--
+  PROCEDURE check_extent_no_future_locs (p_ne_id      nm_elements.ne_id%TYPE
+                                        ,p_effective_date DATE DEFAULT nm3user.get_effective_date
+                                        );
+
+
+
 FUNCTION get_version RETURN varchar2 IS
 BEGIN
    RETURN g_sccsid;
@@ -412,9 +424,11 @@ BEGIN
   if pi_source_type = 'E' then
     l_nte_source := 'SAVED';
   else
+    check_extent_no_future_locs( pi_source_ne_id, nm3user.get_effective_date );
     l_nte_source := 'ROUTE';
   end if;
 
+  
   if m_xsp_changed then
 --
     -- clear the previous temp extent
@@ -429,6 +443,8 @@ BEGIN
     -- an area of interest is defined
     if pi_source_ne_id is not null then
     
+--RAC - extent and dates need to be checked    
+    
       nm3extent.create_temp_ne (
          pi_source_id => pi_source_ne_id
         ,pi_source    => l_nte_source
@@ -437,6 +453,8 @@ BEGIN
         ,po_job_id    => m_nte_job_id
       );
       nm3dbg.putln('m_nte_job_id='||m_nte_job_id);
+
+      check_no_future_locs( m_nte_job_id, nm3user.get_effective_date );
 
       if g_tab_selected_categories.count > 0 then
 --
@@ -1342,6 +1360,97 @@ END;
     g_include_partial := pi_partial_flag;
   --
   END set_partial_flag;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE check_extent_no_future_locs (p_ne_id      nm_elements.ne_id%TYPE
+                                      ,p_effective_date DATE DEFAULT nm3user.get_effective_date
+                                      ) IS
+--
+--If we are to operate on a route at a specific date, the delete global asset list will leave assets of the specific type that exist
+--on datums that were not part of the route on the date in question and will be left unaffected. We need to fail if a route is used at a 
+--date that includes datum members that start after the effective date.
+--
+   CURSOR cs_future_locs (c_nm_ne_id_in    nm_members_all.nm_ne_id_in%TYPE
+                         ,c_effective_date DATE
+                         ) IS
+   SELECT 1 from dual where exists (
+       select 1 from  nm_members_all nm
+   WHERE  nm_ne_id_in   = c_nm_ne_id_in
+    AND   nm_start_date > c_effective_date );
+--
+   l_dummy PLS_INTEGER;
+   l_found BOOLEAN;
+--
+BEGIN
+--
+   nm_debug.proc_start (g_package_name,'check_extent_no_future_locs');
+--
+   OPEN  cs_future_locs (p_ne_id, p_effective_date);
+   FETCH cs_future_locs INTO l_dummy;
+   l_found := cs_future_locs%FOUND;
+   CLOSE cs_future_locs;
+--
+   IF l_found
+    THEN
+      raise_application_error( -20001, 'The NW has datums that start later than the effective date - the assets on this member datum would either be unaffected or '||
+                                       ' give rise to a server error');
+--      hig.raise_ner (pi_appl => nm3type.c_net
+--                    ,pi_id   => 355
+--                    );
+   END IF;
+--
+   nm_debug.proc_end (g_package_name,'check_extent_no_future_locs');
+--
+END check_extent_no_future_locs;
+
+
+PROCEDURE check_no_future_locs (p_nte_job_id  nm_nw_temp_extents.nte_job_id%type
+                               ,p_effective_date DATE DEFAULT nm3user.get_effective_date
+                               ) IS
+--
+--If we are to operate on an extent (which may be an extent formed from a route on a specific date), there may be 
+--visible asset locations that have been end-dated at a datelater than the effective date (ie already closed). These records really should not be touched.
+--Better to have a module which end-dates all at a specific date and deletes anything that was created after that date.
+--
+   CURSOR cs_future_locs (c_job_id  nm_nw_temp_extents.nte_job_id%type
+                         ,c_effective_date DATE
+                         ) IS
+   SELECT 1 from dual where exists (
+       select 1 from  nm_members_all nm, nm_nw_temp_extents
+   WHERE  nm_ne_id_of   = nte_ne_id_of
+   and    nm_type = 'I'
+   and    nm_obj_type in (select nit_inv_type from nm_inv_types t
+                          where t.nit_category in (select column_value from table(cast(get_inv_categories_tbl as nm_code_tbl))))
+   AND   (nm_start_date > c_effective_date OR  -- this record is invisible to the query of items
+          nm_end_date   > c_effective_date ));   -- these have already been updated to a date greater than the proposed end-date.
+--
+   l_dummy PLS_INTEGER;
+   l_found BOOLEAN;
+--
+BEGIN
+--
+   nm_debug.proc_start (g_package_name,'check_no_future_locs');
+--
+   OPEN  cs_future_locs (p_nte_job_id, p_effective_date);
+   FETCH cs_future_locs INTO l_dummy;
+   l_found := cs_future_locs%FOUND;
+   CLOSE cs_future_locs;
+--
+   IF l_found
+    THEN
+      raise_application_error( -20001, 'Inv. data that is opened later than the effective date will remain unaffected or data that has been closed later '|| 
+                                       'than this date will be changed');
+--      hig.raise_ner (pi_appl => nm3type.c_net
+--                    ,pi_id   => 355
+--                    );
+   END IF;
+--
+   nm_debug.proc_end (g_package_name,'check_no_future_locs');
+--
+END check_no_future_locs;
+
+  
 --
 -----------------------------------------------------------------------------
 --
