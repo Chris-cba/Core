@@ -2,11 +2,11 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm_4500_fix1.sql-arc   3.1   Mar 02 2012 10:52:02   Mike.Alexander  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm_4500_fix1.sql-arc   3.2   May 15 2012 11:00:56   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm_4500_fix1.sql  $
---       Date into PVCS   : $Date:   Mar 02 2012 10:52:02  $
---       Date fetched Out : $Modtime:   Mar 02 2012 10:46:50  $
---       PVCS Version     : $Revision:   3.1  $
+--       Date into PVCS   : $Date:   May 15 2012 11:00:56  $
+--       Date fetched Out : $Modtime:   May 15 2012 10:59:56  $
+--       PVCS Version     : $Revision:   3.2  $
 --
 --------------------------------------------------------------------------------
 --   Copyright (c) 2012 Bentley Systems Incorporated.
@@ -117,6 +117,14 @@ SET TERM OFF
 --
 SET FEEDBACK ON
 start nm3api_inv.pkw
+SET FEEDBACK OFF
+--
+--------------------------------------------------------------------------------
+-- Views
+--------------------------------------------------------------------------------
+--
+SET FEEDBACK ON
+start v_nm_admin_units_tree.vw
 SET FEEDBACK OFF
 --
 --------------------------------------------------------------------------------
