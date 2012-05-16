@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY Mapviewer AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/mapviewer.pkb-arc   2.7   May 01 2012 12:33:48   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/mapviewer.pkb-arc   2.8   May 16 2012 11:47:08   Steve.Cooper  $
 --       Module Name      : $Workfile:   mapviewer.pkb  $
---       Date into PVCS   : $Date:   May 01 2012 12:33:48  $
---       Date fetched Out : $Modtime:   May 01 2012 12:33:24  $
---       PVCS Version     : $Revision:   2.7  $
+--       Date into PVCS   : $Date:   May 16 2012 11:47:08  $
+--       Date fetched Out : $Modtime:   May 16 2012 11:45:04  $
+--       PVCS Version     : $Revision:   2.8  $
 
 
 --
@@ -15,7 +15,7 @@ CREATE OR REPLACE PACKAGE BODY Mapviewer AS
 --	Copyright (c) exor corporation ltd, 2004
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(30) := '"$Revision:   2.7  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(30) := '"$Revision:   2.8  $"';
 
 
 FUNCTION Get_Scale RETURN NUMBER;
@@ -102,7 +102,12 @@ PROCEDURE set_cent_size_theme AS
 BEGIN
 
    BEGIN
-     execute immediate 'select nae_extent from hig_users, nm_admin_extents where hus_user_id = nm3user.get_user_id and nae_admin_unit = hus_admin_unit' into l_geom;
+     Select   nae.Nae_Extent
+     Into     l_Geom
+     From     Hig_Users         hu,
+              Nm_Admin_Extents  nae
+     Where    hu.Hus_User_Id        =     To_Number(Sys_Context('NM3CORE','USER_ID')) 
+     And      nae.Nae_Admin_Unit    =     hu.Hus_Admin_Unit;
      
    exception
      when others then   
