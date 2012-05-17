@@ -2,7 +2,8 @@ Create Table Nm_Admin_Extents
 (
 Nae_Admin_Unit    Number(9),        
 Nae_Extent        Mdsys.Sdo_Geometry,
-Constraint Nae_Pk Primary Key (Nae_Admin_Unit)
+Constraint Nae_Pk Primary Key (Nae_Admin_Unit),
+Constraint Nae_Nau_Fk Foreign Key (Nae_Admin_Unit) References Nm_Admin_Units_All(Nau_Admin_Unit) On Delete Cascade
 )
 Organization Index
 /
@@ -15,3 +16,4 @@ Comment On Column  Nm_Admin_Extents.Nae_Admin_Unit Is 'The admin unit for the ex
 
 Comment On Column  Nm_Admin_Extents.Nae_Extent Is 'The default Extent for an admin unit.'
 /
+
