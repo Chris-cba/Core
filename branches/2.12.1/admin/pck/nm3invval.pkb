@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY nm3invval IS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3invval.pkb-arc   2.12.1.0   Mar 07 2012 14:00:26   Rob.Coupe  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3invval.pkb-arc   2.12.1.1   May 17 2012 09:28:44   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3invval.pkb  $
---       Date into PVCS   : $Date:   Mar 07 2012 14:00:26  $
---       Date fetched Out : $Modtime:   Mar 07 2012 13:34:14  $
---       Version          : $Revision:   2.12.1.0  $
+--       Date into PVCS   : $Date:   May 17 2012 09:28:44  $
+--       Date fetched Out : $Modtime:   May 17 2012 09:27:20  $
+--       Version          : $Revision:   2.12.1.1  $
 --       Based on SCCS version : 1.30
 -------------------------------------------------------------------------
 --
@@ -19,7 +19,7 @@ CREATE OR REPLACE PACKAGE BODY nm3invval IS
 --	Copyright (c) exor corporation ltd, 2000
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.12.1.0  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.12.1.1  $"';
 --  g_body_sccsid is the SCCS ID for the package body
    g_package_name    CONSTANT  varchar2(30)   := 'nm3invval';
 --
@@ -1036,6 +1036,24 @@ BEGIN
    END IF;
       -- task 0108705 END
 --
+-- task 0112002 - clear out any shapes that may not be picked up by the member triggers. This is pure inventory so we know the date columns
+-- we can rely on sdo_edit - loop in case there are more than one
+--
+   DECLARE
+     cursor cs_asset_shapes ( c_iit_ne_id in nm_inv_items.iit_ne_id%type ) is
+       select nth_theme_id, nth_feature_table, nth_feature_shape_column
+       from nm_themes_all, nm_inv_themes, nm_inv_items_all
+       where nth_theme_id = nith_nth_theme_id
+       and iit_ne_id = c_iit_ne_id
+       and nith_nit_id = iit_inv_type
+	   and nth_use_history = 'Y'
+       and nth_base_table_theme is null;
+  begin
+    for irec in cs_asset_shapes( p_rec_nii.ne_id ) loop
+       NM3SDO_EDIT.END_DATE_SHAPE(PI_NTH_ID => irec.nth_theme_id, PI_PK => p_rec_nii.ne_id, pi_date => p_rec_nii.end_date );
+    end loop;	
+  end;	  
+
 --   nm_debug.proc_end(g_package_name, 'check_inv_dates');
    --
 EXCEPTION
