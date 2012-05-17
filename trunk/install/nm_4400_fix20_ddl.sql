@@ -17,3 +17,8 @@ Comment On Column  Nm_Admin_Extents.Nae_Admin_Unit Is 'The admin unit for the ex
 Comment On Column  Nm_Admin_Extents.Nae_Extent Is 'The default Extent for an admin unit.'
 /
 
+Begin
+  Nm3Ddl.Refresh_All_Synonyms;
+End;
+/
+
