@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/doc_bundle_loader.pkb-arc   3.9   May 16 2011 14:40:22   Steve.Cooper  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/doc_bundle_loader.pkb-arc   3.10   May 23 2012 14:04:48   Steve.Cooper  $
 --       Module Name      : $Workfile:   doc_bundle_loader.pkb  $
---       Date into PVCS   : $Date:   May 16 2011 14:40:22  $
---       Date fetched Out : $Modtime:   Apr 20 2011 09:04:18  $
---       Version          : $Revision:   3.9  $
+--       Date into PVCS   : $Date:   May 23 2012 14:04:48  $
+--       Date fetched Out : $Modtime:   May 23 2012 13:51:32  $
+--       Version          : $Revision:   3.10  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.9  $';
+  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.10  $';
 
   g_package_name CONSTANT varchar2(30) := 'doc_bundle_loader';
   
@@ -210,7 +210,11 @@ BEGIN
       , pi_dbfr_rec.dbfr_doc_descr
       , pi_dbfr_rec.dbfr_doc_type
       , pi_dbfr_rec.dbfr_dlc_name
-      , pi_dbfr_rec.dbfr_gateway_table_name
+      , (
+        Select  vdgr.Gateway_Name
+        From    V_Doc_Gateway_Resolve   vdgr
+        Where   vdgr.Synonym_Name   =   pi_Dbfr_Rec.Dbfr_Gateway_Table_Name
+        )
       , pi_dbfr_rec.dbfr_rec_id
       , pi_dbfr_rec.dbfr_x_coordinate
       , pi_dbfr_rec.dbfr_y_coordinate                                      
