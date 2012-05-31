@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm0575
 AS
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm0575.pkb-arc   2.7.1.4   May 08 2012 16:58:24   Rob.Coupe  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm0575.pkb-arc   2.7.1.5   May 31 2012 17:08:44   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm0575.pkb  $
---       Date into PVCS   : $Date:   May 08 2012 16:58:24  $
---       Date fetched Out : $Modtime:   May 08 2012 16:57:30  $
---       PVCS Version     : $Revision:   2.7.1.4  $
+--       Date into PVCS   : $Date:   May 31 2012 17:08:44  $
+--       Date fetched Out : $Modtime:   May 31 2012 16:56:24  $
+--       PVCS Version     : $Revision:   2.7.1.5  $
 --       Based on SCCS version : 1.6
 
 --   Author : Graeme Johnson
@@ -23,7 +23,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000)  := '"$Revision:   2.7.1.4  $"';
+  g_body_sccsid  CONSTANT varchar2(2000)  := '"$Revision:   2.7.1.5  $"';
   g_package_name CONSTANT varchar2(30)    := 'nm0575';
   
   subtype id_type is nm_members.nm_ne_id_in%type;
@@ -983,7 +983,8 @@ BEGIN
           l_partial_count := l_partial_count + 1;
         END IF; -- wholly closed asset
       --
-        DECLARE
+        IF g_include_partial = 'Y' then
+          DECLARE
             l_rec_nm_begin nm_members%ROWTYPE;
             l_rec_nm_end   nm_members%ROWTYPE;
           BEGIN
@@ -1030,6 +1031,7 @@ BEGIN
               create_memberships (l_rec_nm_end);
             END IF;
           END;
+		END IF;
       --
         l_log_message := l_partial_message||g_success_message;
       --
@@ -1286,7 +1288,7 @@ END;
       WHERE nm_ne_id_in = p_ne_id_in
         AND nm_ne_id_of = NVL(p_ne_id_of,nm_ne_id_of)
         AND nm_begin_mp = NVL(p_begin_mp,nm_begin_mp)
-        AND nm_start_date = p_start_date;
+        AND nm_start_date = decode( p_ne_id_of, null, nm_start_date, p_start_date);
         --and nm_end_date is null;
       IF SQL%ROWCOUNT = 0 THEN
         nm3dbg.putln('update no_data_found: close_member_record('||p_action
@@ -1300,7 +1302,7 @@ END;
       WHERE nm_ne_id_in = p_ne_id_in
         AND nm_ne_id_of = NVL(p_ne_id_of,nm_ne_id_of)
         AND nm_begin_mp = NVL(p_begin_mp,nm_begin_mp)
-        AND nm_start_date = p_start_date;
+        AND nm_start_date = decode( p_ne_id_of, null, nm_start_date, p_start_date);
         -- Allow to operate on any effective date
         --and nm_end_date is null;
       IF SQL%ROWCOUNT = 0 
