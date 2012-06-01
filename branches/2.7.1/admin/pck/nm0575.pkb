@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm0575
 AS
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm0575.pkb-arc   2.7.1.5   May 31 2012 17:08:44   Rob.Coupe  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm0575.pkb-arc   2.7.1.6   Jun 01 2012 10:36:18   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm0575.pkb  $
---       Date into PVCS   : $Date:   May 31 2012 17:08:44  $
---       Date fetched Out : $Modtime:   May 31 2012 16:56:24  $
---       PVCS Version     : $Revision:   2.7.1.5  $
+--       Date into PVCS   : $Date:   Jun 01 2012 10:36:18  $
+--       Date fetched Out : $Modtime:   Jun 01 2012 10:16:54  $
+--       PVCS Version     : $Revision:   2.7.1.6  $
 --       Based on SCCS version : 1.6
 
 --   Author : Graeme Johnson
@@ -23,7 +23,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000)  := '"$Revision:   2.7.1.5  $"';
+  g_body_sccsid  CONSTANT varchar2(2000)  := '"$Revision:   2.7.1.6  $"';
   g_package_name CONSTANT varchar2(30)    := 'nm0575';
   
   subtype id_type is nm_members.nm_ne_id_in%type;
@@ -1283,13 +1283,16 @@ END;
     -- end date
     IF p_action = 'C' 
     THEN
-      UPDATE nm_members_all
+      UPDATE nm_members
       SET nm_end_date = p_effective_date
       WHERE nm_ne_id_in = p_ne_id_in
         AND nm_ne_id_of = NVL(p_ne_id_of,nm_ne_id_of)
         AND nm_begin_mp = NVL(p_begin_mp,nm_begin_mp)
-        AND nm_start_date = decode( p_ne_id_of, null, nm_start_date, p_start_date);
-        --and nm_end_date is null;
+        AND nm_start_date = decode( p_ne_id_of, null, nm_start_date, p_start_date)
+        and nm_end_date is null;
+--RC> Re-instated the end-date predicate and changed the operand to members rather than members-all.
+--    The code uses an effective date which, if in the past could allow closure on an already closed member. This is almost certainly
+--    going to throw date-tracking errors.	
       IF SQL%ROWCOUNT = 0 THEN
         nm3dbg.putln('update no_data_found: close_member_record('||p_action
           ||', '||p_ne_id_in||', '||p_ne_id_of||', '||p_begin_mp||', '||p_start_date||')');
