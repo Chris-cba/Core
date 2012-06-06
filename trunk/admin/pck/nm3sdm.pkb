@@ -5,11 +5,11 @@ As
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.56   Mar 21 2012 16:21:58   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.57   Jun 06 2012 09:28:46   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3sdm.pkb  $
---       Date into PVCS   : $Date:   Mar 21 2012 16:21:58  $
---       Date fetched Out : $Modtime:   Mar 21 2012 16:17:38  $
---       PVCS Version     : $Revision:   2.56  $
+--       Date into PVCS   : $Date:   Jun 06 2012 09:28:46  $
+--       Date fetched Out : $Modtime:   Jun 06 2012 09:26:52  $
+--       PVCS Version     : $Revision:   2.57  $
 --
 --   Author : R.A. Coupe
 --
@@ -21,7 +21,7 @@ As
 --
 --all global package variables here
 --
-  g_Body_Sccsid     Constant Varchar2 (2000) := '"$Revision:   2.56  $"';
+  g_Body_Sccsid     Constant Varchar2 (2000) := '"$Revision:   2.57  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
   g_Package_Name    Constant Varchar2 (30)   := 'NM3SDM';
@@ -5027,6 +5027,77 @@ Begin
   End Loop;
 End Remove_Gty_Shape;
 --
+--
+-- A procedure to re-set the route shapes for a specific route from and including a specific date 
+-- 
+procedure reset_route_shapes( p_ne_id in nm_elements.ne_id%type) as --, p_date in date) as
+cursor c1 ( c_ne_id in nm_elements.ne_id%type) is
+select * from (
+select ne_id, start_date, lead ( start_date, 1) over (order by start_date ) end_date
+from (
+with membs as ( select nm_ne_id_in, nm_start_date, nm_end_date from nm_members_all where nm_ne_id_in = c_ne_id ) -- and nm_start_date >= c_date )
+select distinct ne_id, start_date
+from (
+select distinct nm_ne_id_in ne_id, nm_start_date start_date 
+from membs
+union
+select distinct nm_ne_id_in, nm_end_date
+from membs 
+)
+order by start_date desc
+ )
+ )
+where nvl(start_date, to_date('05-NOV-1605')) != nvl(end_date, to_date('05-NOV-1605'))
+order by start_date desc;
+--
+begin
+nm_debug.debug_on;
+  For Irec In (
+              Select  nta.Nth_Theme_Id,
+                      nta.Nth_Feature_Table,
+                      nta.Nth_Feature_Pk_Column,
+                      nta.Nth_Feature_Fk_Column,
+                      nta.Nth_Feature_Shape_Column,
+                      nta.Nth_Sequence_Name
+              From    Nm_Themes_All     nta,
+                      Nm_Nw_Themes      nnt,
+                      User_Tables       ut,
+                      Nm_Linear_Types   nlt,
+                      Nm_Elements_All   nea
+              Where   nta.Nth_Theme_Id  =   nnt.Nnth_Nth_Theme_Id
+              And     ut.Table_Name     =   nta.Nth_Feature_Table
+              And     nnt.Nnth_Nlt_Id   =   nlt.Nlt_Id
+              And     nlt.Nlt_Gty_Type  =   nea.Ne_Gty_Group_Type
+              And     nlt.Nlt_Nt_Type   =   nea.Ne_Nt_Type
+              And     nea.Ne_Id         =   p_Ne_Id
+              )
+  Loop
+--
+  begin
+    execute immediate 'delete from '||irec.Nth_Feature_Table||' where '||irec.Nth_Feature_Pk_Column||' = :p_ne_id ' using p_ne_id;
+  exception 
+    when no_data_found then
+      null;
+  end;
+--  
+  nm_debug.debug('go into loop?');
+  for idates in c1(p_ne_id) loop
+    nm_debug.debug('In loop '||idates.start_date);
+    begin
+      nm3user.set_effective_date( idates.start_date );
+      execute immediate 'insert into '||irec.Nth_Feature_Table||
+           '( objectid, ne_id, geoloc, start_date, end_date ) '||
+           ' select '||irec.Nth_Sequence_Name||'.nextval, :p_ne_id, nm3sdo.get_route_shape(:p_ne_id), :start_date, :end_date from dual ' using p_ne_id, p_ne_id, idates.start_date, idates.end_date;
+                      
+    end;
+  end loop;
+  end loop;
+  nm3user.set_effective_date(trunc(sysdate));
+exception
+  when others then
+    nm3user.set_effective_date(trunc(sysdate));    
+end;
+--
 ---------------------------------------------------------------------------------------------------
 --
 Procedure Reshape_Route (
@@ -5098,6 +5169,8 @@ Is
                               ) Return Number
   Is
     Retval   Number;
+    curstr   Varchar2(200);
+    seqname  Varchar2(30) := Nm3Sdo.Get_Spatial_Seq (p_Theme);
   Begin
      Execute Immediate    'select '
                        || Nm3Sdo.Get_Spatial_Seq (p_Theme)
@@ -5305,6 +5378,8 @@ Is
   End Insert_Shape;
   ---------------------
 Begin
+ reset_route_shapes(  p_ne_id => pi_Ne_Id ); --, p_date => pi_Effective_Date );
+/*
   For Irec In (
               Select  nta.Nth_Theme_Id,
                       nta.Nth_Feature_Table,
@@ -5516,6 +5591,7 @@ Begin
     End If;  
   End Loop;
   nm_debug.debug_off;
+*/
 End Reshape_Route;
 --
 -----------------------------------------------------------------------------
@@ -7039,7 +7115,7 @@ Begin
   Append ('--');
   Append ('--   PVCS Identifiers :-');
   Append ('--');
-  Append ('--       PVCS id          : $Header::   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   '|| Get_Body_Version);
+  Append ('--       PVCS id          : $Header::c   '|| Get_Body_Version);
   Append ('--       Module Name      : $Workfile:   nm3sdm.pkb  $');
   Append ('--       Version          : ' || G_Body_Sccsid);
   Append ('--');
