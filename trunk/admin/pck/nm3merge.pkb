@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm3merge IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3merge.pkb-arc   2.13   Nov 04 2011 09:44:44   Rob.Coupe  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3merge.pkb-arc   2.14   Jun 07 2012 13:41:38   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3merge.pkb  $
---       Date into PVCS   : $Date:   Nov 04 2011 09:44:44  $
---       Date fetched Out : $Modtime:   Nov 04 2011 09:43:34  $
---       PVCS Version     : $Revision:   2.13  $
+--       Date into PVCS   : $Date:   Jun 07 2012 13:41:38  $
+--       Date fetched Out : $Modtime:   Jun 07 2012 13:40:30  $
+--       PVCS Version     : $Revision:   2.14  $
 --
 --   Author : ITurnbull
 --
@@ -16,7 +16,7 @@ CREATE OR REPLACE PACKAGE BODY nm3merge IS
 --   Copyright (c) exor corporation ltd, 2000
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.13  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.14  $"';
 --  g_body_sccsid is the SCCS ID for the package body
    g_package_name    CONSTANT  varchar2(30)   := 'nm3merge';
 --
@@ -399,7 +399,7 @@ BEGIN
 --RC> End of task 0111189
 --
    -- get the start and end nodes
-   organise_nodes(p_ne_id_1, p_ne_id_2, v_merge_at_node, g_rec_ne2.ne_no_start, g_rec_ne2.ne_no_end);
+   --organise_nodes(p_ne_id_1, p_ne_id_2, v_merge_at_node, g_rec_ne2.ne_no_start, g_rec_ne2.ne_no_end);
 --
    g_rec_ne1 := nm3net.get_ne (p_ne_id_1);
 --
@@ -899,12 +899,55 @@ PROCEDURE do_merge (p_ne_id_1           IN     nm_elements.ne_id%TYPE
   l_ne_no_end             nm_nodes.no_node_id%TYPE;  
   l_starting_ne_id        nm_elements.ne_id%TYPE;     
 
+FUNCTION defrag_connectivity
+           (pi_ne_id1 IN nm_node_usages.nnu_ne_id%TYPE
+           ,pi_ne_id2 IN nm_node_usages.nnu_ne_id%TYPE
+           ) RETURN INTEGER IS
+--
+--
+   CURSOR c_connectivity( c_ne_1 nm_elements.ne_id%TYPE,
+                          c_ne_2 nm_elements.ne_id%TYPE ) IS
+     SELECT a2.nnu_node_type, Nm3net.get_type_sign( a1.nnu_node_type ),
+                              Nm3net.get_type_sign( a2.nnu_node_type ), sum(1) over (order by 1)
+     FROM nm_node_usages a1, nm_node_usages a2
+     WHERE a1.nnu_ne_id = c_ne_1
+     AND   a2.nnu_ne_id = c_ne_2
+     AND   a1.nnu_no_node_id = a2.nnu_no_node_id order by 2;
+
+   l_type1 nm_node_usages.nnu_node_type%TYPE;
+
+   l1 INTEGER;
+   l2 INTEGER;
+
+   retval  INTEGER;
+   lc      INTEGER;
+
+BEGIN
+--
+   OPEN c_connectivity( pi_ne_id1, pi_ne_id2 );
+   FETCH c_connectivity INTO l_type1, l1, l2, lc;
+   IF c_connectivity%NOTFOUND THEN
+     retval := 0;
+   ELSE
+     IF lc > 1 then
+       retval := -99;
+     ELSIF l1 = l2 THEN
+       retval := 2*l2;
+     ELSE
+       retval := 1*l2;
+     END IF;
+   END IF;
+   CLOSE c_connectivity;
+   RETURN retval;
+
+END defrag_connectivity;
+
 BEGIN
 --
    nm_debug.proc_start(g_package_name , 'do_merge');
    
 --
-  l_connectivity := nm3pla.defrag_connectivity (pi_ne_id1 => p_ne_id_1
+  l_connectivity := defrag_connectivity (pi_ne_id1 => p_ne_id_1
                                                ,pi_ne_id2 => p_ne_id_2
                                                );
 
@@ -959,6 +1002,23 @@ BEGIN
      l_flip_cardinality_of_2  := 'Y';
      g_ne_id_to_flip := p_ne_id_2;
      l_starting_ne_id := p_ne_id_2; -- used by merge members to determine how to determine the new overall measures	 	 
+
+ ELSIF l_connectivity = -99 THEN
+ 
+     --                DATUM 1    
+     --           / -----------\ 
+     --        */               \*
+     --        S                 E
+     --        \                /
+     --         \-------------/
+     --              DATUM 2 
+     --                   
+     l_ne_no_start := l_ne_rec_1.ne_no_start;   
+     l_ne_no_end   := l_ne_rec_1.ne_no_start;
+     l_flip_cardinality_of_2  := 'Y';
+     g_ne_id_to_flip := p_ne_id_2;
+     l_starting_ne_id := p_ne_id_1; -- used by merge members to determine how to determine the new overall measures          
+
 
  END IF;
 --
@@ -1292,6 +1352,7 @@ PROCEDURE end_date_members (p_nm_ne_id_of_old        nm_members.nm_ne_id_of%TYPE
     FROM  nm_members
    WHERE  nm_ne_id_of = c_nm_ne_id_of_old
     AND   nm_type     = NVL(c_nm_type,nm_type)
+    AND   nm_type     != 'F'
    FOR UPDATE NOWAIT;
 --
    l_nm_type nm_members.nm_type%TYPE := NULL;
