@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3_bulk_attrib_upd.pkb-arc   3.9   May 20 2011 15:47:46   Steve.Cooper  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3_bulk_attrib_upd.pkb-arc   3.10   Jun 07 2012 10:22:42   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3_bulk_attrib_upd.pkb  $
---       Date into PVCS   : $Date:   May 20 2011 15:47:46  $
---       Date fetched Out : $Modtime:   May 20 2011 15:46:42  $
---       Version          : $Revision:   3.9  $
+--       Date into PVCS   : $Date:   Jun 07 2012 10:22:42  $
+--       Date fetched Out : $Modtime:   Jun 07 2012 10:21:40  $
+--       Version          : $Revision:   3.10  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.9  $';
+  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.10  $';
 
   g_package_name CONSTANT varchar2(30) := 'nm3_bulk_attrib_upd';
 --
@@ -772,7 +772,7 @@ BEGIN
                   Null, 
                   Null    
                  BULK  COLLECT INTO l_nm_rec   
-           FROM  nm_members nm,
+           FROM  -- nm_members nm,    (RAC - removal of this appalling product - why is this joining to existing members - it is responsible for an attempt to insert zillions of rows!
                  (SELECT ne.* FROM nm_elements ne,(table(cast(nm3_bulk_attrib_upd.get_ne_array(nm3_bulk_attrib_upd.l_ne_id_array) as nm_ne_id_array)) ne1 )
            WHERE   ne.ne_id = ne1.ne_id) x ;       
  
