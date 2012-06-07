@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_nav.pkb-arc   3.17   Dec 03 2010 10:56:24   Linesh.Sorathia  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_nav.pkb-arc   3.18   Jun 07 2012 09:23:00   Linesh.Sorathia  $
 --       Module Name      : $Workfile:   hig_nav.pkb  $
---       Date into PVCS   : $Date:   Dec 03 2010 10:56:24  $
---       Date fetched Out : $Modtime:   Dec 03 2010 10:51:18  $
---       Version          : $Revision:   3.17  $
+--       Date into PVCS   : $Date:   Jun 07 2012 09:23:00  $
+--       Date fetched Out : $Modtime:   May 24 2012 11:35:46  $
+--       Version          : $Revision:   3.18  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.17  $';
+  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.18  $';
 
   g_package_name CONSTANT varchar2(30) := 'hig_nav';
   l_top_id       nav_id := nav_id(Null);
@@ -101,7 +101,7 @@ IS
    l_found Varchar2(1);
 BEGIN
 --
-   IF pi_tab_name != 'NM_INV_ITEMS'
+   IF pi_tab_name != 'NM_INV_ITEMS_ALL'
    THEN
        OPEN  c_get_theme;
        FETCH c_get_theme INTO l_found;
@@ -554,7 +554,7 @@ BEGIN
 --nm_debug.debug('child '||l_sql);
        BEGIN
        --
-          OPEN l_r for l_sql;
+          OPEN l_r for l_sql Using pi_id;
        --
        EXCEPTION
           WHEN l_invalid_table THEN
@@ -579,6 +579,7 @@ BEGIN
                l_type.parent := l_type.parent||'-'||g_hie_seq;
            END IF; 
            l_type.child := l_type.child||'-'||g_hie_seq;
+           l_type.tab_level := g_hie_seq + l_type.tab_level;
            l_tab.extend ;
            l_tab(l_tab.count) :=  l_type;
        END LOOP;
@@ -615,6 +616,14 @@ IS
    l_select    Varchar2(1000);
    l_top_id_cnt Number ;
    l_counter    Number :=0 ;
+   l_asset_hier_counter Number :=0 ;
+   l_iit_rec  Nm_inv_items_all%RowType;
+   l_iig_child_rec Nm_inv_items_all%RowType;   
+   l_iig_parent_rec Nm_inv_items_all%RowType;   
+   l_iig_cur       Sys_Refcursor;
+   l_ast_level     Number;
+   l_child_ast_label Varchar2(4000);
+   l_child_admin_unit nm_admin_units.nau_admin_unit%TYPE;
 
    l_invalid_table  EXCEPTION;
    l_invalid_column EXCEPTION;
@@ -649,15 +658,30 @@ IS
    END ;
 BEGIN
 --
+--nm_debug.debug_on;
    g_hie_seq := 0;
    l_tab.delete ;
    l_t.delete ;
    L_TOP_ID.dELETE ;
---nm_debug.debug_on;
+nm_debug.debug('l_hir_type '|| l_hir_type|| 'pi_tab '||pi_tab ); 
+   IF l_hir_type = 'Assets'
+   AND pi_tab = 'NM_INV_ITEMS_ALL'
+   THEN
+       l_iit_rec := nm3get.get_iit_all(hig_nav.id_tab(1)); 
+       ini_id_tab;
+       For i IN (Select iit_ne_id 
+                 From   nm_inv_items_all 
+                 Where  iit_primary_key = l_iit_rec.iit_primary_key 
+                 ANd    iit_inv_type =  l_iit_rec.iit_inv_type                  
+                 Order By iit_start_date desc)
+       Loop
+           populate_id_in_tab(i.iit_ne_id);
+       End Loop ;
+   END IF ;   
    FOR i in 1..hig_nav.id_tab.count 
    LOOP
        p_id := hig_nav.id_tab(i);
---nm_debug.debug('p_id '||p_id); 
+nm_debug.debug('p_id '||p_id); 
        IF p_id IS NOT NULL 
        THEN
            IF pi_tab = 'NM_INV_ITEMS_ALL' 
@@ -680,7 +704,17 @@ BEGIN
                        AND    is_product_licensed(hnv_hpr_product) = 'Y'
                        ORDER BY hnv_hierarchy_level,hnv_hierarchy_seq)
                WHERE ROWNUM = 1;  
---nm_debug.debug('par alias '||l_chi_alias);                
+nm_debug.debug('par alias '||l_chi_alias);                
+              get_top_par(p_id,l_chi_alias); 
+                   BEGIN
+                      SELECT Count(Column_value)
+                      INTO   l_top_id_cnt 
+                      FROM   Table(Cast(l_top_id AS nav_id)) ;
+                    EXCEPTION
+                    WHEN OTHERS 
+                    THEN
+                        l_top_id_cnt  :=  0;
+                   END ;
            ELSE
                For m IN (
                SELECT hnv_child_alias 
@@ -695,19 +729,24 @@ BEGIN
                Order BY hnv_hierarchy_level,hnv_hierarchy_seq ) 
                LOOP
                    l_chi_alias := m.hnv_child_alias ;
-                   Exit;
+                   get_top_par(p_id,l_chi_alias); 
+                   BEGIN
+                      SELECT Count(Column_value)
+                      INTO   l_top_id_cnt 
+                      FROM   Table(Cast(l_top_id AS nav_id)) ;
+                      If l_top_id_cnt > 0
+                      Then
+                          Exit;
+                      End If;
+                   EXCEPTION
+                      WHEN OTHERS THEN
+                      l_top_id_cnt  :=  0;
+                   END ;
                END LOOP;
            END IF ; -- HIE_TYPE          
            --get_top_level(p_id,l_chi_alias);
-           get_top_par(p_id,l_chi_alias);
-           BEGIN
-              SELECT Count(Column_value)
-              INTO   l_top_id_cnt 
-              FROM   Table(Cast(l_top_id AS nav_id)) ;
-           EXCEPTION
-               WHEN OTHERS THEN
-               l_top_id_cnt  :=  0;
-           END ;
+           --get_top_par(p_id,l_chi_alias);
+
            IF l_top_id_cnt  = 0
            THEN
 --nm_debug.debug('pop up chi '||p_id||' '||l_chi_alias);
@@ -716,7 +755,7 @@ BEGIN
                FOR top_id IN (SELECT *
                              FROM   Table(Cast(l_top_id AS nav_id)) a)  
                LOOP  
-                   nm3ctx.set_context('NAV_VAR1',top_id.column_value);  
+                   --nm3ctx.set_context('NAV_VAR1',top_id.column_value);  
                    BEGIN
                      SELECT Count(1) INTO l_found
                      FROM   table(cast(get_tab(l_tab) as hig_navigator_tab)) x
@@ -757,11 +796,11 @@ BEGIN
                                 ORDER BY hnv_hierarchy_level asc,hnv_hierarchy_seq)
                       LOOP
 --nm_debug.debug(j.hnv_CHILD_ALIAS||','||top_alias||','||sys_context('NM3SQL','NAV_VAR1'));
-                          l_sql := build_child_sql(j.hnv_CHILD_ALIAS,top_alias,sys_context('NM3SQL','NAV_VAR1'));  
---nm_debug.debug(l_sql);
-
+                          l_sql := build_child_sql(j.hnv_CHILD_ALIAS,top_alias,top_id.column_value);  
+nm_debug.debug(l_sql);
+nm_debug.debug('before '||to_char(systimestamp,'ss:ff')); 
                           BEGIN    
-                             OPEN l_r for l_sql;
+                             OPEN l_r for l_sql Using top_id.column_value;
                           EXCEPTION
                               WHEN l_invalid_table THEN
                               CLOSE l_r;
@@ -780,26 +819,81 @@ BEGIN
                               ELSE
                                   l_type.parent := l_type.parent||'-'||g_hie_seq;
                               END IF; 
+nm_debug.debug('Label : '||l_type.child||' ++ '||l_type.data);
+                              IF l_type.child like '%-AST1' 
+                              THEN 
+                                  l_type.label := Nvl(get_asset_node_label(l_type.data),l_type.label);
+                              END IF;
                               l_type.child := l_type.child||'-'||g_hie_seq;
+                              l_type.tab_level := g_hie_seq + l_type.tab_level;
                               l_tab.extend ;
                               l_tab(l_tab.count) :=  l_type;
                           END LOOP;
+nm_debug.debug('after '||to_char(systimestamp,'ss:ff')); 
                           CLOSE l_r;
                       END LOOP;
                   END IF ;                   
                END LOOP;
            END IF ;
+nm_debug.debug('top id : '||sys_context('NM3SQL','NAV_VAR2'));
+nm_debug.debug('Hierarchy type : '||l_hir_type);
+nm_debug.debug(to_char(systimestamp,'ss:ff')); 
+--Add asset grouping data. 
+           IF l_hir_type = 'Assets'
+           AND pi_tab = 'NM_INV_ITEMS_ALL'
+           Then
+               l_asset_hier_counter := 0 ;              
+               Open l_iig_cur For  'Select iig.iig_parent_id,iig.iig_item_id,parent.iit_inv_type parent_inv_type,child.iit_inv_type '||
+                                   ' child_inv_type,parent.iit_start_date,child.iit_primary_key , '||
+                                   ' child.iit_admin_unit child_iit_admin_unit,child.iit_end_date, '||
+                                   ' child.iit_start_date child_start_date, parent_type.nit_descr parent_type_descr,child_type.nit_descr '||
+                                   ' child_type_descr,level '||
+                                   ' From nm_inv_item_groupings_all iig,nm_inv_items_all child,nm_inv_items_all parent,nm_inv_types_all '||
+                                   ' parent_type,nm_inv_types_all child_type '||
+                                   ' Where iig_item_id = child.iit_ne_id '||
+                                   ' And iig_parent_id = parent.iit_ne_id '||
+                                   ' And parent.iit_inv_type = parent_type.nit_inv_type '||
+                                   ' And child.iit_inv_type = child_type.nit_inv_type '||
+                                   ' Connect by iig_parent_id = prior iig_item_id '||
+                                   ' Start with iig_parent_id = :1 ' Using p_id;
+               Loop
+                   Fetch l_iig_cur Into l_iig_parent_rec.iit_ne_id,l_iig_child_rec.iit_ne_id,l_iig_parent_rec.iit_inv_type,l_iig_child_rec.iit_inv_type,l_iig_parent_rec.iit_start_date,
+                   l_iig_child_rec.iit_primary_key,l_child_admin_unit,l_iig_child_rec.iit_end_date, 
+                   l_iig_child_rec.iit_start_date,l_iig_parent_rec.iit_descr,l_iig_child_rec.iit_descr,l_ast_level ;
+                   Exit When l_iig_cur%NotFound;
+                   l_asset_hier_counter := l_asset_hier_counter+1;
+                   If l_asset_hier_counter = 1
+                   Then
+                       l_type.parent := l_iig_parent_rec.iit_ne_id||top_alias||'-'||g_hie_seq;
+                   Else
+                       l_type.parent := l_iig_parent_rec.iit_ne_id||'-'||l_iig_parent_rec.iit_inv_type||'-'||g_hie_seq;
+                   End If ;
+                   l_type.child := l_iig_child_rec.iit_ne_id||'-'||l_iig_child_rec.iit_inv_type||'-'||g_hie_seq;
+                   l_type.data := l_iig_child_rec.iit_ne_id;
+                   l_type.icon := 'asset';
+                   --l_type.tab_level := 1+l_asset_hier_counter;
+                   l_type.tab_level := g_hie_seq+(l_ast_level+100) ;
+                   l_child_ast_label := 'Asset - '||l_iig_child_rec.iit_inv_type||';'||l_iig_child_rec.iit_descr||';'||l_iig_child_rec.iit_ne_id||';'||
+                                        l_iig_child_rec.iit_primary_key||';'||hig_nav.get_admin_unit_name(l_child_admin_unit)||';'||l_iig_child_rec.iit_start_date||';'||
+                                        l_iig_child_rec.iit_end_date ;
+                   l_type.label := Nvl(get_asset_node_label(l_iig_child_rec.iit_ne_id),l_child_ast_label);
+                   l_tab.extend ;
+                   l_tab(l_tab.count) :=  l_type;
+               End Loop ;
+           End If ; 
        END IF ; -- p_id not null
    END loop;
-   
+nm_debug.debug(to_char(systimestamp,'ss:ff'));    
    -- Return the Hierarchy in Ref Cursor
    OPEN po_tab FOR
    SELECT x.parent,x.child,x.data,x.label,x.icon,level
    FROM   table(cast(get_tab(l_tab) as hig_navigator_tab)) x
    CONNECT BY x.parent= prior x.child
-   START WITH x.parent IS NULL ;
+   START WITH x.parent IS NULL 
+   order siblings by tab_level;
+nm_debug.debug(to_char(systimestamp,'ss:ff'));   
 END populate_tree;
---
+ --
 PROCEDURE check_docs(pi_id         IN  Varchar2
                     ,pi_table_name IN  Varchar2
                     ,po_table_name Out Varchar2
@@ -809,43 +903,23 @@ IS
 -- 
    l_table_name Varchar2(50);
    l_cnt        Number ;
+   l_viewname   Boolean := False;
 --
 BEGIN
 --
    Execute Immediate 'SELECT Count(0)  '||
-                     'FROM   doc_assocs '||
-                     'WHERE  das_rec_id = :1 '||
-                     'AND    hig_nav.check_enquiry(das_doc_id )!= 1 '||
-                     'AND    das_table_name = :2 ' INTO l_cnt Using pi_id,pi_table_name ;
-
+                     'From    Doc_Assocs    da '||
+                     'Where   da.Das_Rec_Id                           =   :1 '||
+                     'And     Hig_Nav.Check_Enquiry(da.Das_Doc_Id )   !=  1  '||
+                     'And     da.Das_Table_Name   =   ( Select  Gateway_Name '||
+                     '                                  From    V_Doc_Gateway_Resolve '||
+                     '                                  Where   Synonym_Name  =  :2 '||
+                     '                               )' INTO l_cnt Using pi_id,pi_table_name ;
+   
    IF l_cnt > 0
    THEN
        po_table_name := pi_table_name ;    
-       po_doc_cnt    := l_cnt;
-   ELSE
-       BEGIN  
-       --
-          Execute Immediate ' SELECT DGS_DGT_TABLE_NAME '||
-                            ' FROM   DOC_GATE_SYNS      '||
-                            ' WHERE  DGS_TABLE_SYN = :1 ' INTO l_table_name Using pi_table_name;
-       EXCEPTION
-           WHEN  NO_DATA_FOUND
-           THEN
-               Null;
-       END ;
-       IF l_table_name IS NOT NULL
-       THEN
-           Execute Immediate 'SELECT Count(0)  '||
-                             'FROM   doc_assocs '||
-                             'WHERE  das_rec_id = :1 '||
-                             'AND    hig_nav.check_enquiry(das_doc_id )!= 1 '||
-                             'AND    das_table_name = :2 ' INTO l_cnt Using pi_id,l_table_name ;
-           IF l_cnt > 0
-           THEN
-               po_table_name := l_table_name ;    
-               po_doc_cnt    := l_cnt;
-           END IF ;
-       END IF ;
+       po_doc_cnt    := l_cnt;   
    END IF ;
 --         
 END check_docs;
@@ -1747,7 +1821,7 @@ BEGIN
    FROM   hig_navigator b 
    WHERE  hnv_child_alias = pi_end_alias
    AND    hnv_hierarchy_type = l_hir_type;
-   nm3ctx.set_context('NAV_VAR2',pi_id);
+   --nm3ctx.set_context('NAV_VAR2',pi_id);
    FOR i IN (SELECT  *  
              FROM    hig_navigator
              WHERE   is_product_licensed(hnv_hpr_product) = 'Y'
@@ -1828,7 +1902,8 @@ BEGIN
             l_label||','||chr(39)||
             l_nav_rec.hnv_icon_name||chr(39) ||' col_icon'||','||l_nav_rec.hnv_hierarchy_level|| ' col_level, '||
             l_nav_rec.hnv_parent_id||'||'||chr(39)||l_nav_rec.hnv_parent_alias||chr(39)||' par,'||l_nav_rec.hnv_child_id||'||'||CHR(39)||l_nav_rec.hnv_child_alias||CHR(39)||' chi '||Chr(10)||
-            'FROM '|| l_tab_join||' '||l_col_join||chr(10)||l_and_where||where_col||'= sys_context(''NM3SQL'',''NAV_VAR2'') '||l_add_con;
+            --'FROM '|| l_tab_join||' '||l_col_join||chr(10)||l_and_where||where_col||'= sys_context(''NM3SQL'',''NAV_VAR2'') '||l_add_con;
+            'FROM '|| l_tab_join||' '||l_col_join||chr(10)||l_and_where||where_col||'= :1 '||l_add_con;
    RETURN l_sql ;  
 --
 END build_child_sql;
@@ -1858,7 +1933,7 @@ BEGIN
    FROM   hig_navigator b 
    WHERE  hnv_child_alias = pi_alias
    AND    hnv_hierarchy_type = l_hir_type;
-   nm3ctx.set_context('NAV_VAR2',pi_id);
+   --nm3ctx.set_context('NAV_VAR2',pi_id);
    FOR i IN (SELECT  *  
              FROM    hig_navigator
              CONNECT BY  hnv_child_alias = PRIOR hnv_parent_alias
@@ -1894,9 +1969,10 @@ BEGIN
        END IF ;         
    END LOOP;   
    l_select := 'SELECT '|| l_parent_col ;
-   l_sql := l_select||Chr(10)||'FROM '|| l_tab_join||' '||l_col_join||chr(10)||l_and_where||where_col||'= sys_context(''NM3SQL'',''NAV_VAR2'') '||l_add_con;
---nm_debug.debug('find top '||l_sql);
-   OPEN l_r for l_sql;
+   --l_sql := l_select||Chr(10)||'FROM '|| l_tab_join||' '||l_col_join||chr(10)||l_and_where||where_col||'= sys_context(''NM3SQL'',''NAV_VAR2'') '||l_add_con;
+   l_sql := l_select||Chr(10)||'FROM '|| l_tab_join||' '||l_col_join||chr(10)||l_and_where||where_col||'= :1 '||l_add_con;
+nm_debug.debug('find top '||pi_alias||' == ' ||l_sql);
+   OPEN l_r for l_sql Using pi_id;
    LOOP
        l_top_id.extend ;
        FETCH l_r into l_top_id(l_top_id.Count) ;
@@ -1922,35 +1998,12 @@ BEGIN
                      'AND    doc_dlc_dmd_id = dmd_id(+) '||
                      'AND    das_doc_id = doc_id '||
                      'AND    hig_nav.check_enquiry(das_doc_id )!= 1 '||
-                     'AND    das_table_name = :2 Order By doc_dtp_code, doc_id DESC ' BULK COLLECT INTO l_doc_tab Using pi_id,pi_table_name ;
-
-   IF l_doc_tab.Count > 0
-   THEN
+                     'And    Das_Table_Name   =   ( Select  Gateway_Name '||
+                     '                              From    V_Doc_Gateway_Resolve '||
+                     '                              Where   Synonym_Name  =  :2 '||
+                     '                              ) Order By doc_dtp_code, doc_id DESC ' BULK COLLECT INTO l_doc_tab Using pi_id,pi_table_name ; 
        Return l_doc_tab;
-   ELSE
-       BEGIN  
-       --
-          Execute Immediate ' SELECT DGS_DGT_TABLE_NAME '||
-                            ' FROM   DOC_GATE_SYNS      '||
-                            ' WHERE  DGS_TABLE_SYN = :1 ' INTO l_table_name Using pi_table_name;
-       EXCEPTION
-           WHEN  NO_DATA_FOUND
-           THEN
-               Null;
-       END ;
-       IF l_table_name IS NOT NULL
-       THEN
-           Execute Immediate 'SELECT doc_id,''Document - ''|| doc_id||''; ''||doc_dtp_code||''; ''||doc_file||''; ''||dmd_name||''; ''||To_Char(doc_date_issued,''dd-Mon-yyyy'')||''; ''||To_Char(doc_date_expires,''dd-Mon-yyyy'')'||
 
-                             'FROM   doc_assocs,docs,doc_media '||
-                             'WHERE  das_rec_id = :1 '||
-                             'AND    doc_dlc_dmd_id = dmd_id(+) '||
-                             'AND    das_doc_id = doc_id '||
-                             'AND    hig_nav.check_enquiry(das_doc_id )!= 1 '||
-                             'AND    das_table_name = :2 Order By doc_dtp_code, doc_id DESC' BULK COLLECT INTO l_doc_tab Using pi_id,l_table_name ;           
-       END IF ;
-       Return l_doc_tab;
-   END IF ;
 EXCEPTION
 WHEN OTHERS THEN
      Return l_doc_tab;
@@ -1996,6 +2049,222 @@ BEGIN
    RETURN retval;
 --
 END is_product_licensed;
+--
+FUNCTION get_asset_node_label(pi_iit_ne_id Number )
+Return Varchar2
+IS
+--
+   l_hnal_rec    hig_navigator_asset_labels%Rowtype;
+   l_sql         Varchar2(4000);
+   l_asset_label Varchar2(4000);
+   l_iit_rec     nm_inv_items_all%Rowtype; 
+--
+BEGIN
+--
+   BEGIN
+   --
+      l_iit_rec := nm3get.get_iit_all(pi_iit_ne_id);
+   --
+   EXCEPTION
+   WHEN others Then
+       Return Null;
+   END ;
+   BEGIN
+   --
+     
+     SELECT * Into l_hnal_rec 
+     FROM   hig_navigator_asset_labels
+     WHERE  hnal_inv_type = l_iit_rec.iit_inv_type;
+   
+     l_sql := 'Select '||l_hnal_rec.hnal_hier_label_1||'||'||Nvl(l_hnal_rec.hnal_hier_label_2,'Null')||'||'||Nvl(l_hnal_rec.hnal_hier_label_3,'Null')||'||'||Nvl(l_hnal_rec.hnal_hier_label_4,'Null')||'||'||
+              Nvl(l_hnal_rec.hnal_hier_label_5,'Null')||'||'||Nvl(l_hnal_rec.hnal_hier_label_6,'Null')||'||'||Nvl(l_hnal_rec.hnal_hier_label_7,'Null')||'||'||Nvl(l_hnal_rec.hnal_hier_label_8,'Null')||'||'||
+              Nvl(l_hnal_rec.hnal_hier_label_9,'Null')||'||'||Nvl(l_hnal_rec.hnal_hier_label_10,'Null')||' '||
+              'From nm_inv_items_all Where iit_ne_id = :1 ';
+     
+    Execute Immediate l_sql Into l_asset_label Using pi_iit_ne_id;    
+    Return 'Asset - '||l_asset_label ;
+   --
+   EXCEPTION 
+   WHEN No_Data_Found
+   Then
+       Return Null ;
+   When Others 
+   Then
+       Raise_Application_Error(-20010,'Error while getting label for asset type '||l_iit_rec.iit_inv_type||' '||Sqlerrm);
+   END ;
+--
+END get_asset_node_label;
+--
+FUNCTION get_asset_type_descr(pi_nit_inv_type nm_inv_types.nit_inv_type%TYPE )
+RETURN   VARCHAR2 
+IS
+--
+BEGIN
+--
+   Return nm3get.get_nit(pi_nit_inv_type).nit_descr;
+--
+END get_asset_type_descr;
+--
+FUNCTION get_admin_unit_name(pi_admin_unit nm_admin_units.nau_admin_unit%TYPE )
+RETURN   VARCHAR2 
+IS
+BEGIN
+--
+   Return nm3get.get_nau_all(pi_admin_unit).nau_name;
+--
+END get_admin_unit_name;
+--
+FUNCTION get_schedule_name(pi_schedule_id Number )
+RETURN   VARCHAR2
+IS
+--
+   l_value Varchar2(2000);
+--
+BEGIN
+--
+   IF pi_schedule_id IS NOT NULL
+   THEN
+       Execute Immediate ' Select schd_name '||
+                         ' From   schedules Where schd_id = :1' INTO l_value Using pi_schedule_id;    
+   END IF ;
+   Return l_value ;
+EXCEPTION
+   WHEN OTHERS
+   THEN 
+       RETURN l_value ;
+--
+END get_schedule_name;
+--
+FUNCTION get_schedule_work_category(pi_schedule_id Number )
+RETURN   VARCHAR2 
+IS
+--
+   l_value Varchar2(2000);
+--
+BEGIN
+--
+   IF pi_schedule_id IS NOT NULL
+   THEN
+       Execute Immediate ' Select schd_icb_work_code '||
+                         ' From   schedules Where schd_id = :1' INTO l_value Using pi_schedule_id;    
+   END IF ;
+   Return l_value ;
+EXCEPTION
+   WHEN OTHERS
+   THEN 
+       RETURN l_value ;
+--
+END get_schedule_work_category;
+--
+FUNCTION get_schedule_road_group_id(pi_schedule_id Number )
+RETURN   VARCHAR2
+IS
+--
+   l_value      Varchar2(2000);
+--
+BEGIN
+--
+   IF pi_schedule_id IS NOT NULL
+   THEN
+       Execute Immediate ' Select schd_rse_he_id '||
+                         ' From   schedules Where schd_id = :1' INTO l_value Using pi_schedule_id;    
+       IF l_value IS NOT NULL
+       THEN
+           Return nm3get.get_ne_all(l_value).ne_unique;
+       END IF ;
+   END IF ;
+   Return l_value ;
+EXCEPTION
+   WHEN OTHERS
+   THEN 
+       RETURN l_value ;
+--
+END get_schedule_road_group_id;
+--
+FUNCTION get_scheme_id(pi_scheme_id Number )
+RETURN   VARCHAR2
+IS
+--
+   l_value      Varchar2(2000);
+--
+BEGIN
+--
+   IF pi_scheme_id IS NOT NULL
+   THEN
+       Execute Immediate ' SELECT ss_unique '||
+                         ' FROM   stp_schemes WHERE ss_id = :1' INTO l_value Using pi_scheme_id;    
+   END IF ;
+   Return l_value ;
+EXCEPTION
+   WHEN OTHERS
+   THEN 
+       RETURN l_value ;
+--
+END get_scheme_id;
+--
+FUNCTION get_scheme_status(pi_scheme_id Number )
+RETURN   VARCHAR2
+IS
+--
+   l_value      Varchar2(2000);
+--
+BEGIN
+--
+   IF pi_scheme_id IS NOT NULL
+   THEN
+       Execute Immediate ' SELECT ss_status '||
+                         ' FROM   stp_schemes WHERE ss_id = :1' INTO l_value Using pi_scheme_id;    
+       Return nm3get.get_hsc(pi_hsc_domain_code => 'SCHEMES',pi_hsc_status_code => l_value).hsc_status_name;
+   END IF ;
+   Return l_value ;
+EXCEPTION
+   WHEN OTHERS
+   THEN 
+       RETURN l_value ;
+--
+END get_scheme_status;
+--
+FUNCTION get_scheme_name(pi_scheme_id Number )
+RETURN   VARCHAR2
+IS
+--
+   l_value      Varchar2(2000);
+--
+BEGIN
+--
+   IF pi_scheme_id IS NOT NULL
+   THEN
+       Execute Immediate ' SELECT ss_name '||
+                         ' FROM   stp_schemes WHERE ss_id = :1' INTO l_value Using pi_scheme_id;    
+   END IF ;
+   Return l_value ;
+EXCEPTION
+   WHEN OTHERS
+   THEN 
+       RETURN l_value ;
+--
+END get_scheme_name;
+--
+FUNCTION get_scheme_fy_id(pi_scheme_id Number )
+RETURN   VARCHAR2
+IS
+--
+   l_value      Varchar2(2000);
+--
+BEGIN
+--
+   IF pi_scheme_id IS NOT NULL
+   THEN
+       Execute Immediate ' SELECT ss_fyear_id '||
+                         ' FROM   stp_schemes WHERE ss_id = :1' INTO l_value Using pi_scheme_id;    
+   END IF ;
+   Return l_value ;
+EXCEPTION
+   WHEN OTHERS
+   THEN 
+       RETURN l_value ;
+--
+END get_scheme_fy_id;
 --
 END hig_nav;
 /
