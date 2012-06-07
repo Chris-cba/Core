@@ -4,11 +4,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_nav.pkh-arc   3.8   Dec 03 2010 10:56:24   Linesh.Sorathia  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_nav.pkh-arc   3.9   Jun 07 2012 09:22:54   Linesh.Sorathia  $
 --       Module Name      : $Workfile:   hig_nav.pkh  $
---       Date into PVCS   : $Date:   Dec 03 2010 10:56:24  $
---       Date fetched Out : $Modtime:   Dec 03 2010 10:48:16  $
---       Version          : $Revision:   3.8  $
+--       Date into PVCS   : $Date:   Jun 07 2012 09:22:54  $
+--       Date fetched Out : $Modtime:   May 18 2012 10:55:18  $
+--       Version          : $Revision:   3.9  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --</PACKAGE>
@@ -18,7 +18,7 @@ AS
   --constants
   -----------
   --g_sccsid is the SCCS ID for the package
-  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.8  $';
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.9  $';
 
   TYPE            l_tab_tab IS TABLE OF hig_navigator_type INDEX BY BINARY_INTEGER ;
   l_tab           hig_navigator_tab  := hig_navigator_tab(hig_navigator_type(Null,Null,Null,Null,Null,Null));
@@ -534,6 +534,76 @@ FUNCTION get_return_tab_cnt RETURN Number ;
 --<PROC NAME="is_product_licensed">
 -- This function returns 'Y' is the produt passed is licensed
 FUNCTION is_product_licensed ( pi_product varchar2 )
+RETURN   VARCHAR2 ;
+--</PROC>
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_asset_node_label">
+-- This function returns Asset node label for the given asset id. 
+FUNCTION get_asset_node_label( pi_iit_ne_id Number )
+RETURN   VARCHAR2 ;
+--</PROC>
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_asset_type_descr">
+-- This function returns Asset type description for the given asset type. 
+FUNCTION get_asset_type_descr(pi_nit_inv_type nm_inv_types.nit_inv_type%TYPE )
+RETURN   VARCHAR2 ;
+--</PROC>
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_admin_unit_name">
+-- This function returns the admin unti name for the given admin unit ID. 
+FUNCTION get_admin_unit_name(pi_admin_unit nm_admin_units.nau_admin_unit%TYPE )
+RETURN   VARCHAR2 ;
+--</PROC>
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_schedule_name">
+-- This function returns the schedule name for the given schedule ID. 
+FUNCTION get_schedule_name(pi_schedule_id Number )
+RETURN   VARCHAR2 ;
+--</PROC>
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_schedule_work_category">
+-- This function returns the schedule work category for the given schedule ID. 
+FUNCTION get_schedule_work_category(pi_schedule_id Number )
+RETURN   VARCHAR2 ;
+--</PROC>
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_schedule_road_group_id">
+-- This function returns the schedule road group id for the given schedule ID. 
+FUNCTION get_schedule_road_group_id(pi_schedule_id Number )
+RETURN   VARCHAR2 ;
+--</PROC>
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_scheme_id">
+-- This function returns the scheme unique id for the given scheme id. 
+FUNCTION get_scheme_id(pi_scheme_id Number )
+RETURN   VARCHAR2 ;
+--</PROC>
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_scheme_status">
+-- This function returns the scheme status for the given scheme id. 
+FUNCTION get_scheme_status(pi_scheme_id Number )
+RETURN   VARCHAR2 ;
+--</PROC>
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_scheme_name">
+-- This function returns the scheme name for the given scheme id. 
+FUNCTION get_scheme_name(pi_scheme_id Number )
+RETURN   VARCHAR2 ;
+--</PROC>
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_scheme_fy_id">
+-- This function returns the scheme financial year id for the given scheme id. 
+FUNCTION get_scheme_fy_id(pi_scheme_id Number )
 RETURN   VARCHAR2 ;
 --</PROC>
 -----------------------------------------------------------------------------
