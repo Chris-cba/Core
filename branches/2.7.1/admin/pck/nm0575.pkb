@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm0575
 AS
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm0575.pkb-arc   2.7.1.6   Jun 01 2012 10:36:18   Rob.Coupe  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm0575.pkb-arc   2.7.1.7   Jun 08 2012 15:11:00   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm0575.pkb  $
---       Date into PVCS   : $Date:   Jun 01 2012 10:36:18  $
---       Date fetched Out : $Modtime:   Jun 01 2012 10:16:54  $
---       PVCS Version     : $Revision:   2.7.1.6  $
+--       Date into PVCS   : $Date:   Jun 08 2012 15:11:00  $
+--       Date fetched Out : $Modtime:   Jun 08 2012 15:10:12  $
+--       PVCS Version     : $Revision:   2.7.1.7  $
 --       Based on SCCS version : 1.6
 
 --   Author : Graeme Johnson
@@ -23,7 +23,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000)  := '"$Revision:   2.7.1.6  $"';
+  g_body_sccsid  CONSTANT varchar2(2000)  := '"$Revision:   2.7.1.7  $"';
   g_package_name CONSTANT varchar2(30)    := 'nm0575';
   
   subtype id_type is nm_members.nm_ne_id_in%type;
@@ -134,14 +134,32 @@ BEGIN
 EXCEPTION
   WHEN DUP_VAL_ON_INDEX
   THEN
+-- RAC - Task 0111930 - review failure:
+-- We know a record will exist at this stage when the user has opted to close instead of delete
+-- i.e. the insert on the data that is kept from an intersection 
+-- at the start of the asset will always fail - the process has only just end-dated the row!
+-- So we need to perform the update of the original to give a new start-measure and then re-insert the row
+-- Original is commented out - it merely updated the record to provide correct information after the op
+-- but lost the part that was valid in the past.
+--    UPDATE nm_members_all
+--       SET nm_begin_mp   = pi_nm_rec.nm_begin_mp
+--         , nm_end_mp     = pi_nm_rec.nm_end_mp
+--         , nm_end_date   = NULL
+--     WHERE nm_ne_id_in   = pi_nm_rec.nm_ne_id_in
+--       AND nm_ne_id_of   = pi_nm_rec.nm_ne_id_of
+--       AND nm_begin_mp   = pi_nm_rec.nm_begin_mp
+--       AND nm_start_date = pi_nm_rec.nm_start_date; 
+--
     UPDATE nm_members_all
-       SET nm_begin_mp   = pi_nm_rec.nm_begin_mp
-         , nm_end_mp     = pi_nm_rec.nm_end_mp
-         , nm_end_date   = NULL
+       SET nm_begin_mp   = pi_nm_rec.nm_end_mp
      WHERE nm_ne_id_in   = pi_nm_rec.nm_ne_id_in
        AND nm_ne_id_of   = pi_nm_rec.nm_ne_id_of
        AND nm_begin_mp   = pi_nm_rec.nm_begin_mp
        AND nm_start_date = pi_nm_rec.nm_start_date; 
+--
+  INSERT INTO nm_members_all VALUES pi_nm_rec; 
+--
+
 END create_memberships;
 --
 -----------------------------------------------------------------------------
