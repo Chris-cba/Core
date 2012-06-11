@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm0575
 AS
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm0575.pkb-arc   2.7.1.8   Jun 11 2012 16:06:42   Rob.Coupe  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm0575.pkb-arc   2.7.1.9   Jun 11 2012 17:44:52   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm0575.pkb  $
---       Date into PVCS   : $Date:   Jun 11 2012 16:06:42  $
---       Date fetched Out : $Modtime:   Jun 11 2012 16:04:58  $
---       PVCS Version     : $Revision:   2.7.1.8  $
+--       Date into PVCS   : $Date:   Jun 11 2012 17:44:52  $
+--       Date fetched Out : $Modtime:   Jun 11 2012 17:43:04  $
+--       PVCS Version     : $Revision:   2.7.1.9  $
 --       Based on SCCS version : 1.6
 
 --   Author : Graeme Johnson
@@ -23,7 +23,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000)  := '"$Revision:   2.7.1.8  $"';
+  g_body_sccsid  CONSTANT varchar2(2000)  := '"$Revision:   2.7.1.9  $"';
   g_package_name CONSTANT varchar2(30)    := 'nm0575';
   
   subtype id_type is nm_members.nm_ne_id_in%type;
@@ -736,6 +736,7 @@ BEGIN
   -- if the temp extent is a single point, then only the points that fall onto it are processed
   --  the continuous items that run over the point are also excluded and thus not split.
   --
+  --nm_debug.debug_on;
   IF m_nte_job_id IS NOT NULL
   THEN
   --nm_debug.debug_on;
@@ -907,8 +908,16 @@ BEGIN
                ,p_begin_mp       => CASE WHEN g_include_partial = 'Y' THEN r.nm_begin_mp ELSE NULL END
                ,p_start_date     => r.nm_start_date
               );
+            elsif g_include_partial = 'N' then
+              close_member_record(
+                           p_action         => pi_action
+                          ,p_effective_date => l_effective_date
+                          ,p_ne_id_in       => r.nm_ne_id_in
+                          ,p_start_date     => r.nm_start_date
+                        );
+--                      
             --
-          END IF;
+            END IF;
         --
         END IF;
 
@@ -1025,7 +1034,24 @@ BEGIN
                                ELSE ' entirely'
                              END||' - ';
             l_partial_count := l_partial_count + 1;
+          
+          else
+            -- RC - just get rid and no need to process the keep -bits.
+            close_member_record(
+                           p_action         => pi_action
+                          ,p_effective_date => l_effective_date
+                          ,p_ne_id_in       => r.nm_ne_id_in
+                          ,p_start_date     => r.nm_start_date
+                        );
+                        
+            l_partial_message := CASE WHEN pi_action = 'C' THEN 'Closed' ELSE 'Deleted' END
+                               ||CASE WHEN g_include_partial = 'Y' 
+                                 THEN ' partially'
+                                 ELSE ' entirely'
+                               END||' - ';
+            
           end if;
+          
         END IF; -- wholly closed asset
         
       -- Code below removed since the close_part_member_record will re-create intersecting parts
@@ -1381,6 +1407,7 @@ END;
   l_rec1 nm_members_all%rowtype := nm3get.get_nm_all(p_ne_id_in,p_ne_id_of,p_begin_mp,p_start_date,false);
   l_rec2 nm_members_all%rowtype;
   BEGIN
+    if g_include_partial = 'Y' then
     IF p_keep_begin1 is null and
        p_keep_end1   is null and
        p_keep_begin2 is null and
@@ -1539,6 +1566,13 @@ END;
     ELSE
        raise_application_error( -20001, 'Incorrect combination of measure values 1='||p_keep_begin1||',2='||p_keep_end1||',3='||p_keep_begin2||',4='||p_keep_end2);
     END IF;
+    else
+      -- just in case -operate on all the members 
+      close_member_record( p_action         => p_action
+                          ,p_effective_date => p_effective_date
+                          ,p_ne_id_in       => p_ne_id_in
+                          ,p_start_date     => p_start_date );
+    end if; -- g_include_partial
   END;  
   
 
