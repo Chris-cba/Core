@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm0575
 AS
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm0575.pkb-arc   2.7.1.7   Jun 08 2012 15:11:00   Rob.Coupe  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm0575.pkb-arc   2.7.1.8   Jun 11 2012 16:06:42   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm0575.pkb  $
---       Date into PVCS   : $Date:   Jun 08 2012 15:11:00  $
---       Date fetched Out : $Modtime:   Jun 08 2012 15:10:12  $
---       PVCS Version     : $Revision:   2.7.1.7  $
+--       Date into PVCS   : $Date:   Jun 11 2012 16:06:42  $
+--       Date fetched Out : $Modtime:   Jun 11 2012 16:04:58  $
+--       PVCS Version     : $Revision:   2.7.1.8  $
 --       Based on SCCS version : 1.6
 
 --   Author : Graeme Johnson
@@ -23,7 +23,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000)  := '"$Revision:   2.7.1.7  $"';
+  g_body_sccsid  CONSTANT varchar2(2000)  := '"$Revision:   2.7.1.8  $"';
   g_package_name CONSTANT varchar2(30)    := 'nm0575';
   
   subtype id_type is nm_members.nm_ne_id_in%type;
@@ -57,6 +57,20 @@ AS
     ,p_ne_id_of in id_type default null
     ,p_begin_mp in mp_type default null
     ,p_start_date in date
+  );
+--
+  procedure close_part_member_record(
+     p_action         in varchar2
+    ,p_effective_date in date
+    ,p_ne_id_in       in id_type
+    ,p_ne_id_of       in id_type 
+    ,p_begin_mp       in mp_type 
+    ,p_end_mp         in mp_type    
+    ,p_start_date     in date
+    ,p_keep_begin1    in number default null
+    ,p_keep_end1      in number default null
+    ,p_keep_begin2    in number default null
+    ,p_keep_end2      in number default null   
   );
 --
 -----------------------------------------------------------------------------
@@ -135,6 +149,9 @@ EXCEPTION
   WHEN DUP_VAL_ON_INDEX
   THEN
 -- RAC - Task 0111930 - review failure:
+-- original code would try to re-create a duplicate member by date and start measure - so the following was doen. however, similar problems in duplicating data 
+--occurred for both ends and did not always violate the key- so the code was chanegd to handle the part memberships -
+--  so this code should not be needed any longer but left in just in case.
 -- We know a record will exist at this stage when the user has opted to close instead of delete
 -- i.e. the insert on the data that is kept from an intersection 
 -- at the start of the asset will always fail - the process has only just end-dated the row!
@@ -881,14 +898,15 @@ BEGIN
         -- If the include_partial flag is Y then close the part, otherwise
         -- close the entire membership.
         --
-            close_member_record(
-               p_action         => pi_action
-              ,p_effective_date => l_effective_date
-              ,p_ne_id_in       => r.nm_ne_id_in
-              ,p_ne_id_of       => CASE WHEN g_include_partial = 'Y' THEN r.nm_ne_id_of ELSE NULL END
-              ,p_begin_mp       => CASE WHEN g_include_partial = 'Y' THEN r.nm_begin_mp ELSE NULL END
-              ,p_start_date     => r.nm_start_date
-            );
+            if g_include_partial = 'Y' and (r.keep_begin_mp is null or r.keep_begin_mp2 is null ) then  
+              close_member_record(
+                p_action         => pi_action
+               ,p_effective_date => l_effective_date
+               ,p_ne_id_in       => r.nm_ne_id_in
+               ,p_ne_id_of       => CASE WHEN g_include_partial = 'Y' THEN r.nm_ne_id_of ELSE NULL END
+               ,p_begin_mp       => CASE WHEN g_include_partial = 'Y' THEN r.nm_begin_mp ELSE NULL END
+               ,p_start_date     => r.nm_start_date
+              );
             --
           END IF;
         --
@@ -966,6 +984,7 @@ BEGIN
           -- Finally close the membership for the parent assets after clearing up the children.
           --
             nm_debug.debug('# - '||l_operation||' hierarchical asset memberships '||' - '||r.nm_ne_id_in||' - Parent set to '||r.iig_parent_id);
+            --RC - Ignoring partial locations of hierarchical assets (for now)
             close_member_record(
                            p_action         => pi_action
                           ,p_effective_date => l_effective_date
@@ -985,70 +1004,82 @@ BEGIN
           delete_doc_assocs (r.nm_ne_id_in);
         ELSE
           nm_debug.debug('# - '||l_operation||' partial asset memberships '||' - '||r.nm_ne_id_in||' at rownum '||r.iit_rownum);
-          close_member_record(
-               p_action         => pi_action
-              ,p_effective_date => l_effective_date
-              ,p_ne_id_in       => r.nm_ne_id_in
-              ,p_ne_id_of       => CASE WHEN g_include_partial = 'Y' THEN r.nm_ne_id_of ELSE NULL END
-              ,p_begin_mp       => CASE WHEN g_include_partial = 'Y' THEN r.nm_begin_mp ELSE NULL END
-              ,p_start_date     => r.nm_start_date
-            );
-          l_partial_message := CASE WHEN pi_action = 'C' THEN 'Closed' ELSE 'Deleted' END
+
+          if g_include_partial = 'Y' then
+          
+            close_part_member_record( p_action         => pi_action
+                                     ,p_effective_date => l_effective_date
+                                     ,p_ne_id_in       => r.nm_ne_id_in
+                                     ,p_ne_id_of       => r.nm_ne_id_of
+                                     ,p_begin_mp       => r.nm_begin_mp
+                                     ,p_end_mp         => r.nm_end_mp
+                                     ,p_start_date     => r.nm_start_date
+                                     ,p_keep_begin1    => r.keep_begin_mp
+                                     ,p_keep_end1      => r.keep_end_mp
+                                     ,p_keep_begin2    => r.keep_begin_mp2
+                                     ,p_keep_end2      => r.keep_end_mp2 );
+                                     
+            l_partial_message := CASE WHEN pi_action = 'C' THEN 'Closed' ELSE 'Deleted' END
                              ||CASE WHEN g_include_partial = 'Y' 
                                THEN ' partially'
                                ELSE ' entirely'
                              END||' - ';
-          l_partial_count := l_partial_count + 1;
+            l_partial_count := l_partial_count + 1;
+          end if;
         END IF; -- wholly closed asset
-      --
-        IF g_include_partial = 'Y' then
-          DECLARE
-            l_rec_nm_begin nm_members%ROWTYPE;
-            l_rec_nm_end   nm_members%ROWTYPE;
-          BEGIN
-            IF r.keep_begin_mp IS NOT NULL 
-            THEN
-              nm_debug.debug('# - Recreate partial membership 1 '
-                            ||r.nm_ne_id_in||':'
-                            ||r.nm_ne_id_of||':'
-                            ||r.nm_obj_type||':'
-                            ||r.keep_begin_mp||':'
-                            ||r.keep_end_mp);
-              l_rec_nm_begin.nm_ne_id_in    := r.nm_ne_id_in;
-              l_rec_nm_begin.nm_ne_id_of    := r.nm_ne_id_of;
-              l_rec_nm_begin.nm_type        := r.nm_type;
-              l_rec_nm_begin.nm_obj_type    := r.nm_obj_type;
-              l_rec_nm_begin.nm_begin_mp    := r.keep_begin_mp;
-              l_rec_nm_begin.nm_start_date  := r.nm_start_date;
-              l_rec_nm_begin.nm_end_mp      := r.keep_end_mp;
-              l_rec_nm_begin.nm_admin_unit  := r.nm_admin_unit;
-              l_rec_nm_begin.nm_cardinality := r.nm_cardinality;
-              l_rec_nm_begin.nm_seq_no      := r.nm_seq_no;
-              l_rec_nm_begin.nm_seg_no      := r.nm_seg_no;
-              create_memberships (l_rec_nm_begin);
-            END IF;
-            IF r.keep_begin_mp2 IS NOT NULL 
-            THEN
-              nm_debug.debug('# - Recreate partial membership 2 '
-                            ||r.nm_ne_id_in||':'
-                            ||r.nm_ne_id_of||':'
-                            ||r.nm_obj_type||':'
-                            ||r.keep_begin_mp||':'
-                            ||r.keep_end_mp);
-              l_rec_nm_end.nm_ne_id_in    := r.nm_ne_id_in;
-              l_rec_nm_end.nm_ne_id_of    := r.nm_ne_id_of;
-              l_rec_nm_end.nm_type        := r.nm_type;
-              l_rec_nm_end.nm_obj_type    := r.nm_obj_type;
-              l_rec_nm_end.nm_begin_mp    := r.keep_begin_mp2;
-              l_rec_nm_end.nm_start_date  := r.nm_start_date;
-              l_rec_nm_end.nm_end_mp      := r.keep_end_mp2;
-              l_rec_nm_end.nm_admin_unit  := r.nm_admin_unit;
-              l_rec_nm_end.nm_cardinality := r.nm_cardinality;
-              l_rec_nm_end.nm_seq_no      := r.nm_seq_no;
-              l_rec_nm_end.nm_seg_no      := r.nm_seg_no;
-              create_memberships (l_rec_nm_end);
-            END IF;
-          END;
+        
+      -- Code below removed since the close_part_member_record will re-create intersecting parts
+--          DECLARE
+--            l_rec_nm_begin nm_members%ROWTYPE;
+--            l_rec_nm_end   nm_members%ROWTYPE;
+--          BEGIN
+--            IF r.keep_begin_mp IS NOT NULL or r.keep_begin_mp2 IS NOT NULL 
+--            THEN
+--              nm_debug.debug('# - Recreate partial membership 1 '
+--                            ||r.nm_ne_id_in||':'
+--                            ||r.nm_ne_id_of||':'
+--                            ||r.nm_obj_type||':'
+--                            ||r.keep_begin_mp||':'
+--                            ||r.keep_end_mp);
+--              l_rec_nm_begin.nm_ne_id_in    := r.nm_ne_id_in;
+--              l_rec_nm_begin.nm_ne_id_of    := r.nm_ne_id_of;
+--              l_rec_nm_begin.nm_type        := r.nm_type;
+--              l_rec_nm_begin.nm_obj_type    := r.nm_obj_type;
+--              l_rec_nm_begin.nm_begin_mp    := r.keep_begin_mp;
+--              l_rec_nm_begin.nm_start_date  := r.nm_start_date;
+--              l_rec_nm_begin.nm_end_mp      := r.keep_end_mp;
+--              l_rec_nm_begin.nm_admin_unit  := r.nm_admin_unit;
+--              l_rec_nm_begin.nm_cardinality := r.nm_cardinality;
+--              l_rec_nm_begin.nm_seq_no      := r.nm_seq_no;
+--              l_rec_nm_begin.nm_seg_no      := r.nm_seg_no;
+----
+----           the closure of the original part members has been deferred - handle the create-memberships ans the closure in one subprogram
+----
+--
+--              create_memberships (l_rec_nm_begin);
+--            END IF;
+--            IF r.keep_begin_mp2 IS NOT NULL 
+--            THEN
+--              nm_debug.debug('# - Recreate partial membership 2 '
+--                            ||r.nm_ne_id_in||':'
+--                            ||r.nm_ne_id_of||':'
+--                            ||r.nm_obj_type||':'
+--                            ||r.keep_begin_mp||':'
+--                            ||r.keep_end_mp);
+--              l_rec_nm_end.nm_ne_id_in    := r.nm_ne_id_in;
+--              l_rec_nm_end.nm_ne_id_of    := r.nm_ne_id_of;
+--              l_rec_nm_end.nm_type        := r.nm_type;
+--              l_rec_nm_end.nm_obj_type    := r.nm_obj_type;
+--              l_rec_nm_end.nm_begin_mp    := r.keep_begin_mp2;
+--              l_rec_nm_end.nm_start_date  := r.nm_start_date;
+--              l_rec_nm_end.nm_end_mp      := r.keep_end_mp2;
+--              l_rec_nm_end.nm_admin_unit  := r.nm_admin_unit;
+--              l_rec_nm_end.nm_cardinality := r.nm_cardinality;
+--              l_rec_nm_end.nm_seq_no      := r.nm_seq_no;
+--              l_rec_nm_end.nm_seg_no      := r.nm_seg_no;
+--              create_memberships (l_rec_nm_end);
+--            END IF;
+--          END;
 		END IF;
       --
         l_log_message := l_partial_message||g_success_message;
@@ -1334,6 +1365,183 @@ END;
     END IF;
   END;
 --
+  procedure close_part_member_record(
+     p_action         in varchar2
+    ,p_effective_date in date
+    ,p_ne_id_in       in id_type
+    ,p_ne_id_of       in id_type
+    ,p_begin_mp       in mp_type
+    ,p_end_mp         in mp_type 
+    ,p_start_date     in date
+    ,p_keep_begin1    in number default null
+    ,p_keep_end1      in number default null
+    ,p_keep_begin2    in number default null
+    ,p_keep_end2      in number default null   
+  ) IS
+  l_rec1 nm_members_all%rowtype := nm3get.get_nm_all(p_ne_id_in,p_ne_id_of,p_begin_mp,p_start_date,false);
+  l_rec2 nm_members_all%rowtype;
+  BEGIN
+    IF p_keep_begin1 is null and
+       p_keep_end1   is null and
+       p_keep_begin2 is null and
+       p_keep_end2   is null then
+--     this should not have been called, just use the standard close member procedure
+      close_member_record( p_action         => p_action
+                          ,p_effective_date => p_effective_date
+                          ,p_ne_id_in       => p_ne_id_in
+                          ,p_ne_id_of       => p_ne_id_of
+                          ,p_begin_mp       => p_begin_mp
+                          ,p_start_date     => p_start_date );
+    ELSIF p_keep_begin1 is not null and 
+          p_keep_end1   is not null and
+          p_keep_begin2 is null and
+          p_keep_end2   is null then
+--          
+--     need to retain part 1 - needs to be split into two chunks on part 1 alone
+      if p_keep_end1 < p_begin_mp  or p_keep_begin1 > p_end_mp then
+--      no intersection, just end-dae original
+        close_member_record( p_action         => p_action
+                           ,p_effective_date => p_effective_date
+                           ,p_ne_id_in       => p_ne_id_in
+                           ,p_ne_id_of       => p_ne_id_of
+                           ,p_begin_mp       => p_begin_mp
+                           ,p_start_date     => p_start_date );
+      END IF;
+--
+      l_rec2 := l_rec1;
+
+      if p_keep_begin1 > l_rec1.nm_begin_mp then
+        l_rec1.nm_end_mp := p_keep_begin1;
+      end if;
+      
+      if p_keep_end1 < l_rec1.nm_end_mp then
+        l_rec1.nm_begin_mp := p_keep_end1;
+      end if;
+      
+      if p_action = 'C' then
+        update nm_members_all
+        set nm_begin_mp = l_rec1.nm_begin_mp,
+            nm_end_mp   = l_rec1.nm_end_mp
+        where nm_ne_id_in = p_ne_id_in
+        and   nm_ne_id_of = p_ne_id_of
+        and   nm_begin_mp = p_begin_mp
+        and   nm_start_date = p_start_date;
+      else
+        close_member_record( p_action         => p_action
+                            ,p_effective_date => p_effective_date
+                            ,p_ne_id_in       => p_ne_id_in
+                            ,p_ne_id_of       => p_ne_id_of
+                            ,p_begin_mp       => p_begin_mp
+                            ,p_start_date     => p_start_date );
+      end if;              
+      
+      l_rec2.nm_begin_mp := p_keep_begin1;
+      l_rec2.nm_end_mp   := p_keep_end1;
+      l_rec2.nm_end_date := null;
+      
+      nm3ins.ins_nm(l_rec2);
+--
+    ELSIF p_keep_begin1 is null and 
+          p_keep_end1   is null and
+          p_keep_begin2 is not null and
+          p_keep_end2   is not null then
+--
+--   need to retain part 2 - needs to be split into two chunks on part 2 alone
+      IF p_keep_end2 < p_begin_mp  or p_keep_begin2 > p_end_mp then
+--     no intersection, just end-dae original
+       close_member_record( p_action         => p_action
+                           ,p_effective_date => p_effective_date
+                           ,p_ne_id_in       => p_ne_id_in
+                           ,p_ne_id_of       => p_ne_id_of
+                           ,p_begin_mp       => p_begin_mp
+                           ,p_start_date     => p_start_date );
+      END IF;
+--
+      l_rec2 := l_rec1;
+
+      if p_keep_begin2 > l_rec1.nm_begin_mp then
+        l_rec1.nm_end_mp := p_keep_begin2;
+      end if;
+      
+      if p_keep_end2 < l_rec1.nm_end_mp then
+        l_rec1.nm_begin_mp := p_keep_end2;
+      end if;
+
+      if p_action = 'C' then
+      
+        update nm_members_all
+        set nm_begin_mp = l_rec1.nm_begin_mp,
+            nm_end_mp   = l_rec1.nm_end_mp
+        where nm_ne_id_in = p_ne_id_in
+        and   nm_ne_id_of = p_ne_id_of
+        and   nm_begin_mp = p_begin_mp
+        and   nm_start_date = p_start_date;
+      else
+      
+        close_member_record( p_action         => p_action
+                            ,p_effective_date => p_effective_date
+                            ,p_ne_id_in       => p_ne_id_in
+                            ,p_ne_id_of       => p_ne_id_of
+                            ,p_begin_mp       => p_begin_mp
+                            ,p_start_date     => p_start_date );
+      
+      end if;
+      
+      l_rec2.nm_begin_mp := p_keep_begin2;
+      l_rec2.nm_end_mp   := p_keep_end2;
+      l_rec2.nm_end_date := null;
+      
+      nm3ins.ins_nm(l_rec2);
+           
+    ELSIF p_keep_begin1 is not null and 
+          p_keep_end1   is not null and
+          p_keep_begin2 is not null and
+          p_keep_end2   is not null then
+--    need to retain parts 1 and 2 - needs to be split into three chunks.              
+      l_rec2 := l_rec1;
+      l_rec1.nm_begin_mp := least(p_keep_end1, p_keep_end2);
+      l_rec1.nm_end_mp   := greatest(p_keep_begin1, p_keep_begin2);
+--
+      if p_action = 'C' then
+      
+        update nm_members_all
+        set nm_begin_mp = l_rec1.nm_begin_mp,
+            nm_end_mp   = l_rec1.nm_end_mp,
+            nm_end_date = p_effective_date
+        where nm_ne_id_in = p_ne_id_in
+        and   nm_ne_id_of = p_ne_id_of
+        and   nm_begin_mp = p_begin_mp
+        and   nm_start_date = p_start_date;
+        
+      else
+      
+        close_member_record( p_action         => p_action
+                            ,p_effective_date => p_effective_date
+                            ,p_ne_id_in       => p_ne_id_in
+                            ,p_ne_id_of       => p_ne_id_of
+                            ,p_begin_mp       => p_begin_mp
+                            ,p_start_date     => p_start_date );
+      
+      end if;
+
+      l_rec2.nm_begin_mp := p_keep_begin1;
+      l_rec2.nm_end_mp   := p_keep_end1;
+      l_rec2.nm_end_date := null;
+
+      nm3ins.ins_nm(l_rec2);
+                  
+      l_rec2.nm_begin_mp := p_keep_begin2;
+      l_rec2.nm_end_mp   := p_keep_end2;
+      l_rec2.nm_end_date := null;
+
+      nm3ins.ins_nm(l_rec2);
+
+    ELSE
+       raise_application_error( -20001, 'Incorrect combination of measure values 1='||p_keep_begin1||',2='||p_keep_end1||',3='||p_keep_begin2||',4='||p_keep_end2);
+    END IF;
+  END;  
+  
+
 -----------------------------------------------------------------------------
 --
   -- this is useful code, but not used here.
