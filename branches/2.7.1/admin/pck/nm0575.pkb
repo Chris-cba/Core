@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm0575
 AS
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm0575.pkb-arc   2.7.1.9   Jun 11 2012 17:44:52   Rob.Coupe  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm0575.pkb-arc   2.7.1.10   Jun 13 2012 08:30:28   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm0575.pkb  $
---       Date into PVCS   : $Date:   Jun 11 2012 17:44:52  $
---       Date fetched Out : $Modtime:   Jun 11 2012 17:43:04  $
---       PVCS Version     : $Revision:   2.7.1.9  $
+--       Date into PVCS   : $Date:   Jun 13 2012 08:30:28  $
+--       Date fetched Out : $Modtime:   Jun 13 2012 08:28:54  $
+--       PVCS Version     : $Revision:   2.7.1.10  $
 --       Based on SCCS version : 1.6
 
 --   Author : Graeme Johnson
@@ -23,7 +23,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000)  := '"$Revision:   2.7.1.9  $"';
+  g_body_sccsid  CONSTANT varchar2(2000)  := '"$Revision:   2.7.1.10  $"';
   g_package_name CONSTANT varchar2(30)    := 'nm0575';
   
   subtype id_type is nm_members.nm_ne_id_in%type;
@@ -67,6 +67,9 @@ AS
     ,p_begin_mp       in mp_type 
     ,p_end_mp         in mp_type    
     ,p_start_date     in date
+    ,p_end_date       in date
+    ,p_admin_unit     in id_type  
+    ,p_obj_type       in varchar2 
     ,p_keep_begin1    in number default null
     ,p_keep_end1      in number default null
     ,p_keep_begin2    in number default null
@@ -1023,6 +1026,9 @@ BEGIN
                                      ,p_begin_mp       => r.nm_begin_mp
                                      ,p_end_mp         => r.nm_end_mp
                                      ,p_start_date     => r.nm_start_date
+                                     ,p_end_date       => null
+                                     ,p_admin_unit     => r.nm_admin_unit
+                                     ,p_obj_type       => r.nm_obj_type
                                      ,p_keep_begin1    => r.keep_begin_mp
                                      ,p_keep_end1      => r.keep_end_mp
                                      ,p_keep_begin2    => r.keep_begin_mp2
@@ -1399,14 +1405,28 @@ END;
     ,p_begin_mp       in mp_type
     ,p_end_mp         in mp_type 
     ,p_start_date     in date
+    ,p_end_date       in date
+    ,p_admin_unit     in id_type
+    ,p_obj_type       in varchar2
     ,p_keep_begin1    in number default null
     ,p_keep_end1      in number default null
     ,p_keep_begin2    in number default null
     ,p_keep_end2      in number default null   
   ) IS
-  l_rec1 nm_members_all%rowtype := nm3get.get_nm_all(p_ne_id_in,p_ne_id_of,p_begin_mp,p_start_date,false);
+  l_rec1 nm_members_all%rowtype; -- := nm3get.get_nm_all(p_ne_id_in,p_ne_id_of,p_begin_mp,p_start_date,false);
   l_rec2 nm_members_all%rowtype;
   BEGIN
+  
+    l_rec1.nm_ne_id_in    := p_ne_id_in;
+    l_rec1.nm_ne_id_of    := p_ne_id_of;
+    l_rec1.nm_begin_mp    := p_begin_mp;
+    l_rec1.nm_end_mp      := p_end_mp;
+    l_rec1.nm_start_date  := p_start_date;
+    l_rec1.nm_end_date    := p_end_date;
+    l_rec1.nm_admin_unit  := p_admin_unit;
+    l_rec1.nm_obj_type    := p_obj_type;
+    l_rec1.nm_type        := 'I';
+    
     if g_include_partial = 'Y' then
     IF p_keep_begin1 is null and
        p_keep_end1   is null and
