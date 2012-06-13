@@ -2,11 +2,11 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm_4500_fix8.sql-arc   3.0   Jun 13 2012 16:12:46   Mike.Alexander  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm_4500_fix8.sql-arc   3.1   Jun 13 2012 16:28:14   Mike.Alexander  $
 --       Module Name      : $Workfile:   nm_4500_fix8.sql  $
---       Date into PVCS   : $Date:   Jun 13 2012 16:12:46  $
---       Date fetched Out : $Modtime:   Jun 13 2012 16:05:22  $
---       PVCS Version     : $Revision:   3.0  $
+--       Date into PVCS   : $Date:   Jun 13 2012 16:28:14  $
+--       Date fetched Out : $Modtime:   Jun 13 2012 16:20:40  $
+--       PVCS Version     : $Revision:   3.1  $
 --
 --------------------------------------------------------------------------------
 --   Copyright (c) 2012 Bentley Systems Incorporated.
@@ -92,6 +92,17 @@ SET TERM OFF
 SET FEEDBACK ON
 start web_user_info.pkw
 SET FEEDBACK OFF
+--
+--------------------------------------------------------------------------------
+-- ****************   SYNONYMS   *******************
+--------------------------------------------------------------------------------
+--
+SET TERM ON
+Prompt Creating Synonyms That Do Not Exist...
+SET TERM OFF
+SET FEEDBACK OFF
+EXECUTE nm3ddl.refresh_all_synonyms;
+--
 --
 --------------------------------------------------------------------------------
 -- Update hig_upgrades with fix ID
