@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm0575
 AS
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm0575.pkb-arc   2.7.1.10   Jun 13 2012 08:30:28   Rob.Coupe  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm0575.pkb-arc   2.7.1.11   Jun 15 2012 09:35:50   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm0575.pkb  $
---       Date into PVCS   : $Date:   Jun 13 2012 08:30:28  $
---       Date fetched Out : $Modtime:   Jun 13 2012 08:28:54  $
---       PVCS Version     : $Revision:   2.7.1.10  $
+--       Date into PVCS   : $Date:   Jun 15 2012 09:35:50  $
+--       Date fetched Out : $Modtime:   Jun 15 2012 09:34:18  $
+--       PVCS Version     : $Revision:   2.7.1.11  $
 --       Based on SCCS version : 1.6
 
 --   Author : Graeme Johnson
@@ -23,7 +23,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000)  := '"$Revision:   2.7.1.10  $"';
+  g_body_sccsid  CONSTANT varchar2(2000)  := '"$Revision:   2.7.1.11  $"';
   g_package_name CONSTANT varchar2(30)    := 'nm0575';
   
   subtype id_type is nm_members.nm_ne_id_in%type;
@@ -918,9 +918,10 @@ BEGIN
                           ,p_ne_id_in       => r.nm_ne_id_in
                           ,p_start_date     => r.nm_start_date
                         );
+            END IF;
 --                      
             --
-            END IF;
+          END IF;
         --
         END IF;
 
@@ -1060,59 +1061,6 @@ BEGIN
           
         END IF; -- wholly closed asset
         
-      -- Code below removed since the close_part_member_record will re-create intersecting parts
---          DECLARE
---            l_rec_nm_begin nm_members%ROWTYPE;
---            l_rec_nm_end   nm_members%ROWTYPE;
---          BEGIN
---            IF r.keep_begin_mp IS NOT NULL or r.keep_begin_mp2 IS NOT NULL 
---            THEN
---              nm_debug.debug('# - Recreate partial membership 1 '
---                            ||r.nm_ne_id_in||':'
---                            ||r.nm_ne_id_of||':'
---                            ||r.nm_obj_type||':'
---                            ||r.keep_begin_mp||':'
---                            ||r.keep_end_mp);
---              l_rec_nm_begin.nm_ne_id_in    := r.nm_ne_id_in;
---              l_rec_nm_begin.nm_ne_id_of    := r.nm_ne_id_of;
---              l_rec_nm_begin.nm_type        := r.nm_type;
---              l_rec_nm_begin.nm_obj_type    := r.nm_obj_type;
---              l_rec_nm_begin.nm_begin_mp    := r.keep_begin_mp;
---              l_rec_nm_begin.nm_start_date  := r.nm_start_date;
---              l_rec_nm_begin.nm_end_mp      := r.keep_end_mp;
---              l_rec_nm_begin.nm_admin_unit  := r.nm_admin_unit;
---              l_rec_nm_begin.nm_cardinality := r.nm_cardinality;
---              l_rec_nm_begin.nm_seq_no      := r.nm_seq_no;
---              l_rec_nm_begin.nm_seg_no      := r.nm_seg_no;
-----
-----           the closure of the original part members has been deferred - handle the create-memberships ans the closure in one subprogram
-----
---
---              create_memberships (l_rec_nm_begin);
---            END IF;
---            IF r.keep_begin_mp2 IS NOT NULL 
---            THEN
---              nm_debug.debug('# - Recreate partial membership 2 '
---                            ||r.nm_ne_id_in||':'
---                            ||r.nm_ne_id_of||':'
---                            ||r.nm_obj_type||':'
---                            ||r.keep_begin_mp||':'
---                            ||r.keep_end_mp);
---              l_rec_nm_end.nm_ne_id_in    := r.nm_ne_id_in;
---              l_rec_nm_end.nm_ne_id_of    := r.nm_ne_id_of;
---              l_rec_nm_end.nm_type        := r.nm_type;
---              l_rec_nm_end.nm_obj_type    := r.nm_obj_type;
---              l_rec_nm_end.nm_begin_mp    := r.keep_begin_mp2;
---              l_rec_nm_end.nm_start_date  := r.nm_start_date;
---              l_rec_nm_end.nm_end_mp      := r.keep_end_mp2;
---              l_rec_nm_end.nm_admin_unit  := r.nm_admin_unit;
---              l_rec_nm_end.nm_cardinality := r.nm_cardinality;
---              l_rec_nm_end.nm_seq_no      := r.nm_seq_no;
---              l_rec_nm_end.nm_seg_no      := r.nm_seg_no;
---              create_memberships (l_rec_nm_end);
---            END IF;
---          END;
-		END IF;
       --
         l_log_message := l_partial_message||g_success_message;
       --
