@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm0575
 AS
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm0575.pkb-arc   2.7.1.11   Jun 15 2012 09:35:50   Rob.Coupe  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm0575.pkb-arc   2.7.1.12   Jun 15 2012 11:35:06   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm0575.pkb  $
---       Date into PVCS   : $Date:   Jun 15 2012 09:35:50  $
---       Date fetched Out : $Modtime:   Jun 15 2012 09:34:18  $
---       PVCS Version     : $Revision:   2.7.1.11  $
+--       Date into PVCS   : $Date:   Jun 15 2012 11:35:06  $
+--       Date fetched Out : $Modtime:   Jun 15 2012 11:34:40  $
+--       PVCS Version     : $Revision:   2.7.1.12  $
 --       Based on SCCS version : 1.6
 
 --   Author : Graeme Johnson
@@ -23,7 +23,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000)  := '"$Revision:   2.7.1.11  $"';
+  g_body_sccsid  CONSTANT varchar2(2000)  := '"$Revision:   2.7.1.12  $"';
   g_package_name CONSTANT varchar2(30)    := 'nm0575';
   
   subtype id_type is nm_members.nm_ne_id_in%type;
@@ -1376,7 +1376,7 @@ END;
     l_rec1.nm_type        := 'I';
     
     if g_include_partial = 'Y' then
-    IF p_keep_begin1 is null and
+      IF p_keep_begin1 is null and
        p_keep_end1   is null and
        p_keep_begin2 is null and
        p_keep_end2   is null then
@@ -1387,153 +1387,170 @@ END;
                           ,p_ne_id_of       => p_ne_id_of
                           ,p_begin_mp       => p_begin_mp
                           ,p_start_date     => p_start_date );
-    ELSIF p_keep_begin1 is not null and 
-          p_keep_end1   is not null and
-          p_keep_begin2 is null and
-          p_keep_end2   is null then
+      ELSIF p_keep_begin1 is not null and 
+            p_keep_end1   is not null and
+            p_keep_begin2 is null and
+            p_keep_end2   is null then
 --          
 --     need to retain part 1 - needs to be split into two chunks on part 1 alone
-      if p_keep_end1 < p_begin_mp  or p_keep_begin1 > p_end_mp then
---      no intersection, just end-dae original
-        close_member_record( p_action         => p_action
+        IF p_keep_end1 < p_begin_mp  or p_keep_begin1 > p_end_mp then
+--        no intersection, just end-dae original
+          close_member_record( p_action         => p_action
                            ,p_effective_date => p_effective_date
                            ,p_ne_id_in       => p_ne_id_in
                            ,p_ne_id_of       => p_ne_id_of
                            ,p_begin_mp       => p_begin_mp
                            ,p_start_date     => p_start_date );
-      END IF;
+        ELSE
 --
-      l_rec2 := l_rec1;
+          l_rec2 := l_rec1;
+--can't be sure if the keep is on left or right
+          if p_keep_begin1 > l_rec1.nm_begin_mp then
+           l_rec1.nm_end_mp := p_keep_begin1;
+          end if;
+      
+          if p_keep_end1 < l_rec1.nm_end_mp then
+            l_rec1.nm_begin_mp := p_keep_end1;
+          end if;
+      
+--       the part outside the keep is to be end-dated or deleted
 
-      if p_keep_begin1 > l_rec1.nm_begin_mp then
-        l_rec1.nm_end_mp := p_keep_begin1;
-      end if;
-      
-      if p_keep_end1 < l_rec1.nm_end_mp then
-        l_rec1.nm_begin_mp := p_keep_end1;
-      end if;
-      
-      if p_action = 'C' then
-        update nm_members_all
-        set nm_begin_mp = l_rec1.nm_begin_mp,
-            nm_end_mp   = l_rec1.nm_end_mp
-        where nm_ne_id_in = p_ne_id_in
-        and   nm_ne_id_of = p_ne_id_of
-        and   nm_begin_mp = p_begin_mp
-        and   nm_start_date = p_start_date;
-      else
-        close_member_record( p_action         => p_action
-                            ,p_effective_date => p_effective_date
-                            ,p_ne_id_in       => p_ne_id_in
-                            ,p_ne_id_of       => p_ne_id_of
-                            ,p_begin_mp       => p_begin_mp
-                            ,p_start_date     => p_start_date );
-      end if;              
-      
-      l_rec2.nm_begin_mp := p_keep_begin1;
-      l_rec2.nm_end_mp   := p_keep_end1;
-      l_rec2.nm_end_date := null;
-      
-      nm3ins.ins_nm(l_rec2);
---
-    ELSIF p_keep_begin1 is null and 
-          p_keep_end1   is null and
-          p_keep_begin2 is not null and
-          p_keep_end2   is not null then
---
---   need to retain part 2 - needs to be split into two chunks on part 2 alone
-      IF p_keep_end2 < p_begin_mp  or p_keep_begin2 > p_end_mp then
---     no intersection, just end-dae original
-       close_member_record( p_action         => p_action
-                           ,p_effective_date => p_effective_date
-                           ,p_ne_id_in       => p_ne_id_in
-                           ,p_ne_id_of       => p_ne_id_of
-                           ,p_begin_mp       => p_begin_mp
-                           ,p_start_date     => p_start_date );
-      END IF;
---
-      l_rec2 := l_rec1;
+          if p_action = 'C' then
+          
+            update nm_members_all
+            set nm_begin_mp = l_rec1.nm_begin_mp,
+                nm_end_mp   = l_rec1.nm_end_mp,
+                nm_end_date = p_effective_date
+            where nm_ne_id_in = p_ne_id_in
+            and   nm_ne_id_of = p_ne_id_of
+            and   nm_begin_mp = p_begin_mp
+            and   nm_start_date = p_start_date;
 
-      if p_keep_begin2 > l_rec1.nm_begin_mp then
-        l_rec1.nm_end_mp := p_keep_begin2;
-      end if;
-      
-      if p_keep_end2 < l_rec1.nm_end_mp then
-        l_rec1.nm_begin_mp := p_keep_end2;
-      end if;
-
-      if p_action = 'C' then
-      
-        update nm_members_all
-        set nm_begin_mp = l_rec1.nm_begin_mp,
-            nm_end_mp   = l_rec1.nm_end_mp
-        where nm_ne_id_in = p_ne_id_in
-        and   nm_ne_id_of = p_ne_id_of
-        and   nm_begin_mp = p_begin_mp
-        and   nm_start_date = p_start_date;
-      else
-      
-        close_member_record( p_action         => p_action
+          else
+            -- this will remove
+            close_member_record( p_action         => p_action
                             ,p_effective_date => p_effective_date
                             ,p_ne_id_in       => p_ne_id_in
                             ,p_ne_id_of       => p_ne_id_of
                             ,p_begin_mp       => p_begin_mp
                             ,p_start_date     => p_start_date );
       
-      end if;
-      
-      l_rec2.nm_begin_mp := p_keep_begin2;
-      l_rec2.nm_end_mp   := p_keep_end2;
-      l_rec2.nm_end_date := null;
-      
-      nm3ins.ins_nm(l_rec2);
-           
-    ELSIF p_keep_begin1 is not null and 
-          p_keep_end1   is not null and
-          p_keep_begin2 is not null and
-          p_keep_end2   is not null then
---    need to retain parts 1 and 2 - needs to be split into three chunks.              
-      l_rec2 := l_rec1;
-      l_rec1.nm_begin_mp := least(p_keep_end1, p_keep_end2);
-      l_rec1.nm_end_mp   := greatest(p_keep_begin1, p_keep_begin2);
+            
+          end if;        
+
+--       the part from the keep is to be created
+
+          l_rec2.nm_begin_mp := p_keep_begin1;
+          l_rec2.nm_end_mp   := p_keep_end1;
+          l_rec2.nm_end_date := null;
+--      
+          nm3ins.ins_nm(l_rec2);
+          
+        END IF;
 --
-      if p_action = 'C' then
+      ELSIF p_keep_begin1 is null and 
+            p_keep_end1   is null and
+            p_keep_begin2 is not null and
+            p_keep_end2   is not null then
+--
+--     need to retain part 2 - needs to be split into two chunks on part 2 alone
+        IF p_keep_end2 < p_begin_mp  or p_keep_begin2 > p_end_mp then
+--       no intersection, just end-dae original
+         close_member_record( p_action         => p_action
+                           ,p_effective_date => p_effective_date
+                           ,p_ne_id_in       => p_ne_id_in
+                           ,p_ne_id_of       => p_ne_id_of
+                           ,p_begin_mp       => p_begin_mp
+                           ,p_start_date     => p_start_date );
+        ELSE
+--
+          l_rec2 := l_rec1;
+
+          if p_keep_begin2 > l_rec1.nm_begin_mp then
+            l_rec1.nm_end_mp := p_keep_begin2;
+          end if;
       
-        update nm_members_all
-        set nm_begin_mp = l_rec1.nm_begin_mp,
-            nm_end_mp   = l_rec1.nm_end_mp,
-            nm_end_date = p_effective_date
-        where nm_ne_id_in = p_ne_id_in
-        and   nm_ne_id_of = p_ne_id_of
-        and   nm_begin_mp = p_begin_mp
-        and   nm_start_date = p_start_date;
+          if p_keep_end2 < l_rec1.nm_end_mp then
+            l_rec1.nm_begin_mp := p_keep_end2;
+          end if;
+
+          if p_action = 'C' then
+      
+            update nm_members_all
+            set nm_begin_mp = l_rec1.nm_begin_mp,
+                nm_end_mp   = l_rec1.nm_end_mp,
+                nm_end_date = p_effective_date               
+            where nm_ne_id_in = p_ne_id_in
+            and   nm_ne_id_of = p_ne_id_of
+            and   nm_begin_mp = p_begin_mp
+            and   nm_start_date = p_start_date;
+            
+          else
+      
+            close_member_record( p_action         => p_action
+                            ,p_effective_date => p_effective_date
+                            ,p_ne_id_in       => p_ne_id_in
+                            ,p_ne_id_of       => p_ne_id_of
+                            ,p_begin_mp       => p_begin_mp
+                            ,p_start_date     => p_start_date );
+      
+          end if;
+      
+          l_rec2.nm_begin_mp := p_keep_begin2;
+          l_rec2.nm_end_mp   := p_keep_end2;
+          l_rec2.nm_end_date := null;
+      
+          nm3ins.ins_nm(l_rec2);
         
-      else
+        END IF;      
+     
+      ELSIF p_keep_begin1 is not null and 
+            p_keep_end1   is not null and
+            p_keep_begin2 is not null and
+            p_keep_end2   is not null then
+--    need to retain parts 1 and 2 - needs to be split into three chunks.              
       
-        close_member_record( p_action         => p_action
+        l_rec2 := l_rec1;
+        l_rec1.nm_begin_mp := least(p_keep_end1, p_keep_end2);
+        l_rec1.nm_end_mp   := greatest(p_keep_begin1, p_keep_begin2);
+--
+        if p_action = 'C' then
+      
+          update nm_members_all
+          set nm_begin_mp = l_rec1.nm_begin_mp,
+              nm_end_mp   = l_rec1.nm_end_mp,
+              nm_end_date = p_effective_date
+          where nm_ne_id_in = p_ne_id_in
+           and   nm_ne_id_of = p_ne_id_of
+           and   nm_begin_mp = p_begin_mp
+           and   nm_start_date = p_start_date;
+        
+        else
+      
+          close_member_record( p_action         => p_action
                             ,p_effective_date => p_effective_date
                             ,p_ne_id_in       => p_ne_id_in
                             ,p_ne_id_of       => p_ne_id_of
                             ,p_begin_mp       => p_begin_mp
                             ,p_start_date     => p_start_date );
       
-      end if;
+        end if;
 
-      l_rec2.nm_begin_mp := p_keep_begin1;
-      l_rec2.nm_end_mp   := p_keep_end1;
-      l_rec2.nm_end_date := null;
+        l_rec2.nm_begin_mp := p_keep_begin1;
+        l_rec2.nm_end_mp   := p_keep_end1;
+        l_rec2.nm_end_date := null;
 
-      nm3ins.ins_nm(l_rec2);
+        nm3ins.ins_nm(l_rec2);
                   
-      l_rec2.nm_begin_mp := p_keep_begin2;
-      l_rec2.nm_end_mp   := p_keep_end2;
-      l_rec2.nm_end_date := null;
+        l_rec2.nm_begin_mp := p_keep_begin2;
+        l_rec2.nm_end_mp   := p_keep_end2;
+        l_rec2.nm_end_date := null;
 
-      nm3ins.ins_nm(l_rec2);
+        nm3ins.ins_nm(l_rec2);
 
-    ELSE
-       raise_application_error( -20001, 'Incorrect combination of measure values 1='||p_keep_begin1||',2='||p_keep_end1||',3='||p_keep_begin2||',4='||p_keep_end2);
-    END IF;
+      ELSE
+        raise_application_error( -20001, 'Incorrect combination of measure values 1='||p_keep_begin1||',2='||p_keep_end1||',3='||p_keep_begin2||',4='||p_keep_end2);
+      END IF;
     else
       -- just in case -operate on all the members 
       close_member_record( p_action         => p_action
