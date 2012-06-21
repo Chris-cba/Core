@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3pla AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3pla.pkb-arc   2.11   Jun 19 2012 17:10:46   Rob.Coupe  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3pla.pkb-arc   2.12   Jun 21 2012 14:08:52   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3pla.pkb  $
---       Date into PVCS   : $Date:   Jun 19 2012 17:10:46  $
---       Date fetched Out : $Modtime:   Jun 19 2012 13:38:48  $
---       Version          : $Revision:   2.11  $
+--       Date into PVCS   : $Date:   Jun 21 2012 14:08:52  $
+--       Date fetched Out : $Modtime:   Jun 21 2012 12:32:44  $
+--       Version          : $Revision:   2.12  $
 --       Based on SCCS version : 1.61
 ------------------------------------------------------------------------
 --
@@ -19,7 +19,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3pla AS
 -------------------------------------------------------------------------------------------
 -- Global variables - tree definitions etc.
    --g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"@(#)nm3pla.pkb	1.61 11/29/06"';
-   g_body_sccsid     CONSTANT varchar2(2000) := '$Revision:   2.11  $';
+   g_body_sccsid     CONSTANT varchar2(2000) := '$Revision:   2.12  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT VARCHAR2(30) := 'nm3pla';
@@ -2331,7 +2331,7 @@ FUNCTION get_connected_chunks_internal(pi_iof_tab    IN Nm3type.tab_number
                                       --,pi_rend_tab   IN nm3type.tab_number
                                       ) RETURN nm_placement_array IS
 
-  l_start_id NUMBER;
+--  l_start_id NUMBER;
   l_begin_mp NUMBER;
   l_end_mp   NUMBER;
 
@@ -2351,9 +2351,12 @@ FUNCTION get_connected_chunks_internal(pi_iof_tab    IN Nm3type.tab_number
   l_iit_rec nm_inv_items%ROWTYPE;
 
   retval nm_placement_array := Nm3pla.initialise_placement_array;
+  
+  lc integer := 0;
 
 BEGIN
-  nm_debug.debug('Internal cnct - count = '||pi_iof_tab.COUNT);
+--nm_debug.debug_on;
+--  nm_debug.debug('Internal cnct - count = '||pi_iof_tab.COUNT);
   FOR l_i IN 1..pi_iof_tab.COUNT
   LOOP
     rvrs := (Nm3net.is_gty_reversible( Nm3net.get_gty_type(pi_rin_tab(l_i))) = 'Y');
@@ -2363,7 +2366,9 @@ BEGIN
       rvrsi := 0;
     end if;      
   
-    nm_debug.debug( 'row '||l_i||','||pi_iof_tab(l_i)||','||pi_rdir_tab(l_i)||','||pi_rin_tab(l_i)||','||pi_ibegin_tab(l_i)||','||pi_iend_tab(l_i));
+    lc := lc + 1;
+    
+--    nm_debug.debug( 'row '||l_i||','||pi_iof_tab(l_i)||','||pi_rdir_tab(l_i)||','||pi_rin_tab(l_i)||','||pi_ibegin_tab(l_i)||','||pi_iend_tab(l_i));
 
     IF l_i = 1
     THEN
@@ -2380,29 +2385,32 @@ BEGIN
     
     ELSE
 
-      nm_debug.debug('next');
+--      nm_debug.debug('next');
+      
+      lc := lc + 1;
+
       IF pi_rin_tab(l_i) = l_route_id
       THEN
-        nm_debug.debug('same route, continue checking element connectivity');
+--        nm_debug.debug('same route, continue checking element connectivity');
         IF pi_iof_tab(l_i) = l_prior_ne
         THEN
           IF ( pi_ibegin_tab(l_i) = l_end_mp and pi_rdir_tab(l_i) = 1) OR
              ( pi_iend_tab(l_i) = l_begin_mp and pi_rdir_tab(l_i) = -1)
           THEN
-              nm_debug.debug('Same element and connected');
+--              nm_debug.debug('Same element and connected');
               l_begin_mp := least(l_begin_mp, pi_ibegin_tab(l_i)); 
               l_end_mp   := greatest( l_end_mp, pi_iend_tab(l_i));
 
-              nm_debug.debug( l_i||' saved '||l_begin_mp||','||l_end_mp);
+--              nm_debug.debug( l_i||' saved '||l_begin_mp||','||l_end_mp);
           ELSE
 
-              nm_debug.debug('Its the same element and there is a break between the end of last, start of this');
+--              nm_debug.debug('Its the same element and there is a break between the end of last, start of this');
 
               if l_prior_rdir = 1 then
-                 l_r_begin := Nm3lrs.get_set_offset(l_route_id, l_start_id, l_begin_mp);
+                 l_r_begin := Nm3lrs.get_set_offset(l_route_id, l_prior_ne, l_begin_mp);
                  l_r_end   := Nm3lrs.get_set_offset(l_route_id, l_prior_ne, l_end_mp);
               else
-                  l_r_begin := Nm3lrs.get_set_offset(l_route_id, l_start_id, l_end_mp);
+                  l_r_begin := Nm3lrs.get_set_offset(l_route_id, l_prior_ne, l_end_mp);
                   l_r_end   := Nm3lrs.get_set_offset(l_route_id, l_prior_ne, l_begin_mp);
               end if;
 
@@ -2419,14 +2427,14 @@ BEGIN
 
            END IF;
 
-           nm_debug.debug('Set prior '||l_prior_ne||','||l_start_id||','||l_prior_begin||','||l_prior_end );
-           nm_debug.debug( l_i||' saved '||l_begin_mp||','||l_end_mp);
-           nm_debug.debug( l_i||' route '||l_r_begin||','||l_r_end);
+--           nm_debug.debug('Set prior '||l_prior_ne||','||','||l_prior_begin||','||l_prior_end );
+--           nm_debug.debug( l_i||' saved '||l_begin_mp||','||l_end_mp);
+--           nm_debug.debug( l_i||' route '||l_r_begin||','||l_r_end);
 
         ELSE
 --        it is a different element in the same route, check its connected
 --
-          nm_debug.debug( 'Different element in same route');
+--          nm_debug.debug( 'Different element in same route');
 
           if partial_chunk_connectivity( rvrsi, 
                    l_prior_ne, 
@@ -2439,34 +2447,25 @@ BEGIN
                    TO_NUMBER(pi_iend_tab(l_i))) = 1 then
 
 
-            nm_debug.debug( 'Connected');
-            nm_debug.debug( ' - begin '||TO_CHAR( l_begin_mp )||
-                                       ' end   '||TO_CHAR( l_end_mp )||
-                                       ' of    '||TO_CHAR( l_start_id ));
+  --          nm_debug.debug( 'Connected');
+  --          nm_debug.debug( ' - begin '||TO_CHAR( l_begin_mp )||
+  --                                     ' end   '||TO_CHAR( l_end_mp )||
+  --                                     ' of    '||TO_CHAR( l_prior_ne ));
                                        
             l_begin_mp := pi_ibegin_tab(l_i); 
             l_end_mp   := pi_iend_tab(l_i);                                       
-                                       
+
             if l_prior_rdir = 1 then
                l_r_end   := Nm3lrs.get_set_offset(l_route_id, pi_iof_tab(l_i), l_end_mp);
             else
                 l_r_end   := Nm3lrs.get_set_offset(l_route_id, pi_iof_tab(l_i), l_begin_mp);
             end if;
 
+
           ELSE
-            nm_debug.debug('disc');
+--            nm_debug.debug('disc');
 --          discontinuity is found so create a new
 
-              if l_prior_rdir = 1 then
-                 l_r_begin := Nm3lrs.get_set_offset(l_route_id, l_start_id, l_begin_mp);
-                 l_r_end   := Nm3lrs.get_set_offset(l_route_id, l_prior_ne, l_end_mp);
-              else
-                  l_r_begin := Nm3lrs.get_set_offset(l_route_id, l_start_id, l_end_mp);
-                  l_r_end   := Nm3lrs.get_set_offset(l_route_id, l_prior_ne, l_begin_mp);
-              end if;
-
-              nm_debug.debug( l_i||' saved '||l_begin_mp||','||l_end_mp);
-              nm_debug.debug( l_i||' route '||l_r_begin||','||l_r_end);
 
             nm3pla.add_element_to_pl_arr (pio_pl_arr => retval
                                  ,pi_ne_id   => l_route_id
@@ -2475,10 +2474,20 @@ BEGIN
                                  ,pi_measure => 0
                                  ,pi_mrg_mem => FALSE
                                  );
-
+                                 
             l_begin_mp := pi_ibegin_tab(l_i); 
             l_end_mp   := pi_iend_tab(l_i);
-            nm_debug.debug( l_i||' saved '||l_begin_mp||','||l_end_mp);
+
+            if l_prior_rdir = 1 then
+               l_r_begin := Nm3lrs.get_set_offset(l_route_id, pi_iof_tab(l_i), l_begin_mp);
+               l_r_end   := Nm3lrs.get_set_offset(l_route_id, pi_iof_tab(l_i), l_end_mp);
+            else
+                l_r_begin := Nm3lrs.get_set_offset(l_route_id, pi_iof_tab(l_i), l_end_mp);
+                l_r_end   := Nm3lrs.get_set_offset(l_route_id, pi_iof_tab(l_i), l_begin_mp);
+            end if;
+
+--            nm_debug.debug( l_i||' saved '||l_begin_mp||','||l_end_mp);
+--            nm_debug.debug( l_i||' route '||l_r_begin||','||l_r_end);
 
           END IF;
         END IF;
@@ -2486,10 +2495,10 @@ BEGIN
 --          nm_debug.debug('different route, assume a discontinuity');
 
         if l_prior_rdir = 1 then
-           l_r_begin := Nm3lrs.get_set_offset(l_route_id, l_start_id, l_begin_mp);
+--         l_r_begin := Nm3lrs.get_set_offset(l_route_id, l_prior_ne, l_begin_mp);
            l_r_end   := Nm3lrs.get_set_offset(l_route_id, l_prior_ne, l_end_mp);
         else
-            l_r_begin := Nm3lrs.get_set_offset(l_route_id, l_start_id, l_end_mp);
+--          l_r_begin := Nm3lrs.get_set_offset(l_route_id, l_prior_ne, l_end_mp);
             l_r_end   := Nm3lrs.get_set_offset(l_route_id, l_prior_ne, l_begin_mp);
         end if;
 
@@ -2508,30 +2517,34 @@ BEGIN
     
     l_prior_ne    := pi_iof_tab(l_i);
     l_route_id    := pi_rin_tab(l_i);
-    l_start_id    := pi_iof_tab(l_i);
+--    l_start_id    := pi_iof_tab(l_i);
     l_prior_begin := pi_ibegin_tab(l_i);
     l_prior_end   := pi_iend_tab(l_i);
     l_prior_rdir  := pi_rdir_tab(l_i);
 
-    nm_debug.debug('end of loop set prior '||l_prior_ne||','||l_start_id||','||l_prior_begin||','||l_prior_end );
-    nm_debug.debug( l_i||' saved '||l_begin_mp||','||l_end_mp);
-    nm_debug.debug( l_i||' route '||l_r_begin||','||l_r_end);
+--    nm_debug.debug('end of loop set prior '||l_prior_ne||','||l_prior_begin||','||l_prior_end );
+--    nm_debug.debug( l_i||' saved '||l_begin_mp||','||l_end_mp);
+--    nm_debug.debug( l_i||' route '||l_r_begin||','||l_r_end);
 
   END LOOP;
 --nm_debug.debug('end of loop');
   --at the end of the loop, we may need to add another row in the return
-  IF l_prior_ne IS NOT NULL
+  IF l_prior_ne IS NOT NULL 
   THEN
-    if l_prior_rdir = 1 then
---      l_r_begin := Nm3lrs.get_set_offset(l_route_id, l_start_id, l_begin_mp);
-      l_r_end   := Nm3lrs.get_set_offset(l_route_id, l_prior_ne, l_end_mp);
-    else
---      l_r_begin := Nm3lrs.get_set_offset(l_route_id, l_start_id, l_end_mp);
-      l_r_end   := Nm3lrs.get_set_offset(l_route_id, l_prior_ne, l_begin_mp);
+  
+    if lc > 1
+    then
+      if l_prior_rdir = 1 then
+  --    l_r_begin := nvl(l_r_begin, Nm3lrs.get_set_offset(l_route_id, l_prior_ne, l_begin_mp));
+        l_r_end   := Nm3lrs.get_set_offset(l_route_id, l_prior_ne, l_end_mp);
+      else
+--        l_r_begin := nvl(l_r_begin, Nm3lrs.get_set_offset(l_route_id, l_prior_ne, l_end_mp));
+        l_r_end   := Nm3lrs.get_set_offset(l_route_id, l_prior_ne, l_begin_mp);
+      end if;
     end if;
 
-    nm_debug.debug( 'outside loop '||' saved '||l_begin_mp||','||l_end_mp);
-    nm_debug.debug( ' route '||l_r_begin||','||l_r_end);
+--    nm_debug.debug( 'outside loop '||' saved '||l_begin_mp||','||l_end_mp);
+--    nm_debug.debug( ' route '||l_r_begin||','||l_r_end);
     nm3pla.add_element_to_pl_arr (pio_pl_arr => retval
                                  ,pi_ne_id   => l_route_id
                                  ,pi_start   => l_r_begin
