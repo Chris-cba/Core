@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3pla AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3pla.pkb-arc   2.12   Jun 21 2012 14:08:52   Rob.Coupe  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3pla.pkb-arc   2.13   Jun 22 2012 11:13:54   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3pla.pkb  $
---       Date into PVCS   : $Date:   Jun 21 2012 14:08:52  $
---       Date fetched Out : $Modtime:   Jun 21 2012 12:32:44  $
---       Version          : $Revision:   2.12  $
+--       Date into PVCS   : $Date:   Jun 22 2012 11:13:54  $
+--       Date fetched Out : $Modtime:   Jun 22 2012 11:12:50  $
+--       Version          : $Revision:   2.13  $
 --       Based on SCCS version : 1.61
 ------------------------------------------------------------------------
 --
@@ -19,7 +19,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3pla AS
 -------------------------------------------------------------------------------------------
 -- Global variables - tree definitions etc.
    --g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"@(#)nm3pla.pkb	1.61 11/29/06"';
-   g_body_sccsid     CONSTANT varchar2(2000) := '$Revision:   2.12  $';
+   g_body_sccsid     CONSTANT varchar2(2000) := '$Revision:   2.13  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT VARCHAR2(30) := 'nm3pla';
@@ -2406,14 +2406,6 @@ BEGIN
 
 --              nm_debug.debug('Its the same element and there is a break between the end of last, start of this');
 
-              if l_prior_rdir = 1 then
-                 l_r_begin := Nm3lrs.get_set_offset(l_route_id, l_prior_ne, l_begin_mp);
-                 l_r_end   := Nm3lrs.get_set_offset(l_route_id, l_prior_ne, l_end_mp);
-              else
-                  l_r_begin := Nm3lrs.get_set_offset(l_route_id, l_prior_ne, l_end_mp);
-                  l_r_end   := Nm3lrs.get_set_offset(l_route_id, l_prior_ne, l_begin_mp);
-              end if;
-
               nm3pla.add_element_to_pl_arr (pio_pl_arr => retval
                                      ,pi_ne_id   => l_route_id
                                      ,pi_start   => l_r_begin
@@ -2424,6 +2416,14 @@ BEGIN
 
               l_begin_mp := pi_ibegin_tab(l_i); 
               l_end_mp   := pi_iend_tab(l_i);
+
+              if l_prior_rdir = 1 then
+                 l_r_begin := Nm3lrs.get_set_offset(l_route_id, l_prior_ne, l_begin_mp);
+                 l_r_end   := Nm3lrs.get_set_offset(l_route_id, l_prior_ne, l_end_mp);
+              else
+                  l_r_begin := Nm3lrs.get_set_offset(l_route_id, l_prior_ne, l_end_mp);
+                  l_r_end   := Nm3lrs.get_set_offset(l_route_id, l_prior_ne, l_begin_mp);
+              end if;
 
            END IF;
 
