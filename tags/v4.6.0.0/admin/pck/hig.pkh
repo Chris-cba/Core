@@ -1,0 +1,564 @@
+CREATE OR REPLACE PACKAGE hig AS
+--<PACKAGE>
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)hig.pkh	1.24 10/26/05
+--       Module Name      : hig.pkh
+--       Date into SCCS   : 05/10/26 17:20:59
+--       Date fetched Out : 07/06/13 14:10:17
+--       SCCS Version     : 1.24
+--
+--
+--   Author :
+--
+--   HIGHWAYS application generic utilities package
+--
+-----------------------------------------------------------------------------
+--	Copyright (c) exor corporation ltd, 2000
+-----------------------------------------------------------------------------
+--</PACKAGE>
+  -- package global variable definitions (PUBLIC)
+  /* SCCS ID keyword, do not remove */
+--<GLOBVAR>
+  g_sccsid	CONSTANT	varchar2(2000) := '"@(#)hig.pkh	1.24 10/26/05"'; --@(#)hig.pck	1.21 09/22/99"';
+-- g_sccsid is the SCCS_ID
+
+  g_language			varchar2(30);
+--  some common error messages - prevent more than one database lookup
+  g_thing_already_exists	varchar2(2000);
+  g_thing_does_not_exist	varchar2(2000);
+  g_product                     hig_products.hpr_product%TYPE;
+
+  g_last_ner_appl  nm_errors.ner_appl%TYPE DEFAULT NULL;
+  g_last_ner_id    nm_errors.ner_id%TYPE   DEFAULT NULL;
+  g_last_ner_suppl varchar2(32767)         DEFAULT NULL;
+--</GLOBVAR>
+
+--
+------------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_version">
+-- This function returns the SCCS version information
+  FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+------------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_body_version">
+-- This function returns the SCCS version information for the package body
+  FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+
+  -----------------------------------------------------------------------------
+--<PROC NAME="set_product">
+  -- Procedure to set the product
+  --
+  PROCEDURE set_product
+        ( a_product             IN      varchar2
+  );
+--</PROC>
+  -----------------------------------------------------------------------------
+--<PROC NAME="get_product">
+  -- Procedure to get the product
+  --
+  PROCEDURE get_product
+        ( a_product             OUT      varchar2
+  );
+--</PROC>
+
+  ----------------------------------------------------------------------------------------------
+  --
+  --<PROC NAME="get_application_owner_id">
+  --This function returns the id of the Highways owner
+  FUNCTION get_application_owner_id RETURN number;
+  --</PROC>
+  -----------------------------------------------------------------------------
+--<PROC NAME="get_file_name">
+  -- function to return the file name for a given module
+  --
+  FUNCTION get_file_name   ( p_module  IN varchar2 )
+	  RETURN varchar2;
+--</PROC>
+  -----------------------------------------------------------------------------
+  --
+--<PROC NAME="work_days">
+  FUNCTION work_days( sday IN number, ndays IN number)
+          RETURN number;
+--</PROC>
+  -----------------------------------------------------------------------------
+--<PROC NAME="we_in_period">
+  FUNCTION we_in_period( sdate IN date, edate IN date)
+          RETURN number;
+--</PROC>
+  -----------------------------------------------------------------------------
+--<PROC NAME="date_due">
+  FUNCTION date_due( p_date IN date, p_int_code IN varchar2,
+                      p_week_days IN boolean)
+          RETURN date ;
+--</PROC>
+  -----------------------------------------------------------------------------
+--<PROC NAME="execute_sql">
+  PROCEDURE  execute_sql (sql_in varchar2,
+                          feedback OUT integer);
+--</PROC>
+  -----------------------------------------------------------------------------
+--<PROC NAME="execute_autonomous_sql">
+  PROCEDURE  execute_autonomous_sql (sql_in varchar2);
+  FUNCTION   execute_autonomous_sql (sql_in varchar2) RETURN varchar2;
+--</PROC>
+  -----------------------------------------------------------------------------
+--<PROC NAME="execute_ddl">
+  PROCEDURE  execute_ddl (sql_in IN varchar2);
+--</PROC>
+  -----------------------------------------------------------------------------
+--<PROC NAME="GET_SYSOPT">
+  FUNCTION get_sysopt
+          (p_option_id         hig_options.hop_id%TYPE)
+           RETURN varchar2;
+--</PROC>
+  -----------------------------------------------------------------------------
+--<PROC NAME="get_useopt">
+  FUNCTION get_useopt
+	 ( p_option_id         hig_user_options.huo_id%TYPE,
+	   p_username          varchar2 )
+	   RETURN varchar2;
+  PRAGMA RESTRICT_REFERENCES ( get_useopt, wnds, wnps);
+  FUNCTION get_useopt
+	 (pi_huo_hus_user_id   hig_user_options.huo_hus_user_id%TYPE
+	 ,pi_huo_id            hig_user_options.huo_id%TYPE
+	 ) RETURN hig_user_options.huo_value%TYPE;
+--</PROC>
+  -----------------------------------------------------------------------------
+--<PROC NAME="get_error_message">
+  -- Function to return a HIGHWAYS application error message text
+  --
+  FUNCTION get_error_message
+	( a_error_appl	IN	hig_errors.her_appl%TYPE
+	, a_error_code	IN	hig_errors.her_no%TYPE
+	, a_string1	IN	varchar2 DEFAULT NULL
+	, a_string2	IN	varchar2 DEFAULT NULL
+	, a_string3	IN	varchar2 DEFAULT NULL
+  ) RETURN varchar2;
+
+--</PROC>
+  -----------------------------------------------------------------------------
+--<PROC NAME="get_owner">
+  -- Function to return owner - now public in order to set purity levels
+  --
+
+  FUNCTION get_owner
+	( a_object_name	IN	varchar2
+  ) RETURN varchar2 ;
+
+--</PROC>
+  -----------------------------------------------------------------------------
+--<PROC NAME="replace_strings_in_message">
+  -- Function to replace substitution-strings in an error message
+  --
+  FUNCTION replace_strings_in_message
+	( a_error_text	IN	varchar2
+	, a_string1	IN	varchar2 DEFAULT NULL
+	, a_string2	IN	varchar2 DEFAULT NULL
+	, a_string3	IN	varchar2 DEFAULT NULL
+  ) RETURN varchar2;
+--</PROC>
+  -----------------------------------------------------------------------------
+--<PROC NAME="valid_fk_hco">
+  -- Procedure to validate and return foreign key value
+  --
+  -- This version validates and returns the meaning as at specified effective
+  --  date
+  --
+  PROCEDURE valid_fk_hco
+	(pi_hco_domain     IN     hig_codes.hco_domain%TYPE
+	,pi_hco_code       IN     hig_codes.hco_code%TYPE
+	,pi_effective_date IN     date DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
+	,po_hco_meaning       OUT hig_codes.hco_meaning%TYPE
+        );
+  --
+  -- This version does not return the meaning - used purely for validation
+  --   as at specified effective date
+  --
+  PROCEDURE valid_fk_hco
+	(pi_hco_domain     IN     hig_codes.hco_domain%TYPE
+	,pi_hco_code       IN     hig_codes.hco_code%TYPE
+	,pi_effective_date IN     date
+        );
+  --
+  -- This version does not return the meaning - used purely for validation
+  --  as at current effective_date
+  --
+  PROCEDURE valid_fk_hco
+        (pi_hco_domain IN hig_codes.hco_domain%TYPE
+        ,pi_hco_code   IN hig_codes.hco_code%TYPE
+        );
+  --
+  -- This version validates and returns the meaning as at current effective
+  --  date
+  --
+  PROCEDURE valid_fk_hco
+	( a_hco_domain	IN	hig_codes.hco_domain%TYPE
+	, a_hco_code	IN	hig_codes.hco_code%TYPE
+	, a_hco_meaning	IN OUT	hig_codes.hco_meaning%TYPE
+  );
+  -- Procedure to validate and return foreign key value (Overloaded in
+  -- the use of the date at which th evalidation is to apply. )
+  -- The date is passed as a varchar2 of a specified mask since Pl/SQL 1
+  -- differs in the way date parameters are held to PL/SQL 2.
+  --
+  PROCEDURE valid_fk_hco
+	( a_hco_domain	IN	hig_codes.hco_domain%TYPE
+	, a_hco_code	IN	hig_codes.hco_code%TYPE
+	, a_hco_meaning	IN OUT	hig_codes.hco_meaning%TYPE
+	, a_effective   IN      varchar2
+	, a_date_mask   IN      varchar2 := 'DD-MON-YYYY'
+  );
+--</PROC>
+--<PROC NAME="code_is_in_domain">
+-- is a given code in a given domain
+--
+FUNCTION code_is_in_domain(pi_hco_code   IN hig_codes.hco_code%TYPE
+                           ,pi_hco_domain IN hig_codes.hco_domain%TYPE
+                           ) RETURN BOOLEAN;
+--</PROC>
+  -----------------------------------------------------------------------------
+--<PROC NAME="get_hau_unit_code">
+  -- Function to return nau_unit_code
+  --
+  FUNCTION get_hau_unit_code
+	( a_nau_admin_unit	IN	nm_admin_units.nau_admin_unit%TYPE) RETURN varchar2;
+
+--</PROC>
+  -----------------------------------------------------------------------------
+--<PROC NAME="valid_fk_hau">
+  -- Procedure to validate nau_authority_code
+  --
+  PROCEDURE valid_fk_hau
+	( a_nau_authority_code	IN	nm_admin_units.nau_authority_code%TYPE);
+--</PROC>
+  -----------------------------------------------------------------------------
+  -- Procedure to validate and return foreign key value
+  --
+/*
+  PROCEDURE valid_fk_hau
+        ( a_hau_authority_code  IN      hig_admin_units.hau_authority_code%type
+        , a_hau_admin_unit      IN      hig_admin_units.hau_admin_unit%type
+        , a_hau_name            IN OUT  hig_admin_units.hau_name%type);
+*/
+
+--</PROC>
+  -----------------------------------------------------------------------------
+--<PROC NAME="populate_globals">
+  PROCEDURE populate_globals (a_agent_code OUT hig_users.hus_agent_code%TYPE,
+                              a_rmms_flag  OUT hig_options.hop_value%TYPE,
+                              a_path_name  OUT hig_products.hpr_path_name%TYPE);
+
+--</PROC>
+  -----------------------------------------------------------------------------
+--<PROC NAME="pipe_receive">
+  PROCEDURE pipe_receive ( info      OUT varchar2,
+                         pipe_name IN  varchar2 ) ;
+
+--</PROC>
+  -----------------------------------------------------------------------------
+--<PROC NAME="pipe_send">
+  PROCEDURE pipe_send ( info      IN varchar2,
+		  	 pipe_name IN varchar2 ) ;
+
+--</PROC>
+  -----------------------------------------------------------------------------
+--<PROC NAME="check_lstner">
+  FUNCTION check_lstner RETURN boolean ;
+
+--</PROC>
+  -----------------------------------------------------------------------------
+--<PROC NAME="get_product_path">
+  FUNCTION get_product_path RETURN varchar2;
+
+--</PROC>
+  -----------------------------------------------------------------------------
+--<PROC NAME="get_id_from_descr">
+  FUNCTION get_id_from_descr (table_name IN varchar2,
+                              select_column IN varchar2,
+                              where_column IN varchar2,
+                              where_val IN varchar2) RETURN varchar2;
+
+--</PROC>
+  -----------------------------------------------------------------------------
+--<PROC NAME="valid_fk_hsc">
+  PROCEDURE valid_fk_hsc
+	( a_hsc_domain_code	IN	hig_status_codes.hsc_domain_code%TYPE
+	, a_hsc_status_code	IN	hig_status_codes.hsc_status_code%TYPE
+	, a_hsc_status_name IN OUT hig_status_codes.hsc_status_name%TYPE
+  );
+
+--</PROC>
+  -----------------------------------------------------------------------------
+--<PROC NAME="date_convert">
+  -- Function to validate dates from a given Varchar string against the
+  -- DATE_FORMAT_MASK Domain
+  FUNCTION date_convert (value_in IN date) RETURN date;
+  FUNCTION date_convert (value_in IN varchar2) RETURN date;
+--</PROC>
+  ----------------------------------------------------------------------------------------------
+  --
+  --<PROC NAME="is_module_fastpath_invalid">
+  FUNCTION is_module_fastpath_invalid(pi_module IN hig_modules.hmo_module%TYPE) RETURN varchar2;
+--</PROC>
+--
+  --<PROC NAME="get_module_title">
+  FUNCTION get_module_title(a_module IN hig_modules.hmo_module%TYPE
+                           ) RETURN hig_modules.hmo_title%TYPE;
+--</proc>
+  --
+  ----------------------------------------------------------------------------------------------
+  --
+  --<PROC NAME="get_domain_seq">
+  --This function returns the sequence no for the given domain value
+  FUNCTION get_domain_seq(pi_domain IN hig_domains.hdo_domain%TYPE
+                         ,pi_value  IN hig_codes.hco_code%TYPE
+                         ) RETURN hig_codes.hco_seq%TYPE;
+  --</proc>
+  --
+  ----------------------------------------------------------------------------------------------
+  --
+  --<PROC NAME="domain_exists">
+  --This function returns TRUE if the given domain exists
+  FUNCTION domain_exists(pi_domain IN hig_domains.hdo_domain%TYPE
+                        ) RETURN boolean;
+  --</proc>
+  --
+  --
+  ----------------------------------------------------------------------------------------------
+  --
+  --<PROC NAME="is_product_licensed">
+  --This function returns TRUE if product passed is licensed
+  -- products are 'STR', 'ACC', 'MAI' etc
+  FUNCTION is_product_licensed ( pi_product varchar2 ) RETURN boolean;
+  --</proc>
+  --
+  ----------------------------------------------------------------------------------------------
+  --
+  --<PROC NAME="get_module_details">
+  --This procedure gets the hig_modules record and the mode for the current user
+  PROCEDURE get_module_details(pi_module IN     hig_modules.hmo_module%TYPE
+                              ,po_hmo       OUT hig_modules%ROWTYPE
+                              ,po_mode      OUT hig_module_roles.hmr_mode%TYPE
+                              );
+  --</proc>
+  --
+  ----------------------------------------------------------------------------------------------
+  --
+  --<PROC NAME="get_hpr">
+  --This procedure gets the specified hig_products record
+  FUNCTION get_hpr(pi_product hig_products.hpr_product%TYPE
+                  ) RETURN hig_products%ROWTYPE;
+  --</proc>
+  --
+  ----------------------------------------------------------------------------------------------
+  --
+  --<PROC NAME="ins_hur">
+  --This procedure inserts the supplied hig_user_roles record.
+  PROCEDURE ins_hur(pi_hur_rec IN hig_user_roles%ROWTYPE
+                   );
+  --</proc>
+  --
+  ----------------------------------------------------------------------------------------------
+  --
+  --<PROC NAME="get_user_or_sys_opt">
+  -- This function returns the specified user option if it exists, otherwise it returns the
+  -- equivalent system option.
+  FUNCTION get_user_or_sys_opt(pi_option IN hig_options.hop_id%TYPE
+	                            ) RETURN varchar2;
+  --</proc>
+  --
+  ----------------------------------------------------------------------------------------------
+  --
+  --<PROC NAME="get_ner">
+  -- This function returns the specified row from nm_errors.
+  --
+  FUNCTION get_ner(pi_appl IN nm_errors.ner_appl%TYPE
+                  ,pi_id   IN nm_errors.ner_id%TYPE
+                  ) RETURN nm_errors%ROWTYPE;
+  --</proc>
+  --
+  --
+  ----------------------------------------------------------------------------------------------
+  --
+  --<PROC NAME="raise_ner">
+  -- This function raises the specified NM_ERROR as an application error
+  PROCEDURE raise_ner (pi_appl               IN nm_errors.ner_appl%TYPE
+                      ,pi_id                 IN nm_errors.ner_id%TYPE
+                      ,pi_sqlcode            IN pls_integer DEFAULT -20000
+                      ,pi_supplementary_info IN varchar2    DEFAULT NULL
+                      );
+  --</PROC>
+  --
+  ----------------------------------------------------------------------------------------------
+  --
+  --<PROC NAME="raise_and_catch_ner">
+  -- This function raises the specified NM_ERROR as an application error, catches it
+  --  and then returns the message text
+  FUNCTION raise_and_catch_ner (pi_appl               IN nm_errors.ner_appl%TYPE
+                               ,pi_id                 IN nm_errors.ner_id%TYPE
+                               ,pi_supplementary_info IN varchar2    DEFAULT NULL
+                               ) RETURN varchar2;
+  --</PROC>
+  --
+  ----------------------------------------------------------------------------------------------
+  --
+  --<PROC NAME="raise_and_catch_ner">
+  --
+  -- This function returns TRUE if the last ner raised matches the supplied values.
+  --
+  FUNCTION check_last_ner(pi_appl IN nm_errors.ner_appl%TYPE
+                         ,pi_id   IN nm_errors.ner_id%TYPE
+                         ) RETURN boolean;
+  --</PROC>
+  --
+  -----------------------------------------------------------------------------
+  --
+  --<PROC NAME="get_hig_domain_lov_sql">
+  -- This function returns the SQL required to select the HIG_CODES values
+  --  for a specified HIG_DOMAINS record
+  --
+  FUNCTION get_hig_domain_lov_sql (pi_hdo_domain       hig_domains.hdo_domain%TYPE
+                                  ,pi_include_order_by boolean DEFAULT TRUE
+                                  ) RETURN varchar2;
+  --</PROC>
+  --
+  ----------------------------------------------------------------------------------------------
+  --
+  --<PROC NAME="set_useopt">
+  -- Sets the user option value
+  --
+  PROCEDURE set_useopt (pi_huo_hus_user_id hig_user_options.huo_hus_user_id%TYPE
+                       ,pi_huo_id          hig_user_options.huo_id%TYPE
+                       ,pi_huo_value       hig_user_options.huo_value%TYPE
+                       );
+  --</PROC>
+  --
+  ----------------------------------------------------------------------------------------------
+  --
+  --<PROC NAME="set_opt">
+  -- Sets the product option value
+  --
+PROCEDURE set_opt (pi_hov_id          hig_option_values.hov_id%TYPE
+                  ,pi_hov_value       hig_option_values.hov_value%TYPE
+                     );
+  --</PROC>
+  --
+  ----------------------------------------------------------------------------------------------
+  --
+  --<PROC NAME="raise_constraint_violation_ner">
+  -- This procedure raises a NER for the specified constraint
+  --
+  PROCEDURE raise_constraint_violation_ner (pi_constraint_name IN hig_check_constraint_assocs.hcca_constraint_name%TYPE
+                                           ,pi_sqlcode         IN pls_integer DEFAULT -20000
+                                           );
+  --</PROC>
+  --
+  ----------------------------------------------------------------------------------------------
+  --
+  --<PROC NAME="check_user_instantiated">
+  -- This procedure checks that the user has been instantiated correctly - context variables set
+  --
+  PROCEDURE check_user_instantiated;
+  --
+  --</PROC>
+  --
+  ----------------------------------------------------------------------------------------------
+  --
+  --<PROC NAME="check_user_is_current">
+  -- This procedure checks that the user is a current highways user
+  --
+  PROCEDURE check_user_is_current;
+  --
+  --</PROC>
+  --
+  ----------------------------------------------------------------------------------------------
+  --
+  --<PROC NAME="check_user_instantiated">
+  --
+  -- Raises appropriate ner for supplied contraint, catches it and returns the text.
+  --
+  FUNCTION raise_and_catch_constraint_ner(pi_constraint_name IN hig_check_constraint_assocs.hcca_constraint_name%TYPE
+                                         ) RETURN varchar2;
+  --</PROC>
+  --
+  ----------------------------------------------------------------------------------------------
+  --
+  --<PROC NAME="get_constraint_from_error_text">
+  --
+  -- Returns the constraint name from the supplied error text.
+  --
+  FUNCTION get_constraint_from_error_text(pi_error_text IN varchar2
+                                        ) RETURN user_constraints.constraint_name%TYPE;
+  --</PROC>
+  --
+  ----------------------------------------------------------------------------------------------
+  --
+  --<PROC NAME="huol_already_set">
+  -- Returns TRUE if a given user option has already had value(s) specified in hig_user_options
+  --
+  FUNCTION huol_already_set(pi_huol_id IN hig_user_option_list.huol_id%TYPE) RETURN BOOLEAN;
+  --</PROC>
+  --
+  ----------------------------------------------------------------------------------------------
+  --
+  --<PROC NAME="get_user_option_tree_data">
+  -- Returns pl/sql tables of data used to construct user option tree in HIG1840.fmb
+  --  
+  PROCEDURE get_user_option_tree_data( po_tab_initial_state    IN OUT nm3type.tab_number
+                                      ,po_tab_depth            IN OUT nm3type.tab_number
+                                      ,po_tab_label            IN OUT nm3type.tab_varchar80
+                                      ,po_tab_icon             IN OUT nm3type.tab_varchar30
+                                      ,po_tab_data             IN OUT nm3type.tab_varchar30
+                                      ,po_tab_parent           IN OUT nm3type.tab_varchar30);
+  --</PROC>
+  --
+  ----------------------------------------------------------------------------------------------
+  --
+  --<PROC NAME="get_huol_all">
+  -- Returns hig_user_option_list_all record that matches supplied ID
+  -- Cannot go into nm3get or a generated package cos hig_user_option_list_all is a view  
+   FUNCTION get_huol_all (pi_huol_id            hig_user_option_list_all.huol_id%TYPE
+                         ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                         ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                         ) RETURN hig_user_option_list_all%ROWTYPE;
+  --</PROC>
+  --
+  ----------------------------------------------------------------------------------------------
+  --
+  --DEPRICATED AS OF 4500
+  Function Get_Application_Owner Return Varchar2;
+  --
+  ----------------------------------------------------------------------------------------------
+  --
+  --DEPRICATED AS OF 4500
+  Function Is_Enterprise_Edition Return Boolean;
+  
+--<PRAGMA>
+PRAGMA RESTRICT_REFERENCES (get_version, wnds, wnps);
+PRAGMA RESTRICT_REFERENCES (get_body_version, wnds, wnps);
+  PRAGMA RESTRICT_REFERENCES ( replace_strings_in_message, wnds, wnps );
+  PRAGMA RESTRICT_REFERENCES ( get_error_message, wnds, wnps );
+  PRAGMA RESTRICT_REFERENCES ( get_owner, wnds, wnps );
+  PRAGMA RESTRICT_REFERENCES ( get_sysopt,wnds, wnps );
+  PRAGMA RESTRICT_REFERENCES ( get_useopt,wnds, wnps );
+  PRAGMA RESTRICT_REFERENCES ( date_convert, wnds, wnps );
+  PRAGMA RESTRICT_REFERENCES ( get_domain_seq, wnds, wnps );
+  PRAGMA RESTRICT_REFERENCES ( domain_exists, wnds, wnps );
+  PRAGMA RESTRICT_REFERENCES ( get_module_details, wnds);
+  PRAGMA RESTRICT_REFERENCES ( get_hpr, wnds);
+  PRAGMA RESTRICT_REFERENCES ( get_user_or_sys_opt, wnds, wnps);
+  PRAGMA RESTRICT_REFERENCES ( get_ner, wnds, wnps);
+  PRAGMA RESTRICT_REFERENCES ( raise_ner, wnds, wnps, trust);
+  PRAGMA RESTRICT_REFERENCES ( check_last_ner, wnds, wnps);
+  PRAGMA RESTRICT_REFERENCES ( get_hig_domain_lov_sql, wnds, wnps);
+  PRAGMA RESTRICT_REFERENCES ( check_user_instantiated, wnds, wnps,trust);
+  PRAGMA RESTRICT_REFERENCES ( check_user_is_current, wnds, wnps,trust);
+--</PRAGMA>
+
+END hig;
+/
