@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm3api AS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid                 : $Header:   //vm_latest/archives/nm3/admin/pck/nm3api.pkb-arc   2.2   May 16 2011 14:42:26   Steve.Cooper  $
+--       pvcsid                 : $Header:   //vm_latest/archives/nm3/admin/pck/nm3api.pkb-arc   2.3   Jun 25 2012 09:12:52   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3api.pkb  $
---       Date into PVCS   : $Date:   May 16 2011 14:42:26  $
---       Date fetched Out : $Modtime:   Apr 01 2011 11:21:42  $
---       PVCS Version     : $Revision:   2.2  $
+--       Date into PVCS   : $Date:   Jun 25 2012 09:12:52  $
+--       Date fetched Out : $Modtime:   Oct 12 2011 11:56:58  $
+--       PVCS Version     : $Revision:   2.3  $
 --       Based on SCCS version 1.5: 
 --
 --   Author : Rob Coupe
@@ -19,7 +19,7 @@ CREATE OR REPLACE PACKAGE BODY nm3api AS
 --
 --all global package variables here
 --
-   g_body_sccsid constant varchar2(30) :='"$Revision:   2.2  $"';
+   g_body_sccsid constant varchar2(30) :='"$Revision:   2.3  $"';
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3api';
 --
@@ -97,6 +97,29 @@ BEGIN
                              ).nau_admin_unit;
 --
 END get_nau_admin_unit;
+--
+-----------------------------------------------------------------------------
+--
+Function Get_Effective_Date Return Date
+Is
+Begin
+  --  This is a backwards compatible version of this procedure/function, since not all products made the required changes in time for 4500.
+  --  this shares the same header as the 4400 version but uses 4500 contexts behind the scenes.
+  --  this function should not be used for any new development and will be removed in a future release.
+   Return (To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY'));
+End Get_Effective_Date;
+--
+-----------------------------------------------------------------------------
+--
+Procedure Set_Effective_Date (p_Effective_Date Date)
+Is
+Begin
+  --  This is a backwards compatible version of this procedure/function, since not all products made the required changes in time for 4500.
+  --  this shares the same header as the 4400 version but uses 4500 contexts behind the scenes.
+  --  this function should not be used for any new development and will be removed in a future release.
+   Nm3User.Set_Effective_Date (p_Effective_Date);    
+End Set_Effective_Date;
+
 --
 -----------------------------------------------------------------------------
 --

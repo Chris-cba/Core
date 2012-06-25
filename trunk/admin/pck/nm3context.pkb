@@ -5,11 +5,11 @@ As
 --
 -- PVCS Identifiers :-
 --
--- pvcsid : $Header:   //vm_latest/archives/nm3/admin/pck/nm3context.pkb-arc   2.6   Jun 06 2011 14:38:26   Steve.Cooper  $
+-- pvcsid : $Header:   //vm_latest/archives/nm3/admin/pck/nm3context.pkb-arc   2.7   Jun 25 2012 09:12:52   Steve.Cooper  $
 -- Module Name : $Workfile:   nm3context.pkb  $
--- Date into PVCS : $Date:   Jun 06 2011 14:38:26  $
--- Date fetched Out : $Modtime:   Jun 06 2011 11:28:00  $
--- PVCS Version : $Revision:   2.6  $
+-- Date into PVCS : $Date:   Jun 25 2012 09:12:52  $
+-- Date fetched Out : $Modtime:   Oct 12 2011 16:23:34  $
+-- PVCS Version : $Revision:   2.7  $
 -- Based on SCCS version : 
 --
 --
@@ -21,7 +21,7 @@ As
 --	Copyright (c) exor corporation ltd, 2001
 -----------------------------------------------------------------------------
 --
-  g_Body_Sccsid       Constant  Varchar2(2000)  :='"$Revision:   2.6  $"';
+  g_Body_Sccsid       Constant  Varchar2(2000)  :='"$Revision:   2.7  $"';
 
   c_True              Constant  Varchar2(5)     := 'TRUE';
   c_False             Constant  Varchar2(5)     := 'FALSE';
@@ -365,9 +365,179 @@ EXCEPTION
       RAISE_APPLICATION_ERROR(g_context_exc_code,g_context_exc_msg);
 --
 End Create_Instantiate_User_Trig;
+
+
 --
 -----------------------------------------------------------------------------
 --
+Procedure Set_Context (
+                      pi_Namespace    In  Varchar2 Default Null,
+                      pi_Attribute    In  Varchar2,
+                      pi_Value        In  Date
+                      )
+Is
+Begin
+  --  This is a backwards compatible version of this procedure/function, since not all products made the required changes in time for 4500.
+  --  this shares the same header as the 4400 version but uses 4500 contexts behind the scenes.
+  --  this function should not be used for any new development and will be removed in a future release.
+   
+    --pi_namespace is ignored, it's hardcoded to be NM3SQL
+
+    nm3ctx.Set_Context  (
+                        p_Attribute => pi_Attribute,
+                        p_Value     => To_Char(Trunc(pi_Value),'DD-MON-YYYY')
+                        );
+--
+End Set_Context;
+--
+-----------------------------------------------------------------------------
+--
+Procedure Set_Context (
+                      pi_Namespace  In  Varchar2 Default Null,
+                      pi_Attribute  In  Varchar2,
+                      pi_Value      In  Number
+                      )
+Is
+Begin
+  --  This is a backwards compatible version of this procedure/function, since not all products made the required changes in time for 4500.
+  --  this shares the same header as the 4400 version but uses 4500 contexts behind the scenes.
+  --  this function should not be used for any new development and will be removed in a future release.
+   
+    --pi_namespace is ignored, it's hardcoded to be NM3SQL
+  
+  nm3ctx.Set_Context  (
+                      p_Attribute => pi_Attribute,
+                      p_Value     => To_Char(pi_Value)
+                      );
+--
+End Set_Context;
+--
+-----------------------------------------------------------------------------
+--
+Procedure Set_Context (
+                      pi_Namespace In Varchar2 Default Null,
+                      pi_Attribute In Varchar2,
+                      pi_Value     In Varchar2
+                      )
+Is
+Begin
+  --  This is a backwards compatible version of this procedure/function, since not all products made the required changes in time for 4500.
+  --  this shares the same header as the 4400 version but uses 4500 contexts behind the scenes.
+  --  this function should not be used for any new development and will be removed in a future release.
+   
+  --pi_namespace is ignored, it's hardcoded to be NM3SQL
+  
+  nm3ctx.Set_Context  (
+                      p_Attribute => pi_Attribute,
+                      p_Value     => pi_Value
+                      );
+End Set_Context;
+
+Function Get_Namespace Return Varchar2
+Is
+Begin
+  --  This is a backwards compatible version of this procedure/function, since not all products made the required changes in time for 4500.
+  --  this shares the same header as the 4400 version but uses 4500 contexts behind the scenes.
+  --  this function should not be used for any new development and will be removed in a future release.
+  
+  --This is the static namespace from 4500 for most core related atributes
+   Return 'NM3SQL';
+End Get_Namespace;
+
+Function Get_Context  (
+                      pi_Namespace In Varchar2 Default Null,
+                      pi_Attribute In Varchar2
+                      ) Return Varchar2
+Is
+
+Begin
+  --  This is a backwards compatible version of this procedure/function, since not all products made the required changes in time for 4500.
+  --  this shares the same header as the 4400 version but uses 4500 contexts behind the scenes.
+  --  this function should not be used for any new development and will be removed in a future release.
+  
+  --This is the static namespace from 4500 for most core related atributes
+  
+  Return (Sys_Context(Get_Namespace,pi_Attribute));
+  
+End Get_Context; 
+--
+-----------------------------------------------------------------------------
+--
+Function Get_Effective_Date Return Date
+Is
+Begin
+  --  This is a backwards compatible version of this procedure/function, since not all products made the required changes in time for 4500.
+  --  this shares the same header as the 4400 version but uses 4500 contexts behind the scenes.
+  --  this function should not be used for any new development and will be removed in a future release.
+  
+  --This is the static namespace from 4500 for most core related atributes
+   Return (To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY') );
+--
+End Get_Effective_Date;
+--
+-----------------------------------------------------------------------------
+--
+
+Procedure Instantiate_Data
+Is
+Begin
+  --  This is a backwards compatible version of this procedure/function, since not all products made the required changes in time for 4500.
+  --  this shares the same header as the 4400 version but uses 4500 contexts behind the scenes.
+  --  this function should not be used for any new development and will be removed in a future release.
+  Null;
+End Instantiate_Data;
+--
+-----------------------------------------------------------------------------
+--
+Procedure Show_All_Context  (
+                            pi_Namespace  In  Varchar2 Default Null
+                            )
+Is
+--
+Begin
+  --  This is a backwards compatible version of this procedure/function, since not all products made the required changes in time for 4500.
+  --  this shares the same header as the 4400 version but uses 4500 contexts behind the scenes.
+  --  this function should not be used for any new development and will be removed in a future release.release.
+  For x In  (
+            Select    rpad(sc.Namespace,30,' ') || rpad(sc.Attribute,30,' ') || sc.Value Output_Line
+            From      Session_Context   sc
+            Where     sc.Namespace  =   Nvl(pi_Namespace,sc.Namespace)
+            Order By  sc.Namespace,
+                      sc.Attribute
+            )
+  Loop
+    Dbms_Output.Put_Line(x.Output_Line);
+  End Loop;
+--
+End Show_All_Context;
+--
+-----------------------------------------------------------------------------
+--
+Procedure Show_Context Is
+--
+Begin
+  --  This is a backwards compatible version of this procedure/function, since not all products made the required changes in time for 4500.
+  --  this shares the same header as the 4400 version but uses 4500 contexts behind the scenes.
+  --  this function should not be used for any new development and will be removed in a future release.
+   Show_All_Context;
+End Show_Context;
+--
+-----------------------------------------------------------------------------
+--
+Procedure Show_Context  (
+                        pi_Namespace In Varchar2 Default Null,
+                        pi_Attribute In Varchar2
+                        )
+Is
+Begin
+  --  This is a backwards compatible version of this procedure/function, since not all products made the required changes in time for 4500.
+  --  this shares the same header as the 4400 version but uses 4500 contexts behind the scenes.
+  --  this function should not be used for any new development and will be removed in a future release.
+   DBMS_OUTPUT.PUT_LINE(pi_Namespace||'.'||pi_attribute||' : '  || Sys_Context(pi_Namespace,pi_Attribute));
+End Show_Context; 
+
+
+
 --
 End Nm3Context;
 /

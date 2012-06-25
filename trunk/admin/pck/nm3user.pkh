@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE nm3user AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3user.pkh-arc   2.6   Oct 12 2011 10:23:42   Steve.Cooper  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3user.pkh-arc   2.7   Jun 25 2012 09:12:52   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3user.pkh  $
---       Date into PVCS   : $Date:   Oct 12 2011 10:23:42  $
---       Date fetched Out : $Modtime:   Oct 12 2011 10:18:00  $
---       Version          : $Revision:   2.6  $
+--       Date into PVCS   : $Date:   Jun 25 2012 09:12:52  $
+--       Date fetched Out : $Modtime:   Oct 12 2011 10:49:26  $
+--       Version          : $Revision:   2.7  $
 --       Based on SCCS version : 1.18
 -------------------------------------------------------------------------
 --   Author : Rob Coupe
@@ -19,7 +19,7 @@ CREATE OR REPLACE PACKAGE nm3user AS
 -----------------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
-  g_sccsid      CONSTANT  varchar2(2000) := '$Revision:   2.6  $';
+  g_sccsid      CONSTANT  varchar2(2000) := '$Revision:   2.7  $';
 --  g_sccsid is the SCCS ID for the package
 
 --
@@ -352,6 +352,49 @@ Function Get_Default_User_Tablesp_Quota (
 --
 -----------------------------------------------------------------------------
 --
+--DEPRICATED AS OF 4500
+Function  Get_User_Id Return Number;
+--
+-----------------------------------------------------------------------------
+--
+--DEPRICATED AS OF 4500
+Function  Get_Effective_Date Return Date;
+--
+-----------------------------------------------------------------------------
+--
+--DEPRICATED AS OF 4500
+Function  Get_User_Date_Mask Return Varchar2;
+--
+-----------------------------------------------------------------------------
+--
+--DEPRICATED AS OF 4500
+Function  Get_User_Length_Units Return Number;
+--
+-----------------------------------------------------------------------------
+--
+--DEPRICATED AS OF 4500
+Function  Is_User_Unrestricted Return Boolean;
+--
+-----------------------------------------------------------------------------
+--
+--DEPRICATED AS OF 4500
+Function  Is_User_Unrestricted_Acc Return Boolean;
+--
+-----------------------------------------------------------------------------
+--
+--DEPRICATED AS OF 4500
+Function Get_Preferred_Lrm Return Nm_Group_Types.Ngt_Group_Type%Type;
+--
+-----------------------------------------------------------------------------
+--
+--DEPRICATED AS OF 4500
+Function  Get_User_Length_Mask  Return Varchar2;
+--
+-----------------------------------------------------------------------------
+--
+--DEPRICATED AS OF 4500
+Function Get_User_Def_Inv_Attr_Set Return Nm_Inv_Attribute_Sets.Nias_Id%Type;
+
 --<PRAGMA>
   PRAGMA RESTRICT_REFERENCES( get_version, wnds, wnps );
   PRAGMA RESTRICT_REFERENCES( get_body_version, wnds, wnps );  

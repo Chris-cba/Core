@@ -530,6 +530,14 @@ PROCEDURE set_opt (pi_hov_id          hig_option_values.hov_id%TYPE
   --
   ----------------------------------------------------------------------------------------------
   --
+  --DEPRICATED AS OF 4500
+  Function Get_Application_Owner Return Varchar2;
+  --
+  ----------------------------------------------------------------------------------------------
+  --
+  --DEPRICATED AS OF 4500
+  Function Is_Enterprise_Edition Return Boolean;
+  
 --<PRAGMA>
 PRAGMA RESTRICT_REFERENCES (get_version, wnds, wnps);
 PRAGMA RESTRICT_REFERENCES (get_body_version, wnds, wnps);
