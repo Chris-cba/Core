@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY hig AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/hig.pkb-arc   2.5   May 16 2011 14:42:22   Steve.Cooper  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/hig.pkb-arc   2.6   Jun 25 2012 09:12:54   Steve.Cooper  $
 --       Module Name      : $Workfile:   hig.pkb  $
---       Date into SCCS   : $Date:   May 16 2011 14:42:22  $
---       Date fetched Out : $Modtime:   Apr 20 2011 09:22:46  $
---       SCCS Version     : $Revision:   2.5  $
+--       Date into SCCS   : $Date:   Jun 25 2012 09:12:54  $
+--       Date fetched Out : $Modtime:   Oct 12 2011 10:56:52  $
+--       SCCS Version     : $Revision:   2.6  $
 --       Based on 1.39
 --
 --
@@ -1979,6 +1979,31 @@ BEGIN
    RETURN l_retval;
 --
 END get_huol_all;
+--
+-----------------------------------------------------------------------------
+--
+Function Get_Application_Owner Return Varchar2
+Is
+Begin
+  --  This is a backwards compatible version of this procedure/function, since not all products made the required changes in time for 4500.
+  --  this shares the same header as the 4400 version but uses 4500 contexts behind the scenes.
+  --  this function should not be used for any new development and will be removed in a future release.
+   Return (Sys_Context('NM3CORE','APPLICATION_OWNER'));
+End Get_Application_Owner;
+--
+-----------------------------------------------------------------------------
+--
+Function Is_Enterprise_Edition Return Boolean
+Is
+Begin
+  --  This is a backwards compatible version of this procedure/function, since not all products made the required changes in time for 4500.
+  --  this shares the same header as the 4400 version but uses 4500 contexts behind the scenes.
+  --  this function should not be used for any new development and will be removed in a future release.
+  Return (Sys_Context('NM3CORE','ENTERPRISE_EDITION') = 'TRUE');
+      
+End Is_Enterprise_Edition;
+
+
 --
 -----------------------------------------------------------------------------
 --

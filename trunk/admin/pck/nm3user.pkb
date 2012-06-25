@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm3user AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3user.pkb-arc   2.7   Oct 12 2011 10:23:42   Steve.Cooper  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3user.pkb-arc   2.8   Jun 25 2012 09:12:54   Steve.Cooper  $
 --       Mg_user_id_tabodule Name      : $Workfile:   nm3user.pkb  $
---       Date into PVCS   : $Date:   Oct 12 2011 10:23:42  $
---       Date fetched Out : $Modtime:   Oct 12 2011 10:17:38  $
---       Version          : $Revision:   2.7  $
+--       Date into PVCS   : $Date:   Jun 25 2012 09:12:54  $
+--       Date fetched Out : $Modtime:   Oct 12 2011 10:48:08  $
+--       Version          : $Revision:   2.8  $
 --       Based on SCCS version : 1.21
 -------------------------------------------------------------------------
 --   Author : Rob Coupe
@@ -16,7 +16,7 @@ CREATE OR REPLACE PACKAGE BODY nm3user AS
 -----------------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2000
 -----------------------------------------------------------------------------
-   g_body_sccsid     CONSTANT  varchar2(2000) := '$Revision:   2.7  $';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '$Revision:   2.8  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name CONSTANT  varchar2(2000) := 'nm3user';
@@ -1013,6 +1013,116 @@ Exception
     Raise_Application_Error(-20001,'User ' || p_User || ' has no quota on their default tablespace.');
 
 End Get_Default_User_Tablesp_Quota;
-                                                    
+--
+----------------------------------------------------------------------------------------------------------
+--
+Function  Get_User_Id Return Number
+Is
+
+Begin
+  --  This is a backwards compatible version of this procedure/function, since not all products made the required changes in time for 4500.
+  --  this shares the same header as the 4400 version but uses 4500 contexts behind the scenes.
+  --  this function should not be used for any new development and will be removed in a future release.
+  Return(To_Number(Sys_Context('NM3CORE','USER_ID')));
+End Get_User_Id;
+--
+----------------------------------------------------------------------------------------------------------
+--
+Function  Get_Effective_Date Return Date
+Is
+Begin
+  --  This is a backwards compatible version of this procedure/function, since not all products made the required changes in time for 4500.
+  --  this shares the same header as the 4400 version but uses 4500 contexts behind the scenes.
+  --  this function should not be used for any new development and will be removed in a future release.
+  Return(To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY'));
+End Get_Effective_Date;
+--
+----------------------------------------------------------------------------------------------------------
+--
+Function  Get_User_Date_Mask Return Varchar2
+Is
+Begin
+  --  This is a backwards compatible version of this procedure/function, since not all products made the required changes in time for 4500.
+  --  this shares the same header as the 4400 version but uses 4500 contexts behind the scenes.
+  --  this function should not be used for any new development and will be removed in a future release.
+   Return(Sys_Context('NM3CORE','USER_DATE_MASK'));
+End Get_User_Date_Mask;
+--
+----------------------------------------------------------------------------------------------------------
+--
+Function  Get_User_Length_Units Return Number
+Is
+Begin
+  --  This is a backwards compatible version of this procedure/function, since not all products made the required changes in time for 4500.
+  --  this shares the same header as the 4400 version but uses 4500 contexts behind the scenes.
+  --  this function should not be used for any new development and will be removed in a future release.   
+   Return(To_Number(Sys_Context('NM3CORE','USER_LENGTH_UNITS')));
+End Get_User_Length_Units;
+--
+----------------------------------------------------------------------------------------------------------
+--
+Function  Is_User_Unrestricted Return Boolean
+Is
+
+Begin
+  --  This is a backwards compatible version of this procedure/function, since not all products made the required changes in time for 4500.
+  --  this shares the same header as the 4400 version but uses 4500 contexts behind the scenes.
+  --  this function should not be used for any new development and will be removed in a future release.  
+  Return (Sys_Context('NM3CORE','UNRESTRICTED_INVENTORY') = 'TRUE' );
+End Is_User_Unrestricted;
+--
+-----------------------------------------------------------------------------
+--
+Function  Is_User_Unrestricted_Acc Return Boolean
+Is
+Begin
+  --  This is a backwards compatible version of this procedure/function, since not all products made the required changes in time for 4500.
+  --  this shares the same header as the 4400 version but uses 4500 contexts behind the scenes.
+  --  this function should not be used for any new development and will be removed in a future release.
+  Return (Sys_Context('NM3CORE','UNRESTRICTED_ACCIDENTS') = 'TRUE' );
+End Is_User_Unrestricted_Acc;
+--
+-----------------------------------------------------------------------------
+--
+Function Get_Preferred_Lrm Return Nm_Group_Types.Ngt_Group_Type%Type
+Is
+Begin
+  --  This is a backwards compatible version of this procedure/function, since not all products made the required changes in time for 4500.
+  --  this shares the same header as the 4400 version but uses 4500 contexts behind the scenes.
+  --  this function should not be used for any new development and will be removed in a future release.
+
+  Return(Sys_Context('NM3CORE','PREFERRED_LRM'));
+--
+End Get_Preferred_Lrm;
+--
+-----------------------------------------------------------------------------
+--
+Function  Get_User_Length_Mask  Return Varchar2
+Is
+Begin
+  --  This is a backwards compatible version of this procedure/function, since not all products made the required changes in time for 4500.
+  --  this shares the same header as the 4400 version but uses 4500 contexts behind the scenes.
+  --  this function should not be used for any new development and will be removed in a future release.
+  Return Nvl(Sys_Context('NM3CORE','USER_LENGTH_MASK'),
+            Sys_Context('NM3CORE','DEFAULT_LENGTH_MASK')
+            );
+--
+End Get_User_Length_Mask;            
+--
+-----------------------------------------------------------------------------
+--
+Function Get_User_Def_Inv_Attr_Set Return Nm_Inv_Attribute_Sets.Nias_Id%Type
+Is
+
+Begin
+  --  This is a backwards compatible version of this procedure/function, since not all products made the required changes in time for 4500.
+  --  this shares the same header as the 4400 version but uses 4500 contexts behind the scenes.
+  --  this function should not be used for any new development and will be removed in a future release.
+    
+  Return (Sys_Context('NM3CORE','DEFAULT_INV_ATTR_SET'));
+
+End Get_User_Def_Inv_Attr_Set;
+
+                                        
 END nm3user;
 /
