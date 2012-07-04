@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm0575
 AS
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm0575.pkb-arc   2.7.1.12   Jun 15 2012 11:35:06   Rob.Coupe  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm0575.pkb-arc   2.7.1.13   Jul 04 2012 13:00:48   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm0575.pkb  $
---       Date into PVCS   : $Date:   Jun 15 2012 11:35:06  $
+--       Date into PVCS   : $Date:   Jul 04 2012 13:00:48  $
 --       Date fetched Out : $Modtime:   Jun 15 2012 11:34:40  $
---       PVCS Version     : $Revision:   2.7.1.12  $
+--       PVCS Version     : $Revision:   2.7.1.13  $
 --       Based on SCCS version : 1.6
 
 --   Author : Graeme Johnson
@@ -23,7 +23,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000)  := '"$Revision:   2.7.1.12  $"';
+  g_body_sccsid  CONSTANT varchar2(2000)  := '"$Revision:   2.7.1.13  $"';
   g_package_name CONSTANT varchar2(30)    := 'nm0575';
   
   subtype id_type is nm_members.nm_ne_id_in%type;
@@ -146,7 +146,7 @@ END delete_doc_assocs;
 PROCEDURE create_memberships ( pi_nm_rec IN nm_members%ROWTYPE )
 IS
 BEGIN 
-  nm_debug.debug('# Create member : ('||pi_nm_rec.nm_ne_id_in||', '||pi_nm_rec.nm_ne_id_of||', '||pi_nm_rec.nm_begin_mp||', '||pi_nm_rec.nm_end_mp||', '||pi_nm_rec.nm_begin_mp||')');
+--nm_debug.debug('# Create member : ('||pi_nm_rec.nm_ne_id_in||', '||pi_nm_rec.nm_ne_id_of||', '||pi_nm_rec.nm_begin_mp||', '||pi_nm_rec.nm_end_mp||', '||pi_nm_rec.nm_begin_mp||')');
   INSERT INTO nm_members_all VALUES pi_nm_rec; 
 EXCEPTION
   WHEN DUP_VAL_ON_INDEX
@@ -640,13 +640,17 @@ BEGIN
         select
         distinct i.iit_ne_id, i.iit_inv_type
         from
-           nm_members m
-          ,nm_inv_items i
-          ,(select column_value from table(cast(get_inv_types_tbl as nm_code_tbl))) xt 
+--           nm_members m
+--          ,
+          nm_inv_items i
+          ,(
+          select column_value from table(cast(get_inv_types_tbl as nm_code_tbl))) xt 
           ,(select x2.xsp_value from nm0575_possible_xsps x2 where x2.xsp_selected = 'Y'
             union all select '~~~~' xsp_value from dual) xs
-        where m.nm_ne_id_in = i.iit_ne_id
-          and i.iit_inv_type = xt.column_value
+        where 
+--        m.nm_ne_id_in = i.iit_ne_id
+--          and 
+          i.iit_inv_type = xt.column_value
           and nvl(i.iit_x_sect, '~~~~') = xs.xsp_value
         ) q
         ,nm_inv_types t
@@ -843,7 +847,7 @@ BEGIN
       BEGIN
       --
         l_main_count := l_main_count + 1;
-        nm_debug.debug('# - Asset Delete - flag = '||g_include_partial||' - loop number = '||l_main_count); 
+--        nm_debug.debug('# - Asset Delete - flag = '||g_include_partial||' - loop number = '||l_main_count); 
         --
         -- The asset is wholly closed
         -- i.e. the query return all member records for the assets identified in the query.
@@ -858,7 +862,7 @@ BEGIN
         IF ( r.excluded_member_count = 0 AND r.keep_begin_mp IS NULL AND r.keep_begin_mp2 IS NULL AND r.iit_rownum = 1 )
         THEN
         --
-          nm_debug.debug('# - '||l_operation||' whole asset '||r.nm_ne_id_in||':'||r.nm_obj_type||' at count '||l_main_count||' - parent = '||r.iig_parent_id); 
+--          nm_debug.debug('# - '||l_operation||' whole asset '||r.nm_ne_id_in||':'||r.nm_obj_type||' at count '||l_main_count||' - parent = '||r.iig_parent_id); 
           -- Close the member record later for any assets with a parent.
           IF r.iig_parent_id IS NULL
           THEN
@@ -870,7 +874,7 @@ BEGIN
         --
         -- Close the whole member record.
         --
-            nm_debug.debug('# No parent item - '||l_operation||' the entire member for '||r.nm_ne_id_in);
+--            nm_debug.debug('# No parent item - '||l_operation||' the entire member for '||r.nm_ne_id_in);
             close_member_record(
                p_action         => pi_action
               ,p_effective_date => l_effective_date
@@ -892,11 +896,11 @@ BEGIN
                                               THEN ' partially'
                                               ELSE ' entirely'
                                             END||' - ';
-            nm_debug.debug('# No parent item - '||l_operation||' the '||
-                           CASE WHEN g_include_partial = 'Y' 
-                             THEN 'partial member '||r.nm_ne_id_of||' at '||r.nm_begin_mp
-                             ELSE 'whole member (flag set to delete whole)'
-                           END||' for '||r.nm_ne_id_in);
+--            nm_debug.debug('# No parent item - '||l_operation||' the '||
+--                           CASE WHEN g_include_partial = 'Y' 
+--                             THEN 'partial member '||r.nm_ne_id_of||' at '||r.nm_begin_mp
+--                             ELSE 'whole member (flag set to delete whole)'
+--                           END||' for '||r.nm_ne_id_in);
         --
         -- Close the member record.
         -- If the include_partial flag is Y then close the part, otherwise
@@ -939,7 +943,7 @@ BEGIN
           -- it is a parent asset
           IF r.iig_parent_id IS NOT NULL 
           THEN
-            nm_debug.debug('# - '||l_operation||' hierarchical asset children '||' - '||r.nm_ne_id_in);
+--          nm_debug.debug('# - '||l_operation||' hierarchical asset children '||' - '||r.nm_ne_id_in);
             SELECT iig.iig_item_id, iig.iig_top_id BULK COLLECT INTO t_iig_item_id, t_iig_top_id
               FROM nm_inv_item_groupings iig
                  , nm_inv_items_all iit
@@ -962,7 +966,7 @@ BEGIN
               DELETE FROM nm_inv_item_groupings_all g
               WHERE g.iig_item_id = t_iig_item_id(i)
                 AND g.iig_top_id = t_iig_top_id(i);
-              nm_debug.debug('# - '||l_operation||' hierarchical '||to_char(SQL%ROWCOUNT)||' asset children links');
+--              nm_debug.debug('# - '||l_operation||' hierarchical '||to_char(SQL%ROWCOUNT)||' asset children links');
               --  and g.iig_end_date is null;
             END IF;
 
@@ -989,14 +993,14 @@ BEGIN
             END IF;
             
             FOR i in 1..t_iig_item_id.COUNT LOOP
-              nm_debug.debug('# - Close doc assocs for Parent '||r.iig_parent_id||' of '||t_iig_item_id(i));
+--              nm_debug.debug('# - Close doc assocs for Parent '||r.iig_parent_id||' of '||t_iig_item_id(i));
             END LOOP;
             -- close child doc assocs
             delete_doc_assocs(t_iig_item_id);
           --
           -- Finally close the membership for the parent assets after clearing up the children.
           --
-            nm_debug.debug('# - '||l_operation||' hierarchical asset memberships '||' - '||r.nm_ne_id_in||' - Parent set to '||r.iig_parent_id);
+--            nm_debug.debug('# - '||l_operation||' hierarchical asset memberships '||' - '||r.nm_ne_id_in||' - Parent set to '||r.iig_parent_id);
             --RC - Ignoring partial locations of hierarchical assets (for now)
             close_member_record(
                            p_action         => pi_action
@@ -1011,12 +1015,12 @@ BEGIN
                                END||' - ';
           END IF; -- it is a parent asset
           
-          nm_debug.debug('# - Close doc assocs for Parent '||r.iig_parent_id);
+--          nm_debug.debug('# - Close doc assocs for Parent '||r.iig_parent_id);
           -- close current record doc assocs
           delete_doc_assocs (r.iig_parent_id);
           delete_doc_assocs (r.nm_ne_id_in);
         ELSE
-          nm_debug.debug('# - '||l_operation||' partial asset memberships '||' - '||r.nm_ne_id_in||' at rownum '||r.iit_rownum);
+--          nm_debug.debug('# - '||l_operation||' partial asset memberships '||' - '||r.nm_ne_id_in||' at rownum '||r.iit_rownum);
 
           if g_include_partial = 'Y' then
           
@@ -1104,16 +1108,18 @@ BEGIN
              ,nm_start_date
              ,nm_end_mp 
              ,nm_type
-             ,nm_obj_type
+             ,iit_inv_type nm_obj_type
              ,nm_cardinality
              ,nm_admin_unit
              ,nm_seq_no
              ,nm_seg_no
              ,iig_parent_id
-        FROM nm_inv_items, nm_members, nm_inv_item_groupings
+        FROM nm_inv_items
+        , nm_members
+        , nm_inv_item_groupings
        WHERE iit_inv_type IN (SELECT COLUMN_VALUE FROM TABLE(CAST(t_code AS nm_code_tbl)))
-         AND nm_ne_id_in = iit_ne_id
-         AND nm_type = 'I'
+        AND nm_ne_id_in (+) = iit_ne_id
+         AND nm_type (+) = 'I'
          AND iit_ne_id = iig_parent_id(+)
          AND (iit_x_sect IS NULL 
           OR iit_x_sect IN (SELECT x2.xsp_value FROM nm0575_possible_xsps x2 WHERE x2.xsp_selected = 'Y'));
@@ -1123,15 +1129,19 @@ BEGIN
       FOR FULL_NET_REC IN FULL_NET_CUR LOOP
       --
         BEGIN    
+        
+          if full_net_rec.nm_ne_id_in is not null then
         --
         -- close the current asset placement
-          close_member_record (p_action         => pi_action
-                              ,p_effective_date => l_effective_date
-                              ,p_ne_id_in       => full_net_rec.nm_ne_id_in
-                              ,p_ne_id_of       => full_net_rec.nm_ne_id_of
-                              ,p_begin_mp       => full_net_rec.nm_begin_mp
-                              ,p_start_date     => full_net_rec.nm_start_date
-          );
+              close_member_record (p_action         => pi_action
+                                  ,p_effective_date => l_effective_date
+                                  ,p_ne_id_in       => full_net_rec.nm_ne_id_in
+                                  ,p_ne_id_of       => full_net_rec.nm_ne_id_of
+                                  ,p_begin_mp       => full_net_rec.nm_begin_mp
+                                  ,p_start_date     => full_net_rec.nm_start_date
+              );
+          
+          end if;
           --
           -- store the parent asset id for later forall closure of the inv_items records
           t_iit_id.extend;
@@ -1190,7 +1200,7 @@ BEGIN
       --
           log_event(pi_log_iit_inv_type     => full_net_rec.nm_obj_type
                    ,pi_log_action           => pi_action
-                   ,pi_log_iit_ne_id        => full_net_rec.nm_ne_id_in
+                   ,pi_log_iit_ne_id        => full_net_rec.iit_ne_id --nm_ne_id_in
                    ,pi_log_iit_primary_key  => full_net_rec.iit_primary_key
                    ,pi_log_iit_descr        => full_net_rec.iit_descr
                    ,pi_log_message          => l_log_message
@@ -1213,7 +1223,7 @@ BEGIN
     --
     END;
     --
-    nm_debug.debug('Identified '||t_iit_id.COUNT||' to delete');
+--    nm_debug.debug('Identified '||t_iit_id.COUNT||' to delete');
     --
   END IF;
   -- close all memberless assets
@@ -1235,6 +1245,16 @@ BEGIN
     FORALL i IN 1 .. t_iit_id.COUNT
     DELETE FROM nm_inv_item_groupings_all
      WHERE iig_item_id  = t_iit_id (i);
+     
+--     nm_debug.debug_on;
+--     nm_debug.debug('Removal of set of inventory in table ');
+--     
+--     for i in 1..t_iit_id.count loop
+--       nm_debug.debug(i||','||t_iit_id(i));
+--     end loop;
+--     
+--     nm_debug.debug_on;
+--     nm_debug.debug('end of loop on removal of set of inventory in table ');
 --
     FORALL i IN 1 .. t_iit_id.COUNT
     DELETE FROM nm_inv_items_all
@@ -1308,7 +1328,7 @@ END;
   )
   IS
   BEGIN
-    nm_debug.debug('# Close member : ('||p_action||', '||p_ne_id_in||', '||p_ne_id_of||', '||p_begin_mp||', '||p_start_date||')');
+--    nm_debug.debug('# Close member : ('||p_action||', '||p_ne_id_in||', '||p_ne_id_of||', '||p_begin_mp||', '||p_start_date||')');
     -- end date
     IF p_action = 'C' 
     THEN
@@ -1634,7 +1654,7 @@ PROCEDURE check_extent_no_future_locs (p_ne_id      nm_elements.ne_id%TYPE
 --
 BEGIN
 --
-   nm_debug.proc_start (g_package_name,'check_extent_no_future_locs');
+--   nm_debug.proc_start (g_package_name,'check_extent_no_future_locs');
 --
    OPEN  cs_future_locs (p_ne_id, p_effective_date);
    FETCH cs_future_locs INTO l_dummy;
@@ -1650,7 +1670,7 @@ BEGIN
 --                    );
    END IF;
 --
-   nm_debug.proc_end (g_package_name,'check_extent_no_future_locs');
+--   nm_debug.proc_end (g_package_name,'check_extent_no_future_locs');
 --
 END check_extent_no_future_locs;
 
@@ -1680,7 +1700,7 @@ PROCEDURE check_no_future_locs (p_nte_job_id  nm_nw_temp_extents.nte_job_id%type
 --
 BEGIN
 --
-   nm_debug.proc_start (g_package_name,'check_no_future_locs');
+--   nm_debug.proc_start (g_package_name,'check_no_future_locs');
 --
    OPEN  cs_future_locs (p_nte_job_id, p_effective_date);
    FETCH cs_future_locs INTO l_dummy;
@@ -1696,7 +1716,7 @@ BEGIN
 --                    );
    END IF;
 --
-   nm_debug.proc_end (g_package_name,'check_no_future_locs');
+--   nm_debug.proc_end (g_package_name,'check_no_future_locs');
 --
 END check_no_future_locs;
 
