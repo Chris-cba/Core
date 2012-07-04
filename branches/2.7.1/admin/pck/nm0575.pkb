@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm0575
 AS
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm0575.pkb-arc   2.7.1.13   Jul 04 2012 13:00:48   Rob.Coupe  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm0575.pkb-arc   2.7.1.14   Jul 04 2012 15:52:52   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm0575.pkb  $
---       Date into PVCS   : $Date:   Jul 04 2012 13:00:48  $
---       Date fetched Out : $Modtime:   Jun 15 2012 11:34:40  $
---       PVCS Version     : $Revision:   2.7.1.13  $
+--       Date into PVCS   : $Date:   Jul 04 2012 15:52:52  $
+--       Date fetched Out : $Modtime:   Jul 04 2012 15:50:32  $
+--       PVCS Version     : $Revision:   2.7.1.14  $
 --       Based on SCCS version : 1.6
 
 --   Author : Graeme Johnson
@@ -23,7 +23,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000)  := '"$Revision:   2.7.1.13  $"';
+  g_body_sccsid  CONSTANT varchar2(2000)  := '"$Revision:   2.7.1.14  $"';
   g_package_name CONSTANT varchar2(30)    := 'nm0575';
   
   subtype id_type is nm_members.nm_ne_id_in%type;
@@ -992,9 +992,9 @@ BEGIN
                WHERE i.iit_ne_id = t_iig_item_id(i);
             END IF;
             
-            FOR i in 1..t_iig_item_id.COUNT LOOP
+--            FOR i in 1..t_iig_item_id.COUNT LOOP
 --              nm_debug.debug('# - Close doc assocs for Parent '||r.iig_parent_id||' of '||t_iig_item_id(i));
-            END LOOP;
+--            END LOOP;
             -- close child doc assocs
             delete_doc_assocs(t_iig_item_id);
           --
@@ -1233,12 +1233,14 @@ BEGIN
     FORALL i IN 1 .. t_iit_id.COUNT
     UPDATE nm_inv_item_groupings_all g
        SET g.iig_end_date = l_effective_date
-     WHERE g.iig_item_id = t_iit_id (i);
+     WHERE g.iig_item_id = t_iit_id (i)
+     AND   g.iig_end_date is null;
 --
     FORALL i IN 1 .. t_iit_id.COUNT
     UPDATE nm_inv_items_all
        SET iit_end_date = l_effective_date
-     WHERE iit_ne_id = t_iit_id (i);
+     WHERE iit_ne_id = t_iit_id (i)
+     AND   iit_end_date is null;
 --
   ELSIF pi_action = 'D' THEN
 --
