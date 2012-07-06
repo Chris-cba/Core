@@ -3,16 +3,16 @@ create or replace package nm3sdo_ops as
 --------------------------------------------------------------------------------
 -- PVCS Identifiers :-
 --
--- sccsid : $Header
--- Module Name : $Workfile
--- Date into PVCS : $Date
--- Date fetched Out : $Modtime
--- PVCS Version : $Revision
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_ops.pkh-arc   1.1   Jul 06 2012 13:11:30   Rob.Coupe  $
+--       Module Name      : $Workfile:   nm3sdo_ops.pkh  $
+--       Date into PVCS   : $Date:   Jul 06 2012 13:11:30  $
+--       Date fetched Out : $Modtime:   Jul 06 2012 13:11:08  $
+--       PVCS Version     : $Revision:   1.1  $
 --
  -- Author: Rob Coupe
 --------------------------------------------------------------------------------
 --
-  g_sccsid       CONSTANT VARCHAR2(2000) := '"$Revision"';
+  g_sccsid       CONSTANT VARCHAR2(2000) := '"$Revision:   1.1  $"';
   g_package_name CONSTANT varchar2(30)    := 'nm3sdo_ops';
 FUNCTION get_version RETURN varchar2;
 FUNCTION get_body_version RETURN varchar2;
