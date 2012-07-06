@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm0575
 AS
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm0575.pkb-arc   2.7.1.14   Jul 04 2012 15:52:52   Rob.Coupe  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm0575.pkb-arc   2.7.1.15   Jul 06 2012 13:31:28   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm0575.pkb  $
---       Date into PVCS   : $Date:   Jul 04 2012 15:52:52  $
---       Date fetched Out : $Modtime:   Jul 04 2012 15:50:32  $
---       PVCS Version     : $Revision:   2.7.1.14  $
+--       Date into PVCS   : $Date:   Jul 06 2012 13:31:28  $
+--       Date fetched Out : $Modtime:   Jul 06 2012 13:29:50  $
+--       PVCS Version     : $Revision:   2.7.1.15  $
 --       Based on SCCS version : 1.6
 
 --   Author : Graeme Johnson
@@ -23,7 +23,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000)  := '"$Revision:   2.7.1.14  $"';
+  g_body_sccsid  CONSTANT varchar2(2000)  := '"$Revision:   2.7.1.15  $"';
   g_package_name CONSTANT varchar2(30)    := 'nm0575';
   
   subtype id_type is nm_members.nm_ne_id_in%type;
@@ -47,6 +47,7 @@ AS
   mt_inv_types      nm_code_tbl;
   m_nte_job_id      nm_nw_temp_extents.nte_job_id%type;
   m_xsp_changed     boolean := false;
+  
 --
 -----------------------------------------------------------------------------
 --
@@ -95,8 +96,11 @@ AS
                                         ,p_effective_date DATE DEFAULT nm3user.get_effective_date
                                         );
 
-
-
+  PROCEDURE remove_spatial_data ( p_nm_id_tbl in nm_id_tbl );
+  
+  PROCEDURE close_spatial_data ( p_nm_id_tbl in nm_id_tbl, p_end_date in date );
+  
+--
 FUNCTION get_version RETURN varchar2 IS
 BEGIN
    RETURN g_sccsid;
@@ -990,6 +994,9 @@ BEGIN
               FORALL i IN 1 .. t_iig_item_id.COUNT  
               DELETE FROM nm_inv_items_all i
                WHERE i.iit_ne_id = t_iig_item_id(i);
+--
+              remove_spatial_data(t_iig_item_id);               
+--
             END IF;
             
 --            FOR i in 1..t_iig_item_id.COUNT LOOP
@@ -1179,6 +1186,9 @@ BEGIN
                 FORALL i IN 1 .. t_iig_item_id.count  
                 DELETE FROM nm_inv_items_all i
                  WHERE i.iit_ne_id = t_iig_item_id(i);
+
+                remove_spatial_data(t_iig_item_id);               
+
             --  
             END IF;
           -- close child doc assocs
@@ -1235,12 +1245,16 @@ BEGIN
        SET g.iig_end_date = l_effective_date
      WHERE g.iig_item_id = t_iit_id (i)
      AND   g.iig_end_date is null;
+     
 --
     FORALL i IN 1 .. t_iit_id.COUNT
     UPDATE nm_inv_items_all
        SET iit_end_date = l_effective_date
      WHERE iit_ne_id = t_iit_id (i)
      AND   iit_end_date is null;
+     
+     close_spatial_data( t_iit_id, l_effective_date);
+     
 --
   ELSIF pi_action = 'D' THEN
 --
@@ -1265,6 +1279,10 @@ BEGIN
               (SELECT 1
                  FROM nm_members_all
                 WHERE iit_ne_id = nm_ne_id_in AND nm_ne_id_in = t_iit_id (i));
+
+    remove_spatial_data(t_iit_id);               
+
+--
 --
   END IF;
 --
@@ -1722,7 +1740,30 @@ BEGIN
 --
 END check_no_future_locs;
 
-  
+--
+procedure remove_spatial_data ( p_nm_id_tbl in nm_id_tbl ) is
+--
+p_ids int_array_type;
+begin
+   select cast ( collect ( column_value ) as int_array_type )
+   into p_ids
+   from table ( p_nm_id_tbl );
+--      
+   nm3sdo_ops.remove_spatial_data ( p_ids => p_ids );
+end;                                
+
+procedure close_spatial_data ( p_nm_id_tbl in nm_id_tbl, p_end_date in date ) is
+--
+p_ids int_array_type;
+begin
+   select cast ( collect ( column_value ) as int_array_type )
+   into p_ids
+   from table ( p_nm_id_tbl );
+--      
+   nm3sdo_ops.close_spatial_data ( p_ids => p_ids, p_end_date => p_end_date );
+end;                                
+
+--
 --
 -----------------------------------------------------------------------------
 --
