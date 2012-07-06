@@ -33,7 +33,7 @@ procedure remove_theme_data(p_nth_theme_id in nm_themes_all.nth_theme_id%type, p
 l_nth_row nm_themes_all%rowtype;
 exec_str  varchar2(4000);
 begin
-  nm_debug.debug_on;
+--  nm_debug.debug_on;
   set_global(p_ids);
   dbug_ids;
   l_nth_row := nm3get.get_nth( p_nth_theme_id);
@@ -41,7 +41,7 @@ begin
   exec_str := exec_str||' forall i in 1..nm3sdo_ops.g_ids.last ';
   exec_str := exec_str||'   delete from '||l_nth_row.nth_feature_table||' where '||nvl(l_nth_row.nth_feature_fk_column, l_nth_row.nth_feature_pk_column) ||'=  nm3sdo_ops.g_ids(i);';
   exec_str := exec_str||' end;';
-  nm_debug.debug(exec_str);
+--  nm_debug.debug(exec_str);
   begin
     execute immediate exec_str;
   exception
@@ -55,7 +55,7 @@ procedure close_theme_data(p_nth_theme_id in nm_themes_all.nth_theme_id%type, p_
 l_nth_row nm_themes_all%rowtype;
 exec_str  varchar2(4000);
 begin
-  nm_debug.debug_on;
+--  nm_debug.debug_on;
   set_global(p_ids);
   dbug_ids;
   l_nth_row := nm3get.get_nth( p_nth_theme_id);
@@ -65,12 +65,12 @@ begin
                          nvl(l_nth_row.nth_feature_fk_column, l_nth_row.nth_feature_pk_column) ||'=  nm3sdo_ops.g_ids(i)'||
                          ' and '||l_nth_row.nth_end_date_column||' is null;';
   exec_str := exec_str||' end;';
-  nm_debug.debug(exec_str);
+--  nm_debug.debug(exec_str);
   begin
     execute immediate exec_str using p_end_date;
   exception
     when others then
-      nm_debug.debug(sqlerrm);
+--      nm_debug.debug(sqlerrm);
     raise;
   end;
 end;
@@ -90,10 +90,10 @@ l_ids int_array_type;
 l_nth nm_themes_all.nth_theme_id%type;
 
 begin
-  nm_debug.debug('start of loop');
+--  nm_debug.debug('start of loop');
   for irec in c1 loop
-    nm_debug.debug_on;
-    nm_debug.debug('removing theme data for array ');
+--    nm_debug.debug_on;
+--    nm_debug.debug('removing theme data for array ');
     remove_theme_data( irec.nith_nth_theme_id, irec.id_list );
   end loop; 
 end;
@@ -115,10 +115,10 @@ l_ids int_array_type;
 l_nth nm_themes_all.nth_theme_id%type;
 
 begin
-  nm_debug.debug('start of loop');
+--  nm_debug.debug('start of loop');
   for irec in c1 (p_end_date) loop
-    nm_debug.debug_on;
-    nm_debug.debug('removing theme data for array ');
+--    nm_debug.debug_on;
+--    nm_debug.debug('removing theme data for array ');
     close_theme_data( irec.nith_nth_theme_id, irec.id_list, p_end_date );
   end loop; 
 end;
