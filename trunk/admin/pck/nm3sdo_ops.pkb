@@ -3,18 +3,18 @@ create or replace package body nm3sdo_ops as
 --------------------------------------------------------------------------------
 -- PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_ops.pkb-arc   1.3   Jul 06 2012 13:08:50   Rob.Coupe  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_ops.pkb-arc   1.4   Jul 06 2012 13:10:16   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3sdo_ops.pkb  $
---       Date into PVCS   : $Date:   Jul 06 2012 13:08:50  $
---       Date fetched Out : $Modtime:   Jul 06 2012 13:08:34  $
---       PVCS Version     : $Revision:   1.3  $
+--       Date into PVCS   : $Date:   Jul 06 2012 13:10:16  $
+--       Date fetched Out : $Modtime:   Jul 06 2012 13:09:56  $
+--       PVCS Version     : $Revision:   1.4  $
 --
 -- Author: Rob Coupe
 --
 --------------------------------------------------------------------------------
 --
 
-g_body_sccsid  CONSTANT varchar2(2000)  := '"$Revision"';
+g_body_sccsid  CONSTANT varchar2(2000)  := '"$Revision:   1.4  $"';
 procedure dbug_ids;
 FUNCTION get_version RETURN varchar2 IS
 BEGIN
