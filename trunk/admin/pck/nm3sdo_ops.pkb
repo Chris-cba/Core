@@ -3,11 +3,11 @@ create or replace package body nm3sdo_ops as
 --------------------------------------------------------------------------------
 -- PVCS Identifiers :-
 --
--- sccsid : $Header
--- Module Name : $Workfile
--- Date into PVCS : $Date
--- Date fetched Out : $Modtime
--- PVCS Version : $Revision
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_ops.pkb-arc   1.3   Jul 06 2012 13:08:50   Rob.Coupe  $
+--       Module Name      : $Workfile:   nm3sdo_ops.pkb  $
+--       Date into PVCS   : $Date:   Jul 06 2012 13:08:50  $
+--       Date fetched Out : $Modtime:   Jul 06 2012 13:08:34  $
+--       PVCS Version     : $Revision:   1.3  $
 --
 -- Author: Rob Coupe
 --
