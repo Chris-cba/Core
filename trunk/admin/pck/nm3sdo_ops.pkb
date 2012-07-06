@@ -3,18 +3,18 @@ create or replace package body nm3sdo_ops as
 --------------------------------------------------------------------------------
 -- PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_ops.pkb-arc   1.4   Jul 06 2012 13:10:16   Rob.Coupe  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_ops.pkb-arc   1.5   Jul 06 2012 13:21:46   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3sdo_ops.pkb  $
---       Date into PVCS   : $Date:   Jul 06 2012 13:10:16  $
---       Date fetched Out : $Modtime:   Jul 06 2012 13:09:56  $
---       PVCS Version     : $Revision:   1.4  $
+--       Date into PVCS   : $Date:   Jul 06 2012 13:21:46  $
+--       Date fetched Out : $Modtime:   Jul 06 2012 13:20:54  $
+--       PVCS Version     : $Revision:   1.5  $
 --
 -- Author: Rob Coupe
 --
 --------------------------------------------------------------------------------
 --
 
-g_body_sccsid  CONSTANT varchar2(2000)  := '"$Revision:   1.4  $"';
+g_body_sccsid  CONSTANT varchar2(2000)  := '"$Revision:   1.5  $"';
 procedure dbug_ids;
 FUNCTION get_version RETURN varchar2 IS
 BEGIN
@@ -108,7 +108,7 @@ and nth_theme_id = nith_nth_theme_id
 and nth_base_table_theme is null 
 and nth_use_history = 'Y' and nth_end_date_column is not null
 and i.iit_ne_id = t.column_value
---and not exists ( select 1 from nm_members_all where nm_ne_id_in = i.iit_ne_id and nvl(nm_end_date, c_end_date+1 ) > c_end_date )
+and not exists ( select 1 from nm_members_all where nm_ne_id_in = i.iit_ne_id and nvl(nm_end_date, c_end_date+1 ) > c_end_date )
 group by nith_nth_theme_id;
 --
 l_ids int_array_type;
