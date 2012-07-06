@@ -1,0 +1,23 @@
+create or replace package nm3sdo_ops as
+--
+--------------------------------------------------------------------------------
+-- PVCS Identifiers :-
+--
+-- sccsid : $Header
+-- Module Name : $Workfile
+-- Date into PVCS : $Date
+-- Date fetched Out : $Modtime
+-- PVCS Version : $Revision
+--
+ -- Author: Rob Coupe
+--------------------------------------------------------------------------------
+--
+  g_sccsid       CONSTANT VARCHAR2(2000) := '"$Revision"';
+  g_package_name CONSTANT varchar2(30)    := 'nm3sdo_ops';
+FUNCTION get_version RETURN varchar2;
+FUNCTION get_body_version RETURN varchar2;
+procedure remove_spatial_data(p_ids in int_array_type);
+procedure close_spatial_data(p_ids in int_array_type, p_end_date in date);
+procedure set_global(p_ids in int_array_type);
+g_ids  int_array_type;
+end;
