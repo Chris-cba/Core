@@ -105,7 +105,8 @@ select cast (collect(i.iit_ne_id) as int_array_type ) id_list, nith_nth_theme_id
 from table( p_ids ) t, nm_inv_themes, nm_inv_items i, nm_themes_all
 where nith_nit_id = iit_inv_type
 and nth_theme_id = nith_nth_theme_id
-and nth_base_table_theme is null
+and nth_base_table_theme is null 
+and nth_use_history = 'Y' and nth_end_date_column is not null
 and i.iit_ne_id = t.column_value
 --and not exists ( select 1 from nm_members_all where nm_ne_id_in = i.iit_ne_id and nvl(nm_end_date, c_end_date+1 ) > c_end_date )
 group by nith_nth_theme_id;
