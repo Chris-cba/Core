@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm0575
 AS
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm0575.pkb-arc   2.7.1.15   Jul 06 2012 13:31:28   Rob.Coupe  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm0575.pkb-arc   2.7.1.16   Jul 16 2012 12:16:50   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm0575.pkb  $
---       Date into PVCS   : $Date:   Jul 06 2012 13:31:28  $
---       Date fetched Out : $Modtime:   Jul 06 2012 13:29:50  $
---       PVCS Version     : $Revision:   2.7.1.15  $
+--       Date into PVCS   : $Date:   Jul 16 2012 12:16:50  $
+--       Date fetched Out : $Modtime:   Jul 16 2012 12:15:10  $
+--       PVCS Version     : $Revision:   2.7.1.16  $
 --       Based on SCCS version : 1.6
 
 --   Author : Graeme Johnson
@@ -23,7 +23,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000)  := '"$Revision:   2.7.1.15  $"';
+  g_body_sccsid  CONSTANT varchar2(2000)  := '"$Revision:   2.7.1.16  $"';
   g_package_name CONSTANT varchar2(30)    := 'nm0575';
   
   subtype id_type is nm_members.nm_ne_id_in%type;
@@ -1261,6 +1261,11 @@ BEGIN
     FORALL i IN 1 .. t_iit_id.COUNT
     DELETE FROM nm_inv_item_groupings_all
      WHERE iig_item_id  = t_iit_id (i);
+
+
+    FORALL i in 1 .. t_iit_id.COUNT
+    DELETE FROM nm_members_all m
+    WHERE m.nm_ne_id_in = t_iit_id (i);
      
 --     nm_debug.debug_on;
 --     nm_debug.debug('Removal of set of inventory in table ');
