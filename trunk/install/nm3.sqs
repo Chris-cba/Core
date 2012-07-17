@@ -1,16 +1,16 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.sqs-arc   2.12   May 11 2010 16:09:52   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.sqs-arc   2.13   Jul 17 2012 12:46:14   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3.sqs  $
---       Date into PVCS   : $Date:   May 11 2010 16:09:52  $
---       Date fetched Out : $Modtime:   May 11 2010 16:09:14  $
---       PVCS Version     : $Revision:   2.12  $
+--       Date into PVCS   : $Date:   Jul 17 2012 12:46:14  $
+--       Date fetched Out : $Modtime:   Jul 17 2012 12:45:58  $
+--       PVCS Version     : $Revision:   2.13  $
 --
 --------------------------------------------------------------------------------
 --
--- Generated for Oracle 10g on Tue May 11  15:45:33 2010 by Server Generator 10.1.2.9.28
-
+-- Generated for Oracle 10g on Mon Jul 16  14:47:24 2012 by Server Generator 10.1.2.9.28
+ 
 PROMPT Creating Sequence 'BATCH_ID_SEQ'
 CREATE SEQUENCE BATCH_ID_SEQ
  NOMAXVALUE
@@ -391,6 +391,16 @@ CREATE SEQUENCE HFT_ID_SEQ
 
 PROMPT Creating Sequence 'HIG_HUS_ID_SEQ'
 CREATE SEQUENCE HIG_HUS_ID_SEQ
+ INCREMENT BY 1
+ START WITH 1
+ NOMAXVALUE
+ NOMINVALUE
+ NOCYCLE
+ NOCACHE
+/
+
+PROMPT Creating Sequence 'HIG_ROUTER_PARAMS_SEQ'
+CREATE SEQUENCE HIG_ROUTER_PARAMS_SEQ
  INCREMENT BY 1
  START WITH 1
  NOMAXVALUE
