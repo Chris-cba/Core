@@ -5,11 +5,11 @@ As
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.57   Jun 06 2012 09:28:46   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.58   Jul 17 2012 14:19:12   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3sdm.pkb  $
---       Date into PVCS   : $Date:   Jun 06 2012 09:28:46  $
---       Date fetched Out : $Modtime:   Jun 06 2012 09:26:52  $
---       PVCS Version     : $Revision:   2.57  $
+--       Date into PVCS   : $Date:   Jul 17 2012 14:19:12  $
+--       Date fetched Out : $Modtime:   Jun 27 2012 14:22:30  $
+--       PVCS Version     : $Revision:   2.58  $
 --
 --   Author : R.A. Coupe
 --
@@ -21,7 +21,7 @@ As
 --
 --all global package variables here
 --
-  g_Body_Sccsid     Constant Varchar2 (2000) := '"$Revision:   2.57  $"';
+  g_Body_Sccsid     Constant Varchar2 (2000) := '"$Revision:   2.58  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
   g_Package_Name    Constant Varchar2 (30)   := 'NM3SDM';
@@ -57,6 +57,32 @@ As
                             );
                           
   Type t_View_Tab Is Table Of t_View_Rec Index By Binary_Integer;  
+  
+--
+-----------------------------------------------------------------------------
+--
+Function test_theme_for_update( p_Theme in NM_THEMES_ALL.NTH_THEME_ID%TYPE ) Return Boolean is
+  retval Boolean := FALSE;
+  l_mode nm_theme_roles.nthr_mode%type;
+begin
+  select nthr_mode into l_mode 
+  from nm_theme_roles, hig_user_roles
+  where nthr_theme_id = p_theme
+  and nthr_role = hur_role
+  and hur_username = SYS_CONTEXT ('NM3_SECURITY_CTX', 'USERNAME')
+  and rownum = 1
+  order by nthr_mode;
+--
+  if l_mode = 'NORMAL' then
+    retval := TRUE;
+  else
+    retval := FALSE;
+  end if;
+  return retval;
+exception
+  when no_data_found then
+    Return FALSE;
+end;
   
 --
 -----------------------------------------------------------------------------
@@ -1403,6 +1429,10 @@ Is
   l_Geom2   Mdsys.Sdo_Geometry;
 Begin
   l_Layer := Get_Nt_Theme (Nm3Get.Get_Ne (p_Ne_Id).Ne_Nt_Type);
+  
+  IF NOT test_theme_for_update(l_layer) then
+    HIG.RAISE_NER('NET', 339);
+  END IF;
 
   If Nm3Sdo.Element_Has_Shape (L_Layer, P_Ne_Id) = 'TRUE' Then
     If p_X Is Null And p_Y Is Null Then
@@ -1501,6 +1531,11 @@ Is
   l_Geom    Mdsys.Sdo_Geometry;
 Begin
   l_Layer := Get_Nt_Theme (Nm3Get.Get_Ne (P_Ne_Id).Ne_Nt_Type);
+  
+  if not test_theme_for_update(l_Layer) then
+    HIG.RAISE_NER('NET', 339);
+  END IF;
+  
 
   If      Nm3Sdo.Element_Has_Shape (L_Layer, P_Ne_Id_1) = 'TRUE'
       And Nm3Sdo.Element_Has_Shape (L_Layer, P_Ne_Id_2) = 'TRUE'  Then
@@ -1537,6 +1572,10 @@ Begin
   l_Layer_Old := Get_Nt_Theme (Nm3Get.Get_Ne_All (p_Ne_Id_Old).Ne_Nt_Type);
   l_Layer_New := Get_Nt_Theme (Nm3Get.Get_Ne (p_Ne_Id_New).Ne_Nt_Type);
 
+  IF NOT test_theme_for_update(l_Layer_Old) then
+    HIG.RAISE_NER('NET', 339);
+  END IF;
+
   If      Nm3Sdo.Element_Has_Shape (l_Layer_Old, p_Ne_Id_Old) = 'TRUE' 
       And l_Layer_New Is Not Null Then
     l_Geom := Nm3Sdo.Get_Layer_Element_Geometry (l_Layer_Old, p_Ne_Id_Old);
@@ -1562,6 +1601,10 @@ Is
   l_Geom    Mdsys.Sdo_Geometry;
 Begin
   l_Layer := Get_Nt_Theme (Nm3Get.Get_Ne_All (p_Ne_Id_Old).Ne_Nt_Type);
+
+  IF NOT test_theme_for_update(l_Layer) then
+    HIG.RAISE_NER('NET', 339);
+  END IF;  
 
   If Nm3Sdo.Element_Has_Shape (l_Layer, p_Ne_Id_Old) = 'TRUE' Then
       
@@ -1590,6 +1633,11 @@ Is
   l_Geom      Mdsys.Sdo_Geometry;
 Begin  
   l_Layer := Get_Nt_Theme (Nm3Get.Get_Ne (p_Ne_Id).Ne_Nt_Type);
+
+  IF NOT test_theme_for_update(l_Layer) then
+    HIG.RAISE_NER('NET', 339);
+  END IF;
+
 
   If Nm3Sdo.Element_Has_Shape (l_Layer, p_Ne_Id) = 'TRUE' Then
 
