@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 --
 ---   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.72   May 04 2012 13:01:54   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.73   Jul 17 2012 14:21:30   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3sdo.pkb  $
---       Date into PVCS   : $Date:   May 04 2012 13:01:54  $
---       Date fetched Out : $Modtime:   May 04 2012 12:59:20  $
---       PVCS Version     : $Revision:   2.72  $
+--       Date into PVCS   : $Date:   Jul 17 2012 14:21:30  $
+--       Date fetched Out : $Modtime:   Jun 27 2012 14:22:26  $
+--       PVCS Version     : $Revision:   2.73  $
 --       Based on
 
 --
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 -- Copyright (c) RAC
 -----------------------------------------------------------------------------
 
-   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.72  $"';
+   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.73  $"';
    g_package_name    CONSTANT VARCHAR2 (30)  := 'NM3SDO';
    g_batch_size      INTEGER                 := NVL( TO_NUMBER(Hig.get_sysopt('SDOBATSIZE')), 10);
    g_clip_type       VARCHAR2(30)            := NVL(Hig.get_sysopt('SDOCLIPTYP'),'SDO');
@@ -42,6 +42,33 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
    g_do_geom_validation        BOOLEAN :=  NVL(hig.get_user_or_sys_opt('SDOGEOMVAL'),'Y') = 'Y' ;
 
 --  g_body_sccsid is the SCCS ID for the package body
+--
+--
+-----------------------------------------------------------------------------
+--
+Function test_theme_for_update( p_Theme in NM_THEMES_ALL.NTH_THEME_ID%TYPE ) Return Boolean is
+  retval Boolean := FALSE;
+  l_mode nm_theme_roles.nthr_mode%type;
+begin
+  select nthr_mode into l_mode 
+  from nm_theme_roles, hig_user_roles
+  where nthr_theme_id = p_theme
+  and nthr_role = hur_role
+  and hur_username = SYS_CONTEXT ('NM3_SECURITY_CTX', 'USERNAME')
+  and rownum = 1
+  order by nthr_mode;
+--
+  if l_mode = 'NORMAL' then
+    retval := TRUE;
+  else
+    retval := FALSE;
+  end if;
+  return retval;
+exception
+  when no_data_found then
+    Return FALSE;
+end;
+
 --
   FUNCTION hypot
             ( x1 IN NUMBER
@@ -1922,6 +1949,11 @@ l_insert_pt BOOLEAN := FALSE;
 l_length    NUMBER;
 
 BEGIN
+
+  IF NOT test_theme_for_update(p_layer) then
+    HIG.RAISE_NER('NET', 339);
+  END IF;
+
 
   IF set_theme( p_layer ) THEN
     set_theme_metadata( p_layer );
@@ -4187,6 +4219,11 @@ cur_string VARCHAR2(2000);
 
 BEGIN
 
+  IF NOT test_theme_for_update(p_layer) then
+    HIG.RAISE_NER('NET', 339);
+  END IF;
+
+
   IF set_theme( p_layer ) THEN
     set_theme_metadata( p_layer );
   END IF;
@@ -5035,6 +5072,10 @@ PROCEDURE insert_element_shape( p_layer IN NUMBER,
 --
 BEGIN
 --
+  IF NOT test_theme_for_update(p_layer) then
+    HIG.RAISE_NER('NET', 339);
+  END IF;
+
   l_nth := nm3get.get_nth( p_layer );
 
   IF l_nth.nth_base_table_theme IS NOT NULL THEN
@@ -6612,6 +6653,10 @@ BEGIN
   l_nth_name := l_tab_theme(1);
 
   nth := Nm3get.get_nth( l_nth_name );
+  
+  IF NOT test_theme_for_update(nth.nth_theme_id) then
+    HIG.RAISE_NER('NET', 339);
+  END IF;
 
   l_old_shape := Nm3sdo.get_theme_shape(nth.nth_theme_id, l_tab_pk(1) );
 
