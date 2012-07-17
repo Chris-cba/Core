@@ -1,14 +1,14 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.ind-arc   2.21   Mar 28 2011 17:16:50   Ade.Edwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.ind-arc   2.22   Jul 17 2012 12:44:50   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3.ind  $
---       Date into PVCS   : $Date:   Mar 28 2011 17:16:50  $
---       Date fetched Out : $Modtime:   Mar 28 2011 17:11:44  $
---       PVCS Version     : $Revision:   2.21  $
+--       Date into PVCS   : $Date:   Jul 17 2012 12:44:50  $
+--       Date fetched Out : $Modtime:   Jul 17 2012 12:44:32  $
+--       PVCS Version     : $Revision:   2.22  $
 --
 --------------------------------------------------------------------------------
 --
--- Generated for Oracle 10g on Mon Mar 28  16:43:59 2011 by Server Generator 10.1.2.9.28
+-- Generated for Oracle 10g on Mon Jul 16  14:47:11 2012 by Server Generator 10.1.2.9.28
   
 
 PROMPT Creating Index 'DOC_FK_DLC_IND'
@@ -126,6 +126,11 @@ CREATE INDEX DGS_FK_DGT_IND ON DOC_GATE_SYNS
 
 PROMPT Creating Index 'DGS_IND1'
 CREATE INDEX DGS_IND1 ON DOC_GATE_SYNS
+ (DGS_TABLE_SYN)
+/
+
+PROMPT Creating Index 'DGS_UK1'
+CREATE UNIQUE INDEX DGS_UK1 ON DOC_GATE_SYNS
  (DGS_TABLE_SYN)
 /
 
@@ -672,6 +677,11 @@ CREATE INDEX HRO_HPR_FK_IND ON HIG_ROLES
  (HRO_PRODUCT)
 /
 
+PROMPT Creating Index 'HIG_ROUTER_PARAMS_CREATED_IDX'
+CREATE INDEX HIG_ROUTER_PARAMS_CREATED_IDX ON HIG_ROUTER_PARAMS
+ (HRP_PARAM_CREATED)
+/
+
 PROMPT Creating Index 'HSA_SEQUENCE_NAME_IX'
 CREATE INDEX HSA_SEQUENCE_NAME_IX ON HIG_SEQUENCE_ASSOCIATIONS
  (HSA_SEQUENCE_NAME)
@@ -732,8 +742,8 @@ CREATE INDEX HUR_HRO_FK_IND ON HIG_USER_ROLES
  (HUR_ROLE)
 /
 
-PROMPT Creating Index 'MV_HIGHLIGHT_IND'
-CREATE INDEX MV_HIGHLIGHT_IND ON MV_HIGHLIGHT
+PROMPT Creating Index 'MHL_IND_1'
+CREATE INDEX MHL_IND_1 ON MV_HIGHLIGHT
  (MV_ID
  ,MV_FEAT_TYPE)
 /
