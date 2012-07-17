@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY doc_api AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/doc_api.pkb-arc   2.2   Apr 22 2010 12:00:58   gjohnson  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/doc_api.pkb-arc   2.3   Jul 17 2012 09:20:28   Rob.Coupe  $
 --       Module Name      : $Workfile:   doc_api.pkb  $
---       Date into SCCS   : $Date:   Apr 22 2010 12:00:58  $
---       Date fetched Out : $Modtime:   Apr 21 2010 11:14:12  $
---       SCCS Version     : $Revision:   2.2  $
+--       Date into SCCS   : $Date:   Jul 17 2012 09:20:28  $
+--       Date fetched Out : $Modtime:   Jul 17 2012 09:16:46  $
+--       SCCS Version     : $Revision:   2.3  $
 --       Based on SCCS Version     : 1.1
 --
 --
@@ -26,7 +26,7 @@ CREATE OR REPLACE PACKAGE BODY doc_api AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid   CONSTANT varchar2(2000) := '"$Revision:   2.2  $"';
+  g_body_sccsid   CONSTANT varchar2(2000) := '"$Revision:   2.3  $"';
 
   g_package_name  CONSTANT varchar2(30) := 'doc_api';
   
@@ -241,7 +241,7 @@ PROCEDURE create_document
 , ce_file_name    in  varchar2
 , ce_doc_type     in  varchar2
 , ce_doc_class    in  varchar2 default null
-, ce_date_issued  in  varchar2 default to_char(sysdate)
+, ce_date_issued  in  varchar2 default to_char(sysdate, 'DD-MON-YYYY')
 , ce_date_expired in  varchar2 default null
 , ce_issue_number in  number   default 1
 , ce_x_coordinate in  number   default null
