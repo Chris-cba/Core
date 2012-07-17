@@ -1,14 +1,14 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.con-arc   2.34   Sep 09 2011 11:37:08   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.con-arc   2.35   Jul 17 2012 12:34:32   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3.con  $
---       Date into PVCS   : $Date:   Sep 09 2011 11:37:08  $
---       Date fetched Out : $Modtime:   Sep 09 2011 11:36:28  $
---       PVCS Version     : $Revision:   2.34  $
+--       Date into PVCS   : $Date:   Jul 17 2012 12:34:32  $
+--       Date fetched Out : $Modtime:   Jul 17 2012 12:33:52  $
+--       PVCS Version     : $Revision:   2.35  $
 --
 --------------------------------------------------------------------------------
 --
--- Generated for Oracle 10g on Fri Sep 09  11:26:38 2011 by Server Generator 10.1.2.9.28
+-- Generated for Oracle 10g on Mon Jul 16  14:47:13 2012 by Server Generator 10.1.2.9.28
   
 PROMPT Creating Primary Key on 'ANALYSE_ALL_TABS_LOG'
 ALTER TABLE ANALYSE_ALL_TABS_LOG
@@ -2738,7 +2738,12 @@ ALTER TABLE NM_UPLOAD_FILE_GATEWAY_COLS
   ,NUFGC_COLUMN_NAME))
 /
 
-            
+       
+PROMPT Creating Check Constraint on 'DOC_ASSOCS'
+ALTER TABLE DOC_ASSOCS
+ ADD (CONSTRAINT DAS_TABLE_NAME_UPPER CHECK (Das_Table_Name = Upper(Das_Table_Name)))
+/
+     
 PROMPT Creating Check Constraint on 'DOC_CLASS'
 ALTER TABLE DOC_CLASS
  ADD (CONSTRAINT DCL_END_DATE_TCHK CHECK (DCL_END_DATE=TRUNC(DCL_END_DATE)))
@@ -2758,7 +2763,27 @@ PROMPT Creating Check Constraint on 'DOC_GATEWAYS'
 ALTER TABLE DOC_GATEWAYS
  ADD (CONSTRAINT DGT_START_DATE_TCHK CHECK (DGT_START_DATE=TRUNC(DGT_START_DATE)))
 /
-     
+
+PROMPT Creating Check Constraint on 'DOC_GATEWAYS'
+ALTER TABLE DOC_GATEWAYS
+ ADD (CONSTRAINT DGT_TABLE_NAME_UPPER CHECK (Dgt_Table_Name = Upper(Dgt_Table_Name)))
+/
+ 
+PROMPT Creating Check Constraint on 'DOC_GATE_SYNS'
+ALTER TABLE DOC_GATE_SYNS
+ ADD (CONSTRAINT DGS_TABLE_NAME_SYN_DIFF CHECK (Dgs_Dgt_Table_Name <> Dgs_Table_Syn))
+/
+
+PROMPT Creating Check Constraint on 'DOC_GATE_SYNS'
+ALTER TABLE DOC_GATE_SYNS
+ ADD (CONSTRAINT DGS_TABLE_NAME_UPPER CHECK (Dgs_Dgt_Table_Name = Upper(Dgs_Dgt_Table_Name)))
+/
+
+PROMPT Creating Check Constraint on 'DOC_GATE_SYNS'
+ALTER TABLE DOC_GATE_SYNS
+ ADD (CONSTRAINT DGS_TABLE_SYN_UPPER CHECK (Dgs_Table_Syn = Upper(Dgs_Table_Syn)))
+/
+    
 PROMPT Creating Check Constraint on 'DOC_LOCATIONS'
 ALTER TABLE DOC_LOCATIONS
  ADD (CONSTRAINT DLC_END_DATE_TCHK CHECK (DLC_END_DATE=TRUNC(DLC_END_DATE)))
@@ -2783,7 +2808,12 @@ PROMPT Creating Check Constraint on 'DOC_QUERY_COLS'
 ALTER TABLE DOC_QUERY_COLS
  ADD (CONSTRAINT DQC_DATATYPE_CHK CHECK (dqc_datatype IN ('NUMBER','DATE','VARCHAR2')))
 /
-        
+      
+PROMPT Creating Check Constraint on 'DOC_TEMPLATE_GATEWAYS'
+ALTER TABLE DOC_TEMPLATE_GATEWAYS
+ ADD (CONSTRAINT DTG_TABLE_NAME_UPPER CHECK (Dtg_Table_Name = Upper(Dtg_Table_Name)))
+/
+  
 PROMPT Creating Check Constraint on 'DOC_TYPES'
 ALTER TABLE DOC_TYPES
  ADD (CONSTRAINT DTP_END_DATE_TCHK CHECK (DTP_END_DATE=TRUNC(DTP_END_DATE)))
@@ -3138,7 +3168,20 @@ PROMPT Creating Check Constraint on 'HIG_QUERY_TYPES'
 ALTER TABLE HIG_QUERY_TYPES
  ADD (CONSTRAINT HQT_SECURITY_CHK CHECK (HQT_SECURITY IN ('R','P')))
 /
-     
+    
+PROMPT Creating Check Constraint on 'HIG_ROUTER_PARAMS'
+ALTER TABLE HIG_ROUTER_PARAMS
+ ADD (CONSTRAINT HIG_ROUTER_PARAMS_MUTUAL_EX CHECK (( Hrp_Param_Value_Varchar Is Null 
+And Hrp_Param_Value_Number Is Null 
+And Hrp_Param_Value_Date Is Not Null ) 
+Or ( Hrp_Param_Value_Varchar Is Null 
+And Hrp_Param_Value_Date Is Null 
+And Hrp_Param_Value_Number Is Not Null ) 
+Or ( Hrp_Param_Value_Number Is Null 
+And Hrp_Param_Value_Date Is Null 
+And Hrp_Param_Value_Varchar Is Not Null )))
+/
+  
 PROMPT Creating Check Constraint on 'HIG_SEQUENCE_ASSOCIATIONS'
 ALTER TABLE HIG_SEQUENCE_ASSOCIATIONS
  ADD (CONSTRAINT HSA_UPPERCASE_CHK CHECK (hsa_table_name=UPPER(hsa_table_name) 
@@ -3185,7 +3228,7 @@ PROMPT Creating Check Constraint on 'HIG_USER_ROLES'
 ALTER TABLE HIG_USER_ROLES
  ADD (CONSTRAINT HUR_START_DATE_TCHK CHECK (HUR_START_DATE=TRUNC(HUR_START_DATE)))
 /
-                      
+                       
 PROMPT Creating Check Constraint on 'NM_ASSETS_ON_ROUTE_STORE_HEAD'
 ALTER TABLE NM_ASSETS_ON_ROUTE_STORE_HEAD
  ADD (CONSTRAINT NARSH_ENTIRE_CHK CHECK (narsh_entire IN ('Y', 'N')))
@@ -5448,6 +5491,13 @@ ALTER TABLE IM_JUMP_NODES ADD (CONSTRAINT
   ,HHU_SEQ))
 /
 
+PROMPT Creating Foreign Key on 'NM_ADMIN_EXTENTS'
+ALTER TABLE NM_ADMIN_EXTENTS ADD (CONSTRAINT
+ NAE_NAU_FK FOREIGN KEY 
+  (NAE_ADMIN_UNIT) REFERENCES NM_ADMIN_UNITS_ALL
+  (NAU_ADMIN_UNIT) ON DELETE CASCADE)
+/
+
 PROMPT Creating Foreign Key on 'NM_AREA_THEMES'
 ALTER TABLE NM_AREA_THEMES ADD (CONSTRAINT
  NATH_FK_NAT FOREIGN KEY 
@@ -6526,7 +6576,7 @@ PROMPT Creating Foreign Key on 'NM_SAVED_EXTENT_MEMBERS'
 ALTER TABLE NM_SAVED_EXTENT_MEMBERS ADD (CONSTRAINT
  NSU_NSE_FK FOREIGN KEY 
   (NSM_NSE_ID) REFERENCES NM_SAVED_EXTENTS
-  (NSE_ID) DISABLE)
+  (NSE_ID) ON DELETE CASCADE DISABLE)
 /
 
 PROMPT Creating Foreign Key on 'NM_SAVED_EXTENT_MEMBER_DATUMS'
@@ -6535,7 +6585,7 @@ ALTER TABLE NM_SAVED_EXTENT_MEMBER_DATUMS ADD (CONSTRAINT
   (NSD_NSE_ID
   ,NSD_NSM_ID) REFERENCES NM_SAVED_EXTENT_MEMBERS
   (NSM_NSE_ID
-  ,NSM_ID))
+  ,NSM_ID) ON DELETE CASCADE)
 /
 
 PROMPT Creating Foreign Key on 'NM_TEMP_INV_ITEMS'
