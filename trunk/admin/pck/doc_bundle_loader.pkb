@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/doc_bundle_loader.pkb-arc   3.10   May 23 2012 14:04:48   Steve.Cooper  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/doc_bundle_loader.pkb-arc   3.11   Jul 17 2012 09:24:50   Rob.Coupe  $
 --       Module Name      : $Workfile:   doc_bundle_loader.pkb  $
---       Date into PVCS   : $Date:   May 23 2012 14:04:48  $
---       Date fetched Out : $Modtime:   May 23 2012 13:51:32  $
---       Version          : $Revision:   3.10  $
+--       Date into PVCS   : $Date:   Jul 17 2012 09:24:50  $
+--       Date fetched Out : $Modtime:   Jul 17 2012 09:24:04  $
+--       Version          : $Revision:   3.11  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.10  $';
+  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.11  $';
 
   g_package_name CONSTANT varchar2(30) := 'doc_bundle_loader';
   
@@ -713,7 +713,7 @@ BEGIN
                                     , ce_file_name    => l_tab_c1(d).dbfr_doc_filename
                                     , ce_doc_type     => l_tab_c1(d).dbfr_doc_type
                                     , ce_doc_class    => Null
-                                    , ce_date_issued  => sysdate
+                                    , ce_date_issued  => to_char(sysdate, 'DD-MON-YYYY') -- RAC - task 0112078 - this is a character argument - added format to prevent year being truncated to 2 chars
                                     , ce_date_expired => Null
                                     , ce_issue_number => 1
                                     , ce_x_coordinate => l_tab_c1(d).dbfr_x_coordinate
