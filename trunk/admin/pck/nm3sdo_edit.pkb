@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3sdo_Edit AS
 --
 --   SCCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_edit.pkb-arc   2.15   Mar 19 2012 15:50:04   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_edit.pkb-arc   2.16   Jul 17 2012 14:22:58   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3sdo_edit.pkb  $
---       Date into SCCS   : $Date:   Mar 19 2012 15:50:04  $
---       Date fetched Out : $Modtime:   Mar 19 2012 15:47:12  $
---       SCCS Version     : $Revision:   2.15  $
+--       Date into SCCS   : $Date:   Jul 17 2012 14:22:58  $
+--       Date fetched Out : $Modtime:   Jun 27 2012 15:45:54  $
+--       SCCS Version     : $Revision:   2.16  $
 --
 --
 --  Author :  R Coupe
@@ -23,7 +23,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3sdo_Edit AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid   CONSTANT  VARCHAR2(2000)  :=  '$Revision:   2.15  $';
+  g_body_sccsid   CONSTANT  VARCHAR2(2000)  :=  '$Revision:   2.16  $';
   g_package_name  CONSTANT  VARCHAR2(30)    :=  'nm3sdo_edit';
 --
 -----------------------------------------------------------------------------
@@ -46,6 +46,29 @@ END get_body_version;
 --
 -----------------------------------------------------------------------------
 --
+Function test_theme_for_update( p_Theme in NM_THEMES_ALL.NTH_THEME_ID%TYPE ) Return Boolean is
+  retval Boolean := FALSE;
+  l_mode nm_theme_roles.nthr_mode%type;
+begin
+  select nthr_mode into l_mode 
+  from nm_theme_roles, hig_user_roles
+  where nthr_theme_id = p_theme
+  and nthr_role = hur_role
+  and hur_username = SYS_CONTEXT ('NM3_SECURITY_CTX', 'USERNAME')
+  and rownum = 1
+  order by nthr_mode;
+--
+  if l_mode = 'NORMAL' then
+    retval := TRUE;
+  else
+    retval := FALSE;
+  end if;
+  return retval;
+exception
+  when no_data_found then
+    Return FALSE;
+end;
+
 /* Set SRID
 */
 FUNCTION set_srid (pi_geom IN MDSYS.SDO_GEOMETRY, pi_srid IN NUMBER)
@@ -236,6 +259,11 @@ IS
    l_nth           NM_THEMES_ALL%ROWTYPE   := Nm3get.get_nth (pi_nth_id);
    lock_id         NUMBER;
 BEGIN
+
+  IF NOT test_theme_for_update(pi_nth_id) then
+    HIG.RAISE_NER('NET', 339);
+  END IF;
+
 --get base table first - no point attempting to lock a view
 
    --operate on the base table theme
