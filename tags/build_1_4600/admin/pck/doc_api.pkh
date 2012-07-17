@@ -1,0 +1,159 @@
+CREATE OR REPLACE PACKAGE doc_api AS
+--<PACKAGE>
+--
+--   PVCS Identifiers :-
+--
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/doc_api.pkh-arc   2.2   Jul 17 2012 09:18:54   Rob.Coupe  $
+--       Module Name      : $Workfile:   doc_api.pkh  $
+--       Date into SCCS   : $Date:   Jul 17 2012 09:18:54  $
+--       Date fetched Out : $Modtime:   Jul 17 2012 09:16:22  $
+--       SCCS Version     : $Revision:   2.2  $
+--       Based on SCCS Version     : 1.1
+--
+--   Author : Francis Fish
+--
+--   doc_api
+--
+-----------------------------------------------------------------------------
+--	Copyright (c) exor corporation ltd, 2005
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--
+--<CONSTANTS>
+--</CONSTANTS>
+--<GLOBVAR>
+  -----------
+  --constants
+  -----------
+  --g_sccsid is the SCCS ID for the package
+  g_sccsid CONSTANT varchar2(2000) := '"$Revision:   2.2  $"';
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+------------------------------------------------------------------------------
+--<proc name="create_document">
+-- Create a new document
+-- 
+-- ce_reference_no in  varchar2 Document Reference Number
+-- ce_title        in  varchar2 Document Title
+-- ce_descr        in  varchar2 Document Description
+-- ce_dlc_id       in  number   Document Location Identifier (looked up in DOC_LOCATIONS)
+-- ce_file_name    in  varchar2 Document File Name
+-- ce_doc_type     in  varchar2 Document Type (mandatory and looked up in DOC_TYPES)
+-- ce_doc_class    in  varchar2 Document Class (optional)
+-- ce_date_issued  in  varchar2 Date Issued
+-- ce_date_expired in  varchar2 Date Expires
+-- ce_issue_number in  number   Issue Number of Document
+-- ce_doc_id       out number   Unique Identifier for the Document created by the API
+-- error_value     out number   Error Number. Calling program should 
+--   examine this variable. If it is null then Update Procedure has 
+--   completed successfully. If it is not null then the text in ERR_TEXT 
+--   should be output to the calling application/user.
+-- error_text      out varchar2 Error Text
+--
+PROCEDURE create_document
+( ce_reference_no in  varchar2
+, ce_title        in  varchar2
+, ce_descr        in  varchar2
+, ce_dlc_id       in  number  
+, ce_file_name    in  varchar2
+, ce_doc_type     in  varchar2
+, ce_doc_class    in  varchar2 default null
+, ce_date_issued  in  varchar2 default to_char(sysdate, 'DD-MON-YYYY')
+, ce_date_expired in  varchar2 default null
+, ce_issue_number in  number   default 1
+, ce_x_coordinate in  number   default null
+, ce_y_coordinate in  number   default null
+, ce_doc_id       in out  number
+, ce_do_commit    boolean default true  
+, error_value     out number  
+, error_text      out varchar2
+); 
+--  </proc>
+--
+-----------------------------------------------------------------------------
+--<proc name="validate_document">
+-- validate a document record prior to insert
+-- called by create_document - but also made public so can be called stand alone
+FUNCTION validate_document(ce_reference_no in  varchar2
+                         , ce_title        in  varchar2
+                         , ce_descr        in  varchar2
+                         , ce_dlc_id       in  number  
+                         , ce_file_name    in  varchar2
+                         , ce_doc_type     in  varchar2
+                         , ce_doc_class    in  varchar2 default null
+                         , ce_date_issued  in  varchar2 default to_char(sysdate)
+                         , ce_date_expired in  varchar2 default null
+                         , ce_issue_number in  number   default 1
+                         , ce_x_coordinate in  number   default null
+                         , ce_y_coordinate in  number   default null                         
+                         , error_value     out number  
+                         , error_text      out varchar2) RETURN BOOLEAN;
+--</PROC>
+------------------------------------------------------------------------------
+--
+--
+--<proc name="create_doc_assoc">
+-- Create a new document association
+-- 
+-- ce_doc_id     in  number   Unique Reference for the Document to be associated
+-- ce_table_name in  varchar2 The name of the exor table within which 
+--    the exor object is stored. It MUST exist as a Document Gateway 
+--    defined using DOC0130
+-- ce_unique_id  in  varchar2 Unique Identifier of the Object within 
+--    the Defined TABLE. Must be defined as the first column in the SELECT 
+--    string within DOC0130 Document Gateway.
+-- error_value   out number   Error Number. Calling program should 
+--    examine this variable. If it is null then Update Procedure has 
+--    completed successfully. If it is not null then the text in ERR_TEXT 
+--    should be output to the calling application/user.
+-- error_text    out varchar2 Error Text
+  procedure create_doc_assoc
+  ( ce_doc_id     in  number  
+  , ce_table_name in  varchar2
+  , ce_unique_id  in  varchar2
+  , ce_do_commit  in  boolean  default true  
+  , error_value   out number  
+  , error_text    out varchar2
+  ) ; 
+--  </proc>
+--
+-----------------------------------------------------------------------------
+--
+--<proc name="delete_document">
+-- Create a new document association
+-- 
+-- ce_reference_no in  varchar2 Document Reference Number
+-- ce_delete_doc   in  varchar2 Delete Document flag. If ÊY∆ then 
+--   delete document record and doc_assoc records. If ÊN∆ only delete 
+--   doc_assoc records.
+-- error_value     out number   Error Number. Calling program should 
+--   examine this variable. If it is null then Update Procedure has 
+--   completed successfully. If it is not null then the text in ERR_TEXT 
+--   should be output to the calling application/user.
+-- error_text      out varchar2 Error Text
+  procedure delete_document
+  ( ce_reference_no in  varchar2
+  , ce_delete_doc   in  varchar2
+  , ce_do_commit    in  boolean  default true  
+  , error_value     out number  
+  , error_text      out varchar2
+  ) ; 
+--  </proc>
+--
+-----------------------------------------------------------------------------
+--
+END doc_api;
+/
