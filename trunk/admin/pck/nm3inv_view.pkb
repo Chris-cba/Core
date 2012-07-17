@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_view AS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid                 : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_view.pkb-arc   2.16   Sep 22 2011 09:34:20   Rob.Coupe  $
+--       pvcsid                 : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_view.pkb-arc   2.17   Jul 17 2012 14:31:30   Rob.Coupe  $
 --       Module Name      	: $Workfile:   nm3inv_view.pkb  $
---       Date into PVCS   	: $Date:   Sep 22 2011 09:34:20  $
---       Date fetched Out 	: $Modtime:   Sep 22 2011 09:32:50  $
---       PVCS Version     	: $Revision:   2.16  $
+--       Date into PVCS   	: $Date:   Jul 17 2012 14:31:30  $
+--       Date fetched Out 	: $Modtime:   Jul 17 2012 14:29:40  $
+--       PVCS Version     	: $Revision:   2.17  $
 --       Based on SCCS version 	: 1.56
 --
 --
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_view AS
 --      Copyright (c) exor corporation ltd, 2001
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  varchar2(80) := '$Revision::   2.16     $';
+   g_body_sccsid     CONSTANT  varchar2(80) := '$Revision::   2.17     $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
 --all global package variables here
@@ -318,7 +318,7 @@ BEGIN
           THEN
             l_tab_conversion_st(i)  := 'decode( route_mem.nm_cardinality, 1, route_mem.nm_slk + inv_mem.nm_begin_mp, '||
                                         '  -1, route_mem.nm_end_slk - inv_mem.nm_end_mp )';
-            l_tab_conversion_end(i) := 'decode( route_mem.nm_cardinality, 1, route_mem.nm_slk + inv_mem.nm_end_mp'||
+            l_tab_conversion_end(i) := 'decode( route_mem.nm_cardinality, 1, route_mem.nm_slk + inv_mem.nm_end_mp, '||
                                         '  -1, route_mem.nm_end_slk - inv_mem.nm_begin_mp )';
          ELSE
             OPEN  cs_uc (l_cs_nti.nt_length_unit,l_tab_datum_unit(i));
@@ -326,7 +326,7 @@ BEGIN
             CLOSE cs_uc;
             l_tab_conversion_st(i)  := 'decode( route_mem.nm_cardinality, 1, route_mem.nm_slk + DECODE(inv_mem.nm_begin_mp,0,0,'||l_func||'(inv_mem.nm_begin_mp)), '||
                                         '  -1, route_mem.nm_end_slk - '||l_func||'(inv_mem.nm_end_mp) )';
-            l_tab_conversion_end(i) := 'decode( route_mem.nm_cardinality, 1, route_mem.nm_slk + '||l_func||'(inv_mem.nm_end_mp)'||
+            l_tab_conversion_end(i) := 'decode( route_mem.nm_cardinality, 1, route_mem.nm_slk + '||l_func||'(inv_mem.nm_end_mp), '||
                                         '  -1, route_mem.nm_end_slk - DECODE(inv_mem.nm_begin_mp,0,0,'||l_func||'(inv_mem.nm_begin_mp)) )';
 
             l_tab_conversion_st(i)  := 'route_mem.nm_slk + DECODE(inv_mem.nm_begin_mp,0,0,'||l_func||'(inv_mem.nm_begin_mp))';
