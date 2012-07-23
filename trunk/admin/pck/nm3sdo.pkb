@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 --
 ---   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.73   Jul 17 2012 14:21:30   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.74   Jul 23 2012 13:23:34   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3sdo.pkb  $
---       Date into PVCS   : $Date:   Jul 17 2012 14:21:30  $
---       Date fetched Out : $Modtime:   Jun 27 2012 14:22:26  $
---       PVCS Version     : $Revision:   2.73  $
+--       Date into PVCS   : $Date:   Jul 23 2012 13:23:34  $
+--       Date fetched Out : $Modtime:   Jul 23 2012 13:23:10  $
+--       PVCS Version     : $Revision:   2.74  $
 --       Based on
 
 --
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 -- Copyright (c) RAC
 -----------------------------------------------------------------------------
 
-   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.73  $"';
+   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.74  $"';
    g_package_name    CONSTANT VARCHAR2 (30)  := 'NM3SDO';
    g_batch_size      INTEGER                 := NVL( TO_NUMBER(Hig.get_sysopt('SDOBATSIZE')), 10);
    g_clip_type       VARCHAR2(30)            := NVL(Hig.get_sysopt('SDOCLIPTYP'),'SDO');
@@ -2425,6 +2425,10 @@ BEGIN
 
   END LOOP;
 
+  if nm3sdo.get_no_parts(retval) > 3 and retval.sdo_gtype = 3302 then
+    retval.sdo_gtype := 3306;
+  end if;
+    
   RETURN retval;
 END;
 --
@@ -4968,7 +4972,11 @@ END;
 
   FUNCTION get_no_parts ( p_geom IN mdsys.sdo_geometry ) RETURN NUMBER IS
   BEGIN
-    RETURN p_geom.sdo_elem_info.LAST;
+    IF p_geom is not null then
+       RETURN p_geom.sdo_elem_info.LAST;
+	ELSE
+	   RETURN NULL;
+	END IF;
   END;
 
 -------------------------------------------------------------------------------------------------------------------------
