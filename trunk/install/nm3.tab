@@ -1,15 +1,15 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.tab-arc   2.39   Jul 17 2012 12:21:20   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.tab-arc   2.40   Jul 23 2012 15:56:28   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3.tab  $
---       Date into PVCS   : $Date:   Jul 17 2012 12:21:20  $
---       Date fetched Out : $Modtime:   Jul 17 2012 12:20:46  $
---       PVCS Version     : $Revision:   2.39  $
+--       Date into PVCS   : $Date:   Jul 23 2012 15:56:28  $
+--       Date fetched Out : $Modtime:   Jul 23 2012 15:55:50  $
+--       PVCS Version     : $Revision:   2.40  $
 --
 --------------------------------------------------------------------------------
 --
--- Generated for Oracle 10g on Mon Jul 16  14:46:50 2012 by Server Generator 10.1.2.9.28
+-- Generated for Oracle 10g on Mon Jul 23  15:43:57 2012 by Server Generator 10.1.2.9.28
  
 
 
@@ -2716,6 +2716,68 @@ COMMENT ON COLUMN HIG_NAVIGATOR.HNV_MODIFIED_BY IS 'Audit details'
 /
 
 COMMENT ON COLUMN HIG_NAVIGATOR.HNV_HPR_PRODUCT IS 'This column will hold the Product of the table defined in the hierarchy'
+/
+
+PROMPT Creating Table 'HIG_NAVIGATOR_ASSET_LABELS'
+CREATE TABLE HIG_NAVIGATOR_ASSET_LABELS
+ (HNAL_INV_TYPE VARCHAR2(4) NOT NULL
+ ,HNAL_HIER_LABEL_1 VARCHAR2(500) NOT NULL
+ ,HNAL_HIER_LABEL_2 VARCHAR2(500)
+ ,HNAL_HIER_LABEL_3 VARCHAR2(500)
+ ,HNAL_HIER_LABEL_4 VARCHAR2(500)
+ ,HNAL_HIER_LABEL_5 VARCHAR2(500)
+ ,HNAL_HIER_LABEL_6 VARCHAR2(500)
+ ,HNAL_HIER_LABEL_7 VARCHAR2(500)
+ ,HNAL_HIER_LABEL_8 VARCHAR2(500)
+ ,HNAL_HIER_LABEL_9 VARCHAR2(500)
+ ,HNAL_HIER_LABEL_10 VARCHAR2(500)
+ )
+/
+
+COMMENT ON TABLE HIG_NAVIGATOR_ASSET_LABELS IS 'This table allows configuring flexible attributes as Navigator labels for inventory assets.'
+/
+
+COMMENT ON COLUMN HIG_NAVIGATOR_ASSET_LABELS.HNAL_INV_TYPE IS 'The asset type for which the navigator label can be configured.'
+/
+
+COMMENT ON COLUMN HIG_NAVIGATOR_ASSET_LABELS.HNAL_HIER_LABEL_1 IS 'Column name whose value will be displayed in the Navigator hierarchy. This column can be database column from the inventory table 
+or database function.'
+/
+
+COMMENT ON COLUMN HIG_NAVIGATOR_ASSET_LABELS.HNAL_HIER_LABEL_2 IS 'Column name whose value will be displayed in the Navigator hierarchy. This column can be database column from the inventory table 
+or database function.'
+/
+
+COMMENT ON COLUMN HIG_NAVIGATOR_ASSET_LABELS.HNAL_HIER_LABEL_3 IS 'Column name whose value will be displayed in the Navigator hierarchy. This column can be database column from the inventory table 
+or database function.'
+/
+
+COMMENT ON COLUMN HIG_NAVIGATOR_ASSET_LABELS.HNAL_HIER_LABEL_4 IS 'Column name whose value will be displayed in the Navigator hierarchy. This column can be database column from the inventory table 
+or database function.'
+/
+
+COMMENT ON COLUMN HIG_NAVIGATOR_ASSET_LABELS.HNAL_HIER_LABEL_5 IS 'Column name whose value will be displayed in the Navigator hierarchy. This column can be database column from the inventory table 
+or database function.'
+/
+
+COMMENT ON COLUMN HIG_NAVIGATOR_ASSET_LABELS.HNAL_HIER_LABEL_6 IS 'Column name whose value will be displayed in the Navigator hierarchy. This column can be database column from the inventory table 
+or database function.'
+/
+
+COMMENT ON COLUMN HIG_NAVIGATOR_ASSET_LABELS.HNAL_HIER_LABEL_7 IS 'Column name whose value will be displayed in the Navigator hierarchy. This column can be database column from the inventory table 
+or database function.'
+/
+
+COMMENT ON COLUMN HIG_NAVIGATOR_ASSET_LABELS.HNAL_HIER_LABEL_8 IS 'Column name whose value will be displayed in the Navigator hierarchy. This column can be database column from the inventory table 
+or database function.'
+/
+
+COMMENT ON COLUMN HIG_NAVIGATOR_ASSET_LABELS.HNAL_HIER_LABEL_9 IS 'Column name whose value will be displayed in the Navigator hierarchy. This column can be database column from the inventory table 
+or database function.'
+/
+
+COMMENT ON COLUMN HIG_NAVIGATOR_ASSET_LABELS.HNAL_HIER_LABEL_10 IS 'Column name whose value will be displayed in the Navigator hierarchy. This column can be database column from the inventory table 
+or database function.'
 /
 
 PROMPT Creating Table 'HIG_NAVIGATOR_MODULES'
