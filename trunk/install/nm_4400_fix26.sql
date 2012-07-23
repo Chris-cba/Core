@@ -2,11 +2,11 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm_4400_fix26.sql-arc   1.0   Jul 23 2012 11:57:46   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm_4400_fix26.sql-arc   1.1   Jul 23 2012 12:14:12   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm_4400_fix26.sql  $
---       Date into PVCS   : $Date:   Jul 23 2012 11:57:46  $
---       Date fetched Out : $Modtime:   Jul 23 2012 11:51:58  $
---       PVCS Version     : $Revision:   1.0  $
+--       Date into PVCS   : $Date:   Jul 23 2012 12:14:12  $
+--       Date fetched Out : $Modtime:   Jul 23 2012 12:13:38  $
+--       PVCS Version     : $Revision:   1.1  $
 --
 --------------------------------------------------------------------------------
 --   Copyright (c) 2012 Bentley Systems Incorporated.
@@ -69,19 +69,19 @@ WHENEVER SQLERROR CONTINUE
 --
 --
 --------------------------------------------------------------------------------
--- DDL
+-- Package Bodies
 --------------------------------------------------------------------------------
 --
 SET TERM ON 
-PROMPT nm_4400_fix26_ddl.sql
+PROMPT nm3sdo.pkw
 SET TERM OFF
 --
 SET FEEDBACK ON
-start nm_4400_fix26_ddl.sql
+start nm3sdo.pkw
 SET FEEDBACK OFF
---
+
 --------------------------------------------------------------------------------
--- DDL
+-- DML
 --------------------------------------------------------------------------------
 --
 SET TERM ON 
@@ -89,7 +89,7 @@ PROMPT gtype_3306_update
 SET TERM OFF
 --
 SET FEEDBACK ON
-start gtype_3306_updtae.sql
+start gtype_3306_update.sql
 SET FEEDBACK OFF
 --
 --------------------------------------------------------------------------------
