@@ -1,14 +1,14 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.con-arc   2.35   Jul 17 2012 12:34:32   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.con-arc   2.36   Jul 23 2012 16:02:54   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3.con  $
---       Date into PVCS   : $Date:   Jul 17 2012 12:34:32  $
---       Date fetched Out : $Modtime:   Jul 17 2012 12:33:52  $
---       PVCS Version     : $Revision:   2.35  $
+--       Date into PVCS   : $Date:   Jul 23 2012 16:02:54  $
+--       Date fetched Out : $Modtime:   Jul 23 2012 16:02:16  $
+--       PVCS Version     : $Revision:   2.36  $
 --
 --------------------------------------------------------------------------------
 --
--- Generated for Oracle 10g on Mon Jul 16  14:47:13 2012 by Server Generator 10.1.2.9.28
+-- Generated for Oracle 10g on Mon Jul 23  15:44:01 2012 by Server Generator 10.1.2.9.28
   
 PROMPT Creating Primary Key on 'ANALYSE_ALL_TABS_LOG'
 ALTER TABLE ANALYSE_ALL_TABS_LOG
@@ -692,6 +692,12 @@ PROMPT Creating Primary Key on 'HIG_NAVIGATOR'
 ALTER TABLE HIG_NAVIGATOR
  ADD (CONSTRAINT HNV_PK PRIMARY KEY 
   (HNV_CHILD_ALIAS))
+/
+
+PROMPT Creating Primary Key on 'HIG_NAVIGATOR_ASSET_LABELS'
+ALTER TABLE HIG_NAVIGATOR_ASSET_LABELS
+ ADD (CONSTRAINT HNAL_PK PRIMARY KEY 
+  (HNAL_INV_TYPE))
 /
 
 PROMPT Creating Primary Key on 'HIG_NAVIGATOR_MODULES'
@@ -3008,7 +3014,7 @@ PROMPT Creating Check Constraint on 'HIG_NAVIGATOR'
 ALTER TABLE HIG_NAVIGATOR
  ADD (CONSTRAINT HNV_PRIMARY_HIERARCHY_CKH CHECK (HNV_PRIMARY_HIERARCHY IN ('Y','N')))
 /
- 
+  
 PROMPT Creating Check Constraint on 'HIG_NAVIGATOR_MODULES'
 ALTER TABLE HIG_NAVIGATOR_MODULES
  ADD (CONSTRAINT HNM_PRIMARY_MODULE_CKH CHECK (HNM_PRIMARY_MODULE IN ('Y','N')))
@@ -5126,6 +5132,13 @@ ALTER TABLE HIG_NAVIGATOR ADD (CONSTRAINT
  HNV_HPR_FK FOREIGN KEY 
   (HNV_HPR_PRODUCT) REFERENCES HIG_PRODUCTS
   (HPR_PRODUCT))
+/
+
+PROMPT Creating Foreign Key on 'HIG_NAVIGATOR_ASSET_LABELS'
+ALTER TABLE HIG_NAVIGATOR_ASSET_LABELS ADD (CONSTRAINT
+ HNAL_NIT_FK FOREIGN KEY 
+  (HNAL_INV_TYPE) REFERENCES NM_INV_TYPES_ALL
+  (NIT_INV_TYPE) ON DELETE CASCADE)
 /
 
 PROMPT Creating Foreign Key on 'HIG_NAVIGATOR_MODULES'
