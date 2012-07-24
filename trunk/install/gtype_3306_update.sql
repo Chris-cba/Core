@@ -2,11 +2,11 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/gtype_3306_update.sql-arc   1.0   Jul 23 2012 11:58:40   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/gtype_3306_update.sql-arc   1.1   Jul 24 2012 09:48:20   Rob.Coupe  $
 --       Module Name      : $Workfile:   gtype_3306_update.sql  $
---       Date into PVCS   : $Date:   Jul 23 2012 11:58:40  $
---       Date fetched Out : $Modtime:   Jul 23 2012 11:53:36  $
---       PVCS Version     : $Revision:   1.0  $
+--       Date into PVCS   : $Date:   Jul 24 2012 09:48:20  $
+--       Date fetched Out : $Modtime:   Jul 24 2012 09:47:58  $
+--       PVCS Version     : $Revision:   1.1  $
 --
 --------------------------------------------------------------------------------
 --   Copyright (c) 2012 Bentley Systems Incorporated.
@@ -34,4 +34,4 @@ begin
   end loop;
   commit;
 end;
-
+/
