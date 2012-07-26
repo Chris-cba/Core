@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm0575
 AS
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm0575.pkb-arc   2.12   Mar 26 2012 16:53:12   Ade.Edwards  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm0575.pkb-arc   2.13   Jul 26 2012 13:22:00   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm0575.pkb  $
---       Date into PVCS   : $Date:   Mar 26 2012 16:53:12  $
---       Date fetched Out : $Modtime:   Mar 26 2012 16:52:08  $
---       PVCS Version     : $Revision:   2.12  $
+--       Date into PVCS   : $Date:   Jul 26 2012 13:22:00  $
+--       Date fetched Out : $Modtime:   Jul 26 2012 13:18:00  $
+--       PVCS Version     : $Revision:   2.13  $
 --       Based on SCCS version : 1.6
 
 --   Author : Graeme Johnson
@@ -23,7 +23,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000)  := '"$Revision:   2.12  $"';
+  g_body_sccsid  CONSTANT varchar2(2000)  := '"$Revision:   2.13  $"';
   g_package_name CONSTANT varchar2(30)    := 'nm0575';
   
   subtype id_type is nm_members.nm_ne_id_in%type;
@@ -47,6 +47,7 @@ AS
   mt_inv_types      nm_code_tbl;
   m_nte_job_id      nm_nw_temp_extents.nte_job_id%type;
   m_xsp_changed     boolean := false;
+  
 --
 -----------------------------------------------------------------------------
 --
@@ -59,6 +60,23 @@ AS
     ,p_start_date in date
   );
 --
+  procedure close_part_member_record(
+     p_action         in varchar2
+    ,p_effective_date in date
+    ,p_ne_id_in       in id_type
+    ,p_ne_id_of       in id_type 
+    ,p_begin_mp       in mp_type 
+    ,p_end_mp         in mp_type    
+    ,p_start_date     in date
+    ,p_end_date       in date
+    ,p_admin_unit     in id_type  
+    ,p_obj_type       in varchar2 
+    ,p_keep_begin1    in number default null
+    ,p_keep_end1      in number default null
+    ,p_keep_begin2    in number default null
+    ,p_keep_end2      in number default null   
+  );
+--
 -----------------------------------------------------------------------------
 --
   function are_tables_equal(
@@ -67,6 +85,21 @@ AS
   ) return boolean;
 --
 -----------------------------------------------------------------------------
+--
+  PROCEDURE check_no_future_locs (p_nte_job_id  nm_nw_temp_extents.nte_job_id%type
+                               ,p_effective_date DATE DEFAULT nm3user.get_effective_date
+                               );
+--
+-----------------------------------------------------------------------------
+--
+  PROCEDURE check_extent_no_future_locs (p_ne_id      nm_elements.ne_id%TYPE
+                                        ,p_effective_date DATE DEFAULT nm3user.get_effective_date
+                                        );
+
+  PROCEDURE remove_spatial_data ( p_nm_id_tbl in nm_id_tbl );
+  
+  PROCEDURE close_spatial_data ( p_nm_id_tbl in nm_id_tbl, p_end_date in date );
+  
 --
 FUNCTION get_version RETURN varchar2 IS
 BEGIN
@@ -117,19 +150,40 @@ END delete_doc_assocs;
 PROCEDURE create_memberships ( pi_nm_rec IN nm_members%ROWTYPE )
 IS
 BEGIN 
-  nm_debug.debug('# Create member : ('||pi_nm_rec.nm_ne_id_in||', '||pi_nm_rec.nm_ne_id_of||', '||pi_nm_rec.nm_begin_mp||', '||pi_nm_rec.nm_end_mp||', '||pi_nm_rec.nm_begin_mp||')');
+--nm_debug.debug('# Create member : ('||pi_nm_rec.nm_ne_id_in||', '||pi_nm_rec.nm_ne_id_of||', '||pi_nm_rec.nm_begin_mp||', '||pi_nm_rec.nm_end_mp||', '||pi_nm_rec.nm_begin_mp||')');
   INSERT INTO nm_members_all VALUES pi_nm_rec; 
 EXCEPTION
   WHEN DUP_VAL_ON_INDEX
   THEN
+-- RAC - Task 0111930 - review failure:
+-- original code would try to re-create a duplicate member by date and start measure - so the following was doen. however, similar problems in duplicating data 
+--occurred for both ends and did not always violate the key- so the code was chanegd to handle the part memberships -
+--  so this code should not be needed any longer but left in just in case.
+-- We know a record will exist at this stage when the user has opted to close instead of delete
+-- i.e. the insert on the data that is kept from an intersection 
+-- at the start of the asset will always fail - the process has only just end-dated the row!
+-- So we need to perform the update of the original to give a new start-measure and then re-insert the row
+-- Original is commented out - it merely updated the record to provide correct information after the op
+-- but lost the part that was valid in the past.
+--    UPDATE nm_members_all
+--       SET nm_begin_mp   = pi_nm_rec.nm_begin_mp
+--         , nm_end_mp     = pi_nm_rec.nm_end_mp
+--         , nm_end_date   = NULL
+--     WHERE nm_ne_id_in   = pi_nm_rec.nm_ne_id_in
+--       AND nm_ne_id_of   = pi_nm_rec.nm_ne_id_of
+--       AND nm_begin_mp   = pi_nm_rec.nm_begin_mp
+--       AND nm_start_date = pi_nm_rec.nm_start_date; 
+--
     UPDATE nm_members_all
-       SET nm_begin_mp   = pi_nm_rec.nm_begin_mp
-         , nm_end_mp     = pi_nm_rec.nm_end_mp
-         , nm_end_date   = NULL
+       SET nm_begin_mp   = pi_nm_rec.nm_end_mp
      WHERE nm_ne_id_in   = pi_nm_rec.nm_ne_id_in
        AND nm_ne_id_of   = pi_nm_rec.nm_ne_id_of
        AND nm_begin_mp   = pi_nm_rec.nm_begin_mp
        AND nm_start_date = pi_nm_rec.nm_start_date; 
+--
+  INSERT INTO nm_members_all VALUES pi_nm_rec; 
+--
+
 END create_memberships;
 --
 -----------------------------------------------------------------------------
@@ -412,9 +466,11 @@ BEGIN
   if pi_source_type = 'E' then
     l_nte_source := 'SAVED';
   else
+    check_extent_no_future_locs( pi_source_ne_id, nm3user.get_effective_date );
     l_nte_source := 'ROUTE';
   end if;
 
+  
   if m_xsp_changed then
 --
     -- clear the previous temp extent
@@ -429,6 +485,8 @@ BEGIN
     -- an area of interest is defined
     if pi_source_ne_id is not null then
     
+--RAC - extent and dates need to be checked    
+    
       nm3extent.create_temp_ne (
          pi_source_id => pi_source_ne_id
         ,pi_source    => l_nte_source
@@ -437,6 +495,8 @@ BEGIN
         ,po_job_id    => m_nte_job_id
       );
       nm3dbg.putln('m_nte_job_id='||m_nte_job_id);
+
+      check_no_future_locs( m_nte_job_id, nm3user.get_effective_date );
 
       if g_tab_selected_categories.count > 0 then
 --
@@ -584,13 +644,17 @@ BEGIN
         select
         distinct i.iit_ne_id, i.iit_inv_type
         from
-           nm_members m
-          ,nm_inv_items i
-          ,(select column_value from table(cast(get_inv_types_tbl as nm_code_tbl))) xt 
+--           nm_members m
+--          ,
+          nm_inv_items i
+          ,(
+          select column_value from table(cast(get_inv_types_tbl as nm_code_tbl))) xt 
           ,(select x2.xsp_value from nm0575_possible_xsps x2 where x2.xsp_selected = 'Y'
             union all select '~~~~' xsp_value from dual) xs
-        where m.nm_ne_id_in = i.iit_ne_id
-          and i.iit_inv_type = xt.column_value
+        where 
+--        m.nm_ne_id_in = i.iit_ne_id
+--          and 
+          i.iit_inv_type = xt.column_value
           and nvl(i.iit_x_sect, '~~~~') = xs.xsp_value
         ) q
         ,nm_inv_types t
@@ -683,6 +747,7 @@ BEGIN
   -- if the temp extent is a single point, then only the points that fall onto it are processed
   --  the continuous items that run over the point are also excluded and thus not split.
   --
+  --nm_debug.debug_on;
   IF m_nte_job_id IS NOT NULL
   THEN
   --nm_debug.debug_on;
@@ -786,7 +851,7 @@ BEGIN
       BEGIN
       --
         l_main_count := l_main_count + 1;
-        nm_debug.debug('# - Asset Delete - flag = '||g_include_partial||' - loop number = '||l_main_count); 
+--        nm_debug.debug('# - Asset Delete - flag = '||g_include_partial||' - loop number = '||l_main_count); 
         --
         -- The asset is wholly closed
         -- i.e. the query return all member records for the assets identified in the query.
@@ -801,7 +866,7 @@ BEGIN
         IF ( r.excluded_member_count = 0 AND r.keep_begin_mp IS NULL AND r.keep_begin_mp2 IS NULL AND r.iit_rownum = 1 )
         THEN
         --
-          nm_debug.debug('# - '||l_operation||' whole asset '||r.nm_ne_id_in||':'||r.nm_obj_type||' at count '||l_main_count||' - parent = '||r.iig_parent_id); 
+--          nm_debug.debug('# - '||l_operation||' whole asset '||r.nm_ne_id_in||':'||r.nm_obj_type||' at count '||l_main_count||' - parent = '||r.iig_parent_id); 
           -- Close the member record later for any assets with a parent.
           IF r.iig_parent_id IS NULL
           THEN
@@ -813,7 +878,7 @@ BEGIN
         --
         -- Close the whole member record.
         --
-            nm_debug.debug('# No parent item - '||l_operation||' the entire member for '||r.nm_ne_id_in);
+--            nm_debug.debug('# No parent item - '||l_operation||' the entire member for '||r.nm_ne_id_in);
             close_member_record(
                p_action         => pi_action
               ,p_effective_date => l_effective_date
@@ -835,24 +900,34 @@ BEGIN
                                               THEN ' partially'
                                               ELSE ' entirely'
                                             END||' - ';
-            nm_debug.debug('# No parent item - '||l_operation||' the '||
-                           CASE WHEN g_include_partial = 'Y' 
-                             THEN 'partial member '||r.nm_ne_id_of||' at '||r.nm_begin_mp
-                             ELSE 'whole member (flag set to delete whole)'
-                           END||' for '||r.nm_ne_id_in);
+--            nm_debug.debug('# No parent item - '||l_operation||' the '||
+--                           CASE WHEN g_include_partial = 'Y' 
+--                             THEN 'partial member '||r.nm_ne_id_of||' at '||r.nm_begin_mp
+--                             ELSE 'whole member (flag set to delete whole)'
+--                           END||' for '||r.nm_ne_id_in);
         --
         -- Close the member record.
         -- If the include_partial flag is Y then close the part, otherwise
         -- close the entire membership.
         --
-            close_member_record(
-               p_action         => pi_action
-              ,p_effective_date => l_effective_date
-              ,p_ne_id_in       => r.nm_ne_id_in
-              ,p_ne_id_of       => CASE WHEN g_include_partial = 'Y' THEN r.nm_ne_id_of ELSE NULL END
-              ,p_begin_mp       => CASE WHEN g_include_partial = 'Y' THEN r.nm_begin_mp ELSE NULL END
-              ,p_start_date     => r.nm_start_date
-            );
+            if g_include_partial = 'Y' and (r.keep_begin_mp is null or r.keep_begin_mp2 is null ) then  
+              close_member_record(
+                p_action         => pi_action
+               ,p_effective_date => l_effective_date
+               ,p_ne_id_in       => r.nm_ne_id_in
+               ,p_ne_id_of       => CASE WHEN g_include_partial = 'Y' THEN r.nm_ne_id_of ELSE NULL END
+               ,p_begin_mp       => CASE WHEN g_include_partial = 'Y' THEN r.nm_begin_mp ELSE NULL END
+               ,p_start_date     => r.nm_start_date
+              );
+            elsif g_include_partial = 'N' then
+              close_member_record(
+                           p_action         => pi_action
+                          ,p_effective_date => l_effective_date
+                          ,p_ne_id_in       => r.nm_ne_id_in
+                          ,p_start_date     => r.nm_start_date
+                        );
+            END IF;
+--                      
             --
           END IF;
         --
@@ -872,7 +947,7 @@ BEGIN
           -- it is a parent asset
           IF r.iig_parent_id IS NOT NULL 
           THEN
-            nm_debug.debug('# - '||l_operation||' hierarchical asset children '||' - '||r.nm_ne_id_in);
+--          nm_debug.debug('# - '||l_operation||' hierarchical asset children '||' - '||r.nm_ne_id_in);
             SELECT iig.iig_item_id, iig.iig_top_id BULK COLLECT INTO t_iig_item_id, t_iig_top_id
               FROM nm_inv_item_groupings iig
                  , nm_inv_items_all iit
@@ -895,7 +970,7 @@ BEGIN
               DELETE FROM nm_inv_item_groupings_all g
               WHERE g.iig_item_id = t_iig_item_id(i)
                 AND g.iig_top_id = t_iig_top_id(i);
-              nm_debug.debug('# - '||l_operation||' hierarchical '||to_char(SQL%ROWCOUNT)||' asset children links');
+--              nm_debug.debug('# - '||l_operation||' hierarchical '||to_char(SQL%ROWCOUNT)||' asset children links');
               --  and g.iig_end_date is null;
             END IF;
 
@@ -919,17 +994,21 @@ BEGIN
               FORALL i IN 1 .. t_iig_item_id.COUNT  
               DELETE FROM nm_inv_items_all i
                WHERE i.iit_ne_id = t_iig_item_id(i);
+--
+              remove_spatial_data(t_iig_item_id);               
+--
             END IF;
             
-            FOR i in 1..t_iig_item_id.COUNT LOOP
-              nm_debug.debug('# - Close doc assocs for Parent '||r.iig_parent_id||' of '||t_iig_item_id(i));
-            END LOOP;
+--            FOR i in 1..t_iig_item_id.COUNT LOOP
+--              nm_debug.debug('# - Close doc assocs for Parent '||r.iig_parent_id||' of '||t_iig_item_id(i));
+--            END LOOP;
             -- close child doc assocs
             delete_doc_assocs(t_iig_item_id);
           --
           -- Finally close the membership for the parent assets after clearing up the children.
           --
-            nm_debug.debug('# - '||l_operation||' hierarchical asset memberships '||' - '||r.nm_ne_id_in||' - Parent set to '||r.iig_parent_id);
+--            nm_debug.debug('# - '||l_operation||' hierarchical asset memberships '||' - '||r.nm_ne_id_in||' - Parent set to '||r.iig_parent_id);
+            --RC - Ignoring partial locations of hierarchical assets (for now)
             close_member_record(
                            p_action         => pi_action
                           ,p_effective_date => l_effective_date
@@ -943,75 +1022,56 @@ BEGIN
                                END||' - ';
           END IF; -- it is a parent asset
           
-          nm_debug.debug('# - Close doc assocs for Parent '||r.iig_parent_id);
+--          nm_debug.debug('# - Close doc assocs for Parent '||r.iig_parent_id);
           -- close current record doc assocs
           delete_doc_assocs (r.iig_parent_id);
           delete_doc_assocs (r.nm_ne_id_in);
         ELSE
-          nm_debug.debug('# - '||l_operation||' partial asset memberships '||' - '||r.nm_ne_id_in||' at rownum '||r.iit_rownum);
-          close_member_record(
-               p_action         => pi_action
-              ,p_effective_date => l_effective_date
-              ,p_ne_id_in       => r.nm_ne_id_in
-              ,p_ne_id_of       => CASE WHEN g_include_partial = 'Y' THEN r.nm_ne_id_of ELSE NULL END
-              ,p_begin_mp       => CASE WHEN g_include_partial = 'Y' THEN r.nm_begin_mp ELSE NULL END
-              ,p_start_date     => r.nm_start_date
-            );
-          l_partial_message := CASE WHEN pi_action = 'C' THEN 'Closed' ELSE 'Deleted' END
+--          nm_debug.debug('# - '||l_operation||' partial asset memberships '||' - '||r.nm_ne_id_in||' at rownum '||r.iit_rownum);
+
+          if g_include_partial = 'Y' then
+          
+            close_part_member_record( p_action         => pi_action
+                                     ,p_effective_date => l_effective_date
+                                     ,p_ne_id_in       => r.nm_ne_id_in
+                                     ,p_ne_id_of       => r.nm_ne_id_of
+                                     ,p_begin_mp       => r.nm_begin_mp
+                                     ,p_end_mp         => r.nm_end_mp
+                                     ,p_start_date     => r.nm_start_date
+                                     ,p_end_date       => null
+                                     ,p_admin_unit     => r.nm_admin_unit
+                                     ,p_obj_type       => r.nm_obj_type
+                                     ,p_keep_begin1    => r.keep_begin_mp
+                                     ,p_keep_end1      => r.keep_end_mp
+                                     ,p_keep_begin2    => r.keep_begin_mp2
+                                     ,p_keep_end2      => r.keep_end_mp2 );
+                                     
+            l_partial_message := CASE WHEN pi_action = 'C' THEN 'Closed' ELSE 'Deleted' END
                              ||CASE WHEN g_include_partial = 'Y' 
                                THEN ' partially'
                                ELSE ' entirely'
                              END||' - ';
-          l_partial_count := l_partial_count + 1;
+            l_partial_count := l_partial_count + 1;
+          
+          else
+            -- RC - just get rid and no need to process the keep -bits.
+            close_member_record(
+                           p_action         => pi_action
+                          ,p_effective_date => l_effective_date
+                          ,p_ne_id_in       => r.nm_ne_id_in
+                          ,p_start_date     => r.nm_start_date
+                        );
+                        
+            l_partial_message := CASE WHEN pi_action = 'C' THEN 'Closed' ELSE 'Deleted' END
+                               ||CASE WHEN g_include_partial = 'Y' 
+                                 THEN ' partially'
+                                 ELSE ' entirely'
+                               END||' - ';
+            
+          end if;
+          
         END IF; -- wholly closed asset
-      --
-        DECLARE
-            l_rec_nm_begin nm_members%ROWTYPE;
-            l_rec_nm_end   nm_members%ROWTYPE;
-          BEGIN
-            IF r.keep_begin_mp IS NOT NULL 
-            THEN
-              nm_debug.debug('# - Recreate partial membership 1 '
-                            ||r.nm_ne_id_in||':'
-                            ||r.nm_ne_id_of||':'
-                            ||r.nm_obj_type||':'
-                            ||r.keep_begin_mp||':'
-                            ||r.keep_end_mp);
-              l_rec_nm_begin.nm_ne_id_in    := r.nm_ne_id_in;
-              l_rec_nm_begin.nm_ne_id_of    := r.nm_ne_id_of;
-              l_rec_nm_begin.nm_type        := r.nm_type;
-              l_rec_nm_begin.nm_obj_type    := r.nm_obj_type;
-              l_rec_nm_begin.nm_begin_mp    := r.keep_begin_mp;
-              l_rec_nm_begin.nm_start_date  := r.nm_start_date;
-              l_rec_nm_begin.nm_end_mp      := r.keep_end_mp;
-              l_rec_nm_begin.nm_admin_unit  := r.nm_admin_unit;
-              l_rec_nm_begin.nm_cardinality := r.nm_cardinality;
-              l_rec_nm_begin.nm_seq_no      := r.nm_seq_no;
-              l_rec_nm_begin.nm_seg_no      := r.nm_seg_no;
-              create_memberships (l_rec_nm_begin);
-            END IF;
-            IF r.keep_begin_mp2 IS NOT NULL 
-            THEN
-              nm_debug.debug('# - Recreate partial membership 2 '
-                            ||r.nm_ne_id_in||':'
-                            ||r.nm_ne_id_of||':'
-                            ||r.nm_obj_type||':'
-                            ||r.keep_begin_mp||':'
-                            ||r.keep_end_mp);
-              l_rec_nm_end.nm_ne_id_in    := r.nm_ne_id_in;
-              l_rec_nm_end.nm_ne_id_of    := r.nm_ne_id_of;
-              l_rec_nm_end.nm_type        := r.nm_type;
-              l_rec_nm_end.nm_obj_type    := r.nm_obj_type;
-              l_rec_nm_end.nm_begin_mp    := r.keep_begin_mp2;
-              l_rec_nm_end.nm_start_date  := r.nm_start_date;
-              l_rec_nm_end.nm_end_mp      := r.keep_end_mp2;
-              l_rec_nm_end.nm_admin_unit  := r.nm_admin_unit;
-              l_rec_nm_end.nm_cardinality := r.nm_cardinality;
-              l_rec_nm_end.nm_seq_no      := r.nm_seq_no;
-              l_rec_nm_end.nm_seg_no      := r.nm_seg_no;
-              create_memberships (l_rec_nm_end);
-            END IF;
-          END;
+        
       --
         l_log_message := l_partial_message||g_success_message;
       --
@@ -1055,16 +1115,18 @@ BEGIN
              ,nm_start_date
              ,nm_end_mp 
              ,nm_type
-             ,nm_obj_type
+             ,iit_inv_type nm_obj_type
              ,nm_cardinality
              ,nm_admin_unit
              ,nm_seq_no
              ,nm_seg_no
              ,iig_parent_id
-        FROM nm_inv_items, nm_members, nm_inv_item_groupings
+        FROM nm_inv_items
+        , nm_members
+        , nm_inv_item_groupings
        WHERE iit_inv_type IN (SELECT COLUMN_VALUE FROM TABLE(CAST(t_code AS nm_code_tbl)))
-         AND nm_ne_id_in = iit_ne_id
-         AND nm_type = 'I'
+        AND nm_ne_id_in (+) = iit_ne_id
+         AND nm_type (+) = 'I'
          AND iit_ne_id = iig_parent_id(+)
          AND (iit_x_sect IS NULL 
           OR iit_x_sect IN (SELECT x2.xsp_value FROM nm0575_possible_xsps x2 WHERE x2.xsp_selected = 'Y'));
@@ -1074,15 +1136,19 @@ BEGIN
       FOR FULL_NET_REC IN FULL_NET_CUR LOOP
       --
         BEGIN    
+        
+          if full_net_rec.nm_ne_id_in is not null then
         --
         -- close the current asset placement
-          close_member_record (p_action         => pi_action
-                              ,p_effective_date => l_effective_date
-                              ,p_ne_id_in       => full_net_rec.nm_ne_id_in
-                              ,p_ne_id_of       => full_net_rec.nm_ne_id_of
-                              ,p_begin_mp       => full_net_rec.nm_begin_mp
-                              ,p_start_date     => full_net_rec.nm_start_date
-          );
+              close_member_record (p_action         => pi_action
+                                  ,p_effective_date => l_effective_date
+                                  ,p_ne_id_in       => full_net_rec.nm_ne_id_in
+                                  ,p_ne_id_of       => full_net_rec.nm_ne_id_of
+                                  ,p_begin_mp       => full_net_rec.nm_begin_mp
+                                  ,p_start_date     => full_net_rec.nm_start_date
+              );
+          
+          end if;
           --
           -- store the parent asset id for later forall closure of the inv_items records
           t_iit_id.extend;
@@ -1120,6 +1186,9 @@ BEGIN
                 FORALL i IN 1 .. t_iig_item_id.count  
                 DELETE FROM nm_inv_items_all i
                  WHERE i.iit_ne_id = t_iig_item_id(i);
+
+                remove_spatial_data(t_iig_item_id);               
+
             --  
             END IF;
           -- close child doc assocs
@@ -1141,7 +1210,7 @@ BEGIN
       --
           log_event(pi_log_iit_inv_type     => full_net_rec.nm_obj_type
                    ,pi_log_action           => pi_action
-                   ,pi_log_iit_ne_id        => full_net_rec.nm_ne_id_in
+                   ,pi_log_iit_ne_id        => full_net_rec.iit_ne_id --nm_ne_id_in
                    ,pi_log_iit_primary_key  => full_net_rec.iit_primary_key
                    ,pi_log_iit_descr        => full_net_rec.iit_descr
                    ,pi_log_message          => l_log_message
@@ -1164,7 +1233,7 @@ BEGIN
     --
     END;
     --
-    nm_debug.debug('Identified '||t_iit_id.COUNT||' to delete');
+--    nm_debug.debug('Identified '||t_iit_id.COUNT||' to delete');
     --
   END IF;
   -- close all memberless assets
@@ -1174,18 +1243,39 @@ BEGIN
     FORALL i IN 1 .. t_iit_id.COUNT
     UPDATE nm_inv_item_groupings_all g
        SET g.iig_end_date = l_effective_date
-     WHERE g.iig_item_id = t_iit_id (i);
+     WHERE g.iig_item_id = t_iit_id (i)
+     AND   g.iig_end_date is null;
+     
 --
     FORALL i IN 1 .. t_iit_id.COUNT
     UPDATE nm_inv_items_all
        SET iit_end_date = l_effective_date
-     WHERE iit_ne_id = t_iit_id (i);
+     WHERE iit_ne_id = t_iit_id (i)
+     AND   iit_end_date is null;
+     
+     close_spatial_data( t_iit_id, l_effective_date);
+     
 --
   ELSIF pi_action = 'D' THEN
 --
     FORALL i IN 1 .. t_iit_id.COUNT
     DELETE FROM nm_inv_item_groupings_all
      WHERE iig_item_id  = t_iit_id (i);
+
+
+    FORALL i in 1 .. t_iit_id.COUNT
+    DELETE FROM nm_members_all m
+    WHERE m.nm_ne_id_in = t_iit_id (i);
+     
+--     nm_debug.debug_on;
+--     nm_debug.debug('Removal of set of inventory in table ');
+--     
+--     for i in 1..t_iit_id.count loop
+--       nm_debug.debug(i||','||t_iit_id(i));
+--     end loop;
+--     
+--     nm_debug.debug_on;
+--     nm_debug.debug('end of loop on removal of set of inventory in table ');
 --
     FORALL i IN 1 .. t_iit_id.COUNT
     DELETE FROM nm_inv_items_all
@@ -1194,6 +1284,10 @@ BEGIN
               (SELECT 1
                  FROM nm_members_all
                 WHERE iit_ne_id = nm_ne_id_in AND nm_ne_id_in = t_iit_id (i));
+
+    remove_spatial_data(t_iit_id);               
+
+--
 --
   END IF;
 --
@@ -1259,17 +1353,20 @@ END;
   )
   IS
   BEGIN
-    nm_debug.debug('# Close member : ('||p_action||', '||p_ne_id_in||', '||p_ne_id_of||', '||p_begin_mp||', '||p_start_date||')');
+--    nm_debug.debug('# Close member : ('||p_action||', '||p_ne_id_in||', '||p_ne_id_of||', '||p_begin_mp||', '||p_start_date||')');
     -- end date
     IF p_action = 'C' 
     THEN
-      UPDATE nm_members_all
+      UPDATE nm_members
       SET nm_end_date = p_effective_date
       WHERE nm_ne_id_in = p_ne_id_in
         AND nm_ne_id_of = NVL(p_ne_id_of,nm_ne_id_of)
         AND nm_begin_mp = NVL(p_begin_mp,nm_begin_mp)
-        AND nm_start_date = p_start_date;
-        --and nm_end_date is null;
+        AND nm_start_date = decode( p_ne_id_of, null, nm_start_date, p_start_date)
+        and nm_end_date is null;
+--RC> Re-instated the end-date predicate and changed the operand to members rather than members-all.
+--    The code uses an effective date which, if in the past could allow closure on an already closed member. This is almost certainly
+--    going to throw date-tracking errors.	
       IF SQL%ROWCOUNT = 0 THEN
         nm3dbg.putln('update no_data_found: close_member_record('||p_action
           ||', '||p_ne_id_in||', '||p_ne_id_of||', '||p_begin_mp||', '||p_start_date||')');
@@ -1282,7 +1379,7 @@ END;
       WHERE nm_ne_id_in = p_ne_id_in
         AND nm_ne_id_of = NVL(p_ne_id_of,nm_ne_id_of)
         AND nm_begin_mp = NVL(p_begin_mp,nm_begin_mp)
-        AND nm_start_date = p_start_date;
+        AND nm_start_date = decode( p_ne_id_of, null, nm_start_date, p_start_date);
         -- Allow to operate on any effective date
         --and nm_end_date is null;
       IF SQL%ROWCOUNT = 0 
@@ -1293,6 +1390,222 @@ END;
     END IF;
   END;
 --
+  procedure close_part_member_record(
+     p_action         in varchar2
+    ,p_effective_date in date
+    ,p_ne_id_in       in id_type
+    ,p_ne_id_of       in id_type
+    ,p_begin_mp       in mp_type
+    ,p_end_mp         in mp_type 
+    ,p_start_date     in date
+    ,p_end_date       in date
+    ,p_admin_unit     in id_type
+    ,p_obj_type       in varchar2
+    ,p_keep_begin1    in number default null
+    ,p_keep_end1      in number default null
+    ,p_keep_begin2    in number default null
+    ,p_keep_end2      in number default null   
+  ) IS
+  l_rec1 nm_members_all%rowtype; -- := nm3get.get_nm_all(p_ne_id_in,p_ne_id_of,p_begin_mp,p_start_date,false);
+  l_rec2 nm_members_all%rowtype;
+  BEGIN
+  
+    l_rec1.nm_ne_id_in    := p_ne_id_in;
+    l_rec1.nm_ne_id_of    := p_ne_id_of;
+    l_rec1.nm_begin_mp    := p_begin_mp;
+    l_rec1.nm_end_mp      := p_end_mp;
+    l_rec1.nm_start_date  := p_start_date;
+    l_rec1.nm_end_date    := p_end_date;
+    l_rec1.nm_admin_unit  := p_admin_unit;
+    l_rec1.nm_obj_type    := p_obj_type;
+    l_rec1.nm_type        := 'I';
+    
+    if g_include_partial = 'Y' then
+      IF p_keep_begin1 is null and
+       p_keep_end1   is null and
+       p_keep_begin2 is null and
+       p_keep_end2   is null then
+--     this should not have been called, just use the standard close member procedure
+      close_member_record( p_action         => p_action
+                          ,p_effective_date => p_effective_date
+                          ,p_ne_id_in       => p_ne_id_in
+                          ,p_ne_id_of       => p_ne_id_of
+                          ,p_begin_mp       => p_begin_mp
+                          ,p_start_date     => p_start_date );
+      ELSIF p_keep_begin1 is not null and 
+            p_keep_end1   is not null and
+            p_keep_begin2 is null and
+            p_keep_end2   is null then
+--          
+--     need to retain part 1 - needs to be split into two chunks on part 1 alone
+        IF p_keep_end1 < p_begin_mp  or p_keep_begin1 > p_end_mp then
+--        no intersection, just end-dae original
+          close_member_record( p_action         => p_action
+                           ,p_effective_date => p_effective_date
+                           ,p_ne_id_in       => p_ne_id_in
+                           ,p_ne_id_of       => p_ne_id_of
+                           ,p_begin_mp       => p_begin_mp
+                           ,p_start_date     => p_start_date );
+        ELSE
+--
+          l_rec2 := l_rec1;
+--can't be sure if the keep is on left or right
+          if p_keep_begin1 > l_rec1.nm_begin_mp then
+           l_rec1.nm_end_mp := p_keep_begin1;
+          end if;
+      
+          if p_keep_end1 < l_rec1.nm_end_mp then
+            l_rec1.nm_begin_mp := p_keep_end1;
+          end if;
+      
+--       the part outside the keep is to be end-dated or deleted
+
+          if p_action = 'C' then
+          
+            update nm_members_all
+            set nm_begin_mp = l_rec1.nm_begin_mp,
+                nm_end_mp   = l_rec1.nm_end_mp,
+                nm_end_date = p_effective_date
+            where nm_ne_id_in = p_ne_id_in
+            and   nm_ne_id_of = p_ne_id_of
+            and   nm_begin_mp = p_begin_mp
+            and   nm_start_date = p_start_date;
+
+          else
+            -- this will remove
+            close_member_record( p_action         => p_action
+                            ,p_effective_date => p_effective_date
+                            ,p_ne_id_in       => p_ne_id_in
+                            ,p_ne_id_of       => p_ne_id_of
+                            ,p_begin_mp       => p_begin_mp
+                            ,p_start_date     => p_start_date );
+      
+            
+          end if;        
+
+--       the part from the keep is to be created
+
+          l_rec2.nm_begin_mp := p_keep_begin1;
+          l_rec2.nm_end_mp   := p_keep_end1;
+          l_rec2.nm_end_date := null;
+--      
+          nm3ins.ins_nm(l_rec2);
+          
+        END IF;
+--
+      ELSIF p_keep_begin1 is null and 
+            p_keep_end1   is null and
+            p_keep_begin2 is not null and
+            p_keep_end2   is not null then
+--
+--     need to retain part 2 - needs to be split into two chunks on part 2 alone
+        IF p_keep_end2 < p_begin_mp  or p_keep_begin2 > p_end_mp then
+--       no intersection, just end-dae original
+         close_member_record( p_action         => p_action
+                           ,p_effective_date => p_effective_date
+                           ,p_ne_id_in       => p_ne_id_in
+                           ,p_ne_id_of       => p_ne_id_of
+                           ,p_begin_mp       => p_begin_mp
+                           ,p_start_date     => p_start_date );
+        ELSE
+--
+          l_rec2 := l_rec1;
+
+          if p_keep_begin2 > l_rec1.nm_begin_mp then
+            l_rec1.nm_end_mp := p_keep_begin2;
+          end if;
+      
+          if p_keep_end2 < l_rec1.nm_end_mp then
+            l_rec1.nm_begin_mp := p_keep_end2;
+          end if;
+
+          if p_action = 'C' then
+      
+            update nm_members_all
+            set nm_begin_mp = l_rec1.nm_begin_mp,
+                nm_end_mp   = l_rec1.nm_end_mp,
+                nm_end_date = p_effective_date               
+            where nm_ne_id_in = p_ne_id_in
+            and   nm_ne_id_of = p_ne_id_of
+            and   nm_begin_mp = p_begin_mp
+            and   nm_start_date = p_start_date;
+            
+          else
+      
+            close_member_record( p_action         => p_action
+                            ,p_effective_date => p_effective_date
+                            ,p_ne_id_in       => p_ne_id_in
+                            ,p_ne_id_of       => p_ne_id_of
+                            ,p_begin_mp       => p_begin_mp
+                            ,p_start_date     => p_start_date );
+      
+          end if;
+      
+          l_rec2.nm_begin_mp := p_keep_begin2;
+          l_rec2.nm_end_mp   := p_keep_end2;
+          l_rec2.nm_end_date := null;
+      
+          nm3ins.ins_nm(l_rec2);
+        
+        END IF;      
+     
+      ELSIF p_keep_begin1 is not null and 
+            p_keep_end1   is not null and
+            p_keep_begin2 is not null and
+            p_keep_end2   is not null then
+--    need to retain parts 1 and 2 - needs to be split into three chunks.              
+      
+        l_rec2 := l_rec1;
+        l_rec1.nm_begin_mp := least(p_keep_end1, p_keep_end2);
+        l_rec1.nm_end_mp   := greatest(p_keep_begin1, p_keep_begin2);
+--
+        if p_action = 'C' then
+      
+          update nm_members_all
+          set nm_begin_mp = l_rec1.nm_begin_mp,
+              nm_end_mp   = l_rec1.nm_end_mp,
+              nm_end_date = p_effective_date
+          where nm_ne_id_in = p_ne_id_in
+           and   nm_ne_id_of = p_ne_id_of
+           and   nm_begin_mp = p_begin_mp
+           and   nm_start_date = p_start_date;
+        
+        else
+      
+          close_member_record( p_action         => p_action
+                            ,p_effective_date => p_effective_date
+                            ,p_ne_id_in       => p_ne_id_in
+                            ,p_ne_id_of       => p_ne_id_of
+                            ,p_begin_mp       => p_begin_mp
+                            ,p_start_date     => p_start_date );
+      
+        end if;
+
+        l_rec2.nm_begin_mp := p_keep_begin1;
+        l_rec2.nm_end_mp   := p_keep_end1;
+        l_rec2.nm_end_date := null;
+
+        nm3ins.ins_nm(l_rec2);
+                  
+        l_rec2.nm_begin_mp := p_keep_begin2;
+        l_rec2.nm_end_mp   := p_keep_end2;
+        l_rec2.nm_end_date := null;
+
+        nm3ins.ins_nm(l_rec2);
+
+      ELSE
+        raise_application_error( -20001, 'Incorrect combination of measure values 1='||p_keep_begin1||',2='||p_keep_end1||',3='||p_keep_begin2||',4='||p_keep_end2);
+      END IF;
+    else
+      -- just in case -operate on all the members 
+      close_member_record( p_action         => p_action
+                          ,p_effective_date => p_effective_date
+                          ,p_ne_id_in       => p_ne_id_in
+                          ,p_start_date     => p_start_date );
+    end if; -- g_include_partial
+  END;  
+  
+
 -----------------------------------------------------------------------------
 --
   -- this is useful code, but not used here.
@@ -1342,6 +1655,120 @@ END;
     g_include_partial := pi_partial_flag;
   --
   END set_partial_flag;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE check_extent_no_future_locs (p_ne_id      nm_elements.ne_id%TYPE
+                                      ,p_effective_date DATE DEFAULT nm3user.get_effective_date
+                                      ) IS
+--
+--If we are to operate on a route at a specific date, the delete global asset list will leave assets of the specific type that exist
+--on datums that were not part of the route on the date in question and will be left unaffected. We need to fail if a route is used at a 
+--date that includes datum members that start after the effective date.
+--
+   CURSOR cs_future_locs (c_nm_ne_id_in    nm_members_all.nm_ne_id_in%TYPE
+                         ,c_effective_date DATE
+                         ) IS
+   SELECT 1 from dual where exists (
+       select 1 from  nm_members_all nm
+   WHERE  nm_ne_id_in   = c_nm_ne_id_in
+    AND   nm_start_date > c_effective_date );
+--
+   l_dummy PLS_INTEGER;
+   l_found BOOLEAN;
+--
+BEGIN
+--
+--   nm_debug.proc_start (g_package_name,'check_extent_no_future_locs');
+--
+   OPEN  cs_future_locs (p_ne_id, p_effective_date);
+   FETCH cs_future_locs INTO l_dummy;
+   l_found := cs_future_locs%FOUND;
+   CLOSE cs_future_locs;
+--
+   IF l_found
+    THEN
+      raise_application_error( -20001, 'The NW has datums that start later than the effective date - the assets on this member datum would either be unaffected or '||
+                                       ' give rise to a server error');
+--      hig.raise_ner (pi_appl => nm3type.c_net
+--                    ,pi_id   => 355
+--                    );
+   END IF;
+--
+--   nm_debug.proc_end (g_package_name,'check_extent_no_future_locs');
+--
+END check_extent_no_future_locs;
+
+
+PROCEDURE check_no_future_locs (p_nte_job_id  nm_nw_temp_extents.nte_job_id%type
+                               ,p_effective_date DATE DEFAULT nm3user.get_effective_date
+                               ) IS
+--
+--If we are to operate on an extent (which may be an extent formed from a route on a specific date), there may be 
+--visible asset locations that have been end-dated at a datelater than the effective date (ie already closed). These records really should not be touched.
+--Better to have a module which end-dates all at a specific date and deletes anything that was created after that date.
+--
+   CURSOR cs_future_locs (c_job_id  nm_nw_temp_extents.nte_job_id%type
+                         ,c_effective_date DATE
+                         ) IS
+   SELECT 1 from dual where exists (
+       select 1 from  nm_members_all nm, nm_nw_temp_extents
+   WHERE  nm_ne_id_of   = nte_ne_id_of
+   and    nm_type = 'I'
+   and    nm_obj_type in (select nit_inv_type from nm_inv_types t
+                          where t.nit_category in (select column_value from table(cast(get_inv_categories_tbl as nm_code_tbl))))
+   AND   (nm_start_date > c_effective_date OR  -- this record is invisible to the query of items
+          nm_end_date   > c_effective_date ));   -- these have already been updated to a date greater than the proposed end-date.
+--
+   l_dummy PLS_INTEGER;
+   l_found BOOLEAN;
+--
+BEGIN
+--
+--   nm_debug.proc_start (g_package_name,'check_no_future_locs');
+--
+   OPEN  cs_future_locs (p_nte_job_id, p_effective_date);
+   FETCH cs_future_locs INTO l_dummy;
+   l_found := cs_future_locs%FOUND;
+   CLOSE cs_future_locs;
+--
+   IF l_found
+    THEN
+      raise_application_error( -20001, 'Inv. data that is opened later than the effective date will remain unaffected or data that has been closed later '|| 
+                                       'than this date will be changed');
+--      hig.raise_ner (pi_appl => nm3type.c_net
+--                    ,pi_id   => 355
+--                    );
+   END IF;
+--
+--   nm_debug.proc_end (g_package_name,'check_no_future_locs');
+--
+END check_no_future_locs;
+
+--
+procedure remove_spatial_data ( p_nm_id_tbl in nm_id_tbl ) is
+--
+p_ids int_array_type;
+begin
+   select cast ( collect ( column_value ) as int_array_type )
+   into p_ids
+   from table ( p_nm_id_tbl );
+--      
+   nm3sdo_ops.remove_spatial_data ( p_ids => p_ids );
+end;                                
+
+procedure close_spatial_data ( p_nm_id_tbl in nm_id_tbl, p_end_date in date ) is
+--
+p_ids int_array_type;
+begin
+   select cast ( collect ( column_value ) as int_array_type )
+   into p_ids
+   from table ( p_nm_id_tbl );
+--      
+   nm3sdo_ops.close_spatial_data ( p_ids => p_ids, p_end_date => p_end_date );
+end;                                
+
+--
 --
 -----------------------------------------------------------------------------
 --
