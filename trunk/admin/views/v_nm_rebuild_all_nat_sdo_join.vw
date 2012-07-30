@@ -10,11 +10,11 @@ Select
           -------------------------------------------------------------------------
           --   PVCS Identifiers :-
           --
-          --       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/v_nm_rebuild_all_nat_sdo_join.vw-arc   3.2   Oct 04 2011 09:25:26   Steve.Cooper  $
+          --       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/v_nm_rebuild_all_nat_sdo_join.vw-arc   3.3   Jul 30 2012 10:45:24   Steve.Cooper  $
           --       Module Name      : $Workfile:   v_nm_rebuild_all_nat_sdo_join.vw  $
-          --       Date into PVCS   : $Date:   Oct 04 2011 09:25:26  $
-          --       Date fetched Out : $Modtime:   Oct 04 2011 09:16:28  $
-          --       Version          : $Revision:   3.2  $
+          --       Date into PVCS   : $Date:   Jul 30 2012 10:45:24  $
+          --       Date fetched Out : $Modtime:   Jul 26 2012 15:49:20  $
+          --       Version          : $Revision:   3.3  $
           -------------------------------------------------------------------------
           --
           vw.View_Name                                                                                                                  View_Name,
@@ -48,7 +48,7 @@ Select
           --
           'Comment on Table ' || vw.View_Name ||     ' Is ''Created By :V_Nm_Rebuild_All_Nlt_Sdo_Join ' 
                                                 || Chr(10) || 'Created On :' || To_Char(Sysdate,'dd-mm-yyyy hh24:mi.ss') 
-                                                || Chr(10) || 'Version    :$Revision:   3.2  $'''                                               View_Comments         
+                                                || Chr(10) || 'Version    :$Revision:   3.3  $'''                                               View_Comments         
 From    (        
         --Gets Linear views that can be rebuilt.
         Select  naty.Nat_Nt_Type,
@@ -61,8 +61,18 @@ From    (
         Where   nta.Nth_Base_Table_Theme    Is      Null
         And     nat.Nath_Nth_Theme_Id       =       nta.Nth_Theme_Id 
         And     nat.Nath_Nat_Id             =       naty.Nat_Id             
-        And     nta.Nth_Feature_Table       Like    Sys_Context ('NM3SQL', 'THEME_API_FEATURE_TAB')
+        And     nta.Nth_Feature_Table       Like    Sys_Context ('NM3SQL', 'THEME_API_FEATURE_TAB')        
         ) vw
+Where   Not Exists  (
+                    Select  Null
+                    From    Nm_Themes_All     nta,
+                            Nm_Area_Themes    nat,
+                            Nm_Area_Types     naty
+                    Where   nta.Nth_Feature_Table =   vw.View_Name
+                    And     nta.Nth_Theme_Id      =   nat.Nath_Nth_Theme_Id
+                    And     nat.Nath_Nat_Id       =   naty.Nat_Id
+                    And     naty.Nat_Nt_Type      =   'NSGN'
+                    )
 With Read Only
 /             
                   

@@ -10,11 +10,11 @@ Select
           -------------------------------------------------------------------------
           --   PVCS Identifiers :-
           --
-          --       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/v_nm_rebuild_all_inv_sdo_join.vw-arc   3.3   Oct 06 2011 11:33:58   Steve.Cooper  $
+          --       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/v_nm_rebuild_all_inv_sdo_join.vw-arc   3.4   Jul 30 2012 10:45:24   Steve.Cooper  $
           --       Module Name      : $Workfile:   v_nm_rebuild_all_inv_sdo_join.vw  $
-          --       Date into PVCS   : $Date:   Oct 06 2011 11:33:58  $
-          --       Date fetched Out : $Modtime:   Oct 06 2011 11:33:26  $
-          --       Version          : $Revision:   3.3  $
+          --       Date into PVCS   : $Date:   Jul 30 2012 10:45:24  $
+          --       Date fetched Out : $Modtime:   Jul 26 2012 15:37:54  $
+          --       Version          : $Revision:   3.4  $
           -------------------------------------------------------------------------
           --
           rais.View_Name                                                                                                                                                                View_Name,
@@ -41,7 +41,7 @@ Select
           --
           'Comment on Table ' || rais.View_Name  ||    ' Is ''Created By :V_Nm_Rebuild_All_Inv_Sdo_Join ' 
                                                  || Chr(10) || 'Created On :' || To_Char(Sysdate,'dd-mm-yyyy hh24:mi.ss') 
-                                                 || Chr(10) || 'Version    :$Revision:   3.3  $'''                                                                                              View_Comments         
+                                                 || Chr(10) || 'Version    :$Revision:   3.4  $'''                                                                                              View_Comments         
 From    (
         --Gets the Inventory views that can be rebuilt.
         Select    Nit.Nith_Nit_Id                                                             Inv_Type,
@@ -81,6 +81,16 @@ From    (
         From    Nm_Inv_Types    nit
         ) nit
 Where   Nit.Nit_Inv_Type  =   rais.Inv_Type
+And     Not Exists  (
+                  Select  Null
+                  From    Nm_Themes_All   nta,
+                          Nm_Inv_Themes   nit,
+                          Nm_Nw_Ad_Types  nnat
+                  Where   nta.Nth_Feature_Table   =   rais.View_Name 
+                  And     nta.Nth_Theme_Id        =   nit.Nith_Nth_Theme_Id
+                  And     nit.Nith_Nit_Id         =   nnat.Nad_Inv_Type
+                  And     nnat.Nad_Nt_Type        =   'NSGN' 
+                  )  
 With Read Only
 /
  
