@@ -3,11 +3,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/regen.sql-arc   3.3   Sep 22 2011 15:29:58   Mike.Alexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/regen.sql-arc   3.4   Jul 30 2012 10:42:56   Steve.Cooper  $
 --       Module Name      : $Workfile:   regen.sql  $
---       Date into PVCS   : $Date:   Sep 22 2011 15:29:58  $
---       Date fetched Out : $Modtime:   Sep 22 2011 15:27:22  $
---       Version          : $Revision:   3.3  $
+--       Date into PVCS   : $Date:   Jul 30 2012 10:42:56  $
+--       Date fetched Out : $Modtime:   Jul 30 2012 10:38:42  $
+--       Version          : $Revision:   3.4  $
 --
 --   Product upgrade script
 --
@@ -23,37 +23,41 @@ End;
 /
 
 Declare
-  l_tab_view_name              nm3type.tab_varchar32767;
-  l_tab_view_source            nm3type.tab_varchar32767;
+  l_View_Text  Clob;
 Begin
---
-  Select      uv.View_Name,
-              uv.Text
-  Bulk Collect
-  Into        l_Tab_View_Name,
-              l_Tab_View_Source 
-  From        User_Views    uv,
-              User_Objects  uo
-  Where       uo.Status       =     'INVALID'
-  And         View_Name       =     uo.Object_Name
-  And         Exists          (     Select  Null
-                                    From    User_Dependencies   ud
-                                    Where   ud.Name              =     uv.View_Name
-                                    And     ud.Referenced_Name   =    'NM3CONTEXT'
-                                    );
-  --
-  For i In 1..l_Tab_View_Name.Count
+  for y In  (
+            Select      uv.View_Name 
+            From        User_Views    uv,
+                        User_Objects  uo
+            Where       View_Name       =     uo.Object_Name
+            And         Exists          (     Select  Null
+                                              From    User_Dependencies   ud
+                                              Where   ud.Name              =     uv.View_Name
+                                              And     ud.Referenced_Name   =    'NM3CONTEXT'
+                                        )
+            And     Not Exists          (
+                                              Select  Null
+                                              From    User_Triggers
+                                              Where   Table_Name            =   uv.View_Name
+                                              And     Table_Owner           =   User
+                                        )
+            And         Exists          (
+                                              Select  Null
+                                              From    User_Tab_Columns
+                                              Where   Table_Name            =   uv.View_Name
+                                        )
+            )
   Loop
-    Begin
-      l_Tab_View_Source(i) := Replace ( Upper(l_Tab_View_Source(i)), 'NM3CONTEXT.GET_EFFECTIVE_DATE' , 'to_date(sys_context(''NM3CORE'',''EFFECTIVE_DATE''),''DD-MON-YYYY'')');
-      --
-      Execute Immediate 'CREATE OR REPLACE FORCE VIEW '|| l_Tab_View_Name(i)||' As '|| l_Tab_View_Source(i);
-    Exception When Others
-    Then
-      dbms_output.put_line(l_Tab_View_Name(i)||' - Creation Failed.');
-    End;
+    l_View_Text:=DBMS_METADATA.GET_DDL('VIEW',y.View_Name);
+      If Instr(Upper(l_View_Text),'NM3CONTEXT.GET_EFFECTIVE_DATE')  > 0 Then           
+        l_View_Text:= Replace ( Upper(l_View_Text), 'NM3CONTEXT.GET_EFFECTIVE_DATE' , 'to_date(sys_context(''NM3CORE'',''EFFECTIVE_DATE''),''DD-MON-YYYY'')');
+      Begin
+        Execute Immediate l_View_Text;
+      Exception When Others Then
+        Dbms_output.put_line(y.View_Name ||' - Creation Failed.');
+      End;
+    End If;
   End Loop;
---
 End;
 /
 
