@@ -5,11 +5,11 @@ As
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.58   Jul 17 2012 14:19:12   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.59   Jul 30 2012 10:47:00   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3sdm.pkb  $
---       Date into PVCS   : $Date:   Jul 17 2012 14:19:12  $
---       Date fetched Out : $Modtime:   Jun 27 2012 14:22:30  $
---       PVCS Version     : $Revision:   2.58  $
+--       Date into PVCS   : $Date:   Jul 30 2012 10:47:00  $
+--       Date fetched Out : $Modtime:   Jul 27 2012 13:55:26  $
+--       PVCS Version     : $Revision:   2.59  $
 --
 --   Author : R.A. Coupe
 --
@@ -21,7 +21,7 @@ As
 --
 --all global package variables here
 --
-  g_Body_Sccsid     Constant Varchar2 (2000) := '"$Revision:   2.58  $"';
+  g_Body_Sccsid     Constant Varchar2 (2000) := '"$Revision:   2.59  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
   g_Package_Name    Constant Varchar2 (30)   := 'NM3SDM';
@@ -216,7 +216,8 @@ Function Build_Nat_Sdo_Join_View Return User_Views.View_Name%Type
 Is
 
   l_View_Tab    t_View_Tab;
-
+  View_Creation_Error   Exception;
+  Pragma Exception_Init(View_Creation_Error,-20001);
 Begin
   Nm_Debug.Debug('Nm3Sdm.Build_Nat_Sdo_Join_View - Called');
     
@@ -229,7 +230,12 @@ Begin
     
   For x In  1 .. l_View_Tab.Count
   Loop
-    Process_View_DDL (p_View_Rec=> l_View_Tab(x));                                             
+    Begin
+      Process_View_DDL (p_View_Rec=> l_View_Tab(x));
+    Exception
+      When View_Creation_Error Then
+        Null;
+    End;                                             
   End Loop;
        
   Nm_Debug.Debug('Nm3Sdm.Build_Nat_Sdo_Join_View - Finished');
@@ -285,7 +291,8 @@ Function Build_Nlt_Sdo_Join_View Return User_Views.View_Name%Type
 Is
 
   l_View_Tab    t_View_Tab;
-
+  View_Creation_Error   Exception;
+  Pragma Exception_Init(View_Creation_Error,-20001);
 Begin
   Nm_Debug.Debug('Nm3Sdm.Build_Nlt_Sdo_Join_View - Called');
     
@@ -298,7 +305,12 @@ Begin
     
   For x In  1 .. l_View_Tab.Count
   Loop
-    Process_View_DDL (p_View_Rec=> l_View_Tab(x));                                            
+    Begin
+      Process_View_DDL (p_View_Rec=> l_View_Tab(x));
+    Exception
+      When View_Creation_Error Then
+        Null;
+    End;                                            
   End Loop;
        
   Nm_Debug.Debug('Nm3Sdm.Build_Nlt_Sdo_Join_View - Finished');
@@ -8267,7 +8279,8 @@ Function Build_Inv_Sdo_Join_View Return User_Views.View_Name%Type
 Is
 
   l_View_Tab    t_View_Tab;
-
+  View_Creation_Error   Exception;
+  Pragma Exception_Init(View_Creation_Error,-20001);
 Begin
   Nm_Debug.Debug('Nm3Sdm.Build_Inv_Sdo_Join_View - Called');
     
@@ -8280,7 +8293,12 @@ Begin
     
   For x In  1 .. l_View_Tab.Count
   Loop
-    Process_View_DDL (p_View_Rec=> l_View_Tab(x));                                             
+    Begin
+      Process_View_DDL (p_View_Rec=> l_View_Tab(x));
+    Exception
+      When View_Creation_Error Then
+        Null;
+    End;                                             
   End Loop;
        
   Nm_Debug.Debug('Nm3Sdm.Build_Inv_Sdo_Join_View - Finished');
