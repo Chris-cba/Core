@@ -3,11 +3,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4400_nm4500_upg.sql-arc   3.8   Nov 09 2011 11:29:02   Mike.Alexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4400_nm4500_upg.sql-arc   3.9   Jul 30 2012 13:00:32   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm4400_nm4500_upg.sql  $
---       Date into PVCS   : $Date:   Nov 09 2011 11:29:02  $
---       Date fetched Out : $Modtime:   Nov 09 2011 11:26:06  $
---       Version          : $Revision:   3.8  $
+--       Date into PVCS   : $Date:   Jul 30 2012 13:00:32  $
+--       Date fetched Out : $Modtime:   Jul 30 2012 12:58:00  $
+--       Version          : $Revision:   3.9  $
 --
 --   Product upgrade script
 --
@@ -283,6 +283,22 @@ SET TERM OFF
 SET DEFINE ON
 select '&exor_base'||'nm3'||'&terminator'||'install'||
         '&terminator'||'create_usdo_views.sql' run_file
+from dual
+/
+SET FEEDBACK ON
+start '&&run_file'
+SET FEEDBACK OFF
+--
+---------------------------------------------------------------------------------------------------
+--        ****************   Remove Sub-User Objects  *******************
+--
+--
+SET TERM ON
+PROMPT Remove Sub-User Objects
+SET TERM OFF
+SET DEFINE ON
+select '&exor_base'||'nm3'||'&terminator'||'install'||
+        '&terminator'||'remove_private_views.sql' run_file
 from dual
 /
 SET FEEDBACK ON
