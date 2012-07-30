@@ -3,11 +3,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/regen.sql-arc   3.5   Jul 30 2012 14:52:52   Steve.Cooper  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/regen.sql-arc   3.6   Jul 30 2012 15:05:20   Steve.Cooper  $
 --       Module Name      : $Workfile:   regen.sql  $
---       Date into PVCS   : $Date:   Jul 30 2012 14:52:52  $
---       Date fetched Out : $Modtime:   Jul 30 2012 14:49:56  $
---       Version          : $Revision:   3.5  $
+--       Date into PVCS   : $Date:   Jul 30 2012 15:05:20  $
+--       Date fetched Out : $Modtime:   Jul 30 2012 15:02:52  $
+--       Version          : $Revision:   3.6  $
 --
 --   Product upgrade script
 --
@@ -127,7 +127,7 @@ End;
 Begin
   Hig2.Upgrade  (
                 p_Product        => 'NET',
-                p_Upgrade_Script => 'log_nm_4500_fix20.sql',
+                p_Upgrade_Script => 'regen.sql',
                 p_Remarks        => 'NET 4500 FIX 20',
                 p_To_Version     => Null
                 );
