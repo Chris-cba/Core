@@ -1,10 +1,10 @@
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm_4500_fix20.sql-arc   1.1   Jul 31 2012 10:41:16   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm_4500_fix20.sql-arc   1.2   Jul 31 2012 10:55:38   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm_4500_fix20.sql  $
---       Date into PVCS   : $Date:   Jul 31 2012 10:41:16  $
---       Date fetched Out : $Modtime:   Jul 31 2012 10:40:58  $
---       PVCS Version     : $Revision:   1.1  $
+--       Date into PVCS   : $Date:   Jul 31 2012 10:55:38  $
+--       Date fetched Out : $Modtime:   Jul 31 2012 10:55:12  $
+--       PVCS Version     : $Revision:   1.2  $
 --
 ----------------------------------------------------------------------------
 --   Copyright (c) 2012 Bentley Systems Incorporated.
@@ -146,9 +146,13 @@ EXECUTE nm3ddl.refresh_all_synonyms;
 SET TERM ON
 Prompt Executing the Compile_schema
 SET TERM OFF
+SPOOL OFF
+
+start compile_schema;
+--
+--
 start compile_all;
 --
-SPOOL OFF
 EXIT
 --
 --
