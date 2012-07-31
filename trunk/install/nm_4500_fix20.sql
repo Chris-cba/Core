@@ -1,10 +1,10 @@
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm_4500_fix20.sql-arc   1.0   Jul 31 2012 10:00:12   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm_4500_fix20.sql-arc   1.1   Jul 31 2012 10:41:16   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm_4500_fix20.sql  $
---       Date into PVCS   : $Date:   Jul 31 2012 10:00:12  $
---       Date fetched Out : $Modtime:   Jul 31 2012 09:59:00  $
---       PVCS Version     : $Revision:   1.0  $
+--       Date into PVCS   : $Date:   Jul 31 2012 10:41:16  $
+--       Date fetched Out : $Modtime:   Jul 31 2012 10:40:58  $
+--       PVCS Version     : $Revision:   1.1  $
 --
 ----------------------------------------------------------------------------
 --   Copyright (c) 2012 Bentley Systems Incorporated.
@@ -129,13 +129,24 @@ SET FEEDBACK ON
 start regen.sql
 SET FEEDBACK OFF
 --
------------------------------------------------------------------------------------------------------
---                        ****************   SYNONYMS   *******************
+--------------------------------------------------------------------------------
+-- Refresh synonyms
+--------------------------------------------------------------------------------
+--
 SET TERM ON
 Prompt Refreshing synonyms
 SET TERM OFF
 EXECUTE nm3ddl.refresh_all_synonyms;
 --
+--
+--------------------------------------------------------------------------------
+-- Compile the schema
+--------------------------------------------------------------------------------
+--
+SET TERM ON
+Prompt Executing the Compile_schema
+SET TERM OFF
+start compile_all;
 --
 SPOOL OFF
 EXIT
