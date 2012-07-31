@@ -5,11 +5,11 @@ As
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.57.1.0   Jul 31 2012 14:03:46   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.57.1.1   Jul 31 2012 14:12:40   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3sdm.pkb  $
---       Date into PVCS   : $Date:   Jul 31 2012 14:03:46  $
---       Date fetched Out : $Modtime:   Jul 31 2012 14:02:48  $
---       PVCS Version     : $Revision:   2.57.1.0  $
+--       Date into PVCS   : $Date:   Jul 31 2012 14:12:40  $
+--       Date fetched Out : $Modtime:   Jul 31 2012 14:09:48  $
+--       PVCS Version     : $Revision:   2.57.1.1  $
 --
 --   Author : R.A. Coupe
 --
@@ -21,7 +21,7 @@ As
 --
 --all global package variables here
 --
-  g_Body_Sccsid     Constant Varchar2 (2000) := '"$Revision:   2.57.1.0  $"';
+  g_Body_Sccsid     Constant Varchar2 (2000) := '"$Revision:   2.57.1.1  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
   g_Package_Name    Constant Varchar2 (30)   := 'NM3SDM';
@@ -8233,6 +8233,8 @@ Function Build_Inv_Sdo_Join_View Return User_Views.View_Name%Type
 Is
 
   l_View_Tab    t_View_Tab;
+  View_Creation_Error   Exception;
+  Pragma Exception_Init(View_Creation_Error,-20001);
 
 Begin
   Nm_Debug.Debug('Nm3Sdm.Build_Inv_Sdo_Join_View - Called');
