@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3sdo_Edit AS
 --
 --   SCCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_edit.pkb-arc   2.16   Jul 17 2012 14:22:58   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_edit.pkb-arc   2.17   Aug 01 2012 12:01:50   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3sdo_edit.pkb  $
---       Date into SCCS   : $Date:   Jul 17 2012 14:22:58  $
---       Date fetched Out : $Modtime:   Jun 27 2012 15:45:54  $
---       SCCS Version     : $Revision:   2.16  $
+--       Date into SCCS   : $Date:   Aug 01 2012 12:01:50  $
+--       Date fetched Out : $Modtime:   Aug 01 2012 12:00:12  $
+--       SCCS Version     : $Revision:   2.17  $
 --
 --
 --  Author :  R Coupe
@@ -23,7 +23,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3sdo_Edit AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid   CONSTANT  VARCHAR2(2000)  :=  '$Revision:   2.16  $';
+  g_body_sccsid   CONSTANT  VARCHAR2(2000)  :=  '$Revision:   2.17  $';
   g_package_name  CONSTANT  VARCHAR2(30)    :=  'nm3sdo_edit';
 --
 -----------------------------------------------------------------------------
@@ -446,6 +446,11 @@ IS
 BEGIN
 --   Nm_DebuG.debug_on;
    Nm_Debug.DEBUG('In move reshape');
+   
+   IF NOT test_theme_for_update(pi_nth_id) then
+     HIG.RAISE_NER('NET', 339);
+   END IF;
+   
 
    IF l_nth.nth_base_table_theme IS NOT NULL
    THEN
@@ -581,6 +586,10 @@ IS
    l_nth    NM_THEMES_ALL%ROWTYPE   := Nm3get.get_nth (pi_nth_id);
    l_base   NM_THEMES_ALL%ROWTYPE;
 BEGIN
+   IF NOT test_theme_for_update(pi_nth_id) then
+     HIG.RAISE_NER('NET', 339);
+   END IF;
+
    IF l_nth.nth_base_table_theme IS NOT NULL
    THEN
       l_nth := Nm3get.get_nth (l_nth.nth_base_table_theme);
@@ -628,6 +637,10 @@ begin
 --  
   for irec in c1 ( pi_inv_type, pi_pk ) loop
 
+    IF NOT test_theme_for_update(irec.nth_theme_id) then
+      HIG.RAISE_NER('NET', 339);
+    END IF;
+
     update nm_inv_items
     set iit_x = pi_x,
         iit_y = pi_y
@@ -656,6 +669,10 @@ IS
    lf          VARCHAR2 (1)            := CHR (10);
    l_sqlcount  PLS_INTEGER;
 BEGIN
+
+  IF NOT test_theme_for_update(pi_nth_id) then
+    HIG.RAISE_NER('NET', 339);
+  END IF;
 
   -- Task 0109983
   -- Validate the geometry and raise error if appropriate
@@ -1335,6 +1352,10 @@ IS
    lf          VARCHAR2 (1)            := CHR (10);
    l_sqlcount  PLS_INTEGER;
 BEGIN
+  IF NOT test_theme_for_update(pi_nth_id) then
+    HIG.RAISE_NER('NET', 339);
+  END IF;
+
    IF l_nth.nth_end_date_column IS NOT NULL
    AND l_nth.nth_use_history = 'Y'
    THEN
@@ -1356,6 +1377,10 @@ IS
    lstr        Nm3type.max_varchar2;
    lf          VARCHAR2 (1)            := CHR (10);
 BEGIN
+  IF NOT test_theme_for_update(pi_nth_id) then
+    HIG.RAISE_NER('NET', 339);
+  END IF;
+
   IF l_nth.nth_feature_table IS NOT NULL
   AND l_nth.nth_feature_shape_column IS NOT NULL
   THEN
