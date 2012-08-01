@@ -3,11 +3,11 @@ Is
 --<PACKAGE>
 -- PVCS Identifiers :-
 --
--- pvcsid : $Header:   //vm_latest/archives/nm3/admin/pck/nm3context.pkh-arc   2.5   Jun 25 2012 09:12:52   Steve.Cooper  $
+-- pvcsid : $Header:   //vm_latest/archives/nm3/admin/pck/nm3context.pkh-arc   2.6   Aug 01 2012 10:01:44   Rob.Coupe  $
 -- Module Name : $Workfile:   nm3context.pkh  $
--- Date into PVCS : $Date:   Jun 25 2012 09:12:52  $
--- Date fetched Out : $Modtime:   Oct 12 2011 10:28:36  $
--- PVCS Version : $Revision:   2.5  $
+-- Date into PVCS : $Date:   Aug 01 2012 10:01:44  $
+-- Date fetched Out : $Modtime:   Aug 01 2012 10:00:56  $
+-- PVCS Version : $Revision:   2.6  $
 -- Based on SCCS version : 
 --
 --
@@ -20,7 +20,7 @@ Is
 -----------------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
-  G_Sccsid      Constant  Varchar2(2000) :='"$Revision:   2.5  $"';
+  G_Sccsid      Constant  Varchar2(2000) :='"$Revision:   2.6  $"';
 
 --  g_sccsid is the SCCS ID for the package
 --
@@ -132,7 +132,13 @@ Procedure Show_Context  (
 --<PRAGMA>
    Pragma Restrict_References (Get_Version, Wnps, Wnds);
    Pragma Restrict_References (Get_Body_Version, Wnps, Wnds);
---</PRAGMA>
+-- RC Task 0112107 - re-engage pragma
+   PRAGMA RESTRICT_REFERENCES (get_context, WNDS, WNPS);
+   PRAGMA RESTRICT_REFERENCES (get_effective_date, WNDS, WNPS);
+   PRAGMA RESTRICT_REFERENCES (get_namespace, WNDS, WNPS);
+   
+   
+   --</PRAGMA>
 --
 End Nm3Context;
 /
