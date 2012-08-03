@@ -3,11 +3,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4500_nm4600_upg.sql-arc   1.0   Aug 03 2012 14:41:52   Rob.Coupe  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4500_nm4600_upg.sql-arc   1.1   Aug 03 2012 16:02:34   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm4500_nm4600_upg.sql  $
---       Date into PVCS   : $Date:   Aug 03 2012 14:41:52  $
---       Date fetched Out : $Modtime:   Aug 03 2012 14:41:04  $
---       Version          : $Revision:   1.0  $
+--       Date into PVCS   : $Date:   Aug 03 2012 16:02:34  $
+--       Date fetched Out : $Modtime:   Aug 03 2012 16:01:58  $
+--       Version          : $Revision:   1.1  $
 --
 --   Product upgrade script
 --
@@ -272,54 +272,6 @@ BEGIN
    nm3user.instantiate_user;
 END;
 /
---
----------------------------------------------------------------------------------------------------
---                ****************   CREATE SDO VIEWS  *******************
---
---
-SET TERM ON
-PROMPT Create User SDO Views
-SET TERM OFF
-SET DEFINE ON
-select '&exor_base'||'nm3'||'&terminator'||'install'||
-        '&terminator'||'create_usdo_views.sql' run_file
-from dual
-/
-SET FEEDBACK ON
-start '&&run_file'
-SET FEEDBACK OFF
---
----------------------------------------------------------------------------------------------------
---        ****************   Remove Sub-User Objects  *******************
---
---
-SET TERM ON
-PROMPT Remove Sub-User Objects
-SET TERM OFF
-SET DEFINE ON
-select '&exor_base'||'nm3'||'&terminator'||'install'||
-        '&terminator'||'remove_private_views.sql' run_file
-from dual
-/
-SET FEEDBACK ON
-start '&&run_file'
-SET FEEDBACK OFF
---
----------------------------------------------------------------------------------------------------
---        ****************   REGENERATE SYSTEM BUILT OBJECTS  *******************
---
---
-SET TERM ON
-PROMPT Regenerate system built objects with new context functionality
-SET TERM OFF
-SET DEFINE ON
-select '&exor_base'||'nm3'||'&terminator'||'install'||
-        '&terminator'||'regen.sql' run_file
-from dual
-/
-SET FEEDBACK ON
-start '&&run_file'
-SET FEEDBACK OFF
 --
 ---------------------------------------------------------------------------------------------------
 --                        **************** ADD POLICIES *******************
