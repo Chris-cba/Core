@@ -2,18 +2,18 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data2.sql-arc   2.28   Mar 25 2011 09:35:30   Mike.Alexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data2.sql-arc   2.29   Aug 03 2012 16:42:46   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3data2.sql  $
---       Date into PVCS   : $Date:   Mar 25 2011 09:35:30  $
---       Date fetched Out : $Modtime:   Mar 25 2011 09:31:42  $
---       Version          : $Revision:   2.28  $
+--       Date into PVCS   : $Date:   Aug 03 2012 16:42:46  $
+--       Date fetched Out : $Modtime:   Aug 03 2012 16:30:40  $
+--       Version          : $Revision:   2.29  $
 --       Table Owner      : NM3_METADATA
---       Generation Date  : 25-MAR-2011 09:31
+--       Generation Date  : 03-AUG-2012 16:30
 --
 --   Product metadata script
---   As at Release 4.4.0.0
+--   As at Release 4.6.0.0
 --
---   Copyright (c) exor corporation ltd, 2011
+--   Copyright (c) exor corporation ltd, 2012
 --
 --   TABLES PROCESSED
 --   ================
@@ -256,30 +256,6 @@ INSERT INTO DOC_GATEWAYS
        ,DGT_END_DATE
        )
 SELECT 
-        'NM_INV_ITEMS_ALL'
-       ,'Asset items all'
-       ,'IIT_NE_ID'
-       ,'IIT_INV_TYPE||''-''||DECODE(IIT_X_SECT,Null,Null,IIT_X_SECT||''-'')||IIT_PRIMARY_KEY'
-       ,'NM_INV_ITEMS'
-       ,''
-       ,''
-       ,null
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM DOC_GATEWAYS
-                   WHERE DGT_TABLE_NAME = 'NM_INV_ITEMS_ALL');
---
-INSERT INTO DOC_GATEWAYS
-       (DGT_TABLE_NAME
-       ,DGT_TABLE_DESCR
-       ,DGT_PK_COL_NAME
-       ,DGT_LOV_DESCR_LIST
-       ,DGT_LOV_FROM_LIST
-       ,DGT_LOV_JOIN_CONDITION
-       ,DGT_EXPAND_MODULE
-       ,DGT_START_DATE
-       ,DGT_END_DATE
-       )
-SELECT 
         'ROAD_SEGMENTS_ALL'
        ,'Road Segments'
        ,'RSE_HE_ID'
@@ -315,21 +291,10 @@ INSERT INTO DOC_GATE_SYNS
        ,DGS_TABLE_SYN
        )
 SELECT 
-        'INV_ITEMS_ALL'
-       ,'INV_ITEMS_ALL' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM DOC_GATE_SYNS
-                   WHERE DGS_DGT_TABLE_NAME = 'INV_ITEMS_ALL'
-                    AND  DGS_TABLE_SYN = 'INV_ITEMS_ALL');
---
-INSERT INTO DOC_GATE_SYNS
-       (DGS_DGT_TABLE_NAME
-       ,DGS_TABLE_SYN
-       )
-SELECT 
-        'NM_INV_ITEMS_ALL'
+        'NM_INV_ITEMS'
        ,'NM_ASSET_RESULTS' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM DOC_GATE_SYNS
-                   WHERE DGS_DGT_TABLE_NAME = 'NM_INV_ITEMS_ALL'
+                   WHERE DGS_DGT_TABLE_NAME = 'NM_INV_ITEMS'
                     AND  DGS_TABLE_SYN = 'NM_ASSET_RESULTS');
 --
 INSERT INTO DOC_GATE_SYNS
@@ -337,10 +302,10 @@ INSERT INTO DOC_GATE_SYNS
        ,DGS_TABLE_SYN
        )
 SELECT 
-        'NM_INV_ITEMS_ALL'
+        'NM_INV_ITEMS'
        ,'NM_INV_ITEMS_ALL' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM DOC_GATE_SYNS
-                   WHERE DGS_DGT_TABLE_NAME = 'NM_INV_ITEMS_ALL'
+                   WHERE DGS_DGT_TABLE_NAME = 'NM_INV_ITEMS'
                     AND  DGS_TABLE_SYN = 'NM_INV_ITEMS_ALL');
 --
 INSERT INTO DOC_GATE_SYNS
