@@ -8,11 +8,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4500_nm4600_ddl_upg.sql-arc   1.0   Jul 18 2012 13:50:36   Rob.Coupe  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4500_nm4600_ddl_upg.sql-arc   1.1   Aug 03 2012 15:39:44   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm4500_nm4600_ddl_upg.sql  $
---       Date into PVCS   : $Date:   Jul 18 2012 13:50:36  $
---       Date fetched Out : $Modtime:   Jul 18 2012 13:35:20  $
---       Version          : $Revision:   1.0  $
+--       Date into PVCS   : $Date:   Aug 03 2012 15:39:44  $
+--       Date fetched Out : $Modtime:   Aug 03 2012 15:30:30  $
+--       Version          : $Revision:   1.1  $
 --
 ------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2011
@@ -210,11 +210,11 @@ SET TERM OFF
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm4500_nm4600_ddl_upg.sql-arc   1.0   Jul 18 2012 13:50:36   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm4500_nm4600_ddl_upg.sql-arc   1.1   Aug 03 2012 15:39:44   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm4500_nm4600_ddl_upg.sql  $
---       Date into PVCS   : $Date:   Jul 18 2012 13:50:36  $
---       Date fetched Out : $Modtime:   Jul 18 2012 13:35:20  $
---       PVCS Version     : $Revision:   1.0  $
+--       Date into PVCS   : $Date:   Aug 03 2012 15:39:44  $
+--       Date fetched Out : $Modtime:   Aug 03 2012 15:30:30  $
+--       PVCS Version     : $Revision:   1.1  $
 --
 --------------------------------------------------------------------------------
 --
@@ -470,6 +470,78 @@ Delete From Doc_Gateways Where Dgt_Table_Name = 'NM_INV_ITEMS_ALL'
 /
 
 Commit
+/
+
+------------------------------------------------------------------
+
+
+------------------------------------------------------------------
+SET TERM ON
+PROMPT Navigator Asset Labels
+SET TERM OFF
+
+------------------------------------------------------------------
+-- 
+-- DEVELOPMENT COMMENTS (ROB COUPE)
+-- Added new table to support Navigato changes in its support for more generic specification of asset labels
+-- 
+------------------------------------------------------------------
+CREATE TABLE hig_navigator_asset_labels (
+hnal_inv_type      Varchar2(4)   NOT NULL,
+hnal_hier_label_1  VARCHAR2(500) NOT NULL,
+hnal_hier_label_2  VARCHAR2(500),
+hnal_hier_label_3  VARCHAR2(500),
+hnal_hier_label_4  VARCHAR2(500),
+hnal_hier_label_5  VARCHAR2(500),
+hnal_hier_label_6  VARCHAR2(500),
+hnal_hier_label_7  VARCHAR2(500),
+hnal_hier_label_8  VARCHAR2(500),
+hnal_hier_label_9  VARCHAR2(500),
+hnal_hier_label_10 VARCHAR2(500)
+)
+/
+
+
+COMMENT ON TABLE hig_navigator_asset_labels IS 'This table allows configuring flexible attributes as Navigator labels for inventory assets.'
+/
+COMMENT ON COLUMN hig_navigator_asset_labels.hnal_inv_type IS 'The asset type for which the navigator label can be configured.'
+/
+COMMENT ON COLUMN hig_navigator_asset_labels.hnal_HIER_LABEL_1 IS 'Column name whose value will be displayed in the Navigator hierarchy. This column can be database column from the inventory table 
+or database function.'
+/
+COMMENT ON COLUMN hig_navigator_asset_labels.hnal_HIER_LABEL_2 IS 'Column name whose value will be displayed in the Navigator hierarchy. This column can be database column from the inventory table 
+or database function.'
+/
+COMMENT ON COLUMN hig_navigator_asset_labels.hnal_HIER_LABEL_3 IS 'Column name whose value will be displayed in the Navigator hierarchy. This column can be database column from the inventory table 
+or database function.'
+/
+COMMENT ON COLUMN hig_navigator_asset_labels.hnal_HIER_LABEL_4 IS 'Column name whose value will be displayed in the Navigator hierarchy. This column can be database column from the inventory table 
+or database function.'
+/
+COMMENT ON COLUMN hig_navigator_asset_labels.hnal_HIER_LABEL_5 IS 'Column name whose value will be displayed in the Navigator hierarchy. This column can be database column from the inventory table 
+or database function.'
+/
+COMMENT ON COLUMN hig_navigator_asset_labels.hnal_HIER_LABEL_6 IS 'Column name whose value will be displayed in the Navigator hierarchy. This column can be database column from the inventory table 
+or database function.'
+/
+COMMENT ON COLUMN hig_navigator_asset_labels.hnal_HIER_LABEL_7 IS 'Column name whose value will be displayed in the Navigator hierarchy. This column can be database column from the inventory table 
+or database function.'
+/
+COMMENT ON COLUMN hig_navigator_asset_labels.hnal_HIER_LABEL_8 IS 'Column name whose value will be displayed in the Navigator hierarchy. This column can be database column from the inventory table 
+or database function.'
+/
+COMMENT ON COLUMN hig_navigator_asset_labels.hnal_HIER_LABEL_9 IS 'Column name whose value will be displayed in the Navigator hierarchy. This column can be database column from the inventory table 
+or database function.'
+/
+COMMENT ON COLUMN hig_navigator_asset_labels.hnal_HIER_LABEL_10 IS 'Column name whose value will be displayed in the Navigator hierarchy. This column can be database column from the inventory table 
+or database function.'
+/
+
+    
+ALTER TABLE hig_navigator_asset_labels  ADD (CONSTRAINT hnal_pk PRIMARY KEY (hnal_inv_type))
+/
+ 
+ALTER TABLE hig_navigator_asset_labels   ADD (CONSTRAINT hnal_nit_fk FOREIGN KEY (hnal_inv_type) REFERENCES nm_inv_types_all (nit_inv_type) ON DELETE CASCADE)
 /
 
 ------------------------------------------------------------------
