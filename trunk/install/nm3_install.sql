@@ -1,11 +1,11 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3_install.sql-arc   2.35   Sep 09 2011 16:22:14   Mike.Alexander  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3_install.sql-arc   2.36   Aug 03 2012 14:25:12   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3_install.sql  $
---       Date into PVCS   : $Date:   Sep 09 2011 16:22:14  $
---       Date fetched Out : $Modtime:   Sep 09 2011 16:19:20  $
---       PVCS Version     : $Revision:   2.35  $
+--       Date into PVCS   : $Date:   Aug 03 2012 14:25:12  $
+--       Date fetched Out : $Modtime:   Aug 03 2012 14:24:32  $
+--       PVCS Version     : $Revision:   2.36  $
 --
 --------------------------------------------------------------------------------
 --   Copyright (c) Exor Corporation Ltd, 2011
@@ -607,11 +607,11 @@ SET TERM ON
 Prompt Setting The Version Number...
 SET TERM OFF
 BEGIN
-      hig2.upgrade('HIG','nm3_install.sql','Installed','4.5.0.0');
-      hig2.upgrade('NET','nm3_install.sql','Installed','4.5.0.0');
-      hig2.upgrade('DOC','nm3_install.sql','Installed','4.5.0.0');
-      hig2.upgrade('AST','nm3_install.sql','Installed','4.5.0.0');
-      hig2.upgrade('WMP','nm3_install.sql','Installed','4.5.0.0');
+      hig2.upgrade('HIG','nm3_install.sql','Installed','4.6.0.0');
+      hig2.upgrade('NET','nm3_install.sql','Installed','4.6.0.0');
+      hig2.upgrade('DOC','nm3_install.sql','Installed','4.6.0.0');
+      hig2.upgrade('AST','nm3_install.sql','Installed','4.6.0.0');
+      hig2.upgrade('WMP','nm3_install.sql','Installed','4.6.0.0');
 END;
 /
 COMMIT;
