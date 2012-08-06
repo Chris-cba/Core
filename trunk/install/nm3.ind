@@ -1,14 +1,14 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.ind-arc   2.23   Jul 23 2012 16:01:10   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.ind-arc   2.24   Aug 06 2012 10:24:28   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3.ind  $
---       Date into PVCS   : $Date:   Jul 23 2012 16:01:10  $
---       Date fetched Out : $Modtime:   Jul 23 2012 16:00:44  $
---       PVCS Version     : $Revision:   2.23  $
+--       Date into PVCS   : $Date:   Aug 06 2012 10:24:28  $
+--       Date fetched Out : $Modtime:   Aug 06 2012 10:23:40  $
+--       PVCS Version     : $Revision:   2.24  $
 --
 --------------------------------------------------------------------------------
 --
--- Generated for Oracle 10g on Mon Jul 23  15:44:00 2012 by Server Generator 10.1.2.9.28
+-- Generated for Oracle 10g on Mon Aug 06  10:12:47 2012 by Server Generator 10.1.2.9.28
   
 
 PROMPT Creating Index 'DOC_FK_DLC_IND'
@@ -122,11 +122,6 @@ CREATE UNIQUE INDEX DEC_IND1 ON DOC_ENQUIRY_CONTACTS
 PROMPT Creating Index 'DGS_FK_DGT_IND'
 CREATE INDEX DGS_FK_DGT_IND ON DOC_GATE_SYNS
  (DGS_DGT_TABLE_NAME)
-/
-
-PROMPT Creating Index 'DGS_IND1'
-CREATE INDEX DGS_IND1 ON DOC_GATE_SYNS
- (DGS_TABLE_SYN)
 /
 
 PROMPT Creating Index 'DGS_UK1'
