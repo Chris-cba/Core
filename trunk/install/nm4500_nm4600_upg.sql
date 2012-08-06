@@ -3,11 +3,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4500_nm4600_upg.sql-arc   1.1   Aug 03 2012 16:02:34   Rob.Coupe  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4500_nm4600_upg.sql-arc   1.2   Aug 06 2012 14:24:42   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm4500_nm4600_upg.sql  $
---       Date into PVCS   : $Date:   Aug 03 2012 16:02:34  $
---       Date fetched Out : $Modtime:   Aug 03 2012 16:01:58  $
---       Version          : $Revision:   1.1  $
+--       Date into PVCS   : $Date:   Aug 06 2012 14:24:42  $
+--       Date fetched Out : $Modtime:   Aug 06 2012 14:24:18  $
+--       Version          : $Revision:   1.2  $
 --
 --   Product upgrade script
 --
@@ -220,22 +220,6 @@ SET TERM OFF
 SET DEFINE ON
 select '&exor_base'||'nm3'||'&terminator'||'install'||
         '&terminator'||'mav_grant.sql' run_file
-from dual
-/
-SET FEEDBACK ON
-start '&&run_file'
-SET FEEDBACK OFF
---
----------------------------------------------------------------------------------------------------
---                ****************   PRE_UPG_META_SYNC  *******************
---
---
-SET TERM ON
-PROMPT resynchronize asset metamodel related objects
-SET TERM OFF
-SET DEFINE ON
-select '&exor_base'||'nm3'||'&terminator'||'install'||
-        '&terminator'||'pre_upgrade_meta_sync.sql' run_file
 from dual
 /
 SET FEEDBACK ON
