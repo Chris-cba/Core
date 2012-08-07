@@ -8,11 +8,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4500_nm4600_ddl_upg.sql-arc   1.1   Aug 03 2012 15:39:44   Rob.Coupe  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4500_nm4600_ddl_upg.sql-arc   1.2   Aug 07 2012 12:55:46   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm4500_nm4600_ddl_upg.sql  $
---       Date into PVCS   : $Date:   Aug 03 2012 15:39:44  $
---       Date fetched Out : $Modtime:   Aug 03 2012 15:30:30  $
---       Version          : $Revision:   1.1  $
+--       Date into PVCS   : $Date:   Aug 07 2012 12:55:46  $
+--       Date fetched Out : $Modtime:   Aug 07 2012 12:45:20  $
+--       Version          : $Revision:   1.2  $
 --
 ------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2011
@@ -210,11 +210,11 @@ SET TERM OFF
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm4500_nm4600_ddl_upg.sql-arc   1.1   Aug 03 2012 15:39:44   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm4500_nm4600_ddl_upg.sql-arc   1.2   Aug 07 2012 12:55:46   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm4500_nm4600_ddl_upg.sql  $
---       Date into PVCS   : $Date:   Aug 03 2012 15:39:44  $
---       Date fetched Out : $Modtime:   Aug 03 2012 15:30:30  $
---       PVCS Version     : $Revision:   1.1  $
+--       Date into PVCS   : $Date:   Aug 07 2012 12:55:46  $
+--       Date fetched Out : $Modtime:   Aug 07 2012 12:45:20  $
+--       PVCS Version     : $Revision:   1.2  $
 --
 --------------------------------------------------------------------------------
 --
@@ -252,13 +252,23 @@ Declare
   Index_Not_Exists Exception;
   Pragma Exception_Init (Index_Not_Exists,-01418);
 Begin
-  Execute Immediate 'Drop Index Mv_Highlight_Ind';
+  Execute Immediate 'Drop Index Mv_Ind1';
 Exception
   When  Index_Not_Exists Then
     Null;   
 End;
 /
 
+Declare
+  Index_Not_Exists Exception;
+  Pragma Exception_Init (Index_Not_Exists,-01418);
+Begin
+  Execute Immediate 'Drop Index Mv_Highlight_Ind';
+Exception
+  When  Index_Not_Exists Then
+    Null;   
+End;
+/
 
 Create Index Mv_Highlight_Ind On Mv_Highlight
 (
@@ -318,14 +328,22 @@ SET TERM OFF
 -- Added new Table Nm_Admin_Extents
 -- 
 ------------------------------------------------------------------
-Create Table Nm_Admin_Extents
-(
-Nae_Admin_Unit    Number(9),        
-Nae_Extent        Sdo_Geometry,
-Constraint Nae_Pk Primary Key (Nae_Admin_Unit),
-Constraint Nae_Nau_Fk Foreign Key (Nae_Admin_Unit) References Nm_Admin_Units_All(Nau_Admin_Unit) On Delete Cascade
-)
-Organization Index
+Declare
+Ex_Exists Exception;
+Pragma Exception_Init (Ex_Exists, -00955);
+Begin
+Execute Immediate 
+   'Create Table Nm_Admin_Extents '
+   ||'  ( '
+   ||' Nae_Admin_Unit    Number(9), '        
+   ||' Nae_Extent        Sdo_Geometry, '
+   ||'Constraint Nae_Pk Primary Key (Nae_Admin_Unit), '
+   ||'Constraint Nae_Nau_Fk Foreign Key (Nae_Admin_Unit) References Nm_Admin_Units_All(Nau_Admin_Unit) On Delete Cascade '
+   ||') '
+   ||'Organization Index ';
+Exception 
+  When Ex_Exists Then Null;
+End;  
 /
 
 Comment On Table Nm_Admin_Extents Is 'Used to hold the default extent per admin unit, for use with mapviewer.'
@@ -351,7 +369,7 @@ SET TERM OFF
 -- Added extra constraints on to Doc gateway tables and tidied up some data.
 -- 
 ------------------------------------------------------------------
---Gateway Synonyms
+Prompt Doc Gateways DDL enchancement - Gateway Synonyms
 Alter Table Doc_Gate_Syns  Disable Constraint Dgs_Fk_Dgt
 /
 
@@ -360,21 +378,80 @@ Set     Dgs_Dgt_Table_Name  =   Upper(Dgs_Dgt_Table_Name),
         Dgs_Table_Syn       =   Upper(Dgs_Table_Syn) 
 /
 
-Alter Table Doc_Gate_Syns
-Add Constraint Dgs_Table_Name_Upper Check (Dgs_Dgt_Table_Name = Upper(Dgs_Dgt_Table_Name))
+Declare
+Ex_Exists Exception;
+Pragma Exception_Init (Ex_Exists, -02264);
+Begin
+Execute Immediate 
+  'Alter Table Doc_Gate_Syns '
+  ||'Add Constraint Dgs_Table_Name_Upper Check (Dgs_Dgt_Table_Name = Upper(Dgs_Dgt_Table_Name)) ';
+Exception 
+  When Ex_Exists Then Null;
+End;    
 /
 
-Alter Table Doc_Gate_Syns
-Add Constraint Dgs_Table_Syn_Upper Check (Dgs_Table_Syn = Upper(Dgs_Table_Syn))
+Declare
+Ex_Exists Exception;
+Pragma Exception_Init (Ex_Exists, -02264);
+Begin
+Execute Immediate 
+  'Alter Table Doc_Gate_Syns '
+  ||'Add Constraint Dgs_Table_Syn_Upper Check (Dgs_Table_Syn = Upper(Dgs_Table_Syn)) ';
+Exception 
+  When Ex_Exists Then Null;
+End;    
 /
 
-Drop Index Dgs_Ind1
+
+
+Declare
+  Ex_Not_Exists Exception;
+  Pragma Exception_Init (Ex_Not_Exists,-01418);
+Begin
+  Execute Immediate 'Drop Index Dgs_Ind1';
+Exception
+  When Ex_Not_Exists then Null;
+End;
 /
 
-Drop Index Dgs_Fk_Dgt_Ind
+Declare
+  Ex_Not_Exists Exception;
+  Pragma Exception_Init (Ex_Not_Exists,-01418);
+Begin
+  Execute Immediate 'Drop Index Dgs_Fk_Dgt_Ind';
+Exception
+  When Ex_Not_Exists then Null;
+End;
+
+Prompt Clear out duplicate DOC_GATE_SYNs
+
+Declare
+  Cursor Dupl_DGS is
+    Select Dgs_Table_Syn, irowid, count(*) from
+    ( Select Dgs_Table_Syn, first_value(rowid) over (partition by Dgs_Table_Syn) Irowid
+      from Doc_Gate_Syns )
+  group by Dgs_Table_Syn, Irowid
+  having count(*) > 1;
+begin
+  for irec in Dupl_DGS loop
+    Delete from Doc_Gate_Syns
+    where Dgs_Table_Syn = irec.Dgs_Table_Syn
+    and rowid != irec.Irowid;
+  end loop;
+end;
 /
 
-Create Unique Index Dgs_UK1 On Doc_Gate_Syns(Dgs_Table_Syn)    
+Prompt Doc Gateways DDL enchancement cont.
+
+Declare
+Ex_Exists Exception;
+Pragma Exception_Init (Ex_Exists, -00955);
+Begin
+Execute Immediate 
+   'Create Unique Index Dgs_UK1 On Doc_Gate_Syns(Dgs_Table_Syn)';
+Exception 
+  When Ex_Exists Then Null;
+End;  
 /
 
 --Gateway Templates 
@@ -385,9 +462,18 @@ Update  Doc_Template_Gateways
 Set     Dtg_Table_Name  =  Upper(Dtg_Table_Name)
 /
 
-Alter Table Doc_Template_Gateways
-Add Constraint Dtg_Table_Name_Upper Check (Dtg_Table_Name = Upper(Dtg_Table_Name))
+Declare
+Ex_Exists Exception;
+Pragma Exception_Init (Ex_Exists, -02264);
+Begin
+Execute Immediate 
+  'Alter Table Doc_Template_Gateways '
+  ||'Add Constraint  Dtg_Table_Name_Upper Check (Dtg_Table_Name = Upper(Dtg_Table_Name)) ';
+Exception 
+  When Ex_Exists Then Null;
+End;    
 /
+
 
 --Doc Assocs
 Alter Table Doc_Assocs Disable Constraint Das_Fk_Dgt
@@ -400,8 +486,16 @@ Update  Doc_Assocs
 Set     Das_Table_Name = Upper(Das_Table_Name)
 /
 
-Alter Table Doc_Assocs
-Add Constraint Das_Table_Name_Upper Check (Das_Table_Name = Upper(Das_Table_Name))
+Declare
+Ex_Exists Exception;
+Pragma Exception_Init (Ex_Exists, -02264);
+Begin
+Execute Immediate 
+  'Alter Table Doc_Assocs '
+  ||'Add Constraint Das_Table_Name_Upper Check (Das_Table_Name = Upper(Das_Table_Name)) ';
+Exception 
+  When Ex_Exists Then Null;
+End;    
 /
  
 Update  Doc_Assocs
@@ -417,8 +511,16 @@ Update Doc_Gateways
 Set Dgt_Table_Name = Upper(Dgt_Table_Name)
 /
 
-Alter Table Doc_Gateways
-Add Constraint Dgt_Table_Name_Upper Check (Dgt_Table_Name = Upper(Dgt_Table_Name))
+Declare
+Ex_Exists Exception;
+Pragma Exception_Init (Ex_Exists, -02264);
+Begin
+Execute Immediate 
+  'Alter Table Doc_Gateways '
+  ||'Add Constraint Dgt_Table_Name_Upper Check (Dgt_Table_Name = Upper(Dgt_Table_Name)) ';
+Exception 
+  When Ex_Exists Then Null;
+End;    
 /
 
 Alter Table Doc_Gate_Syns  Enable Constraint Dgs_Fk_Dgt
@@ -459,8 +561,16 @@ From    Doc_Gate_Syns   dgs
 Where   dgs.Dgs_Dgt_Table_Name = dgs.Dgs_Table_Syn;
 /
 
-Alter Table Doc_Gate_Syns
-Add Constraint Dgs_Table_Name_Syn_Diff Check (Dgs_Dgt_Table_Name <> Dgs_Table_Syn)
+Declare
+Ex_Exists Exception;
+Pragma Exception_Init (Ex_Exists, -02264);
+Begin
+Execute Immediate 
+  'Alter Table Doc_Gate_Syns '
+  ||'Add Constraint Dgs_Table_Name_Syn_Diff Check (Dgs_Dgt_Table_Name <> Dgs_Table_Syn) ';
+Exception 
+  When Ex_Exists Then Null;
+End;    
 /
 
 Delete From Doc_Template_Gateways Where Dtg_Table_Name =  'NM_INV_ITEMS_ALL'
