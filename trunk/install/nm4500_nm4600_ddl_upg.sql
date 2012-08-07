@@ -8,11 +8,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4500_nm4600_ddl_upg.sql-arc   1.2   Aug 07 2012 12:55:46   Rob.Coupe  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4500_nm4600_ddl_upg.sql-arc   1.3   Aug 07 2012 13:33:46   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm4500_nm4600_ddl_upg.sql  $
---       Date into PVCS   : $Date:   Aug 07 2012 12:55:46  $
---       Date fetched Out : $Modtime:   Aug 07 2012 12:45:20  $
---       Version          : $Revision:   1.2  $
+--       Date into PVCS   : $Date:   Aug 07 2012 13:33:46  $
+--       Date fetched Out : $Modtime:   Aug 07 2012 13:23:30  $
+--       Version          : $Revision:   1.3  $
 --
 ------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2011
@@ -210,11 +210,11 @@ SET TERM OFF
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm4500_nm4600_ddl_upg.sql-arc   1.2   Aug 07 2012 12:55:46   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm4500_nm4600_ddl_upg.sql-arc   1.3   Aug 07 2012 13:33:46   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm4500_nm4600_ddl_upg.sql  $
---       Date into PVCS   : $Date:   Aug 07 2012 12:55:46  $
---       Date fetched Out : $Modtime:   Aug 07 2012 12:45:20  $
---       PVCS Version     : $Revision:   1.2  $
+--       Date into PVCS   : $Date:   Aug 07 2012 13:33:46  $
+--       Date fetched Out : $Modtime:   Aug 07 2012 13:23:30  $
+--       PVCS Version     : $Revision:   1.3  $
 --
 --------------------------------------------------------------------------------
 --
@@ -369,7 +369,6 @@ SET TERM OFF
 -- Added extra constraints on to Doc gateway tables and tidied up some data.
 -- 
 ------------------------------------------------------------------
-Prompt Doc Gateways DDL enchancement - Gateway Synonyms
 Alter Table Doc_Gate_Syns  Disable Constraint Dgs_Fk_Dgt
 /
 
@@ -402,8 +401,6 @@ Exception
 End;    
 /
 
-
-
 Declare
   Ex_Not_Exists Exception;
   Pragma Exception_Init (Ex_Not_Exists,-01418);
@@ -422,8 +419,9 @@ Begin
 Exception
   When Ex_Not_Exists then Null;
 End;
+/
 
-Prompt Clear out duplicate DOC_GATE_SYNs
+Prompt Doc Gate Syns - remove possible duplicates
 
 Declare
   Cursor Dupl_DGS is
@@ -441,7 +439,7 @@ begin
 end;
 /
 
-Prompt Doc Gateways DDL enchancement cont.
+Prompt Doc Gateways DDL enchancement - unique index and more constraints
 
 Declare
 Ex_Exists Exception;
@@ -474,6 +472,7 @@ Exception
 End;    
 /
 
+Prompt Doc Assocs
 
 --Doc Assocs
 Alter Table Doc_Assocs Disable Constraint Das_Fk_Dgt
