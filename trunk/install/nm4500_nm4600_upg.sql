@@ -3,11 +3,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4500_nm4600_upg.sql-arc   1.4   Aug 07 2012 10:50:56   Rob.Coupe  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4500_nm4600_upg.sql-arc   1.5   Aug 07 2012 11:18:24   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm4500_nm4600_upg.sql  $
---       Date into PVCS   : $Date:   Aug 07 2012 10:50:56  $
---       Date fetched Out : $Modtime:   Aug 07 2012 10:50:08  $
---       Version          : $Revision:   1.4  $
+--       Date into PVCS   : $Date:   Aug 07 2012 11:18:24  $
+--       Date fetched Out : $Modtime:   Aug 07 2012 11:18:00  $
+--       Version          : $Revision:   1.5  $
 --
 --   Product upgrade script
 --
@@ -321,22 +321,6 @@ SET TERM ON
 Prompt Creating ACLs...
 SET TERM OFF
 EXECUTE nm3acl.create_standard_acls;
---
----------------------------------------------------------------------------------------------------
---                ****************   POST_UPG_META_SYNC  *******************
---
---
-SET TERM ON
-PROMPT resynchronize asset metamodel related objects
-SET TERM OFF
-SET DEFINE ON
-select '&exor_base'||'nm3'||'&terminator'||'install'||
-        '&terminator'||'pre_upgrade_meta_sync.sql' run_file
-from dual
-/
-SET FEEDBACK ON
-start '&&run_file'
-SET FEEDBACK OFF
 --
 ---------------------------------------------------------------------------------------------------
 --                        ****************   VERSION NUMBER   *******************
