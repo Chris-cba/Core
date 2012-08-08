@@ -3,11 +3,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4500_nm4600_upg.sql-arc   1.5   Aug 07 2012 11:18:24   Rob.Coupe  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4500_nm4600_upg.sql-arc   1.6   Aug 08 2012 11:30:54   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm4500_nm4600_upg.sql  $
---       Date into PVCS   : $Date:   Aug 07 2012 11:18:24  $
---       Date fetched Out : $Modtime:   Aug 07 2012 11:18:00  $
---       Version          : $Revision:   1.5  $
+--       Date into PVCS   : $Date:   Aug 08 2012 11:30:54  $
+--       Date fetched Out : $Modtime:   Aug 08 2012 11:30:30  $
+--       Version          : $Revision:   1.6  $
 --
 --   Product upgrade script
 --
@@ -321,6 +321,38 @@ SET TERM ON
 Prompt Creating ACLs...
 SET TERM OFF
 EXECUTE nm3acl.create_standard_acls;
+--
+---------------------------------------------------------------------------------------------------
+--                  ****************   gtype update  *******************
+SET FEEDBACK OFF
+SET TERM ON
+PROMPT Converting Multi-part sdo_gtypes...
+SET TERM OFF
+SET DEFINE ON
+select '&exor_base'||'nm3'||'&terminator'||'install'||
+        '&terminator'||'gtype_3306_update.sql' run_file
+from dual
+/
+SET FEEDBACK ON
+start '&&run_file'
+SET FEEDBACK OFF
+--
+---------------------------------------------------------------------------------------------------
+--                  ****************   doc-issued century repair  *******************
+SET FEEDBACK OFF
+SET TERM ON
+PROMPT Converting Multi-part sdo_gtypes...
+SET TERM OFF
+SET DEFINE ON
+select '&exor_base'||'nm3'||'&terminator'||'install'||
+        '&terminator'||'doc_issued_century_repair.sql' run_file
+from dual
+/
+SET FEEDBACK ON
+start '&&run_file'
+SET FEEDBACK OFF
+
+
 --
 ---------------------------------------------------------------------------------------------------
 --                        ****************   VERSION NUMBER   *******************
