@@ -3,11 +3,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4500_nm4600_upg.sql-arc   1.6   Aug 08 2012 11:30:54   Rob.Coupe  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4500_nm4600_upg.sql-arc   1.7   Aug 08 2012 11:53:24   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm4500_nm4600_upg.sql  $
---       Date into PVCS   : $Date:   Aug 08 2012 11:30:54  $
---       Date fetched Out : $Modtime:   Aug 08 2012 11:30:30  $
---       Version          : $Revision:   1.6  $
+--       Date into PVCS   : $Date:   Aug 08 2012 11:53:24  $
+--       Date fetched Out : $Modtime:   Aug 08 2012 11:52:50  $
+--       Version          : $Revision:   1.7  $
 --
 --   Product upgrade script
 --
@@ -341,7 +341,7 @@ SET FEEDBACK OFF
 --                  ****************   doc-issued century repair  *******************
 SET FEEDBACK OFF
 SET TERM ON
-PROMPT Converting Multi-part sdo_gtypes...
+PROMPT Doc-issued date century repair...
 SET TERM OFF
 SET DEFINE ON
 select '&exor_base'||'nm3'||'&terminator'||'install'||
