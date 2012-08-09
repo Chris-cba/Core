@@ -8,11 +8,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4500_nm4600_metadata_upg.sql-arc   1.1   Aug 08 2012 11:37:56   Rob.Coupe  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4500_nm4600_metadata_upg.sql-arc   1.2   Aug 09 2012 09:37:20   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm4500_nm4600_metadata_upg.sql  $
---       Date into PVCS   : $Date:   Aug 08 2012 11:37:56  $
---       Date fetched Out : $Modtime:   Aug 08 2012 11:28:34  $
---       Version          : $Revision:   1.1  $
+--       Date into PVCS   : $Date:   Aug 09 2012 09:37:20  $
+--       Date fetched Out : $Modtime:   Aug 09 2012 09:26:08  $
+--       Version          : $Revision:   1.2  $
 --
 ------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2011
@@ -134,6 +134,8 @@ Declare
   l_Job_Name              Hig_Processes.Hp_Job_Name%Type;
   l_Scheduled_Start_Date  Date;
 Begin
+  dbms_scheduler.set_scheduler_attribute('SCHEDULER_DISABLED', 'FALSE');
+--
   Hig_Process_Api.Create_And_Schedule_Process (
                                               pi_Process_Type_Id           =>   -3,
                                               pi_Initiators_Ref            =>   'COREHOUSE',
@@ -143,6 +145,8 @@ Begin
                                               po_Job_Name                  =>   l_Job_Name,
                                               po_Scheduled_Start_Date      =>   l_Scheduled_Start_Date
                                               );
+  dbms_scheduler.set_scheduler_attribute('SCHEDULER_DISABLED', 'TRUE');
+--
    Commit;
   Dbms_Output.Put_Line('Created Core Houseleeping Process');                                              
   Dbms_Output.Put_Line('Process_Id:'            || To_Char(l_Process_Id) );
