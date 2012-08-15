@@ -2,18 +2,18 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data3.sql-arc   2.28   Nov 09 2011 14:29:38   Mike.Alexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data3.sql-arc   2.29   Aug 15 2012 09:53:02   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3data3.sql  $
---       Date into PVCS   : $Date:   Nov 09 2011 14:29:38  $
---       Date fetched Out : $Modtime:   Nov 09 2011 14:25:06  $
---       Version          : $Revision:   2.28  $
+--       Date into PVCS   : $Date:   Aug 15 2012 09:53:02  $
+--       Date fetched Out : $Modtime:   Aug 15 2012 09:52:26  $
+--       Version          : $Revision:   2.29  $
 --       Table Owner      : NM3_METADATA
---       Generation Date  : 09-NOV-2011 14:25
+--       Generation Date  : 15-AUG-2012 09:26
 --
 --   Product metadata script
---   As at Release 4.4.0.0
+--   As at Release 4.6.0.0
 --
---   Copyright (c) exor corporation ltd, 2011
+--   Copyright (c) exor corporation ltd, 2012
 --
 --   TABLES PROCESSED
 --   ================
@@ -4747,6 +4747,38 @@ INSERT INTO HIG_PROCESS_TYPES
        ,HPT_AREA_TYPE
        )
 SELECT 
+        -3
+       ,'Core Housekeeping'
+       ,'A general collection of Core housekeeping routines.'
+       ,'Hig_Router_Params_Utils.Clear_Down_Old_Params;'
+       ,''
+       ,''
+       ,''
+       ,null
+       ,'N'
+       ,'Y'
+       ,'N'
+       ,null
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_PROCESS_TYPES
+                   WHERE HPT_PROCESS_TYPE_ID = -3);
+--
+INSERT INTO HIG_PROCESS_TYPES
+       (HPT_PROCESS_TYPE_ID
+       ,HPT_NAME
+       ,HPT_DESCR
+       ,HPT_WHAT_TO_CALL
+       ,HPT_INITIATION_MODULE
+       ,HPT_INTERNAL_MODULE
+       ,HPT_INTERNAL_MODULE_PARAM
+       ,HPT_PROCESS_LIMIT
+       ,HPT_RESTARTABLE
+       ,HPT_SEE_IN_HIG2510
+       ,HPT_POLLING_ENABLED
+       ,HPT_POLLING_FTP_TYPE_ID
+       ,HPT_AREA_TYPE
+       )
+SELECT 
         -2
        ,'Load Document Bundles'
        ,'Unpacks document bundle zip file(s) '||CHR(10)||'Reads the driving file(s)'||CHR(10)||'Creates document and document association records'||CHR(10)||'Moves the document files to the correct location'
@@ -4813,6 +4845,17 @@ SET TERM ON
 PROMPT hig_process_type_roles
 SET TERM OFF
 
+INSERT INTO HIG_PROCESS_TYPE_ROLES
+       (HPTR_PROCESS_TYPE_ID
+       ,HPTR_ROLE
+       )
+SELECT 
+        -3
+       ,'NET_ADMIN' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_PROCESS_TYPE_ROLES
+                   WHERE HPTR_PROCESS_TYPE_ID = -3
+                    AND  HPTR_ROLE = 'NET_ADMIN');
+--
 INSERT INTO HIG_PROCESS_TYPE_ROLES
        (HPTR_PROCESS_TYPE_ID
        ,HPTR_ROLE
@@ -5052,6 +5095,19 @@ SET TERM ON
 PROMPT hig_process_type_frequencies
 SET TERM OFF
 
+INSERT INTO HIG_PROCESS_TYPE_FREQUENCIES
+       (HPFR_PROCESS_TYPE_ID
+       ,HPFR_FREQUENCY_ID
+       ,HPFR_SEQ
+       )
+SELECT 
+        -3
+       ,-11
+       ,1 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_PROCESS_TYPE_FREQUENCIES
+                   WHERE HPFR_PROCESS_TYPE_ID = -3
+                    AND  HPFR_FREQUENCY_ID = -11);
+--
 INSERT INTO HIG_PROCESS_TYPE_FREQUENCIES
        (HPFR_PROCESS_TYPE_ID
        ,HPFR_FREQUENCY_ID
