@@ -1,11 +1,11 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3_install.sql-arc   2.36   Aug 03 2012 14:25:12   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3_install.sql-arc   2.37   Aug 15 2012 10:14:04   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3_install.sql  $
---       Date into PVCS   : $Date:   Aug 03 2012 14:25:12  $
---       Date fetched Out : $Modtime:   Aug 03 2012 14:24:32  $
---       PVCS Version     : $Revision:   2.36  $
+--       Date into PVCS   : $Date:   Aug 15 2012 10:14:04  $
+--       Date fetched Out : $Modtime:   Aug 15 2012 10:13:22  $
+--       PVCS Version     : $Revision:   2.37  $
 --
 --------------------------------------------------------------------------------
 --   Copyright (c) Exor Corporation Ltd, 2011
@@ -600,6 +600,44 @@ Prompt make sure .NEXTVAL on sequences is not less than values in associated tab
 SET TERM OFF
 SET DEFINE ON
 EXEC nm3ddl.rebuild_all_sequences;
+--
+---------------------------------------------------------------------------------------------------
+--                     ****************   Create Process for housekeeping  *******************
+SET TERM ON
+PROMPT New process to clean up forms parameter table everyday
+SET TERM OFF
+
+------------------------------------------------------------------
+-- 
+-- DEVELOPMENT COMMENTS (STEVEN COOPER)
+-- New process to clean up forms parameter table everyday
+-- 
+------------------------------------------------------------------
+Declare
+  l_Process_Id            Hig_Processes.Hp_Process_Id%Type;
+  l_Job_Name              Hig_Processes.Hp_Job_Name%Type;
+  l_Scheduled_Start_Date  Date;
+Begin
+  dbms_scheduler.set_scheduler_attribute('SCHEDULER_DISABLED', 'FALSE');
+--
+  Hig_Process_Api.Create_And_Schedule_Process (
+                                              pi_Process_Type_Id           =>   -3,
+                                              pi_Initiators_Ref            =>   'COREHOUSE',
+                                              pi_Start_Date                =>   Sysdate,
+                                              pi_Frequency_Id              =>   -11,
+                                              po_Process_Id                =>   l_Process_Id,
+                                              po_Job_Name                  =>   l_Job_Name,
+                                              po_Scheduled_Start_Date      =>   l_Scheduled_Start_Date
+                                              );
+  dbms_scheduler.set_scheduler_attribute('SCHEDULER_DISABLED', 'TRUE');
+--
+   Commit;
+  Dbms_Output.Put_Line('Created Core Houseleeping Process');                                              
+  Dbms_Output.Put_Line('Process_Id:'            || To_Char(l_Process_Id) );
+  Dbms_Output.Put_Line('Job_Name:'              || l_Job_Name);
+  Dbms_Output.Put_Line('Scheduled_Start_Date:'  || To_Char(l_Scheduled_Start_Date,'dd-mm-yyyy hh24:mi.ss'));  
+End;
+/
 --
 ---------------------------------------------------------------------------------------------------
 --                        ****************   VERSION NUMBER   *******************
