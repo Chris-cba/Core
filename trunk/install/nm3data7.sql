@@ -2,18 +2,18 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data7.sql-arc   2.24   Oct 12 2011 15:39:44   Mike.Alexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data7.sql-arc   2.25   Aug 15 2012 10:01:54   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3data7.sql  $
---       Date into PVCS   : $Date:   Oct 12 2011 15:39:44  $
---       Date fetched Out : $Modtime:   Oct 12 2011 15:36:12  $
---       Version          : $Revision:   2.24  $
+--       Date into PVCS   : $Date:   Aug 15 2012 10:01:54  $
+--       Date fetched Out : $Modtime:   Aug 15 2012 10:01:36  $
+--       Version          : $Revision:   2.25  $
 --       Table Owner      : NM3_METADATA
---       Generation Date  : 12-OCT-2011 15:36
+--       Generation Date  : 15-AUG-2012 09:26
 --
 --   Product metadata script
---   As at Release 4.4.0.0
+--   As at Release 4.6.0.0
 --
---   Copyright (c) exor corporation ltd, 2011
+--   Copyright (c) exor corporation ltd, 2012
 --
 --   TABLES PROCESSED
 --   ================
@@ -6431,6 +6431,24 @@ SELECT
        ,556
        ,null
        ,'Unable to execute this process'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 557;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,557
+       ,null
+       ,'Asset is end dated'
        ,'' FROM DUAL;
 --
 DELETE FROM NM_ERRORS
@@ -14837,6 +14855,42 @@ SELECT
        ,558
        ,null
        ,'The user has no quota on their default tablespace.'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'NET'
+  AND  NER_ID = 559;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'NET'
+       ,559
+       ,null
+       ,'User Successfully Unlocked'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'NET'
+  AND  NER_ID = 560;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'NET'
+       ,560
+       ,null
+       ,'Invalid Username'
        ,'' FROM DUAL;
 --
 --
