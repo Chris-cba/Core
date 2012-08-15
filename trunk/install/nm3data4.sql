@@ -2,18 +2,18 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data4.sql-arc   2.15   Mar 25 2011 09:35:32   Mike.Alexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data4.sql-arc   2.16   Aug 15 2012 09:55:18   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3data4.sql  $
---       Date into PVCS   : $Date:   Mar 25 2011 09:35:32  $
---       Date fetched Out : $Modtime:   Mar 25 2011 09:31:46  $
---       Version          : $Revision:   2.15  $
+--       Date into PVCS   : $Date:   Aug 15 2012 09:55:18  $
+--       Date fetched Out : $Modtime:   Aug 15 2012 09:54:58  $
+--       Version          : $Revision:   2.16  $
 --       Table Owner      : NM3_METADATA
---       Generation Date  : 25-MAR-2011 09:31
+--       Generation Date  : 15-AUG-2012 09:26
 --
 --   Product metadata script
---   As at Release 4.4.0.0
+--   As at Release 4.6.0.0
 --
---   Copyright (c) exor corporation ltd, 2011
+--   Copyright (c) exor corporation ltd, 2012
 --
 --   TABLES PROCESSED
 --   ================
@@ -1798,6 +1798,72 @@ SET TERM ON
 PROMPT hig_navigator
 SET TERM OFF
 
+INSERT INTO HIG_NAVIGATOR
+       (HNV_HIERARCHY_TYPE
+       ,HNV_PARENT_TABLE
+       ,HNV_PARENT_COLUMN
+       ,HNV_CHILD_TABLE
+       ,HNV_CHILD_COLUMN
+       ,HNV_HIERARCHY_LEVEL
+       ,HNV_HIERARCHY_LABEL
+       ,HNV_PARENT_ID
+       ,HNV_CHILD_ID
+       ,HNV_PARENT_ALIAS
+       ,HNV_CHILD_ALIAS
+       ,HNV_ICON_NAME
+       ,HNV_ADDITIONAL_COND
+       ,HNV_PRIMARY_HIERARCHY
+       ,HNV_HIER_LABEL_1
+       ,HNV_HIER_LABEL_2
+       ,HNV_HIER_LABEL_3
+       ,HNV_HIER_LABEL_4
+       ,HNV_HIER_LABEL_5
+       ,HNV_HIER_LABEL_6
+       ,HNV_HIER_LABEL_7
+       ,HNV_HIER_LABEL_8
+       ,HNV_HIER_LABEL_9
+       ,HNV_HIER_LABEL_10
+       ,HNV_HIERARCHY_SEQ
+       ,HNV_DATE_CREATED
+       ,HNV_CREATED_BY
+       ,HNV_DATE_MODIFIED
+       ,HNV_MODIFIED_BY
+       ,HNV_HPR_PRODUCT
+       )
+SELECT 
+        'Assets'
+       ,''
+       ,''
+       ,'nm_inv_items_all'
+       ,'iit_ne_id'
+       ,1
+       ,'Asset'
+       ,''
+       ,'nm_inv_items_all.iit_ne_id'
+       ,''
+       ,'-AST1'
+       ,'asset'
+       ,''
+       ,'Y'
+       ,'iit_inv_type'
+       ,'hig_nav.concate_label(hig_nav.get_asset_type_descr(iit_inv_type))'
+       ,'hig_nav.concate_label(iit_ne_id)'
+       ,'hig_nav.concate_label(iit_primary_key)'
+       ,'hig_nav.concate_label(hig_nav.get_admin_unit_name(iit_admin_unit))'
+       ,'hig_nav.concate_label(iit_start_date)'
+       ,'hig_nav.concate_label(iit_end_date)'
+       ,''
+       ,''
+       ,''
+       ,null
+       ,to_date('20120518104105','YYYYMMDDHH24MISS')
+       ,'HIGHWAYS'
+       ,to_date('20120518104105','YYYYMMDDHH24MISS')
+       ,'HIGHWAYS'
+       ,'AST' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_NAVIGATOR
+                   WHERE HNV_CHILD_ALIAS = '-AST1');
+--
 --
 --
 ----------------------------------------------------------------------------------------
