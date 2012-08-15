@@ -8,11 +8,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4500_nm4600_ddl_upg.sql-arc   1.3   Aug 07 2012 13:33:46   Rob.Coupe  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4500_nm4600_ddl_upg.sql-arc   1.4   Aug 15 2012 08:27:18   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm4500_nm4600_ddl_upg.sql  $
---       Date into PVCS   : $Date:   Aug 07 2012 13:33:46  $
---       Date fetched Out : $Modtime:   Aug 07 2012 13:23:30  $
---       Version          : $Revision:   1.3  $
+--       Date into PVCS   : $Date:   Aug 15 2012 08:27:18  $
+--       Date fetched Out : $Modtime:   Aug 15 2012 08:26:44  $
+--       Version          : $Revision:   1.4  $
 --
 ------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2011
@@ -39,7 +39,7 @@ Declare
   Already_Exists Exception;
   Pragma Exception_Init (Already_Exists,-955); 
 Begin
-  Execute Immediate 'Create Sequence Hig_Router_Params_Seq Start With 1 Increment By 1';
+  Execute Immediate 'Create Sequence Hig_Router_Params_Seq Start With 1 Increment By 1  NOMAXVALUE NOMINVALUE NOCYCLE NOCACHE';
 Exception 
   When Already_Exists Then
     Null;
@@ -210,11 +210,11 @@ SET TERM OFF
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm4500_nm4600_ddl_upg.sql-arc   1.3   Aug 07 2012 13:33:46   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm4500_nm4600_ddl_upg.sql-arc   1.4   Aug 15 2012 08:27:18   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm4500_nm4600_ddl_upg.sql  $
---       Date into PVCS   : $Date:   Aug 07 2012 13:33:46  $
---       Date fetched Out : $Modtime:   Aug 07 2012 13:23:30  $
---       PVCS Version     : $Revision:   1.3  $
+--       Date into PVCS   : $Date:   Aug 15 2012 08:27:18  $
+--       Date fetched Out : $Modtime:   Aug 15 2012 08:26:44  $
+--       PVCS Version     : $Revision:   1.4  $
 --
 --------------------------------------------------------------------------------
 --
