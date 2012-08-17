@@ -5,18 +5,18 @@ PROMPT Drop redundant objects from sub users
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/remove_private_views.sql-arc   1.1   Aug 17 2012 13:57:28   Rob.Coupe  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/remove_private_views.sql-arc   1.2   Aug 17 2012 14:01:20   Rob.Coupe  $
 --       Module Name      : $Workfile:   remove_private_views.sql  $
---       Date into PVCS   : $Date:   Aug 17 2012 13:57:28  $
---       Date fetched Out : $Modtime:   Aug 17 2012 13:49:44  $
---       Version          : $Revision:   1.1  $
+--       Date into PVCS   : $Date:   Aug 17 2012 14:01:20  $
+--       Date fetched Out : $Modtime:   Aug 17 2012 14:00:02  $
+--       Version          : $Revision:   1.2  $
 --
 --   Script to remove private views and their related synonyms.
 --
 -----------------------------------------------------------------------------
 --  Copyright (c) exor corporation ltd, 2011
 -----------------------------------------------------------------------------
--
+--
 
 Declare
   l_Missing_Privs   Boolean:=False;
