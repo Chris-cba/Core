@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3sdo_Edit AS
 --
 --   SCCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_edit.pkb-arc   2.17   Aug 01 2012 12:01:50   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_edit.pkb-arc   2.18   Aug 28 2012 15:45:08   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3sdo_edit.pkb  $
---       Date into SCCS   : $Date:   Aug 01 2012 12:01:50  $
---       Date fetched Out : $Modtime:   Aug 01 2012 12:00:12  $
---       SCCS Version     : $Revision:   2.17  $
+--       Date into SCCS   : $Date:   Aug 28 2012 15:45:08  $
+--       Date fetched Out : $Modtime:   Aug 28 2012 15:44:08  $
+--       SCCS Version     : $Revision:   2.18  $
 --
 --
 --  Author :  R Coupe
@@ -23,7 +23,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3sdo_Edit AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid   CONSTANT  VARCHAR2(2000)  :=  '$Revision:   2.17  $';
+  g_body_sccsid   CONSTANT  VARCHAR2(2000)  :=  '$Revision:   2.18  $';
   g_package_name  CONSTANT  VARCHAR2(30)    :=  'nm3sdo_edit';
 --
 -----------------------------------------------------------------------------
@@ -590,6 +590,10 @@ BEGIN
      HIG.RAISE_NER('NET', 339);
    END IF;
 
+   IF NOT test_theme_for_update(pi_nth_id) then
+     HIG.RAISE_NER('NET', 339);
+   END IF;
+   
    IF l_nth.nth_base_table_theme IS NOT NULL
    THEN
       l_nth := Nm3get.get_nth (l_nth.nth_base_table_theme);
