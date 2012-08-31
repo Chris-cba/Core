@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3sdo_Edit AS
 --
 --   SCCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_edit.pkb-arc   2.18   Aug 28 2012 15:45:08   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_edit.pkb-arc   2.19   Aug 31 2012 17:37:36   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3sdo_edit.pkb  $
---       Date into SCCS   : $Date:   Aug 28 2012 15:45:08  $
---       Date fetched Out : $Modtime:   Aug 28 2012 15:44:08  $
---       SCCS Version     : $Revision:   2.18  $
+--       Date into SCCS   : $Date:   Aug 31 2012 17:37:36  $
+--       Date fetched Out : $Modtime:   Aug 31 2012 17:36:42  $
+--       SCCS Version     : $Revision:   2.19  $
 --
 --
 --  Author :  R Coupe
@@ -23,7 +23,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3sdo_Edit AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid   CONSTANT  VARCHAR2(2000)  :=  '$Revision:   2.18  $';
+  g_body_sccsid   CONSTANT  VARCHAR2(2000)  :=  '$Revision:   2.19  $';
   g_package_name  CONSTANT  VARCHAR2(30)    :=  'nm3sdo_edit';
 --
 -----------------------------------------------------------------------------
@@ -47,18 +47,25 @@ END get_body_version;
 -----------------------------------------------------------------------------
 --
 Function test_theme_for_update( p_Theme in NM_THEMES_ALL.NTH_THEME_ID%TYPE ) Return Boolean is
-  retval Boolean := FALSE;
-  l_mode nm_theme_roles.nthr_mode%type;
+  retval   Boolean := FALSE;
+  l_normal integer := 0;
 begin
-  select nthr_mode into l_mode 
-  from nm_theme_roles, hig_user_roles
-  where nthr_theme_id = p_theme
-  and nthr_role = hur_role
-  and hur_username = SYS_CONTEXT ('NM3_SECURITY_CTX', 'USERNAME')
-  and rownum = 1
-  order by nthr_mode;
+  select 1  into l_normal
+  from dual where exists 
+     ( select 1
+       from ( select nth_theme_id
+              from nm_themes_all 
+              where nth_base_table_theme in (
+                 select nvl(nth_base_table_theme, nth_theme_id )
+                 from nm_themes_all where nth_theme_id = p_Theme )), 
+                      nm_theme_roles, 
+                      hig_user_roles
+                 where nthr_theme_id = nth_theme_id
+                 and nthr_role = hur_role
+                 and hur_username = SYS_CONTEXT ('NM3_SECURITY_CTX', 'USERNAME')
+                 and nthr_mode = 'NORMAL' ) ;
 --
-  if l_mode = 'NORMAL' then
+  if l_normal = 1 then
     retval := TRUE;
   else
     retval := FALSE;
