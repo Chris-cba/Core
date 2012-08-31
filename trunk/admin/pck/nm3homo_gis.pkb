@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3homo_Gis AS
 --
 -- PVCS Identifiers :-
 --
--- pvcsid : $Header:   //vm_latest/archives/nm3/admin/pck/nm3homo_gis.pkb-arc   2.7   Jul 17 2012 14:16:40   Rob.Coupe  $
+-- pvcsid : $Header:   //vm_latest/archives/nm3/admin/pck/nm3homo_gis.pkb-arc   2.8   Aug 31 2012 17:35:26   Rob.Coupe  $
 -- Module Name : $Workfile:   nm3homo_gis.pkb  $
--- Date into PVCS : $Date:   Jul 17 2012 14:16:40  $
--- Date fetched Out : $Modtime:   Jun 27 2012 15:50:42  $
--- PVCS Version : $Revision:   2.7  $
+-- Date into PVCS : $Date:   Aug 31 2012 17:35:26  $
+-- Date fetched Out : $Modtime:   Aug 31 2012 17:34:12  $
+-- PVCS Version : $Revision:   2.8  $
 -- Based on SCCS version : 
 --   Author : Jonathan Mills
 --
@@ -24,7 +24,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3homo_Gis AS
 --
 --all global package variables here
 --
-   g_body_sccsid      CONSTANT   VARCHAR2(2000) := '"$Revision:   2.7  $"';
+   g_body_sccsid      CONSTANT   VARCHAR2(2000) := '"$Revision:   2.8  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name     CONSTANT   VARCHAR2(30)   := 'nm3homo_gis';
@@ -51,18 +51,25 @@ END get_body_version;
 -----------------------------------------------------------------------------
 --
 Function test_theme_for_update( p_Theme in NM_THEMES_ALL.NTH_THEME_ID%TYPE ) Return Boolean is
-  retval Boolean := FALSE;
-  l_mode nm_theme_roles.nthr_mode%type;
+  retval   Boolean := FALSE;
+  l_normal integer := 0;
 begin
-  select nthr_mode into l_mode 
-  from nm_theme_roles, hig_user_roles
-  where nthr_theme_id = p_theme
-  and nthr_role = hur_role
-  and hur_username = SYS_CONTEXT ('NM3_SECURITY_CTX', 'USERNAME')
-  and rownum = 1
-  order by nthr_mode;
+  select 1  into l_normal
+  from dual where exists 
+     ( select 1
+       from ( select nth_theme_id
+              from nm_themes_all 
+              where nth_base_table_theme in (
+                 select nvl(nth_base_table_theme, nth_theme_id )
+                 from nm_themes_all where nth_theme_id = p_Theme )), 
+                      nm_theme_roles, 
+                      hig_user_roles
+                 where nthr_theme_id = nth_theme_id
+                 and nthr_role = hur_role
+                 and hur_username = SYS_CONTEXT ('NM3_SECURITY_CTX', 'USERNAME')
+                 and nthr_mode = 'NORMAL' ) ;
 --
-  if l_mode = 'NORMAL' then
+  if l_normal = 1 then
     retval := TRUE;
   else
     retval := FALSE;
@@ -72,6 +79,7 @@ exception
   when no_data_found then
     Return FALSE;
 end;
+--
 
 FUNCTION column_exists (p_table_name  VARCHAR2
                        ,p_column_name VARCHAR2
