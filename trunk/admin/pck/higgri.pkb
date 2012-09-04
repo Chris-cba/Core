@@ -23,7 +23,7 @@ CREATE OR REPLACE PACKAGE BODY higgri AS
 --	Copyright (c) exor corporation ltd, 2000
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  varchar2(80) := '"$Revision:   2.10  $"';
+   g_body_sccsid     CONSTANT  varchar2(80) := '"$Revision:   2.11  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30) := 'higgri';
@@ -397,12 +397,11 @@ CREATE OR REPLACE PACKAGE BODY higgri AS
       l_param     gri_run_parameters.grp_param%TYPE;
       l_cursor_id integer;
 	l_tag_column_type	varchar2(30);
-	l_owner	varchar2(30);
 	l_varchar2	varchar2(30):=nm3type.c_varchar;
 
 	CURSOR col_type IS
 	  SELECT data_type FROM all_tab_columns,gri_modules
-		WHERE owner = l_owner
+		WHERE owner = sys_context('NM3CORE', 'APPLICATION_OWNER')
 		AND table_name = grm_tag_table
 		AND column_name = grm_tag_column
 		AND grm_module = p_module;
