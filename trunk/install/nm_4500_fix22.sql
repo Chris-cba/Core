@@ -2,11 +2,11 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm_4500_fix22.sql-arc   1.0   Sep 04 2012 15:10:54   Steve.Cooper  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm_4500_fix22.sql-arc   1.1   Sep 04 2012 15:27:46   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm_4500_fix22.sql  $
---       Date into PVCS   : $Date:   Sep 04 2012 15:10:54  $
---       Date fetched Out : $Modtime:   Sep 04 2012 15:00:28  $
---       PVCS Version     : $Revision:   1.0  $
+--       Date into PVCS   : $Date:   Sep 04 2012 15:27:46  $
+--       Date fetched Out : $Modtime:   Sep 04 2012 15:25:50  $
+--       PVCS Version     : $Revision:   1.1  $
 --
 --------------------------------------------------------------------------------
 --   Copyright (c) 2012 Bentley Systems Incorporated.
@@ -31,7 +31,7 @@ set term on
 --
 -- Spool to Logfile
 --
-define logfile1='nm_4500_fix9_&log_extension'
+define logfile1='nm_4500_fix22_&log_extension'
 spool &logfile1
 --
 --------------------------------------------------------------------------------
