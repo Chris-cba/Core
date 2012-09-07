@@ -5,11 +5,11 @@ AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.39.1.5   Jun 06 2012 14:03:32   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.39.1.6   Sep 07 2012 11:41:20   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3sdm.pkb  $
---       Date into PVCS   : $Date:   Jun 06 2012 14:03:32  $
---       Date fetched Out : $Modtime:   Jun 06 2012 14:02:28  $
---       PVCS Version     : $Revision:   2.39.1.5  $
+--       Date into PVCS   : $Date:   Sep 07 2012 11:41:20  $
+--       Date fetched Out : $Modtime:   Sep 07 2012 11:38:36  $
+--       PVCS Version     : $Revision:   2.39.1.6  $
 --
 --   Author : R.A. Coupe
 --
@@ -21,7 +21,7 @@ AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT VARCHAR2 (2000) := '"$Revision:   2.39.1.5  $"';
+   g_body_sccsid     CONSTANT VARCHAR2 (2000) := '"$Revision:   2.39.1.6  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT VARCHAR2 (30)   := 'NM3SDM';
@@ -5770,8 +5770,10 @@ order by start_date desc
 where nvl(start_date, to_date('05-NOV-1605')) != nvl(end_date, to_date('05-NOV-1605'))
 order by start_date desc;
 --
+l_geom mdsys.sdo_geometry;
+--
 begin
-nm_debug.debug_on;
+--nm_debug.debug_on;
   For Irec In (
               Select  nta.Nth_Theme_Id,
                       nta.Nth_Feature_Table,
@@ -5805,17 +5807,25 @@ nm_debug.debug_on;
     nm_debug.debug('In loop '||idates.start_date);
     begin
       nm3user.set_effective_date( idates.start_date );
-      execute immediate 'insert into '||irec.Nth_Feature_Table||
-           '( objectid, ne_id, geoloc, start_date, end_date ) '||
-           ' select '||irec.Nth_Sequence_Name||'.nextval, :p_ne_id, nm3sdo.get_route_shape(:p_ne_id), :start_date, :end_date from dual ' using p_ne_id, p_ne_id, idates.start_date, idates.end_date;
-                      
+      l_geom := nm3sdo.get_route_shape(p_ne_id);
+      if l_geom is not null then
+	    begin
+          execute immediate 'insert into '||irec.Nth_Feature_Table||
+               '( objectid, ne_id, geoloc, start_date, end_date ) '||
+               ' select '||irec.Nth_Sequence_Name||'.nextval, :p_ne_id, :l_geom, :start_date, :end_date from dual ' using p_ne_id, l_geom, idates.start_date, idates.end_date;
+		exception
+		  when others then
+		    null;
+	    end;
+      end if;                
     end;
   end loop;
   end loop;
   nm3user.set_effective_date(trunc(sysdate));
 exception
   when others then
-    nm3user.set_effective_date(trunc(sysdate));    
+    nm3user.set_effective_date(trunc(sysdate));
+    raise;    
 end;
 
 --
@@ -7937,11 +7947,11 @@ End Reshape_Route;
    */
    --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.39.1.5   Jun 06 2012 14:03:32   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.39.1.6   Sep 07 2012 11:41:20   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3sdm.pkb  $
---       Date into PVCS   : $Date:   Jun 06 2012 14:03:32  $
---       Date fetched Out : $Modtime:   Jun 06 2012 14:02:28  $
---       PVCS Version     : $Revision:   2.39.1.5  $
+--       Date into PVCS   : $Date:   Sep 07 2012 11:41:20  $
+--       Date fetched Out : $Modtime:   Sep 07 2012 11:38:36  $
+--       PVCS Version     : $Revision:   2.39.1.6  $
 
       append ('--   PVCS Identifiers :-');
       append ('--');
