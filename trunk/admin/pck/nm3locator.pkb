@@ -25,7 +25,7 @@ CREATE OR REPLACE PACKAGE BODY nm3locator AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000) := '"$Revision:   2.11  $"';
+  g_body_sccsid  CONSTANT varchar2(2000) := '"$Revision:   2.12  $"';
 
   g_package_name CONSTANT varchar2(30) := 'nm3locator';
 
@@ -1649,7 +1649,8 @@ BEGIN
     IF l_pref_lrm IS NOT NULL THEN
       add('    l_pl_arr := nm3pla.get_connected_chunks(irec, '''||l_pref_lrm||''');');
     ELSE
-      add('    l_pl_arr := nm3pla.get_connected_chunks(irec);');
+--      add('    l_pl_arr := nm3pla.get_connected_chunks(irec);');
+      add('    l_pl_arr := NM3PLA.GET_PLACEMENT_FROM_NE(irec);');
     END IF;
   END IF;
 
