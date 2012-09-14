@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 --
 ---   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.71.1.0   Jul 23 2012 14:01:22   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.71.1.1   Sep 14 2012 13:41:22   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3sdo.pkb  $
---       Date into PVCS   : $Date:   Jul 23 2012 14:01:22  $
---       Date fetched Out : $Modtime:   Jul 23 2012 14:00:36  $
---       PVCS Version     : $Revision:   2.71.1.0  $
+--       Date into PVCS   : $Date:   Sep 14 2012 13:41:22  $
+--       Date fetched Out : $Modtime:   Sep 14 2012 13:40:40  $
+--       PVCS Version     : $Revision:   2.71.1.1  $
 --       Based on
 
 --
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 -- Copyright (c) RAC
 -----------------------------------------------------------------------------
 
-   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.71.1.0  $"';
+   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.71.1.1  $"';
    g_package_name    CONSTANT VARCHAR2 (30)  := 'NM3SDO';
    g_batch_size      INTEGER                 := NVL( TO_NUMBER(Hig.get_sysopt('SDOBATSIZE')), 10);
    g_clip_type       VARCHAR2(30)            := NVL(Hig.get_sysopt('SDOCLIPTYP'),'SDO');
@@ -9507,20 +9507,6 @@ BEGIN
   FOR i IN 1..l_pk_array.COUNT LOOP
 
     if l_pk_array(i) is not null then
-
-      IF l_get_projection and is_nw_theme( p_nth_id ) THEN
-
-        IF Nm3net.is_nt_datum( Nm3net.Get_Nt_Type( l_pk_array(i) ) )  = 'N' THEN
-
-  --      make sure we are dealing in correct units. The shape lengths are in datum units.
-
-          Nm3net.get_group_units( l_pk_array(i), l_p_unit, l_c_unit );
-
-          l_meas_array(i) := Nm3unit.convert_unit ( l_c_unit, l_p_unit, l_meas_array(i) );
-
-        END IF;
-
-      END IF;
 
       IF i = 1 THEN
 
