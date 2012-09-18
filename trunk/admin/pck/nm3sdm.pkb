@@ -5,11 +5,11 @@ As
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.61   Sep 07 2012 12:38:10   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.62   Sep 18 2012 11:11:30   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3sdm.pkb  $
---       Date into PVCS   : $Date:   Sep 07 2012 12:38:10  $
---       Date fetched Out : $Modtime:   Sep 07 2012 12:37:18  $
---       PVCS Version     : $Revision:   2.61  $
+--       Date into PVCS   : $Date:   Sep 18 2012 11:11:30  $
+--       Date fetched Out : $Modtime:   Sep 18 2012 11:10:06  $
+--       PVCS Version     : $Revision:   2.62  $
 --
 --   Author : R.A. Coupe
 --
@@ -21,7 +21,7 @@ As
 --
 --all global package variables here
 --
-  g_Body_Sccsid     Constant Varchar2 (2000) := '"$Revision:   2.61  $"';
+  g_Body_Sccsid     Constant Varchar2 (2000) := '"$Revision:   2.62  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
   g_Package_Name    Constant Varchar2 (30)   := 'NM3SDM';
@@ -2695,10 +2695,11 @@ Begin
   --
   -- Task 0108890 - GIS0020 - Error when creating ONA layer
   -- Ensure the Asset views are in place
+  -- RAC - correction to the task - off network assets need the asset view and not the one linking the asset to the NW.
   Declare
     View_Name User_Views.View_Name%Type;
   Begin
-    Nm3Inv_View.Create_Inv_View(Pi_Nit_Inv_Type,True,View_Name);
+    Nm3Inv_View.Create_Inv_View(Pi_Nit_Inv_Type,FALSE,View_Name);
   End;
   --
   --  Nm_Debug.debug_on;
