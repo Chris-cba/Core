@@ -5,11 +5,11 @@ As
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.62   Sep 18 2012 11:11:30   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.63   Sep 18 2012 11:40:22   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3sdm.pkb  $
---       Date into PVCS   : $Date:   Sep 18 2012 11:11:30  $
---       Date fetched Out : $Modtime:   Sep 18 2012 11:10:06  $
---       PVCS Version     : $Revision:   2.62  $
+--       Date into PVCS   : $Date:   Sep 18 2012 11:40:22  $
+--       Date fetched Out : $Modtime:   Sep 18 2012 11:39:28  $
+--       PVCS Version     : $Revision:   2.63  $
 --
 --   Author : R.A. Coupe
 --
@@ -21,7 +21,7 @@ As
 --
 --all global package variables here
 --
-  g_Body_Sccsid     Constant Varchar2 (2000) := '"$Revision:   2.62  $"';
+  g_Body_Sccsid     Constant Varchar2 (2000) := '"$Revision:   2.63  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
   g_Package_Name    Constant Varchar2 (30)   := 'NM3SDM';
@@ -2696,17 +2696,22 @@ Begin
   -- Task 0108890 - GIS0020 - Error when creating ONA layer
   -- Ensure the Asset views are in place
   -- RAC - correction to the task - off network assets need the asset view and not the one linking the asset to the NW.
-  Declare
-    View_Name User_Views.View_Name%Type;
-  Begin
-    Nm3Inv_View.Create_Inv_View(Pi_Nit_Inv_Type,FALSE,View_Name);
-  End;
-  --
-  --  Nm_Debug.debug_on;
+  -- RAC - further correction - don't create an asste view when a FT asset
   ---------------------------------------------------------------
   -- Validate asset type
   ---------------------------------------------------------------
   l_Nit := Nm3Get.Get_Nit (pi_Nit_Inv_Type => pi_Nit_Inv_Type);
+
+  If l_Nit.Nit_Table_Name  is null 
+  Then
+    Declare
+      View_Name User_Views.View_Name%Type;
+    Begin
+      Nm3Inv_View.Create_Inv_View(Pi_Nit_Inv_Type,FALSE,View_Name);
+    End;
+  End If;
+  --
+  --  Nm_Debug.debug_on;
   ---------------------------------------------------------------
   -- Set has network associated flag
   ---------------------------------------------------------------
@@ -3093,8 +3098,8 @@ Begin
     l_Diminfo := Sdo_Lrs.Convert_To_Std_Dim_Array(l_Diminfo);
 
   End If;
-
-  If Not Nm3Ddl.Does_Object_Exist( Nm3Inv_View.Derive_Inv_Type_View_Name(Pi_Nit_Inv_Type)
+--RAC - only create inv views for FT asset type
+  If l_Nit.Nit_Table_Name is NULL and Not Nm3Ddl.Does_Object_Exist( Nm3Inv_View.Derive_Inv_Type_View_Name(Pi_Nit_Inv_Type)
                                  , 'VIEW'
                                  , Sys_Context('NM3CORE','APPLICATION_OWNER') ) Then
     Nm3Inv_View.Create_Inv_View(Pi_Nit_Inv_Type, False, L_Inv_View_Name);
