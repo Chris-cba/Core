@@ -829,15 +829,32 @@ BEGIN
   || Get The Theme From GIS_DATA_OBJECTS
   || And Use It To Get The Asset Type.
   */
-  SELECT unique nith_nit_id
-    INTO lv_asset_type
-	  FROM nm_inv_themes
+-- Task 0112204 - theme could relate to more than one asset type
+-- - Just use first row with an order
+--
+SELECT  unique nith_nit_id
+      INTO lv_asset_type
+      FROM 
+        ( select nith_nit_id, nit_table_name, nit_inv_type 
+          from nm_inv_themes
         ,nm_themes_all
-        ,gis_data_objects
-	 WHERE gdo_session_id = pi_gdo_session_id
+        ,gis_data_objects, nm_inv_types
+     WHERE gdo_session_id = pi_gdo_session_id
      AND gdo_theme_name = nth_theme_name
      AND nth_theme_id = nith_nth_theme_id
-       ;
+     and nith_nit_id = nit_inv_type
+     and rownum = 1
+     order by nit_table_name  nulls first, nit_inv_type );
+--
+--  SELECT unique nith_nit_id
+--    INTO lv_asset_type
+--	  FROM nm_inv_themes
+--        ,nm_themes_all
+--        ,gis_data_objects
+--	 WHERE gdo_session_id = pi_gdo_session_id
+--     AND gdo_theme_name = nth_theme_name
+--     AND nth_theme_id = nith_nth_theme_id
+--       ;
   --
   lv_tablename := nm3get.get_nit(lv_asset_type).nit_table_name;
   --
