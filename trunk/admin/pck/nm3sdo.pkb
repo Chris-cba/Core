@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 --
 ---   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.76   Sep 14 2012 13:42:54   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.77   Oct 18 2012 12:47:20   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3sdo.pkb  $
---       Date into PVCS   : $Date:   Sep 14 2012 13:42:54  $
---       Date fetched Out : $Modtime:   Sep 14 2012 13:42:14  $
---       PVCS Version     : $Revision:   2.76  $
+--       Date into PVCS   : $Date:   Oct 18 2012 12:47:20  $
+--       Date fetched Out : $Modtime:   Oct 18 2012 12:44:58  $
+--       PVCS Version     : $Revision:   2.77  $
 --       Based on
 
 --
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 -- Copyright (c) RAC
 -----------------------------------------------------------------------------
 
-   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.76  $"';
+   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.77  $"';
    g_package_name    CONSTANT VARCHAR2 (30)  := 'NM3SDO';
    g_batch_size      INTEGER                 := NVL( TO_NUMBER(Hig.get_sysopt('SDOBATSIZE')), 10);
    g_clip_type       VARCHAR2(30)            := NVL(Hig.get_sysopt('SDOCLIPTYP'),'SDO');
@@ -4396,8 +4396,15 @@ BEGIN
 --  how do we know its an lrs? - we don't!
 
  IF ldim = 3 THEN
-      ldis := sdo_lrs.geom_segment_end_measure(p_geom)/2;
-      retval := sdo_lrs.locate_pt( p_geom, ldis );
+   declare
+     lsta number;
+     lend number;
+   begin
+     lsta := sdo_lrs.geom_segment_end_measure(p_geom);
+     lend := sdo_lrs.geom_segment_start_measure(p_geom);
+     ldis := (lend - lsta )/2;
+     retval := sdo_lrs.locate_pt( p_geom, lsta + ldis );
+   end;
  ELSIF ldim = 2 THEN
    l_geom := sdo_lrs.convert_to_lrs_geom( p_geom );
       ldis   := sdo_lrs.geom_segment_end_measure(l_geom)/2;
