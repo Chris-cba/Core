@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm3gaz_qry AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3gaz_qry.pkb-arc   2.20   Aug 31 2011 15:49:46   Ade.Edwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3gaz_qry.pkb-arc   2.21   Oct 18 2012 09:50:38   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3gaz_qry.pkb  $
---       Date into PVCS   : $Date:   Aug 31 2011 15:49:46  $
---       Date fetched Out : $Modtime:   Aug 31 2011 15:40:56  $
---       Version          : $Revision:   2.20  $
+--       Date into PVCS   : $Date:   Oct 18 2012 09:50:38  $
+--       Date fetched Out : $Modtime:   Oct 18 2012 09:41:36  $
+--       Version          : $Revision:   2.21  $
 --       Based on SCCS version : 1.45
 -------------------------------------------------------------------------
 --   Author : Jonathan Mills
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3gaz_qry AS
 --all global package variables here
 --
    --g_body_sccsid     CONSTANT  varchar2(2000) := '"@(#)nm3gaz_qry.pkb 1.45 05/26/06"';
-   g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.20  $';
+   g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.21  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3gaz_qry';
@@ -2289,11 +2289,15 @@ END del_ngq_cascade_keep_ngq;
 PROCEDURE chk_value_count_for_condition (pi_condition   nm_gaz_query_attribs.ngqa_condition%TYPE
                                         ,pi_value_count pls_integer
                                         ) IS
+l_condition    varchar2(100) := pi_condition;
+l_value_count  number := pi_value_count;
+									
 BEGIN
 --
    nm_debug.proc_start(g_package_name,'chk_value_count_for_condition');
 --
-   IF NOT nm3mrg_supplementary.valid_pbi_condition_values (pi_condition,pi_value_count)
+   
+   IF NOT nm3mrg_supplementary.valid_pbi_condition_values (l_condition,l_value_count)
     THEN
       hig.raise_ner (pi_appl               => nm3type.c_hig
                     ,pi_id                 => 112
