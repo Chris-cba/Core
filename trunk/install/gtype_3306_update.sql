@@ -2,11 +2,11 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/gtype_3306_update.sql-arc   1.1   Jul 24 2012 09:48:20   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/gtype_3306_update.sql-arc   1.2   Oct 29 2012 09:10:44   Rob.Coupe  $
 --       Module Name      : $Workfile:   gtype_3306_update.sql  $
---       Date into PVCS   : $Date:   Jul 24 2012 09:48:20  $
---       Date fetched Out : $Modtime:   Jul 24 2012 09:47:58  $
---       PVCS Version     : $Revision:   1.1  $
+--       Date into PVCS   : $Date:   Oct 29 2012 09:10:44  $
+--       Date fetched Out : $Modtime:   Oct 29 2012 09:02:56  $
+--       PVCS Version     : $Revision:   1.2  $
 --
 --------------------------------------------------------------------------------
 --   Copyright (c) 2012 Bentley Systems Incorporated.
@@ -26,11 +26,16 @@ declare
 --
 begin
   for irec in c1 loop
-    execute immediate 'update '||irec.nth_feature_table||' a '||
-                      ' set a.'||irec.nth_feature_shape_column||'.sdo_gtype = 3306 '||
-                      ' where objectid in (select objectid from ( '||
-                      '       select objectid, t.* from '||irec.nth_feature_table||' b, table (b.'||irec.nth_feature_shape_column||'.sdo_elem_info) t ) '||
-                      '       group by objectid having count(*) > 3)';
+    begin
+      execute immediate 'update '||irec.nth_feature_table||' a '||
+                        ' set a.'||irec.nth_feature_shape_column||'.sdo_gtype = 3306 '||
+                        ' where objectid in (select objectid from ( '||
+                        '       select objectid, t.* from '||irec.nth_feature_table||' b, table (b.'||irec.nth_feature_shape_column||'.sdo_elem_info) t ) '||
+                        '       group by objectid having count(*) > 3)';
+	exception
+	  when others then 
+	    dbms_output.put_line('Error in changing gtype on table '||irec.nth_feature_table||'-'||sqlerrm );
+	end;
   end loop;
   commit;
 end;
