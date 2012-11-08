@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 --
 ---   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.71.1.2   Nov 08 2012 09:54:30   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.71.1.3   Nov 08 2012 16:39:14   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3sdo.pkb  $
---       Date into PVCS   : $Date:   Nov 08 2012 09:54:30  $
---       Date fetched Out : $Modtime:   Nov 08 2012 09:41:36  $
---       PVCS Version     : $Revision:   2.71.1.2  $
+--       Date into PVCS   : $Date:   Nov 08 2012 16:39:14  $
+--       Date fetched Out : $Modtime:   Nov 08 2012 16:36:58  $
+--       PVCS Version     : $Revision:   2.71.1.3  $
 --       Based on
 
 --
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 -- Copyright (c) RAC
 -----------------------------------------------------------------------------
 
-   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.71.1.2  $"';
+   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.71.1.3  $"';
    g_package_name    CONSTANT VARCHAR2 (30)  := 'NM3SDO';
    g_batch_size      INTEGER                 := NVL( TO_NUMBER(Hig.get_sysopt('SDOBATSIZE')), 10);
    g_clip_type       VARCHAR2(30)            := NVL(Hig.get_sysopt('SDOCLIPTYP'),'SDO');
@@ -6334,8 +6334,6 @@ FUNCTION validate_theme ( p_theme IN NUMBER, ex_table IN VARCHAR2 DEFAULT NULL )
   l_ex_table VARCHAR2(30);
   c_default_tolerance CONSTANT NUMBER:= 0.05;
   l_tolerance NUMBER;
-  l_rowid nm3type.tab_rowid;
-  l_shape geom_tab;
   l_result VARCHAR2(100);
   
   already_exists EXCEPTION;
@@ -6348,6 +6346,8 @@ FUNCTION validate_theme ( p_theme IN NUMBER, ex_table IN VARCHAR2 DEFAULT NULL )
   WHERE owner = Sys_Context('NM3CORE','APPLICATION_OWNER')
   AND table_name = UPPER(p_table_name)
   AND column_name = UPPER(p_column_name);
+  
+  qq varchar2(1) := chr(39);
   
 BEGIN
   l_ex_table := ex_table;
@@ -6373,32 +6373,27 @@ BEGIN
     l_tolerance := c_default_tolerance;
   END IF;
 
-  EXECUTE IMMEDIATE 'SELECT ROWID, ' || nth.nth_feature_shape_column || ' FROM ' || nth.nth_feature_table 
-  BULK COLLECT INTO l_rowid, l_shape;
-  
-  FOR i IN 1..l_rowid.COUNT
-  LOOP
+  DECLARE
+    curstr varchar2(2000);
+  BEGIN
+    curstr :=    'INSERT INTO ' || Sys_Context('NM3CORE','APPLICATION_OWNER') || '.' || l_ex_table ||
+                        ' SELECT sdo_rowid, substr(result,1,1000) from '||
+                          '( with val as ( select rowid sdo_rowid, SDO_GEOM.VALIDATE_GEOMETRY_WITH_CONTEXT('||nth.nth_feature_shape_column||','||
+                            l_tolerance||', null, '||qq||'TRUE'||qq||') result '||
+                        ' from '||nth.nth_feature_table||' ) '||
+                        ' select * from val '|| 
+                        ' where result != '||qq||'TRUE'||qq||')';
+                        
+--    nm_debug.debug_on;
+--    nm_debug.debug(curstr);
+                            
+    execute immediate curstr;
+    
+    execute immediate 'select count(*) from '||Sys_Context('NM3CORE','APPLICATION_OWNER') || '.' || l_ex_table into retval;
+                                
+  END;
     --
-    BEGIN
-      l_result:= SDO_GEOM.VALIDATE_GEOMETRY_WITH_CONTEXT(l_shape(i), l_tolerance, null, 'TRUE');
-      --
-    EXCEPTION 
-    WHEN OTHERS THEN
-      l_result:= 'FAILURE: ' || SQLERRM;
-    END;
-    --
-    IF l_result <> 'TRUE'
-    THEN
-      EXECUTE IMMEDIATE 'INSERT INTO ' || Sys_Context('NM3CORE','APPLICATION_OWNER') || '.' || l_ex_table || ' VALUES (''' || l_rowid(i) || ''', substr(''' || l_result || ''',1,1000))';
-    END IF;
-    --
-  retval:= NVL(retval, 0) +1;
-  END LOOP;
-  --
   COMMIT;
-  
-  l_rowid.delete;
-  l_shape.delete;
   
   --This utility posts a comment on the number of rows processed.
   RETURN retval;
