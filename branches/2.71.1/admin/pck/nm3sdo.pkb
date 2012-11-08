@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 --
 ---   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.71.1.1   Sep 14 2012 13:41:22   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.71.1.2   Nov 08 2012 09:54:30   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3sdo.pkb  $
---       Date into PVCS   : $Date:   Sep 14 2012 13:41:22  $
---       Date fetched Out : $Modtime:   Sep 14 2012 13:40:40  $
---       PVCS Version     : $Revision:   2.71.1.1  $
+--       Date into PVCS   : $Date:   Nov 08 2012 09:54:30  $
+--       Date fetched Out : $Modtime:   Nov 08 2012 09:41:36  $
+--       PVCS Version     : $Revision:   2.71.1.2  $
 --       Based on
 
 --
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 -- Copyright (c) RAC
 -----------------------------------------------------------------------------
 
-   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.71.1.1  $"';
+   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.71.1.2  $"';
    g_package_name    CONSTANT VARCHAR2 (30)  := 'NM3SDO';
    g_batch_size      INTEGER                 := NVL( TO_NUMBER(Hig.get_sysopt('SDOBATSIZE')), 10);
    g_clip_type       VARCHAR2(30)            := NVL(Hig.get_sysopt('SDOCLIPTYP'),'SDO');
@@ -6396,6 +6396,10 @@ BEGIN
   END LOOP;
   --
   COMMIT;
+  
+  l_rowid.delete;
+  l_shape.delete;
+  
   --This utility posts a comment on the number of rows processed.
   RETURN retval;
 
