@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm3ausec_maint AS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid                 : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ausec_maint.pkb-arc   2.4   May 16 2011 14:44:08   Steve.Cooper  $
+--       pvcsid                 : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ausec_maint.pkb-arc   2.5   Nov 15 2012 13:23:20   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3ausec_maint.pkb  $
---       Date into PVCS   : $Date:   May 16 2011 14:44:08  $
---       Date fetched Out : $Modtime:   Apr 01 2011 11:41:56  $
---       PVCS Version     : $Revision:   2.4  $
+--       Date into PVCS   : $Date:   Nov 15 2012 13:23:20  $
+--       Date fetched Out : $Modtime:   Nov 15 2012 13:20:58  $
+--       PVCS Version     : $Revision:   2.5  $
 --       Based on SCCS version : 1.4
 --
 --   Author : Jonathan Mills
@@ -24,7 +24,7 @@ CREATE OR REPLACE PACKAGE BODY nm3ausec_maint AS
 */
 
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.4  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.5  $"';
    g_package_name    CONSTANT  varchar2(30)   := 'nm3ausec_maint';
 --
    TYPE rec_parent IS RECORD
@@ -150,6 +150,10 @@ BEGIN
 --
    END LOOP;
    
+FORALL i in 1..l_tab_affected_inv.count
+     update nm_inv_items
+     set iit_end_date = pi_effective_date
+     where iit_ne_id = l_tab_affected_inv(i);   
 --    nm3dbg.putln('g_tab_rec_iig.count='||g_tab_rec_iig.count);
 --
    FOR i IN 1..g_tab_rec_iig.COUNT
@@ -516,23 +520,25 @@ BEGIN
 --         ||'l_rec_iit(iit_ne_id='||l_rec_iit.iit_ne_id||'))');
       
       nm3inv.insert_nm_inv_items (l_rec_iit);
+      if l_rec_nit.nit_use_xy = 'N' then
       --
-      DECLARE
-         l_pl_arr nm_placement_array := nm3pla.initialise_placement_array;
-      BEGIN
-         l_pl_arr := nm3pla.get_placement_from_temp_ne (l_new_inv_loc_nte_job_id);
+        DECLARE
+           l_pl_arr nm_placement_array := nm3pla.initialise_placement_array;
+        BEGIN
+           l_pl_arr := nm3pla.get_placement_from_temp_ne (l_new_inv_loc_nte_job_id);
          
-         l_pl_arr := nm3pla.get_placement_from_temp_ne (l_new_inv_loc_nte_job_id);
+           l_pl_arr := nm3pla.get_placement_from_temp_ne (l_new_inv_loc_nte_job_id);
          
 --          nm3dbg.putln('nm3homo_o.relocate_inv_at_pl('
 --             ||'p_nm_ne_id_in='||l_rec_iit.iit_ne_id
 --             ||', p_placement_array.count='||l_pl_arr.npa_placement_array.count
 --             ||')');
-         nm3homo_o.relocate_inv_at_pl (p_nm_ne_id_in     => l_rec_iit.iit_ne_id
-                                      ,p_placement_array => l_pl_arr
-                                      ,p_effective_date  => c_effective_date
-                                      );
-      END;
+           nm3homo_o.relocate_inv_at_pl (p_nm_ne_id_in     => l_rec_iit.iit_ne_id
+                                        ,p_placement_array => l_pl_arr
+                                        ,p_effective_date  => c_effective_date
+                                        );
+        END;
+     END IF;
    END IF;
 --
 --    DELETE FROM nm_nw_temp_extents
