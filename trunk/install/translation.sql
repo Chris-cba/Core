@@ -322,7 +322,9 @@ AS SELECT
  nm.nm_start_date,
  nm.nm_end_date,
  nm.nm_seq_no,
- DECODE(get_nt_type(nm_ne_id_of), 'D', 'S', 'L', 'S', 'G'),
+         (SELECT DECODE (ne_nt_type,  'D', 'S',  'L', 'S',  'G')
+            FROM nm_elements_all
+           WHERE ne_id = nm_ne_id_of),
  nm.nm_begin_mp,
  nm.nm_end_mp,
  nm.nm_slk,
