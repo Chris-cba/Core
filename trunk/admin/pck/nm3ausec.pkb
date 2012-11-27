@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm3ausec AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ausec.pkb-arc   2.5   Oct 07 2011 14:34:46   Steve.Cooper  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ausec.pkb-arc   2.6   Nov 27 2012 14:39:10   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3ausec.pkb  $
---       Date into PVCS   : $Date:   Oct 07 2011 14:34:46  $
---       Date fetched Out : $Modtime:   Oct 07 2011 14:34:26  $
---       PVCS Version     : $Revision:   2.5  $
+--       Date into PVCS   : $Date:   Nov 27 2012 14:39:10  $
+--       Date fetched Out : $Modtime:   Nov 27 2012 14:25:32  $
+--       PVCS Version     : $Revision:   2.6  $
 --       Based on
 --
 --   Author : Rob Coupe
@@ -19,7 +19,7 @@ CREATE OR REPLACE PACKAGE BODY nm3ausec AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.5  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.6  $"';
 
 --  g_body_sccsid is the SCCS ID for the package body
 --
@@ -455,9 +455,10 @@ BEGIN
    IF c1%NOTFOUND
     THEN
       CLOSE c1;
-      hig.raise_ner (pi_appl               => nm3type.c_net
-                    ,pi_id                 => 236
-                    );
+	  Return NULL;  -- RC - security fixes for HA - no need to check the mode as this is handled by FGAC
+--      hig.raise_ner (pi_appl               => nm3type.c_net
+--                    ,pi_id                 => 236
+--                    );
       --raise_application_error( -20901, 'You should not be here');
    END IF;
 --
@@ -504,9 +505,10 @@ BEGIN
 
   IF NOT(l_found)
   THEN
-    --you should not be here!
-    hig.raise_ner(pi_appl => nm3type.c_net
-                 ,pi_id   => 236);
+    l_retval := NULL;
+    --you should not be here! (RC - now handled by FGAC)
+--    hig.raise_ner(pi_appl => nm3type.c_net
+--                 ,pi_id   => 236);
   END IF;
 
   nm_debug.proc_end(p_package_name   => g_package_name
@@ -727,9 +729,13 @@ BEGIN
          g_au_sec_exc_msg   := 'You may not create data with this admin unit';
       END IF;
       --
-   --
-      IF nm3ausec.get_au_mode( Sys_Context('NM3_SECURITY_CTX','USERNAME'), p_rec.nm_admin_unit_new ) != nm3type.c_normal
-       THEN
+	  --RC - FGAC now on network, allow get_au_mode to return null value where no security is configured - all handled by FGAC. 
+	  --     but FGAC needs to epxose more than is required. need to check that the user has admin privileges on the new admin-unit or on the
+	  --     admin unit of the child.
+      IF ( nm3ausec.get_au_mode( Sys_Context('NM3_SECURITY_CTX','USERNAME'), p_rec.nm_admin_unit_new ) != nm3type.c_normal AND
+           nm3ausec.get_au_mode( Sys_Context('NM3_SECURITY_CTX','USERNAME'), nm3get.get_ne(p_rec.nm_ne_id_of).ne_admin_unit ) != nm3type.c_normal
+         )
+      THEN
          -- Make Sure that the user has NORMAL access to the AU
          hig.raise_ner (pi_appl               => nm3type.c_net
                        ,pi_id                 => l_ner_id
