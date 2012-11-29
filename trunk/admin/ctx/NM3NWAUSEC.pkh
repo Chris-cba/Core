@@ -1,0 +1,45 @@
+CREATE OR REPLACE PACKAGE nm3nwausec AS 
+--
+-----------------------------------------------------------------------------
+--
+--   PVCS Identifiers :-
+--
+--       sccsid           : $Header  $
+--       Module Name      : $Workfile:   NM3NWAUSEC.pkh  $
+--       Date into SCCS   : $Date:   Nov 29 2012 10:03:28  $
+--       Date fetched Out : $Modtime:   Nov 29 2012 10:02:50  $
+--       SCCS Version     : $Revision:   1.0  $
+--
+-----------------------------------------------------------------------------
+--    Copyright (c) Bentley Systems 2012
+-----------------------------------------------------------------------------
+
+g_sccsid          CONSTANT  VARCHAR2(2000) := '$Revision:   1.0  $';
+
+  FUNCTION get_version RETURN VARCHAR2;
+--
+  FUNCTION get_body_version
+    RETURN VARCHAR2;
+--
+au_vc varchar2(2000);
+au_list int_array;
+--
+FUNCTION get_string (p_au_col_name  IN varchar2  ) RETURN varchar2; 
+FUNCTION get_au_list return int_array_type; 
+--
+function HPA_predicate_read( schema_in varchar2, name_in varchar2) RETURN varchar2; 
+--function DOC_predicate_read( schema_in varchar2, name_in varchar2) RETURN varchar2; 
+function SEC_predicate_read( schema_in varchar2, name_in varchar2) RETURN varchar2; 
+
+--
+function NAU_predicate_read( schema_in varchar2, name_in varchar2) RETURN varchar2; 
+function NAU_predicate_DML( schema_in varchar2, name_in varchar2) RETURN varchar2;
+--
+FUNCTION NE_predicate_READ( schema_in varchar2, name_in varchar2) RETURN varchar2;
+FUNCTION NE_predicate_DML( schema_in varchar2, name_in varchar2) RETURN varchar2;
+FUNCTION NM_predicate_READ( schema_in varchar2, name_in varchar2) RETURN varchar2;
+FUNCTION NM_predicate_DML( schema_in varchar2, name_in varchar2) RETURN varchar2;
+
+--
+END nm3nwausec;
+/
