@@ -3,18 +3,18 @@ CREATE OR REPLACE PACKAGE BODY nm3nwausec AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/ctx/NM3NWAUSEC.pkb-arc   1.1   Nov 29 2012 10:10:54   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/ctx/NM3NWAUSEC.pkb-arc   1.2   Nov 29 2012 11:18:56   Rob.Coupe  $
 --       Module Name      : $Workfile:   NM3NWAUSEC.pkb  $
---       Date into SCCS   : $Date:   Nov 29 2012 10:10:54  $
---       Date fetched Out : $Modtime:   Nov 29 2012 10:10:36  $
---       SCCS Version     : $Revision:   1.1  $
+--       Date into SCCS   : $Date:   Nov 29 2012 11:18:56  $
+--       Date fetched Out : $Modtime:   Nov 29 2012 11:18:42  $
+--       SCCS Version     : $Revision:   1.2  $
 --
 -----------------------------------------------------------------------------
 --    Copyright (c) Bentley Systems 2012
 -----------------------------------------------------------------------------
 
 
-g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   1.1  $"';
+g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   1.2  $"';
 
   FUNCTION get_version RETURN VARCHAR2 IS
   BEGIN
@@ -76,15 +76,15 @@ BEGIN
     END IF; 
  END; 
 
---function DOC_predicate_read( schema_in varchar2, name_in varchar2) RETURN varchar2 IS
---BEGIN 
---    IF Sys_Context('NM3CORE','UNRESTRICTED_INVENTORY') = 'TRUE' and Sys_Context('NM3_SECURITY_CTX','USERNAME') = Sys_Context('NM3_SECURITY_CTX','ACTUAL_USERNAME') 
---     THEN 
---       RETURN NULL; 
---    ELSE 
---       RETURN '('||get_string('DOC_ADMIN_UNIT')||' OR DOC_ADMIN_UNIT IS NULL)'; 
---    END IF; 
--- END; 
+function DOC_predicate_read( schema_in varchar2, name_in varchar2) RETURN varchar2 IS
+BEGIN 
+    IF Sys_Context('NM3CORE','UNRESTRICTED_INVENTORY') = 'TRUE' and Sys_Context('NM3_SECURITY_CTX','USERNAME') = Sys_Context('NM3_SECURITY_CTX','ACTUAL_USERNAME') 
+     THEN 
+       RETURN NULL; 
+    ELSE 
+       RETURN '('||get_string('DOC_ADMIN_UNIT')||' OR DOC_ADMIN_UNIT IS NULL)'; 
+    END IF; 
+END; 
 
 function SEC_predicate_read( schema_in varchar2, name_in varchar2) RETURN varchar2 IS
 BEGIN 
