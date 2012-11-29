@@ -4,17 +4,17 @@ CREATE OR REPLACE PACKAGE nm3nwausec AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/ctx/NM3NWAUSEC.pkh-arc   1.1   Nov 29 2012 10:10:00   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/ctx/NM3NWAUSEC.pkh-arc   1.2   Nov 29 2012 11:15:04   Rob.Coupe  $
 --       Module Name      : $Workfile:   NM3NWAUSEC.pkh  $
---       Date into SCCS   : $Date:   Nov 29 2012 10:10:00  $
---       Date fetched Out : $Modtime:   Nov 29 2012 10:09:46  $
---       SCCS Version     : $Revision:   1.1  $
+--       Date into SCCS   : $Date:   Nov 29 2012 11:15:04  $
+--       Date fetched Out : $Modtime:   Nov 29 2012 11:14:48  $
+--       SCCS Version     : $Revision:   1.2  $
 --
 -----------------------------------------------------------------------------
 --    Copyright (c) Bentley Systems 2012
 -----------------------------------------------------------------------------
 
-g_sccsid          CONSTANT  VARCHAR2(2000) := '$Revision:   1.1  $';
+g_sccsid          CONSTANT  VARCHAR2(2000) := '$Revision:   1.2  $';
 
   FUNCTION get_version RETURN VARCHAR2;
 --
@@ -28,7 +28,7 @@ FUNCTION get_string (p_au_col_name  IN varchar2  ) RETURN varchar2;
 FUNCTION get_au_list return int_array_type; 
 --
 function HPA_predicate_read( schema_in varchar2, name_in varchar2) RETURN varchar2; 
---function DOC_predicate_read( schema_in varchar2, name_in varchar2) RETURN varchar2; 
+function DOC_predicate_read( schema_in varchar2, name_in varchar2) RETURN varchar2; 
 function SEC_predicate_read( schema_in varchar2, name_in varchar2) RETURN varchar2; 
 
 --
