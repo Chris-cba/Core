@@ -1,11 +1,11 @@
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/ctx/add_nm3nwausec_policies.sql-arc   1.1   Nov 29 2012 10:11:34   Rob.Coupe  $
 --       Module Name      : $Workfile:   add_nm3nwausec_policies.sql  $
---       Date into SCCS   : $Date:   Nov 29 2012 10:02:08  $
---       Date fetched Out : $Modtime:   Nov 28 2012 17:06:22  $
---       SCCS Version     : $Revision:   1.0  $
+--       Date into SCCS   : $Date:   Nov 29 2012 10:11:34  $
+--       Date fetched Out : $Modtime:   Nov 29 2012 10:11:22  $
+--       SCCS Version     : $Revision:   1.1  $
 --
 -----------------------------------------------------------------------------
 --    Copyright (c) Bentley Systems 2012
