@@ -3,18 +3,18 @@ CREATE OR REPLACE PACKAGE BODY nm3nwausec AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/ctx/NM3NWAUSEC.pkb-arc   1.1   Nov 29 2012 10:10:54   Rob.Coupe  $
 --       Module Name      : $Workfile:   NM3NWAUSEC.pkb  $
---       Date into SCCS   : $Date:   Nov 29 2012 10:03:14  $
---       Date fetched Out : $Modtime:   Nov 29 2012 10:02:52  $
---       SCCS Version     : $Revision:   1.0  $
+--       Date into SCCS   : $Date:   Nov 29 2012 10:10:54  $
+--       Date fetched Out : $Modtime:   Nov 29 2012 10:10:36  $
+--       SCCS Version     : $Revision:   1.1  $
 --
 -----------------------------------------------------------------------------
 --    Copyright (c) Bentley Systems 2012
 -----------------------------------------------------------------------------
 
 
-g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   1.0  $"';
+g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   1.1  $"';
 
   FUNCTION get_version RETURN VARCHAR2 IS
   BEGIN
