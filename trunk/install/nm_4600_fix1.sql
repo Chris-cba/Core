@@ -1,10 +1,10 @@
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm_4600_fix1.sql-arc   1.0   Nov 29 2012 10:04:44   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm_4600_fix1.sql-arc   1.1   Dec 03 2012 16:31:38   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm_4600_fix1.sql  $
---       Date into PVCS   : $Date:   Nov 29 2012 10:04:44  $
---       Date fetched Out : $Modtime:   Nov 28 2012 17:59:36  $
---       PVCS Version     : $Revision:   1.0  $
+--       Date into PVCS   : $Date:   Dec 03 2012 16:31:38  $
+--       Date fetched Out : $Modtime:   Dec 03 2012 16:31:08  $
+--       PVCS Version     : $Revision:   1.1  $
 --
 ----------------------------------------------------------------------------
 --   Copyright (c) 2012 Bentley Systems Incorporated.
@@ -75,7 +75,7 @@ PROMPT Remove existing security policies
 SET TERM OFF
 --
 SET FEEDBACK ON
-start drop_nm3nwausec_policy.sql
+start drop_nm3nwausec_policies.sql
 SET FEEDBACK OFF
 
 
