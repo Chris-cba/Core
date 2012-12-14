@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3close AS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3close.pkb-arc   2.10   Jul 05 2011 14:42:48   Chris.Strettle  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3close.pkb-arc   2.11   Dec 14 2012 13:59:56   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3close.pkb  $
---       Date into PVCS   : $Date:   Jul 05 2011 14:42:48  $
---       Date fetched Out : $Modtime:   Jul 05 2011 14:38:46  $
---       PVCS Version     : $Revision:   2.10  $
+--       Date into PVCS   : $Date:   Dec 14 2012 13:59:56  $
+--       Date fetched Out : $Modtime:   Dec 14 2012 13:59:02  $
+--       PVCS Version     : $Revision:   2.11  $
 --
 --
 --   Author : I Turnbull
@@ -21,7 +21,7 @@ CREATE OR REPLACE PACKAGE BODY nm3close AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.10  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.11  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3close';
@@ -965,6 +965,41 @@ IS
   l_ne_rec        nm_elements%ROWTYPE;
   l_next_recno    PLS_INTEGER;
 --
+  l_shape_option  VARCHAR2(1) := NVL(hig.get_user_or_sys_opt('SDORESEQ'),'H'); 
+/*
+When performing a route resequence "H" value (default) will maintain history on the route shapes,
+                                  "U" value will update shape with no history, 
+                                  "N" value will do nothing with the shape
+For the close process a value of N will just close the shape and not do the complex stuff                                   
+*/  
+--
+procedure close_shape( p_route_id  IN NM_ELEMENTS.ne_id%TYPE, p_effective_date  IN DATE ) is
+cursor c1( c_route_id in NM_ELEMENTS.ne_id%TYPE) is
+              Select  nta.Nth_Theme_Id,
+                      nta.Nth_Feature_Table,
+                      nta.Nth_Feature_Pk_Column,
+                      nta.Nth_Feature_Fk_Column,
+                      nta.Nth_Feature_Shape_Column,
+                      nta.Nth_Sequence_Name
+              From    Nm_Themes_All     nta,
+                      Nm_Nw_Themes      nnt,
+                      User_Tables       ut,
+                      Nm_Linear_Types   nlt,
+                      Nm_Elements_All   nea
+              Where   nta.Nth_Theme_Id  =   nnt.Nnth_Nth_Theme_Id
+              And     ut.Table_Name     =   nta.Nth_Feature_Table
+              And     nnt.Nnth_Nlt_Id   =   nlt.Nlt_Id
+              And     nlt.Nlt_Gty_Type  =   nea.Ne_Gty_Group_Type
+              And     nlt.Nlt_Nt_Type   =   nea.Ne_Nt_Type
+              And     nea.Ne_Id         =   c_route_id;
+BEGIN
+  -- workaround to have NewBrunswick signed off - on 4.4 but code retrofitted into latest until such time as can be repaired.
+  -- Code needs to close the route shape if an option is set. No easy API exists so it is coded here.
+     for irec in c1 (p_route_id) loop
+        NM3SDO_EDIT.END_DATE_SHAPE(irec.nth_theme_id, p_route_id, pi_effective_date);
+     end loop;
+END;			  
+
 BEGIN
 --
   nm_debug.proc_start(g_package_name,'route_close');
@@ -1052,8 +1087,15 @@ BEGIN
                             );
 --
 --  RAC - if the group is linear, it may have a shape - just reshape it
+--  Task 0112315 - need to just end-date the current shape if the option is set
 --
-  nm3sdm.reshape_route(pi_route_id, pi_effective_date, 'Y');
+
+--
+  IF l_shape_option = 'N' then
+    close_shape ( pi_route_id, pi_effective_date );
+  ELSE
+    nm3sdm.reshape_route(pi_route_id, pi_effective_date, 'Y');
+  END IF;
 
   nm_debug.proc_end(g_package_name,'route_close');
 --
