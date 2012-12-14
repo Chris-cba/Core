@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3pla AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3pla.pkb-arc   2.13   Jun 22 2012 11:13:54   Rob.Coupe  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3pla.pkb-arc   2.14   Dec 14 2012 11:58:30   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3pla.pkb  $
---       Date into PVCS   : $Date:   Jun 22 2012 11:13:54  $
---       Date fetched Out : $Modtime:   Jun 22 2012 11:12:50  $
---       Version          : $Revision:   2.13  $
+--       Date into PVCS   : $Date:   Dec 14 2012 11:58:30  $
+--       Date fetched Out : $Modtime:   Dec 14 2012 11:54:06  $
+--       Version          : $Revision:   2.14  $
 --       Based on SCCS version : 1.61
 ------------------------------------------------------------------------
 --
@@ -19,7 +19,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3pla AS
 -------------------------------------------------------------------------------------------
 -- Global variables - tree definitions etc.
    --g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"@(#)nm3pla.pkb	1.61 11/29/06"';
-   g_body_sccsid     CONSTANT varchar2(2000) := '$Revision:   2.13  $';
+   g_body_sccsid     CONSTANT varchar2(2000) := '$Revision:   2.14  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT VARCHAR2(30) := 'nm3pla';
@@ -2511,6 +2511,14 @@ BEGIN
                                  );
         l_begin_mp := pi_ibegin_tab(l_i); 
         l_end_mp   := pi_iend_tab(l_i);
+
+		if pi_rdir_tab(l_i) = 1 then
+           l_r_begin := Nm3lrs.get_set_offset(l_route_id, pi_iof_tab(l_i), l_begin_mp);
+           l_r_end   := Nm3lrs.get_set_offset(l_route_id, pi_iof_tab(l_i), l_end_mp);
+        else
+           l_r_begin := Nm3lrs.get_set_offset(l_route_id, pi_iof_tab(l_i), l_end_mp);
+           l_r_end   := Nm3lrs.get_set_offset(l_route_id, pi_iof_tab(l_i), l_begin_mp);
+        end if;
 
       END IF;
     END IF;
