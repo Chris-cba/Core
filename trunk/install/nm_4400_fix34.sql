@@ -1,10 +1,10 @@
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm_4400_fix34.sql-arc   1.0   Dec 14 2012 15:01:52   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm_4400_fix34.sql-arc   1.1   Jan 04 2013 10:55:40   Graeme.Johnson  $
 --       Module Name      : $Workfile:   nm_4400_fix34.sql  $ 
---       Date into PVCS   : $Date:   Dec 14 2012 15:01:52  $
---       Date fetched Out : $Modtime:   Dec 14 2012 14:56:40  $
---       PVCS Version     : $Revision:   1.0  $
+--       Date into PVCS   : $Date:   Jan 04 2013 10:55:40  $
+--       Date fetched Out : $Modtime:   Jan 04 2013 10:54:56  $
+--       PVCS Version     : $Revision:   1.1  $
 --
 ----------------------------------------------------------------------------
 --   Copyright (c) 2012 Bentley Systems Incorporated.
@@ -73,6 +73,8 @@ WHENEVER SQLERROR CONTINUE
 SET TERM ON 
 PROMPT nm3close.pkw
 SET TERM OFF
+start nm3close.pkw
+/
 --
 --------------------------------------------------------------------------------
 -- Update hig_upgrades with fix ID
