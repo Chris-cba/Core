@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3debug IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3debug.pkb-arc   2.20   Sep 12 2011 12:34:46   Mike.Alexander  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3debug.pkb-arc   2.21   Jan 08 2013 15:55:30   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm3debug.pkb  $
---       Date into PVCS   : $Date:   Sep 12 2011 12:34:46  $
---       Date fetched Out : $Modtime:   Sep 12 2011 11:25:58  $
---       PVCS Version     : $Revision:   2.20  $
+--       Date into PVCS   : $Date:   Jan 08 2013 15:55:30  $
+--       Date fetched Out : $Modtime:   Jan 08 2013 15:32:04  $
+--       PVCS Version     : $Revision:   2.21  $
 --
 --
 --   Author : Jonathan Mills
@@ -16,7 +16,7 @@ CREATE OR REPLACE PACKAGE BODY nm3debug IS
 --   Generated package DO NOT MODIFY
 --
 --   nm3get_gen header : "@(#)nm3get_gen.pkh	1.3 12/05/05"
---   nm3get_gen body   : "$Revision:   2.20  $"
+--   nm3get_gen body   : "$Revision:   2.21  $"
 --
 -----------------------------------------------------------------------------
 --
@@ -24,7 +24,7 @@ CREATE OR REPLACE PACKAGE BODY nm3debug IS
 --
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid CONSTANT  VARCHAR2(2000) := '"$Revision:   2.20  $"';
+   g_body_sccsid CONSTANT  VARCHAR2(2000) := '"$Revision:   2.21  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3debug';
@@ -615,6 +615,7 @@ BEGIN
    nm_debug.debug('dsa_parallel_flag    : '||pi_rec_dsa.dsa_parallel_flag,p_level);
    nm_debug.debug('dsa_security_level   : '||pi_rec_dsa.dsa_security_level,p_level);
    nm_debug.debug('dsa_amount           : '||pi_rec_dsa.dsa_amount,p_level);
+   nm_debug.debug('dsa_admin_unit       : '||pi_rec_dsa.dsa_admin_unit,p_level);
 --
    nm_debug.proc_end(g_package_name,'debug_dsa');
 --
