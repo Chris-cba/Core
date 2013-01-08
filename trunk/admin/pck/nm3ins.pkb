@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3ins IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ins.pkb-arc   2.23   Sep 13 2011 11:06:40   Mike.Alexander  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ins.pkb-arc   2.24   Jan 08 2013 15:58:08   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm3ins.pkb  $
---       Date into PVCS   : $Date:   Sep 13 2011 11:06:40  $
---       Date fetched Out : $Modtime:   Sep 13 2011 11:00:12  $
---       PVCS Version     : $Revision:   2.23  $
+--       Date into PVCS   : $Date:   Jan 08 2013 15:58:08  $
+--       Date fetched Out : $Modtime:   Jan 08 2013 15:32:04  $
+--       PVCS Version     : $Revision:   2.24  $
 --
 --
 --   Author : Jonathan Mills
@@ -16,7 +16,7 @@ CREATE OR REPLACE PACKAGE BODY nm3ins IS
 --   Generated package DO NOT MODIFY
 --
 --   nm3get_gen header : "@(#)nm3get_gen.pkh	1.3 12/05/05"
---   nm3get_gen body   : "$Revision:   2.23  $"
+--   nm3get_gen body   : "$Revision:   2.24  $"
 --
 -----------------------------------------------------------------------------
 --
@@ -24,7 +24,7 @@ CREATE OR REPLACE PACKAGE BODY nm3ins IS
 --
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid CONSTANT  VARCHAR2(2000) := '"$Revision:   2.23  $"';
+   g_body_sccsid CONSTANT  VARCHAR2(2000) := '"$Revision:   2.24  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3ins';
@@ -1177,6 +1177,7 @@ BEGIN
             ,dsa_parallel_flag
             ,dsa_security_level
             ,dsa_amount
+            ,dsa_admin_unit
             )
      VALUES (p_rec_dsa.dsa_dtp_code
             ,p_rec_dsa.dsa_dcl_code
@@ -1191,6 +1192,7 @@ BEGIN
             ,p_rec_dsa.dsa_parallel_flag
             ,p_rec_dsa.dsa_security_level
             ,p_rec_dsa.dsa_amount
+            ,p_rec_dsa.dsa_admin_unit
             )
    RETURNING dsa_dtp_code
             ,dsa_dcl_code
@@ -1205,6 +1207,7 @@ BEGIN
             ,dsa_parallel_flag
             ,dsa_security_level
             ,dsa_amount
+            ,dsa_admin_unit
       INTO   p_rec_dsa.dsa_dtp_code
             ,p_rec_dsa.dsa_dcl_code
             ,p_rec_dsa.dsa_doc_status
@@ -1217,7 +1220,8 @@ BEGIN
             ,p_rec_dsa.dsa_seq
             ,p_rec_dsa.dsa_parallel_flag
             ,p_rec_dsa.dsa_security_level
-            ,p_rec_dsa.dsa_amount;
+            ,p_rec_dsa.dsa_amount
+            ,p_rec_dsa.dsa_admin_unit;
 --
    nm_debug.proc_end(g_package_name,'ins_dsa');
 --
