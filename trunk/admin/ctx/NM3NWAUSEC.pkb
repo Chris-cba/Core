@@ -3,18 +3,18 @@ CREATE OR REPLACE PACKAGE BODY nm3nwausec AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/ctx/NM3NWAUSEC.pkb-arc   1.2   Nov 29 2012 11:18:56   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/ctx/NM3NWAUSEC.pkb-arc   1.3   Jan 16 2013 13:05:20   Rob.Coupe  $
 --       Module Name      : $Workfile:   NM3NWAUSEC.pkb  $
---       Date into SCCS   : $Date:   Nov 29 2012 11:18:56  $
---       Date fetched Out : $Modtime:   Nov 29 2012 11:18:42  $
---       SCCS Version     : $Revision:   1.2  $
+--       Date into SCCS   : $Date:   Jan 16 2013 13:05:20  $
+--       Date fetched Out : $Modtime:   Jan 16 2013 12:59:22  $
+--       SCCS Version     : $Revision:   1.3  $
 --
 -----------------------------------------------------------------------------
 --    Copyright (c) Bentley Systems 2012
 -----------------------------------------------------------------------------
 
 
-g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   1.2  $"';
+g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   1.3  $"';
 
   FUNCTION get_version RETURN VARCHAR2 IS
   BEGIN
@@ -93,6 +93,16 @@ BEGIN
        RETURN NULL; 
     ELSE 
        RETURN get_string('SEC_ADMIN_UNIT'); 
+    END IF; 
+ END; 
+
+function HFC_predicate_read( schema_in varchar2, name_in varchar2) RETURN varchar2 IS
+BEGIN 
+    IF Sys_Context('NM3CORE','UNRESTRICTED_INVENTORY') = 'TRUE' and Sys_Context('NM3_SECURITY_CTX','USERNAME') = Sys_Context('NM3_SECURITY_CTX','ACTUAL_USERNAME') 
+     THEN 
+       RETURN NULL; 
+    ELSE 
+       RETURN get_string('HFC_NAU_ADMIN_UNIT'); 
     END IF; 
  END; 
 
