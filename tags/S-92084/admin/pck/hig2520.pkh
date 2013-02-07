@@ -1,0 +1,59 @@
+Create Or Replace Package Hig2520
+AUTHID CURRENT_USER
+As
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig2520.pkh-arc   1.0   Feb 07 2013 14:45:22   Steve.Cooper  $
+--       Module Name      : $Workfile:   hig2520.pkh  $
+--       Date into PVCS   : $Date:   Feb 07 2013 14:45:22  $
+--       Date fetched Out : $Modtime:   Feb 07 2013 13:44:42  $
+--       Version          : $Revision:   1.0  $
+--       Based on SCCS version :
+-------------------------------------------------------------------------
+
+  -----------
+  --constants
+  -----------
+  --g_sccsid is the SCCS ID for the package
+  g_Sccsid Constant Varchar2(2000) := '$Revision:   1.0  $';
+ 
+  Type  t_Delete_Rec          Is Record (
+                                        Process_Id    Hig_Processes.Hp_Process_Id%Type,
+                                        Job_Owner     Hig_Processes.Hp_Job_Owner%Type,
+                                        Job_Name      Hig_Processes.Hp_Job_Name%Type
+                                        );  
+  
+  Type  t_Delete_Tab          Is Table Of t_Delete_Rec Index By Pls_Integer;
+  
+  Type  t_Bulk_Exceptions_Rec Is Record (
+                                        --Process_Id    Hig_Processes.Hp_Process_Id%Type,
+                                        --Error_Index   Integer,
+                                        Error_Code    Integer
+                                        );
+                                        
+  Type  t_Bulk_Exceptions_Tab Is Table Of  t_Bulk_Exceptions_Rec Index By Pls_Integer;
+
+-----------------------------------------------------------------------------
+--
+-- This function returns the current SCCS version
+Function Get_Version Return Varchar2;
+--
+-----------------------------------------------------------------------------
+--
+-- This function returns the current SCCS version of the package body
+Function Get_Body_Version Return Varchar2;
+--
+-----------------------------------------------------------------------------
+--
+--Procedure to delete Hig_Processes, logs dml errors into p_exceptions_Tab.
+Procedure Delete_Processes  (
+                            p_Delete_Tab      In        t_Delete_Tab,
+                            p_Exceptions_Tab      Out   t_Bulk_Exceptions_Tab
+                            );
+--
+-----------------------------------------------------------------------------
+--                                      
+End Hig2520;
+/
+     
