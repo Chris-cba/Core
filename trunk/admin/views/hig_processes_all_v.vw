@@ -1,128 +1,136 @@
-CREATE OR REPLACE FORCE VIEW hig_processes_all_v
+Create Or Replace Force View Hig_Processes_All_V
 (
-   HP_PROCESS_ID,
-   HP_FORMATTED_PROCESS_ID,
-   HP_PROCESS_TYPE_ID,
-   HP_PROCESS_TYPE_NAME,
-   HP_PROCESS_LIMIT,
-   HP_INITIATED_BY_USERNAME,
-   HP_INITIATED_DATE,
-   HP_INITIATORS_REF,
-   HP_JOB_NAME,
-   HP_JOB_OWNER,
-   HP_FULL_JOB_NAME,
-   HP_FREQUENCY_ID,
-   MAX_RUNS,
-   MAX_FAILURES,
-   HP_SUCCESS_FLAG,
-   HP_SUCCESS_FLAG_MEANING,
-   HP_WHAT_TO_CALL,
-   HP_POLLING_FLAG,
-   HP_AREA_TYPE,
-   HP_AREA_TYPE_DESCRIPTION,
-   HP_AREA_ID,
-   HP_AREA_MEANING,
-   HPJ_JOB_ACTION,
-   HPJ_SCHEDULE_TYPE,
-   HPJ_REPEAT_INTERVAL,
-   HPJ_JOB_STATE,
-   HPJ_RUN_COUNT,
-   HPJ_RUN_FAILURE_COUNT,
-   HPJ_LAST_RUN_DATE,
-   HPJ_NEXT_RUN_DATE,
-   HP_REQUIRES_ATTENTION_FLAG,
-   HP_INTERNAL_MODULE,
-   HP_INTERNAL_MODULE_TITLE,
-   HP_INTERNAL_MODULE_PARAM
+Hp_Process_Id,
+Hp_Formatted_Process_Id,
+Hp_Process_Type_Id,
+Hp_Process_Type_Name,
+Hp_Process_Limit,
+Hp_Initiated_By_Username,
+Hp_Initiated_Date,
+Hp_Initiators_Ref,
+Hp_Job_Name,
+Hp_Job_Owner,
+Hp_Full_Job_Name,
+Hp_Frequency_Id,
+Max_Runs,
+Max_Failures,
+Hp_Success_Flag,
+Hp_Success_Flag_Meaning,
+Hp_What_To_Call,
+Hp_Polling_Flag,
+Hp_Area_Type,
+Hp_Area_Type_Description,
+Hp_Area_Id,
+Hp_Area_Meaning,
+Hpj_Job_Action,
+Hpj_Schedule_Type,
+Hpj_Repeat_Interval,
+Hpj_Job_State,
+Hpj_Run_Count,
+Hpj_Run_Failure_Count,
+Hpj_Last_Run_Date,
+Hpj_Next_Run_Date,
+Hp_Requires_Attention_Flag,
+Hp_Internal_Module,
+Hp_Internal_Module_Title,
+Hp_Internal_Module_Param
 )
-AS
-   SELECT                                                                   --
+As
+Select  --
         --
         -------------------------------------------------------------------------
         --   PVCS Identifiers :-
         --
-        --       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/hig_processes_all_v.vw-arc   3.0   Feb 25 2011 14:54:24   Ade.Edwards  $
+        --       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/hig_processes_all_v.vw-arc   3.1   Feb 07 2013 14:44:40   Steve.Cooper  $
         --       Module Name      : $Workfile:   hig_processes_all_v.vw  $
-        --       Date into PVCS   : $Date:   Feb 25 2011 14:54:24  $
-        --       Date fetched Out : $Modtime:   Feb 25 2011 11:02:20  $
-        --       Version          : $Revision:   3.0  $
+        --       Date into PVCS   : $Date:   Feb 07 2013 14:44:40  $
+        --       Date fetched Out : $Modtime:   Feb 04 2013 16:25:40  $
+        --       Version          : $Revision:   3.1  $
         -------------------------------------------------------------------------
         --
-          hp_process_id,
-          hig_process_framework_utils.formatted_process_id (hp_process_id)       hp_formatted_process_id,
-          hp_process_type_id,
-          hpt_name hp_process_type_name,
-          hpt_process_limit hp_process_limit,
-          hp_initiated_by_username,
-          hp_initiated_date,
-          hp_initiators_ref,
-          hp_job_name,
-          hp_job_owner,
-          hp_job_owner || '.' || hp_job_name hp_full_job_name,
-          hp_frequency_id,
-          a.max_runs,
-          a.max_failures,
-          hp_success_flag,
-          (SELECT hco_meaning
-             FROM hig_codes
-            WHERE hco_domain = 'PROCESS_SUCCESS_FLAG'
-                  AND hco_code = hp_success_flag)
-             hp_success_flag_meaning,
-          hp_what_to_call hp_what_to_call,
-          hp_polling_flag,
-          hp_area_type,
-          (SELECT hpa_description
-             FROM hig_process_areas
-            WHERE hpa_area_type = hp_area_type)
-             hp_area_type_description,
-          hp_area_id,
-          hp_area_meaning,
-          a.job_action hpj_job_action,
-          a.schedule_type hpj_schedule_type,
-          a.repeat_interval hpj_repeat_interval,
-          DECODE (a.state, 'SUCCEEDED', 'Completed', INITCAP (a.state))
-             hpj_job_state,
-          (SELECT COUNT (hpjr_process_id)
-             FROM hig_process_job_runs
-            WHERE hpjr_process_id = hp_process_id)
-             hpj_run_count,
-          (SELECT COUNT (hpjr_process_id)
-             FROM hig_process_job_runs
-            WHERE hpjr_process_id = hp_process_id AND hpjr_success_flag = 'N')
-             hpj_run_failure_count,
-          CAST (
-             CAST (a.last_start_date AS TIMESTAMP WITH LOCAL TIME ZONE) AS DATE)
-             hpj_last_run_date,
-          CASE
-             WHEN a.state = 'SCHEDULED'
-             THEN
-                CAST (
-                   CAST (a.next_run_date AS TIMESTAMP WITH LOCAL TIME ZONE) AS DATE)
-             ELSE
-                NULL
-          END
-             hpj_next_run_date,
-          CASE
-             WHEN a.state IN ('SCHEDULED', 'SUCCEEDED', 'DISABLED')
-                  AND (SELECT COUNT (hpjr_process_id)
-                         FROM hig_process_job_runs
-                        WHERE hpjr_process_id = c.hp_process_id
-                              AND hpjr_success_flag = 'N') = 0 THEN 'N'
-             ELSE 'Y'
-          END
-             hp_requires_attention_flag,
-          hpt_internal_module hp_internal_module,
-          hpt_internal_module_title hp_internal_module_title,
-          hpt_internal_module_param hp_internal_module_param
-from dba_scheduler_jobs a
-   , hig_users b
-   , hig_processes c
-   , hig_process_types_v d
-where  b.hus_username = a.owner
-and  c.hp_job_name = a.job_name(+)
-and  d.hpt_process_type_id = c.hp_process_type_id
+        hp.Hp_Process_Id                                                            Hp_Process_Id,
+        Hig_Process_Framework_Utils.Formatted_Process_Id (hp.Hp_Process_Id)         Hp_Formatted_Process_Id,
+        hp.Hp_Process_Type_Id                                                       Hp_Process_Type_Id,
+        hptv.Hpt_Name                                                               Hp_Process_Type_Name,
+        hptv.Hpt_Process_Limit                                                      Hp_Process_Limit,
+        hp.Hp_Initiated_By_Username                                                 Hp_Initiated_By_Username,
+        hp.Hp_Initiated_Date                                                        Hp_Initiated_Date,
+        hp.Hp_Initiators_Ref                                                        Hp_Initiators_Ref,
+        hp.Hp_Job_Name                                                              Hp_Job_Name,
+        hp.Hp_Job_Owner                                                             Hp_Job_Owner,
+        hp.Hp_Job_Owner || '.' || hp.Hp_Job_Name                                    Hp_Full_Job_Name,
+        hp.Hp_Frequency_Id                                                          Hp_Frequency_Id,
+        dsj.Max_Runs                                                                Max_Runs,
+        dsj.Max_Failures                                                            Max_Failures,
+        hp.Hp_Success_Flag                                                          Hp_Success_Flag,
+        (
+        Select  hc.Hco_Meaning
+        From    Hig_Codes       hc
+        Where   hc.Hco_Domain   =   'PROCESS_SUCCESS_FLAG'
+        And     hc.Hco_Code     =   hp.Hp_Success_Flag
+        )                                                                           Hp_Success_Flag_Meaning,
+        hp.Hp_What_To_Call                                                          Hp_What_To_Call,
+        hp.Hp_Polling_Flag                                                          Hp_Polling_Flag,
+        hp.Hp_Area_Type                                                             Hp_Area_Type,
+        (
+        Select    hpa.Hpa_Description
+        From      Hig_Process_Areas     hpa
+        Where     hpa.Hpa_Area_Type     =     hp.Hp_Area_Type
+        )                                                                           Hp_Area_Type_Description,
+        hp.Hp_Area_Id                                                               Hp_Area_Id,
+        hp.Hp_Area_Meaning                                                          Hp_Area_Meaning,
+        dsj.Job_Action                                                              Hpj_Job_Action,
+        dsj.Schedule_Type                                                           Hpj_Schedule_Type,
+        dsj.Repeat_Interval                                                         Hpj_Repeat_Interval,
+        Decode (dsj.State,  'SUCCEEDED',  'Completed',
+                            Null,         'Missing Job',
+                            Initcap (dsj.State)
+               )                                                                    Hpj_Job_State,
+        (        
+        Select    Count (hpjr.Hpjr_Process_Id)
+        From      Hig_Process_Job_Runs    hpjr
+        Where     hpjr.Hpjr_Process_Id    =     hp.Hp_Process_Id
+        )                                                                           Hpj_Run_Count,
+        (
+        Select    Count (hpjr.Hpjr_Process_Id)
+        From      Hig_Process_Job_Runs      hpjr
+        Where     hpjr.Hpjr_Process_Id      =   hp.Hp_Process_Id
+        And       hpjr.Hpjr_Success_Flag    =   'N'
+        )                                                                           Hpj_Run_Failure_Count,
+        Cast(Cast (dsj.Last_Start_Date As Timestamp With Local Time Zone) As Date)  Hpj_Last_Run_Date,
+        (
+        Case
+          When dsj.State = 'SCHEDULED' Then
+            Cast (Cast (dsj.Next_Run_Date As Timestamp With Local Time Zone) As Date)
+             Else
+                Null
+          End
+        )                                                                           Hpj_Next_Run_Date,
+        (
+        Case
+          When    dsj.State In ('SCHEDULED', 'SUCCEEDED', 'DISABLED')
+            And   (
+                  Select    Count (hpjr.Hpjr_Process_Id)
+                  From      Hig_Process_Job_Runs hpjr
+                  Where     hpjr.Hpjr_Process_Id    = hp.Hp_Process_Id
+                  And       hpjr.Hpjr_Success_Flag  = 'N'
+                  )  = 0 Then 'N'
+             Else 'Y'
+        End
+        )                                                                           Hp_Requires_Attention_Flag,
+        hptv.Hpt_Internal_Module                                                    Hp_Internal_Module,
+        hptv.Hpt_Internal_Module_Title                                              Hp_Internal_Module_Title,
+        hptv.Hpt_Internal_Module_Param                                              Hp_Internal_Module_Param
+From    Dba_Scheduler_Jobs          dsj,
+        Hig_Users                   hu,
+        Hig_Processes               hp,
+        Hig_Process_Types_V         hptv
+Where   hptv.Hpt_Process_Type_Id    =     hp.Hp_Process_Type_Id
+And     hp.Hp_Job_Name              =     dsj.Job_Name(+)
+And     dsj.Owner                   =     hu.Hus_Username(+)     
 /
-COMMENT ON TABLE HIG_PROCESSES_ALL_V IS 'Exor Process Framework view.  Show process and job details for all processes'
+
+Comment On Table Hig_Processes_All_V Is 'Exor Process Framework view.  Show process and job details for all processes'
 /
 
 
