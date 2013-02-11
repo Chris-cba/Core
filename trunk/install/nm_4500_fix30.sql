@@ -1,10 +1,10 @@
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm_4500_fix30.sql-arc   1.1   Feb 11 2013 13:05:02   Steve.Cooper  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm_4500_fix30.sql-arc   1.2   Feb 11 2013 14:06:46   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm_4500_fix30.sql  $ 
---       Date into PVCS   : $Date:   Feb 11 2013 13:05:02  $
---       Date fetched Out : $Modtime:   Feb 11 2013 13:04:28  $
---       PVCS Version     : $Revision:   1.1  $
+--       Date into PVCS   : $Date:   Feb 11 2013 14:06:46  $
+--       Date fetched Out : $Modtime:   Feb 11 2013 14:04:48  $
+--       PVCS Version     : $Revision:   1.2  $
 --
 ----------------------------------------------------------------------------
 --   Copyright (c) 2012 Bentley Systems Incorporated.
@@ -124,6 +124,20 @@ PROMPT log_nm_4500_fix30.sql
 SET FEEDBACK ON
 start log_nm_4500_fix30.sql 
 SET FEEDBACK OFF
+--
+--------------------------------------------------------------------------------
+-- Refresh Synonyms for new Objects
+--------------------------------------------------------------------------------
+--
+SET TERM ON 
+PROMPT Refresh Synonyms
+SET TERM OFF
+
+Begin
+  Nm3Ddl.Refresh_All_Synonyms;
+End;
+/
+  
 SPOOL OFF
 EXIT
 --
