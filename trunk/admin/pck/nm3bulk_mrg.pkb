@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.43   Feb 18 2013 15:37:28   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.44   Feb 21 2013 17:03:08   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3bulk_mrg.pkb  $
---       Date into PVCS   : $Date:   Feb 18 2013 15:37:28  $
---       Date fetched Out : $Modtime:   Feb 18 2013 15:36:26  $
---       PVCS Version     : $Revision:   2.43  $
+--       Date into PVCS   : $Date:   Feb 21 2013 17:03:08  $
+--       Date fetched Out : $Modtime:   Feb 21 2013 16:47:38  $
+--       PVCS Version     : $Revision:   2.44  $
 --
 --
 --   Author : Priidu Tanava
@@ -124,7 +124,7 @@ No query types defined.
         add nm_route_connect_tmp_ordered view with the next schema change
         in nm3dynsql replace the use of nm3sql.set_context_value() with that of nm3ctx
 */
-  g_body_sccsid     constant  varchar2(40)  :='"$Revision:   2.43  $"';
+  g_body_sccsid     constant  varchar2(40)  :='"$Revision:   2.44  $"';
   g_package_name    constant  varchar2(30)  := 'nm3bulk_mrg';
 
   cr  constant varchar2(1) := chr(10);
@@ -2484,6 +2484,16 @@ No query types defined.
       raise;
   end;
 
+-- RAC - D-118287 - failure to include point data using group of groups
+-- loads datum criteria for a group of groups m
+--  p_group_id is a group of groups
+--  p_group_type is the driving linear group type
+
+
+  procedure load_g_of_g (p_ne_id      IN     nm_elements.ne_id%TYPE
+                        ,p_group_type IN     nm_elements.ne_gty_group_type%TYPE
+                        ,p_sqlcount      OUT NUMBER
+                        );
 
 
   -- loads datum criteria for as single group or datum
@@ -2596,46 +2606,56 @@ No query types defined.
 
     -- group of groups
     elsif l_ne_type = 'P' then
-      l_sql :=
-        sql_nm_datum_criteria_pre_tmp(
-           p_elements_sql =>
-                  '    select nm_ne_id_of, nm_begin_mp begin_mp, nm_end_mp end_mp'
-            ||cr||'     ,to_number(null) group_id'
-            ||cr||'    from'
-            ||cr||'       nm_members'
-            ||cr||'    where nm_ne_id_of in ('
-            ||cr||'      select ne_id'
-            ||cr||'      from'
-            ||cr||'         nm_elements'
-            ||cr||'      where ne_id in (select nm_ne_id_of from nm_members'
-            ||cr||'                        connect by nm_ne_id_in = prior nm_ne_id_of'
-            ||cr||'                        start with nm_ne_id_in = :p_group_id)'
-            ||cr||'        and ne_type in (''S'', ''D'')'
-            ||cr||'      )'
-         );
-
-    end if;
-
-    nm3dbg.putln('l_group_type='||l_group_type);
-    nm3dbg.putln(l_sql);
-
-    if l_sql is not null then
-      clear_datum_criteria_pre_tmp;
-      execute immediate l_sql
-      using
-         p_group_id
-        ,l_effective_date
-        ,l_effective_date
-        ,l_effective_date;
-      p_sqlcount := sql%rowcount;
-      nm3dbg.putln('ins nm_datum_criteria_pre_tmp: '||p_sqlcount);
-
-      -- load from nm_datum_criteria_pre_tmp into nm_datum_criteria_tmp
+--      l_sql :=
+--        sql_nm_datum_criteria_pre_tmp(
+--           p_elements_sql =>
+--                  '    select nm_ne_id_of, nm_begin_mp begin_mp, nm_end_mp end_mp'
+--            ||cr||'     ,to_number(null) group_id'
+--            ||cr||'    from'
+--            ||cr||'       nm_members'
+--            ||cr||'    where nm_ne_id_of in ('
+--            ||cr||'      select ne_id'
+--            ||cr||'      from'
+--            ||cr||'         nm_elements'
+--            ||cr||'      where ne_id in (select nm_ne_id_of from nm_members'
+--            ||cr||'                        connect by nm_ne_id_in = prior nm_ne_id_of'
+--            ||cr||'                        start with nm_ne_id_in = :p_group_id)'
+--            ||cr||'        and ne_type in (''S'', ''D'')'
+--            ||cr||'      )'
+--         );
+--
+--    end if;
+--
+--    nm3dbg.putln('l_group_type='||l_group_type);
+--    nm3dbg.putln(l_sql);
+--
+--    if l_sql is not null then
+--      clear_datum_criteria_pre_tmp;
+--      execute immediate l_sql
+--      using
+--         p_group_id
+--        ,l_effective_date
+--        ,l_effective_date
+--        ,l_effective_date;
+--      p_sqlcount := sql%rowcount;
+--      nm3dbg.putln('ins nm_datum_criteria_pre_tmp: '||p_sqlcount);
+--
+--      -- load from nm_datum_criteria_pre_tmp into nm_datum_criteria_tmp
+--
+--RAC - defect D-118287 - problems in code - commented out above. Needs simpl egroup of groups population
+--   first clear the candidate datums.
+ 
       clear_datum_criteria_tmp;
-      load_nm_datum_criteria_tmp(
-         p_group_type => l_group_type
-        ,p_sqlcount   => p_sqlcount
-      );
+      
+      load_g_of_g( p_ne_id      => p_group_id   
+                  ,p_group_type => l_group_type
+                  ,p_sqlcount   => p_sqlcount
+                 );
+                 
+--      load_nm_datum_criteria_tmp(
+--         p_group_type => l_group_type
+--        ,p_sqlcount   => p_sqlcount
+--      );
     end if;
 
     commit;
@@ -2655,6 +2675,50 @@ No query types defined.
   end;
 
 
+/* Formatted on 21/02/2013 12:39:42 (QP5 v5.185.11230.41888) */
+PROCEDURE load_g_of_g (p_ne_id      IN     nm_elements.ne_id%TYPE
+                      ,p_group_type IN     nm_elements.ne_gty_group_type%TYPE
+                      ,p_sqlcount      OUT NUMBER
+                       )
+IS
+BEGIN
+   INSERT INTO NM_DATUM_CRITERIA_TMP (datum_id,
+                                      begin_mp,
+                                      end_mp,
+                                      GROUP_ID)
+      SELECT DISTINCT a.nm_ne_id_of,
+                      a.nm_begin_mp,
+                      a.end_mp,
+                      b.nm_ne_id_in
+        FROM (
+              SELECT nm_ne_id_of,
+                     nm_begin_mp,
+                     LEAST (nm_end_mp, ne_length) end_mp,
+                     ne_type
+                FROM (    SELECT PRIOR nm_type p_nt,
+                                 nm_ne_id_in,
+                                 nm_ne_id_of,
+                                 nm_obj_type,
+                                 PRIOR nm_begin_mp p_begin,
+                                 PRIOR nm_end_mp p_end,
+                                 nm_slk,
+                                 nm_end_slk,
+                                 nm_begin_mp,
+                                 nm_end_mp,
+                                 ne_length,
+                                 ne_type
+                            FROM nm_members, nm_elements
+                           WHERE nm_type IN ('P', 'G')
+                                 AND ne_id = nm_ne_id_of
+                      CONNECT BY PRIOR nm_ne_id_of = nm_ne_id_in
+                      START WITH nm_ne_id_in = p_ne_id)
+               WHERE ne_type IN ('S', 'D')) a,
+             nm_members b
+       WHERE a.nm_ne_id_of = b.nm_ne_id_of 
+       AND b.nm_obj_type = p_group_type;
+--
+       select count(*) into p_sqlcount from NM_DATUM_CRITERIA_TMP;
+end;
 
   -- load datum criteria for a single saved extent
   procedure load_extent_datums(
