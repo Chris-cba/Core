@@ -6,11 +6,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3sde AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sde.pkb-arc   2.19   Mar 05 2013 10:04:00   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sde.pkb-arc   2.20   Mar 05 2013 14:17:36   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3sde.pkb  $
---       Date into PVCS   : $Date:   Mar 05 2013 10:04:00  $
---       Date fetched Out : $Modtime:   Mar 05 2013 10:01:28  $
---       PVCS Version     : $Revision:   2.19  $
+--       Date into PVCS   : $Date:   Mar 05 2013 14:17:36  $
+--       Date fetched Out : $Modtime:   Mar 05 2013 14:16:18  $
+--       PVCS Version     : $Revision:   2.20  $
 --
 --       Based on one of many versions labeled as 1.21
 --
@@ -24,7 +24,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3sde AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.19  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.20  $"';
    g_keyword         CONSTANT  VARCHAR2(30)   := 'SDO_GEOMETRY'; --get_keyword;
 
 
@@ -1692,10 +1692,9 @@ END;
 
   BEGIN
 
-  IF NOT g_mcp_layer  
-  THEN
      l_nth := Nm3get.get_nth( p_theme_id );
 
+     
      SELECT COUNT(*)
      INTO l_sde_cnt
      FROM sde.layers
@@ -1714,7 +1713,6 @@ END;
                              );
 
       END IF;
-  END IF;
   END;
 
 
