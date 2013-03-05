@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE Nm3sde AS
 --<PACKAGE>
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sde.pkh-arc   2.5   Mar 05 2013 14:11:58   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sde.pkh-arc   2.6   Mar 05 2013 14:13:34   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3sde.pkh  $
---       Date into PVCS   : $Date:   Mar 05 2013 14:11:58  $
---       Date fetched Out : $Modtime:   Mar 05 2013 14:11:24  $
---       PVCS Version     : $Revision:   2.5  $
+--       Date into PVCS   : $Date:   Mar 05 2013 14:13:34  $
+--       Date fetched Out : $Modtime:   Mar 05 2013 14:13:06  $
+--       PVCS Version     : $Revision:   2.6  $
 --
 --   Author : R.A. Coupe
 --
@@ -17,7 +17,7 @@ CREATE OR REPLACE PACKAGE Nm3sde AS
 -----------------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
-  g_sccsid      CONSTANT  VARCHAR2(2000) := '"@(#)nm3sde.pkh	1.11 07/31/06"';
+  g_sccsid      CONSTANT  VARCHAR2(2000) := '"$Revision:   2.6  $"';
 
 --  g_sccsid is the SCCS ID for the package
 
