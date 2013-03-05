@@ -5,11 +5,11 @@ As
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.57.1.2   Sep 07 2012 12:34:50   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.57.1.3   Mar 05 2013 13:30:34   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3sdm.pkb  $
---       Date into PVCS   : $Date:   Sep 07 2012 12:34:50  $
---       Date fetched Out : $Modtime:   Sep 07 2012 12:34:02  $
---       PVCS Version     : $Revision:   2.57.1.2  $
+--       Date into PVCS   : $Date:   Mar 05 2013 13:30:34  $
+--       Date fetched Out : $Modtime:   Mar 05 2013 13:26:38  $
+--       PVCS Version     : $Revision:   2.57.1.3  $
 --
 --   Author : R.A. Coupe
 --
@@ -21,7 +21,7 @@ As
 --
 --all global package variables here
 --
-  g_Body_Sccsid     Constant Varchar2 (2000) := '"$Revision:   2.57.1.2  $"';
+  g_Body_Sccsid     Constant Varchar2 (2000) := '"$Revision:   2.57.1.3  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
   g_Package_Name    Constant Varchar2 (30)   := 'NM3SDM';
@@ -59,6 +59,24 @@ As
   Type t_View_Tab Is Table Of t_View_Rec Index By Binary_Integer;  
   
 --
+  Function Check_Sub_Sde_Exempt( pi_obj_name in varchar2) return Boolean is
+  retval     Boolean := FALSE;
+  l_dummy    Integer;
+  begin
+    select 1
+    into l_dummy
+    from all_objects, nm_sde_sub_layer_exempt
+    where object_name like nssl_object_name
+    and object_type = nssl_object_type
+    and owner = sys_context('NM3CORE', 'APPLICATION_OWNER')
+    and object_name = pi_obj_name
+    and rownum = 1;
+    retval := SQL%FOUND;
+    return retval;
+  exception
+    when no_data_found then
+      return FALSE;
+  end;
 -----------------------------------------------------------------------------
 --
 Function User_Is_Unrestricted Return Boolean
@@ -6597,16 +6615,21 @@ Is
     --Create_Feature_View (I.Hus_Username, I.Nth_Feature_Table);
     
     If Hig.Get_User_Or_Sys_Opt('REGSDELAY') = 'Y' Then
-      Begin
-        Execute Immediate(' begin '||
-                            'nm3sde.create_sub_sde_layer ( p_theme_id => '|| pi_Theme_Id
-                                                      || ',p_username => '''|| i.Hus_Username
-                                                      || ''');'||
-                                                        ' end;');
-      Exception
-        When Others Then
-          Null;
-      End;
+    
+      if NOT check_sub_sde_exempt( i.nth_feature_table ) Then
+
+        Begin
+          Execute Immediate(' begin '||
+                              'nm3sde.create_sub_sde_layer ( p_theme_id => '|| pi_Theme_Id
+                                                        || ',p_username => '''|| i.Hus_Username
+                                                        || ''');'||
+                                                          ' end;');
+        Exception
+          When Others Then
+            Null;
+        End;
+        
+      End If;
 
     End If;
 
@@ -6859,16 +6882,20 @@ Is
       -- Create_Feature_View (Pi_Username, I.Nth_Feature_Table);
       --
       If Hig.Get_User_Or_Sys_Opt('REGSDELAY') = 'Y' Then
-        Begin
-          Execute Immediate (' begin '||
-                             'nm3sde.create_sub_sde_layer ( p_theme_id => '|| To_Char (I.Nth_Theme_Id)
-                                                       || ',p_username => '''|| Pi_Username
-                                                    || ''');'||
-                          ' end;');
-        Exception
-          When Others Then 
-            Null;
-        End;
+  
+        if NOT check_sub_sde_exempt( i.nth_feature_table ) Then
+      
+          Begin
+            Execute Immediate (' begin '||
+                               'nm3sde.create_sub_sde_layer ( p_theme_id => '|| To_Char (I.Nth_Theme_Id)
+                                                         || ',p_username => '''|| Pi_Username
+                                                      || ''');'||
+                            ' end;');
+          Exception
+            When Others Then 
+              Null;
+          End;
+        End If;
       End If;
     End Loop;
   Exception
