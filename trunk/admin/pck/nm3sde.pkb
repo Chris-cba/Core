@@ -6,11 +6,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3sde AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sde.pkb-arc   2.18   Feb 15 2012 10:21:40   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sde.pkb-arc   2.19   Mar 05 2013 10:04:00   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3sde.pkb  $
---       Date into PVCS   : $Date:   Feb 15 2012 10:21:40  $
---       Date fetched Out : $Modtime:   Feb 15 2012 10:15:38  $
---       PVCS Version     : $Revision:   2.18  $
+--       Date into PVCS   : $Date:   Mar 05 2013 10:04:00  $
+--       Date fetched Out : $Modtime:   Mar 05 2013 10:01:28  $
+--       PVCS Version     : $Revision:   2.19  $
 --
 --       Based on one of many versions labeled as 1.21
 --
@@ -24,7 +24,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3sde AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.18  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.19  $"';
    g_keyword         CONSTANT  VARCHAR2(30)   := 'SDO_GEOMETRY'; --get_keyword;
 
 
@@ -1267,7 +1267,12 @@ BEGIN
          l_data_precision_tab (i) := NULL;
          l_data_length_tab (i) := NULL;
          l_obj_id := l_layer.layer_id;
-         l_obj_flag := 131076;
+         if l_nullable_tab (i) = 'Y'
+         then
+           l_obj_flag := 131076;
+         else
+           l_obj_flag := 131072;
+         end if;
       ELSE
          l_obj_id := NULL;
 
@@ -1351,7 +1356,7 @@ BEGIN
       --
          IF l_col_tab (i) = p_rowid
          THEN
-            l_obj_flag := 3;
+            l_obj_flag := 1;
          END IF;
    --
       END IF;
@@ -1687,7 +1692,9 @@ END;
 
   BEGIN
 
-  l_nth := Nm3get.get_nth( p_theme_id );
+  IF NOT g_mcp_layer  
+  THEN
+     l_nth := Nm3get.get_nth( p_theme_id );
 
      SELECT COUNT(*)
      INTO l_sde_cnt
@@ -1707,6 +1714,7 @@ END;
                              );
 
       END IF;
+  END IF;
   END;
 
 
