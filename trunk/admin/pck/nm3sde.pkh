@@ -1,13 +1,12 @@
 CREATE OR REPLACE PACKAGE Nm3sde AS
 --<PACKAGE>
---   SCCS Identifiers :-
+--   PVCS Identifiers :-
 --
---       sccsid           : @(#)nm3sde.pkh	1.11 07/31/06
---       Module Name      : nm3sde.pkh
---       Date into SCCS   : 06/07/31 11:22:06
---       Date fetched Out : 07/06/13 14:13:25
---       SCCS Version     : 1.11
---
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sde.pkh-arc   2.5   Mar 05 2013 14:11:58   Rob.Coupe  $
+--       Module Name      : $Workfile:   nm3sde.pkh  $
+--       Date into PVCS   : $Date:   Mar 05 2013 14:11:58  $
+--       Date fetched Out : $Modtime:   Mar 05 2013 14:11:24  $
+--       PVCS Version     : $Revision:   2.5  $
 --
 --   Author : R.A. Coupe
 --
