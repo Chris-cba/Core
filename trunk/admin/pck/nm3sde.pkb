@@ -6,11 +6,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3sde AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sde.pkb-arc   2.21   Mar 06 2013 13:56:04   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sde.pkb-arc   2.22   Mar 08 2013 08:32:32   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3sde.pkb  $
---       Date into PVCS   : $Date:   Mar 06 2013 13:56:04  $
---       Date fetched Out : $Modtime:   Mar 06 2013 13:55:32  $
---       PVCS Version     : $Revision:   2.21  $
+--       Date into PVCS   : $Date:   Mar 08 2013 08:32:32  $
+--       Date fetched Out : $Modtime:   Mar 08 2013 08:30:34  $
+--       PVCS Version     : $Revision:   2.22  $
 --
 --       Based on one of many versions labeled as 1.21
 --
@@ -24,7 +24,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3sde AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.21  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.22  $"';
    g_keyword         CONSTANT  VARCHAR2(30)   := 'SDO_GEOMETRY'; --get_keyword;
 
 
@@ -1182,387 +1182,40 @@ PROCEDURE create_column_registry (
    p_rowid    IN   VARCHAR2
 )
 IS
---
-   SUBTYPE layer_record_t IS sde.layers%ROWTYPE;
---
---1 = SE_INT16_TYPE             2-byte Integer
---2 = SE_INT32_TYPE             4-byte Integer
---3 = SE_FLOAT32_TYPE           4-byte Float
---4 = SE_FLOAT64_TYPE           8-byte Float
---5 = SE_STRING_TYPE            Null Term. Character Array
---6 = SE_BLOB_TYPE              Variable Length Data
---7 = SE_DATE_TYPE              Struct tm Date
---8 = SE_SHAPE_TYPE             Shape geometry (SE_SHAPE)
---9 = SE_RASTER_TYPE            Raster
---10 = SE_XML_TYPE              XML Document
---11 = SE_INT64_TYPE            8-byte Integer
---12 = SE_UUID_TYPE             A Universal Unique ID
---13 = SE_CLOB_TYPE             Character variable length data
---14 = SE_NSTRING_TYPE UNICODE  Null Term. Character Array
---15 = SE_NCLOB_TYPE UNICODE    Character Large Object
---
---   CURSOR c1 (c_table IN VARCHAR2)
---   IS
---      SELECT column_name,
---             DECODE (data_type,
---                     'DATE', 7,
---                     'VARCHAR2', 5,
---                     'CHAR', 5,
---                     'NUMBER', 4,
---                     'INTEGER', 2,
---                     'SDO_GEOMETRY', 8
---                    ),
---             data_length, data_precision, data_scale, nullable
---        FROM user_tab_columns
---       WHERE table_name = c_table;
---
-----
---   CURSOR c2 (c_table IN VARCHAR2)
---   IS
---      SELECT a.column_name
---        FROM user_cons_columns a, user_constraints b
---       WHERE a.constraint_name = b.constraint_name
---         AND b.table_name = c_table
---         AND b.constraint_type IN ('P', 'U')
---      UNION
---      SELECT a.column_name
---        FROM user_ind_columns a, user_indexes b
---       WHERE a.index_name = b.index_name
---         AND b.table_name = c_table
---         AND b.uniqueness = 'UNIQUE';
---
-----
---   l_col_tab              nm3type.tab_varchar30;
---   l_data_type_tab        nm3type.tab_varchar30;
---   l_data_length_tab      nm3type.tab_number;
---   l_data_precision_tab   nm3type.tab_number;
---   l_data_scale_tab       nm3type.tab_number;
---   l_nullable_tab         nm3type.tab_varchar1;
---
---   l_obj_id               INTEGER;
---   l_obj_flag             NUMBER;
---   l_pk_col               VARCHAR2 (30);
---   l_layer                layer_record_t;
---
+
+-- The column flag settings are available on the ESRI Web site.Each is coded into the context sensitive view V_NM_SDE_COLUMN_REGISTRY
+
 BEGIN
+
+   nm3ctx.set_context('NSCR_TABLE_NAME',   p_table );
+   nm3ctx.set_context('NSCR_COLUMN_NAME',  p_column );
+   nm3ctx.set_context('NSCR_ROWID_COLUMN', p_rowid );
 --
---   
---
---   OPEN c1 (p_table);
---   FETCH c1
---   BULK COLLECT INTO l_col_tab, l_data_type_tab, l_data_length_tab,
---                     l_data_precision_tab, l_data_scale_tab, l_nullable_tab;
---   CLOSE c1;
---
-----assume single column unique key or primary key or unique index?
---   OPEN c2 (p_table);
---   FETCH c2
---    INTO l_pk_col;
---   CLOSE c2;
-----
---   l_layer := get_layer (p_table, p_column);
-----
---   FOR i IN 1 .. l_col_tab.COUNT
---   LOOP
---      IF l_col_tab (i) = p_column
---      THEN
---         l_data_precision_tab (i) := NULL;
---         l_data_length_tab (i) := NULL;
---         l_obj_id := l_layer.layer_id;
---         if l_nullable_tab (i) = 'Y'
---         then
---           l_obj_flag := 131076;
---         else
---           l_obj_flag := 131072;
---         end if;
---      ELSE
---         l_obj_id := NULL;
---
---         IF l_col_tab (i) = l_pk_col
---         THEN
---            l_obj_flag := 3;
---         ELSE
---            l_obj_flag := 4;
---         END IF;
---      --
---         IF l_data_type_tab (i) = 4 AND l_data_scale_tab (i) = 0
---         THEN
---
---     -- cater here for integer columns or number(38) or integer number columns
---     -- integer - set length only
---
---            IF l_data_precision_tab (i) = 38
---            THEN                                 -- this is an integer column
---               l_data_type_tab (i) := 2;
---               l_data_length_tab (i) := 10;
---               l_data_precision_tab (i) := NULL;
---            ELSIF l_data_length_tab (i) = 22
---              AND l_data_precision_tab (i) IS NOT NULL
---            THEN        -- integer disguised a fixed length number with no dp.
---               l_data_type_tab (i) := 2;
---               l_data_length_tab (i) := l_data_precision_tab (i);
---               l_data_precision_tab (i) := NULL;
---            ELSIF l_data_length_tab (i) = 22
---              AND l_data_precision_tab (i) IS NULL
---            THEN                                   -- this is a generic number
---         --      l_data_type_tab (i) := 3; -- CWS 0109471 NO NEED TO CHANGE AN 8 BIT TO A 4 BIT. THIS CAUSES ISSUES
---               l_data_length_tab (i) := 0;
---               l_data_precision_tab (i) := 0;
---            END IF;
---      --
---         ELSIF l_data_type_tab (i) = 4
---           AND l_data_length_tab (i) = 22
---           AND l_data_precision_tab (i) IS NULL
---           AND l_data_scale_tab (i) IS NULL
---         THEN                                      -- this is a generic number
---         --   l_data_type_tab (i) := 3; -- CWS 0109471 NO NEED TO CHANGE AN 8 BIT TO A 4 BIT. THIS CAUSES ISSUES
---            l_data_length_tab (i) := 0;
---            l_data_precision_tab (i) := 0;
---      --
---      --------------------------------------------------------------------------
---      -- AE  19-FEB-2009
---      -- Quick fix for SDE 9.1
---      -- Ensure any number with precision and scale is set to an SDE_TYPE of 3
---      --
---         ELSIF l_data_type_tab (i) = 4
---           AND l_data_precision_tab (i) > 0
---           AND l_data_scale_tab (i) > 0
---           AND nm3sde.get_sde_version = '9.1'
---         THEN                                   -- this is a number with scale
---          --
---         --   l_data_type_tab (i)      := 3; -- CWS 0109471 NO NEED TO CHANGE AN 8 BIT TO A 4 BIT. THIS CAUSES ISSUES
---            l_data_length_tab (i)    := l_data_precision_tab (i);
---            l_data_precision_tab (i) := l_data_scale_tab (i);
---          --
---      --
---      -- AE  19-FEB-2009
---      -- End of changes
---      --------------------------------------------------------------------------
---      --
---         ELSIF l_data_type_tab (i) = 4
---         THEN
---            l_data_length_tab (i) := l_data_scale_tab (i);
---            l_data_precision_tab (i) := l_data_scale_tab (i);
---      --
---         ELSIF l_data_type_tab (i) = 7
---         THEN
---            l_data_length_tab (i) := 0;
---         END IF;
---      --
---         IF l_nullable_tab (i) = 'N'
---         THEN
---            l_obj_flag := 0;
---         ELSE
---            l_obj_flag := 4;
---         END IF;
---      --
---         IF l_col_tab (i) = p_rowid
---         THEN
---            l_obj_flag := 1;
---         END IF;
---   --
---      END IF;
---
---    execute immediate '
-/* Formatted on 06/03/2013 13:55:11 (QP5 v5.185.11230.41888) */
-INSERT INTO sde.column_registry (table_name,
-                                 owner,
-                                 column_name,
-                                 sde_type,
-                                 column_size,
-                                 decimal_digits,
-                                 description,
-                                 object_flags,
-                                 object_id)
-   SELECT p_table,
-          SYS_CONTEXT ('NM3CORE', 'APPLICATION_OWNER'),
-          column_name,
-          sde_type,
-          column_size,
-          decimal_digits,
-          NULL,
-          bit1 + bit2 + bit3 + bit18,
-          object_id
-     FROM (SELECT q1.*,
-                  CASE column_name WHEN p_column THEN layer_id ELSE NULL END
-                     object_id,
-                  NVL (
-                     (SELECT 2
-                        FROM DUAL
-                       WHERE     bit1 = 1
-                             AND bit3 = 0
-                             AND data_type = 'NUMBER'
-                             AND data_precision = 38
-                             AND data_scale = 0),
-                     0)
-                     bit2
-             FROM (SELECT t.column_name,
-                          l.layer_id,
-                          data_type,
-                          data_precision,
-                          data_scale,
-                          nullable,
-                          CASE data_type
-                             WHEN 'SDO_GEOMETRY'
-                             THEN
-                                8
-                             WHEN 'NUMBER'
-                             THEN
-                                CASE NVL (data_scale, -99)
-                                   WHEN -99
-                                   THEN
-                                      CASE NVL (SIGN (data_precision - 4),
-                                                -99)
-                                         WHEN -99
-                                         THEN
-                                            4
-                                         WHEN 1
-                                         THEN
-                                            2
-                                         ELSE
-                                            1
-                                      END
-                                   WHEN 0
-                                   THEN
-                                      CASE NVL (SIGN (data_precision - 4),
-                                                -99)
-                                         WHEN -99
-                                         THEN
-                                            4
-                                         WHEN 1
-                                         THEN
-                                            2
-                                         ELSE
-                                            1
-                                      END
-                                   ELSE
-                                      CASE SIGN (
-                                                LEAST (
-                                                   data_length,
-                                                   NVL (data_precision, 9999))
-                                              - 6)
-                                         WHEN 1
-                                         THEN
-                                            4
-                                         ELSE
-                                            3
-                                      END
-                                END
-                             WHEN 'VARCHAR2'
-                             THEN
-                                5
-                             WHEN 'CHAR'
-                             THEN
-                                5
-                             WHEN 'DATE'
-                             THEN
-                                7
-                             ELSE
-                                99
-                          END
-                             sde_type,
-                          CASE data_type
-                             WHEN 'SDO_GEOMETRY'
-                             THEN
-                                NULL
-                             WHEN 'DATE'
-                             THEN
-                                0
-                             WHEN 'VARCHAR2'
-                             THEN
-                                data_length
-                             WHEN 'CHAR'
-                             THEN
-                                data_length
-                             WHEN 'NUMBER'
-                             THEN
-                                CASE NVL (data_scale, -99)
-                                   WHEN -99
-                                   THEN
-                                      CASE NVL (data_precision, -99)
-                                         WHEN -99
-                                         THEN
-                                            CASE data_length
-                                               WHEN 22 THEN 0
-                                            END
-                                         ELSE
-                                            CASE data_precision
-                                               WHEN 38 THEN 10
-                                            END
-                                      END
-                                   WHEN 0
-                                   THEN
-                                      CASE data_length
-                                         WHEN 22
-                                         THEN
-                                            LEAST (
-                                               NVL (data_precision, 99),
-                                               NVL (
-                                                  DECODE (data_precision,
-                                                          38, 10),
-                                                  10))
-                                      END
-                                   ELSE
-                                      data_precision
-                                END
-                             ELSE
-                                98
-                          END
-                             column_size,
-                          CASE data_type
-                             WHEN 'NUMBER'
-                             THEN
-                                CASE NVL (data_precision, -99)
-                                   WHEN -99
-                                   THEN
-                                      CASE NVL (data_scale, -99)
-                                         WHEN -99
-                                         THEN
-                                            0
-                                         ELSE
-                                            CASE data_length
-                                               WHEN 22 THEN 10
-                                               ELSE NULL
-                                            END
-                                      END
-                                   ELSE
-                                      CASE data_scale
-                                         WHEN 0 THEN NULL
-                                         ELSE data_scale
-                                      END
-                                END
-                             ELSE
-                                NULL
-                          END
-                             decimal_digits,
-                          CASE data_type
-                             WHEN 'SDO_GEOMETRY' THEN 131072
-                             ELSE 0
-                          END
-                             bit18,
-                          CASE nullable WHEN 'Y' THEN 4 ELSE 0 END bit3,
-                          CASE t.column_name
-                             WHEN TO_CHAR (p_rowid) THEN 1
-                             ELSE 0
-                          END
-                             bit1
-                     FROM user_tab_columns t, sde.layers l
-                    WHERE     t.table_name = p_table
-                          AND l.table_name = t.table_name
-                          AND l.owner =
-                                 SYS_CONTEXT ('NM3CORE', 'APPLICATION_OWNER')) q1);
---                  
---           VALUES ( p_table
---                  , Sys_Context('NM3CORE','APPLICATION_OWNER')
---                  , l_col_tab (i)
---                  , l_data_type_tab (i)
---                  , l_data_length_tab (i)
---                  , l_data_precision_tab (i) --l_data_scale(i)
---                  , NULL
---                  , l_obj_flag
---                  , l_obj_id
---                  );
---   END LOOP;
+   BEGIN
+     INSERT INTO sde.column_registry (table_name,
+                                      owner,
+                                      column_name,
+                                      sde_type,
+                                      column_size,
+                                      decimal_digits,
+                                      description,
+                                      object_flags,
+                                      object_id)
+     SELECT table_name,
+            owner,
+            column_name,
+            sde_type,
+            column_size,
+            decimal_digits,
+            description,
+            object_flags,
+            object_id
+     from v_nm_sde_column_registry;
+   EXCEPTION
+     When others then
+        raise_application_error(-20001, 'Failure to construct the SDE Column Registry - '||sqlerrm );
+   END;                                            
+                                 
 --
 END create_column_registry;
 --
