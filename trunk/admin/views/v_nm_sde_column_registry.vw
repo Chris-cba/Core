@@ -2,11 +2,11 @@
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/views/v_nm_sde_column_registry.vw-arc   1.0   Mar 08 2013 09:41:32   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/views/v_nm_sde_column_registry.vw-arc   1.1   Mar 12 2013 14:06:46   Rob.Coupe  $
 --       Module Name      : $Workfile:   v_nm_sde_column_registry.vw  $
---       Date into PVCS   : $Date:   Mar 08 2013 09:41:32  $
---       Date fetched Out : $Modtime:   Mar 08 2013 09:40:06  $
---       PVCS Version     : $Revision:   1.0  $
+--       Date into PVCS   : $Date:   Mar 12 2013 14:06:46  $
+--       Date fetched Out : $Modtime:   Mar 12 2013 14:05:56  $
+--       PVCS Version     : $Revision:   1.1  $
 --
 --   Author : R.A. Coupe
 --
@@ -22,11 +22,11 @@ AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/views/v_nm_sde_column_registry.vw-arc   1.0   Mar 08 2013 09:41:32   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/views/v_nm_sde_column_registry.vw-arc   1.1   Mar 12 2013 14:06:46   Rob.Coupe  $
 --       Module Name      : $Workfile:   v_nm_sde_column_registry.vw  $
---       Date into PVCS   : $Date:   Mar 08 2013 09:41:32  $
---       Date fetched Out : $Modtime:   Mar 08 2013 09:40:06  $
---       PVCS Version     : $Revision:   1.0  $
+--       Date into PVCS   : $Date:   Mar 12 2013 14:06:46  $
+--       Date fetched Out : $Modtime:   Mar 12 2013 14:05:56  $
+--       PVCS Version     : $Revision:   1.1  $
 --
 --   Author : R.A. Coupe
 --
@@ -58,7 +58,7 @@ AS
                   END
                      object_id,
                   NVL (
-                     (SELECT 2
+                     (SELECT 0 --2    -rc - this does not seem to work with standard objectid columns
                         FROM DUAL
                        WHERE     bit1 = 1
                              AND bit3 = 0
