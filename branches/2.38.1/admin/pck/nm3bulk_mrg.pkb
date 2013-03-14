@@ -1,14 +1,14 @@
-CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
+CREATE OR REPLACE PACKAGE BODY LARIMER.nm3bulk_mrg AS
 --
 -----------------------------------------------------------------------------
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.38.1.6   Feb 21 2013 14:00:14   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.38.1.7   Mar 14 2013 17:07:46   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3bulk_mrg.pkb  $
---       Date into PVCS   : $Date:   Feb 21 2013 14:00:14  $
---       Date fetched Out : $Modtime:   Feb 21 2013 13:24:50  $
---       PVCS Version     : $Revision:   2.38.1.6  $
+--       Date into PVCS   : $Date:   Mar 14 2013 17:07:46  $
+--       Date fetched Out : $Modtime:   Mar 14 2013 17:00:58  $
+--       PVCS Version     : $Revision:   2.38.1.7  $
 --
 --
 --   Author : Priidu Tanava
@@ -124,7 +124,7 @@ No query types defined.
         add nm_route_connect_tmp_ordered view with the next schema change
         in nm3dynsql replace the use of nm3sql.set_context_value() with that of nm3ctx
 */
-  g_body_sccsid     constant  varchar2(40)  :='"$Revision:   2.38.1.6  $"';
+  g_body_sccsid     constant  varchar2(40)  :='"$Revision:   2.38.1.7  $"';
   g_package_name    constant  varchar2(30)  := 'nm3bulk_mrg';
 
   cr  constant varchar2(1) := chr(10);
@@ -602,6 +602,8 @@ No query types defined.
     ||cr||'where q1.nm_ne_id_of = m.nm_ne_id_of'
     ||cr||'  and ((q1.begin_mp < m.nm_end_mp and q1.end_mp > m.nm_begin_mp)' -- lenthts
     ||cr||'    or (q1.begin_mp = m.nm_begin_mp and q1.end_mp = m.nm_end_mp))' -- points
+    ||cr||'    or (q1.begin_mp = q1.end_mp and ( ( m.nm_end_mp = q1.begin_mp ) '
+    ||cr||'                                or    (m.nm_end_mp = q1.end_mp ) ) ) '
     --||cr||'  and q1.begin_mp between m.nm_begin_mp and m.nm_end_mp'
     --||cr||'  and q1.end_mp between m.nm_begin_mp and m.nm_end_mp'
     ||cr||'order by q1.nm_ne_id_of, q1.begin_mp, q1.end_mp, m.nm_type, m.nm_obj_type';
@@ -2688,7 +2690,7 @@ No query types defined.
   end;
 
 --
-/* Formatted on 21/02/2013 12:39:42 (QP5 v5.185.11230.41888) */
+
 PROCEDURE load_g_of_g (p_ne_id      IN     nm_elements.ne_id%TYPE
                       ,p_group_type IN     nm_elements.ne_gty_group_type%TYPE
                       ,p_sqlcount      OUT NUMBER
