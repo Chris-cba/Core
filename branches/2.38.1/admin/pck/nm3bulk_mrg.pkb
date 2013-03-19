@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY LARIMER.nm3bulk_mrg AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.38.1.7   Mar 14 2013 17:07:46   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.38.1.8   Mar 19 2013 11:03:40   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3bulk_mrg.pkb  $
---       Date into PVCS   : $Date:   Mar 14 2013 17:07:46  $
---       Date fetched Out : $Modtime:   Mar 14 2013 17:00:58  $
---       PVCS Version     : $Revision:   2.38.1.7  $
+--       Date into PVCS   : $Date:   Mar 19 2013 11:03:40  $
+--       Date fetched Out : $Modtime:   Mar 19 2013 11:02:02  $
+--       PVCS Version     : $Revision:   2.38.1.8  $
 --
 --
 --   Author : Priidu Tanava
@@ -124,7 +124,7 @@ No query types defined.
         add nm_route_connect_tmp_ordered view with the next schema change
         in nm3dynsql replace the use of nm3sql.set_context_value() with that of nm3ctx
 */
-  g_body_sccsid     constant  varchar2(40)  :='"$Revision:   2.38.1.7  $"';
+  g_body_sccsid     constant  varchar2(40)  :='"$Revision:   2.38.1.8  $"';
   g_package_name    constant  varchar2(30)  := 'nm3bulk_mrg';
 
   cr  constant varchar2(1) := chr(10);
@@ -460,6 +460,7 @@ No query types defined.
         ||cr||'    )'
         ||cr||' and ( '
         ||cr||' ( m.nm_begin_mp = m.nm_end_mp and m.nm_begin_mp = x.begin_mp ) OR '
+        ||cr||' ( m.nm_begin_mp = m.nm_end_mp and m.nm_begin_mp = x.end_mp ) OR  '
         ||cr||' ( m.nm_end_mp > x.begin_mp and m.nm_begin_mp < x.end_mp ) '
         ||cr||' ) ';
       l_union_all := cr||'union all';
@@ -508,6 +509,7 @@ No query types defined.
               ||sql_datum_tbl_join('nm_ne_id_of', '  and ', a1)
           ||cr||' and ( '
           ||cr||'  ( '||a1||'.nm_begin_mp = '||a1||'.nm_end_mp and x.begin_mp = x.end_mp and '||a1||'.nm_begin_mp = x.begin_mp ) OR ' 
+          ||cr||'  ( '||a1||'.nm_begin_mp = '||a1||'.nm_end_mp and '||a1||'.nm_begin_mp = x.end_mp ) OR  '
           ||cr||'  ( '||a1||'.nm_end_mp > x.begin_mp and '||a1||'.nm_begin_mp < x.end_mp ) '
           ||cr||'  )'               
           ||cr||'  and '||nm3dynsql.sql_effective_date(l_effective_date, 'm'||i||'.nm_start_date', 'm'||i||'.nm_end_date' )
