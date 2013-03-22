@@ -1,11 +1,11 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       Pvcs Details     : $Header:   //vm_latest/archives/nm3/admin/views/v_nm_ordered_members.vw-arc   1.0   Mar 22 2013 16:11:28   Rob.Coupe  $
+--       Pvcs Details     : $Header:   //vm_latest/archives/nm3/admin/views/v_nm_ordered_members.vw-arc   1.1   Mar 22 2013 16:28:32   Rob.Coupe  $
 --       Module Name      : $Workfile:   v_nm_ordered_members.vw  $
---       Date into PVCS   : $Date:   Mar 22 2013 16:11:28  $
---       Date fetched Out : $Modtime:   Mar 22 2013 16:06:46  $
---       PVCS Version     : $Revision:   1.0  $
+--       Date into PVCS   : $Date:   Mar 22 2013 16:28:32  $
+--       Date fetched Out : $Modtime:   Mar 22 2013 16:27:56  $
+--       PVCS Version     : $Revision:   1.1  $
 --
 --   Author : R.A. Coupe
 --
@@ -14,7 +14,7 @@
 -----------------------------------------------------------------------------
 -- Copyright (c) exor corporation ltd, 2001
 ----------------------------------------------------------------------------
-CREATE OR REPLACE FORCE VIEW EXOR.V_NM_ORDERED_MEMBERS
+CREATE OR REPLACE FORCE VIEW V_NM_ORDERED_MEMBERS
 (
    NM_NE_ID_IN,
    NM_SEG_NO,
