@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY nm3rsc AS
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3rsc.pkb-arc   2.4.1.3   Mar 22 2013 15:58:48   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3rsc.pkb-arc   2.4.1.4   Apr 02 2013 14:08:02   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3rsc.pkb  $
---       Date into PVCS   : $Date:   Mar 22 2013 15:58:48  $
---       Date fetched Out : $Modtime:   Mar 22 2013 15:46:26  $
---       PVCS Version     : $Revision:   2.4.1.3  $
+--       Date into PVCS   : $Date:   Apr 02 2013 14:08:02  $
+--       Date fetched Out : $Modtime:   Apr 02 2013 13:51:16  $
+--       PVCS Version     : $Revision:   2.4.1.4  $
 --
 --   Author : R.A. Coupe
 --
@@ -19,7 +19,7 @@ CREATE OR REPLACE PACKAGE BODY nm3rsc AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(30) :='"$Revision:   2.4.1.3  $"';
+   g_body_sccsid     CONSTANT  varchar2(30) :='"$Revision:   2.4.1.4  $"';
 
 --  g_body_sccsid is the SCCS ID for the package body
 --
@@ -644,7 +644,7 @@ CURSOR C2 IS
           ne_length,
           nm_slk nm_slk_stored,
           nm_end_slk nm_end_slk_stored,
-          order1 nm_calc_seq_no,
+          row_number() over (order by order1) nm_calc_seq_no,
           slk nm_slk_calc,
           end_slk nm_end_slk_calc,
           whole_or_part,
@@ -763,7 +763,7 @@ CURSOR C2 IS
                                                                       rsc3 a
                                                                    ON (a.end_node =
                                                                           b.start_node))
-                                                              SEARCH DEPTH FIRST BY start_node SET order1
+                                                              SEARCH DEPTH FIRST BY start_node, nm_seq_no SET order1
                                                               CYCLE start_node SET is_cycle TO 'Y' DEFAULT 'N'
                                                    SELECT *
                                                      FROM rsc3)
