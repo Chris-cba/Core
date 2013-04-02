@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.45   Mar 21 2013 09:04:06   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.46   Apr 02 2013 16:48:06   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3bulk_mrg.pkb  $
---       Date into PVCS   : $Date:   Mar 21 2013 09:04:06  $
---       Date fetched Out : $Modtime:   Mar 21 2013 08:59:58  $
---       PVCS Version     : $Revision:   2.45  $
+--       Date into PVCS   : $Date:   Apr 02 2013 16:48:06  $
+--       Date fetched Out : $Modtime:   Apr 02 2013 16:47:18  $
+--       PVCS Version     : $Revision:   2.46  $
 --
 --
 --   Author : Priidu Tanava
@@ -124,7 +124,7 @@ No query types defined.
         add nm_route_connect_tmp_ordered view with the next schema change
         in nm3dynsql replace the use of nm3sql.set_context_value() with that of nm3ctx
 */
-  g_body_sccsid     constant  varchar2(40)  :='"$Revision:   2.45  $"';
+  g_body_sccsid     constant  varchar2(40)  :='"$Revision:   2.46  $"';
   g_package_name    constant  varchar2(30)  := 'nm3bulk_mrg';
 
   cr  constant varchar2(1) := chr(10);
@@ -601,10 +601,10 @@ No query types defined.
     ||cr||') q1'
     ||cr||',mrg m'
     ||cr||'where q1.nm_ne_id_of = m.nm_ne_id_of'
-    ||cr||'  and ((q1.begin_mp < m.nm_end_mp and q1.end_mp > m.nm_begin_mp)' -- lenthts
+    ||cr||'  and ( ( ( q1.begin_mp < m.nm_end_mp and q1.end_mp > m.nm_begin_mp)' -- lenthts
     ||cr||'    or (q1.begin_mp = m.nm_begin_mp and q1.end_mp = m.nm_end_mp))' -- points
     ||cr||'    or (q1.begin_mp = q1.end_mp and ( ( m.nm_end_mp = q1.begin_mp ) '
-    ||cr||'                                or    (m.nm_end_mp = q1.end_mp ) ) ) '
+    ||cr||'                                or    (m.nm_end_mp = q1.end_mp ) ) ) )'
     --||cr||'  and q1.begin_mp between m.nm_begin_mp and m.nm_end_mp'
     --||cr||'  and q1.end_mp between m.nm_begin_mp and m.nm_end_mp'
     ||cr||'order by q1.nm_ne_id_of, q1.begin_mp, q1.end_mp, m.nm_type, m.nm_obj_type';
