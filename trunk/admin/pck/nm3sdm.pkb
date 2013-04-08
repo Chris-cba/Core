@@ -5,11 +5,11 @@ As
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.64   Mar 05 2013 14:34:56   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.65   Apr 08 2013 13:16:10   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3sdm.pkb  $
---       Date into PVCS   : $Date:   Mar 05 2013 14:34:56  $
---       Date fetched Out : $Modtime:   Mar 05 2013 14:33:48  $
---       PVCS Version     : $Revision:   2.64  $
+--       Date into PVCS   : $Date:   Apr 08 2013 13:16:10  $
+--       Date fetched Out : $Modtime:   Apr 08 2013 13:09:54  $
+--       PVCS Version     : $Revision:   2.65  $
 --
 --   Author : R.A. Coupe
 --
@@ -21,7 +21,7 @@ As
 --
 --all global package variables here
 --
-  g_Body_Sccsid     Constant Varchar2 (2000) := '"$Revision:   2.64  $"';
+  g_Body_Sccsid     Constant Varchar2 (2000) := '"$Revision:   2.65  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
   g_Package_Name    Constant Varchar2 (30)   := 'NM3SDM';
@@ -86,6 +86,10 @@ Function test_theme_for_update( p_Theme in NM_THEMES_ALL.NTH_THEME_ID%TYPE ) Ret
   retval   Boolean := FALSE;
   l_normal integer := 0;
 begin
+  if p_Theme is null then
+    return TRUE;
+  end if;
+--  
   select 1  into l_normal
   from dual where exists 
      ( select 1
