@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm3merge IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3merge.pkb-arc   2.14   Jun 07 2012 13:41:38   Rob.Coupe  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3merge.pkb-arc   2.15   Apr 08 2013 12:01:34   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3merge.pkb  $
---       Date into PVCS   : $Date:   Jun 07 2012 13:41:38  $
---       Date fetched Out : $Modtime:   Jun 07 2012 13:40:30  $
---       PVCS Version     : $Revision:   2.14  $
+--       Date into PVCS   : $Date:   Apr 08 2013 12:01:34  $
+--       Date fetched Out : $Modtime:   Apr 08 2013 11:59:04  $
+--       PVCS Version     : $Revision:   2.15  $
 --
 --   Author : ITurnbull
 --
@@ -16,7 +16,7 @@ CREATE OR REPLACE PACKAGE BODY nm3merge IS
 --   Copyright (c) exor corporation ltd, 2000
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.14  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.15  $"';
 --  g_body_sccsid is the SCCS ID for the package body
    g_package_name    CONSTANT  varchar2(30)   := 'nm3merge';
 --
@@ -1562,7 +1562,9 @@ PROCEDURE merge_members_by_in (p_ne_id_of_1       nm_elements.ne_id%TYPE
       SELECT *
        FROM  nm_merge_members
       WHERE  nm_ne_id_of = c_ne_id_of
-      ORDER BY nm_seq_no;
+      ORDER BY nm_begin_mp, nm_end_mp; --nm_seq_no;
+--
+--    RAC - order by nm_seq_no (above) is completely ridiculous as it is often null	  
 --
    BEGIN
       FOR cs_rec IN cs_members (p_ne_id_of)
