@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY nm3rsc AS
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3rsc.pkb-arc   2.8   Apr 03 2013 09:43:00   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3rsc.pkb-arc   2.9   Apr 15 2013 13:51:38   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3rsc.pkb  $
---       Date into PVCS   : $Date:   Apr 03 2013 09:43:00  $
---       Date fetched Out : $Modtime:   Apr 03 2013 09:40:28  $
---       PVCS Version     : $Revision:   2.8  $
+--       Date into PVCS   : $Date:   Apr 15 2013 13:51:38  $
+--       Date fetched Out : $Modtime:   Apr 15 2013 13:50:32  $
+--       PVCS Version     : $Revision:   2.9  $
 --
 --   Author : R.A. Coupe
 --
@@ -19,7 +19,7 @@ CREATE OR REPLACE PACKAGE BODY nm3rsc AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(30) :='"$Revision:   2.8  $"';
+   g_body_sccsid     CONSTANT  varchar2(30) :='"$Revision:   2.9  $"';
 
 --  g_body_sccsid is the SCCS ID for the package body
 --
@@ -144,6 +144,12 @@ l_empty_flag varchar2(1);
 BEGIN
 --
    nm_debug.proc_start(g_package_name,'rescale_route');
+   
+   if pi_ne_start is not null then
+     nm3ctx.set_context('RSC_START', to_char(pi_ne_start));
+   else
+     nm3ctx.set_context('RSC_START', NULL);
+   end if;
    --
    -- Set AU Securuty off and effective_date to value passed
    nm3ausec.set_status(nm3type.c_off);
@@ -223,9 +229,14 @@ END rescale_route;
 --
 FUNCTION loop_check RETURN boolean IS
 
-  CURSOR c_loop_check IS
-    SELECT 1 FROM nm_rescale_write
-    WHERE s_ne_id = -1;
+cursor c_loop_check is
+  select 1 from nm_rescale_write, nm_node_usages
+  where nnu_ne_id = ne_id
+  group by nnu_no_node_id having count(*) = 1;
+--
+--  CURSOR c_loop_check IS
+--    SELECT 1 FROM nm_rescale_write
+--    WHERE s_ne_id = -1;
 
   CURSOR c_no_members IS
     SELECT 1 FROM nm_rescale_write;
@@ -738,7 +749,7 @@ CURSOR C2 IS
                                                                    a.has_prior
                                                               FROM v_nm_ordered_members a
                                                              WHERE has_prior
-                                                                      IS NULL
+                                                                      IS NULL or a.ne_id = to_number(sys_context('NM3SQL', 'RSC_START'))
                                                             UNION ALL
                                                             SELECT a.ne_id,
                                                                    b.ne_id,
