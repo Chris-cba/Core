@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.47   Apr 10 2013 13:24:28   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.48   Apr 16 2013 13:53:16   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3bulk_mrg.pkb  $
---       Date into PVCS   : $Date:   Apr 10 2013 13:24:28  $
---       Date fetched Out : $Modtime:   Apr 10 2013 13:23:24  $
---       PVCS Version     : $Revision:   2.47  $
+--       Date into PVCS   : $Date:   Apr 16 2013 13:53:16  $
+--       Date fetched Out : $Modtime:   Apr 16 2013 13:50:46  $
+--       PVCS Version     : $Revision:   2.48  $
 --
 --
 --   Author : Priidu Tanava
@@ -124,7 +124,7 @@ No query types defined.
         add nm_route_connect_tmp_ordered view with the next schema change
         in nm3dynsql replace the use of nm3sql.set_context_value() with that of nm3ctx
 */
-  g_body_sccsid     constant  varchar2(40)  :='"$Revision:   2.47  $"';
+  g_body_sccsid     constant  varchar2(40)  :='"$Revision:   2.48  $"';
   g_package_name    constant  varchar2(30)  := 'nm3bulk_mrg';
 
   cr  constant varchar2(1) := chr(10);
@@ -2692,7 +2692,7 @@ BEGIN
       SELECT DISTINCT a.nm_ne_id_of,
                       a.nm_begin_mp,
                       a.end_mp,
-                      b.nm_ne_id_in
+                      decode( p_group_type, NULL, NULL, b.nm_ne_id_in )
         FROM (
               SELECT nm_ne_id_of,
                      nm_begin_mp,
@@ -2717,8 +2717,9 @@ BEGIN
                       START WITH nm_ne_id_in = p_ne_id)
                WHERE ne_type IN ('S', 'D')) a,
              nm_members b
-       WHERE a.nm_ne_id_of = b.nm_ne_id_of 
-       AND b.nm_obj_type = p_group_type;
+       WHERE a.nm_ne_id_of = b.nm_ne_id_of
+       AND b.nm_obj_type = nvl(p_group_type, b.nm_obj_type )
+       and b.nm_type = 'G'; 
 --
        select count(*) into p_sqlcount from NM_DATUM_CRITERIA_TMP;
 end;
