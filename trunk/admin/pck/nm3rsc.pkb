@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY nm3rsc AS
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3rsc.pkb-arc   2.9   Apr 15 2013 13:51:38   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3rsc.pkb-arc   2.10   Apr 17 2013 15:52:38   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3rsc.pkb  $
---       Date into PVCS   : $Date:   Apr 15 2013 13:51:38  $
---       Date fetched Out : $Modtime:   Apr 15 2013 13:50:32  $
---       PVCS Version     : $Revision:   2.9  $
+--       Date into PVCS   : $Date:   Apr 17 2013 15:52:38  $
+--       Date fetched Out : $Modtime:   Apr 17 2013 15:50:38  $
+--       PVCS Version     : $Revision:   2.10  $
 --
 --   Author : R.A. Coupe
 --
@@ -19,7 +19,7 @@ CREATE OR REPLACE PACKAGE BODY nm3rsc AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(30) :='"$Revision:   2.9  $"';
+   g_body_sccsid     CONSTANT  varchar2(30) :='"$Revision:   2.10  $"';
 
 --  g_body_sccsid is the SCCS ID for the package body
 --
@@ -230,8 +230,12 @@ END rescale_route;
 FUNCTION loop_check RETURN boolean IS
 
 cursor c_loop_check is
-  select 1 from nm_rescale_write, nm_node_usages
-  where nnu_ne_id = ne_id
+select  nnu_no_node_id
+from ( 
+  select nnu_no_node_id, ne_id, nnu_node_type, nnu_chain, nm_begin_mp, nm_end_mp
+  from nm_node_usages, nm_rescale_write
+  where nnu_ne_id = ne_id 
+  and decode (nnu_node_type, 'S', 0, 'E', ne_length ) = decode( nnu_node_type, 'S', nm_begin_mp, 'E', nm_end_mp ) )
   group by nnu_no_node_id having count(*) = 1;
 --
 --  CURSOR c_loop_check IS
@@ -749,7 +753,11 @@ CURSOR C2 IS
                                                                    a.has_prior
                                                               FROM v_nm_ordered_members a
                                                              WHERE has_prior
-                                                                      IS NULL or a.ne_id = to_number(sys_context('NM3SQL', 'RSC_START'))
+                                                                      IS NULL 
+                                                                      or a.ne_id = to_number(sys_context('NM3SQL', 'RSC_START'))
+                                                                      OR (dir_flag = 1 AND nm_begin_mp > 0)
+                                                                      OR (dir_flag = -1 AND nm_end_mp < ne_length)
+                                                                      and rownum = 1																	  
                                                             UNION ALL
                                                             SELECT a.ne_id,
                                                                    b.ne_id,
