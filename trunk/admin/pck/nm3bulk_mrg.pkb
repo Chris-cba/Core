@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.48   Apr 16 2013 13:53:16   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.49   Apr 18 2013 15:28:36   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3bulk_mrg.pkb  $
---       Date into PVCS   : $Date:   Apr 16 2013 13:53:16  $
---       Date fetched Out : $Modtime:   Apr 16 2013 13:50:46  $
---       PVCS Version     : $Revision:   2.48  $
+--       Date into PVCS   : $Date:   Apr 18 2013 15:28:36  $
+--       Date fetched Out : $Modtime:   Apr 18 2013 15:27:46  $
+--       PVCS Version     : $Revision:   2.49  $
 --
 --
 --   Author : Priidu Tanava
@@ -124,7 +124,7 @@ No query types defined.
         add nm_route_connect_tmp_ordered view with the next schema change
         in nm3dynsql replace the use of nm3sql.set_context_value() with that of nm3ctx
 */
-  g_body_sccsid     constant  varchar2(40)  :='"$Revision:   2.48  $"';
+  g_body_sccsid     constant  varchar2(40)  :='"$Revision:   2.49  $"';
   g_package_name    constant  varchar2(30)  := 'nm3bulk_mrg';
 
   cr  constant varchar2(1) := chr(10);
@@ -2689,16 +2689,23 @@ BEGIN
                                       begin_mp,
                                       end_mp,
                                       GROUP_ID)
-      SELECT DISTINCT a.nm_ne_id_of,
-                      a.nm_begin_mp,
-                      a.end_mp,
-                      decode( p_group_type, NULL, NULL, b.nm_ne_id_in )
-        FROM (
-              SELECT nm_ne_id_of,
-                     nm_begin_mp,
+select t1.nm_of, begin_mp, end_mp, 
+      (select m.nm_ne_id_in  
+       from nm_members m 
+       where m.nm_type = 'G' 
+       and m.nm_ne_id_of = nm_of  
+       and m.nm_end_mp > begin_mp 
+       and m.nm_begin_mp < end_mp 
+       and m.nm_obj_type = nvl(p_group_type, m.nm_obj_type)
+       and rownum = 1
+        ) group_id
+from (
+SELECT nm_ne_id_of nm_of,
+                     nm_begin_mp begin_mp,
                      LEAST (nm_end_mp, ne_length) end_mp,
                      ne_type
-                FROM (    SELECT PRIOR nm_type p_nt,
+                FROM (                    
+                SELECT PRIOR nm_type p_nt,
                                  nm_ne_id_in,
                                  nm_ne_id_of,
                                  nm_obj_type,
@@ -2714,12 +2721,12 @@ BEGIN
                            WHERE nm_type IN ('P', 'G')
                                  AND ne_id = nm_ne_id_of
                       CONNECT BY PRIOR nm_ne_id_of = nm_ne_id_in
-                      START WITH nm_ne_id_in = p_ne_id)
-               WHERE ne_type IN ('S', 'D')) a,
-             nm_members b
-       WHERE a.nm_ne_id_of = b.nm_ne_id_of
-       AND b.nm_obj_type = nvl(p_group_type, b.nm_obj_type )
-       and b.nm_type = 'G'; 
+                      START WITH nm_ne_id_in = p_ne_id
+                      )                      
+               WHERE ne_type IN ('S', 'D')  ) t1;
+--
+       select count(*) into p_sqlcount from NM_DATUM_CRITERIA_TMP;
+end;
 --
        select count(*) into p_sqlcount from NM_DATUM_CRITERIA_TMP;
 end;
