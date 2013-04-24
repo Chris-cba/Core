@@ -1,11 +1,11 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       Pvcs Details     : $Header:   //vm_latest/archives/nm3/admin/views/v_nm_ordered_members.vw-arc   1.1   Mar 22 2013 16:28:32   Rob.Coupe  $
+--       Pvcs Details     : $Header:   //vm_latest/archives/nm3/admin/views/v_nm_ordered_members.vw-arc   1.2   Apr 24 2013 15:15:34   Rob.Coupe  $
 --       Module Name      : $Workfile:   v_nm_ordered_members.vw  $
---       Date into PVCS   : $Date:   Mar 22 2013 16:28:32  $
---       Date fetched Out : $Modtime:   Mar 22 2013 16:27:56  $
---       PVCS Version     : $Revision:   1.1  $
+--       Date into PVCS   : $Date:   Apr 24 2013 15:15:34  $
+--       Date fetched Out : $Modtime:   Apr 24 2013 15:13:34  $
+--       PVCS Version     : $Revision:   1.2  $
 --
 --   Author : R.A. Coupe
 --
@@ -54,8 +54,14 @@ AS
                            nm_seq_no,
                            nm_ne_id_of ne_id,
                            nm_cardinality dir_flag,
-                           nm_begin_mp,
-                           nm_end_mp,
+                           CASE nm_cardinality
+                              WHEN 1 then nm_begin_mp
+                              ELSE ne_length - nm_end_mp
+                           END nm_begin_mp,
+                           CASE nm_cardinality
+                              WHEN 1 then nm_end_mp
+                              ELSE ne_length - nm_begin_mp
+                           END nm_end_mp,
                            nm_slk,
                            nm_end_slk,
                            CASE nm_cardinality
@@ -84,4 +90,3 @@ AS
                                WHERE b.end_node = a.start_node))
                      has_prior
              FROM q1 a) q2;
-
