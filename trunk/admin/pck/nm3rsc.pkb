@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY nm3rsc AS
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3rsc.pkb-arc   2.10   Apr 17 2013 15:52:38   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3rsc.pkb-arc   2.11   Apr 24 2013 14:24:12   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3rsc.pkb  $
---       Date into PVCS   : $Date:   Apr 17 2013 15:52:38  $
---       Date fetched Out : $Modtime:   Apr 17 2013 15:50:38  $
---       PVCS Version     : $Revision:   2.10  $
+--       Date into PVCS   : $Date:   Apr 24 2013 14:24:12  $
+--       Date fetched Out : $Modtime:   Apr 24 2013 14:20:52  $
+--       PVCS Version     : $Revision:   2.11  $
 --
 --   Author : R.A. Coupe
 --
@@ -19,7 +19,7 @@ CREATE OR REPLACE PACKAGE BODY nm3rsc AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(30) :='"$Revision:   2.10  $"';
+   g_body_sccsid     CONSTANT  varchar2(30) :='"$Revision:   2.11  $"';
 
 --  g_body_sccsid is the SCCS ID for the package body
 --
@@ -230,13 +230,17 @@ END rescale_route;
 FUNCTION loop_check RETURN boolean IS
 
 cursor c_loop_check is
-select  nnu_no_node_id
-from ( 
-  select nnu_no_node_id, ne_id, nnu_node_type, nnu_chain, nm_begin_mp, nm_end_mp
-  from nm_node_usages, nm_rescale_write
-  where nnu_ne_id = ne_id 
-  and decode (nnu_node_type, 'S', 0, 'E', ne_length ) = decode( nnu_node_type, 'S', nm_begin_mp, 'E', nm_end_mp ) )
-  group by nnu_no_node_id having count(*) = 1;
+select start_node from V_NM_ORDERED_MEMBERS a
+where not exists ( select 1 from v_nm_ordered_members b
+where A.START_NODE = b.end_node );
+--
+--select  nnu_no_node_id
+--from ( 
+--  select nnu_no_node_id, ne_id, nnu_node_type, nnu_chain, nm_begin_mp, nm_end_mp
+--  from nm_node_usages, nm_rescale_write
+--  where nnu_ne_id = ne_id 
+--  and decode (nnu_node_type, 'S', 0, 'E', ne_length ) = decode( nnu_node_type, 'S', nm_begin_mp, 'E', nm_end_mp ) )
+--  group by nnu_no_node_id having count(*) = 1;
 --
 --  CURSOR c_loop_check IS
 --    SELECT 1 FROM nm_rescale_write
@@ -777,7 +781,7 @@ CURSOR C2 IS
                                                                    ON (a.end_node =
                                                                           b.start_node))
                                                               SEARCH DEPTH FIRST BY start_node, nm_seq_no SET order1
-                                                              CYCLE start_node SET is_cycle TO 'Y' DEFAULT 'N'
+                                                              CYCLE ne_id SET is_cycle TO 'Y' DEFAULT 'N'
                                                    SELECT *
                                                      FROM rsc3)
                                             WHERE is_cycle = 'N') q3) q4,
