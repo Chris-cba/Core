@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY nm3rsc AS
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3rsc.pkb-arc   2.11   Apr 24 2013 14:24:12   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3rsc.pkb-arc   2.12   Apr 24 2013 15:40:20   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3rsc.pkb  $
---       Date into PVCS   : $Date:   Apr 24 2013 14:24:12  $
---       Date fetched Out : $Modtime:   Apr 24 2013 14:20:52  $
---       PVCS Version     : $Revision:   2.11  $
+--       Date into PVCS   : $Date:   Apr 24 2013 15:40:20  $
+--       Date fetched Out : $Modtime:   Apr 24 2013 15:39:34  $
+--       PVCS Version     : $Revision:   2.12  $
 --
 --   Author : R.A. Coupe
 --
@@ -19,7 +19,7 @@ CREATE OR REPLACE PACKAGE BODY nm3rsc AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(30) :='"$Revision:   2.11  $"';
+   g_body_sccsid     CONSTANT  varchar2(30) :='"$Revision:   2.12  $"';
 
 --  g_body_sccsid is the SCCS ID for the package body
 --
@@ -230,9 +230,11 @@ END rescale_route;
 FUNCTION loop_check RETURN boolean IS
 
 cursor c_loop_check is
-select start_node from V_NM_ORDERED_MEMBERS a
-where not exists ( select 1 from v_nm_ordered_members b
-where A.START_NODE = b.end_node );
+  select start_node from V_NM_ORDERED_MEMBERS a
+  where A.NM_END_MP = ne_length 
+  and not exists ( select 1 from v_nm_ordered_members b
+  where A.START_NODE = b.end_node
+  and b.nm_begin_mp = 0);
 --
 --select  nnu_no_node_id
 --from ( 
