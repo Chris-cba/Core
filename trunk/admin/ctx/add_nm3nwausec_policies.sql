@@ -1,11 +1,11 @@
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/ctx/add_nm3nwausec_policies.sql-arc   1.3   Jan 16 2013 13:04:54   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/ctx/add_nm3nwausec_policies.sql-arc   1.4   Apr 26 2013 15:10:56   Rob.Coupe  $
 --       Module Name      : $Workfile:   add_nm3nwausec_policies.sql  $
---       Date into SCCS   : $Date:   Jan 16 2013 13:04:54  $
---       Date fetched Out : $Modtime:   Jan 16 2013 13:03:10  $
---       SCCS Version     : $Revision:   1.3  $
+--       Date into SCCS   : $Date:   Apr 26 2013 15:10:56  $
+--       Date fetched Out : $Modtime:   Apr 26 2013 15:10:36  $
+--       SCCS Version     : $Revision:   1.4  $
 --
 -----------------------------------------------------------------------------
 --    Copyright (c) Bentley Systems 2012
@@ -74,7 +74,9 @@ add_policy ( p_policy_name    => 'NE_PREDICATE_UPDEL'   ,p_object_name => 'NM_EL
 add_policy ( p_policy_name    => 'NM_PREDICATE_READ'    ,p_object_name => 'NM_MEMBERS_ALL'   ,p_policy_function => 'NM3NWAUSEC.NM_PREDICATE_READ'    ,p_statement_types => 'SELECT' );
 add_policy ( p_policy_name    => 'NM_PREDICATE_INS'     ,p_object_name => 'NM_MEMBERS_ALL'   ,p_policy_function => 'NM3NWAUSEC.NM_PREDICATE_DML'     ,p_statement_types => 'INSERT' );
 add_policy ( p_policy_name    => 'NM_PREDICATE_UPDEL'   ,p_object_name => 'NM_MEMBERS_ALL'   ,p_policy_function => 'NM3NWAUSEC.NM_PREDICATE_READ'    ,p_statement_types => 'UPDATE,DELETE' );
-
+--
+add_policy (p_policy_name     => 'HDIR_ROLE_POLICY_READ',p_object_name     => 'HIG_DIRECTORIES'   ,p_policy_function => 'NM3NWAUSEC.HDIR_PREDICATE_READ' ,p_statement_types => 'SELECT, INSERT, UPDATE, DELETE'  );
+add_policy (p_policy_name     => 'DLC_ROLE_POLICY_READ' ,p_object_name     => 'DOC_LOCATIONS'     ,p_policy_function => 'NM3NWAUSEC.DLC_PREDICATE_READ'  ,p_statement_types => 'SELECT, INSERT, UPDATE, DELETE'  );
 --
    FOR l_count IN 1..l_tab_policy_name.COUNT
 
