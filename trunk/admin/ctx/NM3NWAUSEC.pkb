@@ -3,18 +3,18 @@ CREATE OR REPLACE PACKAGE BODY nm3nwausec AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/ctx/NM3NWAUSEC.pkb-arc   1.3   Jan 16 2013 13:05:20   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/ctx/NM3NWAUSEC.pkb-arc   1.4   Apr 26 2013 15:05:14   Rob.Coupe  $
 --       Module Name      : $Workfile:   NM3NWAUSEC.pkb  $
---       Date into SCCS   : $Date:   Jan 16 2013 13:05:20  $
---       Date fetched Out : $Modtime:   Jan 16 2013 12:59:22  $
---       SCCS Version     : $Revision:   1.3  $
+--       Date into SCCS   : $Date:   Apr 26 2013 15:05:14  $
+--       Date fetched Out : $Modtime:   Apr 26 2013 15:04:06  $
+--       SCCS Version     : $Revision:   1.4  $
 --
 -----------------------------------------------------------------------------
 --    Copyright (c) Bentley Systems 2012
 -----------------------------------------------------------------------------
 
 
-g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   1.3  $"';
+g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   1.4  $"';
 
   FUNCTION get_version RETURN VARCHAR2 IS
   BEGIN
@@ -82,9 +82,29 @@ BEGIN
      THEN 
        RETURN NULL; 
     ELSE 
-       RETURN '('||get_string('DOC_ADMIN_UNIT')||' OR DOC_ADMIN_UNIT IS NULL)'; 
+       RETURN   ' ( ( '||CHR(10)||
+                ' doc_dlc_id is null'||CHR(10)|| 
+                ' or exists ( select 1 from doc_locations '||CHR(10)||
+                '    where doc_dlc_id = dlc_id '||CHR(10)||
+                '    and   dlc_location_type != '||''''||'ORACLE_DIRECTORY'||''''||chr(10)||
+                '              or ( dlc_location_type   =  '||''''||'ORACLE_DIRECTORY'||''''||chr(10)||
+                '                   and doc_dlc_id = dlc_id '||CHR(10)||
+                '  and exists (select 1 from hig_directory_roles, hig_user_roles '||CHR(10)||
+                '             where hdr_name = dlc_location_name '||CHR(10)||
+                '             and hur_role = hdr_role '||CHR(10)||
+                '             and hur_username = Sys_Context('||''''||'NM3_SECURITY_CTX'||''''||','||''''||'USERNAME'||''''||') '||chr(10)||
+                '            )) ) ' ||chr(10)||
+                '              ) ' ||chr(10)||
+                ' and ( doc_admin_unit is null OR '||chr(10)||
+                ' exists (SELECT  1  '||CHR(10)||
+                ' FROM  HIG_ADMIN_GROUPS  '||CHR(10)||
+                ' WHERE  HAG_PARENT_ADMIN_UNIT  = Sys_Context('||''''||'NM3CORE'||''''||','||''''||'USER_ADMIN_UNIT'||''''||')'||CHR(10)|| 
+                '  AND   HAG_CHILD_ADMIN_UNIT = DOC_ADMIN_UNIT '||chr(10)||
+                ' ) ) '||CHR(10)||
+                ' ) '; 
     END IF; 
 END; 
+
 
 function SEC_predicate_read( schema_in varchar2, name_in varchar2) RETURN varchar2 IS
 BEGIN 
@@ -170,6 +190,37 @@ BEGIN
              get_string('(select ne_admin_unit from nm_elements_all where ne_id = nm_ne_id_of )');
     END IF; 
  END;
+-- 
+function HDIR_predicate_read( schema_in varchar2, name_in varchar2) RETURN varchar2 IS
+BEGIN 
+    IF Sys_Context('NM3CORE','UNRESTRICTED_INVENTORY') = 'TRUE' and Sys_Context('NM3_SECURITY_CTX','USERNAME') = Sys_Context('NM3_SECURITY_CTX','ACTUAL_USERNAME') 
+     THEN 
+       RETURN NULL; 
+    ELSE 
+       RETURN ' ( exists ( '||chr(10)||
+              ' select 1 from hig_directory_roles, hig_user_roles '||chr(10)||
+              ' where hur_role = hdr_role '||chr(10)||
+              ' and   hdr_name = hdir_name '||chr(10)||
+              ' and   hur_username = Sys_Context('||''''||'NM3_SECURITY_CTX'||''''||','||''''||'USERNAME'||''''||')) ) ';
+    END IF; 
+ END;
+
+
+function DLC_predicate_read( schema_in varchar2, name_in varchar2) RETURN varchar2 IS
+begin
+    IF Sys_Context('NM3CORE','UNRESTRICTED_INVENTORY') = 'TRUE' and Sys_Context('NM3_SECURITY_CTX','USERNAME') = Sys_Context('NM3_SECURITY_CTX','ACTUAL_USERNAME') 
+     THEN 
+       RETURN NULL; 
+    ELSE 
+       RETURN ' ( dlc_location_type != '||''''||'ORACLE_DIRECTORY'||''''||chr(10)||
+              ' or ( dlc_location_type   =  '||''''||'ORACLE_DIRECTORY'||''''||chr(10)||
+              ' and exists (select 1 from hig_directory_roles, hig_user_roles '||chr(10)||
+              '       where hdr_name = dlc_location_name '||chr(10)||
+              '       and   hur_role = hdr_role '||CHR(10)||
+              '       and   hur_username = Sys_Context('||''''||'NM3_SECURITY_CTX'||''''||','||''''||'USERNAME'||''''||') '||chr(10)||
+              '          )) )';
+    END IF; 
+end;
 
 --  
  begin 
