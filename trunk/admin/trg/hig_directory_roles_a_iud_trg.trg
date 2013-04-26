@@ -50,9 +50,18 @@ BEGIN
 
  ELSIF DELETING THEN
    -- remove any previously assigned roles before re-applying again
-   hig_directories_api.revoke_role_on_directory(pi_hdr_rec => l_hdr_rec_old);
+   begin
+      hig_directories_api.revoke_role_on_directory(pi_hdr_rec => l_hdr_rec_old);
+   exception
+     when hdir_not_exists then
+       if instr( sqlerrm, '257' ) > 0 then
+          null; -- we should just remove the record.
+       else
+         raise;
+       end if;
+   end;    
 
- END IF;
+   END IF;
 
 END hig_directory_roles_a_iud_trg;
 /
