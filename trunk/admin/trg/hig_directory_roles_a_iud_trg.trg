@@ -6,22 +6,20 @@ REFERENCING
        OLD AS OLD
 FOR EACH ROW
 DECLARE
+
 -----------------------------------------------------------------------------
 --
---   SCCS Identifiers :-
 --
---       sccsid           : @(#)hig_directory_roles_a_iud_trg.trg	1.1 08/31/05
---       Module Name      : hig_directory_roles_a_iud_trg.trg
---       Date into SCCS   : 05/08/31 15:44:00
---       Date fetched Out : 07/06/13 17:02:30
---       SCCS Version     : 1.1
+--   PVCS Identifiers :-
 --
---
---   Author : G Johnson
---
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/trg/hig_directory_roles_a_iud_trg.trg-arc   2.3   May 01 2013 13:24:28   Rob.Coupe  $
+--       Module Name      : $Workfile:   hig_directory_roles_a_iud_trg.trg  $
+--       Date into SCCS   : $Date:   May 01 2013 13:24:28  $
+--       Date fetched Out : $Modtime:   May 01 2013 13:23:58  $
+--       SCCS Version     : $Revision:   2.3  $
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2005
+--    Copyright (c) Bentley Systems 2012
 -----------------------------------------------------------------------------
 
 
