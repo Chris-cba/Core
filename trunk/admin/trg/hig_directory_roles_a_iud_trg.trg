@@ -1,11 +1,10 @@
 CREATE OR REPLACE TRIGGER hig_directory_roles_a_iud_trg
 AFTER INSERT OR UPDATE OR DELETE
-ON    HIG_DIRECTORY_ROLES
+ON HIG_DIRECTORY_ROLES
 REFERENCING
        NEW AS NEW
        OLD AS OLD
 FOR EACH ROW
-
 DECLARE
 -----------------------------------------------------------------------------
 --
@@ -28,6 +27,8 @@ DECLARE
 
  l_hdr_rec_old hig_directory_roles%ROWTYPE;
  l_hdr_rec_new hig_directory_roles%ROWTYPE;
+ hdir_not_exists exception;
+ pragma exception_init (hdir_not_exists, -20000 );
 
 BEGIN
 
@@ -59,10 +60,9 @@ BEGIN
        else
          raise;
        end if;
-   end;    
+   end;
 
    END IF;
 
 END hig_directory_roles_a_iud_trg;
 /
-
