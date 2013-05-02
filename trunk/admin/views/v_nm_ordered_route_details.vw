@@ -1,11 +1,11 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/views/v_nm_ordered_route_details.vw-arc   1.0   Apr 24 2013 16:03:40   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/views/v_nm_ordered_route_details.vw-arc   1.1   May 02 2013 14:20:08   Rob.Coupe  $
 --       Module Name      : $Workfile:   v_nm_ordered_route_details.vw  $
---       Date into PVCS   : $Date:   Apr 24 2013 16:03:40  $
---       Date fetched Out : $Modtime:   Apr 24 2013 16:02:52  $
---       PVCS Version     : $Revision:   1.0  $
+--       Date into PVCS   : $Date:   May 02 2013 14:20:08  $
+--       Date fetched Out : $Modtime:   May 02 2013 14:19:38  $
+--       PVCS Version     : $Revision:   1.1  $
 --
 --   Author : R.A. Coupe
 --
@@ -175,7 +175,7 @@ AS
                                                                            b.start_node))
                                                                SEARCH DEPTH FIRST BY start_node,
                                                                                      nm_seq_no SET order1
-                                                               CYCLE ne_id SET is_cycle TO 'Y' DEFAULT 'N'
+                                                               CYCLE start_node SET is_cycle TO 'Y' DEFAULT 'N'
                                                     SELECT *
                                                       FROM rsc3)
                                              WHERE is_cycle = 'N') q3)) q4,
