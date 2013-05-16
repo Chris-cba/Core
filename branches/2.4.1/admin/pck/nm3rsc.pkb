@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY nm3rsc AS
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3rsc.pkb-arc   2.4.1.7   Apr 24 2013 15:11:32   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3rsc.pkb-arc   2.4.1.8   May 16 2013 13:03:36   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3rsc.pkb  $
---       Date into PVCS   : $Date:   Apr 24 2013 15:11:32  $
---       Date fetched Out : $Modtime:   Apr 24 2013 15:08:42  $
---       PVCS Version     : $Revision:   2.4.1.7  $
+--       Date into PVCS   : $Date:   May 16 2013 13:03:36  $
+--       Date fetched Out : $Modtime:   May 16 2013 13:02:00  $
+--       PVCS Version     : $Revision:   2.4.1.8  $
 --
 --   Author : R.A. Coupe
 --
@@ -19,7 +19,7 @@ CREATE OR REPLACE PACKAGE BODY nm3rsc AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(30) :='"$Revision:   2.4.1.7  $"';
+   g_body_sccsid     CONSTANT  varchar2(30) :='"$Revision:   2.4.1.8  $"';
 
 --  g_body_sccsid is the SCCS ID for the package body
 --
@@ -999,6 +999,8 @@ CURSOR c1 IS
   l_shape_option  VARCHAR2(1) := NVL(hig.get_user_or_sys_opt('SDORESEQ'),'H'); 
 
   l_max_date date; 
+  
+  l_min_true number;
 
 function get_max_date return date is
 retval date;
@@ -1014,6 +1016,11 @@ exception
 end;  
 BEGIN
 
+  select min(nvl(nm_true, 0) )
+  into l_min_true 
+  from nm_members
+  where nm_ne_id_in = pi_ne_id;
+
   instantiate_data(  pi_ne_id => pi_ne_id
                     ,pi_effective_date => NULL );
 
@@ -1023,7 +1030,7 @@ BEGIN
 
     set_start_points;
 
-    connect_route( pi_ne_id, 0, pi_ne_start );
+    connect_route( pi_ne_id, l_min_true, pi_ne_start );
 
     FOR irec IN c1 LOOP
       UPDATE nm_members
