@@ -78,7 +78,7 @@ BEGIN
   SELECT DISTINCT ptr_num( 1, p.ptr_value )
   BULK COLLECT INTO retval.pa
   FROM TABLE ( self.pa ) p;
-  IF retval.pa(1) IS NOT NULL THEN
+  IF retval.pa.LAST IS NOT NULL and retval.pa.LAST > 0 THEN
     FOR i IN 1..retval.pa.LAST LOOP 
 	  retval.pa(i).ptr_id := i;
 	END LOOP;
