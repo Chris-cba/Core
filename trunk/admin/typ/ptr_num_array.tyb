@@ -72,6 +72,16 @@ END get_idx_from_value;
 --
 ------------------------------------------------------------------------------------------------------------------
 --
+MEMBER FUNCTION get_distinct_ptr return ptr_num_array  IS
+retval ptr_num_array := ptr_num_array( ptr_num_array_type( ptr_num( NULL, NULL )));
+BEGIN
+select ptr_num(p.ptr_id, p.ptr_value)
+bulk collect into retval.pa
+from table( self.pa ) p
+group by ptr_id, ptr_value;
+return retval;
+END get_distinct_ptr;
+/*
 MEMBER FUNCTION get_distinct_ptr RETURN ptr_num_array IS
 retval ptr_num_array := ptr_num_array( ptr_num_array_type( ptr_num( NULL, NULL )));
 BEGIN
@@ -85,7 +95,7 @@ BEGIN
   END IF; 
   RETURN retval;
 END get_distinct_ptr;
---
+*/--
 ------------------------------------------------------------------------------------------------------------------
 --
 MEMBER FUNCTION is_empty RETURN BOOLEAN IS
