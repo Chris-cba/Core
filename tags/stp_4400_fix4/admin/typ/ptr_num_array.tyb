@@ -1,0 +1,118 @@
+CREATE OR REPLACE TYPE BODY ptr_num_array IS
+-----------------------------------------------------------------------------
+--
+--
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)ptr_num_array.tyb	1.2 07/24/06
+--       Module Name      : ptr_num_array.tyb
+--       Date into SCCS   : 06/07/24 14:54:16
+--       Date fetched Out : 07/06/13 17:05:02
+--       SCCS Version     : 1.2
+--
+--   Author : Rob Coupe
+--
+--
+--   TYPE ptr_array
+--
+-----------------------------------------------------------------------------
+--      Copyright (c) exor corporation ltd, 2001
+-----------------------------------------------------------------------------
+--
+MEMBER PROCEDURE DEBUG IS
+BEGIN
+  FOR i IN 1..self.pa.LAST LOOP
+    Nm_Debug.DEBUG( 'Ptr '||TO_CHAR(self.pa(i).ptr_id)||','||TO_CHAR(self.pa(i).ptr_value));
+  END LOOP;
+END;
+--
+------------------------------------------------------------------------------------------------------------------
+--
+MEMBER FUNCTION get_id ( p_value IN INTEGER ) RETURN INTEGER IS
+retval INTEGER := -1;
+BEGIN
+  FOR i IN 1..self.pa.LAST LOOP
+    IF self.pa(i).ptr_value = p_value THEN
+      retval := self.pa(i).ptr_id;
+    END IF;
+  END LOOP;
+  RETURN retval;
+END get_id;
+--
+------------------------------------------------------------------------------------------------------------------
+--
+MEMBER FUNCTION get_idx_from_id( p_id IN INTEGER ) RETURN INTEGER IS
+retval INTEGER;
+BEGIN
+  retval := -1;
+  FOR i IN 1..self.pa.LAST LOOP
+    IF self.pa(i).ptr_id = p_id THEN
+	  retval := i;
+      EXIT;
+	END IF;
+  END LOOP;
+  RETURN retval;
+END get_idx_from_id;
+--
+------------------------------------------------------------------------------------------------------------------
+--
+MEMBER FUNCTION get_idx_from_value( p_value IN INTEGER ) RETURN INTEGER IS
+retval INTEGER;
+BEGIN
+  retval := -1;
+  FOR i IN 1..self.pa.LAST LOOP
+    IF self.pa(i).ptr_value = p_value THEN
+	  retval := i;
+      EXIT;
+	END IF;
+  END LOOP;
+  RETURN retval;
+END get_idx_from_value;
+
+--
+------------------------------------------------------------------------------------------------------------------
+--
+MEMBER FUNCTION get_distinct_ptr return ptr_num_array  IS
+retval ptr_num_array := ptr_num_array( ptr_num_array_type( ptr_num( NULL, NULL )));
+BEGIN
+select ptr_num(p.ptr_id, p.ptr_value)
+bulk collect into retval.pa
+from table( self.pa ) p
+group by ptr_id, ptr_value;
+return retval;
+END get_distinct_ptr;
+/*
+MEMBER FUNCTION get_distinct_ptr RETURN ptr_num_array IS
+retval ptr_num_array := ptr_num_array( ptr_num_array_type( ptr_num( NULL, NULL )));
+BEGIN
+  SELECT DISTINCT ptr_num( 1, p.ptr_value )
+  BULK COLLECT INTO retval.pa
+  FROM TABLE ( self.pa ) p;
+  IF retval.pa.LAST IS NOT NULL and retval.pa.LAST > 0 THEN
+    FOR i IN 1..retval.pa.LAST LOOP 
+	  retval.pa(i).ptr_id := i;
+	END LOOP;
+  END IF; 
+  RETURN retval;
+END get_distinct_ptr;
+*/--
+------------------------------------------------------------------------------------------------------------------
+--
+MEMBER FUNCTION is_empty RETURN BOOLEAN IS
+retval BOOLEAN := TRUE;
+BEGIN
+  IF self.pa.LAST > 1 THEN
+    RETURN FALSE;
+  ELSIF self.pa.LAST IS NOT NULL THEN
+    IF self.pa.LAST = 1 AND self.pa(1).ptr_value IS NOT NULL THEN
+      RETURN FALSE;
+    END IF;
+  END IF;      
+  RETURN TRUE;
+END;
+
+--
+
+END;
+/
+
