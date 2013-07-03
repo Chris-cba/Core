@@ -3,11 +3,11 @@ AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/tma/admin/pck/hig_std_text.pkb-arc   3.4   May 16 2011 14:42:20   Steve.Cooper  $
+--       sccsid           : $Header:   //vm_latest/archives/tma/admin/pck/hig_std_text.pkb-arc   3.5   Jul 03 2013 10:19:46   James.Wadsworth  $
 --       Module Name      : $Workfile:   hig_std_text.pkb  $
---       Date into SCCS   : $Date:   May 16 2011 14:42:20  $
---       Date fetched Out : $Modtime:   May 03 2011 11:01:10  $
---       SCCS Version     : $Revision:   3.4  $
+--       Date into SCCS   : $Date:   Jul 03 2013 10:19:46  $
+--       Date fetched Out : $Modtime:   Jul 03 2013 09:37:10  $
+--       SCCS Version     : $Revision:   3.5  $
 --       Based on 
 --
 --
@@ -17,12 +17,12 @@ AS
 --  the implementation of the Projects model.
 --
 -----------------------------------------------------------------------------
---    Copyright (c) exor corporation ltd, 2007
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
-   g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.4  $';
+   g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.5  $';
    g_package_name CONSTANT varchar2(30) := 'tma_fpns_api';
 
---sccsid constant varchar2(30) :='"$Revision:   3.4  $"';
+--sccsid constant varchar2(30) :='"$Revision:   3.5  $"';
 --   g_body_sccsid is the SCCS ID for the package body
 --
 --------------------------------------------------------------------------------
