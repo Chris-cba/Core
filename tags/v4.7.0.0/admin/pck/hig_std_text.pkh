@@ -1,0 +1,184 @@
+CREATE OR REPLACE PACKAGE hig_std_text AS
+--<PACKAGE>
+--
+--   PVCS Identifiers :-
+--
+--       sccsid           : $Header:   //vm_latest/archives/tma/admin/pck/hig_std_text.pkh-arc   3.4   Jul 03 2013 10:19:46   James.Wadsworth  $
+--       Module Name      : $Workfile:   hig_std_text.pkh  $
+--       Date into SCCS   : $Date:   Jul 03 2013 10:19:46  $
+--       Date fetched Out : $Modtime:   Jul 03 2013 09:37:10  $
+--       SCCS Version     : $Revision:   3.4  $
+--       Based on 
+--
+--
+--  Author : B O'Driscoll
+--
+--  Package of functions and or procedures required to support
+--  the implementation of Standard Text.
+--
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+   g_sccsid   CONSTANT varchar2(30) :='"$Revision:   3.4  $"';
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+type texrec is record
+(hst_text       hig_standard_text.HST_TEXT%type);
+ 
+type textab is table of texrec index by binary_integer;
+
+
+type stdrec is record
+(hmi_field_desc   hig_module_items.HMI_FIELD_DESC%type,
+ hst_text         hig_standard_text.HST_TEXT%type,
+ hstu_top_ranking hig_standard_text_usage.hstu_top_ranking%type);
+ 
+type stdtab is table of stdrec index by binary_integer;
+
+g_std_text        hig_standard_text.hst_text%type default null;
+g_append_std_text hig_standard_text.hst_text%type default null;
+    
+--
+--------------------------------------------------------------------------------
+--
+  FUNCTION is_allowed 
+            ( pi_module_name  IN hig_module_items.hmi_module_name%TYPE
+            , pi_module_block IN hig_module_items.hmi_block_name%TYPE
+            , pi_module_item  IN hig_module_items.hmi_item_name%TYPE)
+  RETURN BOOLEAN;
+--
+--------------------------------------------------------------------------------
+--
+--<PROC NAME="GET_HST_TEXT_ID">
+-- get hst_text_id_seq.nexval --
+FUNCTION get_hst_text_id 
+  RETURN hig_standard_text.hst_text_id%TYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_USER_TEXT">
+-- get standard text chosen by user --
+PROCEDURE get_user_text(p_hstu_user_id   in hig_standard_text_usage.hstu_user_id%type,
+                        p_hst_text_id    in hig_standard_text.hst_text_id%type,
+                        p_hst_module_item_id in hig_standard_text.hst_module_item_id%type,
+                        p_text          out hig_standard_text.hst_text%type,
+                        p_top_ranking   out hig_standard_text_usage.hstu_top_ranking%type);    
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--  
+--<PROC NAME="INSERT_INTO_HSTU">
+-- INSERT INTO HIG_STANDARD_TEXT_USAGE --
+PROCEDURE insert_into_hstu(p_hst_text_id    in hig_standard_text.hst_text_id%type,
+                           p_hst_module_item_id in hig_standard_text.hst_module_item_id%type,
+                           p_hstu_user_id   in hig_standard_text_usage.hstu_user_id%type);                               
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_STANDARD_TEXT">
+-- This proc returns the Standard Text for an item.--
+PROCEDURE get_standard_text(po_textab    out textab); 
+--</PROC>
+------------------------------------------------------------------------------
+--
+--<PROC NAME="GET_STD_TEXT">
+-- get standard text chosen by user --
+PROCEDURE get_std_text(p_user_id         in hig_users.hus_user_id%type,
+                       p_hmi_module_name in hig_module_items.hmi_module_name%type,
+                       p_hmi_block_name  in hig_module_items.hmi_block_name%type,
+                       p_hmi_item_name   in hig_module_items.hmi_item_name%type,
+                       p_stdtab          in out stdtab);  
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_FIELD_DESC">
+-- get field description when no standard text exists --
+FUNCTION get_field_desc(p_hmi_module_name in hig_module_items.hmi_module_name%type,
+                       p_hmi_block_name  in hig_module_items.hmi_block_name%type,
+                       p_hmi_item_name   in hig_module_items.hmi_item_name%type) RETURN hig_module_items.hmi_field_desc%type;                        
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="set_append_std_text">
+--
+PROCEDURE set_append_std_text(p_std_text  IN  hig_standard_text.hst_text%type);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<FUNC NAME="get_append_std_text">
+--
+FUNCTION get_append_std_text RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="set_std_text">
+--
+PROCEDURE set_std_text(p_std_text  IN  hig_standard_text.hst_text%type);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<FUNC NAME="get_std_text">
+--
+FUNCTION get_std_text RETURN varchar2;
+--</PROC>
+--
+------------------------------------------------------------------------------
+--<FUNC NAME="get_user_id">
+--
+FUNCTION get_user_id(p_username   in hig_users.hus_username%type) RETURN number;
+--</PROC>
+--
+------------------------------------------------------------------------------
+--<PROC NAME="add_all_tect_to_user">
+--
+PROCEDURE add_all_text_to_user(p_user_id  in hig_users.hus_user_id%type,
+                               p_hst_module_item_id in hig_standard_text.hst_module_item_id%type);
+--</PROC>
+--
+------------------------------------------------------------------------------
+--<PROC NAME="DELETE_FROM_HSTU">
+-- DELETE FROM HIG_STANDARD_TEXT_USAGE --
+PROCEDURE delete_from_hstu(p_hst_text_id    in hig_standard_text.hst_text_id%type,
+                           p_hst_module_item_id in hig_standard_text.hst_module_item_id%type,
+                           p_hstu_user_id   in hig_standard_text_usage.hstu_user_id%type);                               
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="COPY_STD_TEXT_LIST">
+-- COPY ONE USER'S STD TEXT LIST TO ANOTHER --
+PROCEDURE copy_std_text_list(p_user_id1  in hig_users.hus_user_id%type,
+                             p_user_id2  in hig_users.hus_user_id%type);                             
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<FUNC NAME="GET_STD_TEXT_MAX_LENGTH">
+-- GET STANDARD TEXT MAX LENGTH --
+FUNCTION get_std_text_max_length(p_hmi_module_item_id in hig_module_items.hmi_module_item_id%type)
+                                 return number;                                                       
+--</FUNC>
+--
+-----------------------------------------------------------------------------
+--
+--<FUNC NAME="GET_TEXT_BY_ID">
+-- GET STANDARD TEXT BY ID --
+FUNCTION get_text_by_id(p_hst_text_id in hig_standard_text.hst_text_id%type)
+                                 return varchar2;                                                       
+--</FUNC>
+--
+-----------------------------------------------------------------------------
+--
+END hig_std_text; 
+/
