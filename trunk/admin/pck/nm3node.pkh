@@ -4,19 +4,19 @@ CREATE OR REPLACE PACKAGE nm3node AS
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3node.pkh-arc   3.1   Oct 05 2009 11:25:50   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3node.pkh-arc   3.2   Jul 04 2013 16:19:20   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3node.pkh  $
---       Date into PVCS   : $Date:   Oct 05 2009 11:25:50  $
---       Date fetched Out : $Modtime:   Oct 05 2009 11:25:28  $
---       PVCS Version     : $Revision:   3.1  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:19:20  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:18  $
+--       PVCS Version     : $Revision:   3.2  $
 --
 --------------------------------------------------------------------------------
 --
--- Copyright (c) exor corporation ltd, 2009
+-- Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
-  g_sccsid      CONSTANT  VARCHAR2(2000) := '"$Revision:   3.1  $"';
+  g_sccsid      CONSTANT  VARCHAR2(2000) := '"$Revision:   3.2  $"';
 --  g_sccsid is the SCCS ID for the package
 
 FUNCTION get_version RETURN VARCHAR2;
