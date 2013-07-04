@@ -2,18 +2,18 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data_help.sql-arc   2.8   Mar 25 2011 09:35:34   Mike.Alexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data_help.sql-arc   2.9   Jul 04 2013 14:08:58   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3data_help.sql  $
---       Date into PVCS   : $Date:   Mar 25 2011 09:35:34  $
---       Date fetched Out : $Modtime:   Mar 25 2011 09:31:58  $
---       Version          : $Revision:   2.8  $
+--       Date into PVCS   : $Date:   Jul 04 2013 14:08:58  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 11:54:18  $
+--       Version          : $Revision:   2.9  $
 --       Table Owner      : NM3_METADATA
 --       Generation Date  : 25-MAR-2011 09:31
 --
 --   Product metadata script
 --   As at Release 4.4.0.0
 --
---   Copyright (c) exor corporation ltd, 2011
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 --
 --   TABLES PROCESSED
 --   ================

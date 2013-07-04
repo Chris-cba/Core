@@ -3,14 +3,14 @@ As
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3ctx.pkb-arc   3.1   May 17 2011 08:33:20   Steve.Cooper  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3ctx.pkb-arc   3.2   Jul 04 2013 14:08:58   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3ctx.pkb  $
---       Date into PVCS   : $Date:   May 17 2011 08:33:20  $
---       Date fetched Out : $Modtime:   Mar 29 2011 16:11:16  $
---       Version          : $Revision:   3.1  $
+--       Date into PVCS   : $Date:   Jul 04 2013 14:08:58  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 11:54:14  $
+--       Version          : $Revision:   3.2  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2010
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -------------------------------------------------------------------------
 --
 --all global package variables here 
@@ -19,7 +19,7 @@ As
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  G_Body_Sccsid  Constant Varchar2(2000) := '$Revision:   3.1  $';
+  G_Body_Sccsid  Constant Varchar2(2000) := '$Revision:   3.2  $';
    
   Type Context_Tab Is Table Of Boolean Index By Varchar(30);
   
