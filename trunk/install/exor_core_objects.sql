@@ -2,13 +2,15 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/exor_core_objects.sql-arc   3.5   Oct 03 2011 09:38:48   Steve.Cooper  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/exor_core_objects.sql-arc   3.6   Jul 04 2013 13:45:14   James.Wadsworth  $
 --       Module Name      : $Workfile:   exor_core_objects.sql  $
---       Date into PVCS   : $Date:   Oct 03 2011 09:38:48  $
---       Date fetched Out : $Modtime:   Oct 03 2011 09:27:38  $
---       PVCS Version     : $Revision:   3.5  $
+--       Date into PVCS   : $Date:   Jul 04 2013 13:45:14  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 11:59:34  $
+--       PVCS Version     : $Revision:   3.6  $
 --
---------------------------------------------------------------------------------
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
 --
 prompt Creating Exor_Core Objects
 
