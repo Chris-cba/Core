@@ -5,20 +5,20 @@ IS
   --
   --   PVCS Identifiers :-
   --
-  --       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/doc_sdo_util.pkb-arc   2.8   Oct 19 2010 16:59:20   Chris.Strettle  $
+  --       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/doc_sdo_util.pkb-arc   2.9   Jul 04 2013 14:31:26   James.Wadsworth  $
   --       Module Name      : $Workfile:   doc_sdo_util.pkb  $
-  --       Date into PVCS   : $Date:   Oct 19 2010 16:59:20  $
-  --       Date fetched Out : $Modtime:   Oct 19 2010 16:50:00  $
-  --       Version          : $Revision:   2.8  $
+  --       Date into PVCS   : $Date:   Jul 04 2013 14:31:26  $
+  --       Date fetched Out : $Modtime:   Jul 04 2013 14:29:24  $
+  --       Version          : $Revision:   2.9  $
   --
   --   Author : Christopher Strettle
   --
-  -----------------------------------------------------------------------------
-  --   Copyright (c) exor corporation ltd, 2006
-  -----------------------------------------------------------------------------
+  ------------------------------------------------------------------
+  --   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+  ------------------------------------------------------------------
   --
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid          CONSTANT VARCHAR2(2000) := '$Revision:   2.8  $';
+  g_body_sccsid          CONSTANT VARCHAR2(2000) := '$Revision:   2.9  $';
   g_package_name         CONSTANT VARCHAR2(30) := 'DOC_SDO_UTIL';
   nl                     CONSTANT VARCHAR2(5) := chr(10);
 

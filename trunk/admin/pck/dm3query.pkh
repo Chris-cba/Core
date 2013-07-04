@@ -2,11 +2,11 @@ create or replace package dm3query as
 --<PACKAGE>
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/dm3query.pkh-arc   2.0   Jun 14 2007 14:59:48   smarshall  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/dm3query.pkh-arc   2.1   Jul 04 2013 14:31:26   James.Wadsworth  $
 --       Module Name      : $Workfile:   dm3query.pkh  $
---       Date into SCCS   : $Date:   Jun 14 2007 14:59:48  $
---       Date fetched Out : $Modtime:   Jun 14 2007 14:59:00  $
---       SCCS Version     : $Revision:   2.0  $
+--       Date into SCCS   : $Date:   Jul 04 2013 14:31:26  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:06  $
+--       SCCS Version     : $Revision:   2.1  $
 --       Based on SCCS Version     : 1.3
 --
 --
@@ -15,11 +15,11 @@ create or replace package dm3query as
 --   DM3 Query package
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2002
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
-  g_sccsid      CONSTANT  VARCHAR2(2000) := '"$Revision:   2.0  $"';
+  g_sccsid      CONSTANT  VARCHAR2(2000) := '"$Revision:   2.1  $"';
 --  g_sccsid is the SCCS ID for the package
 --
    TYPE tab_dqc IS TABLE OF doc_query_cols%ROWTYPE INDEX BY BINARY_INTEGER;

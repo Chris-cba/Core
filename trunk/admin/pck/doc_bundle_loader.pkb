@@ -3,21 +3,22 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/doc_bundle_loader.pkb-arc   3.11   Jul 17 2012 09:24:50   Rob.Coupe  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/doc_bundle_loader.pkb-arc   3.12   Jul 04 2013 14:31:26   James.Wadsworth  $
 --       Module Name      : $Workfile:   doc_bundle_loader.pkb  $
---       Date into PVCS   : $Date:   Jul 17 2012 09:24:50  $
---       Date fetched Out : $Modtime:   Jul 17 2012 09:24:04  $
---       Version          : $Revision:   3.11  $
+--       Date into PVCS   : $Date:   Jul 04 2013 14:31:26  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:30:28  $
+--       Version          : $Revision:   3.12  $
 --       Based on SCCS version : 
--------------------------------------------------------------------------
---
+------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-------------------------------------------------------------------
 --all global package variables here
 
   -----------
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.11  $';
+  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.12  $';
 
   g_package_name CONSTANT varchar2(30) := 'doc_bundle_loader';
   

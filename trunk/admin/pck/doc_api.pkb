@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY doc_api AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/doc_api.pkb-arc   2.3   Jul 17 2012 09:20:28   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/doc_api.pkb-arc   2.4   Jul 04 2013 14:31:26   James.Wadsworth  $
 --       Module Name      : $Workfile:   doc_api.pkb  $
---       Date into SCCS   : $Date:   Jul 17 2012 09:20:28  $
---       Date fetched Out : $Modtime:   Jul 17 2012 09:16:46  $
---       SCCS Version     : $Revision:   2.3  $
+--       Date into SCCS   : $Date:   Jul 04 2013 14:31:26  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:06  $
+--       SCCS Version     : $Revision:   2.4  $
 --       Based on SCCS Version     : 1.1
 --
 --
@@ -17,7 +17,7 @@ CREATE OR REPLACE PACKAGE BODY doc_api AS
 --   doc_api body
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2005
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 --all global package variables here
@@ -26,7 +26,7 @@ CREATE OR REPLACE PACKAGE BODY doc_api AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid   CONSTANT varchar2(2000) := '"$Revision:   2.3  $"';
+  g_body_sccsid   CONSTANT varchar2(2000) := '"$Revision:   2.4  $"';
 
   g_package_name  CONSTANT varchar2(30) := 'doc_api';
   

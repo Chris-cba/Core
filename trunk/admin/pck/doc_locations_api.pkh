@@ -4,13 +4,15 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/doc_locations_api.pkh-arc   2.5   Mar 08 2011 09:36:18   Ade.Edwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/doc_locations_api.pkh-arc   2.6   Jul 04 2013 14:31:26   James.Wadsworth  $
 --       Module Name      : $Workfile:   doc_locations_api.pkh  $
---       Date into PVCS   : $Date:   Mar 08 2011 09:36:18  $
---       Date fetched Out : $Modtime:   Aug 31 2010 15:01:04  $
---       Version          : $Revision:   2.5  $
+--       Date into PVCS   : $Date:   Jul 04 2013 14:31:26  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:30:54  $
+--       Version          : $Revision:   2.6  $
 --       Based on SCCS version : 
--------------------------------------------------------------------------
+------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
 
@@ -18,7 +20,7 @@ AS
   --constants
   -----------
   --g_sccsid is the SCCS ID for the package
-  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.5  $';
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.6  $';
 --
   TYPE rec_file_record
     IS RECORD ( 

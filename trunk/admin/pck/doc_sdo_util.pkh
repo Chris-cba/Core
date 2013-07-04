@@ -4,20 +4,20 @@ IS
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/doc_sdo_util.pkh-arc   2.3   Oct 06 2010 17:42:16   Chris.Strettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/doc_sdo_util.pkh-arc   2.4   Jul 04 2013 14:31:26   James.Wadsworth  $
 --       Module Name      : $Workfile:   doc_sdo_util.pkh  $
---       Date into PVCS   : $Date:   Oct 06 2010 17:42:16  $
---       Date fetched Out : $Modtime:   Oct 06 2010 17:38:02  $
---       Version          : $Revision:   2.3  $
+--       Date into PVCS   : $Date:   Jul 04 2013 14:31:26  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:06  $
+--       Version          : $Revision:   2.4  $
 --
 --   Author : Chris Strettle
 --
 -----------------------------------------------------------------------------
---   Copyright (c) exor corporation ltd, 2010
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
    --g_sccsid is the SCCS ID for the package
-   g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.3  $';
+   g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.4  $';
 --
    g_table_name          CONSTANT user_tables.table_name%TYPE       := 'DOCS';
    g_pk_column           CONSTANT user_tab_columns.column_name%TYPE := 'DOC_ID';

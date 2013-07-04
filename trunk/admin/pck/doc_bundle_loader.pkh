@@ -4,13 +4,15 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/doc_bundle_loader.pkh-arc   3.2   Dec 07 2010 09:25:56   Graeme.Johnson  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/doc_bundle_loader.pkh-arc   3.3   Jul 04 2013 14:31:26   James.Wadsworth  $
 --       Module Name      : $Workfile:   doc_bundle_loader.pkh  $
---       Date into PVCS   : $Date:   Dec 07 2010 09:25:56  $
---       Date fetched Out : $Modtime:   Dec 07 2010 09:24:58  $
---       Version          : $Revision:   3.2  $
+--       Date into PVCS   : $Date:   Jul 04 2013 14:31:26  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:30:40  $
+--       Version          : $Revision:   3.3  $
 --       Based on SCCS version : 
--------------------------------------------------------------------------
+------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
 
@@ -18,7 +20,7 @@ AS
   --constants
   -----------
   --g_sccsid is the SCCS ID for the package
-  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.2  $';
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.3  $';
 
   TYPE t_tab_doc_bundle_files IS TABLE OF doc_bundle_files%ROWTYPE INDEX BY BINARY_INTEGER;
   

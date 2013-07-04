@@ -3,13 +3,15 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/doc_locations_api.pkb-arc   2.10   May 16 2011 14:41:32   Steve.Cooper  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/doc_locations_api.pkb-arc   2.11   Jul 04 2013 14:31:26   James.Wadsworth  $
 --       Module Name      : $Workfile:   doc_locations_api.pkb  $
---       Date into PVCS   : $Date:   May 16 2011 14:41:32  $
---       Date fetched Out : $Modtime:   Apr 01 2011 10:37:02  $
---       Version          : $Revision:   2.10  $
+--       Date into PVCS   : $Date:   Jul 04 2013 14:31:26  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:29:06  $
+--       Version          : $Revision:   2.11  $
 --       Based on SCCS version : 
--------------------------------------------------------------------------
+------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+------------------------------------------------------------------
 --
 --all global package variables here
 
@@ -17,7 +19,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.10  $';
+  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.11  $';
 --
   g_package_name CONSTANT varchar2(30) := 'doc_locations_api';
 --
@@ -457,11 +459,11 @@ BEGIN
      l_tab_comments(1)  := '--';
      l_tab_comments(2)  := '--   SCCS Identifiers :-';
      l_tab_comments(3)  := '--';
-     l_tab_comments(4)  := '--       pvcsid                     : $Header:   //vm_latest/archives/nm3/admin/pck/doc_locations_api.pkb-arc   2.10   May 16 2011 14:41:32   Steve.Cooper  $';
+     l_tab_comments(4)  := '--       pvcsid                     : $Header:   //vm_latest/archives/nm3/admin/pck/doc_locations_api.pkb-arc   2.11   Jul 04 2013 14:31:26   James.Wadsworth  $';
      l_tab_comments(5)  := '--       Module Name                : $Workfile:   doc_locations_api.pkb  $';
-     l_tab_comments(6)  := '--       Date into PVCS             : $Date:   May 16 2011 14:41:32  $';
-     l_tab_comments(7)  := '--       Date fetched Out           : $Modtime:   Apr 01 2011 10:37:02  $';
-     l_tab_comments(8)  := '--       PVCS Version               : $Revision:   2.10  $';
+     l_tab_comments(6)  := '--       Date into PVCS             : $Date:   Jul 04 2013 14:31:26  $';
+     l_tab_comments(7)  := '--       Date fetched Out           : $Modtime:   Jul 04 2013 14:29:06  $';
+     l_tab_comments(8)  := '--       PVCS Version               : $Revision:   2.11  $';
      l_tab_comments(9)  := '--';
      l_tab_comments(10) := '--   table_name_WHO trigger';
      l_tab_comments(11) := '--';

@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY dm3query AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/dm3query.pkb-arc   2.0   Jun 14 2007 14:59:46   smarshall  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/dm3query.pkb-arc   2.1   Jul 04 2013 14:31:26   James.Wadsworth  $
 --       Module Name      : $Workfile:   dm3query.pkb  $
---       Date into SCCS   : $Date:   Jun 14 2007 14:59:46  $
---       Date fetched Out : $Modtime:   Jun 14 2007 14:59:00  $
---       SCCS Version     : $Revision:   2.0  $
+--       Date into SCCS   : $Date:   Jul 04 2013 14:31:26  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:06  $
+--       SCCS Version     : $Revision:   2.1  $
 --       Based on  SCCS Version     : 1.8
 --
 --
@@ -17,12 +17,12 @@ CREATE OR REPLACE PACKAGE BODY dm3query AS
 --   DM3 Query package body
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2002
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.0  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.1  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'dm3query';

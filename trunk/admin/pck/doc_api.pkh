@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE doc_api AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/doc_api.pkh-arc   2.2   Jul 17 2012 09:18:54   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/doc_api.pkh-arc   2.3   Jul 04 2013 14:31:26   James.Wadsworth  $
 --       Module Name      : $Workfile:   doc_api.pkh  $
---       Date into SCCS   : $Date:   Jul 17 2012 09:18:54  $
---       Date fetched Out : $Modtime:   Jul 17 2012 09:16:22  $
---       SCCS Version     : $Revision:   2.2  $
+--       Date into SCCS   : $Date:   Jul 04 2013 14:31:26  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:06  $
+--       SCCS Version     : $Revision:   2.3  $
 --       Based on SCCS Version     : 1.1
 --
 --   Author : Francis Fish
@@ -15,7 +15,7 @@ CREATE OR REPLACE PACKAGE doc_api AS
 --   doc_api
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2005
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --</PACKAGE>
 --
@@ -26,7 +26,7 @@ CREATE OR REPLACE PACKAGE doc_api AS
   --constants
   -----------
   --g_sccsid is the SCCS ID for the package
-  g_sccsid CONSTANT varchar2(2000) := '"$Revision:   2.2  $"';
+  g_sccsid CONSTANT varchar2(2000) := '"$Revision:   2.3  $"';
 --</GLOBVAR>
 --
 -----------------------------------------------------------------------------
