@@ -1,0 +1,79 @@
+CREATE OR REPLACE PACKAGE nm3xml
+AS
+--<PACKAGE>
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3xml.pkh-arc   3.1   Jul 04 2013 16:45:36   James.Wadsworth  $
+--       Module Name      : $Workfile:   nm3xml.pkh  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:45:36  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 16:44:02  $
+--       Version          : $Revision:   3.1  $
+--       Based on SCCS version : 
+------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+------------------------------------------------------------------
+--
+-- wrapper package to protect from future changes to oracle methods of xml manipulation
+--
+--</PACKAGE>
+--<GLOBVAR>
+
+  -----------
+  --constants
+  -----------
+  --g_sccsid is the SCCS ID for the package
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.1  $';
+
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+
+
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="xml_to_clob">
+-- Given an xml type return a CLOB
+FUNCTION xml_to_clob(pi_xml IN xmltype) RETURN CLOB;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--<PROC NAME="clob_to_xml">
+-- Given a clob return am xmltype
+FUNCTION clob_to_xml(pi_clob clob) RETURN xmltype;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+
+
+-----------------------------------------------------------------------------
+--<PROC NAME="xml_to_tabvarchar">
+-- Given an xml type return a table of max varchar2
+-- useful if you want to take XML and write it to a file using nm3file.write_file!!!
+--
+FUNCTION xml_to_tabvarchar(pi_xml IN xmltype) RETURN nm3type.tab_varchar32767;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--<PROC NAME="tab_varchar_to_xml">
+-- Given a pl/sql table of max varchar2 return am xmltype
+FUNCTION tab_varchar_to_xml(pi_tab_varchar nm3type.tab_varchar32767) RETURN xmltype;
+--</PROC>
+-----------------------------------------------------------------------------
+
+end nm3xml;
+/
+
