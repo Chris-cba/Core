@@ -1,13 +1,13 @@
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm_4054_fix78.sql-arc   1.0   Sep 14 2012 15:29:14   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm_4054_fix78.sql-arc   1.1   Jul 04 2013 13:46:38   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm_4054_fix78.sql  $
---       Date into PVCS   : $Date:   Sep 14 2012 15:29:14  $
---       Date fetched Out : $Modtime:   Sep 14 2012 15:22:10  $
---       PVCS Version     : $Revision:   1.0  $
+--       Date into PVCS   : $Date:   Jul 04 2013 13:46:38  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 11:54:22  $
+--       PVCS Version     : $Revision:   1.1  $
 --
 ----------------------------------------------------------------------------
---   Copyright (c) 2012 Bentley Systems Incorporated.
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 ----------------------------------------------------------------------------
 --
 
