@@ -1,4 +1,4 @@
-REM Copyright (c) Exor Corporation Ltd, 2003
+REM Copyright 2013 Bentley Systems Incorporated. All rights reserved.
 REM '@(#)nm3081_nm3082_upg.sql	1.15 12/05/03'
 --
 COL run_file new_value run_file noprint
