@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm3api AS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid                 : $Header:   //vm_latest/archives/nm3/admin/pck/nm3api.pkb-arc   2.3   Jun 25 2012 09:12:52   Steve.Cooper  $
+--       pvcsid                 : $Header:   //vm_latest/archives/nm3/admin/pck/nm3api.pkb-arc   2.4   Jul 04 2013 15:15:38   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3api.pkb  $
---       Date into PVCS   : $Date:   Jun 25 2012 09:12:52  $
---       Date fetched Out : $Modtime:   Oct 12 2011 11:56:58  $
---       PVCS Version     : $Revision:   2.3  $
+--       Date into PVCS   : $Date:   Jul 04 2013 15:15:38  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:08  $
+--       PVCS Version     : $Revision:   2.4  $
 --       Based on SCCS version 1.5: 
 --
 --   Author : Rob Coupe
@@ -14,12 +14,12 @@ CREATE OR REPLACE PACKAGE BODY nm3api AS
 --   API package body
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2002
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 --all global package variables here
 --
-   g_body_sccsid constant varchar2(30) :='"$Revision:   2.3  $"';
+   g_body_sccsid constant varchar2(30) :='"$Revision:   2.4  $"';
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3api';
 --

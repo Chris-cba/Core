@@ -3,14 +3,14 @@ CREATE OR REPLACE PACKAGE BODY nm3api_admin_unit AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3api_admin_unit.pkb-arc   2.2   May 16 2011 14:42:24   Steve.Cooper  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3api_admin_unit.pkb-arc   2.3   Jul 04 2013 15:15:38   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3api_admin_unit.pkb  $
---       Date into PVCS   : $Date:   May 16 2011 14:42:24  $
---       Date fetched Out : $Modtime:   Apr 01 2011 11:25:10  $
---       Version          : $Revision:   2.2  $
+--       Date into PVCS   : $Date:   Jul 04 2013 15:15:38  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:08  $
+--       Version          : $Revision:   2.3  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2004
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 --all global package variables here
@@ -18,7 +18,7 @@ CREATE OR REPLACE PACKAGE BODY nm3api_admin_unit AS
   --constants
   -----------
 --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.2  $';
+  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.3  $';
   g_package_name     CONSTANT varchar2(30) := 'nm3api_admin_unit';
   g_natg_domain      CONSTANT hig_domains.hdo_domain%TYPE := 'ADMIN TYPE GROUPINGS';
   g_natg_locked      CONSTANT hig_codes.hco_code%TYPE := 'LOCKED';

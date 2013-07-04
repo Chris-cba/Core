@@ -4,13 +4,15 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3acl.pkh-arc   3.1   May 03 2011 17:07:40   Ade.Edwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3acl.pkh-arc   3.2   Jul 04 2013 15:15:38   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3acl.pkh  $
---       Date into PVCS   : $Date:   May 03 2011 17:07:40  $
---       Date fetched Out : $Modtime:   May 03 2011 17:05:10  $
---       Version          : $Revision:   3.1  $
+--       Date into PVCS   : $Date:   Jul 04 2013 15:15:38  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 15:11:56  $
+--       Version          : $Revision:   3.2  $
 --       Based on SCCS version : 
--------------------------------------------------------------------------
+------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
 
@@ -27,7 +29,7 @@ AS
   --constants
   -----------
   --g_sccsid is the SCCS ID for the package
-  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.1  $';
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.2  $';
 
 --</GLOBVAR>
 --

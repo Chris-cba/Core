@@ -16,7 +16,7 @@ CREATE OR REPLACE PACKAGE BODY nm3analytic_connectivity AS
 --   Bulk merge functinality
 --
 -----------------------------------------------------------------------------
---   Copyright (c) exor corporation ltd, 2006
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 
   g_body_sccsid     CONSTANT  varchar2(2000) := '"@(#)nm3analytic_connectivity.pkb	1.1 02/01/07"';
