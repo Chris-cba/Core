@@ -1,0 +1,136 @@
+CREATE OR REPLACE PACKAGE hig_tab_fyr AS 
+--<PACKAGE>
+--
+-----------------------------------------------------------------------------
+--
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)hig_tab_fyr.pkh	1.1 09/02/05
+--       Module Name      : hig_tab_fyr.pkh
+--       Date into SCCS   : 05/09/02 11:14:37
+--       Date fetched Out : 07/06/13 14:10:26
+--       SCCS Version     : 1.1
+--
+--
+--   Author : 
+--
+--   Generated package DO NOT MODIFY
+--
+--   get_gen header : "@(#)hig_tab_fyr.pkh	1.1 09/02/05"
+--   get_gen body   : @(#)hig_tab_fyr.pkh	1.1 09/02/05
+--
+-----------------------------------------------------------------------------
+--
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--
+-----------------------------------------------------------------------------
+--
+--</PACKAGE>
+--<GLOBVAR>
+  g_sccsid      CONSTANT  VARCHAR2(2000) := '"@(#)hig_tab_fyr.pkh	1.1 09/02/05"';
+--  g_sccsid is the SCCS ID for the package
+--
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version of the package
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get">
+--
+--   Function to get using FYR_PK constraint
+--
+FUNCTION get (pi_fyr_id            FINANCIAL_YEARS.fyr_id%TYPE
+             ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+             ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+             ) RETURN FINANCIAL_YEARS%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="del">
+--
+--   Procedure to del using FYR_PK constraint
+--
+PROCEDURE del (pi_fyr_id            FINANCIAL_YEARS.fyr_id%TYPE
+              ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+              ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+              ,pi_locked_sqlcode    PLS_INTEGER DEFAULT -20000
+              );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="lock_gen">
+--
+--   Function to lock using FYR_PK constraint
+--
+FUNCTION lock_gen (pi_fyr_id            FINANCIAL_YEARS.fyr_id%TYPE
+                  ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                  ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                  ,pi_locked_sqlcode    PLS_INTEGER DEFAULT -20000
+                  ) RETURN ROWID;
+--
+--   Procedure to lock using FYR_PK constraint
+--
+PROCEDURE lock_gen (pi_fyr_id            FINANCIAL_YEARS.fyr_id%TYPE
+                   ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                   ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                   ,pi_locked_sqlcode    PLS_INTEGER DEFAULT -20000
+                   );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins">
+-- Inserts record into FINANCIAL_YEARS
+-- Returns the record as inserted - trigger modified values
+--
+PROCEDURE ins (p_rec_fyr IN OUT FINANCIAL_YEARS%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug">
+-- Debug a ROWTYPE record
+PROCEDURE debug (pi_rec_fyr FINANCIAL_YEARS%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="contiguous_sequence">
+-- Return TRUE/FALSE depending on whether any gaps/overlaps exist across all records in table
+FUNCTION contiguous_sequence RETURN BOOLEAN;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="enforce_contiguous_sequence">
+-- Raise exception if gaps/overlaps exist across all records
+PROCEDURE enforce_contiguous_sequence;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PRAGMA>
+   PRAGMA RESTRICT_REFERENCES (get_version, RNDS, WNPS, WNDS);
+   PRAGMA RESTRICT_REFERENCES (get_body_version, RNDS, WNPS, WNDS);
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+END hig_tab_fyr;
+/

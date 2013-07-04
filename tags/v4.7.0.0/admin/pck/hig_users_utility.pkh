@@ -1,0 +1,102 @@
+CREATE OR REPLACE PACKAGE hig_users_utility
+AS
+--<PACKAGE>
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_users_utility.pkh-arc   3.4   Jul 04 2013 14:57:10   James.Wadsworth  $
+--       Module Name      : $Workfile:   hig_users_utility.pkh  $
+--       Date into PVCS   : $Date:   Jul 04 2013 14:57:10  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:56:40  $
+--       Version          : $Revision:   3.4  $
+--       Based on SCCS version : 
+--
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
+--</PACKAGE>
+--<GLOBVAR>
+
+  -----------
+  --constants
+  -----------
+  --g_sccsid is the SCCS ID for the package
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.4  $';
+--</GLOBVAR>
+--
+Type l_huc_rec IS Record (
+     HUD_HUS_USER_ID        Number       ,
+     HUD_HUS_INITIALS       VARCHAR2 (3 ),
+     HUD_HUS_NAME           VARCHAR2 (30),
+     HUD_HUS_USERNAME       VARCHAR2 (30),
+     HUD_HUS_JOB_TITLE      VARCHAR2 (10) ,
+     HUD_huc_ID             NUMBER       ,
+     HUD_huc_ADDRESS1       VARCHAR2(35 ),
+     HUD_huc_ADDRESS2       VARCHAR2(35 ),
+     HUD_huc_ADDRESS3       VARCHAR2(35 ),
+     HUD_huc_ADDRESS4       VARCHAR2(35 ),
+     HUD_huc_ADDRESS5       VARCHAR2(35 ),
+     HUD_huc_POSTCODE       VARCHAR2(30 ),
+     HUD_huc_tel_type_1     VARCHAR2(30 ),
+     HUD_huc_TELEPHONE_1    VARCHAR2(30 ),
+     HUD_huc_primary_tel_1  Varchar2(1)  ,
+     HUD_huc_tel_type_2     VARCHAR2(30 ),
+     HUD_huc_TELEPHONE_2    VARCHAR2(30 ),
+     HUD_huc_primary_tel_2  Varchar2(1)  ,
+     HUD_huc_tel_type_3     VARCHAR2(30 ),
+     HUD_huc_TELEPHONE_3    VARCHAR2(30 ),
+     HUD_huc_primary_tel_3  Varchar2(1)  ,
+     HUD_huc_tel_type4     VARCHAR2(30 ),
+     HUD_huc_TELEPHONE_4    VARCHAR2(30 ),
+     HUD_huc_primary_tel_4  Varchar2(1)  ,
+     HUD_huc_DATE_CREATED   DATE         ,
+     HUD_huc_DATE_MODIFIED  DATE         ,
+     HUD_huc_MODIFIED_BY    VARCHAR2(30 ),
+     HUD_huc_CREATED_BY     VARCHAR2(30 ) );
+
+TYPE l_huc_ref IS REF CURSOR RETURN l_huc_rec ;
+
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PRAGMA>
+  PRAGMA RESTRICT_REFERENCES(get_version, RNDS, WNPS, WNDS);
+  PRAGMA RESTRICT_REFERENCES(get_body_version, RNDS, WNPS, WNDS);
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+PROCEDURE upd_huc( pi_huc_rec           IN OUT l_huc_rec
+                 , po_error_text           OUT VARCHAR2 ) ;
+--
+FUNCTION  get_primary_contact(pi_hus_user_id hig_users.hus_user_id%TYPE)
+RETURN    hig_user_details_vw.HUD_huc_telephone_1%TYPE;
+--
+FUNCTION  get_primary_contact(pi_hus_username hig_users.hus_username%TYPE DEFAULT Sys_Context('NM3_SECURITY_CTX','USERNAME'))
+RETURN    hig_user_details_vw.HUD_huc_telephone_1%TYPE;
+--
+FUNCTION  get_telephone_no(pi_hus_user_id hig_users.hus_user_id%TYPE
+                          ,pi_tel_type    hig_user_contacts_all.huc_tel_type_1%TYPE)
+RETURN    hig_user_contacts_all.huc_telephone_1%TYPE;
+--
+FUNCTION  get_telephone_no(pi_hus_username hig_users.hus_username%TYPE 
+                          ,pi_tel_type    hig_user_contacts_all.huc_tel_type_1%TYPE)
+RETURN    hig_user_contacts_all.huc_telephone_1%TYPE;
+--
+END hig_users_utility;
+/
+
+
