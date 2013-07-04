@@ -13,7 +13,7 @@ SELECT
 --   Dummy view used to resize routes from the CSV loader.
 --
 -----------------------------------------------------------------------------
---  Copyright (c) exor corporation ltd, 2006
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
         ne_unique
        ,ne_nt_type

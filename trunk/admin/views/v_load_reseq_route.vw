@@ -14,7 +14,7 @@ SELECT
 --   Dummy view used to resequence routes from the CSV loader
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2002
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
         ne_unique
        ,ne_nt_type
