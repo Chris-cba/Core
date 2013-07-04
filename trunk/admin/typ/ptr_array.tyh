@@ -15,9 +15,9 @@ CREATE OR REPLACE TYPE PTR_ARRAY AS OBJECT (
 --   TYPE ptr_array
 --
 -----------------------------------------------------------------------------
---      Copyright (c) exor corporation ltd, 2001
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
-
+--
   pa ptr_array_type
 , MEMBER PROCEDURE DEBUG
 , MEMBER FUNCTION get_id ( p_value IN INTEGER ) RETURN INTEGER

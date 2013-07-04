@@ -14,7 +14,7 @@ CREATE OR REPLACE TYPE nm_value_distribution_array AS object
 --    TYPE nm_value_distribution_array
 --
 -----------------------------------------------------------------------------
---      Copyright (c) exor corporation ltd, 2001
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
   nvda_value_distribution_array    nm_value_distribution_arr_type

@@ -3,16 +3,16 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/typ/nm3typ.sql-arc   2.8   Oct 07 2010 14:18:04   Linesh.Sorathia  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/typ/nm3typ.sql-arc   2.9   Jul 04 2013 10:14:48   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3typ.sql  $
---       Date into PVCS   : $Date:   Oct 07 2010 14:18:04  $
---       Date fetched Out : $Modtime:   Oct 07 2010 14:17:44  $
---       Version          : $Revision:   2.8  $
+--       Date into PVCS   : $Date:   Jul 04 2013 10:14:48  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 09:59:36  $
+--       Version          : $Revision:   2.9  $
 --
 --   Product upgrade script
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2009
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 --

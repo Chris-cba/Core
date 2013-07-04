@@ -16,7 +16,7 @@ CREATE OR REPLACE type ptr_array_type as
 --   TYPE ptr_array_type
 --
 -----------------------------------------------------------------------------
---      Copyright (c) exor corporation ltd, 2001
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 varray(1048576)  of ptr;
