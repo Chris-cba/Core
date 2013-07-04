@@ -3,16 +3,19 @@ CREATE OR REPLACE PACKAGE Nm3layer_Tool AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3layer_tool.pkh-arc   2.12   Oct 26 2011 10:07:02   Ade.Edwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3layer_tool.pkh-arc   2.13   Jul 04 2013 16:13:10   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3layer_tool.pkh  $
---       Date into PVCS   : $Date:   Oct 26 2011 10:07:02  $
---       Date fetched Out : $Modtime:   Oct 25 2011 16:37:30  $
---       Version          : $Revision:   2.12  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:13:10  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 16:12:58  $
+--       Version          : $Revision:   2.13  $
 --       Based on SCCS version : 1.6
--------------------------------------------------------------------------
+------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+------------------------------------------------------------------
+
 --</PACKAGE>
 --<GLOBVAR>
-    g_sccsid      CONSTANT  VARCHAR2(2000) := '$Revision:   2.12  $';
+    g_sccsid      CONSTANT  VARCHAR2(2000) := '$Revision:   2.13  $';
     g_boolean               BOOLEAN        := FALSE;
     g_x_column    CONSTANT  user_tab_columns.column_name%TYPE := 'IIT_X';
     g_y_column    CONSTANT  user_tab_columns.column_name%TYPE := 'IIT_Y';
