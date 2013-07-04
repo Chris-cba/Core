@@ -2,21 +2,21 @@ CREATE OR REPLACE PACKAGE BODY nm3merge IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3merge.pkb-arc   2.15   Apr 08 2013 12:01:34   Rob.Coupe  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3merge.pkb-arc   2.16   Jul 04 2013 16:14:40   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3merge.pkb  $
---       Date into PVCS   : $Date:   Apr 08 2013 12:01:34  $
---       Date fetched Out : $Modtime:   Apr 08 2013 11:59:04  $
---       PVCS Version     : $Revision:   2.15  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:14:40  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:16  $
+--       PVCS Version     : $Revision:   2.16  $
 --
 --   Author : ITurnbull
 --
 --     nm3merge package. Used for merging 2 elements
 --
 -----------------------------------------------------------------------------
---   Copyright (c) exor corporation ltd, 2000
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.15  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.16  $"';
 --  g_body_sccsid is the SCCS ID for the package body
    g_package_name    CONSTANT  varchar2(30)   := 'nm3merge';
 --

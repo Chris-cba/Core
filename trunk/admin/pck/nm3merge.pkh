@@ -13,7 +13,7 @@ CREATE OR REPLACE PACKAGE nm3merge IS
 --     nm3merge package. Used for Merging two elements
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2000
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --</PACKAGE>
 --all global package variables here
