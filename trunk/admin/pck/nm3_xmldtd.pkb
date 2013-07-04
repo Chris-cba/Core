@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY nm3_xmldtd AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3_xmldtd.pkb-arc   2.1   Jan 06 2010 16:38:26   cstrettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3_xmldtd.pkb-arc   2.2   Jul 04 2013 15:10:54   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3_xmldtd.pkb  $
---       Date into PVCS   : $Date:   Jan 06 2010 16:38:26  $
---       Date fetched Out : $Modtime:   Jan 06 2010 15:24:14  $
---       Version          : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   Jul 04 2013 15:10:54  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:22  $
+--       Version          : $Revision:   2.2  $
 --       Based on SCCS version : 1.10
 ---------------------------------------------------------------------------
 --   Author : I Turnbull
@@ -15,12 +15,12 @@ CREATE OR REPLACE PACKAGE BODY nm3_xmldtd AS
 --   nm3_xmldtd package body
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2001
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 --all global PACKAGE variables here
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '$Revision:   2.1  $';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '$Revision:   2.2  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(30)   := 'NM3_XMLDTD';

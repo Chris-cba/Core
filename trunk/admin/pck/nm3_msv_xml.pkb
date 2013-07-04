@@ -16,7 +16,7 @@ CREATE OR REPLACE PACKAGE BODY nm3_msv_xml AS
 --   nm3_msv_xml body
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2006
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 --all global package variables here
