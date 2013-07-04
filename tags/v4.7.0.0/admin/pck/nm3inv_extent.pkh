@@ -1,0 +1,91 @@
+CREATE OR REPLACE PACKAGE nm3inv_extent AS
+--<PACKAGE>
+--   SCCS Identifiers :-
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_extent.pkh-arc   2.2   Jul 04 2013 16:04:32   James.Wadsworth  $
+--       Module Name      : $Workfile:   nm3inv_extent.pkh  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:04:32  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:14  $
+--       Version          : $Revision:   2.2  $
+--       Based on SCCS version : 1.2
+-------------------------------------------------------------------------
+--   Author : Kevin Angus
+--
+--    nm3inv_extent
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+  --g_sccsid is the SCCS ID for the package
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.2  $';
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_inv_of_type_in_nte">
+--
+-- This function returns a table of ids of all items of the supplied type
+-- located within the specified extent.
+--
+FUNCTION get_inv_of_type_in_nte(pi_inv_type IN nm_inv_types.nit_inv_type%TYPE
+                               ,pi_nte_job_id IN nm_nw_temp_extents.nte_job_id%TYPE
+                               ) RETURN nm3type.tab_number;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_inv_of_au_type_in_temp_ne">
+--
+-- This function returns a table of ids of all items of the supplied admin
+-- type located within the specified extent.
+--
+FUNCTION get_inv_of_au_type_in_nte
+                            (pi_nte_job_id     IN nm_nw_temp_extents.nte_job_id%TYPE
+                            ,pi_admin_type     IN nm_au_types.nat_admin_type%TYPE
+                            ) RETURN nm3type.tab_number;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_future_inv_au_type_temp_ne">
+--
+-- This function returns a table of ids of all items of the supplied admin
+-- type located within the specified extent. Which have a NM_START_DATE in the future
+--
+FUNCTION get_future_inv_au_type_temp_ne
+                            (pi_nte_job_id     IN nm_nw_temp_extents.nte_job_id%TYPE
+                            ,pi_admin_type     IN nm_au_types.nat_admin_type%TYPE
+                            ) RETURN nm3type.tab_number;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PRAGMA>
+   PRAGMA RESTRICT_REFERENCES (get_version, rnds, wnps, wnds);
+   PRAGMA RESTRICT_REFERENCES (get_body_version, rnds, wnps, wnds);
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+END nm3inv_extent;
+
+
+/
+

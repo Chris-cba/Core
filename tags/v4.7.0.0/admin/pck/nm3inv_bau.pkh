@@ -1,0 +1,83 @@
+create or replace package nm3inv_bau as
+--<PACKAGE>
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_bau.pkh-arc   2.2   Jul 04 2013 16:04:32   James.Wadsworth  $
+--       Module Name      : $Workfile:   nm3inv_bau.pkh  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:04:32  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:14  $
+--       Version          : $Revision:   2.2  $
+--       Based on SCCS version :1.3 
+-------------------------------------------------------------------------
+
+--   Author : Priidu Tanava
+--
+--   service api: BULK ASSET UPDATE
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--
+--<GLOBVAR>
+--
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.2  $';
+  
+  
+  function get_version return varchar2;
+  function get_body_version return varchar2;
+  
+  /*
+  type invattr_value_rec is record (
+     ITA_INV_TYPE     varchar2(4)
+    ,ITEM_ID          number(12)    -- IIT_NE_ID or foreign table pk
+    ,IIT_COLUMN       varchar2(30)  -- native ITA_ATTRIB_NAME column mapped from a foreign table 
+    ,FT_COLUMN        varchar2(30)  -- name of the mapped foreign table column
+    ,ATTR_PROMPT      varchar2(40)
+    ,ATTR_VALUE       varchar2(500)
+    ,ATTR_MEANING     varchar2(80)
+    ,ITA_FORMAT       varchar2(12)  -- datatype: VARCHAR2, NUMBER, DATE
+    ,ITA_FORMAT_MASK  varchar2(80)  -- dataormat
+    ,ITA_FLD_LENGTH   number(4)
+    ,ITA_DEC_PLACES   number(1)
+    ,ITA_MANDATORY    varchar2(1)
+    ,ITA_MAX          number(11,3)
+    ,ITA_MIN          number(11,3)
+    ,ITA_UNITS        number(4)
+    ,ITA_DISPLAYED    varchar2(1)
+    ,ITA_DISP_SEQ_NO  number(4)
+    ,ITA_LOV          varchar2(1)
+  );
+  type invattr_value_tbl is table of invattr_value_rec index by binary_integer;
+  type cur_invattr_value is ref cursor return invattr_value_rec;
+  */
+
+  type id_tbl is table of number(12) index by binary_integer;
+  
+  
+  -- subtypes to avoid forms problems
+  subtype invattr_rec is nm3asset.rec_inv_flex_col_details;
+  subtype invattr_tbl is nm3asset.tab_rec_inv_flex_col_details;
+  
+  
+  procedure sel_invattr_tbl(
+     p_tbl in out invattr_tbl
+    ,p_inv_type in nm_inv_types_all.nit_inv_type%type);
+    
+  procedure post_item_id_table(
+     p_tbl in id_tbl
+    ,p_timestamp out varchar2);
+  
+  procedure bulk_upd_invattr_tbl(
+     p_tbl in out invattr_tbl
+    ,p_timestamp in varchar2);
+    
+  function get_inv_type_from_gis_session(
+     p_gdo_session_id in gis_data_objects.gdo_session_id%type)
+  return nm_inv_themes.nith_nit_id%type;
+  
+  function code_name_meaning_lov(p_sql in varchar2) return nm_code_name_meaning_tbl;
+
+end;
+/

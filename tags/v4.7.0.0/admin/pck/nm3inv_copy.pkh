@@ -1,0 +1,67 @@
+create or replace package nm3inv_copy as
+--<PACKAGE>
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_copy.pkh-arc   2.2   Jul 04 2013 16:04:32   James.Wadsworth  $
+--       Module Name      : $Workfile:   nm3inv_copy.pkh  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:04:32  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:14  $
+--       Version          : $Revision:   2.2  $
+--       Based on SCCS version : 1.1
+-------------------------------------------------------------------------
+--   Author : Jonathan Mills
+--
+--   Inventory Copy package
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.2  $';
+--  g_sccsid is the SCCS ID for the package
+--
+   g_rec_iit_1   nm_inv_items%ROWTYPE;
+   g_rec_iit_2   nm_inv_items%ROWTYPE;
+--
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="copy_item">
+PROCEDURE copy_item (pi_old_iit_ne_id  nm_inv_items.iit_ne_id%TYPE
+                    ,pi_new_rec_iit    nm_inv_items%ROWTYPE
+                    ,pi_nte_job_id     nm_nw_temp_extents.nte_job_id%TYPE
+                    ,pi_effective_date DATE    DEFAULT NULL
+                    ,pi_cascade_xsp    BOOLEAN DEFAULT FALSE
+                    ,pi_cascade_excl   BOOLEAN DEFAULT FALSE
+                    ,pi_cascade_au     BOOLEAN DEFAULT FALSE
+                    );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PRAGMA>
+   PRAGMA RESTRICT_REFERENCES (get_version, RNDS, WNPS, WNDS);
+   PRAGMA RESTRICT_REFERENCES (get_body_version, RNDS, WNPS, WNDS);
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+end nm3inv_copy;
+/

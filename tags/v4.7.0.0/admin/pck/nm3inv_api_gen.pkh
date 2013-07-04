@@ -1,0 +1,70 @@
+create or replace package nm3inv_api_gen as
+--<PACKAGE>
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_api_gen.pkh-arc   2.2   Jul 04 2013 16:04:32   James.Wadsworth  $
+--       Module Name      : $Workfile:   nm3inv_api_gen.pkh  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:04:32  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:14  $
+--       Version          : $Revision:   2.2  $
+--       Based on SCCS version : 1.1
+-------------------------------------------------------------------------
+--   Author : Jonathan Mills
+--
+--   NM3 Inventory API package generation package
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.2  $';
+--  g_sccsid is the SCCS ID for the package
+--
+  g_create_api_inv_packs CONSTANT BOOLEAN := NVL(hig.get_sysopt('INVAPIPACK'),'N') = 'Y';
+--
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="build_one">
+-- This procedure builds a single NM3API_INV_xxxx package if the
+-- INVAPIPACK system option is set to "Y"
+--
+PROCEDURE build_one (p_inv_type nm_inv_types.nit_inv_type%TYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="build_all">
+-- This procedure builds all NM3API_INV_xxxx packages
+--
+PROCEDURE build_all;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PRAGMA>
+   PRAGMA RESTRICT_REFERENCES (get_version, RNDS, WNPS, WNDS);
+   PRAGMA RESTRICT_REFERENCES (get_body_version, RNDS, WNPS, WNDS);
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+end nm3inv_api_gen;
+/

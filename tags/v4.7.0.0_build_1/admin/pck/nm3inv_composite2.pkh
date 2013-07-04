@@ -1,0 +1,146 @@
+create or replace package nm3inv_composite2 as
+--
+--   PVCS Identifiers :-
+--
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_composite2.pkh-arc   2.3   Jul 04 2013 16:04:32   James.Wadsworth  $
+--       Module Name      : $Workfile:   nm3inv_composite2.pkh  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:04:32  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:14  $
+--       PVCS Version     : $Revision:   2.3  $
+--       Based on sccs version : 
+--
+--   Author : Priidu
+--
+--   Composite Inventory package with bulk processing
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+  g_sccsid      constant  varchar2(2000) := '"$Revision:   2.3  $"';
+
+  subtype id_type is number(9);
+  subtype mp_type is number;
+
+  type attrib_rec is record (
+     name       varchar2(30)
+    ,value      varchar2(500)
+    ,sql_value  varchar2(500)
+  );
+  type attrib_tbl is table of attrib_rec index by binary_integer;
+
+  -- record and table to take in the selected route/extent
+  type gaz_rec is record (
+     id id_type
+    ,type varchar2(10)
+  );
+  type gaz_tbl is table of gaz_rec index by binary_integer;
+  g_empty_gaz_tbl gaz_tbl;
+
+
+  
+  
+  function get_version return varchar2;
+  function get_body_version return varchar2;
+
+
+  
+  procedure ins_iit_tmp_values(
+     p_inv_type in nm_inv_types_all.nit_inv_type%type
+    ,p_mrg_job_id in nm_mrg_query_results_all.nqr_mrg_job_id%type
+    ,p_mrg_view in varchar2
+    ,p_mrg_view_where in varchar2
+    ,p_admin_unit_id in nm_admin_units_all.nau_admin_unit%type
+    ,p_effective_date in date
+    ,pt_attr in attrib_tbl
+    ,p_sqlcount out number
+  );
+  
+  procedure process_from_iit_tmp(
+     p_inv_type in nm_inv_types_all.nit_inv_type%type
+    ,p_mrg_job_id in id_type
+    ,p_effective_date in date
+    ,pt_attr in attrib_tbl
+    ,p_iit_tmp_cardinality in number
+    ,p_keep_history in boolean
+    ,p_item_count out pls_integer
+    ,p_member_count out pls_integer
+  );
+  
+  
+  
+  procedure do_rebuild(
+     p_op_context in pls_integer
+    ,p_inv_type in nm_inv_types_all.nit_inv_type%type
+    ,p_nmq_id in nm_mrg_query_all.nmq_id%type
+    ,p_effective_date in date
+    ,p_admin_unit_id in nm_admin_units_all.nau_admin_unit%type
+    ,p_admin_id in hig_users.hus_user_id%type
+    ,p_mrg_view in varchar2
+    ,p_mrg_view_where in varchar2
+    ,pt_unique_attr in attrib_tbl
+    ,p_keep_history in boolean
+    ,p_send_mail in boolean
+    ,p_nt_type in nm_types.nt_type%type
+    ,p_ngt_group_type in nm_group_types_all.ngt_group_type%type
+    ,pt_ne in nm_id_tbl
+    ,pt_nse in nm_id_tbl
+    ,p_ignore_poe in boolean
+  );
+  
+  
+  procedure call_rebuild(
+     p_dbms_job_no in binary_integer
+    ,p_inv_type in nm_inv_types_all.nit_inv_type%type
+    ,p_effective_date in date
+    ,p_send_mail in boolean default true
+    ,p_ne_delim in varchar2 default null
+    ,p_nse_delim in varchar2 default null
+    ,p_attr1 in varchar2 default null
+    ,p_value1 in varchar2 default null
+    ,p_attr2 in varchar2 default null
+    ,p_value2 in varchar2 default null
+    ,p_attr3 in varchar2 default null
+    ,p_value3 in varchar2 default null
+  );
+  
+  
+  -- This returns the plsql code block to be submitted with dbms_job
+  function sql_dbms_job_what(
+     p_inv_type in nm_inv_types_all.nit_inv_type%type
+    ,p_effective_date in date
+    ,p_send_mail in boolean default true
+    ,p_ne_delim in varchar2 default null
+    ,p_nse_delim in varchar2 default null
+    ,p_attr1 in varchar2 default null
+    ,p_value1 in varchar2 default null
+    ,p_attr2 in varchar2 default null
+    ,p_value2 in varchar2 default null
+    ,p_attr3 in varchar2 default null
+    ,p_value3 in varchar2 default null
+  ) return varchar2;
+  
+  function sql_dbms_job_what_hint(
+     p_inv_type in nm_inv_types_all.nit_inv_type%type
+    ,p_interval in varchar2
+  ) return varchar2;
+  
+  
+  procedure submit_job(
+     p_job out binary_integer
+    ,p_what_hint in varchar2
+    ,p_what in varchar2
+    ,p_next_date in date
+    ,p_interval in varchar2
+  );
+  
+  
+  function get_progress_text(
+     p_inv_type in nm_inv_types_all.nit_inv_type%type
+    ,p_job_no in binary_integer
+  ) return varchar2;
+  
+  
+
+end;
+
+/
