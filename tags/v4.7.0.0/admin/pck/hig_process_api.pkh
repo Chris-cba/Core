@@ -1,0 +1,425 @@
+CREATE OR REPLACE PACKAGE hig_process_api 
+AUTHID CURRENT_USER 
+AS
+--<PACKAGE>
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_process_api.pkh-arc   3.14   Jul 04 2013 14:52:08   James.Wadsworth  $
+--       Module Name      : $Workfile:   hig_process_api.pkh  $
+--       Date into PVCS   : $Date:   Jul 04 2013 14:52:08  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:50:26  $
+--       Version          : $Revision:   3.14  $
+--       Based on SCCS version : 
+--
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
+--</PACKAGE>
+--<GLOBVAR>
+
+-----------
+--constants
+-----------
+--g_sccsid is the SCCS ID for the package
+g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.14  $';
+  
+-----------------------------------------------------------
+-- To facilitate attributing a list of files with a process
+-----------------------------------------------------------
+TYPE rec_temp_files IS RECORD(filename         hig_process_files.hpf_filename%TYPE
+                             ,file_type_id     hig_process_files.hpf_file_type_id%TYPE
+                             ,I_or_O           hig_process_files.hpf_input_or_output%TYPE
+                             ,destination      hig_process_files.hpf_destination%TYPE
+                             ,destination_type hig_process_files.hpf_destination%TYPE
+                             ,content          blob);
+
+TYPE tab_temp_files  IS TABLE OF rec_temp_files INDEX BY BINARY_INTEGER;
+  
+g_empty_tab_temp_files tab_temp_files;
+
+g_tab_temp_files        tab_temp_files;
+
+
+----------------------------------------------------------------
+-- To facilitate attributing a list of parameters with a process
+----------------------------------------------------------------
+TYPE rec_temp_params IS RECORD (param_name        varchar2(30)
+                              , param_value         varchar2(4000)
+                              );
+                                  
+TYPE tab_temp_params IS TABLE OF rec_temp_params INDEX BY BINARY_INTEGER;
+  
+g_empty_tab_temp_params tab_temp_params;
+
+g_tab_temp_params       tab_temp_params;
+
+  
+
+
+----------------------------------------------------------
+-- For returning the list of files against a given process
+-----------------------------------------------------------
+TYPE tab_process_files       IS TABLE OF hig_process_files%ROWTYPE INDEX BY BINARY_INTEGER;
+
+---------------------------------------------------------------
+-- For returning the list of parameters against a given process
+---------------------------------------------------------------
+TYPE tab_process_params      IS TABLE OF hig_process_params%ROWTYPE INDEX BY BINARY_INTEGER;
+
+
+
+TYPE tab_connections IS TABLE OF hig_ftp_connections%ROWTYPE INDEX BY BINARY_INTEGER;
+
+-------------------------------------------------
+-- This function returns the current PVCS version
+-------------------------------------------------
+FUNCTION get_version RETURN varchar2;
+
+
+
+---------------------------------------------------------------------
+-- This function returns the current PVCS version of the package body
+---------------------------------------------------------------------
+FUNCTION get_body_version RETURN varchar2;
+
+
+
+----------------------------------------------------------------------------------
+-- Sets the success flag for the current process  
+----------------------------------------------------------------------------------
+PROCEDURE set_success_flag(pi_success_flag IN hig_processes.hp_success_flag%TYPE);
+
+----------------------------------------------------------------------------------
+-- Returns the success flag for the current process  
+----------------------------------------------------------------------------------
+FUNCTION get_success_flag RETURN hig_processes.hp_success_flag%TYPE;
+
+----------------------------------------------------------------------------------
+-- Call to this routine is automatically added to any pl/sql block that is fired 
+-- through the framework.
+--
+-- It sets a context variable so that the running process can make calls to return 
+-- process related data e.g. process files, process params.  
+----------------------------------------------------------------------------------
+PROCEDURE set_current_process_id(pi_process_id IN hig_processes.hp_process_id%TYPE);
+
+
+----------------------------------------------------------------------------------
+-- Returns the hig_processes.hp_process_id which was set by set_current_process_id  
+--
+-- Any code ran through the framework should be able to call this to establish the
+-- invoking process 
+----------------------------------------------------------------------------------
+FUNCTION get_current_process_id RETURN hig_processes.hp_process_id%TYPE;
+
+
+----------------------------------------------------------------------------------
+-- Returns the hig_processes record for the current process
+--
+-- Any code ran through the framework should be able to call this to establish the
+-- invoking process and it's attributes 
+----------------------------------------------------------------------------------
+FUNCTION get_current_process RETURN hig_processes%ROWTYPE;
+
+----------------------------------------------------------------------------------
+-- Returns the current job jun seq for the current process
+----------------------------------------------------------------------------------
+FUNCTION get_current_job_run_seq RETURN hig_process_job_runs.hpjr_job_run_seq%TYPE;
+
+
+----------------------------------------------------------------------------------
+-- Returns you the last job run seq of the given process 
+----------------------------------------------------------------------------------
+FUNCTION last_process_job_run(pi_process_id IN hig_processes.hp_process_id%TYPE) RETURN hig_process_job_runs.hpjr_job_run_seq%TYPE;
+
+
+----------------------------------------------------------------------------------
+-- Sets the job jun seq for the current process 
+----------------------------------------------------------------------------------
+PROCEDURE set_current_job_run_seq(pi_job_run_seq IN hig_process_job_runs.hpjr_job_run_seq%TYPE);
+
+
+----------------------------------------------------------------------------------
+-- Returns a pl/sql table of parameters associated with the current process
+--
+-- Any code ran through the framework should be able to call this to establish the
+-- process parameters 
+----------------------------------------------------------------------------------
+FUNCTION get_current_process_params RETURN tab_process_params;
+
+
+----------------------------------------------------------------------------------
+-- Returns a pl/sql table of INPUT files associated with the current process
+--
+-- Any code ran through the framework should be able to call this to establish the
+-- process input files
+----------------------------------------------------------------------------------
+FUNCTION get_current_process_in_files RETURN tab_process_files;
+
+
+
+-------------------------------------------------------------------------
+-- Clear out a global pl/sql table that is used to store parameter values
+-- that you wish to be associated with a process when you submit it 
+-------------------------------------------------------------------------
+PROCEDURE initialise_temp_params;
+
+--------------------------------------------------------------------------------
+-- Add a value to the global pl/sql table that is used to store parameter values
+-- that you wish to be associated with a process when you submit it
+--------------------------------------------------------------------------------
+PROCEDURE add_temp_param(pi_rec  IN  rec_temp_params);
+
+
+
+-------------------------------------------------------------------------
+-- Clear out a global pl/sql table that is used to store file details
+-- that you wish to be associated with a process when you submit it 
+-------------------------------------------------------------------------
+PROCEDURE initialise_temp_files;
+
+--------------------------------------------------------------------------------
+-- Add a value to the global pl/sql table that is used to store file details
+-- that you wish to be associated with a process when you submit it
+--------------------------------------------------------------------------------
+PROCEDURE add_temp_file(pi_rec  IN  rec_temp_files);
+
+
+----------------------------------------------------------------------------------
+-- Create and schedule a process 
+--
+-- Will fail to create if pi_what_to_call does not parse
+--
+-- Out parameters could be used to drive further actions if needs be
+----------------------------------------------------------------------------------
+PROCEDURE create_and_schedule_process    (pi_process_type_id           IN hig_processes.hp_process_type_id%TYPE
+                                        , pi_initiated_by_username     IN hig_processes.hp_initiated_by_username%TYPE DEFAULT Sys_Context('NM3_SECURITY_CTX','USERNAME')
+                                        , pi_initiated_date            IN hig_processes.hp_initiated_date%TYPE DEFAULT SYSDATE
+                                        , pi_initiators_ref            IN hig_processes.hp_initiators_ref%TYPE
+--                                        , pi_job_owner                 IN hig_processes.hp_job_owner%TYPE DEFAULT Sys_Context('NM3_SECURITY_CTX','USERNAME')
+                                        , pi_start_date                IN date
+                                        , pi_frequency_id              IN hig_processes.hp_frequency_id%TYPE
+                                        , pi_polling_flag              IN hig_processes.hp_polling_flag%TYPE DEFAULT 'N'
+                                        , pi_area_id                   IN hig_processes.hp_area_id%TYPE DEFAULT NULL
+                                        , pi_check_file_cardinality    IN BOOLEAN DEFAULT FALSE
+                                        , pi_max_failures              IN NUMBER DEFAULT Null                                      
+                                        , po_process_id                OUT hig_processes.hp_process_id%TYPE
+                                        , po_job_name                  OUT hig_processes.hp_job_name%TYPE
+                                        , po_scheduled_start_date      OUT date);
+                                        
+                                        
+-------------------------------------------------
+-- Updates a given process and the associated job
+-------------------------------------------------
+PROCEDURE amend_process    (pi_process_id           IN hig_processes.hp_process_id%TYPE
+                           ,pi_job_name             IN hig_processes.hp_job_name%TYPE
+                           ,pi_initiators_ref       IN hig_processes.hp_initiators_ref%TYPE
+                           ,pi_frequency_id         IN hig_processes.hp_frequency_id%TYPE
+                           ,pi_area_id              IN hig_processes.hp_area_id%TYPE
+                           ,pi_scheduled_date       IN DATE);
+                                        
+
+----------------------------------------------------------------------------------------------------------
+-- You can associate a pl/sql table of files to a process when create_and_schedule_process is called
+-- 
+-- However, you may not have the list of files available when you submit a process
+-- 
+-- Therefore to attribute a list of files to a given process, and also to the process job run seq,  post submission you can call this procedure
+-- 
+----------------------------------------------------------------------------------------------------------
+PROCEDURE associate_files_with_process(pi_process_id             IN hig_process_files.hpf_process_id%TYPE
+                                      ,pi_job_run_seq            IN hig_process_files.hpf_job_run_seq%TYPE
+                                      ,pi_tab_files              IN tab_temp_files
+                                      ,pi_check_file_cardinality IN BOOLEAN DEFAULT FALSE);
+
+
+----------------------------------------------------------------------------------------------------------
+-- Overload of above but against the current process
+----------------------------------------------------------------------------------------------------------
+PROCEDURE associate_files_with_process(pi_tab_files              IN tab_temp_files
+                                      ,pi_check_file_cardinality IN BOOLEAN DEFAULT FALSE);
+
+----------------------------------------------------------------------------------------------------------
+-- You can associate a pl/sql table of parameters to a process when create_and_schedule_process is called
+-- 
+-- However, you may not have the list of parameters available when you submit a process
+-- 
+-- Therefore to attribute a list of parameters to a given process, post submission, you can call this procedure 
+----------------------------------------------------------------------------------------------------------
+PROCEDURE associate_params_with_process(pi_process_id  IN hig_processes.hp_process_id%TYPE
+                                       ,pi_tab_params  IN tab_temp_params);
+
+
+----------------------------------------------------------------------------------------------------------
+-- Overload of above but against the current process
+----------------------------------------------------------------------------------------------------------
+PROCEDURE associate_params_with_process(pi_tab_params  IN tab_temp_params);
+
+
+
+----------------------------------------------------------------------------------------------------------
+-- Log a message against a process
+--
+-- Message types are
+--
+-- I-Information
+-- W-Warning
+-- E-Error
+----------------------------------------------------------------------------------------------------------
+PROCEDURE log_it(pi_process_id             IN hig_process_log.hpl_process_id%TYPE 
+                ,pi_message                IN VARCHAR2
+                ,pi_message_type           IN hig_process_log.hpl_message_type%TYPE default 'I'
+                ,pi_summary_flag           IN hig_process_log.hpl_summary_flag%TYPE default 'Y'                
+                );
+
+
+
+PROCEDURE log_it(pi_message                IN VARCHAR2
+                ,pi_message_type           IN hig_process_log.hpl_message_type%TYPE default 'I'
+                ,pi_summary_flag           IN hig_process_log.hpl_summary_flag%TYPE default 'Y'
+                );
+
+
+--
+-- overrides of the first two log_it routines but driving from a pl/sql table of messages to be written
+--
+PROCEDURE log_it(pi_process_id             IN hig_process_log.hpl_process_id%TYPE 
+                ,pi_tab_messages           IN nm3type.tab_varchar32767
+                ,pi_message_type           IN hig_process_log.hpl_message_type%TYPE default 'I'
+                ,pi_summary_flag           IN hig_process_log.hpl_summary_flag%TYPE default 'Y');
+
+
+PROCEDURE log_it(pi_tab_messages           IN nm3type.tab_varchar32767
+                ,pi_message_type           IN hig_process_log.hpl_message_type%TYPE default 'I'
+                ,pi_summary_flag           IN hig_process_log.hpl_summary_flag%TYPE default 'Y');
+
+
+--
+-- overrides of the first two log_it routines but driving from a clob of message text to be written
+--
+PROCEDURE log_it(pi_process_id             IN hig_process_log.hpl_process_id%TYPE 
+                ,pi_message_clob           IN clob
+                ,pi_message_type           IN hig_process_log.hpl_message_type%TYPE default 'I'
+                ,pi_summary_flag           IN hig_process_log.hpl_summary_flag%TYPE default 'Y');
+
+PROCEDURE log_it(pi_message_clob           IN clob
+                ,pi_message_type           IN hig_process_log.hpl_message_type%TYPE default 'I'
+                ,pi_summary_flag           IN hig_process_log.hpl_summary_flag%TYPE default 'Y');
+
+
+
+
+
+----------------------------------------------------------------------------------
+-- Call to this routine is automatically added to any pl/sql block that is fired 
+-- through the framework.
+--
+-- It triggers the creation of a record in HIG_PROCESS_JOB_RUNS to record the 
+-- execution of a process 
+----------------------------------------------------------------------------------
+PROCEDURE process_execution_start;
+
+
+---------------------------------------------------------------------------------------------------
+-- Call to this routine is automatically added to any pl/sql block that is fired 
+-- through the framework.
+--
+-- Code can also be called in any pl/sql code to handle exceptions and 
+-- stop processing 
+--
+-- It triggers the creation update of the appropriate record in HIG_PROCESS_JOB_RUNS 
+-- to record the timing and success/failure of a process execution. 
+---------------------------------------------------------------------------------------------------
+PROCEDURE process_execution_end(pi_success_flag    IN hig_processes.hp_success_flag%TYPE DEFAULT 'Y'
+                               ,pi_additional_info IN VARCHAR2 DEFAULT NULL
+                               ,pi_force           IN BOOLEAN DEFAULT FALSE);
+
+
+
+
+PROCEDURE drop_execution;
+
+
+
+
+--------------------------------------------------------------------------
+-- Update a given process and set the internal reference to a given string
+--------------------------------------------------------------------------
+PROCEDURE set_process_internal_reference(pi_process_id         IN hig_process_job_runs.hpjr_process_id%TYPE
+                                        ,pi_run_seq            IN hig_process_job_runs.hpjr_job_run_seq%TYPE
+                                        ,pi_internal_reference IN hig_process_job_runs.hpjr_internal_reference%TYPE);  
+
+--------------------------------------------------------------------------
+-- Overload of above for current process execution
+--------------------------------------------------------------------------
+PROCEDURE set_process_internal_reference(pi_internal_reference IN hig_process_job_runs.hpjr_internal_reference%TYPE);
+
+
+
+------------------------
+-- Put a process on hold
+------------------------
+FUNCTION disable_process(pi_process_id IN hig_processes.hp_process_id%TYPE) RETURN hig_processes_v.hp_full_job_name%TYPE;
+
+PROCEDURE disable_process(pi_process_id IN hig_processes.hp_process_id%TYPE);
+
+
+
+--------------------------
+-- Take a process off hold
+--------------------------
+PROCEDURE enable_process(pi_process_id IN hig_processes.hp_process_id%TYPE);
+
+-----------------------
+-- Drop a given process
+-----------------------
+PROCEDURE drop_process(pi_process_id IN hig_processes.hp_process_id%TYPE);
+
+
+
+----------------------------
+-- Run a process immediately
+----------------------------
+PROCEDURE run_process_now(pi_process_id IN hig_processes.hp_process_id%TYPE);
+
+----------------------------
+-- API to create Process Alert Log
+----------------------------
+PROCEDURE create_alert_log (pi_hpal_rec IN OUT hig_process_alert_log%ROWTYPE);
+
+
+
+FUNCTION  do_polling_if_requested(pi_file_type_name          IN hig_process_type_files.hptf_name%TYPE
+                                , pi_file_mask               IN VARCHAR2
+                                , pi_binary                  IN BOOLEAN DEFAULT TRUE
+                                , pi_archive_overwrite       IN BOOLEAN DEFAULT FALSE
+                                , pi_remove_failed_arch      IN BOOLEAN DEFAULT FALSE) RETURN BOOLEAN;
+
+
+----------------------------
+-- Run a process immediately
+----------------------------
+PROCEDURE stop_process(pi_process_id IN hig_processes.hp_process_id%TYPE
+                      ,pi_reason     IN VARCHAR2);  
+--
+
+FUNCTION  valid_process_of_type_exists(pi_process_type_id IN hig_process_types.hpt_process_type_id%TYPE) RETURN BOOLEAN;
+
+FUNCTION  valid_process_of_type_exists(pi_process_type_name IN hig_process_types.hpt_name%TYPE) RETURN BOOLEAN; -- overload of above in case driving by hpt_name
+
+PROCEDURE valid_process_of_type_exists(pi_process_type_id IN hig_processes.hp_process_type_id%TYPE); -- calls function of same name then raises an error if function returned false
+
+PROCEDURE valid_process_of_type_exists(pi_process_type_name IN hig_process_types.hpt_name%TYPE); -- overload of above in case driving by hpt_name
+
+-- Returns UP (Scheduler Enabled), SHUTTING DOWN (Scheduler Disabled but processes are running) 
+-- and DOWN (Scheduler Disabled with all processes stopped)
+FUNCTION get_scheduler_state RETURN VARCHAR2;
+--
+FUNCTION count_running_processes RETURN PLS_INTEGER;
+--
+end hig_process_api;
+/
+
+
