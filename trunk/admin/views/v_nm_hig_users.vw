@@ -26,11 +26,11 @@ Select    --
           -------------------------------------------------------------------------
           --   PVCS Identifiers :-
           --
-          --       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/v_nm_hig_users.vw-arc   1.0   Oct 03 2011 09:43:48   Steve.Cooper  $
+          --       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/v_nm_hig_users.vw-arc   1.1   Jul 04 2013 11:23:48   James.Wadsworth  $
           --       Module Name      : $Workfile:   v_nm_hig_users.vw  $
-          --       Date into PVCS   : $Date:   Oct 03 2011 09:43:48  $
-          --       Date fetched Out : $Modtime:   Sep 26 2011 14:22:48  $
-          --       Version          : $Revision:   1.0  $
+          --       Date into PVCS   : $Date:   Jul 04 2013 11:23:48  $
+          --       Date fetched Out : $Modtime:   Jul 04 2013 10:33:42  $
+          --       Version          : $Revision:   1.1  $
           -------------------------------------------------------------------------
           --
           hu.Hus_User_Id,

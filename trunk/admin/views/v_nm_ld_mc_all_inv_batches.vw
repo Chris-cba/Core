@@ -17,7 +17,7 @@ CREATE OR REPLACE FORCE VIEW V_NM_LD_MC_ALL_INV_BATCHES(NLB_BATCH_NO
 --       SCCS Version     : 1.2
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2003
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 SELECT nlb.NLB_BATCH_NO 
