@@ -19,7 +19,7 @@ AS SELECT
 --   v_node_points View
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2001
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 no_node_name, no_descr, no_node_type, no_start_date, no_end_date, np_descr, np_grid_east, np_grid_north
