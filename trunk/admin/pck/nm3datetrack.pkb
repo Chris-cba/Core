@@ -16,7 +16,7 @@ CREATE OR REPLACE PACKAGE BODY nm3datetrack AS
 --   Datetrack triggers package body
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2001
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
    g_body_sccsid     CONSTANT  varchar2(2000) := '"@(#)nm3datetrack.pkb	1.2 10/23/03"';
@@ -823,7 +823,7 @@ BEGIN
    append('--       SCCS Version     : 1.2');
    append('--');
    append('-----------------------------------------------------------------------------');
-   append('--	Copyright (c) exor corporation ltd, 2001');
+   append('--	Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.');
    append('-----------------------------------------------------------------------------');
    append('--');
 --

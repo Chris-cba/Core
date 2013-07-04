@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE nm3data AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3data.pkh-arc   3.1   Jan 06 2010 14:21:54   cstrettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3data.pkh-arc   3.2   Jul 04 2013 15:23:06   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3data.pkh  $
---       Date into PVCS   : $Date:   Jan 06 2010 14:21:54  $
---       Date fetched Out : $Modtime:   Jan 06 2010 14:19:48  $
---       Version          : $Revision:   3.1  $
+--       Date into PVCS   : $Date:   Jul 04 2013 15:23:06  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:10  $
+--       Version          : $Revision:   3.2  $
 --       Based on SCCS version : 1.21
 -------------------------------------------------------------------------
 --   Author : A Edwards
@@ -16,7 +16,7 @@ CREATE OR REPLACE PACKAGE nm3data AS
 --
 --
 -----------------------------------------------------------------------------
--- Copyright (c) exor corporation ltd, 2004
+-- Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 ----
 --</PACKAGE>
@@ -24,7 +24,7 @@ CREATE OR REPLACE PACKAGE nm3data AS
 --<GLOBVAR>
 -- g_sccsid is the SCCS_ID
 -- Constants
-  g_sccsid           CONSTANT VARCHAR2(80) := '"$Revision:   3.1  $"';
+  g_sccsid           CONSTANT VARCHAR2(80) := '"$Revision:   3.2  $"';
 -----------------------------------------------------------------------------
 --
 --<PROC NAME="GET_VERSION">

@@ -13,9 +13,9 @@ CREATE OR REPLACE PACKAGE nm3ausec AS
 --
 --   NM3 Admin Unit Security package
 --
------------------------------------------------------------------------------
---      Copyright (c) exor corporation ltd, 2001
------------------------------------------------------------------------------
+------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
   g_sccsid      CONSTANT  varchar2(2000) := '"@(#)nm3ausec.pkh	1.10 04/11/06"';

@@ -5,11 +5,11 @@ As
 --
 -- PVCS Identifiers :-
 --
--- pvcsid : $Header:   //vm_latest/archives/nm3/admin/pck/nm3context.pkb-arc   2.7   Jun 25 2012 09:12:52   Steve.Cooper  $
+-- pvcsid : $Header:   //vm_latest/archives/nm3/admin/pck/nm3context.pkb-arc   2.8   Jul 04 2013 15:23:06   James.Wadsworth  $
 -- Module Name : $Workfile:   nm3context.pkb  $
--- Date into PVCS : $Date:   Jun 25 2012 09:12:52  $
--- Date fetched Out : $Modtime:   Oct 12 2011 16:23:34  $
--- PVCS Version : $Revision:   2.7  $
+-- Date into PVCS : $Date:   Jul 04 2013 15:23:06  $
+-- Date fetched Out : $Modtime:   Jul 04 2013 14:25:10  $
+-- PVCS Version : $Revision:   2.8  $
 -- Based on SCCS version : 
 --
 --
@@ -18,10 +18,10 @@ As
 --   Package for setting/retrieving context values
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2001
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
-  g_Body_Sccsid       Constant  Varchar2(2000)  :='"$Revision:   2.7  $"';
+  g_Body_Sccsid       Constant  Varchar2(2000)  :='"$Revision:   2.8  $"';
 
   c_True              Constant  Varchar2(5)     := 'TRUE';
   c_False             Constant  Varchar2(5)     := 'FALSE';

@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3dbms_job AS
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3dbms_job.pkb-arc   2.2   May 16 2011 14:44:10   Steve.Cooper  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3dbms_job.pkb-arc   2.3   Jul 04 2013 15:23:06   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3dbms_job.pkb  $
---       Date into PVCS   : $Date:   May 16 2011 14:44:10  $
---       Date fetched Out : $Modtime:   Apr 01 2011 16:12:24  $
---       Version          : $Revision:   2.2  $
+--       Date into PVCS   : $Date:   Jul 04 2013 15:23:06  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:10  $
+--       Version          : $Revision:   2.3  $
 --       Based on SCCS version : 1.2
 --
 --   Author : K Angus
@@ -16,12 +16,12 @@ CREATE OR REPLACE PACKAGE BODY nm3dbms_job AS
 --   Procs/functions for manipulating DBMS jobs.
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2002
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 --all global package variables here
 --
-  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.2  $';
+  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.3  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3dbms_job';

@@ -3,17 +3,19 @@ CREATE OR REPLACE PACKAGE BODY nm3data AS
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3data.pkb-arc   3.1   Feb 22 2010 17:02:24   aedwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3data.pkb-arc   3.2   Jul 04 2013 15:23:06   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3data.pkb  $
---       Date into PVCS   : $Date:   Feb 22 2010 17:02:24  $
---       Date fetched Out : $Modtime:   Feb 22 2010 17:01:56  $
---       PVCS Version     : $Revision:   3.1  $
+--       Date into PVCS   : $Date:   Jul 04 2013 15:23:06  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 15:18:20  $
+--       PVCS Version     : $Revision:   3.2  $
 --
 --   Author : A Edwards
 --
 --   NM3 Data maintenance package
 --
---------------------------------------------------------------------------------
+------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+------------------------------------------------------------------
 --
 --all global package variables here
 
@@ -21,7 +23,7 @@ CREATE OR REPLACE PACKAGE BODY nm3data AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000) :='"$Revision:   3.1  $"';
+  g_body_sccsid  CONSTANT varchar2(2000) :='"$Revision:   3.2  $"';
   g_package_name CONSTANT varchar2(30)   := 'nm3data';
 --
   g_gdo          CONSTANT varchar2(30)   := 'GIS_DATA_OBJECTS';

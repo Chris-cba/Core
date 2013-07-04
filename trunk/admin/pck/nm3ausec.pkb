@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm3ausec AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ausec.pkb-arc   2.6   Nov 27 2012 14:39:10   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ausec.pkb-arc   2.7   Jul 04 2013 15:23:06   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3ausec.pkb  $
---       Date into PVCS   : $Date:   Nov 27 2012 14:39:10  $
---       Date fetched Out : $Modtime:   Nov 27 2012 14:25:32  $
---       PVCS Version     : $Revision:   2.6  $
+--       Date into PVCS   : $Date:   Jul 04 2013 15:23:06  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:10  $
+--       PVCS Version     : $Revision:   2.7  $
 --       Based on
 --
 --   Author : Rob Coupe
@@ -14,12 +14,12 @@ CREATE OR REPLACE PACKAGE BODY nm3ausec AS
 --   NM3 Admin Unit Security package body
 --
 -----------------------------------------------------------------------------
--- Copyright (c) exor corporation ltd, 2001
+-- Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.6  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.7  $"';
 
 --  g_body_sccsid is the SCCS ID for the package body
 --

@@ -3,11 +3,11 @@ Is
 --<PACKAGE>
 -- PVCS Identifiers :-
 --
--- pvcsid : $Header:   //vm_latest/archives/nm3/admin/pck/nm3context.pkh-arc   2.6   Aug 01 2012 10:01:44   Rob.Coupe  $
+-- pvcsid : $Header:   //vm_latest/archives/nm3/admin/pck/nm3context.pkh-arc   2.7   Jul 04 2013 15:23:06   James.Wadsworth  $
 -- Module Name : $Workfile:   nm3context.pkh  $
--- Date into PVCS : $Date:   Aug 01 2012 10:01:44  $
--- Date fetched Out : $Modtime:   Aug 01 2012 10:00:56  $
--- PVCS Version : $Revision:   2.6  $
+-- Date into PVCS : $Date:   Jul 04 2013 15:23:06  $
+-- Date fetched Out : $Modtime:   Jul 04 2013 14:25:10  $
+-- PVCS Version : $Revision:   2.7  $
 -- Based on SCCS version : 
 --
 --
@@ -16,11 +16,11 @@ Is
 --   Package for setting/retrieving context values
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2001
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
-  G_Sccsid      Constant  Varchar2(2000) :='"$Revision:   2.6  $"';
+  G_Sccsid      Constant  Varchar2(2000) :='"$Revision:   2.7  $"';
 
 --  g_sccsid is the SCCS ID for the package
 --

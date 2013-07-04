@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.50   Apr 18 2013 15:43:42   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.51   Jul 04 2013 15:23:06   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3bulk_mrg.pkb  $
---       Date into PVCS   : $Date:   Apr 18 2013 15:43:42  $
---       Date fetched Out : $Modtime:   Apr 18 2013 15:42:56  $
---       PVCS Version     : $Revision:   2.50  $
+--       Date into PVCS   : $Date:   Jul 04 2013 15:23:06  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:10  $
+--       PVCS Version     : $Revision:   2.51  $
 --
 --
 --   Author : Priidu Tanava
@@ -16,7 +16,7 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
 --   Bulk merge functinality
 --
 -----------------------------------------------------------------------------
---   Copyright (c) exor corporation ltd, 2006
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 /* History
   17.04.07  PT change in std_populate(), now uses slk values to
@@ -124,7 +124,7 @@ No query types defined.
         add nm_route_connect_tmp_ordered view with the next schema change
         in nm3dynsql replace the use of nm3sql.set_context_value() with that of nm3ctx
 */
-  g_body_sccsid     constant  varchar2(40)  :='"$Revision:   2.50  $"';
+  g_body_sccsid     constant  varchar2(40)  :='"$Revision:   2.51  $"';
   g_package_name    constant  varchar2(30)  := 'nm3bulk_mrg';
 
   cr  constant varchar2(1) := chr(10);
