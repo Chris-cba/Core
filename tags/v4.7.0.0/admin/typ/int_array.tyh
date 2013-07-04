@@ -1,0 +1,29 @@
+CREATE OR REPLACE type INT_ARRAY as object ( 
+-----------------------------------------------------------------------------
+--
+--
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)int_array.tyh	1.2 03/03/06
+--       Module Name      : int_array.tyh
+--       Date into SCCS   : 06/03/03 12:13:52
+--       Date fetched Out : 07/06/13 17:04:19
+--       SCCS Version     : 1.2
+--
+--   Author : Rob Coupe
+--
+--
+--   TYPE int_array
+--
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
+ia int_array_type 
+, member function add_element( p_i in integer) return int_array
+, member function append( p_ia in int_array) return int_array
+, member function distinct_elements return int_array
+, member function array_to_list return varchar2
+, member procedure debug
+)
+/

@@ -1,0 +1,56 @@
+create or replace type body nm_analytic_chunk_type
+is
+--   PVCS Identifiers :-
+--
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/typ/nm_analytic_chunk_type.tyb-arc   2.2   Jul 04 2013 10:14:02   James.Wadsworth  $
+--       Module Name      : $Workfile:   nm_analytic_chunk_type.tyb  $
+--       Date into PVCS   : $Date:   Jul 04 2013 10:14:02  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 09:59:36  $
+--       PVCS Version     : $Revision:   2.2  $
+--       Based on SCCS version : 1.1
+--
+--   Author : Priidu Tanava
+--
+--   This type supports the custom aggregate function group_chunk_no_seq()
+--   The actual processing logic is implemented in package nm3analytic_connectivity
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+
+static function ODCIAggregateInitialize(sctx IN OUT nm_analytic_chunk_type) 
+return number is 
+begin
+  sctx := nm_analytic_chunk_type(null);
+  --dbms_output.put_line('ODCIAggregateInitialize');
+  nm3analytic_connectivity.chunk_no_init;
+  return ODCIConst.Success;
+end;
+
+member function ODCIAggregateIterate(self IN OUT nm_analytic_chunk_type, value IN varchar2) 
+return number is
+  i       binary_integer;
+begin
+  i := nm3analytic_connectivity.chunk_no_iterate(value);
+  --dbms_output.put_line('ODCIAggregateIterate: '||i||' '||value);
+  return ODCIConst.Success;
+end;
+
+member function ODCIAggregateTerminate(self IN nm_analytic_chunk_type, returnValue OUT 
+varchar2, flags IN number) return number is
+begin  
+  returnValue := nm3analytic_connectivity.chunk_terminate;
+  --dbms_output.put_line('ODCIAggregateTerminate: '||returnValue);
+  return ODCIConst.Success;
+end;
+
+-- the logic does not handle parallel processing so merge not allowed
+-- the parallel processing is also unneeded as we don't operate on large sets here
+--  the maximum number of records is the number of members under a route.
+member function ODCIAggregateMerge(self IN OUT nm_analytic_chunk_type, ctx2 IN 
+nm_analytic_chunk_type) return number is
+begin
+  return ODCIConst.Error;
+end;
+end;
+/

@@ -1,0 +1,25 @@
+CREATE OR REPLACE TYPE nm_cnct_link_array AS OBJECT
+-----------------------------------------------------------------------------
+--
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)nm_cnct_link_array.tyh	1.1 07/18/06
+--       Module Name      : nm_cnct_link_array.tyh
+--       Date into SCCS   : 06/07/18 15:56:57
+--       Date fetched Out : 07/06/13 17:04:24
+--       SCCS Version     : 1.1
+--
+--   Author : Rob Coupe
+--
+--   NM3 Connectivity object - link array type
+--
+-------------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+
+( ncla_link nm_cnct_link_array_type
+
+, MEMBER FUNCTION add_element( p_I IN INTEGER, p_J IN INTEGER, p_cost IN NUMBER, p_path IN int_array) RETURN nm_cnct_link_array
+, MEMBER FUNCTION instantiate_link_array ( p_cnct_ne IN nm_cnct_ne_array ) RETURN nm_cnct_link_array
+)
+/

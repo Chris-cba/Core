@@ -1,0 +1,20 @@
+CREATE OR REPLACE TYPE nav_id
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/typ/nav_id.tyh-arc   3.2   Jul 04 2013 10:14:02   James.Wadsworth  $
+--       Module Name      : $Workfile:   nav_id.tyh  $
+--       Date into PVCS   : $Date:   Jul 04 2013 10:14:02  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 10:03:54  $
+--       Version          : $Revision:   3.2  $
+--       Based on SCCS version : 
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+IS TABLE OF Varchar2(50) ;
+/
+
+
+
+
+

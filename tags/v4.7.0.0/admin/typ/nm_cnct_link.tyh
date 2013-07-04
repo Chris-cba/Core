@@ -1,0 +1,21 @@
+CREATE OR REPLACE TYPE nm_cnct_link AS
+-----------------------------------------------------------------------------
+--
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)nm_cnct_link.tyh	1.1 07/18/06
+--       Module Name      : nm_cnct_link.tyh
+--       Date into SCCS   : 06/07/18 15:56:35
+--       Date fetched Out : 07/06/13 17:04:24
+--       SCCS Version     : 1.1
+--
+--   Author : Rob Coupe
+--
+--   NM3 Connectivity object - link details
+--
+-------------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+
+OBJECT ( I INTEGER, J INTEGER, COST NUMBER, path int_array );
+/

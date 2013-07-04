@@ -1,0 +1,33 @@
+create or replace type nm_analytic_chunk_type as object
+(
+--
+-----------------------------------------------------------------------------
+--
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)nm_analytic_chunk_type.tyh	1.1 02/01/07
+--       Module Name      : nm_analytic_chunk_type.tyh
+--       Date into SCCS   : 07/02/01 16:25:36
+--       Date fetched Out : 07/06/13 17:04:21
+--       SCCS Version     : 1.1
+--
+--   Author : Priidu Tanava
+--
+--   This type supports the custom aggregate function group_chunk_no_seq()
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+
+  val varchar2(1),
+  static function ODCIAggregateInitialize(sctx IN OUT nm_analytic_chunk_type) 
+    return number,
+  member function ODCIAggregateIterate(self IN OUT nm_analytic_chunk_type, 
+    value IN varchar2) return number,
+  member function ODCIAggregateTerminate(self IN nm_analytic_chunk_type, 
+    returnValue OUT varchar2, flags IN number) return number,
+  member function ODCIAggregateMerge(self IN OUT nm_analytic_chunk_type, 
+    ctx2 IN nm_analytic_chunk_type) return number
+);
+/
+

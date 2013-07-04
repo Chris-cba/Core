@@ -1,0 +1,73 @@
+create or replace type body nm_analytic_hash_type
+is
+--
+-----------------------------------------------------------------------------
+--
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)nm_analytic_hash_type.tyb	1.1 02/01/07
+--       Module Name      : nm_analytic_hash_type.tyb
+--       Date into SCCS   : 07/02/01 16:27:37
+--       Date fetched Out : 07/06/13 17:04:21
+--       SCCS Version     : 1.1
+--
+--   Author : Priidu Tanava
+--
+--   This type supports the custom aggregate function group_hash_value()
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+
+static function ODCIAggregateInitialize(sctx IN OUT nm_analytic_hash_type) 
+return number is 
+begin
+  sctx := nm_analytic_hash_type(',');
+  return ODCIConst.Success;
+end;
+
+member function ODCIAggregateIterate(self IN OUT nm_analytic_hash_type, value IN varchar2) 
+return number is
+  i       binary_integer;
+  i_last  binary_integer := 2;
+  l_done  boolean := false;
+begin
+  if self.val is not null and value is not null then
+    i := instr(self.val, ','||value);
+    if i > 0 then
+      self.val := substr(self.val, 1, i-1)||','||value||substr(self.val, i);
+      l_done := true;
+    else
+      while not l_done loop
+        i := instr(self.val, ',', i_last);
+        exit when nvl(i, 0) = 0;
+        if substr(self.val, i_last, i-i_last) > value then
+          self.val := substr(self.val, 1, i_last-2)||','||value||substr(self.val, i_last-1);
+          l_done := true;
+        end if;
+        i_last := i + 1;
+      end loop;
+    end if;
+  end if;
+  if not l_done then
+    self.val := self.val||value||',';
+  end if;
+  return ODCIConst.Success;
+end;
+
+member function ODCIAggregateTerminate(self IN nm_analytic_hash_type, returnValue OUT 
+varchar2, flags IN number) return number is
+begin
+  returnValue := dbms_utility.get_hash_value(self.val, 0, 262144)
+    ||'_'||dbms_utility.get_hash_value(self.val||'x', 0, 262144);
+  --returnValue := self.val;
+  return ODCIConst.Success;
+end;
+
+member function ODCIAggregateMerge(self IN OUT nm_analytic_hash_type, ctx2 IN 
+nm_analytic_hash_type) return number is
+begin
+  return ODCIConst.Error;
+end;
+end;
+/
