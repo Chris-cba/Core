@@ -1,0 +1,228 @@
+CREATE OR REPLACE PACKAGE doc AS
+--<PACKAGE>
+--   PVCS Identifiers :-
+--
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/doc.pkh-arc   2.3   Jul 04 2013 14:31:28   James.Wadsworth  $
+--       Module Name      : $Workfile:   doc.pkh  $
+--       Date into SCCS   : $Date:   Jul 04 2013 14:31:28  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:06  $
+--       SCCS Version     : $Revision:   2.3  $
+--       Based on SCCS Version     : 1.7
+--
+--
+--   Author :
+--
+--   DOCUMENTS application generic utilities package
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--</PACKAGE>
+  /* SCCS ID keyword, do not remove */
+--<GLOBVAR>
+  g_sccsid	CONSTANT	VARCHAR2(2000) := '"$Revision:   2.3  $"'; --'"@(#)doc.pck	1.8 01/10/00"';
+
+  TYPE     t_dgt_tab     IS TABLE OF doc_gateways%ROWTYPE INDEX BY binary_integer;
+  TYPE     t_docs_tab    IS TABLE OF docs%ROWTYPE INDEX BY binary_integer;
+
+-- AE added new table type to get results from locator object type
+  TYPE     tab_loc_results IS TABLE OF NUMBER(12) INDEX BY BINARY_INTEGER;
+
+-- g_sccsid is the SCCS_ID
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+  FUNCTION   get_next_doc_id RETURN NUMBER;
+  FUNCTION   get_table_descr(p_table IN VARCHAR2) RETURN VARCHAR2;
+  FUNCTION   check_doc_assocs (p_doc_id    IN docs.doc_id%TYPE,
+                               p_rse_he_id IN road_segs.rse_he_id%TYPE)
+             RETURN NUMBER;
+
+  FUNCTION   file_exists ( p_dlc_id IN NUMBER, p_file_name IN VARCHAR2 ) RETURN NUMBER;
+
+  FUNCTION   doc_type_exists ( p_dlc_id IN NUMBER, p_file_name IN VARCHAR2 ) RETURN VARCHAR2;
+
+  PROCEDURE  doc_sql (sql_in    IN VARCHAR2,
+                          output   OUT VARCHAR2,
+                          feedback OUT INTEGER  );
+
+  PROCEDURE  create_doc (intdocid		IN NUMBER,
+				 strtitle 		IN VARCHAR2,
+			       strfile		IN VARCHAR2,
+				 mediaid		IN NUMBER,
+				 locationid		IN NUMBER,
+				 strdoctype		IN VARCHAR2,
+				 strpkid		IN VARCHAR2,
+				 strtablename	IN VARCHAR2,
+                         strdescflag      IN VARCHAR2 ,
+                         strcreassoc      IN VARCHAR2
+  );
+
+  PROCEDURE  create_doc (intdocid		IN NUMBER,
+				 strtitle 		IN VARCHAR2,
+			       strfile		IN VARCHAR2,
+				 mediaid		IN NUMBER,
+				 locationid		IN NUMBER,
+				 strdoctype		IN VARCHAR2,
+				 strpkid		IN VARCHAR2,
+				 strtablename	IN VARCHAR2
+  );
+
+  PROCEDURE create_doc_assoc( p_table IN VARCHAR2, p_pk IN VARCHAR2, p_doc_id IN NUMBER );
+
+  FUNCTION get_image(strentity	IN VARCHAR2,
+				strentitypk 	IN VARCHAR2,
+				strimagetype 	IN VARCHAR2,
+				intimageno 		IN NUMBER DEFAULT 1) RETURN VARCHAR2;
+
+  FUNCTION get_location_directory ( p_location IN NUMBER)
+        RETURN VARCHAR2;
+
+  FUNCTION get_media_filetype( p_dmd_id IN NUMBER )
+        RETURN VARCHAR2;
+
+  FUNCTION get_media_filetype( p_dmd_name IN VARCHAR2 )
+        RETURN VARCHAR2;
+
+   FUNCTION building_no_number ( pc_building_number VARCHAR2 ) RETURN NUMBER;
+   FUNCTION building_no_char ( pc_building_number VARCHAR2 ) RETURN VARCHAR2;
+
+   FUNCTION get_con_code( p_det_con_id IN NUMBER) RETURN VARCHAR2;
+   FUNCTION get_con_id( p_det_con_code IN VARCHAR2) RETURN NUMBER;
+
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_dgt_tab">
+-- This function returns  a PL/SQL table of doc_gateways records where the
+-- dgt_table_name equals the parameter value passed into the function OR
+-- there is a doc_gate_syn record that matches the value
+FUNCTION get_tab_current_gateways(
+                                  pi_dgt_table_name  IN  doc_gateways.dgt_table_name%TYPE
+								 ,pi_as_at_date      IN  DATE default TRUNC(SYSDATE)
+                                 ) RETURN t_dgt_tab;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_dgt_tab">
+-- This function returns  a PL/SQL table of docs available for a given
+-- record in a table
+FUNCTION get_tab_das_docs(
+                          pi_das_table_name  IN  doc_assocs.das_table_name%TYPE
+     				     ,pi_das_rec_id      IN  doc_assocs.das_rec_id%TYPE
+                         ) RETURN t_docs_tab;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_doc_url">
+-- This function returns  URL for a given document by analysing the docs records
+-- and also pulling in values from corresponding doc_Location and doc_media records
+FUNCTION get_doc_url( pi_doc_id  IN docs.doc_id%TYPE
+                    , pi_ret_ext IN boolean DEFAULT TRUE
+                    ) RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="das_against_asset">
+FUNCTION das_against_asset (pi_das_table_name IN doc_assocs.das_table_name%TYPE) RETURN BOOLEAN;
+----</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="das_against_network">
+FUNCTION das_against_network (pi_das_table_name IN doc_assocs.das_table_name%TYPE) RETURN BOOLEAN;
+----</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_address_xy">
+-- This procedure returns XY coords for a given postcode/building number
+  PROCEDURE get_address_xy
+              ( pi_postcode     IN  hig_address.had_postcode%TYPE
+              , pi_building_no  IN  hig_address.had_building_no%TYPE
+              , po_x            OUT NUMBER
+              , po_y            OUT NUMBER );
+----</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_address_xy">
+-- This procedure returns XY coords for a given postcode/building name
+  PROCEDURE get_address_xy
+              ( pi_postcode      IN  hig_address.had_postcode%TYPE
+              , pi_building_name IN  hig_address.had_building_name%TYPE
+              , po_x             OUT NUMBER
+              , po_y             OUT NUMBER );
+----</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="set_address_xy_gdo">
+-- This procedure inserts gdo for a given postcode/building no. using the proc
+-- get_address_xy
+  PROCEDURE set_address_xy_gdo
+              ( pi_doc_id          IN  docs.doc_id%TYPE
+              , pi_postcode        IN  hig_address.had_postcode%TYPE
+              , pi_building_no     IN  hig_address.had_building_no%TYPE
+              , po_gis_session_id OUT gis_data_objects.gdo_session_id%TYPE);
+----</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="set_address_xy_gdo">
+-- This procedure inserts gdo for a given postcode/building name. using the proc
+-- get_address_xy
+  PROCEDURE set_address_xy_gdo
+              ( pi_doc_id          IN  docs.doc_id%TYPE
+              , pi_postcode        IN  hig_address.had_postcode%TYPE
+              , pi_building_name   IN  hig_address.had_building_name%TYPE
+              , po_gis_session_id OUT gis_data_objects.gdo_session_id%TYPE);
+----</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="reset_map_gdo">
+-- Creates GDO for map to zoom back to initial extent
+-- Call this, then call plib$call_gis in the form
+  PROCEDURE reset_map
+              ( po_gis_session_id OUT gis_data_objects.gdo_session_id%TYPE );
+----</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="update_pem_with_rse_from_gdo">
+  PROCEDURE update_pem_with_rse_from_gdo
+              ( pi_session_id      IN gis_data_objects.gdo_session_id%TYPE
+              , pi_doc_id          IN docs.doc_id%TYPE );
+----</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_locator_results">
+  FUNCTION get_locator_results
+    RETURN tab_loc_results;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+
+
+END doc;
+/
