@@ -18,7 +18,7 @@ CREATE OR REPLACE PACKAGE BODY hig_hd_extract AS
 --   Package of dynamic sql routines used to generate xml from metadata
 --
 -----------------------------------------------------------------------------
---    Copyright (c) exor corporation ltd, 2003
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 -- 02-05-03 DC - nm_debug calls commented out to aid performance

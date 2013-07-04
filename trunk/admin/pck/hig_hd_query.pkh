@@ -16,7 +16,7 @@ CREATE OR REPLACE PACKAGE hig_hd_query AS
 --   FJF 11-Oct-04 Added context get/set to queries
 --                 Added extra query info
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2003
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>

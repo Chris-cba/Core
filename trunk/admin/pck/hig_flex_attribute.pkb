@@ -3,13 +3,15 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_flex_attribute.pkb-arc   3.5   Oct 04 2011 11:04:44   Steve.Cooper  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_flex_attribute.pkb-arc   3.6   Jul 04 2013 14:45:42   James.Wadsworth  $
 --       Module Name      : $Workfile:   hig_flex_attribute.pkb  $
---       Date into PVCS   : $Date:   Oct 04 2011 11:04:44  $
---       Date fetched Out : $Modtime:   Oct 04 2011 11:04:12  $
---       Version          : $Revision:   3.5  $
+--       Date into PVCS   : $Date:   Jul 04 2013 14:45:42  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:43:58  $
+--       Version          : $Revision:   3.6  $
 --       Based on SCCS version : 
--------------------------------------------------------------------------
+------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+------------------------------------------------------------------
 --
 --all global package variables here
 
@@ -17,7 +19,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.5  $';
+  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.6  $';
 
   g_package_name CONSTANT varchar2(30) := 'hig_flex_attribute';
 --

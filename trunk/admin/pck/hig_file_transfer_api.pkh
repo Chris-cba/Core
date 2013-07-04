@@ -4,13 +4,15 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_file_transfer_api.pkh-arc   3.1   May 06 2010 17:30:22   aedwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_file_transfer_api.pkh-arc   3.2   Jul 04 2013 14:45:42   James.Wadsworth  $
 --       Module Name      : $Workfile:   hig_file_transfer_api.pkh  $
---       Date into PVCS   : $Date:   May 06 2010 17:30:22  $
---       Date fetched Out : $Modtime:   May 06 2010 17:29:46  $
---       Version          : $Revision:   3.1  $
+--       Date into PVCS   : $Date:   Jul 04 2013 14:45:42  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:43:26  $
+--       Version          : $Revision:   3.2  $
 --       Based on SCCS version : 
--------------------------------------------------------------------------
+------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
 
@@ -18,7 +20,7 @@ AS
   --constants
   -----------
   --g_sccsid is the SCCS ID for the package
-  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.1  $';
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.2  $';
 --
   TYPE g_rec_files  IS RECORD 
         ( 

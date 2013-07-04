@@ -4,13 +4,15 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_flex_attribute.pkh-arc   3.2   Jun 24 2010 14:48:16   lsorathia  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_flex_attribute.pkh-arc   3.3   Jul 04 2013 14:45:42   James.Wadsworth  $
 --       Module Name      : $Workfile:   hig_flex_attribute.pkh  $
---       Date into PVCS   : $Date:   Jun 24 2010 14:48:16  $
---       Date fetched Out : $Modtime:   Jun 24 2010 13:32:54  $
---       Version          : $Revision:   3.2  $
+--       Date into PVCS   : $Date:   Jul 04 2013 14:45:42  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:44:06  $
+--       Version          : $Revision:   3.3  $
 --       Based on SCCS version : 
--------------------------------------------------------------------------
+------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
 
@@ -18,7 +20,7 @@ AS
   --constants
   -----------
   --g_sccsid is the SCCS ID for the package
-  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.2  $';
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.3  $';
   /*TYPE attrib_type IS RECORD 
   (
     type        nm_inv_types_all.nit_inv_type%TYPE

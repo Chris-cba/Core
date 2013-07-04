@@ -21,7 +21,7 @@ CREATE OR REPLACE PACKAGE BODY hig_hd_query AS
 --                 And restrict query on individual fields
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2003
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 -- all global package variables here
