@@ -1,12 +1,15 @@
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/utl/drop_sde_logfile_tabs.sql-arc   3.0   Jul 17 2009 10:57:00   malexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/utl/drop_sde_logfile_tabs.sql-arc   3.1   Jul 04 2013 10:30:10   James.Wadsworth  $
 --       Module Name      : $Workfile:   drop_sde_logfile_tabs.sql  $
---       Date into PVCS   : $Date:   Jul 17 2009 10:57:00  $
---       Date fetched Out : $Modtime:   Jul 06 2009 16:58:44  $
---       Version          : $Revision:   3.0  $
--------------------------------------------------------------------------
+--       Date into PVCS   : $Date:   Jul 04 2013 10:30:10  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 10:22:12  $
+--       Version          : $Revision:   3.1  $
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
 --
 --
 -- Script to remove the sde_logfile_data and sde_logfiles tables
