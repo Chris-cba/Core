@@ -1,3 +1,16 @@
+--
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data_patch2.sql-arc   2.1   Jul 04 2013 14:09:12   James.Wadsworth  $
+--       Module Name      : $Workfile:   nm3data_patch2.sql  $
+--       Date into PVCS   : $Date:   Jul 04 2013 14:09:12  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 13:38:18  $
+--       Version          : $Revision:   2.1  $
+--
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
 /***************************************************************************
 
 INFO
