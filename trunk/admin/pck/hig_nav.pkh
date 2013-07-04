@@ -4,13 +4,16 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_nav.pkh-arc   3.9   Jun 07 2012 09:22:54   Linesh.Sorathia  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_nav.pkh-arc   3.10   Jul 04 2013 14:47:36   James.Wadsworth  $
 --       Module Name      : $Workfile:   hig_nav.pkh  $
---       Date into PVCS   : $Date:   Jun 07 2012 09:22:54  $
---       Date fetched Out : $Modtime:   May 18 2012 10:55:18  $
---       Version          : $Revision:   3.9  $
+--       Date into PVCS   : $Date:   Jul 04 2013 14:47:36  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:47:12  $
+--       Version          : $Revision:   3.10  $
 --       Based on SCCS version : 
--------------------------------------------------------------------------
+------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+------------------------------------------------------------------
+
 --</PACKAGE>
 --<GLOBVAR>
 
@@ -18,7 +21,7 @@ AS
   --constants
   -----------
   --g_sccsid is the SCCS ID for the package
-  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.9  $';
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.10  $';
 
   TYPE            l_tab_tab IS TABLE OF hig_navigator_type INDEX BY BINARY_INTEGER ;
   l_tab           hig_navigator_tab  := hig_navigator_tab(hig_navigator_type(Null,Null,Null,Null,Null,Null));
