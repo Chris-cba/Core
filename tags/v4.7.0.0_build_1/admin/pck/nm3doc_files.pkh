@@ -1,0 +1,237 @@
+CREATE OR REPLACE PACKAGE nm3doc_files
+AS
+--<PACKAGE>
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3doc_files.pkh-arc   2.7   Jul 04 2013 15:37:04   James.Wadsworth  $
+--       Module Name      : $Workfile:   nm3doc_files.pkh  $
+--       Date into PVCS   : $Date:   Jul 04 2013 15:37:04  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 15:35:18  $
+--       Version          : $Revision:   2.7  $
+--       Based on SCCS version :
+------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+--
+-- Package to deal with Document associations and table storage
+--
+  -----------
+  --constants
+  -----------
+  --g_sccsid is the SCCS ID for the package
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.7  $';
+ 
+
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+  FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+  FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+--------------------------------------------------------------------------------
+--<PROC NAME="GET_UPLOAD_INFO">
+-- Get the info WebUtil needs to upload a file into DOC_FILES table.
+  PROCEDURE get_upload_info
+              ( pi_doc_id          IN docs.doc_id%TYPE
+              , pi_revision        IN NUMBER DEFAULT NULL
+              , po_table_name     OUT user_tables.table_name%TYPE
+              , po_column_name    OUT user_tab_columns.column_name%TYPE
+              , po_pk_column      OUT user_tab_columns.column_name%TYPE
+              , po_where_clause   OUT VARCHAR2
+              , po_prog_title     OUT VARCHAR2
+              , po_prog_sub_title OUT VARCHAR2 );
+--</PROC>
+--
+--------------------------------------------------------------------------------
+--<PROC NAME="GET_DOWNLOAD_INFO">
+-- Get the info WebUtil needs to download a file from DOC_FILES table.
+  PROCEDURE get_download_info
+              ( pi_doc_id          IN docs.doc_id%TYPE
+              , pi_revision        IN NUMBER DEFAULT NULL
+              , po_client_file    OUT VARCHAR2
+              , po_working_folder OUT VARCHAR2
+              , po_table_name     OUT user_tables.table_name%TYPE
+              , po_column_name    OUT user_tab_columns.column_name%TYPE
+              , po_where_clause   OUT VARCHAR2
+              , po_prog_title     OUT VARCHAR2
+              , po_prog_sub_title OUT VARCHAR2 );
+--</PROC>
+--
+--------------------------------------------------------------------------------
+--<PROC NAME="DOWNLOAD_FROM_BLOB_TO_FILE">
+-- Download a file stored in DOC_FILES to a specified Oracle Directory
+  PROCEDURE download_from_blob_to_file
+                             ( pi_doc_id    IN docs.doc_id%TYPE
+                             , pi_revision  IN NUMBER
+                             , pi_directory IN VARCHAR2
+                             , pi_filename  IN VARCHAR2);
+--</PROC>
+--
+--------------------------------------------------------------------------------
+--
+--<PROC NAME="MOVE_FILE_TO_BLOB">
+-- Upload the file to the BLOB on the database
+  PROCEDURE move_file_to_blob ( pi_doc_id IN docs.doc_id%TYPE 
+                              , pi_revision IN NUMBER DEFAULT NULL);
+--</PROC>
+--
+--------------------------------------------------------------------------------
+--<PROC NAME="STRIP_FILENAME">
+-- Strip the filename from a full filename and path string
+  FUNCTION strip_filename ( pi_full_path_and_file IN VARCHAR2 )
+  RETURN VARCHAR2;
+--</PROC>
+--
+--------------------------------------------------------------------------------
+--<PROC NAME="LOCK_FILE">
+-- Insert a row into DOC_FILE_LOCKS
+  PROCEDURE lock_file
+               ( pi_rec_dfl IN doc_file_locks%ROWTYPE );
+--
+  PROCEDURE lock_file
+               ( pi_dfl_doc_id   IN doc_file_locks.dfl_doc_id%TYPE
+               , pi_dfl_revision IN doc_file_locks.dfl_revision%TYPE
+               , pi_terminal     IN VARCHAR2 DEFAULT NULL );
+--</PROC>
+--
+--------------------------------------------------------------------------------
+--<PROC NAME="UNLOCK_FILE">
+-- Unlock the file record
+  PROCEDURE unlock_file
+               ( pi_dfl_doc_id   IN doc_file_locks.dfl_doc_id%TYPE
+               , pi_dfl_revision IN doc_file_locks.dfl_revision%TYPE);
+-- </PROC>
+--
+--------------------------------------------------------------------------------
+--<PROC NAME="GET_DFL">
+-- Get a DOC_FILE_LOCKS row
+  FUNCTION get_dfl
+               ( pi_dfl_doc_id   IN doc_file_locks.dfl_doc_id%TYPE
+               , pi_dfl_revision IN doc_file_locks.dfl_revision%TYPE )
+  RETURN doc_file_locks%ROWTYPE;
+--</PROC>
+--
+--------------------------------------------------------------------------------
+--<PROC NAME="IS_FILE_LOCKED">
+-- Does the file have an entry in DOC_FILE_LOCKS
+  FUNCTION is_file_locked
+              ( pi_dfl_doc_id   IN doc_file_locks.dfl_doc_id%TYPE
+              , pi_dfl_revision IN doc_file_locks.dfl_revision%TYPE )
+   RETURN BOOLEAN;
+--</PROC>
+--
+--------------------------------------------------------------------------------
+--<PROC NAME="GET_FILE_LOCK_INFO">
+-- Get info on who has locked a file out
+  PROCEDURE get_file_lock_info
+              ( pi_dfl_doc_id   IN  doc_file_locks.dfl_doc_id%TYPE
+              , pi_dfl_revision IN  doc_file_locks.dfl_revision%TYPE
+              , po_filename     OUT VARCHAR2
+              , po_username     OUT doc_file_locks.dfl_username%TYPE
+              , po_date         OUT doc_file_locks.dfl_date%TYPE);
+--</PROC>
+--
+--------------------------------------------------------------------------------
+--<PROC NAME="GET_MAX_REVISION">
+-- Get the latest revision (version) number of a file
+  FUNCTION get_max_revision (pi_doc_id IN docs.doc_id%TYPE)
+  RETURN NUMBER;
+--</PROC>
+--
+--------------------------------------------------------------------------------
+--<PROC NAME="GET_WILDCARD">
+-- Get a wildcard in the format expected by WebUtil
+  FUNCTION get_wildcard ( pi_wildcard    IN VARCHAR2
+                        , pi_description IN VARCHAR2 DEFAULT NULL )
+  RETURN VARCHAR2;
+--</PROC>
+--
+--------------------------------------------------------------------------------
+--<PROC NAME="GET_FILE_SIZE">
+-- Return the filesize from DOC_FILES, either plain bytes, or formatted value
+  FUNCTION get_file_size ( pi_doc_id    IN docs.doc_id%TYPE
+                         , pi_revision  IN NUMBER
+                         , pi_formatted IN BOOLEAN DEFAULT FALSE )
+  RETURN VARCHAR2;
+--
+  FUNCTION get_file_size ( pi_doc_id    IN docs.doc_id%TYPE
+                         , pi_revision  IN NUMBER
+                         , pi_formatted IN VARCHAR2 DEFAULT 'N' )
+  RETURN VARCHAR2;
+--
+  FUNCTION get_file_size ( pi_doc_id    IN docs.doc_id%TYPE
+                         , pi_formatted IN VARCHAR2 DEFAULT 'N' )
+  RETURN VARCHAR2;
+--</PROC>
+--
+--------------------------------------------------------------------------------
+--<PROC NAME="GET_SIZE">
+-- Return the size
+--    pi_size_in_bytes      Size in Bytes
+--    pi_type               Either b for bits, B for Bytes, KB for KBytes, MB for MBytes
+--                          GB for GBytes, TB for TBytes
+--
+  FUNCTION get_size ( pi_size_in_bytes IN NUMBER
+                    , pi_type          IN VARCHAR2 DEFAULT 'B')
+  RETURN NUMBER;
+--</PROC>
+--
+--------------------------------------------------------------------------------
+--<PROC NAME="GET_WORK_FOLDER">
+-- Get the users prefered working folder
+  FUNCTION get_work_folder RETURN VARCHAR2;
+--</PROC>
+--
+--------------------------------------------------------------------------------
+--<PROC NAME="GET_DLC">
+-- Get DOC_LOCATIONS record
+  FUNCTION get_dlc (pi_doc_id IN docs.doc_id%TYPE) RETURN doc_locations%ROWTYPE;
+--</PROC>
+--
+--------------------------------------------------------------------------------
+--<PROC NAME="GET_DLC_TABLE">
+-- Get DOC_LOCATION_TABLES table name
+  FUNCTION get_dlc_table (pi_doc_id IN docs.doc_id%TYPE) RETURN doc_location_tables.dlt_table%TYPE;
+--</PROC>
+--
+--------------------------------------------------------------------------------
+--<PROC NAME="GET_DLC_TABLE">
+-- Get DOC_LOCATION_TABLES table name
+  FUNCTION get_dlc_table (pi_dlc_id IN doc_locations.dlc_id%TYPE) RETURN doc_location_tables.dlt_table%TYPE;
+--</PROC>
+--
+--------------------------------------------------------------------------------
+--<PROC NAME="ARCHIVE_FILE">
+-- 
+  PROCEDURE archive_file ( pi_doc_id    IN docs.doc_id%TYPE
+                         , pi_blob      IN BLOB
+                         , pi_filename  IN VARCHAR2);
+--
+  PROCEDURE archive_file ( pi_doc_id    IN docs.doc_id%TYPE );
+--</PROC>
+--
+--------------------------------------------------------------------------------
+--
+-- <PROC NAME="GET_FILENAME_WITH_DOC_ID">
+  FUNCTION get_filename_with_doc_id ( pi_filename IN VARCHAR2 
+                                    , pi_doc_id   IN NUMBER )
+    RETURN VARCHAR;
+-- </PROC>
+--------------------------------------------------------------------------------
+--
+END nm3doc_files;
+/
+
