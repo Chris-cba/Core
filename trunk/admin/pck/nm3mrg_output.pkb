@@ -3,11 +3,11 @@ create or replace package body nm3mrg_output as
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mrg_output.pkb-arc   2.4   Oct 07 2011 14:41:48   Steve.Cooper  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mrg_output.pkb-arc   2.5   Jul 04 2013 16:15:38   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3mrg_output.pkb  $
---       Date into PVCS   : $Date:   Oct 07 2011 14:41:48  $
---       Date fetched Out : $Modtime:   Oct 07 2011 14:41:38  $
---       Version          : $Revision:   2.4  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:15:38  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 15:47:22  $
+--       Version          : $Revision:   2.5  $
 --       Based on SCCS version : 1.22
 -------------------------------------------------------------------------
 --   Author : Jonathan Mills
@@ -15,12 +15,12 @@ create or replace package body nm3mrg_output as
 --   NM3 Merge Output body
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2001
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 --all global package variables here
 --
-   g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.4  $';
+   g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.5  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3mrg_output';
@@ -547,7 +547,7 @@ BEGIN
    line_write('--  '||g_package_name||' body   : '||get_body_version);
    line_write('--');
    line_write('-----------------------------------------------------------------------------');
-   line_write('--	Copyright (c) exor corporation ltd, 2001');
+   line_write('--	Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.');
    line_write('-----------------------------------------------------------------------------');
    line_write('--');
    line_write('   g_nmq_id      CONSTANT nm_mrg_query.nmq_id%TYPE     := nm3mrg.get_nmq_id;');
