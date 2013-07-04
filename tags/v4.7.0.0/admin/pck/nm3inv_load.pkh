@@ -1,0 +1,172 @@
+CREATE OR REPLACE PACKAGE Nm3inv_Load AS
+--<PACKAGE>
+--   PVCS Identifiers :-
+--
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_load.pkh-arc   2.2   Jul 04 2013 16:08:46   James.Wadsworth  $
+--       Module Name      : $Workfile:   nm3inv_load.pkh  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:08:46  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:14  $
+--       PVCS Version     : $Revision:   2.2  $
+--       Based on SCCS version : 
+--
+--
+--   Author : Jonathan Mills
+--
+--   NM3 Inventory Load package
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+  g_sccsid             CONSTANT VARCHAR2(2000) := '"$Revision:   2.2  $"';
+  g_line_data_suffix   CONSTANT VARCHAR2(40)   := 'LINE';
+--  g_sccsid is the SCCS ID for the package
+--
+   g_create_temp_ne_on_validate BOOLEAN := FALSE;
+   g_last_nte_job_id            NUMBER  := -1;
+--
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="load_ele_mp_ambig">
+PROCEDURE load_ele_mp_ambig (p_rec v_load_inv_mem_ele_mp_ambig%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="validate_ele_mp_ambig">
+PROCEDURE validate_ele_mp_ambig (p_rec v_load_inv_mem_ele_mp_ambig%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="load_ele_mp_true_ambig">
+PROCEDURE load_ele_mp_true_ambig (p_rec v_load_inv_mem_ele_mp_true_amb%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="validate_ele_mp_true_ambig">
+PROCEDURE validate_ele_mp_true_ambig (p_rec v_load_inv_mem_ele_mp_true_amb%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="load_ele_mp_excl">
+PROCEDURE load_ele_mp_excl (p_rec v_load_inv_mem_ele_mp_excl%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="validate_ele_mp_excl">
+PROCEDURE validate_ele_mp_excl (p_rec v_load_inv_mem_ele_mp_excl%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="load_ele_mp_true_excl">
+PROCEDURE load_ele_mp_true_excl (p_rec v_load_inv_mem_ele_mp_true_exc%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="validate_ele_mp_true_excl">
+PROCEDURE validate_ele_mp_true_excl (p_rec v_load_inv_mem_ele_mp_true_exc%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="load_on_element">
+PROCEDURE load_on_element (p_rec v_load_inv_mem_on_element%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="load_on_element_xy">
+
+PROCEDURE load_on_element_xy (p_rec v_load_inv_mem_on_element_xy%ROWTYPE);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="validate_on_element_xy">
+PROCEDURE validate_on_element_xy (p_rec v_load_inv_mem_on_element_xy%ROWTYPE);
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="validate_on_element">
+--
+PROCEDURE validate_on_element (p_rec v_load_inv_mem_on_element%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="load_point_on_ele">
+PROCEDURE load_point_on_ele (p_rec v_load_point_inv_mem_on_ele%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="validate_point_on_ele">
+PROCEDURE validate_point_on_ele (p_rec v_load_point_inv_mem_on_ele%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE load_or_val_on_element (p_rec           v_load_inv_mem_on_element%ROWTYPE
+                                 ,p_validate_only BOOLEAN
+                                 );
+--
+-----------------------------------------------------------------------------
+--
+FUNCTION translate_xy_to_element 
+             ( p_row IN v_load_inv_mem_on_element_xy%ROWTYPE ) 
+  RETURN v_load_inv_mem_on_element%ROWTYPE;
+--
+-----------------------------------------------------------------------------
+--
+FUNCTION xnltw_get_nearest_on_route
+   ( p_ne_id    IN NUMBER
+   , p_x        IN NUMBER
+   , p_y        IN NUMBER )
+  RETURN nm_lref;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE process_line_data 
+        ( pi_asset_type         IN nm_inv_types.nit_inv_type%TYPE
+        , pi_load_file_unique   IN nm_load_files.nlf_unique%TYPE
+        , pi_batch_no           IN nm_load_batches.nlb_batch_no%TYPE
+        , pi_join_column        IN VARCHAR2 DEFAULT 'LFK'
+        , pi_locate_ref_column  IN VARCHAR2 DEFAULT 'LOCATEREF'
+        , po_nlf_id            OUT nm_load_files.nlf_id%TYPE
+        , po_nlb_batch_no      OUT nm_load_batches.nlb_batch_no%TYPE);
+--
+-----------------------------------------------------------------------------
+--
+--<PRAGMA>
+   PRAGMA RESTRICT_REFERENCES (get_version, RNDS, WNPS, WNDS);
+   PRAGMA RESTRICT_REFERENCES (get_body_version, RNDS, WNPS, WNDS);
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+END Nm3inv_Load;
+/

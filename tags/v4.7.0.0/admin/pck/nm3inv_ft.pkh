@@ -1,0 +1,97 @@
+create or replace package nm3inv_ft as
+--<PACKAGE>
+--   SCCS Identifiers :-
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_ft.pkh-arc   2.2   Jul 04 2013 16:08:46   James.Wadsworth  $
+--       Module Name      : $Workfile:   nm3inv_ft.pkh  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:08:46  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:14  $
+--       Version          : $Revision:   2.2  $
+--       Based on SCCS version : 1.3
+-------------------------------------------------------------------------
+--   Author : Jonathan Mills
+--
+--   NM3 Inventory Foreign Table package
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.2  $';
+--  g_sccsid is the SCCS ID for the package
+--
+  TYPE rec_ft IS RECORD
+     (nit_inv_type    nm_inv_types.nit_inv_type%TYPE
+     ,nit_descr       nm_inv_types.nit_descr%TYPE
+     ,nit_table_name  nm_inv_types.nit_table_name%TYPE
+     ,view_text       VARCHAR2(32767)
+     ,create_yn       VARCHAR2(1)
+     );
+--
+   TYPE tab_rec_ft IS TABLE OF rec_ft INDEX BY BINARY_INTEGER;
+--
+   TYPE rec_internal IS TABLE OF nm_mrg_section_inv_values_all%ROWTYPE INDEX BY BINARY_INTEGER;
+--
+   g_rec_internal rec_internal;
+   g_tab_descr    nm3type.tab_varchar2000;
+   g_inv_type     nm_inv_types.nit_inv_type%TYPE;
+   g_view_text    nm3type.tab_varchar32767;
+   g_where_clause nm3type.tab_varchar32767;
+--
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_tab_rec_ft">
+-- This procedure returns an array of TAB_REC_FT for the specified inventory
+--  type
+--
+PROCEDURE get_tab_rec_ft (p_inv_type        IN     nm_inv_types.nit_inv_type%TYPE
+                         ,p_create_snapshot IN     BOOLEAN DEFAULT FALSE
+                         ,p_tab_rec_ft      IN OUT tab_rec_ft
+                         );
+--
+FUNCTION get_tab_rec_ft (p_inv_type        nm_inv_types.nit_inv_type%TYPE
+                        ,p_create_snapshot BOOLEAN DEFAULT FALSE
+                        ) RETURN tab_rec_ft;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="do_create">
+-- This procedure creates views and inventory types for the passed TAB_REC_FT
+--
+PROCEDURE do_create (p_inv_type        nm_inv_types.nit_inv_type%TYPE
+                    ,p_tab_rec_ft      tab_rec_ft
+                    ,p_create_snapshot BOOLEAN DEFAULT FALSE
+                    );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PRAGMA>
+   PRAGMA RESTRICT_REFERENCES (get_version, RNDS, WNPS, WNDS);
+   PRAGMA RESTRICT_REFERENCES (get_body_version, RNDS, WNPS, WNDS);
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+end nm3inv_ft;
+/
