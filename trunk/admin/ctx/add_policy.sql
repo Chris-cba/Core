@@ -5,17 +5,17 @@ DECLARE
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/ctx/add_policy.sql-arc   2.3   May 16 2011 16:03:32   Steve.Cooper  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/ctx/add_policy.sql-arc   2.4   Jul 04 2013 09:23:56   James.Wadsworth  $
 --       Module Name      : $Workfile:   add_policy.sql  $
---       Date into SCCS   : $Date:   May 16 2011 16:03:32  $
---       Date fetched Out : $Modtime:   Apr 19 2011 09:06:04  $
---       SCCS Version     : $Revision:   2.3  $
+--       Date into SCCS   : $Date:   Jul 04 2013 09:23:56  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 09:22:04  $
+--       SCCS Version     : $Revision:   2.4  $
 --       Based on SCCS Version     : 1.11
 --
 --   Create Inventory/Merge security policies
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2001
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
    l_tab_policy_name     nm3type.tab_varchar30;

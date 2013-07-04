@@ -5,18 +5,18 @@ DECLARE
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/ctx/drop_user_policy.sql-arc   3.1   Sep 15 2011 11:35:14   Mike.Alexander  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/ctx/drop_user_policy.sql-arc   3.2   Jul 04 2013 09:23:56   James.Wadsworth  $
 --       Module Name      : $Workfile:   drop_user_policy.sql  $
---       Date into SCCS   : $Date:   Sep 15 2011 11:35:14  $
---       Date fetched Out : $Modtime:   Sep 15 2011 11:33:18  $
---       SCCS Version     : $Revision:   3.1  $
+--       Date into SCCS   : $Date:   Jul 04 2013 09:23:56  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 09:22:04  $
+--       SCCS Version     : $Revision:   3.2  $
 --
 --   Drop Inventory/Merge security policies using user for 4500 upgrade
 --    this script is for use wit 4500 upgrade only and will be made redundant 
 --    after this release
 --
 -----------------------------------------------------------------------------
---	Copyright (c) Bentley Systems Inc., 2011
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
    CURSOR cs_policies_to_drop (c_owner VARCHAR2) IS

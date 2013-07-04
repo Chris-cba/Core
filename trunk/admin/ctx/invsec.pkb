@@ -1,11 +1,11 @@
 CREATE OR REPLACE PACKAGE BODY invsec AS
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/ctx/invsec.pkb-arc   2.3   Nov 25 2011 12:14:10   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/ctx/invsec.pkb-arc   2.4   Jul 04 2013 09:23:56   James.Wadsworth  $
 --       Module Name      : $Workfile:   invsec.pkb  $
---       Date into SCCS   : $Date:   Nov 25 2011 12:14:10  $
---       Date fetched Out : $Modtime:   Nov 25 2011 12:13:18  $
---       SCCS Version     : $Revision:   2.3  $
+--       Date into SCCS   : $Date:   Jul 04 2013 09:23:56  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 09:22:04  $
+--       SCCS Version     : $Revision:   2.4  $
 --       Based on SCCS Version     : 1.12
 --
 --
@@ -19,10 +19,10 @@ CREATE OR REPLACE PACKAGE BODY invsec AS
 --          conjuntion with a CONNECT BY clause
 --
 ------------------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2000
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 ------------------------------------------------------------------------------------
 --
-   g_body_sccsid        CONSTANT  varchar2(2000)                    := '"$Revision:   2.3  $"';
+   g_body_sccsid        CONSTANT  varchar2(2000)                    := '"$Revision:   2.4  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 
    g_package_name       CONSTANT  varchar2(30)                      := 'invsec';

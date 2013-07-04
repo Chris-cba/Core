@@ -4,11 +4,11 @@ create or replace package body mrgsec as
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/ctx/mrgsec.pkb-arc   2.0   Jun 14 2007 09:25:04   smarshall  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/ctx/mrgsec.pkb-arc   2.1   Jul 04 2013 09:23:56   James.Wadsworth  $
 --       Module Name      : $Workfile:   mrgsec.pkb  $
---       Date into SCCS   : $Date:   Jun 14 2007 09:25:04  $
---       Date fetched Out : $Modtime:   Jun 14 2007 09:24:34  $
---       SCCS Version     : $Revision:   2.0  $
+--       Date into SCCS   : $Date:   Jul 04 2013 09:23:56  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 09:22:04  $
+--       SCCS Version     : $Revision:   2.1  $
 --       Based on SCCS Version     : 1.10
 --
 --
@@ -17,9 +17,9 @@ create or replace package body mrgsec as
 --   Package for implementing context-based security for Merge (Slice+Dice) Process
 --
 ------------------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2000
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 ------------------------------------------------------------------------------------
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.0  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.1  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
     c_user_restricted CONSTANT BOOLEAN := (NOT nm3user.is_user_unrestricted);

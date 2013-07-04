@@ -5,17 +5,17 @@ DECLARE
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/ctx/drop_policy.sql-arc   2.1   May 16 2011 16:03:54   Steve.Cooper  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/ctx/drop_policy.sql-arc   2.2   Jul 04 2013 09:23:56   James.Wadsworth  $
 --       Module Name      : $Workfile:   drop_policy.sql  $
---       Date into SCCS   : $Date:   May 16 2011 16:03:54  $
---       Date fetched Out : $Modtime:   Apr 19 2011 09:06:36  $
---       SCCS Version     : $Revision:   2.1  $
+--       Date into SCCS   : $Date:   Jul 04 2013 09:23:56  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 09:22:04  $
+--       SCCS Version     : $Revision:   2.2  $
 --       Based on SCCS Version     : 1.9
 --
 --   Drop Inventory/Merge security policies
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2001
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
    CURSOR cs_policies_to_drop (c_owner VARCHAR2) IS
