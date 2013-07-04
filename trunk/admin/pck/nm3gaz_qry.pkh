@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE nm3gaz_qry AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3gaz_qry.pkh-arc   2.4   May 16 2011 14:44:50   Steve.Cooper  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3gaz_qry.pkh-arc   2.5   Jul 04 2013 15:33:20   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3gaz_qry.pkh  $
---       Date into PVCS   : $Date:   May 16 2011 14:44:50  $
---       Date fetched Out : $Modtime:   Apr 01 2011 10:20:48  $
---       Version          : $Revision:   2.4  $
+--       Date into PVCS   : $Date:   Jul 04 2013 15:33:20  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:12  $
+--       Version          : $Revision:   2.5  $
 --       Based on SCCS version : 1.30
 -------------------------------------------------------------------------
 --   Author : Jonathan Mills
@@ -15,11 +15,11 @@ CREATE OR REPLACE PACKAGE nm3gaz_qry AS
 --   Gazeteer Query package
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2002
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
-   g_sccsid      CONSTANT  VARCHAR2(2000) := '$Revision:   2.4  $';
+   g_sccsid      CONSTANT  VARCHAR2(2000) := '$Revision:   2.5  $';
 --  g_sccsid is the SCCS ID for the package
 --
    c_ngqt_item_type_type_ele    CONSTANT nm_gaz_query_types.ngqt_item_type_type%TYPE := 'E';
