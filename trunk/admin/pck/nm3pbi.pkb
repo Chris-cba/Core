@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY nm3pbi IS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3pbi.pkb-arc   2.2   May 17 2011 08:26:24   Steve.Cooper  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3pbi.pkb-arc   2.3   Jul 04 2013 16:21:08   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3pbi.pkb  $
---       Date into PVCS   : $Date:   May 17 2011 08:26:24  $
---       Date fetched Out : $Modtime:   Apr 01 2011 13:55:16  $
---       Version          : $Revision:   2.2  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:21:08  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:18  $
+--       Version          : $Revision:   2.3  $
 --       Based on SCCS version : 1.24
 -------------------------------------------------------------------------
 --   Author : Jonathan Mills
@@ -15,11 +15,11 @@ CREATE OR REPLACE PACKAGE BODY nm3pbi IS
 --   PBI package body
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2000
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 --  g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.2  $';
+  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.3  $';
   g_package_name    CONSTANT  varchar2(30) := 'nm3pbi';
 --
 ------------------------------------------------------------------------------------------------

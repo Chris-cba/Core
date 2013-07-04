@@ -3,24 +3,24 @@ CREATE OR REPLACE PACKAGE nm3nta AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3nta.pkh-arc   2.1   Jan 06 2010 16:41:32   cstrettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3nta.pkh-arc   2.2   Jul 04 2013 16:21:08   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3nta.pkh  $
---       Date into PVCS   : $Date:   Jan 06 2010 16:41:32  $
---       Date fetched Out : $Modtime:   Jan 06 2010 15:24:14  $
---       Version          : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:21:08  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 15:49:04  $
+--       Version          : $Revision:   2.2  $
 --       Based on SCCS version : 1.1
 ---------------------------------------------------------------------------
 --   Author : R.A. Coupe
 --
 --   NM_THEME_ARRAY related code
------------------------------------------------------------------------------
---  Copyright (c) exor corporation ltd, 2004
------------------------------------------------------------------------------
+------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
 --  g_sccsid is the SCCS ID for the package
 
-  g_sccsid      CONSTANT   VARCHAR2(2000) := '$Revision:   2.1  $';
+  g_sccsid      CONSTANT   VARCHAR2(2000) := '$Revision:   2.2  $';
 
   g_theme_array         nm_theme_array := nm_theme_array( nm_theme_array_type( nm_theme_entry( null)));
   g_theme_array_flag    BOOLEAN        := FALSE;

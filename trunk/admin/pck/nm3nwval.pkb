@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3nwval AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3nwval.pkb-arc   2.10   May 17 2011 08:26:24   Steve.Cooper  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3nwval.pkb-arc   2.11   Jul 04 2013 16:21:08   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3nwval.pkb  $
---       Date into PVCS   : $Date:   May 17 2011 08:26:24  $
---       Date fetched Out : $Modtime:   Apr 08 2011 09:05:10  $
---       PVCS Version     : $Revision:   2.10  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:21:08  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 15:49:34  $
+--       PVCS Version     : $Revision:   2.11  $
 --       Based on 1.67
 --
 --
@@ -14,11 +14,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3nwval AS
 --
 --   nm3nwval package
 --
------------------------------------------------------------------------------
---      Copyright (c) exor corporation ltd, 2000
------------------------------------------------------------------------------
+------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.10  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.11  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 -----------------------------------------------------------------------------
 --

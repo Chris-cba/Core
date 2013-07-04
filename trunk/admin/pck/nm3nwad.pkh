@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE Nm3nwad AS
 -----------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3nwad.pkh-arc   2.3   Oct 07 2011 14:47:04   Steve.Cooper  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3nwad.pkh-arc   2.4   Jul 04 2013 16:21:08   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3nwad.pkh  $
---       Date into SCCS   : $Date:   Oct 07 2011 14:47:04  $
---       Date fetched Out : $Modtime:   Oct 07 2011 14:46:12  $
---       SCCS Version     : $Revision:   2.3  $
+--       Date into SCCS   : $Date:   Jul 04 2013 16:21:08  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 15:49:24  $
+--       SCCS Version     : $Revision:   2.4  $
 --       Based on 
 --
 -- Author : A Edwards/P Stanton/G Johnson
@@ -20,9 +20,9 @@ CREATE OR REPLACE PACKAGE Nm3nwad AS
 --                       Also amended end_date_date_nadl to accept effective date parameter.                  
 --
 --
------------------------------------------------------------------------------
---  Copyright (c) exor corporation ltd, 2004
------------------------------------------------------------------------------
+------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
     g_sccsid      CONSTANT  VARCHAR2(2000) := '@(#)nm3nwad.pkh	1.12 07/18/06';

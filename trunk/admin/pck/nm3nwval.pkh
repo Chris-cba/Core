@@ -13,9 +13,10 @@ CREATE OR REPLACE PACKAGE nm3nwval AS
 --
 --   nm3nwval package
 --
------------------------------------------------------------------------------
---      Copyright (c) exor corporation ltd, 2000
------------------------------------------------------------------------------
+------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+------------------------------------------------------------------
+--
 --</PACKAGE>
 --<GLOBVAR>
   TYPE t_ne_flex_cols_rec IS RECORD(ne_owner      nm_elements.ne_owner%TYPE
@@ -31,7 +32,7 @@ CREATE OR REPLACE PACKAGE nm3nwval AS
 
   --g_sccsid is the SCCS ID for the package
   --g_sccsid      CONSTANT  varchar2(80) := '"@(#)nm3nwval.pkh	1.28 05/02/06"';
-  g_sccsid      CONSTANT  varchar2(80) := '"$Revision:   2.2  $"';
+  g_sccsid      CONSTANT  varchar2(80) := '"$Revision:   2.3  $"';
 --
 -- Global variables used for dynamic sql
    g_dyn_rec_ne nm_elements%ROWTYPE;

@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE nm3pbi IS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3pbi.pkh-arc   2.1   Jan 06 2010 16:41:34   cstrettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3pbi.pkh-arc   2.2   Jul 04 2013 16:21:08   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3pbi.pkh  $
---       Date into PVCS   : $Date:   Jan 06 2010 16:41:34  $
---       Date fetched Out : $Modtime:   Jan 05 2010 11:42:06  $
---       Version          : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:21:08  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:18  $
+--       Version          : $Revision:   2.2  $
 --       Based on SCCS version : 1.5
 -------------------------------------------------------------------------
 --   Author : Jonathan Mills
@@ -15,12 +15,12 @@ CREATE OR REPLACE PACKAGE nm3pbi IS
 --     nm3pbi package. Used for PBI
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2000
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --</PACKAGE>
 --all global package variables here
 --<GLOBVAR>
-  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.1  $';
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.2  $';
 --  g_sccsid is the SCCS_ID
   c_big_number_for_nvl CONSTANT NUMBER := TO_NUMBER(RPAD('9',38,'9'));
 -- c_big_number_for_nvl is a constant to be used when you need the biggest number available

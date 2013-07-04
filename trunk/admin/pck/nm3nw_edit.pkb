@@ -3,11 +3,11 @@ AS
 	-------------------------------------------------------------------------
 	--	 PVCS Identifiers :-
 	--
-	--			 PVCS id					: $Header:   //vm_latest/archives/nm3/admin/pck/nm3nw_edit.pkb-arc   3.0   Apr 14 2010 11:18:54   aedwards  $
+	--			 PVCS id					: $Header:   //vm_latest/archives/nm3/admin/pck/nm3nw_edit.pkb-arc   3.1   Jul 04 2013 16:21:08   James.Wadsworth  $
 	--			 Module Name			: $Workfile:   nm3nw_edit.pkb  $
-	--			 Date into PVCS 	: $Date:   Apr 14 2010 11:18:54  $
-	--			 Date fetched Out : $Modtime:   Apr 14 2010 11:09:24  $
-	--			 Version					: $Revision:   3.0  $
+	--			 Date into PVCS 	: $Date:   Jul 04 2013 16:21:08  $
+	--			 Date fetched Out : $Modtime:   Jul 04 2013 14:25:18  $
+	--			 Version					: $Revision:   3.1  $
 	-------------------------------------------------------------------------
 	--
 	--all global package variables here
@@ -16,7 +16,7 @@ AS
 	--constants
 	-----------
 	--g_body_sccsid is the SCCS ID for the package body
-	g_body_sccsid 	CONSTANT VARCHAR2(2000) := '$Revision:   3.0  $';
+	g_body_sccsid 	CONSTANT VARCHAR2(2000) := '$Revision:   3.1  $';
 
 	g_package_name	CONSTANT VARCHAR2(30) := 'nm3nw_edit';
 	--
