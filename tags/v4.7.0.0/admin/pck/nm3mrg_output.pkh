@@ -1,0 +1,341 @@
+create or replace package nm3mrg_output as
+--<PACKAGE>
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mrg_output.pkh-arc   2.2   Jul 04 2013 16:15:38   James.Wadsworth  $
+--       Module Name      : $Workfile:   nm3mrg_output.pkh  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:15:38  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:16  $
+--       Version          : $Revision:   2.2  $
+--       Based on SCCS version : 1.7
+-------------------------------------------------------------------------
+--   Author : Jonathan Mills
+--
+--   NM3 Merge Output
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.2  $';
+--  g_sccsid is the SCCS ID for the package
+   g_sql        VARCHAR2(32767);
+   g_tab_data  nm3type.tab_varchar32767;
+   g_nqr_id    nm_mrg_query_results.nqr_mrg_job_id%TYPE;
+   --
+   g_tab_data_html  nm3type.tab_varchar32767;
+   g_tab_data_csv   nm3type.tab_varchar32767;
+   g_tab_data_txt   nm3type.tab_varchar32767;
+   --
+   TYPE tab_rec_nmc IS TABLE OF nm_mrg_output_cols%ROWTYPE INDEX BY BINARY_INTEGER;
+   --
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_cols_for_query">
+-- This function returns all of the view columns from the _VAL view for the specified
+--  merge query which do not begin NMS_
+--
+FUNCTION get_cols_for_query (p_nmq_id nm_mrg_query.nmq_id%TYPE) RETURN nm3type.tab_varchar30;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="col_ok_for_query">
+--  This function returns TRUE if that column name is valid for the specified query
+--
+FUNCTION col_ok_for_query (p_nmq_id   nm_mrg_query.nmq_id%TYPE
+                          ,p_col_name VARCHAR2
+                          ) RETURN BOOLEAN;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nmf">
+-- This function returns the specified nm_mrg_output_file record
+--
+FUNCTION get_nmf (p_nmf_id nm_mrg_output_file.nmf_id%TYPE) RETURN nm_mrg_output_file%ROWTYPE;
+--
+FUNCTION get_nmf (p_nmq_id       nm_mrg_output_file.nmf_nmq_id%TYPE
+                 ,p_nmf_filename nm_mrg_output_file.nmf_filename%TYPE
+                 ) RETURN nm_mrg_output_file%ROWTYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="write_results">
+-- This function writes out the specified set of merge results using the specified file format
+--
+PROCEDURE write_results (p_nqr_id                 nm_mrg_query_results.nqr_mrg_job_id%TYPE
+                        ,p_nmf_id                 nm_mrg_output_file.nmf_id%TYPE
+                        ,p_prefix                 VARCHAR2
+                        ,p_suppress_file_creation BOOLEAN DEFAULT FALSE
+                        ,p_produce_server_file    BOOLEAN DEFAULT TRUE
+                        ,p_produce_client_file    BOOLEAN DEFAULT FALSE
+                        );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="dump_merge_def">
+-- This procedure dumps the specified merge definition to a flat file
+--
+PROCEDURE dump_merge_def (p_nmq_id   IN nm_mrg_query.nmq_id%TYPE
+                         ,p_filename IN VARCHAR2 DEFAULT NULL
+                         ,p_location IN VARCHAR2 DEFAULT nm3file.c_default_location
+                         );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="dump_all_merge_defs">
+-- This procedure dumps the definitions for all merge queries to files
+--
+PROCEDURE dump_all_merge_defs (p_location IN VARCHAR2 DEFAULT nm3file.c_default_location);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nmf">
+-- This procedure inserts a nm_mrg_output_file record
+--
+PROCEDURE ins_nmf (p_rec_nmf nm_mrg_output_file%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nmc">
+-- This procedure inserts a nm_mrg_output_cols record
+--
+PROCEDURE ins_nmc (p_rec_nmc        nm_mrg_output_cols%ROWTYPE
+                  ,p_supress_dupval BOOLEAN DEFAULT FALSE
+                  );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nmcd">
+-- This procedure inserts a nm_mrg_output_col_decode record
+--
+PROCEDURE ins_nmcd (p_rec_nmcd nm_mrg_output_col_decode%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_next_nmf_id">
+-- This procedure selects the next NMF_ID from the NMF_ID_SEQ sequence
+--
+FUNCTION get_next_nmf_id RETURN NUMBER;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nm_seq_no">
+-- This procedure returns the NM_SEQ_NO from NM_MEMBERS for the passed values
+--
+FUNCTION get_nm_seq_no (p_nm_ne_id_in IN nm_members.nm_ne_id_in%TYPE
+                       ,p_nm_ne_id_of IN nm_members.nm_ne_id_of%TYPE
+                       ,p_mp          IN nm_members.nm_begin_mp%TYPE
+                       ) RETURN nm_members.nm_seq_no%TYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nm_seg_no">
+-- This procedure returns the NM_SEG_NO from NM_MEMBERS for the passed values
+--
+FUNCTION get_nm_seg_no (p_nm_ne_id_in IN nm_members.nm_ne_id_in%TYPE
+                       ,p_nm_ne_id_of IN nm_members.nm_ne_id_of%TYPE
+                       ,p_mp          IN nm_members.nm_begin_mp%TYPE
+                       ) RETURN nm_members.nm_seg_no%TYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="validate_file">
+-- This procedure validates the nm_mrg_output_file and nm_mrg_output_cols layout
+--
+PROCEDURE validate_file (p_nmf_id nm_mrg_output_file.nmf_id%TYPE);
+FUNCTION  validate_file (p_nmf_id nm_mrg_output_file.nmf_id%TYPE) RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE create_all_procedures;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE create_procedure (p_nmf_id nm_mrg_output_file.nmf_id%TYPE
+                           );
+--
+-----------------------------------------------------------------------------
+--
+FUNCTION get_proc_name (p_nmf_id nm_mrg_output_file.nmf_id%TYPE
+                       ) RETURN VARCHAR2;
+--
+FUNCTION get_view_name (p_nmf_id nm_mrg_output_file.nmf_id%TYPE
+                       ) RETURN VARCHAR2;
+--
+FUNCTION get_table_name(p_nmf_id nm_mrg_output_file.nmf_id%TYPE
+                       ) RETURN VARCHAR2;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE move_data_to_arrays (p_nqr_id nm_mrg_query_results.nqr_mrg_job_id%TYPE
+                              ,p_nmf_id nm_mrg_output_file.nmf_id%TYPE
+                              ,p_prefix VARCHAR2 DEFAULT NULL
+                              );
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE write_arrays (p_nmf_id     nm_mrg_output_file.nmf_id%TYPE
+                       ,p_prefix     VARCHAR2 DEFAULT NULL
+                       ,p_write_txt  BOOLEAN  DEFAULT TRUE
+                       ,p_write_csv  BOOLEAN  DEFAULT TRUE
+                       ,p_write_html BOOLEAN  DEFAULT TRUE
+                       ,p_produce_server_file    BOOLEAN DEFAULT TRUE
+                       ,p_produce_client_file    BOOLEAN DEFAULT FALSE
+                       );
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE delete_change_array;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE add_to_change_array (p_nmf_id nm_mrg_output_file.nmf_id%TYPE);
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE create_procs_for_changed;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE do_txt (p_y_or_n VARCHAR2);
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE do_csv (p_y_or_n VARCHAR2);
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE do_htm (p_y_or_n VARCHAR2);
+--
+-----------------------------------------------------------------------------
+--
+FUNCTION get_nmc (p_nmc_nmf_id nm_mrg_output_cols.nmc_nmf_id%TYPE
+                 ,p_nmc_seq_no nm_mrg_output_cols.nmc_seq_no%TYPE
+                 ) RETURN nm_mrg_output_cols%ROWTYPE;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE drop_nmf_objects (p_nmf_id nm_mrg_output_file.nmf_id%TYPE);
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE drop_nmf_objects_from_chg_arr;
+--
+-----------------------------------------------------------------------------
+--
+FUNCTION query_can_use_nmf_as_template (pi_nmq_id   nm_mrg_query.nmq_id%TYPE
+                                       ,pi_nmf_id   nm_mrg_output_file.nmf_id%TYPE
+                                       ) RETURN BOOLEAN;
+--
+-----------------------------------------------------------------------------
+--
+FUNCTION query_can_use_nmf_as_temp_char (pi_nmq_id   nm_mrg_query.nmq_id%TYPE
+                                        ,pi_nmf_id   nm_mrg_output_file.nmf_id%TYPE
+                                        ) RETURN VARCHAR2;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE create_nmf_from_template (pi_nmq_id   nm_mrg_query.nmq_id%TYPE
+                                   ,pi_nmf_id   nm_mrg_output_file.nmf_id%TYPE
+                                   ,pi_recreate BOOLEAN DEFAULT TRUE
+                                   );
+--
+-----------------------------------------------------------------------------
+--
+FUNCTION duplicate_nmf (pi_nmf_id     nm_mrg_output_file.nmf_id%TYPE
+                       ,pi_nmq_id_new nm_mrg_query.nmq_id%TYPE
+                       ) RETURN nm_mrg_output_file.nmf_id%TYPE;
+--
+-----------------------------------------------------------------------------
+--
+FUNCTION duplicate_nmf_template (pi_nmf_id     nm_mrg_output_file.nmf_id%TYPE
+                                ,pi_nmq_id_new nm_mrg_query.nmq_id%TYPE
+                                ) RETURN nm_mrg_output_file.nmf_id%TYPE;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE duplicate_nmf_and_procs (pi_nmf_id       nm_mrg_output_file.nmf_id%TYPE
+                                  ,pi_nmq_id_new   nm_mrg_query.nmq_id%TYPE
+                                  );
+--
+FUNCTION duplicate_nmf_and_procs (pi_nmf_id       nm_mrg_output_file.nmf_id%TYPE
+                                 ,pi_nmq_id_new   nm_mrg_query.nmq_id%TYPE
+                                 ) RETURN nm_mrg_output_file.nmf_id%TYPE;
+--
+-----------------------------------------------------------------------------
+--
+FUNCTION is_there_a_template_for_query (pi_nmq_id nm_mrg_query.nmq_id%TYPE) RETURN BOOLEAN;
+--
+-----------------------------------------------------------------------------
+--
+FUNCTION get_filepath (p_nmf_id     nm_mrg_output_file.nmf_id%TYPE
+                      ,p_nqr_job_id nm_mrg_query_results.nqr_mrg_job_id%TYPE
+                      ) RETURN VARCHAR2;
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="nmf_exists_for_nmq">
+FUNCTION nmf_exists_for_nmq (pi_nmq_id nm_mrg_query.nmq_id%TYPE) RETURN BOOLEAN;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_server_filename">
+FUNCTION get_server_filename (p_nmf_id         nm_mrg_output_file.nmf_id%TYPE
+                             ,p_prefix         VARCHAR2 DEFAULT NULL
+                             ,p_file_extension VARCHAR2
+                             ) RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_client_filename">
+FUNCTION get_client_filename  (p_nmf_id         nm_mrg_output_file.nmf_id%TYPE
+                              ,p_nqr_job_id     nm_mrg_query_results.nqr_mrg_job_id%TYPE
+                              ,p_prefix         VARCHAR2 DEFAULT NULL
+                              ,p_file_extension VARCHAR2
+                              ) RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PRAGMA>
+   PRAGMA RESTRICT_REFERENCES (get_version, RNDS, WNPS, WNDS);
+   PRAGMA RESTRICT_REFERENCES (get_body_version, RNDS, WNPS, WNDS);
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+end nm3mrg_output;
+/
