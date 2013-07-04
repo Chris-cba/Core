@@ -1,4 +1,4 @@
-REM Copyright (c) Exor Corporation Ltd, 2003
+REM Copyright 2013 Bentley Systems Incorporated. All rights reserved.
 REM @(#)nm3082_nm3100_upg.sql	1.2 01/08/04
 --
 spool nm3100_upg.LOG
