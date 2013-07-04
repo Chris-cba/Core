@@ -8,14 +8,14 @@ DECLARE
 --
 --   SCCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm_themes_all_b_iu_trg.trg-arc   2.3   Oct 02 2007 10:05:14   aedwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm_themes_all_b_iu_trg.trg-arc   2.4   Jul 04 2013 09:54:30   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm_themes_all_b_iu_trg.trg  $
---       Date into SCCS   : $Date:   Oct 02 2007 10:05:14  $
---       Date fetched Out : $Modtime:   Oct 02 2007 09:12:32  $
---       SCCS Version     : $Revision:   2.3  $
+--       Date into SCCS   : $Date:   Jul 04 2013 09:54:30  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 09:35:32  $
+--       SCCS Version     : $Revision:   2.4  $
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2006
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
   c_str      nm3type.max_varchar2;

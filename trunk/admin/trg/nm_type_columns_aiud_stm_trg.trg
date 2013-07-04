@@ -18,7 +18,7 @@ DECLARE
 --    nm_type_columns_aiud_stm_trg
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2002
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 
   l_db_action  varchar2(10);

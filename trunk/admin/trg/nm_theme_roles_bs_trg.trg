@@ -13,7 +13,7 @@ DECLARE
 --       SCCS Version     : 1.1
 --
 -----------------------------------------------------------------------------
--- Copyright (c) exor corporation ltd, 2004
+-- Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 BEGIN
    nm3sdm.g_role_idx := 0;

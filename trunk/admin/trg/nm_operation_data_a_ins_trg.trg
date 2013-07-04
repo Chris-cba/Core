@@ -24,7 +24,7 @@ DECLARE
 --  NOT_STARTED
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2002
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
    CURSOR cs_operations (c_operation nm_operation_data.nod_nmo_operation%TYPE) IS

@@ -14,7 +14,7 @@ DECLARE
 --       SCCS Version     : 1.3
 --
 -----------------------------------------------------------------------------
--- Copyright (c) exor corporation ltd, 2004
+-- Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
    l_nth   NM_THEMES_ALL%ROWTYPE;
 BEGIN

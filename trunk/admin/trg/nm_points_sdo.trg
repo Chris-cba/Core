@@ -5,15 +5,15 @@ CREATE OR REPLACE TRIGGER nm_points_sdo
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm_points_sdo.trg-arc   2.1   Aug 31 2007 17:01:32   malexander  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm_points_sdo.trg-arc   2.2   Jul 04 2013 09:54:30   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm_points_sdo.trg  $
---       Date into SCCS   : $Date:   Aug 31 2007 17:01:32  $
---       Date fetched Out : $Modtime:   Aug 31 2007 16:09:44  $
---       SCCS Version     : $Revision:   2.1  $
+--       Date into SCCS   : $Date:   Jul 04 2013 09:54:30  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 09:35:32  $
+--       SCCS Version     : $Revision:   2.2  $
 --       Based on 
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2007
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 BEGIN
 --

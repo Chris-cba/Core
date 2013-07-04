@@ -7,15 +7,15 @@ DECLARE
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm_points_sdo_row.trg-arc   2.5   Jul 05 2011 10:48:38   Chris.Strettle  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm_points_sdo_row.trg-arc   2.6   Jul 04 2013 09:54:30   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm_points_sdo_row.trg  $
---       Date into SCCS   : $Date:   Jul 05 2011 10:48:38  $
---       Date fetched Out : $Modtime:   Jul 05 2011 10:12:12  $
---       SCCS Version     : $Revision:   2.5  $
+--       Date into SCCS   : $Date:   Jul 04 2013 09:54:30  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 09:39:58  $
+--       SCCS Version     : $Revision:   2.6  $
 --       Based on 
 --
 -----------------------------------------------------------------------------
---  Copyright (c) exor corporation ltd, 2007
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
   CURSOR npl_check(p_np_id NUMBER) IS
          SELECT 'x' 
