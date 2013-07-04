@@ -1,0 +1,48 @@
+CREATE OR REPLACE PACKAGE nm3nwausec AS
+--
+-----------------------------------------------------------------------------
+--
+--   PVCS Identifiers :-
+--
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/ctx/NM3NWAUSEC.pkh-arc   1.6   Jul 04 2013 09:23:58   James.Wadsworth  $
+--       Module Name      : $Workfile:   NM3NWAUSEC.pkh  $
+--       Date into SCCS   : $Date:   Jul 04 2013 09:23:58  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 09:22:04  $
+--       SCCS Version     : $Revision:   1.6  $
+--
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+
+g_sccsid          CONSTANT  VARCHAR2(2000) := '$Revision:   1.6  $';
+
+  FUNCTION get_version RETURN VARCHAR2;
+--
+  FUNCTION get_body_version
+    RETURN VARCHAR2;
+--
+au_vc varchar2(2000);
+au_list int_array;
+--
+FUNCTION get_string (p_au_col_name  IN varchar2  ) RETURN varchar2;
+FUNCTION get_au_list return int_array_type;
+--
+function HPA_predicate_read( schema_in varchar2, name_in varchar2) RETURN varchar2;
+function DOC_predicate_read( schema_in varchar2, name_in varchar2) RETURN varchar2;
+function SEC_predicate_read( schema_in varchar2, name_in varchar2) RETURN varchar2;
+function HFC_predicate_read( schema_in varchar2, name_in varchar2) RETURN varchar2;
+--
+function NAU_predicate_read( schema_in varchar2, name_in varchar2) RETURN varchar2;
+function NAU_predicate_DML( schema_in varchar2, name_in varchar2) RETURN varchar2;
+--
+FUNCTION NE_predicate_READ( schema_in varchar2, name_in varchar2) RETURN varchar2;
+FUNCTION NE_predicate_DML( schema_in varchar2, name_in varchar2) RETURN varchar2;
+FUNCTION NM_predicate_READ( schema_in varchar2, name_in varchar2) RETURN varchar2;
+FUNCTION NM_predicate_DML( schema_in varchar2, name_in varchar2) RETURN varchar2;
+--
+function HDIR_predicate_read( schema_in varchar2, name_in varchar2) RETURN varchar2;
+function DLC_predicate_read( schema_in varchar2, name_in varchar2) RETURN varchar2;
+
+--
+END nm3nwausec;
+/
