@@ -1,0 +1,76 @@
+CREATE OR REPLACE PACKAGE nm3mapcapture_ins_inv AS
+--<PACKAGE>
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mapcapture_ins_inv.pkh-arc   2.4   Jul 04 2013 16:14:40   James.Wadsworth  $
+--       Module Name      : $Workfile:   nm3mapcapture_ins_inv.pkh  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:14:40  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:16  $
+--       Version          : $Revision:   2.4  $
+--       Based on SCCS version : 1.2
+-------------------------------------------------------------------------
+--   Author : Darren Cope
+--
+--   <<  description >>
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+  --g_sccsid      CONSTANT  varchar2(2000) := '"@(#)nm3mapcapture_ins_inv.pkh	1.2 10/23/03"';
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.4  $';
+--  g_sccsid is the SCCS ID for the package
+--
+  g_inv                     nm_inv_items_all%ROWTYPE;
+  g_date_track_attr_changed boolean DEFAULT FALSE;
+  -- LS Hierarchical Asset Changes
+  TYPE         l_iit_tab_type    IS TABLE OF nm_inv_items%ROWTYPE INDEX BY BINARY_INTEGER;
+  l_iit_tab    l_iit_tab_type ;
+  TYPE         l_iit_ne_tab_type IS TABLE OF nm_inv_items.iit_ne_id%TYPE INDEX BY BINARY_INTEGER;
+  l_iit_ne_tab l_iit_ne_tab_type ;
+  l_mapcap_run Varchar2(1) ;   
+  l_batch_no   Number ;
+  l_recod_no   Number := 0 ;
+  --
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_inv">
+-- Insert or Update Inventory loaded from MapCapture
+PROCEDURE ins_inv (p_inv_rec IN nm_ld_mc_all_inv_tmp%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--<PRAGMA>
+   PRAGMA RESTRICT_REFERENCES (get_version, wnds);
+   PRAGMA RESTRICT_REFERENCES (get_body_version, wnds);
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="run_batch">
+-- Insert or Update Inventory loaded from MapCapture
+PROCEDURE run_batch(pi_batch_no nm_load_batch_status.nlbs_nlb_batch_no%TYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+END nm3mapcapture_ins_inv;
+/

@@ -1,0 +1,121 @@
+CREATE OR REPLACE PACKAGE nm3mapcapture_int AS
+--<PACKAGE>
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mapcapture_int.pkh-arc   2.2   Jul 04 2013 16:14:40   James.Wadsworth  $
+--       Module Name      : $Workfile:   nm3mapcapture_int.pkh  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:14:40  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:16  $
+--       Version          : $Revision:   2.2  $
+--       Based on SCCS version : 1.5
+-------------------------------------------------------------------------
+--   Author : Darren Cope
+--
+--   MapCapture File Loader 
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.2  $';
+--  g_sccsid is the SCCS ID for the package
+--
+  c_headfile_extension  CONSTANT varchar2(3)  := 'mch';
+  c_datafile_extension  CONSTANT varchar2(3)  := 'mcd';
+  c_trailfile_extension CONSTANT varchar2(3)  := 'mct';
+  c_edif_date_format    CONSTANT varchar2(20) := 'DDMMYYYYHH24MI';
+  c_date_format         CONSTANT varchar2(20) := 'DDMMYYYYHH24MI';
+--
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="catch_error">
+-- Procedure used to log an error during the load process.
+-- The errors are batched up and sent by send_error_email
+PROCEDURE catch_error(p_appl    IN hig_errors.her_appl%TYPE DEFAULT nm3type.c_hig
+                     ,p_error   IN hig_errors.her_no%TYPE   DEFAULT 207
+                     ,p_supp    IN varchar2 DEFAULT NULL
+                     ,p_batch   IN varchar2 DEFAULT NULL
+                     ,p_in_prc  IN varchar2 DEFAULT NULL);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_mapcap_email_recipients">
+-- Returns the details of the group to be sent MapCapture emails 
+FUNCTION get_mapcap_email_recipients RETURN nm3mail.tab_recipient;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="send_error_email">
+-- This Procedure sends an email to the MapCapture email group
+PROCEDURE send_error_email(pi_batch IN varchar2 DEFAULT NULL);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="lock_the_batch_for_loading">
+-- This Function return true if the batch can be locked for loading
+-- If the function cannot create the lock or the batch is already locked by another load
+-- then it will return false
+FUNCTION lock_the_batch_for_loading(pi_batch IN varchar2) RETURN boolean;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="clear_lock">
+-- This Procedure clears a batch from the lock table
+PROCEDURE clear_lock (pi_batch IN varchar2);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="batch_loader">
+-- The front end to the MapCapture file loader
+PROCEDURE batch_loader (p_debug IN boolean DEFAULT FALSE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="create_mapcapture_loader_job">
+-- This procedure creates a dbms_job that runs at an interval specified by MAPCAP_INT
+--  The job will load any complete MapCapture batches
+PROCEDURE create_mapcapture_loader_job;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="dropmapcapture_loader_job">
+-- This procedure will stop the loader process by dropping the loader job
+PROCEDURE drop_mapcapture_loader_job;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--<PRAGMA>
+   PRAGMA RESTRICT_REFERENCES (get_version, wnds);
+   PRAGMA RESTRICT_REFERENCES (get_body_version, wnds);
+   PRAGMA RESTRICT_REFERENCES (catch_error, wnds);
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+END nm3mapcapture_int;
+/
