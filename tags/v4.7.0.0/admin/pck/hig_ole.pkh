@@ -1,0 +1,126 @@
+--
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_ole.pkh-arc   2.2   Jul 04 2013 14:52:06   James.Wadsworth  $
+--       Module Name      : $Workfile:   hig_ole.pkh  $
+--       Date into PVCS   : $Date:   Jul 04 2013 14:52:06  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:49:38  $
+--       Version          : $Revision:   2.2  $
+--
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
+/* Formatted on 07/05/2010 16:07:51 (QP5 v5.139.911.3011) */
+CREATE OR REPLACE PACKAGE higole
+AS
+  /*
+  ***************************************************
+  * Package for handling OLE Interface requirements,
+  * these procedures return and handle data requirements
+  * from template entities and supply info to the forms
+  * higole library when running Word Template Reports.
+  *
+ --       sccsid           : @(#)hig_ole.pkh 1.2 09/25/02
+ --       Module Name      : hig_ole.pkh
+ --       Date into SCCS   : 02/09/25 15:54:28
+ --       Date fetched Out : 07/06/13 14:10:25
+ --       SCCS Version     : 1.2
+ --
+ --
+  * *****************************************************
+  */
+
+  FUNCTION strget_template_sql ( strtemplate   IN VARCHAR2
+                               , strpkvalue    IN VARCHAR2 )
+    RETURN VARCHAR2;
+
+  ---Pragma Restrict_References(strGet_Template_SQL, WNDS, WNPS);
+
+  PROCEDURE get_template_sql ( strtemplate   IN     VARCHAR2
+                             , strpkvalue    IN     VARCHAR2
+                             , sql_out          OUT VARCHAR2 );
+
+
+  FUNCTION strget_procedure_columns ( strtemplate   IN VARCHAR2
+                                    , strpkvalue    IN VARCHAR2 )
+    RETURN VARCHAR2;
+
+  FUNCTION strget_template_pk_column ( strtemplatename IN VARCHAR2 )
+    RETURN VARCHAR2;
+
+  FUNCTION strget_template_where ( strtemplatename IN VARCHAR2 )
+    RETURN VARCHAR2;
+
+  FUNCTION strget_template_columns ( strtemplate IN VARCHAR2 )
+    RETURN VARCHAR2;
+
+  FUNCTION bolhas_templates ( strtable IN VARCHAR2 )
+    RETURN BOOLEAN;
+
+  FUNCTION strget_template_from ( strtemplate IN VARCHAR2 )
+    RETURN VARCHAR2;
+
+  FUNCTION strget_template_synonym ( strtemplate IN VARCHAR2 )
+    RETURN VARCHAR2;
+
+  FUNCTION strget_template_procedure ( strtemplate IN VARCHAR2 )
+    RETURN VARCHAR2;
+
+  FUNCTION strget_template_path ( strtemplate IN VARCHAR2 )
+    RETURN VARCHAR2;
+
+  FUNCTION strget_template_path ( strtemplate   IN VARCHAR2
+                                , strui         IN VARCHAR2 )
+    RETURN VARCHAR2;
+
+  FUNCTION intget_template_media ( strtemplate IN VARCHAR2 )
+    RETURN NUMBER;
+
+  FUNCTION intget_template_location ( strtemplate IN VARCHAR2 )
+    RETURN NUMBER;
+
+  FUNCTION get_default_report_type
+    RETURN VARCHAR2;
+
+  FUNCTION strget_sccs_id
+    RETURN VARCHAR2;
+
+  FUNCTION strget_function_type ( strfunction IN VARCHAR2 )
+    RETURN VARCHAR2;
+
+  PROCEDURE copytemplate ( strfromtemplate   IN VARCHAR2
+                         , strtotemplate     IN VARCHAR2 );
+
+  FUNCTION bolparsesql ( strsql IN VARCHAR2, strerror OUT VARCHAR2 )
+    RETURN BOOLEAN;
+
+  /* Overloaded for backward compatibility */
+  FUNCTION bolparsesql ( strsql        IN     VARCHAR2
+                       , strerror         OUT VARCHAR2
+                       , interrorpos      OUT INTEGER )
+    RETURN BOOLEAN;
+
+  PROCEDURE initialise_template_data ( strtemplate   IN VARCHAR2
+                                     , strpkvalue    IN VARCHAR2 );
+
+  FUNCTION strget_template_column_data ( intcolumnpos IN INTEGER )
+    RETURN VARCHAR2;
+
+  PROCEDURE initialise_pk_data ( strsql IN VARCHAR2 );
+
+  FUNCTION strget_template_pk_data ( introwpos IN INTEGER )
+    RETURN VARCHAR2;
+
+  FUNCTION intget_no_of_pks
+    RETURN NUMBER;
+
+  PROCEDURE resequencetemplate ( strtemplate IN VARCHAR2 );
+
+  ---Package level PLSQL Table to hold template data as opposed to a string
+  TYPE g_typvarchartab IS TABLE OF VARCHAR2 ( 2000 )
+                            INDEX BY BINARY_INTEGER;
+
+  g_tabtemplatedata   g_typvarchartab;
+END higole;
+/
