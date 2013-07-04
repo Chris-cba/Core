@@ -1,0 +1,169 @@
+CREATE OR REPLACE PACKAGE nm3xml_load AS
+--<PACKAGE>
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3xml_load.pkh-arc   2.2   Jul 04 2013 16:40:30   James.Wadsworth  $
+--       Module Name      : $Workfile:   nm3xml_load.pkh  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:40:30  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:22  $
+--       Version          : $Revision:   2.2  $
+--       Based on SCCS version : 1.4
+-------------------------------------------------------------------------
+--   Author : I Turnbull
+--
+--   nm3xml_load
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+-- 
+--  g_sccsid is the SCCS ID for the package
+  g_sccsid      CONSTANT  VARCHAR2(2000) := '$Revision:   2.2  $';
+--
+  g_batch_id    NM_XML_LOAD_BATCHES.nxb_batch_id%TYPE;
+  g_records_processed NUMBER;
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="load_inv">
+FUNCTION load_inv ( p_xml CLOB 
+                   ,p_file_type NM_XML_FILES.nxf_file_type%TYPE DEFAULT 'INV_ITEMS' 
+                   ,p_commit   VARCHAR2 DEFAULT 'N'
+                  ) RETURN NUMBER;
+--</PROC>  
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="load_inv">
+FUNCTION load_inv (  p_filelocation VARCHAR2
+                    ,p_filename VARCHAR2
+                    ,p_commit   VARCHAR2 DEFAULT 'N'
+                  )RETURN NUMBER;  
+--</PROC>  
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="call_xml_loader">
+-- Calls the correct XML loader depending the 1st element in the XML clob 
+FUNCTION call_xml_loader( p_xml CLOB 
+                        , p_name VARCHAR2 DEFAULT NULL
+                        , p_commit VARCHAR2 DEFAULT 'N'
+                        )RETURN NUMBER;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="load_nodes">
+-- validate and load the node/points xml file specified
+-- returns the number of rows loaded.
+FUNCTION load_nodes ( p_filelocation VARCHAR2
+                     ,p_filename VARCHAR2
+                    )RETURN NUMBER;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="load_nodes">
+-- validate and load the node/points in the clob
+-- returns the number of rows loaded.
+FUNCTION load_nodes ( p_xml CLOB ) RETURN NUMBER;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="load_datums">
+-- validate and load the datum elements xml file specified
+-- returns the number of rows loaded.
+FUNCTION load_datums ( p_filelocation VARCHAR2
+                     ,p_filename VARCHAR2
+                    )RETURN NUMBER;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="load_datums">
+-- validate and load the datum elements in the clob
+-- returns the number of rows loaded.
+FUNCTION load_datums ( p_xml CLOB ) RETURN NUMBER;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="build_rejected_records">
+-- builds the rejected records
+PROCEDURE build_rejected_records( pi_type     IN VARCHAR2
+                                 ,pi_batch_id IN NUMBER
+                                );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_existing_inv_item">
+--get the iit_ne_id for an inv type at a location - for a temp extent                               
+FUNCTION get_existing_inv_item( pi_inv_type   NM_INV_ITEMS.iit_inv_type%TYPE
+                               ,pi_nte_job_id NM_NW_TEMP_EXTENTS.nte_job_id%TYPE
+                               ,pi_end_date   NM_MEMBERS.nm_end_date%TYPE
+                              )
+RETURN NM_MEMBERS.nm_ne_id_in%TYPE;
+--</PROC>                              
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_existing_inv_item">
+--get the iit_ne_id for an inv type at a location                                 
+FUNCTION   get_existing_inv_item( pi_inv_type NM_INV_ITEMS.iit_inv_type%TYPE
+                                 ,pi_unique   NM_ELEMENTS.ne_unique%TYPE
+                                 ,pi_begin_mp NM_MEMBERS.nm_begin_mp%TYPE
+                                 ,pi_end_mp   NM_MEMBERS.nm_end_mp%TYPE
+                                 ,pi_end_date NM_MEMBERS.nm_end_date%TYPE 
+                                )  
+RETURN NM_MEMBERS.nm_ne_id_in%TYPE;            
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_temp_extent">
+-- get a temp extent for the location of an inv item 
+-- minus the location passed.
+FUNCTION get_temp_extent( pi_iit_ne_id NM_ELEMENTS.ne_id%TYPE
+                         ,pi_ne_id NM_ELEMENTS.ne_id%TYPE
+                         ,pi_begin NM_MEMBERS.nm_begin_mp%TYPE
+                         ,pi_end   NM_MEMBERS.nm_end_mp%TYPE
+                        )
+RETURN NM_ELEMENTS.ne_id%TYPE;                 
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_temp_extent">
+-- get a temp extent for the location of an inv item 
+-- minus the location passed.
+-- using a temp_extent
+FUNCTION get_temp_extent( pi_iit_ne_id NM_ELEMENTS.ne_id%TYPE
+                         ,pi_nte_job_id NM_NW_TEMP_EXTENTS.nte_job_id%TYPE
+                        )
+RETURN NM_ELEMENTS.ne_id%TYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+END nm3xml_load;
+/

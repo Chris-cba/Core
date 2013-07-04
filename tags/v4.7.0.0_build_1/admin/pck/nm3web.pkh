@@ -1,0 +1,472 @@
+CREATE OR REPLACE PACKAGE nm3web IS
+--<PACKAGE>
+--   PVCS Identifiers :-
+--
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3web.pkh-arc   2.2   Jul 04 2013 16:40:30   James.Wadsworth  $
+--       Module Name      : $Workfile:   nm3web.pkh  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:40:30  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:20  $
+--       PVCS Version     : $Revision:   2.2  $
+--       Based on         : 1.33
+--
+--
+--   Author : Jonathan Mills + Kevin Angus
+--
+--   NM3 Web Standard Components package
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+  g_sccsid      CONSTANT  varchar2(2000) := '"$Revision:   2.2  $"';
+--  g_sccsid is the SCCS ID for the package
+--
+   c_nbsp CONSTANT varchar2(6) := CHR(38)||'nbsp;';
+--
+   c_frame_attribs CONSTANT varchar2(30) := 'BORDER=0 NORESIZE';
+
+   c_disabled_attr CONSTANT varchar2(8) := 'DISABLED';
+--
+   TYPE ref_cur IS REF CURSOR;
+
+   g_empty_ident_arr owa_util.ident_arr;
+--
+   g_you_should_not_be_here EXCEPTION;
+--
+   g_web_doc_path CONSTANT hig_option_values.hov_value%TYPE := hig.get_sysopt ('WEBDOCPATH');
+--
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="empty_frame">
+PROCEDURE empty_frame (p_text varchar2 DEFAULT NULL);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="head">
+PROCEDURE head(p_close_head IN boolean  DEFAULT TRUE
+              ,p_title      IN varchar2 DEFAULT NULL
+              ,pi_vml       IN boolean  DEFAULT FALSE
+              );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="header">
+-- This procedure provides a standard header for web pages.
+--
+PROCEDURE header(p_title  IN varchar2 DEFAULT NULL
+                ,p_title2 IN varchar2 DEFAULT NULL
+                ,p_module IN hig_modules.hmo_module%TYPE DEFAULT NULL
+                );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="footer">
+-- This procedure provides a standard footer for web pages.
+--
+PROCEDURE footer(pi_main_link IN boolean DEFAULT TRUE
+                ,pi_back_link IN boolean DEFAULT TRUE
+                );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="logoff">
+-- This procedure displays a standard log off page.
+--
+PROCEDURE logoff;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="close">
+-- This procedure provides closing tags for a web page (body and html).
+--
+PROCEDURE CLOSE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="do_option">
+PROCEDURE do_option (p_name     IN varchar2
+                    ,p_sql      IN varchar2
+                    ,p_nullable IN boolean  DEFAULT FALSE
+                    ,p_value    IN varchar2 DEFAULT NULL
+                    );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="display_table">
+PROCEDURE display_table (p_table_name IN varchar2);
+--</PROC>
+--
+----------------------------------------------------------------------------------------
+--
+--<PROC NAME="js_funcs">
+PROCEDURE js_funcs;
+--</PROC>
+--
+----------------------------------------------------------------------------------------
+--
+--<PROC NAME="js_alert_ner">
+--
+-- This procedure outputs a javascript alert with the text of the specified nm_error
+-- plus any extra text supplied. If pi_return_var is supplied then a confirmation alert
+-- is used with OK/Cancel buttons and the result returned into the variable pi_return_var.
+--
+PROCEDURE js_alert_ner(pi_appl       IN nm_errors.ner_appl%TYPE
+                      ,pi_id         IN nm_errors.ner_id%TYPE
+                      ,pi_extra_text IN varchar2    DEFAULT NULL
+                      ,pi_indent     IN pls_integer DEFAULT 0
+                      ,pi_return_var IN varchar2    DEFAULT NULL
+                      );
+--</PROC>
+--
+----------------------------------------------------------------------------------------
+--
+--<PROC NAME="default_page">
+PROCEDURE default_page;
+--</PROC>
+--
+----------------------------------------------------------------------------------------
+--
+--<PROC NAME="string_to_url">
+-- Replaces any characters icompatible with URLs to their equivalent escape character.
+--   e.g spaces are replaced by '%20'
+--
+FUNCTION string_to_url(pi_str              IN varchar2
+                      ,pi_leave_ampersands IN boolean DEFAULT FALSE
+                      ) RETURN varchar2;
+--</PROC>
+--
+----------------------------------------------------------------------------------------
+--
+--<PROC NAME="url_to_string">
+-- Reverses the replacements of of string_to_url
+--
+FUNCTION url_to_string(pi_str              IN varchar2
+                      ,pi_leave_ampersands IN boolean DEFAULT FALSE
+                      ) RETURN varchar2;
+--</PROC>
+--
+----------------------------------------------------------------------------------------
+--
+--
+--<PROC NAME="run_module">
+-- This procedure runs the given module if current user has permissions.
+-- Module arguments should be passed in consecutive parameters i.e. use pi_param_name1
+-- before pi_param_name2.
+--
+PROCEDURE run_module(pi_module       IN hig_modules.hmo_module%TYPE
+                    ,pi_param_name1  IN varchar2 DEFAULT NULL
+                    ,pi_param_value1 IN varchar2 DEFAULT NULL
+                    ,pi_param_name2  IN varchar2 DEFAULT NULL
+                    ,pi_param_value2 IN varchar2 DEFAULT NULL
+                    ,pi_param_name3  IN varchar2 DEFAULT NULL
+                    ,pi_param_value3 IN varchar2 DEFAULT NULL
+                    ,pi_param_name4  IN varchar2 DEFAULT NULL
+                    ,pi_param_value4 IN varchar2 DEFAULT NULL
+                    ,pi_param_name5  IN varchar2 DEFAULT NULL
+                    ,pi_param_value5 IN varchar2 DEFAULT NULL
+                    ,pi_param_name6  IN varchar2 DEFAULT NULL
+                    ,pi_param_value6 IN varchar2 DEFAULT NULL
+                    );
+--</PROC>
+--
+----------------------------------------------------------------------------------------
+--
+--<PROC NAME="main_menu">
+-- This procedure creates NM3 main frameset. If pi_main_url is not null it is loaded
+-- into the main frame.
+--
+PROCEDURE main_menu(pi_main_url varchar2 DEFAULT NULL
+                   );
+--</PROC>
+--
+----------------------------------------------------------------------------------------
+--
+--<PROC NAME="show_clob">
+-- This procedure outputs the contents of the supplied clob to the web page.
+--
+PROCEDURE show_clob(pi_clob IN clob
+                   );
+--</PROC>
+--
+----------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_host">
+-- This function gets the NM3 Web host URL.
+--
+FUNCTION get_host RETURN varchar2;
+--</PROC>
+--
+----------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_path">
+-- This function gets the NM3 Web path URL.
+--
+FUNCTION get_path RETURN varchar2;
+--</PROC>
+--
+----------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_web_run_module_cmd">
+-- This function gets the NM3 Web run module command string.
+--
+FUNCTION get_web_run_module_cmd (pi_param_name1  varchar2 DEFAULT NULL
+                                ,pi_param_value1 varchar2 DEFAULT NULL
+                                ,pi_param_name2  varchar2 DEFAULT NULL
+                                ,pi_param_value2 varchar2 DEFAULT NULL
+                                ,pi_param_name3  varchar2 DEFAULT NULL
+                                ,pi_param_value3 varchar2 DEFAULT NULL
+                                ,pi_param_name4  varchar2 DEFAULT NULL
+                                ,pi_param_value4 varchar2 DEFAULT NULL
+                                ,pi_param_name5  varchar2 DEFAULT NULL
+                                ,pi_param_value5 varchar2 DEFAULT NULL
+                                ,pi_param_name6  varchar2 DEFAULT NULL
+                                ,pi_param_value6 varchar2 DEFAULT NULL
+                                ) RETURN varchar2;
+--</PROC>
+--
+----------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_browser_cmd">
+-- This function gets the browser command. Checks user and system options (BROWSERPTH)
+-- first, then will use DOS command start.
+--
+FUNCTION get_browser_cmd RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE user_can_run_module_web (p_module varchar2);
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE main_menu_frame;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE failure(pi_error IN varchar2);
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE htp_tab_varchar (p_tab_vc         nm3type.tab_varchar32767
+                          ,p_br_each_line   boolean DEFAULT FALSE
+                          ,p_replace_spaces boolean DEFAULT FALSE
+                          );
+--
+-----------------------------------------------------------------------------
+--
+FUNCTION get_escape_char (p_char varchar2) RETURN varchar2;
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="process_download">
+--  Download a file from the browser to the client
+-- Parameters are pi_name - to download a file from nm_upload_files
+PROCEDURE process_download ( pi_name    IN varchar2 );
+PROCEDURE process_download;
+PROCEDURE download_file_to_client (pi_name    IN varchar2 );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+FUNCTION get_download_url( pi_name varchar2 ) RETURN varchar2;
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="about">
+-- This procedure displays the NM3 Web About page.
+--
+PROCEDURE about;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="about_server_objects">
+-- This procedure displays the NM3 Web About page for serve objects.
+--
+PROCEDURE about_server_objects ( pi_refresh varchar2 DEFAULT NULL );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="load_header_from_main">
+-- This procedure reloads the header frame from within the main frame.
+-- It should only be called from code that is building a page in the main
+-- frame.
+--
+PROCEDURE load_header_from_main(pi_title  IN varchar2 DEFAULT NULL
+                               ,pi_title2 IN varchar2 DEFAULT NULL
+                               ,pi_module IN hig_modules.hmo_module%TYPE DEFAULT NULL
+                               );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="module_startup">
+-- This procedure should be called as the first thing in the body of every
+-- module. It checks security and updates the header frame with relevant
+-- information.
+--
+PROCEDURE module_startup(pi_module IN hig_modules.hmo_module%TYPE
+                        );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="help">
+-- This procedure displays the help page for the specified module or the help
+-- contents if the module is null.
+--
+PROCEDURE help(pi_module IN hig_modules.hmo_module%TYPE DEFAULT NULL
+              );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="auto_refresh">
+-- This procedure outputs a refresh meta tag to load pi_url after pi_interval
+-- seconds.
+--
+PROCEDURE auto_refresh(pi_interval IN pls_integer
+                      ,pi_url      IN varchar2
+                      );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="js_open">
+-- This procedure outputs HTML tags to open a section of javascript.
+--
+PROCEDURE js_open;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="js_close">
+-- This procedure outputs HTML tags to close a section of javascript.
+--
+PROCEDURE js_close;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_client_ip_address">
+-- This function returns the client IP address
+FUNCTION get_client_ip_address RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="replace_chevrons">
+-- Returns a string with <> replaced with CHR(60) and chr(62)
+-- Restriction: You can only pass a string of 4000 chars in length
+FUNCTION replace_chevrons( pi_text IN  varchar2) RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="replace_chevrons">
+-- Returns a string with <> replaced with CHR(60) and chr(62)
+PROCEDURE replace_chevrons( pi_text IN OUT varchar2);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="pop_url_and_back">
+-- Opens a URL in a pop-up window and then goes back to the previous page
+--
+PROCEDURE pop_url_and_back (p_url          IN VARCHAR2
+                           ,p_window_title IN VARCHAR2
+                           ,p_width        IN PLS_INTEGER
+                           ,p_height       IN PLS_INTEGER
+                           ,p_toolbar      IN BOOLEAN DEFAULT FALSE
+                           ,p_location     IN BOOLEAN DEFAULT FALSE
+                           ,p_directories  IN BOOLEAN DEFAULT FALSE
+                           ,p_status       IN BOOLEAN DEFAULT FALSE
+                           ,p_menubar      IN BOOLEAN DEFAULT FALSE
+                           ,p_scrollbars   IN BOOLEAN DEFAULT FALSE
+                           ,p_resizable    IN BOOLEAN DEFAULT FALSE
+                           );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="pop_module_and_back">
+-- Opens a module in a pop-up window and then goes back to the previous page
+--
+PROCEDURE pop_module_and_back (p_module       IN hig_modules.hmo_module%TYPE
+                              ,p_width        IN PLS_INTEGER
+                              ,p_height       IN PLS_INTEGER
+                              ,p_toolbar      IN BOOLEAN DEFAULT FALSE
+                              ,p_location     IN BOOLEAN DEFAULT FALSE
+                              ,p_directories  IN BOOLEAN DEFAULT FALSE
+                              ,p_status       IN BOOLEAN DEFAULT FALSE
+                              ,p_menubar      IN BOOLEAN DEFAULT FALSE
+                              ,p_scrollbars   IN BOOLEAN DEFAULT FALSE
+                              ,p_resizable    IN BOOLEAN DEFAULT FALSE
+                              );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_owa_document_mime_type">
+--
+FUNCTION get_owa_document_mime_type(pi_name varchar2
+                                   ) RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_document_table">
+--
+FUNCTION get_document_table RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="do_close_window_button">
+--
+PROCEDURE do_close_window_button;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PRAGMA>
+   PRAGMA RESTRICT_REFERENCES (get_version, rnds, wnps, wnds);
+   PRAGMA RESTRICT_REFERENCES (get_body_version, rnds, wnps, wnds);
+   PRAGMA RESTRICT_REFERENCES (string_to_url, wnds, wnps);
+   PRAGMA RESTRICT_REFERENCES (get_host, wnds, wnps);
+   PRAGMA RESTRICT_REFERENCES (get_path, wnds, wnps);
+   PRAGMA RESTRICT_REFERENCES (get_web_run_module_cmd, wnds, wnps);
+   PRAGMA RESTRICT_REFERENCES (get_escape_char, rnds, rnps, wnds, wnps);
+   PRAGMA RESTRICT_REFERENCES (get_client_ip_address, wnds, wnps);
+   PRAGMA RESTRICT_REFERENCES (get_download_url, wnds, wnps, trust);
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+END nm3web;
+/
