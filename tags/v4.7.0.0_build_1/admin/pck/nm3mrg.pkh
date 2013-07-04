@@ -1,0 +1,384 @@
+CREATE OR REPLACE PACKAGE nm3mrg IS
+--<PACKAGE>
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mrg.pkh-arc   2.2   Jul 04 2013 16:16:48   James.Wadsworth  $
+--       Module Name      : $Workfile:   nm3mrg.pkh  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:16:48  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:16  $
+--       Version          : $Revision:   2.2  $
+--       Based on SCCS version : 1.19
+-------------------------------------------------------------------------
+--
+--   Author : Jonathan Mills
+--
+--     nm3mrg package. Used for Merge Queries
+--
+------------------------------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+------------------------------------------------------------------------------------------------
+--</PACKAGE>
+--all global package variables here
+--<GLOBVAR>
+--  g_sccsid is the SCCS_ID
+   g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.2  $';
+--
+-- Global TYPE declarations
+--
+-- types for storing query definition data
+--
+  TYPE tab_mrg_qry_types    IS TABLE OF nm_mrg_query_types%ROWTYPE        INDEX BY binary_integer;
+  TYPE tab_mrg_qry_attribs  IS TABLE OF nm_mrg_query_attribs%ROWTYPE      INDEX BY binary_integer;
+  TYPE tab_mrg_qry_values   IS TABLE OF nm_mrg_query_values%ROWTYPE       INDEX BY binary_integer;
+  TYPE tab_mrg_sections     IS TABLE OF nm_mrg_sections%ROWTYPE           INDEX BY binary_integer;
+  TYPE tab_mrg_sect_members IS TABLE OF nm_mrg_section_members%ROWTYPE    INDEX BY binary_integer;
+  TYPE tab_mrg_sect_mem_inv IS TABLE OF nm_mrg_section_member_inv%ROWTYPE INDEX BY binary_integer;
+  TYPE tab_mrg_sect_inv_val IS TABLE OF nm_mrg_section_inv_values%ROWTYPE INDEX BY binary_integer;
+  TYPE tab_datatype         IS TABLE OF user_tab_columns.data_type%TYPE   INDEX BY binary_integer;
+--
+  g_tab_pbi_conditions       nm3pbi.tab_varchar20;
+  g_tab_pbi_cond_values_reqd nm3pbi.tab_number;
+  l_rec_nsv                  nm_mrg_section_inv_values%ROWTYPE;
+  g_single_point_merge BOOLEAN;
+--
+--
+-- These are the system_options names for the splitting of results
+--  on POE and change of route
+  c_sysopt_name_poe_split   CONSTANT hig_options.hop_id%TYPE := 'MRGPOE';
+  c_sysopt_name_route_split CONSTANT hig_options.hop_id%TYPE := 'MRGROUTE';
+--
+-- exception message variables
+--
+   g_mrg_exception EXCEPTION;
+   g_mrg_exc_code  number;
+   g_mrg_exc_msg   varchar2(4000);
+   --
+   -- variables for storing query definition data
+   --
+   g_rec_query                  nm_mrg_query%ROWTYPE;
+   g_tab_rec_query_types        tab_mrg_qry_types;
+   g_tab_rec_query_attribs      tab_mrg_qry_attribs;
+   g_tab_query_attrib_datatypes tab_datatype;
+   g_tab_rec_query_values       tab_mrg_qry_values;
+   g_tab_rec_nita               nm3inv.tab_nita;
+   g_tab_rec_nit                nm3inv.tab_nit;
+   --
+   g_tab_mrg_sect_inv_val       tab_mrg_sect_inv_val; -- Used for point items
+   --
+   -- Other variables
+   --
+   g_query_sql                   long;
+   --
+   c_temp_table_name             varchar2(30) := 'NM_MRG_QUERY_RESULTS_TEMP';
+   c_attrib_column_prefix        varchar2(28) := 'ATTRIB';
+   --
+   TYPE rec_inv_type_xsp IS RECORD
+      (query_type_id         binary_integer
+      ,inv_type              nm_inv_types.nit_inv_type%TYPE
+      ,x_sect                nm_inv_items.iit_x_sect%TYPE
+      ,pnt_or_cont           nm_inv_types.nit_pnt_or_cont%TYPE
+      ,ft_name               nm_inv_types.nit_table_name%TYPE
+      ,ft_ne_column_name     nm_inv_types.nit_lr_ne_column_name%TYPE
+      ,ft_st_chain           nm_inv_types.nit_lr_st_chain%TYPE
+      ,ft_end_chain          nm_inv_types.nit_lr_end_chain%TYPE
+      ,foreign_pk_column     nm_inv_types.nit_foreign_pk_column%TYPE
+      );
+--
+   TYPE tab_rec_inv_type_xsp IS TABLE OF rec_inv_type_xsp INDEX BY binary_integer;
+   g_tab_rec_inv_type_xsp tab_rec_inv_type_xsp;
+   --
+   TYPE rec_start_pos IS RECORD
+      (ne_id         nm_members.nm_ne_id_of%TYPE
+      ,position_mp   number
+      );
+   TYPE tab_rec_start_pos IS TABLE OF rec_start_pos INDEX BY binary_integer;
+   g_tab_rec_start_pos tab_rec_start_pos;
+   --
+   TYPE rec_members IS RECORD
+      (mrg_section_id    number
+      ,ne_id         nm_members.nm_ne_id_of%TYPE
+      ,begin_mp      number
+      ,end_mp        number
+      ,measure       number
+      );
+   TYPE tab_rec_members IS TABLE OF rec_members INDEX BY binary_integer;
+   g_tab_rec_members tab_rec_members;
+--
+  g_poe_split   CONSTANT boolean := (hig.get_sysopt(c_sysopt_name_poe_split)   = 'Y');
+  g_route_split CONSTANT boolean := (hig.get_sysopt(c_sysopt_name_route_split) = 'Y');
+--
+  g_mrg_date_format CONSTANT varchar2(15) := 'DD-MON-YYYY';
+--
+   g_running_merge boolean := FALSE;
+--
+   g_resequence_reqd  boolean;
+--
+--</GLOBVAR>
+--
+------------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_version">
+-- This function returns the SCCS version information
+  FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+------------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_body_version">
+-- This function returns the SCCS version information for the package body
+  FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+------------------------------------------------------------------------------------------------
+--
+--<PROC NAME="execute_mrg_query">
+-- This procedure executes a given merge query and creates rows in the relevant tables
+PROCEDURE execute_mrg_query
+             (pi_query_id      IN     nm_mrg_query.nmq_id%TYPE
+             ,pi_nte_job_id    IN     nm_members.nm_ne_id_in%TYPE
+             ,pi_description   IN     nm_mrg_query_results.nqr_description%TYPE
+             ,po_result_job_id IN OUT nm_mrg_query_results.nqr_mrg_job_id%TYPE
+             );
+PROCEDURE execute_mrg_query
+             (pi_query_id      IN     nm_mrg_query.nmq_id%TYPE
+             ,pi_nte_job_id    IN     nm_members.nm_ne_id_in%TYPE
+             ,pi_description   IN     nm_mrg_query_results.nqr_description%TYPE
+             ,pi_admin_unit    IN     nm_mrg_query_results.nqr_admin_unit%TYPE
+             ,po_result_job_id IN OUT nm_mrg_query_results.nqr_mrg_job_id%TYPE
+             );
+-- Possible exceptions raised are the same as those for <I>validate_mrg_query</I> as well as
+--  the following
+-- -20909 Fatal error in NM3MRG. Point item exists on more than 1 NM_MRG_SECTION_MEMBERS record
+--</PROC>
+--
+------------------------------------------------------------------------------------------------
+--
+--<PROC NAME="validate_mrg_query">
+-- This procedure validates a given NM_MRG_QUERY record
+PROCEDURE validate_mrg_query(pi_query_id IN nm_mrg_query.nmq_id%TYPE);
+-- Possible exceptions raised are
+-- -20901 Query not found
+-- -20902 INV_TYPE + XSP combination specified more than once
+-- -20903 No query types defined
+-- -20904 NM_MRG_QUERY_ATTRIBS has condition but invalid number of NM_MRG_QUERY_VALUES defined
+-- -20905 NM_MRG_QUERY_TYPES has no NM_MRG_QUERY_ATTRIBS defined
+-- -20906 NM_INV_TYPE_ATTRIBS record not found
+-- -20907 Too many NM_MRG_QUERY_ATTRIBS records for the temporary table
+-- -20908 No XSP_RESTRAINTS record(s) found
+--</PROC>
+--
+------------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_nmq_id">
+-- This function returns next NMQ_ID_SEQ from a sequence
+FUNCTION get_nmq_id RETURN number;
+--</PROC>
+--
+------------------------------------------------------------------------------------------------
+--
+--<PROC NAME="valid_pbi_condition_values">
+-- This function returns TRUE id the number of values is valid for a particular condition
+FUNCTION valid_pbi_condition_values (pi_condition    IN varchar2
+                                    ,pi_values_count IN number
+                                    ) RETURN boolean;
+--</PROC>
+--
+------------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_tab_column_details">
+-- This function returns the specified row from USER_TAB_COLUMNS
+FUNCTION get_tab_column_details (pi_table_name  IN user_tab_columns.table_name%TYPE
+                                ,pi_column_name IN user_tab_columns.column_name%TYPE
+                                ) RETURN user_tab_columns%ROWTYPE;
+--</PROC>
+--
+------------------------------------------------------------------------------------------------
+--
+--<PROC NAME="defaults_extst">
+-- This function returns TRUE if any merge defaults exist in the system
+FUNCTION defaults_exist RETURN boolean;
+--</PROC>
+--
+------------------------------------------------------------------------------------------------
+--
+--<PROC NAME="defaults_exist">
+-- This function returns TRUE if defaults are present in the specified query
+FUNCTION defaults_in_query(pi_query_id IN nm_mrg_query.nmq_id%TYPE
+                          ) RETURN boolean;
+--</PROC>
+--
+------------------------------------------------------------------------------------------------
+--
+--<PROC NAME="add_defaults">
+-- This procedure adds the default types to a query
+PROCEDURE add_defaults (pi_query_id IN nm_mrg_query.nmq_id%TYPE);
+-- Possible exceptions raised are
+-- -20911 Query already has defaults. Use REFRESH_DEFAULTS procedure
+--</PROC>
+--
+------------------------------------------------------------------------------------------------
+--
+--<PROC NAME="refresh_defaults">
+-- This procedure refreshes the default types to a query
+PROCEDURE refresh_defaults (pi_query_id IN nm_mrg_query.nmq_id%TYPE);
+--</PROC>
+--
+------------------------------------------------------------------------------------------------
+--
+--<PROC NAME="refresh_all_defaults">
+-- This procedure refreshes the default types for all queries
+PROCEDURE refresh_all_defaults;
+--</PROC>
+--
+------------------------------------------------------------------------------------------------
+--
+--<PROC NAME="count_query_results">
+-- This procedure counts how many query_results records there are for a given query_id
+FUNCTION count_query_results (p_nmq_id IN number) RETURN number;
+--</PROC>
+--
+------------------------------------------------------------------------------------------------
+--
+--<PROC NAME="delete_query_results">
+-- This procedure deletes all query_results for a given query_id
+PROCEDURE delete_query_results (p_nmq_id IN number);
+--
+-- Possible excpetions raised are
+-- -20912  Another user has a nm_mrg_query_results record locked
+--
+--</PROC>
+--
+------------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_mrg_section">
+-- This procedure returns the specified NM_MRG_SECTIONS record
+--
+FUNCTION get_mrg_section (p_mrg_job_id     IN nm_mrg_sections.nms_mrg_job_id%TYPE
+                         ,p_mrg_section_id IN nm_mrg_sections.nms_mrg_section_id%TYPE
+                         ) RETURN nm_mrg_sections%ROWTYPE;
+--
+-- Possible excpetions raised are
+-- -20910  NM_MRG_SECTIONS record not found
+--
+--</PROC>
+--
+------------------------------------------------------------------------------------------------
+--
+--<PROC NAME="select_mrg_query">
+-- This procedure returns the specified NM_MRG_QUERY record
+--
+FUNCTION select_mrg_query (pi_query_id IN nm_mrg_query.nmq_id%TYPE) RETURN nm_mrg_query%ROWTYPE;
+--
+-- Possible exceptions raised are
+-- -20901 Query not found
+--
+--</PROC>
+--
+------------------------------------------------------------------------------------------------
+--
+FUNCTION get_parent_ne_id_from_temp (p_ne_id IN number) RETURN number;
+--
+------------------------------------------------------------------------------------------------
+--
+--<PROC NAME="create_remove_transient_job">
+-- This procedure creates the DBMS_JOB required to remove transient merge queries. It will run
+--  for the first time at the time specified and then run at the interval specified.
+-- With the defaults specified it will run Tomorrow at midnight and then every day following at
+--  midnight
+--
+PROCEDURE create_remove_transient_job (p_first_run DATE     DEFAULT TRUNC(SYSDATE+1)
+                                      ,p_next_run  varchar2 DEFAULT 'trunc(sysdate)+1'
+                                      );
+--</PROC
+--
+------------------------------------------------------------------------------------------------
+--
+--<PROC NAME="remove_transient_results">
+-- This procedure removes any results for merge jobs which are marked as transient
+--
+PROCEDURE remove_transient_results;
+--</PROC>
+--
+------------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_nmq_id_from_unique">
+--
+FUNCTION get_nmq_id_from_unique (p_nmq_unique nm_mrg_query.nmq_unique%TYPE
+                                ) RETURN nm_mrg_query.nmq_id%TYPE;
+--
+-- Possible exceptions raised are
+-- -20901 Query not found
+--
+--</PROC>
+--
+------------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_results_by_value_id"
+PROCEDURE get_results_by_value_id (pi_nmq_id        IN     nm_mrg_query_results.nqr_nmq_id%TYPE
+                                  ,pi_job_id        IN     nm_mrg_query_results.nqr_mrg_job_id%TYPE
+                                  ,pi_value_id      IN     nm_mrg_section_inv_values.nsv_value_id%TYPE
+                                  ,po_tab_scrn_text    OUT nm3type.tab_varchar2000
+                                  ,po_tab_value        OUT nm3type.tab_varchar2000
+                                  );
+--</PROC>
+--
+------------------------------------------------------------------------------------------------
+--
+--<PROC NAME="select_nqr">
+-- This function selects the specified NM_MRG_QUERY_RESULTS record
+--
+FUNCTION select_nqr (pi_job_id IN nm_mrg_query_results.nqr_mrg_job_id%TYPE) RETURN nm_mrg_query_results%ROWTYPE;
+--</PROC>
+--
+------------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_invalid_mrg_qry_defaults">
+-- This function returns a PL/SQL table containing the inventory types which are specified
+--  in NM_MRG_DEFAULT_QUERY_TYPES which do not have any NM_MRG_DEFAULT_QUERY_ATTRIBS specified
+--
+FUNCTION get_invalid_mrg_qry_defaults RETURN nm3type.tab_number;
+--</PROC>
+--
+------------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_ndq">
+-- This function returns the row from nm_mrg_default_query_types for pi_ndq_seq_no.
+--
+FUNCTION get_ndq(pi_ndq_seq_no IN nm_mrg_default_query_types.ndq_seq_no%TYPE
+                ) RETURN nm_mrg_default_query_types%ROWTYPE;
+--</PROC>
+--
+------------------------------------------------------------------------------------------------
+--
+FUNCTION execute_sql (pi_sql_string IN long) RETURN binary_integer;
+--
+------------------------------------------------------------------------------------------------
+--
+FUNCTION get_nm_mrg_query_staging_seq RETURN number;
+--
+------------------------------------------------------------------------------------------------
+--
+FUNCTION get_ita_for_mrg (p_inv_type VARCHAR2, p_attrib VARCHAR2) RETURN nm_inv_type_attribs%ROWTYPE;
+--
+------------------------------------------------------------------------------------------------
+--
+--<PRAGMA>
+   PRAGMA RESTRICT_REFERENCES (get_version, wnds, wnps, rnds );
+   PRAGMA RESTRICT_REFERENCES (get_body_version, wnds, wnps, rnds );
+   PRAGMA RESTRICT_REFERENCES (valid_pbi_condition_values, wnds);
+   PRAGMA RESTRICT_REFERENCES (get_tab_column_details, wnds);
+   PRAGMA RESTRICT_REFERENCES (count_query_results, wnds);
+   PRAGMA RESTRICT_REFERENCES (get_mrg_section, wnds);
+   PRAGMA RESTRICT_REFERENCES (select_mrg_query, wnds);
+   PRAGMA RESTRICT_REFERENCES (get_parent_ne_id_from_temp, wnds);
+   PRAGMA RESTRICT_REFERENCES (defaults_exist, wnds);
+   PRAGMA RESTRICT_REFERENCES (defaults_in_query, wnds);
+   PRAGMA RESTRICT_REFERENCES (get_nmq_id_from_unique, wnds);
+   PRAGMA RESTRICT_REFERENCES (select_nqr, wnds);
+   PRAGMA RESTRICT_REFERENCES (get_invalid_mrg_qry_defaults, wnds);
+   PRAGMA RESTRICT_REFERENCES (get_ndq, wnds);
+--</PRAGMA>
+--
+END nm3mrg;
+/
