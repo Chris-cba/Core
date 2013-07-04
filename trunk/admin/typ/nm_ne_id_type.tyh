@@ -2,13 +2,15 @@ CREATE OR REPLACE TYPE nm_ne_id_type AS OBJECT(
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/typ/nm_ne_id_type.tyh-arc   3.0   Jun 01 2009 09:48:48   lsorathia  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/typ/nm_ne_id_type.tyh-arc   3.1   Jul 04 2013 10:16:00   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm_ne_id_type.tyh  $
---       Date into PVCS   : $Date:   Jun 01 2009 09:48:48  $
---       Date fetched Out : $Modtime:   Jun 01 2009 09:43:48  $
---       Version          : $Revision:   3.0  $
+--       Date into PVCS   : $Date:   Jul 04 2013 10:16:00  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 10:15:44  $
+--       Version          : $Revision:   3.1  $
 --       Based on SCCS version : 
--------------------------------------------------------------------------
+------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+------------------------------------------------------------------
 ne_id NUMBER);
 /
 
