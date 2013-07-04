@@ -1,18 +1,18 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/views/v_nm_ordered_route_details.vw-arc   1.1   May 02 2013 14:20:08   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/views/v_nm_ordered_route_details.vw-arc   1.2   Jul 04 2013 11:23:50   James.Wadsworth  $
 --       Module Name      : $Workfile:   v_nm_ordered_route_details.vw  $
---       Date into PVCS   : $Date:   May 02 2013 14:20:08  $
---       Date fetched Out : $Modtime:   May 02 2013 14:19:38  $
---       PVCS Version     : $Revision:   1.1  $
+--       Date into PVCS   : $Date:   Jul 04 2013 11:23:50  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 10:33:42  $
+--       PVCS Version     : $Revision:   1.2  $
 --
 --   Author : R.A. Coupe
 --
 --   View to assist in linear routes rescale (not suitable for divided highways)
 --
 -----------------------------------------------------------------------------
--- Copyright (c) exor corporation ltd, 2001
+-- Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 ----------------------------------------------------------------------------
 --
 CREATE OR REPLACE FORCE VIEW V_NM_ORDERED_ROUTE_DETAILS

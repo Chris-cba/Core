@@ -33,7 +33,7 @@ AS
 --       SCCS Version     : 1.4
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2004
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
           "NM_NE_ID_IN", "NM_NE_ID_OF", "NE_UNIQUE", "NM_TYPE", "NM_OBJ_TYPE",
           "NM_BEGIN_MP", "NM_START_DATE", "NM_END_DATE", "NM_END_MP",

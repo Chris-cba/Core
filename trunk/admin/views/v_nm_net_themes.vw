@@ -18,7 +18,7 @@ AS
 --       SCCS Version     : 1.2
 --
 -----------------------------------------------------------------------------
---  Copyright (c) exor corporation ltd, 2006
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 SELECT "VNNT_NTH_THEME_ID", "VNNT_NTH_THEME_NAME",
        "VNNT_NTH_BASE_TABLE_THEME", "VNNT_TYPE", "VNNT_NT_TYPE",

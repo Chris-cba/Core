@@ -1,18 +1,18 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       Pvcs Details     : $Header:   //vm_latest/archives/nm3/admin/views/v_nm_ordered_members.vw-arc   1.2   Apr 24 2013 15:15:34   Rob.Coupe  $
+--       Pvcs Details     : $Header:   //vm_latest/archives/nm3/admin/views/v_nm_ordered_members.vw-arc   1.3   Jul 04 2013 11:23:50   James.Wadsworth  $
 --       Module Name      : $Workfile:   v_nm_ordered_members.vw  $
---       Date into PVCS   : $Date:   Apr 24 2013 15:15:34  $
---       Date fetched Out : $Modtime:   Apr 24 2013 15:13:34  $
---       PVCS Version     : $Revision:   1.2  $
+--       Date into PVCS   : $Date:   Jul 04 2013 11:23:50  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 10:33:42  $
+--       PVCS Version     : $Revision:   1.3  $
 --
 --   Author : R.A. Coupe
 --
 --   View designed to ease the reading of route connectivity 
 --
 -----------------------------------------------------------------------------
--- Copyright (c) exor corporation ltd, 2001
+-- Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 ----------------------------------------------------------------------------
 CREATE OR REPLACE FORCE VIEW V_NM_ORDERED_MEMBERS
 (
