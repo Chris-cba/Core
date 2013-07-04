@@ -4,13 +4,15 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3info_tool.pkh-arc   3.1   May 20 2010 14:07:12   cstrettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3info_tool.pkh-arc   3.2   Jul 04 2013 16:06:22   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3info_tool.pkh  $
---       Date into PVCS   : $Date:   May 20 2010 14:07:12  $
---       Date fetched Out : $Modtime:   May 20 2010 14:03:04  $
---       Version          : $Revision:   3.1  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:06:22  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 16:06:14  $
+--       Version          : $Revision:   3.2  $
 --       Based on SCCS version : 
--------------------------------------------------------------------------
+------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
 
@@ -18,7 +20,7 @@ AS
   --constants
   -----------
   --g_sccsid is the SCCS ID for the package
-  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.1  $';
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.2  $';
   g_return_value nm_code_name_meaning_tbl := NEW nm_code_name_meaning_tbl();
 
 --</GLOBVAR>
