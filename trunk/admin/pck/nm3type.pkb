@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY nm3type AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3type.pkb-arc   2.1   Jan 05 2010 11:06:42   cstrettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3type.pkb-arc   2.2   Jul 04 2013 16:35:52   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3type.pkb  $
---       Date into PVCS   : $Date:   Jan 05 2010 11:06:42  $
---       Date fetched Out : $Modtime:   Jan 05 2010 11:06:06  $
---       Version          : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:35:52  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:20  $
+--       Version          : $Revision:   2.2  $
 --       Based on SCCS version : 1.6 
 -------------------------------------------------------------------------
 --
@@ -16,13 +16,13 @@ CREATE OR REPLACE PACKAGE BODY nm3type AS
 --   Types package
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2001
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 --all global package variables here
 --
 --  g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.1  $';
+  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.2  $';
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3type';
 --

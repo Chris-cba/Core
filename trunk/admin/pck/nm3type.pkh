@@ -2,13 +2,16 @@ CREATE OR REPLACE PACKAGE nm3type AS
 --<PACKAGE>
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3type.pkh-arc   2.2   Aug 20 2008 15:27:18   smarshall  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3type.pkh-arc   2.3   Jul 04 2013 16:35:52   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3type.pkh  $
---       Date into PVCS   : $Date:   Aug 20 2008 15:27:18  $
---       Date fetched Out : $Modtime:   Aug 20 2008 15:26:30  $
---       PVCS Version     : $Revision:   2.2  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:35:52  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 16:33:54  $
+--       PVCS Version     : $Revision:   2.3  $
 --       Based on SCCS version :  1.34
 --
+------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+------------------------------------------------------------------
 --
 --   Author : Jonathan Mills
 --
@@ -21,11 +24,11 @@ CREATE OR REPLACE PACKAGE nm3type AS
 --    other packages will reference this one
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2001
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
-   g_sccsid      CONSTANT  varchar2(2000) :='"$Revision:   2.2  $"';
+   g_sccsid      CONSTANT  varchar2(2000) :='"$Revision:   2.3  $"';
 --  g_sccsid is the SCCS ID for the package
 --
    SUBTYPE max_varchar2 IS varchar2(32767);
