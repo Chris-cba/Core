@@ -9,6 +9,9 @@ create or replace package body inv as
 --       Date into SCCS   : 01/03/01 16:23:06  -- 99/12/21 15:45:27
 --       Date fetched Out : 07/06/13 14:10:39  -- 00/09/06 12:20:24
 --       SCCS Version     : 1.1      -- 1.4
+------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+------------------------------------------------------------------
 --
 --   The Inventory library package.
 --
