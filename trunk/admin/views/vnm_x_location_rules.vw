@@ -13,7 +13,7 @@ select
 -- VNM_X_LOCATION_RULES
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2001
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
  a.*, nm3inv_xattr.get_loc_constraint( a.nxl_rule_id ) nxl_constraint
 from nm_x_location_rules a
