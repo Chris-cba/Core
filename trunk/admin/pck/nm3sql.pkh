@@ -2,11 +2,11 @@ CREATE OR REPLACE package nm3sql as
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sql.pkh-arc   2.2   Feb 25 2011 10:48:18   Steve.Cooper  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sql.pkh-arc   2.3   Jul 04 2013 16:32:58   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3sql.pkh  $
---       Date into PVCS   : $Date:   Feb 25 2011 10:48:18  $
---       Date fetched Out : $Modtime:   Feb 24 2011 16:26:38  $
---       PVCS Version     : $Revision:   2.2  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:32:58  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:20  $
+--       PVCS Version     : $Revision:   2.3  $
 --       Based on sccs version : 
 --
 --   Author : Priidu Tanava
@@ -14,10 +14,10 @@ CREATE OR REPLACE package nm3sql as
 --   package for generic context 'sql' used to pass bind variables into views
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2005
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
-  g_sccsid      CONSTANT  varchar2(2000) := '"$Revision:   2.2  $"';
+  g_sccsid      CONSTANT  varchar2(2000) := '"$Revision:   2.3  $"';
   
   subtype id_type   is number(9);
   subtype code_type is varchar2(80);

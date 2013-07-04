@@ -4,23 +4,25 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 --
 ---   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.77   Oct 18 2012 12:47:20   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.78   Jul 04 2013 16:32:58   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3sdo.pkb  $
---       Date into PVCS   : $Date:   Oct 18 2012 12:47:20  $
---       Date fetched Out : $Modtime:   Oct 18 2012 12:44:58  $
---       PVCS Version     : $Revision:   2.77  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:32:58  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 16:24:36  $
+--       PVCS Version     : $Revision:   2.78  $
 --       Based on
-
+------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+------------------------------------------------------------------
 --
 --   Author : Rob Coupe
 --
 --   NM3 Package for Oracle Spatial links
 --
 -------------------------------------------------------------------------------
--- Copyright (c) RAC
+-- Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 
-   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.77  $"';
+   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.78  $"';
    g_package_name    CONSTANT VARCHAR2 (30)  := 'NM3SDO';
    g_batch_size      INTEGER                 := NVL( TO_NUMBER(Hig.get_sysopt('SDOBATSIZE')), 10);
    g_clip_type       VARCHAR2(30)            := NVL(Hig.get_sysopt('SDOCLIPTYP'),'SDO');
