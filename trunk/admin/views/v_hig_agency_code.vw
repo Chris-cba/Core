@@ -17,7 +17,7 @@ SELECT
 --   Used as part of the network model validation
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2006
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 ----------------------------------------------------------------------------- 
           hau_authority_code agency_code
         , hau_name
