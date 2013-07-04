@@ -1,0 +1,44 @@
+CREATE OR REPLACE TYPE BODY nm_value_distribution IS
+--
+-----------------------------------------------------------------------------
+--
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)nm_value_distribution.tyb	1.1 01/17/02
+--       Module Name      : nm_value_distribution.tyb
+--       Date into SCCS   : 02/01/17 15:55:38
+--       Date fetched Out : 07/06/13 17:04:54
+--       SCCS Version     : 1.1
+--
+--    TYPE BODY nm_value_distribution
+--
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
+--
+------------------------------------------------------------------------------------------------
+--
+STATIC FUNCTION get_body_version RETURN VARCHAR2 IS
+BEGIN
+   RETURN '"@(#)nm_value_distribution.tyb	1.1 01/17/02"';
+END get_body_version;
+--
+------------------------------------------------------------------------------------------------
+--
+MEMBER FUNCTION return_string RETURN VARCHAR2 IS
+BEGIN
+   RETURN 'Value '
+        ||NVL(SELF.nvd_value,'#Null#')
+        ||'.Length '
+        ||SELF.nvd_length
+        ||'.Count '
+        ||SELF.nvd_item_count
+        ||'.Pct Total Len '
+        ||SELF.nvd_pct_total_length;
+END return_string;
+--
+------------------------------------------------------------------------------------------------
+--
+end;
+/

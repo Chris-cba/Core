@@ -1,0 +1,31 @@
+CREATE OR REPLACE TYPE PTR_num_ARRAY AS 
+OBJECT ( 
+-----------------------------------------------------------------------------
+--
+--
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)ptr_num_array.tyh	1.2 07/24/06
+--       Module Name      : ptr_num_array.tyh
+--       Date into SCCS   : 06/07/24 14:54:54
+--       Date fetched Out : 07/06/13 17:05:03
+--       SCCS Version     : 1.2
+--
+--   Author : Rob Coupe
+--
+--
+--   TYPE ptr_num_array
+--
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
+pa ptr_num_array_type 
+, MEMBER PROCEDURE DEBUG
+, MEMBER FUNCTION get_id ( p_value IN INTEGER ) RETURN INTEGER
+, MEMBER FUNCTION get_idx_from_id( p_id IN INTEGER ) RETURN INTEGER
+, MEMBER FUNCTION get_idx_from_value( p_value IN INTEGER ) RETURN INTEGER
+, MEMBER FUNCTION get_distinct_ptr RETURN ptr_num_array
+, MEMBER FUNCTION is_empty RETURN BOOLEAN
+);
+/

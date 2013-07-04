@@ -1,0 +1,34 @@
+CREATE OR REPLACE type body ptr_num is
+-----------------------------------------------------------------------------
+--
+--
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)ptr_num.tyb	1.1 02/14/06
+--       Module Name      : ptr_num.tyb
+--       Date into SCCS   : 06/02/14 15:26:46
+--       Date fetched Out : 07/06/13 17:05:01
+--       SCCS Version     : 1.1
+--
+--   Author : Rob Coupe
+--
+--
+--   TYPE ptr_array
+--
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
+
+order member function match ( p_ptr in ptr_num ) return integer is
+begin
+  if p_ptr.ptr_value > self.ptr_value then
+    return -1;
+  elsif p_ptr.ptr_value < self.ptr_value then
+    return 1;
+  else
+    return 0;
+  end if;
+end;
+end;
+/

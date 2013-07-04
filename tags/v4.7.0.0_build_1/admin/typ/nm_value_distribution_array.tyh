@@ -1,0 +1,43 @@
+CREATE OR REPLACE TYPE nm_value_distribution_array AS object
+ (
+--
+-----------------------------------------------------------------------------
+--
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)nm_value_distribution_array.tyh	1.1 01/17/02
+--       Module Name      : nm_value_distribution_array.tyh
+--       Date into SCCS   : 02/01/17 15:56:25
+--       Date fetched Out : 07/06/13 17:04:56
+--       SCCS Version     : 1.1
+--
+--    TYPE nm_value_distribution_array
+--
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
+  nvda_value_distribution_array    nm_value_distribution_arr_type
+ ,nvda_total_length                NUMBER
+ ,nvda_most_numerous               VARCHAR2(4000)
+ ,nvda_most_numerous_index         NUMBER
+ ,nvda_most_numerous_amount        NUMBER
+ ,nvda_highest_pct                 VARCHAR2(4000)
+ ,nvda_highest_pct_index           NUMBER
+ ,nvda_highest_pct_amount          NUMBER
+ --
+ ,member FUNCTION add_value       (p_value VARCHAR2, p_length NUMBER) RETURN nm_value_distribution_array
+ ,member FUNCTION is_empty         RETURN boolean
+ ,STATIC FUNCTION get_body_version RETURN VARCHAR2
+ ,member FUNCTION value_dist_count RETURN NUMBER
+ ,member FUNCTION compute_stats  (p_dec_places IN NUMBER DEFAULT NULL) RETURN nm_value_distribution_array
+ ,member FUNCTION get_entry (value_dist_arr_pos IN INTEGER) RETURN nm_value_distribution
+ --
+ ,PRAGMA RESTRICT_REFERENCES (get_body_version, wnds, rnds, rnps, wnps)
+ ,PRAGMA RESTRICT_REFERENCES (is_empty, wnds, rnds, rnps, wnps)
+ ,PRAGMA RESTRICT_REFERENCES (value_dist_count, wnds, rnds, rnps, wnps)
+ ,PRAGMA RESTRICT_REFERENCES (compute_stats, wnds, rnps, wnps)
+ ,PRAGMA RESTRICT_REFERENCES (get_entry, wnds, rnds, rnps, wnps)
+ --
+ )
+/

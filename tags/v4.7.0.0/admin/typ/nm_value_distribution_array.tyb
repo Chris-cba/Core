@@ -1,0 +1,241 @@
+create or replace type body nm_value_distribution_array is
+--
+-----------------------------------------------------------------------------
+--
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)nm_value_distribution_array.tyb	1.4 09/07/06
+--       Module Name      : nm_value_distribution_array.tyb
+--       Date into SCCS   : 06/09/07 14:06:53
+--       Date fetched Out : 07/06/13 17:04:56
+--       SCCS Version     : 1.4
+--
+--  Author : Jonathan Mills
+--
+--   nm_value_distribution_array type body
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
+--
+------------------------------------------------------------------------------------------------
+--
+--
+------------------------------------------------------------------------------------------------
+--
+STATIC FUNCTION get_body_version RETURN VARCHAR2 IS
+BEGIN
+   RETURN '"@(#)nm_value_distribution_array.tyb	1.4 09/07/06"';
+END get_body_version;
+--
+------------------------------------------------------------------------------------------------
+--
+member FUNCTION add_value  (p_value VARCHAR2, p_length NUMBER) RETURN nm_value_distribution_array IS
+--
+   l_retval     nm_value_distribution_array := SELF;
+   l_index      NUMBER;
+   l_val_dist   nm_value_distribution;
+--
+   -- MJA log 703512
+   --c_nvl_char   CONSTANT VARCHAR2(4) := '~­`Ì';
+   c_nvl_char   CONSTANT VARCHAR2(4) := '~~~~';
+   c_nvl_num    CONSTANT NUMBER      := -1;
+--
+   l_found      BOOLEAN := FALSE;
+--
+BEGIN
+--
+   IF l_retval.nvda_value_distribution_array.COUNT = 0
+    THEN
+      l_retval.nvda_value_distribution_array.extend;
+   END IF;
+--
+   FOR i IN 1..l_retval.value_dist_count
+    LOOP
+      l_val_dist := l_retval.get_entry(i);
+      IF NVL(l_val_dist.nvd_value,c_nvl_char) = NVL(p_value,c_nvl_char)
+       THEN
+         l_val_dist.nvd_length     := NVL(l_val_dist.nvd_length,0) + NVL(p_length,0);
+         l_val_dist.nvd_item_count := NVL(l_val_dist.nvd_item_count,0) + 1;
+         l_found := TRUE;
+         l_retval.nvda_value_distribution_array(i) := l_val_dist;
+         EXIT;
+      END IF;
+   END LOOP;
+--
+   IF NOT l_found
+    THEN
+--
+      l_index := l_retval.nvda_value_distribution_array.last;
+--
+      l_val_dist := l_retval.get_entry (l_index);
+   --
+      IF NOT (l_val_dist.nvd_value      IS NULL
+              AND l_val_dist.nvd_length IS NULL
+             )
+       THEN
+         l_retval.nvda_value_distribution_array.extend;
+         l_index := l_retval.nvda_value_distribution_array.last;
+      END IF;
+   --
+      l_val_dist.nvd_value            := p_value;
+      l_val_dist.nvd_length           := p_length;
+      l_val_dist.nvd_item_count       := 1;
+      l_val_dist.nvd_pct_total_length := Null;
+   --
+      l_retval.nvda_value_distribution_array(l_index) := l_val_dist;
+--
+   END IF;
+--
+   RETURN l_retval;
+--
+END add_value;
+--
+------------------------------------------------------------------------------------------------
+--
+member function is_empty RETURN BOOLEAN IS
+--
+-- This function returns TRUE if the nm_value_distribution_array has no array entries, or there is only
+--  one entry and it is set to NULL
+--
+   l_retval BOOLEAN := FALSE;
+--
+begin
+--
+   IF    SELF.nvda_value_distribution_array.COUNT = 0
+    THEN
+      l_retval := TRUE;
+   ELSIF SELF.nvda_value_distribution_array.COUNT = 1
+    AND  SELF.nvda_value_distribution_array(1).nvd_value IS NULL
+    AND  SELF.nvda_value_distribution_array(1).nvd_length IS NULL
+    THEN
+      l_retval := TRUE;
+   END IF;
+--
+   RETURN l_retval;
+--
+END is_empty;
+--
+------------------------------------------------------------------------------------------------
+--
+member function value_dist_count RETURN NUMBER IS
+--
+BEGIN
+--
+   IF SELF.is_empty
+    THEN
+      RETURN 0;
+   ELSE
+      RETURN SELF.nvda_value_distribution_array.COUNT;
+   END IF;
+--
+END value_dist_count;
+--
+------------------------------------------------------------------------------------------------
+--
+member FUNCTION compute_stats  (p_dec_places IN NUMBER DEFAULT NULL) RETURN nm_value_distribution_array IS
+--
+   l_retval nm_value_distribution_array := SELF;
+--
+   l_val_dist   nm_value_distribution;
+--
+   l_val_dist_arr_count NUMBER := l_retval.value_dist_count;
+--
+   l_total_len          NUMBER;
+   l_max_length         NUMBER;
+   l_max_item_count     NUMBER;
+--
+   CURSOR cs_sum_len IS
+   SELECT SUM(NVL(tab_nvd.nvd_length,0))
+         ,MAX(NVL(tab_nvd.nvd_length,0))
+         ,MAX(NVL(tab_nvd.nvd_item_count,0))
+    FROM  TABLE(cast(SELF.nvda_value_distribution_array AS nm_value_distribution_arr_type)) tab_nvd;
+--
+BEGIN
+--
+   l_retval.nvda_total_length          := Null;
+   l_retval.nvda_most_numerous         := Null;
+   l_retval.nvda_most_numerous_index   := Null;
+   l_retval.nvda_highest_pct           := Null;
+   l_retval.nvda_highest_pct_index     := Null;
+   l_retval.nvda_most_numerous_amount  := Null;
+   l_retval.nvda_highest_pct_amount    := Null;
+--
+   IF SELF.is_empty
+    THEN
+      RETURN l_retval;
+   END IF;
+--
+   OPEN  cs_sum_len;
+   FETCH cs_sum_len INTO l_total_len, l_max_length, l_max_item_count;
+   CLOSE cs_sum_len;
+--
+   l_retval.nvda_total_length          := l_total_len;
+   l_retval.nvda_most_numerous_amount  := l_max_item_count;
+--
+   IF l_total_len != 0
+    THEN
+      l_retval.nvda_highest_pct_amount := (l_max_length/l_total_len)*100;
+   END IF;
+--
+   IF p_dec_places IS NOT NULL
+    THEN
+      l_retval.nvda_highest_pct_amount := ROUND(l_retval.nvda_highest_pct_amount,p_dec_places);
+   END IF;
+--
+   IF l_total_len != 0
+    THEN
+--
+      FOR i IN 1..l_val_dist_arr_count
+       LOOP
+         --
+         l_val_dist := l_retval.get_entry(i);
+         l_val_dist.nvd_pct_total_length := (l_val_dist.nvd_length/l_total_len)*100;
+         --
+         IF p_dec_places IS NOT NULL
+          THEN
+            l_val_dist.nvd_pct_total_length := ROUND(l_val_dist.nvd_pct_total_length,p_dec_places);
+         END IF;
+         --
+         l_retval.nvda_value_distribution_array(i) := l_val_dist;
+         --
+         IF l_val_dist.nvd_length = l_max_length
+          THEN
+            l_retval.nvda_highest_pct       := l_val_dist.nvd_value;
+            l_retval.nvda_highest_pct_index := i;
+         END IF;
+         --
+         IF l_val_dist.nvd_item_count = l_max_item_count
+          THEN
+            l_retval.nvda_most_numerous       := l_val_dist.nvd_value;
+            l_retval.nvda_most_numerous_index := i;
+         END IF;
+         --
+      END LOOP;
+--
+   END IF;
+--
+   RETURN l_retval;
+--
+END compute_stats;
+--
+------------------------------------------------------------------------------------------------
+--
+member FUNCTION get_entry (value_dist_arr_pos IN INTEGER) RETURN nm_value_distribution IS
+--
+BEGIN
+--
+   IF NOT SELF.nvda_value_distribution_array.EXISTS(value_dist_arr_pos)
+    THEN
+      RETURN nm_value_distribution(null,null,null,null);
+   ELSE
+      RETURN SELF.nvda_value_distribution_array(value_dist_arr_pos);
+   END IF;
+--
+END get_entry;
+--
+------------------------------------------------------------------------------------------------
+--
+end;
+/

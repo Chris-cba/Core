@@ -1,0 +1,29 @@
+CREATE OR REPLACE TYPE nm_value_distribution AS object
+ (
+--
+-----------------------------------------------------------------------------
+--
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)nm_value_distribution.tyh	1.1 01/17/02
+--       Module Name      : nm_value_distribution.tyh
+--       Date into SCCS   : 02/01/17 15:55:04
+--       Date fetched Out : 07/06/13 17:04:55
+--       SCCS Version     : 1.1
+--
+--    TYPE nm_value_distribution
+--
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
+  nvd_value            VARCHAR2(4000)
+ ,nvd_length           NUMBER
+ ,nvd_item_count       NUMBER
+ ,nvd_pct_total_length NUMBER
+ ,STATIC FUNCTION get_body_version RETURN VARCHAR2
+ ,MEMBER FUNCTION return_string RETURN VARCHAR2
+ ,PRAGMA RESTRICT_REFERENCES (get_body_version, wnds, rnds, rnps, wnps)
+ ,PRAGMA RESTRICT_REFERENCES (return_string, wnds, rnds, rnps, wnps)
+ )
+/

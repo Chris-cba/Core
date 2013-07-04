@@ -1,0 +1,23 @@
+CREATE OR REPLACE type num_array_type as 
+-----------------------------------------------------------------------------
+--
+--
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)num_array_type.tyh	1.1 02/15/06
+--       Module Name      : num_array_type.tyh
+--       Date into SCCS   : 06/02/15 08:26:21
+--       Date fetched Out : 07/06/13 17:04:58
+--       SCCS Version     : 1.1
+--
+--   Author : Rob Coupe
+--
+--
+--   TYPE num_array_type
+--
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
+varray(1048576)  of number;
+/
