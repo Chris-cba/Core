@@ -1,0 +1,152 @@
+CREATE OR REPLACE PACKAGE nm3rsc AS
+--<PACKAGE>
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3rsc.pkh-arc   2.2   Jul 04 2013 16:21:12   James.Wadsworth  $
+--       Module Name      : $Workfile:   nm3rsc.pkh  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:21:12  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:18  $
+--       Version          : $Revision:   2.2  $
+--       Based on SCCS version : 1.20
+-------------------------------------------------------------------------
+--
+--   Author : R.A. Coupe
+--
+--   Package to rescale and resequence routes
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.2  $';
+--  g_sccsid is the SCCS ID for the package
+
+  g_gty          nm_elements.ne_gty_group_type%TYPE;
+  g_route_or_inv varchar2(1) := 'R';
+  g_end_date     DATE;
+  g_admin_unit   nm_elements.ne_admin_unit%TYPE;
+  g_r_seg_no     nm_members.nm_seg_no%TYPE;
+  g_max_r_seq_no nm_members.nm_seq_no%TYPE;
+  g_min_r_seq_no nm_members.nm_seq_no%TYPE;
+  g_route_units  nm_units.un_unit_id%TYPE;
+  g_datum_units  nm_units.un_unit_id%TYPE;
+
+  g_use_sub_class   varchar2(1) := 'Y';
+
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+PROCEDURE rescale_route  ( pi_ne_id IN nm_elements.ne_id%TYPE,
+                           pi_effective_date IN DATE,
+                           pi_offset_st IN number,
+                           pi_st_element_id IN nm_elements.ne_id%TYPE,
+                           pi_use_history IN varchar2,
+                           pi_ne_start IN nm_elements.ne_id%TYPE DEFAULT NULL );
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE connect_route( pi_ne_id IN nm_elements.ne_id%TYPE,
+                         pi_offset_st IN number,
+                         pi_ne_start IN nm_elements.ne_id%TYPE DEFAULT NULL);
+PROCEDURE set_start_points;
+FUNCTION get_start_element( pi_ne_id IN number ) RETURN number;
+PROCEDURE update_route( pi_ne_id IN nm_elements.ne_id%TYPE,
+                        pi_effective_date IN DATE,
+                        pi_use_history IN varchar2 );
+PROCEDURE update_partial_route( pi_ne_id IN nm_elements.ne_id%TYPE,
+                                pi_effective_date DATE,
+                                pi_st_element_id IN nm_elements.ne_id%TYPE,
+                                pi_use_history IN varchar2 );
+PROCEDURE reseq_route( pi_ne_id IN nm_elements.ne_id%TYPE,
+                       pi_ne_start IN nm_elements.ne_id%TYPE DEFAULT NULL );
+FUNCTION get_seg_no( pi_ne_id IN nm_elements.ne_id%TYPE ) RETURN number;
+FUNCTION get_seq_no( pi_ne_id IN nm_elements.ne_id%TYPE ) RETURN number;
+FUNCTION get_true( pi_ne_id IN nm_elements.ne_id%TYPE ) RETURN number;
+FUNCTION get_slk( pi_ne_id IN nm_elements.ne_id%TYPE ) RETURN number;
+FUNCTION get_length( pi_ne_id IN nm_elements.ne_id%TYPE ) RETURN number;
+PROCEDURE check_rescale ( pi_ne_id IN nm_elements.ne_id%TYPE,
+                          pi_effective_date IN DATE );
+PROCEDURE instantiate_data ( pi_ne_id IN nm_elements.ne_id%TYPE
+                            ,pi_effective_date DATE DEFAULT TRUNC(SYSDATE) );
+FUNCTION get_next_element( pi_route_id IN number, pi_ne_id IN number ) RETURN number;
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="local_rescale">
+-- Performs a local rescale on the specified member. This resets the slk of
+-- the member based on its connected members in the route.
+PROCEDURE local_rescale(pi_ne_id_in       IN nm_elements.ne_id%TYPE
+                       ,pi_ne_id_of       IN nm_elements.ne_id%TYPE
+                       ,pi_begin_mp       IN nm_members.nm_begin_mp%TYPE
+                       ,pi_effective_date IN DATE
+                       ,pi_use_history    IN boolean DEFAULT TRUE
+                       );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="stranded_element_check">
+-- Checks for ill formed routes.
+FUNCTION stranded_element_check RETURN boolean;
+--</PROC>
+function is_route ( p_ne_id in nm_elements.ne_id%type ) return boolean;
+--
+-----------------------------------------------------------------------------
+--
+procedure rescale_temp_ne( p_nte_job_id in nm_nw_temp_extents.nte_job_id%type,
+                           p_route_id   IN nm_elements.ne_id%type default NULL,
+                           p_start_ne   IN nm_elements.ne_id%type default NULL);
+                                       
+procedure instantiate_data_from_temp_ne( p_nte_job_id in nm_nw_temp_extents.nte_job_id%type );
+procedure instantiate_from_route_nte( p_nte_job_id IN nm_nw_temp_extents.nte_job_id%TYPE,
+                                      p_route_id   IN nm_elements.ne_id%type );
+
+--
+procedure create_seg_tree;
+
+procedure set_globals_for_temp_ne( p_nte_job_id in nm_nw_temp_extents.nte_job_id%type );
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="set_cardinality">
+-- Sets the cardinality of route members based on the connectivity of the nodes.
+PROCEDURE set_cardinality ( pi_ne_id        IN nm_elements.ne_id%TYPE
+                           ,pi_ne_start     IN nm_elements.ne_id%TYPE DEFAULT NULL
+                           ,pi_raise_errors IN boolean                DEFAULT TRUE);
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE set_next_nsc ( p_rsc IN nm_rescale_write%ROWTYPE );
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="resize_route">
+-- Rescale the members of a route to a given new size
+PROCEDURE resize_route(pi_ne_id    IN nm_elements_all.ne_id%TYPE
+                      ,pi_new_size IN number
+                      ,pi_ne_start in nm_elements.ne_id%type default null);
+--
+--<PRAGMA>
+   PRAGMA RESTRICT_REFERENCES (get_version, rnds, wnps, wnds);
+   PRAGMA RESTRICT_REFERENCES (get_body_version, rnds, wnps, wnds);
+   PRAGMA RESTRICT_REFERENCES (stranded_element_check, wnps, wnds);
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+END nm3rsc;
+/

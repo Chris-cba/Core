@@ -1,0 +1,105 @@
+CREATE OR REPLACE PACKAGE nm3route_check AS
+--<PACKAGE>
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3route_check.pkh-arc   2.2   Jul 04 2013 16:21:12   James.Wadsworth  $
+--       Module Name      : $Workfile:   nm3route_check.pkh  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:21:12  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:18  $
+--       Version          : $Revision:   2.2  $
+--       Based on SCCS version : 1.2
+-------------------------------------------------------------------------
+--
+--   Author : R Coupe
+--
+--   template package
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--
+--<GLOBVAR>
+--
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.2  $';
+--  g_sccsid is the SCCS ID for the package
+--
+  g_S  nm_type_subclass.nsc_sub_class%type;
+  g_L  nm_type_subclass.nsc_sub_class%type;
+  g_R  nm_type_subclass.nsc_sub_class%type;
+  
+  g_ne_st  nm_elements.ne_id%type;
+  g_ne_end nm_elements.ne_id%type;
+
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="route_check">
+--
+PROCEDURE route_check(pi_ne_id            IN     nm_elements.ne_id%TYPE
+                     ,po_route_status        OUT pls_integer
+                     ,po_offending_datums    OUT nm3type.tab_varchar30
+                     );
+--
+-- Errors Raised Are :
+--
+-- -20351 'Start of Right <unique> exists with no compatible end'
+-- -20352 'Start of Left  <unique> exists with no compatible end'
+-- -20353 'Start of <unique> and <unique> are incompatible'
+-- -20354 'End of <unique> and <unique> are incompatible'
+-- terminus_check errors
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="terminus_check">
+--
+PROCEDURE terminus_check(pi_ne_id IN nm_elements.ne_id%TYPE
+                        ,pi_type  IN nm_node_usages.nnu_node_type%TYPE
+                        );
+--
+-- Errors Raised Are :
+--
+-- -20355 'Too many start points'
+-- -20356 'Too many end points'
+-- -20357 'Invalid sub class combination at start of route'
+-- -20358 'Invalid sub class combination at end of route'
+--
+--</PROC>
+--
+PROCEDURE partial_check( pi_ne_id in nm_elements.ne_id%type );
+--
+-- Errors Raised Are :
+--
+-- -20000, NER 263, Partial element means loss of connectivity
+
+-----------------------------------------------------------------------------
+--
+--<PRAGMA>
+   PRAGMA RESTRICT_REFERENCES (get_version, rnds, wnps, wnds);
+   PRAGMA RESTRICT_REFERENCES (get_body_version, rnds, wnps, wnds);
+   PRAGMA RESTRICT_REFERENCES (route_check, wnds, TRUST);
+   PRAGMA RESTRICT_REFERENCES (terminus_check, wnds, TRUST);
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+END nm3route_check;
+/

@@ -1,0 +1,93 @@
+CREATE OR REPLACE PACKAGE nm3reports
+AS
+--<PACKAGE>
+-----------------------------------------------------------------------------
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3reports.pkh-arc   2.2   Jul 04 2013 16:21:12   James.Wadsworth  $
+--       Module Name      : $Workfile:   nm3reports.pkh  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:21:12  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 15:50:04  $
+--       Version          : $Revision:   2.2  $
+--       Based on SCCS version : 1.2
+-------------------------------------------------------------------------
+--   Author : Sarah Scanlon
+--
+--    NM3REPORTS HEADER
+--
+------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+
+   -----------
+--constants
+-----------
+--g_sccsid is the SCCS ID for the package
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.2  $';
+   g_gis_id               NUMBER;
+
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+   FUNCTION get_version
+      RETURN VARCHAR2;
+
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+   FUNCTION get_body_version
+      RETURN VARCHAR2;
+
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PRAGMA>
+   PRAGMA RESTRICT_REFERENCES (get_version, RNDS, WNPS, WNDS);
+   PRAGMA RESTRICT_REFERENCES (get_body_version, RNDS, WNPS, WNDS);
+
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="INITIALISE_DATA">
+-- This procedure runs the correct proecedure depending on the module
+   PROCEDURE initialise_data (
+      pi_module IN hig_modules.hmo_module%TYPE
+     ,pi_job_id IN NUMBER);
+
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="CHECK_PARTIAL">
+-- This function calculates whether a node is partial
+   FUNCTION check_partial (
+      pi_nm_ne_id_of IN nm_elements.ne_id%TYPE
+     ,pi_nm_ne_id_in IN nm_elements.ne_id%TYPE)
+      RETURN VARCHAR;
+
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_GROUP_TYPE">
+-- This function gets the group type of the selected region of interest 
+   FUNCTION get_group_type (
+      pi_job_id IN NUMBER)
+      RETURN VARCHAR2;
+      
+--</PROC>
+
+--      
+END nm3reports;
+/

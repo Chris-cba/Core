@@ -1,0 +1,96 @@
+CREATE OR REPLACE PACKAGE nm3route_ref AS
+--<PACKAGE>
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3route_ref.pkh-arc   2.2   Jul 04 2013 16:21:12   James.Wadsworth  $
+--       Module Name      : $Workfile:   nm3route_ref.pkh  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:21:12  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:18  $
+--       Version          : $Revision:   2.2  $
+--       Based on SCCS version : 1.3
+-------------------------------------------------------------------------
+--
+--   Author : I Turnbull
+--
+--    nm3route_ref
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+  --g_sccsid is the SCCS ID for the package
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.2  $';
+  
+  TYPE rec_route_loc_dets IS RECORD
+       (route_ne_id            nm_elements.ne_id%TYPE
+       ,route_ne_unique        nm_elements.ne_unique%TYPE
+       ,route_ne_descr         nm_elements.ne_descr%TYPE
+       ,route_ne_nt_type       nm_elements.ne_nt_type%TYPE
+       ,route_ne_nt_type_descr nm_types.nt_descr%TYPE
+       ,route_group_type       nm_elements.ne_gty_group_type%TYPE
+       ,route_group_type_descr nm_group_types.ngt_descr%TYPE
+       ,route_units            nm_units.un_unit_id%TYPE
+       ,route_unit_name        nm_units.un_unit_name%TYPE
+       ,nm_slk                 nm_members.nm_slk%TYPE
+       ,nm_end_slk             nm_members.nm_end_slk%TYPE
+       ,measure                number
+       );
+   TYPE tab_rec_route_loc_dets       IS TABLE OF rec_route_loc_dets       INDEX BY binary_integer;
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_inv_on_route">
+-- Populates nm_nw_temp_extents with the location of the
+-- specified inv on the specified route
+PROCEDURE get_inv_on_route( p_ne_id    nm_elements.ne_id%TYPE
+                           ,p_inv_type nm_inv_types.nit_inv_type%TYPE
+                           ,p_job_id   number DEFAULT NULL
+                          )  ;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--  
+--<PROC NAME="set_g_job_id">
+-- This procedure sets the global job_id 
+--
+PROCEDURE set_g_job_id( p_job_id number);
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_g_job_id">
+-- This function returns the global job_id;
+--
+FUNCTION get_g_job_id RETURN number;
+--</PROC>                       
+--
+-----------------------------------------------------------------------------
+--
+--<PRAGMA>
+   PRAGMA RESTRICT_REFERENCES (get_version, rnds, wnps, wnds);
+   PRAGMA RESTRICT_REFERENCES (get_body_version, rnds, wnps, wnds);
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+END nm3route_ref;
+
+
+/ 
+
