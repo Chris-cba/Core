@@ -1,4 +1,4 @@
-REM Copyright (c) Exor Corporation Ltd, 2003
+REM Copyright 2013 Bentley Systems Incorporated. All rights reserved.
 REM @(#)nm3081_nm3100_metadata_upg.sql	1.22 01/09/04
 
 SET FEEDBACK OFF
