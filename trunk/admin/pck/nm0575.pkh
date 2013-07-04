@@ -2,11 +2,11 @@ CREATE OR REPLACE package nm0575
 AS
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm0575.pkh-arc   2.3   Jan 26 2011 13:32:14   Ade.Edwards  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm0575.pkh-arc   2.4   Jul 04 2013 16:00:38   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm0575.pkh  $
---       Date into PVCS   : $Date:   Jan 26 2011 13:32:14  $
---       Date fetched Out : $Modtime:   Jan 26 2011 13:31:02  $
---       PVCS Version     : $Revision:   2.3  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:00:38  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:08  $
+--       PVCS Version     : $Revision:   2.4  $
 --       Based on SCCS version : 1.2
 --
 --
@@ -15,13 +15,13 @@ AS
 --    %YourObjectName%
 --
 -----------------------------------------------------------------------------
--- Copyright (c) exor corporation ltd, 2006
+-- Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 
   -----------
   --constants
   -----------
-  g_sccsid CONSTANT VARCHAR2(2000) := '"$Revision:   2.3  $"';
+  g_sccsid CONSTANT VARCHAR2(2000) := '"$Revision:   2.4  $"';
   
 
 --

@@ -2,17 +2,17 @@ CREATE OR REPLACE PACKAGE BODY nm0575
 AS
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm0575.pkb-arc   2.13   Jul 26 2012 13:22:00   Rob.Coupe  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm0575.pkb-arc   2.14   Jul 04 2013 16:00:38   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm0575.pkb  $
---       Date into PVCS   : $Date:   Jul 26 2012 13:22:00  $
---       Date fetched Out : $Modtime:   Jul 26 2012 13:18:00  $
---       PVCS Version     : $Revision:   2.13  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:00:38  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:08  $
+--       PVCS Version     : $Revision:   2.14  $
 --       Based on SCCS version : 1.6
 
 --   Author : Graeme Johnson
 
 -----------------------------------------------------------------------------
--- Copyright (c) exor corporation ltd, 2006
+-- Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 
 /* History
@@ -23,7 +23,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000)  := '"$Revision:   2.13  $"';
+  g_body_sccsid  CONSTANT varchar2(2000)  := '"$Revision:   2.14  $"';
   g_package_name CONSTANT varchar2(30)    := 'nm0575';
   
   subtype id_type is nm_members.nm_ne_id_in%type;
