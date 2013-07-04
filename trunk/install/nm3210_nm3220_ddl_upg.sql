@@ -13,7 +13,7 @@
 --   Note: nm3210_nm3211_ddl_upg also contains DDL changes that will be ran in at this upgrade
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2005
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 --
