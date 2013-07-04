@@ -1,0 +1,159 @@
+create or replace type body user_hist_item is
+--
+-----------------------------------------------------------------------------
+--
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)user_hist_item.tyb	1.1 03/01/01
+--       Module Name      : user_hist_item.tyb
+--       Date into SCCS   : 01/03/01 16:24:55
+--       Date fetched Out : 07/06/13 17:05:06
+--       SCCS Version     : 1.1
+--
+--   user_hist_item type body
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
+        -- initialize the varray to a maximum of 10 elements
+        member function initialize_varray
+                return user_hist_item
+        is
+                this_uhi user_hist_item := SELF;
+        begin
+                -- extend varray from the last value loaded from the table upto 10 elements
+                for i in this_uhi.uhi_modules.last+1..this_uhi.uhi_modules.limit loop
+                        this_uhi.uhi_modules.extend;
+                        this_uhi.uhi_modules(i) := user_hist_module (NULL, NULL);
+                end loop;
+                return this_uhi;
+
+                exception
+                        when others then
+                                return null;
+        end;
+
+        -- return the varray index of the require module
+        member function module_exists (module in varchar2)
+                return number
+        is
+                this_uhi user_hist_item := SELF;
+        begin
+                for i in 1..this_uhi.uhi_modules.limit loop
+                        if this_uhi.uhi_modules(i).uhi_module = module then
+                                return i;
+                        end if;
+                end loop;
+                return 0;
+        end;
+
+        -- remove module from varray at specified index
+        member function remove_module (vindex in number)
+                return user_hist_item
+        is
+                this_uhi user_hist_item := SELF;
+        begin
+                this_uhi.uhi_modules(vindex).uhi_module := NULL;
+                return this_uhi;
+
+                exception
+                        when others then
+                                return null;
+        end;
+
+        -- resequence varray based on first in first out
+        -- starts at the specified index and shuffles the varray items
+        -- down so that null values are at the end of the array
+        member function module_resequence (vindex in number)
+                return user_hist_item
+        is
+                this_uhi user_hist_item := SELF;
+        begin
+
+                for i in reverse 2..vindex loop
+                        if this_uhi.uhi_modules(i-1).uhi_module is not null then
+                                this_uhi.uhi_modules(i).uhi_module := this_uhi.uhi_modules(i-1).uhi_module;
+                                this_uhi.uhi_modules(i).uhi_date := this_uhi.uhi_modules(i-1).uhi_date;
+                        end if;
+                end loop;
+
+                return this_uhi;
+
+                exception
+                        when others then
+                                return null;
+        end;
+
+        -- adds a new module to the varray
+        -- first checks to see if the module exists and if it does
+        -- removes this item and requences from this point
+        -- if the module is new then resequence from the last item
+        member function add_new_module (module in varchar2)
+                return user_hist_item
+        is
+                this_uhi user_hist_item := SELF;
+                module_index number;
+        begin
+                module_index := this_uhi.module_exists (module);
+                if module_index > 0 then
+                        this_uhi := this_uhi.remove_module (module_index);
+                else
+                        module_index := this_uhi.uhi_modules.last;
+                end if;
+
+                this_uhi := this_uhi.module_resequence (module_index);
+
+                this_uhi.uhi_modules(1).uhi_module := module;
+                this_uhi.uhi_modules(1).uhi_date := sysdate;
+
+                return this_uhi;
+
+                exception
+                        when others then
+                                return null;
+        end;
+
+        -- returns the module name at the specified index
+        member function get_module (vindex in number)
+                return varchar2
+        is
+                this_uhi user_hist_item := SELF;
+        begin
+                if vindex < this_uhi.uhi_modules.first or vindex > this_uhi.uhi_modules.last then
+                        return NULL;
+                end if;
+
+                return this_uhi.uhi_modules(vindex).uhi_module;
+
+                exception
+                        when others then
+                                return null;
+        end;
+
+        -- outputs the current module history
+        member procedure dump_module_hist
+        is
+                this_uhi user_hist_item := SELF;
+        begin
+                for i in 1..this_uhi.uhi_modules.last loop
+                        dbms_output.put_line ('Seq: '||i||','||this_uhi.uhi_modules(i).uhi_module||', '||
+                                                                                                   this_uhi.uhi_modules(i).uhi_date);
+                end loop;
+
+                exception
+                        when others then
+                                return;
+        end;
+--
+------------------------------------------------------------------------------------------------
+--
+STATIC FUNCTION get_body_version RETURN VARCHAR2 IS
+BEGIN
+   RETURN '"@(#)user_hist_item.tyb	1.1 03/01/01"';
+END get_body_version;
+--
+------------------------------------------------------------------------------------------------
+--
+end;
+/

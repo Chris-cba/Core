@@ -1,0 +1,30 @@
+CREATE OR REPLACE TYPE BODY user_hist_module IS
+--
+-----------------------------------------------------------------------------
+--
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)user_hist_module.tyb	1.1 03/01/01
+--       Module Name      : user_hist_module.tyb
+--       Date into SCCS   : 01/03/01 16:24:57
+--       Date fetched Out : 07/06/13 17:05:07
+--       SCCS Version     : 1.1
+--
+--    TYPE BODY user_hist_module
+--
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
+--
+------------------------------------------------------------------------------------------------
+--
+STATIC FUNCTION get_body_version RETURN VARCHAR2 IS
+BEGIN
+   RETURN '"@(#)user_hist_module.tyb	1.1 03/01/01"';
+END get_body_version;
+--
+------------------------------------------------------------------------------------------------
+--
+end;
+/

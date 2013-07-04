@@ -1,0 +1,25 @@
+CREATE OR REPLACE type ptr_num as object ( 
+-----------------------------------------------------------------------------
+--
+--
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)ptr_num.tyh	1.1 02/15/06
+--       Module Name      : ptr_num.tyh
+--       Date into SCCS   : 06/02/15 08:27:56
+--       Date fetched Out : 07/06/13 17:05:02
+--       SCCS Version     : 1.1
+--
+--   Author : Rob Coupe
+--
+--
+--   TYPE ptr_num
+--
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
+ptr_id integer, ptr_value number
+, order member function match ( p_ptr in ptr_num ) return integer
+ );
+/

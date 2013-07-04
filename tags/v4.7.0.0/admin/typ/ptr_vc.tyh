@@ -1,0 +1,25 @@
+CREATE OR REPLACE type ptr_vc as 
+-----------------------------------------------------------------------------
+--
+--
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)ptr_vc.tyh	1.1 02/15/06
+--       Module Name      : ptr_vc.tyh
+--       Date into SCCS   : 06/02/15 08:28:42
+--       Date fetched Out : 07/06/13 17:05:04
+--       SCCS Version     : 1.1
+--
+--   Author : Rob Coupe
+--
+--
+--   TYPE ptr_vc
+--
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
+object ( ptr_id integer, ptr_value varchar2(2000)
+, order member function match ( p_ptr in ptr_vc ) return integer
+ );
+/

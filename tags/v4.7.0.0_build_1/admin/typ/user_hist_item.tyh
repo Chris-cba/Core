@@ -1,0 +1,37 @@
+CREATE OR REPLACE TYPE user_hist_item AS object  (
+--
+-----------------------------------------------------------------------------
+--
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)user_hist_item.tyh	1.1 03/01/01
+--       Module Name      : user_hist_item.tyh
+--       Date into SCCS   : 01/03/01 16:24:56
+--       Date fetched Out : 07/06/13 17:05:07
+--       SCCS Version     : 1.1
+--
+--    TYPE user_hist_item
+--
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
+        uhi_modules user_hist_modules
+       ,member FUNCTION initialize_varray RETURN user_hist_item
+       ,member FUNCTION module_exists (MODULE IN varchar2) RETURN number
+       ,member FUNCTION add_new_module (MODULE IN varchar2) RETURN user_hist_item
+       ,member FUNCTION remove_module (vindex IN number) RETURN user_hist_item
+       ,member FUNCTION module_resequence (vindex IN number) RETURN user_hist_item
+       ,member FUNCTION get_module (vindex IN number) RETURN varchar2
+       ,member PROCEDURE dump_module_hist
+       ,STATIC FUNCTION get_body_version RETURN VARCHAR2
+       ,PRAGMA RESTRICT_REFERENCES (get_body_version, wnds, rnds, rnps, wnps)
+       ,PRAGMA RESTRICT_REFERENCES (initialize_varray, wnds)
+       ,PRAGMA RESTRICT_REFERENCES (module_exists, wnds)
+       ,PRAGMA RESTRICT_REFERENCES (add_new_module, wnds)
+       ,PRAGMA RESTRICT_REFERENCES (remove_module, wnds)
+       ,PRAGMA RESTRICT_REFERENCES (module_resequence, wnds)
+       ,PRAGMA RESTRICT_REFERENCES (dump_module_hist, wnds)
+       ,PRAGMA RESTRICT_REFERENCES (get_module, wnds, wnps)
+)
+/

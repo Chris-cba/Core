@@ -1,0 +1,23 @@
+CREATE OR REPLACE type ptr_vc_array_type as 
+-----------------------------------------------------------------------------
+--
+--
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)ptr_vc_array_type.tyh	1.1 02/15/06
+--       Module Name      : ptr_vc_array_type.tyh
+--       Date into SCCS   : 06/02/15 08:29:20
+--       Date fetched Out : 07/06/13 17:05:06
+--       SCCS Version     : 1.1
+--
+--   Author : Rob Coupe
+--
+--
+--   TYPE ptr_array
+--
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
+varray(1048576) of ptr_vc;
+/

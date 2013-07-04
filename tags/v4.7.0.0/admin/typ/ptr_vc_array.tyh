@@ -1,0 +1,30 @@
+CREATE OR REPLACE TYPE ptr_vc_array AS OBJECT ( 
+-----------------------------------------------------------------------------
+--
+--
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)ptr_vc_array.tyh	1.2 07/24/06
+--       Module Name      : ptr_vc_array.tyh
+--       Date into SCCS   : 06/07/24 14:55:29
+--       Date fetched Out : 07/06/13 17:05:05
+--       SCCS Version     : 1.2
+--
+--   Author : Rob Coupe
+--
+--
+--   TYPE ptr_vc_array
+--
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
+pa ptr_vc_array_type
+, MEMBER PROCEDURE DEBUG
+, MEMBER FUNCTION get_id ( p_value IN INTEGER ) RETURN INTEGER
+, MEMBER FUNCTION get_idx_from_id( p_id IN INTEGER ) RETURN INTEGER
+, MEMBER FUNCTION get_idx_from_value( p_value IN VARCHAR2 ) RETURN INTEGER
+, MEMBER FUNCTION get_distinct_ptr RETURN ptr_vc_array
+, MEMBER FUNCTION is_empty RETURN BOOLEAN
+ );
+/

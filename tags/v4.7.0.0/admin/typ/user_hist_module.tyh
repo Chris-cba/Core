@@ -1,0 +1,24 @@
+CREATE OR REPLACE TYPE user_hist_module AS object  (
+--
+-----------------------------------------------------------------------------
+--
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)user_hist_module.tyh	1.1 03/01/01
+--       Module Name      : user_hist_module.tyh
+--       Date into SCCS   : 01/03/01 16:24:58
+--       Date fetched Out : 07/06/13 17:05:08
+--       SCCS Version     : 1.1
+--
+--    TYPE user_hist_module
+--
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
+   uhi_module varchar2(30)
+  ,uhi_date   DATE
+  ,STATIC FUNCTION get_body_version RETURN VARCHAR2
+  ,PRAGMA RESTRICT_REFERENCES (get_body_version, wnds, rnds, rnps, wnps)
+  )
+/
