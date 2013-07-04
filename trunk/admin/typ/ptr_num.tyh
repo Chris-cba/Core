@@ -16,7 +16,7 @@ CREATE OR REPLACE type ptr_num as object (
 --   TYPE ptr_num
 --
 -----------------------------------------------------------------------------
---      Copyright (c) exor corporation ltd, 2001
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 ptr_id integer, ptr_value number
