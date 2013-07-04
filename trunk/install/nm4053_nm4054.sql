@@ -3,16 +3,16 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4053_nm4054.sql-arc   3.0   Mar 23 2009 12:22:30   malexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4053_nm4054.sql-arc   3.1   Jul 04 2013 14:16:24   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm4053_nm4054.sql  $
---       Date into PVCS   : $Date:   Mar 23 2009 12:22:30  $
---       Date fetched Out : $Modtime:   Mar 11 2009 09:05:14  $
---       Version          : $Revision:   3.0  $
+--       Date into PVCS   : $Date:   Jul 04 2013 14:16:24  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 11:54:20  $
+--       Version          : $Revision:   3.1  $
 --
 --   Product upgrade script
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2009
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 undefine exor_base
 undefine run_file

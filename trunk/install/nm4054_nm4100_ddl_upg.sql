@@ -8,14 +8,14 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4054_nm4100_ddl_upg.sql-arc   3.9   Oct 19 2009 10:29:56   malexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4054_nm4100_ddl_upg.sql-arc   3.10   Jul 04 2013 14:16:24   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm4054_nm4100_ddl_upg.sql  $
---       Date into PVCS   : $Date:   Oct 19 2009 10:29:56  $
---       Date fetched Out : $Modtime:   Oct 19 2009 10:26:44  $
---       Version          : $Revision:   3.9  $
+--       Date into PVCS   : $Date:   Jul 04 2013 14:16:24  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 13:54:18  $
+--       Version          : $Revision:   3.10  $
 --
 ------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2009
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 
 SET ECHO OFF
 SET LINESIZE 120
@@ -409,16 +409,16 @@ BEGIN
    l_tab_comments(1)  := '--';
    l_tab_comments(2)  := '--   SCCS Identifiers :-';
    l_tab_comments(3)  := '--';
-   l_tab_comments(4)  := '--       pvcsid                     : $Header:   //vm_latest/archives/nm3/install/nm4054_nm4100_ddl_upg.sql-arc   3.9   Oct 19 2009 10:29:56   malexander  $';
+   l_tab_comments(4)  := '--       pvcsid                     : $Header:   //vm_latest/archives/nm3/install/nm4054_nm4100_ddl_upg.sql-arc   3.10   Jul 04 2013 14:16:24   James.Wadsworth  $';
    l_tab_comments(5)  := '--       Module Name                : $Workfile:   nm4054_nm4100_ddl_upg.sql  $';
-   l_tab_comments(6)  := '--       Date into PVCS             : $Date:   Oct 19 2009 10:29:56  $';
-   l_tab_comments(7)  := '--       Date fetched Out           : $Modtime:   Oct 19 2009 10:26:44  $';
-   l_tab_comments(8)  := '--       PVCS Version               : $Revision:   3.9  $';
+   l_tab_comments(6)  := '--       Date into PVCS             : $Date:   Jul 04 2013 14:16:24  $';
+   l_tab_comments(7)  := '--       Date fetched Out           : $Modtime:   Jul 04 2013 13:54:18  $';
+   l_tab_comments(8)  := '--       PVCS Version               : $Revision:   3.10  $';
    l_tab_comments(9)  := '--';
    l_tab_comments(10) := '--   table_name_WHO trigger';
    l_tab_comments(11) := '--';
    l_tab_comments(12) := '-----------------------------------------------------------------------------';
-   l_tab_comments(13) := '--    Copyright (c) exor corporation ltd, 2007';
+   l_tab_comments(13) := '--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved';
    l_tab_comments(14) := '-----------------------------------------------------------------------------';
    l_tab_comments(15) := '--';
 --
@@ -535,11 +535,11 @@ AS
     -------------------------------------------------------------------------
     --   PVCS Identifiers :-
     --
-    --       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4054_nm4100_ddl_upg.sql-arc   3.9   Oct 19 2009 10:29:56   malexander  $
+    --       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4054_nm4100_ddl_upg.sql-arc   3.10   Jul 04 2013 14:16:24   James.Wadsworth  $
     --       Module Name      : $Workfile:   nm4054_nm4100_ddl_upg.sql  $
-    --       Date into PVCS   : $Date:   Oct 19 2009 10:29:56  $
-    --       Date fetched Out : $Modtime:   Oct 19 2009 10:26:44  $
-    --       Version          : $Revision:   3.9  $
+    --       Date into PVCS   : $Date:   Jul 04 2013 14:16:24  $
+    --       Date fetched Out : $Modtime:   Jul 04 2013 13:54:18  $
+    --       Version          : $Revision:   3.10  $
     --       Based on SCCS version : 
     -------------------------------------------------------------------------
              ngqs_ngq_id,
@@ -589,11 +589,11 @@ AS
     -------------------------------------------------------------------------
     --   PVCS Identifiers :-
     --
-    --       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4054_nm4100_ddl_upg.sql-arc   3.9   Oct 19 2009 10:29:56   malexander  $
+    --       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4054_nm4100_ddl_upg.sql-arc   3.10   Jul 04 2013 14:16:24   James.Wadsworth  $
     --       Module Name      : $Workfile:   nm4054_nm4100_ddl_upg.sql  $
-    --       Date into PVCS   : $Date:   Oct 19 2009 10:29:56  $
-    --       Date fetched Out : $Modtime:   Oct 19 2009 10:26:44  $
-    --       Version          : $Revision:   3.9  $
+    --       Date into PVCS   : $Date:   Jul 04 2013 14:16:24  $
+    --       Date fetched Out : $Modtime:   Jul 04 2013 13:54:18  $
+    --       Version          : $Revision:   3.10  $
     --       Based on SCCS version : 
     -------------------------------------------------------------------------
           * 
@@ -617,11 +617,11 @@ AS
     -------------------------------------------------------------------------
     --   PVCS Identifiers :-
     --
-    --       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4054_nm4100_ddl_upg.sql-arc   3.9   Oct 19 2009 10:29:56   malexander  $
+    --       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4054_nm4100_ddl_upg.sql-arc   3.10   Jul 04 2013 14:16:24   James.Wadsworth  $
     --       Module Name      : $Workfile:   nm4054_nm4100_ddl_upg.sql  $
-    --       Date into PVCS   : $Date:   Oct 19 2009 10:29:56  $
-    --       Date fetched Out : $Modtime:   Oct 19 2009 10:26:44  $
-    --       Version          : $Revision:   3.9  $
+    --       Date into PVCS   : $Date:   Jul 04 2013 14:16:24  $
+    --       Date fetched Out : $Modtime:   Jul 04 2013 13:54:18  $
+    --       Version          : $Revision:   3.10  $
     --       Based on SCCS version : 
     -------------------------------------------------------------------------
              ngqas_ngq_id       vngqas_ngqa_ngq_id,

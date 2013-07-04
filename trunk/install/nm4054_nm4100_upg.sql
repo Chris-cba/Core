@@ -3,16 +3,16 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4054_nm4100_upg.sql-arc   3.4   Jul 20 2009 11:44:58   aedwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4054_nm4100_upg.sql-arc   3.5   Jul 04 2013 14:16:24   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm4054_nm4100_upg.sql  $
---       Date into PVCS   : $Date:   Jul 20 2009 11:44:58  $
---       Date fetched Out : $Modtime:   Jul 20 2009 11:44:22  $
---       Version          : $Revision:   3.4  $
+--       Date into PVCS   : $Date:   Jul 04 2013 14:16:24  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 11:54:20  $
+--       Version          : $Revision:   3.5  $
 --
 --   Product upgrade script
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2009
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 SET ECHO OFF
 SET LINESIZE 120

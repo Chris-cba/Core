@@ -8,14 +8,14 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4100_nm4101_metadata_upg.sql-arc   3.0   Nov 12 2009 16:40:30   malexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4100_nm4101_metadata_upg.sql-arc   3.1   Jul 04 2013 14:16:24   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm4100_nm4101_metadata_upg.sql  $
---       Date into PVCS   : $Date:   Nov 12 2009 16:40:30  $
---       Date fetched Out : $Modtime:   Nov 12 2009 16:36:42  $
---       Version          : $Revision:   3.0  $
+--       Date into PVCS   : $Date:   Jul 04 2013 14:16:24  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 11:54:20  $
+--       Version          : $Revision:   3.1  $
 --
 ------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2009
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 
 SET ECHO OFF
 SET LINESIZE 120
@@ -210,11 +210,11 @@ BEGIN
     append('--------------------------------------------------------------------------------');
     append('--   PVCS Identifiers :-');
     append('--');
-    append('--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm4100_nm4101_metadata_upg.sql-arc   3.0   Nov 12 2009 16:40:30   malexander  $');
+    append('--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm4100_nm4101_metadata_upg.sql-arc   3.1   Jul 04 2013 14:16:24   James.Wadsworth  $');
     append('--       Module Name      : $Workfile:   nm4100_nm4101_metadata_upg.sql  $');
-    append('--       Date into PVCS   : $Date:   Nov 12 2009 16:40:30  $');
-    append('--       Date fetched Out : $Modtime:   Nov 12 2009 16:36:42  $');
-    append('--       PVCS Version     : $Revision:   3.0  $');
+    append('--       Date into PVCS   : $Date:   Jul 04 2013 14:16:24  $');
+    append('--       Date fetched Out : $Modtime:   Jul 04 2013 11:54:20  $');
+    append('--       PVCS Version     : $Revision:   3.1  $');
     append('--');
     append('--------------------------------------------------------------------------------');
     append('--');
@@ -263,11 +263,11 @@ BEGIN
     append('--------------------------------------------------------------------------------');
     append('--   PVCS Identifiers :-');
     append('--');
-    append('--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm4100_nm4101_metadata_upg.sql-arc   3.0   Nov 12 2009 16:40:30   malexander  $');
+    append('--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm4100_nm4101_metadata_upg.sql-arc   3.1   Jul 04 2013 14:16:24   James.Wadsworth  $');
     append('--       Module Name      : $Workfile:   nm4100_nm4101_metadata_upg.sql  $');
-    append('--       Date into PVCS   : $Date:   Nov 12 2009 16:40:30  $');
-    append('--       Date fetched Out : $Modtime:   Nov 12 2009 16:36:42  $');
-    append('--       PVCS Version     : $Revision:   3.0  $');
+    append('--       Date into PVCS   : $Date:   Jul 04 2013 14:16:24  $');
+    append('--       Date fetched Out : $Modtime:   Jul 04 2013 11:54:20  $');
+    append('--       PVCS Version     : $Revision:   3.1  $');
     append('--');
     append('--------------------------------------------------------------------------------');
     append('--');
