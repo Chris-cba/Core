@@ -3,15 +3,17 @@ As
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3utils.pkb-arc   1.0   Oct 03 2011 09:33:38   Steve.Cooper  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3utils.pkb-arc   1.1   Jul 04 2013 14:09:34   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3utils.pkb  $
---       Date into PVCS   : $Date:   Oct 03 2011 09:33:38  $
---       Date fetched Out : $Modtime:   Sep 19 2011 10:17:34  $
---       Version          : $Revision:   1.0  $
+--       Date into PVCS   : $Date:   Jul 04 2013 14:09:34  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 13:40:52  $
+--       Version          : $Revision:   1.1  $
 --       Based on SCCS version :
--------------------------------------------------------------------------
-
-  gc_Body_Sccsid              Constant  Varchar2(2000)                  :=  '$Revision:   1.0  $';
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
+  gc_Body_Sccsid              Constant  Varchar2(2000)                  :=  '$Revision:   1.1  $';
     
 
 Function Get_Version Return Varchar2
