@@ -1,0 +1,94 @@
+CREATE OR REPLACE PACKAGE nm3api as
+--<PACKAGE>
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3api.pkh-arc   2.4   Jul 04 2013 15:15:38   James.Wadsworth  $
+--       Module Name      : $Workfile:   nm3api.pkh  $
+--       Date into PVCS   : $Date:   Jul 04 2013 15:15:38  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:08  $
+--       Version          : $Revision:   2.4  $
+--       Based on SCCS version : 
+-------------------------------------------------------------------------
+--
+--
+--   Author : Rob Coupe
+--
+--   API package
+--
+--   This package is a collection of many procedures and functions that are available
+--   elsewhere. The intention is to provide a more concise and more easily accessible
+--   list of programmer interface modules.
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.4  $';
+--  g_sccsid is the SCCS ID for the package
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version of this package
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body for this package
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_ne_id">
+-- This function returns the internal NE_ID for the specified NE_UNIQUE and
+--  (optionally) NE_NT_TYPE. This operates as at a specified effective date
+--
+-- 1. With specifying ne_nt_type
+--
+FUNCTION get_ne_id (p_ne_unique      nm_elements.ne_unique%TYPE
+                   ,p_ne_nt_type     nm_elements.ne_nt_type%TYPE
+                   ,p_effective_date DATE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
+                   ) RETURN nm_elements.ne_id%TYPE;
+--
+-- 2. Without specifying ne_nt_type - This will raise an error if
+--     the specified ne_unique exists on >1 network type
+--
+FUNCTION get_ne_id (p_ne_unique      nm_elements.ne_unique%TYPE
+                   ,p_effective_date DATE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
+                   ) RETURN nm_elements.ne_id%TYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nau_admin_unit">
+-- This function returns the NAU_ADMIN_UNIT internal identifier for the specified
+--  NAU_UNIT_CODE and NAU_ADMIN_TYPE
+--
+FUNCTION get_nau_admin_unit (p_nau_unit_code  IN nm_admin_units_all.nau_unit_code%TYPE
+                            ,p_nau_admin_type IN nm_admin_units_all.nau_admin_type%TYPE
+                            ) RETURN nm_admin_units_all.nau_admin_unit%TYPE;
+--
+--</PROC>
+Function Get_Effective_Date Return Date;
+--
+-----------------------------------------------------------------------------
+--
+Procedure Set_Effective_Date (p_Effective_Date Date);
+--
+-----------------------------------------------------------------------------
+--
+--<PRAGMA>
+   PRAGMA RESTRICT_REFERENCES (get_version, RNDS, WNPS, WNDS);
+   PRAGMA RESTRICT_REFERENCES (get_body_version, RNDS, WNPS, WNDS);
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+end nm3api;
+/

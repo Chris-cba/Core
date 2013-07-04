@@ -1,0 +1,194 @@
+CREATE OR REPLACE package nm3acl
+AS
+--<PACKAGE>
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3acl.pkh-arc   3.2   Jul 04 2013 15:15:38   James.Wadsworth  $
+--       Module Name      : $Workfile:   nm3acl.pkh  $
+--       Date into PVCS   : $Date:   Jul 04 2013 15:15:38  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 15:11:56  $
+--       Version          : $Revision:   3.2  $
+--       Based on SCCS version : 
+------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+
+
+-- Access Control List wrapper for Oracle's DBMS_NETWORK_ACL_ADMIN package
+-- These grants are needed at 11gr2 for use with the following packages -
+--UTL_TCP 
+--UTL_SMTP 
+--UTL_MAIL 
+--UTL_HTTP 
+--UTL_INADDR
+
+  -----------
+  --constants
+  -----------
+  --g_sccsid is the SCCS ID for the package
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.2  $';
+
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="CREATE_ACL">
+-- Creates an ACL for a specified user or role
+PROCEDURE create_acl 
+             ( pi_acl_name       IN VARCHAR2
+             , pi_user_or_role   IN VARCHAR2
+             , pi_acl_descr      IN VARCHAR2  DEFAULT NULL
+             , pi_is_grant       IN BOOLEAN   DEFAULT TRUE
+             , pi_privilege      IN VARCHAR2  DEFAULT NULL
+             , pi_start_date     IN TIMESTAMP DEFAULT SYSTIMESTAMP
+             , pi_end_date       IN TIMESTAMP DEFAULT NULL
+             );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="DROP_ACL">
+-- Drop an ACL completely
+PROCEDURE drop_acl
+             ( pi_acl_name       IN VARCHAR2 );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ASSIGN_ACL">
+-- Assigns a host/ports to an existing ACL
+PROCEDURE assign_acl
+            ( pi_acl_name        IN VARCHAR2
+            , pi_host            IN VARCHAR2
+            , pi_lower_port      IN NUMBER DEFAULT NULL
+            , pi_upper_port      IN NUMBER DEFAULT NULL );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ADD_PRIVILEGE">
+-- Add a privilge to an existing ACL
+PROCEDURE add_privilege 
+           ( pi_acl_name        IN VARCHAR2
+           , pi_user_or_role    IN VARCHAR2
+           , pi_privilege       IN VARCHAR2
+           , pi_is_grant        IN BOOLEAN   DEFAULT TRUE
+           , pi_start_date      IN TIMESTAMP DEFAULT SYSTIMESTAMP
+           , pi_end_date        IN TIMESTAMP DEFAULT NULL
+           );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="DELETE_PRIVILEGE">
+-- Delete a privilge on an existing ACL
+
+PROCEDURE delete_privilege ( pi_acl_name     IN VARCHAR2
+                           , pi_user_or_role IN VARCHAR2
+                           , pi_privilege    IN VARCHAR2
+                           , pi_is_grant     IN BOOLEAN DEFAULT TRUE );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="UNASSIGN_ACL">
+-- Unassign an existing ACL
+
+PROCEDURE unassign_acl ( pi_acl_name     IN VARCHAR2
+                       , pi_host         IN VARCHAR2
+                       , pi_lower_port   IN INTEGER DEFAULT NULL
+                       , pi_upper_port   IN INTEGER DEFAULT NULL );
+                       
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="USER_HAS_ACCESS">
+-- Does user have access based on the USER_NETWORK_ACLS_PRIVILEGES view
+FUNCTION user_has_access ( pi_host        IN VARCHAR2
+                         , pi_lower_port  IN VARCHAR2 DEFAULT NULL
+                         , pi_upper_port  IN VARCHAR2 DEFAULT NULL
+ ) RETURN BOOLEAN;
+
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="PROCESS_FTP_CONNECTION">
+-- Add FTP connection to an ACL
+
+PROCEDURE process_ftp_connection ( pi_rec_hfc IN hig_ftp_connections%ROWTYPE );
+
+PROCEDURE process_ftp_connection ( pi_host    IN hig_ftp_connections.hfc_ftp_host%TYPE
+                                 , pi_port    IN hig_ftp_connections.hfc_ftp_port%TYPE DEFAULT NULL);
+
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="REMOVE_FTP_CONNECTION">
+-- Remove FTP connection from an ACL
+
+PROCEDURE remove_ftp_connection ( pi_rec_hfc IN hig_ftp_connections%ROWTYPE );
+
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="PROCESS_EMAIL_CONNECTION">
+-- Add EMAIL connection to an ACL
+
+PROCEDURE process_email_connection ( pi_smtp_server IN VARCHAR2
+                                   , pi_smtp_port   IN NUMBER
+                                   , pi_smtp_domain IN VARCHAR2 );
+--
+PROCEDURE process_email_connection ( pi_pop3_server IN VARCHAR2
+                                   , pi_pop3_port   IN NUMBER );
+
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="CREATE_STANDARD_ACLS">
+-- Create the standard ACLs as required by exor
+
+PROCEDURE create_standard_acls;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="REMOVE_STANDARD_ACLS">
+-- Remove the standard exor ACLs
+
+PROCEDURE remove_standard_acls;
+
+--</PROC>
+--
+--------------------------------------------------------------------------------
+--
+--<PRAGMA>
+--  PRAGMA RESTRICT_REFERENCES(get_version, RNDS, WNPS, WNDS);
+--  PRAGMA RESTRICT_REFERENCES(get_body_version, RNDS, WNPS, WNDS);
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+end nm3acl;
+/

@@ -1,0 +1,477 @@
+CREATE OR REPLACE package nm3api_trans as
+--<PACKAGE>
+--   SCCS Identifiers :-
+--
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3api_trans.pkh-arc   2.2   Jul 04 2013 15:15:38   James.Wadsworth  $
+--       Module Name      : $Workfile:   nm3api_trans.pkh  $
+--       Date into PVCS   : $Date:   Jul 04 2013 15:15:38  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:08  $
+--       Version          : $Revision:   2.2  $
+--       Based on SCCS version : 1.2
+-------------------------------------------------------------------------
+--
+--
+--   Author : Rob Coupe
+--
+--   API package
+--
+--   This package is a collection of many procedures and functions that are available
+--   elsewhere. The intention is to provide a more concise and more easily accessible
+--   list of programmer interface modules.
+--   The examples use the route H001 of type M. the route measurement is in KM and the datum
+--   measurement is in M.
+--   The id number 510084 is that of an item of asset information (adjacent material). This asset
+--   type tends to be quite long and typically covers several datum elements.
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+    g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.2  $';
+--  g_sccsid is the SCCS ID for the package
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_START">
+-- This function returns the start element in a route given the id of the route
+-- It interrogates the connectivity and direction of the elements in the route.
+--
+-- PL/SQL usage example
+--
+-- declare
+--   start_element number;
+-- begin
+--   start_element := nm3api_trans.get_start( nm3api_trans.get_ne_id('H001', 'M'));
+-- end;
+--
+--
+-- SQL*Plus usage example
+--
+--
+-- SQL> l
+--  1* select nm3api_trans.get_start( 'H011', 'M') start_element from dual
+-- SQL> /
+--         2887
+--
+
+FUNCTION get_start( p_ne_id IN NM_ELEMENTS.NE_ID%TYPE) RETURN nm_elements.ne_id%type;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_START">
+--
+-- This function returns the start element in a route given the name and type of the route
+-- It interrogates the connectivity and direction of the elements in the route.
+--
+-- PL/SQL usage example
+--
+-- declare
+--   start_element number;
+-- begin
+--   start_element := nm3api_trans.get_start( nm3api_trans.get_ne_id('H001', 'M'));
+-- end;
+--
+--
+-- SQL*Plus usage example
+--
+--
+-- SQL> l
+--  1* select nm3api_trans.get_start( nm3api_trans.get_ne_id('H011', 'M')) start_element from dual
+-- SQL> /
+--         2887
+--
+FUNCTION get_start( p_route_unique IN NM_ELEMENTS.NE_UNIQUE%TYPE
+                   ,p_nt_type      IN NM_ELEMENTS.NE_NT_TYPE%TYPE ) RETURN nm_elements.ne_id%type;
+--</PROC>
+--
+-------------------------------------------------------------------------------
+--
+--<PROC NAME="get_route_translation">
+-- This function translates a route based linear reference to a datum linear reference.
+-- The route linear reference may be ambiguous and if so a suitable exception is
+-- returned.
+-- ORA-20002: Ambiguous linear reference
+-- Under these circumstances the user should use the get_ambiguous_lrefs to
+-- return an array of all matching linear references.
+-- PL/SQL usage
+--
+--
+-- declare
+--   l_lref nm_lref;
+-- begin
+--   l_lref := nm3api_trans.GET_ROUTE_TRANSLATION( nm_lref( nm3api_trans.get_ne_id('H011','M'), 35 ));
+--   dbms_output.put_line(to_char( l_lref.lr_ne_id )||','||to_char( l_lref.lr_offset ));
+-- end;
+--
+-- SQL*Plus usage - the 35 gives a position 35KM down the route H011
+--
+--   1  select nm3api_trans.GET_ROUTE_TRANSLATION( nm_lref( nm3api_trans.get_ne_id('H011','M'), 35 ))
+--   2* from dual
+-- SQL> /
+-- NM_LREF(2888, 3210)
+--
+--This result shows that 35KM down H011 is the same position as datum id 2888 at 3210 metres.
+--
+FUNCTION get_route_translation( p_route_lref  IN NM_LREF )  RETURN NM_LREF;
+--</PROC>
+--
+-------------------------------------------------------------------------------
+--
+--<PROC NAME="get_datum_translation">
+-- This function translates a datum based linear reference to a route linear
+-- it is the reverse of function get_route_translation. The function expects that
+-- the route type is exclusive and therefore provides an unambiguous translation to
+-- the route level.
+-- As an example, consider the reversal of the translation given in the get_route_translation
+-- function.
+--
+-- PL-SQL Example
+--
+-- declare
+--   l_lref nm_lref;
+-- begin
+--   l_lref := nm3api_trans.GET_DATUM_TRANSLATION( nm_lref( 2888, 3210), 'M');
+--   dbms_output.put_line(to_char( l_lref.lr_ne_id )||','||to_char( l_lref.lr_offset ));
+-- end;
+
+-- SQL*Plus example
+--   1* select nm3api_trans.get_datum_translation( NM_LREF(2888, 3210), 'M') from dual
+-- SQL> /
+--
+-- NM3API_TRANS.GET_DATUM_TRANSLATION(NM_LREF(2888,3210),'M')(LR_NE_ID, LR_OFFSET)
+----------------------------------------------------------------------------------
+-- NM_LREF(247862, 35)
+
+FUNCTION get_datum_translation( p_datum_lref IN NM_LREF
+                               ,p_route_type IN NM_ELEMENTS.NE_GTY_GROUP_TYPE%TYPE )  RETURN NM_LREF;
+--</PROC>
+--
+-------------------------------------------------------------------------------
+--
+--<PROC NAME="get_ambiguous_lrefs">
+-- This function translates an ambiguous route based linear reference and provides
+-- a list of datum linear references matching the route reference.
+-- The returned object is an array of datum linear references which all translate
+-- to the route linear reference.
+--
+-- PL-SQL usage:
+-- The following anonymous block illustrates ambiguity at a node along a route.
+--
+-- declare
+--    l_lref nm_lref;
+--    ambiguous_lref exception;
+--    pragma exception_init ( ambiguous_lref, -20002 );
+-- begin
+--    l_lref := nm3api_trans.GET_route_TRANSLATION( nm_lref( nm3api_trans.get_ne_id('H011','M'), 31.79));
+--    dbms_output.put_line(to_char( l_lref.lr_ne_id )||','||to_char( l_lref.lr_offset ));
+-- exception
+--    when ambiguous_lref then
+--      declare
+--         lref_array nm_lref_array;
+--      begin
+--         lref_array := nm3api_trans.get_ambiguous_lrefs( nm_lref(nm3api_trans.get_ne_id('H011','M'), 31.79));
+--         for ic in 1..lref_array.lref_count loop
+--            dbms_output.put_line(to_char( lref_array.get_entry(ic).lr_ne_id )||','||
+--                                 to_char( lref_array.get_entry(ic).lr_offset ));
+--         end loop;
+--     end;
+-- end;
+-- /
+--
+-- SQL*Plus usage
+--
+-- SQL> select nm3api_trans.get_ambiguous_lrefs( nm_lref( nm3api_trans.get_ne_id('H011','M'), 31.79))
+--   2  from dual;
+--
+-- NM3API_TRANS.GET_AMBIGUOUS_LREFS(NM_LREF(NM3API_TRANS.GET_NE_ID('H011','M'),31.7
+----------------------------------------------------------------------------------
+-- NM_LREF_ARRAY(NM_LREF_ARRAY_TYPE(NM_LREF(2887, 31790), NM_LREF(2888, 0)))
+
+FUNCTION get_ambiguous_lrefs( p_route_lref IN NM_LREF )  RETURN NM_LREF_ARRAY;
+--</PROC>
+--
+--
+-------------------------------------------------------------------------------
+--
+--<PROC NAME="get_max_route_offset">
+-- This function returns the maximum offset along a route. note that this is not the total length
+-- of the datum elements making up the route
+FUNCTION get_max_route_offset( p_route_id IN NM_ELEMENTS.NE_ID%TYPE )  RETURN NUMBER;
+--
+-------------------------------------------------------------------------------
+--
+-- This function returns the maximum offset along a route
+FUNCTION get_max_route_offset( p_route_unique IN NM_ELEMENTS.NE_UNIQUE%TYPE
+                              ,p_nt_type      IN NM_ELEMENTS.NE_NT_TYPE%TYPE)  RETURN NUMBER;
+--</PROC>
+--
+-------------------------------------------------------------------------------
+--
+--<PROC NAME="get_min_route_offset">
+-- This function returns the minimum offset along a route. Note that this is not
+-- always zero.
+FUNCTION get_min_route_offset( p_route_id IN NM_ELEMENTS.NE_ID%TYPE )  RETURN NUMBER;
+--
+-------------------------------------------------------------------------------
+--
+-- This function returns the minimum offset along a route
+FUNCTION get_min_route_offset( p_route_unique IN NM_ELEMENTS.NE_UNIQUE%TYPE
+                              ,p_nt_type      IN NM_ELEMENTS.NE_NT_TYPE%TYPE)  RETURN NUMBER;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_length">
+-- This function returns the length of an object on the network based on route id
+FUNCTION get_length ( p_ne_id IN NM_ELEMENTS.NE_ID%TYPE )  RETURN NUMBER;
+-----------------------------------------------------------------------------
+--
+-- This function returns the length of an object on the network based on route name
+FUNCTION get_length ( p_route_unique IN NM_ELEMENTS.NE_UNIQUE%TYPE
+                     ,p_nt_type      IN NM_ELEMENTS.NE_NT_TYPE%TYPE)  RETURN NUMBER;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="initialise_lref_array">
+-- This function initialises the nm_lref_array object
+FUNCTION initialise_lref_array (pi_ne_id   IN number DEFAULT NULL
+                               ,pi_offset  IN number DEFAULT NULL
+                                ) RETURN nm_lref_array;
+
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="defrag_placement_array">
+-- This function assesses the connectectivty within an ordered placement array and assigns measure
+-- values at the start of each placement within the array. The measure is rest to zero at the breaks
+-- in connectivity.
+--
+-- PL/SQL Usage example:
+--
+-- declare
+--  l_pla nm_placement_array;
+-- begin
+--   l_pla := nm3api_trans.defrag_placement_array(
+--                      nm3api_trans.GET_PLACEMENT_FROM_OBJ( nm3api.get_ne_id('H011','M')));
+--   l_pla.dump_placement_array;
+-- end;
+--
+-- This function returns an array of placements, each placement corresponding to a particular
+-- datum location of the object.
+--
+-- The object has an associated method which allows its contents to be dumped using
+-- when serveroutput in enabled.
+--
+--
+-- SQL*Plus usage example
+--
+--  1  select nm3api_trans.defrag_placement_array(nm3api_trans.GET_PLACEMENT_FROM_OBJ(
+--  2              nm3api.get_ne_id('H011','M')))
+--  3* from dual
+-- SQL> /
+-- NM_PLACEMENT_ARRAY(NM_PLACEMENT_ARRAY_TYPE(NM_PLACEMENT(2887, 0, 31790, 0), NM_P
+-- LACEMENT(2888, 0, 7250, 31790), NM_PLACEMENT(2889, 0, 860, 39040), NM_PLACEMENT(
+-- 2890, 0, 90, 39900), NM_PLACEMENT(2891, 0, 320, 39990), NM_PLACEMENT(2892, 0, 14
+-- 0, 40310), NM_PLACEMENT(2893, 0, 840, 40450), NM_PLACEMENT(2894, 0, 360, 41290),
+--  NM_PLACEMENT(2895, 0, 1510, 41650), NM_PLACEMENT(2896, 0, 430, 43160), NM_PLACE
+-- MENT(2897, 0, 70, 43590), NM_PLACEMENT(2898, 0, 530, 43660), NM_PLACEMENT(2899,
+-- 0, 470, 44190), NM_PLACEMENT(2900, 0, 310, 44660), NM_PLACEMENT(2901, 0, 350, 44
+-- 970), NM_PLACEMENT(2902, 0, 720, 45320), NM_PLACEMENT(2903, 0, 550, 46040), NM_P
+-- LACEMENT(2904, 0, 1890, 46590), NM_PLACEMENT(2905, 0, 80, 48480), NM_PLACEMENT(2
+-- 906, 0, 1300, 48560), NM_PLACEMENT(2907, 0, 780, 49860), NM_PLACEMENT(2908, 0, 1
+-- 800, 50640), NM_PLACEMENT(2909, 0, 28190, 52440), NM_PLACEMENT(2910, 0, 3890, 80
+-- 630), NM_PLACEMENT(2911, 0, 2990, 84520)))
+--
+
+FUNCTION defrag_placement_array (npl_array nm_placement_array) RETURN nm_placement_array;
+
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_connected_arrays">
+-- This function retruns a set of placement arrays. Each placement array is the intersection of the object
+-- with another object of the given type.
+--
+--
+-- SQL*Plus example
+--
+--   1  select nm3api_trans.get_connected_arrays( 510084, 'M' )
+--   2* from dual
+-- SQL> /
+-- NM_PLACEMENT_ARRAY(NM_PLACEMENT_ARRAY_TYPE(NM_PLACEMENT(247561, 0, .24, 0), NM_P
+-- LACEMENT(247561, .18, 21.99, 0)))
+--
+-- This shows that asset number 510084 is in two parts. Each part is on the same route of type M
+-- that is route element 247561 (this is H011).
+--
+
+
+FUNCTION get_connected_arrays ( p_ne_id   IN nm_elements.ne_id%TYPE
+                               ,p_nt_type IN nm_types.nt_type%TYPE
+                              ) RETURN nm_placement_array;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_placement_from_obj">
+-- This function retruns a placement array corresponding to an objects location.
+--
+-- PL/SQL Usage example:
+--
+-- declare
+--  l_pla nm_placement_array;
+-- begin
+--   l_pla := nm3api_trans.GET_PLACEMENT_FROM_OBJ( nm3api.get_ne_id('H011','M'));
+--   l_pla.dump_placement_array;
+-- end;
+--
+-- This function returns an array of placements, each placement corresponding to a particular
+-- datum location of the object.
+--
+-- The object has an associated method which allows its contents to be dumped using
+-- when serveroutput in enabled.
+--
+--
+-- SQL*Plus usage example
+--
+--
+-- SQL> l
+--  1* select nm3api_trans.GET_PLACEMENT_FROM_OBJ( nm3api.get_ne_id('H011','M')) from dual
+-- SQL> /
+-- NM_PLACEMENT_ARRAY(NM_PLACEMENT_ARRAY_TYPE(NM_PLACEMENT(2887, 0, 31790, 0), NM_P
+-- LACEMENT(2888, 0, 7250, 0), NM_PLACEMENT(2889, 0, 860, 0), NM_PLACEMENT(2890, 0,
+--  90, 0), NM_PLACEMENT(2891, 0, 320, 0), NM_PLACEMENT(2892, 0, 140, 0), NM_PLACEM
+-- ENT(2893, 0, 840, 0), NM_PLACEMENT(2894, 0, 360, 0), NM_PLACEMENT(2895, 0, 1510,
+--  0), NM_PLACEMENT(2896, 0, 430, 0), NM_PLACEMENT(2897, 0, 70, 0), NM_PLACEMENT(2
+-- 898, 0, 530, 0), NM_PLACEMENT(2899, 0, 470, 0), NM_PLACEMENT(2900, 0, 310, 0), N
+-- M_PLACEMENT(2901, 0, 350, 0), NM_PLACEMENT(2902, 0, 720, 0), NM_PLACEMENT(2903,
+-- 0, 550, 0), NM_PLACEMENT(2904, 0, 1890, 0), NM_PLACEMENT(2905, 0, 80, 0), NM_PLA
+-- CEMENT(2906, 0, 1300, 0), NM_PLACEMENT(2907, 0, 780, 0), NM_PLACEMENT(2908, 0, 1
+-- 800, 0), NM_PLACEMENT(2909, 0, 28190, 0), NM_PLACEMENT(2910, 0, 3890, 0), NM_PLA
+-- CEMENT(2911, 0, 2990, 0)))
+--
+-- If the measures are required then the placement array must be defragmented
+-- (see defrag_placement_array)
+--
+Function get_placement_from_obj ( p_ne_id IN nm_elements.ne_id%type ) return nm_placement_array;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_linear_route_translation">
+-- This function returns the placement array corresponding to those partial datums arising from the
+-- translation of the placement, to the datum.
+--
+-- PL-SQL usage
+-- declare
+--     npl_array nm_placement_array;
+--   begin
+--     npl_array := nm3api_trans.get_linear_route_translation(
+--                      nm_placement( nm3api.get_ne_id('H011', 'M'), 40, 44, 0));
+--     npl_array.dump_placement_array;
+--   end;
+-- SQL> /
+-- Pos(1)-2891,10,320,0
+-- Pos(2)-2892,0,140,310
+-- Pos(3)-2893,0,840,450
+-- Pos(4)-2894,0,360,1290
+-- Pos(5)-2895,0,1510,1650
+-- Pos(6)-2896,0,430,3160
+-- Pos(7)-2897,0,70,3590
+-- Pos(8)-2898,0,340,3660
+--
+-- PL/SQL procedure successfully completed.
+
+--
+-- SQL*Plus usage
+-- SQL> l
+--   1  select nm3api_trans.get_linear_route_translation(
+--   2*       nm_placement( nm3api.get_ne_id('H011', 'M'), 40, 44, 0)) from dual
+-- SQL> /
+--
+-- NM3API_TRANS.GET_LINEAR_ROUTE_TRANSLATION(NM_PLACEMENT(NM3API.GET_NE_ID('H011','
+----------------------------------------------------------------------------------
+-- NM_PLACEMENT_ARRAY(NM_PLACEMENT_ARRAY_TYPE(NM_PLACEMENT(2891, 10, 320, 0), NM_PL
+-- ACEMENT(2892, 0, 140, 310), NM_PLACEMENT(2893, 0, 840, 450), NM_PLACEMENT(2894,
+-- 0, 360, 1290), NM_PLACEMENT(2895, 0, 1510, 1650), NM_PLACEMENT(2896, 0, 430, 316
+-- 0), NM_PLACEMENT(2897, 0, 70, 3590), NM_PLACEMENT(2898, 0, 340, 3660)))
+
+FUNCTION  get_linear_route_translation ( npl_placement IN nm_placement ) RETURN nm_placement_array;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="initialise_placement">
+-- This function initialises the nm_placement object
+FUNCTION initialise_placement (p_ne_id   IN number DEFAULT NULL
+                              ,p_start   IN number DEFAULT NULL
+                              ,p_end     IN number DEFAULT NULL
+                              ,p_measure IN number DEFAULT NULL
+                              ) RETURN nm_placement;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="initialise_placement_array">
+-- This function initialises the nm_placement_array object
+FUNCTION initialise_placement_array (p_ne_id   IN number DEFAULT NULL
+                                    ,p_start   IN number DEFAULT NULL
+                                    ,p_end     IN number DEFAULT NULL
+                                    ,p_measure IN number DEFAULT NULL
+                                    ) RETURN nm_placement_array;
+
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_ne_id">
+-- This function returns the internal identifier of a route of a known type.
+FUNCTION get_ne_id ( p_route_unique IN NM_ELEMENTS.NE_UNIQUE%TYPE
+                    ,p_nt_type      IN NM_ELEMENTS.NE_NT_TYPE%TYPE)  RETURN NUMBER;
+
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_ne_unique">
+-- This function returns the ne_unique for a given element as identified by the
+--   internal identifier (NE_ID)
+--
+FUNCTION get_ne_unique (p_ne_id IN nm_elements.ne_id%TYPE) RETURN nm_elements.ne_unique%TYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PRAGMA>
+   PRAGMA RESTRICT_REFERENCES (get_version, RNDS, WNPS, WNDS);
+   PRAGMA RESTRICT_REFERENCES (get_body_version, RNDS, WNPS, WNDS);
+
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+end nm3api_trans;
+/

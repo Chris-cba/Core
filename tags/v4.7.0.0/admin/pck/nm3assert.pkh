@@ -1,0 +1,102 @@
+CREATE OR REPLACE PACKAGE nm3assert AS
+--<PACKAGE>
+-----------------------------------------------------------------------------
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3assert.pkh-arc   2.2   Jul 04 2013 15:15:38   James.Wadsworth  $
+--       Module Name      : $Workfile:   nm3assert.pkh  $
+--       Date into PVCS   : $Date:   Jul 04 2013 15:15:38  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:08  $
+--       Version          : $Revision:   2.2  $
+--       Based on SCCS version :  1.1
+--
+--   Author : Kevin Angus
+--
+--    nm3assert
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+
+  -----------
+  --constants
+  -----------
+  --g_sccsid is the SCCS ID for the package
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.2  $';
+  
+  g_default_ner_appl nm_errors.ner_appl%TYPE := nm3type.c_hig;
+  g_default_ner_id   nm_errors.ner_id%TYPE   := 213;
+
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="isnotnull">
+--
+-- This procedure raises an error (HIG 214) if the value passed is null.
+--
+PROCEDURE isnotnull(pi_val IN varchar2
+                   ,pi_msg IN varchar2 DEFAULT NULL
+                   );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="inrange">
+--
+-- This procedure raises an error (HIG 214) if the value passed is not
+-- between the low and high limits.
+--
+PROCEDURE inrange(pi_val      IN date
+                 ,pi_low_val  IN date
+                 ,pi_high_val IN date
+                 ,pi_msg      IN varchar2 DEFAULT NULL
+                 );
+PROCEDURE inrange(pi_val      IN number
+                 ,pi_low_val  IN number
+                 ,pi_high_val IN number
+                 ,pi_msg      IN varchar2 DEFAULT NULL
+                 );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="condition">
+--
+-- This procedure raises the specified error if the condition passed does not
+-- evaluate TRUE (or evaluates to NULL).
+--
+PROCEDURE condition(pi_condition  IN boolean
+                   ,pi_ner_appl   IN nm_errors.ner_appl%TYPE DEFAULT g_default_ner_appl
+                   ,pi_ner_id     IN nm_errors.ner_id%TYPE DEFAULT g_default_ner_id
+                   ,pi_suppl_info IN varchar2 DEFAULT NULL
+                   );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PRAGMA>
+  PRAGMA RESTRICT_REFERENCES(get_version, rnds, wnps, wnds);
+  PRAGMA RESTRICT_REFERENCES(get_body_version, rnds, wnps, wnds);
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+END nm3assert;
+/

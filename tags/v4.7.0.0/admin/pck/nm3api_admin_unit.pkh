@@ -1,0 +1,158 @@
+CREATE OR REPLACE PACKAGE nm3api_admin_unit AS
+--<PACKAGE>
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3api_admin_unit.pkh-arc   2.3   Jul 04 2013 15:15:38   James.Wadsworth  $
+--       Module Name      : $Workfile:   nm3api_admin_unit.pkh  $
+--       Date into PVCS   : $Date:   Jul 04 2013 15:15:38  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:08  $
+--       Version          : $Revision:   2.3  $
+--       Based on SCCS version : 1.5
+-------------------------------------------------------------------------
+--
+--   Author : Graeme Johnson
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+
+  -----------
+  --constants
+  -----------
+  --g_sccsid is the SCCS ID for the package
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.3  $';
+  
+  -- Type/global plsql tables for validation triggers on nm_au_sub_types table
+  TYPE tab_nsty IS TABLE OF nm_au_sub_types%ROWTYPE INDEX BY BINARY_INTEGER;
+  g_tab_nsty_old tab_nsty;
+  g_tab_nsty_new tab_nsty;
+
+  -- Type/global plsql tables for validation triggers on nm_admin_units_all table
+  TYPE tab_nau IS TABLE OF nm_admin_units_all%ROWTYPE INDEX BY BINARY_INTEGER;
+  g_tab_nau_new     tab_nau;
+  g_tab_nau_old     tab_nau;
+  
+  g_tab_nau_actions  nm3type.tab_varchar1;  
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="process_g_tab_nsty">
+-- Validate an nm_au_sub_types record - developed to be called from 
+-- triggers on nm_au_sub_types
+--
+PROCEDURE process_g_tab_nsty;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--<PROC NAME="process_g_tab_nau">
+-- Validate an nm_admin_units_all record - developed to be called from 
+-- triggers on nm_admin_units_all
+--
+PROCEDURE process_g_tab_nau;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--<PROC NAME="get_natg_domain">
+-- return package global
+FUNCTION get_natg_domain RETURN VARCHAR2;
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--<PROC NAME="insert_admin_unit">
+-- This procedure inserts admin unit and creates associated nm_admin_group records
+--
+PROCEDURE insert_admin_unit(pi_nau_rec               IN OUT   nm_admin_units%ROWTYPE
+                           ,pi_nau_rec_parent        IN       nm_admin_units%ROWTYPE);
+
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--<PROC NAME="override_admin_type_locking">
+-- Set package global so that admin type locking is by-passed
+--
+PROCEDURE override_admin_type_locking;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--<PROC NAME="restore_admin_type_locking">
+-- Set package global so that admin type locking is switched back on
+--
+PROCEDURE restore_admin_type_locking;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--<PROC NAME="admin_type_is_locked">
+--
+-- True/False whether admin type is in grouping of 'Locked'
+FUNCTION admin_type_is_locked(pi_nat_admin_type IN nm_au_types.nat_admin_type%TYPE) RETURN BOOLEAN;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--<PROC NAME="nau_check_if_locked">
+-- Do the checking and raise error if locked and locking not being bypassed
+-- 
+PROCEDURE nau_check_if_locked(pi_nat_admin_type IN nm_au_types.nat_admin_type%TYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--<PROC NAME="end_date_admin_unit">
+-- End date an admin unit and optionally end date all it's children
+-- 
+PROCEDURE end_date_admin_unit(pi_admin_unit        IN nm_admin_units.nau_admin_unit%TYPE
+                             ,pi_end_date          IN DATE     DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
+                             ,pi_end_date_children IN VARCHAR2 DEFAULT 'Y');
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--<PROC NAME="get_parent_admin_unit">
+-- For a given admin unit get the direct parent
+-- 
+FUNCTION get_parent_admin_unit(pi_nau_admin_unit IN nm_admin_units_all.nau_admin_unit%TYPE) RETURN nm_admin_units_all%ROWTYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--<PROC NAME="make_unique_nat_admin_type">
+-- Take a proposed NAT_ADMIN_TYPE and check that the admin type does not already exist, if it does make
+-- the proposed NAT_ADMIN_TYPE unique by applying a suffix
+-- 
+FUNCTION make_unique_nat_admin_type(pi_nat_admin_type IN nm_au_types.nat_admin_type%TYPE) RETURN nm_au_types.nat_admin_type%TYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--<PROC NAME="make_unique_nau_name">
+-- Take a proposed NAU_NAME and check that the name does not already exist, if it does make
+-- the proposed NAU_NAME unique by applying a suffix
+-- 
+-- FUNCTION make_unique_nau_name(pi_nau_admin_type IN nm_admin_units.nau_admin_type%TYPE
+--                              ,pi_nau_name       IN nm_admin_units.nau_name%TYPE) RETURN nm_admin_units.nau_name%TYPE; 
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--<PRAGMA>
+  PRAGMA RESTRICT_REFERENCES(get_version, RNDS, WNPS, WNDS);
+  PRAGMA RESTRICT_REFERENCES(get_body_version, RNDS, WNPS, WNDS);
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+end nm3api_admin_unit;
+/
