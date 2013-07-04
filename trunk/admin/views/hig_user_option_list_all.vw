@@ -14,17 +14,17 @@ SELECT
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/hig_user_option_list_all.vw-arc   2.1   Feb 04 2010 10:26:20   cstrettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/hig_user_option_list_all.vw-arc   2.2   Jul 04 2013 11:20:06   James.Wadsworth  $
 --       Module Name      : $Workfile:   hig_user_option_list_all.vw  $
---       Date into PVCS   : $Date:   Feb 04 2010 10:26:20  $
---       Date fetched Out : $Modtime:   Feb 04 2010 10:22:08  $
---       Version          : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   Jul 04 2013 11:20:06  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 10:33:40  $
+--       Version          : $Revision:   2.2  $
 -------------------------------------------------------------------------
 --
 --   Author : G Johnson
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2005
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --   
    HOL_ID

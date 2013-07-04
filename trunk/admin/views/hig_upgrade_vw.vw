@@ -16,12 +16,14 @@ SELECT
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/hig_upgrade_vw.vw-arc   3.0   May 13 2010 14:38:24   malexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/hig_upgrade_vw.vw-arc   3.1   Jul 04 2013 11:20:06   James.Wadsworth  $
 --       Module Name      : $Workfile:   hig_upgrade_vw.vw  $
---       Date into PVCS   : $Date:   May 13 2010 14:38:24  $
---       Date fetched Out : $Modtime:   May 13 2010 14:36:24  $
---       Version          : $Revision:   3.0  $
--------------------------------------------------------------------------
+--       Date into PVCS   : $Date:   Jul 04 2013 11:20:06  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 10:58:32  $
+--       Version          : $Revision:   3.1  $
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
 --
       initcap(p.hpr_product_name) hpr_product_name
      ,p.hpr_product

@@ -19,14 +19,14 @@ SELECT
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --          
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/views/imf_hig_audits.vw-arc   3.1   Jun 20 2011 11:40:48   Linesh.Sorathia  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/views/imf_hig_audits.vw-arc   3.2   Jul 04 2013 11:20:06   James.Wadsworth  $
 --       Module Name      : $Workfile:   imf_hig_audits.vw  $
---       Date into PVCS   : $Date:   Jun 20 2011 11:40:48  $
---       Date fetched Out : $Modtime:   Jun 20 2011 11:08:42  $
---       PVCS Version     : $Revision:   3.1  $
+--       Date into PVCS   : $Date:   Jul 04 2013 11:20:06  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 10:33:40  $
+--       PVCS Version     : $Revision:   3.2  $
 --            
 --------------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2010
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 --------------------------------------------------------------------------------
 --            
         haud_id

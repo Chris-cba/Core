@@ -9,13 +9,15 @@ SELECT
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/imf_hig_financial_years.vw-arc   3.1   Apr 09 2009 14:33:08   smarshall  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/imf_hig_financial_years.vw-arc   3.2   Jul 04 2013 11:20:06   James.Wadsworth  $
 --       Module Name      : $Workfile:   imf_hig_financial_years.vw  $
---       Date into PVCS   : $Date:   Apr 09 2009 14:33:08  $
---       Date fetched Out : $Modtime:   Apr 09 2009 14:32:46  $
---       Version          : $Revision:   3.1  $
+--       Date into PVCS   : $Date:   Jul 04 2013 11:20:06  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 11:01:34  $
+--       Version          : $Revision:   3.2  $
 -- Foundation view displaying financial years
--------------------------------------------------------------------------
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
    fyr_id,
    fyr_start_date,
    fyr_end_date

@@ -41,12 +41,14 @@ Select  --
         -------------------------------------------------------------------------
         --   PVCS Identifiers :-
         --
-        --       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/hig_processes_all_v.vw-arc   3.1   Feb 07 2013 14:44:40   Steve.Cooper  $
+        --       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/hig_processes_all_v.vw-arc   3.2   Jul 04 2013 11:20:06   James.Wadsworth  $
         --       Module Name      : $Workfile:   hig_processes_all_v.vw  $
-        --       Date into PVCS   : $Date:   Feb 07 2013 14:44:40  $
-        --       Date fetched Out : $Modtime:   Feb 04 2013 16:25:40  $
-        --       Version          : $Revision:   3.1  $
-        -------------------------------------------------------------------------
+        --       Date into PVCS   : $Date:   Jul 04 2013 11:20:06  $
+        --       Date fetched Out : $Modtime:   Jul 04 2013 10:55:54  $
+        --       Version          : $Revision:   3.2  $
+        -----------------------------------------------------------------------------
+        --    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+        -----------------------------------------------------------------------------
         --
         hp.Hp_Process_Id                                                            Hp_Process_Id,
         Hig_Process_Framework_Utils.Formatted_Process_Id (hp.Hp_Process_Id)         Hp_Formatted_Process_Id,

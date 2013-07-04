@@ -1,12 +1,14 @@
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/imf_hig_views.sql-arc   3.2   Oct 11 2010 10:41:38   Linesh.Sorathia  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/imf_hig_views.sql-arc   3.3   Jul 04 2013 11:20:06   James.Wadsworth  $
 --       Module Name      : $Workfile:   imf_hig_views.sql  $
---       Date into PVCS   : $Date:   Oct 11 2010 10:41:38  $
---       Date fetched Out : $Modtime:   Oct 11 2010 10:40:00  $
---       Version          : $Revision:   3.2  $
--------------------------------------------------------------------------
+--       Date into PVCS   : $Date:   Jul 04 2013 11:20:06  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 11:01:58  $
+--       Version          : $Revision:   3.3  $
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
 --
 SET echo OFF
 SET term OFF

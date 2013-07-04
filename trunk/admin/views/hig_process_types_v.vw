@@ -4,12 +4,15 @@ SELECT
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/hig_process_types_v.vw-arc   3.1   May 21 2010 10:35:04   gjohnson  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/hig_process_types_v.vw-arc   3.2   Jul 04 2013 11:20:06   James.Wadsworth  $
 --       Module Name      : $Workfile:   hig_process_types_v.vw  $
---       Date into PVCS   : $Date:   May 21 2010 10:35:04  $
---       Date fetched Out : $Modtime:   May 19 2010 18:08:46  $
---       Version          : $Revision:   3.1  $
--------------------------------------------------------------------------
+--       Date into PVCS   : $Date:   Jul 04 2013 11:20:06  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 10:55:28  $
+--       Version          : $Revision:   3.2  $
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
              hpt_process_type_id,
              hpt_name,
              hpt_descr,

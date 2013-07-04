@@ -35,13 +35,15 @@ SELECT
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/hig_user_details_vw.vw-arc   3.0   Apr 06 2009 10:45:28   lsorathia  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/hig_user_details_vw.vw-arc   3.1   Jul 04 2013 11:20:06   James.Wadsworth  $
 --       Module Name      : $Workfile:   hig_user_details_vw.vw  $
---       Date into PVCS   : $Date:   Apr 06 2009 10:45:28  $
---       Date fetched Out : $Modtime:   Apr 01 2009 13:15:30  $
---       Version          : $Revision:   3.0  $
+--       Date into PVCS   : $Date:   Jul 04 2013 11:20:06  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 10:58:44  $
+--       Version          : $Revision:   3.1  $
 --       Based on SCCS version : 
--------------------------------------------------------------------------
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
 --
  HUS_USER_ID  
 ,HUS_INITIALS  
