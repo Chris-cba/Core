@@ -1,0 +1,113 @@
+CREATE OR REPLACE PACKAGE nm3undo IS
+--<PACKAGE>
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)nm3undo.pkh	1.3 04/22/04
+--       Module Name      : nm3undo.pkh
+--       Date into SCCS   : 04/04/22 12:11:43
+--       Date fetched Out : 04/12/16 10:03:14
+--       SCCS Version     : 1.3
+--
+--   Author : ITurnbull
+--
+--     nm3undo package. Used for unsplit, unmerge, unreplace
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--all global package variables here
+--<GLOBVAR>
+  g_sccsid      CONSTANT  VARCHAR2(80) := '@(#)nm3undo.pkh	1.3 04/22/04';
+--  g_sccsid is the SCCS_ID
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_version">
+-- This function returns the SCCS version information
+  FUNCTION get_version RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="unsplit">
+-- Start the unsplit procedure
+-- p_ne_id is the element to un-split
+   PROCEDURE unsplit(p_ne_id NM_ELEMENTS.ne_id%TYPE
+                    );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="unmerge">
+-- Start the unmerge procedure
+-- unmerge the two elements
+   PROCEDURE unmerge(p_ne_id_1 NM_ELEMENTS.ne_id%TYPE,
+                     p_ne_id_2 NM_ELEMENTS.ne_id%TYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="unmerge">
+-- Start the unmerge procedure
+-- unmerge the two elements, passing the new merged element
+   PROCEDURE unmerge(p_ne_id NM_ELEMENTS.ne_id%TYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="unreplace">
+-- Start the unreplace procedure
+-- unreplace an elements
+   PROCEDURE unreplace(p_ne_id NM_ELEMENTS.ne_id%TYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="unclose">
+-- Start the unclose procedure
+-- unclose an element and inv items on it
+PROCEDURE unclose ( p_ne_id NM_ELEMENTS.ne_id%TYPE );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+procedure get_undo_data( p_ne_id in nm_elements.ne_id%type,
+                         p_operation out varchar2,
+                         p_ne_id_new1 out nm_elements.ne_id%type,
+                         p_ne_id_new2 out nm_elements.ne_id%type,                        
+                         p_ne_id_old1 out nm_elements.ne_id%type,
+                         p_ne_id_old2 out nm_elements.ne_id%type
+                          );
+--						  
+-----------------------------------------------------------------------------						  
+--
+--<PROC NAME="check_history">
+-- Checks the if there have been anyother network operations
+-- on the element since the specified network operation
+--
+FUNCTION check_history (p_ne_id NM_ELEMENTS.ne_id%TYPE,
+                        p_neh_operation nm_element_history.neh_operation%TYPE)
+RETURN BOOLEAN;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PRAGMA>
+   PRAGMA RESTRICT_REFERENCES (get_version, rnds, wnps, wnds);
+   PRAGMA RESTRICT_REFERENCES (get_body_version, rnds, wnps, wnds);
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+
+END nm3undo;
+/

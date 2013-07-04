@@ -1,0 +1,307 @@
+CREATE OR REPLACE PACKAGE nm3type AS
+--<PACKAGE>
+--   PVCS Identifiers :-
+--
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3type.pkh-arc   2.3   Jul 04 2013 16:35:52   James.Wadsworth  $
+--       Module Name      : $Workfile:   nm3type.pkh  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:35:52  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 16:33:54  $
+--       PVCS Version     : $Revision:   2.3  $
+--       Based on SCCS version :  1.34
+--
+------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+------------------------------------------------------------------
+--
+--   Author : Jonathan Mills
+--
+--   Types package
+--
+--   This package is to contain TYPE (PL/SQL table ones) declarations to
+--    remove the need to have duplication of these within different packages
+--   This package should not have any dependencies to other packages  (apart
+--    from nm_debug) added to avoid dependency loops, because of course many
+--    other packages will reference this one
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+   g_sccsid      CONSTANT  varchar2(2000) :='"$Revision:   2.3  $"';
+--  g_sccsid is the SCCS ID for the package
+--
+   SUBTYPE max_varchar2 IS varchar2(32767);
+--
+-- "Normal" datatype TYPE definitions
+   TYPE tab_number       IS TABLE OF number          INDEX BY binary_integer;
+   TYPE tab_date         IS TABLE OF date            INDEX BY binary_integer;
+   TYPE tab_boolean      IS TABLE OF boolean         INDEX BY binary_integer;
+   TYPE tab_rowid        IS TABLE OF ROWID           INDEX BY binary_integer;
+   TYPE tab_varchar1     IS TABLE OF varchar2(1)     INDEX BY binary_integer;
+   TYPE tab_varchar4     IS TABLE OF varchar2(4)     INDEX BY binary_integer;
+   TYPE tab_varchar30    IS TABLE OF varchar2(30)    INDEX BY binary_integer;
+   TYPE tab_varchar80    IS TABLE OF varchar2(80)    INDEX BY binary_integer;
+   TYPE tab_varchar2000  IS TABLE OF varchar2(2000)  INDEX BY binary_integer;
+   TYPE tab_varchar4000  IS TABLE OF varchar2(4000)  INDEX BY binary_integer;
+   TYPE tab_varchar32767 IS TABLE OF varchar2(32767) INDEX BY binary_integer;
+--
+-- "ROWTYPE" TYPE definitions
+   TYPE tab_rec_nit    IS TABLE OF nm_inv_types%ROWTYPE       INDEX BY binary_integer;
+   TYPE tab_rec_iit    IS TABLE OF nm_inv_items%ROWTYPE       INDEX BY binary_integer;
+   TYPE tab_rec_nm     IS TABLE OF nm_members%ROWTYPE         INDEX BY binary_integer;
+   TYPE tab_rec_grp    IS TABLE OF gri_run_parameters%ROWTYPE INDEX BY binary_integer;
+   TYPE tab_rec_ngt    IS TABLE OF nm_group_types%ROWTYPE     INDEX BY binary_integer;
+--
+-- "OTHER" datatype TYPE definitions
+   TYPE ref_cursor IS REF CURSOR;
+--
+-- GLOBAL Constants
+--
+   c_default_date_format   CONSTANT varchar2(11) := 'DD-MON-YYYY';
+   c_full_date_time_format CONSTANT varchar2(22) := 'DD-MON-YYYY HH24:MI:SS';
+   -- MJA log 703512 07/09/06
+   --c_nvl                   CONSTANT varchar2(4)  := '~ì~.';
+   c_nvl                   CONSTANT varchar2(4)  := '~~~~';
+--
+   c_readonly            CONSTANT varchar2(8)  := 'READONLY';
+   c_normal              CONSTANT varchar2(6)  := 'NORMAL';
+--
+   c_true                CONSTANT varchar2(4)  := 'TRUE';
+   c_false               CONSTANT varchar2(5)  := 'FALSE';
+--
+   c_updating            CONSTANT varchar2(8)  := 'UPDATING';
+   c_inserting           CONSTANT varchar2(9)  := 'INSERTING';
+   c_deleting            CONSTANT varchar2(8)  := 'DELETING';
+--
+   c_on                  CONSTANT varchar2(3)  := 'ON';
+   c_off                 CONSTANT varchar2(3)  := 'OFF';
+--
+   c_public              CONSTANT varchar2(6)  := 'PUBLIC';
+--
+   c_big_date            CONSTANT date         := TO_DATE('31/12/9999','DD/MM/YYYY');
+   c_nvl_date            CONSTANT date         := TO_DATE('02/08/1973 12:45','DD/MM/YYYY HH24:MI');
+--
+   c_big_number          CONSTANT number  := TO_NUMBER(RPAD('9',38,'9'));
+--
+   c_number              CONSTANT varchar2(6)  := 'NUMBER';
+   c_date                CONSTANT varchar2(4)  := 'DATE';
+   c_varchar             CONSTANT varchar2(8)  := 'VARCHAR2';
+   
+   c_max_varchar2_size   CONSTANT pls_integer := 32767;
+--
+   g_exception           EXCEPTION;
+   g_exception_code      number;
+   g_exception_msg       varchar2(4000);
+--
+   c_and_operator        CONSTANT varchar2(3)  := 'AND';
+   c_or_operator         CONSTANT varchar2(2)  := 'OR';
+--
+   c_intersect           CONSTANT varchar2(9)  := 'INTERSECT';
+   c_union               CONSTANT varchar2(5)  := 'UNION';
+   c_union_all           CONSTANT varchar2(9)  := 'UNION ALL';
+--
+   c_yes                 CONSTANT varchar2(3)  := 'YES';
+   c_no                  CONSTANT varchar2(2)  := 'NO';
+   c_cancel              CONSTANT varchar2(6)  := 'CANCEL';
+--
+   c_dot                 CONSTANT varchar2(1)  := CHR(46); -- the .
+   c_space               CONSTANT varchar2(1)  := CHR(32);
+   c_comma_sep           CONSTANT varchar2(2)  := CHR(44)||c_space; -- the default comma seperator
+   c_newline             CONSTANT varchar2(1)  := CHR(10);
+   c_equals              CONSTANT varchar2(1)  := CHR(61);
+   c_select              CONSTANT varchar2(6)  := 'SELECT';
+   c_from                CONSTANT varchar2(4)  := 'FROM';
+   c_where               CONSTANT varchar2(5)  := 'WHERE';
+   c_order_by            CONSTANT varchar2(8)  := 'ORDER BY';
+   c_insert_into         CONSTANT varchar2(11) := 'INSERT INTO';
+   c_values              CONSTANT varchar2(6)  := 'VALUES';
+   c_outer_join          CONSTANT varchar2(3)  := '(+)';
+   c_in                  CONSTANT varchar2(2)  := 'IN';
+--
+   c_hig                 CONSTANT hig_products.hpr_product%TYPE := 'HIG';
+   c_ast                 CONSTANT hig_products.hpr_product%TYPE := 'AST';
+   c_net                 CONSTANT hig_products.hpr_product%TYPE := 'NET';
+   c_acc                 CONSTANT hig_products.hpr_product%TYPE := 'ACC';
+   c_str                 CONSTANT hig_products.hpr_product%TYPE := 'STR';
+   c_tm                  CONSTANT hig_products.hpr_product%TYPE := 'TM';
+   c_im                  CONSTANT hig_products.hpr_product%TYPE := 'IM';
+   c_clm                 CONSTANT hig_products.hpr_product%TYPE := 'CLM';
+   c_doc                 CONSTANT hig_products.hpr_product%TYPE := 'DOC';
+   c_enq                 CONSTANT hig_products.hpr_product%TYPE := 'ENQ';
+   c_mai                 CONSTANT hig_products.hpr_product%TYPE := 'MAI';
+   c_nsg                 CONSTANT hig_products.hpr_product%TYPE := 'NSG';
+   c_pms                 CONSTANT hig_products.hpr_product%TYPE := 'PMS';
+   c_prow                CONSTANT hig_products.hpr_product%TYPE := 'PROW';
+   c_stp                 CONSTANT hig_products.hpr_product%TYPE := 'STP';
+   c_swr                 CONSTANT hig_products.hpr_product%TYPE := 'SWR';
+   c_ukp                 CONSTANT hig_products.hpr_product%TYPE := 'UKP';
+   c_usr                 CONSTANT hig_products.hpr_product%TYPE := 'USR';
+--
+   c_ora                 CONSTANT varchar2(3) := 'ORA';
+--
+   c_stp_nit_category    CONSTANT nm_inv_types.nit_category%TYPE := 'R';
+--
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="dump_tab_number">
+-- This procedure calls NM_DEBUG.DEBUG for each entry in the array
+--
+PROCEDURE dump_tab_number (p_tab_number IN tab_number);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="dump_tab_boolean">
+-- This procedure calls NM_DEBUG.DEBUG for each entry in the array
+--
+PROCEDURE dump_tab_boolean (p_tab_boolean IN tab_boolean);
+--
+--</PROC>
+--
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_constant">
+-- Return the value held in the given constant.
+FUNCTION get_constant(pi_constant_name in varchar2) RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_default_date_format">
+-- This function returns the default date format package constant
+--
+FUNCTION get_default_date_format RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nvl">
+FUNCTION get_nvl                 RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_readonly">
+FUNCTION get_readonly            RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_normal">
+FUNCTION get_normal              RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_true">
+FUNCTION get_true                RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_false">
+FUNCTION get_false               RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_updating">
+FUNCTION get_updating            RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_inserting">
+FUNCTION get_inserting           RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_deleting">
+FUNCTION get_deleting            RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_on">
+FUNCTION get_on                  RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_off">
+FUNCTION get_off                 RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_big_date">
+FUNCTION get_big_date            RETURN date;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_yes">
+--
+FUNCTION get_yes RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_no">
+--
+FUNCTION get_no RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_cancel">
+--
+FUNCTION get_cancel RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PRAGMA>
+   PRAGMA RESTRICT_REFERENCES (get_version, rnds, wnps, wnds);
+   PRAGMA RESTRICT_REFERENCES (get_body_version, rnds, wnps, wnds);
+   PRAGMA RESTRICT_REFERENCES (get_default_date_format, rnds, wnds, wnps);
+   PRAGMA RESTRICT_REFERENCES (get_nvl, rnds, wnds, wnps);
+   PRAGMA RESTRICT_REFERENCES (get_readonly, rnds, wnds, wnps);
+   PRAGMA RESTRICT_REFERENCES (get_normal, rnds, wnds, wnps);
+   PRAGMA RESTRICT_REFERENCES (get_true, rnds, wnds, wnps);
+   PRAGMA RESTRICT_REFERENCES (get_false, rnds, wnds, wnps);
+   PRAGMA RESTRICT_REFERENCES (get_updating, rnds, wnds, wnps);
+   PRAGMA RESTRICT_REFERENCES (get_inserting, rnds, wnds, wnps);
+   PRAGMA RESTRICT_REFERENCES (get_deleting, rnds, wnds, wnps);
+   PRAGMA RESTRICT_REFERENCES (get_on, rnds, wnds, wnps);
+   PRAGMA RESTRICT_REFERENCES (get_off, rnds, wnds, wnps);
+   PRAGMA RESTRICT_REFERENCES (get_big_date, rnds, wnds, wnps);
+   PRAGMA RESTRICT_REFERENCES (get_yes, rnds, wnds, wnps);
+   PRAGMA RESTRICT_REFERENCES (get_no, rnds, wnds, wnps);
+   PRAGMA RESTRICT_REFERENCES (get_cancel, rnds, wnds, wnps);
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+END nm3type;
+/
