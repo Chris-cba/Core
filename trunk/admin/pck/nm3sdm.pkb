@@ -5,11 +5,11 @@ As
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.65   Apr 08 2013 13:16:10   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.66   Jul 04 2013 16:22:08   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3sdm.pkb  $
---       Date into PVCS   : $Date:   Apr 08 2013 13:16:10  $
---       Date fetched Out : $Modtime:   Apr 08 2013 13:09:54  $
---       PVCS Version     : $Revision:   2.65  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:22:08  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 15:50:42  $
+--       PVCS Version     : $Revision:   2.66  $
 --
 --   Author : R.A. Coupe
 --
@@ -21,7 +21,7 @@ As
 --
 --all global package variables here
 --
-  g_Body_Sccsid     Constant Varchar2 (2000) := '"$Revision:   2.65  $"';
+  g_Body_Sccsid     Constant Varchar2 (2000) := '"$Revision:   2.66  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
   g_Package_Name    Constant Varchar2 (30)   := 'NM3SDM';
@@ -7239,7 +7239,7 @@ Begin
   Append ('--       Version          : ' || G_Body_Sccsid);
   Append ('--');
   Append ('-----------------------------------------------------------------------------');
-  Append ('--    Copyright (c) exor corporation ltd, 2010');
+  Append ('--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.');
   Append ('-----------------------------------------------------------------------------');
   Append ('-- Author : R Coupe');
   Append ('--          G Johnson / A Edwards');

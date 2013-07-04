@@ -6,11 +6,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3sde AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sde.pkb-arc   2.22   Mar 08 2013 08:32:32   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sde.pkb-arc   2.23   Jul 04 2013 16:22:08   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3sde.pkb  $
---       Date into PVCS   : $Date:   Mar 08 2013 08:32:32  $
---       Date fetched Out : $Modtime:   Mar 08 2013 08:30:34  $
---       PVCS Version     : $Revision:   2.22  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:22:08  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:18  $
+--       PVCS Version     : $Revision:   2.23  $
 --
 --       Based on one of many versions labeled as 1.21
 --
@@ -19,12 +19,12 @@ CREATE OR REPLACE PACKAGE BODY Nm3sde AS
 --   Spatial Data Manager specific package body
 --
 -----------------------------------------------------------------------------
--- Copyright (c) exor corporation ltd, 2002
+-- Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.22  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.23  $"';
    g_keyword         CONSTANT  VARCHAR2(30)   := 'SDO_GEOMETRY'; --get_keyword;
 
 
