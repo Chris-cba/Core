@@ -15,7 +15,7 @@ DECLARE
 --    %YourObjectname%
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2004
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 CURSOR cs_hap IS
   SELECT MIN(rowid)

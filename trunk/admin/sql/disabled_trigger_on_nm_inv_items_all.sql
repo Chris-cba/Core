@@ -3,13 +3,15 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/sql/disabled_trigger_on_nm_inv_items_all.sql-arc   3.3   Mar 04 2009 09:03:18   lsorathia  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/sql/disabled_trigger_on_nm_inv_items_all.sql-arc   3.4   Jul 04 2013 09:32:42   James.Wadsworth  $
 --       Module Name      : $Workfile:   disabled_trigger_on_nm_inv_items_all.sql  $
---       Date into PVCS   : $Date:   Mar 04 2009 09:03:18  $
---       Date fetched Out : $Modtime:   Mar 04 2009 09:02:28  $
---       PVCS Version     : $Revision:   3.3  $
+--       Date into PVCS   : $Date:   Jul 04 2013 09:32:42  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 09:27:46  $
+--       PVCS Version     : $Revision:   3.4  $
 --
---------------------------------------------------------------------------------
+------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+------------------------------------------------------------------
 --
 
 PROMPT Drop Tigger NM_INV_ITEMS_ALL_A_DT_TRG as the same code is called in NM_INV_ITEMS_ALL_A_INS_UPD

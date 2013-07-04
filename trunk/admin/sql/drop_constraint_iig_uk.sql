@@ -2,13 +2,15 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/sql/drop_constraint_iig_uk.sql-arc   3.0   May 18 2009 12:25:58   lsorathia  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/sql/drop_constraint_iig_uk.sql-arc   3.1   Jul 04 2013 09:32:42   James.Wadsworth  $
 --       Module Name      : $Workfile:   drop_constraint_iig_uk.sql  $
---       Date into PVCS   : $Date:   May 18 2009 12:25:58  $
---       Date fetched Out : $Modtime:   May 18 2009 11:25:04  $
---       PVCS Version     : $Revision:   3.0  $
+--       Date into PVCS   : $Date:   Jul 04 2013 09:32:42  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 09:27:58  $
+--       PVCS Version     : $Revision:   3.1  $
 --
---------------------------------------------------------------------------------
+------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+------------------------------------------------------------------
 --
 
 PROMPT Drop Trigger NM_INV_ITEMS_INSTEAD_IU

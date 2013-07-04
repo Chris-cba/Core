@@ -3,13 +3,15 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/sql/add_lrs_gtypes.sql-arc   3.0   Oct 10 2008 09:56:28   aedwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/sql/add_lrs_gtypes.sql-arc   3.1   Jul 04 2013 09:32:42   James.Wadsworth  $
 --       Module Name      : $Workfile:   add_lrs_gtypes.sql  $
---       Date into PVCS   : $Date:   Oct 10 2008 09:56:28  $
---       Date fetched Out : $Modtime:   Oct 10 2008 09:55:18  $
---       PVCS Version     : $Revision:   3.0  $
+--       Date into PVCS   : $Date:   Jul 04 2013 09:32:42  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 09:25:46  $
+--       PVCS Version     : $Revision:   3.1  $
 --
---------------------------------------------------------------------------------
+------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+------------------------------------------------------------------
 --
 
 PROMPT Create Oracle LRS Gtype Lookups

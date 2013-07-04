@@ -22,13 +22,15 @@ SELECT
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/sql/bulk_update_ddl_script.sql-arc   3.3   May 23 2011 11:34:46   Chris.Strettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/sql/bulk_update_ddl_script.sql-arc   3.4   Jul 04 2013 09:32:42   James.Wadsworth  $
 --       Module Name      : $Workfile:   bulk_update_ddl_script.sql  $
---       Date into PVCS   : $Date:   May 23 2011 11:34:46  $
---       Date fetched Out : $Modtime:   May 23 2011 11:33:28  $
---       Version          : $Revision:   3.3  $
+--       Date into PVCS   : $Date:   Jul 04 2013 09:32:42  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 09:27:20  $
+--       Version          : $Revision:   3.4  $
 --       Based on SCCS version : 
--------------------------------------------------------------------------
+------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+------------------------------------------------------------------
 --
 ne_id
       ,ne_unique 
@@ -74,11 +76,11 @@ BEGIN
             ' ------------------------------------------------------------------------- '||Chr(10)||
             ' --   PVCS Identifiers :- '||Chr(10)||
             ' -- '||Chr(10)||
-            ' --       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/sql/bulk_update_ddl_script.sql-arc   3.3   May 23 2011 11:34:46   Chris.Strettle  $ '||Chr(10)||
+            ' --       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/sql/bulk_update_ddl_script.sql-arc   3.4   Jul 04 2013 09:32:42   James.Wadsworth  $ '||Chr(10)||
             ' --       Module Name      : $Workfile:   bulk_update_ddl_script.sql  $ '||Chr(10)||
-            ' --       Date into PVCS   : $Date:   May 23 2011 11:34:46  $ '||Chr(10)||
-            ' --       Date fetched Out : $Modtime:   May 23 2011 11:33:28  $ '||Chr(10)||
-            ' --       Version          : $Revision:   3.3  $ '||Chr(10)||
+            ' --       Date into PVCS   : $Date:   Jul 04 2013 09:32:42  $ '||Chr(10)||
+            ' --       Date fetched Out : $Modtime:   Jul 04 2013 09:27:20  $ '||Chr(10)||
+            ' --       Version          : $Revision:   3.4  $ '||Chr(10)||
             ' --       Based on SCCS version :  '||Chr(10)||
             ' ------------------------------------------------------------------------- '||Chr(10)||
             ' --  '||Chr(10)||
