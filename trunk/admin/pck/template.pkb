@@ -16,7 +16,7 @@ Create or Replace Package Body Templates AS
 --  template.
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2000
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
    g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"@(#)template.pkb	1.1 03/01/01"';
 --  g_body_sccsid is the SCCS ID for the package body
