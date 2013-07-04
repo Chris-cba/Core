@@ -10,7 +10,7 @@ CREATE OR REPLACE FUNCTION STYLE_FROM_XML ( STYLE IN VARCHAR2 ) RETURN VARCHAR2 
 --       SCCS Version     : 1.1
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2004
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
   RETVAL VARCHAR2(2000);
 BEGIN

@@ -12,7 +12,7 @@ CREATE OR REPLACE PACKAGE SWR_UTL_FILE_DOWNLOAD AS
 --       SCCS Version     : 1.2
 --
 -----------------------------------------------------------------------------
--- Copyright (c) exor corporation ltd, 2004
+-- Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>

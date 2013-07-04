@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY nm3xsp AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3xsp.pkb-arc   2.1   Jan 06 2010 16:41:38   cstrettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3xsp.pkb-arc   2.2   Jul 04 2013 16:41:22   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3xsp.pkb  $
---       Date into PVCS   : $Date:   Jan 06 2010 16:41:38  $
---       Date fetched Out : $Modtime:   Jan 06 2010 15:24:14  $
---       Version          : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:41:22  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:22  $
+--       Version          : $Revision:   2.2  $
 --       Based on SCCS version : 1.1
 -------------------------------------------------------------------------
 --   Author : Darren Cope
@@ -15,7 +15,7 @@ CREATE OR REPLACE PACKAGE BODY nm3xsp AS
 --   nm3xsp body
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2002
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 --all global package variables here
@@ -24,7 +24,7 @@ CREATE OR REPLACE PACKAGE BODY nm3xsp AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.1  $';
+  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.2  $';
 
   g_package_name CONSTANT varchar2(30) := 'nm3xsp';
 --
