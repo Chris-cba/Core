@@ -7,14 +7,14 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4500_nm4600_metadata_upg.sql-arc   1.3   Oct 15 2012 10:10:48   Rob.Coupe  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4500_nm4600_metadata_upg.sql-arc   1.4   Jul 04 2013 14:16:48   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm4500_nm4600_metadata_upg.sql  $
---       Date into PVCS   : $Date:   Oct 15 2012 10:10:48  $
---       Date fetched Out : $Modtime:   Oct 15 2012 10:10:20  $
---       Version          : $Revision:   1.3  $
+--       Date into PVCS   : $Date:   Jul 04 2013 14:16:48  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 11:54:22  $
+--       Version          : $Revision:   1.4  $
 --
 ------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2011
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 
 
 SET ECHO OFF

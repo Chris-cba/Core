@@ -8,14 +8,14 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4500_nm4600_ddl_upg.sql-arc   1.4   Aug 15 2012 08:27:18   Rob.Coupe  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4500_nm4600_ddl_upg.sql-arc   1.5   Jul 04 2013 14:16:48   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm4500_nm4600_ddl_upg.sql  $
---       Date into PVCS   : $Date:   Aug 15 2012 08:27:18  $
---       Date fetched Out : $Modtime:   Aug 15 2012 08:26:44  $
---       Version          : $Revision:   1.4  $
+--       Date into PVCS   : $Date:   Jul 04 2013 14:16:48  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 11:54:22  $
+--       Version          : $Revision:   1.5  $
 --
 ------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2011
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 
 SET ECHO OFF
 SET LINESIZE 120
@@ -210,11 +210,11 @@ SET TERM OFF
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm4500_nm4600_ddl_upg.sql-arc   1.4   Aug 15 2012 08:27:18   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm4500_nm4600_ddl_upg.sql-arc   1.5   Jul 04 2013 14:16:48   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm4500_nm4600_ddl_upg.sql  $
---       Date into PVCS   : $Date:   Aug 15 2012 08:27:18  $
---       Date fetched Out : $Modtime:   Aug 15 2012 08:26:44  $
---       PVCS Version     : $Revision:   1.4  $
+--       Date into PVCS   : $Date:   Jul 04 2013 14:16:48  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 11:54:22  $
+--       PVCS Version     : $Revision:   1.5  $
 --
 --------------------------------------------------------------------------------
 --
