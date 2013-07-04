@@ -1,0 +1,123 @@
+create or replace package nm3web_apd as
+--<PACKAGE>
+--   PVCS Identifiers :-
+--
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3web_apd.pkh-arc   2.2   Jul 04 2013 16:35:54   James.Wadsworth  $
+--       Module Name      : $Workfile:   nm3web_apd.pkh  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:35:54  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:20  $
+--       PVCS Version     : $Revision:   2.2  $
+--       Based on         : 1.2
+--
+--
+--   Author : Jonathan Mills
+--
+--   NM3 Web APD Package
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+  g_sccsid      CONSTANT  VARCHAR2(2000) := '"$Revision:   2.2  $"';
+--  g_sccsid is the SCCS ID for the package
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="launch_apd">
+-- This is the main driving procedure for the nm3 web schema documentor
+--
+PROCEDURE launch_apd;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="launch_something">
+PROCEDURE launch_something (p_pack_proc  VARCHAR2
+                           ,p_dependency VARCHAR2 DEFAULT 'N'
+                           ,p_radio      VARCHAR2 DEFAULT 'N'
+                           );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_individual">
+PROCEDURE get_individual (p_proc_to_call VARCHAR2
+                         ,p_object_name  VARCHAR2
+                         );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="package_details">
+PROCEDURE package_details;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="individual_package_detail">
+PROCEDURE individual_package_detail (p_package_name VARCHAR2);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="table_details">
+PROCEDURE table_details;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="individual_table_detail">
+PROCEDURE individual_table_detail (p_table_name VARCHAR2);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="view_details">
+PROCEDURE view_details;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="individual_view_detail">
+PROCEDURE individual_view_detail (p_view_name VARCHAR2);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="trigger_details">
+PROCEDURE trigger_details;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="individual_trigger_detail">
+PROCEDURE individual_trigger_detail (p_trigger_name VARCHAR2);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PRAGMA>
+   PRAGMA RESTRICT_REFERENCES (get_version, RNDS, WNPS, WNDS);
+   PRAGMA RESTRICT_REFERENCES (get_body_version, RNDS, WNPS, WNDS);
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+end nm3web_apd;
+/

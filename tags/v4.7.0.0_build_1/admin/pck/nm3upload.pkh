@@ -1,0 +1,148 @@
+CREATE OR REPLACE PACKAGE nm3upload AS
+--<PACKAGE>
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)nm3upload.pkh	1.6 05/12/04
+--       Module Name      : nm3upload.pkh
+--       Date into SCCS   : 04/05/12 00:48:13
+--       Date fetched Out : 07/06/13 14:13:43
+--       SCCS Version     : 1.6
+--
+--
+--   Author : K Angus
+--
+--   NM3 Upload: Contains procedures and functions for uploading data.
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+  g_sccsid      CONSTANT  VARCHAR2(2000) := '"@(#)nm3upload.pkh	1.6 05/12/04"';
+--  g_sccsid is the SCCS ID for the package
+--
+   g_nuf_rowid      ROWID;
+   g_filename       nm3type.max_varchar2;
+--
+   g_new_filename   nm3type.max_varchar2;
+   g_old_filename   nm3type.max_varchar2;
+--
+   c_nm_upload_files CONSTANT VARCHAR2(30) := 'NM_UPLOAD_FILES';
+   g_tab_header     nm3type.tab_varchar80;
+--
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="xml_upload">
+-- This procedure builds the XML Upload web page.
+--
+PROCEDURE xml_upload;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_xml_file">
+-- This procedure performs the upload of the selected XML file and builds a
+-- success or failure page.
+--
+PROCEDURE get_xml_file(pi_file      IN VARCHAR2
+                      ,pi_file_type IN VARCHAR2
+                      ,pi_commit    IN VARCHAR2 DEFAULT 'Y'
+                      );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="strip_dad_reference">
+-- Strip the dad reference from the filename
+--
+FUNCTION strip_dad_reference(pi_filename IN VARCHAR2
+                            ) RETURN VARCHAR2 ;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="load_object">
+-- Loads files into nm_upload_files
+--
+PROCEDURE load_object ;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="load_object">
+-- lists objects loaded in nm_upload_files
+--
+
+PROCEDURE list_loaded( p_in VARCHAR2 DEFAULT NULL
+                      ,pi_orderbydate BOOLEAN DEFAULT FALSE
+                      ,p_replace VARCHAR2 DEFAULT 'N'
+                       );
+
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="do_object_action">
+-- Calls the correct procedure dependant on the action
+--
+PROCEDURE do_object_action ( pi_names IN VARCHAR2 DEFAULT NULL
+                            ,pi_action IN VARCHAR2
+                            ,pi_new_name IN VARCHAR2 DEFAULT NULL
+                           );
+PROCEDURE do_object_action ( pi_names IN nm3type.tab_varchar2000
+                            ,pi_action IN VARCHAR2
+                            ,pi_new_name IN VARCHAR2 DEFAULT NULL
+                           );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="delete_loaded_object">
+-- deletes the named loaded objects
+--
+PROCEDURE delete_loaded_object ( pi_delete IN nm3type.tab_varchar2000  );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="rename_loaded_object">
+-- renames the names loaded object
+--
+PROCEDURE rename_loaded_object ( pi_rename IN nm3type.tab_varchar2000  );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="show_detail">
+-- shows detail of the loaded object
+--
+PROCEDURE show_detail (pi_name VARCHAR2);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PRAGMA>
+   PRAGMA RESTRICT_REFERENCES (get_version, rnds, wnps, wnds);
+   PRAGMA RESTRICT_REFERENCES (get_body_version, rnds, wnps, wnds);
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+END nm3upload;
+/

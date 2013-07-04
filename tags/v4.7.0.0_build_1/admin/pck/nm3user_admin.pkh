@@ -1,0 +1,67 @@
+Create Or Replace Package Nm3User_Admin
+Authid Current_User
+As
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3user_admin.pkh-arc   3.1   Jul 04 2013 16:35:54   James.Wadsworth  $
+--       Module Name      : $Workfile:   nm3user_admin.pkh  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:35:54  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 15:53:20  $
+--       Version          : $Revision:   3.1  $
+-------------------------------------------------------------------------
+--   Author : Steven Cooper
+--
+--   NM3 user Admin package
+--
+------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+------------------------------------------------------------------
+  gc_Header_Version  Constant  Varchar2(2000) := '$Revision:   3.1  $';
+
+--
+--
+-----------------------------------------------------------------------------
+--
+-- This function returns the current SCCS version
+Function Get_Version Return Varchar2;
+--
+-----------------------------------------------------------------------------
+--
+-- This function returns the current SCCS version of the package body
+Function Get_Body_Version Return Varchar2;
+--
+-----------------------------------------------------------------------------
+--
+Procedure Set_Default_Tablespace  (
+                                  p_User                      In  Dba_Users.Username%Type,
+                                  p_Default_Tablespace_Name   In  Dba_Users.Default_Tablespace%Type,
+                                  p_Quota                     In  Dba_Ts_Quotas.Max_Bytes%Type,
+                                  p_Quota_Size_Type           In  Varchar2 Default Null
+                                  );
+--
+-----------------------------------------------------------------------------
+--
+Procedure Set_User_Profile  (
+                            p_User      In   Dba_Users.Username%Type,
+                            p_Profile   In   Dba_Users.Profile%Type
+                            );
+--
+-----------------------------------------------------------------------------
+--
+Function User_Exists  (
+                      p_User    In    All_Users.Username%Type
+                      ) Return Boolean;
+--
+-----------------------------------------------------------------------------
+--
+Procedure Set_User_Password (
+                            p_User        In  Dba_Users.Username%Type,
+                            p_Password    In  Varchar2
+                            );
+--
+-----------------------------------------------------------------------------
+--
+End Nm3User_Admin;
+  
+/

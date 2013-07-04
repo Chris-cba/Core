@@ -1,0 +1,269 @@
+CREATE OR REPLACE PACKAGE nm3web_eng_dynseg AS
+--<PACKAGE>
+--   PVCS Identifiers :-
+--
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3web_eng_dynseg.pkh-arc   2.5   Jul 04 2013 16:35:54   James.Wadsworth  $
+--       Module Name      : $Workfile:   nm3web_eng_dynseg.pkh  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:35:54  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:20  $
+--       PVCS Version     : $Revision:   2.5  $
+--       Based on         : 1.8
+--
+--
+--   Author : Jonathan Mills
+--
+--   NM3 Web Engineering DynSeg package
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+  g_sccsid      CONSTANT  VARCHAR2(2000) := '"$Revision:   2.5  $"';
+--  g_sccsid is the SCCS ID for the package
+--
+   g_tab_value          nm3type.tab_varchar32767;
+   TYPE tab_val_dist    IS TABLE OF nm_value_distribution       INDEX BY BINARY_INTEGER;
+   g_tab_val_obj        tab_val_dist;
+--
+   g_nms_section        nm_mrg_sections.nms_mrg_section_id%TYPE;
+   g_offset_ne_id       nm_mrg_sections.nms_offset_ne_id%TYPE;
+   g_begin_offset       nm_mrg_sections.nms_begin_offset%TYPE;
+   g_end_offset         nm_mrg_sections.nms_end_offset%TYPE;
+   g_nms_ne_id_first    nm_mrg_sections.nms_ne_id_first%TYPE;
+   g_nms_begin_mp_first nm_mrg_sections.nms_begin_mp_first%TYPE;
+   g_nms_ne_id_last     nm_mrg_sections.nms_ne_id_last%TYPE;
+   g_nms_end_mp_last    nm_mrg_sections.nms_end_mp_last%TYPE;
+--
+   g_tab_varchar  nm3type.tab_varchar32767;
+--
+   g_empty_tab    owa_util.ident_arr;
+   --
+   c_poss_func_count    CONSTANT PLS_INTEGER := 100;
+   c_default_func_count CONSTANT PLS_INTEGER := 5;
+--
+-- There needs to be c_poss_func_count g_tab_val_obj_arr_xxx records declared, because
+--  you cannot have an array of nm_value_distribution_arrays unfortunately
+--
+   g_tab_val_obj_arr_1   nm_value_distribution_array;
+   g_tab_val_obj_arr_2   nm_value_distribution_array;
+   g_tab_val_obj_arr_3   nm_value_distribution_array;
+   g_tab_val_obj_arr_4   nm_value_distribution_array;
+   g_tab_val_obj_arr_5   nm_value_distribution_array;
+   g_tab_val_obj_arr_6   nm_value_distribution_array;
+   g_tab_val_obj_arr_7   nm_value_distribution_array;
+   g_tab_val_obj_arr_8   nm_value_distribution_array;
+   g_tab_val_obj_arr_9   nm_value_distribution_array;
+   g_tab_val_obj_arr_10  nm_value_distribution_array;
+   g_tab_val_obj_arr_11  nm_value_distribution_array;
+   g_tab_val_obj_arr_12  nm_value_distribution_array;
+   g_tab_val_obj_arr_13  nm_value_distribution_array;
+   g_tab_val_obj_arr_14  nm_value_distribution_array;
+   g_tab_val_obj_arr_15  nm_value_distribution_array;
+   g_tab_val_obj_arr_16  nm_value_distribution_array;
+   g_tab_val_obj_arr_17  nm_value_distribution_array;
+   g_tab_val_obj_arr_18  nm_value_distribution_array;
+   g_tab_val_obj_arr_19  nm_value_distribution_array;
+   g_tab_val_obj_arr_20  nm_value_distribution_array;
+   g_tab_val_obj_arr_21  nm_value_distribution_array;
+   g_tab_val_obj_arr_22  nm_value_distribution_array;
+   g_tab_val_obj_arr_23  nm_value_distribution_array;
+   g_tab_val_obj_arr_24  nm_value_distribution_array;
+   g_tab_val_obj_arr_25  nm_value_distribution_array;
+   g_tab_val_obj_arr_26  nm_value_distribution_array;
+   g_tab_val_obj_arr_27  nm_value_distribution_array;
+   g_tab_val_obj_arr_28  nm_value_distribution_array;
+   g_tab_val_obj_arr_29  nm_value_distribution_array;
+   g_tab_val_obj_arr_30  nm_value_distribution_array;
+   g_tab_val_obj_arr_31  nm_value_distribution_array;
+   g_tab_val_obj_arr_32  nm_value_distribution_array;
+   g_tab_val_obj_arr_33  nm_value_distribution_array;
+   g_tab_val_obj_arr_34  nm_value_distribution_array;
+   g_tab_val_obj_arr_35  nm_value_distribution_array;
+   g_tab_val_obj_arr_36  nm_value_distribution_array;
+   g_tab_val_obj_arr_37  nm_value_distribution_array;
+   g_tab_val_obj_arr_38  nm_value_distribution_array;
+   g_tab_val_obj_arr_39  nm_value_distribution_array;
+   g_tab_val_obj_arr_40  nm_value_distribution_array;
+   g_tab_val_obj_arr_41  nm_value_distribution_array;
+   g_tab_val_obj_arr_42  nm_value_distribution_array;
+   g_tab_val_obj_arr_43  nm_value_distribution_array;
+   g_tab_val_obj_arr_44  nm_value_distribution_array;
+   g_tab_val_obj_arr_45  nm_value_distribution_array;
+   g_tab_val_obj_arr_46  nm_value_distribution_array;
+   g_tab_val_obj_arr_47  nm_value_distribution_array;
+   g_tab_val_obj_arr_48  nm_value_distribution_array;
+   g_tab_val_obj_arr_49  nm_value_distribution_array;
+   g_tab_val_obj_arr_50  nm_value_distribution_array;
+   g_tab_val_obj_arr_51  nm_value_distribution_array;
+   g_tab_val_obj_arr_52  nm_value_distribution_array;
+   g_tab_val_obj_arr_53  nm_value_distribution_array;
+   g_tab_val_obj_arr_54  nm_value_distribution_array;
+   g_tab_val_obj_arr_55  nm_value_distribution_array;
+   g_tab_val_obj_arr_56  nm_value_distribution_array;
+   g_tab_val_obj_arr_57  nm_value_distribution_array;
+   g_tab_val_obj_arr_58  nm_value_distribution_array;
+   g_tab_val_obj_arr_59  nm_value_distribution_array;
+   g_tab_val_obj_arr_60  nm_value_distribution_array;
+   g_tab_val_obj_arr_61  nm_value_distribution_array;
+   g_tab_val_obj_arr_62  nm_value_distribution_array;
+   g_tab_val_obj_arr_63  nm_value_distribution_array;
+   g_tab_val_obj_arr_64  nm_value_distribution_array;
+   g_tab_val_obj_arr_65  nm_value_distribution_array;
+   g_tab_val_obj_arr_66  nm_value_distribution_array;
+   g_tab_val_obj_arr_67  nm_value_distribution_array;
+   g_tab_val_obj_arr_68  nm_value_distribution_array;
+   g_tab_val_obj_arr_69  nm_value_distribution_array;
+   g_tab_val_obj_arr_70  nm_value_distribution_array;
+   g_tab_val_obj_arr_71  nm_value_distribution_array;
+   g_tab_val_obj_arr_72  nm_value_distribution_array;
+   g_tab_val_obj_arr_73  nm_value_distribution_array;
+   g_tab_val_obj_arr_74  nm_value_distribution_array;
+   g_tab_val_obj_arr_75  nm_value_distribution_array;
+   g_tab_val_obj_arr_76  nm_value_distribution_array;
+   g_tab_val_obj_arr_77  nm_value_distribution_array;
+   g_tab_val_obj_arr_78  nm_value_distribution_array;
+   g_tab_val_obj_arr_79  nm_value_distribution_array;
+   g_tab_val_obj_arr_80  nm_value_distribution_array;
+   g_tab_val_obj_arr_81  nm_value_distribution_array;
+   g_tab_val_obj_arr_82  nm_value_distribution_array;
+   g_tab_val_obj_arr_83  nm_value_distribution_array;
+   g_tab_val_obj_arr_84  nm_value_distribution_array;
+   g_tab_val_obj_arr_85  nm_value_distribution_array;
+   g_tab_val_obj_arr_86  nm_value_distribution_array;
+   g_tab_val_obj_arr_87  nm_value_distribution_array;
+   g_tab_val_obj_arr_88  nm_value_distribution_array;
+   g_tab_val_obj_arr_89  nm_value_distribution_array;
+   g_tab_val_obj_arr_90  nm_value_distribution_array;
+   g_tab_val_obj_arr_91  nm_value_distribution_array;
+   g_tab_val_obj_arr_92  nm_value_distribution_array;
+   g_tab_val_obj_arr_93  nm_value_distribution_array;
+   g_tab_val_obj_arr_94  nm_value_distribution_array;
+   g_tab_val_obj_arr_95  nm_value_distribution_array;
+   g_tab_val_obj_arr_96  nm_value_distribution_array;
+   g_tab_val_obj_arr_97  nm_value_distribution_array;
+   g_tab_val_obj_arr_98  nm_value_distribution_array;
+   g_tab_val_obj_arr_99  nm_value_distribution_array;
+   g_tab_val_obj_arr_100 nm_value_distribution_array;
+--
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="check_route_length">
+procedure check_route_length (pi_route_length    number default null
+                             ,p_source      IN VARCHAR2
+                             ,p_route       IN VARCHAR2           DEFAULT NULL
+                             ,p_slk_from    IN NUMBER             DEFAULT NULL
+                             ,p_slk_to      IN NUMBER             DEFAULT NULL
+                             ,p_saved_ne_id IN NUMBER             DEFAULT NULL
+                             ,p_nmq_id      IN NUMBER             DEFAULT NULL
+                             ,p_nqr_job_id  IN NUMBER             DEFAULT NULL
+                             ,p_gdo_sess_id IN NUMBER             DEFAULT NULL
+                             ,p_function    IN owa_util.ident_arr DEFAULT g_empty_tab
+                             ,p_inv_type    IN owa_util.ident_arr DEFAULT g_empty_tab
+                             ,p_attrib      IN owa_util.ident_arr DEFAULT g_empty_tab
+                             ,p_xsp         IN owa_util.ident_arr DEFAULT g_empty_tab);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="select_route_error">                    
+procedure select_route_error (p_route          varchar2 default null
+                             ,p_error           varchar2 default null
+                             ,p_route_length    number default null);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="select_route_details">
+procedure select_route_details (p_area_type     varchar2 DEFAULT nm3extent.c_route
+                        ,p_gdo_sess_id    number   DEFAULT NULL
+                        ,p_function_count NUMBER   DEFAULT c_default_func_count
+                        ,p_route          varchar2 default null);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="main">                        
+PROCEDURE MAIN;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE dynseg_define (p_area_type      varchar2 DEFAULT nm3extent.c_route
+                        ,p_gdo_sess_id    number   DEFAULT NULL
+                        ,p_function_count NUMBER   DEFAULT c_default_func_count
+                        ,p_route          VARCHAR2 DEFAULT NULL
+                        ,pi_route_length  number DEFAULT NULL
+                        ,pi_descr         varchar2 default null
+                        ,pi_route_min     number default null
+                        ,pi_route_max     number default null
+                        );
+procedure select_route_page (p_area_type      varchar2 DEFAULT nm3extent.c_route
+                        ,p_gdo_sess_id    number   DEFAULT NULL
+                        ,p_function_count NUMBER   DEFAULT c_default_func_count
+                        ,p_route          VARCHAR2 DEFAULT NULL
+                        ) ;                        
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE run_dynseg (p_source      IN VARCHAR2
+                     ,p_route       IN VARCHAR2           DEFAULT NULL
+                     ,p_slk_from    IN NUMBER             DEFAULT NULL
+                     ,p_slk_to      IN NUMBER             DEFAULT NULL
+                     ,p_saved_ne_id IN NUMBER             DEFAULT NULL
+                     ,p_nmq_id      IN NUMBER             DEFAULT NULL
+                     ,p_nqr_job_id  IN NUMBER             DEFAULT NULL
+                     ,p_gdo_sess_id IN NUMBER             DEFAULT NULL
+                     ,p_function    IN owa_util.ident_arr DEFAULT g_empty_tab
+                     ,p_inv_type    IN owa_util.ident_arr DEFAULT g_empty_tab
+                     ,p_attrib      IN owa_util.ident_arr DEFAULT g_empty_tab
+                     ,p_xsp         IN owa_util.ident_arr DEFAULT g_empty_tab
+                     );
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE run_dynseg_arr
+                     (p_source       IN VARCHAR2
+                     ,p_route        IN VARCHAR2 DEFAULT NULL
+                     ,p_slk_from     IN NUMBER   DEFAULT NULL
+                     ,p_slk_to       IN NUMBER   DEFAULT NULL
+                     ,p_saved_ne_id  IN NUMBER   DEFAULT NULL
+                     ,p_nqr_job_id   IN NUMBER   DEFAULT NULL
+                     ,p_gdo_sess_id  IN NUMBER   DEFAULT NULL
+                     ,p_tab_function IN nm3type.tab_varchar30
+                     ,p_tab_inv_type IN nm3type.tab_varchar4
+                     ,p_tab_attrib   IN nm3type.tab_varchar30
+                     ,p_tab_xsp      IN nm3type.tab_varchar4
+                     );
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE write_merge_table_entry;
+--
+-----------------------------------------------------------------------------
+--
+--<PRAGMA>
+   PRAGMA RESTRICT_REFERENCES (get_version, WNPS, WNDS);
+   PRAGMA RESTRICT_REFERENCES (get_body_version, WNPS, WNDS);
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+END nm3web_eng_dynseg;
+/

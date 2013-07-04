@@ -1,0 +1,147 @@
+CREATE OR REPLACE PACKAGE nm3va AS
+--<PACKAGE>
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3va.pkh-arc   2.2   Jul 04 2013 16:35:54   James.Wadsworth  $
+--       Module Name      : $Workfile:   nm3va.pkh  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:35:54  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:20  $
+--       Version          : $Revision:   2.2  $
+--       Based on SCCS version : 1.1
+-------------------------------------------------------------------------
+--
+--   Author : Kevin Angus
+--
+--    nm3va - Procedures and functions for manipulating visual attributes.
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+  -------
+  --types
+  -------
+  SUBTYPE t_nva_rec IS nm_visual_attributes%ROWTYPE;
+  
+  TYPE t_nva_tab IS TABLE OF t_nva_rec INDEX BY binary_integer;
+  
+  TYPE t_rgb_rec IS RECORD(red   pls_integer
+                          ,green pls_integer
+                          ,blue  pls_integer);
+                          
+  SUBTYPE t_va_colour IS varchar2(12);
+
+  -----------
+  --constants
+  -----------
+  --g_sccsid is the SCCS ID for the package
+  g_sccsid CONSTANT varchar2(2000) := '$Revision:   2.2  $';
+
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+--
+-- This function returns the current SCCS version
+--
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+--
+-- This function returns the current SCCS version of the package body
+--
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_default_settings">
+--
+-- This function returns a table with the default settings for all defined
+-- NM visual attributes.
+--
+FUNCTION get_default_settings RETURN t_nva_tab;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_intensities_from_va_colour">
+--
+-- This function returns the rgb intensities from the supplied va.
+-- If pi_scale is set then the intensities are scaled from 8-bit rgb to
+-- percentages.
+--
+FUNCTION get_intensities_from_va_colour(pi_va_colour IN t_va_colour
+                                       ,pi_scale     IN boolean DEFAULT TRUE
+                                       ) RETURN t_rgb_rec;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_va_colour_from_intensities">
+--
+-- This function returns the va created from the supplied rgb intensities.
+-- If pi_scale is set then the intensities are scaled from percentages to
+-- 8-bit rgb.
+--
+FUNCTION get_va_colour_from_intensities(pi_rgb_rec IN t_rgb_rec
+                                       ,pi_scale   IN boolean DEFAULT TRUE
+                                       ) RETURN t_va_colour;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="scale_va_colour_to_rgb">
+--
+-- This function returns the supplied va with its intensities scaled from 
+-- percentages to 8-bit values.
+--
+FUNCTION scale_va_colour_to_rgb(pi_va_colour IN varchar2
+                               ) RETURN t_va_colour;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="scale_va_colour_to_pcnt">
+--
+-- This function returns the supplied va with its intensities scaled from 
+-- 8-bit values to percentages.
+--
+FUNCTION scale_va_colour_to_pcnt(pi_va_colour IN varchar2
+                                ) RETURN t_va_colour;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_default_nfp_id">
+--
+-- This function returns the default fill pattern.
+--
+FUNCTION get_default_nfp_id RETURN nm_fill_patterns.nfp_id%TYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PRAGMA>
+  PRAGMA RESTRICT_REFERENCES(get_version, rnds, wnps, wnds);
+  PRAGMA RESTRICT_REFERENCES(get_body_version, rnds, wnps, wnds);
+  PRAGMA RESTRICT_REFERENCES(get_default_settings, wnps, wnds);
+  PRAGMA RESTRICT_REFERENCES(get_intensities_from_va_colour, wnps, wnds);
+  PRAGMA RESTRICT_REFERENCES(get_va_colour_from_intensities, wnps, wnds);
+  PRAGMA RESTRICT_REFERENCES(scale_va_colour_to_rgb, wnps, wnds);
+  PRAGMA RESTRICT_REFERENCES(scale_va_colour_to_pcnt, wnps, wnds);
+  PRAGMA RESTRICT_REFERENCES(get_default_nfp_id, wnps, wnds);
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+END nm3va;
+
+/ 
+
