@@ -17,7 +17,7 @@ DECLARE
 --    nm_nt_groupings_all_a_stm
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2002
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 BEGIN
   nm3nwval.process_nng_tab;

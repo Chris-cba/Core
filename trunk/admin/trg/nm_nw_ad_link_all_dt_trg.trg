@@ -14,7 +14,7 @@ DECLARE
 --       SCCS Version      :  1.1
 --
 -----------------------------------------------------------------------------
--- Copyright (c) exor corporation ltd, 2005
+-- Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
    l_start_date               DATE := :NEW.NAD_START_DATE;

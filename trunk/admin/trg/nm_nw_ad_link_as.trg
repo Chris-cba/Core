@@ -6,16 +6,16 @@ REFERENCING NEW AS NEW OLD AS OLD
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm_nw_ad_link_as.trg-arc   2.1   Aug 31 2007 17:22:10   malexander  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm_nw_ad_link_as.trg-arc   2.2   Jul 04 2013 09:54:08   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm_nw_ad_link_as.trg  $
---       Date into SCCS   : $Date:   Aug 31 2007 17:22:10  $
---       Date fetched Out : $Modtime:   Aug 31 2007 16:28:06  $
---       SCCS Version     : $Revision:   2.1  $
+--       Date into SCCS   : $Date:   Jul 04 2013 09:54:08  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 09:35:32  $
+--       SCCS Version     : $Revision:   2.2  $
 --       Based on 
 --
 --
 -----------------------------------------------------------------------------
---    Copyright (c) exor corporation ltd, 2004
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 DECLARE
 BEGIN

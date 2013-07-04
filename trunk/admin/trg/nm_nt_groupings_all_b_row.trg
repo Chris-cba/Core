@@ -18,7 +18,7 @@ DECLARE
 --    nm_nt_groupings_all_b_row
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2002
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 
   l_nng_val_rec  nm3nwval.t_nng_val_rec;
