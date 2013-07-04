@@ -4,13 +4,15 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_qry_builder.pkh-arc   3.0   Apr 14 2010 10:42:32   malexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_qry_builder.pkh-arc   3.1   Jul 04 2013 14:57:02   James.Wadsworth  $
 --       Module Name      : $Workfile:   hig_qry_builder.pkh  $
---       Date into PVCS   : $Date:   Apr 14 2010 10:42:32  $
---       Date fetched Out : $Modtime:   Apr 14 2010 10:42:08  $
---       Version          : $Revision:   3.0  $
+--       Date into PVCS   : $Date:   Jul 04 2013 14:57:02  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:53:26  $
+--       Version          : $Revision:   3.1  $
 --       Based on SCCS version : 
--------------------------------------------------------------------------
+------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
 
@@ -18,7 +20,7 @@ AS
   --constants
   -----------
   --g_sccsid is the SCCS ID for the package
-  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.0  $';
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.1  $';
 
   g_return_sql Varchar2(32767) ;
   g_hqt_id     Number ;
