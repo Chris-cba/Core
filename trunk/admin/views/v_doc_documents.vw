@@ -3,11 +3,11 @@ CREATE OR REPLACE FORCE VIEW v_doc_documents
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/v_doc_documents.vw-arc   2.0   Apr 12 2010 09:50:26   aedwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/v_doc_documents.vw-arc   2.1   Jul 04 2013 11:20:52   James.Wadsworth  $
 --       Module Name      : $Workfile:   v_doc_documents.vw  $
---       Date into PVCS   : $Date:   Apr 12 2010 09:50:26  $
---       Date fetched Out : $Modtime:   Apr 12 2010 09:48:56  $
---       Version          : $Revision:   2.0  $
+--       Date into PVCS   : $Date:   Jul 04 2013 11:20:52  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 10:33:42  $
+--       Version          : $Revision:   2.1  $
 -------------------------------------------------------------------------
 --
 (

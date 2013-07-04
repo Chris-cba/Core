@@ -15,7 +15,7 @@ CREATE OR REPLACE FORCE VIEW NM3_NETWORK_ATTRIBS(ELEMENT_ID, HIERARCHY, NOMINATE
 --   Author : %USERNAME%
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2004
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 select ni.iit_ne_id            element_id

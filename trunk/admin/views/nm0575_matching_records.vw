@@ -27,7 +27,7 @@ AS SELECT /*+RULE*/
 --                            the join between nm_inv_items_all and nm_inv_types uses a unique indexed column 
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2006
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
         nit_category       asset_category          
