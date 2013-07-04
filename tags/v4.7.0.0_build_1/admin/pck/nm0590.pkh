@@ -1,0 +1,118 @@
+CREATE OR REPLACE PACKAGE nm0590 AS
+--<PACKAGE>
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)nm0590.pkh	1.6 11/02/06
+--       Module Name      : nm0590.pkh
+--       Date into SCCS   : 06/11/02 17:26:23
+--       Date fetched Out : 07/06/13 14:10:46
+--       SCCS Version     : 1.6
+--
+--
+--   Author : P. Stanton
+--
+--  Package containing functions and procedures that form NM0590 - Asset Maintenance
+--  uses.
+-----------------------------------------------------------------------------
+--      Copyright (c) exor corporation ltd, 2006
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--
+--
+-----------------------------------------------------------------------------
+--
+  TYPE t_valuation IS RECORD ( attrib       VARCHAR2(30)
+                              ,vvn_id       NUMBER
+                              ,screen_text  VARCHAR2(60)
+                              ,value        NUMBER
+                             );
+--
+-----------------------------------------------------------------------------
+--									   
+  TYPE t_tab_valuation IS TABLE OF t_valuation INDEX BY BINARY_INTEGER;
+
+  g_tab_valuation    t_tab_valuation;
+--
+-----------------------------------------------------------------------------
+--
+--
+--<PROC NAME="POPULATE_TAB_FROM_GAZ_QUERY">
+-- Populates the nm_asset_results table using the results of a gaz query
+PROCEDURE populate_inv_tab_from_gaz_qry(pi_ngqi_job_id nm_gaz_query_item_list.ngqi_job_id%TYPE,
+                                        pi_linear      VARCHAR2,
+                                        pi_item_type   VARCHAR2,
+                                        pi_primary_key VARCHAR2,
+                                        pi_xsp         VARCHAR2,
+                                        pi_descr       VARCHAR2,
+                                        pi_admin_unit  NUMBER,
+                                        pi_start_date  DATE,
+                                        pi_end_date    DATE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--
+--<PROC NAME="POPULATE_TAB_FROM_GDA">
+-- Populates the nm_asset_results table using the map results from GIS_DATA_OBJECTS
+PROCEDURE populate_inv_tab_from_gda(pi_ngqi_job_id nm_gaz_query_item_list.ngqi_job_id%TYPE,
+                                    pi_gdo_session_id gis_data_objects.gdo_session_id%TYPE,
+                                    pi_item_type   VARCHAR2,
+                                    pi_primary_key VARCHAR2,
+                                    pi_xsp         VARCHAR2,
+                                    pi_descr       VARCHAR2,
+                                    pi_admin_unit  NUMBER,
+                                    pi_start_date  DATE,
+                                    pi_end_date    DATE);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--
+--<PROC NAME="POPULATE_TAB_FROM_LOC_LOV">
+-- Populates the nm_asset_results table using the results from locator call in LOV mode
+PROCEDURE populate_inv_tab_from_loc(pi_ngqi_job_id nm_gaz_query_item_list.ngqi_job_id%TYPE);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="insert_inv_record">
+-- Inserts into nm_inv_items, items that have been created in the from 
+PROCEDURE insert_inv_record(p_iit_ne_id    IN   nm_inv_items.iit_ne_id%TYPE
+                           ,p_del_post_ins IN   BOOLEAN DEFAULT FALSE
+                           ,p_error_code   OUT  NUMBER
+                           ,p_error_mess   OUT  VARCHAR2);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="update_inv_record">
+-- Populates the result table using the results of a gaz query
+PROCEDURE update_inv_record(pi_qry_results_rowid    IN rowid);
+--</PROC>
+--
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_valuation_data">
+-- 
+FUNCTION get_valuation_data (pi_vva_id   IN  NUMBER
+                            ,pi_vvn_id   IN  NUMBER)
+                            RETURN t_tab_valuation;
+--                            
+--</PROC>
+-- 
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_valuation_data_block">
+-- 
+PROCEDURE get_valuation_parent_block(po_valuation IN OUT t_tab_valuation,
+                                     po_inv_type  IN nm_inv_items.iit_inv_type%TYPE,
+                                     po_iit_ne_id IN nm_inv_items.iit_ne_id%TYPE);
+--                            
+--</PROC>
+--                          
+END nm0590;
+/
