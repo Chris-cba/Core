@@ -15,7 +15,7 @@ create or replace type body nm_placement_array is
 --   nm_placement_array type body
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2001
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 --

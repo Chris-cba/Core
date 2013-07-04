@@ -15,7 +15,7 @@ create or replace TYPE BODY nm_node_class is
 --   nm_node_class type body
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2001
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
   member FUNCTION get_route_id  RETURN number is

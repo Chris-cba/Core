@@ -14,7 +14,7 @@ CREATE OR REPLACE TYPE nm_placement_array AS object
 --    TYPE nm_placement_array
 --
 -----------------------------------------------------------------------------
---      Copyright (c) exor corporation ltd, 2001
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
   npa_placement_array nm_placement_array_type
