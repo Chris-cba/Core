@@ -1,4 +1,4 @@
-REM Copyright (c) Exor Corporation Ltd, 2004
+REM Copyright 2013 Bentley Systems Incorporated. All rights reserved.
 REM @(#)nm3100_nm3110_ddl_upg.sql	1.6 06/21/04
 
 set echo off
