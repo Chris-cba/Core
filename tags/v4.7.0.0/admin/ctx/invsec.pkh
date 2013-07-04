@@ -1,0 +1,161 @@
+CREATE OR REPLACE PACKAGE invsec AS
+--
+------------------------------------------------------------------------------------
+--
+--<PACKAGE>
+--   PVCS Identifiers :-
+--
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/ctx/invsec.pkh-arc   2.1   Jul 04 2013 09:23:56   James.Wadsworth  $
+--       Module Name      : $Workfile:   invsec.pkh  $
+--       Date into SCCS   : $Date:   Jul 04 2013 09:23:56  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 09:22:04  $
+--       SCCS Version     : $Revision:   2.1  $
+--       Based on SCCS Version     : 1.6
+--
+--
+--   Author : Rob Coupe
+--
+--   Package for implementing context-based security
+--
+--   NOTES
+--      1 - The inv_predicate (which is used on NM_INV_ITEMS) function returns a
+--          string which represents a sub-query, that table <STRONG>cannot</STRONG> be used in
+--          conjuntion with a CONNECT BY clause
+--
+------------------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+------------------------------------------------------------------------------------
+--</PACKAGE>
+--
+------------------------------------------------------------------------------------
+--
+--<GLOBVAR>
+  g_sccsid      CONSTANT  varchar2(80) := '"$Revision:   2.1  $"';
+--  g_sccsid is the SCCS_ID
+--
+  c_true_string   CONSTANT varchar2(5) := 'TRUE';
+  c_false_string  CONSTANT varchar2(5) := 'FALSE';
+  c_normal_string CONSTANT varchar2(6) := 'NORMAL';
+--
+  c_start_inv_type_string   CONSTANT varchar2(50) := 'invsec.chk_inv_type_valid_for_role(';
+  c_end_check_string        CONSTANT varchar2(50) := ')='||CHR(39)||c_normal_string||CHR(39);
+  c_end_check_string_read   CONSTANT varchar2(50) := ')!='||CHR(39)||c_false_string||CHR(39);
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_version">
+-- This function returns the SCCS ID
+  FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+------------------------------------------------------------------------------------
+--
+--<PROC NAME="inv_predicate">
+-- This is the predicate function for NM_INV_ITEMS
+  FUNCTION inv_predicate( schema_in varchar2, name_in varchar2) RETURN varchar2;
+--</PROC>
+--
+------------------------------------------------------------------------------------
+--
+--<PROC NAME="inv_predicate_read">
+-- This is the SELECT predicate function for NM_INV_ITEMS
+  FUNCTION inv_predicate_read( schema_in varchar2, name_in varchar2) RETURN varchar2;
+--</PROC>
+--
+------------------------------------------------------------------------------------
+--
+--<PROC NAME="inv_itg_predicate">
+-- This is the predicate function for NM_INV_TYPE_GROUPINGS
+  FUNCTION inv_itg_predicate( schema_in varchar2, name_in varchar2) RETURN varchar2;
+--</PROC>
+--
+------------------------------------------------------------------------------------
+--
+--<PROC NAME="inv_itg_predicate_read">
+-- This is the predicate function for NM_INV_TYPE_GROUPINGS
+  FUNCTION inv_itg_predicate_read( schema_in varchar2, name_in varchar2) RETURN varchar2;
+--</PROC>
+--
+------------------------------------------------------------------------------------
+--
+--<PROC NAME="inv_type_predicate">
+-- This is the predicate function for NM_INV_TYPES
+  FUNCTION inv_type_predicate( schema_in varchar2, name_in varchar2) RETURN varchar2;
+--</PROC>
+--
+------------------------------------------------------------------------------------
+--
+--<PROC NAME="inv_type_predicate_read">
+-- This is the predicate function for NM_INV_TYPES
+  FUNCTION inv_type_predicate_read( schema_in varchar2, name_in varchar2) RETURN varchar2;
+--</PROC>
+--
+------------------------------------------------------------------------------------
+--
+--<PROC NAME="chk_inv_type_valid_for_role">
+-- This function returns "TRUE" if the specified p_inv_type is valid for the current user
+FUNCTION chk_inv_type_valid_for_role (p_inv_type IN nm_inv_items.iit_inv_type%TYPE) RETURN varchar2;
+--</PROC>
+--
+------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_inv_string">
+FUNCTION get_inv_string (p_updating     IN boolean
+                        ,p_au_col_name  IN varchar2
+                        ,p_inv_type_col IN varchar2
+                        ) RETURN varchar2;
+--</PROC>
+--
+------------------------------------------------------------------------------------
+--
+--<PROC NAME="is_inv_item_updatable">
+--
+-- This function returns TRUE if the current inv_type/admin_unit is updatable by
+-- the current user.
+--
+-- If the user has no access to the item directly through roles or admin units but
+-- is unrestricted, then pi_unrestricted_override determines the updatability.
+--
+FUNCTION is_inv_item_updatable (p_iit_inv_type           IN nm_inv_types.nit_inv_type%TYPE
+                               ,p_iit_admin_unit         IN nm_inv_items.iit_admin_unit%TYPE
+                               ,pi_unrestricted_override IN boolean DEFAULT TRUE
+                               ) RETURN boolean;
+--</PROC>
+--
+------------------------------------------------------------------------------------
+--
+--<PROC NAME="is_inv_item_updatable">
+--
+-- This function returns TRUE if items of pi_category can be updated in pi_module. 
+--
+FUNCTION nic_is_updatable_from_module(pi_category IN nm_inv_categories.nic_category%TYPE
+                                     ,pi_module   IN hig_modules.hmo_module%TYPE
+                                     ) RETURN boolean;
+--</PROC>
+--
+------------------------------------------------------------------------------------
+--
+--<PRAGMA>
+   PRAGMA RESTRICT_REFERENCES (get_version,wnds,wnps);
+   PRAGMA RESTRICT_REFERENCES (get_body_version, wnps, wnds);
+   PRAGMA RESTRICT_REFERENCES (inv_predicate,wnds,wnps);
+   PRAGMA RESTRICT_REFERENCES (inv_itg_predicate,wnds,wnps);
+   PRAGMA RESTRICT_REFERENCES (inv_type_predicate,wnds,wnps);
+   PRAGMA RESTRICT_REFERENCES (chk_inv_type_valid_for_role,wnds,wnps);
+   PRAGMA RESTRICT_REFERENCES (get_inv_string,wnds,wnps);
+   PRAGMA RESTRICT_REFERENCES (is_inv_item_updatable,wnds,wnps);
+   PRAGMA RESTRICT_REFERENCES (nic_is_updatable_from_module, wnds, wnps);
+--</PRAGMA>
+--
+------------------------------------------------------------------------------------
+--
+END invsec;
+/
