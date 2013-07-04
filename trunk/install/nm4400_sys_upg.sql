@@ -2,14 +2,15 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm4400_sys_upg.sql-arc   3.0   Feb 28 2011 15:34:14   Ade.Edwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm4400_sys_upg.sql-arc   3.1   Jul 04 2013 14:19:46   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm4400_sys_upg.sql  $
---       Date into PVCS   : $Date:   Feb 28 2011 15:34:14  $
---       Date fetched Out : $Modtime:   Feb 28 2011 15:33:20  $
---       PVCS Version     : $Revision:   3.0  $
+--       Date into PVCS   : $Date:   Jul 04 2013 14:19:46  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:18:58  $
+--       PVCS Version     : $Revision:   3.1  $
 --
---------------------------------------------------------------------------------
---
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
 PROMPT
 PROMPT Highways SYS grants upgrade script
 PROMPT Bentley Systems 2011
