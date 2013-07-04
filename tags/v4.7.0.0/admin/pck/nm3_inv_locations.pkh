@@ -1,0 +1,51 @@
+CREATE OR REPLACE PACKAGE NM3_inv_locations AS
+--<PACKAGE>
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)nm3_inv_locations.pkh	1.2 09/21/05
+--       Module Name      : nm3_inv_locations.pkh
+--       Date into SCCS   : 05/09/21 13:59:59
+--       Date fetched Out : 07/06/13 14:10:47
+--       SCCS Version     : 1.2
+--
+--
+--   Author : P. Stanton 
+--
+--
+------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+
+  --g_sccsid is the SCCS ID for the package
+   g_sccsid      CONSTANT  varchar2(80) := '"@(#)nm3_inv_locations.pkh	1.2 09/21/05"';
+
+--
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="delete_log_table">
+-- This procedure deletes from the nm_members_all_log table 
+PROCEDURE delete_log_table;
+--
+------------------------------------------------------------------------
+--
+--<PROC NAME="add_to_log_table">
+-- This procedure inserts into the nm_members_all_log table 
+PROCEDURE add_to_log_table(p_nm_ne_id_in nm_members_all.nm_ne_id_in%TYPE,
+                           p_nm_ne_id_of nm_members_all.nm_ne_id_of%TYPE,
+                           p_nm_type   VARCHAR2);
+--
+------------------------------------------------------------------------
+--
+--<PROC NAME="add_to_log_table">
+-- This procedure processes the nm_members_all_log_table 
+PROCEDURE update_from_log;                           
+--
+------------------------------------------------------------------------
+--
+
+END nm3_inv_locations;
+/

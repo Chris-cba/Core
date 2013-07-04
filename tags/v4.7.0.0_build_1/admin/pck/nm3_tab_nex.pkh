@@ -1,0 +1,81 @@
+CREATE OR REPLACE PACKAGE nm3_tab_nex AS 
+--<PACKAGE>
+--
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3_tab_nex.pkh-arc   2.2   Jul 04 2013 15:10:54   James.Wadsworth  $
+--       Module Name      : $Workfile:   nm3_tab_nex.pkh  $
+--       Date into PVCS   : $Date:   Jul 04 2013 15:10:54  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:22  $
+--       Version          : $Revision:   2.2  $
+--       Based on SCCS version : 1.1
+---------------------------------------------------------------------------
+--   Author : 
+--
+--   Generated package DO NOT MODIFY
+--
+--   get_gen header : "@(#)nm3_tab_nex.pkh	1.1 11/24/05"
+--   get_gen body   : @(#)nm3_tab_nex.pkh	1.1 11/24/05
+--
+-----------------------------------------------------------------------------
+--
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--
+-----------------------------------------------------------------------------
+--
+--</PACKAGE>
+--<GLOBVAR>
+  g_sccsid      CONSTANT  VARCHAR2(2000) := '$Revision:   2.2  $';
+--  g_sccsid is the SCCS ID for the package
+--
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version of the package
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get">
+--
+--   Function to get using NEX_PK constraint
+--
+FUNCTION get (pi_nex_relationship_type NM_ELEMENT_XREFS.nex_relationship_type%TYPE
+             ,pi_nex_id1               NM_ELEMENT_XREFS.nex_id1%TYPE
+             ,pi_nex_id2               NM_ELEMENT_XREFS.nex_id2%TYPE
+             ,pi_raise_not_found       BOOLEAN     DEFAULT TRUE
+             ,pi_not_found_sqlcode     PLS_INTEGER DEFAULT -20000
+             ) RETURN NM_ELEMENT_XREFS%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="check_ntx_rules">
+-- Make sure the xref does not contravene type xref rules
+-- 
+PROCEDURE check_ntx_rules(pi_nex_rec IN nm_element_xrefs%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PRAGMA>
+   PRAGMA RESTRICT_REFERENCES (get_version, RNDS, WNPS, WNDS);
+   PRAGMA RESTRICT_REFERENCES (get_body_version, RNDS, WNPS, WNDS);
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+END nm3_tab_nex;
+/

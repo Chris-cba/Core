@@ -1,0 +1,92 @@
+CREATE OR REPLACE PACKAGE nm3_tab_naw AS 
+--<PACKAGE>
+--
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3_tab_naw.pkh-arc   2.2   Jul 04 2013 15:10:54   James.Wadsworth  $
+--       Module Name      : $Workfile:   nm3_tab_naw.pkh  $
+--       Date into PVCS   : $Date:   Jul 04 2013 15:10:54  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:22  $
+--       Version          : $Revision:   2.2  $
+--       Based on SCCS version : 1.1
+---------------------------------------------------------------------------
+--
+--   Author : 
+--
+--   Generated package DO NOT MODIFY
+--
+--   get_gen header : "@(#)nm3_tab_naw.pkh	1.1 01/11/06"
+--   get_gen body   : @(#)nm3_tab_naw.pkh	1.1 01/11/06
+--
+-----------------------------------------------------------------------------
+--
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--
+-----------------------------------------------------------------------------
+--
+--</PACKAGE>
+--<GLOBVAR>
+  g_sccsid      CONSTANT  VARCHAR2(2000) := '$Revision:   2.2  $';
+--  g_sccsid is the SCCS ID for the package
+--
+--
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version of the package
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get">
+--
+--   Function to get using NAW_PK constraint
+--
+FUNCTION get (pi_naw_id            NM_AUDIT_WHEN.naw_id%TYPE
+             ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+             ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+             ) RETURN NM_AUDIT_WHEN%ROWTYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="next_naw_id_seq">
+-- Returns NAW_ID_SEQ.NEXTVAL
+FUNCTION next_naw_id_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (next_naw_id_seq, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="curr_naw_id_seq">
+-- Returns NAW_ID_SEQ.CURRVAL
+FUNCTION curr_naw_id_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (curr_naw_id_seq, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PRAGMA>
+   PRAGMA RESTRICT_REFERENCES (get_version, RNDS, WNPS, WNDS);
+   PRAGMA RESTRICT_REFERENCES (get_body_version, RNDS, WNPS, WNDS);
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+END nm3_tab_naw;
+/
