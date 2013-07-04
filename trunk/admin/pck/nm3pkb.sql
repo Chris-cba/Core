@@ -2,11 +2,11 @@
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3pkb.sql-arc   2.40   Feb 07 2013 15:00:42   Steve.Cooper  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3pkb.sql-arc   2.41   Jul 04 2013 16:21:10   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3pkb.sql  $
---       Date into PVCS   : $Date:   Feb 07 2013 15:00:42  $
---       Date fetched Out : $Modtime:   Feb 07 2013 14:59:22  $
---       PVCS Version     : $Revision:   2.40  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:21:10  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:18  $
+--       PVCS Version     : $Revision:   2.41  $
 --
 --
 --   Author : Graeme Johnson
@@ -14,7 +14,7 @@
 --   Run on product install/upgrade
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2007
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 
 SET echo OFF

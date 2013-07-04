@@ -14,7 +14,7 @@ CREATE OR REPLACE PACKAGE Nm3replace IS
 --     nm3replace package.
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2000
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --</PACKAGE>
 --all global package variables here

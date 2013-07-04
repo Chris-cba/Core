@@ -14,7 +14,7 @@ CREATE OR REPLACE PACKAGE Nm3reclass AS
 --   Package for reclassification of network elements
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2001
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>

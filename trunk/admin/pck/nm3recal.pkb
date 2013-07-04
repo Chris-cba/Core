@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3recal IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3recal.pkb-arc   2.7   May 17 2011 08:26:24   Steve.Cooper  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3recal.pkb-arc   2.8   Jul 04 2013 16:21:10   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3recal.pkb  $
---       Date into PVCS   : $Date:   May 17 2011 08:26:24  $
---       Date fetched Out : $Modtime:   Apr 01 2011 13:57:22  $
---       PVCS Version     : $Revision:   2.7  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:21:10  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:18  $
+--       PVCS Version     : $Revision:   2.8  $
 --
 --
 --   Author : Jonathan Mills
@@ -16,7 +16,7 @@ CREATE OR REPLACE PACKAGE BODY nm3recal IS
 --   Recalibration Package
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2000
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 /* History
   PT 23.11.07 recalibrate zero divide fix, subtracting just enough so that the difference is later absorbed in rounding
@@ -25,7 +25,7 @@ CREATE OR REPLACE PACKAGE BODY nm3recal IS
   PT 05.12.07 mairecal.recal_data() brough in line with the others in recalibrate_other_products()
 */
 
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.7  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.8  $"';
    g_package_name    CONSTANT  varchar2(30) := 'nm3recal';
 --
    g_tab_rec_nm      nm3type.tab_rec_nm;

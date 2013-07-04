@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY nm3progress AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3progress.pkb-arc   2.1   Jan 06 2010 16:41:34   cstrettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3progress.pkb-arc   2.2   Jul 04 2013 16:21:10   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3progress.pkb  $
---       Date into PVCS   : $Date:   Jan 06 2010 16:41:34  $
---       Date fetched Out : $Modtime:   Jan 06 2010 10:42:08  $
---       Version          : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:21:10  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:18  $
+--       Version          : $Revision:   2.2  $
 --       Based on SCCS version : 1.2
 -------------------------------------------------------------------------
 --
@@ -15,12 +15,12 @@ CREATE OR REPLACE PACKAGE BODY nm3progress AS
 --
 -----------------------------------------------------------------------------
 --
---	Copyright (c) exor corporation ltd, 2005
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 --
 -----------------------------------------------------------------------------
 --
 --  g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid         CONSTANT varchar2(2000) := '$Revision:   2.1  $';
+  g_body_sccsid         CONSTANT varchar2(2000) := '$Revision:   2.2  $';
   g_package_name     CONSTANT  varchar2(30)   := 'nm3progress';
   g_progress_counter  PLS_INTEGER; 
 --

@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm3replace IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3replace.pkb-arc   2.5   Jun 01 2011 10:10:40   Chris.Strettle  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3replace.pkb-arc   2.6   Jul 04 2013 16:21:10   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3replace.pkb  $
---       Date into PVCS   : $Date:   Jun 01 2011 10:10:40  $
---       Date fetched Out : $Modtime:   Jun 01 2011 10:04:52  $
---       PVCS Version     : $Revision:   2.5  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:21:10  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:18  $
+--       PVCS Version     : $Revision:   2.6  $
 --
 --
 --   Author : ITurnbull
@@ -14,10 +14,10 @@ CREATE OR REPLACE PACKAGE BODY nm3replace IS
 --     nm3replace package.
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2000
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.5  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.6  $"';
 --  g_body_sccsid is the SCCS ID for the package body
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3replace';
 ------------------------------------------------------------------------------------------------

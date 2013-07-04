@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3pla AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3pla.pkb-arc   2.15   Jan 07 2013 15:19:26   Rob.Coupe  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3pla.pkb-arc   2.16   Jul 04 2013 16:21:10   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3pla.pkb  $
---       Date into PVCS   : $Date:   Jan 07 2013 15:19:26  $
---       Date fetched Out : $Modtime:   Jan 07 2013 15:18:40  $
---       Version          : $Revision:   2.15  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:21:10  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:18  $
+--       Version          : $Revision:   2.16  $
 --       Based on SCCS version : 1.61
 ------------------------------------------------------------------------
 --
@@ -15,11 +15,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3pla AS
 --    Placements package
 --
 -------------------------------------------------------------------------------------------
---   Copyright (c) exor corporation ltd, 2000
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -------------------------------------------------------------------------------------------
 -- Global variables - tree definitions etc.
    --g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"@(#)nm3pla.pkb	1.61 11/29/06"';
-   g_body_sccsid     CONSTANT varchar2(2000) := '$Revision:   2.15  $';
+   g_body_sccsid     CONSTANT varchar2(2000) := '$Revision:   2.16  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT VARCHAR2(30) := 'nm3pla';

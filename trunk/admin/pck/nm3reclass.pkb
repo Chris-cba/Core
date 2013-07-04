@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3reclass AS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3reclass.pkb-arc   2.14   Nov 08 2011 16:45:28   Ade.Edwards  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3reclass.pkb-arc   2.15   Jul 04 2013 16:21:10   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3reclass.pkb  $
---       Date into PVCS   : $Date:   Nov 08 2011 16:45:28  $
---       Date fetched Out : $Modtime:   Nov 08 2011 16:44:18  $
---       PVCS Version     : $Revision:   2.14  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:21:10  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:18  $
+--       PVCS Version     : $Revision:   2.15  $
 --
 --
 --   Author : R.A. Coupe
@@ -16,12 +16,12 @@ CREATE OR REPLACE PACKAGE BODY Nm3reclass AS
 --   Package for reclassification of network
 --
 -----------------------------------------------------------------------------
---   Copyright (c) exor corporation ltd, 2001
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.14  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.15  $"';
 -- g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3reclass';

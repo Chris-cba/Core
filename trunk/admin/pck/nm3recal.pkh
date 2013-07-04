@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE nm3recal IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3recal.pkh-arc   2.2   Mar 15 2010 14:58:52   cstrettle  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3recal.pkh-arc   2.3   Jul 04 2013 16:21:10   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3recal.pkh  $
---       Date into PVCS   : $Date:   Mar 15 2010 14:58:52  $
---       Date fetched Out : $Modtime:   Mar 15 2010 14:23:52  $
---       PVCS Version     : $Revision:   2.2  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:21:10  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:18  $
+--       PVCS Version     : $Revision:   2.3  $
 --
 --
 --   Author : Jonathan Mills
@@ -15,11 +15,11 @@ CREATE OR REPLACE PACKAGE nm3recal IS
 --   Recalibration Package
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2000
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
-  g_sccsid      CONSTANT  VARCHAR2(80) := '"$Revision:   2.2  $"';
+  g_sccsid      CONSTANT  VARCHAR2(80) := '"$Revision:   2.3  $"';
 --  g_sccsid is the SCCS ID for the package
 --</GLOBVAR>
 --
