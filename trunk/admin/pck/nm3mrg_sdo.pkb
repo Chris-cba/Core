@@ -1,11 +1,11 @@
 CREATE OR REPLACE PACKAGE BODY NM3MRG_SDO AS
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mrg_sdo.pkb-arc   2.2   Jun 04 2009 11:38:24   ptanava  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mrg_sdo.pkb-arc   2.3   Jul 04 2013 16:16:06   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3mrg_sdo.pkb  $
---       Date into PVCS   : $Date:   Jun 04 2009 11:38:24  $
---       Date fetched Out : $Modtime:   Jun 04 2009 11:37:20  $
---       PVCS Version     : $Revision:   2.2  $ 
+--       Date into PVCS   : $Date:   Jul 04 2013 16:16:06  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:16  $
+--       PVCS Version     : $Revision:   2.3  $ 
 --       Based on SCCS Version     : 1.4
 --
 --   Author : Rob Coupe
@@ -13,14 +13,14 @@ CREATE OR REPLACE PACKAGE BODY NM3MRG_SDO AS
 --   Merge Query SDO package body
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2005
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 /* History
   04.06.09  PT in create_spatial_mrg_view() removed the RULE hint
 */
 
-   g_body_sccsid     constant  varchar2(200) := '"$Revision:   2.2  $"';
+   g_body_sccsid     constant  varchar2(200) := '"$Revision:   2.3  $"';
 
 -----------------------------------------------------------------------------
 
