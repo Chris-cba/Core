@@ -16,7 +16,7 @@ CREATE OR REPLACE PACKAGE BODY higdisco IS
 --   Highways Discoverer Interfacing package body
 --
 -----------------------------------------------------------------------------
---   Copyright (c) exor corporation ltd, 2003
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 --all global package variables here

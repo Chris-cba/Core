@@ -17,7 +17,7 @@ create or replace package body hig_contact as
 --    with contacts
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 1999
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 --package variables

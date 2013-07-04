@@ -16,7 +16,7 @@ CREATE OR REPLACE PACKAGE BODY higfav AS
 --   Package for manipulating the system and user favourites.
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2001
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 --all global package variables here

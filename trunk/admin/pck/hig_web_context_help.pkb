@@ -15,7 +15,7 @@ CREATE OR REPLACE PACKAGE BODY hig_web_context_help AS
 --   hig_web_context_help body
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2002
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
   -----------

@@ -15,7 +15,7 @@ CREATE OR REPLACE PACKAGE BODY higddue AS
 --   HIGHWAYS application generic utilities package
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2000
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
    g_body_sccsid     CONSTANT  VARCHAR2(80) := '"@(#)higddue.pkb	1.2 03/23/05"';
 --  g_body_sccsid is the SCCS ID for the package body

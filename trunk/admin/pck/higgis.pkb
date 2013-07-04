@@ -3,18 +3,20 @@ CREATE OR REPLACE PACKAGE BODY higgis AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/higgis.pkb-arc   2.6   May 16 2011 14:42:22   Steve.Cooper  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/higgis.pkb-arc   2.7   Jul 04 2013 15:01:10   James.Wadsworth  $
 --       Module Name      : $Workfile:   higgis.pkb  $
---       Date into PVCS   : $Date:   May 16 2011 14:42:22  $
---       Date fetched Out : $Modtime:   Apr 20 2011 10:30:50  $
---       Version          : $Revision:   2.6  $
+--       Date into PVCS   : $Date:   Jul 04 2013 15:01:10  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:59:42  $
+--       Version          : $Revision:   2.7  $
 --       Based on SCCS version : 1.39
--------------------------------------------------------------------------
+------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+------------------------------------------------------------------
 --   A GIS package intended to handle all GIS theme and connection information
 --
 --   Author : Rob Coupe
 --
-   g_body_sccsid     CONSTANT  varchar2(80) := '"$Revision:   2.6  $"';
+   g_body_sccsid     CONSTANT  varchar2(80) := '"$Revision:   2.7  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name CONSTANT varchar2(30) := 'higgis';

@@ -4,19 +4,21 @@ As
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig2520.pkh-arc   1.0   Feb 07 2013 14:45:22   Steve.Cooper  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig2520.pkh-arc   1.1   Jul 04 2013 15:01:10   James.Wadsworth  $
 --       Module Name      : $Workfile:   hig2520.pkh  $
---       Date into PVCS   : $Date:   Feb 07 2013 14:45:22  $
---       Date fetched Out : $Modtime:   Feb 07 2013 13:44:42  $
---       Version          : $Revision:   1.0  $
+--       Date into PVCS   : $Date:   Jul 04 2013 15:01:10  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:58:40  $
+--       Version          : $Revision:   1.1  $
 --       Based on SCCS version :
--------------------------------------------------------------------------
+------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+------------------------------------------------------------------
 
   -----------
   --constants
   -----------
   --g_sccsid is the SCCS ID for the package
-  g_Sccsid Constant Varchar2(2000) := '$Revision:   1.0  $';
+  g_Sccsid Constant Varchar2(2000) := '$Revision:   1.1  $';
  
   Type  t_Delete_Rec          Is Record (
                                         Process_Id    Hig_Processes.Hp_Process_Id%Type,

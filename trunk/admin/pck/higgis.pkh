@@ -9,6 +9,9 @@ CREATE OR REPLACE PACKAGE higgis AS
 --       Date fetched Out : 07/06/13 14:10:34
 --       SCCS Version     : 1.23
 --
+------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+------------------------------------------------------------------
 --   A GIS package intended to handle all GIS theme and connection information
 --
 --   Author : Rob Coupe
