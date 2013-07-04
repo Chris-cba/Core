@@ -3,11 +3,11 @@ create or replace package hig2 is
 -----------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       pvcsid                     : $Header:   //vm_latest/archives/nm3/admin/pck/hig2.pkh-arc   2.2   Feb 24 2011 16:58:40   Chris.Strettle  $
+--       pvcsid                     : $Header:   //vm_latest/archives/nm3/admin/pck/hig2.pkh-arc   2.3   Jul 04 2013 14:37:54   James.Wadsworth  $
 --       Module Name                : $Workfile:   hig2.pkh  $
---       Date into PVCS             : $Date:   Feb 24 2011 16:58:40  $
---       Date fetched Out           : $Modtime:   Feb 24 2011 16:55:30  $
---       PVCS Version               : $Revision:   2.2  $
+--       Date into PVCS             : $Date:   Jul 04 2013 14:37:54  $
+--       Date fetched Out           : $Modtime:   Jul 04 2013 14:25:06  $
+--       PVCS Version               : $Revision:   2.3  $
 --       Based on SCCS version      : 1.3
 --
 --
@@ -18,7 +18,7 @@ create or replace package hig2 is
 -- Procedures which are executed sporadically should be held in hig2.pck.
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2000
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>

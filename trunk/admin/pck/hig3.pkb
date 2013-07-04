@@ -17,7 +17,7 @@ CREATE OR REPLACE PACKAGE BODY hig3 AS
 --   hig3 package body
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2000
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
    g_body_sccsid     CONSTANT  VARCHAR2(80) := '"@(#)hig3.pkb	1.1 03/01/01"';
