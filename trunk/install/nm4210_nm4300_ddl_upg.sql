@@ -8,14 +8,14 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4210_nm4300_ddl_upg.sql-arc   3.5   Oct 11 2010 10:07:02   Mike.Alexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4210_nm4300_ddl_upg.sql-arc   3.6   Jul 04 2013 14:16:26   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm4210_nm4300_ddl_upg.sql  $
---       Date into PVCS   : $Date:   Oct 11 2010 10:07:02  $
---       Date fetched Out : $Modtime:   Oct 11 2010 09:54:34  $
---       Version          : $Revision:   3.5  $
+--       Date into PVCS   : $Date:   Jul 04 2013 14:16:26  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 11:54:22  $
+--       Version          : $Revision:   3.6  $
 --
 ------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2010
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 
 SET ECHO OFF
 SET LINESIZE 120
