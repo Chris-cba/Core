@@ -1,13 +1,17 @@
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/set_exor_base.sql-arc   2.0   Jul 20 2007 14:10:54   gjohnson  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/set_exor_base.sql-arc   2.1   Jul 04 2013 14:17:18   James.Wadsworth  $
 --       Module Name      : $Workfile:   set_exor_base.sql  $
---       Date into PVCS   : $Date:   Jul 20 2007 14:10:54  $
---       Date fetched Out : $Modtime:   Jul 20 2007 13:20:18  $
---       Version          : $Revision:   2.0  $
+--       Date into PVCS   : $Date:   Jul 04 2013 14:17:18  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 13:42:30  $
+--       Version          : $Revision:   2.1  $
 --       Based on SCCS version : 
--------------------------------------------------------------------------
+--
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
 cl scr
 undefine exor_base
 undefine run_file

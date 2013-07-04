@@ -12,7 +12,7 @@ REM
 -- Translation View
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2005
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 
 
@@ -41,7 +41,7 @@ AS SELECT
 -- Translation View
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2005
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 DECODE(ngt.ngt_group_type, 'LLNK', 'LINK', 'DLNK', 'LINK', ngt.ngt_group_type),
 ngt.ngt_descr,
@@ -78,7 +78,7 @@ as select
 -- Translation View
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2005
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
        nsc_sub_class
       ,decode( substr(nsc_nw_type,1,1),'D','T','L','C')
@@ -116,7 +116,7 @@ select
 --       SCCS Version     : 1.41
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2005
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 ne.ne_id                                                                                               RSE_HE_ID,
 ne.ne_unique                                                                                           rse_unique,
@@ -226,7 +226,7 @@ SELECT
 -- Translation View
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2005
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 *
 FROM   road_segs
@@ -258,7 +258,7 @@ SELECT
 -- Translation View
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2005
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 *
 FROM   road_segments_all
@@ -282,7 +282,7 @@ AS SELECT
 -- Translation View
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2005
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 nag_parent_admin_unit,
 nag_child_admin_unit,
@@ -315,7 +315,7 @@ AS SELECT
 -- Translation View
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2005
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
  nm.nm_ne_id_in,
  nm.nm_ne_id_of,
@@ -348,7 +348,7 @@ SELECT
 -- Translation View
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2005
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 * FROM road_seg_membs_all
 WHERE RSM_TYPE <> 'P';
@@ -369,7 +369,7 @@ AS SELECT
 -- Translation View
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2005
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
        urp.granted_role ROLE,
        SUM(DISTINCT DECODE(rrp.granted_role,
@@ -403,7 +403,7 @@ AS SELECT
 -- Translation View
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2005
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
  *
 FROM road_segs
@@ -434,7 +434,7 @@ SELECT
 -- Translation View
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2005
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
  * FROM road_segments_all
  WHERE RSE_END_DATE IS NULL;
@@ -458,7 +458,7 @@ SELECT
 -- Translation View
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2005
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
  *
 FROM   road_segments_all
@@ -501,7 +501,7 @@ AS SELECT
 -- Translation View
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2005
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 rse_he_id              ,
 rse_unique             ,
@@ -564,7 +564,7 @@ AS SELECT
 -- Translation View
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2005
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 * 
 FROM  road_groups_all
@@ -588,7 +588,7 @@ SELECT
 -- Translation View
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2005
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
  1,'1',1
 FROM dual;
@@ -607,7 +607,7 @@ nou_pus_node_id, nou_chainage, nou_node_type ) AS SELECT
 -- Translation View
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2005
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
         nnu.nnu_ne_id
        ,no.no_node_name
@@ -638,7 +638,7 @@ SELECT
 -- Translation View
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2005
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
  no_node_name,
 no_np_id,
@@ -667,7 +667,7 @@ AS SELECT
 -- Translation View
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2005
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 np_id, np_descr, np_grid_east, np_grid_north
 FROM nm_points;
@@ -686,7 +686,7 @@ CREATE OR REPLACE FORCE VIEW ROAD_TYPES as
 --       SCCS Version     : 1.41
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2005
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
        select GTY_GROUP_TYPE
              ,GTY_DESCR

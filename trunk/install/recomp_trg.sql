@@ -1,3 +1,16 @@
+--
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/recomp_trg.sql-arc   2.1   Jul 04 2013 14:17:18   James.Wadsworth  $
+--       Module Name      : $Workfile:   recomp_trg.sql  $
+--       Date into PVCS   : $Date:   Jul 04 2013 14:17:18  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 13:42:06  $
+--       Version          : $Revision:   2.1  $
+--
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
 REM SCCS ID Keyword, do no remove
 define sccsid = '%W% %G%';
 

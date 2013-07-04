@@ -3,16 +3,16 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/pre_upgrade_meta_sync.sql-arc   3.1   Oct 19 2011 11:57:02   Mike.Alexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/pre_upgrade_meta_sync.sql-arc   3.2   Jul 04 2013 14:17:18   James.Wadsworth  $
 --       Module Name      : $Workfile:   pre_upgrade_meta_sync.sql  $
---       Date into PVCS   : $Date:   Oct 19 2011 11:57:02  $
---       Date fetched Out : $Modtime:   Oct 19 2011 11:54:08  $
---       Version          : $Revision:   3.1  $
+--       Date into PVCS   : $Date:   Jul 04 2013 14:17:18  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 11:54:24  $
+--       Version          : $Revision:   3.2  $
 --
 --   Product upgrade script
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2011
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 /*

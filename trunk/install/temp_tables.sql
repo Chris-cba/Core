@@ -15,7 +15,7 @@ define sccsid = '@(#)temp_tables.sql	1.34 04/14/04';
 --   Temporary Tables creation script
 --
 -----------------------------------------------------------------------------
---   Copyright (c) exor corporation ltd, 2001
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 */

@@ -10,7 +10,7 @@
 --   Table upgrade scripts
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2001
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 ALTER TABLE nm_mrg_query

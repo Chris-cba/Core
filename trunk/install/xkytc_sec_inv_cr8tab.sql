@@ -14,7 +14,7 @@
 --   Kentucky Securing inventory tables
 --
 -----------------------------------------------------------------------------
---   Copyright (c) exor corporation ltd, 2003
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 
 DROP TABLE xkytc_securing_inventory CASCADE CONSTRAINTS

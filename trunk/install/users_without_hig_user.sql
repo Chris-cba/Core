@@ -16,7 +16,7 @@
 -- i.e. there is a dependancy on procedure GRANT_ROLE_TO_USER
 -- 
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2004
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 
 

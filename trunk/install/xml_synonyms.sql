@@ -2,15 +2,16 @@
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/xml_synonyms.sql-arc   3.0   Sep 15 2009 17:10:46   malexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/xml_synonyms.sql-arc   3.1   Jul 04 2013 14:17:18   James.Wadsworth  $
 --       Module Name      : $Workfile:   xml_synonyms.sql  $
---       Date into PVCS   : $Date:   Sep 15 2009 17:10:46  $
---       Date fetched Out : $Modtime:   Sep 15 2009 17:04:34  $
---       Version          : $Revision:   3.0  $
+--       Date into PVCS   : $Date:   Jul 04 2013 14:17:18  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 13:42:58  $
+--       Version          : $Revision:   3.1  $
 --
--------------------------------------------------------------------------
---  Copyright (c) exor corporation ltd, 2009
--------------------------------------------------------------------------
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
 --
 --
 SET define ON

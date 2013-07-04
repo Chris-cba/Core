@@ -3,16 +3,16 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/regen.sql-arc   3.6   Jul 30 2012 15:05:20   Steve.Cooper  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/regen.sql-arc   3.7   Jul 04 2013 14:17:18   James.Wadsworth  $
 --       Module Name      : $Workfile:   regen.sql  $
---       Date into PVCS   : $Date:   Jul 30 2012 15:05:20  $
---       Date fetched Out : $Modtime:   Jul 30 2012 15:02:52  $
---       Version          : $Revision:   3.6  $
+--       Date into PVCS   : $Date:   Jul 04 2013 14:17:18  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 11:54:24  $
+--       Version          : $Revision:   3.7  $
 --
 --   Product upgrade script
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2011
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 Begin
