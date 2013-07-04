@@ -26,7 +26,7 @@ DECLARE
 --   Kentucky Create Securing inventory trigger
 --
 -----------------------------------------------------------------------------
---   Copyright (c) exor corporation ltd, 2003
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
    l_ne_id nm_elements.ne_id%TYPE;

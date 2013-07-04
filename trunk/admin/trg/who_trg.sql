@@ -4,14 +4,14 @@
 -----------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       pvcsid                     : $Header:   //vm_latest/archives/nm3/admin/trg/who_trg.sql-arc   2.4   Sep 12 2011 15:34:06   Steve.Cooper  $
+--       pvcsid                     : $Header:   //vm_latest/archives/nm3/admin/trg/who_trg.sql-arc   2.5   Jul 04 2013 09:55:36   James.Wadsworth  $
 --       Module Name                : $Workfile:   who_trg.sql  $
---       Date into PVCS             : $Date:   Sep 12 2011 15:34:06  $
---       Date fetched Out           : $Modtime:   Sep 12 2011 14:47:10  $
---       PVCS Version               : $Revision:   2.4  $
+--       Date into PVCS             : $Date:   Jul 04 2013 09:55:36  $
+--       Date fetched Out           : $Modtime:   Jul 04 2013 09:41:42  $
+--       PVCS Version               : $Revision:   2.5  $
 --       Based on SCCS version      : 1.4
 -----------------------------------------------------------------------------
--- Copyright (c) exor corporation ltd, 2007
+-- Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 set serveroutput on size 100000
 --
@@ -44,18 +44,19 @@ BEGIN
    l_tab_comments(1)  := '--';
    l_tab_comments(2)  := '--   SCCS Identifiers :-';
    l_tab_comments(3)  := '--';
-   l_tab_comments(4)  := '--       pvcsid                     : $Header:   //vm_latest/archives/nm3/admin/trg/who_trg.sql-arc   2.4   Sep 12 2011 15:34:06   Steve.Cooper  $';
+   l_tab_comments(4)  := '--       pvcsid                     : $Header:   //vm_latest/archives/nm3/admin/trg/who_trg.sql-arc   2.5   Jul 04 2013 09:55:36   James.Wadsworth  $';
    l_tab_comments(5)  := '--       Module Name                : $Workfile:   who_trg.sql  $';
-   l_tab_comments(6)  := '--       Date into PVCS             : $Date:   Sep 12 2011 15:34:06  $';
-   l_tab_comments(7)  := '--       Date fetched Out           : $Modtime:   Sep 12 2011 14:47:10  $';
-   l_tab_comments(8)  := '--       PVCS Version               : $Revision:   2.4  $';
+   l_tab_comments(6)  := '--       Date into PVCS             : $Date:   Jul 04 2013 09:55:36  $';
+   l_tab_comments(7)  := '--       Date fetched Out           : $Modtime:   Jul 04 2013 09:41:42  $';
+   l_tab_comments(8)  := '--       PVCS Version               : $Revision:   2.5  $';
    l_tab_comments(9)  := '--';
    l_tab_comments(10) := '--   table_name_WHO trigger';
    l_tab_comments(11) := '--';
    l_tab_comments(12) := '-----------------------------------------------------------------------------';
-   l_tab_comments(13) := '--    Copyright (c) exor corporation ltd, 2007';
+   l_tab_comments(13) := '--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.';
    l_tab_comments(14) := '-----------------------------------------------------------------------------';
    l_tab_comments(15) := '--';
+
 --
    dbms_output.put_line('Started WHO trigger creation');
 --
