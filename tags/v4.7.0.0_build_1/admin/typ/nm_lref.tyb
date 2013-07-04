@@ -1,0 +1,40 @@
+CREATE OR REPLACE TYPE BODY NM_LREF IS
+--
+-----------------------------------------------------------------------------
+--
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)nm_lref.tyb	1.1 03/01/01
+--       Module Name      : nm_lref.tyb
+--       Date into SCCS   : 01/03/01 16:24:46
+--       Date fetched Out : 07/06/13 17:04:36
+--       SCCS Version     : 1.1
+--
+--   NM_LREF type body
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
+--
+MEMBER FUNCTION GET_NE_ID
+ RETURN INTEGER
+ IS
+BEGIN
+    RETURN self.lr_ne_id;
+END;
+
+MEMBER FUNCTION GET_OFFSET
+ RETURN NUMBER
+ IS
+BEGIN
+    RETURN self.lr_offset;
+END;
+--
+STATIC FUNCTION get_body_version RETURN VARCHAR2 IS
+BEGIN
+   RETURN '"@(#)nm_lref.tyb	1.1 03/01/01"';
+END get_body_version;
+--
+END;
+/

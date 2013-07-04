@@ -1,0 +1,27 @@
+CREATE OR REPLACE TYPE nm_lref AS object
+ (
+--
+-----------------------------------------------------------------------------
+--
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)nm_lref.tyh	1.1 03/01/01
+--       Module Name      : nm_lref.tyh
+--       Date into SCCS   : 01/03/01 16:24:47
+--       Date fetched Out : 07/06/13 17:04:37
+--       SCCS Version     : 1.1
+--
+--    TYPE nm_lref
+--
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
+  lr_ne_id  integer(9)
+ ,lr_offset number
+ ,member FUNCTION get_ne_id RETURN integer
+ ,member FUNCTION get_offset RETURN number
+ ,STATIC FUNCTION get_body_version RETURN VARCHAR2
+ ,PRAGMA RESTRICT_REFERENCES (get_body_version, wnds, rnds, rnps, wnps)
+ )
+/

@@ -1,0 +1,35 @@
+CREATE OR REPLACE type nm_lref_array AS object
+(
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)nm_lref_array.tyh	1.1 07/22/02
+--       Module Name      : nm_lref_array.tyh
+--       Date into SCCS   : 02/07/22 09:47:47
+--       Date fetched Out : 07/06/13 17:04:38
+--       SCCS Version     : 1.1
+--
+--   The lref array object type
+--   Author : Rob Coupe
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
+  nla_lref_array  nm_lref_array_type 
+ ,member function add_element( lr_ne_id   IN integer
+                              ,lr_offset  IN number ) return nm_lref_array
+ ,PRAGMA RESTRICT_REFERENCES (add_element, wnds, rnds, rnps, wnps)
+ ,member FUNCTION add_element (lr_lref     IN nm_lref ) RETURN nm_lref_array 
+ ,member FUNCTION is_empty RETURN boolean
+ ,member PROCEDURE dump_lref_array
+ ,STATIC FUNCTION get_body_version RETURN VARCHAR2
+ ,member FUNCTION lref_count RETURN NUMBER
+ ,member FUNCTION get_entry (lr_arr_pos IN INTEGER) RETURN nm_lref
+ ,PRAGMA RESTRICT_REFERENCES (get_body_version, wnds, rnds, rnps, wnps)
+ ,PRAGMA RESTRICT_REFERENCES (add_element, wnds, rnds, rnps, wnps)
+ ,PRAGMA RESTRICT_REFERENCES (is_empty, wnds, rnds, rnps, wnps)
+ ,PRAGMA RESTRICT_REFERENCES (lref_count, wnds, rnds, rnps, wnps)
+ ,PRAGMA RESTRICT_REFERENCES (get_entry, wnds, rnds, rnps, wnps)
+ )
+/
+

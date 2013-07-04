@@ -1,0 +1,32 @@
+CREATE OR REPLACE type nm_membership_type
+-----------------------------------------------------------------------------
+--
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)nm_membership_type.tyh	1.1 04/04/06
+--       Module Name      : nm_membership_type.tyh
+--       Date into SCCS   : 06/04/04 15:36:42
+--       Date fetched Out : 07/06/13 17:04:39
+--       SCCS Version     : 1.1
+--
+--
+--   Author : %USERNAME%
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+as object (
+    NE_ID               number(9)     -- id of the route, group or datum
+  , PARENT_NE_ID        number(9)     -- id of the datum or inv item driving the query
+  , NE_UNIQUE           varchar2(30)  -- NM_ELEMENTS_ALL.NE_UNIQUE%type
+  , NE_DESCR            varchar2(240)  -- NM_ELEMENTS_ALL.NE_DESCR%type
+  , NM_BEGIN_MP         number        -- NM_MEMBERS_ALL.NM_BEGIN_MP%type
+  , NM_END_MP           number        -- NM_MEMBERS_ALL.NM_END_MP%type
+  , NE_NT_TYPE          varchar2(4)   -- NM_ELEMENTS_ALL.NE_TYPE%type
+  , NE_NT_TYPE_NAME     varchar2(30)  -- NM_TYPES.NT_UNIQUE%type
+  , NE_GROUP_TYPE       varchar2(4)   -- NM_ELEMENTS_ALL.NE_GTY_GROUP_TYPE%type
+  , NE_GROUP_TYPE_NAME  varchar2(40)  -- nm_group_types_all.NGT_DESCR%type
+  , NT_LENGTH_UNIT      number(4)     -- NM_UNITS.UN_UNIT_ID%type
+  , NT_LENGTH_UNIT_NAME varchar2(20)  -- nm_units.UN_UNIT_NAME%type
+)
+/
