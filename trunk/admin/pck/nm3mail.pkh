@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE nm3mail AUTHID CURRENT_USER AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mail.pkh-arc   2.4   Feb 03 2011 08:45:56   Ade.Edwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mail.pkh-arc   2.5   Jul 04 2013 16:14:38   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3mail.pkh  $
---       Date into PVCS   : $Date:   Feb 03 2011 08:45:56  $
---       Date fetched Out : $Modtime:   Feb 02 2011 09:23:42  $
---       Version          : $Revision:   2.4  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:14:38  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:16  $
+--       Version          : $Revision:   2.5  $
 --       Based on SCCS version : 1.5
 -------------------------------------------------------------------------
 --   Author : Jonathan Mills
@@ -15,13 +15,13 @@ CREATE OR REPLACE PACKAGE nm3mail AUTHID CURRENT_USER AS
 --   nm3mail package
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2002
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --</PACKAGE>
 --
 --<GLOBVAR>
 --
-  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.4  $';
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.5  $';
 --  g_sccsid is the SCCS ID for the package
 --
    g_server_sysopt CONSTANT hig_options.hop_id%TYPE    := 'SMTPSERVER';

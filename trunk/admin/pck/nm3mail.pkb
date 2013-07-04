@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY nm3mail AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mail.pkb-arc   2.14   Oct 04 2011 15:30:14   Steve.Cooper  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mail.pkb-arc   2.15   Jul 04 2013 16:14:38   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3mail.pkb  $
---       Date into PVCS   : $Date:   Oct 04 2011 15:30:14  $
---       Date fetched Out : $Modtime:   Oct 04 2011 15:28:50  $
---       Version          : $Revision:   2.14  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:14:38  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 15:46:14  $
+--       Version          : $Revision:   2.15  $
 --       Based on SCCS version : 1.12
 -------------------------------------------------------------------------
 --   Author : Jonathan Mills
@@ -15,12 +15,12 @@ CREATE OR REPLACE PACKAGE BODY nm3mail AS
 --   nm3mail package
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2002
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 --all global package variables here
 --
-  g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.14  $';
+  g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.15  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3mail';
@@ -811,7 +811,7 @@ BEGIN
              ||CHR(10)||'--   nm3mail sending job'
              ||CHR(10)||'--'
              ||CHR(10)||'-----------------------------------------------------------------------------'
-             ||CHR(10)||'--	Copyright (c) exor corporation ltd, 2004'
+             ||CHR(10)||'--	Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.'
              ||CHR(10)||'-----------------------------------------------------------------------------'
              ||CHR(10)||'--'
              ||CHR(10)||'   l_server_not_there EXCEPTION;'
