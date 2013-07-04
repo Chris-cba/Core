@@ -3,13 +3,15 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3webutil.pkb-arc   2.2   Apr 21 2010 18:17:02   gjohnson  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3webutil.pkb-arc   2.3   Jul 04 2013 16:40:30   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3webutil.pkb  $
---       Date into PVCS   : $Date:   Apr 21 2010 18:17:02  $
---       Date fetched Out : $Modtime:   Apr 21 2010 17:22:24  $
---       Version          : $Revision:   2.2  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:40:30  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 16:36:38  $
+--       Version          : $Revision:   2.3  $
 --       Based on SCCS version : 
--------------------------------------------------------------------------
+------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+------------------------------------------------------------------
 --
 --all global package variables here
 
@@ -17,7 +19,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.2  $';
+  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.3  $';
 
   g_package_name CONSTANT varchar2(30) := 'nm3webutil';
   

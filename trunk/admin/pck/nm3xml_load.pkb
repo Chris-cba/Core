@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY nm3xml_load AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3xml_load.pkb-arc   2.1   Jan 06 2010 16:41:36   cstrettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3xml_load.pkb-arc   2.2   Jul 04 2013 16:40:30   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3xml_load.pkb  $
---       Date into PVCS   : $Date:   Jan 06 2010 16:41:36  $
---       Date fetched Out : $Modtime:   Jan 06 2010 15:23:18  $
---       Version          : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:40:30  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:22  $
+--       Version          : $Revision:   2.2  $
 --       Based on SCCS version : 1.7
 -------------------------------------------------------------------------
 --   Author : I Turnbull
@@ -15,12 +15,12 @@ CREATE OR REPLACE PACKAGE BODY nm3xml_load AS
 --   nm3xml_load package body
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2001
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 --all global PACKAGE variables here
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '$Revision:   2.1  $';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '$Revision:   2.2  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3xml_load';

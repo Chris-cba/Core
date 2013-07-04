@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE nm3web IS
 --<PACKAGE>
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3web.pkh-arc   2.1   Dec 16 2008 11:16:44   smarshall  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3web.pkh-arc   2.2   Jul 04 2013 16:40:30   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3web.pkh  $
---       Date into PVCS   : $Date:   Dec 16 2008 11:16:44  $
---       Date fetched Out : $Modtime:   Dec 16 2008 11:12:36  $
---       PVCS Version     : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:40:30  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:20  $
+--       PVCS Version     : $Revision:   2.2  $
 --       Based on         : 1.33
 --
 --
@@ -15,11 +15,11 @@ CREATE OR REPLACE PACKAGE nm3web IS
 --   NM3 Web Standard Components package
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2001
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
-  g_sccsid      CONSTANT  varchar2(2000) := '"$Revision:   2.1  $"';
+  g_sccsid      CONSTANT  varchar2(2000) := '"$Revision:   2.2  $"';
 --  g_sccsid is the SCCS ID for the package
 --
    c_nbsp CONSTANT varchar2(6) := CHR(38)||'nbsp;';
