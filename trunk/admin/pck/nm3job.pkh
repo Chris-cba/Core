@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE nm3job AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3job.pkh-arc   2.2   May 16 2011 14:44:58   Steve.Cooper  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3job.pkh-arc   2.3   Jul 04 2013 16:11:40   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3job.pkh  $
---       Date into PVCS   : $Date:   May 16 2011 14:44:58  $
---       Date fetched Out : $Modtime:   May 05 2011 09:21:44  $
---       Version          : $Revision:   2.2  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:11:40  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:14  $
+--       Version          : $Revision:   2.3  $
 --       Based on SCCS version : 1.12
 -------------------------------------------------------------------------
 --   Author : Jonathan Mills
@@ -15,12 +15,12 @@ CREATE OR REPLACE PACKAGE nm3job AS
 --   NM3 Job Management package
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2002
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
 --  g_sccsid is the SCCS ID for the package
-   g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.2  $';
+   g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.3  $';
 --
    TYPE tab_rec_njv IS TABLE OF nm_job_operation_data_values%ROWTYPE INDEX BY binary_integer;
    TYPE tab_rec_njo IS TABLE OF nm_job_operations%ROWTYPE            INDEX BY binary_integer;

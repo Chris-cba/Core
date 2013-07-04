@@ -5,11 +5,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3jobs.pkh-arc   3.6   May 16 2011 14:44:58   Steve.Cooper  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3jobs.pkh-arc   3.7   Jul 04 2013 16:11:40   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3jobs.pkh  $
---       Date into PVCS   : $Date:   May 16 2011 14:44:58  $
---       Date fetched Out : $Modtime:   May 05 2011 09:23:28  $
---       Version          : $Revision:   3.6  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:11:40  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:14  $
+--       Version          : $Revision:   3.7  $
 --       Based on SCCS version : 1.21
 -------------------------------------------------------------------------
 --   Author : A Edwards
@@ -17,7 +17,7 @@ AS
 --   NM3 DBMS_SCHEDULER wrapper
 --
 -----------------------------------------------------------------------------
--- Copyright (c) exor corporation ltd, 2004
+-- Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 ----
 --</PACKAGE>
@@ -25,7 +25,7 @@ AS
 --<GLOBVAR>
 -- g_sccsid is the SCCS_ID
 -- Constants
-  g_sccsid           CONSTANT VARCHAR2(80) := '"$Revision:   3.6  $"';
+  g_sccsid           CONSTANT VARCHAR2(80) := '"$Revision:   3.7  $"';
 --
 -- Some invervals
 --

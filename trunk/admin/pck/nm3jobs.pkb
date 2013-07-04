@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3jobs AS
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3jobs.pkb-arc   3.12   May 16 2011 14:44:58   Steve.Cooper  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3jobs.pkb-arc   3.13   Jul 04 2013 16:11:40   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3jobs.pkb  $
---       Date into PVCS   : $Date:   May 16 2011 14:44:58  $
---       Date fetched Out : $Modtime:   May 05 2011 09:25:18  $
---       PVCS Version     : $Revision:   3.12  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:11:40  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:14  $
+--       PVCS Version     : $Revision:   3.13  $
 --
 --   NM3 DBMS_SCHEDULER wrapper
 --
@@ -23,7 +23,7 @@ CREATE OR REPLACE PACKAGE BODY nm3jobs AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid          CONSTANT VARCHAR2(2000) :='"$Revision:   3.12  $"';
+  g_body_sccsid          CONSTANT VARCHAR2(2000) :='"$Revision:   3.13  $"';
   g_package_name         CONSTANT VARCHAR2(30)   := 'nm3jobs';
   ex_resource_busy                EXCEPTION;
   g_default_comment               VARCHAR2(500)  := 'Created by nm3job ';

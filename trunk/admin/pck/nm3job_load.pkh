@@ -3,11 +3,11 @@ create or replace package nm3job_load as
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3job_load.pkh-arc   2.1   Jan 06 2010 16:38:36   cstrettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3job_load.pkh-arc   2.2   Jul 04 2013 16:11:40   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3job_load.pkh  $
---       Date into PVCS   : $Date:   Jan 06 2010 16:38:36  $
---       Date fetched Out : $Modtime:   Jan 05 2010 11:48:00  $
---       Version          : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:11:40  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:14  $
+--       Version          : $Revision:   2.2  $
 --       Based on SCCS version : 1.2
 -------------------------------------------------------------------------
 --   Author : Jonathan Mills
@@ -15,11 +15,11 @@ create or replace package nm3job_load as
 --   NM3 Jobs (and operations) CSV Loader Package
 --
 -----------------------------------------------------------------------------
---   Copyright (c) exor corporation ltd, 2004
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
-  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.1  $';
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.2  $';
 --  g_sccsid is the SCCS ID for the package
 --</GLOBVAR>
 --
