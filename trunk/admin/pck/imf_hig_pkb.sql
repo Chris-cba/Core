@@ -1,12 +1,14 @@
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/imf_hig_pkb.sql-arc   3.0   Apr 08 2009 16:19:02   smarshall  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/imf_hig_pkb.sql-arc   3.1   Jul 04 2013 15:04:18   James.Wadsworth  $
 --       Module Name      : $Workfile:   imf_hig_pkb.sql  $
---       Date into PVCS   : $Date:   Apr 08 2009 16:19:02  $
---       Date fetched Out : $Modtime:   Apr 08 2009 16:18:42  $
---       Version          : $Revision:   3.0  $
--------------------------------------------------------------------------
+--       Date into PVCS   : $Date:   Jul 04 2013 15:04:18  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 15:03:00  $
+--       Version          : $Revision:   3.1  $
+------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+------------------------------------------------------------------
 --
 SET echo OFF
 SET term OFF
