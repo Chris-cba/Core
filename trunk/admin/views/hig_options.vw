@@ -4,11 +4,11 @@ SELECT
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/hig_options.vw-arc   2.1   Feb 04 2010 10:18:50   cstrettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/hig_options.vw-arc   2.2   Jul 04 2013 11:20:04   James.Wadsworth  $
 --       Module Name      : $Workfile:   hig_options.vw  $
---       Date into PVCS   : $Date:   Feb 04 2010 10:18:50  $
---       Date fetched Out : $Modtime:   Feb 04 2010 10:17:48  $
---       Version          : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   Jul 04 2013 11:20:04  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 10:33:40  $
+--       Version          : $Revision:   2.2  $
 -------------------------------------------------------------------------
 --
 --   Author : Jonathan Mills
@@ -16,7 +16,7 @@ SELECT
 --   hig_options view
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2002
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
        hol_id         hop_id

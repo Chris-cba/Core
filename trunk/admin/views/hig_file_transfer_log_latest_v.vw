@@ -5,12 +5,16 @@ SELECT
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/hig_file_transfer_log_latest_v.vw-arc   3.0   Apr 22 2010 11:57:54   gjohnson  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/hig_file_transfer_log_latest_v.vw-arc   3.1   Jul 04 2013 11:20:04   James.Wadsworth  $
 --       Module Name      : $Workfile:   hig_file_transfer_log_latest_v.vw  $
---       Date into PVCS   : $Date:   Apr 22 2010 11:57:54  $
---       Date fetched Out : $Modtime:   Apr 22 2010 11:57:38  $
---       Version          : $Revision:   3.0  $
--------------------------------------------------------------------------
+--       Date into PVCS   : $Date:   Jul 04 2013 11:20:04  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 10:51:20  $
+--       Version          : $Revision:   3.1  $
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
+
 --
    hftl_date
  , hftl_id

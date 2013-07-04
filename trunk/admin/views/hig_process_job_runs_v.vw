@@ -4,12 +4,15 @@ SELECT
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/hig_process_job_runs_v.vw-arc   3.1   Nov 10 2010 17:11:14   Chris.Strettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/hig_process_job_runs_v.vw-arc   3.2   Jul 04 2013 11:20:04   James.Wadsworth  $
 --       Module Name      : $Workfile:   hig_process_job_runs_v.vw  $
---       Date into PVCS   : $Date:   Nov 10 2010 17:11:14  $
---       Date fetched Out : $Modtime:   Nov 10 2010 15:50:50  $
---       Version          : $Revision:   3.1  $
--------------------------------------------------------------------------
+--       Date into PVCS   : $Date:   Jul 04 2013 11:20:04  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 10:53:16  $
+--       Version          : $Revision:   3.2  $
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
        hpjr_process_id
      , hig_process_framework_utils.formatted_process_id (hpjr_process_id) hpjr_formatted_process_id
      , hpjr_job_run_seq

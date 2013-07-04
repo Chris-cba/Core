@@ -6,6 +6,19 @@ CREATE OR REPLACE FORCE VIEW hig_file_transfer_batch
  ,hftb_error
 )
 AS
+--
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/hig_file_transfer_batch.vw-arc   3.1   Jul 04 2013 11:20:04   James.Wadsworth  $
+--       Module Name      : $Workfile:   hig_file_transfer_batch.vw  $
+--       Date into PVCS   : $Date:   Jul 04 2013 11:20:04  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 10:50:48  $
+--       Version          : $Revision:   3.1  $
+--
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
   SELECT hftl_hftq_batch_no
        , count(*)
        , count(no_compl)

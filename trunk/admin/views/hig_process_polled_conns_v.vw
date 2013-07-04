@@ -4,12 +4,14 @@ CREATE OR REPLACE FORCE VIEW hig_process_polled_conns_v AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/hig_process_polled_conns_v.vw-arc   3.0   May 21 2010 10:52:14   gjohnson  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/hig_process_polled_conns_v.vw-arc   3.1   Jul 04 2013 11:20:04   James.Wadsworth  $
 --       Module Name      : $Workfile:   hig_process_polled_conns_v.vw  $
---       Date into PVCS   : $Date:   May 21 2010 10:52:14  $
---       Date fetched Out : $Modtime:   May 21 2010 10:46:00  $
---       Version          : $Revision:   3.0  $
--------------------------------------------------------------------------
+--       Date into PVCS   : $Date:   Jul 04 2013 11:20:04  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 10:53:46  $
+--       Version          : $Revision:   3.1  $
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
 -- 
         c.*
        ,b.hp_process_id

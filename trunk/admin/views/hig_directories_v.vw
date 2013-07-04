@@ -18,7 +18,7 @@ SELECT
 -- along with the read/write permission of the current user
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2005
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
        hdir.hdir_name
