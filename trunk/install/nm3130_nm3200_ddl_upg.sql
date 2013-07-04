@@ -12,7 +12,7 @@
 --   Product upgrade script
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2004
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 --
@@ -157,7 +157,7 @@ AS
 --       SCCS Version     : 1.2
 --
 -----------------------------------------------------------------------------
--- Copyright (c) exor corporation ltd, 2004
+-- Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
           "NAD_ID", "NAD_IIT_NE_ID", "NAD_NE_ID", "NAD_START_DATE",
@@ -183,7 +183,7 @@ FOR EACH ROW
 --       SCCS Version     : 1.4
 --
 -----------------------------------------------------------------------------
---Copyright (c) exor corporation ltd, 2004
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved
 -----------------------------------------------------------------------------
 DECLARE
 
@@ -219,7 +219,7 @@ REFERENCING NEW AS NEW OLD AS OLD
 --       SCCS Version     : 1.3
 --
 -----------------------------------------------------------------------------
---    Copyright (c) exor corporation ltd, 2004
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 DECLARE
 BEGIN
@@ -252,7 +252,7 @@ DECLARE
 --       SCCS Version     : 1.1
 --
 -----------------------------------------------------------------------------
---  Copyright (c) exor corporation ltd, 2004
+--  Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved
 -----------------------------------------------------------------------------
 BEGIN
    nm3sde.g_del_theme := TRUE;
@@ -276,7 +276,7 @@ DECLARE
 --       SCCS Version     : 1.1
 --
 -----------------------------------------------------------------------------
---  Copyright (c) exor corporation ltd, 2004
+--  Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved
 -----------------------------------------------------------------------------
 BEGIN
    nm3sde.g_del_theme := FALSE;
@@ -301,7 +301,7 @@ DECLARE
 --       SCCS Version     : 1.3
 --
 -----------------------------------------------------------------------------
---  Copyright (c) exor corporation ltd, 2004
+--  Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved
 -----------------------------------------------------------------------------
 --
 c_str nm3type.max_varchar2;
@@ -351,7 +351,7 @@ DECLARE
 --       SCCS Version     : 1.1
 --
 -----------------------------------------------------------------------------
---  Copyright (c) exor corporation ltd, 2004
+--  Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved
 -----------------------------------------------------------------------------
 BEGIN
    nm3sdm.g_role_idx := 0;
@@ -374,7 +374,7 @@ DECLARE
 --       SCCS Version     : 1.1
 --
 -----------------------------------------------------------------------------
---  Copyright (c) exor corporation ltd, 2004
+--  Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved
 -----------------------------------------------------------------------------
 BEGIN
    nm3sdm.process_subuser_hur;
@@ -398,7 +398,7 @@ DECLARE
 --       SCCS Version     : 1.1
 --
 -----------------------------------------------------------------------------
--- Copyright (c) exor corporation ltd, 2004
+-- Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 BEGIN
    nm3sdm.g_role_idx := nm3sdm.g_role_idx + 1;
@@ -438,7 +438,7 @@ DECLARE
 --       SCCS Version     : 1.1
 --
 -----------------------------------------------------------------------------
--- Copyright (c) exor corporation ltd, 2004
+-- Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 BEGIN
    nm3sdm.g_role_idx := 0;
@@ -462,7 +462,7 @@ DECLARE
 --       SCCS Version     : 1.1
 --
 -----------------------------------------------------------------------------
--- Copyright (c) exor corporation ltd, 2004
+-- Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
    l_nth   nm_themes_all%ROWTYPE;
 BEGIN
@@ -539,7 +539,7 @@ DECLARE
 --       SCCS Version     : 1.1
 --
 -----------------------------------------------------------------------------
---  Copyright (c) exor corporation ltd, 2004
+--  Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved
 -----------------------------------------------------------------------------
 BEGIN
    nm3sdm.process_subuser_nthr;
