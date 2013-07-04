@@ -1,0 +1,102 @@
+CREATE OR REPLACE package nm0575
+AS
+--   PVCS Identifiers :-
+--
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm0575.pkh-arc   2.4   Jul 04 2013 16:00:38   James.Wadsworth  $
+--       Module Name      : $Workfile:   nm0575.pkh  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:00:38  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:08  $
+--       PVCS Version     : $Revision:   2.4  $
+--       Based on SCCS version : 1.2
+--
+--
+--   Author : Graeme Johnson
+--
+--    %YourObjectName%
+--
+-----------------------------------------------------------------------------
+-- Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+
+  -----------
+  --constants
+  -----------
+  g_sccsid CONSTANT VARCHAR2(2000) := '"$Revision:   2.4  $"';
+  
+
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE set_g_tab_selected_categories(pi_tab_selected_categories IN nm3type.tab_varchar4);
+--
+-----------------------------------------------------------------------------
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE do_query(
+   pi_source_type        in varchar2
+  ,pi_source_ne_id       IN nm_gaz_query.ngq_source_id%TYPE
+  ,pi_begin_mp           IN nm_gaz_query.ngq_begin_mp%TYPE
+  ,pi_end_mp             IN nm_gaz_query.ngq_end_mp%TYPE
+  --,pi_ambig_sub_class    IN nm_gaz_query.ngq_ambig_sub_class%TYPE
+);
+--
+-----------------------------------------------------------------------------
+--   
+PROCEDURE process_tab_asset_types(pi_tab_asset_types  IN nm3type.tab_varchar4
+                                 ,pi_action           IN VARCHAR2
+                                 ,pi_process_partial  IN VARCHAR2);
+
+--
+-----------------------------------------------------------------------------
+--  
+PROCEDURE clear_event_log;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE tidy_up;
+--
+-----------------------------------------------------------------------------
+--
+--                 
+--<PRAGMA>
+  PRAGMA RESTRICT_REFERENCES(get_version, RNDS, WNPS, WNDS);
+  PRAGMA RESTRICT_REFERENCES(get_body_version, RNDS, WNPS, WNDS);
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+
+  function get_inv_categories_tbl
+  return nm_code_tbl;
+  
+  function get_inv_types_tbl
+  return nm_code_tbl;
+  
+  
+  procedure set_inv_types_tbl(p_tbl in nm_code_tbl);
+  
+  procedure set_xsp_changed;
+--
+-----------------------------------------------------------------------------
+--
+  PROCEDURE set_partial_flag ( pi_partial_flag IN VARCHAR2 );
+--
+-----------------------------------------------------------------------------
+--
+end nm0575;
+/
