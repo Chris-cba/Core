@@ -1,0 +1,82 @@
+create or replace package nm3xsp as
+--<PACKAGE>
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3xsp.pkh-arc   2.2   Jul 04 2013 16:41:22   James.Wadsworth  $
+--       Module Name      : $Workfile:   nm3xsp.pkh  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:41:22  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:22  $
+--       Version          : $Revision:   2.2  $
+--       Based on SCCS version : 1.1
+-------------------------------------------------------------------------
+--   Author : Darren Cope
+--
+--    nm3xsp
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+
+  -----------
+  --constants
+  -----------
+  --g_sccsid is the SCCS ID for the package
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.2  $';
+
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="xsp_is_valid">
+-- This function checks the validity of an xsp given network type and sub class
+FUNCTION xsp_is_valid(pi_nsc_nw_type      IN nm_type_subclass.nsc_nw_type%TYPE
+                     ,pi_nsc_sub_class    IN nm_type_subclass.nsc_sub_class%TYPE
+                     ,pi_xsp              IN nm_nw_xsp.nwx_x_sect%TYPE) RETURN boolean;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_xsp_descr">
+-- This function returns the decription of a given xsp
+FUNCTION get_xsp_descr(pi_nsc_nw_type     IN nm_type_subclass.nsc_nw_type%TYPE
+                      ,pi_nsc_sub_class   IN nm_type_subclass.nsc_sub_class%TYPE
+                      ,pi_xsp             IN nm_nw_xsp.nwx_x_sect%TYPE
+                      ,pi_raise_not_found IN boolean DEFAULT TRUE) RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="xsp_valid_for_ne">
+-- This function validates the xsp value against the element given
+FUNCTION xsp_valid_for_ne(pi_ne_id           IN nm_elements.ne_id%TYPE
+                         ,pi_xsp             IN nm_nw_xsp.nwx_x_sect%TYPE) RETURN boolean;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PRAGMA>
+  PRAGMA RESTRICT_REFERENCES(get_version, RNDS, WNPS, WNDS);
+  PRAGMA RESTRICT_REFERENCES(get_body_version, RNDS, WNPS, WNDS);
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+end nm3xsp;
+/

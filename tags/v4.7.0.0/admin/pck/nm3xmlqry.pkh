@@ -1,0 +1,62 @@
+CREATE OR REPLACE package nm3xmlqry as
+--<PACKAGE>
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)nm3xmlqry.pkh	1.2 08/12/04
+--       Module Name      : nm3xmlqry.pkh
+--       Date into SCCS   : 04/08/12 16:54:14
+--       Date fetched Out : 07/06/13 14:13:58
+--       SCCS Version     : 1.2
+--
+--
+--   Author : A.N. Other
+--
+--   XML query package
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+  g_sccsid      CONSTANT  VARCHAR2(2000) := '"@(#)nm3xmlqry.pkh	1.2 08/12/04"';
+--  g_sccsid is the SCCS ID for the package
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+
+PROCEDURE cre_xml_from_query( p_query         IN     VARCHAR2
+                             ,p_xml           IN OUT CLOB
+                             ,p_rowsettag     IN VARCHAR2 DEFAULT NULL
+                             ,p_rowtag        IN VARCHAR2 DEFAULT NULL
+                             ,p_rowidattrname IN VARCHAR2 DEFAULT NULL
+                            );
+
+function get_obj_details_as_xml_clob( p_ne_id in nm_elements.ne_id%type ) return clob;
+function get_theme_details_as_xml_clob( p_theme_id in nm_themes_all.nth_theme_id%type, p_ne_id in nm_elements.ne_id%type ) return clob;
+
+
+--
+--<PRAGMA>
+   PRAGMA RESTRICT_REFERENCES (get_version, RNDS, WNPS, WNDS);
+   PRAGMA RESTRICT_REFERENCES (get_body_version, RNDS, WNPS, WNDS);
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+end nm3xmlqry;
+/
+

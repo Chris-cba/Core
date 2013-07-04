@@ -1,0 +1,54 @@
+CREATE OR REPLACE PACKAGE Run_Gis AS
+
+--<PACKAGE>
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)run_gis.pkh	1.6 11/20/06
+--       Module Name      : run_gis.pkh
+--       Date into SCCS   : 06/11/20 15:33:25
+--       Date fetched Out : 07/06/13 14:14:00
+--       SCCS Version     : 1.6
+--
+--
+--       Author  Rob Coupe
+--
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--</PACKAGE>
+
+--<GLOBVAR>
+   g_sccsid      CONSTANT  VARCHAR2(2000) := '"@(#)run_gis.pkh	1.6 11/20/06"';
+--
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN VARCHAR2;
+--</PROC>
+
+
+ PROCEDURE run_pls_module ( p_module IN VARCHAR2, 
+                            p_param_name1 IN VARCHAR2 DEFAULT NULL, p_param_value1 IN VARCHAR2 DEFAULT NULL,
+                            p_param_name2 IN VARCHAR2 DEFAULT NULL, p_param_value2 IN VARCHAR2 DEFAULT NULL,
+                            p_param_name3 IN VARCHAR2 DEFAULT NULL, p_param_value3 IN VARCHAR2 DEFAULT NULL,
+                            p_param_name4 IN VARCHAR2 DEFAULT NULL, p_param_value4 IN VARCHAR2 DEFAULT NULL,
+                            p_param_name5 IN VARCHAR2 DEFAULT NULL, p_param_value5 IN VARCHAR2 DEFAULT NULL,
+                            p_param_name6 IN VARCHAR2 DEFAULT NULL, p_param_value6 IN VARCHAR2 DEFAULT NULL );
+
+ PROCEDURE run_pls_module ( p_module IN VARCHAR2, 
+                            p_param_name1 IN VARCHAR2 DEFAULT NULL, p_param_value1 IN NUMBER DEFAULT NULL );
+
+ PROCEDURE run_pls_from_gis ( p_theme IN NUMBER, p_module IN VARCHAR2, p_list IN int_array );
+                            
+END;
+/
