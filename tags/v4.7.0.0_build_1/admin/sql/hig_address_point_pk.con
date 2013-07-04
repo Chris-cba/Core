@@ -1,0 +1,22 @@
+-----------------------------------------------------------------------------
+--
+--   SCCS Identifiers :-
+--
+--       sccsid           : %W% %G%
+--       Module Name      : %M%
+--       Date into SCCS   : %E% %U%
+--       Date fetched Out : %D% %T%
+--       SCCS Version     : %I%
+--
+--
+--   Author : %USERNAME%
+--
+--    %YourObjectname%
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+ALTER TABLE HIG_ADDRESS_POINT ADD (
+  CONSTRAINT HDP_PK PRIMARY KEY (HDP_OSAPR));
+
+  
