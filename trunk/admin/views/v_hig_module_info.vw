@@ -11,14 +11,15 @@ As
 Select    -------------------------------------------------------------------------
           --   PVCS Identifiers :-
           --
-          --       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/v_hig_module_info.vw-arc   5.0   Nov 16 2011 15:26:32   Steve.Cooper  $
+          --       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/v_hig_module_info.vw-arc   5.1   Jul 04 2013 11:35:12   James.Wadsworth  $
           --       Module Name      : $Workfile:   v_hig_module_info.vw  $
-          --       Date into PVCS   : $Date:   Nov 16 2011 15:26:32  $
-          --       Date fetched Out : $Modtime:   Nov 16 2011 15:25:12  $
-          --       Version          : $Revision:   5.0  $
+          --       Date into PVCS   : $Date:   Jul 04 2013 11:35:12  $
+          --       Date fetched Out : $Modtime:   Jul 04 2013 11:29:22  $
+          --       Version          : $Revision:   5.1  $
           --
-          --
-          -------------------------------------------------------------------------
+          -----------------------------------------------------------------------------
+          --   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+          -----------------------------------------------------------------------------
           hm.Hmo_Module,
           hmr.Hmr_Mode,
           hm.Hmo_Use_Gri,

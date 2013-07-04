@@ -17,13 +17,15 @@ CREATE OR REPLACE FORCE VIEW NM_THEME_DETAILS_V
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/views/nm_theme_details_v.vw-arc   3.0   Apr 12 2011 11:06:04   Ade.Edwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/views/nm_theme_details_v.vw-arc   3.1   Jul 04 2013 11:35:12   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm_theme_details_v.vw  $
---       Date into PVCS   : $Date:   Apr 12 2011 11:06:04  $
---       Date fetched Out : $Modtime:   Apr 12 2011 10:57:14  $
---       PVCS Version     : $Revision:   3.0  $
+--       Date into PVCS   : $Date:   Jul 04 2013 11:35:12  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 11:28:46  $
+--       PVCS Version     : $Revision:   3.1  $
 --
---------------------------------------------------------------------------------
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
 --
          "NTDV_NTH_THEME_ID"
        , "NTDV_NTH_THEME_NAME"

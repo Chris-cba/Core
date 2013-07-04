@@ -4,12 +4,14 @@ SELECT
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/imf_net_maint_sections_all.vw-arc   3.0   Mar 10 2009 12:28:14   gjohnson  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/imf_net_maint_sections_all.vw-arc   3.1   Jul 04 2013 11:35:12   James.Wadsworth  $
 --       Module Name      : $Workfile:   imf_net_maint_sections_all.vw  $
---       Date into PVCS   : $Date:   Mar 10 2009 12:28:14  $
---       Date fetched Out : $Modtime:   Mar 10 2009 12:27:40  $
---       Version          : $Revision:   3.0  $
-------------------------------------------------------------------------- 
+--       Date into PVCS   : $Date:   Jul 04 2013 11:35:12  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 11:28:30  $
+--       Version          : $Revision:   3.1  $
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
          rse_he_id                            as "NETWORK_ELEMENT_ID"
         ,rse_unique                           as "NETWORK_ELEMENT_REFERENCE"
         ,rse_descr                            as "NETWORK_ELEMENT_DESCRIPTION"

@@ -9,14 +9,16 @@ Select
           -------------------------------------------------------------------------
           --   PVCS Identifiers :-
           --
-          --       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/v_hig_router_params.vw-arc   1.1   Nov 21 2011 11:08:14   Steve.Cooper  $
+          --       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/v_hig_router_params.vw-arc   1.2   Jul 04 2013 11:35:12   James.Wadsworth  $
           --       Module Name      : $Workfile:   v_hig_router_params.vw  $
-          --       Date into PVCS   : $Date:   Nov 21 2011 11:08:14  $
-          --       Date fetched Out : $Modtime:   Nov 21 2011 10:46:24  $
-          --       Version          : $Revision:   1.1  $
+          --       Date into PVCS   : $Date:   Jul 04 2013 11:35:12  $
+          --       Date fetched Out : $Modtime:   Jul 04 2013 11:29:48  $
+          --       Version          : $Revision:   1.2  $
           --
           --
-          -------------------------------------------------------------------------
+          -----------------------------------------------------------------------------
+          --   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+          -----------------------------------------------------------------------------
           hrp.Hrp_Router_Id,
           hrp.Hrp_Param_Name,
           (

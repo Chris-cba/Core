@@ -12,14 +12,15 @@ Select
           -------------------------------------------------------------------------
           --   PVCS Identifiers :-
           --
-          --       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/v_nm_admin_units_tree.vw-arc   3.0   May 15 2012 10:43:32   Steve.Cooper  $
+          --       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/v_nm_admin_units_tree.vw-arc   3.1   Jul 04 2013 11:35:12   James.Wadsworth  $
           --       Module Name      : $Workfile:   v_nm_admin_units_tree.vw  $
-          --       Date into PVCS   : $Date:   May 15 2012 10:43:32  $
-          --       Date fetched Out : $Modtime:   May 15 2012 09:02:12  $
-          --       Version          : $Revision:   3.0  $
+          --       Date into PVCS   : $Date:   Jul 04 2013 11:35:12  $
+          --       Date fetched Out : $Modtime:   Jul 04 2013 11:30:20  $
+          --       Version          : $Revision:   3.1  $
           --
-          --
-          -------------------------------------------------------------------------
+          -----------------------------------------------------------------------------
+          --   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+          -----------------------------------------------------------------------------
           1                                           Initial_State,
           1                                           Depth,
           nau.Nau_Unit_Code || ' - ' || nau.Nau_Name  Label,

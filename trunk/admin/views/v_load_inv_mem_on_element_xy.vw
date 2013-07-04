@@ -6,12 +6,14 @@ SELECT
 -----------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/views/v_load_inv_mem_on_element_xy.vw-arc   2.0   Oct 17 2007 14:02:20   jwadsworth  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/views/v_load_inv_mem_on_element_xy.vw-arc   2.1   Jul 04 2013 11:35:12   James.Wadsworth  $
 --       Module Name      : $Workfile:   v_load_inv_mem_on_element_xy.vw  $
---       Date into SCCS   : $Date:   Oct 17 2007 14:02:20  $
---       Date fetched Out : $Modtime:   Oct 17 2007 14:01:10  $
---       SCCS Version     : $Revision:   2.0  $
------------------------------------------------------------------
+--       Date into SCCS   : $Date:   Jul 04 2013 11:35:12  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 11:30:06  $
+--       SCCS Version     : $Revision:   2.1  $
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
        ne_unique       ne_unique
       ,ne_nt_type      ne_nt_type
       ,TO_NUMBER(NULL) begin_x
