@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE nm3asset_rep AS
 -----------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3asset_rep.pkh-arc   2.1   Jan 04 2010 14:40:16   cstrettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3asset_rep.pkh-arc   2.2   Jul 04 2013 15:15:40   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3asset_rep.pkh  $
---       Date into PVCS   : $Date:   Jan 04 2010 14:40:16  $
---       Date fetched Out : $Modtime:   Jan 04 2010 14:36:30  $
---       Version          : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   Jul 04 2013 15:15:40  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:10  $
+--       Version          : $Revision:   2.2  $
 --       Based on SCCS version :  1.2
 --
 --   Author : Kevin Angus
@@ -15,7 +15,7 @@ CREATE OR REPLACE PACKAGE nm3asset_rep AS
 --    nm3asset_rep
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2002
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
@@ -24,7 +24,7 @@ CREATE OR REPLACE PACKAGE nm3asset_rep AS
   --constants
   -----------
   --g_sccsid is the SCCS ID for the package
-  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.1  $';
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.2  $';
 
 --</GLOBVAR>
 --
