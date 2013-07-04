@@ -3,18 +3,19 @@ create or replace package body nm3sdo_ops as
 --------------------------------------------------------------------------------
 -- PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_ops.pkb-arc   1.6   Jul 16 2012 13:58:00   Rob.Coupe  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_ops.pkb-arc   1.7   Jul 04 2013 16:32:56   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3sdo_ops.pkb  $
---       Date into PVCS   : $Date:   Jul 16 2012 13:58:00  $
---       Date fetched Out : $Modtime:   Jul 16 2012 13:57:36  $
---       PVCS Version     : $Revision:   1.6  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:32:56  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 16:30:40  $
+--       PVCS Version     : $Revision:   1.7  $
 --
 -- Author: Rob Coupe
 --
---------------------------------------------------------------------------------
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
 --
-
-g_body_sccsid  CONSTANT varchar2(2000)  := '"$Revision:   1.6  $"';
+g_body_sccsid  CONSTANT varchar2(2000)  := '"$Revision:   1.7  $"';
 procedure dbug_ids;
 FUNCTION get_version RETURN varchar2 IS
 BEGIN
