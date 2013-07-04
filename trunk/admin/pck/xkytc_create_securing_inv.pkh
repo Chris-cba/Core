@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE xkytc_create_securing_inv AS
 --    of inventory items when a new datum element is created
 --
 -----------------------------------------------------------------------------
---   Copyright (c) exor corporation ltd, 2003
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
