@@ -19,7 +19,7 @@ SELECT
 --       SCCS Version     : 1.3
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2004
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
        xsr_nw_type
