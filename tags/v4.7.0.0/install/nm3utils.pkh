@@ -1,0 +1,61 @@
+Create Or Replace Package Exor_Core.Nm3utils
+Authid Current_User
+As
+--<PACKAGE>
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header::
+--       Module Name      : $Workfile:   nm3utils.pkh  $
+--       Date into PVCS   : $Date:   Jul 04 2013 14:09:34  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 13:41:04  $
+--       Version          : $Revision:   1.2  $
+--       Based on SCCS version :
+--
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
+--
+----</PACKAGE>
+--<GLOBVAR>
+  -----------
+  --constants
+  -----------
+  --g_sccsid is the SCCS ID for the package
+  Gc_Sccsid Constant Varchar2(2000) := '$Revision:   1.2  $';
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+Function Get_Version Return Varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+Function Get_Body_Version Return Varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="Disable_All_User_Schd_Jobs">
+-- This Procedure disables all of the specified users jobs.
+Procedure Disable_All_User_Schd_Jobs  (
+                                      p_User    In  Dba_Scheduler_Jobs.Job_Creator%Type
+                                      );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="User_Has_Jobs">
+-- This function returns the number of jobs that are not Disabled for the specified user
+Function  User_Has_Active_Jobs  (
+                                p_User    In  Dba_Scheduler_Jobs.Job_Creator%Type
+                                ) Return Binary_Integer;
+
+End Nm3utils;
+/
