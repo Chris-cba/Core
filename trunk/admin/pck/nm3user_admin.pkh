@@ -4,20 +4,20 @@ As
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3user_admin.pkh-arc   3.0   Oct 03 2011 09:36:44   Steve.Cooper  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3user_admin.pkh-arc   3.1   Jul 04 2013 16:35:54   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3user_admin.pkh  $
---       Date into PVCS   : $Date:   Oct 03 2011 09:36:44  $
---       Date fetched Out : $Modtime:   Sep 26 2011 09:32:50  $
---       Version          : $Revision:   3.0  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:35:54  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 15:53:20  $
+--       Version          : $Revision:   3.1  $
 -------------------------------------------------------------------------
 --   Author : Steven Cooper
 --
 --   NM3 user Admin package
 --
------------------------------------------------------------------------------
---  Copyright (c) exor corporation ltd, 2000
------------------------------------------------------------------------------
-  gc_Header_Version  Constant  Varchar2(2000) := '$Revision:   3.0  $';
+------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+------------------------------------------------------------------
+  gc_Header_Version  Constant  Varchar2(2000) := '$Revision:   3.1  $';
 
 --
 --

@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE nm3web_eng_dynseg AS
 --<PACKAGE>
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3web_eng_dynseg.pkh-arc   2.4   Apr 14 2009 10:31:16   cstrettle  $
---       Module Name      : $Workfile:   nm3web_eng_dynseg_head_fix.PKH  $
---       Date into PVCS   : $Date:   Apr 14 2009 10:31:16  $
---       Date fetched Out : $Modtime:   Apr 14 2009 10:30:06  $
---       PVCS Version     : $Revision:   2.4  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3web_eng_dynseg.pkh-arc   2.5   Jul 04 2013 16:35:54   James.Wadsworth  $
+--       Module Name      : $Workfile:   nm3web_eng_dynseg.pkh  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:35:54  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:20  $
+--       PVCS Version     : $Revision:   2.5  $
 --       Based on         : 1.8
 --
 --
@@ -15,11 +15,11 @@ CREATE OR REPLACE PACKAGE nm3web_eng_dynseg AS
 --   NM3 Web Engineering DynSeg package
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2002
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
-  g_sccsid      CONSTANT  VARCHAR2(2000) := '"$Revision:   2.4  $"';
+  g_sccsid      CONSTANT  VARCHAR2(2000) := '"$Revision:   2.5  $"';
 --  g_sccsid is the SCCS ID for the package
 --
    g_tab_value          nm3type.tab_varchar32767;

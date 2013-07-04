@@ -16,7 +16,7 @@ CREATE OR REPLACE PACKAGE BODY nm3upload AS
 --   NM3 Upload: Contains procedures and functions for uploading data.
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2001
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 --all global package variables here
@@ -71,7 +71,7 @@ BEGIN
    htp.p('--   NM3 Upload: Contains procedures and functions for uploading data.');
    htp.p('--');
    htp.p('-----------------------------------------------------------------------------');
-   htp.p('--	Copyright (c) exor corporation ltd, 2001');
+   htp.p('--	 Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.');
    htp.p('-----------------------------------------------------------------------------');
    htp.p('--');
    htp.p('-->');
