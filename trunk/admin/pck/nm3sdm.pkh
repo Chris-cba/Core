@@ -3,23 +3,23 @@ Create Or Replace Package Nm3Sdm As
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkh-arc   2.7   Oct 26 2011 11:17:14   Steve.Cooper  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkh-arc   2.8   Jul 04 2013 16:22:10   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3sdm.pkh  $
---       Date into PVCS   : $Date:   Oct 26 2011 11:17:14  $
---       Date fetched Out : $Modtime:   Oct 26 2011 10:51:22  $
---       Version          : $Revision:   2.7  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:22:10  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 15:51:38  $
+--       Version          : $Revision:   2.8  $
 --       Based on SCCS version : 1.25 
 -------------------------------------------------------------------------
 --
 --   Author : R.A. Coupe
 --
 --   SDM specific package
------------------------------------------------------------------------------
---  Copyright (c) exor corporation ltd, 2004
------------------------------------------------------------------------------
+------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
-  g_Sccsid      Constant    Varchar2(2000) := '$Revision:   2.7  $';
+  g_Sccsid      Constant    Varchar2(2000) := '$Revision:   2.8  $';
 
   g_Date_Views  Constant    Varchar2(1) := Nvl(Hig.Get_Sysopt('SDODATEVW'),'N');
 
