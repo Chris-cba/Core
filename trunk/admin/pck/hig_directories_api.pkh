@@ -16,7 +16,7 @@ CREATE OR REPLACE PACKAGE hig_directories_api authid current_user  AS
 --
 -----------------------------------------------------------------------------
 --
---	Copyright (c) exor corporation ltd, 2005
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 --
 -----------------------------------------------------------------------------
 --
