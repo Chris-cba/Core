@@ -1,0 +1,185 @@
+create or replace package dm3query as
+--<PACKAGE>
+--   PVCS Identifiers :-
+--
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/dm3query.pkh-arc   2.1   Jul 04 2013 14:31:26   James.Wadsworth  $
+--       Module Name      : $Workfile:   dm3query.pkh  $
+--       Date into SCCS   : $Date:   Jul 04 2013 14:31:26  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:06  $
+--       SCCS Version     : $Revision:   2.1  $
+--       Based on SCCS Version     : 1.3
+--
+--
+--   Author : Jonathan Mills
+--
+--   DM3 Query package
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+  g_sccsid      CONSTANT  VARCHAR2(2000) := '"$Revision:   2.1  $"';
+--  g_sccsid is the SCCS ID for the package
+--
+   TYPE tab_dqc IS TABLE OF doc_query_cols%ROWTYPE INDEX BY BINARY_INTEGER;
+--
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN varchar2;
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_dq">
+PROCEDURE ins_dq (p_sql   VARCHAR2
+                 ,p_title VARCHAR2
+                 ,p_desc  VARCHAR2 DEFAULT NULL
+                 );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="write_line">
+PROCEDURE write_line (p_line VARCHAR2);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="execute_query">
+FUNCTION execute_query (p_dq_id    doc_query.dq_id%TYPE)    RETURN VARCHAR2;
+--
+PRAGMA RESTRICT_REFERENCES (execute_query,WNDS,TRUST);
+--
+FUNCTION execute_query (p_dq_title doc_query.dq_title%TYPE) RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="execute_query_tab">
+PROCEDURE execute_query_tab (p_dq_id    doc_query.dq_id%TYPE);
+--
+FUNCTION execute_query_tab (p_dq_id    doc_query.dq_id%TYPE) RETURN nm3type.tab_varchar32767;
+--
+FUNCTION execute_query_tab (p_dq_title doc_query.dq_title%TYPE) RETURN nm3type.tab_varchar32767;
+--
+PROCEDURE execute_query_tab (p_dq_title doc_query.dq_title%TYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="show_query_in_own_page">
+PROCEDURE show_query_in_own_page (p_dq_id        doc_query.dq_id%TYPE
+                                 ,p_module       hig_modules.hmo_module%TYPE DEFAULT NULL
+                                 ,p_module_title hig_modules.hmo_title%TYPE  DEFAULT NULL
+                                 );
+--
+PROCEDURE show_query_in_own_page (p_dq_title     doc_query.dq_title%TYPE
+                                 ,p_module       hig_modules.hmo_module%TYPE DEFAULT NULL
+                                 ,p_module_title hig_modules.hmo_title%TYPE  DEFAULT NULL
+                                 );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_rec_dq">
+FUNCTION get_rec_dq (p_dq_id doc_query.dq_id%TYPE) RETURN doc_query%ROWTYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_dq_id">
+FUNCTION get_dq_id  (p_dq_title doc_query.dq_title%TYPE) RETURN doc_query.dq_id%TYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="list_queries">
+PROCEDURE list_queries;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="derive_tab_dqc_from_dq">
+FUNCTION derive_tab_dqc_from_dq (p_dq_sql VARCHAR2
+                                ,p_dq_id  doc_query.dq_id%TYPE DEFAULT NULL
+                                ) RETURN tab_dqc;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_tab_dqc">
+PROCEDURE ins_tab_dqc (p_tab_dqc tab_dqc);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_tab_dqc">
+FUNCTION get_tab_dqc(p_dq_id doc_query.dq_id%TYPE) RETURN tab_dqc;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="execute_query_sql">
+FUNCTION execute_query_sql (p_sql VARCHAR2) RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="execute_query_sql_tab">
+FUNCTION execute_query_sql_tab (p_sql VARCHAR2) RETURN nm3type.tab_varchar32767;
+--
+PROCEDURE execute_query_sql_tab (p_sql VARCHAR2);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="save_tab_varchar">
+PROCEDURE save_tab_varchar (p_tab_vc            nm3type.tab_varchar32767
+                           ,p_window_title      VARCHAR2
+                           ,p_calling_pack_proc VARCHAR2 DEFAULT NULL
+                           );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="main_js_for_dump_table">
+PROCEDURE main_js_for_dump_table (p_tab_vc nm3type.tab_varchar32767);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="do_save_button_and_params">
+PROCEDURE do_save_button_and_params (p_window_title      VARCHAR2
+                                    ,p_calling_pack_proc VARCHAR2
+                                    );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="write_retrieved_js">
+PROCEDURE write_retrieved_js;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PRAGMA>
+   PRAGMA RESTRICT_REFERENCES (get_version, RNDS, WNPS, WNDS);
+   PRAGMA RESTRICT_REFERENCES (get_body_version, RNDS, WNPS, WNDS);
+   PRAGMA RESTRICT_REFERENCES (execute_query,WNDS,TRUST);
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+end dm3query;
+/

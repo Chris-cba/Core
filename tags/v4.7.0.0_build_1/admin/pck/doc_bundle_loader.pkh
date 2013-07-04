@@ -1,0 +1,76 @@
+CREATE OR REPLACE PACKAGE doc_bundle_loader
+AS
+--<PACKAGE>
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/doc_bundle_loader.pkh-arc   3.3   Jul 04 2013 14:31:26   James.Wadsworth  $
+--       Module Name      : $Workfile:   doc_bundle_loader.pkh  $
+--       Date into PVCS   : $Date:   Jul 04 2013 14:31:26  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:30:40  $
+--       Version          : $Revision:   3.3  $
+--       Based on SCCS version : 
+------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+
+  -----------
+  --constants
+  -----------
+  --g_sccsid is the SCCS ID for the package
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.3  $';
+
+  TYPE t_tab_doc_bundle_files IS TABLE OF doc_bundle_files%ROWTYPE INDEX BY BINARY_INTEGER;
+  
+  TYPE rec_driving_rec IS RECORD(doc_filename             docs.doc_file%TYPE                     -- NOT NULL -- Pointer at a file supplied within the bundle 
+                                ,doc_title                docs.doc_title%TYPE                    -- NOT NULL --  Attribute of the DOCS record that is to be created
+                                ,doc_descr                docs.doc_descr%TYPE                    -- NOT NULL --  Attribute of the DOCS record that is to be created
+                                ,doc_type                 doc_types.dtp_code%TYPE                -- NOT NULL --  Attribute of the DOCS record that is to be created - Must match an entry in DOC_TYPES table (DOC_TYPES.DTP_CODE)
+                                ,doc_location_name        doc_locations.dlc_name%TYPE                        -- In order for the loader to determine where the file is ultimately moved to - Must match an entry in DOC_LOCATIONS table (DOC_LOCATIONS.DLC_NAME)
+                                ,doc_gateway_table_name   doc_gateways.dgt_table_name%TYPE                   -- Identifies the gateway table for the document association to be created  - Must match an entry in DOC_GATEWAYS table (DOC_GATEWAYS.DGT_TABLE_NAME)
+                                ,doc_rec_id               doc_assocs.das_rec_id%TYPE                         -- The foreign key pointing to the record within the table named by the ‘gateway table name’ attribute. 
+                                ,doc_x_coordinate         docs.doc_compl_east%TYPE                           -- The x coordinate for the document
+                                ,doc_y_coordinate         docs.doc_compl_north%TYPE);                        -- The y coordinate for the document
+                                   
+  TYPE tab_driving_recs IS TABLE OF rec_driving_rec INDEX BY BINARY_INTEGER;                                   
+
+  
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+-- 
+FUNCTION load_document_bundle(pi_filename         IN doc_bundles.dbun_filename%TYPE
+                             ,pi_oracle_directory IN doc_bundles.dbun_location%TYPE
+                             ,pi_process_id       IN hig_processes.hp_process_id%TYPE) RETURN BOOLEAN; -- boolean indicates success/failure
+
+ 
+
+FUNCTION load_document_bundle_no_zip(pi_filename                   IN doc_bundles.dbun_filename%TYPE
+                                    ,pi_tab_driving_recs            IN tab_driving_recs
+                                    ,pi_oracle_directory            IN doc_bundles.dbun_location%TYPE
+                                    ,pi_process_id                  IN hig_processes.hp_process_id%TYPE
+                                    ,po_bundle_id                   OUT doc_bundles.dbun_bundle_id%TYPE                                    
+                                    ) RETURN BOOLEAN;
+                                    
+PROCEDURE initialise;
+
+PROCEDURE discards_to_temp_table(pi_bundle_id IN doc_bundles.dbun_bundle_id%TYPE);
+
+end doc_bundle_loader;
+/

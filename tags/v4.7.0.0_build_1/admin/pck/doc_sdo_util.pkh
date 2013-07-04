@@ -1,0 +1,84 @@
+CREATE OR REPLACE PACKAGE doc_sdo_util
+IS
+-----------------------------------------------------------------------------
+--
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/doc_sdo_util.pkh-arc   2.4   Jul 04 2013 14:31:26   James.Wadsworth  $
+--       Module Name      : $Workfile:   doc_sdo_util.pkh  $
+--       Date into PVCS   : $Date:   Jul 04 2013 14:31:26  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:06  $
+--       Version          : $Revision:   2.4  $
+--
+--   Author : Chris Strettle
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
+   --g_sccsid is the SCCS ID for the package
+   g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.4  $';
+--
+   g_table_name          CONSTANT user_tables.table_name%TYPE       := 'DOCS';
+   g_pk_column           CONSTANT user_tab_columns.column_name%TYPE := 'DOC_ID';
+   g_feature_tab         CONSTANT user_tables.table_name%TYPE       := 'DOC_DOCUMENTS_XY_SDO';
+   g_view_name           CONSTANT user_views.view_name%TYPE         := 'V_DOC_DOCUMENTS';
+   g_view_pk_col         CONSTANT user_tab_columns.column_name%TYPE := 'DOC_ID';
+   g_shape_col           CONSTANT user_tab_columns.column_name%TYPE := 'GEOLOC';
+   g_x_column            CONSTANT user_tab_columns.column_name%TYPE := 'DOC_COMPL_EAST';
+   g_y_column            CONSTANT user_tab_columns.column_name%TYPE := 'DOC_COMPL_NORTH';
+   g_restriction         CONSTANT VARCHAR2(100)                     := 'doc_sdo_util.doc_is_doc(:NEW.doc_dtp_code)';
+   g_theme_feature_views CONSTANT VARCHAR2(30)                      := 'V_DOCUMENTS_XY_SDO';
+--   g_view_theme_name     CONSTANT nm_themes_all.nth_theme_name%TYPE := 'DOCUMENTS';
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+   FUNCTION get_version
+      RETURN VARCHAR2;
+
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+   FUNCTION get_body_version
+      RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+/*
+--<PROC NAME="IS_DEFAULT_THEME_NAME">
+  FUNCTION is_default_theme_name(p_theme_name nm_themes_all.nth_theme_name%TYPE )
+  RETURN BOOLEAN;
+--</PROC>
+*/
+--
+-----------------------------------------------------------------------------
+--  
+--<PROC NAME="MAKE_BASE_SDO_LAYER">
+-- This procedure creates a base sdo layer for the documents theme.
+   PROCEDURE make_base_sdo_layer
+               ( pi_theme_name    IN  nm_themes_all.nth_theme_name%TYPE
+               , pi_asset_type    IN  nm_inv_types.nit_inv_type%TYPE
+               , pi_asset_descr   IN  nm_inv_types.nit_descr%TYPE
+               , pi_lr_ne_column  IN  user_tab_columns.column_name%TYPE
+               , pi_lr_st_chain   IN  user_tab_columns.column_name%TYPE 
+               , pi_snapping_trig IN  VARCHAR2 DEFAULT 'TRUE' );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="DOC_IS_DOC">
+-- This function returns if the code entered is a document type.
+FUNCTION doc_is_doc (pi_doc_dtp_code VARCHAR2) 
+RETURN BOOLEAN;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+END doc_sdo_util;
+/
