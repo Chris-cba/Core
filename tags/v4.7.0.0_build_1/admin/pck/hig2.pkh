@@ -1,0 +1,95 @@
+create or replace package hig2 is
+--<PACKAGE>
+-----------------------------------------------------------------------------
+--   PVCS Identifiers :-
+--
+--       pvcsid                     : $Header:   //vm_latest/archives/nm3/admin/pck/hig2.pkh-arc   2.3   Jul 04 2013 14:37:54   James.Wadsworth  $
+--       Module Name                : $Workfile:   hig2.pkh  $
+--       Date into PVCS             : $Date:   Jul 04 2013 14:37:54  $
+--       Date fetched Out           : $Modtime:   Jul 04 2013 14:25:06  $
+--       PVCS Version               : $Revision:   2.3  $
+--       Based on SCCS version      : 1.3
+--
+--
+--   Author :
+--
+-- This package contains various highways core procedures and functions.
+-- Procedures which are executed frequently should be held in hig.pck.
+-- Procedures which are executed sporadically should be held in hig2.pck.
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+  g_sccsid      CONSTANT  VARCHAR2(80) := '"@(#)hig2.pkh	1.3 02/22/06"';
+--  g_sccsid is the SCCS ID for the package
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="upgrade">
+-- Procedure to keep a log of all installations, upgrades and patches
+-- applied to each product on the system.
+procedure upgrade
+(p_product         in  hig_upgrades.hup_product%type,
+ p_upgrade_script  in  hig_upgrades.upgrade_script%type,
+ p_remarks         in  hig_upgrades.remarks%type,
+ p_to_version      in  hig_upgrades.to_version%type);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="pre_upgrade_check">
+-- This procedure checks to see if the upgrade should be allowed to continue
+--  based on the current version of the product
+--
+PROCEDURE pre_upgrade_check (p_product               hig_products.hpr_product%TYPE
+                            ,p_new_version           hig_products.hpr_version%TYPE
+                            ,p_allowed_old_version_1 hig_products.hpr_version%TYPE
+                            ,p_allowed_old_version_2 hig_products.hpr_version%TYPE DEFAULT NULL
+                            ,p_allowed_old_version_3 hig_products.hpr_version%TYPE DEFAULT NULL
+                            ,p_allowed_old_version_4 hig_products.hpr_version%TYPE DEFAULT NULL
+                            );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--<PROC NAME="pre_install_check">
+PROCEDURE pre_install_check;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--<PROC NAME="--<PROC NAME="pre_install_check">
+-- This procedure checks to see if the install should be allowed to continue
+-- if this product has dependencies on another product.
+-- All products should depend on NM3 / Core.
+
+PROCEDURE product_exists_at_version (p_product                   hig_products.hpr_product%TYPE
+                                    ,p_version                   hig_products.hpr_version%TYPE
+                                    );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+PROCEDURE oracle_version_check(pi_min_version IN VARCHAR2);
+--
+--<PRAGMA>
+   PRAGMA RESTRICT_REFERENCES (get_version, RNDS, WNPS, WNDS);
+   PRAGMA RESTRICT_REFERENCES (get_body_version, RNDS, WNPS, WNDS);
+--</PRAGMA>
+-----------------------------------------------------------------------------
+end hig2;
+/

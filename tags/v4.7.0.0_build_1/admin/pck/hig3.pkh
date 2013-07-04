@@ -1,0 +1,55 @@
+PROMPT Create the Package HIG3
+CREATE OR REPLACE PACKAGE hig3 AS
+--<PACKAGE>
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)hig3.pkh	1.1 03/01/01
+--       Module Name      : hig3.pkh
+--       Date into SCCS   : 01/03/01 16:22:44
+--       Date fetched Out : 07/06/13 14:10:29
+--       SCCS Version     : 1.1
+--
+--
+--   Author :
+--
+--   HIGHWAYS application generic utilities
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+  g_sccsid      CONSTANT  VARCHAR2(2000) := '"@(#)hig3.pkh	1.1 03/01/01"';
+--  g_sccsid is the SCCS ID for the package
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="PRODUCT_USAGE">
+  PROCEDURE product_usage  (p_product in hig_products.hpr_product%type,
+                            p_message out varchar2);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PRAGMA>
+   PRAGMA RESTRICT_REFERENCES (get_version, RNDS, WNPS, WNDS);
+   PRAGMA RESTRICT_REFERENCES (get_body_version, RNDS, WNPS, WNDS);
+--</PRAGMA>
+
+end hig3;
+/
