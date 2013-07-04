@@ -1,0 +1,2255 @@
+CREATE OR REPLACE PACKAGE nm3ins IS
+--<PACKAGE>
+--
+-----------------------------------------------------------------------------
+--
+--   PVCS Identifiers :-
+--
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ins.pkh-arc   2.21   Jul 04 2013 16:04:30   James.Wadsworth  $
+--       Module Name      : $Workfile:   nm3ins.pkh  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:04:30  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:12  $
+--       PVCS Version     : $Revision:   2.21  $
+--
+--
+--   Author : Jonathan Mills
+--
+--   Generated package DO NOT MODIFY
+--
+--   nm3get_gen header : "@(#)nm3get_gen.pkh	1.3 12/05/05"
+--   nm3get_gen body   : "$Revision:   2.21  $"
+--
+-----------------------------------------------------------------------------
+--
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--
+-----------------------------------------------------------------------------
+--
+--</PACKAGE>
+--<GLOBVAR>
+   g_sccsid          CONSTANT  VARCHAR2(2000) := '"$Revision:   2.21  $"';
+--  g_sccsid is the SCCS ID for the package
+--
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_doc">
+-- Inserts a ROWTYPE record into docs
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_doc (p_rec_doc IN OUT docs%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_dac">
+-- Inserts a ROWTYPE record into doc_actions
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_dac (p_rec_dac IN OUT doc_actions%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_dah">
+-- Inserts a ROWTYPE record into doc_action_history
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_dah (p_rec_dah IN OUT doc_action_history%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_das">
+-- Inserts a ROWTYPE record into doc_assocs
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_das (p_rec_das IN OUT doc_assocs%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_dcl">
+-- Inserts a ROWTYPE record into doc_class
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_dcl (p_rec_dcl IN OUT doc_class%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_dcp">
+-- Inserts a ROWTYPE record into doc_copies
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_dcp (p_rec_dcp IN OUT doc_copies%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_ddg">
+-- Inserts a ROWTYPE record into doc_damage
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_ddg (p_rec_ddg IN OUT doc_damage%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_ddc">
+-- Inserts a ROWTYPE record into doc_damage_costs
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_ddc (p_rec_ddc IN OUT doc_damage_costs%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_dec">
+-- Inserts a ROWTYPE record into doc_enquiry_contacts
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_dec (p_rec_dec IN OUT doc_enquiry_contacts%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_det">
+-- Inserts a ROWTYPE record into doc_enquiry_types
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_det (p_rec_det IN OUT doc_enquiry_types%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_dgt">
+-- Inserts a ROWTYPE record into doc_gateways
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_dgt (p_rec_dgt IN OUT doc_gateways%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_dgs">
+-- Inserts a ROWTYPE record into doc_gate_syns
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_dgs (p_rec_dgs IN OUT doc_gate_syns%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_dhi">
+-- Inserts a ROWTYPE record into doc_history
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_dhi (p_rec_dhi IN OUT doc_history%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_dky">
+-- Inserts a ROWTYPE record into doc_keys
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_dky (p_rec_dky IN OUT doc_keys%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_dkw">
+-- Inserts a ROWTYPE record into doc_keywords
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_dkw (p_rec_dkw IN OUT doc_keywords%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_dlc">
+-- Inserts a ROWTYPE record into doc_locations
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_dlc (p_rec_dlc IN OUT doc_locations%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_dlr">
+-- Inserts a ROWTYPE record into doc_lov_recs
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_dlr (p_rec_dlr IN OUT doc_lov_recs%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_dmd">
+-- Inserts a ROWTYPE record into doc_media
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_dmd (p_rec_dmd IN OUT doc_media%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_dq">
+-- Inserts a ROWTYPE record into doc_query
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_dq (p_rec_dq IN OUT doc_query%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_dqc">
+-- Inserts a ROWTYPE record into doc_query_cols
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_dqc (p_rec_dqc IN OUT doc_query_cols%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_dsa">
+-- Inserts a ROWTYPE record into doc_std_actions
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_dsa (p_rec_dsa IN OUT doc_std_actions%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_dsc">
+-- Inserts a ROWTYPE record into doc_std_costs
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_dsc (p_rec_dsc IN OUT doc_std_costs%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_dsy">
+-- Inserts a ROWTYPE record into doc_synonyms
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_dsy (p_rec_dsy IN OUT doc_synonyms%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_dtc">
+-- Inserts a ROWTYPE record into doc_template_columns
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_dtc (p_rec_dtc IN OUT doc_template_columns%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_dtg">
+-- Inserts a ROWTYPE record into doc_template_gateways
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_dtg (p_rec_dtg IN OUT doc_template_gateways%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_dtu">
+-- Inserts a ROWTYPE record into doc_template_users
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_dtu (p_rec_dtu IN OUT doc_template_users%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_dtp">
+-- Inserts a ROWTYPE record into doc_types
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_dtp (p_rec_dtp IN OUT doc_types%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_gl">
+-- Inserts a ROWTYPE record into gri_lov
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_gl (p_rec_gl IN OUT gri_lov%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_grm">
+-- Inserts a ROWTYPE record into gri_modules
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_grm (p_rec_grm IN OUT gri_modules%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_gmp">
+-- Inserts a ROWTYPE record into gri_module_params
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_gmp (p_rec_gmp IN OUT gri_module_params%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_gp">
+-- Inserts a ROWTYPE record into gri_params
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_gp (p_rec_gp IN OUT gri_params%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_gpd">
+-- Inserts a ROWTYPE record into gri_param_dependencies
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_gpd (p_rec_gpd IN OUT gri_param_dependencies%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_gpl">
+-- Inserts a ROWTYPE record into gri_param_lookup
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_gpl (p_rec_gpl IN OUT gri_param_lookup%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_grr">
+-- Inserts a ROWTYPE record into gri_report_runs
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_grr (p_rec_grr IN OUT gri_report_runs%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_grp">
+-- Inserts a ROWTYPE record into gri_run_parameters
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_grp (p_rec_grp IN OUT gri_run_parameters%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_gsp">
+-- Inserts a ROWTYPE record into gri_saved_params
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_gsp (p_rec_gsp IN OUT gri_saved_params%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_gss">
+-- Inserts a ROWTYPE record into gri_saved_sets
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_gss (p_rec_gss IN OUT gri_saved_sets%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_grs">
+-- Inserts a ROWTYPE record into gri_spool
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_grs (p_rec_grs IN OUT gri_spool%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_had">
+-- Inserts a ROWTYPE record into hig_address
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_had (p_rec_had IN OUT hig_address%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_hco">
+-- Inserts a ROWTYPE record into hig_codes
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_hco (p_rec_hco IN OUT hig_codes%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_hcl">
+-- Inserts a ROWTYPE record into hig_colours
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_hcl (p_rec_hcl IN OUT hig_colours%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_hct">
+-- Inserts a ROWTYPE record into hig_contacts
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_hct (p_rec_hct IN OUT hig_contacts%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_hca">
+-- Inserts a ROWTYPE record into hig_contact_address
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_hca (p_rec_hca IN OUT hig_contact_address%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_hdo">
+-- Inserts a ROWTYPE record into hig_domains
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_hdo (p_rec_hdo IN OUT hig_domains%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_her">
+-- Inserts a ROWTYPE record into hig_errors
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_her (p_rec_her IN OUT hig_errors%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_hht">
+-- Inserts a ROWTYPE record into hig_hd_join_defs
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_hht (p_rec_hht IN OUT hig_hd_join_defs%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_hho">
+-- Inserts a ROWTYPE record into hig_hd_lookup_join_cols
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_hho (p_rec_hho IN OUT hig_hd_lookup_join_cols%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_hhl">
+-- Inserts a ROWTYPE record into hig_hd_lookup_join_defs
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_hhl (p_rec_hhl IN OUT hig_hd_lookup_join_defs%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_hhm">
+-- Inserts a ROWTYPE record into hig_hd_modules
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_hhm (p_rec_hhm IN OUT hig_hd_modules%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_hhu">
+-- Inserts a ROWTYPE record into hig_hd_mod_uses
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_hhu (p_rec_hhu IN OUT hig_hd_mod_uses%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_hhc">
+-- Inserts a ROWTYPE record into hig_hd_selected_cols
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_hhc (p_rec_hhc IN OUT hig_hd_selected_cols%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_hhj">
+-- Inserts a ROWTYPE record into hig_hd_table_join_cols
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_hhj (p_rec_hhj IN OUT hig_hd_table_join_cols%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_hho">
+-- Inserts a ROWTYPE record into hig_holidays
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_hho (p_rec_hho IN OUT hig_holidays%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_hmo">
+-- Inserts a ROWTYPE record into hig_modules
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_hmo (p_rec_hmo IN OUT hig_modules%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_hmh">
+-- Inserts a ROWTYPE record into hig_module_history
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_hmh (p_rec_hmh IN OUT hig_module_history%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_hmk">
+-- Inserts a ROWTYPE record into hig_module_keywords
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_hmk (p_rec_hmk IN OUT hig_module_keywords%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_hmr">
+-- Inserts a ROWTYPE record into hig_module_roles
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_hmr (p_rec_hmr IN OUT hig_module_roles%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_hmu">
+-- Inserts a ROWTYPE record into hig_module_usages
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_hmu (p_rec_hmu IN OUT hig_module_usages%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_hol">
+-- Inserts a ROWTYPE record into hig_option_list
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_hol (p_rec_hol IN OUT hig_option_list%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_hop">
+-- Inserts a ROWTYPE record into hig_options
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_hop (p_rec_hop IN OUT hig_options%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_hov">
+-- Inserts a ROWTYPE record into hig_option_values
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_hov (p_rec_hov IN OUT hig_option_values%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_hpr">
+-- Inserts a ROWTYPE record into hig_products
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_hpr (p_rec_hpr IN OUT hig_products%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_hrs">
+-- Inserts a ROWTYPE record into hig_report_styles
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_hrs (p_rec_hrs IN OUT hig_report_styles%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_hro">
+-- Inserts a ROWTYPE record into hig_roles
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_hro (p_rec_hro IN OUT hig_roles%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_hsc">
+-- Inserts a ROWTYPE record into hig_status_codes
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_hsc (p_rec_hsc IN OUT hig_status_codes%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_hsd">
+-- Inserts a ROWTYPE record into hig_status_domains
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_hsd (p_rec_hsd IN OUT hig_status_domains%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_hup">
+-- Inserts a ROWTYPE record into hig_upgrades
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_hup (p_rec_hup IN OUT hig_upgrades%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_hum">
+-- Inserts a ROWTYPE record into hig_url_modules
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_hum (p_rec_hum IN OUT hig_url_modules%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_hus">
+-- Inserts a ROWTYPE record into hig_users
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_hus (p_rec_hus IN OUT hig_users%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_huh">
+-- Inserts a ROWTYPE record into hig_user_history
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_huh (p_rec_huh IN OUT hig_user_history%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_huo">
+-- Inserts a ROWTYPE record into hig_user_options
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_huo (p_rec_huo IN OUT hig_user_options%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_hur">
+-- Inserts a ROWTYPE record into hig_user_roles
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_hur (p_rec_hur IN OUT hig_user_roles%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nag">
+-- Inserts a ROWTYPE record into nm_admin_groups
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_nag (p_rec_nag IN OUT nm_admin_groups%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nau">
+-- Inserts a ROWTYPE record into nm_admin_units
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_nau (p_rec_nau IN OUT nm_admin_units%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nau_all">
+-- Inserts a ROWTYPE record into nm_admin_units_all
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_nau_all (p_rec_nau_all IN OUT nm_admin_units_all%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nal">
+-- Inserts a ROWTYPE record into nm_area_lock
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_nal (p_rec_nal IN OUT nm_area_lock%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nars">
+-- Inserts a ROWTYPE record into nm_assets_on_route_store
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_nars (p_rec_nars IN OUT nm_assets_on_route_store%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_narsa">
+-- Inserts a ROWTYPE record into nm_assets_on_route_store_att
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_narsa (p_rec_narsa IN OUT nm_assets_on_route_store_att%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_narsd">
+-- Inserts a ROWTYPE record into nm_assets_on_route_store_att_d
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_narsd (p_rec_narsd IN OUT nm_assets_on_route_store_att_d%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_narsh">
+-- Inserts a ROWTYPE record into nm_assets_on_route_store_head
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_narsh (p_rec_narsh IN OUT nm_assets_on_route_store_head%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_narst">
+-- Inserts a ROWTYPE record into nm_assets_on_route_store_total
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_narst (p_rec_narst IN OUT nm_assets_on_route_store_total%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_naa">
+-- Inserts a ROWTYPE record into nm_audit_actions
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_naa (p_rec_naa IN OUT nm_audit_actions%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nach">
+-- Inserts a ROWTYPE record into nm_audit_changes
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_nach (p_rec_nach IN OUT nm_audit_changes%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nac">
+-- Inserts a ROWTYPE record into nm_audit_columns
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_nac (p_rec_nac IN OUT nm_audit_columns%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nkc">
+-- Inserts a ROWTYPE record into nm_audit_key_cols
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_nkc (p_rec_nkc IN OUT nm_audit_key_cols%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_natab">
+-- Inserts a ROWTYPE record into nm_audit_tables
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_natab (p_rec_natab IN OUT nm_audit_tables%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_natmp">
+-- Inserts a ROWTYPE record into nm_audit_temp
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_natmp (p_rec_natmp IN OUT nm_audit_temp%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nat">
+-- Inserts a ROWTYPE record into nm_au_types
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_nat (p_rec_nat IN OUT nm_au_types%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nsty">
+-- Inserts a ROWTYPE record into nm_au_sub_types
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_nsty (p_rec_nsty IN OUT nm_au_sub_types%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_natg">
+-- Inserts a ROWTYPE record into nm_au_types_groupings
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_natg (p_rec_natg IN OUT nm_au_types_groupings%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nd">
+-- Inserts a ROWTYPE record into nm_dbug
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_nd (p_rec_nd IN OUT nm_dbug%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_ne">
+-- Inserts a ROWTYPE record into nm_elements
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_ne (p_rec_ne IN OUT nm_elements%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_ne_all">
+-- Inserts a ROWTYPE record into nm_elements_all
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_ne_all (p_rec_ne_all IN OUT nm_elements_all%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_neh">
+-- Inserts a ROWTYPE record into nm_element_history
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_neh (p_rec_neh IN OUT nm_element_history%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_ner">
+-- Inserts a ROWTYPE record into nm_errors
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_ner (p_rec_ner IN OUT nm_errors%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nea">
+-- Inserts a ROWTYPE record into nm_event_alert_mails
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_nea (p_rec_nea IN OUT nm_event_alert_mails%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nel">
+-- Inserts a ROWTYPE record into nm_event_log
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_nel (p_rec_nel IN OUT nm_event_log%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_net">
+-- Inserts a ROWTYPE record into nm_event_types
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_net (p_rec_net IN OUT nm_event_types%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nfp">
+-- Inserts a ROWTYPE record into nm_fill_patterns
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_nfp (p_rec_nfp IN OUT nm_fill_patterns%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_ngq">
+-- Inserts a ROWTYPE record into nm_gaz_query
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_ngq (p_rec_ngq IN OUT nm_gaz_query%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_ngqt">
+-- Inserts a ROWTYPE record into nm_gaz_query_types
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_ngqt (p_rec_ngqt IN OUT nm_gaz_query_types%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_ngqa">
+-- Inserts a ROWTYPE record into nm_gaz_query_attribs
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_ngqa (p_rec_ngqa IN OUT nm_gaz_query_attribs%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_ngqv">
+-- Inserts a ROWTYPE record into nm_gaz_query_values
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_ngqv (p_rec_ngqv IN OUT nm_gaz_query_values%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_ngit">
+-- Inserts a ROWTYPE record into nm_group_inv_types
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_ngit (p_rec_ngit IN OUT nm_group_inv_types%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_ngil">
+-- Inserts a ROWTYPE record into nm_group_inv_link
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_ngil (p_rec_ngil IN OUT nm_group_inv_link%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_ngil_all">
+-- Inserts a ROWTYPE record into nm_group_inv_link_all
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_ngil_all (p_rec_ngil_all IN OUT nm_group_inv_link_all%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_ngr">
+-- Inserts a ROWTYPE record into nm_group_relations
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_ngr (p_rec_ngr IN OUT nm_group_relations%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_ngr_all">
+-- Inserts a ROWTYPE record into nm_group_relations_all
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_ngr_all (p_rec_ngr_all IN OUT nm_group_relations_all%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_ngt">
+-- Inserts a ROWTYPE record into nm_group_types
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_ngt (p_rec_ngt IN OUT nm_group_types%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_ngt_all">
+-- Inserts a ROWTYPE record into nm_group_types_all
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_ngt_all (p_rec_ngt_all IN OUT nm_group_types_all%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_ial">
+-- Inserts a ROWTYPE record into nm_inv_attri_lookup
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_ial (p_rec_ial IN OUT nm_inv_attri_lookup%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_ial_all">
+-- Inserts a ROWTYPE record into nm_inv_attri_lookup_all
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_ial_all (p_rec_ial_all IN OUT nm_inv_attri_lookup_all%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nic">
+-- Inserts a ROWTYPE record into nm_inv_categories
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_nic (p_rec_nic IN OUT nm_inv_categories%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_icm">
+-- Inserts a ROWTYPE record into nm_inv_category_modules
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_icm (p_rec_icm IN OUT nm_inv_category_modules%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_id">
+-- Inserts a ROWTYPE record into nm_inv_domains
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_id (p_rec_id IN OUT nm_inv_domains%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_id_all">
+-- Inserts a ROWTYPE record into nm_inv_domains_all
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_id_all (p_rec_id_all IN OUT nm_inv_domains_all%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_iit">
+-- Inserts a ROWTYPE record into nm_inv_items
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_iit (p_rec_iit IN OUT nm_inv_items%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_iit_all">
+-- Inserts a ROWTYPE record into nm_inv_items_all
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_iit_all (p_rec_iit_all IN OUT nm_inv_items_all%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_iig">
+-- Inserts a ROWTYPE record into nm_inv_item_groupings
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_iig (p_rec_iig IN OUT nm_inv_item_groupings%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_iig_all">
+-- Inserts a ROWTYPE record into nm_inv_item_groupings_all
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_iig_all (p_rec_iig_all IN OUT nm_inv_item_groupings_all%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nin">
+-- Inserts a ROWTYPE record into nm_inv_nw
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_nin (p_rec_nin IN OUT nm_inv_nw%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nin_all">
+-- Inserts a ROWTYPE record into nm_inv_nw_all
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_nin_all (p_rec_nin_all IN OUT nm_inv_nw_all%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nith">
+-- Inserts a ROWTYPE record into nm_inv_themes
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_nith (p_rec_nith IN OUT nm_inv_themes%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nit">
+-- Inserts a ROWTYPE record into nm_inv_types
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_nit (p_rec_nit IN OUT nm_inv_types%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nit_all">
+-- Inserts a ROWTYPE record into nm_inv_types_all
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_nit_all (p_rec_nit_all IN OUT nm_inv_types_all%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_ita">
+-- Inserts a ROWTYPE record into nm_inv_type_attribs
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_ita (p_rec_ita IN OUT nm_inv_type_attribs%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_ita_all">
+-- Inserts a ROWTYPE record into nm_inv_type_attribs_all
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_ita_all (p_rec_ita_all IN OUT nm_inv_type_attribs_all%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_itb">
+-- Inserts a ROWTYPE record into nm_inv_type_attrib_bandings
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_itb (p_rec_itb IN OUT nm_inv_type_attrib_bandings%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_itd">
+-- Inserts a ROWTYPE record into nm_inv_type_attrib_band_dets
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_itd (p_rec_itd IN OUT nm_inv_type_attrib_band_dets%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nias">
+-- Inserts a ROWTYPE record into nm_inv_attribute_sets
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_nias (p_rec_nias IN OUT nm_inv_attribute_sets%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nsit">
+-- Inserts a ROWTYPE record into nm_inv_attribute_set_inv_types
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_nsit (p_rec_nsit IN OUT nm_inv_attribute_set_inv_types%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nsia">
+-- Inserts a ROWTYPE record into nm_inv_attribute_set_inv_attr
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_nsia (p_rec_nsia IN OUT nm_inv_attribute_set_inv_attr%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nitc">
+-- Inserts a ROWTYPE record into nm_inv_type_colours
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_nitc (p_rec_nitc IN OUT nm_inv_type_colours%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_itg">
+-- Inserts a ROWTYPE record into nm_inv_type_groupings
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_itg (p_rec_itg IN OUT nm_inv_type_groupings%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_itg_all">
+-- Inserts a ROWTYPE record into nm_inv_type_groupings_all
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_itg_all (p_rec_itg_all IN OUT nm_inv_type_groupings_all%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_itr">
+-- Inserts a ROWTYPE record into nm_inv_type_roles
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_itr (p_rec_itr IN OUT nm_inv_type_roles%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_njc">
+-- Inserts a ROWTYPE record into nm_job_control
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_njc (p_rec_njc IN OUT nm_job_control%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_njo">
+-- Inserts a ROWTYPE record into nm_job_operations
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_njo (p_rec_njo IN OUT nm_job_operations%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_njv">
+-- Inserts a ROWTYPE record into nm_job_operation_data_values
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_njv (p_rec_njv IN OUT nm_job_operation_data_values%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_njt">
+-- Inserts a ROWTYPE record into nm_job_types
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_njt (p_rec_njt IN OUT nm_job_types%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_jto">
+-- Inserts a ROWTYPE record into nm_job_types_operations
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_jto (p_rec_jto IN OUT nm_job_types_operations%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nlm">
+-- Inserts a ROWTYPE record into nm_ld_mc_all_inv_tmp
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_nlm (p_rec_nlm IN OUT nm_ld_mc_all_inv_tmp%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nlt">
+-- Inserts a ROWTYPE record into nm_linear_types
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_nlt (p_rec_nlt IN OUT nm_linear_types%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nlb">
+-- Inserts a ROWTYPE record into nm_load_batches
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_nlb (p_rec_nlb IN OUT nm_load_batches%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nlbs">
+-- Inserts a ROWTYPE record into nm_load_batch_status
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_nlbs (p_rec_nlbs IN OUT nm_load_batch_status%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nld">
+-- Inserts a ROWTYPE record into nm_load_destinations
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_nld (p_rec_nld IN OUT nm_load_destinations%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nldd">
+-- Inserts a ROWTYPE record into nm_load_destination_defaults
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_nldd (p_rec_nldd IN OUT nm_load_destination_defaults%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nlf">
+-- Inserts a ROWTYPE record into nm_load_files
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_nlf (p_rec_nlf IN OUT nm_load_files%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nlfc">
+-- Inserts a ROWTYPE record into nm_load_file_cols
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_nlfc (p_rec_nlfc IN OUT nm_load_file_cols%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nlcd">
+-- Inserts a ROWTYPE record into nm_load_file_col_destinations
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_nlcd (p_rec_nlcd IN OUT nm_load_file_col_destinations%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nlfd">
+-- Inserts a ROWTYPE record into nm_load_file_destinations
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_nlfd (p_rec_nlfd IN OUT nm_load_file_destinations%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nmg">
+-- Inserts a ROWTYPE record into nm_mail_groups
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_nmg (p_rec_nmg IN OUT nm_mail_groups%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nmgm">
+-- Inserts a ROWTYPE record into nm_mail_group_membership
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_nmgm (p_rec_nmgm IN OUT nm_mail_group_membership%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nmm">
+-- Inserts a ROWTYPE record into nm_mail_message
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_nmm (p_rec_nmm IN OUT nm_mail_message%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nmmr">
+-- Inserts a ROWTYPE record into nm_mail_message_recipients
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_nmmr (p_rec_nmmr IN OUT nm_mail_message_recipients%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nmmt">
+-- Inserts a ROWTYPE record into nm_mail_message_text
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_nmmt (p_rec_nmmt IN OUT nm_mail_message_text%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nmu">
+-- Inserts a ROWTYPE record into nm_mail_users
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_nmu (p_rec_nmu IN OUT nm_mail_users%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nm">
+-- Inserts a ROWTYPE record into nm_members
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_nm (p_rec_nm IN OUT nm_members%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nm_all">
+-- Inserts a ROWTYPE record into nm_members_all
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_nm_all (p_rec_nm_all IN OUT nm_members_all%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nmh">
+-- Inserts a ROWTYPE record into nm_member_history
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_nmh (p_rec_nmh IN OUT nm_member_history%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nda">
+-- Inserts a ROWTYPE record into nm_mrg_default_query_attribs
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_nda (p_rec_nda IN OUT nm_mrg_default_query_attribs%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_ndq">
+-- Inserts a ROWTYPE record into nm_mrg_default_query_types
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_ndq (p_rec_ndq IN OUT nm_mrg_default_query_types%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_ndq_all">
+-- Inserts a ROWTYPE record into nm_mrg_default_query_types_all
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_ndq_all (p_rec_ndq_all IN OUT nm_mrg_default_query_types_all%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nmid">
+-- Inserts a ROWTYPE record into nm_mrg_inv_derivation
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_nmid (p_rec_nmid IN OUT nm_mrg_inv_derivation%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nmc">
+-- Inserts a ROWTYPE record into nm_mrg_output_cols
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_nmc (p_rec_nmc IN OUT nm_mrg_output_cols%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nmcd">
+-- Inserts a ROWTYPE record into nm_mrg_output_col_decode
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_nmcd (p_rec_nmcd IN OUT nm_mrg_output_col_decode%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nmf">
+-- Inserts a ROWTYPE record into nm_mrg_output_file
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_nmf (p_rec_nmf IN OUT nm_mrg_output_file%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nmq">
+-- Inserts a ROWTYPE record into nm_mrg_query
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_nmq (p_rec_nmq IN OUT nm_mrg_query%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nmq_all">
+-- Inserts a ROWTYPE record into nm_mrg_query_all
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_nmq_all (p_rec_nmq_all IN OUT nm_mrg_query_all%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nmqa">
+-- Inserts a ROWTYPE record into nm_mrg_query_attribs
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_nmqa (p_rec_nmqa IN OUT nm_mrg_query_attribs%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nmqr">
+-- Inserts a ROWTYPE record into nm_mrg_query_results
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_nmqr (p_rec_nmqr IN OUT nm_mrg_query_results%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nmqr_all">
+-- Inserts a ROWTYPE record into nm_mrg_query_results_all
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_nmqr_all (p_rec_nmqr_all IN OUT nm_mrg_query_results_all%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nqro">
+-- Inserts a ROWTYPE record into nm_mrg_query_roles
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_nqro (p_rec_nqro IN OUT nm_mrg_query_roles%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nmqt">
+-- Inserts a ROWTYPE record into nm_mrg_query_types
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_nmqt (p_rec_nmqt IN OUT nm_mrg_query_types%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nmqt_all">
+-- Inserts a ROWTYPE record into nm_mrg_query_types_all
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_nmqt_all (p_rec_nmqt_all IN OUT nm_mrg_query_types_all%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nmqv">
+-- Inserts a ROWTYPE record into nm_mrg_query_values
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_nmqv (p_rec_nmqv IN OUT nm_mrg_query_values%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nms">
+-- Inserts a ROWTYPE record into nm_mrg_sections
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_nms (p_rec_nms IN OUT nm_mrg_sections%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nms_all">
+-- Inserts a ROWTYPE record into nm_mrg_sections_all
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_nms_all (p_rec_nms_all IN OUT nm_mrg_sections_all%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nsv">
+-- Inserts a ROWTYPE record into nm_mrg_section_inv_values
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_nsv (p_rec_nsv IN OUT nm_mrg_section_inv_values%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nsv_all">
+-- Inserts a ROWTYPE record into nm_mrg_section_inv_values_all
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_nsv_all (p_rec_nsv_all IN OUT nm_mrg_section_inv_values_all%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nmsm">
+-- Inserts a ROWTYPE record into nm_mrg_section_members
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_nmsm (p_rec_nmsm IN OUT nm_mrg_section_members%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_no">
+-- Inserts a ROWTYPE record into nm_nodes
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_no (p_rec_no IN OUT nm_nodes%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_no_all">
+-- Inserts a ROWTYPE record into nm_nodes_all
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_no_all (p_rec_no_all IN OUT nm_nodes_all%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nnt">
+-- Inserts a ROWTYPE record into nm_node_types
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_nnt (p_rec_nnt IN OUT nm_node_types%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nnu">
+-- Inserts a ROWTYPE record into nm_node_usages
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_nnu (p_rec_nnu IN OUT nm_node_usages%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nnu_all">
+-- Inserts a ROWTYPE record into nm_node_usages_all
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_nnu_all (p_rec_nnu_all IN OUT nm_node_usages_all%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nng">
+-- Inserts a ROWTYPE record into nm_nt_groupings
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_nng (p_rec_nng IN OUT nm_nt_groupings%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nng_all">
+-- Inserts a ROWTYPE record into nm_nt_groupings_all
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_nng_all (p_rec_nng_all IN OUT nm_nt_groupings_all%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nad">
+-- Inserts a ROWTYPE record into nm_nw_ad_types
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_nad (p_rec_nad IN OUT nm_nw_ad_types%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_npe">
+-- Inserts a ROWTYPE record into nm_nw_persistent_extents
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_npe (p_rec_npe IN OUT nm_nw_persistent_extents%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nnth">
+-- Inserts a ROWTYPE record into nm_nw_themes
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_nnth (p_rec_nnth IN OUT nm_nw_themes%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nmo">
+-- Inserts a ROWTYPE record into nm_operations
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_nmo (p_rec_nmo IN OUT nm_operations%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nod">
+-- Inserts a ROWTYPE record into nm_operation_data
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_nod (p_rec_nod IN OUT nm_operation_data%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_npq">
+-- Inserts a ROWTYPE record into nm_pbi_query
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_npq (p_rec_npq IN OUT nm_pbi_query%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_npqa">
+-- Inserts a ROWTYPE record into nm_pbi_query_attribs
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_npqa (p_rec_npqa IN OUT nm_pbi_query_attribs%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_npqr">
+-- Inserts a ROWTYPE record into nm_pbi_query_results
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_npqr (p_rec_npqr IN OUT nm_pbi_query_results%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_npqt">
+-- Inserts a ROWTYPE record into nm_pbi_query_types
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_npqt (p_rec_npqt IN OUT nm_pbi_query_types%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_npqv">
+-- Inserts a ROWTYPE record into nm_pbi_query_values
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_npqv (p_rec_npqv IN OUT nm_pbi_query_values%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nps">
+-- Inserts a ROWTYPE record into nm_pbi_sections
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_nps (p_rec_nps IN OUT nm_pbi_sections%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_npsm">
+-- Inserts a ROWTYPE record into nm_pbi_section_members
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_npsm (p_rec_npsm IN OUT nm_pbi_section_members%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_np">
+-- Inserts a ROWTYPE record into nm_points
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_np (p_rec_np IN OUT nm_points%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nrd">
+-- Inserts a ROWTYPE record into nm_reclass_details
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_nrd (p_rec_nrd IN OUT nm_reclass_details%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nrev">
+-- Inserts a ROWTYPE record into nm_reversal
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_nrev (p_rec_nrev IN OUT nm_reversal%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nse">
+-- Inserts a ROWTYPE record into nm_saved_extents
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_nse (p_rec_nse IN OUT nm_saved_extents%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nsm">
+-- Inserts a ROWTYPE record into nm_saved_extent_members
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_nsm (p_rec_nsm IN OUT nm_saved_extent_members%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nsd">
+-- Inserts a ROWTYPE record into nm_saved_extent_member_datums
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_nsd (p_rec_nsd IN OUT nm_saved_extent_member_datums%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_tii">
+-- Inserts a ROWTYPE record into nm_temp_inv_items
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_tii (p_rec_tii IN OUT nm_temp_inv_items%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_tiit">
+-- Inserts a ROWTYPE record into nm_temp_inv_items_temp
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_tiit (p_rec_tiit IN OUT nm_temp_inv_items_temp%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_tim">
+-- Inserts a ROWTYPE record into nm_temp_inv_members
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_tim (p_rec_tim IN OUT nm_temp_inv_members%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_timt">
+-- Inserts a ROWTYPE record into nm_temp_inv_members_temp
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_timt (p_rec_timt IN OUT nm_temp_inv_members_temp%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_ntn">
+-- Inserts a ROWTYPE record into nm_temp_nodes
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_ntn (p_rec_ntn IN OUT nm_temp_nodes%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nth">
+-- Inserts a ROWTYPE record into nm_themes_all
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_nth (p_rec_nth IN OUT nm_themes_all%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_ntg">
+-- Inserts a ROWTYPE record into nm_theme_gtypes
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_ntg (p_rec_ntg IN OUT nm_theme_gtypes%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_ntf">
+-- Inserts a ROWTYPE record into nm_theme_functions_all
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_ntf (p_rec_ntf IN OUT nm_theme_functions_all%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nthr">
+-- Inserts a ROWTYPE record into nm_theme_roles
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_nthr (p_rec_nthr IN OUT nm_theme_roles%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nts">
+-- Inserts a ROWTYPE record into nm_theme_snaps
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_nts (p_rec_nts IN OUT nm_theme_snaps%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nt">
+-- Inserts a ROWTYPE record into nm_types
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_nt (p_rec_nt IN OUT nm_types%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_ntc">
+-- Inserts a ROWTYPE record into nm_type_columns
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_ntc (p_rec_ntc IN OUT nm_type_columns%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nti">
+-- Inserts a ROWTYPE record into nm_type_inclusion
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_nti (p_rec_nti IN OUT nm_type_inclusion%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_ntl">
+-- Inserts a ROWTYPE record into nm_type_layers
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_ntl (p_rec_ntl IN OUT nm_type_layers%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_ntl_all">
+-- Inserts a ROWTYPE record into nm_type_layers_all
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_ntl_all (p_rec_ntl_all IN OUT nm_type_layers_all%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nsc">
+-- Inserts a ROWTYPE record into nm_type_subclass
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_nsc (p_rec_nsc IN OUT nm_type_subclass%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nsr">
+-- Inserts a ROWTYPE record into nm_type_subclass_restrictions
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_nsr (p_rec_nsr IN OUT nm_type_subclass_restrictions%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_un">
+-- Inserts a ROWTYPE record into nm_units
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_un (p_rec_un IN OUT nm_units%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_uc">
+-- Inserts a ROWTYPE record into nm_unit_conversions
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_uc (p_rec_uc IN OUT nm_unit_conversions%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_ud">
+-- Inserts a ROWTYPE record into nm_unit_domains
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_ud (p_rec_ud IN OUT nm_unit_domains%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nuf">
+-- Inserts a ROWTYPE record into nm_upload_files
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_nuf (p_rec_nuf IN OUT nm_upload_files%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nufp">
+-- Inserts a ROWTYPE record into nm_upload_filespart
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_nufp (p_rec_nufp IN OUT nm_upload_filespart%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nua">
+-- Inserts a ROWTYPE record into nm_user_aus
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_nua (p_rec_nua IN OUT nm_user_aus%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nua_all">
+-- Inserts a ROWTYPE record into nm_user_aus_all
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_nua_all (p_rec_nua_all IN OUT nm_user_aus_all%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nva">
+-- Inserts a ROWTYPE record into nm_visual_attributes
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_nva (p_rec_nva IN OUT nm_visual_attributes%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nxf">
+-- Inserts a ROWTYPE record into nm_xml_files
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_nxf (p_rec_nxf IN OUT nm_xml_files%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nxb">
+-- Inserts a ROWTYPE record into nm_xml_load_batches
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_nxb (p_rec_nxb IN OUT nm_xml_load_batches%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nxle">
+-- Inserts a ROWTYPE record into nm_xml_load_errors
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_nxle (p_rec_nxle IN OUT nm_xml_load_errors%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nwx">
+-- Inserts a ROWTYPE record into nm_nw_xsp
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_nwx (p_rec_nwx IN OUT nm_nw_xsp%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nxd">
+-- Inserts a ROWTYPE record into nm_x_driving_conditions
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_nxd (p_rec_nxd IN OUT nm_x_driving_conditions%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nxe">
+-- Inserts a ROWTYPE record into nm_x_errors
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_nxe (p_rec_nxe IN OUT nm_x_errors%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nxic">
+-- Inserts a ROWTYPE record into nm_x_inv_conditions
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_nxic (p_rec_nxic IN OUT nm_x_inv_conditions%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nxl">
+-- Inserts a ROWTYPE record into nm_x_location_rules
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_nxl (p_rec_nxl IN OUT nm_x_location_rules%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nxn">
+-- Inserts a ROWTYPE record into nm_x_nw_rules
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_nxn (p_rec_nxn IN OUT nm_x_nw_rules%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nxr">
+-- Inserts a ROWTYPE record into nm_x_rules
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_nxr (p_rec_nxr IN OUT nm_x_rules%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nxv">
+-- Inserts a ROWTYPE record into nm_x_val_conditions
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_nxv (p_rec_nxv IN OUT nm_x_val_conditions%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_xsr">
+-- Inserts a ROWTYPE record into nm_xsp_restraints
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_xsr (p_rec_xsr IN OUT nm_xsp_restraints%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_xrv">
+-- Inserts a ROWTYPE record into nm_xsp_reversal
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_xrv (p_rec_xrv IN OUT nm_xsp_reversal%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PRAGMA>
+   PRAGMA RESTRICT_REFERENCES (get_version, RNDS, WNPS, WNDS);
+   PRAGMA RESTRICT_REFERENCES (get_body_version, RNDS, WNPS, WNDS);
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+END nm3ins;
+/
