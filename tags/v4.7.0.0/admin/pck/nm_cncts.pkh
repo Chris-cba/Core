@@ -1,0 +1,56 @@
+CREATE OR REPLACE PACKAGE Nm_Cncts AS
+-----------------------------------------------------------------------------
+--
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)nm_cncts.pkh	1.1 07/18/06
+--       Module Name      : nm_cncts.pkh
+--       Date into SCCS   : 06/07/18 15:55:08
+--       Date fetched Out : 07/06/13 14:10:42
+--       SCCS Version     : 1.1
+--
+--   Author : Rob Coupe
+--
+--   NM3 Connectivity package
+--
+-------------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+
+
+  g_cnct nm_cnct;
+  
+  g_cnct_instantiated BOOLEAN := FALSE;
+  g_cnct_link_flag    BOOLEAN := FALSE;
+  g_cnct_complete     BOOLEAN := FALSE;
+
+  g_node_limit        INTEGER := 1024;
+
+  g_start_node        INTEGER;
+  g_end_node          INTEGER;
+
+
+  FUNCTION get_cnct RETURN nm_cnct;
+  FUNCTION get_no_array RETURN nm_cnct_no_array_type;
+  FUNCTION get_ne_array RETURN nm_cnct_ne_array_type;
+  FUNCTION get_no_ptr_array RETURN ptr_array_type;
+  PROCEDURE init_start_and_end_nodes;
+  PROCEDURE set_start_and_end_nodes;
+  FUNCTION get_start_node RETURN INTEGER;
+  FUNCTION get_end_node RETURN INTEGER;
+  PROCEDURE instantiate_link_array( p_dir_flag IN VARCHAR2 DEFAULT 'FALSE');
+  PROCEDURE complete_link_table (p_dir_flag IN VARCHAR2 DEFAULT 'FALSE');
+  FUNCTION get_path_from_complete_link( p_no_st IN INTEGER, p_no_end INTEGER, p_dir_flag IN VARCHAR2 DEFAULT 'FALSE') RETURN nm_placement_array;
+  PROCEDURE init_link_from_node( p_no_id IN INTEGER );
+  FUNCTION get_path( p_no_st IN INTEGER, p_no_end IN INTEGER ) RETURN nm_placement_array;
+  PROCEDURE make_cnct_from_tmp_extent ( p_job_id IN NM_NW_TEMP_EXTENTS.NTE_JOB_ID%TYPE );
+  PROCEDURE make_cnct_from_extent ( p_nse_id IN NM_SAVED_EXTENTS.NSE_ID%TYPE );
+  PROCEDURE make_nm_cnct_from_ne ( p_ne_id IN nm_elements.ne_id%TYPE,
+                                   p_obj_type IN nm_members.nm_obj_type%TYPE DEFAULT NULL );
+  PROCEDURE make_nm_cnct_from_ne_list ( p_list IN int_array, p_obj_type IN nm_members.nm_obj_type%TYPE DEFAULT NULL  );
+  FUNCTION get_pl_by_xy ( p_layer IN NUMBER, p_x1 IN NUMBER, p_y1 IN NUMBER, p_x2 IN NUMBER, p_y2 IN NUMBER, p_compl_flag VARCHAR2 DEFAULT 'N' ) RETURN nm_placement_array;
+  PROCEDURE make_cnct_from_line (l_theme_id IN INTEGER, p_geom IN mdsys.sdo_geometry, p_scale IN NUMBER DEFAULT 0.05);
+  PROCEDURE reset_globals;
+  FUNCTION  is_cnct_instantiated RETURN INTEGER;
+END;
+/
