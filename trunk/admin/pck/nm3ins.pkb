@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3ins IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ins.pkb-arc   2.24   Jan 08 2013 15:58:08   Chris.Baugh  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ins.pkb-arc   2.25   Jul 04 2013 16:04:30   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3ins.pkb  $
---       Date into PVCS   : $Date:   Jan 08 2013 15:58:08  $
---       Date fetched Out : $Modtime:   Jan 08 2013 15:32:04  $
---       PVCS Version     : $Revision:   2.24  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:04:30  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:12  $
+--       PVCS Version     : $Revision:   2.25  $
 --
 --
 --   Author : Jonathan Mills
@@ -16,15 +16,15 @@ CREATE OR REPLACE PACKAGE BODY nm3ins IS
 --   Generated package DO NOT MODIFY
 --
 --   nm3get_gen header : "@(#)nm3get_gen.pkh	1.3 12/05/05"
---   nm3get_gen body   : "$Revision:   2.24  $"
+--   nm3get_gen body   : "$Revision:   2.25  $"
 --
 -----------------------------------------------------------------------------
 --
---	Copyright (c) exor corporation ltd, 2005
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 --
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid CONSTANT  VARCHAR2(2000) := '"$Revision:   2.24  $"';
+   g_body_sccsid CONSTANT  VARCHAR2(2000) := '"$Revision:   2.25  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3ins';
