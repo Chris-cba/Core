@@ -17,7 +17,7 @@ SELECT
 --   v_nm_gaz_query_item_list view on nm_gaz_query_item_list
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2002
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
        ngqi_job_id
