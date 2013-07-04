@@ -1,3 +1,16 @@
+--
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/extent_fk_cascade.sql-arc   1.4   Jul 04 2013 13:45:30   James.Wadsworth  $
+--       Module Name      : $Workfile:   extent_fk_cascade.sql  $
+--       Date into PVCS   : $Date:   Jul 04 2013 13:45:30  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 11:59:54  $
+--       Version          : $Revision:   1.4  $
+--
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
 /* script to tidy-up extents
 
 This is shipped as a fix for 4500 (fix1) and 4400 (fix11). 

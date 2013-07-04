@@ -1,3 +1,16 @@
+--
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/higowner_9i_privs.sql-arc   2.1   Jul 04 2013 13:45:30   James.Wadsworth  $
+--       Module Name      : $Workfile:   higowner_9i_privs.sql  $
+--       Date into PVCS   : $Date:   Jul 04 2013 13:45:30  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 12:01:12  $
+--       Version          : $Revision:   2.1  $
+--
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
 define sccsid = '"@(#)higowner_9i_privs.sql	1.2 11/28/03"'
 prompt
 prompt Highways Owner 9i Privileges Grant Script

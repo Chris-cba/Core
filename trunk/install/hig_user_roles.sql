@@ -1,3 +1,16 @@
+--
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/hig_user_roles.sql-arc   2.1   Jul 04 2013 13:45:30   James.Wadsworth  $
+--       Module Name      : $Workfile:   hig_user_roles.sql  $
+--       Date into PVCS   : $Date:   Jul 04 2013 13:45:30  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 12:01:00  $
+--       Version          : $Revision:   2.1  $
+--
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
 REM **************************************************************************
 REM	Copyright (c) 1996 EXOR Corporation.
 REM

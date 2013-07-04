@@ -2,14 +2,14 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/gtype_3306_update.sql-arc   1.2   Oct 29 2012 09:10:44   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/gtype_3306_update.sql-arc   1.3   Jul 04 2013 13:45:30   James.Wadsworth  $
 --       Module Name      : $Workfile:   gtype_3306_update.sql  $
---       Date into PVCS   : $Date:   Oct 29 2012 09:10:44  $
---       Date fetched Out : $Modtime:   Oct 29 2012 09:02:56  $
---       PVCS Version     : $Revision:   1.2  $
+--       Date into PVCS   : $Date:   Jul 04 2013 13:45:30  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 11:54:08  $
+--       PVCS Version     : $Revision:   1.3  $
 --
 --------------------------------------------------------------------------------
---   Copyright (c) 2012 Bentley Systems Incorporated.
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 --------------------------------------------------------------------------------
 --
 -- gtype_3306_update.sql - script to update multi-part lrs features to 3306
