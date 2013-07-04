@@ -1,13 +1,15 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm_inst.sql-arc   2.2   Mar 28 2011 12:25:16   Mike.Alexander  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm_inst.sql-arc   2.3   Jul 04 2013 13:48:10   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm_inst.sql  $
---       Date into PVCS   : $Date:   Mar 28 2011 12:25:16  $
---       Date fetched Out : $Modtime:   Mar 28 2011 12:24:28  $
---       PVCS Version     : $Revision:   2.2  $
+--       Date into PVCS   : $Date:   Jul 04 2013 13:48:10  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 13:34:58  $
+--       PVCS Version     : $Revision:   2.3  $
 --
---------------------------------------------------------------------------------
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
 --
 -- Check that the user isn't sys or system
 WHENEVER SQLERROR EXIT
