@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3tab_varchar AS
 --
 -- PVCS Identifiers :-
 --
--- pvcsid : $Header:   //vm_latest/archives/nm3/admin/pck/nm3tab_varchar.pkb-arc   2.4   Jan 06 2010 16:41:36   cstrettle  $
+-- pvcsid : $Header:   //vm_latest/archives/nm3/admin/pck/nm3tab_varchar.pkb-arc   2.5   Jul 04 2013 16:33:00   James.Wadsworth  $
 -- Module Name : $Workfile:   nm3tab_varchar.pkb  $
--- Date into PVCS : $Date:   Jan 06 2010 16:41:36  $
--- Date fetched Out : $Modtime:   Jan 05 2010 11:24:00  $
--- PVCS Version : $Revision:   2.4  $
+-- Date into PVCS : $Date:   Jul 04 2013 16:33:00  $
+-- Date fetched Out : $Modtime:   Jul 04 2013 14:25:20  $
+-- PVCS Version : $Revision:   2.5  $
 -- Based on SCCS version : 
 --
 --
@@ -17,12 +17,12 @@ CREATE OR REPLACE PACKAGE BODY nm3tab_varchar AS
 --   NM3 nm3type.tab_varchar32767 manipulation package body
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2002
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 --all global package variables here
 --
-   g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.4  $';
+   g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.5  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3tab_varchar';

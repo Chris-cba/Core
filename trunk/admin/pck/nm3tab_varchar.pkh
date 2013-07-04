@@ -2,11 +2,11 @@ create or replace package nm3tab_varchar as
 --<PACKAGE>
 -- PVCS Identifiers :-
 --
--- pvcsid : $Header:   //vm_latest/archives/nm3/admin/pck/nm3tab_varchar.pkh-arc   2.4   Jan 06 2010 16:41:36   cstrettle  $
+-- pvcsid : $Header:   //vm_latest/archives/nm3/admin/pck/nm3tab_varchar.pkh-arc   2.5   Jul 04 2013 16:33:00   James.Wadsworth  $
 -- Module Name : $Workfile:   nm3tab_varchar.pkh  $
--- Date into PVCS : $Date:   Jan 06 2010 16:41:36  $
--- Date fetched Out : $Modtime:   Jan 05 2010 11:10:32  $
--- PVCS Version : $Revision:   2.4  $
+-- Date into PVCS : $Date:   Jul 04 2013 16:33:00  $
+-- Date fetched Out : $Modtime:   Jul 04 2013 14:25:20  $
+-- PVCS Version : $Revision:   2.5  $
 -- Based on SCCS version : 
 --
 --
@@ -15,11 +15,11 @@ create or replace package nm3tab_varchar as
 --   NM3 nm3type.tab_varchar32767 manipulation package
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2002
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
-  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.4  $';
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.5  $';
 --  g_sccsid is the SCCS ID for the package
 --</GLOBVAR>
 --
