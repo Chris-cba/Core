@@ -18,7 +18,7 @@ DECLARE
 --   FOR EACH ROW
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2001
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
    l_view_name      VARCHAR2(30) := nm3mrg_view.get_mrg_view_name_by_unique(:OLD.NMQ_UNIQUE);
@@ -51,7 +51,7 @@ DECLARE
 --    ON NM_MRG_QUERY
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2001
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 BEGIN
@@ -89,7 +89,7 @@ DECLARE
 --    ON NM_MRG_QUERY
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2001
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 BEGIN
@@ -117,7 +117,7 @@ BEGIN
 --     ON   NM_MRG_QUERY_TYPES
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2001
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
    nm3mrg_view.g_tab_nmq_id.DELETE;
@@ -143,7 +143,7 @@ DECLARE
 --    ON   NM_MRG_QUERY_TYPES
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2001
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
    l_add    NUMBER;
@@ -188,7 +188,7 @@ DECLARE
 --     ON   NM_MRG_QUERY_TYPES
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2001
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
    l_count BINARY_INTEGER;
@@ -229,7 +229,7 @@ DECLARE
 --       ON   nm_mrg_file_output_file
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2002
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 BEGIN
@@ -255,7 +255,7 @@ DECLARE
 --       ON   nm_mrg_file_output_file
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2002
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 BEGIN
@@ -284,7 +284,7 @@ DECLARE
 --       FOR EACH ROW
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2002
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 BEGIN
@@ -314,7 +314,7 @@ DECLARE
 --     FOR   EACH ROW
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2002
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 BEGIN

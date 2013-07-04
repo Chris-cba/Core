@@ -23,7 +23,7 @@ DECLARE
 --      FOR EACH ROW
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2002
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
    c_hov_value CONSTANT hig_option_values.hov_value%TYPE := nm3get.get_hov (pi_hov_id          => :NEW.hol_id

@@ -13,7 +13,7 @@ begin
 --  after logon on schema
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2001
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 
    nm3security.Set_User;

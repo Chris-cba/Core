@@ -1,3 +1,22 @@
+-----------------------------------------------------------------------------
+--
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)nm_type_columns_biud_row_trg.trg	1.1 10/22/03
+--       Module Name      : nm_type_columns_biud_row_trg.trg
+--       Date into SCCS   : 03/10/22 19:03:33
+--       Date fetched Out : 07/06/13 17:03:38
+--       SCCS Version     : 1.1
+--
+--
+--   Author : Kevin Angus
+--
+--    nm_type_columns_biu_row_trg
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
 CREATE OR REPLACE TRIGGER hol_hov_length_trg
   BEFORE UPDATE
   ON hig_option_list

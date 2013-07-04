@@ -8,11 +8,11 @@ DECLARE
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/trg/ins_nm_members.trg-arc   2.3   Jun 01 2011 10:10:40   Chris.Strettle  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/trg/ins_nm_members.trg-arc   2.4   Jul 04 2013 09:53:18   James.Wadsworth  $
 --       Module Name      : $Workfile:   ins_nm_members.trg  $
---       Date into PVCS   : $Date:   Jun 01 2011 10:10:40  $
---       Date fetched Out : $Modtime:   Jun 01 2011 10:07:04  $
---       PVCS Version     : $Revision:   2.3  $
+--       Date into PVCS   : $Date:   Jul 04 2013 09:53:18  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 09:35:30  $
+--       PVCS Version     : $Revision:   2.4  $
 --
 --   Author : Chris Strettle
 --
@@ -22,7 +22,7 @@ DECLARE
 --       FOR     EACH ROW
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2011
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
    --

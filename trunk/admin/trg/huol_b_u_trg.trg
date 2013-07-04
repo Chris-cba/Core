@@ -19,7 +19,7 @@ DECLARE
 --
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2005
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
   l_huol_already_set BOOLEAN := hig.huol_already_set(pi_huol_id => :OLD.huol_id);
