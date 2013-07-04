@@ -2,13 +2,16 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/utl/Repair Shape Lengths.sql-arc   1.4   Oct 18 2010 16:22:50   ade.edwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/utl/Repair Shape Lengths.sql-arc   1.5   Jul 04 2013 10:30:12   James.Wadsworth  $
 --       Module Name      : $Workfile:   Repair Shape Lengths.sql  $
---       Date into PVCS   : $Date:   Oct 18 2010 16:22:50  $
---       Date fetched Out : $Modtime:   Oct 18 2010 16:22:32  $
---       PVCS Version     : $Revision:   1.4  $
+--       Date into PVCS   : $Date:   Jul 04 2013 10:30:12  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 10:26:40  $
+--       PVCS Version     : $Revision:   1.5  $
 --
---------------------------------------------------------------------------------
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
 --
 --
 SET SERVEROUTPUT ON

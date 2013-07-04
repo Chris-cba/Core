@@ -12,7 +12,7 @@
 --   General housekeeping to be ran at any time - but usually called on upgrade
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2006
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 --

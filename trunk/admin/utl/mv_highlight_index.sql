@@ -2,13 +2,16 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/utl/mv_highlight_index.sql-arc   3.1   Apr 10 2012 15:23:16   Steve.Cooper  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/utl/mv_highlight_index.sql-arc   3.2   Jul 04 2013 10:30:12   James.Wadsworth  $
 --       Module Name      : $Workfile:   mv_highlight_index.sql  $
---       Date into PVCS   : $Date:   Apr 10 2012 15:23:16  $
---       Date fetched Out : $Modtime:   Apr 10 2012 15:21:36  $
---       PVCS Version     : $Revision:   3.1  $
+--       Date into PVCS   : $Date:   Jul 04 2013 10:30:12  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 10:24:58  $
+--       PVCS Version     : $Revision:   3.2  $
 --
---------------------------------------------------------------------------------
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
 --
 
 PROMPT Drop the Primary Key constraint

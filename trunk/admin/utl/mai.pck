@@ -1,7 +1,20 @@
 -- PROMPT Create the Package MAI
 CREATE OR REPLACE PACKAGE mai AS
-  -- MAINTENANCE MANAGER application generic utilities
-
+--
+--   MAINTENANCE MANAGER application generic utilities
+--
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/utl/mai.pck-arc   2.1   Jul 04 2013 10:30:12   James.Wadsworth  $
+--       Module Name      : $Workfile:   mai.pck  $
+--       Date into PVCS   : $Date:   Jul 04 2013 10:30:12  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 10:24:38  $
+--       Version          : $Revision:   2.1  $
+--
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
   -- package global variable definitions (PUBLIC)
   /* SCCS ID keyword, do not remove */
   g_sccsid	CONSTANT	VARCHAR2(2000) := '@(#)mai.pck	1.21 08/22/00';

@@ -1,3 +1,16 @@
+--
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/utl/nm3sdo_util_setup.sql-arc   1.2   Jul 04 2013 10:30:12   James.Wadsworth  $
+--       Module Name      : $Workfile:   nm3sdo_util_setup.sql  $
+--       Date into PVCS   : $Date:   Jul 04 2013 10:30:12  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 10:25:20  $
+--       Version          : $Revision:   1.2  $
+--
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
 DECLARE
    CURSOR get_base_table
    IS

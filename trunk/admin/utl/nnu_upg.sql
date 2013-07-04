@@ -1,4 +1,17 @@
 --
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/utl/nnu_upg.sql-arc   2.1   Jul 04 2013 10:30:12   James.Wadsworth  $
+--       Module Name      : $Workfile:   nnu_upg.sql  $
+--       Date into PVCS   : $Date:   Jul 04 2013 10:30:12  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 10:25:32  $
+--       Version          : $Revision:   2.1  $
+--
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
+ --
 rename nm_node_usages to nm_node_usages_all;
 --
 alter table nm_node_usages_all

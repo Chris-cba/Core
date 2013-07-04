@@ -1,16 +1,16 @@
 -----------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/utl/ntifix.sql-arc   3.1   Dec 20 2010 11:23:54   Chris.Strettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/utl/ntifix.sql-arc   3.2   Jul 04 2013 10:30:12   James.Wadsworth  $
 --       Module Name      : $Workfile:   ntifix.sql  $
---       Date into PVCS   : $Date:   Dec 20 2010 11:23:54  $
---       Date fetched Out : $Modtime:   Dec 20 2010 11:23:22  $
---       Version          : $Revision:   3.1  $
+--       Date into PVCS   : $Date:   Jul 04 2013 10:30:12  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 10:17:36  $
+--       Version          : $Revision:   3.2  $
 --
 --       Author: Chris Strettle 
 --
 -----------------------------------------------------------------------------
---   Copyright (c) exor corporation ltd, 2010
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 DECLARE

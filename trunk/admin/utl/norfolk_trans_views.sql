@@ -35,7 +35,7 @@ select
 --       SCCS Version     : 1.5
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2003
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 ne.ne_id, 
 ne.ne_unique, 
@@ -186,7 +186,7 @@ AS SELECT
 --       SCCS Version     : 1.5
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2003
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
  nm.nm_ne_id_in,
  nm.nm_ne_id_of,
@@ -244,7 +244,7 @@ SELECT
 --       SCCS Version     : 1.5
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2003
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
           iit_date_created iit_created_date, iit_start_date iit_cre_date
         , inv.iit_ne_id iit_item_id, itt.ity_inv_code iit_ity_inv_code
