@@ -13,7 +13,7 @@ CREATE OR REPLACE TYPE BODY NM_LREF IS
 --   NM_LREF type body
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2001
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 --

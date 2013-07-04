@@ -12,7 +12,7 @@ CREATE OR REPLACE type nm_lref_array AS object
 --   Author : Rob Coupe
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2002
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
   nla_lref_array  nm_lref_array_type 

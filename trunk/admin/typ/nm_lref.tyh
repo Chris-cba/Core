@@ -14,7 +14,7 @@ CREATE OR REPLACE TYPE nm_lref AS object
 --    TYPE nm_lref
 --
 -----------------------------------------------------------------------------
---      Copyright (c) exor corporation ltd, 2001
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
   lr_ne_id  integer(9)
