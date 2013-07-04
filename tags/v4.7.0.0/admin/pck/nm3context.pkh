@@ -1,0 +1,144 @@
+Create Or Replace Package Nm3Context
+Is
+--<PACKAGE>
+-- PVCS Identifiers :-
+--
+-- pvcsid : $Header:   //vm_latest/archives/nm3/admin/pck/nm3context.pkh-arc   2.7   Jul 04 2013 15:23:06   James.Wadsworth  $
+-- Module Name : $Workfile:   nm3context.pkh  $
+-- Date into PVCS : $Date:   Jul 04 2013 15:23:06  $
+-- Date fetched Out : $Modtime:   Jul 04 2013 14:25:10  $
+-- PVCS Version : $Revision:   2.7  $
+-- Based on SCCS version : 
+--
+--
+--   Author : Jonathan Mills
+--
+--   Package for setting/retrieving context values
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+  G_Sccsid      Constant  Varchar2(2000) :='"$Revision:   2.7  $"';
+
+--  g_sccsid is the SCCS ID for the package
+--
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+Function Get_Version Return Varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+Function Get_Body_Version Return Varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="INITIALISE_CONTEXT">
+-- This procedure initialises the NM3CORE context and is called
+--  from the instantiate_user trigger
+--
+Procedure Initialise_Context;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="create_instantiate_user_trig">
+-- This procedure duplicates the instantiate_user trigger from one schema
+--  into another
+--
+Procedure Create_Instantiate_User_Trig (Pi_New_Trigger_Owner In Varchar2);
+--</PROC>
+
+--DEPRICATED AS OF 4500
+Procedure Set_Context (
+                      pi_Namespace    In  Varchar2 Default Null,
+                      pi_Attribute    In  Varchar2,
+                      pi_Value        In  Date
+                      );
+--
+-----------------------------------------------------------------------------
+--
+--DEPRICATED AS OF 4500
+Procedure Set_Context (
+                      pi_Namespace  In  Varchar2 Default Null,
+                      pi_Attribute  In  Varchar2,
+                      pi_Value      In  Number
+                      );
+--
+-----------------------------------------------------------------------------
+--
+--DEPRICATED AS OF 4500
+Procedure Set_Context (
+                      pi_Namespace In Varchar2 Default Null,
+                      pi_Attribute In Varchar2,
+                      pi_Value     In Varchar2
+                      );
+--
+-----------------------------------------------------------------------------
+--
+--DEPRICATED AS OF 4500
+Function Get_Namespace Return Varchar2;
+--
+-----------------------------------------------------------------------------
+--
+--DEPRICATED AS OF 4500
+Function Get_Context  (
+                      pi_Namespace In Varchar2 Default Null,
+                      pi_Attribute In Varchar2
+                      ) Return Varchar2;
+--
+-----------------------------------------------------------------------------
+--
+--DEPRICATED AS OF 4500
+Function Get_Effective_Date Return Date;
+--
+-----------------------------------------------------------------------------
+--
+--DEPRICATED AS OF 4500
+Procedure Instantiate_Data;
+--
+-----------------------------------------------------------------------------
+--
+--DEPRICATED AS OF 4500
+Procedure Show_All_Context  (
+                            pi_Namespace  In  Varchar2 Default Null
+                            );
+--
+-----------------------------------------------------------------------------
+--
+--DEPRICATED AS OF 4500
+Procedure Show_Context;
+--
+-----------------------------------------------------------------------------
+--
+--DEPRICATED AS OF 4500
+Procedure Show_Context  (
+                        pi_Namespace In Varchar2 Default Null,
+                        pi_Attribute In Varchar2
+                        );
+
+--
+-----------------------------------------------------------------------------
+--
+--<PRAGMA>
+   Pragma Restrict_References (Get_Version, Wnps, Wnds);
+   Pragma Restrict_References (Get_Body_Version, Wnps, Wnds);
+-- RC Task 0112107 - re-engage pragma
+   PRAGMA RESTRICT_REFERENCES (get_context, WNDS, WNPS);
+   PRAGMA RESTRICT_REFERENCES (get_effective_date, WNDS, WNPS);
+   PRAGMA RESTRICT_REFERENCES (get_namespace, WNDS, WNPS);
+   
+   
+   --</PRAGMA>
+--
+End Nm3Context;
+/

@@ -1,0 +1,194 @@
+CREATE OR REPLACE PACKAGE nm3clob AS
+--<PACKAGE>
+-- PVCS Identifiers :-
+--
+-- pvcsid : $Header:   //vm_latest/archives/nm3/admin/pck/nm3clob.pkh-arc   2.5   Jul 04 2013 15:23:06   James.Wadsworth  $
+-- Module Name : $Workfile:   nm3clob.pkh  $
+-- Date into PVCS : $Date:   Jul 04 2013 15:23:06  $
+-- Date fetched Out : $Modtime:   Jul 04 2013 14:25:10  $
+-- PVCS Version : $Revision:   2.5  $
+-- Based on SCCS version : 
+--
+--   Author : Jonathan Mills
+--
+--   NM3 CLOB handling package
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.5  $';
+--  g_sccsid is the SCCS ID for the package
+--
+-- This global is used internally within nm3clob. do not use it for any other
+--  purpose
+   g_tab_vc   nm3type.tab_varchar32767;
+--
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="execute_immediate_clob">
+-- This procedure does an "execute immediate" with a CLOB
+--
+PROCEDURE execute_immediate_clob (p_clob IN CLOB);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC name="append">
+-- This procedure appends the passed string to the specified clob
+--
+PROCEDURE append (p_clob   IN OUT nocopy CLOB
+                 ,p_append IN            VARCHAR2
+                 );
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC name="lob_substr">
+--  This function returns a SUBSTR of the passed CLOB
+--
+FUNCTION lob_substr (p_clob      IN CLOB
+                    ,p_offset    IN NUMBER
+                    ,p_num_chars IN NUMBER
+                    ) RETURN VARCHAR2;
+--
+--  Possible errors raised are
+--  -20001 Cannot return more than 32K of a CLOB at a time
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC name="len">
+-- This function returns the length of a CLOB
+--
+FUNCTION len (p_clob IN CLOB) RETURN BINARY_INTEGER;
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC name="create_clob">
+-- This function creates the specified CLOB as a temporary clob
+--
+PROCEDURE create_clob (p_clob IN OUT nocopy CLOB);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC name="WriteClobOut">
+-- This function takes a CLOB and writes it to the specified file
+--
+PROCEDURE writeclobout(result        IN CLOB
+                      ,file_location IN VARCHAR2 DEFAULT nm3file.c_default_location
+                      ,file_name     IN VARCHAR2
+                      );
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC name="ReadClobIn">
+-- This function reads the specified file and puts it into a clob
+--
+PROCEDURE readclobin (file_location IN     VARCHAR2 DEFAULT nm3file.c_default_location
+                     ,file_name     IN     VARCHAR2
+                     ,result           OUT nocopy CLOB
+                     ,add_cr    IN BOOLEAN DEFAULT TRUE
+                     );
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE trim_clob (p_clob    IN OUT nocopy CLOB
+                    ,p_new_len IN            INTEGER
+                    );
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE nullify_clob (p_clob IN OUT nocopy CLOB);
+--
+-----------------------------------------------------------------------------
+--
+FUNCTION lob_instr (lob_loc    IN   CLOB
+                   ,pattern    IN   VARCHAR2
+                   ,offset     IN   INTEGER DEFAULT 1
+                   ,nth        IN   INTEGER DEFAULT 1
+                   ) RETURN INTEGER;
+--
+-----------------------------------------------------------------------------
+--
+--<PROC name="blob_to_clob">
+-- This function converts the specified blob into a clob
+--
+FUNCTION blob_to_clob(pi_blob IN BLOB
+                     ) RETURN CLOB;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC name="append">
+-- Appends a varchar2 to a blob
+--
+
+PROCEDURE append (p_blob   IN OUT nocopy BLOB
+                 ,p_append IN            VARCHAR2
+                 ) ;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC name="clob_to_vlob">
+-- This function converts the specified clob into a blob
+--
+FUNCTION clob_to_blob(pi_clob IN CLOB
+                     ) RETURN BLOB;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="clob_to_tab_varchar">
+-- This function converts the specified clob into an array of VARCHAR2(32767)
+--
+FUNCTION clob_to_tab_varchar (pi_clob IN CLOB) RETURN nm3type.tab_varchar32767;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="tab_varchar_to_clob">
+-- This function converts the specified array of VARCHAR2(32767) into a clob
+--
+FUNCTION tab_varchar_to_clob (pi_tab_vc IN nm3type.tab_varchar32767) RETURN CLOB;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PRAGMA>
+   PRAGMA RESTRICT_REFERENCES (get_version, rnds, wnps, wnds);
+   PRAGMA RESTRICT_REFERENCES (get_body_version, rnds, wnps, wnds);
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+END nm3clob;
+/

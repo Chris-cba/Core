@@ -1,0 +1,38 @@
+create or replace package nm3dbg as
+--
+--   PVCS Identifiers :-
+--
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3dbg.pkh-arc   2.1   Jul 04 2013 15:23:06   James.Wadsworth  $
+--       Module Name      : $Workfile:   nm3dbg.pkh  $
+--       Date into PVCS   : $Date:   Jul 04 2013 15:23:06  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:10  $
+--       PVCS Version     : $Revision:   2.1  $
+--       Based on sccs version : 
+--
+--   Author : Priidu Tanava
+--
+--   package to implement indented and timed debug
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
+  g_sccsid      constant  varchar2(2000) := '"$Revision:   2.1  $"';
+  
+
+  function get_version return varchar2;
+  function get_body_version return varchar2;
+  
+
+  procedure debug_on;
+  procedure debug_off;
+  procedure timing_on;
+  procedure ind;
+  procedure deind;
+  procedure putln(p_text in varchar2);
+  procedure puterr(p_text in varchar2);
+  function to_char(p_value in boolean) return varchar2;
+  function max_id return number;
+  
+end;
+/

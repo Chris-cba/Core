@@ -1,0 +1,185 @@
+create or replace package nm3bulk_mrg as
+--
+--   PVCS Identifiers :-
+--
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkh-arc   2.8   Jul 04 2013 15:23:06   James.Wadsworth  $
+--       Module Name      : $Workfile:   nm3bulk_mrg.pkh  $
+--       Date into PVCS   : $Date:   Jul 04 2013 15:23:06  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:10  $
+--       PVCS Version     : $Revision:   2.8  $
+--       Based on sccs version :
+--
+--   Author : Priidu Tanava
+--
+--   Bulk merge functinality
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+
+  g_sccsid      constant  varchar2(2000) := '"$Revision:   2.8  $"';
+  
+  
+  -- values copied from nm3extent
+  nqr_source_saved      CONSTANT nm_mrg_query_results.nqr_source%TYPE := 'SAVED';
+  nqr_source_route      CONSTANT nm_mrg_query_results.nqr_source%TYPE := 'ROUTE';
+  nqr_source_merge      CONSTANT nm_mrg_query_results.nqr_source%TYPE := 'MERGE';
+  nqr_source_merge_sect CONSTANT nm_mrg_query_results.nqr_source%TYPE := 'MERGE_SECT';
+  nqr_source_pbi        CONSTANT nm_mrg_query_results.nqr_source%TYPE := 'PBI';
+  nqr_source_pbi_sect   CONSTANT nm_mrg_query_results.nqr_source%TYPE := 'PBI_SECT';
+  nqr_source_gis        CONSTANT nm_mrg_query_results.nqr_source%TYPE := 'GIS';
+  nqr_source_temp_ne    CONSTANT nm_mrg_query_results.nqr_source%TYPE := 'TEMP_NE';
+   
+
+  type nm_obj_type_tbl is table of nm_members_all.nm_obj_type%type index by binary_integer;
+  type ita_mapping_rec is record (
+     inv_type           nm_inv_types_all.nit_inv_type%type
+    ,seq                number(4)
+    ,mrg_attrib         nm_mrg_query_attribs.nqa_attrib_name%type
+    ,ita_attrib_name    nm_inv_type_attribs_all.ita_attrib_name%type
+    ,iit_attrib_name    nm_inv_type_attribs_all.ita_attrib_name%type
+    ,ita_format         nm_inv_type_attribs_all.ita_format%type
+    ,ita_format_mask    nm_inv_type_attribs_all.ita_format_mask%type
+    ,ita_domain         nm_inv_type_attribs_all.ita_id_domain%type
+    ,table_name         nm_inv_types_all.nit_table_name%type
+    ,table_iit_flag     varchar2(1)                                   -- Y if ft table is to be treated as a standard nm_inv_items_all table
+    ,table_pk_column    nm_inv_types_all.nit_foreign_pk_column%type
+    ,table_ne_column    nm_inv_types_all.nit_lr_ne_column_name%type
+    ,table_begin_column nm_inv_types_all.nit_lr_st_chain%type
+    ,table_end_column   nm_inv_types_all.nit_lr_end_chain%type
+    ,pnt_or_cont        nm_inv_types_all.nit_pnt_or_cont%type
+    ,xsp                nm_mrg_query_types_all.nqt_x_sect%type
+    ,where_sql          varchar2(1000)
+  );
+  type ita_mapping_tbl is table of ita_mapping_rec index by binary_integer;
+  type itd_tbl is table of nm_inv_type_attrib_band_dets%rowtype index by binary_integer;
+  
+
+  function get_version return varchar2;
+  function get_body_version return varchar2;
+  
+  
+  procedure load_attrib_metadata(
+     pt_attr    out ita_mapping_tbl
+    ,pt_itd     out itd_tbl
+    ,p_inner_join out boolean
+    ,p_nmq_id   in nm_mrg_query_all.nmq_id%type
+  );
+
+  procedure ins_splits(
+     pt_attr in ita_mapping_tbl
+    ,p_effective_date in date
+    ,p_criteria_rowcount in integer
+    ,p_rowcount_out out integer
+  );
+  
+  procedure ins_datum_homo_chunks(
+     pt_attr in ita_mapping_tbl
+    ,pt_itd  in itd_tbl
+    ,p_inner_join in boolean
+    ,p_splits_rowcount in integer
+    ,p_rowcount_out out integer
+  );
+  
+  procedure ins_route_connectivity(
+     p_criteria_rowcount in integer
+    ,p_ignore_poe in boolean
+  );
+  
+  
+  procedure std_populate(
+     p_nmq_id in nm_mrg_query_all.nmq_id%type
+    ,pt_attr in ita_mapping_tbl
+    ,pt_itd  in itd_tbl
+    ,p_admin_unit_id in nm_admin_units_all.nau_admin_unit%type
+    ,p_nqr_source in nm_mrg_query_results_all.nqr_source%type
+    ,p_nqr_source_id in nm_mrg_query_results_all.nqr_source_id%type
+    ,p_domain_return in varchar2
+    ,p_splits_rowcount in integer
+    ,p_description in varchar2
+    ,p_mrg_job_id out nm_mrg_query_results_all.nqr_mrg_job_id%type
+  );
+  
+  
+  procedure std_run(
+     p_nmq_id in nm_mrg_query_all.nmq_id%type
+    ,p_nqr_admin_unit in nm_mrg_query_results_all.nqr_admin_unit%type
+    ,p_nqr_source in nm_mrg_query_results_all.nqr_source%type
+    ,p_nqr_source_id in nm_mrg_query_results_all.nqr_source_id%type
+    ,p_domain_return in varchar2
+    ,p_nmq_descr in nm_mrg_query_all.nmq_descr%type
+    ,p_criteria_rowcount in integer
+    ,p_mrg_job_id out nm_mrg_query_results_all.nqr_mrg_job_id%type
+    ,p_longops_rec in out nm3sql.longops_rec
+  );
+  
+  procedure std_run(
+     p_nmq_id in nm_mrg_query_all.nmq_id%type
+    ,p_nqr_admin_unit in nm_mrg_query_results_all.nqr_admin_unit%type
+    ,p_nqr_source in nm_mrg_query_results_all.nqr_source%type
+    ,p_nqr_source_id in nm_mrg_query_results_all.nqr_source_id%type
+    ,p_domain_return in varchar2
+    ,p_nmq_descr in nm_mrg_query_all.nmq_descr%type
+    ,p_criteria_rowcount in integer
+    ,p_mrg_job_id out nm_mrg_query_results_all.nqr_mrg_job_id%type
+  );
+  
+  
+  -- convinience network criteria loaders
+  procedure load_group_datums(
+     p_group_id in nm_elements_all.ne_id%type
+    ,p_group_type in nm_group_types.ngt_group_type%type
+    ,p_sqlcount out pls_integer
+  );
+  procedure load_group_type_datums(
+     p_group_type in nm_group_types.ngt_group_type%type
+    ,p_route_group_type in nm_group_types.ngt_group_type%type
+    ,p_sqlcount out pls_integer
+  );
+  procedure load_extent_datums(
+     p_group_type in nm_group_types.ngt_group_type%type
+    ,p_nse_id in nm_saved_extents.nse_id%type
+    ,p_sqlcount out pls_integer
+  );
+  procedure load_temp_extent_datums(
+     p_group_type in nm_group_types.ngt_group_type%type
+    ,p_nte_job_id in nm_nw_temp_extents.nte_job_id%type
+    ,p_sqlcount out pls_integer
+  );
+  procedure load_nt_type_datums(
+     p_group_type in nm_group_types.ngt_group_type%type
+    ,p_nt_type in nm_types.nt_type%type
+    ,p_sqlcount out pls_integer
+  );
+  procedure load_all_network_datums(
+     p_group_type in nm_group_types.ngt_group_type%type
+    ,p_sqlcount out pls_integer
+  );
+  procedure load_gaz_list_datums(
+     p_group_type in nm_group_types.ngt_group_type%type
+    ,pt_ne in nm_id_tbl
+    ,pt_nse in nm_id_tbl
+    ,p_sqlcount out pls_integer
+  );
+  
+  
+  function get_datum_id_tbl return nm_id_tbl;
+  function get_group_id_tbl return nm_id_tbl;
+  function get_gg_id_tbl return nm_id_tbl;
+  function get_nse_id_tbl return nm_id_tbl;
+  
+
+  
+  -- debug
+  function to_string_ita_mapping_rec(
+     p_rec in ita_mapping_rec
+  ) return varchar2;
+  function to_string_nm_obj_type_tbl(
+     p_tbl in nm_obj_type_tbl
+  ) return varchar2;
+  function to_string_itd_rec(
+     p_rec in nm_inv_type_attrib_band_dets%rowtype
+  ) return varchar2;
+   
+end;
+/
