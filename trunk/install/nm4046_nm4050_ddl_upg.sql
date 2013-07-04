@@ -8,14 +8,14 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4046_nm4050_ddl_upg.sql-arc   3.6   Sep 19 2008 15:46:32   aedwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4046_nm4050_ddl_upg.sql-arc   3.7   Jul 04 2013 14:10:28   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm4046_nm4050_ddl_upg.sql  $
---       Date into PVCS   : $Date:   Sep 19 2008 15:46:32  $
---       Date fetched Out : $Modtime:   Sep 19 2008 15:46:12  $
---       Version          : $Revision:   3.6  $
+--       Date into PVCS   : $Date:   Jul 04 2013 14:10:28  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 13:53:50  $
+--       Version          : $Revision:   3.7  $
 --
 ------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2007
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 ------------------------------------------------------------------
 
 
@@ -592,14 +592,14 @@ DECLARE
 --
 --   SCCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm4046_nm4050_ddl_upg.sql-arc   3.6   Sep 19 2008 15:46:32   aedwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm4046_nm4050_ddl_upg.sql-arc   3.7   Jul 04 2013 14:10:28   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm4046_nm4050_ddl_upg.sql  $
---       Date into SCCS   : $Date:   Sep 19 2008 15:46:32  $
---       Date fetched Out : $Modtime:   Sep 19 2008 15:46:12  $
---       SCCS Version     : $Revision:   3.6  $
+--       Date into SCCS   : $Date:   Jul 04 2013 14:10:28  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 13:53:50  $
+--       SCCS Version     : $Revision:   3.7  $
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2006
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
   c_str      nm3type.max_varchar2;
@@ -642,7 +642,7 @@ DECLARE
 --       SCCS Version     : 1.2
 --
 -----------------------------------------------------------------------------
---  Copyright (c) exor corporation ltd, 2004
+--  Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved
 -----------------------------------------------------------------------------
 BEGIN
    Nm3sdm.g_del_theme := TRUE;
@@ -665,7 +665,7 @@ DECLARE
 --       SCCS Version     : 1.2
 --
 -----------------------------------------------------------------------------
---  Copyright (c) exor corporation ltd, 2004
+--  Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved
 -----------------------------------------------------------------------------
 BEGIN
    Nm3sdm.g_del_theme := FALSE;
@@ -681,14 +681,14 @@ DECLARE
 -----------------------------------------------------------------------------
 -- PVCS Identifiers :-
 --
--- pvcsid : $Header:   //vm_latest/archives/nm3/install/nm4046_nm4050_ddl_upg.sql-arc   3.6   Sep 19 2008 15:46:32   aedwards  $
+-- pvcsid : $Header:   //vm_latest/archives/nm3/install/nm4046_nm4050_ddl_upg.sql-arc   3.7   Jul 04 2013 14:10:28   James.Wadsworth  $
 -- Module Name : $Workfile:   nm4046_nm4050_ddl_upg.sql  $
--- Date into PVCS : $Date:   Sep 19 2008 15:46:32  $
--- Date fetched Out : $Modtime:   Sep 19 2008 15:46:12  $
--- PVCS Version : $Revision:   3.6  $
+-- Date into PVCS : $Date:   Jul 04 2013 14:10:28  $
+-- Date fetched Out : $Modtime:   Jul 04 2013 13:53:50  $
+-- PVCS Version : $Revision:   3.7  $
 -- Based on SCCS version :
 -----------------------------------------------------------------------------
---  Copyright (c) exor corporation ltd, 2004
+--  Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved
 -----------------------------------------------------------------------------
 BEGIN
   IF INSERTING

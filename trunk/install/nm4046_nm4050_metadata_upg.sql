@@ -8,14 +8,14 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4046_nm4050_metadata_upg.sql-arc   3.5   Sep 04 2008 09:10:30   malexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4046_nm4050_metadata_upg.sql-arc   3.6   Jul 04 2013 14:10:28   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm4046_nm4050_metadata_upg.sql  $
---       Date into PVCS   : $Date:   Sep 04 2008 09:10:30  $
---       Date fetched Out : $Modtime:   Sep 04 2008 09:05:02  $
---       Version          : $Revision:   3.5  $
+--       Date into PVCS   : $Date:   Jul 04 2013 14:10:28  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 11:54:20  $
+--       Version          : $Revision:   3.6  $
 --
 ------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2007
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 ------------------------------------------------------------------
 
 
