@@ -1,3 +1,14 @@
+--
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/trg/restore_instead_trg.sql-arc   2.1   Jul 04 2013 09:58:54   James.Wadsworth  $
+--       Module Name      : $Workfile:   restore_instead_trg.sql  $
+--       Date into PVCS   : $Date:   Jul 04 2013 09:58:54  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 09:57:52  $
+--       Version          : $Revision:   2.1  $
+--
+------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 ---------------------------------------------------------------------------------------------------
 --
 --             **************** Restore any INSTEAD OF triggers *******************

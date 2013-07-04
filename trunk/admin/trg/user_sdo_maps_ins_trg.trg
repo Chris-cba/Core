@@ -1,3 +1,16 @@
+--
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/trg/user_sdo_maps_ins_trg.trg-arc   3.3   Jul 04 2013 09:58:54   James.Wadsworth  $
+--       Module Name      : $Workfile:   user_sdo_maps_ins_trg.trg  $
+--       Date into PVCS   : $Date:   Jul 04 2013 09:58:54  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 09:58:16  $
+--       Version          : $Revision:   3.3  $
+--
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
 BEGIN
   EXECUTE IMMEDIATE 'DROP TRIGGER USER_SDO_MAPS_INS_TRG';
 EXCEPTION
@@ -12,11 +25,11 @@ BEGIN
     '------------------------------------------------------------------------- '||chr(10)||
     '--   PVCS Identifiers :- '||chr(10)||
     '-- '||chr(10)||
-    '--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/trg/user_sdo_maps_ins_trg.trg-arc   3.2   Dec 05 2008 12:00:58   aedwards  $ '||chr(10)||
+    '--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/trg/user_sdo_maps_ins_trg.trg-arc   3.3   Jul 04 2013 09:58:54   James.Wadsworth  $ '||chr(10)||
     '--       Module Name      : $Workfile:   user_sdo_maps_ins_trg.trg  $ '||chr(10)||
-    '--       Date into PVCS   : $Date:   Dec 05 2008 12:00:58  $ '||chr(10)||
-    '--       Date fetched Out : $Modtime:   Dec 05 2008 10:02:36  $ '||chr(10)||
-    '--       Version          : $Revision:   3.2  $ '||chr(10)||
+    '--       Date into PVCS   : $Date:   Jul 04 2013 09:58:54  $ '||chr(10)||
+    '--       Date fetched Out : $Modtime:   Jul 04 2013 09:58:16  $ '||chr(10)||
+    '--       Version          : $Revision:   3.3  $ '||chr(10)||
     '--       Based on SCCS version : '||chr(10)|| 
     '------------------------------------------------------------------------- '||chr(10)||
     'INSTEAD OF DELETE OR INSERT OR UPDATE '||chr(10)||

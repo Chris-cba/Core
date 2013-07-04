@@ -6,13 +6,16 @@ FOR EACH ROW
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/trg/nm_nw_ad_link_br.trg-arc   2.2   Aug 31 2007 17:22:10   malexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/trg/nm_nw_ad_link_br.trg-arc   2.3   Jul 04 2013 09:58:54   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm_nw_ad_link_br.trg  $
---       Date into PVCS   : $Date:   Aug 31 2007 17:22:10  $
---       Date fetched Out : $Modtime:   Aug 31 2007 16:28:30  $
---       Version          : $Revision:   2.2  $
+--       Date into PVCS   : $Date:   Jul 04 2013 09:58:54  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 09:57:28  $
+--       Version          : $Revision:   2.3  $
 --       Based on SCCS version : 1.6
--------------------------------------------------------------------------
+------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+------------------------------------------------------------------
+--
 DECLARE
 
 l_rec_nwad NM_NW_AD_LINK_ALL%ROWTYPE;
