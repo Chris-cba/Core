@@ -1,3 +1,16 @@
+--
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm_4400_fix20_ddl.sql-arc   1.4   Jul 04 2013 13:47:14   James.Wadsworth  $
+--       Module Name      : $Workfile:   nm_4400_fix20_ddl.sql  $
+--       Date into PVCS   : $Date:   Jul 04 2013 13:47:14  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 13:34:14  $
+--       Version          : $Revision:   1.4  $
+--
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
 Create Table Nm_Admin_Extents
 (
 Nae_Admin_Unit    Number(9),        
