@@ -17,7 +17,7 @@ SELECT
 --   NM3 POP Mail view
 --
 -----------------------------------------------------------------------------
---   Copyright (c) exor corporation ltd, 2004
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
         *

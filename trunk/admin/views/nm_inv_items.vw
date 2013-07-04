@@ -1,3 +1,16 @@
+--
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/nm_inv_items.vw-arc   2.4   Jul 04 2013 11:20:32   James.Wadsworth  $
+--       Module Name      : $Workfile:   nm_inv_items.vw  $
+--       Date into PVCS   : $Date:   Jul 04 2013 11:20:32  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 10:43:30  $
+--       Version          : $Revision:   2.4  $
+--
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
 DECLARE
    l_view VARCHAR2(32767);
 --
@@ -34,15 +47,15 @@ BEGIN
    append ('--');
    append ('--   PVCS Identifiers :-');
    append ('--');
-   append ('--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/views/nm_inv_items.vw-arc   2.3   May 17 2011 08:32:42   Steve.Cooper  $');
+   append ('--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/views/nm_inv_items.vw-arc   2.4   Jul 04 2013 11:20:32   James.Wadsworth  $');
    append ('--       Module Name      : $Workfile:   nm_inv_items.vw  $');
-   append ('--       Date into PVCS   : $Date:   May 17 2011 08:32:42  $');
-   append ('--       Date fetched Out : $Modtime:   Mar 31 2011 12:04:26  $');
-   append ('--       PVCS Version     : $Revision:   2.3  $');
+   append ('--       Date into PVCS   : $Date:   Jul 04 2013 11:20:32  $');
+   append ('--       Date fetched Out : $Modtime:   Jul 04 2013 10:43:30  $');
+   append ('--       PVCS Version     : $Revision:   2.4  $');
    append ('--       Based on SCCS version : 1.6');
    append ('--');
    append ('-----------------------------------------------------------------------------');
-   append ('--	Copyright (c) exor corporation ltd, 2001');
+   append ('--	Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.');
    append ('-----------------------------------------------------------------------------');
    append ('--');
    append ('  iit_ne_id, iit_inv_type, iit_primary_key, iit_start_date');
