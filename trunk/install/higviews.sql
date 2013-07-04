@@ -1,3 +1,16 @@
+--
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/higviews.sql-arc   2.4   Jul 04 2013 13:45:32   James.Wadsworth  $
+--       Module Name      : $Workfile:   higviews.sql  $
+--       Date into PVCS   : $Date:   Jul 04 2013 13:45:32  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 12:02:08  $
+--       Version          : $Revision:   2.4  $
+--
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
 REM **************************************************************************
 rem	this script creates ALL VIEWS FOR highways core software.
 REM 	Currently it is maintained manually and cannot be generated from CASE.
@@ -7,11 +20,11 @@ REM SCCS ID Keyword, do no remove
 
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/higviews.sql-arc   2.3   Jul 22 2010 15:34:18   cstrettle  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/higviews.sql-arc   2.4   Jul 04 2013 13:45:32   James.Wadsworth  $
 --       Module Name      : $Workfile:   higviews.sql  $
---       Date into SCCS   : $Date:   Jul 22 2010 15:34:18  $
---       Date fetched Out : $Modtime:   Jul 22 2010 15:30:28  $
---       SCCS Version     : $Revision:   2.3  $
+--       Date into SCCS   : $Date:   Jul 04 2013 13:45:32  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 12:02:08  $
+--       SCCS Version     : $Revision:   2.4  $
 --       Based on 
 --
 rem   ------------------------------------------------------------------------------

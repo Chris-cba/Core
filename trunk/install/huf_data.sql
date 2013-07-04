@@ -1,3 +1,16 @@
+--
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/huf_data.sql-arc   2.1   Jul 04 2013 13:45:32   James.Wadsworth  $
+--       Module Name      : $Workfile:   huf_data.sql  $
+--       Date into PVCS   : $Date:   Jul 04 2013 13:45:32  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 12:02:14  $
+--       Version          : $Revision:   2.1  $
+--
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
 -- Extra Meta Data
 -- SCCS ID
 -- sccs_id = '@(#)huf_data.sql	1.2 09/24/01'

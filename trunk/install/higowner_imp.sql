@@ -1,3 +1,16 @@
+--
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/higowner_imp.sql-arc   2.1   Jul 04 2013 13:45:32   James.Wadsworth  $
+--       Module Name      : $Workfile:   higowner_imp.sql  $
+--       Date into PVCS   : $Date:   Jul 04 2013 13:45:32  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 12:01:16  $
+--       Version          : $Revision:   2.1  $
+--
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
 REM SCCS ID Keyword, do no remove
 define sccsid = '"@(#)higowner.sql	1.27 10/27/06"';
 clear screen
