@@ -3,15 +3,18 @@ As
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3security.pkh-arc   3.0   Jul 15 2011 09:05:54   Steve.Cooper  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3security.pkh-arc   3.1   Jul 04 2013 14:09:32   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3security.pkh  $
---       Date into PVCS   : $Date:   Jul 15 2011 09:05:54  $
---       Date fetched Out : $Modtime:   Apr 08 2011 08:06:26  $
---       Version          : $Revision:   3.0  $
+--       Date into PVCS   : $Date:   Jul 04 2013 14:09:32  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 13:40:12  $
+--       Version          : $Revision:   3.1  $
 --       Based on SCCS version :
--------------------------------------------------------------------------
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
   
-  gc_Sccsid Constant Varchar2(2000) := '$Revision:   3.0  $';
+  gc_Sccsid Constant Varchar2(2000) := '$Revision:   3.1  $';
   
   gc_Package_Name   Constant Varchar2(30)  :='Nm3security';
   

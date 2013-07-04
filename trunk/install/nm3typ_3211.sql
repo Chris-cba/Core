@@ -1,3 +1,16 @@
+--
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3typ_3211.sql-arc   2.1   Jul 04 2013 14:09:32   James.Wadsworth  $
+--       Module Name      : $Workfile:   nm3typ_3211.sql  $
+--       Date into PVCS   : $Date:   Jul 04 2013 14:09:32  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 13:40:36  $
+--       Version          : $Revision:   2.1  $
+--
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
 define sccsid = '@(#)nm3typ_3211.sql	1.5 02/15/06'
 --
 set echo off
