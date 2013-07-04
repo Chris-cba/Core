@@ -1,0 +1,20 @@
+CREATE OR REPLACE TYPE hig_navigator_tab
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/typ/hig_navigator_tab.tyh-arc   3.1   Jul 04 2013 10:14:00   James.Wadsworth  $
+--       Module Name      : $Workfile:   hig_navigator_tab.tyh  $
+--       Date into PVCS   : $Date:   Jul 04 2013 10:14:00  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 10:03:18  $
+--       Version          : $Revision:   3.1  $
+--       Based on SCCS version : 
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+IS TABLE OF hig_navigator_type ;
+/
+
+
+
+
+
