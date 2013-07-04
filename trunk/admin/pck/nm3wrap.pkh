@@ -4,13 +4,15 @@ CREATE OR REPLACE PACKAGE nm3wrap AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3wrap.pkh-arc   2.1   Jan 06 2010 16:41:36   cstrettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3wrap.pkh-arc   2.2   Jul 04 2013 16:39:44   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3wrap.pkh  $
---       Date into PVCS   : $Date:   Jan 06 2010 16:41:36  $
---       Date fetched Out : $Modtime:   Jan 06 2010 15:24:14  $
---       Version          : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:39:44  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 16:39:24  $
+--       Version          : $Revision:   2.2  $
 --       Based on SCCS version : 1.11
--------------------------------------------------------------------------
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
 --   Author : Kevin Angus
 --
 --     nm3wrap package. Contains functions + procedures for accessing packages that use object
@@ -19,7 +21,7 @@ CREATE OR REPLACE PACKAGE nm3wrap AS
 --
 --
 --<GLOBVAR>
-  g_sccsid CONSTANT varchar2(2000) := '$Revision:   2.1  $';
+  g_sccsid CONSTANT varchar2(2000) := '$Revision:   2.2  $';
 --</GLOBVAR>
 --</PACKAGE>
 --
