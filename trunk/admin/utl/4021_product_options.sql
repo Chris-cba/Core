@@ -2,13 +2,15 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/utl/4021_product_options.sql-arc   3.0   Jul 11 2008 11:02:54   aedwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/utl/4021_product_options.sql-arc   3.1   Jul 04 2013 10:29:56   James.Wadsworth  $
 --       Module Name      : $Workfile:   4021_product_options.sql  $
---       Date into PVCS   : $Date:   Jul 11 2008 11:02:54  $
---       Date fetched Out : $Modtime:   Jul 11 2008 10:59:52  $
---       PVCS Version     : $Revision:   3.0  $
+--       Date into PVCS   : $Date:   Jul 04 2013 10:29:56  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 10:18:42  $
+--       PVCS Version     : $Revision:   3.1  $
 --
---------------------------------------------------------------------------------
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
 --
 
 

@@ -9,7 +9,7 @@
 -- SCCS Version : 1.1
 --
 -----------------------------------------------------------------------------
---	Copyright (C) Exor Corporation Ltd, 2004
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 begin

@@ -1,4 +1,16 @@
 --
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/utl/debug.sql-arc   2.1   Jul 04 2013 10:29:56   James.Wadsworth  $
+--       Module Name      : $Workfile:   debug.sql  $
+--       Date into PVCS   : $Date:   Jul 04 2013 10:29:56  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 10:21:22  $
+--       Version          : $Revision:   2.1  $
+--
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
 DROP table nm_dbug;
 --
 create table nm_dbug

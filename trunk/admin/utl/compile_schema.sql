@@ -1,3 +1,16 @@
+--
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/utl/compile_schema.sql-arc   2.12   Jul 04 2013 10:29:56   James.Wadsworth  $
+--       Module Name      : $Workfile:   compile_schema.sql  $
+--       Date into PVCS   : $Date:   Jul 04 2013 10:29:56  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 10:20:18  $
+--       Version          : $Revision:   2.12  $
+--
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
 set verify off
 set head off
 set feed off

@@ -16,7 +16,7 @@ CREATE OR REPLACE PROCEDURE check_x_attr (p_number_of_each NUMBER DEFAULT 1000) 
 --   Procedure to check existing inventory data against x-attibute validation rules
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2001
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
    l_count      number := 0;

@@ -1,4 +1,18 @@
-REM Copyright (c) Exor Corporation Ltd, 2003
+--
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/utl/check_intermediate_nodes.sql-arc   2.1   Jul 04 2013 10:29:56   James.Wadsworth  $
+--       Module Name      : $Workfile:   check_intermediate_nodes.sql  $
+--       Date into PVCS   : $Date:   Jul 04 2013 10:29:56  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 10:20:06  $
+--       Version          : $Revision:   2.1  $
+--
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
+
+REM Copyright 2013 Bentley Systems Incorporated. All rights reserved.
 REM @(#)check_intermediate_nodes.sql	1.1 11/14/03
 
 set pages 9999

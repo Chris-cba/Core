@@ -8,15 +8,15 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/utl/0110142_data_fix.sql-arc   3.0   Sep 14 2010 10:43:32   Mike.Alexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/utl/0110142_data_fix.sql-arc   3.1   Jul 04 2013 10:29:56   James.Wadsworth  $
 --       Module Name      : $Workfile:   0110142_data_fix.sql  $
---       Date into PVCS   : $Date:   Sep 14 2010 10:43:32  $
---       Date fetched Out : $Modtime:   Sep 14 2010 10:43:06  $
---       Version          : $Revision:   3.0  $
+--       Date into PVCS   : $Date:   Jul 04 2013 10:29:56  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 10:18:56  $
+--       Version          : $Revision:   3.1  $
 --
 --
 -----------------------------------------------------------------------------
---  Copyright (c) exor corporation ltd, 2010
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
   DELETE
     FROM hig_user_contacts_all

@@ -12,16 +12,15 @@ AS
    --------------------------------------------------------------------------------
    --   PVCS Identifiers :-
    --
-   --       sccsid           : $Header:   //vm_latest/archives/nm3/admin/utl/create_asgm_view.sql-arc   3.0   Dec 01 2008 11:53:42   aedwards  $
+   --       sccsid           : $Header:   //vm_latest/archives/nm3/admin/utl/create_asgm_view.sql-arc   3.1   Jul 04 2013 10:29:56   James.Wadsworth  $
    --       Module Name      : $Workfile:   create_asgm_view.sql  $
-   --       Date into PVCS   : $Date:   Dec 01 2008 11:53:42  $
-   --       Date fetched Out : $Modtime:   Dec 01 2008 11:51:56  $
-   --       PVCS Version     : $Revision:   3.0  $
+   --       Date into PVCS   : $Date:   Jul 04 2013 10:29:56  $
+   --       Date fetched Out : $Modtime:   Jul 04 2013 10:20:46  $
+   --       PVCS Version     : $Revision:   3.1  $
    --
-   --------------------------------------------------------------------------------
-   --
-   --  
-   --  Exor Corporation 2008
+   -----------------------------------------------------------------------------
+   --    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+   -----------------------------------------------------------------------------
    --   
    -- This is an altered version of the standard Oracle MDSYS ALL_SDO_GEOM_METADATA view
    -- that should help improve performance of the startup of Locator and Mapbuilder.
