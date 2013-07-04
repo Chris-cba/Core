@@ -15,15 +15,15 @@ DECLARE
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/trg/nm_inv_types_all_dt_trg.trg-arc   2.5   Oct 07 2011 12:14:18   Steve.Cooper  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/trg/nm_inv_types_all_dt_trg.trg-arc   2.6   Jul 04 2013 09:53:28   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm_inv_types_all_dt_trg.trg  $
---       Date into PVCS   : $Date:   Oct 07 2011 12:14:18  $
---       Date fetched Out : $Modtime:   Oct 07 2011 12:14:06  $
---       Version          : $Revision:   2.5  $
+--       Date into PVCS   : $Date:   Jul 04 2013 09:53:28  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 09:39:04  $
+--       Version          : $Revision:   2.6  $
 --
 --
 -----------------------------------------------------------------------------
---  Copyright (c) exor corporation ltd, 2008
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
    l_start_date DATE := :NEW.NIT_START_DATE;
