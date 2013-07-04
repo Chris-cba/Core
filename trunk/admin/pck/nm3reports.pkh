@@ -5,20 +5,20 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3reports.pkh-arc   2.1   Jan 06 2010 16:41:34   cstrettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3reports.pkh-arc   2.2   Jul 04 2013 16:21:12   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3reports.pkh  $
---       Date into PVCS   : $Date:   Jan 06 2010 16:41:34  $
---       Date fetched Out : $Modtime:   Jan 05 2010 11:40:10  $
---       Version          : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:21:12  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 15:50:04  $
+--       Version          : $Revision:   2.2  $
 --       Based on SCCS version : 1.2
 -------------------------------------------------------------------------
 --   Author : Sarah Scanlon
 --
 --    NM3REPORTS HEADER
 --
------------------------------------------------------------------------------
---Copyright (c) exor corporation ltd, 2004
------------------------------------------------------------------------------
+------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
 
@@ -26,7 +26,7 @@ AS
 --constants
 -----------
 --g_sccsid is the SCCS ID for the package
-  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.1  $';
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.2  $';
    g_gis_id               NUMBER;
 
 --</GLOBVAR>

@@ -3,23 +3,23 @@ CREATE OR REPLACE PACKAGE BODY nm3rsc AS
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3rsc.pkb-arc   2.12   Apr 24 2013 15:40:20   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3rsc.pkb-arc   2.13   Jul 04 2013 16:21:12   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3rsc.pkb  $
---       Date into PVCS   : $Date:   Apr 24 2013 15:40:20  $
---       Date fetched Out : $Modtime:   Apr 24 2013 15:39:34  $
---       PVCS Version     : $Revision:   2.12  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:21:12  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:18  $
+--       PVCS Version     : $Revision:   2.13  $
 --
 --   Author : R.A. Coupe
 --
 --   Package for the rescaling and resequencing of route members
 --
 -----------------------------------------------------------------------------
--- Copyright (c) exor corporation ltd, 2001
+-- Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 ----------------------------------------------------------------------------
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(30) :='"$Revision:   2.12  $"';
+   g_body_sccsid     CONSTANT  varchar2(30) :='"$Revision:   2.13  $"';
 
 --  g_body_sccsid is the SCCS ID for the package body
 --

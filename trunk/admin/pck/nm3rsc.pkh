@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE nm3rsc AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3rsc.pkh-arc   2.1   Jan 12 2010 10:53:00   cstrettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3rsc.pkh-arc   2.2   Jul 04 2013 16:21:12   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3rsc.pkh  $
---       Date into PVCS   : $Date:   Jan 12 2010 10:53:00  $
---       Date fetched Out : $Modtime:   Jan 12 2010 10:52:18  $
---       Version          : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:21:12  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:18  $
+--       Version          : $Revision:   2.2  $
 --       Based on SCCS version : 1.20
 -------------------------------------------------------------------------
 --
@@ -16,11 +16,11 @@ CREATE OR REPLACE PACKAGE nm3rsc AS
 --   Package to rescale and resequence routes
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2001
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
-  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.1  $';
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.2  $';
 --  g_sccsid is the SCCS ID for the package
 
   g_gty          nm_elements.ne_gty_group_type%TYPE;

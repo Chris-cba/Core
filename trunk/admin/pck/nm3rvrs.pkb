@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3rvrs AS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3rvrs.pkb-arc   2.2   May 17 2011 08:26:24   Steve.Cooper  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3rvrs.pkb-arc   2.3   Jul 04 2013 16:21:12   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3rvrs.pkb  $
---       Date into PVCS   : $Date:   May 17 2011 08:26:24  $
---       Date fetched Out : $Modtime:   Mar 31 2011 14:50:58  $
---       PVCS Version     : $Revision:   2.2  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:21:12  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:18  $
+--       PVCS Version     : $Revision:   2.3  $
 --
 --
 --   Author : R.A. Coupe
@@ -16,10 +16,10 @@ CREATE OR REPLACE PACKAGE BODY nm3rvrs AS
 --   Package to reverse a route
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2001
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.2  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.3  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'NM3RVRS';
