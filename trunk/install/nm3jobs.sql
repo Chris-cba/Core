@@ -2,13 +2,16 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3jobs.sql-arc   3.1   Jul 16 2009 10:24:06   aedwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3jobs.sql-arc   3.2   Jul 04 2013 14:09:18   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3jobs.sql  $
---       Date into PVCS   : $Date:   Jul 16 2009 10:24:06  $
---       Date fetched Out : $Modtime:   Jul 16 2009 10:23:50  $
---       PVCS Version     : $Revision:   3.1  $
+--       Date into PVCS   : $Date:   Jul 04 2013 14:09:18  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 13:39:52  $
+--       PVCS Version     : $Revision:   3.2  $
 --
---------------------------------------------------------------------------------
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
 --
 DECLARE
   ex_no_exists       EXCEPTION;
