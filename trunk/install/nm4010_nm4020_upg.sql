@@ -3,15 +3,15 @@
 --
 --   SCCS Identifiers :-
 --
---       pvcsid                 : $Header:   //vm_latest/archives/nm3/install/nm4010_nm4020_upg.sql-arc   2.5   Oct 24 2007 15:35:52   jwadsworth  $
+--       pvcsid                 : $Header:   //vm_latest/archives/nm3/install/nm4010_nm4020_upg.sql-arc   2.6   Jul 04 2013 14:09:48   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm4010_nm4020_upg.sql  $
---       Date into PVCS   : $Date:   Oct 24 2007 15:35:52  $
---       Date fetched Out : $Modtime:   Oct 24 2007 13:59:40  $
---       PVCS Version     : $Revision:   2.5  $
+--       Date into PVCS   : $Date:   Jul 04 2013 14:09:48  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 11:54:18  $
+--       PVCS Version     : $Revision:   2.6  $
 --       Based on SCCS version :
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2007
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 SET ECHO OFF
 SET LINESIZE 120

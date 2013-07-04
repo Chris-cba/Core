@@ -9,14 +9,14 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4010_nm4020_ddl_upg.sql-arc   2.6   Oct 26 2007 11:53:34   jwadsworth  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4010_nm4020_ddl_upg.sql-arc   2.7   Jul 04 2013 14:09:48   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm4010_nm4020_ddl_upg.sql  $
---       Date into PVCS   : $Date:   Oct 26 2007 11:53:34  $
---       Date fetched Out : $Modtime:   Oct 26 2007 11:28:30  $
---       Version          : $Revision:   2.6  $
+--       Date into PVCS   : $Date:   Jul 04 2013 14:09:48  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 11:54:18  $
+--       Version          : $Revision:   2.7  $
 --
 ------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2007
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 ------------------------------------------------------------------
 
 
