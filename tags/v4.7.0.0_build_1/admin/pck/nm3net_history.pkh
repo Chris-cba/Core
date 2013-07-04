@@ -1,0 +1,230 @@
+create or replace package nm3net_history AS
+--<PACKAGE>
+-----------------------------------------------------------------------------
+--
+--   PVCS Identifiers :-
+--
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3net_history.pkh-arc   2.1   Jul 04 2013 16:19:16   James.Wadsworth  $
+--       Module Name      : $Workfile:   nm3net_history.pkh  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:19:16  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:18  $
+--       PVCS Version     : $Revision:   2.1  $
+--
+--
+--   Author : Kevin Angus
+--
+--    nm3net_history
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+
+  -------
+  --types
+  -------
+  type t_neh_rec_arr            is table of nm_element_history%rowtype                 index by pls_integer;
+  
+  type t_neh_id                 is table of nm_element_history.neh_id%type             index by pls_integer;
+  type t_neh_ne_id_old_arr      is table of nm_element_history.neh_ne_id_old%type      index by pls_integer;
+  type t_neh_ne_id_new_arr      is table of nm_element_history.neh_ne_id_new%type      index by pls_integer;
+  type t_neh_operation_arr      is table of nm_element_history.neh_operation%type      index by pls_integer;
+  type t_neh_effective_date_arr is table of nm_element_history.neh_effective_date%type index by pls_integer;
+  type t_neh_old_ne_length_arr  is table of nm_element_history.neh_old_ne_length%type  index by pls_integer;
+  type t_neh_new_ne_length_arr  is table of nm_element_history.neh_new_ne_length%type  index by pls_integer;
+  type t_neh_param_1_arr        is table of nm_element_history.neh_param_1%type        index by pls_integer;
+  type t_neh_param_2_arr        is table of nm_element_history.neh_param_2%type        index by pls_integer;
+
+  -----------
+  --constants
+  -----------
+  --g_sccsid is the SCCS ID for the package
+  g_sccsid CONSTANT VARCHAR2(2000) := '"$Revision:   2.1  $"';
+  
+  c_neh_op_split       constant nm_element_history.neh_operation%type := 'S';
+  c_neh_op_merge       constant nm_element_history.neh_operation%type := 'M';
+  c_neh_op_replace     constant nm_element_history.neh_operation%type := 'R';
+  c_neh_op_close       constant nm_element_history.neh_operation%type := 'C';
+  c_neh_op_reclassify  constant nm_element_history.neh_operation%type := 'N';
+  c_neh_op_recalibrate constant nm_element_history.neh_operation%type := 'B';
+  c_neh_op_shift       constant nm_element_history.neh_operation%type := 'H';
+  c_neh_op_edit        constant nm_element_history.neh_operation%type := 'E';
+  c_neh_op_reverse     constant nm_element_history.neh_operation%type := 'V';
+
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="value_has_changed">
+--
+-- This function returns TRUE if the new value is different to the old value.
+--
+FUNCTION value_has_changed(pi_old_value in number
+                          ,pi_new_value in number
+                          ) RETURN boolean;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="audit_member_mp_edit">
+--
+-- This procedure creates an audit record to record that the element has been
+-- manually edited. 
+--
+PROCEDURE audit_member_mp_edit(pi_nm_ne_id_in   IN nm_members_all.nm_ne_id_in%TYPE
+                              ,pi_nm_ne_id_of   IN nm_members_all.nm_ne_id_of%TYPE
+                              ,pi_nm_begin_mp   IN nm_members_all.nm_begin_mp%TYPE
+                              ,pi_nm_start_date IN nm_members_all.nm_start_date%TYPE
+                              );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="cascade_neh_delete">
+--
+-- This procedure cascades the delete of an element history record to member
+-- history and other products if they are licensed.
+--
+PROCEDURE cascade_neh_delete(pi_neh_id        in nm_element_history.neh_id%type
+                            ,pi_neh_ne_id_old in nm_element_history.neh_ne_id_old%type
+                            ,pi_neh_ne_id_new in nm_element_history.neh_ne_id_new%type
+                            );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="auditing_member_edits">
+--
+-- This function returns TRUE if ausiting of member record edits is enabled.
+--
+FUNCTION auditing_member_edits RETURN boolean;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="auditing_member_edits">
+--
+-- This procedure en/disables auditing of member record edits.
+--
+PROCEDURE set_auditing_member_edits(pi_setting IN boolean DEFAULT TRUE
+                                   );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_history_for_element">
+--
+-- This function returns the history audit records for the supplied element.
+--
+FUNCTION get_history_for_element(pi_ne_id in nm_elements.ne_id%type
+                                ) RETURN t_neh_rec_arr;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="edit_creates_new_element">
+--
+-- This function returns TRUE if the supplied operation results in a new
+-- element or elements. 
+--
+FUNCTION edit_creates_new_element(pi_neh_operation in nm_element_history.neh_operation%type
+                                 ) RETURN boolean;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_edited_datums_in_nte">
+--
+-- This procedure gets arrays of the ne_id and effective dates of all datums
+-- in the specified temp extent that have been closed by an edit. 
+--
+
+PROCEDURE get_edited_datums_in_nte(pi_nte_id               IN     nm_nw_temp_extents.nte_job_id%TYPE
+                                  ,po_edited_ne_id_arr        OUT nm3net_history.t_neh_ne_id_old_arr
+                                  ,po_edited_operation_arr    OUT nm3net_history.t_neh_operation_arr
+                                  ,po_edited_date_arr         OUT nm3net_history.t_neh_effective_date_arr
+                                  );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_neh_for_closing_op">
+--
+-- This function returns the neh records that audit the end of the specified
+-- element due to a network edit operation.
+--
+FUNCTION get_neh_for_closing_op(pi_ne_id IN nm_elements.ne_id%TYPE
+                               ) RETURN t_neh_rec_arr;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_neh_for_non_closing_ops">
+--
+-- This function returns the neh records that audit non-closing edits to the 
+-- specified element.
+--
+FUNCTION get_neh_for_non_closing_ops(pi_ne_id nm_elements.ne_id%TYPE
+                                    ) RETURN t_neh_rec_arr;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="nte_has_blocking_edits">
+--
+-- This function returns TRUE if any of the datums within the specified temp 
+-- extent have been subject to an error correcting edit such as recalibrate,
+-- shift or a manual edit.
+--
+FUNCTION nte_has_blocking_edits(pi_nte_job_id IN nm_nw_temp_extents.nte_job_id%TYPE
+                                ) RETURN BOOLEAN;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="nte_has_non_blocking_edits">
+--
+-- This function returns TRUE if any of the datums within the specified temp 
+-- extent have been subject to an edit that creates a new element.
+--
+FUNCTION nte_has_non_blocking_edits(pi_nte_job_id IN nm_nw_temp_extents.nte_job_id%TYPE
+                                   ) RETURN BOOLEAN;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="group_has_blocking_edits">
+--
+-- This function returns TRUE if any of the members of the specified
+-- group have been manually edited.
+--
+FUNCTION group_has_blocking_edits(pi_ne_id IN nm_elements.ne_id%TYPE
+                                 ) RETURN BOOLEAN;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--<PRAGMA>
+  PRAGMA RESTRICT_REFERENCES(get_version, RNDS, WNPS, WNDS);
+  PRAGMA RESTRICT_REFERENCES(get_body_version, RNDS, WNPS, WNDS);
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+end nm3net_history;
+/
+

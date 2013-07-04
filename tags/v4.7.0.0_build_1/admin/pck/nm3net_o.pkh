@@ -1,0 +1,80 @@
+CREATE OR REPLACE PACKAGE nm3net_o AS
+--<PACKAGE>
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3net_o.pkh-arc   2.2   Jul 04 2013 16:19:16   James.Wadsworth  $
+--       Module Name      : $Workfile:   nm3net_o.pkh  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:19:16  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:18  $
+--       Version          : $Revision:   2.2  $
+--       Based on SCCS version : 1.2
+---------------------------------------------------------------------------
+--   Author : K Angus
+--
+--   nm3net_o package: Contains procedures/functions that use objects for
+--                     manipulating networks. This package will not be
+--                     usable from client tools such as Forms. 
+--                     
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+  g_sccsid      CONSTANT  varchar2(2000) := '$Revision:   2.2  $';
+  
+  
+  g_ne_id_to_restrict_on  nm_elements.ne_id%TYPE;  -- global package var used initially in nm_routes_on_node_o view
+  
+--  g_sccsid is the SCCS ID for the package
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_node_class">
+-- This function returns a node class object for the node p_node_id on route
+-- p_route_id.
+FUNCTION get_node_class (p_route_id IN number
+                        ,p_node_id  IN number
+                        ) RETURN nm_node_class;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="set_g_ne_id_to_restrict_on">
+PROCEDURE set_g_ne_id_to_restrict_on (pi_ne_id IN nm_elements.ne_id%TYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_g_ne_id_to_restrict_on">
+FUNCTION get_g_ne_id_to_restrict_on RETURN nm_elements.ne_id%TYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PRAGMA>
+   PRAGMA RESTRICT_REFERENCES (get_version, rnds, wnps, wnds);
+   PRAGMA RESTRICT_REFERENCES (get_body_version , rnds, wnps, wnds);
+   PRAGMA RESTRICT_REFERENCES (get_node_class   , wnds);
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+END nm3net_o;
+/

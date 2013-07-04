@@ -1,0 +1,193 @@
+create or replace package nm3net_load as
+--<PACKAGE>
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3net_load.pkh-arc   2.2   Jul 04 2013 16:19:16   James.Wadsworth  $
+--       Module Name      : $Workfile:   nm3net_load.pkh  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:19:16  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:18  $
+--       Version          : $Revision:   2.2  $
+--       Based on SCCS version : 1.2
+-------------------------------------------------------------------------
+--
+--   Author : Jonathan Mills
+--
+--   NM3 Loader Network Related package
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+  g_sccsid      CONSTANT  VARCHAR2(2000) := '$Revision:   2.2  $';
+--  g_sccsid is the SCCS ID for the package
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="rescale_route">
+-- Rescales the route identified in the view ROWTYPE record
+--
+PROCEDURE rescale_route (p_rec v_load_rescale_route%ROWTYPE);
+--
+-- Column                 Meaning
+-- -------------------    -----------------------------------------------
+-- NE_UNIQUE              Route NE_UNIQUE
+-- NE_NT_TYPE             Route NE_NT_TYPE (optional - but error will be
+--                         raised if >1 record exists with NE_UNIQUE)
+-- EFFECTIVE_DATE         Effective date of the rescale operation
+-- START_OFFSET           New starting offset (in route units)
+-- ST_ELEMENT_ID          Datum element at which to start rescale from
+-- USE_HISTORY            Y or N
+-- NE_ID_START            Datum element at which to start rescale from (for
+--                         circular routes)
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="validate_rescale_route">
+-- Validates that the route identified in the view ROWTYPE record may be rescaled
+--
+PROCEDURE validate_rescale_route (p_rec v_load_rescale_route%ROWTYPE);
+--
+-- Column                 Meaning
+-- -------------------    -----------------------------------------------
+-- NE_UNIQUE              Route NE_UNIQUE
+-- NE_NT_TYPE             Route NE_NT_TYPE (optional - but error will be
+--                         raised if >1 record exists with NE_UNIQUE)
+-- EFFECTIVE_DATE         Effective date of the rescale operation
+-- START_OFFSET           New starting offset (in route units)
+-- ST_ELEMENT_ID          Datum element at which to start rescale from
+-- USE_HISTORY            Y or N
+-- NE_ID_START            Datum element at which to start rescale from (for
+--                         circular routes)
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="resize_route">
+--
+-- Resizes the route identified in the view ROWTYPE record.
+--
+-- Column                 Meaning
+-- -------------------    ---------------------------------------------------
+-- NE_UNIQUE              Route NE_UNIQUE
+-- NE_NT_TYPE             Route NE_NT_TYPE (optional - but error will be
+--                         raised if >1 record exists with NE_UNIQUE)
+-- NEW_LENGTH             New length for the route in the units of the route
+--
+PROCEDURE resize_route(pi_rec v_load_resize_route%rowtype
+                      );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="validate_resize_route">
+--
+-- Validates that the route identified in the supplied record can be resized. 
+--
+-- Column                 Meaning
+-- -------------------    ------------------------------------------------
+-- NE_UNIQUE              Route NE_UNIQUE
+-- NE_NT_TYPE             Route NE_NT_TYPE (optional - but error will be
+--                         raised if >1 record exists with NE_UNIQUE)
+-- NEW_LENGTH             New length for the route in the units of the route
+--
+PROCEDURE validate_resize_route(pi_rec v_load_resize_route%rowtype
+                               );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="reseq_route">
+-- Reseqeunces the route identified in the view ROWTYPE record
+--
+PROCEDURE reseq_route (p_rec v_load_reseq_route%ROWTYPE);
+--
+-- Column                 Meaning
+-- -------------------    -----------------------------------------------
+-- NE_UNIQUE              Route NE_UNIQUE
+-- NE_NT_TYPE             Route NE_NT_TYPE (optional - but error will be
+--                         raised if >1 record exists with NE_UNIQUE)
+-- NE_ID_START            Datum element at which to start rescale from (for
+--                         circular routes)
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="validate_reseq_route">
+-- Validates that the route identified in the view ROWTYPE record may be resequenced
+--
+PROCEDURE validate_reseq_route (p_rec v_load_reseq_route%ROWTYPE);
+--
+-- Column                 Meaning
+-- -------------------    -----------------------------------------------
+-- NE_UNIQUE              Route NE_UNIQUE
+-- NE_NT_TYPE             Route NE_NT_TYPE (optional - but error will be
+--                         raised if >1 record exists with NE_UNIQUE)
+-- NE_ID_START            Datum element at which to start rescale from (for
+--                         circular routes)
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="create_distance_break">
+-- Creates a distance break
+--
+PROCEDURE create_distance_break (p_rec v_load_distance_break%ROWTYPE);
+--
+-- Column                 Meaning
+-- -------------------    -----------------------------------------------
+-- NE_UNIQUE              Route NE_UNIQUE
+-- NE_NT_TYPE             Route NE_NT_TYPE (optional - but error will be
+--                         raised if >1 record exists with NE_UNIQUE)
+-- NE_NO_START            Internal Node ID of the start of the DB
+-- NE_NO_END              Internal Node ID of the end of the DB
+-- NE_START_DATE          Start Date of the DB record
+-- NE_LENGTH              Length of the DB (defaults to Zero)
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="validate_distance_break">
+-- Validates a distance break
+--
+PROCEDURE validate_distance_break (p_rec v_load_distance_break%ROWTYPE);
+--
+-- Column                 Meaning
+-- -------------------    -----------------------------------------------
+-- NE_UNIQUE              Route NE_UNIQUE
+-- NE_NT_TYPE             Route NE_NT_TYPE (optional - but error will be
+--                         raised if >1 record exists with NE_UNIQUE)
+-- NE_NO_START            Internal Node ID of the start of the DB
+-- NE_NO_END              Internal Node ID of the end of the DB
+-- NE_START_DATE          Start Date of the DB record
+-- NE_LENGTH              Length of the DB (defaults to Zero)
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PRAGMA>
+   PRAGMA RESTRICT_REFERENCES (get_version, RNDS, WNPS, WNDS);
+   PRAGMA RESTRICT_REFERENCES (get_body_version, RNDS, WNPS, WNDS);
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+end nm3net_load;
+/

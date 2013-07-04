@@ -1,0 +1,1620 @@
+CREATE OR REPLACE PACKAGE nm3net AS
+--<PACKAGE>
+--   PVCS Identifiers :-
+--
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3net.pkh-arc   2.6   Jul 04 2013 16:19:16   James.Wadsworth  $
+--       Module Name      : $Workfile:   nm3net.pkh  $
+--       Date into SCCS   : $Date:   Jul 04 2013 16:19:16  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:18  $
+--       SCCS Version     : $Revision:   2.6  $
+--       Based on 
+--
+--
+--   Author : Rob Coupe
+--
+--     nm3net package
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+
+-- 03.06.08 PT added pi_no_purpose parameter to create_node()
+
+  g_sccsid      CONSTANT  varchar2(80) := '"$Revision:   2.6  $"';
+--  g_sccsid is the SCCS_ID
+--
+
+			TYPE
+			  tab_nt IS TABLE OF Nm_types%ROWTYPE
+			     INDEX BY BINARY_INTEGER; 
+
+   g_dyn_rec_ne  nm_elements%ROWTYPE;
+   g_dyn_rec_ne2 nm_elements%ROWTYPE;
+   g_dyn_ne_id   nm_elements.ne_id%TYPE;
+   g_dyn_val     varchar2(4000);
+   g_tab_nt      tab_nt;   
+   
+   g_ne_type_datum             CONSTANT nm_elements.ne_type%TYPE := 'S';
+   g_ne_type_group             CONSTANT nm_elements.ne_type%TYPE := 'G';
+   g_ne_type_group_of_groups   CONSTANT nm_elements.ne_type%TYPE := 'P';
+   g_ne_type_distance_break    CONSTANT nm_elements.ne_type%TYPE := 'D';   
+
+   -- MJA add 31-Aug-07
+   -- Globals for use in bypassing triggers
+   g_bypass_nm_members_trgs  BOOLEAN := FALSE;
+   g_bypass_nm_elements_trgs BOOLEAN := FALSE;
+   g_bypass_nm_points_trgs   BOOLEAN := FALSE;
+--
+--</GLOBVAR>
+
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_version">
+--This function returns the internal version number of the package
+  FUNCTION get_version                              RETURN varchar2;
+--</proc>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_next_ne_id">
+  FUNCTION get_next_ne_id                           RETURN number;
+--</proc>
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_ne_length">
+--This function returns the total length of a linear feature or network element
+  FUNCTION get_ne_length( p_ne_id IN number)        RETURN number;
+--</proc>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_datum_element_length">
+-- This procedure simply selects NE_LENGTH from NM_ELEMENTS for the ne_id specified
+FUNCTION get_datum_element_length (pi_ne_id IN number) RETURN number;
+--</proc>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_start_node">
+--This function returns the start node of a network element from an id or from its unique reference
+  FUNCTION get_start_node( p_ne_id IN number)       RETURN number;
+  PRAGMA RESTRICT_REFERENCES( get_start_node, wnds, wnps );
+  FUNCTION get_start_node( p_ne_unique IN varchar2) RETURN number;
+--</proc>
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_end_node">
+--This function returns the end node of a network element from an id or from its unique reference
+  FUNCTION get_end_node ( p_ne_id IN number)        RETURN number;
+  PRAGMA RESTRICT_REFERENCES( get_end_node, wnds, wnps );
+  FUNCTION get_end_node ( p_ne_unique IN varchar2)  RETURN number;
+--</proc>
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_ne_id">
+--This function returns the primary key for a given unique reference
+  FUNCTION get_ne_id(p_ne_unique  IN varchar2
+                    ,p_ne_nt_type IN nm_elements.ne_nt_type%TYPE DEFAULT NULL
+                    ) RETURN number;
+--</proc>
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_ne_unique">
+--This function returns the unique key for a given element id.
+  FUNCTION get_ne_unique( p_ne_id IN number )       RETURN nm_elements.ne_unique%TYPE;
+--</proc>
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_ne_descr">
+--This function returns the description for a given element id.
+  FUNCTION get_ne_descr( p_ne_id IN number )       RETURN varchar2;
+--</proc>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_ne_gty">
+--This function returns the group type for a given element id.
+FUNCTION get_ne_gty(pi_ne_id IN nm_elements.ne_id%TYPE
+                   ) RETURN nm_elements.ne_gty_group_type%TYPE;
+--</proc>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_nt">
+--This function returns the NM_TYPES record for a given nt_type
+FUNCTION get_nt(pi_nt_type IN nm_types.nt_type%TYPE)
+               RETURN nm_types%ROWTYPE;
+--</proc>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_nt_units">
+--This function returns the unique of the specified network type
+  FUNCTION get_nt_unique( p_nt_type IN varchar2) RETURN nm_types.nt_unique%TYPE;
+--</proc>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_nt_units">
+--This function returns the units of measurement of the specified network type
+  FUNCTION get_nt_units( p_nt_type IN varchar2)     RETURN number;
+--</proc>
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_nt_descr">
+-- This function returns the description of a given network type
+  FUNCTION get_nt_descr( p_nt_type IN varchar2)		RETURN varchar2;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_nsc_descr">
+-- This function returns the description of a given network type sub class
+  FUNCTION get_nsc_descr( p_nt_type IN varchar2, p_nsc_sub_class IN varchar2)	RETURN varchar2;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_nsc_seq_no">
+-- This function returns the seq_no of a given network type sub class
+  FUNCTION get_nsc_seq_no( p_nt_type IN varchar2, p_nsc_sub_class IN varchar2)	RETURN nm_type_subclass.nsc_seq_no%TYPE;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_xsp_descr">
+-- This function returns the description of a given XSP
+  FUNCTION get_xsp_descr( p_nt_type IN varchar2, p_nsc_sub_class IN varchar2, p_xsp IN varchar2) RETURN varchar2;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_gty_units">
+-- This function returns the units of measure of a given linear group type
+  FUNCTION get_gty_units( p_gty IN varchar2)        RETURN number;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_nt_type">
+-- This functions returns the network type of a given element
+  FUNCTION get_nt_type( p_ne_id IN number )         RETURN varchar2;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_gty_type">
+--This functions returns the network type of a given element
+  FUNCTION get_gty_type( p_ne_id number )           RETURN varchar2;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_gty">
+--This functions returns the specified nm_group_types record.
+FUNCTION get_gty(pi_gty IN nm_group_types.ngt_group_type%TYPE
+                ) RETURN nm_group_types%ROWTYPE;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_gty_descr">
+--This functions returns the description of a given group
+  FUNCTION get_gty_descr( p_gty varchar2 )           RETURN varchar2;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_gty_sub_group_allowed">
+--This functions returns the sub_group_allowed flag of the group type pi_group_type
+FUNCTION get_gty_sub_group_allowed(pi_group_type IN nm_group_types.ngt_group_type%TYPE
+                                  ) RETURN nm_group_types.ngt_sub_group_allowed%TYPE;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_gty_icon">
+--This functions returns the icon for the group type pi_group_type
+FUNCTION get_gty_icon(pi_group_type IN nm_group_types.ngt_group_type%TYPE
+                     ) RETURN nm_group_types.ngt_icon_name%TYPE;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="is_gty_linear">
+--This functions tests if a network group is linear
+  FUNCTION is_gty_linear( p_gty varchar2 )           RETURN varchar2;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="gty_is_partial">
+--This function returns TRUE if group type is partial
+FUNCTION gty_is_partial(pi_gty nm_group_types_all.ngt_group_type%TYPE
+                       ) RETURN boolean;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="group_type_in_use">
+--This functions tests if a network group type is in use
+FUNCTION group_type_in_use(pi_group_type IN nm_group_types.ngt_group_type%TYPE
+                          ) RETURN boolean;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="is_nt_linear">
+--This functions tests if a network type is linear
+  FUNCTION is_nt_linear( p_nt_type varchar2 ) RETURN varchar2;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="is_nt_datum">
+-- This functions tests if a network type is a linear datum
+  FUNCTION is_nt_datum( p_nt_type IN varchar2 )     RETURN varchar2;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_datum_nt">
+-- This functions returns the network type which is the linear datum of the group type of the
+-- supplied ne_id. If it is itself a datum it's network type is returned.
+FUNCTION get_datum_nt(pi_ne_id nm_elements.ne_id%TYPE
+                     ) RETURN nm_types.nt_type%TYPE;
+PRAGMA RESTRICT_REFERENCES( get_datum_nt, wnds, wnps );
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_datum_nt">
+-- This functions returns the network type which is the linear datum of a provided group type.
+  FUNCTION get_datum_nt(pi_gty IN nm_group_types.ngt_group_type%TYPE
+                       ) RETURN nm_types.nt_type%TYPE;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_node_name">
+-- This function returns the node name for a node id
+  FUNCTION get_node_name( p_no_id IN number )       RETURN varchar2;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_node_name_format">
+-- This function returns the node name format for a node type
+  FUNCTION get_node_name_format( p_no_type IN varchar2 )       RETURN varchar2;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="make_node_name">
+-- This function returns a node name compatible with the given type using the node id.
+  FUNCTION make_node_name(pi_no_type IN nm_node_types.nnt_type%TYPE
+                         ,pi_no_id   IN nm_nodes.no_node_id%TYPE
+                         ) RETURN nm_nodes.no_node_name%TYPE;
+--</PROC>
+--
+------------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_node_descr">
+-- This function returns the node description for a node id
+  FUNCTION get_node_descr ( p_no_id IN number ) RETURN varchar2 ;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_node_id">
+-- This function returns the node id for a node name
+  FUNCTION get_node_id ( p_no_name varchar2 )       RETURN number;
+--</PROC>
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_node_id">
+-- This function returns the node id for a node name and node type
+  FUNCTION get_node_id ( p_no_name IN varchar2, p_no_node_type IN varchar2  ) RETURN number ;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_next_node_id">
+-- This function returns the next node id from the appropraite sequence
+  FUNCTION get_next_node_id RETURN nm_nodes.no_node_id%TYPE;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="node_in_use">
+-- This function returns TRUE if pi_node is in nm_node_usages
+FUNCTION node_in_use(pi_node IN nm_nodes.no_node_id%TYPE
+                    ) RETURN boolean;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_ne_column_value">
+-- This function returns the value of a column of a network element record
+  FUNCTION get_ne_column_value ( p_ne_id IN number, p_column_name IN varchar2) RETURN varchar2;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_node_slk">
+-- This functions returns the measured value at a node along a route
+  FUNCTION get_node_slk(p_ne_id       IN number
+                       ,p_no_node_id  IN number
+                       ,p_sub_class   IN nm_elements.ne_sub_class%TYPE DEFAULT NULL
+                       ,p_datum_ne_id IN nm_elements.ne_id%TYPE DEFAULT NULL
+                       ) RETURN number;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_max_slk">
+-- This functions returns the maximum slk length of an element
+  FUNCTION get_max_slk( pi_ne_id IN number ) RETURN number;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_max_true">
+-- This functions returns the maximum true length of a route
+  FUNCTION get_max_true( pi_ne_id IN number ) RETURN number;
+--</PROC>
+--
+----------------------------------------------------------------------------------
+--
+--<PROC NAME="get_node_slk">
+-- This procedure is used to determine the measure at a node when a section is added to an existing
+-- route. The procedure takes the route direction and node connectivity into account
+PROCEDURE get_node_slk
+     (pi_route_ne_id        IN     nm_members.nm_ne_id_in%TYPE
+     ,pi_nw_type            IN     nm_types.nt_type%TYPE
+     ,pi_new_node_id        IN     nm_nodes.no_node_id%TYPE
+     ,pi_new_node_type      IN     nm_node_usages.nnu_node_type%TYPE
+     ,pi_new_element_length IN     nm_elements.ne_length%TYPE
+     ,pi_new_sub_class      IN     nm_elements.ne_sub_class%TYPE
+     ,po_new_slk            IN OUT nm_members.nm_slk%TYPE
+     ,po_new_cardinality    IN OUT nm_members.nm_cardinality%TYPE
+     ,po_warning            IN OUT varchar2
+     );
+--</PROC>
+--
+----------------------------------------------------------------------------------
+--
+--<PROC NAME="get_node_slk_true">
+-- This procedure is used to determine the measure and true distance at a node
+-- when a section is added to an existing route. The procedure takes the route
+-- direction and node connectivity into account
+PROCEDURE get_node_slk_true
+     (pi_route_ne_id        IN     nm_members.nm_ne_id_in%TYPE
+     ,pi_nw_type            IN     nm_types.nt_type%TYPE
+     ,pi_new_node_id        IN     nm_nodes.no_node_id%TYPE
+     ,pi_new_node_type      IN     nm_node_usages.nnu_node_type%TYPE
+     ,pi_new_element_length IN     nm_elements.ne_length%TYPE
+     ,pi_new_sub_class      IN     nm_elements.ne_sub_class%TYPE
+     ,po_new_slk            IN OUT nm_members.nm_slk%TYPE
+     ,po_new_true           IN OUT nm_members.nm_true%TYPE
+     ,po_new_cardinality    IN OUT nm_members.nm_cardinality%TYPE
+     ,po_warning            IN OUT varchar2
+     );
+--</PROC>
+--
+----------------------------------------------------------------------------------
+--
+--<PROC NAME="check_element_connectivity">
+-- This functions returns the connectivity of two datum elements of network.
+FUNCTION check_element_connectivity
+           (pi_ne_id1 IN nm_node_usages.nnu_ne_id%TYPE
+           ,pi_ne_id2 IN nm_node_usages.nnu_ne_id%TYPE
+           ) RETURN boolean;
+--</PROC>
+--
+----------------------------------------------------------------------------------
+--
+--<PROC NAME="get_element_shared_node">
+-- This functions returns the node_id of a shared node of 2 elements on the nw,
+--  if the elements are not connected it returns NULL
+FUNCTION get_element_shared_node
+           (pi_ne_id1 IN nm_node_usages.nnu_ne_id%TYPE
+           ,pi_ne_id2 IN nm_node_usages.nnu_ne_id%TYPE
+           ) RETURN nm_node_usages.nnu_no_node_id%TYPE;
+--</PROC>
+--
+----------------------------------------------------------------------------------
+--
+--<PROC NAME="check_for_ngr_loops">
+-- This function determins whether there is a loop in nm_group_relations data
+-- returns TRUE if the data is OK , FALSE if there is a Connect By Loop
+FUNCTION check_for_ngr_loops
+           (pi_parent_group_type IN nm_group_relations.ngr_parent_group_type%TYPE
+           ,pi_child_group_type IN nm_group_relations.ngr_child_group_type%TYPE
+           ) RETURN boolean ;
+--</PROC>
+--
+----------------------------------------------------------------------------------
+--
+--<PROC NAME="get_next_nte_id">
+-- This function returns the next value from the nte_id_seq sequence
+FUNCTION get_next_nte_id RETURN number ;
+--</PROC>
+--
+----------------------------------------------------------------------------------
+--
+--<PROC NAME="get_grid_refs">
+-- This procedure returns the grid references for a given node id.
+PROCEDURE get_grid_refs	( p_node_id IN number
+				, p_grid_east OUT number
+				, p_grid_north OUT number
+				) ;
+--</PROC>
+--
+----------------------------------------------------------------------------------
+--
+--<PROC NAME="get_next_control">
+-- This procedure returns next conrtrol number for a group
+FUNCTION get_next_control ( 	p_child_ne_id IN number ,
+					p_parent_type IN varchar2,
+					p_parent_id   IN number DEFAULT NULL,
+					p_child_type  IN varchar2 DEFAULT NULL) RETURN varchar2 ;
+
+--</PROC>
+--
+----------------------------------------------------------------------------------
+--
+--<PROC NAME="get_parent_ne_id">
+-- This procedure returns ne_id of parent of an element of a given network_type
+ FUNCTION get_parent_ne_id ( 	p_child_ne_id IN number,
+					p_parent_type IN varchar2) RETURN number ;
+--</PROC>
+--
+----------------------------------------------------------------------------------
+--
+--<PROC NAME="insert_any_element">
+-- This procedure will call either insert_element or grp_insert_element
+--
+PROCEDURE insert_any_element (p_rec_ne         IN OUT nm_elements%ROWTYPE
+                             ,p_nm_cardinality IN     nm_members.nm_cardinality%TYPE DEFAULT NULL
+                             ,p_auto_include   IN     boolean DEFAULT TRUE
+                             );
+--</PROC>
+--
+----------------------------------------------------------------------------------
+--
+--<PROC NAME="insert_element">
+-- Generic insert procedure for nm_elements.
+   PROCEDURE insert_element
+                (p_ne_id             IN OUT nm_elements.ne_id%TYPE
+                ,p_ne_unique         IN     nm_elements.ne_unique%TYPE         DEFAULT NULL
+                ,p_ne_type           IN     nm_elements.ne_type%TYPE           DEFAULT 'S'
+                ,p_ne_nt_type        IN     nm_elements.ne_nt_type%TYPE        DEFAULT NULL
+                ,p_ne_descr          IN     nm_elements.ne_descr%TYPE          DEFAULT NULL
+                ,p_ne_length         IN     nm_elements.ne_length%TYPE         DEFAULT NULL
+                ,p_ne_admin_unit     IN     nm_elements.ne_admin_unit%TYPE     DEFAULT 1
+                ,p_ne_start_date     IN     nm_elements.ne_start_date%TYPE     DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
+                ,p_ne_end_date       IN     nm_elements.ne_end_date%TYPE       DEFAULT NULL
+                ,p_ne_gty_group_type IN     nm_elements.ne_gty_group_type%TYPE DEFAULT NULL
+                ,p_ne_no_start       IN     nm_elements.ne_no_start%TYPE       DEFAULT NULL
+                ,p_ne_no_end         IN     nm_elements.ne_no_end%TYPE         DEFAULT NULL
+                ,p_ne_owner          IN     nm_elements.ne_owner%TYPE          DEFAULT NULL
+                ,p_ne_name_1         IN     nm_elements.ne_name_1%TYPE         DEFAULT NULL
+                ,p_ne_name_2         IN     nm_elements.ne_name_2%TYPE         DEFAULT NULL
+                ,p_ne_prefix         IN     nm_elements.ne_prefix%TYPE         DEFAULT NULL
+                ,p_ne_number         IN     nm_elements.ne_number%TYPE         DEFAULT NULL
+                ,p_ne_sub_type       IN     nm_elements.ne_sub_type%TYPE       DEFAULT NULL
+                ,p_ne_group          IN     nm_elements.ne_group%TYPE          DEFAULT NULL
+                ,p_ne_sub_class      IN     nm_elements.ne_sub_class%TYPE      DEFAULT NULL
+                ,p_ne_nsg_ref        IN     nm_elements.ne_nsg_ref%TYPE        DEFAULT NULL
+                ,p_ne_version_no     IN     nm_elements.ne_version_no%TYPE     DEFAULT NULL
+                ,p_nm_slk            IN     nm_members.nm_slk%TYPE             DEFAULT NULL
+                ,p_nm_cardinality    IN     nm_members.nm_cardinality%TYPE     DEFAULT NULL
+                ,p_auto_include      IN     varchar2                           DEFAULT 'Y'
+                );
+--</PROC>
+--
+----------------------------------------------------------------------------------
+--
+--<PROC NAME="grp_insert_element">
+ --Insert procedure for group nm_elements.
+PROCEDURE grp_insert_element
+                (p_ne_id             IN OUT nm_elements.ne_id%TYPE
+                ,p_ne_unique         IN     nm_elements.ne_unique%TYPE         DEFAULT NULL
+                ,p_ne_type           IN     nm_elements.ne_type%TYPE           DEFAULT 'S'
+                ,p_ne_nt_type        IN     nm_elements.ne_nt_type%TYPE        DEFAULT NULL
+                ,p_ne_descr          IN     nm_elements.ne_descr%TYPE          DEFAULT NULL
+                ,p_ne_length         IN     nm_elements.ne_length%TYPE         DEFAULT NULL
+                ,p_ne_admin_unit     IN     nm_elements.ne_admin_unit%TYPE     DEFAULT 1
+                ,p_ne_start_date     IN     nm_elements.ne_start_date%TYPE     DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
+                ,p_ne_end_date       IN     nm_elements.ne_end_date%TYPE       DEFAULT NULL
+                ,p_ne_gty_group_type IN     nm_elements.ne_gty_group_type%TYPE DEFAULT NULL
+                ,p_ne_no_start       IN     nm_elements.ne_no_start%TYPE       DEFAULT NULL
+                ,p_ne_no_end         IN     nm_elements.ne_no_end%TYPE         DEFAULT NULL
+                ,p_ne_owner          IN     nm_elements.ne_owner%TYPE          DEFAULT NULL
+                ,p_ne_name_1         IN     nm_elements.ne_name_1%TYPE         DEFAULT NULL
+                ,p_ne_name_2         IN     nm_elements.ne_name_2%TYPE         DEFAULT NULL
+                ,p_ne_prefix         IN     nm_elements.ne_prefix%TYPE         DEFAULT NULL
+                ,p_ne_number         IN     nm_elements.ne_number%TYPE         DEFAULT NULL
+                ,p_ne_sub_type       IN     nm_elements.ne_sub_type%TYPE       DEFAULT NULL
+                ,p_ne_group          IN     nm_elements.ne_group%TYPE          DEFAULT NULL
+                ,p_ne_sub_class      IN     nm_elements.ne_sub_class%TYPE      DEFAULT NULL
+                ,p_ne_nsg_ref        IN     nm_elements.ne_nsg_ref%TYPE        DEFAULT NULL
+                ,p_ne_version_no     IN     nm_elements.ne_version_no%TYPE     DEFAULT NULL
+                ,p_nm_slk            IN     nm_members.nm_slk%TYPE             DEFAULT NULL
+                ,p_nm_cardinality    IN     nm_members.nm_cardinality%TYPE     DEFAULT NULL
+                ,p_auto_include      IN     varchar2                           DEFAULT 'Y'
+                );
+--</PROC>
+--
+----------------------------------------------------------------------------------
+--
+--<PROC NAME="gis_insert_element">
+-- GIS insert procedure for nm_elements - Calls INSERT_ELEMENT
+-- The only thing which is different to INSERT_ELEMENT is that p_ne_id is an IN parameter
+--  only
+   PROCEDURE gis_insert_element
+                (p_ne_id             IN     nm_elements.ne_id%TYPE
+                ,p_ne_unique         IN     nm_elements.ne_unique%TYPE         DEFAULT NULL
+                ,p_ne_type           IN     nm_elements.ne_type%TYPE           DEFAULT 'S'
+                ,p_ne_nt_type        IN     nm_elements.ne_nt_type%TYPE        DEFAULT NULL
+                ,p_ne_descr          IN     nm_elements.ne_descr%TYPE          DEFAULT NULL
+                ,p_ne_length         IN     nm_elements.ne_length%TYPE         DEFAULT NULL
+                ,p_ne_admin_unit     IN     nm_elements.ne_admin_unit%TYPE     DEFAULT 1
+                ,p_ne_start_date     IN     nm_elements.ne_start_date%TYPE     DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
+                ,p_ne_end_date       IN     nm_elements.ne_end_date%TYPE       DEFAULT NULL
+                ,p_ne_gty_group_type IN     nm_elements.ne_gty_group_type%TYPE DEFAULT NULL
+                ,p_ne_no_start       IN     nm_elements.ne_no_start%TYPE       DEFAULT NULL
+                ,p_ne_no_end         IN     nm_elements.ne_no_end%TYPE         DEFAULT NULL
+                ,p_ne_owner          IN     nm_elements.ne_owner%TYPE          DEFAULT NULL
+                ,p_ne_name_1         IN     nm_elements.ne_name_1%TYPE         DEFAULT NULL
+                ,p_ne_name_2         IN     nm_elements.ne_name_2%TYPE         DEFAULT NULL
+                ,p_ne_prefix         IN     nm_elements.ne_prefix%TYPE         DEFAULT NULL
+                ,p_ne_number         IN     nm_elements.ne_number%TYPE         DEFAULT NULL
+                ,p_ne_sub_type       IN     nm_elements.ne_sub_type%TYPE       DEFAULT NULL
+                ,p_ne_group          IN     nm_elements.ne_group%TYPE          DEFAULT NULL
+                ,p_ne_sub_class      IN     nm_elements.ne_sub_class%TYPE      DEFAULT NULL
+                ,p_ne_nsg_ref        IN     nm_elements.ne_nsg_ref%TYPE        DEFAULT NULL
+                ,p_ne_version_no     IN     nm_elements.ne_version_no%TYPE     DEFAULT NULL
+                ,p_nm_slk            IN     nm_members.nm_slk%TYPE             DEFAULT NULL
+                ,p_nm_cardinality    IN     nm_members.nm_cardinality%TYPE     DEFAULT NULL
+                ,p_auto_include      IN     varchar2                           DEFAULT 'Y'
+                ,p_ignore_check      IN     varchar2                           DEFAULT 'Y'
+                );
+--</PROC>
+--
+----------------------------------------------------------------------------------
+--
+--<PROC NAME="is_node_valid_for_nw_type">
+-- This function returns TRUE if the specified node is valid for the given network type.
+-- It returns FALSE if it is not valid
+FUNCTION is_node_valid_for_nw_type (p_node_id IN nm_nodes.no_node_id%TYPE ,
+						p_nt_type IN nm_types.nt_type%TYPE) RETURN boolean ;
+--</PROC>
+--
+----------------------------------------------------------------------------------
+--
+--<PROC NAME="get_leg number">
+--This function returns the leg number for a given ne_id and node
+FUNCTION get_leg_number ( p_ne_id  nm_node_usages.nnu_ne_id%TYPE
+                         ,p_node_id nm_node_usages.nnu_no_node_id%TYPE
+                        ) RETURN nm_node_usages.nnu_leg_no%TYPE ;
+--</PROC>
+--
+----------------------------------------------------------------------------------
+--
+--<PROC NAME="check_for_nt_existence">
+--This function returns true if elements exist of the given network type, False if they do not
+FUNCTION check_for_nt_existence ( p_nt_type  nm_types.nt_type%TYPE
+                        ) RETURN boolean ;
+--</PROC>
+--
+----------------------------------------------------------------------------------
+--
+--<PROC NAME="insert_distance_break">
+-- This procedure creates a distance break
+PROCEDURE insert_distance_break (pi_route_ne_id     IN     nm_members.nm_ne_id_of%TYPE
+                                ,pi_start_node_id   IN     nm_nodes.no_node_id%TYPE
+                                ,pi_end_node_id     IN     nm_nodes.no_node_id%TYPE
+                                ,pi_start_date      IN     date
+                                ,pi_length          IN     nm_elements.ne_length%TYPE DEFAULT 0
+                                ,po_db_ne_id           OUT nm_members.nm_ne_id_in%TYPE
+                                ,po_db_ne_unique       OUT nm_elements.ne_unique%TYPE
+                                );
+--</PROC>
+--
+----------------------------------------------------------------------------------
+--
+--<PROC NAME="get_ne">
+-- This function selects a NM_ELEMENTS record for the given NE_ID
+FUNCTION get_ne (pi_ne_id IN nm_elements.ne_id%TYPE) RETURN nm_elements%ROWTYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_db_name">
+-- This function returns the name for a distance break
+FUNCTION get_db_name (pi_ne_unique IN nm_elements.ne_unique%TYPE
+                     ) RETURN nm_elements.ne_unique%TYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_next_nm_db_seq">
+-- This function returns nm_db_seq.NEXTVAL
+FUNCTION get_next_nm_db_seq RETURN number;
+--</PROC>
+--
+----------------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nm">
+-- This procedure does a simple insert into NM_MEMBERS
+PROCEDURE ins_nm (pi_rec_nm IN nm_members%ROWTYPE);
+--</PROC>
+--
+----------------------------------------------------------------------------------
+--
+--<PROC NAME="ins_ne">
+-- This procedure does a simple insert into NM_ELEMENTS
+PROCEDURE ins_ne (pi_rec_ne IN nm_elements%ROWTYPE);
+--</PROC>
+--
+----------------------------------------------------------------------------------
+--
+--<PROC NAME="create_point">
+-- This function creates a new point,
+-- if this desc is null then the new point id will be used
+FUNCTION create_point(pi_np_grid_east  IN nm_points.np_grid_east%TYPE
+	                   ,pi_np_grid_north IN nm_points.np_grid_north%TYPE
+	                   ,pi_np_descr      IN nm_points.np_descr%TYPE DEFAULT NULL
+	                   ) RETURN number ;
+--</PROC>
+--
+----------------------------------------------------------------------------------
+--
+--<PROC NAME="get_node_type">
+-- This function returns the type of a given node
+FUNCTION get_node_type( p_no_node_id nm_nodes.no_node_id%TYPE )
+         RETURN nm_nodes.no_node_type%TYPE;
+--</PROC>
+--
+----------------------------------------------------------------------------------
+--
+--<PROC NAME="get_node_type">
+-- This function returns if the group is exculsive or not
+FUNCTION get_group_exclusive_flag( p_ne_id nm_elements.ne_id%TYPE) RETURN varchar2;
+--</PROC>
+--
+----------------------------------------------------------------------------------
+--
+--<PROC NAME="get_group_units">
+-- This function returns the units of a group and those of its sub items
+PROCEDURE get_group_units(pi_ne_id       IN     nm_elements.ne_id%TYPE
+                         ,po_group_units    OUT nm_units.un_unit_id%TYPE
+                         ,po_child_units    OUT nm_units.un_unit_id%TYPE
+                         );
+PRAGMA RESTRICT_REFERENCES( get_group_units, wnds, wnps );
+--</PROC>
+--
+----------------------------------------------------------------------------------
+--
+--<PROC NAME="get_group_units">
+-- This function returns the units of a group and those of its sub items
+PROCEDURE get_group_units(pi_group_type  IN     nm_group_types.ngt_group_type%TYPE
+                         ,po_group_units    OUT nm_units.un_unit_id%TYPE
+                         ,po_child_units    OUT nm_units.un_unit_id%TYPE
+                         );
+--</PROC>
+--
+----------------------------------------------------------------------------------
+--
+--<PROC NAME="route_direction">
+-- This function returns the direction of the route for the given node type.
+FUNCTION route_direction(p_node_type   IN varchar2
+                        ,p_cardinality IN number
+                        ) RETURN number;
+--</PROC>
+--
+----------------------------------------------------------------------------------
+--
+--<PROC NAME="pop_temp_nodes">
+-- This procedure populates a temporary table with node information along a route.
+PROCEDURE pop_temp_nodes(pi_route_id IN nm_elements.ne_id%TYPE
+                        );
+--</PROC>
+--
+----------------------------------------------------------------------------------
+--
+--<PROC NAME="get_nau">
+-- This function returns a row from nm_admin_units
+FUNCTION get_nau(pi_admin_unit IN nm_admin_units.nau_admin_unit%TYPE
+                ) RETURN nm_admin_units%ROWTYPE;
+--</PROC>
+--
+----------------------------------------------------------------------------------
+--
+--<PROC NAME="get_admin_unit_name">
+-- This function returns the name of admin unit pi_admin_unit
+FUNCTION get_admin_unit_name(pi_admin_unit IN nm_admin_units.nau_admin_unit%TYPE
+                            ) RETURN nm_admin_units.nau_name%TYPE;
+--</PROC>
+--
+----------------------------------------------------------------------------------
+----------------------------------------------------------------------------------
+--
+--<PROC NAME="get_cardinality_flag">
+-- This function returns the cardinality flag or direction indicator of an element
+-- within an ordered set
+FUNCTION get_cardinality(p_ne_id_in IN nm_members.nm_ne_id_in%TYPE,
+                         p_ne_id_of  IN nm_members.nm_ne_id_of%TYPE
+                            ) RETURN nm_members.nm_cardinality%TYPE;
+--</PROC>
+--
+----------------------------------------------------------------------------------
+----------------------------------------------------------------------------------
+--
+--<PROC NAME="check_exclusive>
+-- returns true if nm_ne_id_of does not exist in another group of the same type
+-- within an ordered set
+FUNCTION check_exclusive (p_nm_ne_id_in IN nm_members.nm_ne_id_in%TYPE
+                         ,p_nm_ne_id_of IN nm_members.nm_ne_id_of%TYPE
+                         ,p_nm_begin_mp IN nm_members.nm_begin_mp%TYPE DEFAULT NULL
+                         ,p_nm_end_mp   IN nm_members.nm_end_mp%TYPE   DEFAULT NULL
+                         )RETURN boolean;
+--</PROC>
+--
+----------------------------------------------------------------------------------
+----------------------------------------------------------------------------------
+--
+--<PROC NAME= " get_ne_all_row_type"   ;
+-- returns a rowtype from nm_elements_all
+-- Only use this if you want element info from the base table
+FUNCTION get_ne_all_rowtype ( pi_ne_id nm_elements.ne_id%TYPE )
+RETURN nm_elements_all%ROWTYPE;
+--</PROC>
+--
+----------------------------------------------------------------------------------
+--
+--<PROC NAME="get_parent_type">
+-- This function returns the nti_nw_parent_type for the given nti_nw_child_type
+--
+FUNCTION get_parent_type(p_nt_type             IN nm_type_inclusion.nti_nw_child_type%TYPE
+                        ,p_linear_only         IN boolean DEFAULT FALSE
+                        ,p_fail_if_many_linear IN boolean DEFAULT FALSE
+                        ) RETURN nm_type_inclusion.nti_nw_parent_type%TYPE;
+--
+-- Errors raised are
+-- -20001 - No NM_TYPE_INCLUSION records found
+--
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="is_gty_reversible">
+-- This functions tests if a network group is reversible
+  FUNCTION is_gty_reversible( p_gty varchar2 ) RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_new_slk">
+-- This returns an SLK value for the member record of a newly created element
+  FUNCTION get_new_slk(p_parent_ne_id IN number
+                      ,p_no_start_new IN number
+                      ,p_no_end_new   IN number
+                      ,p_length       IN number
+                      ,p_sub_class    IN nm_elements.ne_sub_class%TYPE
+                      ,p_datum_ne_id  IN nm_elements.ne_id%TYPE
+                      ) RETURN number;
+--</PROC>
+--
+----------------------------------------------------------------------------------
+--
+--
+--<PROC NAME="create_members">
+-- This creates an nm_members record for each auto included parent type
+--  PROCEDURE create_members (p_ne_id		IN nm_elements.ne_id%TYPE
+--			   ,p_ne_nt_type	IN nm_elements.ne_nt_type%TYPE
+--			   ,p_ne_length		IN nm_elements.ne_length%TYPE
+--			   ,p_ne_admin_unit	IN nm_elements.ne_admin_unit%TYPE
+--			   ,p_ne_start_date	IN date
+--			   ,p_ne_end_date	IN date
+--                           ,p_ne_no_start	IN nm_elements.ne_no_start%TYPE
+--                           ,p_ne_no_end		IN nm_elements.ne_no_end%TYPE
+--                           ,p_ne_sub_class      IN nm_elements.ne_sub_class%TYPE
+--                           );
+--</PROC>
+--
+----------------------------------------------------------------------------------
+--
+--<PROC NAME="is_first_on_route">
+-- This returns TRUE if the given start node is not used as the end node of another element on the given route
+  FUNCTION is_first_on_route(p_route_ne_id IN nm_elements.ne_id%TYPE
+			    ,p_no_start IN nm_elements.ne_no_start%TYPE) RETURN boolean;
+--</PROC>
+--
+----------------------------------------------------------------------------------
+--
+--<PROC NAME="is_last_on_route">
+-- This returns TRUE if the given end node is not used as the start node of another element on the given route
+  FUNCTION is_last_on_route(p_route_ne_id IN nm_elements.ne_id%TYPE
+			   ,p_no_end IN nm_elements.ne_no_end%TYPE) RETURN boolean;
+--</PROC>
+--
+----------------------------------------------------------------------------------
+--
+--<PROC NAME="get_admin_unit">
+-- This gets an admin unit for a given admin unit name and network type.
+PROCEDURE get_admin_unit(pio_admin_unit_name	IN OUT nm_admin_units.nau_name%TYPE
+			,pi_nt_type 		IN     nm_types.nt_type%TYPE
+			,po_admin_unit		   OUT nm_admin_units.nau_admin_unit%TYPE);
+--</PROC>
+--
+----------------------------------------------------------------------------------
+--
+--<PROC NAME="create_node">
+-- This procedure inserts a record into NM_NODES. If pi_no_node_type passed is
+--  NULL it checks in NM_NODE_TYPES. The procedure will raise an exception if
+--  <> 1 nm_node_types record found
+--
+PROCEDURE create_node(pi_no_node_id   IN nm_nodes_all.no_node_id%TYPE
+                     ,pi_np_id        IN nm_points.np_id%TYPE
+                     ,pi_start_date   IN nm_nodes_all.no_start_date%TYPE
+                     ,pi_no_descr     IN nm_nodes_all.no_descr%TYPE      DEFAULT NULL
+                     ,pi_no_node_type IN nm_nodes_all.no_node_type%TYPE  DEFAULT NULL
+                     ,pi_no_node_name IN nm_nodes_all.no_node_name%TYPE DEFAULT NULL
+                     ,pi_no_purpose   in nm_nodes_all.no_purpose%type default null
+                     );
+-- Possible exceptions raised are
+-- -21002, 'No node types found'
+-- -21001, 'No node type supplied'
+--</PROC>
+--
+----------------------------------------------------------------------------------
+--
+--<PROC NAME="get_default_node_name">
+-- This function returns the default node name for a given node_id
+--  by formatting the node_id with the format mask as returned
+--  by get_node_name_format
+--
+FUNCTION get_default_node_name(pi_no_node_id   IN nm_nodes.no_node_id%TYPE
+                              ,pi_no_node_type IN nm_nodes.no_node_type%TYPE
+                              ) RETURN varchar2;
+--</PROC>
+--
+----------------------------------------------------------------------------------
+--
+--<PROC NAME="create_point">
+-- This procedure inserts a record into NM_POINTS
+--
+PROCEDURE create_point(pi_np_id         IN nm_points.np_id%TYPE
+                      ,pi_np_grid_east  IN nm_points.np_grid_east%TYPE
+	              ,pi_np_grid_north IN nm_points.np_grid_north%TYPE
+	              ,pi_np_descr      IN nm_points.np_descr%TYPE DEFAULT NULL
+	              );
+--
+PROCEDURE create_point(pi_rec_np IN nm_points%ROWTYPE);
+--</PROC>
+--
+----------------------------------------------------------------------------------
+--
+--<PROC NAME="member_count">
+-- This function returns the number of members the given element has.
+--
+FUNCTION member_count(pi_ne_id IN nm_members.nm_ne_id_in%TYPE
+                     ) RETURN pls_integer;
+--</PROC>
+--
+----------------------------------------------------------------------------------
+--
+--<PROC NAME="group_datum_count">
+-- This function returns the number of datum sections in the given group.
+--
+FUNCTION group_datum_count(pi_ne_id IN nm_members.nm_ne_id_in%TYPE
+                          ) RETURN pls_integer;
+--</PROC>
+--
+--<PROC NAME="get_type">
+-- This function returns the type of object - either a section, a
+-- whole group, partial group or inventory item
+--
+FUNCTION get_type(pi_ne_id IN nm_elements.ne_id%TYPE
+                 ) RETURN varchar2;
+--</PROC>
+
+--<PROC NAME="is_gty_partial">
+-- This function returns the flag indicating if a group type is partial or not
+--
+FUNCTION is_gty_partial(pi_gty IN nm_group_types.ngt_group_type%TYPE
+                 ) RETURN varchar2;
+--</PROC>
+PRAGMA RESTRICT_REFERENCES( is_gty_partial, wnds, wnps);
+
+--
+FUNCTION is_gty_partial(pi_gty IN nm_group_types.ngt_group_type%TYPE,
+                        pi_exception_flag IN varchar2
+                 ) RETURN varchar2;
+--
+----------------------------------------------------------------------------------
+----------------------------------------------------------------------------------
+--
+--<PROC NAME="get_element_history">
+-- This procedure gets the operation that was performed on an element on a
+-- specific date.
+--
+PROCEDURE get_element_history(pi_ne_id      IN  nm_elements.ne_id%TYPE
+                             ,pi_date       IN  date
+                             ,pi_old_new    IN  varchar2
+                             ,po_operation  OUT nm_element_history.neh_operation%TYPE
+                             ,po_op_meaning OUT hig_codes.hco_meaning%TYPE
+                             );
+--</PROC>
+--
+--<PROC NAME="get_sub_class">
+-- This function returns the sub-class
+FUNCTION get_sub_class( pi_ne_id IN nm_elements_all.ne_id%TYPE
+                      ) RETURN varchar2;
+--</PROC>
+--
+----------------------------------------------------------------------------------
+--
+--<PROC NAME="get_sub_class_seq">
+-- This function returns the sub-class sequence number and is used in ordering
+
+FUNCTION get_sub_class_seq ( pi_gty IN nm_elements_all.ne_gty_group_type%TYPE,
+                             pi_sub_class IN nm_elements_all.ne_sub_class%TYPE
+                           ) RETURN number;
+--</PROC>
+--
+----------------------------------------------------------------------------------
+--
+--<PROC NAME="is_sub_classed_used">
+-- This function returns a flag indicating if the sub-class is appropriate for a particular GTY
+
+FUNCTION is_sub_class_used( pi_gty IN nm_group_types.ngt_group_type%TYPE ) RETURN boolean;
+--</PROC>
+--
+----------------------------------------------------------------------------------
+--
+--<PROC NAME="is_nt_inclusion">
+-- This function returns a flag indicating if the group type is auto included.
+
+FUNCTION is_nt_inclusion( pi_nt IN nm_types.nt_type%TYPE ) RETURN boolean;
+--</PROC>
+--
+----------------------------------------------------------------------------------
+--
+FUNCTION decode_nt_inclusion( pi_nt IN nm_types.nt_type%TYPE ) RETURN number;
+--
+----------------------------------------------------------------------------------
+--
+FUNCTION get_gty_nt ( pi_gty IN nm_group_types.ngt_group_type%TYPE ) RETURN nm_types.nt_type%TYPE;
+--
+----------------------------------------------------------------------------------
+--
+--<PROC NAME="get_parent_route_true">
+-- This function returns the true distance of a section along its parent route
+-- on a given date
+FUNCTION get_parent_route_true(pi_ne_id IN nm_elements.ne_id%TYPE
+                              ,pi_date  IN nm_members_all.nm_start_date%TYPE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
+                              ) RETURN nm_members_all.nm_true%TYPE;
+--</PROC>
+--
+----------------------------------------------------------------------------------
+--
+--<PROC NAME="get_nti">
+-- This procedure returns the specified NM_TYPE_INCLUSION record
+--
+FUNCTION get_nti (pi_nti_nw_parent_type IN nm_type_inclusion.nti_nw_parent_type%TYPE
+                 ,pi_nti_nw_child_type  IN nm_type_inclusion.nti_nw_child_type%TYPE
+                 ) RETURN nm_type_inclusion%ROWTYPE;
+-- The following error may be raised
+--
+-- -20001 NM_TYPE_INCLUSION record not found PARENT:CHILD
+--
+--</PROC>
+--
+----------------------------------------------------------------------------------
+--
+--<PROC NAME="get_nm">
+-- This function selects a NM_MEMBERS record for the given NM_NE_ID_IN, NM_NE_ID_OF, NM_BEGIN_MP
+FUNCTION get_nm (pi_ne_id_in IN nm_members.nm_ne_id_in%TYPE
+                ,pi_ne_id_of IN nm_members.nm_ne_id_of%TYPE
+                ,pi_begin_mp IN nm_members.nm_begin_mp%TYPE
+                ) RETURN nm_members%ROWTYPE;
+--</PROC>
+--
+----------------------------------------------------------------------------------
+--
+--<PROC NAME="route_has_true">
+-- This function returns true if all members of the route have a non-NULL true distance
+FUNCTION route_has_true(pi_route IN nm_elements.ne_id%TYPE
+                       ) RETURN boolean;
+--</PROC>
+--
+----------------------------------------------------------------------------------
+--
+--<PROC NAME="get_min_slk">
+-- This function returns the minimum slk on a route
+FUNCTION get_min_slk(pi_ne_id IN nm_elements.ne_id%TYPE
+                    ) RETURN nm_members.nm_slk%TYPE;
+--</PROC>
+--
+----------------------------------------------------------------------------------
+
+----------------------------------------------------------------------------------
+--
+--<PROC NAME="is_pop_unique">
+-- This function returns a Boolean to indicate if the supplied NW type has an automated unique key
+FUNCTION is_pop_unique( pi_nt IN nm_types.nt_type%TYPE ) RETURN boolean;
+--</PROC>
+----------------------------------------------------------------------------------
+--
+--<PROC NAME="is_node_poe">
+-- Returns a boolean to say if there is a POE at the node on the route
+FUNCTION is_node_poe( pi_route_id nm_elements.ne_id%TYPE
+                     ,pi_node_id nm_elements.ne_no_start%TYPE
+                    ) RETURN boolean;
+  PRAGMA RESTRICT_REFERENCES( is_node_poe, wnds );
+FUNCTION is_node_poe (p_route_ne_id IN number
+                     ,p_ne_id_1     IN number
+                     ,p_ne_id_2     IN number
+                     ) RETURN boolean;
+--</PROC>
+--
+----------------------------------------------------------------------------------
+--
+--<PROC NAME="get_point_node_type">
+-- Returns the type of the node for a point item location. If node is both start
+-- and end on route then 'S' will be returned.
+FUNCTION get_point_node_type(pi_route   IN nm_elements.ne_id%TYPE
+                            ,pi_node_id IN nm_nodes.no_node_id%TYPE
+                            ) RETURN nm_node_usages.nnu_node_type%TYPE;
+--</PROC>
+--
+----------------------------------------------------------------------------------
+--
+--<PROC NAME="get_no">
+-- Returns the nm_nodes_all record for pi_node_id
+FUNCTION get_no(pi_node_id IN nm_nodes.no_node_id%TYPE
+               ) RETURN nm_nodes%ROWTYPE;
+--</PROC>
+--
+----------------------------------------------------------------------------------
+--
+--<PROC NAME="get_no">
+-- Returns the nm_nodes_all record for pi_node_id
+FUNCTION nt_valid_in_group(pi_nt_type IN nm_nt_groupings.nng_nt_type%TYPE
+                          ,pi_gty     IN nm_nt_groupings.nng_group_type%TYPE
+                          )RETURN boolean;
+--</PROC>
+--
+----------------------------------------------------------------------------------
+--
+--<PROC NAME="is_nt_inclusion_child">
+--
+FUNCTION is_nt_inclusion_child( pi_nt IN nm_types.nt_type%TYPE ) RETURN boolean;
+--</PROC>
+--
+----------------------------------------------------------------------------------
+--
+--<PROC NAME="datum_will_overlap_existing">
+-- Checks if there are already datums between the nodes on the route.
+FUNCTION datum_will_overlap_existing(pi_route          IN nm_elements.ne_id%TYPE
+                                    ,pi_new_start_node IN nm_nodes.no_node_id%TYPE
+                                    ,pi_new_end_node   IN nm_nodes.no_node_id%TYPE
+                                    ) RETURN boolean;
+--</PROC>
+--
+----------------------------------------------------------------------------------
+--
+--<PROC NAME="get_type_sign">
+-- Returns a number representation of the node type
+FUNCTION get_type_sign(pi_type IN nm_node_usages.nnu_node_type%TYPE
+                      ) RETURN number;
+--</PROC>
+--
+----------------------------------------------------------------------------------
+--
+--<PROC NAME="element_has_children">
+-- Returns TRUE if pi_ne_id is a parent member
+FUNCTION element_has_children(pi_ne_id nm_elements.ne_id%TYPE
+                             ) RETURN boolean;
+--</PROC>
+--
+----------------------------------------------------------------------------------
+--
+--<PROC NAME="element_has_parents">
+-- Returns TRUE if pi_ne_id is a child member (excluding inv locations)
+FUNCTION element_has_parents(pi_ne_id nm_elements.ne_id%TYPE
+                            ) RETURN boolean;
+--</PROC>
+--
+----------------------------------------------------------------------------------
+--
+--<PROC NAME="get_route_and_direction">
+-- This procedure gets details of the given route. This may include the direction
+-- which can be stored in nm_elements.ne_sub_type and is returned if the system
+-- option SHOWRTEDIR is set to Y.
+--
+PROCEDURE get_route_and_direction(pi_datum_id     IN     nm_elements.ne_id%TYPE
+                                 ,po_route_id        OUT nm_elements.ne_id%TYPE
+                                 ,po_route_unique    OUT nm_elements.ne_unique%TYPE
+                                 ,po_route_offset    OUT nm_members.nm_slk%TYPE
+                                 ,po_direction       OUT nm_elements.ne_sub_type%TYPE
+                                 ,po_dir_text        OUT hig_codes.hco_meaning%TYPE
+                                 );
+--</PROC>
+--
+----------------------------------------------------------------------------------
+--
+--<PROC NAME="pop_inclusion_columns">
+-- This function returns an nm_elements record with any inclusion columns
+-- populated with the parent's data.
+--
+FUNCTION pop_inclusion_columns(pi_parent_ne_id IN     nm_elements.ne_id%TYPE
+                               ,pi_child_type  IN     nm_types.nt_type%TYPE
+                               ) RETURN nm_elements%ROWTYPE;
+--</PROC>
+--
+----------------------------------------------------------------------------------
+--
+--<PROC NAME="get_ne_type">
+--  Returns the ne_type of the supplied element.
+--
+FUNCTION get_ne_type(pi_ne_id nm_elements.ne_id%TYPE
+                    ) RETURN nm_elements.ne_type%TYPE;
+--</PROC>
+--
+----------------------------------------------------------------------------------
+--
+--<PROC NAME="get_single_node_true">
+-- A node may have multiple true distances on a route, this function returns a
+-- single value.
+--
+FUNCTION get_single_node_true(pi_route IN nm_elements.ne_id%TYPE
+                             ,pi_node  IN nm_nodes.no_node_id%TYPE
+                             ) RETURN nm_members.nm_true%TYPE;
+--</PROC>
+--
+----------------------------------------------------------------------------------
+--
+--<PROC NAME="get_gty_by_nt_type">
+FUNCTION get_gty_by_nt_type (p_nt_type nm_group_types.ngt_nt_type%TYPE
+                            ) RETURN nm3type.tab_rec_ngt;
+--</PROC>
+--
+----------------------------------------------------------------------------------
+--
+--<PROC NAME="column_is_autocreate_child_col">
+-- This function returns the BOOLEAN TRUE if the passes nm_type_column is a child autocreate
+--  column on the specified NW type, otherwise FALSE
+--
+FUNCTION column_is_autocreate_child_col (p_child_nt_type nm_type_inclusion.nti_nw_child_type%TYPE
+                                        ,p_child_column  nm_type_inclusion.nti_child_column%TYPE
+                                        ) RETURN boolean;
+--</PROC>
+--
+----------------------------------------------------------------------------------
+--
+--<PROC NAME="is_column_autocreate_child_col">
+-- This function returns the VARCHAR "TRUE" if the passes nm_type_column is a child autocreate
+--  column on the specified NW type, orhserwise "FALSE"
+--
+FUNCTION is_column_autocreate_child_col (p_child_nt_type nm_type_inclusion.nti_nw_child_type%TYPE
+                                        ,p_child_column  nm_type_inclusion.nti_child_column%TYPE
+                                        ) RETURN varchar2;
+--</PROC>
+--
+----------------------------------------------------------------------------------
+--
+--<PROC NAME="get_element_cardinality">
+FUNCTION get_element_cardinality (p_route_ne_id       number
+                                 ,p_datum_ne_id       number
+                                 ) RETURN number;
+--
+----------------------------------------------------------------------------------
+--
+--<PROC NAME="subclass_is_used">
+FUNCTION subclass_is_used (pi_ne_id nm_elements.ne_id%TYPE) RETURN boolean;
+--</PROC>
+--
+----------------------------------------------------------------------------------
+--
+--<PROC NAME="get_end_slk">
+FUNCTION get_end_slk (p_ne_id     IN number
+                     ,p_start_slk IN number
+                     ,p_length    IN number
+                     ) RETURN number;
+--</PROC>
+--
+----------------------------------------------------------------------------------
+--
+--<PROC NAME="get_single_ne_id">
+-- This function returns the NE_ID of the element
+--  which is represented of the NT TYPE p_nt_type where p_column = p_col_value
+--
+FUNCTION get_single_ne_id (p_nt_type   IN nm_elements.ne_nt_type%TYPE
+                          ,p_column    IN varchar2
+                          ,p_col_value IN varchar2
+                          ) RETURN nm_elements.ne_id%TYPE;
+--
+-- Possible errors raised are -
+-- -20001 HIG-0067
+-- -20002 HIG-0105
+--</PROC>
+--
+----------------------------------------------------------------------------------
+--
+--<PROC NAME="is_node_valid_on_nt_type">
+-- This Function returns TRUE if the passed node is valid on the passed NT_TYPE
+--  otherwise FALSE
+-- If called with a NULL node_id then the function will always return TRUE
+--
+FUNCTION is_node_valid_on_nt_type (pi_node_id nm_nodes.no_node_id%TYPE
+                                  ,pi_nt_type nm_types.nt_type%TYPE
+                                  ) RETURN boolean;
+--</PROC>
+--
+----------------------------------------------------------------------------------
+--
+--<PROC NAME="get_sub_type">
+--
+FUNCTION get_sub_type (pi_obj_type IN nm_group_types.ngt_group_type%TYPE
+                      ) RETURN nm_types.nt_type%TYPE;
+--</PROC>
+--
+----------------------------------------------------------------------------------
+--
+--<PROC NAME="get_nt_units_from_ne">
+-- For a given NE_ID return the length units for it's associated NT_TYPE
+--
+FUNCTION get_nt_units_from_ne (p_ne_id nm_elements.ne_id%TYPE) RETURN nm_types.nt_length_unit%TYPE;
+--</PROC>
+--
+----------------------------------------------------------------------------------
+--
+--<PROC NAME="child_autoincluded_in_parent">
+-- For given parent and child network types determine whether their is autoinclusion
+-- between these 
+--
+FUNCTION child_autoincluded_in_parent(pi_nti_nw_parent_type   IN nm_type_inclusion.nti_nw_parent_type%TYPE
+                                     ,pi_nti_nw_child_type    IN nm_type_inclusion.nti_nw_child_type%TYPE
+                                     ) RETURN varchar2;
+--</PROC>
+--
+----------------------------------------------------------------------------------
+--
+--<PROC NAME="inclusion_in_use">
+--
+-- Returns TRUE if inclusion is in use in this Highways database.
+--
+FUNCTION inclusion_in_use RETURN boolean;
+--</PROC>
+--
+----------------------------------------------------------------------------------
+--
+--<PROC NAME="get_point_for_coords">
+-- Returns rowtype of NM_POINTS if there is a point with easting/northing that matches params
+--
+FUNCTION get_point_for_coords (pi_np_grid_east   IN nm_points.np_grid_east%TYPE
+                              ,pi_np_grid_north  IN nm_points.np_grid_north%TYPE
+                              ) RETURN nm_points%ROWTYPE;
+--</PROC>
+--
+----------------------------------------------------------------------------------
+--
+--<PROC NAME="get_node_at_point">
+-- Returns rowtype of NM_NODES if there is a node of a given type
+-- at a given point id on a given date.  There could be more than 1 - this function return the first
+--
+FUNCTION get_node_at_point (
+                            pi_no_np_id     IN nm_nodes.no_np_id%TYPE
+                           ,pi_no_node_type IN nm_nodes.no_node_type%TYPE
+						   ,pi_as_at_date   IN DATE DEFAULT NULL
+						   ) RETURN nm_nodes%ROWTYPE;
+--</PROC>
+--
+----------------------------------------------------------------------------------
+----------------------------------------------------------------------------------
+--
+--<PROC NAME="create_or_reuse_point_and_node">
+-- Written primarily for use by translation view SWR_STREETS_ALL but could
+-- be used wherever.
+-- Function will look for a point at grid position - if not exists creates one
+-- Then goes on and sees if node of given type is at this point - if not creates one
+--
+PROCEDURE create_or_reuse_point_and_node(
+                                         pi_np_grid_east     IN      nm_points.np_grid_east%TYPE
+                                        ,pi_np_grid_north    IN      nm_points.np_grid_north%TYPE
+										,pi_no_start_date    IN      nm_nodes.no_start_date%TYPE     DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
+										,pi_no_node_type     IN      nm_nodes.no_node_type%TYPE
+										,pi_node_descr       IN      nm_nodes.no_descr%TYPE          DEFAULT 'Auto-created'
+										,po_no_node_id       IN OUT  nm_nodes.no_node_id%TYPE
+										,po_np_id            IN OUT  nm_points.np_id%TYPE
+										);
+--</PROC>
+--
+----------------------------------------------------------------------------------
+--
+--<PROC NAME="get_min_element_length_allowed">
+-- for a network type return the min permitted length of an element of that type
+-- 
+FUNCTION get_min_element_length_allowed(pi_nt_type IN nm_types.nt_type%TYPE) RETURN NUMBER;
+--</PROC>
+--
+----------------------------------------------------------------------------------
+--<PROC NAME="element_is_a_datum">
+-- more efficient if you call with pi_ne_type set, otherwise you have to hit
+-- nm_elements_to get the type
+FUNCTION element_is_a_datum(pi_ne_type   IN     nm_elements.ne_type%TYPE) RETURN BOOLEAN;
+FUNCTION element_is_a_datum(pi_ne_id     IN     nm_elements.ne_id%TYPE) RETURN BOOLEAN;
+--</PROC>
+--
+----------------------------------------------------------------------------------
+--<PROC NAME="element_is_a_group">
+FUNCTION element_is_a_group(pi_ne_type   IN     nm_elements.ne_type%TYPE) RETURN BOOLEAN;
+FUNCTION element_is_a_group(pi_ne_id     IN     nm_elements.ne_id%TYPE) RETURN BOOLEAN;
+--</PROC>
+--
+----------------------------------------------------------------------------------
+--<PROC NAME="element_is_a_group_of_groups">
+FUNCTION element_is_a_group_of_groups(pi_ne_type   IN     nm_elements.ne_type%TYPE) RETURN BOOLEAN;
+FUNCTION element_is_a_group_of_groups(pi_ne_id     IN     nm_elements.ne_id%TYPE) RETURN BOOLEAN;
+--</PROC>
+--
+----------------------------------------------------------------------------------
+--<PROC NAME="element_is_a_distance_break">
+FUNCTION element_is_a_distance_break(pi_ne_type   IN     nm_elements.ne_type%TYPE) RETURN BOOLEAN;
+FUNCTION element_is_a_distance_break(pi_ne_id     IN     nm_elements.ne_id%TYPE) RETURN BOOLEAN;
+--</PROC>
+--
+----------------------------------------------------------------------------------
+--<PROC NAME="ne_unique_could_be_derived">
+-- look at network type columns are ascertain whether or not ne_unique can be automatically derived
+--
+FUNCTION ne_unique_could_be_derived(pi_nt_type IN nm_types.nt_type%TYPE) RETURN BOOLEAN;
+--
+--</PROC>
+----------------------------------------------------------------------------------
+--<PROC NAME="get_latest_member_date">
+-- get latest date of a membership change that would effect a given element
+FUNCTION get_latest_member_date(pi_ne_id IN nm_elements.ne_id%TYPE) RETURN DATE;
+--
+--</PROC>
+--
+----------------------------------------------------------------------------------
+--<PROC NAME="element_has_future_dated_membs">
+-- return TRUE if there are membership changes effecting the element
+-- after the specified date
+--
+FUNCTION element_has_future_dated_membs (pi_ne_id          IN nm_elements.ne_id%TYPE
+                                        ,pi_effective_date IN DATE) RETURN BOOLEAN;
+--
+--</PROC>
+--
+----------------------------------------------------------------------------------
+--<PROC NAME="get_flex_cols">
+-- return pl/sql table of the flex columns on nm_elements
+--
+FUNCTION get_flex_cols RETURN nm3type.tab_varchar80;
+--
+--</PROC>
+--
+----------------------------------------------------------------------------------
+--<PROC NAME="get_non_flex_cols">
+-- return pl/sql table of the NON-flex columns on nm_elements
+--
+FUNCTION get_non_flex_cols RETURN nm3type.tab_varchar80;
+--
+--</PROC>
+--
+----------------------------------------------------------------------------------
+--<PROC NAME="is_a_flex_col">
+-- return Y/N depending on whether col is a flex col on nm_elements
+--
+FUNCTION is_a_flex_col(pi_column_name IN all_tab_columns.column_name%TYPE) RETURN VARCHAR2;
+--
+--</PROC>
+--
+----------------------------------------------------------------------------------
+--<PROC NAME="is_not_a_flex_col">
+-- return Y/N depending on whether col is a NON-flex col on nm_elements
+--
+--
+FUNCTION is_not_a_flex_col(pi_column_name IN all_tab_columns.column_name%TYPE) RETURN VARCHAR2;
+--
+--</PROC>
+--
+----------------------------------------------------------------------------------
+--<PROC NAME="are_elements_identical">
+-- return true/false depending on whether 2 elements are identical
+FUNCTION are_elements_identical (p_old_rec nm_elements%ROWTYPE
+                                ,p_new_rec nm_elements%ROWTYPE
+                                ) RETURN BOOLEAN;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="process_table_nt">
+-- cascade deletions from the nm_types table to nm_linear_types
+PROCEDURE process_table_nt;
+--</PROC>
+--
+----------------------------------------------------------------------------------
+--
+--<PROC NAME="module_can_process_nt">
+-- check NM_TYPE_SPECIFIC_MODULES and if there are NO entries for NT 
+-- or there is an entry for the NT against the module then ok
+-- otherwise return FALSE
+FUNCTION module_can_process_nt(pi_ntsm_hmo_module IN nm_type_specific_modules.ntsm_hmo_module%TYPE
+                              ,pi_ntsm_nt_type    IN nm_type_specific_modules.ntsm_nt_type%TYPE) RETURN BOOLEAN;
+--</PROC>
+--
+----------------------------------------------------------------------------------
+--
+--<PROC NAME="get_id_and_type_from_unique">
+-- procedure to support the gaz query network selection widget (initially
+-- only on forms module NM0575 - but could be plugged into the other forms
+-- to enable a network extent to be entered in the 'UNIQUE' field without
+-- having to go thru the gazetteer from
+--
+-- given a unique that could be either that of an element or a saved extent
+-- this procedure will check both data sets and return a match
+PROCEDURE get_id_and_type_from_unique(pi_unique    IN VARCHAR2
+                                     ,po_id        OUT NUMBER
+                                     ,po_type      OUT VARCHAR2);
+--</PROC>
+--
+----------------------------------------------------------------------------------
+--
+--<PROC NAME="bypass_nm_members_trgs">
+-- MJA add 31-Aug-07
+-- Speaks for itself.  If true then bypass triggers.
+-- To be called in NM_MEMBERS_SDO_TRG, NM_MEMBERS_B_IU_END_SLK_TRG,
+--   NM_MEMBERS_ALL_EXCL_B_STM, NM_MEMBERS_ALL_EXCL_B_ROW, NM_MEMBERS_ALL_EXCL_A_STM
+--   NM_MEMBERS_ALL_AU_INSERT_CHECK triggers to see if bypass required
+FUNCTION bypass_nm_members_trgs RETURN BOOLEAN;
+--</PROC>
+--
+----------------------------------------------------------------------------------
+--
+--<PROC NAME="bypass_nm_elements_trgs">
+-- MJA add 31-Aug-07
+-- Speaks for itself.  If true then bypass triggers.
+-- To be called in NM_ELEMENTS_ALL_AU_CHECK, NM_ELEMENTS_ALL_DT_TRG, NM_ELEMENTS_ALL_WHO,
+--   NM_ELEMENTS_ALL_BS_NSG_VAL, NM_ELEMENTS_ALL_BR_NSG_VAL, NM_ELEMENTS_ALL_AS_NSG_VAL
+--   triggers to see if bypass required
+FUNCTION bypass_nm_elements_trgs RETURN BOOLEAN;
+--</PROC>
+--
+----------------------------------------------------------------------------------
+--
+--<PROC NAME="bypass_nm_points_trgs">
+-- MJA add 31-Aug-07
+-- Speaks for itself.  If true then bypass triggers.
+-- To be called in NM_POINTS_SDO, NM_POINTS_SDO_ROW triggers to see if bypass required
+FUNCTION bypass_nm_points_trgs RETURN BOOLEAN;
+--</PROC>
+--
+----------------------------------------------------------------------------------
+--
+--<PROC NAME="bypass_nm_members_trgs">
+-- MJA add 31-Aug-07
+-- Sets global g_bypass_nm_members_trgs true or false.
+PROCEDURE bypass_nm_members_trgs ( pi_mode IN BOOLEAN );
+--</PROC>
+--
+----------------------------------------------------------------------------------
+--
+--<PROC NAME="bypass_nm_elements_trgs">
+-- MJA add 31-Aug-07
+-- Sets global g_bypass_nm_elements_trgs true or false.
+PROCEDURE bypass_nm_elements_trgs ( pi_mode IN BOOLEAN );
+--</PROC>
+--
+----------------------------------------------------------------------------------
+--
+--<PROC NAME="bypass_nm_points_trgs">
+-- MJA add 31-Aug-07
+-- Sets global g_bypass_nm_points_trgs true or false.
+PROCEDURE bypass_nm_points_trgs ( pi_mode IN BOOLEAN );
+--</PROC>
+--
+----------------------------------------------------------------------------------
+--
+--<PROC NAME="get_id_and_unique_node_name">
+PROCEDURE get_id_and_unique_node_name(pi_no_node_type     IN      nm_nodes.no_node_type%TYPE
+                                     ,po_no_node_id       IN OUT  nm_nodes.no_node_id%TYPE
+                                     ,po_no_node_name     IN OUT  nm_nodes.no_node_name%TYPE);
+--</PROC>                                     
+--
+----------------------------------------------------------------------------------
+--
+--all pragma definitions here
+--<PRAGMA>
+  PRAGMA RESTRICT_REFERENCES( get_version, wnds, wnps );
+  PRAGMA RESTRICT_REFERENCES( get_body_version, wnds, wnps );
+  PRAGMA RESTRICT_REFERENCES( get_next_ne_id, wnds, wnps );
+  PRAGMA RESTRICT_REFERENCES( get_ne_length, wnds, wnps );
+  PRAGMA RESTRICT_REFERENCES( get_datum_element_length, wnds, wnps );
+  PRAGMA RESTRICT_REFERENCES( get_start_node, wnds, wnps );
+  PRAGMA RESTRICT_REFERENCES( get_end_node, wnds, wnps );
+  PRAGMA RESTRICT_REFERENCES( get_ne_id, wnds, wnps );
+  PRAGMA RESTRICT_REFERENCES( get_ne, wnds, wnps );
+  PRAGMA RESTRICT_REFERENCES( get_ne_unique, wnds, wnps );
+  PRAGMA RESTRICT_REFERENCES( get_ne_descr,  wnds, wnps );
+  PRAGMA RESTRICT_REFERENCES( get_ne_gty,  wnds, wnps );
+  PRAGMA RESTRICT_REFERENCES( get_nt, wnds, wnps );
+  PRAGMA RESTRICT_REFERENCES( get_nt_units, wnds, wnps );
+  PRAGMA RESTRICT_REFERENCES( get_nt_descr, wnds, wnps );
+  PRAGMA RESTRICT_REFERENCES( get_nsc_descr, wnds, wnps );
+  PRAGMA RESTRICT_REFERENCES( get_nsc_seq_no, wnds, wnps );
+  PRAGMA RESTRICT_REFERENCES( get_xsp_descr, wnds, wnps );
+  PRAGMA RESTRICT_REFERENCES( get_gty, wnds, wnps );
+  PRAGMA RESTRICT_REFERENCES( get_gty_units, wnds, wnps );
+  PRAGMA RESTRICT_REFERENCES( get_gty_sub_group_allowed, wnds, wnps);
+  PRAGMA RESTRICT_REFERENCES( get_gty_icon, wnds, wnps);
+  PRAGMA RESTRICT_REFERENCES( get_nt_type, wnds, wnps );
+  PRAGMA RESTRICT_REFERENCES( get_gty_type, wnds, wnps );
+  PRAGMA RESTRICT_REFERENCES( is_nt_datum, wnds, wnps );
+  PRAGMA RESTRICT_REFERENCES( get_datum_nt, wnds, wnps );
+  PRAGMA RESTRICT_REFERENCES( get_node_name, wnds, wnps );
+  PRAGMA RESTRICT_REFERENCES( get_node_id, wnds, wnps );
+  PRAGMA RESTRICT_REFERENCES( get_ne_column_value, wnds, wnps );
+  PRAGMA RESTRICT_REFERENCES( check_element_connectivity, wnps, wnds );
+  PRAGMA RESTRICT_REFERENCES( get_element_shared_node, wnps, wnds );
+  PRAGMA RESTRICT_REFERENCES( get_node_type, wnds, wnps );
+  PRAGMA RESTRICT_REFERENCES( get_group_units, wnds, wnps );
+  PRAGMA RESTRICT_REFERENCES( get_group_exclusive_flag, wnds, wnps );
+  PRAGMA RESTRICT_REFERENCES( route_direction, wnds, wnps );
+  PRAGMA RESTRICT_REFERENCES( node_in_use, wnps, wnds);
+  PRAGMA RESTRICT_REFERENCES( get_admin_unit_name, wnds, wnps);
+  PRAGMA RESTRICT_REFERENCES( get_cardinality, wnds, wnps);
+  PRAGMA RESTRICT_REFERENCES( get_ne_all_rowtype, wnds, wnps);
+  PRAGMA RESTRICT_REFERENCES( get_parent_type, wnds, wnps);
+  PRAGMA RESTRICT_REFERENCES( is_gty_reversible, wnds, wnps );
+  PRAGMA RESTRICT_REFERENCES( gty_is_partial, wnds, wnps );
+  PRAGMA RESTRICT_REFERENCES( is_first_on_route, wnds, wnps, trust );
+  PRAGMA RESTRICT_REFERENCES( is_last_on_route, wnds, wnps, trust );
+  PRAGMA RESTRICT_REFERENCES( get_node_name_format, wnds, wnps );
+  PRAGMA RESTRICT_REFERENCES( get_default_node_name, wnds, wnps );
+  PRAGMA RESTRICT_REFERENCES( get_nau, wnds, wnps );
+  PRAGMA RESTRICT_REFERENCES( member_count, wnds, wnps);
+  PRAGMA RESTRICT_REFERENCES( group_datum_count, wnds, wnps);
+  PRAGMA RESTRICT_REFERENCES( get_type, wnds, wnps);
+  PRAGMA RESTRICT_REFERENCES( is_gty_partial, wnds, wnps);
+  PRAGMA RESTRICT_REFERENCES( get_parent_ne_id, wnds,wnps);
+  PRAGMA RESTRICT_REFERENCES( get_parent_route_true, wnds,wnps);
+  PRAGMA RESTRICT_REFERENCES( get_nti, wnds,wnps);
+  PRAGMA RESTRICT_REFERENCES( get_nm, wnds,wnps);
+  PRAGMA RESTRICT_REFERENCES( route_has_true, wnds, wnps);
+  PRAGMA RESTRICT_REFERENCES( get_min_slk, wnds, wnps);
+  PRAGMA RESTRICT_REFERENCES( is_node_poe, wnds );
+  PRAGMA RESTRICT_REFERENCES( get_no, wnds, wnps);
+  PRAGMA RESTRICT_REFERENCES( get_point_node_type, wnds, wnps);
+  PRAGMA RESTRICT_REFERENCES( nt_valid_in_group, wnds, wnps);
+  PRAGMA RESTRICT_REFERENCES( get_max_slk, wnds, wnps);
+  PRAGMA RESTRICT_REFERENCES( get_max_true, wnds, wnps);
+  PRAGMA RESTRICT_REFERENCES( is_nt_inclusion_child, wnds, wnps);
+  PRAGMA RESTRICT_REFERENCES( get_type_sign, wnds, wnps);
+  PRAGMA RESTRICT_REFERENCES( element_has_children, wnds, wnps);
+  PRAGMA RESTRICT_REFERENCES( element_has_parents, wnds, wnps);
+  PRAGMA RESTRICT_REFERENCES( get_ne_type, wnds, wnps);
+  PRAGMA RESTRICT_REFERENCES( get_single_node_true, wnds, wnps);
+  PRAGMA RESTRICT_REFERENCES( subclass_is_used, wnds, wnps);
+  PRAGMA RESTRICT_REFERENCES( get_sub_class, wnds, wnps);
+  PRAGMA RESTRICT_REFERENCES( get_nt_units_from_ne, wnds, wnps);
+  PRAGMA RESTRICT_REFERENCES( child_autoincluded_in_parent, wnds, wnps);
+  PRAGMA RESTRICT_REFERENCES( inclusion_in_use, wnds, wnps);
+--</PRAGMA>
+
+END nm3net;
+/
