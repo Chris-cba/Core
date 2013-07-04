@@ -3,11 +3,11 @@ create or replace package nm3load as
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3load.pkh-arc   2.2   Jan 06 2010 16:38:38   cstrettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3load.pkh-arc   2.3   Jul 04 2013 16:11:52   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3load.pkh  $
---       Date into PVCS   : $Date:   Jan 06 2010 16:38:38  $
---       Date fetched Out : $Modtime:   Jan 05 2010 11:47:44  $
---       Version          : $Revision:   2.2  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:11:52  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:14  $
+--       Version          : $Revision:   2.3  $
 --       Based on SCCS version : 1.9
 -------------------------------------------------------------------------
 --   Author : Jonathan Mills
@@ -15,11 +15,11 @@ create or replace package nm3load as
 --   NM3 Generic Loader package
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2002
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
-  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.2  $';
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.3  $';
 --  g_sccsid is the SCCS ID for the package
 --
    g_batch_no     NUMBER;

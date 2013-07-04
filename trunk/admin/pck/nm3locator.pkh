@@ -16,7 +16,7 @@ CREATE OR REPLACE PACKAGE nm3locator AS
 --    Relying heavily on the functionality developed in nm3gaz_qry
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2004
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>

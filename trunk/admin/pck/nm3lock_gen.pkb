@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3lock_gen IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3lock_gen.pkb-arc   2.20   Sep 12 2011 12:34:44   Mike.Alexander  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3lock_gen.pkb-arc   2.21   Jul 04 2013 16:11:52   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3lock_gen.pkb  $
---       Date into PVCS   : $Date:   Sep 12 2011 12:34:44  $
---       Date fetched Out : $Modtime:   Sep 12 2011 11:25:58  $
---       PVCS Version     : $Revision:   2.20  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:11:52  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:16  $
+--       PVCS Version     : $Revision:   2.21  $
 --
 --
 --   Author : Jonathan Mills
@@ -16,15 +16,15 @@ CREATE OR REPLACE PACKAGE BODY nm3lock_gen IS
 --   Generated package DO NOT MODIFY
 --
 --   nm3get_gen header : "@(#)nm3get_gen.pkh	1.3 12/05/05"
---   nm3get_gen body   : "$Revision:   2.20  $"
+--   nm3get_gen body   : "$Revision:   2.21  $"
 --
 -----------------------------------------------------------------------------
 --
---	Copyright (c) exor corporation ltd, 2005
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 --
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid CONSTANT  VARCHAR2(2000) := '"$Revision:   2.20  $"';
+   g_body_sccsid CONSTANT  VARCHAR2(2000) := '"$Revision:   2.21  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3lock_gen';

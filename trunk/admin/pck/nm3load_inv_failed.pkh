@@ -4,11 +4,11 @@ CREATE OR REPLACE package NM3LOAD_INV_FAILED as
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3load_inv_failed.pkh-arc   2.1   Jan 06 2010 16:38:36   cstrettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3load_inv_failed.pkh-arc   2.2   Jul 04 2013 16:11:52   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3load_inv_failed.pkh  $
---       Date into PVCS   : $Date:   Jan 06 2010 16:38:36  $
---       Date fetched Out : $Modtime:   Jan 05 2010 11:47:30  $
---       Version          : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:11:52  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:14  $
+--       Version          : $Revision:   2.2  $
 --       Based on SCCS version : 1.5
 -------------------------------------------------------------------------
 --   Author : Graeme Johnson
@@ -16,7 +16,7 @@ CREATE OR REPLACE package NM3LOAD_INV_FAILED as
 --    NM3LOAD_INV_FAILED
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2002
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
@@ -25,7 +25,7 @@ CREATE OR REPLACE package NM3LOAD_INV_FAILED as
   --constants
   -----------
   --g_sccsid is the SCCS ID for the package
-  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.1  $';
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.2  $';
 --
 -- TYPES
   TYPE attrib_rec IS RECORD (attrib_name nm_inv_type_attribs.ita_attrib_name%TYPE
