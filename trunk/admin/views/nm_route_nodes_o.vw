@@ -20,7 +20,7 @@ SELECT
 --   See also: nm_route_nodes which is a view on top of this view that will 'flatten out' the structure
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2004
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
        ne_unique                                        ne_unique

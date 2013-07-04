@@ -18,7 +18,7 @@ SELECT
 --   Under no circumstances should the view be used without a driving route ne_id 
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2004
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
           nrno.node_class.nc_route_id          route_id,

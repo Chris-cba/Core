@@ -14,11 +14,11 @@ SELECT
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/nm_reserve_words_vw.vw-arc   3.2   Feb 16 2010 11:51:38   cstrettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/nm_reserve_words_vw.vw-arc   3.3   Jul 04 2013 11:20:34   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm_reserve_words_vw.vw  $
---       Date into PVCS   : $Date:   Feb 16 2010 11:51:38  $
---       Date fetched Out : $Modtime:   Feb 15 2010 11:44:40  $
---       Version          : $Revision:   3.2  $
+--       Date into PVCS   : $Date:   Jul 04 2013 11:20:34  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 10:33:42  $
+--       Version          : $Revision:   3.3  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --

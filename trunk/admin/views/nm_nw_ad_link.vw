@@ -13,15 +13,15 @@ AS
    SELECT
 --   PVCS Identifiers :-
 --
---       pvcsid                 : $Header:   //vm_latest/archives/nm3/admin/views/nm_nw_ad_link.vw-arc   2.3   May 17 2011 08:32:44   Steve.Cooper  $
+--       pvcsid                 : $Header:   //vm_latest/archives/nm3/admin/views/nm_nw_ad_link.vw-arc   2.4   Jul 04 2013 11:20:34   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm_nw_ad_link.vw  $
---       Date into PVCS   : $Date:   May 17 2011 08:32:44  $
---       Date fetched Out : $Modtime:   Mar 31 2011 11:49:08  $
---       PVCS Version     : $Revision:   2.3  $
+--       Date into PVCS   : $Date:   Jul 04 2013 11:20:34  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 10:33:42  $
+--       PVCS Version     : $Revision:   2.4  $
 --       Based on SCCS version : 1.6
 --
 -----------------------------------------------------------------------------
--- Copyright (c) exor corporation ltd, 2004
+-- Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
           "NAD_ID", "NAD_IIT_NE_ID", "NAD_NE_ID", "NAD_START_DATE",

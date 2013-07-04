@@ -1,3 +1,16 @@
+--
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/nm_mrg_query_results.vw-arc   2.2   Jul 04 2013 11:20:34   James.Wadsworth  $
+--       Module Name      : $Workfile:   nm_mrg_query_results.vw  $
+--       Date into PVCS   : $Date:   Jul 04 2013 11:20:34  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 10:45:46  $
+--       Version          : $Revision:   2.2  $
+--
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
 DECLARE
    l_view VARCHAR2(32767);
 --
@@ -33,7 +46,7 @@ BEGIN
    append ('--       SCCS Version     : 1.1');
    append ('--');
    append ('-----------------------------------------------------------------------------');
-   append ('--	Copyright (c) exor corporation ltd, 2001');
+   append ('--	Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.');
    append ('-----------------------------------------------------------------------------');
    append ('--');
    append ('        *');
