@@ -1,0 +1,60 @@
+CREATE OR REPLACE PACKAGE nm3nw_edit
+AS
+	--<PACKAGE>
+	-------------------------------------------------------------------------
+	--	 PVCS Identifiers :-
+	--
+	--			 PVCS id					: $Header:   //vm_latest/archives/nm3/admin/pck/nm3nw_edit.pkh-arc   3.1   Jul 04 2013 16:21:08   James.Wadsworth  $
+	--			 Module Name			: $Workfile:   nm3nw_edit.pkh  $
+	--			 Date into PVCS 	: $Date:   Jul 04 2013 16:21:08  $
+	--			 Date fetched Out : $Modtime:   Jul 04 2013 14:25:18  $
+	--			 Version					: $Revision:   3.1  $
+	-------------------------------------------------------------------------
+	--</PACKAGE>
+	--<GLOBVAR>
+
+	-----------
+	--constants
+	-----------
+	--g_sccsid is the SCCS ID for the package
+	g_sccsid	CONSTANT VARCHAR2(2000) := '$Revision:   3.1  $';
+
+	--</GLOBVAR>
+	--
+	-----------------------------------------------------------------------------
+	--
+	--<PROC NAME="GET_VERSION">
+	-- This function returns the current SCCS version
+	FUNCTION get_version
+		RETURN VARCHAR2;
+
+	--</PROC>
+	--
+	-----------------------------------------------------------------------------
+	--
+	--<PROC NAME="GET_BODY_VERSION">
+	-- This function returns the current SCCS version of the package body
+	FUNCTION get_body_version
+		RETURN VARCHAR2;
+
+	--</PROC>
+	--
+	-----------------------------------------------------------------------------
+	--
+	--<PRAGMA>
+	PRAGMA RESTRICT_REFERENCES(get_version, rnds, wnps, wnds);
+	PRAGMA RESTRICT_REFERENCES(get_body_version, rnds, wnps, wnds);
+
+	--</PRAGMA>
+	--
+	-----------------------------------------------------------------------------
+	--
+	--<PROC NAME="INS_NEH">
+	--This procedure insert a record into nm_element_history
+	PROCEDURE ins_neh(p_rec_neh IN OUT nm_element_history%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+END nm3nw_edit;
+/

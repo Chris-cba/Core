@@ -1,0 +1,606 @@
+CREATE OR REPLACE PACKAGE nm3nwval AS
+--<PACKAGE>
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)nm3nwval.pkh	1.28 05/02/06
+--       Module Name      : nm3nwval.pkh
+--       Date into SCCS   : 06/05/02 15:00:55
+--       Date fetched Out : 07/06/13 14:13:05
+--       SCCS Version     : 1.28
+--
+--
+--   Author : Nik Stace
+--
+--   nm3nwval package
+--
+------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+------------------------------------------------------------------
+--
+--</PACKAGE>
+--<GLOBVAR>
+  TYPE t_ne_flex_cols_rec IS RECORD(ne_owner      nm_elements.ne_owner%TYPE
+                                   ,ne_name_1     nm_elements.ne_name_1%TYPE
+                                   ,ne_name_2     nm_elements.ne_name_2%TYPE
+                                   ,ne_prefix     nm_elements.ne_prefix%TYPE
+                                   ,ne_number     nm_elements.ne_number%TYPE
+                                   ,ne_sub_type   nm_elements.ne_sub_type%TYPE
+                                   ,ne_sub_class  nm_elements.ne_sub_class%TYPE
+                                   ,ne_nsg_ref    nm_elements.ne_nsg_ref%TYPE
+                                   ,ne_version_no nm_elements.ne_version_no%TYPE
+                                   ,ne_group      nm_elements.ne_group%TYPE);
+
+  --g_sccsid is the SCCS ID for the package
+  --g_sccsid      CONSTANT  varchar2(80) := '"@(#)nm3nwval.pkh	1.28 05/02/06"';
+  g_sccsid      CONSTANT  varchar2(80) := '"$Revision:   2.3  $"';
+--
+-- Global variables used for dynamic sql
+   g_dyn_rec_ne nm_elements%ROWTYPE;
+--
+-- Variables for checking exclusivity
+--
+   TYPE rec_excl IS RECORD
+      (nm_ne_id_in   nm_members.nm_ne_id_in%TYPE
+      ,nm_ne_id_of   nm_members.nm_ne_id_of%TYPE
+      ,nm_begin_mp   nm_members.nm_begin_mp%TYPE
+      ,nm_end_mp     nm_members.nm_end_mp%TYPE
+      ,nm_start_date nm_members.nm_start_date%TYPE -- LS added the members start date in the array
+      );
+--
+   TYPE tab_rec_excl IS TABLE OF rec_excl INDEX BY binary_integer;
+
+   TYPE t_nng_val_rec IS RECORD(group_type nm_nt_groupings_all.nng_group_type%TYPE
+                               ,nt_type    nm_nt_groupings_all.nng_nt_type%TYPE);
+--
+   g_tab_rec_excl tab_rec_excl;
+--
+   g_exclusivity_check boolean := TRUE;
+--
+  -- constants for checking network operations
+  c_split      CONSTANT varchar2(20) := 'SPLIT';
+  c_merge      CONSTANT varchar2(20) := 'MERGE';
+  c_replace    CONSTANT varchar2(20) := 'REPLACE';
+  c_close      CONSTANT varchar2(20) := 'CLOSE';
+  c_unclose    CONSTANT varchar2(20) := 'UNCLOSE';
+  c_closeroute CONSTANT varchar2(20) := 'CLOSEROUTE';
+  c_reclass    CONSTANT varchar2(20) := 'RECLASSIFY';
+  c_reverse    CONSTANT varchar2(20) := 'REVERSE';
+
+  --global for unique formatting dyn sql
+  g_dyn_ne_flex_cols_rec t_ne_flex_cols_rec;
+
+  g_dyn_ne_flex_cols_old_rec t_ne_flex_cols_rec;
+  g_dyn_ne_flex_cols_new_rec t_ne_flex_cols_rec;
+  g_dyn_vals_different boolean;
+  
+  g_ntc_query nm_type_columns.ntc_query%TYPE; -- gj 12-MAY-2005 - required for ntc_query validation  
+--
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="add_member_to_link">
+-- This procedure adds the element to the appropriate link at a given start node
+PROCEDURE add_member_to_link(p_ne_id_in      IN      number
+                            ,p_admin_unit    IN      number
+                            ,p_ne_id_of      IN      number
+                            ,p_ne_group      IN      varchar2
+                            ,p_start_node    IN      number
+                            ,p_slk           IN      number
+                            ,p_seq_no        IN      number
+                            );
+--</PROC>
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="strip_ne_unique">
+-- This procedure takes a ne_unique and strips it down into its components
+PROCEDURE strip_ne_unique (p_ne_unique     IN      varchar2
+                          ,p_ne_nt_type    IN      varchar2
+                          ,p_ne_owner      IN OUT  varchar2
+                          ,p_ne_name_1     IN OUT  varchar2
+                          ,p_ne_name_2     IN OUT  varchar2
+                          ,p_ne_prefix     IN OUT  varchar2
+                          ,p_ne_number     IN OUT  varchar2
+                          ,p_ne_sub_type   IN OUT  varchar2
+                          ,p_ne_no_start   IN OUT  number
+                          ,p_ne_no_end     IN OUT  number
+                          ,p_ne_sub_class  IN OUT  varchar2
+                          ,p_ne_nsg_ref    IN OUT  varchar2
+                          ,p_ne_version_no IN OUT  varchar2
+                          ,p_ne_group      IN OUT  varchar2
+                          );
+--</PROC>
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="validate_nw_element_cols">
+-- This procedure validates the columns of a network element
+PROCEDURE validate_nw_element_cols (p_ne_nt_type    IN OUT  varchar2
+                                   ,p_ne_owner      IN OUT  varchar2
+                                   ,p_ne_name_1     IN OUT  varchar2
+                                   ,p_ne_name_2     IN OUT  varchar2
+                                   ,p_ne_prefix     IN OUT  varchar2
+                                   ,p_ne_number     IN OUT  varchar2
+                                   ,p_ne_sub_type   IN OUT  varchar2
+                                   ,p_ne_no_start   IN OUT  number
+                                   ,p_ne_no_end     IN OUT  number
+                                   ,p_ne_sub_class  IN OUT  varchar2
+                                   ,p_ne_nsg_ref    IN OUT  varchar2
+                                   ,p_ne_version_no IN OUT  varchar2
+                                   ,p_ne_group      IN OUT  varchar2
+                                   ,p_ne_start_date IN      date
+                                   ,p_ne_gty_group_type IN OUT  VARCHAR2
+                                   ,p_ne_admin_unit     IN OUT  VARCHAR2
+                                   );
+--</PROC>
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="create_ne_unique">
+-- This procedure creates the ne_unique from the columns of a network element
+PROCEDURE create_ne_unique (p_ne_unique        OUT varchar2
+                           ,p_ne_nt_type    IN     varchar2
+                           ,p_ne_owner      IN     varchar2
+                           ,p_ne_name_1     IN     varchar2
+                           ,p_ne_name_2     IN     varchar2
+                           ,p_ne_prefix     IN     varchar2
+                           ,p_ne_number     IN     varchar2
+                           ,p_ne_sub_type   IN     varchar2
+                           ,p_ne_no_start   IN     number
+                           ,p_ne_no_end     IN     number
+                           ,p_ne_sub_class  IN     varchar2
+                           ,p_ne_nsg_ref    IN     varchar2
+                           ,p_ne_version_no IN     varchar2
+                           ,p_ne_group      IN     varchar2
+                           );
+
+--</PROC>
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="check_and_add_member_to_link">
+-- This procedure checks the existence of and element and if auto include
+-- is enabled it adds the element to the appropriate link at a given start node
+--
+-- THis is commented out because what is attempting to do is rubbish - JM 10/7/01
+--
+--PROCEDURE check_and_add_member_to_link (p_ne_nt_type    IN      VARCHAR2
+--                                       ,p_ne_id         IN      NUMBER
+--                                       ,p_ne_group      IN      VARCHAR2
+--                                       ,p_ne_owner      IN      VARCHAR2
+--                                       ,p_ne_name_1     IN      VARCHAR2
+--                                       ,p_ne_name_2     IN      VARCHAR2
+--                                       ,p_ne_prefix     IN      VARCHAR2
+--                                       ,p_ne_number     IN      VARCHAR2
+--                                       ,p_ne_sub_type   IN      VARCHAR2
+--                                       ,p_ne_no_start   IN      NUMBER
+--                                       ,p_ne_no_end     IN      NUMBER
+--                                       ,p_ne_sub_class  IN      VARCHAR2
+--                                       ,p_ne_nsg_ref    IN      VARCHAR2
+--                                       ,p_ne_version_no IN      VARCHAR2
+--                                       );
+--</PROC>
+--
+----------------------------------------------------------------------------
+--
+--<PROC NAME="validate_element_for_update">
+-- This procedure validates a element record
+--
+PROCEDURE validate_element_for_update  (p_ne_id                   IN OUT nm_elements.ne_id%TYPE
+                                       ,p_ne_unique               IN OUT nm_elements.ne_unique%TYPE
+                                       ,p_ne_type                 IN OUT nm_elements.ne_type%TYPE
+                                       ,p_ne_nt_type              IN OUT nm_elements.ne_nt_type%TYPE
+                                       ,p_ne_descr                IN OUT nm_elements.ne_descr%TYPE
+                                       ,p_ne_length               IN OUT nm_elements.ne_length%TYPE
+                                       ,p_ne_admin_unit           IN OUT nm_elements.ne_admin_unit%TYPE
+                                       ,p_ne_start_date           IN OUT nm_elements.ne_start_date%TYPE
+                                       ,p_ne_end_date             IN OUT nm_elements.ne_end_date%TYPE
+                                       ,p_ne_gty_group_type       IN OUT nm_elements.ne_gty_group_type%TYPE
+                                       ,p_ne_owner                IN OUT nm_elements.ne_owner%TYPE
+                                       ,p_ne_name_1               IN OUT nm_elements.ne_name_1%TYPE
+                                       ,p_ne_name_2               IN OUT nm_elements.ne_name_2%TYPE
+                                       ,p_ne_prefix               IN OUT nm_elements.ne_prefix%TYPE
+                                       ,p_ne_number               IN OUT nm_elements.ne_number%TYPE
+                                       ,p_ne_sub_type             IN OUT nm_elements.ne_sub_type%TYPE
+                                       ,p_ne_group                IN OUT nm_elements.ne_group%TYPE
+                                       ,p_ne_no_start             IN OUT nm_elements.ne_no_start%TYPE
+                                       ,p_ne_no_end               IN OUT nm_elements.ne_no_end%TYPE
+                                       ,p_ne_sub_class            IN OUT nm_elements.ne_sub_class%TYPE
+                                       ,p_ne_nsg_ref              IN OUT nm_elements.ne_nsg_ref%TYPE
+                                       ,p_ne_version_no           IN OUT nm_elements.ne_version_no%TYPE
+                                       );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="bfr_trigger_validate_element">
+-- This procedure validates elements before insert
+PROCEDURE bfr_trigger_validate_element (p_ne_id                   IN OUT nm_elements.ne_id%TYPE
+                                       ,p_ne_unique               IN OUT nm_elements.ne_unique%TYPE
+                                       ,p_ne_type                 IN OUT nm_elements.ne_type%TYPE
+                                       ,p_ne_nt_type              IN OUT nm_elements.ne_nt_type%TYPE
+                                       ,p_ne_descr                IN OUT nm_elements.ne_descr%TYPE
+                                       ,p_ne_length               IN OUT nm_elements.ne_length%TYPE
+                                       ,p_ne_admin_unit           IN OUT nm_elements.ne_admin_unit%TYPE
+                                       ,p_ne_start_date           IN OUT nm_elements.ne_start_date%TYPE
+                                       ,p_ne_end_date             IN OUT nm_elements.ne_end_date%TYPE
+                                       ,p_ne_gty_group_type       IN OUT nm_elements.ne_gty_group_type%TYPE
+                                       ,p_ne_owner                IN OUT nm_elements.ne_owner%TYPE
+                                       ,p_ne_name_1               IN OUT nm_elements.ne_name_1%TYPE
+                                       ,p_ne_name_2               IN OUT nm_elements.ne_name_2%TYPE
+                                       ,p_ne_prefix               IN OUT nm_elements.ne_prefix%TYPE
+                                       ,p_ne_number               IN OUT nm_elements.ne_number%TYPE
+                                       ,p_ne_sub_type             IN OUT nm_elements.ne_sub_type%TYPE
+                                       ,p_ne_group                IN OUT nm_elements.ne_group%TYPE
+                                       ,p_ne_no_start             IN OUT nm_elements.ne_no_start%TYPE
+                                       ,p_ne_no_end               IN OUT nm_elements.ne_no_end%TYPE
+                                       ,p_ne_sub_class            IN OUT nm_elements.ne_sub_class%TYPE
+                                       ,p_ne_nsg_ref              IN OUT nm_elements.ne_nsg_ref%TYPE
+                                       ,p_ne_version_no           IN OUT nm_elements.ne_version_no%TYPE
+                                       );
+--</PROC>
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="val_nm_elements_record">
+-- This procedure validates the columns of an nm_elements record
+-- It can raise the following exceptions
+-- -20952 'NE_NT_TYPE not supplied'
+-- -20951 'NE_UNIQUE not supplied'
+-- -20953 'Invalid NE_NT_TYPE supplied'
+-- -20954 'Invalid NE_TYPE supplied'
+-- -20955 'NE_DESCR not supplied'
+-- -20956 'NE_LENGTH not supplied'
+-- -20957 'NE_ADMIN_UNIT not supplied'
+-- -20958 'Invalid NE_ADMIN_UNIT supplied'
+-- -20960 'NE_GTY_GROUP_TYPE must not be supplied'
+-- -20961 'Invalid NE_NO_START supplied'
+-- -20962 'Invalid NE_NO_END supplied'
+-- -20963 'NE_GROUP must not be supplied'
+-- -20964 'NE_NAME_1 must not be supplied'
+-- -20965 'NE_NAME_2 must not be supplied'
+-- -20966 'NE_NSG_REF must not be supplied'
+-- -20967 'NE_NUMBER must not be supplied'
+-- -20968 'NE_OWNER must not be supplied'
+-- -20969 'NE_PREFIX must not be supplied'
+-- -20970 'NE_SUB_CLASS must not be supplied'
+-- -20971 'NE_SUB_TYPE must not be supplied'
+-- -20972 'NE_VERSION_NO must not be supplied'
+
+PROCEDURE val_nm_elements_record (p_ne_id                   IN nm_elements.ne_id%TYPE
+                                 ,p_ne_unique               IN nm_elements.ne_unique%TYPE
+                                 ,p_ne_type                 IN nm_elements.ne_type%TYPE
+                                 ,p_ne_nt_type              IN nm_elements.ne_nt_type%TYPE
+                                 ,p_ne_descr                IN nm_elements.ne_descr%TYPE
+                                 ,p_ne_length               IN nm_elements.ne_length%TYPE
+                                 ,p_ne_admin_unit           IN nm_elements.ne_admin_unit%TYPE
+                                 ,p_ne_start_date           IN nm_elements.ne_start_date%TYPE
+                                 ,p_ne_end_date             IN nm_elements.ne_end_date%TYPE
+                                 ,p_ne_gty_group_type       IN nm_elements.ne_gty_group_type%TYPE
+                                 ,p_ne_owner                IN nm_elements.ne_owner%TYPE
+                                 ,p_ne_name_1               IN nm_elements.ne_name_1%TYPE
+                                 ,p_ne_name_2               IN nm_elements.ne_name_2%TYPE
+                                 ,p_ne_prefix               IN nm_elements.ne_prefix%TYPE
+                                 ,p_ne_number               IN nm_elements.ne_number%TYPE
+                                 ,p_ne_sub_type             IN nm_elements.ne_sub_type%TYPE
+                                 ,p_ne_group                IN nm_elements.ne_group%TYPE
+                                 ,p_ne_no_start             IN nm_elements.ne_no_start%TYPE
+                                 ,p_ne_no_end               IN nm_elements.ne_no_end%TYPE
+                                 ,p_ne_sub_class            IN nm_elements.ne_sub_class%TYPE
+                                 ,p_ne_nsg_ref              IN nm_elements.ne_nsg_ref%TYPE
+                                 ,p_ne_version_no           IN nm_elements.ne_version_no%TYPE
+                                 );
+--</PROC>
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="route_check">
+-- This procedure validates the connectivity of new elements on a route
+-- It can raise the following exceptions
+-- -20100 'Element with this start node already exists.'
+-- -20101 'Element with this end node already exists.'
+-- -20102 'Cannot add a single or left to the end of a right where not also the end of a left.'
+-- -20103 'Cannot add a single or left to the start of a right where not also the start of a left.'
+-- -20104 'Either the start or end node of a right must have existing usage in group.'
+-- -20105 'The start of a right must share the start of a left OR the end of a right without a left.'
+-- -20106 'The end of a right must share the end of a left OR the start of a right without a left.'
+PROCEDURE route_check  ( p_ne_no_start_new  IN nm_elements.ne_no_start%TYPE
+                        ,p_ne_no_end_new    IN nm_elements.ne_no_end%TYPE
+                        ,p_ne_sub_class_new IN nm_elements.ne_sub_class%TYPE
+                        ,p_ne_group_new     IN nm_elements.ne_group%TYPE
+                        ,p_check_only       IN varchar2 DEFAULT 'N'
+                        ,p_ne_id            IN nm_elements.ne_id%TYPE DEFAULT NULL
+                       );
+--</PROC>
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="check_node_slk">
+-- Checks that the passed slk at a node is the same as that stored
+-- It can raise the following exceptions
+-- -20300 'SLK AT node does NOT equal input SLK'
+   PROCEDURE check_node_slk ( p_nm_id_in    IN nm_elements.ne_id%TYPE
+                             ,p_ne_no_start IN nm_elements.ne_no_start%TYPE
+                             ,p_new_slk     IN nm_members.nm_slk%TYPE
+                             );
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="check_members">
+-- This procedure is the one called by the INS_NM_MEMBERS trigger, it performs
+--  date and parent validation
+--
+PROCEDURE check_members (p_old_nm_ne_id_in   IN     nm_members.nm_ne_id_in%TYPE
+                        ,p_old_nm_ne_id_of   IN     nm_members.nm_ne_id_of%TYPE
+                        ,p_old_nm_start_date IN     nm_members.nm_start_date%TYPE
+                        ,p_old_nm_obj_type   IN     nm_members.nm_obj_type%TYPE
+                        ,p_new_nm_ne_id_in   IN     nm_members.nm_ne_id_in%TYPE
+                        ,p_new_nm_ne_id_of   IN     nm_members.nm_ne_id_of%TYPE
+                        ,p_new_nm_type       IN     nm_members.nm_type%TYPE
+                        ,p_new_nm_obj_type   IN OUT nm_members.nm_obj_type%TYPE
+                        ,p_new_nm_start_date IN     nm_members.nm_start_date%TYPE
+                        ,p_new_nm_end_date   IN     nm_members.nm_end_date%TYPE
+                        ,p_new_nm_begin_mp   IN     nm_members.nm_begin_mp%TYPE
+                        ,p_new_nm_end_mp     IN     nm_members.nm_end_mp%TYPE
+                        ,p_mode              IN     varchar2
+                        );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--
+--<PROC NAME="check_member_groups">
+-- This procedure is called from check members and checks the group types of the 
+-- records being added to the members table 
+-- 
+PROCEDURE check_member_groups (p_new_nm_ne_id_in   IN     nm_members.nm_ne_id_in%TYPE
+                              ,p_new_nm_ne_id_of   IN     nm_members.nm_ne_id_of%TYPE
+                               );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="process_tab_excl">
+-- This procedure processes the global varaible populated by the nm_members trigger
+PROCEDURE process_tab_excl;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="clear_tab_excl">
+-- This procedure clears the global variable
+PROCEDURE clear_tab_excl;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="group_has_overlaps">
+-- This function returns true when supplied group's members are overlapping.
+FUNCTION group_has_overlaps(pi_ne_id_in IN nm_members.nm_ne_id_in%TYPE
+                           ) RETURN boolean;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="network_operations_check">
+-- Does the relevant check for the netowrk operations
+-- split, merge, replace, close, route_close, unclose,
+-- reclass, reverse
+-- Raises the following exceptions
+-- Raise_Application_Error( -20001, 'Future effective date not allowed' );
+-- Raise_Application_Error( -20003, 'Sub Class of elements are not the same');
+-- Raise_Application_Error( -20004, 'Elements are NOT connected' );
+-- Raise_Application_Error( -20005, 'Not a datum element');
+-- Raise_Application_Error( -20006, 'Elements must be of the same network type');
+-- Raise_Application_Error( -20007, 'Element is a distance break');
+-- Raise_Application_Error( -20008, 'User does not have access to all inventory on the element');
+-- Raise_Application_Error( -20009,'Change violates the XSP Rules.');
+--Also
+-- Raise_Application_Error( -20997, 'USER IS RESTRICTED, You cannot perform this operation.');
+PROCEDURE network_operations_check ( p_operation IN varchar2
+                                    ,p_ne_id_1 IN nm_elements.ne_id%TYPE  DEFAULT NULL
+                                    ,p_effective_date IN date DEFAULT TRUNC(SYSDATE)
+                                    ,p_ne_id_2 IN nm_elements.ne_id%TYPE DEFAULT NULL
+                                   );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="check_slk">
+-- Checks that the slk at the start and end of an element are the same
+-- as the slks of other elements on the same route which start and end
+-- at the same points
+-- Raises the following exceptions
+-- Raise_Application_Error( -20198, 'New Start SLK does not match the Existing Start SLK(s)');
+-- Raise_Application_Error( -20199, 'New End SLK does not match the Existing End SLK(s)');
+PROCEDURE check_slk ( p_parent_ne_id IN number
+                     ,p_no_start_new IN number
+                     ,p_no_end_new   IN number
+                     ,p_length       IN number
+                     ,p_sub_class    IN nm_elements.ne_sub_class%TYPE
+                     ,p_datum_ne_id  IN nm_elements.ne_id%TYPE
+                     ) ;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="is_nm_elements_col">
+-- This function returns TRUE if the passed string is a column in nm_elements_all
+FUNCTION is_nm_elements_col (p_column varchar2) RETURN boolean;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nm_elements_cols">
+-- This function returns a pl/sql table containing the names of all of the
+--  columns in the NM_ELEMENTS_ALL table
+--
+FUNCTION get_nm_elements_cols RETURN nm3type.tab_varchar30;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="validate_network_metadata">
+-- This procedure returns a PL/SQL table listing all flaws found with the
+--  network metadata
+--
+FUNCTION validate_network_metadata RETURN nm3type.tab_varchar2000;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="network_metadata_is_valid">
+-- This procedure returns TRUE if the network metadata is all valid
+--
+FUNCTION network_metadata_is_valid RETURN boolean;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="check_element_b4_row_trigger">
+-- This procedure is run by the nm_elements_all_au_check trigger
+--  which fires before INSERT OR UPDATE on NM_ELEMENTS_ALL and
+--  performs some validation on the record
+--
+PROCEDURE check_element_b4_row_trigger
+                          (p_rec_ne_old nm_elements_all%ROWTYPE
+                          ,p_rec_ne_new nm_elements_all%ROWTYPE
+                          ,p_db_action  varchar2
+                          );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="calc_end_slk_and_true">
+PROCEDURE calc_end_slk_and_true (pi_nm_ne_id_in    IN     nm_members.nm_ne_id_in%TYPE
+                                ,pi_nm_ne_id_of    IN     nm_members.nm_ne_id_of%TYPE
+                                ,pi_nm_type        IN     nm_members.nm_type%TYPE
+                                ,pi_nm_obj_type    IN     nm_members.nm_obj_type%TYPE
+                                ,pi_nm_slk         IN     nm_members.nm_slk%TYPE
+                                ,pi_nm_true        IN     nm_members.nm_true%TYPE
+                                ,pi_nm_begin_mp    IN     nm_members.nm_begin_mp%TYPE
+                                ,pi_nm_end_mp      IN     nm_members.nm_end_mp%TYPE
+                                ,po_nm_end_slk        OUT nm_members.nm_slk%TYPE
+                                ,po_nm_end_true       OUT nm_members.nm_true%TYPE
+                                );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="check_group_type_inclusion">
+--
+PROCEDURE check_group_type_inclusion(pi_group_type IN nm_nt_groupings_all.nng_group_type%TYPE
+                                    ,pi_nt_type    IN nm_nt_groupings_all.nng_nt_type%TYPE
+                                    );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="clear_nng_tab">
+--
+PROCEDURE clear_nng_tab;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="pop_nng_tab">
+--
+PROCEDURE pop_nng_tab(pi_nng_val_rec t_nng_val_rec
+                     );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="process_nng_tab">
+--
+PROCEDURE process_nng_tab;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_unique_formatted_flex_cols">
+--
+--  This procedure formats the flex col vals according to the unique formatting
+--  rules for the network type columns.
+--
+PROCEDURE get_unique_formatted_flex_cols(pi_ne_nt_type        IN     nm_elements.ne_nt_type%TYPE
+                                        ,pio_ne_flex_cols_rec IN OUT t_ne_flex_cols_rec
+                                        );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ntc_before_iud_stm_trg">
+--
+--  Called from trigger on nm_type_columns.
+--
+PROCEDURE ntc_before_iud_stm_trg(pi_db_action IN varchar2
+                                );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ntc_before_iud_row_trg">
+--
+--  Called from trigger on nm_type_columns.
+--
+PROCEDURE ntc_before_iud_row_trg(pi_ntc_old_rec IN nm_type_columns%ROWTYPE
+                                ,pi_ntc_new_rec IN nm_type_columns%ROWTYPE
+                                ,pi_db_action  IN varchar2
+                                );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ntc_after_iud_stm_trg">
+--
+--  Called from trigger on nm_type_columns.
+--
+PROCEDURE ntc_after_iud_stm_trg(pi_db_action IN varchar2
+                               );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="all_bind_vars_ne_cols">
+--
+FUNCTION all_bind_vars_ne_cols(pi_string IN varchar2
+                              ) RETURN boolean;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="check_ne_flex_cols_updatable">
+--
+--  Checks which flex cols have been updated and then assertains whether this is
+--  allowed based on the nm_type_columns updatable flag.
+--
+PROCEDURE check_ne_flex_cols_updatable(pi_ne_nt_type           IN nm_elements.ne_nt_type%TYPE
+                                      ,pi_old_ne_flex_cols_rec IN t_ne_flex_cols_rec
+                                      ,pi_new_ne_flex_cols_rec IN t_ne_flex_cols_rec
+                                      );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PRAGMA>
+   PRAGMA RESTRICT_REFERENCES (get_version, wnps, wnds);
+   PRAGMA RESTRICT_REFERENCES (get_body_version, wnps, wnds);
+   PRAGMA RESTRICT_REFERENCES (group_has_overlaps, wnps, wnds);
+   PRAGMA RESTRICT_REFERENCES (is_nm_elements_col, wnps, wnds);
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+END nm3nwval;
+/

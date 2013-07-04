@@ -1,0 +1,198 @@
+CREATE OR REPLACE PACKAGE nm3pbi IS
+--<PACKAGE>
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3pbi.pkh-arc   2.2   Jul 04 2013 16:21:08   James.Wadsworth  $
+--       Module Name      : $Workfile:   nm3pbi.pkh  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:21:08  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:18  $
+--       Version          : $Revision:   2.2  $
+--       Based on SCCS version : 1.5
+-------------------------------------------------------------------------
+--   Author : Jonathan Mills
+--
+--     nm3pbi package. Used for PBI
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--all global package variables here
+--<GLOBVAR>
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.2  $';
+--  g_sccsid is the SCCS_ID
+  c_big_number_for_nvl CONSTANT NUMBER := TO_NUMBER(RPAD('9',38,'9'));
+-- c_big_number_for_nvl is a constant to be used when you need the biggest number available
+--
+-- Global TYPE declarations
+  TYPE tab_number        IS TABLE OF number                       INDEX BY BINARY_INTEGER;
+  TYPE tab_varchar20     IS TABLE OF varchar2(20)                 INDEX BY BINARY_INTEGER;
+--
+-- types for storing query definition data
+--
+  TYPE tab_query_types   IS TABLE OF nm_pbi_query_types%ROWTYPE   INDEX BY BINARY_INTEGER;
+  TYPE tab_query_attribs IS TABLE OF nm_pbi_query_attribs%ROWTYPE INDEX BY BINARY_INTEGER;
+  TYPE tab_query_values  IS TABLE OF nm_pbi_query_values%ROWTYPE  INDEX BY BINARY_INTEGER;
+-- exception message variables
+--
+   g_pbi_exception EXCEPTION;
+   g_pbi_exc_code  NUMBER;
+   g_pbi_exc_msg   VARCHAR2(4000);
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="execute_pbi_query">
+-- This procedure builds, executes and stores the results of the specified PBI
+--  query
+PROCEDURE execute_pbi_query
+             (pi_query_id      IN     nm_pbi_query.npq_id%TYPE
+             ,pi_nte_job_id    IN     nm_members.nm_ne_id_in%TYPE
+             ,pi_description   IN     nm_pbi_query_results.nqr_description%TYPE
+             ,po_result_job_id    OUT nm_pbi_query_results.nqr_job_id%TYPE
+             );
+-- Possible errors raised within this procedure are
+-- -20801  Query not found
+-- -20802  No query types defined
+-- -20803  NM_INV_TYPE_ATTRIBS record not found
+-- -20804  NM_INV_TYPE_VALUES record not found
+-- -20805  NM_INV_TYPE_VALUES has invalid numeric value
+-- -20806  pi_nte_job_id cannot be null
+-- -20807  SQL Error in PARSE of dynamic SQL (SQLERRM)
+-- -20808  INV_TYPE + XSP combination specified more than once
+-- -20809  PBI cannot be run over multiple non-contiguous partial parts of the same element
+-- -20810  Attributes not specified for all Query Types
+-- -20811  Invalid number of values specified
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_job_id">
+-- This function returns next JOB_ID from a sequence
+FUNCTION get_job_id RETURN NUMBER;
+--</PROC>
+--
+------------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_nqt_seq_no">
+-- This function returns next NQT_SEQ_NO from a sequence
+FUNCTION get_nqt_seq_no RETURN NUMBER;
+--</PROC>
+--
+------------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_npq_id">
+-- This function returns next NPQ_ID_SEQ from a sequence
+FUNCTION get_npq_id RETURN NUMBER;
+--</PROC>
+--
+------------------------------------------------------------------------------------------------
+--
+--<PROC NAME="validate_pbi_query">
+-- This procedure validates a given PBI query
+PROCEDURE validate_pbi_query (pi_query_id      IN     nm_pbi_query.npq_id%TYPE
+                             ,pi_nte_job_id  IN     nm_members.nm_ne_id_in%TYPE DEFAULT NULL
+                             );
+-- Possible errors raised within this procedure are
+-- -20801  Query not found
+-- -20802  No query types defined
+-- -20803  NM_INV_TYPE_ATTRIBS record not found
+-- -20804  NM_INV_TYPE_VALUES record not found
+-- -20805  NM_INV_TYPE_VALUES has invalid numeric value
+-- -20807  SQL Error in PARSE of dynamic SQL (SQLERRM)
+-- -20808  INV_TYPE + XSP combination specified more than once
+-- -20810  Attributes not specified for all Query Types
+-- -20811  Invalid number of values specified
+--</PROC>
+--
+------------------------------------------------------------------------------------------------
+--
+--<PROC NAME="select_npr">
+FUNCTION select_npr (pi_job_id IN nm_pbi_query_results.nqr_job_id%TYPE) RETURN nm_pbi_query_results%ROWTYPE;
+--</PROC>
+--
+------------------------------------------------------------------------------------------------
+--
+--<PROC NAME="fn_convert_attrib_value">
+FUNCTION fn_convert_attrib_value (pi_value  IN VARCHAR2
+                                 ,pi_format IN VARCHAR2
+                                 ) RETURN VARCHAR2;
+--</PROC>
+--
+------------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_npq">
+-- This function returns a nm_pbi_query record
+--
+FUNCTION get_npq (pi_query_id NUMBER) RETURN nm_pbi_query%ROWTYPE;
+--</PROC>
+--
+------------------------------------------------------------------------------------------------
+--
+--<PROC NAME="move_pbi_to_gaz_qry">
+-- This procedure copies the detail records for a specified nm_pbi_query to the specified nm_gaz_query
+--
+PROCEDURE move_pbi_to_gaz_qry (pi_npq_id IN   nm_pbi_query.npq_id%TYPE
+                              ,pi_ngq_id IN   nm_gaz_query.ngq_id%TYPE
+                              );
+--</PROC>
+--
+------------------------------------------------------------------------------------------------
+--
+--<PROC NAME="save_gaz_query_as_pbi">
+PROCEDURE save_gaz_query_as_pbi (pi_ngq_id     IN     nm_gaz_query.ngq_id%TYPE
+                                ,pi_npq_unique IN     nm_pbi_query.npq_unique%TYPE
+                                ,pi_npq_descr  IN     nm_pbi_query.npq_descr%TYPE
+                                ,po_npq_id        OUT nm_pbi_query.npq_id%TYPE
+                                );
+--</PROC>
+--
+------------------------------------------------------------------------------------------------
+--
+--<PROC NAME="save_gaz_query_as_pbi_auton">
+PROCEDURE save_gaz_query_as_pbi_auton (pi_ngq_id     IN     nm_gaz_query.ngq_id%TYPE
+                                      ,pi_npq_unique IN     nm_pbi_query.npq_unique%TYPE
+                                      ,pi_npq_descr  IN     nm_pbi_query.npq_descr%TYPE
+                                      ,po_npq_id        OUT nm_pbi_query.npq_id%TYPE
+                                      );
+--</PROC>
+--
+------------------------------------------------------------------------------------------------
+--
+--<PROC NAME="save_stashed_gaz_query_as_pbi">
+PROCEDURE save_stashed_gaz_query_as_pbi (pi_ngq_tab    IN     nm3gaz_qry.tab_rec_ngq
+                                        ,pi_ngqt_tab   IN     nm3gaz_qry.tab_rec_ngqt
+                                        ,pi_ngqa_tab   IN     nm3gaz_qry.tab_rec_ngqa
+                                        ,pi_ngqv_tab   IN     nm3gaz_qry.tab_rec_ngqv
+                                        ,pi_npq_unique IN     nm_pbi_query.npq_unique%TYPE
+                                        ,pi_npq_descr  IN     nm_pbi_query.npq_descr%TYPE
+                                        ,po_npq_id        OUT nm_pbi_query.npq_id%TYPE
+                                        );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PRAGMA>
+PRAGMA RESTRICT_REFERENCES (get_version, WNDS, WNPS, RNDS);
+PRAGMA RESTRICT_REFERENCES (get_body_version, RNDS, WNPS, WNDS);
+PRAGMA RESTRICT_REFERENCES (select_npr, WNDS, WNPS);
+PRAGMA RESTRICT_REFERENCES (get_npq, WNPS, WNDS);
+--</PRAGMA>
+--
+END nm3pbi;
+/
