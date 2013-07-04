@@ -1,3 +1,16 @@
+--
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/create_nm3_check_cons.sql-arc   2.2   Jul 04 2013 13:44:58   James.Wadsworth  $
+--       Module Name      : $Workfile:   create_nm3_check_cons.sql  $
+--       Date into PVCS   : $Date:   Jul 04 2013 13:44:58  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 11:56:24  $
+--       Version          : $Revision:   2.2  $
+--
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
 PROMPT Creating Check Constraint on 'NM_EVENT_ALERT_MAILS'
 ALTER TABLE NM_EVENT_ALERT_MAILS
  ADD (CONSTRAINT NEA_SEND_TYPE_CHK CHECK (nea_send_type IN ('TO','CC','BCC')))

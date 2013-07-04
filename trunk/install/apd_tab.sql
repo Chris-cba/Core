@@ -1,3 +1,16 @@
+--
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/apd_tab.sql-arc   2.1   Jul 04 2013 13:44:58   James.Wadsworth  $
+--       Module Name      : $Workfile:   apd_tab.sql  $
+--       Date into PVCS   : $Date:   Jul 04 2013 13:44:58  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 11:55:56  $
+--       Version          : $Revision:   2.1  $
+--
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
 define sccsid = '@(#)apd_tab.sql	1.1 09/05/01'
 --
 DROP TABLE apd_tab;
