@@ -1,3 +1,16 @@
+--
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm_4500_fix6_ddl.sql-arc   1.1   Jul 04 2013 13:48:08   James.Wadsworth  $
+--       Module Name      : $Workfile:   nm_4500_fix6_ddl.sql  $
+--       Date into PVCS   : $Date:   Jul 04 2013 13:48:08  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 13:34:36  $
+--       Version          : $Revision:   1.1  $
+--
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
 --Gateway Synonyms
 Alter Table Doc_Gate_Syns  Disable Constraint Dgs_Fk_Dgt
 /
