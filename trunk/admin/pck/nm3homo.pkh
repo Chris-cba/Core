@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE nm3homo AS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3homo.pkh-arc   2.4   Oct 07 2011 14:38:44   Steve.Cooper  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3homo.pkh-arc   2.5   Jul 04 2013 16:04:12   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3homo.pkh  $
---       Date into PVCS   : $Date:   Oct 07 2011 14:38:44  $
---       Date fetched Out : $Modtime:   Oct 07 2011 14:38:22  $
---       PVCS Version     : $Revision:   2.4  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:04:12  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:12  $
+--       PVCS Version     : $Revision:   2.5  $
 --
 --
 --   Author : Jonathan Mills
@@ -15,11 +15,11 @@ CREATE OR REPLACE PACKAGE nm3homo AS
 --   Homogenous Inventory Update package
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2000
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
-   g_sccsid      CONSTANT  VARCHAR2(2000) := '"$Revision:   2.4  $"';
+   g_sccsid      CONSTANT  VARCHAR2(2000) := '"$Revision:   2.5  $"';
 --  g_sccsid is the SCCS ID for the package
 --
    c_contiguous_warning_code CONSTANT VARCHAR2(20) := 'CONTIGUOUS';

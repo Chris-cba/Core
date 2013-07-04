@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY nm3group_inv AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3group_inv.pkb-arc   2.3   May 16 2011 14:44:50   Steve.Cooper  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3group_inv.pkb-arc   2.4   Jul 04 2013 16:04:12   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3group_inv.pkb  $
---       Date into PVCS   : $Date:   May 16 2011 14:44:50  $
---       Date fetched Out : $Modtime:   Apr 01 2011 11:57:14  $
---       Version          : $Revision:   2.3  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:04:12  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:12  $
+--       Version          : $Revision:   2.4  $
 --       Based on SCCS version : 1.7
 -------------------------------------------------------------------------
 --   Author : Kevin Angus
@@ -15,7 +15,7 @@ CREATE OR REPLACE PACKAGE BODY nm3group_inv AS
 --   nm3group_inv body
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2002
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 --all global package variables here
@@ -28,7 +28,7 @@ CREATE OR REPLACE PACKAGE BODY nm3group_inv AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-   g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.3  $';
+   g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.4  $';
    g_package_name CONSTANT varchar2(30) := 'nm3group_inv';
    c_nl           CONSTANT varchar2(1) := CHR(10);
   -----------

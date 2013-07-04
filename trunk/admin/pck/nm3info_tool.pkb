@@ -3,11 +3,11 @@ AS
   -------------------------------------------------------------------------
   --   PVCS Identifiers :-
   --
-  --       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3info_tool.pkb-arc   3.2   May 16 2011 14:44:52   Steve.Cooper  $
+  --       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3info_tool.pkb-arc   3.3   Jul 04 2013 16:04:12   James.Wadsworth  $
   --       Module Name      : $Workfile:   nm3info_tool.pkb  $
-  --       Date into PVCS   : $Date:   May 16 2011 14:44:52  $
-  --       Date fetched Out : $Modtime:   Apr 01 2011 09:57:24  $
-  --       Version          : $Revision:   3.2  $
+  --       Date into PVCS   : $Date:   Jul 04 2013 16:04:12  $
+  --       Date fetched Out : $Modtime:   Jul 04 2013 14:25:12  $
+  --       Version          : $Revision:   3.3  $
   --       Based on SCCS version :
   -------------------------------------------------------------------------
   --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid   CONSTANT VARCHAR2(2000) := '$Revision:   3.2  $';
+  g_body_sccsid   CONSTANT VARCHAR2(2000) := '$Revision:   3.3  $';
   g_package_name  CONSTANT VARCHAR2(30) := 'nm3info_tool';
   g_inv_attrs     nm3inv.tab_nita;
   g_is_ft         BOOLEAN; -- is the query a ft query

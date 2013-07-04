@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3homo_Gis AS
 --
 -- PVCS Identifiers :-
 --
--- pvcsid : $Header:   //vm_latest/archives/nm3/admin/pck/nm3homo_gis.pkb-arc   2.8   Aug 31 2012 17:35:26   Rob.Coupe  $
+-- pvcsid : $Header:   //vm_latest/archives/nm3/admin/pck/nm3homo_gis.pkb-arc   2.9   Jul 04 2013 16:04:12   James.Wadsworth  $
 -- Module Name : $Workfile:   nm3homo_gis.pkb  $
--- Date into PVCS : $Date:   Aug 31 2012 17:35:26  $
--- Date fetched Out : $Modtime:   Aug 31 2012 17:34:12  $
--- PVCS Version : $Revision:   2.8  $
+-- Date into PVCS : $Date:   Jul 04 2013 16:04:12  $
+-- Date fetched Out : $Modtime:   Jul 04 2013 15:41:28  $
+-- PVCS Version : $Revision:   2.9  $
 -- Based on SCCS version : 
 --   Author : Jonathan Mills
 --
@@ -18,13 +18,13 @@ CREATE OR REPLACE PACKAGE BODY Nm3homo_Gis AS
 --            New param - pi_geom -- to allow update/insert of shape
 --            Update of point xy/lref on base theme table from both shape
 --            and xy passed in.
------------------------------------------------------------------------------
---  Copyright (c) exor corporation ltd, 2005
------------------------------------------------------------------------------
+------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+------------------------------------------------------------------
 --
 --all global package variables here
 --
-   g_body_sccsid      CONSTANT   VARCHAR2(2000) := '"$Revision:   2.8  $"';
+   g_body_sccsid      CONSTANT   VARCHAR2(2000) := '"$Revision:   2.9  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name     CONSTANT   VARCHAR2(30)   := 'nm3homo_gis';

@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE nm3globinv AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3globinv.pkh-arc   2.3   Jan 06 2010 16:38:26   cstrettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3globinv.pkh-arc   2.4   Jul 04 2013 16:04:12   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3globinv.pkh  $
---       Date into PVCS   : $Date:   Jan 06 2010 16:38:26  $
---       Date fetched Out : $Modtime:   Jan 05 2010 18:02:30  $
---       Version          : $Revision:   2.3  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:04:12  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:12  $
+--       Version          : $Revision:   2.4  $
 --       Based on SCCS version : 1.5
 -------------------------------------------------------------------------
 --   Author : Jonathan Mills
@@ -15,12 +15,12 @@ CREATE OR REPLACE PACKAGE nm3globinv AS
 --   Global Inventory Update Package
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2001
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
 --
-  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.3  $';
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.4  $';
 --  g_sccsid is the SCCS ID for the package
 --
 -- These constant values are the values to be used for the PI_OVERHANG_RULE

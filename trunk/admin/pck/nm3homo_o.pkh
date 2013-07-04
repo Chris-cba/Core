@@ -3,11 +3,11 @@ create or replace package nm3homo_o as
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3homo_o.pkh-arc   2.2   May 16 2011 14:44:52   Steve.Cooper  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3homo_o.pkh-arc   2.3   Jul 04 2013 16:04:12   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3homo_o.pkh  $
---       Date into PVCS   : $Date:   May 16 2011 14:44:52  $
---       Date fetched Out : $Modtime:   Apr 01 2011 12:00:24  $
---       Version          : $Revision:   2.2  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:04:12  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:12  $
+--       Version          : $Revision:   2.3  $
 --       Based on SCCS version : 1.1
 -------------------------------------------------------------------------
 --
@@ -16,11 +16,11 @@ create or replace package nm3homo_o as
 --   Homogenous Inventory Update Object package
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2002
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
-  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.2  $';
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.3  $';
 --  g_sccsid is the SCCS ID for the package
 --</GLOBVAR>
 --
