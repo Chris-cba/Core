@@ -1,0 +1,97 @@
+CREATE OR REPLACE PACKAGE nm3progress AS 
+--<PACKAGE>
+--
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3progress.pkh-arc   2.2   Jul 04 2013 16:21:10   James.Wadsworth  $
+--       Module Name      : $Workfile:   nm3progress.pkh  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:21:10  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:18  $
+--       Version          : $Revision:   2.2  $
+--       Based on SCCS version : 1.1
+-------------------------------------------------------------------------
+--
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--
+-----------------------------------------------------------------------------
+--
+--</PACKAGE>
+--<GLOBVAR>
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.2  $';
+--  g_sccsid is the SCCS ID for the package
+--
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version of the package
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get">
+--
+--   Function to get using PRG_UK constraint
+--
+FUNCTION get (pi_prg_progress_id   NM_PROGRESS.prg_progress_id%TYPE
+             ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+             ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+             ) RETURN NM_PROGRESS%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="record_progress">
+-- Store details of progress into nm_progress
+PROCEDURE record_progress(pi_progress_id      IN nm_progress.prg_progress_id%TYPE
+                         ,pi_force            IN BOOLEAN DEFAULT FALSE
+						 ,pi_current_stage    IN nm_progress.prg_current_stage%TYPE
+                         ,pi_operation        IN nm_progress.prg_operation%TYPE
+                         ,pi_total_count      IN nm_progress.prg_total_count%TYPE DEFAULT NULL
+                         ,pi_current_position IN nm_progress.prg_current_position%TYPE DEFAULT NULL);
+						 
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--<PROC NAME="get_next_progress_id">
+-- Get next id to assign to a progress record 	  
+FUNCTION get_next_progress_id RETURN PLS_INTEGER;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--<PROC NAME="initialiase_progress">
+-- initialisation	  
+PROCEDURE initialise_progress(pi_progress_id  IN nm_progress.prg_progress_id%TYPE
+                             ,pi_total_stages IN nm_progress.prg_total_stages%TYPE DEFAULT 1);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--<PROC NAME="end_progress">
+-- end of progess 	
+PROCEDURE end_progress(pi_progress_id         IN nm_progress.prg_progress_id%TYPE
+                      ,pi_completion_message  IN nm_progress.prg_operation%TYPE
+                      ,pi_error_message       IN nm_progress.prg_error_message%TYPE DEFAULT NULL);	
+
+--</PROC>
+--
+-------------------------------------------------------------------------------
+--<PRAGMA>
+   PRAGMA RESTRICT_REFERENCES (get_version, RNDS, WNPS, WNDS);
+   PRAGMA RESTRICT_REFERENCES (get_body_version, RNDS, WNPS, WNDS);
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+END nm3progress;
+/

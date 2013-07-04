@@ -1,0 +1,111 @@
+CREATE OR REPLACE PACKAGE Nm3replace IS
+--<PACKAGE>
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)nm3replace.pkh	1.1 03/01/01
+--       Module Name      : nm3replace.pkh
+--       Date into SCCS   : 01/03/01 16:23:58
+--       Date fetched Out : 07/06/13 14:13:15
+--       SCCS Version     : 1.1
+--
+--
+--   Author : ITurnbull
+--
+--     nm3replace package.
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--all global package variables here
+--<GLOBVAR>
+  g_sccsid      CONSTANT  VARCHAR2(80) := '"@(#)nm3replace.pkh	1.1 03/01/01"';
+--  g_sccsid is the SCCS_ID
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_version">
+-- This function returns the SCCS version information
+  FUNCTION get_version RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="do_replace">
+-- replaces one element in nm_members with another
+-- throws exception -20800,'Element has inv items that are not replaceable'
+   PROCEDURE do_replace( p_ne_id nm_elements.ne_id%TYPE
+                        ,p_ne_id_new IN OUT nm_elements.ne_id%TYPE
+                        ,p_effective_date DATE DEFAULT SYSDATE
+                        ,p_ne_unique nm_elements.ne_unique%TYPE DEFAULT NULL
+                        ,p_ne_type nm_elements.ne_type%TYPE DEFAULT NULL
+                        ,p_ne_nt_type nm_elements.ne_nt_type%TYPE DEFAULT NULL
+                        ,p_ne_descr nm_elements.ne_descr%TYPE DEFAULT NULL
+                        ,p_ne_length nm_elements.ne_length%TYPE DEFAULT NULL
+                        ,p_ne_admin_unit nm_elements.ne_admin_unit%TYPE DEFAULT NULL
+                        ,p_ne_gty_group_type nm_elements.ne_gty_group_type%TYPE DEFAULT NULL
+                        ,p_ne_owner nm_elements.ne_owner%TYPE DEFAULT NULL
+                        ,p_ne_name_1 nm_elements.ne_name_1%TYPE DEFAULT NULL
+                        ,p_ne_name_2 nm_elements.ne_name_2%TYPE DEFAULT NULL
+                        ,p_ne_prefix nm_elements.ne_prefix%TYPE DEFAULT NULL
+                        ,p_ne_number nm_elements.ne_number%TYPE DEFAULT NULL
+                        ,p_ne_sub_type nm_elements.ne_sub_type%TYPE DEFAULT NULL
+                        ,p_ne_group nm_elements.ne_group%TYPE DEFAULT NULL
+                        ,p_ne_no_start nm_elements.ne_no_start%TYPE DEFAULT NULL
+                        ,p_ne_no_end nm_elements.ne_no_end%TYPE DEFAULT NULL
+                        ,p_ne_sub_class nm_elements.ne_sub_class%TYPE DEFAULT NULL
+                        ,p_ne_nsg_ref nm_elements.ne_nsg_ref%TYPE DEFAULT NULL
+                        ,p_ne_version_no nm_elements.ne_version_no%TYPE DEFAULT NULL
+                        ,p_neh_descr nm_element_history.neh_descr%TYPE DEFAULT NULL --CWS 0108990 12/03/2010
+                       );
+
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="do_geo_replace">
+-- replaces one element in nm_members with another
+-- call do_replace, only call from SDE new ne_id must be supplied
+   PROCEDURE do_geo_replace( p_ne_id nm_elements.ne_id%TYPE
+                        ,p_ne_id_new IN nm_elements.ne_id%TYPE
+                        ,p_effective_date DATE DEFAULT SYSDATE
+                        ,p_ne_unique nm_elements.ne_unique%TYPE DEFAULT NULL
+                        ,p_ne_type nm_elements.ne_type%TYPE DEFAULT NULL
+                        ,p_ne_nt_type nm_elements.ne_nt_type%TYPE DEFAULT NULL
+                        ,p_ne_descr nm_elements.ne_descr%TYPE DEFAULT NULL
+                        ,p_ne_length nm_elements.ne_length%TYPE DEFAULT NULL
+                        ,p_ne_admin_unit nm_elements.ne_admin_unit%TYPE DEFAULT NULL
+                        ,p_ne_gty_group_type nm_elements.ne_gty_group_type%TYPE DEFAULT NULL
+                        ,p_ne_owner nm_elements.ne_owner%TYPE DEFAULT NULL
+                        ,p_ne_name_1 nm_elements.ne_name_1%TYPE DEFAULT NULL
+                        ,p_ne_name_2 nm_elements.ne_name_2%TYPE DEFAULT NULL
+                        ,p_ne_prefix nm_elements.ne_prefix%TYPE DEFAULT NULL
+                        ,p_ne_number nm_elements.ne_number%TYPE DEFAULT NULL
+                        ,p_ne_sub_type nm_elements.ne_sub_type%TYPE DEFAULT NULL
+                        ,p_ne_group nm_elements.ne_group%TYPE DEFAULT NULL
+                        ,p_ne_no_start nm_elements.ne_no_start%TYPE DEFAULT NULL
+                        ,p_ne_no_end nm_elements.ne_no_end%TYPE DEFAULT NULL
+                        ,p_ne_sub_class nm_elements.ne_sub_class%TYPE DEFAULT NULL
+                        ,p_ne_nsg_ref nm_elements.ne_nsg_ref%TYPE DEFAULT NULL
+                        ,p_ne_version_no nm_elements.ne_version_no%TYPE DEFAULT NULL
+                       );
+--
+-----------------------------------------------------------------------------
+--
+--<PRAGMA>
+   PRAGMA RESTRICT_REFERENCES (get_version, RNDS, WNPS, WNDS);
+   PRAGMA RESTRICT_REFERENCES (get_body_version, RNDS, WNPS, WNDS);
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+END Nm3replace;
+/

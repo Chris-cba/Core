@@ -1,0 +1,170 @@
+CREATE OR REPLACE PACKAGE Nm3reclass AS
+--<PACKAGE>
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)nm3reclass.pkh	1.14 12/08/05
+--       Module Name      : nm3reclass.pkh
+--       Date into SCCS   : 05/12/08 11:14:39
+--       Date fetched Out : 07/06/13 14:13:14
+--       SCCS Version     : 1.14
+--
+--
+--   Author : R.A. Coupe
+--
+--   Package for reclassification of network elements
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+  g_sccsid      CONSTANT  VARCHAR2(2000) := '"@(#)nm3reclass.pkh	1.14 12/08/05"';
+--  g_sccsid is the SCCS ID for the package
+--
+   g_dyn_rec_ne   nm_elements%ROWTYPE;
+   g_dyn_rec_ne2  nm_elements%ROWTYPE;
+   g_rec_ne       nm_elements%ROWTYPE;
+   g_dyn_into     NUMBER;
+   g_dyn_into_str VARCHAR2(2000);
+   g_dyn_ne_id    NUMBER;
+   g_dyn_boolean  BOOLEAN;
+   
+--
+-- globals set by can_element_be_split function
+-- 
+   g_ner_appl  nm_errors.ner_appl%TYPE;
+   g_ner_id    nm_errors.ner_id%TYPE;
+   g_supplimentary_info  VARCHAR2(200);   
+--
+--
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="reclassify_element">
+PROCEDURE reclassify_element
+                (p_old_ne_id         IN     nm_elements.ne_id%TYPE
+                ,p_new_ne            IN     nm_elements%ROWTYPE
+                ,p_job_id            IN     NM_RECLASS_DETAILS.nrd_job_id%TYPE
+                ,p_gis_call          IN     BOOLEAN
+                ,p_new_ne_id         OUT    nm_elements.ne_id%TYPE
+                ,p_check_for_changes IN     BOOLEAN DEFAULT TRUE
+                ,p_neh_descr         IN   nm_element_history.neh_descr%TYPE DEFAULT NULL --CWS
+                );
+PROCEDURE reclassify_element
+                (p_old_ne_id         IN     nm_elements.ne_id%TYPE
+                ,p_new_ne            IN     nm_elements%ROWTYPE
+                ,p_new_ne_id         OUT    nm_elements.ne_id%TYPE
+                ,p_neh_descr         IN   nm_element_history.neh_descr%TYPE DEFAULT NULL --CWS
+                );
+-- Possible errors raised are
+-- -20801, The start node is an invalid type for this network type
+-- -20802, The end node is an invalid type for this network type
+-- -20803, No Unique reference has been supplied
+-- -20804, The new element must not be closed
+-- -20805, Unable to close Element it has un-replaceable inventory
+-- -20806, Parent element does not exist
+-- -20807, Invalid code control
+-- -20808, No length has been supplied
+-- -20809, The lengths of the elements must be the same
+-- -20810, The supplied element must not have a group type
+-- -20811, The start node must not be null
+-- -20812, The end node must not be null
+-- -20813, Column XXXXXX supplied and not used
+-- -20820, Element has shape - cannot reclassify
+-- -20821, Cannot reclassify for dates other than effective date
+-- -20822, Old element not found
+-- -20823, Element is unchanged. Not Reclassifying
+-- -20824, Cannot reclassify distance breaks except for within the reclassification of a route
+-- -20825, Unable to reclassify Element as inventory XSP rules would be violated
+-- -20826, Subclass not valid on new NW Type
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE remove_reclass_details (p_job_id IN NM_RECLASS_DETAILS.nrd_job_id%TYPE);
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="does_nt_scl_change_break_xsp">
+-- This function returns TRUE if by changing the NW_TYPE and SUBCLASS of the
+--  specified NE_ID, some inventory (that the use can see) which is located on
+--  this element would violate the XSP_RESTRAINTS rules
+--
+FUNCTION does_nt_scl_change_break_xsp (p_ne_id_of     nm_members.nm_ne_id_of%TYPE
+                                      ,p_new_nw_type  xsp_restraints.xsr_nw_type%TYPE
+                                      ,p_new_subclass nm_elements.ne_sub_class%TYPE
+                                      ) RETURN BOOLEAN;
+--</PROC>
+--
+---------------------------------------------------------------------------------------------------
+--
+--<PROC NAME="is_subclass_valid">
+-- This function returns TRUE if the passed subclass is valid on the passed NT_TYPE
+--  (or the passed subclass is null)
+FUNCTION is_subclass_valid (p_nt_type   VARCHAR2
+                           ,p_sub_class VARCHAR2
+                           ) RETURN BOOLEAN;
+--</PROC>
+--
+---------------------------------------------------------------------------------------------------
+--
+--<PROC NAME="ne_type_can_be_reclassed">
+--
+-- This function returns TRUE if the passed ne_type is suitable for  reclassification.
+--
+FUNCTION ne_type_can_be_reclassed(pi_ne_type nm_elements.ne_type%TYPE
+                                 ) RETURN BOOLEAN;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--<PROC NAME="can_element_be_reclassed">
+-- true or false returned depending on whether element can be reclassed
+FUNCTION can_element_be_reclassed(pi_ne_rec         IN nm_elements%ROWTYPE
+                                 ,pi_effective_date IN DATE) RETURN BOOLEAN;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--<PROC NAME="check_element_can_be_reclassed">
+-- Raise error if NOT can_element_be_reclassed
+PROCEDURE check_element_can_be_reclassed(pi_ne_id          IN nm_elements.ne_id%TYPE
+    	                                ,pi_effective_date IN DATE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--<PROC NAME="ins_doc_assocs">
+-- Insert a record into doc_assocs, for reclassifying asection with an ENQ or DEFECT on it.
+PROCEDURE ins_doc_assocs( pi_new_id doc_assocs.das_rec_id%TYPE
+                        , pi_old_id doc_assocs.das_rec_id%TYPE
+                        , pi_doc_id doc_assocs.das_doc_id%TYPE default null
+                        , pi_table_name doc_assocs.das_table_name%TYPE
+                        );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PRAGMA>
+   PRAGMA RESTRICT_REFERENCES (get_version, rnds, wnps, wnds);
+   PRAGMA RESTRICT_REFERENCES (get_body_version, rnds, wnps, wnds);
+   PRAGMA RESTRICT_REFERENCES (does_nt_scl_change_break_xsp,  wnps, wnds);
+   PRAGMA RESTRICT_REFERENCES (ne_type_can_be_reclassed    ,  wnps, wnds);
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+END Nm3reclass;
+/
