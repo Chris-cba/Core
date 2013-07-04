@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3asset AS
 --
 --   SCCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3asset.pkb-arc   2.23   Jun 15 2011 17:54:54   Chris.Strettle  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3asset.pkb-arc   2.24   Jul 04 2013 15:23:08   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3asset.pkb  $
---       Date into PVCS   : $Date:   Jun 15 2011 17:54:54  $
---       Date fetched Out : $Modtime:   Jun 15 2011 17:48:26  $
---       PVCS Version     : $Revision:   2.23  $
+--       Date into PVCS   : $Date:   Jul 04 2013 15:23:08  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:08  $
+--       PVCS Version     : $Revision:   2.24  $
 --
 --
 --   Author : Rob Coupe
@@ -16,12 +16,12 @@ CREATE OR REPLACE PACKAGE BODY nm3asset AS
 --   Assets package
 -- nm3inv
 -----------------------------------------------------------------------------
--- Copyright (c) exor corporation ltd, 2001
+-- Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.23  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.24  $"';
    g_gos_ne_id                    nm_members_all.nm_ne_id_in%type ;
 --  g_body_sccsid is the SCCS ID for the package body
 --

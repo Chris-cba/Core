@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3ddl AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ddl.pkb-arc   2.26   Nov 10 2011 14:00:40   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ddl.pkb-arc   2.27   Jul 04 2013 15:23:08   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3ddl.pkb  $
---       Date into PVCS   : $Date:   Nov 10 2011 14:00:40  $
---       Date fetched Out : $Modtime:   Nov 10 2011 13:55:46  $
---       PVCS Version     : $Revision:   2.26  $
+--       Date into PVCS   : $Date:   Jul 04 2013 15:23:08  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 15:20:04  $
+--       PVCS Version     : $Revision:   2.27  $
 --       Based on SCCS Version     : 1.5
 --
 --
@@ -17,13 +17,13 @@ CREATE OR REPLACE PACKAGE BODY Nm3ddl AS
 --   NM3 DDL package
 --
 -----------------------------------------------------------------------------
--- Copyright (c) exor corporation ltd, 2001
+-- Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 --
 --all global package variables here
 --
-   g_body_sccsid     constant varchar2(30) :='"$Revision:   2.26  $"';
+   g_body_sccsid     constant varchar2(30) :='"$Revision:   2.27  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3ddl';
@@ -2338,7 +2338,7 @@ IS
   l_d    VARCHAR2(100) := NVL(pi_d,'%'||'D'||'%');
   l_t    VARCHAR2(100) := NVL(pi_t,'%'||'T'||'%');
   l_i    VARCHAR2(100) := NVL(pi_i,'%'||'I'||'%');
-  l_c    VARCHAR2(100) := NVL(pi_copyright,'Copyright (c) exor corporation ltd, 2006');
+  l_c    VARCHAR2(100) := NVL(pi_copyright,'Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.');
 BEGIN
 --
   IF l_sccs IS NULL

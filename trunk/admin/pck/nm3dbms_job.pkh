@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE nm3dbms_job AS
 --<PACKAGE>
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3dbms_job.pkh-arc   2.1   Jan 04 2010 15:51:24   cstrettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3dbms_job.pkh-arc   2.2   Jul 04 2013 15:23:08   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3dbms_job.pkh  $
---       Date into PVCS   : $Date:   Jan 04 2010 15:51:24  $
---       Date fetched Out : $Modtime:   Jan 04 2010 15:37:24  $
---       Version          : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   Jul 04 2013 15:23:08  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:10  $
+--       Version          : $Revision:   2.2  $
 --       Based on SCCS version : 1.2
 --
 --   Author : K Angus
@@ -14,11 +14,11 @@ CREATE OR REPLACE PACKAGE nm3dbms_job AS
 --   Procs/functions for manipulating DBMS jobs.
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2002
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
-  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.1  $';
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.2  $';
 --  g_sccsid is the SCCS ID for the package
 --</GLOBVAR>
 --

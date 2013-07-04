@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3debug IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3debug.pkb-arc   2.21   Jan 08 2013 15:55:30   Chris.Baugh  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3debug.pkb-arc   2.22   Jul 04 2013 15:23:08   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3debug.pkb  $
---       Date into PVCS   : $Date:   Jan 08 2013 15:55:30  $
---       Date fetched Out : $Modtime:   Jan 08 2013 15:32:04  $
---       PVCS Version     : $Revision:   2.21  $
+--       Date into PVCS   : $Date:   Jul 04 2013 15:23:08  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:10  $
+--       PVCS Version     : $Revision:   2.22  $
 --
 --
 --   Author : Jonathan Mills
@@ -16,15 +16,15 @@ CREATE OR REPLACE PACKAGE BODY nm3debug IS
 --   Generated package DO NOT MODIFY
 --
 --   nm3get_gen header : "@(#)nm3get_gen.pkh	1.3 12/05/05"
---   nm3get_gen body   : "$Revision:   2.21  $"
+--   nm3get_gen body   : "$Revision:   2.22  $"
 --
 -----------------------------------------------------------------------------
 --
---	Copyright (c) exor corporation ltd, 2005
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 --
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid CONSTANT  VARCHAR2(2000) := '"$Revision:   2.21  $"';
+   g_body_sccsid CONSTANT  VARCHAR2(2000) := '"$Revision:   2.22  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3debug';
