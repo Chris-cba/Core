@@ -1,0 +1,277 @@
+CREATE OR REPLACE PACKAGE nm3jobs 
+AUTHID CURRENT_USER 
+AS
+--<PACKAGE>
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3jobs.pkh-arc   3.7   Jul 04 2013 16:11:40   James.Wadsworth  $
+--       Module Name      : $Workfile:   nm3jobs.pkh  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:11:40  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:14  $
+--       Version          : $Revision:   3.7  $
+--       Based on SCCS version : 1.21
+-------------------------------------------------------------------------
+--   Author : A Edwards
+--
+--   NM3 DBMS_SCHEDULER wrapper
+--
+-----------------------------------------------------------------------------
+-- Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+----
+--</PACKAGE>
+--all global package variables here
+--<GLOBVAR>
+-- g_sccsid is the SCCS_ID
+-- Constants
+  g_sccsid           CONSTANT VARCHAR2(80) := '"$Revision:   3.7  $"';
+--
+-- Some invervals
+--
+  g_daily                CONSTANT varchar2(100)  := 'freq=daily;';
+  g_midnight             CONSTANT varchar2(100)  := 'freq=daily; byhour=0; byminute=0; bysecond=0;';
+  g_six_am               CONSTANT varchar2(100)  := 'freq=daily; byhour=6; byminute=0; bysecond=0;';
+  g_hourly               CONSTANT varchar2(100)  := 'freq=hourly; byminute=0; bysecond=0;';
+  g_minute               CONSTANT varchar2(100)  := 'freq=minutely; bysecond=0;';
+  g_every_monday_9am     CONSTANT varchar2(100)  := 'freq=weekly; byday=mon; byhour=9; byminute=0; bysecond=0;';
+  g_first_mon_quarterly  CONSTANT varchar2(100)  := 'freq=monthly; bymonth=1,4,7,10; byday=1mon;';
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+  FUNCTION get_version RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+  FUNCTION get_body_version RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="CREATE_JOB">
+--   This procedure submits a job
+--
+--     pi_job_name           - Pass in a unique job name (no spaces)
+--     pi_job_owner          - The name of the user that the job will execute as
+--     pi_job_action         - Pass in the PLSQL call to packaged procedure etc
+--     pi_repeat_interval    - 
+--       You can use some example intervals
+--       ==========================================================
+--         g_daily                   | Daily
+--         g_midnight                | Midnight
+--         g_six_am                  | 6.00AM Each Day
+--         g_hourly                  | Hourly
+--         g_minute                  | Each Minute
+--         g_every_monday_9am        | Every Day At 9.00AM
+--         g_first_mon_quarterly     | Each Monday Every Quarter
+--       ==========================================================
+--     pi_comments           - Pass in a text comment to assoicate with the Job
+--     pi_job_type           - Defaulted to PLSQL_BLOCK
+--     pi_start_date         - Defaulted to today
+--     pi_end_date           - Defaulted to never
+--     pi_enabled            - Defaulted to enabled
+--     pi_auto_drop          - Defaulted to TRUE - when TRUE the dba_scheduler_jobs entry and all other associated data for the job are purged when FALSE they are kept
+--     pi_run_synchro        - Use same session (i.e. synchronous) or run job in new session - i.e. asynchronous
+--
+--
+  PROCEDURE create_job
+              ( pi_job_name        IN VARCHAR2
+              , pi_job_action      IN VARCHAR2
+              , pi_job_owner       IN VARCHAR2  DEFAULT Sys_Context('NM3_SECURITY_CTX','USERNAME')
+              , pi_repeat_interval IN VARCHAR2  DEFAULT g_midnight
+              , pi_comments        IN VARCHAR2  DEFAULT NULL
+              , pi_job_type        IN VARCHAR2  DEFAULT 'PLSQL_BLOCK'
+              , pi_start_date      IN TIMESTAMP DEFAULT SYSTIMESTAMP
+              , pi_end_date        IN TIMESTAMP DEFAULT NULL
+              , pi_enabled         IN BOOLEAN   DEFAULT TRUE
+              , pi_auto_drop       IN BOOLEAN   DEFAULT TRUE  
+              , pi_run_synchro     IN BOOLEAN   DEFAULT TRUE );
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="INSTANTIATE_ARGS">
+-- 
+  PROCEDURE instantiate_args;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ADD_ARG">
+-- 
+  PROCEDURE add_arg ( pi_arg IN VARCHAR );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="CREATE_JOB">
+-- Run a job immediately
+  PROCEDURE run_job ( pi_job_name            IN VARCHAR2
+                    , pi_use_current_session IN BOOLEAN DEFAULT TRUE );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="STOP_JOB">
+-- Run a job immediately
+  PROCEDURE stop_job ( pi_job_name IN VARCHAR2
+                     , pi_force    IN BOOLEAN DEFAULT FALSE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="DROP_JOB">
+-- Drop a job
+  PROCEDURE drop_job ( pi_job_name IN VARCHAR2
+                     , pi_force    IN BOOLEAN DEFAULT FALSE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="disable_job">
+-- Disable a job
+PROCEDURE disable_job (pi_job_name IN VARCHAR2
+                     , pi_force    IN BOOLEAN DEFAULT FALSE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="enable_job">
+-- Enable a job
+PROCEDURE enable_job (pi_job_name IN VARCHAR2);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="amend_job_start_datim">
+-- Change the start date of a job
+PROCEDURE amend_job_start_datim (pi_job_name IN VARCHAR2 
+                                ,pi_value     IN DATE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="amend_job_interval">
+-- Change the job interval of a job
+PROCEDURE amend_job_interval (pi_job_name IN VARCHAR2 
+                             ,pi_value    IN VARCHAR2);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="amend_job_action">
+-- Change the action of a job
+PROCEDURE amend_job_action (pi_job_name IN VARCHAR2 
+                           ,pi_value    IN VARCHAR2);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--<PROC NAME="amend_job_restartable">
+-- Change the restartable attribute of a job
+PROCEDURE amend_job_restartable (pi_job_name    IN VARCHAR2 
+                                ,pi_value       IN BOOLEAN);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--<PROC NAME="amend_job_max_failures">
+-- Change the max_failures attribute of a job
+PROCEDURE amend_job_max_failures (pi_job_name    IN VARCHAR2 
+                                 ,pi_value       IN NUMBER);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--<PROC NAME="purge_log">
+-- Purge dba_scheduler jobs and related records.
+PROCEDURE purge_log(
+  log_history        IN PLS_INTEGER DEFAULT 0,
+  which_log          IN VARCHAR2    DEFAULT 'JOB_AND_WINDOW_LOG',
+  job_name           IN VARCHAR2    DEFAULT NULL);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--<PROC NAME="evaluate_calendar_string">
+--
+-- Repeat intervals of jobs, windows or schedules are defined using the
+-- scheduler's calendar syntax. This procedure evaluates the calendar string
+-- and tells you what the next execution date of a job or window will be. This
+-- is very useful for testing the correct definition of the calendar string
+-- without having to actually schedule the job or window.
+--
+-- Parameters
+-- calendar_string    The to be evaluated calendar string.
+-- start_date         The date by which the calendar string becomes valid.
+--                    It might also be used to fill in specific items that are
+--                    missing from the calendar string. Can optionally be NULL.
+-- return_date_after  With the start_date and the calendar string the scheduler
+--                    has sufficient information to determine all valid
+--                    execution dates. By setting this argument the scheduler
+--                    determines which one of all possible matches to return.
+--                    When a NULL value is passed for this argument the
+--                    scheduler automatically fills in systimestamp as its
+--                    value.
+-- next_run_date      The first timestamp that matches the calendar string and
+--                    start date that occurs after the value passed in for the
+--                    return_date_after argument.
+-- 
+FUNCTION evaluate_calendar_string(pi_calendar_string   IN VARCHAR2
+                                 ,pi_start_date        IN  DATE DEFAULT SYSDATE
+                                 ,pi_return_date_after IN  DATE DEFAULT SYSDATE
+                                 ) RETURN DATE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--<PROC NAME="calendar_string_is_valid">
+-- 
+PROCEDURE calendar_string_is_valid(pi_calendar_string  IN VARCHAR2
+                                  ,po_is_valid         OUT BOOLEAN
+                                  ,po_frequency        OUT PLS_INTEGER
+                                  ,po_interval         OUT PLS_INTEGER
+                                  ,po_bysecond         OUT dbms_scheduler.BYLIST
+                                  ,po_byminute         OUT dbms_scheduler.BYLIST
+                                  ,po_byhour           OUT dbms_scheduler.BYLIST
+                                  ,po_byday_days       OUT dbms_scheduler.BYLIST
+                                  ,po_byday_occurrence OUT dbms_scheduler.BYLIST
+                                  ,po_bymonthday       OUT dbms_scheduler.BYLIST
+                                  ,po_byyearday        OUT dbms_scheduler.BYLIST
+                                  ,po_byweekno         OUT dbms_scheduler.BYLIST
+                                  ,po_bymonth          OUT dbms_scheduler.BYLIST);                                   
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--<PROC NAME="calendar_string_is_valid">                                 
+FUNCTION calendar_string_is_valid(pi_calendar_string  IN VARCHAR2) RETURN BOOLEAN;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--<PROC NAME="validate_calendar_string">                        
+PROCEDURE validate_calendar_string(pi_calendar_string  IN VARCHAR2);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--<PROC NAME="calendar_string_in_mins">
+FUNCTION calendar_string_in_mins(pi_calendar_string  IN VARCHAR2) RETURN PLS_INTEGER;                      
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--            
+-- Returns UP (Scheduler Enabled), SHUTTING DOWN (Scheduler Disabled but processes are running)
+-- and DOWN (Scheduler Disabled with all processes stopped)
+--<PROC NAME="get_scheduler_state">
+FUNCTION get_scheduler_state RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="count_running_processes">
+FUNCTION count_running_processes RETURN PLS_INTEGER;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+END nm3jobs;
+/
