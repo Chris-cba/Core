@@ -2,13 +2,15 @@
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/utl/0110864_spatial_join_view_refresh.sql-arc   1.0   Mar 28 2011 10:36:32   Ade.Edwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/utl/0110864_spatial_join_view_refresh.sql-arc   1.1   Jul 04 2013 10:29:54   James.Wadsworth  $
 --       Module Name      : $Workfile:   0110864_spatial_join_view_refresh.sql  $
---       Date into PVCS   : $Date:   Mar 28 2011 10:36:32  $
---       Date fetched Out : $Modtime:   Mar 28 2011 10:34:54  $
---       Version          : $Revision:   1.0  $
+--       Date into PVCS   : $Date:   Jul 04 2013 10:29:54  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 10:19:26  $
+--       Version          : $Revision:   1.1  $
 --       Author           : Chris Strettle 25/03/2011
--------------------------------------------------------------------------
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
 --
 DECLARE
   CURSOR network_type_cur IS

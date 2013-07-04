@@ -2,13 +2,15 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/utl/1_719412_Data_Report.sql-arc   3.0   Jan 27 2011 09:25:58   Ade.Edwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/utl/1_719412_Data_Report.sql-arc   3.1   Jul 04 2013 10:29:54   James.Wadsworth  $
 --       Module Name      : $Workfile:   1_719412_Data_Report.sql  $
---       Date into PVCS   : $Date:   Jan 27 2011 09:25:58  $
---       Date fetched Out : $Modtime:   Jan 11 2011 16:54:26  $
---       PVCS Version     : $Revision:   3.0  $
+--       Date into PVCS   : $Date:   Jul 04 2013 10:29:54  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 10:18:20  $
+--       PVCS Version     : $Revision:   3.1  $
 --
---------------------------------------------------------------------------------
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
 --
 
 SET SERVEROUTPUT ON FORMAT WRAPPED 

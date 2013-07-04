@@ -2,13 +2,15 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/utl/0110548_das_data_repair.sql-arc   3.0   Feb 09 2011 08:47:26   Ade.Edwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/utl/0110548_das_data_repair.sql-arc   3.1   Jul 04 2013 10:29:54   James.Wadsworth  $
 --       Module Name      : $Workfile:   0110548_das_data_repair.sql  $
---       Date into PVCS   : $Date:   Feb 09 2011 08:47:26  $
---       Date fetched Out : $Modtime:   Feb 09 2011 08:46:30  $
---       PVCS Version     : $Revision:   3.0  $
+--       Date into PVCS   : $Date:   Jul 04 2013 10:29:54  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 10:19:12  $
+--       PVCS Version     : $Revision:   3.1  $
 --
---------------------------------------------------------------------------------
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
 --
 
 PROMPT Start of DOC_ASSOCS repair

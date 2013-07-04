@@ -2,13 +2,15 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/utl/0110688_SDORESEQ_Option.sql-arc   3.4   Feb 21 2011 08:31:14   Ade.Edwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/utl/0110688_SDORESEQ_Option.sql-arc   3.5   Jul 04 2013 10:29:54   James.Wadsworth  $
 --       Module Name      : $Workfile:   0110688_SDORESEQ_Option.sql  $
---       Date into PVCS   : $Date:   Feb 21 2011 08:31:14  $
---       Date fetched Out : $Modtime:   Feb 21 2011 08:31:14  $
---       PVCS Version     : $Revision:   3.4  $
+--       Date into PVCS   : $Date:   Jul 04 2013 10:29:54  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 10:19:18  $
+--       PVCS Version     : $Revision:   3.5  $
 --
---------------------------------------------------------------------------------
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
 --
 
 DELETE hig_option_values WHERE hov_id = 'SDORESEQ';

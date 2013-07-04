@@ -13,7 +13,7 @@
 --   A script that creates a table/view showing object dependencies
 --   Utilised initially for compile_schema.sql and for dropping of types in nm3typ.sql
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2004
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 
 set term off
