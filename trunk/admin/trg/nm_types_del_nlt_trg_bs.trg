@@ -18,7 +18,7 @@ DECLARE
 --    Create NM_LINEAR_TYPE trigger
 --
 -----------------------------------------------------------------------------
--- Copyright (c) exor corporation ltd, 2004
+-- Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 BEGIN
    --remove any left over records in the temporary table

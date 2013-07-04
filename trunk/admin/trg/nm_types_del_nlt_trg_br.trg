@@ -20,7 +20,7 @@ DECLARE
 --    Create NM_LINEAR_TYPE Trigger
 --
 -----------------------------------------------------------------------------
--- Copyright (c) exor corporation ltd, 2004
+-- Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
    l_rec_nt               nm_types%ROWTYPE;
    i                      NUMBER DEFAULT   nm3net.g_tab_nt.COUNT

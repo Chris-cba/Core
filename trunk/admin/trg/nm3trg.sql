@@ -2,11 +2,11 @@
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm3trg.sql-arc   2.19   Jun 06 2011 09:42:30   Chris.Strettle  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm3trg.sql-arc   2.20   Jul 04 2013 09:54:32   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3trg.sql  $
---       Date into PVCS   : $Date:   Jun 06 2011 09:42:30  $
---       Date fetched Out : $Modtime:   Jun 06 2011 09:28:16  $
---       PVCS Version     : $Revision:   2.19  $
+--       Date into PVCS   : $Date:   Jul 04 2013 09:54:32  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 09:35:30  $
+--       PVCS Version     : $Revision:   2.20  $
 --
 --
 --   Author : Graeme Johnson
@@ -14,7 +14,7 @@
 --   Product install/upgrade script
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2007
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 
 

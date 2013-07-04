@@ -18,7 +18,7 @@ BEGIN
 --         FOR EACH ROW
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2001
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
    IF NOT nm3flx.is_string_valid_for_object ('_'||:NEW.nwx_x_sect) -- Put the _ on the front because numeric only is ok in this case

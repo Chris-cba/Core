@@ -14,7 +14,7 @@ DECLARE
 --       SCCS Version     : 1.1
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2001
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
    CURSOR cs_ngt (c_nt_type nm_type_inclusion.nti_nw_parent_type%TYPE) IS

@@ -17,7 +17,7 @@ DECLARE
 --   Create NM_LINEAR_TYPES trigger
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2003
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 
   CURSOR c_get_nlt_id(cp_nlt_nt_type IN nm_types.nt_type%TYPE) IS
