@@ -1,0 +1,68 @@
+Create Or Replace Package Exor_Core.Nm3Ctx
+As
+--<PACKAGE>
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header::
+--       Module Name      : $Workfile:   nm3ctx.pkh  $
+--       Date into PVCS   : $Date:   Jul 04 2013 14:08:58  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 11:54:14  $
+--       Version          : $Revision:   3.2  $
+--       Based on SCCS version : 
+-------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-------------------------------------------------------------------------
+--
+----</PACKAGE>
+--<GLOBVAR>
+  -----------
+  --constants
+  -----------
+  --g_sccsid is the SCCS ID for the package
+  G_Sccsid Constant Varchar2(2000) := '$Revision:   3.2  $';
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+Function Get_Version Return Varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+Function Get_Body_Version Return Varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="set_context">
+-- This Procedure sets the context variable 
+Procedure Set_Context (
+                      p_Attribute   In  Varchar2,
+                      p_Value       In  Varchar2
+                      ); 
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="Set_Core_Context">
+-- This Procedure sets the context variable for core internal operations.
+Procedure Set_Core_Context  (
+                            p_Attribute   In  Varchar2,
+                            p_Value       In  Varchar2
+                            );
+--</PROC>
+--<PRAGMA>
+  Pragma Restrict_References(Get_Version, Rnds, Wnps, Wnds);
+  Pragma Restrict_References(Get_Body_Version, Rnds, Wnps, Wnds);
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+End Nm3Ctx;
+/
+
