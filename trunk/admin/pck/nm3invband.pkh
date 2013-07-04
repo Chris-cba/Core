@@ -3,11 +3,11 @@ create or replace package nm3invband as
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3invband.pkh-arc   2.1   Jan 06 2010 22:50:32   cstrettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3invband.pkh-arc   2.2   Jul 04 2013 16:11:38   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3invband.pkh  $
---       Date into PVCS   : $Date:   Jan 06 2010 22:50:32  $
---       Date fetched Out : $Modtime:   Jan 06 2010 22:48:58  $
---       Version          : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:11:38  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:12  $
+--       Version          : $Revision:   2.2  $
 --       Based on SCCS version : 1.2
 -------------------------------------------------------------------------
 --
@@ -16,11 +16,11 @@ create or replace package nm3invband as
 --   Inventory Banding package
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2001
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
-  g_sccsid      CONSTANT  VARCHAR2(2000) := '$Revision:   2.1  $';
+  g_sccsid      CONSTANT  VARCHAR2(2000) := '$Revision:   2.2  $';
 --  g_sccsid is the SCCS ID for the package
 --
    TYPE tab_rec_itd IS TABLE OF nm_inv_type_attrib_band_dets%ROWTYPE INDEX BY BINARY_INTEGER;
