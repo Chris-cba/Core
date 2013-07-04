@@ -10,7 +10,7 @@ CREATE OR REPLACE type ptr as object
 --       SCCS Version     : 1.1
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2006
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 ( ptr_id integer, ptr_value integer );
 /

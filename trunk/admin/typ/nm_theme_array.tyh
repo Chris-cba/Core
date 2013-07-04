@@ -14,7 +14,7 @@ CREATE OR REPLACE TYPE NM_theme_array as object
 --    Author : R.A. Coupe
 --
 -----------------------------------------------------------------------------
---      Copyright (c) exor corporation ltd, 2001
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
  nta_theme_array  nm_theme_array_type

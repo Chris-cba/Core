@@ -14,7 +14,7 @@ CREATE OR REPLACE TYPE NM_THEME_LIST as object
 --    Author : R.A. Coupe
 --
 -----------------------------------------------------------------------------
---      Copyright (c) exor corporation ltd, 2001
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
  ntl_theme_list nm_theme_list_type 

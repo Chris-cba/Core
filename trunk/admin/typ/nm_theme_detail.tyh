@@ -14,7 +14,7 @@ CREATE OR REPLACE TYPE NM_THEME_DETAIL as object
 --    Author : R.A. Coupe
 --
 -----------------------------------------------------------------------------
---      Copyright (c) exor corporation ltd, 2001
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 

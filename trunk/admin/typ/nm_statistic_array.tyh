@@ -14,7 +14,7 @@ CREATE OR REPLACE TYPE nm_statistic_array AS object
 --    TYPE nm_statistic_array
 --
 -----------------------------------------------------------------------------
---      Copyright (c) exor corporation ltd, 2001
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
   nsa_statistic_array    nm_statistic_array_type

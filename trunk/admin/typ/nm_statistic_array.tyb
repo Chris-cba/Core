@@ -4,11 +4,11 @@ create or replace type body nm_statistic_array is
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/typ/nm_statistic_array.tyb-arc   2.2   Mar 27 2009 22:00:14   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/typ/nm_statistic_array.tyb-arc   2.3   Jul 04 2013 10:14:46   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm_statistic_array.tyb  $
---       Date into PVCS   : $Date:   Mar 27 2009 22:00:14  $
---       Date fetched Out : $Modtime:   Mar 27 2009 21:59:02  $
---       PVCS Version     : $Revision:   2.2  $
+--       Date into PVCS   : $Date:   Jul 04 2013 10:14:46  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 09:59:38  $
+--       PVCS Version     : $Revision:   2.3  $
 --       Based on
 
 --       SCCS Version     : 1.9
@@ -18,14 +18,14 @@ create or replace type body nm_statistic_array is
 --   nm_statistic_array type body
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2001
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 ------------------------------------------------------------------------------------------------
 --
 STATIC FUNCTION get_body_version RETURN VARCHAR2 IS
 BEGIN
-   RETURN '"$Revision:   2.2  $"';
+   RETURN '"$Revision:   2.3  $"';
 END get_body_version;
 --
 ------------------------------------------------------------------------------------------------

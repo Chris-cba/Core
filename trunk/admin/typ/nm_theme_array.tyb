@@ -13,7 +13,7 @@ CREATE OR REPLACE type body nm_theme_array is
 --    Author : R.A. Coupe
 --
 -----------------------------------------------------------------------------
---      Copyright (c) exor corporation ltd, 2001
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 
