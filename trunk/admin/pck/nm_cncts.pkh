@@ -14,7 +14,7 @@ CREATE OR REPLACE PACKAGE Nm_Cncts AS
 --   NM3 Connectivity package
 --
 -------------------------------------------------------------------------------
---	Copyright (c) exor corporation 2006
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 
 
