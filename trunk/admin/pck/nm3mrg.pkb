@@ -1,20 +1,20 @@
 CREATE OR REPLACE PACKAGE BODY nm3mrg IS
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mrg.pkb-arc   2.8   May 16 2011 14:45:02   Steve.Cooper  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mrg.pkb-arc   2.9   Jul 04 2013 16:16:48   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3mrg.pkb  $
---       Date into PVCS   : $Date:   May 16 2011 14:45:02  $
---       Date fetched Out : $Modtime:   Apr 01 2011 14:48:46  $
---       PVCS Version     : $Revision:   2.8  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:16:48  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 15:46:58  $
+--       PVCS Version     : $Revision:   2.9  $
 --       Based on SCCS version : 1.60
 --
 --   Author : Jonathan Mills
 --
 --     nm3mrg package. Used for Merge Queries
 --
-------------------------------------------------------------------------------------------------
---  Copyright (c) exor corporation ltd, 2000
-------------------------------------------------------------------------------------------------
+------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+------------------------------------------------------------------
 /* History
   06.08.09 RC Changed the default on the system option MRGCODE32 (Not NM3CODE32 as below) to work on old code if no option.
   26.03.09 PT in execute_mrg_query() added logic to call new code in nm3bulk_mrg
@@ -32,7 +32,7 @@ CREATE OR REPLACE PACKAGE BODY nm3mrg IS
                 NB! requires nm3bulk_mrg_pkh 2.7 or higher (logs 723574, 724275)
 */
 
-  g_body_sccsid   constant varchar2(200) :='"$Revision:   2.8  $"';
+  g_body_sccsid   constant varchar2(200) :='"$Revision:   2.9  $"';
   g_package_name     CONSTANT  varchar2(30)   := 'NM3MRG';
 --
   g_mrg_section_id  pls_integer;

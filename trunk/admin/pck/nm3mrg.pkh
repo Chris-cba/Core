@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE nm3mrg IS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mrg.pkh-arc   2.1   Jan 12 2010 10:41:16   cstrettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mrg.pkh-arc   2.2   Jul 04 2013 16:16:48   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3mrg.pkh  $
---       Date into PVCS   : $Date:   Jan 12 2010 10:41:16  $
---       Date fetched Out : $Modtime:   Jan 12 2010 10:39:54  $
---       Version          : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:16:48  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:16  $
+--       Version          : $Revision:   2.2  $
 --       Based on SCCS version : 1.19
 -------------------------------------------------------------------------
 --
@@ -16,13 +16,13 @@ CREATE OR REPLACE PACKAGE nm3mrg IS
 --     nm3mrg package. Used for Merge Queries
 --
 ------------------------------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2000
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 ------------------------------------------------------------------------------------------------
 --</PACKAGE>
 --all global package variables here
 --<GLOBVAR>
 --  g_sccsid is the SCCS_ID
-   g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.1  $';
+   g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.2  $';
 --
 -- Global TYPE declarations
 --
