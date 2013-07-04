@@ -1,0 +1,71 @@
+--
+DROP TABLE exor_version_tab;
+--
+CREATE TABLE exor_version_tab
+   (package_name      VARCHAR2(30)   NOT NULL
+   ,package_type      VARCHAR2(30)   NOT NULL
+   ,version_text      VARCHAR2(2000) NOT NULL
+   ,last_ddl_time     DATE           NOT NULL
+   ,timestamp_created DATE           NOT NULL
+   ,CONSTRAINT  exor_version_tab_PK
+  PRIMARY KEY ( package_name, package_type )
+   );
+--
+CREATE OR REPLACE PACKAGE exor_version IS
+--<PACKAGE>
+--   PVCS Identifiers :-
+--
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/exor_version.pkh-arc   2.1   Jul 04 2013 14:31:52   James.Wadsworth  $
+--       Module Name      : $Workfile:   exor_version.pkh  $
+--       Date into SCCS   : $Date:   Jul 04 2013 14:31:52  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:06  $
+--       SCCS Version     : $Revision:   2.1  $
+--       Based on SCCS Version     : 1.1
+--
+--
+--   Author : Jonathan Mills
+--
+--   exor Package version retrieval package
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+  g_sccsid      CONSTANT  VARCHAR2(80) := '"$Revision:   2.1  $"';
+--  g_sccsid is the SCCS ID for the package
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSIONS">
+-- This procedure refreshes exor_version_tab with details of all packages
+--  which are owned by the application_owner
+PROCEDURE get_versions;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PRAGMA>
+   PRAGMA RESTRICT_REFERENCES (get_version, RNDS, WNPS, WNDS);
+   PRAGMA RESTRICT_REFERENCES (get_body_version, RNDS, WNPS, WNDS);
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+END exor_version;
+/
