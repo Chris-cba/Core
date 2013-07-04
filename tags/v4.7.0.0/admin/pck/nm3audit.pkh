@@ -1,0 +1,147 @@
+CREATE OR REPLACE PACKAGE nm3audit AS
+--<PACKAGE>
+--   PVCS Identifiers :-
+--
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3audit.pkh-arc   2.2   Jul 04 2013 15:23:04   James.Wadsworth  $
+--       Module Name      : $Workfile:   nm3audit.pkh  $
+--       Date into PVCS   : $Date:   Jul 04 2013 15:23:04  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:10  $
+--       PVCS Version     : $Revision:   2.2  $
+--       Based on SCCS version : 
+--
+--
+--   Author : Jonathan Mills
+--
+--   NM3 Auditing
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+  g_sccsid      CONSTANT  varchar2(2000) := '"$Revision:   2.2  $"';
+--  g_sccsid is the SCCS ID for the package
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--<PROC NAME="return_audit_trigger_text">
+-- Derive the audit trigger text for given table
+FUNCTION return_audit_trigger_text(pi_table_name IN user_tables.table_name%TYPE) RETURN CLOB;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--<PROC NAME="return_audit_trigger_text_str">
+-- Derive the audit trigger text and return as a string so it can be displayed in forms
+FUNCTION return_audit_trigger_text_str(pi_table_name IN user_tables.table_name%TYPE) RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--<PROC NAME="BUILD_AUDIT_TRIGGER">
+-- This function builds the audit trigger for the given table
+PROCEDURE build_audit_trigger (pi_table_name IN user_tables.table_name%TYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="BUILD_ALL_AUDIT_TRIGGERS">
+-- This procedure builds all of the audit triggers
+PROCEDURE build_all_audit_triggers;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="process_audited_data">
+-- This procedure processes the audited data which has been written
+PROCEDURE process_audited_data;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="submit_process_job">
+-- This procedure submits the DBMS_JOB to process the audited information
+PROCEDURE submit_process_job;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="build_audit_views">
+-- This procedure builds views of NM_AUDIT for each table audited
+PROCEDURE build_audit_views;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_next_audit_temp_seq">
+-- This returns nm_audit_temp_seq.NEXTVAL
+FUNCTION get_next_audit_temp_seq RETURN number;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_key_cols">
+-- This builds a package global array with the key columns for the specified
+-- table and returns a count of them.
+--
+FUNCTION get_key_cols(pi_table_name IN user_tables.table_name%TYPE
+                     ) RETURN pls_integer;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_key_col_name">
+-- This gets the name of the column from a package global array with the
+-- specified index.
+--
+FUNCTION get_key_col_name(pi_index IN pls_integer
+                         ) RETURN nm_audit_key_cols.nkc_column_name%TYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE reset_nkc_to_default (pi_table_name IN user_tables.table_name%TYPE);
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE reset_nac_to_default (pi_table_name IN user_tables.table_name%TYPE);
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE drop_audit_trigger (pi_table_name IN user_tables.table_name%TYPE);
+--
+-----------------------------------------------------------------------------
+--
+FUNCTION get_trigger_name (pi_table_name IN user_tables.table_name%TYPE
+                          ) RETURN user_triggers.trigger_name%TYPE;
+--
+-----------------------------------------------------------------------------
+--
+FUNCTION get_view_name (pi_table_name IN user_tables.table_name%TYPE
+                       ) RETURN user_views.view_name%TYPE;
+--
+-----------------------------------------------------------------------------
+--
+--<PRAGMA>
+   PRAGMA RESTRICT_REFERENCES (get_version, rnds, wnps, wnds);
+   PRAGMA RESTRICT_REFERENCES (get_body_version, rnds, wnps, wnds);
+   PRAGMA RESTRICT_REFERENCES (get_trigger_name, rnds, wnps, wnds);
+   PRAGMA RESTRICT_REFERENCES (get_view_name, rnds, wnps, wnds);
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+END nm3audit;
+/

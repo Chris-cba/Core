@@ -1,0 +1,447 @@
+CREATE OR REPLACE PACKAGE nm3asset AS
+--<PACKAGE>
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)nm3asset.pkh	1.31 05/26/06
+--       Module Name      : nm3asset.pkh
+--       Date into SCCS   : 06/05/26 13:25:30
+--       Date fetched Out : 07/06/13 14:11:03
+--       SCCS Version     : 1.31
+--
+--
+--   Author : Rob Coupe
+-- 
+--   Package to handle the generation of milepost asset references.
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+  g_sccsid      CONSTANT  varchar2(2000) := '"@(#)nm3asset.pkh	1.31 05/26/06"';
+--  g_sccsid is the SCCS ID for the package
+--
+   c_default_pbi_useopt CONSTANT hig_user_options.huo_id%TYPE := 'DEFAORPBI';
+--
+   TYPE rec_aor_return_args      IS RECORD
+       (narh_job_id          nm_assets_on_route_holding.narh_job_id%TYPE
+       ,un_unit_id_datum     nm_units.un_unit_id%TYPE
+       ,maximum_placement_mp nm_assets_on_route_holding.narh_placement_end_mp%TYPE
+       );
+--
+   TYPE rec_inv_flex_col_details IS RECORD
+       (iit_ne_id              number
+       ,item_type_type         nm_gaz_query_item_list.ngqi_item_type_type%TYPE
+       ,iit_inv_type           nm_inv_items.iit_inv_type%TYPE
+       ,iit_start_date         nm_inv_items.iit_start_date%TYPE
+       ,iit_date_modified      nm_inv_items.iit_date_modified%TYPE
+       ,iit_admin_unit         nm_inv_items.iit_admin_unit%TYPE
+       ,nit_category           nm_inv_types.nit_category%TYPE
+       ,nit_table_name         nm_inv_types.nit_table_name%TYPE
+       ,nit_lr_ne_column_name  nm_inv_types.nit_lr_ne_column_name%TYPE
+       ,nit_lr_st_chain        nm_inv_types.nit_lr_st_chain%TYPE
+       ,nit_lr_end_chain       nm_inv_types.nit_lr_end_chain%TYPE
+       ,nit_foreign_pk_column  nm_inv_types.nit_foreign_pk_column%TYPE
+       ,nit_update_allowed     nm_inv_types.nit_update_allowed%TYPE     -- is the inv type allowed to be updated
+       ,ita_update_allowed     nm_inv_types.nit_update_allowed%TYPE     -- is the attribute allowed to be updated
+       ,ita_attrib_name        nm_inv_type_attribs.ita_attrib_name%TYPE
+       ,ita_scrn_text          nm_inv_type_attribs.ita_scrn_text%TYPE
+       ,ita_view_col_name      nm_inv_type_attribs.ita_view_col_name%TYPE
+       ,ita_id_domain          nm_inv_type_attribs.ita_id_domain%TYPE
+       ,iit_lov_sql            nm3type.max_varchar2
+       ,ita_mandatory_yn       nm_inv_type_attribs.ita_mandatory_yn%TYPE
+       ,ita_mandatory_asterisk varchar2(1)
+       ,ita_format             nm_inv_type_attribs.ita_format%TYPE
+       ,ita_format_mask        nm_inv_type_attribs.ita_format_mask%TYPE
+       ,iit_value_orig         nm3type.max_varchar2
+       ,iit_value              nm3type.max_varchar2
+       ,iit_description        nm3type.max_varchar2
+       ,iit_meaning            nm3type.max_varchar2
+       );
+   TYPE tab_rec_inv_flex_col_details IS TABLE OF rec_inv_flex_col_details INDEX BY binary_integer;
+--
+   TYPE rec_datum_loc_dets IS RECORD
+       (datum_ne_id            nm_elements.ne_id%TYPE
+       ,datum_ne_unique        nm_elements.ne_unique%TYPE
+       ,datum_ne_descr         nm_elements.ne_descr%TYPE
+       ,datum_ne_nt_type       nm_elements.ne_nt_type%TYPE
+       ,datum_ne_nt_descr      nm_types.nt_descr%TYPE
+       ,datum_length_unit      nm_units.un_unit_id%TYPE
+       ,datum_length_unit_name nm_units.un_unit_name%TYPE
+       ,nm_begin_mp            nm_members.nm_begin_mp%TYPE
+       ,nm_end_mp              nm_members.nm_end_mp%TYPE
+       ,nm_seq_no              nm_members.nm_seq_no%TYPE
+       ,nm_seg_no              nm_members.nm_seg_no%TYPE
+       ,nm_true                nm_members.nm_true%TYPE
+       ,nm_slk                 nm_members.nm_slk%TYPE
+       );
+   TYPE tab_rec_datum_loc_dets       IS TABLE OF rec_datum_loc_dets       INDEX BY binary_integer;
+--
+  TYPE rec_nl_grp_membership IS RECORD
+       (
+	    iit_ne_id         nm_members.nm_ne_id_in%TYPE
+       ,ne_id             nm_elements.ne_id%TYPE
+	   ,ne_unique         nm_elements.ne_unique%TYPE
+       ,ne_descr          nm_elements.ne_descr%TYPE
+       ,ne_gty_group_type nm_elements.ne_gty_group_type%TYPE
+	   ,ngt_descr         nm_group_types.ngt_descr%TYPE
+  	   ,ne_nt_type        nm_elements.ne_nt_type%TYPE
+       );
+
+  TYPE tab_rec_nl_grp_membership   IS TABLE OF rec_nl_grp_membership  INDEX BY binary_integer;
+--
+--
+   g_rec_iit            nm_inv_items_all%ROWTYPE;
+   g_rec_ne             nm_elements_all%ROWTYPE;
+   g_tab_attrib_name    nm3type.tab_varchar30;
+   g_tab_value          nm3type.tab_varchar32767;
+   g_tab_descr          nm3type.tab_varchar32767;
+   g_ft_pk_val          nm_inv_items.iit_ne_id%TYPE;
+   g_rec_datum_loc_dets rec_datum_loc_dets;
+--
+   g_rec_ngqi                     nm_gaz_query_item_list%ROWTYPE;
+   gh_tab_narh_ne_id_in           nm3type.tab_number;
+   gh_tab_narh_ne_id_of_begin     nm3type.tab_number;
+   gh_tab_narh_begin_mp           nm3type.tab_number;
+   gh_tab_narh_ne_id_of_end       nm3type.tab_number;
+   gh_tab_narh_end_mp             nm3type.tab_number;
+   gh_tab_narh_seq_no             nm3type.tab_number;
+   gh_tab_narh_seg_no             nm3type.tab_number;
+   gh_tab_cardinality             nm3type.tab_number;
+   gh_tab_narh_nm_type            nm3type.tab_varchar4;
+   gh_tab_narh_nm_obj_type        nm3type.tab_varchar4;
+   gh_tab_narh_placement_begin_mp nm3type.tab_number;
+   gh_tab_narh_placement_end_mp   nm3type.tab_number;
+   gh_tab_narh_rowid              nm3type.tab_rowid;
+--
+   g_flx_lock_rowid               ROWID;
+   g_iit_date_modified            nm_inv_items.iit_date_modified%TYPE;
+   g_narh_job_id                  nm_assets_on_route_holding.narh_job_id%TYPE;
+   g_measure                      number;
+   g_nm_true                      number;
+   g_nm_seg_no                    number;
+   g_rowid                        ROWID;
+--
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="set_nar_references">
+-- This procedure sets the route and milepost references of assets held in the
+-- nm_assets_on_route table
+--
+--
+PROCEDURE set_nar_references;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="create_nar_data">
+-- This procedure creates the data in the temporary table.
+PROCEDURE create_nar_data( pi_route_id IN nm_elements.ne_id%TYPE,
+                           pi_ref_type IN nm_inv_types.nit_inv_type%TYPE ) ;
+--</PROC>
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nar_datum_unit">
+-- This function returns the datum unit
+FUNCTION get_nar_datum_unit RETURN nm_units.un_unit_id%TYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="create_asset_on_route_data">
+-- This procedure creates the NM_ASSETS_ON_ROUTE_HOLDING data for a given gaz query
+--
+PROCEDURE create_asset_on_route_data (pi_ngq_id                     IN     nm_gaz_query.ngq_id%TYPE
+                                     ,pi_effective_date             IN     date                                          DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
+                                     ,pi_reference_item_type_type   IN     nm_gaz_query_types.ngqt_item_type_type%TYPE   DEFAULT NULL
+                                     ,pi_reference_item_type        IN     nm_gaz_query_types.ngqt_item_type%TYPE        DEFAULT NULL
+                                     ,pi_reference_item_id          IN     nm_assets_on_route_holding.narh_ne_id_in%TYPE DEFAULT NULL
+                                     ,pi_ref_negatively_until_found IN     boolean                                       DEFAULT TRUE
+                                     ,pi_reference_units            IN     nm_units.un_unit_id%TYPE                      DEFAULT NULL
+                                     ,po_return_arguments              OUT rec_aor_return_args
+                                     );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="next_narh_job_id_seq">
+-- This function returns narh_job_id_seq.NEXTVAL
+--
+FUNCTION next_narh_job_id_seq RETURN pls_integer;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_user_default_pbi_query">
+-- This procedure retrieves the details of the current user's default PBI query for AoR
+--
+PROCEDURE get_user_default_pbi_query (po_npq_id     OUT nm_pbi_query.npq_id%TYPE
+                                     ,po_npq_unique OUT nm_pbi_query.npq_unique%TYPE
+                                     ,po_npq_descr  OUT nm_pbi_query.npq_descr%TYPE
+                                     );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="set_user_default_pbi_query">
+-- This procedure sets the current user's default PBI query for AoR
+--
+PROCEDURE set_user_default_pbi_query (pi_npq_id     IN  nm_pbi_query.npq_id%TYPE
+                                     );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_inv_flex_col_details">
+-- This procedure gets the formatted details for flexible columns
+--
+PROCEDURE get_inv_flex_col_details (pi_iit_ne_id           IN     nm_inv_items.iit_ne_id%TYPE
+                                   ,pi_nit_inv_type        IN     nm_inv_types.nit_inv_type%TYPE
+                                   ,pi_display_xsp_if_reqd IN     boolean DEFAULT TRUE
+                                   ,pi_display_descr       IN     boolean DEFAULT TRUE
+                                   ,pi_display_start_date  IN     boolean DEFAULT TRUE
+                                   ,pi_display_admin_unit  IN     boolean DEFAULT TRUE
+                                   ,pi_nias_id             IN     nm_inv_attribute_sets.nias_id%TYPE DEFAULT NULL
+                                   ,pi_allow_null_ne_id    IN     boolean DEFAULT FALSE
+                                   ,po_flex_col_dets       IN OUT tab_rec_inv_flex_col_details
+                                   );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--
+--<PROC NAME="get_inv_flex_col_details_char">
+-- This procedure serves as a wrapper for Oracle forms (6i) which throws a wobbly if you try to base
+--  a block on a procedure which has BOOLEANs as parameters
+--
+PROCEDURE get_inv_flex_col_details_char (pi_iit_ne_id           IN     nm_inv_items.iit_ne_id%TYPE
+                                        ,pi_nit_inv_type        IN     nm_inv_types.nit_inv_type%TYPE
+                                        ,pi_display_xsp_if_reqd IN     varchar2 DEFAULT 'TRUE'
+                                        ,pi_display_descr       IN     varchar2 DEFAULT 'TRUE'
+                                        ,pi_display_start_date  IN     varchar2 DEFAULT 'TRUE'
+                                        ,pi_display_admin_unit  IN     varchar2 DEFAULT 'TRUE'
+                                        ,pi_nias_id             IN     nm_inv_attribute_sets.nias_id%TYPE DEFAULT NULL
+                                        ,pi_allow_null_ne_id    IN     varchar2 DEFAULT 'FALSE'
+                                        ,po_flex_col_dets       IN OUT tab_rec_inv_flex_col_details
+                                        );
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_flex_col_details">
+-- This procedure gets the formatted details for flexible columns
+--
+PROCEDURE get_flex_col_details (pi_item_id             IN     nm_gaz_query_item_list.ngqi_item_id%TYPE
+                               ,pi_item_type_type      IN     nm_gaz_query_item_list.ngqi_item_type_type%TYPE
+                               ,pi_item_type           IN     nm_gaz_query_item_list.ngqi_item_type%TYPE
+                               ,pi_display_xsp_if_reqd IN     boolean DEFAULT TRUE
+                               ,pi_display_descr       IN     boolean DEFAULT TRUE
+                               ,pi_display_start_date  IN     boolean DEFAULT TRUE
+                               ,pi_display_admin_unit  IN     boolean DEFAULT TRUE
+                               ,pi_nias_id             IN     nm_inv_attribute_sets.nias_id%TYPE DEFAULT NULL
+                               ,pi_allow_null_ne_id    IN     boolean DEFAULT FALSE
+                               ,po_flex_col_dets       IN OUT tab_rec_inv_flex_col_details
+                               );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--
+--<PROC NAME="get_flex_col_details_char">
+-- This procedure serves as a wrapper for Oracle forms (6i) which throws a wobbly if you try to base
+--  a block on a procedure which has BOOLEANs as parameters
+--
+PROCEDURE get_flex_col_details_char (pi_item_id             IN     nm_gaz_query_item_list.ngqi_item_id%TYPE
+                                    ,pi_item_type_type      IN     nm_gaz_query_item_list.ngqi_item_type_type%TYPE
+                                    ,pi_item_type           IN     nm_gaz_query_item_list.ngqi_item_type%TYPE
+                                    ,pi_display_xsp_if_reqd IN     varchar2 DEFAULT 'TRUE'
+                                    ,pi_display_descr       IN     varchar2 DEFAULT 'TRUE'
+                                    ,pi_display_start_date  IN     varchar2 DEFAULT 'TRUE'
+                                    ,pi_display_admin_unit  IN     varchar2 DEFAULT 'TRUE'
+                                    ,pi_nias_id             IN     nm_inv_attribute_sets.nias_id%TYPE DEFAULT NULL
+                                    ,pi_allow_null_ne_id    IN     varchar2 DEFAULT 'FALSE'
+                                    ,po_flex_col_dets       IN OUT tab_rec_inv_flex_col_details
+                                    );
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_inv_datum_location_details">
+PROCEDURE get_inv_datum_location_details (pi_iit_ne_id           IN     nm_inv_items.iit_ne_id%TYPE
+                                         ,pi_nit_inv_type        IN     nm_inv_types.nit_inv_type%TYPE
+                                         ,po_tab_datum_loc_dets  IN OUT tab_rec_datum_loc_dets
+                                         );
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_inv_route_location_details">
+PROCEDURE get_inv_route_location_details (pi_iit_ne_id           IN     nm_inv_items.iit_ne_id%TYPE
+                                         ,pi_nit_inv_type        IN     nm_inv_types.nit_inv_type%TYPE
+                                         ,po_tab_route_loc_dets  IN OUT nm3route_ref.tab_rec_route_loc_dets
+                                         );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="lock_inv_flex_cols">
+PROCEDURE lock_inv_flex_cols(pi_ignore_null_id     IN     varchar2 DEFAULT 'TRUE'
+                            ,pio_flex_col_dets     IN OUT tab_rec_inv_flex_col_details);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="update_inv_flex_cols">
+PROCEDURE update_inv_flex_cols (pi_perform_update     IN varchar2 DEFAULT 'TRUE'
+                               ,pio_flex_col_dets     IN OUT tab_rec_inv_flex_col_details
+                               );
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="store_narh">
+--
+FUNCTION store_narh(pi_narh_job_id     IN nm_assets_on_route_holding.narh_job_id%TYPE
+                   ,pi_ngq_id          IN nm_gaz_query.ngq_id%TYPE
+                   ,pi_entire          IN varchar2
+                   ,pi_ref_type        IN hig_codes.hco_code%TYPE
+                   ,pi_ref_inv_type    IN nm_inv_types.nit_inv_type%TYPE
+                   ,pi_ref_inv_item_id IN nm_inv_items.iit_ne_id%TYPE
+                   ,pi_ref_negative    IN varchar2
+                   ,pi_results_unit_id IN nm_units.un_unit_id%TYPE
+                   ,pi_nias_id         IN nm_inv_attribute_sets.nias_id%TYPE
+                   ) RETURN nm_assets_on_route_store_head.narsh_job_id%TYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="pop_route_loc_det_tab_from_pl">
+--
+FUNCTION pop_route_loc_det_tab_from_pl(pi_pl_arr IN nm_placement_array
+                                      ) RETURN nm3route_ref.tab_rec_route_loc_dets;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+FUNCTION get_ial_lov_sql (pi_ial_domain IN nm_inv_attri_lookup.ial_domain%TYPE) RETURN varchar2;
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_non_linear_grp_membership">
+-- For a given inventory item id get all of the non linear groups that it belongs to
+-- the details are called from a sub-classed block on inv.fmb - this was originally subclassed
+--
+--    NM0570	Find Inventory
+--    NM0560	Assets On A Route
+--    NM0510	Inventory Items
+--
+PROCEDURE get_non_linear_grp_membership (pi_iit_inv_type               IN     nm_inv_items.iit_inv_type%TYPE
+                                        ,pi_iit_ne_id                  IN     nm_inv_items.iit_ne_id%TYPE
+                                        ,po_tab_rec_nl_grp_membership  IN OUT nm3asset.tab_rec_nl_grp_membership
+                                        );
+
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_inv_ele_flex_col_details">
+PROCEDURE get_inv_ele_flex_col_details (pi_ne_id                 IN     nm_elements_all.ne_id%TYPE
+                                       ,po_flex_col_dets         IN OUT tab_rec_inv_flex_col_details
+                                       ,pi_network_attribs_first IN     varchar2 DEFAULT 'Y');
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="set_gos_ne_id">
+PROCEDURE set_gos_ne_id (pi_ne_id                 IN     nm_elements_all.ne_id%TYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="count_asset_locations">
+FUNCTION count_asset_locations(pi_iit_ne_id nm_inv_items_all.iit_ne_id%TYPE) RETURN PLS_INTEGER;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="asset_is_located">
+FUNCTION asset_is_located(pi_iit_ne_id nm_inv_items_all.iit_ne_id%TYPE) RETURN BOOLEAN;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="is_on_network">
+-- return boolean if inv type is on network
+FUNCTION is_on_network(pi_nit_inv_type IN nm_inv_types_all.nit_inv_type%TYPE) RETURN BOOLEAN;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="is_off_network">
+-- return boolean if inv type is off network
+FUNCTION is_off_network(pi_nit_inv_type IN nm_inv_types_all.nit_inv_type%TYPE) RETURN BOOLEAN;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="is_on_network_vc">
+-- return varchar value of 'TRUE' or 'FALSE' if inv type is on network
+FUNCTION is_on_network_vc(pi_nit_inv_type IN nm_inv_types_all.nit_inv_type%TYPE) RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="is_off_network_vc">
+-- return varchar value of 'TRUE' or 'FALSE' if inv type is off network 
+FUNCTION is_off_network_vc(pi_nit_inv_type IN nm_inv_types_all.nit_inv_type%TYPE) RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_category_for_inv_type">
+-- return inv category for given inv type
+FUNCTION get_category_for_inv_type(pi_nit_inv_type IN nm_inv_types_all.nit_inv_type%TYPE) RETURN nm_inv_types_all.nit_category%TYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_tab_icm_for_module">
+-- return pl/sql table of inv categories for module 
+FUNCTION get_tab_icm_for_module(pi_icm_hmo_module        IN nm_inv_category_modules.icm_hmo_module%TYPE
+                               ,pi_icm_updatable         IN nm_inv_category_modules.icm_hmo_module%TYPE DEFAULT NULL) RETURN nm3type.tab_varchar4;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+							    
+--
+--<PRAGMA>
+   PRAGMA RESTRICT_REFERENCES (get_version, rnds, wnps, wnds, trust);
+   PRAGMA RESTRICT_REFERENCES (get_body_version, rnds, wnps, wnds, trust);
+   PRAGMA RESTRICT_REFERENCES (get_inv_flex_col_details, wnds, trust);
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+END nm3asset;
+/
