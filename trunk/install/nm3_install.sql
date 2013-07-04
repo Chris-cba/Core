@@ -1,14 +1,14 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3_install.sql-arc   2.37   Aug 15 2012 10:14:04   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3_install.sql-arc   2.38   Jul 04 2013 13:55:14   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3_install.sql  $
---       Date into PVCS   : $Date:   Aug 15 2012 10:14:04  $
---       Date fetched Out : $Modtime:   Aug 15 2012 10:13:22  $
---       PVCS Version     : $Revision:   2.37  $
+--       Date into PVCS   : $Date:   Jul 04 2013 13:55:14  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 11:54:18  $
+--       PVCS Version     : $Revision:   2.38  $
 --
 --------------------------------------------------------------------------------
---   Copyright (c) Exor Corporation Ltd, 2011
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 --------------------------------------------------------------------------------
 --
 set echo off

@@ -9,7 +9,7 @@
 --       SCCS Version     : 1.3
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2003
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 -- This script contains objects that use objects not owned by ourselves

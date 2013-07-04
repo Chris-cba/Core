@@ -1,10 +1,16 @@
 -- PVCS Identifiers :-
 --
--- pvcsid : $Header:   //vm_latest/archives/nm3/install/nm3_indexes.sql-arc   3.0   Apr 14 2008 09:59:26   jwadsworth  $
+-- pvcsid : $Header:   //vm_latest/archives/nm3/install/nm3_indexes.sql-arc   3.1   Jul 04 2013 13:55:14   James.Wadsworth  $
 -- Module Name : $Workfile:   nm3_indexes.sql  $
--- Date into PVCS : $Date:   Apr 14 2008 09:59:26  $
--- Date fetched Out : $Modtime:   Apr 14 2008 09:58:50  $
--- PVCS Version : $Revision:   3.0  $
+-- Date into PVCS : $Date:   Jul 04 2013 13:55:14  $
+-- Date fetched Out : $Modtime:   Jul 04 2013 13:37:36  $
+-- PVCS Version : $Revision:   3.1  $
+--
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
+
 --
 Declare
   do_nothing exception;

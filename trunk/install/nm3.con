@@ -1,12 +1,14 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.con-arc   2.37   Aug 15 2012 09:00:04   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.con-arc   2.38   Jul 04 2013 13:55:14   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3.con  $
---       Date into PVCS   : $Date:   Aug 15 2012 09:00:04  $
---       Date fetched Out : $Modtime:   Aug 15 2012 08:59:28  $
---       PVCS Version     : $Revision:   2.37  $
+--       Date into PVCS   : $Date:   Jul 04 2013 13:55:14  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 13:36:02  $
+--       PVCS Version     : $Revision:   2.38  $
 --
---------------------------------------------------------------------------------
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
 --
 -- Generated for Oracle 10g on Mon Jul 23  15:44:01 2012 by Server Generator 10.1.2.9.28
   
