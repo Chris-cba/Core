@@ -20,7 +20,7 @@ DECLARE
 --         FOR EACH ROW
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2002
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
    CURSOR cs_check_short (c_short VARCHAR2) IS

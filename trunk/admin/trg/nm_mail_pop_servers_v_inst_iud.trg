@@ -20,7 +20,7 @@ DECLARE
 --   NM3 POP Mail view instead of trigger
 --
 -----------------------------------------------------------------------------
---   Copyright (c) exor corporation ltd, 2004
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
    l_rec_nmps_old nm_mail_pop_servers%ROWTYPE;

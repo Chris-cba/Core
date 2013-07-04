@@ -7,15 +7,15 @@ DECLARE
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm_members_all_excl_b_row.trg-arc   2.2   Apr 28 2009 10:19:30   lsorathia  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm_members_all_excl_b_row.trg-arc   2.3   Jul 04 2013 09:53:30   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm_members_all_excl_b_row.trg  $
---       Date into SCCS   : $Date:   Apr 28 2009 10:19:30  $
---       Date fetched Out : $Modtime:   Apr 27 2009 13:08:00  $
---       SCCS Version     : $Revision:   2.2  $
+--       Date into SCCS   : $Date:   Jul 04 2013 09:53:30  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 09:35:32  $
+--       SCCS Version     : $Revision:   2.3  $
 --       Based on 
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2001
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
    l_rec_excl nm3nwval.rec_excl;

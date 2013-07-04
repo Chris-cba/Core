@@ -6,15 +6,15 @@ BEGIN
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm_members_all_excl_a_stm.trg-arc   2.1   Aug 31 2007 16:26:30   malexander  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm_members_all_excl_a_stm.trg-arc   2.2   Jul 04 2013 09:53:30   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm_members_all_excl_a_stm.trg  $
---       Date into SCCS   : $Date:   Aug 31 2007 16:26:30  $
---       Date fetched Out : $Modtime:   Aug 31 2007 15:25:42  $
---       SCCS Version     : $Revision:   2.1  $
+--       Date into SCCS   : $Date:   Jul 04 2013 09:53:30  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 09:35:32  $
+--       SCCS Version     : $Revision:   2.2  $
 --       Based on 
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2001
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 --
