@@ -15,13 +15,15 @@ SELECT
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/nm_elements_view_vw.vw-arc   3.0   Jun 01 2009 09:53:32   lsorathia  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/nm_elements_view_vw.vw-arc   3.1   Jul 04 2013 11:20:30   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm_elements_view_vw.vw  $
---       Date into PVCS   : $Date:   Jun 01 2009 09:53:32  $
---       Date fetched Out : $Modtime:   May 28 2009 09:12:42  $
---       Version          : $Revision:   3.0  $
+--       Date into PVCS   : $Date:   Jul 04 2013 11:20:30  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 11:17:28  $
+--       Version          : $Revision:   3.1  $
 --       Based on SCCS version : 
--------------------------------------------------------------------------
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
 --
 ne_id
       ,ne_unique 

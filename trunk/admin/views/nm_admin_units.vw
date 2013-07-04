@@ -10,7 +10,7 @@ SELECT
 --       SCCS Version     : 1.5
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2001
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
     nau_admin_unit

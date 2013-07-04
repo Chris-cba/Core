@@ -21,13 +21,15 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/imf_net_network_members.vw-arc   3.1   May 17 2011 08:32:42   Steve.Cooper  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/imf_net_network_members.vw-arc   3.2   Jul 04 2013 11:20:30   James.Wadsworth  $
 --       Module Name      : $Workfile:   imf_net_network_members.vw  $
---       Date into PVCS   : $Date:   May 17 2011 08:32:42  $
---       Date fetched Out : $Modtime:   Mar 31 2011 10:32:10  $
---       Version          : $Revision:   3.1  $
+--       Date into PVCS   : $Date:   Jul 04 2013 11:20:30  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 11:03:48  $
+--       Version          : $Revision:   3.2  $
 -- Parent/Child network element relationships [date tracked]
--------------------------------------------------------------------------   
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
    p.network_element_id parent_element_id,
    p.network_element_reference parent_element_reference,
    p.network_element_description parent_element_description,

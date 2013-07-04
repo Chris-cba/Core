@@ -1,3 +1,16 @@
+--
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/location_types.vw-arc   2.1   Jul 04 2013 11:20:30   James.Wadsworth  $
+--       Module Name      : $Workfile:   location_types.vw  $
+--       Date into PVCS   : $Date:   Jul 04 2013 11:20:30  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 11:16:02  $
+--       Version          : $Revision:   2.1  $
+--
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
 create or replace force view vnm_location_types
 (nlt_type, nlt_descr, nlt_seq_no, nlt_linear, nlt_units, nlt_start_date, nlt_end_date,
  nlt_admin_type, nlt_g_or_i )
