@@ -1,0 +1,75 @@
+create or replace package nm3eng_dynseg_util as
+--<PACKAGE>
+--   PVCS Identifiers :-
+--
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3eng_dynseg_util.pkh-arc   2.1   Jul 04 2013 15:33:48   James.Wadsworth  $
+--       Module Name      : $Workfile:   nm3eng_dynseg_util.pkh  $
+--       Date into PVCS   : $Date:   Jul 04 2013 15:33:48  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:10  $
+--       PVCS Version     : $Revision:   2.1  $
+--
+--
+--   Author : Priidu Tanava
+--
+--   Bulk processing functions for nm3eng_dynseg package
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+
+  g_sccsid      CONSTANT  VARCHAR2(2000) := '"$Revision:   2.1  $"';
+
+
+  function get_version return varchar2;
+  function get_body_version return varchar2;
+
+  
+  function get_calls_tbl(
+     p_inv_type in nm_inv_types.nit_inv_type%type
+  ) return nm_dynseg_call_tbl;
+
+  function get_sql_build_tbl(
+     p_inv_type in nm_inv_types_all.nit_inv_type%type
+  ) return nm_dynseg_sql_tbl;
+  
+  procedure populate_tmp_table(
+     p_mrg_job_id in nm_mrg_query_results_all.nqr_mrg_job_id%type
+    ,p_inv_type in nm_inv_types.nit_inv_type%type
+    ,p_sqlcount out integer
+  );
+
+  procedure load_iit_mapping(
+     p_inv_type in nm_inv_types.nit_inv_type%type
+  );
+  
+  function formatted_value_literal(
+     p_value in varchar2
+    ,p_format in varchar2
+  ) return varchar2;
+  
+  procedure set_context_mrg_job_id(p_mrg_job_id in number);
+  function get_context_mrg_job_id return number;
+  procedure reset_cache;
+  
+
+  function get_num_value(
+     p_call_func in varchar2
+    ,p_mrg_section_id in nm_mrg_sections_all.nms_mrg_section_id%type
+    ,p_inv_type in nm_inv_types.nit_inv_type%type
+    ,p_xsp in nm_mrg_section_inv_values_all.nsv_x_sect%type
+    ,p_call_attrib in varchar2
+    ,p_call_value in varchar2 default null
+  ) return number;
+
+  function get_chr_value(
+     p_call_func in varchar2
+    ,p_mrg_section_id in nm_mrg_sections_all.nms_mrg_section_id%type
+    ,p_inv_type in nm_inv_types.nit_inv_type%type
+    ,p_xsp in nm_mrg_section_inv_values_all.nsv_x_sect%type
+    ,p_call_attrib in varchar2
+    ,p_call_value in varchar2 default null
+  ) return varchar2;
+  
+
+end;
+/

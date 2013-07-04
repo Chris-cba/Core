@@ -1,0 +1,630 @@
+create or replace package nm3eng_dynseg as
+--<PACKAGE>
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)nm3eng_dynseg.pkh	1.8 06/11/02
+--       Module Name      : nm3eng_dynseg.pkh
+--       Date into SCCS   : 02/06/11 08:00:33
+--       Date fetched Out : 07/06/13 14:11:25
+--       SCCS Version     : 1.8
+--
+--
+--   Author : Jonathan Mills
+--
+--   Engineering Dynamic Segmentation package
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+  g_sccsid      CONSTANT  VARCHAR2(2000) := '"@(#)nm3eng_dynseg.pkh	1.8 06/11/02"';
+--  g_sccsid is the SCCS ID for the package
+--
+--
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+FUNCTION initialise_val_dist_array RETURN nm_value_distribution_array;
+--
+-----------------------------------------------------------------------------
+--
+FUNCTION produce_html_table (p_val_dist_arr nm_value_distribution_array) RETURN nm3type.tab_varchar32767;
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_length_weighted_ave">
+FUNCTION get_length_weighted_ave (pi_nms_mrg_job_id   IN nm_mrg_sections.nms_mrg_job_id%TYPE
+                                 ,pi_nms_section_id   IN nm_mrg_sections.nms_mrg_section_id%TYPE
+                                 ,pi_inv_type         IN VARCHAR2
+                                 ,pi_view_col         IN VARCHAR2
+                                 ) RETURN NUMBER;
+FUNCTION get_length_weighted_ave (pi_nms_mrg_job_id   IN nm_mrg_sections.nms_mrg_job_id%TYPE
+                                 ,pi_nms_section_id   IN nm_mrg_sections.nms_mrg_section_id%TYPE
+                                 ,pi_inv_type         IN VARCHAR2
+                                 ,pi_xsp              IN VARCHAR2
+                                 ,pi_view_col         IN VARCHAR2
+                                 ) RETURN NUMBER;
+FUNCTION get_length_weighted_ave (pi_nte_job_id       IN nm_nw_temp_extents.nte_job_id%TYPE
+                                 ,pi_inv_type         IN VARCHAR2
+                                 ,pi_xsp              IN VARCHAR2
+                                 ,pi_view_col         IN VARCHAR2
+                                 ) RETURN NUMBER;
+FUNCTION get_length_weighted_ave (pi_nte_job_id       IN nm_nw_temp_extents.nte_job_id%TYPE
+                                 ,pi_inv_type         IN VARCHAR2
+                                 ,pi_view_col         IN VARCHAR2
+                                 ) RETURN NUMBER;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_maximum_value">
+FUNCTION get_maximum_value (pi_nms_mrg_job_id   IN nm_mrg_sections.nms_mrg_job_id%TYPE
+                           ,pi_nms_section_id   IN nm_mrg_sections.nms_mrg_section_id%TYPE
+                           ,pi_inv_type         IN VARCHAR2
+                           ,pi_view_col         IN VARCHAR2
+                           ) RETURN NUMBER;
+FUNCTION get_maximum_value (pi_nms_mrg_job_id   IN nm_mrg_sections.nms_mrg_job_id%TYPE
+                           ,pi_nms_section_id   IN nm_mrg_sections.nms_mrg_section_id%TYPE
+                           ,pi_inv_type         IN VARCHAR2
+                           ,pi_xsp              IN VARCHAR2
+                           ,pi_view_col         IN VARCHAR2
+                           ) RETURN NUMBER;
+FUNCTION get_maximum_value (pi_nte_job_id       IN nm_nw_temp_extents.nte_job_id%TYPE
+                           ,pi_inv_type         IN VARCHAR2
+                           ,pi_xsp              IN VARCHAR2
+                           ,pi_view_col         IN VARCHAR2
+                           ) RETURN NUMBER;
+FUNCTION get_maximum_value (pi_nte_job_id       IN nm_nw_temp_extents.nte_job_id%TYPE
+                           ,pi_inv_type         IN VARCHAR2
+                           ,pi_view_col         IN VARCHAR2
+                           ) RETURN NUMBER;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_minimum_value">
+FUNCTION get_minimum_value (pi_nms_mrg_job_id   IN nm_mrg_sections.nms_mrg_job_id%TYPE
+                           ,pi_nms_section_id   IN nm_mrg_sections.nms_mrg_section_id%TYPE
+                           ,pi_inv_type         IN VARCHAR2
+                           ,pi_view_col         IN VARCHAR2
+                           ) RETURN NUMBER;
+FUNCTION get_minimum_value (pi_nms_mrg_job_id   IN nm_mrg_sections.nms_mrg_job_id%TYPE
+                           ,pi_nms_section_id   IN nm_mrg_sections.nms_mrg_section_id%TYPE
+                           ,pi_inv_type         IN VARCHAR2
+                           ,pi_xsp              IN VARCHAR2
+                           ,pi_view_col         IN VARCHAR2
+                           ) RETURN NUMBER;
+FUNCTION get_minimum_value (pi_nte_job_id       IN nm_nw_temp_extents.nte_job_id%TYPE
+                           ,pi_inv_type         IN VARCHAR2
+                           ,pi_xsp              IN VARCHAR2
+                           ,pi_view_col         IN VARCHAR2
+                           ) RETURN NUMBER;
+FUNCTION get_minimum_value (pi_nte_job_id       IN nm_nw_temp_extents.nte_job_id%TYPE
+                           ,pi_inv_type         IN VARCHAR2
+                           ,pi_view_col         IN VARCHAR2
+                           ) RETURN NUMBER;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_most_common_value">
+FUNCTION get_most_common_value (pi_nms_mrg_job_id   IN nm_mrg_sections.nms_mrg_job_id%TYPE
+                               ,pi_nms_section_id   IN nm_mrg_sections.nms_mrg_section_id%TYPE
+                               ,pi_inv_type         IN VARCHAR2
+                               ,pi_view_col         IN VARCHAR2
+                               ) RETURN VARCHAR2;
+FUNCTION get_most_common_value (pi_nms_mrg_job_id   IN nm_mrg_sections.nms_mrg_job_id%TYPE
+                               ,pi_nms_section_id   IN nm_mrg_sections.nms_mrg_section_id%TYPE
+                               ,pi_inv_type         IN VARCHAR2
+                               ,pi_xsp              IN VARCHAR2
+                               ,pi_view_col         IN VARCHAR2
+                               ) RETURN VARCHAR2;
+FUNCTION get_most_common_value (pi_nte_job_id       IN nm_nw_temp_extents.nte_job_id%TYPE
+                               ,pi_inv_type         IN VARCHAR2
+                               ,pi_xsp              IN VARCHAR2
+                               ,pi_view_col         IN VARCHAR2
+                               ) RETURN VARCHAR2;
+FUNCTION get_most_common_value (pi_nte_job_id       IN nm_nw_temp_extents.nte_job_id%TYPE
+                               ,pi_inv_type         IN VARCHAR2
+                               ,pi_view_col         IN VARCHAR2
+                               ) RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_median_value">
+FUNCTION get_median_value (pi_nms_mrg_job_id   IN nm_mrg_sections.nms_mrg_job_id%TYPE
+                          ,pi_nms_section_id   IN nm_mrg_sections.nms_mrg_section_id%TYPE
+                          ,pi_inv_type         IN VARCHAR2
+                          ,pi_view_col         IN VARCHAR2
+                          ) RETURN NUMBER;
+FUNCTION get_median_value (pi_nms_mrg_job_id   IN nm_mrg_sections.nms_mrg_job_id%TYPE
+                          ,pi_nms_section_id   IN nm_mrg_sections.nms_mrg_section_id%TYPE
+                          ,pi_inv_type         IN VARCHAR2
+                          ,pi_xsp              IN VARCHAR2
+                          ,pi_view_col         IN VARCHAR2
+                          ) RETURN NUMBER;
+FUNCTION get_median_value (pi_nte_job_id       IN nm_nw_temp_extents.nte_job_id%TYPE
+                          ,pi_inv_type         IN VARCHAR2
+                          ,pi_xsp              IN VARCHAR2
+                          ,pi_view_col         IN VARCHAR2
+                          ) RETURN NUMBER;
+FUNCTION get_median_value (pi_nte_job_id       IN nm_nw_temp_extents.nte_job_id%TYPE
+                          ,pi_inv_type         IN VARCHAR2
+                          ,pi_view_col         IN VARCHAR2
+                          ) RETURN NUMBER;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_mean_value">
+FUNCTION get_mean_value (pi_nms_mrg_job_id   IN nm_mrg_sections.nms_mrg_job_id%TYPE
+                        ,pi_nms_section_id   IN nm_mrg_sections.nms_mrg_section_id%TYPE
+                        ,pi_inv_type         IN VARCHAR2
+                        ,pi_view_col         IN VARCHAR2
+                        ) RETURN NUMBER;
+FUNCTION get_mean_value (pi_nms_mrg_job_id   IN nm_mrg_sections.nms_mrg_job_id%TYPE
+                        ,pi_nms_section_id   IN nm_mrg_sections.nms_mrg_section_id%TYPE
+                        ,pi_inv_type         IN VARCHAR2
+                        ,pi_xsp              IN VARCHAR2
+                        ,pi_view_col         IN VARCHAR2
+                        ) RETURN NUMBER;
+FUNCTION get_mean_value (pi_nte_job_id       IN nm_nw_temp_extents.nte_job_id%TYPE
+                        ,pi_inv_type         IN VARCHAR2
+                        ,pi_xsp              IN VARCHAR2
+                        ,pi_view_col         IN VARCHAR2
+                        ) RETURN NUMBER;
+FUNCTION get_mean_value (pi_nte_job_id       IN nm_nw_temp_extents.nte_job_id%TYPE
+                        ,pi_inv_type         IN VARCHAR2
+                        ,pi_view_col         IN VARCHAR2
+                        ) RETURN NUMBER;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_variance">
+FUNCTION get_variance (pi_nms_mrg_job_id   IN nm_mrg_sections.nms_mrg_job_id%TYPE
+                      ,pi_nms_section_id   IN nm_mrg_sections.nms_mrg_section_id%TYPE
+                      ,pi_inv_type         IN VARCHAR2
+                      ,pi_view_col         IN VARCHAR2
+                      ) RETURN NUMBER;
+FUNCTION get_variance (pi_nms_mrg_job_id   IN nm_mrg_sections.nms_mrg_job_id%TYPE
+                      ,pi_nms_section_id   IN nm_mrg_sections.nms_mrg_section_id%TYPE
+                      ,pi_inv_type         IN VARCHAR2
+                      ,pi_xsp              IN VARCHAR2
+                      ,pi_view_col         IN VARCHAR2
+                      ) RETURN NUMBER;
+FUNCTION get_variance (pi_nte_job_id       IN nm_nw_temp_extents.nte_job_id%TYPE
+                      ,pi_inv_type         IN VARCHAR2
+                      ,pi_xsp              IN VARCHAR2
+                      ,pi_view_col         IN VARCHAR2
+                      ) RETURN NUMBER;
+FUNCTION get_variance (pi_nte_job_id       IN nm_nw_temp_extents.nte_job_id%TYPE
+                      ,pi_inv_type         IN VARCHAR2
+                      ,pi_view_col         IN VARCHAR2
+                      ) RETURN NUMBER;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_standard_deviation">
+FUNCTION get_standard_deviation
+                (pi_nms_mrg_job_id   IN nm_mrg_sections.nms_mrg_job_id%TYPE
+                ,pi_nms_section_id   IN nm_mrg_sections.nms_mrg_section_id%TYPE
+                ,pi_inv_type         IN VARCHAR2
+                ,pi_view_col         IN VARCHAR2
+                ) RETURN NUMBER;
+FUNCTION get_standard_deviation
+                (pi_nms_mrg_job_id   IN nm_mrg_sections.nms_mrg_job_id%TYPE
+                ,pi_nms_section_id   IN nm_mrg_sections.nms_mrg_section_id%TYPE
+                ,pi_inv_type         IN VARCHAR2
+                ,pi_xsp              IN VARCHAR2
+                ,pi_view_col         IN VARCHAR2
+                ) RETURN NUMBER;
+FUNCTION get_standard_deviation
+                (pi_nte_job_id       IN nm_nw_temp_extents.nte_job_id%TYPE
+                ,pi_inv_type         IN VARCHAR2
+                ,pi_xsp              IN VARCHAR2
+                ,pi_view_col         IN VARCHAR2
+                ) RETURN NUMBER;
+FUNCTION get_standard_deviation
+                (pi_nte_job_id       IN nm_nw_temp_extents.nte_job_id%TYPE
+                ,pi_inv_type         IN VARCHAR2
+                ,pi_view_col         IN VARCHAR2
+                ) RETURN NUMBER;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_biased_standard_deviation">
+FUNCTION get_biased_standard_deviation
+                (pi_nms_mrg_job_id   IN nm_mrg_sections.nms_mrg_job_id%TYPE
+                ,pi_nms_section_id   IN nm_mrg_sections.nms_mrg_section_id%TYPE
+                ,pi_inv_type         IN VARCHAR2
+                ,pi_view_col         IN VARCHAR2
+                ) RETURN NUMBER;
+FUNCTION get_biased_standard_deviation
+                (pi_nms_mrg_job_id   IN nm_mrg_sections.nms_mrg_job_id%TYPE
+                ,pi_nms_section_id   IN nm_mrg_sections.nms_mrg_section_id%TYPE
+                ,pi_inv_type         IN VARCHAR2
+                ,pi_xsp              IN VARCHAR2
+                ,pi_view_col         IN VARCHAR2
+                ) RETURN NUMBER;
+FUNCTION get_biased_standard_deviation
+                (pi_nte_job_id       IN nm_nw_temp_extents.nte_job_id%TYPE
+                ,pi_inv_type         IN VARCHAR2
+                ,pi_xsp              IN VARCHAR2
+                ,pi_view_col         IN VARCHAR2
+                ) RETURN NUMBER;
+FUNCTION get_biased_standard_deviation
+                (pi_nte_job_id       IN nm_nw_temp_extents.nte_job_id%TYPE
+                ,pi_inv_type         IN VARCHAR2
+                ,pi_view_col         IN VARCHAR2
+                ) RETURN NUMBER;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_biased_variance">
+FUNCTION get_biased_variance
+                (pi_nms_mrg_job_id   IN nm_mrg_sections.nms_mrg_job_id%TYPE
+                ,pi_nms_section_id   IN nm_mrg_sections.nms_mrg_section_id%TYPE
+                ,pi_inv_type         IN VARCHAR2
+                ,pi_view_col         IN VARCHAR2
+                ) RETURN NUMBER;
+FUNCTION get_biased_variance
+                (pi_nms_mrg_job_id   IN nm_mrg_sections.nms_mrg_job_id%TYPE
+                ,pi_nms_section_id   IN nm_mrg_sections.nms_mrg_section_id%TYPE
+                ,pi_inv_type         IN VARCHAR2
+                ,pi_xsp              IN VARCHAR2
+                ,pi_view_col         IN VARCHAR2
+                ) RETURN NUMBER;
+FUNCTION get_biased_variance
+                (pi_nte_job_id       IN nm_nw_temp_extents.nte_job_id%TYPE
+                ,pi_inv_type         IN VARCHAR2
+                ,pi_xsp              IN VARCHAR2
+                ,pi_view_col         IN VARCHAR2
+                ) RETURN NUMBER;
+FUNCTION get_biased_variance
+                (pi_nte_job_id       IN nm_nw_temp_extents.nte_job_id%TYPE
+                ,pi_inv_type         IN VARCHAR2
+                ,pi_view_col         IN VARCHAR2
+                ) RETURN NUMBER;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_first_value">
+FUNCTION get_first_value
+                (pi_nms_mrg_job_id   IN nm_mrg_sections.nms_mrg_job_id%TYPE
+                ,pi_nms_section_id   IN nm_mrg_sections.nms_mrg_section_id%TYPE
+                ,pi_inv_type         IN VARCHAR2
+                ,pi_view_col         IN VARCHAR2
+                ) RETURN NUMBER;
+FUNCTION get_first_value
+                (pi_nms_mrg_job_id   IN nm_mrg_sections.nms_mrg_job_id%TYPE
+                ,pi_nms_section_id   IN nm_mrg_sections.nms_mrg_section_id%TYPE
+                ,pi_inv_type         IN VARCHAR2
+                ,pi_xsp              IN VARCHAR2
+                ,pi_view_col         IN VARCHAR2
+                ) RETURN NUMBER;
+FUNCTION get_first_value
+                (pi_nte_job_id       IN nm_nw_temp_extents.nte_job_id%TYPE
+                ,pi_inv_type         IN VARCHAR2
+                ,pi_xsp              IN VARCHAR2
+                ,pi_view_col         IN VARCHAR2
+                ) RETURN NUMBER;
+FUNCTION get_first_value
+                (pi_nte_job_id       IN nm_nw_temp_extents.nte_job_id%TYPE
+                ,pi_inv_type         IN VARCHAR2
+                ,pi_view_col         IN VARCHAR2
+                ) RETURN NUMBER;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_last_value">
+FUNCTION get_last_value
+                (pi_nms_mrg_job_id   IN nm_mrg_sections.nms_mrg_job_id%TYPE
+                ,pi_nms_section_id   IN nm_mrg_sections.nms_mrg_section_id%TYPE
+                ,pi_inv_type         IN VARCHAR2
+                ,pi_view_col         IN VARCHAR2
+                ) RETURN NUMBER;
+FUNCTION get_last_value
+                (pi_nms_mrg_job_id   IN nm_mrg_sections.nms_mrg_job_id%TYPE
+                ,pi_nms_section_id   IN nm_mrg_sections.nms_mrg_section_id%TYPE
+                ,pi_inv_type         IN VARCHAR2
+                ,pi_xsp              IN VARCHAR2
+                ,pi_view_col         IN VARCHAR2
+                ) RETURN NUMBER;
+FUNCTION get_last_value
+                (pi_nte_job_id       IN nm_nw_temp_extents.nte_job_id%TYPE
+                ,pi_inv_type         IN VARCHAR2
+                ,pi_xsp              IN VARCHAR2
+                ,pi_view_col         IN VARCHAR2
+                ) RETURN NUMBER;
+FUNCTION get_last_value
+                (pi_nte_job_id       IN nm_nw_temp_extents.nte_job_id%TYPE
+                ,pi_inv_type         IN VARCHAR2
+                ,pi_view_col         IN VARCHAR2
+                ) RETURN NUMBER;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_most_frequent_value">
+FUNCTION get_most_frequent_value
+                (pi_nms_mrg_job_id   IN nm_mrg_sections.nms_mrg_job_id%TYPE
+                ,pi_nms_section_id   IN nm_mrg_sections.nms_mrg_section_id%TYPE
+                ,pi_inv_type         IN VARCHAR2
+                ,pi_view_col         IN VARCHAR2
+                ) RETURN VARCHAR2;
+FUNCTION get_most_frequent_value
+                (pi_nms_mrg_job_id   IN nm_mrg_sections.nms_mrg_job_id%TYPE
+                ,pi_nms_section_id   IN nm_mrg_sections.nms_mrg_section_id%TYPE
+                ,pi_inv_type         IN VARCHAR2
+                ,pi_xsp              IN VARCHAR2
+                ,pi_view_col         IN VARCHAR2
+                ) RETURN VARCHAR2;
+FUNCTION get_most_frequent_value
+                (pi_nte_job_id       IN nm_nw_temp_extents.nte_job_id%TYPE
+                ,pi_inv_type         IN VARCHAR2
+                ,pi_xsp              IN VARCHAR2
+                ,pi_view_col         IN VARCHAR2
+                ) RETURN VARCHAR2;
+FUNCTION get_most_frequent_value
+                (pi_nte_job_id       IN nm_nw_temp_extents.nte_job_id%TYPE
+                ,pi_inv_type         IN VARCHAR2
+                ,pi_view_col         IN VARCHAR2
+                ) RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_most_frequent_value_dets">
+FUNCTION get_most_frequent_value_dets
+                (pi_nms_mrg_job_id   IN nm_mrg_sections.nms_mrg_job_id%TYPE
+                ,pi_nms_section_id   IN nm_mrg_sections.nms_mrg_section_id%TYPE
+                ,pi_inv_type         IN VARCHAR2
+                ,pi_view_col         IN VARCHAR2
+                ) RETURN nm_value_distribution;
+FUNCTION get_most_frequent_value_dets
+                (pi_nms_mrg_job_id   IN nm_mrg_sections.nms_mrg_job_id%TYPE
+                ,pi_nms_section_id   IN nm_mrg_sections.nms_mrg_section_id%TYPE
+                ,pi_inv_type         IN VARCHAR2
+                ,pi_xsp              IN VARCHAR2
+                ,pi_view_col         IN VARCHAR2
+                ) RETURN nm_value_distribution;
+FUNCTION get_most_frequent_value_dets
+                (pi_nte_job_id       IN nm_nw_temp_extents.nte_job_id%TYPE
+                ,pi_inv_type         IN VARCHAR2
+                ,pi_xsp              IN VARCHAR2
+                ,pi_view_col         IN VARCHAR2
+                ) RETURN nm_value_distribution;
+FUNCTION get_most_frequent_value_dets
+                (pi_nte_job_id       IN nm_nw_temp_extents.nte_job_id%TYPE
+                ,pi_inv_type         IN VARCHAR2
+                ,pi_view_col         IN VARCHAR2
+                ) RETURN nm_value_distribution;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_most_common_value_dets">
+FUNCTION get_most_common_value_dets
+                (pi_nms_mrg_job_id   IN nm_mrg_sections.nms_mrg_job_id%TYPE
+                ,pi_nms_section_id   IN nm_mrg_sections.nms_mrg_section_id%TYPE
+                ,pi_inv_type         IN VARCHAR2
+                ,pi_view_col         IN VARCHAR2
+                ) RETURN nm_value_distribution;
+FUNCTION get_most_common_value_dets
+                (pi_nms_mrg_job_id   IN nm_mrg_sections.nms_mrg_job_id%TYPE
+                ,pi_nms_section_id   IN nm_mrg_sections.nms_mrg_section_id%TYPE
+                ,pi_inv_type         IN VARCHAR2
+                ,pi_xsp              IN VARCHAR2
+                ,pi_view_col         IN VARCHAR2
+                ) RETURN nm_value_distribution;
+FUNCTION get_most_common_value_dets
+                (pi_nte_job_id       IN nm_nw_temp_extents.nte_job_id%TYPE
+                ,pi_inv_type         IN VARCHAR2
+                ,pi_xsp              IN VARCHAR2
+                ,pi_view_col         IN VARCHAR2
+                ) RETURN nm_value_distribution;
+FUNCTION get_most_common_value_dets
+                (pi_nte_job_id       IN nm_nw_temp_extents.nte_job_id%TYPE
+                ,pi_inv_type         IN VARCHAR2
+                ,pi_view_col         IN VARCHAR2
+                ) RETURN nm_value_distribution;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_value_distributions">
+FUNCTION get_value_distributions
+                (pi_nms_mrg_job_id   IN nm_mrg_sections.nms_mrg_job_id%TYPE
+                ,pi_nms_section_id   IN nm_mrg_sections.nms_mrg_section_id%TYPE
+                ,pi_inv_type         IN VARCHAR2
+                ,pi_view_col         IN VARCHAR2
+                ) RETURN nm_value_distribution_array;
+FUNCTION get_value_distributions
+                (pi_nms_mrg_job_id   IN nm_mrg_sections.nms_mrg_job_id%TYPE
+                ,pi_nms_section_id   IN nm_mrg_sections.nms_mrg_section_id%TYPE
+                ,pi_inv_type         IN VARCHAR2
+                ,pi_xsp              IN VARCHAR2
+                ,pi_view_col         IN VARCHAR2
+                ) RETURN nm_value_distribution_array;
+FUNCTION get_value_distributions
+                (pi_nte_job_id       IN nm_nw_temp_extents.nte_job_id%TYPE
+                ,pi_inv_type         IN VARCHAR2
+                ,pi_xsp              IN VARCHAR2
+                ,pi_view_col         IN VARCHAR2
+                ) RETURN nm_value_distribution_array;
+FUNCTION get_value_distributions
+                (pi_nte_job_id       IN nm_nw_temp_extents.nte_job_id%TYPE
+                ,pi_inv_type         IN VARCHAR2
+                ,pi_view_col         IN VARCHAR2
+                ) RETURN nm_value_distribution_array;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_value_existance">
+--  This function returns 1 if there is any of the specified inventory with
+--   the specified attribute value, otherwise returns 0
+--
+FUNCTION get_value_existance
+                (pi_nms_mrg_job_id   IN nm_mrg_sections.nms_mrg_job_id%TYPE
+                ,pi_nms_section_id   IN nm_mrg_sections.nms_mrg_section_id%TYPE
+                ,pi_inv_type         IN VARCHAR2
+                ,pi_view_col         IN VARCHAR2
+                ,pi_value            IN VARCHAR2
+                ) RETURN NUMBER;
+FUNCTION get_value_existance
+                (pi_nms_mrg_job_id   IN nm_mrg_sections.nms_mrg_job_id%TYPE
+                ,pi_nms_section_id   IN nm_mrg_sections.nms_mrg_section_id%TYPE
+                ,pi_inv_type         IN VARCHAR2
+                ,pi_xsp              IN VARCHAR2
+                ,pi_view_col         IN VARCHAR2
+                ,pi_value            IN VARCHAR2
+                ) RETURN NUMBER;
+FUNCTION get_value_existance
+                (pi_nte_job_id       IN nm_nw_temp_extents.nte_job_id%TYPE
+                ,pi_inv_type         IN VARCHAR2
+                ,pi_xsp              IN VARCHAR2
+                ,pi_view_col         IN VARCHAR2
+                ,pi_value            IN VARCHAR2
+                ) RETURN NUMBER;
+FUNCTION get_value_existance
+                (pi_nte_job_id       IN nm_nw_temp_extents.nte_job_id%TYPE
+                ,pi_inv_type         IN VARCHAR2
+                ,pi_view_col         IN VARCHAR2
+                ,pi_value            IN VARCHAR2
+                ) RETURN NUMBER;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_value_count">
+--  This function returns the number of occurences if there is any of the specified
+--   inventory with the specified attribute value, otherwise returns 0
+--
+FUNCTION get_value_count
+                (pi_nms_mrg_job_id   IN nm_mrg_sections.nms_mrg_job_id%TYPE
+                ,pi_nms_section_id   IN nm_mrg_sections.nms_mrg_section_id%TYPE
+                ,pi_inv_type         IN VARCHAR2
+                ,pi_view_col         IN VARCHAR2
+                ,pi_value            IN VARCHAR2
+                ) RETURN NUMBER;
+FUNCTION get_value_count
+                (pi_nms_mrg_job_id   IN nm_mrg_sections.nms_mrg_job_id%TYPE
+                ,pi_nms_section_id   IN nm_mrg_sections.nms_mrg_section_id%TYPE
+                ,pi_inv_type         IN VARCHAR2
+                ,pi_xsp              IN VARCHAR2
+                ,pi_view_col         IN VARCHAR2
+                ,pi_value            IN VARCHAR2
+                ) RETURN NUMBER;
+FUNCTION get_value_count
+                (pi_nte_job_id       IN nm_nw_temp_extents.nte_job_id%TYPE
+                ,pi_inv_type         IN VARCHAR2
+                ,pi_xsp              IN VARCHAR2
+                ,pi_view_col         IN VARCHAR2
+                ,pi_value            IN VARCHAR2
+                ) RETURN NUMBER;
+FUNCTION get_value_count
+                (pi_nte_job_id       IN nm_nw_temp_extents.nte_job_id%TYPE
+                ,pi_inv_type         IN VARCHAR2
+                ,pi_view_col         IN VARCHAR2
+                ,pi_value            IN VARCHAR2
+                ) RETURN NUMBER;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="does_value_exist">
+--  This function returns TRUE if there is any of the specified inventory with
+--   the specified attribute value, otherwise returns FALSE
+--
+FUNCTION does_value_exist
+                (pi_nms_mrg_job_id   IN nm_mrg_sections.nms_mrg_job_id%TYPE
+                ,pi_nms_section_id   IN nm_mrg_sections.nms_mrg_section_id%TYPE
+                ,pi_inv_type         IN VARCHAR2
+                ,pi_view_col         IN VARCHAR2
+                ,pi_value            IN VARCHAR2
+                ) RETURN BOOLEAN;
+FUNCTION does_value_exist
+                (pi_nms_mrg_job_id   IN nm_mrg_sections.nms_mrg_job_id%TYPE
+                ,pi_nms_section_id   IN nm_mrg_sections.nms_mrg_section_id%TYPE
+                ,pi_inv_type         IN VARCHAR2
+                ,pi_xsp              IN VARCHAR2
+                ,pi_view_col         IN VARCHAR2
+                ,pi_value            IN VARCHAR2
+                ) RETURN BOOLEAN;
+FUNCTION does_value_exist
+                (pi_nte_job_id       IN nm_nw_temp_extents.nte_job_id%TYPE
+                ,pi_inv_type         IN VARCHAR2
+                ,pi_xsp              IN VARCHAR2
+                ,pi_view_col         IN VARCHAR2
+                ,pi_value            IN VARCHAR2
+                ) RETURN BOOLEAN;
+FUNCTION does_value_exist
+                (pi_nte_job_id       IN nm_nw_temp_extents.nte_job_id%TYPE
+                ,pi_inv_type         IN VARCHAR2
+                ,pi_view_col         IN VARCHAR2
+                ,pi_value            IN VARCHAR2
+                ) RETURN BOOLEAN;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_sum">
+--  This function the sum of the values 
+--
+FUNCTION get_sum           (pi_nms_mrg_job_id   IN nm_mrg_sections.nms_mrg_job_id%TYPE
+                           ,pi_nms_section_id   IN nm_mrg_sections.nms_mrg_section_id%TYPE
+                           ,pi_inv_type         IN VARCHAR2
+                           ,pi_view_col         IN VARCHAR2
+                           ) RETURN NUMBER;
+FUNCTION get_sum           (pi_nms_mrg_job_id   IN nm_mrg_sections.nms_mrg_job_id%TYPE
+                           ,pi_nms_section_id   IN nm_mrg_sections.nms_mrg_section_id%TYPE
+                           ,pi_inv_type         IN VARCHAR2
+                           ,pi_xsp              IN VARCHAR2
+                           ,pi_view_col         IN VARCHAR2
+                           ) RETURN NUMBER;
+FUNCTION get_sum           (pi_nte_job_id       IN nm_nw_temp_extents.nte_job_id%TYPE
+                           ,pi_inv_type         IN VARCHAR2
+                           ,pi_xsp              IN VARCHAR2
+                           ,pi_view_col         IN VARCHAR2
+                           ) RETURN NUMBER;
+FUNCTION get_sum           (pi_nte_job_id       IN nm_nw_temp_extents.nte_job_id%TYPE
+                           ,pi_inv_type         IN VARCHAR2
+                           ,pi_view_col         IN VARCHAR2
+                           ) RETURN NUMBER;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PRAGMA>
+   PRAGMA RESTRICT_REFERENCES (get_version, RNDS, WNPS, WNDS);
+   PRAGMA RESTRICT_REFERENCES (get_body_version, RNDS, WNPS, WNDS);
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+end nm3eng_dynseg;
+/

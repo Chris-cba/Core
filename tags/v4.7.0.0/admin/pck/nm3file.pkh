@@ -1,0 +1,604 @@
+CREATE OR REPLACE PACKAGE nm3file authid current_user AS
+--<PACKAGE>
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3file.pkh-arc   2.9   Jul 04 2013 15:33:48   James.Wadsworth  $
+--       Module Name      : $Workfile:   nm3file.pkh  $
+--       Date into PVCS   : $Date:   Jul 04 2013 15:33:48  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:10  $
+--       Version          : $Revision:   2.9  $
+--       Based on SCCS version : 1.14
+-------------------------------------------------------------------------
+--
+--   Author : Jonathan Mills
+--
+--   NM3 UTL_FILE wrapper package
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--
+--<GLOBVAR>
+--
+--  g_sccsid is the SCCS ID for the package
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.9  $';
+--
+  c_read_mode        CONSTANT  VARCHAR2(1)    := 'R';
+  c_append_mode      CONSTANT  VARCHAR2(1)    := 'A';
+  c_write_mode       CONSTANT  VARCHAR2(1)    := 'W';
+--
+  c_default_linesize CONSTANT  BINARY_INTEGER := 1023;
+  c_default_location CONSTANT  VARCHAR2(4000) := hig.get_sysopt('UTLFILEDIR');
+--
+  TYPE file_list   IS TABLE OF varchar2(256) INDEX BY BINARY_INTEGER;
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="FOPEN">
+--   FOPEN - open file (user-specified maximum line size)
+--
+--   This version of FOPEN allows the user to specify the desired maximum
+--   line size.  The version with the default line size is earlier in this
+--   package, for compatibility reasons.
+--
+--   As of 8.0.6, you can have a maximum of 50 files open simultaneously.
+--
+--   IN
+--     location     - directory location of file
+--     filename     - file name (including extention)
+--     open_mode    - open mode ('r', 'w', 'a')
+--     max_linesize - maximum number of characters per line, including the
+--                    newline character, for this file.
+--                    (minimum value 1, maximum value 32767)
+--   RETURN
+--     file_type handle to open file
+--   EXCEPTIONS
+--     invalid_path        - file location or name was invalid
+--     invalid_mode        - the open_mode string was invalid
+--     invalid_operation   - file could not be opened as requested
+--     invalid_maxlinesize - specified max_linesize is too large or too small
+--
+  FUNCTION fopen(location     IN VARCHAR2       DEFAULT c_default_location
+                ,filename     IN VARCHAR2
+                ,open_mode    IN VARCHAR2
+                ,max_linesize IN BINARY_INTEGER DEFAULT c_default_linesize
+                ) RETURN utl_file.file_type;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="is_open">
+--   IS_OPEN - Test if file handle is open
+--
+--   IN
+--     file - File handle
+--   RETURN
+--     BOOLEAN - Is file handle open/valid?
+--
+  FUNCTION is_open(FILE IN utl_file.file_type) RETURN BOOLEAN;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="fclose">
+--   FCLOSE - close an open file
+--
+--   IN
+--     file - File handle (open)
+--   EXCEPTIONS
+--     invalid_filehandle - not a valid file handle
+--     write_error        - OS error occured during write operation
+--
+  PROCEDURE fclose(FILE IN OUT utl_file.file_type);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="fclose_all">
+--   FCLOSE_ALL - close all open files for this session
+--
+--   For Emergency/Cleanup use only.  FILE_TYPE handles will not be
+--   cleared (IS_OPEN will still indicate they are valid)
+--
+--   IN
+--     file - File handle (open)
+--   EXCEPTIONS
+--     write_error        - OS error occured during write operation
+--
+  PROCEDURE fclose_all;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_line">
+--   GET_LINE - Get (read) a line of text from the file
+--
+--   IN
+--     file - File handle (open in read mode)
+--   OUT
+--     buffer - next line of text in file
+--   EXCEPTIONS
+--     no_data_found      - reached the end of file
+--     value_error        - line to long to store in buffer
+--     invalid_filehandle - not a valid file handle
+--     invalid_operation  - file is not open for reading
+--     read_error         - OS error occurred during read
+--
+  PROCEDURE get_line(FILE      IN     utl_file.file_type
+                    ,buffer       OUT VARCHAR2
+                    ,eof_found    OUT BOOLEAN
+                    ,add_cr    IN BOOLEAN DEFAULT FALSE
+                    );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="put_line">
+--   PUT_LINE - Put (write) line to file
+--
+--   IN
+--     file   - File handle (open in write/append mode)
+--     buffer - Text to write
+--   EXCEPTIONS
+--     invalid_filehandle - not a valid file handle
+--     invalid_operation  - file is not open for writing/appending
+--     write_error        - OS error occured during write operation
+--
+  PROCEDURE put_line(FILE   IN utl_file.file_type
+                    ,buffer IN VARCHAR2
+                    );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="put">
+--   PUT - Put (write) text to file
+--
+--   IN
+--     file   - File handle (open in write/append mode)
+--     buffer - Text to write
+--   EXCEPTIONS
+--     invalid_filehandle - not a valid file handle
+--     invalid_operation  - file is not open for writing/appending
+--     write_error        - OS error occured during write operation
+--
+PROCEDURE put     (FILE   IN utl_file.file_type
+                  ,buffer IN VARCHAR2
+                  );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_file">
+-- This procedure will return the contents of the given filename in the all_lines
+--  PL/SQL table 
+--
+PROCEDURE get_file (location     IN     VARCHAR2       DEFAULT c_default_location
+                   ,filename     IN     VARCHAR2
+                   ,max_linesize IN     BINARY_INTEGER DEFAULT c_default_linesize
+                   ,all_lines       OUT nm3type.tab_varchar32767
+                   ,add_cr    IN BOOLEAN DEFAULT FALSE
+                   );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_file_as_clob">
+-- This procedure will return the contents of the given filename in a clob
+-- Useful for XML when all data is on one line
+--
+PROCEDURE get_file_as_clob (location     IN     VARCHAR2       DEFAULT c_default_location
+                           ,filename     IN     VARCHAR2
+                           ,output          OUT CLOB
+                           );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="write_file">
+-- This procedure will WRITE the contents of all_lines pl/sql table to the given
+--   filename
+--
+PROCEDURE write_file (location     IN     VARCHAR2       DEFAULT c_default_location
+                     ,filename     IN     VARCHAR2
+                     ,max_linesize IN     BINARY_INTEGER DEFAULT c_default_linesize
+                     ,all_lines    IN     nm3type.tab_varchar32767
+                     );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="append_file">
+-- This procedure will APPEND the contents of all_lines pl/sql table to the given
+--   filename
+--
+PROCEDURE append_file (location     IN     VARCHAR2       DEFAULT c_default_location
+                      ,filename     IN     VARCHAR2
+                      ,max_linesize IN     BINARY_INTEGER DEFAULT c_default_linesize
+                      ,all_lines    IN     nm3type.tab_varchar32767
+                      );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="file_exists">
+-- Returns Y if the file exists or N if it doesn't
+FUNCTION file_exists( location     IN     VARCHAR2       DEFAULT c_default_location
+                     ,filename     IN     VARCHAR2) RETURN VARCHAR2;
+--
+PROCEDURE file_exists( p_location     IN     VARCHAR2       DEFAULT c_default_location
+                     , p_filename     IN     VARCHAR2
+                     , p_exists       IN OUT VARCHAR2);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="write_file_to_nuf">
+-- This procedure will WRITE the contents of all_lines pl/sql table to the given
+--   filename in NM_UPLOAD_FILES
+--
+PROCEDURE write_file_to_nuf (pi_filename         IN     nm_upload_files.name%TYPE
+                            ,pi_all_lines        IN     nm3type.tab_varchar32767
+                            ,pi_mime_type        IN     nm_upload_files.mime_type%TYPE DEFAULT NULL
+                            ,pi_append_lf        IN     BOOLEAN                        DEFAULT TRUE
+                            ,pi_delete_if_exists IN     BOOLEAN                        DEFAULT FALSE
+                            ,pi_gateway_table    IN     VARCHAR2                       DEFAULT NULL
+                            ,pi_gateway_col_1    IN     VARCHAR2                       DEFAULT NULL
+                            ,pi_gateway_col_2    IN     VARCHAR2                       DEFAULT NULL
+                            ,pi_gateway_col_3    IN     VARCHAR2                       DEFAULT NULL
+                            ,pi_gateway_col_4    IN     VARCHAR2                       DEFAULT NULL
+                            ,pi_gateway_col_5    IN     VARCHAR2                       DEFAULT NULL
+                            ) ;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="unix_to_dos">
+-- This Procedure will convert a file from unix to dos
+PROCEDURE unix2dos(pi_file IN OUT NOCOPY clob);
+PROCEDURE unix2dos(pi_file IN OUT NOCOPY nm3type.tab_varchar32767);
+PROCEDURE unix2dos(pi_filename IN nm_upload_files.name%TYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="dos_to_unix">
+-- This Procedure will convert a file from dos to unix
+PROCEDURE dos2unix(pi_file IN OUT NOCOPY clob);
+PROCEDURE dos2unix(pi_file IN OUT NOCOPY nm3type.tab_varchar32767);
+PROCEDURE dos2unix(pi_filename IN nm_upload_files.name%TYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="append_file_to_dir_list">
+-- PROCEDURE called from java to populate the file list
+PROCEDURE append_file_to_dir_list (pi_file IN varchar2);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_files_in_directory">
+-- Procedure to return a list of files in the given directory
+-- Optioanlly an extension can be given to restrict the list of files to a given file type
+-- Permissions must be setup in java
+FUNCTION get_files_in_directory (pi_dir       IN varchar2
+                                ,pi_extension IN varchar2 DEFAULT NULL) RETURN file_list;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="delete_file">
+-- Procedure to delete a file, based on user permissions being set in java
+-- Needs a command of the form:
+-- dbms_java.grant_permission( 'NM3', 'SYS:java.io.FilePermission', 'd:\devwork\nsg\data\*', 'delete' ) ;
+PROCEDURE delete_file (pi_dir IN varchar2, pi_file IN varchar2);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="purge_directory">
+-- Removes files in the folder specified. A wildcard can be added to select 
+-- certain files. pi_delete_tab (if true) will remove the folder after deletion
+-- if it is empty.
+PROCEDURE purge_directory( pi_directory_name VARCHAR2
+                         , pi_wildcard VARCHAR2 DEFAULT NULL
+                         , pi_delete_dir BOOLEAN DEFAULT TRUE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="purge_directory">
+-- Does the same as the previous procedure only you can parse an array of
+-- wildcards as a nm3type.tab_varchar30 in this one. It will delete all files 
+-- that comply with any of the wildcards
+PROCEDURE purge_directory( pi_directory_name VARCHAR2
+                         , pi_wildcard_tab nm3type.tab_varchar30
+                         , pi_delete_dir BOOLEAN DEFAULT TRUE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="move_file">
+-- Procedure to move a file, based on user permissions being set in java
+-- Needs a command of the form:
+-- dbms_java.grant_permission( 'NM3', 'SYS:java.io.FilePermission', 'd:\devwork\nsg\data\*', 'read,write,delete' ) ;
+procedure move_file 
+  ( pi_from_file  in  varchar2
+  , pi_from_loc   in  varchar2 default null
+  , pi_to_file    in  varchar2 default null
+  , pi_to_loc     in  varchar2 default null
+  , pi_use_hig    in  boolean  default false
+  , pi_overwrite  in  boolean  default false
+  , po_err_no     out integer
+  , po_err_mess   out varchar2
+  ) ;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="remove_file_extension">
+-- Function to remove the filename extension from a given file
+FUNCTION remove_file_extension(pi_file IN varchar2) RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_wildcard_files_in_dir">
+-- gets the files that match a specific wildcard.
+-- VERY NODDY - just replaces * with % and ? with _ and does a 'like'
+-- don't expect anything sophisticated here with [] and all the other
+-- clever stuff.
+FUNCTION get_wildcard_files_in_dir
+  (pi_dir       IN varchar2
+  ,pi_wildcard  IN varchar2
+  ) RETURN file_list  ;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_true_dir_name">
+-- get directory name for a given location
+FUNCTION get_true_dir_name
+  (pi_loc       IN varchar2
+  ,pi_use_hig   in boolean default false
+  ) RETURN varchar2  ;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="upload_to_dir">
+-- Process the upload to a given oracle directory
+procedure upload_to_dir
+  ( pi_directory IN varchar2
+  , pi_file_name IN varchar2
+  , pi_show_html in boolean default true
+  ) ;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="upload_to_path">
+-- Process the upload to a given path
+procedure upload_to_path
+  ( pi_path      IN varchar2
+  , pi_file_name IN varchar2
+  , pi_show_html in boolean default true
+  ) ;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="web_upload_to_dir">
+-- Generate the web form to upload to a given Oracle directory
+procedure web_upload_to_dir
+  ;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="web_download_from_dir">
+-- Generate the web form to download from a given Oracle directory
+procedure web_download_from_dir
+  ( pi_directory_name varchar2 default null
+  ) ;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="web_dump_file">
+-- Take the request from web_download_from_directory and action it
+procedure web_dump_file
+  ( pi_file_name in varchar2
+  , pi_oracle_dir in varchar2
+  ) ;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--<PROC NAME="parse_dir_and_or_filename">
+-- take the value of pi_name and replace any separator chars with the standard separator
+-- also append a separator onto the end of the string/ensure that there is not one on the end of the string
+   --   
+   -- Example 1
+   --
+   -- pi_name           e:\utl_file
+   -- pi_sep_on_end     TRUE
+   -- pi_separator      \
+   --
+   -- l_retval          e:\utl_file\
+   --   
+   -- Example 2
+   --
+   -- pi_name           e:\utl_file\
+   -- pi_sep_on_end     FALSE
+   -- pi_separator      \
+   --
+   -- l_retval          e:\utl_file
+   --
+   -- Example 3
+   --
+   -- pi_name           e:\utl_file
+   -- pi_sep_on_end     TRUE
+   -- pi_separator      /
+   --
+   -- l_retval          e:/utl_file/
+   --   
+FUNCTION parse_dir_and_or_filename(pi_name           IN VARCHAR2
+                                  ,pi_sep_on_end     IN BOOLEAN  DEFAULT TRUE
+                                  ,pi_separator      IN VARCHAR2 DEFAULT NULL) RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--<PROC NAME="check_directory_valid">
+-- do the hig directory and the oracle directory line up?
+-- raise_application_error if not
+procedure check_directory_valid( pi_dir_name        IN VARCHAR2 
+                                ,pi_check_delimiter IN BOOLEAN DEFAULT TRUE ) ;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--<PROC NAME="dos_or_unix_plaform">
+-- Read the v$database view and determine whether or not the platform is DOS or UNIX
+FUNCTION dos_or_unix_plaform RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--<PROC NAME="dos_or_unix_file">
+-- Read first line of file and depending on carriage return character return DOS or UNIX or UNKNOWN  
+FUNCTION dos_or_unix_file(pi_file_name             IN VARCHAR2
+                         ,pi_directory             IN VARCHAR2) RETURN VARCHAR2;
+--</PROC>
+-----------------------------------------------------------------------------
+--<PROC NAME="external_table_record_delim">
+--
+-- This routine returns you the string of characters to act as a record delimiter in an external table
+-- depending on format of file (established via call to dos_or_unix_file
+--
+-- i.e.
+--
+--  0X'0D0A' dos
+--  0X'0A'   unix
+--  NEWLINE   anything else
+--
+FUNCTION external_table_record_delim(pi_file_format IN VARCHAR2) RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME = "WRITE_BLOB">
+PROCEDURE write_blob
+    ( p_blob       IN OUT NOCOPY BLOB
+    , p_file_loc   IN VARCHAR2
+    , p_file_name  IN VARCHAR2 );
+--</PROC>
+--
+----------------------------------------------------------------------------- 
+--
+--<PROC NAME = "COPY_FILE">
+-- Copy a file from one Oracle directory to another
+--
+--   pi_source_dir          Source Oracle Directory or server path
+--   pi_source_file         Source filename
+--   pi_destination_dir     Destination Oracle Directory or server path
+--   pi_destination_file    Desctination filename (leave NULL uses pi_source_file)
+--
+PROCEDURE copy_file
+     ( pi_source_dir       IN VARCHAR2
+     , pi_source_file      IN VARCHAR2
+     , pi_destination_dir  IN VARCHAR2
+     , pi_destination_file IN VARCHAR2 DEFAULT NULL 
+     , pi_overwrite        IN BOOLEAN DEFAULT TRUE
+     , pi_leave_original   IN BOOLEAN DEFAULT TRUE);
+--</PROC>
+--
+----------------------------------------------------------------------------- 
+--
+--<PROC NAME = "FILE_TO_BLOB">
+-- Read a binary file into a BLOB
+--
+--   pi_source_dir            Source Oracle Directory or server path
+--   pi_source_file           Source filename
+--   po_blob                  BLOB out
+--
+PROCEDURE file_to_blob
+      ( pi_source_dir      IN VARCHAR2
+      , pi_source_file     IN VARCHAR2
+      , po_blob           OUT BLOB  );
+--
+--   pi_source_dir            Source Oracle Directory or server path
+--   pi_source_file           Source filename
+--
+FUNCTION file_to_blob
+      ( pi_source_dir      IN VARCHAR2
+      , pi_source_file     IN VARCHAR2)
+  RETURN BLOB;
+--</PROC>
+--
+----------------------------------------------------------------------------- 
+--
+--<PROC NAME = "BLOB_TO_FILE">
+-- Write a BLOB out to a file
+--
+--   pi_blob                   BLOB in
+--   pi_destination_dir        Destination Oracle Directory or server path
+--   pi_destination_file       Destination filename
+--
+PROCEDURE blob_to_file
+      ( pi_blob             IN OUT NOCOPY BLOB
+      , pi_destination_dir  IN VARCHAR2
+      , pi_destination_file IN VARCHAR2 );
+--</PROC>
+--
+----------------------------------------------------------------------------- 
+--
+--<PROC NAME = "GET_ORACLE_DIRECTORY">
+--
+--
+FUNCTION get_oracle_directory ( pi_path IN VARCHAR2 ) 
+  RETURN all_directories.directory_name%TYPE;
+--</PROC>
+--
+----------------------------------------------------------------------------- 
+--
+--<PROC NAME = "GET_PATH">
+--
+--
+FUNCTION get_path ( pi_oracle_directory IN VARCHAR2 ) 
+  RETURN all_directories.directory_path%TYPE;
+--</PROC>
+--
+----------------------------------------------------------------------------- 
+--
+--<PRAGMA>
+  PRAGMA RESTRICT_REFERENCES(get_version, rnds, wnps, wnds);
+  PRAGMA RESTRICT_REFERENCES(get_body_version, rnds, wnps, wnds);
+--  PRAGMA RESTRICT_REFERENCES(fopen, wnds, rnds);
+  PRAGMA RESTRICT_REFERENCES(is_open, wnds, rnds, wnps, rnps);
+  PRAGMA RESTRICT_REFERENCES(fclose, wnds, rnds);
+  PRAGMA RESTRICT_REFERENCES(fclose_all, wnds, rnds);
+  PRAGMA RESTRICT_REFERENCES(get_line, wnds, rnds, wnps, rnps);
+  PRAGMA RESTRICT_REFERENCES(put_line, wnds, rnds);
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+END nm3file;
+/
+

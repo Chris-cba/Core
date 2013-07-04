@@ -1,0 +1,95 @@
+CREATE OR REPLACE PACKAGE nm3extent_o AS
+--<PACKAGE>
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3extent_o.pkh-arc   2.2   Jul 04 2013 15:33:48   James.Wadsworth  $
+--       Module Name      : $Workfile:   nm3extent_o.pkh  $
+--       Date into PVCS   : $Date:   Jul 04 2013 15:33:48  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:10  $
+--       Version          : $Revision:   2.2  $
+--       Based on SCCS version :  1.4
+--
+--   Author : K Angus
+--
+--   Package containing procedures/functions that use objects for
+--   manipulating extents. This package will not be usable from client tools
+--   such as Forms.
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.2  $';
+--  g_sccsid is the SCCS ID for the package
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="create_temp_ne_from_pl">
+--
+--  This procedure creates a temporary network extent from a placement array.
+--
+--  pi_ignore_non_linear_parents if set will not use inclusion parents for the
+--    route id if they are non-linear.
+--
+--  If there is no parent inclusion route or pi_ignore_non_linear_parents is set
+--    and the parent inclusion is non-linear then pi_default_parent_id will be
+--    used for the parent network if specified.
+--
+PROCEDURE create_temp_ne_from_pl(pi_pl_arr                    IN     nm_placement_array
+                                ,po_job_id                       OUT nm_nw_temp_extents.nte_job_id%TYPE
+                                ,pi_default_parent_id         IN     nm_elements.ne_id%TYPE DEFAULT NULL
+                                ,pi_ignore_non_linear_parents IN     boolean DEFAULT FALSE
+                                );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_pl_from_npe_measures">
+-- This function returns a placement array which represents the specified subset of
+--  the single connected extent specified
+--
+FUNCTION get_pl_from_npe_measures (p_npe_job_id nm_nw_persistent_extents.npe_job_id%TYPE
+                                  ,p_begin_mp   NUMBER
+                                  ,p_end_mp     NUMBER
+                                  ) RETURN nm_placement_array;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_pl_from_nte_measures">
+-- This function returns a placement array which represents the specified subset of
+--  the single connected extent specified
+--
+FUNCTION get_pl_from_nte_measures (p_nte_job_id nm_nw_temp_extents.nte_job_id%TYPE
+                                  ,p_begin_mp   NUMBER
+                                  ,p_end_mp     NUMBER
+                                  ) RETURN nm_placement_array;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PRAGMA>
+   PRAGMA RESTRICT_REFERENCES (get_version, rnds, wnps, wnds);
+   PRAGMA RESTRICT_REFERENCES (get_body_version, rnds, wnps, wnds);
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+END nm3extent_o;
+/

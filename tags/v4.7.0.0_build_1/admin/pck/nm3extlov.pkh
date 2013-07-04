@@ -1,0 +1,131 @@
+CREATE OR REPLACE PACKAGE nm3extlov AS
+--<PACKAGE>
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3extlov.pkh-arc   2.2   Jul 04 2013 15:33:48   James.Wadsworth  $
+--       Module Name      : $Workfile:   nm3extlov.pkh  $
+--       Date into PVCS   : $Date:   Jul 04 2013 15:33:48  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:10  $
+--       Version          : $Revision:   2.2  $
+--       Based on SCCS version :  1.2
+--
+--   Author : Nik Stace
+--
+--   Extended List of Values package
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.2  $';
+--  g_sccsid is the SCCS ID for the package
+  g_flex_validation_exception EXCEPTION;
+  g_flex_validation_exc_code number;
+  g_flex_validation_exc_msg varchar2(2000);
+-- These are used when raising errors regarding the validation of flex values
+
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+  TYPE rc_lov IS REF CURSOR;
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="lov">
+-- procedure on which the extended LOV is based
+  PROCEDURE lov 	(	p_statement IN varchar2
+			, 	p_arg IN number
+			, 	p_lov IN OUT rc_lov);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="delete_table">
+-- Clears The PL/SQL Table that is used to store values being returned
+-- from the Extended LOV
+  PROCEDURE delete_table ;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="insert_record">
+-- This procedure inserts a record into the PL/SQL table
+PROCEDURE insert_record	(	p_rec_num IN number
+				, 	p_value IN varchar2);
+
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="count_records">
+-- This function returns the number of records stored in the PL/SQL Table
+FUNCTION count_records RETURN number ;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="retrieve_record">
+-- This function returns the specified value from the PL/SQL Table
+  FUNCTION retrieve_record (p_rec_num IN number) RETURN varchar2 ;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="validate_lov_value">
+-- This procedure validates a value against the specified query and returns
+-- meanings and identifiers where the query is select code , desc , id
+
+  PROCEDURE validate_lov_value(p_statement  IN     varchar2
+                              ,p_value      IN     varchar2
+                              ,p_meaning       OUT varchar2
+                              ,p_id            OUT varchar2
+                              ,pi_match_col IN     pls_integer DEFAULT 1
+                              );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="validate_gen_lov_value">
+-- This procedure validates a value against the specified query and returns
+-- meanings and identifiers where the query is select id, code , desc
+
+  PROCEDURE validate_gen_lov_value	(	p_statement IN varchar2
+						, 	p_value IN varchar2
+						, 	p_meaning OUT varchar2
+						,	p_id  OUT varchar2) ;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="string">
+-- This function returns 'pi_string'.
+  FUNCTION string(pi_string IN varchar2) RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PRAGMA>
+   PRAGMA RESTRICT_REFERENCES (get_version, rnds, wnps, wnds);
+   PRAGMA RESTRICT_REFERENCES (get_body_version, rnds, wnps, wnds);
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+
+END nm3extlov ;
+/

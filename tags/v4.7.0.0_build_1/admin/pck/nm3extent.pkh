@@ -1,0 +1,877 @@
+CREATE OR REPLACE PACKAGE nm3extent IS
+  --<PACKAGE>
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3extent.pkh-arc   2.3   Jul 04 2013 15:33:48   James.Wadsworth  $
+--       Module Name      : $Workfile:   nm3extent.pkh  $
+--       Date into PVCS   : $Date:   Jul 04 2013 15:33:48  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 15:28:46  $
+--       Version          : $Revision:   2.3  $
+--       Based on SCCS version : 1.38
+  --
+  --
+  --   Author : Kevin Angus
+  --
+  --     nm3extent package - Functions + Procedures for dealing with saved, persistent
+  --                         and temporary extents.
+  --
+------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+------------------------------------------------------------------
+  --</PACKAGE>
+  --all global package variables here
+  --<GLOBVAR>
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.3  $';
+  --  g_sccsid is the SCCS_ID
+  --
+  --  The following constants are those for the source of the data for the
+  --   creation of a temporary extent
+  c_saved      CONSTANT nm_pbi_query_results.nqr_source%TYPE := 'SAVED';
+  c_route      CONSTANT nm_pbi_query_results.nqr_source%TYPE := 'ROUTE';
+  c_merge      CONSTANT nm_pbi_query_results.nqr_source%TYPE := 'MERGE';
+  c_merge_sect CONSTANT nm_pbi_query_results.nqr_source%TYPE := 'MERGE_SECT';
+  c_pbi        CONSTANT nm_pbi_query_results.nqr_source%TYPE := 'PBI';
+  c_pbi_sect   CONSTANT nm_pbi_query_results.nqr_source%TYPE := 'PBI_SECT';
+  c_gis        CONSTANT nm_pbi_query_results.nqr_source%TYPE := 'GIS';
+  c_temp_ne    CONSTANT nm_pbi_query_results.nqr_source%TYPE := 'TEMP_NE';
+  --
+  c_roi_extent  CONSTANT varchar2(1) := 'E';
+  c_roi_pbi     CONSTANT varchar2(1) := 'B';
+  c_roi_temp_ne CONSTANT varchar2(1) := 'T';
+  c_roi_section CONSTANT varchar2(1) := 'S';
+  c_roi_db      CONSTANT varchar2(1) := 'D';
+  c_roi_gos     CONSTANT varchar2(1) := 'G';
+  c_roi_gog     CONSTANT varchar2(1) := 'P';
+  c_roi_gis     CONSTANT varchar2(3) := 'GIS';
+  --
+  TYPE tab_nsm IS TABLE OF nm_saved_extent_members%ROWTYPE       INDEX BY binary_integer;
+  TYPE tab_nsd IS TABLE OF nm_saved_extent_member_datums%ROWTYPE INDEX BY binary_integer;
+  TYPE tab_nte IS TABLE OF nm_nw_temp_extents%ROWTYPE            INDEX BY binary_integer;
+  --
+  g_last_temp_extent_source_id nm_pbi_query_results.nqr_source_id%TYPE := NULL;
+  g_last_temp_extent_source    nm_pbi_query_results.nqr_source%TYPE    := NULL;
+  g_last_nte_job_id            nm_nw_temp_extents.nte_job_id%TYPE      := -1;
+  --
+  g_combine_temp_ne_called     boolean := FALSE;
+  --
+  TYPE rec_roi_details IS RECORD
+     (roi_id          nm_elements.ne_id%TYPE
+     ,roi_type        varchar2(4)
+     ,roi_name        nm_elements.ne_unique%TYPE
+     ,roi_descr       nm_elements.ne_descr%TYPE
+     ,roi_group_type  nm_group_types.ngt_group_type%TYPE
+     ,roi_icon        nm_group_types.ngt_icon_name%TYPE
+     ,roi_linear      boolean
+     ,roi_min_mp      nm_members.nm_slk%TYPE
+     ,roi_max_mp      nm_members.nm_slk%TYPE
+     ,roi_units       nm_units.un_unit_id%TYPE
+     ,roi_datum_units nm_units.un_unit_id%TYPE
+     );
+     
+  TYPE t_conn_chunks_details_rec IS RECORD
+    (ne_unique nm_elements.ne_unique%TYPE
+    ,ne_descr  nm_elements.ne_descr%TYPE
+    ,begin_mp  number
+    ,end_mp    number
+    ,measure   number);
+    
+  TYPE t_conn_chunks_details_tab IS TABLE OF t_conn_chunks_details_rec INDEX BY binary_integer;
+  --
+  --</GLOBVAR>
+  --
+  -----------------------------------------------------------------------------
+  --
+  --<PROC NAME="get_version">
+  -- This function returns the SCCS version information
+  FUNCTION get_version RETURN varchar2;
+  --</PROC>
+  --
+  -----------------------------------------------------------------------------
+  --
+  --<PROC NAME="GET_BODY_VERSION">
+  -- This function returns the current SCCS version of the package body
+  FUNCTION get_body_version RETURN varchar2;
+  --</PROC>
+  --
+  -----------------------------------------------------------------------------
+  --
+  --<PROC NAME="get_next_nse_id">
+  -- This function returns the next nse id from the sequence
+  FUNCTION get_next_nse_id RETURN nm_saved_extents.nse_id%TYPE;
+  --</PROC>
+  --
+  -----------------------------------------------------------------------------
+  --
+  --<PROC NAME="get_next_nsm_id">
+  -- This function returns the next nsm id from the sequence
+  FUNCTION get_next_nsm_id RETURN nm_saved_extent_members.nsm_id%TYPE;
+  --</PROC>
+  --
+  -----------------------------------------------------------------------------
+  --
+  --<PROC NAME="get_nse">
+  -- This function returns the nm_saved_extent record for the given nse_id.
+  FUNCTION get_nse(pi_nse_id IN nm_saved_extents.nse_id%TYPE
+                  ) RETURN nm_saved_extents%ROWTYPE;
+  --</PROC>
+  --
+  -----------------------------------------------------------------------------
+  --
+  --<PROC NAME="get_nsm">
+  -- This function returns the nm_saved_extent_members record for the given
+  -- nsm_id.
+  FUNCTION get_nsm(pi_nsm_id IN nm_saved_extent_members.nsm_id%TYPE
+                  ) RETURN nm_saved_extent_members%ROWTYPE;
+  --</PROC>
+  --
+  -----------------------------------------------------------------------------
+  --
+  --<PROC NAME="ins_nse">
+  PROCEDURE ins_nse(pi_rec_nse nm_saved_extents%ROWTYPE);
+  --</PROC>
+  --
+  -----------------------------------------------------------------------------
+  --
+  --<PROC NAME="ins_nsm">
+  PROCEDURE ins_nsm(pi_rec_nsm     nm_saved_extent_members%ROWTYPE);
+  PROCEDURE ins_nsm(pi_tab_rec_nsm tab_nsm);
+  --</PROC>
+  --
+  -----------------------------------------------------------------------------
+  --
+  --<PROC NAME="ins_nsd">
+  -- This procedure inserts a row into nm_saved_extent_member_datums.
+  PROCEDURE ins_nsd(pi_nsd_rec     nm_saved_extent_member_datums%ROWTYPE);
+  PROCEDURE ins_nsd(pi_tab_rec_nsd tab_nsd);
+  --</PROC>
+  --
+  -----------------------------------------------------------------------------
+  --
+  --<PROC NAME="del_nsd">
+  -- This procedure deletes the datum elements for an extent member.
+  PROCEDURE del_nsd(pi_nsm_id IN nm_saved_extent_members.nsm_id%TYPE);
+  --</PROC>
+  --
+  -----------------------------------------------------------------------------
+  --
+  --<PROC NAME="del_nsm">
+  -- This procedure deletes the extent member.
+  PROCEDURE del_nsm(pi_nsm_id IN nm_saved_extent_members.nsm_id%TYPE);
+  --</PROC>
+  --
+  -----------------------------------------------------------------------------
+  --
+  --<PROC NAME="del_nse">
+  -- This procedure deletes the extent.
+  PROCEDURE del_nse(pi_nse_id IN nm_saved_extents.nse_id%TYPE);
+  --</PROC>
+  --
+  -----------------------------------------------------------------------------
+  --
+  --<PROC NAME="del_members">
+  -- This procedure deletes the members and datums of an extent.
+  PROCEDURE del_members(pi_nse_id IN nm_saved_extents.nse_id%TYPE);
+  --</PROC>
+  --
+  -----------------------------------------------------------------------------
+  --
+  --<PROC NAME="pop_nsd">
+  -- This procedure populates the datum elements for an extent member.
+  PROCEDURE pop_nsd(pi_nsm_id IN nm_saved_extent_members.nsm_id%TYPE);
+  --</PROC>
+  --
+  -----------------------------------------------------------------------------
+  --
+  --<PROC NAME="create_temp_ne">
+  --  This procedure creates NM_NW_TEMP_EXTENTS records for the given
+  --   source. PI_SOURCE_ID is the ID of the record, with the source
+  --   that passed in to be one of SAVED, ROUTE, MERGE, MERGE_SECT,
+  --   PBI, PBI_SECT.
+  --
+  --  with the source of ROUTE, the source_id can be one of...
+  --     1. NE_ID of a group of sections
+  --     2. NE_ID of a single section
+  --     3. IIT_NE_ID of an inventory item
+  --
+  --  with the source of MERGE_SECT or PBI_SECT pi_source_id_2 must be populated
+  --    with the appropriate section id.
+  --
+  --  pi_ignore_non_linear_parents if set will not use inclusion parents for the
+  --    route id if they are non-linear.
+  --  pi_default_source_as_parent if set will cause the source id to be used
+  --    for the parent route if an inclusion parent cannot be found or
+  --    pi_ignore_non_linear_parents is set and the parent found is non-linear
+  --
+  PROCEDURE create_temp_ne (pi_source_id                 IN     nm_pbi_query_results.nqr_source_id%TYPE
+                           ,pi_source                    IN     nm_pbi_query_results.nqr_source%TYPE
+                           ,pi_begin_mp                  IN     nm_members.nm_begin_mp%TYPE DEFAULT NULL
+                           ,pi_end_mp                    IN     nm_members.nm_end_mp%TYPE DEFAULT NULL
+                           ,po_job_id                       OUT nm_nw_temp_extents.nte_job_id%TYPE
+                           ,pi_default_source_as_parent  IN     boolean DEFAULT FALSE
+                           ,pi_ignore_non_linear_parents IN     boolean DEFAULT FALSE
+                           ,pi_source_id_2               IN     nm_pbi_query_results.nqr_source_id%TYPE DEFAULT NULL
+                           );
+  -- Possible exceptions raised are
+  -- -20212, No values in placement array for nnnnnn
+  -- -20213, NE_ID : nnnnn not found, neither on NM_ELEMENTS nor on NM_INV_ITEMS
+  -- -20214, Cannot operate on Groups of Groups
+  -- -20215, begin_mp and end_mp only valid for source of ROUTE
+  --
+  --</PROC>
+  --
+  -----------------------------------------------------------------------------
+  --
+  --<PROC NAME="create_temp_ne_from_roi">
+  -- This procedure will create a temp NE for a specified Region of Interest (ROI)
+  --
+  PROCEDURE create_temp_ne_from_roi (pi_roi_id                    IN     nm_pbi_query_results.nqr_source_id%TYPE
+                                    ,pi_roi_type                  IN     nm_pbi_query_results.nqr_source%TYPE
+                                    ,po_job_id                       OUT nm_nw_temp_extents.nte_job_id%TYPE
+                                    ,pi_default_source_as_parent  IN     boolean DEFAULT FALSE
+                                    ,pi_ignore_non_linear_parents IN     boolean DEFAULT FALSE
+                                    );
+  --
+  --</PROC>
+  --
+  -----------------------------------------------------------------------------
+  --
+  --<PROC NAME="create_saved_ne_from_ne_id">
+  -- This procedure will create a saved NE for any NE_ID
+  --
+  PROCEDURE create_saved_ne_from_ne_id
+                           (pi_ne_id     IN     nm_members.nm_ne_id_in%TYPE
+                           ,pi_begin_mp  IN     nm_members.nm_begin_mp%TYPE     DEFAULT NULL
+                           ,pi_end_mp    IN     nm_members.nm_end_mp%TYPE       DEFAULT NULL
+                           ,pi_nse_owner IN     nm_saved_extents.nse_owner%TYPE DEFAULT Sys_Context('NM3_SECURITY_CTX','USERNAME')
+                           ,pi_nse_name  IN     nm_saved_extents.nse_name%TYPE  DEFAULT NULL
+                           ,pi_nse_descr IN     nm_saved_extents.nse_descr%TYPE DEFAULT NULL
+                           ,po_nse_id       OUT nm_saved_extents.nse_id%TYPE
+                           );
+  --</PROC>
+  --
+  -----------------------------------------------------------------------------
+  --
+  --<PROC NAME="create_saved_ne_from_temp_ne">
+  -- This procedure will create a saved NE for a temp NE. with a 1-1 relationship
+  --  between nm_saved_extent_members and nm_saved_extent_member_datums
+  --
+  PROCEDURE create_saved_ne_from_temp_ne
+                           (pi_nte_job_id IN     nm_nw_temp_extents.nte_job_id%TYPE
+                           ,pi_nse_owner  IN     nm_saved_extents.nse_owner%TYPE DEFAULT Sys_Context('NM3_SECURITY_CTX','USERNAME')
+                           ,pi_nse_name   IN     nm_saved_extents.nse_name%TYPE
+                           ,pi_nse_descr  IN     nm_saved_extents.nse_descr%TYPE
+                           ,po_nse_id        OUT nm_saved_extents.nse_id%TYPE
+                           );
+  --</PROC>
+  --
+  -----------------------------------------------------------------------------
+  --
+  --<PROC NAME="ins_nte">
+  -- This procedure inserts a row into NM_NW_TEMP_EXTENTS
+  --
+  PROCEDURE ins_nte (p_rec_nte nm_nw_temp_extents%ROWTYPE);
+  --</PROC>
+  --
+  -----------------------------------------------------------------------------
+  --
+  --<PROC NAME="get_saved">
+  -- This function returns the value of c_saved
+  --
+  FUNCTION get_saved RETURN nm_pbi_query_results.nqr_source%TYPE;
+  --</PROC>
+  --
+  -----------------------------------------------------------------------------
+  --
+  --<PROC NAME="get_temp_ne">
+  -- This function returns the value of c_temp_ne
+  --
+  FUNCTION get_temp_ne RETURN nm_pbi_query_results.nqr_source%TYPE;
+  --</PROC>
+  --
+  -----------------------------------------------------------------------------
+  --
+  --<PROC NAME="get_route">
+  -- This function returns the value of c_route
+  --
+  FUNCTION get_route RETURN nm_pbi_query_results.nqr_source%TYPE;
+  --</PROC>
+  --
+  -----------------------------------------------------------------------------
+  --
+  --<PROC NAME="get_pbi">
+  -- This function returns the value of c_pbi
+  --
+  FUNCTION get_pbi RETURN nm_pbi_query_results.nqr_source%TYPE;
+  --</PROC>
+  --
+  -----------------------------------------------------------------------------
+  --
+  --<PROC NAME="get_merge">
+  -- This function returns the value of c_merge
+  --
+  FUNCTION get_merge RETURN nm_pbi_query_results.nqr_source%TYPE;
+  --</PROC>
+  --
+  -----------------------------------------------------------------------------
+  --
+  --<PROC NAME="create_saved_ne_from_pbi">
+  -- This procedure creates a saved network extent from a set of PBI query results
+  --
+  PROCEDURE create_saved_ne_from_pbi
+                  (pi_nqr_job_id IN     nm_pbi_query_results.nqr_job_id%TYPE
+                  ,pi_nse_owner  IN     nm_saved_extents.nse_owner%TYPE DEFAULT NULL
+                  ,pi_nse_name   IN     nm_saved_extents.nse_name%TYPE  DEFAULT NULL
+                  ,pi_nse_descr  IN     nm_saved_extents.nse_descr%TYPE DEFAULT NULL
+                  ,po_nse_id        OUT nm_saved_extents.nse_id%TYPE
+                  );
+  --</PROC>
+  --
+  -----------------------------------------------------------------------------
+  --
+  --<PROC NAME="create_saved_ne_from_merge">
+  -- This procedure creates a saved network extent from a set of merge query results
+  --
+  PROCEDURE create_saved_ne_from_merge
+                  (pi_nqr_mrg_job_id IN     nm_mrg_query_results.nqr_mrg_job_id%TYPE
+                  ,pi_nse_owner      IN     nm_saved_extents.nse_owner%TYPE DEFAULT NULL
+                  ,pi_nse_name       IN     nm_saved_extents.nse_name%TYPE  DEFAULT NULL
+                  ,pi_nse_descr      IN     nm_saved_extents.nse_descr%TYPE DEFAULT NULL
+                  ,po_nse_id            OUT nm_saved_extents.nse_id%TYPE
+                  );
+  --</PROC>
+  --
+  -----------------------------------------------------------------------------
+  --
+  --<PROC NAME="gis_create_saved_ne">
+  -- This procedure creates a saved network extent from a set of data stored in
+  --  the gis_data_objects table
+  --
+  PROCEDURE gis_create_saved_ne
+                 (pi_gdo_session_id IN gis_data_objects.gdo_session_id%TYPE
+                 ,pi_nse_owner      IN nm_saved_extents.nse_owner%TYPE
+                 ,pi_nse_name       IN nm_saved_extents.nse_name%TYPE
+                 ,pi_nse_descr      IN nm_saved_extents.nse_descr%TYPE
+                 );
+  -- Possible exceptions raised are
+  --  -20221 No GIS_DATA_OBJECTS records found which join to NM_ELEMENTS
+  --</PROC>
+  --
+  -----------------------------------------------------------------------------
+  --
+  --<PROC NAME="get_last_gis_nse_id">
+  -- This function returns the last NSE_ID as created by the gis_create_saved_ne
+  --  procedure
+  --
+  FUNCTION get_last_gis_nse_id RETURN nm_saved_extents.nse_id%TYPE;
+  --</PROC>
+  --
+  -----------------------------------------------------------------------------
+  --
+  -----------------------------------------------------------------------------
+  --
+  --<PROC NAME="get_unique_from_source">
+  --
+  --
+  FUNCTION get_unique_from_source
+                       (pi_source_id      IN nm_pbi_query_results.nqr_source_id%TYPE
+                       ,pi_source         IN nm_pbi_query_results.nqr_source%TYPE
+                       ,pi_suppress_error IN varchar2 DEFAULT 'N'
+                       ) RETURN varchar2;
+  --</PROC>
+  --
+  -----------------------------------------------------------------------------
+  --
+  --<PROC NAME="check_nse_nt_types">
+  --This function returns TRUE if all datums in extent are of NW type allowed
+  --for specified group type.
+  --
+  FUNCTION check_nse_nt_types(pi_nse_id     IN nm_saved_extents.nse_id%TYPE
+                             ,pi_group_type IN nm_group_types.ngt_group_type%TYPE
+                             ) RETURN boolean;
+  --</PROC>
+  --
+  -----------------------------------------------------------------------------
+  --
+  --<PROC NAME="extent_is_partial">
+  --This function returns TRUE if at least 1 datum in extent is partial
+  --
+  FUNCTION extent_is_partial(pi_nse_id IN nm_saved_extents.nse_id%TYPE
+                            ) RETURN boolean;
+  --</PROC>
+  --
+  -----------------------------------------------------------------------------
+  --
+  --<PROC NAME="extent_is_exclusive">
+  --This function returns TRUE if at all datums in extent are not in a group
+  --of the specified group type.
+  --
+  FUNCTION extent_is_exclusive(pi_nse_id     IN nm_saved_extents.nse_id%TYPE
+                              ,pi_group_type IN nm_group_types.ngt_group_type%TYPE
+                              ) RETURN boolean;
+  --</PROC>
+  --
+  -----------------------------------------------------------------------------
+  --
+  --<PROC NAME="check_element_dates">
+  --This function retutns TRUE if all datums in extent are valid for the
+  --supplied effective date.
+  --
+  FUNCTION check_element_dates(pi_nse_id     IN nm_saved_extents.nse_id%TYPE
+                              ,pi_start_date IN date
+                              ) RETURN boolean;
+  --</PROC>
+  --
+  -----------------------------------------------------------------------------
+  --
+  --<PROC NAME="create_group_from_nse">
+  --This function creates a group from the specified extent and returns its
+  --ne_id.
+  --
+  FUNCTION create_group_from_nse(pi_nse_id            IN     nm_saved_extents.nse_id%TYPE
+                                ,pio_ne_rec           IN OUT nm_elements%ROWTYPE
+                                ,pi_offset            IN     number                             DEFAULT 0
+                                ,pi_check_overlaps    IN     boolean                            DEFAULT TRUE
+                                ,po_rescale_loop         OUT boolean
+                                ) RETURN nm_elements.ne_id%TYPE;
+  --</PROC>
+  --
+  -----------------------------------------------------------------------------
+  --
+  --<PROC NAME="extent_datum_count">
+  --This function returns the number of datums in a specified extent.
+  --
+  FUNCTION extent_datum_count(pi_nse_id IN nm_saved_extents.nse_id%TYPE
+                             ) RETURN pls_integer;
+  --</PROC>
+  --
+  --
+  -----------------------------------------------------------------------------
+  --
+  --<PROC NAME="debug_temp_extents">
+  -- This procedure writes the contents of NM_NW_TEMP_EXTENTS to tne NM_DBUG table
+  --
+  PROCEDURE debug_temp_extents (pi_nte_job_id IN nm_nw_temp_extents.nte_job_id%TYPE DEFAULT NULL);
+  --</PROC>;
+  --
+  -----------------------------------------------------------------------------
+  --
+  PROCEDURE debug_tab_nte (p_tab_nte in out nocopy tab_nte);
+  --
+  -----------------------------------------------------------------------------
+  --
+  --<PROC NAME="lock_temp_extent_datums">
+  -- This procedure locks the NM_ELEMENTS records which are contained within the
+  --  specified NM_NW_TEMP_EXTENTS records
+  --
+  PROCEDURE lock_temp_extent_datums (pi_nte_job_id IN nm_nw_temp_extents.nte_job_id%TYPE);
+  --</PROC>
+  --
+  -----------------------------------------------------------------------------
+  --
+  --<PROC NAME="lock_persistent_extent_datums">
+  -- This procedure locks the NM_ELEMENTS records which are contained within the
+  --  specified NM_NW_PERSISTENT_EXTENTS records
+  --
+  PROCEDURE lock_persistent_extent_datums (pi_npe_job_id IN nm_nw_persistent_extents.npe_job_id%TYPE);
+  --</PROC>
+  --
+  -----------------------------------------------------------------------------
+  --
+  --<PROC NAME="temp_ne_has_overlaps">
+  -- Returns TRUE if extent pi_job_id has at least one overlap between its
+  -- members.
+  --
+  FUNCTION temp_ne_has_overlaps(pi_job_id IN nm_nw_temp_extents.nte_job_id%TYPE
+                               ) RETURN boolean;
+  --</PROC>
+  --
+  -----------------------------------------------------------------------------
+  --
+  --<PROC NAME="combine_temp_nes">
+  -- Moves members of extent pi_job_id_2 into pi_job_id_1. If successful
+  -- pi_job_id_2 will not exist after the operation. IF pi_check_overlaps is
+  -- TRUE then an error will be raised if the resultant extent has overlaps.
+  --
+  PROCEDURE combine_temp_nes(pi_job_id_1       IN nm_nw_temp_extents.nte_job_id%TYPE
+                            ,pi_job_id_2       IN nm_nw_temp_extents.nte_job_id%TYPE
+                            ,pi_check_overlaps IN boolean DEFAULT TRUE
+                            );
+  -- Possible exceptions raised are:
+  --   -20216 Extent "xxx" has overlaps'
+  --</PROC>
+  --
+  -----------------------------------------------------------------------------
+  --
+  --<PROC NAME="remove_db_from_temp_ne">
+  -- Removes any distance breaks from extent pi_job_id.
+  --
+  PROCEDURE remove_db_from_temp_ne(pi_job_id IN nm_nw_temp_extents.nte_job_id%TYPE
+                                  );
+  --</PROC>
+  --
+  -----------------------------------------------------------------------------
+  --
+  --<PROC NAME="count_routes_in_temp_ne">
+  -- Returns the number of routes that are part of the temporary extent.
+  --
+  FUNCTION count_routes_in_temp_ne(pi_job_id IN nm_nw_temp_extents.nte_job_id%TYPE
+                                  ) RETURN pls_integer;
+  --</PROC>
+  --
+  -----------------------------------------------------------------------------
+  --
+  --<PROC NAME="temp_ne_valid_for_homo">
+  -- Returns TRUE if the temp ne specified is suitable for use in homo
+  -- inventory update.
+  --
+  FUNCTION temp_ne_valid_for_homo(pi_job_id IN nm_nw_temp_extents.nte_job_id%TYPE
+                                 ) RETURN boolean;
+  --</PROC>
+  --
+  -----------------------------------------------------------------------------
+  --
+  --<PROC NAME="nse_name_is_unique">
+  -- Returns TRUE if supplied saved extent name is unique. pi_nse_id is the
+  -- record
+  --
+  FUNCTION nse_name_is_unique(pi_name   IN varchar2
+                             ,pi_nse_id IN varchar2
+                             ) RETURN boolean;
+  --</PROC>
+  --
+  -----------------------------------------------------------------------------
+  --
+  --<PROC NAME="saved_ne_has_overlaps">
+  -- Returns TRUE if supplied saved extent has overlapping datums
+  FUNCTION saved_ne_has_overlaps(pi_nse_id IN nm_saved_extents.nse_id%TYPE
+                                ) RETURN boolean;
+  --</PROC>
+  --
+  -----------------------------------------------------------------------------
+  --
+  --<PROC NAME="saved_ne_contents_updated">
+  -- Returns TRUE if supplied saved extent's datums have been updated since
+  -- their creation.
+  FUNCTION saved_ne_contents_updated(pi_nse_id IN nm_saved_extents.nse_id%TYPE
+                                    ) RETURN boolean;
+  --</PROC>
+  --
+  -----------------------------------------------------------------------------
+  --
+  --<PROC NAME="get_last_nte_job_id">
+  -- Returns the NTE_JOB_ID of the last Temp NE created by CREATE_TEMP_NE
+  --
+  FUNCTION get_last_nte_job_id RETURN nm_nw_temp_extents.nte_job_id%TYPE;
+  --</PROC>
+  --
+  -----------------------------------------------------------------------------
+  --
+  --<PROC NAME="nte_is_single_point">
+  -- Returns TRUE if the NTE_JOB_ID passed in is a single point only
+  --
+  FUNCTION nte_is_single_point (p_nte_job_id nm_nw_temp_extents.nte_job_id%TYPE
+                               ) RETURN boolean;
+  --</PROC>
+  --
+  -----------------------------------------------------------------------------
+  --
+  --<PROC NAME="create_temp_ne_intx_of_temp_ne">
+  --
+  -- Creates a new temp extent as the intersection of the 2 supplied extents.
+  --
+  PROCEDURE create_temp_ne_intx_of_temp_ne
+                      (pi_nte_job_id_1         IN     nm_nw_temp_extents.nte_job_id%TYPE
+                      ,pi_nte_job_id_2         IN     nm_nw_temp_extents.nte_job_id%TYPE
+                      ,pi_resultant_nte_job_id    OUT nm_nw_temp_extents.nte_job_id%TYPE
+                      );
+  PROCEDURE create_temp_ne_intx_of_temp_ne
+                      (pi_tab_nte_1 in out nocopy tab_nte
+                      ,pi_tab_nte_2 in out nocopy tab_nte
+                      ,po_tab_intx  in out nocopy tab_nte
+                      );
+  --</PROC>
+  --
+  -----------------------------------------------------------------------------
+  --
+  --<PROC NAME="create_nte_from_npe">
+  --
+  -- Creates a new temp extent as a copy of the supplied persistent extent.
+  --
+  FUNCTION create_nte_from_npe(pi_npe_job_id IN nm_nw_persistent_extents.npe_job_id%TYPE
+                              ) RETURN nm_nw_temp_extents.nte_job_id%TYPE;
+  --</PROC>
+  --
+  -----------------------------------------------------------------------------
+  --
+  --<PROC NAME="create_npe_from_nte">
+  --
+  -- Creates a new persistent extent as a copy of the supplied temp extent.
+  --
+  FUNCTION create_npe_from_nte(pi_nte_job_id IN nm_nw_temp_extents.nte_job_id%TYPE
+                              ) RETURN nm_nw_persistent_extents.npe_job_id%TYPE;
+  --</PROC>
+  --
+  -----------------------------------------------------------------------------
+  --
+  --<PROC NAME="get_nte_length">
+  --
+  -- Returns the sum of the lengths of all members of the specified extent.
+  --
+  FUNCTION get_nte_length(pi_nte_id IN nm_nw_temp_extents.nte_job_id%TYPE
+                         ) RETURN number;
+  --</PROC>
+  --
+  -----------------------------------------------------------------------------
+  --
+  --<PROC NAME="get_npe_length">
+  --
+  -- Returns the sum of the lengths of all members of the specified extent.
+  --
+  FUNCTION get_npe_length(pi_npe_id IN nm_nw_persistent_extents.npe_job_id%TYPE
+                         ) RETURN number;
+  --</PROC>
+  --
+  -----------------------------------------------------------------------------
+  --
+  PROCEDURE defrag_temp_extent (pi_nte_id           IN nm_nw_temp_extents.nte_job_id%TYPE
+                               ,pi_force_resequence IN boolean DEFAULT FALSE
+                               );
+  --
+  -----------------------------------------------------------------------------
+  --
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE nte_minus_nte (pi_nte_1      in out nocopy tab_nte
+                        ,pi_nte_2      in out nocopy tab_nte
+                        ,po_nte_result in out nocopy tab_nte
+                        );
+PROCEDURE nte_minus_nte (pi_nte_1      IN     nm_nw_temp_extents.nte_job_id%TYPE
+                        ,pi_nte_2      IN     nm_nw_temp_extents.nte_job_id%TYPE
+                        ,po_nte_result    OUT nm_nw_temp_extents.nte_job_id%TYPE
+                        );
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE remove_rec_nte_from_nte (pi_nte_id  IN nm_nw_temp_extents.nte_job_id%TYPE
+                                  ,pi_rec_nte IN nm_nw_temp_extents%ROWTYPE
+                                  );
+PROCEDURE remove_rec_nte_from_nte (pi_tab_rec_nte  IN OUT NOCOPY tab_nte
+                                  ,pi_rec_nte      IN     nm_nw_temp_extents%ROWTYPE
+                                  );
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_tab_nte (pi_tab_nte in out nocopy tab_nte);
+--
+-----------------------------------------------------------------------------
+--
+FUNCTION get_tab_nte (pi_nte_id  IN nm_nw_temp_extents.nte_job_id%TYPE
+                     ) RETURN tab_nte;
+--
+-----------------------------------------------------------------------------
+--
+FUNCTION get_nte_source_from_roi_type (pi_roi_type varchar2) RETURN nm_pbi_query_results.nqr_source%TYPE;
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_roi_type_from_nte_source">
+--
+-- Returns the correct roi type for the given source.
+--
+FUNCTION get_roi_type_from_nte_source(pi_source    IN nm_pbi_query_results.nqr_source%TYPE
+                                     ,pi_source_id IN number
+                                     ) RETURN varchar2;
+--</PROC>
+--
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE get_roi_details (pi_roi_type    IN     varchar2
+                          ,pi_roi_id      IN     number
+                          ,po_roi_details    OUT rec_roi_details
+                          );
+PRAGMA RESTRICT_REFERENCES(get_roi_details, wnds, wnps, trust);
+FUNCTION get_roi_details(pi_roi_type    IN     varchar2
+                        ,pi_roi_id      IN     number
+                        ) RETURN rec_roi_details;
+--
+-----------------------------------------------------------------------------
+--
+FUNCTION get_roi_name  (pi_roi_type    IN     varchar2
+                       ,pi_roi_id      IN     number
+                       ) RETURN nm_elements.ne_unique%TYPE;
+--
+-----------------------------------------------------------------------------
+--
+FUNCTION get_roi_descr (pi_roi_type    IN     varchar2
+                       ,pi_roi_id      IN     number
+                       ) RETURN nm_elements.ne_descr%TYPE;
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="create_saved_ne_from_gaz_query">
+--
+-- Creates a saved extent from the specified gazetteer filter query results.
+--
+PROCEDURE create_saved_ne_from_gaz_query(pi_ngq_id     IN     nm_gaz_query.ngq_id%TYPE
+                                        ,pi_nse_owner  IN     nm_saved_extents.nse_owner%TYPE DEFAULT Sys_Context('NM3_SECURITY_CTX','USERNAME')
+                                        ,pi_nse_name   IN     nm_saved_extents.nse_name%TYPE
+                                        ,pi_nse_descr  IN     nm_saved_extents.nse_descr%TYPE
+                                        ,po_nse_id        OUT nm_saved_extents.nse_id%TYPE
+                                        );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="open_nte_for_adjoining_point">
+--
+-- Takes a temp extent and adds to it all connected points which are not already included in the
+--  extent
+--
+PROCEDURE open_nte_for_adjoining_point (p_nte_job_id IN nm_nw_temp_extents.nte_job_id%TYPE);
+--</PROC>
+
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_c_roi_extent">
+--
+-- Gets the value for c_roi_extent
+--
+FUNCTION get_c_roi_extent RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_c_roi_pbi">
+--
+-- Gets the value for c_roi_pbi
+--
+FUNCTION get_c_roi_pbi RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_c_roi_temp_ne">
+--
+-- Gets the value for c_roi_temp_ne
+--
+FUNCTION get_c_roi_temp_ne RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_c_roi_section">
+--
+-- Gets the value for c_roi_section
+--
+FUNCTION get_c_roi_section RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_c_roi_db">
+--
+-- Gets the value for c_roi_db
+--
+FUNCTION get_c_roi_db RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_c_roi_gos">
+--
+-- Gets the value for c_roi_gos
+--
+FUNCTION get_c_roi_gos RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_c_roi_gog">
+--
+-- Gets the value for c_roi_gog
+--
+FUNCTION get_c_roi_gog RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_c_roi_gis">
+--
+-- Gets the value for c_roi_gis
+--
+FUNCTION get_c_roi_gis RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nte_unit_id">
+-- Returns the UN_UNIT_ID for the specified temp_ne. If more than a single
+--  unit id is returned then an error raised
+--
+FUNCTION get_nte_unit_id (p_nte_job_id nm_nw_temp_extents.nte_job_id%TYPE) RETURN nm_units.un_unit_id%TYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_connected_chunks_for_nte">
+--
+PROCEDURE get_connected_chunks_for_nte(pi_nte_job_id  IN     nm_nw_temp_extents.nte_job_id%TYPE
+                                      ,pi_route_id    IN     nm_elements.ne_id%TYPE
+                                      ,pi_obj_type    IN     nm_members.nm_obj_type%TYPE
+                                      ,pio_chunks_tab IN OUT nm3route_ref.tab_rec_route_loc_dets
+                                      );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="remove overlaps">
+-- Remove overlaps from a temp extent
+--
+FUNCTION remove_overlaps(pi_nte_id  IN     nm_nw_temp_extents.nte_job_id%TYPE) RETURN nm_nw_temp_extents.nte_job_id%TYPE;
+--</PROC>
+--
+  --
+  -----------------------------------------------------------------------------
+  --
+  --<PRAGMA>
+  PRAGMA RESTRICT_REFERENCES(get_version            , wnds, wnps, rnds);
+  PRAGMA RESTRICT_REFERENCES(get_body_version       , wnds, wnps, rnds);
+  PRAGMA RESTRICT_REFERENCES(get_next_nse_id        , wnds, wnps);
+  PRAGMA RESTRICT_REFERENCES(get_next_nsm_id        , wnds, wnps);
+  PRAGMA RESTRICT_REFERENCES(get_nse                , wnds, wnps);
+  PRAGMA RESTRICT_REFERENCES(get_nsm                , wnds);
+  PRAGMA RESTRICT_REFERENCES(del_nsd                      , wnps);
+  PRAGMA RESTRICT_REFERENCES(get_saved              , wnds, wnps);
+  PRAGMA RESTRICT_REFERENCES(get_temp_ne            , wnds, wnps);
+  PRAGMA RESTRICT_REFERENCES(get_route              , wnds, wnps);
+  PRAGMA RESTRICT_REFERENCES(get_pbi                , wnds, wnps);
+  PRAGMA RESTRICT_REFERENCES(get_merge              , wnds, wnps);
+  PRAGMA RESTRICT_REFERENCES(get_last_gis_nse_id    , wnds, wnps);
+  PRAGMA RESTRICT_REFERENCES(get_unique_from_source , wnds);
+  PRAGMA RESTRICT_REFERENCES(extent_datum_count     , wnds);
+  PRAGMA RESTRICT_REFERENCES(temp_ne_valid_for_homo , wnds, wnps);
+  PRAGMA RESTRICT_REFERENCES(count_routes_in_temp_ne, wnds, wnps);
+  PRAGMA RESTRICT_REFERENCES(nse_name_is_unique     , wnds, wnps);
+  PRAGMA RESTRICT_REFERENCES(saved_ne_has_overlaps  , wnds, wnps);
+  PRAGMA RESTRICT_REFERENCES(get_last_nte_job_id    , wnds, wnps);
+  PRAGMA RESTRICT_REFERENCES(get_nte_source_from_roi_type, wnds, wnps);
+  PRAGMA RESTRICT_REFERENCES(get_roi_type_from_nte_source, wnds, wnps);
+  PRAGMA RESTRICT_REFERENCES(debug_temp_extents, wnds, wnps,trust);
+  PRAGMA RESTRICT_REFERENCES(get_roi_details, wnds, wnps);
+  PRAGMA RESTRICT_REFERENCES(get_roi_name, wnds, wnps);
+  PRAGMA RESTRICT_REFERENCES(get_roi_descr, wnds, wnps);
+  PRAGMA RESTRICT_REFERENCES(get_c_roi_extent, wnds, wnps);
+  PRAGMA RESTRICT_REFERENCES(get_c_roi_pbi, wnds, wnps);
+  PRAGMA RESTRICT_REFERENCES(get_c_roi_temp_ne, wnds, wnps);
+  PRAGMA RESTRICT_REFERENCES(get_c_roi_section, wnds, wnps);
+  PRAGMA RESTRICT_REFERENCES(get_c_roi_db, wnds, wnps);
+  PRAGMA RESTRICT_REFERENCES(get_c_roi_gos, wnds, wnps);
+  PRAGMA RESTRICT_REFERENCES(get_c_roi_gog, wnds, wnps);
+  PRAGMA RESTRICT_REFERENCES(get_c_roi_gis, wnds, wnps);
+  --</PRAGMA>
+  --
+END nm3extent;
+/

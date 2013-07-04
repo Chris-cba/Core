@@ -1,0 +1,103 @@
+CREATE OR REPLACE PACKAGE nm3event_log AS
+--<PACKAGE>
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3event_log.pkh-arc   2.2   Jul 04 2013 15:33:48   James.Wadsworth  $
+--       Module Name      : $Workfile:   nm3event_log.pkh  $
+--       Date into PVCS   : $Date:   Jul 04 2013 15:33:48  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:10  $
+--       Version          : $Revision:   2.2  $
+--       Based on SCCS version : 1.2
+--
+--   Author : Kevin Angus
+--
+--   Procs/Functions for manipulating the NM3 event log
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+  -------
+  --types
+  -------
+  SUBTYPE t_net_rec  IS nm_event_types%ROWTYPE;
+  SUBTYPE t_net_type IS nm_event_types.net_type%TYPE;
+  
+  SUBTYPE t_nel_rec IS nm_event_log%ROWTYPE;
+  SUBTYPE t_nel_id  IS nm_event_log.nel_id%TYPE;
+  
+  -----------
+  --constants
+  -----------
+  --g_sccsid is the SCCS ID for the package
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.2  $';
+  
+  c_default_net_type CONSTANT nm_event_types.net_type%TYPE := 'GENR';
+  c_error_net_type   CONSTANT nm_event_types.net_type%TYPE := 'ERRR';
+
+  -----------
+  --variables
+  -----------
+  g_nel_id_tab nm3type.tab_number;
+
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="create_entry">
+-- This procedure creates an entry in the NM3 event log.
+--
+PROCEDURE create_entry(pi_source   IN nm_event_log.nel_source%TYPE
+                      ,pi_event    IN nm_event_log.nel_event%TYPE
+                      ,pi_net_type IN nm_event_types.net_type%TYPE DEFAULT c_default_net_type
+                      ,pi_severity IN nm_event_log.nel_severity%TYPE DEFAULT 3
+                      );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="send_alert_mail">
+--
+-- This procedure sends an email to appropriate users for the severity of the
+-- specified alert.
+--
+PROCEDURE send_alert_mail(pi_nel_id IN t_nel_id
+                          );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="process_nel_tab">
+--
+-- This procedure is used by the alert triggers on nm_event_log.
+--
+PROCEDURE process_nel_tab;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PRAGMA>
+   PRAGMA RESTRICT_REFERENCES (get_version, rnds, wnps, wnds);
+   PRAGMA RESTRICT_REFERENCES (get_body_version, rnds, wnps, wnds);
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+END nm3event_log;
+/ 
+
