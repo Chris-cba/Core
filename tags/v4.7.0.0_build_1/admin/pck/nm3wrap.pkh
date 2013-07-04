@@ -1,0 +1,292 @@
+CREATE OR REPLACE PACKAGE nm3wrap AS
+--<PACKAGE>
+--
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3wrap.pkh-arc   2.2   Jul 04 2013 16:39:44   James.Wadsworth  $
+--       Module Name      : $Workfile:   nm3wrap.pkh  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:39:44  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 16:39:24  $
+--       Version          : $Revision:   2.2  $
+--       Based on SCCS version : 1.11
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--   Author : Kevin Angus
+--
+--     nm3wrap package. Contains functions + procedures for accessing packages that use object
+--                      features in their spec. Client tools such as Forms cannot access these
+--                      directly.
+--
+--
+--<GLOBVAR>
+  g_sccsid CONSTANT varchar2(2000) := '$Revision:   2.2  $';
+--</GLOBVAR>
+--</PACKAGE>
+--
+------------------------------------------------------------------------------------------------
+--
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="pop_sub_placement_array">
+-- This function is a wrapper for nm3pla.get_sub_placement and returns a count of the members
+-- in the resultant array.
+FUNCTION pop_sub_placement_array(pi_ne_id IN nm_elements.ne_id%TYPE
+                                ,pi_start IN nm_elements.ne_no_start%TYPE
+                                ,pi_end   IN nm_elements.ne_no_end%TYPE
+                                ) RETURN pls_integer;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="pop_super_placement_array">
+-- This function is a wrapper for nm3pla.get_super_placement and returns a count of the members
+-- in the resultant array.
+FUNCTION pop_super_placement_array(pi_ne_id IN nm_elements.ne_id%TYPE
+                                  ) RETURN pls_integer;
+                                  
+PRAGMA RESTRICT_REFERENCES (pop_super_placement_array, wnds);
+
+FUNCTION pop_super_placement_array(pi_ne_id    IN nm_elements.ne_id%TYPE
+                                  ,pi_obj_type IN nm_members.nm_obj_type%TYPE
+                                  ) RETURN pls_integer;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="return_placement">
+-- This function returns the data from a member (specified by pi_index) of the placement array
+-- populated by pop_sub_placement_array or pop_super_placement_array.
+PROCEDURE return_placement(pi_index   IN  number
+                          ,po_ne_id   OUT number
+                          ,po_start   OUT number
+                          ,po_end     OUT number
+                          ,po_measure OUT number
+                          );
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_super_placement">
+-- This procedure is a wrapper for nm3pla.get_super_placement
+PROCEDURE get_super_placement(pi_ne_id    IN  nm_elements.ne_id%TYPE
+                             ,pi_nt_type  IN  nm_types.nt_type%TYPE
+                             ,po_ne_id    OUT nm_elements.ne_id%TYPE
+                             ,po_begin_mp OUT nm_members.nm_begin_mp%TYPE
+                             ,po_end_mp   OUT nm_members.nm_end_mp%TYPE
+                             );
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="rescale_group">
+-- This function is a wrapper for nm3pla.set_route_offsets and nm3pla.update_route_offsets.
+PROCEDURE rescale_group(pi_ne_id    IN nm_elements.ne_id%TYPE
+                       ,pi_offset   IN number
+                       ,pi_seq_flag IN varchar2               DEFAULT 'Y'
+                       );
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="resequence_group">
+-- This function is a wrapper for nm3pla.set_route_offsets and nm3pla.resequence_route.
+PROCEDURE resequence_group(pi_ne_id IN nm_elements.ne_id%TYPE);
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_node_details">
+-- This function is a wrapper for nm3net.get_node_class
+PROCEDURE get_node_details(pi_route_id               IN  nm_elements.ne_id%TYPE
+                          ,pi_node_id                IN  nm_nodes.no_node_id%TYPE
+                          ,po_poe_type               OUT varchar2
+                          ,po_poe                    OUT number
+                          ,po_intersecting_road_name OUT varchar2
+                          );
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_ambiguous_lrefs">
+-- This function is a wrapper for nm3lrs.get_ambiguous_lrefs
+PROCEDURE get_ambiguous_lrefs(pi_parent_id IN  nm_members.nm_ne_id_in%TYPE
+                             ,pi_offset    IN  number
+                             ,pi_sub_class IN varchar2 DEFAULT NULL
+                             ,pi_position  in varchar2 DEFAULT NULL);
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="lref_count">
+-- This function returns the count of the lrefs found by get_ambiguous_lrefs
+FUNCTION lref_count RETURN pls_integer;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="lref_get_row">
+-- This procedure returns the lref at index pi_index
+PROCEDURE lref_get_row(pi_index  IN  pls_integer
+                      ,po_ne_id  OUT nm_elements.ne_id%TYPE
+                      ,po_offset OUT number
+                      );
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_set_offset">
+-- This function is a wrapper for nm3lrs.get_set_offset
+FUNCTION get_set_offset(pi_parent_ne_id IN nm_elements.ne_id%TYPE
+                       ,pi_child_ne_id  IN nm_elements.ne_id%TYPE
+                       ,pi_child_offset IN number
+                       ) RETURN number;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_relative_reference">
+--
+PROCEDURE get_relative_reference( p_parent_type   IN nm_members_all.nm_type%TYPE,
+                                  p_parent_obj    IN nm_members_all.nm_obj_type%TYPE,
+   				  p_child_ne_id   IN nm_members_all.nm_ne_id_of%TYPE,
+   				  p_child_offset  IN nm_members_all.nm_begin_mp%TYPE,
+				  p_xsp           IN nm_xsp.nwx_x_sect%TYPE,
+				  p_return_ne_id  OUT nm_members_all.nm_ne_id_in%TYPE,
+				  p_return_offset OUT nm_members_all.nm_begin_mp%TYPE );
+
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_inventory_attrib">
+--
+----------------------------------------------------------------------------------------------
+FUNCTION get_inventory_attrib ( p_parent_obj    IN nm_members_all.nm_obj_type%TYPE,
+   				p_child_ne_id   IN nm_members_all.nm_ne_id_of%TYPE,
+   				p_child_offset  IN nm_members_all.nm_begin_mp%TYPE,
+				p_xsp           IN nm_xsp.nwx_x_sect%TYPE,
+				p_attrib_name   IN nm_inv_type_attribs.ita_attrib_name%TYPE ) RETURN varchar2;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="mid_block_data">
+--
+PROCEDURE mid_block_data(route_id        IN number
+                        ,node1           IN number
+                        ,node2           IN number
+                        ,sub_class       IN varchar2
+                        ,distance_error OUT number
+                        ,ne_id          OUT number
+                        ,offset         OUT number
+                        );
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="pop_member_placement_chunks">
+-- Populates placement array with start and end placements of each connected chunk of members
+-- of specified ne_id
+FUNCTION pop_member_placement_chunks(pi_ne_id IN nm_elements.ne_id%TYPE
+                                    ) RETURN pls_integer;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="create_connected_temp_ne">
+-- Populates temp extent with conncected sections along route using specified sub class where
+-- ambiguous.
+--
+PROCEDURE create_temp_ne_from_route(pi_route                   IN     nm_elements.ne_id%TYPE
+                                   ,pi_start_ne_id             IN     nm_elements.ne_id%TYPE
+                                   ,pi_start_offset            IN     number
+                                   ,pi_end_ne_id               IN     nm_elements.ne_id%TYPE
+                                   ,pi_end_offset              IN     number
+                                   ,pi_sub_class               IN     nm_elements.ne_sub_class%TYPE
+                                   ,pi_restrict_excl_sub_class IN     varchar2
+                                   ,pi_homo_check              IN     boolean DEFAULT FALSE
+                                   ,po_job_id                     OUT nm_nw_temp_extents.nte_job_id%TYPE);
+
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_block_reference">
+-- Wrapper for nm3lrs.get_block_reference.
+--
+PROCEDURE get_block_reference(pi_route        IN     nm_elements.ne_id%TYPE
+                             ,pi_intersection IN     nm_nodes.no_node_id%TYPE
+                             ,pi_sub_class    IN     nm_elements.ne_sub_class%TYPE DEFAULT NULL
+                             ,pi_type         IN     nm_nodes.no_node_type%TYPE
+                             ,po_ne_id           OUT nm_elements.ne_id%TYPE
+                             ,po_offset          OUT number
+                             );
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_element_true">
+-- Wrapper for nm3lrs.get_element_true.
+--
+FUNCTION get_element_true(pi_ne_id_in IN nm_members.nm_ne_id_in%TYPE
+                         ,pi_ne_id_of IN nm_members.nm_ne_id_of%TYPE
+                         ) RETURN nm_members.nm_true%TYPE;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_element_true">
+-- Wrapper for nm3lrs.check_relative_start_end.
+--
+PROCEDURE check_relative_start_end(pi_route        IN nm_elements.ne_id%TYPE
+                                  ,pi_start_sect   IN nm_elements.ne_id%TYPE
+                                  ,pi_start_offset IN number
+                                  ,pi_end_sect     IN nm_elements.ne_id%TYPE
+                                  ,pi_end_offset   IN number
+                                  );
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_element_true">
+-- Wrapper for nm3lrs.process_lref_tab_excl_subclass. Operates on internal nm3wrap lref table
+-- populated by get_ambigous_lrefs
+--
+PROCEDURE process_lref_tab_excl_subclass(pi_sub_class IN nm_elements.ne_sub_class%TYPE
+                                        );
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+PROCEDURE get_tab_lref (p_ne_id    IN     nm_elements.ne_id%TYPE
+                       ,p_offset   IN     nm_members.nm_begin_mp%TYPE
+                       ,p_tab_lref IN OUT nm3lrs.lref_table
+                       );
+--
+----------------------------------------------------------------------------------------------
+--
+--<PRAGMA>
+   PRAGMA RESTRICT_REFERENCES (get_version, rnds, wnps, wnds);
+   PRAGMA RESTRICT_REFERENCES (get_body_version, rnds, wnps, wnds);
+   PRAGMA RESTRICT_REFERENCES (pop_super_placement_array, wnds);
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+END nm3wrap;
+/
