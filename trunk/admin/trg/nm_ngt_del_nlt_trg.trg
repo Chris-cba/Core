@@ -18,7 +18,7 @@ DECLARE
 --   Remove NM_LINEAR_TYPES record trigger
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2003
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 -- Body of trigger removed, duplication of cascade constraint that was
 -- causing mutating table error, see 703686 (FF)
