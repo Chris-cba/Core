@@ -1,0 +1,65 @@
+create or replace package nm3sdo_util
+AS
+--<PACKAGE>
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_util.pkh-arc   1.2   Jul 04 2013 16:32:56   James.Wadsworth  $
+--       Module Name      : $Workfile:   nm3sdo_util.pkh  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:32:56  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 16:31:30  $
+--       Version          : $Revision:   1.2  $
+--       Based on SCCS version : 
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+
+  -----------
+  --constants
+  -----------
+  --g_sccsid is the SCCS ID for the package
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   1.2  $';
+
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="RESHAPE_ROUTE">
+-- This procedure preforms a reshape of a route, useful for route that have been
+-- end dated and cannot be manipulated via the forms. 
+PROCEDURE reshape_route (
+   gis_session_id IN gis_data_objects.gdo_session_id%TYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="REVERSE_DATUM">
+-- This procedure reverse the routes direction and updates the measure accordingly
+PROCEDURE reverse_datum (
+   gis_session_id IN gis_data_objects.gdo_session_id%TYPE);
+--</PROC>
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="DATUM_START_END">
+-- This procedure creates the spatial information of the start and end points on a datum.
+PROCEDURE datum_start_end (
+   gis_session_id IN gis_data_objects.gdo_session_id%TYPE);
+--</PROC>
+end nm3sdo_util;
+/
