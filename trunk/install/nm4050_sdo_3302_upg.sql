@@ -1,14 +1,15 @@
 --
---------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm4050_sdo_3302_upg.sql-arc   3.3   Sep 05 2008 16:04:30   aedwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4050_sdo_3302_upg.sql-arc   3.4   Jul 04 2013 14:15:38   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm4050_sdo_3302_upg.sql  $
---       Date into PVCS   : $Date:   Sep 05 2008 16:04:30  $
---       Date fetched Out : $Modtime:   Sep 05 2008 15:48:32  $
---       PVCS Version     : $Revision:   3.3  $
+--       Date into PVCS   : $Date:   Jul 04 2013 14:15:38  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:14:56  $
+--       Version          : $Revision:   3.4  $
 --
---------------------------------------------------------------------------------
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
 --
 
 
