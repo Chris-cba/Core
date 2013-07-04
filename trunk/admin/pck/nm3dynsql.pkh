@@ -2,11 +2,11 @@ CREATE OR REPLACE package nm3dynsql as
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3dynsql.pkh-arc   2.1   Oct 04 2007 16:57:28   ptanava  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3dynsql.pkh-arc   2.2   Jul 04 2013 15:33:46   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3dynsql.pkh  $
---       Date into PVCS   : $Date:   Oct 04 2007 16:57:28  $
---       Date fetched Out : $Modtime:   Oct 04 2007 10:52:40  $
---       PVCS Version     : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   Jul 04 2013 15:33:46  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:10  $
+--       PVCS Version     : $Revision:   2.2  $
 --       Based on sccs version : 
 --
 --
@@ -15,10 +15,10 @@ CREATE OR REPLACE package nm3dynsql as
 --   Package for standard reusable dynamic sql
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2005
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
-  g_sccsid      CONSTANT  varchar2(2000) := '"$Revision:   2.1  $"';
+  g_sccsid      CONSTANT  varchar2(2000) := '"$Revision:   2.2  $"';
   
   subtype nm_id_type    is number(9);
   subtype nm_code_type  is varchar2(80);
