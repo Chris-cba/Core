@@ -16,7 +16,7 @@ CREATE OR REPLACE type INT_ARRAY as object (
 --   TYPE int_array
 --
 -----------------------------------------------------------------------------
---      Copyright (c) exor corporation ltd, 2001
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 ia int_array_type 

@@ -2,11 +2,11 @@ create or replace type body nm_analytic_chunk_type
 is
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:$
---       Module Name      : $Workfile:$
---       Date into PVCS   : $Date:$
---       Date fetched Out : $Modtime:$
---       PVCS Version     : $Revision:$
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/typ/nm_analytic_chunk_type.tyb-arc   2.2   Jul 04 2013 10:14:02   James.Wadsworth  $
+--       Module Name      : $Workfile:   nm_analytic_chunk_type.tyb  $
+--       Date into PVCS   : $Date:   Jul 04 2013 10:14:02  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 09:59:36  $
+--       PVCS Version     : $Revision:   2.2  $
 --       Based on SCCS version : 1.1
 --
 --   Author : Priidu Tanava
@@ -15,7 +15,7 @@ is
 --   The actual processing logic is implemented in package nm3analytic_connectivity
 --
 -----------------------------------------------------------------------------
---   Copyright (c) exor corporation ltd, 2006
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 
 static function ODCIAggregateInitialize(sctx IN OUT nm_analytic_chunk_type) 

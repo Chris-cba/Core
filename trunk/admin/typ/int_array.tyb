@@ -16,7 +16,7 @@ CREATE OR REPLACE type body INT_ARRAY is
 --   TYPE int_array
 --
 -----------------------------------------------------------------------------
---      Copyright (c) exor corporation ltd, 2001
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 member function add_element( p_i in integer) return int_array is

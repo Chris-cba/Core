@@ -14,7 +14,7 @@ CREATE OR REPLACE TYPE nm_cnct_ne_array_type AS
 --   NM3 Connectivity object - element array type
 --
 -------------------------------------------------------------------------------
---	Copyright (c) exor corporation 2006
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 
 VARRAY(1048576) OF nm_cnct_ne;

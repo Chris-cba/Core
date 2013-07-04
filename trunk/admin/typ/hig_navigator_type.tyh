@@ -2,13 +2,15 @@ CREATE OR REPLACE TYPE hig_navigator_type AS OBJECT(
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/typ/hig_navigator_type.tyh-arc   3.0   Apr 14 2010 10:43:24   malexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/typ/hig_navigator_type.tyh-arc   3.1   Jul 04 2013 10:14:02   James.Wadsworth  $
 --       Module Name      : $Workfile:   hig_navigator_type.tyh  $
---       Date into PVCS   : $Date:   Apr 14 2010 10:43:24  $
---       Date fetched Out : $Modtime:   Apr 14 2010 10:43:04  $
---       Version          : $Revision:   3.0  $
+--       Date into PVCS   : $Date:   Jul 04 2013 10:14:02  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 10:03:28  $
+--       Version          : $Revision:   3.1  $
 --       Based on SCCS version : 
--------------------------------------------------------------------------
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
  parent     Varchar2(100)
 ,child      Varchar2(100)
 ,data       Varchar2(100)

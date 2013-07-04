@@ -14,7 +14,7 @@ CREATE OR REPLACE TYPE nm_cnct_link AS
 --   NM3 Connectivity object - link details
 --
 -------------------------------------------------------------------------------
---	Copyright (c) exor corporation 2006
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 
 OBJECT ( I INTEGER, J INTEGER, COST NUMBER, path int_array );
