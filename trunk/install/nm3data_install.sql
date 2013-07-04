@@ -1,4 +1,17 @@
-REM Copyright (c) Exor Corporation Ltd, 2004
+--
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data_install.sql-arc   2.1   Jul 04 2013 14:09:10   James.Wadsworth  $
+--       Module Name      : $Workfile:   nm3data_install.sql  $
+--       Date into PVCS   : $Date:   Jul 04 2013 14:09:10  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 13:38:06  $
+--       Version          : $Revision:   2.1  $
+--
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
+REM Copyright 2013 Bentley Systems Incorporated. All rights reserved.
 REM @(#)nm3data_install.sql	1.6 01/31/06
 
 set echo off
