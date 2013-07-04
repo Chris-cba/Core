@@ -1,3 +1,16 @@
+--
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/generic_handler.pkh-arc   2.1   Jul 04 2013 14:36:16   James.Wadsworth  $
+--       Module Name      : $Workfile:   generic_handler.pkh  $
+--       Date into PVCS   : $Date:   Jul 04 2013 14:36:16  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:34:36  $
+--       Version          : $Revision:   2.1  $
+--
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
 /* Formatted on 2004/08/27 14:29 (Formatter Plus v4.8.5) */
 Create Or Replace Package generic_handler
 Is
