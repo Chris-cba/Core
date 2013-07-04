@@ -1,0 +1,220 @@
+create or replace package nm_debug as
+--<PACKAGE>
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)nm_debug.pkh	1.7 10/18/02
+--       Module Name      : nm_debug.pkh
+--       Date into SCCS   : 02/10/18 09:18:54
+--       Date fetched Out : 07/06/13 14:10:43
+--       SCCS Version     : 1.7
+--
+--
+--   Author : Jonathan Mills
+--
+--   Debug Package
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+  g_sccsid      CONSTANT  VARCHAR2(2000) := '"@(#)nm_debug.pkh	1.7 10/18/02"';
+--  g_sccsid is the SCCS ID for the package
+--
+   c_default_level  CONSTANT NUMBER := 3;
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_on">
+-- Switch debug mode on
+PROCEDURE debug_on;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_off">
+-- Switch debug mode off
+PROCEDURE debug_off;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="is_debug_on">
+-- Returns TRUE if debugging is on otherwise FALSE
+FUNCTION is_debug_on RETURN BOOLEAN;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="set_level">
+-- There are several levels of debug messages. Suggested uses are
+--  0  -  Very High Level messages (entering procedure)
+--  1  -  High Level messages (start of distinct bit of code)
+--  2  -  Relatively detailed (entering loop)
+--  3  -  Highly detailed     (statement within loop)
+-- Depending on the value passed in here (default is 3) debug messages
+--  will be written
+PROCEDURE set_level (p_level NUMBER);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug">
+-- Write a debug statement with the specified level
+PROCEDURE debug (p_text  IN VARCHAR2
+                ,p_level IN NUMBER  DEFAULT Null
+                );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="delete_debug">
+-- If the parameter is not passed (or is FALSE) then all
+--  debug messages for the current session will be removed, otherwise all
+--  debug messages for the current terminal will be deleted
+PROCEDURE delete_debug (p_remove_all IN BOOLEAN DEFAULT FALSE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_next_nd_id_seq">
+-- This function returns ND_ID_SEQ.NEXTVAL
+FUNCTION get_next_nd_id_seq RETURN NUMBER;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="proc_start">
+-- Call this procedure to produce a debug message to indicate entering a
+--  procedure
+--
+PROCEDURE proc_start (p_package_name   IN VARCHAR2
+                     ,p_procedure_name IN VARCHAR2
+                     );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="proc_end">
+-- Call this procedure to produce a debug message to indicate leaving a
+--  procedure
+--
+PROCEDURE proc_end (p_package_name   IN VARCHAR2
+                   ,p_procedure_name IN VARCHAR2
+                   );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_sql_string">
+-- This procedure executes the select statement specified and sends the output
+--  to debug
+--
+PROCEDURE debug_sql_string (p_sql VARCHAR2);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_clob">
+-- This procedure dumps the passed CLOB to debug
+--
+PROCEDURE debug_clob (p_clob CLOB
+                     ,p_level IN NUMBER  DEFAULT Null
+                     );
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="dump_call_stack">
+-- This procedure dumps the procedure call stack as maintained by proc_start
+--   and proc_end
+--
+PROCEDURE dump_call_stack (p_level IN NUMBER DEFAULT Null);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_default_level">
+-- This function returns the default level
+--
+FUNCTION get_default_level RETURN NUMBER;
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="add_to_callstack">
+-- This procedure adds the text to the callstack
+--
+PROCEDURE add_to_callstack (p_client_info VARCHAR2);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="delete_from_callstack">
+-- This procedure removes the text from the callstack
+--
+PROCEDURE delete_from_callstack (p_client_info VARCHAR2);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="truncate_callstack">
+-- This procedure removes all entries from the callstack
+--
+PROCEDURE truncate_callstack;
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PRAGMA>
+   PRAGMA RESTRICT_REFERENCES (get_version, RNDS, WNPS, WNDS, TRUST);
+   PRAGMA RESTRICT_REFERENCES (get_body_version, RNDS, WNPS, WNDS, TRUST);
+   PRAGMA RESTRICT_REFERENCES (get_next_nd_id_seq, WNPS, WNDS);
+   --
+   --All debug procedures/functions get a full set of restrict_references
+   --options with trust set so they can be called from anywhere else without
+   --violating the PRAGMAs set there.
+   --
+   PRAGMA RESTRICT_REFERENCES (debug       , WNDS, WNPS, RNDS, RNPS, TRUST);
+   PRAGMA RESTRICT_REFERENCES (debug_off   , WNDS, WNPS, RNDS, RNPS, TRUST);
+   PRAGMA RESTRICT_REFERENCES (debug_on    , WNDS, WNPS, RNDS, RNPS, TRUST);
+   PRAGMA RESTRICT_REFERENCES (delete_debug, WNDS, WNPS, RNDS, RNPS, TRUST);
+   PRAGMA RESTRICT_REFERENCES (is_debug_on , WNDS, WNPS, RNDS, RNPS, TRUST);
+   PRAGMA RESTRICT_REFERENCES (proc_end    , WNDS, WNPS, RNDS, RNPS, TRUST);
+   PRAGMA RESTRICT_REFERENCES (proc_start  , WNDS, WNPS, RNDS, RNPS, TRUST);
+   PRAGMA RESTRICT_REFERENCES (set_level   , WNDS, WNPS, RNDS, RNPS, TRUST);
+   PRAGMA RESTRICT_REFERENCES (debug_sql_string , WNDS, WNPS, RNDS, RNPS, TRUST);
+   PRAGMA RESTRICT_REFERENCES (debug_clob  , WNDS, WNPS, RNDS, RNPS, TRUST);
+   PRAGMA RESTRICT_REFERENCES (dump_call_stack , WNDS, WNPS, RNDS, RNPS, TRUST);
+   PRAGMA RESTRICT_REFERENCES (get_default_level , WNDS, WNPS, RNDS, RNPS, TRUST);
+   PRAGMA RESTRICT_REFERENCES (add_to_callstack , WNDS, WNPS, RNDS, RNPS, TRUST);
+   PRAGMA RESTRICT_REFERENCES (delete_from_callstack  , WNDS, WNPS, RNDS, RNPS, TRUST);
+   PRAGMA RESTRICT_REFERENCES (truncate_callstack  , WNDS, WNPS, RNDS, RNPS, TRUST);
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+end nm_debug;
+/
