@@ -6,11 +6,11 @@ spool nm2_nm3_object_setup.log
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/mig/nm2_nm3_object_setup.sql-arc   2.1   Sep 12 2008 10:42:32   Ian Turnbull  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/mig/nm2_nm3_object_setup.sql-arc   2.2   Jul 04 2013 16:49:10   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm2_nm3_object_setup.sql  $
---       Date into PVCS   : $Date:   Sep 12 2008 10:42:32  $
---       Date fetched Out : $Modtime:   Sep 12 2008 10:37:32  $
---       PVCS Version     : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:49:10  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 16:46:22  $
+--       PVCS Version     : $Revision:   2.2  $
 -----------------------------------------------------------------------------
 --
 --   SCCS IDENTIFIERS :-
@@ -23,7 +23,7 @@ spool nm2_nm3_object_setup.log
 
 --
 -----------------------------------------------------------------------------
---	Copyright (C) Exor Corporation Ltd, 2004
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 PROMPT ================================================================

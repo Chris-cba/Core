@@ -1,4 +1,4 @@
-REM Copyright (c) Exor Corporation Ltd, 2004
+REM Copyright 2013 Bentley Systems Incorporated. All rights reserved.
 -- sccsid : @(#)pre_mig_inst.sql	1.20 05/14/07 
 -- Module Name : pre_mig_inst.sql 
 -- Date into SCCS : 07/05/14 17:19:50 

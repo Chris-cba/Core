@@ -1,3 +1,16 @@
+--
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/mig/v2_synonym_removal.sql-arc   2.1   Jul 04 2013 16:49:10   James.Wadsworth  $
+--       Module Name      : $Workfile:   v2_synonym_removal.sql  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:49:10  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 16:48:52  $
+--       Version          : $Revision:   2.1  $
+--
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
 define sccsid = '"@(#)v2_synonym_removal.sql	1.2 12/23/04"'
 prompt
 prompt Version 2 Highways Owner Synonym Remover Script

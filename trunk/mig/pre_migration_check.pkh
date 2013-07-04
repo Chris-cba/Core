@@ -3,18 +3,18 @@ CREATE OR REPLACE PACKAGE Pre_Migration_Check AS
 -----------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/mig/pre_migration_check.pkh-arc   2.1   Jul 31 2007 09:48:38   smarshall  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/mig/pre_migration_check.pkh-arc   2.2   Jul 04 2013 16:49:10   James.Wadsworth  $
 --       Module Name      : $Workfile:   pre_migration_check.pkh  $
---       Date into PVCS   : $Date:   Jul 31 2007 09:48:38  $
---       Date fetched Out : $Modtime:   Jul 31 2007 08:58:48  $
---       PVCS Version     : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:49:10  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 16:46:22  $
+--       PVCS Version     : $Revision:   2.2  $
 --
 --   Author : Stuart Marshall/Graeme Johnson
 --
 --    pre_migration_check
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2002
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
@@ -23,7 +23,7 @@ CREATE OR REPLACE PACKAGE Pre_Migration_Check AS
   --constants
   -----------
   --g_sccsid is the SCCS ID for the package
-  g_sccsid CONSTANT VARCHAR2(2000) := '"$Revision:   2.1  $"';
+  g_sccsid CONSTANT VARCHAR2(2000) := '"$Revision:   2.2  $"';
 
   c_write_mode       CONSTANT  VARCHAR2(1)    := 'W';
 

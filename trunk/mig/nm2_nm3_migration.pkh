@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE Nm2_Nm3_Migration AS
 -----------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       pvcsid                 : $Header:   //vm_latest/archives/nm3/mig/nm2_nm3_migration.pkh-arc   2.4   Jun 18 2009 08:42:40   Ian Turnbull  $
+--       pvcsid                 : $Header:   //vm_latest/archives/nm3/mig/nm2_nm3_migration.pkh-arc   2.5   Jul 04 2013 16:49:10   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm2_nm3_migration.pkh  $
---       Date into PVCS   : $Date:   Jun 18 2009 08:42:40  $
---       Date fetched Out : $Modtime:   Jun 16 2009 15:06:44  $
---       PVCS Version     : $Revision:   2.4  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:49:10  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 16:46:22  $
+--       PVCS Version     : $Revision:   2.5  $
 --       Based on SCCS Version : 1.10
 --
 --
@@ -16,7 +16,7 @@ CREATE OR REPLACE PACKAGE Nm2_Nm3_Migration AS
 --    nm2_nm3_migration
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2002
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
