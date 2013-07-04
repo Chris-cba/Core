@@ -14,7 +14,7 @@ CREATE OR REPLACE TYPE nm_cnct AS OBJECT
 --   NM3 Connectivity object - cnct type
 --
 -------------------------------------------------------------------------------
---	Copyright (c) exor corporation 2006
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 
 ( nc_no_ptr         ptr_array, 

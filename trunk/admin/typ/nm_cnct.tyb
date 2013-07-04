@@ -14,7 +14,7 @@ CREATE OR REPLACE TYPE BODY nm_cnct IS
 --   NM3 Connectivity object - cnct body
 --
 -------------------------------------------------------------------------------
---	Copyright (c) exor corporation 2006
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 
 MEMBER FUNCTION Get_Start_And_End_Nodes RETURN nm_cnct_no_array IS

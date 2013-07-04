@@ -14,7 +14,7 @@ CREATE OR REPLACE TYPE BODY nm_cnct_no_array IS
 --   NM3 Connectivity object - node array type body
 --
 -------------------------------------------------------------------------------
---	Copyright (c) exor corporation 2006
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 
 MEMBER FUNCTION add_element ( p_row_id IN INTEGER, p_no_id IN INTEGER, p_ne_id IN INTEGER, p_no_type IN VARCHAR2 ) RETURN nm_cnct_no_array IS

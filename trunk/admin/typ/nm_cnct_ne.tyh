@@ -14,7 +14,7 @@ CREATE OR REPLACE TYPE nm_cnct_ne AS OBJECT
 --   NM3 Connectivity object - element details
 --
 -------------------------------------------------------------------------------
---	Copyright (c) exor corporation 2006
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 
 (row_id INTEGER, ne_id INTEGER, no_st INTEGER, no_end INTEGER, ne_length NUMBER );

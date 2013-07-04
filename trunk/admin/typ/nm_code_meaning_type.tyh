@@ -13,7 +13,7 @@ CREATE OR REPLACE type nm_code_meaning_type as object (
 --   Author : %USERNAME%
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2006
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
    CODE varchar2(80)
   ,MEANING varchar2(500)

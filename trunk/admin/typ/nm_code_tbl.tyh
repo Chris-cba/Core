@@ -13,7 +13,7 @@ CREATE OR REPLACE type nm_code_tbl
 --   Author : %USERNAME%
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2006
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 as table of varchar2(80)
 /
