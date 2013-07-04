@@ -13,7 +13,7 @@ CREATE OR REPLACE PACKAGE BODY nm0590 AS
 --  Package containing functions and procedures that form NM0590 - Asset Maitenance
 --  uses.
 -----------------------------------------------------------------------------
---  Copyright (c) exor corporation ltd, 2005
+--  Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 --<PROC NAME="get_category_types">
