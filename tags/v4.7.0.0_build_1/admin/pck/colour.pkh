@@ -1,0 +1,87 @@
+PROMPT Create the Package colour
+CREATE OR REPLACE PACKAGE colour AS
+--<PACKAGE>
+--   PVCS Identifiers :-
+--
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/colour.pkh-arc   2.1   Jul 04 2013 14:28:16   James.Wadsworth  $
+--       Module Name      : $Workfile:   colour.pkh  $
+--       Date into SCCS   : $Date:   Jul 04 2013 14:28:16  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:06  $
+--       SCCS Version     : $Revision:   2.1  $
+--       Based on SCCS Version     : 1.1
+--
+--
+--   Author :
+--
+--  Colour package
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+  g_sccsid	CONSTANT	VARCHAR2(2000) := '"$Revision:   2.1  $"';--'"@(#)colour.pck	1.1 09/22/99"';
+-- g_sccsid is the SCCS_ID
+  g_vattr   varchar2(12);
+-- g_vattr is ......
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_colour">
+  function get_colour( p_col_id in number ) return varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_col_id">
+  function get_col_id( p_colour in varchar2 ) return number;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="return_vattr">
+  function return_vattr return varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="return_vattr_id">
+  function return_vattr_id return number;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="set_vattr">
+  procedure set_vattr( p_attr in varchar2 );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PRAGMA>
+   PRAGMA RESTRICT_REFERENCES (get_version, RNDS, WNPS, WNDS);
+   PRAGMA RESTRICT_REFERENCES (get_body_version, RNDS, WNPS, WNDS);
+  pragma restrict_references( get_colour, WNDS );
+  pragma restrict_references( get_col_id, WNDS );
+  pragma restrict_references( return_vattr_id, WNDS );
+  pragma restrict_references( return_vattr, WNDS );
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+end colour;
+/
