@@ -1,0 +1,62 @@
+CREATE OR REPLACE PACKAGE new_Metadata_Generate IS
+--<PACKAGE>
+--
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/new_metadata_generate.pkh-arc   3.1   Jul 04 2013 15:07:20   James.Wadsworth  $
+--       Module Name      : $Workfile:   new_metadata_generate.pkh  $
+--       Date into PVCS   : $Date:   Jul 04 2013 15:07:20  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:08  $
+--       Version          : $Revision:   3.1  $
+--
+--   Author : Graeme Johnson
+--
+--   Package to generate the metadata creation scripts
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+  g_sccsid      CONSTANT  VARCHAR2(80) := '$Revision:   3.1  $';
+--  g_sccsid is the SCCS ID for the package
+  g_trace                 BOOLEAN      := FALSE;
+-- g_trace is a variable which, if set will allow the package to output debugging messages
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_body_version">
+-- This function returns the current SCCS version
+FUNCTION get_body_version RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE file_selection(pi_table_name IN VARCHAR2 DEFAULT NULL);
+
+PROCEDURE generate (filelist     IN owa_util.vc_arr
+                   ,file_location IN varchar2
+                   ,script_header IN varchar2);
+                   
+FUNCTION get_mdo (pi_mdo_option_id metadata_options.MDO_OPTION_ID%TYPE) RETURN metadata_options%ROWTYPE;
+
+PROCEDURE refresh_hwch_for_all_products;                   
+--
+-----------------------------------------------------------------------------
+--
+--<PRAGMA>
+   PRAGMA RESTRICT_REFERENCES (get_version, RNDS, WNDS);
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+END new_Metadata_Generate;
+/
