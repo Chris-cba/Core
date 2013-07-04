@@ -1,0 +1,473 @@
+CREATE OR REPLACE PACKAGE Nm3invval IS
+--<PACKAGE>
+--
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3invval.pkh-arc   2.7   Jul 04 2013 16:11:38   James.Wadsworth  $
+--       Module Name      : $Workfile:   nm3invval.pkh  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:11:38  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:14  $
+--       Version          : $Revision:   2.7  $
+--       Based on SCCS version : 1.13
+-------------------------------------------------------------------------
+--
+--   Author : Jonathan Mills
+--
+--   NM3 Inventory validation package
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--
+--<GLOBVAR>
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.7  $';
+--
+   TYPE tab_nin IS TABLE OF nm_inv_nw%ROWTYPE INDEX BY BINARY_INTEGER;
+--
+   c_max_date CONSTANT   DATE := TO_DATE('31/12/9999','DD/MM/YYYY');
+--
+-- rec_nii, tab_rec_nii and g_tab_rec_nii are in place to avoid trigger mutation on
+--  NM_INV_ITEMS
+--
+   TYPE rec_nii IS RECORD
+       (ne_id            nm_inv_items.iit_ne_id%TYPE
+       ,inv_type         nm_inv_items.iit_inv_type%TYPE
+       ,start_date       nm_inv_items.iit_start_date%TYPE
+       ,end_date         nm_inv_items.iit_end_date%TYPE
+       ,primary_key      nm_inv_items.iit_primary_key%TYPE
+       ,foreign_key      nm_inv_items.iit_foreign_key%TYPE
+       ,is_parent        BOOLEAN
+       ,is_child         BOOLEAN
+       ,parent_inv_type  nm_inv_items.iit_inv_type%TYPE
+       ,child_inv_type   nm_inv_items.iit_inv_type%TYPE
+       ,parent_mandatory nm_inv_type_groupings.itg_mandatory%TYPE
+       ,child_mandatory  nm_inv_type_groupings.itg_mandatory%TYPE
+       ,parent_relation  nm_inv_type_groupings.itg_relation%TYPE
+       ,child_relation   nm_inv_type_groupings.itg_relation%TYPE
+       ,admin_unit       nm_inv_items.iit_admin_unit%TYPE
+       ,trigger_mode     VARCHAR2(30)
+       );
+   TYPE tab_rec_nii IS TABLE OF rec_nii INDEX BY BINARY_INTEGER;
+   g_tab_rec_nii tab_rec_nii;
+   -- task 0108705 CWS
+   g_nii_end_date_old nm_inv_items.iit_end_date%type;
+--
+   TYPE rec_date_chk IS RECORD
+       ( ne_id       nm_inv_items.iit_ne_id%TYPE
+        ,inv_type    nm_inv_items.iit_inv_type%TYPE
+        ,start_date  nm_inv_items.iit_start_date%TYPE
+        ,end_date    nm_inv_items.iit_end_date%TYPE
+        ,admin_unit  nm_inv_items.iit_admin_unit%TYPE
+        ,located_by  nm_inv_items.iit_located_by%TYPE
+        ,primary_key nm_inv_items.iit_primary_key%TYPE
+        ,trigger_mode     VARCHAR2(30)
+       );
+   TYPE tab_rec_date_chk IS TABLE OF rec_date_chk INDEX BY BINARY_INTEGER;
+   g_tab_rec_date_chk tab_rec_date_chk;
+--
+   TYPE tab_number  IS TABLE OF NUMBER  INDEX BY BINARY_INTEGER;
+   TYPE tab_date    IS TABLE OF DATE    INDEX BY BINARY_INTEGER;
+--
+   c_insert_mode CONSTANT VARCHAR2(30) := 'INSERT';
+   c_update_mode CONSTANT VARCHAR2(30) := 'UPDATE';
+   c_delete_mode CONSTANT VARCHAR2(30) := 'DELETE';
+--
+   g_process_update_trigger BOOLEAN := TRUE;
+   g_statement_in_progress  BOOLEAN := TRUE;
+--
+   c_at_relation       CONSTANT nm_inv_type_groupings.itg_relation%TYPE := 'AT';       -- Child exists at the same location as the parent
+   c_in_relation       CONSTANT nm_inv_type_groupings.itg_relation%TYPE := 'IN';       -- Child must exist within the parent
+   c_none_relation     CONSTANT nm_inv_type_groupings.itg_relation%TYPE := 'NONE';     -- No location relationship is enforced
+   c_relative_relation CONSTANT nm_inv_type_groupings.itg_relation%TYPE := 'RELATIVE'; -- Child must exist within the parent but its location
+   c_derived_relation  CONSTANT nm_inv_type_groupings.itg_relation%TYPE := 'DERIVED';  -- The parent is derived by location
+--
+   TYPE rec_excl_check IS RECORD
+       (iit_ne_id             nm_inv_items.iit_ne_id%TYPE
+       ,iit_inv_type          nm_inv_items.iit_inv_type%TYPE
+       ,nit_pnt_or_cont       nm_inv_types.nit_pnt_or_cont%TYPE
+       ,nit_x_sect_allow_flag nm_inv_types.nit_x_sect_allow_flag%TYPE
+       );
+   TYPE tab_rec_excl_check IS TABLE OF rec_excl_check INDEX BY BINARY_INTEGER;
+   g_tab_rec_excl_check tab_rec_excl_check;
+--
+   TYPE rec_latest_asset_chk IS RECORD
+       (iit_ne_id             nm_inv_items.iit_ne_id%TYPE);
+   TYPE tab_rec_la_check IS TABLE OF rec_latest_asset_chk INDEX BY BINARY_INTEGER;
+   g_tab_rec_la_check tab_rec_la_check;
+--
+   TYPE rec_update_au IS RECORD
+       (iit_ne_id             nm_inv_items.iit_ne_id%TYPE
+       ,iit_admin_unit_old    nm_inv_items.iit_admin_unit%TYPE
+       ,iit_admin_unit_new    nm_inv_items.iit_admin_unit%TYPE
+       );
+   TYPE tab_rec_update_au IS TABLE OF rec_update_au INDEX BY BINARY_INTEGER;
+   g_tab_rec_update_au tab_rec_update_au;
+--
+   g_tab_rec_nit  nm3type.tab_rec_nit;
+--
+   g_tab_inv_nw_chk nm3type.tab_varchar4;
+--
+   g_suppress_hierarchy_trigger BOOLEAN := FALSE;
+--
+--</GLOBVAR>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_version">
+-- This function returns the sccs_id
+  FUNCTION get_version RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN VARCHAR2;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="validate_itg">
+-- This procedure validates an NM_INV_TYPE groupings record as being valid, prior to insertion
+--
+PROCEDURE validate_itg (pi_rec_itg IN nm_inv_type_groupings%ROWTYPE);
+--
+-- Exceptions raised by this procedure....
+-- -20101 itg_inv_type AND itg_parent_inv_type cannot be the same
+-- -20102 AT relation only valid for same type of item (P/P or C/C) not ...
+-- -20103 No matching NM_INV_NW records found
+-- -20104 IN relation not valid for Point Parent Type
+-- -20105 DERIVED relation not valid for P/C
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_tab_inv_nw">
+-- This table returns a PL/SQL table of NM_INV_NW records, selected by any combination of
+--   NW_TYPE and INV_TYPE
+--
+FUNCTION get_tab_inv_nw (pi_nw_type  IN nm_inv_nw.nin_nw_type%TYPE      DEFAULT NULL
+                        ,pi_inv_type IN nm_inv_nw.nin_nit_inv_code%TYPE DEFAULT NULL
+                        ) RETURN tab_nin;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="pc_pop_nit_tab">
+-- This procedure is called from the BEFORE ROW LEVEL trigger on NM_INV_ITEMS
+--  The procedures which deal with g_tab_rec_nii are there to avoid trigger mutation
+--
+PROCEDURE pc_pop_nit_tab (pi_rec_nii IN nm_inv_items%ROWTYPE
+                         ,pi_mode    IN VARCHAR2 DEFAULT 'UNKNOWN'
+                         );
+--
+-- Exceptions raised by this procedure....
+-- -20111 No IIT_PRIMARY_KEY specified and INV_TYPE is an ITG parent
+-- -20112 IIT_PRIMARY_KEY specified and INV_TYPE is NOT an ITG parent
+-- -20113 No IIT_FOREIGN_KEY specified and INV_TYPE is an ITG child
+-- -20114 IIT_FOREIGN_KEY specified and INV_TYPE is NOT an ITG child
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="pc_process_nit_tab">
+-- This procedure is called from the AFTER STATEMENT level trigger on NM_INV_ITEMS
+--  The procedures which deal with g_tab_rec_nii are there to avoid trigger mutation
+--
+PROCEDURE pc_process_nit_tab;
+--
+-- The procedure loops through all records in g_tab_rec_nii doing the following....
+--    IF the record is a child
+--       Make sure that there is a parent record with a matching IIT_PRIMARY_KEY
+--       IF the parent is end-dated prior to the child then
+--          update the child setting the end-date to that of the parent
+--
+-- Exceptions raised by this procedure....
+-- -20121 IIT_FOREIGN_KEY does not exist as an IIT_PRIMARY_KEY with inv_type ...
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="insert_iig">
+-- This procedure inserts a row into NM_INV_ITEM_GROUPINGS
+--
+PROCEDURE insert_iig (pi_rec_iig IN nm_inv_item_groupings%ROWTYPE);
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_iig_top_id">
+-- This function returns the iig_top_id from nm_inv_item_groupings for a given iig_item_id
+FUNCTION get_iig_top_id (pi_item_id IN nm_inv_item_groupings.iig_item_id%TYPE
+                        ) RETURN nm_inv_item_groupings.iig_top_id%TYPE;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="pc_duplicate_members">
+-- This procedure duplicates the parent nm_members records for child inventory
+PROCEDURE pc_duplicate_members (pi_parent_ne_id     IN nm_members.nm_ne_id_in%TYPE
+                               ,pi_child_ne_id      IN nm_members.nm_ne_id_in%TYPE
+                               ,pi_child_inv_type   IN nm_members.nm_obj_type%TYPE
+                               ,pi_child_admin_unit IN nm_members.nm_admin_unit%TYPE DEFAULT NULL
+                               ,pi_child_start_date IN nm_members.nm_start_date%TYPE DEFAULT NULL
+                               ,pi_child_end_date   IN nm_members.nm_start_date%TYPE DEFAULT NULL
+                               );
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="pop_date_chk_tab">
+-- This procedure is called from the BEFORE ROW LEVEL trigger on NM_INV_ITEMS
+--  The procedures which deal with g_tab_rec_date_chk are there to avoid trigger mutation
+--
+PROCEDURE pop_date_chk_tab ( pi_rec_nii IN nm_inv_items%ROWTYPE
+                            ,pi_mode    IN VARCHAR2 DEFAULT 'UNKNOWN'
+                           );
+--
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="process_date_chk_tab">
+-- This procedure is called from the AFTER STATEMENT level trigger on NM_INV_ITEMS
+--  The procedures which deal with g_tab_rec_date_chk are there to avoid trigger mutation
+--
+PROCEDURE process_date_chk_tab;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="process_rec_excl_check">
+-- This procedure processes a single rec_excl_check to make sure it does not violate
+--  exclusivity rules
+--
+PROCEDURE process_rec_excl_check (p_rec_excl_check rec_excl_check);
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="check_xsp_valid_on_inv_loc">
+-- This procedure checks to make sure the specified XSP is valid given the inventory's
+--  existing location
+--
+PROCEDURE check_xsp_valid_on_inv_loc (pi_iit_ne_id    IN nm_inv_items.iit_ne_id%TYPE
+                                     ,pi_iit_inv_type IN nm_inv_items.iit_inv_type%TYPE
+                                     ,pi_iit_x_sect   IN nm_inv_items.iit_x_sect%TYPE
+                                     );
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="pop_excl_check_tab">
+-- This procedure populates a row in g_tab_rec_excl_check if the inventory item is
+--  flagged as exclusive
+--
+PROCEDURE pop_excl_check_tab (pi_iit_ne_id    IN nm_inv_items.iit_ne_id%TYPE
+                             ,pi_iit_inv_type IN nm_inv_items.iit_inv_type%TYPE
+                             );
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="pop_excl_check_tab">
+-- This procedure processes the entries in g_tab_rec_excl_check
+--
+PROCEDURE process_excl_check_tab;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="clear_excl_check_tab">
+-- This procedure clears the rows from g_tab_rec_excl_check
+--
+PROCEDURE clear_excl_check_tab;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="datetrack_update_au_for_invmem">
+PROCEDURE datetrack_update_au_for_invmem (p_iit_ne_id      nm_inv_items.iit_ne_id%TYPE
+                                         ,p_iit_admin_unit nm_inv_items.iit_admin_unit%TYPE
+                                         ,p_effective_date nm_inv_items.iit_start_date%TYPE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
+                                         );
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="clear_update_au_tab">
+-- This procedure clears the rows from g_tab_rec_update_au
+--
+PROCEDURE clear_update_au_tab;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="process_update_au_tab">
+-- This procedure processes the entries in g_tab_rec_update_au
+--
+PROCEDURE process_update_au_tab;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="pop_update_au_tab">
+-- This procedure populates a row in g_tab_rec_update_au if the inventory item is
+--  having it's AU updated
+--
+PROCEDURE pop_update_au_tab (pi_iit_ne_id          IN nm_inv_items.iit_ne_id%TYPE
+                            ,pi_iit_admin_unit_old IN nm_inv_items.iit_admin_unit%TYPE
+                            ,pi_iit_admin_unit_new IN nm_inv_items.iit_admin_unit%TYPE
+                            );
+--
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="clear_inv_type_chk_tab">
+-- This procedure deletes all rows from g_tab_rec_nit
+--
+PROCEDURE clear_inv_type_chk_tab;
+--
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="process_inv_type_chk_tab">
+-- This procedure processes the data in g_tab_rec_nit
+--
+PROCEDURE process_inv_type_chk_tab;
+--
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="pop_inv_type_chk_tab">
+-- This procedure adds a row into g_tab_rec_nit
+--
+PROCEDURE pop_inv_type_chk_tab (p_rec_nit nm_inv_types%ROWTYPE);
+--
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="clear_nm_inv_nw_child_chk_tab">
+-- This procedure clears g_tab_inv_nw_chk
+--
+PROCEDURE clear_nm_inv_nw_child_chk_tab;
+--
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="pop_nm_inv_nw_child_chk_tab">
+-- This procedure adds a row into g_tab_inv_nw_chk
+--
+PROCEDURE pop_nm_inv_nw_child_chk_tab (p_inv_type nm_inv_types.nit_inv_type%TYPE);
+--
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="proc_nm_inv_nw_child_chk_tab">
+-- Thus procedure processes the data in g_tab_inv_nw_chk
+--
+PROCEDURE proc_nm_inv_nw_child_chk_tab;
+--
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="inv_type_is_child_type">
+-- This function returns TRUE if the passed inv type is a child type, otherwise FALSE
+--
+FUNCTION inv_type_is_child_type (pi_inv_type nm_inv_types.nit_inv_type%TYPE) RETURN BOOLEAN;
+--
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="inv_type_is_parent_type">
+-- This function returns TRUE if the passed inv type is a parent type, otherwise FALSE
+--
+FUNCTION inv_type_is_parent_type (pi_inv_type nm_inv_types.nit_inv_type%TYPE) RETURN BOOLEAN;
+--
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="all_children_are_mandatory_at">
+-- This function returns TRUE if all children of this inv type have a mandatory AT relation
+--  (or inv type has no children), otherwise returns FALSE
+--
+FUNCTION all_children_are_mandatory_at (pi_inv_type nm_inv_types.nit_inv_type%TYPE) RETURN BOOLEAN;
+--
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="check_inv_item_latest">
+--
+-- This function checks if the ne_id of an asset passes in is the latest occurrence
+-- based on the nm_inv_type and nm_primary_key
+FUNCTION check_inv_item_latest ( pi_iit_ne_id IN nm_inv_items.iit_ne_id%TYPE)
+  RETURN BOOLEAN;
+--
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="edit_latest_asset_enabled">
+--
+-- This function checks if the edit latest asset functionality is enabled
+-- based on the product option EDITENDDAT
+FUNCTION edit_latest_asset_enabled
+  RETURN BOOLEAN;
+--
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="process_latest_asset_chk">
+--
+-- This procedure is used in a trigger to make a list of editted assets for edit
+-- latest asset validation
+--
+PROCEDURE process_latest_asset_chk;
+--
+--</PROC>
+--
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="pop_latest_asset_tab">
+--
+--This procedure is used in a trigger to validate the assets listed in process_latest_asset_chk
+--
+PROCEDURE pop_latest_asset_tab( pi_iit_ne_id IN nm_inv_items_all.iit_ne_id%TYPE);
+--
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+FUNCTION check_contiguity ( pi_ne_id       nm_elements.ne_id%TYPE
+                          , pi_inv_type    nm_inv_items.iit_inv_type%TYPE
+                          , pi_xsp         nm_inv_items.iit_x_sect%TYPE
+                          , pi_route_datum VARCHAR)
+RETURN BOOLEAN;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PRAGMA>
+  PRAGMA RESTRICT_REFERENCES (get_version, RNDS, WNPS, WNDS);
+  PRAGMA RESTRICT_REFERENCES (get_body_version, RNDS, WNPS, WNDS);
+  PRAGMA RESTRICT_REFERENCES (get_iig_top_id,WNPS, WNDS);
+--</PRAGMA>
+--
+----------------------------------------------------------------------------------------------
+--
+END Nm3invval;
+/

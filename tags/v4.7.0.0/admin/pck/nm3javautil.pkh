@@ -1,0 +1,90 @@
+CREATE OR REPLACE PACKAGE nm3javautil authid current_user AS
+--<PACKAGE>
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3javautil.pkh-arc   2.3   Jul 04 2013 16:11:38   James.Wadsworth  $
+--       Module Name      : $Workfile:   nm3javautil.pkh  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:11:38  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:14  $
+--       Version          : $Revision:   2.3  $
+--       Based on SCCS version : 1.3
+-------------------------------------------------------------------------
+--   Author : I Turnbull
+--
+--    util
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+  --g_sccsid is the SCCS ID for the package
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.3  $';
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="set_exec_privs">
+-- Sets execute permissions for external/host files for the 
+-- specified user.
+PROCEDURE set_exec_privs( p_user     VARCHAR2
+                         ,p_dir      VARCHAR2
+                         ,p_filename VARCHAR2 DEFAULT '*'
+                        ) ;
+--</PROC>         
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="revoke_exec_privs">
+-- revokes execute permissions for external/host files for the 
+-- specified user.
+PROCEDURE revoke_exec_privs( p_user     VARCHAR2
+                            ,p_dir      VARCHAR2
+                            ,p_filename VARCHAR2 DEFAULT '*'
+                           ) ;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="exec_sde_bat_file">
+-- Excutes sde batch files 
+PROCEDURE exec_sde_bat_file( pi_filename VARCHAR2
+                            ,pi_username VARCHAR2 DEFAULT Sys_Context('NM3_SECURITY_CTX','USERNAME') 
+                           );
+--</PROC>  
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="set_read_privs">
+-- Sets Read privs on a named directory for a user 
+PROCEDURE set_read_privs( p_user     VARCHAR2
+                         ,p_dir      VARCHAR2
+                         ,p_filename VARCHAR2 DEFAULT '*'
+                        ) ;
+--</PROC>                                                                            
+--
+-----------------------------------------------------------------------------
+--
+--<PRAGMA>
+   PRAGMA RESTRICT_REFERENCES (get_version, rnds, wnps, wnds);
+   PRAGMA RESTRICT_REFERENCES (get_body_version, rnds, wnps, wnds);
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+END nm3javautil;
+/

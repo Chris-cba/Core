@@ -1,0 +1,73 @@
+CREATE OR REPLACE PACKAGE nm3java IS
+--<PACKAGE>
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)nm3java.pkh	1.4 10/02/03
+--       Module Name      : nm3java.pkh
+--       Date into SCCS   : 03/10/02 15:52:25
+--       Date fetched Out : 07/06/13 14:12:14
+--       SCCS Version     : 1.4
+--
+--
+--   Author : I Turnbull
+--
+--    util
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+  --g_sccsid is the SCCS ID for the package
+  g_sccsid CONSTANT VARCHAR2(2000) := '"@(#)nm3java.pkh	1.4 10/02/03"';
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="runthis">
+-- Executes an external program on the host.
+-- synchronous
+FUNCTION runthis ("args" IN VARCHAR2)
+ RETURN NUMBER
+AS LANGUAGE JAVA
+NAME 'Util.RunThis(java.lang.String) return int';
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="runthis">
+-- Executes an external program on the host.
+-- but doesn't wait for it to finish executing.
+-- asynchronous
+FUNCTION runthis_nowait ("args" IN VARCHAR2)
+ RETURN NUMBER
+AS LANGUAGE JAVA
+NAME 'Util.RunThisNoWait(java.lang.String) return int';
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="xmlversion">
+-- Returns the version of the xml parser
+FUNCTION xmlversion RETURN VARCHAR2
+IS LANGUAGE JAVA NAME
+'oracle.xml.parser.v2.XMLParser.getReleaseVersion() returns java.lang.String';
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+
+--<PRAGMA>
+   PRAGMA RESTRICT_REFERENCES (get_version, rnds, wnps, wnds);
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+END nm3java;
+/

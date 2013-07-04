@@ -1,0 +1,199 @@
+create or replace package nm3invband as
+--<PACKAGE>
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3invband.pkh-arc   2.2   Jul 04 2013 16:11:38   James.Wadsworth  $
+--       Module Name      : $Workfile:   nm3invband.pkh  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:11:38  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:12  $
+--       Version          : $Revision:   2.2  $
+--       Based on SCCS version : 1.2
+-------------------------------------------------------------------------
+--
+--   Author : Jonathan Mills
+--
+--   Inventory Banding package
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+  g_sccsid      CONSTANT  VARCHAR2(2000) := '$Revision:   2.2  $';
+--  g_sccsid is the SCCS ID for the package
+--
+   TYPE tab_rec_itd IS TABLE OF nm_inv_type_attrib_band_dets%ROWTYPE INDEX BY BINARY_INTEGER;
+--
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_inv_band_det">
+-- This function returns the ITB_BANDING_DESCRIPTION for the specified
+--  inv_type, attrib_name and banding_id
+--
+FUNCTION get_inv_band_det
+      (pi_inv_type    IN     nm_inv_type_attrib_bandings.itb_inv_type%TYPE
+      ,pi_attrib_name IN     nm_inv_type_attrib_bandings.itb_attrib_name%TYPE
+      ,pi_banding_id  IN     nm_inv_type_attrib_bandings.itb_banding_id%TYPE
+      ,pi_value       IN     NUMBER
+      ) RETURN nm_inv_type_attrib_bandings.itb_banding_description%TYPE;
+--
+PRAGMA RESTRICT_REFERENCES (get_inv_band_det, WNPS, WNDS);
+--
+FUNCTION get_inv_band_det
+      (pi_inv_type    IN     nm_inv_type_attrib_bandings.itb_inv_type%TYPE
+      ,pi_attrib_name IN     nm_inv_type_attrib_bandings.itb_attrib_name%TYPE
+      ,pi_banding_id  IN     nm_inv_type_attrib_bandings.itb_banding_id%TYPE
+      ,pi_value       IN     DATE
+      ) RETURN nm_inv_type_attrib_bandings.itb_banding_description%TYPE;
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="validate_itb">
+-- This procedure validates the nm_inv_type_band_dets records for the
+--  specified nm_inv_type_attrib_bandings record.
+--
+PROCEDURE validate_itb
+      (pi_inv_type    IN     nm_inv_type_attrib_bandings.itb_inv_type%TYPE
+      ,pi_attrib_name IN     nm_inv_type_attrib_bandings.itb_attrib_name%TYPE
+      ,pi_banding_id  IN     nm_inv_type_attrib_bandings.itb_banding_id%TYPE
+      );
+--
+-- Possible exceptions raised are :
+-- -20441 NM_INV_TYPE_ATTRIB_BANDINGS record not found
+-- -20442 No NM_INV_TYPE_ATTRIB_BAND_DETS records found
+-- -20443 NM_INV_TYPE_ATTRIB_BANDINGS record found with
+--         itd_band_min_value NOT < itd_band_max_value
+-- -20444 NM_INV_TYPE_ATTRIB_BANDINGS records found with overlapping values
+-- -20445 NM_INV_TYPE_ATTRIBS record not found
+-- -20446 Gaps found in NM_INV_TYPE_ATTRIB_BANDINGS records
+-- -20447 Bandings only allowed for DATE or NUMBER fields
+-- -20448 Values specified in NM_INV_TYPE_ATTRIB_BAND_DETS to greater
+--         precision than allowed specified for INV_TYPE_ATTRIB
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_itb">
+-- This procedure returns the specified nm_inv_type_attrib_bandings record
+PROCEDURE get_itb
+      (pi_inv_type    IN     nm_inv_type_attrib_bandings.itb_inv_type%TYPE
+      ,pi_attrib_name IN     nm_inv_type_attrib_bandings.itb_attrib_name%TYPE
+      ,pi_banding_id  IN     nm_inv_type_attrib_bandings.itb_banding_id%TYPE
+      ,po_rec_itb        OUT nm_inv_type_attrib_bandings%ROWTYPE
+      );
+--
+-- Possible exceptions raised are :
+-- -20441 NM_INV_TYPE_ATTRIB_BANDINGS record not found
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_itd">
+-- This procedure returns the specified nm_inv_type_attrib_band_dets record
+PROCEDURE get_itd
+      (pi_inv_type    IN     nm_inv_type_attrib_bandings.itb_inv_type%TYPE
+      ,pi_attrib_name IN     nm_inv_type_attrib_bandings.itb_attrib_name%TYPE
+      ,pi_banding_id  IN     nm_inv_type_attrib_bandings.itb_banding_id%TYPE
+      ,po_tab_rec_itb    OUT tab_rec_itd
+      );
+--
+-- Possible exceptions raised are :
+-- -20442 No NM_INV_TYPE_ATTRIB_BAND_DETS records found
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="duplicate_bandings">
+PROCEDURE duplicate_bandings
+      (pi_inv_type_to_copy    IN     nm_inv_type_attrib_bandings.itb_inv_type%TYPE
+      ,pi_attrib_name_to_copy IN     nm_inv_type_attrib_bandings.itb_attrib_name%TYPE
+      ,pi_banding_id_to_copy  IN     nm_inv_type_attrib_bandings.itb_banding_id%TYPE
+      ,pi_inv_type_new        IN     nm_inv_type_attrib_bandings.itb_inv_type%TYPE
+      ,pi_attrib_name_new     IN     nm_inv_type_attrib_bandings.itb_attrib_name%TYPE
+      ,po_banding_id_new         OUT nm_inv_type_attrib_bandings.itb_banding_id%TYPE
+      );
+--
+-- Possible exceptions raised are :
+-- -20441 NM_INV_TYPE_ATTRIB_BANDINGS record not found
+-- -20442 No NM_INV_TYPE_ATTRIB_BAND_DETS records found
+-- -20445 NM_INV_TYPE_ATTRIBS record not found
+-- -20447 Bandings only allowed for DATE or NUMBER fields
+-- -20449 INV_TYPE_ATTRIB having its bandings copied is of different ITA_FORMAT
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_itb_banding_id_seq">
+-- This function returns itb_banding_id_seq.NEXTVAL
+--
+FUNCTION get_itb_banding_id_seq RETURN NUMBER;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_itd_band_seq_seq">
+-- This function returns itd_band_seq_seq.NEXTVAL
+--
+FUNCTION get_itd_band_seq_seq RETURN NUMBER;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_itb">
+-- This procedure inserts the passed NM_INV_TYPE_ATTRIB_BANDINGS record
+--
+PROCEDURE ins_itb (pi_rec_itb IN     nm_inv_type_attrib_bandings%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_itd">
+-- This procedure inserts the passed NM_INV_TYPE_ATTRIB_BAND_DETS record
+--
+PROCEDURE ins_itd (pi_rec_itd IN     nm_inv_type_attrib_band_dets%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ita_format_valid_for_banding">
+FUNCTION ita_format_valid_for_banding
+      (pi_ita_format IN     nm_inv_type_attribs.ita_format%TYPE
+      ) RETURN BOOLEAN;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PRAGMA>
+   PRAGMA RESTRICT_REFERENCES (get_version, WNPS, WNDS);
+   PRAGMA RESTRICT_REFERENCES (get_body_version, WNPS, WNDS);
+   PRAGMA RESTRICT_REFERENCES (get_inv_band_det, WNPS, WNDS);
+   PRAGMA RESTRICT_REFERENCES (ita_format_valid_for_banding, WNPS, WNDS);
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+end nm3invband;
+/
