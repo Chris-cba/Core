@@ -14,7 +14,7 @@ CREATE OR REPLACE PACKAGE nm3asset AS
 --   Package to handle the generation of milepost asset references.
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2001
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>

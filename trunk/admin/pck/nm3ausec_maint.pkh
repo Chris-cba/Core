@@ -14,7 +14,7 @@ create or replace package nm3ausec_maint as
 --   NM3 Admin Unit Security Maintenance package
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2002
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>

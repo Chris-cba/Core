@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE nm3audit AS
 --<PACKAGE>
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3audit.pkh-arc   2.1   28 Sep 2009 10:04:30   kdawson  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3audit.pkh-arc   2.2   Jul 04 2013 15:23:04   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3audit.pkh  $
---       Date into PVCS   : $Date:   28 Sep 2009 10:04:30  $
---       Date fetched Out : $Modtime:   28 Sep 2009 10:03:38  $
---       PVCS Version     : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   Jul 04 2013 15:23:04  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:10  $
+--       PVCS Version     : $Revision:   2.2  $
 --       Based on SCCS version : 
 --
 --
@@ -15,11 +15,11 @@ CREATE OR REPLACE PACKAGE nm3audit AS
 --   NM3 Auditing
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2000
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
-  g_sccsid      CONSTANT  varchar2(2000) := '"$Revision:   2.1  $"';
+  g_sccsid      CONSTANT  varchar2(2000) := '"$Revision:   2.2  $"';
 --  g_sccsid is the SCCS ID for the package
 --</GLOBVAR>
 --

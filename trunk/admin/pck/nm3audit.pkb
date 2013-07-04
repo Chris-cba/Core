@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3audit AS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3audit.pkb-arc   2.3   May 16 2011 14:42:26   Steve.Cooper  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3audit.pkb-arc   2.4   Jul 04 2013 15:23:04   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3audit.pkb  $
---       Date into PVCS   : $Date:   May 16 2011 14:42:26  $
---       Date fetched Out : $Modtime:   Apr 01 2011 16:06:20  $
---       PVCS Version     : $Revision:   2.3  $
+--       Date into PVCS   : $Date:   Jul 04 2013 15:23:04  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 15:17:06  $
+--       PVCS Version     : $Revision:   2.4  $
 --       Based on SCCS version : 
 --
 --
@@ -17,10 +17,10 @@ CREATE OR REPLACE PACKAGE BODY nm3audit AS
 --   NM3 Auditing package body
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2000
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.3  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.4  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3audit';
@@ -321,7 +321,7 @@ BEGIN
    append ('--   Body   : '||get_body_version);
    append ('--');
    append ('-----------------------------------------------------------------------------');
-   append ('--	Copyright (c) exor corporation ltd, 2000');
+   append ('--	Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.');
    append ('-----------------------------------------------------------------------------');
    append ('--');
    append ('   l_aud_seq    nm_audit_temp.nat_audit_id%TYPE;');
