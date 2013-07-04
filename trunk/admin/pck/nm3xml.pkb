@@ -3,13 +3,16 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3xml.pkb-arc   3.0   Jan 15 2008 11:20:52   gjohnson  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3xml.pkb-arc   3.1   Jul 04 2013 16:45:36   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3xml.pkb  $
---       Date into PVCS   : $Date:   Jan 15 2008 11:20:52  $
---       Date fetched Out : $Modtime:   Jan 15 2008 11:19:24  $
---       Version          : $Revision:   3.0  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:45:36  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 16:43:48  $
+--       Version          : $Revision:   3.1  $
 --       Based on SCCS version : 
--------------------------------------------------------------------------
+------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+------------------------------------------------------------------
+
 --
 --all global package variables here
 
@@ -17,7 +20,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.0  $';
+  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.1  $';
 
   g_package_name CONSTANT varchar2(30) := 'nm3xml';
 --

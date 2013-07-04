@@ -3,19 +3,21 @@ As
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/web_user_info.pkh-arc   3.0   May 28 2012 14:49:04   Steve.Cooper  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/web_user_info.pkh-arc   3.1   Jul 04 2013 16:45:36   James.Wadsworth  $
 --       Module Name      : $Workfile:   web_user_info.pkh  $
---       Date into PVCS   : $Date:   May 28 2012 14:49:04  $
---       Date fetched Out : $Modtime:   May 28 2012 14:48:08  $
---       Version          : $Revision:   3.0  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:45:36  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 16:44:38  $
+--       Version          : $Revision:   3.1  $
 --       Based on SCCS version :
--------------------------------------------------------------------------
+------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+------------------------------------------------------------------
 
   -----------
   --constants
   -----------
   --g_sccsid is the SCCS ID for the package
-  g_Sccsid Constant Varchar2(2000) := '$Revision:   3.0  $';
+  g_Sccsid Constant Varchar2(2000) := '$Revision:   3.1  $';
  
 -----------------------------------------------------------------------------
 --

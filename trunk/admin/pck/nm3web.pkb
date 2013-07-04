@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3web IS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3web.pkb-arc   2.3   Oct 07 2011 14:56:36   Steve.Cooper  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3web.pkb-arc   2.4   Jul 04 2013 16:45:36   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3web.pkb  $
---       Date into PVCS   : $Date:   Oct 07 2011 14:56:36  $
---       Date fetched Out : $Modtime:   Oct 07 2011 14:55:08  $
---       PVCS Version     : $Revision:   2.3  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:45:36  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 15:53:46  $
+--       PVCS Version     : $Revision:   2.4  $
 --       Based on         : 1.55
 --
 --
@@ -17,12 +17,12 @@ CREATE OR REPLACE PACKAGE BODY nm3web IS
 --   NM3 Web Standard Components package body
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2001
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.3  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.4  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3web';
@@ -170,7 +170,7 @@ BEGIN
    htp.COMMENT('       SCCS Version     : 1.55');
    htp.COMMENT(NULL);
    htp.COMMENT('-----------------------------------------------------------------------------');
-   htp.COMMENT('	Copyright (c) exor corporation ltd, 2002-2004');
+   htp.COMMENT('	Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.');
    htp.COMMENT('-----------------------------------------------------------------------------');
    htp.COMMENT(NULL);
 --

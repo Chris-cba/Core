@@ -2,13 +2,16 @@ CREATE OR REPLACE PACKAGE BODY WEBUTIL_DB AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/webutil_db.pkb-arc   3.0   Dec 04 2009 16:04:58   aedwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/webutil_db.pkb-arc   3.1   Jul 04 2013 16:45:36   James.Wadsworth  $
 --       Module Name      : $Workfile:   webutil_db.pkb  $
---       Date into PVCS   : $Date:   Dec 04 2009 16:04:58  $
---       Date fetched Out : $Modtime:   Dec 04 2009 16:03:58  $
---       Version          : $Revision:   3.0  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:45:36  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 16:44:58  $
+--       Version          : $Revision:   3.1  $
 --       Based on SCCS version : 
--------------------------------------------------------------------------
+------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+------------------------------------------------------------------
+
 --
 --all global package variables here
 
@@ -16,7 +19,7 @@ CREATE OR REPLACE PACKAGE BODY WEBUTIL_DB AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.0  $';
+  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.1  $';
 
   g_package_name CONSTANT varchar2(30) := '%YourObjectName%';
   
