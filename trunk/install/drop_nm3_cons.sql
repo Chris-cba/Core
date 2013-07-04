@@ -1,3 +1,16 @@
+--
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/drop_nm3_cons.sql-arc   2.3   Jul 04 2013 13:45:00   James.Wadsworth  $
+--       Module Name      : $Workfile:   drop_nm3_cons.sql  $
+--       Date into PVCS   : $Date:   Jul 04 2013 13:45:00  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 11:57:38  $
+--       Version          : $Revision:   2.3  $
+--
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
 DECLARE
 
 CURSOR C1 IS

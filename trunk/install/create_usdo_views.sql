@@ -2,13 +2,15 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/create_usdo_views.sql-arc   3.1   May 17 2011 08:33:20   Steve.Cooper  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/create_usdo_views.sql-arc   3.2   Jul 04 2013 13:45:00   James.Wadsworth  $
 --       Module Name      : $Workfile:   create_usdo_views.sql  $
---       Date into PVCS   : $Date:   May 17 2011 08:33:20  $
---       Date fetched Out : $Modtime:   May 06 2011 10:07:02  $
---       PVCS Version     : $Revision:   3.1  $
+--       Date into PVCS   : $Date:   Jul 04 2013 13:45:00  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 11:56:50  $
+--       PVCS Version     : $Revision:   3.2  $
 --
---------------------------------------------------------------------------------
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
 --
 
 --------------------------------------------------
@@ -138,11 +140,11 @@ BEGIN
     '------------------------------------------------------------------------- '||chr(10)||
     '--   PVCS Identifiers :- '||chr(10)||
     '-- '||chr(10)||
-    '--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/create_usdo_views.sql-arc   3.1   May 17 2011 08:33:20   Steve.Cooper  $ '||chr(10)||
+    '--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/create_usdo_views.sql-arc   3.2   Jul 04 2013 13:45:00   James.Wadsworth  $ '||chr(10)||
     '--       Module Name      : $Workfile:   create_usdo_views.sql  $ '||chr(10)||
-    '--       Date into PVCS   : $Date:   May 17 2011 08:33:20  $ '||chr(10)||
-    '--       Date fetched Out : $Modtime:   May 06 2011 10:07:02  $ '||chr(10)||
-    '--       Version          : $Revision:   3.1  $ '||chr(10)||
+    '--       Date into PVCS   : $Date:   Jul 04 2013 13:45:00  $ '||chr(10)||
+    '--       Date fetched Out : $Modtime:   Jul 04 2013 11:56:50  $ '||chr(10)||
+    '--       Version          : $Revision:   3.2  $ '||chr(10)||
     '--       Based on SCCS version : '||chr(10)|| 
     '------------------------------------------------------------------------- '||chr(10)||
     'INSTEAD OF DELETE OR INSERT OR UPDATE '||chr(10)||
@@ -207,11 +209,11 @@ BEGIN
     '------------------------------------------------------------------------- '||chr(10)||
     '--   PVCS Identifiers :- '||chr(10)||
     '-- '||chr(10)||
-    '--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/create_usdo_views.sql-arc   3.1   May 17 2011 08:33:20   Steve.Cooper  $ '||chr(10)||
+    '--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/create_usdo_views.sql-arc   3.2   Jul 04 2013 13:45:00   James.Wadsworth  $ '||chr(10)||
     '--       Module Name      : $Workfile:   create_usdo_views.sql  $ '||chr(10)||
-    '--       Date into PVCS   : $Date:   May 17 2011 08:33:20  $ '||chr(10)||
-    '--       Date fetched Out : $Modtime:   May 06 2011 10:07:02  $ '||chr(10)||
-    '--       Version          : $Revision:   3.1  $ '||chr(10)||
+    '--       Date into PVCS   : $Date:   Jul 04 2013 13:45:00  $ '||chr(10)||
+    '--       Date fetched Out : $Modtime:   Jul 04 2013 11:56:50  $ '||chr(10)||
+    '--       Version          : $Revision:   3.2  $ '||chr(10)||
     '--       Based on SCCS version : '||chr(10)|| 
     '------------------------------------------------------------------------- '||chr(10)||
     'INSTEAD OF DELETE OR INSERT OR UPDATE '||chr(10)||
@@ -289,11 +291,11 @@ BEGIN
     '-------------------------------------------------------------------------'||chr(10)||
     '--   PVCS Identifiers :-'||chr(10)||
     '-- '||chr(10)||
-    '--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/create_usdo_views.sql-arc   3.1   May 17 2011 08:33:20   Steve.Cooper  $'||chr(10)||
+    '--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/create_usdo_views.sql-arc   3.2   Jul 04 2013 13:45:00   James.Wadsworth  $'||chr(10)||
     '--       Module Name      : $Workfile:   create_usdo_views.sql  $'||chr(10)||
-    '--       Date into PVCS   : $Date:   May 17 2011 08:33:20  $'||chr(10)||
-    '--       Date fetched Out : $Modtime:   May 06 2011 10:07:02  $'||chr(10)||
-    '--       Version          : $Revision:   3.1  $'||chr(10)||
+    '--       Date into PVCS   : $Date:   Jul 04 2013 13:45:00  $'||chr(10)||
+    '--       Date fetched Out : $Modtime:   Jul 04 2013 11:56:50  $'||chr(10)||
+    '--       Version          : $Revision:   3.2  $'||chr(10)||
     '--       Based on SCCS version :'|| chr(10)||
     '-------------------------------------------------------------------------'||chr(10)||
     'INSTEAD OF DELETE OR INSERT OR UPDATE '||chr(10)||

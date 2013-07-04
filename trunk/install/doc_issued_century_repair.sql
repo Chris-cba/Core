@@ -2,14 +2,14 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/doc_issued_century_repair.sql-arc   1.1   Jul 24 2012 14:49:42   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/doc_issued_century_repair.sql-arc   1.2   Jul 04 2013 13:45:00   James.Wadsworth  $
 --       Module Name      : $Workfile:   doc_issued_century_repair.sql  $
---       Date into PVCS   : $Date:   Jul 24 2012 14:49:42  $
---       Date fetched Out : $Modtime:   Jul 24 2012 14:49:26  $
---       PVCS Version     : $Revision:   1.1  $
+--       Date into PVCS   : $Date:   Jul 04 2013 13:45:00  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 11:54:08  $
+--       PVCS Version     : $Revision:   1.2  $
 --
 --------------------------------------------------------------------------------
---   Copyright (c) 2012 Bentley Systems Incorporated.
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 --------------------------------------------------------------------------------
 -- doc_issued_century_repair.sql - module to repair damage by incorrect implicit date format mask being applied in the doc-loader process.
 --

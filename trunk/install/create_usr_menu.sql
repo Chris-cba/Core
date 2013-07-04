@@ -1,3 +1,16 @@
+--
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/create_usr_menu.sql-arc   2.1   Jul 04 2013 13:45:00   James.Wadsworth  $
+--       Module Name      : $Workfile:   create_usr_menu.sql  $
+--       Date into PVCS   : $Date:   Jul 04 2013 13:45:00  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 11:57:02  $
+--       Version          : $Revision:   2.1  $
+--
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
 rem   SCCS Identifiers :-
 rem
 rem       sccsid          "'@(#)create_usr_menu.sql	1.1 05/23/02'"
