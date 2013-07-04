@@ -3,11 +3,11 @@ create or replace package nm3mrg_wrap as
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mrg_wrap.pkh-arc   2.1   Jan 06 2010 16:41:32   cstrettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mrg_wrap.pkh-arc   2.2   Jul 04 2013 16:16:08   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3mrg_wrap.pkh  $
---       Date into PVCS   : $Date:   Jan 06 2010 16:41:32  $
---       Date fetched Out : $Modtime:   Jan 05 2010 11:42:26  $
---       Version          : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:16:08  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:16  $
+--       Version          : $Revision:   2.2  $
 --       Based on SCCS version : 1.1
 -------------------------------------------------------------------------
 --   Author : Jonathan Mills
@@ -15,11 +15,11 @@ create or replace package nm3mrg_wrap as
 --   nm3mrg_wrap package
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2001
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
-  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.1  $';
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.2  $';
 --  g_sccsid is the SCCS ID for the package
 --</GLOBVAR>
 --

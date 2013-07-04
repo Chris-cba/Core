@@ -2,11 +2,11 @@ create or replace package nm3mrg_supplementary as
 --<PACKAGE>
 --   SCCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mrg_supplementary.pkh-arc   2.4   Aug 17 2010 13:25:00   Ade.Edwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mrg_supplementary.pkh-arc   2.5   Jul 04 2013 16:16:08   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3mrg_supplementary.pkh  $
---       Date into PVCS   : $Date:   Aug 17 2010 13:25:00  $
---       Date fetched Out : $Modtime:   Aug 17 2010 13:24:30  $
---       PVCS Version     : $Revision:   2.4  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:16:08  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:16  $
+--       PVCS Version     : $Revision:   2.5  $
 --
 --
 --   Author : Jonathan Mills
@@ -14,13 +14,13 @@ create or replace package nm3mrg_supplementary as
 --   nm3mrg Supplementary Package
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2001
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --</PACKAGE>
 --
 --<GLOBVAR>
 --
-  g_sccsid      CONSTANT  VARCHAR2(2000) := '$Revision:   2.4  $';
+  g_sccsid      CONSTANT  VARCHAR2(2000) := '$Revision:   2.5  $';
 --  g_sccsid is the SCCS ID for the package
 --
   gc_buffer_size integer := 2000 ;
