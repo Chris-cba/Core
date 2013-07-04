@@ -1,0 +1,81 @@
+CREATE OR REPLACE PACKAGE hig_web_context_help IS
+--<PACKAGE>
+-----------------------------------------------------------------------------
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)hig_web_context_help.pkh	1.1 12/11/02
+--       Module Name      : hig_web_context_help.pkh
+--       Date into SCCS   : 02/12/11 10:17:45
+--       Date fetched Out : 07/06/13 14:10:27
+--       SCCS Version     : 1.1
+--
+--
+--   Author : Victor Townson
+--
+--    hig_web_context_help
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+/******************************************************************************
+   NAME:       HIG_WEB_CONTEXT_HELP
+   PURPOSE:    Package to support context sensitive web help.
+
+   REVISIONS:
+   Ver        Date        Author           Description
+   ---------  ----------  ---------------  ------------------------------------
+   1.0        5/3/2002     Victor Townmson This package returns HTML string to
+                                           most relevant known context sensitive
+					   HTML help page.
+   1.1        24/5/2002    Victor Townson  Base address for contents page not
+                                           being added to URL string.
+   1.2        29/05/2002   Victor Townson  Now supports just module name being
+                                           passed in
+******************************************************************************/
+--</PACKAGE>
+--<GLOBVAR>
+  -----------
+  --constants
+  -----------
+  --g_sccsid is the SCCS ID for the package
+  g_sccsid CONSTANT varchar2(2000) := '"@(#)hig_web_context_help.pkh	1.1 12/11/02"';
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+--
+-- This function returns the current SCCS version
+--
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+--
+-- This function returns the current SCCS version of the package body
+--
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_html">
+--
+FUNCTION get_html ( pc_module       varchar2,
+                    pc_current_item varchar2) RETURN varchar2;
+FUNCTION get_html ( pc_module_name  varchar2) RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PRAGMA>
+  PRAGMA RESTRICT_REFERENCES(get_version, rnds, wnps, wnds);
+  PRAGMA RESTRICT_REFERENCES(get_body_version, rnds, wnps, wnds);
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+END hig_web_context_help;
+/

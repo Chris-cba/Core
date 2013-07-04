@@ -1,0 +1,353 @@
+CREATE OR REPLACE PACKAGE higdisco IS
+--<PACKAGE>
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)higdisco.pkh	1.1 05/19/03
+--       Module Name      : higdisco.pkh
+--       Date into SCCS   : 03/05/19 05:59:14
+--       Date fetched Out : 07/06/13 14:10:32
+--       SCCS Version     : 1.1
+--
+--
+--   Author : Jonathan Mills
+--
+--   Highways Discoverer Interfacing package
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+   g_sccsid      CONSTANT  VARCHAR2(2000) := '"@(#)higdisco.pkh	1.1 05/19/03"';
+--  g_sccsid is the SCCS ID for the package
+--
+   g_tab_cols            nm3type.tab_varchar30;
+   g_tab_values_varchar2 nm3type.tab_varchar32767;
+   g_tab_values_date     nm3type.tab_date;
+   g_tab_values_number   nm3type.tab_number;
+   g_tab_datatypes       nm3type.tab_varchar30;
+   g_tab_rowid           nm3type.tab_rowid;
+   g_tab_varchar         nm3type.tab_varchar32767;
+--
+   TYPE tab_rec_hdtc   IS TABLE OF hig_disco_tab_columns%ROWTYPE      INDEX BY BINARY_INTEGER;
+   TYPE tab_rec_hdcv   IS TABLE OF hig_disco_col_values%ROWTYPE       INDEX BY BINARY_INTEGER;
+   TYPE tab_rec_hdkc   IS TABLE OF hig_disco_foreign_key_cols%ROWTYPE INDEX BY BINARY_INTEGER;
+--
+   c_suck_type_def     CONSTANT VARCHAR2(6) := 'DEF';
+   c_suck_type_inv     CONSTANT VARCHAR2(6) := 'INV';
+   c_suck_type_inv_nw  CONSTANT VARCHAR2(6) := 'INV_NW';
+   c_suck_type_acc     CONSTANT VARCHAR2(6) := nm3type.c_acc;
+   c_suck_type_str     CONSTANT VARCHAR2(6) := nm3type.c_str;
+--
+   g_item_type                VARCHAR2(30);
+   g_table_name               VARCHAR2(30);
+   g_seq_no                   PLS_INTEGER;
+   g_hdba_id                  hig_disco_business_areas.hdba_id%TYPE;
+   g_hide_who_cols            BOOLEAN;
+   g_create_hdcv_from_domains BOOLEAN;
+   g_create_parents_if_reqd   BOOLEAN;
+--
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+--------------------------------------------------------------------------
+--
+--<PROC NAME="suck_table_into_disco_tables">
+--
+PROCEDURE suck_table_into_disco_tables (p_table_name                IN hig_disco_tables.hdt_table_name%TYPE
+                                       ,p_hdba_id                   IN hig_disco_business_areas.hdba_id%TYPE DEFAULT NULL
+                                       ,p_seq_no                    IN hig_disco_tables.hdt_seq_no%TYPE      DEFAULT NULL
+                                       ,p_hide_who_cols             IN BOOLEAN                               DEFAULT TRUE
+                                       ,p_create_fk_parents_if_reqd IN BOOLEAN                               DEFAULT TRUE
+                                       );
+--</PROC>
+--
+--------------------------------------------------------------------------
+--
+--<PROC NAME="next_hdba_id_seq">
+--
+FUNCTION next_hdba_id_seq RETURN NUMBER;
+--</PROC>
+--
+--------------------------------------------------------------------------
+--
+--<PROC NAME="next_hdt_id_seq">
+--
+FUNCTION next_hdt_id_seq RETURN NUMBER;
+--</PROC>
+--
+--------------------------------------------------------------------------
+--
+--<PROC NAME="curr_hdt_id_seq">
+--
+FUNCTION curr_hdt_id_seq RETURN NUMBER;
+--</PROC>
+--
+--------------------------------------------------------------------------
+--
+--<PROC NAME="get_hdba">
+--
+FUNCTION get_hdba (p_hdba_id         hig_disco_business_areas.hdba_id%TYPE
+                  ,p_raise_not_found BOOLEAN DEFAULT TRUE
+                  ) RETURN hig_disco_business_areas%ROWTYPE;
+--
+FUNCTION get_hdba (p_hdba_name       hig_disco_business_areas.hdba_name%TYPE
+                  ,p_raise_not_found BOOLEAN DEFAULT TRUE
+                  ) RETURN hig_disco_business_areas%ROWTYPE;
+--</PROC>
+--
+--------------------------------------------------------------------------
+--
+--<PROC NAME="ins_hdt">
+--
+PROCEDURE ins_hdt (p_rec_hdt hig_disco_tables%ROWTYPE);
+--</PROC>
+--
+--------------------------------------------------------------------------
+--
+--<PROC NAME="create_table_in_eul">
+--
+PROCEDURE create_table_in_eul (p_table_name               hig_disco_tables.hdt_table_name%TYPE
+                              ,p_recreate                 BOOLEAN DEFAULT FALSE
+                              ,p_create_fk                BOOLEAN DEFAULT TRUE
+                              ,p_create_fk_parents_in_eul BOOLEAN DEFAULT TRUE
+                              );
+--</PROC>
+--
+--------------------------------------------------------------------------
+--
+--<PROC NAME="get_hdt">
+--
+FUNCTION get_hdt (p_hdt_table_name  hig_disco_tables.hdt_table_name%TYPE
+                 ,p_raise_not_found BOOLEAN DEFAULT TRUE
+                 ) RETURN hig_disco_tables%ROWTYPE;
+--
+FUNCTION get_hdt (p_hdt_id          hig_disco_tables.hdt_id%TYPE
+                 ,p_raise_not_found BOOLEAN DEFAULT TRUE
+                 ) RETURN hig_disco_tables%ROWTYPE;
+--
+--</PROC>
+--
+--------------------------------------------------------------------------
+--
+--<PROC NAME="disco_seq_nextval">
+--
+FUNCTION disco_seq_nextval RETURN NUMBER;
+--</PROC>
+--
+--------------------------------------------------------------------------
+--
+--<PROC NAME="get_prefix">
+--
+FUNCTION get_prefix RETURN VARCHAR2;
+--</PROC>
+--
+--------------------------------------------------------------------------
+--
+--<PROC NAME="get_ba_id">
+--
+FUNCTION get_ba_id (p_ba_name VARCHAR2) RETURN NUMBER;
+--</PROC>
+--
+--------------------------------------------------------------------------
+--
+--<PROC NAME="get_obj_id">
+--
+FUNCTION get_obj_id (p_obj_developer_key VARCHAR2
+                    ,p_raise_not_found   BOOLEAN DEFAULT TRUE
+                    ) RETURN NUMBER;
+--</PROC>
+--
+--------------------------------------------------------------------------
+--
+--<PROC NAME="get_exp_id">
+--
+FUNCTION get_exp_id (p_exp_developer_key VARCHAR2) RETURN NUMBER;
+--</PROC>
+--
+--------------------------------------------------------------------------
+--
+--<PROC NAME="delete_object_from_eul">
+-- Deletes an object from the EUL
+--
+PROCEDURE delete_object_from_eul (p_obj_developer_key IN VARCHAR2);
+--
+PROCEDURE delete_object_from_eul (p_obj_id IN NUMBER);
+--</PROC>
+--
+--------------------------------------------------------------------------
+--
+--<PROC NAME="create_foreign_key_link">
+--
+PROCEDURE create_foreign_key_link (p_hdfk_id hig_disco_foreign_keys.hdfk_id%TYPE);
+--</PROC>
+--
+--------------------------------------------------------------------------
+--
+--<PROC NAME="get_hdfk">
+--
+FUNCTION get_hdfk (p_hdfk_id hig_disco_foreign_keys.hdfk_id%TYPE
+                  ) RETURN hig_disco_foreign_keys%ROWTYPE;
+--</PROC>
+--
+--------------------------------------------------------------------------
+--
+--<PROC NAME="get_tab_hdkc">
+--
+FUNCTION get_tab_hdkc (p_hdfk_id hig_disco_foreign_keys.hdfk_id%TYPE
+                      ) RETURN tab_rec_hdkc;
+--</PROC>
+--
+--------------------------------------------------------------------------
+--
+--<PROC NAME="get_single_hdba_id">
+-- If there is only one HIG_DISCO_BUSINESS_AREAS record in existence
+--  then this function returns the HDBA_ID, otherwise an error will be raised
+--
+FUNCTION get_single_hdba_id RETURN hig_disco_business_areas.hdba_id%TYPE;
+--</PROC>
+--
+--------------------------------------------------------------------------
+--
+--<PROC NAME="get_tab_hdtc">
+FUNCTION get_tab_hdtc (p_hdt_id hig_disco_tables.hdt_id%TYPE) RETURN tab_rec_hdtc;
+--
+--------------------------------------------------------------------------
+--
+--<PROC NAME="ins_hdfk">
+PROCEDURE ins_hdfk (p_rec_hdfk hig_disco_foreign_keys%ROWTYPE);
+--
+--------------------------------------------------------------------------
+--
+--<PROC NAME="next_hdfk_id_seq">
+FUNCTION next_hdfk_id_seq RETURN NUMBER;
+--</PROC>
+--
+--------------------------------------------------------------------------
+--
+--<PROC NAME="ins_hdkc">
+PROCEDURE ins_hdkc (p_rec_hdkc hig_disco_foreign_key_cols%ROWTYPE);
+--</PROC>
+--
+--------------------------------------------------------------------------
+--
+--<PROC NAME="add_fk_links_for_table">
+PROCEDURE add_fk_links_for_table (pi_table_name       VARCHAR2
+                                 ,pi_create_if_needed BOOLEAN DEFAULT TRUE
+                                 );
+--</PROC>
+--
+--------------------------------------------------------------------------
+--
+--<PROC NAME="create_all_fk_by_child">
+PROCEDURE create_all_fk_by_child (p_child_table_name         hig_disco_foreign_keys.hdfk_child_table%TYPE
+                                 ,p_create_fk_parents_in_eul BOOLEAN DEFAULT TRUE
+                                 );
+--</PROC>
+--
+--------------------------------------------------------------------------
+--
+--<PROC NAME="validate_rec_hdtc">
+PROCEDURE validate_rec_hdtc (p_rec_hdtc hig_disco_tab_columns%ROWTYPE);
+--</PROC>
+--
+--------------------------------------------------------------------------
+--
+--<PROC NAME="create_hdcv_from_hig_domain">
+PROCEDURE create_hdcv_from_hig_domain (p_hdtc_hdt_id      hig_disco_tab_columns.hdtc_hdt_id%TYPE
+                                      ,p_hdtc_column_name hig_disco_tab_columns.hdtc_column_name%TYPE
+                                      ,p_hdo_domain       hig_domains.hdo_domain%TYPE
+                                      );
+--</PROC>
+--
+--------------------------------------------------------------------------
+--
+--<PROC NAME="create_hdcv_from_distinct_list">
+PROCEDURE create_hdcv_from_distinct_list (p_hdtc_hdt_id      hig_disco_tab_columns.hdtc_hdt_id%TYPE
+                                         ,p_hdtc_column_name hig_disco_tab_columns.hdtc_column_name%TYPE
+                                         );
+--</PROC>
+--
+--------------------------------------------------------------------------
+--
+--<PROC NAME="get_hdtc">
+FUNCTION get_hdtc  (p_hdtc_hdt_id      hig_disco_tab_columns.hdtc_hdt_id%TYPE
+                   ,p_hdtc_column_name hig_disco_tab_columns.hdtc_column_name%TYPE
+                   ) RETURN hig_disco_tab_columns%ROWTYPE;
+--</PROC>
+--
+--------------------------------------------------------------------------
+--
+--<PROC NAME="suggest_next_bol_sequence">
+FUNCTION suggest_next_bol_sequence (p_hdba_name hig_disco_business_areas.hdba_name%TYPE) RETURN NUMBER;
+--</PROC>
+--
+--------------------------------------------------------------------------
+--
+--<PROC NAME="get_disceulusr">
+FUNCTION get_disceulusr RETURN hig_option_values.hov_value%TYPE;
+--</PROC>
+--
+--------------------------------------------------------------------------
+--
+--<PROC NAME="get_disco_vers">
+FUNCTION get_disco_vers RETURN hig_option_values.hov_value%TYPE;
+--</PROC>
+--
+--------------------------------------------------------------------------
+--
+--<PROC NAME="suck_other_products">
+PROCEDURE suck_other_products (p_suck_type                VARCHAR2                              DEFAULT 'DEF'
+                              ,p_item_type                VARCHAR2
+                              ,p_table_name               VARCHAR2
+                              ,p_seq_no                   PLS_INTEGER                           DEFAULT NULL
+                              ,p_hdba_id                  hig_disco_business_areas.hdba_id%TYPE DEFAULT NULL
+                              ,p_hide_who_cols            BOOLEAN                               DEFAULT TRUE
+                              ,p_create_hdcv_from_domains BOOLEAN                               DEFAULT FALSE
+                              ,p_create_parents_if_reqd   BOOLEAN                               DEFAULT TRUE
+                              );
+--
+--------------------------------------------------------------------------
+--
+--<PROC NAME="extr_inv_type_into_disco_model">
+PROCEDURE extr_inv_type_into_disco_model (pi_inv_type        nm_inv_types.nit_inv_type%TYPE
+                                         ,pi_join_to_network BOOLEAN                               DEFAULT FALSE
+                                         ,pi_hdba_id         hig_disco_business_areas.hdba_id%TYPE DEFAULT NULL
+                                         ,pi_seq_no          PLS_INTEGER                           DEFAULT NULL
+                                         ,pi_hide_who_cols   BOOLEAN                               DEFAULT TRUE
+                                         ,pi_create_hdcv     BOOLEAN                               DEFAULT TRUE
+                                         ,pi_create_into_eul BOOLEAN                               DEFAULT FALSE
+                                         );
+--</PROC>
+--
+--------------------------------------------------------------------------
+--
+--<PROC NAME="create_hdba_records_from_disco">
+--
+PROCEDURE create_hdba_records_from_disco;
+--</PROC>
+--
+--------------------------------------------------------------------------
+--
+--<PRAGMA>
+   PRAGMA RESTRICT_REFERENCES (get_version, RNDS, WNPS, WNDS);
+   PRAGMA RESTRICT_REFERENCES (get_body_version, RNDS, WNPS, WNDS);
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+END higdisco;
+/

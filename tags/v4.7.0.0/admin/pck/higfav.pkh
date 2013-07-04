@@ -1,0 +1,180 @@
+CREATE OR REPLACE PACKAGE higfav AS
+--<PACKAGE>
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)higfav.pkh	1.4 12/23/03
+--       Module Name      : higfav.pkh
+--       Date into SCCS   : 03/12/23 13:30:29
+--       Date fetched Out : 07/06/13 14:10:33
+--       SCCS Version     : 1.4
+--
+--
+--   Author : K Angus
+--
+--   Package for manipulating the system and user favourites.
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+  g_sccsid      CONSTANT  VARCHAR2(2000) := '"@(#)higfav.pkh	1.2 11/26/03"';
+--  g_sccsid is the SCCS ID for the package
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_huf">
+-- This procedure inserts a record into hig_user_favourites.
+--
+PROCEDURE ins_huf(pi_huf_rec IN HIG_USER_FAVOURITES%ROWTYPE
+                 );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_hsf">
+-- This procedure inserts a record into hig_system_favourites.
+--
+PROCEDURE ins_hsf(pi_hsf_rec IN HIG_SYSTEM_FAVOURITES%ROWTYPE
+                 );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="set_huf_descr">
+-- This procedure sets the description for the given hig_user_favourites
+-- record.
+--
+PROCEDURE set_huf_descr(pi_user_id  IN HIG_USER_FAVOURITES.huf_user_id%TYPE
+                       ,pi_parent   IN HIG_USER_FAVOURITES.huf_parent%TYPE
+                       ,pi_child    IN HIG_USER_FAVOURITES.huf_child%TYPE
+                       ,pi_descr    IN HIG_USER_FAVOURITES.huf_descr%TYPE
+                       );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="set_hsf_descr">
+-- This procedure sets the description for the given hig_system_favourites
+-- record.
+--
+PROCEDURE set_hsf_descr(pi_user_id  IN HIG_SYSTEM_FAVOURITES.hsf_user_id%TYPE
+                       ,pi_parent   IN HIG_SYSTEM_FAVOURITES.hsf_parent%TYPE
+                       ,pi_child    IN HIG_SYSTEM_FAVOURITES.hsf_child%TYPE
+                       ,pi_descr    IN HIG_SYSTEM_FAVOURITES.hsf_descr%TYPE
+                       );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="set_hstf_descr">
+-- This procedure sets the description for the given hig_standard_favourites
+-- record.
+--
+PROCEDURE set_hstf_descr(pi_parent  IN HIG_STANDARD_FAVOURITES.hstf_parent%TYPE
+                        ,pi_child   IN HIG_STANDARD_FAVOURITES.hstf_child%TYPE
+                        ,pi_descr   IN HIG_STANDARD_FAVOURITES.hstf_descr%TYPE
+                       );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="del_huf_cascading">
+-- This procedure deletes the section of the user favourites tree cascading
+-- down from the specified record.
+--
+PROCEDURE del_huf_cascading(pi_user_id IN HIG_USER_FAVOURITES.huf_user_id%TYPE
+                           ,pi_parent  IN HIG_USER_FAVOURITES.huf_parent%TYPE
+                           ,pi_child   IN HIG_USER_FAVOURITES.huf_child%TYPE
+                           );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="del_hsf_cascading">
+-- This procedure deletes the section of the favourites tree cascading down
+-- from the specified record.
+--
+PROCEDURE del_hsf_cascading(pi_user_id IN HIG_SYSTEM_FAVOURITES.hsf_user_id%TYPE
+                           ,pi_parent  IN HIG_SYSTEM_FAVOURITES.hsf_parent%TYPE
+                           ,pi_child   IN HIG_SYSTEM_FAVOURITES.hsf_child%TYPE
+                           );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="include_node_in_standards_tree">
+-- This procedure works out whether a node in the HIG_STANDARD_FAVOURITES tree
+-- should be included when building the tree
+-- Called in HIG1807
+FUNCTION include_node_in_standards_tree(pi_hstf_type            IN  HIG_STANDARD_FAVOURITES.hstf_type%TYPE
+                                       ,pi_hstf_parent          IN  HIG_STANDARD_FAVOURITES.hstf_parent%TYPE
+                                       ,pi_hstf_child           IN  HIG_STANDARD_FAVOURITES.hstf_child%TYPE
+                                       ) RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_hstf_for_tree">
+-- populates pl/sql tables with hig_standard_favourites data - called from hig1807                   
+PROCEDURE get_hstf_for_tree ( po_tab_initial_state    IN OUT Nm3type.tab_number
+                             ,po_tab_depth            IN OUT Nm3type.tab_number 
+                             ,po_tab_label            IN OUT Nm3type.tab_varchar80
+                             ,po_tab_icon             IN OUT Nm3type.tab_varchar30
+                             ,po_tab_data             IN OUT Nm3type.tab_varchar30
+                             ,po_tab_parent           IN OUT Nm3type.tab_varchar30);                                                          
+                                       
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_hsf_for_tree">
+-- populates pl/sql tables with hig_system_favourites data - called from hig1807
+PROCEDURE get_hsf_for_tree ( pi_mode                 IN varchar2 DEFAULT 'RUN'
+                            ,po_tab_initial_state    IN OUT nm3type.tab_number
+                            ,po_tab_depth            IN OUT nm3type.tab_number 
+                            ,po_tab_label            IN OUT nm3type.tab_varchar80
+                            ,po_tab_icon             IN OUT nm3type.tab_varchar30
+                            ,po_tab_data             IN OUT nm3type.tab_varchar30
+                            ,po_tab_parent           IN OUT nm3type.tab_varchar30);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_huf_for_tree">
+-- populates pl/sql tables with hig_user_favourites data - called from hig1807
+PROCEDURE get_huf_for_tree ( pi_mode                 IN varchar2 DEFAULT 'RUN'
+                            ,po_tab_initial_state    IN OUT nm3type.tab_number
+                            ,po_tab_depth            IN OUT nm3type.tab_number 
+                            ,po_tab_label            IN OUT nm3type.tab_varchar80
+                            ,po_tab_icon             IN OUT nm3type.tab_varchar30
+                            ,po_tab_data             IN OUT nm3type.tab_varchar30
+                            ,po_tab_parent           IN OUT nm3type.tab_varchar30);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PRAGMA>
+   PRAGMA RESTRICT_REFERENCES (get_version, rnds, wnps, wnds);
+   PRAGMA RESTRICT_REFERENCES (get_body_version, rnds, wnps, wnds);
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+END higfav;
+/

@@ -1,0 +1,98 @@
+create or replace package hig_contact as
+--<PACKAGE>
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)higct.pkh	1.1 03/01/01  -- @(#)higct.pck	1.1 09/06/00
+--       Module Name      : higct.pkh      -- higct.pck
+--       Date into SCCS   : 01/03/01 16:22:48  -- 00/09/06 16:13:22
+--       Date fetched Out : 07/06/13 14:10:30  -- 00/11/23 20:16:00
+--       SCCS Version     : 1.1      -- 1.1
+--
+--
+--   Author :
+--
+--	This package contains procedures and functions used when dealing
+--    with contacts
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+  g_sccsid      CONSTANT  VARCHAR2(2000) := '"@(#)higct.pkh	1.1 03/01/01"';
+--  g_sccsid is the SCCS ID for the package
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_hct_id">
+  function get_hct_id return number;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="set_hct_id">
+  procedure set_hct_id(p_hct_id in hig_contacts.hct_id%type);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="address_from_postcode">
+  procedure address_from_postcode
+        (p_postcode     in     hig_address.had_postcode%type
+        ,p_thoroughfare in out hig_address.had_thoroughfare%type
+        ,p_dep_loc_name in out hig_address.had_dependent_locality_name%type
+        ,p_post_town    in out hig_address.had_post_town%type
+        ,p_county       in out hig_address.had_county%type
+        );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="next_hct_id">
+-- Returns hct_id_seq.nextval
+--
+  function next_hct_id return number;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="delete_ok">
+--
+-- As contacts are associated with more tables this code should grow without
+-- the need for modules using it to be revisited. Problems will occur when tables
+-- are added that are not shipped with the core product - depending on the products
+-- installed this package may fail to compile unless, for example, dynamic sql is
+-- used
+--
+  function delete_ok(p_hct_id in hig_contacts.hct_id%type) return varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PRAGMA>
+   PRAGMA RESTRICT_REFERENCES (get_version, RNDS, WNPS, WNDS);
+   PRAGMA RESTRICT_REFERENCES (get_body_version, RNDS, WNPS, WNDS);
+   PRAGMA RESTRICT_REFERENCES (next_hct_id, WNPS, WNDS);
+   PRAGMA RESTRICT_REFERENCES (delete_ok, WNPS, WNDS);
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+end;
+/
+
