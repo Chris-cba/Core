@@ -1,0 +1,28 @@
+CREATE OR REPLACE TYPE NM_THEME_DETAIL as object 
+( 
+--
+-----------------------------------------------------------------------------
+--
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)nm_theme_detail.tyh	1.1 06/15/05
+--       Module Name      : nm_theme_detail.tyh
+--       Date into SCCS   : 05/06/15 10:16:56
+--       Date fetched Out : 07/06/13 17:04:51
+--       SCCS Version     : 1.1
+--
+--    Author : R.A. Coupe
+--
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
+
+        ntd_theme_id integer, 
+	ntd_pk_id    integer, 
+	ntd_fk_id    integer, 
+	ntd_name     varchar2(100), 
+	ntd_distance number,
+	ntd_measure  number,
+	ntd_descr    varchar2(100));
+/

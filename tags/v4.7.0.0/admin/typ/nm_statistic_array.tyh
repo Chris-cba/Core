@@ -1,0 +1,78 @@
+CREATE OR REPLACE TYPE nm_statistic_array AS object
+ (
+--
+-----------------------------------------------------------------------------
+--
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)nm_statistic_array.tyh	1.6 05/03/02
+--       Module Name      : nm_statistic_array.tyh
+--       Date into SCCS   : 02/05/03 11:21:27
+--       Date fetched Out : 07/06/13 17:04:47
+--       SCCS Version     : 1.6
+--
+--    TYPE nm_statistic_array
+--
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
+  nsa_statistic_array    nm_statistic_array_type
+ ,nsa_sum_x              NUMBER
+ ,nsa_sum_y              NUMBER
+ ,nsa_min_x              NUMBER
+ ,nsa_min_y              NUMBER
+ ,nsa_max_x              NUMBER
+ ,nsa_max_y              NUMBER
+ ,nsa_first_x            NUMBER
+ ,nsa_first_y            NUMBER
+ ,nsa_last_x             NUMBER
+ ,nsa_last_y             NUMBER
+ ,nsa_y_weighted_ave_x   NUMBER
+ ,nsa_x_weighted_ave_y   NUMBER
+ ,nsa_sum_xy_product     NUMBER
+ ,nsa_max_dec_places_x   NUMBER
+ ,nsa_max_dec_places_y   NUMBER
+ ,nsa_median_x           NUMBER
+ ,nsa_median_y           NUMBER
+ ,nsa_mean_x             NUMBER
+ ,nsa_mean_y             NUMBER
+ ,nsa_sd_x               NUMBER
+ ,nsa_sd_y               NUMBER
+ ,nsa_var_x              NUMBER
+ ,nsa_var_y              NUMBER
+ ,nsa_biased_sd_x        NUMBER
+ ,nsa_biased_sd_y        NUMBER
+ ,nsa_biased_var_x       NUMBER
+ ,nsa_biased_var_y       NUMBER
+ --
+ ,STATIC FUNCTION get_body_version RETURN VARCHAR2
+ ,member FUNCTION add_statistic  (p_x NUMBER, p_y NUMBER) RETURN nm_statistic_array
+ --
+ ,member FUNCTION is_empty         RETURN boolean
+ ,member FUNCTION statistic_count  RETURN NUMBER
+ --
+ ,member FUNCTION compute_stats  (p_dec_places IN NUMBER DEFAULT NULL) RETURN nm_statistic_array
+ --
+ ,member FUNCTION get_entry (stat_arr_pos IN INTEGER) RETURN nm_statistic
+ --
+ ,member FUNCTION amend_statistic_y_by_x (p_x NUMBER, p_y_to_add NUMBER) RETURN nm_statistic_array
+ ,member FUNCTION amend_statistic_x_by_y (p_y NUMBER, p_x_to_add NUMBER) RETURN nm_statistic_array
+ --
+ ,member FUNCTION sort_statistic_array_by_x RETURN nm_statistic_array
+ ,member FUNCTION sort_statistic_array_by_y RETURN nm_statistic_array
+ ,member FUNCTION sort_statistic_array (p_by_x BOOLEAN DEFAULT TRUE
+                                       ,p_by_y BOOLEAN DEFAULT FALSE
+                                       ) RETURN nm_statistic_array
+ --
+ ,PRAGMA RESTRICT_REFERENCES (get_body_version, wnds, rnds, rnps, wnps)
+ ,PRAGMA RESTRICT_REFERENCES (is_empty, wnds, rnds, rnps, wnps)
+ ,PRAGMA RESTRICT_REFERENCES (statistic_count, wnds, rnds, rnps, wnps)
+ ,PRAGMA RESTRICT_REFERENCES (compute_stats, wnds, rnds, rnps, wnps)
+ ,PRAGMA RESTRICT_REFERENCES (get_entry, wnds, rnds, rnps, wnps)
+ ,PRAGMA RESTRICT_REFERENCES (sort_statistic_array_by_x, wnds, rnds, rnps, wnps)
+ ,PRAGMA RESTRICT_REFERENCES (sort_statistic_array_by_y, wnds, rnds, rnps, wnps)
+ ,PRAGMA RESTRICT_REFERENCES (sort_statistic_array, wnds, rnds, rnps, wnps)
+ --
+ )
+/

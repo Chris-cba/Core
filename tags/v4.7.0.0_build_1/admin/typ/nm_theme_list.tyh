@@ -1,0 +1,33 @@
+CREATE OR REPLACE TYPE NM_THEME_LIST as object 
+(
+--
+-----------------------------------------------------------------------------
+--
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)nm_theme_list.tyh	1.1 06/15/05
+--       Module Name      : nm_theme_list.tyh
+--       Date into SCCS   : 05/06/15 10:19:16
+--       Date fetched Out : 07/06/13 17:04:53
+--       SCCS Version     : 1.1
+--
+--    Author : R.A. Coupe
+--
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
+ ntl_theme_list nm_theme_list_type 
+ ,member FUNCTION add_detail  (p_theme_id IN integer 
+                              ,p_pk       IN integer 
+                              ,p_fk       IN integer
+                              ,p_name     IN varchar2 
+                              ,p_distance IN number
+                              ,p_measure  IN number 
+                              ,p_descr    in varchar2 
+                              ) RETURN nm_theme_list 
+ ,member function add_theme_list( p_theme_list in nm_theme_list ) return nm_theme_list							  
+ ,PRAGMA RESTRICT_REFERENCES (add_detail, wnds, rnds, rnps, wnps) 
+ ,PRAGMA RESTRICT_REFERENCES (add_theme_list, wnds, rnds, rnps, wnps)
+)
+/

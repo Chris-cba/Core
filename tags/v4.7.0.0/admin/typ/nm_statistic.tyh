@@ -1,0 +1,25 @@
+CREATE OR REPLACE TYPE nm_statistic AS object
+ (
+--
+-----------------------------------------------------------------------------
+--
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)nm_statistic.tyh	1.1 01/11/02
+--       Module Name      : nm_statistic.tyh
+--       Date into SCCS   : 02/01/11 08:50:23
+--       Date fetched Out : 07/06/13 17:04:46
+--       SCCS Version     : 1.1
+--
+--    TYPE nm_statistic
+--
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
+  x   NUMBER
+ ,y   NUMBER
+ ,STATIC FUNCTION get_body_version RETURN VARCHAR2
+ ,PRAGMA RESTRICT_REFERENCES (get_body_version, wnds, rnds, rnps, wnps)
+ )
+/

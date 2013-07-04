@@ -1,0 +1,117 @@
+CREATE OR REPLACE type body nm_theme_array is
+--
+-----------------------------------------------------------------------------
+--
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)nm_theme_array.tyb	1.3 01/19/06
+--       Module Name      : nm_theme_array.tyb
+--       Date into SCCS   : 06/01/19 15:57:18
+--       Date fetched Out : 07/06/13 17:04:49
+--       SCCS Version     : 1.3
+--
+--    Author : R.A. Coupe
+--
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
+
+member FUNCTION add_theme  (p_theme_id IN integer
+                              ) RETURN nm_theme_array is
+
+   this_nta nm_theme_array := SELF;
+--
+   l_extend_varray   BOOLEAN;
+--
+   c_max_array_count CONSTANT BINARY_INTEGER := 1048576;
+--
+begin
+
+--
+-- If there are NO entries in the VARRAY then extend it
+--
+   IF this_nta.nta_theme_array.COUNT = 0
+    THEN
+      this_nta.nta_theme_array.extend;
+   END IF;
+--
+-- If the last element in the array has a NULL,then just update this entry when the time comes
+--
+   l_extend_varray := (nta_theme_array(this_nta.nta_theme_array.last).nthe_id IS NOT NULL);
+
+   IF l_extend_varray
+    THEN
+
+      IF this_nta.nta_theme_array.COUNT = c_max_array_count
+       THEN
+         raise_application_error(-20001,'Theme array cannot have more than '||c_max_array_count||' entries');
+      END IF;
+      this_nta.nta_theme_array.extend;
+
+   END IF;
+--
+   this_nta.nta_theme_array( this_nta.nta_theme_array.last) := nm_theme_entry(p_theme_id);
+--
+   return this_nta;
+--
+exception
+   when others
+    then
+      return null;
+--
+end add_theme;
+
+
+----------------------------------------------------------------------------------------------
+
+/*
+member FUNCTION remove_theme  (p_theme_id IN integer) return nm_theme_array is
+cursor c1 is
+  select 
+
+
+*/
+
+/*
+----------------------------------------------------------------------------------------------
+member function add_theme_list ( p_theme_list nm_theme_list ) return nm_theme_list is
+
+   this_ntl nm_theme_list := SELF;
+--
+   l_extend_varray   BOOLEAN;
+--
+   c_max_array_count CONSTANT BINARY_INTEGER := 1048576;
+
+begin
+
+   if p_theme_list.ntl_theme_list.count = 0 then
+     return this_ntl;
+   else
+
+     for i in 1..p_theme_list.ntl_theme_list.count loop
+
+       IF this_ntl.ntl_theme_list.COUNT = c_max_array_count
+       THEN
+           raise_application_error(-20001,'Theme list cannot have more than '||c_max_array_count||' entries');
+       END IF;
+
+       this_ntl.ntl_theme_list.extend;
+  --
+       this_ntl.ntl_theme_list( this_ntl.ntl_theme_list.last) := p_theme_list.ntl_theme_list(i);
+
+  end loop;
+  --
+     return this_ntl;
+--
+  end if;
+
+exception
+   when others
+    then
+      return null;
+--
+end add_theme_list;
+*/
+end;
+/

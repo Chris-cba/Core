@@ -1,0 +1,30 @@
+CREATE OR REPLACE TYPE NM_theme_array as object
+(
+--
+-----------------------------------------------------------------------------
+--
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)nm_theme_array.tyh	1.2 06/15/05
+--       Module Name      : nm_theme_array.tyh
+--       Date into SCCS   : 05/06/15 10:14:09
+--       Date fetched Out : 07/06/13 17:04:49
+--       SCCS Version     : 1.2
+--
+--    Author : R.A. Coupe
+--
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
+ nta_theme_array  nm_theme_array_type
+ ,member FUNCTION add_theme  (p_theme_id IN integer) return nm_theme_array
+-- ,member function add_theme_array( p_theme_array in nm_theme_array ) return nm_theme_array
+-- ,member FUNCTION remove_theme  (p_theme_id IN integer) return nm_theme_array
+-- ,member function remove_theme_array( p_theme_array in nm_theme_array ) return nm_theme_array
+-- ,PRAGMA RESTRICT_REFERENCES (add_theme, wnds, rnds, rnps, wnps)
+-- ,PRAGMA RESTRICT_REFERENCES (add_theme_array, wnds, rnds, rnps, wnps)
+-- ,PRAGMA RESTRICT_REFERENCES (remove_theme, wnds, rnds, rnps, wnps)
+-- ,PRAGMA RESTRICT_REFERENCES (remove_theme_array, wnds, rnds, rnps, wnps)
+)
+/

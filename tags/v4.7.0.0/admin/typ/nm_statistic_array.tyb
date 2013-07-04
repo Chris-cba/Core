@@ -1,0 +1,480 @@
+create or replace type body nm_statistic_array is
+--
+-----------------------------------------------------------------------------
+--
+--   PVCS Identifiers :-
+--
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/typ/nm_statistic_array.tyb-arc   2.3   Jul 04 2013 10:14:46   James.Wadsworth  $
+--       Module Name      : $Workfile:   nm_statistic_array.tyb  $
+--       Date into PVCS   : $Date:   Jul 04 2013 10:14:46  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 09:59:38  $
+--       PVCS Version     : $Revision:   2.3  $
+--       Based on
+
+--       SCCS Version     : 1.9
+--
+--  Author : Jonathan Mills
+--
+--   nm_statistic_array type body
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
+------------------------------------------------------------------------------------------------
+--
+STATIC FUNCTION get_body_version RETURN VARCHAR2 IS
+BEGIN
+   RETURN '"$Revision:   2.3  $"';
+END get_body_version;
+--
+------------------------------------------------------------------------------------------------
+--
+member FUNCTION add_statistic  (p_x NUMBER, p_y NUMBER) RETURN nm_statistic_array IS
+   l_retval nm_statistic_array := SELF;
+--
+   l_last   NUMBER;
+--
+   l_stat   nm_statistic;
+--
+BEGIN
+--
+   IF l_retval.nsa_statistic_array.COUNT = 0
+    THEN
+      l_retval.nsa_statistic_array.extend;
+   END IF;
+--
+   l_last := l_retval.nsa_statistic_array.last;
+--
+   l_stat := l_retval.get_entry (l_last);
+--
+   IF NOT (l_stat.x     IS NULL
+           AND l_stat.y IS NULL
+          )
+    THEN
+      l_retval.nsa_statistic_array.extend;
+      l_last := l_retval.nsa_statistic_array.last;
+   END IF;
+--
+   l_stat.x := p_x;
+   l_stat.y := p_y;
+--
+   l_retval.nsa_statistic_array(l_last) := l_stat;
+--
+   RETURN l_retval;
+--
+END add_statistic;
+--
+------------------------------------------------------------------------------------------------
+--
+member function is_empty RETURN BOOLEAN IS
+--
+-- This function returns TRUE if the nm_statistic_array has no array entries, or there is only
+--  one entry and it is set to NULL
+--
+   l_retval BOOLEAN := FALSE;
+--
+begin
+--
+   IF    SELF.nsa_statistic_array.COUNT = 0
+    THEN
+      l_retval := TRUE;
+   ELSIF SELF.nsa_statistic_array.COUNT = 1
+    AND  SELF.nsa_statistic_array(1).x IS NULL
+    AND  SELF.nsa_statistic_array(1).y IS NULL
+    THEN
+      l_retval := TRUE;
+   END IF;
+--
+   RETURN l_retval;
+--
+END is_empty;
+--
+------------------------------------------------------------------------------------------------
+--
+member function statistic_count RETURN NUMBER IS
+--
+BEGIN
+--
+   IF SELF.is_empty
+    THEN
+      RETURN 0;
+   ELSE
+      RETURN SELF.nsa_statistic_array.COUNT;
+   END IF;
+--
+END statistic_count;
+--
+------------------------------------------------------------------------------------------------
+--
+member FUNCTION compute_stats  (p_dec_places IN NUMBER DEFAULT NULL) RETURN nm_statistic_array IS
+--
+   l_retval nm_statistic_array := SELF;
+--
+   l_stat   nm_statistic;
+--
+   l_statistic_arr_count NUMBER := l_retval.statistic_count;
+--
+   l_tab_x   nm3type.tab_number;
+   l_tab_y   nm3type.tab_number;
+   l_arr_pos PLS_INTEGER;
+   l_most    NUMBER;
+   l_dp      NUMBER := NVL(p_dec_places,9999);
+--
+   l_sorted_by_x nm_statistic_array := SELF;
+   l_sorted_by_y nm_statistic_array := SELF;
+--
+   l_variance_count_x NUMBER := 0;
+   l_variance_count_y NUMBER := 0;
+   l_biased_variance_count_x NUMBER := 0;
+   l_biased_variance_count_y NUMBER := 0;
+--
+   l_median_pos        NUMBER;
+--
+BEGIN
+--
+   l_retval.nsa_sum_x            := Null;
+   l_retval.nsa_sum_y            := Null;
+   l_retval.nsa_min_x            := Null;
+   l_retval.nsa_min_y            := Null;
+   l_retval.nsa_max_x            := Null;
+   l_retval.nsa_max_y            := Null;
+   l_retval.nsa_first_x          := Null;
+   l_retval.nsa_first_y          := Null;
+   l_retval.nsa_last_x           := Null;
+   l_retval.nsa_last_y           := Null;
+   l_retval.nsa_y_weighted_ave_x := Null;
+   l_retval.nsa_x_weighted_ave_y := Null;
+   l_retval.nsa_sum_xy_product   := Null;
+   l_retval.nsa_max_dec_places_x := Null;
+   l_retval.nsa_max_dec_places_y := Null;
+   l_retval.nsa_median_x         := Null;
+   l_retval.nsa_median_y         := Null;
+   l_retval.nsa_mean_x           := Null;
+   l_retval.nsa_mean_y           := Null;
+   l_retval.nsa_sd_x             := Null;
+   l_retval.nsa_sd_y             := Null;
+   l_retval.nsa_var_x            := Null;
+   l_retval.nsa_var_y            := Null;
+   l_retval.nsa_biased_sd_x      := Null;
+   l_retval.nsa_biased_sd_y      := Null;
+   l_retval.nsa_biased_var_x     := Null;
+   l_retval.nsa_biased_var_y     := Null;
+--
+   IF l_statistic_arr_count = 0
+    THEN
+      RETURN l_retval;
+   END IF;
+--
+   l_retval.nsa_sum_x          := 0;
+   l_retval.nsa_sum_y          := 0;
+   l_retval.nsa_sum_xy_product := 0;
+--
+   FOR i IN 1..l_statistic_arr_count
+    LOOP
+      DECLARE
+         PROCEDURE get_dp (p_val    IN     NUMBER
+                          ,p_max_dp IN OUT NUMBER
+                          ) IS
+            l_val_char VARCHAR2(2000);
+            l_dp_pos   NUMBER;
+            l_num_dp   NUMBER;
+         BEGIN
+           IF p_val IS NOT NULL
+             THEN
+               l_val_char := TO_CHAR(p_val);
+               l_dp_pos   := INSTR(l_val_char,'.');
+               IF l_dp_pos = 0
+                THEN
+                  l_num_dp := 0;
+               ELSE
+                  l_num_dp := LENGTH(l_val_char) - l_dp_pos;
+               END IF;
+               IF l_num_dp > NVL(p_max_dp,-1)
+                THEN
+                  p_max_dp := l_num_dp;
+               END IF;
+            END IF;
+         END get_dp;
+         PROCEDURE sort_sum_min_max (p_val IN     NUMBER
+                                    ,p_sum IN OUT NUMBER
+                                    ,p_min IN OUT NUMBER
+                                    ,p_max IN OUT NUMBER
+                                    ) IS
+         BEGIN
+            p_sum := p_sum + p_val;
+            IF p_max IS NULL
+             OR p_max < p_val
+             THEN
+               p_max := p_val;
+            END IF;
+            IF p_min IS NULL
+             OR p_min > p_val
+             THEN
+               p_min := p_val;
+            END IF;
+         END sort_sum_min_max;
+      BEGIN
+         l_stat := l_retval.get_entry (i);
+         get_dp (l_stat.x, l_retval.nsa_max_dec_places_x);
+         get_dp (l_stat.y, l_retval.nsa_max_dec_places_y);
+   --
+         sort_sum_min_max (l_stat.x
+                          ,l_retval.nsa_sum_x
+                          ,l_retval.nsa_min_x
+                          ,l_retval.nsa_max_x
+                          );
+         sort_sum_min_max (l_stat.y
+                          ,l_retval.nsa_sum_y
+                          ,l_retval.nsa_min_y
+                          ,l_retval.nsa_max_y
+                          );
+--
+         l_retval.nsa_sum_xy_product := l_retval.nsa_sum_xy_product + (l_stat.x*l_stat.y);
+--
+      END;
+   END LOOP;
+--
+   l_sorted_by_x := l_retval.sort_statistic_array_by_x;
+   l_sorted_by_y := l_retval.sort_statistic_array_by_y;
+--
+   IF MOD(l_statistic_arr_count,2) != 0
+    THEN
+      -- If the statistic count is odd then the median is the middle one
+      l_median_pos            := ROUND((l_statistic_arr_count/2),0);
+      l_retval.nsa_median_x   := l_sorted_by_x.get_entry(l_median_pos).x;
+      l_retval.nsa_median_y   := l_sorted_by_y.get_entry(l_median_pos).y;
+   ELSE
+      -- If the statistic count is even then then median is the average of the ones either side
+      l_median_pos            := l_statistic_arr_count/2;
+      l_retval.nsa_median_x   := l_sorted_by_x.get_entry(l_median_pos).x;
+      l_retval.nsa_median_y   := l_sorted_by_y.get_entry(l_median_pos).y;
+--
+      l_median_pos            := l_median_pos + 1;
+      l_retval.nsa_median_x   := l_retval.nsa_median_x + l_sorted_by_x.get_entry(l_median_pos).x;
+      l_retval.nsa_median_y   := l_retval.nsa_median_y + l_sorted_by_y.get_entry(l_median_pos).y;
+--
+      l_retval.nsa_median_x   := l_retval.nsa_median_x / 2;
+      l_retval.nsa_median_y   := l_retval.nsa_median_y / 2;
+--
+   END IF;
+--
+   l_retval.nsa_mean_x     := ROUND(l_retval.nsa_sum_x/l_statistic_arr_count,l_dp);
+   l_retval.nsa_mean_y     := ROUND(l_retval.nsa_sum_y/l_statistic_arr_count,l_dp);
+--
+--  We need this second loop through because we need to have got
+--   the maximum number of dec places in the first one
+   FOR i IN 1..l_statistic_arr_count
+    LOOP
+      -- Store the length of this in a PL/SQL table in array position
+      --  multiply the value up with a multiplier based on the number of dec places
+      --  allowed and this should always result in a whole number and thus give us
+      --  an array position to clag the length into
+      DECLARE
+         l_num_x NUMBER;
+         l_num_y NUMBER;
+      BEGIN
+         l_stat := l_retval.get_entry (i);
+         --
+         l_num_x := (l_stat.x-l_retval.nsa_mean_x);
+         l_num_x := l_num_x * l_num_x;
+         l_variance_count_x := l_variance_count_x + (l_num_x/l_statistic_arr_count);
+         --
+         l_num_y := (l_stat.y-l_retval.nsa_mean_y);
+         l_num_y := l_num_y * l_num_y;
+         l_variance_count_y := l_variance_count_y + (l_num_y/l_statistic_arr_count);
+         --
+         IF l_statistic_arr_count = 1
+          THEN
+            l_biased_variance_count_x := Null;
+            l_biased_variance_count_y := Null;
+         ELSE
+            l_biased_variance_count_x := l_biased_variance_count_x + (l_num_x/(l_statistic_arr_count-1));
+            l_biased_variance_count_y := l_biased_variance_count_y + (l_num_y/(l_statistic_arr_count-1));
+         END IF;
+         --
+      END;
+   END LOOP;
+--
+   l_retval.nsa_var_x  := l_variance_count_x;
+   l_retval.nsa_var_y  := l_variance_count_y;
+   l_retval.nsa_sd_x   := SQRT(l_retval.nsa_var_x);
+   l_retval.nsa_sd_y   := SQRT(l_retval.nsa_var_y);
+--
+   l_retval.nsa_biased_var_x    := l_biased_variance_count_x;
+   l_retval.nsa_biased_var_y    := l_biased_variance_count_y;
+   l_retval.nsa_biased_sd_x     := SQRT(l_retval.nsa_biased_var_x);
+   l_retval.nsa_biased_sd_y     := SQRT(l_retval.nsa_biased_var_y);
+--
+   DECLARE
+      FUNCTION len_weight (p_sum NUMBER) RETURN NUMBER IS
+         l_ret NUMBER;
+      BEGIN
+         IF NVL(p_sum,0) != 0
+          THEN
+            l_ret := ROUND(NVL(l_retval.nsa_sum_xy_product/p_sum,0),l_dp);
+         END IF;
+         RETURN l_ret;
+      END Len_weight;
+   BEGIN
+      l_retval.nsa_y_weighted_ave_x := len_weight(l_retval.nsa_sum_y);
+      l_retval.nsa_x_weighted_ave_y := len_weight(l_retval.nsa_sum_x);
+   END;
+--
+   IF l_statistic_arr_count > 0
+    THEN
+      l_stat               := l_retval.get_entry (1);
+      l_retval.nsa_first_x := l_stat.x;
+      l_retval.nsa_first_y := l_stat.y;
+      l_stat               := l_retval.get_entry (l_statistic_arr_count);
+      l_retval.nsa_last_x  := l_stat.x;
+      l_retval.nsa_last_y  := l_stat.y;
+   END IF;
+--
+   RETURN l_retval;
+--
+END compute_stats;
+--
+------------------------------------------------------------------------------------------------
+--
+member FUNCTION get_entry (stat_arr_pos IN INTEGER) RETURN nm_statistic IS
+--
+BEGIN
+--
+   IF NOT SELF.nsa_statistic_array.EXISTS(stat_arr_pos)
+    THEN
+      RETURN nm_statistic(null,null);
+   ELSE
+      RETURN SELF.nsa_statistic_array(stat_arr_pos);
+   END IF;
+--
+END get_entry;
+--
+------------------------------------------------------------------------------------------------
+--
+member FUNCTION amend_statistic_y_by_x (p_x NUMBER, p_y_to_add NUMBER) RETURN nm_statistic_array IS
+--
+   l_retval nm_statistic_array := SELF;
+   l_stat   nm_statistic;
+   l_found  BOOLEAN := FALSE;
+--
+BEGIN
+--
+   FOR i IN 1..l_retval.statistic_count
+    LOOP
+      l_stat := get_entry (i);
+      IF l_stat.x = p_x
+       THEN
+         l_found  := TRUE;
+         l_stat.y := l_stat.y + p_y_to_add;
+         l_retval.nsa_statistic_array(i) := l_stat;
+         EXIT;
+      END IF;
+   END LOOP;
+--
+   IF NOT l_found
+    THEN
+      l_retval := l_retval.add_statistic (p_x,p_y_to_add);
+   END IF;
+--
+   RETURN l_retval;
+--
+END amend_statistic_y_by_x;
+--
+------------------------------------------------------------------------------------------------
+--
+member FUNCTION amend_statistic_x_by_y (p_y NUMBER, p_x_to_add NUMBER) RETURN nm_statistic_array IS
+--
+   l_retval nm_statistic_array := SELF;
+   l_stat   nm_statistic;
+   l_found  BOOLEAN := FALSE;
+--
+BEGIN
+--
+   FOR i IN 1..l_retval.statistic_count
+    LOOP
+      l_stat := get_entry (i);
+      IF l_stat.y = p_y
+       THEN
+         l_found  := TRUE;
+         l_stat.x := l_stat.x + p_x_to_add;
+         l_retval.nsa_statistic_array(i) := l_stat;
+         EXIT;
+      END IF;
+   END LOOP;
+--
+   IF NOT l_found
+    THEN
+      l_retval := l_retval.add_statistic (p_x_to_add,p_y);
+   END IF;
+--
+   RETURN l_retval;
+--
+END amend_statistic_x_by_y;
+--
+------------------------------------------------------------------------------------------------
+--
+member FUNCTION sort_statistic_array_by_x RETURN nm_statistic_array IS
+--
+BEGIN
+   RETURN SELF.sort_statistic_array (p_by_x => TRUE
+                                    ,p_by_y => FALSE
+                                    );
+END sort_statistic_array_by_x;
+--
+------------------------------------------------------------------------------------------------
+--
+member FUNCTION sort_statistic_array_by_y RETURN nm_statistic_array IS
+BEGIN
+   RETURN SELF.sort_statistic_array (p_by_x => FALSE
+                                    ,p_by_y => TRUE
+                                    );
+END sort_statistic_array_by_y;
+--
+------------------------------------------------------------------------------------------------
+--
+member FUNCTION sort_statistic_array (p_by_x BOOLEAN DEFAULT TRUE
+                                     ,p_by_y BOOLEAN DEFAULT FALSE
+                                     ) RETURN nm_statistic_array IS
+--
+   l_retval              nm_statistic_array := SELF;
+   l_j                   nm_statistic;
+   l_j_add_1             nm_statistic;
+   c_stat_count CONSTANT PLS_INTEGER        := SELF.statistic_count;
+--
+BEGIN
+--
+   IF p_by_x AND p_by_y
+    THEN
+      RAISE_APPLICATION_ERROR(-20001,'Cannot sort a statistic array by both X and Y');
+   END IF;
+--
+   --
+   -- Bubblesort the statistic array
+   --
+   FOR i IN 1..(c_stat_count-1)
+    LOOP
+      FOR j IN 1..(c_stat_count-1)
+       LOOP
+         --
+         l_j       := l_retval.get_entry(j);
+         l_j_add_1 := l_retval.get_entry(j+1);
+         --
+         IF  (l_j.x > l_j_add_1.x AND p_by_x)
+          OR (l_j.y > l_j_add_1.y AND p_by_y)
+          THEN
+            l_retval.nsa_statistic_array(j)   := l_j_add_1;
+            l_retval.nsa_statistic_array(j+1) := l_j;
+         END IF;
+         --
+      END LOOP;
+   END LOOP;
+--
+   RETURN l_retval;
+--
+END sort_statistic_array;
+--
+------------------------------------------------------------------------------------------------
+--
+end;
+/

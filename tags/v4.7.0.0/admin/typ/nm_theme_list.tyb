@@ -1,0 +1,123 @@
+CREATE OR REPLACE type body nm_theme_list as
+--
+--
+--------------------------------------------------------------------------------
+--   PVCS Identifiers :-
+--
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/typ/nm_theme_list.tyb-arc   2.4   Jul 04 2013 10:14:46   James.Wadsworth  $
+--       Module Name      : $Workfile:   nm_theme_list.tyb  $
+--       Date into PVCS   : $Date:   Jul 04 2013 10:14:46  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 10:08:08  $
+--       PVCS Version     : $Revision:   2.4  $
+--
+--    Author : R.A. Coupe
+--
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
+member FUNCTION add_detail  (p_theme_id IN integer
+                              ,p_pk       IN integer
+                              ,p_fk       IN integer
+                              ,p_name     IN varchar2
+                              ,p_distance IN number
+                              ,p_measure  IN number
+                              ,p_descr    in varchar2
+                              ) RETURN nm_theme_list is
+
+   this_ntl nm_theme_list := SELF;
+--
+   l_extend_varray   BOOLEAN;
+--
+   c_max_array_count CONSTANT BINARY_INTEGER := 1048576;
+--
+begin
+
+   if p_theme_id is not null then
+--
+-- If there are NO entries in the VARRAY then extend it
+--
+   IF this_ntl.ntl_theme_list.COUNT = 0
+    THEN
+      this_ntl.ntl_theme_list.extend;
+   END IF;
+--
+-- If the last element in the array has a NULL entry, then just update this entry when the time comes
+--
+   l_extend_varray := (ntl_theme_list(this_ntl.ntl_theme_list.last).ntd_theme_id IS NOT NULL);
+--
+   IF l_extend_varray
+    THEN
+      IF this_ntl.ntl_theme_list.COUNT = c_max_array_count
+       THEN
+         raise_application_error(-20001,'Theme list cannot have more than '||c_max_array_count||' entries');
+      END IF;
+      this_ntl.ntl_theme_list.extend;
+   END IF;
+--
+   this_ntl.ntl_theme_list( this_ntl.ntl_theme_list.last) := nm_theme_detail ( p_theme_id
+                                                                              ,p_pk
+                                                                              ,p_fk
+                                                                              ,p_name
+                                                                              ,p_distance
+                                                                              ,p_measure
+                                                                              ,p_descr
+                                                                                   );
+--
+   end if;
+
+   return this_ntl;
+--
+exception
+   when others
+    then
+      return null;
+--
+end add_detail;
+----------------------------------------------------------------------------------------------
+member function add_theme_list ( p_theme_list nm_theme_list ) return nm_theme_list is
+
+   this_ntl nm_theme_list := SELF;
+--
+   l_extend_varray   BOOLEAN;
+--
+   c_max_array_count CONSTANT BINARY_INTEGER := 1048576;
+
+begin
+
+   if p_theme_list.ntl_theme_list.count = 0 then
+     return this_ntl;
+   elsif this_ntl.ntl_theme_list.count = 1 and
+         this_ntl.ntl_theme_list(1).ntd_pk_id is null then
+     return p_theme_list;
+   else
+
+     for i in 1..p_theme_list.ntl_theme_list.count loop
+
+      if p_theme_list.ntl_theme_list(i).ntd_theme_id is not null then
+
+        IF this_ntl.ntl_theme_list.COUNT = c_max_array_count
+        THEN
+           raise_application_error(-20001,'Theme list cannot have more than '||c_max_array_count||' entries');
+        END IF;
+
+        this_ntl.ntl_theme_list.extend;
+  --
+        this_ntl.ntl_theme_list( this_ntl.ntl_theme_list.last) := p_theme_list.ntl_theme_list(i);
+
+      end if;
+
+  end loop;
+  --
+     return this_ntl;
+--
+  end if;
+
+exception
+   when others
+    then
+      return null;
+--
+end add_theme_list;
+end;
+/

@@ -1,0 +1,19 @@
+CREATE OR REPLACE TYPE NM_THEME_LIST_TYPE as varray(1048576) OF nm_theme_detail
+--
+-----------------------------------------------------------------------------
+--
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)nm_theme_list_type.tyh	1.1 06/15/05
+--       Module Name      : nm_theme_list_type.tyh
+--       Date into SCCS   : 05/06/15 10:17:56
+--       Date fetched Out : 07/06/13 17:04:54
+--       SCCS Version     : 1.1
+--
+--    Author : R.A. Coupe
+--
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
+/

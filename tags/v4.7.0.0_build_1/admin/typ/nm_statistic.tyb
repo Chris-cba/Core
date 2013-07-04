@@ -1,0 +1,30 @@
+CREATE OR REPLACE TYPE BODY nm_statistic IS
+--
+-----------------------------------------------------------------------------
+--
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)nm_statistic.tyb	1.2 01/11/02
+--       Module Name      : nm_statistic.tyb
+--       Date into SCCS   : 02/01/11 09:06:31
+--       Date fetched Out : 07/06/13 17:04:45
+--       SCCS Version     : 1.2
+--
+--    TYPE BODY nm_statistic
+--
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
+--
+------------------------------------------------------------------------------------------------
+--
+STATIC FUNCTION get_body_version RETURN VARCHAR2 IS
+BEGIN
+   RETURN '"@(#)nm_statistic.tyb	1.2 01/11/02"';
+END get_body_version;
+--
+------------------------------------------------------------------------------------------------
+--
+end;
+/
