@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY hig AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/hig.pkb-arc   2.6   Jun 25 2012 09:12:54   Steve.Cooper  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/hig.pkb-arc   2.7   Jul 04 2013 14:37:12   James.Wadsworth  $
 --       Module Name      : $Workfile:   hig.pkb  $
---       Date into SCCS   : $Date:   Jun 25 2012 09:12:54  $
---       Date fetched Out : $Modtime:   Oct 12 2011 10:56:52  $
---       SCCS Version     : $Revision:   2.6  $
+--       Date into SCCS   : $Date:   Jul 04 2013 14:37:12  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:06  $
+--       SCCS Version     : $Revision:   2.7  $
 --       Based on 1.39
 --
 --
@@ -16,7 +16,7 @@ CREATE OR REPLACE PACKAGE BODY hig AS
 --   HIGHWAYS application generic utilities package
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2007
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
   g_body_sccsid	CONSTANT	varchar2(2000) := '"@(#)hig.pkb	1.39 08/16/06"';

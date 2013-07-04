@@ -14,7 +14,7 @@ CREATE OR REPLACE PACKAGE hig AS
 --   HIGHWAYS application generic utilities package
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2000
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --</PACKAGE>
   -- package global variable definitions (PUBLIC)
