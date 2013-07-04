@@ -2,11 +2,11 @@
 create or replace package body higpipe is
 --   PVCS Identifiers :-
 --
---       pvcsid               : $Header:   //vm_latest/archives/nm3/admin/pck/higpipe.pkb-arc   2.1   Dec 18 2007 13:58:00   ptanava  $
+--       pvcsid               : $Header:   //vm_latest/archives/nm3/admin/pck/higpipe.pkb-arc   2.2   Jul 04 2013 15:01:12   James.Wadsworth  $
 --       Module Name          : $Workfile:   higpipe.pkb  $
---       Date into PVCS       : $Date:   Dec 18 2007 13:58:00  $
---       Date fetched Out     : $Modtime:   Dec 18 2007 13:43:32  $
---       PVCS Version         : $Revision:   2.1  $
+--       Date into PVCS       : $Date:   Jul 04 2013 15:01:12  $
+--       Date fetched Out     : $Modtime:   Jul 04 2013 14:25:06  $
+--       PVCS Version         : $Revision:   2.2  $
 --       Based on SCCS Version     : 1.4
 --
 --   Author :
@@ -14,14 +14,14 @@ create or replace package body higpipe is
 --   Highways Pipes package
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2000
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 
 /* History
   11.03.07 PT check_pipe() now uses higgrirp.write_gri_spool()
 */
 
-   g_body_sccsid            constant  varchar2(200) := '"$Revision:   2.1  $"';
+   g_body_sccsid            constant  varchar2(200) := '"$Revision:   2.2  $"';
    g_package_name           constant varchar2(30) := 'higpipe';
 
    
