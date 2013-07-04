@@ -1,0 +1,63 @@
+--
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_router_params_utils.pkh-arc   5.4   Jul 04 2013 14:57:02   James.Wadsworth  $
+--       Module Name      : $Workfile:   hig_router_params_utils.pkh  $
+--       Date into PVCS   : $Date:   Jul 04 2013 14:57:02  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:54:10  $
+--       Version          : $Revision:   5.4  $
+--
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
+Create Or Replace Package Hig_Router_Params_Utils
+Is
+
+  --g_sccsid is the SCCS ID for the package
+  g_Sccsid Constant Varchar2(2000) := '$Revision:   5.4  $';
+  
+  Type t_Param_Rec  
+  Is
+  Record
+  (
+  p_Param_Name    Hig_Router_Params.Hrp_Param_Name%Type,
+  p_Param_Value   Varchar2(100)
+  );
+  
+  Type t_Param_Tab Is Table Of t_Param_Rec Index By Binary_Integer;
+  
+  Function Get_Version Return Varchar2; 
+
+  Function Get_Body_Version Return Varchar2;
+  
+  Function  Get_New_Router_Id Return Hig_Router_Params.Hrp_Router_Id%Type;
+  --
+  Procedure Add_Param (
+                      p_Router_Id     In  Hig_Router_Params.Hrp_Router_Id%Type,
+                      p_Param_Name    In  Hig_Router_Params.Hrp_Param_Name%Type,
+                      p_Param_Value   In  Hig_Router_Params.Hrp_Param_Value_Varchar%Type
+                      );
+  --
+  Procedure Add_Param (
+                      p_Router_Id     In  Hig_Router_Params.Hrp_Router_Id%Type,
+                      p_Param_Name    In  Hig_Router_Params.Hrp_Param_Name%Type,
+                      p_Param_Value   In  Hig_Router_Params.Hrp_Param_Value_Number%Type
+                      );
+  --                      
+  Procedure Add_Param (
+                      p_Router_Id     In  Hig_Router_Params.Hrp_Router_Id%Type,
+                      p_Param_Name    In  Hig_Router_Params.Hrp_Param_Name%Type,
+                      p_Param_Value   In  Hig_Router_Params.Hrp_Param_Value_Date%Type
+                      );
+
+  Function Get_Params (
+                      p_Router_Id   In  Hig_Router_Params.Hrp_Router_Id%Type
+                      ) Return t_Param_Tab;
+
+  Procedure Clear_Down_Old_Params (
+                                  p_Clear_Down_Date   In  Date  Default Trunc(Sysdate-1)
+                                  );
+
+End Hig_Router_Params_Utils;
+/

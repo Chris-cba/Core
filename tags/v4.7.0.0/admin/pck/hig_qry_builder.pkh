@@ -1,0 +1,114 @@
+create or replace package hig_qry_builder
+AS
+--<PACKAGE>
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_qry_builder.pkh-arc   3.1   Jul 04 2013 14:57:02   James.Wadsworth  $
+--       Module Name      : $Workfile:   hig_qry_builder.pkh  $
+--       Date into PVCS   : $Date:   Jul 04 2013 14:57:02  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:53:26  $
+--       Version          : $Revision:   3.1  $
+--       Based on SCCS version : 
+------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+
+  -----------
+  --constants
+  -----------
+  --g_sccsid is the SCCS ID for the package
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.1  $';
+
+  g_return_sql Varchar2(32767) ;
+  g_hqt_id     Number ;
+
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+/*--
+--<PROC NAME="GET_VERSION">
+-- This Procedure saves the query attributes
+PROCEDURE save_query_attributes(pi_qata_rec IN OUT hig_query_type_attributes%ROWTYPE);
+--</PROC>
+--
+*/
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This Procedure saves the query attributes
+FUNCTION get_sql Return Varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This Procedure saves the query attributes
+FUNCTION get_hqt_id Return Number;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This Procedure saves the query attributes
+PROCEDURE clear_sql;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This Procedure saves the query attributes
+Procedure set_sql(pi_sql IN Varchar2,pi_hqt_id IN hig_query_types.hqt_id%TYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This Procedure saves the query attributes
+FUNCTION get_hqt (pi_hqt_id IN hig_query_types.hqt_id%TYPE)
+Return hig_query_types%ROWTYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--<PROC NAME="GET_VERSION">
+-- This FUNCTION return the value of the attribute passed
+FUNCTION get_attribute_value(pi_qat_qt_id     hig_query_type_attributes.hqta_hqt_id%TYPE
+                            ,pi_atribute_name hig_query_type_attributes.hqta_attribute_name%TYPE) 
+RETURN Varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="validate_query_name">
+-- This function checks the uniqueness of the Query Name
+FUNCTION duplicate_query_name(pi_query_name IN  hig_query_types.hqt_name%TYPE
+                            ,pi_security   IN  hig_query_types.hqt_security%TYPE) RETURN Boolean;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PRAGMA>
+  PRAGMA RESTRICT_REFERENCES(get_version, RNDS, WNPS, WNDS);
+  PRAGMA RESTRICT_REFERENCES(get_body_version, RNDS, WNPS, WNDS);
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+End hig_qry_builder;
+/
