@@ -3,13 +3,15 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3gaz_query_saved.pkb-arc   3.0   Jul 13 2009 16:09:14   aedwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3gaz_query_saved.pkb-arc   3.1   Jul 04 2013 15:37:06   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3gaz_query_saved.pkb  $
---       Date into PVCS   : $Date:   Jul 13 2009 16:09:14  $
---       Date fetched Out : $Modtime:   Jul 13 2009 16:05:36  $
---       Version          : $Revision:   3.0  $
+--       Date into PVCS   : $Date:   Jul 04 2013 15:37:06  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 15:35:48  $
+--       Version          : $Revision:   3.1  $
 --       Based on SCCS version : 
--------------------------------------------------------------------------
+------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+------------------------------------------------------------------
 --
 --all global package variables here
 
@@ -17,7 +19,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.0  $';
+  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.1  $';
 
   g_package_name CONSTANT varchar2(30) := 'nm3gaz_query_saved';
 --
