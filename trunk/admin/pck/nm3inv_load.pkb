@@ -4,23 +4,23 @@ CREATE OR REPLACE PACKAGE BODY Nm3inv_Load AS
 --
 --   SCCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_load.pkb-arc   2.7   May 16 2011 14:44:56   Steve.Cooper  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_load.pkb-arc   2.8   Jul 04 2013 16:08:46   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3inv_load.pkb  $
---       Date into PVCS   : $Date:   May 16 2011 14:44:56  $
---       Date fetched Out : $Modtime:   May 05 2011 10:49:00  $
---       PVCS Version     : $Revision:   2.7  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:08:46  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 15:43:18  $
+--       PVCS Version     : $Revision:   2.8  $
 --
 --   Author : Jonathan Mills
 --
 --   NM3 Inventory Load package body
 --
------------------------------------------------------------------------------
---  Copyright (c) exor corporation ltd, 2002
------------------------------------------------------------------------------
+------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+------------------------------------------------------------------
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.7  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.8  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3inv_load';

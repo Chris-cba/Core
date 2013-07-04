@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE Nm3inv_Load AS
 --<PACKAGE>
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_load.pkh-arc   2.1   Jul 20 2007 15:27:34   aedwards  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_load.pkh-arc   2.2   Jul 04 2013 16:08:46   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3inv_load.pkh  $
---       Date into PVCS   : $Date:   Jul 20 2007 15:27:34  $
---       Date fetched Out : $Modtime:   Jul 20 2007 14:36:50  $
---       PVCS Version     : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:08:46  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:14  $
+--       PVCS Version     : $Revision:   2.2  $
 --       Based on SCCS version : 
 --
 --
@@ -15,11 +15,11 @@ CREATE OR REPLACE PACKAGE Nm3inv_Load AS
 --   NM3 Inventory Load package
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2002
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
-  g_sccsid             CONSTANT VARCHAR2(2000) := '"$Revision:   2.1  $"';
+  g_sccsid             CONSTANT VARCHAR2(2000) := '"$Revision:   2.2  $"';
   g_line_data_suffix   CONSTANT VARCHAR2(40)   := 'LINE';
 --  g_sccsid is the SCCS ID for the package
 --
