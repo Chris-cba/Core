@@ -1,0 +1,98 @@
+CREATE OR REPLACE PACKAGE Nm3homo_Gis AS
+--<PACKAGE>
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)nm3homo_gis.pkh	1.5 07/18/06
+--       Module Name      : nm3homo_gis.pkh
+--       Date into SCCS   : 06/07/18 16:59:50
+--       Date fetched Out : 07/06/13 14:11:46
+--       SCCS Version     : 1.5
+--
+--
+--   Author : Jonathan Mills
+--
+--   GIS wrapper for asset (and other products) location package
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+  g_sccsid      CONSTANT  VARCHAR2(2000) := '"@(#)nm3homo_gis.pkh	1.5 07/18/06"';
+--  g_sccsid is the SCCS ID for the package
+--
+   g_item_id        NUMBER;
+   g_nte_job_id     NM_NW_TEMP_EXTENTS.nte_job_id%TYPE;
+   g_effective_date DATE;
+   g_x_pos          NUMBER;
+   g_y_pos          NUMBER;
+--
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="locate_item">
+--  Allows location or relocation of an item from the GIS
+--
+PROCEDURE locate_item
+ ( pi_gt_theme_id             IN NM_THEMES_ALL.nth_theme_id%TYPE
+ , pi_item_id                 IN NUMBER
+ , pi_route_ne_id             IN nm_elements.ne_id%TYPE        DEFAULT NULL
+ , pi_start_ne_id             IN nm_elements.ne_id%TYPE
+ , pi_start_offset            IN NUMBER
+ , pi_end_ne_id               IN nm_elements.ne_id%TYPE        DEFAULT NULL
+ , pi_end_offset              IN NUMBER                        DEFAULT NULL
+ , pi_sub_class               IN nm_elements.ne_sub_class%TYPE DEFAULT NULL
+ , pi_restrict_excl_sub_class IN VARCHAR2                      DEFAULT NULL
+ , pi_x_pos                   IN NUMBER                        DEFAULT NULL
+ , pi_y_pos                   IN NUMBER                        DEFAULT NULL
+ , pi_effective_date          IN DATE                          DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
+ , pi_geom                    IN mdsys.sdo_geometry            DEFAULT NULL
+ );
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="create_members_from_xy">
+--  creates asset locations on the network from an xy pair, by plotting the network path through 
+--  a memory resident set of network objects. The process will raise an exception if the memory 
+--  resident object is not instantiated. 
+--
+PROCEDURE create_members_from_xy( pi_theme_id  IN nm_themes_all.nth_theme_id%TYPE,
+                                  pi_iit_ne_id IN nm_members.nm_ne_id_in%TYPE,
+								  pi_start_date  IN nm_members.nm_start_date%TYPE,
+								  pi_x_st      IN NUMBER,
+								  pi_y_st      IN NUMBER,
+								  pi_x_end     IN NUMBER,
+								  pi_y_end     IN NUMBER );
+
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PRAGMA>
+   PRAGMA RESTRICT_REFERENCES (get_version, RNDS, WNPS, WNDS);
+   PRAGMA RESTRICT_REFERENCES (get_body_version, RNDS, WNPS, WNDS);
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+END Nm3homo_Gis;
+/
+

@@ -1,0 +1,3883 @@
+CREATE OR REPLACE PACKAGE nm3get IS
+--<PACKAGE>
+--
+-----------------------------------------------------------------------------
+--
+--   PVCS Identifiers :-
+--
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3get.pkh-arc   2.22   Jul 04 2013 16:04:12   James.Wadsworth  $
+--       Module Name      : $Workfile:   nm3get.pkh  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:04:12  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:12  $
+--       PVCS Version     : $Revision:   2.22  $
+--
+--
+--   Author : Jonathan Mills
+--
+--   Generated package DO NOT MODIFY
+--
+--   nm3get_gen header : "@(#)nm3get_gen.pkh	1.3 12/05/05"
+--   nm3get_gen body   : "$Revision:   2.22  $"
+--
+-----------------------------------------------------------------------------
+--
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--
+-----------------------------------------------------------------------------
+--
+--</PACKAGE>
+--<GLOBVAR>
+   g_sccsid          CONSTANT  VARCHAR2(2000) := '"$Revision:   2.22  $"';
+--  g_sccsid is the SCCS ID for the package
+--
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_doc">
+--
+--   Function to get using DOC_PK constraint
+--
+FUNCTION get_doc (pi_doc_id            docs.doc_id%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN docs%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_doc, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_dac">
+--
+--   Function to get using DAC_PK constraint
+--
+FUNCTION get_dac (pi_dac_id            doc_actions.dac_id%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN doc_actions%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_dac, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_das">
+--
+--   Function to get using DAS_PK constraint
+--
+FUNCTION get_das (pi_das_table_name    doc_assocs.das_table_name%TYPE
+                 ,pi_das_rec_id        doc_assocs.das_rec_id%TYPE
+                 ,pi_das_doc_id        doc_assocs.das_doc_id%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN doc_assocs%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_das, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_dcl">
+--
+--   Function to get using DCL_PK constraint
+--
+FUNCTION get_dcl (pi_dcl_dtp_code      doc_class.dcl_dtp_code%TYPE
+                 ,pi_dcl_code          doc_class.dcl_code%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN doc_class%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_dcl, WNPS, WNDS);
+--
+--   Function to get using DCL_UK1 constraint
+--
+FUNCTION get_dcl (pi_dcl_name          doc_class.dcl_name%TYPE
+                 ,pi_dcl_dtp_code      doc_class.dcl_dtp_code%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN doc_class%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_dcl, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_dcp">
+--
+--   Function to get using DCP_PK constraint
+--
+FUNCTION get_dcp (pi_dcp_doc_id        doc_copies.dcp_doc_id%TYPE
+                 ,pi_dcp_id            doc_copies.dcp_id%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN doc_copies%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_dcp, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_ddg">
+--
+--   Function to get using DDG_PK constraint
+--
+FUNCTION get_ddg (pi_ddg_id            doc_damage.ddg_id%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN doc_damage%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_ddg, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_ddc">
+--
+--   Function to get using DDC_PK constraint
+--
+FUNCTION get_ddc (pi_ddc_id            doc_damage_costs.ddc_id%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN doc_damage_costs%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_ddc, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_dec">
+--
+--   Function to get using DEC_PK constraint
+--
+FUNCTION get_dec (pi_dec_hct_id        doc_enquiry_contacts.dec_hct_id%TYPE
+                 ,pi_dec_doc_id        doc_enquiry_contacts.dec_doc_id%TYPE
+                 ,pi_dec_type          doc_enquiry_contacts.dec_type%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN doc_enquiry_contacts%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_dec, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_det">
+--
+--   Function to get using DET_PK constraint
+--
+FUNCTION get_det (pi_det_dtp_code      doc_enquiry_types.det_dtp_code%TYPE
+                 ,pi_det_dcl_code      doc_enquiry_types.det_dcl_code%TYPE
+                 ,pi_det_code          doc_enquiry_types.det_code%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN doc_enquiry_types%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_det, WNPS, WNDS);
+--
+--   Function to get using DET_UNQ constraint
+--
+FUNCTION get_det (pi_det_dtp_code      doc_enquiry_types.det_dtp_code%TYPE
+                 ,pi_det_dcl_code      doc_enquiry_types.det_dcl_code%TYPE
+                 ,pi_det_code          doc_enquiry_types.det_code%TYPE
+                 ,pi_det_name          doc_enquiry_types.det_name%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN doc_enquiry_types%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_det, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_dgt">
+--
+--   Function to get using DGT_PK constraint
+--
+FUNCTION get_dgt (pi_dgt_table_name    doc_gateways.dgt_table_name%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN doc_gateways%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_dgt, WNPS, WNDS);
+--
+--   Function to get using DGT_UK1 constraint
+--
+FUNCTION get_dgt (pi_dgt_table_descr   doc_gateways.dgt_table_descr%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN doc_gateways%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_dgt, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_dgs">
+--
+--   Function to get using DGS_PK constraint
+--
+FUNCTION get_dgs (pi_dgs_dgt_table_name doc_gate_syns.dgs_dgt_table_name%TYPE
+                 ,pi_dgs_table_syn      doc_gate_syns.dgs_table_syn%TYPE
+                 ,pi_raise_not_found    BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode  PLS_INTEGER DEFAULT -20000
+                 ) RETURN doc_gate_syns%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_dgs, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_dhi">
+--
+--   Function to get using DHI_PK constraint
+--
+FUNCTION get_dhi (pi_dhi_doc_id        doc_history.dhi_doc_id%TYPE
+                 ,pi_dhi_date_changed  doc_history.dhi_date_changed%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN doc_history%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_dhi, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_dky">
+--
+--   Function to get using DKY_PK constraint
+--
+FUNCTION get_dky (pi_dky_doc_id        doc_keys.dky_doc_id%TYPE
+                 ,pi_dky_dkw_key_id    doc_keys.dky_dkw_key_id%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN doc_keys%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_dky, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_dkw">
+--
+--   Function to get using DKW_PK constraint
+--
+FUNCTION get_dkw (pi_dkw_key_id        doc_keywords.dkw_key_id%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN doc_keywords%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_dkw, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_dlc">
+--
+--   Function to get using DLC_PK constraint
+--
+FUNCTION get_dlc (pi_dlc_id            doc_locations.dlc_id%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN doc_locations%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_dlc, WNPS, WNDS);
+--
+--   Function to get using DLC_UK constraint
+--
+FUNCTION get_dlc (pi_dlc_name          doc_locations.dlc_name%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN doc_locations%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_dlc, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_dmd">
+--
+--   Function to get using DMD_PK constraint
+--
+FUNCTION get_dmd (pi_dmd_id            doc_media.dmd_id%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN doc_media%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_dmd, WNPS, WNDS);
+--
+--   Function to get using DMD_UK constraint
+--
+FUNCTION get_dmd (pi_dmd_name          doc_media.dmd_name%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN doc_media%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_dmd, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_dq">
+--
+--   Function to get using DQ_PK constraint
+--
+FUNCTION get_dq (pi_dq_id             doc_query.dq_id%TYPE
+                ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                ) RETURN doc_query%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_dq, WNPS, WNDS);
+--
+--   Function to get using DQ_UK constraint
+--
+FUNCTION get_dq (pi_dq_title          doc_query.dq_title%TYPE
+                ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                ) RETURN doc_query%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_dq, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_dqc">
+--
+--   Function to get using DQC_PK constraint
+--
+FUNCTION get_dqc (pi_dqc_dq_id         doc_query_cols.dqc_dq_id%TYPE
+                 ,pi_dqc_seq_no        doc_query_cols.dqc_seq_no%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN doc_query_cols%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_dqc, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_dsc">
+--
+--   Function to get using DSC_PK constraint
+--
+FUNCTION get_dsc (pi_dsc_type          doc_std_costs.dsc_type%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN doc_std_costs%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_dsc, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_dsy">
+--
+--   Function to get using DSY_PK constraint
+--
+FUNCTION get_dsy (pi_dsy_key_id        doc_synonyms.dsy_key_id%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN doc_synonyms%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_dsy, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_dtc">
+--
+--   Function to get using DTC_PK constraint
+--
+FUNCTION get_dtc (pi_dtc_template_name doc_template_columns.dtc_template_name%TYPE
+                 ,pi_dtc_col_alias     doc_template_columns.dtc_col_alias%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN doc_template_columns%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_dtc, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_dtg">
+--
+--   Function to get using DTG_PK constraint
+--
+FUNCTION get_dtg (pi_dtg_template_name doc_template_gateways.dtg_template_name%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN doc_template_gateways%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_dtg, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_dtu">
+--
+--   Function to get using DTU_PK constraint
+--
+FUNCTION get_dtu (pi_dtu_user_id       doc_template_users.dtu_user_id%TYPE
+                 ,pi_dtu_template_name doc_template_users.dtu_template_name%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN doc_template_users%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_dtu, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_dtp">
+--
+--   Function to get using DTP_PK constraint
+--
+FUNCTION get_dtp (pi_dtp_code          doc_types.dtp_code%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN doc_types%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_dtp, WNPS, WNDS);
+--
+--   Function to get using DTP_UK constraint
+--
+FUNCTION get_dtp (pi_dtp_name          doc_types.dtp_name%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN doc_types%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_dtp, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_gl">
+--
+--   Function to get using GL_PK constraint
+--
+FUNCTION get_gl (pi_gl_job_id         gri_lov.gl_job_id%TYPE
+                ,pi_gl_param          gri_lov.gl_param%TYPE
+                ,pi_gl_return         gri_lov.gl_return%TYPE
+                ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                ) RETURN gri_lov%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_gl, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_grm">
+--
+--   Function to get using GRM_PK constraint
+--
+FUNCTION get_grm (pi_grm_module        gri_modules.grm_module%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN gri_modules%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_grm, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_gmp">
+--
+--   Function to get using GMP_PK constraint
+--
+FUNCTION get_gmp (pi_gmp_module        gri_module_params.gmp_module%TYPE
+                 ,pi_gmp_param         gri_module_params.gmp_param%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN gri_module_params%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_gmp, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_gp">
+--
+--   Function to get using GP_PK constraint
+--
+FUNCTION get_gp (pi_gp_param          gri_params.gp_param%TYPE
+                ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                ) RETURN gri_params%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_gp, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_gpd">
+--
+--   Function to get using GPD_PK constraint
+--
+FUNCTION get_gpd (pi_gpd_indep_param   gri_param_dependencies.gpd_indep_param%TYPE
+                 ,pi_gpd_module        gri_param_dependencies.gpd_module%TYPE
+                 ,pi_gpd_dep_param     gri_param_dependencies.gpd_dep_param%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN gri_param_dependencies%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_gpd, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_gpl">
+--
+--   Function to get using GPL_PK constraint
+--
+FUNCTION get_gpl (pi_gpl_param         gri_param_lookup.gpl_param%TYPE
+                 ,pi_gpl_value         gri_param_lookup.gpl_value%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN gri_param_lookup%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_gpl, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_grr">
+--
+--   Function to get using GRR_PK constraint
+--
+FUNCTION get_grr (pi_grr_job_id        gri_report_runs.grr_job_id%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN gri_report_runs%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_grr, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_grp">
+--
+--   Function to get using GRP_PK constraint
+--
+FUNCTION get_grp (pi_grp_job_id        gri_run_parameters.grp_job_id%TYPE
+                 ,pi_grp_param         gri_run_parameters.grp_param%TYPE
+                 ,pi_grp_seq           gri_run_parameters.grp_seq%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN gri_run_parameters%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_grp, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_gsp">
+--
+--   Function to get using GSP_PK constraint
+--
+FUNCTION get_gsp (pi_gsp_gss_id        gri_saved_params.gsp_gss_id%TYPE
+                 ,pi_gsp_seq           gri_saved_params.gsp_seq%TYPE
+                 ,pi_gsp_param         gri_saved_params.gsp_param%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN gri_saved_params%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_gsp, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_gss">
+--
+--   Function to get using GSS_PK constraint
+--
+FUNCTION get_gss (pi_gss_id            gri_saved_sets.gss_id%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN gri_saved_sets%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_gss, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_had">
+--
+--   Function to get using HAD_PK constraint
+--
+FUNCTION get_had (pi_had_id            hig_address.had_id%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN hig_address%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_had, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_hco">
+--
+--   Function to get using HCO_PK constraint
+--
+FUNCTION get_hco (pi_hco_domain        hig_codes.hco_domain%TYPE
+                 ,pi_hco_code          hig_codes.hco_code%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN hig_codes%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_hco, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_hcl">
+--
+--   Function to get using HCL_PK constraint
+--
+FUNCTION get_hcl (pi_hcl_colour        hig_colours.hcl_colour%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN hig_colours%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_hcl, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_hct">
+--
+--   Function to get using HCT_PK constraint
+--
+FUNCTION get_hct (pi_hct_id            hig_contacts.hct_id%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN hig_contacts%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_hct, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_hca">
+--
+--   Function to get using HCA_PK constraint
+--
+FUNCTION get_hca (pi_hca_hct_id        hig_contact_address.hca_hct_id%TYPE
+                 ,pi_hca_had_id        hig_contact_address.hca_had_id%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN hig_contact_address%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_hca, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_hdo">
+--
+--   Function to get using HDO_PK constraint
+--
+FUNCTION get_hdo (pi_hdo_domain        hig_domains.hdo_domain%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN hig_domains%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_hdo, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_her">
+--
+--   Function to get using HER_PK constraint
+--
+FUNCTION get_her (pi_her_no            hig_errors.her_no%TYPE
+                 ,pi_her_appl          hig_errors.her_appl%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN hig_errors%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_her, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_hht">
+--
+--   Function to get using HIG_HD_HHT_PK constraint
+--
+FUNCTION get_hht (pi_hht_hhu_hhm_module hig_hd_join_defs.hht_hhu_hhm_module%TYPE
+                 ,pi_hht_hhu_seq        hig_hd_join_defs.hht_hhu_seq%TYPE
+                 ,pi_hht_join_seq       hig_hd_join_defs.hht_join_seq%TYPE
+                 ,pi_raise_not_found    BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode  PLS_INTEGER DEFAULT -20000
+                 ) RETURN hig_hd_join_defs%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_hht, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_hho">
+--
+--   Function to get using HIG_HD_HHO_PK constraint
+--
+FUNCTION get_hho (pi_hho_hhl_hhu_hhm_module hig_hd_lookup_join_cols.hho_hhl_hhu_hhm_module%TYPE
+                 ,pi_hho_hhl_hhu_seq        hig_hd_lookup_join_cols.hho_hhl_hhu_seq%TYPE
+                 ,pi_hho_hhl_join_seq       hig_hd_lookup_join_cols.hho_hhl_join_seq%TYPE
+                 ,pi_hho_parent_col         hig_hd_lookup_join_cols.hho_parent_col%TYPE
+                 ,pi_hho_lookup_col         hig_hd_lookup_join_cols.hho_lookup_col%TYPE
+                 ,pi_raise_not_found        BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode      PLS_INTEGER DEFAULT -20000
+                 ) RETURN hig_hd_lookup_join_cols%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_hho, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_hhl">
+--
+--   Function to get using HIG_HD_HHL_PK constraint
+--
+FUNCTION get_hhl (pi_hhl_hhu_hhm_module hig_hd_lookup_join_defs.hhl_hhu_hhm_module%TYPE
+                 ,pi_hhl_hhu_seq        hig_hd_lookup_join_defs.hhl_hhu_seq%TYPE
+                 ,pi_hhl_join_seq       hig_hd_lookup_join_defs.hhl_join_seq%TYPE
+                 ,pi_raise_not_found    BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode  PLS_INTEGER DEFAULT -20000
+                 ) RETURN hig_hd_lookup_join_defs%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_hhl, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_hhm">
+--
+--   Function to get using HIG_HD_HHM_PK constraint
+--
+FUNCTION get_hhm (pi_hhm_module        hig_hd_modules.hhm_module%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN hig_hd_modules%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_hhm, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_hhu">
+--
+--   Function to get using HIG_HD_HHU_PK constraint
+--
+FUNCTION get_hhu (pi_hhu_hhm_module    hig_hd_mod_uses.hhu_hhm_module%TYPE
+                 ,pi_hhu_seq           hig_hd_mod_uses.hhu_seq%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN hig_hd_mod_uses%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_hhu, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_hhc">
+--
+--   Function to get using HIG_HD_HHC_PK constraint
+--
+FUNCTION get_hhc (pi_hhc_hhu_hhm_module hig_hd_selected_cols.hhc_hhu_hhm_module%TYPE
+                 ,pi_hhc_hhu_seq        hig_hd_selected_cols.hhc_hhu_seq%TYPE
+                 ,pi_hhc_column_seq     hig_hd_selected_cols.hhc_column_seq%TYPE
+                 ,pi_raise_not_found    BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode  PLS_INTEGER DEFAULT -20000
+                 ) RETURN hig_hd_selected_cols%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_hhc, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_hhj">
+--
+--   Function to get using HIG_HD_HHJ_PK constraint
+--
+FUNCTION get_hhj (pi_hhj_hht_hhu_hhm_module   hig_hd_table_join_cols.hhj_hht_hhu_hhm_module%TYPE
+                 ,pi_hhj_hht_hhu_parent_table hig_hd_table_join_cols.hhj_hht_hhu_parent_table%TYPE
+                 ,pi_hhj_hht_join_seq         hig_hd_table_join_cols.hhj_hht_join_seq%TYPE
+                 ,pi_hhj_parent_col           hig_hd_table_join_cols.hhj_parent_col%TYPE
+                 ,pi_hhj_hhu_child_table      hig_hd_table_join_cols.hhj_hhu_child_table%TYPE
+                 ,pi_hhj_child_col            hig_hd_table_join_cols.hhj_child_col%TYPE
+                 ,pi_raise_not_found          BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode        PLS_INTEGER DEFAULT -20000
+                 ) RETURN hig_hd_table_join_cols%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_hhj, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_hho">
+--
+--   Function to get using HHO_PK constraint
+--
+FUNCTION get_hho (pi_hho_id            hig_holidays.hho_id%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN hig_holidays%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_hho, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_hmo">
+--
+--   Function to get using HIG_MODULES_PK constraint
+--
+FUNCTION get_hmo (pi_hmo_module        hig_modules.hmo_module%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN hig_modules%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_hmo, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_hmh">
+--
+--   Function to get using HMH_PK constraint
+--
+FUNCTION get_hmh (pi_hmh_user_id       hig_module_history.hmh_user_id%TYPE
+                 ,pi_hmh_seq_no        hig_module_history.hmh_seq_no%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN hig_module_history%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_hmh, WNPS, WNDS);
+--
+--   Function to get using HMH_UK constraint
+--
+FUNCTION get_hmh (pi_hmh_user_id       hig_module_history.hmh_user_id%TYPE
+                 ,pi_hmh_module        hig_module_history.hmh_module%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN hig_module_history%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_hmh, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_hmk">
+--
+--   Function to get using HMK_PK constraint
+--
+FUNCTION get_hmk (pi_hmk_hmo_module    hig_module_keywords.hmk_hmo_module%TYPE
+                 ,pi_hmk_keyword       hig_module_keywords.hmk_keyword%TYPE
+                 ,pi_hmk_owner         hig_module_keywords.hmk_owner%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN hig_module_keywords%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_hmk, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_hmr">
+--
+--   Function to get using HMR_PK constraint
+--
+FUNCTION get_hmr (pi_hmr_module        hig_module_roles.hmr_module%TYPE
+                 ,pi_hmr_role          hig_module_roles.hmr_role%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN hig_module_roles%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_hmr, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_hmu">
+--
+--   Function to get using HMU_PK constraint
+--
+FUNCTION get_hmu (pi_hmu_module        hig_module_usages.hmu_module%TYPE
+                 ,pi_hmu_usage         hig_module_usages.hmu_usage%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN hig_module_usages%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_hmu, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_hol">
+--
+--   Function to get using HOL_PK constraint
+--
+FUNCTION get_hol (pi_hol_id            hig_option_list.hol_id%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN hig_option_list%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_hol, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_hov">
+--
+--   Function to get using HOV_PK constraint
+--
+FUNCTION get_hov (pi_hov_id            hig_option_values.hov_id%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN hig_option_values%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_hov, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_hpr">
+--
+--   Function to get using HPR_PK constraint
+--
+FUNCTION get_hpr (pi_hpr_product       hig_products.hpr_product%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN hig_products%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_hpr, WNPS, WNDS);
+--
+--   Function to get using HPR_UK1 constraint
+--
+FUNCTION get_hpr (pi_hpr_product_name  hig_products.hpr_product_name%TYPE
+                 ,pi_hpr_version       hig_products.hpr_version%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN hig_products%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_hpr, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_hrs">
+--
+--   Function to get using HRS_PK constraint
+--
+FUNCTION get_hrs (pi_hrs_style_name    hig_report_styles.hrs_style_name%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN hig_report_styles%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_hrs, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_hro">
+--
+--   Function to get using HIG_ROLES_PK constraint
+--
+FUNCTION get_hro (pi_hro_role          hig_roles.hro_role%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN hig_roles%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_hro, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_hsc">
+--
+--   Function to get using HSC_PK constraint
+--
+FUNCTION get_hsc (pi_hsc_domain_code   hig_status_codes.hsc_domain_code%TYPE
+                 ,pi_hsc_status_code   hig_status_codes.hsc_status_code%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN hig_status_codes%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_hsc, WNPS, WNDS);
+--
+--   Function to get using HSC_UK1 constraint
+--
+FUNCTION get_hsc (pi_hsc_domain_code   hig_status_codes.hsc_domain_code%TYPE
+                 ,pi_hsc_status_name   hig_status_codes.hsc_status_name%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN hig_status_codes%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_hsc, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_hsd">
+--
+--   Function to get using HSD_PK constraint
+--
+FUNCTION get_hsd (pi_hsd_domain_code   hig_status_domains.hsd_domain_code%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN hig_status_domains%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_hsd, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_hup">
+--
+--   Function to get using HUP_PK constraint
+--
+FUNCTION get_hup (pi_hup_product       hig_upgrades.hup_product%TYPE
+                 ,pi_date_upgraded     hig_upgrades.date_upgraded%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN hig_upgrades%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_hup, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_hum">
+--
+--   Function to get using HUM_PK constraint
+--
+FUNCTION get_hum (pi_hum_hmo_module    hig_url_modules.hum_hmo_module%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN hig_url_modules%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_hum, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_hus">
+--
+--   Function to get using HIG_USERS_PK constraint
+--
+FUNCTION get_hus (pi_hus_user_id       hig_users.hus_user_id%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN hig_users%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_hus, WNPS, WNDS);
+--
+--   Function to get using HUS_UK constraint
+--
+FUNCTION get_hus (pi_hus_username      hig_users.hus_username%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN hig_users%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_hus, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_huh">
+--
+--   Function to get using HUH_PK constraint
+--
+FUNCTION get_huh (pi_huh_user_id       hig_user_history.huh_user_id%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN hig_user_history%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_huh, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_huo">
+--
+--   Function to get using HUO_PK constraint
+--
+FUNCTION get_huo (pi_huo_hus_user_id   hig_user_options.huo_hus_user_id%TYPE
+                 ,pi_huo_id            hig_user_options.huo_id%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN hig_user_options%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_huo, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_hur">
+--
+--   Function to get using HUR_PK constraint
+--
+FUNCTION get_hur (pi_hur_username      hig_user_roles.hur_username%TYPE
+                 ,pi_hur_role          hig_user_roles.hur_role%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN hig_user_roles%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_hur, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nag">
+--
+--   Function to get using HAG_PK constraint
+--
+FUNCTION get_nag (pi_nag_parent_admin_unit nm_admin_groups.nag_parent_admin_unit%TYPE
+                 ,pi_nag_child_admin_unit  nm_admin_groups.nag_child_admin_unit%TYPE
+                 ,pi_raise_not_found       BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode     PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_admin_groups%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nag, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nau">
+--
+--   Function to get using HAU_PK constraint
+--
+FUNCTION get_nau (pi_nau_admin_unit    nm_admin_units.nau_admin_unit%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_admin_units%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nau, WNPS, WNDS);
+--
+--   Function to get using HAU_UK2 constraint
+--
+FUNCTION get_nau (pi_nau_name          nm_admin_units.nau_name%TYPE
+                 ,pi_nau_admin_type    nm_admin_units.nau_admin_type%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_admin_units%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nau, WNPS, WNDS);
+--
+--   Function to get using HAU_UK1 constraint
+--
+FUNCTION get_nau (pi_nau_unit_code     nm_admin_units.nau_unit_code%TYPE
+                 ,pi_nau_admin_type    nm_admin_units.nau_admin_type%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_admin_units%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nau, WNPS, WNDS);
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nau_all">
+--
+--   Function to get using HAU_PK constraint
+--
+FUNCTION get_nau_all (pi_nau_admin_unit    nm_admin_units_all.nau_admin_unit%TYPE
+                     ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                     ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                     ) RETURN nm_admin_units_all%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nau_all, WNPS, WNDS);
+--
+--   Function to get using HAU_UK2 constraint
+--
+FUNCTION get_nau_all (pi_nau_name          nm_admin_units_all.nau_name%TYPE
+                     ,pi_nau_admin_type    nm_admin_units_all.nau_admin_type%TYPE
+                     ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                     ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                     ) RETURN nm_admin_units_all%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nau_all, WNPS, WNDS);
+--
+--   Function to get using HAU_UK1 constraint
+--
+FUNCTION get_nau_all (pi_nau_unit_code     nm_admin_units_all.nau_unit_code%TYPE
+                     ,pi_nau_admin_type    nm_admin_units_all.nau_admin_type%TYPE
+                     ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                     ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                     ) RETURN nm_admin_units_all%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nau_all, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nal">
+--
+--   Function to get using NAL_PK constraint
+--
+FUNCTION get_nal (pi_nal_id            nm_area_lock.nal_id%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_area_lock%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nal, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nars">
+--
+--   Function to get using NARS_PK constraint
+--
+FUNCTION get_nars (pi_nars_job_id         nm_assets_on_route_store.nars_job_id%TYPE
+                  ,pi_nars_ne_id_in       nm_assets_on_route_store.nars_ne_id_in%TYPE
+                  ,pi_nars_ne_id_of_begin nm_assets_on_route_store.nars_ne_id_of_begin%TYPE
+                  ,pi_nars_begin_mp       nm_assets_on_route_store.nars_begin_mp%TYPE
+                  ,pi_raise_not_found     BOOLEAN     DEFAULT TRUE
+                  ,pi_not_found_sqlcode   PLS_INTEGER DEFAULT -20000
+                  ) RETURN nm_assets_on_route_store%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nars, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_narsa">
+--
+--   Function to get using NARSA_PK constraint
+--
+FUNCTION get_narsa (pi_narsa_job_id      nm_assets_on_route_store_att.narsa_job_id%TYPE
+                   ,pi_narsa_iit_ne_id   nm_assets_on_route_store_att.narsa_iit_ne_id%TYPE
+                   ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                   ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                   ) RETURN nm_assets_on_route_store_att%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_narsa, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_narsd">
+--
+--   Function to get using NARSD_PK constraint
+--
+FUNCTION get_narsd (pi_narsd_job_id      nm_assets_on_route_store_att_d.narsd_job_id%TYPE
+                   ,pi_narsd_iit_ne_id   nm_assets_on_route_store_att_d.narsd_iit_ne_id%TYPE
+                   ,pi_narsd_attrib_name nm_assets_on_route_store_att_d.narsd_attrib_name%TYPE
+                   ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                   ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                   ) RETURN nm_assets_on_route_store_att_d%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_narsd, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_narsh">
+--
+--   Function to get using NARSH_PK constraint
+--
+FUNCTION get_narsh (pi_narsh_job_id      nm_assets_on_route_store_head.narsh_job_id%TYPE
+                   ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                   ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                   ) RETURN nm_assets_on_route_store_head%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_narsh, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_narst">
+--
+--   Function to get using NARST_PK constraint
+--
+FUNCTION get_narst (pi_narst_inv_type    nm_assets_on_route_store_total.narst_inv_type%TYPE
+                   ,pi_narst_job_id      nm_assets_on_route_store_total.narst_job_id%TYPE
+                   ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                   ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                   ) RETURN nm_assets_on_route_store_total%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_narst, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_naa">
+--
+--   Function to get using NM_AUDIT_PK constraint
+--
+FUNCTION get_naa (pi_na_audit_id       nm_audit_actions.na_audit_id%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_audit_actions%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_naa, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nach">
+--
+--   Function to get using NACH_PK constraint
+--
+FUNCTION get_nach (pi_nach_audit_id     nm_audit_changes.nach_audit_id%TYPE
+                  ,pi_nach_column_id    nm_audit_changes.nach_column_id%TYPE
+                  ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                  ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                  ) RETURN nm_audit_changes%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nach, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nac">
+--
+--   Function to get using NM_AUDIT_COLUMNS_PK constraint
+--
+FUNCTION get_nac (pi_nac_column_id     nm_audit_columns.nac_column_id%TYPE
+                 ,pi_nac_table_name    nm_audit_columns.nac_table_name%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_audit_columns%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nac, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nkc">
+--
+--   Function to get using NM_AUDIT_KEY_COLS_PK constraint
+--
+FUNCTION get_nkc (pi_nkc_seq_no        nm_audit_key_cols.nkc_seq_no%TYPE
+                 ,pi_nkc_table_name    nm_audit_key_cols.nkc_table_name%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_audit_key_cols%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nkc, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_natab">
+--
+--   Function to get using NM_AUDIT_TABLES_PK constraint
+--
+FUNCTION get_natab (pi_nat_table_name    nm_audit_tables.nat_table_name%TYPE
+                   ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                   ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                   ) RETURN nm_audit_tables%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_natab, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_natmp">
+--
+--   Function to get using NM_AUDIT_TEMP_PK constraint
+--
+FUNCTION get_natmp (pi_nat_audit_id      nm_audit_temp.nat_audit_id%TYPE
+                   ,pi_nat_old_or_new    nm_audit_temp.nat_old_or_new%TYPE
+                   ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                   ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                   ) RETURN nm_audit_temp%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_natmp, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nat">
+--
+--   Function to get using NAT_PK constraint
+--
+FUNCTION get_nat (pi_nat_admin_type    nm_au_types.nat_admin_type%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_au_types%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nat, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nsty">
+--
+--   Function to get using NSTY_PK constraint
+--
+FUNCTION get_nsty (pi_nsty_id           nm_au_sub_types.nsty_id%TYPE
+                  ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                  ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                  ) RETURN nm_au_sub_types%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nsty, WNPS, WNDS);
+--
+--   Function to get using NSTY_UK1 constraint
+--
+FUNCTION get_nsty (pi_nsty_nat_admin_type nm_au_sub_types.nsty_nat_admin_type%TYPE
+                  ,pi_nsty_sub_type       nm_au_sub_types.nsty_sub_type%TYPE
+                  ,pi_raise_not_found     BOOLEAN     DEFAULT TRUE
+                  ,pi_not_found_sqlcode   PLS_INTEGER DEFAULT -20000
+                  ) RETURN nm_au_sub_types%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nsty, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_natg">
+--
+--   Function to get using NATG_PK constraint
+--
+FUNCTION get_natg (pi_natg_nat_admin_type nm_au_types_groupings.natg_nat_admin_type%TYPE
+                  ,pi_natg_grouping       nm_au_types_groupings.natg_grouping%TYPE
+                  ,pi_raise_not_found     BOOLEAN     DEFAULT TRUE
+                  ,pi_not_found_sqlcode   PLS_INTEGER DEFAULT -20000
+                  ) RETURN nm_au_types_groupings%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_natg, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nd">
+--
+--   Function to get using ND_PK constraint
+--
+FUNCTION get_nd (pi_nd_id             nm_dbug.nd_id%TYPE
+                ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                ) RETURN nm_dbug%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nd, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_ne">
+--
+--   Function to get using NE_PK constraint
+--
+FUNCTION get_ne (pi_ne_id             nm_elements.ne_id%TYPE
+                ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                ) RETURN nm_elements%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_ne, WNPS, WNDS);
+--
+--   Function to get using NE_UK constraint
+--
+FUNCTION get_ne (pi_ne_unique         nm_elements.ne_unique%TYPE
+                ,pi_ne_nt_type        nm_elements.ne_nt_type%TYPE
+                ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                ) RETURN nm_elements%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_ne, WNPS, WNDS);
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_ne_all">
+--
+--   Function to get using NE_PK constraint
+--
+FUNCTION get_ne_all (pi_ne_id             nm_elements_all.ne_id%TYPE
+                    ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                    ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                    ) RETURN nm_elements_all%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_ne_all, WNPS, WNDS);
+--
+--   Function to get using NE_UK constraint
+--
+FUNCTION get_ne_all (pi_ne_unique         nm_elements_all.ne_unique%TYPE
+                    ,pi_ne_nt_type        nm_elements_all.ne_nt_type%TYPE
+                    ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                    ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                    ) RETURN nm_elements_all%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_ne_all, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_neh">
+--
+--   Function to get using NEH_PK constraint
+--
+FUNCTION get_neh (pi_neh_id            nm_element_history.neh_id%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_element_history%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_neh, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_ner">
+--
+--   Function to get using NER_PK constraint
+--
+FUNCTION get_ner (pi_ner_id            nm_errors.ner_id%TYPE
+                 ,pi_ner_appl          nm_errors.ner_appl%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_errors%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_ner, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nel">
+--
+--   Function to get using NEL_PK constraint
+--
+FUNCTION get_nel (pi_nel_id            nm_event_log.nel_id%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_event_log%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nel, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_net">
+--
+--   Function to get using NET_PK constraint
+--
+FUNCTION get_net (pi_net_type          nm_event_types.net_type%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_event_types%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_net, WNPS, WNDS);
+--
+--   Function to get using NET_UK constraint
+--
+FUNCTION get_net (pi_net_unique        nm_event_types.net_unique%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_event_types%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_net, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nfp">
+--
+--   Function to get using NFP_PK constraint
+--
+FUNCTION get_nfp (pi_nfp_id            nm_fill_patterns.nfp_id%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_fill_patterns%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nfp, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_ngq">
+--
+--   Function to get using NGQ_PK constraint
+--
+FUNCTION get_ngq (pi_ngq_id            nm_gaz_query.ngq_id%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_gaz_query%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_ngq, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_ngqt">
+--
+--   Function to get using NGQT_PK constraint
+--
+FUNCTION get_ngqt (pi_ngqt_ngq_id       nm_gaz_query_types.ngqt_ngq_id%TYPE
+                  ,pi_ngqt_seq_no       nm_gaz_query_types.ngqt_seq_no%TYPE
+                  ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                  ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                  ) RETURN nm_gaz_query_types%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_ngqt, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_ngqa">
+--
+--   Function to get using NGQA_PK constraint
+--
+FUNCTION get_ngqa (pi_ngqa_ngq_id       nm_gaz_query_attribs.ngqa_ngq_id%TYPE
+                  ,pi_ngqa_ngqt_seq_no  nm_gaz_query_attribs.ngqa_ngqt_seq_no%TYPE
+                  ,pi_ngqa_seq_no       nm_gaz_query_attribs.ngqa_seq_no%TYPE
+                  ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                  ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                  ) RETURN nm_gaz_query_attribs%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_ngqa, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_ngqv">
+--
+--   Function to get using NGQV_PK constraint
+--
+FUNCTION get_ngqv (pi_ngqv_ngq_id       nm_gaz_query_values.ngqv_ngq_id%TYPE
+                  ,pi_ngqv_ngqt_seq_no  nm_gaz_query_values.ngqv_ngqt_seq_no%TYPE
+                  ,pi_ngqv_ngqa_seq_no  nm_gaz_query_values.ngqv_ngqa_seq_no%TYPE
+                  ,pi_ngqv_sequence     nm_gaz_query_values.ngqv_sequence%TYPE
+                  ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                  ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                  ) RETURN nm_gaz_query_values%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_ngqv, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_ngit">
+--
+--   Function to get using NGIT_PK constraint
+--
+FUNCTION get_ngit (pi_ngit_ngt_group_type nm_group_inv_types.ngit_ngt_group_type%TYPE
+                  ,pi_ngit_nit_inv_type   nm_group_inv_types.ngit_nit_inv_type%TYPE
+                  ,pi_raise_not_found     BOOLEAN     DEFAULT TRUE
+                  ,pi_not_found_sqlcode   PLS_INTEGER DEFAULT -20000
+                  ) RETURN nm_group_inv_types%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_ngit, WNPS, WNDS);
+--
+--   Function to get using NGIT_UK constraint
+--
+FUNCTION get_ngit (pi_ngit_ngt_group_type nm_group_inv_types.ngit_ngt_group_type%TYPE
+                  ,pi_raise_not_found     BOOLEAN     DEFAULT TRUE
+                  ,pi_not_found_sqlcode   PLS_INTEGER DEFAULT -20000
+                  ) RETURN nm_group_inv_types%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_ngit, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_ngil">
+--
+--   Function to get using NGIL_PK constraint
+--
+FUNCTION get_ngil (pi_ngil_ne_ne_id     nm_group_inv_link.ngil_ne_ne_id%TYPE
+                  ,pi_ngil_iit_ne_id    nm_group_inv_link.ngil_iit_ne_id%TYPE
+                  ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                  ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                  ) RETURN nm_group_inv_link%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_ngil, WNPS, WNDS);
+--
+--   Function to get using NGIL_UK constraint
+--
+FUNCTION get_ngil (pi_ngil_ne_ne_id     nm_group_inv_link.ngil_ne_ne_id%TYPE
+                  ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                  ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                  ) RETURN nm_group_inv_link%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_ngil, WNPS, WNDS);
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_ngil_all">
+--
+--   Function to get using NGIL_PK constraint
+--
+FUNCTION get_ngil_all (pi_ngil_ne_ne_id     nm_group_inv_link_all.ngil_ne_ne_id%TYPE
+                      ,pi_ngil_iit_ne_id    nm_group_inv_link_all.ngil_iit_ne_id%TYPE
+                      ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                      ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                      ) RETURN nm_group_inv_link_all%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_ngil_all, WNPS, WNDS);
+--
+--   Function to get using NGIL_UK constraint
+--
+FUNCTION get_ngil_all (pi_ngil_ne_ne_id     nm_group_inv_link_all.ngil_ne_ne_id%TYPE
+                      ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                      ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                      ) RETURN nm_group_inv_link_all%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_ngil_all, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_ngr">
+--
+--   Function to get using NGR_PK constraint
+--
+FUNCTION get_ngr (pi_ngr_parent_group_type nm_group_relations.ngr_parent_group_type%TYPE
+                 ,pi_ngr_child_group_type  nm_group_relations.ngr_child_group_type%TYPE
+                 ,pi_ngr_start_date        nm_group_relations.ngr_start_date%TYPE
+                 ,pi_raise_not_found       BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode     PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_group_relations%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_ngr, WNPS, WNDS);
+--
+--   Function to get using NGR_PK constraint (without start date for Datetrack View)
+--
+FUNCTION get_ngr (pi_ngr_parent_group_type nm_group_relations.ngr_parent_group_type%TYPE
+                 ,pi_ngr_child_group_type  nm_group_relations.ngr_child_group_type%TYPE
+                 ,pi_raise_not_found       BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode     PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_group_relations%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_ngr, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_ngr_all">
+--
+--   Function to get using NGR_PK constraint
+--
+FUNCTION get_ngr_all (pi_ngr_parent_group_type nm_group_relations_all.ngr_parent_group_type%TYPE
+                     ,pi_ngr_child_group_type  nm_group_relations_all.ngr_child_group_type%TYPE
+                     ,pi_ngr_start_date        nm_group_relations_all.ngr_start_date%TYPE
+                     ,pi_raise_not_found       BOOLEAN     DEFAULT TRUE
+                     ,pi_not_found_sqlcode     PLS_INTEGER DEFAULT -20000
+                     ) RETURN nm_group_relations_all%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_ngr_all, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_ngt">
+--
+--   Function to get using NGT_PK constraint
+--
+FUNCTION get_ngt (pi_ngt_group_type    nm_group_types.ngt_group_type%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_group_types%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_ngt, WNPS, WNDS);
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_ngt_all">
+--
+--   Function to get using NGT_PK constraint
+--
+FUNCTION get_ngt_all (pi_ngt_group_type    nm_group_types_all.ngt_group_type%TYPE
+                     ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                     ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                     ) RETURN nm_group_types_all%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_ngt_all, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_ial">
+--
+--   Function to get using IAL_PK constraint
+--
+FUNCTION get_ial (pi_ial_domain        nm_inv_attri_lookup.ial_domain%TYPE
+                 ,pi_ial_value         nm_inv_attri_lookup.ial_value%TYPE
+                 ,pi_ial_start_date    nm_inv_attri_lookup.ial_start_date%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_inv_attri_lookup%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_ial, WNPS, WNDS);
+--
+--   Function to get using IAL_PK constraint (without start date for Datetrack View)
+--
+FUNCTION get_ial (pi_ial_domain        nm_inv_attri_lookup.ial_domain%TYPE
+                 ,pi_ial_value         nm_inv_attri_lookup.ial_value%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_inv_attri_lookup%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_ial, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_ial_all">
+--
+--   Function to get using IAL_PK constraint
+--
+FUNCTION get_ial_all (pi_ial_domain        nm_inv_attri_lookup_all.ial_domain%TYPE
+                     ,pi_ial_value         nm_inv_attri_lookup_all.ial_value%TYPE
+                     ,pi_ial_start_date    nm_inv_attri_lookup_all.ial_start_date%TYPE
+                     ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                     ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                     ) RETURN nm_inv_attri_lookup_all%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_ial_all, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nic">
+--
+--   Function to get using NIC_PK constraint
+--
+FUNCTION get_nic (pi_nic_category      nm_inv_categories.nic_category%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_inv_categories%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nic, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_icm">
+--
+--   Function to get using ICM_PK constraint
+--
+FUNCTION get_icm (pi_icm_nic_category  nm_inv_category_modules.icm_nic_category%TYPE
+                 ,pi_icm_hmo_module    nm_inv_category_modules.icm_hmo_module%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_inv_category_modules%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_icm, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_id">
+--
+--   Function to get using ID_PK constraint
+--
+FUNCTION get_id (pi_id_domain         nm_inv_domains.id_domain%TYPE
+                ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                ) RETURN nm_inv_domains%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_id, WNPS, WNDS);
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_id_all">
+--
+--   Function to get using ID_PK constraint
+--
+FUNCTION get_id_all (pi_id_domain         nm_inv_domains_all.id_domain%TYPE
+                    ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                    ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                    ) RETURN nm_inv_domains_all%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_id_all, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_iit">
+--
+--   Function to get using INV_ITEMS_ALL_PK constraint
+--
+FUNCTION get_iit (pi_iit_ne_id         nm_inv_items.iit_ne_id%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_inv_items%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_iit, WNPS, WNDS);
+--
+--   Function to get using IIT_UK constraint
+--
+FUNCTION get_iit (pi_iit_primary_key   nm_inv_items.iit_primary_key%TYPE
+                 ,pi_iit_inv_type      nm_inv_items.iit_inv_type%TYPE
+                 ,pi_iit_start_date    nm_inv_items.iit_start_date%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_inv_items%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_iit, WNPS, WNDS);
+--
+--   Function to get using IIT_UK constraint (without start date for Datetrack View)
+--
+FUNCTION get_iit (pi_iit_primary_key   nm_inv_items.iit_primary_key%TYPE
+                 ,pi_iit_inv_type      nm_inv_items.iit_inv_type%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_inv_items%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_iit, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_iit_all">
+--
+--   Function to get using INV_ITEMS_ALL_PK constraint
+--
+FUNCTION get_iit_all (pi_iit_ne_id         nm_inv_items_all.iit_ne_id%TYPE
+                     ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                     ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                     ) RETURN nm_inv_items_all%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_iit_all, WNPS, WNDS);
+--
+--   Function to get using IIT_UK constraint
+--
+FUNCTION get_iit_all (pi_iit_primary_key   nm_inv_items_all.iit_primary_key%TYPE
+                     ,pi_iit_inv_type      nm_inv_items_all.iit_inv_type%TYPE
+                     ,pi_iit_start_date    nm_inv_items_all.iit_start_date%TYPE
+                     ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                     ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                     ) RETURN nm_inv_items_all%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_iit_all, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_iig">
+--
+--   Function to get using IIG_PK constraint
+--
+FUNCTION get_iig (pi_iig_item_id       nm_inv_item_groupings.iig_item_id%TYPE
+                 ,pi_iig_parent_id     nm_inv_item_groupings.iig_parent_id%TYPE
+                 ,pi_iig_start_date    nm_inv_item_groupings.iig_start_date%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_inv_item_groupings%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_iig, WNPS, WNDS);
+--
+--   Function to get using IIG_PK constraint (without start date for Datetrack View)
+--
+FUNCTION get_iig (pi_iig_item_id       nm_inv_item_groupings.iig_item_id%TYPE
+                 ,pi_iig_parent_id     nm_inv_item_groupings.iig_parent_id%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_inv_item_groupings%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_iig, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_iig_all">
+--
+--   Function to get using IIG_PK constraint
+--
+FUNCTION get_iig_all (pi_iig_item_id       nm_inv_item_groupings_all.iig_item_id%TYPE
+                     ,pi_iig_parent_id     nm_inv_item_groupings_all.iig_parent_id%TYPE
+                     ,pi_iig_start_date    nm_inv_item_groupings_all.iig_start_date%TYPE
+                     ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                     ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                     ) RETURN nm_inv_item_groupings_all%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_iig_all, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nin">
+--
+--   Function to get using NIN_PK constraint
+--
+FUNCTION get_nin (pi_nin_nit_inv_code  nm_inv_nw.nin_nit_inv_code%TYPE
+                 ,pi_nin_nw_type       nm_inv_nw.nin_nw_type%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_inv_nw%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nin, WNPS, WNDS);
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nin_all">
+--
+--   Function to get using NIN_PK constraint
+--
+FUNCTION get_nin_all (pi_nin_nit_inv_code  nm_inv_nw_all.nin_nit_inv_code%TYPE
+                     ,pi_nin_nw_type       nm_inv_nw_all.nin_nw_type%TYPE
+                     ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                     ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                     ) RETURN nm_inv_nw_all%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nin_all, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nith">
+--
+--   Function to get using NITH_PK constraint
+--
+FUNCTION get_nith (pi_nith_nth_theme_id nm_inv_themes.nith_nth_theme_id%TYPE
+                  ,pi_nith_nit_id       nm_inv_themes.nith_nit_id%TYPE
+                  ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                  ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                  ) RETURN nm_inv_themes%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nith, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nit">
+--
+--   Function to get using ITY_PK constraint
+--
+FUNCTION get_nit (pi_nit_inv_type      nm_inv_types.nit_inv_type%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_inv_types%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nit, WNPS, WNDS);
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nit_all">
+--
+--   Function to get using ITY_PK constraint
+--
+FUNCTION get_nit_all (pi_nit_inv_type      nm_inv_types_all.nit_inv_type%TYPE
+                     ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                     ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                     ) RETURN nm_inv_types_all%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nit_all, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_ita">
+--
+--   Function to get using ITA_PK constraint
+--
+FUNCTION get_ita (pi_ita_inv_type      nm_inv_type_attribs.ita_inv_type%TYPE
+                 ,pi_ita_attrib_name   nm_inv_type_attribs.ita_attrib_name%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_inv_type_attribs%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_ita, WNPS, WNDS);
+--
+--   Function to get using ITA_UK_VIEW_COL constraint
+--
+FUNCTION get_ita (pi_ita_inv_type      nm_inv_type_attribs.ita_inv_type%TYPE
+                 ,pi_ita_view_col_name nm_inv_type_attribs.ita_view_col_name%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_inv_type_attribs%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_ita, WNPS, WNDS);
+--
+--   Function to get using ITA_UK_VIEW_ATTRI constraint
+--
+FUNCTION get_ita (pi_ita_inv_type      nm_inv_type_attribs.ita_inv_type%TYPE
+                 ,pi_ita_view_attri    nm_inv_type_attribs.ita_view_attri%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_inv_type_attribs%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_ita, WNPS, WNDS);
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_ita_all">
+--
+--   Function to get using ITA_PK constraint
+--
+FUNCTION get_ita_all (pi_ita_inv_type      nm_inv_type_attribs_all.ita_inv_type%TYPE
+                     ,pi_ita_attrib_name   nm_inv_type_attribs_all.ita_attrib_name%TYPE
+                     ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                     ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                     ) RETURN nm_inv_type_attribs_all%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_ita_all, WNPS, WNDS);
+--
+--   Function to get using ITA_UK_VIEW_COL constraint
+--
+FUNCTION get_ita_all (pi_ita_inv_type      nm_inv_type_attribs_all.ita_inv_type%TYPE
+                     ,pi_ita_view_col_name nm_inv_type_attribs_all.ita_view_col_name%TYPE
+                     ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                     ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                     ) RETURN nm_inv_type_attribs_all%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_ita_all, WNPS, WNDS);
+--
+--   Function to get using ITA_UK_VIEW_ATTRI constraint
+--
+FUNCTION get_ita_all (pi_ita_inv_type      nm_inv_type_attribs_all.ita_inv_type%TYPE
+                     ,pi_ita_view_attri    nm_inv_type_attribs_all.ita_view_attri%TYPE
+                     ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                     ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                     ) RETURN nm_inv_type_attribs_all%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_ita_all, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_itb">
+--
+--   Function to get using ITB_PK constraint
+--
+FUNCTION get_itb (pi_itb_inv_type      nm_inv_type_attrib_bandings.itb_inv_type%TYPE
+                 ,pi_itb_attrib_name   nm_inv_type_attrib_bandings.itb_attrib_name%TYPE
+                 ,pi_itb_banding_id    nm_inv_type_attrib_bandings.itb_banding_id%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_inv_type_attrib_bandings%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_itb, WNPS, WNDS);
+--
+--   Function to get using ITB_UK constraint
+--
+FUNCTION get_itb (pi_itb_banding_id    nm_inv_type_attrib_bandings.itb_banding_id%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_inv_type_attrib_bandings%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_itb, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_itd">
+--
+--   Function to get using ITD_PK constraint
+--
+FUNCTION get_itd (pi_itd_band_seq       nm_inv_type_attrib_band_dets.itd_band_seq%TYPE
+                 ,pi_itd_inv_type       nm_inv_type_attrib_band_dets.itd_inv_type%TYPE
+                 ,pi_itd_attrib_name    nm_inv_type_attrib_band_dets.itd_attrib_name%TYPE
+                 ,pi_itd_itb_banding_id nm_inv_type_attrib_band_dets.itd_itb_banding_id%TYPE
+                 ,pi_raise_not_found    BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode  PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_inv_type_attrib_band_dets%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_itd, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nias">
+--
+--   Function to get using NIAS_PK constraint
+--
+FUNCTION get_nias (pi_nias_id           nm_inv_attribute_sets.nias_id%TYPE
+                  ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                  ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                  ) RETURN nm_inv_attribute_sets%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nias, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nsit">
+--
+--   Function to get using NSIT_PK constraint
+--
+FUNCTION get_nsit (pi_nsit_nias_id      nm_inv_attribute_set_inv_types.nsit_nias_id%TYPE
+                  ,pi_nsit_nit_inv_type nm_inv_attribute_set_inv_types.nsit_nit_inv_type%TYPE
+                  ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                  ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                  ) RETURN nm_inv_attribute_set_inv_types%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nsit, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nsia">
+--
+--   Function to get using NSIA_PK constraint
+--
+FUNCTION get_nsia (pi_nsia_nsit_nit_inv_type nm_inv_attribute_set_inv_attr.nsia_nsit_nit_inv_type%TYPE
+                  ,pi_nsia_ita_attrib_name   nm_inv_attribute_set_inv_attr.nsia_ita_attrib_name%TYPE
+                  ,pi_nsia_nsit_nias_id      nm_inv_attribute_set_inv_attr.nsia_nsit_nias_id%TYPE
+                  ,pi_raise_not_found        BOOLEAN     DEFAULT TRUE
+                  ,pi_not_found_sqlcode      PLS_INTEGER DEFAULT -20000
+                  ) RETURN nm_inv_attribute_set_inv_attr%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nsia, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nitc">
+--
+--   Function to get using NM_INV_TYPE_COLOURS_PK constraint
+--
+FUNCTION get_nitc (pi_col_id            nm_inv_type_colours.col_id%TYPE
+                  ,pi_ity_inv_code      nm_inv_type_colours.ity_inv_code%TYPE
+                  ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                  ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                  ) RETURN nm_inv_type_colours%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nitc, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_itg">
+--
+--   Function to get using ITG_PK constraint
+--
+FUNCTION get_itg (pi_itg_inv_type        nm_inv_type_groupings.itg_inv_type%TYPE
+                 ,pi_itg_parent_inv_type nm_inv_type_groupings.itg_parent_inv_type%TYPE
+                 ,pi_itg_start_date      nm_inv_type_groupings.itg_start_date%TYPE
+                 ,pi_raise_not_found     BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode   PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_inv_type_groupings%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_itg, WNPS, WNDS);
+--
+--   Function to get using ITG_PK constraint (without start date for Datetrack View)
+--
+FUNCTION get_itg (pi_itg_inv_type        nm_inv_type_groupings.itg_inv_type%TYPE
+                 ,pi_itg_parent_inv_type nm_inv_type_groupings.itg_parent_inv_type%TYPE
+                 ,pi_raise_not_found     BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode   PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_inv_type_groupings%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_itg, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_itg_all">
+--
+--   Function to get using ITG_PK constraint
+--
+FUNCTION get_itg_all (pi_itg_inv_type        nm_inv_type_groupings_all.itg_inv_type%TYPE
+                     ,pi_itg_parent_inv_type nm_inv_type_groupings_all.itg_parent_inv_type%TYPE
+                     ,pi_itg_start_date      nm_inv_type_groupings_all.itg_start_date%TYPE
+                     ,pi_raise_not_found     BOOLEAN     DEFAULT TRUE
+                     ,pi_not_found_sqlcode   PLS_INTEGER DEFAULT -20000
+                     ) RETURN nm_inv_type_groupings_all%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_itg_all, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_itr">
+--
+--   Function to get using ITR_PK constraint
+--
+FUNCTION get_itr (pi_itr_inv_type      nm_inv_type_roles.itr_inv_type%TYPE
+                 ,pi_itr_hro_role      nm_inv_type_roles.itr_hro_role%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_inv_type_roles%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_itr, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_njc">
+--
+--   Function to get using NJC_PK constraint
+--
+FUNCTION get_njc (pi_njc_job_id        nm_job_control.njc_job_id%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_job_control%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_njc, WNPS, WNDS);
+--
+--   Function to get using NM_JOB_CONTROL_UK constraint
+--
+FUNCTION get_njc (pi_njc_unique        nm_job_control.njc_unique%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_job_control%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_njc, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_njo">
+--
+--   Function to get using NJO_PK constraint
+--
+FUNCTION get_njo (pi_njo_njc_job_id    nm_job_operations.njo_njc_job_id%TYPE
+                 ,pi_njo_id            nm_job_operations.njo_id%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_job_operations%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_njo, WNPS, WNDS);
+--
+--   Function to get using NJO_UK constraint
+--
+FUNCTION get_njo (pi_njo_njc_job_id    nm_job_operations.njo_njc_job_id%TYPE
+                 ,pi_njo_seq           nm_job_operations.njo_seq%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_job_operations%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_njo, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_njv">
+--
+--   Function to get using NJV_PK constraint
+--
+FUNCTION get_njv (pi_njv_njc_job_id    nm_job_operation_data_values.njv_njc_job_id%TYPE
+                 ,pi_njv_njo_id        nm_job_operation_data_values.njv_njo_id%TYPE
+                 ,pi_njv_nod_data_item nm_job_operation_data_values.njv_nod_data_item%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_job_operation_data_values%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_njv, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_njt">
+--
+--   Function to get using NJT_PK constraint
+--
+FUNCTION get_njt (pi_njt_type          nm_job_types.njt_type%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_job_types%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_njt, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_jto">
+--
+--   Function to get using JTO_PK constraint
+--
+FUNCTION get_jto (pi_jto_nmo_operation nm_job_types_operations.jto_nmo_operation%TYPE
+                 ,pi_jto_njt_type      nm_job_types_operations.jto_njt_type%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_job_types_operations%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_jto, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nlm">
+--
+--   Function to get using NM_LD_MC_ALL_INV_TMP_PK constraint
+--
+FUNCTION get_nlm (pi_batch_no          nm_ld_mc_all_inv_tmp.batch_no%TYPE
+                 ,pi_record_no         nm_ld_mc_all_inv_tmp.record_no%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_ld_mc_all_inv_tmp%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nlm, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nlt">
+--
+--   Function to get using NLT_PK constraint
+--
+FUNCTION get_nlt (pi_nlt_id            nm_linear_types.nlt_id%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_linear_types%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nlt, WNPS, WNDS);
+--
+--   Function to get using NLT_UK constraint
+--
+FUNCTION get_nlt (pi_nlt_nt_type       nm_linear_types.nlt_nt_type%TYPE
+                 ,pi_nlt_gty_type      nm_linear_types.nlt_gty_type%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_linear_types%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nlt, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nlb">
+--
+--   Function to get using NLB_PK constraint
+--
+FUNCTION get_nlb (pi_nlb_batch_no      nm_load_batches.nlb_batch_no%TYPE
+                 ,pi_nlb_filename      nm_load_batches.nlb_filename%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_load_batches%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nlb, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nlbs">
+--
+--   Function to get using NLBS_PK constraint
+--
+FUNCTION get_nlbs (pi_nlbs_nlb_batch_no nm_load_batch_status.nlbs_nlb_batch_no%TYPE
+                  ,pi_nlbs_record_no    nm_load_batch_status.nlbs_record_no%TYPE
+                  ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                  ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                  ) RETURN nm_load_batch_status%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nlbs, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nld">
+--
+--   Function to get using NLD_PK constraint
+--
+FUNCTION get_nld (pi_nld_id            nm_load_destinations.nld_id%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_load_destinations%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nld, WNPS, WNDS);
+--
+--   Function to get using NLD_UK2 constraint
+--
+FUNCTION get_nld (pi_nld_table_short_name nm_load_destinations.nld_table_short_name%TYPE
+                 ,pi_raise_not_found      BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode    PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_load_destinations%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nld, WNPS, WNDS);
+--
+--   Function to get using NLD_UK1 constraint
+--
+FUNCTION get_nld (pi_nld_table_name    nm_load_destinations.nld_table_name%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_load_destinations%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nld, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nldd">
+--
+--   Function to get using NLDD_PK constraint
+--
+FUNCTION get_nldd (pi_nldd_nld_id       nm_load_destination_defaults.nldd_nld_id%TYPE
+                  ,pi_nldd_column_name  nm_load_destination_defaults.nldd_column_name%TYPE
+                  ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                  ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                  ) RETURN nm_load_destination_defaults%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nldd, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nlf">
+--
+--   Function to get using NLF_PK constraint
+--
+FUNCTION get_nlf (pi_nlf_id            nm_load_files.nlf_id%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_load_files%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nlf, WNPS, WNDS);
+--
+--   Function to get using NLF_UK constraint
+--
+FUNCTION get_nlf (pi_nlf_unique        nm_load_files.nlf_unique%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_load_files%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nlf, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nlfc">
+--
+--   Function to get using NLFC_PK constraint
+--
+FUNCTION get_nlfc (pi_nlfc_nlf_id       nm_load_file_cols.nlfc_nlf_id%TYPE
+                  ,pi_nlfc_seq_no       nm_load_file_cols.nlfc_seq_no%TYPE
+                  ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                  ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                  ) RETURN nm_load_file_cols%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nlfc, WNPS, WNDS);
+--
+--   Function to get using NLFC_UK constraint
+--
+FUNCTION get_nlfc (pi_nlfc_nlf_id       nm_load_file_cols.nlfc_nlf_id%TYPE
+                  ,pi_nlfc_holding_col  nm_load_file_cols.nlfc_holding_col%TYPE
+                  ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                  ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                  ) RETURN nm_load_file_cols%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nlfc, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nlcd">
+--
+--   Function to get using NLCD_PK constraint
+--
+FUNCTION get_nlcd (pi_nlcd_nlf_id       nm_load_file_col_destinations.nlcd_nlf_id%TYPE
+                  ,pi_nlcd_nld_id       nm_load_file_col_destinations.nlcd_nld_id%TYPE
+                  ,pi_nlcd_seq_no       nm_load_file_col_destinations.nlcd_seq_no%TYPE
+                  ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                  ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                  ) RETURN nm_load_file_col_destinations%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nlcd, WNPS, WNDS);
+--
+--   Function to get using NLCD_UK constraint
+--
+FUNCTION get_nlcd (pi_nlcd_nlf_id       nm_load_file_col_destinations.nlcd_nlf_id%TYPE
+                  ,pi_nlcd_nld_id       nm_load_file_col_destinations.nlcd_nld_id%TYPE
+                  ,pi_nlcd_dest_col     nm_load_file_col_destinations.nlcd_dest_col%TYPE
+                  ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                  ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                  ) RETURN nm_load_file_col_destinations%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nlcd, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nlfd">
+--
+--   Function to get using NLFD_PK constraint
+--
+FUNCTION get_nlfd (pi_nlfd_nlf_id       nm_load_file_destinations.nlfd_nlf_id%TYPE
+                  ,pi_nlfd_nld_id       nm_load_file_destinations.nlfd_nld_id%TYPE
+                  ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                  ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                  ) RETURN nm_load_file_destinations%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nlfd, WNPS, WNDS);
+--
+--   Function to get using NLFD_UK constraint
+--
+FUNCTION get_nlfd (pi_nlfd_nlf_id       nm_load_file_destinations.nlfd_nlf_id%TYPE
+                  ,pi_nlfd_seq          nm_load_file_destinations.nlfd_seq%TYPE
+                  ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                  ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                  ) RETURN nm_load_file_destinations%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nlfd, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nmg">
+--
+--   Function to get using NMG_PK constraint
+--
+FUNCTION get_nmg (pi_nmg_id            nm_mail_groups.nmg_id%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_mail_groups%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nmg, WNPS, WNDS);
+--
+--   Function to get using NMG_UK constraint
+--
+FUNCTION get_nmg (pi_nmg_name          nm_mail_groups.nmg_name%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_mail_groups%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nmg, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nmgm">
+--
+--   Function to get using NMGM_PK constraint
+--
+FUNCTION get_nmgm (pi_nmgm_nmg_id       nm_mail_group_membership.nmgm_nmg_id%TYPE
+                  ,pi_nmgm_nmu_id       nm_mail_group_membership.nmgm_nmu_id%TYPE
+                  ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                  ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                  ) RETURN nm_mail_group_membership%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nmgm, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nmm">
+--
+--   Function to get using NMM_PK constraint
+--
+FUNCTION get_nmm (pi_nmm_id            nm_mail_message.nmm_id%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_mail_message%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nmm, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nmmr">
+--
+--   Function to get using NMMR_PK constraint
+--
+FUNCTION get_nmmr (pi_nmmr_nmm_id       nm_mail_message_recipients.nmmr_nmm_id%TYPE
+                  ,pi_nmmr_rcpt_id      nm_mail_message_recipients.nmmr_rcpt_id%TYPE
+                  ,pi_nmmr_rcpt_type    nm_mail_message_recipients.nmmr_rcpt_type%TYPE
+                  ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                  ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                  ) RETURN nm_mail_message_recipients%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nmmr, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nmmt">
+--
+--   Function to get using NMMT_PK constraint
+--
+FUNCTION get_nmmt (pi_nmmt_nmm_id       nm_mail_message_text.nmmt_nmm_id%TYPE
+                  ,pi_nmmt_line_id      nm_mail_message_text.nmmt_line_id%TYPE
+                  ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                  ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                  ) RETURN nm_mail_message_text%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nmmt, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nmu">
+--
+--   Function to get using NMU_PK constraint
+--
+FUNCTION get_nmu (pi_nmu_id            nm_mail_users.nmu_id%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_mail_users%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nmu, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nm">
+--
+--   Function to get using NM_PK constraint
+--
+FUNCTION get_nm (pi_nm_ne_id_in       nm_members.nm_ne_id_in%TYPE
+                ,pi_nm_ne_id_of       nm_members.nm_ne_id_of%TYPE
+                ,pi_nm_begin_mp       nm_members.nm_begin_mp%TYPE
+                ,pi_nm_start_date     nm_members.nm_start_date%TYPE
+                ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                ) RETURN nm_members%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nm, WNPS, WNDS);
+--
+--   Function to get using NM_PK constraint (without start date for Datetrack View)
+--
+FUNCTION get_nm (pi_nm_ne_id_in       nm_members.nm_ne_id_in%TYPE
+                ,pi_nm_ne_id_of       nm_members.nm_ne_id_of%TYPE
+                ,pi_nm_begin_mp       nm_members.nm_begin_mp%TYPE
+                ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                ) RETURN nm_members%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nm, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nm_all">
+--
+--   Function to get using NM_PK constraint
+--
+FUNCTION get_nm_all (pi_nm_ne_id_in       nm_members_all.nm_ne_id_in%TYPE
+                    ,pi_nm_ne_id_of       nm_members_all.nm_ne_id_of%TYPE
+                    ,pi_nm_begin_mp       nm_members_all.nm_begin_mp%TYPE
+                    ,pi_nm_start_date     nm_members_all.nm_start_date%TYPE
+                    ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                    ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                    ) RETURN nm_members_all%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nm_all, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nmh">
+--
+--   Function to get using NMH_PK constraint
+--
+FUNCTION get_nmh (pi_nmh_nm_begin_mp     nm_member_history.nmh_nm_begin_mp%TYPE
+                 ,pi_nmh_nm_start_date   nm_member_history.nmh_nm_start_date%TYPE
+                 ,pi_nmh_nm_ne_id_in     nm_member_history.nmh_nm_ne_id_in%TYPE
+                 ,pi_nmh_nm_ne_id_of_old nm_member_history.nmh_nm_ne_id_of_old%TYPE
+                 ,pi_nmh_nm_ne_id_of_new nm_member_history.nmh_nm_ne_id_of_new%TYPE
+                 ,pi_raise_not_found     BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode   PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_member_history%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nmh, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nda">
+--
+--   Function to get using NDQA_PK constraint
+--
+FUNCTION get_nda (pi_nda_seq_no        nm_mrg_default_query_attribs.nda_seq_no%TYPE
+                 ,pi_nda_attrib_name   nm_mrg_default_query_attribs.nda_attrib_name%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_mrg_default_query_attribs%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nda, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_ndq">
+--
+--   Function to get using NDQT_PK constraint
+--
+FUNCTION get_ndq (pi_ndq_seq_no        nm_mrg_default_query_types.ndq_seq_no%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_mrg_default_query_types%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_ndq, WNPS, WNDS);
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_ndq_all">
+--
+--   Function to get using NDQT_PK constraint
+--
+FUNCTION get_ndq_all (pi_ndq_seq_no        nm_mrg_default_query_types_all.ndq_seq_no%TYPE
+                     ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                     ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                     ) RETURN nm_mrg_default_query_types_all%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_ndq_all, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nmid">
+--
+--   Function to get using NMID_PK constraint
+--
+FUNCTION get_nmid (pi_nmid_nmq_id       nm_mrg_inv_derivation.nmid_nmq_id%TYPE
+                  ,pi_nmid_inv_type     nm_mrg_inv_derivation.nmid_inv_type%TYPE
+                  ,pi_nmid_attrib_name  nm_mrg_inv_derivation.nmid_attrib_name%TYPE
+                  ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                  ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                  ) RETURN nm_mrg_inv_derivation%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nmid, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nmc">
+--
+--   Function to get using NMC_PK constraint
+--
+FUNCTION get_nmc (pi_nmc_nmf_id        nm_mrg_output_cols.nmc_nmf_id%TYPE
+                 ,pi_nmc_seq_no        nm_mrg_output_cols.nmc_seq_no%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_mrg_output_cols%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nmc, WNPS, WNDS);
+--
+--   Function to get using NMC_UK constraint
+--
+FUNCTION get_nmc (pi_nmc_nmf_id        nm_mrg_output_cols.nmc_nmf_id%TYPE
+                 ,pi_nmc_view_col_name nm_mrg_output_cols.nmc_view_col_name%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_mrg_output_cols%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nmc, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nmcd">
+--
+--   Function to get using NMCD_PK constraint
+--
+FUNCTION get_nmcd (pi_nmcd_nmf_id       nm_mrg_output_col_decode.nmcd_nmf_id%TYPE
+                  ,pi_nmcd_nmc_seq_no   nm_mrg_output_col_decode.nmcd_nmc_seq_no%TYPE
+                  ,pi_nmcd_from_value   nm_mrg_output_col_decode.nmcd_from_value%TYPE
+                  ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                  ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                  ) RETURN nm_mrg_output_col_decode%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nmcd, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nmf">
+--
+--   Function to get using NMF_PK constraint
+--
+FUNCTION get_nmf (pi_nmf_id            nm_mrg_output_file.nmf_id%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_mrg_output_file%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nmf, WNPS, WNDS);
+--
+--   Function to get using NMF_UK constraint
+--
+FUNCTION get_nmf (pi_nmf_nmq_id        nm_mrg_output_file.nmf_nmq_id%TYPE
+                 ,pi_nmf_filename      nm_mrg_output_file.nmf_filename%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_mrg_output_file%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nmf, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nmq">
+--
+--   Function to get using NMQ_PK constraint
+--
+FUNCTION get_nmq (pi_nmq_id            nm_mrg_query.nmq_id%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_mrg_query%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nmq, WNPS, WNDS);
+--
+--   Function to get using NMQ_UK constraint
+--
+FUNCTION get_nmq (pi_nmq_unique        nm_mrg_query.nmq_unique%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_mrg_query%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nmq, WNPS, WNDS);
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nmq_all">
+--
+--   Function to get using NMQ_PK constraint
+--
+FUNCTION get_nmq_all (pi_nmq_id            nm_mrg_query_all.nmq_id%TYPE
+                     ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                     ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                     ) RETURN nm_mrg_query_all%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nmq_all, WNPS, WNDS);
+--
+--   Function to get using NMQ_UK constraint
+--
+FUNCTION get_nmq_all (pi_nmq_unique        nm_mrg_query_all.nmq_unique%TYPE
+                     ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                     ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                     ) RETURN nm_mrg_query_all%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nmq_all, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nmqa">
+--
+--   Function to get using NMQA_PK constraint
+--
+FUNCTION get_nmqa (pi_nqa_nmq_id        nm_mrg_query_attribs.nqa_nmq_id%TYPE
+                  ,pi_nqa_nqt_seq_no    nm_mrg_query_attribs.nqa_nqt_seq_no%TYPE
+                  ,pi_nqa_attrib_name   nm_mrg_query_attribs.nqa_attrib_name%TYPE
+                  ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                  ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                  ) RETURN nm_mrg_query_attribs%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nmqa, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nmqr">
+--
+--   Function to get using NMQR_PK constraint
+--
+FUNCTION get_nmqr (pi_nqr_mrg_job_id    nm_mrg_query_results.nqr_mrg_job_id%TYPE
+                  ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                  ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                  ) RETURN nm_mrg_query_results%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nmqr, WNPS, WNDS);
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nmqr_all">
+--
+--   Function to get using NMQR_PK constraint
+--
+FUNCTION get_nmqr_all (pi_nqr_mrg_job_id    nm_mrg_query_results_all.nqr_mrg_job_id%TYPE
+                      ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                      ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                      ) RETURN nm_mrg_query_results_all%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nmqr_all, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nqro">
+--
+--   Function to get using NQRO_PK constraint
+--
+FUNCTION get_nqro (pi_nqro_nmq_id       nm_mrg_query_roles.nqro_nmq_id%TYPE
+                  ,pi_nqro_role         nm_mrg_query_roles.nqro_role%TYPE
+                  ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                  ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                  ) RETURN nm_mrg_query_roles%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nqro, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nmqt">
+--
+--   Function to get using NMQT_PK constraint
+--
+FUNCTION get_nmqt (pi_nqt_nmq_id        nm_mrg_query_types.nqt_nmq_id%TYPE
+                  ,pi_nqt_seq_no        nm_mrg_query_types.nqt_seq_no%TYPE
+                  ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                  ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                  ) RETURN nm_mrg_query_types%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nmqt, WNPS, WNDS);
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nmqt_all">
+--
+--   Function to get using NMQT_PK constraint
+--
+FUNCTION get_nmqt_all (pi_nqt_nmq_id        nm_mrg_query_types_all.nqt_nmq_id%TYPE
+                      ,pi_nqt_seq_no        nm_mrg_query_types_all.nqt_seq_no%TYPE
+                      ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                      ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                      ) RETURN nm_mrg_query_types_all%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nmqt_all, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nmqv">
+--
+--   Function to get using NMQV_PK constraint
+--
+FUNCTION get_nmqv (pi_nqv_nqt_seq_no    nm_mrg_query_values.nqv_nqt_seq_no%TYPE
+                  ,pi_nqv_attrib_name   nm_mrg_query_values.nqv_attrib_name%TYPE
+                  ,pi_nqv_sequence      nm_mrg_query_values.nqv_sequence%TYPE
+                  ,pi_nqv_nmq_id        nm_mrg_query_values.nqv_nmq_id%TYPE
+                  ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                  ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                  ) RETURN nm_mrg_query_values%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nmqv, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nms">
+--
+--   Function to get using NMS_PK constraint
+--
+FUNCTION get_nms (pi_nms_mrg_job_id     nm_mrg_sections.nms_mrg_job_id%TYPE
+                 ,pi_nms_mrg_section_id nm_mrg_sections.nms_mrg_section_id%TYPE
+                 ,pi_raise_not_found    BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode  PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_mrg_sections%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nms, WNPS, WNDS);
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nms_all">
+--
+--   Function to get using NMS_PK constraint
+--
+FUNCTION get_nms_all (pi_nms_mrg_job_id     nm_mrg_sections_all.nms_mrg_job_id%TYPE
+                     ,pi_nms_mrg_section_id nm_mrg_sections_all.nms_mrg_section_id%TYPE
+                     ,pi_raise_not_found    BOOLEAN     DEFAULT TRUE
+                     ,pi_not_found_sqlcode  PLS_INTEGER DEFAULT -20000
+                     ) RETURN nm_mrg_sections_all%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nms_all, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nsv">
+--
+--   Function to get using NMSIV_PK constraint
+--
+FUNCTION get_nsv (pi_nsv_mrg_job_id    nm_mrg_section_inv_values.nsv_mrg_job_id%TYPE
+                 ,pi_nsv_value_id      nm_mrg_section_inv_values.nsv_value_id%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_mrg_section_inv_values%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nsv, WNPS, WNDS);
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nsv_all">
+--
+--   Function to get using NMSIV_PK constraint
+--
+FUNCTION get_nsv_all (pi_nsv_mrg_job_id    nm_mrg_section_inv_values_all.nsv_mrg_job_id%TYPE
+                     ,pi_nsv_value_id      nm_mrg_section_inv_values_all.nsv_value_id%TYPE
+                     ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                     ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                     ) RETURN nm_mrg_section_inv_values_all%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nsv_all, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nmsm">
+--
+--   Function to get using NMSM_PK constraint
+--
+FUNCTION get_nmsm (pi_nsm_mrg_job_id     nm_mrg_section_members.nsm_mrg_job_id%TYPE
+                  ,pi_nsm_mrg_section_id nm_mrg_section_members.nsm_mrg_section_id%TYPE
+                  ,pi_nsm_ne_id          nm_mrg_section_members.nsm_ne_id%TYPE
+                  ,pi_nsm_begin_mp       nm_mrg_section_members.nsm_begin_mp%TYPE
+                  ,pi_nsm_end_mp         nm_mrg_section_members.nsm_end_mp%TYPE
+                  ,pi_raise_not_found    BOOLEAN     DEFAULT TRUE
+                  ,pi_not_found_sqlcode  PLS_INTEGER DEFAULT -20000
+                  ) RETURN nm_mrg_section_members%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nmsm, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_no">
+--
+--   Function to get using NN_PK constraint
+--
+FUNCTION get_no (pi_no_node_id        nm_nodes.no_node_id%TYPE
+                ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                ) RETURN nm_nodes%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_no, WNPS, WNDS);
+--
+--   Function to get using NN_UK constraint
+--
+FUNCTION get_no (pi_no_node_name      nm_nodes.no_node_name%TYPE
+                ,pi_no_node_type      nm_nodes.no_node_type%TYPE
+                ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                ) RETURN nm_nodes%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_no, WNPS, WNDS);
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_no_all">
+--
+--   Function to get using NN_PK constraint
+--
+FUNCTION get_no_all (pi_no_node_id        nm_nodes_all.no_node_id%TYPE
+                    ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                    ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                    ) RETURN nm_nodes_all%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_no_all, WNPS, WNDS);
+--
+--   Function to get using NN_UK constraint
+--
+FUNCTION get_no_all (pi_no_node_name      nm_nodes_all.no_node_name%TYPE
+                    ,pi_no_node_type      nm_nodes_all.no_node_type%TYPE
+                    ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                    ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                    ) RETURN nm_nodes_all%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_no_all, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nnt">
+--
+--   Function to get using NNT_PK constraint
+--
+FUNCTION get_nnt (pi_nnt_type          nm_node_types.nnt_type%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_node_types%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nnt, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nnu">
+--
+--   Function to get using NNU_PK constraint
+--
+FUNCTION get_nnu (pi_nnu_ne_id         nm_node_usages.nnu_ne_id%TYPE
+                 ,pi_nnu_chain         nm_node_usages.nnu_chain%TYPE
+                 ,pi_nnu_no_node_id    nm_node_usages.nnu_no_node_id%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_node_usages%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nnu, WNPS, WNDS);
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nnu_all">
+--
+--   Function to get using NNU_PK constraint
+--
+FUNCTION get_nnu_all (pi_nnu_ne_id         nm_node_usages_all.nnu_ne_id%TYPE
+                     ,pi_nnu_chain         nm_node_usages_all.nnu_chain%TYPE
+                     ,pi_nnu_no_node_id    nm_node_usages_all.nnu_no_node_id%TYPE
+                     ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                     ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                     ) RETURN nm_node_usages_all%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nnu_all, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nng">
+--
+--   Function to get using NNG_PK constraint
+--
+FUNCTION get_nng (pi_nng_group_type    nm_nt_groupings.nng_group_type%TYPE
+                 ,pi_nng_nt_type       nm_nt_groupings.nng_nt_type%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_nt_groupings%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nng, WNPS, WNDS);
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nng_all">
+--
+--   Function to get using NNG_PK constraint
+--
+FUNCTION get_nng_all (pi_nng_group_type    nm_nt_groupings_all.nng_group_type%TYPE
+                     ,pi_nng_nt_type       nm_nt_groupings_all.nng_nt_type%TYPE
+                     ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                     ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                     ) RETURN nm_nt_groupings_all%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nng_all, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nad">
+--
+--   Function to get using NAD_ID_PK constraint
+--
+FUNCTION get_nad (pi_nad_id            nm_nw_ad_types.nad_id%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_nw_ad_types%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nad, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_npe">
+--
+--   Function to get using NPE_PK constraint
+--
+FUNCTION get_npe (pi_npe_job_id        nm_nw_persistent_extents.npe_job_id%TYPE
+                 ,pi_npe_ne_id_of      nm_nw_persistent_extents.npe_ne_id_of%TYPE
+                 ,pi_npe_begin_mp      nm_nw_persistent_extents.npe_begin_mp%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_nw_persistent_extents%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_npe, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nnth">
+--
+--   Function to get using NNTH_PK constraint
+--
+FUNCTION get_nnth (pi_nnth_nlt_id       nm_nw_themes.nnth_nlt_id%TYPE
+                  ,pi_nnth_nth_theme_id nm_nw_themes.nnth_nth_theme_id%TYPE
+                  ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                  ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                  ) RETURN nm_nw_themes%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nnth, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nmo">
+--
+--   Function to get using NMO_PK constraint
+--
+FUNCTION get_nmo (pi_nmo_operation     nm_operations.nmo_operation%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_operations%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nmo, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nod">
+--
+--   Function to get using NOD_PK constraint
+--
+FUNCTION get_nod (pi_nod_nmo_operation nm_operation_data.nod_nmo_operation%TYPE
+                 ,pi_nod_data_item     nm_operation_data.nod_data_item%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_operation_data%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nod, WNPS, WNDS);
+--
+--   Function to get using NOD_UK constraint
+--
+FUNCTION get_nod (pi_nod_nmo_operation nm_operation_data.nod_nmo_operation%TYPE
+                 ,pi_nod_seq           nm_operation_data.nod_seq%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_operation_data%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nod, WNPS, WNDS);
+--
+--   Function to get using NOD_SCRN_TEXT_UK constraint
+--
+FUNCTION get_nod (pi_nod_nmo_operation nm_operation_data.nod_nmo_operation%TYPE
+                 ,pi_nod_scrn_text     nm_operation_data.nod_scrn_text%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_operation_data%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nod, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_npq">
+--
+--   Function to get using NPQ_PK constraint
+--
+FUNCTION get_npq (pi_npq_id            nm_pbi_query.npq_id%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_pbi_query%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_npq, WNPS, WNDS);
+--
+--   Function to get using NPQ_UK constraint
+--
+FUNCTION get_npq (pi_npq_unique        nm_pbi_query.npq_unique%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_pbi_query%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_npq, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_npqa">
+--
+--   Function to get using NQA_PK constraint
+--
+FUNCTION get_npqa (pi_nqa_npq_id        nm_pbi_query_attribs.nqa_npq_id%TYPE
+                  ,pi_nqa_nqt_seq_no    nm_pbi_query_attribs.nqa_nqt_seq_no%TYPE
+                  ,pi_nqa_seq_no        nm_pbi_query_attribs.nqa_seq_no%TYPE
+                  ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                  ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                  ) RETURN nm_pbi_query_attribs%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_npqa, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_npqr">
+--
+--   Function to get using NQR_PK constraint
+--
+FUNCTION get_npqr (pi_nqr_npq_id        nm_pbi_query_results.nqr_npq_id%TYPE
+                  ,pi_nqr_job_id        nm_pbi_query_results.nqr_job_id%TYPE
+                  ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                  ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                  ) RETURN nm_pbi_query_results%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_npqr, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_npqt">
+--
+--   Function to get using NQT_PK constraint
+--
+FUNCTION get_npqt (pi_nqt_npq_id        nm_pbi_query_types.nqt_npq_id%TYPE
+                  ,pi_nqt_seq_no        nm_pbi_query_types.nqt_seq_no%TYPE
+                  ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                  ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                  ) RETURN nm_pbi_query_types%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_npqt, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_npqv">
+--
+--   Function to get using NQV_PK constraint
+--
+FUNCTION get_npqv (pi_nqv_sequence      nm_pbi_query_values.nqv_sequence%TYPE
+                  ,pi_nqv_npq_id        nm_pbi_query_values.nqv_npq_id%TYPE
+                  ,pi_nqv_nqt_seq_no    nm_pbi_query_values.nqv_nqt_seq_no%TYPE
+                  ,pi_nqv_nqa_seq_no    nm_pbi_query_values.nqv_nqa_seq_no%TYPE
+                  ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                  ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                  ) RETURN nm_pbi_query_values%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_npqv, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nps">
+--
+--   Function to get using NPS_PK constraint
+--
+FUNCTION get_nps (pi_nps_npq_id        nm_pbi_sections.nps_npq_id%TYPE
+                 ,pi_nps_nqr_job_id    nm_pbi_sections.nps_nqr_job_id%TYPE
+                 ,pi_nps_section_id    nm_pbi_sections.nps_section_id%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_pbi_sections%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nps, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_npsm">
+--
+--   Function to get using NPM_PK constraint
+--
+FUNCTION get_npsm (pi_npm_npq_id         nm_pbi_section_members.npm_npq_id%TYPE
+                  ,pi_npm_nqr_job_id     nm_pbi_section_members.npm_nqr_job_id%TYPE
+                  ,pi_npm_nps_section_id nm_pbi_section_members.npm_nps_section_id%TYPE
+                  ,pi_npm_ne_id_of       nm_pbi_section_members.npm_ne_id_of%TYPE
+                  ,pi_npm_begin_mp       nm_pbi_section_members.npm_begin_mp%TYPE
+                  ,pi_raise_not_found    BOOLEAN     DEFAULT TRUE
+                  ,pi_not_found_sqlcode  PLS_INTEGER DEFAULT -20000
+                  ) RETURN nm_pbi_section_members%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_npsm, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_np">
+--
+--   Function to get using NP_PK constraint
+--
+FUNCTION get_np (pi_np_id             nm_points.np_id%TYPE
+                ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                ) RETURN nm_points%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_np, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nrd">
+--
+--   Function to get using NRD_PK constraint
+--
+FUNCTION get_nrd (pi_nrd_job_id        nm_reclass_details.nrd_job_id%TYPE
+                 ,pi_nrd_old_ne_id     nm_reclass_details.nrd_old_ne_id%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_reclass_details%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nrd, WNPS, WNDS);
+--
+--   Function to get using NRD_UK constraint
+--
+FUNCTION get_nrd (pi_nrd_job_id        nm_reclass_details.nrd_job_id%TYPE
+                 ,pi_nrd_new_ne_id     nm_reclass_details.nrd_new_ne_id%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_reclass_details%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nrd, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nrev">
+--
+--   Function to get using NMR_PK constraint
+--
+FUNCTION get_nrev (pi_ne_id             nm_reversal.ne_id%TYPE
+                  ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                  ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                  ) RETURN nm_reversal%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nrev, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nse">
+--
+--   Function to get using NSE_PK constraint
+--
+FUNCTION get_nse (pi_nse_id            nm_saved_extents.nse_id%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_saved_extents%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nse, WNPS, WNDS);
+--
+--   Function to get using NSE_UK constraint
+--
+FUNCTION get_nse (pi_nse_name          nm_saved_extents.nse_name%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_saved_extents%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nse, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nsm">
+--
+--   Function to get using NSM_PK constraint
+--
+FUNCTION get_nsm (pi_nsm_nse_id        nm_saved_extent_members.nsm_nse_id%TYPE
+                 ,pi_nsm_id            nm_saved_extent_members.nsm_id%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_saved_extent_members%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nsm, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nsd">
+--
+--   Function to get using NSD_PK constraint
+--
+FUNCTION get_nsd (pi_nsd_ne_id         nm_saved_extent_member_datums.nsd_ne_id%TYPE
+                 ,pi_nsd_begin_mp      nm_saved_extent_member_datums.nsd_begin_mp%TYPE
+                 ,pi_nsd_nse_id        nm_saved_extent_member_datums.nsd_nse_id%TYPE
+                 ,pi_nsd_nsm_id        nm_saved_extent_member_datums.nsd_nsm_id%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_saved_extent_member_datums%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nsd, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_tii">
+--
+--   Function to get using TII_PK constraint
+--
+FUNCTION get_tii (pi_tii_njc_job_id    nm_temp_inv_items.tii_njc_job_id%TYPE
+                 ,pi_tii_ne_id         nm_temp_inv_items.tii_ne_id%TYPE
+                 ,pi_tii_ne_id_new     nm_temp_inv_items.tii_ne_id_new%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_temp_inv_items%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_tii, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_tiit">
+--
+--   Function to get using TII_TEMP_PK constraint
+--
+FUNCTION get_tiit (pi_tii_njc_job_id    nm_temp_inv_items_temp.tii_njc_job_id%TYPE
+                  ,pi_tii_ne_id         nm_temp_inv_items_temp.tii_ne_id%TYPE
+                  ,pi_tii_ne_id_new     nm_temp_inv_items_temp.tii_ne_id_new%TYPE
+                  ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                  ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                  ) RETURN nm_temp_inv_items_temp%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_tiit, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_tim">
+--
+--   Function to get using TIM_PK constraint
+--
+FUNCTION get_tim (pi_tim_njc_job_id      nm_temp_inv_members.tim_njc_job_id%TYPE
+                 ,pi_tim_ne_id_in        nm_temp_inv_members.tim_ne_id_in%TYPE
+                 ,pi_tim_ne_id_in_new    nm_temp_inv_members.tim_ne_id_in_new%TYPE
+                 ,pi_tim_ne_id_of        nm_temp_inv_members.tim_ne_id_of%TYPE
+                 ,pi_tim_extent_begin_mp nm_temp_inv_members.tim_extent_begin_mp%TYPE
+                 ,pi_raise_not_found     BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode   PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_temp_inv_members%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_tim, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_timt">
+--
+--   Function to get using TIM_TEMP_PK constraint
+--
+FUNCTION get_timt (pi_tim_njc_job_id      nm_temp_inv_members_temp.tim_njc_job_id%TYPE
+                  ,pi_tim_ne_id_in        nm_temp_inv_members_temp.tim_ne_id_in%TYPE
+                  ,pi_tim_ne_id_in_new    nm_temp_inv_members_temp.tim_ne_id_in_new%TYPE
+                  ,pi_tim_ne_id_of        nm_temp_inv_members_temp.tim_ne_id_of%TYPE
+                  ,pi_tim_extent_begin_mp nm_temp_inv_members_temp.tim_extent_begin_mp%TYPE
+                  ,pi_raise_not_found     BOOLEAN     DEFAULT TRUE
+                  ,pi_not_found_sqlcode   PLS_INTEGER DEFAULT -20000
+                  ) RETURN nm_temp_inv_members_temp%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_timt, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_ntn">
+--
+--   Function to get using NM_TEMP_NODES_PK constraint
+--
+FUNCTION get_ntn (pi_ntn_route_id      nm_temp_nodes.ntn_route_id%TYPE
+                 ,pi_ntn_node_id       nm_temp_nodes.ntn_node_id%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_temp_nodes%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_ntn, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nth">
+--
+--   Function to get using NTH_PK constraint
+--
+FUNCTION get_nth (pi_nth_theme_id      nm_themes_all.nth_theme_id%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_themes_all%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nth, WNPS, WNDS);
+--
+--   Function to get using NTH_UK constraint
+--
+FUNCTION get_nth (pi_nth_theme_name    nm_themes_all.nth_theme_name%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_themes_all%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nth, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_ntg">
+--
+--   Function to get using NTG_UK constraint
+--
+FUNCTION get_ntg (pi_ntg_theme_id      nm_theme_gtypes.ntg_theme_id%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_theme_gtypes%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_ntg, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_ntf">
+--
+--   Function to get using NTF_PK constraint
+--
+FUNCTION get_ntf (pi_ntf_nth_theme_id  nm_theme_functions_all.ntf_nth_theme_id%TYPE
+                 ,pi_ntf_hmo_module    nm_theme_functions_all.ntf_hmo_module%TYPE
+                 ,pi_ntf_parameter     nm_theme_functions_all.ntf_parameter%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_theme_functions_all%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_ntf, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nthr">
+--
+--   Function to get using NTHR_PK constraint
+--
+FUNCTION get_nthr (pi_nthr_role         nm_theme_roles.nthr_role%TYPE
+                  ,pi_nthr_theme_id     nm_theme_roles.nthr_theme_id%TYPE
+                  ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                  ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                  ) RETURN nm_theme_roles%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nthr, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nts">
+--
+--   Function to get using NTS_PK constraint
+--
+FUNCTION get_nts (pi_nts_theme_id      nm_theme_snaps.nts_theme_id%TYPE
+                 ,pi_nts_snap_to       nm_theme_snaps.nts_snap_to%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_theme_snaps%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nts, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nt">
+--
+--   Function to get using NT_PK constraint
+--
+FUNCTION get_nt (pi_nt_type           nm_types.nt_type%TYPE
+                ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                ) RETURN nm_types%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nt, WNPS, WNDS);
+--
+--   Function to get using NT_UK constraint
+--
+FUNCTION get_nt (pi_nt_unique         nm_types.nt_unique%TYPE
+                ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                ) RETURN nm_types%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nt, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_ntc">
+--
+--   Function to get using NTC_PK constraint
+--
+FUNCTION get_ntc (pi_ntc_nt_type       nm_type_columns.ntc_nt_type%TYPE
+                 ,pi_ntc_column_name   nm_type_columns.ntc_column_name%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_type_columns%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_ntc, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nti">
+--
+--   Function to get using NTI_PK constraint
+--
+FUNCTION get_nti (pi_nti_nw_parent_type nm_type_inclusion.nti_nw_parent_type%TYPE
+                 ,pi_nti_nw_child_type  nm_type_inclusion.nti_nw_child_type%TYPE
+                 ,pi_raise_not_found    BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode  PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_type_inclusion%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nti, WNPS, WNDS);
+--
+--   Function to get using NTI_UK constraint
+--
+FUNCTION get_nti (pi_nti_nw_child_type nm_type_inclusion.nti_nw_child_type%TYPE
+                 ,pi_nti_child_column  nm_type_inclusion.nti_child_column%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_type_inclusion%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nti, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_ntl">
+--
+--   Function to get using NTL_PK constraint
+--
+FUNCTION get_ntl (pi_ntl_nt_type       nm_type_layers.ntl_nt_type%TYPE
+                 ,pi_ntl_layer_id      nm_type_layers.ntl_layer_id%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_type_layers%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_ntl, WNPS, WNDS);
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_ntl_all">
+--
+--   Function to get using NTL_PK constraint
+--
+FUNCTION get_ntl_all (pi_ntl_nt_type       nm_type_layers_all.ntl_nt_type%TYPE
+                     ,pi_ntl_layer_id      nm_type_layers_all.ntl_layer_id%TYPE
+                     ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                     ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                     ) RETURN nm_type_layers_all%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_ntl_all, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nsc">
+--
+--   Function to get using NSC_PK constraint
+--
+FUNCTION get_nsc (pi_nsc_nw_type       nm_type_subclass.nsc_nw_type%TYPE
+                 ,pi_nsc_sub_class     nm_type_subclass.nsc_sub_class%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_type_subclass%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nsc, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nsr">
+--
+--   Function to get using NSR_PK constraint
+--
+FUNCTION get_nsr (pi_nsr_nw_type            nm_type_subclass_restrictions.nsr_nw_type%TYPE
+                 ,pi_nsr_sub_class_new      nm_type_subclass_restrictions.nsr_sub_class_new%TYPE
+                 ,pi_nsr_sub_class_existing nm_type_subclass_restrictions.nsr_sub_class_existing%TYPE
+                 ,pi_raise_not_found        BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode      PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_type_subclass_restrictions%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nsr, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_un">
+--
+--   Function to get using UN_PK constraint
+--
+FUNCTION get_un (pi_un_unit_id        nm_units.un_unit_id%TYPE
+                ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                ) RETURN nm_units%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_un, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_uc">
+--
+--   Function to get using UC_PK constraint
+--
+FUNCTION get_uc (pi_uc_unit_id_in     nm_unit_conversions.uc_unit_id_in%TYPE
+                ,pi_uc_unit_id_out    nm_unit_conversions.uc_unit_id_out%TYPE
+                ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                ) RETURN nm_unit_conversions%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_uc, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_ud">
+--
+--   Function to get using UK_PK constraint
+--
+FUNCTION get_ud (pi_ud_domain_id      nm_unit_domains.ud_domain_id%TYPE
+                ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                ) RETURN nm_unit_domains%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_ud, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nuf">
+--
+--   Function to get using NUF_PK constraint
+--
+FUNCTION get_nuf (pi_name              nm_upload_files.name%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_upload_files%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nuf, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nufp">
+--
+--   Function to get using NUFPART_PK constraint
+--
+FUNCTION get_nufp (pi_document          nm_upload_filespart.document%TYPE
+                  ,pi_part              nm_upload_filespart.part%TYPE
+                  ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                  ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                  ) RETURN nm_upload_filespart%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nufp, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nua">
+--
+--   Function to get using NUA_PK constraint
+--
+FUNCTION get_nua (pi_nua_user_id       nm_user_aus.nua_user_id%TYPE
+                 ,pi_nua_admin_unit    nm_user_aus.nua_admin_unit%TYPE
+                 ,pi_nua_start_date    nm_user_aus.nua_start_date%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_user_aus%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nua, WNPS, WNDS);
+--
+--   Function to get using NUA_PK constraint (without start date for Datetrack View)
+--
+FUNCTION get_nua (pi_nua_user_id       nm_user_aus.nua_user_id%TYPE
+                 ,pi_nua_admin_unit    nm_user_aus.nua_admin_unit%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_user_aus%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nua, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nua_all">
+--
+--   Function to get using NUA_PK constraint
+--
+FUNCTION get_nua_all (pi_nua_user_id       nm_user_aus_all.nua_user_id%TYPE
+                     ,pi_nua_admin_unit    nm_user_aus_all.nua_admin_unit%TYPE
+                     ,pi_nua_start_date    nm_user_aus_all.nua_start_date%TYPE
+                     ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                     ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                     ) RETURN nm_user_aus_all%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nua_all, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nva">
+--
+--   Function to get using NVA_PK constraint
+--
+FUNCTION get_nva (pi_nva_id            nm_visual_attributes.nva_id%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_visual_attributes%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nva, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nxf">
+--
+--   Function to get using NM_XML_FILES_PK constraint
+--
+FUNCTION get_nxf (pi_nxf_file_type     nm_xml_files.nxf_file_type%TYPE
+                 ,pi_nxf_type          nm_xml_files.nxf_type%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_xml_files%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nxf, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nxb">
+--
+--   Function to get using NM_XML_BATCHES_PK constraint
+--
+FUNCTION get_nxb (pi_nxb_batch_id      nm_xml_load_batches.nxb_batch_id%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_xml_load_batches%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nxb, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nxle">
+--
+--   Function to get using NM_XML_LOAD_ERRORS_PK constraint
+--
+FUNCTION get_nxle (pi_nxl_batch_id      nm_xml_load_errors.nxl_batch_id%TYPE
+                  ,pi_nxl_record_id     nm_xml_load_errors.nxl_record_id%TYPE
+                  ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                  ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                  ) RETURN nm_xml_load_errors%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nxle, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nwx">
+--
+--   Function to get using NWX_PK constraint
+--
+FUNCTION get_nwx (pi_nwx_nw_type       nm_nw_xsp.nwx_nw_type%TYPE
+                 ,pi_nwx_x_sect        nm_nw_xsp.nwx_x_sect%TYPE
+                 ,pi_nwx_nsc_sub_class nm_nw_xsp.nwx_nsc_sub_class%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_nw_xsp%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nwx, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nxd">
+--
+--   Function to get using NXD_PK constraint
+--
+FUNCTION get_nxd (pi_nxd_rule_id       nm_x_driving_conditions.nxd_rule_id%TYPE
+                 ,pi_nxd_rule_seq_no   nm_x_driving_conditions.nxd_rule_seq_no%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_x_driving_conditions%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nxd, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nxe">
+--
+--   Function to get using NXE_PK constraint
+--
+FUNCTION get_nxe (pi_nxe_id            nm_x_errors.nxe_id%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_x_errors%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nxe, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nxic">
+--
+--   Function to get using NXIC_PK constraint
+--
+FUNCTION get_nxic (pi_nxic_id           nm_x_inv_conditions.nxic_id%TYPE
+                  ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                  ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                  ) RETURN nm_x_inv_conditions%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nxic, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nxl">
+--
+--   Function to get using NXL_PK constraint
+--
+FUNCTION get_nxl (pi_nxl_rule_id       nm_x_location_rules.nxl_rule_id%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_x_location_rules%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nxl, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nxn">
+--
+--   Function to get using NXN_PK constraint
+--
+FUNCTION get_nxn (pi_nxn_rule_id       nm_x_nw_rules.nxn_rule_id%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_x_nw_rules%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nxn, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nxr">
+--
+--   Function to get using PK_NM_X_RULES constraint
+--
+FUNCTION get_nxr (pi_nxr_rule_id       nm_x_rules.nxr_rule_id%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_x_rules%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nxr, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nxv">
+--
+--   Function to get using NXV_PK constraint
+--
+FUNCTION get_nxv (pi_nxv_rule_id       nm_x_val_conditions.nxv_rule_id%TYPE
+                 ,pi_nxv_rule_seq_no   nm_x_val_conditions.nxv_rule_seq_no%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_x_val_conditions%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nxv, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_xsr">
+--
+--   Function to get using XSR_PK constraint
+--
+FUNCTION get_xsr (pi_xsr_nw_type       nm_xsp_restraints.xsr_nw_type%TYPE
+                 ,pi_xsr_ity_inv_code  nm_xsp_restraints.xsr_ity_inv_code%TYPE
+                 ,pi_xsr_scl_class     nm_xsp_restraints.xsr_scl_class%TYPE
+                 ,pi_xsr_x_sect_value  nm_xsp_restraints.xsr_x_sect_value%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_xsp_restraints%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_xsr, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_xrv">
+--
+--   Function to get using XRV_PK constraint
+--
+FUNCTION get_xrv (pi_xrv_nw_type       nm_xsp_reversal.xrv_nw_type%TYPE
+                 ,pi_xrv_old_sub_class nm_xsp_reversal.xrv_old_sub_class%TYPE
+                 ,pi_xrv_old_xsp       nm_xsp_reversal.xrv_old_xsp%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_xsp_reversal%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_xrv, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PRAGMA>
+   PRAGMA RESTRICT_REFERENCES (get_version, RNDS, WNPS, WNDS);
+   PRAGMA RESTRICT_REFERENCES (get_body_version, RNDS, WNPS, WNDS);
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+END nm3get;
+/

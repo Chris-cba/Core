@@ -1,0 +1,201 @@
+CREATE OR REPLACE PACKAGE nm3globinv AS
+--<PACKAGE>
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3globinv.pkh-arc   2.4   Jul 04 2013 16:04:12   James.Wadsworth  $
+--       Module Name      : $Workfile:   nm3globinv.pkh  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:04:12  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:12  $
+--       Version          : $Revision:   2.4  $
+--       Based on SCCS version : 1.5
+-------------------------------------------------------------------------
+--   Author : Jonathan Mills
+--
+--   Global Inventory Update Package
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+--
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.4  $';
+--  g_sccsid is the SCCS ID for the package
+--
+-- These constant values are the values to be used for the PI_OVERHANG_RULE
+--  argument in the GLOBAL_INVENTORY_UPDATE procedure
+   c_update     CONSTANT varchar2(10) := 'UPDATE';
+   c_leave      CONSTANT varchar2(10) := 'LEAVE';
+   c_split      CONSTANT varchar2(10) := 'SPLIT';
+--
+   g_tab_ne_id_updated nm3type.tab_number;
+--
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_affected_and_overhangs">
+--
+-- po_tab_all_iit_ne_id is populated sequentially
+-- po_tab_overhanging_iit_ne_id is populated in a sparse manner
+--  i.e. If IIT_NE_ID 842313 overhangs then array position 842313 will be populated
+PROCEDURE get_affected_and_overhangs
+               (pi_nte_job_id                IN     nm_nw_temp_extents.nte_job_id%TYPE
+               ,pi_inv_type                  IN     nm_inv_types.nit_inv_type%TYPE
+               ,pi_attrib_name               IN     nm3type.tab_varchar30
+               ,pi_old_value                 IN     nm3type.tab_varchar2000
+               ,po_tab_all_iit_ne_id            OUT nm3type.tab_number
+               ,po_tab_overhanging_iit_ne_id    OUT nm3type.tab_varchar30
+               );
+FUNCTION get_affected_and_overhangs
+               (pi_nte_job_id                IN     nm_nw_temp_extents.nte_job_id%TYPE
+               ,pi_inv_type                  IN     nm_inv_types.nit_inv_type%TYPE
+               ,pi_attrib_name               IN     nm3type.tab_varchar30
+               ,pi_old_value                 IN     nm3type.tab_varchar2000
+               ) RETURN boolean;
+--
+--  Possible exceptions raised are
+--
+-- -20742 Array parameters must have the same number of values
+-- -20743 NM_INV_TYPE_ATTRIBS record not found : TYPE:ATTRIB
+-- -20747 Each Inv Atrrib must only be specified once
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="global_inventory_update">
+--
+--
+-- When passing DATE variables the date MUST be TO_CHARred with the format
+--  of NM3TYPE.C_DEFAULT_DATE_FORMAT, Number variables may be passed in as is
+--  and implicit conversion can deal with those
+--
+-- 4 versions.....
+--
+-- This one tables in a single attrib and returns you the list of IIT_NE_IDs affected
+PROCEDURE global_inventory_update
+               (pi_nte_job_id     IN     nm_nw_temp_extents.nte_job_id%TYPE
+               ,pi_inv_type       IN     nm_inv_types.nit_inv_type%TYPE
+               ,pi_attrib_name    IN     nm_inv_type_attribs.ita_attrib_name%TYPE
+               ,pi_old_value      IN     varchar2
+               ,pi_new_value      IN     varchar2
+               ,pi_overhang_rule  IN     varchar2
+               ,po_iit_ne_id_done    OUT nm3type.tab_number
+               );
+--
+-- This one tables in a single attrib and does not return you the list of IIT_NE_IDs affected, only a count
+PROCEDURE global_inventory_update
+               (pi_nte_job_id     IN     nm_nw_temp_extents.nte_job_id%TYPE
+               ,pi_inv_type       IN     nm_inv_types.nit_inv_type%TYPE
+               ,pi_attrib_name    IN     nm_inv_type_attribs.ita_attrib_name%TYPE
+               ,pi_old_value      IN     varchar2
+               ,pi_new_value      IN     varchar2
+               ,pi_overhang_rule  IN     varchar2
+               ,pi_count_iit_done    OUT NUMBER
+               );
+--
+-- This one tables in an array of attribs and does not return you the list of IIT_NE_IDs affected, only a count
+PROCEDURE global_inventory_update
+               (pi_nte_job_id     IN     nm_nw_temp_extents.nte_job_id%TYPE
+               ,pi_inv_type       IN     nm_inv_types.nit_inv_type%TYPE
+               ,pi_attrib_name    IN     nm3type.tab_varchar30
+               ,pi_old_value      IN     nm3type.tab_varchar2000
+               ,pi_new_value      IN     nm3type.tab_varchar2000
+               ,pi_overhang_rule  IN     varchar2
+               ,pi_count_iit_done    OUT NUMBER
+               );
+--
+-- This one tables in an array of attribs and returns you the list of IIT_NE_IDs affected
+PROCEDURE global_inventory_update
+               (pi_nte_job_id     IN     nm_nw_temp_extents.nte_job_id%TYPE
+               ,pi_inv_type       IN     nm_inv_types.nit_inv_type%TYPE
+               ,pi_attrib_name    IN     nm3type.tab_varchar30
+               ,pi_old_value      IN     nm3type.tab_varchar2000
+               ,pi_new_value      IN     nm3type.tab_varchar2000
+               ,pi_overhang_rule  IN     varchar2
+               ,po_iit_ne_id_done    OUT nm3type.tab_number
+               );
+--
+--  Possible exceptions raised are
+--
+-- -20741 Overhang Rule parameter value not valid
+-- -20742 Array parameters must have the same number of values
+-- -20743 NM_INV_TYPE_ATTRIBS record not found : TYPE:ATTRIB
+-- -20744 All OLD and NEW values passed are the same
+-- -20745 TYPE:ATTRIB is mandatory and as such cannot be null
+-- -20746 New value (VAL)fails validation for TYPE:ATTRIB
+-- -20747 Each Inv Atrrib must only be specified once
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_c_update">
+-- Function to return the value of the package global constant c_update.
+FUNCTION get_c_update RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_c_leave">
+-- Function to return the value of the package global constant c_leave.
+FUNCTION get_c_leave RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_c_split">
+-- Function to return the value of the package global constant c_split.
+FUNCTION get_c_split RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_next_ne_id_from_tab">
+-- This function returns the value of the NEXT entry in the g_tab_mandatory
+--  pl/sql table. If you pass in zero or Null then the function will return
+--  the value from array position 1. If the function returns NULL, then the
+--  array position does not exist. Given that this array is populated
+--  sequentially, then when an empty position is found then that is the end
+--
+-- GJ 05-FEB-2009 should eventaully be removed cos replaced by get_tab_of_updated_items
+
+FUNCTION get_next_ne_id_from_tab RETURN nm_inv_items.iit_ne_id%TYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--<PROC NAME="get_tab_of_updated_items">
+-- called by NM0510 when building a where clause to restrict the list of asset items that
+-- the module queries back
+FUNCTION get_tab_of_updated_items RETURN nm_id_tbl;
+--</PROC>
+
+--<PRAGMA>
+   PRAGMA RESTRICT_REFERENCES (get_version, rnds, wnps, wnds);
+   PRAGMA RESTRICT_REFERENCES (get_body_version, rnds, wnps, wnds);
+   PRAGMA RESTRICT_REFERENCES (get_c_update, rnds, wnds, wnps);
+   PRAGMA RESTRICT_REFERENCES (get_c_leave, rnds, wnds, wnps);
+   PRAGMA RESTRICT_REFERENCES (get_c_split, rnds, wnds, wnps);
+--   PRAGMA RESTRICT_REFERENCES (get_next_ne_id_from_tab, rnds, wnds);
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+END nm3globinv;
+/

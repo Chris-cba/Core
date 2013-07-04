@@ -1,0 +1,192 @@
+CREATE OR REPLACE PACKAGE nm3group_inv AS
+--<PACKAGE> 
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3group_inv.pkh-arc   2.2   Jul 04 2013 16:04:12   James.Wadsworth  $
+--       Module Name      : $Workfile:   nm3group_inv.pkh  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:04:12  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:12  $
+--       Version          : $Revision:   2.2  $
+--       Based on SCCS version : 
+-------------------------------------------------------------------------
+--
+--   Author : Kevin Angus
+--
+--    nm3group_inv
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+
+  -----------
+  --constants
+  -----------
+  --g_sccsid is the SCCS ID for the package
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.2  $';
+  
+  -----------
+  --variables
+  -----------
+  g_iit_rec nm_inv_items%ROWTYPE;
+
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="check_link_types">
+--
+-- This procedure raises an error if the types of the items to be linked are
+-- invalid (according to the data in nm_group_inv_types).
+--
+PROCEDURE check_link_types(pi_ne_ne_id  IN nm_group_inv_link.ngil_ne_ne_id%TYPE
+                          ,pi_iit_ne_id IN nm_group_inv_link.ngil_iit_ne_id%TYPE
+                          );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="set_link_for_group">
+--
+-- Updates/inserts a link between the group type and the inventory type.
+--
+PROCEDURE set_link_for_group(pi_group_type IN nm_group_inv_types.ngit_ngt_group_type%TYPE
+                            ,pi_inv_type   IN nm_group_inv_types.ngit_nit_inv_type%TYPE
+                            );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_inv_item_for_element">
+--
+-- This procedure returns the inventory item (and its type) associated with 
+-- the supplied group (and type).
+--
+PROCEDURE get_inv_item_for_element(pi_ne_id              IN     nm_group_inv_link.ngil_ne_ne_id%TYPE
+                                  ,pi_group_type         IN     nm_group_inv_types.ngit_ngt_group_type%TYPE
+                                  ,pi_raise_if_not_found IN      boolean DEFAULT TRUE
+                                  ,po_iit_ne_id             OUT nm_group_inv_link.ngil_iit_ne_id%TYPE
+                                  ,po_inv_type              OUT nm_group_inv_types.ngit_nit_inv_type%TYPE
+                                  );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="end_date_linked_inv">
+--
+-- End dates inv item linked to element.
+--
+PROCEDURE end_date_linked_inv(pi_ne_id            IN nm_elements.ne_id%TYPE
+                             ,pi_group_type       IN nm_elements.ne_gty_group_type%TYPE
+                             ,pi_end_date         IN nm_elements.ne_end_date%TYPE
+                             ,pi_raise_if_no_link IN boolean DEFAULT TRUE
+                             );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--<PROC NAME="create_grp_with_inv">
+--
+-- Pass in a group and inv flex attribs
+--
+PROCEDURE create_grp_with_inv ( pi_rec_ne  IN nm_elements%ROWTYPE
+			                  , pi_rec_inv IN nm_inv_items%ROWTYPE 
+			      );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="create_grp_with_inv">
+--
+-- Pass in a group and inv flex attribs and members
+--
+PROCEDURE create_grp_with_inv ( pi_rec_ne  IN nm_elements%ROWTYPE
+			                  , pi_rec_inv IN nm_inv_items%ROWTYPE 
+                              , pi_tab_nm  IN nm3type.tab_number
+			      );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="iit_rec_init">
+--
+-- Initialises a package record to store an inventory item in.
+--
+PROCEDURE iit_rec_init(pi_inv_type   IN nm_inv_items.iit_inv_type%TYPE DEFAULT NULL
+                      ,pi_start_date IN nm_inv_items.iit_start_date%TYPE DEFAULT NULL
+                      ,pi_admin_unit IN nm_inv_items.iit_admin_unit%TYPE DEFAULT NULL
+                      );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="iit_rec_update">
+--
+-- Updates the specified field in the package inventory record.
+--
+PROCEDURE iit_rec_update(pi_column_name IN varchar2
+                        ,pi_value       IN varchar2
+                        );
+PROCEDURE iit_rec_update(pi_column_name IN varchar2
+                        ,pi_value       IN number
+                        );
+PROCEDURE iit_rec_update(pi_column_name IN varchar2
+                        ,pi_value       IN date
+                        );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="iit_rec_insert">
+--
+-- Inserts the package inv record into the inventory table..
+--
+FUNCTION iit_rec_insert RETURN nm_inv_items.iit_ne_id%TYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_inv_type_for_gty_type">
+--
+-- For a given network element group type return a corresponding inventory type
+FUNCTION get_inv_type_for_gty_type(pi_ne_gty_group_type IN nm_elements_all.ne_gty_group_type%TYPE) RETURN nm_group_inv_types.ngit_nit_inv_type%TYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_ngil_from_iit_ne_id">
+--
+-- For a given network element get the id of the corresponding inventory item that is used to store associated attributes
+--
+FUNCTION get_ngil_from_iit_ne_id(pi_ngil_ne_ne_id     nm_group_inv_link.ngil_ne_ne_id%TYPE
+                                ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                                ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                                ) RETURN nm_group_inv_link%ROWTYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PRAGMA>
+  PRAGMA RESTRICT_REFERENCES(get_version, rnds, wnps, wnds);
+  PRAGMA RESTRICT_REFERENCES(get_body_version, rnds, wnps, wnds);
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+END nm3group_inv;
+/
