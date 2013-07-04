@@ -19,7 +19,7 @@ DECLARE
 --   node_point_trg Trigger
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2001
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
    l_np_id nm_points.np_id%TYPE;
