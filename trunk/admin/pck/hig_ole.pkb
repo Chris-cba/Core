@@ -1,16 +1,19 @@
 CREATE OR REPLACE PACKAGE BODY higole
 AS
-  --   SCCS Identifiers :-
-  --
-  --       sccsid           : @(#)hig_ole.pkb 1.3 06/08/05
-  --       Module Name      : hig_ole.pkb
-  --       Date into SCCS   : 05/06/08 09:56:27
-  --       Date fetched Out : 07/06/13 14:10:24
-  --       SCCS Version     : 1.3
-  --
-  --
-  --
-  --   Author : Ian Smith
+--
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_ole.pkb-arc   2.3   Jul 04 2013 14:52:06   James.Wadsworth  $
+--       Module Name      : $Workfile:   hig_ole.pkb  $
+--       Date into PVCS   : $Date:   Jul 04 2013 14:52:06  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:49:26  $
+--       Version          : $Revision:   2.3  $
+--
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
+--   Author : Ian Smith
 
   c_strdateformat   VARCHAR2 ( 100 );
   c_strvarchar      CONSTANT VARCHAR2 ( 30 ) := 'VARCHAR2';

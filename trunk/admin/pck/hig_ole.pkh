@@ -1,3 +1,16 @@
+--
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_ole.pkh-arc   2.2   Jul 04 2013 14:52:06   James.Wadsworth  $
+--       Module Name      : $Workfile:   hig_ole.pkh  $
+--       Date into PVCS   : $Date:   Jul 04 2013 14:52:06  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:49:38  $
+--       Version          : $Revision:   2.2  $
+--
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
 /* Formatted on 07/05/2010 16:07:51 (QP5 v5.139.911.3011) */
 CREATE OR REPLACE PACKAGE higole
 AS
