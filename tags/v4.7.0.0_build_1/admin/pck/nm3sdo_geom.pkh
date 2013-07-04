@@ -1,0 +1,73 @@
+CREATE OR REPLACE PACKAGE nm3sdo_geom 
+AS
+--
+--------------------------------------------------------------------------------
+--
+--   PVCS Identifiers :-
+--
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_geom.pkh-arc   1.4   Jul 04 2013 16:29:32   James.Wadsworth  $
+--       Module Name      : $Workfile:   nm3sdo_geom.pkh  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:29:32  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 16:28:58  $
+--       PVCS Version     : $Revision:   1.4  $
+--       Based on
+--
+------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+------------------------------------------------------------------
+--
+  g_sccsid    CONSTANT VARCHAR2(30) :='"$Revision:   1.4  $"';
+  g_srid               NUMBER;
+  g_tolerance          NUMBER := NVL(nm3sdo.get_tol_from_unit_mask(1), 0.0005);
+--
+--------------------------------------------------------------------------------
+--
+  FUNCTION get_version 
+    RETURN VARCHAR2;
+--
+--------------------------------------------------------------------------------
+--
+  FUNCTION get_body_version 
+    RETURN VARCHAR2;
+--
+--------------------------------------------------------------------------------
+--
+  FUNCTION get_feature_type ( p_geom IN mdsys.sdo_geometry ) 
+    RETURN NUMBER;
+--
+--------------------------------------------------------------------------------
+--
+  FUNCTION get_area( p_geom      IN mdsys.sdo_geometry
+                   , p_tolerance IN NUMBER DEFAULT g_tolerance
+                   , p_unit      IN nm_units.un_unit_id%TYPE DEFAULT 1 ) 
+    RETURN NUMBER;
+--
+--------------------------------------------------------------------------------
+--
+  FUNCTION get_length ( p_geom      IN mdsys.sdo_geometry
+                      , p_tolerance IN NUMBER DEFAULT g_tolerance
+                      , p_unit      IN nm_units.un_unit_id%TYPE DEFAULT 1 ) 
+    RETURN NUMBER;
+--
+--------------------------------------------------------------------------------
+--
+  FUNCTION get_geom_from_gdo ( p_gdo_session_id IN NUMBER
+                             , p_gtype          IN NUMBER ) 
+    RETURN mdsys.sdo_geometry;
+--
+--------------------------------------------------------------------------------
+--
+  FUNCTION get_geom_from_gdo ( p_gdo_session_id IN NUMBER
+                             , p_feature_type   IN VARCHAR2 ) 
+    RETURN mdsys.sdo_geometry;
+--
+--------------------------------------------------------------------------------
+--
+  FUNCTION get_geom_from_xys ( p_tab_xys IN nm3sdo_gdo.tab_xys
+                             , p_gtype   IN VARCHAR2 ) 
+    RETURN mdsys.sdo_geometry;
+--
+--------------------------------------------------------------------------------
+--
+END nm3sdo_geom;
+/

@@ -1,0 +1,87 @@
+CREATE OR REPLACE PACKAGE nm3sdo_gdo
+IS
+--<PACKAGE>
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
+--
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_gdo.pkh-arc   3.4   Jul 04 2013 16:29:32   James.Wadsworth  $
+--       Module Name      : $Workfile:   nm3sdo_gdo.pkh  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:29:32  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 16:27:44  $
+--       PVCS Version     : $Revision:   3.4  $
+--
+------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+
+  -----------
+  --constants
+  -----------
+  --g_sccsid is the SCCS ID for the package
+  g_sccsid CONSTANT VARCHAR2(2000) :='"$Revision:   3.4  $"';
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+  TYPE rec_xys IS RECORD ( seq_no  INTEGER
+                         , x_coord NUMBER
+                         , y_coord NUMBER );
+--
+  TYPE tab_xys IS TABLE OF rec_xys INDEX BY BINARY_INTEGER;
+--
+  TYPE tab_gdo IS TABLE OF gis_data_objects%ROWTYPE INDEX BY BINARY_INTEGER;
+--
+--------------------------------------------------------------------------------
+--
+--<PROC NAME="GET_SHAPE_FROM_GDO"
+  FUNCTION get_shape_from_gdo ( pi_gdo_session_id IN gis_data_objects.gdo_session_id%TYPE
+                              , pi_geometry_type  IN nm_theme_gtypes.ntg_gtype%TYPE DEFAULT 2002 )
+    RETURN sdo_geometry;
+--</PROC>
+--
+--------------------------------------------------------------------------------
+--
+--<PROC NAME="GET_GEOM_FROM_XYS"
+  FUNCTION get_geom_from_xys (pi_tab_xys IN tab_xys)
+  RETURN sdo_geometry;
+--</PROC>
+--
+--------------------------------------------------------------------------------
+--
+--<PROC NAME="INSERT_GDO_FROM_THEME_ARRAY"
+    PROCEDURE insert_gdo_from_theme_array ( pi_session_id in number,
+                                          pi_theme_name in varchar2,
+                                          pi_list in nm_theme_list );
+--</PROC>
+--
+--------------------------------------------------------------------------------
+--
+--<PROC NAME="INSERT_GDO_FROM_BUFFER"
+procedure insert_gdo_from_buffer ( pi_session_id in number,
+                                                     pi_theme_name in varchar2,
+                                                     pi_geometry in mdsys.sdo_geometry,
+                                                     pi_buffer in number,
+                                                     pi_sub_select_session in integer );
+--</PROC>
+--
+--------------------------------------------------------------------------------
+
+
+END nm3sdo_gdo;
+/
