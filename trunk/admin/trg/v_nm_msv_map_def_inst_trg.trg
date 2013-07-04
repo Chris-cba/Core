@@ -6,7 +6,7 @@ CREATE OR REPLACE TRIGGER v_nm_msv_map_def_inst_trg
 --
 --
 -----------------------------------------------------------------------------
--- Copyright (c) exor corporation ltd, 2006
+-- Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 DECLARE
    /* cursor to get the definition for ONE map - my test one */

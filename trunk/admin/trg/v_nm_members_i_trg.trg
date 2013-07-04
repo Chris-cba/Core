@@ -7,15 +7,15 @@ DECLARE
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/trg/v_nm_members_i_trg.trg-arc   2.1   Jul 01 2011 10:39:34   Chris.Strettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/trg/v_nm_members_i_trg.trg-arc   2.2   Jul 04 2013 09:55:34   James.Wadsworth  $
 --       Module Name      : $Workfile:   v_nm_members_i_trg.trg  $
---       Date into PVCS   : $Date:   Jul 01 2011 10:39:34  $
---       Date fetched Out : $Modtime:   Jul 01 2011 10:36:46  $
---       Version          : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   Jul 04 2013 09:55:34  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 09:35:32  $
+--       Version          : $Revision:   2.2  $
 --
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2004
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
  l_rec_nm nm_members%ROWTYPE;
 BEGIN
