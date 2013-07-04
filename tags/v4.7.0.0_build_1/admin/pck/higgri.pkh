@@ -1,0 +1,375 @@
+CREATE OR REPLACE PACKAGE higgri AS
+--<PACKAGE>
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)higgri.pkh	1.6 01/19/06
+--       Module Name      : higgri.pkh
+--       Date into SCCS   : 06/01/19 14:23:05
+--       Date fetched Out : 07/06/13 14:10:36
+--       SCCS Version     : 1.6
+--
+-- As fetched originally for NM3
+--       sccsid           : @(#)higgri.pck	1.7 10/09/98
+--       Module Name      : higgri.pck
+--       Date into SCCS   : 98/10/09 10:57:15
+--       Date fetched Out : 00/03/01 13:46:11
+--       SCCS Version     : 1.7
+--
+--
+--   Author :
+--
+--   The GRI package
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+  g_sccsid      CONSTANT  varchar2(80) := '"@(#)higgri.pkh	1.5 11/12/01"';
+--  g_sccsid is the SCCS ID for the package
+--
+--Package global variable for batch job submission;
+--
+  batch_job_id            number := NULL;
+--
+  gri_filename_to_execute hig_modules.hmo_filename%TYPE;
+--
+  last_grr_job_id         gri_report_runs.grr_job_id%TYPE;
+--
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="is_module_gri">
+--This function returns TRUE if the module p_module uses the GRI.
+  FUNCTION is_module_gri(p_module IN hig_modules.hmo_module%TYPE
+                        ) RETURN boolean;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="parse_query">
+  PROCEDURE parse_query (p_query     IN     varchar2
+                        ,p_cursor_id IN OUT integer);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="bind_query">
+  PROCEDURE bind_query (p_cursor_id IN integer
+                       ,p_variable  IN varchar2
+                       ,p_value     IN varchar2
+                       ,p_datatype  IN varchar2 );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="execute_query">
+  PROCEDURE execute_query(p_cursor_id IN OUT integer);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="prepare_query">
+  PROCEDURE prepare_query(p_job_id IN number
+                         ,p_param  IN gri_run_parameters.grp_param%TYPE
+                         ,p_query  IN OUT varchar2
+                         ,p_module IN varchar2);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="bind_tag_variables">
+  PROCEDURE bind_tag_variables(p_job_id    IN number
+                              ,p_cursor_id IN integer
+                              ,p_param     IN gri_run_parameters.grp_param%TYPE
+                               );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="bind_variables">
+  PROCEDURE bind_variables(p_job_id    IN number
+                          ,p_cursor_id IN integer
+                          ,p_param     IN gri_run_parameters.grp_param%TYPE
+                          ,p_module    IN varchar2);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="construct_lov">
+  PROCEDURE construct_lov(p_job_id   IN  number
+                         ,p_param    IN  gri_run_parameters.grp_param%TYPE
+                         ,p_module   IN  varchar2
+			 ,p_restrict IN  varchar2
+                         ,p_pipename IN  varchar2);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="prepare_tag_query">
+  PROCEDURE prepare_tag_query(p_job_id IN number
+                             ,p_param  IN gri_run_parameters.grp_param%TYPE
+                             ,p_query  IN OUT varchar2);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="populate_tags">
+  PROCEDURE populate_tags(p_job_id IN  number
+                         ,p_module IN  varchar2);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_defaults">
+  PROCEDURE get_defaults(p_job_id IN number
+                        ,p_module IN varchar2);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_params">
+  PROCEDURE get_params(p_module IN  varchar2
+                      ,p_job_id IN  OUT number);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="set_param">
+--This procedure sets a particular parameter value for a job.
+  PROCEDURE set_param(pi_job_id IN gri_report_runs.grr_job_id%TYPE
+                     ,pi_param  IN gri_run_parameters.grp_param%TYPE
+                     ,pi_value  IN gri_run_parameters.grp_value%TYPE
+                     );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="validate_date">
+  PROCEDURE validate_date(p_value IN varchar2);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="validate_number">
+  PROCEDURE validate_number(p_value IN varchar2);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="validate_int">
+  PROCEDURE validate_int(p_value IN varchar2);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="validate_type">
+  PROCEDURE validate_type(p_type  IN varchar2
+                         ,p_value IN varchar2);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="validate_param">
+  PROCEDURE validate_param(p_job_id    IN number
+		          ,p_param     IN gri_run_parameters.grp_param%TYPE
+			  ,p_value     IN gri_run_parameters.grp_value%TYPE
+		          ,p_module    IN varchar2
+                          ,p_pipename  IN  varchar2);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="load_params">
+  PROCEDURE load_params (p_job_id   IN integer
+                        ,p_username IN varchar2
+                        ,p_module   IN varchar2
+                        ,p_descr    IN varchar2);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="save_params">
+  PROCEDURE save_params (p_job_id   IN integer
+                        ,p_username IN varchar2
+                        ,p_module   IN varchar2
+                        ,p_descr    IN varchar2);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="gri_batch_job">
+  PROCEDURE gri_batch_job ( p_username IN varchar2,
+                            p_pwd      IN varchar2,
+			    p_module IN varchar2,
+			    p_param_set  IN varchar2,
+			    p_job_id OUT number ) ;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="make_report_run">
+  PROCEDURE make_report_run ( p_username IN varchar2,
+			      p_module   IN varchar2,
+			      p_job_id   IN number );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_batch_job_id">
+  FUNCTION get_batch_job_id RETURN number;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_module_type">
+  FUNCTION get_module_type ( p_module IN varchar2 ) RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_module_spoolfile">
+  FUNCTION get_module_spoolfile
+	(a_job_id	IN	integer
+	,a_module	IN	varchar2
+  ) RETURN varchar2;
+--</PROC>
+--
+----------------------------------------------------------------------------------
+--
+--<PROC NAME="get_grr">
+FUNCTION get_grr (p_grr_job_id IN gri_report_runs.grr_job_id%TYPE
+                 ) RETURN gri_report_runs%ROWTYPE;
+--</PROC>
+--
+----------------------------------------------------------------------------------
+--
+--<PROC NAME="get_grm">
+-- This function returns the gri_modules record for the specified grm_module
+--
+FUNCTION get_grm (p_grm_module IN gri_modules.grm_module%TYPE
+                 ) RETURN gri_modules%ROWTYPE;
+--
+-- Errors raised are
+--  -20072 gri_modules record not found
+--</PROC>
+--
+----------------------------------------------------------------------------------
+--
+--<PROC NAME="get_gp">
+-- This function returns the gri_params record for the specified gp_param
+--
+FUNCTION get_gp (p_gp_param IN gri_params.gp_param%TYPE
+                ) RETURN gri_params%ROWTYPE;
+--
+-- Errors raised are
+-- -20073 gri_params record not found
+--</PROC>
+--
+----------------------------------------------------------------------------------
+--
+--<PROC NAME="get_tab_rec_grp">
+-- This function returns a PL/SQL table containing all of the gri_run_parameters for
+--  the specified grp_job_id
+--
+FUNCTION get_tab_rec_grp (p_grp_job_id IN gri_run_parameters.grp_job_id%TYPE) RETURN nm3type.tab_rec_grp;
+--
+--</PROC>
+--
+----------------------------------------------------------------------------------
+--
+--<PROC NAME="get_tab_grp_value_from_tab_grp">
+-- This function returns a PL/SQL table containing all grp_value records
+--  within the passed tab_grp for the specified grp_param
+--
+FUNCTION get_tab_grp_value_from_tab_grp (p_tab_grp   IN nm3type.tab_rec_grp
+                                        ,p_grp_param IN gri_run_parameters.grp_param%TYPE
+                                        ) RETURN nm3type.tab_varchar2000;
+--</PROC>
+--
+----------------------------------------------------------------------------------
+--
+--<PROC NAME="pre_process">
+PROCEDURE pre_process(pi_job_id    IN     gri_report_runs.grr_job_id%TYPE
+                     ,pio_filename IN OUT gri_report_runs.grr_report_dest%TYPE
+                     );
+--
+-- Errors raised are
+-- -20074 No value found for parameter in preprocess procedure
+-- -20075 >1 value found for parameter in preprocess procedure
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_last_grr_job_id">
+-- This function returns the last grr_job_id for a GRI report run in this session
+FUNCTION get_last_grr_job_id RETURN gri_report_runs.grr_job_id%TYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="check_for_quotes">
+-- 
+FUNCTION check_for_quotes(p_str varchar2) RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_param_value_details">
+-- This procedure validates a value for pi_param against the given LOV query.
+-- Can be used to validate value or shown depending whether pio_value or
+-- pio_shown is not NULL.
+-- Retrieves the description if validation is successful.
+--
+PROCEDURE validate_param_lov(pi_param     IN     gri_params.gp_param%TYPE
+                            ,pi_lov_query IN     varchar2
+							,pi_number_of_query_cols IN PLS_INTEGER DEFAULT 3							
+                            ,pio_value    IN OUT gri_run_parameters.grp_value%TYPE
+                            ,pio_shown    IN OUT gri_run_parameters.grp_shown%TYPE
+                            ,pio_descr    IN OUT gri_run_parameters.grp_descr%TYPE
+                            );
+
+
+
+FUNCTION get_gri_param_query(pi_module IN gri_modules.grm_module%TYPE
+                            ,pi_param  IN gri_params.gp_param%TYPE
+                            ) RETURN varchar2;
+
+
+--
+-- Errors raised are:
+--
+-- -20076 Prameter value not found. <param> = <matched value>
+-- -20077 Prameter value is not unique. <param> = <matched value>
+--
+--</PROC>
+--
+----------------------------------------------------------------------------------
+--
+--<PRAGMA>
+   PRAGMA RESTRICT_REFERENCES (get_version, rnds, wnps, wnds);
+   PRAGMA RESTRICT_REFERENCES (get_body_version, rnds, wnps, wnds);
+   PRAGMA RESTRICT_REFERENCES (get_batch_job_id, wnds );
+   PRAGMA RESTRICT_REFERENCES (get_module_spoolfile, wnds, wnps, rnps);
+   PRAGMA RESTRICT_REFERENCES (get_last_grr_job_id, wnds, wnps);
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+END higgri;
+/

@@ -1,0 +1,95 @@
+create or replace package higpipe is
+--<PACKAGE>
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)higpipe.pkh	1.3 10/30/06
+--       Module Name      : higpipe.pkh
+--       Date into SCCS   : 06/10/30 17:03:11
+--       Date fetched Out : 07/06/13 14:10:39
+--       SCCS Version     : 1.3
+--
+--   Author :
+--
+--   Highways Pipes package
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+    g_sccsid constant varchar2(80) := '"@(#)higpipe.pkh	1.3 10/30/06"'; --'@(#)higpipe.pck	1.1 03/03/00';
+-- g_sccsid is the SCCS_ID
+	pipe_check number;
+    toggle number := 1;
+
+	pipe0 varchar2(80) := hig.get_sysopt ('GRILSTNAME');
+	pipe1 varchar2(80) := pipe0||'1';
+	pipe2 varchar2(80) := pipe0||'2';
+ 
+    pipe_name constant varchar2(20) := 'currenttheme';
+
+--</GLOBVAR>
+
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="del_pipes">
+-- Deletes pipes
+    function del_pipes return integer;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="write_pipe">
+-- Sends message to current pipe and saves to file, if file open
+--  File should be opened by calling program using utl_file.fopen
+-- This relies on the utl_file_dir parameter being set in the init.ora file
+    procedure write_pipe (pipe_message varchar2, file_handle utl_file.file_type) ;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="msg_check">
+-- Gets message from pipe and saves to gri_spool if format '<job id>,<message>'
+    function msg_check return integer;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="gri0207">
+-- test listener, use 'C' program
+   	procedure gri0207;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="CRE_PIPES">
+-- Creates the pipes
+    function cre_pipes return integer;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PRAGMA>
+   PRAGMA RESTRICT_REFERENCES (get_version, WNDS);
+   PRAGMA RESTRICT_REFERENCES (get_body_version, WNDS);
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+end higpipe;
+/

@@ -1,0 +1,214 @@
+CREATE OR REPLACE PACKAGE higgrirp AS
+--<PACKAGE>
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)higgrirp.pkh	1.6 06/26/03
+--       Module Name      : higgrirp.pkh
+--       Date into SCCS   : 03/06/26 10:43:00
+--       Date fetched Out : 07/06/13 14:10:38
+--       SCCS Version     : 1.6
+--
+--
+--   Author :
+--
+--   suite of functions used by programs/reports to retrieve GRI values
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--</PACKAGE>
+
+  /* SCCS ID keyword, do not remove */
+--<GLOBVAR>
+  g_sccsid	CONSTANT	varchar2(2000) := '"@(#)higgrirp.pkh	1.6 06/26/03"'; --'"@(#)higgrirp.pck	1.8 10/15/99"';
+-- g_sccsid is the SCCS_ID
+
+  grs_line_no number;
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_module">
+  FUNCTION get_module
+	(a_job_id	IN	integer
+  ) RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_module_title">
+  FUNCTION get_module_title
+        (a_module IN hig_modules.hmo_module%TYPE
+  ) RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_module_parameter">
+  FUNCTION get_module_parameter
+	(a_job_id	IN	integer
+	,a_seq		IN	integer
+  ) RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_module_param_descr">
+  FUNCTION get_module_param_descr
+	(a_job_id	IN	integer
+	,a_param	IN	varchar2
+	,a_length	IN	number	DEFAULT 30
+  ) RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_module_linesize">
+  FUNCTION get_module_linesize
+	(a_job_id	IN	integer
+  ) RETURN number;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_module_pagesize">
+  FUNCTION get_module_pagesize
+	(a_job_id	IN	integer
+  ) RETURN number;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_module_spoolpath">
+  FUNCTION get_module_spoolpath
+	(a_job_id	IN	integer,
+	 a_username     IN      varchar2
+  ) RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_module_spoolfile">
+  FUNCTION get_module_spoolfile
+	(a_job_id	IN	integer
+  ) RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_parameter">
+  PROCEDURE get_parameter
+	(a_job_id	IN	integer
+	,a_param	IN	varchar2
+	,a_value	IN OUT	varchar2
+	,a_descr	IN OUT	varchar2
+	,a_shown	IN OUT	varchar2
+  );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_parameter_value">
+  FUNCTION get_parameter_value
+	(a_job_id	IN	integer
+	,a_param	IN	varchar2
+  ) RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_parameter_shown">
+  FUNCTION get_parameter_shown
+	(a_job_id	IN	integer
+	,a_param	IN	varchar2
+  ) RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_parameter_descr">
+  FUNCTION get_parameter_descr
+	(a_job_id	IN	integer
+	,a_param	IN	varchar2
+  ) RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_selection_criteria">
+  FUNCTION get_selection_criteria
+	(a_job_id	IN	integer
+	,a_param	IN	varchar2
+  ) RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="INIT_RPT">
+-- procedure to initialise REPORT values by MODULE  - returns error if failure
+	PROCEDURE init_rpt ( p_module IN  gri_modules.grm_module%TYPE
+			   , p_user   OUT varchar2
+			   , p_client OUT nm_admin_units.nau_name%TYPE
+			   , p_title  OUT hig_modules.hmo_title%TYPE );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="write_gri_spool">
+--
+  PROCEDURE write_gri_spool
+    (a_job_id   IN integer
+    ,a_message  IN varchar2);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="gri_spool_exists"
+-- Check for the existance of a spool record for a given job
+FUNCTION gri_spool_exists(pi_job_id IN gri_spool.grs_job_id%TYPE) RETURN BOOLEAN;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_reports_file_extension">
+--
+FUNCTION get_reports_file_extension RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PRAGMA>
+  PRAGMA RESTRICT_REFERENCES (get_version, rnds, wnps, wnds);
+  PRAGMA RESTRICT_REFERENCES (get_body_version, rnds, wnps, wnds);
+  PRAGMA RESTRICT_REFERENCES( get_module ,wnds ,wnps ,rnps);
+  PRAGMA RESTRICT_REFERENCES( get_module_title ,wnds);
+  PRAGMA RESTRICT_REFERENCES( get_module_parameter ,wnds ,wnps ,rnps);
+  PRAGMA RESTRICT_REFERENCES( get_module_param_descr ,wnds ,wnps ,rnps);
+  PRAGMA RESTRICT_REFERENCES( get_module_linesize ,wnds ,wnps ,rnps);
+  PRAGMA RESTRICT_REFERENCES( get_module_pagesize ,wnds ,wnps ,rnps);
+  PRAGMA RESTRICT_REFERENCES( get_module_spoolfile ,wnds ,wnps ,rnps);
+  PRAGMA RESTRICT_REFERENCES( get_module_spoolpath ,wnds ,wnps );
+  PRAGMA RESTRICT_REFERENCES( get_parameter_value ,wnds ,wnps ,rnps);
+  PRAGMA RESTRICT_REFERENCES( get_parameter_shown ,wnds ,wnps ,rnps);
+  PRAGMA RESTRICT_REFERENCES( get_parameter_descr ,wnds ,wnps ,rnps);
+  PRAGMA RESTRICT_REFERENCES( get_selection_criteria ,wnds ,wnps ,rnps);
+  PRAGMA RESTRICT_REFERENCES( get_reports_file_extension ,wnds ,wnps ,rnds);
+--</PRAGMA>
+
+
+END higgrirp;
+/
