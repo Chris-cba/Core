@@ -1,0 +1,15 @@
+--
+--------------------------------------------------------------------------------
+--   PVCS Identifiers :-
+--
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/sql/create_mdsys_syn.sql-arc   3.1   Jul 04 2013 09:32:42   James.Wadsworth  $
+--       Module Name      : $Workfile:   create_mdsys_syn.sql  $
+--       Date into PVCS   : $Date:   Jul 04 2013 09:32:42  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 09:27:34  $
+--       PVCS Version     : $Revision:   3.1  $
+--
+------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+------------------------------------------------------------------
+--
+CREATE OR REPLACE PUBLIC SYNONYM sdo_geom_metadata_table FOR mdsys.sdo_geom_metadata_table;
