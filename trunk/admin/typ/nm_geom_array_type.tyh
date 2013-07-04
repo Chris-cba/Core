@@ -16,7 +16,7 @@ CREATE OR REPLACE type nm_geom_array_type is
 --   TYPE nm_geom_array_type
 --
 -----------------------------------------------------------------------------
---      Copyright (c) exor corporation ltd, 2001
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 varray(1048576)  of nm_geom

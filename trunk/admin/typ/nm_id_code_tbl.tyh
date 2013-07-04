@@ -3,17 +3,17 @@ type nm_id_code_tbl
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:$
---       Module Name      : $Workfile:$
---       Date into PVCS   : $Date:$
---       Date fetched Out : $Modtime:$
---       PVCS Version     : $Revision:$
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/typ/nm_id_code_tbl.tyh-arc   2.1   Jul 04 2013 10:14:06   James.Wadsworth  $
+--       Module Name      : $Workfile:   nm_id_code_tbl.tyh  $
+--       Date into PVCS   : $Date:   Jul 04 2013 10:14:06  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 09:59:38  $
+--       PVCS Version     : $Revision:   2.1  $
 --       Based on sccs version : 
 --
 --   Author : Priidu Tanava
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2006
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 as table of nm_id_code_type
 /

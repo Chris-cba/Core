@@ -16,7 +16,7 @@ CREATE OR REPLACE type nm_geom_array as object (
 --   TYPE nm_geom_array
 --
 -----------------------------------------------------------------------------
---      Copyright (c) exor corporation ltd, 2001
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 nga nm_geom_array_type

@@ -16,7 +16,7 @@ CREATE OR REPLACE type nm_geom as object (
 --   TYPE nm_geom_array
 --
 -----------------------------------------------------------------------------
---      Copyright (c) exor corporation ltd, 2001
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
  ng_ne_id integer, ng_geometry  mdsys.sdo_geometry )

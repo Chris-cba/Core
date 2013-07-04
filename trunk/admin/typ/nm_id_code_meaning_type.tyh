@@ -13,7 +13,7 @@ CREATE OR REPLACE type nm_id_code_meaning_type
 --   Author : %USERNAME%
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2006
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 as object (
    ID number(12)
