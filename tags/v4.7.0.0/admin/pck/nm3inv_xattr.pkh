@@ -1,0 +1,215 @@
+CREATE OR REPLACE PACKAGE nm3inv_xattr AS
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_xattr.pkh-arc   2.2   Jul 04 2013 16:08:48   James.Wadsworth  $
+--       Module Name      : $Workfile:   nm3inv_xattr.pkh  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:08:48  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:14  $
+--       Version          : $Revision:   2.2  $
+--       Based on SCCS version : 1.7
+-------------------------------------------------------------------------
+--
+--   Author : Rob Coupe
+--
+--   Xattr Validation package
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+  g_sccsid      CONSTANT  varchar2(2000) := '$Revision:   2.2  $';
+--  g_sccsid is the SCCS ID for the package
+--</GLOBVAR>
+--
+------------------------------------------------------------------------------
+-- The following globals are used to handle whether the X attr validation should be
+-- switched off or not. The variable should be set in all functions that operate on the
+-- collection of inventory over a location. For example, the reversal of inventory on
+-- a route does not result in an end-date of inventory or an update of any attributes
+-- other than XSP. Under these conditions, the rules are assumed to be symmetric.
+--
+   g_xattr_active boolean := TRUE;
+--
+------------------------------------------------------------------------------
+--
+-- These globals address the need to hold inventory location data across the stages
+-- of trigger operation on nm_members
+--
+   TYPE loc_xattr IS RECORD
+      (nm_ne_id_in   nm_members.nm_ne_id_in%TYPE
+	  ,nm_obj_type   nm_members.nm_obj_type%TYPE
+      ,nm_ne_id_of   nm_members.nm_ne_id_of%TYPE
+      ,nm_begin_mp   nm_members.nm_begin_mp%TYPE
+      ,nm_end_mp     nm_members.nm_end_mp%TYPE
+      ,dep_class     varchar2(1)
+      ,op            varchar2(1)
+      );
+--
+   TYPE tab_rec_xattr IS TABLE OF loc_xattr INDEX BY binary_integer;
+--
+   g_tab_rec_xattr tab_rec_xattr;
+
+   g_tab_loc_idx_xattr binary_integer := 0;
+
+--
+-- These globals store inventory data across the stages of trigger operation on nm_inv_items
+--
+   TYPE loc_item_xattr IS RECORD
+      (iit_ne_id     nm_inv_items_all.iit_ne_id%TYPE
+	  ,iit_inv_type  nm_inv_items_all.iit_inv_type%TYPE
+      ,dep_class     varchar2(1)
+      ,op            varchar2(1)
+      );
+--
+   TYPE tab_loc_item_xattr IS TABLE OF loc_item_xattr INDEX BY binary_integer;
+--
+   g_tab_loc_item_xattr tab_loc_item_xattr;
+
+   g_tab_item_idx_xattr binary_integer := 0;
+
+--
+large  CONSTANT  number := 10*EXP(32);
+
+-----------------------------------------------------------------------------
+-- These globals are used to hold the whole set of criteria for checking
+-- attribute changes
+--
+/*
+   TYPE check_type_attrib is record
+     ( rule_id         nm_x_location_rules.nxl_rule_id%type
+	  ,inv_type        nm_inv_items_all.iit_inv_type%TYPE
+	  ,column_name     varchar2(30)
+	  ,dep_or_indep_flag varchar2(1)
+	  ,has_changed_cursor varchar2(2000)
+	 );
+
+   TYPE check_type_attrib_tab is table of check_type_attrib index by binary_integer;
+
+   g_tab_check_type_attribs check_type_attrib_tab;
+
+   g_idx_check_type_attribs binary_integer := 0;
+
+*/
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="PROCESS_XATTR">
+-- This procedure process the Xattr Validation rules
+PROCEDURE process_xattr;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="CLEAR_LOC_XATTR">
+-- This procedure clears the table used to store ids for validation
+PROCEDURE clear_loc_xattr;
+--</PROC>
+
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="CLEAR_LOC_XATTR">
+-- This procedure clears the table used to store ids for validation
+PROCEDURE clear_inv_xattr;
+--</PROC>
+
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="location_rule">
+-- This procedure returns an indicator if the object type is to be validated as it is located
+FUNCTION location_rule( pi_dep_class IN varchar2, pi_obj_type IN nm_members_all.nm_obj_type%TYPE ) RETURN varchar2;
+--</PROC>
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_inv_condition_text">
+-- This function returns the if condition string from a validation rule id
+FUNCTION get_inv_condition_text( pi_nxic_id IN nm_x_inv_conditions.nxic_id%TYPE ) RETURN varchar2;
+--</PROC>
+-----------------------------------------------------------------------------
+FUNCTION get_loc_constraint( pi_rule_id IN nm_x_location_rules.nxl_rule_id%TYPE ) RETURN varchar2;
+--
+--<PROC NAME="get_dep_location_query">
+-- This function returns the query string from a dependent item validation rule id
+FUNCTION get_dep_location_query( pi_rule_id nm_x_location_rules.nxl_rule_id%TYPE,
+                                pi_loc_xattr IN loc_xattr ) RETURN varchar2;
+--</PROC>
+-----------------------------------------------------------------------------
+--<PROC NAME="get_indep_location_query">
+-- This function returns the query string from an independent item validation rule id
+FUNCTION get_indep_location_query( pi_rule_id nm_x_location_rules.nxl_rule_id%TYPE,
+                                pi_loc_xattr IN loc_xattr,
+                                pi_indep_type IN nm_members.nm_obj_type%type,
+                                pi_op varchar2 ) RETURN varchar2;
+--</PROC>
+-----------------------------------------------------------------------------
+
+PROCEDURE process_item_xattr;
+FUNCTION  check_type( pi_inv_type nm_inv_types.nit_inv_type%TYPE,
+                      pi_i_or_d IN varchar2 ) RETURN boolean;
+
+PROCEDURE deactivate_xattr_validation;
+PROCEDURE activate_xattr_validation;
+PROCEDURE ins_nxc( p_loc_xattr loc_xattr );
+FUNCTION check_x_location_rule( pi_exist   IN varchar2,
+                                pi_mem_rec IN loc_xattr,
+                                pi_cur     IN varchar2 ) RETURN boolean;
+FUNCTION check_indep_end_date( pi_ne_id IN nm_members.nm_ne_id_in%TYPE ) RETURN nm_x_errors.nxe_id%TYPE;
+PROCEDURE trap_indep_end_date( pi_ne_id IN nm_members.nm_ne_id_in%TYPE );
+FUNCTION is_valid_for_reclass( pi_ne_id IN nm_members.nm_ne_id_in%TYPE, pi_dest_nw_type nm_types.nt_type%TYPE ) RETURN boolean;
+FUNCTION is_nt_valid_for_reclass ( pi_ne_id IN nm_members.nm_ne_id_in%TYPE,
+                                   pi_dest_nw_type nm_types.nt_type%TYPE ) RETURN boolean;
+FUNCTION get_dep_item_query( pi_rule_id nm_x_location_rules.nxl_rule_id%TYPE,
+                             pi_item_id nm_inv_items.iit_ne_id%TYPE ) RETURN varchar2;
+FUNCTION get_dep_item_query_at_end_date( pi_rule_id nm_x_location_rules.nxl_rule_id%TYPE,
+                                         pi_item_id nm_inv_items.iit_ne_id%TYPE ) RETURN varchar2;
+FUNCTION get_indep_item_query( pi_rule_id nm_x_location_rules.nxl_rule_id%TYPE,
+                               pi_item_id nm_inv_items.iit_ne_id%TYPE ) RETURN varchar2;
+FUNCTION get_nw_item_query( pi_rule_id nm_x_nw_rules.nxn_rule_id%TYPE,
+                            pi_item_id nm_inv_items.iit_ne_id%TYPE ) RETURN varchar2;
+FUNCTION check_x_item_rule( pi_exist   IN varchar2,
+                            pi_cur     IN varchar2 ) RETURN boolean;
+-----------------------------------------------------------------------------
+--<PROC NAME="parse_nw_indep_condition">
+--
+-- This procedure parses a nw condition. If the sql is invalid an exception
+-- is raised (ORA-20000).
+--
+PROCEDURE parse_nw_indep_condition(pi_condition IN nm_x_nw_rules.nxn_indep_condition%TYPE
+                                  );
+--</PROC>
+
+FUNCTION is_type_multi_allowed ( pi_nit_type in nm_members.nm_obj_type%TYPE ) return boolean;
+
+PROCEDURE x_item_check_pl ( pi_obj_type    in nm_members.nm_obj_type%TYPE
+                           ,pi_nm_ne_id_in in nm_members.nm_ne_id_in%TYPE
+                           ,pi_pl       in nm_placement_array );
+--
+-----------------------------------------------------------------------------
+--
+--<PRAGMA>
+   PRAGMA RESTRICT_REFERENCES (get_version, rnds, wnps, wnds, trust);
+   PRAGMA RESTRICT_REFERENCES (get_body_version, rnds, wnps, wnds , trust);
+   PRAGMA RESTRICT_REFERENCES (activate_xattr_validation, rnds,  wnds , trust);
+   PRAGMA RESTRICT_REFERENCES (deactivate_xattr_validation, rnds, wnds , trust);
+   PRAGMA RESTRICT_REFERENCES (check_indep_end_date, rnds, wnds , trust);
+   PRAGMA RESTRICT_REFERENCES (get_dep_item_query, rnds, wnds , trust);
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+END nm3inv_xattr;
+/

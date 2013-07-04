@@ -1,0 +1,216 @@
+CREATE OR REPLACE PACKAGE nm3inv_view AS
+--<PACKAGE>
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_view.pkh-arc   2.3   Jul 04 2013 16:08:48   James.Wadsworth  $
+--       Module Name      : $Workfile:   nm3inv_view.pkh  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:08:48  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:14  $
+--       Version          : $Revision:   2.3  $
+--       Based on SCCS version : 
+-------------------------------------------------------------------------
+--   Author : Jonathan Mills
+--
+--   nm3inv_view package
+--
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+
+--</PACKAGE>
+--<GLOBVAR>
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.3  $';
+--
+--</GLOBVAR>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_version">
+-- This function returns the sccs_id
+  FUNCTION get_version RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_body_version">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN VARCHAR2;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="Create_view">
+    PROCEDURE create_view (p_inventory_type  IN NM_INV_TYPES.nit_inv_type%TYPE
+                          ,p_join_to_network IN BOOLEAN DEFAULT FALSE
+                          );
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="Create_inv_view">
+PROCEDURE create_inv_view (p_inventory_type  IN  NM_INV_TYPES.nit_inv_type%TYPE
+                          ,p_join_to_network IN  BOOLEAN DEFAULT FALSE
+                          ,p_view_name       OUT USER_VIEWS.view_name%TYPE
+                          );
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_create_inv_view_text">
+-- This function returns the create view string
+FUNCTION get_create_inv_view_text (p_inventory_type   IN NM_INV_TYPES.nit_inv_type%TYPE
+                                  ,p_join_to_network  IN BOOLEAN DEFAULT FALSE
+                                  ) RETURN VARCHAR2;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="Create_all_inv_views">
+-- This procedure creates views for all INVENTORY TYPES
+    PROCEDURE create_all_inv_views;
+--</PROC>;
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME=work_out_inv_type_view_name">
+-- This function derives the view name for a given INVENTRY TYPE depending on whether
+--  or not it is connected to the network
+FUNCTION work_out_inv_type_view_name (pi_inv_type         IN NM_INV_TYPES.nit_inv_type%TYPE
+                                     ,pi_join_to_network  IN BOOLEAN DEFAULT FALSE
+                                     ) RETURN VARCHAR2;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="derive_inv_type_view_name">
+-- This function derives the view name for a given INVENTRY TYPE
+FUNCTION derive_inv_type_view_name (pi_inv_type IN NM_INV_TYPES.nit_inv_type%TYPE)
+ RETURN VARCHAR2;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_mapcapture_csv_unique_ref">
+-- This function derives the MapCapture csv loader definition unique ref for a given INVENTORY TYPE
+FUNCTION get_mapcapture_csv_unique_ref (pi_inv_type IN nm_inv_types.nit_inv_type%TYPE)
+RETURN VARCHAR2;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="derive_nw_inv_type_view_name">
+-- This function derives the view name for a given INVENTRY TYPE joined to the network
+FUNCTION derive_nw_inv_type_view_name (pi_inv_type IN NM_INV_TYPES.nit_inv_type%TYPE)
+ RETURN VARCHAR2;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="create_mapcapture_csv_metadata">
+-- This procedure creates the csv loader metadata for loading mapcapture
+-- assets. It should be called when mapcapture views are created
+PROCEDURE create_mapcapture_csv_metadata (pi_inv_type    VARCHAR2);
+PROCEDURE create_all_mapcapture_csv_data;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="create_ft_inv_for_nt_type">
+-- This procedure creates a view and the inventory type to establish a NT type as foreign table
+--  inventory to allow merge/PBI etc to be run across it
+--
+PROCEDURE create_ft_inv_for_nt_type (pi_nt_type                  IN VARCHAR2
+                                    ,pi_inv_type                 IN VARCHAR2 DEFAULT NULL
+                                    ,pi_delete_existing_inv_type IN BOOLEAN  DEFAULT FALSE
+                                    );
+--</PROC>
+
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="create_view_for_nt_type">
+-- This procedure creates a view for a specified NT type
+--
+PROCEDURE create_view_for_nt_type (pi_nt_type                  IN VARCHAR2 );
+
+--</PROC>
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="create_view_for_nt_type">
+-- This procedure creates a view for a specified NT type and GT Type 
+--
+PROCEDURE create_view_for_nt_type (pi_nt_type  IN varchar2,
+                                   pi_gty_type IN varchar2);
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="create_view_for_nt_type">
+-- This procedure creates a view for a specified NT type and GT Type 
+--
+FUNCTION get_nt_view_name (pi_nt_type  IN VARCHAR2,
+                           pi_gty_type IN VARCHAR2 DEFAULT NULL
+                          ) RETURN VARCHAR2;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="create_inv_nw_trigger">
+-- Produces an instead of trigger for the inv type on the network view
+--
+PROCEDURE create_inv_nw_trigger( pi_inv_type    VARCHAR2
+                                ,pi_attr_prefix VARCHAR2 DEFAULT NULL
+                               );
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="create_all_inv_nw_trigger">
+-- Produces an instead of trigger for the ALL inv types on the network view
+--
+PROCEDURE create_all_inv_nw_trigger( pi_attr_prefix VARCHAR2 DEFAULT NULL );
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="create_ft_inv_for_nt_type">
+-- This procedure creates the views and the inventory types to establish all NT types as foreign table
+--  inventory to allow merge/PBI etc to be run across them
+--
+PROCEDURE create_all_ft_inv_for_nt_type (pi_delete_existing_inv_type IN BOOLEAN DEFAULT FALSE);
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="create_inv_on_route_view">
+-- This procedure creates the inv on route views For all inv types
+--
+PROCEDURE create_all_inv_on_route_view (pi_attr_prefix VARCHAR2 DEFAULT NULL);
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="create_inv_on_route_view">
+-- This procedure creates the inv on route views
+--
+PROCEDURE create_inv_on_route_view (pi_inv_type    VARCHAR2
+                                   ,pi_attr_prefix VARCHAR2 DEFAULT NULL
+                                   ) ;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PRAGMA>
+   PRAGMA RESTRICT_REFERENCES (get_version, wnds, wnps);
+   PRAGMA RESTRICT_REFERENCES (get_body_version, wnds, wnps);
+   PRAGMA RESTRICT_REFERENCES (work_out_inv_type_view_name, wnds, wnps);
+   PRAGMA RESTRICT_REFERENCES (derive_inv_type_view_name, wnds, wnps);
+   PRAGMA RESTRICT_REFERENCES (derive_nw_inv_type_view_name, wnds, wnps);
+   PRAGMA RESTRICT_REFERENCES (get_create_inv_view_text, wnds);
+--</PRAGMA>
+--
+----------------------------------------------------------------------------------------------
+--
+END nm3inv_view;
+/

@@ -1,0 +1,146 @@
+CREATE OR REPLACE PACKAGE nm3inv_xattr_gen AS
+--<PACKAGE>
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_xattr_gen.pkh-arc   2.2   Jul 04 2013 16:08:48   James.Wadsworth  $
+--       Module Name      : $Workfile:   nm3inv_xattr_gen.pkh  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:08:48  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:14  $
+--       Version          : $Revision:   2.2  $
+--       Based on SCCS version : 
+-------------------------------------------------------------------------
+--
+--   Author : Jonathan Mills
+--
+--   NM3 Inventory X-Attribute Trigger Generation package
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.2  $';
+--  g_sccsid is the SCCS ID for the package
+--
+   TYPE tab_ae IS TABLE OF all_errors%ROWTYPE INDEX BY binary_integer;
+--
+   c_xattr_validation_proc_name CONSTANT user_objects.object_name%TYPE := 'IIT_X_ATTR_VALIDATION';
+--
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nxe">
+-- This function returns nm_x_errors row for pi_nxe_id
+FUNCTION get_nxe(pi_nxe_id IN nm_x_errors.nxe_id%TYPE
+                ) RETURN nm_x_errors%ROWTYPE;
+--
+-- Errors Raised Are :
+--
+-- -20101  nm_x_errors record not found: nxe_id =
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nxic">
+-- This function returns nm_x_inv_conditions row for pi_nxic_id
+FUNCTION get_nxic(pi_nxic_id IN nm_x_inv_conditions.nxic_id%TYPE
+                 ) RETURN nm_x_inv_conditions%ROWTYPE;
+--
+-- Errors Raised Are :
+--
+-- -20102 nm_x_inv_conditions record not found: nxic_id =
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_if_condition_text">
+-- This function returns the text of the condition from an
+-- nm_x_inv_conditions record.
+FUNCTION get_if_condition_text(pi_nxic_rec nm_x_inv_conditions%ROWTYPE
+                              ) RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_next_nxr_id">
+--
+FUNCTION get_next_nxr_id RETURN nm_x_rules.nxr_rule_id%TYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_next_nxic_id">
+--
+FUNCTION get_next_nxic_id RETURN nm_x_inv_conditions.nxic_id%TYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="generate_single_inv_record_trg">
+--  This procedure generates the triggers (type 3) which operate on
+--   a single inventory row
+--
+PROCEDURE generate_single_inv_record_trg;
+--
+FUNCTION generate_single_inv_record_trg RETURN tab_ae;
+--
+-- Errors Raised Are :
+--
+-- -20103 nm_x_inv_conditions records must all be for the
+--         same INV_TYPE for the same driving condition
+-- -20104 nm_x_inv_conditions records must all be for the
+--         same INV_TYPE for driving conditions and validation conditions
+-- -20105 nm_x_inv_conditions records must all be for the same INV_TYPE
+--         for the same validation condition
+-- -20106 At least 1 nm_x_driving_conditions record must exist for each rule
+-- -20107 Boolean connector cannot be present for first driving condition
+-- -20108 Boolean connector must be present for driving conditions other than
+--         the first
+-- -20109 Driving conditions may not have the same seq no within the same rule
+-- -20110 Boolean connector cannot be present for first validation condition
+-- -20111 Boolean connector must be present for validation conditions other
+--         than the first
+-- -20112 Validation conditions may not have the same seq no within the same rule
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="Get_Error_String">
+-- This function returns the error string
+--
+FUNCTION get_error_string (pi_err_id IN nm_x_errors.nxe_id%TYPE ) RETURN VARCHAR2;
+--</PROC>
+--
+--
+-----------------------------------------------------------------------------
+--
+--<PRAGMA>
+   PRAGMA RESTRICT_REFERENCES (get_version, rnds, wnps, wnds);
+   PRAGMA RESTRICT_REFERENCES (get_body_version, rnds, wnps, wnds);
+   PRAGMA RESTRICT_REFERENCES (get_nxe, wnds);
+   PRAGMA RESTRICT_REFERENCES (get_nxic, wnds);
+   PRAGMA RESTRICT_REFERENCES (get_if_condition_text, wnds, wnps);
+   PRAGMA RESTRICT_REFERENCES (get_next_nxr_id, wnds, wnps);
+   PRAGMA RESTRICT_REFERENCES (get_next_nxic_id, wnds, wnps);
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+END nm3inv_xattr_gen;
+/

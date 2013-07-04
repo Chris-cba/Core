@@ -1,0 +1,172 @@
+CREATE OR REPLACE PACKAGE nm3inv_temp AS
+--<PACKAGE>
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_temp.pkh-arc   2.3   Jul 04 2013 16:08:48   James.Wadsworth  $
+--       Module Name      : $Workfile:   nm3inv_temp.pkh  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:08:48  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:14  $
+--       Version          : $Revision:   2.3  $
+--       Based on SCCS version : 
+-------------------------------------------------------------------------
+--   Author : Kevin Angus
+--
+--    nm3inv_temp
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+
+  -----------
+  --constants
+  -----------
+  --g_sccsid is the SCCS ID for the package
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.3  $';
+
+  -----------
+  --variables
+  -----------
+--  g_items_copied nm3type.tab_number;
+--
+   g_tii_njc_job_id    nm_temp_inv_items.tii_njc_job_id%TYPE;
+   g_nte_job_id        nm_nw_temp_extents.nte_job_id%TYPE;
+   g_inv_type          nm_inv_types.nit_inv_type%TYPE;
+   g_tii_ne_id         nm_temp_inv_items.tii_ne_id%TYPE;
+   g_ne_id_new         nm_temp_inv_items.tii_ne_id_new%TYPE;
+   g_old_tii_ne_id_new nm_temp_inv_items.tii_ne_id_new%TYPE;
+   --
+   TYPE tab_rec_tim      IS TABLE OF nm_temp_inv_members%ROWTYPE      INDEX BY BINARY_INTEGER;
+   TYPE tab_rec_tim_temp IS TABLE OF nm_temp_inv_members_temp%ROWTYPE INDEX BY BINARY_INTEGER;
+   --
+   g_rec_tii_1 nm_temp_inv_items%ROWTYPE;
+   g_rec_tii_2 nm_temp_inv_items%ROWTYPE;
+   g_boolean   BOOLEAN;
+   --
+   g_rec_tii   nm_temp_inv_items%ROWTYPE;
+   --
+   g_pl_arr    nm_placement_array;
+   --
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+PROCEDURE make_copy(pi_njc_job_id       IN nm_job_control.njc_job_id%TYPE
+                   ,pi_nte_job_id       IN nm_nw_temp_extents.nte_job_id%TYPE
+                   ,pi_inv_type         IN nm_inv_types.nit_inv_type%TYPE
+                   ,pi_include_children IN boolean DEFAULT FALSE
+                   ,pi_effective_date   IN date DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
+                   );
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE delete_copy(pi_njc_job_id IN nm_job_control.njc_job_id%TYPE
+                     );
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_tim (p_rec_tim nm_temp_inv_members%ROWTYPE);
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE del_tim (pi_tim_njc_job_id      nm_temp_inv_members.tim_njc_job_id%TYPE
+                  ,pi_tim_ne_id_in        nm_temp_inv_members.tim_ne_id_in%TYPE
+                  ,pi_tim_ne_id_in_new    nm_temp_inv_members.tim_ne_id_in_new%TYPE
+                  ,pi_tim_ne_id_of        nm_temp_inv_members.tim_ne_id_of%TYPE
+                  ,pi_tim_extent_begin_mp nm_temp_inv_members.tim_extent_begin_mp%TYPE
+                  );
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE split_temp_inv_for_measure (p_njc_job_id nm_temp_inv_members.tim_njc_job_id%TYPE
+                                     ,p_begin_mp   NUMBER
+                                     ,p_end_mp     NUMBER
+                                     );
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_tii (p_rec_tii nm_temp_inv_items%ROWTYPE);
+--
+-----------------------------------------------------------------------------
+--
+FUNCTION get_all_tim_within_ext_limits
+                 (p_tim_njc_job_id      nm_temp_inv_members.tim_njc_job_id%TYPE
+                 ,p_tim_extent_begin_mp nm_temp_inv_members.tim_extent_begin_mp%TYPE
+                 ,p_tim_extent_end_mp   nm_temp_inv_members.tim_extent_begin_mp%TYPE
+                 ,p_inv_type            nm_temp_inv_members.tim_obj_type%TYPE
+                 ) RETURN tab_rec_tim;
+--
+-----------------------------------------------------------------------------
+--
+FUNCTION get_all_tim_temp_in_ext_limits
+                 (p_tim_njc_job_id      nm_temp_inv_members.tim_njc_job_id%TYPE
+                 ,p_tim_extent_begin_mp nm_temp_inv_members.tim_extent_begin_mp%TYPE
+                 ,p_tim_extent_end_mp   nm_temp_inv_members.tim_extent_begin_mp%TYPE
+                 ,p_inv_type            nm_temp_inv_members.tim_obj_type%TYPE
+                 ) RETURN tab_rec_tim_temp;
+--
+-----------------------------------------------------------------------------
+--
+FUNCTION are_2_rec_tii_identical (p_rec_tii_1 nm_temp_inv_items%ROWTYPE
+                                 ,p_rec_tii_2 nm_temp_inv_items%ROWTYPE
+                                 ) RETURN BOOLEAN;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE delete_tii (p_tii_njc_job_id nm_temp_inv_items.tii_njc_job_id%TYPE
+                     ,p_tii_ne_id      nm_temp_inv_items.tii_ne_id%TYPE
+                     ,p_tii_ne_id_new  nm_temp_inv_items.tii_ne_id_new%TYPE
+                     );
+--
+-----------------------------------------------------------------------------
+--
+FUNCTION get_tii (p_tii_njc_job_id nm_temp_inv_items.tii_njc_job_id%TYPE
+                 ,p_tii_ne_id      nm_temp_inv_items.tii_ne_id%TYPE
+                 ,p_tii_ne_id_new  nm_temp_inv_items.tii_ne_id_new%TYPE
+                 ) RETURN nm_temp_inv_items%ROWTYPE;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE restore_inventory (p_njc_job_id nm_temp_inv_members.tim_njc_job_id%TYPE);
+--
+-----------------------------------------------------------------------------
+--
+FUNCTION get_new_iit_pk (pi_job_id    nm_temp_inv_items.tii_njc_job_id%TYPE
+                        ,pi_old_pk    nm_temp_inv_items.tii_primary_key%TYPE
+                        ,pi_ne_id_old nm_temp_inv_items.tii_ne_id%TYPE
+                        ,pi_ne_id_new nm_temp_inv_items.tii_ne_id_new%TYPE
+                        ) RETURN nm_temp_inv_items.tii_primary_key%TYPE;
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="validate_rec_tii">
+-- Validates the passed nm_temp_inv_items record agains the inventory metamodel
+--
+PROCEDURE validate_rec_tii (p_rec_tii nm_temp_inv_items%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PRAGMA>
+  PRAGMA RESTRICT_REFERENCES(get_version, rnds, wnps, wnds);
+  PRAGMA RESTRICT_REFERENCES(get_body_version, rnds, wnps, wnds);
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+END nm3inv_temp;
+/
