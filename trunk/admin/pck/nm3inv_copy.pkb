@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_copy AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_copy.pkb-arc   2.2   May 16 2011 14:44:54   Steve.Cooper  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_copy.pkb-arc   2.3   Jul 04 2013 16:04:32   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3inv_copy.pkb  $
---       Date into PVCS   : $Date:   May 16 2011 14:44:54  $
---       Date fetched Out : $Modtime:   Apr 01 2011 13:16:54  $
---       Version          : $Revision:   2.2  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:04:32  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:14  $
+--       Version          : $Revision:   2.3  $
 --       Based on SCCS version : 1.2
 -------------------------------------------------------------------------
 --   Author : Jonathan Mills
@@ -15,14 +15,14 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_copy AS
 --   Inventory Copy package body
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2002
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 --all global package variables here
 --
 --  g_body_sccsid is the SCCS ID for the package body
 --
-  g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.2  $';
+  g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.3  $';
   g_package_name    CONSTANT  varchar2(30)   := 'nm3inv_copy';
 --
 --

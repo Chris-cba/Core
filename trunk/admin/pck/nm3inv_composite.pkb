@@ -1,11 +1,11 @@
 CREATE OR REPLACE PACKAGE BODY nm3inv_composite AS
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_composite.pkb-arc   2.4   Oct 04 2011 15:04:40   Steve.Cooper  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_composite.pkb-arc   2.5   Jul 04 2013 16:04:32   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3inv_composite.pkb  $
---       Date into PVCS   : $Date:   Oct 04 2011 15:04:40  $
---       Date fetched Out : $Modtime:   Oct 04 2011 15:03:58  $
---       PVCS Version     : $Revision:   2.4  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:04:32  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:14  $
+--       PVCS Version     : $Revision:   2.5  $
 --       Based on SCCS Version: 1.3
 --
 --   Author : Jonathan Mills
@@ -13,7 +13,7 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_composite AS
 --   Composite Inventory package body
 --
 -----------------------------------------------------------------------------
---   Copyright (c) exor corporation ltd, 2005
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 /* History
   26.03.09 PT in refresh_nmnd() added logic to call new code in nm3inv_composite2
@@ -22,7 +22,7 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_composite AS
 */
 
 --
-   g_body_sccsid   constant varchar2(200) :='"$Revision:   2.4  $"';
+   g_body_sccsid   constant varchar2(200) :='"$Revision:   2.5  $"';
    g_package_name    CONSTANT  varchar2(30)   := 'nm3inv_composite';
 --
    g_mrg_results_table VARCHAR2(30);

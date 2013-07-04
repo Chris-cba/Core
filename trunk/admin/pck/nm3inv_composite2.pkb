@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_composite2 AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_composite2.pkb-arc   2.13   May 16 2011 14:44:54   Steve.Cooper  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_composite2.pkb-arc   2.14   Jul 04 2013 16:04:32   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3inv_composite2.pkb  $
---       Date into PVCS   : $Date:   May 16 2011 14:44:54  $
---       Date fetched Out : $Modtime:   May 05 2011 10:45:46  $
---       PVCS Version     : $Revision:   2.13  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:04:32  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:14  $
+--       PVCS Version     : $Revision:   2.14  $
 --       Based on sccs version :
 --
 --   Author : Priidu Tanava
@@ -14,7 +14,7 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_composite2 AS
 --   Bulk Merge Composite Inventory package body
 --
 -----------------------------------------------------------------------------
---   Copyright (c) exor corporation ltd, 2007
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 /* History:
   24.07.07 PT added set_job_broken(), improved progress reporting in get_progress_text()
@@ -39,7 +39,7 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_composite2 AS
                 NB! requires nm3bulk_mrg_pkh 2.7 or higher (logs 723574, 724275)
 */
 
-  g_body_sccsid   constant  varchar2(30) := '"$Revision:   2.13  $"';
+  g_body_sccsid   constant  varchar2(30) := '"$Revision:   2.14  $"';
   g_package_name  constant  varchar2(30) := 'nm3inv_composite2';
   
   cant_serialize exception;

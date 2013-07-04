@@ -3,11 +3,11 @@ create or replace package nm3inv_composite as
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_composite.pkh-arc   2.2   May 16 2011 14:44:54   Steve.Cooper  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_composite.pkh-arc   2.3   Jul 04 2013 16:04:32   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3inv_composite.pkh  $
---       Date into PVCS   : $Date:   May 16 2011 14:44:54  $
---       Date fetched Out : $Modtime:   Apr 01 2011 13:16:10  $
---       Version          : $Revision:   2.2  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:04:32  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:14  $
+--       Version          : $Revision:   2.3  $
 --       Based on SCCS version : 1.1
 -------------------------------------------------------------------------
 --   Author : Jonathan Mills
@@ -15,11 +15,11 @@ create or replace package nm3inv_composite as
 --   Composite Inventory package
 --
 -----------------------------------------------------------------------------
---   Copyright (c) exor corporation ltd, 2005
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
-   g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.2  $';
+   g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.3  $';
 --  g_sccsid is the SCCS ID for the package
 --
    c_composite_nic_category CONSTANT nm_inv_categories.nic_category%TYPE := 'D';

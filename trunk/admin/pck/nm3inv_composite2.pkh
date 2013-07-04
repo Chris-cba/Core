@@ -2,11 +2,11 @@ create or replace package nm3inv_composite2 as
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_composite2.pkh-arc   2.2   Aug 12 2008 11:18:46   ptanava  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_composite2.pkh-arc   2.3   Jul 04 2013 16:04:32   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3inv_composite2.pkh  $
---       Date into PVCS   : $Date:   Aug 12 2008 11:18:46  $
---       Date fetched Out : $Modtime:   Aug 12 2008 10:41:40  $
---       PVCS Version     : $Revision:   2.2  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:04:32  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:14  $
+--       PVCS Version     : $Revision:   2.3  $
 --       Based on sccs version : 
 --
 --   Author : Priidu
@@ -14,9 +14,9 @@ create or replace package nm3inv_composite2 as
 --   Composite Inventory package with bulk processing
 --
 -----------------------------------------------------------------------------
---   Copyright (c) exor corporation ltd, 2007
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
-  g_sccsid      constant  varchar2(2000) := '"$Revision:   2.2  $"';
+  g_sccsid      constant  varchar2(2000) := '"$Revision:   2.3  $"';
 
   subtype id_type is number(9);
   subtype mp_type is number;
