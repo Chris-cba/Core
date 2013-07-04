@@ -1,3 +1,16 @@
+--
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3.typ-arc   2.1   Jul 04 2013 13:55:16   James.Wadsworth  $
+--       Module Name      : $Workfile:   nm3.typ  $
+--       Date into PVCS   : $Date:   Jul 04 2013 13:55:16  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 13:37:10  $
+--       Version          : $Revision:   2.1  $
+--
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
 REM SCCS ID Keyword, do no remove
 define sccsid = '@(#)nm3.typ	1.1 03/02/01';
 
