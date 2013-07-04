@@ -1,0 +1,150 @@
+CREATE OR REPLACE PACKAGE nm3mrg_view AS
+--<PACKAGE>
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mrg_view.pkh-arc   2.2   Jul 04 2013 16:16:08   James.Wadsworth  $
+--       Module Name      : $Workfile:   nm3mrg_view.pkh  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:16:08  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:16  $
+--       Version          : $Revision:   2.2  $
+--       Based on SCCS version : 1.10
+-------------------------------------------------------------------------
+--
+--   Author : Jonathan Mills
+--
+--   NM3 Merge View Creation Package
+--
+-----------------------------------------------------------------------------
+-- Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+--  g_sccsid is the SCCS ID for the package
+   g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.2  $';
+--
+  g_views_to_del   nm3type.tab_varchar30;
+  g_tab_nmq_id_del nm3type.tab_number;
+--
+  TYPE tab_number IS TABLE OF number INDEX BY binary_integer;
+  g_tab_nmq_id tab_number;
+--
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="build_view">
+-- This function builds the view for the specified MRG_QUERY_ID, returning
+--  the view name
+--
+PROCEDURE build_view (p_mrg_query_id IN     number
+                     ,p_view_name       OUT varchar2
+                     );
+PROCEDURE build_view (p_mrg_query_id IN     number);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_mrg_inv_value">
+-- This function is used internally by the merge views to retrieve the
+--  inventory values
+--
+FUNCTION get_mrg_inv_value (p_mrg_job_id     IN number
+                           ,p_mrg_section_id IN number
+                           ,p_inv_type       IN varchar2
+                           ,p_x_sect         IN varchar2
+                           ,p_attrib_number  IN number
+                           ) RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="check_inv_exists">
+-- This function is used internally by the merge views to return "Y"
+--  if inventory values exist
+--
+FUNCTION check_inv_exists (p_mrg_job_id     IN number
+                          ,p_mrg_section_id IN number
+                          ,p_inv_type       IN varchar2
+                          ,p_x_sect         IN varchar2
+                          ) RETURN nm_mrg_sections.nms_in_results%TYPE;
+FUNCTION count_inv_vals   (p_mrg_job_id     IN number
+                          ,p_mrg_section_id IN number
+                          ,p_inv_type       IN varchar2
+                          ,p_x_sect         IN varchar2
+                          ) RETURN number;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_mrg_view_name_by_job_id">
+-- This function returns the name of the view which holds the results
+--  of the merge query with the given job_id
+--
+FUNCTION get_mrg_view_name_by_job_id (pi_job_id number) RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_mrg_view_name_by_qry_id">
+-- This function returns the name of the view which holds the results for
+--  all merge queries of this query type
+--
+FUNCTION get_mrg_view_name_by_qry_id (pi_qry_id number) RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+FUNCTION get_mrg_view_name_by_unique (pi_unique varchar2) RETURN varchar2;
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="drop_merge_view">
+-- This procedure drops a merge view for the given mrg query id
+--
+PROCEDURE drop_merge_view (p_qry_id number);
+PROCEDURE drop_merge_view (p_view_name varchar2);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE refresh_merge_results_snapshot (p_qry_id IN number);
+--
+-----------------------------------------------------------------------------
+--
+FUNCTION can_user_see_merge_views (p_qry_id IN number) RETURN boolean;
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_true">
+-- wrapper for nm3lrs.get_set_offset_true
+--
+FUNCTION get_true (p_offset_ne_id nm_members.nm_ne_id_in%TYPE
+                  ,p_datum_ne_id  nm_members.nm_ne_id_of%TYPE
+                  ,p_datum_mp     nm_members.nm_begin_mp%TYPE
+                  ) RETURN nm_members.nm_true%TYPE DETERMINISTIC;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PRAGMA>
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+END nm3mrg_view;
+/

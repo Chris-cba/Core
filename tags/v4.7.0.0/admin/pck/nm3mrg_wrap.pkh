@@ -1,0 +1,143 @@
+create or replace package nm3mrg_wrap as
+--<PACKAGE>
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mrg_wrap.pkh-arc   2.2   Jul 04 2013 16:16:08   James.Wadsworth  $
+--       Module Name      : $Workfile:   nm3mrg_wrap.pkh  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:16:08  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:16  $
+--       Version          : $Revision:   2.2  $
+--       Based on SCCS version : 1.1
+-------------------------------------------------------------------------
+--   Author : Jonathan Mills
+--
+--   nm3mrg_wrap package
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.2  $';
+--  g_sccsid is the SCCS ID for the package
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="execute_mrg_qry">
+-- This procedure creates the temporary network extent specified and executes
+--  the merge query upon it
+--
+PROCEDURE execute_mrg_qry
+             (pi_query_id      IN     nm_mrg_query.nmq_id%TYPE
+             ,pi_source_id     IN     NUMBER
+             ,pi_source        IN     VARCHAR2 DEFAULT nm3extent.c_route
+             ,pi_begin_mp      IN     NUMBER   DEFAULT NULL
+             ,pi_end_mp        IN     NUMBER   DEFAULT NULL
+             ,pi_description   IN     nm_mrg_query_results.nqr_description%TYPE
+             ,po_result_job_id IN OUT nm_mrg_query_results.nqr_mrg_job_id%TYPE
+             );
+--
+-- Errors raised are -
+--  All those raised by nm3mrg.execute_mrg_qry and nm3extent.create_temp_ne
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="execute_mrg_qry_route">
+-- This procedure creates the temporary network extent specified for the
+--  specified entire route (or single element or inventory location record)
+--  and executes the merge query upon it
+--
+PROCEDURE execute_mrg_qry_route
+             (pi_query_id      IN     nm_mrg_query.nmq_id%TYPE
+             ,pi_route_ne_id   IN     nm_elements.ne_id%TYPE
+             ,pi_description   IN     nm_mrg_query_results.nqr_description%TYPE
+             ,po_result_job_id IN OUT nm_mrg_query_results.nqr_mrg_job_id%TYPE
+             );
+--
+-- Errors raised are -
+--  All those raised by nm3mrg.execute_mrg_qry and nm3extent.create_temp_ne
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="execute_mrg_qry_partial_route">
+-- This procedure creates the temporary network extent specified for the
+--  specified portion on the entire route (or single element record)
+--  and executes the merge query upon it
+--
+PROCEDURE execute_mrg_qry_partial_route
+             (pi_query_id      IN     nm_mrg_query.nmq_id%TYPE
+             ,pi_route_ne_id   IN     nm_elements.ne_id%TYPE
+             ,pi_begin_mp      IN     NUMBER
+             ,pi_end_mp        IN     NUMBER
+             ,pi_description   IN     nm_mrg_query_results.nqr_description%TYPE
+             ,po_result_job_id IN OUT nm_mrg_query_results.nqr_mrg_job_id%TYPE
+             );
+--
+-- Errors raised are -
+--  All those raised by nm3mrg.execute_mrg_qry and nm3extent.create_temp_ne
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="execute_mrg_qry_saved_ne">
+-- This procedure creates the temporary network extent specified for the
+--  specified saved extent and executes the merge query upon it
+--
+PROCEDURE execute_mrg_qry_saved_ne
+             (pi_query_id      IN     nm_mrg_query.nmq_id%TYPE
+             ,pi_nse_id        IN     nm_saved_extents.nse_id%TYPE
+             ,pi_description   IN     nm_mrg_query_results.nqr_description%TYPE
+             ,po_result_job_id IN OUT nm_mrg_query_results.nqr_mrg_job_id%TYPE
+             );
+--
+-- Errors raised are -
+--  All those raised by nm3mrg.execute_mrg_qry and nm3extent.create_temp_ne
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="execute_mrg_qry_gazeteer">
+-- This procedure executes the merge query on the area of interest as specified
+--  by the arguments returned from the gazeteer
+--
+PROCEDURE execute_mrg_qry_gazeteer
+             (pi_query_id      IN     nm_mrg_query.nmq_id%TYPE
+             ,pi_id            IN     NUMBER
+             ,pi_type          IN     VARCHAR2
+             ,pi_description   IN     nm_mrg_query_results.nqr_description%TYPE
+             ,po_result_job_id IN OUT nm_mrg_query_results.nqr_mrg_job_id%TYPE
+             );
+--
+-- Errors raised are -
+--  All those raised by nm3mrg.execute_mrg_qry and nm3extent.create_temp_ne
+--</PROC>
+--
+------------------------------------------------------------------------------------------------
+--
+--<PRAGMA>
+   PRAGMA RESTRICT_REFERENCES (get_version, RNDS, WNPS, WNDS);
+   PRAGMA RESTRICT_REFERENCES (get_body_version, RNDS, WNPS, WNDS);
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+end nm3mrg_wrap;
+/

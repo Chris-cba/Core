@@ -1,0 +1,174 @@
+CREATE OR REPLACE PACKAGE nm3mrg_security AS
+--<PACKAGE>
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mrg_security.pkh-arc   2.2   Jul 04 2013 16:16:08   James.Wadsworth  $
+--       Module Name      : $Workfile:   nm3mrg_security.pkh  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:16:08  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:16  $
+--       Version          : $Revision:   2.2  $
+--       Based on SCCS version : 1.5
+-------------------------------------------------------------------------
+--   Author : Jonathan Mills
+--
+--   NM3 Merge Security package
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.2  $';
+--  g_sccsid is the SCCS ID for the package
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="mrg_nqt_predicate_read">
+FUNCTION mrg_nqt_predicate_read ( schema_in varchar2, name_in varchar2) RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="mrg_nqt_predicate_update">
+FUNCTION mrg_nqt_predicate_update ( schema_in varchar2, name_in varchar2) RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_query_mode">
+FUNCTION get_query_mode (pi_nmq_id nm_mrg_query.nmq_id%TYPE) RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="mrg_nmq_predicate_read">
+FUNCTION mrg_nmq_predicate_read ( schema_in varchar2, name_in varchar2) RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="mrg_nmq_predicate_update">
+FUNCTION mrg_nmq_predicate_update ( schema_in varchar2, name_in varchar2) RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="mrg_nmq_predicate_delete">
+FUNCTION mrg_nmq_predicate_delete ( schema_in varchar2, name_in varchar2) RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="mrg_nqr_predicate">
+FUNCTION mrg_nqr_predicate (schema_in varchar2, name_in varchar2) RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="mrg_nms_predicate">
+FUNCTION mrg_nms_predicate (schema_in varchar2, name_in varchar2) RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="mrg_nsv_predicate">
+FUNCTION mrg_nsv_predicate (schema_in varchar2, name_in varchar2) RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="mrg_ndq_predicate">
+FUNCTION mrg_ndq_predicate (schema_in varchar2, name_in varchar2) RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="is_query_executable">
+FUNCTION is_query_executable (p_nmq_id nm_mrg_query.nmq_id%TYPE) RETURN boolean;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="is_query_executable_char">
+FUNCTION is_query_executable_char (p_nmq_id nm_mrg_query.nmq_id%TYPE) RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="is_query_updatable">
+FUNCTION is_query_updatable (p_nmq_id nm_mrg_query.nmq_id%TYPE) RETURN boolean;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="query_has_roles">
+-- This function returns TRUE if the supplied query has at least one role
+-- assigned to it.
+--
+FUNCTION query_has_roles(pi_nmq_id IN nm_mrg_query.nmq_id%TYPE
+                        ) RETURN boolean;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="results_can_be_seen">
+FUNCTION results_can_be_seen (pi_nqr_job_id nm_mrg_query_results.nqr_mrg_job_id%TYPE) RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="au_can_be_seen">
+FUNCTION au_can_be_seen (pi_nqr_admin_unit nm_mrg_query_results.nqr_admin_unit%TYPE) RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="reset_security_state_for_nmq">
+PROCEDURE reset_security_state_for_nmq (pi_nmq_id IN nm_mrg_query.nmq_id%TYPE);
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="reset_all_security_states">
+PROCEDURE reset_all_security_states;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="can_all_types_be_seen">
+FUNCTION can_all_types_be_seen (pi_nmq_id IN nm_mrg_query.nmq_id%TYPE) RETURN BOOLEAN;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="can_all_types_be_seen_char">
+FUNCTION can_all_types_be_seen_char (pi_nmq_id IN nm_mrg_query.nmq_id%TYPE) RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PRAGMA>
+   PRAGMA RESTRICT_REFERENCES (get_version, rnds, wnps, wnds);
+   PRAGMA RESTRICT_REFERENCES (get_body_version, rnds, wnps, wnds);
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+END nm3mrg_security;
+/

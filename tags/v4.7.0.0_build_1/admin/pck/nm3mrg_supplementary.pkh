@@ -1,0 +1,931 @@
+create or replace package nm3mrg_supplementary as
+--<PACKAGE>
+--   SCCS Identifiers :-
+--
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mrg_supplementary.pkh-arc   2.5   Jul 04 2013 16:16:08   James.Wadsworth  $
+--       Module Name      : $Workfile:   nm3mrg_supplementary.pkh  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:16:08  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:16  $
+--       PVCS Version     : $Revision:   2.5  $
+--
+--
+--   Author : Jonathan Mills
+--
+--   nm3mrg Supplementary Package
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--
+--<GLOBVAR>
+--
+  g_sccsid      CONSTANT  VARCHAR2(2000) := '$Revision:   2.5  $';
+--  g_sccsid is the SCCS ID for the package
+--
+  gc_buffer_size integer := 2000 ;
+
+   TYPE rec_distinct IS RECORD
+      (inv_type    nm_mrg_query_results_temp.inv_type%TYPE
+      ,x_sect      nm_mrg_query_results_temp.x_sect%TYPE
+      ,pnt_or_cont nm_mrg_query_results_temp.pnt_or_cont%TYPE
+      ,attrib1     nm_mrg_query_results_temp.attrib1%TYPE
+      ,attrib2     nm_mrg_query_results_temp.attrib2%TYPE
+      ,attrib3     nm_mrg_query_results_temp.attrib3%TYPE
+      ,attrib4     nm_mrg_query_results_temp.attrib4%TYPE
+      ,attrib5     nm_mrg_query_results_temp.attrib5%TYPE
+      ,attrib6     nm_mrg_query_results_temp.attrib6%TYPE
+      ,attrib7     nm_mrg_query_results_temp.attrib7%TYPE
+      ,attrib8     nm_mrg_query_results_temp.attrib8%TYPE
+      ,attrib9     nm_mrg_query_results_temp.attrib9%TYPE
+      ,attrib10    nm_mrg_query_results_temp.attrib10%TYPE
+      ,attrib11    nm_mrg_query_results_temp.attrib11%TYPE
+      ,attrib12    nm_mrg_query_results_temp.attrib12%TYPE
+      ,attrib13    nm_mrg_query_results_temp.attrib13%TYPE
+      ,attrib14    nm_mrg_query_results_temp.attrib14%TYPE
+      ,attrib15    nm_mrg_query_results_temp.attrib15%TYPE
+      ,attrib16    nm_mrg_query_results_temp.attrib16%TYPE
+      ,attrib17    nm_mrg_query_results_temp.attrib17%TYPE
+      ,attrib18    nm_mrg_query_results_temp.attrib18%TYPE
+      ,attrib19    nm_mrg_query_results_temp.attrib19%TYPE
+      ,attrib20    nm_mrg_query_results_temp.attrib20%TYPE
+      ,attrib21    nm_mrg_query_results_temp.attrib21%TYPE
+      ,attrib22    nm_mrg_query_results_temp.attrib22%TYPE
+      ,attrib23    nm_mrg_query_results_temp.attrib23%TYPE
+      ,attrib24    nm_mrg_query_results_temp.attrib24%TYPE
+      ,attrib25    nm_mrg_query_results_temp.attrib25%TYPE
+      ,attrib26    nm_mrg_query_results_temp.attrib26%TYPE
+      ,attrib27    nm_mrg_query_results_temp.attrib27%TYPE
+      ,attrib28    nm_mrg_query_results_temp.attrib28%TYPE
+      ,attrib29    nm_mrg_query_results_temp.attrib29%TYPE
+      ,attrib30    nm_mrg_query_results_temp.attrib30%TYPE
+      ,attrib31    nm_mrg_query_results_temp.attrib31%TYPE
+      ,attrib32    nm_mrg_query_results_temp.attrib32%TYPE
+      ,attrib33    nm_mrg_query_results_temp.attrib33%TYPE
+      ,attrib34    nm_mrg_query_results_temp.attrib34%TYPE
+      ,attrib35    nm_mrg_query_results_temp.attrib35%TYPE
+      ,attrib36    nm_mrg_query_results_temp.attrib36%TYPE
+      ,attrib37    nm_mrg_query_results_temp.attrib37%TYPE
+      ,attrib38    nm_mrg_query_results_temp.attrib38%TYPE
+      ,attrib39    nm_mrg_query_results_temp.attrib39%TYPE
+      ,attrib40    nm_mrg_query_results_temp.attrib40%TYPE
+      ,attrib41    nm_mrg_query_results_temp.attrib41%TYPE
+      ,attrib42    nm_mrg_query_results_temp.attrib42%TYPE
+      ,attrib43    nm_mrg_query_results_temp.attrib43%TYPE
+      ,attrib44    nm_mrg_query_results_temp.attrib44%TYPE
+      ,attrib45    nm_mrg_query_results_temp.attrib45%TYPE
+      ,attrib46    nm_mrg_query_results_temp.attrib46%TYPE
+      ,attrib47    nm_mrg_query_results_temp.attrib47%TYPE
+      ,attrib48    nm_mrg_query_results_temp.attrib48%TYPE
+      ,attrib49    nm_mrg_query_results_temp.attrib49%TYPE
+      ,attrib50    nm_mrg_query_results_temp.attrib50%TYPE
+      ,attrib51    nm_mrg_query_results_temp.attrib51%TYPE
+      ,attrib52    nm_mrg_query_results_temp.attrib52%TYPE
+      ,attrib53    nm_mrg_query_results_temp.attrib53%TYPE
+      ,attrib54    nm_mrg_query_results_temp.attrib54%TYPE
+      ,attrib55    nm_mrg_query_results_temp.attrib55%TYPE
+      ,attrib56    nm_mrg_query_results_temp.attrib56%TYPE
+      ,attrib57    nm_mrg_query_results_temp.attrib57%TYPE
+      ,attrib58    nm_mrg_query_results_temp.attrib58%TYPE
+      ,attrib59    nm_mrg_query_results_temp.attrib59%TYPE
+      ,attrib60    nm_mrg_query_results_temp.attrib60%TYPE
+      ,attrib61    nm_mrg_query_results_temp.attrib61%TYPE
+      ,attrib62    nm_mrg_query_results_temp.attrib62%TYPE
+      ,attrib63    nm_mrg_query_results_temp.attrib63%TYPE
+      ,attrib64    nm_mrg_query_results_temp.attrib64%TYPE
+      ,attrib65    nm_mrg_query_results_temp.attrib65%TYPE
+      ,attrib66    nm_mrg_query_results_temp.attrib66%TYPE
+      ,attrib67    nm_mrg_query_results_temp.attrib67%TYPE
+      ,attrib68    nm_mrg_query_results_temp.attrib68%TYPE
+      ,attrib69    nm_mrg_query_results_temp.attrib69%TYPE
+      ,attrib70    nm_mrg_query_results_temp.attrib70%TYPE
+      ,attrib71    nm_mrg_query_results_temp.attrib71%TYPE
+      ,attrib72    nm_mrg_query_results_temp.attrib72%TYPE
+      ,attrib73    nm_mrg_query_results_temp.attrib73%TYPE
+      ,attrib74    nm_mrg_query_results_temp.attrib74%TYPE
+      ,attrib75    nm_mrg_query_results_temp.attrib75%TYPE
+      ,attrib76    nm_mrg_query_results_temp.attrib76%TYPE
+      ,attrib77    nm_mrg_query_results_temp.attrib77%TYPE
+      ,attrib78    nm_mrg_query_results_temp.attrib78%TYPE
+      ,attrib79    nm_mrg_query_results_temp.attrib79%TYPE
+      ,attrib80    nm_mrg_query_results_temp.attrib80%TYPE
+      ,attrib81    nm_mrg_query_results_temp.attrib81%TYPE
+      ,attrib82    nm_mrg_query_results_temp.attrib82%TYPE
+      ,attrib83    nm_mrg_query_results_temp.attrib83%TYPE
+      ,attrib84    nm_mrg_query_results_temp.attrib84%TYPE
+      ,attrib85    nm_mrg_query_results_temp.attrib85%TYPE
+      ,attrib86    nm_mrg_query_results_temp.attrib86%TYPE
+      ,attrib87    nm_mrg_query_results_temp.attrib87%TYPE
+      ,attrib88    nm_mrg_query_results_temp.attrib88%TYPE
+      ,attrib89    nm_mrg_query_results_temp.attrib89%TYPE
+      ,attrib90    nm_mrg_query_results_temp.attrib90%TYPE
+      ,attrib91    nm_mrg_query_results_temp.attrib91%TYPE
+      ,attrib92    nm_mrg_query_results_temp.attrib92%TYPE
+      ,attrib93    nm_mrg_query_results_temp.attrib93%TYPE
+      ,attrib94    nm_mrg_query_results_temp.attrib94%TYPE
+      ,attrib95    nm_mrg_query_results_temp.attrib95%TYPE
+      ,attrib96    nm_mrg_query_results_temp.attrib96%TYPE
+      ,attrib97    nm_mrg_query_results_temp.attrib97%TYPE
+      ,attrib98    nm_mrg_query_results_temp.attrib98%TYPE
+      ,attrib99    nm_mrg_query_results_temp.attrib99%TYPE
+      ,attrib100   nm_mrg_query_results_temp.attrib100%TYPE
+      ,attrib101   nm_mrg_query_results_temp.attrib101%TYPE
+      ,attrib102   nm_mrg_query_results_temp.attrib102%TYPE
+      ,attrib103   nm_mrg_query_results_temp.attrib103%TYPE
+      ,attrib104   nm_mrg_query_results_temp.attrib104%TYPE
+      ,attrib105   nm_mrg_query_results_temp.attrib105%TYPE
+      ,attrib106   nm_mrg_query_results_temp.attrib106%TYPE
+      ,attrib107   nm_mrg_query_results_temp.attrib107%TYPE
+      ,attrib108   nm_mrg_query_results_temp.attrib108%TYPE
+      ,attrib109   nm_mrg_query_results_temp.attrib109%TYPE
+      ,attrib110   nm_mrg_query_results_temp.attrib110%TYPE
+      ,attrib111   nm_mrg_query_results_temp.attrib111%TYPE
+      ,attrib112   nm_mrg_query_results_temp.attrib112%TYPE
+      ,attrib113   nm_mrg_query_results_temp.attrib113%TYPE
+      ,attrib114   nm_mrg_query_results_temp.attrib114%TYPE
+      ,attrib115   nm_mrg_query_results_temp.attrib115%TYPE
+      ,attrib116   nm_mrg_query_results_temp.attrib116%TYPE
+      ,attrib117   nm_mrg_query_results_temp.attrib117%TYPE
+      ,attrib118   nm_mrg_query_results_temp.attrib118%TYPE
+      ,attrib119   nm_mrg_query_results_temp.attrib119%TYPE
+      ,attrib120   nm_mrg_query_results_temp.attrib120%TYPE
+      ,attrib121   nm_mrg_query_results_temp.attrib121%TYPE
+      ,attrib122   nm_mrg_query_results_temp.attrib122%TYPE
+      ,attrib123   nm_mrg_query_results_temp.attrib123%TYPE
+      ,attrib124   nm_mrg_query_results_temp.attrib124%TYPE
+      ,attrib125   nm_mrg_query_results_temp.attrib125%TYPE
+      ,attrib126   nm_mrg_query_results_temp.attrib126%TYPE
+      ,attrib127   nm_mrg_query_results_temp.attrib127%TYPE
+      ,attrib128   nm_mrg_query_results_temp.attrib128%TYPE
+      ,attrib129   nm_mrg_query_results_temp.attrib129%TYPE
+      ,attrib130   nm_mrg_query_results_temp.attrib130%TYPE
+      ,attrib131   nm_mrg_query_results_temp.attrib131%TYPE
+      ,attrib132   nm_mrg_query_results_temp.attrib132%TYPE
+      ,attrib133   nm_mrg_query_results_temp.attrib133%TYPE
+      ,attrib134   nm_mrg_query_results_temp.attrib134%TYPE
+      ,attrib135   nm_mrg_query_results_temp.attrib135%TYPE
+      ,attrib136   nm_mrg_query_results_temp.attrib136%TYPE
+      ,attrib137   nm_mrg_query_results_temp.attrib137%TYPE
+      ,attrib138   nm_mrg_query_results_temp.attrib138%TYPE
+      ,attrib139   nm_mrg_query_results_temp.attrib139%TYPE
+      ,attrib140   nm_mrg_query_results_temp.attrib140%TYPE
+      ,attrib141   nm_mrg_query_results_temp.attrib141%TYPE
+      ,attrib142   nm_mrg_query_results_temp.attrib142%TYPE
+      ,attrib143   nm_mrg_query_results_temp.attrib143%TYPE
+      ,attrib144   nm_mrg_query_results_temp.attrib144%TYPE
+      ,attrib145   nm_mrg_query_results_temp.attrib145%TYPE
+      ,attrib146   nm_mrg_query_results_temp.attrib146%TYPE
+      ,attrib147   nm_mrg_query_results_temp.attrib147%TYPE
+      ,attrib148   nm_mrg_query_results_temp.attrib148%TYPE
+      ,attrib149   nm_mrg_query_results_temp.attrib149%TYPE
+      ,attrib150   nm_mrg_query_results_temp.attrib150%TYPE
+      ,attrib151   nm_mrg_query_results_temp.attrib151%TYPE
+      ,attrib152   nm_mrg_query_results_temp.attrib152%TYPE
+      ,attrib153   nm_mrg_query_results_temp.attrib153%TYPE
+      ,attrib154   nm_mrg_query_results_temp.attrib154%TYPE
+      ,attrib155   nm_mrg_query_results_temp.attrib155%TYPE
+      ,attrib156   nm_mrg_query_results_temp.attrib156%TYPE
+      ,attrib157   nm_mrg_query_results_temp.attrib157%TYPE
+      ,attrib158   nm_mrg_query_results_temp.attrib158%TYPE
+      ,attrib159   nm_mrg_query_results_temp.attrib159%TYPE
+      ,attrib160   nm_mrg_query_results_temp.attrib160%TYPE
+      ,attrib161   nm_mrg_query_results_temp.attrib161%TYPE
+      ,attrib162   nm_mrg_query_results_temp.attrib162%TYPE
+      ,attrib163   nm_mrg_query_results_temp.attrib163%TYPE
+      ,attrib164   nm_mrg_query_results_temp.attrib164%TYPE
+      ,attrib165   nm_mrg_query_results_temp.attrib165%TYPE
+      ,attrib166   nm_mrg_query_results_temp.attrib166%TYPE
+      ,attrib167   nm_mrg_query_results_temp.attrib167%TYPE
+      ,attrib168   nm_mrg_query_results_temp.attrib168%TYPE
+      ,attrib169   nm_mrg_query_results_temp.attrib169%TYPE
+      ,attrib170   nm_mrg_query_results_temp.attrib170%TYPE
+      ,attrib171   nm_mrg_query_results_temp.attrib171%TYPE
+      ,attrib172   nm_mrg_query_results_temp.attrib172%TYPE
+      ,attrib173   nm_mrg_query_results_temp.attrib173%TYPE
+      ,attrib174   nm_mrg_query_results_temp.attrib174%TYPE
+      ,attrib175   nm_mrg_query_results_temp.attrib175%TYPE
+      ,attrib176   nm_mrg_query_results_temp.attrib176%TYPE
+      ,attrib177   nm_mrg_query_results_temp.attrib177%TYPE
+      ,attrib178   nm_mrg_query_results_temp.attrib178%TYPE
+      ,attrib179   nm_mrg_query_results_temp.attrib179%TYPE
+      ,attrib180   nm_mrg_query_results_temp.attrib180%TYPE
+      ,attrib181   nm_mrg_query_results_temp.attrib181%TYPE
+      ,attrib182   nm_mrg_query_results_temp.attrib182%TYPE
+      ,attrib183   nm_mrg_query_results_temp.attrib183%TYPE
+      ,attrib184   nm_mrg_query_results_temp.attrib184%TYPE
+      ,attrib185   nm_mrg_query_results_temp.attrib185%TYPE
+      ,attrib186   nm_mrg_query_results_temp.attrib186%TYPE
+      ,attrib187   nm_mrg_query_results_temp.attrib187%TYPE
+      ,attrib188   nm_mrg_query_results_temp.attrib188%TYPE
+      ,attrib189   nm_mrg_query_results_temp.attrib189%TYPE
+      ,attrib190   nm_mrg_query_results_temp.attrib190%TYPE
+      ,attrib191   nm_mrg_query_results_temp.attrib191%TYPE
+      ,attrib192   nm_mrg_query_results_temp.attrib192%TYPE
+      ,attrib193   nm_mrg_query_results_temp.attrib193%TYPE
+      ,attrib194   nm_mrg_query_results_temp.attrib194%TYPE
+      ,attrib195   nm_mrg_query_results_temp.attrib195%TYPE
+      ,attrib196   nm_mrg_query_results_temp.attrib196%TYPE
+      ,attrib197   nm_mrg_query_results_temp.attrib197%TYPE
+      ,attrib198   nm_mrg_query_results_temp.attrib198%TYPE
+      ,attrib199   nm_mrg_query_results_temp.attrib199%TYPE
+      ,attrib200   nm_mrg_query_results_temp.attrib200%TYPE
+      ,attrib201   nm_mrg_query_results_temp.attrib201%TYPE
+      ,attrib202   nm_mrg_query_results_temp.attrib202%TYPE
+      ,attrib203   nm_mrg_query_results_temp.attrib203%TYPE
+      ,attrib204   nm_mrg_query_results_temp.attrib204%TYPE
+      ,attrib205   nm_mrg_query_results_temp.attrib205%TYPE
+      ,attrib206   nm_mrg_query_results_temp.attrib206%TYPE
+      ,attrib207   nm_mrg_query_results_temp.attrib207%TYPE
+      ,attrib208   nm_mrg_query_results_temp.attrib208%TYPE
+      ,attrib209   nm_mrg_query_results_temp.attrib209%TYPE
+      ,attrib210   nm_mrg_query_results_temp.attrib210%TYPE
+      ,attrib211   nm_mrg_query_results_temp.attrib211%TYPE
+      ,attrib212   nm_mrg_query_results_temp.attrib212%TYPE
+      ,attrib213   nm_mrg_query_results_temp.attrib213%TYPE
+      ,attrib214   nm_mrg_query_results_temp.attrib214%TYPE
+      ,attrib215   nm_mrg_query_results_temp.attrib215%TYPE
+      ,attrib216   nm_mrg_query_results_temp.attrib216%TYPE
+      ,attrib217   nm_mrg_query_results_temp.attrib217%TYPE
+      ,attrib218   nm_mrg_query_results_temp.attrib218%TYPE
+      ,attrib219   nm_mrg_query_results_temp.attrib219%TYPE
+      ,attrib220   nm_mrg_query_results_temp.attrib220%TYPE
+      ,attrib221   nm_mrg_query_results_temp.attrib221%TYPE
+      ,attrib222   nm_mrg_query_results_temp.attrib222%TYPE
+      ,attrib223   nm_mrg_query_results_temp.attrib223%TYPE
+      ,attrib224   nm_mrg_query_results_temp.attrib224%TYPE
+      ,attrib225   nm_mrg_query_results_temp.attrib225%TYPE
+      ,attrib226   nm_mrg_query_results_temp.attrib226%TYPE
+      ,attrib227   nm_mrg_query_results_temp.attrib227%TYPE
+      ,attrib228   nm_mrg_query_results_temp.attrib228%TYPE
+      ,attrib229   nm_mrg_query_results_temp.attrib229%TYPE
+      ,attrib230   nm_mrg_query_results_temp.attrib230%TYPE
+      ,attrib231   nm_mrg_query_results_temp.attrib231%TYPE
+      ,attrib232   nm_mrg_query_results_temp.attrib232%TYPE
+      ,attrib233   nm_mrg_query_results_temp.attrib233%TYPE
+      ,attrib234   nm_mrg_query_results_temp.attrib234%TYPE
+      ,attrib235   nm_mrg_query_results_temp.attrib235%TYPE
+      ,attrib236   nm_mrg_query_results_temp.attrib236%TYPE
+      ,attrib237   nm_mrg_query_results_temp.attrib237%TYPE
+      ,attrib238   nm_mrg_query_results_temp.attrib238%TYPE
+      ,attrib239   nm_mrg_query_results_temp.attrib239%TYPE
+      ,attrib240   nm_mrg_query_results_temp.attrib240%TYPE
+      ,attrib241   nm_mrg_query_results_temp.attrib241%TYPE
+      ,attrib242   nm_mrg_query_results_temp.attrib242%TYPE
+      ,attrib243   nm_mrg_query_results_temp.attrib243%TYPE
+      ,attrib244   nm_mrg_query_results_temp.attrib244%TYPE
+      ,attrib245   nm_mrg_query_results_temp.attrib245%TYPE
+      ,attrib246   nm_mrg_query_results_temp.attrib246%TYPE
+      ,attrib247   nm_mrg_query_results_temp.attrib247%TYPE
+      ,attrib248   nm_mrg_query_results_temp.attrib248%TYPE
+      ,attrib249   nm_mrg_query_results_temp.attrib249%TYPE
+      ,attrib250   nm_mrg_query_results_temp.attrib250%TYPE
+      ,attrib251   nm_mrg_query_results_temp.attrib251%TYPE
+      ,attrib252   nm_mrg_query_results_temp.attrib252%TYPE
+      ,attrib253   nm_mrg_query_results_temp.attrib253%TYPE
+      ,attrib254   nm_mrg_query_results_temp.attrib254%TYPE
+      ,attrib255   nm_mrg_query_results_temp.attrib255%TYPE
+      ,attrib256   nm_mrg_query_results_temp.attrib256%TYPE
+      ,attrib257   nm_mrg_query_results_temp.attrib257%TYPE
+      ,attrib258   nm_mrg_query_results_temp.attrib258%TYPE
+      ,attrib259   nm_mrg_query_results_temp.attrib259%TYPE
+      ,attrib260   nm_mrg_query_results_temp.attrib260%TYPE
+      ,attrib261   nm_mrg_query_results_temp.attrib261%TYPE
+      ,attrib262   nm_mrg_query_results_temp.attrib262%TYPE
+      ,attrib263   nm_mrg_query_results_temp.attrib263%TYPE
+      ,attrib264   nm_mrg_query_results_temp.attrib264%TYPE
+      ,attrib265   nm_mrg_query_results_temp.attrib265%TYPE
+      ,attrib266   nm_mrg_query_results_temp.attrib266%TYPE
+      ,attrib267   nm_mrg_query_results_temp.attrib267%TYPE
+      ,attrib268   nm_mrg_query_results_temp.attrib268%TYPE
+      ,attrib269   nm_mrg_query_results_temp.attrib269%TYPE
+      ,attrib270   nm_mrg_query_results_temp.attrib270%TYPE
+      ,attrib271   nm_mrg_query_results_temp.attrib271%TYPE
+      ,attrib272   nm_mrg_query_results_temp.attrib272%TYPE
+      ,attrib273   nm_mrg_query_results_temp.attrib273%TYPE
+      ,attrib274   nm_mrg_query_results_temp.attrib274%TYPE
+      ,attrib275   nm_mrg_query_results_temp.attrib275%TYPE
+      ,attrib276   nm_mrg_query_results_temp.attrib276%TYPE
+      ,attrib277   nm_mrg_query_results_temp.attrib277%TYPE
+      ,attrib278   nm_mrg_query_results_temp.attrib278%TYPE
+      ,attrib279   nm_mrg_query_results_temp.attrib279%TYPE
+      ,attrib280   nm_mrg_query_results_temp.attrib280%TYPE
+      ,attrib281   nm_mrg_query_results_temp.attrib281%TYPE
+      ,attrib282   nm_mrg_query_results_temp.attrib282%TYPE
+      ,attrib283   nm_mrg_query_results_temp.attrib283%TYPE
+      ,attrib284   nm_mrg_query_results_temp.attrib284%TYPE
+      ,attrib285   nm_mrg_query_results_temp.attrib285%TYPE
+      ,attrib286   nm_mrg_query_results_temp.attrib286%TYPE
+      ,attrib287   nm_mrg_query_results_temp.attrib287%TYPE
+      ,attrib288   nm_mrg_query_results_temp.attrib288%TYPE
+      ,attrib289   nm_mrg_query_results_temp.attrib289%TYPE
+      ,attrib290   nm_mrg_query_results_temp.attrib290%TYPE
+      ,attrib291   nm_mrg_query_results_temp.attrib291%TYPE
+      ,attrib292   nm_mrg_query_results_temp.attrib292%TYPE
+      ,attrib293   nm_mrg_query_results_temp.attrib293%TYPE
+      ,attrib294   nm_mrg_query_results_temp.attrib294%TYPE
+      ,attrib295   nm_mrg_query_results_temp.attrib295%TYPE
+      ,attrib296   nm_mrg_query_results_temp.attrib296%TYPE
+      ,attrib297   nm_mrg_query_results_temp.attrib297%TYPE
+      ,attrib298   nm_mrg_query_results_temp.attrib298%TYPE
+      ,attrib299   nm_mrg_query_results_temp.attrib299%TYPE
+      ,attrib300   nm_mrg_query_results_temp.attrib300%TYPE
+      ,attrib301   nm_mrg_query_results_temp.attrib301%TYPE
+      ,attrib302   nm_mrg_query_results_temp.attrib302%TYPE
+      ,attrib303   nm_mrg_query_results_temp.attrib303%TYPE
+      ,attrib304   nm_mrg_query_results_temp.attrib304%TYPE
+      ,attrib305   nm_mrg_query_results_temp.attrib305%TYPE
+      ,attrib306   nm_mrg_query_results_temp.attrib306%TYPE
+      ,attrib307   nm_mrg_query_results_temp.attrib307%TYPE
+      ,attrib308   nm_mrg_query_results_temp.attrib308%TYPE
+      ,attrib309   nm_mrg_query_results_temp.attrib309%TYPE
+      ,attrib310   nm_mrg_query_results_temp.attrib310%TYPE
+      ,attrib311   nm_mrg_query_results_temp.attrib311%TYPE
+      ,attrib312   nm_mrg_query_results_temp.attrib312%TYPE
+      ,attrib313   nm_mrg_query_results_temp.attrib313%TYPE
+      ,attrib314   nm_mrg_query_results_temp.attrib314%TYPE
+      ,attrib315   nm_mrg_query_results_temp.attrib315%TYPE
+      ,attrib316   nm_mrg_query_results_temp.attrib316%TYPE
+      ,attrib317   nm_mrg_query_results_temp.attrib317%TYPE
+      ,attrib318   nm_mrg_query_results_temp.attrib318%TYPE
+      ,attrib319   nm_mrg_query_results_temp.attrib319%TYPE
+      ,attrib320   nm_mrg_query_results_temp.attrib320%TYPE
+      ,attrib321   nm_mrg_query_results_temp.attrib321%TYPE
+      ,attrib322   nm_mrg_query_results_temp.attrib322%TYPE
+      ,attrib323   nm_mrg_query_results_temp.attrib323%TYPE
+      ,attrib324   nm_mrg_query_results_temp.attrib324%TYPE
+      ,attrib325   nm_mrg_query_results_temp.attrib325%TYPE
+      ,attrib326   nm_mrg_query_results_temp.attrib326%TYPE
+      ,attrib327   nm_mrg_query_results_temp.attrib327%TYPE
+      ,attrib328   nm_mrg_query_results_temp.attrib328%TYPE
+      ,attrib329   nm_mrg_query_results_temp.attrib329%TYPE
+      ,attrib330   nm_mrg_query_results_temp.attrib330%TYPE
+      ,attrib331   nm_mrg_query_results_temp.attrib331%TYPE
+      ,attrib332   nm_mrg_query_results_temp.attrib332%TYPE
+      ,attrib333   nm_mrg_query_results_temp.attrib333%TYPE
+      ,attrib334   nm_mrg_query_results_temp.attrib334%TYPE
+      ,attrib335   nm_mrg_query_results_temp.attrib335%TYPE
+      ,attrib336   nm_mrg_query_results_temp.attrib336%TYPE
+      ,attrib337   nm_mrg_query_results_temp.attrib337%TYPE
+      ,attrib338   nm_mrg_query_results_temp.attrib338%TYPE
+      ,attrib339   nm_mrg_query_results_temp.attrib339%TYPE
+      ,attrib340   nm_mrg_query_results_temp.attrib340%TYPE
+      ,attrib341   nm_mrg_query_results_temp.attrib341%TYPE
+      ,attrib342   nm_mrg_query_results_temp.attrib342%TYPE
+      ,attrib343   nm_mrg_query_results_temp.attrib343%TYPE
+      ,attrib344   nm_mrg_query_results_temp.attrib344%TYPE
+      ,attrib345   nm_mrg_query_results_temp.attrib345%TYPE
+      ,attrib346   nm_mrg_query_results_temp.attrib346%TYPE
+      ,attrib347   nm_mrg_query_results_temp.attrib347%TYPE
+      ,attrib348   nm_mrg_query_results_temp.attrib348%TYPE
+      ,attrib349   nm_mrg_query_results_temp.attrib349%TYPE
+      ,attrib350   nm_mrg_query_results_temp.attrib350%TYPE
+      ,attrib351   nm_mrg_query_results_temp.attrib351%TYPE
+      ,attrib352   nm_mrg_query_results_temp.attrib352%TYPE
+      ,attrib353   nm_mrg_query_results_temp.attrib353%TYPE
+      ,attrib354   nm_mrg_query_results_temp.attrib354%TYPE
+      ,attrib355   nm_mrg_query_results_temp.attrib355%TYPE
+      ,attrib356   nm_mrg_query_results_temp.attrib356%TYPE
+      ,attrib357   nm_mrg_query_results_temp.attrib357%TYPE
+      ,attrib358   nm_mrg_query_results_temp.attrib358%TYPE
+      ,attrib359   nm_mrg_query_results_temp.attrib359%TYPE
+      ,attrib360   nm_mrg_query_results_temp.attrib360%TYPE
+      ,attrib361   nm_mrg_query_results_temp.attrib361%TYPE
+      ,attrib362   nm_mrg_query_results_temp.attrib362%TYPE
+      ,attrib363   nm_mrg_query_results_temp.attrib363%TYPE
+      ,attrib364   nm_mrg_query_results_temp.attrib364%TYPE
+      ,attrib365   nm_mrg_query_results_temp.attrib365%TYPE
+      ,attrib366   nm_mrg_query_results_temp.attrib366%TYPE
+      ,attrib367   nm_mrg_query_results_temp.attrib367%TYPE
+      ,attrib368   nm_mrg_query_results_temp.attrib368%TYPE
+      ,attrib369   nm_mrg_query_results_temp.attrib369%TYPE
+      ,attrib370   nm_mrg_query_results_temp.attrib370%TYPE
+      ,attrib371   nm_mrg_query_results_temp.attrib371%TYPE
+      ,attrib372   nm_mrg_query_results_temp.attrib372%TYPE
+      ,attrib373   nm_mrg_query_results_temp.attrib373%TYPE
+      ,attrib374   nm_mrg_query_results_temp.attrib374%TYPE
+      ,attrib375   nm_mrg_query_results_temp.attrib375%TYPE
+      ,attrib376   nm_mrg_query_results_temp.attrib376%TYPE
+      ,attrib377   nm_mrg_query_results_temp.attrib377%TYPE
+      ,attrib378   nm_mrg_query_results_temp.attrib378%TYPE
+      ,attrib379   nm_mrg_query_results_temp.attrib379%TYPE
+      ,attrib380   nm_mrg_query_results_temp.attrib380%TYPE
+      ,attrib381   nm_mrg_query_results_temp.attrib381%TYPE
+      ,attrib382   nm_mrg_query_results_temp.attrib382%TYPE
+      ,attrib383   nm_mrg_query_results_temp.attrib383%TYPE
+      ,attrib384   nm_mrg_query_results_temp.attrib384%TYPE
+      ,attrib385   nm_mrg_query_results_temp.attrib385%TYPE
+      ,attrib386   nm_mrg_query_results_temp.attrib386%TYPE
+      ,attrib387   nm_mrg_query_results_temp.attrib387%TYPE
+      ,attrib388   nm_mrg_query_results_temp.attrib388%TYPE
+      ,attrib389   nm_mrg_query_results_temp.attrib389%TYPE
+      ,attrib390   nm_mrg_query_results_temp.attrib390%TYPE
+      ,attrib391   nm_mrg_query_results_temp.attrib391%TYPE
+      ,attrib392   nm_mrg_query_results_temp.attrib392%TYPE
+      ,attrib393   nm_mrg_query_results_temp.attrib393%TYPE
+      ,attrib394   nm_mrg_query_results_temp.attrib394%TYPE
+      ,attrib395   nm_mrg_query_results_temp.attrib395%TYPE
+      ,attrib396   nm_mrg_query_results_temp.attrib396%TYPE
+      ,attrib397   nm_mrg_query_results_temp.attrib397%TYPE
+      ,attrib398   nm_mrg_query_results_temp.attrib398%TYPE
+      ,attrib399   nm_mrg_query_results_temp.attrib399%TYPE
+      ,attrib400   nm_mrg_query_results_temp.attrib400%TYPE
+      ,attrib401   nm_mrg_query_results_temp.attrib401%TYPE
+      ,attrib402   nm_mrg_query_results_temp.attrib402%TYPE
+      ,attrib403   nm_mrg_query_results_temp.attrib403%TYPE
+      ,attrib404   nm_mrg_query_results_temp.attrib404%TYPE
+      ,attrib405   nm_mrg_query_results_temp.attrib405%TYPE
+      ,attrib406   nm_mrg_query_results_temp.attrib406%TYPE
+      ,attrib407   nm_mrg_query_results_temp.attrib407%TYPE
+      ,attrib408   nm_mrg_query_results_temp.attrib408%TYPE
+      ,attrib409   nm_mrg_query_results_temp.attrib409%TYPE
+      ,attrib410   nm_mrg_query_results_temp.attrib410%TYPE
+      ,attrib411   nm_mrg_query_results_temp.attrib411%TYPE
+      ,attrib412   nm_mrg_query_results_temp.attrib412%TYPE
+      ,attrib413   nm_mrg_query_results_temp.attrib413%TYPE
+      ,attrib414   nm_mrg_query_results_temp.attrib414%TYPE
+      ,attrib415   nm_mrg_query_results_temp.attrib415%TYPE
+      ,attrib416   nm_mrg_query_results_temp.attrib416%TYPE
+      ,attrib417   nm_mrg_query_results_temp.attrib417%TYPE
+      ,attrib418   nm_mrg_query_results_temp.attrib418%TYPE
+      ,attrib419   nm_mrg_query_results_temp.attrib419%TYPE
+      ,attrib420   nm_mrg_query_results_temp.attrib420%TYPE
+      ,attrib421   nm_mrg_query_results_temp.attrib421%TYPE
+      ,attrib422   nm_mrg_query_results_temp.attrib422%TYPE
+      ,attrib423   nm_mrg_query_results_temp.attrib423%TYPE
+      ,attrib424   nm_mrg_query_results_temp.attrib424%TYPE
+      ,attrib425   nm_mrg_query_results_temp.attrib425%TYPE
+      ,attrib426   nm_mrg_query_results_temp.attrib426%TYPE
+      ,attrib427   nm_mrg_query_results_temp.attrib427%TYPE
+      ,attrib428   nm_mrg_query_results_temp.attrib428%TYPE
+      ,attrib429   nm_mrg_query_results_temp.attrib429%TYPE
+      ,attrib430   nm_mrg_query_results_temp.attrib430%TYPE
+      ,attrib431   nm_mrg_query_results_temp.attrib431%TYPE
+      ,attrib432   nm_mrg_query_results_temp.attrib432%TYPE
+      ,attrib433   nm_mrg_query_results_temp.attrib433%TYPE
+      ,attrib434   nm_mrg_query_results_temp.attrib434%TYPE
+      ,attrib435   nm_mrg_query_results_temp.attrib435%TYPE
+      ,attrib436   nm_mrg_query_results_temp.attrib436%TYPE
+      ,attrib437   nm_mrg_query_results_temp.attrib437%TYPE
+      ,attrib438   nm_mrg_query_results_temp.attrib438%TYPE
+      ,attrib439   nm_mrg_query_results_temp.attrib439%TYPE
+      ,attrib440   nm_mrg_query_results_temp.attrib440%TYPE
+      ,attrib441   nm_mrg_query_results_temp.attrib441%TYPE
+      ,attrib442   nm_mrg_query_results_temp.attrib442%TYPE
+      ,attrib443   nm_mrg_query_results_temp.attrib443%TYPE
+      ,attrib444   nm_mrg_query_results_temp.attrib444%TYPE
+      ,attrib445   nm_mrg_query_results_temp.attrib445%TYPE
+      ,attrib446   nm_mrg_query_results_temp.attrib446%TYPE
+      ,attrib447   nm_mrg_query_results_temp.attrib447%TYPE
+      ,attrib448   nm_mrg_query_results_temp.attrib448%TYPE
+      ,attrib449   nm_mrg_query_results_temp.attrib449%TYPE
+      ,attrib450   nm_mrg_query_results_temp.attrib450%TYPE
+      ,attrib451   nm_mrg_query_results_temp.attrib451%TYPE
+      ,attrib452   nm_mrg_query_results_temp.attrib452%TYPE
+      ,attrib453   nm_mrg_query_results_temp.attrib453%TYPE
+      ,attrib454   nm_mrg_query_results_temp.attrib454%TYPE
+      ,attrib455   nm_mrg_query_results_temp.attrib455%TYPE
+      ,attrib456   nm_mrg_query_results_temp.attrib456%TYPE
+      ,attrib457   nm_mrg_query_results_temp.attrib457%TYPE
+      ,attrib458   nm_mrg_query_results_temp.attrib458%TYPE
+      ,attrib459   nm_mrg_query_results_temp.attrib459%TYPE
+      ,attrib460   nm_mrg_query_results_temp.attrib460%TYPE
+      ,attrib461   nm_mrg_query_results_temp.attrib461%TYPE
+      ,attrib462   nm_mrg_query_results_temp.attrib462%TYPE
+      ,attrib463   nm_mrg_query_results_temp.attrib463%TYPE
+      ,attrib464   nm_mrg_query_results_temp.attrib464%TYPE
+      ,attrib465   nm_mrg_query_results_temp.attrib465%TYPE
+      ,attrib466   nm_mrg_query_results_temp.attrib466%TYPE
+      ,attrib467   nm_mrg_query_results_temp.attrib467%TYPE
+      ,attrib468   nm_mrg_query_results_temp.attrib468%TYPE
+      ,attrib469   nm_mrg_query_results_temp.attrib469%TYPE
+      ,attrib470   nm_mrg_query_results_temp.attrib470%TYPE
+      ,attrib471   nm_mrg_query_results_temp.attrib471%TYPE
+      ,attrib472   nm_mrg_query_results_temp.attrib472%TYPE
+      ,attrib473   nm_mrg_query_results_temp.attrib473%TYPE
+      ,attrib474   nm_mrg_query_results_temp.attrib474%TYPE
+      ,attrib475   nm_mrg_query_results_temp.attrib475%TYPE
+      ,attrib476   nm_mrg_query_results_temp.attrib476%TYPE
+      ,attrib477   nm_mrg_query_results_temp.attrib477%TYPE
+      ,attrib478   nm_mrg_query_results_temp.attrib478%TYPE
+      ,attrib479   nm_mrg_query_results_temp.attrib479%TYPE
+      ,attrib480   nm_mrg_query_results_temp.attrib480%TYPE
+      ,attrib481   nm_mrg_query_results_temp.attrib481%TYPE
+      ,attrib482   nm_mrg_query_results_temp.attrib482%TYPE
+      ,attrib483   nm_mrg_query_results_temp.attrib483%TYPE
+      ,attrib484   nm_mrg_query_results_temp.attrib484%TYPE
+      ,attrib485   nm_mrg_query_results_temp.attrib485%TYPE
+      ,attrib486   nm_mrg_query_results_temp.attrib486%TYPE
+      ,attrib487   nm_mrg_query_results_temp.attrib487%TYPE
+      ,attrib488   nm_mrg_query_results_temp.attrib488%TYPE
+      ,attrib489   nm_mrg_query_results_temp.attrib489%TYPE
+      ,attrib490   nm_mrg_query_results_temp.attrib490%TYPE
+      ,attrib491   nm_mrg_query_results_temp.attrib491%TYPE
+      ,attrib492   nm_mrg_query_results_temp.attrib492%TYPE
+      ,attrib493   nm_mrg_query_results_temp.attrib493%TYPE
+      ,attrib494   nm_mrg_query_results_temp.attrib494%TYPE
+      ,attrib495   nm_mrg_query_results_temp.attrib495%TYPE
+      ,attrib496   nm_mrg_query_results_temp.attrib496%TYPE
+      ,attrib497   nm_mrg_query_results_temp.attrib497%TYPE
+      ,attrib498   nm_mrg_query_results_temp.attrib498%TYPE
+      ,attrib499   nm_mrg_query_results_temp.attrib499%TYPE
+      ,attrib500   nm_mrg_query_results_temp.attrib500%TYPE
+      );
+--
+   g_rec_distinct  rec_distinct;
+   TYPE tab_cs_distinct IS TABLE OF rec_distinct INDEX BY binary_integer;
+   g_tab_cs_distinct tab_cs_distinct;
+   g_tab_ne_id_of  nm3type.tab_number;
+   g_tab_begin_mp  nm3type.tab_number;
+   g_tab_end_mp    nm3type.tab_number;
+   g_rec_nsv       nm_mrg_section_inv_values%ROWTYPE;
+   g_value         nm3type.max_varchar2;
+--
+   CURSOR cs_inv_val_by_mem (c_ne_id NUMBER, c_begin_mp NUMBER) IS
+   SELECT /*+ RULE */
+          nmqrt.*
+    FROM  nm_mrg_query_results_temp nmqrt
+         ,nm_mrg_members            nmm
+   WHERE  nmqrt.ne_id       = nmm.nm_ne_id_in
+    AND   nmqrt.pnt_or_cont = 'P'
+    AND   nmm.nm_ne_id_of   = c_ne_id
+    AND   nmm.nm_begin_mp   = c_begin_mp
+    AND   nmm.inv_type      = nmqrt.inv_type;
+--
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+------------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_results_by_value_id">
+PROCEDURE get_results_by_value_id (pi_nmq_id        IN     nm_mrg_query_results.nqr_nmq_id%TYPE
+                                  ,pi_job_id        IN     nm_mrg_query_results.nqr_mrg_job_id%TYPE
+                                  ,pi_value_id      IN     nm_mrg_section_inv_values.nsv_value_id%TYPE
+                                  ,po_tab_scrn_text    OUT nm3type.tab_varchar2000
+                                  ,po_tab_value        OUT nm3type.tab_varchar2000
+                                  );
+--</PROC>
+--
+------------------------------------------------------------------------------------------------
+--
+--<PROC NAME="select_nqr">
+FUNCTION select_nqr (pi_job_id IN nm_mrg_query_results.nqr_mrg_job_id%TYPE) RETURN nm_mrg_query_results%ROWTYPE;
+--</PROC>
+--
+------------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_invalid_mrg_qry_defaults">
+FUNCTION get_invalid_mrg_qry_defaults RETURN nm3type.tab_number;
+--</PROC>
+--
+------------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_ndq">
+FUNCTION get_ndq(pi_ndq_seq_no IN nm_mrg_default_query_types.ndq_seq_no%TYPE
+                ) RETURN nm_mrg_default_query_types%ROWTYPE;
+--
+------------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_nmq_id_from_unique">
+--
+FUNCTION get_nmq_id_from_unique (p_nmq_unique nm_mrg_query.nmq_unique%TYPE
+                                ) RETURN nm_mrg_query.nmq_id%TYPE;
+--
+-- Possible exceptions raised are
+-- -20901 Query not found
+--
+--</PROC>
+--
+------------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_parent_ne_id_from_temp">
+FUNCTION get_parent_ne_id_from_temp (p_ne_id IN number) RETURN number;
+--</PROC>
+--
+------------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_mrg_section">
+-- This procedure returns the specified NM_MRG_SECTIONS record
+--
+FUNCTION get_mrg_section (p_mrg_job_id     IN nm_mrg_sections.nms_mrg_job_id%TYPE
+                         ,p_mrg_section_id IN nm_mrg_sections.nms_mrg_section_id%TYPE
+                         ) RETURN nm_mrg_sections%ROWTYPE;
+--
+-- Possible excpetions raised are
+-- -20910  NM_MRG_SECTIONS record not found
+--
+--</PROC>
+--
+------------------------------------------------------------------------------------------------
+--
+--<PROC NAME="create_remove_transient_job">
+-- This procedure creates the DBMS_JOB required to remove transient merge queries. It will run
+--  for the first time at the time specified and then run at the interval specified.
+-- With the defaults specified it will run Tomorrow at midnight and then every day following at
+--  midnight
+--
+PROCEDURE create_remove_transient_job (p_first_run DATE     DEFAULT TRUNC(SYSDATE+1)
+                                      ,p_next_run  varchar2 DEFAULT 'trunc(sysdate)+1'
+                                      );
+--</PROC>
+--
+------------------------------------------------------------------------------------------------
+--
+--<PROC NAME="remove_transient_results">
+-- This procedure removes any results for merge jobs which are marked as transient
+--
+PROCEDURE remove_transient_results;
+--</PROC>
+--
+------------------------------------------------------------------------------------------------
+--
+--<PROC NAME="defaults_extst">
+-- This function returns TRUE if any merge defaults exist in the system
+FUNCTION defaults_exist RETURN boolean;
+--</PROC>
+--
+------------------------------------------------------------------------------------------------
+--
+--<PROC NAME="defaults_in_query">
+-- This function returns TRUE if defaults are present in the specified query
+FUNCTION defaults_in_query(pi_query_id IN nm_mrg_query.nmq_id%TYPE
+                          ) RETURN boolean;
+--</PROC>
+--
+------------------------------------------------------------------------------------------------
+--
+--<PROC NAME="add_defaults">
+-- This procedure adds the default types to a query
+PROCEDURE add_defaults (pi_query_id IN nm_mrg_query.nmq_id%TYPE);
+-- Possible exceptions raised are
+-- -20911 Query already has defaults. Use REFRESH_DEFAULTS procedure
+--</PROC>
+--
+------------------------------------------------------------------------------------------------
+--
+--<PROC NAME="refresh_defaults">
+-- This procedure refreshes the default types to a query
+PROCEDURE refresh_defaults (pi_query_id IN nm_mrg_query.nmq_id%TYPE);
+--</PROC>
+--
+------------------------------------------------------------------------------------------------
+--
+--<PROC NAME="refresh_all_defaults">
+-- This procedure refreshes the default types for all queries
+PROCEDURE refresh_all_defaults;
+--</PROC>
+--
+------------------------------------------------------------------------------------------------
+--
+--<PROC NAME="count_query_results">
+-- This procedure counts how many query_results records there are for a given query_id
+FUNCTION count_query_results (p_nmq_id IN number) RETURN number;
+--</PROC>
+--
+------------------------------------------------------------------------------------------------
+--
+--<PROC NAME="delete_query_results">
+-- This procedure deletes all query_results for a given query_id
+PROCEDURE delete_query_results (p_nmq_id IN number);
+--
+-- Possible excpetions raised are
+-- -20912  Another user has a nm_mrg_query_results record locked
+--
+--</PROC>
+--
+------------------------------------------------------------------------------------------------
+--
+--<PROC NAME="select_mrg_query">
+-- This procedure returns the specified NM_MRG_QUERY record
+--
+FUNCTION select_mrg_query (pi_query_id IN nm_mrg_query.nmq_id%TYPE) RETURN nm_mrg_query%ROWTYPE;
+--
+-- Possible exceptions raised are
+-- -20901 Query not found
+--
+--</PROC>
+--
+------------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_nmq_id">
+-- This function returns next NMQ_ID_SEQ from a sequence
+FUNCTION get_nmq_id RETURN number;
+--</PROC>
+--
+------------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_nmqv_id">
+FUNCTION get_nmqv_id RETURN number;
+--</PROC>
+--
+------------------------------------------------------------------------------------------------
+--
+--<PROC NAME="fn_get_element_length">
+FUNCTION fn_get_element_length (pi_ne_id IN nm_mrg_members.nm_ne_id_of%TYPE
+                               ) RETURN nm_mrg_members.element_length%TYPE;
+--</PROC>
+--
+------------------------------------------------------------------------------------------------
+--
+--<PROC NAME="validate_data">
+PROCEDURE validate_data;
+--</PROC>
+--
+------------------------------------------------------------------------------------------------
+--
+--<PROC NAME="valid_pbi_condition_values">
+-- This function returns TRUE if the number of values is valid for a particular condition
+FUNCTION valid_pbi_condition_values (pi_condition    IN varchar2
+                                    ,pi_values_count IN number
+                                    ) RETURN boolean;
+--</PROC>
+--
+------------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_pbi_condition_value_count">
+-- This function returns the number of values is valid for a particular condition
+FUNCTION get_pbi_condition_value_count (pi_condition    IN varchar2
+                                       ) RETURN PLS_INTEGER;
+--</PROC>
+--
+------------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_tab_column_details">
+-- This function returns the specified row from USER_TAB_COLUMNS
+FUNCTION get_tab_column_details (pi_table_name  IN user_tab_columns.table_name%TYPE
+                                ,pi_column_name IN user_tab_columns.column_name%TYPE
+                                ) RETURN user_tab_columns%ROWTYPE;
+--</PROC>
+--
+------------------------------------------------------------------------------------------------
+--
+--<PROC NAME="build_value_list">
+FUNCTION build_value_list(pi_condition   IN nm_mrg_query_attribs.nqa_condition%TYPE
+                         ,pi_seq_no      IN nm_mrg_query_attribs.nqa_nqt_seq_no%TYPE
+                         ,pi_attrib_name IN nm_mrg_query_attribs.nqa_attrib_name%TYPE
+                         ,pi_format      IN nm_inv_type_attribs.ita_format%TYPE
+                         ) RETURN long;
+--</PROC>
+--
+------------------------------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nm_mrg_sections">
+PROCEDURE ins_nm_mrg_sections (pi_job_id         IN nm_mrg_sections.nms_mrg_job_id%TYPE
+                              ,pi_mrg_section_id IN nm_mrg_sections.nms_mrg_section_id%TYPE
+                              ,pi_nte_job_id     IN nm_mrg_sections.nms_offset_ne_id%TYPE
+                              ,pi_ne_id_first    IN nm_mrg_sections.nms_ne_id_first%TYPE
+                              ,pi_begin_mp_first IN nm_mrg_sections.nms_begin_mp_first%TYPE
+                              ,pi_ne_id_last     IN nm_mrg_sections.nms_ne_id_last%TYPE
+                              ,pi_end_mp_last    IN nm_mrg_sections.nms_end_mp_last%TYPE
+                              ,pi_orig_sect_id   IN nm_mrg_sections.nms_orig_sect_id%TYPE
+                              ,pi_in_results     IN nm_mrg_sections.nms_in_results%TYPE DEFAULT 'N'
+                              );
+--</PROC>
+--
+------------------------------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nm_mrg_section_members">;
+--
+PROCEDURE ins_nm_mrg_section_members (pi_tab_rec_nsm    IN nm3mrg.tab_mrg_sect_members);
+--
+PROCEDURE ins_nm_mrg_section_members (pi_mrg_job_id     IN nm3type.tab_number
+                                     ,pi_mrg_section_id IN nm3type.tab_number
+                                     ,pi_ne_id          IN nm3type.tab_number
+                                     ,pi_begin_mp       IN nm3type.tab_number
+                                     ,pi_end_mp         IN nm3type.tab_number
+                                     ,pi_measure        IN nm3type.tab_number
+                                     );
+--
+PROCEDURE ins_nm_mrg_section_members (pi_mrg_job_id     IN nm_mrg_section_members.nsm_mrg_job_id%TYPE
+                                     ,pi_mrg_section_id IN nm_mrg_section_members.nsm_mrg_section_id%TYPE
+                                     ,pi_ne_id          IN nm_mrg_section_members.nsm_ne_id%TYPE
+                                     ,pi_begin_mp       IN nm_mrg_section_members.nsm_begin_mp%TYPE
+                                     ,pi_end_mp         IN nm_mrg_section_members.nsm_end_mp%TYPE
+                                     ,pi_measure        IN nm_mrg_section_members.nsm_measure%TYPE
+                                     );
+--
+PROCEDURE ins_nm_mrg_section_members (pi_mrg_job_id     IN nm_mrg_section_members.nsm_mrg_job_id%TYPE
+                                     ,pi_mrg_section_id IN nm_mrg_section_members.nsm_mrg_section_id%TYPE
+                                     ,pi_pl_arr         IN nm_placement_array
+                                     );
+--
+--</PROC>
+--
+------------------------------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nm_mrg_section_inv_values">
+PROCEDURE ins_nm_mrg_section_inv_values (pi_rec_nsv IN OUT nm_mrg_section_inv_values%ROWTYPE);
+--</PROC>
+--
+------------------------------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nm_mrg_section_member_inv">
+PROCEDURE ins_nm_mrg_section_member_inv (pi_rec_nsi IN nm_mrg_section_member_inv%ROWTYPE);
+--</PROC>
+--
+------------------------------------------------------------------------------------------------
+--
+--<PROC NAME="do_cascading_sect_update">
+PROCEDURE do_cascading_sect_update (p_rec_nms            nm_mrg_sections%ROWTYPE
+                                   ,p_new_mrg_section_id number
+                                   );
+--</PROC>
+--
+------------------------------------------------------------------------------------------------
+--
+--<PROC NAME="compare_rec_nsv">
+FUNCTION compare_rec_nsv (pi_rec_1 nm_mrg_section_inv_values%ROWTYPE
+                         ,pi_rec_2 nm_mrg_section_inv_values%ROWTYPE
+                         ) RETURN boolean;
+--</PROC>
+--
+------------------------------------------------------------------------------------------------
+--
+--<PROC NAME="assess_inner_join">
+PROCEDURE assess_inner_join (pi_job_id       IN nm_mrg_query_results.nqr_mrg_job_id%TYPE
+                            );
+--</PROC>
+--
+------------------------------------------------------------------------------------------------
+--
+--<PROC NAME="pop_rec_nsv_from_cs_distinct">
+PROCEDURE pop_rec_nsv_from_cs_distinct
+                            (pi_rowtype      IN     rec_distinct
+                            ,po_rec_nsv      IN OUT nm_mrg_section_inv_values%ROWTYPE
+                            );
+--</PROC>
+--
+------------------------------------------------------------------------------------------------
+--
+--<PROC NAME="pop_rec_nsv_from_inv_val_mem">
+PROCEDURE pop_rec_nsv_from_inv_val_mem
+                            (pi_rowtype    IN     cs_inv_val_by_mem%ROWTYPE
+                            ,po_rec_nsv    IN OUT nm_mrg_section_inv_values%ROWTYPE
+                            );
+--</PROC>
+--
+------------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_val_from_rec_nsv">
+FUNCTION get_val_from_rec_nsv (p_attrib_number IN NUMBER) RETURN VARCHAR2;
+--</PROC>
+--
+------------------------------------------------------------------------------------------------
+--
+PROCEDURE get_route_offsets (pi_job_id IN nm_mrg_sections.nms_mrg_job_id%TYPE);
+--
+------------------------------------------------------------------------------------------------
+--
+FUNCTION get_locations_which_match RETURN nm_placement_array;
+--
+------------------------------------------------------------------------------------------------
+--
+PROCEDURE build_up_sql_individual_point (p_job_id NUMBER);
+--
+------------------------------------------------------------------------------------------------
+--
+PROCEDURE deal_with_point_continous_inv (pi_job_id IN nm_mrg_sections.nms_mrg_job_id%TYPE);
+--
+------------------------------------------------------------------------------------------------
+--
+PROCEDURE build_up_sql_for_matching_locs (p_nqt_seq_no NUMBER);
+
+--
+------------------------------------------------------------------------------------------------
+--
+--<PRAGMA>
+   PRAGMA RESTRICT_REFERENCES (get_version, RNDS, WNPS, WNDS);
+   PRAGMA RESTRICT_REFERENCES (get_body_version, RNDS, WNPS, WNDS);
+   PRAGMA RESTRICT_REFERENCES (select_nqr, wnds);
+   PRAGMA RESTRICT_REFERENCES (get_invalid_mrg_qry_defaults, wnds);
+   PRAGMA RESTRICT_REFERENCES (get_ndq, wnds);
+   PRAGMA RESTRICT_REFERENCES (get_nmq_id_from_unique, wnds);
+   PRAGMA RESTRICT_REFERENCES (defaults_exist, wnds);
+   PRAGMA RESTRICT_REFERENCES (defaults_in_query, wnds);
+   PRAGMA RESTRICT_REFERENCES (select_mrg_query, wnds);
+   PRAGMA RESTRICT_REFERENCES (count_query_results, wnds);
+   PRAGMA RESTRICT_REFERENCES (get_mrg_section, wnds);
+   PRAGMA RESTRICT_REFERENCES (get_parent_ne_id_from_temp, wnds);
+   PRAGMA RESTRICT_REFERENCES (compare_rec_nsv, wnds);
+   PRAGMA RESTRICT_REFERENCES (get_val_from_rec_nsv, wnds, wnps, rnds, rnps, TRUST);
+   PRAGMA RESTRICT_REFERENCES (valid_pbi_condition_values, wnds);
+   PRAGMA RESTRICT_REFERENCES (get_pbi_condition_value_count, wnds);
+   PRAGMA RESTRICT_REFERENCES (get_tab_column_details, wnds);
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+end nm3mrg_supplementary;
+/
