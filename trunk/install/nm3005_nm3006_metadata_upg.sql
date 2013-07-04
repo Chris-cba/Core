@@ -1,3 +1,16 @@
+--
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3005_nm3006_metadata_upg.sql-arc   2.1   Jul 04 2013 14:21:22   James.Wadsworth  $
+--       Module Name      : $Workfile:   nm3005_nm3006_metadata_upg.sql  $
+--       Date into PVCS   : $Date:   Jul 04 2013 14:21:22  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 13:59:48  $
+--       Version          : $Revision:   2.1  $
+--
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
 rem   SCCS Identifiers :-
 rem   
 rem       sccsid           : @(#)nm3005_nm3006_metadata_upg.sql	1.1 06/06/01

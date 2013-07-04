@@ -1,3 +1,16 @@
+--
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3081_nm3100.sql-arc   2.1   Jul 04 2013 14:21:22   James.Wadsworth  $
+--       Module Name      : $Workfile:   nm3081_nm3100.sql  $
+--       Date into PVCS   : $Date:   Jul 04 2013 14:21:22  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:00:48  $
+--       Version          : $Revision:   2.1  $
+--
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
 define sccsid = '@(#)nm3081_nm3100.sql	1.1 10/23/03'
 undefine exor_base
 undefine run_file
