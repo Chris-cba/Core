@@ -6,12 +6,14 @@ set echo off
 --
 --   PVCS Identifiers :-
 --
---       pvcsid                 : $Header:   //vm_latest/archives/nm3/mig/create_step8_script.sql-arc   2.0   Sep 12 2008 11:55:10   Ian Turnbull  $
+--       pvcsid                 : $Header:   //vm_latest/archives/nm3/mig/create_step8_script.sql-arc   2.1   Jul 04 2013 16:49:08   James.Wadsworth  $
 --       Module Name      : $Workfile:   create_step8_script.sql  $
---       Date into PVCS   : $Date:   Sep 12 2008 11:55:10  $
---       Date fetched Out : $Modtime:   Sep 12 2008 11:53:56  $
---       PVCS Version     : $Revision:   2.0  $
------------------------------------------------------------------------------
+--       Date into PVCS   : $Date:   Jul 04 2013 16:49:08  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 16:46:56  $
+--       PVCS Version     : $Revision:   2.1  $
+------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+------------------------------------------------------------------
 
 undefine dir
 

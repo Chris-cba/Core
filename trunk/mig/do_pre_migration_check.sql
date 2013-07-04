@@ -1,4 +1,4 @@
-REM Copyright (c) Exor Corporation Ltd, 2004
+REM Copyright 2013 Bentley Systems Incorporated. All rights reserved.
 REM @(#)do_pre_migration_check.sql	1.3 09/08/04
 
 SET FEEDBACK OFF

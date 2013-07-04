@@ -12,14 +12,18 @@ CREATE OR REPLACE procedure mig_step_8_ind_inv
 --
 --   PVCS Identifiers :-
 --
---       pvcsid                 : $Header:   //vm_latest/archives/nm3/mig/mig_step_8_ind_inv.prc-arc   2.0   Sep 12 2008 10:54:36   Ian Turnbull  $
+--       pvcsid                 : $Header:   //vm_latest/archives/nm3/mig/mig_step_8_ind_inv.prc-arc   2.1   Jul 04 2013 16:49:08   James.Wadsworth  $
 --       Module Name      : $Workfile:   mig_step_8_ind_inv.prc  $
---       Date into PVCS   : $Date:   Sep 12 2008 10:54:36  $
---       Date fetched Out : $Modtime:   Sep 12 2008 10:52:50  $
---       PVCS Version     : $Revision:   2.0  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:49:08  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 16:47:38  $
+--       PVCS Version     : $Revision:   2.1  $
 --       Based on SCCS version :
+--
 -----------------------------------------------------------------------------
-  g_body_sccsid  CONSTANT VARCHAR2(2000) := '$Revision:   2.0  $';
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
+  g_body_sccsid  CONSTANT VARCHAR2(2000) := '$Revision:   2.1  $';
   g_package_name CONSTANT VARCHAR2(30) := 'mig_step_8_ind_inv';
   g_proc_name    VARCHAR2(50);
   g_log_file                UTL_FILE.FILE_TYPE;

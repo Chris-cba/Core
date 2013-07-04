@@ -4,19 +4,19 @@ CREATE OR REPLACE PACKAGE BODY Nm2_Nm3_Migration AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/mig/nm2_nm3_migration.pkb-arc   2.12   Jun 23 2009 14:03:06   Ian Turnbull  $
---       pvcsid                 : $Header:   //vm_latest/archives/nm3/mig/nm2_nm3_migration.pkb-arc   2.12   Jun 23 2009 14:03:06   Ian Turnbull  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/mig/nm2_nm3_migration.pkb-arc   2.13   Jul 04 2013 16:49:08   James.Wadsworth  $
+--       pvcsid                 : $Header:   //vm_latest/archives/nm3/mig/nm2_nm3_migration.pkb-arc   2.13   Jul 04 2013 16:49:08   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm2_nm3_migration.pkb  $
---       Date into PVCS   : $Date:   Jun 23 2009 14:03:06  $
---       Date fetched Out : $Modtime:   Jun 23 2009 14:02:28  $
---       PVCS Version     : $Revision:   2.12  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:49:08  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 16:46:22  $
+--       PVCS Version     : $Revision:   2.13  $
 --
 --   Author D.Cope
 --
 --   nm2_nm3_migration body
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2002
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 --all global package variables here
@@ -24,7 +24,7 @@ CREATE OR REPLACE PACKAGE BODY Nm2_Nm3_Migration AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT VARCHAR2(2000) := '$Revision:   2.12  $';
+  g_body_sccsid  CONSTANT VARCHAR2(2000) := '$Revision:   2.13  $';
   g_package_name CONSTANT VARCHAR2(30) := 'nm2_nm3_migration';
   g_proc_name    VARCHAR2(50);
   g_log_file                UTL_FILE.FILE_TYPE;

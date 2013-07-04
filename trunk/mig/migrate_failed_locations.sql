@@ -1,3 +1,16 @@
+--
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/mig/migrate_failed_locations.sql-arc   2.1   Jul 04 2013 16:49:08   James.Wadsworth  $
+--       Module Name      : $Workfile:   migrate_failed_locations.sql  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:49:08  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 16:48:08  $
+--       Version          : $Revision:   2.1  $
+--
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
 define sccsid = '"@(#)migrate_failed_locations.sql	1.1 12/24/04"'
 PROMPT ==============================================================
 PROMPT Migration of Failed Inventory Locations                       

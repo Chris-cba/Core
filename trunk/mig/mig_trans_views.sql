@@ -1,4 +1,4 @@
-REM Copyright (c) Exor Corporation Ltd, 2004
+REM Copyright 2013 Bentley Systems Incorporated. All rights reserved.
 REM @(#)mig_trans_views.sql	1.6 06/16/05
 
 CREATE OR REPLACE function get_nt_type (pi_ne_id IN nm_elements_all.ne_id%TYPE) RETURN nm_types.nt_type%TYPE IS
