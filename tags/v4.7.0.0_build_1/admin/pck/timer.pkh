@@ -1,0 +1,30 @@
+CREATE OR REPLACE PACKAGE Timer AS
+-----------------------------------------------------------------------------
+--
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)timer.pkh	1.1 07/18/06
+--       Module Name      : timer.pkh
+--       Date into SCCS   : 06/07/18 15:55:26
+--       Date fetched Out : 07/06/13 14:14:03
+--       SCCS Version     : 1.1
+--
+--   Author : Rob Coupe
+--
+--   Timer package
+--
+-------------------------------------------------------------------------------
+g_time_values ptr_num_array := Nm3array.init_ptr_num_array;
+g_time_text   ptr_vc_array := Nm3array.init_ptr_vc_array;
+g_id          INTEGER := 0;
+g_start       NUMBER := DBMS_UTILITY.GET_TIME;
+
+
+PROCEDURE set_timer;
+PROCEDURE set_time  ( p_text IN VARCHAR2 );
+FUNCTION  get_timer_values RETURN ptr_num_array;
+FUNCTION  get_timer_text   RETURN ptr_vc_array;
+PROCEDURE debug_timer;
+
+END;
+/

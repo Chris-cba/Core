@@ -1,0 +1,87 @@
+create or replace package Templates AS
+--<PACKAGE>
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)template.pkh	1.1 03/01/01
+--       Module Name      : template.pkh
+--       Date into SCCS   : 01/03/01 16:24:18
+--       Date fetched Out : 07/06/13 14:14:02
+--       SCCS Version     : 1.1
+--
+--
+--   Author : Ian Smith
+--
+--  Package of functions for reporting on OLE templates
+--  to be used in conjunction with the word template template.dot
+--  It will produce a report of the columns defined within an OLE
+--  template.
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+  g_sccsid      CONSTANT  VARCHAR2(2000) := '"@(#)template.pkh	1.1 03/01/01"';
+--  g_sccsid is the SCCS ID for the package
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="Get_Base_Field">
+function Get_Base_Field(intLine IN INTEGER,Template IN VARCHAR2) RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="Get_Base_Type">
+function Get_Base_Type(intLine IN INTEGER,Template IN VARCHAR2) RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="Get_Word_Field">
+function Get_Word_Field(intLine IN INTEGER,Template IN VARCHAR2) RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="Get_Media">
+function Get_Media(Template IN VARCHAR2) RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="Get_Location">
+function Get_Location(Template IN VARCHAR2) RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PRAGMA>
+   PRAGMA RESTRICT_REFERENCES (get_version, RNDS, WNPS, WNDS);
+   PRAGMA RESTRICT_REFERENCES (get_body_version, RNDS, WNPS, WNDS);
+Pragma Restrict_References(Get_Base_Field , WNDS, WNPS);
+Pragma Restrict_References(Get_Base_Type , WNDS, WNPS);
+Pragma Restrict_References(Get_Word_Field , WNDS, WNPS);
+Pragma Restrict_References(Get_Media , WNDS, WNPS);
+Pragma Restrict_References(Get_Location , WNDS, WNPS);
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+end templates;
+/
