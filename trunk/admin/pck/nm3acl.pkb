@@ -3,13 +3,15 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3acl.pkb-arc   3.6   May 16 2011 14:42:24   Steve.Cooper  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3acl.pkb-arc   3.7   Jul 04 2013 15:15:36   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3acl.pkb  $
---       Date into PVCS   : $Date:   May 16 2011 14:42:24  $
---       Date fetched Out : $Modtime:   May 10 2011 14:51:18  $
---       Version          : $Revision:   3.6  $
+--       Date into PVCS   : $Date:   Jul 04 2013 15:15:36  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 15:11:48  $
+--       Version          : $Revision:   3.7  $
 --       Based on SCCS version : 
--------------------------------------------------------------------------
+------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+------------------------------------------------------------------
 --
 
 -- Access Control List wrapper for Oracle's DBMS_NETWORK_ACL_ADMIN package
@@ -24,7 +26,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid        CONSTANT VARCHAR2(2000) := '$Revision:   3.6  $';
+  g_body_sccsid        CONSTANT VARCHAR2(2000) := '$Revision:   3.7  $';
   g_package_name       CONSTANT varchar2(30) := 'nm3acl';
 --
   c_ftp_role           CONSTANT VARCHAR2(30) := 'FTP_USER';
