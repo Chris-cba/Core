@@ -1,0 +1,73 @@
+CREATE OR REPLACE package nm3gaz_query_saved
+AS
+--<PACKAGE>
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3gaz_query_saved.pkh-arc   3.1   Jul 04 2013 15:37:06   James.Wadsworth  $
+--       Module Name      : $Workfile:   nm3gaz_query_saved.pkh  $
+--       Date into PVCS   : $Date:   Jul 04 2013 15:37:06  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 15:35:58  $
+--       Version          : $Revision:   3.1  $
+--       Based on SCCS version : 
+------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+
+  -----------
+  --constants
+  -----------
+  --g_sccsid is the SCCS ID for the package
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.1  $';
+
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+  FUNCTION get_version RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+  FUNCTION get_body_version RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="SAVE_QUERY">
+-- This saves a query by taking the data in the temp table and inserting it 
+-- into the save table.
+  PROCEDURE save_ngq_query( pi_ngq_id      IN VARCHAR2
+                          , pi_query_owner IN VARCHAR2 DEFAULT 'PUBLIC'
+                          , pi_descr       IN VARCHAR2);
+
+--############################################################
+--PI_QUERY_TYPE parameter - default 'PUBLIC'
+--which you set to NM_GAZ_QUERY_SAVED.NGQS_QUERY_TYPE column
+--and the PI_DESCR attribute - set to NM_GAZ_QUERY_SAVED.NGQS_DESCR
+--############################################################
+                    
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="RESTORE_QUERY">
+  PROCEDURE restore_query( pi_ngq_id      IN VARCHAR2 );
+--</PROC>
+-----------------------------------------------------------------------------
+--
+--<PRAGMA>
+  PRAGMA RESTRICT_REFERENCES(get_version, RNDS, WNPS, WNDS);
+  PRAGMA RESTRICT_REFERENCES(get_body_version, RNDS, WNPS, WNDS);
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+END nm3gaz_query_saved;
+/
