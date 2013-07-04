@@ -1,0 +1,123 @@
+create or replace package nm3tab_varchar as
+--<PACKAGE>
+-- PVCS Identifiers :-
+--
+-- pvcsid : $Header:   //vm_latest/archives/nm3/admin/pck/nm3tab_varchar.pkh-arc   2.5   Jul 04 2013 16:33:00   James.Wadsworth  $
+-- Module Name : $Workfile:   nm3tab_varchar.pkh  $
+-- Date into PVCS : $Date:   Jul 04 2013 16:33:00  $
+-- Date fetched Out : $Modtime:   Jul 04 2013 14:25:20  $
+-- PVCS Version : $Revision:   2.5  $
+-- Based on SCCS version : 
+--
+--
+--   Author : Jonathan Mills
+--
+--   NM3 nm3type.tab_varchar32767 manipulation package
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.5  $';
+--  g_sccsid is the SCCS ID for the package
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="split_string_on_lf">
+-- This function takes the passed string and returns it as a table of varcahr
+--  with the string split into rows on CHR(10) (Line Feeds)
+--
+FUNCTION split_string_on_lf (p_string VARCHAR2) RETURN nm3type.tab_varchar32767;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_tab_varchar">
+-- Does exactly what it says on the tin (TM)
+--
+PROCEDURE debug_tab_varchar (p_tab_vc nm3type.tab_varchar32767);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="split_rough_chunked_tab_vc_lf">
+-- This procedure takes a roughly chunked table of VARCAHR and splits
+--  the rows on line feeds
+--
+FUNCTION split_rough_chunked_tab_vc_lf (p_tab_vc nm3type.tab_varchar32767
+                                       ) RETURN nm3type.tab_varchar32767;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="append_tab_varchar">
+-- This procedure appends p_tab_vc_to_append onto the end of p_tab_vc_main
+--
+PROCEDURE append_tab_varchar (p_tab_vc_main      IN OUT NOCOPY nm3type.tab_varchar32767
+                             ,p_tab_vc_to_append IN            nm3type.tab_varchar32767
+                             );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="compress_tab_vc_by_lf">
+-- This function will attempt to compress a tab_varchar by taking any lines which
+--  do not have a line feed as their last character, and appending the next line to
+--  it (if it will fit)
+--
+FUNCTION compress_tab_vc_by_lf (p_tab_vc nm3type.tab_varchar32767
+                               ) RETURN nm3type.tab_varchar32767;
+--</PROC>
+-----------------------------------------------------------------------------
+--<PROC NAME="cleanse_tab_vc">
+FUNCTION cleanse_tab_vc (pi_tab_vc             IN nm3type.tab_varchar32767
+                        ,pi_remove_blank_lines IN BOOLEAN DEFAULT TRUE
+                        ,pi_remove_cr          IN BOOLEAN DEFAULT TRUE
+                         ) RETURN nm3type.tab_varchar32767;
+--</PROC>
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="append">
+-- This procedure appends the specified text into the tab_varchar
+--  if p_nl is specified then a line feed (CHR(10)) is put into
+--  the string before the passed text
+--
+PROCEDURE append (p_tab_vc IN OUT NOCOPY nm3type.tab_varchar32767
+                 ,p_text   IN            VARCHAR2
+                 ,p_nl     IN            BOOLEAN DEFAULT TRUE
+                 );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PRAGMA>
+   PRAGMA RESTRICT_REFERENCES (get_version, RNDS, WNPS, WNDS);
+   PRAGMA RESTRICT_REFERENCES (get_body_version, RNDS, WNPS, WNDS);
+   PRAGMA RESTRICT_REFERENCES (split_string_on_lf, RNDS, WNPS, WNDS);
+   PRAGMA RESTRICT_REFERENCES (debug_tab_varchar, RNDS, RNPS, WNPS, WNDS, TRUST); -- In debug we trust
+   PRAGMA RESTRICT_REFERENCES (split_rough_chunked_tab_vc_lf, RNDS, WNPS, WNDS);
+   PRAGMA RESTRICT_REFERENCES (append_tab_varchar, RNDS, WNPS, WNDS);
+   PRAGMA RESTRICT_REFERENCES (compress_tab_vc_by_lf, RNDS, WNPS, WNDS);
+   PRAGMA RESTRICT_REFERENCES (append, RNDS, WNPS, WNDS);
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+end nm3tab_varchar;
+/
