@@ -1,0 +1,124 @@
+CREATE OR REPLACE PACKAGE nm3msv_sec
+AS
+--<PACKAGE>
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3msv_sec.pkh-arc   3.1   Jul 04 2013 16:18:42   James.Wadsworth  $
+--       Module Name      : $Workfile:   nm3msv_sec.pkh  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:18:42  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 16:18:18  $
+--       Version          : $Revision:   3.1  $
+--       Based on SCCS version : 
+------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+
+  -----------
+  --constants
+  -----------
+  --g_sccsid is the SCCS ID for the package
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.1  $';
+
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+  FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+  FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--  USER_SDO_MAPS logic
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="DO_USM_INS">
+  PROCEDURE do_usm_ins ( pi_username IN VARCHAR2
+                       , pi_rec_usm  IN user_sdo_maps%ROWTYPE );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="DO_USM_DEL">
+  PROCEDURE do_usm_del ( pi_username IN VARCHAR2
+                       , pi_rec_usm  IN user_sdo_maps%ROWTYPE );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="DO_USM_UPD">
+  PROCEDURE do_usm_upd ( pi_username IN VARCHAR2
+                       , pi_rec_usm  IN user_sdo_maps%ROWTYPE );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--  USER_SDO_THEMES logic
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="DO_UST_INS">
+  PROCEDURE do_ust_ins ( pi_username IN VARCHAR2
+                       , pi_rec_ust  IN user_sdo_themes%ROWTYPE );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="DO_UST_DEL">
+  PROCEDURE do_ust_del ( pi_rec_ust  IN user_sdo_themes%ROWTYPE 
+                       , pi_username IN VARCHAR2);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="DO_UST_UPD">
+  PROCEDURE do_ust_upd ( pi_username IN VARCHAR2
+                       , pi_rec_ust  IN user_sdo_themes%ROWTYPE );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--  USER_SDO_STYLES logic
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="DO_USS_INS">
+  PROCEDURE do_uss_ins ( pi_username IN VARCHAR2
+                       , pi_rec_uss  IN user_sdo_styles%ROWTYPE );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="DO_USS_DEL">
+  PROCEDURE do_uss_del ( pi_username IN VARCHAR2
+                       , pi_rec_uss  IN user_sdo_styles%ROWTYPE );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="DO_USS_UPD">
+  PROCEDURE do_uss_upd ( pi_username IN VARCHAR2
+                       , pi_rec_uss  IN user_sdo_styles%ROWTYPE );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PRAGMA>
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+END nm3msv_sec;
+/
