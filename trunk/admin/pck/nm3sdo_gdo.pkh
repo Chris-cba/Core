@@ -4,13 +4,15 @@ IS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_gdo.pkh-arc   3.3   Sep 28 2010 17:54:50   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_gdo.pkh-arc   3.4   Jul 04 2013 16:29:32   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3sdo_gdo.pkh  $
---       Date into PVCS   : $Date:   Sep 28 2010 17:54:50  $
---       Date fetched Out : $Modtime:   Sep 28 2010 17:51:00  $
---       PVCS Version     : $Revision:   3.3  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:29:32  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 16:27:44  $
+--       PVCS Version     : $Revision:   3.4  $
 --
--------------------------------------------------------------------------
+------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
 
@@ -18,7 +20,7 @@ IS
   --constants
   -----------
   --g_sccsid is the SCCS ID for the package
-  g_sccsid CONSTANT VARCHAR2(2000) :='"$Revision:   3.3  $"';
+  g_sccsid CONSTANT VARCHAR2(2000) :='"$Revision:   3.4  $"';
 --</GLOBVAR>
 --
 -----------------------------------------------------------------------------

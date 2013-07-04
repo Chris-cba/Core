@@ -5,16 +5,18 @@ AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_geom.pkb-arc   1.7   May 17 2011 08:26:26   Steve.Cooper  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_geom.pkb-arc   1.8   Jul 04 2013 16:29:32   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3sdo_geom.pkb  $
---       Date into PVCS   : $Date:   May 17 2011 08:26:26  $
---       Date fetched Out : $Modtime:   Apr 04 2011 10:19:26  $
---       PVCS Version     : $Revision:   1.7  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:29:32  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 16:28:48  $
+--       PVCS Version     : $Revision:   1.8  $
 --       Based on
 --
---------------------------------------------------------------------------------
+------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+------------------------------------------------------------------
 --
-  g_body_sccsid    CONSTANT VARCHAR2(30) :='"$Revision:   1.7  $"';
+  g_body_sccsid    CONSTANT VARCHAR2(30) :='"$Revision:   1.8  $"';
   g_tab_xys                 nm3sdo_gdo.tab_xys;
  -- g_tab_nm_coords           nm_coords_array := NEW nm_coords_array();
 --

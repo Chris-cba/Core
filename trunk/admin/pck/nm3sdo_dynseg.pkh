@@ -4,12 +4,14 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_dynseg.pkh-arc   3.4   May 18 2011 10:59:06   Ade.Edwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_dynseg.pkh-arc   3.5   Jul 04 2013 16:29:32   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3sdo_dynseg.pkh  $
---       Date into PVCS   : $Date:   May 18 2011 10:59:06  $
---       Date fetched Out : $Modtime:   Feb 01 2011 14:13:34  $
---       Version          : $Revision:   3.4  $
--------------------------------------------------------------------------
+--       Date into PVCS   : $Date:   Jul 04 2013 16:29:32  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 16:27:12  $
+--       Version          : $Revision:   3.5  $
+------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
 
@@ -17,7 +19,7 @@ AS
   --constants
   -----------
   --g_sccsid is the SCCS ID for the package
-  g_sccsid      CONSTANT VARCHAR2(2000) := '$Revision:   3.4  $';
+  g_sccsid      CONSTANT VARCHAR2(2000) := '$Revision:   3.5  $';
   g_use_offset  BOOLEAN := FALSE;
   g_base_tol    NUMBER := 0.05; --NM3SDO.GET_TABLE_DIMINFO('NM_NSG_ESU_SHAPES_TABLE', 'SHAPE')(1).sdo_tolerance;
 --</GLOBVAR>

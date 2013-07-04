@@ -5,16 +5,18 @@ AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_geom.pkh-arc   1.3   Oct 22 2009 11:37:14   aedwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_geom.pkh-arc   1.4   Jul 04 2013 16:29:32   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3sdo_geom.pkh  $
---       Date into PVCS   : $Date:   Oct 22 2009 11:37:14  $
---       Date fetched Out : $Modtime:   Oct 22 2009 11:21:42  $
---       PVCS Version     : $Revision:   1.3  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:29:32  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 16:28:58  $
+--       PVCS Version     : $Revision:   1.4  $
 --       Based on
 --
---------------------------------------------------------------------------------
+------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+------------------------------------------------------------------
 --
-  g_sccsid    CONSTANT VARCHAR2(30) :='"$Revision:   1.3  $"';
+  g_sccsid    CONSTANT VARCHAR2(30) :='"$Revision:   1.4  $"';
   g_srid               NUMBER;
   g_tolerance          NUMBER := NVL(nm3sdo.get_tol_from_unit_mask(1), 0.0005);
 --

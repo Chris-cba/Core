@@ -5,15 +5,17 @@ AS
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_gdr.pkh-arc   3.1   Mar 10 2009 11:41:02   aedwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_gdr.pkh-arc   3.2   Jul 04 2013 16:29:32   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3sdo_gdr.pkh  $
---       Date into PVCS   : $Date:   Mar 10 2009 11:41:02  $
---       Date fetched Out : $Modtime:   Mar 10 2009 11:40:20  $
---       PVCS Version     : $Revision:   3.1  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:29:32  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 16:28:32  $
+--       PVCS Version     : $Revision:   3.2  $
 --
 --   NM3 Package for GIS_DATA_RESTRICTIONS
 --
---------------------------------------------------------------------------------
+------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+------------------------------------------------------------------
 --
 --</PACKAGE>
 --
@@ -21,7 +23,7 @@ AS
 --<GLOBVAR>
 -- g_sccsid is the SCCS_ID
 -- Constants
-  g_sccsid           CONSTANT VARCHAR2(80) := '"$Revision:   3.1  $"';
+  g_sccsid           CONSTANT VARCHAR2(80) := '"$Revision:   3.2  $"';
 --
 --</GLOBVAR>
 --------------------------------------------------------------------------------
