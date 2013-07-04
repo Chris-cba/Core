@@ -12,7 +12,7 @@ SELECT
 --   gis_themes View
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2001
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
        *
  FROM  gis_themes_all

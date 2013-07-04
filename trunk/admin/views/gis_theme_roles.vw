@@ -14,7 +14,7 @@ as select
 --       SCCS Version     : 1.1
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2003
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
   NTHR_THEME_ID,
   NTHR_ROLE,

@@ -4,12 +4,14 @@ SELECT
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/doc_bundle_files_v.vw-arc   3.1   Feb 04 2011 15:38:20   Graeme.Johnson  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/doc_bundle_files_v.vw-arc   3.2   Jul 04 2013 11:20:02   James.Wadsworth  $
 --       Module Name      : $Workfile:   doc_bundle_files_v.vw  $
---       Date into PVCS   : $Date:   Feb 04 2011 15:38:20  $
---       Date fetched Out : $Modtime:   Feb 04 2011 15:35:56  $
---       Version          : $Revision:   3.1  $
--------------------------------------------------------------------------
+--       Date into PVCS   : $Date:   Jul 04 2013 11:20:02  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 10:41:12  $
+--       Version          : $Revision:   3.2  $
+------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+------------------------------------------------------------------
 --
        dbf_file_id
      , dbf_bundle_id

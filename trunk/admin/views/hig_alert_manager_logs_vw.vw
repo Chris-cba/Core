@@ -23,13 +23,15 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/hig_alert_manager_logs_vw.vw-arc   3.1   Jun 21 2010 13:15:44   lsorathia  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/hig_alert_manager_logs_vw.vw-arc   3.2   Jul 04 2013 11:20:02   James.Wadsworth  $
 --       Module Name      : $Workfile:   hig_alert_manager_logs_vw.vw  $
---       Date into PVCS   : $Date:   Jun 21 2010 13:15:44  $
---       Date fetched Out : $Modtime:   Jun 21 2010 11:29:14  $
---       Version          : $Revision:   3.1  $
+--       Date into PVCS   : $Date:   Jul 04 2013 11:20:02  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 10:49:06  $
+--       Version          : $Revision:   3.2  $
 --       Based on SCCS version : 
--------------------------------------------------------------------------
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
 -- 
 SELECT halt_id
       ,hal_id

@@ -12,7 +12,7 @@ flag ) AS SELECT
 -- Translation View
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2005
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 urp.granted_role ROLE,
        SUM(DISTINCT DECODE(rrp.granted_role,

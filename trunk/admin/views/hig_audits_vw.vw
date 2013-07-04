@@ -22,13 +22,15 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/hig_audits_vw.vw-arc   3.2   Jun 20 2011 11:40:48   Linesh.Sorathia  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/hig_audits_vw.vw-arc   3.3   Jul 04 2013 11:20:02   James.Wadsworth  $
 --       Module Name      : $Workfile:   hig_audits_vw.vw  $
---       Date into PVCS   : $Date:   Jun 20 2011 11:40:48  $
---       Date fetched Out : $Modtime:   Jun 20 2011 10:05:44  $
---       Version          : $Revision:   3.2  $
+--       Date into PVCS   : $Date:   Jul 04 2013 11:20:02  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 10:49:22  $
+--       Version          : $Revision:   3.3  $
 --       Based on SCCS version : 
--------------------------------------------------------------------------
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
 -- 
 SELECT  haud_id
        ,haud_nit_inv_type
