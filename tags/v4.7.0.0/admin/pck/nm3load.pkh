@@ -1,0 +1,336 @@
+create or replace package nm3load as
+--<PACKAGE>
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3load.pkh-arc   2.3   Jul 04 2013 16:11:52   James.Wadsworth  $
+--       Module Name      : $Workfile:   nm3load.pkh  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:11:52  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:14  $
+--       Version          : $Revision:   2.3  $
+--       Based on SCCS version : 1.9
+-------------------------------------------------------------------------
+--   Author : Jonathan Mills
+--
+--   NM3 Generic Loader package
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.3  $';
+--  g_sccsid is the SCCS ID for the package
+--
+   g_batch_no     NUMBER;
+   g_nlf_id       nm_load_files.nlf_id%TYPE;
+   g_filename     nm_load_batches.nlb_filename%TYPE;
+   g_tab_lines    nm3type.tab_varchar32767;
+   g_single_line  nm3type.max_varchar2;
+   g_batch_source nm_load_batches.nlb_batch_source%TYPE := 'S';
+ --  g_enclosed_by nm_load_files.nlf_enclosed_by%TYPE;
+--
+   TYPE tab_rec_nlfc IS TABLE OF nm_load_file_cols%ROWTYPE            INDEX BY BINARY_INTEGER;
+   TYPE tab_rec_nld  IS TABLE OF nm_load_destinations%ROWTYPE         INDEX BY BINARY_INTEGER;
+   TYPE tab_rec_nldd IS TABLE OF nm_load_destination_defaults%ROWTYPE INDEX BY BINARY_INTEGER;
+--
+   c_nlf             CONSTANT VARCHAR2(30) := 'NM_LOAD_FILES';
+   c_nlb             CONSTANT VARCHAR2(30) := 'NM_LOAD_BATCHES';
+--
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="create_holding_table">
+-- Creates the holding table to load the data
+--
+PROCEDURE create_holding_table (p_nlf_id nm_load_files.nlf_id%TYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="create_dtd">
+-- Creates a row in NM_XML_FILES containing the DTD for the specified NLF
+--
+PROCEDURE create_dtd (p_nlf_id nm_load_files.nlf_id%TYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_holding_table_name">
+--
+FUNCTION get_holding_table_name (p_nlf_id nm_load_files.nlf_id%TYPE) RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_tab_nlfc">
+--
+FUNCTION get_tab_nlfc (p_nlf_id nm_load_files.nlf_id%TYPE) RETURN tab_rec_nlfc;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="transfer_to_holding_dbms_job">
+--
+PROCEDURE transfer_to_holding_dbms_job (p_nlf_id       nm_load_files.nlf_id%TYPE
+                                       ,p_file_name    VARCHAR2
+                                       ,p_batch_source nm_load_batches.nlb_batch_source%TYPE DEFAULT 'S'
+                                       ,p_produce_htp  BOOLEAN DEFAULT FALSE
+                                       );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="transfer_to_holding">
+--
+PROCEDURE transfer_to_holding (p_nlf_id       nm_load_files.nlf_id%TYPE
+                              ,p_file_name    VARCHAR2
+                              ,p_batch_source nm_load_batches.nlb_batch_source%TYPE DEFAULT 'S'
+                              );
+FUNCTION transfer_to_holding  (p_nlf_id       nm_load_files.nlf_id%TYPE
+                              ,p_file_name    VARCHAR2
+                              ,p_batch_source nm_load_batches.nlb_batch_source%TYPE DEFAULT 'S') RETURN PLS_INTEGER;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_csv_value_from_line">
+--
+FUNCTION get_csv_value_from_line (p_seq        nm_load_file_cols.nlfc_seq_no%TYPE
+                                 ,p_delim_char VARCHAR2 DEFAULT ','
+                                 ) RETURN VARCHAR2;
+FUNCTION get_csv_value_from_line (p_seq        nm_load_file_cols.nlfc_seq_no%TYPE
+                                 ,p_delim_char VARCHAR2 DEFAULT ','
+                                 ,p_line       VARCHAR2
+                                 ) RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nld_for_nlf">
+--
+FUNCTION get_nld_for_nlf (p_nlf_id nm_load_files.nlf_id%TYPE) RETURN tab_rec_nld;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_cols_to_move">
+--
+PROCEDURE get_cols_to_move (pi_nlf_id          IN     nm_load_files.nlf_id%TYPE
+                           ,pi_nld_id          IN     nm_load_destinations.nld_id%TYPE
+                           ,po_tab_holding_col    OUT nm3type.tab_varchar2000
+                           ,po_tab_dest_col       OUT nm3type.tab_varchar30
+                           );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="validate_batch">
+--
+PROCEDURE validate_batch (p_batch_no nm_load_batches.nlb_batch_no%TYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="load_batch">
+--
+PROCEDURE load_batch (p_batch_no nm_load_batches.nlb_batch_no%TYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="validate_dbms_job">
+--
+PROCEDURE validate_dbms_job (p_batch_no      nm_load_batches.nlb_batch_no%TYPE
+                            ,p_produce_htp   BOOLEAN DEFAULT FALSE
+                            );
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="load_dbms_job">
+--
+PROCEDURE load_dbms_job (p_batch_no      nm_load_batches.nlb_batch_no%TYPE
+                        ,p_produce_htp   BOOLEAN DEFAULT FALSE
+                        );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="update_status">
+--
+PROCEDURE update_status (p_batch_no   NUMBER
+                        ,p_record_no  NUMBER
+                        ,p_status     VARCHAR2
+                        ,p_text       VARCHAR2
+                        );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_tab_rec_nldd">
+--
+FUNCTION get_tab_rec_nldd (p_nld_id IN     nm_load_destinations.nld_id%TYPE
+                          ) RETURN tab_rec_nldd;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nlb">
+--
+FUNCTION get_nlb (p_nlb_batch_no nm_load_batches.nlb_batch_no%TYPE) RETURN nm_load_batches%ROWTYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nlf">
+--
+FUNCTION get_nlf (p_nlf_id nm_load_files.nlf_id%TYPE) RETURN nm_load_files%ROWTYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nld">
+--
+FUNCTION get_nld (p_nld_id nm_load_destinations.nld_id%TYPE) RETURN nm_load_destinations%ROWTYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="produce_log_files">
+--
+PROCEDURE produce_log_files (p_nlb_batch_no   nm_load_batches.nlb_batch_no%TYPE
+                            ,p_produce_as_htp BOOLEAN DEFAULT FALSE
+                            ,p_send_as_mail   BOOLEAN DEFAULT FALSE
+                            );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="produce_log_email">
+-- Produces an email to a given user/group
+PROCEDURE produce_log_email (p_nlb_batch_no   nm_load_batches.nlb_batch_no%TYPE
+                            ,p_produce_as_htp BOOLEAN DEFAULT FALSE
+                            ,p_send_to        nm3mail.tab_recipient
+                            );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_next_nld_id">
+--
+FUNCTION get_next_nld_id RETURN PLS_INTEGER;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_next_nlf_id">
+--
+FUNCTION get_next_nlf_id RETURN PLS_INTEGER;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="add_columns_for_destinations">
+--
+PROCEDURE add_columns_for_destinations (p_nlf_id nm_load_files.nlf_id%TYPE
+                                       ,p_nld_id nm_load_destinations.nld_id%TYPE
+                                       );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_column_default">
+--
+FUNCTION get_column_default (p_nldd_nld_id      nm_load_destination_defaults.nldd_nld_id%TYPE
+                            ,p_nldd_column_name nm_load_destination_defaults.nldd_column_name%TYPE
+                            ) RETURN nm_load_destination_defaults.nldd_value%TYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_commit_threshold">
+--
+FUNCTION get_commit_threshold RETURN NUMBER;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="dump_nlf_to_server">
+--
+-- Dumps out the NM_LOAD_FILES definition into the NLF_PATH directory on the server
+--  (or UTLFILEDIR if NLF_PATH is null)
+--
+PROCEDURE dump_nlf_to_server
+                   (p_nlf_unique       nm_load_files.nlf_unique%TYPE
+                   ,p_output_filename  nm_load_files.nlf_descr%TYPE DEFAULT NULL
+                   ,p_delete_if_exists BOOLEAN                      DEFAULT TRUE
+                   );
+--
+FUNCTION dump_nlf_to_server
+                   (p_nlf_unique       nm_load_files.nlf_unique%TYPE
+                   ,p_output_filename  nm_load_files.nlf_descr%TYPE DEFAULT NULL
+                   ,p_delete_if_exists BOOLEAN                      DEFAULT TRUE
+                   ) RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="dump_nlf_to_client">
+--
+-- Dumps out the NM_LOAD_FILES definition into NM_UPLOAD_FILES
+--
+PROCEDURE dump_nlf_to_client
+                   (p_nlf_unique       nm_load_files.nlf_unique%TYPE
+                   ,p_delete_if_exists BOOLEAN                      DEFAULT TRUE
+                   );
+--
+FUNCTION dump_nlf_to_client
+                   (p_nlf_unique       nm_load_files.nlf_unique%TYPE
+                   ,p_delete_if_exists BOOLEAN                      DEFAULT TRUE
+                   ) RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="delete_nuf_for_nlf">
+--
+-- Deletes NM_UPLOAD_FILES records which are associated with the NM_LOAD_FILES record
+--
+PROCEDURE delete_nuf_for_nlf (pi_nlf_id nm_load_files.nlf_id%TYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="delete_nuf_for_nlb">
+--
+-- Deletes NM_UPLOAD_FILES records which are associated with the NM_LOAD_BATCHES record
+--
+PROCEDURE delete_nuf_for_nlb(pi_nlb_batch_no nm_load_batches.nlb_batch_no%TYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PRAGMA>
+   PRAGMA RESTRICT_REFERENCES (get_version, RNDS, WNPS, WNDS);
+   PRAGMA RESTRICT_REFERENCES (get_body_version, RNDS, WNPS, WNDS);
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+end nm3load;
+/

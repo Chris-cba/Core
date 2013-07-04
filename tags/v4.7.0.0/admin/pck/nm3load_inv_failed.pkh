@@ -1,0 +1,145 @@
+CREATE OR REPLACE package NM3LOAD_INV_FAILED as
+--<PACKAGE>
+-----------------------------------------------------------------------------
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3load_inv_failed.pkh-arc   2.2   Jul 04 2013 16:11:52   James.Wadsworth  $
+--       Module Name      : $Workfile:   nm3load_inv_failed.pkh  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:11:52  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:14  $
+--       Version          : $Revision:   2.2  $
+--       Based on SCCS version : 1.5
+-------------------------------------------------------------------------
+--   Author : Graeme Johnson
+--
+--    NM3LOAD_INV_FAILED
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+
+  -----------
+  --constants
+  -----------
+  --g_sccsid is the SCCS ID for the package
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.2  $';
+--
+-- TYPES
+  TYPE attrib_rec IS RECORD (attrib_name nm_inv_type_attribs.ita_attrib_name%TYPE
+                            ,attrib_value varchar2(500));
+  TYPE attrib_table IS TABLE OF attrib_rec INDEX BY binary_integer;
+  TYPE attrib_rc IS REF CURSOR;
+
+  TYPE conflict_rec IS RECORD (attrib_name            nm_inv_type_attribs.ita_attrib_name%TYPE
+                              ,attrib_screen_text     nm_inv_type_attribs.ita_scrn_text%TYPE
+                              ,attrib_format          nm_inv_type_attribs.ita_format%TYPE
+                              ,attrib_format_mask     nm_inv_type_attribs.ita_format_mask%TYPE
+                              ,attrib_value_holding   VARCHAR2(500)
+                              ,attrib_meaning_holding nm3type.max_varchar2
+                              ,attrib_value_live      VARCHAR2(500)
+                              ,attrib_meaning_live    nm3type.max_varchar2); 
+
+
+  TYPE conflict_table IS TABLE OF conflict_rec INDEX BY binary_integer;  
+--
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--<PROC NAME="get_all_attrib_values">
+-- This function returns a table containing attribute names and their values for a given inventory item
+-- in the asset loader inventory holding table
+FUNCTION get_all_attrib_values(p_batch_no   IN nm_ld_mc_all_inv_tmp.batch_no%TYPE
+                              ,p_record_no  IN nm_ld_mc_all_inv_tmp.record_no%TYPE)
+                               RETURN attrib_table;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_attrib_value">
+-- This function returns the value assigned to a particular attribute for a given inventory item
+-- in the asset loader inventory holding table 
+FUNCTION get_attrib_value(p_batch_no    IN nm_ld_mc_all_inv_tmp.batch_no%TYPE
+                         ,p_record_no   IN nm_ld_mc_all_inv_tmp.record_no%TYPE
+                         ,p_attrib_name IN nm_inv_type_attribs.ita_attrib_name%TYPE
+                         ) RETURN varchar2;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------						 
+--
+--<PROC NAME="get_conflict">
+-- This procedure sets an in out param that is PL/SQL table of live/holding table attributes for a given inventory item
+PROCEDURE get_conflict(p_batch_no        IN     nm_ld_mc_all_inv_tmp.batch_no%TYPE
+                      ,p_record_no       IN     nm_ld_mc_all_inv_tmp.record_no%TYPE
+                      ,po_conflict_table IN OUT conflict_table); 
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="update_holding_record_attrib">
+-- If user wants attribute from live record to be preserved
+-- then this procedure is called to update the attribute value in the holding table to the attribute value
+-- from the live record
+PROCEDURE update_holding_record_attrib(pi_batch_no             IN     nm_ld_mc_all_inv_tmp.batch_no%TYPE
+                                      ,pi_record_no            IN     nm_ld_mc_all_inv_tmp.record_no%TYPE 
+                                      ,pi_attrib_name          IN     nm_inv_type_attribs.ita_attrib_name%TYPE
+                                      ,pi_attrib_value         IN     VARCHAR2
+                                      ,pi_attrib_format        IN     nm_inv_type_attribs.ita_format%TYPE
+                                      ,pi_attrib_format_mask   IN     nm_inv_type_attribs.ita_format_mask%TYPE);
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="set_conflict_resolved">
+-- Update the holding record NLM_ERROR_STATUS to 3 so that when record is re-submitted a conflict error
+-- is not flagged up
+-- Also update NM_LOAD_BATCH_STATUS to indicate record is now valid
+--
+PROCEDURE set_conflict_resolved(pi_batch_no             IN     nm_ld_mc_all_inv_tmp.batch_no%TYPE
+                               ,pi_record_no            IN     nm_ld_mc_all_inv_tmp.record_no%TYPE
+                               );
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="resubmit_batch">
+-- Resubmit a failed batch for loading from the holding table
+PROCEDURE resubmit_batch(pi_batch_no             IN     nm_ld_mc_all_inv_tmp.batch_no%TYPE);
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="delete_batch_record">
+-- Delete a record from the holding table.
+-- This will also update the batch_status and batches tables, so the record is not reported.
+PROCEDURE delete_batch_record (pi_batch_no             IN     nm_ld_mc_all_inv_tmp.batch_no%TYPE
+                              ,pi_record_no            IN     nm_ld_mc_all_inv_tmp.record_no%TYPE);
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PRAGMA>
+  PRAGMA RESTRICT_REFERENCES(get_version, RNDS, WNPS, WNDS);
+  PRAGMA RESTRICT_REFERENCES(get_body_version, RNDS, WNPS, WNDS);
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+end NM3LOAD_INV_FAILED;
+/

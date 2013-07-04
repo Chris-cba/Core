@@ -1,0 +1,426 @@
+CREATE OR REPLACE PACKAGE nm3locator AS
+--<PACKAGE>
+-----------------------------------------------------------------------------
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)nm3locator.pkh	1.9 04/11/06
+--       Module Name      : nm3locator.pkh
+--       Date into SCCS   : 06/04/11 14:25:01
+--       Date fetched Out : 07/06/13 14:12:24
+--       SCCS Version     : 1.9
+--
+--
+--   Author : Darren Cope
+--
+--    nm3locator package to support from nm0572
+--    Relying heavily on the functionality developed in nm3gaz_qry
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+
+  -----------
+  --constants
+  -----------
+  --g_sccsid is the SCCS ID for the package
+  g_sccsid CONSTANT VARCHAR2(2000) := '"@(#)nm3locator.pkh	1.9 04/11/06"';
+  
+  c_ascending  CONSTANT pls_integer := 1;
+  c_descending CONSTANT pls_integer := -1;
+  
+  TYPE ft_table_mapping IS RECORD
+  (
+   inv_col_name all_tab_columns.column_name%TYPE
+  ,assigned     boolean
+  ,ft_col_name  all_tab_columns.column_name%TYPE
+  );
+  
+  TYPE tab_ft_table_mapping IS TABLE OF ft_table_mapping INDEX BY BINARY_INTEGER;
+  
+  TYPE rec_basic_query_attribs IS RECORD
+     (ngqa_attrib_name  nm_gaz_query_attribs.ngqa_attrib_name%TYPE
+     ,ita_scrn_text     nm_inv_type_attribs_all.ita_scrn_text%TYPE
+     ,ngqv_ngq_id       nm_gaz_query_values.ngqv_ngq_id%TYPE
+     ,ngqv_ngqt_seq_no  nm_gaz_query_values.ngqv_ngqt_seq_no%TYPE
+     ,ngqv_ngqa_seq_no  nm_gaz_query_values.ngqv_ngqa_seq_no%TYPE
+     ,ngqv_sequence     nm_gaz_query_values.ngqv_sequence%TYPE
+     ,ngqv_value        nm_gaz_query_values.ngqv_value%TYPE
+     );
+     
+  TYPE tab_rec_basic_query_attribs IS TABLE OF rec_basic_query_attribs INDEX BY BINARY_INTEGER;
+  
+  SUBTYPE loc_disp_length IS nm_inv_attri_lookup_all.ial_meaning%TYPE;
+
+  g_inv_rec nm_inv_items_all%ROWTYPE;
+  
+  g_attr_detail nm3type.max_varchar2; -- can store FT values
+  
+  g_ft_mapping tab_ft_table_mapping;
+  
+  TYPE rec_inv_item_lookup IS RECORD (
+  ial_domain  nm_inv_attri_lookup_all.ial_domain%TYPE
+ ,ial_value   nm_inv_attri_lookup_all.ial_value%TYPE
+ ,ial_meaning nm_inv_attri_lookup_all.ial_meaning%TYPE);
+ 
+ TYPE tab_rec_inv_item_lookup IS TABLE OF rec_inv_item_lookup INDEX BY BINARY_INTEGER;
+ 
+ g_inv_attrs nm3inv.tab_nita;
+ g_is_ft     boolean; -- is the query a ft query
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BASIC_SEARCH_CONDITION">
+-- Returns the default condition for the basic search block 
+FUNCTION get_basic_search_condition(pi_inv_type IN nm_inv_type_attribs_all.ita_inv_type%TYPE
+                                   ,pi_attrib   IN nm_inv_type_attribs_all.ita_attrib_name%TYPE) RETURN nm_gaz_query_attribs.ngqa_condition%TYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="QRY_BASIC_SEARCH_ATTRIBS">
+-- Controls the query of basic search attributes in nm0570
+PROCEDURE qry_basic_search_attribs(pi_ngqv_ngq_id         IN     nm_gaz_query_values.ngqv_ngq_id%TYPE
+                                  ,pi_ngqv_ngqt_seq_no    IN     nm_gaz_query_values.ngqv_ngqt_seq_no%TYPE
+                                  ,pi_ngqt_item_type_type IN     nm_gaz_query_types.ngqt_item_type_type%TYPE
+                                  ,pi_ngqt_item_type      IN     nm_gaz_query_types.ngqt_item_type%TYPE
+                                  ,po_qry_search_attribs  IN OUT tab_rec_basic_query_attribs);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="LCK_BASIC_SEARCH_ATTRIBS">
+-- Controls the locking of basic search attributes in nm0570
+PROCEDURE lck_basic_search_attribs(po_qry_search_attribs IN OUT tab_rec_basic_query_attribs);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="UPD_BASIC_SEARCH_ATTRIBS">
+-- Controls the update of basic search attributes in nm0570
+-- Therre are no inserts as the block is pre-populated from the query
+PROCEDURE upd_basic_search_attribs(pi_ngqt_item_type     IN     nm_gaz_query_types.ngqt_item_type%TYPE
+                                  ,po_qry_search_attribs IN OUT tab_rec_basic_query_attribs);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="CLEAR_ALL">
+-- Clears all tables prior to performing a query
+PROCEDURE clear_all;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="DEBUG_MAP_TABLE">
+-- debug the FT mapping table
+PROCEDURE debug_map_table(p_only_assigned boolean DEFAULT FALSE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_ft_col">
+-- Function supporing populate_inv_tab_from_gaz_query
+FUNCTION get_ft_col (pi_inv_col   IN all_tab_columns.column_name%TYPE
+                    ,pi_inv_is_ft IN boolean DEFAULT TRUE) RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_inv_col">
+-- Function supporing populate_inv_tab_from_gaz_query
+FUNCTION get_inv_col (pi_ft_col IN all_tab_columns.column_name%TYPE
+                     ,pi_inv_is_ft IN boolean DEFAULT TRUE) RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="apply_ft_cols_to_inv_attr">
+-- Function supporing populate_inv_tab_from_gaz_query
+PROCEDURE apply_ft_cols_to_inv_attr(pi_inv_type IN nm_inv_types_all.nit_inv_type%TYPE);
+--</PROC>
+--
+--<PROC NAME="POPULATE_TAB_FROM_GAZ_QUERY">
+-- Populates the result table using the results of a gaz query
+PROCEDURE populate_inv_tab_from_gaz_qry(pi_ngqi_job_id IN  nm_gaz_query_item_list.ngqi_job_id%TYPE
+                                       ,pi_inv_type    IN  nm_inv_items_all.iit_inv_type%TYPE);
+--</PROC>
+--
+--<PROC NAME="POPULATE_TAB_FROM_GDO">
+-- Populates the result table using the results of items selected from the map
+-- driving from GIS_DATA_OBJECTS - used for nm0573
+PROCEDURE populate_inv_tab_from_gdo
+             ( pi_session_id IN  gis_data_objects.gdo_session_id%TYPE
+             , pi_inv_type   IN  nm_inv_items_all.iit_inv_type%TYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="POPULATE_LOOKUPS_FOR_TYPE">
+-- Populates pl/sql table with all lookup values for the type
+PROCEDURE populate_lookups_for_type(pi_type IN nm_inv_types_all.nit_inv_type%TYPE);
+--</PROC>
+--
+FUNCTION get_meaning_from_lookup(p_domain IN nm_inv_attri_lookup_all.ial_domain%TYPE
+                                ,p_value  IN nm_inv_attri_lookup_all.ial_value%TYPE) RETURN nm_inv_attri_lookup_all.ial_meaning%TYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="SET_ORDER_BY_CLAUSE">
+-- Pass in the column the results are ordered by
+-- If the existing order by column is the same as the coulmn being passed in, the ordering will be reversed
+--  the overloaded function will pass back 1 if the ordering is ascending or -1 if the ordering is descending
+PROCEDURE set_order_by_clause(p_order_by IN all_tab_columns.column_name%TYPE);
+FUNCTION  set_order_by_clause(p_order_by IN all_tab_columns.column_name%TYPE) RETURN pls_integer;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_ORDER_BY_COLUMN">
+-- return the column the results are ordered by
+FUNCTION get_order_by_column RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_ORDER_BY_COLUMN">
+-- return the order by clause
+FUNCTION get_order_by_clause RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_DISP_WIDTH_OF_ATTR">
+-- return the display column width based on the attributes field length or domain values
+FUNCTION get_disp_width_of_attr(p_attribute IN nm_inv_type_attribs_all.ita_attrib_name%TYPE) RETURN number;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_ATTR_PROMPT">
+-- return the prompt truncated in order to allw closely packed inventory attribute listing
+FUNCTION get_attr_prompt(p_attribute IN nm_inv_type_attribs_all.ita_attrib_name%TYPE) RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="SET_INV_DETAIL_RECORD">
+-- Set the inventory detail record
+-- Called on record navigation in the query results block
+PROCEDURE set_inv_detail_record(p_iit_ne_id IN nm_inv_items_all.iit_ne_id%TYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_ATTR_DETAIL">
+-- return the full and complete inventory value
+-- the main dispaly is substringed to 80 chrs
+FUNCTION get_attr_detail(pi_inv_type  IN nm_inv_types_all.nit_inv_type%TYPE
+                        ,pi_attribute IN nm_inv_type_attribs_all.ita_attrib_name%TYPE) RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_tab_disp_attrs">
+-- return a list of attributes for display in the result block
+FUNCTION get_tab_disp_attrs (pi_inv_type IN nm_inv_types_all.nit_inv_type%TYPE) RETURN nm3inv.tab_nita;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="CREATE_TABLE_OF_SELECTED_RECS">
+-- Supporting function to export_results
+FUNCTION create_table_of_selected_recs(pi_tab_resc IN nm3type.tab_number) RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="DROP_TEMP_TABLE">
+-- Supporting function to export_results
+PROCEDURE drop_temp_table(pi_table_name IN varchar2);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_TEMP_TABLE_NAME">
+-- Supporting function to export_results
+FUNCTION get_temp_table_name RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="num_result_rows">
+-- return the number of entries in nm_locator_results
+FUNCTION num_result_rows RETURN pls_integer;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="EXPORT_RESULTS">
+-- Creates an entry in nm_upload_files containing the values selected in the
+--  result block of the locator form. 
+PROCEDURE export_results(pi_format        IN varchar2
+                        ,pi_filename      IN varchar2
+                        ,pi_selected_only IN boolean  DEFAULT FALSE
+                        ,pi_selected_tab  IN varchar2 DEFAULT NULL
+                        ,pi_inc_lrm       IN boolean  DEFAULT FALSE
+                        ,pi_pref_lrm      IN varchar2 DEFAULT NULL);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_LAYER_MBR_ARRAY">
+-- AE Added to deliver MBR of given layer into a pls array or three... 
+-- Easier to handle it this way instead of Locator referencing MDSYS objects
+-- (illegal in current forms release)
+PROCEDURE get_layer_mbr_array
+            ( po_dimname_array OUT nm3type.tab_varchar2000
+            , po_ub_array      OUT nm3type.tab_number
+            , po_lb_array      OUT nm3type.tab_number
+            , po_tolerance     OUT nm3type.tab_number
+            );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="INIT_DISPLAY_ATTRS_LOOKUP">
+-- PT added for STP4400 Schemes form
+-- This procedure is called before get_tab_disp_attrs() to initialize global variables
+procedure init_display_attrs_lookup(
+   pi_inv_type in nm_inv_types_all.nit_inv_type%TYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_inv_type_from_gis_session">
+-- return a list of inventory types in the supplied gis_session_id
+FUNCTION get_inv_type_from_gis_session(pi_session_id IN gis_data_objects.gdo_session_id%TYPE)
+RETURN nm3type.tab_varchar4;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="inv_type_is_in_session">
+-- return true if the session objects exist and are of the given type
+FUNCTION inv_type_is_in_session(pi_session_id IN gis_data_objects.gdo_session_id%TYPE
+                               ,pi_inv_type   IN nm_inv_types_all.nit_inv_type%TYPE)
+RETURN boolean;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_coords_from_session">
+-- return true if the session objects have coordinates
+FUNCTION get_coords_from_session(pi_session_id IN gis_data_objects.gdo_session_id%TYPE
+                                ,po_eastings   OUT gis_data_objects.gdo_x_val%TYPE
+                                ,po_northings  OUT gis_data_objects.gdo_y_val%TYPE) 
+RETURN boolean;
+--
+------------------------------------------------------------------------------
+--
+FUNCTION get_multi_coords_from_gdo(pi_session_id IN gis_data_objects.gdo_session_id%TYPE
+                                  ,po_coords    OUT nm3sdo_gdo.tab_xys ) 
+RETURN boolean;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="refresh_results_from_map">
+-- refreshes the results table from the entries on the map
+-- return true if the map has been refreshed, false otherwise
+FUNCTION refresh_results_from_map(pi_session_id IN gis_data_objects.gdo_session_id%TYPE
+                                 ,pi_inv_type   IN nm_inv_types_all.nit_inv_type%TYPE)
+RETURN boolean;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="clear_checked_item_list">
+-- Locator keeps a list of checked items in the from
+-- so that the entries an in_locator_results can be trimmed 
+-- prior to the results being returned when locator is used as a lov
+-- Clears the package list of checked items in the form
+PROCEDURE clear_checked_item_list;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="send_checked_item_to_db">
+-- Forms cannot pass items other than simple vars so checked items have to be passed one at a time
+PROCEDURE send_checked_item_to_db(p_item IN nm_inv_items_all.iit_ne_id%TYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_selected_items">
+-- return the selected items as a list
+FUNCTION get_selected_items RETURN nm_id_tbl;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="trim_results_to_selected_items">
+-- Remove entries in nm_locator_results that are not in the selected items list
+PROCEDURE trim_results_to_selected_items;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+-- Supporting functions for locator lov functionality
+PROCEDURE set_locator_lov_return(p_retval IN boolean);
+--
+-----------------------------------------------------------------------------
+--
+FUNCTION locator_lov_return RETURN boolean;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE store_coords(pi_eastings               IN    gis_data_objects.gdo_x_val%TYPE
+                      ,pi_northings              IN    gis_data_objects.gdo_x_val%TYPE);
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE return_stored_coords(po_eastings       OUT    gis_data_objects.gdo_x_val%TYPE
+                              ,po_northings      OUT    gis_data_objects.gdo_x_val%TYPE);
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE store_multi_coords(pi_coords IN nm3sdo_gdo.tab_xys);
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE return_multi_stored_coords(po_coords OUT nm3sdo_gdo.tab_xys);
+
+FUNCTION is_gdo_multi_coord ( pi_gis_session_id IN gis_data_objects.gdo_session_id%TYPE)
+RETURN BOOLEAN;
+--
+-----------------------------------------------------------------------------
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PRAGMA>
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+END nm3locator;
+/
