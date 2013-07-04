@@ -1,0 +1,214 @@
+  CREATE OR REPLACE PACKAGE nm3asset_display AS
+--<PACKAGE>
+-----------------------------------------------------------------------------
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3asset_display.pkh-arc   2.2   Jul 04 2013 15:15:40   James.Wadsworth  $
+--       Module Name      : $Workfile:   nm3asset_display.pkh  $
+--       Date into PVCS   : $Date:   Jul 04 2013 15:15:40  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:10  $
+--       Version          : $Revision:   2.2  $
+--       Based on SCCS version : 1.2
+--
+--
+--   Author : Kevin Angus
+--
+--    nm3asset_display
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+  -------
+  --types
+  -------
+  TYPE t_types_details_rec IS RECORD(inv_type   nm_inv_types.nit_inv_type%TYPE
+                                    ,xsp        nm_xsp.nwx_x_sect%TYPE
+                                    ,label_text nm3type.max_varchar2);
+
+  TYPE t_types_details_tab IS TABLE OF t_types_details_rec INDEX BY binary_integer;
+
+  TYPE t_ditem_details_rec IS RECORD(inv_type    nm_inv_types.nit_inv_type%TYPE
+                                    ,xsp         nm_xsp.nwx_x_sect%TYPE
+                                    ,begin_mp    number
+                                    ,end_mp      number
+                                    ,item_count  pls_integer
+                                    ,info_text   nm3type.max_varchar2
+                                    ,point       boolean
+                                    ,start_x     number
+                                    ,start_y     number
+                                    ,end_x       number
+                                    ,end_y       number);
+
+  TYPE t_ditem_details_tab IS TABLE OF t_ditem_details_rec INDEX BY binary_integer;
+
+  TYPE t_ref_item_data_rec IS RECORD(current_ref boolean
+                                    ,start_x     number
+                                    ,end_x       number);
+
+  TYPE t_ref_item_data_tab IS TABLE OF t_ref_item_data_rec INDEX BY binary_integer;
+
+  TYPE t_inv_items_rec IS RECORD(iit_ne_id       nm_inv_items.iit_ne_id%TYPE
+                                ,iit_primary_key nm_inv_items.iit_primary_key%TYPE
+                                ,iit_descr       nm_inv_items.iit_descr%TYPE
+                                ,pl_begin_mp     number
+                                ,pl_end_mp       number
+                                ,narh_rowid      varchar2(4000)  --forms cannot see rowid types so use varchar2
+                                );
+
+  TYPE t_inv_items_tab IS TABLE OF t_inv_items_rec INDEX BY binary_integer;
+  
+  TYPE rec_mp IS RECORD
+      (begin_mp    number
+      ,end_mp      number
+      ,item_count  pls_integer
+      ,is_ref_item boolean
+      );
+      
+  TYPE tab_rec_mp IS TABLE OF rec_mp INDEX BY binary_integer;
+
+  -----------
+  --constants
+  -----------
+  --g_sccsid is the SCCS ID for the package
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.2  $';
+
+  -----------
+  --variables
+  -----------
+  g_inv_types_tab nm3type.tab_varchar4;
+  g_inv_xsps_tab  nm3type.tab_varchar4;
+--
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_distinct_mp">
+PROCEDURE get_distinct_mp (pi_narh_job_id IN     nm_assets_on_route_holding.narh_job_id%TYPE
+                          ,pi_inv_type    IN     nm_inv_items.iit_inv_type%TYPE
+                          ,pi_x_sect      IN     nm_inv_items.iit_x_sect%TYPE
+                          ,pi_range_begin IN     number DEFAULT NULL
+                          ,pi_range_end   IN     number DEFAULT NULL
+                          ,po_tab_rec_mp     OUT tab_rec_mp
+                          );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_ref_item_mp">
+PROCEDURE get_ref_item_mp (pi_narh_job_id   IN     nm_assets_on_route_holding.narh_job_id%TYPE
+                          ,pi_inv_type      IN     nm_inv_items.iit_inv_type%TYPE
+                          ,pi_ref_item_id   IN     number
+                          ,pi_ref_item_only IN     boolean DEFAULT FALSE
+                          ,pi_range_begin   IN     number  DEFAULT NULL
+                          ,pi_range_end     IN     number  DEFAULT NULL
+                          ,po_tab_rec_mp       OUT tab_rec_mp
+                          );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_type_details">
+--
+FUNCTION get_type_details(pi_index IN pls_integer
+                         ) RETURN t_types_details_rec;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE get_items_at_mp (pi_narh_job_id   IN     nm_assets_on_route_holding.narh_job_id%TYPE
+                          ,pi_inv_type      IN     nm_inv_items.iit_inv_type%TYPE
+                          ,pi_x_sect        IN     nm_inv_items.iit_x_sect%TYPE
+                          ,pi_mp            IN     number
+                          ,po_inv_items_tab IN OUT t_inv_items_tab
+                          );
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="build_types_list">
+--
+PROCEDURE build_types_list(pi_narh_job_id    IN     nm_assets_on_route_holding.narh_job_id%TYPE
+                          ,pi_group_by_xsp   IN     boolean DEFAULT TRUE
+                          ,po_types_list_tab    OUT t_types_details_tab
+                          );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="set_window_dimensions">
+--
+PROCEDURE set_window_dimensions(pi_num_types IN pls_integer
+                               ,pi_height    IN number
+                               ,pi_width     IN number
+                               );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="build_window_data">
+--
+PROCEDURE build_window_data(pi_narh_job_id         IN     nm_assets_on_route_holding.narh_job_id%TYPE
+                           ,pi_type_start_index    IN     pls_integer
+                           ,pi_type_end_index      IN     pls_integer
+                           ,pi_measure_start       IN     number
+                           ,pi_measure_end         IN     number
+                           ,pi_ref_type            IN     nm_inv_types.nit_inv_type%TYPE
+                           ,pi_current_ref_item_id IN     nm_inv_items.iit_ne_id%TYPE
+                           ,pi_ref_item_only       IN     boolean
+                           ,po_ditem_data_tab         OUT t_ditem_details_tab
+                           ,po_ref_items_data_tab     OUT t_ref_item_data_tab
+                           );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_type_index">
+--
+FUNCTION get_type_index(pi_inv_type IN nm_inv_types.nit_inv_type%TYPE
+                       ,pi_xsp      IN nm_xsp.nwx_x_sect%TYPE
+                       ) RETURN pls_integer;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_ordered_narh_row_number">
+--
+FUNCTION get_ordered_narh_row_number(pi_narh_job_id IN nm_assets_on_route_holding.narh_job_id%TYPE
+                                    ,pi_rowid       IN ROWID
+                                    ) RETURN pls_integer;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_narh_order_by">
+--
+FUNCTION get_narh_order_by(pi_table_alias IN varchar2 DEFAULT NULL
+                          ) RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PRAGMA>
+  PRAGMA RESTRICT_REFERENCES(get_version, rnds, wnps, wnds);
+  PRAGMA RESTRICT_REFERENCES(get_body_version, rnds, wnps, wnds);
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+END nm3asset_display;
+/

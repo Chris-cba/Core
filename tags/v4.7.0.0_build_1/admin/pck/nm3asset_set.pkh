@@ -1,0 +1,100 @@
+CREATE OR REPLACE PACKAGE nm3asset_set AS
+--<PACKAGE>
+-----------------------------------------------------------------------------
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3asset_set.pkh-arc   2.2   Jul 04 2013 15:15:40   James.Wadsworth  $
+--       Module Name      : $Workfile:   nm3asset_set.pkh  $
+--       Date into PVCS   : $Date:   Jul 04 2013 15:15:40  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:10  $
+--       Version          : $Revision:   2.2  $
+--       Based on SCCS version : 1.2
+--
+--   Author : Kevin Angus
+--
+--    nm3asset_set
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+
+  -----------
+  --constants
+  -----------
+  --g_sccsid is the SCCS ID for the package
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.2  $';
+  
+  c_source_pbi CONSTANT varchar2(3) := 'PBI';
+  c_source_mrg CONSTANT varchar2(3) := 'MRG';
+
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="create_set">
+--
+FUNCTION create_set(pi_source_id IN number
+                   ,pi_source    IN varchar2
+                   ,pi_descr     IN nm_inv_attribute_sets.nias_descr%TYPE
+                   ) RETURN nm_inv_attribute_sets.nias_id%TYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="create_set_from_pbi">
+--
+FUNCTION create_set_from_pbi(pi_npq_id IN nm_pbi_query.npq_id%TYPE
+                            ,pi_descr  IN nm_inv_attribute_sets.nias_descr%TYPE
+                            ) RETURN nm_inv_attribute_sets.nias_id%TYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="create_set_from_mrg">
+--
+FUNCTION create_set_from_mrg(pi_nmq_id IN nm_mrg_query.nmq_id%TYPE
+                            ,pi_descr  IN nm_inv_attribute_sets.nias_descr%TYPE
+                            ) RETURN nm_inv_attribute_sets.nias_id%TYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_source_pbi">
+--
+FUNCTION get_source_pbi RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_source_mrg">
+--
+FUNCTION get_source_mrg RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PRAGMA>
+  PRAGMA RESTRICT_REFERENCES(get_version, rnds, wnps, wnds);
+  PRAGMA RESTRICT_REFERENCES(get_body_version, rnds, wnps, wnds);
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+END nm3asset_set;
+/

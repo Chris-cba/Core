@@ -1,0 +1,83 @@
+CREATE OR REPLACE PACKAGE nm3asset_rep AS
+--<PACKAGE>
+-----------------------------------------------------------------------------
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3asset_rep.pkh-arc   2.2   Jul 04 2013 15:15:40   James.Wadsworth  $
+--       Module Name      : $Workfile:   nm3asset_rep.pkh  $
+--       Date into PVCS   : $Date:   Jul 04 2013 15:15:40  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:10  $
+--       Version          : $Revision:   2.2  $
+--       Based on SCCS version :  1.2
+--
+--   Author : Kevin Angus
+--
+--    nm3asset_rep
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+
+  -----------
+  --constants
+  -----------
+  --g_sccsid is the SCCS ID for the package
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.2  $';
+
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+--
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_aor_reports_lov_sql">
+--
+FUNCTION get_aor_reports_lov_sql RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="create_list_from_inv_attrs">
+--
+FUNCTION create_list_from_inv_attrs(pi_attr_tab  IN nm3asset.tab_rec_inv_flex_col_details
+                                   ,pi_separator IN varchar2 DEFAULT ', '
+                                   ) RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="process_inventory_items">
+--
+PROCEDURE process_inventory_items(
+                                  pi_narsh_job_id         IN nm_assets_on_route_store_head.narsh_job_id%TYPE
+                                 ,pi_populate_narsd       IN boolean
+                                 );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PRAGMA>
+  PRAGMA RESTRICT_REFERENCES(get_version, rnds, wnps, wnds);
+  PRAGMA RESTRICT_REFERENCES(get_body_version, rnds, wnps, wnds);
+  PRAGMA RESTRICT_REFERENCES(get_aor_reports_lov_sql, rnds, wnps, wnds);
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+END nm3asset_rep;
+/
