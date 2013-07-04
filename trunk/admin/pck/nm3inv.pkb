@@ -4,15 +4,18 @@ CREATE OR REPLACE PACKAGE BODY Nm3inv AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv.pkb-arc   2.30   Nov 10 2011 10:22:14   Ade.Edwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv.pkb-arc   2.31   Jul 04 2013 16:08:12   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3inv.pkb  $
---       Date into SCCS   : $Date:   Nov 10 2011 10:22:14  $
---       Date fetched Out : $Modtime:   Nov 10 2011 10:20:24  $
---       SCCS Version     : $Revision:   2.30  $
+--       Date into SCCS   : $Date:   Jul 04 2013 16:08:12  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 16:07:40  $
+--       SCCS Version     : $Revision:   2.31  $
 --       Based on --
 --
 --   nm3inv package body
 --
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
 -- Amendments:-
 -- 30/11/2005  CParkinson  Add function get_inv_domain_value
 -- 24/01/2006  PStanton Added overloaded version of get_all_attrib_values to be used when
@@ -23,14 +26,14 @@ CREATE OR REPLACE PACKAGE BODY Nm3inv AS
 -- 23/06/2008  PT the above change now depends on sysopt 'ATTRVALUEV' value Y | N default N
 --              only use the new logic if sysopt value is 'Y'
 
------------------------------------------------------------------------------
---      Copyright (c) exor corporation ltd, 2005
------------------------------------------------------------------------------
+------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+------------------------------------------------------------------
 --
 --all global package variables here
 --
 --  g_body_sccsid is the SCCS ID for the package body
-   g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.30  $';
+   g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.31  $';
    g_package_name   CONSTANT VARCHAR2(30) := 'nm3inv';
 --
    --<USED BY validate_rec_iit>
