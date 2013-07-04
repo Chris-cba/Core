@@ -4,13 +4,17 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_process_framework.pkh-arc   3.4   Feb 24 2011 16:51:24   Chris.Strettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_process_framework.pkh-arc   3.5   Jul 04 2013 14:52:08   James.Wadsworth  $
 --       Module Name      : $Workfile:   hig_process_framework.pkh  $
---       Date into PVCS   : $Date:   Feb 24 2011 16:51:24  $
---       Date fetched Out : $Modtime:   Feb 24 2011 16:45:42  $
---       Version          : $Revision:   3.4  $
+--       Date into PVCS   : $Date:   Jul 04 2013 14:52:08  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:51:00  $
+--       Version          : $Revision:   3.5  $
 --       Based on SCCS version : 
--------------------------------------------------------------------------
+--
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
 --</PACKAGE>
 --<GLOBVAR>
 
@@ -18,7 +22,7 @@ AS
   --constants
   -----------
   --g_sccsid is the SCCS ID for the package
-  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.4  $';
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.5  $';
 
 --  
 --</GLOBVAR>
