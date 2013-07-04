@@ -1,0 +1,74 @@
+CREATE OR REPLACE PACKAGE nm3disco AS
+--<PACKAGE>
+-----------------------------------------------------------------------------
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3disco.pkh-arc   2.2   Jul 04 2013 15:33:20   James.Wadsworth  $
+--       Module Name      : $Workfile:   nm3disco.pkh  $
+--       Date into PVCS   : $Date:   Jul 04 2013 15:33:20  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:10  $
+--       Version          : $Revision:   2.2  $
+--       Based on SCCS version :  1.1
+--
+--   Author : Kevin Angus
+--
+--    nm3disco
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+
+  -----------
+  --constants
+  -----------
+  --g_sccsid is the SCCS ID for the package
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.2  $';
+
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_command">
+--
+-- This function returns 
+--
+FUNCTION get_run_command(pi_module         IN hig_modules.hmo_module%TYPE
+                        ,pi_param_name     IN varchar2 DEFAULT NULL
+                        ,pi_param_value    IN varchar2 DEFAULT NULL
+                        ,pi_user_interface IN varchar2
+                        ,pi_disco_exe      IN varchar2
+                        ,pi_user           IN hig_users.hus_username%TYPE
+                        ,pi_password       IN varchar2
+                        ,pi_tns            IN varchar2
+                        ) RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PRAGMA>
+  PRAGMA RESTRICT_REFERENCES(get_version, rnds, wnps, wnds);
+  PRAGMA RESTRICT_REFERENCES(get_body_version, rnds, wnps, wnds);
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+END nm3disco;
+
+/ 
+

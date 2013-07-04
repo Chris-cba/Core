@@ -1,0 +1,911 @@
+CREATE OR REPLACE PACKAGE nm3gaz_qry AS
+--<PACKAGE>
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3gaz_qry.pkh-arc   2.5   Jul 04 2013 15:33:20   James.Wadsworth  $
+--       Module Name      : $Workfile:   nm3gaz_qry.pkh  $
+--       Date into PVCS   : $Date:   Jul 04 2013 15:33:20  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:12  $
+--       Version          : $Revision:   2.5  $
+--       Based on SCCS version : 1.30
+-------------------------------------------------------------------------
+--   Author : Jonathan Mills
+--
+--   Gazeteer Query package
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+   g_sccsid      CONSTANT  VARCHAR2(2000) := '$Revision:   2.5  $';
+--  g_sccsid is the SCCS ID for the package
+--
+   c_ngqt_item_type_type_ele    CONSTANT nm_gaz_query_types.ngqt_item_type_type%TYPE := 'E';
+   c_ngqt_item_type_type_inv    CONSTANT nm_gaz_query_types.ngqt_item_type_type%TYPE := 'I';
+--
+   c_open_query                 CONSTANT nm_gaz_query.ngq_open_or_closed%TYPE := 'O';
+   c_closed_query               CONSTANT nm_gaz_query.ngq_open_or_closed%TYPE := 'C';
+--
+   c_items_query                CONSTANT nm_gaz_query.ngq_items_or_area%TYPE  := 'I';
+   c_area_query                 CONSTANT nm_gaz_query.ngq_items_or_area%TYPE  := 'A';
+--
+   c_fixed_cols_domain_inv      CONSTANT hig_domains.hdo_domain%TYPE := 'GAZ_QRY_FIXED_COLS_I';
+   c_fixed_cols_domain_ele      CONSTANT hig_domains.hdo_domain%TYPE := 'GAZ_QRY_FIXED_COLS_E';
+   c_nqgt_item_type_type_domain CONSTANT hig_domains.hdo_domain%TYPE := 'GAZ_QRY_TYPE_TYPES';
+   c_ngqa_pre_bracket_domain    CONSTANT hig_domains.hdo_domain%TYPE := 'GAZ_QRY_L_BRACKETS';
+   c_ngqa_post_bracket_domain   CONSTANT hig_domains.hdo_domain%TYPE := 'GAZ_QRY_R_BRACKETS';
+   c_ngqa_operator_domain       CONSTANT hig_domains.hdo_domain%TYPE := 'GAZ_QRY_OPERATORS';
+   c_ngqa_condition_domain      CONSTANT hig_domains.hdo_domain%TYPE := 'PBI_CONDITION';
+   c_ngqa_sr_condition_domain      CONSTANT hig_domains.hdo_domain%TYPE := 'PBI_SR_COND';
+--
+   g_nte_job_id                          nm_nw_temp_extents.nte_job_id%TYPE;
+   g_new_nte_job_id                      nm_nw_temp_extents.nte_job_id%TYPE;
+--
+   TYPE tab_rec_ngq  IS TABLE OF nm_gaz_query%ROWTYPE           INDEX BY binary_integer;
+   TYPE tab_rec_ngqt IS TABLE OF nm_gaz_query_types%ROWTYPE     INDEX BY binary_integer;
+   TYPE tab_rec_ngqa IS TABLE OF nm_gaz_query_attribs%ROWTYPE   INDEX BY binary_integer;
+   TYPE tab_rec_ngqv IS TABLE OF nm_gaz_query_values%ROWTYPE    INDEX BY binary_integer;
+   TYPE tab_rec_ngqi IS TABLE OF nm_gaz_query_item_list%ROWTYPE INDEX BY binary_integer;
+--
+   g_ngq_tab  tab_rec_ngq;
+   g_ngqt_tab tab_rec_ngqt;
+   g_ngqa_tab tab_rec_ngqa;
+   g_ngqv_tab tab_rec_ngqv;
+
+--
+   TYPE rec_selected_item_details IS RECORD
+      (ngqi_item_id         nm_gaz_query_item_list.ngqi_item_id%TYPE
+      ,ngqi_item_type_type  nm_gaz_query_item_list.ngqi_item_type_type%TYPE
+      ,ngqi_item_type       nm_gaz_query_item_list.ngqi_item_type%TYPE
+      ,iit_primary_key      nm_inv_items.iit_primary_key%TYPE
+      ,iit_descr            nm_elements_all.ne_descr%TYPE
+      );
+--
+   TYPE rec_gaz_restriction IS RECORD
+      (nt_type              nm_types.nt_type%TYPE
+      ,ngt_group_type       nm_group_types.ngt_group_type%TYPE
+      ,ntc_column_name      nm_type_columns.ntc_column_name%TYPE
+      ,ntc_prompt           nm_type_columns.ntc_prompt%TYPE
+      ,ntc_lov_sql          nm3type.max_varchar2
+      );
+   TYPE tab_rec_gaz_restriction IS TABLE OF rec_gaz_restriction INDEX BY BINARY_INTEGER;
+--
+   g_use_date_based_views  BOOLEAN := TRUE;
+   g_ignore_case           BOOLEAN DEFAULT FALSE;
+--   
+--
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="perform_query">
+-- Performs the specified nm_gaz_query on the given effective date
+--
+FUNCTION perform_query   (pi_ngq_id         nm_gaz_query.ngq_id%TYPE
+                         ,pi_effective_date date DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
+                         ) RETURN nm_nw_temp_extents.nte_job_id%TYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="validate_query">
+-- Validates the specified nm_gaz_query
+--
+PROCEDURE validate_query (pi_ngq_id         nm_gaz_query.ngq_id%TYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_erroneous_flex_queries">
+-- Returns the flexible component of the WHERE clause generated by the query
+--  definition, with any error codes and error messsages resulting from the
+--  parse of this query
+--
+PROCEDURE get_erroneous_flex_queries
+                         (pi_ngq_id                  IN     nm_gaz_query.ngq_id%TYPE
+                         ,po_tab_rec_ngqt               OUT tab_rec_ngqt
+                         ,po_tab_flx_query              OUT nm3type.tab_varchar32767
+                         ,po_tab_flx_qry_error_code     OUT nm3type.tab_number
+                         ,po_tab_flx_qry_error_msg      OUT nm3type.tab_varchar32767
+                         ,po_parse_errors_found         OUT boolean
+                         );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_g_nte_job_id">
+-- Returns g_nte_job_id
+--
+FUNCTION get_g_nte_job_id RETURN nm_nw_temp_extents.nte_job_id%TYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_g_new_nte_job_id">
+-- Returns g_new_nte_job_id
+--
+FUNCTION get_g_new_nte_job_id RETURN nm_nw_temp_extents.nte_job_id%TYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_g_ngqi_job_id">
+-- Returns g_ngqi_job_id
+--
+FUNCTION get_g_ngqi_job_id RETURN nm_gaz_query_item_list.ngqi_job_id%TYPE;
+--</PROC>
+
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_c_open_query">
+-- Returns the value of c_open_query
+--
+FUNCTION get_c_open_query   RETURN nm_gaz_query.ngq_open_or_closed%TYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_c_closed_query">
+-- Returns the value of c_closed_query
+--
+FUNCTION get_c_closed_query RETURN nm_gaz_query.ngq_open_or_closed%TYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ngqt_order_by">
+-- Internal function
+--
+FUNCTION ngqt_order_by (pi_ngqt_item_type_type nm_gaz_query_types.ngqt_item_type_type%TYPE
+                       ,pi_ngqt_item_type      nm_gaz_query_types.ngqt_item_type%TYPE
+                       ) RETURN pls_integer;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_ngqv_lov_sql">
+-- Retunrs the query sql required for the LOV for a NGQV record. NULL is returned
+--  if no LOV is available
+--
+--  statement SELECTs id, meaning, description
+--
+FUNCTION get_ngqv_lov_sql (pi_ngqt_item_type_type nm_gaz_query_types.ngqt_item_type_type%TYPE
+                          ,pi_ngqt_item_type      nm_gaz_query_types.ngqt_item_type%TYPE
+                          ,pi_ngqa_attrib_name    nm_gaz_query_attribs.ngqa_attrib_name%TYPE
+                          ) RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_ngqa_lov_sql">
+-- Retunrs the query sql required for the LOV for a NGQA record.
+--
+--  statement SELECTs id, meaning, description
+--
+FUNCTION get_ngqa_lov_sql (pi_ngqt_item_type_type    nm_gaz_query_types.ngqt_item_type_type%TYPE
+                          ,pi_ngqt_item_type         nm_gaz_query_types.ngqt_item_type%TYPE
+                          ,pi_queryable_attribs_only boolean DEFAULT FALSE
+                          ,pi_include_primary_key    boolean DEFAULT FALSE
+                          ) RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_ngqt_lov_sql">
+-- Returns the query sql required for the LOV for a NGQT record.
+--
+--  statement SELECTs id, meaning, description
+--
+FUNCTION get_ngqt_lov_sql (pi_ngqt_item_type_type nm_gaz_query_types.ngqt_item_type_type%TYPE
+                          ,pi_nit_category_restriction        IN nm_inv_types_all.nit_category%TYPE DEFAULT NULL
+                          ,pi_exclude_off_network             IN BOOLEAN DEFAULT FALSE  -- defaulted to protect existing calls to this code
+                          ) RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="check_ngqv_value">
+-- This procedure checks that the passed nqgv_value is valid
+--
+PROCEDURE check_ngqv_value (pi_ngqt_item_type_type nm_gaz_query_types.ngqt_item_type_type%TYPE
+                           ,pi_ngqt_item_type      nm_gaz_query_types.ngqt_item_type%TYPE
+                           ,pi_ngqa_attrib_name    nm_gaz_query_attribs.ngqa_attrib_name%TYPE
+                           ,pi_nqgv_value          nm_gaz_query_values.ngqv_value%TYPE
+                           );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_ngqt_item_type_type_lov_sq">
+-- Returns the query sql required for the LOV for ngqt_item_type_type
+--
+--  statement SELECTs id, meaning, description
+--
+FUNCTION get_ngqt_item_type_type_lov_sq RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_ngqa_pre_bracket_lov_sql">
+-- Returns the query sql required for the LOV for a ngqa_pre_bracket (opening)
+--
+--  statement SELECTs id, meaning, description
+--
+FUNCTION get_ngqa_pre_bracket_lov_sql RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_ngqa_post_bracket_lov_sql">
+-- Returns the query sql required for the LOV for ngqa_post_bracket (closing)
+--
+--  statement SELECTs id, meaning, description
+--
+FUNCTION get_ngqa_post_bracket_lov_sql RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_ngqa_operator_lov_sql">
+-- Returns the query sql required for the LOV for ngqa_operator
+--
+--  statement SELECTs id, meaning, description
+--
+FUNCTION get_ngqa_operator_lov_sql RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_ngqa_condition_lov_sql">
+-- Returns the query sql required for the LOV for ngqa_condition
+--
+--  statement SELECTs id, meaning, description
+--
+FUNCTION get_ngqa_condition_lov_sql RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_ngqa_sr_condition_lov_sql">
+-- Returns the query sql required for the LOV for ngqa_condition (singlerow)
+--
+--  statement SELECTs id, meaning, description
+--
+FUNCTION get_ngqa_sr_condition_lov_sql RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="del_ngq_cascade">
+-- Performs a cascading delete for the specified nm_gaz_query record
+--
+PROCEDURE del_ngq_cascade (pi_ngq_id nm_gaz_query.ngq_id%TYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="del_ngq_cascade_keep_ngq">
+-- Performs a cascading delete for the specified nm_gaz_query record,
+--  but keeps the NM_GAZ_QUERY record
+--
+PROCEDURE del_ngq_cascade_keep_ngq (pi_ngq_id nm_gaz_query.ngq_id%TYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="chk_value_count_for_condition">
+-- Raises an error if the passed number of values is not valid for the
+--  condition specified
+PROCEDURE chk_value_count_for_condition (pi_condition   nm_gaz_query_attribs.ngqa_condition%TYPE
+                                        ,pi_value_count pls_integer
+                                        );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_ngqv_lov_meaning">
+-- Returns the meaning and description for the flexibly defined LOV
+--
+PROCEDURE get_ngqv_lov_meaning (pi_ngqt_item_type_type IN     nm_gaz_query_types.ngqt_item_type_type%TYPE
+                               ,pi_ngqt_item_type      IN     nm_gaz_query_types.ngqt_item_type%TYPE
+                               ,pi_ngqa_attrib_name    IN     nm_gaz_query_attribs.ngqa_attrib_name%TYPE
+                               ,pi_value               IN     nm_gaz_query_values.ngqv_value%TYPE
+                               ,pi_condition           IN     varchar2 DEFAULT NULL
+                               ,po_meaning                OUT varchar2
+                               ,po_description            OUT varchar2
+                               );
+--
+PROCEDURE get_ngqv_lov_meaning (pi_ngqt_item_type_type IN     nm_gaz_query_types.ngqt_item_type_type%TYPE
+                               ,pi_ngqt_item_type      IN     nm_gaz_query_types.ngqt_item_type%TYPE
+                               ,pi_ngqa_attrib_name    IN     nm_gaz_query_attribs.ngqa_attrib_name%TYPE
+                               ,pi_meaning             IN     varchar2
+                               ,pi_condition           IN     varchar2 DEFAULT NULL
+                               ,po_value                  OUT nm_gaz_query_values.ngqv_value%TYPE
+                               ,po_meaning                OUT varchar2
+                               ,po_description            OUT varchar2
+                               );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_ngqv_lov_code">
+-- Returns the code and meaning for a a flexibly defined LOV
+--
+PROCEDURE get_ngqv_lov_code (pi_ngqt_item_type_type IN     nm_gaz_query_types.ngqt_item_type_type%TYPE
+                            ,pi_ngqt_item_type      IN     nm_gaz_query_types.ngqt_item_type%TYPE
+                            ,pi_ngqa_attrib_name    IN     nm_gaz_query_attribs.ngqa_attrib_name%TYPE
+                            ,pi_description         IN     nm_gaz_query_values.ngqv_value%TYPE
+                            ,pi_condition           IN     varchar2 DEFAULT NULL
+                            ,po_value               OUT varchar2
+                            ,po_meaning             OUT varchar2
+                            ,po_description         OUT varchar2
+                            );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_ngqa_lov_meaning>
+-- Returns the meaning and description for the flexibly defined LOV
+--
+PROCEDURE get_ngqa_lov_meaning (pi_ngqt_item_type_type IN     nm_gaz_query_types.ngqt_item_type_type%TYPE
+                               ,pi_ngqt_item_type      IN     nm_gaz_query_types.ngqt_item_type%TYPE
+                               ,pi_value               IN     varchar2
+                               ,po_meaning                OUT varchar2
+                               ,po_description            OUT varchar2
+                               );
+--
+FUNCTION get_ngqa_lov_meaning (pi_ngqt_item_type_type IN     nm_gaz_query_types.ngqt_item_type_type%TYPE
+                              ,pi_ngqt_item_type      IN     nm_gaz_query_types.ngqt_item_type%TYPE
+                              ,pi_value               IN     varchar2
+                              ) RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_ngqt_lov_meaning">
+-- Returns the meaning and description for the flexibly defined LOV
+--
+PROCEDURE get_ngqt_lov_meaning (pi_ngqt_item_type_type IN     nm_gaz_query_types.ngqt_item_type_type%TYPE
+                               ,pi_value               IN     varchar2
+                               ,po_meaning                OUT varchar2
+                               ,po_description            OUT varchar2
+                               );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_ngqt_lov_descr">
+-- Returns the escription for the flexibly defined LOV
+--
+FUNCTION  get_ngqt_lov_descr (pi_ngqt_item_type_type IN     nm_gaz_query_types.ngqt_item_type_type%TYPE
+                             ,pi_value               IN     varchar2
+                             ) RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_ngqt_itm_type_type_meaning">
+-- Returns the meaning and description for the flexibly defined LOV
+--
+PROCEDURE get_ngqt_itm_type_type_meaning
+                               (pi_value               IN     varchar2
+                               ,po_meaning                OUT varchar2
+                               ,po_description            OUT varchar2
+                               );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_ngqt_item_type_type_descr">
+-- Returns the description for the flexibly defined LOV
+--
+FUNCTION get_ngqt_item_type_type_descr
+                               (pi_value               IN     varchar2
+                               ) RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_ngqa_condition_lov_meaning">
+-- Returns the meaning and description for the flexibly defined LOV
+--
+PROCEDURE get_ngqa_condition_lov_meaning
+                               (pi_value               IN     varchar2
+                               ,po_meaning                OUT varchar2
+                               ,po_description            OUT varchar2
+                               );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_roi_name">
+-- Gets the name for a Temp Extent Gazeteer region of interest
+--  i.e. one which has been created from a gazeteer query
+--
+FUNCTION get_roi_name  RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_roi_descr">
+-- Gets the description for a Temp Extent Gazeteer region of interest
+--  i.e. one which has been created from a gazeteer query
+--
+FUNCTION get_roi_descr RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_gaz_pre_query_sql">
+--  Returns the pre-query sql restriction string required to restrict
+--   data to that specified by the gazeteer ROI (Region Of Interest)
+--
+FUNCTION  get_gaz_pre_query_sql (pi_roi_type     IN     varchar2
+                                ,pi_roi_id       IN     number
+                                ,pi_ne_id_col    IN     varchar2
+                                ,pi_begin_mp_col IN     varchar2 DEFAULT NULL
+                                ,pi_end_mp_col   IN     varchar2 DEFAULT NULL
+                                ,pi_where_text   IN     varchar2
+                                ,pi_use_all_tabs IN     boolean  DEFAULT FALSE
+                                ) RETURN varchar2;
+--
+PROCEDURE get_gaz_pre_query_sql (pi_roi_type     IN     varchar2
+                                ,pi_roi_id       IN     number
+                                ,pi_ne_id_col    IN     varchar2
+                                ,pi_begin_mp_col IN     varchar2 DEFAULT NULL
+                                ,pi_end_mp_col   IN     varchar2 DEFAULT NULL
+                                ,pio_where_text  IN OUT varchar2
+                                ,pi_use_all_tabs IN     boolean  DEFAULT FALSE
+                                );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_default_ngqa_operator">
+-- Returns the default NGQA Operator (AND)
+--
+FUNCTION get_default_ngqa_operator RETURN nm_gaz_query_attribs.ngqa_operator%TYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ngqa_attrib_name_is_updatable">
+--
+-- Returns TRUE if update of attrib name is allowed.
+--
+FUNCTION ngqa_attrib_name_is_updatable(pi_ngq_id      IN nm_gaz_query.ngq_id%TYPE
+                                      ,pi_ngqt_seq_no IN nm_gaz_query_types.ngqt_seq_no%TYPE
+                                      ,pi_ngqa_seq_no IN nm_gaz_query_attribs.ngqa_seq_no%TYPE
+                                      ) RETURN boolean;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ngqt_type_is_updatable">
+--
+-- Returns TRUE if update of type is allowed.
+--
+FUNCTION ngqt_type_is_updatable(pi_ngq_id      IN nm_gaz_query.ngq_id%TYPE
+                               ,pi_ngqt_seq_no IN nm_gaz_query_types.ngqt_seq_no%TYPE
+                               ) RETURN boolean;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="stash_query_definition">
+--
+-- Stores the specified query definition internally in the package. The query
+-- can be recovered by calling restore_query_definition.
+--
+PROCEDURE stash_query_definition(pi_ngq_id IN nm_gaz_query.ngq_id%TYPE
+                                );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="restore_query_definition">
+--
+-- Restores a query definition stored internally in the package to the
+-- database tables.
+--
+PROCEDURE restore_query_definition;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_tab_rec_ngqi">
+FUNCTION get_tab_rec_ngqi (p_ngqi_id nm_gaz_query_item_list.ngqi_job_id%TYPE
+                          ) RETURN tab_rec_ngqi;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="disallow_inv_item_type_type">
+-- This function will disallow the "I" item type type for the current session
+--  (within gazeteer query)
+--
+PROCEDURE disallow_inv_item_type_type;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="allow_inv_item_type_type">
+-- This function will allow the "I" item type type for the current session
+--  (within gazeteer query)  (this is the default)
+--
+PROCEDURE allow_inv_item_type_type;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="disallow_ele_item_type_type">
+-- This function will disallow the "E" item type type for the current session
+--  (within gazeteer query)
+--
+PROCEDURE disallow_ele_item_type_type;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="allow_ele_item_type_type">
+-- This function will allow the "E" item type type for the current session
+--  (within gazeteer query)  (this is the default)
+--
+PROCEDURE allow_ele_item_type_type;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="disallow_ft_inv_types">
+-- This function will disallow foreign table inventory types
+--  for the current session (within gazeteer query)
+--
+PROCEDURE disallow_ft_inv_types;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="allow_ft_inv_types">
+-- This function will allow foreign table inventory types
+--  for the current session (within gazeteer query) (this is the default)
+--
+PROCEDURE allow_ft_inv_types;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="disallow_xsp_on_inv">
+-- This function will disallow the use of XSP as a column
+--  for the current session (within gazeteer query)
+--
+PROCEDURE disallow_xsp_on_inv;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="allow_xsp_on_inv">
+-- This function will allow the use of XSP as a column
+--  for the current session (within gazeteer query)
+--
+PROCEDURE allow_xsp_on_inv;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_ngqt_item_type_type_ele">
+--
+-- This function returns the constant c_ngqt_item_type_type_ele.
+--
+FUNCTION get_ngqt_item_type_type_ele RETURN nm_gaz_query_types.ngqt_item_type_type%TYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_ngqt_item_type_type_inv">
+--
+-- This function returns the constant c_ngqt_item_type_type_inv.
+--
+FUNCTION get_ngqt_item_type_type_inv RETURN nm_gaz_query_types.ngqt_item_type_type%TYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="set_selected_item_details">
+--
+PROCEDURE set_selected_item_details (pi_ngqi_item_id        nm_gaz_query_item_list.ngqi_item_id%TYPE
+                                    ,pi_ngqi_item_type_type nm_gaz_query_item_list.ngqi_item_type_type%TYPE
+                                    ,pi_ngqi_item_type      nm_gaz_query_item_list.ngqi_item_type%TYPE
+                                    );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="set_selected_item_detail_by_pk">
+--
+PROCEDURE set_selected_item_detail_by_pk (pi_iit_primary_key     nm_inv_items.iit_primary_key%TYPE
+                                         ,pi_ngqi_item_type_type nm_gaz_query_item_list.ngqi_item_type_type%TYPE
+                                         ,pi_ngqi_item_type      nm_gaz_query_item_list.ngqi_item_type%TYPE
+                                         );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_selected_item_details">
+--
+FUNCTION get_selected_item_details RETURN rec_selected_item_details;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="set_selected_item_list_details">
+--
+PROCEDURE set_selected_item_list_details (pi_ngqi_job_id nm_gaz_query_item_list.ngqi_job_id%TYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_selected_item_list_details">
+--
+FUNCTION get_selected_item_list_details RETURN nm_gaz_query_item_list.ngqi_job_id%TYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_selected_item_list_details">
+-- Returns the WHERE clause for the item selected by "Find Inventory" (NM0570)
+--
+FUNCTION get_where_clause_for_selected (p_id_column      VARCHAR2
+                                       ,p_item_type_type VARCHAR2 DEFAULT 'I'
+                                       ) RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="stash_item_list_details">
+-- Stashes the item list into global variables
+--
+PROCEDURE stash_item_list_details (pi_ngqi_job_id nm_gaz_query_item_list.ngqi_job_id%TYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="restore_item_list_details">
+-- Restores (un-stashes) the globals back into the item list
+--
+PROCEDURE restore_item_list_details;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_all_items_at_location">
+-- This procedure returns details of all items which exist in the specified location
+--
+FUNCTION  get_all_items_at_location (pi_ne_id       IN nm_elements.ne_id%TYPE
+                                    ,pi_nm_begin_mp IN nm_members.nm_begin_mp%TYPE
+                                    ,pi_nm_end_mp   IN nm_members.nm_end_mp%TYPE   DEFAULT NULL
+                                    ,pi_npq_id      IN nm_pbi_query.npq_id%TYPE    DEFAULT NULL
+                                    ) RETURN tab_rec_ngqi;
+--
+PROCEDURE get_all_items_at_location (pi_ne_id                    IN     nm_elements.ne_id%TYPE
+                                    ,pi_nm_begin_mp              IN     nm_members.nm_begin_mp%TYPE
+                                    ,pi_nm_end_mp                IN     nm_members.nm_end_mp%TYPE   DEFAULT NULL
+                                    ,pi_npq_id                   IN     nm_pbi_query.npq_id%TYPE    DEFAULT NULL
+                                    ,po_tab_item_type_type          OUT nm3type.tab_varchar4
+                                    ,po_tab_item_type_type_descr    OUT nm3type.tab_varchar80
+                                    ,po_tab_item_type               OUT nm3type.tab_varchar4
+                                    ,po_tab_item_type_descr         OUT nm3type.tab_varchar80
+                                    ,po_tab_item_id                 OUT nm3type.tab_number
+                                    );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="add_all_possible_types_to_ngq">
+-- Adds all possible NGQT_ITEM_TYPE_TYPE and NGQT_ITEM_TYPE combinations
+--  to the specified nm_gaz_query record
+--
+PROCEDURE add_all_possible_types_to_ngq (pi_ngq_id nm_gaz_query.ngq_id%TYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_tab_rec_gaz_restriction">
+-- This procedure gets the array of records for the gazeteer for restricting the
+--  items brought back by the query in the main gaz front tab
+--
+PROCEDURE get_tab_rec_gaz_restriction (pi_nt_type                 IN OUT nm_types.nt_type%TYPE
+                                      ,pi_ngt_group_type          IN     nm_group_types.ngt_group_type%TYPE DEFAULT NULL
+                                      ,po_tab_rec_gaz_restriction IN OUT tab_rec_gaz_restriction
+                                      );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_pre_qry_sql_gaz_restrict">
+-- Returns the query for use in the DEFAULT_WHERE for the specified restriction
+--
+FUNCTION get_pre_qry_sql_gaz_restrict (pi_nt_type                 IN     nm_types.nt_type%TYPE
+                                      ,pi_ngt_group_type          IN     nm_group_types.ngt_group_type%TYPE DEFAULT NULL
+                                      ,pi_tab_column              IN     nm3type.tab_varchar30
+                                      ,pi_tab_value               IN     nm3type.tab_varchar32767
+                                      ) RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_attrib_datatype">
+--  Returns the datatype of the passed attribute
+--
+FUNCTION get_attrib_datatype (p_ngqt_item_type_type nm_gaz_query_types.ngqt_item_type_type%TYPE
+                             ,p_ngqt_item_type      nm_gaz_query_types.ngqt_item_type%TYPE
+                             ,p_ngqa_attrib_name    nm_gaz_query_attribs.ngqa_attrib_name%TYPE
+                             ) RETURN varchar2;
+--
+FUNCTION get_attrib_datatype (p_rec_ngqt         nm_gaz_query_types%ROWTYPE
+                             ,p_ngqa_attrib_name nm_gaz_query_attribs.ngqa_attrib_name%TYPE
+                             ) RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_rec_selected_item_details">
+--  Returns a record of the current items stored in temp tables for query
+PROCEDURE get_rec_selected_item_details
+            ( po_item_id    OUT NUMBER
+            , po_item_type  OUT VARCHAR2
+            , po_item_pk    OUT VARCHAR2
+            , po_item_descr OUT VARCHAR2);
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="set_inv_type_for_query">
+--  Sets a package global that calling forms can pick up
+PROCEDURE set_inv_type_for_query
+             ( pi_inv_type  IN  VARCHAR2);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="set_roi_for_query">
+--  Sets a package global that calling forms can pick up
+PROCEDURE set_roi_for_query
+             ( pi_roi_id   IN  NUMBER
+             , pi_roi_type IN  VARCHAR2 DEFAULT 'E');
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="return_inv_type_for_query">
+--  Returns package global that calling forms can pick up
+FUNCTION return_inv_type_for_query
+  RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="return_roi_for_query">
+--  Returns package global that calling forms can pick up
+PROCEDURE return_roi_for_query
+             ( po_roi_id   OUT  NUMBER
+             , po_roi_type OUT  VARCHAR2);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="initialise_ngqt">
+--  clear out records in nm_gaz_query_types for given query id 
+PROCEDURE initialise_ngqt(pi_ngqt_ngq_id IN nm_gaz_query_types.ngqt_ngq_id%TYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="add_inv_types_for_categories">
+-- GJ to support NM0590
+-- loop through a table of inv categories and insert all types in the category
+-- into the gaz query types table
+PROCEDURE add_inv_types_for_categories(pi_ngq_id              IN nm_gaz_query.ngq_id%TYPE
+                                      ,pi_tab_categories      IN nm3type.tab_varchar4
+                                      ,pi_exclude_off_network IN BOOLEAN DEFAULT FALSE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--<PROC NAME="simple_restriction_to_type">
+-- GJ - to support NM0590
+-- for given query id and type id add a dead simple restriction into the gaz query type
+-- i.e. attrib = value
+PROCEDURE simple_restriction_to_type (pi_ngq_id       IN nm_gaz_query.ngq_id%TYPE
+                                     ,pi_ngqt_seq_no  IN nm_gaz_query_types.ngqt_seq_no%TYPE
+                                     ,pi_attrib_name  IN nm_gaz_query_attribs.ngqa_attrib_name%TYPE
+								     ,pi_value        IN nm_gaz_query_values.ngqv_value%TYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--<PROC NAME="add_restriction_to_all_types">
+-- GJ - to support NM0590 
+-- for given query id add simple restriction against all types in the query
+PROCEDURE add_restriction_to_all_types(pi_ngq_id       IN nm_gaz_query.ngq_id%TYPE
+                                      ,pi_attrib_name  IN nm_gaz_query_attribs.ngqa_attrib_name%TYPE
+                                      ,pi_value        IN nm_gaz_query_values.ngqv_value%TYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--<PROC NAME="ngqa_for_nqt_are_valid">
+-- GJ - to support NM0590
+-- check that gaz query attribute restrictions that have been added to a gaz query type
+-- are actually valid i.e. they are against columns that exist for the inv type
+--
+FUNCTION  ngqa_for_nqt_are_valid(pi_ngqt_nqq_id IN nm_gaz_query_types.NGQT_NGQ_ID%TYPE
+                                ,pi_nqqt_seq_no IN nm_gaz_query_types.NGQT_SEQ_NO%TYPE
+								,pi_ngqt_item_type IN nm_gaz_query_types.NGQT_ITEM_TYPE%TYPE) RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--<PROC NAME="del_types_with_invalid_restr">
+-- GJ - to support NM0590
+-- go through all inv types for the gaz query and if there are restrictions
+-- in place that are on attributes that do not exist for the inv type
+-- remove the inv type from the query			
+PROCEDURE del_types_with_invalid_restr(pi_ngqt_ngq_id       IN nm_gaz_query_types.ngqt_ngq_id%TYPE);								
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--<PROC NAME="del_types_with_invalid_restr">
+-- GJ - to support NM0575 but could be used all over the place to abstract the complexities
+-- of setting up an nm_gaz_query record
+-- Given an NE_ID (possibly null) to be used as the source for a gaz query 
+-- this procedure will set the nqg_source_id and ngq_source  
+-- be used for nm_gaz_query record
+--
+PROCEDURE set_ngq_source_etc(pi_ne_id               IN  nm_elements_all.ne_id%TYPE  
+                            ,po_ngq_source_id       OUT nm_gaz_query.ngq_source_id%TYPE   
+                            ,po_ngq_source          OUT nm_gaz_query.ngq_source%TYPE
+                            ,po_ngq_query_all_items OUT nm_gaz_query.ngq_query_all_items%TYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--<PROC NAME="set_ignore_case">
+PROCEDURE set_ignore_case(p_value  IN  BOOLEAN);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--<PROC NAME="get_ignore_case">
+FUNCTION get_ignore_case RETURN BOOLEAN;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--<PRAGMA>
+   PRAGMA RESTRICT_REFERENCES (get_version, rnds, wnps, wnds);
+   PRAGMA RESTRICT_REFERENCES (get_body_version, rnds, wnps, wnds);
+   PRAGMA RESTRICT_REFERENCES (get_g_nte_job_id, rnds, wnps, wnds);
+   PRAGMA RESTRICT_REFERENCES (get_c_open_query, rnds, wnps, wnds);
+   PRAGMA RESTRICT_REFERENCES (get_c_closed_query, rnds, wnps, wnds);
+   PRAGMA RESTRICT_REFERENCES (ngqt_order_by, wnds);
+   PRAGMA RESTRICT_REFERENCES (ngqa_attrib_name_is_updatable, wnps, wnds);
+   PRAGMA RESTRICT_REFERENCES (ngqt_type_is_updatable, wnps, wnds);
+   PRAGMA RESTRICT_REFERENCES (get_ngqt_item_type_type_ele, rnds, wnps, wnds);
+   PRAGMA RESTRICT_REFERENCES (get_ngqt_item_type_type_inv, rnds, wnps, wnds);
+--   PRAGMA RESTRICT_REFERENCES (get_ngqt_lov_descr, wnps, wnds);
+--   PRAGMA RESTRICT_REFERENCES (get_ngqt_item_type_type_descr, wnps, wnds);
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+END nm3gaz_qry;
+/
