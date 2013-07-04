@@ -6,15 +6,15 @@ DECLARE
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm_gaz_query_b_ins.trg-arc   3.0   Jun 03 2009 16:24:48   lsorathia  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm_gaz_query_b_ins.trg-arc   3.1   Jul 04 2013 09:53:22   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm_gaz_query_b_ins.trg  $
---       Date into SCCS   : $Date:   Jun 03 2009 16:24:48  $
---       Date fetched Out : $Modtime:   Jun 03 2009 16:12:40  $
---       SCCS Version     : $Revision:   3.0  $
+--       Date into SCCS   : $Date:   Jul 04 2013 09:53:22  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 09:35:32  $
+--       SCCS Version     : $Revision:   3.1  $
 --       Based on 
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2001
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 

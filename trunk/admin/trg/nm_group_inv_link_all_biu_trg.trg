@@ -18,7 +18,7 @@ DECLARE
 --    nm_group_inv_link_all_biu_trg
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2002
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 BEGIN
   nm3group_inv.check_link_types(pi_ne_ne_id  => :NEW.ngil_ne_ne_id
