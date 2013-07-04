@@ -1,0 +1,105 @@
+CREATE OR REPLACE PACKAGE NM3MRG_SDO AS
+--<PACKAGE>
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mrg_sdo.pkh-arc   2.2   Jul 04 2013 16:16:06   James.Wadsworth  $
+--       Module Name      : $Workfile:   nm3mrg_sdo.pkh  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:16:06  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:16  $
+--       Version          : $Revision:   2.2  $
+--       Based on SCCS version : 1.2
+-------------------------------------------------------------------------
+--
+--   Author : R.A. Coupe
+--
+--   Merge Query SDO Package
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+--  g_sccsid is the SCCS ID for the package
+   g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.2  $';
+
+
+--</GLOBVAR>
+--
+
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+  FUNCTION get_version RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+  FUNCTION get_body_version RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GENERATE_MRG_DATUM_SDO">
+-- This procedure generates the datum shapes for a merge job (result set)
+procedure generate_mrg_datum_sdo ( p_mrg_job in number );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="CREATE_ALL_MRG_GEOMETRY">
+-- This procedure generates the datum shapes for all merge jobs 
+procedure create_all_mrg_geometry;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="CREATE_SPATIAL_MRG_VIEWS">
+-- This procedure creates a join view of merge results and the spatial data for a specific query definition 
+procedure create_spatial_mrg_view ( p_mrg_query_id in number );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="CREATE_ALL_SPATIAL_MRG_VIEWS">
+-- This procedure creates a join view of merge results and the spatial data for all query definitions 
+
+procedure create_all_spatial_mrg_views;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_MRG_DYNAMIC_THEME_QUERY">
+-- Retrieves the query to deliver spatial data for a specific merge result set. 
+function get_mrg_dynamic_theme_query ( p_mrg_job_id in number, p_attrib_name in varchar2 default null ) return varchar2;
+--</PROC>
+--
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="CREATE_GDO_FROM_JOB">
+-- Creates the gis-data-objects record for a merge query result set 
+procedure create_gdo_from_job ( p_session_id in number, p_job_id in number, p_attrib_name in varchar2 default null, p_theme_name in varchar2 default null );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="MRG_GEOMETRY_EXISTS">
+-- Returns a Boolean to indicate if the geometries exist for a merge query result set. 
+function mrg_geometry_exists ( p_mrg_job_id in number ) return Boolean;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="REGISTER_MRG_VIEW_AS_THEME">
+-- Constructs a theme and sdo registration (and sde registration for a merge query 
+procedure register_mrg_view_as_theme ( p_mrg_query_id in number );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+
+end;
+/
