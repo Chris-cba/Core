@@ -2,14 +2,14 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm_4500_fix17.sql-arc   1.0   Jul 23 2012 13:02:42   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm_4500_fix17.sql-arc   1.1   Jul 04 2013 13:47:50   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm_4500_fix17.sql  $
---       Date into PVCS   : $Date:   Jul 23 2012 13:02:42  $
---       Date fetched Out : $Modtime:   Jul 23 2012 12:53:44  $
---       PVCS Version     : $Revision:   1.0  $
+--       Date into PVCS   : $Date:   Jul 04 2013 13:47:50  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 11:54:24  $
+--       PVCS Version     : $Revision:   1.1  $
 --
 --------------------------------------------------------------------------------
---   Copyright (c) 2012 Bentley Systems Incorporated.
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 --------------------------------------------------------------------------------
 --
 set echo off
