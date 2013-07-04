@@ -1,0 +1,93 @@
+create or replace package nm3web_mail as
+--<PACKAGE>
+--   PVCS Identifiers :-
+--
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3web_mail.pkh-arc   2.2   Jul 04 2013 16:35:56   James.Wadsworth  $
+--       Module Name      : $Workfile:   nm3web_mail.pkh  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:35:56  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:20  $
+--       PVCS Version     : $Revision:   2.2  $
+--       Based on         : 1.2
+--
+--
+--   Author : Jonathan Mills
+--
+--   NM3 Web Mail package
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+  g_sccsid      CONSTANT  VARCHAR2(2000) := '"$Revision:   2.2  $"';
+--  g_sccsid is the SCCS ID for the package
+--
+   g_empty_tab  owa_util.ident_arr;
+   g_no_subject CONSTANT VARCHAR2(12) := '[no subject]';
+--
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="write_mail">
+--
+PROCEDURE write_mail;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="send_mail">
+--
+PROCEDURE send_mail (p_to_user       owa_util.ident_arr DEFAULT g_empty_tab
+                    ,p_to_dest_type  VARCHAR2           DEFAULT nm3mail.c_user
+                    ,p_cc_user       owa_util.ident_arr DEFAULT g_empty_tab
+                    ,p_cc_dest_type  VARCHAR2           DEFAULT nm3mail.c_user
+                    ,p_bcc_user      owa_util.ident_arr DEFAULT g_empty_tab
+                    ,p_bcc_dest_type VARCHAR2           DEFAULT nm3mail.c_user
+                    ,p_subject       VARCHAR2           DEFAULT g_no_subject
+                    ,p_message       VARCHAR2           DEFAULT NULL
+                    );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_my_nmu">
+--
+FUNCTION get_my_nmu (pi_raise_not_found BOOLEAN DEFAULT TRUE) RETURN nm_mail_users%ROWTYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="can_mail_be_sent">
+--
+PROCEDURE can_mail_be_sent (pi_write_htp        IN     BOOLEAN
+                           ,po_rec_nmu             OUT nm_mail_users%ROWTYPE
+                           ,po_mail_can_be_sent IN OUT BOOLEAN
+                           );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PRAGMA>
+   PRAGMA RESTRICT_REFERENCES (get_version, RNDS, WNPS, WNDS);
+   PRAGMA RESTRICT_REFERENCES (get_body_version, RNDS, WNPS, WNDS);
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+end nm3web_mail;
+/

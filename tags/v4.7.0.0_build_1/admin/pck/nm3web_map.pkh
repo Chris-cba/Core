@@ -1,0 +1,101 @@
+create or replace package nm3web_map as
+--<PACKAGE>
+--   PVCS Identifiers :-
+--
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3web_map.pkh-arc   2.2   Jul 04 2013 16:35:56   James.Wadsworth  $
+--       Module Name      : $Workfile:   nm3web_map.pkh  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:35:56  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:20  $
+--       PVCS Version     : $Revision:   2.2  $
+--       Based on         : 1.2
+--
+--
+--   Author : Jonathan Mills
+--
+--   show items on map package
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+  g_sccsid      CONSTANT  VARCHAR2(2000) := '"$Revision:   2.2  $"';
+--  g_sccsid is the SCCS ID for the package
+--
+  c_map_server_sysopt CONSTANT hig_option_list.hol_id%TYPE := 'WEBMAPSERV';
+--
+   g_pk_value       VARCHAR2(4000);
+   g_gdo_session_id gis_data_objects.gdo_session_id%TYPE;
+--
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="define_item_to_show">
+-- Define an item to show on the web GIS
+--
+PROCEDURE define_item_to_show;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_map_server_sysopt_value">
+-- This function returns the value of the WEBMAPSERV system option
+--  this will raise an error if the option is not set
+--
+FUNCTION get_map_server_sysopt_value RETURN hig_option_values.hov_id%TYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="show_item">
+-- Show an item on the web GIS
+--
+PROCEDURE show_item (p_gt_theme_id    gis_themes.gt_theme_id%TYPE
+                    ,p_pk_value       VARCHAR2
+                    );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="show_gdo">
+-- This function will show some GIS_DATA_OBJECTS records on the web GIS
+--
+PROCEDURE show_gdo  (p_gt_theme_id    gis_themes.gt_theme_id%TYPE
+                    ,p_gdo_session_id gis_data_objects.gdo_session_id%TYPE
+                    );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_url">
+FUNCTION get_url (p_gt_theme_id    gis_themes.gt_theme_id%TYPE
+                 ,p_gdo_session_id gis_data_objects.gdo_session_id%TYPE
+                 ) RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PRAGMA>
+   PRAGMA RESTRICT_REFERENCES (get_version, RNDS, WNPS, WNDS);
+   PRAGMA RESTRICT_REFERENCES (get_body_version, RNDS, WNPS, WNDS);
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+end nm3web_map;
+/

@@ -1,0 +1,79 @@
+create or replace package nm3web_mrg as
+--<PACKAGE>
+--   PVCS Identifiers :-
+--
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3web_mrg.pkh-arc   2.3   Jul 04 2013 16:35:56   James.Wadsworth  $
+--       Module Name      : $Workfile:   nm3web_mrg.pkh  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:35:56  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:22  $
+--       PVCS Version     : $Revision:   2.3  $
+--       Based on         : 1.1
+--
+--
+--   Author : Jonathan Mills
+--
+--   Web Merge package
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+   g_sccsid      CONSTANT  VARCHAR2(2000) := '"$Revision:   2.3  $"';
+--  g_sccsid is the SCCS ID for the package
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="main">
+PROCEDURE main (pi_nmq_id nm_mrg_query.nmq_id%TYPE DEFAULT NULL);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="specific_query">
+PROCEDURE specific_query (p_nmq_id nm_mrg_query.nmq_id%TYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="run_query">
+PROCEDURE run_query (p_nmq_id         nm_mrg_query.nmq_id%TYPE
+                    ,p_nmf_id         nm_mrg_output_file.nmf_id%TYPE
+                    ,p_effective_date VARCHAR2 DEFAULT TO_CHAR(To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY'),'DD-MON-YYYY')
+                    ,p_roi_unique     VARCHAR2
+                    ,p_roi_type       VARCHAR2
+                    ,p_prefix         VARCHAR2
+                    ,p_commit_results VARCHAR2 DEFAULT 'TRUE'
+                    ,p_do_txt         VARCHAR2 DEFAULT 'N'
+                    ,p_do_csv         VARCHAR2 DEFAULT 'N'
+                    ,p_do_htm         VARCHAR2 DEFAULT 'N'
+                    ,p_file_prod_type VARCHAR2
+                    );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PRAGMA>
+   PRAGMA RESTRICT_REFERENCES (get_version, RNDS, WNPS, WNDS);
+   PRAGMA RESTRICT_REFERENCES (get_body_version, RNDS, WNPS, WNDS);
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+end nm3web_mrg;
+/
