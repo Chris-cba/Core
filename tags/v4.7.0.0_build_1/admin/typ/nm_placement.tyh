@@ -1,0 +1,27 @@
+CREATE OR REPLACE TYPE nm_placement AS object
+ (
+--
+-----------------------------------------------------------------------------
+--
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)nm_placement.tyh	1.1 03/01/01
+--       Module Name      : nm_placement.tyh
+--       Date into SCCS   : 01/03/01 16:24:51
+--       Date fetched Out : 07/06/13 17:04:41
+--       SCCS Version     : 1.1
+--
+--    TYPE nm_placement
+--
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
+  pl_ne_id   integer(9)
+ ,pl_start   number
+ ,pl_end     number
+ ,pl_measure number
+ ,STATIC FUNCTION get_body_version RETURN VARCHAR2
+ ,PRAGMA RESTRICT_REFERENCES (get_body_version, wnds, rnds, rnps, wnps)
+ )
+/

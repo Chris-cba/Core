@@ -1,0 +1,30 @@
+CREATE OR REPLACE TYPE BODY nm_placement IS
+--
+-----------------------------------------------------------------------------
+--
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)nm_placement.tyb	1.1 03/01/01
+--       Module Name      : nm_placement.tyb
+--       Date into SCCS   : 01/03/01 16:24:50
+--       Date fetched Out : 07/06/13 17:04:41
+--       SCCS Version     : 1.1
+--
+--    TYPE BODY nm_placement
+--
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
+--
+------------------------------------------------------------------------------------------------
+--
+STATIC FUNCTION get_body_version RETURN VARCHAR2 IS
+BEGIN
+   RETURN '"@(#)nm_placement.tyb	1.1 03/01/01"';
+END get_body_version;
+--
+------------------------------------------------------------------------------------------------
+--
+end;
+/

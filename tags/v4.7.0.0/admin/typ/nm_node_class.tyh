@@ -1,0 +1,40 @@
+CREATE OR REPLACE TYPE nm_node_class AS object
+  (
+--
+-----------------------------------------------------------------------------
+--
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)nm_node_class.tyh	1.1 03/01/01
+--       Module Name      : nm_node_class.tyh
+--       Date into SCCS   : 01/03/01 16:24:49
+--       Date fetched Out : 07/06/13 17:04:40
+--       SCCS Version     : 1.1
+--
+--    TYPE nm_node_class
+--
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
+   nc_route_id          number
+  ,nc_node_id           number
+  ,nc_intersecting_road varchar2(240)
+  ,nc_poe               number
+  ,nc_node_type         varchar2(4)
+  ,member FUNCTION get_route_id          RETURN number
+  ,member FUNCTION get_node_id           RETURN number
+  ,member FUNCTION get_intersecting_road RETURN varchar2
+  ,member FUNCTION get_poe               RETURN number
+  ,member FUNCTION get_poe_type          RETURN varchar2
+  ,member FUNCTION get_node_type         RETURN varchar2
+  ,STATIC FUNCTION get_body_version RETURN VARCHAR2
+  ,PRAGMA RESTRICT_REFERENCES (get_body_version, wnds, rnds, rnps, wnps)
+  ,PRAGMA RESTRICT_REFERENCES( get_intersecting_road, wnds, wnps, rnds, rnps )
+  ,PRAGMA RESTRICT_REFERENCES( get_node_id, wnds, wnps, rnds, rnps )
+  ,PRAGMA RESTRICT_REFERENCES( get_node_type, wnds, wnps, rnds, rnps )
+  ,PRAGMA RESTRICT_REFERENCES( get_poe, wnds, wnps, rnds, rnps )
+  ,PRAGMA RESTRICT_REFERENCES( get_poe_type, wnds, wnps, rnds, rnps )
+  ,PRAGMA RESTRICT_REFERENCES( get_route_id, wnds, wnps, rnds, rnps )
+  )
+/

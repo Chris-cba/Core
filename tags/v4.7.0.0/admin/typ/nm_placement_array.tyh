@@ -1,0 +1,44 @@
+CREATE OR REPLACE TYPE nm_placement_array AS object
+ (
+--
+-----------------------------------------------------------------------------
+--
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)nm_placement_array.tyh	1.4 08/14/01
+--       Module Name      : nm_placement_array.tyh
+--       Date into SCCS   : 01/08/14 13:40:48
+--       Date fetched Out : 07/06/13 17:04:42
+--       SCCS Version     : 1.4
+--
+--    TYPE nm_placement_array
+--
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
+  npa_placement_array nm_placement_array_type
+ ,member FUNCTION add_element (pl_ne_id   IN integer
+                              ,pl_start   IN number
+                              ,pl_end     IN number
+                              ,pl_measure IN number  DEFAULT 0
+                              ,pl_mrg_mem IN boolean DEFAULT TRUE
+                              ) RETURN nm_placement_array
+ ,PRAGMA RESTRICT_REFERENCES (add_element, wnds, rnds, rnps, wnps)
+ ,member FUNCTION add_element (pl_pl      IN nm_placement
+                              ,pl_mrg_mem IN boolean DEFAULT TRUE
+                              ) RETURN nm_placement_array
+ ,member FUNCTION find_element (pl_ne_id IN integer) RETURN integer
+ ,member FUNCTION is_empty RETURN boolean
+ ,member PROCEDURE dump_placement_array
+ ,STATIC FUNCTION get_body_version RETURN VARCHAR2
+ ,member FUNCTION placement_count RETURN NUMBER
+ ,member FUNCTION get_entry (pl_arr_pos IN INTEGER) RETURN nm_placement
+ ,PRAGMA RESTRICT_REFERENCES (get_body_version, wnds, rnds, rnps, wnps)
+ ,PRAGMA RESTRICT_REFERENCES (add_element, wnds, rnds, rnps, wnps)
+ ,PRAGMA RESTRICT_REFERENCES (find_element, wnds, rnds, rnps, wnps)
+ ,PRAGMA RESTRICT_REFERENCES (is_empty, wnds, rnds, rnps, wnps)
+ ,PRAGMA RESTRICT_REFERENCES (placement_count, wnds, rnds, rnps, wnps)
+ ,PRAGMA RESTRICT_REFERENCES (get_entry, wnds, rnds, rnps, wnps)
+ )
+/

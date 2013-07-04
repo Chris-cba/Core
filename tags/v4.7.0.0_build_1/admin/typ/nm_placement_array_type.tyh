@@ -1,0 +1,2 @@
+CREATE OR REPLACE TYPE nm_placement_array_type AS varray(1048576) OF nm_placement
+/

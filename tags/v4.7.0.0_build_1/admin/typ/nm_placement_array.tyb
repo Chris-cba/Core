@@ -1,0 +1,255 @@
+create or replace type body nm_placement_array is
+--
+-----------------------------------------------------------------------------
+--
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)nm_placement_array.tyb	1.6 08/14/01
+--       Module Name      : nm_placement_array.tyb
+--       Date into SCCS   : 01/08/14 13:41:12
+--       Date fetched Out : 07/06/13 17:04:42
+--       SCCS Version     : 1.6
+--
+--  Author : Jonathan Mills
+--
+--   nm_placement_array type body
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
+--
+------------------------------------------------------------------------------------------------
+--
+-- adds a new module to the varray
+member function add_element (PL_NE_ID   IN INTEGER
+                            ,PL_START   IN NUMBER
+                            ,PL_END     IN NUMBER
+                            ,PL_MEASURE IN NUMBER  DEFAULT 0
+                            ,pl_mrg_mem IN BOOLEAN DEFAULT TRUE
+                            )
+   return nm_placement_array
+--
+-- pl_mrg_mem is only set if you do not want this function to be clever where 2 bits of the same
+--  member are being inserted
+--
+is
+--
+   this_npa nm_placement_array := SELF;
+--
+   prior_ne_id   number;
+   prior_start   number;
+   prior_end     number;
+   prior_measure number;
+--
+   l_start NUMBER := pl_start;
+--
+   l_extend_varray   BOOLEAN;
+--
+   c_max_array_count CONSTANT BINARY_INTEGER := 1048576;
+--
+begin
+--
+-- If there are NO entries in the VARRAY then extend it
+--
+   IF this_npa.npa_placement_array.COUNT = 0
+    THEN
+      this_npa.npa_placement_array.extend;
+   END IF;
+--
+   -- get the start, end and measure of the previous section
+   prior_ne_id   := nvl(npa_placement_array(this_npa.npa_placement_array.last).pl_ne_id,0);
+   prior_start   := nvl(npa_placement_array(this_npa.npa_placement_array.last).pl_start,0);
+   prior_end     := nvl(npa_placement_array(this_npa.npa_placement_array.last).pl_end,0);
+   prior_measure := nvl(npa_placement_array(this_npa.npa_placement_array.last).pl_measure,0);
+--
+-- If the last element in the array has a NULL pl_ne_id, then just update this entry when the time comes
+--
+   l_extend_varray := (npa_placement_array(this_npa.npa_placement_array.last).pl_ne_id IS NOT NULL);
+--
+   if   pl_ne_id = prior_ne_id
+    AND pl_start = prior_end
+    AND pl_mrg_mem
+    then
+      --
+      -- If this is the same NE and they are connected then update the previous record
+      --  to have the pl_end set to this record
+      -- i.e.  add_element for   NE_ID   START   END
+      --                          123       0     20
+      --                          123      20    120
+      --                          123     120    200
+      --                          123     220    500
+      --                          354       0    300
+      --  is stored as            123       0    200
+      --                          123     220    500
+      --                          354       0    300
+      --
+      l_start         := prior_start;
+      l_extend_varray := FALSE;
+   end if;
+   --
+   -- If we are NOT just performing an update of the previous record
+   --
+   IF l_extend_varray
+    THEN
+      IF this_npa.npa_placement_array.COUNT = c_max_array_count
+       THEN
+         raise_application_error(-20001,'Placement Array cannot have more than '||c_max_array_count||' entries');
+      END IF;
+      this_npa.npa_placement_array.extend;
+   END IF;
+--
+   this_npa.npa_placement_array(this_npa.npa_placement_array.last) := nm_placement (pl_ne_id
+                                                                                   ,l_start
+                                                                                   ,pl_end
+                                                                                   ,pl_measure
+                                                                                   );
+--
+   return this_npa;
+--
+exception
+   when others
+    then
+      return null;
+--
+end add_element;
+--
+------------------------------------------------------------------------------------------------
+--
+member FUNCTION add_element (pl_pl      IN nm_placement
+                            ,pl_mrg_mem IN boolean DEFAULT TRUE
+                            ) RETURN nm_placement_array IS
+BEGIN
+   RETURN SELF.add_element (pl_ne_id   => pl_pl.pl_ne_id
+                           ,pl_start   => pl_pl.pl_start
+                           ,pl_end     => pl_pl.pl_end
+                           ,pl_measure => pl_pl.pl_measure
+                           ,pl_mrg_mem => pl_mrg_mem
+                           );
+END add_element;
+--
+------------------------------------------------------------------------------------------------
+--
+-- returns the index of the element with the given pl_ne_id
+MEMBER FUNCTION find_element (PL_NE_ID IN INTEGER) RETURN integer
+IS
+--
+   this_npa nm_placement_array := SELF;
+--
+   l_retval INTEGER := 0;
+--
+BEGIN
+--
+   FOR i IN 1..this_npa.npa_placement_array.LAST
+    LOOP
+--
+      IF this_npa.npa_placement_array(i).pl_ne_id = pl_ne_id
+       THEN
+         -- Found a match so drop out of the loop
+         l_retval := i;
+         EXIT;
+      END IF;
+--
+   END LOOP;
+--
+   RETURN l_retval;
+--
+END find_element;
+--
+------------------------------------------------------------------------------------------------
+--
+member function is_empty RETURN BOOLEAN IS
+--
+-- This function returns TRUE if the NM_PLACEMENT_ARRAY has no array entries, or there is only
+--  one entry and it is set to NULL
+--
+   this_npa nm_placement_array := SELF;
+--
+   l_retval BOOLEAN := FALSE;
+--
+begin
+--
+   IF    this_npa.npa_placement_array.COUNT = 0
+    THEN
+      l_retval := TRUE;
+   ELSIF this_npa.npa_placement_array.COUNT = 1
+    AND  npa_placement_array(1).pl_ne_id IS NULL
+    THEN
+      l_retval := TRUE;
+   END IF;
+--
+   RETURN l_retval;
+--
+END is_empty;
+--
+------------------------------------------------------------------------------------------------
+--
+member procedure dump_placement_array
+is
+   this_npa nm_placement_array := SELF;
+begin
+   IF this_npa.is_empty
+    THEN
+      dbms_output.put_line ('Placement Array empty');
+   ELSE
+      for i in 1..this_npa.npa_placement_array.last
+       loop
+         dbms_output.put_line ('Pos('||i||')'
+                               ||'-'||this_npa.npa_placement_array(i).pl_ne_id
+                               ||','||this_npa.npa_placement_array(i).pl_start
+                               ||','||this_npa.npa_placement_array(i).pl_end
+                               ||','||this_npa.npa_placement_array(i).pl_measure
+                              );
+       end loop;
+    END IF;
+exception
+   when others
+    then
+      return;
+end dump_placement_array;
+--
+------------------------------------------------------------------------------------------------
+--
+STATIC FUNCTION get_body_version RETURN VARCHAR2 IS
+BEGIN
+   RETURN '"@(#)nm_placement_array.tyb	1.6 08/14/01"';
+END get_body_version;
+--
+------------------------------------------------------------------------------------------------
+--
+member function placement_count RETURN NUMBER IS
+--
+   this_npa nm_placement_array := SELF;
+--
+BEGIN
+--
+   IF this_npa.is_empty
+    THEN
+      RETURN 0;
+   ELSE
+      RETURN this_npa.npa_placement_array.COUNT;
+   END IF;
+--
+END placement_count;
+--
+------------------------------------------------------------------------------------------------
+--
+member FUNCTION get_entry (pl_arr_pos IN INTEGER) RETURN nm_placement IS
+--
+   this_npa nm_placement_array := SELF;
+--
+BEGIN
+--
+   IF NOT this_npa.npa_placement_array.EXISTS(pl_arr_pos)
+    THEN
+      RETURN nm_placement(null,null,null,null);
+   ELSE
+      RETURN this_npa.npa_placement_array(pl_arr_pos);
+   END IF;
+--
+END get_entry;
+--
+------------------------------------------------------------------------------------------------
+--
+end;
+/

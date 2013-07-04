@@ -1,0 +1,63 @@
+create or replace TYPE BODY nm_node_class is
+--
+-----------------------------------------------------------------------------
+--
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)nm_node_class.tyb	1.1 03/01/01
+--       Module Name      : nm_node_class.tyb
+--       Date into SCCS   : 01/03/01 16:24:48
+--       Date fetched Out : 07/06/13 17:04:40
+--       SCCS Version     : 1.1
+--
+--  Author : Kevin Angus
+--
+--   nm_node_class type body
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
+  member FUNCTION get_route_id  RETURN number is
+  begin
+    RETURN self.nc_route_id;
+  END;
+
+  member FUNCTION get_node_id  RETURN number is
+  begin
+    RETURN self.nc_node_id;
+  END;
+
+  member FUNCTION get_intersecting_road  RETURN varchar2 is
+  begin
+    RETURN self.nc_intersecting_road;
+  END;
+
+  member FUNCTION get_poe  RETURN number is
+  begin
+    RETURN self.nc_poe;
+  END;
+
+  member FUNCTION get_poe_type RETURN varchar2 is
+  begin
+    IF self.nc_poe > 0 THEN
+      RETURN 'GAP';
+    ELSIF self.nc_poe < 0 THEN
+      RETURN 'OVERLAP';
+    ELSE
+      RETURN 'Not a POE';
+    END IF;
+  END;
+
+  member FUNCTION get_node_type RETURN varchar2 is
+  begin
+    RETURN self.nc_node_type;
+  END;
+--
+STATIC FUNCTION get_body_version RETURN VARCHAR2 IS
+BEGIN
+   RETURN '"@(#)nm_node_class.tyb	1.1 03/01/01"';
+END get_body_version;
+--
+END;
+/
