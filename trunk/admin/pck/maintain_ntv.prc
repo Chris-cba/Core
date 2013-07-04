@@ -12,7 +12,7 @@ CREATE OR REPLACE PROCEDURE maintain_ntv
 --       SCCS Version     : 1.1
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2006
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 IS
   l_default_vis VARCHAR2(1) := nvl(hig.get_user_or_sys_opt('DEFVISNTH'),'N');

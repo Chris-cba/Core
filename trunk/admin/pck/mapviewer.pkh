@@ -4,20 +4,20 @@ CREATE OR REPLACE PACKAGE mapviewer AS
 --   SCCS Identifiers :-
 -----------------------------------------------------------------------------
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/mapviewer.pkh-arc   2.3   May 16 2011 14:42:22   Steve.Cooper  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/mapviewer.pkh-arc   2.4   Jul 04 2013 15:07:20   James.Wadsworth  $
 --       Module Name      : $Workfile:   mapviewer.pkh  $
---       Date into PVCS   : $Date:   May 16 2011 14:42:22  $
---       Date fetched Out : $Modtime:   May 03 2011 11:04:34  $
---       PVCS Version     : $Revision:   2.3  $
+--       Date into PVCS   : $Date:   Jul 04 2013 15:07:20  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:08  $
+--       PVCS Version     : $Revision:   2.4  $
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2004
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
   g_ne_id       NUMBER;
   g_doc_id      NUMBER;
-  g_sccsid      CONSTANT  VARCHAR2(2000) :='"$Revision:   2.3  $"';
+  g_sccsid      CONSTANT  VARCHAR2(2000) :='"$Revision:   2.4  $"';
 
   g_conversion_factor number;
 
