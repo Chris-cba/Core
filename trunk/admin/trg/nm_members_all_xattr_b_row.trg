@@ -18,7 +18,7 @@ DECLARE
 --   Xattr Validation trigger
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2001
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 -- It is assumed that the object type (nm_obj_type) and the PK of the object itself (nm_ne_id_in) remain unchanged

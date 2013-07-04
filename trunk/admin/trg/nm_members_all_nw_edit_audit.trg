@@ -8,11 +8,11 @@ DECLARE
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm_members_all_nw_edit_audit.trg-arc   2.0   Jul 18 2007 15:37:06   smarshall  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm_members_all_nw_edit_audit.trg-arc   2.1   Jul 04 2013 09:53:32   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm_members_all_nw_edit_audit.trg  $
---       Date into PVCS   : $Date:   Jul 18 2007 15:37:06  $
---       Date fetched Out : $Modtime:   Jul 18 2007 14:47:32  $
---       PVCS Version     : $Revision:   2.0  $
+--       Date into PVCS   : $Date:   Jul 04 2013 09:53:32  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 09:35:32  $
+--       PVCS Version     : $Revision:   2.1  $
 --
 --
 --   Author : Kevin Angus
@@ -20,7 +20,7 @@ DECLARE
 --    nm_members_all_nw_edit_audit
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2007
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 BEGIN
   if    :new.nm_type = 'G'

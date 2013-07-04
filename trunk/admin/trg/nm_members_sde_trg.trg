@@ -8,11 +8,11 @@ DECLARE
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm_members_sde_trg.trg-arc   2.1   Aug 31 2007 16:26:30   malexander  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm_members_sde_trg.trg-arc   2.2   Jul 04 2013 09:53:32   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm_members_sde_trg.trg  $
---       Date into SCCS   : $Date:   Aug 31 2007 16:26:30  $
---       Date fetched Out : $Modtime:   Aug 31 2007 15:26:28  $
---       SCCS Version     : $Revision:   2.1  $
+--       Date into SCCS   : $Date:   Jul 04 2013 09:53:32  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 09:35:32  $
+--       SCCS Version     : $Revision:   2.2  $
 --       Based on 
 --
 --   Author : Jonathan Mills
@@ -23,7 +23,7 @@ DECLARE
 --   FOR EACH ROW
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2007
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
    l_nm_type CONSTANT NM_MEMBERS_ALL.nm_type%TYPE := NVL(:NEW.nm_type,:OLD.nm_type);
