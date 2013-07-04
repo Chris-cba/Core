@@ -3,13 +3,15 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/sql/identify_distance_break_records_716050.sql-arc   3.0   Apr 15 2009 14:21:52   lsorathia  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/sql/identify_distance_break_records_716050.sql-arc   3.1   Jul 04 2013 09:32:52   James.Wadsworth  $
 --       Module Name      : $Workfile:   identify_distance_break_records_716050.sql  $
---       Date into PVCS   : $Date:   Apr 15 2009 14:21:52  $
---       Date fetched Out : $Modtime:   Apr 15 2009 14:18:52  $
---       PVCS Version     : $Revision:   3.0  $
+--       Date into PVCS   : $Date:   Jul 04 2013 09:32:52  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 09:29:18  $
+--       PVCS Version     : $Revision:   3.1  $
 --
---------------------------------------------------------------------------------
+------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+------------------------------------------------------------------
 --
 Set linesize 1000
 set Pagesize 100

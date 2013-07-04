@@ -3,13 +3,15 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/sql/update_iig_defect_717947.sql-arc   3.2   Feb 24 2009 14:43:18   lsorathia  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/sql/update_iig_defect_717947.sql-arc   3.3   Jul 04 2013 09:32:52   James.Wadsworth  $
 --       Module Name      : $Workfile:   update_iig_defect_717947.sql  $
---       Date into PVCS   : $Date:   Feb 24 2009 14:43:18  $
---       Date fetched Out : $Modtime:   Feb 24 2009 14:39:36  $
---       PVCS Version     : $Revision:   3.2  $
+--       Date into PVCS   : $Date:   Jul 04 2013 09:32:52  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 09:30:52  $
+--       PVCS Version     : $Revision:   3.3  $
 --
---------------------------------------------------------------------------------
+------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+------------------------------------------------------------------
 --
 
 PROMPT End Date NM_INV_ITEM_GROUPINGS For Which Asset Do Not Exists

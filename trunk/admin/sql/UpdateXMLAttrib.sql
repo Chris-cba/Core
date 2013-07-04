@@ -17,7 +17,7 @@ CREATE OR REPLACE AND COMPILE JAVA SOURCE NAMED "com.exor.xml.UpdateXMLAttrib" A
 //   class UpdateXMLAttrib
 //
 /////////////////////////////////////////////////////////////////////////////
-//	Copyright (c) exor corporation ltd, 2006
+//	Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 package com.exor.xml;
 import java.io.IOException;

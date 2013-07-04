@@ -1,3 +1,16 @@
+--------------------------------------------------------------------------------
+--   PVCS Identifiers :-
+--
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/sql/tidy_user.sql-arc   3.1   Jul 04 2013 09:32:52   James.Wadsworth  $
+--       Module Name      : $Workfile:   tidy_user.sql  $
+--       Date into PVCS   : $Date:   Jul 04 2013 09:32:52  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 09:30:36  $
+--       PVCS Version     : $Revision:   3.1  $
+--
+------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+------------------------------------------------------------------
+--
 spool tidy_up.txt
 alter table hig_user_roles
 disable  constraint HUR_HUS_FK
