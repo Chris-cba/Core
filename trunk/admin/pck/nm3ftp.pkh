@@ -4,15 +4,17 @@ AS
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ftp.pkh-arc   3.8   Feb 03 2011 08:45:56   Ade.Edwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ftp.pkh-arc   3.9   Jul 04 2013 15:33:50   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3ftp.pkh  $
---       Date into PVCS   : $Date:   Feb 03 2011 08:45:56  $
---       Date fetched Out : $Modtime:   Feb 02 2011 10:47:16  $
---       PVCS Version     : $Revision:   3.8  $
+--       Date into PVCS   : $Date:   Jul 04 2013 15:33:50  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 15:30:42  $
+--       PVCS Version     : $Revision:   3.9  $
 --
---------------------------------------------------------------------------------
+------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+------------------------------------------------------------------
 --
-  g_sccsid constant varchar2(30) :='"$Revision:   3.8  $"';
+  g_sccsid constant varchar2(30) :='"$Revision:   3.9  $"';
 --
 -----------------------------------------------------------------------------
 --

@@ -2,15 +2,16 @@ CREATE OR REPLACE PACKAGE BODY nm3flx IS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3flx.pkb-arc   2.15   Apr 03 2012 13:22:08   Steve.Cooper  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3flx.pkb-arc   2.16   Jul 04 2013 15:33:50   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3flx.pkb  $
---       Date into PVCS   : $Date:   Apr 03 2012 13:22:08  $
---       Date fetched Out : $Modtime:   Apr 03 2012 07:57:48  $
---       Version          : $Revision:   2.15  $
+--       Date into PVCS   : $Date:   Jul 04 2013 15:33:50  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 15:30:06  $
+--       Version          : $Revision:   2.16  $
 --       Based on SCCS version : 1.47
--------------------------------------------------------------------------
---
-  g_body_sccsid      CONSTANT  VARCHAR2(2000) := '$Revision:   2.15  $';
+------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+------------------------------------------------------------------
+  g_body_sccsid      CONSTANT  VARCHAR2(2000) := '$Revision:   2.16  $';
 
    g_package_name    CONSTANT varchar2(30) := 'nm3flx';
 -- Package variables

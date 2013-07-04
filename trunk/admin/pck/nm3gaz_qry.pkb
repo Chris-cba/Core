@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm3gaz_qry AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3gaz_qry.pkb-arc   2.21   Oct 18 2012 09:50:38   Rob.Coupe  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3gaz_qry.pkb-arc   2.22   Jul 04 2013 15:33:50   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3gaz_qry.pkb  $
---       Date into PVCS   : $Date:   Oct 18 2012 09:50:38  $
---       Date fetched Out : $Modtime:   Oct 18 2012 09:41:36  $
---       Version          : $Revision:   2.21  $
+--       Date into PVCS   : $Date:   Jul 04 2013 15:33:50  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:12  $
+--       Version          : $Revision:   2.22  $
 --       Based on SCCS version : 1.45
 -------------------------------------------------------------------------
 --   Author : Jonathan Mills
@@ -14,13 +14,13 @@ CREATE OR REPLACE PACKAGE BODY nm3gaz_qry AS
 --   Gazeteer Query package body
 --
 -----------------------------------------------------------------------------
---   Copyright (c) exor corporation ltd, 2002
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 --all global package variables here
 --
    --g_body_sccsid     CONSTANT  varchar2(2000) := '"@(#)nm3gaz_qry.pkb 1.45 05/26/06"';
-   g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.21  $';
+   g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.22  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3gaz_qry';
