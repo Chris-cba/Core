@@ -1,0 +1,31 @@
+CREATE OR REPLACE TYPE nm_cnct_no_array AS OBJECT
+-----------------------------------------------------------------------------
+--
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)nm_cnct_no_array.tyh	1.1 07/18/06
+--       Module Name      : nm_cnct_no_array.tyh
+--       Date into SCCS   : 06/07/18 15:54:17
+--       Date fetched Out : 07/06/13 17:04:28
+--       SCCS Version     : 1.1
+--
+--   Author : Rob Coupe
+--
+--   NM3 Connectivity object - node array
+--
+-------------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+
+ ( ncno_array nm_cnct_no_array_type
+ , MEMBER FUNCTION add_element ( p_row_id IN INTEGER, p_no_id IN INTEGER, p_ne_id IN INTEGER, p_no_type IN VARCHAR2 ) RETURN nm_cnct_no_array
+ , MEMBER FUNCTION no_in_array ( p_no_id IN INTEGER ) RETURN INTEGER
+ , MEMBER FUNCTION get_disconnected_nodes  RETURN nm_cnct_no_array
+ , MEMBER FUNCTION get_element_in_array( p_no_id IN INTEGER ) RETURN nm_cnct_no
+ , MEMBER FUNCTION distinct_nodes RETURN int_array
+ , MEMBER FUNCTION Xand( p_ia int_array ) RETURN nm_cnct_no_array
+ , MEMBER FUNCTION furthest_2 RETURN int_array
+ , MEMBER FUNCTION furthest_1( p_no_id IN INTEGER ) RETURN int_array
+ , MEMBER FUNCTION get_elements_in_array( p_ia IN int_array ) RETURN nm_cnct_no_array
+);
+/

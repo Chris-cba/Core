@@ -1,0 +1,302 @@
+CREATE OR REPLACE TYPE BODY nm_cnct IS
+-----------------------------------------------------------------------------
+--
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)nm_cnct.tyb	1.2 02/09/07
+--       Module Name      : nm_cnct.tyb
+--       Date into SCCS   : 07/02/09 11:13:33
+--       Date fetched Out : 07/06/13 17:04:23
+--       SCCS Version     : 1.2
+--
+--   Author : Rob Coupe
+--
+--   NM3 Connectivity object - cnct body
+--
+-------------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+
+MEMBER FUNCTION Get_Start_And_End_Nodes RETURN nm_cnct_no_array IS
+term_nodes      nm_cnct_no_array := nm_cnct_no_array( nm_cnct_no_array_type( nm_cnct_no( NULL, NULL, NULL, NULL)));
+ext_cnct_ia     int_array;
+l_ext_cnct      INTEGER;
+l_term_cnt      INTEGER;
+ino             int_array;
+retval          nm_cnct_no_array;
+l_no            nm_cnct_no;
+l_node_type     VARCHAR2(1) := '~';
+BEGIN
+
+--Nm_Debug.delete_debug(TRUE);
+--Nm_Debug.debug_on;
+
+--Nm_Debug.DEBUG('Start/End - node count = '||TO_CHAR(nc_no_array.ncno_array.LAST));
+
+  term_nodes := nc_no_array.get_disconnected_nodes;
+
+--Nm_Debug.DEBUG('Term count  = '||TO_CHAR(term_nodes.ncno_array.LAST));
+
+  l_term_cnt := term_nodes.ncno_array.LAST;
+
+  IF l_term_cnt IS NULL OR (l_term_cnt = 1 AND term_nodes.ncno_array(1).no_id IS NULL) THEN
+
+    l_term_cnt := 0;
+
+    ext_cnct_ia := is_externally_connected(nc_no_array); -- externally connected of all the nodes
+
+    l_ext_cnct  := ext_cnct_ia.ia.LAST;
+
+	IF l_ext_cnct IS NULL THEN
+	  l_ext_cnct := 0;
+    END IF;
+
+--  Nm_Debug.DEBUG(TO_CHAR(ext_cnct_ia.ia.LAST)||' of the whole set are externally connected');
+
+  ELSE
+
+    ext_cnct_ia := is_externally_connected(term_nodes); -- externally connected of the terminating nodes
+
+    l_ext_cnct  := ext_cnct_ia.ia.LAST;
+
+	IF l_ext_cnct IS NULL THEN
+	  l_ext_cnct := 0;
+    END IF;
+
+--  Nm_Debug.DEBUG(TO_CHAR(l_ext_cnct)||' of the terminal nodes are externally connected');
+
+  END IF;
+
+  IF l_term_cnt < 0 THEN
+
+    RAISE_APPLICATION_ERROR(-20001,'Internal error');
+
+
+  ELSIF l_term_cnt = 0 THEN
+
+    -- there are no terminating nodes - must be empty or circular.
+	-- if circular then start and end nodes can be picked as furthest apart (!).
+
+    IF l_ext_cnct = 0 THEN
+
+--	  Nm_Debug.DEBUG('No terminal nodes, no external connections - return furthest 2 of whole set - expensive');
+
+  	  ino := nc_no_array.furthest_2;
+      RETURN nm_cnct_no_array( nm_cnct_no_array_type( nm_cnct_no( 1, ino.ia(1), NULL, 'S' ),
+ 	                                                  nm_cnct_no( 2, ino.ia(2), NULL, 'E' ) )) ;
+
+    ELSIF l_ext_cnct = 1 THEN
+
+--	  Nm_Debug.DEBUG('No terminal nodes, one external connection - use this as start, get end from furthest from start');
+
+      ino := nc_no_array.furthest_1( ext_cnct_ia.ia(1));
+      RETURN nm_cnct_no_array( nm_cnct_no_array_type( nm_cnct_no( 1, ino.ia(1), NULL, 'S' ),
+ 	                                                  nm_cnct_no( 2, ino.ia(2), NULL, 'E' ) )) ;
+
+    ELSIF l_ext_cnct = 2 THEN
+
+--	  Nm_Debug.DEBUG('No terminal nodes, two external connected nodes - use as start and end (randomly)');
+	  RETURN nm_cnct_no_array( nm_cnct_no_array_type( nm_cnct_no( 1, ext_cnct_ia.ia(1), NULL, 'S' ),
+ 	                                                  nm_cnct_no( 2, ext_cnct_ia.ia(2), NULL, 'E' ) )) ;
+
+    ELSE
+
+--	  Nm_Debug.DEBUG('No terminal nodes, more than two external connected nodes - use furthest apart');
+	  ino := nc_no_array.Xand( ext_cnct_ia ).furthest_2;
+	  RETURN nm_cnct_no_array( nm_cnct_no_array_type( nm_cnct_no( 1, ext_cnct_ia.ia(1), NULL, 'S' ),
+ 	                                                  nm_cnct_no( 2, ext_cnct_ia.ia(2), NULL, 'E' ) )) ;
+
+    END IF;
+
+
+  ELSIF l_term_cnt = 1 THEN
+    
+--  only one terminating node - 
+--    if this is externally connected it is the end node
+--    if it is not externally connected and there is no other externally connected then it is the start and the end is the furthest
+--    if it is not externally connected and there is another externally connected then it is the end and the start is the furthest
+--    
+-- 
+--     Nm_Debug.DEBUG('only one terminating node - use furthest from term node as end');
+
+     ino := nc_no_array.furthest_1( term_nodes.ncno_array(1).no_id );
+
+	 RETURN nm_cnct_no_array( nm_cnct_no_array_type( nm_cnct_no( 1, ino.ia(1), NULL, 'S' ),
+		                                             nm_cnct_no( 2, ino.ia(2), NULL, 'E' ) )) ;
+
+  ELSIF l_term_cnt = 2 THEN
+  
+--  there are two terminating nodes - one is the start and one is the end
+--  if both or neither are externally connected then start/end are arbitrary
+--  if one is externally connected it is the start
+
+    RETURN term_nodes;
+    
+  ELSE -- l_term_cnt > 2
+
+    IF l_ext_cnct < 0 THEN                -- there should be zero or more
+
+      RAISE_APPLICATION_ERROR(-20001,'Internal error');
+
+    ELSIF l_ext_cnct = 0 THEN
+
+      ino := term_nodes.furthest_2;        -- furthest 2 of all terminating nodes
+
+    ELSIF l_ext_cnct = 1 THEN
+
+      ino := nc_no_array.furthest_1( ext_cnct_ia.ia(1));
+
+	  RETURN nm_cnct_no_array( nm_cnct_no_array_type( nm_cnct_no( 1, ext_cnct_ia.ia(1), NULL,'S'), nm_cnct_no( 2, ino.ia(2), NULL, 'E' )));
+      
+
+    ELSIF l_ext_cnct = 2 THEN
+    
+--    many terminating nodes, two of which are externally connected - s and e are arbitrary
+
+      RETURN term_nodes.Xand(ext_cnct_ia);
+    
+    ELSIF l_ext_cnct > 2 THEN
+
+--      Nm_Debug.DEBUG('disconnect count = '||TO_CHAR(l_ext_cnct));  --more than two terminating nodes are externally connected
+      
+/*
+      FOR i IN 1..term_nodes.ncno_array.LAST LOOP
+      
+        Nm_Debug.DEBUG( 'Term node '||TO_CHAR(i)||','||TO_CHAR(term_nodes.ncno_array(i).no_id));
+        
+      END LOOP; 
+      
+      FOR i IN 1..ext_cnct_ia.ia.LAST LOOP       
+
+        Nm_Debug.DEBUG( 'ext cnct node '||TO_CHAR(i)||','||TO_CHAR(ext_cnct_ia.ia(i)));
+        
+      END LOOP; 
+*/
+      
+      ino := term_nodes.Xand(ext_cnct_ia).furthest_2;
+
+    ELSE -- l_ext_cnct = 1
+
+--      Nm_Debug.DEBUG('disconnect count = 1 - find furthest from '||TO_CHAR(ext_cnct_ia.ia(1)));  -- only one terminating node is the externally connected - it is the start
+
+      DECLARE
+	    l_no_node EXCEPTION;
+		PRAGMA EXCEPTION_INIT( l_no_node, -20001 );
+      BEGIN
+--	    Nm_Debug.DEBUG('No furthest terminating node');
+        ino := term_nodes.furthest_1( ext_cnct_ia.ia(1));
+      EXCEPTION
+        WHEN l_no_node THEN
+--		  ino := nc_no_array.furthest_1( ext_cnct_ia.ia(1));
+		  RETURN nm_cnct_no_array( nm_cnct_no_array_type( nm_cnct_no( 1, ino.ia(1), NULL, 'S' ),
+		                                                  nm_cnct_no( 2, ino.ia(2), NULL, 'E' ) )) ;
+	    WHEN OTHERS THEN
+          RAISE;
+      END;
+
+    END IF;
+  END IF;
+
+--Nm_Debug.DEBUG( 'we have '||TO_CHAR( ino.ia.LAST )||' nodes ');
+
+  retval := nm_cnct_no_array( nm_cnct_no_array_type( nm_cnct_no( NULL, NULL, NULL, NULL)));
+
+  FOR i IN 1..2 LOOP
+
+--  Nm_Debug.DEBUG('get node type ');
+
+	l_node_type := nc_no_array.ncno_array( term_nodes.no_in_array( ino.ia(i)) ).no_type;
+
+--	Nm_Debug.DEBUG(' i = '||TO_CHAR(i)||' Node type = '||l_node_type );
+
+	IF i =1 THEN
+
+	  retval.ncno_array(i) := nm_cnct_no( i, ino.ia(i), NULL, l_node_type );
+
+	ELSE
+
+	  retval.ncno_array.EXTEND;
+	  retval.ncno_array(i) := nm_cnct_no( i, ino.ia(i), NULL, l_node_type );
+
+	END IF;
+
+  END LOOP;
+
+  RETURN retval;
+
+END;
+
+MEMBER FUNCTION is_externally_connected ( p_no_array IN nm_cnct_no_array, p_obj_type IN VARCHAR2 DEFAULT NULL) RETURN int_array  IS
+retval int_array;
+CURSOR c1 ( c_obj_type IN VARCHAR2, c_no_array IN nm_cnct_no_array ) IS
+  SELECT n.no_id
+  FROM TABLE ( c_no_array.ncno_array ) n
+  WHERE EXISTS ( SELECT 1 FROM nm_members,
+                             nm_node_usages
+                 WHERE nm_ne_id_of = nnu_ne_id
+			     AND   nnu_no_node_id = n.no_id
+			     AND   nm_obj_type = NVL(c_obj_type, nm_obj_type)
+			     AND   nm_ne_id_of NOT IN ( SELECT e.ne_id
+			                                FROM TABLE ( nc_ne_array.ncne_array ) e ));
+
+l_ne_array nm_cnct_ne_array := self.nc_ne_array;
+l_obj_type VARCHAR2(4) := self.nc_obj_type;
+BEGIN
+  retval := int_array( int_array_type(NULL));
+
+  IF l_obj_type IS NULL THEN
+    RAISE_APPLICATION_ERROR( -20001, 'Cannot assess external connectivity without a known type');
+  END IF;
+
+  OPEN c1( l_obj_type, p_no_array  );
+  FETCH c1 BULK COLLECT INTO retval.ia;
+  CLOSE c1;
+  RETURN retval;
+END;
+
+MEMBER FUNCTION get_connected_elements( p_no_id IN INTEGER ) RETURN ptr_array IS
+CURSOR c1 ( c_no_array IN nm_cnct_no_array, c_ne_array IN nm_cnct_ne_array, c_no_id IN INTEGER ) IS
+  SELECT ptr(e.row_id, n.ne_id)
+  FROM TABLE ( c_no_array.ncno_array ) n, TABLE ( c_ne_array.ncne_array ) e
+  WHERE n.no_id = c_no_id
+  AND   e.ne_id = n.ne_id;
+
+l_no_array nm_cnct_no_array := self.nc_no_array;
+l_ne_array nm_cnct_ne_array := self.nc_ne_array;
+
+retval ptr_array := ptr_array(ptr_array_type(ptr(NULL, NULL)));
+BEGIN
+  OPEN c1( l_no_array, l_ne_array, p_no_id  );
+  FETCH c1 BULK COLLECT INTO retval.pa;
+  CLOSE c1;
+--  nm_debug.debug( 'get_connected_elements to '||to_char(p_no_id));
+--  retval.debug;
+  RETURN retval;
+END;
+
+MEMBER FUNCTION get_connected_elements( p_no_id IN INTEGER, p_exclusion IN ptr_array ) RETURN ptr_array IS
+CURSOR c1 ( c_no_array IN nm_cnct_no_array, c_ne_array IN nm_cnct_ne_array, c_no_id IN INTEGER, c_exclusion IN ptr_array ) IS
+  SELECT ptr(e.row_id, n.ne_id)
+  FROM TABLE ( c_no_array.ncno_array ) n, TABLE ( c_ne_array.ncne_array ) e
+  WHERE n.no_id = c_no_id
+  AND   e.ne_id = n.ne_id
+  AND NOT EXISTS ( SELECT 1 FROM TABLE ( c_exclusion.pa ) ex
+                   WHERE e.row_id = ex.ptr_id
+                   AND   ex.ptr_value = 1 );
+
+l_no_array nm_cnct_no_array := self.nc_no_array;
+l_ne_array nm_cnct_ne_array := self.nc_ne_array;
+
+retval ptr_array := ptr_array(ptr_array_type(ptr(NULL, NULL)));
+BEGIN
+--nm_debug.debug( 'get_connected_elements to '||to_char(p_no_id));
+  OPEN c1( l_no_array, l_ne_array, p_no_id, p_exclusion  );
+  FETCH c1 BULK COLLECT INTO retval.pa;
+  CLOSE c1;
+--nm_debug.debug( 'get_connected_elements to '||to_char(p_no_id));
+--retval.debug;
+  RETURN retval;
+END;
+
+END;
+/

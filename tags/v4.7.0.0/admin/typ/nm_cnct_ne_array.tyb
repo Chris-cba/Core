@@ -1,0 +1,88 @@
+CREATE OR REPLACE TYPE BODY nm_cnct_ne_array IS
+-----------------------------------------------------------------------------
+--
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)nm_cnct_ne_array.tyb	1.1 07/18/06
+--       Module Name      : nm_cnct_ne_array.tyb
+--       Date into SCCS   : 06/07/18 15:50:02
+--       Date fetched Out : 07/06/13 17:04:25
+--       SCCS Version     : 1.1
+--
+--   Author : Rob Coupe
+--
+--   NM3 Connectivity object - element array type body
+--
+-------------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+
+MEMBER FUNCTION add_element( p_row_id IN INTEGER, p_ne_id IN INTEGER, p_no_st IN INTEGER, p_no_end IN INTEGER, p_ne_length IN INTEGER ) RETURN nm_cnct_ne_array IS
+this_cnct_ne nm_cnct_ne_array := self;
+l_extend_varray   BOOLEAN;
+c_max_array_count CONSTANT BINARY_INTEGER := 1048576;
+--
+BEGIN
+--
+-- If there are NO entries in the VARRAY then extend it
+--
+   IF this_cnct_ne.ncne_array.COUNT = 0
+    THEN
+      this_cnct_ne.ncne_array.EXTEND;
+   END IF;
+--
+-- If the last element in the array has a NULL pl_ne_id, then just update this entry when the time comes
+--
+   l_extend_varray := (ncne_array(this_cnct_ne.ncne_array.LAST).ne_id IS NOT NULL);
+--
+   -- If we are NOT just performing an update of the previous record
+   --
+   IF l_extend_varray
+    THEN
+      IF this_cnct_ne.ncne_array.COUNT = c_max_array_count
+       THEN
+         RAISE_APPLICATION_ERROR(-20001,'NE Connection array cannot have more than '||c_max_array_count||' entries');
+      END IF;
+      this_cnct_ne.ncne_array.EXTEND;
+   END IF;
+--
+   this_cnct_ne.ncne_array(this_cnct_ne.ncne_array.LAST) := nm_cnct_ne( p_row_id, p_ne_id, p_no_st, p_no_end, p_ne_length );
+--
+   RETURN this_cnct_ne;
+--
+EXCEPTION
+   WHEN OTHERS
+    THEN
+      RETURN NULL;
+--
+END add_element;
+
+MEMBER FUNCTION distinct_elements RETURN int_array IS
+retval int_array := int_array( int_array_type( NULL));
+this_cnct_ne nm_cnct_ne_array := self;
+BEGIN
+  SELECT DISTINCT n.ne_id
+  BULK COLLECT INTO retval.ia
+  FROM TABLE ( this_cnct_ne.ncne_array ) n;
+  RETURN retval;
+END;
+
+MEMBER FUNCTION get_elements_in_array( p_ia IN int_array ) RETURN nm_cnct_ne_array IS
+this_cnct_ne  nm_cnct_ne_array := self;
+retval        nm_cnct_ne_array := nm_cnct_ne_array( nm_cnct_ne_array_type(nm_cnct_ne( NULL, NULL, NULL, NULL, NULL)));
+BEGIN
+  FOR j IN 1..p_ia.ia.LAST LOOP
+    FOR i IN 1..this_cnct_ne.ncne_array.LAST LOOP
+      IF this_cnct_ne.ncne_array(i).ne_id = p_ia.ia(j) THEN
+	    retval.ncne_array(retval.ncne_array.LAST) := this_cnct_ne.ncne_array(i);
+        retval.ncne_array.EXTEND;
+	  END IF;
+    END LOOP;
+  END LOOP;
+  retval.ncne_array.trim;
+  RETURN retval;
+END;
+
+
+END;
+/

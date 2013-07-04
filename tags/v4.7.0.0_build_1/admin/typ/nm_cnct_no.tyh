@@ -1,0 +1,21 @@
+CREATE OR REPLACE TYPE nm_cnct_no AS OBJECT
+-----------------------------------------------------------------------------
+--
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)nm_cnct_no.tyh	1.1 07/18/06
+--       Module Name      : nm_cnct_no.tyh
+--       Date into SCCS   : 06/07/18 15:51:37
+--       Date fetched Out : 07/06/13 17:04:27
+--       SCCS Version     : 1.1
+--
+--   Author : Rob Coupe
+--
+--   NM3 Connectivity object - nodes
+--
+-------------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+
+(row_id INTEGER, no_id INTEGER, ne_id INTEGER, no_type VARCHAR2(1) );
+/

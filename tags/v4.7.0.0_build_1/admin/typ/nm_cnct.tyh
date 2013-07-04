@@ -1,0 +1,33 @@
+CREATE OR REPLACE TYPE nm_cnct AS OBJECT 
+-----------------------------------------------------------------------------
+--
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)nm_cnct.tyh	1.1 07/18/06
+--       Module Name      : nm_cnct.tyh
+--       Date into SCCS   : 06/07/18 15:55:55
+--       Date fetched Out : 07/06/13 17:04:23
+--       SCCS Version     : 1.1
+--
+--   Author : Rob Coupe
+--
+--   NM3 Connectivity object - cnct type
+--
+-------------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+
+( nc_no_ptr         ptr_array, 
+  nc_no_array       nm_cnct_no_array,
+  nc_ne_array       nm_cnct_ne_array,
+  nc_link           nm_cnct_link_array,
+  nc_obj_type       VARCHAR2(4), 
+  nc_datum_type     VARCHAR2(4), 
+  nc_directional    VARCHAR2(4)
+, MEMBER FUNCTION Get_Start_And_End_Nodes RETURN nm_cnct_no_array
+, MEMBER FUNCTION is_externally_connected( p_no_array IN nm_cnct_no_array, p_obj_type IN VARCHAR2 DEFAULT NULL ) RETURN int_array
+, MEMBER FUNCTION get_connected_elements( p_no_id IN INTEGER ) RETURN ptr_array
+, MEMBER FUNCTION get_connected_elements( p_no_id IN INTEGER, p_exclusion IN ptr_array ) RETURN ptr_array
+
+);
+/

@@ -1,0 +1,24 @@
+CREATE OR REPLACE TYPE nm_cnct_ne_array AS OBJECT
+-----------------------------------------------------------------------------
+--
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)nm_cnct_ne_array.tyh	1.1 07/18/06
+--       Module Name      : nm_cnct_ne_array.tyh
+--       Date into SCCS   : 06/07/18 15:50:58
+--       Date fetched Out : 07/06/13 17:04:26
+--       SCCS Version     : 1.1
+--
+--   Author : Rob Coupe
+--
+--   NM3 Connectivity object - element array
+--
+-------------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+( ncne_array nm_cnct_ne_array_type
+ , MEMBER FUNCTION add_element ( p_row_id IN INTEGER, p_ne_id IN INTEGER, p_no_st IN INTEGER, p_no_end IN INTEGER, p_ne_length IN INTEGER ) RETURN nm_cnct_ne_array
+ , MEMBER FUNCTION distinct_elements RETURN int_array
+ , MEMBER FUNCTION get_elements_in_array( p_ia IN int_array ) RETURN nm_cnct_ne_array
+);
+/

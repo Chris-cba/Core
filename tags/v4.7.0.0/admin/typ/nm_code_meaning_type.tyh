@@ -1,0 +1,21 @@
+CREATE OR REPLACE type nm_code_meaning_type as object (
+-----------------------------------------------------------------------------
+--
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)nm_code_meaning_type.tyh	1.1 04/04/06
+--       Module Name      : nm_code_meaning_type.tyh
+--       Date into SCCS   : 06/04/04 15:28:37
+--       Date fetched Out : 07/06/13 17:04:30
+--       SCCS Version     : 1.1
+--
+--
+--   Author : %USERNAME%
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+   CODE varchar2(80)
+  ,MEANING varchar2(500)
+)
+/

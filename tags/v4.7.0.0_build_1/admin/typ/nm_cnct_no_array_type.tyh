@@ -1,0 +1,21 @@
+CREATE OR REPLACE TYPE nm_cnct_no_array_type AS
+-----------------------------------------------------------------------------
+--
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)nm_cnct_no_array_type.tyh	1.1 07/18/06
+--       Module Name      : nm_cnct_no_array_type.tyh
+--       Date into SCCS   : 06/07/18 15:52:35
+--       Date fetched Out : 07/06/13 17:04:29
+--       SCCS Version     : 1.1
+--
+--   Author : Rob Coupe
+--
+--   NM3 Connectivity object - node array type
+--
+-------------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+
+VARRAY(1048576) OF nm_cnct_no;
+/
