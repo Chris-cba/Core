@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE doc AS
 --<PACKAGE>
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/doc.pkh-arc   2.2   Sep 28 2007 16:10:34   dyounger  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/doc.pkh-arc   2.3   Jul 04 2013 14:31:28   James.Wadsworth  $
 --       Module Name      : $Workfile:   doc.pkh  $
---       Date into SCCS   : $Date:   Sep 28 2007 16:10:34  $
---       Date fetched Out : $Modtime:   Sep 28 2007 15:13:06  $
---       SCCS Version     : $Revision:   2.2  $
+--       Date into SCCS   : $Date:   Jul 04 2013 14:31:28  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:06  $
+--       SCCS Version     : $Revision:   2.3  $
 --       Based on SCCS Version     : 1.7
 --
 --
@@ -15,12 +15,12 @@ CREATE OR REPLACE PACKAGE doc AS
 --   DOCUMENTS application generic utilities package
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2000
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --</PACKAGE>
   /* SCCS ID keyword, do not remove */
 --<GLOBVAR>
-  g_sccsid	CONSTANT	VARCHAR2(2000) := '"$Revision:   2.2  $"'; --'"@(#)doc.pck	1.8 01/10/00"';
+  g_sccsid	CONSTANT	VARCHAR2(2000) := '"$Revision:   2.3  $"'; --'"@(#)doc.pck	1.8 01/10/00"';
 
   TYPE     t_dgt_tab     IS TABLE OF doc_gateways%ROWTYPE INDEX BY binary_integer;
   TYPE     t_docs_tab    IS TABLE OF docs%ROWTYPE INDEX BY binary_integer;
