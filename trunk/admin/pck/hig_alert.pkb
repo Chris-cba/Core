@@ -3,13 +3,15 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --3
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_alert.pkb-arc   3.16   Jul 25 2011 10:18:14   linesh.sorathia  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_alert.pkb-arc   3.17   Jul 04 2013 14:41:32   James.Wadsworth  $
 --       Module Name      : $Workfile:   hig_alert.pkb  $
---       Date into PVCS   : $Date:   Jul 25 2011 10:18:14  $
---       Date fetched Out : $Modtime:   Jul 25 2011 10:17:16  $
---       Version          : $Revision:   3.16  $
+--       Date into PVCS   : $Date:   Jul 04 2013 14:41:32  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:38:38  $
+--       Version          : $Revision:   3.17  $
 --       Based on SCCS version : 
--------------------------------------------------------------------------
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
 --
 --all global package variables here
 
@@ -17,7 +19,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid   CONSTANT varchar2(2000) := '$Revision:   3.16  $';
+  g_body_sccsid   CONSTANT varchar2(2000) := '$Revision:   3.17  $';
 
   c_date_format   CONSTANT varchar2(30) := 'DD-Mon-YYYY HH24:MI:SS';
   g_trigger_text  clob;
