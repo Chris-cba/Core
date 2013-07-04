@@ -1,0 +1,73 @@
+CREATE OR REPLACE PACKAGE WEBUTIL_DB AUTHID CURRENT_USER AS
+--<PACKAGE>
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/webutil_db.pkh-arc   3.1   Jul 04 2013 16:40:38   James.Wadsworth  $
+--       Module Name      : $Workfile:   webutil_db.pkh  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:40:38  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:22  $
+--       Version          : $Revision:   3.1  $
+--
+-------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+
+  -----------
+  --constants
+  -----------
+  --g_sccsid is the SCCS ID for the package
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.1  $';
+
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+
+
+
+/*********************************************************************************\
+ * WebUtil_DB - Database functions used by the WebUtil_File_Transfer
+ * Package.  These functions allow reading and writing direct
+ * to the specified BLOB in the database.
+ *  The functions should not be called externally from WebUtil
+ *********************************************************************************
+ * Version 1.0.0
+ *********************************************************************************
+ * Change History
+ *   DRMILLS 11/JAN/2003 - Creation
+ *
+\*********************************************************************************/
+
+  FUNCTION  OpenBlob(blobTable  in VARCHAR2,
+                     blobColumn in VARCHAR2,
+                     blobWhere  in VARCHAR2,
+                     openMode   in VARCHAR2,
+                     chunkSize  in PLS_INTEGER default null) return BOOLEAN;
+
+  FUNCTION  CloseBlob(checksum in PLS_INTEGER) return BOOLEAN;
+
+  PROCEDURE WriteData(data in VARCHAR2);
+
+  FUNCTION ReadData return VARCHAR;
+
+  FUNCTION GetLastError return PLS_INTEGER;
+
+  FUNCTION GetSourceLength  return PLS_INTEGER;
+
+  FUNCTION GetSourceChunks  return PLS_INTEGER;
+
+END WEBUTIL_DB;
+/
