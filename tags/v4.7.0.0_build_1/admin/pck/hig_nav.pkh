@@ -1,0 +1,623 @@
+Create or replace package hig_nav
+AS
+--<PACKAGE>
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_nav.pkh-arc   3.10   Jul 04 2013 14:47:36   James.Wadsworth  $
+--       Module Name      : $Workfile:   hig_nav.pkh  $
+--       Date into PVCS   : $Date:   Jul 04 2013 14:47:36  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:47:12  $
+--       Version          : $Revision:   3.10  $
+--       Based on SCCS version : 
+------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+------------------------------------------------------------------
+
+--</PACKAGE>
+--<GLOBVAR>
+
+  -----------
+  --constants
+  -----------
+  --g_sccsid is the SCCS ID for the package
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.10  $';
+
+  TYPE            l_tab_tab IS TABLE OF hig_navigator_type INDEX BY BINARY_INTEGER ;
+  l_tab           hig_navigator_tab  := hig_navigator_tab(hig_navigator_type(Null,Null,Null,Null,Null,Null));
+  --l_type          hig_navigator_type;       
+  id_tab          nav_id := nav_id(null);
+  return_id_tab   nav_id := nav_id(null);
+  l_hir_type      Varchar2(50) := 'Enquiries';
+
+  TYPE hie_type IS RECORD
+  (
+   parent    Varchar2(100)
+  ,child     Varchar2(100)
+  ,data      Varchar2(100)
+  ,label     varchar2(3000)
+  ,icon      varchar2(100)
+  ,tab_level Number(9));
+
+  l_type  hie_type ;
+  TYPE l_type_tab IS TABLE OF hie_type INDEX BY BINARY_INTEGER;
+  l_hie_tab l_type_tab;
+  l_t hig_nav.l_hie_tab%TYPE;
+ 
+  TYPE g_doc_rec_type IS RECORD 
+  (
+   doc_id   docs.doc_id%TYPE
+  ,label    Varchar2(1000));         
+  TYPE      g_doc_tab_type IS TABLE OF g_doc_rec_type INDEX BY BINARY_INTEGER;
+
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_primary_hierarchy">
+-- This function returns the Primary Hierarchy for the passed Table Name
+FUNCTION get_primary_hierarchy(pi_tab_name IN Varchar2) 
+RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_primary_hierarchy">
+-- This function validates the sql statement for syntax error
+FUNCTION validate_sql(pi_sql IN Varchar2) 
+RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_primary_hierarchy">
+-- This function returns the Primary Hierarchy for the passed Table Name
+FUNCTION get_hierarchy_cnt(pi_tab_name IN Varchar2)
+RETURN Number;
+--</PROC>
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="populate_tree">
+-- This Procedure populates the PLSQL table for the passed list of ID's
+PROCEDURE populate_tree(--pi_id  IN  nav_id
+                       pi_tab IN  Varchar2
+                      ,po_tab OUT Sys_Refcursor);
+--</PROC>
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_tab">
+-- This Function returns the Table of Type so it can be used in SQL
+FUNCTION get_tab(pi_tab hig_navigator_tab) RETURN hig_navigator_tab;
+--</PROC>
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="populate_id_in_tab">
+-- This Procedure builds the PLSQL table
+PROCEDURE populate_id_in_tab (pi_id Varchar2);
+--</PROC>
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="populate_id_in_tab">
+-- This Procedure builds the PLSQL table
+PROCEDURE populate_return_id_tab (pi_id Varchar2);
+--</PROC>
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ini_id_tab">
+-- This Procedure initialise the PLSQL table
+Procedure ini_id_tab;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ini_id_tab">
+-- This Procedure initialise the PLSQL table
+Procedure ini_return_id_tab;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ini_result_tab">
+-- This Procedure initialise the PLSQL table
+--Procedure ini_result_tab;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_Id_tab">
+-- This function returns the global plsql table 
+Function get_Id_tab Return nav_id;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_Id_tab">
+-- This function returns the global plsql table 
+Function get_return_Id_tab Return nav_id;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_Id_tab">
+-- This function returns the global plsql table 
+--Function get_result_tab Return hig_navigator_tab;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_hnv">
+-- This function returns the navigator row for pased table_name
+FUNCTION get_hnv  (pi_label IN VARCHAR2)  RETURN hig_navigator%ROWTYPE ;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="set_hierarchy_type">
+-- This Procedure sets the global hierarchy variable
+PROCEDURE set_hierarchy_type (pi_type hig_navigator.hnv_hierarchy_type%TYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_primary_module">
+-- This Function returns the Primary Module for each hierarchy
+FUNCTION  get_primary_module(pi_hierarchy_label hig_navigator_modules.hnm_hierarchy_label%TYPE) RETURN hig_navigator_modules%ROWTYPE ;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_module_param">
+-- This Function returns the Parameter to Run the Module
+FUNCTION  get_module_param(pi_module Varchar2,pi_hierarchy_label hig_navigator_modules.hnm_hierarchy_label%TYPE) RETURN hig_navigator_modules%ROWTYPE ;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nav_tab_for_gis">
+-- This Function returns the Table name for GIS Session Id
+FUNCTION  get_nav_tab_for_gis(pi_gis_session_id NUMBER) RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="pop_plsql_tab">
+-- Populate Navigator PlSQL tabel for passed GIs Session Id
+PROCEDURE pop_plsql_tab(pi_gis_session_id NUMBER);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_theme">
+-- Check if theme setup for passed ID and table name
+FUNCTION get_theme(pi_iit_id Varchar2,pi_tab_name Varchar2) RETURN BOOLEAN ;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="check_docs">
+-- Check if theme setup for passed ID and table name
+PROCEDURE check_docs(pi_id         IN Varchar2
+                    ,pi_table_name IN Varchar2
+                    ,po_table_name Out Varchar2
+                    ,po_doc_cnt    Out Number);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="populate_id_in_tab">
+-- This Procedure builds the PLSQL table
+--PROCEDURE populate_result_tab ;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="populate_id_in_tab">
+-- This Procedure builds the PLSQL table
+PROCEDURE get_column_displyed(pi_inv_type IN  nm_inv_types.nit_inv_type%TYPE
+                         ,po_cols     OUT Varchar2
+                         ,po_col_cnt  OUT Number);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_ial">
+-- This function return the domain value
+FUNCTION get_ial (pi_ial_domain        nm_inv_attri_lookup.ial_domain%TYPE
+                 ,pi_ial_value         nm_inv_attri_lookup.ial_value%TYPE
+                 ) RETURN nm_inv_attri_lookup.ial_meaning%TYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="populate_result_tab ">
+-- This procedure populates the result tab
+PROCEDURE  populate_result_tab (pi_sql IN Varchar2);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_column_datatype">
+-- This Procedure builds the PLSQL table
+FUNCTION get_ita_for_seq(pi_inv_type IN  nm_inv_types.nit_inv_type%TYPE
+                             ,pi_seq_no  IN  Number) RETURN nm_inv_type_attribs%ROWTYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="validate_query_name">
+-- This function checks the uniqueness of the Query Name
+FUNCTION get_hnm_rec(pi_module hig_navigator_modules.hnm_module_name%TYPE ) RETURN hig_navigator_modules%ROWTYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="validate_query_name">
+-- This function checks the uniqueness of the Query Name
+FUNCTION get_hnm_for_column(pi_module      IN hig_navigator_modules.hnm_module_name%TYPE 
+                           ,pi_column_name IN Varchar2 )
+RETURN hig_navigator_modules%ROWTYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="validate_query_name">
+-- This function checks the uniqueness of the Query Name
+PROCEDURE get_pk_column(pi_inv_type IN  nm_inv_types.nit_inv_type%TYPE 
+                       ,po_col_name OUT nm_inv_type_attribs.ita_attrib_name%TYPE
+                       ,po_seq_no   OUT Number);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_column_datatype">
+-- This Procedure builds the PLSQL table
+FUNCTION get_hnv (pi_label IN VARCHAR2,pi_hierarchy hig_navigator.hnv_hierarchy_type%TYPE)  
+RETURN hig_navigator%ROWTYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="return_number">
+-- This functions returns the passed varchar id into number
+FUNCTION return_number(pi_das_rec_id IN Varchar2)  
+RETURN Number;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_tma_works_ref">
+-- This functions returns the tma_works_ref
+FUNCTION get_tma_works_ref(pi_works_id IN NUMBER)  
+RETURN Varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_hig_code_meaning">
+-- This functions returns the meaning of the hig code
+FUNCTION get_hig_code_meaning (pi_hco_domain IN hig_codes.hco_domain%TYPE
+                              ,pi_hco_value IN hig_codes.hco_code%TYPE)
+Return Varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_hig_code_meaning">
+-- This functions checks if there is any enquiry against passed id
+FUNCTION check_enquiry(pi_doc_id Number)
+Return Varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="is_enquiry">
+-- This functions checks if the passed code is of Enquiry Type
+FUNCTION is_enquiry(pi_doc_dtp_code Varchar2)
+Return Varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="is_enquiry">
+-- This functions returns the budget description
+FUNCTION get_budget_descr(pi_bud_sys_flag              Varchar2
+                         ,pi_bud_icb_item_code         Varchar2
+                         ,pi_bud_icb_sub_item_code     Varchar2
+                         ,pi_bud_icb_sub_sub_item_code Varchar2
+                         ,pi_bud_agency                Varchar2)
+Return Varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_doc_status_code">
+-- This functions checks if the passed code is of Enquiry Type
+FUNCTION get_doc_status_code(pi_doc_id Number)
+Return Varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_doc_status_code">
+-- This functions checks if the passed code is of Enquiry Type
+FUNCTION get_doc_dtp_code(pi_doc_id Number)
+Return Varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_doc_status_code">
+-- This functions checks if the passed code is of Enquiry Type
+FUNCTION get_doc_dcl_code(pi_doc_id Number)
+Return Varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_doc_status_code">
+-- This functions checks if the passed code is of Enquiry Type
+Function get_road_descr(pi_road_id nm_elements.ne_id%TYPE)
+Return Varchar2 ;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_doc_status_code">
+-- This functions checks if the passed code is of Enquiry Type
+Function get_contract_det(pi_con_id Number)
+Return Varchar2 ;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_doc_status_code">
+-- This functions checks if the passed code is of Enquiry Type
+Function get_asset_descr(pi_inv_type nm_inv_types.nit_inv_type%TYPE)
+Return Varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_doc_status_code">
+-- This functions checks if the passed code is of Enquiry Type
+FUNCTION get_doc_compl_type(pi_doc_id Number)
+Return Varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_doc_status_code">
+-- This functions checks if the passed code is of Enquiry Type
+Function get_hig_user_initials(pi_user_id hig_users.hus_user_id%TYPE)
+Return Varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_doc_status_code">
+-- This functions checks if the passed code is of Enquiry Type
+FUNCTION get_bud_balance(pi_value Number,pi_committed Number,pi_actual Number)
+Return Varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_doc_status_code">
+-- This functions checks if the passed code is of Enquiry Type
+FUNCTION get_doc_descr(pi_doc_id Number)
+Return Varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_doc_status_code">
+-- This functions checks if the passed code is of Enquiry Type
+FUNCTION get_doc_compl_location(pi_doc_id Number)
+Return Varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_doc_status_code">
+-- This functions checks if the passed code is of Enquiry Type
+FUNCTION  get_primary_module(pi_table_name hig_navigator_modules.hnm_table_name%TYPE) 
+RETURN hig_navigator_modules%ROWTYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_doc_status_code">
+-- This functions checks if the passed code is of Enquiry Type
+FUNCTION concate_label(pi_value IN Varchar2)
+Return Varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_doc_status_code">
+-- This functions checks if the query is used in Alert
+FUNCTION check_query_used(pi_hqt_id hig_query_types.hqt_id%TYPE)
+Return Boolean;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_doc_status_code">
+-- This functions returns the tma details for passed tma workss id
+Function tma_notice_details(pi_tma_works_id Number)
+Return Varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_doc_status_code">
+-- This functions returns the meaning of the passed id form ita_query 
+FUNCTION get_ita_meaning(p_inv_type  IN  Varchar2
+                        ,p_attribute IN  Varchar2
+                        ,p_value     IN  Varchar2)    
+Return Varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_doc_status_code">
+-- This procedure removes the passed value from PL/SQL table
+PROCEDURE remove_return_id(pi_value IN Varchar2);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_doc_status_code">
+-- This function returns the wor_flag for passed wor/wol
+FUNCTION get_wor_flag(pi_label IN Varchar2
+                     ,pi_value IN Varchar2)
+Return Varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_doc_status_code">
+-- This function returns the wor_flag for passed wor/wol
+FUNCTION build_child_sql(pi_start_alias IN Varchar2
+                        ,pi_end_alias   IN Varchar2
+                        ,pi_id          IN VARCHAR2
+                        ,pi_rownum      IN NUMBER   Default Null 
+                        ,pi_par_chi     IN Varchar2 Default Null)
+Return Varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_doc_status_code">
+-- This function returns the wor_flag for passed wor/wol
+PROCEDURE get_top_par(pi_id    IN Varchar2
+                     ,pi_alias IN Varchar2);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_road_unique">
+-- This function returns the road unique for passed road_id
+Function get_road_unique(pi_road_id nm_elements.ne_id%TYPE)
+Return Varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_doc_status_code">
+-- This function returns the wor_flag for passed wor/wol
+FUNCTION get_docs_tab(pi_id         IN  Varchar2
+                     ,pi_table_name IN  Varchar2)
+RETURN g_doc_tab_type ;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_doc_status_code">
+-- This function returns the wor_flag for passed wor/wol
+FUNCTION get_return_tab_cnt RETURN Number ;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="is_product_licensed">
+-- This function returns 'Y' is the produt passed is licensed
+FUNCTION is_product_licensed ( pi_product varchar2 )
+RETURN   VARCHAR2 ;
+--</PROC>
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_asset_node_label">
+-- This function returns Asset node label for the given asset id. 
+FUNCTION get_asset_node_label( pi_iit_ne_id Number )
+RETURN   VARCHAR2 ;
+--</PROC>
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_asset_type_descr">
+-- This function returns Asset type description for the given asset type. 
+FUNCTION get_asset_type_descr(pi_nit_inv_type nm_inv_types.nit_inv_type%TYPE )
+RETURN   VARCHAR2 ;
+--</PROC>
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_admin_unit_name">
+-- This function returns the admin unti name for the given admin unit ID. 
+FUNCTION get_admin_unit_name(pi_admin_unit nm_admin_units.nau_admin_unit%TYPE )
+RETURN   VARCHAR2 ;
+--</PROC>
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_schedule_name">
+-- This function returns the schedule name for the given schedule ID. 
+FUNCTION get_schedule_name(pi_schedule_id Number )
+RETURN   VARCHAR2 ;
+--</PROC>
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_schedule_work_category">
+-- This function returns the schedule work category for the given schedule ID. 
+FUNCTION get_schedule_work_category(pi_schedule_id Number )
+RETURN   VARCHAR2 ;
+--</PROC>
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_schedule_road_group_id">
+-- This function returns the schedule road group id for the given schedule ID. 
+FUNCTION get_schedule_road_group_id(pi_schedule_id Number )
+RETURN   VARCHAR2 ;
+--</PROC>
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_scheme_id">
+-- This function returns the scheme unique id for the given scheme id. 
+FUNCTION get_scheme_id(pi_scheme_id Number )
+RETURN   VARCHAR2 ;
+--</PROC>
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_scheme_status">
+-- This function returns the scheme status for the given scheme id. 
+FUNCTION get_scheme_status(pi_scheme_id Number )
+RETURN   VARCHAR2 ;
+--</PROC>
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_scheme_name">
+-- This function returns the scheme name for the given scheme id. 
+FUNCTION get_scheme_name(pi_scheme_id Number )
+RETURN   VARCHAR2 ;
+--</PROC>
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_scheme_fy_id">
+-- This function returns the scheme financial year id for the given scheme id. 
+FUNCTION get_scheme_fy_id(pi_scheme_id Number )
+RETURN   VARCHAR2 ;
+--</PROC>
+-----------------------------------------------------------------------------
+--
+--<PRAGMA>
+  PRAGMA RESTRICT_REFERENCES(get_version, RNDS, WNPS, WNDS);
+  PRAGMA RESTRICT_REFERENCES(get_body_version, RNDS, WNPS, WNDS);
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+End hig_nav;
+/
+

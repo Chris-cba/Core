@@ -1,0 +1,55 @@
+CREATE OR REPLACE package hig_health as
+--<PACKAGE>
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)hig_health.pkh	1.1 06/26/03
+--       Module Name      : hig_health.pkh
+--       Date into SCCS   : 03/06/26 10:42:28
+--       Date fetched Out : 07/06/13 14:10:24
+--       SCCS Version     : 1.1
+--
+--
+--   Author : Graeme Johnson
+--
+--   Contains functions/procedures required to perform database healthcheck
+--   Package is called through the GRI (module HIG2100) and the use of wrapper script (HIG2100.sql)
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+  g_sccsid      CONSTANT  VARCHAR2(2000) := '"@(#)hig_health.pkh	1.1 06/26/03"';
+--  g_sccsid is the SCCS ID for the package
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE main(pi_job_id      IN     gri_run_parameters.grp_job_id%TYPE);
+--
+-----------------------------------------------------------------------------
+--
+--<PRAGMA>
+   PRAGMA RESTRICT_REFERENCES (get_version, WNPS, WNDS);
+   PRAGMA RESTRICT_REFERENCES (get_body_version, WNPS, WNDS);
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+end hig_health;
+/
+
