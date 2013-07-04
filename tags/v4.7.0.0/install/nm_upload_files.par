@@ -1,0 +1,16 @@
+# -------------------------------------------------------------------------
+#  SCCS Identifiers :-
+# 
+#        sccsid           : '"@(#)nm_upload_files.par	1.1 04/16/04"'
+#        Module Name      : '"nm_upload_files.par"'
+#        Date into SCCS   : '"04/04/16 14:12:35"'
+#        Date fetched Out : '"07/06/13 13:57:16"'
+#        SCCS Version     : '"1.1"'
+# 
+# -------------------------------------------------------------------------
+# Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved
+# -------------------------------------------------------------------------
+TABLES=NM_UPLOAD_FILES
+IGNORE=Y
+FILE=nm_upload_files.dmp
+LOG=nm_upload_files.log
