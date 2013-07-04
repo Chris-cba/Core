@@ -16,7 +16,7 @@ CREATE OR REPLACE PACKAGE BODY nm_debug AS
 --   Debug Package body
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2000
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 --all global package variables here

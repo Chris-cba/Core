@@ -11,7 +11,7 @@ CREATE OR REPLACE PACKAGE BODY NM3_inv_locations AS
 --
 --   Author : P. Stanton 
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2005 
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 ---------------------------------------------------------------------------
