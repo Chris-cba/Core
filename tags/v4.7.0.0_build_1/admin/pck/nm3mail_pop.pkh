@@ -1,0 +1,614 @@
+create or replace package nm3mail_pop AUTHID CURRENT_USER as
+--<PACKAGE>
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mail_pop.pkh-arc   2.3   Jul 04 2013 16:14:38   James.Wadsworth  $
+--       Module Name      : $Workfile:   nm3mail_pop.pkh  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:14:38  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:16  $
+--       Version          : $Revision:   2.3  $
+--       Based on SCCS version : 1.1
+-------------------------------------------------------------------------
+--   Author : Jonathan Mills
+--
+--   NM3 POP Mail Processing package
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.3  $';
+--  g_sccsid is the SCCS ID for the package
+--
+   TYPE tab_nmps  IS TABLE OF nm_mail_pop_servers%ROWTYPE            INDEX BY BINARY_INTEGER;
+   TYPE tab_nmpm  IS TABLE OF nm_mail_pop_messages%ROWTYPE           INDEX BY BINARY_INTEGER;
+   TYPE tab_nmpmh IS TABLE OF nm_mail_pop_message_headers%ROWTYPE    INDEX BY BINARY_INTEGER;
+   TYPE tab_nmpmd IS TABLE OF nm_mail_pop_message_details%ROWTYPE    INDEX BY BINARY_INTEGER;
+   TYPE tab_nmpmr IS TABLE OF nm_mail_pop_message_raw%ROWTYPE        INDEX BY BINARY_INTEGER;
+   TYPE tab_nmpp  IS TABLE OF nm_mail_pop_processes%ROWTYPE          INDEX BY BINARY_INTEGER;
+   TYPE tab_nmppc IS TABLE OF nm_mail_pop_process_conditions%ROWTYPE INDEX BY BINARY_INTEGER;
+--
+   g_nmpm_nmps_id nm_mail_pop_messages.nmpm_nmps_id%TYPE;
+   g_tab_nmpm     tab_nmpm;
+   g_tab_nmppc    tab_nmppc;
+--
+   c_unprocessed     CONSTANT  nm_mail_pop_messages.nmpm_status%TYPE := 'UNPROCESSED';
+   c_processing      CONSTANT  nm_mail_pop_messages.nmpm_status%TYPE := 'PROCESSING';
+   c_processed       CONSTANT  nm_mail_pop_messages.nmpm_status%TYPE := 'PROCESSED';
+   c_error           CONSTANT  nm_mail_pop_messages.nmpm_status%TYPE := 'ERROR';
+--
+   c_header_field_domain CONSTANT hig_domains.hdo_domain%TYPE := 'POP3_HEADER_FIELDS';
+--
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="receive_all_accounts">
+--
+PROCEDURE receive_all_accounts;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="receive_individual_account">
+PROCEDURE receive_individual_account (pi_nmps_id nm_mail_pop_servers.nmps_id%TYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="process_all_accounts">
+--
+PROCEDURE process_all_accounts;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="process_individual_account">
+PROCEDURE process_individual_account (pi_nmps_id nm_mail_pop_servers.nmps_id%TYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="process_rule_by_account">
+PROCEDURE process_rule_by_account (pi_nmps_id  nm_mail_pop_servers.nmps_id%TYPE
+                                  ,pi_rec_nmpp nm_mail_pop_processes%ROWTYPE
+                                  );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="retrieve_all_message_data">
+PROCEDURE retrieve_all_message_data (pi_nmpm_id   IN     nm_mail_pop_messages.nmpm_id%TYPE
+                                    ,po_rec_nmpm     OUT nm_mail_pop_messages%ROWTYPE
+                                    ,po_tab_nmpmh    OUT tab_nmpmh
+                                    ,po_tab_nmpmd    OUT tab_nmpmd
+                                    ,po_tab_nmpmr    OUT tab_nmpmr
+                                    );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="store_nmps_from_instead_of_trg">
+PROCEDURE store_nmps_from_instead_of_trg
+                            (pi_rec_nmps_old nm_mail_pop_servers%ROWTYPE
+                            ,pi_rec_nmps_new nm_mail_pop_servers%ROWTYPE
+                            ,pi_inserting    BOOLEAN
+                            ,pi_updating     BOOLEAN
+                            ,pi_deleting     BOOLEAN
+                            );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_header_field_hdo_domain">
+-- Returns the name of the domain used for the header fields
+--
+FUNCTION get_header_field_hdo_domain RETURN hig_domains.hdo_domain%TYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="validate_nmpp_procedure">
+PROCEDURE validate_nmpp_procedure (pi_nmpp_procedure nm_mail_pop_processes.nmpp_procedure%TYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_nmps">
+-- Debug a ROWTYPE record
+PROCEDURE debug_nmps (pi_rec_nmps nm_mail_pop_servers%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_nmpm">
+-- Debug a ROWTYPE record
+PROCEDURE debug_nmpm (pi_rec_nmpm nm_mail_pop_messages%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_nmpmh">
+-- Debug a ROWTYPE record
+PROCEDURE debug_nmpmh (pi_rec_nmpmh nm_mail_pop_message_headers%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_nmpmd">
+-- Debug a ROWTYPE record
+PROCEDURE debug_nmpmd (pi_rec_nmpmd nm_mail_pop_message_details%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_nmpp">
+-- Debug a ROWTYPE record
+PROCEDURE debug_nmpp (pi_rec_nmpp nm_mail_pop_processes%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_nmppc">
+-- Debug a ROWTYPE record
+PROCEDURE debug_nmppc (pi_rec_nmppc nm_mail_pop_process_conditions%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="del_nmps">
+--
+--   Procedure to del using NMPS_PK constraint
+--
+PROCEDURE del_nmps (pi_nmps_id           nm_mail_pop_servers.nmps_id%TYPE
+                   ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                   ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                   ,pi_locked_sqlcode    PLS_INTEGER DEFAULT -20000
+                   );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="del_nmpm">
+--
+--   Procedure to del using NMPM_PK constraint
+--
+PROCEDURE del_nmpm (pi_nmpm_id           nm_mail_pop_messages.nmpm_id%TYPE
+                   ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                   ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                   ,pi_locked_sqlcode    PLS_INTEGER DEFAULT -20000
+                   );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="del_nmpmh">
+--
+--   Procedure to del using NMPMH_PK constraint
+--
+PROCEDURE del_nmpmh (pi_nmpmh_nmpm_id      nm_mail_pop_message_headers.nmpmh_nmpm_id%TYPE
+                    ,pi_nmpmh_header_field nm_mail_pop_message_headers.nmpmh_header_field%TYPE
+                    ,pi_raise_not_found    BOOLEAN     DEFAULT TRUE
+                    ,pi_not_found_sqlcode  PLS_INTEGER DEFAULT -20000
+                    ,pi_locked_sqlcode     PLS_INTEGER DEFAULT -20000
+                    );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="del_nmpmd">
+--
+--   Procedure to del using NMPMD_PK constraint
+--
+PROCEDURE del_nmpmd (pi_nmpmd_nmpm_id     nm_mail_pop_message_details.nmpmd_nmpm_id%TYPE
+                    ,pi_nmpmd_line_number nm_mail_pop_message_details.nmpmd_line_number%TYPE
+                    ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                    ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                    ,pi_locked_sqlcode    PLS_INTEGER DEFAULT -20000
+                    );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="del_nmpp">
+--
+--   Procedure to del using NMPP_PK constraint
+--
+PROCEDURE del_nmpp (pi_nmpp_id           nm_mail_pop_processes.nmpp_id%TYPE
+                   ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                   ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                   ,pi_locked_sqlcode    PLS_INTEGER DEFAULT -20000
+                   );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="del_nmppc">
+--
+--   Procedure to del using NMPPC_PK constraint
+--
+PROCEDURE del_nmppc (pi_nmppc_nmpp_id      nm_mail_pop_process_conditions.nmppc_nmpp_id%TYPE
+                    ,pi_nmppc_header_field nm_mail_pop_process_conditions.nmppc_header_field%TYPE
+                    ,pi_raise_not_found    BOOLEAN     DEFAULT TRUE
+                    ,pi_not_found_sqlcode  PLS_INTEGER DEFAULT -20000
+                    ,pi_locked_sqlcode     PLS_INTEGER DEFAULT -20000
+                    );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nmps">
+--
+--   Function to get using NMPS_PK constraint
+--
+FUNCTION get_nmps (pi_nmps_id           nm_mail_pop_servers.nmps_id%TYPE
+                  ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                  ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                  ) RETURN nm_mail_pop_servers%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nmps, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nmpm">
+--
+--   Function to get using NMPM_PK constraint
+--
+FUNCTION get_nmpm (pi_nmpm_id           nm_mail_pop_messages.nmpm_id%TYPE
+                  ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                  ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                  ) RETURN nm_mail_pop_messages%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nmpm, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nmpmh">
+--
+--   Function to get using NMPMH_PK constraint
+--
+FUNCTION get_nmpmh (pi_nmpmh_nmpm_id      nm_mail_pop_message_headers.nmpmh_nmpm_id%TYPE
+                   ,pi_nmpmh_header_field nm_mail_pop_message_headers.nmpmh_header_field%TYPE
+                   ,pi_raise_not_found    BOOLEAN     DEFAULT TRUE
+                   ,pi_not_found_sqlcode  PLS_INTEGER DEFAULT -20000
+                   ) RETURN nm_mail_pop_message_headers%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nmpmh, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nmpmd">
+--
+--   Function to get using NMPMD_PK constraint
+--
+FUNCTION get_nmpmd (pi_nmpmd_nmpm_id     nm_mail_pop_message_details.nmpmd_nmpm_id%TYPE
+                   ,pi_nmpmd_line_number nm_mail_pop_message_details.nmpmd_line_number%TYPE
+                   ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                   ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                   ) RETURN nm_mail_pop_message_details%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nmpmd, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nmpp">
+--
+--   Function to get using NMPP_PK constraint
+--
+FUNCTION get_nmpp (pi_nmpp_id           nm_mail_pop_processes.nmpp_id%TYPE
+                  ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                  ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                  ) RETURN nm_mail_pop_processes%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nmpp, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nmppc">
+--
+--   Function to get using NMPPC_PK constraint
+--
+FUNCTION get_nmppc (pi_nmppc_nmpp_id      nm_mail_pop_process_conditions.nmppc_nmpp_id%TYPE
+                   ,pi_nmppc_header_field nm_mail_pop_process_conditions.nmppc_header_field%TYPE
+                   ,pi_raise_not_found    BOOLEAN     DEFAULT TRUE
+                   ,pi_not_found_sqlcode  PLS_INTEGER DEFAULT -20000
+                   ) RETURN nm_mail_pop_process_conditions%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nmppc, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nmps_v">
+-- Inserts a ROWTYPE record into nm_mail_pop_servers_v
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_nmps_v (p_rec_nmps_v IN OUT nm_mail_pop_servers_v%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nmpm">
+-- Inserts a ROWTYPE record into nm_mail_pop_messages
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_nmpm (p_rec_nmpm IN OUT nm_mail_pop_messages%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nmpmh">
+-- Inserts a ROWTYPE record into nm_mail_pop_message_headers
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_nmpmh (p_rec_nmpmh IN OUT nm_mail_pop_message_headers%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nmpmd">
+-- Inserts a ROWTYPE record into nm_mail_pop_message_details
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_nmpmd (p_rec_nmpmd IN OUT nm_mail_pop_message_details%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nmpmr">
+-- Inserts a ROWTYPE record into nm_mail_pop_message_raw
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_nmpmr (p_rec_nmpmr IN OUT nm_mail_pop_message_raw%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nmpp">
+-- Inserts a ROWTYPE record into nm_mail_pop_processes
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_nmpp (p_rec_nmpp IN OUT nm_mail_pop_processes%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nmppc">
+-- Inserts a ROWTYPE record into nm_mail_pop_process_conditions
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_nmppc (p_rec_nmppc IN OUT nm_mail_pop_process_conditions%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nmppe">
+-- Inserts a ROWTYPE record into nm_mail_pop_process_conditions
+-- Returns the ROWTYPE record as inserted - trigger modified values
+--
+PROCEDURE ins_nmppe (p_rec_nmppe IN OUT nm_mail_pop_processing_errors%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="lock_nmps">
+--
+--   Function to lock using NMPS_PK constraint
+--
+FUNCTION lock_nmps (pi_nmps_id           nm_mail_pop_servers.nmps_id%TYPE
+                   ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                   ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                   ,pi_locked_sqlcode    PLS_INTEGER DEFAULT -20000
+                   ) RETURN ROWID;
+--
+--   Procedure to lock using NMPS_PK constraint
+--
+PROCEDURE lock_nmps (pi_nmps_id           nm_mail_pop_servers.nmps_id%TYPE
+                    ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                    ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                    ,pi_locked_sqlcode    PLS_INTEGER DEFAULT -20000
+                    );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="lock_nmpm">
+--
+--   Function to lock using NMPM_PK constraint
+--
+FUNCTION lock_nmpm (pi_nmpm_id           nm_mail_pop_messages.nmpm_id%TYPE
+                   ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                   ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                   ,pi_locked_sqlcode    PLS_INTEGER DEFAULT -20000
+                   ) RETURN ROWID;
+--
+--   Procedure to lock using NMPM_PK constraint
+--
+PROCEDURE lock_nmpm (pi_nmpm_id           nm_mail_pop_messages.nmpm_id%TYPE
+                    ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                    ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                    ,pi_locked_sqlcode    PLS_INTEGER DEFAULT -20000
+                    );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="lock_nmpmh">
+--
+--   Function to lock using NMPMH_PK constraint
+--
+FUNCTION lock_nmpmh (pi_nmpmh_nmpm_id      nm_mail_pop_message_headers.nmpmh_nmpm_id%TYPE
+                    ,pi_nmpmh_header_field nm_mail_pop_message_headers.nmpmh_header_field%TYPE
+                    ,pi_raise_not_found    BOOLEAN     DEFAULT TRUE
+                    ,pi_not_found_sqlcode  PLS_INTEGER DEFAULT -20000
+                    ,pi_locked_sqlcode     PLS_INTEGER DEFAULT -20000
+                    ) RETURN ROWID;
+--
+--   Procedure to lock using NMPMH_PK constraint
+--
+PROCEDURE lock_nmpmh (pi_nmpmh_nmpm_id      nm_mail_pop_message_headers.nmpmh_nmpm_id%TYPE
+                     ,pi_nmpmh_header_field nm_mail_pop_message_headers.nmpmh_header_field%TYPE
+                     ,pi_raise_not_found    BOOLEAN     DEFAULT TRUE
+                     ,pi_not_found_sqlcode  PLS_INTEGER DEFAULT -20000
+                     ,pi_locked_sqlcode     PLS_INTEGER DEFAULT -20000
+                     );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="lock_nmpmd">
+--
+--   Function to lock using NMPMD_PK constraint
+--
+FUNCTION lock_nmpmd (pi_nmpmd_nmpm_id     nm_mail_pop_message_details.nmpmd_nmpm_id%TYPE
+                    ,pi_nmpmd_line_number nm_mail_pop_message_details.nmpmd_line_number%TYPE
+                    ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                    ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                    ,pi_locked_sqlcode    PLS_INTEGER DEFAULT -20000
+                    ) RETURN ROWID;
+--
+--   Procedure to lock using NMPMD_PK constraint
+--
+PROCEDURE lock_nmpmd (pi_nmpmd_nmpm_id     nm_mail_pop_message_details.nmpmd_nmpm_id%TYPE
+                     ,pi_nmpmd_line_number nm_mail_pop_message_details.nmpmd_line_number%TYPE
+                     ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                     ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                     ,pi_locked_sqlcode    PLS_INTEGER DEFAULT -20000
+                     );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="lock_nmpp">
+--
+--   Function to lock using NMPP_PK constraint
+--
+FUNCTION lock_nmpp (pi_nmpp_id           nm_mail_pop_processes.nmpp_id%TYPE
+                   ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                   ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                   ,pi_locked_sqlcode    PLS_INTEGER DEFAULT -20000
+                   ) RETURN ROWID;
+--
+--   Procedure to lock using NMPP_PK constraint
+--
+PROCEDURE lock_nmpp (pi_nmpp_id           nm_mail_pop_processes.nmpp_id%TYPE
+                    ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                    ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                    ,pi_locked_sqlcode    PLS_INTEGER DEFAULT -20000
+                    );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="lock_nmppc">
+--
+--   Function to lock using NMPPC_PK constraint
+--
+FUNCTION lock_nmppc (pi_nmppc_nmpp_id      nm_mail_pop_process_conditions.nmppc_nmpp_id%TYPE
+                    ,pi_nmppc_header_field nm_mail_pop_process_conditions.nmppc_header_field%TYPE
+                    ,pi_raise_not_found    BOOLEAN     DEFAULT TRUE
+                    ,pi_not_found_sqlcode  PLS_INTEGER DEFAULT -20000
+                    ,pi_locked_sqlcode     PLS_INTEGER DEFAULT -20000
+                    ) RETURN ROWID;
+--
+--   Procedure to lock using NMPPC_PK constraint
+--
+PROCEDURE lock_nmppc (pi_nmppc_nmpp_id      nm_mail_pop_process_conditions.nmppc_nmpp_id%TYPE
+                     ,pi_nmppc_header_field nm_mail_pop_process_conditions.nmppc_header_field%TYPE
+                     ,pi_raise_not_found    BOOLEAN     DEFAULT TRUE
+                     ,pi_not_found_sqlcode  PLS_INTEGER DEFAULT -20000
+                     ,pi_locked_sqlcode     PLS_INTEGER DEFAULT -20000
+                     );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="next_nmpp_id_seq">
+-- Returns NMPP_ID_SEQ.NEXTVAL
+FUNCTION next_nmpp_id_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (next_nmpp_id_seq, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="curr_nmpp_id_seq">
+-- Returns NMPP_ID_SEQ.CURRVAL
+FUNCTION curr_nmpp_id_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (curr_nmpp_id_seq, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="next_nmpm_id_seq">
+-- Returns NMPM_ID_SEQ.NEXTVAL
+FUNCTION next_nmpm_id_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (next_nmpm_id_seq, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="curr_nmpm_id_seq">
+-- Returns NMPM_ID_SEQ.CURRVAL
+FUNCTION curr_nmpm_id_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (curr_nmpm_id_seq, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="next_nmps_id_seq">
+-- Returns NMPS_ID_SEQ.NEXTVAL
+FUNCTION next_nmps_id_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (next_nmps_id_seq, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="curr_nmps_id_seq">
+-- Returns NMPS_ID_SEQ.CURRVAL
+FUNCTION curr_nmps_id_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (curr_nmps_id_seq, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="submit_retrieve_mail_job">
+PROCEDURE submit_retrieve_mail_job (p_every_n_minutes number DEFAULT 5);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PRAGMA>
+   PRAGMA RESTRICT_REFERENCES (get_version, RNDS, WNPS, WNDS, TRUST);
+   PRAGMA RESTRICT_REFERENCES (get_body_version, RNDS, WNPS, WNDS, TRUST);
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+end nm3mail_pop;
+/
