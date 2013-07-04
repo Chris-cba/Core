@@ -5,24 +5,24 @@ AS
 --
 --   SCCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_edit.pkh-arc   2.6   May 17 2011 08:26:26   Steve.Cooper  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_edit.pkh-arc   2.7   Jul 04 2013 16:22:20   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3sdo_edit.pkh  $
---       Date into SCCS   : $Date:   May 17 2011 08:26:26  $
---       Date fetched Out : $Modtime:   Apr 01 2011 14:03:24  $
---       SCCS Version     : $Revision:   2.6  $
+--       Date into SCCS   : $Date:   Jul 04 2013 16:22:20  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 15:52:10  $
+--       SCCS Version     : $Revision:   2.7  $
 --
 --  Author :  R Coupe
 --            A Edwards
 --
 --  Editing Oracle Spatial features package
 --
------------------------------------------------------------------------------
---  Copyright (c) exor corporation ltd, 2004
------------------------------------------------------------------------------
+------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+------------------------------------------------------------------
 --
 --</PACKAGE>
 --<GLOBVAR>
-    g_sccsid      CONSTANT  VARCHAR2(2000) := '$Revision:   2.6  $';
+    g_sccsid      CONSTANT  VARCHAR2(2000) := '$Revision:   2.7  $';
 --  g_sccsid is the SCCS ID for the package
 --</GLOBVAR>
 -----------------------------------------------------------------------------

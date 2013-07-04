@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3sdo_Edit AS
 --
 --   SCCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_edit.pkb-arc   2.19   Aug 31 2012 17:37:36   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_edit.pkb-arc   2.20   Jul 04 2013 16:22:20   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3sdo_edit.pkb  $
---       Date into SCCS   : $Date:   Aug 31 2012 17:37:36  $
---       Date fetched Out : $Modtime:   Aug 31 2012 17:36:42  $
---       SCCS Version     : $Revision:   2.19  $
+--       Date into SCCS   : $Date:   Jul 04 2013 16:22:20  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 15:51:48  $
+--       SCCS Version     : $Revision:   2.20  $
 --
 --
 --  Author :  R Coupe
@@ -15,15 +15,15 @@ CREATE OR REPLACE PACKAGE BODY Nm3sdo_Edit AS
 --
 --  Editing Oracle Spatial features package
 --
------------------------------------------------------------------------------
---  Copyright (c) exor corporation ltd, 2005
------------------------------------------------------------------------------
+------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+------------------------------------------------------------------
 --
   -----------
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid   CONSTANT  VARCHAR2(2000)  :=  '$Revision:   2.19  $';
+  g_body_sccsid   CONSTANT  VARCHAR2(2000)  :=  '$Revision:   2.20  $';
   g_package_name  CONSTANT  VARCHAR2(30)    :=  'nm3sdo_edit';
 --
 -----------------------------------------------------------------------------
