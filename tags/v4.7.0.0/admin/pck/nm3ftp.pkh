@@ -1,0 +1,335 @@
+CREATE OR REPLACE PACKAGE nm3ftp AUTHID CURRENT_USER
+AS
+--
+--------------------------------------------------------------------------------
+--   PVCS Identifiers :-
+--
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ftp.pkh-arc   3.9   Jul 04 2013 15:33:50   James.Wadsworth  $
+--       Module Name      : $Workfile:   nm3ftp.pkh  $
+--       Date into PVCS   : $Date:   Jul 04 2013 15:33:50  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 15:30:42  $
+--       PVCS Version     : $Revision:   3.9  $
+--
+------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+------------------------------------------------------------------
+--
+  g_sccsid constant varchar2(30) :='"$Revision:   3.9  $"';
+--
+-----------------------------------------------------------------------------
+--
+  TYPE rec_results IS RECORD ( l_result_line nm3type.max_varchar2 );
+  TYPE tab_results IS TABLE OF rec_results INDEX BY BINARY_INTEGER;
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+
+  FUNCTION get_version RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+  FUNCTION get_body_version RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+   TYPE t_string_table IS TABLE OF VARCHAR2 (32767);
+   TYPE g_rec_ftp_outcome IS RECORD ( ftp_htc_id  NUMBER
+                                    , ftp_type    VARCHAR2(100)
+                                    , ftp_filename VARCHAR2(2000)
+                                    , ftp_outcome  VARCHAR(10)
+                                    , ftp_outcome_error VARCHAR(2000)
+                                    );
+   TYPE g_tab_ftp_outcome_type IS TABLE OF g_rec_ftp_outcome;
+   g_tab_ftp_outcome g_tab_ftp_outcome_type:= g_tab_ftp_outcome_type();
+--
+--------------------------------------------------------------------------------
+--
+  FUNCTION obfuscate_password ( pi_password IN VARCHAR2 )
+  RETURN VARCHAR2;
+--
+--------------------------------------------------------------------------------
+--
+   FUNCTION login (
+      p_host      IN   VARCHAR2,
+      p_port      IN   VARCHAR2,
+      p_user      IN   VARCHAR2,
+      p_pass      IN   VARCHAR2,
+      p_timeout   IN   NUMBER  DEFAULT NULL
+   )
+      RETURN UTL_TCP.connection;
+--
+--------------------------------------------------------------------------------
+--
+   FUNCTION get_passive (p_conn IN OUT NOCOPY UTL_TCP.connection)
+      RETURN UTL_TCP.connection;
+--
+--------------------------------------------------------------------------------
+--
+   PROCEDURE LOGOUT (
+      p_conn    IN OUT NOCOPY   UTL_TCP.connection,
+      p_reply   IN              BOOLEAN := TRUE
+   );
+--
+--------------------------------------------------------------------------------
+--
+   PROCEDURE send_command (
+      p_conn      IN OUT NOCOPY   UTL_TCP.connection,
+      p_command   IN              VARCHAR2,
+      p_reply     IN              BOOLEAN := TRUE
+   );
+--
+--------------------------------------------------------------------------------
+--
+   FUNCTION get_local_ascii_data (p_dir IN VARCHAR2, p_file IN VARCHAR2)
+      RETURN CLOB;
+--
+--------------------------------------------------------------------------------
+--
+   FUNCTION get_local_binary_data (p_dir IN VARCHAR2, p_file IN VARCHAR2)
+      RETURN BLOB;
+--
+--------------------------------------------------------------------------------
+--
+   FUNCTION get_remote_ascii_data (
+      p_conn   IN OUT NOCOPY   UTL_TCP.connection,
+      p_file   IN              VARCHAR2
+   )
+      RETURN CLOB;
+--
+--------------------------------------------------------------------------------
+--
+   FUNCTION get_remote_binary_data (
+      p_conn   IN OUT NOCOPY   UTL_TCP.connection,
+      p_file   IN              VARCHAR2
+   )
+      RETURN BLOB;
+--
+--------------------------------------------------------------------------------
+--
+   PROCEDURE put_local_ascii_data (
+      p_data   IN   CLOB,
+      p_dir    IN   VARCHAR2,
+      p_file   IN   VARCHAR2
+   );
+--
+--------------------------------------------------------------------------------
+--
+   PROCEDURE put_local_binary_data (
+      p_data   IN   BLOB,
+      p_dir    IN   VARCHAR2,
+      p_file   IN   VARCHAR2
+   );
+--
+--------------------------------------------------------------------------------
+--
+   PROCEDURE put_remote_ascii_data (
+      p_conn   IN OUT NOCOPY   UTL_TCP.connection,
+      p_file   IN              VARCHAR2,
+      p_data   IN              CLOB
+   );
+--
+--------------------------------------------------------------------------------
+--
+   PROCEDURE put_remote_binary_data (
+      p_conn   IN OUT NOCOPY   UTL_TCP.connection,
+      p_file   IN              VARCHAR2,
+      p_data   IN              BLOB
+   );
+--
+--------------------------------------------------------------------------------
+--
+   PROCEDURE get (
+      p_conn        IN OUT NOCOPY   UTL_TCP.connection,
+      p_from_file   IN              VARCHAR2,
+      p_to_dir      IN              VARCHAR2,
+      p_to_file     IN              VARCHAR2
+   );
+--
+--------------------------------------------------------------------------------
+--
+   PROCEDURE put (
+      p_conn        IN OUT NOCOPY   UTL_TCP.connection,
+      p_from_dir    IN              VARCHAR2,
+      p_from_file   IN              VARCHAR2,
+      p_to_file     IN              VARCHAR2
+   );
+--
+--------------------------------------------------------------------------------
+--
+   PROCEDURE get_direct (
+      p_conn        IN OUT NOCOPY   UTL_TCP.connection,
+      p_from_file   IN              VARCHAR2,
+      p_to_dir      IN              VARCHAR2,
+      p_to_file     IN              VARCHAR2
+   );
+--
+--------------------------------------------------------------------------------
+--
+   PROCEDURE put_direct (
+      p_conn        IN OUT NOCOPY   UTL_TCP.connection,
+      p_from_dir    IN              VARCHAR2,
+      p_from_file   IN              VARCHAR2,
+      p_to_file     IN              VARCHAR2
+   );
+--
+--------------------------------------------------------------------------------
+--
+   PROCEDURE help (p_conn IN OUT NOCOPY UTL_TCP.connection);
+--
+--------------------------------------------------------------------------------
+--
+   PROCEDURE ascii (p_conn IN OUT NOCOPY UTL_TCP.connection);
+--
+--------------------------------------------------------------------------------
+--
+   PROCEDURE binary (p_conn IN OUT NOCOPY UTL_TCP.connection);
+--
+--------------------------------------------------------------------------------
+--
+   PROCEDURE list (
+      p_conn    IN OUT NOCOPY   UTL_TCP.connection,
+      p_dir     IN              VARCHAR2,
+      p_list    OUT             t_string_table,
+      p_command IN VARCHAR2 DEFAULT NULL 
+   );
+--
+--------------------------------------------------------------------------------
+--
+   PROCEDURE rename (
+      p_conn               IN OUT NOCOPY   UTL_TCP.connection,
+      p_from               IN              VARCHAR2,
+      p_to                 IN              VARCHAR2,
+      p_archive_overwrite  IN              BOOLEAN DEFAULT FALSE,
+      p_remove_failed_arch IN              BOOLEAN DEFAULT FALSE
+      );
+--
+--------------------------------------------------------------------------------
+--
+   PROCEDURE delete (
+      p_conn   IN OUT NOCOPY   UTL_TCP.connection,
+      p_file   IN              VARCHAR2
+   );
+--
+--------------------------------------------------------------------------------
+--
+   PROCEDURE mkdir (p_conn IN OUT NOCOPY UTL_TCP.connection, p_dir IN VARCHAR2);
+--
+--------------------------------------------------------------------------------
+--
+   PROCEDURE rmdir (p_conn IN OUT NOCOPY UTL_TCP.connection, p_dir IN VARCHAR2);
+--
+--------------------------------------------------------------------------------
+--
+   PROCEDURE convert_crlf (p_status IN BOOLEAN);
+--
+--------------------------------------------------------------------------------
+--
+--   FUNCTION ret_value ( pi_string IN VARCHAR2 
+--                      , pi_code    IN VARCHAR2)
+--     RETURN VARCHAR2;
+--
+--
+--------------------------------------------------------------------------------
+--
+  FUNCTION get_password ( pi_password IN VARCHAR2 ) RETURN VARCHAR2;
+--
+--------------------------------------------------------------------------------
+--
+  FUNCTION get_hft ( pi_hft_id          IN hig_ftp_types.hft_id%TYPE 
+                   , pi_raise_not_found IN BOOLEAN DEFAULT TRUE )
+    RETURN hig_ftp_types%ROWTYPE;
+--
+--------------------------------------------------------------------------------
+--
+  FUNCTION get_hft ( pi_hft_type        IN hig_ftp_types.hft_type%TYPE 
+                   , pi_raise_not_found IN BOOLEAN DEFAULT TRUE )
+    RETURN hig_ftp_types%ROWTYPE;
+--
+--------------------------------------------------------------------------------
+--
+  FUNCTION get_hfc ( pi_hfc_id          IN hig_ftp_connections.hfc_id%TYPE 
+                   , pi_raise_not_found IN BOOLEAN DEFAULT TRUE )
+    RETURN hig_ftp_connections%ROWTYPE;
+--
+--------------------------------------------------------------------------------
+--
+   PROCEDURE test_connection 
+                 ( pi_hfc_id    IN     hig_ftp_connections.hfc_id%TYPE
+                 , pio_results  IN OUT tab_results ); 
+--
+--------------------------------------------------------------------------------
+--
+  FUNCTION test_connection 
+                 ( pi_hfc_id    IN     hig_ftp_connections.hfc_id%TYPE)
+  RETURN BOOLEAN;
+--
+--------------------------------------------------------------------------------
+--
+  FUNCTION list_all_files_coming_in
+                 ( pi_hfc_id    IN     hig_ftp_connections.hfc_id%TYPE)
+    RETURN nm3type.tab_varchar32767;
+--
+  FUNCTION list_all_files_coming_in
+                 ( pi_hft_id    IN     hig_ftp_types.hft_id%TYPE)
+    RETURN nm3type.tab_varchar32767;
+--
+  FUNCTION list_all_files_coming_in
+              ( pi_hft_type    IN     hig_ftp_types.hft_type%TYPE)
+    RETURN nm3type.tab_varchar32767;
+--
+--------------------------------------------------------------------------------
+--
+  FUNCTION ftp_in_to_database
+              ( pi_tab_ftp_connections     NM_ID_TBL 
+              , pi_db_location_to_move_to  IN VARCHAR2
+              , pi_file_mask               IN VARCHAR2
+              , pi_binary                  IN BOOLEAN DEFAULT TRUE
+              , pi_archive_overwrite       IN BOOLEAN DEFAULT FALSE
+              , pi_remove_failed_arch      IN BOOLEAN DEFAULT FALSE)  RETURN nm3type.tab_varchar32767;
+--
+--------------------------------------------------------------------------------
+--
+  FUNCTION ftp_in_to_database
+              ( pi_ftp_type                IN hig_ftp_types.hft_type%TYPE
+              , pi_db_location_to_move_to  IN VARCHAR2
+              , pi_file_mask               IN VARCHAR2
+              , pi_binary                  IN BOOLEAN DEFAULT TRUE
+              , pi_archive_overwrite       IN BOOLEAN DEFAULT FALSE
+              , pi_remove_failed_arch      IN BOOLEAN DEFAULT FALSE) RETURN nm3type.tab_varchar32767;
+--
+------------------------------------------------------------------------------
+--
+  FUNCTION format_with_separator ( pi_input IN VARCHAR2 )
+  RETURN VARCHAR2;
+--
+--------------------------------------------------------------------------------
+--
+  PROCEDURE purge_directory( pi_hfc_id      IN OUT  hig_ftp_connections.hfc_id%TYPE
+                           , pi_directory   IN VARCHAR2
+                           , pi_wildcard    IN VARCHAR2 DEFAULT NULL
+                           , pi_delete_dir  IN BOOLEAN DEFAULT TRUE);
+--
+--------------------------------------------------------------------------------
+--
+  PROCEDURE purge_directory( pi_hfc_id       IN OUT  hig_ftp_connections.hfc_id%TYPE
+                           , pi_directory    IN      VARCHAR2
+                           , pi_wildcard_tab IN      nm3type.tab_varchar30
+                           , pi_delete_dir   IN      BOOLEAN DEFAULT TRUE);
+--
+--------------------------------------------------------------------------------
+--
+  FUNCTION ftp_in_to_db_success( p_htc_id  hig_ftp_connections.hfc_id%TYPE DEFAULT NULL)
+  RETURN BOOLEAN;
+--
+--------------------------------------------------------------------------------
+--
+  PROCEDURE assess_acl ( pi_rec_hfc IN hig_ftp_connections%ROWTYPE
+                       , pi_mode    IN VARCHAR2 );
+--
+--------------------------------------------------------------------------------
+--   
+END nm3ftp;
+/
