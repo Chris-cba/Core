@@ -12,14 +12,14 @@ DECLARE
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/trg/hig_directory_roles_a_iud_trg.trg-arc   2.3   May 01 2013 13:24:28   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/trg/hig_directory_roles_a_iud_trg.trg-arc   2.4   Jul 04 2013 09:53:16   James.Wadsworth  $
 --       Module Name      : $Workfile:   hig_directory_roles_a_iud_trg.trg  $
---       Date into SCCS   : $Date:   May 01 2013 13:24:28  $
---       Date fetched Out : $Modtime:   May 01 2013 13:23:58  $
---       SCCS Version     : $Revision:   2.3  $
+--       Date into SCCS   : $Date:   Jul 04 2013 09:53:16  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 09:35:30  $
+--       SCCS Version     : $Revision:   2.4  $
 --
 -----------------------------------------------------------------------------
---    Copyright (c) Bentley Systems 2012
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 
 

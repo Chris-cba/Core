@@ -6,16 +6,16 @@ DECLARE
 --
 --   SCCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/trg/hig_ftp_connections_b_ins_upd.trg-arc   2.1   Feb 03 2011 08:49:56   Ade.Edwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/trg/hig_ftp_connections_b_ins_upd.trg-arc   2.2   Jul 04 2013 09:53:16   James.Wadsworth  $
 --       Module Name      : $Workfile:   hig_ftp_connections_b_ins_upd.trg  $
---       Date into PVCS   : $Date:   Feb 03 2011 08:49:56  $
---       Date fetched Out : $Modtime:   Feb 01 2011 14:21:28  $
---       PVCS Version     : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   Jul 04 2013 09:53:16  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 09:35:30  $
+--       PVCS Version     : $Revision:   2.2  $
 --
 --
 --
 -----------------------------------------------------------------------------
---    Copyright (c) exor corporation ltd, 2007
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
    l_sysdate       DATE;

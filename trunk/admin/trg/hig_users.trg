@@ -15,7 +15,7 @@ DECLARE
 --           FOR EACH ROW
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2001
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
    v_num   number;
 BEGIN
@@ -51,7 +51,7 @@ DECLARE
 --           AFTER INSERT ON HIG_USERS
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2001
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
    l_count BINARY_INTEGER;
@@ -94,7 +94,7 @@ BEGIN
 --           FOR EACH ROW
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2001
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
    IF   :NEW.hus_is_hig_owner_flag  = 'Y'
@@ -137,7 +137,7 @@ BEGIN
 --   FOR EACH ROW
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2001
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
    IF :OLD.hus_is_hig_owner_flag = 'Y'

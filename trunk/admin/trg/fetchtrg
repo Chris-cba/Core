@@ -1,6 +1,10 @@
 #
 # sccs tag "'@(#)fetchtrg	1.37 03/07/05'"
 #
+#
+# Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+#
+#
 fetch hig_users.trg
 fetch ins_nm_members.trg
 fetch instantiate_user.trg

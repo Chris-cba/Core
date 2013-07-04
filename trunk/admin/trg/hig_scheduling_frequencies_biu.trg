@@ -9,15 +9,15 @@ DECLARE
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/trg/hig_scheduling_frequencies_biu.trg-arc   3.1   Jun 14 2010 09:08:14   gjohnson  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/trg/hig_scheduling_frequencies_biu.trg-arc   3.2   Jul 04 2013 09:53:16   James.Wadsworth  $
 --       Module Name      : $Workfile:   hig_scheduling_frequencies_biu.trg  $
---       Date into PVCS   : $Date:   Jun 14 2010 09:08:14  $
---       Date fetched Out : $Modtime:   Jun 11 2010 13:55:06  $
---       Version          : $Revision:   3.1  $
+--       Date into PVCS   : $Date:   Jul 04 2013 09:53:16  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 09:35:30  $
+--       Version          : $Revision:   3.2  $
 --
 --
 -----------------------------------------------------------------------------
---    Copyright (c) exor corporation ltd, 2008
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 BEGIN
 

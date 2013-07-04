@@ -8,17 +8,17 @@ DECLARE
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/trg/hig_alert_recipients_a_ins.trg-arc   3.0   Jan 17 2011 09:11:14   Mike.Alexander  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/trg/hig_alert_recipients_a_ins.trg-arc   3.1   Jul 04 2013 09:53:16   James.Wadsworth  $
 --       Module Name      : $Workfile:   hig_alert_recipients_a_ins.trg  $
---       Date into PVCS   : $Date:   Jan 17 2011 09:11:14  $
---       Date fetched Out : $Modtime:   Jan 17 2011 09:10:58  $
---       PVCS Version     : $Revision:   3.0  $
+--       Date into PVCS   : $Date:   Jul 04 2013 09:53:16  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 09:35:30  $
+--       PVCS Version     : $Revision:   3.1  $
 --       Based on SCCS version : 
 --
 --   Author : Chris Baugh
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2011
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 CURSOR C_alert_type(pi_hal_id   hig_alerts.hal_id%TYPE) IS 

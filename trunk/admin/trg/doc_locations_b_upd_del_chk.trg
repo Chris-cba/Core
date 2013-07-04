@@ -6,14 +6,14 @@ DECLARE
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/trg/doc_locations_b_upd_del_chk.trg-arc   3.0   Jun 06 2011 10:00:30   Ade.Edwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/trg/doc_locations_b_upd_del_chk.trg-arc   3.1   Jul 04 2013 09:53:16   James.Wadsworth  $
 --       Module Name      : $Workfile:   doc_locations_b_upd_del_chk.trg  $
---       Date into PVCS   : $Date:   Jun 06 2011 10:00:30  $
---       Date fetched Out : $Modtime:   Jun 06 2011 09:36:06  $
---       Version          : $Revision:   3.0  $
+--       Date into PVCS   : $Date:   Jul 04 2013 09:53:16  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 09:35:30  $
+--       Version          : $Revision:   3.1  $
 --
 -----------------------------------------------------------------------------
---    Copyright (c) Bentley Systems, 2011
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 BEGIN
