@@ -1,0 +1,79 @@
+CREATE OR REPLACE PACKAGE nm3stats AS
+--<PACKAGE>
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3stats.pkh-arc   2.2   Jul 04 2013 16:32:58   James.Wadsworth  $
+--       Module Name      : $Workfile:   nm3stats.pkh  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:32:58  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:20  $
+--       Version          : $Revision:   2.2  $
+--       Based on SCCS version : 1.5
+-------------------------------------------------------------------------
+--   Author : Jonathan Mills
+--
+--   NM3 Statistics package
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+  g_sccsid      CONSTANT  VARCHAR2(2000) := '$Revision:   2.2  $';
+--  g_sccsid is the SCCS ID for the package
+--
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="initialise_statistic_array">
+--
+FUNCTION initialise_statistic_array RETURN nm_statistic_array;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_vkm">
+-- Gets the Volume/Unit value for a route between 2 dates.
+FUNCTION get_vkm(p_start_date IN DATE
+                ,p_end_date   IN DATE
+                ,p_ne_id      IN nm_elements_all.ne_id%TYPE)RETURN NUMBER;
+--</PROC>
+--
+ function yr_first_day( p_yr in number ) return date;
+
+ function yr_last_day( p_yr in number ) return date;
+-- function get_vkm2 ( p_start_date DATE
+--                   ,p_end_date   DATE
+--                   ,p_ne_id      NM_NW_TEMP_EXTENTS.nte_job_id%TYPE
+--                   ) return number;
+
+-----------------------------------------------------------------------------
+--
+--<PRAGMA>
+   PRAGMA RESTRICT_REFERENCES (get_version, rnds, wnps, wnds);
+   PRAGMA RESTRICT_REFERENCES (get_body_version, rnds, wnps, wnds);
+   PRAGMA RESTRICT_REFERENCES (initialise_statistic_array, rnds, wnps, wnds);
+   PRAGMA RESTRICT_REFERENCES (yr_first_day, rnds, wnps, wnds);
+   PRAGMA RESTRICT_REFERENCES (yr_last_day, rnds, wnps, wnds);
+
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+END nm3stats;
+/

@@ -1,0 +1,1159 @@
+CREATE OR REPLACE PACKAGE nm3seq IS
+--<PACKAGE>
+--
+-----------------------------------------------------------------------------
+--
+--   PVCS Identifiers :-
+--
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3seq.pkh-arc   2.21   Jul 04 2013 16:32:58   James.Wadsworth  $
+--       Module Name      : $Workfile:   nm3seq.pkh  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:32:58  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:20  $
+--       PVCS Version     : $Revision:   2.21  $
+--
+--
+--   Author : Jonathan Mills
+--
+--   Generated package DO NOT MODIFY
+--
+--   nm3get_gen header : "@(#)nm3get_gen.pkh	1.3 12/05/05"
+--   nm3get_gen body   : "$Revision:   2.21  $"
+--
+-----------------------------------------------------------------------------
+--
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--
+-----------------------------------------------------------------------------
+--
+--</PACKAGE>
+--<GLOBVAR>
+   g_sccsid          CONSTANT  VARCHAR2(2000) := '"$Revision:   2.21  $"';
+--  g_sccsid is the SCCS ID for the package
+--
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="next_dac_id_seq">
+-- Returns DAC_ID_SEQ.NEXTVAL
+FUNCTION next_dac_id_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (next_dac_id_seq, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="curr_dac_id_seq">
+-- Returns DAC_ID_SEQ.CURRVAL
+FUNCTION curr_dac_id_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (curr_dac_id_seq, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="next_ddc_id_seq">
+-- Returns DDC_ID_SEQ.NEXTVAL
+FUNCTION next_ddc_id_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (next_ddc_id_seq, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="curr_ddc_id_seq">
+-- Returns DDC_ID_SEQ.CURRVAL
+FUNCTION curr_ddc_id_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (curr_ddc_id_seq, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="next_ddg_id_seq">
+-- Returns DDG_ID_SEQ.NEXTVAL
+FUNCTION next_ddg_id_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (next_ddg_id_seq, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="curr_ddg_id_seq">
+-- Returns DDG_ID_SEQ.CURRVAL
+FUNCTION curr_ddg_id_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (curr_ddg_id_seq, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="next_dlc_id_seq">
+-- Returns DLC_ID_SEQ.NEXTVAL
+FUNCTION next_dlc_id_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (next_dlc_id_seq, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="curr_dlc_id_seq">
+-- Returns DLC_ID_SEQ.CURRVAL
+FUNCTION curr_dlc_id_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (curr_dlc_id_seq, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="next_dmd_id_seq">
+-- Returns DMD_ID_SEQ.NEXTVAL
+FUNCTION next_dmd_id_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (next_dmd_id_seq, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="curr_dmd_id_seq">
+-- Returns DMD_ID_SEQ.CURRVAL
+FUNCTION curr_dmd_id_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (curr_dmd_id_seq, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="next_doc_id_seq">
+-- Returns DOC_ID_SEQ.NEXTVAL
+FUNCTION next_doc_id_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (next_doc_id_seq, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="curr_doc_id_seq">
+-- Returns DOC_ID_SEQ.CURRVAL
+FUNCTION curr_doc_id_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (curr_doc_id_seq, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="next_dq_id_seq">
+-- Returns DQ_ID_SEQ.NEXTVAL
+FUNCTION next_dq_id_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (next_dq_id_seq, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="curr_dq_id_seq">
+-- Returns DQ_ID_SEQ.CURRVAL
+FUNCTION curr_dq_id_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (curr_dq_id_seq, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="next_gis_session_id">
+-- Returns GIS_SESSION_ID.NEXTVAL
+FUNCTION next_gis_session_id RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (next_gis_session_id, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="curr_gis_session_id">
+-- Returns GIS_SESSION_ID.CURRVAL
+FUNCTION curr_gis_session_id RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (curr_gis_session_id, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="next_gss_id_seq">
+-- Returns GSS_ID_SEQ.NEXTVAL
+FUNCTION next_gss_id_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (next_gss_id_seq, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="curr_gss_id_seq">
+-- Returns GSS_ID_SEQ.CURRVAL
+FUNCTION curr_gss_id_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (curr_gss_id_seq, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="next_had_id_seq">
+-- Returns HAD_ID_SEQ.NEXTVAL
+FUNCTION next_had_id_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (next_had_id_seq, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="curr_had_id_seq">
+-- Returns HAD_ID_SEQ.CURRVAL
+FUNCTION curr_had_id_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (curr_had_id_seq, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="next_hct_id_seq">
+-- Returns HCT_ID_SEQ.NEXTVAL
+FUNCTION next_hct_id_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (next_hct_id_seq, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="curr_hct_id_seq">
+-- Returns HCT_ID_SEQ.CURRVAL
+FUNCTION curr_hct_id_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (curr_hct_id_seq, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="next_hus_user_id_seq">
+-- Returns HUS_USER_ID_SEQ.NEXTVAL
+FUNCTION next_hus_user_id_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (next_hus_user_id_seq, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="curr_hus_user_id_seq">
+-- Returns HUS_USER_ID_SEQ.CURRVAL
+FUNCTION curr_hus_user_id_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (curr_hus_user_id_seq, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="next_iid_item_id_seq">
+-- Returns IID_ITEM_ID_SEQ.NEXTVAL
+FUNCTION next_iid_item_id_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (next_iid_item_id_seq, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="curr_iid_item_id_seq">
+-- Returns IID_ITEM_ID_SEQ.CURRVAL
+FUNCTION curr_iid_item_id_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (curr_iid_item_id_seq, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="next_itb_banding_id_seq">
+-- Returns ITB_BANDING_ID_SEQ.NEXTVAL
+FUNCTION next_itb_banding_id_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (next_itb_banding_id_seq, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="curr_itb_banding_id_seq">
+-- Returns ITB_BANDING_ID_SEQ.CURRVAL
+FUNCTION curr_itb_banding_id_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (curr_itb_banding_id_seq, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="next_itd_band_seq_seq">
+-- Returns ITD_BAND_SEQ_SEQ.NEXTVAL
+FUNCTION next_itd_band_seq_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (next_itd_band_seq_seq, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="curr_itd_band_seq_seq">
+-- Returns ITD_BAND_SEQ_SEQ.CURRVAL
+FUNCTION curr_itd_band_seq_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (curr_itd_band_seq_seq, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="next_nal_seq">
+-- Returns NAL_SEQ.NEXTVAL
+FUNCTION next_nal_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (next_nal_seq, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="curr_nal_seq">
+-- Returns NAL_SEQ.CURRVAL
+FUNCTION curr_nal_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (curr_nal_seq, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="next_nau_admin_unit_seq">
+-- Returns NAU_ADMIN_UNIT_SEQ.NEXTVAL
+FUNCTION next_nau_admin_unit_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (next_nau_admin_unit_seq, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="curr_nau_admin_unit_seq">
+-- Returns NAU_ADMIN_UNIT_SEQ.CURRVAL
+FUNCTION curr_nau_admin_unit_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (curr_nau_admin_unit_seq, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="next_nsty_id_seq">
+-- Returns NSTY_ID_SEQ.NEXTVAL
+FUNCTION next_nsty_id_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (next_nsty_id_seq, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="curr_nsty_id_seq">
+-- Returns NSTY_ID_SEQ.CURRVAL
+FUNCTION curr_nsty_id_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (curr_nsty_id_seq, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="next_nd_id_seq">
+-- Returns ND_ID_SEQ.NEXTVAL
+FUNCTION next_nd_id_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (next_nd_id_seq, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="curr_nd_id_seq">
+-- Returns ND_ID_SEQ.CURRVAL
+FUNCTION curr_nd_id_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (curr_nd_id_seq, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="next_neh_id_seq">
+-- Returns NEH_ID_SEQ.NEXTVAL
+FUNCTION next_neh_id_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (next_neh_id_seq, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="curr_neh_id_seq">
+-- Returns NEH_ID_SEQ.CURRVAL
+FUNCTION curr_neh_id_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (curr_neh_id_seq, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="next_nel_id_seq">
+-- Returns NEL_ID_SEQ.NEXTVAL
+FUNCTION next_nel_id_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (next_nel_id_seq, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="curr_nel_id_seq">
+-- Returns NEL_ID_SEQ.CURRVAL
+FUNCTION curr_nel_id_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (curr_nel_id_seq, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="next_ne_id_seq">
+-- Returns NE_ID_SEQ.NEXTVAL
+FUNCTION next_ne_id_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (next_ne_id_seq, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="curr_ne_id_seq">
+-- Returns NE_ID_SEQ.CURRVAL
+FUNCTION curr_ne_id_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (curr_ne_id_seq, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="next_ngq_id_seq">
+-- Returns NGQ_ID_SEQ.NEXTVAL
+FUNCTION next_ngq_id_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (next_ngq_id_seq, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="curr_ngq_id_seq">
+-- Returns NGQ_ID_SEQ.CURRVAL
+FUNCTION curr_ngq_id_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (curr_ngq_id_seq, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="next_ngqa_seq_no_seq">
+-- Returns NGQA_SEQ_NO_SEQ.NEXTVAL
+FUNCTION next_ngqa_seq_no_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (next_ngqa_seq_no_seq, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="curr_ngqa_seq_no_seq">
+-- Returns NGQA_SEQ_NO_SEQ.CURRVAL
+FUNCTION curr_ngqa_seq_no_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (curr_ngqa_seq_no_seq, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="next_ngqt_seq_no_seq">
+-- Returns NGQT_SEQ_NO_SEQ.NEXTVAL
+FUNCTION next_ngqt_seq_no_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (next_ngqt_seq_no_seq, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="curr_ngqt_seq_no_seq">
+-- Returns NGQT_SEQ_NO_SEQ.CURRVAL
+FUNCTION curr_ngqt_seq_no_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (curr_ngqt_seq_no_seq, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="next_nias_id_seq">
+-- Returns NIAS_ID_SEQ.NEXTVAL
+FUNCTION next_nias_id_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (next_nias_id_seq, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="curr_nias_id_seq">
+-- Returns NIAS_ID_SEQ.CURRVAL
+FUNCTION curr_nias_id_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (curr_nias_id_seq, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="next_njc_job_id_seq">
+-- Returns NJC_JOB_ID_SEQ.NEXTVAL
+FUNCTION next_njc_job_id_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (next_njc_job_id_seq, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="curr_njc_job_id_seq">
+-- Returns NJC_JOB_ID_SEQ.CURRVAL
+FUNCTION curr_njc_job_id_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (curr_njc_job_id_seq, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="next_njo_id_seq">
+-- Returns NJO_ID_SEQ.NEXTVAL
+FUNCTION next_njo_id_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (next_njo_id_seq, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="curr_njo_id_seq">
+-- Returns NJO_ID_SEQ.CURRVAL
+FUNCTION curr_njo_id_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (curr_njo_id_seq, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="next_nl_layer_id_seq">
+-- Returns NL_LAYER_ID_SEQ.NEXTVAL
+FUNCTION next_nl_layer_id_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (next_nl_layer_id_seq, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="curr_nl_layer_id_seq">
+-- Returns NL_LAYER_ID_SEQ.CURRVAL
+FUNCTION curr_nl_layer_id_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (curr_nl_layer_id_seq, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="next_nld_id_seq">
+-- Returns NLD_ID_SEQ.NEXTVAL
+FUNCTION next_nld_id_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (next_nld_id_seq, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="curr_nld_id_seq">
+-- Returns NLD_ID_SEQ.CURRVAL
+FUNCTION curr_nld_id_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (curr_nld_id_seq, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="next_nlf_id_seq">
+-- Returns NLF_ID_SEQ.NEXTVAL
+FUNCTION next_nlf_id_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (next_nlf_id_seq, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="curr_nlf_id_seq">
+-- Returns NLF_ID_SEQ.CURRVAL
+FUNCTION curr_nlf_id_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (curr_nlf_id_seq, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="next_nlt_id_seq">
+-- Returns NLT_ID_SEQ.NEXTVAL
+FUNCTION next_nlt_id_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (next_nlt_id_seq, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="curr_nlt_id_seq">
+-- Returns NLT_ID_SEQ.CURRVAL
+FUNCTION curr_nlt_id_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (curr_nlt_id_seq, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="next_nmf_id_seq">
+-- Returns NMF_ID_SEQ.NEXTVAL
+FUNCTION next_nmf_id_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (next_nmf_id_seq, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="curr_nmf_id_seq">
+-- Returns NMF_ID_SEQ.CURRVAL
+FUNCTION curr_nmf_id_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (curr_nmf_id_seq, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="next_nmg_id_seq">
+-- Returns NMG_ID_SEQ.NEXTVAL
+FUNCTION next_nmg_id_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (next_nmg_id_seq, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="curr_nmg_id_seq">
+-- Returns NMG_ID_SEQ.CURRVAL
+FUNCTION curr_nmg_id_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (curr_nmg_id_seq, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="next_nmmt_line_id_seq">
+-- Returns NMMT_LINE_ID_SEQ.NEXTVAL
+FUNCTION next_nmmt_line_id_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (next_nmmt_line_id_seq, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="curr_nmmt_line_id_seq">
+-- Returns NMMT_LINE_ID_SEQ.CURRVAL
+FUNCTION curr_nmmt_line_id_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (curr_nmmt_line_id_seq, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="next_nmm_id_seq">
+-- Returns NMM_ID_SEQ.NEXTVAL
+FUNCTION next_nmm_id_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (next_nmm_id_seq, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="curr_nmm_id_seq">
+-- Returns NMM_ID_SEQ.CURRVAL
+FUNCTION curr_nmm_id_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (curr_nmm_id_seq, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="next_nmq_id_seq">
+-- Returns NMQ_ID_SEQ.NEXTVAL
+FUNCTION next_nmq_id_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (next_nmq_id_seq, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="curr_nmq_id_seq">
+-- Returns NMQ_ID_SEQ.CURRVAL
+FUNCTION curr_nmq_id_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (curr_nmq_id_seq, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="next_nmu_id_seq">
+-- Returns NMU_ID_SEQ.NEXTVAL
+FUNCTION next_nmu_id_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (next_nmu_id_seq, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="curr_nmu_id_seq">
+-- Returns NMU_ID_SEQ.CURRVAL
+FUNCTION curr_nmu_id_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (curr_nmu_id_seq, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="next_nm_audit_temp_seq">
+-- Returns NM_AUDIT_TEMP_SEQ.NEXTVAL
+FUNCTION next_nm_audit_temp_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (next_nm_audit_temp_seq, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="curr_nm_audit_temp_seq">
+-- Returns NM_AUDIT_TEMP_SEQ.CURRVAL
+FUNCTION curr_nm_audit_temp_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (curr_nm_audit_temp_seq, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="next_nm_db_seq">
+-- Returns NM_DB_SEQ.NEXTVAL
+FUNCTION next_nm_db_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (next_nm_db_seq, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="curr_nm_db_seq">
+-- Returns NM_DB_SEQ.CURRVAL
+FUNCTION curr_nm_db_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (curr_nm_db_seq, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="next_nm_mrg_query_staging_seq">
+-- Returns NM_MRG_QUERY_STAGING_SEQ.NEXTVAL
+FUNCTION next_nm_mrg_query_staging_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (next_nm_mrg_query_staging_seq, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="curr_nm_mrg_query_staging_seq">
+-- Returns NM_MRG_QUERY_STAGING_SEQ.CURRVAL
+FUNCTION curr_nm_mrg_query_staging_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (curr_nm_mrg_query_staging_seq, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="next_nm_mrg_query_values_seq">
+-- Returns NM_MRG_QUERY_VALUES_SEQ.NEXTVAL
+FUNCTION next_nm_mrg_query_values_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (next_nm_mrg_query_values_seq, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="curr_nm_mrg_query_values_seq">
+-- Returns NM_MRG_QUERY_VALUES_SEQ.CURRVAL
+FUNCTION curr_nm_mrg_query_values_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (curr_nm_mrg_query_values_seq, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="next_no_node_id_seq">
+-- Returns NO_NODE_ID_SEQ.NEXTVAL
+FUNCTION next_no_node_id_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (next_no_node_id_seq, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="curr_no_node_id_seq">
+-- Returns NO_NODE_ID_SEQ.CURRVAL
+FUNCTION curr_no_node_id_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (curr_no_node_id_seq, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="next_npq_id_seq">
+-- Returns NPQ_ID_SEQ.NEXTVAL
+FUNCTION next_npq_id_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (next_npq_id_seq, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="curr_npq_id_seq">
+-- Returns NPQ_ID_SEQ.CURRVAL
+FUNCTION curr_npq_id_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (curr_npq_id_seq, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="next_np_id_seq">
+-- Returns NP_ID_SEQ.NEXTVAL
+FUNCTION next_np_id_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (next_np_id_seq, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="curr_np_id_seq">
+-- Returns NP_ID_SEQ.CURRVAL
+FUNCTION curr_np_id_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (curr_np_id_seq, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="next_nqt_seq_no_seq">
+-- Returns NQT_SEQ_NO_SEQ.NEXTVAL
+FUNCTION next_nqt_seq_no_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (next_nqt_seq_no_seq, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="curr_nqt_seq_no_seq">
+-- Returns NQT_SEQ_NO_SEQ.CURRVAL
+FUNCTION curr_nqt_seq_no_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (curr_nqt_seq_no_seq, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="next_nse_id_seq">
+-- Returns NSE_ID_SEQ.NEXTVAL
+FUNCTION next_nse_id_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (next_nse_id_seq, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="curr_nse_id_seq">
+-- Returns NSE_ID_SEQ.CURRVAL
+FUNCTION curr_nse_id_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (curr_nse_id_seq, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="next_nsm_id_seq">
+-- Returns NSM_ID_SEQ.NEXTVAL
+FUNCTION next_nsm_id_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (next_nsm_id_seq, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="curr_nsm_id_seq">
+-- Returns NSM_ID_SEQ.CURRVAL
+FUNCTION curr_nsm_id_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (curr_nsm_id_seq, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="next_nte_id_seq">
+-- Returns NTE_ID_SEQ.NEXTVAL
+FUNCTION next_nte_id_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (next_nte_id_seq, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="curr_nte_id_seq">
+-- Returns NTE_ID_SEQ.CURRVAL
+FUNCTION curr_nte_id_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (curr_nte_id_seq, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="next_nth_theme_id_seq">
+-- Returns NTH_THEME_ID_SEQ.NEXTVAL
+FUNCTION next_nth_theme_id_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (next_nth_theme_id_seq, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="curr_nth_theme_id_seq">
+-- Returns NTH_THEME_ID_SEQ.CURRVAL
+FUNCTION curr_nth_theme_id_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (curr_nth_theme_id_seq, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="next_nxic_id_seq">
+-- Returns NXIC_ID_SEQ.NEXTVAL
+FUNCTION next_nxic_id_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (next_nxic_id_seq, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="curr_nxic_id_seq">
+-- Returns NXIC_ID_SEQ.CURRVAL
+FUNCTION curr_nxic_id_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (curr_nxic_id_seq, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="next_nxr_id_seq">
+-- Returns NXR_ID_SEQ.NEXTVAL
+FUNCTION next_nxr_id_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (next_nxr_id_seq, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="curr_nxr_id_seq">
+-- Returns NXR_ID_SEQ.CURRVAL
+FUNCTION curr_nxr_id_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (curr_nxr_id_seq, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="next_rtg_job_id_seq">
+-- Returns RTG_JOB_ID_SEQ.NEXTVAL
+FUNCTION next_rtg_job_id_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (next_rtg_job_id_seq, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="curr_rtg_job_id_seq">
+-- Returns RTG_JOB_ID_SEQ.CURRVAL
+FUNCTION curr_rtg_job_id_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (curr_rtg_job_id_seq, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="next_ud_domain_id_seq">
+-- Returns UD_DOMAIN_ID_SEQ.NEXTVAL
+FUNCTION next_ud_domain_id_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (next_ud_domain_id_seq, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="curr_ud_domain_id_seq">
+-- Returns UD_DOMAIN_ID_SEQ.CURRVAL
+FUNCTION curr_ud_domain_id_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (curr_ud_domain_id_seq, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="next_un_unit_id_seq">
+-- Returns UN_UNIT_ID_SEQ.NEXTVAL
+FUNCTION next_un_unit_id_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (next_un_unit_id_seq, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="curr_un_unit_id_seq">
+-- Returns UN_UNIT_ID_SEQ.CURRVAL
+FUNCTION curr_un_unit_id_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (curr_un_unit_id_seq, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PRAGMA>
+   PRAGMA RESTRICT_REFERENCES (get_version, RNDS, WNPS, WNDS);
+   PRAGMA RESTRICT_REFERENCES (get_body_version, RNDS, WNPS, WNDS);
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+END nm3seq;
+/
