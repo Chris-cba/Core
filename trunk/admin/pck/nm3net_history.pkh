@@ -4,11 +4,11 @@ create or replace package nm3net_history AS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3net_history.pkh-arc   2.0   Jul 18 2007 15:35:54   smarshall  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3net_history.pkh-arc   2.1   Jul 04 2013 16:19:16   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3net_history.pkh  $
---       Date into PVCS   : $Date:   Jul 18 2007 15:35:54  $
---       Date fetched Out : $Modtime:   Jul 18 2007 14:46:00  $
---       PVCS Version     : $Revision:   2.0  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:19:16  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:18  $
+--       PVCS Version     : $Revision:   2.1  $
 --
 --
 --   Author : Kevin Angus
@@ -16,7 +16,7 @@ create or replace package nm3net_history AS
 --    nm3net_history
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2007
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
@@ -40,7 +40,7 @@ create or replace package nm3net_history AS
   --constants
   -----------
   --g_sccsid is the SCCS ID for the package
-  g_sccsid CONSTANT VARCHAR2(2000) := '"$Revision:   2.0  $"';
+  g_sccsid CONSTANT VARCHAR2(2000) := '"$Revision:   2.1  $"';
   
   c_neh_op_split       constant nm_element_history.neh_operation%type := 'S';
   c_neh_op_merge       constant nm_element_history.neh_operation%type := 'M';
