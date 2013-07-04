@@ -10,6 +10,19 @@ create or replace force view v_nm_element_history
 ,NEH_ACTIONED_DATE
 ,NEH_ACTIONED_BY )
 as select
+--
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/v_nm_element_history.sql-arc   2.2   Jul 04 2013 11:35:14   James.Wadsworth  $
+--       Module Name      : $Workfile:   v_nm_element_history.sql  $
+--       Date into PVCS   : $Date:   Jul 04 2013 11:35:14  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 11:30:42  $
+--       Version          : $Revision:   2.2  $
+--
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
  NEH_NE_ID_OLD
 ,NEH_NE_ID_NEW
 ,O.NE_UNIQUE

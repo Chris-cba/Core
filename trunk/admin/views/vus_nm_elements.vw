@@ -26,6 +26,19 @@ create or replace force view vus_nm_elements
  NE_NSG_REF,
  NE_VERSION_NO )
 as
+--
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/vus_nm_elements.vw-arc   2.2   Jul 04 2013 11:35:14   James.Wadsworth  $
+--       Module Name      : $Workfile:   vus_nm_elements.vw  $
+--       Date into PVCS   : $Date:   Jul 04 2013 11:35:14  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 11:34:30  $
+--       Version          : $Revision:   2.2  $
+--
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
 select
  NE_ID,
  NE_UNIQUE,

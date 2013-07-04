@@ -1,8 +1,20 @@
 CREATE OR REPLACE VIEW V_NM_FT_ATTRIBUTE_MAPPING
 (ITA_INV_TYPE, NIT_TABLE_NAME, ITA_ATTRIB_NAME, IIT_ATTRIB_NAME)
 AS
+--
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/v_nm_ft_attribute_mapping.vw-arc   2.2   Jul 04 2013 11:35:14   James.Wadsworth  $
+--       Module Name      : $Workfile:   v_nm_ft_attribute_mapping.vw  $
+--       Date into PVCS   : $Date:   Jul 04 2013 11:35:14  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 11:31:18  $
+--       Version          : $Revision:   2.2  $
+--
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
 select
--- PVCS Version     : $Revision:   2.1  $
  q1.ita_inv_type
 ,q1.nit_table_name
 ,q1.ita_attrib_name

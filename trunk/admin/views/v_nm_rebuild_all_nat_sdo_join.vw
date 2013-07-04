@@ -10,12 +10,14 @@ Select
           -------------------------------------------------------------------------
           --   PVCS Identifiers :-
           --
-          --       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/v_nm_rebuild_all_nat_sdo_join.vw-arc   3.3   Jul 30 2012 10:45:24   Steve.Cooper  $
+          --       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/v_nm_rebuild_all_nat_sdo_join.vw-arc   3.4   Jul 04 2013 11:35:14   James.Wadsworth  $
           --       Module Name      : $Workfile:   v_nm_rebuild_all_nat_sdo_join.vw  $
-          --       Date into PVCS   : $Date:   Jul 30 2012 10:45:24  $
-          --       Date fetched Out : $Modtime:   Jul 26 2012 15:49:20  $
-          --       Version          : $Revision:   3.3  $
-          -------------------------------------------------------------------------
+          --       Date into PVCS   : $Date:   Jul 04 2013 11:35:14  $
+          --       Date fetched Out : $Modtime:   Jul 04 2013 11:32:56  $
+          --       Version          : $Revision:   3.4  $
+          -----------------------------------------------------------------------------
+          --    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+          -----------------------------------------------------------------------------
           --
           vw.View_Name                                                                                                                  View_Name,
           --
@@ -48,7 +50,7 @@ Select
           --
           'Comment on Table ' || vw.View_Name ||     ' Is ''Created By :V_Nm_Rebuild_All_Nlt_Sdo_Join ' 
                                                 || Chr(10) || 'Created On :' || To_Char(Sysdate,'dd-mm-yyyy hh24:mi.ss') 
-                                                || Chr(10) || 'Version    :$Revision:   3.3  $'''                                               View_Comments         
+                                                || Chr(10) || 'Version    :$Revision:   3.4  $'''                                               View_Comments         
 From    (        
         --Gets Linear views that can be rebuilt.
         Select  naty.Nat_Nt_Type,

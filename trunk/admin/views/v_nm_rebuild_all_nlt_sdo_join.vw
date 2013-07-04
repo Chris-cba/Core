@@ -10,12 +10,14 @@ Select
           -------------------------------------------------------------------------
           --   PVCS Identifiers :-
           --
-          --       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/v_nm_rebuild_all_nlt_sdo_join.vw-arc   3.2   Oct 04 2011 09:37:56   Steve.Cooper  $
+          --       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/v_nm_rebuild_all_nlt_sdo_join.vw-arc   3.3   Jul 04 2013 11:35:14   James.Wadsworth  $
           --       Module Name      : $Workfile:   v_nm_rebuild_all_nlt_sdo_join.vw  $
-          --       Date into PVCS   : $Date:   Oct 04 2011 09:37:56  $
-          --       Date fetched Out : $Modtime:   Oct 04 2011 09:35:48  $
-          --       Version          : $Revision:   3.2  $
-          -------------------------------------------------------------------------
+          --       Date into PVCS   : $Date:   Jul 04 2013 11:35:14  $
+          --       Date fetched Out : $Modtime:   Jul 04 2013 11:33:06  $
+          --       Version          : $Revision:   3.3  $
+          -----------------------------------------------------------------------------
+          --    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+          -----------------------------------------------------------------------------
           --
           rais.View_Name                                                                                                                View_Name,
           --
@@ -40,7 +42,7 @@ Select
           --
           'Comment on Table ' || rais.View_Name ||     ' Is ''Created By :V_Nm_Rebuild_All_Nlt_Sdo_Join ' 
                                                 || Chr(10) || 'Created On :' || To_Char(Sysdate,'dd-mm-yyyy hh24:mi.ss') 
-                                                || Chr(10) || 'Version    :$Revision:   3.2  $'''                                               View_Comments         
+                                                || Chr(10) || 'Version    :$Revision:   3.3  $'''                                               View_Comments         
 From    (        
         --Gets Linear views that can be rebuilt.
         Select  nlt.Nlt_Nt_Type,
