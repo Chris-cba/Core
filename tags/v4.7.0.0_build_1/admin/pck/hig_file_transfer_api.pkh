@@ -1,0 +1,109 @@
+CREATE OR REPLACE PACKAGE hig_file_transfer_api
+AS
+--<PACKAGE>
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_file_transfer_api.pkh-arc   3.2   Jul 04 2013 14:45:42   James.Wadsworth  $
+--       Module Name      : $Workfile:   hig_file_transfer_api.pkh  $
+--       Date into PVCS   : $Date:   Jul 04 2013 14:45:42  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:43:26  $
+--       Version          : $Revision:   3.2  $
+--       Based on SCCS version : 
+------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+
+  -----------
+  --constants
+  -----------
+  --g_sccsid is the SCCS ID for the package
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.2  $';
+--
+  TYPE g_rec_files  IS RECORD 
+        ( 
+          source                hig_file_transfer_queue.hftq_source%TYPE                -- Required param
+        , source_type           hig_file_transfer_queue.hftq_source_type%TYPE           -- Required param
+        , source_filename       hig_file_transfer_queue.hftq_source_filename%TYPE       -- Required param
+        , source_column         hig_file_transfer_queue.hftq_source_column%TYPE         -- Optional param - only used for BLOB content
+        , destination           hig_file_transfer_queue.hftq_destination%TYPE           -- Required param
+        , destination_type      hig_file_transfer_queue.hftq_destination_type%TYPE      -- Required param
+        , destination_filename  hig_file_transfer_queue.hftq_destination_filename%TYPE  -- Optional param - will default to source_filename
+        , destination_column    hig_file_transfer_queue.hftq_destination_column%TYPE    -- Optional param - only used for BLOB content
+        , direction             hig_file_transfer_queue.hftq_direction%TYPE             -- Optional param - will default to 'IN'
+        , transfer_type         hig_file_transfer_queue.hftq_transfer_type%TYPE         -- Optional param - will default to 'INTERNAL'
+        , status                hig_file_transfer_queue.hftq_status%TYPE                -- Optional param - will default to 'PENDING'
+        , condition             hig_file_transfer_queue.hftq_condition%TYPE             -- Optional param - Table WHERE Clause
+        , content               hig_file_transfer_queue.hftq_content%TYPE               -- Optional param - BLOB Content
+        , comments              hig_file_transfer_queue.hftq_comments%TYPE              -- Optional param - Remarks
+        , process_id            hig_file_transfer_queue.hftq_hp_process_id%TYPE         -- Optional param - Process ID
+        );
+--
+  TYPE g_tab_files IS TABLE OF g_rec_files INDEX BY BINARY_INTEGER;
+--
+  TYPE tab_hftq    IS TABLE OF hig_file_transfer_queue%ROWTYPE INDEX BY BINARY_INTEGER;
+--
+  g_tab_queue_files         tab_hftq;
+  g_overwrite               BOOLEAN := TRUE;
+  g_leave_original          BOOLEAN := TRUE;
+--
+  TYPE tab_file_id IS TABLE OF NUMBER INDEX BY BINARY_INTEGER;
+
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ADD_FILES_TO_QUEUE">
+PROCEDURE add_files_to_queue ( pi_tab_files      IN g_tab_files
+                             , po_hftq_batch_no OUT hig_file_transfer_queue.hftq_batch_no%TYPE );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="PROCESS_FILE_QUEUE">
+PROCEDURE process_file_queue ( pi_hftq_batch_no IN hig_file_transfer_queue.hftq_batch_no%TYPE );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="REPROCESS_FILE_QUEUE">
+PROCEDURE reprocess_file_queue ( pi_hftq_batch_no IN hig_file_transfer_queue.hftq_batch_no%TYPE 
+                               , po_success OUT BOOLEAN
+                               , po_error_message OUT VARCHAR2);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="REPROCESS_FILES">
+PROCEDURE reprocess_files ( pi_hftq_tab IN tab_file_id);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="VALIDATE_FILE_QUEUE_RECORD">
+PROCEDURE validate_file_queue_record
+            ( pi_rec_hftq  IN  hig_file_transfer_queue%ROWTYPE );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+
+END hig_file_transfer_api;
+/
+

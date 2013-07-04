@@ -1,0 +1,77 @@
+CREATE OR REPLACE PACKAGE hig_hd_extract AS
+--<PACKAGE>
+--   SCCS Identifiers :-
+--
+--       sccsid           : %W% %G%
+--       Module Name      : %M%
+--       Date into SCCS   : %E% %U%
+--       Date fetched Out : %D% %T%
+--       SCCS Version     : %I%
+--
+--
+--   Author : D. Cope
+--
+--   Package of dynamic sql routines used to generate xml from metadata
+--
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+  g_sccsid      CONSTANT  varchar2(2000) := '"%W% %G%"';
+--  g_sccsid is the SCCS ID for the package
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="OUTPUT_XML">
+-- This procedure takes a module and produces a file of xml output
+-- The procedure can be called from the gri passing the job id if required
+PROCEDURE output_xml(p_module       IN hig_hd_modules.hhm_module%TYPE
+                    ,p_dir          IN varchar2
+                    ,p_filename     IN varchar2
+                    ,p_job          IN gri_run_parameters.grp_job_id%TYPE DEFAULT NULL);
+
+FUNCTION output_xml(p_module       IN hig_hd_modules.hhm_module%TYPE
+                   ,p_job          IN gri_run_parameters.grp_job_id%TYPE DEFAULT NULL) RETURN clob;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="OUTPUT_CSV>
+-- This procedure takes a module and produces a file of csv delimeted output
+-- The procedure can be called from the gri passing the job id if required
+PROCEDURE output_csv(p_module          IN hig_hd_modules.hhm_module%TYPE
+                    ,p_dir             IN varchar2
+                    ,p_filename        IN varchar2
+                    ,p_job             IN gri_run_parameters.grp_job_id%TYPE DEFAULT NULL
+                    ,p_include_headers IN boolean DEFAULT FALSE);
+
+FUNCTION output_csv(p_module          IN hig_hd_modules.hhm_module%TYPE
+                   ,p_job             IN gri_run_parameters.grp_job_id%TYPE DEFAULT NULL
+                   ,p_include_headers IN boolean DEFAULT FALSE) RETURN clob;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PRAGMA>
+   PRAGMA RESTRICT_REFERENCES (get_version, rnds, wnps, wnds);
+   PRAGMA RESTRICT_REFERENCES (get_body_version, rnds, wnps, wnds);
+--</PRAGMA>
+--
+END hig_hd_extract;
+/

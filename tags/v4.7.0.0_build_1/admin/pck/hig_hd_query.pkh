@@ -1,0 +1,561 @@
+CREATE OR REPLACE PACKAGE hig_hd_query AS
+--<PACKAGE>
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)hig_hd_query.pkh	1.10 07/19/05
+--       Module Name      : hig_hd_query.pkh
+--       Date into SCCS   : 05/07/19 16:24:18
+--       Date fetched Out : 07/06/13 14:10:23
+--       SCCS Version     : 1.10
+--
+--
+--   Author : D. Cope
+--
+--   Package of dynamic sql routines used in xml generation
+--
+--   FJF 11-Oct-04 Added context get/set to queries
+--                 Added extra query info
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+  -------
+  --types
+  -------
+  TYPE t_param_list IS TABLE OF varchar2(32000) INDEX BY binary_integer;
+  
+  -----------
+  --constants
+  -----------
+  g_sccsid      CONSTANT  varchar2(2000) := '"@(#)hig_hd_query.pkh	1.10 07/19/05"';
+
+  c_lower_case  CONSTANT pls_integer := 1;
+  c_upper_case  CONSTANT pls_integer := 2;
+
+  -----------
+  --variables
+  -----------
+  g_dummy_table t_param_list;  
+  
+
+--  g_sccsid is the SCCS ID for the package
+--
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_mu">
+-- Get module usage record
+FUNCTION get_mu (p_module     IN hig_hd_mod_uses.hhu_hhm_module%TYPE
+                ,p_seq        IN hig_hd_mod_uses.hhu_seq%TYPE) RETURN hig_hd_mod_uses%ROWTYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_musc">
+-- Get module usage selected columns record
+FUNCTION get_musc (p_module     IN hig_hd_selected_cols.hhc_hhu_hhm_module%TYPE
+                  ,p_seq        IN hig_hd_selected_cols.hhc_hhu_seq%TYPE
+                  ,p_column_seq IN hig_hd_selected_cols.hhc_column_seq%TYPE) RETURN hig_hd_selected_cols%ROWTYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_QUERY">
+-- This procedure will derive a query from meta-data that will then be used by get_xml_for_query
+-- p_where parameter allows you to specify an extra where clause that already specified as the fixed where clause
+FUNCTION get_query ( p_module                     IN     hig_hd_mod_uses.hhu_hhm_module%TYPE
+                    ,p_seq                        IN     hig_hd_mod_uses.hhu_seq%TYPE
+                    ,p_where                      IN     varchar2                            DEFAULT NULL
+                    ,p_summary_view               IN     varchar2                            DEFAULT 'N'
+                    ,p_select_rowid               IN     boolean                             DEFAULT FALSE
+                    ,p_select_unique_identifiers  IN     boolean                             DEFAULT FALSE
+                    ,p_order_by_module            IN     hig_hd_modules.hhm_module%TYPE      DEFAULT NULL 
+                    ,p_order_by_override          IN     hig_hd_selected_cols.hhc_alias%TYPE DEFAULT NULL
+                    ,p_order_by_order             IN     varchar2                            DEFAULT NULL
+                    ,p_just_displayed_cols        IN     boolean                             DEFAULT FALSE
+                    ,p_replace_parameters         IN     boolean                             DEFAULT TRUE
+                    ) RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_CSV_QUERY">
+-- This procedure will derive a query formatted to produce csv delimited output when run
+-- called from redirect procedure
+FUNCTION get_csv_query ( p_module                     IN     hig_hd_mod_uses.hhu_hhm_module%TYPE
+                        ,p_seq                        IN     hig_hd_mod_uses.hhu_seq%TYPE
+                        ,p_where                      IN     varchar2                            DEFAULT NULL
+                        ,p_summary_view               IN     varchar2                            DEFAULT 'N'
+                        ,p_select_rowid               IN     boolean                             DEFAULT FALSE
+                        ,p_select_unique_identifiers  IN     boolean                             DEFAULT FALSE
+                        ,p_order_by_module            IN     hig_hd_modules.hhm_module%TYPE      DEFAULT NULL
+                        ,p_order_by_override          IN     hig_hd_selected_cols.hhc_alias%TYPE DEFAULT NULL
+                        ,p_order_by_order             IN     varchar2                            DEFAULT NULL
+                        ,p_just_displayed_cols        IN     boolean                             DEFAULT FALSE
+                        ,p_replace_parameters         IN     boolean                             DEFAULT TRUE
+                        ) RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_QUERY_AS_XML">
+-- This procedure takes a query string as a parameter
+-- and returns as xml the result of the query
+PROCEDURE get_query_as_xml(p_query         IN OUT        varchar2
+                          ,p_xml           IN OUT NOCOPY clob);
+PROCEDURE get_query_as_xml(p_query         IN OUT        varchar2
+                          ,p_xml           IN OUT NOCOPY varchar2);
+PROCEDURE get_query_as_xml(p_query         IN OUT        varchar2
+                          ,p_xml           IN OUT NOCOPY nm3type.tab_varchar32767);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="XML_FILE_FROM_QUERY">
+-- This procedure takes a query string as a parameter
+-- and creates an entry in nm_upload_files as the result
+PROCEDURE xml_file_from_query(p_query         IN            varchar2
+                             ,p_filename      IN            varchar2);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="DELETE_NUF">
+-- Delete upload_file
+PROCEDURE delete_nuf ( pi_file   IN nm_upload_files.name%TYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_QUERY_AS_CSV">
+-- This procedure takes a query string as a parameter
+-- and returns as csv format the result of the query
+PROCEDURE get_query_as_csv(p_query           IN            varchar2
+                          ,p_csv             IN OUT NOCOPY nm3type.tab_varchar32767
+                          ,p_include_headers IN            boolean DEFAULT FALSE);
+PROCEDURE get_query_as_csv(p_query           IN            varchar2
+                          ,p_csv             IN OUT NOCOPY clob
+                          ,p_include_headers IN            boolean DEFAULT FALSE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="SELECT_HEADINGS">
+-- This procedure takes a query string as a parameter
+-- and returns a csv separated list of the column headings as a result
+PROCEDURE select_headings(p_query IN varchar2
+                         ,p_csv   IN OUT NOCOPY nm3type.tab_varchar32767);
+PROCEDURE select_headings(p_query IN varchar2
+                         ,p_csv   IN OUT NOCOPY clob);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="CSV_FILE_FROM_QUERY">
+-- This procedure takes a query string as a parameter
+-- and creates an entry in nm_upload_files as the result
+PROCEDURE csv_file_from_query(p_query         IN            varchar2
+                             ,p_filename      IN            varchar2);
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_DTD_FROM_QUERY">
+-- This procedure takes a query string as a parameter
+-- returns the DTD of the query result as a CLOB
+PROCEDURE get_dtd_from_query( p_query         IN            varchar2
+                             ,p_xml           IN OUT NOCOPY clob);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_DTD_FROM_QUERY">
+-- This procedure takes a query string as a parameter
+-- returns the DTD of the query result as a VARCHAR
+PROCEDURE get_dtd_from_query( p_query         IN            varchar2
+                             ,p_xml_varchar2  IN OUT        varchar2);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_COLUMNS">
+-- This procedure returns a pl/sql table of column names and alias which can
+-- be used when building the select statement for a mod_use
+PROCEDURE get_columns(pi_module                    IN     hig_hd_modules.hhm_module%TYPE
+                     ,pi_seq                       IN     hig_hd_mod_uses.hhu_seq%TYPE
+                     ,pi_just_the_order_by_cols    IN     varchar2 DEFAULT 'N'
+                     ,pi_just_the_unique_cols      IN     varchar2 DEFAULT 'N'
+                     ,pi_summary_view              IN     hig_hd_selected_cols.hhc_summary_view%TYPE DEFAULT 'Y'
+                     ,pi_select_rowid              IN     boolean DEFAULT FALSE
+                     ,pi_select_unique_identifiers IN     boolean DEFAULT FALSE
+                     ,po_columns_tab               OUT    nm3type.tab_varchar2000
+                     ,po_alias_tab                 OUT    nm3type.tab_varchar2000
+                     ,po_displayed_tab             OUT    nm3type.tab_varchar1
+                     ,po_calc_ratio_tab            OUT    nm3type.tab_varchar1);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_ratio_to_report_column">
+-- Take a column name and convert to 'get_ratio_to_report(pi_column_name) over ()'
+FUNCTION get_ratio_to_report_column(pi_column_name  IN hig_hd_selected_cols.hhc_column_name%TYPE) RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="BUILD_COLUMN_LIST">
+-- This function returns a formatted list of columns to select from a
+-- given table.
+FUNCTION build_column_list (pi_columns_tab         IN    nm3type.tab_varchar2000
+                           ,pi_alias_tab           IN    nm3type.tab_varchar2000) RETURN varchar2;
+FUNCTION build_column_list (pi_columns_tab         IN    nm3type.tab_varchar2000
+                           ,pi_alias_tab           IN    nm3type.tab_varchar2000
+                           ,pi_displayed_tab       IN    nm3type.tab_varchar1
+                           ,pi_just_displayed_cols IN    boolean DEFAULT FALSE) RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="BUILD_WHERE_CLAUSE">
+-- This function returns a where clause detailing
+-- the join condition for a master detail browse
+FUNCTION build_where_clause (p_muj_module        IN    hig_hd_join_defs.hht_hhu_hhm_module%TYPE
+                            ,p_muj_seq           IN    hig_hd_join_defs.hht_hhu_seq%TYPE
+                            ,p_muj_join_seq      IN    hig_hd_join_defs.hht_join_seq%TYPE
+                            ,p_rowid             IN    urowid
+                            ,p_paramlist         IN    t_param_list DEFAULT g_dummy_table) RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="where_based_on_params">
+-- This function returns a where clause based on the parameter values passed in
+FUNCTION where_based_on_params (p_module        IN    hig_hd_mod_uses.hhu_hhm_module%TYPE
+                               ,p_seq           IN    hig_hd_mod_uses.hhu_seq%TYPE
+                               ,p_paramlist     IN    t_param_list) RETURN varchar2;
+--</PROC>
+--
+--
+--<PROC NAME="get_parent_where_clause">
+-- This function returns either a where clause based on the parameter values passed in
+-- or a where clause based on ROWID restriction
+FUNCTION get_parent_where_clause(p_muj_module  IN    hig_hd_join_defs.hht_hhu_hhm_module%TYPE
+                                ,p_muj_seq     IN    hig_hd_join_defs.hht_hhu_seq%TYPE
+                                ,p_rowid       IN    urowid
+                                ,p_paramlist   IN    t_param_list DEFAULT g_dummy_table) RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_LOOKUP_WHERE">
+-- This function returns a where clause detailing the join condition
+-- for tables with lookup columns
+FUNCTION get_lookup_where (p_module    IN     hig_hd_mod_uses.hhu_hhm_module%TYPE
+                          ,p_seq       IN     hig_hd_mod_uses.hhu_seq%TYPE) RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="RETURN_LOOKUP_TABLES">
+-- This function returns a list of tables to select from when
+-- the columns selected include lookup columns
+FUNCTION return_lookup_tables(p_module        IN     hig_hd_mod_uses.hhu_hhm_module%TYPE
+                             ,p_seq           IN     hig_hd_mod_uses.hhu_seq%TYPE) RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="RETURN_ORDER_BY_COLS">
+-- This function returns a list of columns that are to be ordered by
+FUNCTION return_order_by_cols(p_module              IN  hig_hd_mod_uses.hhu_hhm_module%TYPE
+                             ,p_seq                 IN  hig_hd_mod_uses.hhu_seq%TYPE
+                             ,p_order_by_module     IN  hig_hd_modules.hhm_module%TYPE       DEFAULT NULL                                          
+                             ,p_order_by_override   IN  hig_hd_selected_cols.hhc_alias%TYPE  DEFAULT NULL
+                             ,p_order_by_order      IN     varchar2                          DEFAULT NULL
+                             ) RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="DRILL_DOWN">
+-- This procedure is used to drill down from a master
+-- table to a child. It will return as xml the child
+-- records for the master table
+FUNCTION drill_down(p_muj_module                   IN hig_hd_join_defs.hht_hhu_hhm_module%TYPE
+                   ,p_muj_seq                      IN hig_hd_join_defs.hht_hhu_seq%TYPE
+                   ,p_muj_join_seq                 IN hig_hd_join_defs.hht_join_seq%TYPE
+                   ,p_rowid                        IN urowid
+                   ,p_where                        IN varchar2
+                   ,p_summary_view                 IN varchar2 DEFAULT 'N'
+                   ,p_select_rowid                 IN boolean DEFAULT FALSE
+                   ,p_select_unique_identifiers    IN boolean DEFAULT FALSE
+                   ,p_paramlist                    IN t_param_list DEFAULT g_dummy_table
+                   ,p_order_by_module              IN hig_hd_modules.hhm_module%TYPE      DEFAULT NULL
+                   ,p_order_by_override            IN hig_hd_selected_cols.hhc_alias%TYPE DEFAULT NULL
+                   ,p_order_by_order               IN varchar2                            DEFAULT NULL
+                   ) RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+-- setup functions
+--<PROC NAME="Set_Xml_Tag_Case">
+-- This procedure is used to toggle the case of the tags ouput
+-- input values - 1: lower case 2:UPPER CASE
+PROCEDURE set_xml_tag_case(p_case IN pls_integer);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="Set_Date_Format">
+-- This procecure sets the format of any date output from the package
+-- any date format valid in java should be supplied.
+PROCEDURE set_date_format(p_format IN varchar2);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="Set_csv_Date_Format">
+-- This procecure sets the format of any date output when generating csv
+-- 
+PROCEDURE set_csv_date_format(p_format IN varchar2);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="Set_Row_Tag">
+-- This procecure sets the tag output for every row retrieved from the
+-- database. Setting the tag to null will prevent its output
+PROCEDURE set_row_tag(p_tag IN varchar2);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="Set_RowSet_Tag">
+-- This procecure sets the tag output around the entire
+-- database output. Setting the tag to null will prevent its output
+PROCEDURE set_rowset_tag(p_tag IN varchar2);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="Set_null_attribute_indicator>
+-- This procedure controls the handling of null values. If set to TRUE then a empty tag is output
+-- for a null value. If set to false then no tag is output for null values
+PROCEDURE set_null_attribute_indicator (p_disp IN boolean);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="Set_comma_replacement_char>
+-- This procedure sets the character that will replace any commas found in csv fields
+PROCEDURE set_comma_replacement_char (p_char IN varchar2);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="clear_module_parameters">
+-- This procedure will clear any parameters that have been previously set for a given module
+-- IF the module is NULL Lthen all parameters will be erased
+PROCEDURE clear_parameters(p_module IN hig_hd_modules.hhm_module%TYPE DEFAULT NULL);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="set_parameter">
+-- Use tihs procedure to set the value of a parameter before running a query
+PROCEDURE set_parameter(p_module IN hig_hd_modules.hhm_module%TYPE
+                       ,p_param  IN hig_hd_mod_parameters.hhp_parameter%TYPE
+                       ,p_value  IN varchar2);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="replace_parameters_in_query">
+-- This procedure will replace parameters with the values entered by set_parameter
+-- any default values will be applied
+FUNCTION replace_parameters_in_query (p_module IN hig_hd_modules.hhm_module%TYPE
+                                     ,p_query IN varchar2) RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="sql_parses_without_error">
+-- This function will check the supplied sql for errors
+-- This function differs the the function of the same name in nm3flx, in that this function
+-- will not treat the sql with bind variables as an error
+FUNCTION sql_parses_without_error (pi_sql           IN     varchar2
+                                  ,po_error_message IN OUT varchar2) RETURN boolean;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="Get_Row_Tag">
+-- This function returns the tag that encloses a single row
+-- of xml output
+FUNCTION get_row_tag RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="Get_RowSet_Tag">
+-- This function returns the rowset tag (the tag that encloses all of the xml output)
+FUNCTION get_rowset_tag RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="Get_Xml_Tag_Case">
+-- This function returns the setting of the tag case. 1 for lower, 2 for UPPER
+FUNCTION get_xml_tag_case RETURN pls_integer;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="Get_Lower_Tag_Case">
+-- This function returns the the c_lower_case constant
+FUNCTION get_lower_tag_case RETURN pls_integer;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="Get_Upper_Tag_Case">
+-- This function returns the the c_upper_case constant
+FUNCTION get_upper_tag_case RETURN pls_integer;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="Get_null_attribute_indicator>
+-- This function returns the setting of the null attribute indicator
+FUNCTION get_null_attribute_indicator RETURN boolean;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="Get_comma_replacement_char>
+-- This function returns the character that will replace any commas found in csv fields
+FUNCTION get_comma_replacement_char RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_joins_for_mod_usage">
+--
+-- This function populates po_join_seq_tab and po_join_decsr_tab with the available
+-- joins from the specified module usage.
+--
+PROCEDURE get_joins_for_mod_usage(pi_module         IN     hig_hd_join_defs.hht_hhu_hhm_module%TYPE
+                                 ,pi_mod_usage_seq  IN     hig_hd_join_defs.hht_hhu_seq%TYPE
+                                 ,po_join_seq_tab      OUT nm3type.tab_number
+                                 ,po_join_decsr_tab    OUT nm3type.tab_varchar30
+                                 );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_hhj">
+--
+-- This function returns the specified hig_hd_table_join_cols record.
+--
+FUNCTION get_hhj(pi_module_id IN hig_hd_table_join_cols.hhj_hht_hhu_hhm_module%TYPE
+                ,pi_usage_seq IN hig_hd_table_join_cols.hhj_hht_hhu_parent_table%TYPE
+                ,pi_join_seq  IN hig_hd_table_join_cols.hhj_hht_join_seq%TYPE
+                ) RETURN hig_hd_table_join_cols%ROWTYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_hhm">
+--
+-- This function returns the specified hig_hd_modules record.
+--
+FUNCTION get_hhm(pi_module IN hig_hd_modules.hhm_module%TYPE
+                ) RETURN hig_hd_modules%ROWTYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="nm3_context_on">
+--
+--  procedure sets hidden package variable to to NM3 context, and restrict
+-- to first 100 rows
+--
+procedure nm3_context_on ;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="nm3_context_off">
+--
+--  procedure sets hidden package variable to to NM3 context, and restrict
+-- to first 100 rows
+--
+procedure nm3_context_off ;
+--</PROC>
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nm3_context">
+--
+-- return boolean showing whether or not NM3 context is switched on
+--
+function is_nm3_context_on return boolean ;
+--</PROC>
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="set_im_roi">
+--
+-- Set the ROI global used by IM
+--
+procedure set_im_roi
+  ( pi_roi_id integer 
+  , pi_eff_date date
+  ) ;
+--</PROC>
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="clear_im_roi">
+--
+-- Unset the ROI global used by IM
+--
+procedure clear_im_roi ;
+--</PROC>
+--<PRAGMA>
+   PRAGMA RESTRICT_REFERENCES (get_version, rnds, wnps, wnds);
+   PRAGMA RESTRICT_REFERENCES (get_body_version, rnds, wnps, wnds);
+   PRAGMA RESTRICT_REFERENCES (set_xml_tag_case, rnds, wnds);
+   PRAGMA RESTRICT_REFERENCES (set_date_format, rnds, wnds);
+   PRAGMA RESTRICT_REFERENCES (set_row_tag, rnds, wnds);
+   PRAGMA RESTRICT_REFERENCES (set_rowset_tag, rnds, wnds);
+   PRAGMA RESTRICT_REFERENCES (get_xml_tag_case, rnds, wnps, wnds);
+   PRAGMA RESTRICT_REFERENCES (get_lower_tag_case, rnds, wnps, wnds);
+   PRAGMA RESTRICT_REFERENCES (get_upper_tag_case, rnds, wnps, wnds);
+   PRAGMA RESTRICT_REFERENCES (get_row_tag, rnds, wnds, wnps);
+   PRAGMA RESTRICT_REFERENCES (get_rowset_tag, rnds, wnds, wnps);
+   PRAGMA RESTRICT_REFERENCES (get_comma_replacement_char, rnds, wnds, wnps);
+   PRAGMA RESTRICT_REFERENCES (get_null_attribute_indicator, rnds, wnds, wnps);
+   PRAGMA RESTRICT_REFERENCES (get_joins_for_mod_usage, wnds, wnps);
+   PRAGMA RESTRICT_REFERENCES (get_mu, wnds, wnps);
+   PRAGMA RESTRICT_REFERENCES (get_musc, wnds, wnps);
+   PRAGMA RESTRICT_REFERENCES (get_hhj, wnds, wnps);
+   PRAGMA RESTRICT_REFERENCES (get_hhm, wnds, wnps);
+--</PRAGMA>
+--
+
+END hig_hd_query;
+/

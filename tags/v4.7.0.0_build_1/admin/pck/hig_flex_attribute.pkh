@@ -1,0 +1,191 @@
+Create Or Replace Package hig_flex_attribute
+AS
+--<PACKAGE>
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_flex_attribute.pkh-arc   3.3   Jul 04 2013 14:45:42   James.Wadsworth  $
+--       Module Name      : $Workfile:   hig_flex_attribute.pkh  $
+--       Date into PVCS   : $Date:   Jul 04 2013 14:45:42  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:44:06  $
+--       Version          : $Revision:   3.3  $
+--       Based on SCCS version : 
+------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+
+  -----------
+  --constants
+  -----------
+  --g_sccsid is the SCCS ID for the package
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.3  $';
+  /*TYPE attrib_type IS RECORD 
+  (
+    type        nm_inv_types_all.nit_inv_type%TYPE
+   ,atrib_name  nm_inv_type_attribs.ita_attrib_name%TYPE
+   ,attrib_data Varchar2(1000)
+  );
+  TYPE attrib_tab_type IS TABLE OF attrib_type INDEX BY BINARY_INTEGER;
+
+  g_attrib_tab attrib_tab_type ;
+  */
+  g_upd_col   clob;
+
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="is_flex_attrib">
+-- This function checks is the passed attrib is a flex 
+FUNCTION check_attrib_exists (pi_inv_type    IN nm_inv_types.nit_inv_type%TYPE 
+                             ,pi_attrib_name IN nm_inv_type_attribs.ita_attrib_name%TYPE) RETURN Boolean;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="is_flex_attrib">
+-- This function checks is the passed attrib is a flex 
+FUNCTION get_flex_attrib_seq (pi_table_name   IN Varchar2 
+                             ,pi_attrib_name  IN nm_inv_type_attribs.ita_attrib_name%TYPE)
+RETURN Number ;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="is_flex_attrib">
+-- This function checks is the passed attrib is a flex 
+FUNCTION get_mapping_inv (pi_table_name     IN Varchar2 
+                         ,pi_attrib_name1   IN nm_inv_type_attribs.ita_attrib_name%TYPE
+                         ,pi_attrib_value1  IN Varchar2
+                         ,pi_attrib_name2   IN nm_inv_type_attribs.ita_attrib_name%TYPE Default Null
+                         ,pi_attrib_value2  IN Varchar2                                 Default Null
+                         ,pi_attrib_name3   IN nm_inv_type_attribs.ita_attrib_name%TYPE Default Null
+                         ,pi_attrib_value3  IN Varchar2                                 Default Null
+                         ,pi_attrib_name4   IN nm_inv_type_attribs.ita_attrib_name%TYPE Default Null
+                         ,pi_attrib_value4  IN Varchar2                                 Default Null
+                         ,pi_attrib_name5   IN nm_inv_type_attribs.ita_attrib_name%TYPE Default Null
+                         ,pi_attrib_value5  IN Varchar2                                 Default Null) 
+RETURN nm_inv_types%ROWTYPE ;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="is_flex_attrib">
+-- This function checks is the passed attrib is a flex 
+FUNCTION get_inv_for_attrib (pi_table_name    IN Varchar2 
+                            ,pi_attrib_name   IN nm_inv_type_attribs.ita_attrib_name%TYPE
+                            ,pi_attrib_value IN Varchar2) RETURN nm_inv_types%ROWTYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="is_flex_attrib">
+-- This function checks is the passed attrib is a flex 
+PROCEDURE upd_attrib_data (pi_inv_type     IN nm_inv_types_all.nit_inv_type%TYPE
+                          ,pi_pk_col       IN Varchar2
+                          );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="is_flex_attrib">
+-- This function checks is the passed attrib is a flex 
+FUNCTION get_attrib_value (pi_inv_type      IN nm_inv_types_all.nit_inv_type%TYPE
+                          ,pi_pk_col       IN Varchar2
+                          ,pi_attrib_name   IN nm_inv_type_attribs.ita_attrib_name%TYPE
+                          ) RETURN Varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="is_flex_attrib">
+-- This procedure builds the Update statement 
+PROCEDURE build_upd_statement (pi_inv_type      IN nm_inv_type_attribs.ita_inv_type%TYPE
+                              ,pi_attrib_name   IN nm_inv_type_attribs.ita_attrib_name%TYPE
+                              ,pi_attrib_data   IN Varchar2 );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="is_flex_attrib">
+-- clear global variable 
+PROCEDURE clear_gob_var ;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="is_flex_attrib">
+-- This procesure return all the flex combinations for passed data 
+FUNCTION get_combi (pi_tab_name IN Varchar2
+                   ,pi_value    IN Varchar2)   
+RETURN    hig_flex_attribute_inv_mapping.hfam_id%TYPE ; 
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="is_flex_attrib">
+-- This procesure return all the flex combinations for passed data 
+FUNCTION get_inv_type (pi_tab_name    IN Varchar2
+                      ,pi_column_name IN Varchar2
+                      ,pi_screen_text IN Varchar2)   
+RETURN    hig_flex_attribute_inv_mapping.hfam_nit_inv_type%TYPE ; 
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="is_flex_attrib">
+-- This procesure return all the flex combinations for passed data 
+PROCEDURE get_label(pi_hfa_id      IN  NUMBER
+                   ,pi_hfam_id     IN  NUMBER
+                   ,pi_block_label OUT Varchar2
+                   ,pi_pk_label    OUT Varchar2
+                   ,pi_label1      OUT Varchar2
+                   ,pi_label2      OUT Varchar2
+                   ,pi_label3      OUT Varchar2
+                   ,pi_value1      OUT Varchar2
+                   ,pi_value2      OUT Varchar2
+                   ,pi_value3      OUT Varchar2
+)   ;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="is_flex_attrib">
+-- This procesure return all the flex combinations for passed data 
+FUNCTION validate_combi(pi_hfam_hfa_id          IN hig_flex_attribute_inv_mapping.hfam_hfa_id%TYPE 
+                       ,pi_hfam_attribute_data1 IN hig_flex_attribute_inv_mapping.hfam_attribute_data1%TYPE
+                       ,pi_hfam_attribute_data2 IN hig_flex_attribute_inv_mapping.hfam_attribute_data2%TYPE
+                       ,pi_hfam_attribute_data3 IN hig_flex_attribute_inv_mapping.hfam_attribute_data3%TYPE
+                       ,pi_hfam_attribute_data4 IN hig_flex_attribute_inv_mapping.hfam_attribute_data4%TYPE
+                       ,pi_hfam_attribute_data5 IN hig_flex_attribute_inv_mapping.hfam_attribute_data5%TYPE
+)   
+RETURN Boolean ;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PRAGMA>
+  PRAGMA RESTRICT_REFERENCES(get_version, RNDS, WNPS, WNDS);
+  PRAGMA RESTRICT_REFERENCES(get_body_version, RNDS, WNPS, WNDS);
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+End hig_flex_attribute;
+/
