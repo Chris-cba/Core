@@ -15,7 +15,7 @@ BEGIN
 --       ON      NM_INV_ITEMS_ALL
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2001
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
    IF (UPDATING AND Nm3invval.g_process_update_trigger)

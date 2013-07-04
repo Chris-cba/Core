@@ -6,11 +6,11 @@ DECLARE
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm_inv_items_all_role_sec.trg-arc   2.2   May 17 2011 08:32:02   Steve.Cooper  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm_inv_items_all_role_sec.trg-arc   2.3   Jul 04 2013 09:53:24   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm_inv_items_all_role_sec.trg  $
---       Date into SCCS   : $Date:   May 17 2011 08:32:02  $
---       Date fetched Out : $Modtime:   May 05 2011 15:10:24  $
---       SCCS Version     : $Revision:   2.2  $
+--       Date into SCCS   : $Date:   Jul 04 2013 09:53:24  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 09:35:32  $
+--       SCCS Version     : $Revision:   2.3  $
 --       Based on 
 --
 --      TRIGGER nm_inv_items_all_role_sec
@@ -19,7 +19,7 @@ DECLARE
 --       FOR EACH ROW
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2001
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
    l_inv_type nm_inv_types.nit_inv_type%TYPE;

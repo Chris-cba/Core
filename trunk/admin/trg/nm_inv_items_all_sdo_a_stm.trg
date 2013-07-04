@@ -7,11 +7,11 @@ DECLARE
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm_inv_items_all_sdo_a_stm.trg-arc   2.1   Aug 31 2007 17:14:56   malexander  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm_inv_items_all_sdo_a_stm.trg-arc   2.2   Jul 04 2013 09:53:24   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm_inv_items_all_sdo_a_stm.trg  $
---       Date into SCCS   : $Date:   Aug 31 2007 17:14:56  $
---       Date fetched Out : $Modtime:   Aug 31 2007 16:21:40  $
---       SCCS Version     : $Revision:   2.1  $
+--       Date into SCCS   : $Date:   Jul 04 2013 09:53:24  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 09:38:24  $
+--       SCCS Version     : $Revision:   2.2  $
 --       Based on 
 --
 --   Author  : Ade Edwards
@@ -19,7 +19,7 @@ DECLARE
 --             asset shapes
 --
 -----------------------------------------------------------------------------
---  Copyright (c) exor corporation ltd, 2006
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
   l_rec_iit nm_inv_items%ROWTYPE;

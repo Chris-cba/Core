@@ -4,11 +4,11 @@ CREATE OR REPLACE TRIGGER nm_inv_items_all_excl_a_stm
 DECLARE
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm_inv_items_all_excl_a_stm.trg-arc   2.2   Jul 22 2010 09:20:24   cstrettle  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm_inv_items_all_excl_a_stm.trg-arc   2.3   Jul 04 2013 09:53:24   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm_inv_items_all_excl_a_stm.trg  $
---       Date into SCCS   : $Date:   Jul 22 2010 09:20:24  $
---       Date fetched Out : $Modtime:   Jul 20 2010 16:25:12  $
---       SCCS Version     : $Revision:   2.2  $
+--       Date into SCCS   : $Date:   Jul 04 2013 09:53:24  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 09:35:32  $
+--       SCCS Version     : $Revision:   2.3  $
 --       Based on 
 --
 --   Author : Jonathan Mills
@@ -16,7 +16,7 @@ DECLARE
 --   Exclusivity policing trigger
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2007
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 BEGIN
 --

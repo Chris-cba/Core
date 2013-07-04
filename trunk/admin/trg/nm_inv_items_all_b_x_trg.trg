@@ -22,7 +22,7 @@ DECLARE
 --   Inventory Cross-Attribute Validation Trigger
 --
 -----------------------------------------------------------------------------
---      Copyright (c) exor corporation ltd, 2001
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 --
