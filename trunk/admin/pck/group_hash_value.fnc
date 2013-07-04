@@ -11,7 +11,7 @@
 --   A custom aggregate function used in route bulk merge sql
 --
 -----------------------------------------------------------------------------
---   Copyright (c) exor corporation ltd, 2006
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 
 

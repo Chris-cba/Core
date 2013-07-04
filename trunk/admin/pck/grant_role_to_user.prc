@@ -26,7 +26,7 @@ CREATE OR REPLACE PROCEDURE grant_role_to_user
 --   KA: Added sys privs loop. Upper'd role.
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2002
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
    CURSOR cs_atc (c_grantee varchar2) IS

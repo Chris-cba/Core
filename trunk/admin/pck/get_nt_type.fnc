@@ -10,7 +10,7 @@
 -- Translation View function
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2005
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 
 CREATE OR REPLACE function get_nt_type (pi_ne_id IN nm_elements_all.ne_id%TYPE) RETURN nm_types.nt_type%TYPE IS

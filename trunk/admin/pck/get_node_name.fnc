@@ -12,7 +12,7 @@ create or replace FUNCTION get_node_name ( p_no_id IN number ) RETURN varchar2 I
 -----------------------------------------------------------------------------
 --   Originally taken from 
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2002
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 BEGIN
    RETURN nm3get.get_no (pi_no_node_id      => p_no_id

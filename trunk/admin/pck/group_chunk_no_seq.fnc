@@ -12,7 +12,7 @@
 --   A custom aggregate function used in route connectivity sql
 --
 -----------------------------------------------------------------------------
---   Copyright (c) exor corporation ltd, 2006
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 
 -- note that this function must not be parallel enabled

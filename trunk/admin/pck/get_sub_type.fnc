@@ -12,7 +12,7 @@ CREATE OR REPLACE function get_sub_type
 --       SCCS Version     : 1.2
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2003
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 cursor c1( c_obj_type nm_group_types.ngt_group_type%TYPE) is
   select a.NNG_NT_TYPE
