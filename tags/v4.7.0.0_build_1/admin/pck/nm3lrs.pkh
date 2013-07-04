@@ -1,0 +1,322 @@
+CREATE OR REPLACE PACKAGE nm3lrs  AS
+--<PACKAGE>
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)nm3lrs.pkh	1.19 08/02/05
+--       Module Name      : nm3lrs.pkh
+--       Date into SCCS   : 05/08/02 14:17:44
+--       Date fetched Out : 07/06/13 14:12:33
+--       SCCS Version     : 1.19
+--
+--
+--   Author : Rob Coupe
+--
+--  nm3lrs package
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--all global package variables here
+
+--<GLOBVAR>
+  g_sccsid      CONSTANT  varchar2(80) := '"@(#)nm3lrs.pkh	1.19 08/02/05"';
+-- g_sccsid is the SCCS_ID
+--
+  TYPE lref_record IS RECORD (r_ne_id       NUMBER
+                             ,r_offset      NUMBER
+                             ,r_source      VARCHAR2(10)
+                             );
+  TYPE lref_table  IS TABLE OF lref_record INDEX BY binary_integer;
+--
+  TYPE rec_nodes   IS RECORD (no_node_name  nm_nodes.no_node_name%TYPE 
+                            , no_descr      nm_nodes.no_descr%TYPE
+							, no_node_id    nm_nodes.no_node_id%TYPE);
+
+  TYPE tab_rec_nodes IS TABLE OF rec_nodes INDEX BY BINARY_INTEGER;   
+--
+
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_version">
+-- This function returns the current SCCS version
+  FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_start">
+  FUNCTION get_start( p_unique IN varchar2 ) RETURN number;
+  FUNCTION get_start( p_set_id IN number ) RETURN number;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_element_offset">
+  FUNCTION get_element_offset( p_ne_id_in IN number, p_ne_id_of IN number) RETURN number;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_element_true">
+  FUNCTION get_element_true( p_ne_id_in IN number, p_ne_id_of IN number) RETURN number;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--<PROC NAME="get_element_seg_no">
+  FUNCTION get_element_seg_no( p_ne_id_in IN number, p_ne_id_of IN number) RETURN number;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--<PROC NAME="get_element_seq_no">
+  FUNCTION get_element_seq_no( p_ne_id_in IN number, p_ne_id_of IN number) RETURN number;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_set_offset">
+  FUNCTION get_set_offset( p_ne_parent_id IN number, p_ne_child_id IN number, p_offset IN number ) RETURN number;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_set_offset_true">
+  FUNCTION get_set_offset_true( p_ne_parent_id IN number, p_ne_child_id IN number, p_offset IN number ) RETURN number;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_datum_offset">
+  FUNCTION get_datum_offset( p_parent_lr IN nm_lref ) RETURN nm_lref;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_distinct_offset">
+ --same as get_datum_offset but checks on ambiguity at a node
+  FUNCTION get_distinct_offset( p_parent_lr IN nm_lref
+                               ,p_use_db    IN varchar2 DEFAULT 'FALSE') RETURN nm_lref;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_location_offset">
+  FUNCTION get_location_offset( p_parent_type IN varchar2, p_child_lref IN nm_lref ) RETURN nm_lref;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_lref_ne_id">
+  FUNCTION get_lref_ne_id( p_lref IN nm_lref ) RETURN number;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_lref_offset">
+  FUNCTION get_lref_offset( p_lref IN nm_lref ) RETURN number;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_ambiguous_lrefs">
+  PROCEDURE get_ambiguous_lrefs (p_parent_id    IN     number
+                                ,p_parent_units IN     number
+                                ,p_datum_units  IN     number
+                                ,p_offset       IN     number
+                                ,p_lrefs           OUT lref_table
+                                ,p_sub_class    IN     varchar2 DEFAULT NULL
+                                ,p_use_db       IN     varchar2 DEFAULT 'FALSE'
+                                );
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_ambiguous_lrefs_true">
+  PROCEDURE get_ambiguous_lrefs_true (p_parent_id    IN     number
+                                     ,p_parent_units IN     number
+                                     ,p_datum_units  IN     number
+                                     ,p_offset       IN     number
+                                     ,p_lrefs           OUT lref_table
+                                     ,p_sub_class    IN     varchar2 DEFAULT NULL
+                                     ,p_use_db       IN     varchar2 DEFAULT 'FALSE'
+                                     );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_relative_reference">
+  FUNCTION get_relative_reference( p_parent_type IN nm_members_all.nm_type%TYPE,
+                                    p_parent_obj  IN nm_members_all.nm_obj_type%TYPE,
+									p_child_lref  IN nm_lref,
+									p_xsp IN nm_xsp.nwx_x_sect%TYPE ) RETURN nm_lref;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_datum_true_offset">
+  FUNCTION get_datum_true_offset( pi_ne_id IN nm_elements.ne_id%TYPE,
+                                  pi_true  IN nm_members.nm_true%TYPE,
+	                              pi_sub_class IN nm_elements.ne_sub_class%TYPE) RETURN nm_lref;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_datum_mp_from_route_true">
+FUNCTION get_datum_mp_from_route_true (pi_ne_id     IN nm_elements.ne_id%TYPE
+                                      ,pi_true      IN nm_members.nm_true%TYPE
+                                      ,pi_sub_class IN nm_elements.ne_sub_class%TYPE
+                                      ) RETURN nm_lref;
+
+
+
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="mid_block_data">
+-- Returns the midpoint along a route between two nodes that are intersections
+-- and the element that this is on and the distance along the element.
+-- the distance error/route off set is in the same units as the route
+-- and the element offset is in the units of the elements.
+--
+PROCEDURE mid_block_data( route_id        IN number
+                        , node1           IN number
+                        , node2           IN number
+                        , sub_class       IN varchar2
+                        , distance_error OUT number
+                        , ne_id          OUT number
+                        , offset         OUT number
+                        );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+FUNCTION unique_sub_class( p_route_id IN number,
+                                             pi_st_true IN number,
+					     pi_end_true IN number) RETURN boolean;
+
+FUNCTION max_seg_true ( p_route_id IN number, p_seg_no IN number ) RETURN number;
+FUNCTION min_seg_true ( p_route_id IN number, p_seg_no IN number ) RETURN number;
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_block_reference">
+-- Returns a unique linear reference of an intersection along a route with an
+-- optional sub class.
+--
+FUNCTION get_block_reference(pi_route        IN nm_elements.ne_id%TYPE
+                            ,pi_intersection IN nm_nodes.no_node_id%TYPE
+                            ,pi_sub_class    IN nm_elements.ne_sub_class%TYPE DEFAULT NULL
+                            ,pi_type         IN nm_nodes.no_node_type%TYPE
+                            ) RETURN nm_lref;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="check_relative_start_end">
+-- Checks the relative positions of the start and end linear references along
+-- a route.
+--
+PROCEDURE check_relative_start_end(pi_route      IN nm_elements.ne_id%TYPE
+                                  ,pi_start_lref IN nm_lref
+                                  ,pi_end_lref   IN nm_lref
+                                  );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="process_lref_tab_excl_subclass">
+-- Strips the lref table of any elements that are not of the specified sub
+-- class.
+--
+PROCEDURE process_lref_tab_excl_subclass(pio_lref_tab IN OUT lref_table
+                                        ,pi_sub_class IN     nm_elements.ne_sub_class%TYPE
+                                        );
+--
+----------------------------------------------------------------------------------
+--
+--<PROC NAME="get_element_node_slk">
+-- This function returns the SLK of the specified node type on the datum on the route
+--
+FUNCTION get_element_node_slk (p_route_ne_id    nm_elements.ne_id%TYPE
+                              ,p_element_ne_id  nm_elements.ne_id%TYPE
+                              ,p_node_type      nm_node_usages.nnu_node_type%TYPE
+                              ,p_datum_length   nm_elements.ne_length%TYPE
+                              ) RETURN nm_members.nm_slk%TYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_tab_lref">
+FUNCTION get_tab_lref (p_ne_id  nm_elements.ne_id%TYPE
+                      ,p_offset nm_members.nm_begin_mp%TYPE
+                      ) RETURN lref_table;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+FUNCTION get_nlt (p_nlt_type   vnm_linear_types.nlt_type%TYPE
+                 ,p_nlt_g_or_i vnm_linear_types.nlt_g_or_i%TYPE
+                 ) RETURN vnm_linear_types%ROWTYPE;
+--
+-----------------------------------------------------------------------------
+--
+-- <PROC NAME="get_coinciding_nodes_sql">
+-- Given a route and offset return a the SQL that could be used to determine if that offset coincides
+-- with a node(s)
+--
+FUNCTION get_coinciding_nodes_sql(pi_route_ne_id   IN nm_elements.ne_id%TYPE
+                                 ,pi_offset        IN NUMBER) RETURN VARCHAR2;
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+-- <PROC NAME="get_coinciding_nodes">
+-- Run SQL returned by get_coinciding_nodes_sql
+--
+FUNCTION get_coinciding_nodes(pi_route_ne_id   IN nm_elements.ne_id%TYPE
+                             ,pi_offset        IN NUMBER) RETURN tab_rec_nodes;								 
+--</PROC>
+--
+-----------------------------------------------------------------------------
+-- <PROC NAME="is_location_ambiguous">
+-- Determine if a location is ambiguous
+--
+FUNCTION is_location_ambiguous(pi_ne_id     IN nm_elements.ne_id%TYPE
+                              ,pi_offset    IN NUMBER
+                              ,pi_sub_class IN varchar2 DEFAULT NULL) RETURN BOOLEAN;
+--</PROC>
+--
+----------------------------------------------------------------------------- 
+--
+--all pragma definitions here
+--<PRAGMA>
+  PRAGMA RESTRICT_REFERENCES( get_version, wnds );
+  PRAGMA RESTRICT_REFERENCES( get_body_version, wnds );
+  PRAGMA RESTRICT_REFERENCES( get_start, wnds, TRUST );
+  PRAGMA RESTRICT_REFERENCES( get_element_offset, wnds, wnps );
+  PRAGMA RESTRICT_REFERENCES( get_set_offset, wnds );
+  PRAGMA RESTRICT_REFERENCES( get_datum_offset, wnds );
+  PRAGMA RESTRICT_REFERENCES( get_distinct_offset, wnds );
+  PRAGMA RESTRICT_REFERENCES( get_lref_ne_id, wnds );
+  PRAGMA RESTRICT_REFERENCES( get_lref_offset, wnds );
+  PRAGMA RESTRICT_REFERENCES( get_element_true, wnds );
+  PRAGMA RESTRICT_REFERENCES( get_element_seg_no, wnds );
+  PRAGMA RESTRICT_REFERENCES( min_seg_true, wnds );
+  PRAGMA RESTRICT_REFERENCES( max_seg_true, wnds );
+  PRAGMA RESTRICT_REFERENCES( get_datum_true_offset, wnds );
+  PRAGMA RESTRICT_REFERENCES( get_datum_mp_from_route_true, wnds );
+  PRAGMA RESTRICT_REFERENCES( get_element_node_slk, wnds );
+  --PRAGMA RESTRICT_REFERENCES( get_block_reference, wnds);
+--</PRAGMA>
+
+END;
+/

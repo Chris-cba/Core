@@ -1,0 +1,183 @@
+CREATE OR REPLACE PACKAGE nm3lock AS
+--<PACKAGE>
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)nm3lock.pkh	1.11 07/18/06
+--       Module Name      : nm3lock.pkh
+--       Date into SCCS   : 06/07/18 10:29:57
+--       Date fetched Out : 07/06/13 14:12:25
+--       SCCS Version     : 1.11
+--
+--
+--   Author : Jonathan Mills
+--
+--   NM3 Locking Package
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+  g_sccsid     CONSTANT  varchar2(2000) := '"@(#)nm3lock.pkh	1.11 07/18/06"';
+--  g_sccsid is the SCCS ID for the package
+--
+   g_rowid     ROWID;
+   g_found     boolean;
+   g_rec_ne    nm_elements%ROWTYPE;
+   g_rec_nm    nm_members%ROWTYPE;
+   g_rec_iit   nm_inv_items%ROWTYPE;
+   
+   g_lock_flag VARCHAR2(3) := NULL;
+--
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="lock_members_by_of">
+-- This procedure locks all NM_MEMBERS records with the specified NM_NE_ID_OF
+--
+PROCEDURE lock_members_by_of (p_nm_ne_id_of IN nm_members.nm_ne_id_of%TYPE);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="lock_members_by_in">
+-- This procedure locks all NM_MEMBERS records with the specified NM_NE_ID_IN
+--
+PROCEDURE lock_members_by_in (p_nm_ne_id_in IN nm_members.nm_ne_id_in%TYPE);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="lock_element">
+-- This procedure locks the specified nm_elements record
+--
+PROCEDURE lock_element (p_ne_id               IN nm_elements.ne_id%TYPE
+                       ,p_lock_ele_for_update IN boolean DEFAULT FALSE
+					   ,p_updrdonly           IN hig_option_values.hov_value%TYPE DEFAULT NULL					   
+                       );
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="lock_element_and_members">
+-- This procedure locks the specified nm_elements record and it's associated nm_members records
+--
+PROCEDURE lock_element_and_members (p_ne_id               IN nm_elements.ne_id%TYPE
+                                   ,p_lock_ele_for_update IN boolean DEFAULT FALSE
+                                   );
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="lock_parent">
+-- This procedure locks the parent of the specified nm_elements record
+-- The FUNCTION returns the parent NE_ID
+--
+PROCEDURE lock_parent (p_ne_id IN nm_elements.ne_id%TYPE);
+--
+FUNCTION  lock_parent (p_ne_id IN nm_elements.ne_id%TYPE) RETURN nm_elements.ne_id%TYPE;
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="lock_inv_item">
+-- This procedure locks the specified inv item
+--
+PROCEDURE lock_inv_item(pi_iit_ne_id      IN nm_inv_items.iit_ne_id%TYPE
+                       ,p_lock_for_update IN boolean DEFAULT FALSE
+                       );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="lock_inv_item_and_members">
+-- This procedure locks the specified inv item and its locations
+--
+PROCEDURE lock_inv_item_and_members(pi_iit_ne_id      IN nm_inv_items.iit_ne_id%TYPE
+                                   ,p_lock_for_update IN boolean DEFAULT FALSE
+                                   );
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="lock_asset_item">
+-- more thorough locking routine than lock_inv_item - cos it deals with ft assets
+--
+PROCEDURE lock_asset_item ( pi_nit_id          IN nm_inv_types.nit_inv_type%TYPE
+                           ,pi_pk_id           IN NUMBER
+                           ,pi_lock_for_update IN BOOLEAN DEFAULT FALSE 
+                           ,pi_updrdonly       IN hig_option_values.hov_value%TYPE DEFAULT NULL);
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--<PROC NAME="lock_inv_type">
+-- This procedure locks the specified NM_INV_TYPES record
+--
+PROCEDURE lock_inv_type (pi_inv_type nm_inv_types.nit_inv_type%TYPE);
+--
+FUNCTION  lock_inv_type (pi_inv_type nm_inv_types.nit_inv_type%TYPE) RETURN ROWID;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="lock_ne_by_rowtype">
+FUNCTION lock_ne_by_rowtype  (pi_rec_ne  IN nm_elements%ROWTYPE)  RETURN ROWID;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="lock_nm_by_rowtype">
+--
+FUNCTION lock_nm_by_rowtype(pi_nm_rec IN nm_members%ROWTYPE
+                           ) RETURN ROWID;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="lock_iit_by_rowtype">
+FUNCTION lock_iit_by_rowtype (pi_rec_iit IN nm_inv_items%ROWTYPE) RETURN ROWID;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="build_rowtype_and_lock_record">
+FUNCTION build_rowtype_and_lock_record (pi_table_name IN user_tables.table_name%TYPE
+                                       ,pi_tab_col    IN nm3type.tab_varchar30
+                                       ,pi_tab_value  IN nm3type.tab_varchar4000
+                                       ) RETURN ROWID;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+FUNCTION get_updrdonly RETURN VARCHAR2;
+
+
+--<PRAGMA>
+--   PRAGMA RESTRICT_REFERENCES (get_version, rnds, wnps, wnds);
+--   PRAGMA RESTRICT_REFERENCES (get_body_version, rnds, wnps, wnds);
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+END nm3lock;
+/
