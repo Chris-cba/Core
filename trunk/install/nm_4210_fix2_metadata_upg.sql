@@ -2,13 +2,15 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm_4210_fix2_metadata_upg.sql-arc   1.1   Aug 16 2010 16:13:42   Chris.Strettle  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm_4210_fix2_metadata_upg.sql-arc   1.2   Jul 04 2013 13:46:56   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm_4210_fix2_metadata_upg.sql  $
---       Date into PVCS   : $Date:   Aug 16 2010 16:13:42  $
---       Date fetched Out : $Modtime:   Aug 16 2010 16:10:52  $
---       PVCS Version     : $Revision:   1.1  $
+--       Date into PVCS   : $Date:   Jul 04 2013 13:46:56  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 13:33:28  $
+--       PVCS Version     : $Revision:   1.2  $
 --
---------------------------------------------------------------------------------
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
 --
 
 INSERT INTO NM_ERRORS ( NER_APPL

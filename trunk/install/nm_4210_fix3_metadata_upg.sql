@@ -2,13 +2,15 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm_4210_fix3_metadata_upg.sql-arc   3.0   Aug 24 2010 14:47:34   Mike.Alexander  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm_4210_fix3_metadata_upg.sql-arc   3.1   Jul 04 2013 13:46:56   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm_4210_fix3_metadata_upg.sql  $
---       Date into PVCS   : $Date:   Aug 24 2010 14:47:34  $
---       Date fetched Out : $Modtime:   Aug 24 2010 14:44:04  $
---       PVCS Version     : $Revision:   3.0  $
+--       Date into PVCS   : $Date:   Jul 04 2013 13:46:56  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 13:33:38  $
+--       PVCS Version     : $Revision:   3.1  $
 --
---------------------------------------------------------------------------------
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
 --
 
 
