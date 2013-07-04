@@ -1,11 +1,11 @@
 CREATE OR REPLACE PACKAGE BODY nm3eng_dynseg AS
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3eng_dynseg.pkb-arc   2.15   May 16 2011 14:44:36   Steve.Cooper  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3eng_dynseg.pkb-arc   2.16   Jul 04 2013 15:33:48   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3eng_dynseg.pkb  $
---       Date into PVCS   : $Date:   May 16 2011 14:44:36  $
---       Date fetched Out : $Modtime:   Apr 01 2011 14:40:24  $
---       PVCS Version     : $Revision:   2.15  $
+--       Date into PVCS   : $Date:   Jul 04 2013 15:33:48  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:10  $
+--       PVCS Version     : $Revision:   2.16  $
 --       Based on sccs version : 1.13
 --
 --   Author : Jonathan Mills
@@ -13,7 +13,7 @@ CREATE OR REPLACE PACKAGE BODY nm3eng_dynseg AS
 --   Engineering Dynamic Segmentation package body
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2001
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 /* History
   24.07.07 PT modified build_sql() so that the FT placements are now expected to be read from nm_members as for iit_inv_items
@@ -27,7 +27,7 @@ CREATE OR REPLACE PACKAGE BODY nm3eng_dynseg AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.15  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.16  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3eng_dynseg';

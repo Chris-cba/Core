@@ -1,18 +1,18 @@
 CREATE OR REPLACE PACKAGE BODY nm3eng_dynseg_util AS
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3eng_dynseg_util.pkb-arc   2.11   Nov 02 2009 21:36:24   ptanava  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3eng_dynseg_util.pkb-arc   2.12   Jul 04 2013 15:33:48   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3eng_dynseg_util.pkb  $
---       Date into PVCS   : $Date:   Nov 02 2009 21:36:24  $
---       Date fetched Out : $Modtime:   Nov 02 2009 21:35:34  $
---       PVCS Version     : $Revision:   2.11  $
+--       Date into PVCS   : $Date:   Jul 04 2013 15:33:48  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:10  $
+--       PVCS Version     : $Revision:   2.12  $
 --
 --   Author : Priidu Tanava
 --
 --   Bulk processing functions for nm3eng_dynseg package
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2007
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 /* History
   17.09.07 PT First delivery with get_first_value(), get_last_value(), get_most_frequent_value()
@@ -41,7 +41,7 @@ CREATE OR REPLACE PACKAGE BODY nm3eng_dynseg_util AS
 */
 
 
-  g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.11  $"';
+  g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.12  $"';
   g_package_name    CONSTANT  varchar2(30)   := 'nm3eng_dynseg_util';
   
   cr            constant varchar2(1) := chr(10);

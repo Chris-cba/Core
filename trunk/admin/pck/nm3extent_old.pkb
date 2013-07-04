@@ -14,9 +14,9 @@ CREATE OR REPLACE force PACKAGE BODY nm3extent IS
   --     nm3extent package - Functions + Procedures for dealing with temporary
   --                         extents.
   --
-  -----------------------------------------------------------------------------
-  --    Copyright (c) exor corporation ltd, 2000
-  -----------------------------------------------------------------------------
+------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+------------------------------------------------------------------
   --
    g_body_sccsid     CONSTANT  varchar2(2000) := '"%W% %G%"';
 --  g_body_sccsid is the SCCS ID for the package body

@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3file AS
 --
 -- PVCS Identifiers :-
 --
--- pvcsid : $Header:   //vm_latest/archives/nm3/admin/pck/nm3file.pkb-arc   2.15   Aug 26 2010 15:19:02   Chris.Strettle  $
+-- pvcsid : $Header:   //vm_latest/archives/nm3/admin/pck/nm3file.pkb-arc   2.16   Jul 04 2013 15:33:48   James.Wadsworth  $
 -- Module Name : $Workfile:   nm3file.pkb  $
--- Date into PVCS : $Date:   Aug 26 2010 15:19:02  $
--- Date fetched Out : $Modtime:   Aug 26 2010 15:18:02  $
--- PVCS Version : $Revision:   2.15  $
+-- Date into PVCS : $Date:   Jul 04 2013 15:33:48  $
+-- Date fetched Out : $Modtime:   Jul 04 2013 14:25:10  $
+-- PVCS Version : $Revision:   2.16  $
 -- Based on SCCS version : 
 --
 --
@@ -17,12 +17,12 @@ CREATE OR REPLACE PACKAGE BODY nm3file AS
 --   NM3 UTL_FILE wrapper package body
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2001
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 --all global package variables here
 --
-   g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.15  $';
+   g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.16  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3file';

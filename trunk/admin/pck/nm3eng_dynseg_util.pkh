@@ -2,11 +2,11 @@ create or replace package nm3eng_dynseg_util as
 --<PACKAGE>
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3eng_dynseg_util.pkh-arc   2.0   Sep 19 2007 09:44:06   smarshall  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3eng_dynseg_util.pkh-arc   2.1   Jul 04 2013 15:33:48   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3eng_dynseg_util.pkh  $
---       Date into PVCS   : $Date:   Sep 19 2007 09:44:06  $
---       Date fetched Out : $Modtime:   Sep 19 2007 08:52:06  $
---       PVCS Version     : $Revision:   2.0  $
+--       Date into PVCS   : $Date:   Jul 04 2013 15:33:48  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:10  $
+--       PVCS Version     : $Revision:   2.1  $
 --
 --
 --   Author : Priidu Tanava
@@ -14,10 +14,10 @@ create or replace package nm3eng_dynseg_util as
 --   Bulk processing functions for nm3eng_dynseg package
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2007
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 
-  g_sccsid      CONSTANT  VARCHAR2(2000) := '"$Revision:   2.0  $"';
+  g_sccsid      CONSTANT  VARCHAR2(2000) := '"$Revision:   2.1  $"';
 
 
   function get_version return varchar2;

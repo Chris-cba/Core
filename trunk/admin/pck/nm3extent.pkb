@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3extent IS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3extent.pkb-arc   2.7   Mar 26 2012 17:55:42   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3extent.pkb-arc   2.8   Jul 04 2013 15:33:48   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3extent.pkb  $
---       Date into SCCS   : $Date:   Mar 26 2012 17:55:42  $
---       Date fetched Out : $Modtime:   Mar 26 2012 17:53:20  $
---       SCCS Version     : $Revision:   2.7  $
+--       Date into SCCS   : $Date:   Jul 04 2013 15:33:48  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:10  $
+--       SCCS Version     : $Revision:   2.8  $
 --       Based on 
 --
 --
@@ -16,13 +16,13 @@ CREATE OR REPLACE PACKAGE BODY Nm3extent IS
 --                           and temporary extents.
 --
 -----------------------------------------------------------------------------
---    Copyright (c) exor corporation ltd, 2007
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
   g_package_name CONSTANT VARCHAR2(30) := 'nm3extent';
   --
   --g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"@(#)nm3extent.pkb	1.77 05/02/06"';
-  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.7  $';
+  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.8  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
   g_extent_exception EXCEPTION;

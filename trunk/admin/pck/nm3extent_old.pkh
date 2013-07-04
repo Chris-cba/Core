@@ -14,9 +14,9 @@ create or replace force PACKAGE nm3extent IS
   --     nm3extent package - Functions + Procedures for dealing with temporary
   --                         extents.
   --
-  -----------------------------------------------------------------------------
-  --    Copyright (c) exor corporation ltd, 2000
-  -----------------------------------------------------------------------------
+------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+------------------------------------------------------------------
   --</PACKAGE>
   --all global package variables here
   --<GLOBVAR>
