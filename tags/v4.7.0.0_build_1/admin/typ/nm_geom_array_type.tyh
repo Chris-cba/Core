@@ -1,0 +1,23 @@
+CREATE OR REPLACE type nm_geom_array_type is 
+-----------------------------------------------------------------------------
+--
+--
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)nm_geom_array_type.tyh	1.1 02/15/06
+--       Module Name      : nm_geom_array_type.tyh
+--       Date into SCCS   : 06/02/15 08:25:53
+--       Date fetched Out : 07/06/13 17:04:33
+--       SCCS Version     : 1.1
+--
+--   Author : Rob Coupe
+--
+--
+--   TYPE nm_geom_array_type
+--
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
+varray(1048576)  of nm_geom
+/

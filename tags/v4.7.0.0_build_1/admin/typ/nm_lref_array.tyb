@@ -1,0 +1,150 @@
+CREATE OR REPLACE type body nm_lref_array is
+--
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)nm_lref_array.tyb	1.2 07/22/02
+--       Module Name      : nm_lref_array.tyb
+--       Date into SCCS   : 02/07/22 09:57:10
+--       Date fetched Out : 07/06/13 17:04:37
+--       SCCS Version     : 1.2
+--
+--   The lref array type body
+--   Author : Rob Coupe
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
+
+-- adds a new element to the varray
+member function add_element( lr_ne_id   IN integer
+                            ,lr_offset  IN number ) return nm_lref_array
+is
+--
+   this_nla nm_lref_array := SELF;
+--
+   c_max_array_count CONSTANT BINARY_INTEGER := 1048576;
+--
+begin
+--
+-- If there are NO entries in the VARRAY then extend it
+--
+   IF this_nla.nla_lref_array.COUNT = 0
+    THEN
+      this_nla.nla_lref_array.extend;
+   END IF;
+--
+   if this_nla.nla_lref_array( this_nla.nla_lref_array.last ).lr_ne_id is not null then
+     this_nla.nla_lref_array.extend;
+   end if;
+   this_nla.nla_lref_array( this_nla.nla_lref_array.last ) := nm_lref( lr_ne_id, lr_offset );
+--
+   return this_nla;
+--
+exception
+   when others
+    then
+      return null;
+--
+end add_element;
+--
+------------------------------------------------------------------------------------------------
+--
+member function add_element( lr_lref IN nm_lref ) return nm_lref_array is
+begin
+  return self.add_element( lr_lref.lr_ne_id, lr_lref.lr_offset );
+end add_element;
+--
+------------------------------------------------------------------------------------------------
+--
+
+member function is_empty RETURN BOOLEAN IS
+--
+   this_nla nm_lref_array := SELF;
+--
+   l_retval BOOLEAN := FALSE;
+--
+begin
+--
+   IF this_nla.nla_lref_array.COUNT = 0
+    THEN
+      l_retval := TRUE;
+   ELSIF this_nla.nla_lref_array.COUNT = 1
+    AND  nla_lref_array(1).lr_ne_id IS NULL
+    THEN
+      l_retval := TRUE;
+   END IF;
+--
+   RETURN l_retval;
+--
+END is_empty;
+--
+------------------------------------------------------------------------------------------------
+--
+member procedure dump_lref_array
+is
+   this_nla nm_lref_array := SELF;
+begin
+   IF this_nla.is_empty
+    THEN
+      dbms_output.put_line ('Array empty');
+   ELSE
+      for i in 1..this_nla.nla_lref_array.last
+       loop
+         dbms_output.put_line ('Pos('||i||')'
+                               ||'-'||this_nla.nla_lref_array(i).lr_ne_id
+                               ||','||this_nla.nla_lref_array(i).lr_offset
+                              );
+       end loop;
+    END IF;
+exception
+   when others
+    then
+      return;
+end dump_lref_array;
+--
+------------------------------------------------------------------------------------------------
+--
+STATIC FUNCTION get_body_version RETURN VARCHAR2 IS
+BEGIN
+   RETURN '"@(#)nm_lref_array.tyb	1.2 07/22/02"';
+END get_body_version;
+--
+------------------------------------------------------------------------------------------------
+--
+member function lref_count RETURN NUMBER IS
+--
+   this_nla nm_lref_array := SELF;
+--
+BEGIN
+--
+   IF this_nla.is_empty
+    THEN
+      RETURN 0;
+   ELSE
+      RETURN this_nla.nla_lref_array.COUNT;
+   END IF;
+--
+END lref_count;
+--
+------------------------------------------------------------------------------------------------
+--
+member FUNCTION get_entry (lr_arr_pos IN INTEGER) RETURN nm_lref IS
+--
+   this_nla nm_lref_array := SELF;
+--
+BEGIN
+--
+   IF NOT this_nla.nla_lref_array.EXISTS(lr_arr_pos)
+    THEN
+      RETURN nm_lref( null, null);
+   ELSE
+      RETURN this_nla.nla_lref_array(lr_arr_pos);
+   END IF;
+--
+END get_entry;
+--
+------------------------------------------------------------------------------------------------
+--
+end;
+/

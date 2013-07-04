@@ -1,0 +1,26 @@
+CREATE OR REPLACE type nm_geom_array as object ( 
+-----------------------------------------------------------------------------
+--
+--
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)nm_geom_array.tyh	1.1 02/15/06
+--       Module Name      : nm_geom_array.tyh
+--       Date into SCCS   : 06/02/15 08:24:56
+--       Date fetched Out : 07/06/13 17:04:33
+--       SCCS Version     : 1.1
+--
+--   Author : Rob Coupe
+--
+--
+--   TYPE nm_geom_array
+--
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
+nga nm_geom_array_type
+, member function get_idx ( p_id in integer ) return integer
+, member function get_geom_by_id( p_id in integer ) return mdsys.sdo_geometry
+);
+/

@@ -1,0 +1,19 @@
+CREATE OR REPLACE type nm_id_meaning_tbl
+-----------------------------------------------------------------------------
+--
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)nm_id_meaning_tbl.tyh	1.1 04/04/06
+--       Module Name      : nm_id_meaning_tbl.tyh
+--       Date into SCCS   : 06/04/04 15:33:57
+--       Date fetched Out : 07/06/13 17:04:35
+--       SCCS Version     : 1.1
+--
+--
+--   Author : %USERNAME%
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+as table of nm_id_meaning_type
+/

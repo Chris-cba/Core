@@ -1,0 +1,60 @@
+CREATE OR REPLACE type body nm_geom_array is
+-----------------------------------------------------------------------------
+--
+--
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)nm_geom_array.tyb	1.1 02/14/06
+--       Module Name      : nm_geom_array.tyb
+--       Date into SCCS   : 06/02/14 15:25:30
+--       Date fetched Out : 07/06/13 17:04:32
+--       SCCS Version     : 1.1
+--
+--   Author : Rob Coupe
+--
+--
+--   TYPE nm_geom_array
+--
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
+member function get_idx ( p_id in integer ) return integer is
+retval integer;
+isave  integer;
+begin
+  retval := -1;
+  for i in 1..self.nga.last loop
+    isave := i;
+    if self.nga(i).ng_ne_id = p_id then
+	  retval := i;
+      exit;
+	end if;
+  end loop;
+  return retval;
+exception
+when others then
+  nm_debug.debug_on;
+  nm_debug.debug( to_char( self.nga(isave).ng_ne_id )); 
+  raise; 
+end;
+
+member function get_geom_by_id( p_id in integer ) return mdsys.sdo_geometry is
+isave integer;
+begin
+  for i in 1..self.nga.last loop
+    isave := i;
+    if self.nga(i).ng_ne_id = p_id then
+	  return self.nga(i).ng_geometry;
+      exit;
+	end if;
+  end loop;
+exception
+when others then
+  nm_debug.debug_on;
+  nm_debug.debug( to_char( self.nga(isave).ng_ne_id )); 
+  raise; 
+end;
+
+end;
+/

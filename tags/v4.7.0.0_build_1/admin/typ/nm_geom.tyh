@@ -1,0 +1,23 @@
+CREATE OR REPLACE type nm_geom as object (
+-----------------------------------------------------------------------------
+--
+--
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)nm_geom.tyh	1.1 02/15/06
+--       Module Name      : nm_geom.tyh
+--       Date into SCCS   : 06/02/15 08:24:36
+--       Date fetched Out : 07/06/13 17:04:32
+--       SCCS Version     : 1.1
+--
+--   Author : Rob Coupe
+--
+--
+--   TYPE nm_geom_array
+--
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
+ ng_ne_id integer, ng_geometry  mdsys.sdo_geometry )
+/

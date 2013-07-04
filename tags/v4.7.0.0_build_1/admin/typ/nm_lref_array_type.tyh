@@ -1,0 +1,20 @@
+CREATE OR REPLACE type nm_lref_array_type as
+
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)nm_lref_array_type.tyh	1.2 07/22/02
+--       Module Name      : nm_lref_array_type.tyh
+--       Date into SCCS   : 02/07/22 11:52:14
+--       Date fetched Out : 07/06/13 17:04:38
+--       SCCS Version     : 1.2
+--
+--   The lref array type.
+--   Author : Rob Coupe
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+
+    varray(1048576) OF nm_lref
+/
+
