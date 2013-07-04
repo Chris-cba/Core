@@ -2,11 +2,11 @@ create or replace package nm3web_map as
 --<PACKAGE>
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3web_map.pkh-arc   2.1   Dec 16 2008 11:16:42   smarshall  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3web_map.pkh-arc   2.2   Jul 04 2013 16:35:56   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3web_map.pkh  $
---       Date into PVCS   : $Date:   Dec 16 2008 11:16:42  $
---       Date fetched Out : $Modtime:   Dec 16 2008 11:11:38  $
---       PVCS Version     : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:35:56  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:20  $
+--       PVCS Version     : $Revision:   2.2  $
 --       Based on         : 1.2
 --
 --
@@ -15,11 +15,11 @@ create or replace package nm3web_map as
 --   show items on map package
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2002
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
-  g_sccsid      CONSTANT  VARCHAR2(2000) := '"$Revision:   2.1  $"';
+  g_sccsid      CONSTANT  VARCHAR2(2000) := '"$Revision:   2.2  $"';
 --  g_sccsid is the SCCS ID for the package
 --
   c_map_server_sysopt CONSTANT hig_option_list.hol_id%TYPE := 'WEBMAPSERV';

@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3web_mrg AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3web_mrg.pkb-arc   2.2   May 17 2011 08:26:28   Steve.Cooper  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3web_mrg.pkb-arc   2.3   Jul 04 2013 16:35:56   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3web_mrg.pkb  $
---       Date into PVCS   : $Date:   May 17 2011 08:26:28  $
---       Date fetched Out : $Modtime:   May 05 2011 14:48:24  $
---       PVCS Version     : $Revision:   2.2  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:35:56  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 15:57:12  $
+--       PVCS Version     : $Revision:   2.3  $
 --       Based on         : 1.3
 --
 --
@@ -17,12 +17,12 @@ CREATE OR REPLACE PACKAGE BODY nm3web_mrg AS
 --   Web Merge package body
 --
 -----------------------------------------------------------------------------
---   Copyright (c) exor corporation ltd, 2003
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.2  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.3  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3web_mrg';
@@ -83,7 +83,7 @@ BEGIN
    htp.p('--   NM3 Web Merge package.');
    htp.p('--');
    htp.p('-----------------------------------------------------------------------------');
-   htp.p('--	Copyright (c) exor corporation ltd, 2003');
+   htp.p('--	Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.');
    htp.p('-----------------------------------------------------------------------------');
    htp.p('--');
    htp.p('-->');

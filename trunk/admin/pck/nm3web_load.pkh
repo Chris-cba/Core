@@ -2,11 +2,11 @@ CREATE OR REPLACE package nm3web_load as
 --<PACKAGE>
 --   PVCS Identifiers :-
 --
---       pvcsid                 : $Header:   //vm_latest/archives/nm3/admin/pck/nm3web_load.pkh-arc   2.3   Nov 14 2008 09:40:10   aedwards  $
+--       pvcsid                 : $Header:   //vm_latest/archives/nm3/admin/pck/nm3web_load.pkh-arc   2.4   Jul 04 2013 16:35:56   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3web_load.pkh  $
---       Date into PVCS   : $Date:   Nov 14 2008 09:40:10  $
---       Date fetched Out : $Modtime:   Nov 14 2008 09:39:10  $
---       PVCS Version     : $Revision:   2.3  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:35:56  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:20  $
+--       PVCS Version     : $Revision:   2.4  $
 --       Based on SCCS version : 
 --
 --
@@ -15,11 +15,11 @@ CREATE OR REPLACE package nm3web_load as
 --   NM3 CSV Loader Web package
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2002
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
-  g_sccsid      CONSTANT  VARCHAR2(2000) := '"$Revision:   2.3  $"';
+  g_sccsid      CONSTANT  VARCHAR2(2000) := '"$Revision:   2.4  $"';
 --  g_sccsid is the SCCS ID for the package
    c_continue         CONSTANT  nm_errors.ner_descr%TYPE    := hig.get_ner(nm3type.c_hig,165).ner_descr;
 --</GLOBVAR>

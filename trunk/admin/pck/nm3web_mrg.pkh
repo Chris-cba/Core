@@ -2,11 +2,11 @@ create or replace package nm3web_mrg as
 --<PACKAGE>
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3web_mrg.pkh-arc   2.2   May 17 2011 08:26:28   Steve.Cooper  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3web_mrg.pkh-arc   2.3   Jul 04 2013 16:35:56   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3web_mrg.pkh  $
---       Date into PVCS   : $Date:   May 17 2011 08:26:28  $
---       Date fetched Out : $Modtime:   Apr 01 2011 14:11:44  $
---       PVCS Version     : $Revision:   2.2  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:35:56  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:22  $
+--       PVCS Version     : $Revision:   2.3  $
 --       Based on         : 1.1
 --
 --
@@ -15,11 +15,11 @@ create or replace package nm3web_mrg as
 --   Web Merge package
 --
 -----------------------------------------------------------------------------
---   Copyright (c) exor corporation ltd, 2003
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
-   g_sccsid      CONSTANT  VARCHAR2(2000) := '"$Revision:   2.2  $"';
+   g_sccsid      CONSTANT  VARCHAR2(2000) := '"$Revision:   2.3  $"';
 --  g_sccsid is the SCCS ID for the package
 --</GLOBVAR>
 --
