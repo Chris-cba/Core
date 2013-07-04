@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3get_gen AS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3get_gen.pkb-arc   2.2   May 16 2011 14:44:50   Steve.Cooper  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3get_gen.pkb-arc   2.3   Jul 04 2013 16:04:10   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3get_gen.pkb  $
---       Date into PVCS   : $Date:   May 16 2011 14:44:50  $
---       Date fetched Out : $Modtime:   May 05 2011 08:00:26  $
---       PVCS Version     : $Revision:   2.2  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:04:10  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 15:40:50  $
+--       PVCS Version     : $Revision:   2.3  $
 --
 --
 --   Author : Jonathan Mills
@@ -16,12 +16,12 @@ CREATE OR REPLACE PACKAGE BODY nm3get_gen AS
 --   nm3get generation package body
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2002
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.2  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.3  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3get_gen';
@@ -615,7 +615,7 @@ PROCEDURE generate_from_globals IS
       append('--   '||g_package_name||' header : '||get_version);
       append('--   '||g_package_name||' body   : '||get_body_version);
       seperator;
-      append('--	Copyright (c) exor corporation ltd, 2005');
+      append('--	Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.');
       seperator;
    END pvcs_tags;
 --
