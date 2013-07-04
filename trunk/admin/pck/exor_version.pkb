@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY exor_version IS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/exor_version.pkb-arc   2.1   May 16 2011 14:42:10   Steve.Cooper  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/exor_version.pkb-arc   2.2   Jul 04 2013 14:31:52   James.Wadsworth  $
 --       Module Name      : $Workfile:   exor_version.pkb  $
---       Date into SCCS   : $Date:   May 16 2011 14:42:10  $
---       Date fetched Out : $Modtime:   Apr 01 2011 15:50:50  $
---       SCCS Version     : $Revision:   2.1  $
+--       Date into SCCS   : $Date:   Jul 04 2013 14:31:52  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:06  $
+--       SCCS Version     : $Revision:   2.2  $
 --       Based on SCCS Version     : 1.2
 --
 --
@@ -17,10 +17,10 @@ CREATE OR REPLACE PACKAGE BODY exor_version IS
 --   exor Package version retrieval package
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2000
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(80) := '"$Revision:   2.1  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(80) := '"$Revision:   2.2  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(30)   := 'exor_version';
