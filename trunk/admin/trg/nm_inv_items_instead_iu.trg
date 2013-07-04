@@ -1,3 +1,16 @@
+--
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/trg/nm_inv_items_instead_iu.trg-arc   2.1   Jul 04 2013 09:53:26   James.Wadsworth  $
+--       Module Name      : $Workfile:   nm_inv_items_instead_iu.trg  $
+--       Date into PVCS   : $Date:   Jul 04 2013 09:53:26  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 09:50:12  $
+--       Version          : $Revision:   2.1  $
+--
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
 create or replace trigger nm_inv_items_instead_iu
 instead of insert or update
 on nm_inv_items
@@ -5,11 +18,11 @@ for each row
 declare
   rec nm_inv_items_all%rowtype;
 --   PVCS Identifiers :-
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm_inv_items_instead_iu.trg-arc   2.0   Oct 25 2007 09:46:10   smarshall  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm_inv_items_instead_iu.trg-arc   2.1   Jul 04 2013 09:53:26   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm_inv_items_instead_iu.trg  $
---       Date into PVCS   : $Date:   Oct 25 2007 09:46:10  $
---       Date fetched Out : $Modtime:   Oct 25 2007 09:45:42  $
---       PVCS Version     : $Revision:   2.0  $ 
+--       Date into PVCS   : $Date:   Jul 04 2013 09:53:26  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 09:50:12  $
+--       PVCS Version     : $Revision:   2.1  $ 
 begin
   rec.iit_ne_id := :new.iit_ne_id;
   rec.iit_inv_type := :new.iit_inv_type;

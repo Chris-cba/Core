@@ -17,7 +17,7 @@ ON NM_INV_TYPE_ATTRIBS_ALL
 --
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2005
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 
 BEGIN
