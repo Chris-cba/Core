@@ -16,7 +16,7 @@ DECLARE
 --   nm_event_log_a_ins_stm trigger
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2002
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 BEGIN
   nm3event_log.process_nel_tab;

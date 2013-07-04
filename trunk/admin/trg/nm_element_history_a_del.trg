@@ -6,11 +6,11 @@ DECLARE
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm_element_history_a_del.trg-arc   2.2   Apr 13 2010 16:57:34   cstrettle  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm_element_history_a_del.trg-arc   2.3   Jul 04 2013 09:53:20   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm_element_history_a_del.trg  $
---       Date into PVCS   : $Date:   Apr 13 2010 16:57:34  $
---       Date fetched Out : $Modtime:   Jul 18 2007 14:47:32  $
---       PVCS Version     : $Revision:   2.2  $
+--       Date into PVCS   : $Date:   Jul 04 2013 09:53:20  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 09:35:32  $
+--       PVCS Version     : $Revision:   2.3  $
 --
 --
 --   Author : Kevin Angus
@@ -18,7 +18,7 @@ DECLARE
 --    nm_element_history_a_del
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2007
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 BEGIN
   nm3net_history.cascade_neh_delete(pi_neh_id        => :old.neh_id

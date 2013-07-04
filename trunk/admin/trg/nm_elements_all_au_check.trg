@@ -8,11 +8,11 @@ DECLARE
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm_elements_all_au_check.trg-arc   2.1   Aug 31 2007 16:52:02   malexander  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm_elements_all_au_check.trg-arc   2.2   Jul 04 2013 09:53:20   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm_elements_all_au_check.trg  $
---       Date into SCCS   : $Date:   Aug 31 2007 16:52:02  $
---       Date fetched Out : $Modtime:   Aug 31 2007 15:53:46  $
---       SCCS Version     : $Revision:   2.1  $
+--       Date into SCCS   : $Date:   Jul 04 2013 09:53:20  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 09:35:32  $
+--       SCCS Version     : $Revision:   2.2  $
 --       Based on 
 --
 --   TRIGGER NM_ELEMENTS_ALL_AU_CHECK
@@ -20,7 +20,7 @@ DECLARE
 --   FOR EACH ROW
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2001
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
    l_rec_ne_old nm_elements_all%ROWTYPE;

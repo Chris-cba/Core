@@ -16,7 +16,7 @@ DECLARE
 --    nm_elements_all_a_u_trg
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2005
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 
   l_old_end_date date := :OLD.ne_end_date;

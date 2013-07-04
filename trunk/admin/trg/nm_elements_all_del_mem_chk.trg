@@ -10,6 +10,9 @@ DECLARE
 --       Date into SCCS   : 01/10/01 11:11:03
 --       Date fetched Out : 07/06/13 17:02:43
 --       SCCS Version     : 1.1
+------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+------------------------------------------------------------------
 --
 --   TRIGGER nm_elements_all_del_mem_chk
 --    BEFORE DELETE

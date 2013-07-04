@@ -7,15 +7,15 @@ DECLARE
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm_elements_all_dt_trg.trg-arc   2.2   May 17 2011 08:32:02   Steve.Cooper  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm_elements_all_dt_trg.trg-arc   2.3   Jul 04 2013 09:53:20   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm_elements_all_dt_trg.trg  $
---       Date into SCCS   : $Date:   May 17 2011 08:32:02  $
---       Date fetched Out : $Modtime:   Apr 01 2011 14:52:16  $
---       SCCS Version     : $Revision:   2.2  $
+--       Date into SCCS   : $Date:   Jul 04 2013 09:53:20  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 09:35:32  $
+--       SCCS Version     : $Revision:   2.3  $
 --       Based on 
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2001
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
    l_start_date DATE := :NEW.NE_START_DATE;

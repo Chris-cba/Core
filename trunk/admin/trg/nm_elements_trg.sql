@@ -6,11 +6,11 @@ CREATE OR REPLACE TRIGGER a_ins_nm_elements
 DECLARE
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm_elements_trg.sql-arc   2.4   Jul 23 2010 14:07:12   gjohnson  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm_elements_trg.sql-arc   2.5   Jul 04 2013 09:53:20   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm_elements_trg.sql  $
---       Date into SCCS   : $Date:   Jul 23 2010 14:07:12  $
---       Date fetched Out : $Modtime:   May 07 2010 15:18:20  $
---       SCCS Version     : $Revision:   2.4  $
+--       Date into SCCS   : $Date:   Jul 04 2013 09:53:20  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 09:35:32  $
+--       SCCS Version     : $Revision:   2.5  $
 --       Based on 
 --       Based on 1.11
 --
@@ -20,7 +20,7 @@ DECLARE
 --       FOR    EACH ROW
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2001
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
    l_tab_nnu_no_node_id nm3type.tab_number;
@@ -86,11 +86,11 @@ CREATE OR REPLACE TRIGGER b_upd_nm_elements
 DECLARE
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm_elements_trg.sql-arc   2.4   Jul 23 2010 14:07:12   gjohnson  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm_elements_trg.sql-arc   2.5   Jul 04 2013 09:53:20   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm_elements_trg.sql  $
---       Date into SCCS   : $Date:   Jul 23 2010 14:07:12  $
---       Date fetched Out : $Modtime:   May 07 2010 15:18:20  $
---       SCCS Version     : $Revision:   2.4  $
+--       Date into SCCS   : $Date:   Jul 04 2013 09:53:20  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 09:35:32  $
+--       SCCS Version     : $Revision:   2.5  $
 --       Based on 
 --       Based on 1.11
 --
@@ -100,7 +100,7 @@ DECLARE
 --       FOR     EACH ROW
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2001
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
    c_dummy_date CONSTANT date   := TO_DATE('01011801','DDMMYYYY');
@@ -210,11 +210,11 @@ CREATE OR REPLACE TRIGGER b_ins_nm_elements
 BEGIN
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm_elements_trg.sql-arc   2.4   Jul 23 2010 14:07:12   gjohnson  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm_elements_trg.sql-arc   2.5   Jul 04 2013 09:53:20   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm_elements_trg.sql  $
---       Date into SCCS   : $Date:   Jul 23 2010 14:07:12  $
---       Date fetched Out : $Modtime:   May 07 2010 15:18:20  $
---       SCCS Version     : $Revision:   2.4  $
+--       Date into SCCS   : $Date:   Jul 04 2013 09:53:20  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 09:35:32  $
+--       SCCS Version     : $Revision:   2.5  $
 --       Based on 
 --       Based on 1.11
 --
@@ -224,7 +224,7 @@ BEGIN
 --       FOR     EACH ROW
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2001
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
   --MJA add 31-Aug-07
   --New functionality to allow override
@@ -266,11 +266,11 @@ CREATE OR REPLACE TRIGGER a_del_nm_elements
 DECLARE
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm_elements_trg.sql-arc   2.4   Jul 23 2010 14:07:12   gjohnson  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm_elements_trg.sql-arc   2.5   Jul 04 2013 09:53:20   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm_elements_trg.sql  $
---       Date into SCCS   : $Date:   Jul 23 2010 14:07:12  $
---       Date fetched Out : $Modtime:   May 07 2010 15:18:20  $
---       SCCS Version     : $Revision:   2.4  $
+--       Date into SCCS   : $Date:   Jul 04 2013 09:53:20  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 09:35:32  $
+--       SCCS Version     : $Revision:   2.5  $
 --       Based on 
 --
 --     TRIGGER a_del_nm_elements
@@ -279,7 +279,7 @@ DECLARE
 --       FOR     EACH ROW
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2001
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
    no_spatial_exists EXCEPTION;
@@ -368,11 +368,11 @@ DECLARE
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm_elements_trg.sql-arc   2.4   Jul 23 2010 14:07:12   gjohnson  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm_elements_trg.sql-arc   2.5   Jul 04 2013 09:53:20   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm_elements_trg.sql  $
---       Date into SCCS   : $Date:   Jul 23 2010 14:07:12  $
---       Date fetched Out : $Modtime:   May 07 2010 15:18:20  $
---       SCCS Version     : $Revision:   2.4  $
+--       Date into SCCS   : $Date:   Jul 04 2013 09:53:20  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 09:35:32  $
+--       SCCS Version     : $Revision:   2.5  $
 --       Based on 
 --       Based on 1.11
 --
@@ -382,7 +382,7 @@ DECLARE
 --       FOR     EACH ROW
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2001
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
    CURSOR cs_other_usages (p_ne_id    nm_node_usages_all.nnu_ne_id%TYPE
