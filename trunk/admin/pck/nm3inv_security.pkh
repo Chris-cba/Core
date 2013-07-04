@@ -3,11 +3,11 @@ create or replace package nm3inv_security as
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_security.pkh-arc   2.2   Mar 16 2011 11:19:38   Chris.Strettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_security.pkh-arc   2.3   Jul 04 2013 16:08:48   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3inv_security.pkh  $
---       Date into PVCS   : $Date:   Mar 16 2011 11:19:38  $
---       Date fetched Out : $Modtime:   Mar 15 2011 11:04:24  $
---       Version          : $Revision:   2.2  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:08:48  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:14  $
+--       Version          : $Revision:   2.3  $
 --       Based on SCCS version : 1.1
 -------------------------------------------------------------------------
 --
@@ -16,11 +16,11 @@ create or replace package nm3inv_security as
 --   NM3 Inventory Security
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2001
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
-  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.2  $';
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.3  $';
 --  g_sccsid is the SCCS ID for the package
 --</GLOBVAR>
 --

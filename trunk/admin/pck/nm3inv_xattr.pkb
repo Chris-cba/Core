@@ -2,23 +2,23 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_xattr AS
 -----------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_xattr.pkb-arc   2.2   Aug 10 2009 11:42:30   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_xattr.pkb-arc   2.3   Jul 04 2013 16:08:48   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3inv_xattr.pkb  $
---       Date into PVCS   : $Date:   Aug 10 2009 11:42:30  $
---       Date fetched Out : $Modtime:   Aug 10 2009 11:41:44  $
---       PVCS Version     : $Revision:   2.2  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:08:48  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:14  $
+--       PVCS Version     : $Revision:   2.3  $
 --
 --   Author : Rob Coupe
 --
 --   Xattr Validation package
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2001
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.2  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.3  $"';
 -- g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'NM3INV_XATTR';

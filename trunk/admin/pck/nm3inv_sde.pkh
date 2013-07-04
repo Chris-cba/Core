@@ -3,11 +3,11 @@ create or replace package nm3inv_sde as
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_sde.pkh-arc   2.1   Jan 06 2010 16:38:28   cstrettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_sde.pkh-arc   2.2   Jul 04 2013 16:08:48   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3inv_sde.pkh  $
---       Date into PVCS   : $Date:   Jan 06 2010 16:38:28  $
---       Date fetched Out : $Modtime:   Jan 05 2010 17:52:32  $
---       Version          : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:08:48  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:14  $
+--       Version          : $Revision:   2.2  $
 --       Based on SCCS version : 1.4
 -------------------------------------------------------------------------
 
@@ -16,11 +16,11 @@ create or replace package nm3inv_sde as
 --   NM3 Inventory for SDE package
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2001
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
-  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.1  $';
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.2  $';
 --  g_sccsid is the SCCS ID for the package
 --</GLOBVAR>
 --

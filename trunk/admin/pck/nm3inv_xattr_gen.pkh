@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE nm3inv_xattr_gen AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_xattr_gen.pkh-arc   2.1   Jan 06 2010 16:38:36   cstrettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_xattr_gen.pkh-arc   2.2   Jul 04 2013 16:08:48   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3inv_xattr_gen.pkh  $
---       Date into PVCS   : $Date:   Jan 06 2010 16:38:36  $
---       Date fetched Out : $Modtime:   Jan 05 2010 17:45:32  $
---       Version          : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:08:48  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:14  $
+--       Version          : $Revision:   2.2  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -16,11 +16,11 @@ CREATE OR REPLACE PACKAGE nm3inv_xattr_gen AS
 --   NM3 Inventory X-Attribute Trigger Generation package
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2001
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
-  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.1  $';
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.2  $';
 --  g_sccsid is the SCCS ID for the package
 --
    TYPE tab_ae IS TABLE OF all_errors%ROWTYPE INDEX BY binary_integer;

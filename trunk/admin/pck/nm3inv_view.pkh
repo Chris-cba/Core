@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE nm3inv_view AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_view.pkh-arc   2.2   Mar 22 2010 09:48:00   cstrettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_view.pkh-arc   2.3   Jul 04 2013 16:08:48   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3inv_view.pkh  $
---       Date into PVCS   : $Date:   Mar 22 2010 09:48:00  $
---       Date fetched Out : $Modtime:   Mar 22 2010 09:32:46  $
---       Version          : $Revision:   2.2  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:08:48  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:14  $
+--       Version          : $Revision:   2.3  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --   Author : Jonathan Mills
@@ -16,12 +16,12 @@ CREATE OR REPLACE PACKAGE nm3inv_view AS
 --
 --
 -----------------------------------------------------------------------------
---   Copyright (c) exor corporation ltd, 2001
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 
 --</PACKAGE>
 --<GLOBVAR>
-  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.2  $';
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.3  $';
 --
 --</GLOBVAR>
 --

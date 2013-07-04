@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_security AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_security.pkb-arc   2.6   Jul 12 2011 15:01:58   Chris.Strettle  $
---       Module Name      : $Workfile:   nm3inv_security_co.pkb  $
---       Date into PVCS   : $Date:   Jul 12 2011 15:01:58  $
---       Date fetched Out : $Modtime:   Jul 12 2011 14:53:56  $
---       Version          : $Revision:   2.6  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_security.pkb-arc   2.7   Jul 04 2013 16:08:48   James.Wadsworth  $
+--       Module Name      : $Workfile:   nm3inv_security.pkb  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:08:48  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:14  $
+--       Version          : $Revision:   2.7  $
 --       Based on SCCS version : 1.1
 -------------------------------------------------------------------------
 --
@@ -16,14 +16,14 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_security AS
 --   NM3 Inventory Security body
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2001
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 --all global package variables here
 --
 --  g_body_sccsid is the SCCS ID for the package body
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '$Revision:   2.6  $';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '$Revision:   2.7  $';
    g_package_name    CONSTANT  varchar2(30)   := 'nm3inv_security';
 --
    l_dummy_package_variable number;

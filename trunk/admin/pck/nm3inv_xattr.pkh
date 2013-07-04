@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE nm3inv_xattr AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_xattr.pkh-arc   2.1   Jan 06 2010 22:50:32   cstrettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_xattr.pkh-arc   2.2   Jul 04 2013 16:08:48   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3inv_xattr.pkh  $
---       Date into PVCS   : $Date:   Jan 06 2010 22:50:32  $
---       Date fetched Out : $Modtime:   Jan 06 2010 22:49:34  $
---       Version          : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:08:48  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:14  $
+--       Version          : $Revision:   2.2  $
 --       Based on SCCS version : 1.7
 -------------------------------------------------------------------------
 --
@@ -15,11 +15,11 @@ CREATE OR REPLACE PACKAGE nm3inv_xattr AS
 --   Xattr Validation package
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2001
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
-  g_sccsid      CONSTANT  varchar2(2000) := '$Revision:   2.1  $';
+  g_sccsid      CONSTANT  varchar2(2000) := '$Revision:   2.2  $';
 --  g_sccsid is the SCCS ID for the package
 --</GLOBVAR>
 --

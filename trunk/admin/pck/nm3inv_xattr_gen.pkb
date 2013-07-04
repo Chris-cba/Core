@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_xattr_gen AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_xattr_gen.pkb-arc   2.2   May 16 2011 14:44:56   Steve.Cooper  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_xattr_gen.pkb-arc   2.3   Jul 04 2013 16:08:48   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3inv_xattr_gen.pkb  $
---       Date into PVCS   : $Date:   May 16 2011 14:44:56  $
---       Date fetched Out : $Modtime:   Apr 04 2011 08:10:18  $
---       Version          : $Revision:   2.2  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:08:48  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 15:44:12  $
+--       Version          : $Revision:   2.3  $
 --       Based on SCCS version : 1.9
 -------------------------------------------------------------------------
 --
@@ -16,14 +16,14 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_xattr_gen AS
 --   NM3 Inventory X-Attribute Trigger Generation package body
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2001
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 --all global package variables here
 --
 --  g_body_sccsid is the SCCS ID for the package body
 --
-   g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.2  $';
+   g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.3  $';
    g_package_name    CONSTANT  varchar2(30)   := 'nm3inv_xattr_gen';
 --
    g_tab_varchar     nm3type.tab_varchar32767;
@@ -189,7 +189,7 @@ BEGIN
    append ('--   ####################################################');
    append ('--');
    append ('-----------------------------------------------------------------------------');
-   append ('--      Copyright (c) exor corporation ltd, 2003');
+   append ('--      Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.');
    append ('-----------------------------------------------------------------------------');
    append ('--');
    append ('--  Generation Details :-');
@@ -202,6 +202,7 @@ BEGIN
    append ('--');
    append ('BEGIN');
    append ('--');
+
 --
    l_if := indent(3)||'IF ';
    FOR cs_outer IN cs_driving_inv_type
