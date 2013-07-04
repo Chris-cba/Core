@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY nm3net_api_gen AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3net_api_gen.pkb-arc   2.3   Oct 04 2011 15:43:44   Steve.Cooper  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3net_api_gen.pkb-arc   2.4   Jul 04 2013 16:19:14   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3net_api_gen.pkb  $
---       Date into PVCS   : $Date:   Oct 04 2011 15:43:44  $
---       Date fetched Out : $Modtime:   Oct 04 2011 15:43:18  $
---       Version          : $Revision:   2.3  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:19:14  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 15:47:58  $
+--       Version          : $Revision:   2.4  $
 --       Based on SCCS version : 1.7
 ---------------------------------------------------------------------------
 --   Author : Jonathan Mills
@@ -15,12 +15,12 @@ CREATE OR REPLACE PACKAGE BODY nm3net_api_gen AS
 --   network API generation package body
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2002
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '$Revision:   2.3  $';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '$Revision:   2.4  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3net_api_gen';
@@ -96,7 +96,7 @@ BEGIN
    append_both('--  User         : '||USER);
    append_both('--');
    append_both('-----------------------------------------------------------------------------');
-   append_both('--	Copyright (c) exor corporation ltd, 2002');
+   append_both('--	Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.');
    append_both('-----------------------------------------------------------------------------');
    append_both('--');
 END append_sccs;

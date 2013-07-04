@@ -3,11 +3,11 @@ create or replace package nm3net_api_gen as
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3net_api_gen.pkh-arc   2.1   Jan 06 2010 16:41:32   cstrettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3net_api_gen.pkh-arc   2.2   Jul 04 2013 16:19:14   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm3net_api_gen.pkh  $
---       Date into PVCS   : $Date:   Jan 06 2010 16:41:32  $
---       Date fetched Out : $Modtime:   Jan 06 2010 15:24:14  $
---       Version          : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   Jul 04 2013 16:19:14  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:18  $
+--       Version          : $Revision:   2.2  $
 --       Based on SCCS version : 1.1
 ---------------------------------------------------------------------------
 --   Author : Jonathan Mills
@@ -15,11 +15,11 @@ create or replace package nm3net_api_gen as
 --   network API generation package
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2002
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
-  g_sccsid      CONSTANT  VARCHAR2(2000) := '$Revision:   2.1  $';
+  g_sccsid      CONSTANT  VARCHAR2(2000) := '$Revision:   2.2  $';
 --  g_sccsid is the SCCS ID for the package
 --</GLOBVAR>
 --
