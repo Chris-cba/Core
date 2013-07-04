@@ -6,11 +6,11 @@ for each row
 declare
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm_nw_ad_link_whole_flag_trg.sql-arc   2.0   Jun 05 2008 09:17:34   smarshall  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm_nw_ad_link_whole_flag_trg.sql-arc   2.1   Jul 04 2013 09:54:28   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm_nw_ad_link_whole_flag_trg.sql  $
---       Date into PVCS   : $Date:   Jun 05 2008 09:17:34  $
---       Date fetched Out : $Modtime:   Jun 04 2008 09:16:02  $
---       PVCS Version     : $Revision:   2.0  $
+--       Date into PVCS   : $Date:   Jul 04 2013 09:54:28  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 09:35:32  $
+--       PVCS Version     : $Revision:   2.1  $
 begin
   if :new.nad_whole_road = '0' then
     :new.nad_member_id := :new.nad_iit_ne_id;
