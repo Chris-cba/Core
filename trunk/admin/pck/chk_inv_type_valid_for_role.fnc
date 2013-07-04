@@ -3,11 +3,11 @@ CREATE OR REPLACE FUNCTION chk_inv_type_valid_for_role (p_inv_type IN varchar2)
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/chk_inv_type_valid_for_role.fnc-arc   2.1   May 16 2011 14:25:52   Steve.Cooper  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/chk_inv_type_valid_for_role.fnc-arc   2.2   Jul 04 2013 14:28:16   James.Wadsworth  $
 --       Module Name      : $Workfile:   chk_inv_type_valid_for_role.fnc  $
---       Date into SCCS   : $Date:   May 16 2011 14:25:52  $
---       Date fetched Out : $Modtime:   Apr 20 2011 08:41:52  $
---       SCCS Version     : $Revision:   2.1  $
+--       Date into SCCS   : $Date:   Jul 04 2013 14:28:16  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 14:25:06  $
+--       SCCS Version     : $Revision:   2.2  $
 --       Based on SCCS Version     : 1.6
 --
 --
@@ -16,7 +16,7 @@ CREATE OR REPLACE FUNCTION chk_inv_type_valid_for_role (p_inv_type IN varchar2)
 --   Role Based Inventory Function
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2001
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
    CURSOR cs_inv_type_valid_for_role (p_inv_type varchar2) IS
