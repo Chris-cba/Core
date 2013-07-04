@@ -3,13 +3,15 @@ CREATE OR REPLACE procedure replace_R_with_Q_trees( p_level in number default 6 
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/utl/replace_r_with_q_trees.prc-arc   3.0   Jul 11 2008 11:04:12   aedwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/utl/replace_r_with_q_trees.prc-arc   3.1   Jul 04 2013 10:30:14   James.Wadsworth  $
 --       Module Name      : $Workfile:   replace_r_with_q_trees.prc  $
---       Date into PVCS   : $Date:   Jul 11 2008 11:04:12  $
---       Date fetched Out : $Modtime:   Jul 11 2008 11:00:26  $
---       PVCS Version     : $Revision:   3.0  $
+--       Date into PVCS   : $Date:   Jul 04 2013 10:30:14  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 10:27:08  $
+--       PVCS Version     : $Revision:   3.1  $
 --
---------------------------------------------------------------------------------
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
 --
 as
   cursor get_rts is

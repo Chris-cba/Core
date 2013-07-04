@@ -3,13 +3,15 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/utl/upd_incorrect_child_loc_with_at_rel.sql-arc   3.0   Jul 13 2009 09:38:32   lsorathia  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/utl/upd_incorrect_child_loc_with_at_rel.sql-arc   3.1   Jul 04 2013 10:30:14   James.Wadsworth  $
 --       Module Name      : $Workfile:   upd_incorrect_child_loc_with_at_rel.sql  $
---       Date into PVCS   : $Date:   Jul 13 2009 09:38:32  $
---       Date fetched Out : $Modtime:   Jul 06 2009 16:40:48  $
---       PVCS Version     : $Revision:   3.0  $
+--       Date into PVCS   : $Date:   Jul 04 2013 10:30:14  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 10:28:54  $
+--       PVCS Version     : $Revision:   3.1  $
 --
---------------------------------------------------------------------------------
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
 --
 
 Set linesize 1000

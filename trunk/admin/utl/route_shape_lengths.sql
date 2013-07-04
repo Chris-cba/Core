@@ -14,8 +14,9 @@
 --  Author:	Rob Coupe
 --
 -----------------------------------------------------------------------------
---  Copyright (c) exor corporation ltd, 2006
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
+--
 --
 CREATE OR REPLACE PROCEDURE set_measure (
    p_shape    IN OUT NOCOPY   MDSYS.SDO_GEOMETRY,

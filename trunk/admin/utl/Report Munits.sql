@@ -2,13 +2,15 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/utl/Report Munits.sql-arc   1.1   Dec 08 2010 09:39:58   Ade.Edwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/utl/Report Munits.sql-arc   1.2   Jul 04 2013 10:30:14   James.Wadsworth  $
 --       Module Name      : $Workfile:   Report Munits.sql  $
---       Date into PVCS   : $Date:   Dec 08 2010 09:39:58  $
---       Date fetched Out : $Modtime:   Dec 08 2010 09:39:10  $
---       PVCS Version     : $Revision:   1.1  $
+--       Date into PVCS   : $Date:   Jul 04 2013 10:30:14  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 10:27:22  $
+--       PVCS Version     : $Revision:   1.2  $
 --
---------------------------------------------------------------------------------
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
 --
 
 SET SERVEROUTPUT ON

@@ -3,13 +3,15 @@ CREATE OR REPLACE procedure replace_Q_with_R_trees
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/utl/replace_q_with_r_trees.prc-arc   3.0   Jul 11 2008 11:03:34   aedwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/utl/replace_q_with_r_trees.prc-arc   3.1   Jul 04 2013 10:30:14   James.Wadsworth  $
 --       Module Name      : $Workfile:   replace_q_with_r_trees.prc  $
---       Date into PVCS   : $Date:   Jul 11 2008 11:03:34  $
---       Date fetched Out : $Modtime:   Jul 11 2008 11:00:02  $
---       PVCS Version     : $Revision:   3.0  $
+--       Date into PVCS   : $Date:   Jul 04 2013 10:30:14  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 10:26:54  $
+--       PVCS Version     : $Revision:   3.1  $
 --
---------------------------------------------------------------------------------
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
 --
 as
   cursor get_qts is

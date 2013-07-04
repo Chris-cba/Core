@@ -1,4 +1,17 @@
-REM Copyright (c) Exor Corporation Ltd, 2004
+--
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/utl/set_tables_noparallel.sql-arc   2.1   Jul 04 2013 10:30:14   James.Wadsworth  $
+--       Module Name      : $Workfile:   set_tables_noparallel.sql  $
+--       Date into PVCS   : $Date:   Jul 04 2013 10:30:14  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 10:27:56  $
+--       Version          : $Revision:   2.1  $
+--
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
+REM Copyright 2013 Bentley Systems Incorporated. All rights reserved.
 REM @(#)set_tables_noparallel.sql	1.2 05/26/05
 
 set echo off

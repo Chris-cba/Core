@@ -2,13 +2,15 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/utl/Report Shape Lengths.sql-arc   1.0   Oct 25 2010 09:06:22   ade.edwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/utl/Report Shape Lengths.sql-arc   1.1   Jul 04 2013 10:30:14   James.Wadsworth  $
 --       Module Name      : $Workfile:   Report Shape Lengths.sql  $
---       Date into PVCS   : $Date:   Oct 25 2010 09:06:22  $
---       Date fetched Out : $Modtime:   Oct 25 2010 09:04:58  $
---       PVCS Version     : $Revision:   1.0  $
+--       Date into PVCS   : $Date:   Jul 04 2013 10:30:14  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 10:27:32  $
+--       PVCS Version     : $Revision:   1.1  $
 --
---------------------------------------------------------------------------------
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
 --
 --
 SET SERVEROUTPUT ON

@@ -1,3 +1,16 @@
+--
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/utl/sleq_install.sql-arc   2.1   Jul 04 2013 10:30:14   James.Wadsworth  $
+--       Module Name      : $Workfile:   sleq_install.sql  $
+--       Date into PVCS   : $Date:   Jul 04 2013 10:30:14  $
+--       Date fetched Out : $Modtime:   Jul 04 2013 10:28:40  $
+--       Version          : $Revision:   2.1  $
+--
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
 define sccsid = '@(#)sleq_install.sql	1.2 07/06/05'
 
 set echo off
