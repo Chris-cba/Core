@@ -5,6 +5,8 @@
 #define F_OK 00
 #endif
 
+/* Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved. */
+
 /* SCCS ID keywords, do not remove */
 static char *sccsid = "@(#)pclsnr.c	1.1 09/08/03";
 

@@ -1,5 +1,7 @@
 #include <stdio.h>
 
+/* Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved. */
+
 /* SCCS ID keywords, do not remove */
 static char *sccsid = "@(#)unxlsnr.c	1.1 09/08/03";
 
