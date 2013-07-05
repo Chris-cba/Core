@@ -1,0 +1,407 @@
+/*    SCCS Identifiers :-
+rem   
+rem   Oracle Server based listener mechanism for recording 
+rem   error/debug messages from server based C modules
+rem   into a database table
+rem
+rem   SCCS Identifiers :-
+rem   
+rem       sccsid           : @(#)gri0207.pc	1.1 09/08/03
+rem       Module Name      : gri0207.pc
+rem       Date into SCCS   : 03/09/08 17:29:34
+rem       Date fetched Out : 07/06/13 13:55:37
+rem       SCCS Version     : 1.1# 
+
+rem */
+
+/* Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved. */
+
+/* SCCSID Keyowords - Do not remove */
+static char *sccsid = "@(#)gri0207.pc	1.1 09/08/03";
+
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <signal.h>
+#ifdef WIN32
+#include <windows.h>
+#endif
+
+#define LENCHAR(str) str.len=strlen((char *)str.arr);
+#define TERMCHAR(str) str.arr[str.len]='\0';
+#define SQLSUCCESS (sqlca.sqlcode == 0)
+#ifdef WIN32
+	#define SLASH "\\"
+#else
+	#define SLASH "/"
+#endif
+
+int EXDebug;
+void sql_error();
+void sql_logon_fail();
+void clean_closedown();
+void dirty_closedown();
+void do_listen();
+void writetodbase(char *);
+void breakupstring(char *);
+void check_database();
+
+exec sql begin declare section;
+	varchar	username[64];
+    varchar dummy[254];
+	unsigned long seqno;
+	unsigned long jobid;
+	varchar msgtext[2000];
+    exec sql declare
+    exor_lock table (ex_lock varchar2(10));
+    varchar gri_status[5];
+    varchar pipe_name[254];
+    short   i_pipe_name;
+    int pipe_status;
+exec sql end declare section;
+
+exec sql include sqlca;
+exec sql include oraca;
+
+main ( argc, argv )
+int argc;
+char **argv;
+{
+	char *ptr;
+	int fd;
+	char buff[30];
+	char lockfile[50];
+
+	if (argc < 2)
+	{
+		printf("Usage : gri0207 <username/password>\n");
+		exit(1);
+	}
+
+	if (argc > 2 && strcmp(argv[2],"-d")==0)
+	{
+		EXDebug = 1;
+	}
+	else
+		EXDebug = 0;
+
+#ifdef WIN32
+   SetConsoleTitle("gri0207 : Highways by exor - Listener process 3");   
+#endif
+        set_signals();
+        /* check_env(); */
+        oralogon(argv[1]);
+        lock_lsnr();
+
+	if (EXDebug)
+		printf("gri0207: Connected to Oracle.\n");
+
+#ifndef WIN32
+    if (fork()) /* Clone myself */
+      exit(0); /* Exit the original parent*
+
+    setsid(); /* Make myself a process group leader and detach from terminal */
+#endif
+
+        if (EXDebug)
+           printf ("gri0207: Going into listening state.\n");
+	do_listen();
+	clean_closedown();
+}
+
+void writetodbase(msgline)
+char *msgline;
+{
+	char *ptr;
+
+	ptr=strtok(msgline,","); /* Job Id */
+	if (!ptr)
+	{
+		puts("gri0207: No Job id");
+		return;
+	}
+
+	jobid=strtoul(ptr,(char **)0,10);
+	if (jobid==0)
+	{
+		puts("gri0207: Zero Job id");
+		return;
+	}
+
+	ptr=strtok(NULL,","); /* Message Text */
+	if (!ptr)
+	{
+		printf("gri0207: No message text for job id %d\n",jobid);
+		return;
+	}
+
+	strcpy((char *)msgtext.arr,ptr);
+	LENCHAR(msgtext);
+
+	if (EXDebug)
+		printf("gri0207: Job Id %d Msg %s\n",jobid,msgtext.arr);
+
+	EXEC SQL 
+		SELECT nvl(max(GRS_LINE_NO),0) + 1
+    	INTO   :seqno
+    	FROM GRI_SPOOL
+        WHERE GRS_JOB_ID = :jobid;
+
+	if (EXDebug)
+		printf("gri0207: Job Id/Seqno %d/%d Msg %s\n",jobid,seqno,msgtext.arr);
+
+	EXEC SQL 
+		INSERT INTO GRI_SPOOL
+		(
+			GRS_JOB_ID,
+			GRS_LINE_NO,
+			GRS_TEXT
+		)
+		VALUES 
+		(
+			:jobid,
+			:seqno,
+			:msgtext
+		);
+
+	EXEC SQL COMMIT WORK;
+
+	return;
+}
+
+void sql_logon_fail()
+{
+	puts("Failed to log on using the specified username/password");
+	exit(1);
+}
+
+void sql_error()
+{
+	char msg[1024];
+	int	rlen, len;
+
+	len = sizeof( msg );
+
+	oraca.orastxt.orastxtc[oraca.orastxt.orastxtl]='\0';
+	oraca.orasfnm.orasfnmc[oraca.orasfnm.orasfnml]='\0';
+	printf("Oracle error %d at line %d of %s\n",sqlca.sqlcode,oraca.oraslnr,oraca.orasfnm.orasfnmc);
+	printf("Statement : %s\n",oraca.orastxt.orastxtc);
+
+	EXEC SQL WHENEVER SQLERROR CONTINUE;
+	EXEC SQL WHENEVER SQLWARNING CONTINUE;
+	EXEC SQL ROLLBACK RELEASE;
+	exit (1);
+}
+
+void clean_closedown(int sig)
+{
+/* 
+** Signal handler for closedown signals received
+**
+** Don't try to log off the database upon receipt of a signal
+** because it will probably get stuck !
+*/
+	signal(sig,SIG_IGN);
+	printf("Listener Shutdown requested\n");
+
+	exit(0);
+}
+
+void dirty_closedown(int sig)
+{
+/* 
+** Signal handler for fatal signals received
+**
+** Don't try to log off the database upon receipt of a signal
+** because it will probably get stuck !
+*/
+	signal(sig,SIG_IGN);
+	printf("Signal %d received. Dumping core\n",sig);
+	
+	abort();
+	exit(1);
+}
+
+check_env()
+{
+   char *ptr;
+	ptr=getenv("ORACLE_HOME");
+	if (!ptr)
+	{
+		printf("gri0207: ORACLE_HOME not set\n");
+	}
+	if (EXDebug)
+		printf("gri0207: ORACLE_HOME=%s\n",ptr);
+
+	ptr=getenv("ORACLE_SID");
+	if (!ptr)
+	{
+		printf("gri0207: ORACLE_SID not set\n");
+	}
+	if (EXDebug)
+		printf("gri0207: ORACLE_SID=%s\n",ptr);
+}
+
+oralogon(char *uid)
+{
+	strcpy( (char *)username.arr, uid);
+	username.len = strlen( (char *)username.arr );
+
+	oraca.orastxtf = 1;
+	exec sql whenever sqlerror do sql_logon_fail();
+	exec sql connect :username;
+	exec sql whenever sqlerror do sql_error();
+}
+
+int lock_lsnr()
+{
+   EXEC SQL select 'Lock'
+            into :dummy
+            from  exor_lock
+            where ex_lock = 'GRI0207'
+            for update of ex_lock;
+   oraerror("lock_lsnr");
+}
+
+void check_database(fname,full_pipe_name)
+char *fname, *full_pipe_name;
+{
+   char sys_call[254];
+   if (sqlca.sqlcode < 0)
+   {
+      printf("\n\ngri0207: Fatal error when in listening state.\n");
+      printf("gri0207: This probably occurred because the database\n");
+      printf("gri0207: has been shutdown without propperly stopping\n");
+      printf("gri0207: the listener processes. The listeners can be\n");
+      printf("gri0207: restarted once the database is restarted.\n");
+      printf("gri0207: Oracle error produced was :\n");
+      printf("%s\n",sqlca.sqlerrm.sqlerrmc);
+#ifndef WIN32
+      strcpy(sys_call,"rm ");
+      strcat(sys_call,full_pipe_name);
+      system(sys_call);
+#endif
+      EXEC SQL ROLLBACK WORK RELEASE;
+      exit(1);
+   }
+}
+
+void do_listen()
+{
+   char   message[1000];
+   char ch;
+   strcpy(message,"\0");
+   
+
+      /* Create the pipes */
+   EXEC SQL EXECUTE
+   BEGIN
+          :pipe_status := higpipe.cre_pipes;
+   END;
+   END-EXEC;
+
+   if ( pipe_status == 0 )
+   {
+      printf("GRI0207: Error Pipes not created\n");
+   }
+   
+   for (;;)
+   {
+      EXEC SQL select 'x'
+               into :dummy
+               from exor_lsnr
+               where mod_name = 'GRI0207';
+      oraerror("do_listen - Check database connection");
+
+      if (strlen(message)>0)
+      {
+         exec sql select status
+                  into   :gri_status
+                  from   exor_lsnr
+                  where  mod_name = 'GRI0207';
+         oraerror("do_listen : GRI_STATUS");
+
+         gri_status.arr[gri_status.len] = '\0';
+   
+         if (EXDebug)
+            printf ("GRI0207: Got %s Status\n",gri_status.arr);
+
+         if (strcmp(gri_status.arr,"STOP") == 0)
+         {
+            do_stop();
+         }
+	  }
+      /* Check for message in pipe */
+      EXEC SQL EXECUTE    
+      BEGIN
+
+         :pipe_status := higpipe.msg_check;
+ 
+      END;
+      END-EXEC;
+     	  
+	  /* if pipe_status is 5 then STOP msg received */
+      if ( pipe_status == 5 )
+		 {
+         EXEC SQL EXECUTE
+         BEGIN
+		    /* delete the pipe */
+            :pipe_status := higpipe.del_pipes;
+         END;
+         END-EXEC;
+         /* stop the listener */
+		 do_stop();
+		 }
+
+	/*   Sleep(500); */
+   }
+}
+
+
+do_stop()
+{
+   exec sql lock table exor_lsnr in exclusive mode;
+   oraerror("gri0207 : lock EXOR_LSNR");
+
+   exec sql delete exor_lsnr
+      where mod_name = 'GRI0207';
+
+   exec sql commit work release;
+   oraerror("gri0207: Commit release");
+
+   if (EXDebug)
+      printf ("GRI0207: Stop signal received\n");
+   exit(0);
+}
+
+oraerror(char *fname)
+{
+   if (sqlca.sqlcode < 0)
+   {
+      printf("GRI9998: \nERROR:\n%s\nOccurred in function %s\n",
+             sqlca.sqlerrm.sqlerrmc,
+             fname);
+      EXEC SQL ROLLBACK WORK RELEASE;
+      exit(1);
+   }
+}
+
+set_signals()
+{
+#ifdef WIN32
+   signal(SIGTERM,clean_closedown);
+   signal(SIGINT,clean_closedown);
+   signal(SIGILL,dirty_closedown);
+   signal(SIGFPE,dirty_closedown);
+   signal(SIGSEGV,dirty_closedown);
+#else
+   signal(SIGHUP,clean_closedown);
+   signal(SIGTERM,clean_closedown);
+   signal(SIGINT,clean_closedown);
+   signal(SIGQUIT,clean_closedown);
+   signal(SIGILL,dirty_closedown);
+   signal(SIGFPE,dirty_closedown);
+   signal(SIGBUS,dirty_closedown);
+   signal(SIGSEGV,dirty_closedown);
+#endif
+}
