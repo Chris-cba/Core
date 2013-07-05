@@ -1,0 +1,176 @@
+#include <stdio.h>
+#include <string.h>
+#include <signal.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <errno.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <stdlib.h>
+#include <sys/ipc.h>
+#include <sys/msg.h>
+
+/* Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved. */
+
+/* SCCS ID keywords, do not remove */
+static char *sccsid = "@(#)unx206.pc	1.1 09/08/03";
+
+exec sql begin declare section;
+   varchar gri_status[5];
+   varchar pipe_name[254];
+   varchar dummy[254];
+   short   i_pipe_name;
+exec sql end declare section;
+
+exec sql include sqlca;
+exec sql include oraca;
+
+extern int EXDebug;
+void clean_closedown();
+void dirty_closedown();
+
+set_signals()
+{
+        signal(SIGHUP,clean_closedown);
+        signal(SIGTERM,clean_closedown);
+        signal(SIGINT,clean_closedown);
+        signal(SIGQUIT,clean_closedown);
+        signal(SIGILL,dirty_closedown);
+        signal(SIGFPE,dirty_closedown);
+        signal(SIGBUS,dirty_closedown);
+        signal(SIGSEGV,dirty_closedown);
+}
+
+void do_listen()
+{
+        struct msgs
+        {
+                long type;
+                char text[2000];
+        } msg;
+
+        int mkey;
+        int totbytes;
+        char full_pipe_name[254];
+        FILE *pipe_file;
+
+   EXEC SQL select min(hop_value)
+            into   :pipe_name:i_pipe_name
+            from   hig_options
+            where  hop_product = 'HIG'
+            and    hop_id = 'GRILSTNAME';
+   oraerror("do_listen : get pipe name");
+
+/*
+**  Form a key for the messages and create a message queue entry if
+**  one does not already exist with this id. The id is formed by the ftok()
+**  and the args of "/tmp" and 1 must be the same for both message sender
+**  and message receiver or else we won't see each others messages
+*/
+
+    if (i_pipe_name < 0)
+    {
+       strcpy(pipe_name.arr,"lstner");
+       pipe_name.len = 6;
+    }
+
+    pipe_name.arr[pipe_name.len] = '\0';
+
+    strcpy(full_pipe_name,"/tmp/EXOR_");
+    strcat(full_pipe_name,pipe_name.arr);
+
+   pipe_file=fopen(full_pipe_name,"a");
+   if (pipe_file == NULL)
+   {
+      printf ("gri0206: ERROR - Unable to open pipe file %s\n",full_pipe_name);
+      exit(1);
+   }
+   fclose (pipe_file);
+
+   if (EXDebug)
+      printf ("gri0206: INFO - Pipe file is %s\n",full_pipe_name);
+   
+        /* mkey=msgget(ftok(full_pipe_name,2),01666); */
+        mkey=msgget(ftok(full_pipe_name,1),01666); 
+
+        if (mkey == -1)
+        {
+                puts(strerror(errno));
+                exit(1);
+        }
+
+
+
+        if (EXDebug)
+                printf("gri0206: Going into listening state\n");
+
+        for (;;)
+        {
+        EXEC SQL select 'x'
+                 into :dummy
+                 from exor_lsnr
+                 where mod_name = 'GRI0206';
+        check_database("do_listen - Check Database Connection",full_pipe_name);
+/*
+**      Receive a type 1 message of up to 2000 bytes. The sender must have
+**      sent a type 1 message for us to receive it here. the type is irrelevant
+**      for our purposes as long as it's the same at each end but it would allow
+**      us to send "control" messages and the like with different type numbers
+**      if we wanted to in the future
+*/
+                /* totbytes=msgrcv(mkey,&msg,2000,1,MSG_NOERROR); */
+                totbytes=msgrcv(mkey,&msg,2000,1,IPC_NOWAIT);
+                if (totbytes > -1)
+                {
+                        exec sql select status
+                                 into :gri_status
+                                 from  exor_lsnr
+                                 where mod_name = 'GRI0206';
+                        oraerror("do_listen : GRI_STATUS");
+                        gri_status.arr[gri_status.len] = '\0';
+
+                        if (EXDebug)
+                           printf ("GRI0206: Got %s Status\n",gri_status.arr);
+
+                        if (strcmp(gri_status.arr,"STOP") == 0)
+                        {
+                           do_stop();
+                        }
+
+                        msg.text[totbytes]='\0';
+                        if (EXDebug)
+                                puts(msg.text);
+                        writetodbase(msg.text);
+                }
+                usleep(200000);
+        }
+}
+
+do_stop()
+{
+   exec sql lock table exor_lsnr in exclusive mode;
+   oraerror("gri0206 : lock EXOR_LSNR");
+
+   exec sql delete exor_lsnr
+      where mod_name = 'GRI0206';
+
+   exec sql commit work release;
+   oraerror("gri0206: Commit release");
+
+   if (EXDebug)
+      printf ("GRI0206: Stop signal received\n");
+   exit(0);
+}
+
+oraerror(char *fname)
+{
+   if (sqlca.sqlcode < 0)
+   {
+      printf("GRI9998: \nERROR:\n%s\nOccurred in function %s\n",
+             sqlca.sqlerrm.sqlerrmc,
+             fname);
+      EXEC SQL ROLLBACK WORK RELEASE;
+      exit(1);
+   }
+}
+
