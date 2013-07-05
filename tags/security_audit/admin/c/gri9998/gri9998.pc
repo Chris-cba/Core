@@ -1,0 +1,157 @@
+/*    SCCS Identifiers :-
+rem
+rem       sccsid           : @(#)gri9998.pc	1.1 09/08/03
+rem       Module Name      : gri9998.pc
+rem       Date into SCCS   : 03/09/08 17:30:49
+rem       Date fetched Out : 07/06/13 13:56:10
+rem       SCCS Version     : 1.1# 
+rem
+rem   Module to test operation of Server based listener processes.
+rem   Takes parameters from GRI for repeat count and sleep time and
+rem   loops round sending messages for GRI0206 to pick up.
+rem
+rem   Author : A. Rowlinson
+rem
+rem */
+
+/* Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved. */
+
+#include <stdio.h>
+#include <string.h>
+#include <signal.h>
+#include <stdlib.h>
+#ifdef WIN32
+#include <windows.h>
+#endif
+
+exec sql begin declare section;
+	varchar	username[64];
+	int status;
+exec sql end declare section;
+
+EXEC SQL INCLUDE sqlext.h;
+
+short EXDebug;
+char *EXRepOutpath;
+
+FILE *open_log_file(char *fname);
+void oralogon(char *uid), get_params(int numb), i_toa(int i, char *no),
+     write_pipe(FILE *fp, char *msg),
+     jobend(int id, int id2, char *msg), oraerror(char *fname);
+
+void main ( argc, argv )
+int argc;
+char **argv;
+{
+	int i=0;
+        FILE *fp;
+        char no[8];
+        char pipe_msg[254];
+
+        int repeat_cnt, sleep_cnt;
+
+	if (argc < 3)
+	{
+		printf("Usage : %s <username/password> <message>\n",argv[0]);
+		exit(1);
+	}
+
+	puts("GRI9998: Logging on");
+        oralogon(argv[1]);
+	puts("GRI9998: Logged on");
+        jobmain(argc,argv);
+        fp = open_log_file(argv[2]);
+        fprintf (fp,"GRI9998: Logged on\n");
+
+        get_params(2);
+        repeat_cnt = atoi((char *)EXParam[0].arr);
+        sleep_cnt = atoi((char *)EXParam[1].arr);
+        printf ("GRI9998: Parameters Found are : Repeat Count - %d\n",repeat_cnt);
+        printf ("                                Sleep Count  - %d\n",sleep_cnt);
+        fprintf (fp,"GRI9998: Parameters Found are : Repeat Count - %d\n",repeat_cnt);
+        fprintf (fp,"                                Sleep Count  - %d\n",sleep_cnt);
+
+
+	puts("GRI9998: Preparing to send to pipe.");
+        fprintf (fp,"GRI9998: Preparing to send to pipe.\n");
+
+        for (i=0; i<8; i++)
+           no[i] = '\0';
+
+        for (i=0; i<repeat_cnt; i++)
+        {
+	   strcpy(pipe_msg,argv[2]);
+           strcat(pipe_msg,",GRI9998 : Testing GRI Server / Listener # ");
+           i_toa(i,no);
+           strcat(pipe_msg,no);
+           printf ("GRI9998: msg is '%s'\n",pipe_msg);
+           fprintf (fp,"GRI9998: msg is '%s'\n",pipe_msg);
+           strcpy(pipe_msg,"GRI9998 : Testing GRI Server / Listener # ");
+           strcat(pipe_msg,no);
+           write_pipe(fp,pipe_msg);
+
+#ifdef WIN32
+           Sleep(sleep_cnt * 1000);
+#else
+           sleep(sleep_cnt);
+#endif
+        }
+
+	EXEC SQL ROLLBACK RELEASE;
+	exit(status);
+}
+
+void usersigfunc(sig)
+int sig;
+{
+        printf("GRI9998: Signal %d received. Aborting ...",sig);
+        EXEC SQL ROLLBACK WORK;
+        jobend(EXJobId,1,"Signal received causing abnormal program termination")
+;
+        EXEC SQL COMMIT WORK;
+}
+
+void oralogon(char *uid)
+{
+   strcpy( (char *)username.arr, uid);
+   username.len = strlen( (char *)username.arr );
+
+   oraca.orastxtf = 1;
+   exec sql connect :username;
+   oraerror("oralogon");
+}
+
+void oraerror(char *fname)
+{
+   if (sqlca.sqlcode < 0)
+   {
+      printf("GRI9998: \nERROR:\n%s\nOccurred in function %s\n",
+             sqlca.sqlerrm.sqlerrmc,
+             fname);
+      EXEC SQL ROLLBACK WORK RELEASE;
+      exit(1);
+   }
+
+}
+
+FILE *open_log_file(char *fname)
+{
+   FILE *fp;
+   char file_name[200];
+
+   sprintf (file_name,"%d.lst",atoi(fname));
+   printf ("GRI9998: Log File Is %s\n",file_name);
+
+   fp = fopen(file_name,"w");
+   if (fp == NULL)
+   {
+      printf ("GRI9998: Couldn't open log file\n");
+      jobend(atoi(fname),1,"Couldn't open log file");
+   }
+   else
+   {
+      printf ("GRI9998: Log File %s Opened successfully\n",file_name);
+      fprintf (fp,"GRI9998: Log File %s Opened successfully\n",file_name);
+   }
+   return(fp);
+}
