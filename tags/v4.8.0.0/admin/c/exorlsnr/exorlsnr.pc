@@ -1,0 +1,436 @@
+#include <stdio.h> 
+#ifdef WIN32
+#include <windows.h>
+#endif
+#include <signal.h>
+#include <stdlib.h>
+ 
+/* Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved. */
+
+int EXDebug;
+int EXJobId=0;
+char full_pipe_name[254];
+
+int CreateChildProcess(char *params);
+void   ErrorExit(char *), dupl_processes(), oralogoff(),
+       set_signals(), check_env(), set_params(char *params, char *uid),
+       oralogon(char *uid), create_lsnr_table(), do_start(char *params),
+       do_stop(), oraerror(char *fname), sql_logon_fail(),
+       clean_closedown(), dirty_closedown();
+
+exec sql begin declare section;
+       varchar username[64];
+       varchar dummy[2];
+       varchar lsnr_msg[100];
+       varchar pipe_name[254];
+       short   i_pipe_name;
+       int     lsnrs;
+       exec sql declare 
+       exor_lsnr table (mod_name varchar2(10),
+       status   varchar2(5));
+       exec sql declare
+       exor_lock table (ex_lock varchar2(10));
+	   int pipe_status;
+exec sql end declare section;
+
+exec sql include sqlca;
+exec sql include oraca;
+
+/* SCCS ID keywords, do not remove */
+static char *sccsid = "@(#)exorlsnr.pc	1.1 09/08/03";
+
+void main(int argc, char *argv[]) 
+{ 
+    char params[254];
+    char state[254];
+    int loop;
+
+    if (argc == 4)
+	    EXDebug = 1;
+    else
+	    EXDebug = 0;
+
+    if (argc > 2)
+    {
+       for (loop=0;loop<strlen(argv[2]);loop++)
+       {
+          state[loop]=toupper(argv[2][loop]);
+       }
+       state[loop]='\0';
+    }
+    else
+    {
+       strcpy(state,"NONE");
+    }
+
+    if ( ((argc < 3) || (argc > 4)) ||
+          (strchr(argv[1],'/') == NULL) ||
+          ( (strcmp(state,"START") != 0) && (strcmp(state,"STOP") !=0) ) )
+    {
+       printf ("exorlsnr: Usage: %s username/password (START | STOP) [-d]\n",argv[0]);
+       exit(1);
+    }
+
+    set_signals();
+    /* check_env(); */
+    set_params(params,argv[1]);
+    oralogon(argv[1]);
+
+
+    if (EXDebug)
+       printf ("exorlsnr: Connected to Oracle OK\n");
+
+
+    if (strcmp(state,"START") == 0)
+    {
+       check_exor_lock();
+       create_lsnr_table();
+       do_start(params);
+    }
+    else
+    {
+       do_stop();
+    }
+} 
+ 
+void ErrorExit (char *lpszMessage) 
+{ 
+    fprintf(stderr, "%s\n", lpszMessage); 
+    exit(0); 
+} 
+
+void oraerror(fname)
+char *fname;
+{
+   if (sqlca.sqlcode < 0)
+   {
+      printf("\nERROR:\n%s\nOccurred in function %s\n",
+             sqlca.sqlerrm.sqlerrmc,
+             fname);
+      EXEC SQL ROLLBACK WORK RELEASE;
+      exit(1);
+   }
+}
+
+void clean_closedown(int sig)
+{
+   signal(sig,SIG_IGN);
+   printf ("exorlsnr: Listener Shutdown requested\n");
+   exit(0);
+}
+
+void dirty_closedown(int sig)
+{
+   signal(sig,SIG_IGN);
+   printf ("exorlsnr: Signal %d received. Aborting\n",sig);
+   abort();
+   exit(1);
+}
+
+void dupl_processes()
+{
+   printf ("exorlsnr: ERROR: exor listener processes already running\n");
+   exec sql rollback work release;
+   exit (1);
+}
+
+void oralogoff()
+{
+   exec sql rollback work release;
+}
+
+void check_env()
+{
+   char *ptr;
+    ptr=getenv("ORACLE_HOME");
+    if (!ptr)
+    {
+       printf("exorlsnr: ORACLE_HOME not set\n");
+    }
+    if (EXDebug)
+       printf ("exorlsnr: ORACLE_HOME=%s\n",ptr);
+
+    ptr=getenv("ORACLE_SID");
+    if (!ptr)
+    {
+       printf ("exorlsnr: ORACLE_SID not set\n");
+    }
+    if (EXDebug)
+       printf ("exorlsnr: ORACLE_SID=%s\n",ptr);
+}
+
+void set_params(params,uid)
+char *params, *uid;
+{
+    params[0] = '\0';
+
+    if (EXDebug)
+    {
+       strcpy(params,uid);
+       strcat(params," -d");
+    }
+    else
+    {
+       strcpy(params,uid);
+    }
+}
+
+void oralogon(uid)
+char *uid;
+{
+    strcpy((char *)username.arr,uid);
+    username.len = strlen((char *)username.arr);
+
+    oraca.orastxtf = 1;
+    exec sql connect :username;
+    oraerror("oralogon");
+}
+
+void set_signals()
+{
+    signal(SIGINT,clean_closedown);
+    signal(SIGTERM,clean_closedown);
+    signal(SIGABRT,dirty_closedown);
+    signal(SIGFPE,dirty_closedown);
+    signal(SIGILL,dirty_closedown);
+    signal(SIGSEGV,dirty_closedown);
+}
+
+void create_lsnr_table()
+{
+    exec sql whenever sqlerror continue;
+    exec sql whenever sqlwarning continue;
+    exec sql create table exor_lsnr (mod_name varchar2(10), status varchar2(5));
+    exec sql delete exor_lsnr;
+}
+
+void do_start(params)
+char *params;
+{
+    if (EXDebug)
+        printf ("exorlsnr: Starting exorlsnr in START mode\n");
+
+    exec sql insert into exor_lsnr (mod_name, status)
+             values ('GRI0205','START');
+    oraerror("do_start : GRI0205");
+    exec sql insert into exor_lsnr (mod_name, status)
+             values ('GRI0206','START');
+    oraerror("do_start : GRI0206");
+    exec sql insert into exor_lsnr (mod_name, status)
+             values ('GRI0207','START');
+    oraerror("do_start : GRI0207");
+    exec sql commit;
+    oraerror("do_start : commit");
+
+    if (! CreateChildProcess(params)) 
+    {
+       del_rows();
+       ErrorExit("Create process failed"); 
+    }
+	
+    printf ("exorlsnr: GRI Listener successfully spawned\n");
+    exit(0);
+}
+
+void do_stop()
+{
+    int loop=0;
+    int lsnr_found=1;   /* Set to TRUE initially */
+    char sys_call[254];
+
+    if (EXDebug)
+       printf ("exorlsnr: Started on STOP mode\n");
+
+    exec sql select count(*)
+             into   :lsnrs
+             from   exor_lsnr;
+    oraerror("do_stop : Get lsnr Count - 3");
+
+    if (lsnrs == 0)
+    {
+       printf ("exorlsnr: Listeners have already been stopped.\n");
+       return;
+    }
+
+    exec sql lock table exor_lsnr in exclusive mode nowait;
+    oraerror("do_stop : Lock Table");
+    exec sql update exor_lsnr
+             set status = 'STOP';
+    oraerror("do_stop : update exor_lsnr");
+    exec sql commit work;
+    oraerror("do_stop : commit");
+
+    /*  Added code to get the name of the pipe from HIG_OPTIONS */
+
+    EXEC SQL select min(hop_value)
+             into   :pipe_name:i_pipe_name
+             from   hig_options
+             where  hop_product = 'HIG'
+             and    hop_id = 'GRILSTNAME';
+   oraerror("do_stop : get pipe name");
+
+    if ( (i_pipe_name < 0) || (pipe_name.len = 0))
+    {
+       strcpy(pipe_name.arr,"lstner");
+       pipe_name.len = 6;
+    }
+
+    strcpy(full_pipe_name,(char *)pipe_name.arr);
+
+    while ((loop++ < 10) && (lsnr_found))
+    {
+       strcpy(lsnr_msg.arr,"Stop listener");
+       lsnr_msg.len=strlen(lsnr_msg.arr);
+   
+       exec sql execute
+                declare
+                    s    integer;
+                    chr  varchar2(200);
+                    p_name varchar2(254);
+                begin
+                   chr := :lsnr_msg;
+                   p_name := hig.get_sysopt('GRILSTNAME');
+                   if p_name is null then
+                      p_name := 'lstner';
+                   end if;
+                   dbms_pipe.pack_message(chr);
+                   s := dbms_pipe.send_message(p_name,10);
+                end;
+       end-exec;
+       oraerror("do_stop : send pipe");
+
+       write_pipe(NULL,"Stop Listener");
+       
+	   /* Send the pipe message to stop 
+	      DB pipe gri0207 */
+	   exec sql execute 
+	   declare 
+	      FP utl_file.file_type;
+       begin
+	      higpipe.write_pipe('STOP',FP);
+		  higpipe.write_pipe('STOP',FP);
+       end;
+	   end-exec;
+
+#ifdef WIN32
+          Sleep(1000);
+#else
+          sleep(1);
+#endif
+
+       exec sql select count(*)
+                into   :lsnrs
+                from   exor_lsnr;
+       oraerror("do_stop : Get lsnr Count - 2");
+
+       if (lsnrs == 0)      /* No Listener Entries in Table */
+          lsnr_found = 0;   /* Listeners Found = FALSE */
+
+       if (lsnr_found)      /* Listeners still there so sleep and retry */
+       {
+          printf ("exorlsnr: Listeners still found after %d attempt(s). Retrying...\n",loop);
+#ifdef WIN32
+          Sleep(1000);
+#else
+          sleep(1);
+#endif
+       }
+    }
+
+    if (lsnr_found)        /* Listener entries still there after 10 goes */
+    {
+       printf ("exorlsnr: ERROR: Failed to stop the exor listeners after 10 attempts\n");
+       printf ("       PLEASE CONTACT THE SUPPORT DESK\n");
+    }
+    else
+       printf ("exorlsnr: Listeners have been stopped.\n");
+
+    if (EXDebug)
+       printf ("exorlsnr: Disconnecting from Oracle\n");
+
+    exec sql commit work release;
+    oraerror("do_stop : commit and release");
+#ifndef WIN32
+    strcpy(sys_call,"rm ");
+    strcat(sys_call,full_pipe_name);
+    system(sys_call);
+#endif
+
+    exit(0);
+}
+
+i_toa(n, s)
+char s[];
+int n;
+{
+   int i, sign;
+
+   if (( sign=n) < 0)
+      n = -n;
+   i = 0;
+   do {
+      s[i++] = n%10+'0';
+   } while ((n /= 10) > 0);
+
+   if (sign < 0)
+      s[i++] = '-';
+
+   s[i] = '\0';
+   reverse(s);
+}
+
+reverse(s)
+char s[];
+{
+   int c, i, j;
+
+   for (i=0, j=strlen(s)-1; i<j; i++, j--) 
+   {
+      c=s[i];
+     s[i] = s[j];
+      s[j]=c;
+   }
+}
+
+del_rows()
+{
+    exec sql delete exor_lsnr;
+    oraerror("do_start : delete exor_lsnr");
+    exec sql commit work release;
+}
+
+int check_exor_lock()
+{
+   exec sql whenever sqlerror continue;
+   exec sql whenever sqlwarning continue;
+   exec sql create table exor_lock(ex_lock varchar2(10));
+   exec sql insert into exor_lock (ex_lock)
+            select 'GRI0205'
+            from   dual
+            where not exists 
+                (select 'Lock Exists'
+                 from   exor_lock
+                 where  ex_lock = 'GRI0205');
+   oraerror("check_exor_lock - populate gri0205 lock");
+
+   exec sql insert into exor_lock (ex_lock)
+            select 'GRI0206'
+            from   dual
+            where not exists 
+                (select 'Lock Exists'
+                 from   exor_lock
+                 where  ex_lock = 'GRI0206');
+   oraerror("check_exor_lock - populate gri0206 lock");
+
+   exec sql insert into exor_lock (ex_lock)
+            select 'GRI0207'
+            from   dual
+            where not exists 
+                (select 'Lock Exists'
+                 from   exor_lock
+                 where  ex_lock = 'GRI0207');
+   oraerror("check_exor_lock - populate gri0207 lock");
+
+   exec sql whenever sqlerror do dupl_processes();
+   EXEC SQL lock table exor_lock in exclusive mode nowait;
+}
