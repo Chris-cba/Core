@@ -1,0 +1,50 @@
+/*SCCS ID keyword, do not remove */
+/* static char *sccsid = "@(#)dblogon.pc	1.1 09/08/03"; */
+
+/*PVCS keyword, do not remove */
+static char *sccsid = "$Workfile:   dblogon.pc  $ $Revision:   2.1  $ $Modtime:   Jul 05 2013 10:26:20  $";
+
+/*=============================================================================
+ *
+ * Program      : dblogon/dblogoff - standard library
+ *
+ * Author       : G.Fletcher
+ * Version      : 1.0
+ * Date         : 31-Oct-1997
+ * Description  : Log onto the database using the connect string received
+ *              : Log off the database
+ *
+ * Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+ *
+ * Use K&R style declarations for portability
+ /
+ =============================================================================*/
+
+#include <string.h>
+
+EXEC SQL BEGIN DECLARE SECTION;
+	static VARCHAR		userid[64];
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL INCLUDE sqlca;
+
+long dblogon();
+void dblogoff();
+
+long dblogon(user)
+char *user;
+{
+	strcpy((char *)userid.arr,user);
+    userid.len = strlen((char *)userid.arr);
+
+	EXEC SQL CONNECT :userid;
+
+	return(0);
+}
+
+void dblogoff()
+{
+	EXEC SQL WHENEVER SQLERROR CONTINUE;
+	EXEC SQL WHENEVER SQLWARNING CONTINUE;
+	EXEC SQL ROLLBACK RELEASE;
+}

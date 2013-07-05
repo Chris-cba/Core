@@ -1,0 +1,398 @@
+/*Old SCCS ID keyword, do not remove */
+/*static char *sccsid = "@(#)jobrun.pc	1.1 09/08/03";*/
+
+/*PVCS keyword, do not remove */
+static char *sccsid = "$Workfile:   jobrun.pc  $ $Revision:   2.1  $ $Modtime:   Jul 05 2013 10:26:42  $";
+
+/*=============================================================================
+ *
+ * Program      : jobrun - standard library
+ *
+ * Version      : 1.0
+ * Date         : 31-Oct-1997
+ * Description  : Standard functions to parse command line args from Proc module
+ *                called from client-server form, log onto the database, update
+ *                gri run files, retrieve gri parameters etc
+ *
+ * Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+ *
+ * Further details follow :-
+ * 
+ * Function usage :-
+ * jobmain is called from main in the Proc module passing argc,argv[]. It
+ *         will validate the received args and if OK it will log onto the
+ *         database and call jobstart to update GRI_REPORT_RUNS with the 
+ *         start date/time of this run of this job. It will also retrieve
+ *         and validate user custom parameters from HIG_USER_OPTIONS table
+ *         via the relevant hig packaged procedures. If all is well it will
+ *         set up an external string var EXRepOutpath containing the full path
+ *         for report output. Also change directory to the reports directory
+ *         This validates the directory and also means any report files created
+ *         will be created in the correct place
+ *
+ * jobstart is passed the Job Id to update GRI_REPORT_RUNS with the 
+ *         start date/time of the job
+ *
+ * jobend is passed the Job Id to update GRI_REPORT_RUNS with the 
+ *        end date/time of the job, a completion error code which should map
+ *        to a HIG_ERRORS message and optionally a description of the
+ *        completion status
+ *
+ * get_params is passed a count and attempts to retrieve count number of
+ *        parameters from gri_run_parameters table. If it doesn't retrieve
+ *        enough it fatal errors. It doesn't check if too many are received.
+ *        Correct functionality depends upon the calling module passing the
+ *        correct value for the required number of parameters
+ =============================================================================*/
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <errno.h>
+#include <signal.h>
+#include <string.h>
+#ifndef WIN32
+#include <unistd.h>
+#endif
+#include "rmms.h"
+
+#ifndef F_OK
+#define F_OK 00
+#endif
+
+EXEC SQL BEGIN DECLARE SECTION;
+	static unsigned long d_jobid;
+	static int           d_ccode;
+	static VARCHAR	 d_rowid[18];
+	static VARCHAR	 d_desc[255];
+        varchar pipe_name[254];
+        short   i_pipe_name;
+EXEC SQL END DECLARE SECTION;
+
+char EXJobId_C[20];
+char pipe_msg[254];
+char full_pipe_name[254];
+
+extern short EXDebug;
+extern char *EXRepOutpath;
+
+EXEC SQL INCLUDE sqlext.h;
+ 
+void jobstart();
+void jobend();
+void catchsig();
+void sql_err();
+void get_params();
+
+void jobmain(argc,argv)
+int argc;
+char *argv[];
+{
+/*
+ * argv[0] = name of this module
+ * argv[1] = Oracle username/Password
+ * argv[2] = GRI Job Identifier                       
+ * argv[3] = optional debug flag (-d)
+ * 
+*/
+	char *ptr;
+	char curpath[255];
+  
+#ifndef WIN32
+	if (geteuid() != 0)
+	{
+		printf("WARNING: %s not root privileged\n",argv[0]);
+	}
+#endif
+
+/* 
+** Set up standard signal handler and standard sql error handler
+*/
+
+	signal(SIGILL,catchsig);
+	signal(SIGFPE,catchsig);
+#ifndef WIN32
+	signal(SIGBUS,catchsig);
+#endif
+	signal(SIGSEGV,catchsig);
+
+	EXEC SQL WHENEVER SQLERROR   do sql_err("jobmain(1)");
+
+	/* oraca.orastxtf = 1; Save sql statement for errors */
+	oraca.orastxtf = 2; /* Save sql statement for errors or warnings */
+
+	if ( argc < 3)
+	{
+		printf("\nUsage: %s <Userid/password> <JobNo>\n",argv[0]);
+		exit(1);
+	}
+
+	if (argc == 4 )                         /* If there is a 4th argument */ 
+	if (strcmp(argv[3],"-d") == 0 )         /* and the argument is -d     */
+		EXDebug=1;                          /* switch debugging on.       */
+
+	dblogon(argv[1]);                       /* Log-on ,to Oracle database */
+
+        EXEC SQL select min(hop_value)
+                 into   :pipe_name:i_pipe_name
+                 from   hig_options
+                 where  hop_product = 'HIG'
+                 and    hop_id = 'GRILSTNAME';
+
+        if (i_pipe_name < 0)
+        {
+           strcpy((char*)pipe_name.arr,"lstner");
+           pipe_name.len=6;
+        }
+
+        strcpy(full_pipe_name,(char *)pipe_name.arr);
+
+	EXJobId=strtoul(argv[2],(char **)0,10);
+	strcpy(EXJobId_C,argv[2]);
+
+	jobstart(EXJobId);
+	EXEC SQL COMMIT WORK;
+
+/*
+** Get customised options for this user
+*/
+
+	EXEC SQL WHENEVER SQLERROR   CONTINUE;
+	EXEC SQL WHENEVER SQLWARNING CONTINUE;
+	exec sql execute
+		begin
+			:EXRepDir := hig.get_useopt('REPOUTPATH',user);
+			:EXSpoolFileName := higgrirp.get_module_spoolfile(:EXJobId);
+		end;
+	end-exec;
+	term_varchar(EXRepDir);
+	term_varchar(EXSpoolFileName);
+
+	EXEC SQL WHENEVER SQLERROR do sql_err("jobmain(2)");
+
+	if (EXSpoolFileName.len == 0)
+	{
+        printf("Call to get_module_spoolfile failed to return a value\n");
+        write_pipe(NULL,"Call to get_module_spoolfile failed to return a value");
+		EXEC SQL ROLLBACK WORK;
+		jobend(EXJobId,1,"Call to get_module_spoolfile failed to return a value");
+		EXEC SQL COMMIT WORK;
+		exit(1);
+	}
+	
+	if (EXRepDir.len == 0)
+	{
+			
+		ptr=getenv("PROD_REPORTS");
+		if (ptr)
+		{
+			strcpy((char *)EXRepDir.arr,ptr);
+		}
+		else
+		{
+			strcpy((char *)EXRepDir.arr,"./");
+		}
+	}
+	else
+	{
+		if (EXRepDir.arr[0]=='$')
+		{
+			char *envptr;
+			ptr=(char *)&EXRepDir.arr[1];
+			envptr=getenv(ptr);
+			if (envptr)
+				strcpy((char *)EXRepDir.arr,envptr);
+			else
+			{
+				printf("Variable %s not set\n",EXRepDir.arr);
+                                strcpy(pipe_msg,"Variable ");
+                                strcat(pipe_msg,(char*)EXRepDir.arr);
+                                strcat(pipe_msg," not set");
+                                write_pipe(NULL,pipe_msg);
+				EXEC SQL ROLLBACK WORK;
+				jobend(EXJobId,1,"Invalid variable for reports output path");
+				EXEC SQL COMMIT WORK;
+				exit(1);
+			}
+		}
+	}
+
+	EXRepOutpath=malloc(strlen((char *)EXRepDir.arr)+20);
+	strcpy(EXRepOutpath,(char *)EXRepDir.arr);
+	strcat(EXRepOutpath,(char *)EXSpoolFileName.arr);
+
+	if (chdir((char *)EXRepDir.arr) !=0)
+	{
+		char err[100];
+		char *ptr;
+
+		strcpy(err,strerror(errno));
+		ptr=malloc(strlen((char *)EXRepDir.arr)+100);
+		strcpy(ptr,(char *)EXRepDir.arr);
+		strcat(ptr," ");
+		strcat(ptr,err);
+		printf("%s\n",ptr);
+                write_pipe(NULL,ptr);
+		EXEC SQL ROLLBACK WORK;
+		jobend(EXJobId,1,ptr);
+		EXEC SQL COMMIT WORK;
+		exit(1);
+	}
+
+	if (access(EXRepOutpath,F_OK)==0)
+	{
+		char *ptr;
+
+		ptr=malloc(strlen(EXRepOutpath)+30);
+		strcpy(ptr,EXRepOutpath);
+		strcat(ptr," already exists");
+		printf("%s\n",ptr);
+                write_pipe(NULL,ptr);
+		EXEC SQL ROLLBACK WORK;
+		jobend(EXJobId,1,ptr);
+		EXEC SQL COMMIT WORK;
+		exit(1);
+	}
+
+	if (EXDebug)
+		printf("\nOutput path is %s\n",EXRepOutpath);
+}
+
+void jobstart(jobid)
+unsigned long jobid;
+{
+	d_jobid = jobid;
+
+   	EXEC SQL 
+		SELECT ROWID 
+		INTO :d_rowid
+		FROM GRI_REPORT_RUNS
+		WHERE GRR_JOB_ID = :d_jobid
+		FOR UPDATE OF GRR_ACT_START_DATE;
+
+	EXEC SQL
+		UPDATE GRI_REPORT_RUNS
+		SET GRR_ACT_START_DATE=sysdate
+		WHERE ROWID=:d_rowid;
+
+	return;
+}
+
+void jobend(jobid,ccode,desc)
+unsigned long jobid;
+int ccode;
+char *desc;
+{
+	d_jobid = jobid;
+	d_ccode = ccode;
+
+	if (desc)
+	{
+		strcpy((char *)d_desc.arr,desc);
+		d_desc.len = strlen(desc);
+	}
+	else
+		d_desc.len=0;
+
+	EXEC SQL WHENEVER SQLERROR CONTINUE;
+	EXEC SQL WHENEVER SQLWARNING CONTINUE;
+
+   	EXEC SQL 
+		SELECT ROWID 
+		INTO :d_rowid
+		FROM GRI_REPORT_RUNS
+		WHERE GRR_JOB_ID = :d_jobid
+		FOR UPDATE OF GRR_END_DATE;
+
+	EXEC SQL
+		UPDATE GRI_REPORT_RUNS
+		SET GRR_END_DATE = sysdate,
+			GRR_ERROR_NO = :d_ccode,
+			GRR_ERROR_DESCR = :d_desc
+		WHERE ROWID=:d_rowid;
+
+	return;
+}
+
+void sql_err(func)
+char *func;
+{
+        write_pipe(NULL,"Module called sql_err() function.");
+	EXEC SQL WHENEVER SQLERROR CONTINUE;
+	EXEC SQL WHENEVER SQLWARNING CONTINUE;
+	EXEC SQL ROLLBACK WORK;
+	jobend(EXJobId,1,sqlerr((FILE *)0,func));
+	EXEC SQL COMMIT WORK RELEASE;
+	exit(1);
+}
+
+void get_params(count)
+int count;
+{
+	register int i;
+
+    EXEC SQL DECLARE GET_PARAMS CURSOR FOR
+    	SELECT   grp_value
+    	FROM     gri_run_parameters
+    	WHERE    grp_job_id = :EXJobId
+    	ORDER BY grp_seq;
+
+	EXEC SQL OPEN GET_PARAMS;
+
+	EXEC SQL FETCH GET_PARAMS INTO :EXParam:EXParami;
+
+	EXParamCount = sqlca.sqlerrd[2];
+
+	if (EXParamCount < count)
+	{
+		printf("GRI Params: Needed %d , got %d\n",count,EXParamCount);
+                write_pipe(NULL,"Failed to get appropriate GRI Parameters.");
+		EXEC SQL ROLLBACK WORK;
+		jobend(EXJobId,1,"Not enough GRI params");
+		EXEC SQL COMMIT WORK;
+		dblogoff();
+		exit(1);
+	}
+
+
+	if (EXDebug)
+		printf("%d GRI parameters retrieved\n",EXParamCount);
+
+    for (i=0;i < EXParamCount;i++)
+        term_varchar(EXParam[i]);
+
+	EXEC SQL CLOSE GET_PARAMS;
+    return;
+}
+
+i_toa(n, s)
+char s[];
+int n;
+{
+   int i, sign;
+
+   if (( sign=n) < 0)
+      n = -n;
+   i = 0;
+   do {
+      s[i++] = n%10+'0';
+   } while ((n /= 10) > 0);
+
+   if (sign < 0)
+      s[i++] = '-';
+
+   s[i] = '\0';
+   reverse(s);
+}
+
+reverse(s)
+char s[];
+{
+   int c, i, j;
+
+   for (i=0, j=strlen(s)-1; i<j; i++, j--) 
+   {
+      c=s[i];
+     s[i] = s[j];
+      s[j]=c;
+   }
+}

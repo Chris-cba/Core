@@ -1,0 +1,79 @@
+/*SCCS ID keyword, do not remove */
+/* static char *sccsid = "@(#)sqlerr.pc	1.1 09/08/03"; */
+
+/* Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved. */
+
+/*PVCS keyword, do not remove */
+static char *sccsid = "$Workfile:   sqlerr.pc  $ $Revision:   2.1  $ $Modtime:   Jul 05 2013 10:27:46  $";
+
+/*=============================================================================
+ *
+ * Program      : sqlerr - standard library function
+ *
+ * Author       : G.Fletcher
+ * Version      : 1.0
+ * Date         : 31-Oct-1997
+ * Description  : Called whenever necessary. If standard jobmain() function
+ *                has been called by thre Proc main then this will be called
+ *                whenever there is a sql error. It accesses the oraca struct
+ *                and so depends upon the Oracle precompiler option "oraca=yes"
+ *                to function correctly. It will identify the Proc module and
+ *                line number where the error occurred and a the first 70 
+ *                characters of the sql code in error. It requires a file
+ *                pointer which may be null (in which case standard error will
+ *                be used) to which it will write the error details. It will
+ *                also return a string containing the error details.
+ *
+ =============================================================================*/
+#include <stdio.h>
+EXEC SQL INCLUDE sqlca;
+EXEC SQL INCLUDE oraca;
+char * sqlerr();
+
+char *sqlerr(fp,func)
+FILE *fp;
+char *func;
+{
+	FILE *outfp;
+	static char outmsg[255];
+
+	if (fp)
+		outfp=fp;
+	else
+		outfp=stderr;
+
+	oraca.orastxt.orastxtc[oraca.orastxt.orastxtl]='\0';
+	oraca.orasfnm.orasfnmc[oraca.orasfnm.orasfnml]='\0';
+	/* fprintf(outfp, "Oracle error %d at line %d of %s\n",sqlca.sqlcode,oraca.oraslnr,oraca.orasfnm.orasfnmc); */
+	/* sprintf(outmsg,"Oracle error %d at line %d of %s - :",sqlca.sqlcode,oraca.oraslnr,oraca.orasfnm.orasfnmc); */
+	/* strcat(outmsg,oraca.orastxt.orastxtc); */
+	/* fprintf(outfp,"Statement : %s\n",oraca.orastxt.orastxtc); */
+        fprintf(outfp,"\nOracle Error : \n%s\n",sqlca.sqlerrm.sqlerrmc);
+        fprintf(outfp,"Error occurred in function : %s\n\n",func);
+        strcpy(outmsg,"Oracle Error :");
+        write_pipe(NULL,outmsg);
+        strcpy(outmsg,(char *)sqlca.sqlerrm.sqlerrmc);
+        write_pipe(NULL,outmsg);
+        strcpy(outmsg,"Occurred in : ");
+        strcat(outmsg,func);
+        write_pipe(NULL,outmsg);
+        strcpy(outmsg,"Oracle Error : ");
+        strcat(outmsg,sqlca.sqlerrm.sqlerrmc);
+        rtrim(outmsg);
+        strcat(outmsg," : Occurred in ");
+        strcat(outmsg,func);
+	return(outmsg);
+}
+
+int rtrim(msg)
+char *msg;
+{
+   int n;
+
+   n = strlen(msg);
+
+   while (--n >= 0)
+      if (msg[n] != ' ' && msg[n] != '\t' && msg[n] != '\n')
+         break;
+   msg[n+1] = '\0';
+}
