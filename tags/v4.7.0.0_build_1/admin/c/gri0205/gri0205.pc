@@ -1,0 +1,542 @@
+/*SCCS ID keyword, do not remove */
+static char *sccsid = "@(#)gri0205.pc	1.1 09/08/03";
+
+/* Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved. */
+
+#include <stdio.h>
+#include <string.h>
+#include <signal.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <errno.h>
+#ifdef WIN32
+#include <windows.h>
+#endif
+#ifndef WIN32
+#include <unistd.h>
+#endif
+#include <stdlib.h>
+
+#define LENCHAR(str) str.len=strlen((char *)str.arr);
+#define TERMCHAR(str) str.arr[str.len]='\0';
+#define SQLSUCCESS (sqlca.sqlcode == 0)
+
+#ifdef WIN32
+	#define SLASH "\\"
+#else
+	#define SLASH "/"
+#endif
+
+char GBJobIdChar[10];
+int  EXDebug;
+void sql_error(), log_error(int ernum), sql_logon_fail(), set_signals(),
+     clean_closedown(), dirty_closedown(), do_listen(), runmodule(char *),
+     check_database(), oraerror(char *fname), oralogon(char *uid), do_stop();
+
+exec sql begin declare section;
+	varchar	username[64];
+	varchar	loginname[64];
+      varchar	short_user[64];
+	varchar	mod_type[4];
+	varchar	rep_def[101];
+	varchar	rep_prncmd[101];
+	varchar	rep_outpath[101];
+	varchar	file_name[31];
+        varchar dummy[254];
+	varchar	file_type[4];
+      varchar     gri_status[5];
+	unsigned long jobid;
+	unsigned long linesize;
+	int		status;
+	char 		msgrcvd[200];
+       exec sql declare
+            exor_lock table (ex_lock varchar2(10));
+exec sql end declare section;
+
+exec sql include sqlca;
+exec sql include oraca;
+
+void main ( argc, argv )
+int argc;
+char **argv;
+{
+#ifdef WIN32
+   SetConsoleTitle("GRI0205 : Highways by exor - Listener process 1");
+#endif
+
+   if (argc < 2)
+   {
+      printf("Usage : %s <username/password\n",argv[0]);
+      exit(1);
+   }
+
+   if (argc > 2 && strcmp(argv[2],"-d")==0)
+   {
+      EXDebug = 1;
+#ifdef WIN32
+      SetHandlers();
+#endif
+   }
+   else
+      EXDebug = 0;
+
+   set_signals();
+   oralogon(argv[1]);
+   lock_lsnr();
+
+   if (EXDebug)
+      printf("gri0205: Connected to Oracle.\n");
+
+#ifndef WIN32
+   if (fork())
+      exit(0);
+   if (EXDebug)
+      printf("gri0205: successfully forked\n");
+   setsid(); /* Make myself a process group leader and detach from terminal */
+#endif
+
+   do_listen();
+   clean_closedown();
+}
+
+void do_listen()
+{
+   if (EXDebug)
+      printf("gri0205: Going into listening state\n");
+
+   for (;;)
+   {
+      exec sql execute
+         declare
+            s    integer;
+            chr  varchar2(200);
+            p_name varchar2(254);
+         begin
+            chr := '';
+            p_name := hig.get_sysopt('GRILSTNAME');
+            if p_name is null then
+               p_name := 'lstner';
+            end if;
+            s := dbms_pipe.receive_message( p_name );
+            if s = 0 then
+               dbms_pipe.unpack_message(chr);
+            end if;
+            :status := s;
+            :msgrcvd := chr;
+         end;
+      end-exec;
+
+      exec sql select status
+               into :gri_status
+               from exor_lsnr
+               where mod_name = 'GRI0205';
+      check_database("do_listen : Get Listener Status");
+      TERMCHAR(gri_status);
+
+      if (EXDebug)
+         printf ("gri0205: Got %s status\n",gri_status.arr);
+
+      gri_status.arr[gri_status.len] = '\0';
+
+      if (strcmp(gri_status.arr,"STOP") == 0)
+      {
+         do_stop();
+      }
+
+      if (EXDebug)
+      {
+         printf("gri0205: msg is %s\n",msgrcvd);
+      }
+      if ( status == 0 ) 
+      {
+        runmodule(msgrcvd);
+      }
+   }
+}
+
+void runmodule(msgrcvd)
+char *msgrcvd;
+{
+   char syscall[256], *ptr, *envptr, modname[30],
+        prod_home[256], db_alias[100];
+   int  modtyp, retval;
+
+   ptr=strtok(msgrcvd," "); /* Module name or command */
+   if (!ptr)
+   {
+      log_error(1);
+      return;
+   }
+   strcpy(modname,ptr);
+
+   ptr=strtok(NULL," "); /* username/password */
+   if (!ptr)
+   {
+      log_error(2);
+      return;
+   }
+   strcpy((char *)loginname.arr,ptr);
+   LENCHAR(loginname);
+
+   envptr=getenv("DB_ALIAS");
+   if (envptr)
+      strcpy(db_alias,envptr);
+   else	
+      db_alias[0]='\0';
+
+   if (strlen(db_alias) > 0)
+   {
+      strcat(loginname.arr,"@");
+      strcat(loginname.arr,db_alias);
+   }
+   LENCHAR(loginname);
+
+   ptr=strtok(NULL," "); /* JobId */
+   if (!ptr)
+   {
+      log_error(3);
+      return;
+   }
+   jobid=strtoul(ptr,(char **)0,10);
+   strcpy(GBJobIdChar,ptr);
+
+   if (strcmp(modname,"PRINT")==0)
+      modtyp=3;
+   else if (strcmp(modname,"DELETE")==0)
+      modtyp=4;
+   else
+      modtyp=0;
+
+   if (modtyp == 0)
+   {
+      EXEC SQL SELECT HMO_MODULE_TYPE,
+                      HMO_FILENAME,
+                      GRM_LINESIZE,
+                      GRR_USERNAME,
+                      GRM_FILE_TYPE
+               INTO   :mod_type,
+                      :file_name,
+                      :linesize,
+                      :short_user,
+                      :file_type
+               FROM   GRI_REPORT_RUNS,
+                      HIG_MODULES,
+                      GRI_MODULES
+               WHERE  grr_job_id = :jobid
+               AND    HMO_MODULE=GRR_MODULE
+               AND    GRM_MODULE=GRR_MODULE;
+      oraerror("runmodule : Cursor 1");
+	
+      if (!SQLSUCCESS)
+      {
+         printf("gri0205: %d is not a valid Job Id\n",jobid);
+         return;
+      }
+	
+      TERMCHAR(mod_type);
+      TERMCHAR(file_name);
+      TERMCHAR(short_user);
+      TERMCHAR(file_type);
+	
+      if (strcmp((char *)mod_type.arr,"SVR")==0)
+         modtyp=1;
+      else if (strcmp((char *)mod_type.arr,"SQL")==0)
+         modtyp=2;
+      else
+      {
+         printf("gri0205: %s is not a valid module type\n",mod_type.arr);
+         return;
+      }
+   }
+
+   exec sql execute
+      begin
+         :rep_def := hig.get_useopt('REPDEFCMND',:short_user);
+         :rep_outpath := hig.get_useopt('REPOUTPATH',:short_user);
+         if :linesize > 80 then
+            :rep_prncmd := hig.get_useopt('REPPRNWIDE',:short_user);
+         else
+            :rep_prncmd := hig.get_useopt('REPPRNNORM',:short_user);
+         end if;
+      end;
+   end-exec;
+   TERMCHAR(rep_def);
+   TERMCHAR(rep_prncmd);
+   TERMCHAR(rep_outpath);
+
+   if (rep_def.arr[0]=='$')
+   {
+      ptr=(char *)&rep_def.arr[1];
+      envptr=getenv(ptr);
+      if (envptr)
+         strcpy((char *)rep_def.arr,envptr);
+   }
+   if (rep_prncmd.arr[0]=='$')
+   {
+      ptr=(char *)&rep_prncmd.arr[1];
+      envptr=getenv(ptr);
+      if (envptr)
+         strcpy((char *)rep_prncmd.arr,envptr);
+   }
+
+   if (rep_outpath.arr[0]=='$')
+   {
+      ptr=(char *)&rep_outpath.arr[1];
+      envptr=getenv(ptr);
+      if (envptr)
+         strcpy((char *)rep_outpath.arr,envptr);
+   }
+
+   envptr=getenv("PROD_HOME");
+   if (envptr)
+      strcpy(prod_home,envptr);
+   else	
+      prod_home[0]='\0';
+
+   switch(modtyp)
+   {
+      case 1: /* It's a C program or shell script */
+         if (prod_home[0] != '\0')
+         {
+            strcpy(syscall,prod_home);
+            strcat(syscall,SLASH);
+            strcat(syscall,(char *)file_name.arr);
+         }
+         else
+         {
+            strcpy(syscall,(char *)file_name.arr);
+         }
+#ifdef WIN32
+         strcat(syscall,".exe");
+#endif
+         strcat(syscall," ");
+         strcat(syscall,(char *)loginname.arr);
+	   strcat(syscall," ");
+	   strcat(syscall,GBJobIdChar);
+	   strcat(syscall," &"); /* Async execution */
+         break;
+
+      case 2: /* It's a sql script */
+         strcpy(syscall,"sqlplus -s ");
+         strcat(syscall,(char *)loginname.arr);
+         strcat(syscall," @");
+         if (prod_home[0] != '\0')
+         {
+            strcat(syscall,prod_home);
+            strcat(syscall,SLASH);
+         }
+         strcat(syscall,(char *)file_name.arr);
+	   strcat(syscall," ");
+	   strcat(syscall,GBJobIdChar);
+	   strcat(syscall," &"); /* Async execution */
+         break;
+
+      case 3: /* It's a print command */
+         strcpy(syscall,(char *)rep_prncmd.arr);
+         strcat(syscall," ");
+         strcat(syscall,(char *)rep_outpath.arr);
+	   strcat(syscall,GBJobIdChar);
+	   strcat(syscall,".");
+         strcat(syscall,(char *)file_type.arr);
+	   strcat(syscall," &"); /* Async execution */
+         break;
+
+      case 4: /* It's a delete command */
+         strcpy(syscall,"rm -f ");
+         strcat(syscall," ");
+         strcat(syscall,(char *)rep_outpath.arr);
+	   strcat(syscall,GBJobIdChar);
+	   strcat(syscall,".");
+         strcat(syscall,(char *)file_type.arr);
+	   strcat(syscall," &"); /* Async execution */
+         break;
+   }
+
+   if (EXDebug)
+   {
+      printf("gri0205: USER:     %s\n",short_user.arr);
+      printf("gri0205: DEFAULT:  %s\n",rep_def.arr);
+      printf("gri0205: PRNCMD:   %s\n",rep_prncmd.arr);
+      printf("gri0205: OUTPATH:  %s\n",rep_outpath.arr);
+      printf("gri0205: syscall:  %s\n",syscall);
+   }
+
+#ifndef WIN32
+   retval=system(syscall);
+#else
+   if (EXDebug)
+   {
+      retval=system(syscall);
+   }
+   else
+   {
+      retval=0;
+      if (!CreateChildProcess(syscall))
+         printf("gri0205: System error code %d returned for Job Id %d\n",retval,jobid);
+   }
+         
+#endif
+
+   /* Synchronous execution  */
+   if (retval >255) retval >>=8;
+      if (retval != 0)
+      {
+         printf("gri0205: System error code %d returned for Job Id %d\n",retval,jobid);
+      }
+  
+
+   return;
+}
+
+void log_error(ernum)
+int ernum;
+{
+/*
+** Write an error msg to ???. We can't use GRI_REPORT_RUNS as the error
+** may be not job id !!
+*/
+   switch (ernum)
+   {
+      case 1:
+         puts("gri0205: No module name received");
+      case 2:
+         puts("gri0205: No username/password received");
+         break;
+      case 3:
+         puts("gri0205: No GRI job Id received");
+         break;
+   }
+}
+
+void sql_logon_fail()
+{
+   puts("gri0205: Failed to log on using the specified username/password");
+   exit(1);
+}
+
+void sql_error()
+{
+   oraca.orastxt.orastxtc[oraca.orastxt.orastxtl]='\0';
+   oraca.orasfnm.orasfnmc[oraca.orasfnm.orasfnml]='\0';
+   printf("gri0205: Oracle error %d at line %d of %s\n",sqlca.sqlcode,oraca.oraslnr,oraca.orasfnm.orasfnmc);
+   printf("gri0205: Statement : %s\n",oraca.orastxt.orastxtc);
+
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL WHENEVER SQLWARNING CONTINUE;
+   EXEC SQL ROLLBACK RELEASE;
+   exit (1);
+}
+
+void clean_closedown(int sig)
+{
+/* 
+** Signal handler for closedown signals received
+**
+** Don't try to log off the database upon receipt of a signal
+** because it will probably get stuck !
+** This is a problem in Oracle as it shouldn't bother itself with 
+** a signal 15 
+**
+*/
+   signal(sig,SIG_IGN);
+   printf("gri0205: Listener Shutdown requested\n");
+
+   exit(0);
+}
+
+void dirty_closedown(int sig)
+{
+/* 
+** Signal handler for fatal signals received
+**
+** Don't try to log off the database upon receipt of a fatal signal
+** because it will probably get stuck !
+*/
+   signal(sig,SIG_IGN);
+   printf("gri0205: Signal %d received. Dumping core\n",sig);
+	
+   abort();
+   exit(1);
+}
+
+void set_signals()
+{
+#ifndef WIN32
+   signal(SIGHUP,clean_closedown);
+   signal(SIGQUIT,clean_closedown);
+   signal(SIGBUS,dirty_closedown);
+#endif
+   signal(SIGTERM,clean_closedown);
+   signal(SIGINT,clean_closedown);
+   signal(SIGILL,dirty_closedown);
+   signal(SIGFPE,dirty_closedown);
+   signal(SIGSEGV,dirty_closedown);
+}
+
+void oraerror(fname)
+char *fname;
+{
+   if (sqlca.sqlcode < 0)
+   {
+      printf("gri0205: \nERROR:\n%s\nOccurred in function %s\n",
+             sqlca.sqlerrm.sqlerrmc,
+             fname);
+      EXEC SQL ROLLBACK WORK RELEASE;
+      exit(1);
+   }
+}
+
+void oralogon(char *uid)
+{
+   strcpy( (char *)username.arr, uid);
+   username.len = strlen( (char *)username.arr );
+
+   oraca.orastxtf = 1;
+   exec sql whenever sqlerror do sql_logon_fail();
+   exec sql connect :username;
+}
+
+void do_stop()
+{
+   exec sql lock table exor_lsnr in exclusive mode;
+   oraerror("do_listen : Lock EXOR_LSNR");
+
+   exec sql delete exor_lsnr
+            where  mod_name = 'GRI0205';
+   oraerror("do_listen : Delete GRI0205");
+
+   exec sql commit work release;
+   oraerror("do_listen : Commit release");
+
+   if (EXDebug)
+      printf ("gri0205: STOP signal received\n");
+   exit(0);
+}
+
+int lock_lsnr()
+{
+   EXEC SQL select 'Lock'
+            into :dummy
+            from exor_lock
+            where ex_lock = 'GRI0205'
+            for update of ex_lock;
+   oraerror("lock_lsnr");
+}
+
+void check_database(fname)
+char *fname;
+{
+   if (sqlca.sqlcode < 0)
+   {
+      printf("\n\ngri0205: Fatal error when in listening state.\n");
+      printf("gri0205: This probably occurred because the database\n");
+      printf("gri0205: has been shutdown without propperly stopping\n");
+      printf("gri0205: the listener processes. The listeners can be\n");
+      printf("gri0205: restarted once the database is restarted.\n");
+      printf("gri0205: Oracle error produced was :\n");
+      printf("%s\n\n",sqlca.sqlerrm.sqlerrmc);
+      EXEC SQL ROLLBACK WORK RELEASE;
+      exit(1);
+   }
+}
