@@ -14,6 +14,8 @@ rem   Author : A. Rowlinson
 rem
 rem */
 
+/* Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved. */
+
 #include <stdio.h>
 #include <string.h>
 #include <signal.h>
