@@ -5,6 +5,8 @@
 #include <signal.h>
 #include <stdlib.h>
  
+/* Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved. */
+
 int EXDebug;
 int EXJobId=0;
 char full_pipe_name[254];
