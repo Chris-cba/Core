@@ -1,0 +1,242 @@
+#include <stdio.h>
+#include <windows.h>
+#include <signal.h>
+
+/* Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved. */
+
+/* SCCS ID keywords, do not remove */
+static char *sccsid = "@(#)pc206.pc	1.1 09/08/03";
+
+HANDLE Makeslot();
+BOOL   Readslot(HANDLE hSlot1, LPSTR lpszBuffer);
+
+BOOL SetHandlers()
+{
+   BOOL fSuccess;
+   BOOL CtrlHandler(DWORD fdwCtrlType);
+
+   fSuccess = SetConsoleCtrlHandler(
+           (PHANDLER_ROUTINE) CtrlHandler, TRUE);
+
+   return(fSuccess);
+}
+
+exec sql begin declare section;
+   varchar gri_status[5];
+   varchar pipe_name[254];
+   varchar dummy[254];
+   short   i_pipe_name;
+exec sql end declare section;
+
+exec sql include sqlca;
+exec sql include oraca;
+
+extern int EXDebug;
+void clean_closedown();
+void dirty_closedown();
+
+void do_listen()
+{
+   HANDLE hSlot1;
+   char   message[1000];
+   strcpy(message,"\0");
+
+   hSlot1 = Makeslot();
+   for (;;)
+   {
+      EXEC SQL select 'x'
+               into :dummy
+               from exor_lsnr
+               where mod_name = 'GRI0206';
+      oraerror("do_listen - Check database connection");
+
+      strcpy(message,"\0");
+      Readslot(hSlot1,message);
+
+      if (strlen(message)>0)
+      {
+         exec sql select status
+                  into   :gri_status
+                  from   exor_lsnr
+                  where  mod_name = 'GRI0206';
+         oraerror("do_listen : GRI_STATUS");
+
+         gri_status.arr[gri_status.len] = '\0';
+   
+         if (EXDebug)
+            printf ("GRI0206: Got %s Status\n",gri_status.arr);
+
+         if (strcmp(gri_status.arr,"STOP") == 0)
+         {
+            do_stop();
+         }
+      }
+      Sleep(500);
+   }
+}
+
+HANDLE Makeslot() 
+{ 
+   HANDLE hSlot1;
+
+   /* LPSTR lpszSlotName = "\\\\.\\mailslot\\exor_mailslot";  */
+   LPSTR lpszSlotName[254];
+
+   EXEC SQL select min(hop_value)
+            into   :pipe_name:i_pipe_name
+            from   hig_options
+            where  hop_product = 'HIG'
+            and    hop_id = 'GRILSTNAME';
+   oraerror("Makeslot : get pipe name");
+
+   if (i_pipe_name < 0)
+   {
+      strcpy((char *)pipe_name.arr,"lstner");
+      pipe_name.len = 6;
+   }
+
+   strcpy(lpszSlotName,"\\\\.\\mailslot\\exor_");
+   strcat(lpszSlotName,(char *)pipe_name.arr);
+ 
+   hSlot1 = CreateMailslot(lpszSlotName, 
+            0,                         /* no maximum message size         */ 
+            MAILSLOT_WAIT_FOREVER,     /* no time-out for read operations */ 
+        (LPSECURITY_ATTRIBUTES) NULL); /* no security attributes      */ 
+ 
+   if (hSlot1 == INVALID_HANDLE_VALUE) 
+   { 
+      printf ("gri0206: Unable to create mailslot %s\n",lpszSlotName);
+      return FALSE; 
+   } 
+   if (EXDebug)
+      printf ("gri0206: INFO - Pipe file is exor_%s\n",pipe_name.arr);
+   return hSlot1; 
+}
+
+BOOL Readslot(HANDLE hSlot1, LPSTR message) 
+{ 
+   DWORD cbMessage, cMessage, cbRead; 
+   BOOL fResult; 
+   LPSTR lpszBuffer;
+   CHAR achID[80]; 
+   DWORD cAllMessages; 
+ 
+   cbMessage = cMessage = cbRead = 0; 
+ 
+   fResult = GetMailslotInfo(hSlot1, /* mailslot handle         */ 
+        (LPDWORD) NULL,               /* no maximum message size */ 
+        &cbMessage,                   /* size of next message    */ 
+        &cMessage,                    /* number of messages      */ 
+        (LPDWORD) NULL);              /* no read time-out        */ 
+
+   if (!fResult) 
+   { 
+      printf ("gri0206: ERROR - Unabel to get Mailslot Info\n"); 
+      return FALSE; 
+   } 
+ 
+   cAllMessages = cMessage; 
+ 
+   while (cMessage != 0)                /* retrieves each message  */ 
+   {
+        /* Create a message-number string. */ 
+      wsprintf((LPSTR) achID, 
+         "\nMessage #%d of %d\n", cAllMessages - cMessage + 1, 
+         cAllMessages); 
+ 
+      /* Allocate memory for the message. */ 
+ 
+      lpszBuffer = (LPSTR) GlobalAlloc(GPTR, 
+            lstrlen((LPSTR) achID) + cbMessage); 
+ 
+      lpszBuffer[0] = '\0'; 
+ 
+      fResult = ReadFile(hSlot1, lpszBuffer, cbMessage, &cbRead, 
+            (LPOVERLAPPED) NULL); 
+ 
+      if (!fResult) 
+      { 
+         printf ("gri0206: ERROR - Unable to read from mailslot\n"); 
+         GlobalFree((HGLOBAL) lpszBuffer); 
+         return FALSE; 
+      } 
+ 
+      /* Concatenate the message and the message-number string. */ 
+ 
+      strcpy(message,lpszBuffer);
+      if (EXDebug)
+         printf ("GRI0206: Sending '%s' to database\n",message);
+      writetodbase(message);
+ 
+      /* Display the message. */ 
+ 
+      GlobalFree((HGLOBAL) lpszBuffer); 
+ 
+      fResult = GetMailslotInfo(hSlot1, /* mailslot handle         */ 
+            (LPDWORD) NULL,               /* no maximum message size */ 
+            &cbMessage,                   /* size of next message    */ 
+            &cMessage,                    /* number of messages      */ 
+            (LPDWORD) NULL);              /* no read time-out        */ 
+ 
+      if (!fResult) 
+      { 
+         printf ("gri0206: ERROR - Unabel to get Mailslot Info\n"); 
+         return FALSE; 
+      } 
+   } 
+   return TRUE; 
+}
+
+do_stop()
+{
+   exec sql lock table exor_lsnr in exclusive mode;
+   oraerror("gri0206 : lock EXOR_LSNR");
+
+   exec sql delete exor_lsnr
+      where mod_name = 'GRI0206';
+
+   exec sql commit work release;
+   oraerror("gri0206: Commit release");
+
+   if (EXDebug)
+      printf ("GRI0206: Stop signal received\n");
+   exit(0);
+}
+
+oraerror(char *fname)
+{
+   if (sqlca.sqlcode < 0)
+   {
+      printf("GRI9998: \nERROR:\n%s\nOccurred in function %s\n",
+             sqlca.sqlerrm.sqlerrmc,
+             fname);
+      EXEC SQL ROLLBACK WORK RELEASE;
+      exit(1);
+   }
+}
+
+set_signals()
+{
+   signal(SIGTERM,clean_closedown);
+   signal(SIGINT,clean_closedown);
+   signal(SIGILL,dirty_closedown);
+   signal(SIGFPE,dirty_closedown);
+   signal(SIGSEGV,dirty_closedown);
+}
+
+BOOL CtrlHandler(DWORD fdwCtrlType)
+{
+   switch (fdwCtrlType)
+   {
+      case CTRL_C_EVENT:
+         Beep(1000,1000);
+         return TRUE;
+      case CTRL_CLOSE_EVENT:
+         return TRUE;
+      case CTRL_BREAK_EVENT:
+      case CTRL_LOGOFF_EVENT:
+      case CTRL_SHUTDOWN_EVENT:
+      default:
+         return FALSE;
+   }
+}
