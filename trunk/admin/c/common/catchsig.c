@@ -2,7 +2,7 @@
 /* static char *sccsid = "@(#)catchsig.c	1.1 09/08/03"; */
 
 /*PVCS keyword, do not remove */
-static char *sccsid = "$Workfile:   catchsig.c  $ $Revision:   2.0  $ $Modtime:   Jun 15 2007 14:41:24  $";
+static char *sccsid = "$Workfile:   catchsig.c  $ $Revision:   2.1  $ $Modtime:   Jul 05 2013 10:25:44  $";
 
 /*=============================================================================
  *
@@ -16,6 +16,9 @@ static char *sccsid = "$Workfile:   catchsig.c  $ $Revision:   2.0  $ $Modtime: 
  * a file or whatever it needs to do before disconnecting from database and 
  * dumping core
  * K&R style declarations for portability
+ *
+ * Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+ *
  =============================================================================*/
 
 #include <signal.h>

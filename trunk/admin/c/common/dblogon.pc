@@ -2,7 +2,7 @@
 /* static char *sccsid = "@(#)dblogon.pc	1.1 09/08/03"; */
 
 /*PVCS keyword, do not remove */
-static char *sccsid = "$Workfile:   dblogon.pc  $ $Revision:   2.0  $ $Modtime:   Jun 15 2007 14:41:24  $";
+static char *sccsid = "$Workfile:   dblogon.pc  $ $Revision:   2.1  $ $Modtime:   Jul 05 2013 10:26:20  $";
 
 /*=============================================================================
  *
@@ -13,6 +13,8 @@ static char *sccsid = "$Workfile:   dblogon.pc  $ $Revision:   2.0  $ $Modtime: 
  * Date         : 31-Oct-1997
  * Description  : Log onto the database using the connect string received
  *              : Log off the database
+ *
+ * Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
  *
  * Use K&R style declarations for portability
  /

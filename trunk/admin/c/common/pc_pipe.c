@@ -4,8 +4,10 @@
 /* SCCS ID keywords, do not remove */
 /* static char *sccsid = "@(#)pc_pipe.c	1.1 09/08/03"; */
 
+/* Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved. */
+
 /*PVCS keyword, do not remove */
-static char *sccsid = "$Workfile:   pc_pipe.c  $ $Revision:   2.0  $ $Modtime:   Jun 15 2007 14:41:24  $";
+static char *sccsid = "$Workfile:   pc_pipe.c  $ $Revision:   2.1  $ $Modtime:   Jul 05 2013 10:27:20  $";
 
 #define TRUE 1
 #define FALSE 0

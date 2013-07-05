@@ -2,11 +2,13 @@
 #include <stdlib.h>
 #include <sys/ipc.h>
 
+/* Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved. */
+
 /* SCCS ID keywords, do not remove */
 /* static char *sccsid = "@(#)unx_pipe.c	1.1 09/08/03"; */
 
 /*PVCS keyword, do not remove */
-static char *sccsid = "$Workfile:   unx_pipe.c  $ $Revision:   2.0  $ $Modtime:   Jun 15 2007 14:41:24  $";
+static char *sccsid = "$Workfile:   unx_pipe.c  $ $Revision:   2.1  $ $Modtime:   Jul 05 2013 10:27:58  $";
 
 #define TRUE 1
 #define FALSE 0

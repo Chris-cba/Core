@@ -2,7 +2,7 @@
 /*static char *sccsid = "@(#)jobrun.pc	1.1 09/08/03";*/
 
 /*PVCS keyword, do not remove */
-static char *sccsid = "$Workfile:   jobrun.pc  $ $Revision:   2.0  $ $Modtime:   Jun 15 2007 14:41:24  $";
+static char *sccsid = "$Workfile:   jobrun.pc  $ $Revision:   2.1  $ $Modtime:   Jul 05 2013 10:26:42  $";
 
 /*=============================================================================
  *
@@ -13,6 +13,8 @@ static char *sccsid = "$Workfile:   jobrun.pc  $ $Revision:   2.0  $ $Modtime:  
  * Description  : Standard functions to parse command line args from Proc module
  *                called from client-server form, log onto the database, update
  *                gri run files, retrieve gri parameters etc
+ *
+ * Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
  *
  * Further details follow :-
  * 

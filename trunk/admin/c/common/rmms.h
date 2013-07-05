@@ -1,8 +1,10 @@
 /* SCCS ID keywords, do not remove */
 /* "@(#)rmms.h	1.2 05/20/04"                       */
 
+/* Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved. */
+
 /*PVCS keyword, do not remove         */
-/* $Workfile:   rmms.h  $ $Revision:   2.0  $ $Modtime:   Jun 15 2007 14:41:24  $ */
+/* $Workfile:   rmms.h  $ $Revision:   2.1  $ $Modtime:   Jul 05 2013 10:27:34  $ */
 
 #define MAXLINE 600 /* Maximum length of input records           */
 

@@ -1,8 +1,10 @@
 /*SCCS ID keyword, do not remove */
 /* static char *sccsid = "@(#)sqlerr.pc	1.1 09/08/03"; */
 
+/* Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved. */
+
 /*PVCS keyword, do not remove */
-static char *sccsid = "$Workfile:   sqlerr.pc  $ $Revision:   2.0  $ $Modtime:   Jun 15 2007 14:41:24  $";
+static char *sccsid = "$Workfile:   sqlerr.pc  $ $Revision:   2.1  $ $Modtime:   Jul 05 2013 10:27:46  $";
 
 /*=============================================================================
  *

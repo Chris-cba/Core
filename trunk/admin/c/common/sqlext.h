@@ -1,8 +1,10 @@
 /* SCCS ID keywords, do not remove */
 /* "@(#)sqlext.h	1.1 09/08/03"                       */
 
+/* Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved. */
+
 /*PVCS keyword, do not remove         */
-/* $Workfile:   sqlext.h  $ $Revision:   2.0  $ $Modtime:   Jun 15 2007 14:41:24  $ */
+/* $Workfile:   sqlext.h  $ $Revision:   2.1  $ $Modtime:   Jul 05 2013 10:27:52  $ */
 
 /*
 ** External declarations for standard sql modules
