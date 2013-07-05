@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include <process.h>
 
+/* Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved. */
+
 /* SCCS ID keywords, do not remove */
 static char *sccsid = "@(#)pc0205.c	1.1 09/08/03";
 
