@@ -1,11 +1,11 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.tab-arc   2.41   Jul 04 2013 13:55:14   James.Wadsworth  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.tab-arc   2.42   Jul 11 2013 16:48:10   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3.tab  $
---       Date into PVCS   : $Date:   Jul 04 2013 13:55:14  $
---       Date fetched Out : $Modtime:   Jul 04 2013 13:36:48  $
---       PVCS Version     : $Revision:   2.41  $
+--       Date into PVCS   : $Date:   Jul 11 2013 16:48:10  $
+--       Date fetched Out : $Modtime:   Jul 11 2013 16:39:30  $
+--       PVCS Version     : $Revision:   2.42  $
 --
 -----------------------------------------------------------------------------
 --    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
@@ -762,6 +762,7 @@ CREATE TABLE DOC_REDIR_PRIOR
  ,DRP_USER_TYPE VARCHAR2(4)
  ,DRP_RESPONS NUMBER(9)
  ,DRP_NE_ID NUMBER(9)
+ ,DRP_ADMIN_UNIT NUMBER(9) NOT NULL
  )
 /
 
@@ -10887,5 +10888,16 @@ CREATE TABLE REPORT_TAGS
 /
 
 COMMENT ON TABLE REPORT_TAGS IS 'Interface table which allows reports to be driven from a GIS or a front-end form.'
+/
+
+PROMPT Creating Table 'NM_SDE_SUB_LAYER_EXEMPT'
+CREATE TABLE NM_SDE_SUB_LAYER_EXEMPT
+  (NSSL_OBJECT_NAME  VARCHAR2(128)
+  ,NSSL_OBJECT_TYPE  VARCHAR2(19)
+  ,CONSTRAINT NSSL_PK
+  PRIMARY KEY
+ (NSSL_OBJECT_NAME, NSSL_OBJECT_TYPE) 
+ )
+ORGANIZATION INDEX
 /
 
