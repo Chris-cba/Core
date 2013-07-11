@@ -1,10 +1,10 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.ind-arc   2.26   Jul 04 2013 13:55:14   James.Wadsworth  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.ind-arc   2.27   Jul 11 2013 16:48:34   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3.ind  $
---       Date into PVCS   : $Date:   Jul 04 2013 13:55:14  $
---       Date fetched Out : $Modtime:   Jul 04 2013 13:36:08  $
---       PVCS Version     : $Revision:   2.26  $
+--       Date into PVCS   : $Date:   Jul 11 2013 16:48:34  $
+--       Date fetched Out : $Modtime:   Jul 11 2013 16:46:44  $
+--       PVCS Version     : $Revision:   2.27  $
 --
 -----------------------------------------------------------------------------
 --    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
@@ -1574,4 +1574,7 @@ CREATE INDEX RPA_PK_IDX ON REPORT_PARAMS
  (REP_SESSIONID)
 /
 
-
+PROMPT Creating Index 'DRP_FK_NAU_IND'
+CREATE INDEX drp_fk_nau_ind ON doc_redir_prior
+ (drp_admin_unit)
+/ 
