@@ -2,11 +2,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data1.sql-arc   2.56   Jul 04 2013 14:09:12   James.Wadsworth  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data1.sql-arc   2.57   Jul 11 2013 11:24:16   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3data1.sql  $
---       Date into PVCS   : $Date:   Jul 04 2013 14:09:12  $
---       Date fetched Out : $Modtime:   Jul 04 2013 13:38:40  $
---       Version          : $Revision:   2.56  $
+--       Date into PVCS   : $Date:   Jul 11 2013 11:24:16  $
+--       Date fetched Out : $Modtime:   Jul 11 2013 11:23:36  $
+--       Version          : $Revision:   2.57  $
 --       Table Owner      : NM3_METADATA
 --       Generation Date  : 15-AUG-2012 09:26
 --
@@ -6726,6 +6726,40 @@ SELECT
  WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
                    WHERE NER_APPL = 'HIG'
                     AND  NER_ID = 557);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,558
+       ,null
+       ,'Not all selections could be deleted'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 558);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,559
+       ,null
+       ,'All selections deleted'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 559);
 --
 INSERT INTO NM_ERRORS
        (NER_APPL
@@ -33584,6 +33618,30 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MAX_LENGTH
        )
 SELECT 
+        'CMDSHELL'
+       ,'HIG'
+       ,'Location of Windows cmd shell'
+       ,'Location of Windows cmd shell such as ''C:\WINDOWS\system32\cmd.exe'''
+       ,''
+       ,'VARCHAR2'
+       ,'Y'
+       ,'Y'
+       ,2000 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
+                   WHERE HOL_ID = 'CMDSHELL');
+--
+INSERT INTO HIG_OPTION_LIST
+       (HOL_ID
+       ,HOL_PRODUCT
+       ,HOL_NAME
+       ,HOL_REMARKS
+       ,HOL_DOMAIN
+       ,HOL_DATATYPE
+       ,HOL_MIXED_CASE
+       ,HOL_USER_OPTION
+       ,HOL_MAX_LENGTH
+       )
+SELECT 
         'DBWINTITLE'
        ,'HIG'
        ,'DB Info in Window Titles'
@@ -34411,6 +34469,30 @@ SELECT
        ,2000 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
                    WHERE HOL_ID = 'GRPXCLOVWR');
+--
+INSERT INTO HIG_OPTION_LIST
+       (HOL_ID
+       ,HOL_PRODUCT
+       ,HOL_NAME
+       ,HOL_REMARKS
+       ,HOL_DOMAIN
+       ,HOL_DATATYPE
+       ,HOL_MIXED_CASE
+       ,HOL_USER_OPTION
+       ,HOL_MAX_LENGTH
+       )
+SELECT 
+        'GUNZIPCMD'
+       ,'HIG'
+       ,'Command line to invoke gunzip'
+       ,'Command line to invoke gunzip such as ''/bin/gunzip'''
+       ,''
+       ,'VARCHAR2'
+       ,'Y'
+       ,'Y'
+       ,2000 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
+                   WHERE HOL_ID = 'GUNZIPCMD');
 --
 INSERT INTO HIG_OPTION_LIST
        (HOL_ID
@@ -36224,6 +36306,54 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MAX_LENGTH
        )
 SELECT 
+        'TARCMD'
+       ,'HIG'
+       ,'Command line to invoke tar'
+       ,'Command line to invoke tar such as ''/bin/tar'''
+       ,''
+       ,'VARCHAR2'
+       ,'Y'
+       ,'Y'
+       ,2000 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
+                   WHERE HOL_ID = 'TARCMD');
+--
+INSERT INTO HIG_OPTION_LIST
+       (HOL_ID
+       ,HOL_PRODUCT
+       ,HOL_NAME
+       ,HOL_REMARKS
+       ,HOL_DOMAIN
+       ,HOL_DATATYPE
+       ,HOL_MIXED_CASE
+       ,HOL_USER_OPTION
+       ,HOL_MAX_LENGTH
+       )
+SELECT 
+        'UNZIPCMD'
+       ,'HIG'
+       ,'Command line to invoke unzip'
+       ,'Command line to invoke unzip such as ''c:\tools\unzip\unzip or /bin/unzip'''
+       ,''
+       ,'VARCHAR2'
+       ,'Y'
+       ,'Y'
+       ,2000 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
+                   WHERE HOL_ID = 'UNZIPCMD');
+--
+INSERT INTO HIG_OPTION_LIST
+       (HOL_ID
+       ,HOL_PRODUCT
+       ,HOL_NAME
+       ,HOL_REMARKS
+       ,HOL_DOMAIN
+       ,HOL_DATATYPE
+       ,HOL_MIXED_CASE
+       ,HOL_USER_OPTION
+       ,HOL_MAX_LENGTH
+       )
+SELECT 
         'UPDRDONLY'
        ,'HIG'
        ,'Allow update of subordinates'
@@ -37096,6 +37226,16 @@ INSERT INTO HIG_OPTION_VALUES
        ,HOV_VALUE
        )
 SELECT 
+        'CMDSHELL'
+       ,'C:\WINDOWS\system32\cmd.exe' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
+                   WHERE HOV_ID = 'CMDSHELL');
+--
+INSERT INTO HIG_OPTION_VALUES
+       (HOV_ID
+       ,HOV_VALUE
+       )
+SELECT 
         'DBWINTITLE'
        ,'Y' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
@@ -37380,6 +37520,16 @@ SELECT
        ,'N' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
                    WHERE HOV_ID = 'GRPXCLOVWR');
+--
+INSERT INTO HIG_OPTION_VALUES
+       (HOV_ID
+       ,HOV_VALUE
+       )
+SELECT 
+        'GUNZIPCMD'
+       ,'/bin/gunzip' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
+                   WHERE HOV_ID = 'GUNZIPCMD');
 --
 INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
@@ -37950,6 +38100,26 @@ SELECT
        ,'sqlldr' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
                    WHERE HOV_ID = 'SQLLDR_EXE');
+--
+INSERT INTO HIG_OPTION_VALUES
+       (HOV_ID
+       ,HOV_VALUE
+       )
+SELECT 
+        'TARCMD'
+       ,'/bin/tar' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
+                   WHERE HOV_ID = 'TARCMD');
+--
+INSERT INTO HIG_OPTION_VALUES
+       (HOV_ID
+       ,HOV_VALUE
+       )
+SELECT 
+        'UNZIPCMD'
+       ,'unzip' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
+                   WHERE HOV_ID = 'UNZIPCMD');
 --
 INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
