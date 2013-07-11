@@ -1,10 +1,10 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.con-arc   2.38   Jul 04 2013 13:55:14   James.Wadsworth  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.con-arc   2.39   Jul 11 2013 16:49:02   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3.con  $
---       Date into PVCS   : $Date:   Jul 04 2013 13:55:14  $
---       Date fetched Out : $Modtime:   Jul 04 2013 13:36:02  $
---       PVCS Version     : $Revision:   2.38  $
+--       Date into PVCS   : $Date:   Jul 11 2013 16:49:02  $
+--       Date fetched Out : $Modtime:   Jul 11 2013 16:44:54  $
+--       PVCS Version     : $Revision:   2.39  $
 --
 -----------------------------------------------------------------------------
 --    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
@@ -6943,4 +6943,19 @@ ALTER TABLE NM_X_VAL_CONDITIONS ADD (CONSTRAINT
   (NXR_RULE_ID))
 /
 
+PROMPT Creating constraints on 'NM_SDE_SUB_LAYER_EXEMPT'
+ALTER TABLE NM_SDE_SUB_LAYER_EXEMPT ADD ( 
+  CONSTRAINT NSSL_OBJ_NAME_UPP_CHK
+  CHECK (Nssl_Object_Name = Upper(Nssl_Object_Name))
+  ENABLE VALIDATE,
+  CONSTRAINT NSSL_OBJ_TYPE_UPP_CHK
+  CHECK (Nssl_Object_Type = Upper(Nssl_Object_Type))
+  ENABLE VALIDATE)
+/  
 
+PROMPT Creating foreign key on 'DOC_REDIR_PRIOR'
+ALTER TABLE doc_redir_prior 
+   ADD (CONSTRAINT drp_fk_nau 
+      FOREIGN KEY (drp_admin_unit) 
+      REFERENCES nm_admin_units_all (nau_admin_unit))
+/	  
