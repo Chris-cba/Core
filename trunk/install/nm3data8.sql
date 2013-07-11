@@ -2,11 +2,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data8.sql-arc   2.20   Jul 04 2013 14:09:18   James.Wadsworth  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data8.sql-arc   2.21   Jul 11 2013 10:59:54   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3data8.sql  $
---       Date into PVCS   : $Date:   Jul 04 2013 14:09:18  $
---       Date fetched Out : $Modtime:   Jul 04 2013 13:39:40  $
---       Version          : $Revision:   2.20  $
+--       Date into PVCS   : $Date:   Jul 11 2013 10:59:54  $
+--       Date fetched Out : $Modtime:   Jul 11 2013 10:52:50  $
+--       Version          : $Revision:   2.21  $
 --       Table Owner      : NM3_METADATA
 --       Generation Date  : 25-MAR-2011 09:31
 --
@@ -26,6 +26,7 @@
 --   NM_INV_TYPES_ALL
 --   NM_INV_TYPE_ATTRIBS_ALL
 --   NM_INV_TYPE_ROLES
+--   NM_SDE_SUB_LAYER_EXEMPT
 --
 -----------------------------------------------------------------------------
 
@@ -2324,6 +2325,46 @@ SELECT
  WHERE NOT EXISTS (SELECT 1 FROM NM_INV_TYPE_ROLES
                    WHERE ITR_INV_TYPE = 'PRO$'
                     AND  ITR_HRO_ROLE = 'HIG_USER');
+--
+--
+--
+----------------------------------------------------------------------------------------
+
+
+----------------------------------------------------------------------------------------
+-- NM_SDE_SUB_LAYER_EXEMPT
+--
+-- select * from nm3_metadata.nm_sde_sub_layer_exempt
+-- order by nssl_object_name
+--         ,nssl_object_type
+--
+----------------------------------------------------------------------------------------
+
+SET TERM ON
+PROMPT nm_sde_sub_layer_exempt
+SET TERM OFF
+
+INSERT INTO NM_SDE_SUB_LAYER_EXEMPT
+       (NSSL_OBJECT_NAME
+       ,NSSL_OBJECT_TYPE
+       )
+SELECT 
+        'V_MCP_EXTRACT%'
+       ,'VIEW' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_SDE_SUB_LAYER_EXEMPT
+                   WHERE NSSL_OBJECT_NAME = 'V_MCP_EXTRACT%'
+                    AND  NSSL_OBJECT_TYPE = 'VIEW');
+--
+INSERT INTO NM_SDE_SUB_LAYER_EXEMPT
+       (NSSL_OBJECT_NAME
+       ,NSSL_OBJECT_TYPE
+       )
+SELECT 
+        'V_MCP_UPLOAD%'
+       ,'VIEW' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_SDE_SUB_LAYER_EXEMPT
+                   WHERE NSSL_OBJECT_NAME = 'V_MCP_UPLOAD%'
+                    AND  NSSL_OBJECT_TYPE = 'VIEW');
 --
 --
 --
