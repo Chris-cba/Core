@@ -8,14 +8,15 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4600_nm4700_ddl_upg.sql-arc   1.0   Jul 11 2013 10:09:10   Rob.Coupe  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4600_nm4700_ddl_upg.sql-arc   1.1   Jul 12 2013 11:24:28   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm4600_nm4700_ddl_upg.sql  $
---       Date into PVCS   : $Date:   Jul 11 2013 10:09:10  $
---       Date fetched Out : $Modtime:   Jul 11 2013 10:07:18  $
---       Version          : $Revision:   1.0  $
+--       Date into PVCS   : $Date:   Jul 12 2013 11:24:28  $
+--       Date fetched Out : $Modtime:   Jul 12 2013 11:22:42  $
+--       Version          : $Revision:   1.1  $
 --
-------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2013
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
 
 SET ECHO OFF
 SET LINESIZE 120
@@ -26,7 +27,7 @@ SET FEEDBACK OFF
 
 ------------------------------------------------------------------
 SET TERM ON
-PROMPT DDL Upgrade to DOC_STD_ACTIONS and DOC_REDIR_PRIOR
+PROMPT DDL Upgrade to DOC_REDIR_PRIOR
 SET TERM OFF
 
 ------------------------------------------------------------------
@@ -77,6 +78,70 @@ BEGIN
   */
   EXECUTE IMMEDIATE('CREATE INDEX drp_fk_nau_ind ON doc_redir_prior (drp_admin_unit)');
   EXECUTE IMMEDIATE('ALTER TABLE doc_redir_prior ADD (CONSTRAINT drp_fk_nau FOREIGN KEY (drp_admin_unit) REFERENCES nm_admin_units_all (nau_admin_unit))');
+END;
+/
+
+------------------------------------------------------------------
+
+
+------------------------------------------------------------------
+SET TERM ON
+PROMPT DDL Upgrade to DOC_STD_ACTIONS
+SET TERM OFF
+
+------------------------------------------------------------------
+-- 
+-- DEVELOPMENT COMMENTS (ROB COUPE)
+-- Imported from NM_4600_fix2.sql
+-- 
+------------------------------------------------------------------
+DECLARE
+  --
+  already_exists EXCEPTION;
+  PRAGMA exception_init( already_exists,-01430); 
+  --
+  lv_top_admin_unit hig_admin_units.hau_admin_unit%TYPE;
+  --
+  PROCEDURE get_top_admin_unit
+    IS
+  BEGIN
+    SELECT hau_admin_unit
+      INTO lv_top_admin_unit
+      FROM hig_admin_units
+     WHERE hau_level = 1
+         ;
+  EXCEPTION
+    WHEN no_data_found
+     THEN
+        raise_application_error(-20001,'Cannot find the top admin unit.');
+    WHEN others
+     THEN RAISE;
+  END;
+BEGIN
+  /*
+  ||Add the Admin Unit Column.
+  */
+  EXECUTE IMMEDIATE('ALTER TABLE doc_std_actions ADD(dsa_admin_unit NUMBER(9))');
+  /*
+  ||Populate existing rows with the top Admin Unit;
+  */
+  get_top_admin_unit;
+  --
+  EXECUTE IMMEDIATE('UPDATE doc_std_actions SET dsa_admin_unit = :lv_top_admin_unit') USING lv_top_admin_unit;
+  /*
+  ||Make the column NOT NULL.
+  */
+  EXECUTE IMMEDIATE('ALTER TABLE doc_std_actions MODIFY(dsa_admin_unit NOT NULL)');
+  /*
+  ||Rebuild the Unique Index.
+  */
+  EXECUTE IMMEDIATE('DROP INDEX dsa_ind1');
+  EXECUTE IMMEDIATE('CREATE UNIQUE INDEX dsa_ind1 ON doc_std_actions (dsa_admin_unit, dsa_dtp_code, dsa_dcl_code, dsa_doc_status, dsa_doc_type, dsa_code)');
+  /*
+  ||Create FK for Admin Unit.
+  */
+  EXECUTE IMMEDIATE('CREATE INDEX dsa_fk_nau_ind ON doc_std_actions (dsa_admin_unit)');
+  EXECUTE IMMEDIATE('ALTER TABLE doc_std_actions ADD (CONSTRAINT dsa_fk_nau FOREIGN KEY (dsa_admin_unit) REFERENCES nm_admin_units_all (nau_admin_unit))');
 END;
 /
 
