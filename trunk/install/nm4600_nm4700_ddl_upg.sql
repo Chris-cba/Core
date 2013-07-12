@@ -8,11 +8,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4600_nm4700_ddl_upg.sql-arc   1.1   Jul 12 2013 11:24:28   Rob.Coupe  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4600_nm4700_ddl_upg.sql-arc   1.2   Jul 12 2013 12:45:38   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm4600_nm4700_ddl_upg.sql  $
---       Date into PVCS   : $Date:   Jul 12 2013 11:24:28  $
---       Date fetched Out : $Modtime:   Jul 12 2013 11:22:42  $
---       Version          : $Revision:   1.1  $
+--       Date into PVCS   : $Date:   Jul 12 2013 12:45:38  $
+--       Date fetched Out : $Modtime:   Jul 12 2013 12:45:12  $
+--       Version          : $Revision:   1.2  $
 --
 -----------------------------------------------------------------------------
 --    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
@@ -205,6 +205,32 @@ end;
 
 ------------------------------------------------------------------
 
+declare
+obj_exists exception;
+pragma exception_init( obj_exists, -955);
+begin
+execute immediate ' CREATE TABLE BENTLEY_SELECT '||
+'( '||
+'   BS_PRODUCT_ID         INTEGER                      NOT NULL,'||
+'   BS_PRODUCT_NAME  VARCHAR2(80)          NOT NULL, '||
+'   BS_HPR_PRODUCT     VARCHAR2(6)            NOT NULL, '||
+'  CONSTRAINT  BS_PK'||
+'  PRIMARY KEY'||
+'   (BS_HPR_PRODUCT, BS_PRODUCT_ID)'||
+'  ENABLE VALIDATE'||
+')'||
+'ORGANIZATION INDEX';
+exception
+  when obj_exists then
+    NULL;
+end;
+/
+
+
+begin
+nm3ddl.create_synonym_for_object('BENTLEY_SELECT');
+end;
+/
 
 
 ------------------------------------------------------------------
