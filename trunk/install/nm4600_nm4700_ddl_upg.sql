@@ -8,11 +8,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4600_nm4700_ddl_upg.sql-arc   1.2   Jul 12 2013 12:45:38   Rob.Coupe  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4600_nm4700_ddl_upg.sql-arc   1.3   Jul 12 2013 12:53:06   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm4600_nm4700_ddl_upg.sql  $
---       Date into PVCS   : $Date:   Jul 12 2013 12:45:38  $
---       Date fetched Out : $Modtime:   Jul 12 2013 12:45:12  $
---       Version          : $Revision:   1.2  $
+--       Date into PVCS   : $Date:   Jul 12 2013 12:53:06  $
+--       Date fetched Out : $Modtime:   Jul 12 2013 12:52:50  $
+--       Version          : $Revision:   1.3  $
 --
 -----------------------------------------------------------------------------
 --    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
@@ -203,6 +203,16 @@ end;
 /
 
 
+------------------------------------------------------------------
+SET TERM ON
+PROMPT Bentley Select License table
+SET TERM OFF
+
+------------------------------------------------------------------
+-- 
+-- DEVELOPMENT COMMENTS (ROB COUPE)
+-- Table used for Bentley Select Licensing
+-- 
 ------------------------------------------------------------------
 
 declare
