@@ -2,11 +2,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data1.sql-arc   2.57   Jul 11 2013 11:24:16   Rob.Coupe  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data1.sql-arc   2.58   Jul 12 2013 12:30:16   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3data1.sql  $
---       Date into PVCS   : $Date:   Jul 11 2013 11:24:16  $
---       Date fetched Out : $Modtime:   Jul 11 2013 11:23:36  $
---       Version          : $Revision:   2.57  $
+--       Date into PVCS   : $Date:   Jul 12 2013 12:30:16  $
+--       Date fetched Out : $Modtime:   Jul 12 2013 12:29:44  $
+--       Version          : $Revision:   2.58  $
 --       Table Owner      : NM3_METADATA
 --       Generation Date  : 15-AUG-2012 09:26
 --
@@ -35,6 +35,7 @@
 --   HIG_CHECK_CONSTRAINT_ASSOCS
 --   HIG_USER_OPTION_LIST
 --   NM_SYN_EXEMPT
+--   BENTLEY_SELECT
 --
 -----------------------------------------------------------------------------
 
@@ -46514,6 +46515,307 @@ SELECT
  WHERE NOT EXISTS (SELECT 1 FROM NM_SYN_EXEMPT
                    WHERE NSYN_OBJECT_NAME = 'V_MCP_UPLOAD%'
                     AND  NSYN_OBJECT_TYPE = 'VIEW');
+--
+--
+--
+----------------------------------------------------------------------------------------
+-- BENTLEY_SELECT
+--
+-- select * from nm3_metadata.bentley_select
+-- order by bs_hpr_product
+--         ,bs_product_id
+--
+----------------------------------------------------------------------------------------
+
+SET TERM ON
+PROMPT bentley_select
+SET TERM OFF
+
+INSERT INTO BENTLEY_SELECT
+       (BS_PRODUCT_ID
+       ,BS_PRODUCT_NAME
+       ,BS_HPR_PRODUCT
+       )
+SELECT 
+        1370
+       ,'Exor Accidents Manager'
+       ,'ACC' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM BENTLEY_SELECT
+                   WHERE BS_HPR_PRODUCT = 'ACC'
+                    AND  BS_PRODUCT_ID = 1370);
+--
+INSERT INTO BENTLEY_SELECT
+       (BS_PRODUCT_ID
+       ,BS_PRODUCT_NAME
+       ,BS_HPR_PRODUCT
+       )
+SELECT 
+        1339
+       ,'Exor Asset Manager'
+       ,'AST' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM BENTLEY_SELECT
+                   WHERE BS_HPR_PRODUCT = 'AST'
+                    AND  BS_PRODUCT_ID = 1339);
+--
+INSERT INTO BENTLEY_SELECT
+       (BS_PRODUCT_ID
+       ,BS_PRODUCT_NAME
+       ,BS_HPR_PRODUCT
+       )
+SELECT 
+        1371
+       ,'Exor Street Lighting Manager'
+       ,'CLM' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM BENTLEY_SELECT
+                   WHERE BS_HPR_PRODUCT = 'CLM'
+                    AND  BS_PRODUCT_ID = 1371);
+--
+INSERT INTO BENTLEY_SELECT
+       (BS_PRODUCT_ID
+       ,BS_PRODUCT_NAME
+       ,BS_HPR_PRODUCT
+       )
+SELECT 
+        1340
+       ,'Exor Enquiry Manager'
+       ,'ENQ' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM BENTLEY_SELECT
+                   WHERE BS_HPR_PRODUCT = 'ENQ'
+                    AND  BS_PRODUCT_ID = 1340);
+--
+INSERT INTO BENTLEY_SELECT
+       (BS_PRODUCT_ID
+       ,BS_PRODUCT_NAME
+       ,BS_HPR_PRODUCT
+       )
+SELECT 
+        1341
+       ,'Exor Information Manager'
+       ,'IM' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM BENTLEY_SELECT
+                   WHERE BS_HPR_PRODUCT = 'IM'
+                    AND  BS_PRODUCT_ID = 1341);
+--
+INSERT INTO BENTLEY_SELECT
+       (BS_PRODUCT_ID
+       ,BS_PRODUCT_NAME
+       ,BS_HPR_PRODUCT
+       )
+SELECT 
+        1342
+       ,'Exor Maintenance Manager'
+       ,'MAI' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM BENTLEY_SELECT
+                   WHERE BS_HPR_PRODUCT = 'MAI'
+                    AND  BS_PRODUCT_ID = 1342);
+--
+INSERT INTO BENTLEY_SELECT
+       (BS_PRODUCT_ID
+       ,BS_PRODUCT_NAME
+       ,BS_HPR_PRODUCT
+       )
+SELECT 
+        1344
+       ,'Exor MapCapture'
+       ,'MCP' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM BENTLEY_SELECT
+                   WHERE BS_HPR_PRODUCT = 'MCP'
+                    AND  BS_PRODUCT_ID = 1344);
+--
+INSERT INTO BENTLEY_SELECT
+       (BS_PRODUCT_ID
+       ,BS_PRODUCT_NAME
+       ,BS_HPR_PRODUCT
+       )
+SELECT 
+        1343
+       ,'Exor Maintenance Mobile'
+       ,'MMO' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM BENTLEY_SELECT
+                   WHERE BS_HPR_PRODUCT = 'MMO'
+                    AND  BS_PRODUCT_ID = 1343);
+--
+INSERT INTO BENTLEY_SELECT
+       (BS_PRODUCT_ID
+       ,BS_PRODUCT_NAME
+       ,BS_HPR_PRODUCT
+       )
+SELECT 
+        1345
+       ,'Exor Network Event Manager'
+       ,'NEM' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM BENTLEY_SELECT
+                   WHERE BS_HPR_PRODUCT = 'NEM'
+                    AND  BS_PRODUCT_ID = 1345);
+--
+INSERT INTO BENTLEY_SELECT
+       (BS_PRODUCT_ID
+       ,BS_PRODUCT_NAME
+       ,BS_HPR_PRODUCT
+       )
+SELECT 
+        1346
+       ,'Exor Network Manager'
+       ,'NET' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM BENTLEY_SELECT
+                   WHERE BS_HPR_PRODUCT = 'NET'
+                    AND  BS_PRODUCT_ID = 1346);
+--
+INSERT INTO BENTLEY_SELECT
+       (BS_PRODUCT_ID
+       ,BS_PRODUCT_NAME
+       ,BS_HPR_PRODUCT
+       )
+SELECT 
+        1351
+       ,'Exor Street Gazetteer Manager'
+       ,'NSG' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM BENTLEY_SELECT
+                   WHERE BS_HPR_PRODUCT = 'NSG'
+                    AND  BS_PRODUCT_ID = 1351);
+--
+INSERT INTO BENTLEY_SELECT
+       (BS_PRODUCT_ID
+       ,BS_PRODUCT_NAME
+       ,BS_HPR_PRODUCT
+       )
+SELECT 
+        1348
+       ,'Exor Public Rights of Way'
+       ,'PROW' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM BENTLEY_SELECT
+                   WHERE BS_HPR_PRODUCT = 'PROW'
+                    AND  BS_PRODUCT_ID = 1348);
+--
+INSERT INTO BENTLEY_SELECT
+       (BS_PRODUCT_ID
+       ,BS_PRODUCT_NAME
+       ,BS_HPR_PRODUCT
+       )
+SELECT 
+        1350
+       ,'Exor Spatial Manager'
+       ,'SM' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM BENTLEY_SELECT
+                   WHERE BS_HPR_PRODUCT = 'SM'
+                    AND  BS_PRODUCT_ID = 1350);
+--
+INSERT INTO BENTLEY_SELECT
+       (BS_PRODUCT_ID
+       ,BS_PRODUCT_NAME
+       ,BS_HPR_PRODUCT
+       )
+SELECT 
+        1466
+       ,'Exor Spatial Manager'
+       ,'SM' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM BENTLEY_SELECT
+                   WHERE BS_HPR_PRODUCT = 'SM'
+                    AND  BS_PRODUCT_ID = 1466);
+--
+INSERT INTO BENTLEY_SELECT
+       (BS_PRODUCT_ID
+       ,BS_PRODUCT_NAME
+       ,BS_HPR_PRODUCT
+       )
+SELECT 
+        1352
+       ,'Exor Streetworks Mobile'
+       ,'SMO' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM BENTLEY_SELECT
+                   WHERE BS_HPR_PRODUCT = 'SMO'
+                    AND  BS_PRODUCT_ID = 1352);
+--
+INSERT INTO BENTLEY_SELECT
+       (BS_PRODUCT_ID
+       ,BS_PRODUCT_NAME
+       ,BS_HPR_PRODUCT
+       )
+SELECT 
+        1349
+       ,'Exor Schemes Manager'
+       ,'STP' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM BENTLEY_SELECT
+                   WHERE BS_HPR_PRODUCT = 'STP'
+                    AND  BS_PRODUCT_ID = 1349);
+--
+INSERT INTO BENTLEY_SELECT
+       (BS_PRODUCT_ID
+       ,BS_PRODUCT_NAME
+       ,BS_HPR_PRODUCT
+       )
+SELECT 
+        1353
+       ,'Exor Structures Manager'
+       ,'STR' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM BENTLEY_SELECT
+                   WHERE BS_HPR_PRODUCT = 'STR'
+                    AND  BS_PRODUCT_ID = 1353);
+--
+INSERT INTO BENTLEY_SELECT
+       (BS_PRODUCT_ID
+       ,BS_PRODUCT_NAME
+       ,BS_HPR_PRODUCT
+       )
+SELECT 
+        1372
+       ,'Exor Streetworks Manager'
+       ,'SWR' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM BENTLEY_SELECT
+                   WHERE BS_HPR_PRODUCT = 'SWR'
+                    AND  BS_PRODUCT_ID = 1372);
+--
+INSERT INTO BENTLEY_SELECT
+       (BS_PRODUCT_ID
+       ,BS_PRODUCT_NAME
+       ,BS_HPR_PRODUCT
+       )
+SELECT 
+        1355
+       ,'Exor Traffic Interface Manager'
+       ,'TM' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM BENTLEY_SELECT
+                   WHERE BS_HPR_PRODUCT = 'TM'
+                    AND  BS_PRODUCT_ID = 1355);
+--
+INSERT INTO BENTLEY_SELECT
+       (BS_PRODUCT_ID
+       ,BS_PRODUCT_NAME
+       ,BS_HPR_PRODUCT
+       )
+SELECT 
+        1347
+       ,'Exor TMA Manager'
+       ,'TMA' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM BENTLEY_SELECT
+                   WHERE BS_HPR_PRODUCT = 'TMA'
+                    AND  BS_PRODUCT_ID = 1347);
+--
+INSERT INTO BENTLEY_SELECT
+       (BS_PRODUCT_ID
+       ,BS_PRODUCT_NAME
+       ,BS_HPR_PRODUCT
+       )
+SELECT 
+        1354
+       ,'Exor TMA API and Web Service'
+       ,'TMA' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM BENTLEY_SELECT
+                   WHERE BS_HPR_PRODUCT = 'TMA'
+                    AND  BS_PRODUCT_ID = 1354);
+--
+INSERT INTO BENTLEY_SELECT
+       (BS_PRODUCT_ID
+       ,BS_PRODUCT_NAME
+       ,BS_HPR_PRODUCT
+       )
+SELECT 
+        1356
+       ,'Exor UKPMS'
+       ,'UKP' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM BENTLEY_SELECT
+                   WHERE BS_HPR_PRODUCT = 'UKP'
+                    AND  BS_PRODUCT_ID = 1356);
 --
 --
 --
