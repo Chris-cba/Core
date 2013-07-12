@@ -8,11 +8,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4600_nm4700_metadata_upg.sql-arc   1.1   Jul 12 2013 12:59:00   Rob.Coupe  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4600_nm4700_metadata_upg.sql-arc   1.2   Jul 12 2013 13:03:08   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm4600_nm4700_metadata_upg.sql  $
---       Date into PVCS   : $Date:   Jul 12 2013 12:59:00  $
---       Date fetched Out : $Modtime:   Jul 12 2013 12:58:28  $
---       Version          : $Revision:   1.1  $
+--       Date into PVCS   : $Date:   Jul 12 2013 13:03:08  $
+--       Date fetched Out : $Modtime:   Jul 12 2013 13:02:52  $
+--       Version          : $Revision:   1.2  $
 --
 ------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2013
@@ -361,6 +361,10 @@ where not exists ( select 1 from NM_SDE_SUB_LAYER_EXEMPT
 --
 ----------------------------------------------------------------------------------------
 --
+
+SET TERM ON
+PROMPT Bentley Select Licesning Metadata
+SET TERM OFF
 
 ------------------------------------------------------------------
 -- 
