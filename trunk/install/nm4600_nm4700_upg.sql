@@ -3,11 +3,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4600_nm4700_upg.sql-arc   1.0   Jul 12 2013 10:26:08   Rob.Coupe  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4600_nm4700_upg.sql-arc   1.1   Jul 15 2013 10:34:14   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm4600_nm4700_upg.sql  $
---       Date into PVCS   : $Date:   Jul 12 2013 10:26:08  $
---       Date fetched Out : $Modtime:   Jul 11 2013 09:03:14  $
---       Version          : $Revision:   1.0  $
+--       Date into PVCS   : $Date:   Jul 15 2013 10:34:14  $
+--       Date fetched Out : $Modtime:   Jul 15 2013 10:33:42  $
+--       Version          : $Revision:   1.1  $
 --
 --   Product upgrade script
 --
@@ -134,6 +134,18 @@ SET FEEDBACK OFF
 ---------------------------------------------------------------------------------------------------
 --                        **************** APPLICATION CONTEXTS ****************
 --
+SET TERM ON
+Prompt Application Contexts...
+--SET TERM OFF
+SET DEFINE ON
+select '&exor_base'||'nm3'||'&terminator'||'admin'||
+        '&terminator'||'ctx'||'&terminator'||'nm3ctx.sql' run_file
+from dual
+/
+SET FEEDBACK ON
+start &&run_file
+SET FEEDBACK OFF
+
 --
 ---------------------------------------------------------------------------------------------------
 --                  **************** PACKAGE HEADERS AND BODIES   ****************
