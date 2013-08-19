@@ -3,11 +3,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4500_nm4700_upg.sql-arc   1.0   Aug 19 2013 11:10:12   Rob.Coupe  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4500_nm4700_upg.sql-arc   1.1   Aug 19 2013 11:40:28   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm4500_nm4700_upg.sql  $
---       Date into PVCS   : $Date:   Aug 19 2013 11:10:12  $
---       Date fetched Out : $Modtime:   Aug 19 2013 11:09:04  $
---       Version          : $Revision:   1.0  $
+--       Date into PVCS   : $Date:   Aug 19 2013 11:40:28  $
+--       Date fetched Out : $Modtime:   Aug 19 2013 11:36:42  $
+--       Version          : $Revision:   1.1  $
 --
 --   Product upgrade script
 --
@@ -274,6 +274,43 @@ from dual
 /
 SET FEEDBACK ON
 start &&run_file
+SET FEEDBACK OFF
+--
+---------------------------------------------------------------------------------------------------
+--                  ****************   CREATE ACLs   *******************
+SET TERM ON
+Prompt Creating ACLs...
+SET TERM OFF
+EXECUTE nm3acl.create_standard_acls;
+--
+---------------------------------------------------------------------------------------------------
+--                  ****************   gtype update  *******************
+SET FEEDBACK OFF
+SET TERM ON
+PROMPT Converting Multi-part sdo_gtypes...
+SET TERM OFF
+SET DEFINE ON
+select '&exor_base'||'nm3'||'&terminator'||'install'||
+        '&terminator'||'gtype_3306_update.sql' run_file
+from dual
+/
+SET FEEDBACK ON
+start '&&run_file'
+SET FEEDBACK OFF
+--
+---------------------------------------------------------------------------------------------------
+--                  ****************   doc-issued century repair  *******************
+SET FEEDBACK OFF
+SET TERM ON
+PROMPT Doc-issued date century repair...
+SET TERM OFF
+SET DEFINE ON
+select '&exor_base'||'nm3'||'&terminator'||'install'||
+        '&terminator'||'doc_issued_century_repair.sql' run_file
+from dual
+/
+SET FEEDBACK ON
+start '&&run_file'
 SET FEEDBACK OFF
 --
 ---------------------------------------------------------------------------------------------------
