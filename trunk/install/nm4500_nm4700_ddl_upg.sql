@@ -8,11 +8,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4500_nm4700_ddl_upg.sql-arc   1.0   Aug 19 2013 17:36:48   Rob.Coupe  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4500_nm4700_ddl_upg.sql-arc   1.1   Aug 23 2013 09:55:16   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm4500_nm4700_ddl_upg.sql  $
---       Date into PVCS   : $Date:   Aug 19 2013 17:36:48  $
---       Date fetched Out : $Modtime:   Aug 19 2013 17:23:20  $
---       Version          : $Revision:   1.0  $
+--       Date into PVCS   : $Date:   Aug 23 2013 09:55:16  $
+--       Date fetched Out : $Modtime:   Aug 23 2013 09:53:20  $
+--       Version          : $Revision:   1.1  $
 --
 -----------------------------------------------------------------------------
 --    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
@@ -48,10 +48,6 @@ Exception
     Null;
 End;
 /
-
-
-
-------------------------------------------------------------------
 
 
 ------------------------------------------------------------------
@@ -150,6 +146,7 @@ SET TERM OFF
 ------------------------------------------------------------------
 /* script to tidy-up extents */
 
+
 alter table nm_saved_extent_member_datums
 drop constraint nsd_nsm_fk;
 
@@ -179,23 +176,32 @@ exception
 end;
 /
 
-ALTER TABLE NM_SAVED_EXTENT_MEMBERS ADD 
-CONSTRAINT nsu_nse_fk
-FOREIGN KEY (NSM_NSE_ID)
-REFERENCES NM_SAVED_EXTENTS (NSE_ID)
-ON DELETE CASCADE
-ENABLE
-VALIDATE;
+Declare
+  Already_Exists Exception;
+  Pragma Exception_Init (Already_Exists,-2275); 
+Begin
+  Execute Immediate 'ALTER TABLE NM_SAVED_EXTENT_MEMBERS ADD CONSTRAINT nsu_nse_fk '||
+                    ' FOREIGN KEY (NSM_NSE_ID) REFERENCES NM_SAVED_EXTENTS (NSE_ID) '||
+                    'ON DELETE CASCADE ENABLE VALIDATE ';
+Exception 
+  When Already_Exists Then
+    Null;
+End;
+/
 
-ALTER TABLE NM_SAVED_EXTENT_MEMBER_DATUMS ADD 
-CONSTRAINT nsd_nsm_fk
-FOREIGN KEY (NSD_NSE_ID, NSD_NSM_ID)
-REFERENCES NM_SAVED_EXTENT_MEMBERS (NSM_NSE_ID, NSM_ID)
-ON DELETE CASCADE
-ENABLE
-VALIDATE;
 
-------------------------------------------------------------------
+Declare
+  Already_Exists Exception;
+  Pragma Exception_Init (Already_Exists,-2275); 
+Begin
+  Execute Immediate 'ALTER TABLE NM_SAVED_EXTENT_MEMBER_DATUMS ADD CONSTRAINT nsd_nsm_fk '||
+                    ' FOREIGN KEY (NSD_NSE_ID, NSD_NSM_ID) REFERENCES NM_SAVED_EXTENT_MEMBERS (NSM_NSE_ID, NSM_ID) '||
+                    ' ON DELETE CASCADE ENABLE VALIDATE';
+Exception 
+  When Already_Exists Then
+    Null;
+End;
+/
 
 
 ------------------------------------------------------------------
@@ -213,11 +219,11 @@ SET TERM OFF
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm4500_nm4700_ddl_upg.sql-arc   1.0   Aug 19 2013 17:36:48   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm4500_nm4700_ddl_upg.sql-arc   1.1   Aug 23 2013 09:55:16   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm4500_nm4700_ddl_upg.sql  $
---       Date into PVCS   : $Date:   Aug 19 2013 17:36:48  $
---       Date fetched Out : $Modtime:   Aug 19 2013 17:23:20  $
---       PVCS Version     : $Revision:   1.0  $
+--       Date into PVCS   : $Date:   Aug 23 2013 09:55:16  $
+--       Date fetched Out : $Modtime:   Aug 23 2013 09:53:20  $
+--       PVCS Version     : $Revision:   1.1  $
 --
 --------------------------------------------------------------------------------
 --
