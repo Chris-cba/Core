@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 --
 ---   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.56.1.13   Sep 14 2012 13:34:06   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.56.1.14   Sep 02 2013 12:49:36   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3sdo.pkb  $
---       Date into PVCS   : $Date:   Sep 14 2012 13:34:06  $
---       Date fetched Out : $Modtime:   Sep 14 2012 13:28:30  $
---       PVCS Version     : $Revision:   2.56.1.13  $
+--       Date into PVCS   : $Date:   Sep 02 2013 12:49:36  $
+--       Date fetched Out : $Modtime:   Sep 02 2013 12:47:34  $
+--       PVCS Version     : $Revision:   2.56.1.14  $
 --       Based on
 
 --
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 -- Copyright (c) RAC
 -----------------------------------------------------------------------------
 
-   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.56.1.13  $"';
+   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.56.1.14  $"';
    g_package_name    CONSTANT VARCHAR2 (30)  := 'NM3SDO';
    g_batch_size      INTEGER                 := NVL( TO_NUMBER(Hig.get_sysopt('SDOBATSIZE')), 10);
    g_clip_type       VARCHAR2(30)            := NVL(Hig.get_sysopt('SDOCLIPTYP'),'SDO');
@@ -9175,9 +9175,10 @@ BEGIN
 
   l_nth := p_nth;
 
-  IF p_nth.nth_base_table_theme IS NOT NULL THEN
-    l_nth := Nm3get.get_nth( l_nth.nth_base_table_theme);
-  END IF;
+--  RAC - made change to prevent use of the two pass filter. See ticket 8001552660  
+--  IF p_nth.nth_base_table_theme IS NOT NULL THEN
+--    l_nth := Nm3get.get_nth( l_nth.nth_base_table_theme);
+--  END IF;
 
   IF l_nth.nth_feature_table = l_nth.nth_table_name THEN
 
@@ -9365,10 +9366,11 @@ BEGIN
 
   END LOOP;
 
-  IF p_nth.nth_base_table_theme IS NOT NULL THEN
+-- RAC - prevent use fo two-pass filter - see ticket  8001552660
+--  IF p_nth.nth_base_table_theme IS NOT NULL THEN
 -- ensure only those in the view are returned.
-    retval :=  join_ntl_array( p_nth, retval );
-  END IF;
+--    retval :=  join_ntl_array( p_nth, retval );
+--  END IF;
 
   RETURN retval;
 
