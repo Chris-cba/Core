@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE nm3flx IS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3flx.pkh-arc   2.9   Jul 04 2013 15:33:50   James.Wadsworth  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3flx.pkh-arc   2.10   Sep 02 2013 12:29:44   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3flx.pkh  $
---       Date into PVCS   : $Date:   Jul 04 2013 15:33:50  $
---       Date fetched Out : $Modtime:   Jul 04 2013 15:30:16  $
---       Version          : $Revision:   2.9  $
+--       Date into PVCS   : $Date:   Sep 02 2013 12:29:44  $
+--       Date fetched Out : $Modtime:   Sep 02 2013 12:18:36  $
+--       Version          : $Revision:   2.10  $
 --       Based on SCCS version : 1.30
 ------------------------------------------------------------------
 --   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
@@ -33,7 +33,8 @@ CREATE OR REPLACE PACKAGE nm3flx IS
 --
    TYPE validtype is table of varchar2(1);
    -- List the values that should not be allowed in a valid password.
-   g_invalid_chars CONSTANT validtype:= validtype('£', '€');
+--   g_invalid_chars CONSTANT validtype:= validtype('£', '€');
+   g_invalid_chars CONSTANT validtype:= validtype(chr(163), chr(128));
    -- £ Added due to what appears to be an Oracle bug in 11g. a £ can be used 
    -- creating a password but the password is not recognised when logging on.
 --
