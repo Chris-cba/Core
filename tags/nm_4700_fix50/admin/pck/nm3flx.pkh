@@ -1,0 +1,754 @@
+CREATE OR REPLACE PACKAGE nm3flx IS
+--<PACKAGE>
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3flx.pkh-arc   2.10   Sep 02 2013 12:29:44   Rob.Coupe  $
+--       Module Name      : $Workfile:   nm3flx.pkh  $
+--       Date into PVCS   : $Date:   Sep 02 2013 12:29:44  $
+--       Date fetched Out : $Modtime:   Sep 02 2013 12:18:36  $
+--       Version          : $Revision:   2.10  $
+--       Based on SCCS version : 1.30
+------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+------------------------------------------------------------------
+
+
+--</PACKAGE>
+--all global package variables here
+--<GLOBVAR>
+  g_sccsid      CONSTANT  varchar2(80) := '"@(#)nm3flx.pkh	1.30 12/11/06"';
+--  g_sccsid is the SCCS_ID
+--
+-- Global TYPE declarations
+  TYPE tab_type_columns IS TABLE OF nm_type_columns%ROWTYPE INDEX BY binary_integer;
+  
+--
+   g_last_parse_exception_msg  varchar2(32767);
+--
+   g_flex_validation_exception EXCEPTION;
+   g_flex_validation_exc_code  number;
+   g_flex_validation_exc_msg   varchar2(2000);
+--  These are used when raising errors regarding the validation of flex values
+--
+   TYPE validtype is table of varchar2(1);
+   -- List the values that should not be allowed in a valid password.
+--   g_invalid_chars CONSTANT validtype:= validtype('£', '€');
+   g_invalid_chars CONSTANT validtype:= validtype(chr(163), chr(128));
+   -- £ Added due to what appears to be an Oracle bug in 11g. a £ can be used 
+   -- creating a password but the password is not recognised when logging on.
+--
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_version">
+-- This function returns the SCCS ID
+  FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="right">
+-- This function returns the rightmost "pi_chars_reqd" characters of "pi_string"
+FUNCTION RIGHT(pi_string     IN varchar2
+              ,pi_chars_reqd IN number
+              ) RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="left">
+-- This function returns the leftmost "pi_chars_reqd" characters of "pi_string"
+FUNCTION LEFT(pi_string     IN varchar2
+             ,pi_chars_reqd IN number
+             ) RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="mid">
+-- This function returns the value of "pi_string" between "pi_start_pos" and "pi_end_pos"
+FUNCTION mid(pi_string    IN varchar2
+            ,pi_start_pos IN number
+            ,pi_end_pos   IN number
+            ) RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="string">
+-- This function when given the value string returns 'string'
+FUNCTION string(pi_string IN varchar2) RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="string_before_character">
+-- This function returns all characters to the right of a given character in a string
+FUNCTION string_before_character (pi_string   IN varchar2
+                                 ,pi_char     IN varchar2) RETURN varchar2;
+
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="string_after_character">
+-- This function returns all characters to the right of a given character in a string
+FUNCTION string_after_character (pi_string   IN varchar2
+                                ,pi_char     IN varchar2) RETURN varchar2;
+
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="is_numeric">
+-- This function returns TRUE if the pi_string is wholly numeric
+FUNCTION is_numeric(pi_string IN varchar2) RETURN boolean;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="is_valid_numeric_char">
+-- This function returns TRUE if the pi_char is a valid character to have in a
+--   numeric string, for instance , or . (as well as 0-9)
+FUNCTION is_valid_numeric_char(pi_char IN char) RETURN boolean;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_session_parameter">
+-- This function returns the value for the specified NLS_SESSION_PARAMETER
+FUNCTION get_session_parameter(pi_parameter IN nls_session_parameters.parameter%TYPE
+                              ) RETURN nls_session_parameters.VALUE%TYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="extract_bind_variable">
+-- This function returns the pi_occurrence occurrence of a bind variable
+--   within the specified pi_string
+FUNCTION extract_bind_variable(pi_string     IN varchar2
+                              ,pi_occurrence IN number DEFAULT 1
+                              ) RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="extract_bind_variable">
+--
+--  This function returns all occurrences of bind variables
+--  within the specified pi_string.
+--
+FUNCTION extract_all_bind_variables(pi_string IN varchar2
+                                   ) RETURN nm3type.tab_varchar80;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="select_nm_type_columns">
+-- This procedure returns a selected row fron NM_TYPE_COLUMNS
+PROCEDURE select_nm_type_columns
+            (pi_nt_type     IN     nm_type_columns.ntc_nt_type%TYPE
+            ,pi_column_name IN     nm_type_columns.ntc_column_name%TYPE
+            ,po_rec_ntc        OUT nm_type_columns%ROWTYPE
+            );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="sel_nm_type_inclusion_by_child">
+-- This procedure returns a selected row fron NM_TYPE_INCLUSION
+PROCEDURE sel_nm_type_inclusion_by_child
+            (pi_nt_type     IN     nm_type_inclusion.nti_nw_child_type%TYPE
+            ,pi_column_name IN     nm_type_inclusion.nti_child_column%TYPE
+            ,po_rec_nti        OUT nm_type_inclusion%ROWTYPE
+            );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="build_inclusion_sql_string">
+-- This overloaded function returns the SQL string necessary for dealing with
+--  NM_TYPE_INCLUSIONS. The version which takes the record is for use within
+--  VALIDATE_NM_ELEMENT_GROUP and the other is for use from within forms
+--  to return the SQL required for a LOV
+FUNCTION build_inclusion_sql_string
+            (pi_rec_nti                IN     nm_type_inclusion%ROWTYPE
+            ,pi_include_ne_id          IN     boolean DEFAULT TRUE
+            ,pi_include_2nd_parent_col IN boolean DEFAULT TRUE
+            ) RETURN varchar2;
+FUNCTION build_inclusion_sql_string
+            (pi_nt_type                IN     nm_type_columns.ntc_nt_type%TYPE
+            ,pi_column_name            IN     nm_type_columns.ntc_column_name%TYPE
+            ,pi_include_ne_id          IN     boolean DEFAULT TRUE
+            ,pi_include_2nd_parent_col IN boolean DEFAULT TRUE            
+            ) RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_domain">
+-- This procedure returns the domain name for a given NT_TYPE and COLUMN_NAME.
+--  It is merely a wrapper around <I>select_nm_type_columns</I> for use in
+--  Forms to save on network traffic
+FUNCTION get_domain
+            (pi_nt_type     IN     nm_type_columns.ntc_nt_type%TYPE
+            ,pi_column_name IN     nm_type_columns.ntc_column_name%TYPE
+            ) RETURN nm_type_columns.ntc_domain%TYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="validate_flex_column">
+-- This procedure returns the validated value for a column, and the NE_ID if applicable
+PROCEDURE validate_flex_column
+            (pi_nt_type               IN     nm_type_columns.ntc_nt_type%TYPE
+            ,pi_column_name           IN     nm_type_columns.ntc_column_name%TYPE
+            ,pi_bind_variable_value   IN     varchar2 DEFAULT NULL  -- for use when validating ntc_query			
+            ,po_value                 IN OUT varchar2
+            ,po_ne_id                 OUT nm_elements.ne_id%TYPE
+            );
+-- This procedure may raise the following application errors
+-- -20601 - NM_TYPE_COLUMNS record not found
+-- -20602 - Column is mandatory
+-- -20603 - Value is too long
+-- -20604 - Value is invalid on domain
+-- -20605 - n rows selected by query SQL
+-- -20606 - Value is invalid for format mask
+-- -20609 - More than 1 bind variable in Query SQL
+-- -20610 - No bind variable in Query SQL
+-- -20611 - SQL Error from dynamic SQL for Query SQL
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="validate_domain_value">
+-- This function returns the valid domain values for a domain
+FUNCTION validate_domain_value
+            (pi_domain IN nm_type_columns.ntc_domain%TYPE
+            ,pi_value  IN varchar2
+            ) RETURN hig_codes.hco_meaning%TYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="validate_nm_element_group">
+FUNCTION validate_nm_element_group (pi_nt_type     IN nm_types.nt_type%TYPE
+                                   ,pi_column_name IN nm_type_columns.ntc_column_name%TYPE
+                                   ,pi_value       IN varchar2
+                                   ) RETURN nm_elements.ne_id%TYPE;
+-- This procedure may raise the following application errors
+-- -20607 - Parent Element not found
+-- -20608 - n Parent Elements found
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_flx_column_details">
+-- This function returns the details of all flexible columns for a network
+-- type.
+FUNCTION get_flx_column_details(pi_nt_type        IN nm_types.nt_type%TYPE
+                               ,pi_disp_derived   IN boolean               DEFAULT FALSE
+                               ,pi_disp_inherited IN boolean               DEFAULT FALSE
+                               ) RETURN tab_type_columns;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_flx_column_details">
+-- This function returns the details of all flexible columns for a network
+PROCEDURE get_flx_col_data(pi_ne_id       IN  nm_elements.ne_id%TYPE
+                          ,pi_column_name IN  varchar2
+                          ,po_value       OUT varchar2
+                          ,po_meaning     OUT varchar2
+                          );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_dec_places_from_mask">
+-- This function returns an integer indicating the number of decimal places
+--   within a format mask
+FUNCTION get_dec_places_from_mask (pi_format_mask IN varchar2) RETURN number;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_flx_col_domain_sql">
+-- Returns the sql to be used to lookup a flex column value from a domain
+--
+FUNCTION get_flx_col_domain_sql(pi_domain IN VARCHAR2) RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--<PROC NAME="build_lov_sql_string">
+--
+-- New function within NM3FLX arg:  NT_TYPE, Column name
+--
+-- If column is a nti_child_column for the NT then return nm3flx.build_inclusion_sql_string
+--
+-- else if query, return sql string with each bind variable on RHS of predicate being end
+--  if replaced by the column on LHS or by removal of predicate
+--
+-- else if domain based then return SQL string from domain lookup. select hco_value, hco_meaning from hig_codes
+-- where hco_domain_id = 'DOMAIN'
+--
+-- else return null
+--
+-- GJ 09-MAY-2005
+-- Added parameters 
+--    p_include_bind_variable
+--    p_replace_bind_variable_with
+FUNCTION build_lov_sql_string (p_nt_type                    IN varchar2
+                              ,p_column_name                IN varchar2
+							  ,p_include_bind_variable      IN BOOLEAN DEFAULT FALSE
+							  ,p_replace_bind_variable_with IN VARCHAR2 DEFAULT NULL
+                              ) RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="remove_bind_variable_refs">
+-- This function removes references of bind variables from a query string
+--
+--  e.g. "SELECT * FROM NM_ELEMENTS WHERE NE_ID = :BIND_VAR"
+--   becomes
+--       "SELECT * FROM NM_ELEMENTS WHERE 1=1"
+--
+-- Starting from the bind variable position work backwards
+--  until we find an alphabetic character as this will indicate
+--  that we are on a field defn. therefore the next space we find
+--  is the beginning of that field def. . SO just replace the whole
+--  lot with "1=1"
+--
+--
+FUNCTION remove_bind_variable_refs (p_query    IN varchar2) RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="is_string_valid_for_object">
+-- This function returns TRUE if the string passed in would be a valid
+--  name for a database object
+--
+--  The rules for returning TRUE are the following
+--
+--  1. The string must be <= 30 chars
+--  2. The first character must be alphabetic
+--  3. The remaining chars must be alphabetic, numeric or one of "_","$","#"
+--
+--
+FUNCTION is_string_valid_for_object (p_string IN varchar2) RETURN boolean;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ten_to_power">
+-- This function returns (p_mantissa*10) E (p_exponent)
+--
+FUNCTION ten_to_power (p_mantissa number
+                      ,p_exponent number
+                      ) RETURN number;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="boolean_to_char">
+-- This function returns the string representation of a boolean
+--
+FUNCTION boolean_to_char (p_boolean boolean) RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="char_to_boolean">
+-- This function returns the string representation of a boolean
+--
+FUNCTION char_to_boolean (p_char varchar2) RETURN boolean;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_cols_from_sql">
+-- This function returns a PL/SQL table containing the names of the
+--  columns selected in the specified SQL string
+--
+FUNCTION get_cols_from_sql (p_sql varchar2) RETURN nm3type.tab_varchar30;
+--
+-- This function returns a PL/SQL table containing the all details of the
+--  columns selected in the specified SQL string
+--
+FUNCTION get_col_dets_from_sql (p_sql varchar2) RETURN dbms_sql.desc_tab;
+  -- bug 702903 reveals that col_name can be of any length, not just 32 which
+  -- can be resolved by changing the maximum size above from 32 to 32767.
+  -- However, this will affect the signature of the package and to avoid that
+  -- side effect, the current API describe_columns is left unchanged but a new
+  -- API describe_columns2 is added at the end of this package specification.
+  -- The new API relies on a table type desc_tab2 whose array element is a new
+  -- record type desc_rec2, and desc_rec2 contains the variable col_name with a
+  -- maximum size of 32,767.
+  -- If the original API describe_columns is used and col_name encounters an
+  -- overflow, an error will be raised.
+FUNCTION get_col_dets_from_sql2(p_sql varchar2) RETURN dbms_sql.desc_tab2;
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="is_select_statement_valid">
+-- This function returns TRUE if the passed SELECT statement is valid,
+--  otherwise returns FALSE
+--
+FUNCTION  is_select_statement_valid (p_sql varchar2) RETURN boolean;
+--
+-- This overloaded version raises a NM_ERROR if the statement is not valid
+--
+PROCEDURE is_select_statement_valid (p_sql varchar2);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="parse_sql_string">
+PROCEDURE parse_sql_string (p_sql varchar2);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="sql_parses_without_error">
+FUNCTION sql_parses_without_error (pi_sql           IN     varchar2
+                                  ,po_error_message IN OUT varchar2) RETURN boolean;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="rowid_can_be_selected"
+--Test to see if ROWID can be selected from given table/view
+--
+FUNCTION rowid_can_be_selected(pi_from IN varchar2) RETURN boolean;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+
+
+--
+--<PROC NAME="get_datatype_from_int_col_type">
+-- This function returns the datatype (VARCHAR2, NUMBER etc) from the
+--  internal column type (1,4 etc)
+--
+FUNCTION get_datatype_from_int_col_type (p_col_type    IN binary_integer
+                                        ,p_charsetform IN binary_integer DEFAULT NULL
+                                        ,p_scale       IN binary_integer DEFAULT NULL
+                                        ,p_precision   IN number         DEFAULT NULL
+                                        ) RETURN user_arguments.data_type%TYPE;
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_datatype_dbms_sql_desc_rec">
+-- This function returns the datatype (VARCHAR2, NUMBER etc) from the
+--  internal column type (1,4 etc)
+--
+FUNCTION get_datatype_dbms_sql_desc_rec (p_rec IN dbms_sql.desc_rec) RETURN user_arguments.data_type%TYPE;
+FUNCTION get_datatype_dbms_sql_desc_rec (p_rec IN dbms_sql.desc_rec2) RETURN user_arguments.data_type%TYPE;
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="is_reserved_word">
+-- This function returns TRUE if the passed argument is a reserved word -
+--  hence it cant be used as a column name in a table etc.
+--
+FUNCTION is_reserved_word (p_name varchar2) RETURN boolean;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="repl_quotes_amps_for_dyn_sql">
+FUNCTION repl_quotes_amps_for_dyn_sql (p_text_in varchar2) RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_file_extenstion">
+-- returns the characters after a dot '.' in a string
+-- normally the file extenstion txt for nm3.txt
+FUNCTION get_file_extenstion (p_filename varchar2) RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="convert_seconds_to_hh_mi_ss">
+--  This function takes a number of seconds and returns HH:MI:SS
+--
+FUNCTION convert_seconds_to_hh_mi_ss (p_seconds number) RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--<PROC NAME="convert_hh_mi_ss_to_seconds">
+FUNCTION convert_hh_mi_ss_to_seconds(pi_hh_mi_ss IN VARCHAR2) RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="parse_error_code_and_message">
+-- Returns the text of the desired occurrence of the specified program's
+-- errors in the supplied message.
+--
+FUNCTION parse_error_code_and_message
+                            (pi_msg        IN varchar2
+                            ,pi_program    IN varchar2 DEFAULT 'ORA'
+                            ,pi_occurrence IN number   DEFAULT 1
+                            ) RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="parse_error_message">
+-- Returns the text of the desired occurrence of the specified program's
+-- errors in the supplied message.
+--
+FUNCTION parse_error_message(pi_msg        IN varchar2
+                            ,pi_program    IN varchar2 DEFAULT 'ORA'
+                            ,pi_occurrence IN number   DEFAULT 1
+                            ) RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="parse_error_code">
+-- Returns the number of the desired occurrence of the specified program's
+-- errors in the supplied message.
+--
+FUNCTION parse_error_code(pi_msg        IN varchar2
+                         ,pi_program    IN varchar2 DEFAULT 'ORA'
+                         ,pi_occurrence IN number   DEFAULT 1
+                         ) RETURN pls_integer;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="can_string_be_select_from_dual">
+-- This function returns TRUE if the passed string can be selected from DUAL
+--  without any errors
+FUNCTION can_string_be_select_from_dual (p_string varchar2) RETURN boolean;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--<PROC NAME="can_string_be_select_from_dual">
+--
+--  This function returns TRUE if the passed string can be selected from 
+--  pi_table without any errors.
+--  IF pi_remove_binds is TRUE then all ':' charachters are removed.
+--
+FUNCTION can_string_be_select_from_tab(pi_string       IN varchar2
+                                      ,pi_table        IN user_tables.table_name%TYPE
+                                      ,pi_remove_binds IN boolean DEFAULT TRUE
+                                      ) RETURN boolean;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="i_t_e">
+--
+-- IF/THEN/ELSE macro.
+--
+FUNCTION i_t_e(pi_expr IN boolean
+              ,pi_then IN varchar2
+              ,pi_else IN varchar2
+              ) RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_columns_for_table">
+-- Returns a pl/sql table containing column names for a given table/view
+-- When passing in a value for pi_column_name you would just get the details for the given
+-- column returned
+--
+PROCEDURE get_columns_for_table(pi_table_name      IN     varchar2
+                               ,pi_owner           IN     varchar2 DEFAULT Sys_Context('NM3CORE','APPLICATION_OWNER')
+                               ,pi_column_name     IN     varchar2 DEFAULT NULL
+                               ,po_tab_column_name IN OUT nm3type.tab_varchar30
+                               ,po_tab_data_type   IN OUT nm3type.tab_varchar30
+                               ,po_tab_data_length IN OUT nm3type.tab_number
+                               ,po_tab_nullable    IN OUT nm3type.tab_varchar4);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_column_datatype">
+-- For a given table/column return the data type
+FUNCTION get_column_datatype(pi_table_name  IN varchar2
+                            ,pi_column_name IN varchar2) RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="add_to_where_clause">
+-- Construct a where clause for use in dynamic sql
+PROCEDURE add_to_where_clause(pi_existing_clause      IN OUT varchar2
+                             ,pi_prefix_with_where    IN     boolean
+                             ,pi_column_name          IN     varchar2
+                             ,pi_column_datatype      IN     varchar2 DEFAULT 'VARCHAR2'
+                             ,pi_operator             IN     varchar2 DEFAULT '='
+                             ,pi_string_value         IN     varchar2
+                             );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="validate_ntc_query">
+-- Does what it says on the tin
+PROCEDURE validate_ntc_query(pi_query           IN VARCHAR2
+                            ,pi_ntc_nt_type     IN nm_type_columns.ntc_nt_type%TYPE
+							,pi_ntc_column_name IN nm_type_columns.ntc_column_name%TYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="validate_ita_query">
+-- Does what it says on the tin                     
+PROCEDURE validate_ita_query(pi_query           IN VARCHAR2
+                            ,pi_ita_inv_type    IN nm_inv_type_attribs.ita_inv_type%TYPE
+							,pi_ita_attrib_name IN nm_inv_type_attribs.ita_attrib_name%TYPE);							
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="string_contains_numbers">
+-- Does what it says on the tin
+FUNCTION string_contains_numbers ( pi_string  VARCHAR2) RETURN BOOLEAN;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="string_contains_special_chars">
+-- return true if string contains any special characters (currently outside of the 
+-- range 'A'-'Z', 'a'-'z' and '_')
+-- Special characters - select chr(nsc_ascii_character) from nm3_special_chars
+FUNCTION string_contains_special_chars ( pi_string IN VARCHAR2) RETURN BOOLEAN;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_character_set_members">
+-- Return pl/sql table of characters within a set
+FUNCTION get_character_set_members(pi_character_set IN nm_character_sets.ncs_code%TYPE) RETURN nm3type.tab_varchar1;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--<PROC NAME="string_has_chars_IN_set">
+-- for when you have a character set of all not permitted characters
+-- and you want to check if a string contains any of them
+FUNCTION string_has_chars_IN_set(pi_string                     IN VARCHAR2
+                                ,pi_tab_character_set_members  IN nm3type.tab_varchar1) RETURN BOOLEAN;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--<PROC NAME="string_has_chars_IN_set_vc">
+-- return varchar TRUE or FALSE
+FUNCTION string_has_chars_IN_set_vc(pi_string                  IN VARCHAR2
+                                   ,pi_tab_character_set_members  IN nm3type.tab_varchar1) RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--<PROC NAME="string_has_chars_NOT_IN_set">
+-- for when you have a character set of all permitted characters
+-- and you want to check if a string contains any additional characters
+FUNCTION string_has_chars_NOT_IN_set(pi_string                  IN VARCHAR2
+                                    ,pi_tab_character_set_members  IN nm3type.tab_varchar1) RETURN BOOLEAN;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="copy_character_set">
+-- Copys contents of one character set to another
+PROCEDURE copy_character_set( pi_from  IN nm_character_sets.ncs_code%TYPE
+                            , pi_to    IN nm_character_sets.ncs_code%TYPE
+                            , pi_descr IN nm_character_sets.ncs_description%TYPE
+                            );
+--</PROC>
+-----------------------------------------------------------------------------
+--<PROC NAME="string_is_unchanged">
+FUNCTION string_is_unchanged(pi_old IN VARCHAR2
+                            ,pi_new IN VARCHAR2) RETURN BOOLEAN;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--<PROC NAME="date_is_unchanged">
+FUNCTION date_is_unchanged(pi_old IN DATE
+                          ,pi_new IN DATE) RETURN BOOLEAN;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--<PROC NAME="number_is_unchanged">
+FUNCTION number_is_unchanged(pi_old IN NUMBER
+                            ,pi_new IN NUMBER) RETURN BOOLEAN;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--<PROC NAME="search_in_long">
+FUNCTION search_in_long( p_long           LONG
+                       , p_search_val     VARCHAR2
+                       , p_ignore_case    BOOLEAN DEFAULT TRUE) RETURN BOOLEAN;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--<PROC NAME="is_string_valid_for_password">
+FUNCTION is_string_valid_for_password (pi_password IN varchar2) 
+RETURN BOOLEAN;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--<PROC NAME="is_string_valid_for_password">
+FUNCTION is_string_valid_for_password (pi_password IN varchar2, po_reason OUT varchar2) 
+RETURN BOOLEAN;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PRAGMA>
+   PRAGMA RESTRICT_REFERENCES(get_version              ,rnds     ,wnds,wnps);
+   PRAGMA RESTRICT_REFERENCES(RIGHT                    ,rnds,rnps,wnds,wnps);
+   PRAGMA RESTRICT_REFERENCES(LEFT                     ,rnds,rnps,wnds,wnps);
+   PRAGMA RESTRICT_REFERENCES(mid                      ,rnds,rnps,wnds,wnps);
+   PRAGMA RESTRICT_REFERENCES(string                   ,rnds,rnps,wnds,wnps);
+   PRAGMA RESTRICT_REFERENCES(is_numeric                         ,wnds,wnps);
+   PRAGMA RESTRICT_REFERENCES(validate_domain_value         ,rnps,wnds,wnps);
+   PRAGMA RESTRICT_REFERENCES(is_valid_numeric_char              ,wnds,wnps);
+   PRAGMA RESTRICT_REFERENCES(get_session_parameter         ,rnps,wnds,wnps);
+   PRAGMA RESTRICT_REFERENCES(extract_bind_variable    ,rnds,rnps,wnds,wnps);
+   PRAGMA RESTRICT_REFERENCES(get_dec_places_from_mask           ,wnds,wnps);
+   PRAGMA RESTRICT_REFERENCES(is_string_valid_for_object         ,wnds,wnps);
+   PRAGMA RESTRICT_REFERENCES(ten_to_power             ,rnds,rnps,wnds,wnps);
+   PRAGMA RESTRICT_REFERENCES(boolean_to_char          ,rnds     ,wnds,wnps);
+   PRAGMA RESTRICT_REFERENCES(char_to_boolean          ,rnds     ,wnds,wnps);
+   PRAGMA RESTRICT_REFERENCES(is_reserved_word                   ,wnds,wnps);
+   PRAGMA RESTRICT_REFERENCES(get_file_extenstion      ,rnds,rnps,wnds,wnps);
+   PRAGMA RESTRICT_REFERENCES(convert_seconds_to_hh_mi_ss,rnds,rnps,wnds,wnps);
+   PRAGMA RESTRICT_REFERENCES(parse_error_code_and_message       ,wnds,wnps);
+   PRAGMA RESTRICT_REFERENCES(parse_error_message                ,wnds,wnps);
+   PRAGMA RESTRICT_REFERENCES(parse_error_code                   ,wnds,wnps);
+   PRAGMA RESTRICT_REFERENCES(can_string_be_select_from_dual     ,wnds,wnps);
+   --PRAGMA RESTRICT_REFERENCES(get_cols_from_sql        );
+--*   PRAGMA RESTRICT_REFERENCES(build_lov_sql_string               ,wnds     );
+--*   PRAGMA RESTRICT_REFERENCES(build_inclusion_sql_string         ,wnds     );
+--*   PRAGMA RESTRICT_REFERENCES(sel_nm_type_inclusion_by_child     ,wnds     );
+--*   PRAGMA RESTRICT_REFERENCES(select_nm_type_columns             ,wnds     );
+--</PRAGMA>
+--
+END nm3flx;
+/
