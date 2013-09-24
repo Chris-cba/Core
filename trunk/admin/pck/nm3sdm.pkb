@@ -5,11 +5,11 @@ As
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.66   Jul 04 2013 16:22:08   James.Wadsworth  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.67   Sep 24 2013 13:40:58   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3sdm.pkb  $
---       Date into PVCS   : $Date:   Jul 04 2013 16:22:08  $
---       Date fetched Out : $Modtime:   Jul 04 2013 15:50:42  $
---       PVCS Version     : $Revision:   2.66  $
+--       Date into PVCS   : $Date:   Sep 24 2013 13:40:58  $
+--       Date fetched Out : $Modtime:   Sep 24 2013 13:40:34  $
+--       PVCS Version     : $Revision:   2.67  $
 --
 --   Author : R.A. Coupe
 --
@@ -21,7 +21,7 @@ As
 --
 --all global package variables here
 --
-  g_Body_Sccsid     Constant Varchar2 (2000) := '"$Revision:   2.66  $"';
+  g_Body_Sccsid     Constant Varchar2 (2000) := '"$Revision:   2.67  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
   g_Package_Name    Constant Varchar2 (30)   := 'NM3SDM';
@@ -4282,7 +4282,14 @@ Begin
     If        Irec.Nth_Xsp_Column Is Not Null
         And   Nvl(Hig.Get_Sysopt('XSPOFFSET'),'N') = 'Y'   Then
 
-       l_Geom := Nm3Sdo_Dynseg.Get_Shape( Irec.Nbth_Base_Theme, p_Nm_Ne_Id_In, p_Nm_Ne_Id_Of, p_New_Begin_Mp, p_Nm_End_Mp );
+       If l_nit.nit_pnt_or_cont = 'P'
+	   Then
+          
+		  l_Geom := sdo_lrs.convert_to_std_geom( Nm3Sdo_Dynseg.Get_Shape( Irec.Nbth_Base_Theme, p_Nm_Ne_Id_In, p_Nm_Ne_Id_Of, p_New_Begin_Mp, p_Nm_End_Mp ));
+	   Else
+          
+		  l_Geom := Nm3Sdo_Dynseg.Get_Shape( Irec.Nbth_Base_Theme, p_Nm_Ne_Id_In, p_Nm_Ne_Id_Of, p_New_Begin_Mp, p_Nm_End_Mp );
+       End if;
 
     End If;
 
