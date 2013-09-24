@@ -5,11 +5,11 @@ As
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.57.1.1.1.0   Sep 24 2013 12:24:12   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.57.1.1.1.1   Sep 24 2013 15:28:12   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3sdm.pkb  $
---       Date into PVCS   : $Date:   Sep 24 2013 12:24:12  $
---       Date fetched Out : $Modtime:   Sep 24 2013 12:22:36  $
---       PVCS Version     : $Revision:   2.57.1.1.1.0  $
+--       Date into PVCS   : $Date:   Sep 24 2013 15:28:12  $
+--       Date fetched Out : $Modtime:   Sep 24 2013 15:27:50  $
+--       PVCS Version     : $Revision:   2.57.1.1.1.1  $
 --
 --   Author : R.A. Coupe
 --
@@ -21,7 +21,7 @@ As
 --
 --all global package variables here
 --
-  g_Body_Sccsid     Constant Varchar2 (2000) := '"$Revision:   2.57.1.1.1.0  $"';
+  g_Body_Sccsid     Constant Varchar2 (2000) := '"$Revision:   2.57.1.1.1.1  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
   g_Package_Name    Constant Varchar2 (30)   := 'NM3SDM';
@@ -4205,9 +4205,6 @@ Begin
            ELSE
               l_geom := nm3sdo_dynseg.get_shape( irec.nbth_base_theme, p_nm_ne_id_in, p_nm_ne_id_of, p_new_begin_mp, p_nm_end_mp );
            END IF;
-		
-
-       l_Geom := Nm3Sdo_Dynseg.Get_Shape( Irec.Nbth_Base_Theme, p_Nm_Ne_Id_In, p_Nm_Ne_Id_Of, p_New_Begin_Mp, p_Nm_End_Mp );
 
     End If;
 
