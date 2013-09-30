@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3web IS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3web.pkb-arc   2.4   Jul 04 2013 16:45:36   James.Wadsworth  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3web.pkb-arc   2.5   Sep 30 2013 15:51:14   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3web.pkb  $
---       Date into PVCS   : $Date:   Jul 04 2013 16:45:36  $
---       Date fetched Out : $Modtime:   Jul 04 2013 15:53:46  $
---       PVCS Version     : $Revision:   2.4  $
+--       Date into PVCS   : $Date:   Sep 30 2013 15:51:14  $
+--       Date fetched Out : $Modtime:   Sep 30 2013 15:39:24  $
+--       PVCS Version     : $Revision:   2.5  $
 --       Based on         : 1.55
 --
 --
@@ -22,14 +22,14 @@ CREATE OR REPLACE PACKAGE BODY nm3web IS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.4  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.5  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3web';
    --
    g_highways_product_name  CONSTANT hig_products.hpr_product_name%TYPE := nm3get.get_hpr(pi_hpr_product=>nm3type.c_hig).hpr_product_name;
    g_default_title          CONSTANT hig_options.hop_value%TYPE         := NVL(hig.get_sysopt('HIGWINTITL'),g_highways_product_name);
-   g_exor_home_page         CONSTANT varchar2(100)                      := 'http://www.exorcorp.com';
+   g_exor_home_page         CONSTANT varchar2(100)                      := 'http://www.bentley.com/en-US/Products/Exor';
    --
    g_css CONSTANT varchar2(2000) := NVL(hig.get_sysopt('NM3WEBCSS'),get_download_url('exor.css'));
 
@@ -837,7 +837,7 @@ BEGIN
       htp.tabledata(cvalue => CHR(169)
 --                              || '2002 '
                               || htf.anchor2(curl    => g_exor_home_page
-                                            ,ctext   => 'Exor Corporation'
+                                            ,ctext   => '2013 Bentley Systems Incorporated. All rights reserved.'
                                             ,ctarget => '_blank')
                    ,calign => 'left');
 
