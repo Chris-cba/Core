@@ -1,10 +1,10 @@
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm_4500_fix36.sql-arc   1.0   Sep 25 2013 14:46:34   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm_4500_fix36.sql-arc   1.1   Oct 03 2013 17:48:20   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm_4500_fix36.sql  $ 
---       Date into PVCS   : $Date:   Sep 25 2013 14:46:34  $
---       Date fetched Out : $Modtime:   Sep 25 2013 14:25:08  $
---       PVCS Version     : $Revision:   1.0  $
+--       Date into PVCS   : $Date:   Oct 03 2013 17:48:20  $
+--       Date fetched Out : $Modtime:   Oct 03 2013 17:47:54  $
+--       PVCS Version     : $Revision:   1.1  $
 --
 ----------------------------------------------------------------------------
 --   Copyright (c) 2013 Bentley Systems Incorporated.
@@ -71,11 +71,11 @@ WHENEVER SQLERROR CONTINUE
 --------------------------------------------------------------------------------
 --
 SET TERM ON 
-PROMPT nm3sdm.pkb
+PROMPT nm3sdm.pkw
 SET TERM OFF
 
 SET FEEDBACK ON
-start nm3sdm.pkb
+start nm3sdm.pkw
 SET FEEDBACK OFF
 --
 
