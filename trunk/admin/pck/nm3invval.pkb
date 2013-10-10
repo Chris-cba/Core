@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY nm3invval IS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3invval.pkb-arc   2.16   Jul 04 2013 16:11:38   James.Wadsworth  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3invval.pkb-arc   2.17   Oct 10 2013 11:44:14   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3invval.pkb  $
---       Date into PVCS   : $Date:   Jul 04 2013 16:11:38  $
---       Date fetched Out : $Modtime:   Jul 04 2013 14:25:14  $
---       Version          : $Revision:   2.16  $
+--       Date into PVCS   : $Date:   Oct 10 2013 11:44:14  $
+--       Date fetched Out : $Modtime:   Oct 10 2013 11:42:54  $
+--       Version          : $Revision:   2.17  $
 --       Based on SCCS version : 1.30
 -------------------------------------------------------------------------
 --
@@ -19,7 +19,7 @@ CREATE OR REPLACE PACKAGE BODY nm3invval IS
 --   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.16  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.17  $"';
 --  g_body_sccsid is the SCCS ID for the package body
    g_package_name    CONSTANT  varchar2(30)   := 'nm3invval';
 --
@@ -1180,15 +1180,26 @@ PROCEDURE check_xsp_valid_on_inv_loc (pi_iit_ne_id    IN nm_inv_items.iit_ne_id%
                     ,c_x_sect   nm_inv_items.iit_x_sect%TYPE
                     ) IS
    SELECT 1
-    FROM  nm_members
+    FROM  nm_members a
    WHERE  nm_ne_id_in = c_ne_id_in
-    AND   NOT EXISTS (SELECT 1
+    AND   NOT EXISTS (
+                       SELECT 1
                        FROM  nm_elements
-                            ,xsp_restraints
-                      WHERE  nm_ne_id_of      = ne_id
+                                ,xsp_restraints
+                      WHERE  a.nm_ne_id_of      = ne_id
                        AND   xsr_nw_type      = ne_nt_type
                        AND   xsr_ity_inv_code = c_inv_type
-                       AND   nvl(xsr_scl_class,nm3type.c_nvl)  = nvl(ne_sub_class, nm3type.c_nvl)
+                       AND   xsr_scl_class  = ne_sub_class
+                       AND   xsr_x_sect_value = c_x_sect
+                       UNION ALL
+                       SELECT 1
+                       FROM  nm_elements
+                                ,xsp_restraints, nm_members b
+                      WHERE  b.nm_ne_id_in      = ne_id
+                      and a.nm_ne_id_of = b.nm_ne_id_of
+                       AND   xsr_nw_type      = ne_nt_type
+                       AND   xsr_ity_inv_code = c_inv_type
+                       AND   xsr_scl_class  = ne_sub_class
                        AND   xsr_x_sect_value = c_x_sect
                      );
 --
