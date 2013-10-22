@@ -5,11 +5,11 @@ CREATE OR REPLACE PACKAGE BODY hig2 IS
 -----------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       pvcsid                     : $Header:   //vm_latest/archives/nm3/admin/pck/hig2.pkb-arc   2.4   Jul 04 2013 14:37:54   James.Wadsworth  $
+--       pvcsid                     : $Header:   //vm_latest/archives/nm3/admin/pck/hig2.pkb-arc   2.5   Oct 22 2013 17:30:18   Rob.Coupe  $
 --       Module Name                : $Workfile:   hig2.pkb  $
---       Date into PVCS             : $Date:   Jul 04 2013 14:37:54  $
---       Date fetched Out           : $Modtime:   Jul 04 2013 14:25:06  $
---       PVCS Version               : $Revision:   2.4  $
+--       Date into PVCS             : $Date:   Oct 22 2013 17:30:18  $
+--       Date fetched Out           : $Modtime:   Oct 22 2013 17:23:12  $
+--       PVCS Version               : $Revision:   2.5  $
 --       Based on SCCS version      : 1.4
 --
 --
@@ -175,8 +175,14 @@ BEGIN
                                               ,NVL(p_allowed_old_version_4,c_nvl)
                                               )
     THEN
-      RAISE_APPLICATION_ERROR(-20000,'Upgrade of "'||p_product||'" from v'||l_rec_hpr.hpr_version||' to v'||p_new_version||' not allowed');
-   END IF;
+	  IF NVL( substr( l_rec_hpr.hpr_version, 1, instr( l_rec_hpr.hpr_version, '.', 1, 3)-1), c_nvl ) 
+              NOT LIKE NVL( substr(p_new_version, 1, instr( p_new_version, '.', 1, 3)-1), c_nvl )
+      AND NVL( substr( l_rec_hpr.hpr_version, 1, instr( l_rec_hpr.hpr_version, '.', 1, 3)-1), c_nvl ) 
+              NOT LIKE NVL( substr(p_allowed_old_version_1, 1, instr( p_allowed_old_version_1, '.', 1, 3)-1), c_nvl )
+	  THEN
+         RAISE_APPLICATION_ERROR(-20000,'Upgrade of "'||p_product||'" from v'||l_rec_hpr.hpr_version||' to v'||p_new_version||' not allowed');
+      END IF;
+	END IF;
 --
    IF NOT hig_process_framework.disable_check_scheduler_down
    THEN
@@ -227,6 +233,8 @@ BEGIN
 
   -- return true if product found at required version is licensed, else default value remains
   IF p_version = l_rec_hpr.hpr_version AND l_rec_hpr.hpr_key IS NOT NULL THEN
+    l_found := TRUE;
+  ELSIF substr( p_version, 1, instr( p_version, '.', 1, 3)-1) = substr(l_rec_hpr.hpr_version, 1, instr( l_rec_hpr.hpr_version, '.', 1, 3)-1) THEN
     l_found := TRUE;
   END IF;       
   
