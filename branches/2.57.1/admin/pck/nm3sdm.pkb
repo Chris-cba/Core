@@ -5,11 +5,11 @@ As
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.57.1.4   Sep 24 2013 13:40:02   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.57.1.5   Mar 04 2014 11:20:12   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3sdm.pkb  $
---       Date into PVCS   : $Date:   Sep 24 2013 13:40:02  $
---       Date fetched Out : $Modtime:   Sep 24 2013 13:38:40  $
---       PVCS Version     : $Revision:   2.57.1.4  $
+--       Date into PVCS   : $Date:   Mar 04 2014 11:20:12  $
+--       Date fetched Out : $Modtime:   Mar 04 2014 11:19:18  $
+--       PVCS Version     : $Revision:   2.57.1.5  $
 --
 --   Author : R.A. Coupe
 --
@@ -21,7 +21,7 @@ As
 --
 --all global package variables here
 --
-  g_Body_Sccsid     Constant Varchar2 (2000) := '"$Revision:   2.57.1.4  $"';
+  g_Body_Sccsid     Constant Varchar2 (2000) := '"$Revision:   2.57.1.5  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
   g_Package_Name    Constant Varchar2 (30)   := 'NM3SDM';
@@ -3059,10 +3059,11 @@ Begin
 
   End If;
 
-  If Not Nm3Ddl.Does_Object_Exist( Nm3Inv_View.Derive_Inv_Type_View_Name(Pi_Nit_Inv_Type)
-                                 , 'VIEW'
-                                 , Sys_Context('NM3CORE','APPLICATION_OWNER') ) Then
+  If l_Nit.Nit_Table_Name is NULL and Not Nm3Ddl.Does_Object_Exist( Nm3Inv_View.Derive_Inv_Type_View_Name(Pi_Nit_Inv_Type)
+                               , 'VIEW'
+                               , Sys_Context('NM3CORE','APPLICATION_OWNER') ) Then
     Nm3Inv_View.Create_Inv_View(Pi_Nit_Inv_Type, False, L_Inv_View_Name);
+  
   End If;
 
   ---------------------------------------------------------------
