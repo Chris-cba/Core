@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_nav.pkb-arc   3.18   Jun 07 2012 09:23:00   Linesh.Sorathia  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_nav.pkb-arc   3.19   Apr 03 2014 11:13:48   Linesh.Sorathia  $
 --       Module Name      : $Workfile:   hig_nav.pkb  $
---       Date into PVCS   : $Date:   Jun 07 2012 09:23:00  $
---       Date fetched Out : $Modtime:   May 24 2012 11:35:46  $
---       Version          : $Revision:   3.18  $
+--       Date into PVCS   : $Date:   Apr 03 2014 11:13:48  $
+--       Date fetched Out : $Modtime:   Feb 20 2014 11:30:42  $
+--       Version          : $Revision:   3.19  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.18  $';
+  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.19  $';
 
   g_package_name CONSTANT varchar2(30) := 'hig_nav';
   l_top_id       nav_id := nav_id(Null);
@@ -907,15 +907,26 @@ IS
 --
 BEGIN
 --
-   Execute Immediate 'SELECT Count(0)  '||
+  If hig.get_sysopt('NEWDOCMAN') = 'Y'
+  Then 
+       Execute Immediate 'SELECT Count(0)  '||
+                         'From    eb_exor_associations    eea '||
+                         'Where   eea.eea_feature_id                           =   :1 '||
+                         'And     eea.eea_object_type = 3 '||
+                         'And     eea.eea_feature_table_name  In  ( Select  Gateway_Name '||
+                         '                                          From    V_Doc_Gateway_Resolve '||
+                         '                                          Where   Synonym_Name  =  :2 '||
+                         '                               )' INTO l_cnt Using pi_id,pi_table_name ;     
+   Else
+       Execute Immediate 'SELECT Count(0)  '||
                      'From    Doc_Assocs    da '||
                      'Where   da.Das_Rec_Id                           =   :1 '||
                      'And     Hig_Nav.Check_Enquiry(da.Das_Doc_Id )   !=  1  '||
-                     'And     da.Das_Table_Name   =   ( Select  Gateway_Name '||
-                     '                                  From    V_Doc_Gateway_Resolve '||
-                     '                                  Where   Synonym_Name  =  :2 '||
+                     'And     da.Das_Table_Name   In   ( Select  Gateway_Name '||
+                     '                                   From    V_Doc_Gateway_Resolve '||
+                     '                                   Where   Synonym_Name  =  :2 '||
                      '                               )' INTO l_cnt Using pi_id,pi_table_name ;
-   
+   End If ;
    IF l_cnt > 0
    THEN
        po_table_name := pi_table_name ;    
@@ -1998,11 +2009,11 @@ BEGIN
                      'AND    doc_dlc_dmd_id = dmd_id(+) '||
                      'AND    das_doc_id = doc_id '||
                      'AND    hig_nav.check_enquiry(das_doc_id )!= 1 '||
-                     'And    Das_Table_Name   =   ( Select  Gateway_Name '||
+                     'And    Das_Table_Name   In   ( Select  Gateway_Name '||
                      '                              From    V_Doc_Gateway_Resolve '||
                      '                              Where   Synonym_Name  =  :2 '||
-                     '                              ) Order By doc_dtp_code, doc_id DESC ' BULK COLLECT INTO l_doc_tab Using pi_id,pi_table_name ; 
-       Return l_doc_tab;
+                     '                              ) Order By doc_dtp_code, doc_id DESC ' BULK COLLECT INTO l_doc_tab Using pi_id,pi_table_name ;       
+   Return l_doc_tab;
 
 EXCEPTION
 WHEN OTHERS THEN
