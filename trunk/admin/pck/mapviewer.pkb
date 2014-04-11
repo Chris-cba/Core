@@ -3,19 +3,19 @@ CREATE OR REPLACE PACKAGE BODY Mapviewer AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/mapviewer.pkb-arc   2.9   Jul 04 2013 15:07:20   James.Wadsworth  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/mapviewer.pkb-arc   2.10   Apr 11 2014 17:54:54   Upendra.Hukeri  $
 --       Module Name      : $Workfile:   mapviewer.pkb  $
---       Date into PVCS   : $Date:   Jul 04 2013 15:07:20  $
---       Date fetched Out : $Modtime:   Jul 04 2013 14:25:08  $
---       PVCS Version     : $Revision:   2.9  $
+--       Date into PVCS   : $Date:   Apr 11 2014 17:54:54  $
+--       Date fetched Out : $Modtime:   Apr 11 2014 17:44:36  $
+--       PVCS Version     : $Revision:   2.10  $
 
 
 --
 -----------------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2014 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(30) := '"$Revision:   2.9  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(30) := '"$Revision:   2.10  $"';
 
 
 FUNCTION Get_Scale RETURN NUMBER;
@@ -434,8 +434,203 @@ END;
 end;
 
 --
------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------------------------------------------------------
+--                             ****************** Added Functions to call Procedures - Defect 84769 ******************
 --
-
+	FUNCTION	q_insert_gdo
+				( pi_session_id IN gis_data_objects.gdo_session_id%TYPE
+				, pi_theme_name IN gis_data_objects.gdo_theme_name%TYPE DEFAULT NULL
+				, pi_pk_id      IN gis_data_objects.gdo_pk_id%TYPE
+				, pi_x_val      IN gis_data_objects.gdo_x_val%TYPE DEFAULT NULL
+				, pi_y_val      IN gis_data_objects.gdo_y_val%TYPE DEFAULT NULL
+				, pi_seq        IN gis_data_objects.gdo_seq_no%TYPE
+				, pi_rse_he_id  IN gis_data_objects.gdo_rse_he_id%TYPE DEFAULT NULL
+				, pi_st_chain   IN gis_data_objects.gdo_st_chain%TYPE DEFAULT NULL
+				, pi_end_chain  IN gis_data_objects.gdo_end_chain%TYPE DEFAULT NULL
+				, pi_feature_id IN gis_data_objects.gdo_feature_id%TYPE DEFAULT NULL
+				, pi_xsp        IN gis_data_objects.gdo_xsp%TYPE DEFAULT NULL
+				, pi_offset     IN gis_data_objects.gdo_offset%TYPE DEFAULT NULL
+				) RETURN NUMBER IS
+	PRAGMA AUTONOMOUS_TRANSACTION;           
+	BEGIN
+		insert_gdo
+				( pi_session_id 
+				, pi_theme_name 
+				, pi_pk_id      
+				, pi_x_val      
+				, pi_y_val      
+				, pi_seq        
+				, pi_rse_he_id  
+				, pi_st_chain   
+				, pi_end_chain  
+				, pi_feature_id 
+				, pi_xsp        
+				, pi_offset     
+				);
+		RETURN 1;
+	END;  
+--
+----------------------------------------------------------------------------------------------------------------------------------------------------------
+--
+    FUNCTION   	q_create_pem
+				( pi_asset_id     IN  nm_inv_items.iit_ne_id%TYPE
+				, pi_x_val        IN  docs.doc_compl_east%TYPE
+				, pi_y_val        IN  docs.doc_compl_north%TYPE
+				, pi_lr_ne_id     IN  nm_elements.ne_id%TYPE
+				, pi_lr_offset    IN  NUMBER
+				, pi_inv_theme_id IN  nm_themes_all.nth_theme_id%TYPE
+				, pi_err_sequence IN  NUMBER
+				, pi_username     IN  hig_users.hus_username%TYPE DEFAULT Sys_Context('NM3_SECURITY_CTX','USERNAME')
+				, pi_session_id   IN  gis_data_objects.gdo_session_id%TYPE
+				) RETURN NUMBER IS
+    PRAGMA AUTONOMOUS_TRANSACTION;
+	BEGIN
+        create_pem
+				( pi_asset_id     
+				, pi_x_val        
+				, pi_y_val        
+				, pi_lr_ne_id     
+				, pi_lr_offset    
+				, pi_inv_theme_id 
+				, pi_err_sequence 
+				, pi_username     
+				, pi_session_id
+				);
+		RETURN 1;
+	END;   
+--
+----------------------------------------------------------------------------------------------------------------------------------------------------------
+--
+    FUNCTION   	q_insert_gdo_from_query
+				( pi_session_id  IN  gis_data_objects.gdo_session_id%TYPE
+				, pi_pk_name     IN  VARCHAR2
+				, pi_theme_name  IN  gis_data_objects.gdo_theme_name%TYPE DEFAULT NULL
+				, pi_theme_table IN  VARCHAR2
+				, pi_predicate   IN  VARCHAR2
+				, pi_query_col   IN  VARCHAR2
+				) RETURN NUMBER IS
+	PRAGMA AUTONOMOUS_TRANSACTION;
+	BEGIN
+		insert_gdo_from_query
+				( pi_session_id  
+				, pi_pk_name     
+				, pi_theme_name  
+				, pi_theme_table 
+				, pi_predicate   
+				, pi_query_col   
+				);
+		RETURN 1;
+	END;   
+--
+----------------------------------------------------------------------------------------------------------------------------------------------------------
+--
+    FUNCTION	q_delete_gdo
+				( pi_session_id IN gis_data_objects.gdo_session_id%TYPE ) RETURN NUMBER IS
+    PRAGMA AUTONOMOUS_TRANSACTION;
+	BEGIN
+		delete_gdo 
+				( pi_session_id );
+		RETURN 1;
+	END;   
+--
+----------------------------------------------------------------------------------------------------------------------------------------------------------
+--
+    FUNCTION   	q_create_highlight_data 
+				( p_query	IN VARCHAR2
+				, p_id 		IN INTEGER
+				) RETURN NUMBER IS
+    PRAGMA AUTONOMOUS_TRANSACTION;
+	BEGIN
+		create_highlight_data 
+				( p_query
+				, p_id 
+				); 
+		RETURN 1;
+	END;   
+--
+----------------------------------------------------------------------------------------------------------------------------------------------------------
+--
+	FUNCTION	q_insert_gdo_from_buffer
+				( pi_session_id			IN NUMBER 
+                , pi_theme_name 		IN VARCHAR2 
+                , pi_geometry 			IN MDSYS.SDO_GEOMETRY 
+                , pi_buffer 			IN NUMBER
+                , pi_sub_select_session	IN INTEGER 
+				) RETURN NUMBER IS
+    PRAGMA AUTONOMOUS_TRANSACTION;
+	BEGIN
+		nm3sdo_gdo.insert_gdo_from_buffer
+				( pi_session_id  
+				, pi_theme_name 
+				, pi_geometry  
+				, pi_buffer  
+				, pi_sub_select_session 
+				);  
+		RETURN 1;
+	END;   
+--
+----------------------------------------------------------------------------------------------------------------------------------------------------------
+--
+	FUNCTION  	q_locate_item	
+				( pi_gt_theme_id             IN NM_THEMES_ALL.nth_theme_id%TYPE
+				, pi_item_id                 IN NUMBER
+				, pi_route_ne_id             IN nm_elements.ne_id%TYPE        DEFAULT NULL
+				, pi_start_ne_id             IN nm_elements.ne_id%TYPE
+				, pi_start_offset            IN NUMBER
+				, pi_end_ne_id               IN nm_elements.ne_id%TYPE        DEFAULT NULL
+				, pi_end_offset              IN NUMBER                        DEFAULT NULL
+				, pi_sub_class               IN nm_elements.ne_sub_class%TYPE DEFAULT NULL
+				, pi_restrict_excl_sub_class IN VARCHAR2                      DEFAULT NULL
+				, pi_x_pos                   IN NUMBER                        DEFAULT NULL
+				, pi_y_pos                   IN NUMBER                        DEFAULT NULL
+				, pi_effective_date          IN DATE                          DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
+				, pi_geom                    IN mdsys.sdo_geometry            DEFAULT NULL
+				) RETURN NUMBER IS
+	PRAGMA AUTONOMOUS_TRANSACTION;
+	BEGIN
+		nm3homo_gis.locate_item
+				( pi_gt_theme_id  
+				, pi_item_id
+				, pi_route_ne_id
+				, pi_start_ne_id
+				, pi_start_offset
+				, pi_end_ne_id
+				, pi_end_offset
+				, pi_sub_class
+				, pi_restrict_excl_sub_class
+				, pi_x_pos
+				, pi_y_pos
+				, pi_effective_date
+				, pi_geom
+				);  
+		RETURN 1;
+	END;
+--
+----------------------------------------------------------------------------------------------------------------------------------------------------------
+--			  
+	FUNCTION	q_update_gis_data_object
+				( pi_session_id IN gis_data_objects.gdo_session_id%TYPE
+				, pi_pk_id      IN gis_data_objects.gdo_pk_id%TYPE
+				, pi_x_val      IN gis_data_objects.gdo_x_val%TYPE DEFAULT NULL
+				, pi_y_val      IN gis_data_objects.gdo_y_val%TYPE DEFAULT NULL
+				) RETURN NUMBER IS
+	PRAGMA AUTONOMOUS_TRANSACTION;
+	BEGIN
+		UPDATE 	gis_data_objects 
+		SET 	gdo_x_val 		= pi_x_val, 
+				gdo_y_val 		= pi_y_val
+        WHERE 	gdo_session_id 	= pi_session_id 
+		AND 	gdo_pk_id 		= pi_pk_id;
+--		
+		COMMIT;
+--		
+		RETURN 1;
+--
+	    EXCEPTION
+            WHEN OTHERS THEN RAISE;
+	END;
+--
+--                             ****************** Added Functions to call Procedures - Defect 84769 ******************
+----------------------------------------------------------------------------------------------------------------------------------------------------------
 END Mapviewer;
 /
