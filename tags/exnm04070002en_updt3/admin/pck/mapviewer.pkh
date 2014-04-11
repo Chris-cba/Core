@@ -1,0 +1,279 @@
+CREATE OR REPLACE PACKAGE Mapviewer AS
+-----------------------------------------------------------------------------
+--
+--<PACKAGE>
+--
+--   SCCS Identifiers :-
+-----------------------------------------------------------------------------
+--
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/mapviewer.pkh-arc   2.5   Apr 11 2014 17:56:16   Upendra.Hukeri  $
+--       Module Name      : $Workfile:   mapviewer.pkh  $
+--       Date into PVCS   : $Date:   Apr 11 2014 17:56:16  $
+--       Date fetched Out : $Modtime:   Apr 11 2014 17:44:58  $
+--       PVCS Version     : $Revision:   2.5  $
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2014 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+  g_ne_id       NUMBER;
+  g_doc_id      NUMBER;
+  g_sccsid      CONSTANT  VARCHAR2(2000) :='"$Revision:   2.5  $"';
+
+  g_conversion_factor number;
+
+--  g_sccsid is the SCCS ID for the package
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+  FUNCTION get_version RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+  FUNCTION get_body_version RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="CLEAR_CENTSIZE">
+  PROCEDURE clear_centsize;
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="SET_CENT_SIZE">
+  PROCEDURE set_cent_size
+              ( p_theme_id   IN NUMBER
+              , p_feature_id IN VARCHAR );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="SET_CENT_SIZE_SDO">
+  PROCEDURE set_cent_size_gdo
+              ( p_theme_id   IN NUMBER
+              , p_session_id IN NUMBER);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="SET_CENT_SIZE_THEME">
+  PROCEDURE set_cent_size_theme;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="COMMIT_CENTSIZE">
+  PROCEDURE commit_centsize;
+--</PROC>
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="INSERT_GDO">
+  PROCEDURE insert_gdo
+              ( pi_session_id IN gis_data_objects.gdo_session_id%TYPE
+              , pi_theme_name IN gis_data_objects.gdo_theme_name%TYPE DEFAULT NULL
+              , pi_pk_id      IN gis_data_objects.gdo_pk_id%TYPE
+              , pi_x_val      IN gis_data_objects.gdo_x_val%TYPE DEFAULT NULL
+              , pi_y_val      IN gis_data_objects.gdo_y_val%TYPE DEFAULT NULL
+              , pi_seq        IN gis_data_objects.gdo_seq_no%TYPE
+              , pi_rse_he_id  IN gis_data_objects.gdo_rse_he_id%TYPE DEFAULT NULL
+              , pi_st_chain   IN gis_data_objects.gdo_st_chain%TYPE DEFAULT NULL
+              , pi_end_chain  IN gis_data_objects.gdo_end_chain%TYPE DEFAULT NULL
+              , pi_feature_id IN gis_data_objects.gdo_feature_id%TYPE DEFAULT NULL
+              , pi_xsp        IN gis_data_objects.gdo_xsp%TYPE DEFAULT NULL
+              , pi_offset     IN gis_data_objects.gdo_offset%TYPE DEFAULT NULL
+              );
+--</PROC>
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="INSERT_GDO">
+  PROCEDURE create_pem
+              ( pi_asset_id     IN  nm_inv_items.iit_ne_id%TYPE
+              , pi_x_val        IN  docs.doc_compl_east%TYPE
+              , pi_y_val        IN  docs.doc_compl_north%TYPE
+              , pi_lr_ne_id     IN  nm_elements.ne_id%TYPE
+              , pi_lr_offset    IN  number
+              , pi_inv_theme_id IN  nm_themes_all.nth_theme_id%TYPE
+              , pi_err_sequence IN  NUMBER
+              , pi_username     IN  hig_users.hus_username%TYPE DEFAULT Sys_Context('NM3_SECURITY_CTX','USERNAME')
+              , pi_session_id   IN  gis_data_objects.gdo_session_id%TYPE) -- clb 21062010 - task 0109021
+              ;
+
+--</PROC>
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_DOC_ID">
+  FUNCTION get_doc_id
+    RETURN NUMBER;
+--</PROC>
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="INSERT_GDO">
+  PROCEDURE insert_gdo_from_query
+              ( pi_session_id  IN  gis_data_objects.gdo_session_id%TYPE
+              , pi_pk_name     IN  VARCHAR2
+              , pi_theme_name  IN  gis_data_objects.gdo_theme_name%TYPE DEFAULT NULL
+              , pi_theme_table IN  VARCHAR2
+              , pi_predicate   IN  VARCHAR2
+              , pi_query_col   IN  VARCHAR2
+              );
+--</PROC>
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="INSERT_GDO">
+  FUNCTION get_user_or_sys_opt(pi_option   IN hig_options.hop_id%TYPE
+                             , pi_username IN varchar2)
+    RETURN VARCHAR2;
+--</PROC>
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="MSV_AVAILABLE">
+-- return TRUE if mapviewer is configured to run i.e. product option WEBMAPMSV is set
+  FUNCTION msv_available RETURN BOOLEAN;
+--</PROC>
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="WEB_GIS_AVAILABLE">
+-- return TRUE if 'old' mapviewer is configured to run i.e. product option WEBMAPSERV is set
+  FUNCTION web_gis_available RETURN BOOLEAN;
+--</PROC>
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_CONVERSION_FACTOR">
+-- returns an estimate of the ratio of the length scale.
+  FUNCTION get_conversion_factor return number;
+
+--</PROC>
+-----------------------------------------------------------------------------
+--
+--
+--<PROC NAME="DELETE_GDO">
+-- delete GDO data for given session id
+  PROCEDURE delete_gdo
+              ( pi_session_id IN gis_data_objects.gdo_session_id%TYPE );
+
+--</PROC>
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="CREATE_HIGHLIGHT_DATA">
+-- creates the data to be highlighted in MV organised by feature type
+  PROCEDURE create_highlight_data ( p_query in varchar2, p_id in integer );
+
+--</PROC>
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--                             ****************** Added Functions to call Procedures - Defect 84769 ******************
+--	<FUNCTION>
+	FUNCTION  	q_insert_gdo
+				( pi_session_id IN gis_data_objects.gdo_session_id%TYPE
+				, pi_theme_name IN gis_data_objects.gdo_theme_name%TYPE DEFAULT NULL
+				, pi_pk_id      IN gis_data_objects.gdo_pk_id%TYPE
+				, pi_x_val      IN gis_data_objects.gdo_x_val%TYPE DEFAULT NULL
+				, pi_y_val      IN gis_data_objects.gdo_y_val%TYPE DEFAULT NULL
+				, pi_seq        IN gis_data_objects.gdo_seq_no%TYPE
+				, pi_rse_he_id  IN gis_data_objects.gdo_rse_he_id%TYPE DEFAULT NULL
+				, pi_st_chain   IN gis_data_objects.gdo_st_chain%TYPE DEFAULT NULL
+				, pi_end_chain  IN gis_data_objects.gdo_end_chain%TYPE DEFAULT NULL
+				, pi_feature_id IN gis_data_objects.gdo_feature_id%TYPE DEFAULT NULL
+				, pi_xsp        IN gis_data_objects.gdo_xsp%TYPE DEFAULT NULL
+				, pi_offset     IN gis_data_objects.gdo_offset%TYPE DEFAULT NULL
+				) RETURN NUMBER;
+--	</FUNCTION>
+--
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--
+--	<FUNCTION>
+    FUNCTION  	q_create_pem
+				( pi_asset_id     IN  nm_inv_items.iit_ne_id%TYPE
+				, pi_x_val        IN  docs.doc_compl_east%TYPE
+				, pi_y_val        IN  docs.doc_compl_north%TYPE
+				, pi_lr_ne_id     IN  nm_elements.ne_id%TYPE
+				, pi_lr_offset    IN  NUMBER
+				, pi_inv_theme_id IN  nm_themes_all.nth_theme_id%TYPE
+				, pi_err_sequence IN  NUMBER
+				, pi_username     IN  hig_users.hus_username%TYPE DEFAULT Sys_Context('NM3_SECURITY_CTX','USERNAME')
+				, pi_session_id   IN  gis_data_objects.gdo_session_id%TYPE
+				) RETURN NUMBER;
+--	</FUNCTION>
+--
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--
+--	<FUNCTION>
+    FUNCTION  	q_insert_gdo_from_query
+				( pi_session_id  IN  gis_data_objects.gdo_session_id%TYPE
+				, pi_pk_name     IN  VARCHAR2
+				, pi_theme_name  IN  gis_data_objects.gdo_theme_name%TYPE DEFAULT NULL
+				, pi_theme_table IN  VARCHAR2
+				, pi_predicate   IN  VARCHAR2
+				, pi_query_col   IN  VARCHAR2
+				) RETURN NUMBER;
+--  </FUNCTION>
+--
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--
+--  <FUNCTION>
+    FUNCTION  	q_delete_gdo
+				( pi_session_id IN gis_data_objects.gdo_session_id%TYPE ) RETURN NUMBER;
+--  </FUNCTION>
+--
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--
+--  <FUNCTION>
+    FUNCTION  	q_create_highlight_data 
+				( p_query IN VARCHAR2
+				, p_id 	IN INTEGER 
+				) RETURN NUMBER;
+--  </FUNCTION>
+--
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--
+--  <FUNCTION>
+    FUNCTION  	q_insert_gdo_from_buffer
+				( pi_session_id 			IN NUMBER
+				, pi_theme_name 			IN VARCHAR2
+				, pi_geometry 			IN MDSYS.SDO_GEOMETRY
+				, pi_buffer 				IN NUMBER
+				, pi_sub_select_session 	IN INTEGER 
+				) RETURN NUMBER;
+--  </FUNCTION>
+--
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--
+--  <FUNCTION>
+	FUNCTION  	q_locate_item	
+				( pi_gt_theme_id             IN NM_THEMES_ALL.nth_theme_id%TYPE
+				, pi_item_id                 IN NUMBER
+				, pi_route_ne_id             IN nm_elements.ne_id%TYPE        DEFAULT NULL
+				, pi_start_ne_id             IN nm_elements.ne_id%TYPE
+				, pi_start_offset            IN NUMBER
+				, pi_end_ne_id               IN nm_elements.ne_id%TYPE        DEFAULT NULL
+				, pi_end_offset              IN NUMBER                        DEFAULT NULL
+				, pi_sub_class               IN nm_elements.ne_sub_class%TYPE DEFAULT NULL
+				, pi_restrict_excl_sub_class IN VARCHAR2                      DEFAULT NULL
+				, pi_x_pos                   IN NUMBER                        DEFAULT NULL
+				, pi_y_pos                   IN NUMBER                        DEFAULT NULL
+				, pi_effective_date          IN DATE                          DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
+				, pi_geom                    IN mdsys.sdo_geometry            DEFAULT NULL
+				) RETURN NUMBER;
+--  </FUNCTION>
+--
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--
+--  <FUNCTION>
+	FUNCTION	q_update_gis_data_object
+				( pi_session_id IN gis_data_objects.gdo_session_id%TYPE
+				, pi_pk_id      IN gis_data_objects.gdo_pk_id%TYPE
+				, pi_x_val      IN gis_data_objects.gdo_x_val%TYPE DEFAULT NULL
+				, pi_y_val      IN gis_data_objects.gdo_y_val%TYPE DEFAULT NULL
+				) RETURN NUMBER;
+--  </FUNCTION>
+--
+--                             ****************** Added Functions to call Procedures - Defect 84769 ******************
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+END;
+/
