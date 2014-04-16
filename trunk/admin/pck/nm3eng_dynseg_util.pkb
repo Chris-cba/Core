@@ -1,11 +1,11 @@
 CREATE OR REPLACE PACKAGE BODY nm3eng_dynseg_util AS
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3eng_dynseg_util.pkb-arc   2.12   Jul 04 2013 15:33:48   James.Wadsworth  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3eng_dynseg_util.pkb-arc   2.13   Apr 16 2014 11:25:06   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3eng_dynseg_util.pkb  $
---       Date into PVCS   : $Date:   Jul 04 2013 15:33:48  $
---       Date fetched Out : $Modtime:   Jul 04 2013 14:25:10  $
---       PVCS Version     : $Revision:   2.12  $
+--       Date into PVCS   : $Date:   Apr 16 2014 11:25:06  $
+--       Date fetched Out : $Modtime:   Apr 16 2014 11:24:30  $
+--       PVCS Version     : $Revision:   2.13  $
 --
 --   Author : Priidu Tanava
 --
@@ -41,7 +41,7 @@ CREATE OR REPLACE PACKAGE BODY nm3eng_dynseg_util AS
 */
 
 
-  g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.12  $"';
+  g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.13  $"';
   g_package_name    CONSTANT  varchar2(30)   := 'nm3eng_dynseg_util';
   
   cr            constant varchar2(1) := chr(10);
@@ -320,8 +320,9 @@ CREATE OR REPLACE PACKAGE BODY nm3eng_dynseg_util AS
     end if;
     
   
-    -- the main case stement
-    case p_call_func
+    -- the main case stement  RAC(TFS: 76899 EXOR AST: NM0435 Subscript outside of limit -Problem ID: 96981 )  
+	--                            Changed to include a lower case translation to allow it to work when a user types upper-case in the form! 
+    case lower(p_call_func)
     when 'get_length_weighted_ave'  then return 'lwa';    -- custom                         g_stat_array.nsa_y_weighted_ave_x
     when 'get_maximum_value'        then return 'max';    -- max()                          g_stat_array.nsa_max_x
     when 'get_minimum_value'        then return 'min';    -- min()                          g_stat_array.nsa_min_x
