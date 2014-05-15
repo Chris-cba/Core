@@ -4,11 +4,11 @@ Is
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3_doc_man.pkh-arc   3.1   Apr 07 2014 10:40:52   Linesh.Sorathia  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3_doc_man.pkh-arc   3.2   May 15 2014 13:31:24   Linesh.Sorathia  $
 --       Module Name      : $Workfile:   nm3_doc_man.pkh  $
---       Date into PVCS   : $Date:   Apr 07 2014 10:40:52  $
---       Date fetched Out : $Modtime:   Apr 07 2014 10:39:02  $
---       Version          : $Revision:   3.1  $
+--       Date into PVCS   : $Date:   May 15 2014 13:31:24  $
+--       Date fetched Out : $Modtime:   May 09 2014 10:20:30  $
+--       Version          : $Revision:   3.2  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --</PACKAGE>
@@ -18,7 +18,7 @@ Is
   --constants
   -----------
   --g_sccsid is the SCCS ID for the package
-  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.1  $';
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.2  $';
 
   Type g_association_rec Is Record (featue_table_name Varchar2(500)
                                    ,feature_id        Varchar2(500)) ;
@@ -56,6 +56,23 @@ PROCEDURE get_documents(pi_gateway_name In  Varchar2
                        ,po_ref_out      Out Sys_Refcursor);
 --</PROC>
 --
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_TEMPLATES">
+-- This procedure returns all the internal ids of the templates which are associated with the given exor feature.
+PROCEDURE get_templates(pi_gateway_name In  Varchar2
+                       ,po_ref_out      Out Sys_Refcursor);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_TEMPLATES">
+-- This procedure returns the internal id of the default template for the the given exor feature.
+FUNCTION get_default_template(pi_gateway_name In  Varchar2)
+Return Number ;
+--</PROC>
+--
+
 -----------------------------------------------------------------------------
 --
 --<PROC NAME="GET_ASSOCIATIONS">

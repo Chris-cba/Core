@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3_doc_man.pkb-arc   3.0   Apr 07 2014 09:39:36   James.Wadsworth  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3_doc_man.pkb-arc   3.1   May 15 2014 13:31:24   Linesh.Sorathia  $
 --       Module Name      : $Workfile:   nm3_doc_man.pkb  $
---       Date into PVCS   : $Date:   Apr 07 2014 09:39:36  $
---       Date fetched Out : $Modtime:   Apr 07 2014 09:38:58  $
---       Version          : $Revision:   3.0  $
+--       Date into PVCS   : $Date:   May 15 2014 13:31:24  $
+--       Date fetched Out : $Modtime:   May 09 2014 10:29:32  $
+--       Version          : $Revision:   3.1  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.0  $';
+  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.1  $';
 
   g_package_name CONSTANT varchar2(30) := 'nm3_doc_man';
 --
@@ -584,6 +584,43 @@ EXCEPTION
 --
    WHEN NO_DATA_FOUND THEN NULL;
 End create_document_and_assocs ;
+--
+PROCEDURE get_templates(pi_gateway_name In  Varchar2
+                       ,po_ref_out      Out Sys_Refcursor)
+Is
+--
+Begin
+--
+   Open po_ref_out For  
+   Select dgtm_template_id
+   From   dm_gateway_template_map
+   Where  dgtm_gateway_name = pi_gateway_name
+   Order by dgtm_seq ;
+--
+End get_templates;
+--
+FUNCTION get_default_template(pi_gateway_name In  Varchar2)
+Return Number 
+Is
+--
+   l_template_id Number := -1;
+--
+Begin
+--
+   Select dgtm_template_id Into l_template_id 
+   From (Select * 
+         From   dm_gateway_template_map
+         Where  dgtm_gateway_name = pi_gateway_name
+         Order By dgtm_seq)
+   Where rownum = 1 ;
+   Return l_template_id;
+--
+Exception 
+--
+   When no_data_found
+   Then
+       return -1; 
+End get_default_template;
 --
 End nm3_doc_man;
 /
