@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 --
 ---   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.71.1.3   Nov 08 2012 16:39:14   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.71.1.4   May 23 2014 13:44:28   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3sdo.pkb  $
---       Date into PVCS   : $Date:   Nov 08 2012 16:39:14  $
---       Date fetched Out : $Modtime:   Nov 08 2012 16:36:58  $
---       PVCS Version     : $Revision:   2.71.1.3  $
+--       Date into PVCS   : $Date:   May 23 2014 13:44:28  $
+--       Date fetched Out : $Modtime:   May 23 2014 13:41:10  $
+--       PVCS Version     : $Revision:   2.71.1.4  $
 --       Based on
 
 --
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 -- Copyright (c) RAC
 -----------------------------------------------------------------------------
 
-   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.71.1.3  $"';
+   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.71.1.4  $"';
    g_package_name    CONSTANT VARCHAR2 (30)  := 'NM3SDO';
    g_batch_size      INTEGER                 := NVL( TO_NUMBER(Hig.get_sysopt('SDOBATSIZE')), 10);
    g_clip_type       VARCHAR2(30)            := NVL(Hig.get_sysopt('SDOCLIPTYP'),'SDO');
@@ -188,7 +188,7 @@ END;
 
 FUNCTION set_theme (p_layer IN NM_THEMES_ALL.nth_theme_id%TYPE ) RETURN BOOLEAN IS
 BEGIN
-  IF g_nth.nth_theme_id = p_layer THEN
+  IF nvl(g_nth.nth_theme_id,-99) = p_layer THEN
     RETURN FALSE;
   ELSE
     RETURN TRUE;
@@ -3021,6 +3021,9 @@ BEGIN
   */
 
   --  l_th_id := l_th.get_distinct_ptr;
+
+   if not l_th.is_empty then   --RAC - don't do anything in thcase where the theme array is empty
+
       l_th_id := get_distinct_ptr(l_th);
 
   --  nm_debug.debug('Done - now loop over each base theme - in this batch there are '||to_char( l_th_id.pa.last ));
@@ -3211,6 +3214,8 @@ BEGIN
         END LOOP; -- next theme
 
       END IF;
+
+	  end if; -- RAC - by-pass everything where there are no network theme values in the array to dyn-seg against.
 
       FETCH ref_cur BULK COLLECT INTO v_it.pa, v_ne.pa, v_pl.npa_placement_array, l_date_tab, l_end_date_tab LIMIT l_limit;
 
