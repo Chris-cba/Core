@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 --
 ---   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.78   Jul 04 2013 16:32:58   James.Wadsworth  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.79   May 23 2014 13:56:04   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3sdo.pkb  $
---       Date into PVCS   : $Date:   Jul 04 2013 16:32:58  $
---       Date fetched Out : $Modtime:   Jul 04 2013 16:24:36  $
---       PVCS Version     : $Revision:   2.78  $
+--       Date into PVCS   : $Date:   May 23 2014 13:56:04  $
+--       Date fetched Out : $Modtime:   May 23 2014 13:54:18  $
+--       PVCS Version     : $Revision:   2.79  $
 --       Based on
 ------------------------------------------------------------------
 --   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
@@ -22,7 +22,7 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 -- Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 
-   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.78  $"';
+   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.79  $"';
    g_package_name    CONSTANT VARCHAR2 (30)  := 'NM3SDO';
    g_batch_size      INTEGER                 := NVL( TO_NUMBER(Hig.get_sysopt('SDOBATSIZE')), 10);
    g_clip_type       VARCHAR2(30)            := NVL(Hig.get_sysopt('SDOCLIPTYP'),'SDO');
@@ -224,7 +224,7 @@ END;
 
 FUNCTION set_theme (p_layer IN NM_THEMES_ALL.nth_theme_id%TYPE ) RETURN BOOLEAN IS
 BEGIN
-  IF g_nth.nth_theme_id = p_layer THEN
+  IF nvl(g_nth.nth_theme_id, -99) = p_layer THEN
     RETURN FALSE;
   ELSE
     RETURN TRUE;
@@ -3070,6 +3070,9 @@ BEGIN
   */
 
   --  l_th_id := l_th.get_distinct_ptr;
+  
+      if not l_th.is_empty then   --RAC - don't do anything in thcase where the theme array is empty
+  
       l_th_id := get_distinct_ptr(l_th);
 
   --  nm_debug.debug('Done - now loop over each base theme - in this batch there are '||to_char( l_th_id.pa.last ));
@@ -3260,6 +3263,8 @@ BEGIN
         END LOOP; -- next theme
 
       END IF;
+
+	  end if; -- RAC - by-pass everything where there are no network theme values in the array to dyn-seg against.
 
       FETCH ref_cur BULK COLLECT INTO v_it.pa, v_ne.pa, v_pl.npa_placement_array, l_date_tab, l_end_date_tab LIMIT l_limit;
 
