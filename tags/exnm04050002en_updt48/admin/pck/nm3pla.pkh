@@ -1,0 +1,612 @@
+CREATE OR REPLACE PACKAGE nm3pla AS
+--<PACKAGE>
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3pla.pkh-arc   2.4   Jun 05 2014 11:03:44   Rob.Coupe  $
+--       Module Name      : $Workfile:   nm3pla.pkh  $
+--       Date into PVCS   : $Date:   Jun 05 2014 11:03:44  $
+--       Date fetched Out : $Modtime:   Jun 05 2014 11:02:16  $
+--       Version          : $Revision:   2.4  $
+--       Based on SCCS version : 1.24
+-------------------------------------------------------------------------
+--   Author : Rob Coupe
+--
+--    Placements package
+--
+-------------------------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-------------------------------------------------------------------------------------------
+--</PACKAGE>
+--all global package variables here
+--<GLOBVAR>
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.4  $';
+-- g_sccsid is the SCCS_ID
+--
+-- The following constants are the possible values returned by DERIVE_NE_ID_RELATION
+--  or DERIVE_PLACEMENT_ARR_RELATION
+  c_internal     CONSTANT varchar2(20) := 'INT';       -- NE_ID_1 is wholly contained within NE_ID_2
+  c_none         CONSTANT varchar2(20) := 'NONE';      -- NE_ID_1 has no relation to NE_ID_2
+  c_olap_begin   CONSTANT varchar2(20) := 'O-B';       -- NE_ID_1 begins before NE_ID_2 and finishes within NE_ID_2
+  c_olap_end     CONSTANT varchar2(20) := 'O-E';       -- NE_ID_1 begins within NE_ID_2 and finishes outside NE_ID_2
+  c_olap_b_e     CONSTANT varchar2(20) := 'O-B-E';     -- NE_ID_1 begins before NE_ID_2 and finishes outside NE_ID_2
+  c_not_found    CONSTANT varchar2(20) := 'NOT FOUND'; -- One or other of the NE_IDs not found
+  c_unknown      CONSTANT varchar2(20) := 'UNKNOWN';   -- Unknown outcome
+  c_connected    CONSTANT varchar2(20) := 'CONNECTED'; -- The two placement arrays are connected, but have no actual relation
+--
+-- The following constants are used within the get_pl_set function and are the allowable
+--  set operators
+  c_intersection CONSTANT varchar2(20) := 'INTERSECTION';
+  c_union        CONSTANT varchar2(20) := 'UNION';
+  c_minus        CONSTANT varchar2(20) := 'MINUS';
+--</GLOBVAR>
+--
+-------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_version">
+-- This functon returns the current SCCS version details
+  FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_body_version">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+-------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_tree_index">
+  FUNCTION get_tree_index RETURN number;
+--</PROC>
+--
+-------------------------------------------------------------------------------------------
+--
+--<PROC NAME="set_tree_id">
+  PROCEDURE set_tree_id( p_tree_id IN binary_integer );
+--</PROC>
+--
+-------------------------------------------------------------------------------------------
+--
+--<PROC NAME="set_route_offsets">
+PROCEDURE set_route_offsets (p_ne_id     IN number
+                            ,p_offset_st IN number
+                            );
+--</PROC>
+--
+-------------------------------------------------------------------------------------------
+--
+--<PROC NAME="recursive_tree">
+-- starting at the given node, within a given set, get the elements at the end node and repeat recursively until
+-- all records are processed.
+PROCEDURE recursive_tree (p_ne_id     IN number
+                         ,p_st_node   IN varchar2
+                         ,p_offset_st IN number
+                         );
+--</PROC>
+--
+-------------------------------------------------------------------------------------------
+--
+--<PROC NAME="element_in_tree">
+  FUNCTION element_in_tree( p_ne_id IN nm_elements.ne_id%TYPE ) RETURN boolean;
+--</PROC>
+--
+-------------------------------------------------------------------------------------------
+--
+--<PROC NAME="set_tree">
+PROCEDURE set_tree (p_ne_id     IN nm_elements.ne_id%TYPE
+                   ,p_st_node   IN nm_elements.ne_no_start%TYPE
+                   ,p_end_node  IN nm_elements.ne_no_end%TYPE
+                   ,p_length    IN nm_elements.ne_length%TYPE
+                   ,p_offset_st IN nm_members.nm_slk%TYPE
+                   );
+--</PROC>
+--
+-------------------------------------------------------------------------------------------
+--
+--<PROC NAME="dump_tree">
+  PROCEDURE dump_tree;
+--</PROC>
+--
+-------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_tree_rec">
+PROCEDURE get_tree_rec(p_index IN     number
+                      ,p_ne_id    OUT number
+                      ,p_sn       OUT number
+                      ,p_en       OUT number
+                      ,p_len      OUT number
+                      ,p_sto      OUT number
+                      );
+--</PROC>
+--
+-------------------------------------------------------------------------------------------
+--
+--<PROC NAME="update_route_offsets">
+PROCEDURE update_route_offsets (p_ne_id    IN number
+                               ,p_unit     IN number
+                               ,p_seq_flag IN varchar2
+                               );
+--</PROC>
+--
+-------------------------------------------------------------------------------------------
+--
+--<PROC NAME="resequence_route">
+  PROCEDURE resequence_route ( p_ne_id IN number );
+--</PROC>
+--
+-------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_sub_placement">
+-- this function derives a set of placements from a start and end of a parent placement. Note that offsets in the
+-- placement are provided in the units of the type of network element.
+  FUNCTION  get_sub_placement ( p_pl IN nm_placement ) RETURN nm_placement_array;
+--</PROC>
+--
+-------------------------------------------------------------------------------------------
+--
+--<PROC NAME="recursive_placement">
+PROCEDURE recursive_placement (p_pl     IN nm_placement
+                              ,p_node   IN number
+                              ,p_offset IN number
+                              );
+--</PROC>
+--
+-------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_super_placement">
+FUNCTION  get_super_placement(p_pl_array IN nm_placement_array
+                             ,p_type     IN varchar2
+                             ) RETURN nm_placement_array;
+--</PROC>
+--
+-------------------------------------------------------------------------------------------
+--
+--  function  get_super_placement( p_ne_id_in in number, p_type in varchar2 ) return nm_placement_array;
+--
+-------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_placement_from_ne">
+-- This procedure returns a placement array for the given NE_ID
+  FUNCTION  get_placement_from_ne( p_ne_id_in IN number) RETURN nm_placement_array;
+--</PROC>
+--
+------------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_placement_from_temp_ne">
+-- This procedure returns a placement array for a temporary extent (NM_NW_TEMP_EXTENTS) for
+--  the given NTE_JOB_ID
+  FUNCTION  get_placement_from_temp_ne( p_ne_id_in IN number) RETURN nm_placement_array;
+--</PROC>
+--
+------------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_placement_persistent_ne">
+-- This procedure returns a placement array for a persisten extent (NM_NW_PERSISTENT_EXTENTS) for
+--  the given NPE_JOB_ID
+  FUNCTION  get_placement_persistent_ne( p_ne_id_in IN number) RETURN nm_placement_array;
+--</PROC>
+--
+------------------------------------------------------------------------------------------------
+--
+--<PROC NAME="defrag_placement_array">
+-- This function defragments a placement array and sets the offset if connectivity is detected
+FUNCTION defrag_placement_array (this_npa nm_placement_array) RETURN nm_placement_array;
+--</PROC>
+--
+------------------------------------------------------------------------------------------------
+--
+--<PROC NAME="split_placement_array">
+-- This function takes a placement array and an ne_id and mp and splits the placement array at that point
+-- There are two versions - a function which returns a single placement array with the values split, and a
+--  procedure which returns 2 seperate placement arrays
+FUNCTION  split_placement_array (this_npa    IN     nm_placement_array
+                                ,pi_ne_id    IN     nm_members.nm_ne_id_of%TYPE
+                                ,pi_mp       IN     nm_members.nm_begin_mp%TYPE
+                                ) RETURN nm_placement_array;
+--
+PROCEDURE split_placement_array (this_npa    IN     nm_placement_array
+                                ,pi_ne_id    IN     nm_members.nm_ne_id_of%TYPE
+                                ,pi_mp       IN     nm_members.nm_begin_mp%TYPE
+                                ,po_npa_pre     OUT nm_placement_array
+                                ,po_npa_post    OUT nm_placement_array
+                                ,pi_allow_zero_length_placement IN boolean DEFAULT TRUE
+                                );
+--</PROC>
+--
+-------------------------------------------------------------------------------------------
+--
+--<PROC NAME="initialise_placement_array">
+-- This function returns an initialised NM_PLACEMENT_ARRAY, with the values specified (if any)
+FUNCTION initialise_placement_array (pi_ne_id   IN number DEFAULT NULL
+                                    ,pi_start   IN number DEFAULT NULL
+                                    ,pi_end     IN number DEFAULT NULL
+                                    ,pi_measure IN number DEFAULT NULL
+                                    ) RETURN nm_placement_array;
+--</PROC>
+--
+-------------------------------------------------------------------------------------------
+--
+--<PROC NAME="initialise_placement_arr_type">
+-- This function returns an initialised NM_PLACEMENT_ARRAY_TYPE, with the values specified (if any)
+FUNCTION initialise_placement_arr_type (pi_ne_id   IN number DEFAULT NULL
+                                       ,pi_start   IN number DEFAULT NULL
+                                       ,pi_end     IN number DEFAULT NULL
+                                       ,pi_measure IN number DEFAULT NULL
+                                       ) RETURN nm_placement_array_type;
+--</PROC>
+--
+-------------------------------------------------------------------------------------------
+--
+--<PROC NAME="initialise_placement">
+-- This function returns an initialised NM_PLACEMENT, with the values specified (if any)
+FUNCTION initialise_placement (pi_ne_id   IN number DEFAULT NULL
+                              ,pi_start   IN number DEFAULT NULL
+                              ,pi_end     IN number DEFAULT NULL
+                              ,pi_measure IN number DEFAULT NULL
+                              ) RETURN nm_placement;
+--</PROC>
+--
+-------------------------------------------------------------------------------------------
+--
+--<PROC NAME="pop_sub_placement_array">
+-- This function ececutes get_sub_placement with the supplied data. For use in tools that
+-- are not equipped to handle Oracle object tupes (eg forms)
+FUNCTION pop_sub_placement_array(pi_ne_id IN nm_elements.ne_id%TYPE
+                                ,pi_start IN nm_elements.ne_no_start%TYPE
+                                                                ,pi_end   IN nm_elements.ne_no_end%TYPE
+                                                                ) RETURN pls_integer;
+--</PROC>
+--
+-------------------------------------------------------------------------------------------
+--
+--<PROC NAME="return_placement">
+-- This function returns a specified element from the global placement array g_pl. For use
+-- in tools that are not equipped to handle Oracle object types (eg forms)
+PROCEDURE return_placement(pi_index   IN     number
+                          ,po_ne_id      OUT number
+                          ,po_start      OUT number
+                          ,po_end        OUT number
+                          ,po_measure    OUT number
+                          );
+--</PROC>
+--
+------------------------------------------------------------------------------------------------
+--
+--<PROC NAME="check_exists_in_placement_arr">
+-- This function checks to see if a ne_id and mp exist within a placement array
+FUNCTION check_exists_in_placement_arr (this_npa    IN     nm_placement_array
+                                       ,pi_ne_id    IN     nm_members.nm_ne_id_of%TYPE
+                                       ,pi_mp       IN     nm_members.nm_begin_mp%TYPE
+                                       ) RETURN boolean;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="derive_ne_id_relation">
+-- This function returns a character string determining the relation between the 2 sets of
+--  NM_MEMBERS records identified by the two supplied NE_IDs
+FUNCTION derive_ne_id_relation (pi_ne_id_1 IN nm_elements.ne_id%TYPE
+                               ,pi_ne_id_2 IN nm_elements.ne_id%TYPE
+                               ) RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="derive_placement_arr_relation">
+-- This function returns a character string determining the relation between the 2 sets of
+--  NM_MEMBERS records identified by two supplied nm_placement_arrays
+FUNCTION derive_placement_arr_relation (pi_pl_1 IN nm_placement_array
+                                       ,pi_pl_2 IN nm_placement_array
+                                       ) RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_ne_intersection">
+-- This function returns a placement array showing the position were
+-- two members intersect/overlap
+FUNCTION get_ne_intersection( ne_id1 nm_members.nm_ne_id_in%TYPE
+                             ,ne_id2 nm_members.nm_ne_id_in%TYPE
+                            ) RETURN nm_placement_array;
+--</PROC>
+--
+------------------------------------------------------------------------------------------------
+--
+--<PROC NAME="dump_placement_array">
+-- This procedure is similar to the DUMP_PLACEMENT_ARRAY member procedure of
+--  the NM_PLACEMENT_ARRAY type, except that it outputs the placement array
+--  to the debug table
+--
+PROCEDURE dump_placement_array
+                (p_pl_arr IN nm_placement_array
+                ,p_level  IN number  DEFAULT nm_debug.c_default_level
+                );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="count_pl_arr_connected_chunks">
+-- This function returns the number of distinct "chunks" of connected
+--  network there are in a given placement array. It first calls
+--  defrag_placement_array with the passed pl_arr and returns the
+--  number of distinct "chunks" there are (number of records with a
+--  measure of zero)
+--
+FUNCTION count_pl_arr_connected_chunks
+           (pi_pl_arr IN nm_placement_array) RETURN binary_integer;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="count_pl_arr_distinct_subclass">
+-- This procedure returns the number of distinct NE_NT_TYPE and NE_SUB_CLASS
+--  combinations which occur within a given placement array
+--
+FUNCTION count_pl_arr_distinct_subclass
+           (pi_pl_arr IN nm_placement_array) RETURN binary_integer;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_placement_chunks">
+-- This function returns an array of placement arrays by resetting the measure where connectivity
+-- has been lost and assembling the connected chunks into single route references
+--
+FUNCTION get_placement_chunks ( p_pl IN nm_placement_array ) RETURN nm_placement_array;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_connected_placement_from_ne">
+-- This function returns an array of placement arrays by resetting the measure where connectivity
+-- has been lost.
+--
+--function get_connected_placement ( pi_ne_id in nm_elements.ne_id%TYPE )
+--      return nm_placement_array;
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_next_element">
+--
+FUNCTION get_next_element( pi_route_id IN number, pi_ne_id IN number ) RETURN number;
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_next_element">
+--
+FUNCTION get_next_element2( pi_route_id IN number, pi_ne_id IN number, pi_sub_class IN varchar2 ) RETURN number;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_connected_extent">
+--
+FUNCTION get_connected_extent( pi_st_lref IN nm_lref,
+                               pi_end_lref IN nm_lref,
+                               pi_route  IN nm_elements.ne_id%TYPE,
+                               pi_sub_class IN nm_elements.ne_sub_class%TYPE )
+                                RETURN nm_placement_array;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--<PROC NAME="get_connected_chunks">
+--
+FUNCTION get_connected_chunks ( p_ne_id IN nm_elements.ne_id%TYPE,
+                                p_route_id IN nm_members.nm_ne_id_in%TYPE,
+                                p_obj_type IN nm_members.nm_obj_type%TYPE ) RETURN nm_placement_array;
+
+PRAGMA RESTRICT_REFERENCES( get_connected_chunks, wnds );
+
+FUNCTION get_connected_chunks ( pi_ne_id IN nm_elements.ne_id%TYPE,
+                                pi_obj_type IN nm_members.nm_obj_type%TYPE ) RETURN nm_placement_array;
+PRAGMA RESTRICT_REFERENCES( get_connected_chunks, wnds );
+--
+FUNCTION get_connected_chunks ( pi_ne_id IN nm_elements.ne_id%TYPE,
+                                pi_route_id IN nm_members.nm_ne_id_in%TYPE ) RETURN nm_placement_array;
+--
+PRAGMA RESTRICT_REFERENCES( get_connected_chunks, wnds );
+--
+FUNCTION get_connected_chunks ( pi_ne_id IN nm_elements.ne_id%TYPE ) RETURN nm_placement_array;
+PRAGMA RESTRICT_REFERENCES( get_connected_chunks, wnds );
+
+FUNCTION get_connected_chunks(p_nte_job_id IN nm_nw_temp_extents.nte_job_id%TYPE
+                             ,p_route_id   IN nm_members.nm_ne_id_in%TYPE
+                             ,p_obj_type   IN nm_members.nm_obj_type%TYPE
+                             ) RETURN nm_placement_array;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="are_placements_connected">
+--  This function returns TRUE if the two placements passed are connected exactly (no overlap) orherwise FALSE
+--
+FUNCTION are_placements_connected (p_pl_1 nm_placement
+                                  ,p_pl_2 nm_placement
+                                  ) RETURN boolean;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_pl_by_excl_sub_class">
+--
+FUNCTION get_pl_by_excl_sub_class (pi_st_lref   IN nm_lref
+                                  ,pi_end_lref  IN nm_lref
+                                  ,pi_route     IN nm_elements.ne_id%TYPE
+                                  ,pi_sub_class IN nm_elements.ne_sub_class%TYPE
+                                  ) RETURN nm_placement_array;
+  PRAGMA RESTRICT_REFERENCES( get_pl_by_excl_sub_class, wnds );
+FUNCTION get_pl_by_excl_sub_class (pi_route     IN nm_elements.ne_id%TYPE
+                                  ,pi_st_true   IN nm_members.nm_true%TYPE
+                                  ,pi_end_true  IN nm_members.nm_true%TYPE
+                                  ,pi_sub_class IN nm_elements.ne_sub_class%TYPE
+                                  ) RETURN nm_placement_array;
+--</PROC>
+--
+FUNCTION chunk_connectivity( rvrs IN boolean,
+                             c1 IN number,
+                             c2 IN number,
+                             p1 IN number,
+                                                         p2 IN number ) RETURN boolean;
+FUNCTION partial_chunk_connectivity( rvrs IN boolean,
+                             p1 IN number,
+                             p2 IN number,
+                             s1 IN number,
+                             e1 IN number,
+                             s2 IN number,
+                             e2 IN number  ) RETURN boolean;
+
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="defrag_connectivity">
+--
+FUNCTION defrag_connectivity(pi_ne_id1 IN nm_node_usages.nnu_ne_id%TYPE
+                            ,pi_ne_id2 IN nm_node_usages.nnu_ne_id%TYPE
+                           ) RETURN integer;
+--</PROC>
+-------------------------------------------------------------------------------
+--
+--<PROC NAME="get_pl_from_mrg_section">
+-- This function returns a placement array representing a merge section (chunk)
+--
+FUNCTION get_pl_from_mrg_section (pi_nms_mrg_job_id   IN nm_mrg_sections.nms_mrg_job_id%TYPE
+                                 ,pi_nms_section_id   IN nm_mrg_sections.nms_mrg_section_id%TYPE
+                                 ) RETURN nm_placement_array;
+--</PROC>
+--
+-------------------------------------------------------------------------------
+--
+--<PROC NAME="remove_pl_from_pl_arr">
+-- This function returns the defragmented pi_pl_arr without the chunk of network represented
+--  by pi_pl
+--
+FUNCTION remove_pl_from_pl_arr (pi_pl_arr IN nm_placement_array
+                               ,pi_pl     IN nm_placement
+                               ) RETURN nm_placement_array;
+--
+-- Possible exceptions raised are :
+-- -20001  Start MP cannot be after End MP : start > end
+--
+--</PROC>
+--
+-------------------------------------------------------------------------------
+--
+FUNCTION subtract_pl_from_pl (p_pl_main      IN nm_placement_array
+                             ,p_pl_to_remove IN nm_placement_array
+                             ) RETURN nm_placement_array;
+--
+-------------------------------------------------------------------------------
+--
+FUNCTION get_measure_in_pl_arr (p_pl      IN nm_placement_array
+                               ,p_lref    IN nm_lref
+                               ) RETURN number;
+--
+-------------------------------------------------------------------------------
+--
+FUNCTION get_lref_from_measure_in_plarr (p_pl        IN nm_placement_array
+                                        ,p_measure   IN number
+                                        ,p_st_or_end IN varchar2 DEFAULT NULL
+                                        ) RETURN nm_lref;
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_pl_within_measures">
+-- This function returns the portion of a placement array represented
+--  between the 2 passed measures. This can only be run on a single connected
+--  "chunk"
+--
+FUNCTION get_pl_within_measures (p_pl       nm_placement_array
+                                ,p_begin_mp number
+                                ,p_end_mp   number
+                                ) RETURN nm_placement_array;
+--</PROC>
+--
+-------------------------------------------------------------------------------
+--
+--<PROC NAME="get_pl_from_rescale_write">
+-- This function returns a placement array from the records in NM_RESCALE_WRITE
+--
+FUNCTION get_pl_from_rescale_write (pi_nm_seg_no nm_rescale_write.nm_seg_no%TYPE DEFAULT NULL
+                                   ) RETURN nm_placement_array;
+--</PROC>
+--
+-------------------------------------------------------------------------------
+--
+--<PROC NAME="add_element_to_pl_arr">
+-- This procedure adds an element to the passed placement array
+-- It should be used in preference to the .add_element member function as this
+--  passes the array by value rather than by reference (NOCOPY) so for larger Placement arrays
+--  the system consumes an inordinate amount of RAM
+--
+PROCEDURE add_element_to_pl_arr (pio_pl_arr IN OUT NOCOPY nm_placement_array
+                                ,pi_ne_id   IN            nm_elements.ne_id%TYPE
+                                ,pi_start   IN            nm_members.nm_begin_mp%TYPE
+                                ,pi_end     IN            nm_members.nm_end_mp%TYPE
+                                ,pi_measure IN            nm_members.nm_true%TYPE DEFAULT 0
+                                ,pi_mrg_mem IN            BOOLEAN                 DEFAULT TRUE
+                                );
+--
+PRAGMA RESTRICT_REFERENCES( add_element_to_pl_arr, wnds, wnps );
+--
+PROCEDURE add_element_to_pl_arr (pio_pl_arr IN OUT NOCOPY nm_placement_array
+                                ,pi_pl      IN            nm_placement
+                                ,pi_mrg_mem IN            BOOLEAN                 DEFAULT TRUE
+                                );
+--</PROC>
+--
+-------------------------------------------------------------------------------
+--
+--<PROC NAME="check_contiguity">
+FUNCTION check_contiguity ( pi_ne_id       nm_elements.ne_id%TYPE
+                          , pi_inv_type    nm_inv_items.iit_inv_type%TYPE
+                          , pi_xsp         nm_inv_items.iit_x_sect%TYPE
+                          , pi_route_datum VARCHAR)
+RETURN BOOLEAN;
+--</PROC>
+--
+-------------------------------------------------------------------------------
+--
+--all pragma definitions here
+--<PRAGMA>
+  PRAGMA RESTRICT_REFERENCES( get_version, wnds );
+  PRAGMA RESTRICT_REFERENCES( get_body_version, wnds );
+  PRAGMA RESTRICT_REFERENCES( get_sub_placement, wnds );
+  PRAGMA RESTRICT_REFERENCES( recursive_placement, wnds );
+  PRAGMA RESTRICT_REFERENCES( get_super_placement, wnds );
+  PRAGMA RESTRICT_REFERENCES( initialise_placement_array, wnds);
+  PRAGMA RESTRICT_REFERENCES( initialise_placement_arr_type, wnds);
+  PRAGMA RESTRICT_REFERENCES( initialise_placement, wnds);
+  PRAGMA RESTRICT_REFERENCES( check_exists_in_placement_arr, wnds);
+  PRAGMA RESTRICT_REFERENCES( get_placement_from_ne, wnds);
+  PRAGMA RESTRICT_REFERENCES( get_placement_from_temp_ne, wnds);
+  PRAGMA RESTRICT_REFERENCES( derive_ne_id_relation, wnds);
+  PRAGMA RESTRICT_REFERENCES( derive_placement_arr_relation, wnds);
+  PRAGMA RESTRICT_REFERENCES( get_ne_intersection, wnds);
+  PRAGMA RESTRICT_REFERENCES( count_pl_arr_connected_chunks, wnds);
+  PRAGMA RESTRICT_REFERENCES( chunk_connectivity, wnds);
+  PRAGMA RESTRICT_REFERENCES( defrag_placement_array, wnds);
+  PRAGMA RESTRICT_REFERENCES( count_pl_arr_distinct_subclass, wnds);
+  PRAGMA RESTRICT_REFERENCES( get_connected_chunks, wnds );
+  PRAGMA RESTRICT_REFERENCES( are_placements_connected, wnds );
+  PRAGMA RESTRICT_REFERENCES( dump_placement_array, rnds, rnps, wnds, wnps, trust); -- PRAGMA this one right up seeing as it is a debug
+  PRAGMA RESTRICT_REFERENCES( get_pl_by_excl_sub_class, wnds);
+  PRAGMA RESTRICT_REFERENCES( defrag_connectivity, wnds );
+  PRAGMA RESTRICT_REFERENCES( remove_pl_from_pl_arr, wnds );
+  PRAGMA RESTRICT_REFERENCES( subtract_pl_from_pl, wnds, 'TRUST' );
+  PRAGMA RESTRICT_REFERENCES( partial_chunk_connectivity, wnds, wnps );
+  PRAGMA RESTRICT_REFERENCES( defrag_connectivity, wnds, wnps );
+  PRAGMA RESTRICT_REFERENCES( get_measure_in_pl_arr, wnds, wnps );
+  PRAGMA RESTRICT_REFERENCES( get_lref_from_measure_in_plarr, wnds, wnps );
+  PRAGMA RESTRICT_REFERENCES( add_element_to_pl_arr, wnds, wnps );
+
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+END nm3pla;
+/
