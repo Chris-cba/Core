@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE nm3pla AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3pla.pkh-arc   2.3   Jul 04 2013 16:21:10   James.Wadsworth  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3pla.pkh-arc   2.4   Jun 05 2014 11:03:44   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3pla.pkh  $
---       Date into PVCS   : $Date:   Jul 04 2013 16:21:10  $
---       Date fetched Out : $Modtime:   Jul 04 2013 14:25:18  $
---       Version          : $Revision:   2.3  $
+--       Date into PVCS   : $Date:   Jun 05 2014 11:03:44  $
+--       Date fetched Out : $Modtime:   Jun 05 2014 11:02:16  $
+--       Version          : $Revision:   2.4  $
 --       Based on SCCS version : 1.24
 -------------------------------------------------------------------------
 --   Author : Rob Coupe
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE nm3pla AS
 --</PACKAGE>
 --all global package variables here
 --<GLOBVAR>
-  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.3  $';
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.4  $';
 -- g_sccsid is the SCCS_ID
 --
 -- The following constants are the possible values returned by DERIVE_NE_ID_RELATION
@@ -597,7 +597,7 @@ RETURN BOOLEAN;
   PRAGMA RESTRICT_REFERENCES( get_pl_by_excl_sub_class, wnds);
   PRAGMA RESTRICT_REFERENCES( defrag_connectivity, wnds );
   PRAGMA RESTRICT_REFERENCES( remove_pl_from_pl_arr, wnds );
-  PRAGMA RESTRICT_REFERENCES( subtract_pl_from_pl, wnds );
+  PRAGMA RESTRICT_REFERENCES( subtract_pl_from_pl, wnds, 'TRUST' );
   PRAGMA RESTRICT_REFERENCES( partial_chunk_connectivity, wnds, wnps );
   PRAGMA RESTRICT_REFERENCES( defrag_connectivity, wnds, wnps );
   PRAGMA RESTRICT_REFERENCES( get_measure_in_pl_arr, wnds, wnps );
