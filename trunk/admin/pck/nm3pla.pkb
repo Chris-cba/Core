@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3pla AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3pla.pkb-arc   2.16   Jul 04 2013 16:21:10   James.Wadsworth  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3pla.pkb-arc   2.17   Jun 05 2014 11:05:22   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3pla.pkb  $
---       Date into PVCS   : $Date:   Jul 04 2013 16:21:10  $
---       Date fetched Out : $Modtime:   Jul 04 2013 14:25:18  $
---       Version          : $Revision:   2.16  $
+--       Date into PVCS   : $Date:   Jun 05 2014 11:05:22  $
+--       Date fetched Out : $Modtime:   Jun 05 2014 11:04:22  $
+--       Version          : $Revision:   2.17  $
 --       Based on SCCS version : 1.61
 ------------------------------------------------------------------------
 --
@@ -18,8 +18,8 @@ CREATE OR REPLACE PACKAGE BODY Nm3pla AS
 --   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -------------------------------------------------------------------------------------------
 -- Global variables - tree definitions etc.
-   --g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"@(#)nm3pla.pkb	1.61 11/29/06"';
-   g_body_sccsid     CONSTANT varchar2(2000) := '$Revision:   2.16  $';
+   --g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"@(#)nm3pla.pkb    1.61 11/29/06"';
+   g_body_sccsid     CONSTANT varchar2(2000) := '$Revision:   2.17  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT VARCHAR2(30) := 'nm3pla';
@@ -70,8 +70,19 @@ g_pla_exc_msg     VARCHAR2(2000) := 'Unspecified exception within NM3PLA';
   TYPE tab_rec_conn_chunk IS TABLE OF rec_conn_chunk INDEX BY BINARY_INTEGER;
 --
   g_conn_chunk tab_rec_conn_chunk;
+
 --
 --------------------------------------------------------------------------------------------------------------------
+--
+FUNCTION ordered_pl ( pl in nm_placement_array ) RETURN nm_placement_array;
+--
+--------------------------------------------------------------------------------------------------------------------
+--
+FUNCTION subtract_pl_from_pl_ordered (p_pl_main      IN nm_placement_array
+                             ,p_pl_to_remove IN nm_placement_array
+                             ) RETURN nm_placement_array;
+--
+-------------------------------------------------------------------------------------------
 --
 FUNCTION local_connected_chunks RETURN nm_placement_array;
 --
@@ -426,7 +437,7 @@ FUNCTION  get_sub_placement ( p_pl IN nm_placement ) RETURN nm_placement_array I
 --
 CURSOR get_start (c_ne_id         NUMBER
                  ,c_start         NUMBER
-				 ,c_end           NUMBER
+                 ,c_end           NUMBER
                  ,c_route_units   NUMBER
                  ,c_element_units NUMBER
                  ) IS
@@ -435,8 +446,8 @@ CURSOR get_start (c_ne_id         NUMBER
         ,s.ne_no_end   end_node
         ,s.ne_length   ne_length
         ,m.nm_slk
-		,m.nm_begin_mp begin_mp
-		,NVL(m.nm_end_mp,s.ne_length)   end_mp
+        ,m.nm_begin_mp begin_mp
+        ,NVL(m.nm_end_mp,s.ne_length)   end_mp
         ,m.nm_cardinality
   FROM   nm_elements s
         ,nm_members  m
@@ -444,7 +455,7 @@ CURSOR get_start (c_ne_id         NUMBER
   AND    m.nm_ne_id_in = c_ne_id
   AND    c_start >= m.nm_slk
   AND    c_start <   m.nm_slk + Nm3unit.convert_unit(c_element_units, c_route_units,
-				                        ( NVL(m.nm_end_mp, s.ne_length) - m.nm_begin_mp));
+                                        ( NVL(m.nm_end_mp, s.ne_length) - m.nm_begin_mp));
 --
 l_offset_st       NUMBER;
 l_p_next_offset   NUMBER;
@@ -499,7 +510,7 @@ BEGIN
 --   if the rowcount > 1 and its a point item, then it has been dealt with
 
      IF get_start%rowcount > 1 AND p_pl.pl_end = p_pl.pl_start THEN
-	   EXIT;
+       EXIT;
      END IF;
 
 --   convert the start offset to a datum position
@@ -527,7 +538,7 @@ BEGIN
 --
 --     nm_debug.debug( 'Comparing '||to_char(p_pl.pl_end)||' and '||to_char(l_current_mem_end));
 
-	 IF p_pl.pl_end <= l_current_mem_end
+     IF p_pl.pl_end <= l_current_mem_end
      THEN
 --        nm_debug.debug( 'Only need look at first element');
 
@@ -536,7 +547,7 @@ BEGIN
   --
         l_conv_value   := Nm3unit.convert_unit(g_route_unit
                                               ,g_element_unit
-											  ,p_pl.pl_end - st_rec.nm_slk );
+                                              ,p_pl.pl_end - st_rec.nm_slk );
 --        nm_debug.debug( to_char( l_conv_value ));
   --
         IF st_rec.nm_cardinality = 1
@@ -2512,7 +2523,7 @@ BEGIN
         l_begin_mp := pi_ibegin_tab(l_i); 
         l_end_mp   := pi_iend_tab(l_i);
 
-		if pi_rdir_tab(l_i) = 1 then
+        if pi_rdir_tab(l_i) = 1 then
            l_r_begin := Nm3lrs.get_set_offset(pi_rin_tab(l_i), pi_iof_tab(l_i), l_begin_mp);
            l_r_end   := Nm3lrs.get_set_offset(pi_rin_tab(l_i), pi_iof_tab(l_i), l_end_mp);
         else
@@ -2751,7 +2762,7 @@ BEGIN
     r.nm_obj_type,
     r.nm_ne_id_in,
     r.nm_seq_no,
-	i.nte_begin_mp;
+    i.nte_begin_mp;
 
   l_retval := get_connected_chunks_internal(pi_iof_tab    => l_iof_tab
                                            ,pi_ibegin_tab => l_ibegin_tab
@@ -2913,9 +2924,9 @@ l_retval BOOLEAN;
 BEGIN
 
    l_retval := partial_chunk_connectivity ( TRUE,
-	                                        p_pl_1.pl_ne_id, p_pl_2.pl_ne_id,
-	                                        p_pl_1.pl_start, p_pl_1.pl_end,
-	                                        p_pl_2.pl_start, p_pl_2.pl_end );
+                                            p_pl_1.pl_ne_id, p_pl_2.pl_ne_id,
+                                            p_pl_1.pl_start, p_pl_1.pl_end,
+                                            p_pl_2.pl_start, p_pl_2.pl_end );
    RETURN l_retval;
 --
 END are_placements_connected;
@@ -3403,7 +3414,7 @@ END IF;
     IF rvrs THEN
       retval := TRUE;
     ELSIF ABS(dcon ) = 1 THEN
-	    retval := TRUE;
+        retval := TRUE;
     END IF;
   END IF;
   RETURN retval;
@@ -3571,10 +3582,10 @@ end;
 FUNCTION partial_chunk_connectivity( rvrs IN BOOLEAN,
                              p1 IN NUMBER,
                              p2 IN NUMBER,
-							 s1 IN NUMBER,
-							 e1 IN NUMBER,
-							 s2 IN NUMBER,
-							 e2 IN NUMBER  ) RETURN BOOLEAN IS
+                             s1 IN NUMBER,
+                             e1 IN NUMBER,
+                             s2 IN NUMBER,
+                             e2 IN NUMBER  ) RETURN BOOLEAN IS
 
 retval BOOLEAN := FALSE;
 dcon   INTEGER := defrag_connectivity( p1, p2);
@@ -3589,27 +3600,27 @@ BEGIN
   ELSE
     IF rvrs THEN
       IF dcon = 1 AND e1 = Nm3net.Get_Ne_Length( p1 ) AND s2 = 0 THEN
-  	    retval := TRUE;
-	  ELSIF dcon = -1 AND s1 = 0 AND e2 = Nm3net.Get_Ne_Length( p2 ) THEN
-	    retval := TRUE;
-	  ELSIF dcon = 2 AND s1 = 0 AND s2 = 0 THEN
-	    retval := TRUE;
-	  ELSIF dcon  = -2 AND e1 = Nm3net.Get_Ne_Length( p1 ) AND e2 = Nm3net.Get_Ne_Length( p2 ) THEN
-	    retval := TRUE;
+          retval := TRUE;
+      ELSIF dcon = -1 AND s1 = 0 AND e2 = Nm3net.Get_Ne_Length( p2 ) THEN
+        retval := TRUE;
+      ELSIF dcon = 2 AND s1 = 0 AND s2 = 0 THEN
+        retval := TRUE;
+      ELSIF dcon  = -2 AND e1 = Nm3net.Get_Ne_Length( p1 ) AND e2 = Nm3net.Get_Ne_Length( p2 ) THEN
+        retval := TRUE;
       ELSE
-	    retval := FALSE;
-	  END IF;
+        retval := FALSE;
+      END IF;
     ELSIF ABS( dcon ) = 2  THEN
-	  retval := FALSE;
+      retval := FALSE;
     ELSE
 --    cardinality the same and connected
       IF dcon > 0 AND e1 = Nm3net.Get_Ne_Length( p1 ) AND s2 = 0 THEN
-  	    retval := TRUE;
-	  ELSIF dcon <0 AND s1 = 0 AND e2 = Nm3net.Get_Ne_Length( p2 ) THEN
-	    retval := TRUE;
-	  ELSE
-	    retval := FALSE;
-	  END IF;
+          retval := TRUE;
+      ELSIF dcon <0 AND s1 = 0 AND e2 = Nm3net.Get_Ne_Length( p2 ) THEN
+        retval := TRUE;
+      ELSE
+        retval := FALSE;
+      END IF;
     END IF;
   END IF;
   RETURN retval;
@@ -3812,6 +3823,14 @@ END remove_pl_from_pl_arr;
 FUNCTION subtract_pl_from_pl (p_pl_main      IN nm_placement_array
                              ,p_pl_to_remove IN nm_placement_array
                              ) RETURN nm_placement_array IS
+begin
+  return subtract_pl_from_pl_ordered( ordered_pl(p_pl_main), ordered_pl(p_pl_to_remove));
+end;                               
+
+
+FUNCTION subtract_pl_from_pl_ordered (p_pl_main      IN nm_placement_array
+                             ,p_pl_to_remove IN nm_placement_array
+                             ) RETURN nm_placement_array IS
 --
    l_retval nm_placement_array := p_pl_main;
 --
@@ -3847,7 +3866,7 @@ BEGIN
 --
    RETURN l_retval;
 --
-END subtract_pl_from_pl;
+END subtract_pl_from_pl_ordered;
 --
 -------------------------------------------------------------------------------
 --
@@ -4230,5 +4249,19 @@ END;
 --
 -----------------------------------------------------------------------------
 --
+FUNCTION ordered_pl ( pl in nm_placement_array ) RETURN nm_placement_array is 
+retval nm_placement_array;
+begin
+  select nm_placement_array(
+  cast(collect(nm_placement(pl_ne_id, pl_start, pl_end, pl_measure )) as nm_placement_array_type ))
+  into retval
+  from (
+    select t.* from table (pl.npa_placement_array) t
+    order by pl_ne_id, pl_start, pl_end );
+return retval;
+exception
+  when others then
+    raise_application_error(-20001, 'Problems in the ordering of the placement array' );
+end; 
 END Nm3pla;
 /
