@@ -4,11 +4,11 @@ As
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/web_user_info.pkb-arc   3.2   Aug 12 2014 09:37:32   Linesh.Sorathia  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/web_user_info.pkb-arc   3.3   Aug 12 2014 13:00:40   Linesh.Sorathia  $
 --       Module Name      : $Workfile:   web_user_info.pkb  $
---       Date into PVCS   : $Date:   Aug 12 2014 09:37:32  $
---       Date fetched Out : $Modtime:   Aug 09 2014 12:40:52  $
---       Version          : $Revision:   3.2  $
+--       Date into PVCS   : $Date:   Aug 12 2014 13:00:40  $
+--       Date fetched Out : $Modtime:   Aug 12 2014 12:58:50  $
+--       Version          : $Revision:   3.3  $
 --       Based on SCCS version :
 ------------------------------------------------------------------
 --   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
@@ -18,7 +18,7 @@ As
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_Body_Sccsid               Constant  Varchar2(2000)                      :=  '$Revision:   3.2  $';
+  g_Body_Sccsid               Constant  Varchar2(2000)                      :=  '$Revision:   3.3  $';
 
 --
 -----------------------------------------------------------------------------
@@ -121,11 +121,11 @@ Begin
       
       If l_unrestricted = 'Y'
       Then
-          Raise_Application_Error (-21201,'Cannot set context for unrestricted user ');     
+          Raise_Application_Error (-20201,'Cannot set context for unrestricted user ');     
       End If ;
       If l_end_date Is Not Null
       Then        
-           Raise_Application_Error(-21202,'Exor hig user ('||l_name||') is end dated');
+           Raise_Application_Error(-20202,'Exor hig user ('||l_name||') is end dated');
       End If ;  
 
       OPEN  c_get_account_status(l_db_user);
@@ -135,13 +135,13 @@ Begin
         
       If l_status != 'OPEN'
       Then        
-          Raise_Application_Error(-21202,'Exor db user '||l_db_user||' is not open');
+          Raise_Application_Error(-20202,'Exor db user '||l_db_user||' is not open');
       End If ;          
    --
    Exception
       When No_Data_Found
       Then
-          Raise_Application_Error (-21204,'Given hig user id ('||pi_user_id||') is not found ');     
+          Raise_Application_Error (-20204,'Given hig user id ('||pi_user_id||') is not found ');     
 
    End ;
      
