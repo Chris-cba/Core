@@ -3,11 +3,11 @@ As
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/web_user_info.pkh-arc   3.1   Jul 04 2013 16:45:36   James.Wadsworth  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/web_user_info.pkh-arc   3.2   Aug 12 2014 09:37:32   Linesh.Sorathia  $
 --       Module Name      : $Workfile:   web_user_info.pkh  $
---       Date into PVCS   : $Date:   Jul 04 2013 16:45:36  $
---       Date fetched Out : $Modtime:   Jul 04 2013 16:44:38  $
---       Version          : $Revision:   3.1  $
+--       Date into PVCS   : $Date:   Aug 12 2014 09:37:32  $
+--       Date fetched Out : $Modtime:   Aug 08 2014 14:51:40  $
+--       Version          : $Revision:   3.2  $
 --       Based on SCCS version :
 ------------------------------------------------------------------
 --   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
@@ -17,7 +17,7 @@ As
   --constants
   -----------
   --g_sccsid is the SCCS ID for the package
-  g_Sccsid Constant Varchar2(2000) := '$Revision:   3.1  $';
+  g_Sccsid Constant Varchar2(2000) := '$Revision:   3.2  $';
  
 -----------------------------------------------------------------------------
 --
@@ -34,6 +34,16 @@ Function Get_Body_Version Return Varchar2;
 Procedure Set_User  (
                     p_Name  In  Varchar2
                     );
+--
+-----------------------------------------------------------------------------
+--
+-- This procedure sets context for the given user Id. 
+-- Throws following exceptions
+-- If Invalid user Id
+-- If user is end dated
+-- If user DB account is not OPEN
+-- If user is unrestricted
+Procedure set_context(pi_user_id In hig_users.hus_user_id%Type);
 --
 -----------------------------------------------------------------------------
 --
