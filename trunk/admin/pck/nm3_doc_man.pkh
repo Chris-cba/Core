@@ -4,11 +4,11 @@ Is
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3_doc_man.pkh-arc   3.2   May 15 2014 13:31:24   Linesh.Sorathia  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3_doc_man.pkh-arc   3.3   Aug 14 2014 09:36:26   Linesh.Sorathia  $
 --       Module Name      : $Workfile:   nm3_doc_man.pkh  $
---       Date into PVCS   : $Date:   May 15 2014 13:31:24  $
---       Date fetched Out : $Modtime:   May 09 2014 10:20:30  $
---       Version          : $Revision:   3.2  $
+--       Date into PVCS   : $Date:   Aug 14 2014 09:36:26  $
+--       Date fetched Out : $Modtime:   Aug 12 2014 09:31:28  $
+--       Version          : $Revision:   3.3  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --</PACKAGE>
@@ -18,7 +18,7 @@ Is
   --constants
   -----------
   --g_sccsid is the SCCS ID for the package
-  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.2  $';
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.3  $';
 
   Type g_association_rec Is Record (featue_table_name Varchar2(500)
                                    ,feature_id        Varchar2(500)) ;
@@ -173,6 +173,22 @@ Return Varchar2;
 --
 -----------------------------------------------------------------------------
 --
+--<FUNC NAME="GET_HIG_USER_ID">
+-- Returns the hig user id from the mapped eB person id.
+FUNCTION get_hig_user_id(pi_person_id In Number)
+Return Number;
+--</FUNC>
+--
+-----------------------------------------------------------------------------
+--
+--<FUNC NAME="GET_EB_PERSON_ID">
+-- Returns the eB person id from the mapped hig user .
+FUNCTION get_eb_person_id(pi_hig_user_id In hig_users.hus_user_id%TYPE)
+Return Number;
+--</FUNC>
+--
+-----------------------------------------------------------------------------
+--
 --<PROC NAME="create_document_and_assocs">
 -- This procedure creates document in eB and associates it with the given association tab.
 PROCEDURE create_document_and_assocs(pi_template_id     In  Number
@@ -191,6 +207,16 @@ PROCEDURE create_document_and_assocs(pi_template_id     In  Number
 PROCEDURE create_document_and_assocs(pi_iit_ne_id       In  nm_inv_items.iit_ne_id%Type
                                     ,pi_inv_type        In  nm_inv_types.nit_inv_type%Type
                                     ,pi_photo           In  Varchar2);
+
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="copy_attributes">
+-- This procedure copies the mapped exor attributes on to eB document.
+PROCEDURE copy_attributes (pi_doc_id       In Number
+                          ,pi_gateway_name In Varchar2
+                          ,pi_feature_id   In Varchar2);
 
 --</PROC>
 --

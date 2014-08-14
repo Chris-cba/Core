@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3_doc_man.pkb-arc   3.1   May 15 2014 13:31:24   Linesh.Sorathia  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3_doc_man.pkb-arc   3.2   Aug 14 2014 09:36:26   Linesh.Sorathia  $
 --       Module Name      : $Workfile:   nm3_doc_man.pkb  $
---       Date into PVCS   : $Date:   May 15 2014 13:31:24  $
---       Date fetched Out : $Modtime:   May 09 2014 10:29:32  $
---       Version          : $Revision:   3.1  $
+--       Date into PVCS   : $Date:   Aug 14 2014 09:36:26  $
+--       Date fetched Out : $Modtime:   Aug 12 2014 09:28:12  $
+--       Version          : $Revision:   3.2  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.1  $';
+  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.2  $';
 
   g_package_name CONSTANT varchar2(30) := 'nm3_doc_man';
 --
@@ -212,9 +212,24 @@ PROCEDURE create_association(pi_object_type  In Number
                             ,pi_feature_id   In Varchar2)
 Is
    l_eea_rec eb_exor_associations%RowType;
+   l_cnt           Number ;
 --
 Begin
 --
+   Select Count(0) 
+   Into   l_cnt
+   From   eb_exor_associations
+         ,dm_attributes_map 
+   Where  eea_object_type = 3
+   And    eea_object_id= pi_object_id
+   And    eea_feature_table_name = dam_gateway_name ;
+
+   --Do not allow to associate the document which has attribute synchronised from exor feature.
+   If l_cnt >  0
+   Then       
+       Raise_Application_Error(-20101,'This document can be associated to only one feature.');
+   End if;            
+
    l_eea_rec.eea_object_type        := pi_object_type;
    l_eea_rec.eea_object_id          := pi_object_id ;
    l_eea_rec.eea_feature_table_name := pi_gateway_name;
@@ -431,7 +446,7 @@ Begin
    Where  gdo_session_id = pi_gdo_session_id ;
    If l_count > 1
    Then
-        Raise_Application_Error(-20400,'Document association with more than one item.');     
+        Raise_Application_Error(-20400,'More than one feature has been selected.');     
    End If;
    Open  c_getways ;
    Fetch c_getways Into l_gateway_name;
@@ -621,6 +636,92 @@ Exception
    Then
        return -1; 
 End get_default_template;
+--
+FUNCTION get_hig_user_id(pi_person_id In Number)
+Return Number
+Is
+--
+   l_hig_user_id hig_users.hus_user_id%TYPE;
+--
+Begin
+--
+   Select eeum_hus_user_id
+   Into   l_hig_user_id
+   From   dm_eb_exor_user_mappings
+   Where  eeum_person_id  = pi_person_id ;
+
+   Return l_hig_user_id;
+--
+Exception 
+   When No_Data_Found
+   Then 
+       Null;
+End ;
+--
+FUNCTION get_eb_person_id(pi_hig_user_id In hig_users.hus_user_id%TYPE)
+Return Number
+Is
+--
+   l_person_id Number;
+--
+Begin
+--
+   Select eeum_person_id
+   Into   l_person_id
+   From   dm_eb_exor_user_mappings
+   Where  eeum_hus_user_id  = pi_hig_user_id ;
+ 
+   Return l_person_id;
+--
+Exception 
+   When No_Data_Found
+   Then 
+       Null;
+End ;
+--
+PROCEDURE copy_attributes (pi_doc_id       In Number
+                          ,pi_gateway_name In Varchar2
+                          ,pi_feature_id   In Varchar2)
+Is
+   l_date_value     Date;
+   l_char_value     Varchar2(4000);
+   l_number_value   Number;
+Begin
+   For dam In (Select * From dm_attributes_map , doc_gateways 
+               Where  dam_gateway_name = pi_gateway_name
+               And    dam_gateway_name = dgt_table_name  
+               )
+   Loop
+       If dam.dam_data_type = 'DATE'
+       Then
+           Execute Immediate 'Select '||dam.dam_exor_column_name ||' From '||pi_gateway_name||
+                             ' Where '|| dam.dgt_pk_col_name || '= :1 '
+           Into    l_date_value
+           Using   pi_feature_id ;       
+       ElsIf dam.dam_data_type = 'VARCHAR2'
+       Then
+           Execute Immediate 'Select '||dam.dam_exor_column_name||' From '||pi_gateway_name||' Where '|| dam.dgt_pk_col_name || '= :1 '
+           Into    l_char_value
+           Using   pi_feature_id ;       
+       Else
+            Execute Immediate 'Select '||dam.dam_exor_column_name||' From '||pi_gateway_name||' Where '|| dam.dgt_pk_col_name || '= :1 '
+           Into    l_number_value
+           Using   pi_feature_id ;       
+       End If;        
+       If dam.dam_data_type = 'DATE'
+       Then
+           Execute Immediate 'Begin ebp_set_char_data(:1,:2,Null,Null,:3,Null,1); End ;  '
+           Using  pi_doc_id,dam.dam_eb_char_id,l_date_value;
+       Elsif dam.dam_data_type = 'VARCHAR2'
+       Then
+           Execute Immediate 'Begin ebp_set_char_data(:1,:2,:3,Null,Null,Null,1); End ;  '
+           Using  pi_doc_id ,dam.dam_eb_char_id,l_char_value ;
+       Else 
+           Execute Immediate 'Begin ebp_set_char_data(:1,:2,Null,:3,Null,Null,1); End ;  '
+           Using  pi_doc_id ,dam.dam_eb_char_id,l_number_value ;
+       End If ;       
+   End Loop;   
+End copy_attributes;
 --
 End nm3_doc_man;
 /
