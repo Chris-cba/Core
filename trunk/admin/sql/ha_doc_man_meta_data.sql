@@ -103,13 +103,33 @@ Declare
 --
 Begin
    Execute Immediate ' Create Public Synonym nm3_doc_man For nm3_doc_man ' ;
-   Execute Immediate ' GRANT EXECUTE ON NM3_DOC_MAN to public ' ;
+Exception
+  When l_exception Then
+  null;
+  When Others Then
+  Raise ;
+End ;
+/
+
+Declare
+--
+   l_exception exception;
+   pragma      exception_init(l_exception,-00955);
+--
+Begin
+   Execute Immediate ' Create Public Synonym WEB_USER_INFO For WEB_USER_INFO ' ;
    Execute Immediate ' Grant execute on WEB_USER_INFO to public ' ;
 Exception
   When l_exception Then
   null;
   When Others Then
   Raise ;
+End ;
+/
+
+Begin
+   Execute Immediate ' GRANT EXECUTE ON NM3_DOC_MAN   TO public ' ;
+   Execute Immediate ' Grant execute ON WEB_USER_INFO TO public ' ;
 End ;
 /
 
