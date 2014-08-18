@@ -118,7 +118,6 @@ Declare
 --
 Begin
    Execute Immediate ' Create Public Synonym WEB_USER_INFO For WEB_USER_INFO ' ;
-   Execute Immediate ' Grant execute on WEB_USER_INFO to public ' ;
 Exception
   When l_exception Then
   null;
@@ -133,25 +132,14 @@ Begin
 End ;
 /
 
-Declare
---
-   l_exception exception;
-   pragma      exception_init(l_exception,-00955);
---
+
 Begin
 --
-
    hig2.upgrade(p_product        => 'HIG'
               ,p_upgrade_script => 'ha_doc_man_meta_data.sql'
               ,p_remarks        => '04.07.15.10'
-              ,p_to_version     => Null); 
-           
+              ,p_to_version     => Null);            
 --
-Exception
-  When l_exception Then
-  null;
-  When Others Then
-  Raise ;
 End ;
 /
 
