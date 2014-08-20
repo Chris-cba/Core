@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3_doc_man.pkb-arc   3.2   Aug 14 2014 09:36:26   Linesh.Sorathia  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3_doc_man.pkb-arc   3.3   Aug 20 2014 09:16:16   Linesh.Sorathia  $
 --       Module Name      : $Workfile:   nm3_doc_man.pkb  $
---       Date into PVCS   : $Date:   Aug 14 2014 09:36:26  $
---       Date fetched Out : $Modtime:   Aug 12 2014 09:28:12  $
---       Version          : $Revision:   3.2  $
+--       Date into PVCS   : $Date:   Aug 20 2014 09:16:16  $
+--       Date fetched Out : $Modtime:   Aug 19 2014 21:18:30  $
+--       Version          : $Revision:   3.3  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.2  $';
+  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.3  $';
 
   g_package_name CONSTANT varchar2(30) := 'nm3_doc_man';
 --
@@ -655,7 +655,7 @@ Begin
 Exception 
    When No_Data_Found
    Then 
-       Null;
+       Return Null;
 End ;
 --
 FUNCTION get_eb_person_id(pi_hig_user_id In hig_users.hus_user_id%TYPE)
@@ -676,7 +676,7 @@ Begin
 Exception 
    When No_Data_Found
    Then 
-       Null;
+       Return Null;
 End ;
 --
 PROCEDURE copy_attributes (pi_doc_id       In Number
