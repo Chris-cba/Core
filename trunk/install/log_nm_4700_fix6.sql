@@ -1,0 +1,18 @@
+--
+--------------------------------------------------------------------------------
+--   Copyright (c) 2014 Bentley Systems Incorporated.
+--------------------------------------------------------------------------------
+--
+BEGIN
+--
+  hig2.upgrade(p_product        => 'NET'
+              ,p_upgrade_script => 'log_nm_4700_fix6.sql'
+              ,p_remarks        => 'NET 4700 FIX 6'
+              ,p_to_version     => Null);
+--
+  commit;
+--
+EXCEPTION
+  WHEN others THEN Null;
+END;
+/
