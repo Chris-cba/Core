@@ -3,13 +3,15 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3_doc_man.pkb-arc   3.3   Aug 20 2014 09:16:16   Linesh.Sorathia  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3_doc_man.pkb-arc   3.4   Sep 05 2014 14:46:56   Linesh.Sorathia  $
 --       Module Name      : $Workfile:   nm3_doc_man.pkb  $
---       Date into PVCS   : $Date:   Aug 20 2014 09:16:16  $
---       Date fetched Out : $Modtime:   Aug 19 2014 21:18:30  $
---       Version          : $Revision:   3.3  $
+--       Date into PVCS   : $Date:   Sep 05 2014 14:46:56  $
+--       Date fetched Out : $Modtime:   Sep 03 2014 11:06:58  $
+--       Version          : $Revision:   3.4  $
 --       Based on SCCS version : 
--------------------------------------------------------------------------
+------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+------------------------------------------------------------------
 --
 --all global package variables here
 
@@ -17,7 +19,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.3  $';
+  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.4  $';
 
   g_package_name CONSTANT varchar2(30) := 'nm3_doc_man';
 --
@@ -261,7 +263,7 @@ Begin
    NM3USER.SET_EFFECTIVE_DATE(sysdate);
    If pi_gateway_name Is Null
    Then 
-       Raise_Application_Error(-20048,'Gatway name is null');
+       Raise_Application_Error(-20048,'Gateway name is null');
    End If;
       
    Open  c_getways ;
@@ -502,7 +504,7 @@ Is
 --
    l_table_name       VARCHAR2(30);
    l_doc_id           docs.doc_id%TYPE;
-   l_iit_ne_id        nm_inv_items.iit_ne_id%TYPE;
+   l_iit_ne_id        nm_inv_items.iit_ne_id%TYPE := pi_iit_ne_id;
    l_doc_file         VARCHAR2(2000);
    l_rec_dlo          doc_locations%ROWTYPE;
    l_nit              nm_inv_types%ROWTYPE;
