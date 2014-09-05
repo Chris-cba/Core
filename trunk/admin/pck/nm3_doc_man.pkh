@@ -4,13 +4,15 @@ Is
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3_doc_man.pkh-arc   3.3   Aug 14 2014 09:36:26   Linesh.Sorathia  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3_doc_man.pkh-arc   3.4   Sep 05 2014 14:46:58   Linesh.Sorathia  $
 --       Module Name      : $Workfile:   nm3_doc_man.pkh  $
---       Date into PVCS   : $Date:   Aug 14 2014 09:36:26  $
---       Date fetched Out : $Modtime:   Aug 12 2014 09:31:28  $
---       Version          : $Revision:   3.3  $
+--       Date into PVCS   : $Date:   Sep 05 2014 14:46:58  $
+--       Date fetched Out : $Modtime:   Sep 03 2014 11:08:10  $
+--       Version          : $Revision:   3.4  $
 --       Based on SCCS version : 
--------------------------------------------------------------------------
+------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
 
@@ -18,7 +20,7 @@ Is
   --constants
   -----------
   --g_sccsid is the SCCS ID for the package
-  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.3  $';
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.4  $';
 
   Type g_association_rec Is Record (featue_table_name Varchar2(500)
                                    ,feature_id        Varchar2(500)) ;
