@@ -137,7 +137,7 @@ Begin
 --
    hig2.upgrade(p_product        => 'HIG'
               ,p_upgrade_script => 'ha_doc_man_meta_data.sql'
-              ,p_remarks        => '04.07.15.10'
+              ,p_remarks        => '04.07.15.13'
               ,p_to_version     => Null);            
 --
 End ;
