@@ -1,45 +1,53 @@
-CREATE OR replace force view nm_xsp (nwx_nw_type,
-                                     nwx_x_sect,
-                                     nwx_nsc_sub_class,
-                                     nwx_descr,
-                                     nwx_seq,
-                                     nwx_offset,
-                                     nwx_date_created,
-                                     nwx_date_modified,
-                                     nwx_modified_by,
-                                     nwx_created_by
-                                     ) AS
-SELECT
+CREATE OR REPLACE FORCE VIEW NM_XSP
+(
+   NWX_NW_TYPE,
+   NWX_X_SECT,
+   NWX_NSC_SUB_CLASS,
+   NWX_DESCR,
+   NWX_SEQ,
+   NWX_OFFSET,
+   NWX_DATE_CREATED,
+   NWX_DATE_MODIFIED,
+   NWX_MODIFIED_BY,
+   NWX_CREATED_BY
+)
+AS
 --
---   SCCS Identifiers :-
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
 --
---       sccsid           : @(#)nm_xsp.vw	1.1 03/30/04
---       Module Name      : nm_xsp.vw
---       Date into SCCS   : 04/03/30 09:56:59
---       Date fetched Out : 07/06/13 17:08:22
---       SCCS Version     : 1.1
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/nm_xsp.vw-arc   2.2   Sep 15 2014 14:34:16   Chris.Baugh  $
+--       Module Name      : $Workfile:   nm_xsp.vw  $
+--       Date into PVCS   : $Date:   Sep 15 2014 14:34:16  $
+--       Date fetched Out : $Modtime:   Sep 03 2014 14:09:28  $
+--       Version          : $Revision:   2.2  $
+-------------------------------------------------------------------------
 --
 -----------------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2014 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
-       nng.nng_nt_type,
-       nwx.nwx_x_sect,
-       nsc.nsc_sub_class,
-       nwx.nwx_descr,
-       nwx.nwx_seq,
-       nwx.nwx_offset,
-       nwx.nwx_date_created,
-       nwx.nwx_date_modified,
-       nwx.nwx_modified_by,
-       nwx.nwx_created_by
-FROM   nm_nw_xsp        nwx
-      ,nm_nt_groupings  nng
-      ,nm_linear_types  nlt
-      ,nm_type_subclass nsc
-WHERE  nwx.nwx_nw_type  = nlt.nlt_nt_type
-AND    nlt.nlt_gty_type = nng.nng_group_type
-AND    nng.nng_nt_type  = nsc.nsc_nw_type (+)
-UNION
-SELECT * 
-FROM   nm_nw_xsp;
+   SELECT nwx_nw_type,
+          nwx_x_sect,
+          nwx_nsc_sub_class,
+          NWX_DESCR,
+          NWX_SEQ,
+          NWX_OFFSET,
+          NWX_DATE_CREATED,
+          NWX_DATE_MODIFIED,
+          NWX_MODIFIED_BY,
+          NWX_CREATED_BY
+     FROM nm_nw_xsp
+   UNION
+   SELECT nng_nt_type,
+          nwx_x_sect,
+          nwx_nsc_sub_class,
+          NWX_DESCR,
+          NWX_SEQ,
+          NWX_OFFSET,
+          NWX_DATE_CREATED,
+          NWX_DATE_MODIFIED,
+          NWX_MODIFIED_BY,
+          NWX_CREATED_BY
+     FROM nm_nw_xsp, nm_nt_groupings, nm_group_types
+    WHERE ngt_group_type = nng_group_type AND ngt_nt_type = nwx_nw_type;
