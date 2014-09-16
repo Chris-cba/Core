@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3homo AS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3homo.pkb-arc   2.22   Jul 04 2013 16:04:12   James.Wadsworth  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3homo.pkb-arc   2.23   Sep 16 2014 11:01:12   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm3homo.pkb  $
---       Date into PVCS   : $Date:   Jul 04 2013 16:04:12  $
---       Date fetched Out : $Modtime:   Jul 04 2013 14:25:12  $
---       PVCS Version     : $Revision:   2.22  $
+--       Date into PVCS   : $Date:   Sep 16 2014 11:01:12  $
+--       Date fetched Out : $Modtime:   Sep 01 2014 13:13:34  $
+--       PVCS Version     : $Revision:   2.23  $
 --
 --
 --   Author : Jonathan Mills
@@ -40,7 +40,7 @@ CREATE OR REPLACE PACKAGE BODY nm3homo AS
    
    -- Log 713421
    
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.22  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.23  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3homo';
@@ -106,6 +106,13 @@ PROCEDURE deal_with_hierarchical (p_ne_id          NUMBER
 PROCEDURE check_item_has_no_future_locs (p_iit_ne_id      nm_inv_items.iit_ne_id%TYPE
                                         ,p_effective_date DATE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                                         );
+--
+-----------------------------------------------------------------------------
+--
+FUNCTION valid_xsp_on_pl (pi_pl       IN  NM_PLACEMENT_ARRAY, 
+                          pi_inv_type IN  nm_inv_items.iit_inv_type%TYPE, 
+                          pi_x_sect   IN  nm_inv_items.iit_x_sect%TYPE ) 
+  RETURN BOOLEAN;
 --
 -----------------------------------------------------------------------------
 --
@@ -264,7 +271,8 @@ PROCEDURE homo_update_old (p_temp_ne_id_in  IN     NUMBER
    c_nte_id_for_unchanged_locs CONSTANT NM_NW_TEMP_EXTENTS.nte_job_id%TYPE := nm3net.get_next_nte_id;
    c_nte_id                    CONSTANT NM_NW_TEMP_EXTENTS.nte_job_id%TYPE := nm3net.get_next_nte_id;
    l_remnant_job_id                     NM_NW_TEMP_EXTENTS.nte_job_id%TYPE;
-
+--
+   l_valid_xsp   BOOLEAN;
 --
    PROCEDURE reset_for_return IS
    BEGIN
@@ -738,53 +746,17 @@ BEGIN
             --
             -- For all the elements on which this item is being located, check XSP restraints
             --
-            DECLARE
-               l_last_rec_ne  NM_ELEMENTS%ROWTYPE;
-               l_local_rec_ne NM_ELEMENTS%ROWTYPE;
-               l_ne_id        NM_ELEMENTS.ne_id%TYPE;
-               l_tab_ne_id_ok nm3type.tab_boolean;
-            BEGIN
-               l_last_rec_ne.ne_nt_type   := nm3type.c_nvl;
-               l_last_rec_ne.ne_sub_class := nm3type.c_nvl;
-               FOR j IN 1..l_new_inv_pl_arr.placement_count
-                LOOP
-                  l_ne_id := l_new_inv_pl_arr.get_entry(j).pl_ne_id;
-                  --
-                  IF NOT l_tab_ne_id_ok.EXISTS(l_ne_id)
-                   THEN -- Only check for NE_IDs we haven't already checked - no point wasting time
-                  --
-                     l_local_rec_ne := nm3net.get_ne (l_ne_id);
-                     IF  l_local_rec_ne.ne_nt_type                      != l_last_rec_ne.ne_nt_type
-                      OR NVL(l_local_rec_ne.ne_sub_class,nm3type.c_nvl) != NVL(l_last_rec_ne.ne_sub_class,nm3type.c_nvl)
-                      THEN -- Only check if the NT_TYPE or the SUBCLASS has changed from the previous record. no point otherwise
-                        DECLARE
-                           l_xsr_descr  XSP_RESTRAINTS.xsr_descr%TYPE;
-                           no_xsr_found EXCEPTION;
-                           PRAGMA EXCEPTION_INIT (no_xsr_found,-20001);
-                        BEGIN
-                           l_xsr_descr := nm3inv.get_xsp_descr
-                                             (p_inv_type   => l_rec_iit.iit_inv_type
-                                             ,p_x_sect_val => l_rec_iit.iit_x_sect
-                                             ,p_nw_type    => l_local_rec_ne.ne_nt_type
-                                             ,p_scl_class  => l_local_rec_ne.ne_sub_class
-                                             );
-                        EXCEPTION
-                           WHEN no_xsr_found
-                            THEN
-                              g_homo_exc_code := -20508;
-                              g_homo_exc_msg  := 'XSP "'||l_rec_iit.iit_x_sect||'" is not allowed for Inventory type "'
-                                                 ||l_rec_iit.iit_inv_type||'" on NW_TYPE "'||l_local_rec_ne.ne_nt_type||'"'
-                                                 ||', SUB_CLASS "'||l_local_rec_ne.ne_sub_class||'"';
-                              RAISE g_homo_exception;
-                        END;
-                     END IF;
-                     l_last_rec_ne           := l_local_rec_ne;
-                     l_tab_ne_id_ok(l_ne_id) := TRUE;
-                  END IF;
-                  --
-               END LOOP;
-                  --
-            END;
+            IF NOT valid_xsp_on_pl (pi_pl       => l_new_inv_pl_arr, 
+                                    pi_inv_type => l_rec_iit.iit_inv_type, 
+                                    pi_x_sect   => l_rec_iit.iit_x_sect ) 
+            THEN
+              g_homo_exc_code := -20508;
+              g_homo_exc_msg  := 'XSP "'||l_rec_iit.iit_x_sect||'" is not allowed for Inventory type "'
+                                 ||l_rec_iit.iit_inv_type;--||'" on NW_TYPE "'||l_local_rec_ne.ne_nt_type||'"'
+                                 --||', SUB_CLASS "'||l_local_rec_ne.ne_sub_class||'"';
+              RAISE g_homo_exception;
+            END IF;
+            
          END IF;
       END IF;
    --
@@ -5650,6 +5622,48 @@ BEGIN
   RETURN l_target_job_id;
 
 END translate_location_in_time;
+
+FUNCTION valid_xsp_on_pl (pi_pl       IN  NM_PLACEMENT_ARRAY, 
+                          pi_inv_type IN  nm_inv_items.iit_inv_type%TYPE, 
+                          pi_x_sect   IN  nm_inv_items.iit_x_sect%TYPE ) 
+  RETURN BOOLEAN IS
+  --
+  lv_retval BOOLEAN := FALSE;
+  l_dummy integer;
+  --
+BEGIN
+  --
+  SELECT 1 
+    INTO l_dummy 
+    FROM dual 
+   WHERE EXISTS (SELECT t.pl_ne_id 
+                   FROM TABLE(CAST(pi_pl.npa_placement_array AS nm_placement_array_type)) t
+                  WHERE NOT EXISTS (SELECT 1 
+                                      FROM nm_elements, 
+                                           nm_members, 
+                                           xsp_restraints 
+                                     WHERE nm_ne_id_of = t.pl_ne_id
+                                       AND nm_ne_id_in = ne_id
+                                       AND ne_sub_class = xsr_scl_class
+                                       AND xsr_x_sect_value = pi_x_sect
+                                       AND xsr_ity_inv_code = pi_inv_type
+                                       AND xsr_nw_type = ne_nt_type
+                                    UNION ALL
+                                    SELECT ne_id 
+                                      FROM nm_elements, 
+                                           xsp_restraints 
+                                     WHERE ne_id = t.pl_ne_id
+                                       AND ne_sub_class = xsr_scl_class
+                                       AND xsr_x_sect_value = pi_x_sect
+                                       AND xsr_ity_inv_code = pi_inv_type
+                                       AND xsr_nw_type = ne_nt_type ) );
+  lv_retval := FALSE;
+  RETURN lv_retval;
+EXCEPTION
+  WHEN NO_DATA_FOUND THEN
+    return TRUE;
+END valid_xsp_on_pl;
+--    
 --
 -----------------------------------------------------------------------------
 --
