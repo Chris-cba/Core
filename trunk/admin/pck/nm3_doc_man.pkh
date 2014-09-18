@@ -4,11 +4,11 @@ Is
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3_doc_man.pkh-arc   3.4   Sep 05 2014 14:46:58   Linesh.Sorathia  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3_doc_man.pkh-arc   3.5   Sep 18 2014 10:29:48   Linesh.Sorathia  $
 --       Module Name      : $Workfile:   nm3_doc_man.pkh  $
---       Date into PVCS   : $Date:   Sep 05 2014 14:46:58  $
---       Date fetched Out : $Modtime:   Sep 03 2014 11:08:10  $
---       Version          : $Revision:   3.4  $
+--       Date into PVCS   : $Date:   Sep 18 2014 10:29:48  $
+--       Date fetched Out : $Modtime:   Sep 16 2014 13:00:54  $
+--       Version          : $Revision:   3.5  $
 --       Based on SCCS version : 
 ------------------------------------------------------------------
 --   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
@@ -20,7 +20,7 @@ Is
   --constants
   -----------
   --g_sccsid is the SCCS ID for the package
-  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.4  $';
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.5  $';
 
   Type g_association_rec Is Record (featue_table_name Varchar2(500)
                                    ,feature_id        Varchar2(500)) ;
@@ -73,6 +73,14 @@ PROCEDURE get_templates(pi_gateway_name In  Varchar2
 FUNCTION get_default_template(pi_gateway_name In  Varchar2)
 Return Number ;
 --</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<FUNC NAME="GET_EB_TEMPLATE_FOR_AU">
+-- This function returns the eb template id mapped to exor admin unit.
+FUNCTION get_eb_template_for_au(pi_admin_unit In  Number)
+Return Number ;
+--</FUNC>
 --
 
 -----------------------------------------------------------------------------
