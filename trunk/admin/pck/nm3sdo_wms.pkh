@@ -1,0 +1,297 @@
+CREATE OR REPLACE PACKAGE nm3sdo_wms AS
+  -------------------------------------------------------------------------
+  --   PVCS Identifiers :-
+  --
+  --       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_wms.pkh-arc   3.0   Sep 18 2014 13:10:04   Mike.Huitson  $
+  --       Module Name      : $Workfile:   nm3sdo_wms.pkh  $
+  --       Date into PVCS   : $Date:   Sep 18 2014 13:10:04  $
+  --       Date fetched Out : $Modtime:   Sep 16 2014 15:19:08  $
+  --       Version          : $Revision:   3.0  $
+  --       Based on SCCS version : 1.1
+  -------------------------------------------------------------------------
+  --   Author : I Turnbull
+  --
+  --    nm3sdo_xml
+  --
+  -----------------------------------------------------------------------------
+  --   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+  -----------------------------------------------------------------------------
+  --g_sccsid is the SCCS ID for the package
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.0  $';
+  --
+  TYPE wms_theme_rec IS RECORD(nwt_id                  nm_wms_themes.nwt_id%TYPE
+                              ,nwt_name                nm_wms_themes.nwt_name%TYPE
+                              ,nwt_is_background       nm_wms_themes.nwt_is_background%TYPE
+                              ,nwt_transparency        nm_wms_themes.nwt_transparency%TYPE
+                              ,nwt_visible_on_startup  nm_wms_themes.nwt_visible_on_startup%TYPE
+                              ,description             VARCHAR2(4000)
+                              ,service_url             VARCHAR2(4000)
+                              ,auth_user               VARCHAR2(4000)
+                              ,auth_password           VARCHAR2(4000)
+                              ,version                 VARCHAR2(4000)
+                              ,srs                     VARCHAR2(4000)
+                              ,format                  VARCHAR2(4000)
+                              ,bgcolor                 VARCHAR2(4000)
+                              ,transparent             VARCHAR2(4000)
+                              ,exceptions              VARCHAR2(4000)
+                              ,capabilities_url        VARCHAR2(4000));
+  TYPE wms_theme_tab IS TABLE OF wms_theme_rec INDEX BY BINARY_INTEGER;
+  --
+  TYPE wms_theme_layer_rec IS RECORD(theme_name  nm_wms_themes.nwt_name%TYPE
+                                    ,layer_name  VARCHAR2(4000));
+  TYPE wms_theme_layer_tab IS TABLE OF wms_theme_layer_rec INDEX BY BINARY_INTEGER;
+  --
+  TYPE wms_theme_param_rec IS RECORD(theme_name   nm_wms_themes.nwt_name%TYPE
+                                    ,param_name   VARCHAR2(4000)
+                                    ,param_value  VARCHAR2(4000));
+  TYPE wms_theme_param_tab IS TABLE OF wms_theme_param_rec INDEX BY BINARY_INTEGER;
+  --
+  TYPE wms_theme_style_rec IS RECORD(theme_name  nm_wms_themes.nwt_name%TYPE
+                                    ,style_name  VARCHAR2(4000));
+  TYPE wms_theme_style_tab IS TABLE OF wms_theme_style_rec INDEX BY BINARY_INTEGER;
+  --
+  -----------------------------------------------------------------------------
+  --
+  -- This function returns the current SCCS version
+  FUNCTION get_version
+    RETURN VARCHAR2;
+
+  --
+  -----------------------------------------------------------------------------
+  --
+  -- This function returns the current SCCS version of the package body
+  FUNCTION get_body_version
+    RETURN VARCHAR2;
+
+  --
+  -----------------------------------------------------------------------------
+  --
+  FUNCTION tokenise_clob(pi_clob        IN CLOB
+                        ,pi_token       IN VARCHAR2 DEFAULT ','
+                        ,pi_trim_values IN BOOLEAN DEFAULT TRUE)
+    RETURN nm_max_varchar_tbl;
+
+  --
+  -----------------------------------------------------------------------------
+  --
+  FUNCTION get_wms_theme_name(pi_nwt_id IN nm_wms_themes.nwt_id%TYPE)
+    RETURN nm_wms_themes.nwt_name%TYPE;
+
+  --
+  -----------------------------------------------------------------------------
+  --
+  PROCEDURE ins_nwt(pio_nwt_rec IN OUT nm_wms_themes%ROWTYPE);
+
+  --
+  -----------------------------------------------------------------------------
+  --
+  PROCEDURE ins_nwtr(pio_nwtr_rec IN OUT nm_wms_theme_roles%ROWTYPE);
+
+  --
+  -----------------------------------------------------------------------------
+  --
+  PROCEDURE get_wms_theme(pi_nwt_id IN  nm_wms_themes.nwt_id%TYPE
+                         ,po_cursor OUT sys_refcursor);
+
+  --
+  -----------------------------------------------------------------------------
+  --
+  FUNCTION get_wms_theme(pi_nwt_id IN nm_wms_themes.nwt_id%TYPE)
+    RETURN sys_refcursor;
+
+  --
+  -----------------------------------------------------------------------------
+  --
+  PROCEDURE get_wms_themes(po_cursor IN OUT sys_refcursor);
+
+  --
+  -----------------------------------------------------------------------------
+  --
+  FUNCTION get_wms_themes
+    RETURN sys_refcursor;
+
+  --
+  -----------------------------------------------------------------------------
+  --
+  FUNCTION get_wms_theme_tab
+    RETURN wms_theme_tab;
+
+  --
+  -----------------------------------------------------------------------------
+  --
+  PROCEDURE get_wms_theme_tab(po_wms_themes IN OUT wms_theme_tab);
+
+  --
+  -----------------------------------------------------------------------------
+  --
+  PROCEDURE get_map_wms_themes(pi_map_name IN  VARCHAR2
+                              ,po_cursor   OUT sys_refcursor);
+
+  --
+  -----------------------------------------------------------------------------
+  --
+  FUNCTION get_map_wms_themes(pi_map_name IN VARCHAR2)
+    RETURN sys_refcursor;
+
+  --
+  -----------------------------------------------------------------------------
+  --
+  FUNCTION get_map_wms_theme_tab(pi_map_name IN VARCHAR2)
+    RETURN wms_theme_tab;
+
+  --
+  -----------------------------------------------------------------------------
+  --
+  PROCEDURE get_map_wms_theme_tab(pi_map_name   IN     VARCHAR2
+                                 ,po_wms_themes IN OUT wms_theme_tab);
+
+  --
+  -----------------------------------------------------------------------------
+  --
+  PROCEDURE get_wms_theme_layers(pi_nwt_name IN  nm_wms_themes.nwt_name%TYPE
+                                ,po_cursor   OUT sys_refcursor);
+
+  --
+  -----------------------------------------------------------------------------
+  --
+  FUNCTION get_wms_theme_layers(pi_nwt_name IN nm_wms_themes.nwt_name%TYPE)
+    RETURN sys_refcursor;
+
+  --
+  -----------------------------------------------------------------------------
+  --
+  FUNCTION get_wms_theme_layer_tab(pi_nwt_name IN nm_wms_themes.nwt_name%TYPE)
+    RETURN wms_theme_layer_tab;
+
+  --
+  -----------------------------------------------------------------------------
+  --
+  PROCEDURE get_wms_theme_layer_tab(pi_nwt_name         IN     nm_wms_themes.nwt_name%TYPE
+                                   ,po_wms_theme_layers IN OUT wms_theme_layer_tab);
+
+  --
+  -----------------------------------------------------------------------------
+  --
+  FUNCTION get_wms_theme_layers(pi_nwt_id IN nm_wms_themes.nwt_id%TYPE)
+    RETURN sys_refcursor;
+
+  --
+  -----------------------------------------------------------------------------
+  --
+  PROCEDURE get_wms_theme_layers(pi_nwt_id IN  nm_wms_themes.nwt_id%TYPE
+                                ,po_cursor OUT sys_refcursor);
+
+  --
+  -----------------------------------------------------------------------------
+  --
+  FUNCTION get_wms_theme_layer_tab(pi_nwt_id IN nm_wms_themes.nwt_id%TYPE)
+    RETURN wms_theme_layer_tab;
+
+  --
+  -----------------------------------------------------------------------------
+  --
+  PROCEDURE get_wms_theme_layer_tab(pi_nwt_id           IN     nm_wms_themes.nwt_id%TYPE
+                                   ,po_wms_theme_layers IN OUT wms_theme_layer_tab);
+
+  --
+  -----------------------------------------------------------------------------
+  --
+  PROCEDURE get_wms_theme_params(pi_nwt_name IN  nm_wms_themes.nwt_name%TYPE
+                                ,po_cursor   OUT sys_refcursor);
+
+  --
+  -----------------------------------------------------------------------------
+  --
+  FUNCTION get_wms_theme_params(pi_nwt_name IN nm_wms_themes.nwt_name%TYPE)
+    RETURN sys_refcursor;
+
+  --
+  -----------------------------------------------------------------------------
+  --
+  FUNCTION get_wms_theme_param_tab(pi_nwt_name IN nm_wms_themes.nwt_name%TYPE)
+    RETURN wms_theme_param_tab;
+
+  --
+  -----------------------------------------------------------------------------
+  --
+  PROCEDURE get_wms_theme_param_tab(pi_nwt_name         IN nm_wms_themes.nwt_name%TYPE
+                                   ,po_wms_theme_params IN OUT wms_theme_param_tab);
+
+  --
+  -----------------------------------------------------------------------------
+  --
+  PROCEDURE get_wms_theme_params(pi_nwt_id IN  nm_wms_themes.nwt_id%TYPE
+                                ,po_cursor OUT sys_refcursor);
+
+  --
+  -----------------------------------------------------------------------------
+  --
+  FUNCTION get_wms_theme_params(pi_nwt_id IN nm_wms_themes.nwt_id%TYPE)
+    RETURN sys_refcursor;
+
+  --
+  -----------------------------------------------------------------------------
+  --
+  FUNCTION get_wms_theme_param_tab(pi_nwt_id IN nm_wms_themes.nwt_id%TYPE)
+    RETURN wms_theme_param_tab;
+
+  --
+  -----------------------------------------------------------------------------
+  --
+  PROCEDURE get_wms_theme_param_tab(pi_nwt_id           IN     nm_wms_themes.nwt_id%TYPE
+                                   ,po_wms_theme_params IN OUT wms_theme_param_tab);
+
+  --
+  -----------------------------------------------------------------------------
+  --
+  PROCEDURE get_wms_theme_styles(pi_nwt_name IN  nm_wms_themes.nwt_name%TYPE
+                                ,po_cursor   OUT sys_refcursor);
+
+  --
+  -----------------------------------------------------------------------------
+  --
+  FUNCTION get_wms_theme_styles(pi_nwt_name IN nm_wms_themes.nwt_name%TYPE)
+    RETURN sys_refcursor;
+
+  --
+  -----------------------------------------------------------------------------
+  --
+  FUNCTION get_wms_theme_style_tab(pi_nwt_name IN nm_wms_themes.nwt_name%TYPE)
+    RETURN wms_theme_style_tab;
+
+  --
+  -----------------------------------------------------------------------------
+  --
+  PROCEDURE get_wms_theme_style_tab(pi_nwt_name         IN nm_wms_themes.nwt_name%TYPE
+                                   ,po_wms_theme_styles IN OUT wms_theme_style_tab);
+
+  --
+  -----------------------------------------------------------------------------
+  --
+  PROCEDURE get_wms_theme_styles(pi_nwt_id IN  nm_wms_themes.nwt_id%TYPE
+                                ,po_cursor OUT sys_refcursor);
+
+  --
+  -----------------------------------------------------------------------------
+  --
+  FUNCTION get_wms_theme_styles(pi_nwt_id IN nm_wms_themes.nwt_id%TYPE)
+    RETURN sys_refcursor;
+
+  --
+  -----------------------------------------------------------------------------
+  --
+  FUNCTION get_wms_theme_style_tab(pi_nwt_id IN nm_wms_themes.nwt_id%TYPE)
+    RETURN wms_theme_style_tab;
+
+  --
+  -----------------------------------------------------------------------------
+  --
+  PROCEDURE get_wms_theme_style_tab(pi_nwt_id           IN     nm_wms_themes.nwt_id%TYPE
+                                   ,po_wms_theme_styles IN OUT wms_theme_style_tab);
+
+--
+-------------------------------------------------------------------------------
+--
+END nm3sdo_wms;
+/
+
