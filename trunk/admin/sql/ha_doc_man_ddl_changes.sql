@@ -259,3 +259,39 @@ Exception
   Raise ;
 End ;
 /
+
+Declare
+--
+   l_exception exception;
+   pragma      exception_init(l_exception,-00955);
+--
+Begin
+--
+   Execute Immediate           ' Create Table dm_au_eb_template_mappings(  '||
+                               ' daet_admin_unit_id Number Not Null       '||
+                               ',daet_template_id   Number Not Null)      ';
+--
+Exception
+  When l_exception Then
+  null;
+  When Others Then
+  Raise ;
+End ;
+/
+
+Declare
+--
+   l_exception exception;
+   pragma      exception_init(l_exception,-02261);
+--
+Begin
+--
+   Execute Immediate ' Alter table dm_au_eb_template_mappings Add Constraint daet_uk Unique (daet_admin_unit_id,daet_template_id) ';
+--
+Exception
+  When l_exception Then
+  null;
+  When Others Then
+  Raise ;
+End ;
+/
