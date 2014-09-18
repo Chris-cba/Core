@@ -1516,11 +1516,10 @@ start '&run_file'
 ----------------------------------------------------------------------------------------- 
 --
 SET TERM ON 
-PROMPT nm_xsp_related_inv_types.vw
+PROMPT v_nm_wms_themes.vw
 SET TERM OFF
 SET DEFINE ON 
-SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'views'||'&terminator'||'nm_xsp_related_inv_types.vw' run_file 
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'views'||'&terminator'||'v_nm_wms_themes.vw' run_file 
 FROM dual 
 / 
 start '&run_file'
-
