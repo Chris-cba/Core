@@ -1,0 +1,19 @@
+CREATE OR REPLACE TYPE nm_max_varchar_tbl
+-----------------------------------------------------------------------------
+--
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/typ/nm_max_varchar_tbl.tyh-arc   3.1   Sep 18 2014 13:37:42   Mike.Huitson  $
+--       Module Name      : $Workfile:   nm_max_varchar_tbl.tyh  $
+--       Date into PVCS   : $Date:   Sep 18 2014 13:37:42  $
+--       Date fetched Out : $Modtime:   Sep 18 2014 13:36:52  $
+--       Version          : $Revision:   3.1  $
+--
+--   Product upgrade script
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
+AS TABLE OF VARCHAR2(32767)
+/
