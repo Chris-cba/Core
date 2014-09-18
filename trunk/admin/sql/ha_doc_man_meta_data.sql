@@ -128,16 +128,19 @@ End ;
 
 Begin
    Execute Immediate ' GRANT EXECUTE ON NM3_DOC_MAN   TO public ' ;
-   Execute Immediate ' Grant execute ON WEB_USER_INFO TO public ' ;
 End ;
 /
 
+Begin
+   Execute Immediate ' Grant execute ON WEB_USER_INFO TO public ' ;
+End ;
+/
 
 Begin
 --
    hig2.upgrade(p_product        => 'HIG'
               ,p_upgrade_script => 'ha_doc_man_meta_data.sql'
-              ,p_remarks        => '04.07.15.13'
+              ,p_remarks        => '04.07.15.14'
               ,p_to_version     => Null);            
 --
 End ;
