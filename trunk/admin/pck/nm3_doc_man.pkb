@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3_doc_man.pkb-arc   3.4   Sep 05 2014 14:46:56   Linesh.Sorathia  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3_doc_man.pkb-arc   3.5   Sep 18 2014 10:28:28   Linesh.Sorathia  $
 --       Module Name      : $Workfile:   nm3_doc_man.pkb  $
---       Date into PVCS   : $Date:   Sep 05 2014 14:46:56  $
---       Date fetched Out : $Modtime:   Sep 03 2014 11:06:58  $
---       Version          : $Revision:   3.4  $
+--       Date into PVCS   : $Date:   Sep 18 2014 10:28:28  $
+--       Date fetched Out : $Modtime:   Sep 16 2014 13:25:20  $
+--       Version          : $Revision:   3.5  $
 --       Based on SCCS version : 
 ------------------------------------------------------------------
 --   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
@@ -19,7 +19,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.4  $';
+  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.5  $';
 
   g_package_name CONSTANT varchar2(30) := 'nm3_doc_man';
 --
@@ -298,7 +298,7 @@ Begin
                      '                    ,ps_title           => :3 '||
                      '                    ,ps_remarks         => :4 '||
                      '                    ,pdt_date_effective => :5 '||
-                     '                    ,pi_called_by       => 1  '||
+                     '                    ,pi_called_by       =>  1 '||
                      '                    ,pi_doc_id          => :6 ); '||
                      ' End ; ' Using pi_template_id,pi_prefix,pi_title,pi_remarks,pi_date_issued,Out l_document_id ;
    For i In 1..pi_association_tab.Count
@@ -724,6 +724,29 @@ Begin
        End If ;       
    End Loop;   
 End copy_attributes;
+--
+FUNCTION get_eb_template_for_au(pi_admin_unit In  Number)
+Return Number
+Is
+--
+   Cursor c_eb_template
+   Is
+   Select daet_template_id
+   From   dm_au_eb_template_mappings
+   Where  daet_admin_unit_id = pi_admin_unit ; 
+
+   l_eb_template_id Number ;
+--
+Begin
+--
+   Open  c_eb_template;
+   Fetch c_eb_template Into l_eb_template_id;
+   Close c_eb_template;
+
+   Return l_eb_template_id ; 
+
+--
+End get_eb_template_for_au;
 --
 End nm3_doc_man;
 /
