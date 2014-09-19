@@ -2,11 +2,11 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm_4700_fix8.sql-arc   3.0   Sep 19 2014 17:38:42   Mike.Huitson  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm_4700_fix8.sql-arc   3.1   Sep 19 2014 18:03:58   Mike.Huitson  $
 --       Module Name      : $Workfile:   nm_4700_fix8.sql  $
---       Date into PVCS   : $Date:   Sep 19 2014 17:38:42  $
---       Date fetched Out : $Modtime:   Sep 19 2014 14:03:52  $
---       PVCS Version     : $Revision:   3.0  $
+--       Date into PVCS   : $Date:   Sep 19 2014 18:03:58  $
+--       Date fetched Out : $Modtime:   Sep 19 2014 18:03:10  $
+--       PVCS Version     : $Revision:   3.1  $
 --
 --------------------------------------------------------------------------------
 --   Copyright (c) 2014 Bentley Systems Incorporated.
@@ -201,7 +201,7 @@ DECLARE
   PRAGMA exception_init( obj_exists, -955);
 BEGIN
   EXECUTE IMMEDIATE 'CREATE TABLE nm_wms_theme_roles'
-                    ||'(nwtr_nwt_id  NUMBER(9)     NOT NULL'
+                    ||'(nwtr_nwt_id  NUMBER(38)     NOT NULL'
                     ||',nwtr_role    VARCHAR2(30)  NOT NULL)';
 EXCEPTION
   WHEN obj_exists THEN
