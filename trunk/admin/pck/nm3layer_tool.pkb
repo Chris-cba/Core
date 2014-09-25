@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3layer_tool.pkb-arc   2.32   Jul 04 2013 16:13:10   James.Wadsworth  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3layer_tool.pkb-arc   2.33   Sep 25 2014 14:37:30   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3layer_tool.pkb  $
---       Date into PVCS   : $Date:   Jul 04 2013 16:13:10  $
---       Date fetched Out : $Modtime:   Jul 04 2013 16:12:48  $
---       Version          : $Revision:   2.32  $
+--       Date into PVCS   : $Date:   Sep 25 2014 14:37:30  $
+--       Date fetched Out : $Modtime:   Sep 25 2014 14:29:32  $
+--       Version          : $Revision:   2.33  $
 --       Based on SCCS version : 1.11
 ------------------------------------------------------------------
 --   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
@@ -16,7 +16,7 @@ AS
 --
 --all global package variables here
 --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000)       := '$Revision:   2.32  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000)       := '$Revision:   2.33  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name   CONSTANT VARCHAR2 (30)         := 'NM3LAYER_TOOL';
@@ -38,6 +38,8 @@ AS
 --
 -----------------------------------------------------------------------------
 --
+   procedure index_generation(p_table in varchar2);
+   procedure index_drop (p_table in varchar2);   
  /*
    PRIVATE CURSORS
  */
@@ -2683,21 +2685,30 @@ AS
     --  
        if l_spatial_ind_name is not null then
        BEGIN
-         execute immediate 'ALTER INDEX ' || l_spatial_ind_name || ' PARAMETERS (''index_status=deferred'')';
+--         execute immediate 'ALTER INDEX ' || l_spatial_ind_name || ' PARAMETERS (''index_status=deferred'')';
+         execute immediate ' drop index '||l_spatial_ind_name;
        EXCEPTION
        WHEN OTHERS THEN
-         NULL;-- IF THE INDEX IS ALREADY DEFERRED CARRY ON.
+         NULL;-- IF THE INDEX IS ALREADY DEFERRED CARRY ON.- also carry on if it did not exist
        END;
        end if;
     --   
+       index_drop(P_TABLE => l_feature_table );
+       
        nm3sdo.create_non_linear_data( p_table_name => l_feature_table
                                     , p_gty_type   => pi_gty_type
                                     , p_seq_name   => l_sequence_name
                                     , p_job_id     => pi_job_id);
     --
-       if l_spatial_ind_name is not null then  
-         execute immediate 'ALTER INDEX ' || l_spatial_ind_name || ' PARAMETERS (''index_status=synchronize'')';
-       end if;
+    
+       nm3sdo.create_spatial_idx ( p_table => l_feature_table, p_column => 'GEOLOC' );
+       
+       index_generation(p_table => l_feature_table);
+       
+       
+         
+--         execute immediate 'ALTER INDEX ' || l_spatial_ind_name || ' PARAMETERS (''index_status=synchronize'')';
+--       end if;
     --
        -- Refresh Stats CWS 0109217
        BEGIN
@@ -5765,6 +5776,59 @@ END get_srid;
 --
 -----------------------------------------------------------------------------
 --
+  procedure index_generation (p_table in varchar2) is
+  cur_string varchar2(4000);
+  begin
+    cur_string := 'alter table '
+                 || p_Table
+                 || ' ADD CONSTRAINT '
+                 || p_Table
+                 || '_PK PRIMARY KEY '
+                 || ' ( ne_id, ne_id_of, nm_begin_mp, start_date '
+                 || ' )';
+
+    Execute Immediate Cur_String;
+
+    If Nm3Sdo.Use_Surrogate_Key = 'Y' Then
+      Cur_String := 'alter table '
+                 || p_Table
+                 || ' ADD ( CONSTRAINT '
+                 || p_Table
+                 || '_UK UNIQUE '
+                 || ' ( objectid ))';
+
+      Execute Immediate Cur_String;
+
+     End If; -- surrogate key
+
+     Cur_String := 'create index '|| p_Table
+                || '_NW_IDX'|| ' on '|| p_Table|| ' ( ne_id_of, nm_begin_mp )';
+
+     Execute Immediate Cur_String;
+   end;
+
+procedure index_drop (p_table in varchar2) is
+  cursor c1 (c_table in varchar2) is
+    select constraint_name from all_constraints
+    where table_name = c_table
+    and owner = sys_context('NM3CORE', 'APPLICATION_OWNER');
+--
+  cursor c2 (c_table in varchar2) is
+    select index_name from all_indexes
+    where table_name = c_table
+    and owner = sys_context('NM3CORE', 'APPLICATION_OWNER');
+--
+begin
+  for irec in c1(p_table) loop
+    execute immediate 'alter table '||p_table||' drop constraint '||irec.constraint_name;
+  end loop;
+--
+  for irec in c2(p_table) loop
+    execute immediate 'drop index '||irec.index_name;
+  end loop;
+
+end;   
+                 
 END nm3layer_tool;
 /
 
