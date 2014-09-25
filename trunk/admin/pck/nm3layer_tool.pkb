@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3layer_tool.pkb-arc   2.33   Sep 25 2014 14:37:30   Rob.Coupe  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3layer_tool.pkb-arc   2.34   Sep 25 2014 14:59:54   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3layer_tool.pkb  $
---       Date into PVCS   : $Date:   Sep 25 2014 14:37:30  $
---       Date fetched Out : $Modtime:   Sep 25 2014 14:29:32  $
---       Version          : $Revision:   2.33  $
+--       Date into PVCS   : $Date:   Sep 25 2014 14:59:54  $
+--       Date fetched Out : $Modtime:   Sep 25 2014 14:54:06  $
+--       Version          : $Revision:   2.34  $
 --       Based on SCCS version : 1.11
 ------------------------------------------------------------------
 --   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
@@ -16,7 +16,7 @@ AS
 --
 --all global package variables here
 --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000)       := '$Revision:   2.33  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000)       := '$Revision:   2.34  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name   CONSTANT VARCHAR2 (30)         := 'NM3LAYER_TOOL';
@@ -2680,9 +2680,14 @@ AS
                                   , 'Cannot refresh this layer - there is no non-linear base Theme available');
        END IF;
     --  Find the name of the spatial index
-       l_spatial_ind_name := get_spatial_index ( pi_table_name  => l_feature_table
-                                               , pi_column_name => l_feature_shape_column);
-    --  
+	   begin
+         l_spatial_ind_name := get_spatial_index ( pi_table_name  => l_feature_table
+                                                 , pi_column_name => l_feature_shape_column);
+       exception
+	     when ex_no_spdix then
+		   NULL; -- we do not need an index - will drop it anyway
+       end;
+		   --  
        if l_spatial_ind_name is not null then
        BEGIN
 --         execute immediate 'ALTER INDEX ' || l_spatial_ind_name || ' PARAMETERS (''index_status=deferred'')';
