@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 --
 ---   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.80   Sep 25 2014 14:42:26   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.81   Sep 25 2014 16:55:58   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3sdo.pkb  $
---       Date into PVCS   : $Date:   Sep 25 2014 14:42:26  $
---       Date fetched Out : $Modtime:   Sep 25 2014 14:28:24  $
---       PVCS Version     : $Revision:   2.80  $
+--       Date into PVCS   : $Date:   Sep 25 2014 16:55:58  $
+--       Date fetched Out : $Modtime:   Sep 25 2014 16:54:32  $
+--       PVCS Version     : $Revision:   2.81  $
 --       Based on
 ------------------------------------------------------------------
 --   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
@@ -22,10 +22,11 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 -- Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 
-   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.80  $"';
+   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.81  $"';
    g_package_name    CONSTANT VARCHAR2 (30)  := 'NM3SDO';
    g_batch_size      INTEGER                 := NVL( TO_NUMBER(Hig.get_sysopt('SDOBATSIZE')), 10);
    g_clip_type       VARCHAR2(30)            := NVL(Hig.get_sysopt('SDOCLIPTYP'),'SDO');
+   g_only_live       VARCHAR2(1)             := NVL(hig.get_sysopt('SDOONLYLIV'), 'N');
 --
    SUBTYPE rec_usgm IS user_sdo_geom_metadata%ROWTYPE;
    SUBTYPE rec_nth  IS NM_THEMES_ALL%ROWTYPE;
@@ -53,6 +54,7 @@ PROCEDURE internal_member_dynseg (
    p_type         IN VARCHAR2,
    p_obj_type     IN VARCHAR2,
    p_seq_name     IN VARCHAR2,
+   p_only_live    IN VARCHAR2 default 'N',  
    p_job_id       IN NUMBER DEFAULT NULL,
    p_limit        IN INTEGER DEFAULT 500);
 --   
@@ -2863,6 +2865,7 @@ begin
      p_type         => 'I',
      p_obj_type     => p_inv_type,
      p_seq_name     => p_seq_name,
+     p_only_live    => g_only_live,
      p_job_id       => p_job_id,
      p_limit        => 5000 );
 end;
@@ -3036,6 +3039,7 @@ begin
      p_type         => 'G',
      p_obj_type     => p_gty_type,
      p_seq_name     => p_seq_name,
+     p_only_live    => g_only_live,
      p_job_id       => p_job_id,
      p_limit        => 5000 );
 end;
@@ -10244,6 +10248,7 @@ PROCEDURE internal_member_dynseg (
    p_type         IN VARCHAR2,
    p_obj_type     IN VARCHAR2,
    p_seq_name     IN VARCHAR2,
+   p_only_live    IN VARCHAR2 default 'N',
    p_job_id       IN NUMBER DEFAULT NULL,
    p_limit        IN INTEGER DEFAULT 500)
 IS
@@ -10251,7 +10256,11 @@ IS
    TYPE l_geom_array IS TABLE OF MDSYS.sdo_geometry
       INDEX BY BINARY_INTEGER;
 
-   --
+   --  
+   TYPE geocurtype IS REF CURSOR;
+
+   geocur         geocurtype;
+
    l_objectid      nm3type.tab_number;
    l_ne_id         nm3type.tab_number;
    l_ne_of         nm3type.tab_number;
@@ -10263,41 +10272,77 @@ IS
    --
    l_gty_partial   VARCHAR2 (1) := 'Y';
    --
+   qq varchar2(1) := chr(39);
+   lf varchar2(1) := chr(10);
+   --
    error_count     NUMBER;
    dml_errors      EXCEPTION;
    PRAGMA EXCEPTION_INIT (dml_errors, -24381);
-
-   --
-   CURSOR c1 (
-      c_type          IN VARCHAR2,
-      c_obj_type      IN VARCHAR2,
-      c_gty_partial   IN VARCHAR2)
-   IS
-      SELECT ROWNUM objectid,
-             nm_ne_id_in ne_id,
-             nm_ne_id_of ne_id_of,
-             nm_begin_mp,
-             nm_end_mp,
---             CASE c_gty_partial
---                WHEN 'N'
---                THEN
-                   SDO_LRS.convert_to_std_geom (shape),
---                ELSE
---                   SDO_LRS.convert_to_std_geom (SDO_LRS.clip_geom_segment (
---                                                   shape,
---                                                   nm_begin_mp,
---                                                   nm_end_mp,
---                                                   0.005))
---             END,
-             nm_start_date start_date,
-             nm_end_date end_date
-        FROM nm_members_all, nm_nsg_esu_shapes_table
-       WHERE     nm_ne_id_of = ne_id
-             AND nm_obj_type = c_obj_type
-             AND nm_type = c_type
-             AND nm_type = 'G'
-             AND nm_end_date IS NULL;
 --
+  cursor c_base_themes ( c_type in varchar2, c_obj_type in varchar2 ) is
+  SELECT nth.*
+  FROM nm_themes_all nth,
+       nm_nw_themes,
+       nm_linear_types,
+       (SELECT 'I' nm_type, nin_nit_inv_code nm_obj_type, nin_nw_type nt_type
+          FROM nm_inv_nw
+        UNION ALL
+        SELECT 'G', nng_group_type, nng_nt_type FROM nm_nt_groupings)
+ WHERE     nm_type = c_type
+       AND nm_obj_type = c_obj_type
+       AND nt_type = nlt_nt_type
+       AND nlt_g_i_d = 'D'
+       AND nnth_nth_theme_id = nth_theme_id
+       AND nnth_nlt_id = nlt_id
+       AND nth_base_table_theme IS NULL;
+
+   curstr varchar2(4000);       
+       
+   --whole element ony extends to groups - so we can hard code the nm_type and the convert to STD-geom
+   curstr_whole varchar2(4000) := 
+      'SELECT ROWNUM objectid, '||lf||
+           '  nm_ne_id_in ne_id,'||lf||
+           '  nm_ne_id_of ne_id_of,'||lf||
+           '  nm_begin_mp,'||lf||
+           '  nm_end_mp,'||lf||
+           '        SDO_LRS.convert_to_std_geom (<nth_feature_shape_column>),'||lf||
+           '  nm_start_date start_date,'||lf||
+           '  nm_end_date end_date'||lf||
+       ' FROM nm_members_all, <nth_feature_table>'||lf||
+      ' WHERE     nm_ne_id_of = <nth_feature_pk_column>'||lf||
+       '      AND nm_obj_type = '||qq||'<nm_obj_type>'||qq||lf||
+       '      AND nm_type = '||qq||'G'||qq;
+--
+   curstr_partial_inv varchar2(4000) := 
+      'SELECT ROWNUM objectid, '||lf||
+           '  nm_ne_id_in ne_id,'||lf||
+           '  nm_ne_id_of ne_id_of,'||lf||
+           '  nm_begin_mp,'||lf||
+           '  nm_end_mp,'||lf||
+                          '  sdo_lrs.clip_geom_segment(<nth_feature_shape_column>, nm_begin_mp, nm_end_mp, 0.005),'||lf||
+           '  nm_start_date start_date,'||lf||
+           '  nm_end_date end_date'||lf||
+       ' FROM nm_members_all, <nth_feature_table>'||lf||
+      ' WHERE     nm_ne_id_of = <nth_feature_pk_column>'||lf||
+       '      AND nm_obj_type = '||qq||'<nm_obj_type>'||qq||lf||
+       '      AND nm_type = '||qq||'<nm_type>'||qq;
+
+   curstr_partial_gty varchar2(4000) := 
+      'SELECT ROWNUM objectid, '||lf||
+           '  nm_ne_id_in ne_id,'||lf||
+           '  nm_ne_id_of ne_id_of,'||lf||
+           '  nm_begin_mp,'||lf||
+           '  nm_end_mp,'||lf||
+           '        SDO_LRS.convert_to_std_geom ('||lf||
+                          '  sdo_lrs.clip_geom_segment(<nth_feature_shape_column>, nm_begin_mp, nm_end_mp, 0.005)),'||lf||
+           '  nm_start_date start_date,'||lf||
+           '  nm_end_date end_date'||lf||
+       ' FROM nm_members_all, <nth_feature_table>'||lf||
+      ' WHERE     nm_ne_id_of = <nth_feature_pk_column>'||lf||
+       '      AND nm_obj_type = '||qq||'<nm_obj_type>'||qq||lf||
+       '      AND nm_type = '||qq||'<nm_type>'||qq;
+
+
 BEGIN
    --
    IF p_type = 'I'
@@ -10312,28 +10357,78 @@ BEGIN
       EXCEPTION
          WHEN NO_DATA_FOUND
          THEN
-            l_gty_partial := 'Y';
+           l_gty_partial := 'Y';
       END;
    END IF;
 
-   OPEN c1 (p_type, p_obj_type, l_gty_partial);
+   for irec in c_base_themes(p_type, p_obj_type) loop
 
-   FETCH c1
-      BULK COLLECT INTO l_objectid,
-           l_ne_id,
-           l_ne_of,
-           l_begin,
-           l_end,
-           l_shape,
-           l_start_date,
-           l_end_date
-      LIMIT p_limit;
+      if l_gty_partial = 'N' then
+   
+        curstr_whole := replace(curstr_whole, '<nth_feature_table>', irec.nth_feature_table );
+        curstr_whole := replace(curstr_whole, '<nth_feature_shape_column>', irec.nth_feature_shape_column );
+        curstr_whole := replace(curstr_whole, '<nth_feature_pk_column>', irec.nth_feature_pk_column );
+        curstr_whole := replace(curstr_whole, '<nm_obj_type>', p_obj_type );
+        
+        if p_only_live = 'Y' then
+          curstr_whole := curstr_whole||lf||' and nm_end_date is null';
+        end if;
+        
+        curstr := curstr_whole;
+        
+      else
+        if p_type = 'I' then
 
-   WHILE l_objectid.COUNT > 0
-   LOOP
-      BEGIN
-         FORALL i IN 1 .. l_objectid.COUNT SAVE EXCEPTIONS
-            EXECUTE IMMEDIATE
+          curstr_partial_inv  := replace(curstr_partial_inv, '<nth_feature_table>', irec.nth_feature_table );
+          curstr_partial_inv := replace(curstr_partial_inv, '<nth_feature_shape_column>', irec.nth_feature_shape_column );
+          curstr_partial_inv := replace(curstr_partial_inv, '<nth_feature_pk_column>', irec.nth_feature_pk_column );
+          curstr_partial_inv := replace(curstr_partial_inv, '<nm_obj_type>', p_obj_type );
+          curstr_partial_inv := replace(curstr_partial_inv, '<nm_type>', p_type );
+
+          if p_only_live = 'Y' then
+            curstr_partial_inv := curstr_partial_inv||lf||' and nm_end_date is null';
+          end if;
+          
+          curstr := curstr_partial_inv;
+                   
+        else
+        
+          curstr_partial_gty  := replace(curstr_partial_gty, '<nth_feature_table>', irec.nth_feature_table );
+          curstr_partial_gty := replace(curstr_partial_gty, '<nth_feature_shape_column>', irec.nth_feature_shape_column );
+          curstr_partial_gty := replace(curstr_partial_gty, '<nth_feature_pk_column>', irec.nth_feature_pk_column );
+          curstr_partial_gty := replace(curstr_partial_gty, '<nm_obj_type>', p_obj_type );
+          curstr_partial_gty := replace(curstr_partial_gty, '<nm_type>', p_type );
+
+          if p_only_live = 'Y' then
+            curstr_partial_gty := curstr_partial_gty||lf||' and nm_end_date is null';
+          end if;
+          
+          curstr := curstr_partial_gty;
+          
+        end if;
+
+      end if;
+        
+      nm_debug.debug_on;
+      nm_debug.debug(curstr);
+      open geocur for curstr;
+      
+      FETCH geocur
+         BULK COLLECT INTO l_objectid,
+              l_ne_id,
+              l_ne_of,
+              l_begin,
+              l_end,
+              l_shape,
+              l_start_date,
+              l_end_date
+         LIMIT p_limit;
+
+      WHILE l_objectid.COUNT > 0
+      LOOP
+         BEGIN
+            FORALL i IN 1 .. l_objectid.COUNT SAVE EXCEPTIONS
+               EXECUTE IMMEDIATE
                   'insert into '
                || p_table_name
                || '  (objectid, ne_id, ne_id_of, nm_begin_mp, nm_end_mp, geoloc, start_date, end_date ) '
@@ -10347,42 +10442,41 @@ BEGIN
                      l_start_date (i),
                      l_end_date (i);
 
-         COMMIT;
+            COMMIT;
       --
-      EXCEPTION
-         WHEN dml_errors
-         THEN
-            error_count := SQL%BULK_EXCEPTIONS.COUNT;
-            nm_debug.debug (
-               'Number of statements that failed: ' || error_count);
-
-            IF p_job_id IS NULL
+         EXCEPTION
+            WHEN dml_errors
             THEN
-               FOR j IN 1 .. error_count
-               LOOP
-                  nm_debug.debug (
-                        'Error #'
-                     || j
-                     || ' occurred during '
-                     || 'iteration #'
-                     || SQL%BULK_EXCEPTIONS (j).ERROR_INDEX);
-                  nm_debug.debug (
-                        'Error message is '
-                     || SQLERRM (
-                           -SQL%BULK_EXCEPTIONS (SQL%BULK_EXCEPTIONS (j).ERROR_INDEX).ERROR_CODE));
-               END LOOP;
-            ELSE
-               DECLARE
-                  k        INTEGER;
-                  l_errm   VARCHAR2 (100);
-               BEGIN
+               error_count := SQL%BULK_EXCEPTIONS.COUNT;
+               nm_debug.debug (
+                  'Number of statements that failed: ' || error_count);
+
+               IF p_job_id IS NULL   
+               THEN
                   FOR j IN 1 .. error_count
                   LOOP
-                     k := SQL%BULK_EXCEPTIONS (j).ERROR_INDEX;
-                     l_errm := SQLERRM (-SQL%BULK_EXCEPTIONS (k).ERROR_CODE);
-
-                     --
-                     INSERT INTO NM3SDM_DYN_SEG_EX (ndse_job_id,
+                     nm_debug.debug (
+                           'Error #'
+                        || j
+                        || ' occurred during '
+                        || 'iteration #'
+                        || SQL%BULK_EXCEPTIONS (j).ERROR_INDEX);
+                     nm_debug.debug (
+                           'Error message is '
+                        || SQLERRM (
+                              -SQL%BULK_EXCEPTIONS (SQL%BULK_EXCEPTIONS (j).ERROR_INDEX).ERROR_CODE));
+                  END LOOP;
+               ELSE
+                  DECLARE
+                     k        INTEGER;
+                     l_errm   VARCHAR2 (100);
+                  BEGIN
+                     FOR j IN 1 .. error_count
+                     LOOP
+                        k := SQL%BULK_EXCEPTIONS (j).ERROR_INDEX;
+                        l_errm := SQLERRM (-SQL%BULK_EXCEPTIONS (k).ERROR_CODE);
+ 
+                        INSERT INTO NM3SDM_DYN_SEG_EX (ndse_job_id,
                                                     ndse_ner_id,
                                                     ndse_ne_id_in,
                                                     ndse_ne_id_of,
@@ -10402,14 +10496,13 @@ BEGIN
                                        l_begin (k),
                                        l_end (k),
                                        l_errm);
-                  END LOOP;
-               END;
-            END IF;
-      END;
+                     END LOOP;
+                  END;
+               END IF;
+         END;
 
-      --
-      FETCH c1
-         BULK COLLECT INTO l_objectid,
+         FETCH geocur
+            BULK COLLECT INTO l_objectid,
               l_ne_id,
               l_ne_of,
               l_begin,
@@ -10417,11 +10510,12 @@ BEGIN
               l_shape,
               l_start_date,
               l_end_date
-         LIMIT p_limit;
-   END LOOP;
+            LIMIT p_limit;
+      END LOOP;
 
-   --
-   CLOSE c1;
+      CLOSE geocur;
+      
+   end loop;
 END;
 
 --
