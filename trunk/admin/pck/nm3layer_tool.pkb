@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3layer_tool.pkb-arc   2.34   Sep 25 2014 14:59:54   Rob.Coupe  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3layer_tool.pkb-arc   2.35   Sep 26 2014 09:20:42   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3layer_tool.pkb  $
---       Date into PVCS   : $Date:   Sep 25 2014 14:59:54  $
---       Date fetched Out : $Modtime:   Sep 25 2014 14:54:06  $
---       Version          : $Revision:   2.34  $
+--       Date into PVCS   : $Date:   Sep 26 2014 09:20:42  $
+--       Date fetched Out : $Modtime:   Sep 26 2014 09:17:32  $
+--       Version          : $Revision:   2.35  $
 --       Based on SCCS version : 1.11
 ------------------------------------------------------------------
 --   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
@@ -16,7 +16,7 @@ AS
 --
 --all global package variables here
 --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000)       := '$Revision:   2.34  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000)       := '$Revision:   2.35  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name   CONSTANT VARCHAR2 (30)         := 'NM3LAYER_TOOL';
@@ -2792,19 +2792,20 @@ AS
           END IF;
        --      
        --  Find the name of the spatial index 
-           l_spatial_ind_name := get_spatial_index ( pi_table_name  => l_feature_table
-                                                   , pi_column_name => l_Feature_shape_column); 
-       --    
-          IF l_spatial_ind_name IS NOT NULL 
-          THEN       
-            BEGIN
-              EXECUTE IMMEDIATE 'ALTER INDEX ' || l_spatial_ind_name || ' PARAMETERS (''index_status=deferred'')';
-            EXCEPTION
-            WHEN OTHERS THEN
-              NULL;-- IF THE INDEX IS ALREADY DEFERRED CARRY ON.
-            END;         
-          END IF;
-       --
+          l_spatial_ind_name := get_spatial_index ( pi_table_name  => l_feature_table
+                                                  , pi_column_name => l_Feature_shape_column); 
+          if l_spatial_ind_name is not null then
+             BEGIN
+--             execute immediate 'ALTER INDEX ' || l_spatial_ind_name || ' PARAMETERS (''index_status=deferred'')';
+               execute immediate ' drop index '||l_spatial_ind_name;
+             EXCEPTION
+             WHEN OTHERS THEN
+               NULL;-- IF THE INDEX IS ALREADY DEFERRED CARRY ON.- also carry on if it did not exist
+             END;
+          end if;
+    --   
+          index_drop(P_TABLE => l_feature_table );
+       
           nm3sdo.create_inv_data
                ( p_table_name  => l_feature_table
                , p_inv_type    => pi_inv_type 
@@ -2812,23 +2813,28 @@ AS
                , p_pnt_or_cont => l_pnt_or_cont
                , p_job_id      => pi_job_id
                );                            
-      --
-         IF l_spatial_ind_name IS NOT NULL 
-         THEN
-           EXECUTE IMMEDIATE 'ALTER INDEX ' || l_spatial_ind_name || ' PARAMETERS (''index_status=synchronize'')';
-         END IF;
+    
+          nm3sdo.create_spatial_idx ( p_table => l_feature_table, p_column => 'GEOLOC' );
+       
+          index_generation(p_table => l_feature_table);
+       --    
+--      --
+--         IF l_spatial_ind_name IS NOT NULL 
+--         THEN
+--           EXECUTE IMMEDIATE 'ALTER INDEX ' || l_spatial_ind_name || ' PARAMETERS (''index_status=synchronize'')';
+--         END IF;
      --
          -- Refresh Stats CWS 0109217
-         BEGIN
-           Nm3ddl.analyse_table( pi_table_name          => l_feature_table
-                               , pi_schema              => Sys_Context('NM3CORE','APPLICATION_OWNER')
-                               , pi_estimate_percentage => NULL
-                               , pi_auto_sample_size    => FALSE);
-         EXCEPTION
-         WHEN OTHERS
-         THEN
-         RAISE e_no_analyse_privs;
-         NULL;
+          BEGIN
+            Nm3ddl.analyse_table( pi_table_name          => l_feature_table
+                                , pi_schema              => Sys_Context('NM3CORE','APPLICATION_OWNER')
+                                , pi_estimate_percentage => NULL
+                                , pi_auto_sample_size    => FALSE);
+          EXCEPTION
+          WHEN OTHERS
+          THEN
+            RAISE e_no_analyse_privs;
+            NULL;
          END;
        
        ELSE-- Use XY offnetwork asset layer
