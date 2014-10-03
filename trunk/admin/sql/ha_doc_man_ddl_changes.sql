@@ -223,6 +223,23 @@ Exception
 End ;
 /
 
+Declare
+--
+   l_exception exception;
+   pragma      exception_init(l_exception,-00942);
+--
+Begin
+--
+   Execute Immediate           ' Drop Table dm_eb_exor_user_mappings ';
+--
+Exception
+  When l_exception Then
+  null;
+  When Others Then
+  Raise ;
+End ;
+/
+
 
 Declare
 --
@@ -231,7 +248,7 @@ Declare
 --
 Begin
 --
-   Execute Immediate           ' Create Table dm_eb_exor_user_mappings(  '||
+   Execute Immediate           ' Create Table nm_eb_exor_user_mappings(  '||
                                ' eeum_hus_user_id  Number Not Null       '||
                                ',eeum_person_id    Number Not null)      ';
 --
@@ -250,7 +267,7 @@ Declare
 --
 Begin
 --
-   Execute Immediate ' Alter table dm_eb_exor_user_mappings Add Constraint eeum_uk Unique (eeum_hus_user_id,eeum_person_id) ';
+   Execute Immediate ' Alter table nm_eb_exor_user_mappings Add Constraint eeum_uk Unique (eeum_hus_user_id,eeum_person_id) ';
 --
 Exception
   When l_exception Then
