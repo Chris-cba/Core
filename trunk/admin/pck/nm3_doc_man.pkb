@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3_doc_man.pkb-arc   3.5   Sep 18 2014 10:28:28   Linesh.Sorathia  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3_doc_man.pkb-arc   3.6   Oct 03 2014 10:08:44   Linesh.Sorathia  $
 --       Module Name      : $Workfile:   nm3_doc_man.pkb  $
---       Date into PVCS   : $Date:   Sep 18 2014 10:28:28  $
---       Date fetched Out : $Modtime:   Sep 16 2014 13:25:20  $
---       Version          : $Revision:   3.5  $
+--       Date into PVCS   : $Date:   Oct 03 2014 10:08:44  $
+--       Date fetched Out : $Modtime:   Oct 03 2014 09:29:46  $
+--       Version          : $Revision:   3.6  $
 --       Based on SCCS version : 
 ------------------------------------------------------------------
 --   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
@@ -19,7 +19,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.5  $';
+  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.6  $';
 
   g_package_name CONSTANT varchar2(30) := 'nm3_doc_man';
 --
@@ -638,48 +638,6 @@ Exception
    Then
        return -1; 
 End get_default_template;
---
-FUNCTION get_hig_user_id(pi_person_id In Number)
-Return Number
-Is
---
-   l_hig_user_id hig_users.hus_user_id%TYPE;
---
-Begin
---
-   Select eeum_hus_user_id
-   Into   l_hig_user_id
-   From   dm_eb_exor_user_mappings
-   Where  eeum_person_id  = pi_person_id ;
-
-   Return l_hig_user_id;
---
-Exception 
-   When No_Data_Found
-   Then 
-       Return Null;
-End ;
---
-FUNCTION get_eb_person_id(pi_hig_user_id In hig_users.hus_user_id%TYPE)
-Return Number
-Is
---
-   l_person_id Number;
---
-Begin
---
-   Select eeum_person_id
-   Into   l_person_id
-   From   dm_eb_exor_user_mappings
-   Where  eeum_hus_user_id  = pi_hig_user_id ;
- 
-   Return l_person_id;
---
-Exception 
-   When No_Data_Found
-   Then 
-       Return Null;
-End ;
 --
 PROCEDURE copy_attributes (pi_doc_id       In Number
                           ,pi_gateway_name In Varchar2

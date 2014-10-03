@@ -4,11 +4,11 @@ Is
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3_doc_man.pkh-arc   3.5   Sep 18 2014 10:29:48   Linesh.Sorathia  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3_doc_man.pkh-arc   3.6   Oct 03 2014 10:08:44   Linesh.Sorathia  $
 --       Module Name      : $Workfile:   nm3_doc_man.pkh  $
---       Date into PVCS   : $Date:   Sep 18 2014 10:29:48  $
---       Date fetched Out : $Modtime:   Sep 16 2014 13:00:54  $
---       Version          : $Revision:   3.5  $
+--       Date into PVCS   : $Date:   Oct 03 2014 10:08:44  $
+--       Date fetched Out : $Modtime:   Oct 03 2014 09:28:00  $
+--       Version          : $Revision:   3.6  $
 --       Based on SCCS version : 
 ------------------------------------------------------------------
 --   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
@@ -20,7 +20,7 @@ Is
   --constants
   -----------
   --g_sccsid is the SCCS ID for the package
-  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.5  $';
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.6  $';
 
   Type g_association_rec Is Record (featue_table_name Varchar2(500)
                                    ,feature_id        Varchar2(500)) ;
@@ -179,22 +179,6 @@ PROCEDURE create_association(pi_object_type  In Number
 -- Returns the header details for the given gateway.
 FUNCTION get_additional_asso_details(pi_gateway_name In Varchar2)
 Return Varchar2;
---</FUNC>
---
------------------------------------------------------------------------------
---
---<FUNC NAME="GET_HIG_USER_ID">
--- Returns the hig user id from the mapped eB person id.
-FUNCTION get_hig_user_id(pi_person_id In Number)
-Return Number;
---</FUNC>
---
------------------------------------------------------------------------------
---
---<FUNC NAME="GET_EB_PERSON_ID">
--- Returns the eB person id from the mapped hig user .
-FUNCTION get_eb_person_id(pi_hig_user_id In hig_users.hus_user_id%TYPE)
-Return Number;
 --</FUNC>
 --
 -----------------------------------------------------------------------------
