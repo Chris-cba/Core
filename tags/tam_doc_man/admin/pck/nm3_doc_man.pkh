@@ -1,0 +1,250 @@
+Create Or Replace Package nm3_doc_man
+Is
+--<PACKAGE>
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3_doc_man.pkh-arc   3.6   Oct 03 2014 10:08:44   Linesh.Sorathia  $
+--       Module Name      : $Workfile:   nm3_doc_man.pkh  $
+--       Date into PVCS   : $Date:   Oct 03 2014 10:08:44  $
+--       Date fetched Out : $Modtime:   Oct 03 2014 09:28:00  $
+--       Version          : $Revision:   3.6  $
+--       Based on SCCS version : 
+------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+
+  -----------
+  --constants
+  -----------
+  --g_sccsid is the SCCS ID for the package
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.6  $';
+
+  Type g_association_rec Is Record (featue_table_name Varchar2(500)
+                                   ,feature_id        Varchar2(500)) ;
+  Type g_association_tab is Table of g_association_rec;
+
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PRAGMA>
+  PRAGMA RESTRICT_REFERENCES(get_version, RNDS, WNPS, WNDS);
+  PRAGMA RESTRICT_REFERENCES(get_body_version, RNDS, WNPS, WNDS);
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_DOCUMENTS">
+-- This procedure returns all the internal ids of the Documents which are associated with the given exor feature.
+PROCEDURE get_documents(pi_gateway_name In  Varchar2
+                       ,pi_feature_id   In  Varchar2
+                       ,po_ref_out      Out Sys_Refcursor);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_TEMPLATES">
+-- This procedure returns all the internal ids of the templates which are associated with the given exor feature.
+PROCEDURE get_templates(pi_gateway_name In  Varchar2
+                       ,po_ref_out      Out Sys_Refcursor);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_TEMPLATES">
+-- This procedure returns the internal id of the default template for the the given exor feature.
+FUNCTION get_default_template(pi_gateway_name In  Varchar2)
+Return Number ;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<FUNC NAME="GET_EB_TEMPLATE_FOR_AU">
+-- This function returns the eb template id mapped to exor admin unit.
+FUNCTION get_eb_template_for_au(pi_admin_unit In  Number)
+Return Number ;
+--</FUNC>
+--
+
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_ASSOCIATIONS">
+-- This procedure returns all the association details (gateway name and feature Id) which are associated to the given Document Id.
+PROCEDURE get_associations(pi_document_id  In  Number
+                          ,po_ref_out      Out Sys_Refcursor);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<FUNC NAME="CHECK_ASSOCIATIONS_EXISTS">
+-- This function Returns true if association exists for the given Document Id.
+FUNCTION check_associations_exists(pi_document_id  In  Number)
+Return   Boolean;
+--</FUNC>
+--
+-----------------------------------------------------------------------------
+--
+--<FUNC NAME="CHECK_ASSOCIATIONS_EXISTS">
+-- This function Returns true if association exists for the given Document Id, Gateway name and feature id.
+FUNCTION check_associations_exists(pi_document_id  In  Number
+                                  ,pi_gateway_name In  Varchar2
+                                  ,pi_feature_id   In  Varchar2)
+Return   Boolean;
+--</FUNC>
+--
+-----------------------------------------------------------------------------
+--
+--<FUNC NAME="CHECK_ASSOCIATIONS_EXISTS">
+-- This function Returns true if association exists for the given gateway name and featue id .
+FUNCTION check_associations_exists(pi_gateway_name In  Varchar2
+                                  ,pi_feature_id   In  Varchar2)
+Return   Boolean;
+--</FUNC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="DELETE_ASSOCIATIONS">
+-- Deletes all the associations for the given Document Id.
+PROCEDURE delete_associations(pi_document_id  In  Number);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="DELETE_ASSOCIATIONS">
+-- Deletes all the document associations for the given exor feature
+PROCEDURE delete_associations(pi_gateway_name In  Varchar2
+                             ,pi_feature_id   In  Varchar2);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="DELETE_ASSOCIATIONS">
+-- Deletes specific associations for the given exor feature and Document ID.
+PROCEDURE delete_associations(pi_document_id  In  Number
+                             ,pi_gateway_name In  Varchar2
+                             ,pi_feature_id   In  Varchar2);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="SYNCHRONISE_DOCUMENT_ID">
+-- Synchronises exor associations with latest document ID.
+PROCEDURE synchronise_document_id(pi_old_document_id  In  Number
+                                 ,pi_new_document_id  In  Number);
+
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="SYNCHRONISE_DOCUMENT_ID">
+-- Corrects the exor feature ID.
+PROCEDURE update_feature_id(pi_gateway_name    In  Varchar2
+                           ,pi_old_feature_id  In  Varchar2
+                           ,pi_new_feature_id  In  Varchar2);
+
+--</PROC>
+--
+-----------------------------------------------------------------------------
+
+--
+--<PROC NAME="CREATE_ASSOCIATION">
+-- Creates new exor association for given parameters.
+PROCEDURE create_association(pi_object_type  In Number
+                            ,pi_object_id    In Number
+                            ,pi_gateway_name In Varchar2
+                            ,pi_feature_id   In Varchar2);
+
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<FUNC NAME="GET_ADDITIONAL_ASSO_DETAILS">
+-- Returns the header details for the given gateway.
+FUNCTION get_additional_asso_details(pi_gateway_name In Varchar2)
+Return Varchar2;
+--</FUNC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="create_document_and_assocs">
+-- This procedure creates document in eB and associates it with the given association tab.
+PROCEDURE create_document_and_assocs(pi_template_id     In  Number
+                                    ,pi_prefix          In  Varchar2
+                                    ,pi_title           In  Varchar2
+                                    ,pi_remarks         In  Varchar2
+                                    ,pi_date_issued     In  Date
+                                    ,pi_association_tab In  g_association_tab
+                                    ,po_document_id     Out Number);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="create_document_and_assocs">
+-- This procedure creates document and association for asset surveyor.
+PROCEDURE create_document_and_assocs(pi_iit_ne_id       In  nm_inv_items.iit_ne_id%Type
+                                    ,pi_inv_type        In  nm_inv_types.nit_inv_type%Type
+                                    ,pi_photo           In  Varchar2);
+
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="copy_attributes">
+-- This procedure copies the mapped exor attributes on to eB document.
+PROCEDURE copy_attributes (pi_doc_id       In Number
+                          ,pi_gateway_name In Varchar2
+                          ,pi_feature_id   In Varchar2);
+
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<FUNC NAME="GET_EB_URL">
+-- Returns the eB URL.
+FUNCTION get_eB_url(pi_gateway_name In Varchar2
+                   ,pi_feature_id   In Varchar2)
+Return Varchar2;
+--</FUNC>
+--
+-----------------------------------------------------------------------------
+--
+Procedure check_docs(pi_gateway_name   In  Varchar2
+                    ,pi_feature_key    In  Varchar2
+                    ,po_icon_name      Out Varchar2);
+
+--
+Procedure get_associations(pi_object_type  In  Number
+                          ,pi_gateway_name In  Varchar2
+                          ,pi_feature_id   In  Varchar2
+                          ,po_ref_out      Out sys_refcursor);
+--
+Procedure get_docs(pi_gateway_name In Varchar2
+                  ,pi_feature_id   In Varchar2
+                  ,po_ref_out      Out sys_refcursor);
+--
+Procedure update_associations(pi_gateway_name   In Varchar2
+                             ,pi_old_feature_id In Varchar2
+                             ,pi_new_feature_id In Varchar2 );
+--
+Function get_url_for_gis_session_id(pi_gdo_session_id In  Number)
+Return Varchar2;
+-- 
+End nm3_doc_man;
+/
