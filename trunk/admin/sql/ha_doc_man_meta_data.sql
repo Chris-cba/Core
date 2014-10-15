@@ -21,49 +21,6 @@ Insert into hig_option_values (Select 'eBAssoURL','http://localhost/Documents/Do
 /
 
 
-Insert into dm_attributes_map (Select 'DEFECTS', 'DEF_DATE_COMPL', 'DATE', 0, Null From dual 
-                               Where Not Exists (Select 1 From dm_attributes_map 
-                                                 Where  dam_gateway_name     = 'DEFECTS'
-                                                 And    dam_exor_column_name = 'DEF_DATE_COMPL'))
-/
-
-
-Insert into dm_attributes_map (Select 'DEFECTS', 'DEF_STATUS_CODE', 'VARCHAR2', 0, Null From dual 
-                               Where Not Exists (Select 1 From dm_attributes_map 
-                                                 Where  dam_gateway_name     = 'DEFECTS'
-                                                 And    dam_exor_column_name = 'DEF_STATUS_CODE'))
-/
-Insert into dm_attributes_map (Select 'DEFECTS', 'DEF_CREATED_DATE', 'DATE', 0, Null From dual 
-                               Where Not Exists (Select 1 From dm_attributes_map 
-                                                 Where  dam_gateway_name     = 'DEFECTS'
-                                                 And    dam_exor_column_name = 'DEF_CREATED_DATE'))
-/
-Insert into dm_attributes_map (Select 'DEFECTS', 'DEF_ARE_REPORT_ID', 'NUMBER', 0, Null From dual 
-                               Where Not Exists (Select 1 From dm_attributes_map 
-                                                 Where  dam_gateway_name     = 'DEFECTS'
-                                                 And    dam_exor_column_name = 'DEF_ARE_REPORT_ID'))
-/
-Insert into dm_attributes_map (Select 'WORK_ORDERS', 'WOR_DATE_CLOSED', 'DATE', 0, Null From dual 
-                               Where Not Exists (Select 1 From dm_attributes_map 
-                                                 Where  dam_gateway_name     = 'WORK_ORDERS'
-                                                 And    dam_exor_column_name = 'WOR_DATE_CLOSED'))
-/
-Insert into dm_attributes_map (Select 'WORK_ORDERS', 'WOR_DATE_RAISED', 'DATE', 0, Null From dual 
-                               Where Not Exists (Select 1 From dm_attributes_map 
-                                                 Where  dam_gateway_name     = 'WORK_ORDERS'
-                                                 And    dam_exor_column_name = 'WOR_DATE_RAISED'))
-/
-Insert into dm_attributes_map (Select 'DOCS2VIEW', 'DOC_COMPL_COMPLETE', 'DATE', 0, Null From dual 
-                               Where Not Exists (Select 1 From dm_attributes_map 
-                                                 Where  dam_gateway_name     = 'DOCS2VIEW'
-                                                 And    dam_exor_column_name = 'DOC_COMPL_COMPLETE'))
-/
-Insert into dm_attributes_map (Select 'DOCS2VIEW', 'DOC_DATE_ISSUED', 'DATE', 0, Null From dual 
-                               Where Not Exists (Select 1 From dm_attributes_map 
-                                                 Where  dam_gateway_name     = 'DOCS2VIEW'
-                                                 And    dam_exor_column_name = 'DOC_DATE_ISSUED'))
-/
-
 Insert into hig_option_list (Select 'DEFPHOTTEM','HIG','eB Template Id for defects','eB template ID for creating documents for defects.',null,'NUMBER','N','N',2000 From dual 
 Where Not Exists (Select 1 From hig_option_list
                   Where hol_id = 'DEFPHOTTEM' ))
@@ -140,7 +97,7 @@ Begin
 --
    hig2.upgrade(p_product        => 'HIG'
               ,p_upgrade_script => 'ha_doc_man_meta_data.sql'
-              ,p_remarks        => '04.07.15.16'
+              ,p_remarks        => '04.07.15.18'
               ,p_to_version     => Null);            
 --
 End ;
