@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 --
 ---   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.81   Sep 25 2014 16:55:58   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.82   Oct 21 2014 00:16:30   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3sdo.pkb  $
---       Date into PVCS   : $Date:   Sep 25 2014 16:55:58  $
---       Date fetched Out : $Modtime:   Sep 25 2014 16:54:32  $
---       PVCS Version     : $Revision:   2.81  $
+--       Date into PVCS   : $Date:   Oct 21 2014 00:16:30  $
+--       Date fetched Out : $Modtime:   Oct 21 2014 00:15:34  $
+--       PVCS Version     : $Revision:   2.82  $
 --       Based on
 ------------------------------------------------------------------
 --   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
@@ -22,7 +22,7 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 -- Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 
-   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.81  $"';
+   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.82  $"';
    g_package_name    CONSTANT VARCHAR2 (30)  := 'NM3SDO';
    g_batch_size      INTEGER                 := NVL( TO_NUMBER(Hig.get_sysopt('SDOBATSIZE')), 10);
    g_clip_type       VARCHAR2(30)            := NVL(Hig.get_sysopt('SDOCLIPTYP'),'SDO');
@@ -1552,7 +1552,7 @@ BEGIN
       if l_base_themes.nta_theme_array.count = 0 then
 
         SELECT nm_theme_entry(a.nnth_nth_theme_id)
-		bulk collect
+        bulk collect
         into l_base_themes.nta_theme_array
         FROM nm_inv_themes, nm_inv_nw, nm_linear_types, NM_NW_THEMES a
         WHERE nith_nth_theme_id = p_theme
@@ -1572,7 +1572,7 @@ BEGIN
                         );
         end if;
 
-	  end if;
+      end if;
 
     end if;
     
@@ -1852,11 +1852,11 @@ BEGIN
       if measures_ok(l_geom) = 'FALSE' then
    
         l_geom := sdo_util.simplify(l_geom, 0.1, g_usgm.diminfo(1).sdo_tolerance );
-	   
-	    if measures_ok(l_geom) = 'FALSE' then
-	       raise_application_error(-200010, 'Geometry is invalid for split - check the measure values' );
+       
+        if measures_ok(l_geom) = 'FALSE' then
+           raise_application_error(-200010, 'Geometry is invalid for split - check the measure values' );
         end if;
-	  end if;
+      end if;
     end if;    
 
     sdo_lrs.split_geom_segment( l_geom, g_usgm.diminfo, p_measure, p_geom1, p_geom2 );
@@ -4187,9 +4187,9 @@ END;
   BEGIN
     IF p_geom is not null then
        RETURN p_geom.sdo_elem_info.LAST;
-	ELSE
-	   RETURN NULL;
-	END IF;
+    ELSE
+       RETURN NULL;
+    END IF;
   END;
 
 -------------------------------------------------------------------------------------------------------------------------
@@ -8579,36 +8579,13 @@ BEGIN
   END IF;
 
 
---  IF p_get_projection = 'TRUE' THEN
---    IF NOT is_nw_theme( p_nth_id ) THEN
---      Hig.raise_ner(pi_appl                => Nm3type.c_hig
---                    ,pi_id                 => 291
---                    ,pi_sqlcode            => -20001
---                    );
-----    RAISE_APPLICATION_ERROR( -20001, 'Theme is not a linear referencing layer - cannot return projections');
 --
---    ELSIF l_geometry.sdo_gtype != 2001 THEN
---      Hig.raise_ner(pi_appl                => Nm3type.c_hig
---                    ,pi_id                 => 292
---                    ,pi_sqlcode            => -20001
---                    );
-----      RAISE_APPLICATION_ERROR( -20001, 'Cannot find position to project from');
---
---    ELSE
---      l_get_projection := ( p_get_projection = 'TRUE');
---    END IF;
---  END IF;
-
 --RAC - the projection needs to work dynamically when used with the ID tool - it should return the disatnce to the object and, when the object s a network object,
 --      it should return the distance (measure) along the object.
 
   l_get_projection := ( p_get_projection = 'TRUE');
 
   l_nth := p_nth;
-
-  IF p_nth.nth_base_table_theme IS NOT NULL THEN
-    l_nth := Nm3get.get_nth( l_nth.nth_base_table_theme);
-  END IF;
 
   IF l_nth.nth_feature_table = l_nth.nth_table_name THEN
 
@@ -8797,10 +8774,6 @@ BEGIN
 
   END LOOP;
 
-  IF p_nth.nth_base_table_theme IS NOT NULL THEN
--- ensure only those in the view are returned.
-    retval :=  join_ntl_array( p_nth, retval );
-  END IF;
 
   RETURN retval;
 
@@ -8856,7 +8829,7 @@ CURSOR c1 (c_theme IN NUMBER ) IS
   WHERE nts_theme_id = c_theme
   AND  nts_snap_to = a.nnth_nth_theme_id
   AND  EXISTS ( SELECT 1 FROM NM_THEME_ROLES, HIG_USER_ROLES
-                WHERE hur_username = USER
+                WHERE hur_username = SYS_CONTEXT ('NM3_SECURITY_CTX', 'USERNAME')
                 AND hur_role = nthr_role
                 AND nthr_theme_id = a.nnth_nth_theme_id )
   ORDER BY nts_priority;
@@ -8867,7 +8840,7 @@ CURSOR c2 (c_theme IN NUMBER) IS
   WHERE nbth_theme_id = c_theme
   AND  nbth_base_theme = a.nnth_nth_theme_id
   AND  EXISTS ( SELECT 1 FROM NM_THEME_ROLES, HIG_USER_ROLES
-                WHERE hur_username = USER
+                WHERE hur_username = SYS_CONTEXT ('NM3_SECURITY_CTX', 'USERNAME')
                 AND hur_role = nthr_role
                 AND nthr_theme_id = b.nnth_nth_theme_id ) 
   AND a.nnth_nlt_id = b.nnth_nlt_id;
@@ -8881,7 +8854,7 @@ SELECT a.nnth_nth_theme_id
   and nlt_g_i_d = 'D'
   and nnth_nlt_id = nlt_id
   and exists ( select 1 from hig_user_roles, nm_theme_roles
-               WHERE hur_username = USER
+               WHERE hur_username = SYS_CONTEXT ('NM3_SECURITY_CTX', 'USERNAME')
                AND hur_role = nthr_role
                AND nthr_theme_id = a.nnth_nth_theme_id );
 
@@ -9043,7 +9016,7 @@ CURSOR c1 (c_theme IN NUMBER ) IS
   WHERE nts_theme_id = c_theme
   AND  nts_snap_to = a.nnth_nth_theme_id
   AND  EXISTS ( SELECT 1 FROM NM_THEME_ROLES, HIG_USER_ROLES
-                WHERE hur_username = USER
+                WHERE hur_username = SYS_CONTEXT ('NM3_SECURITY_CTX', 'USERNAME')
                 AND hur_role = nthr_role
                 AND nthr_theme_id = a.nnth_nth_theme_id )
   ORDER BY nts_priority;
@@ -9054,7 +9027,7 @@ CURSOR c2 (c_theme IN NUMBER) IS
   WHERE nbth_theme_id = c_theme
   AND  nbth_base_theme = a.nnth_nth_theme_id
   AND  EXISTS ( SELECT 1 FROM NM_THEME_ROLES, HIG_USER_ROLES
-                WHERE hur_username = USER
+                WHERE hur_username = SYS_CONTEXT ('NM3_SECURITY_CTX', 'USERNAME')
                 AND hur_role = nthr_role
                 AND nthr_theme_id = b.nnth_nth_theme_id )
   AND a.nnth_nlt_id = b.nnth_nlt_id;
@@ -9068,7 +9041,7 @@ SELECT nm_theme_entry(a.nnth_nth_theme_id)
   and nlt_g_i_d = 'D'
   and nnth_nlt_id = nlt_id
   and exists ( select 1 from hig_user_roles, nm_theme_roles
-               WHERE hur_username = USER
+               WHERE hur_username = SYS_CONTEXT ('NM3_SECURITY_CTX', 'USERNAME')
                AND hur_role = nthr_role
                AND nthr_theme_id = a.nnth_nth_theme_id );
 
@@ -9291,7 +9264,7 @@ END;
 
          p_x := l_geom.sdo_ordinates (1);
          p_y := l_geom.sdo_ordinates (2);
-		 
+         
 --       p_x := ROUND (l_geom.sdo_ordinates (1), l_rnd);
 --       p_y := ROUND (l_geom.sdo_ordinates (2), l_rnd);
       ELSE
@@ -10271,6 +10244,9 @@ IS
    l_end_date      nm3type.tab_date;
    --
    l_gty_partial   VARCHAR2 (1) := 'Y';
+   
+   l_loop_count    INTEGER := 1;
+   l_seq           VARCHAR2(30);
    --
    qq varchar2(1) := chr(39);
    lf varchar2(1) := chr(10);
@@ -10300,7 +10276,7 @@ IS
        
    --whole element ony extends to groups - so we can hard code the nm_type and the convert to STD-geom
    curstr_whole varchar2(4000) := 
-      'SELECT ROWNUM objectid, '||lf||
+      'SELECT nth_<nth_theme_id>_seq.nextval objectid, '||lf||
            '  nm_ne_id_in ne_id,'||lf||
            '  nm_ne_id_of ne_id_of,'||lf||
            '  nm_begin_mp,'||lf||
@@ -10314,7 +10290,7 @@ IS
        '      AND nm_type = '||qq||'G'||qq;
 --
    curstr_partial_inv varchar2(4000) := 
-      'SELECT ROWNUM objectid, '||lf||
+      'SELECT nth_<nth_theme_id>_seq.nextval objectid, '||lf||
            '  nm_ne_id_in ne_id,'||lf||
            '  nm_ne_id_of ne_id_of,'||lf||
            '  nm_begin_mp,'||lf||
@@ -10328,7 +10304,7 @@ IS
        '      AND nm_type = '||qq||'<nm_type>'||qq;
 
    curstr_partial_gty varchar2(4000) := 
-      'SELECT ROWNUM objectid, '||lf||
+      'SELECT nth_<nth_theme_id>_seq.nextval objectid, '||lf||
            '  nm_ne_id_in ne_id,'||lf||
            '  nm_ne_id_of ne_id_of,'||lf||
            '  nm_begin_mp,'||lf||
@@ -10342,6 +10318,40 @@ IS
        '      AND nm_obj_type = '||qq||'<nm_obj_type>'||qq||lf||
        '      AND nm_type = '||qq||'<nm_type>'||qq;
 
+   curstr_ASD_whole varchar2(4000) := 
+      'SELECT nth_<nth_theme_id>_seq.nextval objectid, '||lf||
+           '  nad_iit_ne_id ne_id,'||lf||
+           '  nm_ne_id_of ne_id_of,'||lf||
+           '  nm_begin_mp,'||lf||
+           '  nm_end_mp,'||lf||
+           '  <nth_feature_shape_column>,'||lf||
+           '  nm_start_date start_date,'||lf||
+           '  nm_end_date end_date'||lf||
+       ' FROM nm_members_all, nm_nw_ad_link_all, <nth_feature_table>'||lf||
+      ' WHERE     nm_ne_id_of = <nth_feature_pk_column>'||lf||
+      '       AND nad_inv_type = '||qq||'<nm_obj_type>'||qq||lf||
+      '       AND nad_ne_id = nm_ne_id_in '||lf||
+       '      AND nm_obj_type = nad_gty_type'||lf||
+       '      AND nm_type = '||qq||'G'||qq||lf||
+       '       AND nad_whole_road = 1';
+
+
+FUNCTION IS_AD_TYPE(p_obj_type in VARCHAR2 ) return Boolean is
+retval Boolean := FALSE;
+l_dummy integer := 0;
+begin
+  begin
+    select 1 into l_dummy
+    from dual where exists ( select 1 from nm_nw_ad_types where nad_inv_type = p_obj_type and nad_primary_ad = 'N' );
+--
+    retval := TRUE;
+  Exception
+    when no_data_found 
+    THEN
+      retval := FALSE;
+  END;
+  RETURN retval;
+END;  
 
 BEGIN
    --
@@ -10390,6 +10400,23 @@ BEGIN
           end if;
           
           curstr := curstr_partial_inv;
+          
+          if IS_AD_TYPE(p_obj_type) then
+          
+            curstr_ASD_whole  := replace(curstr_ASD_whole, '<nth_feature_table>', irec.nth_feature_table );
+            curstr_ASD_whole := replace(curstr_ASD_whole, '<nth_feature_shape_column>', irec.nth_feature_shape_column );
+            curstr_ASD_whole := replace(curstr_ASD_whole, '<nth_feature_pk_column>', irec.nth_feature_pk_column );
+            curstr_ASD_whole := replace(curstr_ASD_whole, '<nm_obj_type>', p_obj_type );
+            curstr_ASD_whole := replace(curstr_ASD_whole, '<nm_type>', p_type );
+
+            if p_only_live = 'Y' then
+              curstr_ASD_whole := curstr_ASD_whole||lf||' and nm_end_date is null';
+              curstr_ASD_whole := curstr_ASD_whole||lf||' and nad_end_date is null';
+            end if;
+            
+            l_loop_count := 2;
+            
+          end if;
                    
         else
         
@@ -10408,9 +10435,16 @@ BEGIN
         end if;
 
       end if;
-        
+      
+     l_seq := create_spatial_seq(irec.nth_theme_id);
+
+      for loop_count in 1..l_loop_count loop
+
+      curstr := replace (curstr, '<nth_theme_id>', to_char(irec.nth_theme_id));        
+
       nm_debug.debug_on;
       nm_debug.debug(curstr);
+
       open geocur for curstr;
       
       FETCH geocur
@@ -10512,9 +10546,13 @@ BEGIN
               l_end_date
             LIMIT p_limit;
       END LOOP;
-
+      
       CLOSE geocur;
       
+      if IS_AD_TYPE(p_obj_type) and p_type = 'I' then
+         curstr := curstr_ASD_whole;
+      end if;
+      end loop;      
    end loop;
 END;
 
