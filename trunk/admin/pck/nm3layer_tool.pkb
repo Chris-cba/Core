@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3layer_tool.pkb-arc   2.35   Sep 26 2014 09:20:42   Rob.Coupe  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3layer_tool.pkb-arc   2.36   Oct 21 2014 15:01:28   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3layer_tool.pkb  $
---       Date into PVCS   : $Date:   Sep 26 2014 09:20:42  $
---       Date fetched Out : $Modtime:   Sep 26 2014 09:17:32  $
---       Version          : $Revision:   2.35  $
+--       Date into PVCS   : $Date:   Oct 21 2014 15:01:28  $
+--       Date fetched Out : $Modtime:   Oct 21 2014 14:59:44  $
+--       Version          : $Revision:   2.36  $
 --       Based on SCCS version : 1.11
 ------------------------------------------------------------------
 --   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
@@ -16,7 +16,7 @@ AS
 --
 --all global package variables here
 --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000)       := '$Revision:   2.35  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000)       := '$Revision:   2.36  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name   CONSTANT VARCHAR2 (30)         := 'NM3LAYER_TOOL';
@@ -2633,8 +2633,13 @@ AS
     --   
        l_nlt_id:= nm3get.get_nlt(l_ngt_nt_type, pi_gty_type).nlt_id;
     -- 
-       l_spatial_ind_name := get_spatial_index ( pi_table_name  => rec_linear.nth_feature_table
-                                               , pi_column_name => rec_linear.nth_Feature_shape_column);  
+       begin
+         l_spatial_ind_name := get_spatial_index ( pi_table_name  => rec_linear.nth_feature_table
+                                                 , pi_column_name => rec_linear.nth_Feature_shape_column);
+       exception
+         when ex_no_spdix then
+           l_spatial_ind_name := NULL;
+       end;                                              
     -- 
        IF l_spatial_ind_name is not null THEN       
          BEGIN   
@@ -2685,7 +2690,7 @@ AS
                                                  , pi_column_name => l_feature_shape_column);
        exception
 	     when ex_no_spdix then
-		   NULL; -- we do not need an index - will drop it anyway
+		   l_spatial_ind_name := NULL; -- we do not need an index - will drop it anyway
        end;
 		   --  
        if l_spatial_ind_name is not null then
@@ -2772,8 +2777,8 @@ AS
    --
    BEGIN
     --
-      IF nm3get.get_nit(pi_nit_inv_type => pi_inv_type ).nit_table_name IS NULL
-      THEN
+--      IF nm3get.get_nit(pi_nit_inv_type => pi_inv_type ).nit_table_name IS NULL
+--      THEN
     --
         IF nm3get.get_nit(pi_nit_inv_type => pi_inv_type ).nit_use_xy != 'Y'
         THEN
@@ -2792,8 +2797,14 @@ AS
           END IF;
        --      
        --  Find the name of the spatial index 
-          l_spatial_ind_name := get_spatial_index ( pi_table_name  => l_feature_table
-                                                  , pi_column_name => l_Feature_shape_column); 
+          begin
+            l_spatial_ind_name := get_spatial_index ( pi_table_name  => l_feature_table
+                                                    , pi_column_name => l_Feature_shape_column);
+          exception
+             when ex_no_spdix then
+            l_spatial_ind_name := NULL;
+          end;
+           
           if l_spatial_ind_name is not null then
              BEGIN
 --             execute immediate 'ALTER INDEX ' || l_spatial_ind_name || ' PARAMETERS (''index_status=deferred'')';
@@ -2841,13 +2852,13 @@ AS
          nm3sdo_edit.process_inv_xy_update(pi_inv_type=>pi_inv_type);
        END IF;
      --
-     END IF;
+--     END IF;
    --
    EXCEPTION
-     WHEN ex_no_spdix
-     THEN
-      raise_application_error ( -20103
-                              , 'Cannot derive spatial index for ' || l_feature_table);
+--     WHEN ex_no_spdix
+--     THEN
+--      raise_application_error ( -20103
+--                              , 'Cannot derive spatial index for ' || l_feature_table);
      -- Refresh Stats CWS 0109217
      WHEN e_no_analyse_privs
      THEN
