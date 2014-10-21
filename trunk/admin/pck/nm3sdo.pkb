@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 --
 ---   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.82   Oct 21 2014 00:16:30   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.83   Oct 21 2014 14:57:08   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3sdo.pkb  $
---       Date into PVCS   : $Date:   Oct 21 2014 00:16:30  $
---       Date fetched Out : $Modtime:   Oct 21 2014 00:15:34  $
---       PVCS Version     : $Revision:   2.82  $
+--       Date into PVCS   : $Date:   Oct 21 2014 14:57:08  $
+--       Date fetched Out : $Modtime:   Oct 21 2014 14:55:46  $
+--       PVCS Version     : $Revision:   2.83  $
 --       Based on
 ------------------------------------------------------------------
 --   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
@@ -22,7 +22,7 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 -- Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 
-   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.82  $"';
+   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.83  $"';
    g_package_name    CONSTANT VARCHAR2 (30)  := 'NM3SDO';
    g_batch_size      INTEGER                 := NVL( TO_NUMBER(Hig.get_sysopt('SDOBATSIZE')), 10);
    g_clip_type       VARCHAR2(30)            := NVL(Hig.get_sysopt('SDOCLIPTYP'),'SDO');
@@ -6902,11 +6902,19 @@ END;
 
 
 FUNCTION create_spatial_seq( p_theme_id IN NUMBER ) RETURN VARCHAR2 IS
-l_seq_name VARCHAR2(30) := 'NTH_'||TO_CHAR(p_theme_id)||'_SEQ';
+   l_seq_name VARCHAR2(30) := 'NTH_'||TO_CHAR(p_theme_id)||'_SEQ';
+   ex_object_exists exception;   
+   pragma exception_init ( ex_object_exists, -955 );
+   ex_object_exists_ddl exception;   
+   pragma exception_init ( ex_object_exists_ddl, -20306 );
 BEGIN
+  begin
     Nm3ddl.create_object_and_syns( l_seq_name, 'create sequence '||l_seq_name||' start with 1' );
-
-    RETURN l_seq_name;
+  EXCEPTION
+    when ex_object_exists_ddl then
+      NULL;
+  end;
+  RETURN l_seq_name;
 END;
 
 --
@@ -10276,65 +10284,74 @@ IS
        
    --whole element ony extends to groups - so we can hard code the nm_type and the convert to STD-geom
    curstr_whole varchar2(4000) := 
-      'SELECT nth_<nth_theme_id>_seq.nextval objectid, '||lf||
-           '  nm_ne_id_in ne_id,'||lf||
-           '  nm_ne_id_of ne_id_of,'||lf||
-           '  nm_begin_mp,'||lf||
-           '  nm_end_mp,'||lf||
-           '        SDO_LRS.convert_to_std_geom (<nth_feature_shape_column>),'||lf||
-           '  nm_start_date start_date,'||lf||
-           '  nm_end_date end_date'||lf||
-       ' FROM nm_members_all, <nth_feature_table>'||lf||
-      ' WHERE     nm_ne_id_of = <nth_feature_pk_column>'||lf||
-       '      AND nm_obj_type = '||qq||'<nm_obj_type>'||qq||lf||
-       '      AND nm_type = '||qq||'G'||qq;
+      'SELECT <nth_theme_id_seq>.nextval objectid, '||lf||
+           '  m.nm_ne_id_in ne_id,'||lf||
+           '  m.nm_ne_id_of ne_id_of,'||lf||
+           '  m.nm_begin_mp,'||lf||
+           '  m.nm_end_mp,'||lf||
+           '        SDO_LRS.convert_to_std_geom (f.<nth_feature_shape_column>),'||lf||
+           '  m.nm_start_date start_date,'||lf||
+           '  m.nm_end_date end_date'||lf||
+       ' FROM nm_members_all m, <nth_feature_table> f'||lf||
+      ' WHERE     m.nm_ne_id_of = f.<nth_feature_pk_column>'||lf||
+       '      AND m.nm_obj_type = '||qq||'<nm_obj_type>'||qq||lf||
+       '      AND m.nm_type = '||qq||'G'||qq;
 --
    curstr_partial_inv varchar2(4000) := 
-      'SELECT nth_<nth_theme_id>_seq.nextval objectid, '||lf||
-           '  nm_ne_id_in ne_id,'||lf||
-           '  nm_ne_id_of ne_id_of,'||lf||
-           '  nm_begin_mp,'||lf||
-           '  nm_end_mp,'||lf||
-                          '  sdo_lrs.clip_geom_segment(<nth_feature_shape_column>, nm_begin_mp, nm_end_mp, 0.005),'||lf||
-           '  nm_start_date start_date,'||lf||
-           '  nm_end_date end_date'||lf||
-       ' FROM nm_members_all, <nth_feature_table>'||lf||
-      ' WHERE     nm_ne_id_of = <nth_feature_pk_column>'||lf||
-       '      AND nm_obj_type = '||qq||'<nm_obj_type>'||qq||lf||
-       '      AND nm_type = '||qq||'<nm_type>'||qq;
+      'SELECT <nth_theme_id_seq>.nextval objectid, '||lf||
+           '  m.nm_ne_id_in ne_id,'||lf||
+           '  m.nm_ne_id_of ne_id_of,'||lf||
+           '  m.nm_begin_mp,'||lf||
+           '  m.nm_end_mp,'||lf||
+                          '  sdo_lrs.clip_geom_segment(f.<nth_feature_shape_column>, m.nm_begin_mp, m.nm_end_mp, 0.005),'||lf||
+           '  m.nm_start_date start_date,'||lf||
+           '  m.nm_end_date end_date'||lf||
+       ' FROM nm_members_all m, <nth_feature_table> f'||lf||
+      ' WHERE     m.nm_ne_id_of = f.<nth_feature_pk_column>'||lf||
+       '      AND m.nm_obj_type = '||qq||'<nm_obj_type>'||qq||lf||
+       '      AND m.nm_type = '||qq||'<nm_type>'||qq;
 
    curstr_partial_gty varchar2(4000) := 
-      'SELECT nth_<nth_theme_id>_seq.nextval objectid, '||lf||
-           '  nm_ne_id_in ne_id,'||lf||
-           '  nm_ne_id_of ne_id_of,'||lf||
-           '  nm_begin_mp,'||lf||
-           '  nm_end_mp,'||lf||
+      'SELECT <nth_theme_id_seq>.nextval objectid, '||lf||
+           '  m.nm_ne_id_in ne_id,'||lf||
+           '  m.nm_ne_id_of ne_id_of,'||lf||
+           '  m.nm_begin_mp,'||lf||
+           '  m.nm_end_mp,'||lf||
            '        SDO_LRS.convert_to_std_geom ('||lf||
-                          '  sdo_lrs.clip_geom_segment(<nth_feature_shape_column>, nm_begin_mp, nm_end_mp, 0.005)),'||lf||
-           '  nm_start_date start_date,'||lf||
-           '  nm_end_date end_date'||lf||
-       ' FROM nm_members_all, <nth_feature_table>'||lf||
-      ' WHERE     nm_ne_id_of = <nth_feature_pk_column>'||lf||
-       '      AND nm_obj_type = '||qq||'<nm_obj_type>'||qq||lf||
-       '      AND nm_type = '||qq||'<nm_type>'||qq;
+                          '  sdo_lrs.clip_geom_segment(f.<nth_feature_shape_column>,m. nm_begin_mp, m.nm_end_mp, 0.005)),'||lf||
+           '  m.nm_start_date start_date,'||lf||
+           '  m.nm_end_date end_date'||lf||
+       ' FROM nm_members_all m, <nth_feature_table> f'||lf||
+      ' WHERE     m.nm_ne_id_of = f.<nth_feature_pk_column>'||lf||
+       '      AND m.nm_obj_type = '||qq||'<nm_obj_type>'||qq||lf||
+       '      AND m.nm_type = '||qq||'<nm_type>'||qq;
 
    curstr_ASD_whole varchar2(4000) := 
-      'SELECT nth_<nth_theme_id>_seq.nextval objectid, '||lf||
-           '  nad_iit_ne_id ne_id,'||lf||
-           '  nm_ne_id_of ne_id_of,'||lf||
-           '  nm_begin_mp,'||lf||
-           '  nm_end_mp,'||lf||
-           '  <nth_feature_shape_column>,'||lf||
-           '  nm_start_date start_date,'||lf||
-           '  nm_end_date end_date'||lf||
-       ' FROM nm_members_all, nm_nw_ad_link_all, <nth_feature_table>'||lf||
-      ' WHERE     nm_ne_id_of = <nth_feature_pk_column>'||lf||
-      '       AND nad_inv_type = '||qq||'<nm_obj_type>'||qq||lf||
-      '       AND nad_ne_id = nm_ne_id_in '||lf||
-       '      AND nm_obj_type = nad_gty_type'||lf||
-       '      AND nm_type = '||qq||'G'||qq||lf||
-       '       AND nad_whole_road = 1';
+      'SELECT <nth_theme_id_seq>.nextval objectid, '||lf||
+           '  n.nad_iit_ne_id ne_id,'||lf||
+           '  m.nm_ne_id_of ne_id_of,'||lf||
+           '  m.nm_begin_mp,'||lf||
+           '  m.nm_end_mp,'||lf||
+           '  f.<nth_feature_shape_column>,'||lf||
+           '  m.nm_start_date start_date,'||lf||
+           '  m.nm_end_date end_date'||lf||
+       ' FROM nm_members_all m, nm_nw_ad_link_all n, <nth_feature_table> f'||lf||
+      ' WHERE     m.nm_ne_id_of = f.<nth_feature_pk_column>'||lf||
+      '       AND n.nad_inv_type = '||qq||'<nm_obj_type>'||qq||lf||
+      '       AND n.nad_ne_id = m.nm_ne_id_in '||lf||
+       '      AND m.nm_obj_type = n.nad_gty_type'||lf||
+       '      AND m.nm_type = '||qq||'G'||qq||lf||
+       '       AND n.nad_whole_road = 1';
 
+   curstr_INV_FT varchar2(4000) :=
+      'SELECT <nth_theme_id_seq>.nextval objectid, '||lf||
+      '  i.<nit_foreign_pk_column>,i.<nit_lr_ne_column_name>, '||lf||
+      ' i.<nit_lr_st_chain>, '||lf||
+      '  NVL(i.<nit_lr_end_chain>, i.<nit_lr_st_chain>), '||lf||
+      '  sdo_lrs.clip_geom_segment(f.<nth_feature_shape_column>, i.<nit_lr_st_chain>, NVL(i.<nit_lr_end_chain>,i.<nit_lr_st_chain>)), '||lf||
+      '  trunc(sysdate), NULL '||lf||
+      ' from <nit_table_name> i, <nth_feature_table> f '||lf||
+      ' where i.<nit_lr_ne_column_name> = f.<nth_feature_pk_column> ';
 
 FUNCTION IS_AD_TYPE(p_obj_type in VARCHAR2 ) return Boolean is
 retval Boolean := FALSE;
@@ -10343,6 +10360,23 @@ begin
   begin
     select 1 into l_dummy
     from dual where exists ( select 1 from nm_nw_ad_types where nad_inv_type = p_obj_type and nad_primary_ad = 'N' );
+--
+    retval := TRUE;
+  Exception
+    when no_data_found 
+    THEN
+      retval := FALSE;
+  END;
+  RETURN retval;
+END;  
+
+FUNCTION IS_FT_TYPE(p_obj_type in VARCHAR2 ) return Boolean is
+retval Boolean := FALSE;
+l_dummy integer := 0;
+begin
+  begin
+    select 1 into l_dummy
+    from dual where exists ( select 1 from nm_inv_types where nit_inv_type = p_obj_type and nit_table_name is not null );
 --
     retval := TRUE;
   Exception
@@ -10388,34 +10422,57 @@ BEGIN
         
       else
         if p_type = 'I' then
-
-          curstr_partial_inv  := replace(curstr_partial_inv, '<nth_feature_table>', irec.nth_feature_table );
-          curstr_partial_inv := replace(curstr_partial_inv, '<nth_feature_shape_column>', irec.nth_feature_shape_column );
-          curstr_partial_inv := replace(curstr_partial_inv, '<nth_feature_pk_column>', irec.nth_feature_pk_column );
-          curstr_partial_inv := replace(curstr_partial_inv, '<nm_obj_type>', p_obj_type );
-          curstr_partial_inv := replace(curstr_partial_inv, '<nm_type>', p_type );
-
-          if p_only_live = 'Y' then
-            curstr_partial_inv := curstr_partial_inv||lf||' and nm_end_date is null';
-          end if;
+        
+          if is_ft_type (p_obj_type) then
           
-          curstr := curstr_partial_inv;
+             declare
+               l_nit nm_inv_types%rowtype := nm3get.get_nit(p_obj_type);
+             begin
           
-          if IS_AD_TYPE(p_obj_type) then
-          
-            curstr_ASD_whole  := replace(curstr_ASD_whole, '<nth_feature_table>', irec.nth_feature_table );
-            curstr_ASD_whole := replace(curstr_ASD_whole, '<nth_feature_shape_column>', irec.nth_feature_shape_column );
-            curstr_ASD_whole := replace(curstr_ASD_whole, '<nth_feature_pk_column>', irec.nth_feature_pk_column );
-            curstr_ASD_whole := replace(curstr_ASD_whole, '<nm_obj_type>', p_obj_type );
-            curstr_ASD_whole := replace(curstr_ASD_whole, '<nm_type>', p_type );
+                curstr_inv_ft  := replace(curstr_inv_ft, '<nth_feature_table>', irec.nth_feature_table );
+                curstr_inv_ft := replace(curstr_inv_ft, '<nth_feature_shape_column>', irec.nth_feature_shape_column );
+                curstr_inv_ft := replace(curstr_inv_ft, '<nth_feature_pk_column>', irec.nth_feature_pk_column );
+                curstr_inv_ft := replace(curstr_inv_ft, '<nit_foreign_pk_column>', l_nit.nit_foreign_pk_column );
+                curstr_inv_ft := replace(curstr_inv_ft, '<nit_lr_ne_column_name>', l_nit.nit_lr_ne_column_name );
+                curstr_inv_ft := replace(curstr_inv_ft, '<nit_lr_st_chain>', l_nit.nit_lr_st_chain );                
+                curstr_inv_ft := replace(curstr_inv_ft, '<nit_lr_end_chain>', l_nit.nit_lr_end_chain );
+                curstr_inv_ft := replace(curstr_inv_ft, '<nit_table_name>', l_nit.nit_table_name );
+             end;
+             
+             curstr := curstr_inv_ft;
+             
+          else
 
-            if p_only_live = 'Y' then
-              curstr_ASD_whole := curstr_ASD_whole||lf||' and nm_end_date is null';
-              curstr_ASD_whole := curstr_ASD_whole||lf||' and nad_end_date is null';
-            end if;
+             curstr_partial_inv  := replace(curstr_partial_inv, '<nth_feature_table>', irec.nth_feature_table );
+             curstr_partial_inv := replace(curstr_partial_inv, '<nth_feature_shape_column>', irec.nth_feature_shape_column );
+             curstr_partial_inv := replace(curstr_partial_inv, '<nth_feature_pk_column>', irec.nth_feature_pk_column );
+             curstr_partial_inv := replace(curstr_partial_inv, '<nm_obj_type>', p_obj_type );
+             curstr_partial_inv := replace(curstr_partial_inv, '<nm_type>', p_type );
+
+             if p_only_live = 'Y' then
+               curstr_partial_inv := curstr_partial_inv||lf||' and nm_end_date is null';
+             end if;
+
+             curstr := curstr_partial_inv;
+          
+             if IS_AD_TYPE(p_obj_type) then
+          
+               curstr_ASD_whole  := replace(curstr_ASD_whole, '<nth_feature_table>', irec.nth_feature_table );
+               curstr_ASD_whole := replace(curstr_ASD_whole, '<nth_feature_shape_column>', irec.nth_feature_shape_column );
+               curstr_ASD_whole := replace(curstr_ASD_whole, '<nth_feature_pk_column>', irec.nth_feature_pk_column );
+               curstr_ASD_whole := replace(curstr_ASD_whole, '<nm_obj_type>', p_obj_type );
+               curstr_ASD_whole := replace(curstr_ASD_whole, '<nm_type>', p_type );
+
+               if p_only_live = 'Y' then
+                 curstr_ASD_whole := curstr_ASD_whole||lf||' and nm_end_date is null';
+                 curstr_ASD_whole := curstr_ASD_whole||lf||' and nad_end_date is null';
+               end if;
             
-            l_loop_count := 2;
+               l_loop_count := 2;
             
+          
+             end if;
+
           end if;
                    
         else
@@ -10436,11 +10493,19 @@ BEGIN
 
       end if;
       
-     l_seq := create_spatial_seq(irec.nth_theme_id);
+      declare
+        ex_object_exists exception;
+        pragma exception_init ( ex_object_exists, -00955 );
+      begin
+        l_seq := create_spatial_seq(irec.nth_theme_id);
+      exception
+        when ex_object_exists then
+          NULL;
+      end;
 
       for loop_count in 1..l_loop_count loop
 
-      curstr := replace (curstr, '<nth_theme_id>', to_char(irec.nth_theme_id));        
+      curstr := replace (curstr, '<nth_theme_id_seq>', p_seq_name);        
 
       nm_debug.debug_on;
       nm_debug.debug(curstr);
