@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3layer_tool.pkb-arc   2.36   Oct 21 2014 15:01:28   Rob.Coupe  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3layer_tool.pkb-arc   2.37   Oct 21 2014 15:39:12   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3layer_tool.pkb  $
---       Date into PVCS   : $Date:   Oct 21 2014 15:01:28  $
---       Date fetched Out : $Modtime:   Oct 21 2014 14:59:44  $
---       Version          : $Revision:   2.36  $
+--       Date into PVCS   : $Date:   Oct 21 2014 15:39:12  $
+--       Date fetched Out : $Modtime:   Oct 21 2014 15:38:12  $
+--       Version          : $Revision:   2.37  $
 --       Based on SCCS version : 1.11
 ------------------------------------------------------------------
 --   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
@@ -16,7 +16,7 @@ AS
 --
 --all global package variables here
 --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000)       := '$Revision:   2.36  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000)       := '$Revision:   2.37  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name   CONSTANT VARCHAR2 (30)         := 'NM3LAYER_TOOL';
@@ -3807,7 +3807,8 @@ AS
         EXECUTE IMMEDIATE
           'BEGIN '||lf||
           ' IF nm3nsgasd.asd_record_type_in_use(pi_type => :pi_type) THEN'||lf||
-          '   nm3nsgasd.Make_Asd_Spatial_Layer (p_inv_type => :pi_type, p_job_id => :p_job_id );'||lf||
+--        '   nm3nsgasd.Make_Asd_Spatial_Layer (p_inv_type => :pi_type, p_job_id => :p_job_id );'||lf||
+          '   nm3sdm.make_inv_spatial_layer(PI_NIT_INV_TYPE => :pi_type, p_job_id => :p_job_id );'||lf||
           ' END IF;'||lf||
           'END;' USING pi_type, pi_job_id;
       
@@ -3868,39 +3869,12 @@ AS
                              , pi_job_id   IN NUMBER DEFAULT NULL)
   IS
   --
-  l_nth_feature_table nm_themes_all.nth_feature_table%TYPE;
-  --
-  CURSOR get_feature_table (c_inv_type IN nm_inv_types.nit_inv_type%TYPE ) IS
-  SELECT nth_feature_table
-  FROM nm_themes_all t, nm_inv_themes
-  WHERE nth_theme_id = nith_nth_theme_id
-  AND   nith_nit_id = c_inv_type
-  AND   nth_base_table_theme IS NULL;
-
+  
   BEGIN
-  --
+  
     IF hig.is_product_licensed ('NSG') THEN
     --
-      EXECUTE IMMEDIATE
-        'BEGIN '||lf||
-        '  nm3nsgasd.refresh_asd_layer(:pi_inv_type,:pi_job_id);'||lf||
-        'END;'
-      USING IN pi_inv_type, IN pi_job_id;
-      --
-      -- Refresh Stats CWS 0109217
-      BEGIN
-        OPEN get_feature_table (pi_inv_type);
-        FETCH get_feature_table INTO l_nth_feature_table;
-        CLOSE get_feature_table;
-        --
-        Nm3ddl.analyse_table( pi_table_name          => l_nth_feature_table
-                            , pi_schema              => Sys_Context('NM3CORE','APPLICATION_OWNER')
-                            , pi_estimate_percentage => NULL
-                            , pi_auto_sample_size    => FALSE);
-      EXCEPTION
-      WHEN OTHERS THEN
-      RAISE e_no_analyse_privs;
-      END;
+      refresh_asset_layer (pi_inv_type, pi_job_id );
     --
     END IF;
   --
