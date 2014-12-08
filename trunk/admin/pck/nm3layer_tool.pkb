@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3layer_tool.pkb-arc   2.37   Oct 21 2014 15:39:12   Rob.Coupe  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3layer_tool.pkb-arc   2.38   Dec 08 2014 10:48:42   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3layer_tool.pkb  $
---       Date into PVCS   : $Date:   Oct 21 2014 15:39:12  $
---       Date fetched Out : $Modtime:   Oct 21 2014 15:38:12  $
---       Version          : $Revision:   2.37  $
+--       Date into PVCS   : $Date:   Dec 08 2014 10:48:42  $
+--       Date fetched Out : $Modtime:   Nov 05 2014 14:06:02  $
+--       Version          : $Revision:   2.38  $
 --       Based on SCCS version : 1.11
 ------------------------------------------------------------------
 --   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
@@ -16,7 +16,7 @@ AS
 --
 --all global package variables here
 --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000)       := '$Revision:   2.37  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000)       := '$Revision:   2.38  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name   CONSTANT VARCHAR2 (30)         := 'NM3LAYER_TOOL';
@@ -3890,62 +3890,24 @@ AS
 --
 -----------------------------------------------------------------------------
 --
-  PROCEDURE create_tma_layer( p_theme_type varchar2
-                            , p_layer_name nm_themes_all.nth_theme_name%TYPE
-                            , p_asset_type nm_inv_types.nit_inv_type%TYPE
-                            , p_asset_type_descr nm_inv_types.nit_descr%TYPE ) IS
-  BEGIN
-  --
-    IF hig.is_product_licensed ('TMA') THEN
-    --
-      IF p_theme_type = 'PHASE' THEN
-      --    
-        EXECUTE IMMEDIATE 'BEGIN' ||lf||
-                          'TMA_SDO_UTIL.MAKE_PHASE_BASE_THEME( :p_layer_name' ||lf||
-                                                            ', :p_asset_type' ||lf||
-                                                            ', :p_asset_type_descr);' ||lf||
-                          'END;'
-        USING p_layer_name, p_asset_type, p_asset_type_descr;
-      --  
-      ELSIF p_theme_type = 'SITE' THEN
-      --
-        EXECUTE IMMEDIATE 'BEGIN' ||lf||
-                          'TMA_SDO_UTIL.MAKE_SITE_BASE_THEME( :p_layer_name' ||lf||
-                                                           ', :p_asset_type' ||lf||
-                                                           ', :p_asset_type_descr);' ||lf||
-                          'END;'
-        USING p_layer_name, p_asset_type, p_asset_type_descr;
-      --  
-      ELSIF p_theme_type = 'RESTRICTION' THEN
-      --
-        EXECUTE IMMEDIATE 'BEGIN' ||lf||
-                          'TMA_SDO_UTIL.MAKE_RESTRICTION_BASE_THEME( :p_layer_name' ||lf||
-                                                                  ', :p_asset_type' ||lf||
-                                                                  ', :p_asset_type_descr);' ||lf||
-                          'END;'
-        USING p_layer_name, p_asset_type, p_asset_type_descr;
-      --  
-      ELSIF p_theme_type = 'NONSWA' THEN
-      --
-        EXECUTE IMMEDIATE 'BEGIN' ||lf||
-                          'TMA_SDO_UTIL.MAKE_NONSWA_BASE_THEME( :p_layer_name' ||lf||
-                                                             ', :p_asset_type' ||lf||
-                                                             ', :p_asset_type_descr);' ||lf||
-                          'END;'
-        USING p_layer_name, p_asset_type, p_asset_type_descr;
-      --  
-      ELSIF p_theme_type = 'SWLIC' THEN
-      --
-        EXECUTE IMMEDIATE 'BEGIN' ||lf||
-                          'TMA_SDO_UTIL.MAKE_SW_LICENCES_BASE_THEME( :p_layer_name' ||lf||
-                                                                  ', :p_asset_type' ||lf||
-                                                                  ', :p_asset_type_descr);' ||lf||
-                          'END;'
-        USING p_layer_name, p_asset_type, p_asset_type_descr;
-      --  
-      END IF;
-    END IF;
-  END create_tma_layer;
+Procedure Create_Tma_Layer  (
+                            p_Theme_Type        In    Varchar2,
+                            p_Layer_Name        In    Nm_Themes_All.Nth_Theme_Name%Type,
+                            p_Asset_Type        In    Nm_Inv_Types.Nit_Inv_Type%Type,
+                            p_Asset_Type_Descr  In    Nm_Inv_Types.Nit_Descr%Type
+                            )
+Is
+  Begin   
+    Execute Immediate 'Begin'                                                                        ||lf||
+                      '  Tma_Sdo_Util.Create_Tma_Layer  ('                                           ||lf||
+                      '                                 p_Theme_Type        => :p_Theme_Type,'       ||lf||
+                      '                                 p_Layer_Name        => :p_Layer_Name,'       ||lf||                                                            
+                      '                                 p_Asset_Type        => :p_Asset_Type,'       ||lf||
+                      '                                 p_Asset_Type_Descr  => :p_Asset_Type_Descr'  ||lf||                      
+                      '                                 );'                                          ||lf||                                   
+                      'End;'
+    Using p_Theme_Type, p_Layer_Name, p_Asset_Type,p_Asset_Type_Descr;        
+  End Create_Tma_Layer;
 --
 -----------------------------------------------------------------------------
 --
