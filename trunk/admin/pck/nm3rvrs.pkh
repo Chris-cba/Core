@@ -19,6 +19,9 @@ CREATE OR REPLACE PACKAGE nm3rvrs AS
 --</PACKAGE>
 --<GLOBVAR>
   g_sccsid      CONSTANT  varchar2(2000) := '"@(#)nm3rvrs.pkh	1.5 11/22/01"';
+  --
+  g_route_ne_id       nm_elements_all.ne_id%TYPE;
+  g_cardinality_flip  BOOLEAN;
 --  g_sccsid is the SCCS ID for the package
 --</GLOBVAR>
 --
