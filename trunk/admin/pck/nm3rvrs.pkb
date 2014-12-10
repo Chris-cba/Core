@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3rvrs AS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3rvrs.pkb-arc   2.3   Jul 04 2013 16:21:12   James.Wadsworth  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3rvrs.pkb-arc   2.4   10 Dec 2014 11:03:12   Mike.Huitson  $
 --       Module Name      : $Workfile:   nm3rvrs.pkb  $
---       Date into PVCS   : $Date:   Jul 04 2013 16:21:12  $
---       Date fetched Out : $Modtime:   Jul 04 2013 14:25:18  $
---       PVCS Version     : $Revision:   2.3  $
+--       Date into PVCS   : $Date:   10 Dec 2014 11:03:12  $
+--       Date fetched Out : $Modtime:   24 Nov 2014 11:08:28  $
+--       PVCS Version     : $Revision:   2.4  $
 --
 --
 --   Author : R.A. Coupe
@@ -19,7 +19,7 @@ CREATE OR REPLACE PACKAGE BODY nm3rvrs AS
 --   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.3  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.4  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'NM3RVRS';
@@ -155,7 +155,8 @@ END reverse_sub_class;
 FUNCTION reverse_length ( pi_ne_id IN nm_elements_all.ne_id%TYPE,
                           pi_offset IN number ) RETURN number IS
 BEGIN
-  RETURN nm3net.get_datum_element_length( pi_ne_id ) - pi_offset;
+  --RETURN nm3net.get_datum_element_length( pi_ne_id ) - pi_offset;
+  RETURN nm3net.get_ne_length( pi_ne_id ) - pi_offset;
 END reverse_length;
 --
 -----------------------------------------------------------------------------
@@ -524,7 +525,14 @@ PROCEDURE reverse_route (pi_ne_id          IN nm_elements.ne_id%TYPE
 --
 BEGIN
    g_rvrs_circroute := 'N';
-
+   /*
+   ||Allow other products to know what type of reversal
+   ||is being executed and which group is being reversed
+   ||in the case of a hierarchical network.
+   */
+   g_cardinality_flip := FALSE;
+   g_route_ne_id := pi_ne_id;
+   --
    Nm_Debug.proc_start(g_package_name,'reverse_route');
 --
    Nm3nwval.network_operations_check( Nm3nwval.c_reverse );
@@ -918,7 +926,11 @@ BEGIN
 
 --
   ELSE
--- Just flip the cardinality
+    /*
+    ||Allow other products to detect the type of reversal.
+    */
+    g_cardinality_flip := TRUE;
+  -- Just flip the cardinality
 
      OPEN  cs_future_check_non_inclusion (pi_ne_id, pi_effective_date);
      FETCH cs_future_check_non_inclusion INTO l_dummy;
