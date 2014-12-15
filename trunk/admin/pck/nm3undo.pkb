@@ -4,11 +4,11 @@ IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3undo.pkb-arc   2.18   Jul 04 2013 16:35:52   James.Wadsworth  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3undo.pkb-arc   2.19   Dec 15 2014 09:41:38   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm3undo.pkb  $
---       Date into PVCS   : $Date:   Jul 04 2013 16:35:52  $
---       Date fetched Out : $Modtime:   Jul 04 2013 14:25:20  $
---       PVCS Version     : $Revision:   2.18  $
+--       Date into PVCS   : $Date:   Dec 15 2014 09:41:38  $
+--       Date fetched Out : $Modtime:   Nov 13 2014 07:59:24  $
+--       PVCS Version     : $Revision:   2.19  $
 --
 --   Author : ITurnbull
 --
@@ -19,7 +19,7 @@ IS
 -- Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '"$Revision:   2.18  $"';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '"$Revision:   2.19  $"';
 --  g_body_sccsid is the SCCS ID for the package body
    g_package_name   CONSTANT VARCHAR2 (2000) := 'nm3undo';
 --
@@ -1112,8 +1112,26 @@ END undo_scheme;
          pi_effective_date   IN   DATE
       )
       IS
-         l_rec_nm   nm_members%ROWTYPE;
+         l_tab_ne_id_of     Nm3type.tab_number; 
+         l_rec_nm           nm_members%ROWTYPE;
       BEGIN
+         nm_debug.debug_on;
+          -- unsplit the underlying datums
+        SELECT distinct nm_ne_id_of
+          BULK COLLECT
+          INTO l_tab_ne_id_of
+          FROM nm_members_all, 
+               nm_elements_all, 
+               nm_element_history a, 
+               nm_element_history b
+         WHERE nm_ne_id_in = pi_ne_id
+           AND nm_ne_id_of = ne_id
+           AND a.neh_ne_id_old = nm_ne_id_of 
+           AND a.neh_operation = 'S'
+           AND a.neh_effective_date = b.neh_effective_date
+           AND b.neh_ne_id_old = pi_ne_id 
+           AND b.neh_operation = 'S';
+         
          -- unclose the element
          error_loc := 20 ;
          UPDATE NM_ELEMENTS_ALL
@@ -1143,39 +1161,40 @@ END undo_scheme;
          UPDATE NM_MEMBERS_ALL
             SET nm_end_date = NULL
           WHERE nm_ne_id_in = pi_ne_id
+            AND nm_end_date = pi_effective_date
             AND nm_ne_id_of IN (SELECT nm_ne_id_of
                                   FROM NM_MEMBERS_ALL
                                  WHERE nm_ne_id_in IN
                                                      (pi_ne_id_1, pi_ne_id_2));
          error_loc := 23 ;
+------------------------------------------
+-- undo any changes to other products
+-----------------------------------------
+         undo_other_products (p_ne_id_1        => pi_ne_id        -- old ne_id
+                             ,p_ne_id_2        => pi_ne_id_1      -- new ne_id
+                             ,p_ne_id_3        => pi_ne_id_2      -- new ne_id
+                             ,p_operation      => c_split
+                             ,p_op_date        => pi_effective_date
+                             );
 
+         error_loc := 24 ;
 ------------------------------------------
 -- remove any trace of 2 new groups
 -----------------------------------------
          DELETE FROM NM_MEMBERS_ALL
                WHERE nm_ne_id_of IN (pi_ne_id_1, pi_ne_id_2);
-         error_loc := 24 ;
 
+         error_loc := 25 ;
          DELETE FROM NM_MEMBERS_ALL
                WHERE nm_ne_id_in IN (pi_ne_id_1, pi_ne_id_2);
-         error_loc := 25 ;
 
+         error_loc := 26 ;
          -- delete the history
          delete_element_history (pi_ne_id, c_split);
 
          delete_element_history_for_new(pi_ne_id_new => pi_ne_id_1);
          delete_element_history_for_new(pi_ne_id_new => pi_ne_id_2);
 
-         error_loc := 26 ;
-         undo_other_products (p_ne_id_1        => pi_ne_id        -- old ne_id
-                                                          ,
-                              p_ne_id_2        => pi_ne_id_1      -- new ne_id
-                                                            ,
-                              p_ne_id_3        => pi_ne_id_2      -- new ne_id
-                                                            ,
-                              p_operation      => c_split,
-                              p_op_date        => pi_effective_date
-                             );
          error_loc := 27 ;
 -------------------------------
 -- Delete Shape of new elements
@@ -1212,6 +1231,20 @@ END undo_scheme;
                                      p_date       => pi_effective_date
                                     );
             error_loc := 33 ;
+
+         
+        --nm_debug.debug('==> Tab Count = '||l_tab_ne_id_of.COUNT);
+        IF l_tab_ne_id_of.COUNT >0 
+          THEN
+          FOR i IN 1..l_tab_ne_id_of.COUNT LOOP
+           -- nm_debug.debug('==> unsplitting ' ||l_tab_ne_id_of(i));
+            
+            unsplit (p_ne_id => l_tab_ne_id_of(i));
+          
+          END LOOP;
+         END IF;
+         
+            
       END unsplit_group;
    BEGIN
       error_loc := 40 ;
@@ -1565,6 +1598,7 @@ END undo_scheme;
          UPDATE NM_MEMBERS_ALL
             SET nm_end_date = NULL
           WHERE nm_ne_id_in IN (pi_ne_id_1, pi_ne_id_2)
+            AND nm_end_date = pi_effective_date            
             AND nm_ne_id_of IN (SELECT nm_ne_id_of
                                   FROM NM_MEMBERS_ALL
                                  WHERE nm_ne_id_in = pi_ne_id);
