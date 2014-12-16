@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 --
 ---   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.83   Oct 21 2014 14:57:08   Rob.Coupe  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.84   Dec 16 2014 17:00:04   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3sdo.pkb  $
---       Date into PVCS   : $Date:   Oct 21 2014 14:57:08  $
---       Date fetched Out : $Modtime:   Oct 21 2014 14:55:46  $
---       PVCS Version     : $Revision:   2.83  $
+--       Date into PVCS   : $Date:   Dec 16 2014 17:00:04  $
+--       Date fetched Out : $Modtime:   Dec 16 2014 16:58:22  $
+--       PVCS Version     : $Revision:   2.84  $
 --       Based on
 ------------------------------------------------------------------
 --   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
@@ -22,7 +22,7 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 -- Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 
-   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.83  $"';
+   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.84  $"';
    g_package_name    CONSTANT VARCHAR2 (30)  := 'NM3SDO';
    g_batch_size      INTEGER                 := NVL( TO_NUMBER(Hig.get_sysopt('SDOBATSIZE')), 10);
    g_clip_type       VARCHAR2(30)            := NVL(Hig.get_sysopt('SDOCLIPTYP'),'SDO');
@@ -10264,14 +10264,15 @@ IS
    PRAGMA EXCEPTION_INIT (dml_errors, -24381);
 --
   cursor c_base_themes ( c_type in varchar2, c_obj_type in varchar2 ) is
-  SELECT nth.*
+  SELECT nth.*, pnt_or_cont
   FROM nm_themes_all nth,
        nm_nw_themes,
        nm_linear_types,
-       (SELECT 'I' nm_type, nin_nit_inv_code nm_obj_type, nin_nw_type nt_type
-          FROM nm_inv_nw
+       (SELECT 'I' nm_type, nin_nit_inv_code nm_obj_type, nin_nw_type nt_type, nit_pnt_or_cont pnt_or_cont
+          FROM nm_inv_nw, nm_inv_types
+          where nit_inv_type = nin_nit_inv_code
         UNION ALL
-        SELECT 'G', nng_group_type, nng_nt_type FROM nm_nt_groupings)
+        SELECT 'G', nng_group_type, nng_nt_type, 'C'  FROM nm_nt_groupings)
  WHERE     nm_type = c_type
        AND nm_obj_type = c_obj_type
        AND nt_type = nlt_nt_type
@@ -10303,7 +10304,7 @@ IS
            '  m.nm_ne_id_of ne_id_of,'||lf||
            '  m.nm_begin_mp,'||lf||
            '  m.nm_end_mp,'||lf||
-                          '  sdo_lrs.clip_geom_segment(f.<nth_feature_shape_column>, m.nm_begin_mp, m.nm_end_mp, 0.005),'||lf||
+                          '  <clipstr>(f.<nth_feature_shape_column>, m.nm_begin_mp, m.nm_end_mp, 0.005)<clipbr>,'||lf||
            '  m.nm_start_date start_date,'||lf||
            '  m.nm_end_date end_date'||lf||
        ' FROM nm_members_all m, <nth_feature_table> f'||lf||
@@ -10348,7 +10349,7 @@ IS
       '  i.<nit_foreign_pk_column>,i.<nit_lr_ne_column_name>, '||lf||
       ' i.<nit_lr_st_chain>, '||lf||
       '  NVL(i.<nit_lr_end_chain>, i.<nit_lr_st_chain>), '||lf||
-      '  sdo_lrs.clip_geom_segment(f.<nth_feature_shape_column>, i.<nit_lr_st_chain>, NVL(i.<nit_lr_end_chain>,i.<nit_lr_st_chain>)), '||lf||
+      '  <clipstr>(f.<nth_feature_shape_column>, i.<nit_lr_st_chain>, NVL(i.<nit_lr_end_chain>,i.<nit_lr_st_chain>))<clipbr>, '||lf||
       '  trunc(sysdate), NULL '||lf||
       ' from <nit_table_name> i, <nth_feature_table> f '||lf||
       ' where i.<nit_lr_ne_column_name> = f.<nth_feature_pk_column> ';
@@ -10437,25 +10438,43 @@ BEGIN
                 curstr_inv_ft := replace(curstr_inv_ft, '<nit_lr_st_chain>', l_nit.nit_lr_st_chain );                
                 curstr_inv_ft := replace(curstr_inv_ft, '<nit_lr_end_chain>', l_nit.nit_lr_end_chain );
                 curstr_inv_ft := replace(curstr_inv_ft, '<nit_table_name>', l_nit.nit_table_name );
+                if irec.pnt_or_cont = 'P' then
+                  curstr_inv_ft := replace(curstr_inv_ft, '<clipstr>', 'sdo_lrs.convert_to_std_geom(sdo_lrs.clip_geom_segment' );
+                  curstr_inv_ft := replace(curstr_inv_ft, '<clipbr>', ')' );              
+                else
+                  curstr_inv_ft := replace(curstr_inv_ft, '<clipstr>', 'sdo_lrs.clip_geom_segment' );
+                  curstr_inv_ft := replace(curstr_inv_ft, '<clipbr>', NULL );
+                end if;
              end;
              
              curstr := curstr_inv_ft;
              
           else
-
-             curstr_partial_inv  := replace(curstr_partial_inv, '<nth_feature_table>', irec.nth_feature_table );
-             curstr_partial_inv := replace(curstr_partial_inv, '<nth_feature_shape_column>', irec.nth_feature_shape_column );
-             curstr_partial_inv := replace(curstr_partial_inv, '<nth_feature_pk_column>', irec.nth_feature_pk_column );
-             curstr_partial_inv := replace(curstr_partial_inv, '<nm_obj_type>', p_obj_type );
-             curstr_partial_inv := replace(curstr_partial_inv, '<nm_type>', p_type );
-
-             if p_only_live = 'Y' then
-               curstr_partial_inv := curstr_partial_inv||lf||' and nm_end_date is null';
-             end if;
-
-             curstr := curstr_partial_inv;
           
-             if IS_AD_TYPE(p_obj_type) then
+             if NOT IS_AD_TYPE(p_obj_type) then
+
+                curstr_partial_inv  := replace(curstr_partial_inv, '<nth_feature_table>', irec.nth_feature_table );
+                curstr_partial_inv := replace(curstr_partial_inv, '<nth_feature_shape_column>', irec.nth_feature_shape_column );
+                curstr_partial_inv := replace(curstr_partial_inv, '<nth_feature_pk_column>', irec.nth_feature_pk_column );
+                curstr_partial_inv := replace(curstr_partial_inv, '<nm_obj_type>', p_obj_type );
+                curstr_partial_inv := replace(curstr_partial_inv, '<nm_type>', p_type );
+
+                if irec.pnt_or_cont = 'P' then
+                  curstr_partial_inv := replace(curstr_partial_inv, '<clipstr>', 'sdo_lrs.convert_to_std_geom(sdo_lrs.clip_geom_segment' );
+                  curstr_partial_inv := replace(curstr_partial_inv, '<clipbr>', ')' );              
+                else
+                  curstr_partial_inv := replace(curstr_partial_inv, '<clipstr>', 'sdo_lrs.clip_geom_segment' );
+                  curstr_partial_inv := replace(curstr_partial_inv, '<clipbr>', NULL );
+                end if;
+             
+
+                if p_only_live = 'Y' then
+                  curstr_partial_inv := curstr_partial_inv||lf||' and nm_end_date is null';
+                end if;
+
+                curstr := curstr_partial_inv;
+          
+             else
           
                curstr_ASD_whole  := replace(curstr_ASD_whole, '<nth_feature_table>', irec.nth_feature_table );
                curstr_ASD_whole := replace(curstr_ASD_whole, '<nth_feature_shape_column>', irec.nth_feature_shape_column );
