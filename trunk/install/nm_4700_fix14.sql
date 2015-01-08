@@ -2,11 +2,11 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/nm_4700_fix14.sql-arc   3.0   Jan 08 2015 10:23:18   Stephen.Sewell  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/nm_4700_fix14.sql-arc   3.1   Jan 08 2015 15:49:22   Stephen.Sewell  $
 --       Module Name      : $Workfile:   nm_4700_fix14.sql  $
---       Date into PVCS   : $Date:   Jan 08 2015 10:23:18  $
---       Date fetched Out : $Modtime:   Jan 07 2015 15:21:08  $
---       PVCS Version     : $Revision:   3.0  $
+--       Date into PVCS   : $Date:   Jan 08 2015 15:49:22  $
+--       Date fetched Out : $Modtime:   Jan 08 2015 15:44:28  $
+--       PVCS Version     : $Revision:   3.1  $
 --
 --------------------------------------------------------------------------------
 --   Copyright (c) 2014 Bentley Systems Incorporated.
@@ -387,7 +387,7 @@ PROMPT Updating package body nm3asset
 SET TERM OFF
 --
 SET FEEDBACK ON
-start nm3asset.pkb
+start nm3asset.pkw
 SET FEEDBACK OFF
 --
 SET TERM ON 
@@ -395,7 +395,7 @@ PROMPT Updating package body nm3inv
 SET TERM OFF
 --
 SET FEEDBACK ON
-start nm3inv.pkb
+start nm3inv.pkw
 SET FEEDBACK OFF
 --
 SET TERM ON 
@@ -403,7 +403,7 @@ PROMPT Creating package body nm3inv_item_aud
 SET TERM OFF
 --
 SET FEEDBACK ON
-start nm3inv_item_aud.pkb
+start nm3inv_item_aud.pkw
 SET FEEDBACK OFF
 --
 SET TERM ON 
@@ -411,7 +411,7 @@ PROMPT Creating package body nm3inv_update
 SET TERM OFF
 --
 SET FEEDBACK ON
-start nm3inv_update.pkb
+start nm3inv_update.pkw
 SET FEEDBACK OFF
 --
 SET TERM ON 
@@ -419,7 +419,7 @@ PROMPT Creating package body nm3locator
 SET TERM OFF
 --
 SET FEEDBACK ON
-start nm3locator.pkb
+start nm3locator.pkw
 SET FEEDBACK OFF
 
 --
