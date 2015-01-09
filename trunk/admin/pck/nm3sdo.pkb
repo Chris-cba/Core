@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 --
 ---   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.84   Dec 16 2014 17:00:04   Rob.Coupe  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.85   Jan 09 2015 15:12:58   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3sdo.pkb  $
---       Date into PVCS   : $Date:   Dec 16 2014 17:00:04  $
---       Date fetched Out : $Modtime:   Dec 16 2014 16:58:22  $
---       PVCS Version     : $Revision:   2.84  $
+--       Date into PVCS   : $Date:   Jan 09 2015 15:12:58  $
+--       Date fetched Out : $Modtime:   Jan 09 2015 15:11:32  $
+--       PVCS Version     : $Revision:   2.85  $
 --       Based on
 ------------------------------------------------------------------
 --   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
@@ -22,7 +22,7 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 -- Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 
-   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.84  $"';
+   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.85  $"';
    g_package_name    CONSTANT VARCHAR2 (30)  := 'NM3SDO';
    g_batch_size      INTEGER                 := NVL( TO_NUMBER(Hig.get_sysopt('SDOBATSIZE')), 10);
    g_clip_type       VARCHAR2(30)            := NVL(Hig.get_sysopt('SDOCLIPTYP'),'SDO');
@@ -10276,7 +10276,7 @@ IS
  WHERE     nm_type = c_type
        AND nm_obj_type = c_obj_type
        AND nt_type = nlt_nt_type
-       AND nlt_g_i_d = 'D'
+--       AND nlt_g_i_d = 'D'
        AND nnth_nth_theme_id = nth_theme_id
        AND nnth_nlt_id = nlt_id
        AND nth_base_table_theme IS NULL;
@@ -10350,7 +10350,7 @@ IS
       ' i.<nit_lr_st_chain>, '||lf||
       '  NVL(i.<nit_lr_end_chain>, i.<nit_lr_st_chain>), '||lf||
       '  <clipstr>(f.<nth_feature_shape_column>, i.<nit_lr_st_chain>, NVL(i.<nit_lr_end_chain>,i.<nit_lr_st_chain>))<clipbr>, '||lf||
-      '  trunc(sysdate), NULL '||lf||
+      '  <start_date>, <end_date> '||lf||
       ' from <nit_table_name> i, <nth_feature_table> f '||lf||
       ' where i.<nit_lr_ne_column_name> = f.<nth_feature_pk_column> ';
 
@@ -10445,6 +10445,19 @@ BEGIN
                   curstr_inv_ft := replace(curstr_inv_ft, '<clipstr>', 'sdo_lrs.clip_geom_segment' );
                   curstr_inv_ft := replace(curstr_inv_ft, '<clipbr>', NULL );
                 end if;
+                
+                if irec.nth_start_date_column is null then
+                  curstr_inv_ft := replace(curstr_inv_ft, '<start_date>', 'trunc(sysdate)' );
+                else
+                  curstr_inv_ft := replace(curstr_inv_ft, '<start_date>', irec.nth_start_date_column );
+                end if;
+                                
+                if irec.nth_end_date_column is null then
+                  curstr_inv_ft := replace(curstr_inv_ft, '<end_date>', 'NULL' );
+                else
+                  curstr_inv_ft := replace(curstr_inv_ft, '<end_date>', irec.nth_end_date_column );
+                end if;
+
              end;
              
              curstr := curstr_inv_ft;
@@ -10573,6 +10586,8 @@ BEGIN
                THEN
                   FOR j IN 1 .. error_count
                   LOOP
+                     nm_debug.debug(' J = '||j);
+
                      nm_debug.debug (
                            'Error #'
                         || j
@@ -10581,8 +10596,7 @@ BEGIN
                         || SQL%BULK_EXCEPTIONS (j).ERROR_INDEX);
                      nm_debug.debug (
                            'Error message is '
-                        || SQLERRM (
-                              -SQL%BULK_EXCEPTIONS (SQL%BULK_EXCEPTIONS (j).ERROR_INDEX).ERROR_CODE));
+                        || SQLERRM(-SQL%BULK_EXCEPTIONS(j).ERROR_CODE));
                   END LOOP;
                ELSE
                   DECLARE
@@ -10592,7 +10606,8 @@ BEGIN
                      FOR j IN 1 .. error_count
                      LOOP
                         k := SQL%BULK_EXCEPTIONS (j).ERROR_INDEX;
-                        l_errm := SQLERRM (-SQL%BULK_EXCEPTIONS (k).ERROR_CODE);
+                        l_errm := SQLERRM (-SQL%BULK_EXCEPTIONS (j).ERROR_CODE);
+--                        l_errm := 'xxxx';
  
                         INSERT INTO NM3SDM_DYN_SEG_EX (ndse_job_id,
                                                     ndse_ner_id,
@@ -10608,8 +10623,9 @@ BEGIN
                                        -1,
                                        l_ne_id (k),
                                        l_ne_of (k),
-                                       SDO_LRS.geom_segment_end_measure (
-                                          l_shape (k)),
+                                       null,
+--                                       SDO_LRS.geom_segment_end_measure (
+--                                          l_shape (k)),
                                        NULL,
                                        l_begin (k),
                                        l_end (k),
