@@ -2,11 +2,11 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/nm_4700_fix14.sql-arc   3.1   Jan 08 2015 15:49:22   Stephen.Sewell  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/nm_4700_fix14.sql-arc   3.2   Jan 09 2015 11:26:16   Stephen.Sewell  $
 --       Module Name      : $Workfile:   nm_4700_fix14.sql  $
---       Date into PVCS   : $Date:   Jan 08 2015 15:49:22  $
---       Date fetched Out : $Modtime:   Jan 08 2015 15:44:28  $
---       PVCS Version     : $Revision:   3.1  $
+--       Date into PVCS   : $Date:   Jan 09 2015 11:26:16  $
+--       Date fetched Out : $Modtime:   Jan 09 2015 11:19:32  $
+--       PVCS Version     : $Revision:   3.2  $
 --
 --------------------------------------------------------------------------------
 --   Copyright (c) 2014 Bentley Systems Incorporated.
@@ -78,14 +78,20 @@ set serveroutput on size 200000
 
 DECLARE
   obj_exists EXCEPTION;
+  obj_notexists EXCEPTION;
   PRAGMA exception_init( obj_exists, -955);
+  PRAGMA exception_init( obj_notexists, -942);
 BEGIN
   -- Disable security policies on nm_inv_items_all and nm_inv_items_all_j during this release/upgrade.
-  sys.dbms_rls.enable_policy('highways','nm_inv_items_all','INV_AU_POLICY_READ',FALSE);
-  sys.dbms_rls.enable_policy('highways','nm_inv_items_all','INV_AU_POLICY',FALSE);
-  sys.dbms_rls.enable_policy('highways','nm_inv_items_all_j','INV_AU_POLICY_READ',FALSE);
-  sys.dbms_rls.enable_policy('highways','nm_inv_items_all_j','INV_AU_POLICY',FALSE);
-
+  sys.dbms_rls.enable_policy(Sys_Context('NM3_SECURITY_CTX','USERNAME'),'nm_inv_items_all','INV_AU_POLICY_READ',FALSE);
+  sys.dbms_rls.enable_policy(Sys_Context('NM3_SECURITY_CTX','USERNAME'),'nm_inv_items_all','INV_AU_POLICY',FALSE);
+  BEGIN
+    sys.dbms_rls.enable_policy(Sys_Context('NM3_SECURITY_CTX','USERNAME'),'nm_inv_items_all_j','INV_AU_POLICY_READ',FALSE);
+    sys.dbms_rls.enable_policy(Sys_Context('NM3_SECURITY_CTX','USERNAME'),'nm_inv_items_all_j','INV_AU_POLICY',FALSE);
+  EXCEPTION
+    when obj_notexists then
+      null;
+  END;
   -- Create backup table for nm_inv_items_all. If it is already present then leave it and move on.
   begin
     EXECUTE IMMEDIATE 'CREATE TABLE nm_inv_items_all_backup as select * from nm_inv_items_all';
@@ -174,21 +180,23 @@ BEGIN
   dbms_output.put_line('Updated audit column in nm_inv_items_all.');
 
   -- Re-enable security policies on nm_inv_items_all during this release/upgrade.
-  sys.dbms_rls.enable_policy('highways','nm_inv_items_all','INV_AU_POLICY_READ',TRUE);
-  sys.dbms_rls.enable_policy('highways','nm_inv_items_all','INV_AU_POLICY',TRUE);
+  sys.dbms_rls.enable_policy(Sys_Context('NM3_SECURITY_CTX','USERNAME'),'nm_inv_items_all','INV_AU_POLICY_READ',TRUE);
+  sys.dbms_rls.enable_policy(Sys_Context('NM3_SECURITY_CTX','USERNAME'),'nm_inv_items_all','INV_AU_POLICY',TRUE);
+  -- Ensure enabled security policies on nm_inv_items_all_j
+  sys.dbms_rls.enable_policy(Sys_Context('NM3_SECURITY_CTX','USERNAME'),'nm_inv_items_all_j','INV_AU_POLICY_READ',TRUE);
+  sys.dbms_rls.enable_policy(Sys_Context('NM3_SECURITY_CTX','USERNAME'),'nm_inv_items_all_j','INV_AU_POLICY',TRUE);
 
 EXCEPTION
   WHEN obj_exists THEN
     -- Re-enable security policies on nm_inv_items_all during this release/upgrade.
-    sys.dbms_rls.enable_policy('highways','nm_inv_items_all','INV_AU_POLICY_READ',TRUE);
-    sys.dbms_rls.enable_policy('highways','nm_inv_items_all','INV_AU_POLICY',TRUE);
+    sys.dbms_rls.enable_policy(Sys_Context('NM3_SECURITY_CTX','USERNAME'),'nm_inv_items_all','INV_AU_POLICY_READ',TRUE);
+    sys.dbms_rls.enable_policy(Sys_Context('NM3_SECURITY_CTX','USERNAME'),'nm_inv_items_all','INV_AU_POLICY',TRUE);
     dbms_output.put_line('OBJ_EXISTS exception raised.');
    when others then
      -- Re-enable security policies on nm_inv_items_all during this release/upgrade.
-     sys.dbms_rls.enable_policy('highways','nm_inv_items_all','INV_AU_POLICY_READ',TRUE);
-     sys.dbms_rls.enable_policy('highways','nm_inv_items_all','INV_AU_POLICY',TRUE);
+     sys.dbms_rls.enable_policy(Sys_Context('NM3_SECURITY_CTX','USERNAME'),'nm_inv_items_all','INV_AU_POLICY_READ',TRUE);
+     sys.dbms_rls.enable_policy(Sys_Context('NM3_SECURITY_CTX','USERNAME'),'nm_inv_items_all','INV_AU_POLICY',TRUE);
     dbms_output.put_line('OTHERS exception raised. sqlerror was '||sqlerrm);
-
 END;
 /
 
@@ -375,6 +383,14 @@ SET TERM OFF
 --
 SET FEEDBACK ON
 start nm3inv.pkh
+SET FEEDBACK OFF
+
+SET TERM ON 
+PROMPT Updating package header nm3locator.pkh
+SET TERM OFF
+--
+SET FEEDBACK ON
+start nm3locator.pkh
 SET FEEDBACK OFF
 
 --
