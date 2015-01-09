@@ -2,11 +2,11 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/nm_4700_fix14.sql-arc   3.2   Jan 09 2015 11:26:16   Stephen.Sewell  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/nm_4700_fix14.sql-arc   3.3   Jan 09 2015 14:34:36   Stephen.Sewell  $
 --       Module Name      : $Workfile:   nm_4700_fix14.sql  $
---       Date into PVCS   : $Date:   Jan 09 2015 11:26:16  $
---       Date fetched Out : $Modtime:   Jan 09 2015 11:19:32  $
---       PVCS Version     : $Revision:   3.2  $
+--       Date into PVCS   : $Date:   Jan 09 2015 14:34:36  $
+--       Date fetched Out : $Modtime:   Jan 09 2015 13:55:22  $
+--       PVCS Version     : $Revision:   3.3  $
 --
 --------------------------------------------------------------------------------
 --   Copyright (c) 2014 Bentley Systems Incorporated.
@@ -179,24 +179,29 @@ BEGIN
   EXECUTE IMMEDIATE 'ALTER TABLE nm_inv_items_all enable all triggers';
   dbms_output.put_line('Updated audit column in nm_inv_items_all.');
 
-  -- Re-enable security policies on nm_inv_items_all during this release/upgrade.
+  -- Re-enable security policies on nm_inv_items_all disabled during this release/upgrade.
   sys.dbms_rls.enable_policy(Sys_Context('NM3_SECURITY_CTX','USERNAME'),'nm_inv_items_all','INV_AU_POLICY_READ',TRUE);
   sys.dbms_rls.enable_policy(Sys_Context('NM3_SECURITY_CTX','USERNAME'),'nm_inv_items_all','INV_AU_POLICY',TRUE);
-  -- Ensure enabled security policies on nm_inv_items_all_j
-  sys.dbms_rls.enable_policy(Sys_Context('NM3_SECURITY_CTX','USERNAME'),'nm_inv_items_all_j','INV_AU_POLICY_READ',TRUE);
-  sys.dbms_rls.enable_policy(Sys_Context('NM3_SECURITY_CTX','USERNAME'),'nm_inv_items_all_j','INV_AU_POLICY',TRUE);
 
+  -- Re-enable security policies on nm_inv_items_all_j disabled during this release/upgrade. Disregard any errors.
+  BEGIN
+    sys.dbms_rls.enable_policy(Sys_Context('NM3_SECURITY_CTX','USERNAME'),'nm_inv_items_all','INV_AU_POLICY_READ',TRUE);
+    sys.dbms_rls.enable_policy(Sys_Context('NM3_SECURITY_CTX','USERNAME'),'nm_inv_items_all','INV_AU_POLICY',TRUE);
+  EXCEPTION
+    when others THEN
+      null;
+  END;
 EXCEPTION
   WHEN obj_exists THEN
-    -- Re-enable security policies on nm_inv_items_all during this release/upgrade.
+    -- Re-enable security policies on nm_inv_items_all disabled during this release/upgrade.
     sys.dbms_rls.enable_policy(Sys_Context('NM3_SECURITY_CTX','USERNAME'),'nm_inv_items_all','INV_AU_POLICY_READ',TRUE);
     sys.dbms_rls.enable_policy(Sys_Context('NM3_SECURITY_CTX','USERNAME'),'nm_inv_items_all','INV_AU_POLICY',TRUE);
     dbms_output.put_line('OBJ_EXISTS exception raised.');
-   when others then
-     -- Re-enable security policies on nm_inv_items_all during this release/upgrade.
-     sys.dbms_rls.enable_policy(Sys_Context('NM3_SECURITY_CTX','USERNAME'),'nm_inv_items_all','INV_AU_POLICY_READ',TRUE);
-     sys.dbms_rls.enable_policy(Sys_Context('NM3_SECURITY_CTX','USERNAME'),'nm_inv_items_all','INV_AU_POLICY',TRUE);
+   when others THEN
+     -- Re-enable security policies on nm_inv_items_all disabled during this release/upgrade.
     dbms_output.put_line('OTHERS exception raised. sqlerror was '||sqlerrm);
+    sys.dbms_rls.enable_policy(Sys_Context('NM3_SECURITY_CTX','USERNAME'),'nm_inv_items_all','INV_AU_POLICY_READ',TRUE);
+    sys.dbms_rls.enable_policy(Sys_Context('NM3_SECURITY_CTX','USERNAME'),'nm_inv_items_all','INV_AU_POLICY',TRUE);
 END;
 /
 
