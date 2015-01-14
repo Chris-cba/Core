@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_reg
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_reg.pkb-arc   1.1   Jan 14 2015 15:44:38   Rob.Coupe  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_reg.pkb-arc   1.2   Jan 14 2015 15:46:08   Rob.Coupe  $
 --       Module Name      : $Workfile:   lb_reg.pkb  $
---       Date into PVCS   : $Date:   Jan 14 2015 15:44:38  $
---       Date fetched Out : $Modtime:   Jan 14 2015 15:44:02  $
---       PVCS Version     : $Revision:   1.1  $
+--       Date into PVCS   : $Date:   Jan 14 2015 15:46:08  $
+--       Date fetched Out : $Modtime:   Jan 14 2015 15:45:32  $
+--       PVCS Version     : $Revision:   1.2  $
 --
 --   Author : R.A. Coupe
 --
@@ -15,16 +15,16 @@ CREATE OR REPLACE PACKAGE BODY lb_reg
 -----------------------------------------------------------------------------
 --   Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
 ------------------------------
+AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(30) :='"$Revision:   1.1  $"';
+   g_body_sccsid     CONSTANT  varchar2(30) :='"$Revision:   1.2  $"';
 
    g_package_name    CONSTANT  varchar2(30)   := 'NM3RSC';
 --
 ------------------------------------------------
 
-AS
    NOT_EXISTS   EXCEPTION;
    PRAGMA EXCEPTION_INIT (NOT_EXISTS, -942);
 
