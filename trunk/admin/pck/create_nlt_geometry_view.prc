@@ -2,15 +2,15 @@ CREATE OR REPLACE PROCEDURE create_nlt_geometry_view
 AS
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/create_nlt_geometry_view.prc-arc   1.0   Jan 15 2015 20:12:16   Rob.Coupe  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/create_nlt_geometry_view.prc-arc   1.1   Jan 15 2015 20:20:50   Rob.Coupe  $
 --       Module Name      : $Workfile:   create_nlt_geometry_view.prc  $
---       Date into PVCS   : $Date:   Jan 15 2015 20:12:16  $
---       Date fetched Out : $Modtime:   Jan 15 2015 20:10:28  $
---       PVCS Version     : $Revision:   1.0  $
+--       Date into PVCS   : $Date:   Jan 15 2015 20:20:50  $
+--       Date fetched Out : $Modtime:   Jan 15 2015 20:19:52  $
+--       PVCS Version     : $Revision:   1.1  $
 --
 --   Author : R.A. Coupe
 --
---   Policy predicates for Location Bridge FGAC security
+--   View definition for network spatial source for dynamic segmentation
 --
 -----------------------------------------------------------------------------
 -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
@@ -110,3 +110,4 @@ BEGIN
    NM3DDL.CREATE_SYNONYM_FOR_OBJECT('V_LB_NLT_GEOMETRY');
       
 END;
+/
