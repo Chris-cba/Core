@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE lb_ops
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_ops.pkh-arc   1.1   Jan 15 2015 20:00:06   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_ops.pkh-arc   1.2   Jan 15 2015 22:36:00   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_ops.pkh  $
-   --       Date into PVCS   : $Date:   Jan 15 2015 20:00:06  $
-   --       Date fetched Out : $Modtime:   Jan 15 2015 19:59:30  $
-   --       PVCS Version     : $Revision:   1.1  $
+   --       Date into PVCS   : $Date:   Jan 15 2015 22:36:00  $
+   --       Date fetched Out : $Modtime:   Jan 15 2015 22:35:42  $
+   --       PVCS Version     : $Revision:   1.2  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,10 +16,13 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.1  $';
+   g_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.2  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_ops';
 
+   FUNCTION get_version return varchar2;
+   FUNCTION get_body_version return varchar2;
+   
    FUNCTION RPt_intersection (p_Rpt1             lb_RPt_tab,
                               p_Rpt2             lb_RPt_tab,
                               p_cardinality   IN INTEGER)
