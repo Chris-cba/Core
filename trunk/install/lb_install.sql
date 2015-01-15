@@ -1,10 +1,10 @@
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/lb/install/lb_install.sql-arc   1.0   Jan 14 2015 15:57:26   Rob.Coupe  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/lb/install/lb_install.sql-arc   1.1   Jan 15 2015 21:47:46   Rob.Coupe  $
 --       Module Name      : $Workfile:   lb_install.sql  $
---       Date into PVCS   : $Date:   Jan 14 2015 15:57:26  $
---       Date fetched Out : $Modtime:   Jan 14 2015 15:56:56  $
---       PVCS Version     : $Revision:   1.0  $
+--       Date into PVCS   : $Date:   Jan 15 2015 21:47:46  $
+--       Date fetched Out : $Modtime:   Jan 15 2015 21:24:18  $
+--       PVCS Version     : $Revision:   1.1  $
 --
 --   Author : R.A. Coupe
 --
@@ -29,34 +29,33 @@ start lb_data_types.sql;
 
 start lb_ddl.sql;
 
-start LB_GET.pkh;
-start LB_LOAD.pkh;
-start LB_LOC.pkh;
-start LB_OPS.pkh;
-start LB_PATH.pkh;
-start LB_REF.pkh;
-start LB_REG.pkh;
-start LB_PATH_REG.pkh;
+start ..\admin\pck\LB_GET.pkh;
+start ..\admin\pck\LB_LOAD.pkh;
+start ..\admin\pck\LB_LOC.pkh;
+start ..\admin\pck\LB_OPS.pkh;
+start ..\admin\pck\LB_PATH.pkh;
+start ..\admin\pck\LB_REF.pkh;
+start ..\admin\pck\LB_REG.pkh;
+start ..\admin\pck\LB_PATH_REG.pkh;
 
 start lb_views.sql;
 
 
-start get_lb_rpt_d_tab.prc;
-start get_lb_rpt_r_tab.prc;
-start create_nlt_geometry_view.prc;
+--start ..\admin\pck\get_lb_rpt_d_tab.prc;
+--start ..\admin\pck\get_lb_rpt_r_tab.prc;
+start ..\admin\pck\create_nlt_geometry_view.prc;
 
 begin
 CREATE_NLT_GEOMETRY_VIEW;
 end;
 /
 
-
-start LB_GET.pkb;
-start LB_LOAD.pkb;
-start LB_LOC.pkb;
-start LB_OPS.pkb
-start LB_PATH.pkb;
-start LB_REF.pkb;
-start LB_REG.pkb;
-start LB_PATH_REG.pkb;
+start ..\admin\pck\LB_PATH_REG.pkb;
+start ..\admin\pck\LB_OPS.pkb
+start ..\admin\pck\LB_REG.pkb;
+start ..\admin\pck\LB_REF.pkb;
+start ..\admin\pck\LB_GET.pkb;
+start ..\admin\pck\LB_LOAD.pkb;
+start ..\admin\pck\LB_LOC.pkb;
+start ..\admin\pck\LB_PATH.pkb;
 
