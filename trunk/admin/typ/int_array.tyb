@@ -95,7 +95,31 @@ begin
   end if;
   return retval;
 end;
-  
+--
+member function is_empty RETURN BOOLEAN IS
+--
+-- This function returns TRUE if the array has no entries, or there is only
+--  one entry and it is set to NULL
+--
+   this_ia int_array := SELF;
+--
+   l_retval BOOLEAN := FALSE;
+--
+begin
+--
+   IF    this_ia.ia.COUNT = 0
+    THEN
+      l_retval := TRUE;
+   ELSIF this_ia.ia.COUNT = 1
+    AND  ia(1) IS NULL
+    THEN
+      l_retval := TRUE;
+   END IF;
+--
+   RETURN l_retval;
+--
+END is_empty;
+--  
 member procedure debug is
 begin
   for i in 1..self.ia.last loop
