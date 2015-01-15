@@ -1,13 +1,14 @@
 CREATE OR REPLACE PACKAGE lb_security
+AS
 --
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_security.pkh-arc   1.0   Jan 15 2015 13:18:22   Rob.Coupe  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_security.pkh-arc   1.1   Jan 15 2015 19:55:18   Rob.Coupe  $
 --       Module Name      : $Workfile:   lb_security.pkh  $
---       Date into PVCS   : $Date:   Jan 15 2015 13:18:22  $
---       Date fetched Out : $Modtime:   Jan 15 2015 13:15:20  $
---       Version          : $Revision:   1.0  $
+--       Date into PVCS   : $Date:   Jan 15 2015 19:55:18  $
+--       Date fetched Out : $Modtime:   Jan 15 2015 19:54:42  $
+--       Version          : $Revision:   1.1  $
 --       Based on SCCS version : 1.20
 -------------------------------------------------------------------------
 --
@@ -18,9 +19,8 @@ CREATE OR REPLACE PACKAGE lb_security
 -----------------------------------------------------------------------------
 --   Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
-  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   1.0  $';
+   g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   1.1  $';
 
-AS
    FUNCTION loc_predicate (schema_in VARCHAR2, NAME_IN VARCHAR2)
       RETURN VARCHAR2;
 
