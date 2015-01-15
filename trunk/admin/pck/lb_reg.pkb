@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_reg
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_reg.pkb-arc   1.2   Jan 14 2015 15:46:08   Rob.Coupe  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_reg.pkb-arc   1.3   Jan 15 2015 20:49:16   Rob.Coupe  $
 --       Module Name      : $Workfile:   lb_reg.pkb  $
---       Date into PVCS   : $Date:   Jan 14 2015 15:46:08  $
---       Date fetched Out : $Modtime:   Jan 14 2015 15:45:32  $
---       PVCS Version     : $Revision:   1.2  $
+--       Date into PVCS   : $Date:   Jan 15 2015 20:49:16  $
+--       Date fetched Out : $Modtime:   Jan 15 2015 20:48:44  $
+--       PVCS Version     : $Revision:   1.3  $
 --
 --   Author : R.A. Coupe
 --
@@ -19,7 +19,7 @@ AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(30) :='"$Revision:   1.2  $"';
+   g_body_sccsid     CONSTANT  varchar2(30) :='"$Revision:   1.3  $"';
 
    g_package_name    CONSTANT  varchar2(30)   := 'NM3RSC';
 --
@@ -278,6 +278,9 @@ AS
 
       DELETE FROM nm_inv_type_attribs
             WHERE ita_inv_type = pi_exor_type;
+            
+      DELETE FROM lb_types
+            WHERE lb_exor_inv_type = pi_exor_type;            
 
       DELETE FROM nm_inv_types_all
             WHERE nit_inv_type = pi_exor_type;
