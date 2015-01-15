@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE lb_ref
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_ref.pkh-arc   1.0   Jan 15 2015 15:25:44   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_ref.pkh-arc   1.1   Jan 15 2015 22:38:38   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_ref.pkh  $
-   --       Date into PVCS   : $Date:   Jan 15 2015 15:25:44  $
-   --       Date fetched Out : $Modtime:   Jan 15 2015 15:25:04  $
-   --       PVCS Version     : $Revision:   1.0  $
+   --       Date into PVCS   : $Date:   Jan 15 2015 22:38:38  $
+   --       Date fetched Out : $Modtime:   Jan 15 2015 22:38:20  $
+   --       PVCS Version     : $Revision:   1.1  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,8 +16,11 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.0  $';
+   g_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.1  $';
    --
+   FUNCTION get_version return varchar2;
+   FUNCTION get_body_version return varchar2;
+   
    FUNCTION get_linear_types (pi_inv_type IN nm_inv_types.nit_inv_type%TYPE)
       RETURN SYS_REFCURSOR;
 
