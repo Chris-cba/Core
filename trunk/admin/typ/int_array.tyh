@@ -24,6 +24,7 @@ ia int_array_type
 , member function append( p_ia in int_array) return int_array
 , member function distinct_elements return int_array
 , member function array_to_list return varchar2
+, member function is_empty return BOOLEAN
 , member procedure debug
 )
 /
