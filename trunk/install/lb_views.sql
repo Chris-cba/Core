@@ -1,10 +1,10 @@
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/lb/install/lb_views.sql-arc   1.0   Jan 14 2015 16:16:28   Rob.Coupe  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/lb/install/lb_views.sql-arc   1.1   Jan 15 2015 23:06:02   Rob.Coupe  $
 --       Module Name      : $Workfile:   lb_views.sql  $
---       Date into PVCS   : $Date:   Jan 14 2015 16:16:28  $
---       Date fetched Out : $Modtime:   Jan 14 2015 16:16:00  $
---       PVCS Version     : $Revision:   1.0  $
+--       Date into PVCS   : $Date:   Jan 15 2015 23:06:02  $
+--       Date fetched Out : $Modtime:   Jan 15 2015 23:04:58  $
+--       PVCS Version     : $Revision:   1.1  $
 --
 --   Author : R.A. Coupe
 --
@@ -60,11 +60,11 @@ AS
    SELECT 
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/lb/install/lb_views.sql-arc   1.0   Jan 14 2015 16:16:28   Rob.Coupe  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/lb/install/lb_views.sql-arc   1.1   Jan 15 2015 23:06:02   Rob.Coupe  $
 --       Module Name      : $Workfile:   lb_views.sql  $
---       Date into PVCS   : $Date:   Jan 14 2015 16:16:28  $
---       Date fetched Out : $Modtime:   Jan 14 2015 16:16:00  $
---       PVCS Version     : $Revision:   1.0  $
+--       Date into PVCS   : $Date:   Jan 15 2015 23:06:02  $
+--       Date fetched Out : $Modtime:   Jan 15 2015 23:04:58  $
+--       PVCS Version     : $Revision:   1.1  $
 --
 --   Author : R.A. Coupe
 --
@@ -134,11 +134,11 @@ AS
    SELECT 
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/lb/install/lb_views.sql-arc   1.0   Jan 14 2015 16:16:28   Rob.Coupe  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/lb/install/lb_views.sql-arc   1.1   Jan 15 2015 23:06:02   Rob.Coupe  $
 --       Module Name      : $Workfile:   lb_views.sql  $
---       Date into PVCS   : $Date:   Jan 14 2015 16:16:28  $
---       Date fetched Out : $Modtime:   Jan 14 2015 16:16:00  $
---       PVCS Version     : $Revision:   1.0  $
+--       Date into PVCS   : $Date:   Jan 15 2015 23:06:02  $
+--       Date fetched Out : $Modtime:   Jan 15 2015 23:04:58  $
+--       PVCS Version     : $Revision:   1.1  $
 --
 --   Author : R.A. Coupe
 --
@@ -178,11 +178,11 @@ AS
    SELECT 
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/lb/install/lb_views.sql-arc   1.0   Jan 14 2015 16:16:28   Rob.Coupe  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/lb/install/lb_views.sql-arc   1.1   Jan 15 2015 23:06:02   Rob.Coupe  $
 --       Module Name      : $Workfile:   lb_views.sql  $
---       Date into PVCS   : $Date:   Jan 14 2015 16:16:28  $
---       Date fetched Out : $Modtime:   Jan 14 2015 16:16:00  $
---       PVCS Version     : $Revision:   1.0  $
+--       Date into PVCS   : $Date:   Jan 15 2015 23:06:02  $
+--       Date fetched Out : $Modtime:   Jan 15 2015 23:04:58  $
+--       PVCS Version     : $Revision:   1.1  $
 --
 --   Author : R.A. Coupe
 --
@@ -224,11 +224,11 @@ create or replace view v_nm_nlt_refnts as
 select 
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/lb/install/lb_views.sql-arc   1.0   Jan 14 2015 16:16:28   Rob.Coupe  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/lb/install/lb_views.sql-arc   1.1   Jan 15 2015 23:06:02   Rob.Coupe  $
 --       Module Name      : $Workfile:   lb_views.sql  $
---       Date into PVCS   : $Date:   Jan 14 2015 16:16:28  $
---       Date fetched Out : $Modtime:   Jan 14 2015 16:16:00  $
---       PVCS Version     : $Revision:   1.0  $
+--       Date into PVCS   : $Date:   Jan 15 2015 23:06:02  $
+--       Date fetched Out : $Modtime:   Jan 15 2015 23:04:58  $
+--       PVCS Version     : $Revision:   1.1  $
 --
 --   Author : R.A. Coupe
 --
@@ -260,11 +260,11 @@ create or replace view v_lb_nlt_refnts as
 select 
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/lb/install/lb_views.sql-arc   1.0   Jan 14 2015 16:16:28   Rob.Coupe  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/lb/install/lb_views.sql-arc   1.1   Jan 15 2015 23:06:02   Rob.Coupe  $
 --       Module Name      : $Workfile:   lb_views.sql  $
---       Date into PVCS   : $Date:   Jan 14 2015 16:16:28  $
---       Date fetched Out : $Modtime:   Jan 14 2015 16:16:00  $
---       PVCS Version     : $Revision:   1.0  $
+--       Date into PVCS   : $Date:   Jan 15 2015 23:06:02  $
+--       Date fetched Out : $Modtime:   Jan 15 2015 23:04:58  $
+--       PVCS Version     : $Revision:   1.1  $
 --
 --   Author : R.A. Coupe
 --
@@ -305,11 +305,11 @@ AS
    SELECT 
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/lb/install/lb_views.sql-arc   1.0   Jan 14 2015 16:16:28   Rob.Coupe  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/lb/install/lb_views.sql-arc   1.1   Jan 15 2015 23:06:02   Rob.Coupe  $
 --       Module Name      : $Workfile:   lb_views.sql  $
---       Date into PVCS   : $Date:   Jan 14 2015 16:16:28  $
---       Date fetched Out : $Modtime:   Jan 14 2015 16:16:00  $
---       PVCS Version     : $Revision:   1.0  $
+--       Date into PVCS   : $Date:   Jan 15 2015 23:06:02  $
+--       Date fetched Out : $Modtime:   Jan 15 2015 23:04:58  $
+--       PVCS Version     : $Revision:   1.1  $
 --
 --   Author : R.A. Coupe
 --
@@ -389,11 +389,11 @@ AS
    SELECT 
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/lb/install/lb_views.sql-arc   1.0   Jan 14 2015 16:16:28   Rob.Coupe  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/lb/install/lb_views.sql-arc   1.1   Jan 15 2015 23:06:02   Rob.Coupe  $
 --       Module Name      : $Workfile:   lb_views.sql  $
---       Date into PVCS   : $Date:   Jan 14 2015 16:16:28  $
---       Date fetched Out : $Modtime:   Jan 14 2015 16:16:00  $
---       PVCS Version     : $Revision:   1.0  $
+--       Date into PVCS   : $Date:   Jan 15 2015 23:06:02  $
+--       Date fetched Out : $Modtime:   Jan 15 2015 23:04:58  $
+--       PVCS Version     : $Revision:   1.1  $
 --
 --   Author : R.A. Coupe
 --
@@ -468,11 +468,11 @@ AS
    SELECT 
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/lb/install/lb_views.sql-arc   1.0   Jan 14 2015 16:16:28   Rob.Coupe  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/lb/install/lb_views.sql-arc   1.1   Jan 15 2015 23:06:02   Rob.Coupe  $
 --       Module Name      : $Workfile:   lb_views.sql  $
---       Date into PVCS   : $Date:   Jan 14 2015 16:16:28  $
---       Date fetched Out : $Modtime:   Jan 14 2015 16:16:00  $
---       PVCS Version     : $Revision:   1.0  $
+--       Date into PVCS   : $Date:   Jan 15 2015 23:06:02  $
+--       Date fetched Out : $Modtime:   Jan 15 2015 23:04:58  $
+--       PVCS Version     : $Revision:   1.1  $
 --
 --   Author : R.A. Coupe
 --
@@ -538,11 +538,11 @@ AS
    SELECT 
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/lb/install/lb_views.sql-arc   1.0   Jan 14 2015 16:16:28   Rob.Coupe  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/lb/install/lb_views.sql-arc   1.1   Jan 15 2015 23:06:02   Rob.Coupe  $
 --       Module Name      : $Workfile:   lb_views.sql  $
---       Date into PVCS   : $Date:   Jan 14 2015 16:16:28  $
---       Date fetched Out : $Modtime:   Jan 14 2015 16:16:00  $
---       PVCS Version     : $Revision:   1.0  $
+--       Date into PVCS   : $Date:   Jan 15 2015 23:06:02  $
+--       Date fetched Out : $Modtime:   Jan 15 2015 23:04:58  $
+--       PVCS Version     : $Revision:   1.1  $
 --
 --   Author : R.A. Coupe
 --
@@ -582,11 +582,11 @@ create or replace view v_lb_xsp_list (XSP, XSP_DESCR) as
            SELECT                   /* +INDEX( e NE_PK) +CARDINALITY(t 10) */
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/lb/install/lb_views.sql-arc   1.0   Jan 14 2015 16:16:28   Rob.Coupe  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/lb/install/lb_views.sql-arc   1.1   Jan 15 2015 23:06:02   Rob.Coupe  $
 --       Module Name      : $Workfile:   lb_views.sql  $
---       Date into PVCS   : $Date:   Jan 14 2015 16:16:28  $
---       Date fetched Out : $Modtime:   Jan 14 2015 16:16:00  $
---       PVCS Version     : $Revision:   1.0  $
+--       Date into PVCS   : $Date:   Jan 15 2015 23:06:02  $
+--       Date fetched Out : $Modtime:   Jan 15 2015 23:04:58  $
+--       PVCS Version     : $Revision:   1.1  $
 --
 --   Author : R.A. Coupe
 --
@@ -656,4 +656,136 @@ create or replace view v_lb_xsp_list (XSP, XSP_DESCR) as
                    AND xsr_ity_inv_code = sys_context( 'NM3SQL', 'NLT_DATA_INV_TYPE')
                    AND xsr_nw_type = ne_nt_type
 /                   
+ 
+ 
+CREATE OR REPLACE FORCE VIEW V_LB_SEG_FIXED_LENGTHS
+(
+   OBJ_ID,
+   SEG_ID,
+   FULL_SEG_LENGTH,
+   NO_SEGS,
+   SEG_PART_ID,
+   P_SEG_PART_ID,
+   START_M,
+   END_M,
+   LB_SEG_TAB
+)
+AS
+   SELECT 
+--   PVCS Identifiers :-
+--
+--       pvcsid           : $Header:   //new_vm_latest/archives/lb/install/lb_views.sql-arc   1.1   Jan 15 2015 23:06:02   Rob.Coupe  $
+--       Module Name      : $Workfile:   lb_views.sql  $
+--       Date into PVCS   : $Date:   Jan 15 2015 23:06:02  $
+--       Date fetched Out : $Modtime:   Jan 15 2015 23:04:58  $
+--       PVCS Version     : $Revision:   1.1  $
+--
+--   Author : R.A. Coupe
+--
+--   View definition script for interim install of Location Bridge
+--
+-----------------------------------------------------------------------------
+-- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
+----------------------------------------------------------------------------
+--
+          t4."OBJ_ID",
+          t4."SEG_ID",
+          t4."FULL_SEG_LENGTH",
+          t4."NO_SEGS",
+          t4."SEG_PART_ID",
+          t4."P_SEG_PART_ID",
+          t4."START_M",
+          t4."END_M",
+          get_lb_rpt_d_tab (
+             lb_rpt_tab (
+                lb_rpt (
+                   obj_id,
+                   TO_NUMBER (SYS_CONTEXT ('NM3SQL', 'NLT_DATA_NLT_ID')),
+                   NULL,
+                   obj_id,
+                   seg_id,
+                   NULL,
+                   1,
+                   start_m,
+                   end_m,
+                   4)))
+             lb_seg_tab
+     FROM (SELECT t3.*,
+                    p_seg_part_id
+                  * TO_NUMBER (SYS_CONTEXT ('NM3SQL', 'NLT_FIXED_LENGTH'))
+                     start_m,
+                    seg_part_id
+                  * TO_NUMBER (SYS_CONTEXT ('NM3SQL', 'NLT_FIXED_LENGTH'))
+                     end_m
+             FROM (SELECT obj_id,
+                          seg_id,
+                          full_seg_length,
+                          no_segs,
+                          seg_part_id,
+                          NVL (
+                             LAG (
+                                seg_part_id,
+                                1)
+                             OVER (PARTITION BY obj_id, seg_id
+                                   ORDER BY seg_part_id),
+                             0)
+                             p_seg_part_id
+                     FROM (WITH segs
+                                AS (  SELECT obj_id,
+                                             seg_id,
+                                             full_seg_length,
+                                             FLOOR (
+                                                  full_seg_length
+                                                / TO_NUMBER (
+                                                     SYS_CONTEXT (
+                                                        'NM3SQL',
+                                                        'NLT_FIXED_LENGTH')))
+                                                no_segs
+                                        FROM (  SELECT t.*,
+                                                       SUM (
+                                                          end_m - start_m)
+                                                       OVER (
+                                                          PARTITION BY obj_id,
+                                                                       seg_id)
+                                                          full_seg_length
+                                                  FROM TABLE (
+                                                          SELECT CAST (
+                                                                    COLLECT (
+                                                                       lb_rpt (
+                                                                          nm_ne_id_of,
+                                                                          TO_NUMBER (
+                                                                             SYS_CONTEXT (
+                                                                                'NM3SQL',
+                                                                                'NLT_DATA_NLT_ID')),
+                                                                          nm_obj_type,
+                                                                          nm_ne_id_in,
+                                                                          nm_seg_no,
+                                                                          nm_seq_no,
+                                                                          nm_cardinality,
+                                                                          nm_slk,
+                                                                          nm_end_slk,
+                                                                          4)) AS lb_rpt_tab)
+                                                                    lb_tab
+                                                            FROM nm_members
+                                                           WHERE nm_ne_id_in =
+                                                                    TO_NUMBER (
+                                                                       SYS_CONTEXT (
+                                                                          'NM3SQL',
+                                                                          'NLT_NE_ID'))) t
+                                              ORDER BY obj_id, seg_id, seq_id)
+                                             t1
+                                    GROUP BY obj_id,
+                                             seg_id,
+                                             full_seg_length,
+                                             FLOOR (
+                                                  full_seg_length
+                                                / TO_NUMBER (
+                                                     SYS_CONTEXT (
+                                                        'NM3SQL',
+                                                        'NLT_FIXED_LENGTH'))))
+                           SELECT *
+                             FROM segs,
+                                  (    SELECT LEVEL seg_part_id
+                                         FROM segs
+                                   CONNECT BY LEVEL <= no_segs))) t3) t4;
  
