@@ -3,11 +3,11 @@
 --
 --   PVCS Identifiers :-
 --
---       pvcsid                 : $Header:   //new_vm_latest/archives/lb/admin/utl/drop_lb.sql-arc   1.0   Jan 14 2015 15:18:54   Rob.Coupe  $
+--       pvcsid                 : $Header:   //new_vm_latest/archives/lb/admin/utl/drop_lb.sql-arc   1.1   Jan 15 2015 21:13:38   Rob.Coupe  $
 --       Module Name      : $Workfile:   drop_lb.sql  $
---       Date into PVCS   : $Date:   Jan 14 2015 15:18:54  $
---       Date fetched Out : $Modtime:   Jan 14 2015 15:15:28  $
---       PVCS Version     : $Revision:   1.0  $
+--       Date into PVCS   : $Date:   Jan 15 2015 21:13:38  $
+--       Date fetched Out : $Modtime:   Jan 15 2015 21:12:44  $
+--       PVCS Version     : $Revision:   1.1  $
 --
 --   Author : Rob Coupe
 --
@@ -90,4 +90,51 @@ ALTER TABLE NM_LOCATION_GEOMETRY
 /
 
 DROP TABLE NM_LOCATION_GEOMETRY CASCADE CONSTRAINTS
+/
+
+ALTER TABLE NM_LOCATIONS_ALL
+   DROP PRIMARY KEY CASCADE
+/
+
+DROP TABLE NM_LOCATIONS_ALL CASCADE CONSTRAINTS
+/
+
+
+drop view v_lb_nlt_geometry
+/
+
+drop procedure create_nlt_geometry_view
+/
+
+drop view v_nm_nlt_data
+/
+
+drop view V_XSP_LIST
+/
+
+drop view v_lb_xsp_list
+/
+
+drop view V_NM_NLT_MEASURES
+/
+
+drop view V_LB_NLT_REFNTS
+/
+
+drop view V_LB_NETWORKTYPES
+/
+
+drop view V_LB_INV_NLT_DATA
+/
+
+drop view NM_ASSET_LOCATIONS
+/
+
+drop view NM_LOCATIONS
+/
+
+drop view V_NM_NLT_UNIT_CONVERSIONS
+/
+
+drop view v_nm_nlt_refnts
 /
