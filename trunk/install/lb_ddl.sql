@@ -1,10 +1,10 @@
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/lb/install/lb_ddl.sql-arc   1.0   Jan 14 2015 16:06:46   Rob.Coupe  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/lb/install/lb_ddl.sql-arc   1.1   Jan 15 2015 21:19:42   Rob.Coupe  $
 --       Module Name      : $Workfile:   lb_ddl.sql  $
---       Date into PVCS   : $Date:   Jan 14 2015 16:06:46  $
---       Date fetched Out : $Modtime:   Jan 14 2015 16:06:12  $
---       PVCS Version     : $Revision:   1.0  $
+--       Date into PVCS   : $Date:   Jan 15 2015 21:19:42  $
+--       Date fetched Out : $Modtime:   Jan 15 2015 21:19:14  $
+--       PVCS Version     : $Revision:   1.1  $
 --
 --   Author : R.A. Coupe
 --
@@ -20,22 +20,6 @@
  LB_TYPES - the interface table to eB asset types
  
 */
-
-declare
-  cursor c1 is
-    select nit_inv_type from nm_inv_types
-    where nit_category = 'L';
-begin
-  for irec in c1 loop
-    begin
-      execute immediate 'begin LB_REG.DROP_LB_ASSET_TYPE(:nit_inv_type); end; ' using irec.nit_inv_type;
-	exception
-	  when others then NULL;
-	end;
-  end loop;
-end;
-/
-
 
 ALTER TABLE LB_TYPES
  DROP PRIMARY KEY CASCADE
