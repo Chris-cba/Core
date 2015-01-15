@@ -1,0 +1,52 @@
+CREATE OR REPLACE PACKAGE lb_reg
+AS
+--   PVCS Identifiers :-
+--
+--       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_reg.pkh-arc   1.1   Jan 15 2015 22:39:32   Rob.Coupe  $
+--       Module Name      : $Workfile:   lb_reg.pkh  $
+--       Date into PVCS   : $Date:   Jan 15 2015 22:39:32  $
+--       Date fetched Out : $Modtime:   Jan 15 2015 22:39:12  $
+--       PVCS Version     : $Revision:   1.1  $
+-----------------------------------------------------------------------------
+--   Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+
+   g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   1.1  $';
+   FUNCTION get_version return varchar2;
+   FUNCTION get_body_version return varchar2;
+
+   PROCEDURE register_lb_asset_type (
+      pi_lb_object_type   IN INTEGER,
+      pi_LB_asset_class   IN VARCHAR2,
+      pi_exor_type        IN VARCHAR2,
+      pi_xsp_flag         IN BOOLEAN,
+      pi_nlt_id           IN INTEGER DEFAULT NULL,
+      pi_role             IN VARCHAR2 DEFAULT NULL,
+      pi_role_mode        IN VARCHAR2 DEFAULT 'NORMAL',
+      pi_start_date       IN DATE DEFAULT TRUNC (SYSDATE),
+      pi_p_or_c           IN VARCHAR2 DEFAULT 'C',
+      pi_security_type    IN VARCHAR2 DEFAULT 'NONE');
+
+   --
+
+   PROCEDURE register_lb_asset_type (
+      pi_lb_object_type   IN INTEGER,
+      pi_LB_asset_class   IN VARCHAR2,
+      pi_exor_type        IN VARCHAR2,
+      pi_xsp_flag         IN BOOLEAN,
+      pi_nlt_ids          IN INT_ARRAY DEFAULT NULL,
+      pi_role             IN VARCHAR2 DEFAULT NULL,
+      pi_role_mode        IN VARCHAR2 DEFAULT 'NORMAL',
+      pi_start_date       IN DATE DEFAULT TRUNC (SYSDATE),
+      pi_p_or_c           IN VARCHAR2 DEFAULT 'C',
+      pi_security_type    IN VARCHAR2 DEFAULT 'NONE');
+
+   --
+   PROCEDURE drop_lb_asset_type (pi_lb_object_type   IN INTEGER,
+                                 pi_exor_type        IN VARCHAR2);
+--
+
+   PROCEDURE drop_lb_asset_type (pi_exor_type        IN VARCHAR2);
+
+END;
+/
