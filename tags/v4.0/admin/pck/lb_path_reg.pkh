@@ -1,0 +1,29 @@
+CREATE OR REPLACE PACKAGE lb_path_reg
+AS
+   --   PVCS Identifiers :-
+   --
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_path_reg.pkh-arc   1.1   Jan 15 2015 22:37:06   Rob.Coupe  $
+   --       Module Name      : $Workfile:   lb_path_reg.pkh  $
+   --       Date into PVCS   : $Date:   Jan 15 2015 22:37:06  $
+   --       Date fetched Out : $Modtime:   Jan 15 2015 22:36:44  $
+   --       PVCS Version     : $Revision:   1.1  $
+   --
+   --   Author : R.A. Coupe
+   --
+   --   Location Bridge package for registering network metadata for pathing
+   --
+   -----------------------------------------------------------------------------
+   -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
+   ----------------------------------------------------------------------------
+   --
+   g_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.1  $';
+   --
+   FUNCTION get_version return varchar2;
+   FUNCTION get_body_version return varchar2;
+
+   PROCEDURE register_nw_types (pi_network_name   IN VARCHAR2,
+                                pi_node_type      IN VARCHAR2);
+
+   PROCEDURE drop_network (pi_network IN VARCHAR2);
+END;
+/
