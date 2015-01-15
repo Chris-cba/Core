@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE lb_get
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_get.pkh-arc   1.0   Jan 15 2015 15:18:54   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_get.pkh-arc   1.1   Jan 15 2015 22:33:42   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_get.pkh  $
-   --       Date into PVCS   : $Date:   Jan 15 2015 15:18:54  $
-   --       Date fetched Out : $Modtime:   Jan 15 2015 15:18:08  $
-   --       PVCS Version     : $Revision:   1.0  $
+   --       Date into PVCS   : $Date:   Jan 15 2015 22:33:42  $
+   --       Date fetched Out : $Modtime:   Jan 15 2015 22:32:56  $
+   --       PVCS Version     : $Revision:   1.1  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,8 +16,11 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.0  $';
+   g_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.1  $';
    --
+   FUNCTION get_version return varchar2;
+   FUNCTION get_body_version return varchar2;
+   
    FUNCTION get_obj_RPt_tab (p_refnt_tab     IN lb_RPt_tab,
                              p_obj_type      IN VARCHAR2,
                              p_intsct        IN VARCHAR2 default 'FALSE',
