@@ -1,0 +1,29 @@
+CREATE OR REPLACE PACKAGE lb_seg
+AS
+--   PVCS Identifiers :-
+--
+--       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_seg.pkh-arc   1.0   Jan 15 2015 22:52:22   Rob.Coupe  $
+--       Module Name      : $Workfile:   lb_seg.pkh  $
+--       Date into PVCS   : $Date:   Jan 15 2015 22:52:22  $
+--       Date fetched Out : $Modtime:   Jan 15 2015 22:51:42  $
+--       PVCS Version     : $Revision:   1.0  $
+-----------------------------------------------------------------------------
+--   Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+
+   g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   1.0  $';
+   FUNCTION get_version return varchar2;
+   FUNCTION get_body_version return varchar2;
+
+   PROCEDURE set_fixed_length_seg (pi_nlt_type in integer,
+                                   pi_ne_id                  IN INTEGER,
+                                   pi_fixed_length           IN NUMBER,
+                                   pi_fixed_length_unit_id   IN INTEGER);
+
+   FUNCTION get_nth_fixed_length_seg (pi_N IN INTEGER)
+      RETURN lb_rpt_tab;
+
+   FUNCTION get_random_fixed_length_seg
+      RETURN lb_rpt_tab;
+END;
+/
