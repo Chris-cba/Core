@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_load
 AS
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_load.pkb-arc   1.1   Jan 15 2015 13:33:40   Rob.Coupe  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_load.pkb-arc   1.2   Jan 15 2015 20:26:58   Rob.Coupe  $
 --       Module Name      : $Workfile:   lb_load.pkb  $
---       Date into PVCS   : $Date:   Jan 15 2015 13:33:40  $
---       Date fetched Out : $Modtime:   Jan 15 2015 13:33:18  $
---       PVCS Version     : $Revision:   1.1  $
+--       Date into PVCS   : $Date:   Jan 15 2015 20:26:58  $
+--       Date fetched Out : $Modtime:   Jan 15 2015 20:25:54  $
+--       PVCS Version     : $Revision:   1.2  $
 --
 --   Author : R.A. Coupe
 --
@@ -16,7 +16,7 @@ AS
 -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
 ----------------------------------------------------------------------------
 --
-   g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   1.1  $';
+   g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   1.2  $';
   
    g_package_name    CONSTANT  varchar2(30)   := 'lb_load';
 
@@ -222,7 +222,7 @@ AS
                                   ( select ne_admin_unit from nm_elements where ne_id = p_obj_Rpt (i).refnt )
                                  else p_security_id                                 
                                  end
-                                 from lb_types where lb_exor_inv_type = p_obj_Rpt (i).obj_type ),
+                                 from LB_INV_SECURITY where lb_exor_inv_type = p_obj_Rpt (i).obj_type ),
                            p_xsp,
                            p_xsp,
                            p_obj_Rpt (i).dir_flag,
