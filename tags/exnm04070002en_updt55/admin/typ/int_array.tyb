@@ -1,0 +1,131 @@
+CREATE OR REPLACE type body INT_ARRAY is 
+-----------------------------------------------------------------------------
+--
+--
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)int_array.tyb	1.2 03/03/06
+--       Module Name      : int_array.tyb
+--       Date into SCCS   : 06/03/03 12:13:17
+--       Date fetched Out : 07/06/13 17:04:19
+--       SCCS Version     : 1.2
+--
+--   Author : Rob Coupe
+--
+--
+--   TYPE int_array
+--
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
+member function add_element( p_i in integer) return int_array is
+   this_ia int_array := SELF;
+--
+   prior_i integer;
+--
+   l_extend_varray   BOOLEAN;
+--
+   c_max_array_count CONSTANT BINARY_INTEGER := 1048576;
+--
+begin
+--
+-- If there are NO entries in the VARRAY then extend it
+--
+   IF this_ia.ia.COUNT = 0
+    THEN
+      this_ia.ia.extend;
+   END IF;
+--
+-- If the last element in the array has a NULL pl_ne_id, then just update this entry when the time comes
+--
+   l_extend_varray := (ia(this_ia.ia.last) IS NOT NULL);
+--
+   IF l_extend_varray
+    THEN
+      IF this_ia.ia.COUNT = c_max_array_count
+       THEN
+         raise_application_error(-20001,'Integer Array cannot have more than '||c_max_array_count||' entries');
+      END IF;
+      this_ia.ia.extend;
+   END IF;
+--
+   this_ia.ia(this_ia.ia.last) := p_i;
+--
+   return this_ia;
+--
+exception
+   when others
+    then
+      return null;
+--
+end add_element;
+
+
+member function append( p_ia in int_array) return int_array is 
+l_last integer; 
+l_ia    int_array := self; 
+retval  int_array; 
+begin 
+  l_last := l_ia.ia.last; 
+  l_ia.ia.extend( p_ia.ia.last ); 
+  for i in 1..p_ia.ia.last loop 
+    l_ia.ia( l_last + i ) := p_ia.ia(i); 
+  end loop; 
+  return l_ia; 
+end; 
+
+member function distinct_elements return int_array is
+l_ia     int_array := int_array( int_array_type(null));
+begin
+  select distinct i.column_value
+  bulk collect into l_ia.ia
+  from table ( self.ia ) i;
+  return l_ia;
+end;
+
+member function array_to_list return varchar2 is
+retval varchar2(4000);
+begin
+  retval := to_char( self.ia(1) );
+  if self.ia.last > 1 then
+    for i in 2..self.ia.last loop
+	  retval := retval||','||to_char(self.ia(i));
+	end loop;
+  end if;
+  return retval;
+end;
+--
+member function is_empty RETURN BOOLEAN IS
+--
+-- This function returns TRUE if the array has no entries, or there is only
+--  one entry and it is set to NULL
+--
+   this_ia int_array := SELF;
+--
+   l_retval BOOLEAN := FALSE;
+--
+begin
+--
+   IF    this_ia.ia.COUNT = 0
+    THEN
+      l_retval := TRUE;
+   ELSIF this_ia.ia.COUNT = 1
+    AND  ia(1) IS NULL
+    THEN
+      l_retval := TRUE;
+   END IF;
+--
+   RETURN l_retval;
+--
+END is_empty;
+--  
+member procedure debug is
+begin
+  for i in 1..self.ia.last loop
+    nm_debug.debug( 'Value '||to_char(i)||','||to_char(self.ia(i)));
+  end loop;
+end;
+
+end;
+/
