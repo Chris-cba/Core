@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE lb_loc
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_loc.pkh-arc   1.1   Jan 15 2015 20:03:08   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_loc.pkh-arc   1.2   Jan 15 2015 22:35:12   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_loc.pkh  $
-   --       Date into PVCS   : $Date:   Jan 15 2015 20:03:08  $
-   --       Date fetched Out : $Modtime:   Jan 15 2015 20:02:46  $
-   --       PVCS Version     : $Revision:   1.1  $
+   --       Date into PVCS   : $Date:   Jan 15 2015 22:35:12  $
+   --       Date fetched Out : $Modtime:   Jan 15 2015 22:34:52  $
+   --       PVCS Version     : $Revision:   1.2  $
    --
    --   Author : R.A. Coupe
    --
@@ -17,11 +17,10 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.1  $';
+   g_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.2  $';
 
-   --
-   -----------------------------------------------------------------------------
-   --
+   FUNCTION get_version return varchar2;
+   FUNCTION get_body_version return varchar2;
 
    --function to return a set of asset locations and JXPs (query by asset-id and exor asset type)
    FUNCTION get_nal (
