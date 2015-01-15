@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_security
 AS
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_security.pkb-arc   1.0   Jan 15 2015 15:01:26   Rob.Coupe  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_security.pkb-arc   1.1   Jan 15 2015 22:48:02   Rob.Coupe  $
 --       Module Name      : $Workfile:   lb_security.pkb  $
---       Date into PVCS   : $Date:   Jan 15 2015 15:01:26  $
---       Date fetched Out : $Modtime:   Jan 15 2015 14:59:28  $
---       PVCS Version     : $Revision:   1.0  $
+--       Date into PVCS   : $Date:   Jan 15 2015 22:48:02  $
+--       Date fetched Out : $Modtime:   Jan 15 2015 22:47:44  $
+--       PVCS Version     : $Revision:   1.1  $
 --
 --   Author : R.A. Coupe
 --
@@ -17,7 +17,7 @@ AS
 ----------------------------------------------------------------------------
 --
 
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.0  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.1  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_security	';
 
@@ -211,3 +211,4 @@ AS
       RETURN l_str;
    END;
 END;
+/
