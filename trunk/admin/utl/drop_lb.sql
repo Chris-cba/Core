@@ -3,11 +3,11 @@
 --
 --   PVCS Identifiers :-
 --
---       pvcsid                 : $Header:   //new_vm_latest/archives/lb/admin/utl/drop_lb.sql-arc   1.1   Jan 15 2015 21:13:38   Rob.Coupe  $
+--       pvcsid                 : $Header:   //new_vm_latest/archives/lb/admin/utl/drop_lb.sql-arc   1.2   Jan 15 2015 22:11:42   Rob.Coupe  $
 --       Module Name      : $Workfile:   drop_lb.sql  $
---       Date into PVCS   : $Date:   Jan 15 2015 21:13:38  $
---       Date fetched Out : $Modtime:   Jan 15 2015 21:12:44  $
---       PVCS Version     : $Revision:   1.1  $
+--       Date into PVCS   : $Date:   Jan 15 2015 22:11:42  $
+--       Date fetched Out : $Modtime:   Jan 15 2015 22:11:14  $
+--       PVCS Version     : $Revision:   1.2  $
 --
 --   Author : Rob Coupe
 --
@@ -17,22 +17,6 @@
 --   Copyright (c) 2014 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
-
-
-
-DECLARE
-   CURSOR c1
-   IS
-      SELECT nit_inv_type
-        FROM nm_inv_types
-       WHERE nit_category = 'L';
-BEGIN
-   FOR irec IN c1
-   LOOP
-      LB_REG.DROP_LB_ASSET_TYPE (irec.nit_inv_type);
-   END LOOP;
-END;
-/
 
 
 ALTER TABLE LB_TYPES
@@ -109,8 +93,8 @@ drop procedure create_nlt_geometry_view
 drop view v_nm_nlt_data
 /
 
-drop view V_XSP_LIST
-/
+--drop view V_XSP_LIST
+--/
 
 drop view v_lb_xsp_list
 /
