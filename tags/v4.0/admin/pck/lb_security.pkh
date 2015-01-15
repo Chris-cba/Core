@@ -1,0 +1,39 @@
+CREATE OR REPLACE PACKAGE lb_security
+AS
+--
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_security.pkh-arc   1.2   Jan 15 2015 22:40:16   Rob.Coupe  $
+--       Module Name      : $Workfile:   lb_security.pkh  $
+--       Date into PVCS   : $Date:   Jan 15 2015 22:40:16  $
+--       Date fetched Out : $Modtime:   Jan 15 2015 22:39:58  $
+--       Version          : $Revision:   1.2  $
+--       Based on SCCS version : 1.20
+-------------------------------------------------------------------------
+--
+--   Author : R.A. Coupe
+--
+--   Location Bridge Security Predicate Package header
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+   g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   1.2  $';
+
+   FUNCTION get_version return varchar2;
+   FUNCTION get_body_version return varchar2;
+   
+   FUNCTION loc_predicate (schema_in VARCHAR2, NAME_IN VARCHAR2)
+      RETURN VARCHAR2;
+
+   FUNCTION nal_predicate (schema_in VARCHAR2, NAME_IN VARCHAR2)
+      RETURN VARCHAR2;
+
+   FUNCTION get_loc_string
+      RETURN VARCHAR2;
+
+   FUNCTION get_nal_string
+      RETURN VARCHAR2;
+END;
+/
