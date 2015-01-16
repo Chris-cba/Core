@@ -1,0 +1,69 @@
+CREATE OR REPLACE PACKAGE nm3_msv_util AS
+--------------------------------------------------------------------------------------------------------------------
+--
+--  <PACKAGE>
+--
+--    SCCS Identifiers :-
+--------------------------------------------------------------------------------------------------------------------
+--
+--    sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3_msv_util.pkh-arc   3.0   Jan 16 2015 11:08:08   Mike.Huitson  $
+--    Module Name      : $Workfile:   nm3_msv_util.pkh  $
+--    Date into PVCS   : $Date:   Jan 16 2015 11:08:08  $
+--    Date fetched Out : $Modtime:   Jan 16 2015 10:15:02  $
+--    PVCS Version     : $Revision:   3.0  $
+--
+--   Product upgrade script
+--
+--------------------------------------------------------------------------------------------------------------------
+--   Copyright (c) 2014 Bentley Systems Incorporated. All rights reserved.
+--------------------------------------------------------------------------------------------------------------------
+--  </PACKAGE>
+--  <GLOBVAR>
+    g_ne_id       NUMBER;
+    g_doc_id      NUMBER;
+    g_sccsid      CONSTANT  VARCHAR2(2000) :='"$Revision:   3.0  $"';
+
+    g_conversion_factor NUMBER;
+    --
+    error_msg_gbl VARCHAR2(4000);
+    --
+--    g_sccsid is the SCCS ID for the package
+--  </GLOBVAR>
+--
+--------------------------------------------------------------------------------------------------------------------
+--
+--  <PROC NAME="GET_VERSION">
+--  This function returns the current SCCS version
+    FUNCTION get_version RETURN VARCHAR2;
+--  </PROC>
+--
+--------------------------------------------------------------------------------------------------------------------
+--
+--  <PROC NAME="GET_BODY_VERSION">
+--  This function returns the current SCCS version of the package body
+    FUNCTION get_body_version RETURN VARCHAR2;
+--  </PROC>
+--
+--------------------------------------------------------------------------------------------------------------------
+--
+--  <PROC NAME="get_style_size">
+--  This procedure takes style name as input parameter and returns width, height
+--  and an error message (if any) for the style as output parameters
+    PROCEDURE get_style_size  (style_name IN    MDSYS.sdo_styles_table.name%TYPE
+                  ,width    OUT   NUMBER
+                  ,height   OUT   NUMBER
+                  );
+--  </PROC>
+--
+--------------------------------------------------------------------------------------------------------------------
+--
+--  <PROC NAME="get_style_size">
+--  This function takes style name as input parameter and returns width and
+--  height as an OBJECT for the style
+    FUNCTION get_style_size (style_name IN  MDSYS.sdo_styles_table.name%TYPE)
+    RETURN nm_msv_style_size;
+--  </PROC>
+--
+--------------------------------------------------------------------------------------------------------------------
+END nm3_msv_util;
+/
