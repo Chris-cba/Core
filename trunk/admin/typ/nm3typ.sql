@@ -3,11 +3,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/typ/nm3typ.sql-arc   2.10   Sep 18 2014 13:25:58   Mike.Huitson  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/typ/nm3typ.sql-arc   2.11   Jan 16 2015 10:22:54   Mike.Huitson  $
 --       Module Name      : $Workfile:   nm3typ.sql  $
---       Date into PVCS   : $Date:   Sep 18 2014 13:25:58  $
---       Date fetched Out : $Modtime:   Sep 18 2014 13:25:18  $
---       Version          : $Revision:   2.10  $
+--       Date into PVCS   : $Date:   Jan 16 2015 10:22:54  $
+--       Date fetched Out : $Modtime:   Jan 16 2015 10:22:18  $
+--       Version          : $Revision:   2.11  $
 --
 --   Product upgrade script
 --
@@ -2065,12 +2065,25 @@ start '&&run_file'
 --------------------------------------------------------------------------------------------
 --
 set term on
-prompt nav_id header
+prompt nm_max_varchar_tbl header
 set term off
 set define on
 set feedback off
 select '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'typ'||
         '&terminator'||'nm_max_varchar_tbl.tyh' run_file
+from dual
+/
+start '&&run_file'
+--
+--------------------------------------------------------------------------------------------
+--
+set term on
+prompt nm_msv_style_size.tyh header
+set term off
+set define on
+set feedback off
+select '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'typ'||
+        '&terminator'||'nm_msv_style_size.tyh' run_file
 from dual
 /
 start '&&run_file'
