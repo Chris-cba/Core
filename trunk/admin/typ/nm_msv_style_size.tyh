@@ -1,0 +1,21 @@
+CREATE OR REPLACE TYPE nm_msv_style_size
+--------------------------------------------------------------------------------------------------------------------
+--
+--   PVCS Identifiers :-
+--
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/typ/nm_msv_style_size.tyh-arc   3.0   Jan 16 2015 10:19:56   Mike.Huitson  $
+--       Module Name      : $Workfile:   nm_msv_style_size.tyh  $
+--       Date into PVCS   : $Date:   Jan 16 2015 10:19:56  $
+--       Date fetched Out : $Modtime:   Jan 16 2015 10:07:16  $
+--       PVCS Version     : $Revision:   3.0  $
+--
+--   Product upgrade script
+--
+--------------------------------------------------------------------------------------------------------------------
+--   Copyright (c) 2014 Bentley Systems Incorporated. All rights reserved.
+--------------------------------------------------------------------------------------------------------------------
+--
+AS OBJECT (width    NUMBER
+          ,height   NUMBER
+          ,error_msg  VARCHAR2(4000))
+/
