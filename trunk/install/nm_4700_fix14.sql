@@ -2,11 +2,11 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/nm_4700_fix14.sql-arc   3.4   Jan 16 2015 11:45:26   Stephen.Sewell  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/nm_4700_fix14.sql-arc   3.5   Jan 19 2015 10:38:56   Stephen.Sewell  $
 --       Module Name      : $Workfile:   nm_4700_fix14.sql  $
---       Date into PVCS   : $Date:   Jan 16 2015 11:45:26  $
---       Date fetched Out : $Modtime:   Jan 15 2015 15:56:46  $
---       PVCS Version     : $Revision:   3.4  $
+--       Date into PVCS   : $Date:   Jan 19 2015 10:38:56  $
+--       Date fetched Out : $Modtime:   Jan 19 2015 10:37:54  $
+--       PVCS Version     : $Revision:   3.5  $
 --
 --------------------------------------------------------------------------------
 --   Copyright (c) 2014 Bentley Systems Incorporated.
@@ -129,19 +129,14 @@ BEGIN
       dbms_output.put_line('Columns already present in nm_inv_items_all_j.');
       null;
   end;
-  -- Tie back rows to row in nm_inv_items_all - TFL
-  EXECUTE IMMEDIATE 'UPDATE nm_inv_items_all_j iiaj '
-                    ||'set iiaj.parent_ne_id = (select max(iia.iit_ne_id) '
-                    ||'from nm_inv_items_all iia '
-                    ||'where iia.iit_primary_key = iiaj.iit_primary_key '
-                    ||'and iia.iit_inv_type = iiaj.iit_inv_type) '
-                    ||'where iiaj.parent_ne_id is NULL';
-  dbms_output.put_line('Updated parent_id in nm_inv_items_all_j.');
 
   -- Update audit columns added to new table
   EXECUTE IMMEDIATE 'UPDATE nm_inv_items_all_j '
                     ||'set iit_audit_type = ''M'', created_by = USER, date_created = SYSDATE';
   dbms_output.put_line('Updated audit columns in nm_inv_items_all_j.');
+
+  -- Disable triggers on nm_inv_items_all to prevent them firing for the following deletes and updates
+  EXECUTE IMMEDIATE 'ALTER TABLE nm_inv_items_all disable all triggers';
 
   -- Remove rows from nm_inv_items_all which have been copied into nm_inv_items_all_j
   EXECUTE IMMEDIATE 'DELETE from nm_inv_items_all iia '
@@ -158,14 +153,11 @@ BEGIN
 --      null;
   end;
  
-  -- Disable triggers on nm_inv_items_all to prevent them firing for the following update
-  EXECUTE IMMEDIATE 'ALTER TABLE nm_inv_items_all disable all triggers';
-
   -- Update audit column added to nm_inv_items_all
   EXECUTE IMMEDIATE 'UPDATE nm_inv_items_all '
                     ||'set iit_audit_type = ''M''';
 
-  -- Re-enable triggers on nm_inv_items_all now update is complete
+  -- Re-enable triggers on nm_inv_items_all now deletes and updates are complete
   EXECUTE IMMEDIATE 'ALTER TABLE nm_inv_items_all enable all triggers';
   dbms_output.put_line('Updated audit column in nm_inv_items_all.');
 
@@ -280,6 +272,30 @@ EXCEPTION
   WHEN name_already_used THEN
     dbms_output.put_line('NAME_ALREADY_USED exception raised.');
     NULL;
+END;
+/
+
+PROMPT Gather stats on new table to aid performance
+begin
+  dbms_stats.gather_table_stats(Sys_Context('NM3CORE','APPLICATION_OWNER'),'nm_inv_items_all_j');
+end;
+
+SET TERM ON 
+PROMPT Linking rows in nm_inv_items_all_j back to master row in nm_inv_items_all.
+SET TERM OFF
+
+BEGIN
+  -- Tie back rows to row in nm_inv_items_all - TFL
+  EXECUTE IMMEDIATE 'UPDATE nm_inv_items_all_j iiaj '
+                    ||'set iiaj.parent_ne_id = (select max(iia.iit_ne_id) '
+                    ||'from nm_inv_items_all iia '
+                    ||'where iia.iit_primary_key = iiaj.iit_primary_key '
+                    ||'and iia.iit_inv_type = iiaj.iit_inv_type) '
+                    ||'where iiaj.parent_ne_id is NULL';
+  dbms_output.put_line('Updated parent_id in nm_inv_items_all_j.');
+EXCEPTION
+   when others THEN
+    dbms_output.put_line('OTHERS exception raised. sqlerror was '||sqlerrm);
 END;
 /
 
