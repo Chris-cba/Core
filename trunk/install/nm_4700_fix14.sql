@@ -2,11 +2,11 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/nm_4700_fix14.sql-arc   3.5   Jan 19 2015 10:38:56   Stephen.Sewell  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/nm_4700_fix14.sql-arc   3.6   Jan 19 2015 11:54:24   Stephen.Sewell  $
 --       Module Name      : $Workfile:   nm_4700_fix14.sql  $
---       Date into PVCS   : $Date:   Jan 19 2015 10:38:56  $
---       Date fetched Out : $Modtime:   Jan 19 2015 10:37:54  $
---       PVCS Version     : $Revision:   3.5  $
+--       Date into PVCS   : $Date:   Jan 19 2015 11:54:24  $
+--       Date fetched Out : $Modtime:   Jan 19 2015 11:53:28  $
+--       PVCS Version     : $Revision:   3.6  $
 --
 --------------------------------------------------------------------------------
 --   Copyright (c) 2014 Bentley Systems Incorporated.
@@ -279,6 +279,7 @@ PROMPT Gather stats on new table to aid performance
 begin
   dbms_stats.gather_table_stats(Sys_Context('NM3CORE','APPLICATION_OWNER'),'nm_inv_items_all_j');
 end;
+/
 
 SET TERM ON 
 PROMPT Linking rows in nm_inv_items_all_j back to master row in nm_inv_items_all.
