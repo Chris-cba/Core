@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_ref
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_ref.pkb-arc   1.2   Jan 20 2015 19:38:30   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_ref.pkb-arc   1.3   Jan 20 2015 21:04:36   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_ref.pkb  $
-   --       Date into PVCS   : $Date:   Jan 20 2015 19:38:30  $
-   --       Date fetched Out : $Modtime:   Jan 20 2015 19:38:04  $
-   --       PVCS Version     : $Revision:   1.2  $
+   --       Date into PVCS   : $Date:   Jan 20 2015 21:04:36  $
+   --       Date fetched Out : $Modtime:   Jan 20 2015 21:04:10  $
+   --       PVCS Version     : $Revision:   1.3  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,7 +16,7 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.2  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.3  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_ref';
 
@@ -545,7 +545,18 @@ AS
 
       RETURN retval;
    END;
-   
+
+   FUNCTION GETASSETNETWORKELEMENTS (
+      ASSETTYPE   IN INTEGER DEFAULT NULL,
+      NETWORKTYPEID     IN INTEGER DEFAULT NULL,
+      NETWORKELEMENT     IN VARCHAR2 DEFAULT NULL)
+      RETURN SYS_REFCURSOR;
+
+   FUNCTION GETASSETNETWORKELEMENTS_TAB (
+      ASSETTYPE   IN INTEGER DEFAULT NULL,
+      NETWORKTYPEID     IN INTEGER DEFAULT NULL,
+      NETWORKELEMENT     IN VARCHAR2 DEFAULT NULL)
+      RETURN lb_linear_refnt_tab;   
    
 END lb_ref;
 /
