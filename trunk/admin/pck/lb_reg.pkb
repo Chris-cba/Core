@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_reg
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_reg.pkb-arc   1.3   Jan 15 2015 20:49:16   Rob.Coupe  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_reg.pkb-arc   1.4   Jan 20 2015 15:58:06   Rob.Coupe  $
 --       Module Name      : $Workfile:   lb_reg.pkb  $
---       Date into PVCS   : $Date:   Jan 15 2015 20:49:16  $
---       Date fetched Out : $Modtime:   Jan 15 2015 20:48:44  $
---       PVCS Version     : $Revision:   1.3  $
+--       Date into PVCS   : $Date:   Jan 20 2015 15:58:06  $
+--       Date fetched Out : $Modtime:   Jan 20 2015 15:57:28  $
+--       PVCS Version     : $Revision:   1.4  $
 --
 --   Author : R.A. Coupe
 --
@@ -19,7 +19,7 @@ AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(30) :='"$Revision:   1.3  $"';
+   g_body_sccsid     CONSTANT  varchar2(30) :='"$Revision:   1.4  $"';
 
    g_package_name    CONSTANT  varchar2(30)   := 'NM3RSC';
 --
@@ -252,6 +252,7 @@ AS
    --
    PROCEDURE drop_lb_asset_type (pi_exor_type IN VARCHAR2)
    IS
+   l_themes int_array := nm3array.init_int_array;
    BEGIN
       --
       BEGIN
@@ -263,6 +264,11 @@ AS
 
       DELETE FROM lb_inv_security
             WHERE lb_exor_inv_type = pi_exor_type;
+            
+      NM3SDM.DROP_LAYERS_BY_INV_TYPE(pi_exor_type);        
+      
+      DELETE FROM nm_inv_themes
+      where nith_nit_id = pi_exor_type;            
 
       DELETE FROM nm_inv_type_roles
             WHERE itr_inv_type = pi_exor_type;
@@ -280,7 +286,7 @@ AS
             WHERE ita_inv_type = pi_exor_type;
             
       DELETE FROM lb_types
-            WHERE lb_exor_inv_type = pi_exor_type;            
+            WHERE lb_exor_inv_type = pi_exor_type;   
 
       DELETE FROM nm_inv_types_all
             WHERE nit_inv_type = pi_exor_type;
