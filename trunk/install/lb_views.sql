@@ -1,10 +1,10 @@
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/lb/install/lb_views.sql-arc   1.2   Jan 20 2015 15:19:48   Rob.Coupe  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/lb/install/lb_views.sql-arc   1.3   Jan 20 2015 19:33:22   Rob.Coupe  $
 --       Module Name      : $Workfile:   lb_views.sql  $
---       Date into PVCS   : $Date:   Jan 20 2015 15:19:48  $
---       Date fetched Out : $Modtime:   Jan 20 2015 15:19:08  $
---       PVCS Version     : $Revision:   1.2  $
+--       Date into PVCS   : $Date:   Jan 20 2015 19:33:22  $
+--       Date fetched Out : $Modtime:   Jan 20 2015 19:30:36  $
+--       PVCS Version     : $Revision:   1.3  $
 --
 --   Author : R.A. Coupe
 --
@@ -60,11 +60,11 @@ AS
    SELECT 
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/lb/install/lb_views.sql-arc   1.2   Jan 20 2015 15:19:48   Rob.Coupe  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/lb/install/lb_views.sql-arc   1.3   Jan 20 2015 19:33:22   Rob.Coupe  $
 --       Module Name      : $Workfile:   lb_views.sql  $
---       Date into PVCS   : $Date:   Jan 20 2015 15:19:48  $
---       Date fetched Out : $Modtime:   Jan 20 2015 15:19:08  $
---       PVCS Version     : $Revision:   1.2  $
+--       Date into PVCS   : $Date:   Jan 20 2015 19:33:22  $
+--       Date fetched Out : $Modtime:   Jan 20 2015 19:30:36  $
+--       PVCS Version     : $Revision:   1.3  $
 --
 --   Author : R.A. Coupe
 --
@@ -134,11 +134,11 @@ AS
    SELECT 
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/lb/install/lb_views.sql-arc   1.2   Jan 20 2015 15:19:48   Rob.Coupe  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/lb/install/lb_views.sql-arc   1.3   Jan 20 2015 19:33:22   Rob.Coupe  $
 --       Module Name      : $Workfile:   lb_views.sql  $
---       Date into PVCS   : $Date:   Jan 20 2015 15:19:48  $
---       Date fetched Out : $Modtime:   Jan 20 2015 15:19:08  $
---       PVCS Version     : $Revision:   1.2  $
+--       Date into PVCS   : $Date:   Jan 20 2015 19:33:22  $
+--       Date fetched Out : $Modtime:   Jan 20 2015 19:30:36  $
+--       PVCS Version     : $Revision:   1.3  $
 --
 --   Author : R.A. Coupe
 --
@@ -178,11 +178,11 @@ AS
    SELECT 
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/lb/install/lb_views.sql-arc   1.2   Jan 20 2015 15:19:48   Rob.Coupe  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/lb/install/lb_views.sql-arc   1.3   Jan 20 2015 19:33:22   Rob.Coupe  $
 --       Module Name      : $Workfile:   lb_views.sql  $
---       Date into PVCS   : $Date:   Jan 20 2015 15:19:48  $
---       Date fetched Out : $Modtime:   Jan 20 2015 15:19:08  $
---       PVCS Version     : $Revision:   1.2  $
+--       Date into PVCS   : $Date:   Jan 20 2015 19:33:22  $
+--       Date fetched Out : $Modtime:   Jan 20 2015 19:30:36  $
+--       PVCS Version     : $Revision:   1.3  $
 --
 --   Author : R.A. Coupe
 --
@@ -224,11 +224,11 @@ create or replace view v_nm_nlt_refnts as
 select 
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/lb/install/lb_views.sql-arc   1.2   Jan 20 2015 15:19:48   Rob.Coupe  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/lb/install/lb_views.sql-arc   1.3   Jan 20 2015 19:33:22   Rob.Coupe  $
 --       Module Name      : $Workfile:   lb_views.sql  $
---       Date into PVCS   : $Date:   Jan 20 2015 15:19:48  $
---       Date fetched Out : $Modtime:   Jan 20 2015 15:19:08  $
---       PVCS Version     : $Revision:   1.2  $
+--       Date into PVCS   : $Date:   Jan 20 2015 19:33:22  $
+--       Date fetched Out : $Modtime:   Jan 20 2015 19:30:36  $
+--       PVCS Version     : $Revision:   1.3  $
 --
 --   Author : R.A. Coupe
 --
@@ -260,11 +260,11 @@ create or replace view v_lb_nlt_refnts as
 select 
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/lb/install/lb_views.sql-arc   1.2   Jan 20 2015 15:19:48   Rob.Coupe  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/lb/install/lb_views.sql-arc   1.3   Jan 20 2015 19:33:22   Rob.Coupe  $
 --       Module Name      : $Workfile:   lb_views.sql  $
---       Date into PVCS   : $Date:   Jan 20 2015 15:19:48  $
---       Date fetched Out : $Modtime:   Jan 20 2015 15:19:08  $
---       PVCS Version     : $Revision:   1.2  $
+--       Date into PVCS   : $Date:   Jan 20 2015 19:33:22  $
+--       Date fetched Out : $Modtime:   Jan 20 2015 19:30:36  $
+--       PVCS Version     : $Revision:   1.3  $
 --
 --   Author : R.A. Coupe
 --
@@ -305,11 +305,11 @@ AS
    SELECT 
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/lb/install/lb_views.sql-arc   1.2   Jan 20 2015 15:19:48   Rob.Coupe  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/lb/install/lb_views.sql-arc   1.3   Jan 20 2015 19:33:22   Rob.Coupe  $
 --       Module Name      : $Workfile:   lb_views.sql  $
---       Date into PVCS   : $Date:   Jan 20 2015 15:19:48  $
---       Date fetched Out : $Modtime:   Jan 20 2015 15:19:08  $
---       PVCS Version     : $Revision:   1.2  $
+--       Date into PVCS   : $Date:   Jan 20 2015 19:33:22  $
+--       Date fetched Out : $Modtime:   Jan 20 2015 19:30:36  $
+--       PVCS Version     : $Revision:   1.3  $
 --
 --   Author : R.A. Coupe
 --
@@ -389,11 +389,11 @@ AS
    SELECT 
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/lb/install/lb_views.sql-arc   1.2   Jan 20 2015 15:19:48   Rob.Coupe  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/lb/install/lb_views.sql-arc   1.3   Jan 20 2015 19:33:22   Rob.Coupe  $
 --       Module Name      : $Workfile:   lb_views.sql  $
---       Date into PVCS   : $Date:   Jan 20 2015 15:19:48  $
---       Date fetched Out : $Modtime:   Jan 20 2015 15:19:08  $
---       PVCS Version     : $Revision:   1.2  $
+--       Date into PVCS   : $Date:   Jan 20 2015 19:33:22  $
+--       Date fetched Out : $Modtime:   Jan 20 2015 19:30:36  $
+--       PVCS Version     : $Revision:   1.3  $
 --
 --   Author : R.A. Coupe
 --
@@ -468,11 +468,11 @@ AS
    SELECT 
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/lb/install/lb_views.sql-arc   1.2   Jan 20 2015 15:19:48   Rob.Coupe  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/lb/install/lb_views.sql-arc   1.3   Jan 20 2015 19:33:22   Rob.Coupe  $
 --       Module Name      : $Workfile:   lb_views.sql  $
---       Date into PVCS   : $Date:   Jan 20 2015 15:19:48  $
---       Date fetched Out : $Modtime:   Jan 20 2015 15:19:08  $
---       PVCS Version     : $Revision:   1.2  $
+--       Date into PVCS   : $Date:   Jan 20 2015 19:33:22  $
+--       Date fetched Out : $Modtime:   Jan 20 2015 19:30:36  $
+--       PVCS Version     : $Revision:   1.3  $
 --
 --   Author : R.A. Coupe
 --
@@ -525,12 +525,17 @@ CREATE OR REPLACE VIEW v_lb_inv_nlt_data
 (
    AssetType,
    NetworkTypeId,
+   NetworkType,
    NetworkTypeName,
+   NetworkFlag,
    NetworkTypeDescr,
-   UnitName
+   MandatoryLocation,
+   UnitId,
+   UnitName,
+   UnitMask
 )
 AS
- WITH inv_nw
+   WITH inv_nw
         AS (SELECT *
               FROM nm_inv_nw, lb_types, V_NM_NLT_DATA
              WHERE     lb_exor_inv_type = nin_nit_inv_code
@@ -538,11 +543,11 @@ AS
    SELECT 
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/lb/install/lb_views.sql-arc   1.2   Jan 20 2015 15:19:48   Rob.Coupe  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/lb/install/lb_views.sql-arc   1.3   Jan 20 2015 19:33:22   Rob.Coupe  $
 --       Module Name      : $Workfile:   lb_views.sql  $
---       Date into PVCS   : $Date:   Jan 20 2015 15:19:48  $
---       Date fetched Out : $Modtime:   Jan 20 2015 15:19:08  $
---       PVCS Version     : $Revision:   1.2  $
+--       Date into PVCS   : $Date:   Jan 20 2015 19:33:22  $
+--       Date fetched Out : $Modtime:   Jan 20 2015 19:30:36  $
+--       PVCS Version     : $Revision:   1.3  $
 --
 --   Author : R.A. Coupe
 --
@@ -551,24 +556,29 @@ AS
 -----------------------------------------------------------------------------
 -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
 ----------------------------------------------------------------------------
---  
-          lb_object_type, nlt_id, 
-          nt_unique, nt_descr,
-   --       nt_type,
-                                  --       nin_nit_inv_code,
-                                  --       nin_loc_mandatory,
-                                  --       nlt_units,
-                                  un_unit_name --     un_format_mask
-   FROM inv_nw
+--     
+          lb_object_type,
+          nlt_id,
+          nt_type,
+          nt_unique,
+          nlt_g_i_d,
+          nt_descr,
+          nin_loc_mandatory,
+          nlt_units,
+          un_unit_name,
+          un_format_mask
+     FROM inv_nw
    UNION
-   SELECT lb_object_type, g.nlt_id, 
-          g.nt_unique, g.nt_descr,
-   --       g.nt_type,
-                                    --       nin_nit_inv_code,
-                                    --       nin_loc_mandatory,
-                                    --       g.nlt_units,
-                                    g.un_unit_name
-     --     g.un_format_mask
+   SELECT lb_object_type,
+          g.nlt_id,
+          g.nt_type,
+          g.nt_unique,
+          g.nlt_g_i_d,
+          g.nt_descr,
+          nin_loc_mandatory,
+          g.nlt_units,
+          g.un_unit_name,
+          g.un_format_mask
      FROM inv_nw i,
           nm_nt_groupings,
           V_NM_NLT_DATA g,
@@ -582,11 +592,11 @@ create or replace view v_lb_xsp_list (XSP, XSP_DESCR) as
            SELECT                   /* +INDEX( e NE_PK) +CARDINALITY(t 10) */
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/lb/install/lb_views.sql-arc   1.2   Jan 20 2015 15:19:48   Rob.Coupe  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/lb/install/lb_views.sql-arc   1.3   Jan 20 2015 19:33:22   Rob.Coupe  $
 --       Module Name      : $Workfile:   lb_views.sql  $
---       Date into PVCS   : $Date:   Jan 20 2015 15:19:48  $
---       Date fetched Out : $Modtime:   Jan 20 2015 15:19:08  $
---       PVCS Version     : $Revision:   1.2  $
+--       Date into PVCS   : $Date:   Jan 20 2015 19:33:22  $
+--       Date fetched Out : $Modtime:   Jan 20 2015 19:30:36  $
+--       PVCS Version     : $Revision:   1.3  $
 --
 --   Author : R.A. Coupe
 --
