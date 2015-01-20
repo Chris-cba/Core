@@ -1,10 +1,10 @@
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/lb/install/lb_data_types.sql-arc   1.0   Jan 14 2015 16:08:36   Rob.Coupe  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/lb/install/lb_data_types.sql-arc   1.1   Jan 20 2015 14:57:04   Rob.Coupe  $
 --       Module Name      : $Workfile:   lb_data_types.sql  $
---       Date into PVCS   : $Date:   Jan 14 2015 16:08:36  $
---       Date fetched Out : $Modtime:   Jan 14 2015 16:07:58  $
---       PVCS Version     : $Revision:   1.0  $
+--       Date into PVCS   : $Date:   Jan 20 2015 14:57:04  $
+--       Date fetched Out : $Modtime:   Jan 20 2015 14:56:28  $
+--       PVCS Version     : $Revision:   1.1  $
 --
 --   Author : R.A. Coupe
 --
@@ -157,3 +157,37 @@ create or replace type  lb_RPt_Geom as object ( refnt integer,
 create or replace type lb_RPt_geom_tab is table of lb_RPt_geom
 /
 
+DECLARE
+   TYPE object_name_type IS TABLE OF VARCHAR2 (123) INDEX BY binary_integer;
+--
+   TYPE object_type_type IS TABLE OF VARCHAR2 (23) INDEX BY binary_integer;
+--
+   l_object_name   object_name_type;
+   l_object_type   object_type_type;
+--
+   PROCEDURE add_object (p_object_name VARCHAR2, p_object_type VARCHAR2)
+   IS
+      i   CONSTANT PLS_INTEGER := l_object_name.COUNT + 1;
+   BEGIN
+      l_object_name (i) := p_object_name;
+      l_object_type (i) := p_object_type;
+   END add_object;
+BEGIN
+   add_object ('LB_STATS', 'TYPE');
+   add_object ('LB_STATS', 'TYPE BODY');
+   add_object ('LB_RPT', 'TYPE');
+   add_object ('LB_RPT_TAB', 'TYPE');
+   add_object ('LB_LOC_ERROR', 'TYPE');
+   add_object ('LB_LOC_ERROR_TAB', 'TYPE');
+   add_object ('LB_OBJ_ID', 'TYPE');
+   add_object ('LB_OBJ_ID_TAB', 'TYPE');
+   add_object ('LB_RPT_GEOM', 'TYPE');
+   add_object ('LB_RPT_GEOM_TAB', 'TYPE');
+--     
+   FOR i IN 1 .. l_object_name.COUNT
+   LOOP
+      INSERT INTO lb_objects (object_name, object_type)
+           VALUES (l_object_name (i), l_object_type (i));
+   END LOOP;
+END;
+/
