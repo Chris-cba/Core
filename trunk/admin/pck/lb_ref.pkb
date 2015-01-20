@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_ref
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_ref.pkb-arc   1.3   Jan 20 2015 21:04:36   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_ref.pkb-arc   1.4   Jan 20 2015 21:09:14   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_ref.pkb  $
-   --       Date into PVCS   : $Date:   Jan 20 2015 21:04:36  $
-   --       Date fetched Out : $Modtime:   Jan 20 2015 21:04:10  $
-   --       PVCS Version     : $Revision:   1.3  $
+   --       Date into PVCS   : $Date:   Jan 20 2015 21:09:14  $
+   --       Date fetched Out : $Modtime:   Jan 20 2015 21:08:02  $
+   --       PVCS Version     : $Revision:   1.4  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,7 +16,7 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.3  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.4  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_ref';
 
@@ -550,13 +550,62 @@ AS
       ASSETTYPE   IN INTEGER DEFAULT NULL,
       NETWORKTYPEID     IN INTEGER DEFAULT NULL,
       NETWORKELEMENT     IN VARCHAR2 DEFAULT NULL)
-      RETURN SYS_REFCURSOR;
+      RETURN SYS_REFCURSOR
+   IS
+      RETVAL   SYS_REFCURSOR;
+      l_nit_inv_type nm_inv_types.nit_inv_type%type;
+   BEGIN
+      begin
+         select lb_exor_inv_type into l_nit_inv_type
+         from lb_types where lb_object_type = ASSETTYPE;
+      exception
+        when no_data_found then
+           l_nit_inv_type := NULL;
+      end;
+--      
+      nm3ctx.set_context ('NLT_DATA_INV_TYPE', l_nit_inv_type);
+      nm3ctx.set_context ('NLT_DATA_NLT_ID', TO_CHAR (NETWORKTYPEID));
+      nm3ctx.set_context ('NLT_DATA_UNIQUE', NETWORKELEMENT);
+
+      OPEN retval FOR SELECT * FROM v_nm_nlt_refnts;
+
+      RETURN retval;
+   END;
+      
 
    FUNCTION GETASSETNETWORKELEMENTS_TAB (
       ASSETTYPE   IN INTEGER DEFAULT NULL,
       NETWORKTYPEID     IN INTEGER DEFAULT NULL,
       NETWORKELEMENT     IN VARCHAR2 DEFAULT NULL)
-      RETURN lb_linear_refnt_tab;   
+      RETURN lb_linear_refnt_tab IS 
+      RETVAL   LB_LINEAR_REFNT_TAB;
+      l_nit_inv_type nm_inv_types.nit_inv_type%type;
+--      
+   BEGIN
+      begin
+         select lb_exor_inv_type into l_nit_inv_type
+         from lb_types where lb_object_type = ASSETTYPE;
+      exception
+        when no_data_found then
+           l_nit_inv_type := NULL;
+      end;
+
+      nm3ctx.set_context ('NLT_DATA_INV_TYPE', l_nit_inv_type);
+      nm3ctx.set_context ('NLT_DATA_NLT_ID', TO_CHAR (NETWORKTYPEID));
+      nm3ctx.set_context ('NLT_DATA_UNIQUE', NETWORKELEMENT);
+
+      SELECT lb_linear_refnt (nlt_id,
+                              ne_id,
+                              ne_unique,
+                              ne_descr,
+                              nt_type,
+                              nt_descr,
+                              un_unit_name)
+        BULK COLLECT INTO retval
+        FROM v_nm_nlt_refnts;
+
+      RETURN retval;
+   END;
    
 END lb_ref;
 /
