@@ -1,24 +1,24 @@
 Create Or Replace Package Body  Web_User_Info
 
 As
--------------------------------------------------------------------------
+-----------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/web_user_info.pkb-arc   3.3   Aug 12 2014 13:00:40   Linesh.Sorathia  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/web_user_info.pkb-arc   3.4   Jan 20 2015 13:22:38   Upendra.Hukeri  $
 --       Module Name      : $Workfile:   web_user_info.pkb  $
---       Date into PVCS   : $Date:   Aug 12 2014 13:00:40  $
---       Date fetched Out : $Modtime:   Aug 12 2014 12:58:50  $
---       Version          : $Revision:   3.3  $
+--       Date into PVCS   : $Date:   Jan 20 2015 13:22:38  $
+--       Date fetched Out : $Modtime:   Jan 20 2015 13:16:36  $
+--       Version          : $Revision:   3.4  $
 --       Based on SCCS version :
-------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
-------------------------------------------------------------------
+-----------------------------------------------------------------------------
+--   Copyright (c) 2014 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
 
   -----------
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_Body_Sccsid               Constant  Varchar2(2000)                      :=  '$Revision:   3.3  $';
+  g_Body_Sccsid CONSTANT  VARCHAR2(2000) :=  '$Revision:   3.4  $';
 
 --
 -----------------------------------------------------------------------------
@@ -83,17 +83,55 @@ Begin
     End;
     Return(l_Hig_Owner);
 End Get_Hig_Owner;
+--
+----------------------------------------------------------------------------------------------------
+--
+PROCEDURE set_context(pi_user_name IN hig_users.hus_username%TYPE, pi_error_msg OUT VARCHAR2)
+IS
+--
+   l_user_id	hig_users.hus_user_id%TYPE;
+   l_err_descr	nm_errors.ner_descr%TYPE;
+	--
+	CURSOR get_user_id IS 
+		SELECT  hus_user_id
+		FROM    hig_users 
+		WHERE   hus_username =  UPPER(pi_user_name);
+--
+BEGIN
+	OPEN get_user_id;
+	FETCH get_user_id INTO l_user_id;
+	--
+	IF get_user_id%NOTFOUND THEN
+		SELECT ner_descr INTO l_err_descr FROM nm_errors WHERE ner_appl = 'HIG' AND ner_id = 80;
+		--
+		pi_error_msg := 'HIG-0080: ' || l_err_descr;
+	ELSE
+		set_context(l_user_id);
+	END IF;
+	--
+	CLOSE get_user_id;
+--
+EXCEPTION WHEN OTHERS THEN
+	IF get_user_id%ISOPEN THEN
+		CLOSE get_user_id;
+	END IF;
+	--
+    pi_error_msg := SQLERRM;     
+--
+END set_context;
+--
 -----------------------------------------------------------------------------
 --
-Procedure set_context(pi_user_id In hig_users.hus_user_id%Type)
+PROCEDURE set_context(pi_user_id IN hig_users.hus_user_id%TYPE)
 Is
 --
-   l_user_au      Number;
-   l_unrestricted Varchar2(1);
-   l_end_date     Date;
-   l_name         hig_users.hus_name%Type;
-   l_status       Varchar2(100); 
-   l_db_user      Varchar2(100);  
+   l_user_au      NUMBER;
+   l_unrestricted VARCHAR2(1);
+   l_end_date     DATE;
+   l_name         hig_users.hus_name%TYPE;
+   l_status       VARCHAR2(100); 
+   l_db_user      VARCHAR2(100);
+   l_is_owner     VARCHAR2(1);
    CURSOR c_get_account_status (c_useraccount VARCHAR2)  
    IS
    
@@ -102,27 +140,32 @@ Is
    FROM   dba_users 
    WHERE  username = c_useraccount;
 --
-Begin
+BEGIN
 --
-   Begin
+IF g_account_unrestricted = 'N' OR g_account_unrestricted IS NULL THEN
+  raise_application_error(-20001, 'A restricted or unknown user cannot use this function');
+END IF;
+   BEGIN
    --
-      Select  hus_admin_unit 
+      SELECT  hus_admin_unit 
              ,hus_unrestricted  
              ,hus_end_date
              ,hus_name
              ,hus_username
-      Into    l_user_au
+             ,hus_is_hig_owner_flag
+      INTO    l_user_au
              ,l_unrestricted
              ,l_end_date
              ,l_name
              ,l_db_user
-      From    hig_users 
-      Where   hus_user_id =  pi_user_id ;
+             ,l_is_owner
+      FROM    hig_users 
+      WHERE   hus_user_id =  pi_user_id ;
       
-      If l_unrestricted = 'Y'
-      Then
-          Raise_Application_Error (-20201,'Cannot set context for unrestricted user ');     
-      End If ;
+--      If l_unrestricted = 'Y'
+--      Then
+--          Raise_Application_Error (-20201,'Cannot set context for unrestricted user ');     
+--      End If ;
       If l_end_date Is Not Null
       Then        
            Raise_Application_Error(-20202,'Exor hig user ('||l_name||') is end dated');
@@ -145,14 +188,32 @@ Begin
 
    End ;
      
-   Nm3Security.Set_Hig_Owner(true);
-   Nm3Security.Set_User(NM3USER.GET_USERNAME(pi_user_id)); 
+   Nm3Security.Set_User(l_db_user); 
    nm3ctx.Set_Core_Context (p_Attribute => 'USER_ID'          ,p_Value => pi_user_id);
    nm3ctx.Set_Core_Context (p_Attribute => 'APPLICATION_OWNER',p_Value => Get_Hig_Owner);
    nm3ctx.Set_Core_Context (p_Attribute => 'EFFECTIVE_DATE'   ,p_Value => To_Char(Trunc(Sysdate),'DD-MON-YYYY'));
    nm3ctx.set_core_context (p_Attribute => 'USER_ADMIN_UNIT'  ,p_Value => l_user_au );
+   nm3ctx.set_core_context (p_Attribute => 'UNRESTRICTED_INVENTORY', p_Value => l_unrestricted );
+   nm3ctx.set_core_context (p_attribute => 'HIG_OWNER',        p_value => l_is_owner );
 --
 End set_context;
+--
+-----------------------------------------------------------------------------
+--
+procedure clear_contexts is
+begin
+DBMS_SESSION.CLEAR_ALL_CONTEXT('NM3SQL');
+DBMS_SESSION.CLEAR_ALL_CONTEXT('NM3CORE');
+dbms_session.clear_all_context('NM3_SECURITY_CTX');
+end;
+--
+-----------------------------------------------------------------------------
+--
+Begin
+  select hus_user_id, hus_unrestricted, hus_is_hig_owner_flag
+  into g_account_user_id, g_account_unrestricted, g_account_owner
+  from hig_users
+  where hus_username = user;
 --
 -----------------------------------------------------------------------------
 --
