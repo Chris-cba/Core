@@ -1,0 +1,74 @@
+Create Or Replace Package Web_User_Info
+As
+-----------------------------------------------------------------------------
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/web_user_info.pkh-arc   3.3   Jan 20 2015 13:22:10   Upendra.Hukeri  $
+--       Module Name      : $Workfile:   web_user_info.pkh  $
+--       Date into PVCS   : $Date:   Jan 20 2015 13:22:10  $
+--       Date fetched Out : $Modtime:   Jan 20 2015 13:18:28  $
+--       Version          : $Revision:   3.3  $
+--       Based on SCCS version :
+-----------------------------------------------------------------------------
+--   Copyright (c) 2014 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+
+  -----------
+  --constants
+  -----------
+  --g_sccsid is the SCCS ID for the package
+  g_Sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.3  $';
+  g_account_user_id  integer;
+  g_account_unrestricted Char(1);
+  g_account_owner char(1);
+ 
+-----------------------------------------------------------------------------
+--
+-- This function returns the current SCCS version
+Function Get_Version Return Varchar2;
+--
+-----------------------------------------------------------------------------
+--
+-- This function returns the current SCCS version of the package body
+Function Get_Body_Version Return Varchar2;
+--
+-----------------------------------------------------------------------------
+--
+Procedure Set_User  (
+                    p_Name  In  Varchar2
+                    );
+--
+-----------------------------------------------------------------------------
+--
+-- This procedure sets context for the given user Id. 
+-- Throws following exceptions
+-- If Invalid user Id
+-- If user is end dated
+-- If user DB account is not OPEN
+-- If user is unrestricted
+Procedure set_context(pi_user_id In hig_users.hus_user_id%Type);
+--
+-----------------------------------------------------------------------------
+--
+-- This procedure sets context for the given user Name. 
+-- It calls set_context procedure for the user Id for given user Name
+-- and catches any exception in pi_error_msg OUT parameter.
+PROCEDURE set_context(pi_user_name IN hig_users.hus_username%TYPE, pi_error_msg OUT VARCHAR2);
+--
+-----------------------------------------------------------------------------
+--
+Procedure Clear_User;
+--
+-----------------------------------------------------------------------------
+--
+Function Get_User Return Varchar2;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE clear_contexts;
+--
+-----------------------------------------------------------------------------
+--                                      
+End Web_User_Info;
+/
+     
