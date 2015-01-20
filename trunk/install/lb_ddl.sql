@@ -1,10 +1,10 @@
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/lb/install/lb_ddl.sql-arc   1.1   Jan 15 2015 21:19:42   Rob.Coupe  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/lb/install/lb_ddl.sql-arc   1.2   Jan 20 2015 15:00:00   Rob.Coupe  $
 --       Module Name      : $Workfile:   lb_ddl.sql  $
---       Date into PVCS   : $Date:   Jan 15 2015 21:19:42  $
---       Date fetched Out : $Modtime:   Jan 15 2015 21:19:14  $
---       PVCS Version     : $Revision:   1.1  $
+--       Date into PVCS   : $Date:   Jan 20 2015 15:00:00  $
+--       Date fetched Out : $Modtime:   Jan 20 2015 14:59:00  $
+--       PVCS Version     : $Revision:   1.2  $
 --
 --   Author : R.A. Coupe
 --
@@ -21,12 +21,30 @@
  
 */
 
-ALTER TABLE LB_TYPES
- DROP PRIMARY KEY CASCADE
+DECLARE
+   not_exists   exception;
+   PRAGMA EXCEPTION_INIT (not_exists, -942);
+BEGIN
+   EXECUTE IMMEDIATE 'ALTER TABLE LB_TYPES DROP PRIMARY KEY CASCADE ';
+
+EXCEPTION
+   WHEN not_exists
+Then NULL;
+end;
 / 
 
-DROP TABLE LB_TYPES CASCADE CONSTRAINTS
-/
+
+
+DECLARE
+   not_exists   exception;
+   PRAGMA EXCEPTION_INIT (not_exists, -942);
+BEGIN
+   EXECUTE IMMEDIATE 'DROP TABLE LB_TYPES CASCADE CONSTRAINTS';
+EXCEPTION
+   WHEN not_exists
+Then NULL;
+end;
+/ 
 
 CREATE TABLE LB_TYPES
 (
@@ -77,8 +95,19 @@ LB_INV_SECURITY - a table to configure different security regimes
 
 */
 
-drop table lb_inv_security cascade constraints
-/
+
+
+DECLARE
+   not_exists   exception;
+   PRAGMA EXCEPTION_INIT (not_exists, -942);
+BEGIN
+   EXECUTE IMMEDIATE 'DROP TABLE LB_INV_SECURITY CASCADE CONSTRAINTS';
+EXCEPTION
+   WHEN not_exists
+Then NULL;
+end;
+/ 
+
 
 create table LB_INV_SECURITY 
 ( LB_EXOR_INV_TYPE    VARCHAR2(4),
@@ -118,11 +147,42 @@ ALTER TABLE LB_INV_SECURITY ADD (
 All the location stuff
 
 */
-ALTER TABLE NM_ASSET_LOCATIONS_ALL
- DROP PRIMARY KEY CASCADE
- /
 
-DROP TABLE NM_ASSET_LOCATIONS_ALL CASCADE CONSTRAINTS
+
+DECLARE
+   not_exists   exception;
+   PRAGMA EXCEPTION_INIT (not_exists, -942);
+BEGIN
+   EXECUTE IMMEDIATE 'ALTER TABLE NM_ASSET_LOCATIONS_ALL  DROP PRIMARY KEY CASCADE';
+
+EXCEPTION
+   WHEN not_exists
+Then NULL;
+end;
+/ 
+
+DECLARE
+   not_exists   exception;
+   PRAGMA EXCEPTION_INIT (not_exists, -942);
+BEGIN
+   EXECUTE IMMEDIATE 'ALTER TABLE NM_ASSET_LOCATIONS_ALL  DROP PRIMARY KEY CASCADE';
+EXCEPTION
+   WHEN not_exists
+Then NULL;
+end;
+/ 
+
+DECLARE
+   not_exists   exception;
+   PRAGMA EXCEPTION_INIT (not_exists, -942);
+BEGIN
+   EXECUTE IMMEDIATE 'DROP TABLE NM_ASSET_LOCATIONS_ALL CASCADE CONSTRAINTS';
+EXCEPTION
+   WHEN not_exists
+Then NULL;
+end;
+/ 
+
 /
 
 CREATE TABLE NM_ASSET_LOCATIONS_ALL
@@ -176,8 +236,17 @@ ALTER TABLE NM_ASSET_LOCATIONS_ALL ADD (
   ENABLE VALIDATE)
 /  
 
-drop sequence nal_id_seq
-/
+
+DECLARE
+   not_exists   exception;
+   PRAGMA EXCEPTION_INIT (not_exists, -942);
+BEGIN
+   EXECUTE IMMEDIATE 'DROP SEQUENCE NAL_ID_SEQ';
+EXCEPTION
+   WHEN not_exists
+Then NULL;
+end;
+/ 
 
 create sequence nal_id_seq start with 1
 /
@@ -212,11 +281,32 @@ END NM_ASSET_LOCATIONS_ALL_WHO;
 /
 
 
-drop sequence NM_loc_id_seq
-/
+
+DECLARE
+   not_exists   exception;
+   PRAGMA EXCEPTION_INIT (not_exists, -942);
+BEGIN
+   EXECUTE IMMEDIATE 'DROP SEQUENCE NM_LOC_ID_SEQ';
+EXCEPTION
+   WHEN not_exists
+Then NULL;
+end;
+/ 
+
 
 create sequence NM_loc_id_seq start with 1
 /
+
+DECLARE
+   not_exists   exception;
+   PRAGMA EXCEPTION_INIT (not_exists, -942);
+BEGIN
+   EXECUTE IMMEDIATE 'DROP TABLE NM_LOCATIONS_ALL CASCADE CONSTRAINTS';
+EXCEPTION
+   WHEN not_exists
+Then NULL;
+end;
+/ 
 
 DROP TABLE NM_LOCATIONS_ALL CASCADE CONSTRAINTS
 /
@@ -338,12 +428,29 @@ END nm_locations_all_who;
 /
 
 
-ALTER TABLE NM_JUXTAPOSITION_TYPES
- DROP PRIMARY KEY CASCADE
+DECLARE
+   not_exists   exception;
+   PRAGMA EXCEPTION_INIT (not_exists, -942);
+BEGIN
+   EXECUTE IMMEDIATE 'ALTER TABLE NM_JUXTAPOSITION_TYPES DROP PRIMARY KEY CASCADE';
+
+EXCEPTION
+   WHEN not_exists
+Then NULL;
+end;
 / 
 
-DROP TABLE NM_JUXTAPOSITION_TYPES CASCADE CONSTRAINTS
-/
+
+DECLARE
+   not_exists   exception;
+   PRAGMA EXCEPTION_INIT (not_exists, -942);
+BEGIN
+   EXECUTE IMMEDIATE 'DROP TABLE NM_JUXTAPOSITION_TYPES CASCADE CONSTRAINTS';
+EXCEPTION
+   WHEN not_exists
+Then NULL;
+end;
+/ 
 
 CREATE TABLE NM_JUXTAPOSITION_TYPES
 (
@@ -377,12 +484,30 @@ ALTER TABLE NM_JUXTAPOSITION_TYPES ADD (
 /  
 
 
-ALTER TABLE NM_JUXTAPOSITIONS
- DROP PRIMARY KEY CASCADE
- /
+DECLARE
+   not_exists   exception;
+   PRAGMA EXCEPTION_INIT (not_exists, -942);
+BEGIN
+   EXECUTE IMMEDIATE 'ALTER TABLE NM_JUXTAPOSITIONS DROP PRIMARY KEY CASCADE';
 
-DROP TABLE NM_JUXTAPOSITIONS CASCADE CONSTRAINTS
-/
+EXCEPTION
+   WHEN not_exists
+Then NULL;
+end;
+/ 
+
+DECLARE
+   not_exists   exception;
+   PRAGMA EXCEPTION_INIT (not_exists, -942);
+BEGIN
+   EXECUTE IMMEDIATE 'DROP TABLE NM_JUXTAPOSITIONS CASCADE CONSTRAINTS';
+EXCEPTION
+   WHEN not_exists
+Then NULL;
+end;
+/ 
+
+
 
 CREATE TABLE NM_JUXTAPOSITIONS
 (
@@ -427,12 +552,28 @@ ALTER TABLE NM_JUXTAPOSITIONS ADD (
 
 
 
-ALTER TABLE NM_ASSET_TYPE_JUXTAPOSITIONS
- DROP PRIMARY KEY CASCADE
+DECLARE
+   not_exists   exception;
+   PRAGMA EXCEPTION_INIT (not_exists, -942);
+BEGIN
+   EXECUTE IMMEDIATE 'ALTER TABLE NM_ASSET_TYPE_JUXTAPOSITIONS DROP PRIMARY KEY CASCADE';
+
+EXCEPTION
+   WHEN not_exists
+Then NULL;
+end;
 / 
 
-DROP TABLE NM_ASSET_TYPE_JUXTAPOSITIONS CASCADE CONSTRAINTS
-/
+DECLARE
+   not_exists   exception;
+   PRAGMA EXCEPTION_INIT (not_exists, -942);
+BEGIN
+   EXECUTE IMMEDIATE 'DROP TABLE NM_ASSET_TYPE_JUXTAPOSITIONS CASCADE CONSTRAINTS';
+EXCEPTION
+   WHEN not_exists
+Then NULL;
+end;
+/ 
 
 
 CREATE TABLE NM_ASSET_TYPE_JUXTAPOSITIONS
@@ -499,12 +640,29 @@ end;
 /
 
 
-ALTER TABLE NM_LOCATION_GEOMETRY
- DROP PRIMARY KEY CASCADE
+DECLARE
+   not_exists   exception;
+   PRAGMA EXCEPTION_INIT (not_exists, -942);
+BEGIN
+   EXECUTE IMMEDIATE 'ALTER TABLE NM_LOCATION_GEOMETRY DROP PRIMARY KEY CASCADE';
+
+EXCEPTION
+   WHEN not_exists
+Then NULL;
+end;
 / 
 
-DROP TABLE NM_LOCATION_GEOMETRY CASCADE CONSTRAINTS
-/
+
+DECLARE
+   not_exists   exception;
+   PRAGMA EXCEPTION_INIT (not_exists, -942);
+BEGIN
+   EXECUTE IMMEDIATE 'DROP TABLE NM_LOCATION_GEOMETRY CASCADE CONSTRAINTS';
+EXCEPTION
+   WHEN not_exists
+Then NULL;
+end;
+/ 
 
 CREATE TABLE NM_LOCATION_GEOMETRY
 (
@@ -565,10 +723,21 @@ CREATE INDEX NLG_LOC_IDX ON NM_LOCATION_GEOMETRY
 (NLG_LOC_ID)
 /
 
-DROP Sequence nlg_id_seq
-/
 
-Create sequence nlg_id_seq
+DECLARE
+   not_exists   exception;
+   PRAGMA EXCEPTION_INIT (not_exists, -942);
+BEGIN
+   EXECUTE IMMEDIATE 'DROP SEQUENCE NLG_ID_SEQ';
+EXCEPTION
+   WHEN not_exists
+Then NULL;
+end;
+/ 
+
+
+
+CREATE SEQUENCE NLG_ID_SEQ
 /
 
 CREATE OR REPLACE TRIGGER NM_LOCATION_GEOMETRY_TRG
@@ -621,4 +790,46 @@ where not exists ( select 1 from nm_au_types where nat_admin_type = 'NONE' )
 / 
 
 
+
+
+DECLARE
+   TYPE object_name_type IS TABLE OF VARCHAR2 (123) INDEX BY binary_integer;
+
+   TYPE object_type_type IS TABLE OF VARCHAR2 (23) INDEX BY binary_integer;
+
+   l_object_name   object_name_type;
+   l_object_type   object_type_type;
+
+   PROCEDURE add_object (p_object_name VARCHAR2, p_object_type VARCHAR2)
+   IS
+      i   CONSTANT PLS_INTEGER := l_object_name.COUNT + 1;
+   BEGIN
+      l_object_name (i) := p_object_name;
+      l_object_type (i) := p_object_type;
+   END add_object;
+BEGIN
+   add_object ('LB_TYPES', 'TABLE');
+   add_object ('LB_INV_SECURITY', 'TABLE');
+   add_object ('NM_ASSET_LOCATIONS_ALL', 'TABLE');
+   add_object ('NAL_ID_SEQ', 'SEQUENCE');
+   add_object ('NM_LOC_ID_SEQ', 'SEQUENCE');
+   add_object ('NM_LOCATIONS_ALL', 'TABLE');
+   add_object ('NM_JUXTAPOSITION_TYPES', 'TABLE');
+   add_object ('NM_JUXTAPOSITIONS', 'TABLE');
+   add_object ('NM_ASSET_TYPE_JUXTAPOSITIONS', 'TABLE');
+   add_object ('NM_LOCATION_GEOMETRY', 'TABLE');
+   add_object ('NLG_ID_SEQ', 'SEQUENCE' );
+--   
+   FOR i IN 1 .. l_object_name.COUNT
+   LOOP
+      INSERT INTO lb_objects (object_name, object_type)
+           VALUES (l_object_name (i), l_object_type (i));
+   END LOOP;
+END;
+/
+
+
+select * from lb_objects
+
 prompt "DDL Completed"
+
