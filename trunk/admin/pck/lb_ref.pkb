@@ -1,5 +1,50 @@
 CREATE OR REPLACE PACKAGE BODY lb_ref
 AS
+   --   PVCS Identifiers :-
+   --
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_ref.pkb-arc   1.2   Jan 20 2015 19:38:30   Rob.Coupe  $
+   --       Module Name      : $Workfile:   lb_ref.pkb  $
+   --       Date into PVCS   : $Date:   Jan 20 2015 19:38:30  $
+   --       Date fetched Out : $Modtime:   Jan 20 2015 19:38:04  $
+   --       PVCS Version     : $Revision:   1.2  $
+   --
+   --   Author : R.A. Coupe
+   --
+   --   Location Bridge package for handling reference data
+   --
+   -----------------------------------------------------------------------------
+   -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
+   ----------------------------------------------------------------------------
+   --
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.2  $';
+
+   g_package_name   CONSTANT VARCHAR2 (30) := 'lb_ref';
+
+   --
+   -----------------------------------------------------------------------------
+   --
+
+   FUNCTION get_version
+      RETURN VARCHAR2
+   IS
+   BEGIN
+      RETURN g_sccsid;
+   END get_version;
+
+   --
+   -----------------------------------------------------------------------------
+   --
+
+   FUNCTION get_body_version
+      RETURN VARCHAR2
+   IS
+   BEGIN
+      RETURN g_body_sccsid;
+   END get_body_version;
+   --
+   -----------------------------------------------------------------------------
+   --
+
    FUNCTION get_linear_types (pi_inv_type IN nm_inv_types.nit_inv_type%TYPE)
       RETURN SYS_REFCURSOR
    IS
