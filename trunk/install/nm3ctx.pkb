@@ -1,17 +1,17 @@
 Create Or Replace Package Body Exor_Core.Nm3Ctx
 As
--------------------------------------------------------------------------
+-----------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3ctx.pkb-arc   3.2   Jul 04 2013 14:08:58   James.Wadsworth  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm3ctx.pkb-arc   3.3   Jan 20 2015 07:18:18   Upendra.Hukeri  $
 --       Module Name      : $Workfile:   nm3ctx.pkb  $
---       Date into PVCS   : $Date:   Jul 04 2013 14:08:58  $
---       Date fetched Out : $Modtime:   Jul 04 2013 11:54:14  $
---       Version          : $Revision:   3.2  $
+--       Date into PVCS   : $Date:   Jan 20 2015 07:18:18  $
+--       Date fetched Out : $Modtime:   Jan 20 2015 06:43:44  $
+--       Version          : $Revision:   3.3  $
 --       Based on SCCS version : 
--------------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
--------------------------------------------------------------------------
+-----------------------------------------------------------------------------
+--   Copyright (c) 2014 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
 --
 --all global package variables here 
  
@@ -19,7 +19,7 @@ As
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  G_Body_Sccsid  Constant Varchar2(2000) := '$Revision:   3.2  $';
+  G_Body_Sccsid  CONSTANT VARCHAR2(2000) := '$Revision:   3.3  $';
    
   Type Context_Tab Is Table Of Boolean Index By Varchar(30);
   
@@ -77,21 +77,22 @@ End Set_Context;
 --
 -----------------------------------------------------------------------------
 --
-Procedure Set_Core_Context  (
-                            p_Attribute   In  Varchar2,
-                            p_Value       In  Varchar2
+PROCEDURE set_core_context  (
+                            p_attribute   IN  VARCHAR2,
+                            p_value       IN  VARCHAR2
                             )
-Is
-
-Begin
-  If Sys_Context('NM3_SECURITY_CTX','ENFORCE_READONLY_CTX') = 'YES' And g_Context_Tab.exists(p_Attribute) Then    
-    Raise_Application_Error(-20498,'Cannot set context values for read only attributes');  
-  Else
-    Dbms_Session.Set_Context('NM3CORE', p_Attribute, p_Value);
-  End If;
-End Set_Core_Context;                            
-
-
+IS
+--
+BEGIN
+    IF  SYS_CONTEXT('NM3_SECURITY_CTX','ENFORCE_READONLY_CTX') = 'YES' 
+        AND g_context_tab.EXISTS(p_attribute) 
+        AND SYS_CONTEXT('NM3_SECURITY_CTX', 'HIG_OWNER') != 'Y' 
+    THEN
+        RAISE_APPLICATION_ERROR(-20498,'Cannot set context values for read only attributes');  
+    ELSE
+        dbms_session.set_context('NM3CORE', p_attribute, p_value);
+    END IF;
+END set_core_context;                          
 --
 ----------------------------------------------------------------------------- 
 --
