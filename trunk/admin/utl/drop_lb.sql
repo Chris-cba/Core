@@ -3,11 +3,11 @@
 --
 --   PVCS Identifiers :-
 --
---       pvcsid                 : $Header:   //new_vm_latest/archives/lb/admin/utl/drop_lb.sql-arc   1.3   Jan 20 2015 14:31:48   Rob.Coupe  $
+--       pvcsid                 : $Header:   //new_vm_latest/archives/lb/admin/utl/drop_lb.sql-arc   1.4   Jan 20 2015 14:45:00   Rob.Coupe  $
 --       Module Name      : $Workfile:   drop_lb.sql  $
---       Date into PVCS   : $Date:   Jan 20 2015 14:31:48  $
---       Date fetched Out : $Modtime:   Jan 20 2015 14:31:18  $
---       PVCS Version     : $Revision:   1.3  $
+--       Date into PVCS   : $Date:   Jan 20 2015 14:45:00  $
+--       Date fetched Out : $Modtime:   Jan 20 2015 14:44:02  $
+--       PVCS Version     : $Revision:   1.4  $
 --
 --   Author : Rob Coupe
 --
@@ -164,6 +164,8 @@ begin
       when others then NULL;
     end;
   end loop;
+  exception
+    when others then NULL;
 end;
 /
 
@@ -172,7 +174,19 @@ lb_objects lo
 where exists ( select 1 from user_objects o where lo.object_name = o.object_name )
 /
 
-drop table lb_objects;
+
+DECLARE
+   not_exists   EXCEPTION;
+   PRAGMA EXCEPTION_INIT (not_exists, -942);
+BEGIN
+   EXECUTE IMMEDIATE 'drop table lb_objects';
+EXCEPTION
+   WHEN not_exists
+   THEN
+      NULL;
+END;
+/
+
 
 /*  
 
