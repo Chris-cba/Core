@@ -3,11 +3,11 @@
 --
 --   PVCS Identifiers :-
 --
---       pvcsid                 : $Header:   //new_vm_latest/archives/lb/admin/utl/drop_lb.sql-arc   1.4   Jan 20 2015 14:45:00   Rob.Coupe  $
+--       pvcsid                 : $Header:   //new_vm_latest/archives/lb/admin/utl/drop_lb.sql-arc   1.5   Jan 20 2015 15:59:44   Rob.Coupe  $
 --       Module Name      : $Workfile:   drop_lb.sql  $
---       Date into PVCS   : $Date:   Jan 20 2015 14:45:00  $
---       Date fetched Out : $Modtime:   Jan 20 2015 14:44:02  $
---       PVCS Version     : $Revision:   1.4  $
+--       Date into PVCS   : $Date:   Jan 20 2015 15:59:44  $
+--       Date fetched Out : $Modtime:   Jan 20 2015 15:59:18  $
+--       PVCS Version     : $Revision:   1.5  $
 --
 --   Author : Rob Coupe
 --
@@ -135,7 +135,7 @@ declare
 begin
   for irec in c1 loop
     begin
-       execute immediate 'begin lb_reg.drop_lb_asset_type ( pi_exor_type => irec.nit_inv_type ); end; ';
+       execute immediate 'begin lb_reg.drop_lb_asset_type ( pi_exor_type => '||''''||irec.nit_inv_type||''''||' ); end; ';
     exception
       when others then
         null;
