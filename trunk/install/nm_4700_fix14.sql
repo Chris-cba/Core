@@ -2,11 +2,11 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/nm_4700_fix14.sql-arc   3.6   Jan 19 2015 11:54:24   Stephen.Sewell  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/nm_4700_fix14.sql-arc   3.7   Jan 21 2015 12:26:16   Stephen.Sewell  $
 --       Module Name      : $Workfile:   nm_4700_fix14.sql  $
---       Date into PVCS   : $Date:   Jan 19 2015 11:54:24  $
---       Date fetched Out : $Modtime:   Jan 19 2015 11:53:28  $
---       PVCS Version     : $Revision:   3.6  $
+--       Date into PVCS   : $Date:   Jan 21 2015 12:26:16  $
+--       Date fetched Out : $Modtime:   Jan 21 2015 12:13:44  $
+--       PVCS Version     : $Revision:   3.7  $
 --
 --------------------------------------------------------------------------------
 --   Copyright (c) 2014 Bentley Systems Incorporated.
@@ -502,7 +502,7 @@ PROMPT Adding audit trigger to nm_inv_items_all table
 SET TERM OFF
 
 SET FEEDBACK ON
-start nm_inv_items_all_aud_br_u.trg
+start nm_inv_items_all_aud_br_iu.trg
 SET FEEDBACK OFF
 
 SET TERM ON 
@@ -512,22 +512,6 @@ SET TERM OFF
 SET FEEDBACK ON
 start nm_inv_items_instead_iu.trg
 SET FEEDBACK OFF
-
---
---------------------------------------------------------------------------------
--- Synonyms
---------------------------------------------------------------------------------
---
-SET TERM ON 
-PROMPT Updating all synonyms
-SET TERM OFF
-SET FEEDBACK ON
-BEGIN
-  nm3ddl.refresh_all_synonyms;
-END;
-/
-SET FEEDBACK OFF
-
 
 --
 --------------------------------------------------------------------------------
