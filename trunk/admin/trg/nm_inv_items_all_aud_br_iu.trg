@@ -4,11 +4,11 @@ CREATE OR REPLACE TRIGGER NM_INV_ITEMS_ALL_AUD_BR_IU BEFORE
     --
     --   SCCS Identifiers :-
     --
-    --       pvcsid                     : $Header:   //new_vm_latest/archives/nm3/admin/trg/nm_inv_items_all_aud_br_iu.trg-arc   1.0   Jan 21 2015 12:03:26   Stephen.Sewell  $
+    --       pvcsid                     : $Header:   //new_vm_latest/archives/nm3/admin/trg/nm_inv_items_all_aud_br_iu.trg-arc   3.0   Jan 21 2015 12:05:48   Stephen.Sewell  $
     --       Module Name                : $Workfile:   nm_inv_items_all_aud_br_iu.trg  $
-    --       Date into PVCS             : $Date:   Jan 21 2015 12:03:26  $
+    --       Date into PVCS             : $Date:   Jan 21 2015 12:05:48  $
     --       Date fetched Out           : $Modtime:   Jan 21 2015 11:41:50  $
-    --       PVCS Version               : $Revision:   1.0  $
+    --       PVCS Version               : $Revision:   3.0  $
     --
     --   table_name_AUD trigger
     --   Write old row into Audit Journal table for any update to this table
