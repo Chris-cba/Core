@@ -2,11 +2,11 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/nm_4700_fix14.sql-arc   3.7   Jan 21 2015 12:26:16   Stephen.Sewell  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/nm_4700_fix14.sql-arc   3.8   Jan 28 2015 11:00:54   Stephen.Sewell  $
 --       Module Name      : $Workfile:   nm_4700_fix14.sql  $
---       Date into PVCS   : $Date:   Jan 21 2015 12:26:16  $
---       Date fetched Out : $Modtime:   Jan 21 2015 12:13:44  $
---       PVCS Version     : $Revision:   3.7  $
+--       Date into PVCS   : $Date:   Jan 28 2015 11:00:54  $
+--       Date fetched Out : $Modtime:   Jan 28 2015 11:00:16  $
+--       PVCS Version     : $Revision:   3.8  $
 --
 --------------------------------------------------------------------------------
 --   Copyright (c) 2014 Bentley Systems Incorporated.
@@ -487,6 +487,47 @@ WHERE HMR2.HMR_MODULE = 'NM0510'
 AND NOT EXISTS (SELECT 1 FROM HIG_MODULE_ROLES HMR3
                    WHERE HMR3.HMR_MODULE = 'NM0525'
                     AND  HMR3.HMR_ROLE = HMR2.HMR_ROLE)
+;
+SET FEEDBACK OFF
+
+--
+--------------------------------------------------------------------------------
+-- HIG_NAVIGATOR_MODULES
+--------------------------------------------------------------------------------
+--
+SET TERM ON 
+PROMPT Inserting into HIG_NAVIGATOR_MODULES to provide menu entry in Navigator screen for new form NM0525
+SET TERM OFF
+--
+SET FEEDBACK ON
+INSERT INTO HIG_NAVIGATOR_MODULES
+  (
+    HNM_MODULE_NAME,
+    HNM_MODULE_PARAM,
+    HNM_PRIMARY_MODULE,
+    HNM_SEQUENCE,
+    HNM_TABLE_NAME ,
+    HNM_FIELD_NAME,
+    HNM_HIERARCHY_LABEL,
+    HNM_DATE_CREATED,
+    HNM_CREATED_BY,
+    HNM_DATE_MODIFIED,
+    HNM_MODIFIED_BY)
+SELECT
+    'NM0525',
+    'ne_id',
+    'N',
+    3,
+    NULL,
+    NULL,
+    'Asset',
+    SYSDATE,
+    USER,
+    NULL,
+    NULL
+FROM DUAL
+WHERE NOT EXISTS (SELECT 1 FROM HIG_NAVIGATOR_MODULES
+                   WHERE HNM_MODULE_NAME = 'NM0525')
 ;
 SET FEEDBACK OFF
 
