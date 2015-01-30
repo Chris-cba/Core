@@ -4,11 +4,11 @@ As
 -----------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/web_user_info.pkb-arc   3.4   Jan 20 2015 13:22:38   Upendra.Hukeri  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/web_user_info.pkb-arc   3.5   Jan 30 2015 12:43:08   Rob.Coupe  $
 --       Module Name      : $Workfile:   web_user_info.pkb  $
---       Date into PVCS   : $Date:   Jan 20 2015 13:22:38  $
---       Date fetched Out : $Modtime:   Jan 20 2015 13:16:36  $
---       Version          : $Revision:   3.4  $
+--       Date into PVCS   : $Date:   Jan 30 2015 12:43:08  $
+--       Date fetched Out : $Modtime:   Jan 30 2015 12:41:54  $
+--       Version          : $Revision:   3.5  $
 --       Based on SCCS version :
 -----------------------------------------------------------------------------
 --   Copyright (c) 2014 Bentley Systems Incorporated. All rights reserved.
@@ -18,7 +18,7 @@ As
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_Body_Sccsid CONSTANT  VARCHAR2(2000) :=  '$Revision:   3.4  $';
+  g_Body_Sccsid CONSTANT  VARCHAR2(2000) :=  '$Revision:   3.5  $';
 
 --
 -----------------------------------------------------------------------------
@@ -190,7 +190,7 @@ END IF;
      
    Nm3Security.Set_User(l_db_user); 
    nm3ctx.Set_Core_Context (p_Attribute => 'USER_ID'          ,p_Value => pi_user_id);
-   nm3ctx.Set_Core_Context (p_Attribute => 'APPLICATION_OWNER',p_Value => Get_Hig_Owner);
+-- nm3ctx.Set_Core_Context (p_Attribute => 'APPLICATION_OWNER',p_Value => Get_Hig_Owner);
    nm3ctx.Set_Core_Context (p_Attribute => 'EFFECTIVE_DATE'   ,p_Value => To_Char(Trunc(Sysdate),'DD-MON-YYYY'));
    nm3ctx.set_core_context (p_Attribute => 'USER_ADMIN_UNIT'  ,p_Value => l_user_au );
    nm3ctx.set_core_context (p_Attribute => 'UNRESTRICTED_INVENTORY', p_Value => l_unrestricted );
