@@ -4,11 +4,11 @@ CREATE OR REPLACE TRIGGER NM_INV_ITEMS_ALL_AUD_BR_IU BEFORE
     --
     --   SCCS Identifiers :-
     --
-    --       pvcsid                     : $Header:   //new_vm_latest/archives/nm3/admin/trg/nm_inv_items_all_aud_br_iu.trg-arc   3.0   Jan 21 2015 12:05:48   Stephen.Sewell  $
+    --       pvcsid                     : $Header:   //new_vm_latest/archives/nm3/admin/trg/nm_inv_items_all_aud_br_iu.trg-arc   3.1   Jan 30 2015 15:44:44   Stephen.Sewell  $
     --       Module Name                : $Workfile:   nm_inv_items_all_aud_br_iu.trg  $
-    --       Date into PVCS             : $Date:   Jan 21 2015 12:05:48  $
-    --       Date fetched Out           : $Modtime:   Jan 21 2015 11:41:50  $
-    --       PVCS Version               : $Revision:   3.0  $
+    --       Date into PVCS             : $Date:   Jan 30 2015 15:44:44  $
+    --       Date fetched Out           : $Modtime:   Jan 28 2015 16:26:28  $
+    --       PVCS Version               : $Revision:   3.1  $
     --
     --   table_name_AUD trigger
     --   Write old row into Audit Journal table for any update to this table
@@ -68,10 +68,16 @@ CREATE OR REPLACE TRIGGER NM_INV_ITEMS_ALL_AUD_BR_IU BEFORE
         l_old_iit_end_date   := NULL;
       ELSE
         --
-        -- Record requires start and end dates. Use dates passed in
+        -- Record requires start and end dates. Use date passed in
+        -- if different to previous start date
         -- or trunc(SYSDATE).
         --
-        l_old_iit_end_date   := nvl(:NEW.IIT_START_DATE, trunc(SYSDATE));
+        if nvl(:NEW.IIT_START_DATE,SYSDATE) <> nvl(:OLD.IIT_START_DATE,SYSDATE)
+        THEN
+          l_old_iit_end_date   := nvl(:NEW.IIT_START_DATE, trunc(SYSDATE));
+        ELSE
+          l_old_iit_end_date   := trunc(SYSDATE);
+        END IF;
         :NEW.IIT_START_DATE  := l_old_iit_end_date;
       END IF;
       
