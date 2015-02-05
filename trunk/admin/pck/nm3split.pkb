@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3split IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3split.pkb-arc   2.15   Jul 04 2013 16:32:58   James.Wadsworth  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3split.pkb-arc   2.16   Feb 05 2015 10:17:56   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm3split.pkb  $
---       Date into PVCS   : $Date:   Jul 04 2013 16:32:58  $
---       Date fetched Out : $Modtime:   Jul 04 2013 14:25:20  $
---       PVCS Version     : $Revision:   2.15  $
+--       Date into PVCS   : $Date:   Feb 05 2015 10:17:56  $
+--       Date fetched Out : $Modtime:   Feb 02 2015 14:13:56  $
+--       PVCS Version     : $Revision:   2.16  $
 --
 --
 --   Author : ITurnbull
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3split IS
 -- 03.06.08 PT added p_no_purpose parameter throughout where node is created.
 
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.15  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.16  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(2000) := 'nm3split';
@@ -478,7 +478,11 @@ BEGIN
 --   nm_debug.debug('p_node='||p_node);
       g_rec_ne_new_1.ne_no_start            := NVL(p_ne_no_start_1,g_rec_ne_old.ne_no_start);
       g_rec_ne_new_1.ne_no_end              := p_node;
+   ELSE
+      g_rec_ne_new_1.ne_no_start            := NULL;
+      g_rec_ne_new_1.ne_no_end              := NULL;
    END IF;
+   
    g_rec_ne_new_1.ne_sub_class           := p_ne_sub_class_1;
    g_rec_ne_new_1.ne_nsg_ref             := p_ne_nsg_ref_1;
    g_rec_ne_new_1.ne_version_no          := p_ne_version_no_1;
@@ -508,6 +512,9 @@ BEGIN
    IF Nm3net.get_nt(g_rec_ne_new_2.ne_nt_type).nt_node_type IS NOT NULL THEN
      g_rec_ne_new_2.ne_no_start            := p_node;
      g_rec_ne_new_2.ne_no_end              := NVL(p_ne_no_end_2,g_rec_ne_old.ne_no_end);
+   ELSE
+      g_rec_ne_new_2.ne_no_start            := NULL;
+      g_rec_ne_new_2.ne_no_end              := NULL;
    END IF;
 
    g_rec_ne_new_2.ne_sub_class           := p_ne_sub_class_2;
