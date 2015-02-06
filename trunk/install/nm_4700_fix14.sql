@@ -2,11 +2,11 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/nm_4700_fix14.sql-arc   3.8   Jan 28 2015 11:00:54   Stephen.Sewell  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/nm_4700_fix14.sql-arc   3.9   Feb 06 2015 14:49:02   Stephen.Sewell  $
 --       Module Name      : $Workfile:   nm_4700_fix14.sql  $
---       Date into PVCS   : $Date:   Jan 28 2015 11:00:54  $
---       Date fetched Out : $Modtime:   Jan 28 2015 11:00:16  $
---       PVCS Version     : $Revision:   3.8  $
+--       Date into PVCS   : $Date:   Feb 06 2015 14:49:02  $
+--       Date fetched Out : $Modtime:   Feb 06 2015 14:47:56  $
+--       PVCS Version     : $Revision:   3.9  $
 --
 --------------------------------------------------------------------------------
 --   Copyright (c) 2014 Bentley Systems Incorporated.
@@ -553,6 +553,20 @@ SET TERM OFF
 SET FEEDBACK ON
 start nm_inv_items_instead_iu.trg
 SET FEEDBACK OFF
+
+--
+--------------------------------------------------------------------------------
+-- SYNONYMS
+--------------------------------------------------------------------------------
+--
+SET TERM ON 
+PROMPT Creating missing synonyms
+SET TERM OFF
+
+BEGIN
+  nm3ddl.refresh_all_synonyms;
+END;
+/
 
 --
 --------------------------------------------------------------------------------
