@@ -5,11 +5,11 @@ As
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.67   Sep 24 2013 13:40:58   Rob.Coupe  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.68   Feb 06 2015 15:03:12   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3sdm.pkb  $
---       Date into PVCS   : $Date:   Sep 24 2013 13:40:58  $
---       Date fetched Out : $Modtime:   Sep 24 2013 13:40:34  $
---       PVCS Version     : $Revision:   2.67  $
+--       Date into PVCS   : $Date:   Feb 06 2015 15:03:12  $
+--       Date fetched Out : $Modtime:   Feb 06 2015 14:47:06  $
+--       PVCS Version     : $Revision:   2.68  $
 --
 --   Author : R.A. Coupe
 --
@@ -21,7 +21,7 @@ As
 --
 --all global package variables here
 --
-  g_Body_Sccsid     Constant Varchar2 (2000) := '"$Revision:   2.67  $"';
+  g_Body_Sccsid     Constant Varchar2 (2000) := '"$Revision:   2.68  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
   g_Package_Name    Constant Varchar2 (30)   := 'NM3SDM';
@@ -1418,12 +1418,21 @@ Is
   l_Measure Number;
   l_Usgm    User_Sdo_Geom_Metadata%Rowtype;
   l_End     Number;
-
+  l_tol     Number;
 Begin
   l_Usgm := Nm3Sdo.Get_Theme_Metadata( p_Layer );
   If Nm3Sdo.Element_Has_Shape( p_Layer, p_Ne_Id ) = 'TRUE'  Then
     l_Measure := Nm3Sdo.Get_Measure ( p_Layer, p_Ne_Id, p_X, p_Y ).Lr_Offset;
 
+	select NM3SDO.GET_TOL_FROM_UNIT_MASK(nt_length_unit) into l_tol 
+	from nm_elements, nm_types where ne_id = p_Ne_Id and ne_nt_type = nt_type;
+
+    l_End   := Nm3Net.Get_Datum_Element_Length( p_Ne_Id ) - l_Measure;
+	
+	if l_measure < l_tol or abs(l_measure - l_End ) < l_tol then
+	   raise_application_error(-20001, 'Split position cannot be at the start or end of an element);
+	end if;
+	
     Sdo_Lrs.Split_Geom_Segment( l_Geom, l_Usgm.Diminfo, l_Measure, p_Geom_1, p_Geom_2 );
 
     If p_Measure Is Not Null Then
