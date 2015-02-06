@@ -5,11 +5,11 @@ As
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.68   Feb 06 2015 15:03:12   Rob.Coupe  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.69   Feb 06 2015 16:04:10   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm3sdm.pkb  $
---       Date into PVCS   : $Date:   Feb 06 2015 15:03:12  $
---       Date fetched Out : $Modtime:   Feb 06 2015 14:47:06  $
---       PVCS Version     : $Revision:   2.68  $
+--       Date into PVCS   : $Date:   Feb 06 2015 16:04:10  $
+--       Date fetched Out : $Modtime:   Feb 06 2015 16:03:24  $
+--       PVCS Version     : $Revision:   2.69  $
 --
 --   Author : R.A. Coupe
 --
@@ -21,7 +21,7 @@ As
 --
 --all global package variables here
 --
-  g_Body_Sccsid     Constant Varchar2 (2000) := '"$Revision:   2.68  $"';
+  g_Body_Sccsid     Constant Varchar2 (2000) := '"$Revision:   2.69  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
   g_Package_Name    Constant Varchar2 (30)   := 'NM3SDM';
@@ -1430,7 +1430,7 @@ Begin
     l_End   := Nm3Net.Get_Datum_Element_Length( p_Ne_Id ) - l_Measure;
 	
 	if l_measure < l_tol or abs(l_measure - l_End ) < l_tol then
-	   raise_application_error(-20001, 'Split position cannot be at the start or end of an element);
+	   raise_application_error(-20001, 'Split position cannot be at the start or end of an element');
 	end if;
 	
     Sdo_Lrs.Split_Geom_Segment( l_Geom, l_Usgm.Diminfo, l_Measure, p_Geom_1, p_Geom_2 );
