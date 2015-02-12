@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3nwval AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3nwval.pkb-arc   2.11   Jul 04 2013 16:21:08   James.Wadsworth  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3nwval.pkb-arc   2.12   Feb 12 2015 09:28:52   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm3nwval.pkb  $
---       Date into PVCS   : $Date:   Jul 04 2013 16:21:08  $
---       Date fetched Out : $Modtime:   Jul 04 2013 15:49:34  $
---       PVCS Version     : $Revision:   2.11  $
+--       Date into PVCS   : $Date:   Feb 12 2015 09:28:52  $
+--       Date fetched Out : $Modtime:   Feb 04 2015 16:04:24  $
+--       PVCS Version     : $Revision:   2.12  $
 --       Based on 1.67
 --
 --
@@ -18,7 +18,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3nwval AS
 --   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 ------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.11  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.12  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 -----------------------------------------------------------------------------
 --
@@ -3420,7 +3420,7 @@ BEGIN
             THEN
                 CLOSE c_get_nav;
                 l_plsql :=            'BEGIN'
-                        || c_nl || '  nm3nwval.g_dyn_vals_different := NVL(nm3nwval.g_dyn_ne_flex_cols_old_rec.' || l_rec.ntc_column_name || ', nm3type.c_nvl) <> NVL(nm3nwval.g_dyn_ne_flex_cols_new_rec.' || l_rec.ntc_column_name || ', nm3type.c_nvl);'
+                        || c_nl || '  nm3nwval.g_dyn_vals_different := NVL(RTRIM(nm3nwval.g_dyn_ne_flex_cols_old_rec.' || l_rec.ntc_column_name || '), nm3type.c_nvl) <> NVL(RTRIM(nm3nwval.g_dyn_ne_flex_cols_new_rec.' || l_rec.ntc_column_name || '), nm3type.c_nvl);'
                         || c_nl || 'END;';
 
                 EXECUTE IMMEDIATE l_plsql;
@@ -3436,7 +3436,7 @@ BEGIN
             END IF ;
         ELSE
             l_plsql :=            'BEGIN'
-                    || c_nl || '  nm3nwval.g_dyn_vals_different := NVL(nm3nwval.g_dyn_ne_flex_cols_old_rec.' || l_rec.ntc_column_name || ', nm3type.c_nvl) <> NVL(nm3nwval.g_dyn_ne_flex_cols_new_rec.' || l_rec.ntc_column_name || ', nm3type.c_nvl);'
+                    || c_nl || '  nm3nwval.g_dyn_vals_different := NVL(RTRIM(nm3nwval.g_dyn_ne_flex_cols_old_rec.' || l_rec.ntc_column_name || '), nm3type.c_nvl) <> NVL(RTRIM(nm3nwval.g_dyn_ne_flex_cols_new_rec.' || l_rec.ntc_column_name || '), nm3type.c_nvl);'
                     || c_nl || 'END;';
 
             EXECUTE IMMEDIATE l_plsql;
