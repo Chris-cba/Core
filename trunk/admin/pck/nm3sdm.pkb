@@ -5,11 +5,11 @@ As
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.69   Feb 06 2015 16:04:10   Chris.Baugh  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.70   Feb 17 2015 12:56:04   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm3sdm.pkb  $
---       Date into PVCS   : $Date:   Feb 06 2015 16:04:10  $
---       Date fetched Out : $Modtime:   Feb 06 2015 16:03:24  $
---       PVCS Version     : $Revision:   2.69  $
+--       Date into PVCS   : $Date:   Feb 17 2015 12:56:04  $
+--       Date fetched Out : $Modtime:   Feb 17 2015 13:20:08  $
+--       PVCS Version     : $Revision:   2.70  $
 --
 --   Author : R.A. Coupe
 --
@@ -21,7 +21,7 @@ As
 --
 --all global package variables here
 --
-  g_Body_Sccsid     Constant Varchar2 (2000) := '"$Revision:   2.69  $"';
+  g_Body_Sccsid     Constant Varchar2 (2000) := '"$Revision:   2.70  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
   g_Package_Name    Constant Varchar2 (30)   := 'NM3SDM';
@@ -1424,14 +1424,14 @@ Begin
   If Nm3Sdo.Element_Has_Shape( p_Layer, p_Ne_Id ) = 'TRUE'  Then
     l_Measure := Nm3Sdo.Get_Measure ( p_Layer, p_Ne_Id, p_X, p_Y ).Lr_Offset;
 
-	select NM3SDO.GET_TOL_FROM_UNIT_MASK(nt_length_unit) into l_tol 
-	from nm_elements, nm_types where ne_id = p_Ne_Id and ne_nt_type = nt_type;
+	  select NM3SDO.GET_TOL_FROM_UNIT_MASK(nt_length_unit) into l_tol 
+	    from nm_elements, nm_types where ne_id = p_Ne_Id and ne_nt_type = nt_type;
 
-    l_End   := Nm3Net.Get_Datum_Element_Length( p_Ne_Id ) - l_Measure;
+    l_End   := Nm3Net.Get_Datum_Element_Length( p_Ne_Id );
 	
-	if l_measure < l_tol or abs(l_measure - l_End ) < l_tol then
-	   raise_application_error(-20001, 'Split position cannot be at the start or end of an element');
-	end if;
+	  if l_measure < l_tol or abs(l_End - l_measure ) < l_tol then
+	    raise_application_error(-20001, 'Split position cannot be at the start or end of an element');
+	  end if;
 	
     Sdo_Lrs.Split_Geom_Segment( l_Geom, l_Usgm.Diminfo, l_Measure, p_Geom_1, p_Geom_2 );
 
