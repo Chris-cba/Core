@@ -4,11 +4,11 @@ IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3undo.pkb-arc   2.19   Dec 15 2014 09:41:38   Chris.Baugh  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3undo.pkb-arc   2.20   Feb 19 2015 16:42:22   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3undo.pkb  $
---       Date into PVCS   : $Date:   Dec 15 2014 09:41:38  $
---       Date fetched Out : $Modtime:   Nov 13 2014 07:59:24  $
---       PVCS Version     : $Revision:   2.19  $
+--       Date into PVCS   : $Date:   Feb 19 2015 16:42:22  $
+--       Date fetched Out : $Modtime:   Feb 19 2015 17:45:20  $
+--       PVCS Version     : $Revision:   2.20  $
 --
 --   Author : ITurnbull
 --
@@ -19,7 +19,7 @@ IS
 -- Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '"$Revision:   2.19  $"';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '"$Revision:   2.20  $"';
 --  g_body_sccsid is the SCCS ID for the package body
    g_package_name   CONSTANT VARCHAR2 (2000) := 'nm3undo';
 --
@@ -1130,7 +1130,9 @@ END undo_scheme;
            AND a.neh_operation = 'S'
            AND a.neh_effective_date = b.neh_effective_date
            AND b.neh_ne_id_old = pi_ne_id 
-           AND b.neh_operation = 'S';
+           AND b.neh_operation = 'S'
+           AND nvl(a.neh_descr, '£$%^') = nvl(b.neh_descr, '£$%^')
+           AND nm_start_date = a.neh_effective_date;
          
          -- unclose the element
          error_loc := 20 ;
