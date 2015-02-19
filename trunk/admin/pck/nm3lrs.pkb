@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3lrs.pkb-arc   2.8   Feb 16 2015 10:52:06   Chris.Baugh  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3lrs.pkb-arc   2.9   Feb 19 2015 13:27:02   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm3lrs.pkb  $
---       Date into PVCS   : $Date:   Feb 16 2015 10:52:06  $
---       Date fetched Out : $Modtime:   Feb 16 2015 09:46:06  $
---       Version          : $Revision:   2.8  $
+--       Date into PVCS   : $Date:   Feb 19 2015 13:27:02  $
+--       Date fetched Out : $Modtime:   Feb 18 2015 15:16:38  $
+--       Version          : $Revision:   2.9  $
 --       Based on SCCS version : 1.45
 -------------------------------------------------------------------------
 --   Author : Rob Coupe
@@ -18,7 +18,7 @@ AS
 --   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
    --g_body_sccsid     CONSTANT  varchar2(2000) := '"@(#)nm3lrs.pkb	1.45 09/25/06"';
-   g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.8  $';
+   g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.9  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3lrs';
@@ -1673,7 +1673,10 @@ BEGIN
              ||'FROM nm_node_usages'||chr(10)
              ||'   , nm_members'||chr(10)
              ||'   , nm_nodes'||chr(10)
-             ||'WHERE nnu_ne_id = nm_ne_id_of'||chr(10)
+             ||'   , nm_route_nodes'||chr(10)
+             ||'WHERE node_id = nnu_no_node_id'||chr(10)
+             ||'AND   node_type != ''T'''||chr(10)
+             ||'AND   nnu_ne_id = nm_ne_id_of'||chr(10)
              ||'AND   nnu_no_node_id = no_node_id'||chr(10)
              ||'AND   nm_ne_id_in = '||TO_CHAR(pi_route_ne_id)||chr(10)
              ||'AND   nnu_chain = decode(nm_cardinality, -1, nm_end_mp,nm_begin_mp)'||chr(10)
