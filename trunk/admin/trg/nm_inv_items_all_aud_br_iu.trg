@@ -4,11 +4,11 @@ CREATE OR REPLACE TRIGGER NM_INV_ITEMS_ALL_AUD_BR_IU BEFORE
     --
     --   SCCS Identifiers :-
     --
-    --       pvcsid                     : $Header:   //new_vm_latest/archives/nm3/admin/trg/nm_inv_items_all_aud_br_iu.trg-arc   3.2   Feb 18 2015 11:14:04   Stephen.Sewell  $
+    --       pvcsid                     : $Header:   //new_vm_latest/archives/nm3/admin/trg/nm_inv_items_all_aud_br_iu.trg-arc   3.3   Feb 20 2015 11:50:50   Stephen.Sewell  $
     --       Module Name                : $Workfile:   nm_inv_items_all_aud_br_iu.trg  $
-    --       Date into PVCS             : $Date:   Feb 18 2015 11:14:04  $
-    --       Date fetched Out           : $Modtime:   Feb 17 2015 11:47:00  $
-    --       PVCS Version               : $Revision:   3.2  $
+    --       Date into PVCS             : $Date:   Feb 20 2015 11:50:50  $
+    --       Date fetched Out           : $Modtime:   Feb 20 2015 12:53:02  $
+    --       PVCS Version               : $Revision:   3.3  $
     --
     --   table_name_AUD trigger
     --   Write old row into Audit Journal table for any update to this table
@@ -73,7 +73,7 @@ CREATE OR REPLACE TRIGGER NM_INV_ITEMS_ALL_AUD_BR_IU BEFORE
               nvl(:OLD.IIT_PRIMARY_KEY,to_date('01-JAN-1900','DD-MON-YYYY')) <> nvl( :NEW.IIT_PRIMARY_KEY,to_date('01-JAN-1900','DD-MON-YYYY')) OR
               nvl(:OLD.IIT_START_DATE,to_date('01-JAN-1900','DD-MON-YYYY')) <> nvl( :NEW.IIT_START_DATE,to_date('01-JAN-1900','DD-MON-YYYY')) OR
               nvl(:OLD.IIT_DATE_CREATED,to_date('01-JAN-1900','DD-MON-YYYY')) <> nvl( :NEW.IIT_DATE_CREATED,to_date('01-JAN-1900','DD-MON-YYYY')) OR
-              nvl(:OLD.IIT_DATE_MODIFIED,to_date('01-JAN-1900','DD-MON-YYYY')) <> nvl( :NEW.IIT_DATE_MODIFIED,to_date('01-JAN-1900','DD-MON-YYYY')) OR
+              --nvl(:OLD.IIT_DATE_MODIFIED,to_date('01-JAN-1900','DD-MON-YYYY')) <> nvl( :NEW.IIT_DATE_MODIFIED,to_date('01-JAN-1900','DD-MON-YYYY')) OR
               nvl(:OLD.IIT_CREATED_BY,'??') <> nvl( :NEW.IIT_CREATED_BY,'??') OR
               nvl(:OLD.IIT_MODIFIED_BY,'??') <> nvl( :NEW.IIT_MODIFIED_BY,'??') OR
               nvl(:OLD.IIT_ADMIN_UNIT,-1) <> nvl( :NEW.IIT_ADMIN_UNIT,-1) OR
@@ -237,7 +237,10 @@ CREATE OR REPLACE TRIGGER NM_INV_ITEMS_ALL_AUD_BR_IU BEFORE
               nvl(:OLD.IIT_NUM_ATTRIB115,-1) <> nvl( :NEW.IIT_NUM_ATTRIB115,-1)
       THEN
         --
-        -- Record has changed so should be updated,
+        -- Record has changed so should be updated.
+        -- Note that as IIT_DATE_MODIFIED is changed by
+        -- trigger this is excluded from this test (it always
+        -- returns TRUE).
         --
         -- Record requires start and end dates. Use date passed in
         -- if different to previous start date
