@@ -4,11 +4,11 @@ CREATE OR REPLACE TRIGGER NM_INV_ITEMS_ALL_AUD_BR_IU BEFORE
     --
     --   SCCS Identifiers :-
     --
-    --       pvcsid                     : $Header:   //new_vm_latest/archives/nm3/admin/trg/nm_inv_items_all_aud_br_iu.trg-arc   3.4   Feb 26 2015 20:28:24   Stephen.Sewell  $
+    --       pvcsid                     : $Header:   //new_vm_latest/archives/nm3/admin/trg/nm_inv_items_all_aud_br_iu.trg-arc   3.5   Feb 27 2015 13:50:10   Stephen.Sewell  $
     --       Module Name                : $Workfile:   nm_inv_items_all_aud_br_iu.trg  $
-    --       Date into PVCS             : $Date:   Feb 26 2015 20:28:24  $
-    --       Date fetched Out           : $Modtime:   Feb 26 2015 13:26:50  $
-    --       PVCS Version               : $Revision:   3.4  $
+    --       Date into PVCS             : $Date:   Feb 27 2015 13:50:10  $
+    --       Date fetched Out           : $Modtime:   Feb 27 2015 14:48:14  $
+    --       PVCS Version               : $Revision:   3.5  $
     --
     --   table_name_AUD trigger
     --   Write old row into Audit Journal table for any update to this table
@@ -217,6 +217,7 @@ CREATE OR REPLACE TRIGGER NM_INV_ITEMS_ALL_AUD_BR_IU BEFORE
          nvl(:OLD.IIT_PROV_FLAG,'??') <> nvl( :NEW.IIT_PROV_FLAG,'??') OR
          nvl(:OLD.IIT_REV_BY,'??') <> nvl( :NEW.IIT_REV_BY,'??') OR
          nvl(:OLD.IIT_REV_DATE,to_date('01-JAN-1900','DD-MON-YYYY')) <> nvl( :NEW.IIT_REV_DATE,to_date('01-JAN-1900','DD-MON-YYYY')) OR
+         nvl(:OLD.IIT_TYPE,'??') <> nvl( :NEW.IIT_TYPE,'??') OR
          nvl(:OLD.IIT_TYPE_TXT,'??') <> nvl( :NEW.IIT_TYPE_TXT,'??') OR
          nvl(:OLD.IIT_WIDTH,-1) <> nvl( :NEW.IIT_WIDTH,-1) OR
          nvl(:OLD.IIT_XTRA_CHAR_1,'??') <> nvl( :NEW.IIT_XTRA_CHAR_1,'??') OR
