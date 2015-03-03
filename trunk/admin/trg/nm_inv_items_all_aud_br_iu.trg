@@ -1,14 +1,15 @@
 CREATE OR REPLACE TRIGGER NM_INV_ITEMS_ALL_AUD_BR_IU BEFORE
   INSERT OR UPDATE ON NM_INV_ITEMS_ALL FOR EACH row 
-  FOLLOWS NM_INV_ITEMS_ALL_B_DT_TRG DECLARE
+  FOLLOWS NM_INV_ITEMS_ALL_B_DT_TRG, 
+          NM_INV_ITEMS_ALL_WHO DECLARE
     --
     --   SCCS Identifiers :-
     --
-    --       pvcsid                     : $Header:   //new_vm_latest/archives/nm3/admin/trg/nm_inv_items_all_aud_br_iu.trg-arc   3.5   Feb 27 2015 13:50:10   Stephen.Sewell  $
+    --       pvcsid                     : $Header:   //new_vm_latest/archives/nm3/admin/trg/nm_inv_items_all_aud_br_iu.trg-arc   3.6   Mar 03 2015 09:27:32   Stephen.Sewell  $
     --       Module Name                : $Workfile:   nm_inv_items_all_aud_br_iu.trg  $
-    --       Date into PVCS             : $Date:   Feb 27 2015 13:50:10  $
-    --       Date fetched Out           : $Modtime:   Feb 27 2015 14:48:14  $
-    --       PVCS Version               : $Revision:   3.5  $
+    --       Date into PVCS             : $Date:   Mar 03 2015 09:27:32  $
+    --       Date fetched Out           : $Modtime:   Mar 03 2015 09:31:46  $
+    --       PVCS Version               : $Revision:   3.6  $
     --
     --   table_name_AUD trigger
     --   Write old row into Audit Journal table for any update to this table
@@ -255,21 +256,9 @@ CREATE OR REPLACE TRIGGER NM_INV_ITEMS_ALL_AUD_BR_IU BEFORE
         --
         -- Record has changed so should be updated.
         -- Note that as IIT_DATE_MODIFIED is changed by
-        -- trigger this is excluded from this test (it always
-        -- returns TRUE).
-        --
-        -- Record requires start and end dates. Use date passed in
-        -- if different to previous start date
-        -- or trunc(SYSDATE).
-        --
-        if nvl(:NEW.IIT_START_DATE,SYSDATE) <> nvl(:OLD.IIT_START_DATE,SYSDATE)
-        THEN
-          l_old_iit_end_date   := nvl(:NEW.IIT_START_DATE, trunc(SYSDATE));
-        ELSE
-          l_old_iit_end_date   := trunc(SYSDATE);
-        END IF;
-        :NEW.IIT_START_DATE  := l_old_iit_end_date;
-        
+        -- trigger this is excluded from this test (it would always
+        -- return TRUE).
+        --       
         INSERT
         INTO nm_inv_items_all_j
           (
