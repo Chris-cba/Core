@@ -4,11 +4,11 @@ IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3undo.pkb-arc   2.21   Mar 09 2015 17:00:58   Rob.Coupe  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3undo.pkb-arc   2.22   Mar 09 2015 17:08:50   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3undo.pkb  $
---       Date into PVCS   : $Date:   Mar 09 2015 17:00:58  $
---       Date fetched Out : $Modtime:   Mar 09 2015 16:59:24  $
---       PVCS Version     : $Revision:   2.21  $
+--       Date into PVCS   : $Date:   Mar 09 2015 17:08:50  $
+--       Date fetched Out : $Modtime:   Mar 09 2015 17:04:12  $
+--       PVCS Version     : $Revision:   2.22  $
 --
 --   Author : ITurnbull
 --
@@ -19,7 +19,7 @@ IS
 -- Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '"$Revision:   2.21  $"';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '"$Revision:   2.22  $"';
 --  g_body_sccsid is the SCCS ID for the package body
    g_package_name   CONSTANT VARCHAR2 (2000) := 'nm3undo';
 --
@@ -1121,7 +1121,7 @@ END undo_scheme;
           BULK COLLECT
           INTO l_tab_ne_id_of
 		from  (
-        SELECT distinct nm_ne_id_of
+        SELECT distinct nm_ne_id_of, nm_start_date
           FROM nm_members_all, 
                nm_elements_all, 
                nm_element_history a, 
