@@ -4,11 +4,11 @@ IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3undo.pkb-arc   2.20   Feb 19 2015 16:42:22   Rob.Coupe  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3undo.pkb-arc   2.21   Mar 09 2015 17:00:58   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3undo.pkb  $
---       Date into PVCS   : $Date:   Feb 19 2015 16:42:22  $
---       Date fetched Out : $Modtime:   Feb 19 2015 17:45:20  $
---       PVCS Version     : $Revision:   2.20  $
+--       Date into PVCS   : $Date:   Mar 09 2015 17:00:58  $
+--       Date fetched Out : $Modtime:   Mar 09 2015 16:59:24  $
+--       PVCS Version     : $Revision:   2.21  $
 --
 --   Author : ITurnbull
 --
@@ -19,7 +19,7 @@ IS
 -- Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '"$Revision:   2.20  $"';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '"$Revision:   2.21  $"';
 --  g_body_sccsid is the SCCS ID for the package body
    g_package_name   CONSTANT VARCHAR2 (2000) := 'nm3undo';
 --
@@ -1117,9 +1117,11 @@ END undo_scheme;
       BEGIN
          nm_debug.debug_on;
           -- unsplit the underlying datums
-        SELECT distinct nm_ne_id_of
+		select nm_ne_id_of
           BULK COLLECT
           INTO l_tab_ne_id_of
+		from  (
+        SELECT distinct nm_ne_id_of
           FROM nm_members_all, 
                nm_elements_all, 
                nm_element_history a, 
@@ -1132,7 +1134,10 @@ END undo_scheme;
            AND b.neh_ne_id_old = pi_ne_id 
            AND b.neh_operation = 'S'
            AND nvl(a.neh_descr, '£$%^') = nvl(b.neh_descr, '£$%^')
-           AND nm_start_date = a.neh_effective_date;
+           AND nm_end_date = a.neh_effective_date
+           order by nm_start_date desc
+           )
+		where rownum = 1;
          
          -- unclose the element
          error_loc := 20 ;
