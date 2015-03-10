@@ -5,11 +5,11 @@ As
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.70   Feb 17 2015 12:56:04   Chris.Baugh  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.71   Mar 10 2015 10:02:06   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3sdm.pkb  $
---       Date into PVCS   : $Date:   Feb 17 2015 12:56:04  $
---       Date fetched Out : $Modtime:   Feb 17 2015 13:20:08  $
---       PVCS Version     : $Revision:   2.70  $
+--       Date into PVCS   : $Date:   Mar 10 2015 10:02:06  $
+--       Date fetched Out : $Modtime:   Mar 10 2015 09:57:10  $
+--       PVCS Version     : $Revision:   2.71  $
 --
 --   Author : R.A. Coupe
 --
@@ -21,7 +21,7 @@ As
 --
 --all global package variables here
 --
-  g_Body_Sccsid     Constant Varchar2 (2000) := '"$Revision:   2.70  $"';
+  g_Body_Sccsid     Constant Varchar2 (2000) := '"$Revision:   2.71  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
   g_Package_Name    Constant Varchar2 (30)   := 'NM3SDM';
@@ -1415,13 +1415,19 @@ Procedure  Split_Element_At_Xy (
 Is
   l_Geom    Mdsys.Sdo_Geometry := Nm3Sdo.Get_Layer_Element_Geometry( p_Layer, p_Ne_Id );
 
-  l_Measure Number;
-  l_Usgm    User_Sdo_Geom_Metadata%Rowtype;
-  l_End     Number;
-  l_tol     Number;
+  l_Measure  Number;
+  l_Distance Number;
+  l_Usgm     User_Sdo_Geom_Metadata%Rowtype;
+  l_End      Number;
+  l_tol      Number;
 Begin
   l_Usgm := Nm3Sdo.Get_Theme_Metadata( p_Layer );
   If Nm3Sdo.Element_Has_Shape( p_Layer, p_Ne_Id ) = 'TRUE'  Then
+    l_Distance := sdo_geom.sdo_distance( l_geom, nm3sdo.get_2d_pt(p_x, p_y), 0.005);
+	if l_Distance > to_number( nvl(hig.get_sysopt('SDOPROXTOL'), 2 ) then
+      raise_application_error(-20001, 'Split position is not in close proximity to element geometry');
+	end if;
+	
     l_Measure := Nm3Sdo.Get_Measure ( p_Layer, p_Ne_Id, p_X, p_Y ).Lr_Offset;
 
 	  select NM3SDO.GET_TOL_FROM_UNIT_MASK(nt_length_unit) into l_tol 
