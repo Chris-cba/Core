@@ -5,11 +5,11 @@ As
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.71   Mar 10 2015 10:02:06   Rob.Coupe  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.72   Mar 10 2015 13:51:52   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3sdm.pkb  $
---       Date into PVCS   : $Date:   Mar 10 2015 10:02:06  $
---       Date fetched Out : $Modtime:   Mar 10 2015 09:57:10  $
---       PVCS Version     : $Revision:   2.71  $
+--       Date into PVCS   : $Date:   Mar 10 2015 13:51:52  $
+--       Date fetched Out : $Modtime:   Mar 10 2015 13:51:18  $
+--       PVCS Version     : $Revision:   2.72  $
 --
 --   Author : R.A. Coupe
 --
@@ -21,7 +21,7 @@ As
 --
 --all global package variables here
 --
-  g_Body_Sccsid     Constant Varchar2 (2000) := '"$Revision:   2.71  $"';
+  g_Body_Sccsid     Constant Varchar2 (2000) := '"$Revision:   2.72  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
   g_Package_Name    Constant Varchar2 (30)   := 'NM3SDM';
@@ -1424,7 +1424,7 @@ Begin
   l_Usgm := Nm3Sdo.Get_Theme_Metadata( p_Layer );
   If Nm3Sdo.Element_Has_Shape( p_Layer, p_Ne_Id ) = 'TRUE'  Then
     l_Distance := sdo_geom.sdo_distance( l_geom, nm3sdo.get_2d_pt(p_x, p_y), 0.005);
-	if l_Distance > to_number( nvl(hig.get_sysopt('SDOPROXTOL'), 2 ) then
+	if l_Distance > to_number( nvl(hig.get_sysopt('SDOPROXTOL'), 2 )) then
       raise_application_error(-20001, 'Split position is not in close proximity to element geometry');
 	end if;
 	
