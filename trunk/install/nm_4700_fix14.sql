@@ -2,11 +2,11 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/nm_4700_fix14.sql-arc   3.10   Feb 25 2015 13:34:46   Stephen.Sewell  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/nm_4700_fix14.sql-arc   3.11   Mar 11 2015 13:13:34   Stephen.Sewell  $
 --       Module Name      : $Workfile:   nm_4700_fix14.sql  $
---       Date into PVCS   : $Date:   Feb 25 2015 13:34:46  $
---       Date fetched Out : $Modtime:   Feb 25 2015 14:28:54  $
---       PVCS Version     : $Revision:   3.10  $
+--       Date into PVCS   : $Date:   Mar 11 2015 13:13:34  $
+--       Date fetched Out : $Modtime:   Mar 11 2015 14:14:48  $
+--       PVCS Version     : $Revision:   3.11  $
 --
 --------------------------------------------------------------------------------
 --   Copyright (c) 2014 Bentley Systems Incorporated.
@@ -570,6 +570,13 @@ SET FEEDBACK ON
 start nm_inv_items_instead_iu.trg
 SET FEEDBACK OFF
 
+SET TERM ON 
+PROMPT Updating nm_inv_items_all_b_dt trigger on nm_inv_items_all table
+SET TERM OFF
+
+SET FEEDBACK ON
+start nm_inv_items_all_b_dt_trg.trg
+SET FEEDBACK OFF
 --
 --------------------------------------------------------------------------------
 -- SYNONYMS
