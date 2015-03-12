@@ -1,0 +1,239 @@
+CREATE OR REPLACE package hig_alert AUTHID CURRENT_USER
+AS
+--<PACKAGE>
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/hig_alert.pkh-arc   3.8   Mar 12 2015 15:25:30   Shivani.Gaind  $
+--       Module Name      : $Workfile:   hig_alert.pkh  $
+--       Date into PVCS   : $Date:   Mar 12 2015 15:25:30  $
+--       Date fetched Out : $Modtime:   Feb 13 2015 13:39:52  $
+--       Version          : $Revision:   3.8  $
+--       Based on SCCS version :
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+
+  -----------
+  --constants
+  -----------
+  --g_sccsid is the SCCS ID for the package
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.8  $';
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+PROCEDURE send_mail(pi_hal_id      IN hig_alerts.hal_id%TYPE           DEFAULT NULL
+                   ,pi_har_id      IN hig_alert_recipients.har_id%TYPE DEFAULT NULL
+                   ,pi_from_screen IN Varchar2 DEFAULT 'N' );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_halt(pi_halt_id IN hig_alert_types.halt_id%TYPE)
+RETURN hig_alert_types%ROWTYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+/*PROCEDURE create_trg_alert(pi_halt_rec     IN hig_alert_types%ROWTYPE
+                          ,pi_param_1      IN Varchar2
+                          ,pi_param_2      IN Varchar2
+                          ,pi_param_3      IN Varchar2
+                          ,pi_param_4      IN Varchar2
+                          ,pi_param_5      IN Varchar2
+                          ,pi_param_6      IN Varchar2
+                          ,pi_param_7      IN Varchar2
+                          ,pi_param_8      IN Varchar2
+                          ,pi_param_9      IN Varchar2
+                          ,pi_param_10     IN Varchar2
+                          ,po_subject      OUT Varchar2
+                          ,po_email_body   OUT Clob);*/
+		  
+	PROCEDURE	  create_trg_alert(pi_halt_rec     IN hig_alert_types%ROWTYPE
+								  ,pi_param_1      IN Varchar2
+								  ,pi_param_2      IN Varchar2
+								  ,pi_param_3      IN Varchar2
+								  ,pi_param_4      IN Varchar2
+								  ,pi_param_5      IN Varchar2
+								  ,pi_param_6      IN Varchar2
+								  ,pi_param_7      IN Varchar2
+								  ,pi_param_8      IN Varchar2
+								  ,pi_param_9      IN Varchar2
+								  ,pi_param_10     IN Varchar2
+								  ,pi_param_11      IN Varchar2
+								  ,pi_param_12      IN Varchar2  -- 129356 add 10 new parameters (11-20)
+								  ,pi_param_13      IN Varchar2
+								  ,pi_param_14      IN Varchar2
+								  ,pi_param_15      IN Varchar2
+								  ,pi_param_16      IN Varchar2
+								  ,pi_param_17      IN Varchar2
+								  ,pi_param_18      IN Varchar2
+								  ,pi_param_19      IN Varchar2
+								  ,pi_param_20     IN Varchar2
+								  ,po_subject    OUT Varchar2
+								  ,po_email_body OUT Clob);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_hatm(pi_halt_id IN hig_alert_types.halt_id%TYPE)
+RETURN hig_alert_type_mail%ROWTYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_har(pi_har_id IN hig_alert_recipients.har_id%TYPE)
+RETURN hig_alert_recipients%ROWTYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_hatr(pi_hatr_id IN hig_alert_type_recipients.hatr_id%TYPE)
+RETURN hig_alert_type_recipients%ROWTYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_harr(pi_harr_id       IN hig_alert_recipient_rules.harr_id%TYPE)
+RETURN hig_alert_recipient_rules%ROWTYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+PROCEDURE insert_hal(pi_hal_rec IN OUT hig_alerts%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+PROCEDURE insert_hael(pi_hael_rec IN hig_alert_error_logs%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+PROCEDURE upd_hal_status(pi_hal_id IN hig_alerts.hal_id%TYPE
+                        ,pi_status IN hig_alerts.hal_status%TYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+PROCEDURE insert_har(pi_har_rec IN hig_alert_recipients%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+PROCEDURE create_alert(pi_hal_rec IN hig_alerts%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="run_notification_batch">
+-- This batch will run all notification queries and send out the emails
+PROCEDURE run_alert_batch;
+--</PROC>
+--
+----------------------------------------------------------------------------
+--
+--<PROC NAME="create_trigger">
+-- This function creates the alert trigger
+FUNCTION create_trigger(pi_halt_id     IN  hig_alert_types.halt_id%TYPE
+                       ,po_error_text  OUT Varchar2 ) RETURN Boolean;
+--</PROC>
+--
+----------------------------------------------------------------------------
+--
+--<PROC NAME="create_trigger">
+-- This function creates the alert trigger
+FUNCTION get_trigger_status(pi_trigger_name hig_alert_types.halt_trigger_name%TYPE)
+RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="create_trigger">
+-- This function drops the alert trigger
+FUNCTION drop_trigger(pi_halt_id       IN  hig_alert_types.halt_id%TYPE
+                     ,pi_trigger_name  IN  hig_alert_types.halt_trigger_name%TYPE
+                     ,po_error_text    OUT Varchar2) RETURN Boolean;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="create_trigger">
+-- This procedure sends batch mail
+PROCEDURE send_batch_mail(pi_halt_id         IN hig_alert_types.halt_id%TYPE
+                         ,pi_recipient_email IN hig_alert_recipients.har_recipient_email%TYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_next_run_date">
+-- This funtions returns the next run date
+FUNCTION get_next_run_date(pi_hsfr_id IN hig_scheduling_frequencies.hsfr_frequency_id%TYPE)
+RETURN DATE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="create_trigger">
+-- This procedure sends single batch mail
+PROCEDURE send_batch_single_mail(pi_halt_id  IN hig_alert_types.halt_id%TYPE
+                                ,pi_hal_id   IN hig_alerts.hal_id%TYPE );
+--                                ,pi_har_id   IN hig_alert_recipients.har_id%TYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PRAGMA>
+  PRAGMA RESTRICT_REFERENCES(get_version, RNDS, WNPS, WNDS);
+  PRAGMA RESTRICT_REFERENCES(get_body_version, RNDS, WNPS, WNDS);
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+ PROCEDURE HIG_ALERT_LOG_DELETE(p_halt_id NUMBER);
+--
+-----------------------------------------------------------------------------
+--
+End hig_alert;
+/
