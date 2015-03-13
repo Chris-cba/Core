@@ -2,11 +2,11 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/nm_4700_fix14.sql-arc   3.11   Mar 11 2015 13:13:34   Stephen.Sewell  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/nm_4700_fix14.sql-arc   3.12   Mar 13 2015 14:58:00   Stephen.Sewell  $
 --       Module Name      : $Workfile:   nm_4700_fix14.sql  $
---       Date into PVCS   : $Date:   Mar 11 2015 13:13:34  $
---       Date fetched Out : $Modtime:   Mar 11 2015 14:14:48  $
---       PVCS Version     : $Revision:   3.11  $
+--       Date into PVCS   : $Date:   Mar 13 2015 14:58:00  $
+--       Date fetched Out : $Modtime:   Mar 13 2015 15:59:30  $
+--       PVCS Version     : $Revision:   3.12  $
 --
 --------------------------------------------------------------------------------
 --   Copyright (c) 2014 Bentley Systems Incorporated.
@@ -559,7 +559,7 @@ PROMPT Adding audit trigger to nm_inv_items_all table
 SET TERM OFF
 
 SET FEEDBACK ON
-start nm_inv_items_all_aud_br_iu.trg
+start nm_inv_items_all_aud_br_iud.trg
 SET FEEDBACK OFF
 
 SET TERM ON 
