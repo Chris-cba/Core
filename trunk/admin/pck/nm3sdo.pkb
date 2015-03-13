@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 --
 ---   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.85   Jan 09 2015 15:12:58   Rob.Coupe  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.86   Mar 13 2015 14:48:08   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3sdo.pkb  $
---       Date into PVCS   : $Date:   Jan 09 2015 15:12:58  $
---       Date fetched Out : $Modtime:   Jan 09 2015 15:11:32  $
---       PVCS Version     : $Revision:   2.85  $
+--       Date into PVCS   : $Date:   Mar 13 2015 14:48:08  $
+--       Date fetched Out : $Modtime:   Mar 13 2015 14:39:30  $
+--       PVCS Version     : $Revision:   2.86  $
 --       Based on
 ------------------------------------------------------------------
 --   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
@@ -22,7 +22,7 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 -- Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 
-   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.85  $"';
+   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.86  $"';
    g_package_name    CONSTANT VARCHAR2 (30)  := 'NM3SDO';
    g_batch_size      INTEGER                 := NVL( TO_NUMBER(Hig.get_sysopt('SDOBATSIZE')), 10);
    g_clip_type       VARCHAR2(30)            := NVL(Hig.get_sysopt('SDOCLIPTYP'),'SDO');
@@ -10449,13 +10449,13 @@ BEGIN
                 if irec.nth_start_date_column is null then
                   curstr_inv_ft := replace(curstr_inv_ft, '<start_date>', 'trunc(sysdate)' );
                 else
-                  curstr_inv_ft := replace(curstr_inv_ft, '<start_date>', irec.nth_start_date_column );
+                  curstr_inv_ft := replace(curstr_inv_ft, '<start_date>', 'f.'||irec.nth_start_date_column );
                 end if;
                                 
                 if irec.nth_end_date_column is null then
                   curstr_inv_ft := replace(curstr_inv_ft, '<end_date>', 'NULL' );
                 else
-                  curstr_inv_ft := replace(curstr_inv_ft, '<end_date>', irec.nth_end_date_column );
+                  curstr_inv_ft := replace(curstr_inv_ft, '<end_date>', 'f.'||irec.nth_end_date_column );
                 end if;
 
              end;
