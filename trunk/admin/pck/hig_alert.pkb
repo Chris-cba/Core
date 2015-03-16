@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/hig_alert.pkb-arc   3.18   Mar 12 2015 15:25:28   Shivani.Gaind  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/hig_alert.pkb-arc   3.19   Mar 16 2015 11:23:30   Shivani.Gaind  $
 --       Module Name      : $Workfile:   hig_alert.pkb  $
---       Date into PVCS   : $Date:   Mar 12 2015 15:25:28  $
---       Date fetched Out : $Modtime:   Mar 10 2015 15:23:10  $
---       Version          : $Revision:   3.18  $
+--       Date into PVCS   : $Date:   Mar 16 2015 11:23:30  $
+--       Date fetched Out : $Modtime:   Mar 16 2015 11:18:04  $
+--       Version          : $Revision:   3.19  $
 --       Based on SCCS version : 
 -----------------------------------------------------------------------------
 --    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
@@ -19,7 +19,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid   CONSTANT varchar2(2000) := '$Revision:   3.18  $';
+  g_body_sccsid   CONSTANT varchar2(2000) := '$Revision:   3.19  $';
 
   c_date_format   CONSTANT varchar2(30) := 'DD-Mon-YYYY HH24:MI:SS';
   g_trigger_text  clob;
@@ -452,7 +452,7 @@ BEGIN
    OPEN  c_get_hatm;
    FETCH c_get_hatm INTO l_hatm_rec;
    CLOSE c_get_hatm;
-   RETURN l_hatm_rec;
+   
    
    l_hatm_rec.hatm_param_1  := TRIM (l_hatm_rec.hatm_param_1 );
    l_hatm_rec.hatm_param_2  := TRIM (l_hatm_rec.hatm_param_2 );
@@ -475,6 +475,7 @@ BEGIN
    l_hatm_rec.hatm_param_19 := TRIM (l_hatm_rec.hatm_param_19);
    l_hatm_rec.hatm_param_20 := TRIM (l_hatm_rec.hatm_param_20);
 --
+   RETURN l_hatm_rec;
 END get_hatm;
 --
 PROCEDURE insert_har(pi_har_rec IN hig_alert_recipients%ROWTYPE)
