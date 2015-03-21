@@ -1,34 +1,38 @@
 CREATE OR REPLACE PACKAGE lb_load
 AS
---   PVCS Identifiers :-
---
---       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_load.pkh-arc   1.1   Jan 15 2015 22:34:22   Rob.Coupe  $
---       Module Name      : $Workfile:   lb_load.pkh  $
---       Date into PVCS   : $Date:   Jan 15 2015 22:34:22  $
---       Date fetched Out : $Modtime:   Jan 15 2015 22:34:04  $
---       PVCS Version     : $Revision:   1.1  $
---
---   Author : R.A. Coupe
---
---   Text description
---
------------------------------------------------------------------------------
--- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
-----------------------------------------------------------------------------
---
-   g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   1.1  $';
+   --   PVCS Identifiers :-
+   --
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_load.pkh-arc   1.2   Mar 21 2015 08:32:56   Rob.Coupe  $
+   --       Module Name      : $Workfile:   lb_load.pkh  $
+   --       Date into PVCS   : $Date:   Mar 21 2015 08:32:56  $
+   --       Date fetched Out : $Modtime:   Mar 21 2015 09:30:24  $
+   --       PVCS Version     : $Revision:   1.2  $
+   --
+   --   Author : R.A. Coupe
+   --
+   --   Text description
+   --
+   -----------------------------------------------------------------------------
+   -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
+   ----------------------------------------------------------------------------
+   --
+   g_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.2  $';
 
-   FUNCTION get_version return varchar2;
-   FUNCTION get_body_version return varchar2;
+   FUNCTION get_version
+      RETURN VARCHAR2;
+
+   FUNCTION get_body_version
+      RETURN VARCHAR2;
 
    FUNCTION ld_nal (
-      p_nal_nit_type     IN nm_asset_locations_all.nal_nit_type%TYPE,
-      p_nal_asset_id     IN nm_asset_locations_all.nal_asset_id%TYPE,
-      p_nal_descr        IN nm_asset_locations_all.nal_descr%TYPE,
-      p_nal_jxp          IN nm_asset_locations_all.nal_jxp%TYPE,
-      p_nal_primary      IN nm_asset_locations_all.nal_primary%TYPE,
-      p_nal_start_date   IN nm_asset_locations_all.nal_start_date%TYPE,
-      p_nal_security     IN nm_asset_locations_all.nal_security_key%TYPE)
+      p_nal_nit_type        IN nm_asset_locations_all.nal_nit_type%TYPE,
+      p_nal_asset_id        IN nm_asset_locations_all.nal_asset_id%TYPE,
+      p_nal_descr           IN nm_asset_locations_all.nal_descr%TYPE,
+      p_nal_jxp             IN nm_asset_locations_all.nal_jxp%TYPE,
+      p_nal_primary         IN nm_asset_locations_all.nal_primary%TYPE,
+      p_nal_location_type   IN nm_asset_locations_all.nal_location_type%TYPE,
+      p_nal_start_date      IN nm_asset_locations_all.nal_start_date%TYPE,
+      p_nal_security        IN nm_asset_locations_all.nal_security_key%TYPE)
       RETURN INTEGER;
 
    --
@@ -44,6 +48,14 @@ AS
       pi_xsp            IN VARCHAR2,
       pi_start_date     IN nm_asset_locations_all.nal_start_date%TYPE,
       pi_security_id    IN nm_asset_locations_all.nal_security_key%TYPE);
+
+   PROCEDURE lb_ld_geom (
+      pi_nal_id         IN nm_asset_locations_all.nal_id%TYPE,
+      pi_nal_nit_type   IN nm_asset_locations_all.nal_nit_type%TYPE,
+      pi_geom           IN MDSYS.sdo_geometry,
+      pi_start_date     IN nm_asset_locations_all.nal_start_date%TYPE,
+      pi_security_id    IN nm_asset_locations_all.nal_security_key%TYPE);
+
 
    PROCEDURE delete_asset_location (
       pi_nal_asset_id   IN INTEGER,
