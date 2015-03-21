@@ -1,10 +1,10 @@
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/lb/install/lb_data_types.sql-arc   1.1   Jan 20 2015 14:57:04   Rob.Coupe  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/lb/install/lb_data_types.sql-arc   1.2   Mar 21 2015 07:48:06   Rob.Coupe  $
 --       Module Name      : $Workfile:   lb_data_types.sql  $
---       Date into PVCS   : $Date:   Jan 20 2015 14:57:04  $
---       Date fetched Out : $Modtime:   Jan 20 2015 14:56:28  $
---       PVCS Version     : $Revision:   1.1  $
+--       Date into PVCS   : $Date:   Mar 21 2015 07:48:06  $
+--       Date fetched Out : $Modtime:   Mar 21 2015 08:55:50  $
+--       PVCS Version     : $Revision:   1.2  $
 --
 --   Author : R.A. Coupe
 --
@@ -156,6 +156,13 @@ create or replace type  lb_RPt_Geom as object ( refnt integer,
 
 create or replace type lb_RPt_geom_tab is table of lb_RPt_geom
 /
+
+create or replace type lb_obj_Geom as object ( obj_type varchar2(4), obj_id integer, geom mdsys.sdo_geometry )
+/
+
+create or replace type lb_obj_geom_tab is table of lb_obj_geom
+/
+
 
 DECLARE
    TYPE object_name_type IS TABLE OF VARCHAR2 (123) INDEX BY binary_integer;
