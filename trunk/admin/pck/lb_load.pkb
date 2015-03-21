@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_load
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_load.pkb-arc   1.3   Mar 21 2015 08:33:22   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_load.pkb-arc   1.4   Mar 21 2015 08:56:44   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_load.pkb  $
-   --       Date into PVCS   : $Date:   Mar 21 2015 08:33:22  $
-   --       Date fetched Out : $Modtime:   Mar 21 2015 09:40:06  $
-   --       PVCS Version     : $Revision:   1.3  $
+   --       Date into PVCS   : $Date:   Mar 21 2015 08:56:44  $
+   --       Date fetched Out : $Modtime:   Mar 21 2015 10:03:12  $
+   --       PVCS Version     : $Revision:   1.4  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,7 +16,7 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.3  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.4  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_load';
 
@@ -330,7 +330,8 @@ AS
                    lb_obj_geom (nal_asset_id, pi_nal_nit_type, pi_geom)) AS lb_obj_geom_tab)
         INTO l_obj_geom
         FROM nm_asset_locations
-       WHERE nal_id = pi_nal_id;
+       WHERE nal_id = pi_nal_id
+       AND   nal_location_type = 'G';
 
       lb_load (l_obj_geom,
                pi_nal_id,
