@@ -1,24 +1,24 @@
 CREATE OR REPLACE PACKAGE BODY lb_load
 AS
---   PVCS Identifiers :-
---
---       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_load.pkb-arc   1.2   Jan 15 2015 20:26:58   Rob.Coupe  $
---       Module Name      : $Workfile:   lb_load.pkb  $
---       Date into PVCS   : $Date:   Jan 15 2015 20:26:58  $
---       Date fetched Out : $Modtime:   Jan 15 2015 20:25:54  $
---       PVCS Version     : $Revision:   1.2  $
---
---   Author : R.A. Coupe
---
---   Location Bridge package for loading LRS placements
---
------------------------------------------------------------------------------
--- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
-----------------------------------------------------------------------------
---
-   g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   1.2  $';
-  
-   g_package_name    CONSTANT  varchar2(30)   := 'lb_load';
+   --   PVCS Identifiers :-
+   --
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_load.pkb-arc   1.3   Mar 21 2015 08:33:22   Rob.Coupe  $
+   --       Module Name      : $Workfile:   lb_load.pkb  $
+   --       Date into PVCS   : $Date:   Mar 21 2015 08:33:22  $
+   --       Date fetched Out : $Modtime:   Mar 21 2015 09:40:06  $
+   --       PVCS Version     : $Revision:   1.3  $
+   --
+   --   Author : R.A. Coupe
+   --
+   --   Location Bridge package for loading LRS placements
+   --
+   -----------------------------------------------------------------------------
+   -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
+   ----------------------------------------------------------------------------
+   --
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.3  $';
+
+   g_package_name   CONSTANT VARCHAR2 (30) := 'lb_load';
 
    --
    -----------------------------------------------------------------------------
@@ -41,15 +41,23 @@ AS
    BEGIN
       RETURN g_body_sccsid;
    END get_body_version;
---
------------------------------------------------------------------------------
---
+
+   --
+   -----------------------------------------------------------------------------
+   --
 
    --
    PROCEDURE lb_load (p_obj_Rpt       IN     lb_RPt_tab,
+                      p_nal_id        IN     NM_ASSET_LOCATIONS_ALL.NAL_ID%TYPE,
                       p_start_date    IN     DATE,
                       p_security_id   IN     INTEGER,
                       p_xsp           IN     VARCHAR2,
+                      p_loc_error        OUT lb_loc_error_tab);
+
+   PROCEDURE lb_load (p_obj_geom      IN     lb_obj_geom_tab,
+                      p_nal_id        IN     NM_ASSET_LOCATIONS_ALL.NAL_ID%TYPE,
+                      p_start_date    IN     DATE,
+                      p_security_id   IN     INTEGER,
                       p_loc_error        OUT lb_loc_error_tab);
 
    --
@@ -59,13 +67,14 @@ AS
 
 
    FUNCTION ld_nal (
-      p_nal_nit_type     IN nm_asset_locations_all.nal_nit_type%TYPE,
-      p_nal_asset_id     IN nm_asset_locations_all.nal_asset_id%TYPE,
-      p_nal_descr        IN nm_asset_locations_all.nal_descr%TYPE,
-      p_nal_jxp          IN nm_asset_locations_all.nal_jxp%TYPE,
-      p_nal_primary      IN nm_asset_locations_all.nal_primary%TYPE,
-      p_nal_start_date   IN nm_asset_locations_all.nal_start_date%TYPE,
-      p_nal_security     IN nm_asset_locations_all.nal_security_key%TYPE)
+      p_nal_nit_type        IN nm_asset_locations_all.nal_nit_type%TYPE,
+      p_nal_asset_id        IN nm_asset_locations_all.nal_asset_id%TYPE,
+      p_nal_descr           IN nm_asset_locations_all.nal_descr%TYPE,
+      p_nal_jxp             IN nm_asset_locations_all.nal_jxp%TYPE,
+      p_nal_primary         IN nm_asset_locations_all.nal_primary%TYPE,
+      p_nal_location_type   IN nm_asset_locations_all.nal_location_type%TYPE,
+      p_nal_start_date      IN nm_asset_locations_all.nal_start_date%TYPE,
+      p_nal_security        IN nm_asset_locations_all.nal_security_key%TYPE)
       RETURN INTEGER
    IS
       retval   INTEGER;
@@ -75,6 +84,7 @@ AS
                                           nal_descr,
                                           nal_jxp,
                                           nal_primary,
+                                          nal_location_type,
                                           nal_security_key,
                                           nal_start_date)
            VALUES (p_nal_nit_type,
@@ -82,6 +92,7 @@ AS
                    p_nal_descr,
                    p_nal_jxp,
                    p_nal_primary,
+                   p_nal_location_type,
                    p_nal_security,
                    p_nal_start_date)
         RETURNING nal_id
@@ -135,6 +146,7 @@ AS
                                                                pi_end_m,
                                                                pi_unit)),
                                            10),
+                  pi_nal_id,
                   pi_start_date,
                   pi_security_id,
                   pi_xsp,
@@ -154,6 +166,7 @@ AS
                                                            pi_end_m,
                                                            pi_unit))),
                      10),
+                  pi_nal_id,
                   pi_start_date,
                   pi_security_id,
                   pi_xsp,
@@ -163,6 +176,7 @@ AS
 
    --
    PROCEDURE lb_load (p_obj_Rpt       IN     lb_RPt_tab,
+                      p_nal_id        IN     nm_asset_locations_all.nal_id%TYPE,
                       p_start_date    IN     DATE,
                       p_security_id   IN     INTEGER,
                       p_xsp           IN     VARCHAR2,
@@ -171,28 +185,41 @@ AS
       l_loc_tab   int_array_type;
       l_err_tab   lb_loc_error_tab;
    BEGIN
-      l_err_tab := validate_xsp_on_RPt_tab(PI_XSP => p_xsp, PI_RPT_TAB => p_obj_Rpt );
-      if l_err_tab.count is not null and l_err_tab.count > 0 then
---        if l_err_tab(1).error_code is not null then 
-           raise_application_error(-20001, 'XSP is invalid - count = '||l_err_tab.count);
---        end if;
-      end if;
-      
-      declare
-        problem varchar2(7) := NULL;
-      begin
-         select 'Problem' into problem from nm_inv_types 
-         where exists ( select 1 from table (p_obj_Rpt) t
-                        where start_m != end_m
-                        and t.obj_type = nit_inv_type
-                        and nit_pnt_or_cont = 'P' );
-         raise_application_error ( -20002, 'Asset type has a point reference - line events not allowed' );
-      exception
-        when no_data_found then
-          NULL;
-      end;                                            
+      l_err_tab :=
+         validate_xsp_on_RPt_tab (PI_XSP => p_xsp, PI_RPT_TAB => p_obj_Rpt);
 
-      
+      IF l_err_tab.COUNT IS NOT NULL AND l_err_tab.COUNT > 0
+      THEN
+         --        if l_err_tab(1).error_code is not null then
+         raise_application_error (
+            -20001,
+            'XSP is invalid - count = ' || l_err_tab.COUNT);
+      --        end if;
+      END IF;
+
+      DECLARE
+         problem   VARCHAR2 (7) := NULL;
+      BEGIN
+         SELECT 'Problem'
+           INTO problem
+           FROM nm_inv_types
+          WHERE EXISTS
+                   (SELECT 1
+                      FROM TABLE (p_obj_Rpt) t
+                     WHERE     start_m != end_m
+                           AND t.obj_type = nit_inv_type
+                           AND nit_pnt_or_cont = 'P');
+
+         raise_application_error (
+            -20002,
+            'Asset type has a point reference - line events not allowed');
+      EXCEPTION
+         WHEN NO_DATA_FOUND
+         THEN
+            NULL;
+      END;
+
+
       FORALL i IN 1 .. p_obj_Rpt.COUNT
          INSERT INTO nm_locations_all (nm_ne_id_of,
                                        nm_obj_type,
@@ -207,8 +234,7 @@ AS
                                        nm_dir_flag,
                                        nm_nlt_id,
                                        nm_offset_st,
-                                       nm_offset_end
-                                       )
+                                       nm_offset_end)
                  VALUES (
                            p_obj_Rpt (i).refnt,
                            p_obj_Rpt (i).obj_type,
@@ -217,12 +243,17 @@ AS
                            p_start_date,
                            p_obj_Rpt (i).end_m,
                            'I',
-                           (select case lb_security_type
-                                when 'INHERIT' then 
-                                  ( select ne_admin_unit from nm_elements where ne_id = p_obj_Rpt (i).refnt )
-                                 else p_security_id                                 
-                                 end
-                                 from LB_INV_SECURITY where lb_exor_inv_type = p_obj_Rpt (i).obj_type ),
+                           (SELECT CASE lb_security_type
+                                      WHEN 'INHERIT'
+                                      THEN
+                                         (SELECT ne_admin_unit
+                                            FROM nm_elements
+                                           WHERE ne_id = p_obj_Rpt (i).refnt)
+                                      ELSE
+                                         p_security_id
+                                   END
+                              FROM LB_INV_SECURITY
+                             WHERE lb_exor_inv_type = p_obj_Rpt (i).obj_type),
                            p_xsp,
                            p_xsp,
                            p_obj_Rpt (i).dir_flag,
@@ -265,9 +296,13 @@ AS
 
       --
       INSERT INTO nm_location_geometry (nlg_loc_id,
+                                        nlg_nal_id,
+                                        nlg_location_type,
                                         nlg_obj_type,
                                         nlg_geometry)
          SELECT nm_loc_id,
+                p_nal_id,
+                'N',
                 nm_obj_type,
                 SDO_LRS.OFFSET_GEOM_SEGMENT (geoloc,
                                              nm_begin_mp,
@@ -279,6 +314,46 @@ AS
                 AND nm_loc_id IN (SELECT t.COLUMN_VALUE
                                     FROM TABLE (l_loc_tab) t);
    END;
+
+   PROCEDURE lb_ld_geom (
+      pi_nal_id         IN nm_asset_locations_all.nal_id%TYPE,
+      pi_nal_nit_type   IN nm_asset_locations_all.nal_nit_type%TYPE,
+      pi_geom           IN MDSYS.sdo_geometry,
+      pi_start_date     IN nm_asset_locations_all.nal_start_date%TYPE,
+      pi_security_id    IN nm_asset_locations_all.nal_security_key%TYPE)
+   IS
+      l_obj_geom    lb_obj_geom_tab;
+      l_loc_error   lb_loc_error_tab;
+   BEGIN
+      SELECT CAST (
+                COLLECT (
+                   lb_obj_geom (nal_asset_id, pi_nal_nit_type, pi_geom)) AS lb_obj_geom_tab)
+        INTO l_obj_geom
+        FROM nm_asset_locations
+       WHERE nal_id = pi_nal_id;
+
+      lb_load (l_obj_geom,
+               pi_nal_id,
+               pi_start_date,
+               pi_security_id,
+               l_loc_error);
+   END;
+
+   --
+
+   PROCEDURE lb_load (p_obj_geom      IN     lb_obj_geom_tab,
+                      p_nal_id        IN     NM_ASSET_LOCATIONS_ALL.NAL_ID%TYPE,
+                      p_start_date    IN     DATE,
+                      p_security_id   IN     INTEGER,
+                      p_loc_error        OUT lb_loc_error_tab)
+   IS
+   BEGIN
+        FORALL i IN 1 .. p_obj_geom.COUNT
+           INSERT INTO nm_location_geometry  ( nlg_loc_id, nlg_location_type, nlg_nal_id, nlg_obj_type, nlg_geometry )
+           values ( NULL, 'G', p_nal_id, p_obj_geom(i).obj_type, p_obj_geom(i).geom );
+      
+   END;
+
 
    PROCEDURE delete_asset_location (
       pi_nal_asset_id   IN INTEGER,
@@ -401,26 +476,28 @@ AS
         INTO retval
         FROM TABLE (pi_rpt_tab)
        WHERE     NOT EXISTS
-                        (SELECT 1
-                           FROM nm_elements, xsp_restraints
-                          WHERE     ne_id = refnt
-                                AND ne_sub_class = xsr_scl_class
-                                AND obj_type = xsr_ity_inv_code
-                                AND xsr_nw_type = ne_nt_type
-                                AND xsr_x_sect_value = pi_xsp)
+                    (SELECT 1
+                       FROM nm_elements, xsp_restraints
+                      WHERE     ne_id = refnt
+                            AND ne_sub_class = xsr_scl_class
+                            AND obj_type = xsr_ity_inv_code
+                            AND xsr_nw_type = ne_nt_type
+                            AND xsr_x_sect_value = pi_xsp)
              AND NOT EXISTS
-                        (SELECT 1
-                           FROM nm_elements, xsp_restraints, nm_members
-                          WHERE     nm_ne_id_of = refnt
-                                AND nm_ne_id_in = ne_id
-                                AND ne_sub_class = xsr_scl_class
-                                AND obj_type = xsr_ity_inv_code
-                                AND xsr_nw_type = ne_nt_type
-                                AND xsr_x_sect_value = pi_xsp)
-             AND exists ( select 1 from nm_inv_types
-                          where nit_inv_type = obj_type
-                          and nit_x_sect_allow_flag = 'Y'
-                          and pi_xsp is not null ) ;  
+                    (SELECT 1
+                       FROM nm_elements, xsp_restraints, nm_members
+                      WHERE     nm_ne_id_of = refnt
+                            AND nm_ne_id_in = ne_id
+                            AND ne_sub_class = xsr_scl_class
+                            AND obj_type = xsr_ity_inv_code
+                            AND xsr_nw_type = ne_nt_type
+                            AND xsr_x_sect_value = pi_xsp)
+             AND EXISTS
+                    (SELECT 1
+                       FROM nm_inv_types
+                      WHERE     nit_inv_type = obj_type
+                            AND nit_x_sect_allow_flag = 'Y'
+                            AND pi_xsp IS NOT NULL);
 
       --  if retval.count >0 then
       --    return_code := 0;
@@ -433,6 +510,6 @@ AS
          raise_application_error (-20001, 'Problem in XSP validation');
    END;
 --
-                                      
+
 END lb_load;
 /
