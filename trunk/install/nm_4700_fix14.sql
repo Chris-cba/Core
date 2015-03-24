@@ -2,11 +2,11 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/nm_4700_fix14.sql-arc   3.12   Mar 13 2015 14:58:00   Stephen.Sewell  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/nm_4700_fix14.sql-arc   3.13   Mar 24 2015 09:23:00   Stephen.Sewell  $
 --       Module Name      : $Workfile:   nm_4700_fix14.sql  $
---       Date into PVCS   : $Date:   Mar 13 2015 14:58:00  $
---       Date fetched Out : $Modtime:   Mar 13 2015 15:59:30  $
---       PVCS Version     : $Revision:   3.12  $
+--       Date into PVCS   : $Date:   Mar 24 2015 09:23:00  $
+--       Date fetched Out : $Modtime:   Mar 17 2015 15:47:22  $
+--       PVCS Version     : $Revision:   3.13  $
 --
 --------------------------------------------------------------------------------
 --   Copyright (c) 2014 Bentley Systems Incorporated.
@@ -76,6 +76,7 @@ PROMPT Creating backup and journal tables nm_inv_items_all_backup and nm_inv_ite
 set serveroutput on size 200000
 
 DECLARE
+  l_count number;
   obj_exists EXCEPTION;
   obj_notexists EXCEPTION;
   PRAGMA exception_init( obj_exists, -955);
@@ -156,6 +157,23 @@ BEGIN
   -- Update audit column added to nm_inv_items_all
   EXECUTE IMMEDIATE 'UPDATE nm_inv_items_all '
                     ||'set iit_audit_type = ''M''';
+
+  EXECUTE IMMEDIATE 'select count(*) from nm_inv_items_all niia, '
+                   ||'(select niiaj.parent_ne_id, min(niiaj.iit_start_date) niiaj_iit_start_date '
+                   ||'from nm_inv_items_all_j niiaj '
+                   ||'group by niiaj.parent_ne_id) niiaj2 '
+                   ||'where niiaj2.parent_ne_id = niia.iit_ne_id '
+                   ||'and   niiaj2.niiaj_iit_start_date <> niia.iit_start_date ' into l_count;
+  dbms_output.put_line('Number of assets to have start date updated: '||to_char(l_count));
+
+  -- Update start date in nm_inv_items_all to reflect overall start date of asset
+  EXECUTE IMMEDIATE 'UPDATE nm_inv_items_all niia '
+                    ||'set niia.iit_start_date = (select min(niiaj.iit_start_date) '
+                                               ||'from nm_inv_items_all_j niiaj '
+                                               ||'where niiaj.parent_ne_id = niia.iit_ne_id) '
+                    ||'where exists (select 1 '
+                                  ||'from nm_inv_items_all_j niiaj2 '
+                                  ||'where niiaj2.parent_ne_id = niia.iit_ne_id)';
 
   -- Re-enable triggers on nm_inv_items_all now deletes and updates are complete
   EXECUTE IMMEDIATE 'ALTER TABLE nm_inv_items_all enable all triggers';
