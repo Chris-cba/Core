@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY nm3invval IS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3invval.pkb-arc   2.17   Oct 10 2013 11:44:14   Rob.Coupe  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3invval.pkb-arc   2.18   Mar 31 2015 21:07:02   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3invval.pkb  $
---       Date into PVCS   : $Date:   Oct 10 2013 11:44:14  $
---       Date fetched Out : $Modtime:   Oct 10 2013 11:42:54  $
---       Version          : $Revision:   2.17  $
+--       Date into PVCS   : $Date:   Mar 31 2015 21:07:02  $
+--       Date fetched Out : $Modtime:   Mar 13 2015 15:23:10  $
+--       Version          : $Revision:   2.18  $
 --       Based on SCCS version : 1.30
 -------------------------------------------------------------------------
 --
@@ -19,7 +19,7 @@ CREATE OR REPLACE PACKAGE BODY nm3invval IS
 --   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.17  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.18  $"';
 --  g_body_sccsid is the SCCS ID for the package body
    g_package_name    CONSTANT  varchar2(30)   := 'nm3invval';
 --
@@ -233,16 +233,18 @@ BEGIN
    IF   pi_rec_nii.iit_primary_key IS NULL
     AND l_rec_nii.is_parent
     THEN
-      g_validation_error_code := -20111;
-      g_validation_error_msg  := 'No IIT_PRIMARY_KEY specified and INV_TYPE is an ITG parent';
-      RAISE g_validation_error;
-   ELSIF pi_rec_nii.iit_primary_key IS NOT NULL
+      NULL;
+--  	  g_validation_error_code := -20111;
+--      g_validation_error_msg  := 'No IIT_PRIMARY_KEY specified and INV_TYPE is an ITG parent';
+--      RAISE g_validation_error;
+--   ELSIF pi_rec_nii.iit_primary_key IS NOT NULL
+   END IF;
+   IF pi_rec_nii.iit_primary_key IS NOT NULL
     AND  NOT l_rec_nii.is_parent
     THEN
-      NULL;
---      g_validation_error_code := -20112;
---      g_validation_error_msg  := 'IIT_PRIMARY_KEY specified and INV_TYPE is NOT an ITG parent';
---      RAISE g_validation_error;
+      g_validation_error_code := -20112;
+      g_validation_error_msg  := 'IIT_PRIMARY_KEY specified and INV_TYPE is NOT an ITG parent';
+      RAISE g_validation_error;
    END IF;
 --
    IF    pi_rec_nii.iit_foreign_key IS NULL
