@@ -2,11 +2,11 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/nm_4700_fix14.sql-arc   3.13   Mar 24 2015 09:23:00   Stephen.Sewell  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/nm_4700_fix14.sql-arc   3.14   Apr 02 2015 11:42:54   Stephen.Sewell  $
 --       Module Name      : $Workfile:   nm_4700_fix14.sql  $
---       Date into PVCS   : $Date:   Mar 24 2015 09:23:00  $
---       Date fetched Out : $Modtime:   Mar 17 2015 15:47:22  $
---       PVCS Version     : $Revision:   3.13  $
+--       Date into PVCS   : $Date:   Apr 02 2015 11:42:54  $
+--       Date fetched Out : $Modtime:   Mar 25 2015 16:45:12  $
+--       PVCS Version     : $Revision:   3.14  $
 --
 --------------------------------------------------------------------------------
 --   Copyright (c) 2014 Bentley Systems Incorporated.
@@ -109,8 +109,11 @@ BEGIN
   begin
     EXECUTE IMMEDIATE 'CREATE TABLE nm_inv_items_all_j as '
                       ||'select iia.* '
-                      ||'from nm_inv_items_all iia '
-                      ||'where iia.iit_ne_id <> (select max(iia2.iit_ne_id) '
+                      ||'from nm_inv_items_all iia, '
+                      ||'nm_inv_types_all nita '
+                      ||'where nita.nit_inv_type = iia.iit_inv_type '
+                      ||'and nita.nit_category in (''I'') '
+                      ||'and iia.iit_ne_id <> (select max(iia2.iit_ne_id) '
                       ||'from nm_inv_items_all iia2 '
                       ||'where iia2.iit_primary_key = iia.iit_primary_key)';
     dbms_output.put_line('Created table nm_inv_items_all_j.');
@@ -141,7 +144,7 @@ BEGIN
 
   -- Remove rows from nm_inv_items_all which have been copied into nm_inv_items_all_j
   EXECUTE IMMEDIATE 'DELETE from nm_inv_items_all iia '
-                    ||'where iia.iit_ne_id <> (select max(iia2.iit_ne_id) from nm_inv_items_all iia2 where iia2.iit_primary_key = iia.iit_primary_key)';
+                    ||'where exists (select 1 from nm_inv_items_all_j iiaj where iiaj.iit_ne_id = iia.iit_ne_id)';
   dbms_output.put_line('Removed unwanted rows from nm_inv_items_all.');
 
   begin
