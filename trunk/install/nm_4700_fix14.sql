@@ -2,11 +2,11 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/nm_4700_fix14.sql-arc   3.14   Apr 02 2015 11:42:54   Stephen.Sewell  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/nm_4700_fix14.sql-arc   3.15   Apr 07 2015 09:26:24   Stephen.Sewell  $
 --       Module Name      : $Workfile:   nm_4700_fix14.sql  $
---       Date into PVCS   : $Date:   Apr 02 2015 11:42:54  $
---       Date fetched Out : $Modtime:   Mar 25 2015 16:45:12  $
---       PVCS Version     : $Revision:   3.14  $
+--       Date into PVCS   : $Date:   Apr 07 2015 09:26:24  $
+--       Date fetched Out : $Modtime:   Apr 07 2015 10:34:16  $
+--       PVCS Version     : $Revision:   3.15  $
 --
 --------------------------------------------------------------------------------
 --   Copyright (c) 2014 Bentley Systems Incorporated.
@@ -404,6 +404,14 @@ SET FEEDBACK ON
 start nm3locator.pkh
 SET FEEDBACK OFF
 
+SET TERM ON 
+PROMPT Updating package header nm3rvrs.pkh
+SET TERM OFF
+--
+SET FEEDBACK ON
+start nm3rvrs.pkh
+SET FEEDBACK OFF
+
 --
 --------------------------------------------------------------------------------
 -- Package Body
@@ -463,6 +471,14 @@ SET TERM OFF
 --
 SET FEEDBACK ON
 start nm3close.pkw
+SET FEEDBACK OFF
+--
+SET TERM ON 
+PROMPT Creating package body nm3rvrs
+SET TERM OFF
+--
+SET FEEDBACK ON
+start nm3rvrs.pkw
 SET FEEDBACK OFF
 
 --
