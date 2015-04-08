@@ -1,0 +1,58 @@
+--
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/views/v_obj_on_route.vw-arc   1.0   Apr 08 2015 10:24:54   Chris.Baugh  $
+--       Module Name      : $Workfile:   v_obj_on_route.vw  $
+--       Date into PVCS   : $Date:   Apr 08 2015 10:24:54  $
+--       Date fetched Out : $Modtime:   Mar 26 2015 15:35:02  $
+--       Version          : $Revision:   1.0  $
+-------------------------------------------------------------------------
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2014 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
+
+DROP MATERIALIZED VIEW V_OBJ_ON_ROUTE
+/
+
+CREATE MATERIALIZED VIEW V_OBJ_ON_ROUTE (REFNT,REFNT_TYPE,OBJ_TYPE,OBJ_ID,SEG_ID,SEQ_ID,DIR_FLAG,NM_BEGIN_MP,NM_END_MP,M_UNIT)
+BUILD IMMEDIATE
+REFRESH FORCE ON DEMAND
+WITH PRIMARY KEY
+AS 
+SELECT t.*
+  FROM TABLE (
+          SELECT GET_LB_RPT_R_TAB (CAST (COLLECT (lb_rpt (nm_ne_id_of,
+                                                          2,
+                                                          nm_obj_type,
+                                                          nm_ne_id_in,
+                                                          NULL,
+                                                          NULL,
+                                                          NULL,
+                                                          nm_begin_mp,
+                                                          nm_end_mp,
+                                                          1)) AS lb_rpt_tab),
+                                   SYS_CONTEXT('NM3SQL', 'MV_ROUTE_TYPE'),
+                                   1000)
+            FROM nm_members
+           WHERE nm_type = 'I'       
+                              ) t;
+
+
+COMMENT ON MATERIALIZED VIEW V_OBJ_ON_ROUTE IS 'Snapshot table for all assets on a section'
+/
+
+
+CREATE INDEX MV_OOR_RT_IDX ON V_OBJ_ON_ROUTE
+(REFNT)
+/
+
+CREATE INDEX MV_OOR_INV_IDX ON V_OBJ_ON_ROUTE
+(OBJ_ID, OBJ_TYPE)
+/
+
+BEGIN
+  NM3DDL.CREATE_SYNONYM_FOR_OBJECT('MV_ROUTE_TYPE');
+END;
