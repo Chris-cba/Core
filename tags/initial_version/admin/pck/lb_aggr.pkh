@@ -1,0 +1,37 @@
+CREATE OR REPLACE PACKAGE lb_aggr
+IS
+  -------------------------------------------------------------------------
+  --   PVCS Identifiers :-
+  --
+  --       PVCS id          : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_aggr.pkh-arc   1.0   Apr 09 2015 15:24:28   Chris.Baugh  $
+  --       Module Name      : $Workfile:   lb_aggr.pkh  $
+  --       Date into PVCS   : $Date:   Apr 09 2015 15:24:28  $
+  --       Date fetched Out : $Modtime:   Mar 26 2015 13:23:42  $
+  --       Version          : $Revision:   1.0  $
+  --       Based on SCCS version :
+  ------------------------------------------------------------------
+  --   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+  ------------------------------------------------------------------
+
+   g_sccsid      CONSTANT  VARCHAR2(2000) := '$Revision:   1.0  $';
+
+  --
+  -----------------------------------------------------------------------------
+  --
+  -- This function returns the current SCCS version
+
+  FUNCTION get_version RETURN VARCHAR2;
+  --
+  -----------------------------------------------------------------------------
+  --
+
+  FUNCTION get_body_version RETURN VARCHAR2;
+  --
+  -----------------------------------------------------------------------------
+  --
+
+  PROCEDURE refresh_route_views;
+  --
+
+END lb_aggr;
+/
