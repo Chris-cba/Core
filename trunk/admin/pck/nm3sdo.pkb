@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 --
 ---   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.86   Mar 13 2015 14:48:08   Rob.Coupe  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.87   Apr 14 2015 17:03:24   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3sdo.pkb  $
---       Date into PVCS   : $Date:   Mar 13 2015 14:48:08  $
---       Date fetched Out : $Modtime:   Mar 13 2015 14:39:30  $
---       PVCS Version     : $Revision:   2.86  $
+--       Date into PVCS   : $Date:   Apr 14 2015 17:03:24  $
+--       Date fetched Out : $Modtime:   Apr 14 2015 17:01:18  $
+--       PVCS Version     : $Revision:   2.87  $
 --       Based on
 ------------------------------------------------------------------
 --   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
@@ -22,7 +22,7 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 -- Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 
-   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.86  $"';
+   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.87  $"';
    g_package_name    CONSTANT VARCHAR2 (30)  := 'NM3SDO';
    g_batch_size      INTEGER                 := NVL( TO_NUMBER(Hig.get_sysopt('SDOBATSIZE')), 10);
    g_clip_type       VARCHAR2(30)            := NVL(Hig.get_sysopt('SDOCLIPTYP'),'SDO');
@@ -296,6 +296,7 @@ l_mbr   mdsys.sdo_geometry;
 l_tol   NUMBER;
 l_m_tol NUMBER;
 l_srid  num_array := Nm3array.init_num_array;
+l_dim   sdo_dim_array;
 
 CURSOR get_srids ( c_themes IN nm_theme_array ) IS
   SELECT nth_theme_id, sdo_srid
@@ -336,7 +337,16 @@ BEGIN
   END LOOP;
    END IF;
 
-   SELECT sdo_aggr_mbr(Convert_Dim_Array_To_Mbr( sdo_lrs.convert_to_std_dim_array(Get_Theme_Diminfo(l.nthe_id))))
+  if p_themes.nta_theme_array(1).nthe_id is not null then
+     l_dim := Get_Theme_Diminfo(p_themes.nta_theme_array(1).nthe_id);
+  else
+    raise_application_error(-20099, 'No base theme metadata available');
+  end if;
+   
+   SELECT sdo_aggr_mbr(Convert_Dim_Array_To_Mbr( 
+--    sdo_lrs.convert_to_std_dim_array(
+      Get_Theme_Diminfo(l.nthe_id)))
+--      )
    INTO l_mbr
    FROM NM_THEMES_ALL, TABLE ( p_themes.nta_theme_array ) l
    WHERE l.nthe_id = nth_theme_id;
@@ -347,16 +357,22 @@ BEGIN
    FROM NM_THEMES_ALL, TABLE ( p_themes.nta_theme_array ) l
    WHERE l.nthe_id = nth_theme_id;
 
-   SELECT MIN( Get_Dim_Element( 3, Nm3sdo.Get_Theme_Diminfo(nth_theme_id)).sdo_tolerance )
-   INTO l_m_tol
-   FROM NM_THEMES_ALL, TABLE ( p_themes.nta_theme_array ) l
-   WHERE l.nthe_id = nth_theme_id;
+   if l_dim.last > 2 then
+     SELECT MIN( Get_Dim_Element( 3, Nm3sdo.Get_Theme_Diminfo(nth_theme_id)).sdo_tolerance )
+     INTO l_m_tol
+     FROM NM_THEMES_ALL, TABLE ( p_themes.nta_theme_array ) l
+     WHERE l.nthe_id = nth_theme_id;
 
-   p_diminfo := mdsys.sdo_dim_array(
+     p_diminfo := mdsys.sdo_dim_array(
                 mdsys.sdo_dim_element( 'X', l_mbr.sdo_ordinates(1), l_mbr.sdo_ordinates(3), l_tol ),
                 mdsys.sdo_dim_element( 'Y', l_mbr.sdo_ordinates(2), l_mbr.sdo_ordinates(4), l_tol ),
                 mdsys.sdo_dim_element( 'M', 0, Nm3type.c_big_number, l_m_tol ));
-
+   else
+     p_diminfo := mdsys.sdo_dim_array(
+                mdsys.sdo_dim_element( 'X', l_mbr.sdo_ordinates(1), l_mbr.sdo_ordinates(3), l_tol ),
+                mdsys.sdo_dim_element( 'Y', l_mbr.sdo_ordinates(2), l_mbr.sdo_ordinates(4), l_tol ));
+   end if;   
+   
 END;
 --
 -----------------------------------------------------------------------------
