@@ -5,11 +5,11 @@ As
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.72   Mar 10 2015 13:51:52   Rob.Coupe  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.73   Apr 15 2015 14:49:38   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3sdm.pkb  $
---       Date into PVCS   : $Date:   Mar 10 2015 13:51:52  $
---       Date fetched Out : $Modtime:   Mar 10 2015 13:51:18  $
---       PVCS Version     : $Revision:   2.72  $
+--       Date into PVCS   : $Date:   Apr 15 2015 14:49:38  $
+--       Date fetched Out : $Modtime:   Apr 15 2015 14:48:38  $
+--       PVCS Version     : $Revision:   2.73  $
 --
 --   Author : R.A. Coupe
 --
@@ -21,7 +21,7 @@ As
 --
 --all global package variables here
 --
-  g_Body_Sccsid     Constant Varchar2 (2000) := '"$Revision:   2.72  $"';
+  g_Body_Sccsid     Constant Varchar2 (2000) := '"$Revision:   2.73  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
   g_Package_Name    Constant Varchar2 (30)   := 'NM3SDM';
@@ -59,8 +59,28 @@ As
   Type t_View_Tab Is Table Of t_View_Rec Index By Binary_Integer;  
   
 -----------------------------------------------------------------------------
-  
+  Function Get_Nat_Feature_Table_Name (
+                                      p_Nt_Type    In   Nm_Types.Nt_Type%Type,
+                                      p_Gty_Type   In   Nm_Group_Types.Ngt_Group_Type%Type
+                                      ) Return Varchar2;
+
+Procedure Create_G_of_G_Group_Layer (
+                                        p_Nt_Type    In   Nm_Types.Nt_Type%Type,
+                                        p_Gty_Type   In   Nm_Group_Types.Ngt_Group_Type%Type,
+                                        p_Job_Id     In   Number Default Null
+                                        );
 --
+  Function Get_Nat_Feature_Table_Name (
+                                      p_Nt_Type    In   Nm_Types.Nt_Type%Type,
+                                      p_Gty_Type   In   Nm_Group_Types.Ngt_Group_Type%Type
+                                      ) Return Varchar2
+  Is
+  Begin
+    Return 'NM_NAT_' || p_Nt_Type || '_' || p_Gty_Type || '_SDO';
+  End Get_Nat_Feature_Table_Name;
+
+-----------------------------------------------------------------------------------------------------------------
+
   Function Check_Sub_Sde_Exempt( pi_obj_name in varchar2) return Boolean is
   retval     Boolean := FALSE;
   l_dummy    Integer;
@@ -784,6 +804,8 @@ Begin
       Execute Immediate Cur_String;
 
       Execute Immediate Con_String;
+      
+      Execute Immediate Uk_String;
 
     End If;
   Else --single part - assumed multi-row
@@ -1424,21 +1446,21 @@ Begin
   l_Usgm := Nm3Sdo.Get_Theme_Metadata( p_Layer );
   If Nm3Sdo.Element_Has_Shape( p_Layer, p_Ne_Id ) = 'TRUE'  Then
     l_Distance := sdo_geom.sdo_distance( l_geom, nm3sdo.get_2d_pt(p_x, p_y), 0.005);
-	if l_Distance > to_number( nvl(hig.get_sysopt('SDOPROXTOL'), 2 )) then
+    if l_Distance > to_number( nvl(hig.get_sysopt('SDOPROXTOL'), 2 )) then
       raise_application_error(-20001, 'Split position is not in close proximity to element geometry');
-	end if;
-	
+    end if;
+    
     l_Measure := Nm3Sdo.Get_Measure ( p_Layer, p_Ne_Id, p_X, p_Y ).Lr_Offset;
 
-	  select NM3SDO.GET_TOL_FROM_UNIT_MASK(nt_length_unit) into l_tol 
-	    from nm_elements, nm_types where ne_id = p_Ne_Id and ne_nt_type = nt_type;
+      select NM3SDO.GET_TOL_FROM_UNIT_MASK(nt_length_unit) into l_tol 
+        from nm_elements, nm_types where ne_id = p_Ne_Id and ne_nt_type = nt_type;
 
     l_End   := Nm3Net.Get_Datum_Element_Length( p_Ne_Id );
-	
-	  if l_measure < l_tol or abs(l_End - l_measure ) < l_tol then
-	    raise_application_error(-20001, 'Split position cannot be at the start or end of an element');
-	  end if;
-	
+    
+      if l_measure < l_tol or abs(l_End - l_measure ) < l_tol then
+        raise_application_error(-20001, 'Split position cannot be at the start or end of an element');
+      end if;
+    
     Sdo_Lrs.Split_Geom_Segment( l_Geom, l_Usgm.Diminfo, l_Measure, p_Geom_1, p_Geom_2 );
 
     If p_Measure Is Not Null Then
@@ -1857,7 +1879,7 @@ Begin
     l_T_Begin_Col := pi_Nit.Nit_Lr_St_Chain;
 
     l_immediate_or_deferred := 'N';
-	
+    
     If pi_Nit.Nit_Pnt_Or_Cont = 'C' Then
       l_End_Mp := pi_Nit.Nit_Lr_End_Chain;
     End If;
@@ -4298,12 +4320,12 @@ Begin
         And   Nvl(Hig.Get_Sysopt('XSPOFFSET'),'N') = 'Y'   Then
 
        If l_nit.nit_pnt_or_cont = 'P'
-	   Then
+       Then
           
-		  l_Geom := sdo_lrs.convert_to_std_geom( Nm3Sdo_Dynseg.Get_Shape( Irec.Nbth_Base_Theme, p_Nm_Ne_Id_In, p_Nm_Ne_Id_Of, p_New_Begin_Mp, p_Nm_End_Mp ));
-	   Else
+          l_Geom := sdo_lrs.convert_to_std_geom( Nm3Sdo_Dynseg.Get_Shape( Irec.Nbth_Base_Theme, p_Nm_Ne_Id_In, p_Nm_Ne_Id_Of, p_New_Begin_Mp, p_Nm_End_Mp ));
+       Else
           
-		  l_Geom := Nm3Sdo_Dynseg.Get_Shape( Irec.Nbth_Base_Theme, p_Nm_Ne_Id_In, p_Nm_Ne_Id_Of, p_New_Begin_Mp, p_Nm_End_Mp );
+          l_Geom := Nm3Sdo_Dynseg.Get_Shape( Irec.Nbth_Base_Theme, p_Nm_Ne_Id_In, p_Nm_Ne_Id_Of, p_New_Begin_Mp, p_Nm_End_Mp );
        End if;
 
     End If;
@@ -5208,14 +5230,14 @@ begin
       nm3user.set_effective_date( idates.start_date );
       l_geom := nm3sdo.get_route_shape(p_ne_id);
       if l_geom is not null then
-	    begin
+        begin
           execute immediate 'insert into '||irec.Nth_Feature_Table||
                '( objectid, ne_id, geoloc, start_date, end_date ) '||
                ' select '||irec.Nth_Sequence_Name||'.nextval, :p_ne_id, :l_geom, :start_date, :end_date from dual ' using p_ne_id, l_geom, idates.start_date, idates.end_date;
-		exception
-		  when others then
-		    null;
-	    end;
+        exception
+          when others then
+            null;
+        end;
       end if;                
     end;
   end loop;
@@ -5835,11 +5857,14 @@ Begin
 
   If Not Nm3Ddl.Does_Object_Exist (l_View, 'VIEW')  Then
      Nm3Inv_View.Create_View_For_Nt_Type (p_Nt_Type);
-     Nm3Inv_View.Create_Ft_Inv_For_Nt_Type  (
-                                            pi_Nt_Type                  => p_Gty_Type,
-                                            pi_Inv_Type                 => Null,
-                                            pi_Delete_Existing_Inv_Type => True
-                                            );
+     
+     If NM3NET.GET_GTY_SUB_GROUP_ALLOWED( p_Gty_Type) = 'N' then
+        Nm3Inv_View.Create_Ft_Inv_For_Nt_Type  (
+                                               pi_Nt_Type                  => p_Gty_Type,
+                                               pi_Inv_Type                 => Null,
+                                               pi_Delete_Existing_Inv_Type => True
+                                               );
+     End If;
   End If;
 
   If      Nm3Net.Is_Gty_Linear (p_Gty_Type)   = 'Y'
@@ -5850,12 +5875,16 @@ Begin
                           pi_Nlt_Id =>  l_Nlt,
                           p_Job_Id  =>  p_Job_Id
                           );     
-  Else
+  Elsif NM3NET.get_gty_sub_group_allowed(p_Gty_Type) = 'N' then
     Create_Non_Linear_Group_Layer (
                                   p_Nt_Type   =>  p_Nt_Type,
                                   p_Gty_Type  =>  p_Gty_Type,
                                   p_Job_Id    =>  p_Job_Id
                                   );
+  Else
+    Create_G_of_G_Group_Layer(p_Nt_TYpe    => p_Nt_Type,
+                              p_Gty_Type   => p_Gty_Type,
+                              p_Job_Id     => p_Job_Id );
   End If;
 Exception
   When E_Not_Unrestricted Then
@@ -5864,6 +5893,463 @@ End Make_Group_Layer;
 --
 -----------------------------------------------------------------------------------------------------------------------------------
 --
+Procedure Create_G_of_G_Group_Layer (
+                                        p_Nt_Type    In   Nm_Types.Nt_Type%Type,
+                                        p_Gty_Type   In   Nm_Group_Types.Ngt_Group_Type%Type,
+                                        p_Job_Id     In   Number Default Null
+                                        )
+As
+  l_Tab              Nm_Themes_All.Nth_Feature_Table%Type;
+  l_View             Nm_Themes_All.Nth_Table_Name%Type;
+  l_Seq              Varchar2 (30);
+
+  l_Base_Themes      Nm_Theme_Array;
+  l_Diminfo          Mdsys.Sdo_Dim_Array;
+  l_Srid             Number;
+
+  l_Usgm             User_Sdo_Geom_Metadata%Rowtype;
+
+  l_Theme_Id         Nm_Themes_All.Nth_Theme_Id%Type;
+  l_V_Theme_Id       Nm_Themes_All.Nth_Theme_Id%Type;
+--
+  
+function get_base_themes return nm_theme_array is
+retval nm_theme_array := NM3ARRAY.INIT_NM_THEME_ARRAY;
+begin
+         select cast (collect (nm_theme_entry(nth_theme_id) ) as nm_theme_array_type )
+         into retval.nta_theme_array
+         from ( 
+        select * from v_nm_sub_group_structure g, v_nm_network_themes t
+        where g.child_nt_type    = t.nt_type (+)
+        and   nvl(g.child_group_type,'£$%^') = nvl(t.gty_type, '£$%^')
+--        and g.parent_group_type = 'GR20'
+        and nth_base_table_theme is null
+        and nth_feature_table not like 'SECT_SS%' ) t2
+        where rownum = 1
+        order by levl;
+return retval;
+end;        
+   
+--
+-----------------------------------------------------------------------------------------------------------------
+--Function Register_Nat_Theme (
+--                            p_Nt_Type          In   Nm_Types.Nt_Type%Type,
+--                            p_Gty_Type         In   Nm_Group_Types.Ngt_Group_Type%Type,
+--                            p_Base_Themes      In   Nm_Theme_Array,
+--                            p_Table_Name       In   Varchar2,
+--                            p_Spatial_Column   In   Varchar2 Default 'GEOLOC',
+--                            p_Fk_Column        In   Varchar2 Default 'NE_ID',
+--                            p_Name             In   Varchar2 Default Null,
+--                            p_View_Flag        In   Varchar2 Default 'N',
+--                            p_Base_Table_Nth   In   Nm_Themes_All.Nth_Theme_Id%Type Default Null
+--                            ) Return Number
+--Is
+--  Retval                    Number;
+--  l_Nat_Id                  Number;
+--  l_Name                    Varchar2 (30)                     := Nvl (p_Name, p_Table_Name);
+--  l_Immediate_Or_Deferred   Varchar2 (1)                      := 'D';
+--  l_Nat                     Nm_Area_Types%Rowtype;
+--  l_Nth_Id                  Nm_Themes_All.Nth_Theme_Id%Type;
+--  l_Nth                     Nm_Themes_All%Rowtype;
+--  l_Rec_Ntg                 Nm_Theme_Gtypes%Rowtype;
+--
+--Begin
+--
+--  If p_View_Flag = 'Y'  Then
+--    l_Immediate_Or_Deferred := 'N';                --no update for views
+--  End If;
+--
+--  Select  Nat_Id_Seq.Nextval
+--  Into    l_Nat_Id
+--  From    Dual;
+--
+--  l_Nat.Nat_Id              :=  l_Nat_Id;
+--  l_Nat.Nat_Nt_Type         :=  p_Nt_Type;
+--  l_Nat.Nat_Gty_Group_Type  :=  p_Gty_Type;
+--  l_Nat.Nat_Descr           :=  'Spatial Representation of ' || p_Gty_Type || ' Groups';
+--  l_Nat.Nat_Seq_No          :=  1;
+--  l_Nat.Nat_Start_Date      :=  To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY');
+--  l_Nat.Nat_End_Date        :=  Null;
+--  l_Nat.Nat_Shape_Type      :=  'TRACED';
+--
+--  Begin
+--    Insert Into Nm_Area_Types
+--    (
+--    Nat_Id,
+--    Nat_Nt_Type,
+--    Nat_Gty_Group_Type,
+--    Nat_Descr,
+--    Nat_Seq_No,
+--    Nat_Start_Date,
+--    Nat_End_Date,
+--    Nat_Shape_Type
+--    )
+--    Values
+--    (
+--    l_Nat.Nat_Id,
+--    l_Nat.Nat_Nt_Type,
+--    l_Nat.Nat_Gty_Group_Type,
+--    l_Nat.Nat_Descr,
+--    l_Nat.Nat_Seq_No,
+--    l_Nat.Nat_Start_Date,
+--    l_Nat.Nat_End_Date,
+--    l_Nat.Nat_Shape_Type
+--    );
+--  Exception
+--    When Dup_Val_On_Index Then
+--      Select  nat.Nat_Id
+--      Into    l_Nat_Id
+--      From    Nm_Area_Types nat
+--      Where   nat.Nat_Nt_Type         =   p_Nt_Type
+--      And     nat.Nat_Gty_Group_Type  =   p_Gty_Type;
+--  End;
+--
+--  Retval := Nm3Seq.Next_Nth_Theme_Id_Seq;
+--
+--  nm_debug.debug('Assemble theme data - name = '||l_name );
+--  -- generate the theme
+--  l_Nth_Id              :=  Retval;
+--  l_Nth.Nth_Theme_Id    :=  l_Nth_Id;
+--  l_Nth.Nth_Theme_Name  :=  l_Name;
+--  l_Nth.Nth_Table_Name  :=  p_Table_Name;
+--  l_Nth.Nth_Where       :=  Null;
+--  l_Nth.Nth_Pk_Column   :=  'NE_ID';
+--  --
+--  -- Task ID 0107889 - Set Label Column to NE_ID for Group layer base table themes
+--  -- 05/10/09 AE Further restrict on the non DT theme 
+--  --
+--    
+--  If      p_Base_Table_Nth      Is        Null
+--      Or  l_Nth.Nth_Theme_Name  Not Like  '%DT' Then
+--    l_Nth.Nth_Label_Column := 'NE_ID';
+--  Else
+--    l_Nth.Nth_Label_Column := 'NE_UNIQUE';
+--  End If;
+--  --
+--  nm_debug.debug('Theme creation ');
+--  
+--  l_Nth.Nth_Rse_Table_Name        :=  'NM_ELEMENTS';
+--  l_Nth.Nth_Rse_Fk_Column         :=  Null;
+--  l_Nth.Nth_St_Chain_Column       :=  Null;
+--  l_Nth.Nth_End_Chain_Column      :=  Null;
+--  l_Nth.Nth_X_Column              :=  Null;
+--  l_Nth.Nth_Y_Column              :=  Null;
+--  l_Nth.Nth_Offset_Field          :=  Null;
+--  l_Nth.Nth_Feature_Table         :=  p_Table_Name;
+--  l_Nth.Nth_Feature_Pk_Column     :=  'NE_ID';
+--  l_Nth.Nth_Feature_Fk_Column     :=  P_Fk_Column;
+--  l_Nth.Nth_Xsp_Column            :=  Null;
+--  l_Nth.Nth_Feature_Shape_Column  :=  p_Spatial_Column;
+--  l_Nth.Nth_Hpr_Product           :=  'NET';
+--  l_Nth.Nth_Location_Updatable    :=  'N';
+--  l_Nth.Nth_Theme_Type            :=  'SDO';
+--  l_Nth.Nth_Dependency            :=  'D';
+--  l_Nth.Nth_Storage               :=  'S';
+--  l_Nth.Nth_Update_On_Edit        :=  l_Immediate_Or_Deferred;
+--  l_Nth.Nth_Use_History           :=  'Y';
+--  l_Nth.Nth_Start_Date_Column     :=  'START_DATE';
+--  l_Nth.Nth_End_Date_Column       :=  'END_DATE';
+--  l_Nth.Nth_Base_Table_Theme      :=  p_Base_Table_Nth;
+--  l_Nth.Nth_Sequence_Name         :=  'NTH_' || Nvl(p_Base_Table_Nth,Retval) || '_SEQ';
+--  l_Nth.Nth_Snap_To_Theme         :=  'N';
+--  l_Nth.Nth_Lref_Mandatory        :=  'N';
+--  l_Nth.Nth_Tolerance             :=  10;
+--  l_Nth.Nth_Tol_Units             :=  1;
+--  nm_debug.debug('Theme creation - '||l_Nth.nth_theme_id);
+--
+--  Nm3Ins.Ins_Nth (l_Nth);
+--  nm_debug.debug('Theme creation - inserted ');
+--  --
+--  --  Build theme gtype rowtype
+--  l_Rec_Ntg.Ntg_Theme_Id  :=  l_Nth_Id;
+--  l_Rec_Ntg.Ntg_Seq_No    :=  1;
+--  l_Rec_Ntg.Ntg_Xml_Url   :=  Null;
+--  l_Rec_Ntg.Ntg_Gtype     :=  '2006';
+--  Nm3Ins.Ins_Ntg (p_Rec_Ntg => l_Rec_Ntg);
+--
+--  -- generate the link
+--  Insert Into Nm_Area_Themes
+--  (
+--  Nath_Nat_Id,
+--  Nath_Nth_Theme_Id
+--  )
+--  Values
+--  (
+--  l_Nat_Id,
+--  l_Nth_Id
+--  );
+--    
+----  Create_Base_Themes( l_Nth_Id, p_Base_Themes );
+--
+--  If Hig.Get_Sysopt ('REGSDELAY') = 'Y' Then 
+--    Execute Immediate (   'begin '
+--                      || '    nm3sde.register_sde_layer( p_theme_id => '||To_Char( l_Nth.Nth_Theme_Id )||');'
+--                      || 'end;'
+--                      );
+--  End If;
+--
+--  If p_View_Flag = 'N'  Then
+--      
+--    Declare
+--      l_Role   Varchar2 (30);
+--    Begin
+--      l_Role := Hig.Get_Sysopt ('SDONETROLE');
+--
+--      If l_Role Is Not Null Then
+--          
+--        Insert Into Nm_Theme_Roles
+--        (
+--        Nthr_Theme_Id,
+--        Nthr_Role,
+--        Nthr_Mode
+--        )
+--        Values
+--        (
+--        l_Nth_Id,
+--        l_Role,
+--        'NORMAL'
+--        );
+--          
+--      End If;
+--    End;
+--  End If;
+--
+--  Declare
+--    l_Type Number;
+--  Begin
+--    If Nm3Net.Get_Gty_Sub_Group_Allowed( p_Gty_Type ) = 'Y' Then
+--      l_Type := 3;
+--    Else
+--      l_Type := 2;
+--    End If;
+--      
+----    Create_Theme_Functions( p_Theme => l_Nth.Nth_Theme_Id, p_Pa => g_Network_Modules, p_Exclude => l_Type );
+--      
+--  End;
+--
+--  Return l_Nth_Id;
+--End Register_Nat_Theme;
+--
+--
+Procedure Create_Spatial_Table  (
+                                p_Table               In   Varchar2,
+                                p_Start_Date_Column   In   Varchar2 Default Null,
+                                p_End_Date_Column     In   Varchar2 Default Null
+                                )
+Is
+  Cur_String            Varchar2 (2000);
+  Con_String            Varchar2 (2000);
+  Uk_String             Varchar2 (2000);
+  b_Use_History         Constant Boolean :=p_Start_Date_Column Is Not Null And p_End_Date_Column Is Not Null;
+Begin
+  --
+
+      If b_Use_History Then
+        Cur_String :=  'create table '
+                    || p_Table
+                    || ' ( objectid number(38) not null, '
+                    || '   ne_id number(38) not null, '
+                    || '   geoloc mdsys.sdo_geometry not null,'
+                    || '   '
+                    || p_Start_Date_Column
+                    || ' date, '
+                    || '   '
+                    || p_End_Date_Column
+                    || ' date, date_created date, date_modified date,'
+                    || '   modified_by varchar2(30), created_by varchar2(30) )';
+        Con_String :=  'alter table '
+                    || p_Table
+                    || ' ADD CONSTRAINT '
+                    || p_Table
+                    || '_PK PRIMARY KEY '
+                    || ' ( ne_id, '
+                    || p_Start_Date_Column
+                    || ' )';
+      Else  -- no history
+        Cur_String :=  'create table '
+                    || p_Table
+                    || ' ( objectid number(38) not null, '
+                    || '   ne_id number(38) not null, '
+                    || '   geoloc mdsys.sdo_geometry not null,'
+                    || '   date_created date, date_modified date,'
+                    || '   modified_by varchar2(30), created_by varchar2(30) )';
+        Con_String :=  'alter table '
+                    || p_Table
+                    || ' ADD CONSTRAINT '
+                    || p_Table
+                    || '_PK PRIMARY KEY '
+                    || ' ( ne_id )';
+      End If; -- history
+
+      Uk_String :=  'alter table '
+                 || p_Table
+                 || ' ADD ( CONSTRAINT '
+                 || p_Table
+                 || '_UK UNIQUE '
+                 || ' (objectid))';
+
+      Execute Immediate Cur_String;
+
+      Execute Immediate Con_String;
+      
+      Execute Immediate Uk_String;
+
+ 
+  nm3ddl.create_synonym_for_object(p_object_name => p_Table);
+
+End Create_Spatial_Table;
+--
+  
+
+-----------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------------
+Begin
+
+  nm_debug.delete_debug(true);
+  nm_debug.debug_on;
+  NM_DEBUG.DEBUG(l_tab);
+
+  nm3ctx.set_context('PARENT_GROUP_TYPE', p_Gty_Type ); 
+
+  l_Tab   := Get_Nat_Feature_Table_Name (p_Nt_Type, p_Gty_Type);  
+  
+  nm_debug.debug('Table name = '||l_tab );
+  
+--l_View  := Get_Nt_View_Name (p_Nt_Type, p_Gty_Type);
+
+  l_Base_Themes := Get_Base_Themes;
+
+  nm_debug.debug(to_char(l_base_themes.nta_theme_array(1).nthe_id));
+  
+  Nm3Sdo.Set_Diminfo_And_Srid( l_Base_Themes, l_Diminfo, l_Srid );
+  
+  if l_diminfo.count > 2 then
+
+    l_Diminfo := Sdo_Lrs.Convert_To_Std_Dim_Array(l_Diminfo);
+    
+  end if;
+
+  --check tha the effective date is today - otherwise the layer will be out of step already!
+  --generate the area type
+  --
+  nm_debug.debug('Creating spatial table ');
+  
+  Create_Spatial_Table (l_Tab, 'START_DATE', 'END_DATE');
+  
+  nm_debug.debug('Created Table '||l_Tab );
+  ---------------------------------------------------------------
+  -- Set the registration of metadata
+  ---------------------------------------------------------------
+  l_Usgm.Table_Name  := l_Tab;
+  l_Usgm.Column_Name := 'GEOLOC';
+  l_Usgm.Diminfo     := l_Diminfo;
+  l_Usgm.Srid        := l_Srid;
+
+  Nm3Sdo.Ins_Usgm ( l_Usgm );
+
+  l_Theme_Id := Register_Nat_Theme  (
+                                    p_Nt_Type,
+                                    p_Gty_Type,
+                                    l_Base_Themes,
+                                    l_Tab,
+                                    'GEOLOC',
+                                    'NE_ID',
+                                    Null,
+                                    'N'
+                                    );
+  l_Seq := Nm3Sdo.Create_Spatial_Seq (l_Theme_Id);
+
+--  If Not Nm3Ddl.Does_Object_Exist (l_View, 'VIEW')  Then
+--    Nm3Inv_View.Create_View_For_Nt_Type (p_Nt_Type, p_Gty_Type);
+--  End If;
+
+/*
+  Create_Spatial_Date_View (l_Tab);
+
+  l_Usgm.Table_Name  := 'V_' || l_Tab;
+  Nm3Sdo.Ins_Usgm ( l_Usgm );
+
+  l_V_Theme_Id := Register_Nat_Theme  (
+                                      p_Nt_Type,
+                                      p_Gty_Type,
+                                      l_Base_Themes,
+                                      'V_' || L_Tab,
+                                      'GEOLOC',
+                                      'NE_ID',
+                                      'V_'|| L_Tab,
+                                      'Y',
+                                      l_Theme_Id
+                                      );
+*/                  
+
+  nm_debug.debug_on;
+  nm_debug.debug('Creating data');                    
+                                      
+  nm3sdo.create_gofg_Data (
+                                p_Table_Name    => l_Tab,
+                                p_Gty_Type      => p_Gty_Type,
+                                p_Seq_Name      => l_Seq,
+                                p_Job_Id        => p_Job_Id
+                                );
+  --table needs a spatial index
+
+  Nm3Sdo.Create_Spatial_Idx (l_Tab);
+
+
+  --need a join view between spatial table and NT view
+
+/* No need for these view types yet 
+
+  l_View := nm3sdm.Create_Nat_Sdo_Join_View  (
+                                      p_Feature_Table_Name  => l_Tab
+                                      ); 
+  l_Usgm.Table_Name  := l_View;
+
+  Nm3Sdo.Ins_Usgm ( l_Usgm );
+
+  If G_Date_Views = 'Y' Then
+    L_V_Theme_Id := Register_Nat_Theme  (
+                                        p_Nt_Type,
+                                        p_Gty_Type,
+                                        l_Base_Themes,
+                                        l_View,
+                                        'GEOLOC',
+                                        'NE_ID',
+                                        Null,
+                                        'Y',
+                                        l_Theme_Id
+                                       );
+  End If;
+*/
+
+  Begin
+    Nm3Ddl.Analyse_Table  (
+                          pi_Table_Name          => l_Tab,
+                          pi_Schema              => Sys_Context('NM3CORE','APPLICATION_OWNER'),
+                          pi_Estimate_Percentage => Null,
+                          pi_Auto_Sample_Size    => False
+                          );
+--  Exception
+--    When Others Then
+--      Raise E_No_Analyse_Privs;
+  End;
+  --
+--  Nm_Debug.Proc_End (G_Package_Name, 'make_ona_inv_spatial_layer');
+  --
+--Exception
+--  When E_Not_Unrestricted Then
+--    Raise_Application_Error (-20777,'Restricted users are not permitted to create SDO layers');
+--  
+--  When E_No_Analyse_Privs Then
+--    Raise_Application_Error (-20778,'Layer created - but user does not have ANALYZE ANY granted. '||
+--                                    'Please ensure the correct role/privs are applied to the user');
+
+End Create_G_of_G_Group_Layer;
+--
+------------------------------------
+--
+
+
 Procedure Create_Non_Linear_Group_Layer (
                                         p_Nt_Type    In   Nm_Types.Nt_Type%Type,
                                         p_Gty_Type   In   Nm_Group_Types.Ngt_Group_Type%Type,
@@ -5883,17 +6369,6 @@ As
   l_Theme_Id         Nm_Themes_All.Nth_Theme_Id%Type;
   l_V_Theme_Id       Nm_Themes_All.Nth_Theme_Id%Type;
 
------------------------------------------------------------------------------------------------------------------
-  Function Get_Nat_Feature_Table_Name (
-                                      p_Nt_Type    In   Nm_Types.Nt_Type%Type,
-                                      p_Gty_Type   In   Nm_Group_Types.Ngt_Group_Type%Type
-                                      ) Return Varchar2
-  Is
-  Begin
-    Return 'NM_NAT_' || p_Nt_Type || '_' || p_Gty_Type || '_SDO';
-  End Get_Nat_Feature_Table_Name;
-
------------------------------------------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------------------------------------
 Begin
   l_Tab   := Get_Nat_Feature_Table_Name (p_Nt_Type, p_Gty_Type);
@@ -6702,7 +7177,7 @@ Is
     --Create_Feature_View (I.Hus_Username, I.Nth_Feature_Table);
     
     If Hig.Get_User_Or_Sys_Opt('REGSDELAY') = 'Y' Then
-	
+    
       If NOT check_sub_sde_exempt( i.nth_feature_table ) Then
 
         Begin
@@ -6715,8 +7190,8 @@ Is
           When Others Then
             Null;
         End;
-	  
-	  End If;
+      
+      End If;
 
     End If;
 
@@ -6969,7 +7444,7 @@ Is
       -- Create_Feature_View (Pi_Username, I.Nth_Feature_Table);
       --
       If Hig.Get_User_Or_Sys_Opt('REGSDELAY') = 'Y' Then
-	  
+      
         If NOT check_sub_sde_exempt( i.nth_feature_table ) Then
       
           Begin
@@ -6983,10 +7458,10 @@ Is
               Null;
           End;
         
-		End If;
-		
+        End If;
+        
       End If;
-	  
+      
     End Loop;
   Exception
     When Others Then
