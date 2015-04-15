@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 --
 ---   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.87   Apr 14 2015 17:03:24   Rob.Coupe  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.88   Apr 15 2015 16:16:08   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3sdo.pkb  $
---       Date into PVCS   : $Date:   Apr 14 2015 17:03:24  $
---       Date fetched Out : $Modtime:   Apr 14 2015 17:01:18  $
---       PVCS Version     : $Revision:   2.87  $
+--       Date into PVCS   : $Date:   Apr 15 2015 16:16:08  $
+--       Date fetched Out : $Modtime:   Apr 15 2015 14:51:50  $
+--       PVCS Version     : $Revision:   2.88  $
 --       Based on
 ------------------------------------------------------------------
 --   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
@@ -22,7 +22,7 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 -- Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 
-   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.87  $"';
+   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.88  $"';
    g_package_name    CONSTANT VARCHAR2 (30)  := 'NM3SDO';
    g_batch_size      INTEGER                 := NVL( TO_NUMBER(Hig.get_sysopt('SDOBATSIZE')), 10);
    g_clip_type       VARCHAR2(30)            := NVL(Hig.get_sysopt('SDOCLIPTYP'),'SDO');
@@ -3059,6 +3059,78 @@ begin
      p_job_id       => p_job_id,
      p_limit        => 5000 );
 end;
+
+procedure create_gofg_data (    p_Table_Name in varchar2,
+                                p_Gty_Type   in nm_group_types.ngt_group_type%type,
+                                p_Seq_Name   in varchar2,
+                                p_Job_Id     in integer 
+                                ) is
+l_str varchar2(2000);
+begin
+   nm3ctx.set_context('PARENT_GROUP_TYPE', p_Gty_Type );
+--   
+  nm_debug.debug('Get list of base themes from which to derive shapes');
+     for irec in (
+         select t2.*, GET_THEME_DIMINFO(nth_theme_id) diminfo
+         from ( 
+        select * from v_nm_sub_group_structure g, v_nm_network_themes t
+        where g.child_nt_type    = t.nt_type
+        and   nvl(g.child_group_type,'£$%^') = nvl(t.gty_type, '£$%^')
+        and nth_base_table_theme is null
+        and nth_feature_table not like 'SECT_SS%' order by ord ) t2   
+        where rownum = 1
+        ) loop   
+
+        nm_debug.debug('Top of loop of base themes from which to derive shapes');
+   
+        for ne_rec in ( select ne_id from nm_elements where ne_gty_group_type = p_gty_type ) loop 
+            
+        nm_debug.debug('generating data for gty = '||p_gty_type||' ne = '||ne_rec.ne_id );  
+--   
+        l_str :=  'INSERT INTO '||p_Table_Name||' (objectid, '||
+                                       ' ne_id, '||
+                                       ' start_date, '||
+                                       ' end_date, '||
+                                       ' geoloc ) '||
+         'SELECT * from ( '||
+         'SELECT :ne_id objectid, '||
+               ' :ne_id ne_id,'||
+                ' TRUNC (SYSDATE), NULL, '||
+               '  sdo_aggr_union ( '||
+               '    sdoaggrtype ( ';
+          if irec.diminfo.count = 3 then     
+             l_str := l_str||'  SDO_LRS.convert_to_std_geom ('||irec.nth_feature_shape_column||' ) ';
+          else
+             l_str := l_str||irec.nth_feature_shape_column;
+          end if;
+--
+          l_str := l_str||
+          ' , 0.005)) GEOLOC '||
+          ' FROM (    SELECT nm_ne_id_in, nm_ne_id_of '||
+          '             FROM nm_members '||
+          '       CONNECT BY PRIOR nm_ne_id_of = nm_ne_id_in '||
+          '       START WITH nm_ne_id_in = :ne_id), '||irec.nth_feature_table||' s '||         
+          ' WHERE     nm_ne_id_of = s.'||irec.nth_feature_pk_column;
+          
+          if irec.theme_type in ('Linear Group', 'Non-Linear Group' ) then        
+             l_str := l_str ||
+             '     AND end_date IS NULL )'||
+             ' WHERE GEOLOC IS NOT NULL';
+          elsif irec.theme_type in ('Group of Groups', 'Linear Datum') then
+             l_str := l_str ||
+             ' ) WHERE GEOLOC IS NOT NULL';
+          end if;
+          
+          nm_debug.debug(l_str);
+          
+          execute immediate l_str using ne_rec.ne_id, ne_rec.ne_id, ne_rec.ne_id;
+          
+        COMMIT;
+     END LOOP;
+     END LOOP;
+   
+end create_gofg_data;
+
 
 FUNCTION sample_elements_in_route( p_layer    IN  NM_THEMES_ALL.nth_theme_id%TYPE,
                        p_ne_id    IN  nm_elements.ne_id%TYPE,
