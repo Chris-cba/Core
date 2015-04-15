@@ -1,0 +1,1722 @@
+CREATE OR REPLACE PACKAGE Nm3sdo AS
+--<PACKAGE>
+-----------------------------------------------------------------------------
+--
+--   SCCS Identifiers :-
+--
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3sdo.pkh-arc   2.9   Apr 15 2015 16:18:28   Rob.Coupe  $
+--       Module Name      : $Workfile:   nm3sdo.pkh  $
+--       Date into PVCS   : $Date:   Apr 15 2015 16:18:28  $
+--       Date fetched Out : $Modtime:   Apr 15 2015 16:17:50  $
+--       PVCS Version     : $Revision:   2.9  $
+--
+--   Author : Rob Coupe
+--
+--   NM3 Package for Oracle Spatial links
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+----
+--</PACKAGE>
+--all global package variables here
+--<GLOBVAR>
+-- g_sccsid is the SCCS_ID
+-- Constants
+  g_sccsid           CONSTANT VARCHAR2(80) := '"$Revision:   2.9  $"';
+  single_shape_inv   CONSTANT VARCHAR2(3)  := NVL( Hig.get_sysopt('SDOSINGSHP'), 'N');
+  use_surrogate_key  CONSTANT VARCHAR2(1)  := NVL( Hig.get_sysopt('SDOSURKEY'),'N');
+  def_pt_zoom        CONSTANT NUMBER       := NVL( TO_NUMBER( Hig.get_sysopt('SDOPTZOOM' )), 100);
+  c_def_tolerance    CONSTANT NUMBER       := 0.005;
+  c_sdo              CONSTANT VARCHAR2(3)  := 'SDO';
+
+-- Anchored
+  g_route_name                nm_elements.ne_unique%TYPE;
+  g_route_id                  nm_elements.ne_id%TYPE := 149677;     -- := nm3net.get_ne_id(g_route_name);
+
+-- Numeric
+  g_base_layer                NUMBER;
+  g_base_srid                 NUMBER;
+  g_old_op_ne_id              NUMBER;
+  g_new_op_ne_id              NUMBER;
+  g_point_srid                NUMBER;
+
+-- Booleans
+  g_sdo_layer_available       BOOLEAN := TRUE;
+  g_old_op_has_shape          BOOLEAN := FALSE;
+  g_new_op_has_shape          BOOLEAN := FALSE;
+
+-- This flag indicates if triggers should be used to guarantee the consistency of spatial layers
+-- When set to true, it means that a specific API call has been used to address the impact and
+--  the triggers are switched off.
+  g_api_used                  BOOLEAN := FALSE;
+--</GLOBVAR>
+--
+
+SUBTYPE nth_row_type IS nm_themes_all%ROWTYPE;
+
+TYPE    nth_row_tab_type IS TABLE OF nth_row_type INDEX BY BINARY_INTEGER;
+
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+  FUNCTION get_version RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+  FUNCTION get_body_version
+    RETURN VARCHAR2;
+--</PROC>
+--
+
+  FUNCTION get_layer_table ( p_layer IN NUMBER ) RETURN VARCHAR2;
+  FUNCTION get_layer_shape_column ( p_layer IN NUMBER ) RETURN VARCHAR2;
+  FUNCTION get_layer_ne_column ( p_layer IN NUMBER ) RETURN VARCHAR2;
+
+  FUNCTION get_nw_srids RETURN NUMBER;
+
+  FUNCTION get_nw_themes RETURN nm_theme_array;
+
+  FUNCTION join_ptr_array( p_nth IN nm_themes_all%ROWTYPE, p_pa IN ptr_array ) RETURN ptr_array;
+
+  FUNCTION get_buffer_of_base_ids( p_theme IN NUMBER, p_geom IN mdsys.sdo_geometry, p_buffer IN NUMBER DEFAULT 1 )
+    RETURN ptr_array;
+
+  FUNCTION get_buffer_of_base_ids( p_theme IN NUMBER, p_x IN NUMBER, p_y IN NUMBER, p_buffer IN NUMBER DEFAULT 1 )
+    RETURN ptr_array;
+
+  FUNCTION Get_Batch_Of_Base_Nn( p_theme IN NUMBER, p_geom IN mdsys.sdo_geometry )
+    RETURN ptr_array;
+
+  FUNCTION Get_Batch_Of_Base_Nn( p_theme IN NUMBER, p_x IN NUMBER, p_y IN NUMBER )
+    RETURN ptr_array;
+
+  FUNCTION Get_Batch_Of_Base_Nn( p_theme IN NUMBER, p_geom IN mdsys.sdo_geometry, p_ne_array IN  nm_cnct_ne_array_type )
+    RETURN ptr_array;
+
+  FUNCTION get_nearest_nw_to_xy ( p_x IN NUMBER, p_y IN NUMBER,
+                                  p_theme IN nm_theme_array ) RETURN nm_lref;
+
+  FUNCTION get_nearest_nw_to_xy ( p_x IN NUMBER, p_y IN NUMBER ) RETURN nm_lref;
+
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="SET_THEME_METADATA">
+-- This procedure sets the global theme details.
+  PROCEDURE set_theme_metadata ( p_nth_id IN nm_themes_all.nth_theme_id%TYPE );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="SET_GLOBAL_METADATA">
+-- This procedure sets the global geometry metdata
+PROCEDURE set_global_metadata ( p_usgm IN user_sdo_geom_metadata%ROWTYPE );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="SET_GLOBAL_METADATA">
+-- This procedure sets the global geometry metdata
+PROCEDURE set_global_metadata ( p_table_name IN VARCHAR2,
+                                p_column_name IN VARCHAR2,
+                                p_diminfo IN mdsys.sdo_dim_array,
+                                p_srid IN NUMBER);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="SET_DIMINFO_AND_SRID">
+-- This procedure sets the global geometry metdata
+PROCEDURE set_diminfo_and_srid( p_themes  IN nm_theme_array,
+                                p_diminfo OUT mdsys.sdo_dim_array,
+                                p_srid    OUT NUMBER );
+--</PROC>
+--
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="INS_USGM">
+-- Inserts into usgm
+   PROCEDURE ins_usgm (pi_rec_usgm IN user_sdo_geom_metadata%ROWTYPE);
+--</PROC>
+--
+
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="SET_ROUTE_NAME">
+-- Sets the current operating route by name
+  FUNCTION set_route_name
+           ( p_route_name IN nm_elements.ne_unique%TYPE )
+    RETURN nm_elements.ne_id%TYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="SET_ROUTE_ID">
+-- Sets the current operating route by ID
+  FUNCTION set_route_id
+           ( p_route_id IN nm_elements.ne_id%TYPE )
+    RETURN nm_elements.ne_unique%TYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_ROUTE_ID">
+-- Returns the current operating route ID
+  FUNCTION get_route_id
+    RETURN nm_elements.ne_id%TYPE;
+--</PROC>
+--
+--
+-----------------------------------------------------------------------------
+--
+-- <PROC NAME="GET_USGM">
+--  Returns user_sdo_geom_metadata rowtype based on Primary Key
+--
+  FUNCTION get_usgm
+             ( pi_table_name  IN user_sdo_geom_metadata.table_name%TYPE
+             , pi_column_name IN user_sdo_geom_metadata.column_name%TYPE)
+    RETURN user_sdo_geom_metadata%ROWTYPE;
+--</PROC>
+
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_projection">
+-- return the projection from a given point to a representation of an element in the
+-- given layer. It needs to use a nearest-neighbour routine first.
+  FUNCTION get_projection
+           ( p_layer IN NUMBER
+           , p_ne_id IN NUMBER
+           , p_x     IN NUMBER
+           , p_y     IN NUMBER )
+    RETURN mdsys.sdo_geometry;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_measure">
+-- return the linear reference of a projection from a given X,Y to an element at the current
+-- effective date.
+  FUNCTION get_measure
+           ( p_layer IN NUMBER
+           , p_ne_id IN NUMBER
+           , p_x     IN NUMBER
+           , p_y     IN NUMBER )
+    RETURN nm_lref;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_xy_from_measure">
+-- Retrieves the x,y co-ordinates of an element and measure in a given layer at the
+-- current effective date
+  FUNCTION get_xy_from_measure
+           ( p_ne_id   IN NUMBER
+           , p_measure IN NUMBER)
+    RETURN MDSYS.SDO_GEOMETRY deterministic;
+
+  FUNCTION get_xy_from_measure
+           ( p_layer   IN NUMBER
+           , p_ne_id   IN NUMBER
+           , p_measure IN NUMBER)
+    RETURN MDSYS.SDO_GEOMETRY deterministic;
+--
+  PRAGMA RESTRICT_REFERENCES( GET_XY_FROM_MEASURE, WNDS, TRUST);
+-----------------------------------------------------------------------------
+--
+--</PROC>
+--
+  FUNCTION get_xy_from_measure
+           ( p_layer IN NUMBER
+           , p_lref  IN NM_LREF )
+    RETURN MDSYS.SDO_GEOMETRY deterministic;
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_x_from_pt_geometry">
+-- Provides the X co-ordinate of the point geometry
+  FUNCTION get_x_from_pt_geometry
+           ( p_geometry IN mdsys.sdo_geometry )
+    RETURN NUMBER;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_y_from_pt_geometry">
+-- Provides the Y co-ordinate of the point geometry
+  FUNCTION get_y_from_pt_geometry
+           ( p_geometry IN mdsys.sdo_geometry )
+    RETURN NUMBER;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="linear_interp">
+
+-- Overloaded function, this one delivers the linear interpolated point between two points
+--   and optionally includes the projected distance off the linear feature
+--  function linear_interp( p_pt1 in mdsys.sdo_geometry, p_pt2 in mdsys.sdo_geometry,
+--                          p_n1 in number, p_n2 in number, p_n3 in number,
+--                          p_geometry in mdsys.sdo_geometry, p_offset_flag in varchar2 ) return mdsys.sdo_geometry;
+--
+--
+-- Overloaded function, this one delivers the linear interpolated point between two measures
+--   Note that this version will not cater for offsets, this version is based on a network element
+--   and thus needs to query info from the layer
+  FUNCTION linear_interp
+           ( p_m1    IN NUMBER
+           , p_m2    IN NUMBER
+           , p_n1    IN NUMBER
+           , p_n2    IN NUMBER
+           , p_n3    IN NUMBER
+           , p_layer IN NUMBER
+           , p_ne_id IN NUMBER )
+    RETURN MDSYS.SDO_GEOMETRY;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_placement_geometry">
+-- Translates a placement into a shape by dyn-segging it
+  FUNCTION get_placement_geometry
+           ( p_pl IN NM_PLACEMENT )
+    RETURN mdsys.sdo_geometry;
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_placement_geometry">
+-- Translates a placement or placement array into a shape by dyn-segging it from the given layer.
+  FUNCTION get_placement_geometry
+           ( p_pl_array IN NM_PLACEMENT_ARRAY )
+    RETURN mdsys.sdo_geometry;
+--
+-----------------------------------------------------------------------------
+--</PROC>
+  FUNCTION get_placement_geometry
+           ( p_layer IN NUMBER
+           , p_pl    IN NM_PLACEMENT)
+    RETURN MDSYS.SDO_GEOMETRY;
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ADD_SEGMENTS">
+-- A function to concatenate segments of an SDO geometry. If P_CONN is provided as FALSE
+-- then a multi-part geometry will result.
+  FUNCTION add_segments
+           ( p_geom1 IN MDSYS.SDO_GEOMETRY
+           , p_geom2 IN MDSYS.SDO_GEOMETRY
+           , p_conn  IN BOOLEAN DEFAULT FALSE )
+    RETURN MDSYS.SDO_GEOMETRY;
+--</PROC>
+--
+--
+-----------------------------------------------------------------------------
+--
+  PROCEDURE add_segments
+           ( p_geom1   IN OUT NOCOPY MDSYS.SDO_GEOMETRY
+           , p_geom2   IN MDSYS.SDO_GEOMETRY
+           , p_diminfo IN MDSYS.SDO_DIM_ARRAY
+           , p_conn    IN BOOLEAN DEFAULT FALSE );
+--</PROC>
+--
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_TABLE_DIMINFO">
+-- This function returns the dimension information of the given table and column
+  FUNCTION get_table_diminfo
+           ( p_table  IN VARCHAR2
+           , p_column IN VARCHAR2 DEFAULT NULL )
+    RETURN MDSYS.SDO_DIM_ARRAY;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_LAYER_DIMENSION">
+-- This function returns the dimension number of the given layer
+  FUNCTION get_layer_dimension
+           ( p_layer IN nm_themes_all.nth_theme_id%TYPE )
+    RETURN INTEGER;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+-----------------------------------------------------------------------------
+--<PROC NAME="GET_NEAREST_TO_XY";
+-- This function returns the nearest neighbour in the given layer
+-- to the given ordinate pair
+  FUNCTION get_nearest_to_xy
+           ( p_layer   IN NUMBER
+           , p_pt_geom IN MDSYS.SDO_GEOMETRY )
+    RETURN nm_elements.ne_id%TYPE;
+--
+--<PROC NAME="GET_NEAREST_TO_XY">
+--
+  FUNCTION get_nearest_to_xy
+           ( p_layer IN NUMBER
+           , p_x     IN NUMBER
+           , p_y     IN NUMBER )
+    RETURN nm_elements.ne_id%TYPE;
+--</PROC>
+--
+
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_NEAREST_TO_XY_ON_ROUTE">
+-- This function returns the nearest neighbour to the XY in the given layer
+-- which is a member of the given route.
+  FUNCTION get_nearest_to_xy_on_route
+           ( p_layer IN NUMBER
+           , p_ne_id IN NUMBER
+           , p_x     IN NUMBER
+           , p_y     IN NUMBER )
+    RETURN nm_elements.ne_id%TYPE;
+--</PROC>
+--
+----------------------------------------------------------------------------
+--
+--<PROC NAME="REMOVE_REDUNDANT_PTS">
+-- Removal of vertices of a geometry where the ordinate is classed as redundant due to its proximity
+-- with a neighbour less than the tolerance away.
+  FUNCTION remove_redundant_pts
+           ( p_layer IN NUMBER
+           , p_geom  IN MDSYS.SDO_GEOMETRY )
+    RETURN MDSYS.SDO_GEOMETRY;
+--</PROC>
+--
+----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_NEAREST_THEME_TO_XY">
+--return the id of the record in a theme shape table which is nearest to the XY.
+  FUNCTION get_nearest_theme_to_xy
+           ( p_theme IN NUMBER
+           , p_x     IN NUMBER
+           , p_y     IN NUMBER )
+    RETURN NUMBER;
+--</PROC>
+--
+----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_PROJECTION_TO_NEAREST"
+  FUNCTION get_projection_to_nearest
+           ( p_layer   IN NUMBER
+           , p_pt_geom IN mdsys.sdo_geometry )
+    RETURN NM_LREF;
+--</PROC>
+----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_PROJECTION_TO_NEAREST">
+-- An amalgamation of finding the nearest element to an ordinate pair and returning
+-- the linear reference of the projection of the X,Y onto it.
+  FUNCTION get_projection_to_nearest
+           ( p_layer IN NUMBER
+           , p_x     IN NUMBER
+           , p_y     IN NUMBER )
+    RETURN NM_LREF;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_NEAREST_LREF">
+-- Nearest lref to geometry based on snapping and base themes.
+FUNCTION get_nearest_lref
+         ( p_theme IN nm_themes_all.nth_theme_id%TYPE
+         , p_geom IN mdsys.sdo_geometry )
+    RETURN NM_LREF;
+--</PROC>
+----------------------------------------------------------------------------
+
+--
+--<PROC NAME="GET_START_POINT">
+-- This function returns the start point geometry for a given element in the given layer
+  FUNCTION get_start_point
+           ( p_layer IN NUMBER
+           , p_ne_id IN nm_elements.ne_id%TYPE )
+    RETURN MDSYS.SDO_GEOMETRY;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_END_POINT">
+-- This function returns the end point geometry for a given element in the given layer
+  FUNCTION get_end_point
+           ( p_layer IN NUMBER
+           , p_ne_id IN nm_elements.ne_id%TYPE )
+    RETURN MDSYS.SDO_GEOMETRY;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_START_POINT">
+-- This function returns the start point geometry for a given element in the given layer
+-- relative to the given cardinality flag
+  FUNCTION get_start_point
+           ( p_layer       IN NUMBER
+           , p_ne_id       IN nm_elements.ne_id%TYPE
+           , p_cardinality IN nm_members.nm_cardinality%TYPE )
+    RETURN MDSYS.SDO_GEOMETRY;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_END_POINT">
+-- This function returns the end point geometry for a given element in the given layer
+-- relative to the given cardinality flag
+  FUNCTION get_end_point
+           ( p_layer       IN NUMBER
+           , p_ne_id       IN nm_elements.ne_id%TYPE
+           , p_cardinality IN nm_members.nm_cardinality%TYPE )
+    RETURN MDSYS.SDO_GEOMETRY;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_LAYER_ELEMENT_GEOMETRY">
+-- This function returns the shape of the given element from its representation
+-- in the given layer
+  FUNCTION Get_Layer_Element_Geometry
+           ( p_ne_id IN nm_elements.ne_id%TYPE )
+    RETURN MDSYS.SDO_GEOMETRY;
+  FUNCTION Get_Layer_Element_Geometry
+           ( p_layer IN NUMBER
+           , p_ne_id IN nm_elements.ne_id%TYPE )
+    RETURN MDSYS.SDO_GEOMETRY;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_LAYER_FRAGMENT_GEOMETRY">
+-- This function returns the shape of the given fragment of an element from its representation
+-- in the given layer
+  FUNCTION get_layer_fragment_geometry
+           ( p_ne_id IN nm_elements.ne_id%TYPE
+           , p_begin IN NUMBER
+           , p_end   IN NUMBER )
+    RETURN MDSYS.SDO_GEOMETRY;
+
+  FUNCTION get_layer_fragment_geometry
+           ( p_layer IN NUMBER
+           , p_ne_id IN nm_elements.ne_id%TYPE
+           , p_begin IN NUMBER
+           , p_end   IN NUMBER )
+    RETURN MDSYS.SDO_GEOMETRY;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="SPLIT_ELEMENT_AT_MEASURE">
+-- This procedure slits a shape into two new ones in the given layer
+  PROCEDURE split_element_at_measure
+            ( p_layer   IN NUMBER
+        , p_ne_id   IN nm_elements.ne_id%TYPE
+            , p_measure IN NUMBER
+            , p_ne_id_1 IN nm_elements.ne_id%TYPE
+            , p_ne_id_2 IN nm_elements.ne_id%TYPE
+            , p_geom1  OUT mdsys.sdo_geometry
+            , p_geom2  OUT mdsys.sdo_geometry );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="MERGE_ELEMENT_SHAPES">
+-- This procedure merges the element shapes into a single shape within the
+-- given layer. A failure will result if they are are not connected.
+  PROCEDURE merge_element_shapes
+            ( p_layer         IN NUMBER
+            , p_ne_id_1       IN nm_elements.ne_id%TYPE
+            , p_ne_id_2       IN nm_elements.ne_id%TYPE
+            , p_ne_id_to_flip IN nm_elements.ne_id%TYPE
+            , p_geom         OUT MDSYS.SDO_GEOMETRY );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="RECALIBRATE_GEOMETRY">
+-- Recalibrates the shape of an element in the given layer by allocating a new measure
+-- at the given point (by measure) and thereafter along the shape at each vertex until
+-- the last.
+  FUNCTION recalibrate_geometry
+           ( p_layer         IN NUMBER
+           , p_geom          IN OUT NOCOPY MDSYS.SDO_GEOMETRY
+           , p_measure       IN NUMBER
+           , p_length_to_end IN NUMBER
+           , p_ne_id         IN NUMBER DEFAULT NULL )
+    RETURN MDSYS.SDO_GEOMETRY;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_ROUTE_SHAPE">
+-- This function returns the current shape of the given route by tracing the shapes of
+-- its component elements.
+FUNCTION get_route_shape( p_ne_id    IN nm_elements.ne_id%TYPE,
+                          p_nt       IN ptr_vc_array,
+                          p_th       IN ptr_array,
+                          p_nth_tab  IN nth_row_tab_type,
+                          p_diminfo  IN mdsys.sdo_dim_array,
+                          p_srid     IN NUMBER,
+                          p_part     IN VARCHAR2 DEFAULT NULL) RETURN mdsys.sdo_geometry;
+
+    RETURN mdsys.sdo_geometry;
+
+FUNCTION get_route_shape( p_ne_id    IN nm_elements.ne_id%TYPE )
+    RETURN mdsys.sdo_geometry;
+
+    RETURN mdsys.sdo_geometry;
+
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_SHAPE_FROM_NE">
+-- This function returns the shape of an object by tracing the shapes of its component
+-- parts from the given layer. A multi-part shape will be likely given.
+  FUNCTION get_shape_from_ne
+           ( p_ne_id IN nm_elements.ne_id%TYPE )
+    RETURN MDSYS.SDO_GEOMETRY;
+--
+--
+  FUNCTION get_shape_from_ne
+           ( p_ne_id IN nm_elements.ne_id%TYPE
+           , p_effective_date IN DATE  )
+    RETURN MDSYS.SDO_GEOMETRY;
+
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_SHAPE_FROM_NM">
+-- This function returns the current shape of a part of an object by tracing the part
+-- from th egiven layer between the two measures.
+  FUNCTION get_shape_from_nm
+           ( p_ne_id    IN nm_elements.ne_id%TYPE
+           , p_ne_id_of IN nm_elements.ne_id%TYPE
+           , p_begin_mp IN nm_members.nm_begin_mp%TYPE
+           , p_end_mp   IN nm_members.nm_begin_mp%TYPE )
+    RETURN MDSYS.SDO_GEOMETRY;
+  FUNCTION get_shape_from_nm
+           ( p_layer    IN nm_themes_all.nth_theme_id%TYPE
+           , p_ne_id    IN nm_elements.ne_id%TYPE
+           , p_ne_id_of IN nm_elements.ne_id%TYPE
+           , p_begin_mp IN nm_members.nm_begin_mp%TYPE
+           , p_end_mp   IN nm_members.nm_begin_mp%TYPE )
+    RETURN MDSYS.SDO_GEOMETRY;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_SHAPE_FROM_FT">
+-- This function returns the shape of the line representing the given FT record
+-- in the foriegn table traced from the given layer
+--
+   FUNCTION get_shape_from_ft
+            (p_pk_id IN NUMBER
+            , p_nit   IN nm_inv_types.nit_inv_type%TYPE )
+     RETURN MDSYS.SDO_GEOMETRY;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_PT_SHAPE_FROM_NE">
+-- This function returns the point shape of the item by tracing its start position
+-- from the element representetd in the given layer at the given measure.
+  FUNCTION get_pt_shape_from_ne
+           ( p_ne_id_of IN nm_elements.ne_id%TYPE
+           , p_measure  IN nm_members.nm_begin_mp%TYPE )
+    RETURN MDSYS.SDO_GEOMETRY;
+  FUNCTION get_pt_shape_from_ne
+           ( p_layer    IN nm_themes_all.nth_theme_id%TYPE
+           , p_ne_id_of IN nm_elements.ne_id%TYPE
+           , p_measure  IN nm_members.nm_begin_mp%TYPE )
+    RETURN MDSYS.SDO_GEOMETRY;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="CREATE_INV_DATA">
+-- This procedure dyn-seggs all inventory of the given type and loads it into the
+-- spatial column in the given table. The inventory is traced from the shapes of elements
+-- in the layers defined through the datum layers relating to rows in the NM_INV_NW table
+  PROCEDURE create_inv_data
+            ( p_table_name  IN VARCHAR2
+            , p_inv_type    IN nm_inv_types.nit_inv_type%TYPE
+            , p_seq_name    IN VARCHAR2
+            , p_pnt_or_cont IN VARCHAR2
+            , p_job_id      IN NUMBER DEFAULT NULL );
+--</PROC>
+--
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="CREATE_NT_DATA">
+-- This procedure dyn-seggs all route shapes of the given type and loads it into the
+-- spatial column in the given table. The routes are traced from the shapes of elements
+-- in the layers defined through the datum layers relating to rows in the NM_NT_GROUPINGS table
+  PROCEDURE create_nt_data( p_nth IN nm_themes_all%ROWTYPE,
+                            p_nlt_id IN nm_linear_types.nlt_id%TYPE,
+                            p_ta IN nm_theme_array,
+                            p_job_id IN NUMBER DEFAULT NULL );
+--</PROC>
+--
+
+  PROCEDURE create_non_linear_data ( p_table_name  IN VARCHAR2,
+                                       p_gty_type    IN VARCHAR2,
+                                     p_seq_name    IN VARCHAR2,
+                                     p_job_id      IN NUMBER DEFAULT NULL );
+-----------------------------------------------------------------------------
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="CREATE_GOFG_DATA">
+-- This procedure generates compound geometries representing group of groups data
+
+procedure create_gofg_data (    p_Table_Name in varchar2,
+                                p_Gty_Type   in nm_group_types.ngt_group_type%type,
+                                p_Seq_Name   in varchar2,
+                                p_Job_Id     in integer 
+                                );
+--</PROC>
+--
+
+--
+--<PROC NAME="SAMPLE_ELEMENTS_IN_ROUTE">
+-- This function produces some sample shapes from a route shape
+  FUNCTION sample_elements_in_route
+           ( p_layer    IN  nm_themes_all.nth_theme_id%TYPE
+           , p_ne_id    IN  nm_elements.ne_id%TYPE
+           , p_interval IN  INTEGER )
+    RETURN MDSYS.SDO_GEOMETRY;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="SAMPLE_ROUTE">
+-- This procedure will create the route shape by sampling the concatenated shapes at
+-- the prescribed interval by ID
+  FUNCTION sample_route
+           ( p_layer    IN nm_themes_all.nth_theme_id%TYPE
+           , p_ne_id    IN nm_elements.ne_id%TYPE
+           , p_interval IN INTEGER )
+    RETURN MDSYS.SDO_GEOMETRY;
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="SAMPLE_ROUTE">
+-- This procedure will create the route shape by sampling the concatenated shapes at
+-- the prescribed interval by Name
+  FUNCTION sample_route
+           ( p_layer      IN nm_themes_all.nth_theme_id%TYPE
+           , p_route_name IN nm_elements.ne_unique%TYPE
+           , p_interval   IN INTEGER )
+    RETURN MDSYS.SDO_GEOMETRY;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ELEMENT_HAS_SHAPE";
+-- returns TRUE if the element has a representation in the given layer
+  FUNCTION element_has_shape
+           ( p_ne_id IN nm_elements.ne_id%TYPE )
+    RETURN VARCHAR2;
+--
+--
+  FUNCTION element_has_shape
+           ( p_layer IN NUMBER
+           , p_ne_id IN nm_elements.ne_id%TYPE )
+    RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="INSERT_LAYER_SHAPE">
+-- Procedure to create a shape in the given layer to represent the given element.
+  PROCEDURE insert_layer_shape
+            ( p_layer IN NUMBER
+            , p_ne_id IN nm_elements.ne_id%TYPE
+            , p_geom  IN MDSYS.SDO_GEOMETRY );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="DELETE_LAYER_SHAPE">
+-- This procedure will remove a shape of an object from the given layer
+  PROCEDURE delete_layer_shape
+            ( p_layer IN NUMBER
+            , p_ne_id IN nm_elements.ne_id%TYPE );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="RESCALE_LAYER_ELEMENT">
+-- This function returns the current geometry which represents the given element in the
+-- given layer after measures are re-set according to the linear allocation along the
+-- length of the element as seen on the NE_LENGTH attribute
+  FUNCTION rescale_layer_element
+           ( p_layer IN NUMBER
+           , p_ne_id IN nm_elements.ne_id%TYPE )
+    RETURN MDSYS.SDO_GEOMETRY;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="RESCALE_GEOMETRY">
+-- This function returns the given geometry after re-sclaing the measures according
+-- to the length of the given element.
+  FUNCTION rescale_geometry
+           ( p_layer IN NUMBER
+           , p_ne_id IN nm_elements.ne_id%TYPE
+           , p_geom  IN MDSYS.SDO_GEOMETRY )
+    RETURN MDSYS.SDO_GEOMETRY;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_2D_PT">
+-- This function returns the 9i release 2 geometry type for a measured polyline.
+  FUNCTION get_2d_pt
+           ( p_geom MDSYS.SDO_GEOMETRY )
+    RETURN MDSYS.SDO_GEOMETRY;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_2D_PT">
+-- This function returns the 9i release 2 geometry type for a 2d point
+  FUNCTION get_2d_pt
+           ( p_x IN NUMBER, p_y IN NUMBER)
+    RETURN MDSYS.SDO_GEOMETRY;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="SET_SRID">
+-- This function returns the geometry with the projection identifier of the given layer.
+-- Note that there is no transformation.
+  FUNCTION set_srid
+           ( p_layer IN NUMBER
+           , p_geom  MDSYS.SDO_GEOMETRY )
+    RETURN MDSYS.SDO_GEOMETRY;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="SET_SRID">
+-- This function returns the geometry with the given srid.
+-- Note that there is no transformation.
+FUNCTION set_srid
+         ( p_geom IN mdsys.sdo_geometry
+         , p_srid IN NUMBER )
+    RETURN mdsys.sdo_geometry;
+--</PROC>
+
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="PROJECT">
+-- This function returns the geometry with the given srid.
+FUNCTION project
+         ( p_geom IN mdsys.sdo_geometry
+         , p_srid IN NUMBER )
+    RETURN mdsys.sdo_geometry;
+--</PROC>
+
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_MIDPOINT">
+-- This function returns the mid-point of a line
+--
+
+FUNCTION get_midpoint ( p_geom IN mdsys.sdo_geometry) RETURN mdsys.sdo_geometry;
+--</PROC>
+
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_DISTANCE_POINTS">
+-- This function returns a multi-point shape which corresponds to the interval points
+-- along the geometry in the given layer. It assumes that the interval is in the
+-- units of the elements described in the layer.
+--
+  FUNCTION get_distance_points
+           ( p_layer    IN NUMBER
+           , p_interval IN NUMBER
+           , p_geometry IN MDSYS.SDO_GEOMETRY )
+    RETURN MDSYS.SDO_GEOMETRY;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_DISTANCE_POINTS">
+-- This function returns a multi-point shape which corresponds to the interval points
+-- along the geometry in the given layer. It uses the intervals in the given units.
+--
+  FUNCTION get_distance_points
+           ( p_layer    IN NUMBER
+           , p_interval IN NUMBER
+           , p_unit_id  IN NM_UNITS.un_unit_id%TYPE
+           , p_ne_id    IN NUMBER )
+    RETURN MDSYS.SDO_GEOMETRY;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_DISTANCE_POINTS">
+-- This function returns a multi-point shape which corresponds to the interval points
+-- along the geometry represented by the element in the given layer. It uses the units
+-- of the given element.
+  FUNCTION get_distance_points
+           ( p_layer    IN NUMBER
+           , p_interval IN NUMBER
+           , p_ne_id    IN NUMBER )
+    RETURN MDSYS.SDO_GEOMETRY;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="IS_CLIPPED">
+-- This function returns a flag to indicate if the start and end measures
+-- along an object represent the given lenght. It is used to prevent unwanted
+-- spatial clipping where there is no need.
+  FUNCTION is_clipped
+           ( p_start  IN NUMBER
+           , p_end    IN NUMBER
+           , p_length IN NUMBER )
+    RETURN NUMBER;
+--</PROC>
+--
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_PLACEMENT_MP_GEOMETRY">
+-- This function returns the spatial representation of the placement array
+-- by tracing its shape in the given layer. It uses the placement array as
+-- a bind-variable in an object relational in-line view. This fails to execute
+-- in 8i but functions correctly in 9i release 2
+  FUNCTION get_placement_mp_geometry
+           ( p_layer    IN NUMBER
+           , p_pl_array IN nm_placement_array )
+    RETURN MDSYS.SDO_GEOMETRY;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_TEMP_EXTENT_MP_GEOMETRY">
+-- A function to retrieve all the shapes of a temporary network extent and accumulate
+-- them into a single multi-part geometry
+  FUNCTION get_temp_extent_mp_geometry
+           ( p_layer      IN NUMBER
+           , p_nte_job_id IN NM_NW_TEMP_EXTENTS.nte_job_id%TYPE )
+    RETURN MDSYS.SDO_GEOMETRY;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--<PROC NAME="CREATE_SDO_LAYER">
+-- This procedure is used to register a layer in SDO using a GType specified.
+-- Use this procedure for registering empty spatial tables
+FUNCTION create_sdo_layer
+          ( pi_table_name  IN user_sdo_geom_metadata.table_name%TYPE
+          , pi_column_name IN user_sdo_geom_metadata.column_name%TYPE
+          , pi_gtype       IN NM_THEME_GTYPES.ntg_gtype%TYPE)
+  RETURN NUMBER;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="CLONE_LAYER">
+-- This function clones a given layer and replicates it using the given table and column
+-- names.
+  FUNCTION clone_layer
+           ( p_layer       IN NUMBER
+           , p_table_name  IN VARCHAR2
+           , p_column_name IN VARCHAR2 )
+    RETURN NUMBER;
+--</PROC>
+--
+  FUNCTION clone_2d_from_3d_layer
+           ( p_layer       IN NUMBER
+           , p_table_name  IN VARCHAR2
+           , p_column_name IN VARCHAR2 )
+    RETURN NUMBER;
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="CLONE_PT_FROM_LINE">
+-- This function clones the metadata of the given layer but replicates a point
+-- geometry type.
+  FUNCTION clone_pt_from_line
+           ( p_layer       IN NUMBER
+           , p_table_name  IN VARCHAR2
+           , p_column_name IN VARCHAR2 )
+    RETURN NUMBER;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_SDO_PT">
+-- This function returns the point geometry translation of an ordinate pair.
+  FUNCTION get_sdo_pt
+           ( p_layer IN NUMBER
+           , p_x     IN NUMBER
+           , p_y     IN NUMBER )
+    RETURN MDSYS.SDO_GEOMETRY deterministic;
+--</PROC>
+
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_NO_PARTS">
+-- This function returns the number of parts in a geometry
+  FUNCTION get_no_parts
+           ( p_geom IN MDSYS.SDO_GEOMETRY )
+    RETURN NUMBER;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_PLACEMENT_BY_XY">
+-- This function generates a placement from the projection of the two x,y pairs onto an
+-- element shape. The points must be on the same element shape and must not be the same.
+  FUNCTION get_placement_by_xy
+           ( p_layer IN NUMBER
+           , p_x1    IN NUMBER
+           , p_y1    IN NUMBER
+           , p_x2    IN NUMBER
+           , p_y2    IN NUMBER )
+    RETURN NM_PLACEMENT;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="INSERT_ELEMENT_SHAPE">
+-- This function creates the representation of the given element in the
+-- given layer by the given shape.
+  PROCEDURE insert_element_shape
+            ( p_layer IN NUMBER
+            , p_ne_id IN nm_elements.ne_id%TYPE
+            , p_geom  IN MDSYS.SDO_GEOMETRY );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="SET_POINT_SRID">
+-- Sets a global variable on the basis of the SRID of the point locations data.
+  PROCEDURE set_point_srid;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_POINT_SRID">
+-- This function returns the global variable holding the SRID of the point-locations table
+  FUNCTION get_point_srid
+    RETURN NUMBER;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+
+--<PROC NAME="GET_TABLE_SRID">
+-- This function returns the SRID of the spatial column in the given table
+  FUNCTION get_table_srid
+           ( p_table_name  IN VARCHAR2
+           , p_column_name IN VARCHAR2 )
+    RETURN NUMBER;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ADD_NEW_INV_SHAPES">
+-- Adds new shapes to represent the given object in the given layer
+  PROCEDURE add_new_inv_shapes
+            ( p_layer IN NUMBER
+            , p_ne_id IN nm_elements.ne_id%TYPE
+            , p_geom  IN OUT NOCOPY MDSYS.SDO_GEOMETRY );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+-- All the functions below this mark are used with Oracle 8i although their
+-- functionality is reproduced directly in Oracle 9i
+--
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="REVERSE_GEOMETRY">
+-- This function reverses a geaometry and optionally rescales it. This function does not
+-- exist in basic 8i server.
+  FUNCTION reverse_geometry
+           ( p_geom    IN MDSYS.SDO_GEOMETRY
+           , p_measure IN NUMBER DEFAULT NULL)
+    RETURN MDSYS.SDO_GEOMETRY;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_PLACEMENT_MBR">
+-- This function returns the envelope or MBR of the spatial representation
+-- of the placement array in the given layer. It will be replaced by 9i specific aggreagte
+-- functions.
+  FUNCTION get_placement_mbr
+           ( p_layer IN NUMBER
+           , p_pl_array IN nm_placement_array )
+    RETURN MDSYS.SDO_GEOMETRY;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_3D_LAYER_EXTENT">
+-- return the minimum bounding rectangle of a geometry.
+  PROCEDURE get_3d_layer_extent
+            ( p_geom IN MDSYS.SDO_GEOMETRY
+            , minx   IN OUT NUMBER
+            , maxx   IN OUT NUMBER
+            , miny   IN OUT NUMBER
+            , maxy   IN OUT NUMBER );
+--</PROC>
+-----------------------------------------------------------------------------
+--
+-- All the functions below this mark are used with Oracle 9i extensions
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_MBR">
+-- return the minimum bounding rectangle of a geometry.
+  FUNCTION get_mbr
+           ( p_geom IN MDSYS.SDO_GEOMETRY )
+    RETURN MDSYS.SDO_GEOMETRY;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_MBR">
+-- return the minimum bounding rectangle of an element.
+  FUNCTION get_mbr
+           ( p_layer IN NUMBER
+           , p_ne_id IN nm_elements.ne_id%TYPE )
+    RETURN MDSYS.SDO_GEOMETRY;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_AGGR_MBR">
+-- return the minimum bounding rectangle of an element or group of elements.
+  FUNCTION get_aggr_mbr
+           ( p_layer IN NUMBER
+           , p_ne_id IN nm_elements.ne_id%TYPE )
+    RETURN MDSYS.SDO_GEOMETRY;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_PLACEMENT_AGGR_MBR">
+-- return the minimum bounding rectangle of a placement_array.
+  FUNCTION get_placement_aggr_mbr
+           ( p_layer    IN NUMBER
+           , p_pl_array IN nm_placement_array )
+    RETURN MDSYS.SDO_GEOMETRY;
+
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_CENTRE_AND_SIZE">
+-- return the centre and size of a geometry.
+  FUNCTION get_centre_and_size
+           ( p_geom IN MDSYS.SDO_GEOMETRY )
+    RETURN MDSYS.SDO_GEOMETRY;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_CENTRE_AND_SIZE">
+-- return the centre and size of a geometry identified as a theme and identifier.
+  FUNCTION get_centre_and_size
+           ( p_theme IN NUMBER
+           , p_pk_id IN NUMBER )
+    RETURN MDSYS.SDO_GEOMETRY;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_GDO_CENTRE_AND_SIZE">
+-- return the centre and size of a set of geometries identified by a gdo session id.
+  FUNCTION get_gdo_centre_and_size
+           ( p_session_id IN NUMBER )
+    RETURN MDSYS.SDO_GEOMETRY;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_POINT_COORDINATES">
+-- return the triplet representing a point from the geometry.
+  PROCEDURE get_point_coordinates
+            ( p_geom  IN MDSYS.SDO_GEOMETRY
+            , p_x    OUT NUMBER
+            , p_y    OUT NUMBER
+            , p_m    OUT NUMBER );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_GEOMETRY_ARRAY">
+-- return arrays of x,y,z/m co-ordinates from a geometry.
+  PROCEDURE get_geometry_array
+            ( p_geom IN MDSYS.SDO_GEOMETRY
+            , p_x   OUT Nm3type.tab_number
+            , p_y   OUT Nm3type.tab_number
+            , p_m   OUT Nm3type.tab_number );
+
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_THEME_PT_COORDS">
+-- return centroid/midpoint/position
+PROCEDURE get_theme_pt_coords ( p_theme_id IN nm_themes_all.nth_theme_id%TYPE,
+                                p_pk_id IN gis_data_objects.gdo_pk_id%TYPE,
+                                p_x OUT NUMBER, p_y OUT NUMBER, p_z OUT NUMBER );
+
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_THEME_SHAPE">
+-- return the shape of a theme record, identified by theme identifier
+  FUNCTION get_theme_shape
+           ( p_theme_id IN NUMBER
+           , p_pk_id    IN NUMBER )
+    RETURN MDSYS.SDO_GEOMETRY;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_THEME_SHAPE">
+-- return the shape of a theme record, identified by theme name
+  FUNCTION get_theme_shape
+           ( p_theme_name IN VARCHAR2
+           , p_pk_id      IN NUMBER )
+    RETURN MDSYS.SDO_GEOMETRY;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_THEME_DIMINFO">
+-- return the diminfo for a theme.
+  FUNCTION get_theme_diminfo
+           ( p_nth_id IN NUMBER )
+   RETURN MDSYS.SDO_DIM_ARRAY;
+--</PROC>
+
+--
+-----------------------------------------------------------------------------
+--
+--
+--<PROC NAME="GET_DIMENSION">
+-- return the dimension of a diminfo.
+FUNCTION get_dimension ( p_diminfo IN mdsys.sdo_dim_array ) RETURN NUMBER;
+--</PROC>
+--
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_THEME_METADATA">
+-- return the sdo metadata for a theme.
+  FUNCTION get_theme_metadata
+           ( p_nth_id IN NUMBER )
+    RETURN user_sdo_geom_metadata%ROWTYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_THEME_GTYPE">
+-- return the primary geometry type in a theme.
+  FUNCTION get_theme_gtype
+           ( p_nth_id IN NUMBER )
+    RETURN NUMBER;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_THEME_GTYPE_TEXT">
+-- return the primary geometry type in a theme.
+  FUNCTION get_theme_gtype_text
+           ( p_nth_id IN NUMBER )
+    RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_TABLE_GTYPE">
+-- return the primary geometry type in a table.
+  FUNCTION get_table_gtype
+           ( p_table     IN VARCHAR2
+           , p_column    IN VARCHAR2
+           , p_full_scan IN VARCHAR2 DEFAULT 'N')
+    RETURN NUMBER;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="REGISTER_SDO_TABLE_AS_THEME">
+-- Regsiters the minimum infomation of a table and geometry pair as a theme.
+  PROCEDURE register_sdo_table_as_theme
+            ( p_table              IN VARCHAR2
+            , p_theme_name  IN VARCHAR2
+            , p_pk_col            IN VARCHAR2
+            , p_fk_col             IN VARCHAR2
+            , p_shape_col       IN VARCHAR2
+            , p_tol                  IN NUMBER   DEFAULT 0.005
+            , p_cre_idx           IN VARCHAR2 DEFAULT 'N'
+            , p_estimate_new_tol  IN VARCHAR2 DEFAULT 'N'
+            , p_override_sdo_meta IN VARCHAR2 DEFAULT 'I');
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="REGISTER_SDO_TABLE_AS_THEME">
+-- Regsiters the minimum infomation of a table and geometry pair as a theme.
+  PROCEDURE register_sdo_table_as_theme
+            ( p_table             IN VARCHAR2
+            , p_pk_col            IN VARCHAR2
+            , p_fk_col            IN VARCHAR2
+            , p_shape_col         IN VARCHAR2
+            , p_tol               IN NUMBER   DEFAULT 0.005
+            , p_cre_idx           IN VARCHAR2 DEFAULT 'N'
+            , p_estimate_new_tol  IN VARCHAR2 DEFAULT 'N'
+            , p_override_sdo_meta IN VARCHAR2 DEFAULT 'I');
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="VALIDATE_THEME">
+-- Creates a table containing a list of invalid theme geometries.
+  FUNCTION validate_theme
+           ( p_theme  IN NUMBER
+           , ex_table IN VARCHAR2 DEFAULT NULL)
+    RETURN NUMBER;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_SHAPE_FROM_GDO">
+-- return a shape constructed from the X,Y columns in the GDO table, identified by session ID
+  FUNCTION get_shape_from_gdo
+           ( p_session_id IN NUMBER )
+    RETURN MDSYS.SDO_GEOMETRY;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_TABLE_MBR">
+-- return the minimum bounding rectangle of a table from the diminfo.
+  FUNCTION get_table_mbr
+           ( p_table  IN VARCHAR2
+           , p_column IN VARCHAR2 )
+    RETURN MDSYS.SDO_GEOMETRY;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="CALCULATE_TABLE_DIMINFO">
+-- calculates the dimension information for a table and column pair.
+  FUNCTION calculate_table_diminfo
+           ( p_table            IN VARCHAR2
+           , p_column           IN VARCHAR2
+           , p_tol              IN NUMBER   DEFAULT 0.005
+           , p_estimate_new_tol IN VARCHAR2 DEFAULT 'N'  )
+    RETURN MDSYS.SDO_DIM_ARRAY;
+
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="CREATE_SPATIAL_EXTENT">
+-- Creates a network extent from a a spatial extent polygon and a theme from which to derive the network entries.
+-- Uses a whole flag to choose all base elements that are wholly inside the polygon or, if set to N, uses the
+-- elements that are partially within the polygon and are either inside or intersect the polygon boundary.
+-- Care should be taken with this as as the measures can be returned as null and so the insert into the extent
+-- members fails.
+  FUNCTION create_spatial_extent
+           ( p_theme_id   IN NM_THEMES_ALL.nth_theme_id%TYPE
+           , p_nsperow    IN NM_SPATIAL_EXTENTS%ROWTYPE
+           , p_whole_flag IN VARCHAR2 DEFAULT 'Y' )
+    RETURN NUMBER;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="SET_SRID">
+-- sets the SRID on all geometries in the table/column
+  PROCEDURE set_srid
+            ( p_table  IN VARCHAR2
+            , p_column IN VARCHAR2
+            , p_srid   IN NUMBER );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_SPATIAL_INDEX">
+-- return the name of the spatial index on a table/column pair
+  FUNCTION get_spatial_index
+           ( p_table  IN VARCHAR2
+           , p_column IN VARCHAR2 )
+    RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="RE_PROJECT">
+-- Sets all the geometries in a table/column to a new SRID and modifies the metadata and indexes accordingly.
+  PROCEDURE re_project
+            ( p_table    IN VARCHAR2
+            , p_column   IN VARCHAR2
+            , p_old_srid IN NUMBER
+            , p_new_srid IN NUMBER );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_POLYGON_FROM_GDO">
+-- Returns a polygon from assembling the points in the X,Y coordinates in the GDO records.
+  FUNCTION get_polygon_from_gdo
+           ( p_session_id IN NUMBER )
+    RETURN MDSYS.SDO_GEOMETRY;
+--
+--</PROC>
+--
+  PROCEDURE Change_Affected_Shapes
+            ( p_layer IN NUMBER
+            , p_ne_id IN nm_elements.ne_id%TYPE );
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="CREATE_SPATIAL_SEQ
+-- Function to create and return the sequence name for a theme using surrogate keys.
+  FUNCTION create_spatial_seq
+           ( p_theme_id IN NUMBER )
+    RETURN VARCHAR2;
+--</PROC>
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_SPATIAL_SEQ
+-- Function to return a sequence name associated with a theme
+  FUNCTION get_spatial_seq
+           ( p_theme_id IN NUMBER )
+    RETURN VARCHAR2;
+--</PROC>
+----------------------------------------------------------------------------
+--
+--<PROC NAME="CREATE_SPATIAL_IDX
+  PROCEDURE create_spatial_idx
+            ( p_table  IN VARCHAR2
+            , p_column IN VARCHAR2 DEFAULT 'GEOLOC' );
+--</PROC>
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="CREATE_QTREE_IDX
+  PROCEDURE create_qtree_idx
+            ( p_table  IN VARCHAR2
+            , p_column IN VARCHAR2 DEFAULT 'GEOLOC' );
+--</PROC>
+
+----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_SPATIAL_INDEX_TYPE
+  FUNCTION get_spatial_index_type
+            ( p_table_name IN VARCHAR2)
+    RETURN VARCHAR2;
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_SPATIAL_INDEX_TYPE
+  FUNCTION get_spatial_index_type
+           ( p_theme_id IN NUMBER )
+    RETURN VARCHAR2;
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="CONVERT_DIM_ARRAY_TO_MBR
+  FUNCTION convert_dim_array_to_mbr
+           ( p_layer IN NUMBER )
+    RETURN MDSYS.SDO_GEOMETRY;
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="CONVERT_DIM_ARRAY_TO_MBR
+  FUNCTION convert_dim_array_to_mbr
+           ( p_diminfo IN MDSYS.SDO_DIM_ARRAY
+           , p_srid    IN NUMBER DEFAULT NULL )
+    RETURN MDSYS.SDO_GEOMETRY;
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="REGISTER_TABLE
+  PROCEDURE register_table
+            ( p_table             IN VARCHAR2
+            , p_shape_col         IN VARCHAR2
+            , p_cre_idx           IN VARCHAR2
+            , p_tol               IN NUMBER   DEFAULT .005
+            , p_estimate_new_tol  IN VARCHAR2 DEFAULT 'N'
+            , p_override_sdo_meta IN VARCHAR2 DEFAULT 'I' );
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_TOL_FROM_UNIT_MASK
+  FUNCTION get_tol_from_unit_mask
+           ( p_unit IN NUMBER )
+    RETURN NUMBER;
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_THEME_MBR">
+-- return the MBR for a theme.
+  FUNCTION get_theme_mbr
+           ( p_nth_id IN NUMBER )
+    RETURN MDSYS.SDO_GEOMETRY;
+--</PROC>
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_THEME_CENTRE_AND_SIZE">
+-- return the centre and size for a theme.
+  FUNCTION get_theme_centre_and_size
+           ( p_nth_id IN NUMBER )
+    RETURN MDSYS.SDO_GEOMETRY;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="CALCULATE_THEME_MBR">
+-- return the MBR for a theme.
+  FUNCTION calculate_theme_mbr
+           ( p_nth_id IN NUMBER )
+    RETURN MDSYS.SDO_GEOMETRY;
+--</PROC>
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="CALCULATE_TABLE_MBR">
+  FUNCTION calculate_table_mbr
+           ( p_table_name IN VARCHAR2
+           , p_column     IN VARCHAR2 )
+    RETURN MDSYS.SDO_GEOMETRY;
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="CALCULATE_THEME_CENT_AND_SIZE">
+-- return the centre and size for a theme.
+  FUNCTION calculate_theme_cent_and_size
+           ( p_nth_id IN NUMBER )
+    RETURN MDSYS.SDO_GEOMETRY;
+--</PROC>
+-----------------------------------------------------------------------------
+--<PROC NAME="CREATE_SDO_LAYER_FROM_LOCL"'
+-- Create an SDO layer from a Local (shapefile) theme
+  PROCEDURE create_sdo_layer_from_locl
+            ( p_nth_id IN NM_THEMES_ALL.nth_theme_id%TYPE
+            , p_base_theme IN NUMBER DEFAULT NULL
+            , p_srid   IN NUMBER DEFAULT NULL ) ;
+--</PROC>
+-----------------------------------------------------------------------------
+--<PROC NAME="GET_DIM_FROM_GTYPE"'
+  FUNCTION get_dim_from_gtype
+           ( p_gtype IN NUMBER )
+    RETURN INTEGER;
+--</PROC>
+-----------------------------------------------------------------------------
+--<PROC NAME="GET_LRS_FROM_GTYPE'"
+  FUNCTION get_lrs_from_gtype
+           ( p_gtype IN NUMBER )
+    RETURN INTEGER;
+--</PROC>
+-----------------------------------------------------------------------------
+--<PROC NAME="GET_TYPE_FROM_GTYPE"'
+  FUNCTION get_type_from_gtype
+           ( p_gtype IN NUMBER )
+    RETURN INTEGER;
+--</PROC>
+-----------------------------------------------------------------------------
+--<PROC NAME="GET_SAMPLE_TOLERANCE"'
+  FUNCTION get_sample_tolerance
+           ( p_table   IN VARCHAR2
+           , p_column  IN VARCHAR2
+           , p_use_lrs IN VARCHAR2 DEFAULT 'Y'
+           , p_row     IN NUMBER   DEFAULT 10
+           , p_elem    IN NUMBER   DEFAULT 1
+           , p_vertex  IN NUMBER   DEFAULT -1 )
+    RETURN num_array_type;
+--</PROC>
+-----------------------------------------------------------------------------
+--<PROC NAME="CREATE_SDO_LAYER_FROM_LOCL"'
+--
+  PROCEDURE drop_metadata
+            ( p_object_name IN VARCHAR2 );
+--</PROC>
+-----------------------------------------------------------------------------
+--<PROC NAME="COPY_SDO_LAYER_BY_THEME_USER"
+-- PROCEDURE gets the details from the theme_id in sdo_geometry from
+-- the highways owner and inserts in all_sdo_geom_metadata
+  PROCEDURE create_sub_sdo_layer
+            ( p_theme_id IN NM_THEMES_ALL.nth_theme_id%TYPE
+            , p_username IN HIG_USERS.hus_username%TYPE);
+--</PROC>
+-----------------------------------------------------------------------------
+--<PROC NAME="REMOVE_SUB_SDO_LAYER"
+  PROCEDURE remove_sub_sdo_layer
+            ( p_theme_id IN NM_THEMES_ALL.nth_theme_id%TYPE
+            , p_username IN HIG_USERS.hus_username%TYPE);
+--</PROC>
+-----------------------------------------------------------------------------
+--<PROC NAME="DROP_SUB_LAYER_BY_TABLE"
+PROCEDURE drop_sub_layer_by_table
+            ( p_table    IN VARCHAR2
+            , p_column   IN VARCHAR2
+            , p_owner    IN VARCHAR2 DEFAULT NULL);
+--</PROC>
+-----------------------------------------------------------------------------
+
+--<PROC NAME="GET_DISTANCE"
+--return the distance between a point and a theme object
+FUNCTION get_distance( p_theme IN NUMBER, p_pk IN NUMBER, p_x IN NUMBER, p_y IN NUMBER ) RETURN NUMBER;
+--</PROC>
+
+-----------------------------------------------------------------------------
+--<PROC NAME="WITHIN_TOLERANCE"
+--return TRUE if the the distance between a point and a theme object is less than th etheme tolerance
+FUNCTION within_tolerance( p_theme IN NUMBER, p_pk IN NUMBER, p_x IN NUMBER, p_y IN NUMBER ) RETURN VARCHAR2;
+--</PROC>
+-----------------------------------------------------------------------------
+--<PROC NAME=""IS_TABLE_REGD"
+--return true if feature table is registered
+FUNCTION is_table_regd ( p_feature_table IN VARCHAR2, p_col IN VARCHAR2 ) RETURN BOOLEAN;
+--
+--</PROC>
+
+-----------------------------------------------------------------------------
+--<PROC NAME="MAKE_SINGLE_PART"
+--generates a single-part shape from a multi_part shape in cases where the two parts are connected.
+FUNCTION Make_Single_Part( p_geom IN mdsys.sdo_geometry, p_diminfo IN mdsys.sdo_dim_array ) RETURN mdsys.sdo_geometry;
+--
+--</PROC>
+
+-----------------------------------------------------------------------------
+--<PROC NAME="GET_DISTANCE_BETWEEN_PARTS"
+--return the average distance (in base map units) between two parts
+FUNCTION get_distance_between_parts( p_geom IN mdsys.sdo_geometry ) RETURN NUMBER;
+--
+--</PROC>
+-----------------------------------------------------------------------------
+--<PROC NAME="GET_OBJECTS_IN_BUFFER"
+--return all objects from all snapping themes within the buffer
+
+-- AE 11-JUN-2009 - added p_gdo_session_id parameter for sub-selections based on gis_data_objects
+
+FUNCTION get_objects_in_buffer( p_nth_id         IN NUMBER,
+                                p_geometry       IN mdsys.sdo_geometry,
+                                p_buffer         IN NUMBER,
+                                p_buffer_units   IN NUMBER DEFAULT 1,
+                                p_get_projection IN VARCHAR2 DEFAULT 'FALSE',
+                                p_gdo_session_id IN gis_data_objects.gdo_session_id%TYPE DEFAULT NULL )
+  RETURN nm_theme_list;
+--
+FUNCTION get_objects_in_buffer( p_geometry       IN mdsys.sdo_geometry,
+                                p_buffer         IN NUMBER,
+                                p_buffer_units   IN NUMBER,
+                                p_theme_txt      IN VARCHAR2 )
+  RETURN nm_theme_list;
+--
+--</PROC>
+-----------------------------------------------------------------------------
+--<PROC NAME="GET_NW_SNAPS_AT_XY"
+--return a theme array of snapped network objects from the xy location possibly restricted by the
+--global theme array.
+FUNCTION get_nw_snaps_at_xy( p_nth_id IN NUMBER, p_geom IN mdsys.sdo_geometry ) RETURN nm_theme_list;
+
+--
+--</PROC>
+-----------------------------------------------------------------------------
+--<PROC NAME="GET_NW_SNAPS_AT_XY"
+--return a theme array of snapped network objects from the xy location possibly restricted by the
+--the string of theme ids in the theme txt string.
+FUNCTION get_nw_snaps_at_xy( p_nth_id IN NUMBER,
+                             p_geom IN mdsys.sdo_geometry,
+                             p_theme_txt IN VARCHAR2)
+                    RETURN nm_theme_list;
+--</PROC>
+
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_DATUM_XY_FROM_MEASURE">
+-- The datum base shape is interrogated for the given element to provide the x,y
+-- co-ordinates at the given measure. This is used to provide grid-co-ordinates
+-- for nodes/points that are derived on the fly.
+  PROCEDURE get_datum_xy_from_measure
+            ( p_ne_id    IN NUMBER
+            , p_measure  IN NUMBER
+            , p_x       OUT NUMBER
+            , p_y       OUT NUMBER );
+--</PROC>
+-----------------------------------------------------------------------------
+
+--<PROC NAME="GET_SPATIAL_COLUMN_NAME">
+--Function to return the spatial column name from a table
+  FUNCTION get_spatial_column_name ( p_table_name IN VARCHAR2 ) RETURN VARCHAR2;
+--</PROC>
+-----------------------------------------------------------------------------
+
+--<PROC NAME="COALESCE_NW_DIMINFO">
+--Function to return the aggregated diminfo from all datum network layers.
+FUNCTION coalesce_nw_diminfo( p_pct_increase IN NUMBER DEFAULT 0,
+                              p_tol IN NUMBER DEFAULT NULL,
+                              p_m_tol IN NUMBER DEFAULT NULL ) RETURN mdsys.sdo_dim_array;
+--</PROC>
+-----------------------------------------------------------------------------
+
+--<PROC NAME="VALIDATE_GEOMETRY">
+--Function to return the validation status of a geometry
+FUNCTION validate_geometry ( p_geom IN mdsys.sdo_geometry, p_nth_id IN nm_themes_all.nth_theme_id%TYPE, p_tol IN NUMBER ) RETURN VARCHAR2;
+--</PROC>
+
+-----------------------------------------------------------------------------
+
+--<PROC NAME="get_shape_length">
+--Function to return the pure shape length of a geometry
+FUNCTION get_shape_length ( p_geom IN mdsys.sdo_geometry, p_nth_id IN nm_themes_all.nth_theme_id%TYPE, p_tol IN NUMBER ) RETURN NUMBER;
+--</PROC>
+
+-----------------------------------------------------------------------------
+
+--<PROC NAME="get_srs_text">
+--Function to return srs text
+FUNCTION get_srs_text( p_theme_id IN NM_THEMES_ALL.nth_theme_id%TYPE ) RETURN cs_srs.wktext%TYPE;
+--
+--------------------------------------------------------------------------------
+--
+PROCEDURE evaluate_and_raise_geo_val ( pi_text IN VARCHAR2 );
+--
+-------------------------------------------------------------------------------
+--
+--all pragma definitions here
+--<PRAGMA>
+  PRAGMA RESTRICT_REFERENCES( SET_THEME_METADATA, WNDS, TRUST );
+  PRAGMA RESTRICT_REFERENCES (GET_VERSION, WNPS, WNDS);
+  PRAGMA RESTRICT_REFERENCES (GET_BODY_VERSION, WNPS, WNDS);
+--PRAGMA RESTRICT_REFERENCES( GET_PROJECTION, WNDS );
+--PRAGMA RESTRICT_REFERENCES( GET_MEASURE, WNDS );
+ PRAGMA RESTRICT_REFERENCES( GET_XY_FROM_MEASURE, WNDS, TRUST);
+--PRAGMA RESTRICT_REFERENCES( LINEAR_INTERP, WNDS );
+  PRAGMA RESTRICT_REFERENCES( GET_PLACEMENT_GEOMETRY, WNDS );
+  PRAGMA RESTRICT_REFERENCES( ADD_SEGMENTS, WNDS );
+  PRAGMA RESTRICT_REFERENCES( IS_CLIPPED, WNDS );
+  PRAGMA RESTRICT_REFERENCES( GET_PLACEMENT_MP_GEOMETRY, WNDS, TRUST );
+  PRAGMA RESTRICT_REFERENCES( REVERSE_GEOMETRY, WNDS );
+  PRAGMA RESTRICT_REFERENCES( GET_NO_PARTS, WNDS );
+  PRAGMA RESTRICT_REFERENCES( SET_THEME_METADATA, WNDS );
+--</PRAGMA>
+-----------------------------------------------------------------------------
+--
+END Nm3sdo;
+/
