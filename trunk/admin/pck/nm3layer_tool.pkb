@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3layer_tool.pkb-arc   2.38   Dec 08 2014 10:48:42   Steve.Cooper  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3layer_tool.pkb-arc   2.39   Apr 15 2015 14:45:42   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3layer_tool.pkb  $
---       Date into PVCS   : $Date:   Dec 08 2014 10:48:42  $
---       Date fetched Out : $Modtime:   Nov 05 2014 14:06:02  $
---       Version          : $Revision:   2.38  $
+--       Date into PVCS   : $Date:   Apr 15 2015 14:45:42  $
+--       Date fetched Out : $Modtime:   Apr 15 2015 14:42:14  $
+--       Version          : $Revision:   2.39  $
 --       Based on SCCS version : 1.11
 ------------------------------------------------------------------
 --   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
@@ -16,7 +16,7 @@ AS
 --
 --all global package variables here
 --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000)       := '$Revision:   2.38  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000)       := '$Revision:   2.39  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name   CONSTANT VARCHAR2 (30)         := 'NM3LAYER_TOOL';
@@ -38,7 +38,7 @@ AS
 --
 -----------------------------------------------------------------------------
 --
-   procedure index_generation(p_table in varchar2);
+   procedure index_generation(p_table in varchar2, p_of_column_exists varchar2 default 'Y');
    procedure index_drop (p_table in varchar2);   
  /*
    PRIVATE CURSORS
@@ -2673,6 +2673,7 @@ AS
     --
     ELSE --If it is non linear
     --
+    
        OPEN cur_non_linear(pi_gty_type);
        FETCH cur_non_linear
        INTO l_sequence_name, l_feature_table, l_feature_shape_column;
@@ -2685,14 +2686,14 @@ AS
                                   , 'Cannot refresh this layer - there is no non-linear base Theme available');
        END IF;
     --  Find the name of the spatial index
-	   begin
+       begin
          l_spatial_ind_name := get_spatial_index ( pi_table_name  => l_feature_table
                                                  , pi_column_name => l_feature_shape_column);
        exception
-	     when ex_no_spdix then
-		   l_spatial_ind_name := NULL; -- we do not need an index - will drop it anyway
+         when ex_no_spdix then
+           l_spatial_ind_name := NULL; -- we do not need an index - will drop it anyway
        end;
-		   --  
+           --  
        if l_spatial_ind_name is not null then
        BEGIN
 --         execute immediate 'ALTER INDEX ' || l_spatial_ind_name || ' PARAMETERS (''index_status=deferred'')';
@@ -2705,15 +2706,24 @@ AS
     --   
        index_drop(P_TABLE => l_feature_table );
        
-       nm3sdo.create_non_linear_data( p_table_name => l_feature_table
-                                    , p_gty_type   => pi_gty_type
-                                    , p_seq_name   => l_sequence_name
-                                    , p_job_id     => pi_job_id);
-    --
-    
+       IF NM3NET.get_gty_sub_group_allowed(pi_gty_type) = 'N' 
+       THEN
+       
+          nm3sdo.create_non_linear_data( p_table_name => l_feature_table
+                                       , p_gty_type   => pi_gty_type
+                                       , p_seq_name   => l_sequence_name
+                                       , p_job_id     => pi_job_id);
+       ELSE
+       
+          nm3sdo.create_gofg_data(p_table_name => l_feature_table
+                                       , p_gty_type   => pi_gty_type
+                                       , p_seq_name   => l_sequence_name
+                                       , p_job_id     => pi_job_id);
+       END IF;
+       
        nm3sdo.create_spatial_idx ( p_table => l_feature_table, p_column => 'GEOLOC' );
        
-       index_generation(p_table => l_feature_table);
+       index_generation(l_feature_table, case NM3NET.get_gty_sub_group_allowed(pi_gty_type) when 'N' then 'Y' else 'N' end );
        
        
          
@@ -2745,9 +2755,9 @@ AS
      THEN
        RAISE_APPLICATION_ERROR (-20778,'Layer created - but user does not have ANALYZE ANY granted. '||
                                        'Please ensure the correct role/privs are applied to the user');
-     WHEN OTHERS 
-     THEN       
-       RAISE;
+--     WHEN OTHERS 
+--     THEN       
+--       RAISE;
    END; 
 --
 -----------------------------------------------------------------------------
@@ -5734,16 +5744,26 @@ END get_srid;
 --
 -----------------------------------------------------------------------------
 --
-  procedure index_generation (p_table in varchar2) is
+  procedure index_generation(p_table in varchar2, p_of_column_exists varchar2 default 'Y') is
   cur_string varchar2(4000);
   begin
-    cur_string := 'alter table '
-                 || p_Table
-                 || ' ADD CONSTRAINT '
-                 || p_Table
-                 || '_PK PRIMARY KEY '
-                 || ' ( ne_id, ne_id_of, nm_begin_mp, start_date '
-                 || ' )';
+    if p_of_column_exists = 'Y' then
+       cur_string := 'alter table '
+                    || p_Table
+                    || ' ADD CONSTRAINT '
+                    || p_Table
+                    || '_PK PRIMARY KEY '
+                    || ' ( ne_id, ne_id_of, nm_begin_mp, start_date '
+                    || ' )';
+    else
+       cur_string := 'alter table '
+                    || p_Table
+                    || ' ADD CONSTRAINT '
+                    || p_Table
+                    || '_PK PRIMARY KEY '
+                    || ' ( ne_id '
+                    || ' )';
+    end if;
 
     Execute Immediate Cur_String;
 
@@ -5759,10 +5779,14 @@ END get_srid;
 
      End If; -- surrogate key
 
-     Cur_String := 'create index '|| p_Table
-                || '_NW_IDX'|| ' on '|| p_Table|| ' ( ne_id_of, nm_begin_mp )';
+     If p_of_column_exists = 'Y' then
 
-     Execute Immediate Cur_String;
+        Cur_String := 'create index '|| p_Table
+                   || '_NW_IDX'|| ' on '|| p_Table|| ' ( ne_id_of, nm_begin_mp )';
+
+        Execute Immediate Cur_String;
+        
+     End if;
    end;
 
 procedure index_drop (p_table in varchar2) is
