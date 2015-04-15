@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE Nm3sdo AS
 --
 --   SCCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkh-arc   2.8   Jul 04 2013 16:32:58   James.Wadsworth  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3sdo.pkh-arc   2.9   Apr 15 2015 16:18:28   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3sdo.pkh  $
---       Date into PVCS   : $Date:   Jul 04 2013 16:32:58  $
---       Date fetched Out : $Modtime:   Jul 04 2013 14:25:20  $
---       PVCS Version     : $Revision:   2.8  $
+--       Date into PVCS   : $Date:   Apr 15 2015 16:18:28  $
+--       Date fetched Out : $Modtime:   Apr 15 2015 16:17:50  $
+--       PVCS Version     : $Revision:   2.9  $
 --
 --   Author : Rob Coupe
 --
@@ -23,7 +23,7 @@ CREATE OR REPLACE PACKAGE Nm3sdo AS
 --<GLOBVAR>
 -- g_sccsid is the SCCS_ID
 -- Constants
-  g_sccsid           CONSTANT VARCHAR2(80) := '"$Revision:   2.8  $"';
+  g_sccsid           CONSTANT VARCHAR2(80) := '"$Revision:   2.9  $"';
   single_shape_inv   CONSTANT VARCHAR2(3)  := NVL( Hig.get_sysopt('SDOSINGSHP'), 'N');
   use_surrogate_key  CONSTANT VARCHAR2(1)  := NVL( Hig.get_sysopt('SDOSURKEY'),'N');
   def_pt_zoom        CONSTANT NUMBER       := NVL( TO_NUMBER( Hig.get_sysopt('SDOPTZOOM' )), 100);
@@ -123,8 +123,8 @@ PROCEDURE set_global_metadata ( p_usgm IN user_sdo_geom_metadata%ROWTYPE );
 -- This procedure sets the global geometry metdata
 PROCEDURE set_global_metadata ( p_table_name IN VARCHAR2,
                                 p_column_name IN VARCHAR2,
-								p_diminfo IN mdsys.sdo_dim_array,
-								p_srid IN NUMBER);
+                                p_diminfo IN mdsys.sdo_dim_array,
+                                p_srid IN NUMBER);
 --</PROC>
 --
 -----------------------------------------------------------------------------
@@ -133,7 +133,7 @@ PROCEDURE set_global_metadata ( p_table_name IN VARCHAR2,
 -- This procedure sets the global geometry metdata
 PROCEDURE set_diminfo_and_srid( p_themes  IN nm_theme_array,
                                 p_diminfo OUT mdsys.sdo_dim_array,
-								p_srid    OUT NUMBER );
+                                p_srid    OUT NUMBER );
 --</PROC>
 --
 --
@@ -334,7 +334,7 @@ PROCEDURE set_diminfo_and_srid( p_themes  IN nm_theme_array,
 -- This function returns the dimension information of the given table and column
   FUNCTION get_table_diminfo
            ( p_table  IN VARCHAR2
-		   , p_column IN VARCHAR2 DEFAULT NULL )
+           , p_column IN VARCHAR2 DEFAULT NULL )
     RETURN MDSYS.SDO_DIM_ARRAY;
 --</PROC>
 --
@@ -429,7 +429,7 @@ PROCEDURE set_diminfo_and_srid( p_themes  IN nm_theme_array,
 -- Nearest lref to geometry based on snapping and base themes.
 FUNCTION get_nearest_lref
          ( p_theme IN nm_themes_all.nth_theme_id%TYPE
-		 , p_geom IN mdsys.sdo_geometry )
+         , p_geom IN mdsys.sdo_geometry )
     RETURN NM_LREF;
 --</PROC>
 ----------------------------------------------------------------------------
@@ -516,7 +516,7 @@ FUNCTION get_nearest_lref
 -- This procedure slits a shape into two new ones in the given layer
   PROCEDURE split_element_at_measure
             ( p_layer   IN NUMBER
-	    , p_ne_id   IN nm_elements.ne_id%TYPE
+        , p_ne_id   IN nm_elements.ne_id%TYPE
             , p_measure IN NUMBER
             , p_ne_id_1 IN nm_elements.ne_id%TYPE
             , p_ne_id_2 IN nm_elements.ne_id%TYPE
@@ -559,18 +559,18 @@ FUNCTION get_nearest_lref
 -- its component elements.
 FUNCTION get_route_shape( p_ne_id    IN nm_elements.ne_id%TYPE,
                           p_nt       IN ptr_vc_array,
-						  p_th       IN ptr_array,
-						  p_nth_tab  IN nth_row_tab_type,
-						  p_diminfo  IN mdsys.sdo_dim_array,
-						  p_srid     IN NUMBER,
-						  p_part     IN VARCHAR2 DEFAULT NULL) RETURN mdsys.sdo_geometry;
+                          p_th       IN ptr_array,
+                          p_nth_tab  IN nth_row_tab_type,
+                          p_diminfo  IN mdsys.sdo_dim_array,
+                          p_srid     IN NUMBER,
+                          p_part     IN VARCHAR2 DEFAULT NULL) RETURN mdsys.sdo_geometry;
 
-	RETURN mdsys.sdo_geometry;
+    RETURN mdsys.sdo_geometry;
 
 FUNCTION get_route_shape( p_ne_id    IN nm_elements.ne_id%TYPE )
     RETURN mdsys.sdo_geometry;
 
-	RETURN mdsys.sdo_geometry;
+    RETURN mdsys.sdo_geometry;
 
 --</PROC>
 --
@@ -649,8 +649,8 @@ FUNCTION get_route_shape( p_ne_id    IN nm_elements.ne_id%TYPE )
             ( p_table_name  IN VARCHAR2
             , p_inv_type    IN nm_inv_types.nit_inv_type%TYPE
             , p_seq_name    IN VARCHAR2
-			, p_pnt_or_cont IN VARCHAR2
-			, p_job_id      IN NUMBER DEFAULT NULL );
+            , p_pnt_or_cont IN VARCHAR2
+            , p_job_id      IN NUMBER DEFAULT NULL );
 --</PROC>
 --
 --
@@ -662,16 +662,30 @@ FUNCTION get_route_shape( p_ne_id    IN nm_elements.ne_id%TYPE )
 -- in the layers defined through the datum layers relating to rows in the NM_NT_GROUPINGS table
   PROCEDURE create_nt_data( p_nth IN nm_themes_all%ROWTYPE,
                             p_nlt_id IN nm_linear_types.nlt_id%TYPE,
-							p_ta IN nm_theme_array,
-							p_job_id IN NUMBER DEFAULT NULL );
+                            p_ta IN nm_theme_array,
+                            p_job_id IN NUMBER DEFAULT NULL );
 --</PROC>
 --
 
   PROCEDURE create_non_linear_data ( p_table_name  IN VARCHAR2,
-	  							     p_gty_type    IN VARCHAR2,
+                                       p_gty_type    IN VARCHAR2,
                                      p_seq_name    IN VARCHAR2,
-								     p_job_id      IN NUMBER DEFAULT NULL );
+                                     p_job_id      IN NUMBER DEFAULT NULL );
 -----------------------------------------------------------------------------
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="CREATE_GOFG_DATA">
+-- This procedure generates compound geometries representing group of groups data
+
+procedure create_gofg_data (    p_Table_Name in varchar2,
+                                p_Gty_Type   in nm_group_types.ngt_group_type%type,
+                                p_Seq_Name   in varchar2,
+                                p_Job_Id     in integer 
+                                );
+--</PROC>
+--
+
 --
 --<PROC NAME="SAMPLE_ELEMENTS_IN_ROUTE">
 -- This function produces some sample shapes from a route shape
@@ -716,7 +730,7 @@ FUNCTION get_route_shape( p_ne_id    IN nm_elements.ne_id%TYPE )
 --
   FUNCTION element_has_shape
            ( p_layer IN NUMBER
-		   , p_ne_id IN nm_elements.ne_id%TYPE )
+           , p_ne_id IN nm_elements.ne_id%TYPE )
     RETURN VARCHAR2;
 --</PROC>
 --
@@ -799,7 +813,7 @@ FUNCTION get_route_shape( p_ne_id    IN nm_elements.ne_id%TYPE )
 -- Note that there is no transformation.
 FUNCTION set_srid
          ( p_geom IN mdsys.sdo_geometry
-		 , p_srid IN NUMBER )
+         , p_srid IN NUMBER )
     RETURN mdsys.sdo_geometry;
 --</PROC>
 
@@ -809,7 +823,7 @@ FUNCTION set_srid
 -- This function returns the geometry with the given srid.
 FUNCTION project
          ( p_geom IN mdsys.sdo_geometry
-		 , p_srid IN NUMBER )
+         , p_srid IN NUMBER )
     RETURN mdsys.sdo_geometry;
 --</PROC>
 
@@ -847,7 +861,7 @@ FUNCTION get_midpoint ( p_geom IN mdsys.sdo_geometry) RETURN mdsys.sdo_geometry;
            , p_interval IN NUMBER
            , p_unit_id  IN NM_UNITS.un_unit_id%TYPE
            , p_ne_id    IN NUMBER )
-	RETURN MDSYS.SDO_GEOMETRY;
+    RETURN MDSYS.SDO_GEOMETRY;
 --</PROC>
 --
 -----------------------------------------------------------------------------
@@ -1165,7 +1179,7 @@ FUNCTION create_sdo_layer
 -- return centroid/midpoint/position
 PROCEDURE get_theme_pt_coords ( p_theme_id IN nm_themes_all.nth_theme_id%TYPE,
                                 p_pk_id IN gis_data_objects.gdo_pk_id%TYPE,
-								p_x OUT NUMBER, p_y OUT NUMBER, p_z OUT NUMBER );
+                                p_x OUT NUMBER, p_y OUT NUMBER, p_z OUT NUMBER );
 
 --</PROC>
 --
@@ -1415,7 +1429,7 @@ FUNCTION get_dimension ( p_diminfo IN mdsys.sdo_dim_array ) RETURN NUMBER;
 --<PROC NAME="GET_SPATIAL_INDEX_TYPE
   FUNCTION get_spatial_index_type
             ( p_table_name IN VARCHAR2)
-	RETURN VARCHAR2;
+    RETURN VARCHAR2;
 --
 -----------------------------------------------------------------------------
 --
@@ -1503,7 +1517,7 @@ FUNCTION get_dimension ( p_diminfo IN mdsys.sdo_dim_array ) RETURN NUMBER;
 -- Create an SDO layer from a Local (shapefile) theme
   PROCEDURE create_sdo_layer_from_locl
             ( p_nth_id IN NM_THEMES_ALL.nth_theme_id%TYPE
-			, p_base_theme IN NUMBER DEFAULT NULL
+            , p_base_theme IN NUMBER DEFAULT NULL
             , p_srid   IN NUMBER DEFAULT NULL ) ;
 --</PROC>
 -----------------------------------------------------------------------------
