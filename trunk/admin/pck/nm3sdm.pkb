@@ -5,11 +5,11 @@ As
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.73   Apr 15 2015 14:49:38   Rob.Coupe  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.74   Apr 16 2015 10:05:58   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3sdm.pkb  $
---       Date into PVCS   : $Date:   Apr 15 2015 14:49:38  $
---       Date fetched Out : $Modtime:   Apr 15 2015 14:48:38  $
---       PVCS Version     : $Revision:   2.73  $
+--       Date into PVCS   : $Date:   Apr 16 2015 10:05:58  $
+--       Date fetched Out : $Modtime:   Apr 16 2015 11:04:36  $
+--       PVCS Version     : $Revision:   2.74  $
 --
 --   Author : R.A. Coupe
 --
@@ -21,7 +21,7 @@ As
 --
 --all global package variables here
 --
-  g_Body_Sccsid     Constant Varchar2 (2000) := '"$Revision:   2.73  $"';
+  g_Body_Sccsid     Constant Varchar2 (2000) := '"$Revision:   2.74  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
   g_Package_Name    Constant Varchar2 (30)   := 'NM3SDM';
@@ -2270,7 +2270,7 @@ Is
   Retval                    Number;
   l_Nat_Id                  Number;
   l_Name                    Varchar2 (30)                     := Nvl (p_Name, p_Table_Name);
-  l_Immediate_Or_Deferred   Varchar2 (1)                      := 'I';
+  l_Immediate_Or_Deferred   Varchar2 (1)                      := case NM3NET.GET_GTY_SUB_GROUP_ALLOWED(p_Gty_Type) when 'Y' then 'D' else  'I' end;
   l_Nat                     Nm_Area_Types%Rowtype;
   l_Nth_Id                  Nm_Themes_All.Nth_Theme_Id%Type;
   l_Nth                     Nm_Themes_All%Rowtype;
@@ -5930,283 +5930,11 @@ begin
 return retval;
 end;        
    
---
------------------------------------------------------------------------------------------------------------------
---Function Register_Nat_Theme (
---                            p_Nt_Type          In   Nm_Types.Nt_Type%Type,
---                            p_Gty_Type         In   Nm_Group_Types.Ngt_Group_Type%Type,
---                            p_Base_Themes      In   Nm_Theme_Array,
---                            p_Table_Name       In   Varchar2,
---                            p_Spatial_Column   In   Varchar2 Default 'GEOLOC',
---                            p_Fk_Column        In   Varchar2 Default 'NE_ID',
---                            p_Name             In   Varchar2 Default Null,
---                            p_View_Flag        In   Varchar2 Default 'N',
---                            p_Base_Table_Nth   In   Nm_Themes_All.Nth_Theme_Id%Type Default Null
---                            ) Return Number
---Is
---  Retval                    Number;
---  l_Nat_Id                  Number;
---  l_Name                    Varchar2 (30)                     := Nvl (p_Name, p_Table_Name);
---  l_Immediate_Or_Deferred   Varchar2 (1)                      := 'D';
---  l_Nat                     Nm_Area_Types%Rowtype;
---  l_Nth_Id                  Nm_Themes_All.Nth_Theme_Id%Type;
---  l_Nth                     Nm_Themes_All%Rowtype;
---  l_Rec_Ntg                 Nm_Theme_Gtypes%Rowtype;
---
---Begin
---
---  If p_View_Flag = 'Y'  Then
---    l_Immediate_Or_Deferred := 'N';                --no update for views
---  End If;
---
---  Select  Nat_Id_Seq.Nextval
---  Into    l_Nat_Id
---  From    Dual;
---
---  l_Nat.Nat_Id              :=  l_Nat_Id;
---  l_Nat.Nat_Nt_Type         :=  p_Nt_Type;
---  l_Nat.Nat_Gty_Group_Type  :=  p_Gty_Type;
---  l_Nat.Nat_Descr           :=  'Spatial Representation of ' || p_Gty_Type || ' Groups';
---  l_Nat.Nat_Seq_No          :=  1;
---  l_Nat.Nat_Start_Date      :=  To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY');
---  l_Nat.Nat_End_Date        :=  Null;
---  l_Nat.Nat_Shape_Type      :=  'TRACED';
---
---  Begin
---    Insert Into Nm_Area_Types
---    (
---    Nat_Id,
---    Nat_Nt_Type,
---    Nat_Gty_Group_Type,
---    Nat_Descr,
---    Nat_Seq_No,
---    Nat_Start_Date,
---    Nat_End_Date,
---    Nat_Shape_Type
---    )
---    Values
---    (
---    l_Nat.Nat_Id,
---    l_Nat.Nat_Nt_Type,
---    l_Nat.Nat_Gty_Group_Type,
---    l_Nat.Nat_Descr,
---    l_Nat.Nat_Seq_No,
---    l_Nat.Nat_Start_Date,
---    l_Nat.Nat_End_Date,
---    l_Nat.Nat_Shape_Type
---    );
---  Exception
---    When Dup_Val_On_Index Then
---      Select  nat.Nat_Id
---      Into    l_Nat_Id
---      From    Nm_Area_Types nat
---      Where   nat.Nat_Nt_Type         =   p_Nt_Type
---      And     nat.Nat_Gty_Group_Type  =   p_Gty_Type;
---  End;
---
---  Retval := Nm3Seq.Next_Nth_Theme_Id_Seq;
---
---  nm_debug.debug('Assemble theme data - name = '||l_name );
---  -- generate the theme
---  l_Nth_Id              :=  Retval;
---  l_Nth.Nth_Theme_Id    :=  l_Nth_Id;
---  l_Nth.Nth_Theme_Name  :=  l_Name;
---  l_Nth.Nth_Table_Name  :=  p_Table_Name;
---  l_Nth.Nth_Where       :=  Null;
---  l_Nth.Nth_Pk_Column   :=  'NE_ID';
---  --
---  -- Task ID 0107889 - Set Label Column to NE_ID for Group layer base table themes
---  -- 05/10/09 AE Further restrict on the non DT theme 
---  --
---    
---  If      p_Base_Table_Nth      Is        Null
---      Or  l_Nth.Nth_Theme_Name  Not Like  '%DT' Then
---    l_Nth.Nth_Label_Column := 'NE_ID';
---  Else
---    l_Nth.Nth_Label_Column := 'NE_UNIQUE';
---  End If;
---  --
---  nm_debug.debug('Theme creation ');
---  
---  l_Nth.Nth_Rse_Table_Name        :=  'NM_ELEMENTS';
---  l_Nth.Nth_Rse_Fk_Column         :=  Null;
---  l_Nth.Nth_St_Chain_Column       :=  Null;
---  l_Nth.Nth_End_Chain_Column      :=  Null;
---  l_Nth.Nth_X_Column              :=  Null;
---  l_Nth.Nth_Y_Column              :=  Null;
---  l_Nth.Nth_Offset_Field          :=  Null;
---  l_Nth.Nth_Feature_Table         :=  p_Table_Name;
---  l_Nth.Nth_Feature_Pk_Column     :=  'NE_ID';
---  l_Nth.Nth_Feature_Fk_Column     :=  P_Fk_Column;
---  l_Nth.Nth_Xsp_Column            :=  Null;
---  l_Nth.Nth_Feature_Shape_Column  :=  p_Spatial_Column;
---  l_Nth.Nth_Hpr_Product           :=  'NET';
---  l_Nth.Nth_Location_Updatable    :=  'N';
---  l_Nth.Nth_Theme_Type            :=  'SDO';
---  l_Nth.Nth_Dependency            :=  'D';
---  l_Nth.Nth_Storage               :=  'S';
---  l_Nth.Nth_Update_On_Edit        :=  l_Immediate_Or_Deferred;
---  l_Nth.Nth_Use_History           :=  'Y';
---  l_Nth.Nth_Start_Date_Column     :=  'START_DATE';
---  l_Nth.Nth_End_Date_Column       :=  'END_DATE';
---  l_Nth.Nth_Base_Table_Theme      :=  p_Base_Table_Nth;
---  l_Nth.Nth_Sequence_Name         :=  'NTH_' || Nvl(p_Base_Table_Nth,Retval) || '_SEQ';
---  l_Nth.Nth_Snap_To_Theme         :=  'N';
---  l_Nth.Nth_Lref_Mandatory        :=  'N';
---  l_Nth.Nth_Tolerance             :=  10;
---  l_Nth.Nth_Tol_Units             :=  1;
---  nm_debug.debug('Theme creation - '||l_Nth.nth_theme_id);
---
---  Nm3Ins.Ins_Nth (l_Nth);
---  nm_debug.debug('Theme creation - inserted ');
---  --
---  --  Build theme gtype rowtype
---  l_Rec_Ntg.Ntg_Theme_Id  :=  l_Nth_Id;
---  l_Rec_Ntg.Ntg_Seq_No    :=  1;
---  l_Rec_Ntg.Ntg_Xml_Url   :=  Null;
---  l_Rec_Ntg.Ntg_Gtype     :=  '2006';
---  Nm3Ins.Ins_Ntg (p_Rec_Ntg => l_Rec_Ntg);
---
---  -- generate the link
---  Insert Into Nm_Area_Themes
---  (
---  Nath_Nat_Id,
---  Nath_Nth_Theme_Id
---  )
---  Values
---  (
---  l_Nat_Id,
---  l_Nth_Id
---  );
---    
-----  Create_Base_Themes( l_Nth_Id, p_Base_Themes );
---
---  If Hig.Get_Sysopt ('REGSDELAY') = 'Y' Then 
---    Execute Immediate (   'begin '
---                      || '    nm3sde.register_sde_layer( p_theme_id => '||To_Char( l_Nth.Nth_Theme_Id )||');'
---                      || 'end;'
---                      );
---  End If;
---
---  If p_View_Flag = 'N'  Then
---      
---    Declare
---      l_Role   Varchar2 (30);
---    Begin
---      l_Role := Hig.Get_Sysopt ('SDONETROLE');
---
---      If l_Role Is Not Null Then
---          
---        Insert Into Nm_Theme_Roles
---        (
---        Nthr_Theme_Id,
---        Nthr_Role,
---        Nthr_Mode
---        )
---        Values
---        (
---        l_Nth_Id,
---        l_Role,
---        'NORMAL'
---        );
---          
---      End If;
---    End;
---  End If;
---
---  Declare
---    l_Type Number;
---  Begin
---    If Nm3Net.Get_Gty_Sub_Group_Allowed( p_Gty_Type ) = 'Y' Then
---      l_Type := 3;
---    Else
---      l_Type := 2;
---    End If;
---      
-----    Create_Theme_Functions( p_Theme => l_Nth.Nth_Theme_Id, p_Pa => g_Network_Modules, p_Exclude => l_Type );
---      
---  End;
---
---  Return l_Nth_Id;
---End Register_Nat_Theme;
---
---
-Procedure Create_Spatial_Table  (
-                                p_Table               In   Varchar2,
-                                p_Start_Date_Column   In   Varchar2 Default Null,
-                                p_End_Date_Column     In   Varchar2 Default Null
-                                )
-Is
-  Cur_String            Varchar2 (2000);
-  Con_String            Varchar2 (2000);
-  Uk_String             Varchar2 (2000);
-  b_Use_History         Constant Boolean :=p_Start_Date_Column Is Not Null And p_End_Date_Column Is Not Null;
-Begin
-  --
-
-      If b_Use_History Then
-        Cur_String :=  'create table '
-                    || p_Table
-                    || ' ( objectid number(38) not null, '
-                    || '   ne_id number(38) not null, '
-                    || '   geoloc mdsys.sdo_geometry not null,'
-                    || '   '
-                    || p_Start_Date_Column
-                    || ' date, '
-                    || '   '
-                    || p_End_Date_Column
-                    || ' date, date_created date, date_modified date,'
-                    || '   modified_by varchar2(30), created_by varchar2(30) )';
-        Con_String :=  'alter table '
-                    || p_Table
-                    || ' ADD CONSTRAINT '
-                    || p_Table
-                    || '_PK PRIMARY KEY '
-                    || ' ( ne_id, '
-                    || p_Start_Date_Column
-                    || ' )';
-      Else  -- no history
-        Cur_String :=  'create table '
-                    || p_Table
-                    || ' ( objectid number(38) not null, '
-                    || '   ne_id number(38) not null, '
-                    || '   geoloc mdsys.sdo_geometry not null,'
-                    || '   date_created date, date_modified date,'
-                    || '   modified_by varchar2(30), created_by varchar2(30) )';
-        Con_String :=  'alter table '
-                    || p_Table
-                    || ' ADD CONSTRAINT '
-                    || p_Table
-                    || '_PK PRIMARY KEY '
-                    || ' ( ne_id )';
-      End If; -- history
-
-      Uk_String :=  'alter table '
-                 || p_Table
-                 || ' ADD ( CONSTRAINT '
-                 || p_Table
-                 || '_UK UNIQUE '
-                 || ' (objectid))';
-
-      Execute Immediate Cur_String;
-
-      Execute Immediate Con_String;
-      
-      Execute Immediate Uk_String;
-
- 
-  nm3ddl.create_synonym_for_object(p_object_name => p_Table);
-
-End Create_Spatial_Table;
---
-  
-
------------------------------------------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------------------------------------
 Begin
 
-  nm_debug.delete_debug(true);
-  nm_debug.debug_on;
+--  nm_debug.delete_debug(true);
+--  nm_debug.debug_on;
   NM_DEBUG.DEBUG(l_tab);
 
   nm3ctx.set_context('PARENT_GROUP_TYPE', p_Gty_Type ); 
@@ -6234,7 +5962,7 @@ Begin
   --
   nm_debug.debug('Creating spatial table ');
   
-  Create_Spatial_Table (l_Tab, 'START_DATE', 'END_DATE');
+  Create_Spatial_Table (l_Tab, TRUE, 'START_DATE', 'END_DATE');
   
   nm_debug.debug('Created Table '||l_Tab );
   ---------------------------------------------------------------
@@ -6259,9 +5987,9 @@ Begin
                                     );
   l_Seq := Nm3Sdo.Create_Spatial_Seq (l_Theme_Id);
 
---  If Not Nm3Ddl.Does_Object_Exist (l_View, 'VIEW')  Then
---    Nm3Inv_View.Create_View_For_Nt_Type (p_Nt_Type, p_Gty_Type);
---  End If;
+  If Not Nm3Ddl.Does_Object_Exist (l_View, 'VIEW')  Then
+    Nm3Inv_View.Create_View_For_Nt_Type (p_Nt_Type, p_Gty_Type);
+  End If;
 
 /*
   Create_Spatial_Date_View (l_Tab);
@@ -6298,7 +6026,6 @@ Begin
 
   --need a join view between spatial table and NT view
 
-/* No need for these view types yet 
 
   l_View := nm3sdm.Create_Nat_Sdo_Join_View  (
                                       p_Feature_Table_Name  => l_Tab
@@ -6320,7 +6047,6 @@ Begin
                                         l_Theme_Id
                                        );
   End If;
-*/
 
   Begin
     Nm3Ddl.Analyse_Table  (
