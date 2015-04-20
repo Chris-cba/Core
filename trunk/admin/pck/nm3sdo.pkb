@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 --
 ---   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.88   Apr 15 2015 16:16:08   Rob.Coupe  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.89   Apr 20 2015 13:29:30   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3sdo.pkb  $
---       Date into PVCS   : $Date:   Apr 15 2015 16:16:08  $
---       Date fetched Out : $Modtime:   Apr 15 2015 14:51:50  $
---       PVCS Version     : $Revision:   2.88  $
+--       Date into PVCS   : $Date:   Apr 20 2015 13:29:30  $
+--       Date fetched Out : $Modtime:   Apr 20 2015 13:29:02  $
+--       PVCS Version     : $Revision:   2.89  $
 --       Based on
 ------------------------------------------------------------------
 --   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
@@ -22,7 +22,7 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 -- Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 
-   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.88  $"';
+   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.89  $"';
    g_package_name    CONSTANT VARCHAR2 (30)  := 'NM3SDO';
    g_batch_size      INTEGER                 := NVL( TO_NUMBER(Hig.get_sysopt('SDOBATSIZE')), 10);
    g_clip_type       VARCHAR2(30)            := NVL(Hig.get_sysopt('SDOCLIPTYP'),'SDO');
@@ -3123,7 +3123,16 @@ begin
           
           nm_debug.debug(l_str);
           
-          execute immediate l_str using ne_rec.ne_id, ne_rec.ne_id, ne_rec.ne_id;
+          begin
+            execute immediate l_str using ne_rec.ne_id, ne_rec.ne_id, ne_rec.ne_id;
+          exception
+            WHEN OTHERS THEN
+              IF p_job_id IS NULL THEN       
+                 Nm_Debug.DEBUG('Failed on NE_ID = '||TO_CHAR( ne_rec.ne_id )||' - Error = '||SQLERRM );
+              ELSE
+                add_dyn_seg_exception( 282, p_job_id, ne_rec.ne_id, NULL, NULL, NULL, NULL, NULL, SQLERRM );
+              END IF;
+          END;
           
         COMMIT;
      END LOOP;
