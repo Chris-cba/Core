@@ -1,15 +1,15 @@
-Create Or Replace Package Body Nm3Sdm
+CREATE OR REPLACE Package Body Nm3Sdm
 As
 --
 -----------------------------------------------------------------------------
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.74   Apr 16 2015 10:05:58   Rob.Coupe  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.75   Apr 22 2015 13:50:14   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3sdm.pkb  $
---       Date into PVCS   : $Date:   Apr 16 2015 10:05:58  $
---       Date fetched Out : $Modtime:   Apr 16 2015 11:04:36  $
---       PVCS Version     : $Revision:   2.74  $
+--       Date into PVCS   : $Date:   Apr 22 2015 13:50:14  $
+--       Date fetched Out : $Modtime:   Apr 22 2015 14:55:12  $
+--       PVCS Version     : $Revision:   2.75  $
 --
 --   Author : R.A. Coupe
 --
@@ -21,7 +21,7 @@ As
 --
 --all global package variables here
 --
-  g_Body_Sccsid     Constant Varchar2 (2000) := '"$Revision:   2.74  $"';
+  g_Body_Sccsid     Constant Varchar2 (2000) := '"$Revision:   2.75  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
   g_Package_Name    Constant Varchar2 (30)   := 'NM3SDM';
@@ -1436,31 +1436,18 @@ Procedure  Split_Element_At_Xy (
                                )
 Is
   l_Geom    Mdsys.Sdo_Geometry := Nm3Sdo.Get_Layer_Element_Geometry( p_Layer, p_Ne_Id );
+  l_Usgm     user_sdo_geom_metadata%rowtype;
 
   l_Measure  Number;
   l_Distance Number;
-  l_Usgm     User_Sdo_Geom_Metadata%Rowtype;
-  l_End      Number;
-  l_tol      Number;
+  l_end      Number;
 Begin
-  l_Usgm := Nm3Sdo.Get_Theme_Metadata( p_Layer );
   If Nm3Sdo.Element_Has_Shape( p_Layer, p_Ne_Id ) = 'TRUE'  Then
     l_Distance := sdo_geom.sdo_distance( l_geom, nm3sdo.get_2d_pt(p_x, p_y), 0.005);
-    if l_Distance > to_number( nvl(hig.get_sysopt('SDOPROXTOL'), 2 )) then
-      raise_application_error(-20001, 'Split position is not in close proximity to element geometry');
-    end if;
-    
     l_Measure := Nm3Sdo.Get_Measure ( p_Layer, p_Ne_Id, p_X, p_Y ).Lr_Offset;
 
-      select NM3SDO.GET_TOL_FROM_UNIT_MASK(nt_length_unit) into l_tol 
-        from nm_elements, nm_types where ne_id = p_Ne_Id and ne_nt_type = nt_type;
+    l_Usgm := Nm3Sdo.Get_Theme_Metadata( p_Layer );
 
-    l_End   := Nm3Net.Get_Datum_Element_Length( p_Ne_Id );
-    
-      if l_measure < l_tol or abs(l_End - l_measure ) < l_tol then
-        raise_application_error(-20001, 'Split position cannot be at the start or end of an element');
-      end if;
-    
     Sdo_Lrs.Split_Geom_Segment( l_Geom, l_Usgm.Diminfo, l_Measure, p_Geom_1, p_Geom_2 );
 
     If p_Measure Is Not Null Then
@@ -1504,9 +1491,14 @@ Procedure Split_Element_Shapes  (
                                 p_Y         In   Number Default Null
                                 )
 Is
-  l_Layer   Number;
-  l_Geom1   Mdsys.Sdo_Geometry;
-  l_Geom2   Mdsys.Sdo_Geometry;
+  l_Layer    Number;
+  l_geom     Mdsys.Sdo_Geometry;
+  l_Geom1    Mdsys.Sdo_Geometry;
+  l_Geom2    Mdsys.Sdo_Geometry;
+  l_Usgm     user_sdo_geom_metadata%rowtype;
+  l_tol      number;
+  l_End      number;
+  l_distance number;
 Begin
   l_Layer := Get_Nt_Theme (Nm3Get.Get_Ne (p_Ne_Id).Ne_Nt_Type);
   
@@ -1515,8 +1507,23 @@ Begin
   END IF;
 
   If Nm3Sdo.Element_Has_Shape (L_Layer, P_Ne_Id) = 'TRUE' Then
+  
+    l_geom :=  Nm3Sdo.Get_Layer_Element_Geometry( l_Layer, p_Ne_Id );
+  
+    l_Usgm := Nm3Sdo.Get_Theme_Metadata( l_Layer );
+    
+    select greatest( NM3SDO.GET_TOL_FROM_UNIT_MASK(nt_length_unit), to_number( nvl(hig.get_sysopt('SDOMINPROJ'), '0'))) into l_tol
+    from nm_elements, nm_types where ne_id = p_Ne_Id and ne_nt_type = nt_type;
+    
+    l_End   := Nm3Net.Get_Datum_Element_Length( p_Ne_Id );
+    
+  
     If p_X Is Null And p_Y Is Null Then
 
+      if p_measure < l_tol or abs(l_End - p_measure ) < l_tol then
+        raise_application_error(-20001, 'Split position cannot be at the start or end of an element');
+      end if;
+        
       Nm3Sdo.Split_Element_At_Measure (
                                       p_Layer        => l_Layer,
                                       p_Ne_Id        => p_Ne_Id,
@@ -1526,7 +1533,13 @@ Begin
                                       p_Geom1        => l_Geom1,
                                       p_Geom2        => l_Geom2
                                       );
+
     Elsif p_X Is Not Null And p_Y Is Not Null Then
+
+      l_Distance := sdo_geom.sdo_distance( l_geom, nm3sdo.get_2d_pt(p_x, p_y), 0.005);
+      if l_Distance > to_number( nvl(hig.get_sysopt('SDOPROXTOL'), 2 )) then
+        raise_application_error(-20001, 'Split position is not in close proximity to element geometry');
+      end if;
 
       Split_Element_At_Xy (
                           p_Layer        =>   l_Layer,
@@ -8799,4 +8812,3 @@ End Rebuild_All_Inv_Sdo_Join_View;
 --
 End Nm3Sdm;
 /
-
