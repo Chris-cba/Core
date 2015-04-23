@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 --
 ---   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.89   Apr 20 2015 13:29:30   Rob.Coupe  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.90   Apr 23 2015 16:15:52   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3sdo.pkb  $
---       Date into PVCS   : $Date:   Apr 20 2015 13:29:30  $
---       Date fetched Out : $Modtime:   Apr 20 2015 13:29:02  $
---       PVCS Version     : $Revision:   2.89  $
+--       Date into PVCS   : $Date:   Apr 23 2015 16:15:52  $
+--       Date fetched Out : $Modtime:   Apr 23 2015 16:15:08  $
+--       PVCS Version     : $Revision:   2.90  $
 --       Based on
 ------------------------------------------------------------------
 --   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
@@ -22,7 +22,7 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 -- Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 
-   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.89  $"';
+   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.90  $"';
    g_package_name    CONSTANT VARCHAR2 (30)  := 'NM3SDO';
    g_batch_size      INTEGER                 := NVL( TO_NUMBER(Hig.get_sysopt('SDOBATSIZE')), 10);
    g_clip_type       VARCHAR2(30)            := NVL(Hig.get_sysopt('SDOCLIPTYP'),'SDO');
@@ -49,6 +49,8 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 --
 -----------------------------------------------------------------------------
 --
+
+         
 PROCEDURE internal_member_dynseg (
    p_table_name   IN VARCHAR2,
    p_type         IN VARCHAR2,
@@ -3065,24 +3067,32 @@ procedure create_gofg_data (    p_Table_Name in varchar2,
                                 p_Seq_Name   in varchar2,
                                 p_Job_Id     in integer 
                                 ) is
-l_str varchar2(2000);
+l_str varchar2(4000);
+l_substr varchar2(4000);
+l_count integer;
+--
+
+--
 begin
    nm3ctx.set_context('PARENT_GROUP_TYPE', p_Gty_Type );
---   
-  nm_debug.debug('Get list of base themes from which to derive shapes');
-     for irec in (
-         select t2.*, GET_THEME_DIMINFO(nth_theme_id) diminfo
+   
+   select listagg (nm3sdo.get_gofg_substr(nth_feature_pk_column, nth_feature_table, nth_feature_shape_column, dim, nth_use_history), ' UNION ALL ') within group (order by nth_feature_table ), count(*)
+   into l_substr, l_count
+   from (
+   select min(levl) over (partition by top_group_type) min_levl, t3.* from (         
+         select row_number() over (partition by  parent_group_type 
+                            order by parent_group_type, child_group_type ) rn, 
+         t2.*, nm3sdo.get_dimension(nm3sdo.GET_THEME_DIMINFO(nth_theme_id)) dim
          from ( 
         select * from v_nm_sub_group_structure g, v_nm_network_themes t
         where g.child_nt_type    = t.nt_type
         and   nvl(g.child_group_type,'£$%^') = nvl(t.gty_type, '£$%^')
         and nth_base_table_theme is null
         and nth_feature_table not like 'SECT_SS%' order by ord ) t2   
-        where rownum = 1
-        ) loop   
+) t3 
+) t4 where  levl = min_levl;
 
-        nm_debug.debug('Top of loop of base themes from which to derive shapes');
-   
+--   
         for ne_rec in ( select ne_id from nm_elements where ne_gty_group_type = p_gty_type ) loop 
             
         nm_debug.debug('generating data for gty = '||p_gty_type||' ne = '||ne_rec.ne_id );  
@@ -3093,52 +3103,56 @@ begin
                                        ' end_date, '||
                                        ' geoloc ) '||
          'SELECT * from ( '||
-         'SELECT :ne_id objectid, '||
-               ' :ne_id ne_id,'||
+         'SELECT ne_id objectid, '||
+               ' ne_id ne_id,'||
                 ' TRUNC (SYSDATE), NULL, '||
                '  sdo_aggr_union ( '||
-               '    sdoaggrtype ( ';
-          if irec.diminfo.count = 3 then     
-             l_str := l_str||'  SDO_LRS.convert_to_std_geom ('||irec.nth_feature_shape_column||' ) ';
-          else
-             l_str := l_str||irec.nth_feature_shape_column;
-          end if;
---
-          l_str := l_str||
-          ' , 0.005)) GEOLOC '||
-          ' FROM (    SELECT nm_ne_id_in, nm_ne_id_of '||
-          '             FROM nm_members '||
-          '       CONNECT BY PRIOR nm_ne_id_of = nm_ne_id_in '||
-          '       START WITH nm_ne_id_in = :ne_id), '||irec.nth_feature_table||' s '||         
-          ' WHERE     nm_ne_id_of = s.'||irec.nth_feature_pk_column;
-          
-          if irec.theme_type in ('Linear Group', 'Non-Linear Group' ) then        
-             l_str := l_str ||
-             '     AND end_date IS NULL )'||
-             ' WHERE GEOLOC IS NOT NULL';
-          elsif irec.theme_type in ('Group of Groups', 'Linear Datum') then
-             l_str := l_str ||
-             ' ) WHERE GEOLOC IS NOT NULL';
-          end if;
-          
+               '    sdoaggrtype ( geoloc, 0.005)) GEOLOC '||
+          ' FROM ( '||
+          l_substr||
+          ' ) group by ne_id ) '; 
+
           nm_debug.debug(l_str);
           
           begin
-            execute immediate l_str using ne_rec.ne_id, ne_rec.ne_id, ne_rec.ne_id;
+            execute immediate l_str using ne_rec.ne_id, ne_rec.ne_id;
           exception
             WHEN OTHERS THEN
               IF p_job_id IS NULL THEN       
                  Nm_Debug.DEBUG('Failed on NE_ID = '||TO_CHAR( ne_rec.ne_id )||' - Error = '||SQLERRM );
               ELSE
-                add_dyn_seg_exception( 282, p_job_id, ne_rec.ne_id, NULL, NULL, NULL, NULL, NULL, SQLERRM );
+--                add_dyn_seg_exception( 282, p_job_id, ne_rec.ne_id, NULL, NULL, NULL, NULL, NULL, SQLERRM );
+                 Nm_Debug.DEBUG('Failed on NE_ID = '||TO_CHAR( ne_rec.ne_id )||' - Error = '||SQLERRM );
               END IF;
           END;
           
         COMMIT;
      END LOOP;
-     END LOOP;
    
 end create_gofg_data;
+
+function get_gofg_substr( p_feature_pk_column in varchar2, p_feature_table in varchar2, 
+          p_feature_shape_column in varchar2, p_dim in integer,
+          p_use_history in varchar2 ) return varchar2 is
+begin
+   return ' select nm_ne_id_in ne_id, nm_ne_id_of, '||
+           case  p_dim
+             when 2 then p_feature_shape_column
+             when 3 then 'SDO_LRS.convert_to_std_geom ('||p_feature_shape_column||' ) '
+           end || 
+          ' geoloc '||
+          ' from (    SELECT nm_ne_id_in, nm_ne_id_of '||
+          '             FROM nm_members  '||
+          '       CONNECT BY PRIOR nm_ne_id_of = nm_ne_id_in '|| 
+          '       START WITH nm_ne_id_in = :p_ne_id ), '||p_feature_table||' s '||          
+          ' WHERE     nm_ne_id_of = s.'||p_feature_pk_column||
+          case p_use_history
+             when 'Y' then 
+               ' and end_date is null '
+             when 'N' then
+               NULL
+          end;
+end;    
 
 
 FUNCTION sample_elements_in_route( p_layer    IN  NM_THEMES_ALL.nth_theme_id%TYPE,
@@ -10753,8 +10767,7 @@ BEGIN
    end loop;
 END;
 
+
 --
 END Nm3sdo;
 /
-
-
