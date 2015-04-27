@@ -2,11 +2,11 @@
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/views/v_geom_on_route.vw-arc   1.2   Apr 27 2015 11:01:38   Chris.Baugh  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/views/v_geom_on_route.vw-arc   1.3   Apr 27 2015 11:47:06   Chris.Baugh  $
 --       Module Name      : $Workfile:   v_geom_on_route.vw  $
---       Date into PVCS   : $Date:   Apr 27 2015 11:01:38  $
---       Date fetched Out : $Modtime:   Apr 27 2015 11:00:26  $
---       Version          : $Revision:   1.2  $
+--       Date into PVCS   : $Date:   Apr 27 2015 11:47:06  $
+--       Date fetched Out : $Modtime:   Apr 27 2015 11:46:34  $
+--       Version          : $Revision:   1.3  $
 -------------------------------------------------------------------------
 --
 -----------------------------------------------------------------------------
@@ -69,7 +69,7 @@ SELECT *
                                               'V_MCP_%'
                                        AND nit_table_name IS NULL))
  WHERE geoloc IS NOT NULL;
-/
+
 
 COMMENT ON MATERIALIZED VIEW V_GEOM_ON_ROUTE IS 'Snapshot of assets on route with aggregated geometry'
 /
