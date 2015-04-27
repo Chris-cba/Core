@@ -2,11 +2,11 @@
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/views/v_obj_on_route.vw-arc   1.0   Apr 08 2015 10:24:54   Chris.Baugh  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/views/v_obj_on_route.vw-arc   1.1   Apr 27 2015 10:56:26   Chris.Baugh  $
 --       Module Name      : $Workfile:   v_obj_on_route.vw  $
---       Date into PVCS   : $Date:   Apr 08 2015 10:24:54  $
---       Date fetched Out : $Modtime:   Mar 26 2015 15:35:02  $
---       Version          : $Revision:   1.0  $
+--       Date into PVCS   : $Date:   Apr 27 2015 10:56:26  $
+--       Date fetched Out : $Modtime:   Apr 27 2015 10:54:44  $
+--       Version          : $Revision:   1.1  $
 -------------------------------------------------------------------------
 --
 -----------------------------------------------------------------------------
@@ -14,8 +14,18 @@
 -----------------------------------------------------------------------------
 --
 
-DROP MATERIALIZED VIEW V_OBJ_ON_ROUTE
-/
+DECLARE
+  view_does_not_exist  EXCEPTION;
+  pragma exception_init(view_does_not_exist,-12003);
+
+BEGIN
+  EXECUTE IMMEDIATE 'DROP MATERIALIZED VIEW V_OBJ_ON_ROUTE';
+EXCEPTION
+  WHEN view_does_not_exist THEN
+    NULL;
+  WHEN OTHERS THEN
+    RAISE;
+END;
 
 CREATE MATERIALIZED VIEW V_OBJ_ON_ROUTE (REFNT,REFNT_TYPE,OBJ_TYPE,OBJ_ID,SEG_ID,SEQ_ID,DIR_FLAG,NM_BEGIN_MP,NM_END_MP,M_UNIT)
 BUILD IMMEDIATE
