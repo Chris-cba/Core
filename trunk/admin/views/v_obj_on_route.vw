@@ -2,11 +2,11 @@
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/views/v_obj_on_route.vw-arc   1.2   Apr 27 2015 11:01:20   Chris.Baugh  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/views/v_obj_on_route.vw-arc   1.3   Apr 27 2015 11:38:20   Chris.Baugh  $
 --       Module Name      : $Workfile:   v_obj_on_route.vw  $
---       Date into PVCS   : $Date:   Apr 27 2015 11:01:20  $
---       Date fetched Out : $Modtime:   Apr 27 2015 11:00:36  $
---       Version          : $Revision:   1.2  $
+--       Date into PVCS   : $Date:   Apr 27 2015 11:38:20  $
+--       Date fetched Out : $Modtime:   Apr 27 2015 11:35:24  $
+--       Version          : $Revision:   1.3  $
 -------------------------------------------------------------------------
 --
 -----------------------------------------------------------------------------
@@ -65,6 +65,6 @@ CREATE INDEX MV_OOR_INV_IDX ON V_OBJ_ON_ROUTE
 /
 
 BEGIN
-  NM3DDL.CREATE_SYNONYM_FOR_OBJECT('MV_ROUTE_TYPE');
+  NM3DDL.CREATE_SYNONYM_FOR_OBJECT('V_OBJ_ON_ROUTE');
 END;
 /
