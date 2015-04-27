@@ -2,11 +2,11 @@
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/views/v_obj_on_route.vw-arc   1.1   Apr 27 2015 10:56:26   Chris.Baugh  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/views/v_obj_on_route.vw-arc   1.2   Apr 27 2015 11:01:20   Chris.Baugh  $
 --       Module Name      : $Workfile:   v_obj_on_route.vw  $
---       Date into PVCS   : $Date:   Apr 27 2015 10:56:26  $
---       Date fetched Out : $Modtime:   Apr 27 2015 10:54:44  $
---       Version          : $Revision:   1.1  $
+--       Date into PVCS   : $Date:   Apr 27 2015 11:01:20  $
+--       Date fetched Out : $Modtime:   Apr 27 2015 11:00:36  $
+--       Version          : $Revision:   1.2  $
 -------------------------------------------------------------------------
 --
 -----------------------------------------------------------------------------
@@ -26,6 +26,7 @@ EXCEPTION
   WHEN OTHERS THEN
     RAISE;
 END;
+/
 
 CREATE MATERIALIZED VIEW V_OBJ_ON_ROUTE (REFNT,REFNT_TYPE,OBJ_TYPE,OBJ_ID,SEG_ID,SEQ_ID,DIR_FLAG,NM_BEGIN_MP,NM_END_MP,M_UNIT)
 BUILD IMMEDIATE
@@ -66,3 +67,4 @@ CREATE INDEX MV_OOR_INV_IDX ON V_OBJ_ON_ROUTE
 BEGIN
   NM3DDL.CREATE_SYNONYM_FOR_OBJECT('MV_ROUTE_TYPE');
 END;
+/
