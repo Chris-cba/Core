@@ -2,11 +2,11 @@
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/views/v_geom_on_route.vw-arc   1.3   Apr 27 2015 11:47:06   Chris.Baugh  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/views/v_geom_on_route.vw-arc   1.4   Apr 27 2015 12:02:38   Chris.Baugh  $
 --       Module Name      : $Workfile:   v_geom_on_route.vw  $
---       Date into PVCS   : $Date:   Apr 27 2015 11:47:06  $
---       Date fetched Out : $Modtime:   Apr 27 2015 11:46:34  $
---       Version          : $Revision:   1.3  $
+--       Date into PVCS   : $Date:   Apr 27 2015 12:02:38  $
+--       Date fetched Out : $Modtime:   Apr 27 2015 12:00:26  $
+--       Version          : $Revision:   1.4  $
 -------------------------------------------------------------------------
 --
 -----------------------------------------------------------------------------
@@ -78,13 +78,24 @@ CREATE INDEX VGOR_OBJ_IDX ON V_GEOM_ON_ROUTE
 (OBJ_TYPE, OBJ_ID)
 /
 
-INSERT INTO user_sdo_geom_metadata
-   SELECT 'V_GEOM_ON_ROUTE',
-          'GEOLOC',
-          diminfo,
-          srid
-     FROM user_sdo_geom_metadata
-    WHERE table_name = 'NM_NSG_ESU_SHAPES_TABLE'
+DECLARE
+  data_exists  EXCEPTION;
+  pragma exception_init(data_exists,-13223);
+
+BEGIN
+  EXECUTE IMMEDIATE 'INSERT INTO user_sdo_geom_metadata '||
+                    'SELECT ''V_GEOM_ON_ROUTE'','||
+                            '''GEOLOC'','||
+                            'diminfo,'||
+                            'srid '||
+                      'FROM user_sdo_geom_metadata '||
+                     'WHERE table_name = ''NM_NSG_ESU_SHAPES_TABLE''';
+EXCEPTION
+  WHEN data_exists THEN
+    NULL;
+  WHEN OTHERS THEN
+    RAISE;
+END;
 /
 
 CREATE INDEX VGOR_SPIDX ON V_GEOM_ON_ROUTE
