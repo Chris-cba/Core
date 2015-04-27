@@ -2,11 +2,11 @@
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/views/v_geom_on_route.vw-arc   1.1   Apr 27 2015 10:57:08   Chris.Baugh  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/views/v_geom_on_route.vw-arc   1.2   Apr 27 2015 11:01:38   Chris.Baugh  $
 --       Module Name      : $Workfile:   v_geom_on_route.vw  $
---       Date into PVCS   : $Date:   Apr 27 2015 10:57:08  $
---       Date fetched Out : $Modtime:   Apr 27 2015 10:54:28  $
---       Version          : $Revision:   1.1  $
+--       Date into PVCS   : $Date:   Apr 27 2015 11:01:38  $
+--       Date fetched Out : $Modtime:   Apr 27 2015 11:00:26  $
+--       Version          : $Revision:   1.2  $
 -------------------------------------------------------------------------
 --
 -----------------------------------------------------------------------------
@@ -26,6 +26,7 @@ EXCEPTION
   WHEN OTHERS THEN
     RAISE;
 END;
+/
 
 CREATE MATERIALIZED VIEW V_GEOM_ON_ROUTE
    (
@@ -97,3 +98,4 @@ CREATE INDEX VGOR_NE_IDX ON V_GEOM_ON_ROUTE
 BEGIN
   NM3DDL.CREATE_SYNONYM_FOR_OBJECT('V_GEOM_ON_ROUTE');
 END;
+/
