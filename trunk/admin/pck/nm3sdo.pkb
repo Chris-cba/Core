@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 --
 ---   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.90   Apr 23 2015 16:15:52   Rob.Coupe  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.91   Apr 29 2015 12:28:48   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3sdo.pkb  $
---       Date into PVCS   : $Date:   Apr 23 2015 16:15:52  $
---       Date fetched Out : $Modtime:   Apr 23 2015 16:15:08  $
---       PVCS Version     : $Revision:   2.90  $
+--       Date into PVCS   : $Date:   Apr 29 2015 12:28:48  $
+--       Date fetched Out : $Modtime:   Apr 29 2015 12:28:12  $
+--       PVCS Version     : $Revision:   2.91  $
 --       Based on
 ------------------------------------------------------------------
 --   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
@@ -22,7 +22,7 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 -- Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 
-   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.90  $"';
+   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.91  $"';
    g_package_name    CONSTANT VARCHAR2 (30)  := 'NM3SDO';
    g_batch_size      INTEGER                 := NVL( TO_NUMBER(Hig.get_sysopt('SDOBATSIZE')), 10);
    g_clip_type       VARCHAR2(30)            := NVL(Hig.get_sysopt('SDOCLIPTYP'),'SDO');
@@ -3115,7 +3115,7 @@ begin
           nm_debug.debug(l_str);
           
           begin
-            execute immediate l_str using ne_rec.ne_id, ne_rec.ne_id;
+            execute immediate l_str using ne_rec.ne_id;
           exception
             WHEN OTHERS THEN
               IF p_job_id IS NULL THEN       
