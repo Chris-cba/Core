@@ -2,11 +2,11 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/nm_4700_fix16.sql-arc   1.0   Apr 29 2015 12:52:56   Shivani.Gaind  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/nm_4700_fix16.sql-arc   1.1   Apr 29 2015 14:23:46   Shivani.Gaind  $
 --       Module Name      : $Workfile:   nm_4700_fix16.sql  $
---       Date into PVCS   : $Date:   Apr 29 2015 12:52:56  $
---       Date fetched Out : $Modtime:   Apr 29 2015 12:41:32  $
---       PVCS Version     : $Revision:   1.0  $
+--       Date into PVCS   : $Date:   Apr 29 2015 14:23:46  $
+--       Date fetched Out : $Modtime:   Apr 29 2015 14:18:52  $
+--       PVCS Version     : $Revision:   1.1  $
 -- 
 --------------------------------------------------------------------------------
 --   Copyright (c) 2014 Bentley Systems Incorporated.
@@ -266,6 +266,7 @@ DECLARE
         and dt.trigger_name = do.object_name and UPPER(do.object_type) = 'TRIGGER';
     type lt_halt is table of c_alert_type%ROWTYPE index by binary_integer;      
     t_alert      lt_halt;
+    t_alert1      lt_halt;
 BEGIN
     dbms_output.put_line('Status of Triggers on existing Alerts');
     OPEN C_alert_type;
@@ -282,10 +283,13 @@ BEGIN
     END LOOP;
     dbms_output.put_line(' ');
     dbms_output.put_line('Triggers ReGenerated: ');
-    FOR i IN 1..t_alert.COUNT
+    OPEN C_alert_type;
+    FETCH C_alert_type BULK COLLECT INTO t_alert1;
+    CLOSE C_alert_type;
+    FOR i IN 1..t_alert1.COUNT
     LOOP
-        l_trg_status := hig_alert.get_trigger_status(t_alert(i).halt_trigger_name);
-        DBMS_OUTPUT.PUT_LINE(t_alert(i).halt_trigger_name||' : '||t_alert(i).STATUS);
+        l_trg_status := hig_alert.get_trigger_status(t_alert1(i).halt_trigger_name);
+        DBMS_OUTPUT.PUT_LINE(t_alert1(i).halt_trigger_name||' : '||t_alert1(i).STATUS);
     END LOOP;    
     dbms_output.put_line('Finished ReGeneration');
 EXCEPTION
