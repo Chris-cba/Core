@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 --
 ---   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.91   Apr 29 2015 12:28:48   Rob.Coupe  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.92   Apr 30 2015 13:32:36   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3sdo.pkb  $
---       Date into PVCS   : $Date:   Apr 29 2015 12:28:48  $
---       Date fetched Out : $Modtime:   Apr 29 2015 12:28:12  $
---       PVCS Version     : $Revision:   2.91  $
+--       Date into PVCS   : $Date:   Apr 30 2015 13:32:36  $
+--       Date fetched Out : $Modtime:   Apr 30 2015 13:31:06  $
+--       PVCS Version     : $Revision:   2.92  $
 --       Based on
 ------------------------------------------------------------------
 --   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
@@ -22,7 +22,7 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 -- Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 
-   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.91  $"';
+   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.92  $"';
    g_package_name    CONSTANT VARCHAR2 (30)  := 'NM3SDO';
    g_batch_size      INTEGER                 := NVL( TO_NUMBER(Hig.get_sysopt('SDOBATSIZE')), 10);
    g_clip_type       VARCHAR2(30)            := NVL(Hig.get_sysopt('SDOCLIPTYP'),'SDO');
@@ -3068,6 +3068,7 @@ procedure create_gofg_data (    p_Table_Name in varchar2,
                                 p_Job_Id     in integer 
                                 ) is
 l_str varchar2(4000);
+l_pl  varchar2(4000);
 l_substr varchar2(4000);
 l_count integer;
 --
@@ -3076,10 +3077,12 @@ l_count integer;
 begin
    nm3ctx.set_context('PARENT_GROUP_TYPE', p_Gty_Type );
    
-   select listagg (nm3sdo.get_gofg_substr(nth_feature_pk_column, nth_feature_table, nth_feature_shape_column, dim, nth_use_history), ' UNION ALL ') within group (order by nth_feature_table ), count(*)
+   select    listagg (nm3sdo.get_gofg_substr(nth_feature_pk_column, nth_feature_table, nth_feature_shape_column, dim, nth_use_history), ' UNION ALL ') within group (order by nth_feature_table ), count(*)
    into l_substr, l_count
    from (
-   select min(levl) over (partition by top_group_type) min_levl, t3.* from (         
+     select top_group_type, child_group_type, nth_feature_pk_column, nth_feature_table, nth_feature_shape_column, dim, nth_use_history 
+     from (
+       select min(levl) over (partition by top_group_type) min_levl, t3.* from (         
          select row_number() over (partition by  parent_group_type 
                             order by parent_group_type, child_group_type ) rn, 
          t2.*, nm3sdo.get_dimension(nm3sdo.GET_THEME_DIMINFO(nth_theme_id)) dim
@@ -3089,8 +3092,10 @@ begin
         and   nvl(g.child_group_type,'£$%^') = nvl(t.gty_type, '£$%^')
         and nth_base_table_theme is null
         and nth_feature_table not like 'SECT_SS%' order by ord ) t2   
-) t3 
-) t4 where  levl = min_levl;
+       ) t3
+     ) t4 where  levl = min_levl
+     group by top_group_type, child_group_type, nth_feature_pk_column, nth_feature_table, nth_feature_shape_column, dim, nth_use_history
+   );
 
 --   
         for ne_rec in ( select ne_id from nm_elements where ne_gty_group_type = p_gty_type ) loop 
@@ -3108,7 +3113,7 @@ begin
                 ' TRUNC (SYSDATE), NULL, '||
                '  sdo_aggr_union ( '||
                '    sdoaggrtype ( geoloc, 0.005)) GEOLOC '||
-          ' FROM ( '||
+          ' FROM ( with ne_data as ( select ne_id root_ne from nm_elements where ne_id = :p_ne_id) '||
           l_substr||
           ' ) group by ne_id ) '; 
 
@@ -3141,10 +3146,10 @@ begin
              when 3 then 'SDO_LRS.convert_to_std_geom ('||p_feature_shape_column||' ) '
            end || 
           ' geoloc '||
-          ' from (    SELECT nm_ne_id_in, nm_ne_id_of '||
-          '             FROM nm_members  '||
+          ' from (  SELECT connect_by_root nm_ne_id_in nm_ne_id_in, nm_ne_id_of '||
+          '             FROM nm_members, ne_data  '||
           '       CONNECT BY PRIOR nm_ne_id_of = nm_ne_id_in '|| 
-          '       START WITH nm_ne_id_in = :p_ne_id ), '||p_feature_table||' s '||          
+          '       START WITH nm_ne_id_in = ne_data.root_ne ), '||p_feature_table||' s '||          
           ' WHERE     nm_ne_id_of = s.'||p_feature_pk_column||
           case p_use_history
              when 'Y' then 
