@@ -1,4 +1,4 @@
-CREATE OR REPLACE FORCE VIEW HIGHWAYS.V_NM_NETWORK_THEMES
+CREATE OR REPLACE FORCE VIEW V_NM_NETWORK_THEMES
 (
    THEME_TYPE,
    NT_TYPE,
@@ -18,11 +18,11 @@ AS
    SELECT 
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/views/v_nm_network_themes.vw-arc   1.0   May 05 2015 12:15:42   Rob.Coupe  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/views/v_nm_network_themes.vw-arc   1.1   May 05 2015 12:17:34   Rob.Coupe  $
 --       Module Name      : $Workfile:   v_nm_network_themes.vw  $
---       Date into PVCS   : $Date:   May 05 2015 12:15:42  $
---       Date fetched Out : $Modtime:   May 05 2015 12:14:46  $
---       PVCS Version     : $Revision:   1.0  $
+--       Date into PVCS   : $Date:   May 05 2015 12:17:34  $
+--       Date fetched Out : $Modtime:   May 05 2015 12:17:12  $
+--       PVCS Version     : $Revision:   1.1  $
 --
 --   Author : R.A. Coupe
 --
