@@ -17,11 +17,11 @@ AS
      SELECT 
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/views/v_nm_group_hierarchy.vw-arc   1.0   May 05 2015 11:58:18   Rob.Coupe  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/views/v_nm_group_hierarchy.vw-arc   1.1   May 06 2015 09:17:28   Chris.Baugh  $
 --       Module Name      : $Workfile:   v_nm_group_hierarchy.vw  $
---       Date into PVCS   : $Date:   May 05 2015 11:58:18  $
---       Date fetched Out : $Modtime:   May 05 2015 11:57:24  $
---       PVCS Version     : $Revision:   1.0  $
+--       Date into PVCS   : $Date:   May 06 2015 09:17:28  $
+--       Date fetched Out : $Modtime:   May 06 2015 09:15:44  $
+--       PVCS Version     : $Revision:   1.1  $
 --
 --   Author : R.A. Coupe
 --
@@ -31,8 +31,7 @@ AS
 -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
 ----------------------------------------------------------------------------
 --
-	 
-	        t."TOP_GROUP_TYPE",
+ 	          t."TOP_GROUP_TYPE",
             t."PARENT_GROUP_TYPE",
             t."CHILD_GROUP_TYPE",
             t."CHILD_TYPE",
