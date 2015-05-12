@@ -1362,6 +1362,49 @@ start '&run_file'
 ----------------------------------------------------------------------------------------- 
 --
 SET TERM ON 
+PROMPT v_nm_group_structure.vw
+SET TERM OFF
+SET DEFINE ON 
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'views'||'&terminator'||'v_nm_group_structure.vw' run_file 
+FROM dual 
+/ 
+start '&run_file'
+--
+----------------------------------------------------------------------------------------- 
+--
+SET TERM ON 
+PROMPT v_nm_sub_group_structure.vw
+SET TERM OFF
+SET DEFINE ON 
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'views'||'&terminator'||'v_nm_sub_group_structure.vw' run_file 
+FROM dual 
+/ 
+start '&run_file'
+--
+----------------------------------------------------------------------------------------- 
+--
+SET TERM ON 
+PROMPT v_nm_group_hierarchy.vw
+SET TERM OFF
+SET DEFINE ON 
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'views'||'&terminator'||'v_nm_group_hierarchy.vw' run_file 
+FROM dual 
+/ 
+start '&run_file'
+--
+----------------------------------------------------------------------------------------- 
+--
+SET TERM ON 
+PROMPT v_nm_network_themes.vw
+SET TERM OFF
+SET DEFINE ON 
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'views'||'&terminator'||'v_nm_network_themes.vw' run_file 
+FROM dual 
+/ 
+start '&run_file'--
+----------------------------------------------------------------------------------------- 
+--
+SET TERM ON 
 PROMPT v_nm_rebuild_all_nat_sdo_join.vw
 SET TERM OFF
 SET DEFINE ON 
@@ -1545,3 +1588,4 @@ SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'views'||'&te
 FROM dual 
 / 
 start '&run_file'
+
