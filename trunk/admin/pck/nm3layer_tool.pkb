@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3layer_tool.pkb-arc   2.39   Apr 15 2015 14:45:42   Rob.Coupe  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3layer_tool.pkb-arc   2.40   May 12 2015 09:40:52   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm3layer_tool.pkb  $
---       Date into PVCS   : $Date:   Apr 15 2015 14:45:42  $
---       Date fetched Out : $Modtime:   Apr 15 2015 14:42:14  $
---       Version          : $Revision:   2.39  $
+--       Date into PVCS   : $Date:   May 12 2015 09:40:52  $
+--       Date fetched Out : $Modtime:   May 12 2015 09:30:18  $
+--       Version          : $Revision:   2.40  $
 --       Based on SCCS version : 1.11
 ------------------------------------------------------------------
 --   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
@@ -16,7 +16,7 @@ AS
 --
 --all global package variables here
 --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000)       := '$Revision:   2.39  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000)       := '$Revision:   2.40  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name   CONSTANT VARCHAR2 (30)         := 'NM3LAYER_TOOL';
@@ -5810,6 +5810,47 @@ begin
   end loop;
 
 end;   
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE refresh_group_of_groups IS
+  TYPE t_group_type_tab IS TABLE OF nm_group_relations.ngr_parent_group_type%TYPE 
+    INDEX BY BINARY_INTEGER;
+  TYPE t_ord_tab IS TABLE OF PLS_INTEGER
+    INDEX BY BINARY_INTEGER;
+    
+  lt_parent_group_types   t_group_type_tab;
+  lt_ord                  t_ord_tab;
+BEGIN
+  Hig_Process_Api.Log_It(pi_Message => 'Group Of Groups Theme Refresh started - ' || To_Char(Sysdate,'dd-mm-yyyy hh24:mi.ss') );
+  
+  SELECT parent_group_type, MAX (ord) ord 
+    BULK COLLECT INTO lt_parent_group_types, lt_ord
+    FROM v_nm_group_hierarchy g, 
+         v_nm_network_themes t1, 
+         v_nm_network_themes t2
+   WHERE g.child_nt_type = t1.nt_type
+     AND NVL (g.child_group_type, '£$%^') = NVL (t1.gty_type, '£$%^')
+     AND t1.nth_base_table_theme IS NULL
+     AND t1.nth_feature_table NOT LIKE 'SECT_SS%'
+     AND t1.nth_update_on_edit = 'D'
+     AND g.parent_nt_type = t2.nt_type
+     AND NVL (g.parent_group_type, '£$%^') = NVL (t2.gty_type, '£$%^')
+     AND t2.nth_base_table_theme IS NULL
+     AND t2.nth_feature_table NOT LIKE 'SECT_SS%'
+     AND t2.nth_update_on_edit = 'D'
+   GROUP BY parent_group_type
+   ORDER BY 2 DESC;
+
+   FOR i in 1 .. lt_parent_group_types.COUNT LOOP
+     Hig_Process_Api.Log_It(pi_Message => 'Refreshing '||lt_parent_group_types(i)||' Theme - '||To_Char(Sysdate,'dd-mm-yyyy hh24:mi.ss') );
+     NM3LAYER_TOOL.REFRESH_GTY_LAYER(lt_parent_group_types(i), FALSE, NULL);
+   END LOOP;
+    
+END refresh_group_of_groups;
+--
+-----------------------------------------------------------------------------
+--
                  
 END nm3layer_tool;
 /
