@@ -5,11 +5,11 @@ As
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.75   Apr 22 2015 13:50:14   Rob.Coupe  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.76   May 14 2015 11:54:58   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3sdm.pkb  $
---       Date into PVCS   : $Date:   Apr 22 2015 13:50:14  $
---       Date fetched Out : $Modtime:   Apr 22 2015 14:55:12  $
---       PVCS Version     : $Revision:   2.75  $
+--       Date into PVCS   : $Date:   May 14 2015 11:54:58  $
+--       Date fetched Out : $Modtime:   May 14 2015 11:54:14  $
+--       PVCS Version     : $Revision:   2.76  $
 --
 --   Author : R.A. Coupe
 --
@@ -21,7 +21,7 @@ As
 --
 --all global package variables here
 --
-  g_Body_Sccsid     Constant Varchar2 (2000) := '"$Revision:   2.75  $"';
+  g_Body_Sccsid     Constant Varchar2 (2000) := '"$Revision:   2.76  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
   g_Package_Name    Constant Varchar2 (30)   := 'NM3SDM';
@@ -1805,11 +1805,11 @@ Begin
   And     nin.Nin_Nw_Type           =   nlt.Nlt_Nt_Type
   And     nlt.Nlt_Id                =   nnt.Nnth_Nlt_Id
   And     nta.Nth_Base_Table_Theme  Is  Null
-  And     nnt.Nnth_Nth_Theme_Id     =   nta.Nth_Theme_Id
-  And     Not Exists            (   Select  Null
-                                    From    Nm_Base_Themes  nbt
-                                    Where   nta.Nth_Theme_Id = nbt.Nbth_Theme_Id
-                                );
+  And     nnt.Nnth_Nth_Theme_Id     =   nta.Nth_Theme_Id;
+--And     Not Exists            (   Select  Null
+--                                  From    Nm_Base_Themes  nbt
+--                                  Where   nta.Nth_Theme_Id = nbt.Nbth_Theme_Id
+--                              );
 
   If Retval.Nta_Theme_Array.Last Is Null  Then
     -- no base theme availible
