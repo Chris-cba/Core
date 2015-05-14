@@ -10,11 +10,11 @@ Select
           -------------------------------------------------------------------------
           --   PVCS Identifiers :-
           --
-          --       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/views/v_nm_rebuild_all_nat_sdo_join.vw-arc   3.5   Apr 16 2015 20:39:28   Rob.Coupe  $
+          --       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/views/v_nm_rebuild_all_nat_sdo_join.vw-arc   3.6   May 14 2015 10:59:40   Chris.Baugh  $
           --       Module Name      : $Workfile:   v_nm_rebuild_all_nat_sdo_join.vw  $
-          --       Date into PVCS   : $Date:   Apr 16 2015 20:39:28  $
-          --       Date fetched Out : $Modtime:   Apr 16 2015 21:36:10  $
-          --       Version          : $Revision:   3.5  $
+          --       Date into PVCS   : $Date:   May 14 2015 10:59:40  $
+          --       Date fetched Out : $Modtime:   May 14 2015 10:59:12  $
+          --       Version          : $Revision:   3.6  $
           -----------------------------------------------------------------------------
           --    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
           -----------------------------------------------------------------------------
@@ -51,7 +51,7 @@ Select
           --
           'Comment on Table ' || vw.View_Name ||     ' Is ''Created By :V_Nm_Rebuild_All_Nlt_Sdo_Join ' 
                                                 || Chr(10) || 'Created On :' || To_Char(Sysdate,'dd-mm-yyyy hh24:mi.ss') 
-                                                || Chr(10) || 'Version    :$Revision:   3.5  $'''                                               View_Comments         
+                                                || Chr(10) || 'Version    :$Revision:   3.6  $'''                                               View_Comments         
 From    (        
         --Gets Linear views that can be rebuilt.
         Select  naty.Nat_Nt_Type,
@@ -63,7 +63,6 @@ From    (
                 Nm_Area_Themes  nat,
                 Nm_Area_Types   naty,
 				Nm_Group_Types  ngt
-
         Where   nta.Nth_Base_Table_Theme    Is      Null
         And     nat.Nath_Nth_Theme_Id       =       nta.Nth_Theme_Id 
         And     nat.Nath_Nat_Id             =       naty.Nat_Id    
