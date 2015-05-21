@@ -5,11 +5,11 @@ As
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.76   May 14 2015 11:54:58   Rob.Coupe  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.77   May 21 2015 14:43:20   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3sdm.pkb  $
---       Date into PVCS   : $Date:   May 14 2015 11:54:58  $
---       Date fetched Out : $Modtime:   May 14 2015 11:54:14  $
---       PVCS Version     : $Revision:   2.76  $
+--       Date into PVCS   : $Date:   May 21 2015 14:43:20  $
+--       Date fetched Out : $Modtime:   May 21 2015 14:42:16  $
+--       PVCS Version     : $Revision:   2.77  $
 --
 --   Author : R.A. Coupe
 --
@@ -21,7 +21,7 @@ As
 --
 --all global package variables here
 --
-  g_Body_Sccsid     Constant Varchar2 (2000) := '"$Revision:   2.76  $"';
+  g_Body_Sccsid     Constant Varchar2 (2000) := '"$Revision:   2.77  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
   g_Package_Name    Constant Varchar2 (30)   := 'NM3SDM';
@@ -1516,8 +1516,7 @@ Begin
     from nm_elements, nm_types where ne_id = p_Ne_Id and ne_nt_type = nt_type;
     
     l_End   := Nm3Net.Get_Datum_Element_Length( p_Ne_Id );
-    
-  
+     
     If p_X Is Null And p_Y Is Null Then
 
       if p_measure < l_tol or abs(l_End - p_measure ) < l_tol then
@@ -1537,8 +1536,13 @@ Begin
     Elsif p_X Is Not Null And p_Y Is Not Null Then
 
       l_Distance := sdo_geom.sdo_distance( l_geom, nm3sdo.get_2d_pt(p_x, p_y), 0.005);
+
       if l_Distance > to_number( nvl(hig.get_sysopt('SDOPROXTOL'), 2 )) then
         raise_application_error(-20001, 'Split position is not in close proximity to element geometry');
+      end if;
+
+      if p_measure < l_tol or abs(l_End - p_measure ) < l_tol then
+        raise_application_error(-20001, 'Split position cannot be at the start or end of an element');
       end if;
 
       Split_Element_At_Xy (
