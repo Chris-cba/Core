@@ -2,11 +2,11 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/nm_4700_fix14.sql-arc   3.15   Apr 07 2015 09:26:24   Stephen.Sewell  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/nm_4700_fix14.sql-arc   3.16   May 26 2015 16:48:52   Stephen.Sewell  $
 --       Module Name      : $Workfile:   nm_4700_fix14.sql  $
---       Date into PVCS   : $Date:   Apr 07 2015 09:26:24  $
---       Date fetched Out : $Modtime:   Apr 07 2015 10:34:16  $
---       PVCS Version     : $Revision:   3.15  $
+--       Date into PVCS   : $Date:   May 26 2015 16:48:52  $
+--       Date fetched Out : $Modtime:   May 26 2015 16:46:08  $
+--       PVCS Version     : $Revision:   3.16  $
 --
 --------------------------------------------------------------------------------
 --   Copyright (c) 2014 Bentley Systems Incorporated.
@@ -204,7 +204,7 @@ DECLARE
   PRAGMA exception_init( name_in_use, -955);
   PRAGMA exception_init( pk_already_exists, -2261);
 BEGIN
-  EXECUTE IMMEDIATE 'ALTER TABLE nm_inv_items_all_j ADD CONSTRAINT NM_INV_ITEMS_ALL_J_PK PRIMARY KEY(parent_ne_id, iit_ne_id, iit_start_date, iit_date_modified) USING INDEX ENABLE';
+  EXECUTE IMMEDIATE 'ALTER TABLE nm_inv_items_all_j ADD CONSTRAINT NM_INV_ITEMS_ALL_J_PK PRIMARY KEY(parent_ne_id, iit_ne_id, iit_start_date, iit_date_modified, date_created) USING INDEX ENABLE';
 EXCEPTION
   WHEN obj_exists THEN
     dbms_output.put_line('OBJ_EXISTS exception raised.');
@@ -479,6 +479,14 @@ SET TERM OFF
 --
 SET FEEDBACK ON
 start nm3rvrs.pkw
+SET FEEDBACK OFF
+--
+SET TERM ON 
+PROMPT Updating package body nm3ins
+SET TERM OFF
+--
+SET FEEDBACK ON
+start nm3ins.pkw
 SET FEEDBACK OFF
 
 --
