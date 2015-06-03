@@ -1,17 +1,17 @@
 CREATE OR REPLACE PACKAGE BODY hig_flex_attribute
 AS
--------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_flex_attribute.pkb-arc   3.6   Jul 04 2013 14:45:42   James.Wadsworth  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/hig_flex_attribute.pkb-arc   3.7   Jun 03 2015 10:06:06   Upendra.Hukeri  $
 --       Module Name      : $Workfile:   hig_flex_attribute.pkb  $
---       Date into PVCS   : $Date:   Jul 04 2013 14:45:42  $
---       Date fetched Out : $Modtime:   Jul 04 2013 14:43:58  $
---       Version          : $Revision:   3.6  $
+--       Date into PVCS   : $Date:   Jun 03 2015 10:06:06  $
+--       Date fetched Out : $Modtime:   Jun 03 2015 09:44:10  $
+--       Version          : $Revision:   3.7  $
 --       Based on SCCS version : 
-------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
-------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+-- Copyright (c) 2015 Bentley Systems Incorporated.  All rights reserved.
+----------------------------------------------------------------------------------------------------
 --
 --all global package variables here
 
@@ -19,7 +19,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.6  $';
+  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.7  $';
 
   g_package_name CONSTANT varchar2(30) := 'hig_flex_attribute';
 --
@@ -193,29 +193,33 @@ BEGIN
    END IF ;
 --
 END get_mapping_inv;
---
-PROCEDURE upd_attrib_data (pi_inv_type     IN nm_inv_types_all.nit_inv_type%TYPE
-                          ,pi_pk_col       IN Varchar2
+----------------------------------------------------------------------------------------------------
+PROCEDURE upd_attrib_data (pi_inv_type	IN nm_inv_types_all.nit_inv_type%TYPE
+                          ,pi_pk_col	IN VARCHAR2
                           )
 IS
---
-   l_nit_rec nm_inv_types%ROWTYPE;
-   l_error   Varchar2(32767);
---
+	--
+	l_nit_rec nm_inv_types%ROWTYPE;
+	l_error   VARCHAR2(32767);
+	--
 BEGIN
---   
-   l_nit_rec := nm3get.get_nit(pi_inv_type);   
-   nm3clob.execute_immediate_clob(' UPDATE '||l_nit_rec.nit_table_name  ||Chr(10)||
-                                  ' SET    '||g_upd_col||Chr(10)||
-                                  ' WHERE  '||l_nit_rec.nit_foreign_pk_column||' = '||nm3flx.string(pi_pk_col) );
-   Commit;
---
+	--
+	l_nit_rec := nm3get.get_nit(pi_inv_type);
+	--
+	nm3clob.execute_immediate_clob(' UPDATE ' || l_nit_rec.nit_table_name || CHR(10) ||
+                                   ' SET    ' || g_upd_col || CHR(10) ||
+                                   ' WHERE  ' || l_nit_rec.nit_foreign_pk_column || ' = ' || nm3flx.string(pi_pk_col)
+								  );
+	--
+	COMMIT;
+	--
 EXCEPTION
-WHEN others
-THEN
-    Raise_Application_Error(-20000,'Error while updating l_nit_rec.nit_table_name : '||Sqlerrm);
+	WHEN OTHERS THEN
+	--
+		RAISE_APPLICATION_ERROR(-20000, 'Error while updating ' || l_nit_rec.nit_table_name || ': ' || SQLERRM);
+	--
 END upd_attrib_data;
---
+----------------------------------------------------------------------------------------------------
 FUNCTION get_attrib_value (pi_inv_type      IN nm_inv_types_all.nit_inv_type%TYPE
                           ,pi_pk_col        IN Varchar2
                           ,pi_attrib_name   IN nm_inv_type_attribs.ita_attrib_name%TYPE
