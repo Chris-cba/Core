@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_load
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_load.pkb-arc   1.4   Mar 21 2015 08:56:44   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_load.pkb-arc   1.5   Jun 09 2015 11:38:10   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_load.pkb  $
-   --       Date into PVCS   : $Date:   Mar 21 2015 08:56:44  $
-   --       Date fetched Out : $Modtime:   Mar 21 2015 10:03:12  $
-   --       PVCS Version     : $Revision:   1.4  $
+   --       Date into PVCS   : $Date:   Jun 09 2015 11:38:10  $
+   --       Date fetched Out : $Modtime:   Jun 09 2015 11:37:28  $
+   --       PVCS Version     : $Revision:   1.5  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,7 +16,7 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.4  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.5  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_load';
 
@@ -200,19 +200,19 @@ AS
       DECLARE
          problem   VARCHAR2 (7) := NULL;
       BEGIN
-         SELECT 'Problem'
-           INTO problem
-           FROM nm_inv_types
-          WHERE EXISTS
-                   (SELECT 1
-                      FROM TABLE (p_obj_Rpt) t
-                     WHERE     start_m != end_m
-                           AND t.obj_type = nit_inv_type
-                           AND nit_pnt_or_cont = 'P');
-
+       SELECT 'Problem'
+       INTO problem
+       FROM nm_inv_types
+       where EXISTS
+              (SELECT 1
+                 FROM TABLE (p_obj_Rpt ) t
+                WHERE     t.obj_type = nit_inv_type
+                 AND nit_pnt_or_cont !=
+                        CASE start_m WHEN end_m THEN 'P' ELSE 'C' END);
+--
          raise_application_error (
             -20002,
-            'Asset type has a point reference - line events not allowed');
+            'Asset location has a point/line reference when asset type is flagged as line/point');
       EXCEPTION
          WHEN NO_DATA_FOUND
          THEN
@@ -304,11 +304,11 @@ AS
                 p_nal_id,
                 'N',
                 nm_obj_type,
-                SDO_LRS.OFFSET_GEOM_SEGMENT (geoloc,
+                sdo_lrs.convert_to_std_geom(SDO_LRS.OFFSET_GEOM_SEGMENT (geoloc,
                                              nm_begin_mp,
                                              nm_end_mp,
                                              NVL (nm_offset_st, 0),
-                                             0.005)
+                                             0.005))
            FROM nm_locations_all, v_lb_nlt_geometry
           WHERE     nm_ne_id_of = ne_id
                 AND nm_loc_id IN (SELECT t.COLUMN_VALUE
