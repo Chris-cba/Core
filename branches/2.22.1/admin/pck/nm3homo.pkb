@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3homo AS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3homo.pkb-arc   2.22.1.0   Apr 17 2015 08:05:18   Vikas.Mhetre  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3homo.pkb-arc   2.22.1.1   Jun 10 2015 13:53:16   Vikas.Mhetre  $
 --       Module Name      : $Workfile:   nm3homo.pkb  $
---       Date into PVCS   : $Date:   Apr 17 2015 08:05:18  $
---       Date fetched Out : $Modtime:   Apr 17 2015 09:02:10  $
---       PVCS Version     : $Revision:   2.22.1.0  $
+--       Date into PVCS   : $Date:   Jun 10 2015 13:53:16  $
+--       Date fetched Out : $Modtime:   Jun 10 2015 12:20:52  $
+--       PVCS Version     : $Revision:   2.22.1.1  $
 --
 --
 --   Author : Jonathan Mills
@@ -40,7 +40,7 @@ CREATE OR REPLACE PACKAGE BODY nm3homo AS
    
    -- Log 713421
    
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.22.1.0  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.22.1.1  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3homo';
@@ -3994,7 +3994,9 @@ BEGIN
         -------------------------
         --get new element details
         -------------------------
-        l_new_ne_1_rec := nm3get.get_ne(pi_ne_id => l_closing_hist_arr(1).neh_ne_id_new);
+        -- This line caused only current records to be returned - we need to also examine history
+        -- l_new_ne_1_rec := nm3get.get_ne(pi_ne_id => l_closing_hist_arr(1).neh_ne_id_new);
+        l_new_ne_1_rec := nm3get.get_ne_all(pi_ne_id => l_closing_hist_arr(1).neh_ne_id_new);
         --get non-closing edits to apply on new element
         db('get non-closing edits to apply on new element');
         l_ne_1_non_closing_hist_arr := nm3net_history.get_neh_for_non_closing_ops(pi_ne_id => l_closing_hist_arr(1).neh_ne_id_new);
@@ -4013,21 +4015,25 @@ BEGIN
         IF l_closing_hist_arr(1).neh_operation = nm3net_history.c_neh_op_split
         then
           db('split so get second new element');
-          l_new_ne_2_rec := nm3get.get_ne(pi_ne_id => l_closing_hist_arr(2).neh_ne_id_new);
+          -- l_new_ne_2_rec := nm3get.get_ne(pi_ne_id => l_closing_hist_arr(2).neh_ne_id_new);
+          l_new_ne_2_rec := nm3get.get_ne_all(pi_ne_id => l_closing_hist_arr(2).neh_ne_id_new);
           --get non-closing edits to apply for 2nd element
           l_ne_2_non_closing_hist_arr := nm3net_history.get_neh_for_non_closing_ops(pi_ne_id => l_closing_hist_arr(2).neh_ne_id_new);
           
           --get closing op if they exist
           l_ne_2_closing_hist_arr := nm3net_history.get_neh_for_closing_op(pi_ne_id => l_closing_hist_arr(2).neh_ne_id_new);
           
-          if l_ne_2_closing_hist_arr.count > 0
-          then
+          -- if l_ne_2_closing_hist_arr.count > 0
+          -- then
+          for i in 1..l_ne_2_closing_hist_arr.count
+          loop
             --add to end of element array
             db('add to end of element array - ' || l_closing_hist_arr(2).neh_ne_id_new);
-            l_edited_ne_id_arr(l_edited_ne_id_arr.count + 1) := l_ne_2_closing_hist_arr(2).neh_ne_id_old;
-            l_edited_operation_arr(l_edited_ne_id_arr.COUNT) := l_ne_2_closing_hist_arr(2).neh_operation;
-            l_edited_date_arr(l_edited_ne_id_arr.COUNT) := l_ne_2_closing_hist_arr(2).neh_effective_date;
-          end if;
+            l_edited_ne_id_arr(l_edited_ne_id_arr.count + 1) := l_ne_2_closing_hist_arr(i).neh_ne_id_old; -- replace 2 with i
+            l_edited_operation_arr(l_edited_ne_id_arr.COUNT) := l_ne_2_closing_hist_arr(i).neh_operation; -- replace 2 with i
+            l_edited_date_arr(l_edited_ne_id_arr.COUNT) := l_ne_2_closing_hist_arr(i).neh_effective_date; -- replace 2 with i
+          end loop;
+          -- end if;
         end if;
         
         ----------------------
@@ -4104,7 +4110,19 @@ BEGIN
             --set end date for member
             l_nm_rec.nm_end_date := l_new_ne_2_rec.ne_end_date; 
           end if;
-          
+
+          -- delete future location records for existing assets
+          -- further it will create the required members records 
+          if l_rec_nit.nit_exclusive = 'Y' then
+            delete nm_members_all 
+            where nm_ne_id_of = l_new_pl_1.pl_ne_id
+            and nm_begin_mp = l_new_pl_1.pl_start
+            and nm_end_mp = l_new_pl_1.pl_end
+            and nm_obj_type = l_rec_iit.iit_inv_type
+            and nm_start_date = l_nm_rec.nm_start_date
+            and nm_end_date is null;
+          end if;
+         
           --create mems for exclusive conflicted chunks
           l_pl_arr := cr8_mems_for_excl_affected(pi_pl      => l_new_pl_1
                                                 ,pi_iit_rec => l_rec_iit
@@ -4199,6 +4217,97 @@ BEGIN
       l_date_arr_idx := l_date_arr.next(l_date_arr_idx);
     end loop;
   end if;
+
+  -- End date the asset in nm_inv_items as of the start date of the new asset
+  if l_rec_nit.nit_exclusive = 'Y' then
+  --
+    declare
+      cursor c_inv is                
+      select iit_ne_id, iit_start_date, iit_end_date, iit_inv_type, nm_ne_id_of
+      from nm_inv_items_all, nm_members_all
+      where iit_ne_id = nm_ne_id_in
+      and iit_ne_id = l_rec_iit.iit_ne_id
+      and iit_inv_type = nm_obj_type
+      and iit_start_date = nm_start_date
+      and iit_inv_type = l_rec_iit.iit_inv_type
+      order by iit_start_date;
+  --
+      cursor c_inv_previous(c_nm_ne_id_of nm_members_all.nm_ne_id_of%type,
+                            c_iit_inv_type nm_inv_items_all.iit_inv_type%type,
+                            c_iit_start_date nm_inv_items_all.iit_start_date%type) is
+      select iit_ne_id, iit_start_date, iit_end_date, nm_end_date
+      from nm_inv_items_all n, nm_members_all
+      where iit_ne_id = nm_ne_id_in
+      and nm_ne_id_of = c_nm_ne_id_of
+      and iit_inv_type = nm_obj_type
+      and iit_inv_type = c_iit_inv_type
+      and nm_end_date = c_iit_start_date
+      and iit_start_date = ( select min(n.iit_start_date)
+                             from nm_inv_items_all
+                             where iit_ne_id = n.iit_ne_id
+                             and iit_inv_type = n.iit_inv_type
+                             and iit_start_date < c_iit_start_date);
+  --
+  --
+      cursor c_inv_next(c_nm_ne_id_of nm_members_all.nm_ne_id_of%type,
+                            c_iit_inv_type nm_inv_items_all.iit_inv_type%type,
+                            c_iit_start_date nm_inv_items_all.iit_start_date%type) is
+      select iit_ne_id, iit_start_date, iit_end_date, nm_end_date
+      from nm_inv_items_all n, nm_members_all
+      where iit_ne_id = nm_ne_id_in
+      and nm_ne_id_of = c_nm_ne_id_of
+      and iit_inv_type = nm_obj_type
+      and iit_inv_type = c_iit_inv_type
+      and iit_start_date = ( select min(n.iit_start_date)
+                             from nm_inv_items_all
+                             where iit_ne_id = n.iit_ne_id
+                             and iit_inv_type = n.iit_inv_type
+                             and iit_start_date = c_iit_start_date)
+      and exists (select 1 
+                  from nm_inv_items_all,  nm_members_all
+                  where iit_ne_id = nm_ne_id_in
+                  and nm_ne_id_of = c_nm_ne_id_of
+                  and iit_inv_type = nm_obj_type
+                  and iit_inv_type = n.iit_inv_type
+                  and iit_start_date > c_iit_start_date);
+  --
+    begin
+  --   
+      for i in c_inv
+      loop
+        for j in c_inv_previous(i.nm_ne_id_of, i.iit_inv_type, i.iit_start_date)
+        loop
+          if j.iit_end_date = j.nm_end_date then
+             null;
+          else
+             update nm_inv_items_all
+             set iit_end_date = j.nm_end_date
+             where iit_ne_id = j.iit_ne_id
+             and iit_start_date = j.iit_start_date
+             and not exists ( select 1 from nm_members_all 
+                              where nm_ne_id_in = j.iit_ne_id 
+                              and nm_start_date > j.nm_end_date 
+                              and nm_end_date is null);
+          end if;
+  --
+        end loop;
+        for j in c_inv_next(i.nm_ne_id_of, i.iit_inv_type, i.iit_start_date)
+        loop
+          if j.iit_end_date = j.nm_end_date then
+             null;
+          else
+             update nm_inv_items_all
+             set iit_end_date = j.nm_end_date
+             where iit_ne_id = j.iit_ne_id
+             and iit_start_date = j.iit_start_date;
+          end if;
+  --
+        end loop;
+      end loop;
+  --
+    end;
+  --
+  end if; 
 
   reset_for_return;
 
