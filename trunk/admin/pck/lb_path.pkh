@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE lb_path
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_path.pkh-arc   1.1   Jan 15 2015 22:38:00   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_path.pkh-arc   1.2   Jun 15 2015 15:57:00   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_path.pkh  $
-   --       Date into PVCS   : $Date:   Jan 15 2015 22:38:00  $
-   --       Date fetched Out : $Modtime:   Jan 15 2015 22:37:40  $
-   --       PVCS Version     : $Revision:   1.1  $
+   --       Date into PVCS   : $Date:   Jun 15 2015 15:57:00  $
+   --       Date fetched Out : $Modtime:   Jun 15 2015 15:56:20  $
+   --       PVCS Version     : $Revision:   1.2  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,15 +16,19 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.1  $';
+   g_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.2  $';
    --
    g_network           VARCHAR2 (30);
+
    --
    ----------------------------------------------------------------------------
    --
-   FUNCTION get_version return varchar2;
-   FUNCTION get_body_version return varchar2;
-   
+   FUNCTION get_version
+      RETURN VARCHAR2;
+
+   FUNCTION get_body_version
+      RETURN VARCHAR2;
+
 
    FUNCTION get_path (pi_node1 IN INTEGER, pi_node2 IN INTEGER)
       RETURN SYS_REFCURSOR;
@@ -48,6 +52,9 @@ AS
    --
    FUNCTION get_sdo_path (p_no_1 INTEGER, p_no_2 INTEGER)
       RETURN sdo_number_array;
+
+   FUNCTION get_sdo_path (l1 IN nm_lref, l2 IN nm_lref)
+      RETURN lb_rpt_tab;
 
    FUNCTION get_tsp_sdo_path (p_nodes IN sdo_number_array)
       RETURN sdo_number_array;
