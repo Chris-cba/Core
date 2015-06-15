@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_load
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_load.pkb-arc   1.5   Jun 09 2015 11:38:10   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_load.pkb-arc   1.6   Jun 15 2015 16:47:06   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_load.pkb  $
-   --       Date into PVCS   : $Date:   Jun 09 2015 11:38:10  $
-   --       Date fetched Out : $Modtime:   Jun 09 2015 11:37:28  $
-   --       PVCS Version     : $Revision:   1.5  $
+   --       Date into PVCS   : $Date:   Jun 15 2015 16:47:06  $
+   --       Date fetched Out : $Modtime:   Jun 15 2015 16:46:02  $
+   --       PVCS Version     : $Revision:   1.6  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,7 +16,7 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.5  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.6  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_load';
 
@@ -315,6 +315,38 @@ AS
                                     FROM TABLE (l_loc_tab) t);
    END;
 
+
+   Procedure lb_ld_path(
+      pi_nal_id         IN nm_asset_locations_all.nal_id%TYPE,
+      pi_nal_nit_type   IN nm_asset_locations_all.nal_nit_type%TYPE,
+      pi_start_refnt    IN v_nm_nlt_refnts.ne_id%TYPE,
+      pi_start_nlt_id   IN v_nm_nlt_refnts.nlt_id%TYPE,
+      pi_start_m        IN NUMBER,
+      pi_start_xsp      IN VARCHAR2,
+      pi_end_refnt      IN v_nm_nlt_refnts.ne_id%TYPE,
+      pi_end_nlt_id     IN v_nm_nlt_refnts.nlt_id%TYPE,
+      pi_end_m          IN NUMBER,
+      pi_end_xsp        IN VARCHAR2,
+      pi_start_date     IN nm_asset_locations_all.nal_start_date%TYPE,
+      pi_security_id    IN nm_asset_locations_all.nal_security_key%TYPE)
+   IS      
+      loc_error    lb_loc_error_tab;
+      l_load_tab   lb_rpt_tab;
+   BEGIN
+      l_load_tab := lb_path.get_sdo_path(nm_lref(pi_start_refnt, pi_start_m), nm_lref(pi_end_refnt, pi_end_m));
+
+      lb_load (lb_ops.merge_lb_rpt_tab (pi_nal_id,
+                                        pi_nal_nit_type,
+                                        l_load_tab,
+                                        10),
+                  pi_nal_id,
+                  pi_start_date,
+                  pi_security_id,
+                  pi_start_xsp,
+                  loc_error);
+      
+   END;
+   
    PROCEDURE lb_ld_geom (
       pi_nal_id         IN nm_asset_locations_all.nal_id%TYPE,
       pi_nal_nit_type   IN nm_asset_locations_all.nal_nit_type%TYPE,
@@ -327,7 +359,7 @@ AS
    BEGIN
       SELECT CAST (
                 COLLECT (
-                   lb_obj_geom (nal_asset_id, pi_nal_nit_type, pi_geom)) AS lb_obj_geom_tab)
+                   lb_obj_geom (pi_nal_nit_type, nal_asset_id, pi_geom)) AS lb_obj_geom_tab)
         INTO l_obj_geom
         FROM nm_asset_locations
        WHERE nal_id = pi_nal_id
