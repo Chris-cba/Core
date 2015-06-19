@@ -5,19 +5,18 @@ CREATE OR REPLACE FORCE VIEW V_LB_PATH_BETWEEN_POINTS
 AS
    WITH start_data
         AS (
---   SCCS Identifiers :-
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
 --
---       sccsid           : @(#)run_gis.pkb	1.6 06/12/07
---       Module Name      : run_gis.pkb
---       Date into SCCS   : 07/06/12 10:53:09
---       Date fetched Out : 07/06/13 15:37:51
---       SCCS Version     : 1.6
---
---       Author   Rob Coupe
---
------------------------------------------------------------------------------
---    Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
------------------------------------------------------------------------------
+--       PVCS id          : $Header:   //new_vm_latest/archives/lb/admin/views/V_LB_PATH_BETWEEN_POINTS.vw-arc   1.1   Jun 19 2015 14:15:04   Rob.Coupe  $
+--       Module Name      : $Workfile:   V_LB_PATH_BETWEEN_POINTS.vw  $
+--       Date into PVCS   : $Date:   Jun 19 2015 14:15:04  $
+--       Date fetched Out : $Modtime:   Jun 19 2015 15:25:02  $
+--       Version          : $Revision:   1.1  $
+------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+------------------------------------------------------------------
+----
 		
 		     SELECT 'S',
                    n2.*,
