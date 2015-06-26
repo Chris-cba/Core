@@ -1,0 +1,1247 @@
+CREATE OR REPLACE PACKAGE Nm3inv AS
+--<PACKAGE>
+--
+--   PVCS Identifiers :-
+--
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3inv.pkh-arc   2.5.1.0   Jun 26 2015 11:19:12   Vikas.Mhetre  $
+--       Module Name      : $Workfile:   nm3inv.pkh  $
+--       Date into SCCS   : $Date:   Jun 26 2015 11:19:12  $
+--       Date fetched Out : $Modtime:   Jun 25 2015 11:59:16  $
+--       SCCS Version     : $Revision:   2.5.1.0  $
+--       Based on 
+--
+--   nm3inv package header
+--
+-----------------------------------------------------------------------------
+--    Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+-- Amendments:-
+-- 30/11/2005  CParkinson  Add function get_inv_domain_value
+-- 24/01/2006  PStanton Added overloaded version of get_all_attrib_values to be used when
+--             when dealing with foreign table assets
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+
+--</PACKAGE>
+--<GLOBVAR>
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.5.1.0  $';
+--  some common error messages - prevent more than one database lookup
+  g_thing_already_exists	VARCHAR2(2000);
+  g_thing_does_not_exist	VARCHAR2(2000);
+--
+--
+-- TYPES
+  TYPE attrib_rec IS RECORD (attrib_name NM_INV_TYPE_ATTRIBS.ita_attrib_name%TYPE
+                            ,attrib_value VARCHAR2(500));
+  TYPE attrib_table IS TABLE OF attrib_rec INDEX BY BINARY_INTEGER;
+  TYPE attrib_rc IS REF CURSOR;
+--
+  TYPE tab_nita IS TABLE OF NM_INV_TYPE_ATTRIBS%ROWTYPE INDEX BY BINARY_INTEGER;
+  TYPE tab_nit  IS TABLE OF NM_INV_TYPES%ROWTYPE        INDEX BY BINARY_INTEGER;
+--
+  g_rec_iit NM_INV_ITEMS%ROWTYPE;
+--
+  c_code              CONSTANT VARCHAR2(10) := 'CODE';
+  c_meaning           CONSTANT VARCHAR2(10) := 'MEANING';
+  c_both              CONSTANT VARCHAR2(10) := 'BOTH';
+  g_validate_flex_inv_func_rtn VARCHAR2(10) := c_code;
+--
+   g_inv_warning_msg  VARCHAR2(32767);
+--
+--
+-- Global pl/sql table for use in triggers on nm_inv_type_attribs_all
+--
+  TYPE tab_ita IS TABLE OF NM_INV_TYPE_ATTRIBS_ALL%ROWTYPE INDEX BY BINARY_INTEGER;
+  g_tab_ita tab_ita;
+--
+  g_ita_query NM_INV_TYPE_ATTRIBS_ALL.ita_query%TYPE; -- GJ 24-MAY-2005 - required for ita_query validation
+--
+   -- MJA add 31-Aug-07
+   -- Globals for use in bypassing triggers
+  g_bypass_inv_items_all_trgs BOOLEAN := FALSE;
+--
+--</GLOBVAR>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_version">
+-- This function returns the sccs_id
+  FUNCTION get_version RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_body_version">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN VARCHAR2;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_units">
+-- This function takes the id of a unit and returns its name
+--####################################
+--## IT CALLS nm3unit.get_unit_name ##
+--####################################
+  FUNCTION get_units( p_unit_id IN NUMBER ) RETURN VARCHAR2;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_nt_unique">
+-- This function returns the nt_unique for a given type
+--###################################
+--## IT CALLS nm3net.get_nt_unique ##
+--###################################
+  FUNCTION get_nt_unique( p_type IN VARCHAR2 ) RETURN VARCHAR2;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_nit_descr">
+-- This function returns the description of a given inventory type and raises ora-20001 if the
+-- supplied type does not exist. A parent type can be supplied to restrict the types that are valid.
+  FUNCTION get_nit_descr(p_inv_type IN NM_INV_TYPES.nit_inv_type%TYPE
+                        ,p_parent_type IN NM_INV_TYPES.nit_inv_type%TYPE DEFAULT NULL)
+           RETURN NM_INV_TYPES.nit_descr%TYPE;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_nit_pnt_or_cont">
+-- This function returns whether a given inventory type is 'P'oint or 'C'ontinuous
+  FUNCTION get_nit_pnt_or_cont( p_type IN VARCHAR2 ) RETURN VARCHAR2;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_top_item_type">
+-- This function returns the item at the top of a given inventory items hierarchy
+  FUNCTION get_top_item_type ( p_type IN VARCHAR2) RETURN VARCHAR2;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_inv_type_icon">
+-- This function returns the icon name (with the '.ico' stripped if present) assigned to a given inventory type
+  FUNCTION get_inv_type_icon(p_inv_type IN VARCHAR2) RETURN VARCHAR2;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="View_Exists">
+    FUNCTION view_exists( inv_view_name IN NM_INV_TYPES.nit_view_name%TYPE )
+    RETURN BOOLEAN;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="View_In_Use">
+-- Check if the existing view is in use within the database.
+    FUNCTION view_in_use(p_view_name IN NM_INV_TYPES.nit_view_name%TYPE)
+    RETURN BOOLEAN;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="Synonym_Exists">
+-- When called, this procedure should perform the actual creation of the
+-- specified inventory view. A return code should be provided if there were any
+-- problems when creating the view object. ( Such as insufficient priviledges ).
+    FUNCTION synonym_exists(SYNONYM IN NM_INV_TYPES.nit_view_name%TYPE)
+    RETURN BOOLEAN;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="Create_view">
+    PROCEDURE create_view (p_inventory_type  IN NM_INV_TYPES.nit_inv_type%TYPE
+                          ,p_join_to_network IN BOOLEAN DEFAULT FALSE
+                          );
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="Create_inv_view">
+PROCEDURE create_inv_view (p_inventory_type  IN  NM_INV_TYPES.nit_inv_type%TYPE
+                          ,p_join_to_network IN  BOOLEAN DEFAULT FALSE
+                          ,p_view_name       OUT user_views.view_name%TYPE
+                          );
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_create_inv_view_text">
+-- This function returns the create view string
+FUNCTION get_create_inv_view_text (p_inventory_type   IN NM_INV_TYPES.nit_inv_type%TYPE
+                                  ,p_join_to_network  IN BOOLEAN DEFAULT FALSE
+                                  ) RETURN VARCHAR2;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="Create_all_inv_views">
+-- This procedure creates views for all INVENTORY TYPES
+    PROCEDURE create_all_inv_views;
+--</PROC>;
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME=work_out_inv_type_view_name">
+-- This function derives the view name for a given INVENTRY TYPE depending on whether
+--  or not it is connected to the network
+FUNCTION work_out_inv_type_view_name (pi_inv_type         IN NM_INV_TYPES.nit_inv_type%TYPE
+                                     ,pi_join_to_network  IN BOOLEAN DEFAULT FALSE
+                                     ) RETURN VARCHAR2;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="derive_inv_type_view_name">
+-- This function derives the view name for a given INVENTRY TYPE
+FUNCTION derive_inv_type_view_name (pi_inv_type IN NM_INV_TYPES.nit_inv_type%TYPE)
+ RETURN VARCHAR2;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="derive_nw_inv_type_view_name">
+-- This function derives the view name for a given INVENTRY TYPE joined to the network
+FUNCTION derive_nw_inv_type_view_name (pi_inv_type IN NM_INV_TYPES.nit_inv_type%TYPE)
+ RETURN VARCHAR2;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_iit_id">
+-- This function
+--function get_iit_id ( p_pk_id in varchar2 ) return number;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_iit_pk">
+-- This function
+FUNCTION get_iit_pk ( p_item_id IN NUMBER ) RETURN VARCHAR2;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+----<PROC NAME="get_ity_descr">
+---- This function
+--FUNCTION get_ity_descr ( p_ity IN varchar2) RETURN varchar2;
+----</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+----<PROC NAME="get_ity">
+---- This function is redundant - DO NOT USE
+--FUNCTION get_ity ( p_item_id  IN number ) RETURN varchar2;
+----</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_item_details">
+-- This function
+--function get_item_details ( p_item_id in number) return varchar2;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_xsp_offset_range">
+-- This function
+--function get_xsp_offset_range( p_sys_flag in varchar2, p_scl_class in varchar2 ) return number;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_xsp_descr">
+-- This function returns the description of a given XSP and raises ora-20001 if the supplied XSP does not exists
+FUNCTION get_xsp_descr(p_inv_type IN XSP_RESTRAINTS.xsr_ity_inv_code%TYPE
+                      ,p_x_sect_val IN XSP_RESTRAINTS.xsr_x_sect_value%TYPE
+                      ,p_nw_type IN XSP_RESTRAINTS.xsr_nw_type%TYPE
+                      ,p_scl_class IN XSP_RESTRAINTS.xsr_scl_class%TYPE)
+         RETURN XSP_RESTRAINTS.xsr_descr%TYPE;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+----<PROC NAME="get_pk_column_name">
+---- This function
+--FUNCTION get_pk_column_name ( p_ity_inv_code IN nm_inv_types.nit_inv_type%TYPE ) RETURN varchar2;
+----</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+----<PROC NAME="ity_exists">
+---- This function
+--FUNCTION ity_exists( p_ity IN nm_inv_types.nit_inv_type%TYPE ) RETURN boolean;
+----</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="pop_inv_colours">
+-- This function
+PROCEDURE pop_inv_colours;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_last_mp_rse">
+-- This function
+--function get_last_mp_rse( p_ity in varchar2, p_rse_he_id in number, p_chain in number ) return number;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_last_mp">
+-- This function
+--function get_last_mp( p_ity in varchar2, p_route in number, p_rse_he_id in number, p_chain in number ) return number;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_mp_offset">
+-- This function
+--function get_mp_offset( p_iit in number, p_route in number, p_rse_he_id in number, p_chain in number ) return number;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+----<PROC NAME="get_nit_inv_type">
+---- This function
+--FUNCTION get_nit_inv_type (tablename IN nm_inv_types.nit_table_name%TYPE) RETURN nm_inv_types.nit_inv_type%TYPE;
+----</PROC>
+--
+-----------------------------------------------------------------------------
+--<PROC NAME="valid_fk_ial">
+-- Procedure to validate and return foreign key value
+--
+-- Procedure to validate and return foreign key value (Overloaded in
+-- the use of the date at which the validation is to apply. )
+-- The date is passed as a varchar2 of a specified mask since Pl/SQL 1
+-- differs in the way date parameters are held to PL/SQL 2.
+--
+PROCEDURE valid_fk_ial
+( a_ial_domain	IN	NM_INV_ATTRI_LOOKUP.ial_domain%TYPE
+,a_ial_value	IN	NM_INV_ATTRI_LOOKUP.ial_value%TYPE
+,a_ial_meaning	IN OUT	NM_INV_ATTRI_LOOKUP.ial_meaning%TYPE
+  );
+--
+PROCEDURE valid_fk_ial
+( a_ial_domain	IN	NM_INV_ATTRI_LOOKUP.ial_domain%TYPE
+,a_ial_value	IN	NUMBER
+,a_ial_meaning	IN OUT	NM_INV_ATTRI_LOOKUP.ial_meaning%TYPE
+  );
+--
+PROCEDURE valid_fk_ial
+( a_ial_domain	IN	NM_INV_ATTRI_LOOKUP.ial_domain%TYPE
+,a_ial_value	IN	DATE
+,a_ial_meaning	IN OUT	NM_INV_ATTRI_LOOKUP.ial_meaning%TYPE
+  );
+--
+PROCEDURE valid_fk_ial
+( a_ial_domain	IN	NM_INV_ATTRI_LOOKUP.ial_domain%TYPE
+, a_ial_value	IN	NM_INV_ATTRI_LOOKUP.ial_value%TYPE
+, a_ial_meaning	IN OUT	NM_INV_ATTRI_LOOKUP.ial_meaning%TYPE
+, a_effective   IN      VARCHAR2
+, a_date_mask   IN      VARCHAR2 := 'DD-MON-YYYY'
+ );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--<PROC NAME="get_inv_domain_meaning">
+-- Function returns meaning of domain value from base table i.e. without
+-- regard to start/end dates.
+--
+FUNCTION get_inv_domain_meaning(pi_domain IN NM_INV_ATTRI_LOOKUP_ALL.ial_domain%TYPE
+                               ,pi_value  IN NM_INV_ATTRI_LOOKUP_ALL.ial_value%TYPE
+                               ,pi_iit_start_date IN NM_INV_ITEMS_ALL.iit_start_date%TYPE
+                               ) RETURN NM_INV_ATTRI_LOOKUP_ALL.ial_meaning%TYPE;
+--
+PRAGMA RESTRICT_REFERENCES (get_inv_domain_meaning, wnds);
+--
+FUNCTION get_inv_domain_meaning(pi_domain IN NM_INV_ATTRI_LOOKUP_ALL.ial_domain%TYPE
+                               ,pi_value  IN NM_INV_ATTRI_LOOKUP_ALL.ial_value%TYPE
+                               ) RETURN NM_INV_ATTRI_LOOKUP_ALL.ial_meaning%TYPE;
+--
+PRAGMA RESTRICT_REFERENCES (get_inv_domain_meaning, wnds);
+--
+FUNCTION get_inv_domain_meaning(pi_domain IN NM_INV_ATTRI_LOOKUP_ALL.ial_domain%TYPE
+                               ,pi_value  IN NUMBER
+                               ) RETURN NM_INV_ATTRI_LOOKUP_ALL.ial_meaning%TYPE;
+--
+PRAGMA RESTRICT_REFERENCES (get_inv_domain_meaning, wnds);
+--
+FUNCTION get_inv_domain_meaning(pi_domain IN NM_INV_ATTRI_LOOKUP_ALL.ial_domain%TYPE
+                               ,pi_value  IN DATE
+                               ) RETURN NM_INV_ATTRI_LOOKUP_ALL.ial_meaning%TYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--<PROC NAME="get_inv_domain_meaning">
+-- Function returns domain value of the meaning from base table i.e. without
+-- regard to start/end dates.
+--
+FUNCTION get_inv_domain_value (pi_domain  IN     NM_INV_ATTRI_LOOKUP_ALL.ial_domain%TYPE
+                              ,pi_meaning IN OUT NM_INV_ATTRI_LOOKUP_ALL.ial_meaning%TYPE
+                              ) RETURN NM_INV_ATTRI_LOOKUP_ALL.ial_value%TYPE;
+--
+PRAGMA RESTRICT_REFERENCES (get_inv_domain_value, wnds);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--<PROC NAME="validate_flex_inv">
+-- Procedure to validate flexible inventory items
+--
+PROCEDURE validate_flex_inv (p_inv_type	              IN     VARCHAR2
+                            ,p_attrib_name            IN     VARCHAR2
+                            ,pi_value                 IN     VARCHAR2
+                            ,po_value                    OUT VARCHAR2
+                            ,po_meaning                  OUT VARCHAR2
+                            ,pi_validate_domain_dates IN     BOOLEAN DEFAULT TRUE
+                            ,pi_bind_variable_value   IN     VARCHAR2 DEFAULT NULL
+                            );
+PROCEDURE validate_flex_inv (p_inv_type	              IN     VARCHAR2
+                            ,p_attrib_name            IN     VARCHAR2
+                            ,pi_value                 IN     DATE
+                            ,po_value                    OUT VARCHAR2
+                            ,po_meaning                  OUT VARCHAR2
+                            ,pi_validate_domain_dates IN     BOOLEAN DEFAULT TRUE
+                            ,pi_bind_variable_value   IN     VARCHAR2 DEFAULT NULL
+                            );
+--
+FUNCTION  validate_flex_inv (pi_inv_type    IN     VARCHAR2
+                            ,pi_attrib_name IN     VARCHAR2
+                            ,pi_value       IN     DATE
+                            ,pi_bind_variable_value   IN     VARCHAR2 DEFAULT NULL
+                            ) RETURN VARCHAR2;
+--
+FUNCTION  validate_flex_inv (pi_inv_type    IN     VARCHAR2
+                            ,pi_attrib_name IN     VARCHAR2
+                            ,pi_value       IN     VARCHAR2
+                            ,pi_bind_variable_value   IN     VARCHAR2 DEFAULT NULL
+                            ) RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_inv_type_attr">
+-- This function returns the specified NM_INV_TYPE_ATTRIBS record
+FUNCTION get_inv_type_attr
+             (pi_inv_type    IN NM_INV_TYPE_ATTRIBS.ita_inv_type%TYPE
+             ,pi_attrib_name IN NM_INV_TYPE_ATTRIBS.ita_attrib_name%TYPE
+             ) RETURN NM_INV_TYPE_ATTRIBS%ROWTYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_all_attribs">
+-- This function returns all attribute names for inventory type pi_inv_type
+FUNCTION get_all_attribs(pi_inv_type IN NM_INV_TYPE_ATTRIBS.ita_inv_type%TYPE
+                        ) RETURN attrib_table;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_attrib_value">
+-- This function returns the value assigned to a particular attribute for a given inventory item
+  FUNCTION get_attrib_value(p_ne_id IN NM_INV_ITEMS.iit_ne_id%TYPE
+                           ,p_attrib_name IN NM_INV_TYPE_ATTRIBS.ita_attrib_name%TYPE)
+           RETURN VARCHAR2;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_all_attrib_values">
+-- This function returns a table containing attribute names and their values for a given
+-- inventory item **THIS WILL NOT COPE WITH FOREIGN TABLE ASSETS**
+  FUNCTION get_all_attrib_values(p_ne_id IN NM_INV_ITEMS.iit_ne_id%TYPE)
+           RETURN attrib_table;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_all_attrib_values">
+-- This function returns a table containing attribute names and their values for a given
+-- inventory item. This is overloaded for use with foreign tabe assets, inv type is required
+-- since we have no control over the ne_id's of foreign items
+  FUNCTION get_all_attrib_values(p_ne_id IN NM_INV_ITEMS.iit_ne_id%TYPE
+                                ,p_inv_type IN NM_INV_ITEMS.iit_inv_type%TYPE )
+           RETURN attrib_table;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_attrib_scrn_text">
+-- This function returns the screen text for the attribute pi_attribute_name
+  FUNCTION get_attrib_scrn_text(pi_inv_type    IN NM_INV_TYPE_ATTRIBS.ita_inv_type%TYPE
+                               ,pi_attrib_name IN NM_INV_TYPE_ATTRIBS.ita_attrib_name%TYPE
+                               ) RETURN NM_INV_TYPE_ATTRIBS.ita_scrn_text%TYPE;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_attrib_domain">
+-- This function returns the domain for the attribute pi_attribute_name
+FUNCTION get_attrib_domain(pi_inv_type    IN NM_INV_TYPE_ATTRIBS.ita_inv_type%TYPE
+                          ,pi_attrib_name IN NM_INV_TYPE_ATTRIBS.ita_attrib_name%TYPE
+                          ) RETURN NM_INV_TYPE_ATTRIBS.ita_id_domain%TYPE;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_attrib_format">
+-- This function returns the format for the attribute pi_attribute_name
+FUNCTION get_attrib_format(pi_inv_type    IN NM_INV_TYPE_ATTRIBS.ita_inv_type%TYPE
+                          ,pi_attrib_name IN NM_INV_TYPE_ATTRIBS.ita_attrib_name%TYPE
+                          ) RETURN NM_INV_TYPE_ATTRIBS.ita_format%TYPE;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_attrib_scrn_text">
+-- This function returns TRUE if the attribute specified is queryable
+  FUNCTION attrib_queryable(pi_inv_type    IN NM_INV_TYPE_ATTRIBS.ita_inv_type%TYPE
+                           ,pi_attrib_name IN NM_INV_TYPE_ATTRIBS.ita_attrib_name%TYPE
+                           ) RETURN BOOLEAN;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_top_item_id">
+-- This function returns the top item in a given inventory item's grouping
+  FUNCTION get_top_item_id(p_item_id IN NM_INV_ITEM_GROUPINGS.iig_item_id%TYPE)
+           RETURN NM_INV_ITEM_GROUPINGS.iig_top_id%TYPE;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_inv_type">
+-- This function returns the type of a given inventory item
+  FUNCTION get_inv_type(p_ne_id IN NM_INV_ITEMS.iit_ne_id%TYPE)
+           RETURN NM_INV_ITEMS.iit_inv_type%TYPE;
+PRAGMA RESTRICT_REFERENCES (get_inv_type, wnds );
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_inv_item_details">
+-- This procedure returns a selection of details for a given inventory item
+  PROCEDURE get_inv_item_details(p_ne_id IN NM_INV_ITEMS.iit_ne_id%TYPE
+                                ,p_type IN OUT NM_INV_ITEMS.iit_inv_type%TYPE
+                                ,p_descr IN OUT NM_INV_ITEMS.iit_descr%TYPE
+                                ,p_primary IN OUT NM_INV_ITEMS.iit_primary_key%TYPE
+                                ,p_xsp IN OUT NM_INV_ITEMS.iit_x_sect%TYPE);
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_inv_primary_key">
+-- This function returns the primary key for a given inventory item
+  FUNCTION get_inv_primary_key(p_ne_id IN NM_INV_ITEMS.iit_ne_id%TYPE)
+           RETURN NM_INV_ITEMS.iit_primary_key%TYPE;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_inv_type">
+-- This function returns a single NM_INV_TYPES record
+FUNCTION get_inv_type (pi_inv_type IN NM_INV_TYPES.nit_inv_type%TYPE) RETURN NM_INV_TYPES%ROWTYPE;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_inv_type_table_name">
+-- This function returns the table name the inv type is based on,
+-- null is returned if it is based on nm_inv_items
+FUNCTION get_inv_type_table_name( p_nit_inv_type NM_INV_TYPES.nit_inv_type%TYPE) RETURN VARCHAR2;
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_inv_ft_details">
+-- This function returns true or false if details exist and fills in the parameters
+-- if details exist
+FUNCTION get_inv_ft_details( p_nit_inv_type NM_INV_TYPES.nit_inv_type%TYPE
+                            ,p_nit_table_name IN OUT NM_INV_TYPES.nit_table_name%TYPE
+                            ,p_nit_lr_ne_column_name IN OUT NM_INV_TYPES.nit_lr_ne_column_name%TYPE
+                            ,p_nit_lr_st_chain IN OUT NM_INV_TYPES.nit_lr_st_chain%TYPE
+                            ,p_nit_lr_end_chain IN OUT NM_INV_TYPES.nit_lr_end_chain%TYPE
+                           ) RETURN BOOLEAN;
+
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="inv_type_has_child">
+-- This function returns true if pi_nit_inv_type is a parent type
+FUNCTION inv_type_has_child(pi_nit_inv_type NM_INV_TYPES.nit_inv_type%TYPE
+                           ) RETURN BOOLEAN;
+--</PROC>
+
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_inv_item">
+-- This function returns the specfied NM_INV_ITEMS record
+FUNCTION get_inv_item(pi_ne_id NM_INV_ITEMS.iit_ne_id%TYPE
+                     ) RETURN NM_INV_ITEMS%ROWTYPE;
+--</PROC>
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="insert_nm_in_items">
+-- General procedure to insert into nm_inv_items
+PROCEDURE insert_nm_inv_items ( pi_inv_rec NM_INV_ITEMS%ROWTYPE );
+--</PROC>
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="copy_inv">
+-- Creates a copy on an inventory item
+--  assigns the copy a new iit_ne_id that is returned
+-- and assigns the copy the start date supplied
+PROCEDURE copy_inv( pi_iit_ne_id NM_INV_ITEMS.iit_ne_id%TYPE
+                   ,pi_iit_start_date  NM_INV_ITEMS.iit_start_date%TYPE
+                   ,po_iit_ne_id OUT NM_INV_ITEMS.iit_ne_id%TYPE
+                   ,pi_primary_key NM_INV_ITEMS.iit_primary_key%TYPE DEFAULT NULL
+                  );
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_nm_inv_nw">
+-- This function returns the specified NM_INV_NW record
+FUNCTION get_nm_inv_nw (pi_inv_type IN NM_INV_NW.nin_nit_inv_code%TYPE
+                       ,pi_nw_type  IN NM_INV_NW.nin_nw_type%TYPE
+                       ) RETURN NM_INV_NW%ROWTYPE;
+-- Possible errors raised are
+--  -20001 NM_INV_NW record not found
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="check_mand">
+-- This procedure checks the record g_rec_iit and raises an error if all of the mandatory
+--  attributes are not present
+--
+PROCEDURE check_mand;
+--
+-- Possible errors raised are
+-- -20750, Not all mandatory attribs populated
+--
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="attrib_in_use">
+-- This function returns TRUE if the specified INV_TYPE and ATTRIB_NAME have ever been
+--  specified
+--
+FUNCTION attrib_in_use (pi_inv_type    IN NM_INV_TYPE_ATTRIBS.ita_inv_type%TYPE
+                       ,pi_attrib_name IN NM_INV_TYPE_ATTRIBS.ita_attrib_name%TYPE
+                       ) RETURN BOOLEAN;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="attrib_in_use">
+-- Version of attrib_in_use that returns a character rather than a boolean.
+-- Returns nm3type.c_true or nm3type.c_false.
+--
+FUNCTION attrib_in_use_char(pi_inv_type    IN NM_INV_TYPE_ATTRIBS.ita_inv_type%TYPE
+                           ,pi_attrib_name IN NM_INV_TYPE_ATTRIBS.ita_attrib_name%TYPE
+                           ) RETURN VARCHAR2;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_inv_admin_type">
+-- This function returns the admin_unit type of an inv item
+--
+FUNCTION get_inv_admin_type ( pi_inv_type NM_INV_TYPES.nit_inv_type%TYPE )
+         RETURN VARCHAR2;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="mand_loc_inv_not_located">
+-- This function returns TRUE if the inv item is location mandatory but is not currently
+-- located.
+--
+FUNCTION mand_loc_inv_not_located(pi_ne_id IN NM_INV_ITEMS.iit_ne_id%TYPE
+                                 )RETURN BOOLEAN;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_const_code">
+FUNCTION get_const_code    RETURN VARCHAR2;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_const_meaning">
+FUNCTION get_const_meaning RETURN VARCHAR2;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_const_both">
+FUNCTION get_const_both    RETURN VARCHAR2;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="set_val_flx_inv_func_ret_type">
+PROCEDURE set_val_flx_inv_func_ret_type (p_val VARCHAR2);
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_inv_item_all">
+-- This function returns the nm_inv_items_all row for the specified ne_id
+FUNCTION get_inv_item_all(pi_ne_id NM_INV_ITEMS.iit_ne_id%TYPE
+                         ) RETURN NM_INV_ITEMS%ROWTYPE;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_inv_type_all">
+-- This function returns the inv type for the specified ne_id from the base table
+FUNCTION get_inv_type_all(p_ne_id IN NM_INV_ITEMS.iit_ne_id%TYPE
+                         ) RETURN NM_INV_ITEMS.iit_inv_type%TYPE;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_itg">
+-- This function returns the specified nm_inv_type_groupings record.
+FUNCTION get_itg(pi_inv_type IN NM_INV_TYPES.nit_inv_type%TYPE
+                ) RETURN NM_INV_TYPE_GROUPINGS%ROWTYPE;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_ita_by_view_col">
+FUNCTION get_ita_by_view_col (pi_inv_type      IN NM_INV_TYPE_ATTRIBS.ita_inv_type%TYPE
+                             ,pi_view_col_name IN NM_INV_TYPE_ATTRIBS.ita_view_col_name%TYPE
+                             ) RETURN NM_INV_TYPE_ATTRIBS%ROWTYPE;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_inv_mode_by_role">
+-- This function returns the mode in which a user has the particular inv_type according
+--  to NM_INV_TYPE_ROLES. If there is no privilege at all then NULL is returned
+--
+FUNCTION get_inv_mode_by_role (pi_inv_type      IN NM_INV_TYPE_ATTRIBS.ita_inv_type%TYPE
+                              ,pi_username      IN user_users.username%TYPE
+                              ) RETURN NM_INV_TYPE_ROLES.itr_mode%TYPE;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="inv_location_is_mandatory">
+-- This function returns TRUE if specified inv type is location mandatory for at least one
+-- network type.
+--
+FUNCTION inv_location_is_mandatory(pi_inv_type IN NM_INV_TYPES.nit_inv_type%TYPE
+                                  )RETURN BOOLEAN;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="validate_rec_iit">
+-- This procedure takes the passed rec_iit and validates it against the inventory metamodel
+--
+PROCEDURE validate_rec_iit (p_rec_iit NM_INV_ITEMS%ROWTYPE);
+--
+-- This overloaded version operates on g_rec_iit from nm3inv
+--
+PROCEDURE validate_rec_iit;
+--
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nit">
+PROCEDURE ins_nit (p_rec_nit NM_INV_TYPES%ROWTYPE);
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="ins_ita">
+PROCEDURE ins_ita (p_rec_ita NM_INV_TYPE_ATTRIBS%ROWTYPE);
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="ins_tab_ita">
+PROCEDURE ins_tab_ita (p_tab_ita tab_nita);
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_attribute_value">
+-- Gets the attribute value for the inventory record from the passed ITA_INV_TYPE and ITA_ATTRIB_NAME
+--
+FUNCTION get_attribute_value
+                   (pi_ne_id    IN NM_MEMBERS.nm_ne_id_of%TYPE
+                   ,pi_mp       IN NM_MEMBERS.nm_begin_mp%TYPE
+                   ,pi_inv_type IN NM_INV_ITEMS.iit_inv_type%TYPE
+                   ,pi_xsp      IN NM_INV_ITEMS.iit_x_sect%TYPE
+                   ,pi_attrib   IN NM_INV_TYPE_ATTRIBS.ita_attrib_name%TYPE
+                   ) RETURN VARCHAR2;
+PRAGMA RESTRICT_REFERENCES (get_attribute_value, wnds);
+FUNCTION get_attribute_value
+                   (pi_ne_id    IN NM_MEMBERS.nm_ne_id_of%TYPE
+                   ,pi_mp       IN NM_MEMBERS.nm_begin_mp%TYPE
+                   ,pi_inv_type IN NM_INV_ITEMS.iit_inv_type%TYPE
+                   ,pi_attrib   IN NM_INV_TYPE_ATTRIBS.ita_attrib_name%TYPE
+                   ) RETURN VARCHAR2;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_attribute_value_number">
+-- Gets the attribute value for the inventory record from the passed ITA_INV_TYPE and ITA_ATTRIB_NAME
+--
+FUNCTION get_attribute_value_number
+                   (pi_ne_id    IN NM_MEMBERS.nm_ne_id_of%TYPE
+                   ,pi_mp       IN NM_MEMBERS.nm_begin_mp%TYPE
+                   ,pi_inv_type IN NM_INV_ITEMS.iit_inv_type%TYPE
+                   ,pi_xsp      IN NM_INV_ITEMS.iit_x_sect%TYPE
+                   ,pi_attrib   IN NM_INV_TYPE_ATTRIBS.ita_attrib_name%TYPE
+                   ) RETURN NUMBER;
+PRAGMA RESTRICT_REFERENCES (get_attribute_value_number, wnds);
+FUNCTION get_attribute_value_number
+                   (pi_ne_id    IN NM_MEMBERS.nm_ne_id_of%TYPE
+                   ,pi_mp       IN NM_MEMBERS.nm_begin_mp%TYPE
+                   ,pi_inv_type IN NM_INV_ITEMS.iit_inv_type%TYPE
+                   ,pi_attrib   IN NM_INV_TYPE_ATTRIBS.ita_attrib_name%TYPE
+                   ) RETURN NUMBER;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_attribute_value_date">
+-- Gets the attribute value for the inventory record from the passed ITA_INV_TYPE and ITA_ATTRIB_NAME
+--
+FUNCTION get_attribute_value_date
+                   (pi_ne_id    IN NM_MEMBERS.nm_ne_id_of%TYPE
+                   ,pi_mp       IN NM_MEMBERS.nm_begin_mp%TYPE
+                   ,pi_inv_type IN NM_INV_ITEMS.iit_inv_type%TYPE
+                   ,pi_xsp      IN NM_INV_ITEMS.iit_x_sect%TYPE
+                   ,pi_attrib   IN NM_INV_TYPE_ATTRIBS.ita_attrib_name%TYPE
+                   ) RETURN DATE;
+PRAGMA RESTRICT_REFERENCES (get_attribute_value_date, wnds);
+FUNCTION get_attribute_value_date
+                   (pi_ne_id    IN NM_MEMBERS.nm_ne_id_of%TYPE
+                   ,pi_mp       IN NM_MEMBERS.nm_begin_mp%TYPE
+                   ,pi_inv_type IN NM_INV_ITEMS.iit_inv_type%TYPE
+                   ,pi_attrib   IN NM_INV_TYPE_ATTRIBS.ita_attrib_name%TYPE
+                   ) RETURN DATE;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_attrib_value_view_col">
+-- Gets the attribute value for the inventory record from the passed ITA_INV_TYPE and ITA_VIEW_COL_NAME
+--
+FUNCTION get_attrib_value_view_col
+                   (pi_ne_id    IN NM_MEMBERS.nm_ne_id_of%TYPE
+                   ,pi_mp       IN NM_MEMBERS.nm_begin_mp%TYPE
+                   ,pi_inv_type IN NM_INV_ITEMS.iit_inv_type%TYPE
+                   ,pi_xsp      IN NM_INV_ITEMS.iit_x_sect%TYPE
+                   ,pi_attrib   IN NM_INV_TYPE_ATTRIBS.ita_view_col_name%TYPE
+                   ) RETURN VARCHAR2;
+PRAGMA RESTRICT_REFERENCES (get_attrib_value_view_col, wnds);
+FUNCTION get_attrib_value_view_col
+                   (pi_ne_id    IN NM_MEMBERS.nm_ne_id_of%TYPE
+                   ,pi_mp       IN NM_MEMBERS.nm_begin_mp%TYPE
+                   ,pi_inv_type IN NM_INV_ITEMS.iit_inv_type%TYPE
+                   ,pi_attrib   IN NM_INV_TYPE_ATTRIBS.ita_view_col_name%TYPE
+                   ) RETURN VARCHAR2;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_attrib_value_view_col_num">
+-- Gets the attribute value for the inventory record from the passed ITA_INV_TYPE and ITA_VIEW_COL_NAME
+--
+FUNCTION get_attrib_value_view_col_num
+                   (pi_ne_id    IN NM_MEMBERS.nm_ne_id_of%TYPE
+                   ,pi_mp       IN NM_MEMBERS.nm_begin_mp%TYPE
+                   ,pi_inv_type IN NM_INV_ITEMS.iit_inv_type%TYPE
+                   ,pi_xsp      IN NM_INV_ITEMS.iit_x_sect%TYPE
+                   ,pi_attrib   IN NM_INV_TYPE_ATTRIBS.ita_view_col_name%TYPE
+                   ) RETURN NUMBER;
+PRAGMA RESTRICT_REFERENCES (get_attrib_value_view_col_num, wnds);
+FUNCTION get_attrib_value_view_col_num
+                   (pi_ne_id    IN NM_MEMBERS.nm_ne_id_of%TYPE
+                   ,pi_mp       IN NM_MEMBERS.nm_begin_mp%TYPE
+                   ,pi_inv_type IN NM_INV_ITEMS.iit_inv_type%TYPE
+                   ,pi_attrib   IN NM_INV_TYPE_ATTRIBS.ita_view_col_name%TYPE
+                   ) RETURN NUMBER;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_attrib_value_view_col_date">
+-- Gets the attribute value for the inventory record from the passed ITA_INV_TYPE and ITA_VIEW_COL_NAME
+--
+FUNCTION get_attrib_value_view_col_date
+                   (pi_ne_id    IN NM_MEMBERS.nm_ne_id_of%TYPE
+                   ,pi_mp       IN NM_MEMBERS.nm_begin_mp%TYPE
+                   ,pi_inv_type IN NM_INV_ITEMS.iit_inv_type%TYPE
+                   ,pi_xsp      IN NM_INV_ITEMS.iit_x_sect%TYPE
+                   ,pi_attrib   IN NM_INV_TYPE_ATTRIBS.ita_view_col_name%TYPE
+                   ) RETURN DATE;
+PRAGMA RESTRICT_REFERENCES (get_attrib_value_view_col_date, wnds);
+FUNCTION get_attrib_value_view_col_date
+                   (pi_ne_id    IN NM_MEMBERS.nm_ne_id_of%TYPE
+                   ,pi_mp       IN NM_MEMBERS.nm_begin_mp%TYPE
+                   ,pi_inv_type IN NM_INV_ITEMS.iit_inv_type%TYPE
+                   ,pi_attrib   IN NM_INV_TYPE_ATTRIBS.ita_view_col_name%TYPE
+                   ) RETURN DATE;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="delete_inv_items">
+--
+-- This procedure deletes all items for the specified type including any groupings and
+-- memberships. An optional where clause can be specifed to retrict the items deleted within
+-- the type.
+-- If any item has children, pi_cascade = TRUE will delete them recursively. If pi_cascade is
+-- FALSE an error will be raised. The cascade option can only be used when no where clause is
+-- specified.
+--
+-- NB: No security checked in this procedure.
+--     User may not be able to see the inv they are trying to delete.
+--     Calling context should check this if necessary.
+--
+PROCEDURE delete_inv_items(pi_inv_type        IN NM_INV_TYPES.nit_inv_type%TYPE
+                          ,pi_cascade         IN BOOLEAN  DEFAULT FALSE
+                          ,pi_where           IN VARCHAR2 DEFAULT NULL
+                          ,pi_inv_table_alias IN VARCHAR2 DEFAULT 'iit'
+                          );
+--
+-- Errors raised:
+--
+-- -20710 Cannot delete items in inventory type as they have child items.
+-- -20711 Cannot cascade delete when a where clause is specified.
+--
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="set_inv_warning_msg">
+-- This procedure sets the value of g_inv_warning_msg
+--
+PROCEDURE set_inv_warning_msg (p_msg VARCHAR2);
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_inv_warning_msg">
+-- This function returns the value of g_inv_warning_msg
+--
+FUNCTION get_inv_warning_msg RETURN VARCHAR2;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="nm_inv_domain_exists">
+-- This function returns TRUE if the specified NM_INV_DOMAINS record exists
+--
+FUNCTION nm_inv_domain_exists (p_id_domain  NM_INV_DOMAINS_ALL.id_domain%TYPE) RETURN BOOLEAN;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="duplicate_hdo_as_id">
+-- This procedure duplicates the specified HIG_DOMAIN (and associated HIG_CODES)
+--  as NM_INV_DOMAINS and NM_INV_ATTRI_LOOKUP records.
+--
+-- NOTE : you can optionally pass in a ID_DOMAIN name to create the records with
+--        a different domain name
+--
+PROCEDURE duplicate_hdo_as_id (p_hdo_domain    HIG_DOMAINS.hdo_domain%TYPE
+                              ,p_id_start_date NM_INV_DOMAINS_ALL.id_start_date%TYPE
+                              ,p_id_domain     NM_INV_DOMAINS_ALL.id_domain%TYPE DEFAULT NULL
+                              );
+--
+-- This function will attempt to duplicate the specified hig_domain and will, if necessary
+--  prefix the data with the passed prefix. This will return the name of the ID_DOMAIN created
+--
+FUNCTION duplicate_hdo_as_id (p_hdo_domain      HIG_DOMAINS.hdo_domain%TYPE
+                             ,p_id_start_date   NM_INV_DOMAINS_ALL.id_start_date%TYPE
+                             ,p_optional_prefix NM_INV_TYPES.nit_inv_type%TYPE
+                             ) RETURN NM_INV_DOMAINS_ALL.id_domain%TYPE;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="check_inv_format_against_col">
+-- This procedure checks to make sure that the format specified is legitimate to
+--  be stored in the specified field. If p_inv_type is not passed then the procedure assumes
+--  that the column we are checking is in NM_INV_ITEMS_ALL, otherwise it checks to see if it
+--  is a foreign table
+--
+PROCEDURE check_inv_format_against_col (p_column_name VARCHAR2
+                                       ,p_format      VARCHAR2
+                                       ,p_inv_type    VARCHAR2 DEFAULT NULL
+                                       );
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="is_column_allowable_for_flex">
+-- This function returns "TRUE" if the passed column name (or atc.column_id) is allowable as a flexible column
+--  on NM_INV_ITEMS_ALL
+--
+FUNCTION is_column_allowable_for_flex (p_column_name user_tab_columns.column_name%TYPE) RETURN VARCHAR2;
+--
+PRAGMA RESTRICT_REFERENCES (is_column_allowable_for_flex, wnds);
+--
+FUNCTION is_column_allowable_for_flex (p_column_id   user_tab_columns.column_id%TYPE)   RETURN VARCHAR2;
+--
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_tab_ita">
+-- This function returns an array of ROWTYPE records containing all nm_inv_type_attribs
+--  records for the inv_type specified
+--
+FUNCTION get_tab_ita (p_inv_type NM_INV_TYPES.nit_inv_type%TYPE) RETURN tab_nita;
+--
+--<PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_tab_ita_exclusive">
+-- This function returns an array of ROWTYPE records containing all nm_inv_type_attribs
+--  records for the inv_type specified where the ITA_EXCLUSIVE flag is set to "Y"
+--
+FUNCTION get_tab_ita_exclusive (p_inv_type NM_INV_TYPES.nit_inv_type%TYPE) RETURN tab_nita;
+--
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_tab_ita_displayed">
+-- This function returns an array of ROWTYPE records containing all nm_inv_type_attribs
+--  records for the inv_type specified where the ITA_DISPLAYED flag is set to "Y"
+-- resutls are returned in disp_seq order
+--
+FUNCTION get_tab_ita_displayed (p_inv_type NM_INV_TYPES.nit_inv_type%TYPE) RETURN tab_nita;
+--
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="inv_type_is_hierarchical">
+-- This function returns
+--
+FUNCTION inv_type_is_hierarchical(pi_type           IN NM_INV_TYPES.nit_inv_type%TYPE
+                                 ,pi_ignore_derived IN BOOLEAN DEFAULT TRUE
+                                 ) RETURN BOOLEAN;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="does_child_exist_diff_au_type"
+--  This function returns FALSE if the passed inventory type is :=
+--   a. Not a parent in an inventory hierarchy
+--   b. All child types within the hierarchy are of the same AU type
+--  Otherwise returns TRUE
+--
+FUNCTION does_child_exist_diff_au_type (pi_inv_type IN NM_INV_TYPES.nit_inv_type%TYPE) RETURN BOOLEAN;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="is_xsp_valid_on_inv_type"
+-- This function returns TRUE if the passed Inv Type and XSP combo are valid together.
+--
+--  THIS FUNCTION TAKES NO INTEREST INTO THE NETWORK TYPE OR SUB CLASS, IT IS INTERESTED
+--   PURELY IF THE XSP AND INV TYPE COMBO EXISTS
+--
+FUNCTION is_xsp_valid_on_inv_type (pi_inv_type IN NM_INV_TYPES.nit_inv_type%TYPE
+                                  ,pi_xsp      IN NM_XSP.nwx_x_sect%TYPE
+                                  ) RETURN BOOLEAN;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="is_xsp_valid_on_inv_type"
+-- Called by after statement trigger on nm_inv_type_attribs_all
+-- to loop through global pl/sql table and validate changed records
+PROCEDURE process_g_tab_ita;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+FUNCTION build_ita_lov_sql_string (pi_ita_inv_type               IN NM_INV_TYPE_ATTRIBS_ALL.ita_inv_type%TYPE
+                                  ,pi_ita_attrib_name            IN NM_INV_TYPE_ATTRIBS_ALL.ita_attrib_name%TYPE
+                                  ,pi_include_bind_variable      IN BOOLEAN DEFAULT FALSE
+							      ,pi_replace_bind_variable_with IN VARCHAR2 DEFAULT NULL
+                                  ) RETURN VARCHAR2;
+
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME=""CREATE_FT_ASSET_FROM_TABLE">
+-- Create a Foreign Table Asset type from a table
+PROCEDURE create_ft_asset_from_table
+               ( pi_table_name         IN     user_tables.table_name%TYPE
+               , pi_pk_column          IN     user_tab_columns.column_name%TYPE
+               , pi_asset_type         IN     NM_INV_TYPES.nit_inv_type%TYPE
+               , pi_asset_descr        IN     NM_INV_TYPES.nit_descr%TYPE
+               , pi_start_date         IN     DATE                                     DEFAULT '01-JAN-1900'
+               , pi_pnt_or_cont        IN     NM_INV_TYPES.nit_pnt_or_cont%TYPE        DEFAULT 'P'
+               , pi_use_xy             IN     NM_INV_TYPES.nit_use_xy%TYPE             DEFAULT 'N'
+               , pi_x_column           IN     user_tab_columns.column_name%TYPE
+               , pi_y_column           IN     user_tab_columns.column_name%TYPE
+               , pi_lr_ne_column       IN     NM_INV_TYPES.nit_lr_ne_column_name%TYPE  DEFAULT NULL
+               , pi_lr_st_chain        IN     NM_INV_TYPES.nit_lr_st_chain%TYPE        DEFAULT NULL
+               , pi_lr_end_chain       IN     NM_INV_TYPES.nit_lr_end_chain%TYPE       DEFAULT NULL
+               , pi_attrib_ltrim       IN     NUMBER                                   DEFAULT 5
+               , pi_admin_type         IN     NM_INV_TYPES.nit_admin_type%TYPE 
+                                              DEFAULT Nm3get.get_nau
+                                                          ( pi_nau_admin_unit => Nm3get.get_hus
+                                                                                    (pi_hus_username=>Sys_Context('NM3_SECURITY_CTX','USERNAME'))
+                                                                                    .hus_admin_unit)
+                                                                                    .nau_admin_type
+               , pi_role               IN     NM_INV_TYPE_ROLES.itr_hro_role%TYPE      DEFAULT 'HIG_USER'
+               , pi_role_mode          IN     NM_INV_TYPE_ROLES.itr_mode%TYPE          DEFAULT 'NORMAL');
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="is_linear_asset_type">
+-- Return TRUE if asset type is linear
+FUNCTION is_linear_asset_type(pi_nit_inv_type IN nm_inv_types_all.nit_inv_type%TYPE) RETURN BOOLEAN;
+--
+--</PROC>
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="is_cont_asset_type">
+-- Return TRUE if asset type is contiguous
+FUNCTION is_cont_asset_type(pi_nit_inv_type IN nm_inv_types_all.nit_inv_type%TYPE) RETURN BOOLEAN;
+--
+--</PROC>
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="check_asset_location">
+-- Call asset_location_is_valid and raise error if FALSE is returned
+-- this procedure was introduced to be called from nm3nwval.check_members
+-- which itself is called from ins_nm_members trigger on NM_MEMBERS_ALL
+--
+-- Note: other location checking is done in on the client forms e.g. NM0510 and NM0590
+-- in program units LOCATE_INVENTORY and GET_NETWORK_LOCATION
+PROCEDURE check_asset_location(pi_nit_inv_type IN nm_inv_types_all.nit_inv_type%TYPE 
+                              ,pi_begin_mp     IN nm_members_all.nm_begin_mp%TYPE
+                              ,pi_end_mp       IN nm_members_all.nm_end_mp%TYPE);
+--
+--</PROC>
+----------------------------------------------------------------------------------
+--
+--<PROC NAME="bypass_inv_items_all_trgs">
+-- MJA add 31-Aug-07
+-- Speaks for itself.  If true then bypass triggers.
+-- To be called in NM_INV_ITEMS_ALL_SDO_B_UPD, NM_INV_ITEMS_ALL_SDO_B_STM,
+--  NM_INV_ITEMS_ALL_SDO_A_STM, NM_INV_ITEMS_ALL_ROLE_SEC, NM_INV_ITEMS_ALL_EXCL_A_STM,
+--  NM_INV_ITEMS_ALL_EXCL_B_ROW, NM_INV_ITEMS_ALL_EXCL_B_STM triggers to see if 
+--  bypass required
+FUNCTION bypass_inv_items_all_trgs RETURN BOOLEAN;
+--</PROC>
+--
+----------------------------------------------------------------------------------
+--
+--<PROC NAME="bypass_inv_items_all_trgs">
+-- MJA add 31-Aug-07
+-- Sets global g_bypass_inv_items_all_trgs true or false.
+PROCEDURE bypass_inv_items_all_trgs ( pi_mode IN BOOLEAN );
+--</PROC>
+--
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_ita_case">
+-- Return the case of an attribute from ita_case
+  FUNCTION get_ita_case ( pi_asset_type   IN  nm_inv_type_attribs.ita_inv_type%TYPE
+                        , pi_attrib_name  IN  nm_inv_type_attribs.ita_attrib_name%TYPE ) 
+    RETURN nm_inv_type_attribs.ita_case%TYPE;
+--</PROC>
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="format_with_ita_case">
+-- Return the varchar2 value after upper/lowering it depending on ita_case
+  FUNCTION format_with_ita_case ( pi_asset_type   IN  nm_inv_type_attribs.ita_inv_type%TYPE
+                                , pi_attrib_name  IN  nm_inv_type_attribs.ita_attrib_name%TYPE
+                                , pi_value        IN  VARCHAR2 ) 
+    RETURN VARCHAR2;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--<PRAGMA>
+PRAGMA RESTRICT_REFERENCES (get_version, wnds, wnps);
+PRAGMA RESTRICT_REFERENCES (get_body_version, wnds, wnps);
+PRAGMA RESTRICT_REFERENCES (work_out_inv_type_view_name, wnds);
+PRAGMA RESTRICT_REFERENCES (derive_inv_type_view_name, wnds);
+PRAGMA RESTRICT_REFERENCES (derive_nw_inv_type_view_name, wnds);
+PRAGMA RESTRICT_REFERENCES (get_create_inv_view_text, wnds);
+PRAGMA RESTRICT_REFERENCES (get_version, wnds );
+--* PRAGMA RESTRICT_REFERENCES (get_iit_id, WNDS );
+PRAGMA RESTRICT_REFERENCES (get_iit_pk , wnds );
+--* PRAGMA RESTRICT_REFERENCES (get_ity_descr , wnds );
+--* PRAGMA RESTRICT_REFERENCES (get_ity , wnds, TRUST );
+--* PRAGMA RESTRICT_REFERENCES (get_item_details, WNDS );
+--* PRAGMA RESTRICT_REFERENCES (get_xsp_offset_range, WNDS );
+--* PRAGMA RESTRICT_REFERENCES (get_xsp_descr, WNDS );
+--* PRAGMA RESTRICT_REFERENCES (get_pk_column_name, wnds );
+--* PRAGMA RESTRICT_REFERENCES (ity_exists, wnds );
+--* PRAGMA RESTRICT_REFERENCES ( get_last_mp_rse, WNDS );
+--* PRAGMA RESTRICT_REFERENCES ( get_last_mp, WNDS );
+--* PRAGMA RESTRICT_REFERENCES ( get_mp_offset, WNDS ); - Unit conversion cannot be included with this pragma
+--* PRAGMA RESTRICT_REFERENCES ( get_nit_inv_type, wnds );
+PRAGMA RESTRICT_REFERENCES (get_inv_type_attr, wnds );
+PRAGMA RESTRICT_REFERENCES (get_inv_type, wnds );
+PRAGMA RESTRICT_REFERENCES (get_inv_type_table_name, wnds );
+PRAGMA RESTRICT_REFERENCES (get_inv_item, wnds, wnps);
+PRAGMA RESTRICT_REFERENCES (get_inv_primary_key, wnds );
+PRAGMA RESTRICT_REFERENCES (get_inv_type, wnds );
+PRAGMA RESTRICT_REFERENCES (get_nm_inv_nw, wnds );
+PRAGMA RESTRICT_REFERENCES (attrib_in_use, wnds );
+PRAGMA RESTRICT_REFERENCES (attrib_in_use_char, wnds );
+PRAGMA RESTRICT_REFERENCES (get_inv_admin_type, wnds );
+PRAGMA RESTRICT_REFERENCES (get_inv_domain_meaning, wnds);
+PRAGMA RESTRICT_REFERENCES (mand_loc_inv_not_located, wnds);
+PRAGMA RESTRICT_REFERENCES (get_const_code, wnds);
+PRAGMA RESTRICT_REFERENCES (get_const_meaning , wnds);
+PRAGMA RESTRICT_REFERENCES (get_const_both, wnds);
+PRAGMA RESTRICT_REFERENCES (set_val_flx_inv_func_ret_type, wnds);
+PRAGMA RESTRICT_REFERENCES (get_inv_item_all, wnds, wnps);
+PRAGMA RESTRICT_REFERENCES (get_inv_type_all, wnds, wnps);
+PRAGMA RESTRICT_REFERENCES (get_itg, wnds, wnps);
+PRAGMA RESTRICT_REFERENCES (get_inv_mode_by_role, wnds, wnps);
+PRAGMA RESTRICT_REFERENCES (inv_location_is_mandatory, wnds);
+PRAGMA RESTRICT_REFERENCES (get_nit_pnt_or_cont, wnds);
+PRAGMA RESTRICT_REFERENCES (get_attribute_value, wnds);
+PRAGMA RESTRICT_REFERENCES (get_attribute_value_date, wnds);
+PRAGMA RESTRICT_REFERENCES (get_attribute_value_number, wnds);
+PRAGMA RESTRICT_REFERENCES (get_attrib_value_view_col, wnds);
+PRAGMA RESTRICT_REFERENCES (get_attrib_value_view_col_date, wnds);
+PRAGMA RESTRICT_REFERENCES (get_attrib_value_view_col_num, wnds);
+PRAGMA RESTRICT_REFERENCES (get_ita_by_view_col, wnds);
+PRAGMA RESTRICT_REFERENCES (set_inv_warning_msg, wnds);
+PRAGMA RESTRICT_REFERENCES (get_inv_warning_msg, wnds);
+PRAGMA RESTRICT_REFERENCES (nm_inv_domain_exists, wnds);
+PRAGMA RESTRICT_REFERENCES (is_column_allowable_for_flex, wnds);
+PRAGMA RESTRICT_REFERENCES (inv_type_is_hierarchical, wnds);
+--</PRAGMA>
+--
+----------------------------------------------------------------------------------------------
+--
+END Nm3inv;
+/
