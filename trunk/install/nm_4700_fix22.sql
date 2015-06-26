@@ -2,11 +2,11 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/nm_4700_fix22.sql-arc   1.2   Jun 02 2015 12:24:56   Vikas.Mhetre  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/nm_4700_fix22.sql-arc   1.3   Jun 26 2015 12:26:22   Vikas.Mhetre  $
 --       Module Name      : $Workfile:   nm_4700_fix22.sql  $
---       Date into PVCS   : $Date:   Jun 02 2015 12:24:56  $
---       Date fetched Out : $Modtime:   Jun 02 2015 12:24:12  $
---       PVCS Version     : $Revision:   1.2  $
+--       Date into PVCS   : $Date:   Jun 26 2015 12:26:22  $
+--       Date fetched Out : $Modtime:   Jun 26 2015 13:19:26  $
+--       PVCS Version     : $Revision:   1.3  $
 --
 --------------------------------------------------------------------------------
 --   Copyright (c) 2015 Bentley Systems Incorporated.  All rights reserved.
@@ -81,6 +81,22 @@ SET TERM OFF
 --
 SET FEEDBACK ON
 start nm3homo.pkw
+SET FEEDBACK OFF
+--
+SET TERM ON 
+PROMPT nm3inv.pkh
+SET TERM OFF
+--
+SET FEEDBACK ON
+start nm3inv.pkh
+SET FEEDBACK OFF
+--
+SET TERM ON 
+PROMPT nm3inv.pkw
+SET TERM OFF
+--
+SET FEEDBACK ON
+start nm3inv.pkw
 SET FEEDBACK OFF
 --
 --------------------------------------------------------------------------------
