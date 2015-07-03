@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY nm3invval IS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3invval.pkb-arc   2.18   Mar 31 2015 21:07:02   Rob.Coupe  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3invval.pkb-arc   2.19   Jul 03 2015 14:45:28   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3invval.pkb  $
---       Date into PVCS   : $Date:   Mar 31 2015 21:07:02  $
---       Date fetched Out : $Modtime:   Mar 13 2015 15:23:10  $
---       Version          : $Revision:   2.18  $
+--       Date into PVCS   : $Date:   Jul 03 2015 14:45:28  $
+--       Date fetched Out : $Modtime:   Jul 03 2015 14:43:12  $
+--       Version          : $Revision:   2.19  $
 --       Based on SCCS version : 1.30
 -------------------------------------------------------------------------
 --
@@ -19,7 +19,7 @@ CREATE OR REPLACE PACKAGE BODY nm3invval IS
 --   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.18  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.19  $"';
 --  g_body_sccsid is the SCCS ID for the package body
    g_package_name    CONSTANT  varchar2(30)   := 'nm3invval';
 --
@@ -242,9 +242,10 @@ BEGIN
    IF pi_rec_nii.iit_primary_key IS NOT NULL
     AND  NOT l_rec_nii.is_parent
     THEN
-      g_validation_error_code := -20112;
-      g_validation_error_msg  := 'IIT_PRIMARY_KEY specified and INV_TYPE is NOT an ITG parent';
-      RAISE g_validation_error;
+	  NULL;
+--      g_validation_error_code := -20112;
+--      g_validation_error_msg  := 'IIT_PRIMARY_KEY specified and INV_TYPE is NOT an ITG parent';
+--      RAISE g_validation_error;
    END IF;
 --
    IF    pi_rec_nii.iit_foreign_key IS NULL
