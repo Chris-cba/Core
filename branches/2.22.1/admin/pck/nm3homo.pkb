@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3homo AS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3homo.pkb-arc   2.22.1.1   Jun 10 2015 13:53:16   Vikas.Mhetre  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3homo.pkb-arc   2.22.1.2   Jul 16 2015 09:45:22   Vikas.Mhetre  $
 --       Module Name      : $Workfile:   nm3homo.pkb  $
---       Date into PVCS   : $Date:   Jun 10 2015 13:53:16  $
---       Date fetched Out : $Modtime:   Jun 10 2015 12:20:52  $
---       PVCS Version     : $Revision:   2.22.1.1  $
+--       Date into PVCS   : $Date:   Jul 16 2015 09:45:22  $
+--       Date fetched Out : $Modtime:   Jul 16 2015 10:48:32  $
+--       PVCS Version     : $Revision:   2.22.1.2  $
 --
 --
 --   Author : Jonathan Mills
@@ -40,7 +40,7 @@ CREATE OR REPLACE PACKAGE BODY nm3homo AS
    
    -- Log 713421
    
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.22.1.1  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.22.1.2  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3homo';
@@ -4135,6 +4135,7 @@ BEGIN
                              ,pi_nte_for_chunk => l_nte_for_edited_datums);
           
           if l_new_pl_2.pl_ne_id is not null
+          and l_new_pl_2.pl_ne_id <> l_locs_on_element_arr(i).nte_ne_id_of -- VM
           then
             IF l_new_pl_2.pl_ne_id = l_closing_hist_arr(1).neh_ne_id_new
             THEN
