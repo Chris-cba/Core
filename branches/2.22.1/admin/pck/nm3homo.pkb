@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3homo AS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3homo.pkb-arc   2.22.1.2   Jul 16 2015 09:45:22   Vikas.Mhetre  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3homo.pkb-arc   2.22.1.3   Jul 17 2015 14:54:04   Vikas.Mhetre  $
 --       Module Name      : $Workfile:   nm3homo.pkb  $
---       Date into PVCS   : $Date:   Jul 16 2015 09:45:22  $
---       Date fetched Out : $Modtime:   Jul 16 2015 10:48:32  $
---       PVCS Version     : $Revision:   2.22.1.2  $
+--       Date into PVCS   : $Date:   Jul 17 2015 14:54:04  $
+--       Date fetched Out : $Modtime:   Jul 17 2015 14:45:00  $
+--       PVCS Version     : $Revision:   2.22.1.3  $
 --
 --
 --   Author : Jonathan Mills
@@ -40,7 +40,7 @@ CREATE OR REPLACE PACKAGE BODY nm3homo AS
    
    -- Log 713421
    
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.22.1.2  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.22.1.3  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3homo';
@@ -2424,7 +2424,14 @@ BEGIN
     l_nm_rec.nm_end_mp     := l_pl.pl_end;
           
     db('  inserting nm rec ' || l_nm_rec.nm_ne_id_of || ':' || l_pl.pl_start || ':' || l_pl.pl_end);
-    nm3ins.ins_nm(p_rec_nm => l_nm_rec);
+    BEGIN
+      nm3ins.ins_nm(p_rec_nm => l_nm_rec);
+    EXCEPTION
+      WHEN DUP_VAL_ON_INDEX
+      THEN
+        -- don't do anything and keep the existing record as it is
+        NULL;
+    END;
 
     IF pi_nte_for_chunk IS NOT NULL
     THEN
@@ -4135,7 +4142,6 @@ BEGIN
                              ,pi_nte_for_chunk => l_nte_for_edited_datums);
           
           if l_new_pl_2.pl_ne_id is not null
-          and l_new_pl_2.pl_ne_id <> l_locs_on_element_arr(i).nte_ne_id_of -- VM
           then
             IF l_new_pl_2.pl_ne_id = l_closing_hist_arr(1).neh_ne_id_new
             THEN
