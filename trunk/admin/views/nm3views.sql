@@ -14,7 +14,7 @@
 --   Product install/upgrade script
 --
 -----------------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 
 
@@ -1588,4 +1588,14 @@ SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'views'||'&te
 FROM dual 
 / 
 start '&run_file'
-
+--
+----------------------------------------------------------------------------------------- 
+--
+SET TERM ON 
+PROMPT all_sdo_styles.vw
+SET TERM OFF
+SET DEFINE ON 
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'views'||'&terminator'||'all_sdo_styles.vw' run_file 
+FROM dual 
+/ 
+start '&run_file'
