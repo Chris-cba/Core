@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3ddl AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ddl.pkb-arc   2.27   Jul 04 2013 15:23:08   James.Wadsworth  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3ddl.pkb-arc   2.28   Jul 20 2015 13:54:42   Upendra.Hukeri  $
 --       Module Name      : $Workfile:   nm3ddl.pkb  $
---       Date into PVCS   : $Date:   Jul 04 2013 15:23:08  $
---       Date fetched Out : $Modtime:   Jul 04 2013 15:20:04  $
---       PVCS Version     : $Revision:   2.27  $
+--       Date into PVCS   : $Date:   Jul 20 2015 13:54:42  $
+--       Date fetched Out : $Modtime:   Jul 20 2015 13:52:02  $
+--       PVCS Version     : $Revision:   2.28  $
 --       Based on SCCS Version     : 1.5
 --
 --
@@ -17,13 +17,13 @@ CREATE OR REPLACE PACKAGE BODY Nm3ddl AS
 --   NM3 DDL package
 --
 -----------------------------------------------------------------------------
--- Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 --
 --all global package variables here
 --
-   g_body_sccsid     constant varchar2(30) :='"$Revision:   2.27  $"';
+   g_body_sccsid     constant varchar2(30) :='"$Revision:   2.28  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3ddl';
@@ -2109,160 +2109,180 @@ IS
 -- until the user is assigned roles)
 -- so it is done on post-forms-commit instead
 ---------------------------------------------
-  PROCEDURE create_user_sdo_maps IS
-
-  BEGIN
-
-    --
-    -- drop priv synonym if it exists (which is why there's a when others null exception handler)
-    --
-    BEGIN
-      EXECUTE IMMEDIATE 'DROP SYNONYM '||UPPER(pi_sub_username)||'.USER_SDO_MAPS';
-    EXCEPTION
-      WHEN others THEN
-        Null;
-    END;
-
-
-    EXECUTE IMMEDIATE
-      'CREATE OR REPLACE FORCE VIEW '||UPPER(pi_sub_username)||'.user_sdo_maps '||
-      'AS '||'   SELECT * FROM '||Sys_Context('NM3CORE','APPLICATION_OWNER')||'.user_sdo_maps';
-  EXCEPTION
-    WHEN OTHERS THEN
-      -- raise_application_error(-20001,'Failed to create view USER_SDO_MAPS'||chr(10)||nm3flx.parse_error_message(sqlerrm));
-      -- 712315 removed above line to stop creation of users falling over in hig1832 and allow the creation of user_sdo_maps view.
-      NULL;
-
-  END create_user_sdo_maps;
-  --
-  --
-  --
-  PROCEDURE create_user_sdo_themes IS
-
-  BEGIN
-
-    --
-    -- drop priv synonym if it exists (which is why there's a when others null exception handler)
-    --
-    BEGIN
-      EXECUTE IMMEDIATE 'DROP SYNONYM '||UPPER(pi_sub_username)||'.USER_SDO_THEMES';
-    EXCEPTION
-      WHEN others THEN
-        Null;
-    END;
-
-
-    EXECUTE IMMEDIATE
-      'CREATE OR REPLACE FORCE VIEW '||UPPER(pi_sub_username)||'.user_sdo_themes '||
-      'AS '||'   SELECT * FROM '||Sys_Context('NM3CORE','APPLICATION_OWNER')||'.user_sdo_themes';
-  EXCEPTION
-    WHEN OTHERS THEN
-      -- raise_application_error(-20001,'Failed to create view USER_SDO_THEMES'||chr(10)||nm3flx.parse_error_message(sqlerrm));
-      -- 712315 removed above line to stop creation of users falling over in hig1832 and allow the creation of user_sdo_themes view.
-      NULL;
-  END create_user_sdo_themes;
-  --
-  --
-  --
-  PROCEDURE create_user_sdo_styles IS
-
-  BEGIN
-
-    --
-    -- drop priv synonym if it exists (which is why there's a when others null exception handler)
-    --
-    BEGIN
-      EXECUTE IMMEDIATE 'DROP SYNONYM '||UPPER(pi_sub_username)||'.USER_SDO_STYLES';
-    EXCEPTION
-      WHEN others THEN
-        Null;
-    END;
-
-
-    EXECUTE IMMEDIATE
-      'CREATE OR REPLACE FORCE VIEW '||UPPER(pi_sub_username)||'.user_sdo_styles '||
-      ' AS '||'  SELECT * FROM '||Sys_Context('NM3CORE','APPLICATION_OWNER')||'.user_sdo_styles';
-  EXCEPTION
-    WHEN OTHERS THEN
-      -- raise_application_error(-20001,'Failed to create view USER_SDO_STYLES'||chr(10)||nm3flx.parse_error_message(sqlerrm));
-      -- 712315 removed above line to stop creation of users falling over in hig1832 and allow the creation of user_sdo_styles view.
-      NULL;
-  END create_user_sdo_styles;
-
-
+	PROCEDURE create_user_sdo_maps 
+	IS
+	--
+	BEGIN
+		--
+		-- drop priv synonym if it exists (which is why there's a when others null exception handler)
+		--
+		BEGIN
+		EXECUTE IMMEDIATE 
+			'DROP SYNONYM '||UPPER(pi_sub_username)||'.USER_SDO_MAPS';
+		EXCEPTION
+			WHEN others THEN
+				NULL;
+		END;
+		--
+		EXECUTE IMMEDIATE
+			'CREATE OR REPLACE FORCE VIEW '||UPPER(pi_sub_username)||'.user_sdo_maps '||
+			'AS '||'   SELECT * FROM '||Sys_Context('NM3CORE', 'APPLICATION_OWNER')||'.user_sdo_maps';
+	EXCEPTION
+		WHEN OTHERS THEN
+		  -- raise_application_error(-20001,'Failed to create view USER_SDO_MAPS'||chr(10)||nm3flx.parse_error_message(sqlerrm));
+		  -- 712315 removed above line to stop creation of users falling over in hig1832 and allow the creation of user_sdo_maps view.
+		NULL;
+	--
+	END create_user_sdo_maps;
+	--
+	--
+	--
+	PROCEDURE create_user_sdo_themes 
+	IS
+	--
+	BEGIN
+		--
+		-- drop priv synonym if it exists (which is why there's a when others null exception handler)
+		--
+		BEGIN
+			EXECUTE IMMEDIATE 'DROP SYNONYM '||UPPER(pi_sub_username)||'.USER_SDO_THEMES';
+		EXCEPTION
+			WHEN OTHERS THEN
+				NULL;
+		END;
+		--
+		EXECUTE IMMEDIATE
+			'CREATE OR REPLACE FORCE VIEW '||UPPER(pi_sub_username)||'.user_sdo_themes '||
+			'AS '||'   SELECT * FROM '||Sys_Context('NM3CORE', 'APPLICATION_OWNER')||'.user_sdo_themes';
+	EXCEPTION
+		WHEN OTHERS THEN
+			-- raise_application_error(-20001,'Failed to create view USER_SDO_THEMES'||chr(10)||nm3flx.parse_error_message(sqlerrm));
+			-- 712315 removed above line to stop creation of users falling over in hig1832 and allow the creation of user_sdo_themes view.
+			NULL;
+	END create_user_sdo_themes;
+	--
+	--
+	--
+	PROCEDURE create_user_sdo_styles 
+	IS
+	--
+	BEGIN
+		--
+		-- drop priv synonym if it exists (which is why there's a when others null exception handler)
+		--
+		BEGIN
+			EXECUTE IMMEDIATE 
+				'DROP SYNONYM '||UPPER(pi_sub_username)||'.USER_SDO_STYLES';
+		EXCEPTION
+			WHEN others THEN
+				NULL;
+		END;
+		--
+		EXECUTE IMMEDIATE
+			'CREATE OR REPLACE FORCE VIEW '||UPPER(pi_sub_username)||'.user_sdo_styles '||
+			' AS '||'  SELECT * FROM '||Sys_Context('NM3CORE', 'APPLICATION_OWNER')||'.user_sdo_styles';
+	EXCEPTION
+		WHEN OTHERS THEN
+			-- raise_application_error(-20001,'Failed to create view USER_SDO_STYLES'||chr(10)||nm3flx.parse_error_message(sqlerrm));
+			-- 712315 removed above line to stop creation of users falling over in hig1832 and allow the creation of user_sdo_styles view.
+			NULL;
+	END create_user_sdo_styles;
+	--
+	--
+	--
+	PROCEDURE create_all_sdo_styles 
+	IS
+	--
+	BEGIN
+		--
+		-- drop priv synonym if it exists (which is why there's a when others null exception handler)
+		--
+		BEGIN
+			EXECUTE IMMEDIATE 
+				'DROP SYNONYM ' || UPPER(pi_sub_username) || '.ALL_SDO_STYLES';
+		EXCEPTION
+			WHEN OTHERS THEN
+				NULL;
+		END;
+		--
+		EXECUTE IMMEDIATE
+			'CREATE OR REPLACE FORCE VIEW ' || UPPER(pi_sub_username) || '.ALL_SDO_STYLES ' ||
+			' AS ' || '  SELECT * FROM ' || SYS_CONTEXT('NM3CORE', 'APPLICATION_OWNER') || '.ALL_SDO_STYLES';
+	EXCEPTION
+		WHEN OTHERS THEN
+			NULL;
+		--
+	END create_all_sdo_styles;
+	--
 BEGIN
-
-  --
-  IF Nm3get.get_hus (pi_hus_username => pi_sub_username ).hus_is_hig_owner_flag != 'Y' THEN
-
-    create_user_sdo_maps;
-
-    create_user_sdo_themes;
-
-    create_user_sdo_styles;
---
---RC> Task 0108742 - we do not want subordinate user views or synonyms - these can be created when a user is allocated
---    a role or a role is allocated to a theme. The code in nm3sdm was modified to create the synonyms rather than views
---    but neither are required here.
---     nm3sdm.create_msv_feature_views ( pi_username => pi_sub_username );
-
- END IF;
-
+	--
+	IF nm3get.get_hus (pi_hus_username => pi_sub_username).hus_is_hig_owner_flag != 'Y' THEN
+		create_user_sdo_maps;
+		--
+		create_user_sdo_themes;
+		--
+		create_user_sdo_styles;
+		--
+		create_all_sdo_styles;
+		--
+		-- RC> Task 0108742 - we do not want subordinate user views or synonyms - these can be created when a user is allocated
+		-- a role or a role is allocated to a theme. The code in nm3sdm was modified to create the synonyms rather than views
+		-- but neither are required here.
+		-- nm3sdm.create_msv_feature_views ( pi_username => pi_sub_username );
+	END IF;
+	--
 END create_sub_sdo_views;
 --
 -----------------------------------------------------------------------------
 --
 PROCEDURE create_all_styles_view
 IS
-  l_view_sql       nm3type.max_varchar2;
-  l_tab_usernames  nm3type.tab_varchar30;
-  lf               VARCHAR2(10) := CHR(10);
+	l_view_sql       nm3type.max_varchar2;
+	l_tab_usernames  nm3type.tab_varchar30;
+	lf               VARCHAR2(10) := CHR(10);
 BEGIN
-  l_view_sql := 'CREATE OR REPLACE VIEW mdsys.ALL_SDO_STYLES'||lf||
-                ' ( OWNER '       ||lf||
-                ' , NAME '        ||lf||
-                ' , TYPE '        ||lf||
-                ' , DESCRIPTION ' ||lf||
-                ' , DEFINITION '  ||lf||
-                ' , IMAGE '       ||lf||
-                ' , GEOMETRY) '   ||lf||
-                ' AS ';
---
-  SELECT owner
+	SELECT 	owner
     BULK COLLECT INTO l_tab_usernames
-    FROM dba_objects
-   WHERE object_name = 'HIG_USERS'
-     AND object_type = 'TABLE';
---
-  FOR i IN 1..l_tab_usernames.COUNT
-  LOOP
-    l_view_sql := l_view_sql||lf||
-                  'SELECT HUS_USERNAME OWNER '||lf||
-                  '     , NAME '||lf||
-                  '     , TYPE '||lf||
-                  '     , DESCRIPTION '||lf||
-                  '     , DEFINITION '||lf||
-                  '     , IMAGE '||lf||
-                  '     , GEOMETRY '||lf||
-                  '  FROM MDSYS.SDO_STYLES_TABLE '||lf||
-                  '     , '||l_tab_usernames(i)||'.HIG_USERS'||lf||
-                  '  WHERE sdo_owner = '||nm3flx.string(l_tab_usernames(i))||lf||
-                  '    AND hus_username IS NOT NULL ';
-    IF i != l_tab_usernames.COUNT
-    THEN
-      l_view_sql := l_view_sql||lf||'UNION ALL';
-    END IF;
-  END LOOP;
---
---   nm_debug.debug_on;
---   nm_debug.debug(l_view_sql);
-  EXECUTE IMMEDIATE l_view_sql;
---
+    FROM 	dba_objects
+	WHERE 	object_name = 'HIG_USERS'
+		AND object_type = 'TABLE';
+	--
+	FOR i IN 1..l_tab_usernames.COUNT
+	LOOP
+		l_view_sql := 	'CREATE OR REPLACE VIEW ' || l_tab_usernames(i) || '.ALL_SDO_STYLES' || lf ||
+						' (OWNER '       		|| lf ||
+						' ,NAME '        		|| lf ||
+						' ,TYPE '        		|| lf ||
+						' ,DESCRIPTION '		|| lf ||
+						' ,DEFINITION ' 		|| lf ||
+						' ,IMAGE '      		|| lf ||
+						' ,GEOMETRY) '  		|| lf ||
+						' AS '					|| lf ||
+						' SELECT HUS_USERNAME OWNER '|| lf ||
+						'      ,NAME '			|| lf ||
+						'      ,TYPE '			|| lf ||
+						'      ,DESCRIPTION '	|| lf ||
+						'      ,DEFINITION '	|| lf ||
+						'      ,IMAGE '			|| lf ||
+						'      ,GEOMETRY '		|| lf ||
+						' FROM MDSYS.SDO_STYLES_TABLE '|| lf|| 
+						'      , ' || l_tab_usernames(i) || '.HIG_USERS' || lf ||
+						' WHERE sdo_owner = ' || nm3flx.string(l_tab_usernames(i)) || lf || 
+						' 	   AND hus_username IS NOT NULL ';
+		--
+		--
+		--   nm_debug.debug_on;
+		--   nm_debug.debug(l_view_sql);
+		--
+		EXECUTE IMMEDIATE l_view_sql;
+		--
+	END LOOP;
+	--
 EXCEPTION
-  WHEN NO_DATA_FOUND
-    THEN raise_application_error (-20001,'No users found');
-  WHEN OTHERS
-    THEN RAISE;
+	WHEN NO_DATA_FOUND THEN 
+		raise_application_error (-20001,'No users found');
+	WHEN OTHERS THEN 
+		RAISE;
 END create_all_styles_view;
 --
 -----------------------------------------------------------------------------
@@ -2338,7 +2358,7 @@ IS
   l_d    VARCHAR2(100) := NVL(pi_d,'%'||'D'||'%');
   l_t    VARCHAR2(100) := NVL(pi_t,'%'||'T'||'%');
   l_i    VARCHAR2(100) := NVL(pi_i,'%'||'I'||'%');
-  l_c    VARCHAR2(100) := NVL(pi_copyright,'Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.');
+  l_c    VARCHAR2(100) := NVL(pi_copyright,'Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.');
 BEGIN
 --
   IF l_sccs IS NULL
