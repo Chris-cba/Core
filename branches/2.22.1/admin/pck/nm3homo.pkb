@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3homo AS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3homo.pkb-arc   2.22.1.3   Jul 17 2015 14:54:04   Vikas.Mhetre  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3homo.pkb-arc   2.22.1.4   Jul 22 2015 14:11:04   Vikas.Mhetre  $
 --       Module Name      : $Workfile:   nm3homo.pkb  $
---       Date into PVCS   : $Date:   Jul 17 2015 14:54:04  $
---       Date fetched Out : $Modtime:   Jul 17 2015 14:45:00  $
---       PVCS Version     : $Revision:   2.22.1.3  $
+--       Date into PVCS   : $Date:   Jul 22 2015 14:11:04  $
+--       Date fetched Out : $Modtime:   Jul 22 2015 13:56:22  $
+--       PVCS Version     : $Revision:   2.22.1.4  $
 --
 --
 --   Author : Jonathan Mills
@@ -40,7 +40,7 @@ CREATE OR REPLACE PACKAGE BODY nm3homo AS
    
    -- Log 713421
    
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.22.1.3  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.22.1.4  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3homo';
@@ -4282,34 +4282,36 @@ BEGIN
   --   
       for i in c_inv
       loop
-        for j in c_inv_previous(i.nm_ne_id_of, i.iit_inv_type, i.iit_start_date)
-        loop
-          if j.iit_end_date = j.nm_end_date then
-             null;
-          else
-             update nm_inv_items_all
-             set iit_end_date = j.nm_end_date
-             where iit_ne_id = j.iit_ne_id
-             and iit_start_date = j.iit_start_date
-             and not exists ( select 1 from nm_members_all 
-                              where nm_ne_id_in = j.iit_ne_id 
-                              and nm_start_date > j.nm_end_date 
-                              and nm_end_date is null);
-          end if;
+        if i.iit_start_date < nm3user.get_effective_date then        
+          for j in c_inv_previous(i.nm_ne_id_of, i.iit_inv_type, i.iit_start_date)
+          loop
+            if j.iit_end_date = j.nm_end_date then
+              null;
+            else
+              update nm_inv_items_all
+              set iit_end_date = j.nm_end_date
+              where iit_ne_id = j.iit_ne_id
+              and iit_start_date = j.iit_start_date
+              and not exists ( select 1 from nm_members_all 
+                               where nm_ne_id_in = j.iit_ne_id 
+                               and nm_start_date > j.nm_end_date 
+                               and nm_end_date is null);
+            end if;
   --
-        end loop;
-        for j in c_inv_next(i.nm_ne_id_of, i.iit_inv_type, i.iit_start_date)
-        loop
-          if j.iit_end_date = j.nm_end_date then
-             null;
-          else
-             update nm_inv_items_all
-             set iit_end_date = j.nm_end_date
-             where iit_ne_id = j.iit_ne_id
-             and iit_start_date = j.iit_start_date;
-          end if;
+          end loop;
+          for j in c_inv_next(i.nm_ne_id_of, i.iit_inv_type, i.iit_start_date)
+          loop
+            if j.iit_end_date = j.nm_end_date then
+              null;
+            else
+              update nm_inv_items_all
+              set iit_end_date = j.nm_end_date
+              where iit_ne_id = j.iit_ne_id
+              and iit_start_date = j.iit_start_date;
+            end if;
   --
-        end loop;
+          end loop;
+        end if;
       end loop;
   --
     end;
