@@ -16,11 +16,11 @@
  *
  *    PVCS Identifiers :-
  *
- *       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/Java/shapefile/ShapefileDataStore.java-arc   1.0   Apr 24 2015 06:20:58   Upendra.Hukeri  $
+ *       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/Java/shapefile/ShapefileDataStore.java-arc   1.1   Aug 17 2015 07:37:36   Upendra.Hukeri  $
  *       Module Name      : $Workfile:   ShapefileDataStore.java  $
- *       Date into SCCS   : $Date:   Apr 24 2015 06:20:58  $
- *       Date fetched Out : $Modtime:   Apr 21 2015 12:54:58  $
- *       SCCS Version     : $Revision:   1.0  $
+ *       Date into SCCS   : $Date:   Aug 17 2015 07:37:36  $
+ *       Date fetched Out : $Modtime:   Jul 31 2015 14:10:28  $
+ *       SCCS Version     : $Revision:   1.1  $
  *       Based on 
  *
  *
@@ -358,11 +358,9 @@ public class ShapefileDataStore extends ContentDataStore implements FileDataStor
             } else if (colType == Long.class) {
                 header.addColumn(colName, 'N', Math.min(fieldLen, 18), 0);
             } else if (colType == BigInteger.class) {
-                header.addColumn(colName, 'N', Math.min(fieldLen, 38), 0);
+                header.addColumn(colName, 'N', Math.min(fieldLen, 19), 0);
             } else if (Number.class.isAssignableFrom(colType)) {
-                int l = Math.min(fieldLen, 38);
-                int d = Math.max(l - (l/2), 0);
-                header.addColumn(colName, 'N', l, d);
+                header.addColumn(colName, 'N', 19, 9);
                 // This check has to come before the Date one or it is never reached
                 // also, this field is only activated with the following system property:
                 // org.geotools.shapefile.datetime=true
