@@ -1,18 +1,18 @@
 /**
  *    PVCS Identifiers :-
  *
- *       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/Java/shapefile/bentley/exor/gis/SHP2SDE.java-arc   1.0   Apr 24 2015 06:18:32   Upendra.Hukeri  $
+ *       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/Java/shapefile/bentley/exor/gis/SHP2SDE.java-arc   1.1   Aug 17 2015 07:25:48   Upendra.Hukeri  $
  *       Module Name      : $Workfile:   SHP2SDE.java  $
- *       Date into SCCS   : $Date:   Apr 24 2015 06:18:32  $
- *       Date fetched Out : $Modtime:   Apr 24 2015 06:03:28  $
- *       SCCS Version     : $Revision:   1.0  $
+ *       Date into SCCS   : $Date:   Aug 17 2015 07:25:48  $
+ *       Date fetched Out : $Modtime:   Aug 17 2015 07:06:14  $
+ *       SCCS Version     : $Revision:   1.1  $
  *       Based on 
  *
  *
  *
  *    Author : Upendra Hukeri
  *
- *    CMDUtilities.java
+ *    SHP2SDE.java
  ****************************************************************************************************
  *	  Copyright (c) 2015 Bentley Systems Incorporated.  All rights reserved.
  ****************************************************************************************************
@@ -434,23 +434,75 @@ public class SHP2SDE {
 
 		SimpleFeatureType ft = (SimpleFeatureType) fs.getSchema();
 		
-		if (m_srid == 0) {
-			CoordinateReferenceSystem crs = ft.getCoordinateReferenceSystem();
-			m_srid = CRS.lookupEpsgCode(crs, true);
-		}
-		
 		// Make connection to DB
-		writeLog(logger, new Date().toString() + ": connecting to Oracle Database using...");
-		writeLog(logger, "\t\t\t\t\t\t" + m_host + ", " + m_port + ", " + m_sid + ", " + m_user + ", ******, " + m_tableName + ", " + m_shapefileName + ", " + m_idName + ", " + m_srid);
+		writeLog(logger, new Date().toString() + ": connecting to Oracle Database...");
 		
 		String url = "jdbc:oracle:thin:@ " + m_host + ":" + m_port + ":" + m_sid;
 		
 		OracleConnection conn = null;
 		
 		DriverManager.registerDriver(new OracleDriver());
-			
+		
 		conn = (OracleConnection) DriverManager.getConnection(url, m_user, m_password);
 		conn.setAutoCommit(false);
+		
+		writeLog(logger, new Date().toString() + ": connected to Oracle Database successfully!");
+		
+		String sridQuery = "SELECT sdo_cs.map_oracle_srid_to_epsg(NVL(nm3sdo.get_nw_srids, 0)) srid FROM DUAL";
+		
+		Statement statement = conn.createStatement();
+		ResultSet sridData = statement.executeQuery(sridQuery);
+		
+		int db_srid = 0;
+		int prj_srid = 0;
+		
+		if(sridData.next()) {
+			db_srid = sridData.getInt("srid");
+			
+			writeLog(logger, new Date().toString() + ": database default SRID - " + db_srid);
+		} else {
+			writeLog(logger, new Date().toString() + ": Error: Error in getting database default SRID!\n");
+			
+			systemExit(logger);
+		}
+		
+		File prjFile = new File(m_shapefileName.replace(".shp", ".prj"));
+		
+		if (prjFile.isFile()) {
+			try {
+				CoordinateReferenceSystem crs = ft.getCoordinateReferenceSystem();
+				
+				prj_srid = CRS.lookupEpsgCode(crs, true);
+				
+				writeLog(logger, new Date().toString() + ": SRID from '.prj' file - " + prj_srid);
+			} catch (Exception noCRSException) {
+				writeLog(logger, new Date().toString() + ": Error: Error in getting SRID from '.prj' file\n");
+					
+				systemExit(logger);
+			}
+			
+			if (prj_srid != db_srid) {
+				writeLog(logger, new Date().toString() + ": Error: SRID retrieved from '.prj' file does not match the database default SRID\n");
+				
+				systemExit(logger);
+			} else {
+				
+			}
+			
+			m_srid = prj_srid;
+		} else if (m_srid != 0) {
+			writeLog(logger, "\n" + new Date().toString() + ": Warning: No '.prj' file found! Using SRID from command line argument '-r' - " + m_srid + "\n");
+			
+			if (m_srid != db_srid) {
+				writeLog(logger, new Date().toString() + ": Error: SRID provided with command line argument '-r' does not match the database default SRID\n");
+				
+				systemExit(logger);
+			} 
+		} else {
+			writeLog(logger, "\n" + new Date().toString() + ": Error: No SRID found! Check if '.prj' file exists or command line argument '-r' is specified\n");
+				
+			systemExit(logger);
+		}
 		
 		ShapefileReaderJGeom sfh = new ShapefileReaderJGeom(m_shapefileName);
 
@@ -1055,10 +1107,6 @@ public class SHP2SDE {
 				java.sql.Timestamp timeStamp = ((oracle.sql.TIMESTAMPTZ)propertyValue).timestampValue();
 				pstmt.setTimestamp((cloNo), timeStamp);
 			}
-			else if (propertyClass == Class.forName("java.sql.TimestampLTZ")) {
-				java.sql.Timestamp timeStamp = ((oracle.sql.TIMESTAMPLTZ)propertyValue).timestampValue();
-				pstmt.setTimestamp((cloNo), timeStamp);
-			}
 			// RowId Type
 			else if (propertyClass == Class.forName("java.sql.RowId"))
 				pstmt.setRowId((cloNo), (java.sql.RowId)propertyValue);
@@ -1171,7 +1219,7 @@ public class SHP2SDE {
 		
 		return shpColumnName;
 	}
-		
+	
 	protected static void writeLog(BufferedWriter logger, String log) {
 		try {
 			logger.write(log);
