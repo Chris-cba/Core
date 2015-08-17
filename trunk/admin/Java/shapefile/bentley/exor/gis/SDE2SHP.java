@@ -1,18 +1,18 @@
 /**
  *    PVCS Identifiers :-
  *
- *       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/Java/shapefile/bentley/exor/gis/SDE2SHP.java-arc   1.0   Apr 24 2015 06:17:06   Upendra.Hukeri  $
+ *       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/Java/shapefile/bentley/exor/gis/SDE2SHP.java-arc   1.1   Aug 17 2015 07:25:06   Upendra.Hukeri  $
  *       Module Name      : $Workfile:   SDE2SHP.java  $
- *       Date into SCCS   : $Date:   Apr 24 2015 06:17:06  $
- *       Date fetched Out : $Modtime:   Apr 24 2015 06:03:14  $
- *       SCCS Version     : $Revision:   1.0  $
+ *       Date into SCCS   : $Date:   Aug 17 2015 07:25:06  $
+ *       Date fetched Out : $Modtime:   Jul 31 2015 14:00:24  $
+ *       SCCS Version     : $Revision:   1.1  $
  *       Based on 
  *
  *
  *
  *    Author : Upendra Hukeri
  *
- *    CMDUtilities.java
+ *    SDE2SHP.java
  ****************************************************************************************************
  *	  Copyright (c) 2015 Bentley Systems Incorporated.  All rights reserved.
  ****************************************************************************************************
