@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_ops
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_ops.pkb-arc   1.0   Jan 15 2015 13:58:22   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_ops.pkb-arc   1.1   Sep 02 2015 17:20:54   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_ops.pkb  $
-   --       Date into PVCS   : $Date:   Jan 15 2015 13:58:22  $
-   --       Date fetched Out : $Modtime:   Jan 15 2015 13:57:56  $
-   --       PVCS Version     : $Revision:   1.0  $
+   --       Date into PVCS   : $Date:   Sep 02 2015 17:20:54  $
+   --       Date fetched Out : $Modtime:   Sep 02 2015 17:20:06  $
+   --       PVCS Version     : $Revision:   1.1  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,7 +16,7 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated . All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.0  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.1  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_ops';
 
@@ -41,6 +41,7 @@ AS
    BEGIN
       RETURN g_body_sccsid;
    END get_body_version;
+
    --
    -----------------------------------------------------------------------------
    --
@@ -84,46 +85,65 @@ AS
       retval   lb_RPt_tab;
    --
    BEGIN
-      WITH lrs_intsct
-           AS (SELECT t1.*, t2.start_m start_m2, t2.end_m end_m2
-                 FROM TABLE (p_Rpt1) t1, TABLE (p_Rpt2) t2
-                WHERE     t1.refnt = t2.refnt
-                      AND t1.start_m < t2.end_m
-                      AND t1.end_m > t2.start_m)
-      --select * from lrs_intsct
-      SELECT lb_RPt (refnt,
-                     refnt_type,
-                     obj_type,
-                     obj_id,
-                     seg_id,
-                     seq_id,
-                     dir_flag,
-                     GREATEST (start_m, start_m2),
-                     LEAST (end_m, end_m2),
-                     m_unit)
+      WITH lrs_Rpt1
+           AS (SELECT t1.*
+                 FROM TABLE (
+                         lb_path.get_sdo_path (nm_lref (3867959, 20),
+                                               nm_lref (4174510, 84))) t1),
+           lrs_Rpt2
+           AS (SELECT t2.*
+                 FROM TABLE (
+                         lb_path.get_sdo_path (nm_lref (3867959, 10),
+                                               nm_lref (4174510, 84))) t2)
+      SELECT lb_RPt (
+                t.refnt,
+                t.refnt_type,
+                t.obj_type,
+                t.obj_id,
+                t.seg_id,
+                t.seq_id,
+                t.dir_flag,
+                --                     t.start_m,
+                CASE
+                   WHEN t.start_m < NVL (t2.start_m, t.start_m + 1)
+                   THEN
+                      t.start_m
+                   ELSE
+                      CASE
+                         WHEN t.end_m > NVL (t2.end_m, t.end_m - 1)
+                         THEN
+                            NVL (t2.end_m, t.end_m)
+                         ELSE
+                            -99
+                      END
+                END,
+                CASE
+                   WHEN t.end_m > NVL (t2.end_m, t.end_m - 1)
+                   THEN
+                      t.end_m
+                   ELSE
+                      CASE
+                         WHEN t.end_m < NVL (t2.end_m, t.end_m)
+                         THEN
+                            NVL (t2.start_m, t.end_m)
+                         ELSE
+                            -99
+                      END
+                END,
+                t.m_unit)
         BULK COLLECT INTO retval
-        FROM lrs_intsct
-      UNION ALL
-      SELECT lb_RPt (refnt,
-                     refnt_type,
-                     obj_type,
-                     obj_id,
-                     seg_id,
-                     seq_id,
-                     dir_flag,
-                     start_m,
-                     end_m,
-                     m_unit)
-        FROM TABLE (p_Rpt1) t1
-       WHERE NOT EXISTS
-                    (SELECT 1
-                       FROM TABLE (p_Rpt2) t2
-                      WHERE     t1.refnt = t2.refnt
-                            AND t1.start_m < t2.end_m
-                            AND t1.end_m > t2.start_m);
+        FROM ((SELECT * FROM lrs_Rpt1
+               MINUS
+               SELECT * FROM lrs_Rpt2)) t,
+             lrs_RPt2 t2
+       WHERE     t.refnt = t2.refnt(+)
+             AND t.start_m < NVL (t2.end_m, t.start_m - 1)
+             AND t.end_m > NVL (t2.start_m, t.end_m + 1);
 
       RETURN retval;
    END;
+
+
 
    --
    FUNCTION RPt_union (p_Rpt1             lb_RPt_tab,
