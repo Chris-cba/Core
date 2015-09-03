@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_loc
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_loc.pkb-arc   1.0   Jan 15 2015 13:56:02   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_loc.pkb-arc   1.1   Sep 03 2015 16:54:06   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_loc.pkb  $
-   --       Date into PVCS   : $Date:   Jan 15 2015 13:56:02  $
-   --       Date fetched Out : $Modtime:   Jan 15 2015 13:55:28  $
-   --       PVCS Version     : $Revision:   1.0  $
+   --       Date into PVCS   : $Date:   Sep 03 2015 16:54:06  $
+   --       Date fetched Out : $Modtime:   Sep 03 2015 16:52:58  $
+   --       PVCS Version     : $Revision:   1.1  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,7 +16,7 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.0  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.1  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_loc';
 
@@ -265,6 +265,7 @@ AS
 
    FUNCTION translate_nlt (pi_lb_rpt_tab    IN lb_RPt_tab,
                            pi_refnt_type    IN INTEGER,
+                           pi_inner_join_flag IN VARCHAR2 DEFAULT 'Y',
                            pi_cardinality   IN INTEGER)
       RETURN lb_RPt_tab
    IS
@@ -633,7 +634,23 @@ AS
                        end_seg,
                        nlt_id,
                        m_unit
-              ORDER BY route_id, inv_start_slk);
+                       union all
+            SELECT  refnt,
+                    refnt_type,
+                    obj_type,
+                    obj_id,
+                    seg_id,
+                    start_m,
+                    end_m,
+                    m_unit           
+           from table (pi_lb_RPt_tab)
+           where pi_inner_join_flag = 'N'
+           and not exists ( select 1 from nm_members, nm_linear_types where nlt_id = pi_refnt_type and nm_obj_type = nlt_gty_type and nm_ne_id_of = refnt)
+                         ORDER BY 1, 6 );
+
+
+
+
 
       RETURN retval;
    END;
@@ -674,6 +691,7 @@ AS
                                      pi_nal_nit_type,
                                      pi_refnt_type),
                    pi_refnt_type,
+                   'Y',
                    100);
       END IF;
    END;
@@ -709,6 +727,7 @@ AS
       ELSE
          RETURN translate_nlt (get_location_tab (pi_nal_id, NULL),
                                pi_refnt_type,
+                               'Y',
                                100);
       END IF;
    END;
