@@ -4,40 +4,38 @@ CREATE OR REPLACE FORCE VIEW V_LB_PATH_BETWEEN_POINTS
 )
 AS
    WITH start_data
-        AS (
--------------------------------------------------------------------------
---   PVCS Identifiers :-
---
---       PVCS id          : $Header:   //new_vm_latest/archives/lb/admin/views/V_LB_PATH_BETWEEN_POINTS.vw-arc   1.1   Jun 19 2015 14:15:04   Rob.Coupe  $
---       Module Name      : $Workfile:   V_LB_PATH_BETWEEN_POINTS.vw  $
---       Date into PVCS   : $Date:   Jun 19 2015 14:15:04  $
---       Date fetched Out : $Modtime:   Jun 19 2015 15:25:02  $
---       Version          : $Revision:   1.1  $
-------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
-------------------------------------------------------------------
-----
-		
-		     SELECT 'S',
-                   n2.*,
-                   MIN (dist) OVER (PARTITION BY nnu_ne_id) min_dist
-              FROM (SELECT n.*,
-                           CASE nnu_node_type
-                              WHEN 'S'
-                              THEN
-                                 TO_NUMBER (
-                                    SYS_CONTEXT ('NM3SQL', 'L1_OFFSET'))
-                              WHEN 'E'
-                              THEN
-                                   nnu_chain
-                                 - TO_NUMBER (
-                                      SYS_CONTEXT ('NM3SQL', 'L1_OFFSET'))
-                           END
-                              dist
-                      FROM nm_node_usages n
-                     WHERE n.nnu_ne_id IN (TO_NUMBER (
-                                              SYS_CONTEXT ('NM3SQL',
-                                                           'L1_NE_ID')))) n2),
+        AS ( -------------------------------------------------------------------------
+                                                      --   PVCS Identifiers :-
+                                                                            --
+ --       PVCS id          : $Header:   //new_vm_latest/archives/lb/admin/views/V_LB_PATH_BETWEEN_POINTS.vw-arc   1.2   Sep 03 2015 13:34:46   Rob.Coupe  $
+       --       Module Name      : $Workfile:   V_LB_PATH_BETWEEN_POINTS.vw  $
+                  --       Date into PVCS   : $Date:   Sep 03 2015 13:34:46  $
+               --       Date fetched Out : $Modtime:   Sep 03 2015 13:33:56  $
+                               --       Version          : $Revision:   1.2  $
+            ------------------------------------------------------------------
+    --   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+            ------------------------------------------------------------------
+                                                                          ----
+           SELECT 'S',
+                  n2.*,
+                  MIN (dist) OVER (PARTITION BY nnu_ne_id) min_dist
+             FROM (SELECT n.*,
+                          CASE nnu_node_type
+                             WHEN 'S'
+                             THEN
+                                TO_NUMBER (
+                                   SYS_CONTEXT ('NM3SQL', 'L1_OFFSET'))
+                             WHEN 'E'
+                             THEN
+                                  nnu_chain
+                                - TO_NUMBER (
+                                     SYS_CONTEXT ('NM3SQL', 'L1_OFFSET'))
+                          END
+                             dist
+                     FROM nm_node_usages n
+                    WHERE n.nnu_ne_id IN (TO_NUMBER (
+                                             SYS_CONTEXT ('NM3SQL',
+                                                          'L1_NE_ID')))) n2),
         end_data
         AS (SELECT 'E',
                    n2.*,
@@ -377,7 +375,7 @@ AS
                                      THEN
                                         TO_NUMBER (
                                            SYS_CONTEXT ('NM3SQL',
-                                                        'L1_OFFSET'))
+                                                        'L2_OFFSET'))
                                      WHEN 'E'
                                      THEN
                                         nnu_chain
@@ -429,5 +427,4 @@ AS
                                          TO_NUMBER (
                                             SYS_CONTEXT ('NM3SQL',
                                                          'L2_OFFSET'))
-                                  AND nnu_ne_id = ne_id)) t3) 
-/								  
+                                  AND nnu_ne_id = ne_id)) t3);
