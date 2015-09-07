@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 --
 ---   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.92   Apr 30 2015 13:32:36   Rob.Coupe  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.93   Sep 07 2015 11:15:18   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3sdo.pkb  $
---       Date into PVCS   : $Date:   Apr 30 2015 13:32:36  $
---       Date fetched Out : $Modtime:   Apr 30 2015 13:31:06  $
---       PVCS Version     : $Revision:   2.92  $
+--       Date into PVCS   : $Date:   Sep 07 2015 11:15:18  $
+--       Date fetched Out : $Modtime:   Sep 07 2015 11:05:16  $
+--       PVCS Version     : $Revision:   2.93  $
 --       Based on
 ------------------------------------------------------------------
 --   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
@@ -22,7 +22,7 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 -- Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 
-   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.92  $"';
+   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.93  $"';
    g_package_name    CONSTANT VARCHAR2 (30)  := 'NM3SDO';
    g_batch_size      INTEGER                 := NVL( TO_NUMBER(Hig.get_sysopt('SDOBATSIZE')), 10);
    g_clip_type       VARCHAR2(30)            := NVL(Hig.get_sysopt('SDOCLIPTYP'),'SDO');
@@ -64,20 +64,28 @@ Function test_theme_for_update( p_Theme in NM_THEMES_ALL.NTH_THEME_ID%TYPE ) Ret
   retval   Boolean := FALSE;
   l_normal integer := 0;
 begin
-  select 1  into l_normal
-  from dual where exists 
-     ( select 1
-       from ( select nth_theme_id
-              from nm_themes_all 
-              where nth_base_table_theme in (
-                 select nvl(nth_base_table_theme, nth_theme_id )
-                 from nm_themes_all where nth_theme_id = p_Theme )), 
-                      nm_theme_roles, 
-                      hig_user_roles
-                 where nthr_theme_id = nth_theme_id
-                 and nthr_role = hur_role
-                 and hur_username = SYS_CONTEXT ('NM3_SECURITY_CTX', 'USERNAME')
-                 and nthr_mode = 'NORMAL' ) ;
+  SELECT 1
+  into l_normal
+  FROM DUAL
+  WHERE EXISTS
+          (SELECT nth_theme_id, hur_role
+             FROM nm_theme_roles,
+                  hig_user_roles,
+                  (SELECT p_Theme nth_theme_id FROM DUAL
+                   UNION ALL
+                   SELECT nth_base_table_theme
+                     FROM nm_themes_all
+                    WHERE     nth_theme_id = p_Theme
+                          AND nth_base_table_theme IS NOT NULL
+                   UNION ALL
+                   SELECT nth_theme_id
+                     FROM nm_themes_all
+                    WHERE nth_base_table_theme = p_Theme)
+            WHERE     nthr_theme_id = nth_theme_id
+                  AND nthr_role = hur_role
+                  AND hur_username =
+                         SYS_CONTEXT ('NM3_SECURITY_CTX', 'USERNAME')
+                  AND nthr_mode = 'NORMAL');      
 --
   if l_normal = 1 then
     retval := TRUE;
@@ -89,7 +97,6 @@ exception
   when no_data_found then
     Return FALSE;
 end;
-
 --
   FUNCTION hypot
             ( x1 IN NUMBER
