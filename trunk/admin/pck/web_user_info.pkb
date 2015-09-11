@@ -3,11 +3,11 @@ AS
 -----------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/web_user_info.pkb-arc   3.7   Sep 07 2015 12:14:36   Upendra.Hukeri  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/web_user_info.pkb-arc   3.8   Sep 11 2015 11:25:58   Upendra.Hukeri  $
 --       Module Name      : $Workfile:   web_user_info.pkb  $
---       Date into PVCS   : $Date:   Sep 07 2015 12:14:36  $
---       Date fetched Out : $Modtime:   Sep 07 2015 12:10:36  $
---       Version          : $Revision:   3.7  $
+--       Date into PVCS   : $Date:   Sep 11 2015 11:25:58  $
+--       Date fetched Out : $Modtime:   Sep 11 2015 07:29:00  $
+--       Version          : $Revision:   3.8  $
 --       Based on SCCS version :
 -----------------------------------------------------------------------------
 --   Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
@@ -17,11 +17,13 @@ AS
   --Constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-	g_Body_Sccsid CONSTANT  VARCHAR2(2000) :=  '$Revision:   3.7  $';
+	g_Body_Sccsid CONSTANT  VARCHAR2(2000) :=  '$Revision:   3.8  $';
   -----------
   --Variables
   -----------
 	l_err_desc	VARCHAR2(32767) := NULL;
+	c_true      CONSTANT  VARCHAR2(5) := 'TRUE';
+    c_false     CONSTANT  VARCHAR2(5) := 'FALSE';
 --
 -----------------------------------------------------------------------------
 --
@@ -147,7 +149,7 @@ PROCEDURE set_context(pi_user_id IN hig_users.hus_user_id%TYPE)
 IS
 	--
 	l_user_au      NUMBER;
-	l_unrestricted VARCHAR2(1);
+	l_unrestricted VARCHAR2(5);
 	l_end_date     DATE;
 	l_name         hig_users.hus_name%TYPE;
 	l_status       VARCHAR2(100); 
@@ -166,7 +168,7 @@ BEGIN
 	--
 	BEGIN
 		SELECT  hus_admin_unit 
-				,hus_unrestricted  
+				,DECODE(hus_unrestricted, 'Y', c_true, c_false)
 				,hus_end_date
 				,hus_name
 				,hus_username
