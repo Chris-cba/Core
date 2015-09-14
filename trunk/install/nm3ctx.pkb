@@ -3,11 +3,11 @@ As
 -----------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm3ctx.pkb-arc   3.3   Jan 20 2015 07:18:18   Upendra.Hukeri  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm3ctx.pkb-arc   3.4   Sep 14 2015 16:02:58   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3ctx.pkb  $
---       Date into PVCS   : $Date:   Jan 20 2015 07:18:18  $
---       Date fetched Out : $Modtime:   Jan 20 2015 06:43:44  $
---       Version          : $Revision:   3.3  $
+--       Date into PVCS   : $Date:   Sep 14 2015 16:02:58  $
+--       Date fetched Out : $Modtime:   Sep 14 2015 16:01:30  $
+--       Version          : $Revision:   3.4  $
 --       Based on SCCS version : 
 -----------------------------------------------------------------------------
 --   Copyright (c) 2014 Bentley Systems Incorporated. All rights reserved.
@@ -19,7 +19,7 @@ As
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  G_Body_Sccsid  CONSTANT VARCHAR2(2000) := '$Revision:   3.3  $';
+  G_Body_Sccsid  CONSTANT VARCHAR2(2000) := '$Revision:   3.4  $';
    
   Type Context_Tab Is Table Of Boolean Index By Varchar(30);
   
@@ -88,7 +88,7 @@ BEGIN
         AND g_context_tab.EXISTS(p_attribute) 
         AND SYS_CONTEXT('NM3_SECURITY_CTX', 'HIG_OWNER') != 'Y' 
     THEN
-        RAISE_APPLICATION_ERROR(-20498,'Cannot set context values for read only attributes');  
+        Null;  
     ELSE
         dbms_session.set_context('NM3CORE', p_attribute, p_value);
     END IF;
