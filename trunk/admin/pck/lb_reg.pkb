@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_reg
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_reg.pkb-arc   1.4   Jan 20 2015 15:58:06   Rob.Coupe  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_reg.pkb-arc   1.5   Sep 16 2015 11:36:08   Rob.Coupe  $
 --       Module Name      : $Workfile:   lb_reg.pkb  $
---       Date into PVCS   : $Date:   Jan 20 2015 15:58:06  $
---       Date fetched Out : $Modtime:   Jan 20 2015 15:57:28  $
---       PVCS Version     : $Revision:   1.4  $
+--       Date into PVCS   : $Date:   Sep 16 2015 11:36:08  $
+--       Date fetched Out : $Modtime:   Sep 16 2015 11:35:04  $
+--       PVCS Version     : $Revision:   1.5  $
 --
 --   Author : R.A. Coupe
 --
@@ -19,7 +19,7 @@ AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(30) :='"$Revision:   1.4  $"';
+   g_body_sccsid     CONSTANT  varchar2(30) :='"$Revision:   1.5  $"';
 
    g_package_name    CONSTANT  varchar2(30)   := 'NM3RSC';
 --
@@ -258,6 +258,9 @@ AS
       BEGIN
          nm3sdm.drop_layers_by_inv_type (pi_exor_type);
       END;
+	  
+	  DELETE FROM nm_asset_geometry_all
+	        WHERE nag_obj_type = pi_exor_type;
 
       DELETE FROM nm_inv_nw
             WHERE nin_nit_inv_code = pi_exor_type;
