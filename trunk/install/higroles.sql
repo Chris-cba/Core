@@ -2,11 +2,11 @@
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/higroles.sql-arc   2.14   Jul 04 2013 13:45:32   James.Wadsworth  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/higroles.sql-arc   2.15   Sep 16 2015 10:29:54   Steve.Cooper  $
 --       Module Name      : $Workfile:   higroles.sql  $
---       Date into PVCS   : $Date:   Jul 04 2013 13:45:32  $
---       Date fetched Out : $Modtime:   Jul 04 2013 12:01:44  $
---       Version          : $Revision:   2.14  $
+--       Date into PVCS   : $Date:   Sep 16 2015 10:29:54  $
+--       Date fetched Out : $Modtime:   Sep 16 2015 10:29:36  $
+--       Version          : $Revision:   2.15  $
 --
 -----------------------------------------------------------------------------
 --    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
@@ -655,6 +655,16 @@ EXCEPTION
 END;
 /
 
+Declare
+  Role_Already_Exists Exception;
+  Pragma Exception_Init(Role_Already_Exists,-1921);
+Begin
+  Execute Immediate ('Create Role Exor_Allow_User_Proxy');
+Exception
+  When Role_Already_Exists Then
+    Null;
+End;  
+/
 
 --
 REM End of command file
