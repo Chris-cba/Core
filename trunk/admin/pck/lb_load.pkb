@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_load
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_load.pkb-arc   1.6   Jun 15 2015 16:47:06   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_load.pkb-arc   1.7   Sep 16 2015 11:24:22   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_load.pkb  $
-   --       Date into PVCS   : $Date:   Jun 15 2015 16:47:06  $
-   --       Date fetched Out : $Modtime:   Jun 15 2015 16:46:02  $
-   --       PVCS Version     : $Revision:   1.6  $
+   --       Date into PVCS   : $Date:   Sep 16 2015 11:24:22  $
+   --       Date fetched Out : $Modtime:   Sep 16 2015 11:21:42  $
+   --       PVCS Version     : $Revision:   1.7  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,7 +16,7 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.6  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.7  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_load';
 
@@ -200,16 +200,20 @@ AS
       DECLARE
          problem   VARCHAR2 (7) := NULL;
       BEGIN
-       SELECT 'Problem'
-       INTO problem
-       FROM nm_inv_types
-       where EXISTS
-              (SELECT 1
-                 FROM TABLE (p_obj_Rpt ) t
-                WHERE     t.obj_type = nit_inv_type
-                 AND nit_pnt_or_cont !=
-                        CASE start_m WHEN end_m THEN 'P' ELSE 'C' END);
---
+         SELECT 'Problem'
+           INTO problem
+           FROM nm_inv_types
+          WHERE EXISTS
+                   (SELECT 1
+                      FROM TABLE (p_obj_Rpt) t
+                     WHERE     t.obj_type = nit_inv_type
+                           AND nit_pnt_or_cont !=
+                                  CASE start_m
+                                     WHEN end_m THEN 'P'
+                                     ELSE 'C'
+                                  END);
+
+         --
          raise_application_error (
             -20002,
             'Asset location has a point/line reference when asset type is flagged as line/point');
@@ -304,19 +308,25 @@ AS
                 p_nal_id,
                 'N',
                 nm_obj_type,
-                sdo_lrs.convert_to_std_geom(SDO_LRS.OFFSET_GEOM_SEGMENT (geoloc,
-                                             nm_begin_mp,
-                                             nm_end_mp,
-                                             NVL (nm_offset_st, 0),
-                                             0.005))
+                SDO_LRS.convert_to_std_geom (SDO_LRS.OFFSET_GEOM_SEGMENT (
+                                                geoloc,
+                                                nm_begin_mp,
+                                                nm_end_mp,
+                                                NVL (nm_offset_st, 0),
+                                                0.005))
            FROM nm_locations_all, v_lb_nlt_geometry
           WHERE     nm_ne_id_of = ne_id
                 AND nm_loc_id IN (SELECT t.COLUMN_VALUE
                                     FROM TABLE (l_loc_tab) t);
+
+      --
+      --  look after the aggregated geoetry
+      --
+      aggregate_geometry (pi_nal_id => p_nal_id, pi_start_date => p_start_date);
    END;
 
 
-   Procedure lb_ld_path(
+   PROCEDURE lb_ld_path (
       pi_nal_id         IN nm_asset_locations_all.nal_id%TYPE,
       pi_nal_nit_type   IN nm_asset_locations_all.nal_nit_type%TYPE,
       pi_start_refnt    IN v_nm_nlt_refnts.ne_id%TYPE,
@@ -329,24 +339,25 @@ AS
       pi_end_xsp        IN VARCHAR2,
       pi_start_date     IN nm_asset_locations_all.nal_start_date%TYPE,
       pi_security_id    IN nm_asset_locations_all.nal_security_key%TYPE)
-   IS      
+   IS
       loc_error    lb_loc_error_tab;
       l_load_tab   lb_rpt_tab;
    BEGIN
-      l_load_tab := lb_path.get_sdo_path(nm_lref(pi_start_refnt, pi_start_m), nm_lref(pi_end_refnt, pi_end_m));
+      l_load_tab :=
+         lb_path.get_sdo_path (nm_lref (pi_start_refnt, pi_start_m),
+                               nm_lref (pi_end_refnt, pi_end_m));
 
       lb_load (lb_ops.merge_lb_rpt_tab (pi_nal_id,
                                         pi_nal_nit_type,
                                         l_load_tab,
                                         10),
-                  pi_nal_id,
-                  pi_start_date,
-                  pi_security_id,
-                  pi_start_xsp,
-                  loc_error);
-      
+               pi_nal_id,
+               pi_start_date,
+               pi_security_id,
+               pi_start_xsp,
+               loc_error);
    END;
-   
+
    PROCEDURE lb_ld_geom (
       pi_nal_id         IN nm_asset_locations_all.nal_id%TYPE,
       pi_nal_nit_type   IN nm_asset_locations_all.nal_nit_type%TYPE,
@@ -362,14 +373,16 @@ AS
                    lb_obj_geom (pi_nal_nit_type, nal_asset_id, pi_geom)) AS lb_obj_geom_tab)
         INTO l_obj_geom
         FROM nm_asset_locations
-       WHERE nal_id = pi_nal_id
-       AND   nal_location_type = 'G';
+       WHERE nal_id = pi_nal_id AND nal_location_type = 'G';
 
       lb_load (l_obj_geom,
                pi_nal_id,
                pi_start_date,
                pi_security_id,
                l_loc_error);
+
+      aggregate_geometry (pi_nal_id       => pi_nal_id,
+                          pi_start_date   => pi_start_date);
    END;
 
    --
@@ -381,10 +394,19 @@ AS
                       p_loc_error        OUT lb_loc_error_tab)
    IS
    BEGIN
-        FORALL i IN 1 .. p_obj_geom.COUNT
-           INSERT INTO nm_location_geometry  ( nlg_loc_id, nlg_location_type, nlg_nal_id, nlg_obj_type, nlg_geometry )
-           values ( NULL, 'G', p_nal_id, p_obj_geom(i).obj_type, p_obj_geom(i).geom );
-      
+      FORALL i IN 1 .. p_obj_geom.COUNT
+         INSERT INTO nm_location_geometry (nlg_loc_id,
+                                           nlg_location_type,
+                                           nlg_nal_id,
+                                           nlg_obj_type,
+                                           nlg_geometry)
+              VALUES (NULL,
+                      'G',
+                      p_nal_id,
+                      p_obj_geom (i).obj_type,
+                      p_obj_geom (i).geom);
+
+      aggregate_geometry (PI_NAL_ID => p_nal_id, PI_START_DATE => p_start_date);
    END;
 
 
@@ -430,6 +452,11 @@ AS
                   AND nal_nit_type = pi_nal_nit_type
                   AND DECODE (pi_nal_jxp, NULL, '&^%$', pi_nal_jxp) =
                          DECODE (pi_nal_jxp, NULL, '&^%$', nal_jxp);
+
+      aggregate_geometry (PI_ASSET_ID        => pi_nal_asset_id,
+                          pi_location_type   => NULL,
+                          pi_obj_type        => pi_nal_nit_type,
+                          PI_START_DATE      => TRUNC (SYSDATE));
    END;
 
    PROCEDURE delete_location (pi_nal_id IN INTEGER)
@@ -452,6 +479,9 @@ AS
                        WHERE     nal_id = pi_nal_id
                              AND nal_id = nm_ne_id_in
                              AND nal_nit_type = nm_obj_type);
+
+      aggregate_geometry (pi_nal_id       => pi_nal_id,
+                          pi_start_date   => TRUNC (SYSDATE));
    END;
 
 
@@ -493,6 +523,8 @@ AS
                   WHERE     nal_id = pi_nal_id
                         AND nal_id = nm_ne_id_in
                         AND nal_nit_type = nm_obj_type);
+
+      aggregate_geometry (pi_nal_id => pi_nal_id, pi_start_date => pi_end_date);
    END;
 
    --
@@ -509,22 +541,22 @@ AS
         INTO retval
         FROM TABLE (pi_rpt_tab)
        WHERE     NOT EXISTS
-                    (SELECT 1
-                       FROM nm_elements, xsp_restraints
-                      WHERE     ne_id = refnt
-                            AND ne_sub_class = xsr_scl_class
-                            AND obj_type = xsr_ity_inv_code
-                            AND xsr_nw_type = ne_nt_type
-                            AND xsr_x_sect_value = pi_xsp)
+                        (SELECT 1
+                           FROM nm_elements, xsp_restraints
+                          WHERE     ne_id = refnt
+                                AND ne_sub_class = xsr_scl_class
+                                AND obj_type = xsr_ity_inv_code
+                                AND xsr_nw_type = ne_nt_type
+                                AND xsr_x_sect_value = pi_xsp)
              AND NOT EXISTS
-                    (SELECT 1
-                       FROM nm_elements, xsp_restraints, nm_members
-                      WHERE     nm_ne_id_of = refnt
-                            AND nm_ne_id_in = ne_id
-                            AND ne_sub_class = xsr_scl_class
-                            AND obj_type = xsr_ity_inv_code
-                            AND xsr_nw_type = ne_nt_type
-                            AND xsr_x_sect_value = pi_xsp)
+                        (SELECT 1
+                           FROM nm_elements, xsp_restraints, nm_members
+                          WHERE     nm_ne_id_of = refnt
+                                AND nm_ne_id_in = ne_id
+                                AND ne_sub_class = xsr_scl_class
+                                AND obj_type = xsr_ity_inv_code
+                                AND xsr_nw_type = ne_nt_type
+                                AND xsr_x_sect_value = pi_xsp)
              AND EXISTS
                     (SELECT 1
                        FROM nm_inv_types
@@ -542,7 +574,99 @@ AS
          --    return_code := 1;
          raise_application_error (-20001, 'Problem in XSP validation');
    END;
---
 
+   --
+   PROCEDURE aggregate_geometry (pi_nal_id IN INTEGER, pi_start_date IN DATE)
+   IS
+      l_location_type   VARCHAR2 (1);
+      l_asset_id        INTEGER;
+      l_obj_type        VARCHAR2 (4);
+      l_start_date      DATE;
+      l_end_date        DATE;
+   BEGIN
+      SELECT nal_asset_id, nal_location_type, nal_nit_type
+        INTO l_asset_id, l_location_type, l_obj_type
+        FROM nm_asset_locations_all
+       WHERE nal_id = pi_nal_id;
+
+      aggregate_geometry (pi_asset_id        => l_asset_id,
+                          pi_location_type   => l_location_type,
+                          pi_obj_type        => l_obj_type,
+                          pi_start_date      => pi_start_date);
+   END;
+
+   --
+
+   PROCEDURE aggregate_geometry (pi_asset_id        IN INTEGER,
+                                 pi_location_type   IN VARCHAR2,
+                                 pi_obj_type        IN VARCHAR2,
+                                 pi_start_date      IN DATE)
+   IS
+      l_geom   MDSYS.sdo_geometry;
+   BEGIN
+      SELECT                                              --nlg_location_type,
+                                                                   --asset_id,
+                                                                   --obj_type,
+                                                                 --start_date,
+                                                                   --end_date,
+           sdo_aggr_union (sdoaggrtype (nlg_geometry, 0.005))
+      INTO                                                  --l_location_type,
+           --               l_asset_id,
+           --               l_obj_type,
+           --               l_start_date,
+           --               l_end_date,
+           l_geom
+      FROM (SELECT nlg_location_type,
+                   pi_asset_id asset_id,
+                   nlg_obj_type obj_type,
+                   TRUNC (SYSDATE) start_date,
+                   NULL end_date,
+                   nlg_geometry
+              FROM nm_location_geometry
+             WHERE nlg_nal_id IN (SELECT l2.nal_id
+                                    FROM nm_asset_locations l2
+                                   WHERE     l2.nal_asset_id = pi_asset_id
+                                         AND l2.nal_location_type =
+                                                nlg_location_type
+                                         AND l2.nal_nit_type = nlg_obj_type))
+           t;
+
+      --      GROUP BY --nlg_location_type,
+      --               asset_id,
+      --               obj_type,
+      --               start_date,
+      --               end_date;
+
+      UPDATE nm_asset_geometry_all
+         SET nag_end_date = pi_start_date
+       WHERE     nag_end_date IS NULL
+             AND nag_asset_id = pi_asset_id
+             AND nag_location_type = pi_location_type
+             AND nag_obj_type = pi_obj_type;
+
+
+      BEGIN
+         INSERT INTO nm_asset_geometry_all (nag_location_type,
+                                            nag_asset_id,
+                                            nag_obj_type,
+                                            nag_start_date,
+                                            nag_end_date,
+                                            nag_geometry)
+              VALUES (pi_location_type,
+                      pi_asset_id,
+                      pi_obj_type,
+                      pi_start_date,
+                      NULL,
+                      l_geom);
+      EXCEPTION
+         WHEN DUP_VAL_ON_INDEX
+         THEN
+            UPDATE nm_asset_geometry
+               SET nag_geometry = l_geom
+             WHERE     nag_asset_id = pi_asset_id
+                   AND nag_obj_type = pi_obj_type
+                   AND nag_location_type = pi_location_type;
+      END;
+   END;
 END lb_load;
 /
