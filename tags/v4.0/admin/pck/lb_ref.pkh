@@ -1,0 +1,132 @@
+CREATE OR REPLACE PACKAGE lb_ref
+AS
+   --   PVCS Identifiers :-
+   --
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_ref.pkh-arc   1.6   Sep 17 2015 12:06:10   Rob.Coupe  $
+   --       Module Name      : $Workfile:   lb_ref.pkh  $
+   --       Date into PVCS   : $Date:   Sep 17 2015 12:06:10  $
+   --       Date fetched Out : $Modtime:   Sep 17 2015 12:05:28  $
+   --       PVCS Version     : $Revision:   1.6  $
+   --
+   --   Author : R.A. Coupe
+   --
+   --   Location Bridge ref-data package - that is to return cursors for basic reference data validation.
+   --
+   -----------------------------------------------------------------------------
+   -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
+   ----------------------------------------------------------------------------
+   --
+   g_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.6  $';
+
+   --
+   FUNCTION get_version
+      RETURN VARCHAR2;
+
+   FUNCTION get_body_version
+      RETURN VARCHAR2;
+
+   FUNCTION get_linear_types (pi_inv_type IN nm_inv_types.nit_inv_type%TYPE)
+      RETURN SYS_REFCURSOR;
+
+   FUNCTION get_linear_types_tab (
+      pi_inv_type   IN nm_inv_types.nit_inv_type%TYPE)
+      RETURN lb_linear_type_tab;
+
+   FUNCTION get_linear_refnt (
+      pi_inv_type   IN nm_inv_types.nit_inv_type%TYPE DEFAULT NULL,
+      pi_nlt_id     IN nm_linear_types.nlt_id%TYPE DEFAULT NULL,
+      pi_unique     IN VARCHAR2 DEFAULT NULL)
+      RETURN SYS_REFCURSOR;
+
+   FUNCTION get_linear_refnt_tab (
+      pi_inv_type   IN nm_inv_types.nit_inv_type%TYPE DEFAULT NULL,
+      pi_nlt_id     IN nm_linear_types.nlt_id%TYPE DEFAULT NULL,
+      pi_unique     IN VARCHAR2 DEFAULT NULL)
+      RETURN lb_linear_refnt_tab;
+
+
+   FUNCTION get_refnt_measures (pi_ne_id IN INTEGER)
+      RETURN SYS_REFCURSOR;
+
+   FUNCTION get_refnt_measures_tab (pi_ne_id IN INTEGER)
+      RETURN LB_refnt_measure_tab;
+
+   FUNCTION get_unit (pi_unit_name      IN VARCHAR2,
+                      pi_network_type   IN INTEGER,
+                      pi_value          IN NUMBER)
+      RETURN NUMBER;
+
+   --
+   FUNCTION GetLocationIDs (AssetType IN INTEGER, AssetID IN INTEGER)
+      RETURN SYS_REFCURSOR;
+
+   FUNCTION GetLocationIDs_tab (AssetType IN INTEGER, AssetID IN INTEGER)
+      RETURN lb_location_id_tab;
+
+   --
+   FUNCTION GetXSPList (LocationId IN INTEGER)
+      RETURN SYS_REFCURSOR;
+
+   FUNCTION GetXSP_TAB (LocationId IN INTEGER)
+      RETURN LB_XSP_TAB;
+
+   FUNCTION GetXSPList (Inv_type           IN VARCHAR2,
+                        NetworkElementID   IN INTEGER,
+                        StartDistance      IN NUMBER,
+                        EndDistance        IN NUMBER)
+      RETURN SYS_REFCURSOR;
+
+
+   FUNCTION GetXSP_tab (Inv_type           IN VARCHAR2,
+                        NetworkElementID   IN INTEGER,
+                        StartDistance      IN NUMBER,
+                        EndDistance        IN NUMBER)
+      RETURN lb_xsp_tab;
+
+   FUNCTION GetXSPList (AssetType           IN INTEGER,
+                        NetworkTypeID       IN INTEGER,
+                        NetworkElementID    IN INTEGER,
+                        StartDistance       IN NUMBER,
+                        StartDistanceUnit   IN VARCHAR2,
+                        EndDistance         IN NUMBER,
+                        EndDistanceUnit     IN VARCHAR2)
+      RETURN SYS_REFCURSOR;
+
+   FUNCTION GetXSP_tab (AssetType           IN INTEGER,
+                        NetworkTypeID       IN INTEGER,
+                        NetworkElementID    IN INTEGER,
+                        StartDistance       IN NUMBER,
+                        StartDistanceUnit   IN VARCHAR2,
+                        EndDistance         IN NUMBER,
+                        EndDistanceUnit     IN VARCHAR2)
+      RETURN lb_xsp_tab;
+
+
+   FUNCTION getJXP (AssetType IN INTEGER)
+      RETURN SYS_REFCURSOR;
+
+   FUNCTION getJXP_TAB (AssetType IN INTEGER)
+      RETURN lb_jxp_tab;
+
+   FUNCTION GETASSETYPENETWORKTYPES (AssetType IN INTEGER DEFAULT NULL)
+      RETURN SYS_REFCURSOR;
+
+   FUNCTION GETASSETYPENETWORKTYPE_TAB (AssetType IN INTEGER DEFAULT NULL)
+      RETURN lb_asset_type_network_tab;
+
+   FUNCTION GETASSETNETWORKELEMENTS (
+      ASSETTYPE        IN INTEGER DEFAULT NULL,
+      NETWORKTYPEID    IN INTEGER DEFAULT NULL,
+      NETWORKELEMENT   IN VARCHAR2 DEFAULT NULL)
+      RETURN SYS_REFCURSOR;
+
+   FUNCTION GETASSETNETWORKELEMENTS_TAB (
+      ASSETTYPE        IN INTEGER DEFAULT NULL,
+      NETWORKTYPEID    IN INTEGER DEFAULT NULL,
+      NETWORKELEMENT   IN VARCHAR2 DEFAULT NULL)
+      RETURN lb_linear_refnt_tab;
+
+   --
+   PROCEDURE CHECK_JXP (ASSETTYPE IN INTEGER, JXP IN VARCHAR2);
+END lb_ref;
+/
