@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_load
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_load.pkb-arc   1.7   Sep 16 2015 11:24:22   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_load.pkb-arc   1.8   Sep 17 2015 12:35:06   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_load.pkb  $
-   --       Date into PVCS   : $Date:   Sep 16 2015 11:24:22  $
-   --       Date fetched Out : $Modtime:   Sep 16 2015 11:21:42  $
-   --       PVCS Version     : $Revision:   1.7  $
+   --       Date into PVCS   : $Date:   Sep 17 2015 12:35:06  $
+   --       Date fetched Out : $Modtime:   Sep 17 2015 12:34:32  $
+   --       PVCS Version     : $Revision:   1.8  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,7 +16,7 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.7  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.8  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_load';
 
@@ -604,32 +604,35 @@ AS
    IS
       l_geom   MDSYS.sdo_geometry;
    BEGIN
+      nm_debug.debug_on;
+      nm_debug.debug ('AGG1');
+
       SELECT                                              --nlg_location_type,
-                                                                   --asset_id,
-                                                                   --obj_type,
-                                                                 --start_date,
-                                                                   --end_date,
-           sdo_aggr_union (sdoaggrtype (nlg_geometry, 0.005))
-      INTO                                                  --l_location_type,
-           --               l_asset_id,
-           --               l_obj_type,
-           --               l_start_date,
-           --               l_end_date,
-           l_geom
-      FROM (SELECT nlg_location_type,
-                   pi_asset_id asset_id,
-                   nlg_obj_type obj_type,
-                   TRUNC (SYSDATE) start_date,
-                   NULL end_date,
-                   nlg_geometry
-              FROM nm_location_geometry
-             WHERE nlg_nal_id IN (SELECT l2.nal_id
-                                    FROM nm_asset_locations l2
-                                   WHERE     l2.nal_asset_id = pi_asset_id
-                                         AND l2.nal_location_type =
-                                                nlg_location_type
-                                         AND l2.nal_nit_type = nlg_obj_type))
-           t;
+             --asset_id,
+             --obj_type,
+             --start_date,
+             --end_date,
+             sdo_aggr_union (sdoaggrtype (nlg_geometry, 0.005))
+        INTO                                                --l_location_type,
+             --               l_asset_id,
+             --               l_obj_type,
+             --               l_start_date,
+             --               l_end_date,
+             l_geom
+        FROM (SELECT nlg_location_type,
+                     pi_asset_id asset_id,
+                     nlg_obj_type obj_type,
+                     TRUNC (SYSDATE) start_date,
+                     NULL end_date,
+                     nlg_geometry
+                FROM nm_location_geometry
+               WHERE nlg_nal_id IN (SELECT l2.nal_id
+                                      FROM nm_asset_locations l2
+                                     WHERE     l2.nal_asset_id = pi_asset_id
+                                           AND l2.nal_location_type =
+                                                  nlg_location_type
+                                           AND l2.nal_nit_type = nlg_obj_type))
+             t;
 
       --      GROUP BY --nlg_location_type,
       --               asset_id,
@@ -637,15 +640,16 @@ AS
       --               start_date,
       --               end_date;
 
-      UPDATE nm_asset_geometry_all
-         SET nag_end_date = pi_start_date
-       WHERE     nag_end_date IS NULL
-             AND nag_asset_id = pi_asset_id
-             AND nag_location_type = pi_location_type
-             AND nag_obj_type = pi_obj_type;
-
-
       BEGIN
+         SAVEPOINT update1;
+
+         UPDATE nm_asset_geometry_all
+            SET nag_end_date = pi_start_date
+          WHERE     nag_end_date IS NULL
+                AND nag_asset_id = pi_asset_id
+                AND nag_location_type = pi_location_type
+                AND nag_obj_type = pi_obj_type;
+
          INSERT INTO nm_asset_geometry_all (nag_location_type,
                                             nag_asset_id,
                                             nag_obj_type,
@@ -661,12 +665,48 @@ AS
       EXCEPTION
          WHEN DUP_VAL_ON_INDEX
          THEN
+            ROLLBACK TO SAVEPOINT update1;
+
             UPDATE nm_asset_geometry
                SET nag_geometry = l_geom
              WHERE     nag_asset_id = pi_asset_id
                    AND nag_obj_type = pi_obj_type
                    AND nag_location_type = pi_location_type;
       END;
+   END;
+
+   --
+   PROCEDURE update_location (
+      p_nal_id      IN nm_asset_locations_all.nal_id%TYPE,
+      p_nal_descr   IN nm_asset_locations_all.nal_descr%TYPE,
+      p_jxp         IN nm_juxtapositions.njx_meaning%TYPE DEFAULT NULL)
+   IS
+      l_exor_njx_code   nm_juxtapositions.njx_code%TYPE := NULL;
+   BEGIN
+      IF p_jxp IS NOT NULL
+      THEN
+         --
+         BEGIN
+            SELECT njx_code
+              INTO l_exor_njx_code
+              FROM nm_juxtapositions,
+                   NM_ASSET_TYPE_JUXTAPOSITIONS,
+                   nm_asset_locations
+             WHERE     nal_id = p_nal_id
+                   AND najx_njxt_id = njx_njxt_id
+                   AND njx_meaning = p_jxp
+                   AND najx_inv_type = nal_nit_type;
+         EXCEPTION
+            WHEN NO_DATA_FOUND
+            THEN
+               raise_application_error (-20001, 'Juxtaposition not known');
+         END;
+      END IF;
+
+      UPDATE nm_asset_locations
+         SET nal_descr = p_nal_descr,
+             nal_jxp = NVL (l_exor_njx_code, nal_jxp)
+       WHERE nal_id = p_nal_id;
    END;
 END lb_load;
 /
