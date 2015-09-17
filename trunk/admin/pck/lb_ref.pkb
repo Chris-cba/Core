@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_ref
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_ref.pkb-arc   1.4   Jan 20 2015 21:09:14   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_ref.pkb-arc   1.5   Sep 17 2015 12:07:38   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_ref.pkb  $
-   --       Date into PVCS   : $Date:   Jan 20 2015 21:09:14  $
-   --       Date fetched Out : $Modtime:   Jan 20 2015 21:08:02  $
-   --       PVCS Version     : $Revision:   1.4  $
+   --       Date into PVCS   : $Date:   Sep 17 2015 12:07:38  $
+   --       Date fetched Out : $Modtime:   Sep 17 2015 12:06:50  $
+   --       PVCS Version     : $Revision:   1.5  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,7 +16,7 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.4  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.5  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_ref';
 
@@ -41,6 +41,7 @@ AS
    BEGIN
       RETURN g_body_sccsid;
    END get_body_version;
+
    --
    -----------------------------------------------------------------------------
    --
@@ -490,20 +491,21 @@ AS
       RETURN retval;
    END;
 
-   FUNCTION getJXP_TAB (AssetType in INTEGER)
-   return lb_jxp_tab is
-     retval lb_jxp_tab;
-   begin
-         SELECT lb_jxp(NJX_CODE, NJX_MEANING)
-         bulk collect into retval
-           FROM NM_ASSET_TYPE_JUXTAPOSITIONS, NM_JUXTAPOSITIONS, LB_TYPES
-          WHERE     njx_njxt_id = najx_njxt_id
-                AND lb_object_type = AssetType
-                AND najx_inv_type = lb_exor_inv_type;
+   FUNCTION getJXP_TAB (AssetType IN INTEGER)
+      RETURN lb_jxp_tab
+   IS
+      retval   lb_jxp_tab;
+   BEGIN
+      SELECT lb_jxp (NJX_CODE, NJX_MEANING)
+        BULK COLLECT INTO retval
+        FROM NM_ASSET_TYPE_JUXTAPOSITIONS, NM_JUXTAPOSITIONS, LB_TYPES
+       WHERE     njx_njxt_id = najx_njxt_id
+             AND lb_object_type = AssetType
+             AND najx_inv_type = lb_exor_inv_type;
 
       RETURN retval;
    END;
-     
+
 
    FUNCTION GETASSETYPENETWORKTYPES (AssetType IN INTEGER DEFAULT NULL)
       RETURN SYS_REFCURSOR
@@ -522,47 +524,50 @@ AS
 
       RETURN retval;
    END;
-   
 
-   FUNCTION GETASSETYPENETWORKTYPE_TAB(AssetType IN INTEGER DEFAULT NULL)
+
+   FUNCTION GETASSETYPENETWORKTYPE_TAB (AssetType IN INTEGER DEFAULT NULL)
       RETURN lb_asset_type_network_tab
    IS
       retval         lb_asset_type_network_tab;
       p_asset_type   INTEGER := AssetType;
    BEGIN
-      SELECT lb_asset_type_network(
-                AssetType,
-                NetworkTypeId,
-                NetworkType,
-                NetworkTypeName,
-                NetworkFlag,
-                NetworkTypeDescr,
-                UnitName,
-                UnitMask )
-      BULK Collect into retval
-           FROM v_lb_inv_nlt_data
-          WHERE AssetType = NVL (p_asset_type, AssetType);
+      SELECT lb_asset_type_network (AssetType,
+                                    NetworkTypeId,
+                                    NetworkType,
+                                    NetworkTypeName,
+                                    NetworkFlag,
+                                    NetworkTypeDescr,
+                                    UnitName,
+                                    UnitMask)
+        BULK COLLECT INTO retval
+        FROM v_lb_inv_nlt_data
+       WHERE AssetType = NVL (p_asset_type, AssetType);
 
       RETURN retval;
    END;
 
    FUNCTION GETASSETNETWORKELEMENTS (
-      ASSETTYPE   IN INTEGER DEFAULT NULL,
-      NETWORKTYPEID     IN INTEGER DEFAULT NULL,
-      NETWORKELEMENT     IN VARCHAR2 DEFAULT NULL)
+      ASSETTYPE        IN INTEGER DEFAULT NULL,
+      NETWORKTYPEID    IN INTEGER DEFAULT NULL,
+      NETWORKELEMENT   IN VARCHAR2 DEFAULT NULL)
       RETURN SYS_REFCURSOR
    IS
-      RETVAL   SYS_REFCURSOR;
-      l_nit_inv_type nm_inv_types.nit_inv_type%type;
+      RETVAL           SYS_REFCURSOR;
+      l_nit_inv_type   nm_inv_types.nit_inv_type%TYPE;
    BEGIN
-      begin
-         select lb_exor_inv_type into l_nit_inv_type
-         from lb_types where lb_object_type = ASSETTYPE;
-      exception
-        when no_data_found then
-           l_nit_inv_type := NULL;
-      end;
---      
+      BEGIN
+         SELECT lb_exor_inv_type
+           INTO l_nit_inv_type
+           FROM lb_types
+          WHERE lb_object_type = ASSETTYPE;
+      EXCEPTION
+         WHEN NO_DATA_FOUND
+         THEN
+            l_nit_inv_type := NULL;
+      END;
+
+      --
       nm3ctx.set_context ('NLT_DATA_INV_TYPE', l_nit_inv_type);
       nm3ctx.set_context ('NLT_DATA_NLT_ID', TO_CHAR (NETWORKTYPEID));
       nm3ctx.set_context ('NLT_DATA_UNIQUE', NETWORKELEMENT);
@@ -571,24 +576,28 @@ AS
 
       RETURN retval;
    END;
-      
+
 
    FUNCTION GETASSETNETWORKELEMENTS_TAB (
-      ASSETTYPE   IN INTEGER DEFAULT NULL,
-      NETWORKTYPEID     IN INTEGER DEFAULT NULL,
-      NETWORKELEMENT     IN VARCHAR2 DEFAULT NULL)
-      RETURN lb_linear_refnt_tab IS 
-      RETVAL   LB_LINEAR_REFNT_TAB;
-      l_nit_inv_type nm_inv_types.nit_inv_type%type;
---      
+      ASSETTYPE        IN INTEGER DEFAULT NULL,
+      NETWORKTYPEID    IN INTEGER DEFAULT NULL,
+      NETWORKELEMENT   IN VARCHAR2 DEFAULT NULL)
+      RETURN lb_linear_refnt_tab
+   IS
+      RETVAL           LB_LINEAR_REFNT_TAB;
+      l_nit_inv_type   nm_inv_types.nit_inv_type%TYPE;
+   --
    BEGIN
-      begin
-         select lb_exor_inv_type into l_nit_inv_type
-         from lb_types where lb_object_type = ASSETTYPE;
-      exception
-        when no_data_found then
-           l_nit_inv_type := NULL;
-      end;
+      BEGIN
+         SELECT lb_exor_inv_type
+           INTO l_nit_inv_type
+           FROM lb_types
+          WHERE lb_object_type = ASSETTYPE;
+      EXCEPTION
+         WHEN NO_DATA_FOUND
+         THEN
+            l_nit_inv_type := NULL;
+      END;
 
       nm3ctx.set_context ('NLT_DATA_INV_TYPE', l_nit_inv_type);
       nm3ctx.set_context ('NLT_DATA_NLT_ID', TO_CHAR (NETWORKTYPEID));
@@ -606,6 +615,25 @@ AS
 
       RETURN retval;
    END;
-   
+
+   --
+
+
+   PROCEDURE CHECK_JXP (ASSETTYPE IN INTEGER, JXP IN VARCHAR2)
+   IS
+      l_exor_njx_code   NM_JUXTAPOSITIONS.NJX_CODE%TYPE;
+   BEGIN
+      SELECT njx_code
+        INTO l_exor_njx_code
+        FROM nm_juxtapositions, NM_ASSET_TYPE_JUXTAPOSITIONS, lb_types
+       WHERE     najx_njxt_id = njx_njxt_id
+             AND njx_meaning = JXP
+             AND lb_object_type = ASSETTYPE
+             AND lb_exor_inv_type = najx_inv_type;
+   EXCEPTION
+      WHEN NO_DATA_FOUND
+      THEN
+         raise_application_error (-20001, 'Juxtaposition not known');
+   END;
 END lb_ref;
 /
