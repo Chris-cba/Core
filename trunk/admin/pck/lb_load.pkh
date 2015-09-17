@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE lb_load
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_load.pkh-arc   1.4   Sep 16 2015 11:23:58   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_load.pkh-arc   1.5   Sep 17 2015 12:33:56   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_load.pkh  $
-   --       Date into PVCS   : $Date:   Sep 16 2015 11:23:58  $
-   --       Date fetched Out : $Modtime:   Sep 16 2015 11:21:32  $
-   --       PVCS Version     : $Revision:   1.4  $
+   --       Date into PVCS   : $Date:   Sep 17 2015 12:33:56  $
+   --       Date fetched Out : $Modtime:   Sep 17 2015 12:32:24  $
+   --       PVCS Version     : $Revision:   1.5  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,7 +16,7 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.4  $';
+   g_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.5  $';
 
    FUNCTION get_version
       RETURN VARCHAR2;
@@ -90,6 +90,9 @@ AS
    
    PROCEDURE aggregate_geometry(pi_nal_id in INTEGER, pi_start_date in date);
    PROCEDURE aggregate_geometry( pi_asset_id in integer, pi_location_type in varchar2, pi_obj_type in varchar2, pi_start_date in date );
-
+   
+   PROCEDURE update_location (p_nal_id     in nm_asset_locations_all.nal_id%type,
+                              p_nal_descr  IN nm_asset_locations_all.nal_descr%TYPE,
+                              p_jxp        IN nm_juxtapositions.njx_meaning%type DEFAULT NULL );
 END lb_load;
 /
