@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE lb_path
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_path.pkh-arc   1.2   Jun 15 2015 15:57:00   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_path.pkh-arc   1.3   Sep 23 2015 10:36:56   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_path.pkh  $
-   --       Date into PVCS   : $Date:   Jun 15 2015 15:57:00  $
-   --       Date fetched Out : $Modtime:   Jun 15 2015 15:56:20  $
-   --       PVCS Version     : $Revision:   1.2  $
+   --       Date into PVCS   : $Date:   Sep 23 2015 10:36:56  $
+   --       Date fetched Out : $Modtime:   Sep 23 2015 10:35:40  $
+   --       PVCS Version     : $Revision:   1.3  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,7 +16,7 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.2  $';
+   g_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.3  $';
    --
    g_network           VARCHAR2 (30);
 
@@ -67,5 +67,9 @@ AS
 
    FUNCTION get_path_as_lb_rpt_tab (p_no_1 INTEGER, p_no_2 INTEGER)
       RETURN lb_rpt_tab;
+
+   FUNCTION get_path_as_lb_rpt_tab (pi_path in sdo_number_array)
+      RETURN lb_rpt_tab;
+	  
 END lb_path;
 /
