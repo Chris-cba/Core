@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE Nm3layer_Tool AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3layer_tool.pkh-arc   2.13   Jul 04 2013 16:13:10   James.Wadsworth  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3layer_tool.pkh-arc   2.14   Sep 23 2015 11:33:34   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm3layer_tool.pkh  $
---       Date into PVCS   : $Date:   Jul 04 2013 16:13:10  $
---       Date fetched Out : $Modtime:   Jul 04 2013 16:12:58  $
---       Version          : $Revision:   2.13  $
+--       Date into PVCS   : $Date:   Sep 23 2015 11:33:34  $
+--       Date fetched Out : $Modtime:   May 06 2015 11:27:36  $
+--       Version          : $Revision:   2.14  $
 --       Based on SCCS version : 1.6
 ------------------------------------------------------------------
 --   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
@@ -15,7 +15,7 @@ CREATE OR REPLACE PACKAGE Nm3layer_Tool AS
 
 --</PACKAGE>
 --<GLOBVAR>
-    g_sccsid      CONSTANT  VARCHAR2(2000) := '$Revision:   2.13  $';
+    g_sccsid      CONSTANT  VARCHAR2(2000) := '$Revision:   2.14  $';
     g_boolean               BOOLEAN        := FALSE;
     g_x_column    CONSTANT  user_tab_columns.column_name%TYPE := 'IIT_X';
     g_y_column    CONSTANT  user_tab_columns.column_name%TYPE := 'IIT_Y';
@@ -1024,6 +1024,11 @@ FUNCTION get_srid ( pi_nth_theme_id IN nm_themes_all.nth_theme_id%TYPE )
 --
 -----------------------------------------------------------------------------
 --
+PROCEDURE refresh_group_of_groups;
+--
+-----------------------------------------------------------------------------
+--
+
 END Nm3layer_Tool;
 /
 
