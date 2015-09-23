@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_path
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_path.pkb-arc   1.3   Jun 19 2015 12:47:58   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_path.pkb-arc   1.4   Sep 23 2015 13:30:20   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_path.pkb  $
-   --       Date into PVCS   : $Date:   Jun 19 2015 12:47:58  $
-   --       Date fetched Out : $Modtime:   Jun 19 2015 13:57:20  $
-   --       PVCS Version     : $Revision:   1.3  $
+   --       Date into PVCS   : $Date:   Sep 23 2015 13:30:20  $
+   --       Date fetched Out : $Modtime:   Sep 23 2015 13:29:30  $
+   --       PVCS Version     : $Revision:   1.4  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,7 +16,7 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.3  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.4  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_path';
 
@@ -251,12 +251,14 @@ AS
       retval   lb_rpt_tab;
    --
    BEGIN
-      nm3ctx.set_context('L1_NE_ID', to_char(l1.lr_ne_id));
-      nm3ctx.set_context('L1_OFFSET', to_char(l1.lr_offset));
-      nm3ctx.set_context('L2_NE_ID', to_char(l2.lr_ne_id));
-      nm3ctx.set_context('L2_OFFSET', to_char(l2.lr_offset));
---
-      select * into retval from v_lb_path_between_points;
+      nm3ctx.set_context ('L1_NE_ID', TO_CHAR (l1.lr_ne_id));
+      nm3ctx.set_context ('L1_OFFSET', TO_CHAR (l1.lr_offset));
+      nm3ctx.set_context ('L2_NE_ID', TO_CHAR (l2.lr_ne_id));
+      nm3ctx.set_context ('L2_OFFSET', TO_CHAR (l2.lr_offset));
+
+      --
+      SELECT * INTO retval FROM v_lb_path_between_points;
+
       RETURN retval;
    END;
 
@@ -332,6 +334,170 @@ AS
                 FROM nm_linear_types,
                      nm_elements e,
                      v_lb_directed_path_links p
+               WHERE     e.ne_id = p.ne_id
+                     AND e.ne_nt_type = nlt_nt_type
+                     AND nlt_gty_type IS NULL
+                     AND nlt_g_i_d = 'D');
+
+      RETURN retval;
+   END;
+
+   FUNCTION get_path_as_lb_rpt_tab (pi_path IN sdo_number_array)
+      RETURN lb_rpt_tab
+   IS
+      retval   lb_RPt_tab;
+   BEGIN
+      SELECT CAST (COLLECT (lb_rpt (ne_id,
+                                    nlt_id,
+                                    obj_type,
+                                    obj_id,
+                                    seg_id,
+                                    path_seq,
+                                    dir_flag,
+                                    start_m,
+                                    end_m,
+                                    nlt_units)) AS lb_rpt_tab)
+        INTO retval
+        FROM (SELECT e.ne_id,
+                     nlt_id,
+                     'PATH' obj_type,
+                     1 obj_id,
+                     1 seg_id,
+                     path_seq,
+                     dir_flag,
+                     0 start_m,
+                     p.ne_length end_m,
+                     nlt_units
+                FROM nm_linear_types,
+                     nm_elements e,
+                     (WITH path_links
+                           AS (SELECT path_seq,
+                                      ne_id,
+                                      ne_no_start,
+                                      ne_no_end,
+                                      ne_length,
+                                      cum_length,
+                                      dir_flag
+                                 FROM (SELECT path_seq,
+                                              ne_id,
+                                              ne_no_start,
+                                              ne_no_end,
+                                              ne_length,
+                                              SUM (ne_length)
+                                                 OVER (ORDER BY path_seq)
+                                                 cum_length,
+                                              CASE path_seq
+                                                 WHEN 1
+                                                 THEN
+                                                    CASE ne_no_start
+                                                       WHEN p_s
+                                                       THEN
+                                                          -1
+                                                       WHEN p_e
+                                                       THEN
+                                                          -1
+                                                       ELSE
+                                                          CASE ne_no_end
+                                                             WHEN p_s THEN 1
+                                                             WHEN p_e THEN 1
+                                                             ELSE 0
+                                                          END
+                                                    END
+                                              END
+                                                 dir_flag
+                                         FROM (  SELECT t.path_seq,
+                                                        ne_id,
+                                                        ne_no_start,
+                                                        ne_no_end,
+                                                        ne_length,
+                                                        LEAD (
+                                                           ne_no_start,
+                                                           1)
+                                                        OVER (
+                                                           ORDER BY path_seq)
+                                                           p_s,
+                                                        LEAD (
+                                                           ne_no_end,
+                                                           1)
+                                                        OVER (
+                                                           ORDER BY path_seq)
+                                                           p_e
+                                                   FROM (SELECT ROWNUM path_seq,
+                                                                COLUMN_VALUE
+                                                                   path_ne_id
+                                                           FROM TABLE (
+                                                                   lb_path.get_sdo_path (
+                                                                      1076647,
+                                                                      1076648)))
+                                                        t,
+                                                        nm_elements
+                                                  WHERE path_ne_id = ne_id
+                                               ORDER BY path_seq) t2)),
+                           recursive_path (path_seq,
+                                           ne_id,
+                                           ne_no_start,
+                                           ne_no_end,
+                                           ne_length,
+                                           cum_length,
+                                           dir_flag)
+                           AS (SELECT p.path_seq,
+                                      p.ne_id,
+                                      p.ne_no_start,
+                                      p.ne_no_end,
+                                      p.ne_length,
+                                      p.cum_length,
+                                      p.dir_flag
+                                 FROM path_links p
+                                WHERE path_seq = 1
+                               UNION ALL
+                               SELECT c.path_seq,
+                                      c.ne_id,
+                                      c.ne_no_start,
+                                      c.ne_no_end,
+                                      c.ne_length,
+                                      c.cum_length,
+                                      CASE p.dir_flag
+                                         WHEN 1
+                                         THEN
+                                            CASE
+                                               WHEN p.ne_no_end =
+                                                       c.ne_no_start
+                                               THEN
+                                                  1
+                                               WHEN p.ne_no_end = c.ne_no_end
+                                               THEN
+                                                  -1
+                                               ELSE
+                                                  0
+                                            END
+                                         WHEN -1
+                                         THEN
+                                            CASE
+                                               WHEN p.ne_no_start =
+                                                       c.ne_no_start
+                                               THEN
+                                                  1
+                                               WHEN p.ne_no_start =
+                                                       c.ne_no_end
+                                               THEN
+                                                  -1
+                                               ELSE
+                                                  0
+                                            END
+                                         ELSE
+                                            0
+                                      END
+                                         dir_flag
+                                 FROM recursive_path p, path_links c
+                                WHERE c.path_seq = p.path_seq + 1)
+                      SELECT "PATH_SEQ",
+                             "NE_ID",
+                             "NE_NO_START",
+                             "NE_NO_END",
+                             "NE_LENGTH",
+                             "CUM_LENGTH",
+                             "DIR_FLAG"
+                        FROM recursive_path) p
                WHERE     e.ne_id = p.ne_id
                      AND e.ne_nt_type = nlt_nt_type
                      AND nlt_gty_type IS NULL
