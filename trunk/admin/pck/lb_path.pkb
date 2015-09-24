@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_path
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_path.pkb-arc   1.4   Sep 23 2015 13:30:20   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_path.pkb-arc   1.5   Sep 24 2015 09:19:18   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_path.pkb  $
-   --       Date into PVCS   : $Date:   Sep 23 2015 13:30:20  $
-   --       Date fetched Out : $Modtime:   Sep 23 2015 13:29:30  $
-   --       PVCS Version     : $Revision:   1.4  $
+   --       Date into PVCS   : $Date:   Sep 24 2015 09:19:18  $
+   --       Date fetched Out : $Modtime:   Sep 24 2015 09:19:28  $
+   --       PVCS Version     : $Revision:   1.5  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,7 +16,7 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.4  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.5  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_path';
 
@@ -503,6 +503,91 @@ AS
                      AND nlt_gty_type IS NULL
                      AND nlt_g_i_d = 'D');
 
+      RETURN retval;
+   END;
+
+   --
+   FUNCTION get_lb_rpt_tab_from_lref_array (
+      pi_lref_array   IN nm_lref_array_type)
+      RETURN lb_rpt_tab
+   IS
+      retval   lb_rpt_tab;
+   BEGIN
+      SELECT p1
+        INTO retval
+        FROM (SELECT *
+                FROM (SELECT rn, MAX (rn) OVER (PARTITION BY 1) max_rn, p1
+                        FROM (WITH lr_data (rn,
+                                            lr_ne_id,
+                                            lr_offset,
+                                            next_rn,
+                                            next_lr_ne_id,
+                                            next_lr_offset)
+                                   AS (SELECT *
+                                         FROM (SELECT rn,
+                                                      lr_ne_id,
+                                                      lr_offset,
+                                                      LEAD (rn, 1)
+                                                         OVER (ORDER BY rn)
+                                                         next_rn,
+                                                      LEAD (lr_ne_id, 1)
+                                                         OVER (ORDER BY rn)
+                                                         next_lr_ne_id,
+                                                      LEAD (lr_offset, 1)
+                                                         OVER (ORDER BY rn)
+                                                         next_lr_offset
+                                                 FROM (SELECT ROWNUM rn,
+                                                              t.lr_ne_id,
+                                                              t.lr_offset
+                                                         FROM TABLE (
+                                                                 pi_lref_array) t)))
+                              SELECT rn,
+                                     --rn, lr_ne_id, lr_offset, next_lr_ne_id, next_lr_offset
+                                     LB_PATH.get_sdo_path (
+                                        nm_lref (lr_ne_id, lr_offset),
+                                        nm_lref (next_lr_ne_id,
+                                                 next_lr_offset))
+                                        p1
+                                FROM lr_data l1
+                               WHERE rn = 1
+                              UNION ALL
+                              SELECT l3.rn,
+                                     LB_OPS.RPT_UNION (
+                                        LB_PATH.get_sdo_path (
+                                           nm_lref (l2.lr_ne_id,
+                                                    l2.lr_offset),
+                                           nm_lref (l2.next_lr_ne_id,
+                                                    l2.next_lr_offset)),
+                                        LB_PATH.get_sdo_path (
+                                           nm_lref (l3.lr_ne_id,
+                                                    l3.lr_offset),
+                                           nm_lref (l3.next_lr_ne_id,
+                                                    l3.next_lr_offset)),
+                                        100)
+                                --LB_PATH.get_sdo_path(nm_lref(l3.lr_ne_id, l3.lr_offset), nm_lref(l3.next_lr_ne_id, l3.next_lr_offset))
+                                --l3.rn, l3.lr_ne_id, l3.lr_offset, l3.next_lr_ne_id, l3.next_lr_offset
+                                FROM lr_data l2,
+                                     (SELECT rn,
+                                             lr_ne_id,
+                                             lr_offset,
+                                             LEAD (rn, 1) OVER (ORDER BY rn)
+                                                next_rn,
+                                             LEAD (lr_ne_id, 1)
+                                                OVER (ORDER BY rn)
+                                                next_lr_ne_id,
+                                             LEAD (lr_offset, 1)
+                                                OVER (ORDER BY rn)
+                                                next_lr_offset
+                                        FROM (SELECT ROWNUM rn,
+                                                     t.lr_ne_id,
+                                                     t.lr_offset
+                                                FROM TABLE (pi_lref_array) t))
+                                     l3
+                               WHERE     l3.rn = l2.next_rn --order by seg_id, seq_id
+                                     AND l3.next_rn IS NOT NULL))
+               WHERE rn = max_rn);
+
+      --
       RETURN retval;
    END;
 --
