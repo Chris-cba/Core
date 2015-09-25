@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE lb_load
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_load.pkh-arc   1.5   Sep 17 2015 12:33:56   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_load.pkh-arc   1.6   Sep 25 2015 17:04:22   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_load.pkh  $
-   --       Date into PVCS   : $Date:   Sep 17 2015 12:33:56  $
-   --       Date fetched Out : $Modtime:   Sep 17 2015 12:32:24  $
-   --       PVCS Version     : $Revision:   1.5  $
+   --       Date into PVCS   : $Date:   Sep 25 2015 17:04:22  $
+   --       Date fetched Out : $Modtime:   Sep 25 2015 17:04:50  $
+   --       PVCS Version     : $Revision:   1.6  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,7 +16,7 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.5  $';
+   g_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.6  $';
 
    FUNCTION get_version
       RETURN VARCHAR2;
@@ -36,7 +36,16 @@ AS
       RETURN INTEGER;
 
    --
-   PROCEDURE lb_ld_RPt (
+   PROCEDURE lb_ld_Rpt (
+      pi_nal_id         IN nm_asset_locations_all.nal_id%TYPE,
+      pi_nal_nit_type   IN nm_asset_locations_all.nal_nit_type%TYPE,
+      pi_Rpt            IN lb_RPt_tab,
+      pi_xsp            IN VARCHAR2,
+      pi_start_date     IN nm_asset_locations_all.nal_start_date%TYPE,
+      pi_security_id    IN nm_asset_locations_all.nal_security_key%TYPE);
+
+   --
+   PROCEDURE lb_ld_range (
       pi_nal_id         IN nm_asset_locations_all.nal_id%TYPE,
       pi_nal_nit_type   IN nm_asset_locations_all.nal_nit_type%TYPE,
       pi_refnt          IN v_nm_nlt_refnts.ne_id%TYPE,
@@ -48,9 +57,9 @@ AS
       pi_xsp            IN VARCHAR2,
       pi_start_date     IN nm_asset_locations_all.nal_start_date%TYPE,
       pi_security_id    IN nm_asset_locations_all.nal_security_key%TYPE);
-      
+
    --
-   Procedure lb_ld_path(
+   PROCEDURE lb_ld_path (
       pi_nal_id         IN nm_asset_locations_all.nal_id%TYPE,
       pi_nal_nit_type   IN nm_asset_locations_all.nal_nit_type%TYPE,
       pi_start_refnt    IN v_nm_nlt_refnts.ne_id%TYPE,
@@ -63,7 +72,15 @@ AS
       pi_end_xsp        IN VARCHAR2,
       pi_start_date     IN nm_asset_locations_all.nal_start_date%TYPE,
       pi_security_id    IN nm_asset_locations_all.nal_security_key%TYPE);
+
    --
+   PROCEDURE lb_ld_lref_array (
+      pi_nal_id         IN nm_asset_locations_all.nal_id%TYPE,
+      pi_nal_nit_type   IN nm_asset_locations_all.nal_nit_type%TYPE,
+      pi_lref_array     IN nm_lref_array_type,
+      pi_xsp            IN VARCHAR2,
+      pi_start_date     IN nm_asset_locations_all.nal_start_date%TYPE,
+      pi_security_id    IN nm_asset_locations_all.nal_security_key%TYPE);
 
    PROCEDURE lb_ld_geom (
       pi_nal_id         IN nm_asset_locations_all.nal_id%TYPE,
@@ -87,12 +104,17 @@ AS
       pi_nal_jxp        IN VARCHAR2 DEFAULT NULL);
 
    PROCEDURE close_location (pi_nal_id IN INTEGER, pi_end_date IN DATE);
-   
-   PROCEDURE aggregate_geometry(pi_nal_id in INTEGER, pi_start_date in date);
-   PROCEDURE aggregate_geometry( pi_asset_id in integer, pi_location_type in varchar2, pi_obj_type in varchar2, pi_start_date in date );
-   
-   PROCEDURE update_location (p_nal_id     in nm_asset_locations_all.nal_id%type,
-                              p_nal_descr  IN nm_asset_locations_all.nal_descr%TYPE,
-                              p_jxp        IN nm_juxtapositions.njx_meaning%type DEFAULT NULL );
+
+   PROCEDURE aggregate_geometry (pi_nal_id IN INTEGER, pi_start_date IN DATE);
+
+   PROCEDURE aggregate_geometry (pi_asset_id        IN INTEGER,
+                                 pi_location_type   IN VARCHAR2,
+                                 pi_obj_type        IN VARCHAR2,
+                                 pi_start_date      IN DATE);
+
+   PROCEDURE update_location (
+      p_nal_id      IN nm_asset_locations_all.nal_id%TYPE,
+      p_nal_descr   IN nm_asset_locations_all.nal_descr%TYPE,
+      p_jxp         IN nm_juxtapositions.njx_meaning%TYPE DEFAULT NULL);
 END lb_load;
 /
