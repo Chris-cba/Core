@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_load
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_load.pkb-arc   1.10   Sep 25 2015 17:01:14   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_load.pkb-arc   1.11   Sep 25 2015 17:28:26   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_load.pkb  $
-   --       Date into PVCS   : $Date:   Sep 25 2015 17:01:14  $
-   --       Date fetched Out : $Modtime:   Sep 25 2015 17:01:30  $
-   --       PVCS Version     : $Revision:   1.10  $
+   --       Date into PVCS   : $Date:   Sep 25 2015 17:28:26  $
+   --       Date fetched Out : $Modtime:   Sep 25 2015 17:28:28  $
+   --       PVCS Version     : $Revision:   1.11  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,7 +16,7 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.10  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.11  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_load';
 
@@ -114,10 +114,12 @@ AS
       l_g_i_d      VARCHAR2 (1);
       l_load_tab   lb_rpt_tab;
    BEGIN
-      lb_load (lb_ops.group_lb_rpt_tab (lb_ops.merge_lb_rpt_tab (pi_nal_id,
-                                        pi_nal_nit_type,
-                                        pi_Rpt,
-                                        100)),
+      lb_load (lb_ops.group_lb_rpt_tab (lb_ops.merge_lb_rpt_tab (
+                                           pi_nal_id,
+                                           pi_nal_nit_type,
+                                           pi_Rpt,
+                                           100),
+                                        100),
                pi_nal_id,
                pi_start_date,
                pi_security_id,
@@ -398,7 +400,8 @@ AS
                                            pi_nal_id,
                                            pi_nal_nit_type,
                                            l_load_tab,
-                                           10)),
+                                           10),
+                                        10),
                pi_nal_id,
                pi_start_date,
                pi_security_id,
