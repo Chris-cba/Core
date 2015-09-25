@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_ops
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_ops.pkb-arc   1.1   Sep 02 2015 17:20:54   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_ops.pkb-arc   1.2   Sep 25 2015 17:21:56   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_ops.pkb  $
-   --       Date into PVCS   : $Date:   Sep 02 2015 17:20:54  $
-   --       Date fetched Out : $Modtime:   Sep 02 2015 17:20:06  $
-   --       PVCS Version     : $Revision:   1.1  $
+   --       Date into PVCS   : $Date:   Sep 25 2015 17:21:56  $
+   --       Date fetched Out : $Modtime:   Sep 25 2015 17:22:08  $
+   --       PVCS Version     : $Revision:   1.2  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,7 +16,7 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated . All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.1  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.2  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_ops';
 
@@ -237,6 +237,43 @@ AS
 
       RETURN retval;
    END;
---
+
+   --
+   FUNCTION group_lb_rpt_tab (p_tab IN lb_RPt_Tab, p_cardinality IN INTEGER)
+      RETURN lb_RPt_tab
+   IS
+      retval   lb_RPt_tab;
+   BEGIN
+      SELECT lb_RPt (refnt,
+                     refnt_type,
+                     obj_type,
+                     obj_id,
+                     seg_id,
+                     seq_id,
+                     dir_flag,
+                     start_m,
+                     end_m,
+                     m_unit)
+        BULK COLLECT INTO retval
+        FROM (  SELECT refnt,
+                       refnt_type,
+                       obj_type,
+                       obj_id,
+                       seg_id,
+                       MIN (seq_id) seq_id,
+                       MIN (dir_flag) dir_flag,
+                       MIN (start_m) start_m,
+                       MAX (end_m) end_m,
+                       m_unit
+                  FROM TABLE (p_tab) t
+              GROUP BY refnt,
+                       refnt_type,
+                       obj_type,
+                       obj_id,
+                       seg_id,
+                       m_unit);
+
+      RETURN retval;
+   END;
 END;
 /
