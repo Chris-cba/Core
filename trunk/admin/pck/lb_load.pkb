@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_load
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_load.pkb-arc   1.9   Sep 22 2015 12:33:58   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_load.pkb-arc   1.10   Sep 25 2015 17:01:14   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_load.pkb  $
-   --       Date into PVCS   : $Date:   Sep 22 2015 12:33:58  $
-   --       Date fetched Out : $Modtime:   Sep 22 2015 12:33:56  $
-   --       PVCS Version     : $Revision:   1.9  $
+   --       Date into PVCS   : $Date:   Sep 25 2015 17:01:14  $
+   --       Date fetched Out : $Modtime:   Sep 25 2015 17:01:30  $
+   --       PVCS Version     : $Revision:   1.10  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,7 +16,7 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.9  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.10  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_load';
 
@@ -101,8 +101,32 @@ AS
       RETURN retval;
    END;
 
+   PROCEDURE lb_ld_Rpt (
+      pi_nal_id         IN nm_asset_locations_all.nal_id%TYPE,
+      pi_nal_nit_type   IN nm_asset_locations_all.nal_nit_type%TYPE,
+      pi_Rpt            IN lb_RPt_tab,
+      --    pi_g_i_d          IN varchar2,
+      pi_xsp            IN VARCHAR2,
+      pi_start_date     IN nm_asset_locations_all.nal_start_date%TYPE,
+      pi_security_id    IN nm_asset_locations_all.nal_security_key%TYPE)
+   IS
+      loc_error    lb_loc_error_tab;
+      l_g_i_d      VARCHAR2 (1);
+      l_load_tab   lb_rpt_tab;
+   BEGIN
+      lb_load (lb_ops.group_lb_rpt_tab (lb_ops.merge_lb_rpt_tab (pi_nal_id,
+                                        pi_nal_nit_type,
+                                        pi_Rpt,
+                                        100)),
+               pi_nal_id,
+               pi_start_date,
+               pi_security_id,
+               pi_xsp,
+               loc_error);
+   END;
+
    --
-   PROCEDURE lb_ld_RPt (
+   PROCEDURE lb_ld_range (
       pi_nal_id         IN nm_asset_locations_all.nal_id%TYPE,
       pi_nal_nit_type   IN nm_asset_locations_all.nal_nit_type%TYPE,
       pi_refnt          IN v_nm_nlt_refnts.ne_id%TYPE,
@@ -358,6 +382,31 @@ AS
                loc_error);
    END;
 
+   PROCEDURE lb_ld_lref_array (
+      pi_nal_id         IN nm_asset_locations_all.nal_id%TYPE,
+      pi_nal_nit_type   IN nm_asset_locations_all.nal_nit_type%TYPE,
+      pi_lref_array     IN nm_lref_array_type,
+      pi_xsp            IN VARCHAR2,
+      pi_start_date     IN nm_asset_locations_all.nal_start_date%TYPE,
+      pi_security_id    IN nm_asset_locations_all.nal_security_key%TYPE)
+   IS
+      loc_error    lb_loc_error_tab;
+      l_load_tab   lb_rpt_tab;
+   BEGIN
+      l_load_tab := lb_path.get_lb_rpt_tab_from_lref_array (pi_lref_array);
+      lb_load (lb_ops.group_lb_rpt_tab (lb_ops.merge_lb_rpt_tab (
+                                           pi_nal_id,
+                                           pi_nal_nit_type,
+                                           l_load_tab,
+                                           10)),
+               pi_nal_id,
+               pi_start_date,
+               pi_security_id,
+               pi_xsp,
+               loc_error);
+   END;
+
+
    PROCEDURE lb_ld_geom (
       pi_nal_id         IN nm_asset_locations_all.nal_id%TYPE,
       pi_nal_nit_type   IN nm_asset_locations_all.nal_nit_type%TYPE,
@@ -452,6 +501,9 @@ AS
                   AND nal_nit_type = pi_nal_nit_type
                   AND DECODE (pi_nal_jxp, NULL, '&^%$', pi_nal_jxp) =
                          DECODE (pi_nal_jxp, NULL, '&^%$', nal_jxp);
+
+      DELETE FROM nm_asset_geometry_all
+            WHERE nag_asset_id = pi_nal_asset_id;
 
       aggregate_geometry (PI_ASSET_ID        => pi_nal_asset_id,
                           pi_location_type   => NULL,
@@ -604,14 +656,13 @@ AS
    IS
       l_geom   MDSYS.sdo_geometry;
    BEGIN
-
       BEGIN
-
-  	     DELETE FROM nm_asset_geometry_all
+         DELETE FROM nm_asset_geometry_all
                WHERE     nag_asset_id = pi_asset_id
                      AND nag_location_type = pi_location_type
                      AND nag_obj_type = pi_obj_type;
 
+         --
          INSERT INTO nm_asset_geometry_all (nag_location_type,
                                             nag_asset_id,
                                             nag_obj_type,
@@ -655,12 +706,14 @@ AS
                                              nm_asset_locations_all l2
                                        WHERE     nlg_nal_id = l2.nal_id
                                              AND l2.nal_asset_id = pi_asset_id
-                                             AND nal_location_type = pi_location_type
+                                             AND nal_location_type =
+                                                    pi_location_type
                                              AND l2.nal_location_type =
                                                     nlg_location_type
                                              AND l2.nal_nit_type = nlg_obj_type
                                              AND l2.nal_nit_type = pi_obj_type
-                                             AND nal_location_type = pi_location_type
+                                             AND nal_location_type =
+                                                    pi_location_type
                                              AND nlg_obj_type = pi_obj_type) t
                             GROUP BY                      --nlg_location_type,
                                     asset_id,
