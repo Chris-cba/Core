@@ -1,0 +1,120 @@
+CREATE OR REPLACE PACKAGE lb_load
+AS
+   --   PVCS Identifiers :-
+   --
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_load.pkh-arc   1.6   Sep 25 2015 17:04:22   Rob.Coupe  $
+   --       Module Name      : $Workfile:   lb_load.pkh  $
+   --       Date into PVCS   : $Date:   Sep 25 2015 17:04:22  $
+   --       Date fetched Out : $Modtime:   Sep 25 2015 17:04:50  $
+   --       PVCS Version     : $Revision:   1.6  $
+   --
+   --   Author : R.A. Coupe
+   --
+   --   Text description
+   --
+   -----------------------------------------------------------------------------
+   -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
+   ----------------------------------------------------------------------------
+   --
+   g_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.6  $';
+
+   FUNCTION get_version
+      RETURN VARCHAR2;
+
+   FUNCTION get_body_version
+      RETURN VARCHAR2;
+
+   FUNCTION ld_nal (
+      p_nal_nit_type        IN nm_asset_locations_all.nal_nit_type%TYPE,
+      p_nal_asset_id        IN nm_asset_locations_all.nal_asset_id%TYPE,
+      p_nal_descr           IN nm_asset_locations_all.nal_descr%TYPE,
+      p_nal_jxp             IN nm_asset_locations_all.nal_jxp%TYPE,
+      p_nal_primary         IN nm_asset_locations_all.nal_primary%TYPE,
+      p_nal_location_type   IN nm_asset_locations_all.nal_location_type%TYPE,
+      p_nal_start_date      IN nm_asset_locations_all.nal_start_date%TYPE,
+      p_nal_security        IN nm_asset_locations_all.nal_security_key%TYPE)
+      RETURN INTEGER;
+
+   --
+   PROCEDURE lb_ld_Rpt (
+      pi_nal_id         IN nm_asset_locations_all.nal_id%TYPE,
+      pi_nal_nit_type   IN nm_asset_locations_all.nal_nit_type%TYPE,
+      pi_Rpt            IN lb_RPt_tab,
+      pi_xsp            IN VARCHAR2,
+      pi_start_date     IN nm_asset_locations_all.nal_start_date%TYPE,
+      pi_security_id    IN nm_asset_locations_all.nal_security_key%TYPE);
+
+   --
+   PROCEDURE lb_ld_range (
+      pi_nal_id         IN nm_asset_locations_all.nal_id%TYPE,
+      pi_nal_nit_type   IN nm_asset_locations_all.nal_nit_type%TYPE,
+      pi_refnt          IN v_nm_nlt_refnts.ne_id%TYPE,
+      pi_g_i_d          IN v_nm_nlt_data.nlt_g_i_d%TYPE,
+      pi_nlt_id         IN v_nm_nlt_refnts.nlt_id%TYPE,
+      pi_start_m        IN NUMBER,
+      pi_end_m          IN NUMBER,
+      pi_unit           IN nm_units.un_unit_id%TYPE,
+      pi_xsp            IN VARCHAR2,
+      pi_start_date     IN nm_asset_locations_all.nal_start_date%TYPE,
+      pi_security_id    IN nm_asset_locations_all.nal_security_key%TYPE);
+
+   --
+   PROCEDURE lb_ld_path (
+      pi_nal_id         IN nm_asset_locations_all.nal_id%TYPE,
+      pi_nal_nit_type   IN nm_asset_locations_all.nal_nit_type%TYPE,
+      pi_start_refnt    IN v_nm_nlt_refnts.ne_id%TYPE,
+      pi_start_nlt_id   IN v_nm_nlt_refnts.nlt_id%TYPE,
+      pi_start_m        IN NUMBER,
+      pi_start_xsp      IN VARCHAR2,
+      pi_end_refnt      IN v_nm_nlt_refnts.ne_id%TYPE,
+      pi_end_nlt_id     IN v_nm_nlt_refnts.nlt_id%TYPE,
+      pi_end_m          IN NUMBER,
+      pi_end_xsp        IN VARCHAR2,
+      pi_start_date     IN nm_asset_locations_all.nal_start_date%TYPE,
+      pi_security_id    IN nm_asset_locations_all.nal_security_key%TYPE);
+
+   --
+   PROCEDURE lb_ld_lref_array (
+      pi_nal_id         IN nm_asset_locations_all.nal_id%TYPE,
+      pi_nal_nit_type   IN nm_asset_locations_all.nal_nit_type%TYPE,
+      pi_lref_array     IN nm_lref_array_type,
+      pi_xsp            IN VARCHAR2,
+      pi_start_date     IN nm_asset_locations_all.nal_start_date%TYPE,
+      pi_security_id    IN nm_asset_locations_all.nal_security_key%TYPE);
+
+   PROCEDURE lb_ld_geom (
+      pi_nal_id         IN nm_asset_locations_all.nal_id%TYPE,
+      pi_nal_nit_type   IN nm_asset_locations_all.nal_nit_type%TYPE,
+      pi_geom           IN MDSYS.sdo_geometry,
+      pi_start_date     IN nm_asset_locations_all.nal_start_date%TYPE,
+      pi_security_id    IN nm_asset_locations_all.nal_security_key%TYPE);
+
+
+   PROCEDURE delete_asset_location (
+      pi_nal_asset_id   IN INTEGER,
+      pi_nal_nit_type   IN VARCHAR2,
+      pi_nal_jxp        IN VARCHAR2 DEFAULT NULL);
+
+   PROCEDURE delete_location (pi_nal_id IN INTEGER);
+
+   PROCEDURE close_asset_location (
+      pi_nal_asset_id   IN INTEGER,
+      pi_nal_nit_type   IN VARCHAR2,
+      pi_end_date       IN DATE,
+      pi_nal_jxp        IN VARCHAR2 DEFAULT NULL);
+
+   PROCEDURE close_location (pi_nal_id IN INTEGER, pi_end_date IN DATE);
+
+   PROCEDURE aggregate_geometry (pi_nal_id IN INTEGER, pi_start_date IN DATE);
+
+   PROCEDURE aggregate_geometry (pi_asset_id        IN INTEGER,
+                                 pi_location_type   IN VARCHAR2,
+                                 pi_obj_type        IN VARCHAR2,
+                                 pi_start_date      IN DATE);
+
+   PROCEDURE update_location (
+      p_nal_id      IN nm_asset_locations_all.nal_id%TYPE,
+      p_nal_descr   IN nm_asset_locations_all.nal_descr%TYPE,
+      p_jxp         IN nm_juxtapositions.njx_meaning%TYPE DEFAULT NULL);
+END lb_load;
+/
