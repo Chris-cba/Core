@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE Nm3sdo AS
 --
 --   SCCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3sdo.pkh-arc   2.10   Apr 23 2015 16:17:38   Rob.Coupe  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3sdo.pkh-arc   2.11   Sep 28 2015 11:10:26   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3sdo.pkh  $
---       Date into PVCS   : $Date:   Apr 23 2015 16:17:38  $
---       Date fetched Out : $Modtime:   Apr 23 2015 16:16:54  $
---       PVCS Version     : $Revision:   2.10  $
+--       Date into PVCS   : $Date:   Sep 28 2015 11:10:26  $
+--       Date fetched Out : $Modtime:   Sep 28 2015 11:09:36  $
+--       PVCS Version     : $Revision:   2.11  $
 --
 --   Author : Rob Coupe
 --
@@ -23,7 +23,7 @@ CREATE OR REPLACE PACKAGE Nm3sdo AS
 --<GLOBVAR>
 -- g_sccsid is the SCCS_ID
 -- Constants
-  g_sccsid           CONSTANT VARCHAR2(80) := '"$Revision:   2.10  $"';
+  g_sccsid           CONSTANT VARCHAR2(80) := '"$Revision:   2.11  $"';
   single_shape_inv   CONSTANT VARCHAR2(3)  := NVL( Hig.get_sysopt('SDOSINGSHP'), 'N');
   use_surrogate_key  CONSTANT VARCHAR2(1)  := NVL( Hig.get_sysopt('SDOSURKEY'),'N');
   def_pt_zoom        CONSTANT NUMBER       := NVL( TO_NUMBER( Hig.get_sysopt('SDOPTZOOM' )), 100);
@@ -1215,7 +1215,12 @@ PROCEDURE get_theme_pt_coords ( p_theme_id IN nm_themes_all.nth_theme_id%TYPE,
            ( p_nth_id IN NUMBER )
    RETURN MDSYS.SDO_DIM_ARRAY;
 --</PROC>
-
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_THEME_SRID">
+-- return the SRID for a theme.
+FUNCTION Get_Theme_SRID ( p_nth_id IN NUMBER ) RETURN INTEGER;
+--
 --
 -----------------------------------------------------------------------------
 --
