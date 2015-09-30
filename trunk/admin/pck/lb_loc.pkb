@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_loc
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_loc.pkb-arc   1.1   Sep 03 2015 16:54:06   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_loc.pkb-arc   1.2   Sep 30 2015 13:08:58   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_loc.pkb  $
-   --       Date into PVCS   : $Date:   Sep 03 2015 16:54:06  $
-   --       Date fetched Out : $Modtime:   Sep 03 2015 16:52:58  $
-   --       PVCS Version     : $Revision:   1.1  $
+   --       Date into PVCS   : $Date:   Sep 30 2015 13:08:58  $
+   --       Date fetched Out : $Modtime:   Sep 30 2015 13:08:18  $
+   --       PVCS Version     : $Revision:   1.2  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,7 +16,7 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.1  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.2  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_loc';
 
@@ -353,7 +353,8 @@ AS
                                                              1)
                                                           OVER (
                                                              ORDER BY
-                                                                nm_seg_no,
+                                                                route_id,
+  															    nm_seg_no,
                                                                 nm_seq_no,
                                                                 datum_id,
                                                                 datum_st * dir,
@@ -366,6 +367,7 @@ AS
                                                              1)
                                                           OVER (
                                                              ORDER BY
+                                                                route_id,
                                                                 nm_seg_no,
                                                                 nm_seq_no,
                                                                 datum_id,
@@ -379,6 +381,7 @@ AS
                                                              1)
                                                           OVER (
                                                              ORDER BY
+                                                                route_id,
                                                                 nm_seg_no,
                                                                 nm_seq_no,
                                                                 datum_id,
@@ -392,6 +395,7 @@ AS
                                                              1)
                                                           OVER (
                                                              ORDER BY
+                                                                route_id,
                                                                 nm_seg_no,
                                                                 nm_seq_no,
                                                                 datum_id,
@@ -405,6 +409,7 @@ AS
                                                              1)
                                                           OVER (
                                                              ORDER BY
+                                                                route_id,
                                                                 nm_seg_no,
                                                                 nm_seq_no,
                                                                 datum_id,
@@ -418,6 +423,7 @@ AS
                                                              1)
                                                           OVER (
                                                              ORDER BY
+                                                                route_id,
                                                                 nm_seg_no,
                                                                 nm_seq_no,
                                                                 datum_id,
@@ -432,6 +438,7 @@ AS
                                                              1)
                                                           OVER (
                                                              ORDER BY
+                                                                route_id,
                                                                 nm_seg_no,
                                                                 nm_seq_no,
                                                                 datum_id,
@@ -446,6 +453,7 @@ AS
                                                           OVER (
                                                              PARTITION BY inv_id
                                                              ORDER BY
+                                                                route_id,
                                                                 nm_seg_no,
                                                                 nm_seq_no,
                                                                 datum_id,
@@ -460,6 +468,7 @@ AS
                                                           OVER (
                                                              PARTITION BY inv_id
                                                              ORDER BY
+                                                                route_id,
                                                                 nm_seg_no,
                                                                 nm_seq_no,
                                                                 datum_id,
@@ -474,6 +483,7 @@ AS
                                                           OVER (
                                                              PARTITION BY inv_id
                                                              ORDER BY
+                                                                route_id,
                                                                 nm_seg_no,
                                                                 nm_seq_no,
                                                                 datum_id,
@@ -488,6 +498,7 @@ AS
                                                           OVER (
                                                              PARTITION BY inv_id
                                                              ORDER BY
+                                                                route_id,
                                                                 nm_seg_no,
                                                                 nm_seq_no,
                                                                 datum_id,
@@ -502,6 +513,7 @@ AS
                                                           OVER (
                                                              PARTITION BY inv_id
                                                              ORDER BY
+                                                                route_id,
                                                                 nm_seg_no,
                                                                 nm_seq_no,
                                                                 datum_id,
@@ -515,6 +527,7 @@ AS
                                                              1)
                                                           OVER (
                                                              ORDER BY
+                                                                route_id,
                                                                 nm_seg_no,
                                                                 nm_seq_no,
                                                                 datum_id,
@@ -529,6 +542,7 @@ AS
                                                           OVER (
                                                              PARTITION BY inv_id
                                                              ORDER BY
+                                                                route_id,
                                                                 nm_seg_no,
                                                                 nm_seq_no,
                                                                 datum_id,
