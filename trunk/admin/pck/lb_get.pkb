@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_get
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_get.pkb-arc   1.1   Sep 30 2015 12:52:54   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_get.pkb-arc   1.2   Oct 05 2015 12:14:32   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_get.pkb  $
-   --       Date into PVCS   : $Date:   Sep 30 2015 12:52:54  $
-   --       Date fetched Out : $Modtime:   Sep 30 2015 12:52:24  $
-   --       PVCS Version     : $Revision:   1.1  $
+   --       Date into PVCS   : $Date:   Oct 05 2015 12:14:32  $
+   --       Date fetched Out : $Modtime:   Oct 05 2015 12:14:10  $
+   --       PVCS Version     : $Revision:   1.2  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,13 +16,26 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.1  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.2  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_get';
 
    --
    -----------------------------------------------------------------------------
    --
+function get_FT_retrieval_str (p_obj_type in varchar2, p_obj_id in integer ) return varchar2;
+
+function get_FT_retrieval_str (p_obj_type in varchar2, p_obj_id in integer ) return varchar2
+ is
+  l_inv_on_nw_row v_nm_inv_on_network%rowtype;
+begin
+  select * into l_inv_on_nw_row
+  from v_nm_inv_on_network
+  where nit_inv_type = p_obj_type;
+--
+  return l_inv_on_nw_row.rpt_string||' where '||l_inv_on_nw_row.nit_foreign_pk_column||' = :obj_id ' ;
+end;    
+
 
    FUNCTION get_version
       RETURN VARCHAR2
@@ -1107,7 +1120,24 @@ AS
       RETURN lb_rpt_tab
    IS
       retval   lb_rpt_tab;
+      l_ft_flag varchar2(1);
+      l_category varchar2(1);
    BEGIN
+   --
+      BEGIN
+        select decode(nit_table_name, NULL, 'N', 'Y'), nit_category
+        into l_ft_flag, l_category
+        from nm_inv_types
+        where nit_inv_type = pi_obj_type;
+      EXCEPTION
+        WHEN NO_DATA_FOUND then NULL;
+      END;
+      
+      if l_ft_flag = 'Y' then
+        execute immediate get_FT_retrieval_str(pi_obj_type, pi_obj_id) into retval using pi_obj_id;  
+
+      else
+--           
       SELECT CAST (COLLECT (lb_rpt (nm_ne_id_of,
                                     nlt_id,
                                     nm_obj_type,
@@ -1154,7 +1184,7 @@ AS
                             NVL (ne_gty_group_type, '£$%^')
                      AND nm_ne_id_in = pi_obj_id
                      AND nm_obj_type = pi_obj_type);
-
+      end if;
       RETURN retval;
    END;
 END;
