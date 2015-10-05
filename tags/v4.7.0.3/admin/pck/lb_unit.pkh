@@ -1,0 +1,72 @@
+CREATE OR REPLACE PACKAGE lb_unit
+AS
+   --   PVCS Identifiers :-
+   --
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_unit.pkh-arc   1.0   Oct 05 2015 11:40:26   Rob.Coupe  $
+   --       Module Name      : $Workfile:   lb_unit.pkh  $
+   --       Date into PVCS   : $Date:   Oct 05 2015 11:40:26  $
+   --       Date fetched Out : $Modtime:   Oct 05 2015 11:39:54  $
+   --       PVCS Version     : $Revision:   1.0  $
+   --
+   --   Author : R.A. Coupe
+   --
+   --   Package designed to handle LB unit translations
+   --
+   -----------------------------------------------------------------------------
+   -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
+   ----------------------------------------------------------------------------
+   --
+   --Function to interface with Exor unit conversion function. Had been coded as a new function inside CTDOT package - code has been commented
+   --out and replaced with a reference to the Exorconversion routine - not sure why this CTDOT package had its own version of stadard exor code?
+   --This function is renamed to avoid ambiguity with all the various unit systems (Exor, eB and SDO)
+   --
+--   FUNCTION tokenize (pi_text IN VARCHAR2, pi_delimiter IN CHAR) RETURN DBMS_SQL.VARCHAR2_TABLE;
+   
+   FUNCTION convert_exor_unit (pi_un_id_in    IN nm_units.UN_UNIT_ID%TYPE,
+                               pi_un_id_out   IN nm_units.UN_UNIT_ID%TYPE,
+                               pi_value       IN NUMBER)
+      RETURN NUMBER;
+
+   --
+   -- Function to convert unit values between eB (External) units and Exor
+   --
+   FUNCTION convert_lb_unit_to_exor (
+      pi_external_unit_id   IN lb_units.EXTERNAL_UNIT_ID%TYPE,
+      pi_un_id_out          IN nm_units.UN_UNIT_ID%TYPE,
+      pi_value              IN NUMBER)
+      RETURN NUMBER;
+
+   --
+   -- Function to convert unit values between Exor and eB (External) units
+   --
+
+   FUNCTION convert_exor_unit_to_lb (
+      pi_un_id_in           IN nm_units.UN_UNIT_ID%TYPE,
+      pi_external_unit_id   IN lb_units.EXTERNAL_UNIT_ID%TYPE,
+      pi_value              IN NUMBER)
+      RETURN NUMBER;
+
+   --
+   -- Function to transform lengths using Oracle SRIDs - originally coded in CTDOT package
+   --
+   FUNCTION transform_length (pi_length      IN NUMBER,
+                              pi_from_srid   IN NUMBER,
+                              pi_to_srid     IN NUMBER)
+      RETURN NUMBER;
+
+   --
+   --
+   -- Generic distance converter uses units in SDO system-
+   --
+   FUNCTION Convert_Distance (p_srid    IN NUMBER,
+                              p_value   IN NUMBER,
+                              p_unit    IN VARCHAR2 := 'Meter')
+      RETURN NUMBER;
+--
+   FUNCTION Convert_Distance (p_srid    IN NUMBER,
+                              p_value   IN NUMBER,
+                              p_unit    IN nm_units.un_unit_id%type)
+      RETURN NUMBER;
+
+END;
+/
