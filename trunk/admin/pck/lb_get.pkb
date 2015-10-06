@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_get
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_get.pkb-arc   1.2   Oct 05 2015 12:14:32   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_get.pkb-arc   1.3   Oct 06 2015 14:06:54   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_get.pkb  $
-   --       Date into PVCS   : $Date:   Oct 05 2015 12:14:32  $
-   --       Date fetched Out : $Modtime:   Oct 05 2015 12:14:10  $
-   --       PVCS Version     : $Revision:   1.2  $
+   --       Date into PVCS   : $Date:   Oct 06 2015 14:06:54  $
+   --       Date fetched Out : $Modtime:   Oct 06 2015 14:06:28  $
+   --       PVCS Version     : $Revision:   1.3  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,25 +16,34 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.2  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.3  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_get';
 
    --
    -----------------------------------------------------------------------------
    --
-function get_FT_retrieval_str (p_obj_type in varchar2, p_obj_id in integer ) return varchar2;
+   FUNCTION get_FT_retrieval_str (p_obj_type   IN VARCHAR2,
+                                  p_obj_id     IN INTEGER)
+      RETURN VARCHAR2;
 
-function get_FT_retrieval_str (p_obj_type in varchar2, p_obj_id in integer ) return varchar2
- is
-  l_inv_on_nw_row v_nm_inv_on_network%rowtype;
-begin
-  select * into l_inv_on_nw_row
-  from v_nm_inv_on_network
-  where nit_inv_type = p_obj_type;
---
-  return l_inv_on_nw_row.rpt_string||' where '||l_inv_on_nw_row.nit_foreign_pk_column||' = :obj_id ' ;
-end;    
+   FUNCTION get_FT_retrieval_str (p_obj_type   IN VARCHAR2,
+                                  p_obj_id     IN INTEGER)
+      RETURN VARCHAR2
+   IS
+      l_inv_on_nw_row   v_nm_inv_on_network%ROWTYPE;
+   BEGIN
+      SELECT *
+        INTO l_inv_on_nw_row
+        FROM v_nm_inv_on_network
+       WHERE nit_inv_type = p_obj_type;
+
+      --
+      RETURN    l_inv_on_nw_row.rpt_string
+             || ' where '
+             || l_inv_on_nw_row.nit_foreign_pk_column
+             || ' = :obj_id ';
+   END;
 
 
    FUNCTION get_version
@@ -1115,76 +1124,185 @@ end;
       RETURN retval;
    END;
 
+   FUNCTION get_lb_RPt_D_tab (p_lb_RPt_tab IN lb_RPt_tab)
+      RETURN lb_RPt_tab
+   IS
+      retval         lb_RPt_tab;
+      l_refnt_type   nm_linear_types%ROWTYPE;
+   BEGIN
+      -- just going down the hierarchy to diseeminate the data according to linear type
+      WITH itab
+           AS (SELECT t.*
+                 FROM TABLE (p_lb_RPt_tab) t)
+      SELECT lb_RPt (refnt,
+                     refnt_type,
+                     obj_type,
+                     obj_id,
+                     seg_id,
+                     ROWNUM,
+                     dir_flag,
+                     start_m,
+                     end_m,
+                     m_unit)
+        BULK COLLECT INTO retval
+        FROM (SELECT datum_ne_id refnt,
+                     refnt_type,
+                     obj_type,
+                     obj_id,
+                     nm_seg_no seg_id,
+                     ROWNUM,
+                     route_dir_flag dir_flag,
+                     inv_datum_start start_m,
+                     inv_datum_end end_m,
+                     1 m_unit
+                FROM (SELECT t1."SECTION_ID",
+                             t1."NM_SEQ_NO",
+                             t1."NM_SEG_NO",
+                             t1.datum_ne_id,
+                             t1."ROUTE_DIR_FLAG",
+                             t1."ROUTE_START_ON_ESU",
+                             t1."ROUTE_END_ON_ESU",
+                             t1."ROUTE_START_M",
+                             t1."ROUTE_END_M",
+                             obj_id,
+                             t1.obj_type,
+                             t1."START_M",
+                             t1."END_M",
+                             t1."INV_START",
+                             t1."INV_END",
+                             t1."NE_LENGTH",
+                             t1.ne_nt_type,
+                             CASE route_dir_flag
+                                WHEN 1 THEN inv_start
+                                ELSE ne_length - inv_end
+                             END
+                                inv_datum_start,
+                             CASE route_dir_flag
+                                WHEN 1 THEN inv_end
+                                ELSE ne_length - inv_start
+                             END
+                                inv_datum_end,
+                             refnt_type
+                        FROM (  SELECT rm.nm_ne_id_in section_id,
+                                       rm.nm_seq_no,
+                                       rm.nm_seg_no,
+                                       rm.nm_ne_id_of datum_ne_id,
+                                       rm.nm_cardinality route_dir_flag,
+                                       rm.nm_begin_mp route_start_on_esu,
+                                       rm.nm_end_mp route_end_on_esu,
+                                       rm.nm_slk route_start_m,
+                                       rm.nm_end_slk route_end_m,
+                                       im.obj_id,
+                                       im.obj_type,
+                                       im.start_m,
+                                       im.end_m,
+                                         GREATEST (im.start_m, rm.nm_slk)
+                                       - rm.nm_slk
+                                       + rm.nm_begin_mp
+                                          inv_start,
+                                         LEAST (im.end_m, rm.nm_end_slk)
+                                       - rm.nm_slk
+                                       + rm.nm_begin_mp
+                                          inv_end,
+                                       e.ne_length,
+                                       e.ne_nt_type,
+                                       nlt_id refnt_type
+                                  FROM itab im,
+                                       nm_members rm,
+                                       nm_elements e,
+                                       nm_linear_types l
+                                 WHERE     e.ne_id = rm.nm_ne_id_of
+                                       AND l.nlt_g_i_d = 'D'
+                                       AND l.nlt_nt_type = ne_nt_type
+                                       AND rm.nm_ne_id_in = im.refnt
+                                       AND (   (    im.start_m < rm.nm_end_slk
+                                                AND im.end_m > rm.nm_slk
+                                                AND im.end_m > im.start_m)
+                                            OR (    im.start_m = im.end_m
+                                                AND im.end_m <= rm.nm_end_slk
+                                                AND im.start_m >= rm.nm_slk))
+                              ORDER BY rm.nm_seg_no, rm.nm_seq_no, im.start_m)
+                             t1));
+
+      RETURN retval;
+   END;
+
+
    FUNCTION get_obj_id_as_rpt_tab (pi_obj_id     IN INTEGER,
                                    pi_obj_type   IN VARCHAR2)
       RETURN lb_rpt_tab
    IS
-      retval   lb_rpt_tab;
-      l_ft_flag varchar2(1);
-      l_category varchar2(1);
+      retval       lb_rpt_tab;
+      l_ft_flag    VARCHAR2 (1);
+      l_category   VARCHAR2 (1);
    BEGIN
-   --
+      --
       BEGIN
-        select decode(nit_table_name, NULL, 'N', 'Y'), nit_category
-        into l_ft_flag, l_category
-        from nm_inv_types
-        where nit_inv_type = pi_obj_type;
+         SELECT DECODE (nit_table_name, NULL, 'N', 'Y'), nit_category
+           INTO l_ft_flag, l_category
+           FROM nm_inv_types
+          WHERE nit_inv_type = pi_obj_type;
       EXCEPTION
-        WHEN NO_DATA_FOUND then NULL;
+         WHEN NO_DATA_FOUND
+         THEN
+            NULL;
       END;
-      
-      if l_ft_flag = 'Y' then
-        execute immediate get_FT_retrieval_str(pi_obj_type, pi_obj_id) into retval using pi_obj_id;  
 
-      else
---           
-      SELECT CAST (COLLECT (lb_rpt (nm_ne_id_of,
-                                    nlt_id,
-                                    nm_obj_type,
-                                    nm_ne_id_in,
-                                    nm_seg_no,
-                                    nm_seq_no,
-                                    nm_cardinality,
-                                    nm_begin_mp,
-                                    nm_end_mp,
-                                    nlt_units)) AS lb_rpt_tab)
-        INTO retval
-        FROM (SELECT nm_ne_id_of,
-                     nlt_id,
-                     nm_obj_type,
-                     nm_ne_id_in,
-                     nm_seg_no,
-                     nm_seq_no,
-                     nm_cardinality,
-                     nm_begin_mp,
-                     nm_end_mp,
-                     nlt_units
-                FROM nm_members, nm_linear_types, nm_elements
-               WHERE     ne_id = nm_ne_id_of
-                     AND nlt_nt_type = ne_nt_type
-                     AND NVL (nlt_gty_type, '£$%^') =
-                            NVL (ne_gty_group_type, '£$%^')
-                     AND nm_ne_id_in = pi_obj_id
-                     AND nm_obj_type = pi_obj_type
-              UNION ALL
-              SELECT nm_ne_id_of,
-                     nlt_id,
-                     nm_obj_type,
-                     nm_ne_id_in,
-                     nm_seg_no,
-                     nm_seq_no,
-                     nm_dir_flag,
-                     nm_begin_mp,
-                     nm_end_mp,
-                     nlt_units
-                FROM nm_locations, nm_linear_types, nm_elements
-               WHERE     ne_id = nm_ne_id_of
-                     AND nlt_nt_type = ne_nt_type
-                     AND NVL (nlt_gty_type, '£$%^') =
-                            NVL (ne_gty_group_type, '£$%^')
-                     AND nm_ne_id_in = pi_obj_id
-                     AND nm_obj_type = pi_obj_type);
-      end if;
+      IF l_ft_flag = 'Y'
+      THEN
+         EXECUTE IMMEDIATE get_FT_retrieval_str (pi_obj_type, pi_obj_id)
+            INTO retval
+            USING pi_obj_id;
+      ELSE
+         --
+         SELECT CAST (COLLECT (lb_rpt (nm_ne_id_of,
+                                       nlt_id,
+                                       nm_obj_type,
+                                       nm_ne_id_in,
+                                       nm_seg_no,
+                                       nm_seq_no,
+                                       nm_cardinality,
+                                       nm_begin_mp,
+                                       nm_end_mp,
+                                       nlt_units)) AS lb_rpt_tab)
+           INTO retval
+           FROM (SELECT nm_ne_id_of,
+                        nlt_id,
+                        nm_obj_type,
+                        nm_ne_id_in,
+                        nm_seg_no,
+                        nm_seq_no,
+                        nm_cardinality,
+                        nm_begin_mp,
+                        nm_end_mp,
+                        nlt_units
+                   FROM nm_members, nm_linear_types, nm_elements
+                  WHERE     ne_id = nm_ne_id_of
+                        AND nlt_nt_type = ne_nt_type
+                        AND NVL (nlt_gty_type, '£$%^') =
+                               NVL (ne_gty_group_type, '£$%^')
+                        AND nm_ne_id_in = pi_obj_id
+                        AND nm_obj_type = pi_obj_type
+                 UNION ALL
+                 SELECT nm_ne_id_of,
+                        nlt_id,
+                        nm_obj_type,
+                        nm_ne_id_in,
+                        nm_seg_no,
+                        nm_seq_no,
+                        nm_dir_flag,
+                        nm_begin_mp,
+                        nm_end_mp,
+                        nlt_units
+                   FROM nm_locations, nm_linear_types, nm_elements
+                  WHERE     ne_id = nm_ne_id_of
+                        AND nlt_nt_type = ne_nt_type
+                        AND NVL (nlt_gty_type, '£$%^') =
+                               NVL (ne_gty_group_type, '£$%^')
+                        AND nm_ne_id_in = pi_obj_id
+                        AND nm_obj_type = pi_obj_type);
+      END IF;
+
       RETURN retval;
    END;
 END;
