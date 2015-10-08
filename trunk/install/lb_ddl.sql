@@ -1,10 +1,10 @@
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/lb/install/lb_ddl.sql-arc   1.3   Oct 08 2015 10:40:50   Rob.Coupe  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/lb/install/lb_ddl.sql-arc   1.4   Oct 08 2015 10:49:06   Rob.Coupe  $
 --       Module Name      : $Workfile:   lb_ddl.sql  $
---       Date into PVCS   : $Date:   Oct 08 2015 10:40:50  $
---       Date fetched Out : $Modtime:   Oct 08 2015 10:41:08  $
---       PVCS Version     : $Revision:   1.3  $
+--       Date into PVCS   : $Date:   Oct 08 2015 10:49:06  $
+--       Date fetched Out : $Modtime:   Oct 08 2015 10:48:42  $
+--       PVCS Version     : $Revision:   1.4  $
 --
 --   Author : R.A. Coupe
 --
@@ -1085,7 +1085,8 @@ BEGIN
    add_object( 'V_NM_NLT_MEASURES','VIEW');
    add_object( 'V_NM_NLT_REFNTS','VIEW');
    add_object( 'V_NM_NLT_UNIT_CONVERSIONS','VIEW');
-   add_object('V_LB_DIRECTED_PATH_LINKS','VIEW');   
+   add_object('V_LB_DIRECTED_PATH_LINKS','VIEW');  
+   add_object('LB_UNITS','TABLE');   
    --   
    FOR i IN 1 .. l_object_name.COUNT
    LOOP
