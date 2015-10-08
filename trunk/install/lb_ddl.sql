@@ -1,10 +1,10 @@
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/lb/install/lb_ddl.sql-arc   1.2   Jan 20 2015 15:00:00   Rob.Coupe  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/lb/install/lb_ddl.sql-arc   1.3   Oct 08 2015 10:40:50   Rob.Coupe  $
 --       Module Name      : $Workfile:   lb_ddl.sql  $
---       Date into PVCS   : $Date:   Jan 20 2015 15:00:00  $
---       Date fetched Out : $Modtime:   Jan 20 2015 14:59:00  $
---       PVCS Version     : $Revision:   1.2  $
+--       Date into PVCS   : $Date:   Oct 08 2015 10:40:50  $
+--       Date fetched Out : $Modtime:   Oct 08 2015 10:41:08  $
+--       PVCS Version     : $Revision:   1.3  $
 --
 --   Author : R.A. Coupe
 --
@@ -23,12 +23,16 @@
 
 DECLARE
    not_exists   exception;
-   PRAGMA EXCEPTION_INIT (not_exists, -942);
+   PRAGMA EXCEPTION_INIT (not_exists, -2441);
+   table_not_exists   exception;
+   PRAGMA EXCEPTION_INIT (table_not_exists, -942);   
 BEGIN
    EXECUTE IMMEDIATE 'ALTER TABLE LB_TYPES DROP PRIMARY KEY CASCADE ';
 
 EXCEPTION
    WHEN not_exists
+Then NULL;
+   WHEN table_not_exists
 Then NULL;
 end;
 / 
@@ -151,7 +155,7 @@ All the location stuff
 
 DECLARE
    not_exists   exception;
-   PRAGMA EXCEPTION_INIT (not_exists, -942);
+   PRAGMA EXCEPTION_INIT (not_exists, -2441);
 BEGIN
    EXECUTE IMMEDIATE 'ALTER TABLE NM_ASSET_LOCATIONS_ALL  DROP PRIMARY KEY CASCADE';
 
@@ -163,7 +167,7 @@ end;
 
 DECLARE
    not_exists   exception;
-   PRAGMA EXCEPTION_INIT (not_exists, -942);
+   PRAGMA EXCEPTION_INIT (not_exists, -2441);
 BEGIN
    EXECUTE IMMEDIATE 'ALTER TABLE NM_ASSET_LOCATIONS_ALL  DROP PRIMARY KEY CASCADE';
 EXCEPTION
@@ -239,7 +243,7 @@ ALTER TABLE NM_ASSET_LOCATIONS_ALL ADD (
 
 DECLARE
    not_exists   exception;
-   PRAGMA EXCEPTION_INIT (not_exists, -942);
+   PRAGMA EXCEPTION_INIT (not_exists, -2289);
 BEGIN
    EXECUTE IMMEDIATE 'DROP SEQUENCE NAL_ID_SEQ';
 EXCEPTION
@@ -284,7 +288,7 @@ END NM_ASSET_LOCATIONS_ALL_WHO;
 
 DECLARE
    not_exists   exception;
-   PRAGMA EXCEPTION_INIT (not_exists, -942);
+   PRAGMA EXCEPTION_INIT (not_exists, -2289);
 BEGIN
    EXECUTE IMMEDIATE 'DROP SEQUENCE NM_LOC_ID_SEQ';
 EXCEPTION
@@ -307,9 +311,6 @@ EXCEPTION
 Then NULL;
 end;
 / 
-
-DROP TABLE NM_LOCATIONS_ALL CASCADE CONSTRAINTS
-/
 
 CREATE TABLE NM_LOCATIONS_ALL
 (
@@ -430,7 +431,7 @@ END nm_locations_all_who;
 
 DECLARE
    not_exists   exception;
-   PRAGMA EXCEPTION_INIT (not_exists, -942);
+   PRAGMA EXCEPTION_INIT (not_exists, -2441);
 BEGIN
    EXECUTE IMMEDIATE 'ALTER TABLE NM_JUXTAPOSITION_TYPES DROP PRIMARY KEY CASCADE';
 
@@ -486,7 +487,7 @@ ALTER TABLE NM_JUXTAPOSITION_TYPES ADD (
 
 DECLARE
    not_exists   exception;
-   PRAGMA EXCEPTION_INIT (not_exists, -942);
+   PRAGMA EXCEPTION_INIT (not_exists, -2441);
 BEGIN
    EXECUTE IMMEDIATE 'ALTER TABLE NM_JUXTAPOSITIONS DROP PRIMARY KEY CASCADE';
 
@@ -554,7 +555,7 @@ ALTER TABLE NM_JUXTAPOSITIONS ADD (
 
 DECLARE
    not_exists   exception;
-   PRAGMA EXCEPTION_INIT (not_exists, -942);
+   PRAGMA EXCEPTION_INIT (not_exists, -2441);
 BEGIN
    EXECUTE IMMEDIATE 'ALTER TABLE NM_ASSET_TYPE_JUXTAPOSITIONS DROP PRIMARY KEY CASCADE';
 
@@ -642,7 +643,7 @@ end;
 
 DECLARE
    not_exists   exception;
-   PRAGMA EXCEPTION_INIT (not_exists, -942);
+   PRAGMA EXCEPTION_INIT (not_exists, -2441);
 BEGIN
    EXECUTE IMMEDIATE 'ALTER TABLE NM_LOCATION_GEOMETRY DROP PRIMARY KEY CASCADE';
 
@@ -726,7 +727,7 @@ CREATE INDEX NLG_LOC_IDX ON NM_LOCATION_GEOMETRY
 
 DECLARE
    not_exists   exception;
-   PRAGMA EXCEPTION_INIT (not_exists, -942);
+   PRAGMA EXCEPTION_INIT (not_exists, -2289);
 BEGIN
    EXECUTE IMMEDIATE 'DROP SEQUENCE NLG_ID_SEQ';
 EXCEPTION
@@ -789,8 +790,212 @@ from dual
 where not exists ( select 1 from nm_au_types where nat_admin_type = 'NONE' )
 / 
 
+DECLARE
+   not_exists   exception;
+   PRAGMA EXCEPTION_INIT (not_exists, -942);
+BEGIN
+   EXECUTE IMMEDIATE 'DROP TABLE NM_ASSET_GEOMETRY_ALL CASCADE CONSTRAINTS';
+EXCEPTION
+   WHEN not_exists
+Then NULL;
+end;
+/ 
+
+CREATE TABLE NM_ASSET_GEOMETRY_ALL
+(
+  NAG_ID             INTEGER                    NOT NULL,
+  NAG_LOCATION_TYPE  VARCHAR2(1 BYTE)           NOT NULL,
+  NAG_ASSET_ID       NUMBER(38)                 NOT NULL,
+  NAG_OBJ_TYPE       VARCHAR2(4 BYTE)           NOT NULL,
+  NAG_START_DATE     DATE                       NOT NULL,
+  NAG_END_DATE       DATE,
+  NAG_GEOMETRY       MDSYS.SDO_GEOMETRY
+)
+/
+
+CREATE INDEX NAG_ID_IDX ON NM_ASSET_GEOMETRY_ALL
+(NAG_ASSET_ID)
+/
 
 
+CREATE INDEX NAG_OBJ_TYPE_IDX ON NM_ASSET_GEOMETRY_ALL
+(NAG_OBJ_TYPE)
+/
+
+--  There is no statement for index HIGHWAYS.SYS_C00119096.
+--  The object is created when the parent object is created.
+
+CREATE UNIQUE INDEX NAG_ASSET_IDX ON NM_ASSET_GEOMETRY_ALL
+(NAG_ASSET_ID, NAG_START_DATE, NAG_LOCATION_TYPE)
+/
+
+delete from user_sdo_geom_metadata
+where table_name = 'NM_ASSET_GEOMETRY_ALL' and column_name = 'NAG_GEOMETRY'
+/
+
+insert into user_sdo_geom_metadata
+(table_name, column_name, diminfo, srid)
+select 'NM_ASSET_GEOMETRY_ALL', 'NAG_GEOMETRY', sdo_lrs.convert_to_std_dim_array(nm3sdo.coalesce_nw_diminfo), srid
+from table(NM3SDO.GET_NW_THEMES().nta_theme_array ) t, nm_themes_all, user_sdo_geom_metadata
+where nth_feature_table = table_name
+and nth_feature_shape_column = column_name 
+and nth_theme_id = nthe_id
+and rownum = 1
+/
+
+
+CREATE INDEX NAG_SPIDX ON NM_ASSET_GEOMETRY_ALL
+(NAG_GEOMETRY)
+INDEXTYPE IS MDSYS.SPATIAL_INDEX
+/
+
+DECLARE
+   not_exists   exception;
+   PRAGMA EXCEPTION_INIT (not_exists, -2289);
+BEGIN
+   EXECUTE IMMEDIATE 'DROP SEQUENCE NAG_ID_SEQ';
+EXCEPTION
+   WHEN not_exists
+Then NULL;
+end;
+/ 
+
+create sequence nag_id_seq start with 1
+/
+
+CREATE OR REPLACE TRIGGER NM_ASSET_GEOMETRY_ALL_TRG
+BEFORE INSERT
+ON NM_ASSET_GEOMETRY_ALL
+REFERENCING NEW AS New OLD AS Old
+FOR EACH ROW
+BEGIN
+  :new.NAG_ID := NAG_ID_SEQ.nextval;
+END NM_ASSET_GEOMETRY_ALL_TRG;
+/
+
+
+ALTER TABLE NM_ASSET_GEOMETRY_ALL ADD (
+  PRIMARY KEY
+  (NAG_ID)
+  USING INDEX
+  ENABLE VALIDATE,
+  CONSTRAINT NAG_UK
+  UNIQUE (NAG_ASSET_ID, NAG_START_DATE, NAG_LOCATION_TYPE)
+  USING INDEX NAG_ASSET_IDX
+  ENABLE VALIDATE)
+/  
+
+ALTER TABLE NM_ASSET_GEOMETRY_ALL ADD (
+  CONSTRAINT NAG_FK_OBJ_TYPE 
+  FOREIGN KEY (NAG_OBJ_TYPE) 
+  REFERENCES NM_INV_TYPES_ALL (NIT_INV_TYPE)
+  ENABLE VALIDATE)
+/
+  
+
+CREATE INDEX NLG_OBJ_TYPE_IDX ON NM_LOCATION_GEOMETRY
+(NLG_OBJ_TYPE)
+/
+
+ALTER TABLE NM_LOCATION_GEOMETRY add
+CONSTRAINT NLG_FK_OBJ_TYPE
+FOREIGN KEY
+(NLG_OBJ_TYPE) REFERENCES NM_INV_TYPES_ALL (NIT_INV_TYPE)
+
+
+
+CREATE INDEX nal_nit_idx ON NM_ASSET_LOCATIONS_ALL
+(NAL_NIT_TYPE)
+/
+
+
+
+ALTER TABLE NM_LOCATIONS_ALL ADD 
+CONSTRAINT nm_fk_nal
+ FOREIGN KEY (NM_NE_ID_IN)
+ REFERENCES NM_ASSET_LOCATIONS_ALL (NAL_ID)
+ ENABLE
+ VALIDATE
+/
+
+CREATE OR REPLACE FORCE VIEW NM_ASSET_GEOMETRY
+(
+   NAG_ID,
+   NAG_LOCATION_TYPE,
+   NAG_ASSET_ID,
+   NAG_OBJ_TYPE,
+   NAG_START_DATE,
+   NAG_END_DATE,
+   NAG_GEOMETRY
+)
+AS
+   SELECT "NAG_ID",
+          "NAG_LOCATION_TYPE",
+          "NAG_ASSET_ID",
+          "NAG_OBJ_TYPE",
+          "NAG_START_DATE",
+          "NAG_END_DATE",
+          "NAG_GEOMETRY"
+     FROM nm_asset_geometry_all
+    WHERE     nag_start_date <=
+                 TO_DATE (SYS_CONTEXT ('NM3CORE', 'EFFECTIVE_DATE'),
+                          'DD-MON-YYYY')
+          AND NVL (nag_end_date, TO_DATE ('99991231', 'YYYYMMDD')) >
+                 TO_DATE (SYS_CONTEXT ('NM3CORE', 'EFFECTIVE_DATE'),
+                          'DD-MON-YYYY');
+
+DECLARE
+   not_exists   exception;
+   PRAGMA EXCEPTION_INIT (not_exists, -942);
+BEGIN
+   EXECUTE IMMEDIATE 'DROP TABLE LB_UNITS CASCADE CONSTRAINTS';
+EXCEPTION
+   WHEN not_exists
+Then NULL;
+end;
+/ 
+
+CREATE TABLE lb_units
+(
+   external_unit_id    INTEGER NOT NULL,
+   external_unit_name  VARCHAR2(2000),
+   exor_unit_id        NUMBER(4) NOT NULL,
+   exor_unit_name      VARCHAR2(20) NOT NULL,
+      CONSTRAINT lb_units_uk1 UNIQUE ( external_unit_id )
+--      ,
+--      CONSTRAINT lb_units_uk2 UNIQUE ( exor_unit_name )
+);
+
+ALTER TABLE lb_units ADD CONSTRAINT lb_units_fk1
+FOREIGN KEY ( exor_unit_id ) REFERENCES nm_units( un_unit_id );
+
+
+/*
+CREATE TABLE lb_users
+(
+   external_username   VARCHAR2 (300),
+   exor_user_id        INTEGER,
+   exor_username       VARCHAR2 (100),
+   CONSTRAINT lb_users_pk PRIMARY KEY (external_username)
+);
+
+alter table lb_users add constraint lb_users_fk_hus
+foreign key (exor_user_id ) references hig_users(hus_user_id);
+
+*/
+DECLARE
+   not_exists   exception;
+   PRAGMA EXCEPTION_INIT (not_exists, -942);
+BEGIN
+   EXECUTE IMMEDIATE 'DROP TABLE LB_OBJECTS CASCADE CONSTRAINTS';
+EXCEPTION
+   WHEN not_exists
+Then NULL;
+end;
+/ 
+
+create table lb_objects ( object_name varchar2(30), object_type varchar2(30))
+/
 
 DECLARE
    TYPE object_name_type IS TABLE OF VARCHAR2 (123) INDEX BY binary_integer;
@@ -808,28 +1013,91 @@ DECLARE
       l_object_type (i) := p_object_type;
    END add_object;
 BEGIN
-   add_object ('LB_TYPES', 'TABLE');
-   add_object ('LB_INV_SECURITY', 'TABLE');
-   add_object ('NM_ASSET_LOCATIONS_ALL', 'TABLE');
-   add_object ('NAL_ID_SEQ', 'SEQUENCE');
-   add_object ('NM_LOC_ID_SEQ', 'SEQUENCE');
-   add_object ('NM_LOCATIONS_ALL', 'TABLE');
-   add_object ('NM_JUXTAPOSITION_TYPES', 'TABLE');
-   add_object ('NM_JUXTAPOSITIONS', 'TABLE');
-   add_object ('NM_ASSET_TYPE_JUXTAPOSITIONS', 'TABLE');
-   add_object ('NM_LOCATION_GEOMETRY', 'TABLE');
-   add_object ('NLG_ID_SEQ', 'SEQUENCE' );
---   
+   add_object( 'CREATE_NLT_GEOMETRY_VIEW','PROCEDURE');
+   add_object( 'LB_ASSET_TYPE_NETWORK','TYPE');
+   add_object( 'LB_ASSET_TYPE_NETWORK_TAB','TYPE');
+   add_object( 'LB_GET','PACKAGE');
+   add_object( 'LB_GET','PACKAGE BODY');
+   add_object( 'LB_INV_SECURITY','TABLE');
+   add_object( 'LB_JXP','TYPE');
+   add_object( 'LB_JXP_TAB','TYPE');
+   add_object( 'LB_LINEAR_REFNT','TYPE');
+   add_object( 'LB_LINEAR_REFNT_TAB','TYPE');
+   add_object( 'LB_LINEAR_TYPE','TYPE');
+   add_object( 'LB_LINEAR_TYPE_TAB','TYPE');
+   add_object( 'LB_LOAD','PACKAGE');
+   add_object( 'LB_LOAD','PACKAGE BODY');
+   add_object( 'LB_LOC','PACKAGE');
+   add_object( 'LB_LOC','PACKAGE BODY');
+   add_object( 'LB_LOCATION_ID','TYPE');
+   add_object( 'LB_LOCATION_ID_TAB','TYPE');
+   add_object( 'LB_LOC_ERROR','TYPE');
+   add_object( 'LB_LOC_ERROR_TAB','TYPE');
+   add_object( 'LB_OBJ_GEOM','TYPE');
+   add_object( 'LB_OBJ_GEOM_TAB','TYPE');
+   add_object( 'LB_OBJ_ID','TYPE');
+   add_object( 'LB_OBJ_ID_TAB','TYPE');
+   add_object( 'LB_OPS','PACKAGE');
+   add_object( 'LB_OPS','PACKAGE BODY');
+   add_object( 'LB_PATH','PACKAGE');
+   add_object( 'LB_PATH','PACKAGE BODY');
+   add_object( 'LB_PATH_REG','PACKAGE');
+   add_object( 'LB_PATH_REG','PACKAGE BODY');
+   add_object( 'LB_REF','PACKAGE');
+   add_object( 'LB_REF','PACKAGE BODY');
+   add_object( 'LB_REFNT_MEASURE','TYPE');
+   add_object( 'LB_REFNT_MEASURE_TAB','TYPE');
+   add_object( 'LB_REG','PACKAGE');
+   add_object( 'LB_REG','PACKAGE BODY');
+   add_object( 'LB_RPT','TYPE');
+   add_object( 'LB_RPT_GEOM','TYPE');
+   add_object( 'LB_RPT_GEOM_TAB','TYPE');
+   add_object( 'LB_RPT_TAB','TYPE');
+   add_object( 'LB_STATS','TYPE');
+   add_object( 'LB_STATS','TYPE BODY');
+   add_object( 'LB_TYPES','TABLE');
+   add_object( 'LB_XSP','TYPE');
+   add_object( 'LB_XSP_TAB','TYPE');
+   add_object( 'LINEAR_ELEMENT_TYPE','TYPE');
+   add_object( 'LINEAR_ELEMENT_TYPES','TYPE');
+   add_object( 'LINEAR_LOCATION','TYPE');
+   add_object( 'LINEAR_LOCATIONS','TYPE');
+   add_object( 'NAL_ID_SEQ','SEQUENCE');
+   add_object( 'NLG_ID_SEQ','SEQUENCE');
+   add_object( 'NM_ASSET_GEOMETRY','NAG_ID_SEQ');
+   add_object( 'NM_ASSET_GEOMETRY','VIEW');
+   add_object( 'NM_ASSET_GEOMETRY_ALL','TABLE');
+   add_object( 'NM_ASSET_LOCATIONS','VIEW');
+   add_object( 'NM_ASSET_LOCATIONS_ALL','TABLE');
+   add_object( 'NM_ASSET_TYPE_JUXTAPOSITIONS','TABLE');
+   add_object( 'NM_JUXTAPOSITIONS','TABLE');
+   add_object( 'NM_JUXTAPOSITION_TYPES','TABLE');
+   add_object( 'NM_LOCATIONS','VIEW');
+   add_object( 'NM_LOCATIONS_ALL','TABLE');
+   add_object( 'NM_LOCATION_GEOMETRY','TABLE');
+   add_object( 'NM_LOC_ID_SEQ','SEQUENCE');
+   add_object( 'V_LB_INV_NLT_DATA','VIEW');
+   add_object( 'V_LB_NETWORKTYPES','VIEW');
+   add_object( 'V_LB_NLT_GEOMETRY','VIEW');
+   add_object( 'V_LB_NLT_REFNTS','VIEW');
+   add_object( 'V_LB_XSP_LIST','VIEW');
+   add_object( 'V_NM_NLT_DATA','VIEW');
+   add_object( 'V_NM_NLT_MEASURES','VIEW');
+   add_object( 'V_NM_NLT_REFNTS','VIEW');
+   add_object( 'V_NM_NLT_UNIT_CONVERSIONS','VIEW');
+   add_object('V_LB_DIRECTED_PATH_LINKS','VIEW');   
+   --   
    FOR i IN 1 .. l_object_name.COUNT
    LOOP
+     begin
       INSERT INTO lb_objects (object_name, object_type)
            VALUES (l_object_name (i), l_object_type (i));
+     exception
+       when dup_val_on_index then
+         NULL;
+     end;
    END LOOP;
 END;
 /
 
-
-select * from lb_objects
-
 prompt "DDL Completed"
-
