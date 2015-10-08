@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_path
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_path.pkb-arc   1.5   Sep 24 2015 09:19:18   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_path.pkb-arc   1.6   Oct 08 2015 16:24:14   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_path.pkb  $
-   --       Date into PVCS   : $Date:   Sep 24 2015 09:19:18  $
-   --       Date fetched Out : $Modtime:   Sep 24 2015 09:19:28  $
-   --       PVCS Version     : $Revision:   1.5  $
+   --       Date into PVCS   : $Date:   Oct 08 2015 16:24:14  $
+   --       Date fetched Out : $Modtime:   Oct 08 2015 16:24:16  $
+   --       PVCS Version     : $Revision:   1.6  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,7 +16,7 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.5  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.6  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_path';
 
@@ -168,7 +168,7 @@ AS
       SELECT SDO_AGGR_UNION (
                 sdoaggrtype (SDO_LRS.convert_to_std_geom (geoloc), 0.05))
         INTO retval
-        FROM V_LB_NLT_GEOMETRY_U, TABLE (pi_path) t
+        FROM V_LB_NLT_GEOMETRY, TABLE (pi_path) t
        WHERE t.COLUMN_VALUE = ne_id;
 
       --     retval := sdo_lrs.convert_to_std_geom(retval);
