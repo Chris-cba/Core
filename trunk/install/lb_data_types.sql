@@ -1,10 +1,10 @@
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/lb/install/lb_data_types.sql-arc   1.2   Mar 21 2015 07:48:06   Rob.Coupe  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/lb/install/lb_data_types.sql-arc   1.3   Oct 08 2015 11:58:02   Rob.Coupe  $
 --       Module Name      : $Workfile:   lb_data_types.sql  $
---       Date into PVCS   : $Date:   Mar 21 2015 07:48:06  $
---       Date fetched Out : $Modtime:   Mar 21 2015 08:55:50  $
---       PVCS Version     : $Revision:   1.2  $
+--       Date into PVCS   : $Date:   Oct 08 2015 11:58:02  $
+--       Date fetched Out : $Modtime:   Oct 08 2015 11:58:06  $
+--       PVCS Version     : $Revision:   1.3  $
 --
 --   Author : R.A. Coupe
 --
@@ -163,38 +163,124 @@ create or replace type lb_obj_Geom as object ( obj_type varchar2(4), obj_id inte
 create or replace type lb_obj_geom_tab is table of lb_obj_geom
 /
 
-
-DECLARE
-   TYPE object_name_type IS TABLE OF VARCHAR2 (123) INDEX BY binary_integer;
---
-   TYPE object_type_type IS TABLE OF VARCHAR2 (23) INDEX BY binary_integer;
---
-   l_object_name   object_name_type;
-   l_object_type   object_type_type;
---
-   PROCEDURE add_object (p_object_name VARCHAR2, p_object_type VARCHAR2)
-   IS
-      i   CONSTANT PLS_INTEGER := l_object_name.COUNT + 1;
-   BEGIN
-      l_object_name (i) := p_object_name;
-      l_object_type (i) := p_object_type;
-   END add_object;
-BEGIN
-   add_object ('LB_STATS', 'TYPE');
-   add_object ('LB_STATS', 'TYPE BODY');
-   add_object ('LB_RPT', 'TYPE');
-   add_object ('LB_RPT_TAB', 'TYPE');
-   add_object ('LB_LOC_ERROR', 'TYPE');
-   add_object ('LB_LOC_ERROR_TAB', 'TYPE');
-   add_object ('LB_OBJ_ID', 'TYPE');
-   add_object ('LB_OBJ_ID_TAB', 'TYPE');
-   add_object ('LB_RPT_GEOM', 'TYPE');
-   add_object ('LB_RPT_GEOM_TAB', 'TYPE');
---     
-   FOR i IN 1 .. l_object_name.COUNT
-   LOOP
-      INSERT INTO lb_objects (object_name, object_type)
-           VALUES (l_object_name (i), l_object_type (i));
-   END LOOP;
-END;
+CREATE OR REPLACE
+TYPE LB_ASSET_TYPE_NETWORK AS OBJECT
+(
+   AssetType        INTEGER,
+   NetworkTypeId    INTEGER,
+   NetworkType      VARCHAR2 (4),
+   NetworkTypeName  VARCHAR2 (30),
+   NetworkFlag      VARCHAR2 (1),
+   NetworkTypeDescr VARCHAR2 (80),
+   UnitName         VARCHAR2 (40),
+   UnitMask         VARCHAR2 (80)
+);
 /
+
+CREATE OR REPLACE
+type LB_ASSET_TYPE_NETWORK_TAB
+as table of lb_asset_type_network
+/
+
+CREATE OR REPLACE
+type LB_JXP as object (jxp_code integer, jxp_descr varchar2(80) );
+/
+
+CREATE OR REPLACE
+type LB_JXP_TAB as table of lb_jxp;
+/
+
+CREATE OR REPLACE
+TYPE LB_LINEAR_REFNT AS OBJECT(
+   NetworkTypeId       NUMBER,        -- ID of the network type
+   NetworkElementID    NUMBER(9),     -- Network element ID
+   NetworkElementName  VARCHAR2(50),  -- Network element unique name
+   NetworkElementDescr VARCHAR2(240), -- Optional network element description
+   NetworkElementType  VARCHAR2(4),   -- Network element type code
+   NetworkTypeDescr    VARCHAR2(80),  -- Optional description of the network type
+   Unit                VARCHAR2(20)); -- Default length unit
+/
+
+CREATE OR REPLACE
+TYPE LB_LINEAR_REFNT_TAB AS TABLE OF LB_LINEAR_REFNT;
+/
+
+CREATE OR REPLACE
+TYPE LB_LINEAR_TYPE AS OBJECT(
+   NetworkTypeId    NUMBER,        -- ID of the network type
+   NetworkType      VARCHAR2(4),   -- Unique name of the network type
+   NetworkFlag      CHAR(1),       -- Indicates datum (D), Group (G) etc.
+   NetworkTypeDescr VARCHAR2(80),  -- Optional description of the network type
+   Unit             VARCHAR2(20),  -- Default length unit
+   UnitMask         VARCHAR2(80)); -- Format mask for displying lengths
+/
+
+CREATE OR REPLACE
+type LB_LINEAR_TYPE_TAB as table of LB_LINEAR_TYPE
+/
+
+CREATE OR REPLACE
+type LB_LOCATION_ID as object(
+LocationId Integer, LocationDescription varchar2(240), JXP_CODE integer, JXP_DESCR varchar2(80))
+/
+
+CREATE OR REPLACE
+type LB_LOCATION_ID_TAB
+as table of lb_location_id;
+/
+
+CREATE OR REPLACE
+TYPE LB_REFNT_MEASURE AS OBJECT(
+   NetworkElementId   INTEGER,       -- Network element ID
+   NetworkElementName VARCHAR2(30),  -- Network element unique name
+   StartM             NUMBER,        -- Minimum absolute linear measure
+   EndM               NUMBER,        -- Maximum absolute linear measure
+   Unit               VARCHAR2(20)); -- Units of minimum and maximum measures
+/
+
+CREATE OR REPLACE
+TYPE LB_REFNT_MEASURE_TAB AS TABLE OF LB_REFNT_MEASURE;
+/
+
+CREATE OR REPLACE
+type LB_XSP as object ( XSP varchar2(4), XSP_DESCR varchar2(80) );
+/
+
+CREATE OR REPLACE
+type LB_XSP_TAB as table of lb_xsp;
+/
+
+CREATE OR REPLACE
+TYPE LINEAR_ELEMENT_TYPE                                         AS OBJECT(
+   linearlyLocatableType  NUMBER,        -- ID of a linearly locatable type
+   linearElementTypeId    NUMBER,        -- ID of the linear element type
+   linearElementTypeName  VARCHAR2(30),  -- Unique name of the linear element type
+   linearElementTypeDescr VARCHAR2(80),  -- Optional description of the linear element type
+   lengthUnit             VARCHAR2(20)); -- Default length unit
+/
+
+CREATE OR REPLACE
+TYPE  LINEAR_ELEMENT_TYPES AS TABLE OF linear_element_type;
+/
+
+CREATE OR REPLACE
+TYPE LINEAR_LOCATION AS OBJECT(
+   AssetId             NUMBER(38),    -- ID of the linearly located asset
+   AssetType           NUMBER(38),    -- Type of the asset
+   LocationId          NUMBER(38),    -- ID of the linear location
+   LocationDescription VARCHAR2(240), -- Linear location description
+   NetworkTypeId       INTEGER,       -- Network element type
+   NetworkElementId    INTEGER,       -- Network element ID
+   StartM              NUMBER,        -- Absolute position of start of linear range
+   EndM                NUMBER,        -- Optional absolute position of end of linear range
+   Unit                INTEGER,       -- Exor ID of Units of start and end position
+   NetworkElementName  VARCHAR2(30),  -- Network element unique name
+   NetworkElementDescr VARCHAR2(240), -- Optional network element description
+   JXP                 VARCHAR2(80)); -- Juxtaposition of owning linear location
+/
+
+CREATE OR REPLACE
+TYPE LINEAR_LOCATIONS AS TABLE OF linear_location;
+/
+
+
