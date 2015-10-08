@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_load
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_load.pkb-arc   1.11   Sep 25 2015 17:28:26   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_load.pkb-arc   1.12   Oct 08 2015 16:21:54   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_load.pkb  $
-   --       Date into PVCS   : $Date:   Sep 25 2015 17:28:26  $
-   --       Date fetched Out : $Modtime:   Sep 25 2015 17:28:28  $
-   --       PVCS Version     : $Revision:   1.11  $
+   --       Date into PVCS   : $Date:   Oct 08 2015 16:21:54  $
+   --       Date fetched Out : $Modtime:   Oct 08 2015 16:22:02  $
+   --       PVCS Version     : $Revision:   1.12  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,7 +16,7 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.11  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.12  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_load';
 
@@ -181,7 +181,7 @@ AS
          lb_load (lb_ops.merge_lb_rpt_tab (
                      pi_nal_id,
                      pi_nal_nit_type,
-                     get_lb_rpt_d_tab (LB_RPT_TAB (LB_RPt (pi_refnt,
+                     lb_get.get_lb_rpt_d_tab (LB_RPT_TAB (LB_RPt (pi_refnt,
                                                            pi_nlt_id,
                                                            NULL,
                                                            NULL,
