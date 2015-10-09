@@ -1,10 +1,10 @@
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/lb/install/lb_install.sql-arc   1.5   Oct 09 2015 13:42:36   Rob.Coupe  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/lb/install/lb_install.sql-arc   1.6   Oct 09 2015 14:01:46   Rob.Coupe  $
 --       Module Name      : $Workfile:   lb_install.sql  $
---       Date into PVCS   : $Date:   Oct 09 2015 13:42:36  $
---       Date fetched Out : $Modtime:   Oct 09 2015 13:42:24  $
---       PVCS Version     : $Revision:   1.5  $
+--       Date into PVCS   : $Date:   Oct 09 2015 14:01:46  $
+--       Date fetched Out : $Modtime:   Oct 09 2015 13:53:48  $
+--       PVCS Version     : $Revision:   1.6  $
 --
 --   Author : R.A. Coupe
 --
@@ -167,7 +167,7 @@ END;
 
 prompt Creating eB interface modules
 
-start ..\eB_interface\install_eB_interface.sql
+start ..\admin\eB_interface\install_eB_interface.sql
 
 prompt Creating synonyms
 
