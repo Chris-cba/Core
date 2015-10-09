@@ -1,10 +1,10 @@
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/lb/install/lb_ddl.sql-arc   1.5   Oct 09 2015 15:10:30   Rob.Coupe  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/lb/install/lb_ddl.sql-arc   1.6   Oct 09 2015 15:19:56   Rob.Coupe  $
 --       Module Name      : $Workfile:   lb_ddl.sql  $
---       Date into PVCS   : $Date:   Oct 09 2015 15:10:30  $
---       Date fetched Out : $Modtime:   Oct 09 2015 15:10:38  $
---       PVCS Version     : $Revision:   1.5  $
+--       Date into PVCS   : $Date:   Oct 09 2015 15:19:56  $
+--       Date fetched Out : $Modtime:   Oct 09 2015 15:19:24  $
+--       PVCS Version     : $Revision:   1.6  $
 --
 --   Author : R.A. Coupe
 --
@@ -30,7 +30,6 @@ DECLARE
    PRAGMA EXCEPTION_INIT (table_not_exists, -942);   
 BEGIN
    EXECUTE IMMEDIATE 'ALTER TABLE LB_TYPES DROP PRIMARY KEY CASCADE ';
-
 EXCEPTION
    WHEN not_exists
 Then NULL;
@@ -142,18 +141,7 @@ Prompt Asset Locations
 
 DECLARE
    not_exists   exception;
-   PRAGMA EXCEPTION_INIT (not_exists, -2441);
-BEGIN
-   EXECUTE IMMEDIATE 'ALTER TABLE NM_ASSET_LOCATIONS_ALL  DROP PRIMARY KEY CASCADE';
-EXCEPTION
-   WHEN not_exists
-Then NULL;
-end;
-/ 
-
-DECLARE
-   not_exists   exception;
-   PRAGMA EXCEPTION_INIT (not_exists, -2441);
+   PRAGMA EXCEPTION_INIT (not_exists, -942);
 BEGIN
    EXECUTE IMMEDIATE 'ALTER TABLE NM_ASSET_LOCATIONS_ALL  DROP PRIMARY KEY CASCADE';
 EXCEPTION
@@ -439,11 +427,14 @@ Prompt JXP data
 DECLARE
    not_exists   exception;
    PRAGMA EXCEPTION_INIT (not_exists, -2441);
+   table_not_exists   exception;
+   PRAGMA EXCEPTION_INIT (table_not_exists, -942);   
 BEGIN
    EXECUTE IMMEDIATE 'ALTER TABLE NM_JUXTAPOSITION_TYPES DROP PRIMARY KEY CASCADE';
-
 EXCEPTION
    WHEN not_exists
+Then NULL;
+   WHEN table_not_exists
 Then NULL;
 end;
 / 
@@ -495,11 +486,14 @@ ALTER TABLE NM_JUXTAPOSITION_TYPES ADD (
 DECLARE
    not_exists   exception;
    PRAGMA EXCEPTION_INIT (not_exists, -2441);
+   table_not_exists   exception;
+   PRAGMA EXCEPTION_INIT (table_not_exists, -942);   
 BEGIN
    EXECUTE IMMEDIATE 'ALTER TABLE NM_JUXTAPOSITIONS DROP PRIMARY KEY CASCADE';
-
 EXCEPTION
    WHEN not_exists
+Then NULL;
+   WHEN table_not_exists
 Then NULL;
 end;
 / 
@@ -563,11 +557,14 @@ ALTER TABLE NM_JUXTAPOSITIONS ADD (
 DECLARE
    not_exists   exception;
    PRAGMA EXCEPTION_INIT (not_exists, -2441);
+   table_not_exists   exception;
+   PRAGMA EXCEPTION_INIT (table_not_exists, -942);   
 BEGIN
    EXECUTE IMMEDIATE 'ALTER TABLE NM_ASSET_TYPE_JUXTAPOSITIONS DROP PRIMARY KEY CASCADE';
-
 EXCEPTION
    WHEN not_exists
+Then NULL;
+   WHEN table_not_exists
 Then NULL;
 end;
 / 
@@ -652,11 +649,14 @@ Prompt Location Geometry
 DECLARE
    not_exists   exception;
    PRAGMA EXCEPTION_INIT (not_exists, -2441);
+   table_not_exists   exception;
+   PRAGMA EXCEPTION_INIT (table_not_exists, -942);   
 BEGIN
    EXECUTE IMMEDIATE 'ALTER TABLE NM_LOCATION_GEOMETRY DROP PRIMARY KEY CASCADE';
-
 EXCEPTION
    WHEN not_exists
+Then NULL;
+   WHEN table_not_exists
 Then NULL;
 end;
 / 
