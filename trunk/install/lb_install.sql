@@ -1,10 +1,10 @@
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/lb/install/lb_install.sql-arc   1.7   Oct 09 2015 15:11:40   Rob.Coupe  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/lb/install/lb_install.sql-arc   1.8   Oct 09 2015 15:37:16   Rob.Coupe  $
 --       Module Name      : $Workfile:   lb_install.sql  $
---       Date into PVCS   : $Date:   Oct 09 2015 15:11:40  $
---       Date fetched Out : $Modtime:   Oct 09 2015 14:31:42  $
---       PVCS Version     : $Revision:   1.7  $
+--       Date into PVCS   : $Date:   Oct 09 2015 15:37:16  $
+--       Date fetched Out : $Modtime:   Oct 09 2015 15:37:44  $
+--       PVCS Version     : $Revision:   1.8  $
 --
 --   Author : R.A. Coupe
 --
@@ -198,6 +198,12 @@ begin
     NM3DDL.REFRESH_PRIVATE_SYNONYMS;
   end if;
 end;    
+/
+
+insert into hig_upgrades
+(hup_product, date_upgraded, from_version, to_version, upgrade_script, executed_by, remarks )
+values
+('NET', sysdate, '4.0.0.0', '4.0.0.0', 'lb_install', user, 'Location Bridge development version 4' )
 /
 
 prompt End of Location Bridge Installation
