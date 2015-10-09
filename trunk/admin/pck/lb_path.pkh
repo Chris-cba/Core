@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE lb_path
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_path.pkh-arc   1.4   Sep 24 2015 09:16:48   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_path.pkh-arc   1.5   Oct 09 2015 10:42:26   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_path.pkh  $
-   --       Date into PVCS   : $Date:   Sep 24 2015 09:16:48  $
-   --       Date fetched Out : $Modtime:   Sep 24 2015 09:16:44  $
-   --       PVCS Version     : $Revision:   1.4  $
+   --       Date into PVCS   : $Date:   Oct 09 2015 10:42:26  $
+   --       Date fetched Out : $Modtime:   Oct 09 2015 10:42:46  $
+   --       PVCS Version     : $Revision:   1.5  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,7 +16,7 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.4  $';
+   g_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.5  $';
    --
    g_network           VARCHAR2 (30);
 
@@ -59,7 +59,7 @@ AS
    FUNCTION get_tsp_sdo_path (p_nodes IN sdo_number_array)
       RETURN sdo_number_array;
 
-   PROCEDURE set_network (pi_network IN VARCHAR2);
+   PROCEDURE set_network (pi_network IN VARCHAR2 default NULL);
 
    --
    FUNCTION node_state (p_node_id IN INTEGER)
@@ -71,9 +71,9 @@ AS
    FUNCTION get_path_as_lb_rpt_tab (pi_path in sdo_number_array)
       RETURN lb_rpt_tab;
 
-	  FUNCTION get_lb_rpt_tab_from_lref_array (
+      FUNCTION get_lb_rpt_tab_from_lref_array (
       pi_lref_array   IN nm_lref_array_type)
       RETURN lb_rpt_tab;
-	  
+      
 END lb_path;
 /
