@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_reg
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_reg.pkb-arc   1.5   Sep 16 2015 11:36:08   Rob.Coupe  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_reg.pkb-arc   1.6   Oct 09 2015 13:18:30   Rob.Coupe  $
 --       Module Name      : $Workfile:   lb_reg.pkb  $
---       Date into PVCS   : $Date:   Sep 16 2015 11:36:08  $
---       Date fetched Out : $Modtime:   Sep 16 2015 11:35:04  $
---       PVCS Version     : $Revision:   1.5  $
+--       Date into PVCS   : $Date:   Oct 09 2015 13:18:30  $
+--       Date fetched Out : $Modtime:   Oct 09 2015 13:17:52  $
+--       PVCS Version     : $Revision:   1.6  $
 --
 --   Author : R.A. Coupe
 --
@@ -19,7 +19,7 @@ AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(30) :='"$Revision:   1.5  $"';
+   g_body_sccsid     CONSTANT  varchar2(30) :='"$Revision:   1.6  $"';
 
    g_package_name    CONSTANT  varchar2(30)   := 'NM3RSC';
 --
@@ -32,6 +32,8 @@ AS
 
    PROCEDURE create_lb_sdo_view (
       pi_inv_type   IN nm_inv_types.nit_inv_type%TYPE);
+
+   PROCEDURE create_lb_aggr_sdo_view (pi_inv_type IN nm_inv_types.nit_inv_type%TYPE);
 
 --
 -----------------------------------------------------------------------------
@@ -51,8 +53,8 @@ AS
 --
 -----------------------------------------------------------------------------
 --
-	  
-	  
+      
+      
    PROCEDURE register_lb_asset_type (
       pi_lb_object_type   IN INTEGER,
       pi_LB_asset_class   IN VARCHAR2,
@@ -219,6 +221,23 @@ AS
    END;
 
    --
+   PROCEDURE create_lb_aggr_sdo_view (
+      pi_inv_type   IN nm_inv_types.nit_inv_type%TYPE)
+   IS
+      l_str   VARCHAR2 (2000)
+         :=    'create or replace view v_lb_'
+            || pi_inv_type
+            || '_aggr_sdo '
+            || ' (NAG_ID, NAG_ASSET_ID, NAG_START_DATE,NAG_END_DATE,NAG_GEOMETRY ) '
+            || ' as    SELECT nag_id, nag_asset_id, nag_start_date, nag_end_date, nag_geometry '
+            || ' FROM nm_asset_geometry '
+            || ' WHERE nag_location_type = '||''''||'N'||''''||' AND nag_obj_type = '||''''||pi_inv_type||'''';
+   BEGIN
+      EXECUTE IMMEDIATE l_str;
+   END;
+
+   --
+
    PROCEDURE drop_lb_asset_type (pi_lb_object_type   IN INTEGER,
                                  pi_exor_type        IN VARCHAR2)
    IS
@@ -258,9 +277,9 @@ AS
       BEGIN
          nm3sdm.drop_layers_by_inv_type (pi_exor_type);
       END;
-	  
-	  DELETE FROM nm_asset_geometry_all
-	        WHERE nag_obj_type = pi_exor_type;
+      
+      DELETE FROM nm_asset_geometry_all
+            WHERE nag_obj_type = pi_exor_type;
 
       DELETE FROM nm_inv_nw
             WHERE nin_nit_inv_code = pi_exor_type;
@@ -309,6 +328,15 @@ AS
          THEN
             NULL;
       END;
+
+      BEGIN
+         EXECUTE IMMEDIATE 'drop view V_LB_' || pi_exor_type || '_AGGR_SDO';
+      EXCEPTION
+         WHEN not_exists
+         THEN
+            NULL;
+      END;
+
    END;
 END;
 /
