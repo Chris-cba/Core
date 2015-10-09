@@ -1,10 +1,10 @@
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/lb/install/lb_install.sql-arc   1.6   Oct 09 2015 14:01:46   Rob.Coupe  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/lb/install/lb_install.sql-arc   1.7   Oct 09 2015 15:11:40   Rob.Coupe  $
 --       Module Name      : $Workfile:   lb_install.sql  $
---       Date into PVCS   : $Date:   Oct 09 2015 14:01:46  $
---       Date fetched Out : $Modtime:   Oct 09 2015 13:53:48  $
---       PVCS Version     : $Revision:   1.6  $
+--       Date into PVCS   : $Date:   Oct 09 2015 15:11:40  $
+--       Date fetched Out : $Modtime:   Oct 09 2015 14:31:42  $
+--       PVCS Version     : $Revision:   1.7  $
 --
 --   Author : R.A. Coupe
 --
@@ -16,12 +16,17 @@
 ----------------------------------------------------------------------------
 --
 
-/* LB Install file */
+Prompt Installation of Location Bridge
 
+Prompt Objects and Data Types
 
 start lb_data_types.sql;
 
+Prompt DDL Script - tables, indexes, constraints etc
+
 start lb_ddl.sql;
+
+Prompt Packages
 
 start ..\admin\pck\LB_GET.pkh;
 start ..\admin\pck\LB_LOAD.pkh;
@@ -32,19 +37,25 @@ start ..\admin\pck\LB_REF.pkh;
 start ..\admin\pck\LB_REG.pkh;
 start ..\admin\pck\LB_PATH_REG.pkh;
 
+Prompt Views
+
 start lb_views.sql;
 
 start ..\admin\views\views.sql
 
+Prompt Stand alone procedures
 
 --start ..\admin\pck\get_lb_rpt_d_tab.prc;
 --start ..\admin\pck\get_lb_rpt_r_tab.prc;
+
 start ..\admin\pck\create_nlt_geometry_view.prc;
 
 begin
 CREATE_NLT_GEOMETRY_VIEW;
 end;
 /
+
+Prompt Package bodies
 
 start ..\admin\pck\LB_PATH_REG.pkb;
 start ..\admin\pck\LB_OPS.pkb
@@ -165,6 +176,8 @@ BEGIN
 END;
 /
 
+commit;
+
 prompt Creating eB interface modules
 
 start ..\admin\eB_interface\install_eB_interface.sql
@@ -185,9 +198,6 @@ begin
     NM3DDL.REFRESH_PRIVATE_SYNONYMS;
   end if;
 end;    
-/
-
-commit
 /
 
 prompt End of Location Bridge Installation
