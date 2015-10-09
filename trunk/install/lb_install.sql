@@ -1,10 +1,10 @@
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/lb/install/lb_install.sql-arc   1.4   Oct 09 2015 10:33:12   Rob.Coupe  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/lb/install/lb_install.sql-arc   1.5   Oct 09 2015 13:42:36   Rob.Coupe  $
 --       Module Name      : $Workfile:   lb_install.sql  $
---       Date into PVCS   : $Date:   Oct 09 2015 10:33:12  $
---       Date fetched Out : $Modtime:   Oct 09 2015 10:33:24  $
---       PVCS Version     : $Revision:   1.4  $
+--       Date into PVCS   : $Date:   Oct 09 2015 13:42:36  $
+--       Date fetched Out : $Modtime:   Oct 09 2015 13:42:24  $
+--       PVCS Version     : $Revision:   1.5  $
 --
 --   Author : R.A. Coupe
 --
@@ -55,7 +55,7 @@ start ..\admin\pck\LB_LOAD.pkb;
 start ..\admin\pck\LB_LOC.pkb;
 start ..\admin\pck\LB_PATH.pkb;
 
-
+prompt Creating the registry of Location Bridge Objects
 
 DECLARE
    TYPE object_name_type IS TABLE OF VARCHAR2 (123) INDEX BY binary_integer;
@@ -165,6 +165,11 @@ BEGIN
 END;
 /
 
+prompt Creating eB interface modules
+
+start ..\eB_interface\install_eB_interface.sql
+
+prompt Creating synonyms
 
 declare
   cursor c1 is
