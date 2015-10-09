@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_path
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_path.pkb-arc   1.6   Oct 08 2015 16:24:14   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_path.pkb-arc   1.7   Oct 09 2015 10:47:28   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_path.pkb  $
-   --       Date into PVCS   : $Date:   Oct 08 2015 16:24:14  $
-   --       Date fetched Out : $Modtime:   Oct 08 2015 16:24:16  $
-   --       PVCS Version     : $Revision:   1.6  $
+   --       Date into PVCS   : $Date:   Oct 09 2015 10:47:28  $
+   --       Date fetched Out : $Modtime:   Oct 09 2015 10:47:44  $
+   --       PVCS Version     : $Revision:   1.7  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,7 +16,7 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.6  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.7  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_path';
 
@@ -282,10 +282,22 @@ AS
    --   END;
 
    --
-   PROCEDURE set_network (pi_network IN VARCHAR2)
+    PROCEDURE set_network (pi_network IN VARCHAR2 default NULL)
    IS
    BEGIN
-      g_network := pi_network;
+      if pi_network is NULL then
+         begin
+           select network into g_network 
+           from all_sdo_network_metadata where owner = sys_context('NM3CORE', 'APPLICATION_OWNER');
+         exception
+           when too_many_rows then
+             raise_application_error(-20001, 'There is more than one network registered, please specifiy a network name');
+           when no_data_found then
+             raise_application_error(-20002, 'You do not have access to a network');
+         end;   
+      else               
+        g_network := pi_network;
+      end if;
    END;
 
    --
@@ -592,7 +604,7 @@ AS
    END;
 --
 BEGIN
-   set_network ('XHA_ESU_NETWORK');
+   set_network; --('XHA_ESU_NETWORK');
 
    DECLARE
       net_mem      VARCHAR2 (100) := g_network;
