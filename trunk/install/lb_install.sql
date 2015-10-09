@@ -1,10 +1,10 @@
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/lb/install/lb_install.sql-arc   1.3   Oct 08 2015 15:07:44   Rob.Coupe  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/lb/install/lb_install.sql-arc   1.4   Oct 09 2015 10:33:12   Rob.Coupe  $
 --       Module Name      : $Workfile:   lb_install.sql  $
---       Date into PVCS   : $Date:   Oct 08 2015 15:07:44  $
---       Date fetched Out : $Modtime:   Oct 08 2015 15:05:40  $
---       PVCS Version     : $Revision:   1.3  $
+--       Date into PVCS   : $Date:   Oct 09 2015 10:33:12  $
+--       Date fetched Out : $Modtime:   Oct 09 2015 10:33:24  $
+--       PVCS Version     : $Revision:   1.4  $
 --
 --   Author : R.A. Coupe
 --
@@ -169,12 +169,16 @@ END;
 declare
   cursor c1 is
     select * from lb_objects l
-    where object_type in ('PACKAGE', 'TABLE', 'VIEW', 'VIEW', 'PROCEDURE', 'SEQUENCE' )
-	and  nvl(hig.get_sysopt('HIGPUBSYN'),'Y') = 'Y' ;
+    where object_type in ('PACKAGE', 'TABLE', 'VIEW', 'PROCEDURE', 'SEQUENCE' );
 begin
-  for irec in c1 loop
-    NM3DDL.CREATE_SYNONYM_FOR_OBJECT(irec.object_name, 'PUBLIC');
-  end loop;
+  if nvl(hig.get_sysopt('HIGPUBSYN'),'Y') = 'Y' 
+  then
+     for irec in c1 loop
+       NM3DDL.CREATE_SYNONYM_FOR_OBJECT(irec.object_name, 'PUBLIC');
+     end loop;
+  else
+    NM3DDL.REFRESH_PRIVATE_SYNONYMS;
+  end if;
 end;    
 /
 
