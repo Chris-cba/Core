@@ -1,0 +1,79 @@
+CREATE OR REPLACE PACKAGE lb_path
+AS
+   --   PVCS Identifiers :-
+   --
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_path.pkh-arc   1.5   Oct 09 2015 10:42:26   Rob.Coupe  $
+   --       Module Name      : $Workfile:   lb_path.pkh  $
+   --       Date into PVCS   : $Date:   Oct 09 2015 10:42:26  $
+   --       Date fetched Out : $Modtime:   Oct 09 2015 10:42:46  $
+   --       PVCS Version     : $Revision:   1.5  $
+   --
+   --   Author : R.A. Coupe
+   --
+   --   Location Bridge package for handling path data
+   --
+   -----------------------------------------------------------------------------
+   -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
+   ----------------------------------------------------------------------------
+   --
+   g_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.5  $';
+   --
+   g_network           VARCHAR2 (30);
+
+   --
+   ----------------------------------------------------------------------------
+   --
+   FUNCTION get_version
+      RETURN VARCHAR2;
+
+   FUNCTION get_body_version
+      RETURN VARCHAR2;
+
+
+   FUNCTION get_path (pi_node1 IN INTEGER, pi_node2 IN INTEGER)
+      RETURN SYS_REFCURSOR;
+
+   FUNCTION get_tsp_path (p_nodes IN sdo_number_array)
+      RETURN SYS_REFCURSOR;
+
+   FUNCTION get_path_from_gdo (pi_gdo_session_id IN INTEGER)
+      RETURN SYS_REFCURSOR;
+
+   FUNCTION get_tsp_path_from_gdo (pi_gdo_session_id IN INTEGER)
+      RETURN SYS_REFCURSOR;
+
+   FUNCTION get_path_geometry (pi_path IN sdo_number_array)
+      RETURN SYS_REFCURSOR;
+
+   --
+   FUNCTION get_sdo_path_geometry (pi_path IN sdo_number_array)
+      RETURN MDSYS.sdo_geometry;
+
+   --
+   FUNCTION get_sdo_path (p_no_1 INTEGER, p_no_2 INTEGER)
+      RETURN sdo_number_array;
+
+   FUNCTION get_sdo_path (l1 IN nm_lref, l2 IN nm_lref)
+      RETURN lb_rpt_tab;
+
+   FUNCTION get_tsp_sdo_path (p_nodes IN sdo_number_array)
+      RETURN sdo_number_array;
+
+   PROCEDURE set_network (pi_network IN VARCHAR2 default NULL);
+
+   --
+   FUNCTION node_state (p_node_id IN INTEGER)
+      RETURN VARCHAR2;
+
+   FUNCTION get_path_as_lb_rpt_tab (p_no_1 INTEGER, p_no_2 INTEGER)
+      RETURN lb_rpt_tab;
+
+   FUNCTION get_path_as_lb_rpt_tab (pi_path in sdo_number_array)
+      RETURN lb_rpt_tab;
+
+      FUNCTION get_lb_rpt_tab_from_lref_array (
+      pi_lref_array   IN nm_lref_array_type)
+      RETURN lb_rpt_tab;
+      
+END lb_path;
+/
