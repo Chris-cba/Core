@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE lb_get
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_get.pkh-arc   1.4   Oct 12 2015 16:23:22   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_get.pkh-arc   1.5   Oct 12 2015 16:35:24   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_get.pkh  $
-   --       Date into PVCS   : $Date:   Oct 12 2015 16:23:22  $
-   --       Date fetched Out : $Modtime:   Oct 12 2015 16:22:40  $
-   --       PVCS Version     : $Revision:   1.4  $
+   --       Date into PVCS   : $Date:   Oct 12 2015 16:35:24  $
+   --       Date fetched Out : $Modtime:   Oct 12 2015 16:35:00  $
+   --       PVCS Version     : $Revision:   1.5  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,7 +16,7 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.4  $';
+   g_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.5  $';
 
    --
    FUNCTION get_version
@@ -35,6 +35,7 @@ AS
       p_geom         IN MDSYS.sdo_geometry,
       p_theme_id     IN nm_themes_all.nth_theme_id%TYPE,
       p_mask_array   IN VARCHAR2 DEFAULT 'ANYINTERACT',
+	  p_cardinality  IN INTEGER )
       RETURN lb_RPt_tab;
 
    FUNCTION get_RPT_geom_tab_from_RPt (p_rpt_tab IN lb_RPt_tab)
