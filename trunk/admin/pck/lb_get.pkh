@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE lb_get
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_get.pkh-arc   1.5   Oct 12 2015 16:35:24   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_get.pkh-arc   1.6   Oct 15 2015 17:05:34   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_get.pkh  $
-   --       Date into PVCS   : $Date:   Oct 12 2015 16:35:24  $
-   --       Date fetched Out : $Modtime:   Oct 12 2015 16:35:00  $
-   --       PVCS Version     : $Revision:   1.5  $
+   --       Date into PVCS   : $Date:   Oct 15 2015 17:05:34  $
+   --       Date fetched Out : $Modtime:   Oct 15 2015 17:05:00  $
+   --       PVCS Version     : $Revision:   1.6  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,7 +16,7 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.5  $';
+   g_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.6  $';
 
    --
    FUNCTION get_version
@@ -35,8 +35,16 @@ AS
       p_geom         IN MDSYS.sdo_geometry,
       p_theme_id     IN nm_themes_all.nth_theme_id%TYPE,
       p_mask_array   IN VARCHAR2 DEFAULT 'ANYINTERACT',
-	  p_cardinality  IN INTEGER )
+      p_cardinality  IN INTEGER )
       RETURN lb_RPt_tab;
+
+   FUNCTION get_refnt_RPt_tab_from_nspe (
+      p_nspe_id      IN INTEGER,
+      p_theme_id     IN nm_themes_all.nth_theme_id%TYPE,
+      p_mask_array   IN VARCHAR2 := 'ANYINTERACT',
+      p_cardinality  IN INTEGER )
+      RETURN lb_RPt_tab;
+      
 
    FUNCTION get_RPT_geom_tab_from_RPt (p_rpt_tab IN lb_RPt_tab)
       RETURN lb_RPt_geom_tab;
@@ -105,5 +113,15 @@ AS
    FUNCTION get_obj_id_as_rpt_tab (pi_obj_id     IN INTEGER,
                                    pi_obj_type   IN VARCHAR2)
       RETURN lb_rpt_tab;
+   
+   FUNCTION get_ft_rpt_tab (p_rpt_tab      IN lb_rpt_tab,
+                            p_table_name   IN VARCHAR2,
+                            p_inv_type     IN VARCHAR2,
+                            p_key          IN VARCHAR2,
+                            p_ne_key       IN VARCHAR2,
+                            p_start_col    IN VARCHAR2,
+                            p_end_col      IN VARCHAR2)
+      RETURN lb_rpt_tab;
+
 END;
 /
