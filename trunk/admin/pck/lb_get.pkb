@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_get
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_get.pkb-arc   1.4   Oct 12 2015 16:32:48   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_get.pkb-arc   1.5   Oct 15 2015 17:08:32   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_get.pkb  $
-   --       Date into PVCS   : $Date:   Oct 12 2015 16:32:48  $
-   --       Date fetched Out : $Modtime:   Oct 12 2015 16:32:08  $
-   --       PVCS Version     : $Revision:   1.4  $
+   --       Date into PVCS   : $Date:   Oct 15 2015 17:08:32  $
+   --       Date fetched Out : $Modtime:   Oct 15 2015 17:06:54  $
+   --       PVCS Version     : $Revision:   1.5  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,7 +16,7 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.4  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.5  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_get';
 
@@ -74,124 +74,152 @@ AS
                              p_cardinality   IN INTEGER)
       RETURN lb_RPt_tab
    IS
-      retval   lb_RPt_tab;
+      retval       lb_rpt_tab;
+      l_nit_row    nm_inv_types%rowtype := nm3get.get_nit(p_obj_type);
+      l_ft_flag    VARCHAR2 (1);
+      l_category   VARCHAR2 (1);
    BEGIN
-      SELECT lb_RPt (
-                nm_ne_id_of,
-                nlt_id,
-                nm_obj_type,
-                nm_ne_id_in,
-                nm_seg_no,
-                nm_seq_no,
-                nm_cardinality,
-                CASE p_intsct
-                   WHEN 'FALSE'
-                   THEN
-                      nm_begin_mp
-                   ELSE
-                      CASE
-                         WHEN (nm_begin_mp <= NVL (t.start_m, 0))
+      --
+      BEGIN
+         SELECT DECODE (nit_table_name, NULL, 'N', 'Y'), nit_category
+           INTO l_ft_flag, l_category
+           FROM nm_inv_types
+          WHERE nit_inv_type = p_obj_type;
+      EXCEPTION
+         WHEN NO_DATA_FOUND
+         THEN
+            NULL;
+      END;
+
+      IF l_ft_flag = 'Y'
+      THEN
+         retval := get_ft_rpt_tab (p_rpt_tab => p_refnt_tab,
+                            p_table_name     => l_nit_row.nit_table_name,
+                            p_inv_type       => p_obj_type,
+                            p_key            => l_nit_row.nit_foreign_pk_column,
+                            p_ne_key         => l_nit_row.nit_lr_ne_column_name,
+                            p_start_col      => l_nit_row.nit_lr_st_chain,
+                            p_end_col        => l_nit_row.nit_lr_end_chain );
+      ELSE
+         BEGIN
+            SELECT lb_RPt (
+                      nm_ne_id_of,
+                      nlt_id,
+                      nm_obj_type,
+                      nm_ne_id_in,
+                      nm_seg_no,
+                      nm_seq_no,
+                      nm_cardinality,
+                      CASE p_intsct
+                         WHEN 'FALSE'
                          THEN
-                            NVL (t.start_m, 0)
-                         ELSE
                             nm_begin_mp
-                      END
-                END,
-                CASE p_intsct
-                   WHEN 'FALSE'
-                   THEN
-                      nm_end_mp
-                   ELSE
-                      CASE
-                         WHEN (nm_end_mp >= NVL (t.end_m, ne_length))
-                         THEN
-                            NVL (t.end_m, ne_length)
                          ELSE
+                            CASE
+                               WHEN (nm_begin_mp <= NVL (t.start_m, 0))
+                               THEN
+                                  NVL (t.start_m, 0)
+                               ELSE
+                                  nm_begin_mp
+                            END
+                      END,
+                      CASE p_intsct
+                         WHEN 'FALSE'
+                         THEN
                             nm_end_mp
-                      END
-                END,
-                nt_length_unit)
-        BULK COLLECT INTO retval
-        FROM nm_members,
-             nm_linear_types,
-             nm_elements,
-             nm_types,
-             TABLE (p_refnt_tab) t
-       WHERE     nm_ne_id_of = ne_id
-             AND t.refnt = ne_id
-             AND ne_nt_type = nlt_nt_type
-             AND NVL (ne_gty_group_type, '£$%"') =
-                    NVL (nlt_gty_type, '£$%"')
-             AND nt_type = ne_nt_type
-             AND nlt_id = t.refnt_type
-             --  and ne_id = nvl(p_refnt, ne_id)
-             AND nm_obj_type = NVL (p_obj_type, nm_obj_type)
-             --  and nm_ne_id_in  = nvl(p_obj_id, nm_ne_id_in)
-             AND (   (    nm_begin_mp < NVL (t.end_m, ne_length)
-                      AND nm_end_mp > NVL (t.start_m, 0))
-                  OR (    nm_begin_mp = nm_end_mp
-                      AND nm_begin_mp BETWEEN NVL (t.start_m, 0)
-                                          AND NVL (t.end_m, ne_length)))
-      UNION ALL
-      SELECT lb_RPt (
-                nm_ne_id_of,
-                nlt_id,
-                nm_obj_type,
-                nm_ne_id_in,
-                nm_seg_no,
-                nm_seq_no,
-                nm_dir_flag,
-                CASE p_intsct
-                   WHEN 'FALSE'
-                   THEN
-                      nm_begin_mp
-                   ELSE
-                      CASE
-                         WHEN (nm_begin_mp <= t.start_m) THEN t.start_m
-                         ELSE nm_begin_mp
-                      END
-                END,
-                CASE p_intsct
-                   WHEN 'FALSE'
-                   THEN
-                      nm_end_mp
-                   ELSE
-                      CASE
-                         WHEN (nm_end_mp >= t.end_m) THEN t.start_m
-                         ELSE nm_end_mp
-                      END
-                END,
-                nt_length_unit)
-        FROM nm_locations_all,
-             nm_linear_types,
-             nm_elements,
-             nm_types,
-             TABLE (p_refnt_tab) t
-       WHERE     nm_ne_id_of = ne_id
-             AND t.refnt = ne_id
-             AND ne_nt_type = nlt_nt_type
-             AND NVL (ne_gty_group_type, '£$%"') =
-                    NVL (nlt_gty_type, '£$%"')
-             AND nt_type = ne_nt_type
-             AND nlt_id = t.refnt_type
-             --  and ne_id = nvl(p_refnt, ne_id)
-             AND nm_obj_type = NVL (p_obj_type, nm_obj_type)
-             --  and nm_ne_id_in  = nvl(p_obj_id, nm_ne_id_in)
-             AND (   (    nm_begin_mp < NVL (t.end_m, ne_length)
-                      AND nm_end_mp > NVL (t.start_m, 0))
-                  OR (    nm_begin_mp = nm_end_mp
-                      AND nm_begin_mp BETWEEN NVL (t.start_m, 0)
-                                          AND NVL (t.end_m, ne_length)));
+                         ELSE
+                            CASE
+                               WHEN (nm_end_mp >= NVL (t.end_m, ne_length))
+                               THEN
+                                  NVL (t.end_m, ne_length)
+                               ELSE
+                                  nm_end_mp
+                            END
+                      END,
+                      nt_length_unit)
+              BULK COLLECT INTO retval
+              FROM nm_members,
+                   nm_linear_types,
+                   nm_elements,
+                   nm_types,
+                   TABLE (p_refnt_tab) t
+             WHERE     nm_ne_id_of = ne_id
+                   AND t.refnt = ne_id
+                   AND ne_nt_type = nlt_nt_type
+                   AND NVL (ne_gty_group_type, '£$%"') =
+                          NVL (nlt_gty_type, '£$%"')
+                   AND nt_type = ne_nt_type
+                   AND nlt_id = t.refnt_type
+                   --  and ne_id = nvl(p_refnt, ne_id)
+                   AND nm_obj_type = NVL (p_obj_type, nm_obj_type)
+                   --  and nm_ne_id_in  = nvl(p_obj_id, nm_ne_id_in)
+                   AND (   (    nm_begin_mp < NVL (t.end_m, ne_length)
+                            AND nm_end_mp > NVL (t.start_m, 0))
+                        OR (    nm_begin_mp = nm_end_mp
+                            AND nm_begin_mp BETWEEN NVL (t.start_m, 0)
+                                                AND NVL (t.end_m, ne_length)))
+            UNION ALL
+            SELECT lb_RPt (
+                      nm_ne_id_of,
+                      nlt_id,
+                      nm_obj_type,
+                      nm_ne_id_in,
+                      nm_seg_no,
+                      nm_seq_no,
+                      nm_dir_flag,
+                      CASE p_intsct
+                         WHEN 'FALSE'
+                         THEN
+                            nm_begin_mp
+                         ELSE
+                            CASE
+                               WHEN (nm_begin_mp <= t.start_m) THEN t.start_m
+                               ELSE nm_begin_mp
+                            END
+                      END,
+                      CASE p_intsct
+                         WHEN 'FALSE'
+                         THEN
+                            nm_end_mp
+                         ELSE
+                            CASE
+                               WHEN (nm_end_mp >= t.end_m) THEN t.start_m
+                               ELSE nm_end_mp
+                            END
+                      END,
+                      nt_length_unit)
+              FROM nm_locations_all,
+                   nm_linear_types,
+                   nm_elements,
+                   nm_types,
+                   TABLE (p_refnt_tab) t
+             WHERE     nm_ne_id_of = ne_id
+                   AND t.refnt = ne_id
+                   AND ne_nt_type = nlt_nt_type
+                   AND NVL (ne_gty_group_type, '£$%"') =
+                          NVL (nlt_gty_type, '£$%"')
+                   AND nt_type = ne_nt_type
+                   AND nlt_id = t.refnt_type
+                   --  and ne_id = nvl(p_refnt, ne_id)
+                   AND nm_obj_type = NVL (p_obj_type, nm_obj_type)
+                   --  and nm_ne_id_in  = nvl(p_obj_id, nm_ne_id_in)
+                   AND (   (    nm_begin_mp < NVL (t.end_m, ne_length)
+                            AND nm_end_mp > NVL (t.start_m, 0))
+                        OR (    nm_begin_mp = nm_end_mp
+                            AND nm_begin_mp BETWEEN NVL (t.start_m, 0)
+                                                AND NVL (t.end_m, ne_length)));
+         END;
+      END IF;
 
       RETURN retval;
    END;
 
    --
    FUNCTION get_refnt_RPt_tab_from_geom (
-      p_geom         IN MDSYS.sdo_geometry,
-      p_theme_id     IN nm_themes_all.nth_theme_id%TYPE,
-      p_mask_array   IN VARCHAR2 := 'ANYINTERACT',
-	  p_cardinality  IN INTEGER )
+      p_geom          IN MDSYS.sdo_geometry,
+      p_theme_id      IN nm_themes_all.nth_theme_id%TYPE,
+      p_mask_array    IN VARCHAR2 := 'ANYINTERACT',
+      p_cardinality   IN INTEGER)
       RETURN lb_RPt_tab
    IS
       --
@@ -202,9 +230,11 @@ AS
    --
    BEGIN
       lstr :=
-            'select lb_RPt( e.ne_id, nlt_id, null, null, null, null, 1, start_m, end_m, nlt_units ) '
+            'select  /*+INDEX (e, NE_PK) */ lb_RPt( e.ne_id, nlt_id, null, null, null, null, 1, start_m, end_m, nlt_units ) '
          || ' from ( '
-         || ' select ne_id, sdo_lrs.geom_segment_start_measure(shape) start_m, sdo_lrs.geom_segment_end_measure(shape) end_m '
+         || ' select /*+materialize */ '
+         || nth.nth_pk_column
+         || ', sdo_lrs.geom_segment_start_measure(shape) start_m, sdo_lrs.geom_segment_end_measure(shape) end_m '
          || ' from '
          || nth.nth_feature_table
          || '  where sdo_relate( '
@@ -231,6 +261,55 @@ AS
    --
    END;
 
+
+   FUNCTION get_refnt_RPt_tab_from_nspe (
+      p_nspe_id       IN INTEGER,
+      p_theme_id      IN nm_themes_all.nth_theme_id%TYPE,
+      p_mask_array    IN VARCHAR2 := 'ANYINTERACT',
+      p_cardinality   IN INTEGER)
+      RETURN lb_RPt_tab
+   IS
+      --
+      retval   lb_RPt_tab;
+      qq       CHAR (1) := CHR (39);
+      nth      nm_themes_all%ROWTYPE := nm3get.get_nth (p_theme_id);
+      lstr     VARCHAR2 (2000);
+   --
+   BEGIN
+      lstr :=
+            'select /*+INDEX (e, NE_PK) */ lb_RPt( e.ne_id, nlt_id, null, null, null, null, 1, start_m, end_m, nlt_units ) '
+         || ' from ( '
+         || ' select /*+materialize */ '
+         || nth.nth_pk_column
+         || ' ne_id, sdo_lrs.geom_segment_start_measure(shape) start_m, sdo_lrs.geom_segment_end_measure(shape) end_m '
+         || ' from '
+         || nth.nth_feature_table
+         || ', nm_spatial_extents x '
+         || '  where sdo_relate( '
+         || nth.nth_feature_shape_column
+         || ', x.nspe_boundary, '
+         || qq
+         || ' mask=anyinteract'
+         || qq
+         || ') = '
+         || qq
+         || 'TRUE'
+         || qq
+         || ' and x.nspe_id = :nspe_id '
+         || ' ) a, nm_linear_types, nm_elements e '
+         || '   where a.ne_id'
+         || ' = e.ne_id and nlt_nt_type = e.ne_nt_type ';
+
+      nm_debug.debug_on;
+      nm_debug.debug (lstr);
+
+      EXECUTE IMMEDIATE lstr BULK COLLECT INTO retval USING p_nspe_id;      --
+
+      RETURN retval;
+   --
+   END;
+
+
    FUNCTION get_lb_RPt_geom_tab_from_geom (
       p_geom         IN MDSYS.sdo_geometry,
       p_theme_id     IN nm_themes_all.nth_theme_id%TYPE,
@@ -245,11 +324,13 @@ AS
    --
    BEGIN
       lstr :=
-            'select lb_RPt_geom( e.ne_id, nlt_id, null, null, null, null, 1, start_m, end_m, nlt_units, '
+            'select  /*+INDEX (e, NE_PK) */ lb_RPt_geom( e.ne_id, nlt_id, null, null, null, null, 1, start_m, end_m, nlt_units, '
          || nth.nth_feature_shape_column
          || ' ) '
          || ' from ( '
-         || ' select ne_id, sdo_lrs.geom_segment_start_measure('
+         || ' select /*+MATERIALIZE*/ '
+         || nth.nth_pk_column
+         || ', sdo_lrs.geom_segment_start_measure('
          || nth.nth_feature_shape_column
          || ') start_m, '
          || '       sdo_lrs.geom_segment_end_measure('
@@ -1304,6 +1385,128 @@ AS
                         AND nm_obj_type = pi_obj_type);
       END IF;
 
+      RETURN retval;
+   END;
+
+   FUNCTION get_ft_rpt_tab (p_rpt_tab      IN lb_rpt_tab,
+                            p_table_name   IN VARCHAR2,
+                            p_inv_type     IN VARCHAR2,
+                            p_key          IN VARCHAR2,
+                            p_ne_key       IN VARCHAR2,
+                            p_start_col    IN VARCHAR2,
+                            p_end_col      IN VARCHAR2)
+      RETURN lb_rpt_tab
+   IS
+      retval   lb_rpt_tab;
+      l_str    VARCHAR2 (4000);
+   BEGIN
+      l_str :=
+            ' SELECT cast ( collect(lb_rpt( esu_id, 2, inv_type, inv_id, NULL, NULL, 1, inv_datum_start, inv_datum_end, 1 ) ) as lb_rpt_tab ) '
+         || ' from ( select '
+         || '       t1."SECTION_ID", '
+         || '       t1."NM_SEQ_NO", '
+         || '       t1."NM_SEG_NO", '
+         || '       t1."ESU_ID", '
+         || '       t1."ROUTE_DIR_FLAG", '
+         || '       t1."ROUTE_START_ON_ESU", '
+         || '       t1."ROUTE_END_ON_ESU", '
+         || '       t1."ROUTE_START_M", '
+         || '       t1."ROUTE_END_M", '
+         || '       t1."INV_ID", '
+         || '       t1."INV_TYPE", '
+         || '       t1."START_M", '
+         || '       t1."END_M", '
+         || '       t1."INV_START", '
+         || '       t1."INV_END", '
+         || '       t1."NE_LENGTH", '
+         || '       t1."START_DATE", '
+         || '       t1."END_DATE", '
+         || '       CASE route_dir_flag '
+         || '          WHEN 1 THEN inv_start '
+         || '          ELSE ne_length - inv_end '
+         || '       END '
+         || '          inv_datum_start, '
+         || '       CASE route_dir_flag '
+         || '          WHEN 1 THEN inv_end '
+         || '          ELSE ne_length - inv_start '
+         || '       END '
+         || '          inv_datum_end '
+         || '  FROM (  SELECT rm.nm_ne_id_in section_id, '
+         || '                 rm.nm_seq_no, '
+         || '                 rm.nm_seg_no, '
+         || '                 rm.nm_ne_id_of esu_id, '
+         || '                 rm.nm_cardinality route_dir_flag, '
+         || '                 rm.nm_begin_mp route_start_on_esu, '
+         || '                 rm.nm_end_mp route_end_on_esu, '
+         || '                 rm.nm_slk route_start_m, '
+         || '                 rm.nm_end_slk route_end_m, '
+         || '                 im.'
+         || p_key
+         || ' inv_id, '
+         || '                 '
+         || ''''
+         || p_inv_type
+         || ''''
+         || ' inv_type, '
+         || '                 im.'
+         || p_start_col
+         || ', '
+         || '                 im.'
+         || p_end_col
+         || ', '
+         || '                   GREATEST (im.'
+         || p_start_col
+         || ', rm.nm_slk) '
+         || '                 - rm.nm_slk '
+         || '                 + rm.nm_begin_mp '
+         || '                    inv_start, '
+         || '                   LEAST (im.'
+         || p_end_col
+         || ', rm.nm_end_slk) '
+         || '                 - rm.nm_slk '
+         || '                 + rm.nm_begin_mp '
+         || '                    inv_end, '
+         || '                 e.ne_length, '
+         || '                 start_date, '
+         || '                 end_date '
+         || '            FROM '
+         || p_table_name
+         || ' im, nm_members rm, nm_elements e, table (:p_rpt_tab ) '
+         || '           WHERE     e.ne_id = rm.nm_ne_id_of '
+         || '                 AND rm.nm_ne_id_in = im.route_id '
+         || '                 AND e.ne_id = refnt '
+         || '                 AND (   (    im.'
+         || p_start_col
+         || ' < rm.nm_end_slk '
+         || '                          AND im.'
+         || p_end_col
+         || ' > rm.nm_slk '
+         || '                          AND im.'
+         || p_end_col
+         || ' > im.'
+         || p_start_col
+         || ') '
+         || '                      OR (    im.'
+         || p_start_col
+         || ' = im.'
+         || p_end_col
+         || ' '
+         || '                          AND im.'
+         || p_end_col
+         || ' <= rm.nm_end_slk '
+         || '                          AND im.'
+         || p_start_col
+         || ' >= rm.nm_slk)) '
+         || '        ORDER BY rm.nm_seg_no, rm.nm_seq_no, im.'
+         || p_start_col
+         || ') t1 )';
+      --
+      nm_debug.debug_on;
+      nm_debug.debug (l_str);
+
+      EXECUTE IMMEDIATE l_str INTO retval USING p_rpt_tab;
+
+      --
       RETURN retval;
    END;
 END;
