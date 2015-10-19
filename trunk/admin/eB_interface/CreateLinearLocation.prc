@@ -9,11 +9,11 @@ CREATE OR REPLACE PROCEDURE CreateLinearLocation (
 AS
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/eB_interface/CreateLinearLocation.prc-arc   1.0   Oct 07 2015 11:01:16   Rob.Coupe  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/eB_interface/CreateLinearLocation.prc-arc   1.1   Oct 19 2015 11:02:46   Rob.Coupe  $
 --       Module Name      : $Workfile:   CreateLinearLocation.prc  $
---       Date into PVCS   : $Date:   Oct 07 2015 11:01:16  $
---       Date fetched Out : $Modtime:   Oct 07 2015 11:00:00  $
---       PVCS Version     : $Revision:   1.0  $
+--       Date into PVCS   : $Date:   Oct 19 2015 11:02:46  $
+--       Date fetched Out : $Modtime:   Oct 19 2015 11:02:10  $
+--       PVCS Version     : $Revision:   1.1  $
 --
 --   Author : R.A. Coupe/David Stow
 --
@@ -23,7 +23,6 @@ AS
 -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
 ----------------------------------------------------------------------------
 --
-
    l_exor_type       lb_types.lb_exor_inv_type%TYPE;
    l_exor_njx_code   NM_JUXTAPOSITIONS.NJX_CODE%TYPE;
 BEGIN
@@ -49,15 +48,16 @@ BEGIN
       END;
    END IF;
 
-   LocationId := 
+   LocationId :=
       lb_load.ld_nal (l_exor_type,
                       AssetID,
                       LocationDescription,
                       l_exor_njx_code,
                       'Y',
-                      trunc (startDate),
                       'N',
+                      trunc (startDate),
                       SecurityKey);
 --
+
 END;
 /
