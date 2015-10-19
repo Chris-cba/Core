@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_load
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_load.pkb-arc   1.12   Oct 08 2015 16:21:54   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_load.pkb-arc   1.13   Oct 19 2015 10:51:18   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_load.pkb  $
-   --       Date into PVCS   : $Date:   Oct 08 2015 16:21:54  $
-   --       Date fetched Out : $Modtime:   Oct 08 2015 16:22:02  $
-   --       PVCS Version     : $Revision:   1.12  $
+   --       Date into PVCS   : $Date:   Oct 19 2015 10:51:18  $
+   --       Date fetched Out : $Modtime:   Oct 19 2015 10:50:10  $
+   --       PVCS Version     : $Revision:   1.13  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,7 +16,7 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.12  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.13  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_load';
 
@@ -578,7 +578,11 @@ AS
                   WHERE     nal_id = pi_nal_id
                         AND nal_id = nm_ne_id_in
                         AND nal_nit_type = nm_obj_type);
-
+--
+      UPDATE nm_asset_locations_all
+         SET nal_end_date = pi_end_date
+       WHERE nal_id = pi_nal_id;
+--
       aggregate_geometry (pi_nal_id => pi_nal_id, pi_start_date => pi_end_date);
    END;
 
