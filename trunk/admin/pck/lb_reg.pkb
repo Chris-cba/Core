@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_reg
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_reg.pkb-arc   1.6   Oct 09 2015 13:18:30   Rob.Coupe  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_reg.pkb-arc   1.7   Oct 19 2015 17:41:46   Rob.Coupe  $
 --       Module Name      : $Workfile:   lb_reg.pkb  $
---       Date into PVCS   : $Date:   Oct 09 2015 13:18:30  $
---       Date fetched Out : $Modtime:   Oct 09 2015 13:17:52  $
---       PVCS Version     : $Revision:   1.6  $
+--       Date into PVCS   : $Date:   Oct 19 2015 17:41:46  $
+--       Date fetched Out : $Modtime:   Oct 19 2015 17:41:34  $
+--       PVCS Version     : $Revision:   1.7  $
 --
 --   Author : R.A. Coupe
 --
@@ -16,16 +16,16 @@ CREATE OR REPLACE PACKAGE BODY lb_reg
 --   Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
 ------------------------------
 AS
---
---all global package variables here
---
-   g_body_sccsid     CONSTANT  varchar2(30) :='"$Revision:   1.6  $"';
+   --
+   --all global package variables here
+   --
+   g_body_sccsid    CONSTANT VARCHAR2 (30) := '"$Revision:   1.7  $"';
 
-   g_package_name    CONSTANT  varchar2(30)   := 'NM3RSC';
---
-------------------------------------------------
+   g_package_name   CONSTANT VARCHAR2 (30) := 'NM3RSC';
+   --
+   ------------------------------------------------
 
-   NOT_EXISTS   EXCEPTION;
+   NOT_EXISTS                EXCEPTION;
    PRAGMA EXCEPTION_INIT (NOT_EXISTS, -942);
 
    PROCEDURE create_lb_view (pi_inv_type IN nm_inv_types.nit_inv_type%TYPE);
@@ -33,28 +33,35 @@ AS
    PROCEDURE create_lb_sdo_view (
       pi_inv_type   IN nm_inv_types.nit_inv_type%TYPE);
 
-   PROCEDURE create_lb_aggr_sdo_view (pi_inv_type IN nm_inv_types.nit_inv_type%TYPE);
+   PROCEDURE create_lb_aggr_sdo_view (
+      pi_inv_type   IN nm_inv_types.nit_inv_type%TYPE);
 
---
------------------------------------------------------------------------------
---
+   --
+   -----------------------------------------------------------------------------
+   --
 
-   FUNCTION get_version RETURN varchar2 IS
+   FUNCTION get_version
+      RETURN VARCHAR2
+   IS
    BEGIN
       RETURN g_sccsid;
    END get_version;
---
------------------------------------------------------------------------------
---
-   FUNCTION get_body_version RETURN varchar2 IS
+
+   --
+   -----------------------------------------------------------------------------
+   --
+   FUNCTION get_body_version
+      RETURN VARCHAR2
+   IS
    BEGIN
       RETURN g_body_sccsid;
    END get_body_version;
---
------------------------------------------------------------------------------
---
-      
-      
+
+   --
+   -----------------------------------------------------------------------------
+   --
+
+
    PROCEDURE register_lb_asset_type (
       pi_lb_object_type   IN INTEGER,
       pi_LB_asset_class   IN VARCHAR2,
@@ -231,7 +238,14 @@ AS
             || ' (NAG_ID, NAG_ASSET_ID, NAG_START_DATE,NAG_END_DATE,NAG_GEOMETRY ) '
             || ' as    SELECT nag_id, nag_asset_id, nag_start_date, nag_end_date, nag_geometry '
             || ' FROM nm_asset_geometry '
-            || ' WHERE nag_location_type = '||''''||'N'||''''||' AND nag_obj_type = '||''''||pi_inv_type||'''';
+            || ' WHERE nag_location_type = '
+            || ''''
+            || 'N'
+            || ''''
+            || ' AND nag_obj_type = '
+            || ''''
+            || pi_inv_type
+            || '''';
    BEGIN
       EXECUTE IMMEDIATE l_str;
    END;
@@ -271,13 +285,13 @@ AS
    --
    PROCEDURE drop_lb_asset_type (pi_exor_type IN VARCHAR2)
    IS
-   l_themes int_array := nm3array.init_int_array;
+      l_themes   int_array := nm3array.init_int_array;
    BEGIN
       --
       BEGIN
          nm3sdm.drop_layers_by_inv_type (pi_exor_type);
       END;
-      
+
       DELETE FROM nm_asset_geometry_all
             WHERE nag_obj_type = pi_exor_type;
 
@@ -286,11 +300,11 @@ AS
 
       DELETE FROM lb_inv_security
             WHERE lb_exor_inv_type = pi_exor_type;
-            
-      NM3SDM.DROP_LAYERS_BY_INV_TYPE(pi_exor_type);        
-      
+
+      NM3SDM.DROP_LAYERS_BY_INV_TYPE (pi_exor_type);
+
       DELETE FROM nm_inv_themes
-      where nith_nit_id = pi_exor_type;            
+            WHERE nith_nit_id = pi_exor_type;
 
       DELETE FROM nm_inv_type_roles
             WHERE itr_inv_type = pi_exor_type;
@@ -306,9 +320,9 @@ AS
 
       DELETE FROM nm_inv_type_attribs
             WHERE ita_inv_type = pi_exor_type;
-            
+
       DELETE FROM lb_types
-            WHERE lb_exor_inv_type = pi_exor_type;   
+            WHERE lb_exor_inv_type = pi_exor_type;
 
       DELETE FROM nm_inv_types_all
             WHERE nit_inv_type = pi_exor_type;
@@ -336,7 +350,26 @@ AS
          THEN
             NULL;
       END;
+   END;
 
+   PROCEDURE register_unit (external_unit_id     IN INTEGER,
+                            external_unit_name   IN VARCHAR2,
+                            exor_unit_id         IN NUMBER)
+   AS
+      exor_unit_name   VARCHAR2 (20);
+   BEGIN
+      SELECT u.UN_UNIT_NAME
+        INTO exor_unit_name
+        FROM nm_units u
+       WHERE un_unit_id = exor_unit_id;
+
+      INSERT INTO lb_units
+           VALUES (external_unit_id,
+                   external_unit_name,
+                   exor_unit_id,
+                   exor_unit_name);
+
+      COMMIT;
    END;
 END;
 /
