@@ -4,15 +4,15 @@ CREATE OR REPLACE PROCEDURE CloseLinearLocation (
 AS
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/eB_interface/CloseLinearLocation.prc-arc   1.0   Oct 09 2015 13:28:24   Rob.Coupe  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/eB_interface/CloseLinearLocation.prc-arc   1.1   Oct 19 2015 10:55:40   Rob.Coupe  $
 --       Module Name      : $Workfile:   CloseLinearLocation.prc  $
---       Date into PVCS   : $Date:   Oct 09 2015 13:28:24  $
---       Date fetched Out : $Modtime:   Oct 07 2015 11:03:50  $
---       PVCS Version     : $Revision:   1.0  $
+--       Date into PVCS   : $Date:   Oct 19 2015 10:55:40  $
+--       Date fetched Out : $Modtime:   Oct 19 2015 10:55:14  $
+--       PVCS Version     : $Revision:   1.1  $
 --
 --   Author : R.A. Coupe/David Stow
 --
---   eB Interface procedure to add a linear location header record
+--   eB Interface procedure to close a linear location by location ID.
 --
 -----------------------------------------------------------------------------
 -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
@@ -22,6 +22,7 @@ AS
 BEGIN
 --
   BEGIN
+    
     UPDATE nm_asset_locations
        SET nal_end_date = NVL (endDate,trunc(sysdate))
     WHERE
@@ -30,6 +31,8 @@ BEGIN
     IF sql%rowcount = 0 -- nothing updated.
     THEN
        raise_application_error( -20001, 'Asset location ' || LocationId || ' does not exist and cannot be closed.');
+    ELSE
+      lb_load.close_location(PI_NAL_ID => LocationId, PI_END_DATE => endDate );
     END IF;
    END;
 END;
