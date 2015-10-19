@@ -1,19 +1,23 @@
 CREATE OR REPLACE PACKAGE lb_reg
 AS
---   PVCS Identifiers :-
---
---       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_reg.pkh-arc   1.1   Jan 15 2015 22:39:32   Rob.Coupe  $
---       Module Name      : $Workfile:   lb_reg.pkh  $
---       Date into PVCS   : $Date:   Jan 15 2015 22:39:32  $
---       Date fetched Out : $Modtime:   Jan 15 2015 22:39:12  $
---       PVCS Version     : $Revision:   1.1  $
------------------------------------------------------------------------------
---   Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
------------------------------------------------------------------------------
+   --   PVCS Identifiers :-
+   --
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_reg.pkh-arc   1.2   Oct 19 2015 17:40:02   Rob.Coupe  $
+   --       Module Name      : $Workfile:   lb_reg.pkh  $
+   --       Date into PVCS   : $Date:   Oct 19 2015 17:40:02  $
+   --       Date fetched Out : $Modtime:   Oct 19 2015 17:39:46  $
+   --       PVCS Version     : $Revision:   1.2  $
+   -----------------------------------------------------------------------------
+   --   Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
+   -----------------------------------------------------------------------------
 
-   g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   1.1  $';
-   FUNCTION get_version return varchar2;
-   FUNCTION get_body_version return varchar2;
+   g_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.2  $';
+
+   FUNCTION get_version
+      RETURN VARCHAR2;
+
+   FUNCTION get_body_version
+      RETURN VARCHAR2;
 
    PROCEDURE register_lb_asset_type (
       pi_lb_object_type   IN INTEGER,
@@ -44,9 +48,13 @@ AS
    --
    PROCEDURE drop_lb_asset_type (pi_lb_object_type   IN INTEGER,
                                  pi_exor_type        IN VARCHAR2);
---
 
-   PROCEDURE drop_lb_asset_type (pi_exor_type        IN VARCHAR2);
+   --
 
+   PROCEDURE drop_lb_asset_type (pi_exor_type IN VARCHAR2);
+
+   PROCEDURE register_unit (external_unit_id     IN INTEGER,
+                            external_unit_name   IN VARCHAR2,
+                            exor_unit_id         IN NUMBER);
 END;
 /
