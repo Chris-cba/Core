@@ -1,10 +1,10 @@
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/eB_interface/install_eB_interface.sql-arc   1.2   Oct 29 2015 07:27:38   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/eB_interface/install_eB_interface.sql-arc   1.3   Oct 29 2015 07:47:14   Rob.Coupe  $
    --       Module Name      : $Workfile:   install_eB_interface.sql  $
-   --       Date into PVCS   : $Date:   Oct 29 2015 07:27:38  $
-   --       Date fetched Out : $Modtime:   Oct 29 2015 07:28:10  $
-   --       PVCS Version     : $Revision:   1.2  $
+   --       Date into PVCS   : $Date:   Oct 29 2015 07:47:14  $
+   --       Date fetched Out : $Modtime:   Oct 29 2015 07:47:40  $
+   --       PVCS Version     : $Revision:   1.3  $
    --
    --   Author : R.A. Coupe
    --
@@ -14,7 +14,7 @@
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-start ..\admin\eB_interface\eB_interface.tyh
+--start ..\admin\eB_interface\eB_interface.tyh  --RAC the types in this script are already absorbed into main LB installation
 start ..\admin\eB_interface\CloseLinearLocation.prc
 start ..\admin\eB_interface\CreateLinearLocation.prc
 start ..\admin\eB_interface\CreateLinearRange.prc
