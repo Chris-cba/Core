@@ -1,10 +1,10 @@
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/lb/install/lb_data_types.sql-arc   1.4   Oct 29 2015 07:42:38   Rob.Coupe  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/lb/install/lb_data_types.sql-arc   1.5   Oct 29 2015 09:42:06   Rob.Coupe  $
 --       Module Name      : $Workfile:   lb_data_types.sql  $
---       Date into PVCS   : $Date:   Oct 29 2015 07:42:38  $
---       Date fetched Out : $Modtime:   Oct 29 2015 07:42:58  $
---       PVCS Version     : $Revision:   1.4  $
+--       Date into PVCS   : $Date:   Oct 29 2015 09:42:06  $
+--       Date fetched Out : $Modtime:   Oct 29 2015 09:42:40  $
+--       PVCS Version     : $Revision:   1.5  $
 --
 --   Author : R.A. Coupe
 --
@@ -157,12 +157,6 @@ create or replace type  lb_RPt_Geom as object ( refnt integer,
 create or replace type lb_RPt_geom_tab is table of lb_RPt_geom
 /
 
-create or replace type lb_obj_Geom as object ( obj_type varchar2(4), obj_id integer, geom mdsys.sdo_geometry )
-/
-
-create or replace type lb_obj_geom_tab is table of lb_obj_geom
-/
-
 CREATE OR REPLACE
 TYPE LB_ASSET_TYPE_NETWORK AS OBJECT
 (
@@ -250,11 +244,11 @@ CREATE OR REPLACE
 type LB_XSP_TAB as table of lb_xsp;
 /--   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/lb/install/lb_data_types.sql-arc   1.4   Oct 29 2015 07:42:38   Rob.Coupe  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/lb/install/lb_data_types.sql-arc   1.5   Oct 29 2015 09:42:06   Rob.Coupe  $
 --       Module Name      : $Workfile:   lb_data_types.sql  $
---       Date into PVCS   : $Date:   Oct 29 2015 07:42:38  $
---       Date fetched Out : $Modtime:   Oct 29 2015 07:42:58  $
---       PVCS Version     : $Revision:   1.4  $
+--       Date into PVCS   : $Date:   Oct 29 2015 09:42:06  $
+--       Date fetched Out : $Modtime:   Oct 29 2015 09:42:40  $
+--       PVCS Version     : $Revision:   1.5  $
 --
 --   Author : R.A. Coupe
 --
