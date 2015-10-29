@@ -1,10 +1,10 @@
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/lb/install/lb_install.sql-arc   1.10   Oct 29 2015 09:30:04   Rob.Coupe  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/lb/install/lb_install.sql-arc   1.11   Oct 29 2015 09:38:04   Rob.Coupe  $
 --       Module Name      : $Workfile:   lb_install.sql  $
---       Date into PVCS   : $Date:   Oct 29 2015 09:30:04  $
---       Date fetched Out : $Modtime:   Oct 29 2015 09:30:16  $
---       PVCS Version     : $Revision:   1.10  $
+--       Date into PVCS   : $Date:   Oct 29 2015 09:38:04  $
+--       Date fetched Out : $Modtime:   Oct 29 2015 09:38:26  $
+--       PVCS Version     : $Revision:   1.11  $
 --
 --   Author : R.A. Coupe
 --
@@ -203,7 +203,7 @@ end;
 insert into hig_upgrades
 (hup_product, date_upgraded, from_version, to_version, upgrade_script, executed_by, remarks )
 values
-('NET', sysdate, '4.0.0.0', '4.0.0.0', 'lb_install', user, 'Location Bridge development version 4' )
+('NET', sysdate, '4.0.0.0', '4.1.0.0', 'lb_install', user, 'Location Bridge development version 4.1' )
 /
 
 commit;
