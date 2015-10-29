@@ -1,10 +1,10 @@
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/lb/install/lb_install.sql-arc   1.8   Oct 09 2015 15:37:16   Rob.Coupe  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/lb/install/lb_install.sql-arc   1.9   Oct 29 2015 09:15:48   Rob.Coupe  $
 --       Module Name      : $Workfile:   lb_install.sql  $
---       Date into PVCS   : $Date:   Oct 09 2015 15:37:16  $
---       Date fetched Out : $Modtime:   Oct 09 2015 15:37:44  $
---       PVCS Version     : $Revision:   1.8  $
+--       Date into PVCS   : $Date:   Oct 29 2015 09:15:48  $
+--       Date fetched Out : $Modtime:   Oct 29 2015 09:16:08  $
+--       PVCS Version     : $Revision:   1.9  $
 --
 --   Author : R.A. Coupe
 --
@@ -135,7 +135,7 @@ BEGIN
    add_object( 'LINEAR_LOCATIONS','TYPE');
    add_object( 'NAL_ID_SEQ','SEQUENCE');
    add_object( 'NLG_ID_SEQ','SEQUENCE');
-   add_object( 'NM_ASSET_GEOMETRY','NAG_ID_SEQ');
+   add_object( 'NAG_ID_SEQ','SEQUENCE');
    add_object( 'NM_ASSET_GEOMETRY','VIEW');
    add_object( 'NM_ASSET_GEOMETRY_ALL','TABLE');
    add_object( 'NM_ASSET_LOCATIONS','VIEW');
