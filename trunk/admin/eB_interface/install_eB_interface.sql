@@ -1,10 +1,10 @@
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/eB_interface/install_eB_interface.sql-arc   1.3   Oct 29 2015 07:47:14   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/eB_interface/install_eB_interface.sql-arc   1.4   Oct 29 2015 09:00:30   Rob.Coupe  $
    --       Module Name      : $Workfile:   install_eB_interface.sql  $
-   --       Date into PVCS   : $Date:   Oct 29 2015 07:47:14  $
-   --       Date fetched Out : $Modtime:   Oct 29 2015 07:47:40  $
-   --       PVCS Version     : $Revision:   1.3  $
+   --       Date into PVCS   : $Date:   Oct 29 2015 09:00:30  $
+   --       Date fetched Out : $Modtime:   Oct 29 2015 09:00:54  $
+   --       PVCS Version     : $Revision:   1.4  $
    --
    --   Author : R.A. Coupe
    --
@@ -66,12 +66,7 @@ BEGIN
    add_object( 'GETNETWORKLINEARLOCATIONS','FUNCTION');
    add_object( 'GETNETWORKLINEARLOCATIONSTAB','FUNCTION');
    add_object( 'UPDATELINEARLOCATION','PROCEDURE');
-   add_object( 'V_NETWORK_ELEMENTS', 'VIEW' );
    add_object( 'V_NETWORK_TYPES', 'VIEW' );
-   add_object( 'LINEAR_LOCATION', 'TYPE' );
-   add_object( 'LINEAR_LOCATIONS','TYPE');
-   add_object( 'LINEAR_ELEMENT_TYPE','TYPE');
-   add_object( 'LINEAR_ELEMENT_TYPES','TYPE');
    
    --   
    FOR i IN 1 .. l_object_name.COUNT
