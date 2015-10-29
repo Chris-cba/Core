@@ -3,11 +3,11 @@
 --
 --   PVCS Identifiers :-
 --
---       pvcsid                 : $Header:   //new_vm_latest/archives/lb/admin/utl/drop_lb.sql-arc   1.8   Oct 09 2015 10:56:42   Rob.Coupe  $
+--       pvcsid                 : $Header:   //new_vm_latest/archives/lb/admin/utl/drop_lb.sql-arc   1.9   Oct 29 2015 07:32:20   Rob.Coupe  $
 --       Module Name      : $Workfile:   drop_lb.sql  $
---       Date into PVCS   : $Date:   Oct 09 2015 10:56:42  $
---       Date fetched Out : $Modtime:   Oct 09 2015 10:57:06  $
---       PVCS Version     : $Revision:   1.8  $
+--       Date into PVCS   : $Date:   Oct 29 2015 07:32:20  $
+--       Date fetched Out : $Modtime:   Oct 29 2015 07:31:50  $
+--       PVCS Version     : $Revision:   1.9  $
 --
 --   Author : Rob Coupe
 --
@@ -60,7 +60,7 @@ begin
 		   when others then null;
 		 end;
          execute immediate ' drop table '||irec.object_name||' cascade constraints ';
-      elsif irec.object_type in ('VIEW', 'SEQUENCE', 'PACKAGE', 'PROCEDURE') then
+      elsif irec.object_type in ('VIEW', 'SEQUENCE', 'PACKAGE', 'PROCEDURE', 'FUNCTION') then
          execute immediate ' drop '||irec.object_type||' '||irec.object_name;
       elsif irec.object_type in ('TYPE', 'TYPE BODY ') then
          execute immediate ' drop '||irec.object_type||' '||irec.object_name||' FORCE';
