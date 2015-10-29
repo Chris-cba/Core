@@ -1,10 +1,10 @@
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/lb/install/lb_ddl.sql-arc   1.6   Oct 09 2015 15:19:56   Rob.Coupe  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/lb/install/lb_ddl.sql-arc   1.7   Oct 29 2015 07:35:48   Rob.Coupe  $
 --       Module Name      : $Workfile:   lb_ddl.sql  $
---       Date into PVCS   : $Date:   Oct 09 2015 15:19:56  $
---       Date fetched Out : $Modtime:   Oct 09 2015 15:19:24  $
---       PVCS Version     : $Revision:   1.6  $
+--       Date into PVCS   : $Date:   Oct 29 2015 07:35:48  $
+--       Date fetched Out : $Modtime:   Oct 29 2015 07:36:06  $
+--       PVCS Version     : $Revision:   1.7  $
 --
 --   Author : R.A. Coupe
 --
@@ -851,7 +851,7 @@ CREATE INDEX NAG_OBJ_TYPE_IDX ON NM_ASSET_GEOMETRY_ALL
 --  The object is created when the parent object is created.
 
 CREATE UNIQUE INDEX NAG_ASSET_IDX ON NM_ASSET_GEOMETRY_ALL
-(NAG_ASSET_ID, NAG_START_DATE, NAG_LOCATION_TYPE)
+(NAG_ASSET_ID, NAG_OBJ_TYPE, NAG_START_DATE, NAG_LOCATION_TYPE)
 /
 
 delete from user_sdo_geom_metadata
@@ -905,7 +905,7 @@ ALTER TABLE NM_ASSET_GEOMETRY_ALL ADD (
   USING INDEX
   ENABLE VALIDATE,
   CONSTRAINT NAG_UK
-  UNIQUE (NAG_ASSET_ID, NAG_START_DATE, NAG_LOCATION_TYPE)
+  UNIQUE (NAG_ASSET_ID, NAG_OBJ_TYPE, NAG_START_DATE, NAG_LOCATION_TYPE)
   USING INDEX NAG_ASSET_IDX
   ENABLE VALIDATE)
 /  
