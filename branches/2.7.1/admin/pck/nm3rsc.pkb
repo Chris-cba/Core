@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY nm3rsc AS
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3rsc.pkb-arc   2.7.1.0   10 Dec 2014 10:54:48   Mike.Huitson  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3rsc.pkb-arc   2.7.1.1   Oct 30 2015 16:48:46   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3rsc.pkb  $
---       Date into PVCS   : $Date:   10 Dec 2014 10:54:48  $
---       Date fetched Out : $Modtime:   09 Dec 2014 21:54:18  $
---       PVCS Version     : $Revision:   2.7.1.0  $
+--       Date into PVCS   : $Date:   Oct 30 2015 16:48:46  $
+--       Date fetched Out : $Modtime:   Oct 30 2015 16:48:46  $
+--       PVCS Version     : $Revision:   2.7.1.1  $
 --
 --   Author : R.A. Coupe
 --
@@ -19,7 +19,7 @@ CREATE OR REPLACE PACKAGE BODY nm3rsc AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(30) :='"$Revision:   2.7.1.0  $"';
+   g_body_sccsid     CONSTANT  varchar2(30) :='"$Revision:   2.7.1.1  $"';
 
 --  g_body_sccsid is the SCCS ID for the package body
 --
@@ -145,6 +145,13 @@ l_empty_flag varchar2(1);
 BEGIN
 --
    nm_debug.proc_start(g_package_name,'rescale_route');
+
+  declare 
+    l_mode nm_user_aus.nua_mode%type;
+  begin
+    select nm3ausec.get_au_mode(sys_context('NM3_SECURITY_CTX','USERNAME'), ne_admin_unit ) into l_mode from nm_elements where ne_id = pi_ne_id;
+  end;
+
    --
    -- Set AU Securuty off and effective_date to value passed
    nm3ausec.set_status(nm3type.c_off);
@@ -786,6 +793,8 @@ END;
 --
 -----------------------------------------------------------------------------
 --
+
+
 PROCEDURE reseq_route( pi_ne_id    IN nm_elements.ne_id%TYPE,
                        pi_ne_start IN nm_elements.ne_id%TYPE DEFAULT NULL
                       ) IS
@@ -813,6 +822,17 @@ exception
     return null;
 end;   
 BEGIN
+
+  declare 
+    l_mode nm_user_aus.nua_mode%type;
+  begin
+    select nm3ausec.get_au_mode(sys_context('NM3_SECURITY_CTX','USERNAME'), ne_admin_unit ) into l_mode from nm_elements where ne_id = pi_ne_id;
+    if l_mode != 'NORMAL' then
+       hig.raise_ner (pi_appl               => nm3type.c_net
+                     ,pi_id                 => 236 );
+    end if;
+  end;
+
 
   instantiate_data(  pi_ne_id => pi_ne_id
                     ,pi_effective_date => NULL );
@@ -1046,7 +1066,6 @@ CURSOR c3 ( c_ne_id nm_elements.ne_id%TYPE, c_gty nm_elements.ne_gty_group_type%
 --
 BEGIN
 --
-
   IF is_route( pi_ne_id ) THEN
     --nm_debug.debug('Route');
     g_route_or_inv := 'R';
@@ -1965,6 +1984,14 @@ PROCEDURE resize_route(pi_ne_id    IN nm_elements_all.ne_id%TYPE
 BEGIN
   nm_debug.proc_start(p_package_name   => g_package_name
                      ,p_procedure_name => 'resize_route');
+
+  declare 
+    l_mode nm_user_aus.nua_mode%type;
+  begin
+    select nm3ausec.get_au_mode(sys_context('NM3_SECURITY_CTX','USERNAME'), ne_admin_unit ) into l_mode from nm_elements where ne_id = pi_ne_id;
+  end;
+
+
 
   l_ne_rec := nm3get.get_ne(pi_ne_id => pi_ne_id);
 
