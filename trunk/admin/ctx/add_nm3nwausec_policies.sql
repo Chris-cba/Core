@@ -1,11 +1,11 @@
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/ctx/add_nm3nwausec_policies.sql-arc   1.5   Jul 04 2013 09:23:56   James.Wadsworth  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/ctx/add_nm3nwausec_policies.sql-arc   1.6   Nov 03 2015 07:56:14   Rob.Coupe  $
 --       Module Name      : $Workfile:   add_nm3nwausec_policies.sql  $
---       Date into SCCS   : $Date:   Jul 04 2013 09:23:56  $
---       Date fetched Out : $Modtime:   Jul 04 2013 09:22:04  $
---       SCCS Version     : $Revision:   1.5  $
+--       Date into SCCS   : $Date:   Nov 03 2015 07:56:14  $
+--       Date fetched Out : $Modtime:   Nov 03 2015 07:55:56  $
+--       SCCS Version     : $Revision:   1.6  $
 --
 -----------------------------------------------------------------------------
 --    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
@@ -65,15 +65,17 @@ add_policy ( p_policy_name    => 'SEC_AU_READ'            ,p_object_name => 'NM3
 add_policy ( p_policy_name    => 'HFC_AU_READ'            ,p_object_name => 'HIG_FTP_CONNECTIONS'     ,p_policy_function => 'NM3NWAUSEC.HFC_PREDICATE_READ'            ,p_statement_types => 'SELECT,INSERT,UPDATE,DELETE' ); 
 
 --
-add_policy ( p_policy_name    => 'NAU_AU_READ'          ,p_object_name => 'NM_ADMIN_UNITS_ALL'   ,p_policy_function => 'NM3NWAUSEC.NAU_PREDICATE_READ'   ,p_statement_types => 'SELECT' ); 
+--add_policy ( p_policy_name    => 'NAU_AU_READ'          ,p_object_name => 'NM_ADMIN_UNITS_ALL'   ,p_policy_function => 'NM3NWAUSEC.NAU_PREDICATE_READ'   ,p_statement_types => 'SELECT' ); 
 add_policy ( p_policy_name    => 'NAU_AU_DML'           ,p_object_name => 'NM_ADMIN_UNITS_ALL'   ,p_policy_function => 'NM3NWAUSEC.NAU_PREDICATE_DML'    ,p_statement_types => 'INSERT,UPDATE,DELETE' ); 
 --
+/*
 add_policy ( p_policy_name    => 'NE_PREDICATE_READ'    ,p_object_name => 'NM_ELEMENTS_ALL'  ,p_policy_function => 'NM3NWAUSEC.NE_PREDICATE_READ'    ,p_statement_types => 'SELECT' );
 add_policy ( p_policy_name    => 'NE_PREDICATE_INS'     ,p_object_name => 'NM_ELEMENTS_ALL'  ,p_policy_function => 'NM3NWAUSEC.NE_PREDICATE_DML'     ,p_statement_types => 'INSERT' );
 add_policy ( p_policy_name    => 'NE_PREDICATE_UPDEL'   ,p_object_name => 'NM_ELEMENTS_ALL'  ,p_policy_function => 'NM3NWAUSEC.NE_PREDICATE_READ'    ,p_statement_types => 'UPDATE,DELETE' );
 add_policy ( p_policy_name    => 'NM_PREDICATE_READ'    ,p_object_name => 'NM_MEMBERS_ALL'   ,p_policy_function => 'NM3NWAUSEC.NM_PREDICATE_READ'    ,p_statement_types => 'SELECT' );
 add_policy ( p_policy_name    => 'NM_PREDICATE_INS'     ,p_object_name => 'NM_MEMBERS_ALL'   ,p_policy_function => 'NM3NWAUSEC.NM_PREDICATE_DML'     ,p_statement_types => 'INSERT' );
 add_policy ( p_policy_name    => 'NM_PREDICATE_UPDEL'   ,p_object_name => 'NM_MEMBERS_ALL'   ,p_policy_function => 'NM3NWAUSEC.NM_PREDICATE_READ'    ,p_statement_types => 'UPDATE,DELETE' );
+*/
 --
 add_policy (p_policy_name     => 'HDIR_ROLE_POLICY_READ',p_object_name     => 'HIG_DIRECTORIES'   ,p_policy_function => 'NM3NWAUSEC.HDIR_PREDICATE_READ' ,p_statement_types => 'SELECT, INSERT, UPDATE, DELETE'  );
 add_policy (p_policy_name     => 'DLC_ROLE_POLICY_READ' ,p_object_name     => 'DOC_LOCATIONS'     ,p_policy_function => 'NM3NWAUSEC.DLC_PREDICATE_READ'  ,p_statement_types => 'SELECT, INSERT, UPDATE, DELETE'  );
