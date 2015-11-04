@@ -1,11 +1,11 @@
 CREATE OR REPLACE PACKAGE BODY invsec AS
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/ctx/invsec.pkb-arc   2.5   Nov 03 2015 08:10:46   Rob.Coupe  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/ctx/invsec.pkb-arc   2.6   Nov 04 2015 11:47:00   Rob.Coupe  $
 --       Module Name      : $Workfile:   invsec.pkb  $
---       Date into SCCS   : $Date:   Nov 03 2015 08:10:46  $
---       Date fetched Out : $Modtime:   Nov 03 2015 08:10:20  $
---       SCCS Version     : $Revision:   2.5  $
+--       Date into SCCS   : $Date:   Nov 04 2015 11:47:00  $
+--       Date fetched Out : $Modtime:   Nov 04 2015 11:47:14  $
+--       SCCS Version     : $Revision:   2.6  $
 --       Based on SCCS Version     : 1.12
 --
 --
@@ -22,7 +22,7 @@ CREATE OR REPLACE PACKAGE BODY invsec AS
 --   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 ------------------------------------------------------------------------------------
 --
-   g_body_sccsid        CONSTANT  varchar2(2000)                    := '"$Revision:   2.5  $"';
+   g_body_sccsid        CONSTANT  varchar2(2000)                    := '"$Revision:   2.6  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 
    g_package_name       CONSTANT  varchar2(30)                      := 'invsec';
@@ -278,17 +278,25 @@ END inv_itg_predicate_read;
 --
 ------------------------------------------------------------------------------------
 --
-FUNCTION chk_inv_type_valid_for_role (p_inv_type IN nm_inv_items.iit_inv_type%TYPE)
-  RETURN varchar2 IS
---
-   CURSOR cs_inv_type_valid_for_role (p_inv_type nm_inv_items.iit_inv_type%TYPE) IS
-   SELECT itr_mode
-    FROM  hig_user_roles
-         ,nm_inv_type_roles
-   WHERE  itr_inv_type = p_inv_type
-    AND   itr_hro_role = hur_role
-    AND   hur_username = Sys_Context('NM3_SECURITY_CTX','USERNAME')
-    ORDER BY itr_mode;
+/* Formatted on 11/3/2015 9:03:41 AM (QP5 v5.256.13226.35538) */
+FUNCTION chk_inv_type_valid_for_role (
+   p_inv_type   IN nm_inv_items.iit_inv_type%TYPE)
+   RETURN VARCHAR2
+IS
+   --
+   CURSOR cs_inv_type_valid_for_role (
+      p_inv_type    nm_inv_items.iit_inv_type%TYPE)
+   IS
+      SELECT itr_mode
+        FROM hig_user_roles, nm_inv_type_roles
+       WHERE     itr_inv_type = p_inv_type
+             AND itr_hro_role = hur_role
+             AND hur_username = SYS_CONTEXT ('NM3_SECURITY_CTX', 'USERNAME')
+      UNION
+      SELECT 'READONLY'
+        FROM nm_nw_ad_types
+       WHERE nad_inv_type = p_inv_type
+      ORDER BY itr_mode;
 --
 -- Assign FALSE to the return value, then if the cursor is %NOTFOUND then
 --  FALSE will be returned
