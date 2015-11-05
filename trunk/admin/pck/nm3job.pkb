@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3job AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3job.pkb-arc   2.4   Jul 04 2013 16:11:40   James.Wadsworth  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3job.pkb-arc   2.5   Nov 05 2015 16:30:34   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3job.pkb  $
---       Date into PVCS   : $Date:   Jul 04 2013 16:11:40  $
---       Date fetched Out : $Modtime:   Jul 04 2013 14:25:14  $
---       PVCS Version     : $Revision:   2.4  $
+--       Date into PVCS   : $Date:   Nov 05 2015 16:30:34  $
+--       Date fetched Out : $Modtime:   Nov 05 2015 16:30:52  $
+--       PVCS Version     : $Revision:   2.5  $
 
 --       Based on SCCS Version     : 1.19
 --
@@ -25,7 +25,7 @@ CREATE OR REPLACE PACKAGE BODY nm3job AS
 --
 -- g_body_sccsid is the SCCS ID for the package body
 
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.4  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.5  $"';
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3job';
 
@@ -2071,7 +2071,19 @@ BEGIN
   THEN
     IF nm3homo.g_homo_touch_flag
     THEN
-      check_job_inv_item_lock(pi_iit_ne_id => pi_nm_ne_id_in);
+      declare
+        l_end_loc_only nm_inv_types.nit_end_loc_only%type;
+      begin
+        select nit_end_loc_only into l_end_loc_only
+        from nm_inv_types_all, nm_inv_items_all
+        where nit_inv_type = iit_inv_type
+        and iit_ne_id = pi_nm_ne_id_in;
+--        
+        if l_end_loc_only = 'N' then      
+          check_job_inv_item_lock(pi_iit_ne_id => pi_nm_ne_id_in);
+        end if;
+--        
+      END;
     END IF;
   END IF;
 
