@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3lock AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3lock.pkb-arc   2.5   Jul 04 2013 16:11:54   James.Wadsworth  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3lock.pkb-arc   2.6   Nov 05 2015 16:46:34   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3lock.pkb  $
---       Date into PVCS   : $Date:   Jul 04 2013 16:11:54  $
---       Date fetched Out : $Modtime:   Jul 04 2013 14:25:14  $
---       PVCS Version     : $Revision:   2.5  $
+--       Date into PVCS   : $Date:   Nov 05 2015 16:46:34  $
+--       Date fetched Out : $Modtime:   Nov 05 2015 16:45:58  $
+--       PVCS Version     : $Revision:   2.6  $
 --       Based on         : 1.16
 --
 --
@@ -22,7 +22,7 @@ CREATE OR REPLACE PACKAGE BODY nm3lock AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.5  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.6  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3lock';
@@ -105,7 +105,7 @@ END lock_members_by_in;
 --
 PROCEDURE lock_element (p_ne_id               IN nm_elements.ne_id%TYPE
                        ,p_lock_ele_for_update IN boolean DEFAULT FALSE
-					   ,p_updrdonly           IN hig_option_values.hov_value%TYPE DEFAULT NULL
+                       ,p_updrdonly           IN hig_option_values.hov_value%TYPE DEFAULT NULL
                        ) IS
 
    l_rowid ROWID;
@@ -145,7 +145,7 @@ BEGIN
 -- 
 --   IF p_lock_ele_for_update THEN
      l_sql := l_sql|| 'FOR UPDATE of ne_id'; --SM 03092006 710020 added 'of ne_id' so only the nm_elements table gets locked
---   END IF;	    
+--   END IF;        
 
   OPEN c1 FOR l_sql USING p_ne_id, To_Number(Sys_Context('NM3CORE','USER_ID')) ; 
    
@@ -155,11 +155,11 @@ BEGIN
     Hig.raise_ner('NET',240);
   ELSIF l_mode = 'READONLY' THEN
 -- GJ 17-JUL-2006     IF NVL(Hig.get_sysopt('UPDRDONLY'),'Y') = 'N' THEN
-       IF p_updrdonly = 'N' THEN  
+--       IF p_updrdonly = 'N' THEN  
        CLOSE c1;
-	   Hig.raise_ner('NET',240);
-    END IF;
-  END IF; 	
+       Hig.raise_ner('NET',240);
+--    END IF;
+  END IF;     
 --
    nm_debug.proc_end(g_package_name,'lock_element');
 --
@@ -176,10 +176,10 @@ BEGIN
    nm_debug.proc_start(g_package_name,'lock_element_and_members');
 --
    -- Set Global for Versioning
-   IF l_lock_flag_bol THEN
+--   IF l_lock_flag_bol THEN
    -- Lock the element record
       lock_element       (p_ne_id,p_lock_ele_for_update);
-   END IF;   
+--   END IF;   
    -- Lock any OF members (i.e. inv locations or route memberships)
    lock_members_by_of (p_ne_id);
    -- Lock any IN members (i.e. if this is a parent)
@@ -249,10 +249,10 @@ BEGIN
       UPDATE NM_INV_ITEMS_ALL
        SET   iit_date_modified = iit_date_modified
       WHERE  ROWID             = l_rowid
-	  RETURNING iit_ne_id INTO l_pk_id;  -- RC added returning clause to cater with security predicates which result in no record being returned
+      RETURNING iit_ne_id INTO l_pk_id;  -- RC added returning clause to cater with security predicates which result in no record being returned
       IF l_pk_id IS NULL THEN
-	    Hig.raise_ner('NET',240);
-	  END IF;
+        Hig.raise_ner('NET',240);
+      END IF;
    END IF;
 --
 --   Nm_Debug.proc_end(p_package_name   => g_package_name
@@ -264,8 +264,8 @@ END lock_inv_item;
 PROCEDURE lock_asset_item ( pi_nit_id          IN nm_inv_types.nit_inv_type%TYPE
                            ,pi_pk_id           IN NUMBER
                            ,pi_lock_for_update IN BOOLEAN DEFAULT FALSE 
-    					   ,pi_updrdonly       IN hig_option_values.hov_value%TYPE DEFAULT NULL) IS
-						   
+                           ,pi_updrdonly       IN hig_option_values.hov_value%TYPE DEFAULT NULL) IS
+                           
   l_nit    nm_inv_types%ROWTYPE;
   l_mode   VARCHAR2(10);
   l_lock_string VARCHAR2(2000);
@@ -302,35 +302,35 @@ BEGIN
   IF l_nit.nit_table_name IS NOT NULL THEN  -- foreign table inventory
   
     OPEN c_inv_role ( pi_nit_id );
-	FETCH c_inv_role INTO l_mode;
-	IF c_inv_role%NOTFOUND THEN
+    FETCH c_inv_role INTO l_mode;
+    IF c_inv_role%NOTFOUND THEN
       CLOSE c_inv_role;
-	  Hig.raise_ner( 'NET',240);
+      Hig.raise_ner( 'NET',240);
     ELSIF l_mode = 'READONLY' THEN
 --      IF NVL(Hig.get_sysopt('UPDRDONLY'),'Y') = 'N' THEN
        IF pi_updrdonly = 'N' THEN 
          CLOSE c_inv_role;
-	     Hig.raise_ner('NET',240);
+         Hig.raise_ner('NET',240);
       END IF;
     ELSE
-	  CLOSE c_inv_role; 
+      CLOSE c_inv_role; 
     END IF;
 
     l_lock_string := 'select '||l_nit.nit_foreign_pk_column||' from '||l_nit.nit_table_name||' where '||l_nit.nit_foreign_pk_column||' = '||
-	                  TO_CHAR( pi_pk_id );
-					  
-	IF pi_lock_for_update THEN
-	
-      l_lock_string := l_lock_string||' for update ';  	 	   	    	
+                      TO_CHAR( pi_pk_id );
+                      
+    IF pi_lock_for_update THEN
+    
+      l_lock_string := l_lock_string||' for update ';                          
 
     END IF;
-	
-    EXECUTE IMMEDIATE l_lock_string; 					  
+    
+    EXECUTE IMMEDIATE l_lock_string;                       
 
   ELSE  -- conventional inventory
   
     Lock_Inv_Item( pi_pk_id, pi_lock_for_update );
-	
+    
   END IF;
 
 END lock_asset_item;
