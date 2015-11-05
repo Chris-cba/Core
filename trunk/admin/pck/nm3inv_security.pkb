@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_security AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_security.pkb-arc   2.7   Jul 04 2013 16:08:48   James.Wadsworth  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3inv_security.pkb-arc   2.8   Nov 05 2015 16:41:42   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3inv_security.pkb  $
---       Date into PVCS   : $Date:   Jul 04 2013 16:08:48  $
---       Date fetched Out : $Modtime:   Jul 04 2013 14:25:14  $
---       Version          : $Revision:   2.7  $
+--       Date into PVCS   : $Date:   Nov 05 2015 16:41:42  $
+--       Date fetched Out : $Modtime:   Nov 05 2015 16:42:06  $
+--       Version          : $Revision:   2.8  $
 --       Based on SCCS version : 1.1
 -------------------------------------------------------------------------
 --
@@ -23,7 +23,7 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_security AS
 --
 --  g_body_sccsid is the SCCS ID for the package body
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '$Revision:   2.7  $';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '$Revision:   2.8  $';
    g_package_name    CONSTANT  varchar2(30)   := 'nm3inv_security';
 --
    l_dummy_package_variable number;
@@ -57,7 +57,8 @@ FUNCTION can_usr_see_all_inv_on_element ( pi_ne_id IN nm_members.nm_ne_id_of%TYP
      AND  (nm_type = 'I' OR p_usegrpsec = 'Y')
      AND  NOT EXISTS (SELECT  1
                         FROM  nm_inv_items
-                       WHERE  iit_ne_id = nm_ne_id_in);
+                       WHERE  iit_ne_id = nm_ne_id_in)
+     and ( nm_type = 'I' and nm_obj_type not in ( select nit_inv_type from nm_inv_types where nit_end_loc_only = 'Y' ));
   --
   CURSOR cur_missing_children(c_ne_id_of  nm_members.nm_ne_id_of%TYPE, p_usegrpsec VARCHAR2)
   IS
