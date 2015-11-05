@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3nwval AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3nwval.pkb-arc   2.12   Feb 12 2015 09:28:52   Chris.Baugh  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3nwval.pkb-arc   2.13   Nov 05 2015 16:21:46   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3nwval.pkb  $
---       Date into PVCS   : $Date:   Feb 12 2015 09:28:52  $
---       Date fetched Out : $Modtime:   Feb 04 2015 16:04:24  $
---       PVCS Version     : $Revision:   2.12  $
+--       Date into PVCS   : $Date:   Nov 05 2015 16:21:46  $
+--       Date fetched Out : $Modtime:   Nov 05 2015 16:20:56  $
+--       PVCS Version     : $Revision:   2.13  $
 --       Based on 1.67
 --
 --
@@ -18,7 +18,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3nwval AS
 --   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 ------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.12  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.13  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 -----------------------------------------------------------------------------
 --
@@ -335,36 +335,36 @@ BEGIN
                append('  l_meaning VARCHAR2(2000);');
                append('  l_id VARCHAR2(2000);');
                append('  ex_value_not_found   EXCEPTION;');
-               append('	 PRAGMA EXCEPTION_INIT(ex_value_not_found,-20699);');
+               append('     PRAGMA EXCEPTION_INIT(ex_value_not_found,-20699);');
 
                append('BEGIN');
                append(' IF '||g_package_name||'.g_dyn_rec_ne.'||cs_rec.ntc_column_name||' IS NOT NULL THEN');
 
 
                IF l_bind_var IS NOT NULL THEN
- 	   		      append('--');
- 	   		      append('-- The query string for this col has a bind variable so cater for it');
- 	   		      append('--');
- 	   		      append('  '||g_package_name||'.g_ntc_query := nm3flx.build_lov_sql_string (p_nt_type                    => '||Nm3flx.string(g_dyn_rec_ne.ne_nt_type));
+                      append('--');
+                      append('-- The query string for this col has a bind variable so cater for it');
+                      append('--');
+                      append('  '||g_package_name||'.g_ntc_query := nm3flx.build_lov_sql_string (p_nt_type                    => '||Nm3flx.string(g_dyn_rec_ne.ne_nt_type));
                   append('                                                                  ,p_column_name                => '||Nm3flx.string(cs_rec.ntc_column_name));
                   append('                                                                  ,p_include_bind_variable      => FALSE');
                   append('                                                                  ,p_replace_bind_variable_with => '||g_package_name||'.g_dyn_rec_ne.'||REPLACE(l_bind_var,':',NULL)||');');
                   append(' ');
-		  	   ELSE
+                 ELSE
                   -- GJ all the CHR(39) bit is to do is to deal with query strings that already have ' in them
-				  -- e.g.
-				  -- SELECT NSC_SUB_CLASS, NSC_SUB_CLASS NSC_MEANING, Null NSC_ID FROM NM_TYPE_SUBCLASS WHERE NSC_NW_TYPE = 'L'
+                  -- e.g.
+                  -- SELECT NSC_SUB_CLASS, NSC_SUB_CLASS NSC_MEANING, Null NSC_ID FROM NM_TYPE_SUBCLASS WHERE NSC_NW_TYPE = 'L'
                   -- needs to be converted to
-				  -- 'SELECT NSC_SUB_CLASS, NSC_SUB_CLASS NSC_MEANING, Null NSC_ID FROM NM_TYPE_SUBCLASS WHERE NSC_NW_TYPE = ''L'''
-				  -- to make the dynamic sql block valid
-			      append('   '||g_package_name||'.g_ntc_query := '||Nm3flx.string(REPLACE(cs_rec.ntc_query,CHR(39),CHR(39)||CHR(39)))||';');
-			   END IF;
+                  -- 'SELECT NSC_SUB_CLASS, NSC_SUB_CLASS NSC_MEANING, Null NSC_ID FROM NM_TYPE_SUBCLASS WHERE NSC_NW_TYPE = ''L'''
+                  -- to make the dynamic sql block valid
+                  append('   '||g_package_name||'.g_ntc_query := '||Nm3flx.string(REPLACE(cs_rec.ntc_query,CHR(39),CHR(39)||CHR(39)))||';');
+               END IF;
 
 
                append(' ');
                append(' ');
                append(' ');
-			   append('    nm3extlov.validate_lov_value(p_statement => '||g_package_name||'.g_ntc_query');
+               append('    nm3extlov.validate_lov_value(p_statement => '||g_package_name||'.g_ntc_query');
                append('                                ,p_value     => '||g_package_name||'.g_dyn_rec_ne.'||cs_rec.ntc_column_name);
                append('                                ,p_meaning   => l_meaning');
                append('                                ,p_id        => l_id');
@@ -445,15 +445,15 @@ BEGIN
             ---------------------------
 
             -- Start Log 36516
-			-- 
+            -- 
 
             if instr(cs_rec.ntc_default,CHR(39),1) = 0 then
                append('      '||g_package_name||'.g_dyn_rec_ne.'||cs_rec.ntc_column_name||' := '||Nm3flx.string(cs_rec.ntc_default)||';');
             else
                append('      '||g_package_name||'.g_dyn_rec_ne.'||cs_rec.ntc_column_name||' := '||cs_rec.ntc_default||';');
-			end if;    
+            end if;    
             --
-			-- End Log 36516
+            -- End Log 36516
 
          END IF;
          append('   END IF;');
@@ -828,7 +828,7 @@ BEGIN
                             ,p_ne_start_date
 --
                             ,p_ne_gty_group_type
-							,p_ne_admin_unit
+                            ,p_ne_admin_unit
                             );
 --
    Nm_Debug.proc_end   (g_package_name,'validate_element_for_update');
@@ -932,12 +932,12 @@ BEGIN
                                         ,p_ne_start_date
 --
                                         ,p_ne_gty_group_type
-										,p_ne_admin_unit										
+                                        ,p_ne_admin_unit                                        
                                         );
 --
       IF p_ne_id IS NULL
        THEN
-	 p_ne_id := Nm3net.get_next_ne_id;
+     p_ne_id := Nm3net.get_next_ne_id;
       END IF;
 --
 
@@ -1122,7 +1122,7 @@ BEGIN
                    );
    END IF;
 --
-   IF p_ne_type != 'D' THEN 	-- KD 06/08/09 721802
+   IF p_ne_type != 'D' THEN     -- KD 06/08/09 721802
    DECLARE
       l_rec_nau   nm_admin_units%ROWTYPE;
       l_rec_nsty  NM_AU_SUB_TYPES%ROWTYPE;
@@ -1152,8 +1152,8 @@ BEGIN
             l_suppl := 'Element should be of Group Type '||l_rec_nsty.nsty_ngt_group_type;
 
             Hig.raise_ner(pi_appl               => Nm3type.c_net
-	                     ,pi_id                 => 386
-				         ,pi_supplementary_info => l_suppl);
+                         ,pi_id                 => 386
+                         ,pi_supplementary_info => l_suppl);
 
           END IF;
        END IF;
@@ -1873,9 +1873,23 @@ BEGIN
 --
        IF c2%NOTFOUND
         THEN
-         -- no data found
-         CLOSE c2;
-         RAISE l_parent_not_found_inv;
+         declare
+           l_end_loc_only nm_inv_types.nit_end_loc_only%type;
+         begin
+           select nit_end_loc_only into l_end_loc_only
+           from nm_inv_types_all
+           where nit_inv_type = nvl(p_old_nm_obj_type ,p_new_nm_obj_type);
+--
+           if l_end_loc_only = 'N' then
+              nm_debug.debug('end-loc = N, fail!');
+              raise l_parent_not_found_inv;
+           end if;                     
+--
+         exception
+             when no_data_found then
+             close c2;           
+             RAISE l_parent_not_found_inv;
+         end;
        ELSE
          CLOSE c2;
          -- parent found, make sure nm_obj_type is same as parent
@@ -2347,7 +2361,7 @@ BEGIN
 --
   IF p_operation = c_split THEN
        Nm3split.check_element_can_be_split(pi_ne_id          => p_ne_id_1
-	                                      ,pi_effective_date => p_effective_date);
+                                          ,pi_effective_date => p_effective_date);
 --     check_future_date( p_effective_date );
 --     check_datum_elements( p_ne_id_1 );
 --     check_if_distance_break( p_ne_id_1 );
@@ -2356,8 +2370,8 @@ BEGIN
 --
   IF p_operation = c_merge THEN
        Nm3merge.check_elements_can_be_merged(pi_ne_id_1        => p_ne_id_1
-	                                        ,pi_ne_id_2        => l_ne_id
-	                                        ,pi_effective_date => p_effective_date);
+                                            ,pi_ne_id_2        => l_ne_id
+                                            ,pi_effective_date => p_effective_date);
 
 --     check_future_date( p_effective_date );
 --     check_sub_class( p_ne_id_1, l_ne_id);
@@ -2409,7 +2423,7 @@ BEGIN
   IF p_operation = c_reclass THEN
 --     nm3user.restricted_user_check;
      Nm3reclass.check_element_can_be_reclassed(pi_ne_id          => p_ne_id_1
-    	                                      ,pi_effective_date => p_effective_date);
+                                              ,pi_effective_date => p_effective_date);
   END IF;
 --
   Nm_Debug.proc_end(g_package_name , 'network_operations_check');
@@ -3308,15 +3322,15 @@ BEGIN
       LOOP
 
         -- GJ 12-MAY-2005
-		-- Added logic to ensure that the ntc_query fits the structure
-		-- required by lov's in forms such as nm0105
-		--
-	    IF g_ntc_val_new_tab(l_i).ntc_query IS NOT NULL THEN
+        -- Added logic to ensure that the ntc_query fits the structure
+        -- required by lov's in forms such as nm0105
+        --
+        IF g_ntc_val_new_tab(l_i).ntc_query IS NOT NULL THEN
            Nm3flx.validate_ntc_query(pi_query           => g_ntc_val_new_tab(l_i).ntc_query
-                                    ,pi_ntc_nt_type	    => g_ntc_val_new_tab(l_i).ntc_nt_type
-									,pi_ntc_column_name => g_ntc_val_new_tab(l_i).ntc_column_name);
+                                    ,pi_ntc_nt_type        => g_ntc_val_new_tab(l_i).ntc_nt_type
+                                    ,pi_ntc_column_name => g_ntc_val_new_tab(l_i).ntc_column_name);
 
-		END IF;
+        END IF;
 
         l_inc_child := col_is_inclusion_child(pi_nt_type => g_ntc_val_new_tab(l_i).ntc_nt_type
                                              ,pi_col     => g_ntc_val_new_tab(l_i).ntc_column_name);
