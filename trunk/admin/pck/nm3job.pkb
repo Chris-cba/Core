@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3job AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3job.pkb-arc   2.5   Nov 05 2015 16:30:34   Rob.Coupe  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3job.pkb-arc   2.6   Nov 06 2015 15:56:10   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3job.pkb  $
---       Date into PVCS   : $Date:   Nov 05 2015 16:30:34  $
---       Date fetched Out : $Modtime:   Nov 05 2015 16:30:52  $
---       PVCS Version     : $Revision:   2.5  $
+--       Date into PVCS   : $Date:   Nov 06 2015 15:56:10  $
+--       Date fetched Out : $Modtime:   Nov 06 2015 15:56:42  $
+--       PVCS Version     : $Revision:   2.6  $
 
 --       Based on SCCS Version     : 1.19
 --
@@ -25,7 +25,7 @@ CREATE OR REPLACE PACKAGE BODY nm3job AS
 --
 -- g_body_sccsid is the SCCS ID for the package body
 
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.5  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.6  $"';
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3job';
 
@@ -2051,6 +2051,7 @@ END check_job_inv_item_lock;
 PROCEDURE check_job_member_lock(pi_nm_type     IN nm_members.nm_type%TYPE
                                ,pi_nm_ne_id_in IN nm_members.nm_ne_id_in%TYPE
                                ,pi_nm_ne_id_of IN nm_members.nm_ne_id_of%TYPE
+                               ,pi_nm_obj_type IN nm_members.nm_obj_type%TYPE
                                ) IS
 
   e_item_locked EXCEPTION;
@@ -2075,9 +2076,8 @@ BEGIN
         l_end_loc_only nm_inv_types.nit_end_loc_only%type;
       begin
         select nit_end_loc_only into l_end_loc_only
-        from nm_inv_types_all, nm_inv_items_all
-        where nit_inv_type = iit_inv_type
-        and iit_ne_id = pi_nm_ne_id_in;
+        from nm_inv_types_all
+        where nit_inv_type = pi_nm_obj_type;
 --        
         if l_end_loc_only = 'N' then      
           check_job_inv_item_lock(pi_iit_ne_id => pi_nm_ne_id_in);
