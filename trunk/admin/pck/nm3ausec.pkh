@@ -31,6 +31,7 @@ CREATE OR REPLACE PACKAGE nm3ausec AS
       ,nm_begin_mp_new   nm_members.nm_begin_mp%TYPE
       ,nm_end_mp_new     nm_members.nm_end_mp%TYPE
       ,nm_type_new       nm_members.nm_type%TYPE
+      ,nm_obj_type       nm_members.nm_obj_type%TYPE
       ,trigger_mode      varchar2(10)
       );
 --
