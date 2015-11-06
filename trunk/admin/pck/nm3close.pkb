@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3close AS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3close.pkb-arc   2.12   Jul 04 2013 15:23:06   James.Wadsworth  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3close.pkb-arc   2.14   Nov 06 2015 10:54:32   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3close.pkb  $
---       Date into PVCS   : $Date:   Jul 04 2013 15:23:06  $
---       Date fetched Out : $Modtime:   Jul 04 2013 14:25:10  $
---       PVCS Version     : $Revision:   2.12  $
+--       Date into PVCS   : $Date:   Nov 06 2015 10:54:32  $
+--       Date fetched Out : $Modtime:   Nov 06 2015 07:53:38  $
+--       PVCS Version     : $Revision:   2.14  $
 --
 --
 --   Author : I Turnbull
@@ -21,7 +21,7 @@ CREATE OR REPLACE PACKAGE BODY nm3close AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.12  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.14  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3close';
@@ -301,6 +301,18 @@ BEGIN
          USING IN  p_ne_id
                   ,p_effective_date;
    END IF;
+   
+   --NSG
+   If Hig.Is_Product_Licensed( Nm3type.c_Nsg ) Then   
+     Execute Immediate 'Begin'                                                        ||Chr(10)||
+                       '  Nsg_Close.Close_Esu ('                                      ||Chr(10)||
+                       '                      p_Ne_Id           => :p_Ne_Id,'         ||Chr(10)||
+                       '                      p_Effective_Date  => :p_Effective_Date' ||Chr(10)||
+                       '                      );'                                     ||Chr(10)||
+                       'End;'
+      Using In  p_Ne_Id,
+                p_Effective_Date;
+   End If;
    
    nm_debug.proc_end(g_package_name , 'close_other_products');
 END close_other_products;
