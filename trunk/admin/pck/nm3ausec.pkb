@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm3ausec AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3ausec.pkb-arc   2.8   Nov 05 2015 16:53:04   Rob.Coupe  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3ausec.pkb-arc   2.9   Nov 06 2015 15:46:52   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3ausec.pkb  $
---       Date into PVCS   : $Date:   Nov 05 2015 16:53:04  $
---       Date fetched Out : $Modtime:   Nov 05 2015 16:53:22  $
---       PVCS Version     : $Revision:   2.8  $
+--       Date into PVCS   : $Date:   Nov 06 2015 15:46:52  $
+--       Date fetched Out : $Modtime:   Nov 06 2015 15:47:30  $
+--       PVCS Version     : $Revision:   2.9  $
 --       Based on
 --
 --   Author : Rob Coupe
@@ -19,7 +19,7 @@ CREATE OR REPLACE PACKAGE BODY nm3ausec AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.8  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.9  $"';
 
 --  g_body_sccsid is the SCCS ID for the package body
 --
@@ -695,6 +695,8 @@ PROCEDURE check_each_nm_row(p_rec IN rec_each_nm) IS
 --
    l_ner_id    nm_errors.ner_id%TYPE;
 --
+   l_end_loc_only nm_inv_types.nit_end_loc_only%type;   
+--
 BEGIN
 --
 --Check the admin unit values and make sure the user has the au mode for this particular access
@@ -731,20 +733,37 @@ BEGIN
          g_au_sec_exc_msg   := 'You may not create data with this admin unit';
       END IF;
       --
-	  --RC - FGAC now on network, allow get_au_mode to return null value where no security is configured - all handled by FGAC. 
-	  --     but FGAC needs to epxose more than is required. need to check that the user has admin privileges on the new admin-unit or on the
-	  --     admin unit of the child.
-      IF ( nm3ausec.get_au_mode( Sys_Context('NM3_SECURITY_CTX','USERNAME'), p_rec.nm_admin_unit_new ) != nm3type.c_normal AND
-           nm3ausec.get_au_mode( Sys_Context('NM3_SECURITY_CTX','USERNAME'), nm3get.get_ne(p_rec.nm_ne_id_of).ne_admin_unit ) != nm3type.c_normal
-         )
-      THEN
-         -- Make Sure that the user has NORMAL access to the AU
-         hig.raise_ner (pi_appl               => nm3type.c_net
-                       ,pi_id                 => l_ner_id
-                       ,pi_supplementary_info => get_unit_code(p_rec.nm_admin_unit_new)
-                       );
+--RAC - should always find a row - else other locking/tests would have failed earlier in the process.Belt and braces though - if
+--the member is visible and the asset type is not, then the user has no role on the asset type and hence cannot perform the change
+
+      BEGIN  
+        if p_rec.nm_type_new = 'I' then
+          select nit_end_loc_only 
+          into l_end_loc_only
+          from nm_inv_types
+          where nit_inv_type = p_rec.nm_obj_type;
+       end if;
+      EXCEPTION
+        when no_data_found then
+                hig.raise_ner (pi_appl               => nm3type.c_net
+                              ,pi_id                 => l_ner_id
+                              ,pi_supplementary_info => get_unit_code(p_rec.nm_admin_unit_new)
+                              );
+      END;
+--   
+      if (p_rec.nm_type_new = 'I' and l_end_loc_only = 'N' ) or p_rec.nm_type_new = 'G' then
+
+        IF ( nm3ausec.get_au_mode( Sys_Context('NM3_SECURITY_CTX','USERNAME'), p_rec.nm_admin_unit_new ) != nm3type.c_normal AND
+             nm3ausec.get_au_mode( Sys_Context('NM3_SECURITY_CTX','USERNAME'), nm3get.get_ne(p_rec.nm_ne_id_of).ne_admin_unit ) != nm3type.c_normal           
+           )
+        THEN
+                hig.raise_ner (pi_appl               => nm3type.c_net
+                              ,pi_id                 => l_ner_id
+                              ,pi_supplementary_info => get_unit_code(p_rec.nm_admin_unit_new)
+                              );
 --         RAISE g_au_sec_exception;
-      END IF;
+        END IF;
+      end if;
       -- Reset the exception variables
       l_ner_id           := NULL;
       g_au_sec_exc_code  := NULL;
