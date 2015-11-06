@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm3merge IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3merge.pkb-arc   2.16   Jul 04 2013 16:14:40   James.Wadsworth  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3merge.pkb-arc   2.17   Nov 06 2015 10:54:32   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3merge.pkb  $
---       Date into PVCS   : $Date:   Jul 04 2013 16:14:40  $
---       Date fetched Out : $Modtime:   Jul 04 2013 14:25:16  $
---       PVCS Version     : $Revision:   2.16  $
+--       Date into PVCS   : $Date:   Nov 06 2015 10:54:32  $
+--       Date fetched Out : $Modtime:   Nov 06 2015 10:19:44  $
+--       PVCS Version     : $Revision:   2.17  $
 --
 --   Author : ITurnbull
 --
@@ -16,7 +16,7 @@ CREATE OR REPLACE PACKAGE BODY nm3merge IS
 --   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.16  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.17  $"';
 --  g_body_sccsid is the SCCS ID for the package body
    g_package_name    CONSTANT  varchar2(30)   := 'nm3merge';
 --
@@ -809,6 +809,21 @@ BEGIN
                 ,p_ne_id_1
                 ,p_ne_id_2;
    END IF;
+   
+   --NSG
+   If Hig.Is_Product_Licensed( Nm3type.c_Nsg )  Then   
+            
+     Execute Immediate 'Begin'                                                    ||  Chr(10) ||
+                       '  Nsg_Merge.Merge_Esu ('                                  ||  Chr(10) || 
+                       '                      p_Old_Ne_Id_1   =>  :p_Ne_Id_1,'    ||  Chr(10) ||
+                       '                      p_Old_Ne_Id_2   =>  :p_Ne_Id_2,'    ||  Chr(10) ||
+                       '                      p_New_Ne_Id     =>  :p_Ne_Id_New'   ||  Chr(10) ||
+                       '                      );'                                 ||  Chr(10) ||
+                       'End;'
+     Using In p_Ne_Id_1,
+              p_Ne_Id_2,
+              p_Ne_Id_New;
+   End If;
 --
    nm_debug.proc_end(g_package_name,'merge_other_products');
 --

@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3split IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3split.pkb-arc   2.16   Feb 05 2015 10:17:56   Chris.Baugh  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3split.pkb-arc   2.17   Nov 06 2015 10:54:32   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3split.pkb  $
---       Date into PVCS   : $Date:   Feb 05 2015 10:17:56  $
---       Date fetched Out : $Modtime:   Feb 02 2015 14:13:56  $
---       PVCS Version     : $Revision:   2.16  $
+--       Date into PVCS   : $Date:   Nov 06 2015 10:54:32  $
+--       Date fetched Out : $Modtime:   Nov 04 2015 13:58:18  $
+--       PVCS Version     : $Revision:   2.17  $
 --
 --
 --   Author : ITurnbull
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3split IS
 -- 03.06.08 PT added p_no_purpose parameter throughout where node is created.
 
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.16  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.17  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(2000) := 'nm3split';
@@ -937,9 +937,25 @@ BEGIN
                ,p_ne_id_2
                ,p_split_measure;
   END IF;
---
-   Nm_Debug.proc_end(g_package_name,'split_other_products');
---
+  If Hig.Is_Product_Licensed(Nm3type.c_Nsg) Then
+    l_Block:=                 'Begin'
+              ||  CHR(10) ||  '    Nsg_Split.Split_Esu  ('
+              ||  CHR(10) ||  '                         p_Old_Ne_Id       =>  :p_Ne_Id,'
+              ||  CHR(10) ||  '                         p_New_Ne_Id_1     =>  :p_Ne_Id_1,'
+              ||  CHR(10) ||  '                         p_New_Ne_Id_2     =>  :p_Ne_Id_2,'
+              ||  CHR(10) ||  '                         p_Effective_Date  =>  :p_Effective_Date'
+              ||  CHR(10) ||  '                         );'
+              ||  CHR(10) ||  'End;';
+      Execute Immediate l_Block
+      Using In  p_Ne_Id,
+                p_Ne_Id_1,
+                p_Ne_Id_2,
+                p_Effective_Date;                 
+  End If;
+
+  --
+  Nm_Debug.proc_end(g_package_name,'split_other_products');
+  --
 END split_other_products;
 --
 ------------------------------------------------------------------------------------------------

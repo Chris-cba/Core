@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm3replace IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3replace.pkb-arc   2.6   Jul 04 2013 16:21:10   James.Wadsworth  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3replace.pkb-arc   2.7   Nov 06 2015 10:54:32   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3replace.pkb  $
---       Date into PVCS   : $Date:   Jul 04 2013 16:21:10  $
---       Date fetched Out : $Modtime:   Jul 04 2013 14:25:18  $
---       PVCS Version     : $Revision:   2.6  $
+--       Date into PVCS   : $Date:   Nov 06 2015 10:54:32  $
+--       Date fetched Out : $Modtime:   Nov 05 2015 16:01:42  $
+--       PVCS Version     : $Revision:   2.7  $
 --
 --
 --   Author : ITurnbull
@@ -17,7 +17,7 @@ CREATE OR REPLACE PACKAGE BODY nm3replace IS
 --   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.6  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.7  $"';
 --  g_body_sccsid is the SCCS ID for the package body
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3replace';
 ------------------------------------------------------------------------------------------------
@@ -472,7 +472,20 @@ END get_body_version;
                      ,p_ne_id_new;
 
       END IF;
-	  
+      
+     --NSG
+     If Hig.Is_Product_Licensed(Nm3type.c_Nsg) Then
+               
+       Execute Immediate  'Begin'                                                     || Chr(10) ||
+                          '  Nsg_Replace.Replace_Esu  ('                              || Chr(10) ||
+                          '                           p_Old_Ne_Id    => :p_Ne_Id'     || Chr(10) ||
+                          '                           p_New_Ne_Id    => :p_Ne_Id_New' || Chr(10) ||
+                          '                           );'                             || Chr(10) ||
+                          'End;'
+        Using In p_Ne_Id,
+                 p_Ne_Id_New;
+
+     End If;    
    END replace_other_products;
 --
 ------------------------------------------------------------------------------------------------
