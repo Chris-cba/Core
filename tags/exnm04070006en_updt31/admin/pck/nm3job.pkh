@@ -1,0 +1,503 @@
+CREATE OR REPLACE PACKAGE nm3job AS
+--<PACKAGE>
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3job.pkh-arc   2.4   Nov 06 2015 15:52:28   Rob.Coupe  $
+--       Module Name      : $Workfile:   nm3job.pkh  $
+--       Date into PVCS   : $Date:   Nov 06 2015 15:52:28  $
+--       Date fetched Out : $Modtime:   Nov 06 2015 15:53:28  $
+--       Version          : $Revision:   2.4  $
+--       Based on SCCS version : 1.12
+-------------------------------------------------------------------------
+--   Author : Jonathan Mills
+--
+--   NM3 Job Management package
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+--  g_sccsid is the SCCS ID for the package
+   g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.4  $';
+--
+   TYPE tab_rec_njv IS TABLE OF nm_job_operation_data_values%ROWTYPE INDEX BY binary_integer;
+   TYPE tab_rec_njo IS TABLE OF nm_job_operations%ROWTYPE            INDEX BY binary_integer;
+   TYPE tab_rec_nod IS TABLE OF nm_operation_data%ROWTYPE            INDEX BY binary_integer;
+--
+   c_in_progress CONSTANT hig_codes.hco_code%TYPE := 'IN_PROGRESS';
+   c_complete    CONSTANT hig_codes.hco_code%TYPE := 'COMPLETE';
+   c_error       CONSTANT hig_codes.hco_code%TYPE := 'ERROR';
+   c_not_started CONSTANT hig_codes.hco_code%TYPE := 'NOT_STARTED';
+--
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_njo">
+--
+--
+FUNCTION get_njo (pi_njo_njc_job_id IN nm_job_operations.njo_njc_job_id%TYPE
+                 ,pi_njo_id         IN nm_job_operations.njo_id%TYPE
+                 ) RETURN nm_job_operations%ROWTYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_njc">
+--
+--
+FUNCTION get_njc (pi_njc_job_id nm_job_control.njc_job_id%TYPE
+                 ) RETURN nm_job_control%ROWTYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="lock_njc">
+--
+--
+FUNCTION lock_njc (pi_njc_job_id nm_job_control.njc_job_id%TYPE
+                  ) RETURN rowid;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="lock_njo">
+--
+--
+FUNCTION lock_njo (pi_njo_njc_job_id IN nm_job_operations.njo_njc_job_id%TYPE
+                  ,pi_njo_id         IN nm_job_operations.njo_id%TYPE
+                  ) RETURN rowid;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_tab_njv">
+--
+--
+FUNCTION get_tab_njv (pi_njv_njc_job_id IN nm_job_operations.njo_njc_job_id%TYPE
+                     ,pi_njv_njo_id     IN nm_job_operations.njo_id%TYPE
+                     ) RETURN tab_rec_njv;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_tab_nod">
+--
+--
+FUNCTION get_tab_nod (pi_nod_nmo_operation IN nm_operation_data.nod_nmo_operation%TYPE
+                     ) RETURN tab_rec_nod;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="validate_njo_njv">
+--
+--
+PROCEDURE validate_njo_njv (pi_operation   varchar2
+                           ,pi_rec_njo     nm_job_operations%ROWTYPE
+                           ,pi_tab_rec_njv tab_rec_njv
+                           );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nmo_by_proc_name">
+--
+--
+FUNCTION get_nmo_by_proc_name (p_nmo_proc_name nm_operations.nmo_proc_name%TYPE
+                              ) RETURN nm_operations%ROWTYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="execute_njc">
+--
+--
+PROCEDURE execute_njc (pi_njc_job_id nm_job_control.njc_job_id%TYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="execute_njo">
+--
+--
+PROCEDURE execute_njo (pi_njo_njc_job_id nm_job_operations.njo_njc_job_id%TYPE
+                      ,pi_njo_id         nm_job_operations.njo_id%TYPE
+                      );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nmo">
+--
+--
+FUNCTION get_nmo (pi_nmo_operation nm_operations.nmo_operation%TYPE
+                 ) RETURN nm_operations%ROWTYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_tab_njv">
+--
+--
+PROCEDURE debug_tab_njv (pi_tab_rec_njv tab_rec_njv
+                        ,pi_level       pls_integer DEFAULT nm_debug.c_default_level
+                        );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="split_inv_for_njc">
+--
+--
+PROCEDURE split_inv_for_njc (pi_njc_job_id nm_job_control.njc_job_id%TYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_njt">
+--
+--
+FUNCTION get_njt (pi_njt_type nm_job_types.njt_type%TYPE) RETURN nm_job_types%ROWTYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_njv">
+--
+FUNCTION get_njv (pi_njv_njc_job_id    nm_job_operation_data_values.njv_njc_job_id%TYPE
+                 ,pi_njv_njo_id        nm_job_operation_data_values.njv_njo_id%TYPE
+                 ,pi_njv_nod_data_item nm_job_operation_data_values.njv_nod_data_item%TYPE
+                 ) RETURN nm_job_operation_data_values%ROWTYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="update_njv_value">
+--
+PROCEDURE update_njv_value(pi_njv_njc_job_id    IN nm_job_operation_data_values.njv_njc_job_id%TYPE
+                          ,pi_njv_njo_id        IN nm_job_operation_data_values.njv_njo_id%TYPE
+                          ,pi_njv_nod_data_item IN nm_job_operation_data_values.njv_nod_data_item%TYPE
+                          ,pi_value             IN nm_job_operation_data_values.njv_value%TYPE
+                          );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="create_njvs_for_job_operation">
+--
+PROCEDURE create_njvs_for_job_operation(pi_job_id IN nm_job_operations.njo_njc_job_id%TYPE
+                                       ,pi_njo_id IN nm_job_operations.njo_id%TYPE
+                                       );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="update_njc_status">
+--
+PROCEDURE update_njc_status (pi_njc_job_id IN nm_job_control.njc_job_id%TYPE
+                            ,pi_njc_status IN nm_job_control.njc_status%TYPE
+                            );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="set_njc_status_in_progress">
+--
+PROCEDURE set_njc_status_in_progress (pi_njc_job_id IN nm_job_control.njc_job_id%TYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="set_njc_status_complete">
+--
+PROCEDURE set_njc_status_complete    (pi_njc_job_id IN nm_job_control.njc_job_id%TYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="set_njc_status_error">
+--
+PROCEDURE set_njc_status_error       (pi_njc_job_id IN nm_job_control.njc_job_id%TYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="set_njc_status_not_started">
+--
+PROCEDURE set_njc_status_not_started (pi_njc_job_id IN nm_job_control.njc_job_id%TYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="update_njo_status">
+--
+PROCEDURE update_njo_status (pi_njo_njc_job_id IN nm_job_operations.njo_njc_job_id%TYPE
+                            ,pi_njo_id         IN nm_job_operations.njo_id%TYPE
+                            ,pi_njo_status     IN nm_job_operations.njo_status%TYPE
+                            );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="set_njo_status_in_progress">
+--
+PROCEDURE set_njo_status_in_progress
+                            (pi_njo_njc_job_id IN nm_job_operations.njo_njc_job_id%TYPE
+                            ,pi_njo_id         IN nm_job_operations.njo_id%TYPE
+                            );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="set_njo_status_complete">
+--
+PROCEDURE set_njo_status_complete
+                            (pi_njo_njc_job_id IN nm_job_operations.njo_njc_job_id%TYPE
+                            ,pi_njo_id         IN nm_job_operations.njo_id%TYPE
+                            );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="set_njo_status_error">
+--
+PROCEDURE set_njo_status_error
+                            (pi_njo_njc_job_id IN nm_job_operations.njo_njc_job_id%TYPE
+                            ,pi_njo_id         IN nm_job_operations.njo_id%TYPE
+                            );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="set_njo_status_not_started">
+--
+PROCEDURE set_njo_status_not_started
+                            (pi_njo_njc_job_id IN nm_job_operations.njo_njc_job_id%TYPE
+                            ,pi_njo_id         IN nm_job_operations.njo_id%TYPE
+                            );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_initial_status">
+--
+FUNCTION get_initial_status RETURN nm_job_control.njc_status%TYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_next_njc_job_id">
+--
+FUNCTION get_next_njc_job_id RETURN nm_job_control.njc_job_id%TYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_next_njo_id">
+--
+FUNCTION get_next_njo_id RETURN nm_job_operations.njo_id%TYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="execute_next_njo">
+--
+PROCEDURE execute_next_njo(pi_njc_job_id IN nm_job_operations.njo_njc_job_id%TYPE
+                          );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="execute_remaining_njos">
+--
+PROCEDURE execute_remaining_njos(pi_njc_job_id IN nm_job_operations.njo_njc_job_id%TYPE
+                                );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_c_in_progress">
+-- Returns the value of c_in_progress
+--
+FUNCTION get_c_in_progress RETURN hig_codes.hco_code%TYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_c_complete">
+-- Returns the value of c_complete
+--
+FUNCTION get_c_complete RETURN hig_codes.hco_code%TYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_c_error">
+-- Returns the value of c_error
+--
+FUNCTION get_c_error RETURN hig_codes.hco_code%TYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_c_not_started">
+-- Returns the value of c_not_started
+--
+FUNCTION get_c_not_started RETURN hig_codes.hco_code%TYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="validate_njo_mp_against_njc">
+--  This procedure checks to make sure that the passed begin and end MP are valid for that job
+--
+PROCEDURE validate_njo_mp_against_njc (pi_njo_begin_mp   nm_job_operations.njo_begin_mp%TYPE
+                                      ,pi_njo_end_mp     nm_job_operations.njo_end_mp%TYPE
+                                      ,pi_njo_njc_job_id nm_job_operations.njo_njc_job_id%TYPE
+                                      );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="validate_njc_mp_against_njo">
+--  This procedure checks to make sure that the passed begin and end MP
+---  does not render any of the job operations invalid
+--
+PROCEDURE validate_njc_mp_against_njo (pi_rec_njc nm_job_control%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_max_seq_for_njc">
+--
+FUNCTION get_max_seq_for_njc(pi_njc_job_id IN nm_job_control.njc_job_id%TYPE
+                             ) RETURN nm_job_operations.njo_seq%TYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_default_njc_unique">
+--
+FUNCTION get_default_njc_unique(pi_njc_job_id IN nm_job_control.njc_job_id%TYPE
+                               ,pi_njt_type   IN nm_job_types.njt_type%TYPE
+                               ,pi_username   IN user_users.username%TYPE DEFAULT Sys_Context('NM3_SECURITY_CTX','USERNAME')
+                                ) RETURN nm_job_control.njc_unique%TYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="build_and_run_njc">
+-- These procedures will build and run a NM_JOB_CONTROL record
+--
+PROCEDURE build_and_run_njc (pi_njc_unique         IN     nm_job_control.njc_unique%TYPE         DEFAULT NULL
+                            ,pi_njc_njt_type       IN     nm_job_control.njc_njt_type%TYPE
+                            ,pi_njc_job_descr      IN     nm_job_control.njc_job_descr%TYPE      DEFAULT NULL
+                            ,pi_njc_route_ne_id    IN     nm_job_control.njc_route_ne_id%TYPE
+                            ,pi_njc_route_begin_mp IN     nm_job_control.njc_route_begin_mp%TYPE
+                            ,pi_njc_route_end_mp   IN     nm_job_control.njc_route_end_mp%TYPE
+                            ,pi_njc_effective_date IN     nm_job_control.njc_effective_date%TYPE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
+                            ,pi_tab_rec_njo        IN     tab_rec_njo
+                            ,pi_tab_rec_njv        IN     tab_rec_njv
+                            ,po_njc_job_id            OUT nm_job_control.njc_job_id%TYPE
+                            );
+--
+PROCEDURE build_and_run_njc (pi_njc_unique         IN     nm_job_control.njc_unique%TYPE         DEFAULT NULL
+                            ,pi_njc_njt_type       IN     nm_job_control.njc_njt_type%TYPE
+                            ,pi_njc_job_descr      IN     nm_job_control.njc_job_descr%TYPE      DEFAULT NULL
+                            ,pi_njc_route_ne_id    IN     nm_job_control.njc_route_ne_id%TYPE
+                            ,pi_njc_route_begin_mp IN     nm_job_control.njc_route_begin_mp%TYPE
+                            ,pi_njc_route_end_mp   IN     nm_job_control.njc_route_end_mp%TYPE
+                            ,pi_njc_effective_date IN     nm_job_control.njc_effective_date%TYPE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
+                            ,pi_tab_rec_njo        IN     tab_rec_njo
+                            ,pi_tab_rec_njv        IN     tab_rec_njv
+                            );
+--
+FUNCTION  build_and_run_njc (pi_njc_unique         IN     nm_job_control.njc_unique%TYPE         DEFAULT NULL
+                            ,pi_njc_njt_type       IN     nm_job_control.njc_njt_type%TYPE
+                            ,pi_njc_job_descr      IN     nm_job_control.njc_job_descr%TYPE      DEFAULT NULL
+                            ,pi_njc_route_ne_id    IN     nm_job_control.njc_route_ne_id%TYPE
+                            ,pi_njc_route_begin_mp IN     nm_job_control.njc_route_begin_mp%TYPE
+                            ,pi_njc_route_end_mp   IN     nm_job_control.njc_route_end_mp%TYPE
+                            ,pi_njc_effective_date IN     nm_job_control.njc_effective_date%TYPE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
+                            ,pi_tab_rec_njo        IN     tab_rec_njo
+                            ,pi_tab_rec_njv        IN     tab_rec_njv
+                            ) RETURN nm_job_control.njc_job_id%TYPE;
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_njc">
+-- Inserts a row into NM_JOB_CONTROL
+--
+PROCEDURE ins_njc (p_rec_njc IN OUT nm_job_control%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_njo">
+-- Inserts a row into NM_JOB_OPERATIONS
+--
+PROCEDURE ins_njo (p_rec_njo IN OUT nm_job_operations%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="validate_all_njo">
+PROCEDURE validate_all_njo (pi_njc_job_id nm_job_control.njc_job_id%TYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="validate_njo">
+PROCEDURE validate_njo (pi_njo_njc_job_id nm_job_operations.njo_njc_job_id%TYPE
+                       ,pi_njo_id         nm_job_operations.njo_id%TYPE
+                       );
+--</PROC>
+--
+PROCEDURE check_job_element_lock(pi_ne_id IN nm_elements.ne_id%TYPE
+                                );
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="check_job_member_lock">
+--
+--  Checks to see if member is locked by any jobs that are in progress.
+--
+PROCEDURE check_job_member_lock(pi_nm_type     IN nm_members.nm_type%TYPE
+                               ,pi_nm_ne_id_in IN nm_members.nm_ne_id_in%TYPE
+                               ,pi_nm_ne_id_of IN nm_members.nm_ne_id_of%TYPE
+                               ,pi_nm_obj_type IN nm_members.nm_obj_type%TYPE
+                               );
+--</PROC>
+--
+PROCEDURE check_job_inv_item_lock(pi_iit_ne_id IN nm_inv_items.iit_ne_id%TYPE
+                                 ,pi_inv_type  IN nm_inv_types.nit_inv_type%TYPE DEFAULT NULL
+                                 );
+-----------------------------------------------------------------------------
+--
+--<PRAGMA>
+   PRAGMA RESTRICT_REFERENCES (get_version, rnds, wnps, wnds);
+   PRAGMA RESTRICT_REFERENCES (get_body_version, rnds, wnps, wnds);
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+END nm3job;
+/
