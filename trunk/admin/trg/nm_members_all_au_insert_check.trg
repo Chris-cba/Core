@@ -4,11 +4,11 @@ CREATE OR REPLACE TRIGGER NM_MEMBERS_ALL_AU_INSERT_CHECK
 DECLARE
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm_members_all_au_insert_check.trg-arc   2.2   Jul 04 2013 09:53:30   James.Wadsworth  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/trg/nm_members_all_au_insert_check.trg-arc   2.3   Nov 06 2015 15:22:44   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm_members_all_au_insert_check.trg  $
---       Date into SCCS   : $Date:   Jul 04 2013 09:53:30  $
---       Date fetched Out : $Modtime:   Jul 04 2013 09:35:32  $
---       SCCS Version     : $Revision:   2.2  $
+--       Date into SCCS   : $Date:   Nov 06 2015 15:22:44  $
+--       Date fetched Out : $Modtime:   Nov 06 2015 15:23:36  $
+--       SCCS Version     : $Revision:   2.3  $
 --       Based on 
 --
 --   TRIGGER NM_MEMBERS_ALL_AU_INSERT_CHECK
@@ -36,6 +36,7 @@ BEGIN
      l_rec_each_nm.nm_begin_mp_new   := :NEW.nm_begin_mp;
      l_rec_each_nm.nm_end_mp_new     := :NEW.nm_end_mp;
      l_rec_each_nm.nm_type_new       := :NEW.nm_type;
+     l_rec_each_nm.nm_obj_type       := :NEW.nm_obj_type;	 
   --
      IF inserting
       THEN
