@@ -25,7 +25,8 @@ DECLARE
 BEGIN
   nm3job.check_job_member_lock(pi_nm_type     => :NEW.nm_type
                               ,pi_nm_ne_id_in => :NEW.nm_ne_id_in
-                              ,pi_nm_ne_id_of => :NEW.nm_ne_id_of);
+                              ,pi_nm_ne_id_of => :NEW.nm_ne_id_of
+                              ,pi_nm_obj_type => :NEW.nm_obj_type);
                        
 END nm_members_all_jobs_b_ins_upd;
 / 
