@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE nm3job AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3job.pkh-arc   2.3   Jul 04 2013 16:11:40   James.Wadsworth  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3job.pkh-arc   2.4   Nov 06 2015 15:52:28   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3job.pkh  $
---       Date into PVCS   : $Date:   Jul 04 2013 16:11:40  $
---       Date fetched Out : $Modtime:   Jul 04 2013 14:25:14  $
---       Version          : $Revision:   2.3  $
+--       Date into PVCS   : $Date:   Nov 06 2015 15:52:28  $
+--       Date fetched Out : $Modtime:   Nov 06 2015 15:53:28  $
+--       Version          : $Revision:   2.4  $
 --       Based on SCCS version : 1.12
 -------------------------------------------------------------------------
 --   Author : Jonathan Mills
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE nm3job AS
 --</PACKAGE>
 --<GLOBVAR>
 --  g_sccsid is the SCCS ID for the package
-   g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.3  $';
+   g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.4  $';
 --
    TYPE tab_rec_njv IS TABLE OF nm_job_operation_data_values%ROWTYPE INDEX BY binary_integer;
    TYPE tab_rec_njo IS TABLE OF nm_job_operations%ROWTYPE            INDEX BY binary_integer;
@@ -483,6 +483,7 @@ PROCEDURE check_job_element_lock(pi_ne_id IN nm_elements.ne_id%TYPE
 PROCEDURE check_job_member_lock(pi_nm_type     IN nm_members.nm_type%TYPE
                                ,pi_nm_ne_id_in IN nm_members.nm_ne_id_in%TYPE
                                ,pi_nm_ne_id_of IN nm_members.nm_ne_id_of%TYPE
+                               ,pi_nm_obj_type IN nm_members.nm_obj_type%TYPE
                                );
 --</PROC>
 --
