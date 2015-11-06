@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY nm3invval IS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3invval.pkb-arc   2.19   Jul 03 2015 14:45:28   Rob.Coupe  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3invval.pkb-arc   2.20   Nov 06 2015 15:19:08   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3invval.pkb  $
---       Date into PVCS   : $Date:   Jul 03 2015 14:45:28  $
---       Date fetched Out : $Modtime:   Jul 03 2015 14:43:12  $
---       Version          : $Revision:   2.19  $
+--       Date into PVCS   : $Date:   Nov 06 2015 15:19:08  $
+--       Date fetched Out : $Modtime:   Nov 06 2015 15:18:54  $
+--       Version          : $Revision:   2.20  $
 --       Based on SCCS version : 1.30
 -------------------------------------------------------------------------
 --
@@ -19,7 +19,7 @@ CREATE OR REPLACE PACKAGE BODY nm3invval IS
 --   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.19  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.20  $"';
 --  g_body_sccsid is the SCCS ID for the package body
    g_package_name    CONSTANT  varchar2(30)   := 'nm3invval';
 --
@@ -225,7 +225,9 @@ BEGIN
    l_rec_nii.is_parent := cs_is_parent%FOUND;
    CLOSE cs_is_parent;
 --
-   OPEN  cs_is_child (pi_rec_nii.iit_inv_type);
+   if NOT cs_is_child%isopen then
+     OPEN  cs_is_child (pi_rec_nii.iit_inv_type);
+   end if;
    FETCH cs_is_child INTO l_rec_nii.child_inv_type, l_rec_nii.child_mandatory, l_rec_nii.child_relation;
    l_rec_nii.is_child := cs_is_child%FOUND;
    CLOSE cs_is_child;
