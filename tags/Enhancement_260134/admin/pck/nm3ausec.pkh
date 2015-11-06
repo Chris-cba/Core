@@ -1,0 +1,189 @@
+CREATE OR REPLACE PACKAGE nm3ausec AS
+--<PACKAGE>
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)nm3ausec.pkh	1.10 04/11/06
+--       Module Name      : nm3ausec.pkh
+--       Date into SCCS   : 06/04/11 13:18:32
+--       Date fetched Out : 07/06/13 14:11:08
+--       SCCS Version     : 1.10
+--
+--
+--   Author : Rob Coupe
+--
+--   NM3 Admin Unit Security package
+--
+------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+  g_sccsid      CONSTANT  varchar2(2000) := '"@(#)nm3ausec.pkh	1.10 04/11/06"';
+--  g_sccsid is the SCCS ID for the package
+--
+   TYPE rec_each_nm IS RECORD
+      (nm_ne_id_in       nm_members.nm_ne_id_in%TYPE
+      ,nm_ne_id_of       nm_members.nm_ne_id_of%TYPE
+      ,nm_admin_unit_old nm_members.nm_admin_unit%TYPE
+      ,nm_begin_mp_old   nm_members.nm_begin_mp%TYPE
+      ,nm_end_mp_old     nm_members.nm_end_mp%TYPE
+      ,nm_admin_unit_new nm_members.nm_admin_unit%TYPE
+      ,nm_begin_mp_new   nm_members.nm_begin_mp%TYPE
+      ,nm_end_mp_new     nm_members.nm_end_mp%TYPE
+      ,nm_type_new       nm_members.nm_type%TYPE
+      ,nm_obj_type       nm_members.nm_obj_type%TYPE
+      ,trigger_mode      varchar2(10)
+      );
+--
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="clear_nm_au_security_temp">
+PROCEDURE clear_nm_au_security_temp;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nast">
+PROCEDURE ins_nast (p_rec_nast nm_au_security_temp%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="check_au">
+FUNCTION  check_au (p_id IN number
+                   ,p_au IN number
+                   ) RETURN number;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_unit_code">
+FUNCTION get_unit_code (p_au IN number) RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="check_each_au">
+PROCEDURE check_each_au;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_au_mode">
+FUNCTION get_au_mode (p_user IN varchar2
+                     ,p_au   IN nm_admin_units.nau_admin_unit%TYPE
+                     ) RETURN varchar2;
+-- PRAGMA RESTRICT_REFERENCES (get_au_mode, wnps, wnds); -- causing compilation issues 10-apr-2006
+FUNCTION get_au_mode(pi_user_id IN hig_users.hus_user_id%TYPE
+                    ,pi_au      IN nm_admin_units.nau_admin_unit%TYPE
+                    ) RETURN nm_user_aus.nua_mode%TYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="do_locations_exist">
+FUNCTION do_locations_exist (p_ne_id IN number) RETURN boolean;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_au_type">
+FUNCTION get_au_type ( p_au IN number ) RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_inv_au_type">
+FUNCTION get_inv_au_type ( p_inv_type IN nm_inv_types.nit_inv_type%TYPE ) RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_au_sec_temp">
+PROCEDURE debug_au_sec_temp;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_status">
+FUNCTION get_status RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="set_status">
+PROCEDURE set_status(p_status IN varchar2);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="check_each_nm_row">
+PROCEDURE check_each_nm_row(p_rec IN rec_each_nm);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_highest_au_of_au_type">
+-- This function returns the admin unit which the passed user has the specified
+--  access mode to. If the user has no access of that mode to ANY AU of that type
+--  then an exception will be raised
+--
+FUNCTION get_highest_au_of_au_type (p_au_type nm_admin_units.nau_admin_type%TYPE DEFAULT NULL
+                                   ,p_user    varchar2                           DEFAULT Sys_Context('NM3_SECURITY_CTX','USERNAME')
+                                   ,p_mode    varchar2                           DEFAULT nm3type.c_normal
+                                   ) RETURN nm_admin_units.nau_admin_unit%TYPE;
+--
+-- Exceptions raised are
+-- -20918  No admin unit found for this user of the correct Admin Type
+--
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_nau_unit_code">
+-- This function returns the nau_unit_code for the specified nau_admin_unit.
+--
+-- This is a duplicate of HIG.GET_HAU_UNIT_CODE, but that could not be used in view
+--  definitions as it caused bizarre PL/SQL internal errors
+--
+FUNCTION get_nau_unit_code (p_nau_admin_unit IN nm_admin_units.nau_admin_unit%TYPE
+                           ) RETURN nm_admin_units.nau_unit_code%TYPE;
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PRAGMA>
+   PRAGMA RESTRICT_REFERENCES (get_version, rnds, wnps, wnds); -- causing compilation issues 10-apr-2006
+   PRAGMA RESTRICT_REFERENCES (get_body_version, rnds, wnps, wnds); -- causing compilation issues 10-apr-2006
+   PRAGMA RESTRICT_REFERENCES (do_locations_exist, wnps, wnds); -- causing compilation issues 10-apr-2006
+   PRAGMA RESTRICT_REFERENCES (get_au_type, wnps, wnds); -- causing compilation issues 10-apr-2006
+   PRAGMA RESTRICT_REFERENCES (get_inv_au_type, wnps, wnds); -- causing compilation issues 10-apr-2006
+   PRAGMA RESTRICT_REFERENCES (get_au_mode, wnps, wnds); -- causing compilation issues 10-apr-2006
+   PRAGMA RESTRICT_REFERENCES (check_au, wnps, wnds); -- causing compilation issues 10-apr-2006
+   PRAGMA RESTRICT_REFERENCES (get_unit_code, wnps, wnds); -- causing compilation issues 10-apr-2006
+   PRAGMA RESTRICT_REFERENCES (get_status, wnps, wnds); -- causing compilation issues 10-apr-2006
+   PRAGMA RESTRICT_REFERENCES (set_status, wnds); -- causing compilation issues 10-apr-2006
+   PRAGMA RESTRICT_REFERENCES (get_nau_unit_code, wnds, wnps); -- causing compilation issues 10-apr-2006
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+END nm3ausec;
+/
