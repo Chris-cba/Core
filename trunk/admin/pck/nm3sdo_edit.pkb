@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3sdo_Edit AS
 --
 --   SCCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_edit.pkb-arc   2.20   Jul 04 2013 16:22:20   James.Wadsworth  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3sdo_edit.pkb-arc   2.21   Nov 09 2015 20:48:02   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3sdo_edit.pkb  $
---       Date into SCCS   : $Date:   Jul 04 2013 16:22:20  $
---       Date fetched Out : $Modtime:   Jul 04 2013 15:51:48  $
---       SCCS Version     : $Revision:   2.20  $
+--       Date into SCCS   : $Date:   Nov 09 2015 20:48:02  $
+--       Date fetched Out : $Modtime:   Nov 09 2015 20:43:10  $
+--       SCCS Version     : $Revision:   2.21  $
 --
 --
 --  Author :  R Coupe
@@ -23,7 +23,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3sdo_Edit AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid   CONSTANT  VARCHAR2(2000)  :=  '$Revision:   2.20  $';
+  g_body_sccsid   CONSTANT  VARCHAR2(2000)  :=  '$Revision:   2.21  $';
   g_package_name  CONSTANT  VARCHAR2(30)    :=  'nm3sdo_edit';
 --
 -----------------------------------------------------------------------------
@@ -750,7 +750,7 @@ BEGIN
          Nm_Debug.DEBUG('Inserting instead..');
          Nm_Debug.DEBUG(lstr);
 
-         IF l_nth.nth_feature_fk_column IS NOT NULL
+         IF l_nth.nth_feature_fk_column IS NOT NULL and l_nth.nth_feature_fk_column != l_nth.nth_feature_pk_column
          THEN
          --
             IF l_nth.nth_use_history = 'Y'
