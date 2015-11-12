@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_security AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3inv_security.pkb-arc   2.8   Nov 05 2015 16:41:42   Rob.Coupe  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3inv_security.pkb-arc   2.9   Nov 12 2015 15:27:24   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3inv_security.pkb  $
---       Date into PVCS   : $Date:   Nov 05 2015 16:41:42  $
---       Date fetched Out : $Modtime:   Nov 05 2015 16:42:06  $
---       Version          : $Revision:   2.8  $
+--       Date into PVCS   : $Date:   Nov 12 2015 15:27:24  $
+--       Date fetched Out : $Modtime:   Nov 12 2015 15:26:50  $
+--       Version          : $Revision:   2.9  $
 --       Based on SCCS version : 1.1
 -------------------------------------------------------------------------
 --
@@ -23,7 +23,7 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_security AS
 --
 --  g_body_sccsid is the SCCS ID for the package body
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '$Revision:   2.8  $';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '$Revision:   2.9  $';
    g_package_name    CONSTANT  varchar2(30)   := 'nm3inv_security';
 --
    l_dummy_package_variable number;
@@ -92,7 +92,8 @@ FUNCTION can_usr_see_all_inv_on_element ( pi_ne_id IN nm_members.nm_ne_id_of%TYP
      WHERE a.nm_ne_id_in = c_ne_id_of
        AND b.nm_ne_id_of = a.nm_ne_id_of
        AND (b.nm_type = 'I' OR p_usegrpsec = 'Y')
-       AND NOT EXISTS (SELECT 'X' FROM all_visable_au WHERE nag_child_admin_unit = b.nm_admin_unit);
+       AND NOT EXISTS (SELECT 'X' FROM all_visable_au WHERE nag_child_admin_unit = b.nm_admin_unit)
+       AND ( b.nm_type = 'I' and NOT EXISTS ( select 1 from nm_inv_types where nit_end_loc_only = 'Y' and nit_inv_type = b.nm_obj_type ));
         --
   CURSOR cur_missing_grandchildren(c_ne_id_of  nm_members.nm_ne_id_of%TYPE, p_usegrpsec VARCHAR2) 
   IS
