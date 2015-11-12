@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm3ausec AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3ausec.pkb-arc   2.9   Nov 06 2015 15:46:52   Rob.Coupe  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3ausec.pkb-arc   2.10   Nov 12 2015 20:19:32   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3ausec.pkb  $
---       Date into PVCS   : $Date:   Nov 06 2015 15:46:52  $
---       Date fetched Out : $Modtime:   Nov 06 2015 15:47:30  $
---       PVCS Version     : $Revision:   2.9  $
+--       Date into PVCS   : $Date:   Nov 12 2015 20:19:32  $
+--       Date fetched Out : $Modtime:   Nov 12 2015 20:18:22  $
+--       PVCS Version     : $Revision:   2.10  $
 --       Based on
 --
 --   Author : Rob Coupe
@@ -19,7 +19,7 @@ CREATE OR REPLACE PACKAGE BODY nm3ausec AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.9  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.10  $"';
 
 --  g_body_sccsid is the SCCS ID for the package body
 --
@@ -404,12 +404,14 @@ BEGIN
    -- give an overall lenght that would allow placement
    -- therefore call function to check for this
    ---------------------------------------------------------
-            IF NOT check_fragmented_memberships THEN
-                 hig.raise_ner (pi_appl               => nm3type.c_net
-                               ,pi_id                 => 235
-                               );
-            END IF;
-
+   --RAC - HE Data Access - no need to check for gaps - any user can place an asset over any new network with no assets or with non-exclusive admin-types
+   -- so not needed
+--            IF NOT check_fragmented_memberships THEN
+--                 hig.raise_ner (pi_appl               => nm3type.c_net
+--                               ,pi_id                 => 235
+--                               );
+--            END IF;
+           NULL;
          END IF;
       ELSE
 --       dbms_output.put_line( 'privvy');
@@ -457,7 +459,7 @@ BEGIN
    IF c1%NOTFOUND
     THEN
       CLOSE c1;
-	  Return NULL;  -- RC - security fixes for HA - no need to check the mode as this is handled by FGAC
+      Return NULL;  -- RC - security fixes for HA - no need to check the mode as this is handled by FGAC
 --      hig.raise_ner (pi_appl               => nm3type.c_net
 --                    ,pi_id                 => 236
 --                    );
