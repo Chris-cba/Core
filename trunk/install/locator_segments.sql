@@ -1,11 +1,11 @@
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/locator_segments.sql-arc   1.0   Nov 13 2015 16:51:46   Rob.Coupe  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/locator_segments.sql-arc   1.1   Nov 13 2015 17:43:06   Rob.Coupe  $
 --       Module Name      : $Workfile:   locator_segments.sql  $
---       Date into SCCS   : $Date:   Nov 13 2015 16:51:46  $
---       Date fetched Out : $Modtime:   Nov 13 2015 16:50:52  $
---       SCCS Version     : $Revision:   1.0  $
+--       Date into SCCS   : $Date:   Nov 13 2015 17:43:06  $
+--       Date fetched Out : $Modtime:   Nov 13 2015 17:42:50  $
+--       SCCS Version     : $Revision:   1.1  $
 --
 -----------------------------------------------------------------------------
 --    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
@@ -85,20 +85,21 @@ CREATE OR REPLACE FORCE VIEW LOCATOR_SEGMENTS
    RSE_USRN_NO
 )
 AS
-   SELECT -----------------------------------------------------------------------------
-                                                      --   SCCS Identifiers :-
-                                                                            --
-                 --       sccsid           : @(#)translation.sql 1.41 11/10/06
-                                   --       Module Name      : translation.sql
-                                 --       Date into SCCS   : 06/11/10 11:55:59
-                                 --       Date fetched Out : 07/06/13 13:59:30
-                                              --       SCCS Version     : 1.41
-                                                                            --
-                                                           -- Translation View
-                                                                            --
- -----------------------------------------------------------------------------
-                                   -- Copyright (c) exor corporation ltd, 2005
- -----------------------------------------------------------------------------
+   SELECT --
+--   PVCS Identifiers :-
+--
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/locator_segments.sql-arc   1.1   Nov 13 2015 17:43:06   Rob.Coupe  $
+--       Module Name      : $Workfile:   locator_segments.sql  $
+--       Date into SCCS   : $Date:   Nov 13 2015 17:43:06  $
+--       Date fetched Out : $Modtime:   Nov 13 2015 17:42:50  $
+--       SCCS Version     : $Revision:   1.1  $
+--
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+
+-- script to create new, unrestricted views for use in Locator on HE systems
+--
          "RSE_HE_ID",
          "RSE_UNIQUE",
          "RSE_ADMIN_UNIT",
