@@ -1,11 +1,11 @@
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/locator_segs.sql-arc   1.0   Nov 13 2015 16:52:16   Rob.Coupe  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/locator_segs.sql-arc   1.1   Nov 13 2015 17:46:00   Rob.Coupe  $
 --       Module Name      : $Workfile:   locator_segs.sql  $
---       Date into SCCS   : $Date:   Nov 13 2015 16:52:16  $
---       Date fetched Out : $Modtime:   Nov 13 2015 16:51:02  $
---       SCCS Version     : $Revision:   1.0  $
+--       Date into SCCS   : $Date:   Nov 13 2015 17:46:00  $
+--       Date fetched Out : $Modtime:   Nov 13 2015 17:45:32  $
+--       SCCS Version     : $Revision:   1.1  $
 --
 -----------------------------------------------------------------------------
 --    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
@@ -86,7 +86,23 @@ CREATE OR REPLACE FORCE VIEW LOCATOR_SEGS
    RSE_SECT_FUNC
 )
 AS
-   SELECT ne.ne_id,
+   SELECT 
+--
+--   PVCS Identifiers :-
+--
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/locator_segs.sql-arc   1.1   Nov 13 2015 17:46:00   Rob.Coupe  $
+--       Module Name      : $Workfile:   locator_segs.sql  $
+--       Date into SCCS   : $Date:   Nov 13 2015 17:46:00  $
+--       Date fetched Out : $Modtime:   Nov 13 2015 17:45:32  $
+--       SCCS Version     : $Revision:   1.1  $
+--
+-----------------------------------------------------------------------------
+--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+-- script to create new, unrestricted views for use in Locator on HE systems
+--
+
+          ne.ne_id,
           ne.ne_unique,
           ne.ne_admin_unit,
           DECODE (ne.ne_gty_group_type,
