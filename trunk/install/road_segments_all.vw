@@ -1,11 +1,11 @@
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/road_segments_all.vw-arc   1.1   Nov 13 2015 18:06:06   Rob.Coupe  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/road_segments_all.vw-arc   1.2   Nov 13 2015 18:14:24   Rob.Coupe  $
 --       Module Name      : $Workfile:   road_segments_all.vw  $
---       Date into SCCS   : $Date:   Nov 13 2015 18:06:06  $
---       Date fetched Out : $Modtime:   Nov 13 2015 18:05:40  $
---       SCCS Version     : $Revision:   1.1  $
+--       Date into SCCS   : $Date:   Nov 13 2015 18:14:24  $
+--       Date fetched Out : $Modtime:   Nov 13 2015 18:14:12  $
+--       SCCS Version     : $Revision:   1.2  $
 --
 -----------------------------------------------------------------------------
 --    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
@@ -85,14 +85,15 @@ CREATE OR REPLACE FORCE VIEW ROAD_SEGMENTS_ALL
    RSE_USRN_NO
 )
 AS
+SELECT 
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/road_segments_all.vw-arc   1.1   Nov 13 2015 18:06:06   Rob.Coupe  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/road_segments_all.vw-arc   1.2   Nov 13 2015 18:14:24   Rob.Coupe  $
 --       Module Name      : $Workfile:   road_segments_all.vw  $
---       Date into SCCS   : $Date:   Nov 13 2015 18:06:06  $
---       Date fetched Out : $Modtime:   Nov 13 2015 18:05:40  $
---       SCCS Version     : $Revision:   1.1  $
+--       Date into SCCS   : $Date:   Nov 13 2015 18:14:24  $
+--       Date fetched Out : $Modtime:   Nov 13 2015 18:14:12  $
+--       SCCS Version     : $Revision:   1.2  $
 --
 -----------------------------------------------------------------------------
 --    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
