@@ -1,16 +1,15 @@
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/locator_segments.sql-arc   1.1   Nov 13 2015 17:43:06   Rob.Coupe  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/locator_segments.sql-arc   1.2   Nov 13 2015 17:48:50   Rob.Coupe  $
 --       Module Name      : $Workfile:   locator_segments.sql  $
---       Date into SCCS   : $Date:   Nov 13 2015 17:43:06  $
---       Date fetched Out : $Modtime:   Nov 13 2015 17:42:50  $
---       SCCS Version     : $Revision:   1.1  $
+--       Date into SCCS   : $Date:   Nov 13 2015 17:48:50  $
+--       Date fetched Out : $Modtime:   Nov 13 2015 17:48:26  $
+--       SCCS Version     : $Revision:   1.2  $
 --
 -----------------------------------------------------------------------------
 --    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
-
 -- script to create new, unrestricted views for use in Locator on HE systems
 --
 
@@ -88,16 +87,15 @@ AS
    SELECT --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/locator_segments.sql-arc   1.1   Nov 13 2015 17:43:06   Rob.Coupe  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/locator_segments.sql-arc   1.2   Nov 13 2015 17:48:50   Rob.Coupe  $
 --       Module Name      : $Workfile:   locator_segments.sql  $
---       Date into SCCS   : $Date:   Nov 13 2015 17:43:06  $
---       Date fetched Out : $Modtime:   Nov 13 2015 17:42:50  $
---       SCCS Version     : $Revision:   1.1  $
+--       Date into SCCS   : $Date:   Nov 13 2015 17:48:50  $
+--       Date fetched Out : $Modtime:   Nov 13 2015 17:48:26  $
+--       SCCS Version     : $Revision:   1.2  $
 --
 -----------------------------------------------------------------------------
 --    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
-
 -- script to create new, unrestricted views for use in Locator on HE systems
 --
          "RSE_HE_ID",
