@@ -5,11 +5,11 @@ As
 --
 -- PVCS Identifiers :-
 --
--- pvcsid : $Header:   //vm_latest/archives/nm3/admin/pck/nm3context.pkb-arc   2.8   Jul 04 2013 15:23:06   James.Wadsworth  $
+-- pvcsid : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3context.pkb-arc   2.9   Nov 23 2015 17:52:40   Rob.Coupe  $
 -- Module Name : $Workfile:   nm3context.pkb  $
--- Date into PVCS : $Date:   Jul 04 2013 15:23:06  $
--- Date fetched Out : $Modtime:   Jul 04 2013 14:25:10  $
--- PVCS Version : $Revision:   2.8  $
+-- Date into PVCS : $Date:   Nov 23 2015 17:52:40  $
+-- Date fetched Out : $Modtime:   Nov 23 2015 17:52:14  $
+-- PVCS Version : $Revision:   2.9  $
 -- Based on SCCS version : 
 --
 --
@@ -21,7 +21,7 @@ As
 --   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
-  g_Body_Sccsid       Constant  Varchar2(2000)  :='"$Revision:   2.8  $"';
+  g_Body_Sccsid       Constant  Varchar2(2000)  :='"$Revision:   2.9  $"';
 
   c_True              Constant  Varchar2(5)     := 'TRUE';
   c_False             Constant  Varchar2(5)     := 'FALSE';
@@ -326,7 +326,7 @@ BEGIN
     THEN
       CLOSE cs_user;
       g_context_exc_code := -20493;
-      g_context_exc_msg  := 'User '||l_application_owner||' not found';
+      g_context_exc_msg  := 'User '||pi_new_trigger_owner||' not found';
       RAISE g_context_exception;
    END IF;
    CLOSE cs_user;
