@@ -4,11 +4,11 @@ IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3undo.pkb-arc   2.22   Mar 09 2015 17:08:50   Rob.Coupe  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3undo.pkb-arc   2.23   Nov 26 2015 13:55:56   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3undo.pkb  $
---       Date into PVCS   : $Date:   Mar 09 2015 17:08:50  $
---       Date fetched Out : $Modtime:   Mar 09 2015 17:04:12  $
---       PVCS Version     : $Revision:   2.22  $
+--       Date into PVCS   : $Date:   Nov 26 2015 13:55:56  $
+--       Date fetched Out : $Modtime:   Nov 26 2015 13:55:40  $
+--       PVCS Version     : $Revision:   2.23  $
 --
 --   Author : ITurnbull
 --
@@ -19,7 +19,7 @@ IS
 -- Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '"$Revision:   2.22  $"';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '"$Revision:   2.23  $"';
 --  g_body_sccsid is the SCCS ID for the package body
    g_package_name   CONSTANT VARCHAR2 (2000) := 'nm3undo';
 --
@@ -564,7 +564,55 @@ END undo_scheme;
       -- check product install
       -- </UKP>
       --
+      If Hig.is_Product_Licensed (Nm3type.c_Nsg)  Then
+        -- undo the action
+        If p_Operation = c_Split Then
+          -- passes the ne_ids of the 2 new/split elements
+          Execute Immediate 'Begin'                                                       || Chr (10) ||
+                            '  Nsg_Split.Undo_Split_Esu ('                                || Chr (10) ||                            
+                            '                           p_Old_Ne_Id    => :p_Ne_Id_1,'    || Chr (10) || 
+                            '                           p_New_Ne_Id_1  => :p_Ne_Id_2,'    || Chr (10) ||
+                            '                           p_New_Ne_Id_2  => :p_Ne_Id_3,'    || Chr (10) ||
+                            '                           p_Op_Date      => :p_Op_Date'     || Chr (10) ||
+                            '                           );'                               || Chr (10) ||                            
+                            'End;'
+          Using In p_Ne_Id_1, p_Ne_Id_2, p_Ne_Id_3, p_Op_Date;
+        
+        Elsif p_Operation = c_Merge Then
+          -- passes the ne_id of the new/merged element
+          Execute Immediate    'Begin'                                                              ||  Chr (10)  || 
+                               '  Nsg_Merge.Undo_Merge_Esu  ('                                      ||  Chr (10)  ||
+                               '                            p_New_Ne_Id       =>    :p_Ne_Id_1,'    ||  Chr (10)  ||
+                               '                            p_Old_Ne_Id_1     =>    :p_Ne_Id_2,'    ||  Chr (10)  ||
+                               '                            p_Old_Ne_Id_2     =>    :p_Ne_Id_3,'    ||  Chr (10)  ||
+                               '                            p_Effective_Date  =>    :p_Op_Date'     ||  Chr (10)  ||
+                               '                            );'                                     ||  Chr (10)  ||
+                               'End;'
+          Using In p_Ne_Id_1, p_Ne_Id_2, p_Ne_Id_3,p_Op_Date;
+        
+        Elsif p_Operation = c_Replace  Then
+          -- passes the ne_id of the new element
+          Execute Immediate   'Begin'                                                             ||  Chr (10)  ||
+                              '  Nsg_Replace.Undo_Replace_Esu ('                                  ||  Chr (10)  ||
+                              '                               p_New_Ne_Id       =>  :p_Ne_Id_1,'  ||  Chr (10)  ||
+                              '                               p_Old_Ne_Id       =>  :p_Ne_Id_2,'  ||  Chr (10)  ||
+                              '                               p_Effective_Date  =>  :p_Op_Date'   ||  Chr (10)  ||                              
+                              '                               );'                                 ||  Chr (10)  ||
+                              'End;'
+          Using In p_Ne_Id_1, p_Ne_Id_2,p_Op_Date;
 
+        Elsif p_Operation = c_Close Then
+          -- passes the ne_id of the element
+          Execute Immediate   'Begin'                                                           ||  Chr(10) ||
+                              ' Nsg_Close.Undo_Close_Esu  ('                                    ||  Chr(10) ||
+                              '                           p_Ne_Id           =>    :p_Ne_Id_1,'  ||  Chr(10) ||
+                              '                           p_Effective_Date  =>    :p_Op_Date'   ||  Chr(10) ||                              
+                              '                           );'                                   ||  Chr(10) ||
+                              'End;'
+          Using In p_Ne_Id_1,p_Op_Date;
+         End If;
+      End If;
+      
       Nm_Debug.proc_end (g_package_name, 'UNDO_OTHER_PRODUCTS');
 
    END undo_other_products;
