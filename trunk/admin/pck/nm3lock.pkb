@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3lock AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3lock.pkb-arc   2.8   Dec 01 2015 16:34:44   Rob.Coupe  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3lock.pkb-arc   2.9   Dec 01 2015 16:50:24   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3lock.pkb  $
---       Date into PVCS   : $Date:   Dec 01 2015 16:34:44  $
---       Date fetched Out : $Modtime:   Dec 01 2015 16:33:46  $
---       PVCS Version     : $Revision:   2.8  $
+--       Date into PVCS   : $Date:   Dec 01 2015 16:50:24  $
+--       Date fetched Out : $Modtime:   Dec 01 2015 16:49:48  $
+--       PVCS Version     : $Revision:   2.9  $
 --       Based on         : 1.16
 --
 --
@@ -22,7 +22,7 @@ CREATE OR REPLACE PACKAGE BODY nm3lock AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.8  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.9  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3lock';
@@ -144,7 +144,7 @@ BEGIN
 -- GJ 17-JUL-2006 lock for update regardless
 -- 
   IF p_lock_ele_for_update THEN
-     l_sql := l_sql|| 'FOR UPDATE of ne_id'; --SM 03092006 710020 added 'of ne_id' so only the nm_elements table gets locked
+     l_sql := l_sql|| 'FOR UPDATE of ne_id NOWAIT'; --SM 03092006 710020 added 'of ne_id' so only the nm_elements table gets locked
    END IF;        
 
   OPEN c1 FOR l_sql USING p_ne_id, To_Number(Sys_Context('NM3CORE','USER_ID')) ; 
@@ -323,7 +323,7 @@ BEGIN
                       
     IF pi_lock_for_update THEN
     
-      l_lock_string := l_lock_string||' for update ';                          
+      l_lock_string := l_lock_string||' for update nowait';                          
 
     END IF;
     
