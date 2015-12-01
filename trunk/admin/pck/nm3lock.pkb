@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3lock AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3lock.pkb-arc   2.7   Nov 12 2015 20:26:28   Rob.Coupe  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3lock.pkb-arc   2.8   Dec 01 2015 16:34:44   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3lock.pkb  $
---       Date into PVCS   : $Date:   Nov 12 2015 20:26:28  $
---       Date fetched Out : $Modtime:   Nov 12 2015 20:25:06  $
---       PVCS Version     : $Revision:   2.7  $
+--       Date into PVCS   : $Date:   Dec 01 2015 16:34:44  $
+--       Date fetched Out : $Modtime:   Dec 01 2015 16:33:46  $
+--       PVCS Version     : $Revision:   2.8  $
 --       Based on         : 1.16
 --
 --
@@ -22,7 +22,7 @@ CREATE OR REPLACE PACKAGE BODY nm3lock AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.7  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.8  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3lock';
@@ -134,7 +134,7 @@ BEGIN
   l_sql :=         'SELECT nua_mode'||chr(10); 
   l_sql := l_sql|| 'FROM nm_admin_groups'||chr(10);
   l_sql := l_sql|| ',nm_user_aus'||chr(10);
-  l_sql := l_sql|| ',nm_elements'||chr(10);
+  l_sql := l_sql|| ',nm_elements_all'||chr(10);
   l_sql := l_sql|| 'WHERE ne_id = :c_ne_id'||chr(10);
   l_sql := l_sql|| 'AND ne_admin_unit = nag_child_admin_unit'||chr(10);
   l_sql := l_sql|| 'AND nag_parent_admin_unit = nua_admin_unit'||chr(10);
@@ -152,7 +152,9 @@ BEGIN
   FETCH c1 INTO l_mode;
   IF c1%NOTFOUND THEN
     CLOSE c1;
-    Hig.raise_ner('NET',240);
+    IF p_ne_id is NOT NULL then
+      Hig.raise_ner('NET',240);  -- RC - Global Network Update has extended NULL array values and hence attempts to take a lock on a NULL NE_ID
+    END IF;
   ELSIF l_mode = 'READONLY' THEN
 -- GJ 17-JUL-2006     IF NVL(Hig.get_sysopt('UPDRDONLY'),'Y') = 'N' THEN
 --       IF p_updrdonly = 'N' THEN  
