@@ -1,11 +1,11 @@
 ----------------------------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm_4700_fix23.sql-arc   1.0   Jun 03 2015 10:42:42   Upendra.Hukeri  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm_4700_fix23.sql-arc   1.1   Dec 02 2015 12:45:54   Upendra.Hukeri  $
 --       Module Name      : $Workfile:   nm_4700_fix23.sql  $ 
---       Date into PVCS   : $Date:   Jun 03 2015 10:42:42  $
---       Date fetched Out : $Modtime:   Jun 03 2015 10:39:54  $
---       Version     	  : $Revision:   1.0  $
+--       Date into PVCS   : $Date:   Dec 02 2015 12:45:54  $
+--       Date fetched Out : $Modtime:   Dec 02 2015 12:45:34  $
+--       Version     	  : $Revision:   1.1  $
 --
 ----------------------------------------------------------------------------------------------------
 --   Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
@@ -67,14 +67,6 @@ WHENEVER SQLERROR CONTINUE
 --------------------------------------------------------------------------------
 -- Package Bodies
 --------------------------------------------------------------------------------
---
-SET TERM ON 
-PROMPT nm3flx.pkw
-SET TERM OFF
---
-SET FEEDBACK ON
-START nm3flx.pkw
-SET FEEDBACK OFF
 --
 SET TERM ON 
 PROMPT hig_flex_attribute.pkw
