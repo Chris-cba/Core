@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_load
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_load.pkb-arc   1.13   Oct 19 2015 10:51:18   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_load.pkb-arc   1.14   Dec 02 2015 13:04:32   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_load.pkb  $
-   --       Date into PVCS   : $Date:   Oct 19 2015 10:51:18  $
-   --       Date fetched Out : $Modtime:   Oct 19 2015 10:50:10  $
-   --       PVCS Version     : $Revision:   1.13  $
+   --       Date into PVCS   : $Date:   Dec 02 2015 13:04:32  $
+   --       Date fetched Out : $Modtime:   Dec 02 2015 13:03:52  $
+   --       PVCS Version     : $Revision:   1.14  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,7 +16,7 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.13  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.14  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_load';
 
@@ -178,20 +178,20 @@ AS
                   pi_xsp,
                   loc_error);
       ELSE
-         lb_load (lb_ops.merge_lb_rpt_tab (
-                     pi_nal_id,
-                     pi_nal_nit_type,
-                     lb_get.get_lb_rpt_d_tab (LB_RPT_TAB (LB_RPt (pi_refnt,
-                                                           pi_nlt_id,
-                                                           NULL,
-                                                           NULL,
-                                                           NULL,
-                                                           NULL,
-                                                           1,
-                                                           pi_start_m,
-                                                           pi_end_m,
-                                                           pi_unit))),
-                     10),
+         lb_load (lb_ops.merge_lb_rpt_tab (pi_nal_id,
+                                           pi_nal_nit_type,
+                                           lb_get.get_lb_rpt_d_tab (
+                                              LB_RPT_TAB (LB_RPt (pi_refnt,
+                                                                  pi_nlt_id,
+                                                                  NULL,
+                                                                  NULL,
+                                                                  NULL,
+                                                                  NULL,
+                                                                  1,
+                                                                  pi_start_m,
+                                                                  pi_end_m,
+                                                                  pi_unit))),
+                                           10),
                   pi_nal_id,
                   pi_start_date,
                   pi_security_id,
@@ -578,11 +578,13 @@ AS
                   WHERE     nal_id = pi_nal_id
                         AND nal_id = nm_ne_id_in
                         AND nal_nit_type = nm_obj_type);
---
+
+      --
       UPDATE nm_asset_locations_all
          SET nal_end_date = pi_end_date
        WHERE nal_id = pi_nal_id;
---
+
+      --
       aggregate_geometry (pi_nal_id => pi_nal_id, pi_start_date => pi_end_date);
    END;
 
@@ -600,22 +602,22 @@ AS
         INTO retval
         FROM TABLE (pi_rpt_tab)
        WHERE     NOT EXISTS
-                        (SELECT 1
-                           FROM nm_elements, xsp_restraints
-                          WHERE     ne_id = refnt
-                                AND ne_sub_class = xsr_scl_class
-                                AND obj_type = xsr_ity_inv_code
-                                AND xsr_nw_type = ne_nt_type
-                                AND xsr_x_sect_value = pi_xsp)
+                    (SELECT 1
+                       FROM nm_elements, xsp_restraints
+                      WHERE     ne_id = refnt
+                            AND ne_sub_class = xsr_scl_class
+                            AND obj_type = xsr_ity_inv_code
+                            AND xsr_nw_type = ne_nt_type
+                            AND xsr_x_sect_value = pi_xsp)
              AND NOT EXISTS
-                        (SELECT 1
-                           FROM nm_elements, xsp_restraints, nm_members
-                          WHERE     nm_ne_id_of = refnt
-                                AND nm_ne_id_in = ne_id
-                                AND ne_sub_class = xsr_scl_class
-                                AND obj_type = xsr_ity_inv_code
-                                AND xsr_nw_type = ne_nt_type
-                                AND xsr_x_sect_value = pi_xsp)
+                    (SELECT 1
+                       FROM nm_elements, xsp_restraints, nm_members
+                      WHERE     nm_ne_id_of = refnt
+                            AND nm_ne_id_in = ne_id
+                            AND ne_sub_class = xsr_scl_class
+                            AND obj_type = xsr_ity_inv_code
+                            AND xsr_nw_type = ne_nt_type
+                            AND xsr_x_sect_value = pi_xsp)
              AND EXISTS
                     (SELECT 1
                        FROM nm_inv_types
@@ -676,57 +678,96 @@ AS
                                             nag_start_date,
                                             nag_end_date,
                                             nag_geometry)
-            SELECT pi_location_type,
+            SELECT 'N',
                    asset_id,
                    obj_type,
                    start_date,
-                   LEAST (NVL (end_date, TO_DATE ('31122999', 'DDMMYYYY')),
-                          lag_start)
-                      end_date,
+                   end_date,
                    l_geom
-              FROM (SELECT asset_id,
-                           obj_type,
-                           start_date,
-                           end_date,
-                           LAG (start_date, 1)
-                              OVER (ORDER BY start_date DESC, end_date DESC)
-                              lag_start,
-                           LAG (end_date, 1)
-                              OVER (ORDER BY start_date DESC, end_date DESC)
-                              lag_end,
-                           l_geom
-                      FROM (  SELECT                      --nlg_location_type,
-                                    asset_id,
-                                     obj_type,
-                                     start_date,
-                                     end_date,
-                                     sdo_aggr_union (
-                                        sdoaggrtype (nlg_geometry, 0.005))
-                                        l_geom
-                                FROM (SELECT nlg_location_type,
-                                             pi_asset_id asset_id,
-                                             nlg_obj_type obj_type,
-                                             nal_start_date start_date,
-                                             nal_end_date end_date,
-                                             nlg_geometry
-                                        FROM nm_location_geometry,
-                                             nm_asset_locations_all l2
-                                       WHERE     nlg_nal_id = l2.nal_id
-                                             AND l2.nal_asset_id = pi_asset_id
-                                             AND nal_location_type =
-                                                    pi_location_type
-                                             AND l2.nal_location_type =
-                                                    nlg_location_type
-                                             AND l2.nal_nit_type = nlg_obj_type
-                                             AND l2.nal_nit_type = pi_obj_type
-                                             AND nal_location_type =
-                                                    pi_location_type
-                                             AND nlg_obj_type = pi_obj_type) t
-                            GROUP BY                      --nlg_location_type,
-                                    asset_id,
-                                     obj_type,
-                                     start_date,
-                                     end_date));
+              FROM (SELECT t2.*,
+                           LEAD (
+                              start_date,
+                              1)
+                           OVER (
+                              ORDER BY
+                                 start_date,
+                                 NVL (end_date,
+                                      TO_DATE ('31122999', 'DDMMYYYY')))
+                              n_start_date
+                      FROM (SELECT asset_id,
+                                   obj_type,
+                                   start_date,
+                                   LEAST (
+                                      NVL (end_date,
+                                           TO_DATE ('31122999', 'DDMMYYYY')),
+                                      lag_start)
+                                      end_date,
+                                   l_geom
+                              FROM (SELECT asset_id,
+                                           obj_type,
+                                           start_date,
+                                           end_date,
+                                           LAG (
+                                              start_date,
+                                              1)
+                                           OVER (
+                                              ORDER BY
+                                                 start_date DESC,
+                                                 end_date DESC)
+                                              lag_start,
+                                           LAG (
+                                              end_date,
+                                              1)
+                                           OVER (
+                                              ORDER BY
+                                                 start_date DESC,
+                                                 end_date DESC)
+                                              lag_end,
+                                           l_geom
+                                      FROM (  SELECT      --nlg_location_type,
+                                                    asset_id,
+                                                     obj_type,
+                                                     start_date,
+                                                     end_date,
+                                                     sdo_aggr_union (
+                                                        sdoaggrtype (
+                                                           nlg_geometry,
+                                                           0.005))
+                                                        l_geom
+                                                FROM (SELECT nlg_location_type,
+                                                             19397 asset_id,
+                                                             nlg_obj_type
+                                                                obj_type,
+                                                             nal_start_date
+                                                                start_date,
+                                                             nal_end_date
+                                                                end_date,
+                                                             nlg_geometry
+                                                        FROM nm_location_geometry,
+                                                             nm_asset_locations_all l2
+                                                       WHERE     nlg_nal_id =
+                                                                    l2.nal_id
+                                                             AND l2.nal_asset_id =
+                                                                    19397
+                                                             AND nal_location_type =
+                                                                    'N'
+                                                             AND l2.nal_location_type =
+                                                                    nlg_location_type
+                                                             AND l2.nal_nit_type =
+                                                                    nlg_obj_type
+                                                             AND l2.nal_nit_type =
+                                                                    'L9'
+                                                             AND nal_location_type =
+                                                                    'N'
+                                                             AND nlg_obj_type =
+                                                                    'L9') t
+                                            GROUP BY      --nlg_location_type,
+                                                    asset_id,
+                                                     obj_type,
+                                                     start_date,
+                                                     end_date))) t2)
+             WHERE start_date <>
+                      NVL (n_start_date, TO_DATE ('01010001', 'DDMMYYYY'));
       END;
    END;
 
