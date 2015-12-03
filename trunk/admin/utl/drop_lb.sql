@@ -3,11 +3,11 @@
 --
 --   PVCS Identifiers :-
 --
---       pvcsid                 : $Header:   //new_vm_latest/archives/lb/admin/utl/drop_lb.sql-arc   1.9   Oct 29 2015 07:32:20   Rob.Coupe  $
+--       pvcsid                 : $Header:   //new_vm_latest/archives/lb/admin/utl/drop_lb.sql-arc   1.10   Dec 03 2015 16:35:30   Rob.Coupe  $
 --       Module Name      : $Workfile:   drop_lb.sql  $
---       Date into PVCS   : $Date:   Oct 29 2015 07:32:20  $
---       Date fetched Out : $Modtime:   Oct 29 2015 07:31:50  $
---       PVCS Version     : $Revision:   1.9  $
+--       Date into PVCS   : $Date:   Dec 03 2015 16:35:30  $
+--       Date fetched Out : $Modtime:   Dec 03 2015 16:35:38  $
+--       PVCS Version     : $Revision:   1.10  $
 --
 --   Author : Rob Coupe
 --
@@ -17,6 +17,8 @@
 --   Copyright (c) 2014 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
+
+Prompt Dropping object dependency list
 
 DECLARE
    not_exists   EXCEPTION;
@@ -30,56 +32,74 @@ EXCEPTION
 END;
 /
 
-declare
-  cursor c1 is
-    select nit_inv_type from nm_inv_types_all where nit_category = 'L';
-begin
-  for irec in c1 loop
-    begin
-       execute immediate 'begin lb_reg.drop_lb_asset_type ( pi_exor_type => '||''''||irec.nit_inv_type||''''||' ); end; ';
-    exception
-      when others then
-        null;
-    end;
-  end loop;
-end;
+Prompt Dropping objects in LB object registry
+
+DECLARE
+   CURSOR c1
+   IS
+      SELECT * FROM lb_objects;
+BEGIN
+   FOR irec IN c1
+   LOOP
+      BEGIN
+         IF irec.object_type = 'TABLE'
+         THEN
+            BEGIN
+               EXECUTE IMMEDIATE
+                     ' alter table '
+                  || irec.object_name
+                  || ' drop primary key cascade ';
+            EXCEPTION
+               WHEN OTHERS
+               THEN
+                  NULL;
+            END;
+
+            EXECUTE IMMEDIATE
+               ' drop table ' || irec.object_name || ' cascade constraints ';
+         ELSIF irec.object_type IN ('VIEW',
+                                    'SEQUENCE',
+                                    'PACKAGE',
+                                    'PROCEDURE',
+                                    'FUNCTION')
+         THEN
+            EXECUTE IMMEDIATE
+               ' drop ' || irec.object_type || ' ' || irec.object_name;
+         ELSIF irec.object_type IN ('TYPE', 'TYPE BODY ')
+         THEN
+            EXECUTE IMMEDIATE
+                  ' drop '
+               || irec.object_type
+               || ' '
+               || irec.object_name
+               || ' FORCE';
+         END IF;
+
+         NM3DDL.DROP_SYNONYM_FOR_OBJECT (irec.object_name);
+      EXCEPTION
+         WHEN OTHERS
+         THEN
+            NULL;
+      END;
+   END LOOP;
+EXCEPTION
+   WHEN OTHERS
+   THEN
+      NULL;
+END;
 /
 
+Prompt Test for remnants
 
-
-declare
-  cursor c1 is
-    select * from lb_objects;
-begin
-  for irec in c1 loop
-    begin
-      if irec.object_type = 'TABLE' then
-         begin
-		    execute immediate ' alter table '||irec.object_name||' drop primary key cascade ';
-	     exception
-		   when others then null;
-		 end;
-         execute immediate ' drop table '||irec.object_name||' cascade constraints ';
-      elsif irec.object_type in ('VIEW', 'SEQUENCE', 'PACKAGE', 'PROCEDURE', 'FUNCTION') then
-         execute immediate ' drop '||irec.object_type||' '||irec.object_name;
-      elsif irec.object_type in ('TYPE', 'TYPE BODY ') then
-         execute immediate ' drop '||irec.object_type||' '||irec.object_name||' FORCE';
-      end if;
-    NM3DDL.DROP_SYNONYM_FOR_OBJECT(irec.object_name);
-    exception
-      when others then NULL;
-    end;
-  end loop;
-  exception
-    when others then NULL;
-end;
+SELECT object_name, object_type, 'Remains in existence'
+  FROM lb_objects lo
+ WHERE EXISTS
+          (SELECT 1
+             FROM user_objects o
+            WHERE lo.object_name = o.object_name)
 /
 
-select object_name, object_type, 'Remains in existence' from
-lb_objects lo 
-where exists ( select 1 from user_objects o where lo.object_name = o.object_name )
-/
-
+Prompt Removal of LB object list 
 
 DECLARE
    not_exists   EXCEPTION;
@@ -93,6 +113,44 @@ EXCEPTION
 END;
 /
 
+Prompt Clean up any residual metadata
 
-prompt Completed lb_drop script
+DECLARE
+   CURSOR c1
+   IS
+      SELECT nit_inv_type
+        FROM nm_inv_types_all
+       WHERE nit_category = 'L';
+BEGIN
+   FOR irec IN c1
+   LOOP
+      BEGIN
+         EXECUTE IMMEDIATE
+               'delete from nm_inv_type_attribs where ita_inv_type = '
+            || ''''
+            || irec.nit_inv_type
+            || '''';
+
+         EXECUTE IMMEDIATE
+               'delete from nm_inv_type_roles where itr_inv_type = '
+            || ''''
+            || irec.nit_inv_type
+            || '''';
+
+         EXECUTE IMMEDIATE
+               'delete from nm_inv_types_all where nit_inv_type  = '
+            || ''''
+            || irec.nit_inv_type
+            || '''';
+      EXCEPTION
+         WHEN OTHERS
+         THEN
+            NULL;
+      END;
+   END LOOP;
+END;
 /
+
+PROMPT Completed lb_drop script
+/
+
