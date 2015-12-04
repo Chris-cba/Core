@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm3ausec AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3ausec.pkb-arc   2.10   Nov 12 2015 20:19:32   Rob.Coupe  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3ausec.pkb-arc   2.11   Dec 04 2015 16:30:44   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3ausec.pkb  $
---       Date into PVCS   : $Date:   Nov 12 2015 20:19:32  $
---       Date fetched Out : $Modtime:   Nov 12 2015 20:18:22  $
---       PVCS Version     : $Revision:   2.10  $
+--       Date into PVCS   : $Date:   Dec 04 2015 16:30:44  $
+--       Date fetched Out : $Modtime:   Dec 04 2015 16:30:08  $
+--       PVCS Version     : $Revision:   2.11  $
 --       Based on
 --
 --   Author : Rob Coupe
@@ -19,7 +19,7 @@ CREATE OR REPLACE PACKAGE BODY nm3ausec AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.10  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.11  $"';
 
 --  g_body_sccsid is the SCCS ID for the package body
 --
@@ -143,62 +143,99 @@ PROCEDURE check_each_au IS
 --
    l_au number;
 --
--- The following cursor checks a partial, hierarchical security doobery.
--- Do not remove the space in the hint
---   CURSOR c1 IS
---     SELECT /*+ RULE*/ c.nm_admin_unit
---     FROM  NM_MEMBERS          c
---          ,NM_AU_SECURITY_TEMP st1
---    WHERE  get_au_type(c.nm_admin_unit) = st1.nast_admin_type            -- We must check for the same au type
---     AND   c.nm_ne_id_of = st1.nast_ne_of                                -- at the location provided from before trg
---     AND   c.nm_begin_mp < st1.nast_nm_end
---     AND   NVL(c.nm_end_mp, st1.nast_nm_begin ) > st1.nast_nm_begin      -- with  a partial overlap with existing data
---     AND   NOT EXISTS ( SELECT 1 FROM NM_ADMIN_GROUPS                    -- where the existing AU is not a parent
---               WHERE nag_parent_admin_unit = c.nm_admin_unit
---               AND  nag_child_admin_unit   = st1.nast_au_id )
---     AND   NOT EXISTS ( SELECT 1 FROM NM_ADMIN_GROUPS                    -- where the existing AU is not a parent
---               WHERE nag_child_admin_unit  = c.nm_admin_unit
---                AND  nag_parent_admin_unit = st1.nast_au_id )
---     AND c.nm_ne_id_in != st1.nast_ne_id;
---
    CURSOR c1 (c_use_group_security in varchar2 )  IS
-     SELECT /*+ RULE*/ c.nm_admin_unit
-     FROM  nm_members          c
-          ,nm_au_security_temp st1, nm_admin_units a, nm_au_types
-    WHERE  c.nm_admin_unit = a.nau_admin_unit
-     AND   a.nau_admin_type = nat_admin_type
-     AND   nat_exclusive = 'Y'
-     AND   a.nau_admin_type = st1.nast_admin_type            -- We must check for the same au type
-     AND   c.nm_ne_id_of = st1.nast_ne_of                                -- at the location provided from before trg
-     and (  ( c_use_group_security='N' and st1.NAST_NM_TYPE = 'I' and   c.nm_type = 'I' )
-          or c_use_group_security = 'Y' )
-      --
-     -- it's either IN the range of current inv
-     --
-     AND ((c.nm_begin_mp < st1.nast_nm_end
-           AND NVL(c.nm_end_mp, st1.nast_nm_begin ) > st1.nast_nm_begin      -- with  a partial overlap with existing data
-          )
-         OR
-         --
-         -- OR it's point data which is right at the end of the element
-         --
-          (st1.nast_nm_begin           = st1.nast_nm_end
-           AND ((st1.nast_nm_begin      = c.nm_end_mp
-                 AND  st1.nast_nm_begin = nm3net.get_datum_element_length(c.nm_ne_id_of)
-                )
-             OR (st1.nast_nm_begin      = c.nm_begin_mp
-                 AND  st1.nast_nm_begin = 0
-                )
-               )
-          )
-         )
-     AND   NOT EXISTS ( SELECT 1 FROM nm_admin_groups                    -- where the existing AU is not a parent
-               WHERE nag_parent_admin_unit = c.nm_admin_unit
-               AND  nag_child_admin_unit   = st1.nast_au_id )
-     AND   NOT EXISTS ( SELECT 1 FROM nm_admin_groups                    -- where the existing AU is not a parent
-               WHERE nag_child_admin_unit  = c.nm_admin_unit
-                AND  nag_parent_admin_unit = st1.nast_au_id )
-     AND c.nm_ne_id_in != st1.nast_ne_id;
+WITH member1
+     AS (SELECT nast_ne_id,
+                nast_au_id,
+                nast_ne_of,
+                nast_nm_begin,
+                nast_nm_end,
+                nm_ne_id_in,
+                nm_ne_id_of,
+                nm_begin_mp,
+                nm_end_mp,
+                nm_admin_unit,
+                ne_length,
+                CASE
+                   WHEN NOT EXISTS
+                               (SELECT 1
+                                  FROM nm_admin_groups
+                                 WHERE     nag_parent_admin_unit =
+                                              nm_admin_unit
+                                       AND nag_child_admin_unit = nast_au_id
+                                UNION ALL
+                                SELECT 1
+                                  FROM nm_admin_groups
+                                 WHERE     nag_child_admin_unit =
+                                              nm_admin_unit
+                                       AND nag_parent_admin_unit = nast_au_id)
+                   THEN
+                      'TRUE'
+                   ELSE
+                      'FALSE'
+                END
+                   AU_CONFLICT
+           FROM nm_au_security_temp,
+                nm_au_types,
+                nm_members,
+                nm_elements
+          WHERE     nat_exclusive = 'Y'
+                AND ne_id = nm_ne_id_of
+                AND nat_admin_type = nast_admin_type
+                AND nm_ne_id_of = nast_ne_of
+                AND (   (    c_use_group_security = 'N'
+                         AND NAST_NM_TYPE = 'I'
+                         AND nm_type = 'I')
+                     OR c_use_group_security = 'Y')),
+     member2
+     AS (SELECT t1.*,
+                (SELECT au_conflict
+                   FROM member1
+                  WHERE     nm_ne_id_of = nast_ne_of
+                        AND nm_end_mp = nast_nm_begin
+                        AND nm_end_mp > nm_begin_mp
+                        AND au_conflict = 'TRUE')
+                   prior_conflict,
+                (SELECT au_conflict
+                   FROM member1
+                  WHERE     nm_ne_id_of = nast_ne_of
+                        AND nm_begin_mp = nast_nm_end
+                        AND nm_end_mp > nm_begin_mp
+                        AND au_conflict = 'TRUE')
+                   next_conflict,
+                (SELECT au_conflict
+                   FROM member1
+                  WHERE     nm_ne_id_of = nast_ne_of
+                        AND nm_end_mp = nast_nm_begin
+                        AND au_conflict = 'FALSE')
+                   prior_non_conflict,
+                (SELECT au_conflict
+                   FROM member1
+                  WHERE     nm_ne_id_of = nast_ne_of
+                        AND nm_begin_mp = nast_nm_end
+                        AND au_conflict = 'FALSE')
+                   next_non_conflict
+           FROM member1 t1)
+SELECT nm_admin_unit
+  FROM member2
+ WHERE (   (    nast_ne_of = nm_ne_id_of
+            AND nast_nm_begin < nm_end_mp
+            AND nast_nm_end > nm_begin_mp
+            AND au_conflict = 'TRUE')               -- point or linear overlap
+        OR (    nast_nm_begin = nast_nm_end
+            AND nast_nm_begin = 0
+            AND next_conflict = 'TRUE') -- start of datum with adjoining conflict
+        OR (    nast_nm_begin = nast_nm_end
+            AND nast_nm_end = ne_length
+            AND prior_conflict = 'TRUE') -- end of datum with adjoining conflict
+        OR (    nast_nm_begin = nast_nm_end
+            AND nast_nm_begin != 0
+            AND nast_nm_end != ne_length
+            AND prior_conflict = 'TRUE'
+            AND next_conflict = 'TRUE') -- point location between two linear conflicts
+        OR (    nast_nm_begin < nast_nm_end
+            AND (   (prior_conflict = 'TRUE' AND prior_non_conflict = 'TRUE')
+                 OR (next_conflict = 'TRUE' AND next_non_conflict = 'TRUE'))));
 --
 -- look for an au element of the same type over the whole extent,
 -- excluding the record being inserted/updated
@@ -459,10 +496,10 @@ BEGIN
    IF c1%NOTFOUND
     THEN
       CLOSE c1;
-      Return NULL;  -- RC - security fixes for HA - no need to check the mode as this is handled by FGAC
---      hig.raise_ner (pi_appl               => nm3type.c_net
---                    ,pi_id                 => 236
---                    );
+--    Return NULL;  -- RC - security fixes for HA - no need to check the mode as this is handled by FGAC
+      hig.raise_ner (pi_appl               => nm3type.c_net
+                    ,pi_id                 => 236
+                    );
       --raise_application_error( -20901, 'You should not be here');
    END IF;
 --
