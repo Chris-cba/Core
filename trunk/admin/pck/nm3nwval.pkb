@@ -2,13 +2,13 @@ CREATE OR REPLACE PACKAGE BODY Nm3nwval AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3nwval.pkb-arc   2.13   Nov 05 2015 16:21:46   Rob.Coupe  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3nwval.pkb-arc   2.14   Dec 08 2015 17:16:18   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3nwval.pkb  $
---       Date into PVCS   : $Date:   Nov 05 2015 16:21:46  $
---       Date fetched Out : $Modtime:   Nov 05 2015 16:20:56  $
---       PVCS Version     : $Revision:   2.13  $
+--       Date into PVCS   : $Date:   Dec 08 2015 17:16:18  $
+--       Date fetched Out : $Modtime:   Dec 08 2015 17:15:08  $
+--       PVCS Version     : $Revision:   2.14  $
 --       Based on 1.67
---
+--  
 --
 --   Author : Jonathan Mills
 --
@@ -18,7 +18,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3nwval AS
 --   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 ------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.13  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.14  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 -----------------------------------------------------------------------------
 --
@@ -94,6 +94,9 @@ CREATE OR REPLACE PACKAGE BODY Nm3nwval AS
 -----------------------------------------------------------------------------
 --
 PROCEDURE append (p_text VARCHAR2, p_nl BOOLEAN DEFAULT TRUE);
+--
+-----------------------------------------------------------------------------
+function check_asset_closure_on_element( pi_ne_id in nm_elements.ne_id%type ) return Boolean;
 --
 -----------------------------------------------------------------------------
 --
@@ -2322,8 +2325,8 @@ END group_has_overlaps;
      END IF;
   EXCEPTION
      WHEN cannot_see_inv THEN
-        RAISE_APPLICATION_ERROR( -20008, 'User does not have access to all inventory on the element');
-      WHEN OTHERS THEN
+      Hig.raise_ner (Nm3type.c_net,172); 
+       WHEN OTHERS THEN
         RAISE;
   END check_user_can_see_inv;
 --
@@ -2341,10 +2344,20 @@ IS
   WHERE ne_id = c_ne_id;
 
   l_ne_id nm_elements.ne_id%TYPE;
+  l_ne_row nm_elements%rowtype;
+  l_mode varchar2(10);
 BEGIN
   Nm_Debug.proc_start(g_package_name , 'network_operations_check');
 --
+  l_ne_row := nm3get.get_ne(p_ne_id_1);
+     
   check_operation( p_operation => p_operation );
+  
+  begin
+     l_mode := NM3AUSEC.get_au_mode(sys_context('NM3_SECURITY_CTX', 'USERNAME'), l_ne_row.ne_admin_unit);
+  end;
+
+
 
   -- Some operations might pass in a 2nd ne_id even if it hasn't been
   -- created yet, so check it exists and set it to null if it doesn't
@@ -2392,8 +2405,12 @@ BEGIN
   END IF;
 --
   IF p_operation IN (c_close, c_unclose, c_closeroute, c_reverse, c_reclass) THEN
+--RC Data Access - allow the test to work as it is for al other operations but these operations may need to access the inventory data.
+--So, just seeing the asset data is insufficient - it needs to test if, when locations are closed there are some readonly assets that
+--would be affected.Test on the usual 
+
      IF  NOT Sys_Context('NM3CORE','UNRESTRICTED_INVENTORY') = 'TRUE' 
-     AND NOT(nm3inv_security.can_usr_see_all_inv_on_element(pi_ne_id => p_ne_id_1))
+     AND NOT(check_asset_closure_on_element(pi_ne_id => p_ne_id_1))
      THEN
        --
        hig.raise_ner( pi_appl            => 'NET'
@@ -2401,6 +2418,8 @@ BEGIN
        --RAISE_APPLICATION_ERROR( -20008, 'User is restricted and does not have access to all inventory on the element');
        --
      END IF;
+--
+          
   END IF;
 --
 /*
@@ -3469,6 +3488,61 @@ BEGIN
                    ,p_procedure_name => 'check_ne_flex_cols_updatable');
 
 END check_ne_flex_cols_updatable;
+
+
+FUNCTION check_asset_closure_on_element (
+   pi_ne_id   IN nm_elements.ne_id%TYPE)
+   RETURN BOOLEAN
+IS
+   l_dummy   INTEGER := 0;
+   retval    BOOLEAN;
+BEGIN
+   BEGIN
+      SELECT 1
+        INTO l_dummy
+        FROM DUAL
+       WHERE EXISTS
+                (SELECT i.nm_obj_type
+                   FROM nm_members i
+                  WHERE     nm_type = 'I'
+                        AND nm_ne_id_of IN (    SELECT m.nm_ne_id_of
+                                                  FROM nm_members m
+                                            CONNECT BY PRIOR nm_ne_id_in =
+                                                          nm_ne_id_of
+                                            START WITH nm_ne_id_in = pi_ne_id
+                                            UNION
+                                            SELECT ne_id
+                                              FROM nm_elements
+                                             WHERE ne_id = pi_ne_id)
+                        AND (   (NOT EXISTS
+                                    (SELECT 1
+                                       FROM v_nm_user_inv_mode
+                                      WHERE inv_type = nm_obj_type)) -- asset type is invisible through roles
+                             OR (EXISTS
+                                    (SELECT 1
+                                       FROM nm_inv_types, v_nm_user_inv_mode
+                                      WHERE     inv_type = nm_obj_type
+                                            AND inv_type = nit_inv_type
+                                            AND access_mode = 'READONLY'
+                                            AND nit_end_loc_only = 'N'))
+                             OR (EXISTS
+                                    (SELECT 1
+                                       FROM nm_inv_types, v_nm_user_au_mode
+                                      WHERE     admin_unit = nm_admin_unit
+                                            AND access_mode = 'READONLY'
+                                            AND nit_inv_type = nm_obj_type
+                                            AND nit_end_loc_only = 'N'))));
+
+      retval := FALSE;
+   EXCEPTION
+      WHEN NO_DATA_FOUND
+      THEN
+         retval := TRUE;
+   END;
+
+   RETURN retval;
+END;
+
 --
 -----------------------------------------------------------------------------
 --
@@ -3479,4 +3553,4 @@ BEGIN
    CLOSE cs_cols_in_elements;
 --
 END Nm3nwval;
-/ 
+/
