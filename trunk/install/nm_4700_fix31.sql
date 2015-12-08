@@ -1,10 +1,10 @@
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/nm_4700_fix31.sql-arc   1.0   Nov 09 2015 14:12:38   Rob.Coupe  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/nm_4700_fix31.sql-arc   1.1   Dec 08 2015 11:11:50   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm_4700_fix31.sql  $ 
---       Date into PVCS   : $Date:   Nov 09 2015 14:12:38  $
---       Date fetched Out : $Modtime:   Nov 09 2015 14:10:58  $
---       PVCS Version     : $Revision:   1.0  $
+--       Date into PVCS   : $Date:   Dec 08 2015 11:11:50  $
+--       Date fetched Out : $Modtime:   Dec 08 2015 11:11:30  $
+--       PVCS Version     : $Revision:   1.1  $
 --
 ----------------------------------------------------------------------------
 --   Copyright (c) 2015 Bentley Systems Incorporated.  All rights reserved.
@@ -73,6 +73,13 @@ END;
 /
 WHENEVER SQLERROR CONTINUE
 --
+Prompt Update to error message
+
+update nm_errors
+set ner_descr = 'User does not have permission or access to all assets on the element'
+where ner_id = 172
+and ner_appl = 'NET'
+/
 
 Prompt Upgrades to admin-types to allow non-exclusivity
 
