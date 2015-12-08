@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3recal IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3recal.pkb-arc   2.8   Jul 04 2013 16:21:10   James.Wadsworth  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3recal.pkb-arc   2.9   Dec 08 2015 12:01:04   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3recal.pkb  $
---       Date into PVCS   : $Date:   Jul 04 2013 16:21:10  $
---       Date fetched Out : $Modtime:   Jul 04 2013 14:25:18  $
---       PVCS Version     : $Revision:   2.8  $
+--       Date into PVCS   : $Date:   Dec 08 2015 12:01:04  $
+--       Date fetched Out : $Modtime:   Dec 08 2015 12:00:14  $
+--       PVCS Version     : $Revision:   2.9  $
 --
 --
 --   Author : Jonathan Mills
@@ -25,7 +25,7 @@ CREATE OR REPLACE PACKAGE BODY nm3recal IS
   PT 05.12.07 mairecal.recal_data() brough in line with the others in recalibrate_other_products()
 */
 
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.8  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.9  $"';
    g_package_name    CONSTANT  varchar2(30) := 'nm3recal';
 --
    g_tab_rec_nm      nm3type.tab_rec_nm;
@@ -145,11 +145,27 @@ PROCEDURE recalibrate_section (pi_ne_id             IN nm_elements.ne_id%TYPE
    
    l_neh_rec nm_element_history%rowtype;
 
+   l_ne_row nm_elements%rowtype;
 --
 BEGIN
   nm_debug.debug_on;
 
    nm_debug.proc_start(g_package_name,'recalibrate_section');
+   
+   l_ne_row := nm3get.get_ne(pi_ne_id);
+   
+   IF Nm3ausec.get_au_mode( Sys_Context('NM3_SECURITY_CTX','USERNAME'), l_ne_row.ne_admin_unit ) != Invsec.c_normal_string
+   THEN
+      Hig.raise_ner(Nm3type.c_net,240);
+         --raise_application_error(-20902, 'You may not change this record');
+   END IF;
+
+  IF Not NM3INV_SECURITY.CAN_USR_SEE_ALL_INV_ON_ELEMENT(PI_NE_ID) 
+  THEN
+      Hig.raise_ner(Nm3type.c_net,172);
+         --raise_application_error(-20902, 'You may not change this record');
+   END IF;
+  
 --
    nm3ausec.set_status(nm3type.c_off);
 
