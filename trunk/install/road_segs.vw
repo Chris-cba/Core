@@ -1,17 +1,17 @@
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/road_segs.vw-arc   1.1   Nov 13 2015 18:08:26   Rob.Coupe  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/road_segs.vw-arc   1.2   Dec 09 2015 22:07:28   Rob.Coupe  $
 --       Module Name      : $Workfile:   road_segs.vw  $
---       Date into SCCS   : $Date:   Nov 13 2015 18:08:26  $
---       Date fetched Out : $Modtime:   Nov 13 2015 18:08:06  $
---       SCCS Version     : $Revision:   1.1  $
+--       Date into SCCS   : $Date:   Dec 09 2015 22:07:28  $
+--       Date fetched Out : $Modtime:   Dec 09 2015 22:07:16  $
+--       SCCS Version     : $Revision:   1.2  $
 --
 -----------------------------------------------------------------------------
 --    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 
--- script to create new, unrestricted views for use in Locator on HE systems
+-- script to create new, restricted view of ROAD_SEGS which goes up and down the hierarchy
 --
 
 CREATE OR REPLACE FORCE VIEW ROAD_SEGS
@@ -90,16 +90,16 @@ AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/road_segs.vw-arc   1.1   Nov 13 2015 18:08:26   Rob.Coupe  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/road_segs.vw-arc   1.2   Dec 09 2015 22:07:28   Rob.Coupe  $
 --       Module Name      : $Workfile:   road_segs.vw  $
---       Date into SCCS   : $Date:   Nov 13 2015 18:08:26  $
---       Date fetched Out : $Modtime:   Nov 13 2015 18:08:06  $
---       SCCS Version     : $Revision:   1.1  $
+--       Date into SCCS   : $Date:   Dec 09 2015 22:07:28  $
+--       Date fetched Out : $Modtime:   Dec 09 2015 22:07:16  $
+--       SCCS Version     : $Revision:   1.2  $
 --
 -----------------------------------------------------------------------------
 --    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
--- script to create new, unrestricted views for use in Locator on HE systems
+-- script to create new, restricted view of ROAD_SEGS which goes up and down the hierarchy
 --
    ne.ne_id,
           ne.ne_unique,
@@ -213,4 +213,5 @@ AS
                                                                SYS_CONTEXT (
                                                                   'NM3_SECURITY_CTX',
                                                                   'USERNAME')))));
+																  
 																  
