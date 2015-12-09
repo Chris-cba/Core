@@ -1,11 +1,11 @@
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/locator_segments.sql-arc   1.2   Nov 13 2015 17:48:50   Rob.Coupe  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/locator_segments.sql-arc   1.3   Dec 09 2015 22:11:46   Rob.Coupe  $
 --       Module Name      : $Workfile:   locator_segments.sql  $
---       Date into SCCS   : $Date:   Nov 13 2015 17:48:50  $
---       Date fetched Out : $Modtime:   Nov 13 2015 17:48:26  $
---       SCCS Version     : $Revision:   1.2  $
+--       Date into SCCS   : $Date:   Dec 09 2015 22:11:46  $
+--       Date fetched Out : $Modtime:   Dec 09 2015 22:11:24  $
+--       SCCS Version     : $Revision:   1.3  $
 --
 -----------------------------------------------------------------------------
 --    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
@@ -87,11 +87,11 @@ AS
    SELECT --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/locator_segments.sql-arc   1.2   Nov 13 2015 17:48:50   Rob.Coupe  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/locator_segments.sql-arc   1.3   Dec 09 2015 22:11:46   Rob.Coupe  $
 --       Module Name      : $Workfile:   locator_segments.sql  $
---       Date into SCCS   : $Date:   Nov 13 2015 17:48:50  $
---       Date fetched Out : $Modtime:   Nov 13 2015 17:48:26  $
---       SCCS Version     : $Revision:   1.2  $
+--       Date into SCCS   : $Date:   Dec 09 2015 22:11:46  $
+--       Date fetched Out : $Modtime:   Dec 09 2015 22:11:24  $
+--       SCCS Version     : $Revision:   1.3  $
 --
 -----------------------------------------------------------------------------
 --    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
@@ -170,6 +170,6 @@ AS
     
     
 begin
-NM3DDL.CREATE_SYNONYM_FOR_OBJECT('LOCATOR_SEGS', 'PUBLIC');
+NM3DDL.CREATE_SYNONYM_FOR_OBJECT('LOCATOR_SEGMENTS', 'PUBLIC');
 end;    
 /
