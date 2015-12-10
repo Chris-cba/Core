@@ -1,10 +1,10 @@
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/nm_4700_fix31.sql-arc   1.2   Dec 10 2015 10:26:56   Rob.Coupe  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/nm_4700_fix31.sql-arc   1.3   Dec 10 2015 13:44:42   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm_4700_fix31.sql  $ 
---       Date into PVCS   : $Date:   Dec 10 2015 10:26:56  $
---       Date fetched Out : $Modtime:   Dec 10 2015 10:18:16  $
---       PVCS Version     : $Revision:   1.2  $
+--       Date into PVCS   : $Date:   Dec 10 2015 13:44:42  $
+--       Date fetched Out : $Modtime:   Dec 10 2015 13:41:20  $
+--       PVCS Version     : $Revision:   1.3  $
 --
 ----------------------------------------------------------------------------
 --   Copyright (c) 2015 Bentley Systems Incorporated.  All rights reserved.
@@ -140,6 +140,10 @@ start mapviewer.pkw
 prompt nm3undo....
 
 start nm3undo.pkw
+
+prompt nm3close....
+
+start nm3close.pkw
 
 Prompt Modifications to TRIGGERS
 
