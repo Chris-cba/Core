@@ -1,10 +1,10 @@
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/nm_4700_fix31.sql-arc   1.1   Dec 08 2015 11:11:50   Rob.Coupe  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/nm_4700_fix31.sql-arc   1.2   Dec 10 2015 10:26:56   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm_4700_fix31.sql  $ 
---       Date into PVCS   : $Date:   Dec 08 2015 11:11:50  $
---       Date fetched Out : $Modtime:   Dec 08 2015 11:11:30  $
---       PVCS Version     : $Revision:   1.1  $
+--       Date into PVCS   : $Date:   Dec 10 2015 10:26:56  $
+--       Date fetched Out : $Modtime:   Dec 10 2015 10:18:16  $
+--       PVCS Version     : $Revision:   1.2  $
 --
 ----------------------------------------------------------------------------
 --   Copyright (c) 2015 Bentley Systems Incorporated.  All rights reserved.
@@ -67,7 +67,6 @@ BEGIN
                                         ,p_VERSION        => '4.7.0.0'
                                         );
 --
--- 	Check that NET 4700 FIX 15 has already been applied
 --
 END;
 /
@@ -129,6 +128,18 @@ start nm3nwval.pkw
 prompt nm3rsc....
 
 start nm3rsc.pkw
+
+prompt nm3recal....
+
+start nm3recal.pkw
+
+prompt mapviewer....
+
+start mapviewer.pkw
+
+prompt nm3undo....
+
+start nm3undo.pkw
 
 Prompt Modifications to TRIGGERS
 
