@@ -4,18 +4,20 @@ CREATE OR REPLACE FORCE VIEW V_NM_USER_AU_MODE
    ACCESS_MODE
 )
 AS
-   SELECT 
-                                                      --   SCCS Identifiers :-
+   SELECT                                                                   --
+                                                      --   PVCS Identifiers :-
                                                                             --
-                   --       sccsid           : @(#)nm_elements.vw 1.3 03/24/05
-                                    --       Module Name      : nm_elements.vw
-                                 --       Date into SCCS   : 05/03/24 16:15:06
-                                 --       Date fetched Out : 07/06/13 17:08:05
-                                               --       SCCS Version     : 1.3
+ --       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/views/v_nm_user_au_mode.vw-arc   1.1   Dec 11 2015 16:37:50   Rob.Coupe  $
+                  --       Module Name      : $Workfile:   v_nm_user_au_mode.vw  $
+                  --       Date into SCCS   : $Date:   Dec 11 2015 16:37:50  $
+               --       Date fetched Out : $Modtime:   Dec 11 2015 16:36:04  $
+                               --       SCCS Version     : $Revision:   1.1  $
                                                                             --
  -----------------------------------------------------------------------------
-    --   Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
- -----------------------------------------------------------------------------                                                                            --
+   --    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+ -----------------------------------------------------------------------------
+  -- script to create new, unrestricted views for use in Locator on HE systems
+                                                                            --
           DISTINCT
           nag_child_admin_unit admin_unit,
           FIRST_VALUE (nua_mode)
@@ -29,13 +31,13 @@ AS
 begin
   if NVL(hig.get_sysopt('HIGPUBSYN'), 'Y' ) = 'Y' then
       nm3ddl.create_synonym_for_object (
-      'V_NM_USER_INV_MODE', 'PUBLIC' );
+      'V_NM_USER_AU_MODE', 'PUBLIC' );
   else
     for i in ( select hus_username from hig_users, dba_users
                where hus_username = username
                and hus_is_hig_owner_flag  = 'N'  ) loop
         begin
-           execute immediate 'create synonym '||i.hus_username||' for '||sys_context('NM3_SECURITY_CTX', 'HIG_OWNER')||'.V_NM_USER_INV_MODE';
+           execute immediate 'create synonym '||i.hus_username||'.V_NM_USER_AU_MODE for '||sys_context('NM3_SECURITY_CTX', 'HIG_OWNER')||'.V_NM_USER_AU_MODE';
         exception
            when others then NULL;
         end;
