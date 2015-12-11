@@ -1,10 +1,10 @@
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/nm_4700_fix31.sql-arc   1.3   Dec 10 2015 13:44:42   Rob.Coupe  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/nm_4700_fix31.sql-arc   1.4   Dec 11 2015 16:09:38   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm_4700_fix31.sql  $ 
---       Date into PVCS   : $Date:   Dec 10 2015 13:44:42  $
---       Date fetched Out : $Modtime:   Dec 10 2015 13:41:20  $
---       PVCS Version     : $Revision:   1.3  $
+--       Date into PVCS   : $Date:   Dec 11 2015 16:09:38  $
+--       Date fetched Out : $Modtime:   Dec 11 2015 16:08:14  $
+--       PVCS Version     : $Revision:   1.4  $
 --
 ----------------------------------------------------------------------------
 --   Copyright (c) 2015 Bentley Systems Incorporated.  All rights reserved.
@@ -88,6 +88,17 @@ start NAT_EXCLUSIVE.SQL
 Prompt Modifications to network policies
 
 start drop_policies.sql
+
+Prompt New views to support access rules
+
+Prompt v_nm_user_inv_mode....
+
+start v_nm_user_inv_mode.vw
+
+Prompt v_nm_user_au_mode....
+
+start v_nm_user_au_mode.vw
+
 
 Prompt Modifications to package headers
 
