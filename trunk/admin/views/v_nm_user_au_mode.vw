@@ -7,16 +7,16 @@ AS
    SELECT                                                                   --
                                                       --   PVCS Identifiers :-
                                                                             --
- --       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/views/v_nm_user_au_mode.vw-arc   1.1   Dec 11 2015 16:37:50   Rob.Coupe  $
+ --       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/views/v_nm_user_au_mode.vw-arc   1.2   Dec 11 2015 16:52:10   Rob.Coupe  $
                   --       Module Name      : $Workfile:   v_nm_user_au_mode.vw  $
-                  --       Date into SCCS   : $Date:   Dec 11 2015 16:37:50  $
-               --       Date fetched Out : $Modtime:   Dec 11 2015 16:36:04  $
-                               --       SCCS Version     : $Revision:   1.1  $
+                  --       Date into SCCS   : $Date:   Dec 11 2015 16:52:10  $
+               --       Date fetched Out : $Modtime:   Dec 11 2015 16:51:42  $
+                               --       SCCS Version     : $Revision:   1.2  $
                                                                             --
  -----------------------------------------------------------------------------
-   --    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+   --    Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
  -----------------------------------------------------------------------------
-  -- script to create new, unrestricted views for use in Locator on HE systems
+  -- script to create a view to show available admin-units and maximum mode for a user
                                                                             --
           DISTINCT
           nag_child_admin_unit admin_unit,
