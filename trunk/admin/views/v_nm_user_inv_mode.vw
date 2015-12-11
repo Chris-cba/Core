@@ -4,18 +4,20 @@ CREATE OR REPLACE FORCE VIEW V_NM_USER_INV_MODE
    ACCESS_MODE
 )
 AS
-   SELECT 
-                                                      --   SCCS Identifiers :-
+   SELECT                                                                   --
+                                                      --   PVCS Identifiers :-
                                                                             --
-                   --       sccsid           : @(#)nm_elements.vw 1.3 03/24/05
-                                    --       Module Name      : nm_elements.vw
-                                 --       Date into SCCS   : 05/03/24 16:15:06
-                                 --       Date fetched Out : 07/06/13 17:08:05
-                                               --       SCCS Version     : 1.3
+ --       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/views/v_nm_user_inv_mode.vw-arc   1.1   Dec 11 2015 16:48:52   Rob.Coupe  $
+                  --       Module Name      : $Workfile:   v_nm_user_inv_mode.vw  $
+                  --       Date into SCCS   : $Date:   Dec 11 2015 16:48:52  $
+               --       Date fetched Out : $Modtime:   Dec 11 2015 16:48:24  $
+                               --       SCCS Version     : $Revision:   1.1  $
                                                                             --
  -----------------------------------------------------------------------------
-    --   Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
- -----------------------------------------------------------------------------                                                                            --
+   --    Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
+ -----------------------------------------------------------------------------
+  -- script to create a view to show asset types and maximum access mode for a user
+                                                                            --
           DISTINCT
           itr_inv_type inv_type,
           FIRST_VALUE (itr_mode)
@@ -36,7 +38,7 @@ begin
                where hus_username = username
                and hus_is_hig_owner_flag  = 'N'  ) loop
         begin
-           execute immediate 'create synonym '||i.hus_username||' for '||sys_context('NM3_SECURITY_CTX', 'HIG_OWNER')||'.V_NM_USER_INV_MODE';
+           execute immediate 'create synonym '||i.hus_username||'.V_NM_USER_INV_MODE for '||sys_context('NM3_SECURITY_CTX', 'HIG_OWNER')||'.V_NM_USER_INV_MODE';
         exception
            when others then NULL;
         end;
