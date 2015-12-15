@@ -7,11 +7,11 @@ AS
    SELECT                                                                   --
                                                       --   PVCS Identifiers :-
                                                                             --
- --       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/views/v_nm_user_au_mode.vw-arc   1.3   Dec 15 2015 20:35:08   Rob.Coupe  $
+ --       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/views/v_nm_user_au_mode.vw-arc   1.4   Dec 15 2015 20:39:44   Rob.Coupe  $
                   --       Module Name      : $Workfile:   v_nm_user_au_mode.vw  $
-                  --       Date into SCCS   : $Date:   Dec 15 2015 20:35:08  $
-               --       Date fetched Out : $Modtime:   Dec 15 2015 20:33:40  $
-                               --       SCCS Version     : $Revision:   1.3  $
+                  --       Date into SCCS   : $Date:   Dec 15 2015 20:39:44  $
+               --       Date fetched Out : $Modtime:   Dec 15 2015 20:39:34  $
+                               --       SCCS Version     : $Revision:   1.4  $
                                                                             --
  -----------------------------------------------------------------------------
    --    Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
@@ -35,7 +35,7 @@ begin
         already_exists exception;
         pragma exception_init (already_exists, -955);
      begin
-        execute immediate 'create public synonym locator_segs for '||sys_context('NM3CORE', 'APPLICATION_OWNER')||'.LOCATOR_SEGS';
+        execute immediate 'create public synonym v_nm_user_au_mode for '||sys_context('NM3CORE', 'APPLICATION_OWNER')||'.V_NM_USER_AU_MODE';
      exception 
        when already_exists then NULL;
      end;
