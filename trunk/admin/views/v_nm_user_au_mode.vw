@@ -7,11 +7,11 @@ AS
    SELECT                                                                   --
                                                       --   PVCS Identifiers :-
                                                                             --
- --       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/views/v_nm_user_au_mode.vw-arc   1.2   Dec 11 2015 16:52:10   Rob.Coupe  $
+ --       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/views/v_nm_user_au_mode.vw-arc   1.3   Dec 15 2015 20:35:08   Rob.Coupe  $
                   --       Module Name      : $Workfile:   v_nm_user_au_mode.vw  $
-                  --       Date into SCCS   : $Date:   Dec 11 2015 16:52:10  $
-               --       Date fetched Out : $Modtime:   Dec 11 2015 16:51:42  $
-                               --       SCCS Version     : $Revision:   1.2  $
+                  --       Date into SCCS   : $Date:   Dec 15 2015 20:35:08  $
+               --       Date fetched Out : $Modtime:   Dec 15 2015 20:33:40  $
+                               --       SCCS Version     : $Revision:   1.3  $
                                                                             --
  -----------------------------------------------------------------------------
    --    Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
@@ -28,10 +28,17 @@ AS
           AND nua_user_id = SYS_CONTEXT ('NM3CORE', 'USER_ID');
 /
 
+
 begin
   if NVL(hig.get_sysopt('HIGPUBSYN'), 'Y' ) = 'Y' then
-      nm3ddl.create_synonym_for_object (
-      'V_NM_USER_AU_MODE', 'PUBLIC' );
+     declare
+        already_exists exception;
+        pragma exception_init (already_exists, -955);
+     begin
+        execute immediate 'create public synonym locator_segs for '||sys_context('NM3CORE', 'APPLICATION_OWNER')||'.LOCATOR_SEGS';
+     exception 
+       when already_exists then NULL;
+     end;
   else
     for i in ( select hus_username from hig_users, dba_users
                where hus_username = username
