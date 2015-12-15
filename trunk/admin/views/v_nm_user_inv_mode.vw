@@ -7,11 +7,11 @@ AS
    SELECT                                                                   --
                                                       --   PVCS Identifiers :-
                                                                             --
- --       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/views/v_nm_user_inv_mode.vw-arc   1.1   Dec 11 2015 16:48:52   Rob.Coupe  $
+ --       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/views/v_nm_user_inv_mode.vw-arc   1.2   Dec 15 2015 20:37:58   Rob.Coupe  $
                   --       Module Name      : $Workfile:   v_nm_user_inv_mode.vw  $
-                  --       Date into SCCS   : $Date:   Dec 11 2015 16:48:52  $
-               --       Date fetched Out : $Modtime:   Dec 11 2015 16:48:24  $
-                               --       SCCS Version     : $Revision:   1.1  $
+                  --       Date into SCCS   : $Date:   Dec 15 2015 20:37:58  $
+               --       Date fetched Out : $Modtime:   Dec 15 2015 20:37:40  $
+                               --       SCCS Version     : $Revision:   1.2  $
                                                                             --
  -----------------------------------------------------------------------------
    --    Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
@@ -31,8 +31,14 @@ AS
 
 begin
   if NVL(hig.get_sysopt('HIGPUBSYN'), 'Y' ) = 'Y' then
-      nm3ddl.create_synonym_for_object (
-      'V_NM_USER_INV_MODE', 'PUBLIC' );
+     declare
+        already_exists exception;
+        pragma exception_init (already_exists, -955);
+     begin
+        execute immediate 'create public synonym v_nm_user_inv_mode for '||sys_context('NM3CORE', 'APPLICATION_OWNER')||'.V_NM_USER_INV_MODE';
+     exception 
+       when already_exists then NULL;
+     end;
   else
     for i in ( select hus_username from hig_users, dba_users
                where hus_username = username
