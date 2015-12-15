@@ -1,11 +1,11 @@
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/locator_segments.sql-arc   1.3   Dec 09 2015 22:11:46   Rob.Coupe  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/locator_segments.sql-arc   1.4   Dec 15 2015 14:17:22   Rob.Coupe  $
 --       Module Name      : $Workfile:   locator_segments.sql  $
---       Date into SCCS   : $Date:   Dec 09 2015 22:11:46  $
---       Date fetched Out : $Modtime:   Dec 09 2015 22:11:24  $
---       SCCS Version     : $Revision:   1.3  $
+--       Date into SCCS   : $Date:   Dec 15 2015 14:17:22  $
+--       Date fetched Out : $Modtime:   Dec 15 2015 14:16:30  $
+--       SCCS Version     : $Revision:   1.4  $
 --
 -----------------------------------------------------------------------------
 --    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
@@ -87,11 +87,11 @@ AS
    SELECT --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/locator_segments.sql-arc   1.3   Dec 09 2015 22:11:46   Rob.Coupe  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/locator_segments.sql-arc   1.4   Dec 15 2015 14:17:22   Rob.Coupe  $
 --       Module Name      : $Workfile:   locator_segments.sql  $
---       Date into SCCS   : $Date:   Dec 09 2015 22:11:46  $
---       Date fetched Out : $Modtime:   Dec 09 2015 22:11:24  $
---       SCCS Version     : $Revision:   1.3  $
+--       Date into SCCS   : $Date:   Dec 15 2015 14:17:22  $
+--       Date fetched Out : $Modtime:   Dec 15 2015 14:16:30  $
+--       SCCS Version     : $Revision:   1.4  $
 --
 -----------------------------------------------------------------------------
 --    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
@@ -168,8 +168,14 @@ AS
     FROM locator_segs
 /
     
-    
+   
+declare
+   already_exists exception;
+   pragma exception_init (already_exists, -955);
 begin
-NM3DDL.CREATE_SYNONYM_FOR_OBJECT('LOCATOR_SEGMENTS', 'PUBLIC');
-end;    
+  execute immediate 'create public synonym locator_segs for '||sys_context('NM3CORE', 'APPLICATION_OWNER')||'.LOCATOR_SEGS';
+exception 
+  when already_exists then NULL;
+end;
 /
+
