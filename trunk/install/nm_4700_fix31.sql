@@ -1,10 +1,10 @@
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/nm_4700_fix31.sql-arc   1.5   Dec 15 2015 21:00:34   Rob.Coupe  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/nm_4700_fix31.sql-arc   1.6   Dec 15 2015 21:56:06   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm_4700_fix31.sql  $ 
---       Date into PVCS   : $Date:   Dec 15 2015 21:00:34  $
---       Date fetched Out : $Modtime:   Dec 15 2015 21:00:18  $
---       PVCS Version     : $Revision:   1.5  $
+--       Date into PVCS   : $Date:   Dec 15 2015 21:56:06  $
+--       Date fetched Out : $Modtime:   Dec 15 2015 21:55:42  $
+--       PVCS Version     : $Revision:   1.6  $
 --
 ----------------------------------------------------------------------------
 --   Copyright (c) 2015 Bentley Systems Incorporated.  All rights reserved.
@@ -90,6 +90,10 @@ Prompt Modifications to network policies
 start drop_policies.sql
 
 Prompt Recompiling some base packages
+
+alter package nm3get compile;
+
+alter package nm3ins compile;
 
 alter package hig compile body;
 
