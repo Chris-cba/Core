@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3pla AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3pla.pkb-arc   2.17   Jun 05 2014 11:05:22   Rob.Coupe  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3pla.pkb-arc   2.18   Dec 21 2015 09:48:08   Upendra.Hukeri  $
 --       Module Name      : $Workfile:   nm3pla.pkb  $
---       Date into PVCS   : $Date:   Jun 05 2014 11:05:22  $
---       Date fetched Out : $Modtime:   Jun 05 2014 11:04:22  $
---       Version          : $Revision:   2.17  $
+--       Date into PVCS   : $Date:   Dec 21 2015 09:48:08  $
+--       Date fetched Out : $Modtime:   Dec 17 2015 06:28:06  $
+--       Version          : $Revision:   2.18  $
 --       Based on SCCS version : 1.61
 ------------------------------------------------------------------------
 --
@@ -15,11 +15,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3pla AS
 --    Placements package
 --
 -------------------------------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
 -------------------------------------------------------------------------------------------
 -- Global variables - tree definitions etc.
    --g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"@(#)nm3pla.pkb    1.61 11/29/06"';
-   g_body_sccsid     CONSTANT varchar2(2000) := '$Revision:   2.17  $';
+   g_body_sccsid     CONSTANT varchar2(2000) := '$Revision:   2.18  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT VARCHAR2(30) := 'nm3pla';
@@ -1092,6 +1092,7 @@ FUNCTION defrag_placement_array (this_npa nm_placement_array) RETURN nm_placemen
 --
    l_end         NUMBER;
    l_this_ne_id  NUMBER;
+   l_this_gty    nm_elements.ne_gty_group_type%TYPE;
 --
    l_array_count NUMBER;
    l_length      NUMBER;
@@ -1104,7 +1105,7 @@ BEGIN
 --
 -- If Placement array empty or only contains one record then return as is
 --
-   new_npa := Nm3pla.initialise_placement_array;
+   new_npa := nm3pla.initialise_placement_array;
 --
    IF l_array_count <= 1
     THEN
@@ -1124,6 +1125,7 @@ BEGIN
        LOOP
    --
          l_this_ne_id := NVL(this_npa.npa_placement_array(l_counter).pl_ne_id,0);
+		 l_this_gty   := nm3net.get_gty_type(l_this_ne_id);
    --
          IF l_this_ne_id <> prior_ne_id
           THEN -- This is for a different NE_ID
@@ -1149,8 +1151,11 @@ BEGIN
 
             measure := measure + (l_end - prior_start);
 --
-            IF Nm3net.subclass_is_used (l_this_ne_id) AND
-               Nm3net.get_sub_class(l_this_ne_id) != Nm3net.get_sub_class(prior_ne_id)
+            IF nm3net.subclass_is_used (l_this_ne_id) AND
+			   NVL(hig.get_sysopt('DISAMBIGSC'), 'N') = 'Y' AND
+			   l_this_gty IS NOT NULL AND
+			   NVL(nm3net.is_gty_reversible(l_this_gty), 'N') = 'Y' AND
+               nm3net.get_sub_class(l_this_ne_id) != nm3net.get_sub_class(prior_ne_id)
              THEN
                IF    l_connect = 1
                 THEN
@@ -2073,16 +2078,19 @@ FUNCTION get_connected_extent( pi_st_lref IN nm_lref,
 -- Note that the supplied sub-class is an excluded sub-class
 
   e_no_connectivity EXCEPTION;
-
-  CURSOR c1 IS
+  --
+  l_sub_class nm_elements.ne_sub_class%TYPE := pi_sub_class;
+  --
+  CURSOR c1 (c_ne_id IN nm_elements.ne_id%TYPE, c_sub_class IN nm_elements.ne_sub_class%TYPE) 
+  IS
     SELECT * FROM 
-    (SELECT CONNECT_BY_ISCYCLE connectby, ne_id, ne_length, Nm3net.get_cardinality( pi_route, ne_id) ne_cardinality
+    (SELECT CONNECT_BY_ISCYCLE connectby, ne_id, ne_length, Nm3net.get_cardinality(c_ne_id, ne_id) ne_cardinality
     FROM nm_elements
-    WHERE NVL(ne_sub_class, '÷÷÷÷') != NVL(pi_sub_class,'÷$%^')
-    CONNECT BY NOCYCLE PRIOR get_next_element2(pi_route, ne_id, pi_sub_class ) = ne_id
-    AND NVL(ne_sub_class, '÷÷÷÷') != NVL(pi_sub_class,'÷$%^')
-    START WITH ne_id = get_next_element2(pi_route, pi_st_lref.lr_ne_id, pi_sub_class )
-    AND NVL(ne_sub_class, '÷÷÷÷') != NVL(pi_sub_class,'÷$%^'))
+    WHERE NVL(ne_sub_class, '÷÷÷÷') != NVL(c_sub_class,'÷$%^')
+    CONNECT BY NOCYCLE PRIOR get_next_element2(c_ne_id, ne_id, c_sub_class) = ne_id
+    AND NVL(ne_sub_class, '÷÷÷÷') != NVL(c_sub_class,'÷$%^')
+    START WITH ne_id = get_next_element2(c_ne_id, pi_st_lref.lr_ne_id, c_sub_class )
+    AND NVL(ne_sub_class, '÷÷÷÷') != NVL(c_sub_class,'÷$%^'))
     WHERE connectby = 0;
 
   l_st_true  NUMBER := Nm3lrs.get_element_true( pi_route, pi_st_lref.lr_ne_id );
@@ -2103,7 +2111,17 @@ FUNCTION get_connected_extent( pi_st_lref IN nm_lref,
 BEGIN
 
   Nm_Debug.proc_start(g_package_name,'get_connected_extent');
-
+  --
+  IF nm3net.is_gty_reversible(nm3get.get_ne(pi_route).ne_gty_group_type) = 'Y' THEN
+    l_sub_class := NULL;
+  ELSE
+    l_sub_class := pi_sub_class;
+  END IF; 
+  --
+  IF l_sub_class IS NULL AND NOT nm3lrs.unique_sub_class(pi_route, l_st_true, l_end_true) THEN
+    RAISE_APPLICATION_ERROR (-20043, 'No unique sub-class supplied');
+  END IF;
+  --
   IF l_st_seg = l_end_seg
   THEN
     IF (pi_st_lref.lr_ne_id = pi_end_lref.lr_ne_id
@@ -2133,12 +2151,6 @@ BEGIN
 
   --If no sub-class supplied, then check the sub-class of elements between the two
   --values and if more than one then force a sub-class.
-
-  IF pi_sub_class IS NULL
-    AND NOT Nm3lrs.unique_sub_class( pi_route, l_st_true, l_end_true )
-  THEN
-    RAISE_APPLICATION_ERROR ( -20043, 'No unique sub-class supplied ');
-  END IF;
 
   IF l_st_cardinality = 1 THEN
 
@@ -2180,7 +2192,7 @@ BEGIN
 
 --    nm3pla.dump_placement_array(retval);
 
-    FOR irec IN c1
+    FOR irec IN c1(pi_route, l_sub_class)
     LOOP
 
       --   loop over all elements between the two true values, restricted by the optional sub-class,
@@ -2221,12 +2233,12 @@ BEGIN
                                  );
     END LOOP;
   END IF;
-
+  /*
   IF retval.get_entry(retval.placement_count).pl_ne_id <> pi_end_lref.get_ne_id
   THEN
     RAISE e_no_connectivity;
   END IF;
-
+  */
   Nm_Debug.proc_start(g_package_name,'get_connected_extent');
 
   RETURN retval;
@@ -2235,7 +2247,6 @@ EXCEPTION
   WHEN e_no_connectivity
   THEN
     RAISE_APPLICATION_ERROR ( -20042, 'Cannot establish connectivity between the start and end');
-
 END get_connected_extent;
 --
 --------------------------------------------------------------------------------------------------------------------
