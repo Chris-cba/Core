@@ -1,10 +1,10 @@
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/nm_4700_fix31.sql-arc   1.6   Dec 15 2015 21:56:06   Rob.Coupe  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/nm_4700_fix31.sql-arc   1.7   Dec 21 2015 16:38:14   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm_4700_fix31.sql  $ 
---       Date into PVCS   : $Date:   Dec 15 2015 21:56:06  $
---       Date fetched Out : $Modtime:   Dec 15 2015 21:55:42  $
---       PVCS Version     : $Revision:   1.6  $
+--       Date into PVCS   : $Date:   Dec 21 2015 16:38:14  $
+--       Date fetched Out : $Modtime:   Dec 21 2015 16:38:30  $
+--       PVCS Version     : $Revision:   1.7  $
 --
 ----------------------------------------------------------------------------
 --   Copyright (c) 2015 Bentley Systems Incorporated.  All rights reserved.
@@ -28,7 +28,7 @@ SET TERM ON
 --
 -- Spool to Logfile
 --
-DEFINE logfile1='nm_4700_fix31_&log_extension'
+DEFINE logfile1='nm_4700_fix31_part1_&log_extension'
 SPOOL &logfile1
 --
 --------------------------------------------------------------------------------
@@ -70,6 +70,35 @@ BEGIN
 --
 END;
 /
+
+DECLARE
+FUNCTION check_lstner RETURN boolean IS
+  l_lsnr_count number;
+  table_locked EXCEPTION;
+  PRAGMA EXCEPTION_INIT( table_locked, -54 );
+    lock_alert number;
+  BEGIN
+  SAVEPOINT lstner;
+  LOCK TABLE exor_lock IN EXCLUSIVE MODE NOWAIT;
+  ROLLBACK TO SAVEPOINT lstner;
+  RETURN FALSE;
+EXCEPTION
+  WHEN table_locked THEN
+   ROLLBACK TO SAVEPOINT lstner;
+     RETURN TRUE;
+  END;
+
+BEGIN
+  IF check_lstner THEN
+    dbms_output.put_line(chr(10));
+    dbms_output.put_line('***************************************************************************************************');
+    dbms_output.put_line('CAUTION: Exor Listeners are currently running - executing compile_all.sql could result in deadlock');
+    dbms_output.put_line('***************************************************************************************************');	
+  END IF;
+
+END;
+/
+
 WHENEVER SQLERROR CONTINUE
 --
 Prompt Update to error message
@@ -89,15 +118,24 @@ Prompt Modifications to network policies
 
 start drop_policies.sql
 
-Prompt Recompiling some base packages
 
-alter package nm3get compile;
+Prompt Recompiling.....
 
-alter package nm3ins compile;
+spool off;
 
-alter package hig compile body;
+start fix31_compile
 
-alter package nm3ddl compile body;
+set head on
+set feed on
+set pages 24
+set lines 132
+set verify OFF
+set termout on
+
+start compile_all.sql
+
+DEFINE logfile2='nm_4700_fix31_part2_&log_extension'
+SPOOL &logfile2
 
 Prompt New views to support access rules
 
@@ -189,5 +227,4 @@ SET FEEDBACK OFF
 SPOOL OFF
 
 EXIT
---
 --
