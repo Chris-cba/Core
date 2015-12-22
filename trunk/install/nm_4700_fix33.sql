@@ -2,11 +2,11 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/nm3/install/nm_4700_fix33.sql-arc   1.0   Dec 22 2015 17:20:14   Sarah.Williams  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/nm3/install/nm_4700_fix33.sql-arc   1.1   Dec 22 2015 17:23:12   Sarah.Williams  $
 --       Module Name      : $Workfile:   nm_4700_fix33.sql  $
---       Date into PVCS   : $Date:   Dec 22 2015 17:20:14  $
---       Date fetched Out : $Modtime:   Dec 22 2015 17:12:06  $
---       PVCS Version     : $Revision:   1.0  $
+--       Date into PVCS   : $Date:   Dec 22 2015 17:23:12  $
+--       Date fetched Out : $Modtime:   Dec 22 2015 17:21:38  $
+--       PVCS Version     : $Revision:   1.1  $
 --
 --------------------------------------------------------------------------------
 --   Copyright (c) 2014 Bentley Systems Incorporated.
@@ -77,7 +77,7 @@ PROMPT Creating function get_passw_exp_date
 SET TERM OFF
 --
 SET FEEDBACK ON
-start get_passw_exp_date.fnc
+start get_passw_exp_date.fnw
 SET FEEDBACK OFF
 
 
