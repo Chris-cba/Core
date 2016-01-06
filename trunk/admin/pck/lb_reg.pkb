@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_reg
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_reg.pkb-arc   1.7   Oct 19 2015 17:41:46   Rob.Coupe  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_reg.pkb-arc   1.8   Jan 06 2016 14:16:58   Rob.Coupe  $
 --       Module Name      : $Workfile:   lb_reg.pkb  $
---       Date into PVCS   : $Date:   Oct 19 2015 17:41:46  $
---       Date fetched Out : $Modtime:   Oct 19 2015 17:41:34  $
---       PVCS Version     : $Revision:   1.7  $
+--       Date into PVCS   : $Date:   Jan 06 2016 14:16:58  $
+--       Date fetched Out : $Modtime:   Jan 06 2016 14:13:34  $
+--       PVCS Version     : $Revision:   1.8  $
 --
 --   Author : R.A. Coupe
 --
@@ -19,7 +19,7 @@ AS
    --
    --all global package variables here
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (30) := '"$Revision:   1.7  $"';
+   g_body_sccsid    CONSTANT VARCHAR2 (30) := '"$Revision:   1.8  $"';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'NM3RSC';
    --
@@ -309,14 +309,14 @@ AS
       DELETE FROM nm_inv_type_roles
             WHERE itr_inv_type = pi_exor_type;
 
-      DELETE FROM NM_ASSET_LOCATIONS_ALL
-            WHERE nal_nit_type = pi_exor_type;
-
       DELETE FROM nm_location_geometry
             WHERE nlg_obj_type = pi_exor_type;
 
       DELETE FROM nm_locations_all
             WHERE nm_obj_type = pi_exor_type;
+
+      DELETE FROM NM_ASSET_LOCATIONS_ALL
+            WHERE nal_nit_type = pi_exor_type;
 
       DELETE FROM nm_inv_type_attribs
             WHERE ita_inv_type = pi_exor_type;
