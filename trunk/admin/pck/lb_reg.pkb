@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_reg
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_reg.pkb-arc   1.10   Jan 06 2016 14:32:04   Rob.Coupe  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_reg.pkb-arc   1.11   Jan 06 2016 14:36:58   Rob.Coupe  $
 --       Module Name      : $Workfile:   lb_reg.pkb  $
---       Date into PVCS   : $Date:   Jan 06 2016 14:32:04  $
---       Date fetched Out : $Modtime:   Jan 06 2016 14:31:36  $
---       PVCS Version     : $Revision:   1.10  $
+--       Date into PVCS   : $Date:   Jan 06 2016 14:36:58  $
+--       Date fetched Out : $Modtime:   Jan 06 2016 14:36:34  $
+--       PVCS Version     : $Revision:   1.11  $
 --
 --   Author : R.A. Coupe
 --
@@ -19,7 +19,7 @@ AS
    --
    --all global package variables here
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (30) := '"$Revision:   1.10  $"';
+   g_body_sccsid    CONSTANT VARCHAR2 (30) := '"$Revision:   1.11  $"';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'NM3RSC';
    --
