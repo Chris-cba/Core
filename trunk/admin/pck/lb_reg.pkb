@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_reg
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_reg.pkb-arc   1.9   Jan 06 2016 14:21:08   Rob.Coupe  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_reg.pkb-arc   1.10   Jan 06 2016 14:32:04   Rob.Coupe  $
 --       Module Name      : $Workfile:   lb_reg.pkb  $
---       Date into PVCS   : $Date:   Jan 06 2016 14:21:08  $
---       Date fetched Out : $Modtime:   Jan 06 2016 14:20:32  $
---       PVCS Version     : $Revision:   1.9  $
+--       Date into PVCS   : $Date:   Jan 06 2016 14:32:04  $
+--       Date fetched Out : $Modtime:   Jan 06 2016 14:31:36  $
+--       PVCS Version     : $Revision:   1.10  $
 --
 --   Author : R.A. Coupe
 --
@@ -19,7 +19,7 @@ AS
    --
    --all global package variables here
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (30) := '"$Revision:   1.9  $"';
+   g_body_sccsid    CONSTANT VARCHAR2 (30) := '"$Revision:   1.10  $"';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'NM3RSC';
    --
@@ -252,8 +252,9 @@ AS
 
    --
 
-   PROCEDURE drop_lb_asset_type (pi_lb_object_type   IN INTEGER,
-                                 pi_exor_type        IN VARCHAR2)
+   PROCEDURE drop_lb_asset_type (
+      pi_lb_object_type   IN INTEGER,
+      pi_exor_type        IN VARCHAR2 DEFAULT NULL)
    IS
       l_exor_type   lb_types.lb_exor_inv_type%TYPE := pi_exor_type;
    BEGIN
@@ -264,16 +265,18 @@ AS
               INTO l_exor_type
               FROM lb_types
              WHERE lb_object_type = pi_lb_object_type;
-         EXCEPTION
-            WHEN NO_DATA_FOUND
-            THEN
-               NULL;
+                  EXCEPTION
+                     WHEN NO_DATA_FOUND
+                     THEN
+                        NULL;
          END;
       END IF;
 
       IF l_exor_type IS NOT NULL
       THEN
          drop_lb_asset_type (l_exor_type);
+      ELSE
+         raise_application_error (-20001, 'Problem');
       END IF;
 
       --
@@ -375,3 +378,4 @@ AS
       COMMIT;
    END;
 END;
+/
