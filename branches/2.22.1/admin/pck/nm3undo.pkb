@@ -4,11 +4,11 @@ IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3undo.pkb-arc   2.22.1.0   Dec 01 2015 16:54:20   Rob.Coupe  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3undo.pkb-arc   2.22.1.1   Jan 11 2016 21:22:24   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3undo.pkb  $
---       Date into PVCS   : $Date:   Dec 01 2015 16:54:20  $
---       Date fetched Out : $Modtime:   Dec 01 2015 16:53:52  $
---       PVCS Version     : $Revision:   2.22.1.0  $
+--       Date into PVCS   : $Date:   Jan 11 2016 21:22:24  $
+--       Date fetched Out : $Modtime:   Jan 11 2016 21:22:56  $
+--       PVCS Version     : $Revision:   2.22.1.1  $
 --
 --   Author : ITurnbull
 --
@@ -19,7 +19,7 @@ IS
 -- Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '"$Revision:   2.22.1.0  $"';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '"$Revision:   2.22.1.1  $"';
 --  g_body_sccsid is the SCCS ID for the package body
    g_package_name   CONSTANT VARCHAR2 (2000) := 'nm3undo';
 --
@@ -1960,7 +1960,7 @@ END undo_scheme;
 --
       Nm_Debug.proc_start (g_package_name, 'unclose');
 --
-      Nm3nwval.network_operations_check (Nm3nwval.c_unclose);
+      Nm3nwval.network_operations_check (Nm3nwval.c_unclose, p_ne_id);
 --
       Nm3ausec.set_status (Nm3type.c_off);
       
