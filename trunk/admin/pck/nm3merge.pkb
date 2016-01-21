@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm3merge IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3merge.pkb-arc   2.18   Nov 26 2015 13:11:26   Steve.Cooper  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3merge.pkb-arc   2.19   Jan 21 2016 11:41:52   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3merge.pkb  $
---       Date into PVCS   : $Date:   Nov 26 2015 13:11:26  $
---       Date fetched Out : $Modtime:   Nov 10 2015 15:43:36  $
---       PVCS Version     : $Revision:   2.18  $
+--       Date into PVCS   : $Date:   Jan 21 2016 11:41:52  $
+--       Date fetched Out : $Modtime:   Jan 21 2016 11:41:02  $
+--       PVCS Version     : $Revision:   2.19  $
 --
 --   Author : ITurnbull
 --
@@ -16,7 +16,7 @@ CREATE OR REPLACE PACKAGE BODY nm3merge IS
 --   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.18  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.19  $"';
 --  g_body_sccsid is the SCCS ID for the package body
    g_package_name    CONSTANT  varchar2(30)   := 'nm3merge';
 --
@@ -1631,7 +1631,8 @@ PROCEDURE merge_members_by_in (p_ne_id_of_1       nm_elements.ne_id%TYPE
          IF l_is_group
            AND NOT l_gty_is_partial
          THEN
-           IF cs_rec.nm_ne_id_of = p_ne_id_of_2
+           IF cs_rec.nm_ne_id_of!= p_starting_ne_id  --RAC - the order of the arguments is not important, we need to keep the data on the first element by direction
+--         IF cs_rec.nm_ne_id_of = p_ne_id_of_2
            THEN
              --ignore non-partial memberships of the second element being merged
              --as they will be covered by the first elements new members
