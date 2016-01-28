@@ -3,11 +3,11 @@ AS
    --
    --   PVCS Identifiers :-
    --
-   --       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3ausec.pkb-arc   2.12   Jan 09 2016 00:00:56   Rob.Coupe  $
+   --       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3ausec.pkb-arc   2.13   Jan 28 2016 10:46:58   Rob.Coupe  $
    --       Module Name      : $Workfile:   nm3ausec.pkb  $
-   --       Date into PVCS   : $Date:   Jan 09 2016 00:00:56  $
-   --       Date fetched Out : $Modtime:   Jan 09 2016 00:00:32  $
-   --       PVCS Version     : $Revision:   2.12  $
+   --       Date into PVCS   : $Date:   Jan 28 2016 10:46:58  $
+   --       Date fetched Out : $Modtime:   Jan 28 2016 10:46:32  $
+   --       PVCS Version     : $Revision:   2.13  $
    --       Based on
    --
    --   Author : Rob Coupe
@@ -20,7 +20,7 @@ AS
    --
    --all global package variables here
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '"$Revision:   2.12  $"';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '"$Revision:   2.13  $"';
 
    --  g_body_sccsid is the SCCS ID for the package body
    --
@@ -230,7 +230,7 @@ AS
                          END
                             PNT_OR_LINE
                     FROM nm_au_security_temp,
-                         nm_au_types,
+                         nm_au_types_full,
                          nm_members,
                          nm_elements
                    WHERE     nat_exclusive = 'Y'
