@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3lock AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3lock.pkb-arc   2.9   Dec 01 2015 16:50:24   Rob.Coupe  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3lock.pkb-arc   2.10   Jan 28 2016 14:50:02   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3lock.pkb  $
---       Date into PVCS   : $Date:   Dec 01 2015 16:50:24  $
---       Date fetched Out : $Modtime:   Dec 01 2015 16:49:48  $
---       PVCS Version     : $Revision:   2.9  $
+--       Date into PVCS   : $Date:   Jan 28 2016 14:50:02  $
+--       Date fetched Out : $Modtime:   Jan 28 2016 14:49:06  $
+--       PVCS Version     : $Revision:   2.10  $
 --       Based on         : 1.16
 --
 --
@@ -22,7 +22,7 @@ CREATE OR REPLACE PACKAGE BODY nm3lock AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.9  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.10  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3lock';
@@ -123,10 +123,6 @@ PROCEDURE lock_element (p_ne_id               IN nm_elements.ne_id%TYPE
 -- If the flag is set to null the option should be ignored. 
 -- This will cover-off all occurrences of the call to the locking procedures in existing code. The new code (amended from the patch and the additional triggers on the DAS) will pass in the value of the system option. 
 --
-   
-   
-   
-
 BEGIN
 --
    nm_debug.proc_start(g_package_name,'lock_element');
@@ -145,16 +141,33 @@ BEGIN
 -- 
   IF p_lock_ele_for_update THEN
      l_sql := l_sql|| 'FOR UPDATE of ne_id NOWAIT'; --SM 03092006 710020 added 'of ne_id' so only the nm_elements table gets locked
-   END IF;        
+  END IF;        
 
   OPEN c1 FOR l_sql USING p_ne_id, To_Number(Sys_Context('NM3CORE','USER_ID')) ; 
    
   FETCH c1 INTO l_mode;
   IF c1%NOTFOUND THEN
     CLOSE c1;
-    IF p_ne_id is NOT NULL then
-      Hig.raise_ner('NET',240);  -- RC - Global Network Update has extended NULL array values and hence attempts to take a lock on a NULL NE_ID
-    END IF;
+--    
+    if p_ne_id is not null then
+       declare
+         l_dummy integer;
+       begin
+         select 1 into l_dummy from nm_elements where ne_id = p_ne_id;
+--      RC - the ne_id is found but main driver has no data - fail with 240 error       
+        Hig.raise_ner('NET',240);  -- 
+       exception
+         when no_data_found then
+--          RC - SM will use the lock element procedures with an NE_ID that has yet to be posted to the database. 
+--          Let it go if NE_ID is not null, assume admin-unit is validated by client.
+            NULL;
+       end ;
+    else -- NULL p_ne_id
+--    RC - Global Network Update has extended NULL array values and hence attempts to take a lock on a NULL NE_ID
+--    Let it go.
+      NULL;
+    end if;
+     
   ELSIF l_mode = 'READONLY' THEN
 -- GJ 17-JUL-2006     IF NVL(Hig.get_sysopt('UPDRDONLY'),'Y') = 'N' THEN
 --       IF p_updrdonly = 'N' THEN  
