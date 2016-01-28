@@ -1,10 +1,10 @@
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/change_of_au.sql-arc   1.0   Nov 09 2015 13:14:24   Rob.Coupe  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/change_of_au.sql-arc   1.1   Jan 28 2016 12:56:28   Rob.Coupe  $
 --       Module Name      : $Workfile:   change_of_au.sql  $ 
---       Date into PVCS   : $Date:   Nov 09 2015 13:14:24  $
---       Date fetched Out : $Modtime:   Nov 09 2015 13:13:06  $
---       PVCS Version     : $Revision:   1.0  $
+--       Date into PVCS   : $Date:   Jan 28 2016 12:56:28  $
+--       Date fetched Out : $Modtime:   Jan 28 2016 12:56:10  $
+--       PVCS Version     : $Revision:   1.1  $
 --
 ----------------------------------------------------------------------------
 --   Copyright (c) 2015 Bentley Systems Incorporated.  All rights reserved.
@@ -16,7 +16,7 @@
 
 Prompt Creating new admin-type
 
-insert into nm_au_types
+insert into nm_au_types_full
 (nat_admin_type, nat_descr, nat_exclusive)
 values
 ( 'NEM', 'Administration of Event data', 'Y' )
