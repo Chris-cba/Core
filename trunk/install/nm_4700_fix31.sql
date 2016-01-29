@@ -1,10 +1,10 @@
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/nm_4700_fix31.sql-arc   1.7   Dec 21 2015 16:38:14   Rob.Coupe  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/nm_4700_fix31.sql-arc   1.8   Jan 29 2016 12:16:58   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm_4700_fix31.sql  $ 
---       Date into PVCS   : $Date:   Dec 21 2015 16:38:14  $
---       Date fetched Out : $Modtime:   Dec 21 2015 16:38:30  $
---       PVCS Version     : $Revision:   1.7  $
+--       Date into PVCS   : $Date:   Jan 29 2016 12:16:58  $
+--       Date fetched Out : $Modtime:   Jan 29 2016 12:16:46  $
+--       PVCS Version     : $Revision:   1.8  $
 --
 ----------------------------------------------------------------------------
 --   Copyright (c) 2015 Bentley Systems Incorporated.  All rights reserved.
@@ -151,6 +151,7 @@ start v_nm_user_au_mode.vw
 Prompt Modifications to package headers
 
 start nm3ausec.pkh
+
 start nm3job.pkh
 
 
@@ -163,6 +164,10 @@ start nm3ausec.pkw
 Prompt invsec....
 
 start invsec.pkw
+
+prompt nm3inv....
+
+start nm3inv.pkw
 
 prompt nm3inv_security....
 
