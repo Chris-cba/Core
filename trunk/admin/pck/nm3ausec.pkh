@@ -18,8 +18,8 @@ CREATE OR REPLACE PACKAGE nm3ausec AS
 ------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
-  g_sccsid      CONSTANT  varchar2(2000) := '"@(#)nm3ausec.pkh	1.10 04/11/06"';
 --  g_sccsid is the SCCS ID for the package
+    g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.4  $';
 --
    TYPE rec_each_nm IS RECORD
       (nm_ne_id_in       nm_members.nm_ne_id_in%TYPE
