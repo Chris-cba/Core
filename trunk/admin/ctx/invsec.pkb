@@ -1,11 +1,11 @@
 CREATE OR REPLACE PACKAGE BODY invsec AS
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/ctx/invsec.pkb-arc   2.6   Nov 04 2015 11:47:00   Rob.Coupe  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/ctx/invsec.pkb-arc   2.7   Jan 29 2016 11:37:42   Rob.Coupe  $
 --       Module Name      : $Workfile:   invsec.pkb  $
---       Date into SCCS   : $Date:   Nov 04 2015 11:47:00  $
---       Date fetched Out : $Modtime:   Nov 04 2015 11:47:14  $
---       SCCS Version     : $Revision:   2.6  $
+--       Date into SCCS   : $Date:   Jan 29 2016 11:37:42  $
+--       Date fetched Out : $Modtime:   Jan 29 2016 11:37:24  $
+--       SCCS Version     : $Revision:   2.7  $
 --       Based on SCCS Version     : 1.12
 --
 --
@@ -22,7 +22,7 @@ CREATE OR REPLACE PACKAGE BODY invsec AS
 --   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 ------------------------------------------------------------------------------------
 --
-   g_body_sccsid        CONSTANT  varchar2(2000)                    := '"$Revision:   2.6  $"';
+   g_body_sccsid        CONSTANT  varchar2(2000)                    := '"$Revision:   2.7  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 
    g_package_name       CONSTANT  varchar2(30)                      := 'invsec';
@@ -76,7 +76,8 @@ BEGIN
    l_retval := l_retval||
                '         AND   NUA_ADMIN_UNIT       = NAG_PARENT_ADMIN_UNIT '||CHR(10)||
                '         AND   NAG_CHILD_ADMIN_UNIT = '||p_au_col_name||CHR(10)||
-               '       ) '||CHR(10);
+               '       ) '
+               ||CHR(10);
 --
 -- Make sure the user can see (or update) that inventory type
 --
@@ -91,15 +92,15 @@ BEGIN
    IF p_updating
     THEN
       l_retval := l_retval||
-               '         AND   ITR_MODE             = '||CHR(39)||c_normal_string||CHR(39)||CHR(10)||')))';
+               '         AND   ITR_MODE             = '||CHR(39)||c_normal_string||CHR(39)||CHR(10); --||')))';
    END IF;
 
 --   l_retval := l_retval||')))';               
-   if not p_updating
-     THEN
+--   if not p_updating
+--     THEN
         l_retval := l_retval||
                ')) OR (exists ( select 1 from nm_nw_ad_types where nad_inv_type = '||p_inv_type_col||CHR(10)||')))';
-   end if;               
+--   end if;               
 --
    RETURN l_retval;
 --
