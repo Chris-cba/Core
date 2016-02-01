@@ -5,11 +5,11 @@ AS
    --
    ---   PVCS Identifiers :-
    --
-   --       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.94   Sep 28 2015 11:14:22   Rob.Coupe  $
+   --       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.95   Feb 01 2016 12:36:56   Rob.Coupe  $
    --       Module Name      : $Workfile:   nm3sdo.pkb  $
-   --       Date into PVCS   : $Date:   Sep 28 2015 11:14:22  $
-   --       Date fetched Out : $Modtime:   Sep 28 2015 11:13:50  $
-   --       PVCS Version     : $Revision:   2.94  $
+   --       Date into PVCS   : $Date:   Feb 01 2016 12:36:56  $
+   --       Date fetched Out : $Modtime:   Feb 01 2016 11:35:20  $
+   --       PVCS Version     : $Revision:   2.95  $
    --       Based on
    ------------------------------------------------------------------
    --   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
@@ -23,7 +23,7 @@ AS
    -- Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
    -----------------------------------------------------------------------------
 
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '"$Revision:   2.94  $"';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '"$Revision:   2.95  $"';
    g_package_name   CONSTANT VARCHAR2 (30) := 'NM3SDO';
    g_batch_size              INTEGER
       := NVL (TO_NUMBER (Hig.get_sysopt ('SDOBATSIZE')), 10);
@@ -11402,7 +11402,8 @@ AS
                 AND nnth_nlt_id = nlt_id
                 AND t.ptr_value = nlt_nt_type
                 AND nlt_g_i_d = 'D'
-                AND nth_base_table_theme IS NULL;
+                AND nth_base_table_theme IS NULL
+	      ORDER BY ptr_id;
    BEGIN
       OPEN c1 (p_nt);
 
@@ -12133,7 +12134,8 @@ AS
                                        WHERE     nnth_nth_theme_id = nth_theme_id
                                              AND table_name = nth_feature_table
                                              AND nnth_nlt_id = nlt_id
-                                             AND nlt_g_i_d = 'D')
+                                             AND nlt_g_i_d = 'D'
+											 AND nth_base_table_theme is NULL)
                             ORDER BY dim_row)
                      WHERE sdo_lb IS NOT NULL
                   GROUP BY row_num, srid
