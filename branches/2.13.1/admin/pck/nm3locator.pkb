@@ -25,7 +25,7 @@ CREATE OR REPLACE PACKAGE BODY nm3locator AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000) := '"$Revision:   2.13.1.0  $"';
+  g_body_sccsid  CONSTANT varchar2(2000) := '"$Revision:   2.13.1.1  $"';
 
   g_package_name CONSTANT varchar2(30) := 'nm3locator';
 
@@ -44,8 +44,6 @@ CREATE OR REPLACE PACKAGE BODY nm3locator AS
   g_eastings         gis_data_objects.gdo_x_val%TYPE;
   g_northings        gis_data_objects.gdo_x_val%TYPE;
   g_multi_coords     nm3sdo_gdo.tab_xys;
-  
-  g_primary_key_mapped Boolean := FALSE;
 --
 -----------------------------------------------------------------------------
 --
@@ -101,11 +99,8 @@ BEGIN
 
   EXECUTE IMMEDIATE ('TRUNCATE TABLE nm_locator_results');
 
-  g_primary_key_mapped := FALSE;
-  
   clear_sql;
 
---  nm_debug.debug('Clearing the arrays - count of g_ft_mapping = '||g_ft_mapping.count );
   -- reset FT mapping
   FOR irec IN 1..g_ft_mapping.COUNT LOOP
     g_ft_mapping(irec).ft_col_name := NULL;
@@ -393,7 +388,7 @@ BEGIN
     -- if not then delete the attribute and value
     IF po_qry_search_attribs(irec).ngqv_value IS NULL THEN
       --
---    nm_debug.debug('Value is null');
+      nm_debug.debug('Value is null');
 
       nm3del.del_ngqa(pi_ngqa_ngq_id      => po_qry_search_attribs(irec).ngqv_ngq_id
                      ,pi_ngqa_ngqt_seq_no => po_qry_search_attribs(irec).ngqv_ngqt_seq_no
@@ -506,9 +501,9 @@ BEGIN
     l_retval := NULL;
   END IF;
 
---    nm_debug.debug_on;
---    nm_debug.debug('2g_inv_type: ' || g_inv_type);
---    nm_debug.debug_off;
+    nm_debug.debug_on;
+    nm_debug.debug('2g_inv_type: ' || g_inv_type);
+    nm_debug.debug_off;
 
   RETURN l_retval;
 END get_order_by_clause;
@@ -618,8 +613,6 @@ BEGIN
 
     IF g_ft_mapping(irec).inv_col_name = 'IIT_PRIMARY_KEY' THEN
       l_ind_pk_id := irec;
---    nm_debug.debug('Mapping IIT_PRIMARY_KEY');
-      g_primary_key_mapped := TRUE;
     END IF;
   END LOOP;
 
@@ -686,10 +679,7 @@ PROCEDURE apply_ft_cols_to_inv_attr(pi_inv_type IN nm_inv_types_all.nit_inv_type
 l_cols nm3inv.tab_nita := nm3inv.get_tab_ita_displayed(p_inv_type => pi_inv_type);
 BEGIN
   -- clear mapping table
---  nm_debug.debug('Clear mapping');
   clear_ft_mapping;
-  
---  nm_debug.debug('map_ft_to_iit');
   nm3ft_mapping.map_ft_to_iit(pi_inv_type => pi_inv_type);
   --
   -- map the primary key
@@ -717,20 +707,13 @@ FUNCTION get_fixed_cols(pi_inv_type IN nm_inv_types_all.nit_inv_type%TYPE
   END add;
 --
 BEGIN
---  nm_debug.debug_on;
 
   add('IIT_NE_ID');
-  
---  nm_debug.debug('Fixed cols IIT_NE_ID');
 
   IF NOT p_ft THEN
     IF NOT nm3inv.attrib_in_use(pi_inv_type, 'IIT_PRIMARY_KEY') THEN
---    nm_debug.debug('Fixed cols IIT_PRIMARY_KEY');
-
       add('IIT_PRIMARY_KEY');
     END IF;
-
---    nm_debug.debug('Fixed cols IIT_DESCR');
 
     add('IIT_DESCR');
   END IF;
@@ -762,12 +745,10 @@ BEGIN
   clear_all;
   l_fixed_cols := get_fixed_cols(pi_inv_type, l_ft_inv);
   g_inv_attrs  := nm3inv.get_tab_ita(pi_inv_type);
-  
   populate_lookups_for_type(pi_inv_type);
 
   g_inv_type := pi_inv_type;
   g_is_ft := l_ft_inv;
-
 
   IF l_ft_inv THEN
     nm3locator.apply_ft_cols_to_inv_attr(pi_inv_type);
@@ -816,9 +797,7 @@ BEGIN
 
   -- assign primary key value
   IF l_ft_inv THEN
-    if not g_primary_key_mapped then
-      add('  ,iit_primary_key');
-    end if;
+    add('  ,iit_primary_key');
   ELSE
     add('  ,iit_start_date');
     add('  ,iit_end_date');
@@ -840,9 +819,7 @@ BEGIN
 
   -- assign primary key value
   IF l_ft_inv THEN
-    if not g_primary_key_mapped then
-      add('  ,irec.'||nm3locator.get_ft_col('IIT_NE_ID', nm3locator.g_is_ft));
-    end if;
+    add('  ,irec.'||nm3locator.get_ft_col('IIT_NE_ID', nm3locator.g_is_ft));
   ELSE
     add('  ,irec.iit_start_date');
     add('  ,irec.iit_end_date');
@@ -1042,29 +1019,21 @@ BEGIN
   nm_debug.proc_start(p_package_name   => g_package_name
                      ,p_procedure_name => 'populate_inv_tab_from_gaz_qry');
 
---  nm_debug.debug_on;
---  nm_debug.debug('populate_inv_tab_from_gaz_qry - clear all');
   clear_all;
 
   l_fixed_cols := get_fixed_cols(pi_inv_type, l_ft_inv);
 
-  g_inv_attrs := nm3inv.get_tab_ita(pi_inv_type);  -- full set of all attributes for asset type
-  
---  for i in 1..g_inv_attrs.count loop
---    nm_debug.debug(' g_inv_attrs '||i||','||g_inv_attrs(i).ita_attrib_name );
---  end loop;
-  
+  g_inv_attrs := nm3inv.get_tab_ita(pi_inv_type);
   populate_lookups_for_type(pi_inv_type);
 
   g_inv_type := pi_inv_type;
   g_is_ft := l_ft_inv;
 
   IF l_ft_inv THEN
---  nm_debug.debug('FT so apply_ft_cols_to_inv_attr' );
     nm3locator.apply_ft_cols_to_inv_attr(pi_inv_type);
   END IF;
 
-  --nm3locator.debug_map_table;
+--  nm3locator.debug_map_table;
 
   add('BEGIN');
 
@@ -1072,18 +1041,12 @@ BEGIN
   add('  INSERT INTO '||c_results_table||' (');
   add('  iit_inv_type');
   FOR irec IN 1..l_fixed_cols.COUNT LOOP
---    if l_fixed_cols(irec) = 'IIT_PRIMARY_KEY' then
---      nm_debug.debug('PK already assigned');
---    end if;
     add('  ,'||l_fixed_cols(irec));
   END LOOP;
 
 -- assign primary key value
   IF l_ft_inv THEN
-    if not g_primary_key_mapped then
-      add('  ,iit_primary_key');
-    end if;
---    null;
+    add('  ,iit_primary_key');
   ELSE
     add('  ,iit_start_date');
     add('  ,iit_end_date');
@@ -1094,7 +1057,6 @@ BEGIN
   FOR i_attr IN 1..l_attrs.COUNT LOOP
     -- now the attribs
     add('  ,'||nm3locator.get_inv_col(l_attrs(i_attr).ita_attrib_name,nm3locator.g_is_ft));
---  nm_debug.debug(l_attrs(i_attr).ita_attrib_name||','||get_inv_col(l_attrs(i_attr).ita_attrib_name,nm3locator.g_is_ft));
   END LOOP;
 
   add('  ) ');
@@ -1111,10 +1073,7 @@ BEGIN
 
     -- assign primary key value
     IF l_ft_inv THEN
---      NULL;
-      if not g_primary_key_mapped then
-        add('  ,ft.'||nm3locator.get_ft_col('IIT_NE_ID', nm3locator.g_is_ft));
-      end if;
+      add('  ,ft.'||nm3locator.get_ft_col('IIT_NE_ID', nm3locator.g_is_ft));
     ELSE
       add('  ,ft.iit_start_date');
       add('  ,ft.iit_end_date');
@@ -1196,15 +1155,15 @@ BEGIN
 
   add('END;');
 
-  debug_sql;
+--debug_sql;
 --  nm_debug.debug_on;
---  nm_debug.debug('populate_inv_tab_from_gaz_qry start SQL');
+  nm_debug.debug('populate_inv_tab_from_gaz_qry start SQL');
 --  nm_debug.debug_off;
 
   execute_sql;
 
 --  nm_debug.debug_on;
---  nm_debug.debug('populate_inv_tab_from_gaz_qry finished SQL');
+  nm_debug.debug('populate_inv_tab_from_gaz_qry finished SQL');
 --  nm_debug.debug_off;
 
   nm_debug.proc_end(p_package_name   => g_package_name
@@ -1575,8 +1534,13 @@ PROCEDURE export_results(pi_format        IN varchar2
   l_pref_lrm   nm_group_types_all.ngt_group_type%TYPE;
   l_attrs      nm3inv.tab_nita;
 
+  l_inv_nw     nm_types.nt_type%type;
+  l_nw_datum   varchar2(1); 
+  l_gty_type   nm_linear_types.nlt_gty_type%type;
+
   e_no_rows        EXCEPTION;
   e_already_loaded EXCEPTION;
+  
 --
 BEGIN
   nm_debug.debug_on;
@@ -1607,6 +1571,21 @@ BEGIN
   l_nit   := nm3get.get_nit(g_inv_type);
   l_attrs := nm3inv.get_tab_ita_displayed(p_inv_type => g_inv_type);
   l_table_name := get_temp_table_name;
+
+  if pi_inc_lrm then
+     begin
+        nm_debug.debug('RAC> Test on LRM');
+        select nin_nw_type, nlt_g_i_d, nlt_gty_type
+        into l_inv_nw, l_nw_datum, l_gty_type
+        from nm_inv_nw, nm_linear_types
+        where nin_nw_type = nlt_nt_type        
+        and nin_nit_inv_code = l_nit.nit_inv_type
+        and rownum = 1;
+     exception
+        when no_data_found then
+          raise_application_error( -20001, 'Export requested with network for an off-network asset');
+     end;
+  end if;
 
 
   -- create a temporary table as a copy of inv_items_all
@@ -1688,10 +1667,29 @@ BEGIN
   -- now deal with the placement
   IF pi_inc_lrm THEN
     IF l_pref_lrm IS NOT NULL THEN
-      add('    l_pl_arr := nm3pla.get_connected_chunks(irec, '''||l_pref_lrm||''');');
+      if not g_is_ft then    
+         nm_debug.debug('RC> get_pl stuff -- '||'    l_pl_arr := nm3pla.get_connected_chunks(irec, '''||l_pref_lrm||''');');
+         add('    l_pl_arr := nm3pla.get_connected_chunks(irec, '''||l_pref_lrm||''');');
+      else
+         if l_gty_type is null and l_nw_datum = 'D' then
+            nm_debug.debug('RC> get_pl stuff -- '||'    l_pl_arr :=  nm3pla.get_super_placement(get_pl_from_ft( '''||g_inv_type||''', irec ), '''||l_pref_lrm||''');');
+            add('    l_pl_arr := nm3pla.get_super_placement(get_pl_from_ft( '''||g_inv_type||''', irec ), '''||l_pref_lrm||''');');
+         elsif l_nw_datum = 'G' and l_gty_type = l_pref_lrm then
+            nm_debug.debug('RC> get_pl stuff -- '||'    l_pl_arr :=  get_pl_from_ft( '''||g_inv_type||''', irec );');
+            add('    l_pl_arr := get_pl_from_ft( '''||g_inv_type||''', irec );');
+         else
+            raise_application_error(-20002, 'The network type does not translate into the preferred LRM');
+         end if;
+      end if;
     ELSE
 --      add('    l_pl_arr := nm3pla.get_connected_chunks(irec);');
-      add('    l_pl_arr := NM3PLA.GET_PLACEMENT_FROM_NE(irec);');
+      if not g_is_ft then
+         nm_debug.debug('RC> get_pl stuff -- '||'    l_pl_arr := NM3PLA.GET_PLACEMENT_FROM_NE(irec);');
+         add('    l_pl_arr := NM3PLA.GET_PLACEMENT_FROM_NE(irec);');
+      else
+         nm_debug.debug('RC> get_pl stuff -- '||'    l_pl_arr :=  get_pl_from_ft( '''||g_inv_type||''', irec );');
+         add('    l_pl_arr := get_pl_from_ft( '''||g_inv_type||''', irec );');
+      end if;
     END IF;
   END IF;
 
@@ -1792,7 +1790,7 @@ BEGIN
       -- now the attribs'
         add('      ,l_ft.'||l_attrs(i_attr).ita_attrib_name);
       END LOOP;
-      add('    ,nm3net.get_ne_length(l_ft.'||get_ft_col('IIT_NE_ID')||')');
+--    add('    ,nm3net.get_ne_length(l_ft.'||get_ft_col('IIT_NE_ID')||')');
     ELSE
       add('   ,'''||l_nit.nit_descr||'''');
       FOR i_attr IN 1..l_attrs.COUNT LOOP
@@ -1885,7 +1883,7 @@ EXCEPTION
     --nm_debug.debug('Nothing to do');
     NULL;
   WHEN e_already_loaded THEN
-    hig.raise_ner(nm3type.c_hig, 397);
+    hig.raise_ner(nm3type.c_net, 397);
   WHEN OTHERS THEN
     nm_debug.debug(SQLERRM);
     drop_temp_table(l_table_name);
@@ -2026,9 +2024,9 @@ RETURN boolean IS
   l_tab_northings nm3type.tab_number;
   no_data EXCEPTION;
 BEGIN
---  nm_debug.debug_on;
---  nm_debug.debug('Parameters');
---  nm_debug.debug('pi_session_id : '||pi_session_id);
+  nm_debug.debug_on;
+  nm_debug.debug('Parameters');
+  nm_debug.debug('pi_session_id : '||pi_session_id);
   OPEN get_coords(pi_session_id);
   FETCH get_coords BULK COLLECT INTO l_tab_eastings, l_tab_northings;
   CLOSE get_coords;
@@ -2039,11 +2037,11 @@ BEGIN
 
   po_eastings := l_tab_eastings(1);
   po_northings := l_tab_northings(1);
---  nm_debug.debug('returning true');
+  nm_debug.debug('returning true');
   RETURN TRUE;
 EXCEPTION
   WHEN no_data THEN
---    nm_debug.debug('Returning false');
+    nm_debug.debug('Returning false');
     RETURN FALSE;
 END get_coords_from_session;
 --
@@ -2065,10 +2063,10 @@ RETURN boolean IS
   retval  nm3sdo_gdo.tab_xys;
   no_data EXCEPTION;
 BEGIN
---  nm_debug.debug_on;
---  nm_debug.debug('In multi coords proc');
---  nm_debug.debug('Parameters');
---  nm_debug.debug('pi_session_id : '||pi_session_id);
+  nm_debug.debug_on;
+  nm_debug.debug('In multi coords proc');
+  nm_debug.debug('Parameters');
+  nm_debug.debug('pi_session_id : '||pi_session_id);
   OPEN get_coords(pi_session_id);
   FETCH get_coords BULK COLLECT INTO retval;
   CLOSE get_coords;
@@ -2079,11 +2077,11 @@ BEGIN
   
   po_coords := retval;
 
---  nm_debug.debug('returning true');
+  nm_debug.debug('returning true');
   RETURN TRUE;
 EXCEPTION
   WHEN no_data THEN
---    nm_debug.debug('Returning false');
+    nm_debug.debug('Returning false');
     RETURN FALSE;
 END get_multi_coords_from_gdo;
 --
@@ -2239,4 +2237,3 @@ BEGIN
   instantiate_data;
 END nm3locator;
 /
-
