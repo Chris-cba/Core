@@ -1,13 +1,13 @@
-CREATE OR REPLACE package nm3ft_mapping as
+CREATE OR REPLACE package TRANSINFO.nm3ft_mapping as
 --<PACKAGE>
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3ft_mapping.pkh-arc   2.3   Jan 26 2016 09:21:18   Rob.Coupe  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3ft_mapping.pkh-arc   2.4   Feb 03 2016 10:21:04   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3ft_mapping.pkh  $
---       Date into PVCS   : $Date:   Jan 26 2016 09:21:18  $
---       Date fetched Out : $Modtime:   Jan 26 2016 09:20:58  $
---       Version          : $Revision:   2.3  $
+--       Date into PVCS   : $Date:   Feb 03 2016 10:21:04  $
+--       Date fetched Out : $Modtime:   Feb 03 2016 10:20:38  $
+--       Version          : $Revision:   2.4  $
 --       Based on SCCS version : 1.1
 -------------------------------------------------------------------------
 --   Author : M Huitson
@@ -22,7 +22,8 @@ CREATE OR REPLACE package nm3ft_mapping as
 --<TYPES>
   TYPE ft_cols_rec IS RECORD(inv_col_name   all_tab_columns.column_name%TYPE
                                  ,inv_col_length number
-                                 ,inv_col_data_type all_tab_columns.data_type%type);
+                                 ,inv_col_data_type all_tab_columns.data_type%type
+                                 ,is_flexible integer);
   TYPE ft_cols_tab IS TABLE OF ft_cols_rec;
   --
   TYPE ft_table_mapping IS RECORD(inv_col_name   all_tab_columns.column_name%TYPE
@@ -45,7 +46,7 @@ CREATE OR REPLACE package nm3ft_mapping as
   --constants
   -----------
   --g_sccsid is the SCCS ID for the package
-  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.3  $';
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.4  $';
   --
 --</GLOBVAR>
 --
