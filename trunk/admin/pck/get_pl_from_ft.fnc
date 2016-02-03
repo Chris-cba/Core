@@ -4,12 +4,12 @@ CREATE OR REPLACE function get_pl_from_ft( pi_inv_type in nm_inv_types.nit_inv_t
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/get_pl_from_ft.fnc-arc   1.0   Feb 03 2016 14:03:06   Rob.Coupe  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/get_pl_from_ft.fnc-arc   1.1   Feb 03 2016 14:05:04   Rob.Coupe  $
 --       Module Name      : $Workfile:   get_pl_from_ft.fnc  $
---       Date into PVCS   : $Date:   Feb 03 2016 14:03:06  $
---       Date fetched Out : $Modtime:   Feb 03 2016 14:02:20  $
---       Version          : $Revision:   1.0  $
---       Based on SCCS version : 1.2
+--       Date into PVCS   : $Date:   Feb 03 2016 14:05:04  $
+--       Date fetched Out : $Modtime:   Feb 03 2016 14:04:50  $
+--       Version          : $Revision:   1.1  $
+--
 -------------------------------------------------------------------------
 --   Author : Rob Coupe.
 --
