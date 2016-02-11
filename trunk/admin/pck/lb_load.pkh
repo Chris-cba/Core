@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE lb_load
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_load.pkh-arc   1.6   Sep 25 2015 17:04:22   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_load.pkh-arc   1.7   Feb 11 2016 11:13:12   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_load.pkh  $
-   --       Date into PVCS   : $Date:   Sep 25 2015 17:04:22  $
-   --       Date fetched Out : $Modtime:   Sep 25 2015 17:04:50  $
-   --       PVCS Version     : $Revision:   1.6  $
+   --       Date into PVCS   : $Date:   Feb 11 2016 11:13:12  $
+   --       Date fetched Out : $Modtime:   Feb 11 2016 11:11:50  $
+   --       PVCS Version     : $Revision:   1.7  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,7 +16,8 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.6  $';
+   g_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.7  $';
+   g_nvl      VARCHAR2(4) := nm3type.c_nvl;
 
    FUNCTION get_version
       RETURN VARCHAR2;
@@ -114,7 +115,7 @@ AS
 
    PROCEDURE update_location (
       p_nal_id      IN nm_asset_locations_all.nal_id%TYPE,
-      p_nal_descr   IN nm_asset_locations_all.nal_descr%TYPE,
-      p_jxp         IN nm_juxtapositions.njx_meaning%TYPE DEFAULT NULL);
+      p_nal_descr   IN nm_asset_locations_all.nal_descr%TYPE DEFAULT g_nvl,
+      p_jxp         IN nm_juxtapositions.njx_meaning%TYPE DEFAULT g_nvl);
 END lb_load;
 /
