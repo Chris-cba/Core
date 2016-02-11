@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_load
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_load.pkb-arc   1.14   Dec 02 2015 13:04:32   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_load.pkb-arc   1.15   Feb 11 2016 11:15:10   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_load.pkb  $
-   --       Date into PVCS   : $Date:   Dec 02 2015 13:04:32  $
-   --       Date fetched Out : $Modtime:   Dec 02 2015 13:03:52  $
-   --       PVCS Version     : $Revision:   1.14  $
+   --       Date into PVCS   : $Date:   Feb 11 2016 11:15:10  $
+   --       Date fetched Out : $Modtime:   Feb 11 2016 11:12:14  $
+   --       PVCS Version     : $Revision:   1.15  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,7 +16,7 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.14  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.15  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_load';
 
@@ -679,7 +679,7 @@ AS
                                             nag_end_date,
                                             nag_geometry)
             SELECT 'N',
-                   asset_id,
+                   nal_asset_id,
                    obj_type,
                    start_date,
                    end_date,
@@ -694,7 +694,7 @@ AS
                                  NVL (end_date,
                                       TO_DATE ('31122999', 'DDMMYYYY')))
                               n_start_date
-                      FROM (SELECT asset_id,
+                      FROM (SELECT nal_asset_id,
                                    obj_type,
                                    start_date,
                                    LEAST (
@@ -703,7 +703,7 @@ AS
                                       lag_start)
                                       end_date,
                                    l_geom
-                              FROM (SELECT asset_id,
+                              FROM (SELECT nal_asset_id,
                                            obj_type,
                                            start_date,
                                            end_date,
@@ -725,7 +725,7 @@ AS
                                               lag_end,
                                            l_geom
                                       FROM (  SELECT      --nlg_location_type,
-                                                    asset_id,
+                                                    nal_asset_id,
                                                      obj_type,
                                                      start_date,
                                                      end_date,
@@ -735,7 +735,7 @@ AS
                                                            0.005))
                                                         l_geom
                                                 FROM (SELECT nlg_location_type,
-                                                             19397 asset_id,
+                                                             nal_asset_id,
                                                              nlg_obj_type
                                                                 obj_type,
                                                              nal_start_date
@@ -748,7 +748,7 @@ AS
                                                        WHERE     nlg_nal_id =
                                                                     l2.nal_id
                                                              AND l2.nal_asset_id =
-                                                                    19397
+                                                                    pi_asset_id
                                                              AND nal_location_type =
                                                                     'N'
                                                              AND l2.nal_location_type =
@@ -756,13 +756,13 @@ AS
                                                              AND l2.nal_nit_type =
                                                                     nlg_obj_type
                                                              AND l2.nal_nit_type =
-                                                                    'L9'
+                                                                    pi_obj_type
                                                              AND nal_location_type =
                                                                     'N'
-                                                             AND nlg_obj_type =
-                                                                    'L9') t
+                                                             AND nlg_obj_type = pi_obj_type
+                                                                    ) t
                                             GROUP BY      --nlg_location_type,
-                                                    asset_id,
+                                                    nal_asset_id,
                                                      obj_type,
                                                      start_date,
                                                      end_date))) t2)
@@ -774,12 +774,12 @@ AS
    --
    PROCEDURE update_location (
       p_nal_id      IN nm_asset_locations_all.nal_id%TYPE,
-      p_nal_descr   IN nm_asset_locations_all.nal_descr%TYPE,
-      p_jxp         IN nm_juxtapositions.njx_meaning%TYPE DEFAULT NULL)
+      p_nal_descr   IN nm_asset_locations_all.nal_descr%TYPE DEFAULT g_nvl,
+      p_jxp         IN nm_juxtapositions.njx_meaning%TYPE DEFAULT g_nvl)
    IS
       l_exor_njx_code   nm_juxtapositions.njx_code%TYPE := NULL;
    BEGIN
-      IF p_jxp IS NOT NULL
+      IF p_jxp != g_nvl
       THEN
          --
          BEGIN
@@ -797,11 +797,14 @@ AS
             THEN
                raise_application_error (-20001, 'Juxtaposition not known');
          END;
+      ELSIF p_jxp is NULL
+      THEN
+         l_exor_njx_code := NULL;
       END IF;
 
       UPDATE nm_asset_locations
-         SET nal_descr = p_nal_descr,
-             nal_jxp = NVL (l_exor_njx_code, nal_jxp)
+         SET nal_descr = decode( p_nal_descr, g_nvl, nal_descr, p_nal_descr ),
+             nal_jxp = decode(l_exor_njx_code, g_nvl, nal_jxp, l_exor_njx_code )
        WHERE nal_id = p_nal_id;
    END;
 END lb_load;
