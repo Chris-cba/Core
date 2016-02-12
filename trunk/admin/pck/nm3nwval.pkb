@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3nwval AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3nwval.pkb-arc   2.15   Jan 11 2016 21:32:38   Rob.Coupe  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3nwval.pkb-arc   2.16   Feb 12 2016 17:13:50   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3nwval.pkb  $
---       Date into PVCS   : $Date:   Jan 11 2016 21:32:38  $
---       Date fetched Out : $Modtime:   Jan 11 2016 21:32:54  $
---       PVCS Version     : $Revision:   2.15  $
+--       Date into PVCS   : $Date:   Feb 12 2016 17:13:50  $
+--       Date fetched Out : $Modtime:   Feb 12 2016 17:13:08  $
+--       PVCS Version     : $Revision:   2.16  $
 --       Based on 1.67
 --  
 --
@@ -18,7 +18,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3nwval AS
 --   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 ------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.15  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.16  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 -----------------------------------------------------------------------------
 --
@@ -2353,15 +2353,6 @@ BEGIN
      l_ne_row := nm3get.get_ne_all(p_ne_id_1);
      l_mode := NM3AUSEC.get_au_mode(sys_context('NM3_SECURITY_CTX', 'USERNAME'), l_ne_row.ne_admin_unit);
   end if;
-     
-  if p_ne_id_2 is not null then
-     l_ne_row := nm3get.get_ne_all(p_ne_id_2);
-     l_mode := NM3AUSEC.get_au_mode(sys_context('NM3_SECURITY_CTX', 'USERNAME'), l_ne_row.ne_admin_unit);
-  end if;
-
-
-  check_operation( p_operation => p_operation );
-  
 
   -- Some operations might pass in a 2nd ne_id even if it hasn't been
   -- created yet, so check it exists and set it to null if it doesn't
@@ -2373,7 +2364,13 @@ BEGIN
      CLOSE cs_exists;
   ELSE
      CLOSE cs_exists;
+     l_ne_row := nm3get.get_ne_all(l_ne_id);
+     l_mode := NM3AUSEC.get_au_mode(sys_context('NM3_SECURITY_CTX', 'USERNAME'), l_ne_row.ne_admin_unit);
   END IF;
+
+
+  check_operation( p_operation => p_operation );
+  
 
 --
   IF p_operation = c_split THEN
