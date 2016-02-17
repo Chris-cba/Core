@@ -4,11 +4,11 @@ IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3undo.pkb-arc   2.23   Nov 26 2015 13:55:56   Steve.Cooper  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3undo.pkb-arc   2.24   Feb 17 2016 15:47:14   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3undo.pkb  $
---       Date into PVCS   : $Date:   Nov 26 2015 13:55:56  $
---       Date fetched Out : $Modtime:   Nov 26 2015 13:55:40  $
---       PVCS Version     : $Revision:   2.23  $
+--       Date into PVCS   : $Date:   Feb 17 2016 15:47:14  $
+--       Date fetched Out : $Modtime:   Feb 17 2016 15:46:54  $
+--       PVCS Version     : $Revision:   2.24  $
 --
 --   Author : ITurnbull
 --
@@ -19,7 +19,7 @@ IS
 -- Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '"$Revision:   2.23  $"';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '"$Revision:   2.24  $"';
 --  g_body_sccsid is the SCCS ID for the package body
    g_package_name   CONSTANT VARCHAR2 (2000) := 'nm3undo';
 --
@@ -1304,6 +1304,7 @@ END undo_scheme;
    BEGIN
       error_loc := 40 ;
       Nm_Debug.proc_start (g_package_name, 'unsplit_datum_or_group');
+      NM3LOCK.LOCK_ELEMENT_AND_MEMBERS(p_ne_id, TRUE);     
       Nm3ausec.set_status (Nm3type.c_off);
       Nm3merge.set_nw_operation_in_progress;
 
@@ -1729,6 +1730,9 @@ END undo_scheme;
       END unmerge_group;
    BEGIN
       Nm_Debug.proc_start (g_package_name, 'unmerge');
+      NM3LOCK.LOCK_ELEMENT_AND_MEMBERS(p_ne_id_1, TRUE);
+      NM3LOCK.LOCK_ELEMENT_AND_MEMBERS(p_ne_id_2, TRUE);
+--
       Nm3ausec.set_status (Nm3type.c_off);
       Nm3merge.set_nw_operation_in_progress;
 
@@ -1827,6 +1831,7 @@ END undo_scheme;
       END set_for_return;
    BEGIN
       Nm_Debug.proc_start (g_package_name, 'unreplace');
+      NM3LOCK.LOCK_ELEMENT_AND_MEMBERS(p_ne_id, TRUE);      
       Nm3ausec.set_status (Nm3type.c_off);
       Nm3merge.set_nw_operation_in_progress;
 
@@ -2002,7 +2007,7 @@ END undo_scheme;
 --
       Nm_Debug.proc_start (g_package_name, 'unclose');
 --
-      Nm3nwval.network_operations_check (Nm3nwval.c_unclose);
+      Nm3nwval.network_operations_check (Nm3nwval.c_unclose, p_ne_id);
 --
       Nm3ausec.set_status (Nm3type.c_off);
       
