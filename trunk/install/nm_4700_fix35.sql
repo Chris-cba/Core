@@ -1,10 +1,10 @@
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/nm_4700_fix35.sql-arc   1.0   Feb 03 2016 17:21:44   Rob.Coupe  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/nm_4700_fix35.sql-arc   1.1   Feb 17 2016 17:33:52   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm_4700_fix35.sql  $ 
---       Date into PVCS   : $Date:   Feb 03 2016 17:21:44  $
---       Date fetched Out : $Modtime:   Feb 03 2016 14:26:22  $
---       PVCS Version     : $Revision:   1.0  $
+--       Date into PVCS   : $Date:   Feb 17 2016 17:33:52  $
+--       Date fetched Out : $Modtime:   Feb 17 2016 17:33:46  $
+--       PVCS Version     : $Revision:   1.1  $
 --
 ----------------------------------------------------------------------------
 --   Copyright (c) 2015 Bentley Systems Incorporated.  All rights reserved.
@@ -63,12 +63,36 @@ BEGIN
 --
 -- 	Check that HIG has been installed @ v4.7.0.x
 --
-	HIG2.PRODUCT_EXISTS_AT_VERSION  (p_product        => 'HIG'
-                                        ,p_VERSION        => '4.7.0.0'
-                                        );
+--	HIG2.PRODUCT_EXISTS_AT_VERSION  (p_product        => 'HIG'
+--                                        ,p_VERSION        => '4.7.0.0'
+--                                        );
 --
 --
 END;
+/
+
+Declare
+  n  Varchar2(1);
+Begin
+  Select  Null
+  Into    n
+  From    Hig_Products
+  Where   Hpr_Product = 'NSG' 
+     and  Hpr_Key is not NULL
+     and  Not EXISTS
+             ( select 1 from Hig_Upgrades
+               Where   Hup_Product     =   'NET'
+               And     From_Version    =   '4.7.0.1'
+               And     Upgrade_Script  =   'exnm04070001en_updt32.sql'
+			   );
+--
+  RAISE_APPLICATION_ERROR(-20000,'Please install NM 4700 Fix 32 before proceding.');
+--
+  Exception 
+  When No_Data_Found
+Then
+  NULL;
+End;
 /
 
 WHENEVER SQLERROR CONTINUE
