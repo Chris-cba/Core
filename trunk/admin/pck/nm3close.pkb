@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3close AS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3close.pkb-arc   2.14   Nov 06 2015 10:54:32   Steve.Cooper  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3close.pkb-arc   2.15   Feb 17 2016 15:53:48   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3close.pkb  $
---       Date into PVCS   : $Date:   Nov 06 2015 10:54:32  $
---       Date fetched Out : $Modtime:   Nov 06 2015 07:53:38  $
---       PVCS Version     : $Revision:   2.14  $
+--       Date into PVCS   : $Date:   Feb 17 2016 15:53:48  $
+--       Date fetched Out : $Modtime:   Feb 17 2016 15:53:08  $
+--       PVCS Version     : $Revision:   2.15  $
 --
 --
 --   Author : I Turnbull
@@ -21,7 +21,7 @@ CREATE OR REPLACE PACKAGE BODY nm3close AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.14  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.15  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3close';
@@ -54,6 +54,7 @@ PROCEDURE close_temp_extent ( pi_job_id NM_NW_TEMP_EXTENTS.nte_job_id%TYPE
                              ,pi_effective_date DATE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                             );
 --
+FUNCTION multi_element_check( pi_type in varchar2, pi_element_id in number ) return Boolean;
 -----------------------------------------------------------------------------
 --
 FUNCTION get_version RETURN VARCHAR2 IS
@@ -598,9 +599,17 @@ BEGIN
 --
    nm_debug.proc_start(g_package_name,'Multi_Element_Close');
 --
-   nm3nwval.network_operations_check( nm3nwval.c_close
+
+   if pi_type = c_route then
+     nm3nwval.network_operations_check( nm3nwval.c_close
                                      ,pi_id
                                     );
+   elsif pi_type = 'EXT' and g_multi_check then
+      if not multi_element_check( pi_type => pi_type, pi_element_id => pi_id )
+      then
+         hig.raise_ner('NET', 172 );
+      end if;                                 
+   end if;                                 
 --
    -- call the relvant function for the type
    IF pi_type = nm3close.c_gis THEN
@@ -896,7 +905,10 @@ BEGIN
                                          ,pi_source    => nm3extent.c_route
                                          ,po_job_id    => l_job_id
                                          );
+                g_multi_check := FALSE;                                         
                 multi_element_close( nm3close.c_extent, l_job_id, pi_effective_date );
+                g_multi_check := TRUE;                                         
+
              EXCEPTION
                 WHEN pla_exception THEN
                   -- if the placement array is empty then do nothing
@@ -1332,5 +1344,67 @@ END close_node;
 --
 -----------------------------------------------------------------------------
 --
+FUNCTION multi_element_check (pi_type IN VARCHAR2, pi_element_id IN NUMBER)
+   RETURN BOOLEAN
+IS
+   retval    BOOLEAN;
+   l_dummy   INTEGER;
+BEGIN
+   BEGIN
+      WITH datums
+           AS (SELECT nte_ne_id_of datum_ne_id
+                 FROM nm_nw_temp_extents
+                WHERE nte_job_id = pi_element_id AND pi_type = 'EXT'
+               --  union all
+               --  select nm_ne_id_of
+               --  from nm_members
+               --  where :c_type = 'ROU'
+               --  connect by prior nm_ne_id_in = nm_ne_id_of
+               --  and :c_type = 'ROU'
+               --  start with nm_ne_id_in = pi_element_id
+               --  and :c_type = 'ROU'
+--               UNION ALL
+--               SELECT ne_id
+--                 FROM nm_elements, gis_data_objects
+--                WHERE     gdo_session_id = pi_element_id
+--                      AND ne_id = gdo_pk_id
+--                      AND pi_type = 'GIS'
+               )   -- No need to include GIS or routes as routes ar ehandled in nm3nwval and GIS will go through an extent anyway
+      SELECT 1
+        INTO l_dummy
+        FROM DUAL
+       WHERE EXISTS
+                (SELECT i.nm_obj_type
+                   FROM nm_members i, datums d
+                  WHERE     nm_type = 'I'
+                        AND nm_ne_id_of = datum_ne_id
+                        AND (   (NOT EXISTS
+                                    (SELECT 1
+                                       FROM v_nm_user_inv_mode
+                                      WHERE inv_type = nm_obj_type)) -- asset type is invisible through roles
+                             OR (EXISTS
+                                    (SELECT 1
+                                       FROM nm_inv_types, v_nm_user_inv_mode
+                                      WHERE     inv_type = nm_obj_type
+                                            AND inv_type = nit_inv_type
+                                            AND access_mode = 'READONLY'
+                                            AND nit_end_loc_only = 'N'))
+                             OR (EXISTS
+                                    (SELECT 1
+                                       FROM nm_inv_types, v_nm_user_au_mode
+                                      WHERE     admin_unit = nm_admin_unit
+                                            AND access_mode = 'READONLY'
+                                            AND nit_inv_type = nm_obj_type
+                                            AND nit_end_loc_only = 'N'))));
+
+      retval := FALSE;
+   EXCEPTION
+      WHEN NO_DATA_FOUND
+      THEN
+         retval := TRUE;
+   END;
+
+   RETURN retval;
+END;
 END nm3close;
 /
