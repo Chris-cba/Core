@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm3merge IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3merge.pkb-arc   2.19   Jan 21 2016 11:41:52   Rob.Coupe  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3merge.pkb-arc   2.20   Feb 18 2016 15:03:42   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3merge.pkb  $
---       Date into PVCS   : $Date:   Jan 21 2016 11:41:52  $
---       Date fetched Out : $Modtime:   Jan 21 2016 11:41:02  $
---       PVCS Version     : $Revision:   2.19  $
+--       Date into PVCS   : $Date:   Feb 18 2016 15:03:42  $
+--       Date fetched Out : $Modtime:   Feb 18 2016 14:51:32  $
+--       PVCS Version     : $Revision:   2.20  $
 --
 --   Author : ITurnbull
 --
@@ -16,7 +16,7 @@ CREATE OR REPLACE PACKAGE BODY nm3merge IS
 --   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.19  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.20  $"';
 --  g_body_sccsid is the SCCS ID for the package body
    g_package_name    CONSTANT  varchar2(30)   := 'nm3merge';
 --
@@ -1683,6 +1683,10 @@ PROCEDURE merge_members_by_in (p_ne_id_of_1       nm_elements.ne_id%TYPE
                ,nm_cardinality = nm_cardinality * -1
          WHERE  nm_ne_id_of    = l_ne_id_of;
       END IF;
+	  
+      update nm_merge_members
+      set nm_slk = (select min(nm_slk) from nm_merge_members group by nm_ne_id_in )
+      where nm_type = 'G' and nm_slk is not null;
       --
    END duplicate_members_local;
 --
