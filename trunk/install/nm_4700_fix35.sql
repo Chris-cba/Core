@@ -1,10 +1,10 @@
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/nm_4700_fix35.sql-arc   1.2   Feb 17 2016 17:37:00   Rob.Coupe  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/nm_4700_fix35.sql-arc   1.3   Feb 18 2016 15:23:44   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm_4700_fix35.sql  $ 
---       Date into PVCS   : $Date:   Feb 17 2016 17:37:00  $
---       Date fetched Out : $Modtime:   Feb 17 2016 17:37:12  $
---       PVCS Version     : $Revision:   1.2  $
+--       Date into PVCS   : $Date:   Feb 18 2016 15:23:44  $
+--       Date fetched Out : $Modtime:   Feb 18 2016 15:22:56  $
+--       PVCS Version     : $Revision:   1.3  $
 --
 ----------------------------------------------------------------------------
 --   Copyright (c) 2015 Bentley Systems Incorporated.  All rights reserved.
@@ -28,7 +28,7 @@ SET TERM ON
 --
 -- Spool to Logfile
 --
-DEFINE logfile1='nm_4700_fix31_part1_&log_extension'
+DEFINE logfile1='nm_4700_fix35_&log_extension'
 SPOOL &logfile1
 --
 --------------------------------------------------------------------------------
