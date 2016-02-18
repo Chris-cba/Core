@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3close AS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3close.pkb-arc   2.15   Feb 17 2016 15:53:48   Rob.Coupe  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3close.pkb-arc   2.16   Feb 18 2016 16:32:56   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3close.pkb  $
---       Date into PVCS   : $Date:   Feb 17 2016 15:53:48  $
---       Date fetched Out : $Modtime:   Feb 17 2016 15:53:08  $
---       PVCS Version     : $Revision:   2.15  $
+--       Date into PVCS   : $Date:   Feb 18 2016 16:32:56  $
+--       Date fetched Out : $Modtime:   Feb 18 2016 16:32:12  $
+--       PVCS Version     : $Revision:   2.16  $
 --
 --
 --   Author : I Turnbull
@@ -21,7 +21,7 @@ CREATE OR REPLACE PACKAGE BODY nm3close AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.15  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.16  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3close';
@@ -34,6 +34,8 @@ CREATE OR REPLACE PACKAGE BODY nm3close AS
    g_tab_rte_memb_child_ne_type         nm3type.tab_varchar4;
    g_tab_rte_memb_child_ne_id           nm3type.tab_number;
    g_tab_rte_memb_end_date_flag         nm3type.tab_varchar4;
+--
+   g_multi_check Boolean := TRUE;   
 --
 -----------------------------------------------------------------------------
 --
