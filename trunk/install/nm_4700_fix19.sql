@@ -1,13 +1,13 @@
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/nm_4700_fix19.sql-arc   1.0   May 13 2015 10:01:02   Vikas.Mhetre  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/nm_4700_fix19.sql-arc   1.1   Feb 22 2016 11:38:48   Vikas.Mhetre  $
 --       Module Name      : $Workfile:   nm_4700_fix19.sql  $ 
---       Date into PVCS   : $Date:   May 13 2015 10:01:02  $
---       Date fetched Out : $Modtime:   May 13 2015 09:22:22  $
---       PVCS Version     : $Revision:   1.0  $
+--       Date into PVCS   : $Date:   Feb 22 2016 11:38:48  $
+--       Date fetched Out : $Modtime:   Feb 22 2016 10:44:40  $
+--       PVCS Version     : $Revision:   1.1  $
 --
 ----------------------------------------------------------------------------
---   Copyright (c) 2015 Bentley Systems Incorporated.  All rights reserved.
+--   Copyright (c) 2016 Bentley Systems Incorporated.  All rights reserved.
 ----------------------------------------------------------------------------
 --
 SET ECHO OFF
@@ -40,48 +40,48 @@ FROM v$instance;
 --
 SELECT 'Current version of '||hpr_product||' ' ||hpr_version
 FROM hig_products
-WHERE hpr_product IN ('HIG','AST');
+WHERE hpr_product IN ('HIG','NET','AST');
 --
 --------------------------------------------------------------------------------
--- 	Check(s)
+-- Check(s)
 --------------------------------------------------------------------------------
 --
 WHENEVER SQLERROR EXIT
 --
 DECLARE
 --
-	CURSOR c1 is
-		SELECT 'Y'
-		FROM   hig_upgrades
-		WHERE  hup_product = 'NET'
-		AND    remarks = 'NET 4700 FIX 15';
+  CURSOR c1 is
+    SELECT 'Y'
+    FROM   hig_upgrades
+    WHERE  hup_product = 'NET'
+    AND    remarks = 'NET 4700 FIX 15';
 --
-	l_dummy_c1 VARCHAR2(1);
+  l_dummy_c1 VARCHAR2(1);
 --
 BEGIN
 --
--- 	Check that the user isn't sys or system
+--  Check that the user isn't sys or system
 --
-	IF USER IN ('SYS','SYSTEM')
-	THEN
-		RAISE_APPLICATION_ERROR(-20000,'You cannot install this product as ' || USER);
-	END IF;
+  IF USER IN ('SYS','SYSTEM')
+  THEN
+    RAISE_APPLICATION_ERROR(-20000,'You cannot install this product as ' || USER);
+  END IF;
 --
--- 	Check that HIG has been installed @ v4.7.0.x
+--  Check that HIG has been installed @ v4.7.0.x
 --
-	HIG2.PRODUCT_EXISTS_AT_VERSION  (p_product        => 'HIG'
+        HIG2.PRODUCT_EXISTS_AT_VERSION  (p_product        => 'HIG'
                                         ,p_VERSION        => '4.7.0.0'
                                         );
 --
--- 	Check that NET 4700 FIX 15 has already been applied
+--  Check that NET 4700 FIX 15 has already been applied
 --
-	OPEN  c1;
-	FETCH c1 INTO l_dummy_c1;
-	CLOSE c1;
+  OPEN  c1;
+  FETCH c1 INTO l_dummy_c1;
+  CLOSE c1;
 --
-	IF l_dummy_c1 IS NULL THEN
-		RAISE_APPLICATION_ERROR(-20001,'NET 4700 FIX 15 must be applied before proceeding - contact exor support for further information');
-	END IF;
+  IF l_dummy_c1 IS NULL THEN
+    RAISE_APPLICATION_ERROR(-20001,'NET 4700 FIX 15 must be applied before proceeding - contact exor support for further information');
+  END IF;
 --
 END;
 /
