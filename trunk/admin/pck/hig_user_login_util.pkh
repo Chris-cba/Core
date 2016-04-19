@@ -1,0 +1,49 @@
+CREATE OR REPLACE PACKAGE hig_user_login_util AS
+--
+-----------------------------------------------------------------------------
+--
+--   PVCS Identifiers :-
+--
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/hig_user_login_util.pkh-arc   1.0   Apr 19 2016 07:52:26   Vikas.Mhetre  $
+--       Module Name      : $Workfile:   hig_user_login_util.pkh  $
+--       Date into PVCS   : $Date:   Apr 19 2016 07:52:26  $
+--       Date fetched Out : $Modtime:   Apr 19 2016 07:34:48  $
+--       PVCS Version     : $Revision:   1.0  $
+--
+--   Author : Vikas Mhetre
+--
+-----------------------------------------------------------------------------
+-- Copyright (c) 2016 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
+--
+-- all global package variables here
+--
+   g_body_sccsid     constant varchar2(30) :='"$Revision:   1.0  $"';
+--
+-----------------------------------------------------------------------------
+--
+  FUNCTION encrypt_answer( pi_answer IN hig_user_access_security.huas_answer%TYPE ) RETURN VARCHAR2;
+--
+-----------------------------------------------------------------------------
+--
+  FUNCTION decrypt_answer( pi_string IN VARCHAR2) RETURN VARCHAR2;
+--
+-----------------------------------------------------------------------------
+--
+  FUNCTION send_mail(msg_from_uname hig_users.hus_username%TYPE,
+                     msg_to_uname   hig_users.hus_username%TYPE,
+                     msg_subject    VARCHAR2,
+                     msg_text       VARCHAR2 
+                     ) RETURN VARCHAR2;
+--
+-----------------------------------------------------------------------------
+--
+  PROCEDURE alter_profile(alter_profile_text IN VARCHAR2,
+                          error_code         OUT NUMBER,
+                          error_message      OUT VARCHAR2);
+--
+-----------------------------------------------------------------------------
+--
+END hig_user_login_util;
+/
