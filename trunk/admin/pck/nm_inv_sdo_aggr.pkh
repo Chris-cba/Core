@@ -1,0 +1,30 @@
+CREATE OR REPLACE PACKAGE nm_inv_sdo_aggr
+AS
+--   PVCS Identifiers :-
+--
+--       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm_inv_sdo_aggr.pkh-arc   1.0   Apr 20 2016 15:11:56   Rob.Coupe  $
+--       Module Name      : $Workfile:   nm_inv_sdo_aggr.pkh  $
+--       Date into PVCS   : $Date:   Apr 20 2016 15:11:56  $
+--       Date fetched Out : $Modtime:   Apr 20 2016 15:09:24  $
+--       PVCS Version     : $Revision:   1.0  $
+--
+--   Author : R.A. Coupe
+--
+--   Package for code which produces aggregated geometry for assets.
+--
+-----------------------------------------------------------------------------
+-- Copyright (c) 2016 Bentley Systems Incorporated. All rights reserved.
+----------------------------------------------------------------------------
+--
+
+
+   PROCEDURE gen_inv_aggr_sdo (
+      pi_inv_type   IN     nm_inv_types.nit_inv_type%TYPE,
+      po_cur           OUT VARCHAR2,
+      p_limit       IN     INTEGER DEFAULT 500);
+
+   PROCEDURE create_aggr_sdo_view (
+      pi_inv_type    IN nm_inv_types.nit_inv_type%TYPE,
+      pi_view_name   IN VARCHAR2 DEFAULT NULL);
+END;
+/
