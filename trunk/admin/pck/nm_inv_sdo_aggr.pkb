@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm_inv_sdo_aggr
 AS
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm_inv_sdo_aggr.pkb-arc   1.0   Apr 20 2016 15:09:26   Rob.Coupe  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm_inv_sdo_aggr.pkb-arc   1.1   Apr 20 2016 16:24:20   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm_inv_sdo_aggr.pkb  $
---       Date into PVCS   : $Date:   Apr 20 2016 15:09:26  $
---       Date fetched Out : $Modtime:   Apr 20 2016 15:09:28  $
---       PVCS Version     : $Revision:   1.0  $
+--       Date into PVCS   : $Date:   Apr 20 2016 16:24:20  $
+--       Date fetched Out : $Modtime:   Apr 20 2016 16:23:30  $
+--       PVCS Version     : $Revision:   1.1  $
 --
 --   Author : R.A. Coupe
 --
@@ -16,6 +16,22 @@ AS
 -- Copyright (c) 2016 Bentley Systems Incorporated. All rights reserved.
 ----------------------------------------------------------------------------
 --
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.1  $';
+
+   FUNCTION get_version
+      RETURN VARCHAR2
+   IS
+   BEGIN
+      RETURN g_sccsid;
+   END get_version;
+
+   FUNCTION get_body_version
+      RETURN VARCHAR2
+   IS
+   BEGIN
+      RETURN g_body_sccsid;
+   END get_body_version;
+
    PROCEDURE gen_inv_aggr_sdo (
       pi_inv_type   IN     nm_inv_types.nit_inv_type%TYPE,
       po_cur           OUT VARCHAR2,
