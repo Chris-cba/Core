@@ -1,10 +1,10 @@
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/nm3/install/aggregated_geometry_ddl.sql-arc   1.1   Apr 20 2016 16:35:46   Rob.Coupe  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/nm3/install/aggregated_geometry_ddl.sql-arc   1.2   Apr 20 2016 16:38:32   Rob.Coupe  $
 --       Module Name      : $Workfile:   aggregated_geometry_ddl.sql  $
---       Date into PVCS   : $Date:   Apr 20 2016 16:35:46  $
---       Date fetched Out : $Modtime:   Apr 20 2016 16:35:20  $
---       PVCS Version     : $Revision:   1.1  $
+--       Date into PVCS   : $Date:   Apr 20 2016 16:38:32  $
+--       Date fetched Out : $Modtime:   Apr 20 2016 16:37:34  $
+--       PVCS Version     : $Revision:   1.2  $
 --
 --   Author : R.A. Coupe
 --
@@ -161,6 +161,7 @@ begin
   NM3DDL.CREATE_SYNONYM_FOR_OBJECT('NM_INV_GEOMETRY_ALL');
   NM3DDL.CREATE_SYNONYM_FOR_OBJECT('NM_INV_GEOMETRY');
   NM3DDL.CREATE_SYNONYM_FOR_OBJECT('NM_INV_SDO_AGGR');
+  NM3DDL.CREATE_SYNONYM_FOR_OBJECT('NM_INV_AGGR_SDO_TYPES');
 end;
 /
 
