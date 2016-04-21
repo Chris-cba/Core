@@ -1,22 +1,22 @@
 CREATE OR REPLACE PACKAGE BODY nm_inv_sdo_aggr
 AS
---   PVCS Identifiers :-
---
---       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm_inv_sdo_aggr.pkb-arc   1.1   Apr 20 2016 16:24:20   Rob.Coupe  $
---       Module Name      : $Workfile:   nm_inv_sdo_aggr.pkb  $
---       Date into PVCS   : $Date:   Apr 20 2016 16:24:20  $
---       Date fetched Out : $Modtime:   Apr 20 2016 16:23:30  $
---       PVCS Version     : $Revision:   1.1  $
---
---   Author : R.A. Coupe
---
---   Package for code which produces aggregated geometry for assets.
---
------------------------------------------------------------------------------
--- Copyright (c) 2016 Bentley Systems Incorporated. All rights reserved.
-----------------------------------------------------------------------------
---
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.1  $';
+   --   PVCS Identifiers :-
+   --
+   --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm_inv_sdo_aggr.pkb-arc   1.2   Apr 21 2016 18:02:34   Rob.Coupe  $
+   --       Module Name      : $Workfile:   nm_inv_sdo_aggr.pkb  $
+   --       Date into PVCS   : $Date:   Apr 21 2016 18:02:34  $
+   --       Date fetched Out : $Modtime:   Apr 21 2016 18:02:36  $
+   --       PVCS Version     : $Revision:   1.2  $
+   --
+   --   Author : R.A. Coupe
+   --
+   --   Package for code which produces aggregated geometry for assets.
+   --
+   -----------------------------------------------------------------------------
+   -- Copyright (c) 2016 Bentley Systems Incorporated. All rights reserved.
+   ----------------------------------------------------------------------------
+   --
+   g_body_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.2  $';
 
    FUNCTION get_version
       RETURN VARCHAR2
@@ -244,24 +244,106 @@ AS
       pi_inv_type    IN nm_inv_types.nit_inv_type%TYPE,
       pi_view_name   IN VARCHAR2 DEFAULT NULL)
    IS
-   l_view_name varchar2(30) := NVL (pi_view_name, 'V_' || pi_inv_type || '_AGGR_SDO');
+      l_view_name   VARCHAR2 (30)
+         := NVL (pi_view_name, 'V_' || pi_inv_type || '_AGGR_SDO');
    BEGIN
       EXECUTE IMMEDIATE
-            'create or replace view '||l_view_name
+            'create or replace view '
+         || l_view_name
          || ' as select * from nm_inv_geometry where asset_type = '
          || ''''
          || pi_inv_type
          || '''';
-   --
-      INSERT into mdsys.SDO_GEOM_METADATA_TABLE
-      ( SDO_OWNER, SDO_TABLE_NAME, SDO_COLUMN_NAME, SDO_DIMINFO, SDO_SRID )
-      select sys_context('NM3CORE', 'APPLICATION_OWNER'), l_view_name, 'SHAPE', sdo_diminfo, sdo_srid
-      from mdsys.SDO_GEOM_METADATA_TABLE
-      where sdo_owner = sys_context('NM3CORE', 'APPLICATION_OWNER')
-      and sdo_table_name = 'NM_INV_GEOMETRY_ALL' and sdo_column_name = 'SHAPE';
-      
+
+      --
+      BEGIN
+         NM3DDL.CREATE_SYNONYM_FOR_OBJECT (l_view_name);
+      END;
+
+      --
+      BEGIN
+         INSERT INTO mdsys.SDO_GEOM_METADATA_TABLE (SDO_OWNER,
+                                                    SDO_TABLE_NAME,
+                                                    SDO_COLUMN_NAME,
+                                                    SDO_DIMINFO,
+                                                    SDO_SRID)
+            SELECT SYS_CONTEXT ('NM3CORE', 'APPLICATION_OWNER'),
+                   l_view_name,
+                   'SHAPE',
+                   sdo_diminfo,
+                   sdo_srid
+              FROM mdsys.SDO_GEOM_METADATA_TABLE
+             WHERE     sdo_owner =
+                          SYS_CONTEXT ('NM3CORE', 'APPLICATION_OWNER')
+                   AND sdo_table_name = 'NM_INV_GEOMETRY_ALL'
+                   AND sdo_column_name = 'SHAPE';
+      EXCEPTION
+         WHEN DUP_VAL_ON_INDEX
+         THEN
+            NULL;
+      END;
    END;
-   
+
+   PROCEDURE create_aggr_join_view (
+      pi_inv_type    IN nm_inv_types.nit_inv_type%TYPE,
+      pi_view_name   IN VARCHAR2 DEFAULT NULL--      pi_aggr_view    IN VARCHAR2 DEFAULT NULL
+      )
+   IS
+      l_view_name     VARCHAR2 (30)
+         := NVL (pi_view_name, 'V_NM_INV_AGGR_' || pi_inv_type || '_SDO');
+      --   l_aggr_view varchar2(30) := NVL (pi_aggr_view, 'V_' || pi_inv_type || '_AGGR_SDO');
+      l_inv_table     VARCHAR2 (30);
+      l_pk_column     VARCHAR2 (30);
+
+      nit_not_found   PLS_INTEGER := -20002;
+      l_nit_row       nm_inv_types%ROWTYPE;
+   BEGIN
+      l_nit_row := nm3get.get_nit (pi_inv_type, TRUE, nit_not_found);
+
+      l_inv_table := NVL (l_nit_row.nit_table_name, 'V_NM_' || pi_inv_type);
+      l_pk_column := NVL (l_nit_row.nit_foreign_pk_column, 'IIT_NE_ID');
+
+      EXECUTE IMMEDIATE
+            'create or replace view '
+         || l_view_name
+         || ' as select * from '
+         || l_inv_table
+         || ' i, nm_inv_geometry s '
+         || ' where s.asset_id = '
+         || l_pk_column
+         || ' and s.asset_type = '
+         || ''''
+         || pi_inv_type
+         || '''';
+
+      --
+      BEGIN
+         NM3DDL.CREATE_SYNONYM_FOR_OBJECT (l_view_name);
+      END;
+
+      --
+      BEGIN
+         INSERT INTO mdsys.SDO_GEOM_METADATA_TABLE (SDO_OWNER,
+                                                    SDO_TABLE_NAME,
+                                                    SDO_COLUMN_NAME,
+                                                    SDO_DIMINFO,
+                                                    SDO_SRID)
+            SELECT SYS_CONTEXT ('NM3CORE', 'APPLICATION_OWNER'),
+                   l_view_name,
+                   'SHAPE',
+                   sdo_diminfo,
+                   sdo_srid
+              FROM mdsys.SDO_GEOM_METADATA_TABLE
+             WHERE     sdo_owner =
+                          SYS_CONTEXT ('NM3CORE', 'APPLICATION_OWNER')
+                   AND sdo_table_name = 'NM_INV_GEOMETRY_ALL'
+                   AND sdo_column_name = 'SHAPE';
+      EXCEPTION
+         WHEN DUP_VAL_ON_INDEX
+         THEN
+            NULL;
+      END;
+   END;
 END;
 /
 
