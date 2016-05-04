@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_get
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_get.pkb-arc   1.5   Oct 15 2015 17:08:32   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_get.pkb-arc   1.6   May 04 2016 14:35:18   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_get.pkb  $
-   --       Date into PVCS   : $Date:   Oct 15 2015 17:08:32  $
-   --       Date fetched Out : $Modtime:   Oct 15 2015 17:06:54  $
-   --       PVCS Version     : $Revision:   1.5  $
+   --       Date into PVCS   : $Date:   May 04 2016 14:35:18  $
+   --       Date fetched Out : $Modtime:   May 04 2016 14:32:20  $
+   --       PVCS Version     : $Revision:   1.6  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,7 +16,7 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.5  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.6  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_get';
 
@@ -75,7 +75,7 @@ AS
       RETURN lb_RPt_tab
    IS
       retval       lb_rpt_tab;
-      l_nit_row    nm_inv_types%rowtype := nm3get.get_nit(p_obj_type);
+      l_nit_row    nm_inv_types%ROWTYPE := nm3get.get_nit (p_obj_type);
       l_ft_flag    VARCHAR2 (1);
       l_category   VARCHAR2 (1);
    BEGIN
@@ -93,13 +93,14 @@ AS
 
       IF l_ft_flag = 'Y'
       THEN
-         retval := get_ft_rpt_tab (p_rpt_tab => p_refnt_tab,
-                            p_table_name     => l_nit_row.nit_table_name,
-                            p_inv_type       => p_obj_type,
-                            p_key            => l_nit_row.nit_foreign_pk_column,
-                            p_ne_key         => l_nit_row.nit_lr_ne_column_name,
-                            p_start_col      => l_nit_row.nit_lr_st_chain,
-                            p_end_col        => l_nit_row.nit_lr_end_chain );
+         retval :=
+            get_ft_rpt_tab (p_rpt_tab      => p_refnt_tab,
+                            p_table_name   => l_nit_row.nit_table_name,
+                            p_inv_type     => p_obj_type,
+                            p_key          => l_nit_row.nit_foreign_pk_column,
+                            p_ne_key       => l_nit_row.nit_lr_ne_column_name,
+                            p_start_col    => l_nit_row.nit_lr_st_chain,
+                            p_end_col      => l_nit_row.nit_lr_end_chain);
       ELSE
          BEGIN
             SELECT lb_RPt (
@@ -870,9 +871,9 @@ AS
                                                              1)
                                                           OVER (
                                                              ORDER BY
-                                                                route_id,
                                                                 nm_seg_no,
                                                                 nm_seq_no,
+                                                                nm_slk,
                                                                 datum_id,
                                                                 datum_st * dir,
                                                                 datum_end * dir),
@@ -884,9 +885,9 @@ AS
                                                              1)
                                                           OVER (
                                                              ORDER BY
-                                                                route_id,
                                                                 nm_seg_no,
                                                                 nm_seq_no,
+                                                                nm_slk,
                                                                 datum_id,
                                                                 datum_st * dir,
                                                                 datum_end * dir),
@@ -898,9 +899,9 @@ AS
                                                              1)
                                                           OVER (
                                                              ORDER BY
-                                                                route_id,
                                                                 nm_seg_no,
                                                                 nm_seq_no,
+                                                                nm_slk,
                                                                 datum_id,
                                                                 datum_st * dir,
                                                                 datum_end * dir),
@@ -912,9 +913,9 @@ AS
                                                              1)
                                                           OVER (
                                                              ORDER BY
-                                                                route_id,
                                                                 nm_seg_no,
                                                                 nm_seq_no,
+                                                                nm_slk,
                                                                 datum_id,
                                                                 datum_st * dir,
                                                                 datum_end * dir),
@@ -926,9 +927,9 @@ AS
                                                              1)
                                                           OVER (
                                                              ORDER BY
-                                                                route_id,
                                                                 nm_seg_no,
                                                                 nm_seq_no,
+                                                                nm_slk,
                                                                 datum_id,
                                                                 datum_st * dir,
                                                                 datum_end * dir),
@@ -940,9 +941,9 @@ AS
                                                              1)
                                                           OVER (
                                                              ORDER BY
-                                                                route_id,
                                                                 nm_seg_no,
                                                                 nm_seq_no,
+                                                                nm_slk,
                                                                 datum_id,
                                                                 datum_st * dir,
                                                                 datum_end * dir),
@@ -955,9 +956,9 @@ AS
                                                              1)
                                                           OVER (
                                                              ORDER BY
-                                                                route_id,
                                                                 nm_seg_no,
                                                                 nm_seq_no,
+                                                                nm_slk,
                                                                 datum_id,
                                                                 datum_st * dir,
                                                                 datum_end * dir),
@@ -970,9 +971,9 @@ AS
                                                           OVER (
                                                              PARTITION BY inv_id
                                                              ORDER BY
-                                                                route_id,
                                                                 nm_seg_no,
                                                                 nm_seq_no,
+                                                                nm_slk,
                                                                 datum_id,
                                                                 datum_st * dir,
                                                                 datum_end * dir),
@@ -985,9 +986,9 @@ AS
                                                           OVER (
                                                              PARTITION BY inv_id
                                                              ORDER BY
-                                                                route_id,
                                                                 nm_seg_no,
                                                                 nm_seq_no,
+                                                                nm_slk,
                                                                 datum_id,
                                                                 datum_st * dir,
                                                                 datum_end * dir),
@@ -1000,9 +1001,9 @@ AS
                                                           OVER (
                                                              PARTITION BY inv_id
                                                              ORDER BY
-                                                                route_id,
                                                                 nm_seg_no,
                                                                 nm_seq_no,
+                                                                nm_slk,
                                                                 datum_id,
                                                                 datum_st * dir,
                                                                 datum_end * dir),
@@ -1015,9 +1016,9 @@ AS
                                                           OVER (
                                                              PARTITION BY inv_id
                                                              ORDER BY
-                                                                route_id,
                                                                 nm_seg_no,
                                                                 nm_seq_no,
+                                                                nm_slk,
                                                                 datum_id,
                                                                 datum_st * dir,
                                                                 datum_end * dir),
@@ -1030,9 +1031,9 @@ AS
                                                           OVER (
                                                              PARTITION BY inv_id
                                                              ORDER BY
-                                                                route_id,
                                                                 nm_seg_no,
                                                                 nm_seq_no,
+                                                                nm_slk,
                                                                 datum_id,
                                                                 datum_st * dir,
                                                                 datum_end * dir),
@@ -1044,9 +1045,9 @@ AS
                                                              1)
                                                           OVER (
                                                              ORDER BY
-                                                                route_id,
                                                                 nm_seg_no,
                                                                 nm_seq_no,
+                                                                nm_slk,
                                                                 datum_id,
                                                                 datum_st * dir,
                                                                 datum_end * dir),
@@ -1059,9 +1060,9 @@ AS
                                                           OVER (
                                                              PARTITION BY inv_id
                                                              ORDER BY
-                                                                route_id,
                                                                 nm_seg_no,
                                                                 nm_seq_no,
+                                                                nm_slk,
                                                                 datum_id,
                                                                 datum_st * dir,
                                                                 datum_end * dir),
@@ -1086,21 +1087,17 @@ AS
                                                                  m.nm_end_slk,
                                                                  nm_seg_no,
                                                                  nm_seq_no,
-                                                                 CASE m.nm_cardinality
-                                                                    WHEN 1
-                                                                    THEN
-                                                                       ne_no_start
-                                                                    ELSE
-                                                                       ne_no_end
-                                                                 END
+                                                                 DECODE (
+                                                                    m.nm_cardinality,
+                                                                    1, ne_no_start,
+                                                                    -1, ne_no_end,
+                                                                    ne_no_start)
                                                                     start_node,
-                                                                 CASE m.nm_cardinality
-                                                                    WHEN 1
-                                                                    THEN
-                                                                       ne_no_end
-                                                                    ELSE
-                                                                       ne_no_start
-                                                                 END
+                                                                 DECODE (
+                                                                    m.nm_cardinality,
+                                                                    1, ne_no_end,
+                                                                    -1, ne_no_start,
+                                                                    ne_no_end)
                                                                     end_node,
                                                                  ne_length,
                                                                  m.nm_cardinality
@@ -1111,7 +1108,16 @@ AS
                                                                     'L', 'S/L',
                                                                     'R')
                                                                     sc,
-                                                                 CASE m.nm_cardinality
+                                                                 --                                                              DECODE (datum_st,
+                                                                 --                                                                      0, 0,
+                                                                 --                                                                      0) --1)
+                                                                 --                                                                 cs,
+                                                                 --                                                              DECODE (
+                                                                 --                                                                 datum_end,
+                                                                 --                                                                 ne_length, 0,
+                                                                 --                                                                 0) --1)
+                                                                 --                                                                 ce,
+                                                                 CASE nm_cardinality
                                                                     WHEN 1
                                                                     THEN
                                                                        CASE datum_st
@@ -1131,19 +1137,19 @@ AS
                                                                        END
                                                                  END
                                                                     cs,
-                                                                 CASE m.nm_cardinality
-                                                                    WHEN -1
+                                                                 CASE nm_cardinality
+                                                                    WHEN 1
                                                                     THEN
-                                                                       CASE datum_st
-                                                                          WHEN 0
+                                                                       CASE datum_end
+                                                                          WHEN ne_length
                                                                           THEN
                                                                              0
                                                                           ELSE
                                                                              1
                                                                        END
                                                                     ELSE
-                                                                       CASE datum_end
-                                                                          WHEN ne_length
+                                                                       CASE datum_st
+                                                                          WHEN 0
                                                                           THEN
                                                                              0
                                                                           ELSE
