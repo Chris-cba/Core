@@ -2,11 +2,11 @@ CREATE OR REPLACE VIEW v_network_types
 AS
      SELECT -------------------------------------------------------------------------
             --   PVCS Identifiers :-
-            --       PVCS id          : $Header:   //new_vm_latest/archives/lb/admin/eB_interface/v_network_types.sql-arc   1.0   Oct 19 2015 11:48:38   Rob.Coupe  $
+            --       PVCS id          : $Header:   //new_vm_latest/archives/lb/admin/eB_interface/v_network_types.sql-arc   1.1   May 06 2016 15:07:52   Rob.Coupe  $
             --       Module Name      : $Workfile:   v_network_types.sql  $
-            --       Date into PVCS   : $Date:   Oct 19 2015 11:48:38  $
-            --       Date fetched Out : $Modtime:   Oct 19 2015 11:47:16  $
-            --       Version          : $Revision:   1.0  $
+            --       Date into PVCS   : $Date:   May 06 2016 15:07:52  $
+            --       Date fetched Out : $Modtime:   May 06 2016 15:07:12  $
+            --       Version          : $Revision:   1.1  $
             ------------------------------------------------------------------
             --   Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
             -----------------------------------------------------------------
@@ -41,7 +41,7 @@ AS
                   AND NVL (nlt_gty_type, '^%&*') = NVL (a.gty_type, '^%&*')
             INNER JOIN nm_units ON nlt_units = un_unit_id
             INNER JOIN nm_inv_nw ON nin_nw_type = datum_type
-            INNER JOIN lb_types ON lb_exor_inv_type = nin_nit_inv_code
+            LEFT OUTER JOIN lb_types ON lb_exor_inv_type = nin_nit_inv_code
             INNER JOIN lb_units ON exor_unit_id = nlt_units
    ORDER BY nlt_seq_no
 /
