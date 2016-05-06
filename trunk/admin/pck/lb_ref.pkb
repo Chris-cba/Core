@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_ref
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_ref.pkb-arc   1.5   Sep 17 2015 12:07:38   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_ref.pkb-arc   1.6   May 06 2016 15:33:12   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_ref.pkb  $
-   --       Date into PVCS   : $Date:   Sep 17 2015 12:07:38  $
-   --       Date fetched Out : $Modtime:   Sep 17 2015 12:06:50  $
-   --       PVCS Version     : $Revision:   1.5  $
+   --       Date into PVCS   : $Date:   May 06 2016 15:33:12  $
+   --       Date fetched Out : $Modtime:   May 06 2016 15:32:30  $
+   --       PVCS Version     : $Revision:   1.6  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,7 +16,7 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.5  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.6  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_ref';
 
@@ -617,7 +617,35 @@ AS
    END;
 
    --
+   FUNCTION GET_POINT_OR_CONTINUOUS ( ASSETTYPE IN INTEGER )
+      RETURN VARCHAR2 IS
+   RETVAL VARCHAR2(1);
+   BEGIN
+     SELECT NIT_PNT_OR_CONT
+     INTO RETVAL
+     FROM v_lb_type_nw_flags
+     where lb_object_type = ASSETTYPE
+     group by nit_pnt_or_cont;
+   EXCEPTION
+     WHEN NO_DATA_FOUND 
+     THEN
+        raise_application_error( -20005, 'Asset type is not registered');
+   END;     
 
+   FUNCTION GET_POINT_OR_CONTINUOUS ( INV_TYPE IN VARCHAR2 )
+      RETURN VARCHAR2 IS
+   RETVAL VARCHAR2(1);
+   BEGIN
+     SELECT NIT_PNT_OR_CONT
+     INTO RETVAL
+     FROM v_lb_type_nw_flags
+     where lb_exor_inv_type = INV_TYPE
+     group by nit_pnt_or_cont;
+   EXCEPTION
+     WHEN NO_DATA_FOUND 
+     THEN
+        raise_application_error( -20005, 'Asset type is not registered');
+   END;     
 
    PROCEDURE CHECK_JXP (ASSETTYPE IN INTEGER, JXP IN VARCHAR2)
    IS
