@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_reg
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_reg.pkb-arc   1.11   Jan 06 2016 14:36:58   Rob.Coupe  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_reg.pkb-arc   1.12   May 06 2016 14:38:20   Rob.Coupe  $
 --       Module Name      : $Workfile:   lb_reg.pkb  $
---       Date into PVCS   : $Date:   Jan 06 2016 14:36:58  $
---       Date fetched Out : $Modtime:   Jan 06 2016 14:36:34  $
---       PVCS Version     : $Revision:   1.11  $
+--       Date into PVCS   : $Date:   May 06 2016 14:38:20  $
+--       Date fetched Out : $Modtime:   May 06 2016 14:37:58  $
+--       PVCS Version     : $Revision:   1.12  $
 --
 --   Author : R.A. Coupe
 --
@@ -19,7 +19,7 @@ AS
    --
    --all global package variables here
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (30) := '"$Revision:   1.11  $"';
+   g_body_sccsid    CONSTANT VARCHAR2 (30) := '"$Revision:   1.12  $"';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'NM3RSC';
    --
@@ -127,7 +127,8 @@ AS
       --  register exor inv type
 
       --
-      NM3INV.CREATE_FT_ASSET_FROM_TABLE ('V_LB_' || pi_exor_type,
+      BEGIN
+        NM3INV.CREATE_FT_ASSET_FROM_TABLE ('V_LB_' || pi_exor_type,
                                          'EXOR_ID',
                                          pi_exor_type,
                                          pi_lB_asset_class,
@@ -143,12 +144,25 @@ AS
                                          pi_security_type,
                                          pi_role,
                                          pi_role_mode);
-
+      EXCEPTION
+        WHEN DUP_VAL_ON_INDEX then
+          DECLARE
+            l_nit nm_inv_types%rowtype;
+          BEGIN
+            select * into l_nit from nm_inv_types where nit_inv_type = pi_exor_type;
+            IF l_nit.nit_table_name = 'V_LB_' || pi_exor_type
+            THEN 
+               NULL;
+            END IF;
+          END;
+       END;
       --
       UPDATE nm_inv_types
          SET nit_category = 'L', nit_x_sect_allow_flag = l_xsp
        WHERE nit_inv_type = pi_exor_type;
-
+nm_debug.debug_on;
+nm_debug.delete_debug(true);
+nm_debug.debug('insert NIN');
       --
       INSERT INTO nm_inv_nw (nin_nw_type,
                              nin_nit_inv_code,
@@ -165,14 +179,24 @@ AS
 
       IF pi_lb_object_type IS NOT NULL
       THEN
-         INSERT
-           INTO LB_TYPES (LB_OBJECT_TYPE, LB_ASSET_GROUP, LB_EXOR_INV_TYPE)
-         VALUES (pi_lb_object_type, pi_LB_asset_class, pi_exor_type);
+         BEGIN
+           INSERT
+             INTO LB_TYPES (LB_OBJECT_TYPE, LB_ASSET_GROUP, LB_EXOR_INV_TYPE)
+           VALUES (pi_lb_object_type, pi_LB_asset_class, pi_exor_type);
+         EXCEPTION
+           WHEN DUP_VAL_ON_INDEX then
+             NULL;
+         END;
       END IF;
 
       --
-      INSERT INTO LB_INV_SECURITY (LB_EXOR_INV_TYPE, LB_SECURITY_TYPE)
-           VALUES (pi_exor_type, pi_security_type);
+      BEGIN
+        INSERT INTO LB_INV_SECURITY (LB_EXOR_INV_TYPE, LB_SECURITY_TYPE)
+             VALUES (pi_exor_type, pi_security_type);
+      EXCEPTION
+           WHEN DUP_VAL_ON_INDEX then
+             NULL;
+      END;
 
       --
       create_lb_sdo_view (pi_exor_type);
