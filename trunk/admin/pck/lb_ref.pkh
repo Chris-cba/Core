@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE lb_ref
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_ref.pkh-arc   1.6   Sep 17 2015 12:06:10   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_ref.pkh-arc   1.7   May 06 2016 15:32:46   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_ref.pkh  $
-   --       Date into PVCS   : $Date:   Sep 17 2015 12:06:10  $
-   --       Date fetched Out : $Modtime:   Sep 17 2015 12:05:28  $
-   --       PVCS Version     : $Revision:   1.6  $
+   --       Date into PVCS   : $Date:   May 06 2016 15:32:46  $
+   --       Date fetched Out : $Modtime:   May 06 2016 15:32:34  $
+   --       PVCS Version     : $Revision:   1.7  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,7 +16,7 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.6  $';
+   g_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.7  $';
 
    --
    FUNCTION get_version
@@ -126,6 +126,11 @@ AS
       NETWORKELEMENT   IN VARCHAR2 DEFAULT NULL)
       RETURN lb_linear_refnt_tab;
 
+   FUNCTION GET_POINT_OR_CONTINUOUS ( ASSETTYPE IN INTEGER )
+      RETURN VARCHAR2;
+
+   FUNCTION GET_POINT_OR_CONTINUOUS ( INV_TYPE IN VARCHAR2 )
+      RETURN VARCHAR2;
    --
    PROCEDURE CHECK_JXP (ASSETTYPE IN INTEGER, JXP IN VARCHAR2);
 END lb_ref;
