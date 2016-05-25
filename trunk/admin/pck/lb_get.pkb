@@ -1,12 +1,13 @@
+/* Formatted on 25/05/2016 11:32:20 (QP5 v5.265.14096.38000) */
 CREATE OR REPLACE PACKAGE BODY lb_get
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_get.pkb-arc   1.6   May 04 2016 14:35:18   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_get.pkb-arc   1.7   May 25 2016 12:56:04   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_get.pkb  $
-   --       Date into PVCS   : $Date:   May 04 2016 14:35:18  $
-   --       Date fetched Out : $Modtime:   May 04 2016 14:32:20  $
-   --       PVCS Version     : $Revision:   1.6  $
+   --       Date into PVCS   : $Date:   May 25 2016 12:56:04  $
+   --       Date fetched Out : $Modtime:   May 25 2016 12:51:38  $
+   --       PVCS Version     : $Revision:   1.7  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,7 +17,7 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.6  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.7  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_get';
 
@@ -80,6 +81,17 @@ AS
       l_category   VARCHAR2 (1);
    BEGIN
       --
+      DECLARE
+         not_an_asset_type   EXCEPTION;
+         PRAGMA EXCEPTION_INIT (not_an_asset_type, -20000);
+      BEGIN
+         l_nit_row := nm3get.get_nit (p_obj_type);
+      EXCEPTION
+         WHEN not_an_asset_type
+         THEN
+            NULL;
+      END;
+
       BEGIN
          SELECT DECODE (nit_table_name, NULL, 'N', 'Y'), nit_category
            INTO l_ft_flag, l_category
@@ -693,6 +705,105 @@ AS
    END;
 
    --
+
+   FUNCTION g_of_g_search (p_group_id IN INTEGER, p_obj_type IN VARCHAR2)
+      RETURN lb_rpt_tab
+   IS
+      retval   lb_rpt_tab;
+   BEGIN
+      WITH group_hierarchy (levl,
+                            top_group,
+                            parent_group,
+                            child_group,
+                            parent_type,
+                            path_string,
+                            nm_begin_mp,
+                            nm_end_mp,
+                            nm_slk,
+                            nm_end_slk)
+           AS (SELECT 1 levl,
+                      nm_ne_id_in top_group,
+                      nm_ne_id_in parent_group,
+                      nm_ne_id_of child_group,
+                      nm_obj_type parent_type,
+                      TO_CHAR (nm_ne_id_in) path_string,
+                      nm_begin_mp,
+                      nm_end_mp,
+                      nm_slk,
+                      nm_end_slk
+                 FROM nm_members
+                WHERE nm_ne_id_in = p_group_id
+               --                      TO_NUMBER (SYS_CONTEXT ('NM3SQL', 'GROUP_ID'))
+               UNION ALL
+               SELECT levl + 1,
+                      t.parent_group,
+                      p.nm_ne_id_in,
+                      p.nm_ne_id_of,
+                      p.nm_obj_type,
+                      t.path_string || ',' || TO_CHAR (p.nm_ne_id_in),
+                      p.nm_begin_mp,
+                      p.nm_end_mp,
+                      p.nm_slk,
+                      p.nm_end_slk
+                 FROM group_hierarchy t, nm_members p
+                WHERE t.child_group = p.nm_ne_id_in)
+                 SEARCH DEPTH FIRST BY parent_group SET order1
+                 CYCLE parent_group SET cycle TO 1 DEFAULT 0
+--select * from group_hierarchy
+        SELECT CAST (COLLECT (lb_rpt (nm_ne_id_of,
+                                      nlt_id,
+                                      nm_obj_type,
+                                      nm_ne_id_in,
+                                      nm_seg_no,
+                                      nm_seq_no,
+                                      nm_dir_flag,
+                                      nm_begin_mp,
+                                      nm_end_mp,
+                                      nlt_units)) AS lb_rpt_tab)
+          INTO retval
+          FROM ( select nm_ne_id_of,
+                                      nlt_id,
+                                      nm_obj_type,
+                                      nm_ne_id_in,
+                                      nm_seg_no,
+                                      nm_seq_no,
+                                      nm_dir_flag,
+                                      GREATEST (m.nm_begin_mp, g.nm_begin_mp) nm_begin_mp,
+                                      LEAST (m.nm_end_mp, g.nm_end_mp) nm_end_mp,
+                                      nlt_units
+          FROM group_hierarchy g,
+               nm_elements e,
+               nm_locations m,
+               nm_linear_types
+         WHERE     ne_type = 'S'
+               AND ne_id = m.nm_ne_id_of
+               AND g.child_group = ne_id
+               AND nlt_nt_type = ne_nt_type
+               AND nm_obj_type = p_obj_type  --SYS_CONTEXT ('NM3SQL', 'OBJECT_TYPE');
+       UNION ALL
+           select nm_ne_id_of,
+                                      nlt_id,
+                                      nm_obj_type,
+                                      nm_ne_id_in,
+                                      nm_seg_no,
+                                      nm_seq_no,
+                                      nm_cardinality,
+                                      GREATEST (m.nm_begin_mp, g.nm_begin_mp) nm_begin_mp,
+                                      LEAST (m.nm_end_mp, g.nm_end_mp) nm_end_mp,
+                                      nlt_units
+          FROM group_hierarchy g,
+               nm_elements e,
+               nm_members m,
+               nm_linear_types
+         WHERE     ne_type = 'S'
+               AND ne_id = m.nm_ne_id_of
+               AND g.child_group = ne_id
+               AND nlt_nt_type = ne_nt_type
+               AND nm_obj_type = p_obj_type ); --SYS_CONTEXT ('NM3SQL', 'OBJECT_TYPE');
+
+RETURN retval;
+END;
+
 
    FUNCTION get_lb_RPt_cur (p_refnt         IN INTEGER,
                             p_refnt_type    IN INTEGER,
