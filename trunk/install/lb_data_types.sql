@@ -1,10 +1,10 @@
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/lb/install/lb_data_types.sql-arc   1.6   Oct 29 2015 10:14:38   Rob.Coupe  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/lb/install/lb_data_types.sql-arc   1.7   May 26 2016 10:34:34   Rob.Coupe  $
 --       Module Name      : $Workfile:   lb_data_types.sql  $
---       Date into PVCS   : $Date:   Oct 29 2015 10:14:38  $
---       Date fetched Out : $Modtime:   Oct 29 2015 10:14:10  $
---       PVCS Version     : $Revision:   1.6  $
+--       Date into PVCS   : $Date:   May 26 2016 10:34:34  $
+--       Date fetched Out : $Modtime:   May 26 2016 10:35:02  $
+--       PVCS Version     : $Revision:   1.7  $
 --
 --   Author : R.A. Coupe
 --
@@ -283,6 +283,26 @@ type LB_XSP as object ( XSP varchar2(4), XSP_DESCR varchar2(80) );
 CREATE OR REPLACE
 type LB_XSP_TAB as table of lb_xsp;
 /
+
+drop type lb_asset_type_tab force
+/
+
+drop type lb_asset_type force
+/
+
+begin
+  drop_transient_types('LB_ASSET_TYPE_TAB');
+  drop_transient_types('LB_ASSET_TYPE');
+end;
+/
+
+create or replace type lb_asset_type
+as object ( asset_type varchar2(4))
+/
+
+create or replace type lb_asset_type_tab as table of lb_asset_type
+/
+
 
 drop type LINEAR_ELEMENT_TYPES force;
 
