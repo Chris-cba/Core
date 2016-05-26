@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE lb_get
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_get.pkh-arc   1.7   May 25 2016 12:57:26   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_get.pkh-arc   1.8   May 26 2016 10:24:50   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_get.pkh  $
-   --       Date into PVCS   : $Date:   May 25 2016 12:57:26  $
-   --       Date fetched Out : $Modtime:   May 25 2016 12:57:04  $
-   --       PVCS Version     : $Revision:   1.7  $
+   --       Date into PVCS   : $Date:   May 26 2016 10:24:50  $
+   --       Date fetched Out : $Modtime:   May 26 2016 10:25:00  $
+   --       PVCS Version     : $Revision:   1.8  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,7 +16,7 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.7  $';
+   g_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.8  $';
 
    --
    FUNCTION get_version
@@ -86,6 +86,11 @@ AS
                             p_cardinality   IN INTEGER)
       RETURN lb_RPt_tab;
 
+   FUNCTION g_of_g_search (p_group_id      IN INTEGER,
+                           p_asset_types   IN lb_asset_type_tab,
+                           CARDINALITY        INTEGER)
+      RETURN lb_rpt_tab;
+	  
    FUNCTION g_of_g_search (p_group_id IN INTEGER, p_obj_type IN VARCHAR2)
       RETURN lb_rpt_tab;
 
