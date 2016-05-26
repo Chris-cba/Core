@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_get
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_get.pkb-arc   1.8   May 26 2016 10:22:04   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_get.pkb-arc   1.9   May 26 2016 10:48:58   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_get.pkb  $
-   --       Date into PVCS   : $Date:   May 26 2016 10:22:04  $
-   --       Date fetched Out : $Modtime:   May 26 2016 10:22:08  $
-   --       PVCS Version     : $Revision:   1.8  $
+   --       Date into PVCS   : $Date:   May 26 2016 10:48:58  $
+   --       Date fetched Out : $Modtime:   May 26 2016 10:48:22  $
+   --       PVCS Version     : $Revision:   1.9  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,7 +16,7 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.8  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.9  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_get';
 
@@ -75,7 +75,7 @@ AS
       RETURN lb_RPt_tab
    IS
       retval       lb_rpt_tab;
-      l_nit_row    nm_inv_types%ROWTYPE := nm3get.get_nit (p_obj_type);
+      l_nit_row    nm_inv_types%ROWTYPE;
       l_ft_flag    VARCHAR2 (1);
       l_category   VARCHAR2 (1);
    BEGIN
