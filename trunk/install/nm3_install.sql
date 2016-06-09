@@ -1,11 +1,11 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3_install.sql-arc   2.40   Oct 31 2013 09:48:04   Rob.Coupe  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/nm3_install.sql-arc   2.41   Jun 09 2016 15:30:04   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3_install.sql  $
---       Date into PVCS   : $Date:   Oct 31 2013 09:48:04  $
---       Date fetched Out : $Modtime:   Oct 31 2013 09:46:34  $
---       PVCS Version     : $Revision:   2.40  $
+--       Date into PVCS   : $Date:   Jun 09 2016 15:30:04  $
+--       Date fetched Out : $Modtime:   Jun 09 2016 15:25:46  $
+--       PVCS Version     : $Revision:   2.41  $
 --
 --------------------------------------------------------------------------------
 --   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
@@ -92,6 +92,13 @@ EXCEPTION
 END;
 /
 WHENEVER SQLERROR CONTINUE
+--
+---------------------------------------------------------------------------------------------------
+--                        ****************   EXOR_CORE ACCOUNT LOCK  *******************
+--
+--  After intial object creation the exor_core account is not needed to be logged into, so lock it.
+Alter User Exor_Core Account Lock
+/
 --
 ---------------------------------------------------------------------------------------------------
 --                        ****************   TYPES  *******************
