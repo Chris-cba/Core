@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3_doc_man.pkb-arc   3.6   Oct 03 2014 10:08:44   Linesh.Sorathia  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3_doc_man.pkb-arc   3.7   Jun 22 2016 11:39:56   linesh.sorathia  $
 --       Module Name      : $Workfile:   nm3_doc_man.pkb  $
---       Date into PVCS   : $Date:   Oct 03 2014 10:08:44  $
---       Date fetched Out : $Modtime:   Oct 03 2014 09:29:46  $
---       Version          : $Revision:   3.6  $
+--       Date into PVCS   : $Date:   Jun 22 2016 11:39:56  $
+--       Date fetched Out : $Modtime:   Apr 27 2016 10:20:04  $
+--       Version          : $Revision:   3.7  $
 --       Based on SCCS version : 
 ------------------------------------------------------------------
 --   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
@@ -19,7 +19,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.6  $';
+  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.7  $';
 
   g_package_name CONSTANT varchar2(30) := 'nm3_doc_man';
 --
@@ -39,212 +39,6 @@ END get_body_version;
 --
 -----------------------------------------------------------------------------
 --
-PROCEDURE get_documents(pi_gateway_name In  Varchar2
-                       ,pi_feature_id   In  Varchar2
-                       ,po_ref_out      Out Sys_Refcursor)
-Is
-Begin
---
-   Open po_ref_out For  
-   Select eea_object_id
-   From   eb_exor_associations 
-   Where  eea_feature_table_name  = pi_gateway_name
-   And    eea_feature_id          = pi_feature_id ;           
---
-End get_documents;
---
------------------------------------------------------------------------------
---
-PROCEDURE get_associations(pi_document_id  In  Number
-                          ,po_ref_out      Out Sys_Refcursor)
-Is
-Begin
---
-   Open po_ref_out For  
-   Select eea_feature_table_name,eea_feature_id
-   From   eb_exor_associations 
-   Where  eea_object_id   = pi_document_id
-   And    eea_object_type =  3 ;    
---
-End get_associations;
---
------------------------------------------------------------------------------
---
-FUNCTION check_associations_exists(pi_document_id  In  Number)
-Return Boolean
-Is
-   l_count   Number ; 
-   Cursor c_asso_exists
-   IS
-   Select Count(0)
-   From   eb_exor_associations 
-   Where  eea_object_id   = pi_document_id
-   And    eea_object_type =  3 ;    
-Begin
---
-   Open  c_asso_exists;
-   Fetch c_asso_exists Into l_count;
-   Close c_asso_exists;
-   If l_count > 0
-   Then 
-       Return True;
-   Else
-       Return False;
-   End If ;
---
-End check_associations_exists;
---
------------------------------------------------------------------------------
---
-FUNCTION check_associations_exists(pi_document_id  In  Number
-                                  ,pi_gateway_name In  Varchar2
-                                  ,pi_feature_id   In  Varchar2)
-Return Boolean
-Is
-   l_count   Number ; 
-   Cursor c_asso_exists
-   IS
-   Select Count(0)
-   From   eb_exor_associations 
-   Where  eea_object_id          = pi_document_id
-   And    eea_feature_table_name = pi_gateway_name
-   And    eea_feature_id         = pi_feature_id
-   And    eea_object_type        =  3 ;    
-Begin
---
-   Open  c_asso_exists;
-   Fetch c_asso_exists Into l_count;
-   Close c_asso_exists;
-   If l_count > 0
-   Then 
-       Return True;
-   Else
-       Return False;
-   End If ;
---
-End check_associations_exists;
---
------------------------------------------------------------------------------
---
-FUNCTION check_associations_exists(pi_gateway_name In  Varchar2
-                                  ,pi_feature_id   In  Varchar2)
-Return Boolean
-Is
-   l_count   Number ; 
-   Cursor c_asso_exists
-   IS
-   Select Count(0)
-   From   eb_exor_associations 
-   Where  eea_feature_table_name = pi_gateway_name
-   And    eea_feature_id         = pi_feature_id
-   And    eea_object_type        =  3 ;    
-Begin
---
-   Open  c_asso_exists;
-   Fetch c_asso_exists Into l_count;
-   Close c_asso_exists;
-   If l_count > 0
-   Then 
-       Return True;
-   Else
-       Return False;
-   End If ;
---
-End check_associations_exists;
---
------------------------------------------------------------------------------
---
-PROCEDURE delete_associations(pi_document_id  In  Number)
-Is
-Begin
---
-   Delete From eb_exor_associations
-   Where  eea_object_id   = pi_document_id
-   And    eea_object_type = 3 ;
---
-End delete_associations;
---
------------------------------------------------------------------------------
---
-PROCEDURE delete_associations(pi_gateway_name In  Varchar2
-                             ,pi_feature_id   In  Varchar2)
-Is
-Begin
---
-   Delete From eb_exor_associations
-   Where  eea_feature_table_name = pi_gateway_name
-   And    eea_feature_id         = pi_feature_id ;
---
-End delete_associations;
---
------------------------------------------------------------------------------
---
-PROCEDURE delete_associations(pi_document_id  In  Number
-                             ,pi_gateway_name In  Varchar2
-                             ,pi_feature_id   In  Varchar2)
-Is
-Begin
---
-   Delete From eb_exor_associations
-   Where  eea_object_id          = pi_document_id
-   And    eea_feature_table_name = pi_gateway_name
-   And    eea_feature_id         = pi_feature_id ;
---
-End delete_associations;
---
------------------------------------------------------------------------------
---
-PROCEDURE synchronise_document_id(pi_old_document_id  In  Number
-                                 ,pi_new_document_id  In  Number)
-Is
-Begin
---
-   Update eb_exor_associations 
-   Set    eea_object_id   = pi_new_document_id
-   Where  eea_object_id   = pi_old_document_id
-   And    eea_object_type = 3 ;
---
-End synchronise_document_id;
---
------------------------------------------------------------------------------
---
-PROCEDURE create_association(pi_object_type  In Number
-                            ,pi_object_id    In Number
-                            ,pi_gateway_name In Varchar2
-                            ,pi_feature_id   In Varchar2)
-Is
-   l_eea_rec eb_exor_associations%RowType;
-   l_cnt           Number ;
---
-Begin
---
-   Select Count(0) 
-   Into   l_cnt
-   From   eb_exor_associations
-         ,dm_attributes_map 
-   Where  eea_object_type = 3
-   And    eea_object_id= pi_object_id
-   And    eea_feature_table_name = dam_gateway_name ;
-
-   --Do not allow to associate the document which has attribute synchronised from exor feature.
-   If l_cnt >  0
-   Then       
-       Raise_Application_Error(-20101,'This document can be associated to only one feature.');
-   End if;            
-
-   l_eea_rec.eea_object_type        := pi_object_type;
-   l_eea_rec.eea_object_id          := pi_object_id ;
-   l_eea_rec.eea_feature_table_name := pi_gateway_name;
-   l_eea_rec.eea_feature_id         := pi_feature_id;
-   --
-   Select eea_id_seq.Nextval Into l_eea_rec.eea_id
-   From dual;
-   --
-   Insert into eb_exor_associations Values l_eea_rec;
---
-End create_association;
---
------------------------------------------------------------------------------
 --
 FUNCTION get_additional_asso_details(pi_gateway_name In Varchar2)
 Return Varchar2
@@ -278,60 +72,13 @@ Begin
 End get_additional_asso_details;
 --
 -----------------------------------------------------------------------------
-PROCEDURE create_document_and_assocs(pi_template_id     In  Number
-                                    ,pi_prefix          In  Varchar2
-                                    ,pi_title           In  Varchar2
-                                    ,pi_remarks         In  Varchar2
-                                    ,pi_date_issued     In  Date
-                                    ,pi_association_tab In  g_association_tab
-                                    ,po_document_id     Out Number)
-Is
---
-   l_document_id     Number ;
-   l_association_rec g_association_rec ;
---
-Begin
---
-   Execute Immediate ' Begin '||
-                     ' ebexor_add_document(pi_template_id     => :1 '||
-                     '                    ,ps_prefix          => :2 '||
-                     '                    ,ps_title           => :3 '||
-                     '                    ,ps_remarks         => :4 '||
-                     '                    ,pdt_date_effective => :5 '||
-                     '                    ,pi_called_by       =>  1 '||
-                     '                    ,pi_doc_id          => :6 ); '||
-                     ' End ; ' Using pi_template_id,pi_prefix,pi_title,pi_remarks,pi_date_issued,Out l_document_id ;
-   For i In 1..pi_association_tab.Count
-   Loop
-       l_association_rec := pi_association_tab(i);     
-
-       create_association(pi_object_type  => 3
-                         ,pi_object_id    => l_document_id 
-                         ,pi_gateway_name => l_association_rec.featue_table_name
-                         ,pi_feature_id   => l_association_rec.feature_id);
-   End Loop; 
-   po_document_id := l_document_id;
---
-End create_document_and_assocs;
---
------------------------------------------------------------------------------
 Procedure check_docs(pi_gateway_name   In  Varchar2
                     ,pi_feature_key    In  Varchar2
                     ,po_icon_name      Out Varchar2) 
 IS
 --
-   l_exists Varchar2(1);   
-   Cursor check_docs_new (c_rec_id varchar2) 
-   Is
-   Select 'x' From dual
-   Where Exists (Select 'x' 
-                 From   eb_exor_associations  
-                 Where  eea_feature_id         = c_rec_id
-                 And    eea_feature_table_name In (Select Gateway_Name 
-                                                   From   V_Doc_Gateway_Resolve 
-                                                   Where  Synonym_Name  = pi_gateway_name)
-                 And    eea_object_type        = 3 ) ;  
-
+   l_exists Varchar2(1);       
+   l_cnt    INT ;
    Cursor check_docs (c_rec_id varchar2) 
    Is
    Select 'x' From dual
@@ -348,16 +95,23 @@ Begin
 --
    If hig.get_sysopt('NEWDOCMAN') = 'Y'
    Then
-       Open check_docs_new( pi_feature_key);
-       Fetch check_docs_new Into l_exists;
-       If check_docs_new%found 
-       Then
-           po_icon_name     := 'docs'; 
-       Else
-           po_icon_name     := 'nodocs' ; 
-       End if;
-       Close check_docs_new;   
-  Else
+       po_icon_name     := 'nodocs' ;
+       For i IN  (Select Gateway_Name 
+                  From   V_Doc_Gateway_Resolve 
+                  Where  Synonym_Name  = pi_gateway_name )
+       Loop
+           Execute Immediate ' Begin                                                    '||
+                             ' :1 := docman_get_document_count ( ps_feature_id   => :2,  '||
+                             '                            ps_gateway_name => :3   '||
+                             '                         );'||
+                             ' END ; ' Using Out l_cnt, pi_feature_key , i.Gateway_Name    ;
+           If l_cnt > 0 
+           Then 
+               po_icon_name  := 'docs'; 
+               Exit;
+           End If ;        
+       End Loop;
+   Else
        Open check_docs( pi_feature_key);
        Fetch check_docs Into l_exists;
        If check_docs%found 
@@ -371,58 +125,6 @@ Begin
 --
 End  ;
 --
-Procedure get_associations(pi_object_type  In Number
-                          ,pi_gateway_name In Varchar2
-                          ,pi_feature_id   In Varchar2
-                          ,po_ref_out      Out sys_refcursor)
-Is
---
-Begin
---
-   Open po_ref_out For
-   Select  *
-   From    eb_exor_associations
-   Where   eea_feature_id         = pi_feature_id
-   And     eea_feature_table_name In (Select Gateway_Name 
-                                      From   V_Doc_Gateway_Resolve 
-                                      Where   Synonym_Name  = pi_gateway_name)
-   And     eea_object_type        = pi_object_type ;  
---
-End get_associations;
---
-Procedure get_docs(pi_gateway_name In Varchar2
-                  ,pi_feature_id   In Varchar2
-                  ,po_ref_out      Out sys_refcursor)
-Is
---
-Begin
---
-   Open po_ref_out For
-   Select eea_object_id,eea_feature_table_name ,eea_feature_id, Null Image
-   From   eb_exor_associations 
-   Where eea_feature_table_name In (Select Gateway_Name 
-                                  From   V_Doc_Gateway_Resolve 
-                                  Where   Synonym_Name  = pi_gateway_name)
-   And eea_feature_id =  pi_feature_id;  
-   Null;
---
-End get_docs;
---
-Procedure update_associations(pi_gateway_name   In Varchar2
-                             ,pi_old_feature_id In Varchar2
-                             ,pi_new_feature_id In Varchar2 )
-Is
---
-Begin
---
-   Update eb_exor_associations
-   Set    eea_feature_id         = pi_new_feature_id
-   Where  eea_feature_id         = pi_old_feature_id
-   And    eea_feature_table_name = pi_gateway_name   ;
---
-End update_associations;
---
-
 Function get_url_for_gis_session_id(pi_gdo_session_id In  Number)
 Return Varchar2
 Is
@@ -460,7 +162,7 @@ Begin
        Into   l_feature_id
        From   gis_data_objects 
        Where  gdo_session_id  = pi_gdo_session_id ;
-       Return hig.get_sysopt('eBAssoURL')||chr(294)||'tab='||l_gateway_name||chr(294)||'featureid='||l_feature_id;
+       Return hig.get_sysopt('eBAssoURL')||'tab/'||l_gateway_name||'/feature/'||l_feature_id||'?loadTab=DocumentsRelationshipTemplateId';
    Else
        Raise_Application_Error(-20401,'Gateway had not been setup');     
    End If ;
@@ -479,7 +181,7 @@ Begin
    Then
        Raise_Application_Error(-20101,'Either gateway name or feature ID is null');  
    End If ;
-   Return hig.get_sysopt('eBAssoURL')||chr(294)||'tab='||pi_gateway_name||chr(294)||'featureid='||pi_feature_id ;
+   Return hig.get_sysopt('eBAssoURL')||'Tab/'||pi_gateway_name||'/Feature/'||pi_feature_id||'?loadTab=DocumentsRelationshipTemplateId' ;
 --
 End get_eB_url;
 --
@@ -490,10 +192,7 @@ Is
 --
 Begin
 --
-   Update eb_exor_associations 
-   Set    eea_feature_id          = pi_new_feature_id 
-   Where  eea_feature_table_name  = pi_gateway_name
-   And    eea_feature_id          = pi_old_feature_id ;
+  EXECUTE IMMEDIATE 'BEGIN update_feature (:1,:2,:3,1) ; END ;' USING pi_gateway_name,pi_old_feature_id,pi_new_feature_id ;
 --
 End update_feature_id;
 --
@@ -508,6 +207,7 @@ Is
    l_doc_file         VARCHAR2(2000);
    l_rec_dlo          doc_locations%ROWTYPE;
    l_nit              nm_inv_types%ROWTYPE;
+   l_iit_rec          nm_inv_items%ROWTYPE;  
 --
 Begin
 --
@@ -537,25 +237,43 @@ Begin
        Then
            Declare
               --
+              l_eB_template_id  Number ;
+              l_eB_doc_id       Number ;
               l_association_rec nm3_doc_man.g_association_rec;
               l_association_tab nm3_doc_man.g_association_tab := nm3_doc_man.g_association_tab(null);
-              l_eB_doc_id       Number ;
+              l_title           Varchar2(1000) ;
+              l_scope_id        Number;
+              Cursor c_scope_id (pi_admin_unit_id NUMBER)
+              Is
+              Select dasm_scope_id
+              From   dm_admin_unit_scope_map
+              Where  dasm_admin_unit_id = pi_admin_unit_id ; 
            --
            Begin
            -- 
-              l_association_rec.featue_table_name := l_table_name;
-              l_association_rec.feature_id        := l_iit_ne_id ;
-              l_association_tab(1)                := l_association_rec;
+             l_iit_rec := nm3get.get_iit(pi_iit_ne_id);
+             l_title := 'Image of '||pi_inv_type||' '||TO_CHAR(pi_iit_ne_id)||' from Asset Surveyor ' ;
+             --Get the eB scope id mapped to admin unit.
+             Open  c_scope_id(l_iit_rec.iit_admin_unit);
+             Fetch c_scope_id Into l_scope_id;
+             Close c_scope_id;   
+             l_scope_id := NVL(l_scope_id,1)  ;          
+
+             l_eB_template_id  := hig.get_sysopt('MCPPHOTTEM');
+             l_association_rec.featue_table_name := l_table_name ;
+             l_association_rec.feature_id        := l_iit_ne_id ;
+             l_association_tab(1)                := l_association_rec;
            
-              nm3_doc_man.create_document_and_assocs(pi_template_id     => hig.get_sysopt('MCPPHOTTEM') 
-                                                    ,pi_prefix          => pi_photo
-                                                    --,pi_title           => 'Image of '||l_nit_type||' '||TO_CHAR(pi_nm_inv_id)||' from MCP Batch '||TO_CHAR(pi_batch_no)
-                                                    --,pi_remarks         => 'Image of '||l_nit_type||' '||TO_CHAR(pi_nm_inv_id)||' from MCP Batch '||TO_CHAR(pi_batch_no)
-                                                    ,pi_title           => 'Image of '||pi_inv_type||' '||TO_CHAR(pi_iit_ne_id)||' from Asset Surveyor '
-                                                    ,pi_remarks         => 'Image of '||pi_inv_type||' '||TO_CHAR(pi_iit_ne_id)||' from Asset Surveyor '
-                                                    ,pi_date_issued     => SYSDATE
-                                                    ,pi_association_tab => l_association_tab    
-                                                    ,po_document_id     => l_eB_doc_id );       
+             create_document_and_assocs
+             (pi_template_id      => l_eB_template_id
+             ,pi_scope_id        => l_scope_id
+             ,pi_prefix          => pi_photo
+             ,pi_title           => l_title
+             ,pi_remarks         => l_title
+             ,pi_date_issued     => SYSDATE
+             ,pi_association_tab => l_association_tab 
+             ,pi_called_by       =>  1 
+             ,po_document_id     => l_eB_doc_id) ;
                  
            End ;
      Else
@@ -602,109 +320,47 @@ EXCEPTION
    WHEN NO_DATA_FOUND THEN NULL;
 End create_document_and_assocs ;
 --
-PROCEDURE get_templates(pi_gateway_name In  Varchar2
-                       ,po_ref_out      Out Sys_Refcursor)
+-----------------------------------------------------------------------------
+PROCEDURE create_document_and_assocs(pi_template_id     In  Number
+                                    ,pi_scope_id        In  Number
+                                    ,pi_prefix          In  Varchar2
+                                    ,pi_title           In  Varchar2
+                                    ,pi_remarks         In  Varchar2
+                                    ,pi_date_issued     In  Date
+                                    ,pi_association_tab In  g_association_tab
+                                    ,pi_called_by       In  Number
+                                    ,po_document_id     Out Number)
 Is
+--
+   l_eB_doc_id     Number ;
+   l_association_rec nm3_doc_man.g_association_rec;  
+   l_associations    Varchar2(1000); 
 --
 Begin
 --
-   Open po_ref_out For  
-   Select dgtm_template_id
-   From   dm_gateway_template_map
-   Where  dgtm_gateway_name = pi_gateway_name
-   Order by dgtm_seq ;
---
-End get_templates;
---
-FUNCTION get_default_template(pi_gateway_name In  Varchar2)
-Return Number 
-Is
---
-   l_template_id Number := -1;
---
-Begin
---
-   Select dgtm_template_id Into l_template_id 
-   From (Select * 
-         From   dm_gateway_template_map
-         Where  dgtm_gateway_name = pi_gateway_name
-         Order By dgtm_seq)
-   Where rownum = 1 ;
-   Return l_template_id;
---
-Exception 
---
-   When no_data_found
-   Then
-       return -1; 
-End get_default_template;
---
-PROCEDURE copy_attributes (pi_doc_id       In Number
-                          ,pi_gateway_name In Varchar2
-                          ,pi_feature_id   In Varchar2)
-Is
-   l_date_value     Date;
-   l_char_value     Varchar2(4000);
-   l_number_value   Number;
-Begin
-   For dam In (Select * From dm_attributes_map , doc_gateways 
-               Where  dam_gateway_name = pi_gateway_name
-               And    dam_gateway_name = dgt_table_name  
-               )
+   l_associations := '<associations>' ;
+   For i IN 1..pi_association_tab.Count
    Loop
-       If dam.dam_data_type = 'DATE'
-       Then
-           Execute Immediate 'Select '||dam.dam_exor_column_name ||' From '||pi_gateway_name||
-                             ' Where '|| dam.dgt_pk_col_name || '= :1 '
-           Into    l_date_value
-           Using   pi_feature_id ;       
-       ElsIf dam.dam_data_type = 'VARCHAR2'
-       Then
-           Execute Immediate 'Select '||dam.dam_exor_column_name||' From '||pi_gateway_name||' Where '|| dam.dgt_pk_col_name || '= :1 '
-           Into    l_char_value
-           Using   pi_feature_id ;       
-       Else
-            Execute Immediate 'Select '||dam.dam_exor_column_name||' From '||pi_gateway_name||' Where '|| dam.dgt_pk_col_name || '= :1 '
-           Into    l_number_value
-           Using   pi_feature_id ;       
-       End If;        
-       If dam.dam_data_type = 'DATE'
-       Then
-           Execute Immediate 'Begin ebp_set_char_data(:1,:2,Null,Null,:3,Null,1); End ;  '
-           Using  pi_doc_id,dam.dam_eb_char_id,l_date_value;
-       Elsif dam.dam_data_type = 'VARCHAR2'
-       Then
-           Execute Immediate 'Begin ebp_set_char_data(:1,:2,:3,Null,Null,Null,1); End ;  '
-           Using  pi_doc_id ,dam.dam_eb_char_id,l_char_value ;
-       Else 
-           Execute Immediate 'Begin ebp_set_char_data(:1,:2,Null,:3,Null,Null,1); End ;  '
-           Using  pi_doc_id ,dam.dam_eb_char_id,l_number_value ;
-       End If ;       
-   End Loop;   
-End copy_attributes;
---
-FUNCTION get_eb_template_for_au(pi_admin_unit In  Number)
-Return Number
-Is
---
-   Cursor c_eb_template
-   Is
-   Select daet_template_id
-   From   dm_au_eb_template_mappings
-   Where  daet_admin_unit_id = pi_admin_unit ; 
+       l_association_rec := pi_association_tab(i) ;
+       l_associations := l_associations||'<association><gateway_name>'||l_association_rec.featue_table_name||'</gateway_name><feature_id>'||l_association_rec.feature_id||'</feature_id></association>';  
+   End Loop; 
+   l_associations := l_associations||'</associations>';
 
-   l_eb_template_id Number ;
+           EXECUTE IMMEDIATE ' BEGIN '||
+                             ' docman_add_document(pi_template_id     => :1 '||
+                             '                    ,pi_scope_id        => :2 '||
+                             '                    ,ps_prefix          => :3 '||
+                             '                    ,ps_title           => :4 '||
+                             '                    ,ps_remarks         => :5 '||
+                             '                    ,pdt_date_effective => :6 '||
+                             '                    ,ps_associations    => :7 '||
+                             '                    ,pi_called_by       =>  1 '||
+                             '                    ,pi_doc_id          => :8) ;'||
+                             ' END ; '
+           USING pi_template_id,NVL(pi_scope_id,1), pi_prefix ,pi_title, pi_remarks, pi_date_issued, l_associations, OUT l_eB_doc_id;
+   po_document_id := l_eB_doc_id;
 --
-Begin
---
-   Open  c_eb_template;
-   Fetch c_eb_template Into l_eb_template_id;
-   Close c_eb_template;
-
-   Return l_eb_template_id ; 
-
---
-End get_eb_template_for_au;
+End create_document_and_assocs;
 --
 End nm3_doc_man;
 /
