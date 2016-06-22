@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_nav.pkb-arc   3.19   Apr 03 2014 11:13:48   Linesh.Sorathia  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/hig_nav.pkb-arc   3.20   Jun 22 2016 14:11:30   linesh.sorathia  $
 --       Module Name      : $Workfile:   hig_nav.pkb  $
---       Date into PVCS   : $Date:   Apr 03 2014 11:13:48  $
---       Date fetched Out : $Modtime:   Feb 20 2014 11:30:42  $
---       Version          : $Revision:   3.19  $
+--       Date into PVCS   : $Date:   Jun 22 2016 14:11:30  $
+--       Date fetched Out : $Modtime:   Jun 17 2015 11:02:46  $
+--       Version          : $Revision:   3.20  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.19  $';
+  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.20  $';
 
   g_package_name CONSTANT varchar2(30) := 'hig_nav';
   l_top_id       nav_id := nav_id(Null);
@@ -902,21 +902,25 @@ PROCEDURE check_docs(pi_id         IN  Varchar2
 IS 
 -- 
    l_table_name Varchar2(50);
-   l_cnt        Number ;
+   l_cnt        Number := 0 ;
    l_viewname   Boolean := False;
+   l_counter    INT := 0 ;
 --
 BEGIN
 --
-  If hig.get_sysopt('NEWDOCMAN') = 'Y'
-  Then 
-       Execute Immediate 'SELECT Count(0)  '||
-                         'From    eb_exor_associations    eea '||
-                         'Where   eea.eea_feature_id                           =   :1 '||
-                         'And     eea.eea_object_type = 3 '||
-                         'And     eea.eea_feature_table_name  In  ( Select  Gateway_Name '||
-                         '                                          From    V_Doc_Gateway_Resolve '||
-                         '                                          Where   Synonym_Name  =  :2 '||
-                         '                               )' INTO l_cnt Using pi_id,pi_table_name ;     
+   If hig.get_sysopt('NEWDOCMAN') = 'Y'
+   Then 
+       For i IN  (Select Gateway_Name 
+                   From   V_Doc_Gateway_Resolve 
+                   Where  Synonym_Name  = pi_table_name )
+       Loop
+           Execute Immediate ' Begin                                                    '||
+                             ' :1 := docman_get_document_count ( ps_feature_id   => :2,  '||
+                             '                            ps_gateway_name => :3   '||
+                             '                         );'||
+                             ' END ; ' Using Out l_counter, pi_id , i.Gateway_Name    ;
+           l_cnt := l_cnt + l_counter ;
+      End Loop;   
    Else
        Execute Immediate 'SELECT Count(0)  '||
                      'From    Doc_Assocs    da '||
