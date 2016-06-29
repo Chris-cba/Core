@@ -5,11 +5,11 @@ As
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.77   May 21 2015 14:43:20   Rob.Coupe  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.78   Jun 29 2016 15:31:50   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3sdm.pkb  $
---       Date into PVCS   : $Date:   May 21 2015 14:43:20  $
---       Date fetched Out : $Modtime:   May 21 2015 14:42:16  $
---       PVCS Version     : $Revision:   2.77  $
+--       Date into PVCS   : $Date:   Jun 29 2016 15:31:50  $
+--       Date fetched Out : $Modtime:   Jun 29 2016 15:31:26  $
+--       PVCS Version     : $Revision:   2.78  $
 --
 --   Author : R.A. Coupe
 --
@@ -21,7 +21,7 @@ As
 --
 --all global package variables here
 --
-  g_Body_Sccsid     Constant Varchar2 (2000) := '"$Revision:   2.77  $"';
+  g_Body_Sccsid     Constant Varchar2 (2000) := '"$Revision:   2.78  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
   g_Package_Name    Constant Varchar2 (30)   := 'NM3SDM';
@@ -8784,6 +8784,9 @@ End Rebuild_All_Inv_Sdo_Join_View;
       --
          nm3sdo.change_affected_shapes (p_layer      => l_layer,
                                         p_ne_id      => p_ne_id);
+      --
+         nm_inv_sdo_aggr.reshape_aggregated_geometry( p_ne_id );	
+		 
       ELSE
          nm3sdo.insert_element_shape (p_layer      => l_layer,
                                       p_ne_id      => p_ne_id,
@@ -8791,6 +8794,10 @@ End Rebuild_All_Inv_Sdo_Join_View;
                                      );
          nm3sdo.change_affected_shapes (p_layer      => l_layer,
                                         p_ne_id      => p_ne_id);
+										
+      --
+         nm_inv_sdo_aggr.reshape_aggregated_geometry( p_ne_id );      
+   										
       END IF;
 
    END reshape_element;
