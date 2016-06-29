@@ -1,10 +1,10 @@
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/nm3/install/aggregated_geometry_ddl.sql-arc   1.4   Jun 29 2016 11:08:28   Rob.Coupe  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/nm3/install/aggregated_geometry_ddl.sql-arc   1.5   Jun 29 2016 13:43:54   Rob.Coupe  $
 --       Module Name      : $Workfile:   aggregated_geometry_ddl.sql  $
---       Date into PVCS   : $Date:   Jun 29 2016 11:08:28  $
---       Date fetched Out : $Modtime:   Jun 29 2016 11:08:34  $
---       PVCS Version     : $Revision:   1.4  $
+--       Date into PVCS   : $Date:   Jun 29 2016 13:43:54  $
+--       Date fetched Out : $Modtime:   Jun 29 2016 13:44:14  $
+--       PVCS Version     : $Revision:   1.5  $
 --
 --   Author : R.A. Coupe
 --
@@ -47,7 +47,7 @@ CREATE UNIQUE INDEX NIG_PK_IDX ON NM_INV_GEOMETRY_ALL
 /
 
 ALTER TABLE NM_INV_GEOMETRY_ALL ADD (
-  CONSTRAINT NIG_PK
+  CONSTRAINT NIG_SDO_PK
   PRIMARY KEY
   (ASSET_ID, asset_type, START_DATE)
   USING INDEX NIG_PK_IDX
