@@ -1,10 +1,10 @@
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/exnm04070001en_updt43.sql-arc   1.0   Jun 29 2016 11:48:12   Rob.Coupe  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/exnm04070001en_updt43.sql-arc   1.1   Jun 29 2016 15:53:34   Rob.Coupe  $
 --       Module Name      : $Workfile:   exnm04070001en_updt43.sql  $ 
---       Date into PVCS   : $Date:   Jun 29 2016 11:48:12  $
---       Date fetched Out : $Modtime:   Jun 29 2016 11:45:04  $
---       PVCS Version     : $Revision:   1.0  $
+--       Date into PVCS   : $Date:   Jun 29 2016 15:53:34  $
+--       Date fetched Out : $Modtime:   Jun 29 2016 15:53:34  $
+--       PVCS Version     : $Revision:   1.1  $
 --
 ----------------------------------------------------------------------------
 --   Copyright (c) 2015 Bentley Systems Incorporated.  All rights reserved.
@@ -50,8 +50,20 @@ WHENEVER SQLERROR EXIT
 --
 DECLARE
 --
-	l_dummy_c1 VARCHAR2(1);
+	l_dummy_c VARCHAR2(1);
 --
+	CURSOR c1 is
+      SELECT 1
+      FROM DUAL
+      WHERE EXISTS
+              (SELECT 1
+                 FROM hig_upgrades
+                WHERE hup_product = 'NET' AND remarks = 'NET 4700 FIX 37')
+       AND  EXISTS
+              (SELECT 1
+                 FROM hig_upgrades
+                WHERE hup_product = 'NET' AND remarks = 'NET 4700 FIX 21');
+				
 BEGIN
 --
 -- 	Check that the user isn't sys or system
@@ -67,6 +79,14 @@ BEGIN
                                         ,p_VERSION        => '4.7.0.0'
                                         );
 --
+	OPEN  c1;
+	FETCH c1 INTO l_dummy_c;
+	CLOSE c1;
+	--
+	IF l_dummy_c IS NULL THEN
+		RAISE_APPLICATION_ERROR(-20001, 'NET 4700 FIX 21 and 37 must be applied before proceeding - contact exor support for further information');
+	END IF;
+
 --
 END;
 /
@@ -91,6 +111,8 @@ prompt Modifications to package bodies
 start nm3close.pkw;
 
 start nm3homo.pkw;
+
+start nm3sdm.pkw;
 
 prompt Synonyms
 
