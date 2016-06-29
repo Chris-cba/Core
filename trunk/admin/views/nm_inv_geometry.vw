@@ -1,4 +1,4 @@
-CREATE OR REPLACE FORCE VIEW EXOR.NM_INV_GEOMETRY
+CREATE OR REPLACE FORCE VIEW NM_INV_GEOMETRY
 (
    ASSET_ID,
    ASSET_TYPE,
@@ -10,11 +10,11 @@ AS
    SELECT 
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/views/nm_inv_geometry.vw-arc   1.0   Jun 28 2016 15:55:42   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/views/nm_inv_geometry.vw-arc   1.1   Jun 29 2016 11:21:40   Rob.Coupe  $
    --       Module Name      : $Workfile:   nm_inv_geometry.vw  $
-   --       Date into PVCS   : $Date:   Jun 28 2016 15:55:42  $
-   --       Date fetched Out : $Modtime:   Jun 28 2016 15:55:06  $
-   --       PVCS Version     : $Revision:   1.0  $
+   --       Date into PVCS   : $Date:   Jun 29 2016 11:21:40  $
+   --       Date fetched Out : $Modtime:   Jun 29 2016 11:22:04  $
+   --       PVCS Version     : $Revision:   1.1  $
    --
    --   Author : R.A. Coupe
    --
@@ -24,7 +24,6 @@ AS
    -- Copyright (c) 2016 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   
           "ASSET_ID",
           "ASSET_TYPE",
           "START_DATE",
