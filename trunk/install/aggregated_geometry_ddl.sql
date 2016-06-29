@@ -1,10 +1,10 @@
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/nm3/install/aggregated_geometry_ddl.sql-arc   1.3   Apr 20 2016 16:48:20   Rob.Coupe  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/nm3/install/aggregated_geometry_ddl.sql-arc   1.4   Jun 29 2016 11:08:28   Rob.Coupe  $
 --       Module Name      : $Workfile:   aggregated_geometry_ddl.sql  $
---       Date into PVCS   : $Date:   Apr 20 2016 16:48:20  $
---       Date fetched Out : $Modtime:   Apr 20 2016 16:48:16  $
---       PVCS Version     : $Revision:   1.3  $
+--       Date into PVCS   : $Date:   Jun 29 2016 11:08:28  $
+--       Date fetched Out : $Modtime:   Jun 29 2016 11:08:34  $
+--       PVCS Version     : $Revision:   1.4  $
 --
 --   Author : R.A. Coupe
 --
@@ -78,23 +78,11 @@ create index nig_spidx on nm_inv_geometry_all
 (shape) indextype is mdsys.spatial_index
 /
 
-Prompt View definition
-
-CREATE OR REPLACE FORCE VIEW NM_INV_GEOMETRY
-(ASSET_ID, ASSET_TYPE, START_DATE, END_DATE, SHAPE)
-AS
-SELECT "ASSET_ID",
-       "ASSET_TYPE",
-       "START_DATE",
-       "END_DATE",
-       "SHAPE"
-  FROM nm_inv_geometry_all;
-/
-
+start nm_inv_geometry.vw;
 
 declare
   duplicate_SDO_data exception;
-  pragma exception_init( duplicate_SDO_data, -13223); -- duplicate entry for NM_INV_GEOMETRY_ALL.SHAPE in SDO_GEOM_METADATA
+  pragma exception_init( duplicate_SDO_data, -13223); -- duplicate entry for NM_INV_GEOMETRY.SHAPE in SDO_GEOM_METADATA
 begin  
   insert into user_sdo_geom_metadata
   select 'NM_INV_GEOMETRY', 'SHAPE', diminfo, srid
@@ -117,7 +105,7 @@ exception
 end;
 /
 
-prompt create list of asset types that are aggregated
+prompt create table as list of asset types that are aggregated
 
 create table nm_inv_aggr_sdo_types
 ( nit_inv_type varchar2(4),
@@ -129,6 +117,14 @@ constraint niaggr_pk primary key (nit_inv_type ))
 organization index
 /
 
+ALTER TABLE NM_INV_AGGR_SDO_TYPES ADD 
+CONSTRAINT niaggr_fk_nit
+ FOREIGN KEY (NIT_INV_TYPE)
+ REFERENCES NM_INV_TYPES_ALL (NIT_INV_TYPE)
+ ON DELETE CASCADE
+ ENABLE
+ VALIDATE
+/
 
 CREATE OR REPLACE TRIGGER nm_inv_aggr_sdo_types_who
  BEFORE insert OR update
