@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3close AS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3close.pkb-arc   2.16   Feb 18 2016 16:32:56   Rob.Coupe  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3close.pkb-arc   2.17   Jun 29 2016 11:37:10   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3close.pkb  $
---       Date into PVCS   : $Date:   Feb 18 2016 16:32:56  $
---       Date fetched Out : $Modtime:   Feb 18 2016 16:32:12  $
---       PVCS Version     : $Revision:   2.16  $
+--       Date into PVCS   : $Date:   Jun 29 2016 11:37:10  $
+--       Date fetched Out : $Modtime:   Jun 29 2016 11:36:46  $
+--       PVCS Version     : $Revision:   2.17  $
 --
 --
 --   Author : I Turnbull
@@ -21,7 +21,7 @@ CREATE OR REPLACE PACKAGE BODY nm3close AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.16  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.17  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3close';
@@ -416,6 +416,7 @@ PROCEDURE do_close(p_ne_id          NM_ELEMENTS.ne_id%TYPE
    v_errors                NUMBER;
    v_err_text              VARCHAR2(10000);
 --   
+   l_aggr_list             ptr_vc_array_type;
 
 --
    PROCEDURE set_for_return IS
@@ -480,6 +481,15 @@ BEGIN
 --      close_groups( p_ne_id
 --                   ,p_effective_date );
 --
+
+--    grab the list of assets to aggregate at the end
+--
+        SELECT ptr_vc( nm_ne_id_in, nm_obj_type)
+          BULK COLLECT INTO l_aggr_list
+          FROM nm_members, nm_inv_aggr_sdo_types
+         WHERE nm_ne_id_of = p_ne_id AND nm_obj_type = nit_inv_type
+      GROUP BY nm_obj_type, nm_ne_id_in;
+
       -- Close all membership records
       nm3inv_xattr.g_xattr_active := FALSE;
       nm3merge.end_date_members (p_nm_ne_id_of_old => p_ne_id
@@ -531,6 +541,13 @@ BEGIN
      UPDATE nm_nw_ad_link_all
         SET nad_end_date = p_effective_date
       WHERE nad_ne_id = p_ne_id;
+
+--     nm_inv_sdo_aggr.reshape_aggregated_geometry(p_ne_id);
+
+     for i in 1..l_aggr_list.count loop
+        nm_inv_sdo_aggr.aggregate_inv_geometry(l_aggr_list(i).ptr_value, l_aggr_list(i).ptr_id );
+     end loop;
+
 
     set_for_return;
     nm_debug.proc_end(g_package_name , 'do_close');
