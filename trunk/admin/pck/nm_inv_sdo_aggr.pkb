@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm_inv_sdo_aggr
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm_inv_sdo_aggr.pkb-arc   1.3   Jun 28 2016 15:26:04   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm_inv_sdo_aggr.pkb-arc   1.4   Jun 30 2016 10:54:38   Rob.Coupe  $
    --       Module Name      : $Workfile:   nm_inv_sdo_aggr.pkb  $
-   --       Date into PVCS   : $Date:   Jun 28 2016 15:26:04  $
-   --       Date fetched Out : $Modtime:   Jun 28 2016 15:24:44  $
-   --       PVCS Version     : $Revision:   1.3  $
+   --       Date into PVCS   : $Date:   Jun 30 2016 10:54:38  $
+   --       Date fetched Out : $Modtime:   Jun 30 2016 10:52:56  $
+   --       PVCS Version     : $Revision:   1.4  $
    --
    --   Author : R.A. Coupe
    --
@@ -81,7 +81,7 @@ AS
 
    --
 
-   g_body_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.3  $';
+   g_body_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.4  $';
 
    nit_not_found            PLS_INTEGER := -20002;
 
@@ -461,7 +461,7 @@ AS
       EXECUTE IMMEDIATE
             'create or replace view '
          || l_view_name
-         || ' as select * from '
+         || ' as select s.asset_id aggr_asset_id, i.*, s.shape aggr_shape from '
          || l_inv_table
          || ' i, nm_inv_geometry s '
          || ' where s.asset_id = '
