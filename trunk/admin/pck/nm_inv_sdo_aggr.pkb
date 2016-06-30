@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm_inv_sdo_aggr
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm_inv_sdo_aggr.pkb-arc   1.4   Jun 30 2016 10:54:38   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm_inv_sdo_aggr.pkb-arc   1.5   Jun 30 2016 16:22:56   Rob.Coupe  $
    --       Module Name      : $Workfile:   nm_inv_sdo_aggr.pkb  $
-   --       Date into PVCS   : $Date:   Jun 30 2016 10:54:38  $
-   --       Date fetched Out : $Modtime:   Jun 30 2016 10:52:56  $
-   --       PVCS Version     : $Revision:   1.4  $
+   --       Date into PVCS   : $Date:   Jun 30 2016 16:22:56  $
+   --       Date fetched Out : $Modtime:   Jun 30 2016 16:23:18  $
+   --       PVCS Version     : $Revision:   1.5  $
    --
    --   Author : R.A. Coupe
    --
@@ -81,7 +81,7 @@ AS
 
    --
 
-   g_body_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.4  $';
+   g_body_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.5  $';
 
    nit_not_found            PLS_INTEGER := -20002;
 
@@ -485,7 +485,7 @@ AS
                                                     SDO_SRID)
             SELECT SYS_CONTEXT ('NM3CORE', 'APPLICATION_OWNER'),
                    l_view_name,
-                   'SHAPE',
+                   'AGGR_SHAPE',
                    sdo_diminfo,
                    sdo_srid
               FROM mdsys.SDO_GEOM_METADATA_TABLE
