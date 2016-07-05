@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3inv_Load AS
 --
 --   SCCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_load.pkb-arc   2.8   Jul 04 2013 16:08:46   James.Wadsworth  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3inv_load.pkb-arc   2.9   Jul 05 2016 13:26:16   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm3inv_load.pkb  $
---       Date into PVCS   : $Date:   Jul 04 2013 16:08:46  $
---       Date fetched Out : $Modtime:   Jul 04 2013 15:43:18  $
---       PVCS Version     : $Revision:   2.8  $
+--       Date into PVCS   : $Date:   Jul 05 2016 13:26:16  $
+--       Date fetched Out : $Modtime:   Jun 22 2016 10:50:46  $
+--       PVCS Version     : $Revision:   2.9  $
 --
 --   Author : Jonathan Mills
 --
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3inv_Load AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.8  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.9  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3inv_load';
@@ -532,6 +532,11 @@ BEGIN
       RAISE nothing_to_do;
    END IF;
 --
+   IF p_rec.begin_mp > p_rec.end_mp
+   THEN
+      raise_application_error(-20001, 'BEGIN_MP is greater than END_MP');
+   END IF;
+   
    nm3homo.historic_locate_init(pi_effective_date => p_rec.nm_start_date);
 
    l_rec_ne := nm3get.get_ne (pi_ne_id  => nm3net.get_ne_id (p_rec.ne_unique,p_rec.ne_nt_type));
