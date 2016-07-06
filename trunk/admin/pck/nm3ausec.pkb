@@ -3,11 +3,11 @@ AS
    --
    --   PVCS Identifiers :-
    --
-   --       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3ausec.pkb-arc   2.13   Jan 28 2016 10:46:58   Rob.Coupe  $
+   --       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3ausec.pkb-arc   2.14   Jul 06 2016 12:18:06   Rob.Coupe  $
    --       Module Name      : $Workfile:   nm3ausec.pkb  $
-   --       Date into PVCS   : $Date:   Jan 28 2016 10:46:58  $
-   --       Date fetched Out : $Modtime:   Jan 28 2016 10:46:32  $
-   --       PVCS Version     : $Revision:   2.13  $
+   --       Date into PVCS   : $Date:   Jul 06 2016 12:18:06  $
+   --       Date fetched Out : $Modtime:   Jul 06 2016 12:16:20  $
+   --       PVCS Version     : $Revision:   2.14  $
    --       Based on
    --
    --   Author : Rob Coupe
@@ -20,7 +20,7 @@ AS
    --
    --all global package variables here
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '"$Revision:   2.13  $"';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '"$Revision:   2.14  $"';
 
    --  g_body_sccsid is the SCCS ID for the package body
    --
@@ -232,11 +232,14 @@ AS
                     FROM nm_au_security_temp,
                          nm_au_types_full,
                          nm_members,
-                         nm_elements
+                         nm_elements,
+                         nm_admin_units
                    WHERE     nat_exclusive = 'Y'
                          AND ne_id = nm_ne_id_of
                          AND nat_admin_type = nast_admin_type
                          AND nm_ne_id_of = nast_ne_of
+                         AND nm_admin_unit = nau_admin_unit
+                         AND nau_admin_type = nast_admin_type
                          AND nm_end_mp >= nast_nm_begin
                          AND nm_begin_mp <= nast_nm_end
                          AND (   (    c_use_group_security = 'N'
