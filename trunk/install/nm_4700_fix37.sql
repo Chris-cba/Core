@@ -1,10 +1,10 @@
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/nm_4700_fix37.sql-arc   1.0   Feb 18 2016 16:40:48   Rob.Coupe  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/nm_4700_fix37.sql-arc   1.1   Jul 08 2016 12:46:42   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm_4700_fix37.sql  $ 
---       Date into PVCS   : $Date:   Feb 18 2016 16:40:48  $
---       Date fetched Out : $Modtime:   Feb 18 2016 16:26:56  $
---       PVCS Version     : $Revision:   1.0  $
+--       Date into PVCS   : $Date:   Jul 08 2016 12:46:42  $
+--       Date fetched Out : $Modtime:   Jul 08 2016 12:46:06  $
+--       PVCS Version     : $Revision:   1.1  $
 --
 ----------------------------------------------------------------------------
 --   Copyright (c) 2015 Bentley Systems Incorporated.  All rights reserved.
@@ -83,7 +83,7 @@ Begin
              ( select 1 from Hig_Upgrades
                Where   Hup_Product     =   'NET'
                And     From_Version    =   '4.7.0.1'
-               And     Upgrade_Script  =   'exnm04070001en_updt32.sql'
+               And     Upgrade_Script  =   'exnm04070001en_updt32.sql'	
 			   );
 --
   RAISE_APPLICATION_ERROR(-20000,'Please install NM 4700 Fix 32 before proceding.');
@@ -102,7 +102,8 @@ Begin
   From Hig_Upgrades
   Where   Hup_Product     =   'NET'
   And     From_Version    in ( '4.7.0.1', '4.7.0.0')
-  And     Upgrade_Script  =   'log_nm_4700_fix31.sql';
+  And     Upgrade_Script  =   'log_nm_4700_fix31.sql'
+  And     rownum          = 1;
 exception
   when no_data_found then
     RAISE_APPLICATION_ERROR(-20000,'Please install NM 4700 Fix 31 before proceding.');
