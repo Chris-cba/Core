@@ -1,10 +1,10 @@
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/nm_4700_fix37.sql-arc   1.1   Jul 08 2016 12:46:42   Rob.Coupe  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/nm_4700_fix37.sql-arc   1.2   Jul 08 2016 13:02:12   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm_4700_fix37.sql  $ 
---       Date into PVCS   : $Date:   Jul 08 2016 12:46:42  $
---       Date fetched Out : $Modtime:   Jul 08 2016 12:46:06  $
---       PVCS Version     : $Revision:   1.1  $
+--       Date into PVCS   : $Date:   Jul 08 2016 13:02:12  $
+--       Date fetched Out : $Modtime:   Jul 08 2016 13:01:32  $
+--       PVCS Version     : $Revision:   1.2  $
 --
 ----------------------------------------------------------------------------
 --   Copyright (c) 2015 Bentley Systems Incorporated.  All rights reserved.
@@ -98,15 +98,19 @@ End;
 Declare
   n  Varchar2(1);
 Begin
-  select 1 into n
-  From Hig_Upgrades
-  Where   Hup_Product     =   'NET'
-  And     From_Version    in ( '4.7.0.1', '4.7.0.0')
-  And     Upgrade_Script  =   'log_nm_4700_fix31.sql'
-  And     rownum          = 1;
+  select Null into n
+  From Hig_Products
+  Where   Hpr_Product     =   'NET'
+  And     Hpr_Key         is not NULL
+  And     not exists ( select 1 from Hig_Upgrades
+                       where hup_product = 'NET'
+					   And     From_Version    in ( '4.7.0.1', '4.7.0.0')
+                       And     Upgrade_Script  =   'log_nm_4700_fix31.sql'
+					   );
+  RAISE_APPLICATION_ERROR(-20000,'Please install NM 4700 Fix 31 before proceding.');
 exception
   when no_data_found then
-    RAISE_APPLICATION_ERROR(-20000,'Please install NM 4700 Fix 31 before proceding.');
+    NULL;
 End;
 /
 
