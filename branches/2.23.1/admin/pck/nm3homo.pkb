@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3homo AS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3homo.pkb-arc   2.23.1.0   Jun 29 2016 11:34:18   Rob.Coupe  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3homo.pkb-arc   2.23.1.1   Jul 12 2016 10:29:28   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3homo.pkb  $
---       Date into PVCS   : $Date:   Jun 29 2016 11:34:18  $
---       Date fetched Out : $Modtime:   Jun 23 2016 16:37:58  $
---       PVCS Version     : $Revision:   2.23.1.0  $
+--       Date into PVCS   : $Date:   Jul 12 2016 10:29:28  $
+--       Date fetched Out : $Modtime:   Jul 12 2016 10:29:38  $
+--       PVCS Version     : $Revision:   2.23.1.1  $
 --
 --
 --   Author : Jonathan Mills
@@ -40,7 +40,7 @@ CREATE OR REPLACE PACKAGE BODY nm3homo AS
    
    -- Log 713421
    
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.23.1.0  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.23.1.1  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3homo';
@@ -1668,6 +1668,20 @@ BEGIN
          END IF;
       END;
    END IF;
+   
+   NM_INV_SDO_AGGR.AGGREGATE_INV_GEOMETRY(l_rec_nit.nit_inv_type, p_iit_ne_id );
+  
+  declare
+    l_nit_type nm_inv_types.nit_inv_type%type;
+  begin
+    for i in 1..l_tab_iit_ne_id.count loop
+       db('Aggregate the affected geometry '||l_tab_iit_ne_id(i));
+
+      select iit_inv_type into l_nit_type from nm_inv_items_all where iit_ne_id = l_tab_iit_ne_id(i); 
+      NM_INV_SDO_AGGR.AGGREGATE_INV_GEOMETRY(l_nit_type, l_tab_iit_ne_id(i) );
+    end loop;    
+  end;
+
 --
    reset_for_return;
 --
@@ -4172,12 +4186,16 @@ BEGIN
     end loop;
   end if;
 
+  db('Aggregate the asset geometry '||p_iit_ne_id);
+  
   NM_INV_SDO_AGGR.AGGREGATE_INV_GEOMETRY(l_rec_nit.nit_inv_type, p_iit_ne_id );
   
   declare
     l_nit_type nm_inv_types.nit_inv_type%type;
   begin
     for i in 1..l_tab_iit_ne_id.count loop
+       db('Aggregate the affected geometry '||l_tab_iit_ne_id(i));
+
       select iit_inv_type into l_nit_type from nm_inv_items_all where iit_ne_id = l_tab_iit_ne_id(i); 
       NM_INV_SDO_AGGR.AGGREGATE_INV_GEOMETRY(l_nit_type, l_tab_iit_ne_id(i) );
     end loop;    
