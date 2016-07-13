@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY nm3wrap AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3wrap.pkb-arc   2.2   Jul 04 2013 16:38:44   James.Wadsworth  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3wrap.pkb-arc   2.3   Jul 13 2016 10:56:24   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm3wrap.pkb  $
---       Date into PVCS   : $Date:   Jul 04 2013 16:38:44  $
---       Date fetched Out : $Modtime:   Jul 04 2013 16:37:54  $
---       Version          : $Revision:   2.2  $
+--       Date into PVCS   : $Date:   Jul 13 2016 10:56:24  $
+--       Date fetched Out : $Modtime:   Jul 07 2016 11:52:24  $
+--       Version          : $Revision:   2.3  $
 --       Based on SCCS version : 1.19
 ------------------------------------------------------------------
 --   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
@@ -21,7 +21,7 @@ CREATE OR REPLACE PACKAGE BODY nm3wrap AS
 --
 ------------------------------------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '$Revision:   2.2  $';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '$Revision:   2.3  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3wrap';
@@ -187,16 +187,53 @@ PROCEDURE get_node_details(pi_route_id               IN  nm_elements.ne_id%TYPE
                           ,po_poe                    OUT number
                           ,po_intersecting_road_name OUT varchar2
                           ) IS
-
-  l_node_class nm_node_class;
-
+  --
+  CURSOR c1(p_route_id number,
+            p_node_id  number ) IS
+  SELECT nnu_ne_id 
+    FROM nm_node_usages
+   WHERE nnu_no_node_id = p_node_id
+     AND NOT EXISTS (SELECT 1 
+                       FROM nm_members
+                      WHERE nm_ne_id_in = p_route_id
+                        AND nm_ne_id_of = nnu_ne_id );
+  --
+  CURSOR c2(p_node_id  number) IS
+  SELECT DECODE(SIGN(NVL(measure_difference,0)), 1 , 'GAP', -1, 'OVERLAP', 'Not a POE'),
+         NVL(measure_difference,0)
+    FROM v_nm_route_view
+   WHERE start_node = p_node_id;
+  --  
+  lv_ne_id              nm_elements.ne_id%TYPE;
+  lv_poe_type           VARCHAR2(10);
+  lv_poe                NUMBER;
+  lv_intersecting_road  nm_elements.ne_descr%TYPE;
+  lv_row_found          BOOLEAN;
+  --
 BEGIN
-  l_node_class := nm3net_o.get_node_class(p_route_id => pi_route_id
-                                         ,p_node_id  => pi_node_id);
-
-  po_poe_type               := l_node_class.get_poe_type;
-  po_poe                    := l_node_class.get_poe;
-  po_intersecting_road_name := l_node_class.get_intersecting_road;
+  --
+  nm3ctx.set_context('ROUTE_NE_ID', pi_route_id);
+  --
+  OPEN  c1 ( pi_route_id, pi_node_id );
+  FETCH c1 INTO lv_ne_id;
+  lv_row_found := c1%FOUND;
+  CLOSE c1;
+  --
+  IF NOT lv_row_found THEN
+     lv_intersecting_road := NULL;
+  ELSE
+     lv_intersecting_road := nm3net.get_ne_descr( lv_ne_id );
+  END IF;
+  --
+  OPEN c2(pi_node_id);
+  FETCH c2 INTO lv_poe_type,
+                lv_poe;
+  CLOSE c2;
+  --
+  po_poe_type               := lv_poe_type;
+  po_poe                    := lv_poe;
+  po_intersecting_road_name := lv_intersecting_road;
+  --
 END get_node_details;
 --
 ------------------------------------------------------------------------------------------------
