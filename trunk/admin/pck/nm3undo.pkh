@@ -75,7 +75,8 @@ FUNCTION get_body_version RETURN VARCHAR2;
 --<PROC NAME="unclose">
 -- Start the unclose procedure
 -- unclose an element and inv items on it
-PROCEDURE unclose ( p_ne_id NM_ELEMENTS.ne_id%TYPE );
+PROCEDURE unclose ( p_ne_id            NM_ELEMENTS.ne_id%TYPE 
+                   ,p_include_datums   BOOLEAN DEFAULT TRUE);
 --</PROC>
 --
 -----------------------------------------------------------------------------
