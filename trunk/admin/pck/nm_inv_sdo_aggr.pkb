@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm_inv_sdo_aggr
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm_inv_sdo_aggr.pkb-arc   1.6   Jul 11 2016 17:28:34   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm_inv_sdo_aggr.pkb-arc   1.7   Jul 19 2016 09:46:28   Rob.Coupe  $
    --       Module Name      : $Workfile:   nm_inv_sdo_aggr.pkb  $
-   --       Date into PVCS   : $Date:   Jul 11 2016 17:28:34  $
-   --       Date fetched Out : $Modtime:   Jul 11 2016 17:28:38  $
-   --       PVCS Version     : $Revision:   1.6  $
+   --       Date into PVCS   : $Date:   Jul 19 2016 09:46:28  $
+   --       Date fetched Out : $Modtime:   Jul 19 2016 09:42:42  $
+   --       PVCS Version     : $Revision:   1.7  $
    --
    --   Author : R.A. Coupe
    --
@@ -53,9 +53,6 @@ AS
    TABLE_NOT_EXISTS         EXCEPTION;
    PRAGMA EXCEPTION_INIT (TABLE_NOT_EXISTS, -942);
 
-   FUNCTION is_type_aggregated (
-      pi_inv_type   IN nm_inv_types.nit_inv_type%TYPE)
-      RETURN BOOLEAN;
 
    --   FUNCTION get_table_string (pi_inv_type in varchar2 )
    --      RETURN VARCHAR2;
@@ -81,7 +78,7 @@ AS
 
    --
 
-   g_body_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.6  $';
+   g_body_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.7  $';
 
    nit_not_found            PLS_INTEGER := -20002;
 
@@ -542,112 +539,116 @@ AS
       nm_debug.debug_on;
 
       l_nit_row := nm3get.get_nit (pi_inv_type, TRUE, nit_not_found);
-      --
-      l_table_name := NVL (l_nit_row.nit_table_name, 'NM_MEMBERS'); -- Take date tracking out for now
-      l_pk_column := NVL (l_nit_row.nit_foreign_pk_column, 'NM_NE_ID_IN');
-      l_st_column := NVL (l_nit_row.nit_lr_st_chain, 'NM_BEGIN_MP');
-      l_end_column := NVL (l_nit_row.nit_lr_end_chain, 'NM_END_MP');
-      l_ne_column := NVL (l_nit_row.nit_lr_ne_column_name, 'NM_NE_ID_OF');
-
-      DELETE FROM nm_inv_geometry_all
-            WHERE asset_type = pi_inv_type AND asset_id = pi_iit_ne_id;
 
       --
-      l_geom_str := 'sdo_aggr_union (sdoaggrtype (shape, 0.005))';
-
-      IF l_nit_row.nit_pnt_or_cont = 'P'
+      IF is_type_aggregated (pi_inv_type)
       THEN
-         l_geom_str := 'shape';
-      END IF;
+         l_table_name := NVL (l_nit_row.nit_table_name, 'NM_MEMBERS'); -- Take date tracking out for now
+         l_pk_column := NVL (l_nit_row.nit_foreign_pk_column, 'NM_NE_ID_IN');
+         l_st_column := NVL (l_nit_row.nit_lr_st_chain, 'NM_BEGIN_MP');
+         l_end_column := NVL (l_nit_row.nit_lr_end_chain, 'NM_END_MP');
+         l_ne_column := NVL (l_nit_row.nit_lr_ne_column_name, 'NM_NE_ID_OF');
 
-      IF l_nit_row.nit_table_name IS NULL
-      THEN
-         cur_string :=
-            gen_inv_sql (pi_inv_type   => pi_inv_type,
-                         PI_INV_ID     => pi_iit_ne_id,
-                         PI_PNT_TYPE   => l_nit_row.nit_pnt_or_cont = 'P');
-         nm_debug.debug (cur_string);
+         DELETE FROM nm_inv_geometry_all
+               WHERE asset_type = pi_inv_type AND asset_id = pi_iit_ne_id;
 
-         nm_debug.debug (
-            'using type=' || pi_inv_type || ', ID = ' || pi_iit_ne_id);
-
-         OPEN geocur FOR cur_string
-            USING pi_inv_type,
-                  pi_iit_ne_id,
-                  pi_inv_type,
-                  pi_iit_ne_id,
-                  pi_inv_type;
-
-         FETCH geocur
-            BULK COLLECT INTO l_asset_id_tab,
-                 l_asset_type_tab,
-                 l_start_date_tab,
-                 l_end_date_tab,
-                 l_geom_tab;
-
-         FORALL i IN 1 .. l_asset_id_tab.COUNT
-            INSERT INTO nm_inv_geometry_all (asset_id,
-                                             asset_type,
-                                             start_date,
-                                             end_date,
-                                             shape)
-                 VALUES (l_asset_id_tab (i),
-                         l_asset_type_tab (i),
-                         l_start_date_tab (i),
-                         l_end_date_tab (i),
-                         l_geom_tab (i));
-      -- RC> Original code is swapped with the forall insert due to the dynamic insert raising
-      --     ORA-30625: method dispatch on NULL SELF argument is disallowed
-      --     ORA-06512: at "MDSYS.AGGRUNION", line 30
-      --
-      --         EXECUTE IMMEDIATE
-      --               'insert into nm_inv_geometry_all (asset_id, asset_type, start_date, end_date, shape ) '
-      --            || cur_string
-      --            USING pi_inv_type,
-      --                  pi_iit_ne_id,
-      --                  pi_inv_type,
-      --                  pi_iit_ne_id,
-      --                  pi_inv_type;
-      ELSE
          --
-         cur_string :=
-               'SELECT asset_id, asset_type, trunc(sysdate), '
-            || l_geom_str
-            || ' FROM (SELECT '
-            || l_pk_column
-            || ' asset_id, '
-            || qq
-            || pi_inv_type
-            || qq
-            || ' asset_type, '
-            || '   SDO_LRS.convert_to_std_geom (SDO_LRS.clip_geom_segment ( '
-            || l_feature_shape
-            || ','
-            || l_st_column
-            || ','
-            || l_end_column
-            || ',0.005 )) shape '
-            || ' FROM '
-            || l_table_name
-            || ', '
-            || l_feature_table
-            || ' WHERE   '
-            || l_feature_pk
-            || ' = '
-            || l_ne_column
-            || ' and '
-            || l_pk_column
-            || ' = :pi_iit_ne_id )';
+         l_geom_str := 'sdo_aggr_union (sdoaggrtype (shape, 0.005))';
 
-         IF l_nit_row.nit_pnt_or_cont != 'P'
+         IF l_nit_row.nit_pnt_or_cont = 'P'
          THEN
-            cur_string := cur_string || ' GROUP BY asset_id, asset_type ';
+            l_geom_str := 'shape';
          END IF;
 
-         EXECUTE IMMEDIATE
-               'insert into nm_inv_geometry_all (asset_id, asset_type, start_date, shape ) '
-            || cur_string
-            USING pi_iit_ne_id;
+         IF l_nit_row.nit_table_name IS NULL
+         THEN
+            cur_string :=
+               gen_inv_sql (pi_inv_type   => pi_inv_type,
+                            PI_INV_ID     => pi_iit_ne_id,
+                            PI_PNT_TYPE   => l_nit_row.nit_pnt_or_cont = 'P');
+            nm_debug.debug (cur_string);
+
+            nm_debug.debug (
+               'using type=' || pi_inv_type || ', ID = ' || pi_iit_ne_id);
+
+            OPEN geocur FOR cur_string
+               USING pi_inv_type,
+                     pi_iit_ne_id,
+                     pi_inv_type,
+                     pi_iit_ne_id,
+                     pi_inv_type;
+
+            FETCH geocur
+               BULK COLLECT INTO l_asset_id_tab,
+                    l_asset_type_tab,
+                    l_start_date_tab,
+                    l_end_date_tab,
+                    l_geom_tab;
+
+            FORALL i IN 1 .. l_asset_id_tab.COUNT
+               INSERT INTO nm_inv_geometry_all (asset_id,
+                                                asset_type,
+                                                start_date,
+                                                end_date,
+                                                shape)
+                    VALUES (l_asset_id_tab (i),
+                            l_asset_type_tab (i),
+                            l_start_date_tab (i),
+                            l_end_date_tab (i),
+                            l_geom_tab (i));
+         -- RC> Original code is swapped with the forall insert due to the dynamic insert raising
+         --     ORA-30625: method dispatch on NULL SELF argument is disallowed
+         --     ORA-06512: at "MDSYS.AGGRUNION", line 30
+         --
+         --         EXECUTE IMMEDIATE
+         --               'insert into nm_inv_geometry_all (asset_id, asset_type, start_date, end_date, shape ) '
+         --            || cur_string
+         --            USING pi_inv_type,
+         --                  pi_iit_ne_id,
+         --                  pi_inv_type,
+         --                  pi_iit_ne_id,
+         --                  pi_inv_type;
+         ELSE
+            --
+            cur_string :=
+                  'SELECT asset_id, asset_type, trunc(sysdate), '
+               || l_geom_str
+               || ' FROM (SELECT '
+               || l_pk_column
+               || ' asset_id, '
+               || qq
+               || pi_inv_type
+               || qq
+               || ' asset_type, '
+               || '   SDO_LRS.convert_to_std_geom (SDO_LRS.clip_geom_segment ( '
+               || l_feature_shape
+               || ','
+               || l_st_column
+               || ','
+               || l_end_column
+               || ',0.005 )) shape '
+               || ' FROM '
+               || l_table_name
+               || ', '
+               || l_feature_table
+               || ' WHERE   '
+               || l_feature_pk
+               || ' = '
+               || l_ne_column
+               || ' and '
+               || l_pk_column
+               || ' = :pi_iit_ne_id )';
+
+            IF l_nit_row.nit_pnt_or_cont != 'P'
+            THEN
+               cur_string := cur_string || ' GROUP BY asset_id, asset_type ';
+            END IF;
+
+            EXECUTE IMMEDIATE
+                  'insert into nm_inv_geometry_all (asset_id, asset_type, start_date, shape ) '
+               || cur_string
+               USING pi_iit_ne_id;
+         END IF;
       END IF;
    END;
 
@@ -708,7 +709,7 @@ AS
                             THEN
                                ' and nm_ne_id_in = ' || pi_inv_id || ' '
                          END
-                      || ' and <feature_shape> is not null '
+                      || ' and shape is not null '
                          sql_text
                  FROM DUAL)
       SELECT LISTAGG (sql_text, ' UNION ALL ')
@@ -720,14 +721,11 @@ AS
                      nth_feature_shape_column,
                      REPLACE (
                         REPLACE (
-                           REPLACE (
-                              REPLACE (sql_text,
-                                       '<network_shape_table>',
-                                       nth_feature_table),
-                              '<feature_pk_column>',
-                              nth_feature_pk_column),
-                           '<feature_shape>',
-                           nth_feature_shape_column),
+                           REPLACE (sql_text,
+                                    '<network_shape_table>',
+                                    nth_feature_table),
+                           '<feature_pk_column>',
+                           nth_feature_pk_column),
                         '<feature_shape>',
                         nth_feature_shape_column)
                         SQL_TEXT
@@ -828,8 +826,15 @@ AS
          || geom_string
          || ' shape '
          || ' FROM ( '
-         || get_table_string (pi_inv_type)
-         || ') group by nm_ne_id_in, start_date, end_date';
+         || get_table_string (pi_inv_type);
+
+      IF pi_pnt_type
+      THEN
+         cur_string := cur_string || ')';
+      ELSE
+         cur_string :=
+            cur_string || ') group by nm_ne_id_in, start_date, end_date';
+      END IF;
 
       RETURN cur_string;
    END;
