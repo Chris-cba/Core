@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3asset AS
 --
 --   SCCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3asset.pkb-arc   2.24   Jul 04 2013 15:23:08   James.Wadsworth  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3asset.pkb-arc   2.26   Jul 20 2016 11:41:30   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm3asset.pkb  $
---       Date into PVCS   : $Date:   Jul 04 2013 15:23:08  $
---       Date fetched Out : $Modtime:   Jul 04 2013 14:25:08  $
---       PVCS Version     : $Revision:   2.24  $
+--       Date into PVCS   : $Date:   Jul 20 2016 11:41:30  $
+--       Date fetched Out : $Modtime:   Jul 20 2016 11:36:34  $
+--       PVCS Version     : $Revision:   2.26  $
 --
 --
 --   Author : Rob Coupe
@@ -21,7 +21,7 @@ CREATE OR REPLACE PACKAGE BODY nm3asset AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.24  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.26  $"';
    g_gos_ne_id                    nm_members_all.nm_ne_id_in%type ;
 --  g_body_sccsid is the SCCS ID for the package body
 --
@@ -445,6 +445,8 @@ BEGIN
    --
    -- Get the Gaz Query source NE_ID
      l_ne_id := nm3get.get_ngq(pi_ngq_id => pi_ngq_id, pi_raise_not_found => FALSE ).ngq_source_id;
+   --
+   nm3ctx.set_context('ORDERED_ROUTE', to_char( l_ne_id )); 
    --
      IF l_ne_id IS NOT NULL
      THEN
