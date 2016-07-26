@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3close AS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3close.pkb-arc   2.17   Jun 29 2016 11:37:10   Rob.Coupe  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3close.pkb-arc   2.18   Jul 26 2016 09:52:32   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm3close.pkb  $
---       Date into PVCS   : $Date:   Jun 29 2016 11:37:10  $
---       Date fetched Out : $Modtime:   Jun 29 2016 11:36:46  $
---       PVCS Version     : $Revision:   2.17  $
+--       Date into PVCS   : $Date:   Jul 26 2016 09:52:32  $
+--       Date fetched Out : $Modtime:   Jul 22 2016 13:48:00  $
+--       PVCS Version     : $Revision:   2.18  $
 --
 --
 --   Author : I Turnbull
@@ -21,7 +21,7 @@ CREATE OR REPLACE PACKAGE BODY nm3close AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.17  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.18  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3close';
@@ -1124,10 +1124,10 @@ BEGIN
   AND     ne_type= 'D' ;
   --
 -- CWS 0111307 Add element history
-  insert_nm_element_history ( p_ne_id          => pi_route_id
+  /*insert_nm_element_history ( p_ne_id          => pi_route_id
                             , p_effective_date => pi_effective_date
                             , p_neh_descr      => null
-                            );
+                            );*/
 --
 --  RAC - if the group is linear, it may have a shape - just reshape it
 --  Task 0112315 - need to just end-date the current shape if the option is set
