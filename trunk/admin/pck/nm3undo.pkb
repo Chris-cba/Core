@@ -4,11 +4,11 @@ IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3undo.pkb-arc   2.24   Feb 17 2016 15:47:14   Rob.Coupe  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3undo.pkb-arc   2.25   Jul 26 2016 09:56:16   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm3undo.pkb  $
---       Date into PVCS   : $Date:   Feb 17 2016 15:47:14  $
---       Date fetched Out : $Modtime:   Feb 17 2016 15:46:54  $
---       PVCS Version     : $Revision:   2.24  $
+--       Date into PVCS   : $Date:   Jul 26 2016 09:56:16  $
+--       Date fetched Out : $Modtime:   Jul 22 2016 14:12:22  $
+--       PVCS Version     : $Revision:   2.25  $
 --
 --   Author : ITurnbull
 --
@@ -19,7 +19,7 @@ IS
 -- Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '"$Revision:   2.24  $"';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '"$Revision:   2.25  $"';
 --  g_body_sccsid is the SCCS ID for the package body
    g_package_name   CONSTANT VARCHAR2 (2000) := 'nm3undo';
 --
@@ -1966,8 +1966,8 @@ END undo_scheme;
 --
 ------------------------------------------------------------------------------------------------
 --
-   PROCEDURE unclose (p_ne_id nm_elements.ne_id%TYPE)
-   IS
+   PROCEDURE unclose ( p_ne_id            NM_ELEMENTS.ne_id%TYPE 
+                      ,p_include_datums   BOOLEAN DEFAULT TRUE)   IS
       CURSOR c1
       IS
          SELECT neh_effective_date, a.ROWID neh_rowid
@@ -2144,7 +2144,8 @@ END undo_scheme;
       END;
 -- Task 0111307 CWS code block added to undo the closures to a groups
 -- unclose the children
-      IF NM3GET.GET_NE_ALL(PI_NE_ID => p_ne_id).NE_TYPE IN ('P','G')
+      IF NM3GET.GET_NE_ALL(PI_NE_ID => p_ne_id).NE_TYPE IN ('P','G') AND
+         p_include_datums
       THEN
         DECLARE
            l_neh_ne_id          Nm3type.tab_number;
