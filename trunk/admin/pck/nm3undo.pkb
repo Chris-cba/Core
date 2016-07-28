@@ -4,11 +4,11 @@ IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3undo.pkb-arc   2.25   Jul 26 2016 09:56:16   Chris.Baugh  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3undo.pkb-arc   2.26   Jul 28 2016 11:28:30   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm3undo.pkb  $
---       Date into PVCS   : $Date:   Jul 26 2016 09:56:16  $
---       Date fetched Out : $Modtime:   Jul 22 2016 14:12:22  $
---       PVCS Version     : $Revision:   2.25  $
+--       Date into PVCS   : $Date:   Jul 28 2016 11:28:30  $
+--       Date fetched Out : $Modtime:   Jul 28 2016 10:54:50  $
+--       PVCS Version     : $Revision:   2.26  $
 --
 --   Author : ITurnbull
 --
@@ -19,7 +19,7 @@ IS
 -- Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '"$Revision:   2.25  $"';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '"$Revision:   2.26  $"';
 --  g_body_sccsid is the SCCS ID for the package body
    g_package_name   CONSTANT VARCHAR2 (2000) := 'nm3undo';
 --
@@ -2149,120 +2149,93 @@ END undo_scheme;
       THEN
         DECLARE
            l_neh_ne_id          Nm3type.tab_number;
-           l_neh_effective_date Nm3type.tab_date;
+
            -- A list of the elements that need to be unclosed. Checks need to
            -- be done here to ensure
            CURSOR cs_neh (
               c_ne_id   nm_elements.ne_id%TYPE
            )
            IS
-           select ne_id, neh_effective_date 
-               from NM_ELEMENT_HISTORY
-                  , NM_ELEMENTS_ALL
-               where neh_ne_id_old = ne_id
-               and neh_operation = 'C'
-               and neh_effective_date = ne_end_date
-               and (ne_id = c_ne_id
-               OR  ne_id IN (SELECT NM_NE_ID_OF
-                           FROM NM_MEMBERS_ALL
-                           START WITH NM_NE_ID_IN = c_ne_id
-                           CONNECT BY NM_NE_ID_IN = PRIOR NM_NE_ID_OF)
-                           );
+           SELECT ne_id
+             FROM nm_element_history, 
+                  nm_elements_all
+            WHERE neh_ne_id_old = ne_id
+              AND neh_operation = c_close
+              AND neh_effective_date = ne_end_date
+              AND neh_effective_date = v_close_date
+              AND (   ne_id = c_ne_id
+                   OR ne_id IN (SELECT nm_ne_id_of
+                                  FROM nm_members_all
+                                 WHERE nm_end_date = v_close_date
+                                 START WITH nm_ne_id_in = c_ne_id
+                               CONNECT BY nm_ne_id_in = PRIOR nm_ne_id_of));
 
-           -- A list of the members that need to be unclosed
-           CURSOR cs_nmh (
-              c_nmh_ne_id_of_old   nm_members.nm_ne_id_of%TYPE
-           )
-           IS
-              SELECT nmh_nm_ne_id_in, nmh_nm_ne_id_of_old, nmh_nm_begin_mp,
-                     nmh_nm_start_date, nmh_nm_end_date, nmh_nm_type
-                FROM NM_MEMBER_HISTORY
-                START WITH nmh_nm_ne_id_in = c_nmh_ne_id_of_old
-                CONNECT BY nmh_nm_ne_id_in = PRIOR nmh_nm_ne_id_of_old;
-
-           l_tab_ne_id_in     Nm3type.tab_number;
-           l_tab_ne_id_of     Nm3type.tab_number;
-           l_tab_begin_mp     Nm3type.tab_number;
-           l_tab_start_date   Nm3type.tab_date;
-           l_tab_end_date     Nm3type.tab_date;
-           l_tab_nm_type      Nm3type.tab_varchar4;
-           --
+        --
         BEGIN
            OPEN cs_neh (p_ne_id);
            FETCH cs_neh
-           BULK COLLECT INTO l_neh_ne_id, l_neh_effective_date;
+           BULK COLLECT INTO l_neh_ne_id;
            CLOSE cs_neh;
             
-           OPEN cs_nmh (p_ne_id);
-           FETCH cs_nmh
-           BULK COLLECT INTO l_tab_ne_id_in, l_tab_ne_id_of, l_tab_begin_mp,
-                              l_tab_start_date, l_tab_end_date, l_tab_nm_type;
-            CLOSE cs_nmh;
            -- Unclose elements
            FORALL i IN 1 .. l_neh_ne_id.COUNT
               UPDATE nm_elements_all
                  SET ne_end_date = NULL
                WHERE ne_id = l_neh_ne_id (i)
-                 AND ne_end_date = l_neh_effective_date(i);
+                 AND ne_end_date = v_close_date;
            
            -- Un-end date the membership records
-           FORALL i IN 1 .. l_tab_ne_id_in.COUNT
+           FORALL i IN 1 .. l_neh_ne_id.COUNT
               UPDATE nm_members_all
-                 SET nm_end_date = l_tab_end_date(i)
-               WHERE nm_ne_id_in = l_tab_ne_id_in(i)
-                 AND nm_ne_id_of = l_tab_ne_id_of(i)
-                 AND nm_begin_mp = l_tab_begin_mp(i)
-                 AND nm_start_date = l_tab_start_date(i);
-
+                 SET nm_end_date = NULL
+               WHERE nm_ne_id_in = l_neh_ne_id (i)
+                 AND nm_end_date = v_close_date;
+                 
            -- Un end date the inventory on the children
-           FORALL i IN 1 .. l_tab_ne_id_in.COUNT
+           FORALL i IN 1 .. l_neh_ne_id.COUNT
            UPDATE nm_inv_items_all
-              SET iit_end_date =  l_tab_end_date(i)
-            WHERE iit_ne_id IN
-              (SELECT nmh_nm_ne_id_in 
-                 FROM nm_member_history 
-                WHERE nmh_nm_ne_id_of_new = l_tab_ne_id_of(i)
-                  AND nmh_nm_ne_id_of_old = l_tab_ne_id_of(i)
-                  AND NMH_NM_TYPE = 'I');
+              SET iit_end_date =  NULL
+            WHERE iit_end_date = v_close_date
+              AND iit_ne_id IN
+              (SELECT nm_ne_id_in
+                FROM nm_members_all
+               WHERE nm_ne_id_of = l_neh_ne_id (i)
+                 AND nm_end_date = v_close_date
+                 AND nm_type = 'I');
 
-           -- Un end date the inventory on the children
-           FORALL i IN 1 .. l_tab_ne_id_in.COUNT
-           UPDATE nm_members_all
-              SET nm_end_date =  l_tab_end_date(i)
-            WHERE (nm_ne_id_of, nm_ne_id_in) IN
-              (SELECT nmh_nm_ne_id_of_old, nmh_nm_ne_id_in 
-                 FROM nm_member_history 
-                WHERE nmh_nm_ne_id_of_new = l_tab_ne_id_of(i)
-                  AND nmh_nm_ne_id_of_old = l_tab_ne_id_of(i)
-                  AND nmh_nm_type IN ('P','G'));
-
+           -- Un-end date the membership records
+           FORALL i IN 1 .. l_neh_ne_id.COUNT
+              UPDATE nm_members_all
+                 SET nm_end_date = NULL
+               WHERE nm_ne_id_of = l_neh_ne_id (i)
+                 AND nm_end_date = v_close_date;
+                 
            -- Delete element history records 
            FORALL i IN 1 .. l_neh_ne_id.COUNT
               DELETE nm_element_history
                WHERE neh_ne_id_new = l_neh_ne_id(i)
                  AND neh_ne_id_old = l_neh_ne_id(i)
-                 AND neh_effective_date = l_neh_effective_date(i)
+                 AND neh_effective_date = v_close_date
                  AND neh_operation = 'C';
            
            -- Delete the membership history records
-           FORALL i IN 1 .. l_tab_ne_id_in.COUNT
+           FORALL i IN 1 .. l_neh_ne_id.COUNT
               DELETE nm_member_history
-               WHERE nmh_nm_ne_id_in = l_tab_ne_id_in (i)
-                 AND nmh_nm_ne_id_of_new = l_tab_ne_id_of (i)
-                 AND nmh_nm_ne_id_of_old = l_tab_ne_id_of (i)
-                 AND nmh_nm_begin_mp = l_tab_begin_mp (i)
-                 AND nmh_nm_start_date = l_tab_start_date (i);
+               WHERE nmh_nm_ne_id_in = l_neh_ne_id(i)
+                 AND nmh_nm_ne_id_of_new = l_neh_ne_id(i)
+                 AND nmh_nm_ne_id_of_old = l_neh_ne_id (i);
            
            -- Unclose other products.
            FOR i IN 1 .. l_neh_ne_id.COUNT LOOP
            undo_other_products (p_ne_id_1        => l_neh_ne_id(i)
                                ,p_ne_id_2        => l_neh_ne_id(i)
                                ,p_operation      => c_close
-                               ,p_op_date        => l_neh_effective_date(i)
+                               ,p_op_date        => v_close_date
                                );
            END LOOP;
 
         END;
+
       END IF;
       -- Task 0111307 End
       --
