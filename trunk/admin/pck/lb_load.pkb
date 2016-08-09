@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_load
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_load.pkb-arc   1.16   Aug 03 2016 10:06:18   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_load.pkb-arc   1.17   Aug 09 2016 11:07:58   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_load.pkb  $
-   --       Date into PVCS   : $Date:   Aug 03 2016 10:06:18  $
-   --       Date fetched Out : $Modtime:   Aug 03 2016 10:00:50  $
-   --       PVCS Version     : $Revision:   1.16  $
+   --       Date into PVCS   : $Date:   Aug 09 2016 11:07:58  $
+   --       Date fetched Out : $Modtime:   Aug 09 2016 10:40:58  $
+   --       PVCS Version     : $Revision:   1.17  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,7 +16,7 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.16  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.17  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_load';
 
@@ -144,6 +144,7 @@ AS
       loc_error    lb_loc_error_tab;
       l_g_i_d      VARCHAR2 (1);
       l_load_tab   lb_rpt_tab;
+	  l_pnt_or_cont varchar2(1);
    BEGIN
       --
       IF pi_g_i_d IS NULL
@@ -156,6 +157,18 @@ AS
          l_g_i_d := pi_g_i_d;
       END IF;
 
+	  select nit_pnt_or_cont into l_pnt_or_cont
+	  from nm_inv_types where nit_inv_type = pi_nal_nit_type;
+      
+      if pi_start_m is null then
+        raise_application_error (-20001, 'Start measure must be specified' );
+      end if;
+      
+      if l_pnt_or_cont = 'P' and pi_start_m <> nvl(pi_end_m, pi_start_m) then
+         raise_application_error( -20001, 'The start and end measures must be the same for point asset types');
+      elsif l_pnt_or_cont = 'C' and pi_start_m >= pi_end_m then
+         raise_application_error (-20002, 'The end measure must be greater than the start measure' );
+      end if;
       --
       IF l_g_i_d = 'D'
       THEN
