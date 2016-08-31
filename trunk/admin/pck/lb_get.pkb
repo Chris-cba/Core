@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_get
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_get.pkb-arc   1.10   Aug 31 2016 16:59:48   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_get.pkb-arc   1.11   Aug 31 2016 17:03:48   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_get.pkb  $
-   --       Date into PVCS   : $Date:   Aug 31 2016 16:59:48  $
-   --       Date fetched Out : $Modtime:   Aug 31 2016 16:59:30  $
-   --       PVCS Version     : $Revision:   1.10  $
+   --       Date into PVCS   : $Date:   Aug 31 2016 17:03:48  $
+   --       Date fetched Out : $Modtime:   Aug 31 2016 17:03:50  $
+   --       PVCS Version     : $Revision:   1.11  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,7 +16,7 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.10  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.11  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_get';
 
@@ -1462,7 +1462,7 @@ AS
             NULL;
       END;
 
-      IF l_ft_flag = 'Y' and l_category != 'F'
+      IF l_ft_flag = 'Y' and l_category = 'F'
       THEN
          EXECUTE IMMEDIATE get_FT_retrieval_str (pi_obj_type, pi_obj_id)
             INTO retval
