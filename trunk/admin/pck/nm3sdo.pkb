@@ -5,11 +5,11 @@ AS
    --
    ---   PVCS Identifiers :-
    --
-   --       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.95   Feb 01 2016 12:36:56   Rob.Coupe  $
+   --       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.96   Sep 05 2016 09:52:54   Chris.Baugh  $
    --       Module Name      : $Workfile:   nm3sdo.pkb  $
-   --       Date into PVCS   : $Date:   Feb 01 2016 12:36:56  $
-   --       Date fetched Out : $Modtime:   Feb 01 2016 11:35:20  $
-   --       PVCS Version     : $Revision:   2.95  $
+   --       Date into PVCS   : $Date:   Sep 05 2016 09:52:54  $
+   --       Date fetched Out : $Modtime:   Sep 02 2016 15:10:34  $
+   --       PVCS Version     : $Revision:   2.96  $
    --       Based on
    ------------------------------------------------------------------
    --   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
@@ -23,7 +23,7 @@ AS
    -- Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
    -----------------------------------------------------------------------------
 
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '"$Revision:   2.95  $"';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '"$Revision:   2.96  $"';
    g_package_name   CONSTANT VARCHAR2 (30) := 'NM3SDO';
    g_batch_size              INTEGER
       := NVL (TO_NUMBER (Hig.get_sysopt ('SDOBATSIZE')), 10);
@@ -13105,6 +13105,9 @@ AS
                      END IF;
 
                      l_loop_count := 2;
+                     
+                     curstr := curstr_ASD_whole;
+                     
                   END IF;
                END IF;
             ELSE
