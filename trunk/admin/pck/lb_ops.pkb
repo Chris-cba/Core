@@ -1,13 +1,12 @@
-/* Formatted on 07/09/2016 10:46:16 (QP5 v5.294) */
 CREATE OR REPLACE PACKAGE BODY lb_ops
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_ops.pkb-arc   1.3   Sep 07 2016 11:10:36   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_ops.pkb-arc   1.4   Sep 07 2016 17:38:22   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_ops.pkb  $
-   --       Date into PVCS   : $Date:   Sep 07 2016 11:10:36  $
-   --       Date fetched Out : $Modtime:   Sep 07 2016 11:09:26  $
-   --       PVCS Version     : $Revision:   1.3  $
+   --       Date into PVCS   : $Date:   Sep 07 2016 17:38:22  $
+   --       Date fetched Out : $Modtime:   Sep 07 2016 17:37:32  $
+   --       PVCS Version     : $Revision:   1.4  $
    --
    --   Author : R.A. Coupe
    --
@@ -17,7 +16,7 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated . All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.3  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.4  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_ops';
 
@@ -78,68 +77,134 @@ AS
    END;
 
    --
-   FUNCTION RPt_minus (p_Rpt1             lb_RPt_tab,
-                       p_Rpt2             lb_RPt_tab,
+   FUNCTION rpt_minus (p_Rpt1             lb_rpt_tab,
+                       p_Rpt2             lb_rpt_tab,
                        p_cardinality   IN INTEGER)
-      RETURN lb_RPt_tab
-   AS
-      retval   lb_RPt_tab;
-   --
+      RETURN lb_rpt_tab
+   IS
+      retval   lb_rpt_tab;
    BEGIN
-      WITH lrs_Rpt1
-           AS (SELECT t1.*
-                 FROM TABLE (
-                         lb_path.get_sdo_path (nm_lref (3867959, 20),
-                                               nm_lref (4174510, 84))) t1),
-           lrs_Rpt2
-           AS (SELECT t2.*
-                 FROM TABLE (
-                         lb_path.get_sdo_path (nm_lref (3867959, 10),
-                                               nm_lref (4174510, 84))) t2)
-      SELECT lb_RPt (
-                t.refnt,
-                t.refnt_type,
-                t.obj_type,
-                t.obj_id,
-                t.seg_id,
-                t.seq_id,
-                t.dir_flag,
-                --                     t.start_m,
-                CASE
-                   WHEN t.start_m < NVL (t2.start_m, t.start_m + 1)
-                   THEN
-                      t.start_m
-                   ELSE
-                      CASE
-                         WHEN t.end_m > NVL (t2.end_m, t.end_m - 1)
-                         THEN
-                            NVL (t2.end_m, t.end_m)
-                         ELSE
-                            -99
-                      END
-                END,
-                CASE
-                   WHEN t.end_m > NVL (t2.end_m, t.end_m - 1)
-                   THEN
-                      t.end_m
-                   ELSE
-                      CASE
-                         WHEN t.end_m < NVL (t2.end_m, t.end_m)
-                         THEN
-                            NVL (t2.start_m, t.end_m)
-                         ELSE
-                            -99
-                      END
-                END,
-                t.m_unit)
-        BULK COLLECT INTO retval
-        FROM ((SELECT * FROM lrs_Rpt1
-               MINUS
-               SELECT * FROM lrs_Rpt2)) t,
-             lrs_RPt2 t2
-       WHERE     t.refnt = t2.refnt(+)
-             AND t.start_m < NVL (t2.end_m, t.start_m - 1)
-             AND t.end_m > NVL (t2.start_m, t.end_m + 1);
+      --
+      WITH ldat
+           AS (SELECT 'A' op,
+                      refnt,
+                      refnt_type,
+                      obj_type,
+                      obj_id,
+                      start_m,
+                      end_m,
+                      m_unit
+                 FROM TABLE (p_Rpt1) t
+               UNION ALL
+               SELECT 'B' op,
+                      refnt,
+                      refnt_type,
+                      obj_type,
+                      obj_id,
+                      start_m,
+                      end_m,
+                      m_unit
+                 FROM TABLE (p_Rpt2))
+        SELECT CAST (COLLECT (lb_rpt (t4.refnt,
+                                      NULL,
+                                      NULL,
+                                      NULL,
+                                      NULL,
+                                      NULL,
+                                      NULL,
+                                      start_m,
+                                      end_m,
+                                      NULL)) AS lb_rpt_tab)
+          INTO retval
+          FROM (SELECT t3.*,
+                       LAG (op, 1)
+                          OVER (PARTITION BY refnt,
+                                             refnt_type,
+                                             obj_type,
+                                             obj_id,
+                                             m_unit
+                                ORDER BY rn)
+                          p_op,
+                       LAG (typ, 1)
+                          OVER (PARTITION BY refnt,
+                                             refnt_type,
+                                             obj_type,
+                                             obj_id,
+                                             m_unit
+                                ORDER BY rn)
+                          p_typ,
+                       LAG (measure, 1)
+                          OVER (PARTITION BY refnt,
+                                             refnt_type,
+                                             obj_type,
+                                             obj_id,
+                                             m_unit
+                                ORDER BY rn)
+                          start_m,
+                       measure end_m
+                  FROM (SELECT rn,
+                               op,
+                               refnt,
+                               refnt_type,
+                               obj_type,
+                               obj_id,
+                               m_unit,
+                               measure,
+                               prior_m,
+                               typ,
+                               CASE op WHEN 'B' THEN 'E' --start or end of the minus array is always considered an end
+                                                         --  else case typ
+                                                         --     when 'E' then 'R'
+                               ELSE typ --   end
+                               END typ1
+                          FROM (SELECT ROW_NUMBER ()
+                                          OVER (PARTITION BY refnt,
+                                                             refnt_type,
+                                                             obj_type,
+                                                             obj_id,
+                                                             m_unit
+                                                ORDER BY measure, op, typ)
+                                          rn,
+                                       op,
+                                       typ,
+                                       refnt,
+                                       refnt_type,
+                                       obj_type,
+                                       obj_id,
+                                       m_unit,
+                                       measure,
+                                       LAG (measure, 1)
+                                          OVER (PARTITION BY refnt,
+                                                             refnt_type,
+                                                             obj_type,
+                                                             obj_id,
+                                                             m_unit
+                                                ORDER BY measure, op, typ)
+                                          prior_m
+                                  FROM (SELECT t2.op,
+                                               'S'      typ,
+                                               t2.refnt,
+                                               refnt_type,
+                                               obj_type,
+                                               obj_id,
+                                               m_unit,
+                                               t2.start_m measure
+                                          FROM ldat t2
+                                        UNION ALL
+                                        SELECT t2.op,
+                                               'E' typ,
+                                               t2.refnt,
+                                               refnt_type,
+                                               obj_type,
+                                               obj_id,
+                                               m_unit,
+                                               t2.end_m
+                                          FROM ldat t2))) t3) t4
+         WHERE     p_typ IS NOT NULL
+               AND start_m < end_m
+               AND ( (   p_op = 'A' AND typ1 = 'E' AND p_typ = 'S'
+                      OR op = 'A' AND typ = 'E' AND p_op = 'B' AND p_typ = 'E'))
+      ORDER BY refnt, rn, measure;
 
       RETURN retval;
    END;
@@ -278,9 +343,9 @@ AS
    END;
 
    FUNCTION is_contiguous (p_lb_rpt_tab IN lb_rpt_tab)
-      RETURN varchar2
+      RETURN VARCHAR2
    IS
-      retval    varchar2(10) := 'FALSE';
+      retval    VARCHAR2 (10) := 'FALSE';
       l_dummy   INTEGER;
    BEGIN
       BEGIN
