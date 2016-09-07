@@ -1,12 +1,13 @@
+/* Formatted on 07/09/2016 10:46:16 (QP5 v5.294) */
 CREATE OR REPLACE PACKAGE BODY lb_ops
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_ops.pkb-arc   1.2   Sep 25 2015 17:21:56   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_ops.pkb-arc   1.3   Sep 07 2016 11:10:36   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_ops.pkb  $
-   --       Date into PVCS   : $Date:   Sep 25 2015 17:21:56  $
-   --       Date fetched Out : $Modtime:   Sep 25 2015 17:22:08  $
-   --       PVCS Version     : $Revision:   1.2  $
+   --       Date into PVCS   : $Date:   Sep 07 2016 11:10:36  $
+   --       Date fetched Out : $Modtime:   Sep 07 2016 11:09:26  $
+   --       PVCS Version     : $Revision:   1.3  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,7 +17,7 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated . All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.2  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.3  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_ops';
 
@@ -179,7 +180,7 @@ AS
                               seq_id,
                               dir_flag,
                               MIN (start_m) OVER (PARTITION BY seg) start_m,
-                              MAX (end_m) OVER (PARTITION BY seg) end_m,
+                              MAX (end_m) OVER (PARTITION BY seg)   end_m,
                               m_unit
                 FROM (SELECT q3.*,
                              SUM (
@@ -263,7 +264,7 @@ AS
                        MIN (seq_id) seq_id,
                        MIN (dir_flag) dir_flag,
                        MIN (start_m) start_m,
-                       MAX (end_m) end_m,
+                       MAX (end_m)  end_m,
                        m_unit
                   FROM TABLE (p_tab) t
               GROUP BY refnt,
@@ -272,6 +273,66 @@ AS
                        obj_id,
                        seg_id,
                        m_unit);
+
+      RETURN retval;
+   END;
+
+   FUNCTION is_contiguous (p_lb_rpt_tab IN lb_rpt_tab)
+      RETURN varchar2
+   IS
+      retval    varchar2(10) := 'FALSE';
+      l_dummy   INTEGER;
+   BEGIN
+      BEGIN
+         SELECT 1
+           INTO l_dummy
+           FROM (SELECT t2.*
+                   FROM (SELECT t1.*,
+                                NVL (
+                                   LAG (end_node, 1)
+                                      OVER (ORDER BY seg_id, seq_id),
+                                   start_node)
+                                   prior_end_node
+                           FROM (  SELECT t.*,
+                                          CASE dir_flag
+                                             WHEN 1 THEN ne_no_start
+                                             ELSE ne_no_end
+                                          END
+                                             start_node,
+                                          CASE dir_flag
+                                             WHEN -1 THEN ne_no_start
+                                             ELSE ne_no_end
+                                          END
+                                             end_node,
+                                          ne_length refnt_length,
+                                          MIN (seq_id)
+                                             OVER (PARTITION BY seg_id)
+                                             min_seq,
+                                          MAX (seq_id)
+                                             OVER (PARTITION BY seg_id)
+                                             max_seq,
+                                          CASE dir_flag
+                                             WHEN 1 THEN start_m
+                                             WHEN -1 THEN ne_length - end_m
+                                          END
+                                             start_m2,
+                                          CASE dir_flag
+                                             WHEN 1 THEN end_m
+                                             WHEN -1 THEN ne_length - start_m
+                                          END
+                                             end_m2
+                                     FROM TABLE (p_lb_rpt_tab) t, nm_elements
+                                    WHERE ne_id = refnt
+                                 ORDER BY seg_id, seq_id) t1) t2
+                  WHERE    start_node != prior_end_node
+                        OR (start_m2 != 0 AND seq_id != min_seq)
+                        OR (end_m2 != refnt_length AND seq_id != max_seq))
+          WHERE ROWNUM = 1;
+      EXCEPTION
+         WHEN NO_DATA_FOUND
+         THEN
+            retval := 'TRUE';
+      END;
 
       RETURN retval;
    END;
