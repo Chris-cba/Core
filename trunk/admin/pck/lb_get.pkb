@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_get
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_get.pkb-arc   1.11   Aug 31 2016 17:03:48   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_get.pkb-arc   1.12   Sep 08 2016 16:35:36   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_get.pkb  $
-   --       Date into PVCS   : $Date:   Aug 31 2016 17:03:48  $
-   --       Date fetched Out : $Modtime:   Aug 31 2016 17:03:50  $
-   --       PVCS Version     : $Revision:   1.11  $
+   --       Date into PVCS   : $Date:   Sep 08 2016 16:35:36  $
+   --       Date fetched Out : $Modtime:   Sep 08 2016 16:16:08  $
+   --       PVCS Version     : $Revision:   1.12  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,7 +16,7 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.11  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.12  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_get';
 
@@ -1520,7 +1520,7 @@ AS
       RETURN retval;
    END;
 
-   FUNCTION get_ft_rpt_tab (p_rpt_tab      IN lb_rpt_tab,
+  FUNCTION get_ft_rpt_tab (p_rpt_tab      IN lb_rpt_tab,
                             p_table_name   IN VARCHAR2,
                             p_inv_type     IN VARCHAR2,
                             p_key          IN VARCHAR2,
@@ -1551,8 +1551,8 @@ AS
          || '       t1."INV_START", '
          || '       t1."INV_END", '
          || '       t1."NE_LENGTH", '
-         || '       t1."START_DATE", '
-         || '       t1."END_DATE", '
+--         || '       t1."START_DATE", '
+--         || '       t1."END_DATE", '
          || '       CASE route_dir_flag '
          || '          WHEN 1 THEN inv_start '
          || '          ELSE ne_length - inv_end '
@@ -1582,10 +1582,10 @@ AS
          || ' inv_type, '
          || '                 im.'
          || p_start_col
-         || ', '
+         || ' start_m, '
          || '                 im.'
          || p_end_col
-         || ', '
+         || ' end_m,  '
          || '                   GREATEST (im.'
          || p_start_col
          || ', rm.nm_slk) '
@@ -1598,14 +1598,14 @@ AS
          || '                 - rm.nm_slk '
          || '                 + rm.nm_begin_mp '
          || '                    inv_end, '
-         || '                 e.ne_length, '
-         || '                 start_date, '
-         || '                 end_date '
+         || '                 e.ne_length '
+--         || '                 start_date, '
+--         || '                 end_date '
          || '            FROM '
          || p_table_name
          || ' im, nm_members rm, nm_elements e, table (:p_rpt_tab ) '
          || '           WHERE     e.ne_id = rm.nm_ne_id_of '
-         || '                 AND rm.nm_ne_id_in = im.route_id '
+         || '                 AND rm.nm_ne_id_in = im.'||p_ne_key
          || '                 AND e.ne_id = refnt '
          || '                 AND (   (    im.'
          || p_start_col
