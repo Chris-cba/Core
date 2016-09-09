@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_get
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_get.pkb-arc   1.12   Sep 08 2016 16:35:36   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_get.pkb-arc   1.13   Sep 09 2016 18:40:24   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_get.pkb  $
-   --       Date into PVCS   : $Date:   Sep 08 2016 16:35:36  $
-   --       Date fetched Out : $Modtime:   Sep 08 2016 16:16:08  $
-   --       PVCS Version     : $Revision:   1.12  $
+   --       Date into PVCS   : $Date:   Sep 09 2016 18:40:24  $
+   --       Date fetched Out : $Modtime:   Sep 09 2016 18:39:20  $
+   --       PVCS Version     : $Revision:   1.13  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,7 +16,7 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.12  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.13  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_get';
 
@@ -705,11 +705,14 @@ AS
 
    --
    FUNCTION g_of_g_search (p_group_id      IN INTEGER,
-                           p_asset_types   IN lb_asset_type_tab,
-                           CARDINALITY        INTEGER)
+--                           p_asset_types   IN lb_asset_type_tab,
+                           p_inv_type      IN VARCHAR2 DEFAULT NULL,
+                           p_LB_only       IN VARCHAR2 DEFAULT 'TRUE',
+                           p_cardinality   IN INTEGER)
       RETURN lb_rpt_tab
    IS
-      retval   lb_rpt_tab;
+      retval        lb_rpt_tab;
+--      l_asset_count integer := p_asset_types.count;
    BEGIN
       WITH group_hierarchy (levl,
                             top_group,
@@ -775,12 +778,22 @@ AS
                      nm_elements e,
                      nm_locations m,
                      nm_linear_types,
-                     TABLE (p_asset_types)
+                     lb_types
+--                     TABLE (p_asset_types)
                WHERE     ne_type = 'S'
                      AND ne_id = m.nm_ne_id_of
                      AND g.child_group = ne_id
                      AND nlt_nt_type = ne_nt_type
-                     AND nm_obj_type = asset_type --p_obj_type  --SYS_CONTEXT ('NM3SQL', 'OBJECT_TYPE');
+                     AND nm_obj_type = p_inv_type --asset_type --(+)
+                     AND nm_obj_type = lb_exor_inv_type --(+)
+--                     and nvl(lb_exor_inv_type, '£$%^') =  case p_LB_only
+--                                                             when 'TRUE' then lb_exor_inv_type 
+--                                                             else 'NONE'
+--                                                             end
+--                     and nvl(asset_type, '£$%^') = case nvl(l_asset_count, 0)
+--                                                             when 0 then asset_type
+--                                                             else nm_obj_type
+--                                                             end                    
               UNION ALL
               SELECT nm_ne_id_of,
                      nlt_id,
@@ -795,29 +808,29 @@ AS
                 FROM group_hierarchy g,
                      nm_elements e,
                      nm_members m,
-                     nm_linear_types,
-                     TABLE (p_asset_types)
+                     nm_linear_types
+--                     TABLE (p_asset_types)
                WHERE     ne_type = 'S'
                      AND ne_id = m.nm_ne_id_of
                      AND g.child_group = ne_id
                      AND nlt_nt_type = ne_nt_type
-                     AND nm_obj_type = asset_type); --p_obj_type ); --SYS_CONTEXT ('NM3SQL', 'OBJECT_TYPE');
+                     AND nm_obj_type = p_inv_type );--asset_type); 
 
       RETURN retval;
    END;
 
 
-   FUNCTION g_of_g_search (p_group_id IN INTEGER, p_obj_type IN VARCHAR2)
-      RETURN lb_rpt_tab
-   IS
-      retval   lb_rpt_tab;
-   BEGIN
-      retval :=
-         g_of_g_search (p_group_id,
-                        lb_asset_type_tab (lb_asset_type (p_obj_type)),
-                        1);
-      RETURN retval;
-   END;
+--   FUNCTION g_of_g_search (p_group_id IN INTEGER, p_obj_type IN VARCHAR2, p_LB_only IN VARCHAR2 DEFAULT 'TRUE', p_cardinality IN INTEGER)
+--      RETURN lb_rpt_tab
+--   IS
+--      retval   lb_rpt_tab;
+--   BEGIN
+--      retval :=
+--         g_of_g_search (p_group_id,
+--                        lb_asset_type_tab (lb_asset_type (p_obj_type)), p_lb_only,
+--                        1);
+--      RETURN retval;
+--   END;
 
 
    FUNCTION get_lb_RPt_cur (p_refnt         IN INTEGER,
@@ -1410,11 +1423,11 @@ AS
                                        im.obj_type,
                                        im.start_m,
                                        im.end_m,
-                                         GREATEST (im.start_m, rm.nm_slk)
+                                         GREATEST (nvl(im.start_m,rm.nm_slk), rm.nm_slk)
                                        - rm.nm_slk
                                        + rm.nm_begin_mp
                                           inv_start,
-                                         LEAST (im.end_m, rm.nm_end_slk)
+                                         LEAST (nvl(im.end_m, rm.nm_end_slk), rm.nm_end_slk)
                                        - rm.nm_slk
                                        + rm.nm_begin_mp
                                           inv_end,
@@ -1429,12 +1442,12 @@ AS
                                        AND l.nlt_g_i_d = 'D'
                                        AND l.nlt_nt_type = ne_nt_type
                                        AND rm.nm_ne_id_in = im.refnt
-                                       AND (   (    im.start_m < rm.nm_end_slk
-                                                AND im.end_m > rm.nm_slk
-                                                AND im.end_m > im.start_m)
-                                            OR (    im.start_m = im.end_m
-                                                AND im.end_m <= rm.nm_end_slk
-                                                AND im.start_m >= rm.nm_slk))
+                                       AND (   (    nvl(im.start_m, rm.nm_end_slk) <= rm.nm_end_slk
+                                                AND nvl(im.end_m, rm.nm_slk) >= rm.nm_slk
+                                                AND nvl(im.end_m, rm.nm_end_slk) > nvl(im.start_m, rm.nm_end_slk -1))
+                                            OR (    nvl(im.start_m,0) = nvl(im.end_m, 0)
+                                                AND nvl(im.end_m, rm.nm_end_slk) <= rm.nm_end_slk
+                                                AND nvl(im.start_m, rm.nm_slk) >= rm.nm_slk))
                               ORDER BY rm.nm_seg_no, rm.nm_seq_no, im.start_m)
                              t1));
 
