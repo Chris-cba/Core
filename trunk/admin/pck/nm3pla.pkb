@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3pla AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3pla.pkb-arc   2.19   Feb 22 2016 10:27:20   Upendra.Hukeri  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3pla.pkb-arc   2.20   Sep 13 2016 12:31:32   Upendra.Hukeri  $
 --       Module Name      : $Workfile:   nm3pla.pkb  $
---       Date into PVCS   : $Date:   Feb 22 2016 10:27:20  $
---       Date fetched Out : $Modtime:   Feb 22 2016 10:24:20  $
---       Version          : $Revision:   2.19  $
+--       Date into PVCS   : $Date:   Sep 13 2016 12:31:32  $
+--       Date fetched Out : $Modtime:   Sep 13 2016 08:35:42  $
+--       Version          : $Revision:   2.20  $
 --       Based on SCCS version : 1.61
 ------------------------------------------------------------------------
 --
@@ -19,7 +19,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3pla AS
 -------------------------------------------------------------------------------------------
 -- Global variables - tree definitions etc.
    --g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"@(#)nm3pla.pkb    1.61 11/29/06"';
-   g_body_sccsid     CONSTANT varchar2(2000) := '$Revision:   2.19  $';
+   g_body_sccsid     CONSTANT varchar2(2000) := '$Revision:   2.20  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT VARCHAR2(30) := 'nm3pla';
@@ -2233,12 +2233,12 @@ BEGIN
                                  );
     END LOOP;
   END IF;
-  /*
+  
   IF retval.get_entry(retval.placement_count).pl_ne_id <> pi_end_lref.get_ne_id
   THEN
     RAISE e_no_connectivity;
   END IF;
-  */
+  
   Nm_Debug.proc_start(g_package_name,'get_connected_extent');
 
   RETURN retval;
