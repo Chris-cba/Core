@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_get
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_get.pkb-arc   1.13   Sep 09 2016 18:40:24   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_get.pkb-arc   1.14   Sep 15 2016 10:48:22   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_get.pkb  $
-   --       Date into PVCS   : $Date:   Sep 09 2016 18:40:24  $
-   --       Date fetched Out : $Modtime:   Sep 09 2016 18:39:20  $
-   --       PVCS Version     : $Revision:   1.13  $
+   --       Date into PVCS   : $Date:   Sep 15 2016 10:48:22  $
+   --       Date fetched Out : $Modtime:   Sep 15 2016 10:45:30  $
+   --       PVCS Version     : $Revision:   1.14  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,7 +16,7 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.13  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.14  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_get';
 
@@ -784,7 +784,7 @@ AS
                      AND ne_id = m.nm_ne_id_of
                      AND g.child_group = ne_id
                      AND nlt_nt_type = ne_nt_type
-                     AND nm_obj_type = p_inv_type --asset_type --(+)
+                     AND nm_obj_type = nvl(p_inv_type, nm_obj_type) --asset_type --(+)
                      AND nm_obj_type = lb_exor_inv_type --(+)
 --                     and nvl(lb_exor_inv_type, '£$%^') =  case p_LB_only
 --                                                             when 'TRUE' then lb_exor_inv_type 
@@ -813,8 +813,9 @@ AS
                WHERE     ne_type = 'S'
                      AND ne_id = m.nm_ne_id_of
                      AND g.child_group = ne_id
+                     AND p_LB_only != 'TRUE'
                      AND nlt_nt_type = ne_nt_type
-                     AND nm_obj_type = p_inv_type );--asset_type); 
+                     AND nm_obj_type = nvl(p_inv_type, nm_obj_type) );--asset_type); 
 
       RETURN retval;
    END;
