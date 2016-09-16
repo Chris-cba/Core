@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_ref
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_ref.pkb-arc   1.7   May 06 2016 15:36:20   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_ref.pkb-arc   1.8   Sep 16 2016 15:00:30   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_ref.pkb  $
-   --       Date into PVCS   : $Date:   May 06 2016 15:36:20  $
-   --       Date fetched Out : $Modtime:   May 06 2016 15:36:12  $
-   --       PVCS Version     : $Revision:   1.7  $
+   --       Date into PVCS   : $Date:   Sep 16 2016 15:00:30  $
+   --       Date fetched Out : $Modtime:   Sep 16 2016 14:58:36  $
+   --       PVCS Version     : $Revision:   1.8  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,7 +16,7 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.7  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.8  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_ref';
 
@@ -189,9 +189,9 @@ AS
       retval   SYS_REFCURSOR;
    BEGIN
       OPEN retval FOR
-         SELECT nal_id LocationId,
-                NAL_DESCR LocationDescription,
-                NJX_CODE JXP,
+         SELECT nal_id      LocationId,
+                NAL_DESCR   LocationDescription,
+                NJX_CODE    JXP,
                 NJX_MEANING JXP_DESCR
            FROM NM_ASSET_LOCATIONS,
                 LB_TYPES,
@@ -251,7 +251,7 @@ AS
            FROM nm_xsp_restraints,
                 nm_locations l,
                 nm_elements,
-                nm_members r
+                nm_members   r
           WHERE     l.nm_ne_id_in = LocationId
                 AND r.nm_ne_id_of = l.nm_ne_id_of
                 AND ne_id = r.nm_ne_id_in
@@ -283,7 +283,7 @@ AS
                 FROM nm_xsp_restraints,
                      nm_locations l,
                      nm_elements,
-                     nm_members r
+                     nm_members   r
                WHERE     l.nm_ne_id_in = LocationId
                      AND r.nm_ne_id_of = l.nm_ne_id_of
                      AND ne_id = r.nm_ne_id_in
@@ -617,37 +617,41 @@ AS
    END;
 
    --
-   FUNCTION GET_POINT_OR_CONTINUOUS ( ASSETTYPE IN INTEGER )
-      RETURN VARCHAR2 IS
-   RETVAL VARCHAR2(1);
+   FUNCTION GET_POINT_OR_CONTINUOUS (ASSETTYPE IN INTEGER)
+      RETURN VARCHAR2
+   IS
+      RETVAL   VARCHAR2 (1);
    BEGIN
-     SELECT NIT_PNT_OR_CONT
-     INTO RETVAL
-     FROM v_lb_type_nw_flags
-     where lb_object_type = ASSETTYPE
-     group by nit_pnt_or_cont;
-     RETURN RETVAL;     
-   EXCEPTION
-     WHEN NO_DATA_FOUND 
-     THEN
-        raise_application_error( -20005, 'Asset type is not registered');
-   END;     
+        SELECT NIT_PNT_OR_CONT
+          INTO RETVAL
+          FROM v_lb_type_nw_flags
+         WHERE lb_object_type = ASSETTYPE
+      GROUP BY nit_pnt_or_cont;
 
-   FUNCTION GET_POINT_OR_CONTINUOUS ( INV_TYPE IN VARCHAR2 )
-      RETURN VARCHAR2 IS
-   RETVAL VARCHAR2(1);
-   BEGIN
-     SELECT NIT_PNT_OR_CONT
-     INTO RETVAL
-     FROM v_lb_type_nw_flags
-     where lb_exor_inv_type = INV_TYPE
-     group by nit_pnt_or_cont;
-     RETURN RETVAL;     
+      RETURN RETVAL;
    EXCEPTION
-     WHEN NO_DATA_FOUND 
-     THEN
-        raise_application_error( -20005, 'Asset type is not registered');
-   END;     
+      WHEN NO_DATA_FOUND
+      THEN
+         raise_application_error (-20005, 'Asset type is not registered');
+   END;
+
+   FUNCTION GET_POINT_OR_CONTINUOUS (INV_TYPE IN VARCHAR2)
+      RETURN VARCHAR2
+   IS
+      RETVAL   VARCHAR2 (1);
+   BEGIN
+        SELECT NIT_PNT_OR_CONT
+          INTO RETVAL
+          FROM v_lb_type_nw_flags
+         WHERE lb_exor_inv_type = INV_TYPE
+      GROUP BY nit_pnt_or_cont;
+
+      RETURN RETVAL;
+   EXCEPTION
+      WHEN NO_DATA_FOUND
+      THEN
+         raise_application_error (-20005, 'Asset type is not registered');
+   END;
 
    PROCEDURE CHECK_JXP (ASSETTYPE IN INTEGER, JXP IN VARCHAR2)
    IS
@@ -664,6 +668,45 @@ AS
       WHEN NO_DATA_FOUND
       THEN
          raise_application_error (-20001, 'Juxtaposition not known');
+   END;
+
+   FUNCTION get_xsp_on_lb_rpt_tab (
+      p_lb_rpt_tab   IN lb_rpt_tab,
+      p_inv_type     IN LB_TYPES.LB_EXOR_INV_TYPE%TYPE)
+      RETURN lb_xsp_tab
+   IS
+      retval   lb_xsp_tab;
+   BEGIN
+      WITH datum_range AS (SELECT /*+materialise*/
+                                 * FROM TABLE (p_lb_rpt_tab))
+      SELECT CAST (
+                COLLECT (lb_xsp (xsr_x_sect_value, xsr_descr)) AS lb_xsp_tab)
+        INTO retval
+        FROM (SELECT DISTINCT xsr_x_sect_value, xsr_descr
+                FROM (SELECT d.ne_id,
+                             d.ne_nt_type,
+                             d.ne_gty_group_type,
+                             d.ne_sub_class
+                        FROM nm_elements d, datum_range
+                       WHERE refnt = ne_id
+                      --and ne_sub_class is not null
+                      UNION ALL
+                      SELECT /*+INDEX(m nm_obj_type_ne_id_of_ind) */
+                            nm_ne_id_of,
+                             g.ne_nt_type,
+                             g.ne_gty_group_type,
+                             g.ne_sub_class
+                        FROM nm_members m, nm_elements g, datum_range
+                       WHERE     nm_ne_id_of = refnt
+                             AND nm_ne_id_in = g.ne_id
+                             AND nm_obj_type = g.ne_gty_group_type --and g.ne_sub_class is not null
+                                                                  ) t,
+                     xsp_restraints
+               WHERE     xsr_nw_type = ne_nt_type
+                     AND xsr_ity_inv_code = p_inv_type
+                     AND xsr_scl_class = ne_sub_class);
+
+      RETURN retval;
    END;
 END lb_ref;
 /
