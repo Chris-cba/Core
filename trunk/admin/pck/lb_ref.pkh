@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE lb_ref
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_ref.pkh-arc   1.7   May 06 2016 15:32:46   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_ref.pkh-arc   1.8   Sep 16 2016 15:03:36   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_ref.pkh  $
-   --       Date into PVCS   : $Date:   May 06 2016 15:32:46  $
-   --       Date fetched Out : $Modtime:   May 06 2016 15:32:34  $
-   --       PVCS Version     : $Revision:   1.7  $
+   --       Date into PVCS   : $Date:   Sep 16 2016 15:03:36  $
+   --       Date fetched Out : $Modtime:   Sep 16 2016 15:02:56  $
+   --       PVCS Version     : $Revision:   1.8  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,7 +16,7 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.7  $';
+   g_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.8  $';
 
    --
    FUNCTION get_version
@@ -126,12 +126,18 @@ AS
       NETWORKELEMENT   IN VARCHAR2 DEFAULT NULL)
       RETURN lb_linear_refnt_tab;
 
-   FUNCTION GET_POINT_OR_CONTINUOUS ( ASSETTYPE IN INTEGER )
+   FUNCTION GET_POINT_OR_CONTINUOUS (ASSETTYPE IN INTEGER)
       RETURN VARCHAR2;
 
-   FUNCTION GET_POINT_OR_CONTINUOUS ( INV_TYPE IN VARCHAR2 )
+   FUNCTION GET_POINT_OR_CONTINUOUS (INV_TYPE IN VARCHAR2)
       RETURN VARCHAR2;
+
    --
    PROCEDURE CHECK_JXP (ASSETTYPE IN INTEGER, JXP IN VARCHAR2);
+
+   FUNCTION HIGHWAYS.get_xsp_on_lb_rpt_tab (
+      p_lb_rpt_tab   IN lb_rpt_tab,
+      p_inv_type     IN LB_TYPES.LB_EXOR_INV_TYPE%TYPE)
+      RETURN lb_xsp_tab;
 END lb_ref;
 /
