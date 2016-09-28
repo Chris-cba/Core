@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_get
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_get.pkb-arc   1.14   Sep 15 2016 10:48:22   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_get.pkb-arc   1.15   Sep 28 2016 11:06:16   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_get.pkb  $
-   --       Date into PVCS   : $Date:   Sep 15 2016 10:48:22  $
-   --       Date fetched Out : $Modtime:   Sep 15 2016 10:45:30  $
-   --       PVCS Version     : $Revision:   1.14  $
+   --       Date into PVCS   : $Date:   Sep 28 2016 11:06:16  $
+   --       Date fetched Out : $Modtime:   Sep 28 2016 11:02:12  $
+   --       PVCS Version     : $Revision:   1.15  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,7 +16,7 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.14  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.15  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_get';
 
@@ -724,7 +724,7 @@ AS
                             nm_end_mp,
                             nm_slk,
                             nm_end_slk)
-           AS (SELECT 1 levl,
+           AS (SELECT  /*+materialize*/ 1 levl,
                       nm_ne_id_in top_group,
                       nm_ne_id_in parent_group,
                       nm_ne_id_of child_group,
@@ -780,8 +780,7 @@ AS
                      nm_linear_types,
                      lb_types
 --                     TABLE (p_asset_types)
-               WHERE     ne_type = 'S'
-                     AND ne_id = m.nm_ne_id_of
+               WHERE ne_id = m.nm_ne_id_of
                      AND g.child_group = ne_id
                      AND nlt_nt_type = ne_nt_type
                      AND nm_obj_type = nvl(p_inv_type, nm_obj_type) --asset_type --(+)
@@ -810,8 +809,7 @@ AS
                      nm_members m,
                      nm_linear_types
 --                     TABLE (p_asset_types)
-               WHERE     ne_type = 'S'
-                     AND ne_id = m.nm_ne_id_of
+               WHERE ne_id = m.nm_ne_id_of
                      AND g.child_group = ne_id
                      AND p_LB_only != 'TRUE'
                      AND nlt_nt_type = ne_nt_type
