@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_load
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_load.pkb-arc   1.17   Aug 09 2016 11:07:58   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_load.pkb-arc   1.18   Oct 04 2016 14:03:50   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_load.pkb  $
-   --       Date into PVCS   : $Date:   Aug 09 2016 11:07:58  $
-   --       Date fetched Out : $Modtime:   Aug 09 2016 10:40:58  $
-   --       PVCS Version     : $Revision:   1.17  $
+   --       Date into PVCS   : $Date:   Oct 04 2016 14:03:50  $
+   --       Date fetched Out : $Modtime:   Oct 04 2016 14:02:40  $
+   --       PVCS Version     : $Revision:   1.18  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,7 +16,7 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.17  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.18  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_load';
 
@@ -796,7 +796,7 @@ AS
       UPDATE nm_asset_locations
          SET nal_descr = DECODE (p_nal_descr, g_nvl, nal_descr, p_nal_descr),
              nal_jxp =
-                DECODE (l_exor_njx_code, g_nvl, nal_jxp, l_exor_njx_code)
+                DECODE (p_jxp, g_nvl, nal_jxp, l_exor_njx_code)
        WHERE nal_id = p_nal_id;
    END;
 END lb_load;
