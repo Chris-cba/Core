@@ -1,12 +1,13 @@
+/* Formatted on 06/10/2016 14:32:36 (QP5 v5.294) */
 CREATE OR REPLACE PACKAGE BODY lb_get
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_get.pkb-arc   1.15   Sep 28 2016 11:06:16   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_get.pkb-arc   1.16   Oct 06 2016 14:38:52   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_get.pkb  $
-   --       Date into PVCS   : $Date:   Sep 28 2016 11:06:16  $
-   --       Date fetched Out : $Modtime:   Sep 28 2016 11:02:12  $
-   --       PVCS Version     : $Revision:   1.15  $
+   --       Date into PVCS   : $Date:   Oct 06 2016 14:38:52  $
+   --       Date fetched Out : $Modtime:   Oct 06 2016 14:32:44  $
+   --       PVCS Version     : $Revision:   1.16  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,7 +17,7 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.15  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.16  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_get';
 
@@ -704,10 +705,11 @@ AS
    END;
 
    --
-   FUNCTION g_of_g_search (p_group_id      IN INTEGER,
+FUNCTION g_of_g_search (p_group_id      IN INTEGER,
 --                           p_asset_types   IN lb_asset_type_tab,
                            p_inv_type      IN VARCHAR2 DEFAULT NULL,
                            p_LB_only       IN VARCHAR2 DEFAULT 'TRUE',
+                           p_whole_only    IN VARCHAR2 DEFAULT 'FALSE',
                            p_cardinality   IN INTEGER)
       RETURN lb_rpt_tab
    IS
@@ -792,7 +794,12 @@ AS
 --                     and nvl(asset_type, '£$%^') = case nvl(l_asset_count, 0)
 --                                                             when 0 then asset_type
 --                                                             else nm_obj_type
---                                                             end                    
+--                                                             end   
+                     AND ( p_whole_only = 'TRUE' and not exists ( select 1 from nm_locations l
+                                      where l.nm_ne_id_in = m.nm_ne_id_in
+                                      and l.nm_obj_type = m.nm_obj_type
+                                      and l.nm_ne_id_of not in ( select child_group from group_hierarchy ))
+                     OR p_whole_only = 'FALSE' )               
               UNION ALL
               SELECT nm_ne_id_of,
                      nlt_id,
@@ -813,11 +820,17 @@ AS
                      AND g.child_group = ne_id
                      AND p_LB_only != 'TRUE'
                      AND nlt_nt_type = ne_nt_type
-                     AND nm_obj_type = nvl(p_inv_type, nm_obj_type) );--asset_type); 
+                     AND nm_obj_type = nvl(p_inv_type, nm_obj_type) --asset_type); 
+                     AND ( p_whole_only = 'TRUE' AND not exists ( select 1 from nm_members l
+                                      where l.nm_ne_id_in = m.nm_ne_id_in
+                                      and l.nm_obj_type = m.nm_obj_type
+                                      and l.nm_ne_id_of not in ( select child_group from group_hierarchy ))
+                     OR p_whole_only = 'FALSE' )               
+                              );             
 
-      RETURN retval;
-   END;
+return retval;
 
+end;
 
 --   FUNCTION g_of_g_search (p_group_id IN INTEGER, p_obj_type IN VARCHAR2, p_LB_only IN VARCHAR2 DEFAULT 'TRUE', p_cardinality IN INTEGER)
 --      RETURN lb_rpt_tab
