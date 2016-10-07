@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY lb_get
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_get.pkb-arc   1.16   Oct 06 2016 14:38:52   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_get.pkb-arc   1.17   Oct 07 2016 14:13:44   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_get.pkb  $
-   --       Date into PVCS   : $Date:   Oct 06 2016 14:38:52  $
-   --       Date fetched Out : $Modtime:   Oct 06 2016 14:32:44  $
-   --       PVCS Version     : $Revision:   1.16  $
+   --       Date into PVCS   : $Date:   Oct 07 2016 14:13:44  $
+   --       Date fetched Out : $Modtime:   Oct 06 2016 16:14:36  $
+   --       PVCS Version     : $Revision:   1.17  $
    --
    --   Author : R.A. Coupe
    --
@@ -17,7 +17,7 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.16  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.17  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_get';
 
@@ -72,6 +72,8 @@ AS
    FUNCTION get_obj_RPt_tab (p_refnt_tab     IN lb_RPt_tab,
                              p_obj_type      IN VARCHAR2,
                              p_intsct        IN VARCHAR2 DEFAULT 'FALSE',
+                             p_lb_only       IN VARCHAR2 DEFAULT 'FALSE',
+                             p_whole_only    IN VARCHAR2 DEFAULT 'FALSE',
                              p_cardinality   IN INTEGER)
       RETURN lb_RPt_tab
    IS
@@ -102,9 +104,13 @@ AS
          THEN
             NULL;
       END;
-
-      IF l_ft_flag = 'Y' and l_category = 'F'
+      
+      IF l_ft_flag = 'Y' and l_category = 'F'      
       THEN
+         if p_lb_only = 'TRUE' then
+            raise_application_error(-20003, 'LB only flag is at odds with a foreign table asset');
+         end if;
+--         
          retval :=
             get_ft_rpt_tab (p_rpt_tab      => p_refnt_tab,
                             p_table_name   => l_nit_row.nit_table_name,
@@ -151,7 +157,7 @@ AS
                       END,
                       nt_length_unit)
               BULK COLLECT INTO retval
-              FROM nm_members,
+              FROM nm_members m,
                    nm_linear_types,
                    nm_elements,
                    nm_types,
@@ -171,6 +177,11 @@ AS
                         OR (    nm_begin_mp = nm_end_mp
                             AND nm_begin_mp BETWEEN NVL (t.start_m, 0)
                                                 AND NVL (t.end_m, ne_length)))
+                     AND ( p_whole_only = 'TRUE' and not exists ( select 1 from nm_locations l
+                                      where l.nm_ne_id_in = m.nm_ne_id_in
+                                      and l.nm_obj_type = m.nm_obj_type
+                                      and l.nm_ne_id_of not in ( select refnt from table (p_refnt_tab ) t))
+                     OR p_whole_only = 'FALSE' )               
             UNION ALL
             SELECT lb_RPt (
                       nm_ne_id_of,
@@ -201,7 +212,7 @@ AS
                             END
                       END,
                       nt_length_unit)
-              FROM nm_locations_all,
+              FROM nm_locations_all m,
                    nm_linear_types,
                    nm_elements,
                    nm_types,
@@ -220,7 +231,12 @@ AS
                             AND nm_end_mp > NVL (t.start_m, 0))
                         OR (    nm_begin_mp = nm_end_mp
                             AND nm_begin_mp BETWEEN NVL (t.start_m, 0)
-                                                AND NVL (t.end_m, ne_length)));
+                                                AND NVL (t.end_m, ne_length)))
+                     AND ( p_whole_only = 'TRUE' and not exists ( select 1 from nm_locations l
+                                      where l.nm_ne_id_in = m.nm_ne_id_in
+                                      and l.nm_obj_type = m.nm_obj_type
+                                      and l.nm_ne_id_of not in ( select refnt from table (p_refnt_tab ) t))
+                     OR p_whole_only = 'FALSE' );
          END;
       END IF;
 
@@ -572,6 +588,8 @@ AS
                             p_end_m         IN NUMBER,
                             p_intsct        IN VARCHAR DEFAULT 'FALSE',
                             p_m_unit        IN INTEGER,
+                            p_lb_only       IN VARCHAR2 DEFAULT 'FALSE',
+                            p_whole_only    IN VARCHAR2 DEFAULT 'FALSE',
                             p_cardinality   IN INTEGER)
       RETURN lb_RPt_tab
    IS
@@ -607,6 +625,8 @@ AS
                                        p_m_unit)),
                    p_obj_type,
                    p_intsct,
+                   p_lb_only,
+                   p_whole_only,
                    20)
            INTO retval
            FROM nm_elements
@@ -625,6 +645,8 @@ AS
                                                          p_m_unit))),
                    p_obj_type,
                    p_intsct,
+                   p_lb_only,
+                   p_whole_only,
                    20)
            INTO retval
            FROM DUAL;
@@ -876,6 +898,8 @@ end;
                                 P_END_M,
                                 P_INTSCT,
                                 P_M_UNIT,
+                                'FALSE',
+                                'FALSE',
                                 P_CARDINALITY);
 
       OPEN retval FOR l_str USING t1;
