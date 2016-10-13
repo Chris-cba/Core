@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY nm3wrap AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3wrap.pkb-arc   2.3   Jul 13 2016 10:56:24   Chris.Baugh  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3wrap.pkb-arc   2.4   Oct 13 2016 14:51:46   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm3wrap.pkb  $
---       Date into PVCS   : $Date:   Jul 13 2016 10:56:24  $
---       Date fetched Out : $Modtime:   Jul 07 2016 11:52:24  $
---       Version          : $Revision:   2.3  $
+--       Date into PVCS   : $Date:   Oct 13 2016 14:51:46  $
+--       Date fetched Out : $Modtime:   Oct 13 2016 09:24:08  $
+--       Version          : $Revision:   2.4  $
 --       Based on SCCS version : 1.19
 ------------------------------------------------------------------
 --   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
@@ -21,7 +21,7 @@ CREATE OR REPLACE PACKAGE BODY nm3wrap AS
 --
 ------------------------------------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '$Revision:   2.3  $';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '$Revision:   2.4  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3wrap';
@@ -231,7 +231,7 @@ BEGIN
   CLOSE c2;
   --
   po_poe_type               := lv_poe_type;
-  po_poe                    := lv_poe;
+  po_poe                    := NVL(lv_poe,0);
   po_intersecting_road_name := lv_intersecting_road;
   --
 END get_node_details;
