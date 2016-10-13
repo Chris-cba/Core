@@ -4,11 +4,11 @@ IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3undo.pkb-arc   2.18.1.2   Jul 28 2016 13:54:38   Chris.Baugh  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3undo.pkb-arc   2.18.1.3   Oct 13 2016 14:56:44   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm3undo.pkb  $
---       Date into PVCS   : $Date:   Jul 28 2016 13:54:38  $
---       Date fetched Out : $Modtime:   Jul 28 2016 13:16:44  $
---       PVCS Version     : $Revision:   2.18.1.2  $
+--       Date into PVCS   : $Date:   Oct 13 2016 14:56:44  $
+--       Date fetched Out : $Modtime:   Oct 13 2016 14:37:12  $
+--       PVCS Version     : $Revision:   2.18.1.3  $
 --
 --   Author : ITurnbull
 --
@@ -19,7 +19,7 @@ IS
 -- Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '"$Revision:   2.18.1.2  $"';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '"$Revision:   2.18.1.3  $"';
 --  g_body_sccsid is the SCCS ID for the package body
    g_package_name   CONSTANT VARCHAR2 (2000) := 'nm3undo';
 --
@@ -1934,14 +1934,11 @@ END undo_scheme;
       CURSOR c_check_parent (c_ne_id nm_elements.ne_id%TYPE)
       IS
          SELECT 1
-           FROM nm_elements
-          WHERE ne_id =
-                   Nm3net.get_parent_ne_id
-                          (c_ne_id,
-                           Nm3net.get_parent_type (Nm3net.Get_Nt_Type (c_ne_id)
-                                                  )
-                          );
-
+           FROM nm_members_all
+               ,nm_elements_all 
+          WHERE ne_id = nm_ne_id_in 
+            AND nm_ne_id_of = c_ne_id
+            AND ne_end_date IS NOT NULL;
 --
       l_parent_exists           NUMBER (1);
 --
@@ -1998,7 +1995,7 @@ END undo_scheme;
          FETCH c_check_parent
           INTO l_parent_exists;
 
-         IF c_check_parent%NOTFOUND
+         IF c_check_parent%FOUND
          THEN
             RAISE_APPLICATION_ERROR
                        (-20002,
@@ -2014,88 +2011,7 @@ END undo_scheme;
          THEN
             NULL;
       END;
---
---    unclose any nodes that underpin the elements.
-
-      UPDATE NM_NODES_ALL
-           SET no_end_date = NULL
-        WHERE no_node_id in ( select ne_no_start
-                               from nm_elements_all
-                               where ne_id = p_ne_id
-                               union
-                               select ne_no_end
-                               from nm_elements_all
-                               where ne_id = p_ne_id
-                             );
---   unclose element
-      UPDATE nm_elements_all
-         SET ne_end_date = NULL
-       WHERE ne_id = p_ne_id;
---
---  Remove element close history
---
-      DELETE nm_element_history
-       WHERE neh_ne_id_new = p_ne_id
-         AND neh_ne_id_old = p_ne_id
-         AND neh_operation = 'C';
---
-      undo_other_products (p_ne_id_1        => p_ne_id
-                          ,p_operation      => c_close
-                          ,p_op_date        => v_close_date
-                          );
-
---
--- unclose the groups
-      DECLARE
-         CURSOR cs_nmh (
-            c_nmh_ne_id_of_new   nm_members.nm_ne_id_of%TYPE,
-            c_nmh_ne_id_of_old   nm_members.nm_ne_id_of%TYPE
-         )
-         IS
-            SELECT nmh_nm_ne_id_in, nmh_nm_ne_id_of_old, nmh_nm_begin_mp,
-                   nmh_nm_start_date, nmh_nm_end_date, nmh_nm_type
-              FROM NM_MEMBER_HISTORY
-             WHERE (nmh_nm_ne_id_of_new = c_nmh_ne_id_of_new
-               AND nmh_nm_ne_id_of_old = c_nmh_ne_id_of_old);
-
-         l_tab_ne_id_in     Nm3type.tab_number;
-         l_tab_ne_id_of     Nm3type.tab_number;
-         l_tab_begin_mp     Nm3type.tab_number;
-         l_tab_start_date   Nm3type.tab_date;
-         l_tab_end_date     Nm3type.tab_date;
-         l_tab_nm_type      Nm3type.tab_varchar4;
-      --
-      BEGIN
-         OPEN cs_nmh (p_ne_id, p_ne_id);
-
-         FETCH cs_nmh
-         BULK COLLECT INTO l_tab_ne_id_in, l_tab_ne_id_of, l_tab_begin_mp,
-                l_tab_start_date, l_tab_end_date, l_tab_nm_type;
-
-         CLOSE cs_nmh;
-
-         -- Un-end date any inventory
-         FORALL i IN 1 .. l_tab_ne_id_in.COUNT
-            UPDATE NM_INV_ITEMS_ALL
-               SET iit_end_date =
-                      DECODE (GREATEST (NVL (l_tab_end_date (i),
-                                             Nm3type.c_big_date
-                                            ),
-                                        iit_end_date
-                                       ),
-                              Nm3type.c_big_date, NULL,
-                              GREATEST (l_tab_end_date (i), iit_end_date)
-                             )
-             WHERE iit_ne_id = l_tab_ne_id_in (i) AND l_tab_nm_type (i) = 'I';
-         -- Un-end date the membership records
-         FORALL i IN 1 .. l_tab_ne_id_in.COUNT
-            UPDATE NM_MEMBERS_ALL
-               SET nm_end_date = l_tab_end_date (i)
-             WHERE nm_ne_id_in = l_tab_ne_id_in (i)
-               AND nm_ne_id_of = l_tab_ne_id_of (i)
-               AND nm_begin_mp = l_tab_begin_mp (i)
-               AND nm_start_date = l_tab_start_date (i);
-      END;
+      
 -- Task 0111307 CWS code block added to undo the closures to a groups
 -- unclose the children
       IF NM3GET.GET_NE_ALL(PI_NE_ID => p_ne_id).NE_TYPE IN ('P','G') AND
@@ -2192,6 +2108,88 @@ END undo_scheme;
 
      END IF;
       -- Task 0111307 End
+--
+--    unclose any nodes that underpin the elements.
+
+      UPDATE NM_NODES_ALL
+           SET no_end_date = NULL
+        WHERE no_node_id in ( select ne_no_start
+                               from nm_elements_all
+                               where ne_id = p_ne_id
+                               union
+                               select ne_no_end
+                               from nm_elements_all
+                               where ne_id = p_ne_id
+                             );
+--   unclose element
+      UPDATE nm_elements_all
+         SET ne_end_date = NULL
+       WHERE ne_id = p_ne_id;
+--
+--  Remove element close history
+--
+      DELETE nm_element_history
+       WHERE neh_ne_id_new = p_ne_id
+         AND neh_ne_id_old = p_ne_id
+         AND neh_operation = 'C';
+--
+      undo_other_products (p_ne_id_1        => p_ne_id
+                          ,p_operation      => c_close
+                          ,p_op_date        => v_close_date
+                          );
+
+--
+-- unclose the groups
+      DECLARE
+         CURSOR cs_nmh (
+            c_nmh_ne_id_of_new   nm_members.nm_ne_id_of%TYPE,
+            c_nmh_ne_id_of_old   nm_members.nm_ne_id_of%TYPE
+         )
+         IS
+            SELECT nmh_nm_ne_id_in, nmh_nm_ne_id_of_old, nmh_nm_begin_mp,
+                   nmh_nm_start_date, nmh_nm_end_date, nmh_nm_type
+              FROM NM_MEMBER_HISTORY
+             WHERE (nmh_nm_ne_id_of_new = c_nmh_ne_id_of_new
+               AND nmh_nm_ne_id_of_old = c_nmh_ne_id_of_old);
+
+         l_tab_ne_id_in     Nm3type.tab_number;
+         l_tab_ne_id_of     Nm3type.tab_number;
+         l_tab_begin_mp     Nm3type.tab_number;
+         l_tab_start_date   Nm3type.tab_date;
+         l_tab_end_date     Nm3type.tab_date;
+         l_tab_nm_type      Nm3type.tab_varchar4;
+      --
+      BEGIN
+         OPEN cs_nmh (p_ne_id, p_ne_id);
+
+         FETCH cs_nmh
+         BULK COLLECT INTO l_tab_ne_id_in, l_tab_ne_id_of, l_tab_begin_mp,
+                l_tab_start_date, l_tab_end_date, l_tab_nm_type;
+
+         CLOSE cs_nmh;
+
+         -- Un-end date any inventory
+         FORALL i IN 1 .. l_tab_ne_id_in.COUNT
+            UPDATE NM_INV_ITEMS_ALL
+               SET iit_end_date =
+                      DECODE (GREATEST (NVL (l_tab_end_date (i),
+                                             Nm3type.c_big_date
+                                            ),
+                                        iit_end_date
+                                       ),
+                              Nm3type.c_big_date, NULL,
+                              GREATEST (l_tab_end_date (i), iit_end_date)
+                             )
+             WHERE iit_ne_id = l_tab_ne_id_in (i) AND l_tab_nm_type (i) = 'I';
+         -- Un-end date the membership records
+         FORALL i IN 1 .. l_tab_ne_id_in.COUNT
+            UPDATE NM_MEMBERS_ALL
+               SET nm_end_date = l_tab_end_date (i)
+             WHERE nm_ne_id_in = l_tab_ne_id_in (i)
+               AND nm_ne_id_of = l_tab_ne_id_of (i)
+               AND nm_begin_mp = l_tab_begin_mp (i)
+               AND nm_start_date = l_tab_start_date (i);
+      END;
       --
 --RC> Problems here - code has been uncommented since group members and assets were not being unlcosed.      
 --    Also, added the v_close_date below because otherwise, a member that was closed at the max date (not at the close date of the element) would be unclosed!      --
