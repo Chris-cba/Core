@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm_inv_sdo_aggr
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm_inv_sdo_aggr.pkb-arc   1.7   Jul 19 2016 09:46:28   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm_inv_sdo_aggr.pkb-arc   1.8   Oct 14 2016 18:30:44   Rob.Coupe  $
    --       Module Name      : $Workfile:   nm_inv_sdo_aggr.pkb  $
-   --       Date into PVCS   : $Date:   Jul 19 2016 09:46:28  $
-   --       Date fetched Out : $Modtime:   Jul 19 2016 09:42:42  $
-   --       PVCS Version     : $Revision:   1.7  $
+   --       Date into PVCS   : $Date:   Oct 14 2016 18:30:44  $
+   --       Date fetched Out : $Modtime:   Oct 14 2016 18:30:02  $
+   --       PVCS Version     : $Revision:   1.8  $
    --
    --   Author : R.A. Coupe
    --
@@ -78,7 +78,7 @@ AS
 
    --
 
-   g_body_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.7  $';
+   g_body_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.8  $';
 
    nit_not_found            PLS_INTEGER := -20002;
 
@@ -709,7 +709,7 @@ AS
                             THEN
                                ' and nm_ne_id_in = ' || pi_inv_id || ' '
                          END
-                      || ' and shape is not null '
+--                      || ' and shape is not null '
                          sql_text
                  FROM DUAL)
       SELECT LISTAGG (sql_text, ' UNION ALL ')
