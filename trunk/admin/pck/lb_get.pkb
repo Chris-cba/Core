@@ -1,13 +1,12 @@
-/* Formatted on 06/10/2016 14:32:36 (QP5 v5.294) */
 CREATE OR REPLACE PACKAGE BODY lb_get
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_get.pkb-arc   1.17   Oct 07 2016 14:13:44   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_get.pkb-arc   1.18   Oct 18 2016 16:18:38   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_get.pkb  $
-   --       Date into PVCS   : $Date:   Oct 07 2016 14:13:44  $
-   --       Date fetched Out : $Modtime:   Oct 06 2016 16:14:36  $
-   --       PVCS Version     : $Revision:   1.17  $
+   --       Date into PVCS   : $Date:   Oct 18 2016 16:18:38  $
+   --       Date fetched Out : $Modtime:   Oct 18 2016 16:18:00  $
+   --       PVCS Version     : $Revision:   1.18  $
    --
    --   Author : R.A. Coupe
    --
@@ -17,7 +16,7 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.17  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.18  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_get';
 
@@ -162,7 +161,8 @@ AS
                    nm_elements,
                    nm_types,
                    TABLE (p_refnt_tab) t
-             WHERE     nm_ne_id_of = ne_id
+             WHERE p_lb_only = 'FALSE'
+                   AND nm_ne_id_of = ne_id
                    AND t.refnt = ne_id
                    AND ne_nt_type = nlt_nt_type
                    AND NVL (ne_gty_group_type, '£$%"') =
@@ -207,7 +207,7 @@ AS
                             nm_end_mp
                          ELSE
                             CASE
-                               WHEN (nm_end_mp >= t.end_m) THEN t.start_m
+                               WHEN (nm_end_mp >= t.end_m) THEN t.end_m
                                ELSE nm_end_mp
                             END
                       END,
@@ -960,14 +960,24 @@ end;
    END;
 
    --
-   FUNCTION get_lb_RPt_r_tab (p_lb_RPt_tab        IN lb_RPt_tab,
+FUNCTION get_lb_RPt_r_tab (p_lb_RPt_tab        IN lb_RPt_tab,
                               p_linear_obj_type   IN VARCHAR2,
                               p_cardinality       IN INTEGER DEFAULT NULL)
       RETURN lb_RPt_tab
    IS
       retval         lb_RPt_tab;
       l_refnt_type   nm_linear_types%ROWTYPE;
+      l_round        integer;
    BEGIN
+      select * into l_refnt_type from nm_linear_types where nlt_g_i_d = 'G' and nlt_gty_type = p_linear_obj_type;
+      
+      select case instr( un_format_mask, '.') 
+               when 0 then 0
+               else nvl(length(substr(un_format_mask, instr( un_format_mask, '.')+1)),0)  
+             end
+      into l_round
+      from nm_units where un_unit_id = l_refnt_type.nlt_units; 
+      --
       -- just going up the hierarchy to aggregate the data according to linear type
       WITH itab
            AS (SELECT t.*
@@ -981,16 +991,16 @@ end;
                      1,
                      start_m,
                      end_m,
-                     m_unit)
+                     unit_m)
         BULK COLLECT INTO retval
         FROM (  SELECT route_id refnt,
-                       1 refnt_type,
+                       l_refnt_type.nlt_id refnt_type,
                        inv_type obj_type,
                        inv_id obj_id,
                        inv_segment_id seg_id,
-                       INV_START_SLK start_m,
-                       inv_end_slk end_m,
-                       1 m_unit
+                       round(INV_START_SLK, l_round) start_m,
+                       round(inv_end_slk, l_round) end_m,
+                       l_refnt_type.nlt_units unit_m
                   FROM (SELECT route_id,
                                l.inv_id,
                                l.inv_segment_id,
@@ -1015,7 +1025,8 @@ end;
                                   nm_seg_no)
                                OVER (
                                   PARTITION BY route_id, inv_id, inv_segment_id)
-                                  end_seg
+                                  end_seg,
+                               datum_unit
                           FROM (SELECT k.*,
                                          --sum( conn_flag ) over (order by nm_seg_no, nm_seq_no rows between unbounded preceding and current row ) as segment_id,
                                          SUM (
@@ -1253,7 +1264,8 @@ end;
                                                                         itab.start_m
                                                                            datum_st,
                                                                         itab.end_m
-                                                                           datum_end
+                                                                           datum_end,
+                                                                        itab.m_unit datum_unit
                                                                    FROM itab) --nm_members where nm_ne_id_of in ( select nm_ne_id_of from nm_members c where c.nm_ne_id_in = 1887))
                                                           SELECT i.*,
                                                                  m.nm_ne_id_in
@@ -1335,22 +1347,23 @@ end;
                                                                  DECODE (
                                                                     nm_cardinality,
                                                                     1, (  nm_slk
-                                                                        + datum_st),
+                                                                        + datum_st * uc_conversion_factor),
                                                                     -1, (  nm_slk
                                                                          + (  ne_length
-                                                                            - datum_end)))
+                                                                            - datum_end) * uc_conversion_factor))
                                                                     start_slk,
                                                                  DECODE (
                                                                     nm_cardinality,
-                                                                    1, (  nm_slk
-                                                                        + datum_end),
+                                                                    1, (  nm_slk 
+                                                                        + datum_end * uc_conversion_factor),
                                                                     -1, (  nm_slk
                                                                          + (  ne_length
-                                                                            - datum_st)))
+                                                                            - datum_st) * uc_conversion_factor))
                                                                     end_slk
                                                             FROM INV_IDS i,
                                                                  nm_members m,
-                                                                 nm_elements e
+                                                                 nm_elements e,
+                                                                 nm_unit_conversions
                                                            WHERE     nm_obj_type =
                                                                         NVL (
                                                                            p_linear_obj_type,
@@ -1365,6 +1378,8 @@ end;
                                                                         e.ne_id
                                                                  AND nm_ne_id_of =
                                                                         datum_id
+                                                                 AND uc_unit_id_out = l_refnt_type.nlt_units
+                                                                 AND uc_unit_id_in = i.datum_unit
                                                         ORDER BY m.nm_ne_id_in,
                                                                  nm_seg_no,
                                                                  nm_seq_no,
@@ -1381,13 +1396,15 @@ end;
                        inv_start_slk,
                        inv_end_slk,
                        start_seg,
-                       end_seg
+                       end_seg,
+                       datum_unit
               ORDER BY route_id, inv_start_slk);
 
       RETURN retval;
    END;
 
-   FUNCTION get_lb_RPt_D_tab (p_lb_RPt_tab IN lb_RPt_tab)
+
+FUNCTION get_lb_RPt_D_tab (p_lb_RPt_tab IN lb_RPt_tab)
       RETURN lb_RPt_tab
    IS
       retval         lb_RPt_tab;
@@ -1406,7 +1423,7 @@ end;
                      dir_flag,
                      start_m,
                      end_m,
-                     m_unit)
+                     datum_unit)
         BULK COLLECT INTO retval
         FROM (SELECT datum_ne_id refnt,
                      refnt_type,
@@ -1417,7 +1434,7 @@ end;
                      route_dir_flag dir_flag,
                      inv_datum_start start_m,
                      inv_datum_end end_m,
-                     1 m_unit
+                     datum_unit
                 FROM (SELECT t1."SECTION_ID",
                              t1."NM_SEQ_NO",
                              t1."NM_SEG_NO",
@@ -1435,18 +1452,22 @@ end;
                              t1."INV_END",
                              t1."NE_LENGTH",
                              t1.ne_nt_type,
-                             CASE route_dir_flag
-                                WHEN 1 THEN inv_start
-                                ELSE ne_length - inv_end
-                             END
-                                inv_datum_start,
-                             CASE route_dir_flag
-                                WHEN 1 THEN inv_end
-                                ELSE ne_length - inv_start
-                             END
-                                inv_datum_end,
-                             refnt_type
-                        FROM (  SELECT rm.nm_ne_id_in section_id,
+                             round(inv_start, 2) inv_datum_start,
+--                             round(CASE route_dir_flag
+--                                WHEN 1 THEN inv_start
+--                                ELSE ne_length - inv_end
+--                             END, 2 )
+--                                inv_datum_start,
+                             round(inv_end, 2) inv_datum_end,
+--                             round(CASE route_dir_flag
+--                                WHEN 1 THEN inv_end
+--                                ELSE ne_length  - inv_start
+--                             END, 2)
+--                                inv_datum_end,
+                             refnt_type,
+                             datum_unit
+                        FROM (  
+                        SELECT rm.nm_ne_id_in section_id,
                                        rm.nm_seq_no,
                                        rm.nm_seg_no,
                                        rm.nm_ne_id_of datum_ne_id,
@@ -1459,21 +1480,37 @@ end;
                                        im.obj_type,
                                        im.start_m,
                                        im.end_m,
-                                         GREATEST (nvl(im.start_m,rm.nm_slk), rm.nm_slk)
-                                       - rm.nm_slk
-                                       + rm.nm_begin_mp
-                                          inv_start,
-                                         LEAST (nvl(im.end_m, rm.nm_end_slk), rm.nm_end_slk)
-                                       - rm.nm_slk
-                                       + rm.nm_begin_mp
-                                          inv_end,
+                                       case rm.nm_cardinality
+                                          when 1 then
+                                            case when im.start_m >= nm_slk then ( start_m - nm_slk )/nvl(uc_conversion_factor,1) + nm_begin_mp
+                                            else nm_begin_mp
+                                          end
+                                       else
+                                            case when im.end_m >= nm_end_slk then nm_begin_mp
+                                            else ne_length - (end_m - nm_slk)/nvl(uc_conversion_factor,1) + nm_begin_mp
+                                          end
+                                        end inv_start,
+                                        case rm.nm_cardinality
+                                           when 1 then
+                                              case when end_m >= nm_end_slk then nm_end_mp
+                                              else ( end_m - nm_slk )/nvl(uc_conversion_factor,1) + nm_begin_mp
+                                              end
+                                           else
+                                              case when start_m <= nm_slk then nm_end_mp
+                                              else ne_length - ( start_m - nm_slk ) /nvl(uc_conversion_factor,1)
+                                           end
+                                        end inv_end,                                       
                                        e.ne_length,
                                        e.ne_nt_type,
-                                       nlt_id refnt_type
+                                       nlt_id refnt_type,
+                                       nlt_units datum_unit,
+                                       im.m_unit group_unit,
+                                       nvl(uc_conversion_factor, 1)
                                   FROM itab im,
                                        nm_members rm,
                                        nm_elements e,
-                                       nm_linear_types l
+                                       nm_linear_types l,
+                                       nm_unit_conversions                                     
                                  WHERE     e.ne_id = rm.nm_ne_id_of
                                        AND l.nlt_g_i_d = 'D'
                                        AND l.nlt_nt_type = ne_nt_type
@@ -1484,7 +1521,9 @@ end;
                                             OR (    nvl(im.start_m,0) = nvl(im.end_m, 0)
                                                 AND nvl(im.end_m, rm.nm_end_slk) <= rm.nm_end_slk
                                                 AND nvl(im.start_m, rm.nm_slk) >= rm.nm_slk))
-                              ORDER BY rm.nm_seg_no, rm.nm_seq_no, im.start_m)
+                                 AND UC_UNIT_ID_IN (+) = nlt_units
+                                 AND UC_UNIT_ID_OUT (+) = m_unit
+                              ORDER BY rm.nm_seg_no, rm.nm_seq_no, im.start_m )
                              t1));
 
       RETURN retval;
