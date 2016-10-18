@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_get
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_get.pkb-arc   1.18   Oct 18 2016 16:18:38   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_get.pkb-arc   1.19   Oct 18 2016 16:40:46   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_get.pkb  $
-   --       Date into PVCS   : $Date:   Oct 18 2016 16:18:38  $
-   --       Date fetched Out : $Modtime:   Oct 18 2016 16:18:00  $
-   --       PVCS Version     : $Revision:   1.18  $
+   --       Date into PVCS   : $Date:   Oct 18 2016 16:40:46  $
+   --       Date fetched Out : $Modtime:   Oct 18 2016 16:39:20  $
+   --       PVCS Version     : $Revision:   1.19  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,7 +16,7 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.18  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.19  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_get';
 
@@ -992,6 +992,7 @@ FUNCTION get_lb_RPt_r_tab (p_lb_RPt_tab        IN lb_RPt_tab,
                      start_m,
                      end_m,
                      unit_m)
+
         BULK COLLECT INTO retval
         FROM (  SELECT route_id refnt,
                        l_refnt_type.nlt_id refnt_type,
@@ -1001,6 +1002,8 @@ FUNCTION get_lb_RPt_r_tab (p_lb_RPt_tab        IN lb_RPt_tab,
                        round(INV_START_SLK, l_round) start_m,
                        round(inv_end_slk, l_round) end_m,
                        l_refnt_type.nlt_units unit_m
+
+
                   FROM (SELECT route_id,
                                l.inv_id,
                                l.inv_segment_id,
@@ -1347,18 +1350,18 @@ FUNCTION get_lb_RPt_r_tab (p_lb_RPt_tab        IN lb_RPt_tab,
                                                                  DECODE (
                                                                     nm_cardinality,
                                                                     1, (  nm_slk
-                                                                        + datum_st * uc_conversion_factor),
+                                                                        + datum_st * nvl(uc_conversion_factor,1)),
                                                                     -1, (  nm_slk
                                                                          + (  ne_length
-                                                                            - datum_end) * uc_conversion_factor))
+                                                                            - datum_end) * nvl(uc_conversion_factor,1)))
                                                                     start_slk,
                                                                  DECODE (
                                                                     nm_cardinality,
                                                                     1, (  nm_slk 
-                                                                        + datum_end * uc_conversion_factor),
+                                                                        + datum_end * nvl(uc_conversion_factor,1)),
                                                                     -1, (  nm_slk
                                                                          + (  ne_length
-                                                                            - datum_st) * uc_conversion_factor))
+                                                                            - datum_st) * nvl(uc_conversion_factor,1)))
                                                                     end_slk
                                                             FROM INV_IDS i,
                                                                  nm_members m,
@@ -1378,8 +1381,8 @@ FUNCTION get_lb_RPt_r_tab (p_lb_RPt_tab        IN lb_RPt_tab,
                                                                         e.ne_id
                                                                  AND nm_ne_id_of =
                                                                         datum_id
-                                                                 AND uc_unit_id_out = l_refnt_type.nlt_units
-                                                                 AND uc_unit_id_in = i.datum_unit
+                                                                 AND uc_unit_id_out (+) = l_refnt_type.nlt_units
+                                                                 AND uc_unit_id_in (+) = i.datum_unit
                                                         ORDER BY m.nm_ne_id_in,
                                                                  nm_seg_no,
                                                                  nm_seq_no,
