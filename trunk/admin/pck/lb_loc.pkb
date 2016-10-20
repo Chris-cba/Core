@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_loc
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_loc.pkb-arc   1.3   Oct 19 2016 14:14:22   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_loc.pkb-arc   1.4   Oct 20 2016 13:44:16   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_loc.pkb  $
-   --       Date into PVCS   : $Date:   Oct 19 2016 14:14:22  $
-   --       Date fetched Out : $Modtime:   Oct 19 2016 14:13:48  $
-   --       PVCS Version     : $Revision:   1.3  $
+   --       Date into PVCS   : $Date:   Oct 20 2016 13:44:16  $
+   --       Date fetched Out : $Modtime:   Oct 20 2016 13:43:38  $
+   --       PVCS Version     : $Revision:   1.4  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,7 +16,7 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.3  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.4  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_loc';
 
@@ -411,6 +411,66 @@ AS
       retval   SYS_REFCURSOR;
    BEGIN
       retval := NULL;
+      RETURN retval;
+   END;
+
+   FUNCTION xsps_for_asset_location (p_lb_rpt_tab      IN lb_rpt_tab,
+                                     p_exor_inv_type   IN VARCHAR2)
+      RETURN lb_xsp_tab
+   IS
+      retval   lb_xsp_tab;
+   BEGIN
+      --
+      SELECT CAST (COLLECT (lb_xsp (xsp, xsp_descr)) AS lb_xsp_tab)
+        INTO retval
+        FROM (SELECT DISTINCT xsr_x_sect_value xsp, xsr_descr xsp_descr
+                FROM (WITH datum_range
+                           AS (SELECT t1.*,
+                                      SUM (1) OVER (PARTITION BY 1)
+                                         datum_count
+                                 FROM (SELECT /*+materialise*/
+                                             * FROM TABLE (p_lb_rpt_tab)) t1)
+                        SELECT ne_id,
+                               ne_nt_type,
+                               ne_sub_class,
+                               xsr_x_sect_value,
+                               xsr_descr,
+                               COUNT (
+                                  1)
+                               OVER (
+                                  PARTITION BY ne_sub_class, xsr_x_sect_value)
+                                  sc_count,
+                               datum_count
+                          FROM (SELECT d.ne_id,
+                                       d.ne_nt_type,
+                                       d.ne_gty_group_type,
+                                       d.ne_sub_class,
+                                       datum_count
+                                  FROM nm_elements d, datum_range
+                                 WHERE refnt = ne_id
+                                --and ne_sub_class is not null
+                                UNION ALL
+                                SELECT /*+INDEX(m nm_obj_type_ne_id_of_ind) */
+                                      nm_ne_id_of,
+                                       g.ne_nt_type,
+                                       g.ne_gty_group_type,
+                                       g.ne_sub_class,
+                                       datum_count
+                                  FROM nm_members m, nm_elements g, datum_range
+                                 WHERE     nm_ne_id_of = refnt
+                                       AND nm_ne_id_in = g.ne_id
+                                       AND nm_obj_type = g.ne_gty_group_type --and g.ne_sub_class is not null
+                                                                            ) t,
+                               xsp_restraints
+                         WHERE     xsr_nw_type(+) = ne_nt_type
+                               AND xsr_scl_class(+) = ne_sub_class
+                               AND xsr_ity_inv_code = p_exor_inv_type
+                      ORDER BY ne_id,
+                               ne_nt_type,
+                               ne_sub_class,
+                               xsr_x_sect_value)
+               WHERE sc_count = datum_count);
+
       RETURN retval;
    END;
 END lb_loc;
