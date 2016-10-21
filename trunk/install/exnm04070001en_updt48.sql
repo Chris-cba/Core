@@ -1,10 +1,10 @@
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/lb/install/exnm04070001en_updt48.sql-arc   1.0   Oct 21 2016 13:46:30   Rob.Coupe  $
+--       sccsid           : $Header:   //new_vm_latest/archives/lb/install/exnm04070001en_updt48.sql-arc   1.1   Oct 21 2016 14:29:40   Rob.Coupe  $
 --       Module Name      : $Workfile:   exnm04070001en_updt48.sql  $ 
---       Date into PVCS   : $Date:   Oct 21 2016 13:46:30  $
---       Date fetched Out : $Modtime:   Oct 21 2016 13:21:50  $
---       PVCS Version     : $Revision:   1.0  $
+--       Date into PVCS   : $Date:   Oct 21 2016 14:29:40  $
+--       Date fetched Out : $Modtime:   Oct 21 2016 14:10:52  $
+--       PVCS Version     : $Revision:   1.1  $
 --
 ----------------------------------------------------------------------------
 --   Copyright (c) 2015 Bentley Systems Incorporated.  All rights reserved.
@@ -158,9 +158,9 @@ prompt package lb_load.pkh
 
 start .\admin\pck\lb_load.pkh;
 
-prompt package lb_load.pkh
+prompt package lb_loc.pkh
 
-start .\admin\pck\lb_load.pkh;
+start .\admin\pck\lb_loc.pkh;
 
 
 --
@@ -186,9 +186,9 @@ prompt package lb_load.pkb
 
 start .\admin\pck\lb_load.pkb;
 
-prompt package lb_load.pkb
+prompt package lb_loc.pkb
 
-start .\admin\pck\lb_load.pkb;
+start .\admin\pck\lb_loc.pkb;
 
 --------------------------------------------------------------------------------
 -- Update hig_upgrades with fix ID
