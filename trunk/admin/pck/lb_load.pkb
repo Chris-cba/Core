@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_load
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_load.pkb-arc   1.18   Oct 04 2016 14:03:50   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_load.pkb-arc   1.19   Oct 26 2016 16:05:56   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_load.pkb  $
-   --       Date into PVCS   : $Date:   Oct 04 2016 14:03:50  $
-   --       Date fetched Out : $Modtime:   Oct 04 2016 14:02:40  $
-   --       PVCS Version     : $Revision:   1.18  $
+   --       Date into PVCS   : $Date:   Oct 26 2016 16:05:56  $
+   --       Date fetched Out : $Modtime:   Oct 26 2016 16:04:48  $
+   --       PVCS Version     : $Revision:   1.19  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,7 +16,7 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.18  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.19  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_load';
 
@@ -145,6 +145,9 @@ AS
       l_g_i_d      VARCHAR2 (1);
       l_load_tab   lb_rpt_tab;
 	  l_pnt_or_cont varchar2(1);
+	  l_start number;
+	  l_end   number;
+	  l_unit integer;
    BEGIN
       --
       IF pi_g_i_d IS NULL
@@ -159,16 +162,25 @@ AS
 
 	  select nit_pnt_or_cont into l_pnt_or_cont
 	  from nm_inv_types where nit_inv_type = pi_nal_nit_type;
-      
+
       if pi_start_m is null then
         raise_application_error (-20001, 'Start measure must be specified' );
       end if;
-      
+
       if l_pnt_or_cont = 'P' and pi_start_m <> nvl(pi_end_m, pi_start_m) then
          raise_application_error( -20001, 'The start and end measures must be the same for point asset types');
       elsif l_pnt_or_cont = 'C' and pi_start_m >= pi_end_m then
          raise_application_error (-20002, 'The end measure must be greater than the start measure' );
       end if;
+      
+      select pi_start_m*nvl(uc_conversion_factor,1), pi_end_m*nvl(uc_conversion_factor,1), nlt_units
+      into l_start, l_end, l_unit
+      from nm_unit_conversions, nm_linear_types, nm_elements
+      where nlt_units = uc_unit_id_out
+      and  uc_unit_id_in = pi_unit 
+      and ne_id = pi_refnt
+      and nlt_nt_type = ne_nt_type
+      and nvl(ne_gty_group_type, '%^&*') = nvl(nlt_gty_type, '%^&*');
       --
       IF l_g_i_d = 'D'
       THEN
@@ -181,9 +193,9 @@ AS
                                                                NULL,
                                                                NULL,
                                                                1,
-                                                               pi_start_m,
-                                                               pi_end_m,
-                                                               pi_unit)),
+                                                               l_start,
+                                                               l_end,
+                                                               l_unit)),
                                            10),
                   pi_nal_id,
                   pi_start_date,
@@ -201,9 +213,9 @@ AS
                                                                   NULL,
                                                                   NULL,
                                                                   1,
-                                                                  pi_start_m,
-                                                                  pi_end_m,
-                                                                  pi_unit))),
+                                                                  l_start,
+                                                                  l_end,
+                                                                  l_unit))),
                                            10),
                   pi_nal_id,
                   pi_start_date,
@@ -757,8 +769,9 @@ AS
                              V_LB_NLT_GEOMETRY
                        WHERE     nm_ne_id_of = ne_id
                              AND l.nm_ne_id_in = d.nm_ne_id_in
-                    GROUP BY nal_asset_id, start_date, end_date)
-             WHERE geoloc IS NOT NULL;
+--                             and geoloc is not null
+                    GROUP BY nal_asset_id, start_date, end_date);
+--             WHERE geoloc IS NOT NULL;
       END;
    END;
 
