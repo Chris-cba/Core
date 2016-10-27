@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_load
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_load.pkb-arc   1.20   Oct 26 2016 18:06:12   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_load.pkb-arc   1.21   Oct 27 2016 13:42:28   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_load.pkb  $
-   --       Date into PVCS   : $Date:   Oct 26 2016 18:06:12  $
-   --       Date fetched Out : $Modtime:   Oct 26 2016 18:05:00  $
-   --       PVCS Version     : $Revision:   1.20  $
+   --       Date into PVCS   : $Date:   Oct 27 2016 13:42:28  $
+   --       Date fetched Out : $Modtime:   Oct 27 2016 13:42:20  $
+   --       PVCS Version     : $Revision:   1.21  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,7 +16,7 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.20  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.21  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_load';
 
@@ -769,6 +769,10 @@ AS
                              V_LB_NLT_GEOMETRY
                        WHERE     nm_ne_id_of = ne_id
                              AND l.nm_ne_id_in = d.nm_ne_id_in
+                             AND l.nm_obj_type = pi_obj_type
+                             and l.nm_start_date < end_date
+                             and l.nm_end_date > start_date
+                             AND l.nm_nlt_id = g.nlt_id                             							 
 --                             and geoloc is not null
                     GROUP BY nal_asset_id, start_date, end_date)
              WHERE geoloc IS NOT NULL;
