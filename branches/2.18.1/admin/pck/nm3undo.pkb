@@ -4,11 +4,11 @@ IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3undo.pkb-arc   2.18.1.3   Oct 13 2016 14:56:44   Chris.Baugh  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3undo.pkb-arc   2.18.1.4   Oct 28 2016 13:29:34   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm3undo.pkb  $
---       Date into PVCS   : $Date:   Oct 13 2016 14:56:44  $
---       Date fetched Out : $Modtime:   Oct 13 2016 14:37:12  $
---       PVCS Version     : $Revision:   2.18.1.3  $
+--       Date into PVCS   : $Date:   Oct 28 2016 13:29:34  $
+--       Date fetched Out : $Modtime:   Oct 28 2016 13:26:58  $
+--       PVCS Version     : $Revision:   2.18.1.4  $
 --
 --   Author : ITurnbull
 --
@@ -19,7 +19,7 @@ IS
 -- Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '"$Revision:   2.18.1.3  $"';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '"$Revision:   2.18.1.4  $"';
 --  g_body_sccsid is the SCCS ID for the package body
    g_package_name   CONSTANT VARCHAR2 (2000) := 'nm3undo';
 --
@@ -2133,6 +2133,10 @@ END undo_scheme;
          AND neh_ne_id_old = p_ne_id
          AND neh_operation = 'C';
 --
+--  Remove any nm_member_history details
+      DELETE nm_member_history
+       WHERE nmh_nm_ne_id_in = p_ne_id;
+
       undo_other_products (p_ne_id_1        => p_ne_id
                           ,p_operation      => c_close
                           ,p_op_date        => v_close_date
