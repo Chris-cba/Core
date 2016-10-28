@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_load
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_load.pkb-arc   1.21   Oct 27 2016 13:42:28   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_load.pkb-arc   1.22   Oct 28 2016 14:42:42   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_load.pkb  $
-   --       Date into PVCS   : $Date:   Oct 27 2016 13:42:28  $
-   --       Date fetched Out : $Modtime:   Oct 27 2016 13:42:20  $
-   --       PVCS Version     : $Revision:   1.21  $
+   --       Date into PVCS   : $Date:   Oct 28 2016 14:42:42  $
+   --       Date fetched Out : $Modtime:   Oct 28 2016 14:36:40  $
+   --       PVCS Version     : $Revision:   1.22  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,7 +16,7 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.21  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.22  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_load';
 
@@ -141,13 +141,13 @@ AS
       pi_start_date     IN nm_asset_locations_all.nal_start_date%TYPE,
       pi_security_id    IN nm_asset_locations_all.nal_security_key%TYPE)
    IS
-      loc_error    lb_loc_error_tab;
-      l_g_i_d      VARCHAR2 (1);
-      l_load_tab   lb_rpt_tab;
-	  l_pnt_or_cont varchar2(1);
-	  l_start number;
-	  l_end   number;
-	  l_unit integer;
+      loc_error       lb_loc_error_tab;
+      l_g_i_d         VARCHAR2 (1);
+      l_load_tab      lb_rpt_tab;
+      l_pnt_or_cont   VARCHAR2 (1);
+      l_start         NUMBER;
+      l_end           NUMBER;
+      l_unit          INTEGER;
    BEGIN
       --
       IF pi_g_i_d IS NULL
@@ -160,27 +160,46 @@ AS
          l_g_i_d := pi_g_i_d;
       END IF;
 
-	  select nit_pnt_or_cont into l_pnt_or_cont
-	  from nm_inv_types where nit_inv_type = pi_nal_nit_type;
+      SELECT nit_pnt_or_cont
+        INTO l_pnt_or_cont
+        FROM nm_inv_types
+       WHERE nit_inv_type = pi_nal_nit_type;
 
-      if pi_start_m is null then
-        raise_application_error (-20001, 'Start measure must be specified' );
-      end if;
+      IF pi_start_m IS NULL
+      THEN
+         raise_application_error (-20001, 'Start measure must be specified');
+      END IF;
 
-      if l_pnt_or_cont = 'P' and pi_start_m <> nvl(pi_end_m, pi_start_m) then
-         raise_application_error( -20001, 'The start and end measures must be the same for point asset types');
-      elsif l_pnt_or_cont = 'C' and pi_start_m >= pi_end_m then
-         raise_application_error (-20002, 'The end measure must be greater than the start measure' );
-      end if;
-      
-      select pi_start_m*nvl(uc_conversion_factor,1), pi_end_m*nvl(uc_conversion_factor,1), nlt_units
-      into l_start, l_end, l_unit
-      from nm_unit_conversions, nm_linear_types, nm_elements
-      where nlt_units = uc_unit_id_out
-      and  uc_unit_id_in = pi_unit 
-      and ne_id = pi_refnt
-      and nlt_nt_type = ne_nt_type
-      and nvl(ne_gty_group_type, '%^&*') = nvl(nlt_gty_type, '%^&*');
+      IF l_pnt_or_cont = 'P' AND pi_start_m <> NVL (pi_end_m, pi_start_m)
+      THEN
+         raise_application_error (
+            -20001,
+            'The start and end measures must be the same for point asset types');
+      ELSIF l_pnt_or_cont = 'C' AND pi_start_m >= pi_end_m
+      THEN
+         raise_application_error (
+            -20002,
+            'The end measure must be greater than the start measure');
+      END IF;
+
+      SELECT pi_start_m * NVL (uc_conversion_factor, 1),
+             pi_end_m * NVL (uc_conversion_factor, 1),
+             nlt_units
+        INTO l_start, l_end, l_unit
+        FROM nm_unit_conversions, nm_linear_types, nm_elements
+       WHERE     nlt_units = uc_unit_id_out
+             AND uc_unit_id_in = pi_unit
+             AND ne_id = pi_refnt
+             AND nlt_nt_type = ne_nt_type
+             AND NVL (ne_gty_group_type, '%^&*') = NVL (nlt_gty_type, '%^&*')
+       union 
+       select pi_start_m, pi_end_m, nlt_units
+       from nm_linear_types, nm_elements
+       WHERE     nlt_units = pi_unit
+             AND ne_id = pi_refnt
+             AND nlt_nt_type = ne_nt_type
+             AND NVL (ne_gty_group_type, '%^&*') = NVL (nlt_gty_type, '%^&*');
+
       --
       IF l_g_i_d = 'D'
       THEN
@@ -707,75 +726,91 @@ AS
                                             nag_start_date,
                                             nag_end_date,
                                             nag_geometry)
-            SELECT *
-              FROM (WITH date_tracked_assets
-                         AS (SELECT nal_asset_id,
-                                    d.nm_ne_id_in,
-                                    d.start_date,
-                                    d.end_date
-                               FROM (SELECT nal_asset_id,
-                                            nm_ne_id_in,
-                                            start_date,
-                                            LEAD (
-                                               start_date,
-                                               1)
-                                            OVER (PARTITION BY nm_ne_id_in
-                                                  ORDER BY start_date)
-                                               end_date
-                                       FROM (SELECT nal_asset_id,
-                                                    nm_ne_id_in,
-                                                    nm_start_date start_date
-                                               FROM nm_locations_all,
-                                                    nm_asset_locations_all
-                                              WHERE     nm_obj_type =
-                                                           pi_obj_type
-                                                    AND nm_ne_id_in = nal_id
-                                                    AND nal_asset_id =
-                                                           pi_asset_id
-                                             UNION ALL
-                                             SELECT nal_asset_id,
-                                                    nm_ne_id_in,
-                                                    NVL (
-                                                       nm_end_date,
-                                                       TO_DATE ('31123000',
-                                                                'DDMMYYYY'))
-                                               FROM nm_locations_all,
-                                                    nm_asset_locations_all
-                                              WHERE     nm_obj_type =
-                                                           pi_obj_type
-                                                    AND nm_ne_id_in = nal_id
-                                                    AND nal_asset_id =
-                                                           pi_asset_id)) d
-                              WHERE start_date != end_date)
-                      SELECT 'N',
+              SELECT location_type,
+                     nal_asset_id,
+                     pi_obj_type,
+                     start_date,
+                     CASE end_date
+                        WHEN TO_DATE ('31123000', 'DDMMYYYY') THEN NULL
+                        ELSE end_date
+                     END
+                        end_date,
+                     sdo_aggr_union (sdoaggrtype (geoloc, 0.005))
+                FROM (WITH date_tracked_assets
+                           AS (SELECT                       /* +materialize */
+                                     nal_asset_id,
+                                      d.nm_ne_id_in,
+                                      d.start_date,
+                                      d.end_date
+                                 FROM (SELECT nal_asset_id,
+                                              nm_ne_id_in,
+                                              start_date,
+                                              LEAD (
+                                                 start_date,
+                                                 1)
+                                              OVER (PARTITION BY nm_ne_id_in
+                                                    ORDER BY start_date)
+                                                 end_date
+                                         FROM (SELECT nal_asset_id,
+                                                      nm_ne_id_in,
+                                                      nm_start_date start_date
+                                                 FROM nm_locations_all,
+                                                      nm_asset_locations_all
+                                                WHERE     nm_obj_type =
+                                                             pi_obj_type
+                                                      AND nm_ne_id_in = nal_id
+                                                      AND nal_asset_id =
+                                                             pi_asset_id
+                                               UNION ALL
+                                               SELECT nal_asset_id,
+                                                      nm_ne_id_in,
+                                                      NVL (
+                                                         nm_end_date,
+                                                         TO_DATE ('31123000',
+                                                                  'DDMMYYYY'))
+                                                 FROM nm_locations_all,
+                                                      nm_asset_locations_all
+                                                WHERE     nm_obj_type =
+                                                             pi_obj_type
+                                                      AND nm_ne_id_in = nal_id
+                                                      AND nal_asset_id =
+                                                             pi_asset_id)) d
+                                WHERE start_date != end_date)
+                      SELECT location_type,
                              nal_asset_id,
                              pi_obj_type,
                              start_date,
-                             CASE end_date
-                                WHEN TO_DATE ('31123000', 'DDMMYYYY') THEN NULL
-                                ELSE end_date
-                             END
-                                end_date,
-                             sdo_aggr_union (sdoaggrtype (SDO_LRS.convert_to_std_geom (
-                                                             SDO_LRS.clip_geom_segment (
-                                                                geoloc,
-                                                                nm_begin_mp,
-                                                                nm_end_mp,
-                                                                0.005)),
-                                                          0.005))
-                                geoloc
-                        FROM date_tracked_assets d,
-                             nm_locations_all l,
-                             V_LB_NLT_GEOMETRY
-                       WHERE     nm_ne_id_of = ne_id
-                             AND l.nm_ne_id_in = d.nm_ne_id_in
-                             AND l.nm_obj_type = pi_obj_type
-                             and l.nm_start_date < end_date
-                             and l.nm_end_date > start_date
-                             AND l.nm_nlt_id = g.nlt_id                             							 
---                             and geoloc is not null
-                    GROUP BY nal_asset_id, start_date, end_date)
-             WHERE geoloc IS NOT NULL;
+                             end_date,
+                             geoloc
+                        FROM (SELECT 'N' location_type,
+                                     nal_asset_id,
+                                     pi_obj_type,
+                                     start_date,
+                                     end_date,
+                                     SDO_LRS.convert_to_std_geom (SDO_LRS.clip_geom_segment (
+                                                                     g.geoloc,
+                                                                     nm_begin_mp,
+                                                                     nm_end_mp,
+                                                                     0.005))
+                                        geoloc
+                                FROM date_tracked_assets d,
+                                     nm_locations_all  l,
+                                     V_LB_NLT_GEOMETRY g
+                               WHERE     nm_ne_id_of = ne_id
+                                     AND l.nm_ne_id_in = d.nm_ne_id_in
+                                     AND l.nm_obj_type = pi_obj_type
+                                     AND l.nm_start_date < end_date
+                                     AND NVL (l.nm_end_date,
+                                              TO_DATE ('31123000', 'DDMMYYYY')) >
+                                            start_date
+                                     AND l.nm_nlt_id = g.nlt_id)
+                       WHERE geoloc IS NOT NULL)
+            GROUP BY location_type,
+                     nal_asset_id,
+                     pi_obj_type,
+                     start_date,
+                     end_date;
+      --             WHERE geoloc IS NOT NULL;
       END;
    END;
 
@@ -812,8 +847,7 @@ AS
 
       UPDATE nm_asset_locations
          SET nal_descr = DECODE (p_nal_descr, g_nvl, nal_descr, p_nal_descr),
-             nal_jxp =
-                DECODE (p_jxp, g_nvl, nal_jxp, l_exor_njx_code)
+             nal_jxp = DECODE (p_jxp, g_nvl, nal_jxp, l_exor_njx_code)
        WHERE nal_id = p_nal_id;
    END;
 END lb_load;
