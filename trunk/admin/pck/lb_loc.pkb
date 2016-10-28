@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_loc
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_loc.pkb-arc   1.4   Oct 20 2016 13:44:16   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_loc.pkb-arc   1.5   Oct 28 2016 15:36:12   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_loc.pkb  $
-   --       Date into PVCS   : $Date:   Oct 20 2016 13:44:16  $
-   --       Date fetched Out : $Modtime:   Oct 20 2016 13:43:38  $
-   --       PVCS Version     : $Revision:   1.4  $
+   --       Date into PVCS   : $Date:   Oct 28 2016 15:36:12  $
+   --       Date fetched Out : $Modtime:   Oct 28 2016 15:31:32  $
+   --       PVCS Version     : $Revision:   1.5  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,7 +16,7 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.4  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.5  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_loc';
 
@@ -421,9 +421,10 @@ AS
       retval   lb_xsp_tab;
    BEGIN
       --
-      SELECT CAST (COLLECT (lb_xsp (xsp, xsp_descr)) AS lb_xsp_tab)
+      SELECT CAST (COLLECT (lb_xsp (xsp, nwx_descr)) AS lb_xsp_tab)
         INTO retval
-        FROM (SELECT DISTINCT xsr_x_sect_value xsp, xsr_descr xsp_descr
+        FROM nm_xsp,(select xsr_x_sect_value xsp
+        from ( SELECT DISTINCT xsr_x_sect_value
                 FROM (WITH datum_range
                            AS (SELECT t1.*,
                                       SUM (1) OVER (PARTITION BY 1)
@@ -438,7 +439,7 @@ AS
                                COUNT (
                                   1)
                                OVER (
-                                  PARTITION BY ne_sub_class, xsr_x_sect_value)
+                                  PARTITION BY xsr_x_sect_value)
                                   sc_count,
                                datum_count
                           FROM (SELECT d.ne_id,
@@ -469,7 +470,7 @@ AS
                                ne_nt_type,
                                ne_sub_class,
                                xsr_x_sect_value)
-               WHERE sc_count = datum_count);
+               WHERE sc_count = datum_count));
 
       RETURN retval;
    END;
