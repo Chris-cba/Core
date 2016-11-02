@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3homo_Gis AS
 --
 -- PVCS Identifiers :-
 --
--- pvcsid : $Header:   //vm_latest/archives/nm3/admin/pck/nm3homo_gis.pkb-arc   2.9   Jul 04 2013 16:04:12   James.Wadsworth  $
+-- pvcsid : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3homo_gis.pkb-arc   2.10   Nov 02 2016 13:48:56   Chris.Baugh  $
 -- Module Name : $Workfile:   nm3homo_gis.pkb  $
--- Date into PVCS : $Date:   Jul 04 2013 16:04:12  $
--- Date fetched Out : $Modtime:   Jul 04 2013 15:41:28  $
--- PVCS Version : $Revision:   2.9  $
+-- Date into PVCS : $Date:   Nov 02 2016 13:48:56  $
+-- Date fetched Out : $Modtime:   Nov 01 2016 14:59:40  $
+-- PVCS Version : $Revision:   2.10  $
 -- Based on SCCS version : 
 --   Author : Jonathan Mills
 --
@@ -24,7 +24,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3homo_Gis AS
 --
 --all global package variables here
 --
-   g_body_sccsid      CONSTANT   VARCHAR2(2000) := '"$Revision:   2.9  $"';
+   g_body_sccsid      CONSTANT   VARCHAR2(2000) := '"$Revision:   2.10  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name     CONSTANT   VARCHAR2(30)   := 'nm3homo_gis';
@@ -170,6 +170,56 @@ BEGIN
   CLOSE c1;
   RETURN retval;
 END is_xy_inventory;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE update_xy
+ ( pi_table_name IN VARCHAR2
+ , pi_pk_column  IN VARCHAR2
+ , pi_x_column   IN VARCHAR2
+ , pi_y_column   IN VARCHAR2
+ , pi_pk_value   IN VARCHAR2
+ , pi_x_value    IN NUMBER
+ , pi_y_value    IN NUMBER
+ )
+IS
+   nl   CONSTANT VARCHAR2(1)  := CHR(10);
+   lstr VARCHAR2(2000);
+BEGIN
+   lstr := 'BEGIN'
+     ||nl||'   UPDATE '||pi_table_name
+     ||nl||'    SET   '||pi_x_column ||' = '||pi_x_value
+     ||nl||'         ,'||pi_y_column ||' = '||pi_y_value
+     ||nl||'   WHERE  '||pi_pk_column||' = '||pi_pk_value||';'
+     ||nl||'END;';
+
+  Nm_Debug.DEBUG( lstr );
+  EXECUTE IMMEDIATE lstr;
+END update_xy;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE update_point_lref
+ ( pi_table_name IN VARCHAR2
+ , pi_pk_column  IN VARCHAR2
+ , pi_rse_column IN VARCHAR2
+ , pi_st_chain   IN VARCHAR2
+ , pi_lref_value IN nm_lref
+ , pi_pk_value   IN VARCHAR2
+ )
+IS
+   nl   CONSTANT VARCHAR2(1)  := CHR(10);
+BEGIN
+   EXECUTE IMMEDIATE
+         'BEGIN'
+   ||nl||'  UPDATE '||pi_table_name
+   ||nl||'     SET '||pi_rse_column||' = '||pi_lref_value.lr_ne_id
+   ||nl||'       , '||pi_st_chain||' = '
+                    ||Nm3unit.get_formatted_value( pi_lref_value.lr_offset
+                    , Nm3net.get_nt_units_from_ne(pi_lref_value.lr_ne_id))
+   ||nl||'   WHERE '||pi_pk_column||' = '||pi_pk_value||';'
+   ||nl||'END;';
+END update_point_lref;
 --
 -----------------------------------------------------------------------------
 --
@@ -461,7 +511,7 @@ BEGIN
       IF l_rec_nit.nit_use_xy = 'Y'
       AND l_geom.sdo_gtype = 2001
       THEN
-        Nm3sdo_Edit.update_xy
+        update_xy
            ( pi_table_name => c_asset_table
            , pi_pk_column  => pi_theme_rec.nth_pk_column
            , pi_x_column   => 'IIT_X'
@@ -473,7 +523,7 @@ BEGIN
       ELSIF l_rec_nit.nit_use_xy = 'N'
       AND l_point_xy
       THEN
-        Nm3sdo_Edit.update_xy
+        update_xy
            ( pi_table_name => pi_theme_rec.nth_table_name
            , pi_pk_column  => pi_theme_rec.nth_pk_column
            , pi_x_column   => pi_theme_rec.nth_x_column
@@ -490,7 +540,7 @@ BEGIN
       IF l_rec_nit.nit_use_xy = 'Y'
       AND l_geom.sdo_gtype = 2001
       THEN
-        Nm3sdo_Edit.update_xy
+        update_xy
           ( pi_table_name => c_asset_table
           , pi_pk_column  => pi_theme_rec.nth_pk_column
           , pi_x_column   => 'IIT_X'
@@ -514,7 +564,7 @@ BEGIN
       --RAC>
 
         -- update table with geometry ordinates
-        Nm3sdo_Edit.update_point_lref
+        update_point_lref
           ( pi_table_name => pi_theme_rec.nth_table_name
           , pi_pk_column  => pi_theme_rec.nth_pk_column
           , pi_rse_column => pi_theme_rec.nth_rse_fk_column
@@ -524,7 +574,7 @@ BEGIN
           );
 
         -- update xy values on theme table from sdo_point array
-        Nm3sdo_Edit.update_xy
+        update_xy
           ( pi_table_name => pi_theme_rec.nth_table_name
           , pi_pk_column  => pi_theme_rec.nth_pk_column
           , pi_x_column   => pi_theme_rec.nth_x_column
@@ -610,7 +660,7 @@ BEGIN
     --RAC>
 
       -- update table with geometry ordinates
-    Nm3sdo_Edit.update_point_lref
+    update_point_lref
       ( pi_table_name => pi_theme_rec.nth_table_name
       , pi_pk_column  => pi_theme_rec.nth_pk_column
       , pi_rse_column => pi_theme_rec.nth_rse_fk_column
@@ -624,7 +674,7 @@ BEGIN
     -- convert to use sdo_point array instead of sdo_ordinate array for xys
     l_geom := Nm3sdo.get_2d_pt(pi_shape);
     -- update xy values on theme table from sdo_point array
-    Nm3sdo_Edit.update_xy
+    update_xy
      ( pi_table_name => pi_theme_rec.nth_table_name
      , pi_pk_column  => pi_theme_rec.nth_pk_column
      , pi_x_column   => pi_theme_rec.nth_x_column
@@ -647,7 +697,7 @@ BEGIN
     --RAC>
 
     -- update table with geometry ordinates
-    Nm3sdo_Edit.update_point_lref
+    update_point_lref
       ( pi_table_name => pi_theme_rec.nth_table_name
       , pi_pk_column  => pi_theme_rec.nth_pk_column
       , pi_rse_column => pi_theme_rec.nth_rse_fk_column
@@ -657,7 +707,7 @@ BEGIN
       );
 
       -- update xy values on theme table from sdo_point array
-    Nm3sdo_Edit.update_xy
+    update_xy
       ( pi_table_name => pi_theme_rec.nth_table_name
       , pi_pk_column  => pi_theme_rec.nth_pk_column
       , pi_x_column   => pi_theme_rec.nth_x_column
@@ -932,7 +982,7 @@ BEGIN
   IF l_point_xy
   THEN
 
-     Nm3sdo_Edit.update_xy
+     update_xy
       ( pi_table_name => l_xy_table_name
       , pi_pk_column  => l_xy_column_name
       , pi_x_column   => l_rec_gt.nth_x_column
@@ -949,7 +999,7 @@ BEGIN
     l_lref := Nm3sdo.get_nearest_lref( l_rec_gt.nth_theme_id, Nm3sdo.get_2d_pt( pi_x_pos, pi_y_pos ));
     --RAC>
 
-    Nm3sdo_Edit.update_point_lref
+    update_point_lref
       ( pi_table_name => l_xy_table_name
       , pi_pk_column  => l_xy_column_name
       , pi_rse_column => l_rec_gt.nth_rse_fk_column
