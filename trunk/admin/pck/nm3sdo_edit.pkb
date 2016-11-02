@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3sdo_Edit AS
 --
 --   SCCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3sdo_edit.pkb-arc   2.21   Nov 09 2015 20:48:02   Rob.Coupe  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3sdo_edit.pkb-arc   2.22   Nov 02 2016 13:50:10   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm3sdo_edit.pkb  $
---       Date into SCCS   : $Date:   Nov 09 2015 20:48:02  $
---       Date fetched Out : $Modtime:   Nov 09 2015 20:43:10  $
---       SCCS Version     : $Revision:   2.21  $
+--       Date into SCCS   : $Date:   Nov 02 2016 13:50:10  $
+--       Date fetched Out : $Modtime:   Nov 01 2016 14:57:40  $
+--       SCCS Version     : $Revision:   2.22  $
 --
 --
 --  Author :  R Coupe
@@ -23,7 +23,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3sdo_Edit AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid   CONSTANT  VARCHAR2(2000)  :=  '$Revision:   2.21  $';
+  g_body_sccsid   CONSTANT  VARCHAR2(2000)  :=  '$Revision:   2.22  $';
   g_package_name  CONSTANT  VARCHAR2(30)    :=  'nm3sdo_edit';
 --
 -----------------------------------------------------------------------------
@@ -928,7 +928,8 @@ BEGIN
           -- construct a new point shape
           l_geom := nm3sdo.get_2d_pt(g_tab_inv(g_tab_inv_count).iit_x, g_tab_inv(g_tab_inv_count).iit_y);
 
-          IF is_located ( pi_inv_type => g_tab_inv(g_tab_inv_count).iit_inv_type)
+          IF is_located ( pi_inv_type => g_tab_inv(g_tab_inv_count).iit_inv_type) AND
+              NVL(sys_context('NM3SQL', 'SNAP_ON' ), 'TRUE' ) = 'TRUE' 
           THEN
           --
           --<RAC - 3.2.1.1
@@ -1300,56 +1301,6 @@ BEGIN
 --EXCEPTION
 --  WHEN NO_DATA_FOUND THEN NULL;
 END process_inv_xy_update;
---
------------------------------------------------------------------------------
---
-PROCEDURE update_xy
- ( pi_table_name IN VARCHAR2
- , pi_pk_column  IN VARCHAR2
- , pi_x_column   IN VARCHAR2
- , pi_y_column   IN VARCHAR2
- , pi_pk_value   IN VARCHAR2
- , pi_x_value    IN NUMBER
- , pi_y_value    IN NUMBER
- )
-IS
-   nl   CONSTANT VARCHAR2(1)  := CHR(10);
-   lstr VARCHAR2(2000);
-BEGIN
-   lstr := 'BEGIN'
-     ||nl||'   UPDATE '||pi_table_name
-     ||nl||'    SET   '||pi_x_column ||' = '||pi_x_value
-     ||nl||'         ,'||pi_y_column ||' = '||pi_y_value
-     ||nl||'   WHERE  '||pi_pk_column||' = '||pi_pk_value||';'
-     ||nl||'END;';
-
-  Nm_Debug.DEBUG( lstr );
-  EXECUTE IMMEDIATE lstr;
-END update_xy;
---
------------------------------------------------------------------------------
---
-PROCEDURE update_point_lref
- ( pi_table_name IN VARCHAR2
- , pi_pk_column  IN VARCHAR2
- , pi_rse_column IN VARCHAR2
- , pi_st_chain   IN VARCHAR2
- , pi_lref_value IN nm_lref
- , pi_pk_value   IN VARCHAR2
- )
-IS
-   nl   CONSTANT VARCHAR2(1)  := CHR(10);
-BEGIN
-   EXECUTE IMMEDIATE
-         'BEGIN'
-   ||nl||'  UPDATE '||pi_table_name
-   ||nl||'     SET '||pi_rse_column||' = '||pi_lref_value.lr_ne_id
-   ||nl||'       , '||pi_st_chain||' = '
-                    ||Nm3unit.get_formatted_value( pi_lref_value.lr_offset
-                    , Nm3net.get_nt_units_from_ne(pi_lref_value.lr_ne_id))
-   ||nl||'   WHERE '||pi_pk_column||' = '||pi_pk_value||';'
-   ||nl||'END;';
-END update_point_lref;
 --
 -----------------------------------------------------------------------------
 --
