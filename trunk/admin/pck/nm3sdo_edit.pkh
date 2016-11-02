@@ -5,11 +5,11 @@ AS
 --
 --   SCCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_edit.pkh-arc   2.7   Jul 04 2013 16:22:20   James.Wadsworth  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3sdo_edit.pkh-arc   2.9   Nov 02 2016 13:51:04   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm3sdo_edit.pkh  $
---       Date into SCCS   : $Date:   Jul 04 2013 16:22:20  $
---       Date fetched Out : $Modtime:   Jul 04 2013 15:52:10  $
---       SCCS Version     : $Revision:   2.7  $
+--       Date into SCCS   : $Date:   Nov 02 2016 13:51:04  $
+--       Date fetched Out : $Modtime:   Nov 01 2016 14:57:44  $
+--       SCCS Version     : $Revision:   2.9  $
 --
 --  Author :  R Coupe
 --            A Edwards
@@ -22,7 +22,7 @@ AS
 --
 --</PACKAGE>
 --<GLOBVAR>
-    g_sccsid      CONSTANT  VARCHAR2(2000) := '$Revision:   2.7  $';
+    g_sccsid      CONSTANT  VARCHAR2(2000) := '$Revision:   2.9  $';
 --  g_sccsid is the SCCS ID for the package
 --</GLOBVAR>
 -----------------------------------------------------------------------------
@@ -191,33 +191,6 @@ PROCEDURE process_inv_xy_update;
 --
 PROCEDURE process_inv_xy_update
          ( pi_inv_type IN nm_inv_types.nit_inv_type%TYPE );
---
------------------------------------------------------------------------------
---
---<PROC_NAME="update_xy">
--- Generic procedure to allow the updating of a Theme tables XY values
-PROCEDURE update_xy
-            ( pi_table_name IN VARCHAR2
-            , pi_pk_column  IN VARCHAR2
-            , pi_x_column   IN VARCHAR2
-            , pi_y_column   IN VARCHAR2
-            , pi_pk_value   IN VARCHAR2
-            , pi_x_value    IN NUMBER
-            , pi_y_value    IN NUMBER
-            );
---
------------------------------------------------------------------------------
---
---<PROC_NAME="update_point_lref">
--- Generic procedure to allow the updating of a Theme tables LREF values
-PROCEDURE update_point_lref
-            ( pi_table_name IN VARCHAR2
-            , pi_pk_column  IN VARCHAR2
-            , pi_rse_column IN VARCHAR2
-            , pi_st_chain   IN VARCHAR2
-            , pi_lref_value IN nm_lref
-            , pi_pk_value   IN VARCHAR2
-            );
 --
 -----------------------------------------------------------------------------
 --
