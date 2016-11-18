@@ -1,12 +1,12 @@
-CREATE OR REPLACE PACKAGE BODY lb_load
+CREATE OR REPLACE PACKAGE BODY EXOR.lb_load
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_load.pkb-arc   1.22   Oct 28 2016 14:42:42   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_load.pkb-arc   1.23   Nov 18 2016 16:27:00   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_load.pkb  $
-   --       Date into PVCS   : $Date:   Oct 28 2016 14:42:42  $
-   --       Date fetched Out : $Modtime:   Oct 28 2016 14:36:40  $
-   --       PVCS Version     : $Revision:   1.22  $
+   --       Date into PVCS   : $Date:   Nov 18 2016 16:27:00  $
+   --       Date fetched Out : $Modtime:   Nov 18 2016 16:25:20  $
+   --       PVCS Version     : $Revision:   1.23  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,7 +16,7 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.22  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.23  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_load';
 
@@ -192,9 +192,9 @@ AS
              AND ne_id = pi_refnt
              AND nlt_nt_type = ne_nt_type
              AND NVL (ne_gty_group_type, '%^&*') = NVL (nlt_gty_type, '%^&*')
-       union 
-       select pi_start_m, pi_end_m, nlt_units
-       from nm_linear_types, nm_elements
+      UNION
+      SELECT pi_start_m, pi_end_m, nlt_units
+        FROM nm_linear_types, nm_elements
        WHERE     nlt_units = pi_unit
              AND ne_id = pi_refnt
              AND nlt_nt_type = ne_nt_type
@@ -378,12 +378,19 @@ AS
                 p_nal_id,
                 'N',
                 nm_obj_type,
-                SDO_LRS.convert_to_std_geom (SDO_LRS.OFFSET_GEOM_SEGMENT (
+                SDO_GEOM.sdo_arc_densify (SDO_LRS.convert_to_std_geom (
+                                             SDO_LRS.OFFSET_GEOM_SEGMENT (
                                                 geoloc,
                                                 nm_begin_mp,
                                                 nm_end_mp,
-                                                NVL (nm_offset_st, 0),
-                                                0.005))
+                                                NVL (
+                                                   nm_offset_st * nm_dir_flag,
+                                                   0),
+                                                0.005--                                               ,'unit=m'
+                                                )),
+                                          0.005,
+                                          'arc_tolerance=0.05')
+                   geoloc
            FROM nm_locations_all, v_lb_nlt_geometry
           WHERE     nm_ne_id_of = ne_id
                 AND nm_loc_id IN (SELECT t.COLUMN_VALUE
@@ -787,11 +794,19 @@ AS
                                      pi_obj_type,
                                      start_date,
                                      end_date,
-                                     SDO_LRS.convert_to_std_geom (SDO_LRS.clip_geom_segment (
-                                                                     g.geoloc,
-                                                                     nm_begin_mp,
-                                                                     nm_end_mp,
-                                                                     0.005))
+                                     SDO_GEOM.sdo_arc_densify (
+                                        SDO_LRS.convert_to_std_geom (
+                                           SDO_LRS.OFFSET_GEOM_SEGMENT (
+                                              geoloc,
+                                              nm_begin_mp,
+                                              nm_end_mp,
+                                              NVL (
+                                                 nm_offset_st,
+                                                 0),
+                                              0.0005--                                               ,'unit=m'
+                                              )),
+                                        0.005,
+                                        'arc_tolerance=0.05')
                                         geoloc
                                 FROM date_tracked_assets d,
                                      nm_locations_all  l,
