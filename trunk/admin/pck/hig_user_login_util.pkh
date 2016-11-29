@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE hig_user_login_util AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/hig_user_login_util.pkh-arc   1.0   Apr 19 2016 07:52:26   Vikas.Mhetre  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/hig_user_login_util.pkh-arc   1.1   Nov 29 2016 13:38:18   Chris.Baugh  $
 --       Module Name      : $Workfile:   hig_user_login_util.pkh  $
---       Date into PVCS   : $Date:   Apr 19 2016 07:52:26  $
---       Date fetched Out : $Modtime:   Apr 19 2016 07:34:48  $
---       PVCS Version     : $Revision:   1.0  $
+--       Date into PVCS   : $Date:   Nov 29 2016 13:38:18  $
+--       Date fetched Out : $Modtime:   Nov 29 2016 13:36:14  $
+--       PVCS Version     : $Revision:   1.1  $
 --
 --   Author : Vikas Mhetre
 --
@@ -19,7 +19,17 @@ CREATE OR REPLACE PACKAGE hig_user_login_util AS
 --
 -- all global package variables here
 --
-   g_body_sccsid     constant varchar2(30) :='"$Revision:   1.0  $"';
+   g_sccsid     constant varchar2(30) :='"$Revision:   1.1  $"';
+
+-- This function returns the current SCCS version
+  FUNCTION get_version
+    RETURN VARCHAR2;
+
+  --
+  -----------------------------------------------------------------------------
+  --
+  FUNCTION get_body_version
+    RETURN VARCHAR2;
 --
 -----------------------------------------------------------------------------
 --
