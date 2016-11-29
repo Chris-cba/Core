@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY exor_password_engine AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/exor_password_engine.pkb-arc   1.1   Nov 29 2016 10:08:14   Chris.Baugh  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/exor_password_engine.pkb-arc   1.2   Nov 29 2016 13:31:14   Chris.Baugh  $
 --       Module Name      : $Workfile:   exor_password_engine.pkb  $
---       Date into PVCS   : $Date:   Nov 29 2016 10:08:14  $
---       Date fetched Out : $Modtime:   Nov 29 2016 10:06:50  $
---       PVCS Version     : $Revision:   1.1  $
+--       Date into PVCS   : $Date:   Nov 29 2016 13:31:14  $
+--       Date fetched Out : $Modtime:   Nov 29 2016 13:30:08  $
+--       PVCS Version     : $Revision:   1.2  $
 --
 --   Author : Vikas Mhetre
 --
@@ -19,7 +19,7 @@ CREATE OR REPLACE PACKAGE BODY exor_password_engine AS
 --
 -- all global package variables here
 --
-   g_body_sccsid     constant varchar2(30) :='"$Revision:   1.1  $"';
+   g_body_sccsid     constant varchar2(30) :='"$Revision:   1.2  $"';
 --
    g_package_name    CONSTANT  VARCHAR2(30) := 'exor_password_engine';
 --
@@ -54,7 +54,7 @@ CREATE OR REPLACE PACKAGE BODY exor_password_engine AS
 --  9) New password must differ from the previous by at least 3 chars
 -- 10) Password must not contain consecutive letters or numbers 
 -- ------------------------------------------------------------------
-
+--
 pgDatabaseServer v$database.name%TYPE;
 
 TYPE pgInvalidPassword_t IS TABLE OF VARCHAR2(20);
@@ -83,6 +83,25 @@ PRAGMA EXCEPTION_INIT(eConsecutiveNumChar,  -20009);
 eInvalidSpecialChar EXCEPTION;
 PRAGMA EXCEPTION_INIT(eInvalidSpecialChar,  -20010);
 
+  --
+  -----------------------------------------------------------------------------
+  --
+  FUNCTION get_version
+    RETURN VARCHAR2
+  IS
+  BEGIN
+    RETURN g_sccsid;
+  END get_version;
+
+  --
+  -----------------------------------------------------------------------------
+  --
+  FUNCTION get_body_version
+    RETURN VARCHAR2
+  IS
+  BEGIN
+    RETURN g_body_sccsid;
+  END get_body_version;
 -- ------------------------------------------------------------------
 
 -- ************************
