@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/hig_process_api.pkb-arc   3.24   Aug 26 2016 09:08:10   Chris.Baugh  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/hig_process_api.pkb-arc   3.25   Dec 01 2016 10:08:08   Chris.Baugh  $
 --       Module Name      : $Workfile:   hig_process_api.pkb  $
---       Date into PVCS   : $Date:   Aug 26 2016 09:08:10  $
---       Date fetched Out : $Modtime:   Aug 17 2016 11:16:58  $
---       Version          : $Revision:   3.24  $
+--       Date into PVCS   : $Date:   Dec 01 2016 10:08:08  $
+--       Date fetched Out : $Modtime:   Nov 30 2016 15:31:56  $
+--       Version          : $Revision:   3.25  $
 --       Based on SCCS version : 
 --
 -----------------------------------------------------------------------------
@@ -21,7 +21,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.24  $';
+  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.25  $';
 
   g_package_name CONSTANT varchar2(30) := 'hig_process_framework';
   
@@ -224,7 +224,7 @@ FUNCTION last_process_job_run(pi_process_id IN hig_processes.hp_process_id%TYPE)
 
 BEGIN
 
- select MAX(hpjr_process_id)
+ select NVL(MAX(hpjr_job_run_seq),1)
  into  l_retval 
  from hig_process_job_runs 
  where hpjr_process_id = pi_process_id;
