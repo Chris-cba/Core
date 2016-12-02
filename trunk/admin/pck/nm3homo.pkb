@@ -1,15 +1,14 @@
-CREATE OR REPLACE PACKAGE BODY nm3homo
-AS
+CREATE OR REPLACE PACKAGE BODY nm3homo AS
    --
    -----------------------------------------------------------------------------
    --
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3homo.pkb-arc   2.25   Sep 12 2016 11:20:58   Vikas.Mhetre  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3homo.pkb-arc   2.26   02 Dec 2016 17:14:02   Mike.Huitson  $
    --       Module Name      : $Workfile:   nm3homo.pkb  $
-   --       Date into PVCS   : $Date:   Sep 12 2016 11:20:58  $
-   --       Date fetched Out : $Modtime:   Sep 12 2016 11:16:18  $
-   --       PVCS Version     : $Revision:   2.25  $
+   --       Date into PVCS   : $Date:   02 Dec 2016 17:14:02  $
+   --       Date fetched Out : $Modtime:   02 Dec 2016 17:07:04  $
+   --       PVCS Version     : $Revision:   2.26  $
    --
    --
    --   Author : Jonathan Mills
@@ -56,7 +55,7 @@ AS
 
    -- Log 713421
 
-   g_body_sccsid        CONSTANT VARCHAR2 (2000) := '"$Revision:   2.25  $"';
+   g_body_sccsid        CONSTANT VARCHAR2 (2000) := '"$Revision:   2.26  $"';
    --  g_body_sccsid is the SCCS ID for the package body
    --
    g_package_name       CONSTANT VARCHAR2 (30) := 'nm3homo';
@@ -204,8 +203,8 @@ AS
       l_warning_code   VARCHAR2 (30);
       l_warning_msg    VARCHAR2 (32767);
       --
-      c_pl    CONSTANT NM_PLACEMENT_ARRAY
-         := nm3pla.get_placement_from_temp_ne (p_temp_ne_id_in) ;
+      --c_pl    CONSTANT NM_PLACEMENT_ARRAY
+      --   := nm3pla.get_placement_from_temp_ne (p_temp_ne_id_in) ;
    --
    BEGIN
       --
@@ -237,19 +236,13 @@ AS
    --
    -----------------------------------------------------------------------------
    --
-   PROCEDURE homo_update_old (
-      p_temp_ne_id_in    IN     NUMBER,
-      p_iit_ne_id        IN     NUMBER,
-      p_effective_date   IN     DATE DEFAULT TO_DATE (
-                                                SYS_CONTEXT (
-                                                   'NM3CORE',
-                                                   'EFFECTIVE_DATE'),
-                                                'DD-MON-YYYY'),
-      p_warning_code        OUT VARCHAR2,
-      p_warning_msg         OUT VARCHAR2)
-   IS
-      --
-
+   PROCEDURE homo_update_old(p_temp_ne_id_in  IN  NUMBER
+                            ,p_iit_ne_id      IN  NUMBER
+                            ,p_effective_date IN  DATE DEFAULT TO_DATE(SYS_CONTEXT('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
+                            ,p_warning_code   OUT VARCHAR2
+                            ,p_warning_msg    OUT VARCHAR2)
+     IS
+     --
       CURSOR cs_affected_inv (
          p_nte_job_id    NUMBER,
          p_inv_type      VARCHAR2,
@@ -280,10 +273,8 @@ AS
                 AND nm.nm_type = 'I'
                 AND nm.nm_obj_type = p_inv_type
                 AND nm.nm_ne_id_in != p_iit_ne_id;
-
       --
       l_not_correct_xsp                      EXCEPTION;
-
       --
       --   CURSOR cs_xsp (p_iit_ne_id number) IS
       --   SELECT iit_x_sect
@@ -464,15 +455,12 @@ AS
 
             l_pl_arr := nm3pla.defrag_placement_array (l_new_inv_pl_arr);
 
-            FOR i IN 2 .. l_pl_arr.placement_count
-            LOOP
-               l_pl := l_pl_arr.npa_placement_array (i);
-
-               IF l_pl.pl_measure = 0
-               THEN
-                  -- If the measure is zero then the record is seperate from the last one
-                  RAISE fail_multi_allowed;
-               END IF;
+            FOR i IN 2..l_pl_arr.placement_count LOOP
+              IF l_pl_arr.npa_placement_array(i).pl_measure = 0
+              THEN
+                 -- If the measure is zero then the record is seperate from the last one
+                 RAISE fail_multi_allowed;
+              END IF;
             END LOOP;
          EXCEPTION
             WHEN fail_multi_allowed
@@ -563,22 +551,16 @@ AS
 
             RAISE skip_rest_of_val;
          END IF;
-
+         --
          nm3extent_o.create_temp_ne_from_pl (l_new_inv_pl_arr,
                                              l_remnant_job_id);
          --      nm_debug.debug('Remnant Temp Extent');
          -- nm3extent.debug_temp_extents(l_remnant_job_id);
          --   nm3pla.dump_placement_array(l_new_inv_pl_arr);
-         l_new_inv_pl_arr :=
-            nm3pla.get_placement_from_temp_ne (l_remnant_job_id);
+         l_new_inv_pl_arr := nm3pla.get_placement_from_temp_ne (l_remnant_job_id);
          --
-         l_new_first_pl :=
-            l_new_inv_pl_arr.npa_placement_array (
-               l_new_inv_pl_arr.npa_placement_array.FIRST);
-         l_new_last_pl :=
-            l_new_inv_pl_arr.npa_placement_array (
-               l_new_inv_pl_arr.npa_placement_array.LAST);
-
+         l_new_first_pl := l_new_inv_pl_arr.npa_placement_array(l_new_inv_pl_arr.npa_placement_array.FIRST);
+         l_new_last_pl := l_new_inv_pl_arr.npa_placement_array(l_new_inv_pl_arr.npa_placement_array.LAST);
          --
          --
          -- Validate where the Inventory is valid on the network, and whether or not
@@ -590,17 +572,10 @@ AS
          -- Get the NW type from the first element in the placement array,
          --  they will all be the same
          -- nm_debug.debug('Get the NW type from the first element in the placement array');
-         FOR i IN 1 .. l_new_inv_pl_arr.placement_count
-         LOOP
-            DECLARE
-               l_pl   NM_PLACEMENT := l_new_inv_pl_arr.get_entry (i);
-            BEGIN
-               l_rec_ne :=
-                  nm3get.get_ne (pi_ne_id             => l_pl.pl_ne_id,
-                                 pi_raise_not_found   => FALSE);
-            END;
-
-            EXIT WHEN l_rec_ne.ne_id IS NOT NULL;
+         FOR i IN 1..l_new_inv_pl_arr.placement_count LOOP
+           l_rec_ne := nm3get.get_ne(pi_ne_id => l_new_inv_pl_arr.npa_placement_array(i).pl_ne_id
+                                    ,pi_raise_not_found => FALSE);
+           EXIT WHEN l_rec_ne.ne_id IS NOT NULL;
          END LOOP;
 
          --
@@ -633,16 +608,10 @@ AS
                nm3inv.get_nm_inv_nw (l_rec_iit.iit_inv_type,
                                      l_rec_ne.ne_nt_type);
          EXCEPTION
-            WHEN no_nin_found
+           WHEN no_nin_found
             THEN
                g_homo_exc_code := -20505;
-               g_homo_exc_msg :=
-                     'Inventory type "'
-                  || l_rec_iit.iit_inv_type
-                  || '"'
-                  || ' invalid on NW_TYPE "'
-                  || l_rec_ne.ne_nt_type
-                  || '"';
+               g_homo_exc_msg := 'Inventory type "'||l_rec_iit.iit_inv_type||'" invalid on NW_TYPE "'||l_rec_ne.ne_nt_type||'"';
                RAISE g_homo_exception;
          END;
 
@@ -651,14 +620,13 @@ AS
          --  Do not allow location of Child AT records which have a parent
          -- ####################################################################################
          --
-         IF     does_relation_exist (l_rec_nit.nit_inv_type,
-                                     nm3invval.c_at_relation)
-            AND has_parent (l_rec_iit.iit_ne_id)
-         THEN
-            g_homo_exc_code := -20518;
-            g_homo_exc_msg :=
-               'Cannot locate Inventory records which are in a Child AT relationship';
-            RAISE g_homo_exception;
+         IF does_relation_exist(l_rec_nit.nit_inv_type
+                               ,nm3invval.c_at_relation)
+          AND has_parent(l_rec_iit.iit_ne_id)
+          THEN
+             g_homo_exc_code := -20518;
+             g_homo_exc_msg := 'Cannot locate Inventory records which are in a Child AT relationship';
+             RAISE g_homo_exception;
          END IF;
 
          --
@@ -675,19 +643,19 @@ AS
          --      AND  has_parent (l_rec_iit.iit_ne_id)
          THEN
             DECLARE
-               l_found_par       BOOLEAN;
+               l_found_par       BOOLEAN := FALSE;
                c_pl     CONSTANT NM_PLACEMENT
                                     := l_new_inv_pl_arr.npa_placement_array (1) ;
                l_ne_id           NUMBER;
 
-               CURSOR c_parent
+               CURSOR c_parent(cp_iit_ne_id nm_inv_items_all.iit_ne_id%TYPE)
                IS
                   SELECT NVL (iig_parent_id, 0) iig_parent_id,
                          itg_parent_inv_type iit_inv_type
                     FROM nm_inv_item_groupings iig,
                          nm_inv_items iit,
                          nm_inv_type_groupings itg
-                   WHERE     iit.iit_ne_id = l_rec_iit.iit_ne_id
+                   WHERE     iit.iit_ne_id = cp_iit_ne_id
                          AND iig_parent_id(+) = iit.iit_ne_id
                          AND itg_inv_type = iit.iit_inv_type;
 
@@ -696,42 +664,40 @@ AS
                                     := nm3get.get_iit (l_rec_iit.iit_ne_id);
 
                --
-               CURSOR c_child_loc
+               CURSOR c_child_loc(cp_iit_inv_type nm_inv_types_all.nit_inv_type%TYPE)
                IS
                   SELECT nin_loc_mandatory
                     FROM nm_inv_nw
-                   WHERE nin_nit_inv_code = l_iit_rec.iit_inv_type;
+                   WHERE nin_nit_inv_code = cp_iit_inv_type;
 
                l_loc_man         nm_inv_nw.nin_loc_mandatory%TYPE;
 
                --
-               CURSOR c_get_rel_mandatory
+               CURSOR c_get_rel_mandatory(cp_iit_inv_type nm_inv_types_all.nit_inv_type%TYPE)
                IS
                   SELECT itg_mandatory, itg_relation
                     FROM nm_inv_type_groupings
-                   WHERE itg_inv_type = l_iit_rec.iit_inv_type;
+                   WHERE itg_inv_type = cp_iit_inv_type;
 
                l_rel_mandatory   c_get_rel_mandatory%ROWTYPE;
                l_nit_rec         nm_inv_types%ROWTYPE
                   := nm3get.get_nit (l_iit_rec.iit_inv_type);
             BEGIN
-               l_found_par := FALSE;
-
-               OPEN c_parent;
+               OPEN c_parent(l_rec_iit.iit_ne_id);
 
                FETCH c_parent INTO l_parent_rec;
 
                CLOSE c_parent;
 
                --
-               OPEN c_child_loc;
+               OPEN c_child_loc(l_iit_rec.iit_inv_type);
 
                FETCH c_child_loc INTO l_loc_man;
 
                CLOSE c_child_loc;
 
                --
-               OPEN c_get_rel_mandatory;
+               OPEN c_get_rel_mandatory(l_iit_rec.iit_inv_type);
 
                FETCH c_get_rel_mandatory INTO l_rel_mandatory;
 
@@ -857,20 +823,13 @@ AS
             RAISE g_homo_exception;
          ELSIF l_rec_nit.nit_pnt_or_cont = 'P'
          THEN
-            FOR i IN 1 .. l_new_inv_pl_arr.placement_count
-            LOOP
-               DECLARE
-                  c_pl   CONSTANT NM_PLACEMENT
-                     := l_new_inv_pl_arr.npa_placement_array (i) ;
-               BEGIN
-                  IF c_pl.pl_start != c_pl.pl_end
-                  THEN
-                     g_homo_exc_code := -20515;
-                     g_homo_exc_msg :=
-                        'Point Inventory Items can only be placed at single points';
-                     RAISE g_homo_exception;
-                  END IF;
-               END;
+            FOR i IN 1..l_new_inv_pl_arr.placement_count LOOP
+              IF l_new_inv_pl_arr.npa_placement_array(i).pl_start != l_new_inv_pl_arr.npa_placement_array(i).pl_end
+               THEN
+                  g_homo_exc_code := -20515;
+                  g_homo_exc_msg := 'Point Inventory Items can only be placed at single points';
+                  RAISE g_homo_exception;
+              END IF;
             END LOOP;
          END IF;
 
@@ -1190,13 +1149,12 @@ AS
                   -- Assemble the MPs into potential chunks
                   FOR l_count IN 1 .. l_mp.COUNT - 1
                   LOOP
-                     l_placement_arr :=
-                        l_placement_arr.add_element (
-                           pl_ne_id     => cs_rec.nm_ne_id_of,
-                           pl_start     => l_mp (l_count),
-                           pl_end       => l_mp (l_count + 1),
-                           pl_measure   => 0,
-                           pl_mrg_mem   => FALSE);
+                     nm3pla.add_element_to_pl_arr(pio_pl_arr => l_placement_arr
+                                                 ,pi_ne_id   => cs_rec.nm_ne_id_of
+                                                 ,pi_start   => l_mp(l_count)
+                                                 ,pi_end     => l_mp(l_count + 1)
+                                                 ,pi_measure => 0
+                                                 ,pi_mrg_mem => FALSE);
                      l_placed_begin_mp (l_count) := l_mp (l_count);
                      l_placed_end_mp (l_count) := l_mp (l_count + 1);
                   -- nm_debug.debug(l_mp(l_count)||':'||l_mp(l_count+1));
@@ -1254,37 +1212,23 @@ AS
 
                   --
                   -- Re-create any of the location records for existing inventory on this ne_id_of
-                  FOR l_count IN 1 ..
-                                 l_placement_arr.npa_placement_array.COUNT
-                  LOOP
-                     IF NOT l_tab_dont_do.EXISTS (l_count)
+                  FOR l_count IN 1..l_placement_arr.npa_placement_array.COUNT LOOP
+                    IF NOT l_tab_dont_do.EXISTS(l_count)
                      THEN
-                        DECLARE
-                           l_pl   NM_PLACEMENT
-                              := l_placement_arr.npa_placement_array (
-                                    l_count);
-                        BEGIN
-                           l_member_arr :=
-                              l_member_arr.add_element (
-                                 pl_ne_id     => l_pl.pl_ne_id,
-                                 pl_start     => l_pl.pl_start,
-                                 pl_end       => l_pl.pl_end,
-                                 pl_measure   => 0,
-                                 pl_mrg_mem   => FALSE);
-                        END;
-                     END IF;
+                        nm3pla.add_element_to_pl_arr(pio_pl_arr => l_member_arr
+                                                    ,pi_ne_id   => l_placement_arr.npa_placement_array(l_count).pl_ne_id
+                                                    ,pi_start   => l_placement_arr.npa_placement_array(l_count).pl_start
+                                                    ,pi_end     => l_placement_arr.npa_placement_array(l_count).pl_end
+                                                    ,pi_measure => 0
+                                                    ,pi_mrg_mem => FALSE);
+                    END IF;
                   END LOOP;
-
                   --             nm_debug.debug('Inserting replacements');
                   --             nm3pla.dump_placement_array(l_member_arr);
                   IF NOT l_member_arr.is_empty
                   THEN
-                     FOR l_count IN 1 ..
-                                    l_member_arr.npa_placement_array.COUNT
-                     LOOP
-                        DECLARE
-                           l_pl             NM_PLACEMENT
-                              := l_member_arr.npa_placement_array (l_count);
+                     FOR l_count IN 1..l_member_arr.npa_placement_array.COUNT LOOP
+                       DECLARE
                            l_rec_nm         NM_MEMBERS%ROWTYPE := cs_rec;
                            l_rec_chi_nm     NM_MEMBERS%ROWTYPE;
 
@@ -1340,8 +1284,8 @@ AS
                            l_child_nm_rec   NM_MEMBERS%ROWTYPE;
                         --Log 713412:Linesh:End
                         BEGIN
-                           l_rec_nm.nm_begin_mp := l_pl.pl_start;
-                           l_rec_nm.nm_end_mp := l_pl.pl_end;
+                           l_rec_nm.nm_begin_mp := l_member_arr.npa_placement_array(l_count).pl_start;
+                           l_rec_nm.nm_end_mp := l_member_arr.npa_placement_array(l_count).pl_end;
                            l_rec_nm.nm_start_date := p_effective_date;
                            --                      nm_debug.debug('IN : '||l_rec_nm.nm_ne_id_in||' : OF : '||l_rec_nm.nm_ne_id_of||' : BEGIN : '||l_rec_nm.nm_begin_mp||' : END : '||l_rec_nm.nm_end_mp);
                            xattr_off;
@@ -1505,76 +1449,79 @@ AS
 
       --
       -- Inserting membership records for the newly placed item
-      -- nm_debug.debug('Inserting membership records for the newly placed item');
       --
       DECLARE
-         l_nm_seq_no   NM_MEMBERS.nm_seq_no%TYPE;
-
-         CURSOR cs_nte (c_nte_job_id NM_NW_TEMP_EXTENTS.nte_job_id%TYPE)
-         IS
-            SELECT *
-              FROM NM_NW_TEMP_EXTENTS
-             WHERE nte_job_id = c_nte_job_id;
-
-         l_rec_nm      NM_MEMBERS%ROWTYPE;
+        --
+        l_nm_seq_no  nm_members.nm_seq_no%TYPE;
+        --
+        CURSOR cs_nte(c_nte_job_id nm_nw_temp_extents.nte_job_id%TYPE)
+            IS
+        SELECT *
+          FROM nm_nw_temp_extents
+         WHERE nte_job_id = c_nte_job_id
+         ORDER
+            BY nte_seq_no
+             ;
+        --
+        TYPE nte_tab IS TABLE OF nm_nw_temp_extents%ROWTYPE;
+        lt_nte  nte_tab;
+        --
+        TYPE nm_tab IS TABLE OF nm_members%ROWTYPE INDEX BY BINARY_INTEGER;
+        lt_nm     nm_tab;
+        l_rec_nm  nm_members%ROWTYPE;
+        --
       BEGIN
-         -- nm_debug.debug('Remnants later');
-         -- nm3extent.debug_temp_extents(l_remnant_job_id);
-         FOR cs_rec IN cs_nte (l_remnant_job_id)
-         LOOP
-            --
-            BEGIN
-               --          nm_debug.debug('############ '||cs_nte%ROWCOUNT||' cs_nte count');
-               --       Changed to be a cursor loop rather than a single INSERT statement as to not
-               --        cause AU security to grind to a halt
-               --
-               l_nm_seq_no :=
-                  NVL (
-                     get_seq_no_from_orig (cs_rec.nte_ne_id_of,
-                                           cs_rec.nte_begin_mp,
-                                           cs_rec.nte_end_mp),
-                     cs_rec.nte_seq_no);
-               --            nm_debug.debug('############ '||cs_nte%ROWCOUNT||' pre insert');
-               --
-               l_rec_nm.nm_ne_id_in := l_rec_iit.iit_ne_id;
-               l_rec_nm.nm_ne_id_of := cs_rec.nte_ne_id_of;
-               l_rec_nm.nm_type := 'I';
-               l_rec_nm.nm_obj_type := l_rec_iit.iit_inv_type;
-               l_rec_nm.nm_begin_mp := cs_rec.nte_begin_mp;
-               l_rec_nm.nm_start_date := p_effective_date;
-               l_rec_nm.nm_end_date := l_rec_iit.iit_end_date;
-               l_rec_nm.nm_end_mp := cs_rec.nte_end_mp;
-               l_rec_nm.nm_slk := NULL;
-               l_rec_nm.nm_cardinality := 1;
-               l_rec_nm.nm_admin_unit := l_rec_iit.iit_admin_unit;
-               l_rec_nm.nm_seq_no := l_nm_seq_no;
-               l_rec_nm.nm_seg_no := NULL;
-               l_rec_nm.nm_true := NULL;
-               nm3net.ins_nm (l_rec_nm);
-            --            nm_debug.debug('############ '||cs_nte%ROWCOUNT||' post insert');
-            EXCEPTION
-               WHEN DUP_VAL_ON_INDEX
-               THEN
-                  --               nm_debug.debug('############ dup_val_on_index caught');
-                  DELETE NM_MEMBERS_ALL
-                   WHERE     nm_ne_id_in = l_rec_nm.nm_ne_id_in
-                         AND nm_ne_id_of = l_rec_nm.nm_ne_id_of
-                         AND nm_begin_mp = l_rec_nm.nm_begin_mp
-                         AND nm_start_date = l_rec_nm.nm_start_date;
-
-                  nm3net.ins_nm (l_rec_nm);
-            END;
-         --
-         END LOOP;
+        --
+        OPEN  cs_nte(l_remnant_job_id);
+        FETCH cs_nte
+         BULK COLLECT
+         INTO lt_nte;
+        CLOSE cs_nte;
+        --
+        FOR i IN 1..lt_nte.COUNT LOOP
+          --
+          l_nm_seq_no := NVL(get_seq_no_from_orig(lt_nte(i).nte_ne_id_of
+                                                 ,lt_nte(i).nte_begin_mp
+                                                 ,lt_nte(i).nte_end_mp)
+                            ,lt_nte(i).nte_seq_no);
+          --
+          l_rec_nm.nm_ne_id_in := l_rec_iit.iit_ne_id;
+          l_rec_nm.nm_ne_id_of := lt_nte(i).nte_ne_id_of;
+          l_rec_nm.nm_type := 'I';
+          l_rec_nm.nm_obj_type := l_rec_iit.iit_inv_type;
+          l_rec_nm.nm_begin_mp := lt_nte(i).nte_begin_mp;
+          l_rec_nm.nm_start_date := p_effective_date;
+          l_rec_nm.nm_end_date := l_rec_iit.iit_end_date;
+          l_rec_nm.nm_end_mp := lt_nte(i).nte_end_mp;
+          l_rec_nm.nm_slk := NULL;
+          l_rec_nm.nm_cardinality := 1;
+          l_rec_nm.nm_admin_unit := l_rec_iit.iit_admin_unit;
+          l_rec_nm.nm_seq_no := l_nm_seq_no;
+          l_rec_nm.nm_seg_no := NULL;
+          l_rec_nm.nm_true := NULL;
+          --
+          lt_nm(lt_nm.COUNT + 1) := l_rec_nm;
+          --
+        END LOOP;
+        --
+        FORALL i IN 1 .. lt_nm.COUNT
+          DELETE nm_members_all
+           WHERE nm_ne_id_in = lt_nm(i).nm_ne_id_in
+             AND nm_ne_id_of = lt_nm(i).nm_ne_id_of
+             AND nm_begin_mp = lt_nm(i).nm_begin_mp
+             AND nm_start_date = lt_nm(i).nm_start_date;
+        --
+        FORALL i IN 1 .. lt_nm.COUNT
+          INSERT INTO nm_members_all
+               VALUES lt_nm(i);
+        --
       EXCEPTION
-         WHEN DUP_VAL_ON_INDEX
+        WHEN DUP_VAL_ON_INDEX
          THEN
             g_homo_exc_code := -20517;
-            g_homo_exc_msg :=
-               'Inventory Locations already exist for this item at this point with this start date';
+            g_homo_exc_msg := 'Inventory Locations already exist for this item at this point with this start date';
             RAISE g_homo_exception;
       END;
-
       --
       -- nm_debug.debug('   -- Deal with any hierarchical children');
       -- Deal with any hierarchical children
@@ -1855,7 +1802,7 @@ AS
                  FROM NM_ELEMENTS
                 WHERE ne_id IN (SELECT nte_ne_id_of
                                   FROM NM_NW_TEMP_EXTENTS
-                                 WHERE nte_job_id = l_remnant_job_id);
+                                 WHERE nte_job_id = p_job_id);
 
             --
             CURSOR cs_members (
@@ -1917,13 +1864,12 @@ AS
                   --
                   l_been_into_loop := TRUE;
                   --
-                  l_placement_arr :=
-                     l_placement_arr.add_element (
-                        pl_ne_id     => cs_rec.ne_id,
-                        pl_start     => cs_mem.nm_begin_mp,
-                        pl_end       => cs_mem.nm_end_mp,
-                        pl_measure   => 0,
-                        pl_mrg_mem   => TRUE);
+                  nm3pla.add_element_to_pl_arr(pio_pl_arr => l_placement_arr
+                                              ,pi_ne_id   => cs_rec.ne_id
+                                              ,pi_start   => cs_mem.nm_begin_mp
+                                              ,pi_end     => cs_mem.nm_end_mp
+                                              ,pi_measure => 0
+                                              ,pi_mrg_mem => TRUE);
                --
                END LOOP;                                             -- cs_mem
 
@@ -2378,17 +2324,15 @@ AS
 
                   -- nm_debug.debug('Potential chunks');
                   -- Assemble the MPs into potential chunks
-                  FOR l_count IN 1 .. l_mp.COUNT - 1
-                  LOOP
-                     l_placement_arr :=
-                        l_placement_arr.add_element (
-                           pl_ne_id     => cs_rec.nm_ne_id_of,
-                           pl_start     => l_mp (l_count),
-                           pl_end       => l_mp (l_count + 1),
-                           pl_measure   => 0,
-                           pl_mrg_mem   => FALSE);
-                     l_placed_begin_mp (l_count) := l_mp (l_count);
-                     l_placed_end_mp (l_count) := l_mp (l_count + 1);
+                  FOR l_count IN 1 .. l_mp.COUNT - 1 LOOP
+                    nm3pla.add_element_to_pl_arr(pio_pl_arr => l_placement_arr
+                                                ,pi_ne_id   => cs_rec.nm_ne_id_of
+                                                ,pi_start   => l_mp(l_count)
+                                                ,pi_end     => l_mp(l_count + 1)
+                                                ,pi_measure => 0
+                                                ,pi_mrg_mem => FALSE);
+                    l_placed_begin_mp(l_count) := l_mp(l_count);
+                    l_placed_end_mp(l_count) := l_mp(l_count + 1);
                   -- nm_debug.debug(l_mp(l_count)||':'||l_mp(l_count+1));
                   END LOOP;
 
@@ -2444,37 +2388,24 @@ AS
 
                   --
                   -- Re-create any of the location records for existing inventory on this ne_id_of
-                  FOR l_count IN 1 ..
-                                 l_placement_arr.npa_placement_array.COUNT
-                  LOOP
-                     IF NOT l_tab_dont_do.EXISTS (l_count)
+                  FOR l_count IN 1..l_placement_arr.npa_placement_array.COUNT LOOP
+                    IF NOT l_tab_dont_do.EXISTS(l_count)
                      THEN
-                        DECLARE
-                           l_pl   NM_PLACEMENT
-                              := l_placement_arr.npa_placement_array (
-                                    l_count);
-                        BEGIN
-                           l_member_arr :=
-                              l_member_arr.add_element (
-                                 pl_ne_id     => l_pl.pl_ne_id,
-                                 pl_start     => l_pl.pl_start,
-                                 pl_end       => l_pl.pl_end,
-                                 pl_measure   => 0,
-                                 pl_mrg_mem   => FALSE);
-                        END;
-                     END IF;
+                        nm3pla.add_element_to_pl_arr(pio_pl_arr => l_member_arr
+                                                    ,pi_ne_id   => l_placement_arr.npa_placement_array(l_count).pl_ne_id
+                                                    ,pi_start   => l_placement_arr.npa_placement_array(l_count).pl_start
+                                                    ,pi_end     => l_placement_arr.npa_placement_array(l_count).pl_end
+                                                    ,pi_measure => 0
+                                                    ,pi_mrg_mem => FALSE);
+                    END IF;
                   END LOOP;
 
                   --             nm_debug.debug('Inserting replacements');
                   --             nm3pla.dump_placement_array(l_member_arr);
                   IF NOT l_member_arr.is_empty
                   THEN
-                     FOR l_count IN 1 ..
-                                    l_member_arr.npa_placement_array.COUNT
-                     LOOP
+                     FOR l_count IN 1..l_member_arr.npa_placement_array.COUNT LOOP
                         DECLARE
-                           l_pl             NM_PLACEMENT
-                              := l_member_arr.npa_placement_array (l_count);
                            l_rec_nm         NM_MEMBERS%ROWTYPE := cs_rec;
                            l_rec_chi_nm     NM_MEMBERS%ROWTYPE;
 
@@ -2530,8 +2461,8 @@ AS
                            l_child_nm_rec   NM_MEMBERS%ROWTYPE;
                         --Log 713412:Linesh:End
                         BEGIN
-                           l_rec_nm.nm_begin_mp := l_pl.pl_start;
-                           l_rec_nm.nm_end_mp := l_pl.pl_end;
+                           l_rec_nm.nm_begin_mp := l_member_arr.npa_placement_array(l_count).pl_start;
+                           l_rec_nm.nm_end_mp := l_member_arr.npa_placement_array(l_count).pl_end;
                            l_rec_nm.nm_start_date := pi_effective_date;
                            --                      nm_debug.debug('IN : '||l_rec_nm.nm_ne_id_in||' : OF : '||l_rec_nm.nm_ne_id_of||' : BEGIN : '||l_rec_nm.nm_begin_mp||' : END : '||l_rec_nm.nm_end_mp);
                            xattr_off;
@@ -2763,8 +2694,6 @@ AS
       pi_nm_rec          IN nm_members%ROWTYPE,
       pi_nte_for_chunk   IN nm_nw_temp_extents.nte_job_id%TYPE DEFAULT NULL)
    IS
-      l_pl       nm_placement;
-
       l_nm_rec   nm_members%ROWTYPE := pi_nm_rec;
    BEGIN
       nm_debug.proc_start (p_package_name     => g_package_name,
@@ -2772,27 +2701,24 @@ AS
 
       db ('cr8_mems_for_pl_arr');
 
-      FOR i IN 1 .. pi_pl_arr.placement_count
-      LOOP
-         l_pl := pi_pl_arr.get_entry (i);
-
-         l_nm_rec.nm_ne_id_of := l_pl.pl_ne_id;
-         l_nm_rec.nm_begin_mp := l_pl.pl_start;
-         l_nm_rec.nm_end_mp := l_pl.pl_end;
+      FOR i IN 1..pi_pl_arr.placement_count LOOP
+         l_nm_rec.nm_ne_id_of := pi_pl_arr.npa_placement_array(i).pl_ne_id;
+         l_nm_rec.nm_begin_mp := pi_pl_arr.npa_placement_array(i).pl_start;
+         l_nm_rec.nm_end_mp := pi_pl_arr.npa_placement_array(i).pl_end;
 
          db (
                '  inserting nm rec '
             || l_nm_rec.nm_ne_id_of
             || ':'
-            || l_pl.pl_start
+            || pi_pl_arr.npa_placement_array(i).pl_start
             || ':'
-            || l_pl.pl_end);
+            || pi_pl_arr.npa_placement_array(i).pl_end);
          nm3ins.ins_nm (p_rec_nm => l_nm_rec);
 
          IF pi_nte_for_chunk IS NOT NULL
          THEN
             db ('  adding chunk to temp extent');
-            add_pl_to_nte (pi_pl => l_pl, pi_nte_job_id => pi_nte_for_chunk);
+            add_pl_to_nte (pi_pl => pi_pl_arr.npa_placement_array(i), pi_nte_job_id => pi_nte_for_chunk);
          END IF;
       END LOOP;
 
@@ -3325,13 +3251,12 @@ AS
                   --
                   l_been_into_loop := TRUE;
                   --
-                  l_placement_arr :=
-                     l_placement_arr.add_element (
-                        pl_ne_id     => cs_rec.ne_id,
-                        pl_start     => cs_mem.nm_begin_mp,
-                        pl_end       => cs_mem.nm_end_mp,
-                        pl_measure   => 0,
-                        pl_mrg_mem   => TRUE);
+                  nm3pla.add_element_to_pl_arr(pio_pl_arr => l_placement_arr
+                                              ,pi_ne_id   => cs_rec.ne_id
+                                              ,pi_start   => cs_mem.nm_begin_mp
+                                              ,pi_end     => cs_mem.nm_end_mp
+                                              ,pi_measure => 0
+                                              ,pi_mrg_mem => TRUE);
                --
                END LOOP;                                             -- cs_mem
 
@@ -4017,17 +3942,10 @@ AS
          -- Get the NW type from the first element in the placement array,
          --  they will all be the same
          -- nm_debug.debug('Get the NW type from the first element in the placement array');
-         FOR i IN 1 .. l_new_inv_pl_arr.placement_count
-         LOOP
-            DECLARE
-               l_pl   NM_PLACEMENT := l_new_inv_pl_arr.get_entry (i);
-            BEGIN
-               l_rec_ne :=
-                  nm3get.get_ne (pi_ne_id             => l_pl.pl_ne_id,
-                                 pi_raise_not_found   => FALSE);
-            END;
-
-            EXIT WHEN l_rec_ne.ne_id IS NOT NULL;
+         FOR i IN 1..l_new_inv_pl_arr.placement_count LOOP
+           l_rec_ne := nm3get.get_ne(pi_ne_id           => l_new_inv_pl_arr.npa_placement_array(i).pl_ne_id
+                                    ,pi_raise_not_found => FALSE);
+           EXIT WHEN l_rec_ne.ne_id IS NOT NULL;
          END LOOP;
 
          --
@@ -4104,20 +4022,13 @@ AS
             RAISE g_homo_exception;
          ELSIF l_rec_nit.nit_pnt_or_cont = 'P'
          THEN
-            FOR i IN 1 .. l_new_inv_pl_arr.placement_count
-            LOOP
-               DECLARE
-                  c_pl   CONSTANT NM_PLACEMENT
-                     := l_new_inv_pl_arr.npa_placement_array (i) ;
-               BEGIN
-                  IF c_pl.pl_start != c_pl.pl_end
-                  THEN
-                     g_homo_exc_code := -20515;
-                     g_homo_exc_msg :=
-                        'Point Inventory Items can only be placed at single points';
-                     RAISE g_homo_exception;
-                  END IF;
-               END;
+            FOR i IN 1..l_new_inv_pl_arr.placement_count LOOP
+              IF l_new_inv_pl_arr.npa_placement_array(i).pl_start != l_new_inv_pl_arr.npa_placement_array(i).pl_end
+               THEN
+                  g_homo_exc_code := -20515;
+                  g_homo_exc_msg := 'Point Inventory Items can only be placed at single points';
+                  RAISE g_homo_exception;
+              END IF;
             END LOOP;
          END IF;
 
@@ -4760,7 +4671,6 @@ AS
       END IF;
 
       db ('Aggregate the asset geometry ' || p_iit_ne_id);
-
       IF NM_INV_SDO_AGGR.IS_TYPE_AGGREGATED (l_rec_nit.nit_inv_type)
       THEN
          NM_INV_SDO_AGGR.AGGREGATE_INV_GEOMETRY (l_rec_nit.nit_inv_type,
@@ -5192,28 +5102,27 @@ AS
    --
    -----------------------------------------------------------------------------
    --
-   FUNCTION get_seq_no_from_orig (nte_ne_id_of   IN NUMBER,
-                                  nte_begin_mp   IN NUMBER,
-                                  nte_end_mp     IN NUMBER)
-      RETURN NUMBER
-   IS
-      l_retval   NUMBER;
-      l_pl       NM_PLACEMENT;
+   FUNCTION get_seq_no_from_orig(nte_ne_id_of IN NUMBER
+                                ,nte_begin_mp IN NUMBER
+                                ,nte_end_mp   IN NUMBER)
+     RETURN NUMBER IS
+     l_retval  NUMBER;
    BEGIN
-      FOR i IN 1 .. g_orig_new_inv_pl_arr.placement_count
-      LOOP
-         l_pl := g_orig_new_inv_pl_arr.get_entry (i);
-
-         IF     l_pl.pl_ne_id = nte_ne_id_of
-            AND l_pl.pl_start <= nte_end_mp
-            AND l_pl.pl_end >= nte_begin_mp
-         THEN
-            l_retval := i;
-            EXIT;
-         END IF;
-      END LOOP;
-
-      RETURN l_retval;
+     --
+     FOR i IN 1..g_orig_new_inv_pl_arr.placement_count LOOP
+       --
+       IF g_orig_new_inv_pl_arr.npa_placement_array(i).pl_ne_id = nte_ne_id_of
+        AND g_orig_new_inv_pl_arr.npa_placement_array(i).pl_start <= nte_end_mp
+        AND g_orig_new_inv_pl_arr.npa_placement_array(i).pl_end >= nte_begin_mp
+        THEN
+           l_retval := i;
+           EXIT;
+       END IF;
+       --
+     END LOOP;
+     --
+     RETURN l_retval;
+     --
    END get_seq_no_from_orig;
 
    --
@@ -5746,15 +5655,14 @@ AS
          c_inv_type      NM_MEMBERS.nm_obj_type%TYPE,
          c_eff_date      DATE)
       IS
-         SELECT /*+ RULE */
-                nm_ne_id_in
+         SELECT nm_ne_id_in
            FROM NM_MEMBERS_ALL, NM_NW_TEMP_EXTENTS
           WHERE     nte_job_id = c_nte_job_id
                 AND nte_ne_id_of = nm_ne_id_of
                 AND nte_begin_mp < nm_end_mp
                 AND nte_end_mp > nm_begin_mp
                 AND nm_type = 'I'
-                AND nm_obj_type || NULL = c_inv_type
+                AND nm_obj_type = c_inv_type
                 AND nm_start_date > c_eff_date;
 
       CURSOR cs_future_affected_inv_point (
@@ -5762,15 +5670,14 @@ AS
          c_inv_type      NM_MEMBERS.nm_obj_type%TYPE,
          c_eff_date      DATE)
       IS
-         SELECT /*+ RULE */
-                nm_ne_id_in
+         SELECT nm_ne_id_in
            FROM NM_MEMBERS_ALL, NM_NW_TEMP_EXTENTS
           WHERE     nte_job_id = c_nte_job_id
                 AND nte_ne_id_of = nm_ne_id_of
                 AND nte_begin_mp = nm_end_mp
                 AND nte_end_mp = nm_begin_mp
                 AND nm_type = 'I'
-                AND nm_obj_type || NULL = c_inv_type
+                AND nm_obj_type = c_inv_type
                 AND nm_start_date > c_eff_date;
 
       --
