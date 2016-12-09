@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_loc
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_loc.pkb-arc   1.5   Oct 28 2016 15:36:12   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_loc.pkb-arc   1.6   Dec 09 2016 09:13:20   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_loc.pkb  $
-   --       Date into PVCS   : $Date:   Oct 28 2016 15:36:12  $
-   --       Date fetched Out : $Modtime:   Oct 28 2016 15:31:32  $
-   --       PVCS Version     : $Revision:   1.5  $
+   --       Date into PVCS   : $Date:   Dec 09 2016 09:13:20  $
+   --       Date fetched Out : $Modtime:   Dec 09 2016 09:12:26  $
+   --       PVCS Version     : $Revision:   1.6  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,7 +16,7 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.5  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.6  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_loc';
 
@@ -423,7 +423,8 @@ AS
       --
       SELECT CAST (COLLECT (lb_xsp (xsp, nwx_descr)) AS lb_xsp_tab)
         INTO retval
-        FROM nm_xsp,(select xsr_x_sect_value xsp
+        FROM (select distinct xsp, nwx_descr from 
+        nm_xsp,(select xsr_x_sect_value xsp
         from ( SELECT DISTINCT xsr_x_sect_value
                 FROM (WITH datum_range
                            AS (SELECT t1.*,
@@ -470,7 +471,7 @@ AS
                                ne_nt_type,
                                ne_sub_class,
                                xsr_x_sect_value)
-               WHERE sc_count = datum_count));
+               WHERE sc_count = datum_count))where nwx_x_sect = xsp);
 
       RETURN retval;
    END;
