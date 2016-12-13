@@ -2,11 +2,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data1.sql-arc   2.58   Jul 12 2013 12:30:16   Rob.Coupe  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/nm3/install/nm3data1.sql-arc   2.59   Dec 13 2016 10:36:02   Sarah.Williams  $
 --       Module Name      : $Workfile:   nm3data1.sql  $
---       Date into PVCS   : $Date:   Jul 12 2013 12:30:16  $
---       Date fetched Out : $Modtime:   Jul 12 2013 12:29:44  $
---       Version          : $Revision:   2.58  $
+--       Date into PVCS   : $Date:   Dec 13 2016 10:36:02  $
+--       Date fetched Out : $Modtime:   Dec 13 2016 10:35:40  $
+--       PVCS Version     : $Revision:   2.59  $
 --       Table Owner      : NM3_METADATA
 --       Generation Date  : 15-AUG-2012 09:26
 --
@@ -15,7 +15,7 @@
 -----------------------------------------------------------------------------
 --
 --   Product metadata script
---   As at Release 4.6.0.0
+--   As at Release 4.7.0.0
 --
 --   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 --
@@ -30819,7 +30819,7 @@ INSERT INTO HIG_MODULES
        )
 SELECT 
         'HIG4025'
-       ,'My Standard Text Usuage'
+       ,'My Standard Text Usage'
        ,'hig4020'
        ,'FMX'
        ,''
