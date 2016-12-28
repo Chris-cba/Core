@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3file AS
 --
 -- PVCS Identifiers :-
 --
--- pvcsid : $Header:   //vm_latest/archives/nm3/admin/pck/nm3file.pkb-arc   2.16   Jul 04 2013 15:33:48   James.Wadsworth  $
+-- pvcsid : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3file.pkb-arc   2.17   Dec 28 2016 10:05:42   Upendra.Hukeri  $
 -- Module Name : $Workfile:   nm3file.pkb  $
--- Date into PVCS : $Date:   Jul 04 2013 15:33:48  $
--- Date fetched Out : $Modtime:   Jul 04 2013 14:25:10  $
--- PVCS Version : $Revision:   2.16  $
+-- Date into PVCS : $Date:   Dec 28 2016 10:05:42  $
+-- Date fetched Out : $Modtime:   Dec 26 2016 10:27:38  $
+-- PVCS Version : $Revision:   2.17  $
 -- Based on SCCS version : 
 --
 --
@@ -17,12 +17,12 @@ CREATE OR REPLACE PACKAGE BODY nm3file AS
 --   NM3 UTL_FILE wrapper package body
 --
 -----------------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2016 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 --all global package variables here
 --
-   g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.16  $';
+   g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.17  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3file';
@@ -1233,10 +1233,12 @@ end web_upload_to_dir;
 --
 -----------------------------------------------------------------------------
 --
-procedure web_download_from_dir
-  ( pi_directory_name varchar2 default null
-  ) is 
-l_ret_files file_list;
+procedure web_download_from_dir( pi_directory_name varchar2 default null) 
+IS 
+	l_directory_path all_directories.directory_path%TYPE;
+	l_ret_files 	 file_list;
+	src_loc   		 BFILE := NULL;
+	file_size 		 INTEGER; 
 begin
   nm_debug.proc_start(g_package_name,'web_download_from_dir');
   web_top('Download from Oracle Directory');
@@ -1257,7 +1259,8 @@ begin
     htp.p('        <select name="pi_directory_name">');
     for dirs in (select * from all_directories order by directory_name)
     loop
-      htp.p('          <option value="'|| dirs.directory_path || '">' || dirs.directory_name || '</option>');
+      --htp.p('          <option value="'|| dirs.directory_path || '">' || dirs.directory_name || '</option>');
+	  htp.p('          <option value="'|| dirs.directory_name || '">' || dirs.directory_name || '</option>');
     end loop;
     htp.p('        </select>');
     htp.p('      </td>');
@@ -1270,12 +1273,17 @@ begin
     htp.p('  </table>');
     htp.p('</form>');
   else
-    htp.p('<form action="./nm3file.web_dump_file" method="post">'); 
-    htp.p('  <input type="hidden" name="pi_oracle_dir" value="' || pi_directory_name || '" />' ) ;
+	SELECT directory_path INTO l_directory_path FROM all_directories WHERE directory_name = pi_directory_name;
+	--
+    --htp.p('<form action="./nm3file.web_dump_file" method="post">'); 
+	htp.p('<form action="./nm3file.get_big_file" method="post">'); 
+    --htp.p('  <input type="hidden" name="pi_oracle_dir" value="' || pi_directory_name || '" />' ) ;
+	htp.p('  <input type="hidden" name="p_file_dir" value="' || pi_directory_name || '" />' ) ;
     htp.p('  <table>');
     htp.p('    <tr>');
     htp.p('      <td colspan="2">');
-    htp.p('        <h1>Download from Oracle Directory ' || pi_directory_name || '</h1>');
+    --htp.p('        <h1>Download from Oracle Directory ' || pi_directory_name || '</h1>');
+	htp.p('        <h1>Download from Oracle Directory ' || l_directory_path || '</h1>');
     htp.p('      </td>');
     htp.p('    </tr>');
     htp.p('    <tr>');
@@ -1283,15 +1291,29 @@ begin
     htp.p('        Select file to download');
     htp.p('      </td>');
     htp.p('      <td>');
-    htp.p('        <select name="pi_file_name">');
-    l_ret_files := get_files_in_directory( pi_directory_name, null ) ;
-    if l_ret_files.count > 0
-    then
-      for fi in 1..l_ret_files.count
-      loop
-        htp.p('          <option value="'|| l_ret_files(fi) || '">' || l_ret_files(fi) || '</option>');
-      end loop;
-    end if;
+    --htp.p('        <select name="pi_file_name">');
+	htp.p('        <select name="p_file_name">');
+	--
+    --l_ret_files := get_files_in_directory(pi_directory_name, null);
+	l_ret_files := get_files_in_directory(l_directory_path, null);
+	--
+    IF l_ret_files.COUNT > 0 THEN
+		FOR fi IN 1..l_ret_files.COUNT
+		LOOP
+			--
+			src_loc := bfilename(pi_directory_name, l_ret_files(fi));
+			file_size := dbms_lob.getlength(src_loc);
+			--
+			htp.p('          <option ');
+			--
+			IF file_size > 4294967295 THEN
+				htp.p('style="color: red;"');
+			END IF;
+			--
+			htp.p(' value="' || l_ret_files(fi) || '">' || l_ret_files(fi) || '</option>');
+		END LOOP;
+    END IF;
+	--
     htp.p('        </select>');
     htp.p('      </td>');
     htp.p('    </tr>');
@@ -1749,6 +1771,33 @@ END external_table_record_delim;
     nm_debug.proc_end (g_package_name,'blob_to_file');
   --
   END blob_to_file;
+--
+--------------------------------------------------------------------------------
+--
+PROCEDURE get_big_file (p_file_dir VARCHAR2, p_file_name VARCHAR2) IS
+	src_loc   BFILE := bfilename(p_file_dir, p_file_name);
+	file_size INTEGER; 
+BEGIN
+	--
+	file_size := dbms_lob.getlength(src_loc);
+	--
+	IF file_size > 4294967295 THEN
+		htp.p('<font color="red"><h2>Error:</b> File size limit (4GB or 4,294,967,295 bytes) exceeded.</h2></font><br/>');
+		htp.p('Unable to download the file - <b>' || p_file_name || ' (' || file_size || ' bytes)</b>.<br/>');
+		htp.p('Please contact your System Administrator to get the file.<br/><br/>');
+		htp.p('<a href="javascript:window.history.back();">Download another file...</a>');  
+	ELSE
+		owa_util.mime_header('application/octet-stream', FALSE);
+		--
+		htp.p('Content-Disposition: filename="' || p_file_name || '"' );
+		htp.p('Content-Length: ' || dbms_lob.getlength(src_loc)); 
+		--
+		owa_util.http_header_close; 
+		--
+		wpg_docload.download_file(src_loc); 
+	END IF; 
+	--   
+END get_big_file; 
 --
 --------------------------------------------------------------------------------
 --
