@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_get
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_get.pkb-arc   1.20   Oct 28 2016 17:01:18   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_get.pkb-arc   1.21   Jan 06 2017 17:03:20   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_get.pkb  $
-   --       Date into PVCS   : $Date:   Oct 28 2016 17:01:18  $
-   --       Date fetched Out : $Modtime:   Oct 28 2016 16:58:16  $
-   --       PVCS Version     : $Revision:   1.20  $
+   --       Date into PVCS   : $Date:   Jan 06 2017 17:03:20  $
+   --       Date fetched Out : $Modtime:   Jan 06 2017 17:03:36  $
+   --       PVCS Version     : $Revision:   1.21  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,7 +16,7 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.20  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.21  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_get';
 
@@ -613,10 +613,11 @@ AS
    IS
       l_g_i_d        VARCHAR2 (1);
       l_refnt_type   INTEGER;
+      l_units        INTEGER;
       retval         lb_Rpt_tab;
    BEGIN
-      SELECT nlt_g_i_d, nlt_id
-        INTO l_g_i_d, l_refnt_type
+      SELECT nlt_g_i_d, nlt_id, nlt_units
+        INTO l_g_i_d, l_refnt_type, l_units
         FROM nm_linear_types, nm_elements
        WHERE     ne_id = p_refnt
              -- and nlt_id = nvl(pi_refrnt_type, nlt_id)
@@ -640,7 +641,7 @@ AS
                                        1,
                                        NVL (p_start_m, 0),
                                        NVL (p_end_m, ne_length),
-                                       p_m_unit)),
+                                       nvl(p_m_unit, l_units))),
                    p_obj_type,
                    p_intsct,
                    p_lb_only,
@@ -660,7 +661,7 @@ AS
                                                          1,
                                                          p_start_m,
                                                          p_end_m,
-                                                         p_m_unit))),
+                                                         nvl(p_m_unit, l_units)))),
                    p_obj_type,
                    p_intsct,
                    p_lb_only,
