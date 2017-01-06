@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_get
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_get.pkb-arc   1.21   Jan 06 2017 17:03:20   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_get.pkb-arc   1.22   Jan 06 2017 17:27:28   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_get.pkb  $
-   --       Date into PVCS   : $Date:   Jan 06 2017 17:03:20  $
-   --       Date fetched Out : $Modtime:   Jan 06 2017 17:03:36  $
-   --       PVCS Version     : $Revision:   1.21  $
+   --       Date into PVCS   : $Date:   Jan 06 2017 17:27:28  $
+   --       Date fetched Out : $Modtime:   Jan 06 2017 17:26:46  $
+   --       PVCS Version     : $Revision:   1.22  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,7 +16,7 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.21  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.22  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_get';
 
@@ -641,7 +641,7 @@ AS
                                        1,
                                        NVL (p_start_m, 0),
                                        NVL (p_end_m, ne_length),
-                                       nvl(p_m_unit, l_units))),
+                                       l_units)),
                    p_obj_type,
                    p_intsct,
                    p_lb_only,
@@ -661,7 +661,7 @@ AS
                                                          1,
                                                          p_start_m,
                                                          p_end_m,
-                                                         nvl(p_m_unit, l_units)))),
+                                                         l_units))),
                    p_obj_type,
                    p_intsct,
                    p_lb_only,
