@@ -1,12 +1,12 @@
-CREATE OR REPLACE PACKAGE BODY EXOR.lb_load
+CREATE OR REPLACE PACKAGE BODY lb_load
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_load.pkb-arc   1.23   Nov 18 2016 16:27:00   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_load.pkb-arc   1.24   Jan 10 2017 17:00:10   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_load.pkb  $
-   --       Date into PVCS   : $Date:   Nov 18 2016 16:27:00  $
-   --       Date fetched Out : $Modtime:   Nov 18 2016 16:25:20  $
-   --       PVCS Version     : $Revision:   1.23  $
+   --       Date into PVCS   : $Date:   Jan 10 2017 17:00:10  $
+   --       Date fetched Out : $Modtime:   Jan 10 2017 16:56:32  $
+   --       PVCS Version     : $Revision:   1.24  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,7 +16,7 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.23  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.24  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_load';
 
@@ -175,11 +175,11 @@ AS
          raise_application_error (
             -20001,
             'The start and end measures must be the same for point asset types');
-      ELSIF l_pnt_or_cont = 'C' AND pi_start_m >= pi_end_m
+      ELSIF l_pnt_or_cont = 'C' AND pi_start_m >= NVL (pi_end_m, pi_start_m)
       THEN
          raise_application_error (
             -20002,
-            'The end measure must be greater than the start measure');
+            'The end measure must be provided and greater than the start measure');
       END IF;
 
       SELECT pi_start_m * NVL (uc_conversion_factor, 1),
@@ -252,7 +252,7 @@ AS
                       p_xsp           IN     VARCHAR2,
                       p_loc_error        OUT lb_loc_error_tab)
    IS
-      l_loc_tab   int_array_type;
+      l_loc_tab   int_array_type := int_array_type (NULL);
       l_err_tab   lb_loc_error_tab;
    BEGIN
       l_err_tab :=
@@ -386,8 +386,8 @@ AS
                                                 NVL (
                                                    nm_offset_st * nm_dir_flag,
                                                    0),
-                                                0.005--                                               ,'unit=m'
-                                                )),
+                                                0.005 --                                               ,'unit=m'
+                                                     )),
                                           0.005,
                                           'arc_tolerance=0.05')
                    geoloc
@@ -803,8 +803,8 @@ AS
                                               NVL (
                                                  nm_offset_st,
                                                  0),
-                                              0.0005--                                               ,'unit=m'
-                                              )),
+                                              0.0005 --                                               ,'unit=m'
+                                                    )),
                                         0.005,
                                         'arc_tolerance=0.05')
                                         geoloc
