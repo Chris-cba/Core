@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_load
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_load.pkb-arc   1.24   Jan 10 2017 17:00:10   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_load.pkb-arc   1.25   Jan 10 2017 17:11:02   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_load.pkb  $
-   --       Date into PVCS   : $Date:   Jan 10 2017 17:00:10  $
-   --       Date fetched Out : $Modtime:   Jan 10 2017 16:56:32  $
-   --       PVCS Version     : $Revision:   1.24  $
+   --       Date into PVCS   : $Date:   Jan 10 2017 17:11:02  $
+   --       Date fetched Out : $Modtime:   Jan 10 2017 17:11:18  $
+   --       PVCS Version     : $Revision:   1.25  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,7 +16,7 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.24  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.25  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_load';
 
@@ -362,6 +362,11 @@ AS
                                    AND nwx_nsc_sub_class = ne_sub_class))
            RETURNING nm_loc_id
                 BULK COLLECT INTO l_loc_tab;
+
+         if int_array(l_loc_tab).is_empty then
+            raise_application_error( -20007, 'There is no location to load, please check the input arguments');
+         end if;                
+
 
       --      FOR i IN 1 .. l_loc_tab.COUNT
       --      LOOP
