@@ -1,0 +1,82 @@
+CREATE OR REPLACE PACKAGE lb_nw_edit
+AS
+   --   PVCS Identifiers :-
+   --
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_nw_edit.pkh-arc   1.0   Jan 11 2017 17:59:44   Rob.Coupe  $
+   --       Module Name      : $Workfile:   lb_nw_edit.pkh  $
+   --       Date into PVCS   : $Date:   Jan 11 2017 17:59:44  $
+   --       Date fetched Out : $Modtime:   Jan 11 2017 17:58:16  $
+   --       PVCS Version     : $Revision:   1.0  $
+   --
+   --   Author : R.A. Coupe
+   --
+   --   Network Edit package - performing updates to linear locations during network changes
+   --
+   -----------------------------------------------------------------------------
+   -- Copyright (c) 2016 Bentley Systems Incorporated. All rights reserved.
+   ----------------------------------------------------------------------------
+   --
+   g_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.0  $';
+
+   c_split     CONSTANT VARCHAR2 (1) := 'S';
+   c_merge     CONSTANT VARCHAR2 (1) := 'M';
+   c_replace   CONSTANT VARCHAR2 (1) := 'R';
+   c_close     CONSTANT VARCHAR2 (1) := 'C';
+   
+   c_shift CONSTANT VARCHAR2(1) := 'H';
+   c_recalibrate CONSTANT VARCHAR2(1) := 'B';
+   
+   c_undo CONSTANT VARCHAR2(1) := 'U';
+
+   FUNCTION get_version
+      RETURN VARCHAR2;
+   FUNCTION get_body_version
+      RETURN VARCHAR2;
+
+   --
+   PROCEDURE lb_split (p_ne               IN INTEGER,
+                       p_split_m          IN NUMBER,
+                       p_ne1              IN INTEGER,
+                       p_ne2              IN INTEGER,
+                       p_effective_date   IN DATE,
+                       p_transaction_id   IN INTEGER);
+
+   PROCEDURE lb_merge (p_ne1              IN INTEGER,
+                       p_ne2              IN INTEGER,
+                       p_ne               IN INTEGER,
+                       p_effective_date   IN DATE,
+                       p_transaction_id   IN INTEGER);
+
+   PROCEDURE lb_replace (p_ne1              IN INTEGER,
+                         p_ne2              IN INTEGER,
+                         p_effective_date   IN DATE,
+                         p_transaction_id   IN INTEGER);
+
+   PROCEDURE lb_recalibrate (p_ne_id_of            IN NUMBER,
+                             p_original_length     IN NUMBER,
+                             p_start_m             IN NUMBER,
+                             p_new_length_to_end   IN NUMBER,
+                             p_transaction_id      IN INTEGER);
+
+   PROCEDURE lb_shift (p_ne               IN INTEGER,
+                       p_start_m          IN NUMBER,
+                       p_shift_m          IN NUMBER,
+                       p_length           IN NUMBER,
+                       p_transaction_id   IN INTEGER);
+
+   PROCEDURE lb_close (p_ne               IN INTEGER,
+                       p_effective_date   IN DATE,
+                       p_transaction_id   IN INTEGER);
+
+   PROCEDURE lb_undo (p_transaction_id IN INTEGER);
+   
+   PROCEDURE lb_undo (p_neh_id IN INTEGER);
+
+   PROCEDURE lb_undo (p_ne_id IN INTEGER);   
+
+   PROCEDURE log_transaction (p_transaction_id   IN INTEGER,
+                              p_neh_id           IN INTEGER);
+
+   PROCEDURE check_operation( p_op in VARCHAR2, p_ne in INTEGER, p_start_m in number, p_shift_m in number, p_effective_date in date, p_length in number );                               
+END;
+/
