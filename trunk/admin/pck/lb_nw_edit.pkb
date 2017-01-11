@@ -1,12 +1,12 @@
-CREATE OR REPLACE PACKAGE BODY EXOR.lb_nw_edit
+CREATE OR REPLACE PACKAGE BODY lb_nw_edit
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_nw_edit.pkb-arc   1.0   Jan 11 2017 18:00:26   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_nw_edit.pkb-arc   1.1   Jan 11 2017 18:02:44   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_nw_edit.pkb  $
-   --       Date into PVCS   : $Date:   Jan 11 2017 18:00:26  $
-   --       Date fetched Out : $Modtime:   Jan 11 2017 17:59:00  $
-   --       PVCS Version     : $Revision:   1.0  $
+   --       Date into PVCS   : $Date:   Jan 11 2017 18:02:44  $
+   --       Date fetched Out : $Modtime:   Jan 11 2017 18:03:26  $
+   --       PVCS Version     : $Revision:   1.1  $
    --
    --   Author : R.A. Coupe
    --
@@ -17,10 +17,10 @@ AS
    ----------------------------------------------------------------------------
    --
 
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.0  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.1  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_get';
-   
+
    --
    FUNCTION get_version
       RETURN VARCHAR2
@@ -43,7 +43,7 @@ AS
    --
    -----------------------------------------------------------------------------
    --
-   
+
    PROCEDURE generate_datum_geoms (p_transaction_id   IN INTEGER,
                                    p_ne1              IN INTEGER,
                                    p_ne2              IN INTEGER);
@@ -65,10 +65,14 @@ AS
 
    PROCEDURE reinstate (p_edit_tab lb_edit_transaction_tab);
 
-  PROCEDURE check_forward_dates( p_ne in INTEGER, p_effective_date in date );
+   PROCEDURE check_forward_dates (p_ne IN INTEGER, p_effective_date IN DATE);
 
-  PROCEDURE check_overhangs( p_ne in INTEGER, p_start_m in number, p_shift_m in number, p_effective_date in date, p_length in number );
-   
+   PROCEDURE check_overhangs (p_ne               IN INTEGER,
+                              p_start_m          IN NUMBER,
+                              p_shift_m          IN NUMBER,
+                              p_effective_date   IN DATE,
+                              p_length           IN NUMBER);
+
    --
    PROCEDURE lb_split (p_ne               IN INTEGER,
                        p_split_m          IN NUMBER,
@@ -695,55 +699,90 @@ AS
                        p_length           IN NUMBER,
                        p_transaction_id   IN INTEGER)
    IS
-   l_dummy integer := 0;
+      l_dummy   INTEGER := 0;
    BEGIN
       BEGIN
-      select 1 into l_dummy --'Problem in LB Shift - Operation results in measure greater than element length'
-      from nm_locations_all
-      where ( (nm_end_mp + p_shift_m > p_length and nm_end_mp > p_start_m )
-      OR    (nm_begin_mp + p_shift_m > p_length and nm_end_mp > p_start_m))
-      and nm_ne_id_of = p_ne;
+         SELECT 1
+           INTO l_dummy --'Problem in LB Shift - Operation results in measure greater than element length'
+           FROM nm_locations_all
+          WHERE     (   (    nm_end_mp + p_shift_m > p_length
+                         AND nm_end_mp > p_start_m)
+                     OR (    nm_begin_mp + p_shift_m > p_length
+                         AND nm_end_mp > p_start_m))
+                AND nm_ne_id_of = p_ne;
 
-      if l_dummy = 1 then
-        raise_application_error(  -20056, 'Shift causes overhang of LB data at end of element');
-      end if;
+         IF l_dummy = 1
+         THEN
+            raise_application_error (
+               -20056,
+               'Shift causes overhang of LB data at end of element');
+         END IF;
       EXCEPTION
-        WHEN NO_DATA_FOUND then
-          NULL;
+         WHEN NO_DATA_FOUND
+         THEN
+            NULL;
       END;
-       
+
       l_dummy := 0;
-      
-      BEGIN
-      select 1 into l_dummy --'Problem in LB Shift - Operation results in measure greater than element length'
-      from nm_locations_all
-      where nm_begin_mp + p_shift_m < 0
-      and nm_ne_id_of = p_ne;
 
-      if l_dummy = 1 then
-        raise_application_error(  -20056, 'Shift causes overhang of LB data at beginning of element');
-      end if;
+      BEGIN
+         SELECT 1
+           INTO l_dummy --'Problem in LB Shift - Operation results in measure greater than element length'
+           FROM nm_locations_all
+          WHERE nm_begin_mp + p_shift_m < 0 AND nm_ne_id_of = p_ne;
+
+         IF l_dummy = 1
+         THEN
+            raise_application_error (
+               -20056,
+               'Shift causes overhang of LB data at beginning of element');
+         END IF;
       EXCEPTION
-        WHEN NO_DATA_FOUND then
-          NULL;
+         WHEN NO_DATA_FOUND
+         THEN
+            NULL;
       END;
 
-      update nm_locations_all
-      set nm_begin_mp = case when nm_begin_mp <= p_start_m then nm_begin_mp
-                             when nm_begin_mp = 0 and nm_end_mp > 0 then nm_begin_mp
-                             when nm_begin_mp = p_length then nm_begin_mp
-                             else case when nm_begin_mp >  p_start_m then nm_begin_mp + p_shift_m
-                                       else nm_begin_mp
-                                  end
-                        end,
-          nm_end_mp = case when nm_end_mp <= p_start_m then nm_end_mp
-                             when nm_end_mp = p_length then nm_end_mp
-                             else case when nm_end_mp >  p_start_m then nm_end_mp + p_shift_m
-                                       else nm_end_mp
-                                  end
-                        end,
-          transaction_id = p_transaction_id
-      where nm_ne_id_of = p_ne;                                         
+      UPDATE nm_locations_all
+         SET nm_begin_mp =
+                CASE
+                   WHEN nm_begin_mp <= p_start_m
+                   THEN
+                      nm_begin_mp
+                   WHEN nm_begin_mp = 0 AND nm_end_mp > 0
+                   THEN
+                      nm_begin_mp
+                   WHEN nm_begin_mp = p_length
+                   THEN
+                      nm_begin_mp
+                   ELSE
+                      CASE
+                         WHEN nm_begin_mp > p_start_m
+                         THEN
+                            nm_begin_mp + p_shift_m
+                         ELSE
+                            nm_begin_mp
+                      END
+                END,
+             nm_end_mp =
+                CASE
+                   WHEN nm_end_mp <= p_start_m
+                   THEN
+                      nm_end_mp
+                   WHEN nm_end_mp = p_length
+                   THEN
+                      nm_end_mp
+                   ELSE
+                      CASE
+                         WHEN nm_end_mp > p_start_m
+                         THEN
+                            nm_end_mp + p_shift_m
+                         ELSE
+                            nm_end_mp
+                      END
+                END,
+             transaction_id = p_transaction_id
+       WHERE nm_ne_id_of = p_ne;
    END;
 
 
@@ -936,80 +975,118 @@ AS
                 AND e2.neh_ne_id_new(+) = e1.neh_ne_id_old;
    END;
 
-  PROCEDURE check_operation( p_op in VARCHAR2, p_ne in INTEGER, p_start_m in number, p_shift_m in number, p_effective_date in date, p_length in number ) is
-  BEGIN
-  
-    CASE p_op
-       when c_split  then
-          check_forward_dates( p_ne, p_effective_date );
-       when c_merge  then
-          check_forward_dates( p_ne, p_effective_date );
-       when c_replace then
-          check_forward_dates( p_ne, p_effective_date );
-       when c_close then
-          check_forward_dates( p_ne, p_effective_date );
-       when c_undo then
-          check_forward_dates( p_ne, p_effective_date );
-       when c_shift then
-          check_overhangs( p_ne, p_start_m, p_shift_m, p_effective_date, p_length );
-       when c_recalibrate then
-          check_overhangs( p_ne, p_start_m, p_shift_m, p_effective_date, p_length );
-    END CASE;
-   
+   PROCEDURE check_operation (p_op               IN VARCHAR2,
+                              p_ne               IN INTEGER,
+                              p_start_m          IN NUMBER,
+                              p_shift_m          IN NUMBER,
+                              p_effective_date   IN DATE,
+                              p_length           IN NUMBER)
+   IS
+   BEGIN
+      CASE p_op
+         WHEN c_split
+         THEN
+            check_forward_dates (p_ne, p_effective_date);
+         WHEN c_merge
+         THEN
+            check_forward_dates (p_ne, p_effective_date);
+         WHEN c_replace
+         THEN
+            check_forward_dates (p_ne, p_effective_date);
+         WHEN c_close
+         THEN
+            check_forward_dates (p_ne, p_effective_date);
+         WHEN c_undo
+         THEN
+            check_forward_dates (p_ne, p_effective_date);
+         WHEN c_shift
+         THEN
+            check_overhangs (p_ne,
+                             p_start_m,
+                             p_shift_m,
+                             p_effective_date,
+                             p_length);
+         WHEN c_recalibrate
+         THEN
+            check_overhangs (p_ne,
+                             p_start_m,
+                             p_shift_m,
+                             p_effective_date,
+                             p_length);
+      END CASE;
    END;
 
-  PROCEDURE check_forward_dates( p_ne in INTEGER, p_effective_date in date ) is
-  l_dummy integer;
-  BEGIN
-     BEGIN
-        select 1 into l_dummy
-        from nm_locations_all
-        where nm_ne_id_of = p_ne
-        and nm_start_date > p_effective_date;
-     EXCEPTION
-        WHEN NO_DATA_FOUND then NULL;
-     END;
-     
-     if l_dummy = 1 then
-       hig.raise_ner( 'NET', 378 );
-     end if;
-
-  END;
-
-  PROCEDURE check_overhangs( p_ne in INTEGER, p_start_m in number, p_shift_m in number, p_effective_date in date, p_length in number ) is
-  l_dummy integer;
-  BEGIN
-     BEGIN
-      select 1 into l_dummy --'Problem in LB Shift - Operation results in measure greater than element length'
-      from nm_locations_all
-      where ( (nm_end_mp + p_shift_m > p_length and nm_end_mp > p_start_m )
-      OR    (nm_begin_mp + p_shift_m > p_length and nm_end_mp > p_start_m))
-      and nm_ne_id_of = p_ne;
-
-      if l_dummy = 1 then
-        raise_application_error(  -20056, 'Shift causes overhang of LB data at end of element');
-      end if;
-      EXCEPTION
-        WHEN NO_DATA_FOUND then
-          NULL;
-      END;
-       
-      l_dummy := 0;
-      
+   PROCEDURE check_forward_dates (p_ne IN INTEGER, p_effective_date IN DATE)
+   IS
+      l_dummy   INTEGER;
+   BEGIN
       BEGIN
-      select 1 into l_dummy --'Problem in LB Shift - Operation results in measure greater than element length'
-      from nm_locations_all
-      where nm_begin_mp + p_shift_m < 0
-      and nm_ne_id_of = p_ne;
-
-      if l_dummy = 1 then
-        raise_application_error(  -20056, 'Shift causes overhang of LB data at beginning of element');
-      end if;
+         SELECT 1
+           INTO l_dummy
+           FROM nm_locations_all
+          WHERE nm_ne_id_of = p_ne AND nm_start_date > p_effective_date;
       EXCEPTION
-        WHEN NO_DATA_FOUND then
-          NULL;
+         WHEN NO_DATA_FOUND
+         THEN
+            NULL;
       END;
-  END;
 
+      IF l_dummy = 1
+      THEN
+         hig.raise_ner ('NET', 378);
+      END IF;
+   END;
+
+   PROCEDURE check_overhangs (p_ne               IN INTEGER,
+                              p_start_m          IN NUMBER,
+                              p_shift_m          IN NUMBER,
+                              p_effective_date   IN DATE,
+                              p_length           IN NUMBER)
+   IS
+      l_dummy   INTEGER;
+   BEGIN
+      BEGIN
+         SELECT 1
+           INTO l_dummy --'Problem in LB Shift - Operation results in measure greater than element length'
+           FROM nm_locations_all
+          WHERE     (   (    nm_end_mp + p_shift_m > p_length
+                         AND nm_end_mp > p_start_m)
+                     OR (    nm_begin_mp + p_shift_m > p_length
+                         AND nm_end_mp > p_start_m))
+                AND nm_ne_id_of = p_ne;
+
+         IF l_dummy = 1
+         THEN
+            raise_application_error (
+               -20056,
+               'Shift causes overhang of LB data at end of element');
+         END IF;
+      EXCEPTION
+         WHEN NO_DATA_FOUND
+         THEN
+            NULL;
+      END;
+
+      l_dummy := 0;
+
+      BEGIN
+         SELECT 1
+           INTO l_dummy --'Problem in LB Shift - Operation results in measure greater than element length'
+           FROM nm_locations_all
+          WHERE nm_begin_mp + p_shift_m < 0 AND nm_ne_id_of = p_ne;
+
+         IF l_dummy = 1
+         THEN
+            raise_application_error (
+               -20056,
+               'Shift causes overhang of LB data at beginning of element');
+         END IF;
+      EXCEPTION
+         WHEN NO_DATA_FOUND
+         THEN
+            NULL;
+      END;
+   END;
 END;
 /
+
