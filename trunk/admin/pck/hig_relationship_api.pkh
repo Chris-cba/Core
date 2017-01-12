@@ -1,0 +1,84 @@
+CREATE OR REPLACE PACKAGE hig_relationship_api
+AS
+  -------------------------------------------------------------------------
+  --   PVCS Identifiers :-
+  --
+  --       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/hig_relationship_api.pkh-arc   1.0   Jan 12 2017 13:19:28   Chris.Baugh  $
+  --       Module Name      : $Workfile:   hig_relationship_api.pkh  $
+  --       Date into PVCS   : $Date:   Jan 12 2017 13:19:28  $
+  --       Date fetched Out : $Modtime:   Dec 12 2016 09:26:22  $
+  --       Version          : $Revision:   1.0  $
+  --       Based on SCCS version :
+  ------------------------------------------------------------------
+  --   Copyright (c) 2016 Bentley Systems Incorporated. All rights reserved.
+  ------------------------------------------------------------------
+  --g_sccsid is the SCCS ID for the package
+  g_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.0  $';
+  --
+  -----------------------------------------------------------------------------
+  --
+  -- This function returns the current SCCS version
+  FUNCTION get_version
+    RETURN VARCHAR2;
+
+  --
+  -----------------------------------------------------------------------------
+  --
+  FUNCTION get_body_version
+    RETURN VARCHAR2;
+  --
+  -----------------------------------------------------------------------------
+  --
+  FUNCTION encrypt_input(pi_input_string   VARCHAR2,
+                         pi_salt           RAW)
+    RETURN RAW;
+  --
+  -----------------------------------------------------------------------------
+  --
+  FUNCTION decrypt_input(pi_input_string   RAW,
+                         pi_salt           RAW)
+    RETURN VARCHAR2;
+  --
+  -----------------------------------------------------------------------------
+  --
+  FUNCTION get_user_salt(pi_attribute1 IN  hig_relationship.hir_attribute1%TYPE)
+    RETURN VARCHAR2;
+  --
+  -----------------------------------------------------------------------------
+  --
+  FUNCTION pwd_autogenerate_user(pi_username IN  VARCHAR2)
+    RETURN VARCHAR2;
+  --
+  -----------------------------------------------------------------------------
+  --
+  PROCEDURE get_username_orm(po_cursor     OUT sys_refcursor
+                            ,pi_attribute1 IN  hig_relationship.hir_attribute1%TYPE);
+  --
+  -----------------------------------------------------------------------------
+  --
+  PROCEDURE get_username(pi_attribute1 IN  hig_relationship.hir_attribute1%TYPE
+                        ,po_cursor     OUT sys_refcursor);
+
+  --
+  -----------------------------------------------------------------------------
+  --
+  PROCEDURE create_relationship(pi_relationship IN  hig_relationship%ROWTYPE);
+  --
+  -----------------------------------------------------------------------------
+  --
+  PROCEDURE update_relationship(pi_key        IN  hig_relationship.hir_attribute1%TYPE,
+                                pi_attribute1 IN  hig_relationship.hir_attribute1%TYPE,
+                                pi_attribute3 IN  hig_relationship.hir_attribute3%TYPE);
+  --
+  -----------------------------------------------------------------------------
+  --
+  PROCEDURE delete_relationship(pi_attribute1 IN  hig_relationship.hir_attribute1%TYPE);
+  --
+  -----------------------------------------------------------------------------
+  --
+  PROCEDURE refresh_auto_passwords;
+--
+-----------------------------------------------------------------------------
+--
+END hig_relationship_api;
+/
