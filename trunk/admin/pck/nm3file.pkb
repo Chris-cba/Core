@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3file AS
 --
 -- PVCS Identifiers :-
 --
--- pvcsid : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3file.pkb-arc   2.17   Dec 28 2016 10:05:42   Upendra.Hukeri  $
+-- pvcsid : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3file.pkb-arc   2.18   Jan 12 2017 06:39:22   Upendra.Hukeri  $
 -- Module Name : $Workfile:   nm3file.pkb  $
--- Date into PVCS : $Date:   Dec 28 2016 10:05:42  $
--- Date fetched Out : $Modtime:   Dec 26 2016 10:27:38  $
--- PVCS Version : $Revision:   2.17  $
+-- Date into PVCS : $Date:   Jan 12 2017 06:39:22  $
+-- Date fetched Out : $Modtime:   Jan 12 2017 06:37:26  $
+-- PVCS Version : $Revision:   2.18  $
 -- Based on SCCS version : 
 --
 --
@@ -22,7 +22,7 @@ CREATE OR REPLACE PACKAGE BODY nm3file AS
 --
 --all global package variables here
 --
-   g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.17  $';
+   g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.18  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3file';
@@ -1789,7 +1789,7 @@ BEGIN
 	ELSE
 		owa_util.mime_header('application/octet-stream', FALSE);
 		--
-		htp.p('Content-Disposition: filename="' || p_file_name || '"' );
+		htp.p('Content-Disposition: attachment;filename="' || p_file_name || '"' );
 		htp.p('Content-Length: ' || dbms_lob.getlength(src_loc)); 
 		--
 		owa_util.http_header_close; 
