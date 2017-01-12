@@ -3,11 +3,11 @@ As
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3user_admin.pkb-arc   3.2   Jul 04 2013 16:35:54   James.Wadsworth  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3user_admin.pkb-arc   3.3   Jan 12 2017 13:26:10   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm3user_admin.pkb  $
---       Date into PVCS   : $Date:   Jul 04 2013 16:35:54  $
---       Date fetched Out : $Modtime:   Jul 04 2013 15:53:10  $
---       Version          : $Revision:   3.2  $
+--       Date into PVCS   : $Date:   Jan 12 2017 13:26:10  $
+--       Date fetched Out : $Modtime:   Dec 16 2016 11:40:04  $
+--       Version          : $Revision:   3.3  $
 -------------------------------------------------------------------------
 --   Author : Steven Cooper
 --
@@ -17,7 +17,7 @@ As
 --   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 ------------------------------------------------------------------
 
-  gc_Body_Version  Constant  Varchar2(100) := '$Revision:   3.2  $';
+  gc_Body_Version  Constant  Varchar2(100) := '$Revision:   3.3  $';
 
   gc_Package_Name  Constant  Varchar2(30)  := 'nm3User_Admin';
  
@@ -242,7 +242,7 @@ Begin
                                             po_Reason     =>  p_Reason
                                             ) Then 
       Begin
-        Execute Immediate ('Alter User ' || p_User || ' Identified By '  || p_Password);
+        Execute Immediate ('Alter User ' || p_User || ' Identified By "'  || p_Password||'"');
       Exception
         When Invalid_Char Or Missing_Option Or End_Of_Sql Or Zero_Len_Identifier Or Missing_Pass Or Bad_Comments Then
           Raise_Application_Error(-20002,'Invalid Password in call to Set_User_Password.');
