@@ -2,11 +2,11 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/lb/install/jxp_upgrade.sql-arc   1.0   Jan 16 2017 21:43:26   Rob.Coupe  $
+--       sccsid           : $Header:   //new_vm_latest/archives/lb/install/jxp_upgrade.sql-arc   1.1   Jan 17 2017 14:23:14   Rob.Coupe  $
 --       Module Name      : $Workfile:   jxp_upgrade.sql  $
---       Date into PVCS   : $Date:   Jan 16 2017 21:43:26  $
---       Date fetched Out : $Modtime:   Jan 16 2017 21:38:44  $
---       PVCS Version     : $Revision:   1.0  $
+--       Date into PVCS   : $Date:   Jan 17 2017 14:23:14  $
+--       Date fetched Out : $Modtime:   Jan 17 2017 14:23:22  $
+--       PVCS Version     : $Revision:   1.1  $
 --
 --------------------------------------------------------------------------------
 --   Copyright (c) 2015 Bentley Systems Incorporated.  All rights reserved.
@@ -94,7 +94,9 @@ BEFORE INSERT ON NM_ASSET_TYPE_JUXTAPOSITIONS
 REFERENCING NEW AS New OLD AS Old 
 FOR EACH ROW
 BEGIN 
-  :new.NAJX_ID := NAJX_ID_SEQ.nextval;
+  if :new.najx_id is null then
+    :new.NAJX_ID := NAJX_ID_SEQ.nextval;
+  end if;
 END  NAJX_ID_SEQ_TRG;
 /
 
@@ -103,7 +105,9 @@ BEFORE INSERT ON NM_JUXTAPOSITIONS
 REFERENCING NEW AS New OLD AS Old 
 FOR EACH ROW
 BEGIN 
-  :new.NJX_ID := NJX_ID_SEQ.nextval;
+  if :new.njx_id is null then
+    :new.NJX_ID := NJX_ID_SEQ.nextval;
+  end if;
 END  NJX_ID_SEQ_TRG;
 /
 
@@ -112,6 +116,8 @@ BEFORE INSERT ON NM_JUXTAPOSITION_TYPES
 REFERENCING NEW AS New OLD AS Old 
 FOR EACH ROW
 BEGIN 
-  :new.NJXT_ID := NJXT_ID_SEQ.nextval;
+  if :new.njxt_id is null then
+     :new.NJXT_ID := NJXT_ID_SEQ.nextval;
+  end if;
 END  NJXT_ID_SEQ_TRG;
 /
