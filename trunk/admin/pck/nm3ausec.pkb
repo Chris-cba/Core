@@ -3,11 +3,11 @@ AS
    --
    --   PVCS Identifiers :-
    --
-   --       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3ausec.pkb-arc   2.14   Jul 06 2016 12:18:06   Rob.Coupe  $
+   --       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3ausec.pkb-arc   2.15   Jan 24 2017 12:52:18   Rob.Coupe  $
    --       Module Name      : $Workfile:   nm3ausec.pkb  $
-   --       Date into PVCS   : $Date:   Jul 06 2016 12:18:06  $
-   --       Date fetched Out : $Modtime:   Jul 06 2016 12:16:20  $
-   --       PVCS Version     : $Revision:   2.14  $
+   --       Date into PVCS   : $Date:   Jan 24 2017 12:52:18  $
+   --       Date fetched Out : $Modtime:   Jan 24 2017 12:51:50  $
+   --       PVCS Version     : $Revision:   2.15  $
    --       Based on
    --
    --   Author : Rob Coupe
@@ -20,7 +20,7 @@ AS
    --
    --all global package variables here
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '"$Revision:   2.14  $"';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '"$Revision:   2.15  $"';
 
    --  g_body_sccsid is the SCCS ID for the package body
    --
@@ -104,9 +104,9 @@ AS
          c_admin_unit     NUMBER)
       IS
          SELECT /*+ RULE*/
-                a.nm_admin_unit
-           FROM nm_members a,
-                nm_members b,
+               a.nm_admin_unit
+           FROM nm_members     a,
+                nm_members     b,
                 nm_admin_units a_au,
                 nm_admin_units b_au
           WHERE     b.nm_ne_id_of = a.nm_ne_id_of
@@ -189,19 +189,27 @@ AS
                          ne_length,
                          CASE
                             WHEN NOT EXISTS
-                                        (SELECT 1
-                                           FROM nm_admin_groups
-                                          WHERE     nag_parent_admin_unit =
-                                                       nm_admin_unit
-                                                AND nag_child_admin_unit =
-                                                       nast_au_id
-                                         UNION ALL
-                                         SELECT 1
-                                           FROM nm_admin_groups
-                                          WHERE     nag_child_admin_unit =
-                                                       nm_admin_unit
-                                                AND nag_parent_admin_unit =
-                                                       nast_au_id)
+                                    (SELECT 1
+                                       FROM nm_admin_groups, nm_admin_units
+                                      WHERE     nag_parent_admin_unit =
+                                                   nm_admin_unit
+                                            AND nag_child_admin_unit =
+                                                   nast_au_id
+                                            AND nag_parent_admin_unit =
+                                                   nau_admin_unit
+                                            AND nau_admin_type =
+                                                   nast_admin_type
+                                     UNION ALL
+                                     SELECT 1
+                                       FROM nm_admin_groups, nm_admin_units
+                                      WHERE     nag_child_admin_unit =
+                                                   nm_admin_unit
+                                            AND nag_parent_admin_unit =
+                                                   nast_au_id
+                                            AND nag_parent_admin_unit =
+                                                   nau_admin_unit
+                                            AND nau_admin_type =
+                                                   nast_admin_type)
                             THEN
                                'TRUE'
                             WHEN EXISTS
@@ -321,7 +329,7 @@ AS
          c_use_group_security   IN VARCHAR2)
       IS
          SELECT /*+ RULE*/
-                c.nm_admin_unit
+               c.nm_admin_unit
            FROM nm_members c, nm_au_security_temp nast, nm_admin_units au
           WHERE     au.nau_admin_unit = c.nm_admin_unit
                 AND au.NAU_ADMIN_TYPE = nast.nast_admin_type -- We must check for the same au type
@@ -480,30 +488,30 @@ AS
       -- to check if the proposed locations are already populated with an au of this type.
       -- Check if one of this type which is in a different tree already exists.
       --
---    nm_debug.debug ('   OPEN  c1;');
+      --    nm_debug.debug ('   OPEN  c1;');
 
       OPEN c1 (g_use_group_security);
 
---    nm_debug.debug ('   FETCH c1 INTO l_au');
+      --    nm_debug.debug ('   FETCH c1 INTO l_au');
 
---      FOR irec IN (SELECT * FROM nm_au_security_temp)
---      LOOP
---         nm_debug.debug (
---               'RC> '
---            || irec.nast_ne_id
---            || ','
---            || irec.nast_au_id
---            || ','
---            || irec.nast_ne_of
---            || ','
---            || irec.nast_nm_begin
---            || ','
---            || irec.nast_nm_end);
---      END LOOP;
+      --      FOR irec IN (SELECT * FROM nm_au_security_temp)
+      --      LOOP
+      --         nm_debug.debug (
+      --               'RC> '
+      --            || irec.nast_ne_id
+      --            || ','
+      --            || irec.nast_au_id
+      --            || ','
+      --            || irec.nast_ne_of
+      --            || ','
+      --            || irec.nast_nm_begin
+      --            || ','
+      --            || irec.nast_nm_end);
+      --      END LOOP;
 
       FETCH c1 INTO l_au;
 
---    nm_debug.debug ('   IF c1%FOUND - AU = ' || l_au);
+      --    nm_debug.debug ('   IF c1%FOUND - AU = ' || l_au);
 
       IF c1%FOUND
       THEN
@@ -806,7 +814,8 @@ AS
       nm_debug.proc_start (g_package_name, 'debug_au_sec_temp');
 
       --
-      FOR cs_rec IN (SELECT * FROM nm_au_security_temp)
+      FOR cs_rec IN (SELECT *
+                       FROM nm_au_security_temp)
       LOOP
          l_been_in_loop := TRUE;
          l_ne_unique := NULL;
@@ -936,7 +945,8 @@ AS
          ELSE
             l_ner_id := 241;
             g_au_sec_exc_code := -20903;
-            g_au_sec_exc_msg := 'You may not create data with this admin unit';
+            g_au_sec_exc_msg :=
+               'You may not create data with this admin unit';
          END IF;
 
          --
