@@ -2,14 +2,14 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/sql/nm_4700_fix11.sql-arc   3.0   Nov 19 2014 10:05:00   James.Wadsworth  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/sql/nm_4700_fix11.sql-arc   3.1   Feb 09 2017 10:30:48   James.Wadsworth  $
 --       Module Name      : $Workfile:   nm_4700_fix11.sql  $
---       Date into PVCS   : $Date:   Nov 19 2014 10:05:00  $
---       Date fetched Out : $Modtime:   Nov 19 2014 10:04:24  $
---       PVCS Version     : $Revision:   3.0  $
+--       Date into PVCS   : $Date:   Feb 09 2017 10:30:48  $
+--       Date fetched Out : $Modtime:   Feb 09 2017 09:50:26  $
+--       PVCS Version     : $Revision:   3.1  $
 --
 --------------------------------------------------------------------------------
---   Copyright (c) 2014 Bentley Systems Incorporated.
+--   Copyright (c) 2017 Bentley Systems Incorporated.
 --------------------------------------------------------------------------------
 --
 set echo off
@@ -31,7 +31,7 @@ set term on
 --
 -- Spool to Logfile
 --
-define logfile1='nm_4700_fix5_&log_extension'
+define logfile1='nm_4700_fix11_&log_extension'
 spool &logfile1
 --
 --------------------------------------------------------------------------------
@@ -66,11 +66,6 @@ BEGIN
 END;
 /
 WHENEVER SQLERROR CONTINUE
---
---------------------------------------------------------------------------------
--- HIG_CODES
---------------------------------------------------------------------------------
---
 --
 --------------------------------------------------------------------------------
 -- HIG_CODES
