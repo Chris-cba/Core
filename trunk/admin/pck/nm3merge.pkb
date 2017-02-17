@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm3merge IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3merge.pkb-arc   2.20   Feb 18 2016 15:03:42   Rob.Coupe  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3merge.pkb-arc   2.21   Feb 17 2017 13:57:56   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3merge.pkb  $
---       Date into PVCS   : $Date:   Feb 18 2016 15:03:42  $
---       Date fetched Out : $Modtime:   Feb 18 2016 14:51:32  $
---       PVCS Version     : $Revision:   2.20  $
+--       Date into PVCS   : $Date:   Feb 17 2017 13:57:56  $
+--       Date fetched Out : $Modtime:   Feb 17 2017 13:53:12  $
+--       PVCS Version     : $Revision:   2.21  $
 --
 --   Author : ITurnbull
 --
@@ -16,7 +16,7 @@ CREATE OR REPLACE PACKAGE BODY nm3merge IS
 --   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.20  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.21  $"';
 --  g_body_sccsid is the SCCS ID for the package body
    g_package_name    CONSTANT  varchar2(30)   := 'nm3merge';
 --
@@ -27,6 +27,9 @@ CREATE OR REPLACE PACKAGE BODY nm3merge IS
    g_nw_operation_in_progress boolean := FALSE;
 --
    g_ausec_status varchar2(3);
+   
+   g_transaction_id integer;
+
 --
 --
 ------------------------------------------------------------------------------------------------
@@ -303,6 +306,10 @@ BEGIN
   l_rec_neh.neh_descr          := pi_neh_descr; --CWS 0108990 12/03/2010
       
   nm3nw_edit.ins_neh(l_rec_neh); --CWS 0108990 12/03/2010
+
+  if HIG.IS_PRODUCT_LICENSED('LB') then
+    execute immediate 'begin lb_nw_edit.log_transaction( :g_transaction_id, :neh_id ); end; ' using g_transaction_id, l_rec_neh.neh_id;
+  end if;
       
   l_rec_neh.neh_id             := nm3seq.next_neh_id_seq;
   l_rec_neh.neh_ne_id_old      := l_ne_id_2;
@@ -311,6 +318,10 @@ BEGIN
   l_rec_neh.neh_param_1        := 2;
 
   nm3nw_edit.ins_neh(l_rec_neh); --CWS 0108990 12/03/2010
+  
+  if HIG.IS_PRODUCT_LICENSED('LB') then
+    execute immediate 'begin lb_nw_edit.log_transaction( :g_transaction_id, :neh_id ); end; ' using g_transaction_id, l_rec_neh.neh_id;
+  end if;
 
   nm_debug.proc_end(p_package_name   => g_package_name
                    ,p_procedure_name => 'audit_element_history');
@@ -347,6 +358,7 @@ PROCEDURE merge_elements (p_ne_id_1               IN     nm_elements.ne_id%TYPE
                          ,p_neh_descr             IN     nm_element_history.neh_descr%TYPE  DEFAULT NULL --CWS 0108990 12/03/2010
                          ) IS
 --
+
    -- flexible attributes (columns) to inherit
    CURSOR cs_inherited_columns (c_nt_type nm_type_columns.ntc_nt_type%TYPE) IS
    SELECT ntc_column_name
@@ -361,6 +373,7 @@ PROCEDURE merge_elements (p_ne_id_1               IN     nm_elements.ne_id%TYPE
    --
    v_ne_length_2   nm_elements.ne_length%TYPE   := p_ne_length_new;
    v_merge_at_node nm_elements.ne_no_start%TYPE := p_merge_at_node;
+   
 --
 BEGIN
 --
@@ -915,6 +928,8 @@ PROCEDURE do_merge (p_ne_id_1           IN     nm_elements.ne_id%TYPE
   l_ne_no_start           nm_nodes.no_node_id%TYPE;
   l_ne_no_end             nm_nodes.no_node_id%TYPE;  
   l_starting_ne_id        nm_elements.ne_id%TYPE;     
+  
+  g_transaction_id integer;
 
 FUNCTION defrag_connectivity
            (pi_ne_id1 IN nm_node_usages.nnu_ne_id%TYPE
@@ -958,6 +973,14 @@ BEGIN
    RETURN retval;
 
 END defrag_connectivity;
+
+   function next_transaction_id return integer is
+   retval integer;
+   begin
+    select lb_transaction_id_seq.nextval into retval from dual;
+    return retval;
+   end;
+
 
 BEGIN
 --
@@ -1043,6 +1066,9 @@ BEGIN
    g_ne_2_datum_length := nm3net.get_datum_element_length(p_ne_id_2);
 --
    g_starting_ne_id := l_starting_ne_id;
+   
+   g_transaction_id := next_transaction_id;
+
 --
    merge_elements (p_ne_id_1               => p_ne_id_1
                   ,p_ne_id_2               => p_ne_id_2
@@ -1090,7 +1116,16 @@ BEGIN
  --
    end_date_members_internal (p_ne_id_1, p_ne_id_2, p_ne_id_new, p_effective_date);
 
- --
+   if HIG.IS_PRODUCT_LICENSED('LB') then
+      declare
+         l_block varchar2(2000);
+      begin 
+         l_block := 'begin lb_nw_edit.lb_merge(:p_ne1, :p_ne2, :p_ne, :p_effective_date, :g_transaction_id); end; ';
+--
+         execute immediate l_block using p_ne_id_1, p_ne_id_2, p_ne_id_new, p_effective_date, g_transaction_id;
+      end;
+   end if;
+--
    merge_other_products (p_ne_id_1        => p_ne_id_1
                         ,p_ne_id_2        => p_ne_id_2
                         ,p_ne_id_new      => p_ne_id_new
@@ -1132,6 +1167,7 @@ BEGIN
  --
    -- Insert the stored NM_MEMBER_HISTORY records
    ins_nmh;
+   
  --
    nm_debug.proc_end(g_package_name , 'do_merge');
 --
@@ -1870,6 +1906,17 @@ FUNCTION can_elements_be_merged (pi_ne_id_1        IN nm_elements.ne_id%TYPE
 BEGIN
 
   nm_debug.proc_start(g_package_name,'can_elements_be_merged');
+
+  if HIG.IS_PRODUCT_LICENSED('LB') then
+     declare
+       l_block varchar2(2000);
+     begin
+        l_block := 'BEGIN LB_NW_EDIT.CHECK_OPERATION(:p_op, :p_ne1, :p_ne2, :p_start_m, :p_shift_m, :p_effective_date, :p_length ); end; ';
+        execute immediate l_block using 'M', pi_ne_id_1, pi_ne_id_2, 0, 0, pi_effective_date, 0;
+     end;
+  end if;
+  
+
   
   check_other_products ( p_ne_id1         => pi_ne_id_1
                         ,p_ne_id2         => pi_ne_id_2
