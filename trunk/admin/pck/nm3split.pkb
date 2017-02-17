@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3split IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3split.pkb-arc   2.17   Nov 06 2015 10:54:32   Steve.Cooper  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3split.pkb-arc   2.18   Feb 17 2017 10:52:44   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3split.pkb  $
---       Date into PVCS   : $Date:   Nov 06 2015 10:54:32  $
---       Date fetched Out : $Modtime:   Nov 04 2015 13:58:18  $
---       PVCS Version     : $Revision:   2.17  $
+--       Date into PVCS   : $Date:   Feb 17 2017 10:52:44  $
+--       Date fetched Out : $Modtime:   Feb 17 2017 10:52:34  $
+--       PVCS Version     : $Revision:   2.18  $
 --
 --
 --   Author : ITurnbull
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3split IS
 -- 03.06.08 PT added p_no_purpose parameter throughout where node is created.
 
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.17  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.18  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(2000) := 'nm3split';
@@ -335,6 +335,14 @@ PROCEDURE split_element (p_ne_id               IN     nm_elements.ne_id%TYPE    
 --
   c_orig_ne_length CONSTANT number := p_ne_length_1 + p_ne_length_2;
 
+  g_transaction_id integer;
+  
+  function next_transaction_id return integer is
+  retval integer;
+  begin
+    select lb_transaction_id_seq.nextval into retval from dual;
+    return retval;
+  end;
    PROCEDURE do_inheritance IS
       -- flexible attributes (columns) to inherit
       CURSOR cs_inherit (c_nt_type NM_TYPE_COLUMNS.ntc_nt_type%TYPE) IS
@@ -529,6 +537,20 @@ BEGIN
 --
    g_element_unit := Nm3net.get_nt_units(g_rec_ne_new_1.ne_nt_type);
 --
+   g_transaction_id := next_transaction_id;
+   
+   nm_debug.debug('Transaction_id = '||g_transaction_id||', now start lb_split procedure' );
+   
+   if HIG.IS_PRODUCT_LICENSED('LB') then
+      declare
+         l_block varchar2(2000);
+      begin 
+         l_block := 'begin lb_nw_edit.lb_split(:p_ne_id, :p_ne_length_1, :p_ne_id_1, :p_ne_id_2, :p_effective_date, :g_transaction_id); end; ';
+--
+         execute immediate l_block using p_ne_id, p_ne_length_1, p_ne_id_1, p_ne_id_2, p_effective_date, g_transaction_id;
+      end;
+   end if;
+              
    -- update the element history
    DECLARE
       l_rec_neh NM_ELEMENT_HISTORY%ROWTYPE;
@@ -548,6 +570,8 @@ BEGIN
       --Nm3merge.ins_neh (l_rec_neh);
       nm3nw_edit.ins_neh(l_rec_neh); --CWS 0108990 12/03/2010
 
+      lb_nw_edit.log_transaction( g_transaction_id, l_rec_neh.neh_id );
+
       l_rec_neh.neh_id             := nm3seq.next_neh_id_seq;
       l_rec_neh.neh_ne_id_new      := p_ne_id_2;
       l_rec_neh.neh_new_ne_length  := p_ne_length_2;
@@ -556,6 +580,8 @@ BEGIN
       --insert history for second new element
       --Nm3merge.ins_neh (l_rec_neh);
       nm3nw_edit.ins_neh(l_rec_neh); --CWS 0108990 12/03/2010
+      lb_nw_edit.log_transaction( g_transaction_id, l_rec_neh.neh_id );
+
    END;
 --
    Nm_Debug.proc_end(g_package_name,'split_element');
@@ -1756,6 +1782,15 @@ BEGIN
     l_ne_rec := g_ne_to_split_rec;
   END IF;
 
+  if HIG.IS_PRODUCT_LICENSED('LB') then
+     declare
+       l_block varchar2(2000);
+     begin
+        l_block := 'BEGIN LB_NW_EDIT.CHECK_OPERATION(:p_op, :p_ne, :p_start_m, :p_shift_m, :p_effective_date, :p_length ); end; ';
+        execute immediate l_block using 'S', pi_ne_id, pi_split_offset, 0, pi_effective_date, l_ne_rec.ne_length;
+     end;
+  end if;
+  
   check_other_products ( p_ne_id          => pi_ne_id
                         ,p_chain          => pi_split_offset
                         ,p_effective_date => pi_effective_date
