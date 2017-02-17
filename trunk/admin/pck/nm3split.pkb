@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3split IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3split.pkb-arc   2.18   Feb 17 2017 10:52:44   Rob.Coupe  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3split.pkb-arc   2.19   Feb 17 2017 13:56:00   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3split.pkb  $
---       Date into PVCS   : $Date:   Feb 17 2017 10:52:44  $
---       Date fetched Out : $Modtime:   Feb 17 2017 10:52:34  $
---       PVCS Version     : $Revision:   2.18  $
+--       Date into PVCS   : $Date:   Feb 17 2017 13:56:00  $
+--       Date fetched Out : $Modtime:   Feb 17 2017 13:56:18  $
+--       PVCS Version     : $Revision:   2.19  $
 --
 --
 --   Author : ITurnbull
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3split IS
 -- 03.06.08 PT added p_no_purpose parameter throughout where node is created.
 
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.18  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.19  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(2000) := 'nm3split';
@@ -31,6 +31,9 @@ CREATE OR REPLACE PACKAGE BODY Nm3split IS
    g_prev_rec_ne_old   nm_elements%ROWTYPE;
    g_prev_rec_ne_new_1 nm_elements%ROWTYPE;
    g_prev_rec_ne_new_2 nm_elements%ROWTYPE;
+   
+   g_transaction_id integer;
+    
 --
 ------------------------------------------------------------------------------------------------
 --
@@ -335,8 +338,6 @@ PROCEDURE split_element (p_ne_id               IN     nm_elements.ne_id%TYPE    
 --
   c_orig_ne_length CONSTANT number := p_ne_length_1 + p_ne_length_2;
 
-  g_transaction_id integer;
-  
   function next_transaction_id return integer is
   retval integer;
   begin
@@ -570,7 +571,9 @@ BEGIN
       --Nm3merge.ins_neh (l_rec_neh);
       nm3nw_edit.ins_neh(l_rec_neh); --CWS 0108990 12/03/2010
 
-      lb_nw_edit.log_transaction( g_transaction_id, l_rec_neh.neh_id );
+      if HIG.IS_PRODUCT_LICENSED('LB') then
+         execute immediate 'begin lb_nw_edit.log_transaction( :g_transaction_id, :neh_id ); end; ' using g_transaction_id, l_rec_neh.neh_id;
+      end if;
 
       l_rec_neh.neh_id             := nm3seq.next_neh_id_seq;
       l_rec_neh.neh_ne_id_new      := p_ne_id_2;
@@ -1786,8 +1789,8 @@ BEGIN
      declare
        l_block varchar2(2000);
      begin
-        l_block := 'BEGIN LB_NW_EDIT.CHECK_OPERATION(:p_op, :p_ne, :p_start_m, :p_shift_m, :p_effective_date, :p_length ); end; ';
-        execute immediate l_block using 'S', pi_ne_id, pi_split_offset, 0, pi_effective_date, l_ne_rec.ne_length;
+        l_block := 'BEGIN LB_NW_EDIT.CHECK_OPERATION(:p_op, :p_ne1, :p_ne2, :p_start_m, :p_shift_m, :p_effective_date, :p_length ); end; ';
+        execute immediate l_block using 'S', pi_ne_id, 0, pi_split_offset, 0, pi_effective_date, l_ne_rec.ne_length;
      end;
   end if;
   
