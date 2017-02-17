@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm3replace IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3replace.pkb-arc   2.8   Nov 26 2015 13:11:24   Steve.Cooper  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3replace.pkb-arc   2.9   Feb 17 2017 14:29:22   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3replace.pkb  $
---       Date into PVCS   : $Date:   Nov 26 2015 13:11:24  $
---       Date fetched Out : $Modtime:   Nov 10 2015 16:17:32  $
---       PVCS Version     : $Revision:   2.8  $
+--       Date into PVCS   : $Date:   Feb 17 2017 14:29:22  $
+--       Date fetched Out : $Modtime:   Feb 17 2017 14:29:46  $
+--       PVCS Version     : $Revision:   2.9  $
 --
 --
 --   Author : ITurnbull
@@ -17,9 +17,11 @@ CREATE OR REPLACE PACKAGE BODY nm3replace IS
 --   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.8  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.9  $"';
 --  g_body_sccsid is the SCCS ID for the package body
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3replace';
+   
+   g_transaction_id  INTEGER;
 ------------------------------------------------------------------------------------------------
 --
 FUNCTION get_version RETURN VARCHAR2 IS
@@ -236,6 +238,11 @@ END get_body_version;
          l_rec_neh.neh_descr          := p_neh_descr; --CWS 0108990 12/03/2010
          
          nm3nw_edit.ins_neh(l_rec_neh); --CWS 0108990 12/03/2010
+         
+         if HIG.IS_PRODUCT_LICENSED('LB') then
+            execute immediate 'begin lb_nw_edit.log_transaction( :g_transaction_id, :neh_id ); end; ' using g_transaction_id, l_rec_neh.neh_id;
+         end if;
+         
       END;
    END;
 --
@@ -575,6 +582,12 @@ END check_other_products;
    v_errors                NUMBER;
    v_err_text              VARCHAR2(10000);
    --
+  function next_transaction_id return integer is
+  retval integer;
+  begin
+    select lb_transaction_id_seq.nextval into retval from dual;
+    return retval;
+  end;
 
    --
       PROCEDURE set_for_return IS
@@ -676,7 +689,20 @@ END check_other_products;
                              ,p_ne_id_new
                              ,p_effective_date
                             );
- 
+
+         g_transaction_id := next_transaction_id;
+   
+  
+         if HIG.IS_PRODUCT_LICENSED('LB') then
+            declare
+               l_block varchar2(2000);
+            begin 
+               l_block := 'begin lb_nw_edit.lb_replace(:p_ne1, :p_ne2, :p_effective_date, :p_transaction_id); end; ';
+--
+               execute immediate l_block using p_ne_id, p_ne_id_new, p_effective_date, g_transaction_id;
+            end;
+         end if;                            
+          
 	     replace_other_products ( p_ne_id
                                  ,p_ne_id_new
 	        					 ,p_effective_date
