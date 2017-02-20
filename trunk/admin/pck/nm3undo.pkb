@@ -4,11 +4,11 @@ IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3undo.pkb-arc   2.29   Feb 20 2017 17:18:08   Rob.Coupe  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3undo.pkb-arc   2.30   Feb 20 2017 17:20:46   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3undo.pkb  $
---       Date into PVCS   : $Date:   Feb 20 2017 17:18:08  $
---       Date fetched Out : $Modtime:   Feb 20 2017 17:18:10  $
---       PVCS Version     : $Revision:   2.29  $
+--       Date into PVCS   : $Date:   Feb 20 2017 17:20:46  $
+--       Date fetched Out : $Modtime:   Feb 20 2017 17:21:24  $
+--       PVCS Version     : $Revision:   2.30  $
 --
 --   Author : ITurnbull
 --
@@ -19,7 +19,7 @@ IS
 -- Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '"$Revision:   2.29  $"';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '"$Revision:   2.30  $"';
 --  g_body_sccsid is the SCCS ID for the package body
    g_package_name   CONSTANT VARCHAR2 (2000) := 'nm3undo';
 --
@@ -1344,7 +1344,7 @@ END undo_scheme;
          END IF;
          --
          
-         error_loc := 43.5;
+         error_loc := 431;
                
          if hig.is_product_licensed('LB') then
             lb_nw_edit.lb_undo(p_ne_id => l_ne_id_1 );
