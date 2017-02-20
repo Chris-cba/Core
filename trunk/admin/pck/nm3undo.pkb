@@ -4,11 +4,11 @@ IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3undo.pkb-arc   2.28   Oct 28 2016 14:22:54   Chris.Baugh  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3undo.pkb-arc   2.29   Feb 20 2017 17:18:08   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3undo.pkb  $
---       Date into PVCS   : $Date:   Oct 28 2016 14:22:54  $
---       Date fetched Out : $Modtime:   Oct 28 2016 14:21:50  $
---       PVCS Version     : $Revision:   2.28  $
+--       Date into PVCS   : $Date:   Feb 20 2017 17:18:08  $
+--       Date fetched Out : $Modtime:   Feb 20 2017 17:18:10  $
+--       PVCS Version     : $Revision:   2.29  $
 --
 --   Author : ITurnbull
 --
@@ -19,7 +19,7 @@ IS
 -- Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '"$Revision:   2.28  $"';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '"$Revision:   2.29  $"';
 --  g_body_sccsid is the SCCS ID for the package body
    g_package_name   CONSTANT VARCHAR2 (2000) := 'nm3undo';
 --
@@ -1343,6 +1343,13 @@ END undo_scheme;
            EXECUTE IMMEDIATE 'BEGIN xncc_herm_xsp.unclose_herm_xsp(:p_ne_id); END;' USING p_ne_id;
          END IF;
          --
+         
+         error_loc := 43.5;
+               
+         if hig.is_product_licensed('LB') then
+            lb_nw_edit.lb_undo(p_ne_id => l_ne_id_1 );
+         end if;
+         
          IF Nm3net.element_is_a_datum (pi_ne_id => p_ne_id)
          THEN
            error_loc := 44 ;
@@ -1505,6 +1512,12 @@ END undo_scheme;
             UPDATE NM_NODE_USAGES_ALL
                SET nnu_end_date = NULL
              WHERE nnu_ne_id IN (pi_ne_id_1, pi_ne_id_2);
+               
+            if hig.is_product_licensed('LB') then
+               error_loc := 1041;
+               lb_nw_edit.lb_undo(p_ne_id => pi_ne_id );
+            end if;
+             
 
             error_loc := 105 ;
             undo_other_products (p_ne_id_1        => pi_ne_id_1,
@@ -1914,6 +1927,11 @@ END undo_scheme;
             THEN
                Nm3nwad.do_ad_unreplace (pi_old_ne_id => v_ne_id);
             END IF;
+            
+            if hig.is_product_licensed('LB') then
+               lb_nw_edit.lb_undo(p_ne_id => p_ne_id );
+            end if;
+
 
           --            UPDATE NM_MEMBERS_ALL
           --            SET nm_end_date = NULL
