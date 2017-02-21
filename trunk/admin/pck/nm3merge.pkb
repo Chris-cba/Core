@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm3merge IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3merge.pkb-arc   2.21   Feb 17 2017 13:57:56   Rob.Coupe  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3merge.pkb-arc   2.22   Feb 21 2017 18:02:26   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3merge.pkb  $
---       Date into PVCS   : $Date:   Feb 17 2017 13:57:56  $
---       Date fetched Out : $Modtime:   Feb 17 2017 13:53:12  $
---       PVCS Version     : $Revision:   2.21  $
+--       Date into PVCS   : $Date:   Feb 21 2017 18:02:26  $
+--       Date fetched Out : $Modtime:   Feb 21 2017 18:01:32  $
+--       PVCS Version     : $Revision:   2.22  $
 --
 --   Author : ITurnbull
 --
@@ -16,7 +16,7 @@ CREATE OR REPLACE PACKAGE BODY nm3merge IS
 --   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.21  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.22  $"';
 --  g_body_sccsid is the SCCS ID for the package body
    g_package_name    CONSTANT  varchar2(30)   := 'nm3merge';
 --
@@ -929,8 +929,6 @@ PROCEDURE do_merge (p_ne_id_1           IN     nm_elements.ne_id%TYPE
   l_ne_no_end             nm_nodes.no_node_id%TYPE;  
   l_starting_ne_id        nm_elements.ne_id%TYPE;     
   
-  g_transaction_id integer;
-
 FUNCTION defrag_connectivity
            (pi_ne_id1 IN nm_node_usages.nnu_ne_id%TYPE
            ,pi_ne_id2 IN nm_node_usages.nnu_ne_id%TYPE
