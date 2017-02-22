@@ -3,11 +3,11 @@ AS
   -------------------------------------------------------------------------
   --   PVCS Identifiers :-
   --
-  --       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/hig_sso_api.pkb-arc   1.0   Jan 12 2017 13:15:04   Chris.Baugh  $
+  --       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/hig_sso_api.pkb-arc   1.1   Feb 22 2017 08:18:28   Chris.Baugh  $
   --       Module Name      : $Workfile:   hig_sso_api.pkb  $
-  --       Date into PVCS   : $Date:   Jan 12 2017 13:15:04  $
-  --       Date fetched Out : $Modtime:   Dec 07 2016 14:16:50  $
-  --       Version          : $Revision:   1.0  $
+  --       Date into PVCS   : $Date:   Feb 22 2017 08:18:28  $
+  --       Date fetched Out : $Modtime:   Feb 22 2017 08:17:38  $
+  --       Version          : $Revision:   1.1  $
   --       Based on SCCS version :
   ------------------------------------------------------------------
   --   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
@@ -19,7 +19,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.0  $';
+  g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.1  $';
 
   g_package_name   CONSTANT VARCHAR2 (30) := 'hig_sso_api';
   --
@@ -71,7 +71,7 @@ AS
       FROM hig_relationship,
            dba_users,
            hig_users
-     WHERE hir_attribute1 = pi_attribute1
+     WHERE LOWER(hir_attribute1) = LOWER(pi_attribute1)
        AND NVL(account_status, 'MISSING') != 'LOCKED'
        AND username = hus_username
        AND hus_username = hig_relationship_api.decrypt_input(pi_input_string => hir_attribute2,
