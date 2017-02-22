@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_nw_edit
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_nw_edit.pkb-arc   1.1   Jan 11 2017 18:02:44   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_nw_edit.pkb-arc   1.2   Feb 22 2017 13:20:50   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_nw_edit.pkb  $
-   --       Date into PVCS   : $Date:   Jan 11 2017 18:02:44  $
-   --       Date fetched Out : $Modtime:   Jan 11 2017 18:03:26  $
-   --       PVCS Version     : $Revision:   1.1  $
+   --       Date into PVCS   : $Date:   Feb 22 2017 13:20:50  $
+   --       Date fetched Out : $Modtime:   Feb 22 2017 13:17:08  $
+   --       PVCS Version     : $Revision:   1.2  $
    --
    --   Author : R.A. Coupe
    --
@@ -17,7 +17,7 @@ AS
    ----------------------------------------------------------------------------
    --
 
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.1  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.2  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_get';
 
@@ -976,7 +976,8 @@ AS
    END;
 
    PROCEDURE check_operation (p_op               IN VARCHAR2,
-                              p_ne               IN INTEGER,
+                              p_ne1              IN INTEGER,
+                              p_ne2              IN INTEGER,
                               p_start_m          IN NUMBER,
                               p_shift_m          IN NUMBER,
                               p_effective_date   IN DATE,
@@ -986,29 +987,30 @@ AS
       CASE p_op
          WHEN c_split
          THEN
-            check_forward_dates (p_ne, p_effective_date);
+            check_forward_dates (p_ne1, p_effective_date);
          WHEN c_merge
          THEN
-            check_forward_dates (p_ne, p_effective_date);
+            check_forward_dates (p_ne1, p_effective_date);
+            check_forward_dates (p_ne2, p_effective_date);
          WHEN c_replace
          THEN
-            check_forward_dates (p_ne, p_effective_date);
+            check_forward_dates (p_ne1, p_effective_date);
          WHEN c_close
          THEN
-            check_forward_dates (p_ne, p_effective_date);
+            check_forward_dates (p_ne1, p_effective_date);
          WHEN c_undo
          THEN
-            check_forward_dates (p_ne, p_effective_date);
+            check_forward_dates (p_ne1, p_effective_date);
          WHEN c_shift
          THEN
-            check_overhangs (p_ne,
+            check_overhangs (p_ne1,
                              p_start_m,
                              p_shift_m,
                              p_effective_date,
                              p_length);
          WHEN c_recalibrate
          THEN
-            check_overhangs (p_ne,
+            check_overhangs (p_ne1,
                              p_start_m,
                              p_shift_m,
                              p_effective_date,
@@ -1089,4 +1091,3 @@ AS
    END;
 END;
 /
-
