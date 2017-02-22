@@ -4,11 +4,11 @@ As
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3user_admin.pkh-arc   3.1   Jul 04 2013 16:35:54   James.Wadsworth  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3user_admin.pkh-arc   3.2   Feb 22 2017 11:06:26   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm3user_admin.pkh  $
---       Date into PVCS   : $Date:   Jul 04 2013 16:35:54  $
---       Date fetched Out : $Modtime:   Jul 04 2013 15:53:20  $
---       Version          : $Revision:   3.1  $
+--       Date into PVCS   : $Date:   Feb 22 2017 11:06:26  $
+--       Date fetched Out : $Modtime:   Feb 16 2017 14:56:10  $
+--       Version          : $Revision:   3.2  $
 -------------------------------------------------------------------------
 --   Author : Steven Cooper
 --
@@ -17,7 +17,7 @@ As
 ------------------------------------------------------------------
 --   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 ------------------------------------------------------------------
-  gc_Header_Version  Constant  Varchar2(2000) := '$Revision:   3.1  $';
+  gc_Header_Version  Constant  Varchar2(2000) := '$Revision:   3.2  $';
 
 --
 --
@@ -59,6 +59,13 @@ Procedure Set_User_Password (
                             p_User        In  Dba_Users.Username%Type,
                             p_Password    In  Varchar2
                             );
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE change_user_password(pi_user       IN VARCHAR2
+                              ,pi_new_passwd IN VARCHAR2
+                              ,pi_old_passwd IN VARCHAR2
+                              );
 --
 -----------------------------------------------------------------------------
 --
