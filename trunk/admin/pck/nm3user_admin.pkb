@@ -3,11 +3,11 @@ As
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3user_admin.pkb-arc   3.3   Jan 12 2017 13:26:10   Chris.Baugh  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3user_admin.pkb-arc   3.4   Feb 22 2017 11:06:08   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm3user_admin.pkb  $
---       Date into PVCS   : $Date:   Jan 12 2017 13:26:10  $
---       Date fetched Out : $Modtime:   Dec 16 2016 11:40:04  $
---       Version          : $Revision:   3.3  $
+--       Date into PVCS   : $Date:   Feb 22 2017 11:06:08  $
+--       Date fetched Out : $Modtime:   Feb 16 2017 15:53:14  $
+--       Version          : $Revision:   3.4  $
 -------------------------------------------------------------------------
 --   Author : Steven Cooper
 --
@@ -17,7 +17,7 @@ As
 --   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 ------------------------------------------------------------------
 
-  gc_Body_Version  Constant  Varchar2(100) := '$Revision:   3.3  $';
+  gc_Body_Version  Constant  Varchar2(100) := '$Revision:   3.4  $';
 
   gc_Package_Name  Constant  Varchar2(30)  := 'nm3User_Admin';
  
@@ -248,7 +248,7 @@ Begin
           Raise_Application_Error(-20002,'Invalid Password in call to Set_User_Password.');
       End;
     Else
-      Raise_Application_Error(-20002,'Invalid Password in call to Set_User_Password. :' || p_Reason);
+      Raise_Application_Error(-20002,p_Reason);
     End If;
   Else
     Raise_Application_Error(-20001,'Invalid Username in call to Set_User_Password. ');
@@ -259,6 +259,35 @@ End Set_User_Password;
 --
 -----------------------------------------------------------------------------
 --
-
+PROCEDURE change_user_password(pi_user       IN VARCHAR2
+                              ,pi_new_passwd IN VARCHAR2
+                              ,pi_old_passwd IN VARCHAR2
+                              ) IS
+BEGIN
+  --
+  -- Task 0111425
+  -- Create mcp password metadata
+  -- Ammended to occur before the password is changed as the Form HIG1833 does not 
+  -- issue a commit before exiting.
+  --
+  IF hig.is_product_licensed('MCP')
+  THEN
+    BEGIN
+      EXECUTE IMMEDIATE
+        'BEGIN '||
+        '  nm3mcp_sde.STORE_PASSWORD(:pi_username, :pi_password); '||
+        'END;'
+      USING IN pi_user, IN pi_new_passwd;
+    EXCEPTION
+      WHEN OTHERS THEN NULL;
+    END;
+  END IF;
+--
+  EXECUTE IMMEDIATE 'ALTER USER ' || pi_user || ' IDENTIFIED BY "' || pi_new_passwd||'" REPLACE "'||pi_old_passwd||'"';
+--
+END;
+--
+-----------------------------------------------------------------------------
+--
 End Nm3User_Admin;
 /
