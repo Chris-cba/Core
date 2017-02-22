@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE lb_nw_edit
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_nw_edit.pkh-arc   1.0   Jan 11 2017 17:59:44   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_nw_edit.pkh-arc   1.1   Feb 22 2017 13:22:14   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_nw_edit.pkh  $
-   --       Date into PVCS   : $Date:   Jan 11 2017 17:59:44  $
-   --       Date fetched Out : $Modtime:   Jan 11 2017 17:58:16  $
-   --       PVCS Version     : $Revision:   1.0  $
+   --       Date into PVCS   : $Date:   Feb 22 2017 13:22:14  $
+   --       Date fetched Out : $Modtime:   Feb 22 2017 13:22:08  $
+   --       PVCS Version     : $Revision:   1.1  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,7 +16,7 @@ AS
    -- Copyright (c) 2016 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.0  $';
+   g_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.1  $';
 
    c_split     CONSTANT VARCHAR2 (1) := 'S';
    c_merge     CONSTANT VARCHAR2 (1) := 'M';
@@ -77,6 +77,6 @@ AS
    PROCEDURE log_transaction (p_transaction_id   IN INTEGER,
                               p_neh_id           IN INTEGER);
 
-   PROCEDURE check_operation( p_op in VARCHAR2, p_ne in INTEGER, p_start_m in number, p_shift_m in number, p_effective_date in date, p_length in number );                               
+   PROCEDURE check_operation( p_op in VARCHAR2, p_ne1 in INTEGER, p_ne2 in INTEGER, p_start_m in number, p_shift_m in number, p_effective_date in date, p_length in number );                               
 END;
 /
