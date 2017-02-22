@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE hig_user_login_util AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/hig_user_login_util.pkh-arc   1.1   Nov 29 2016 13:38:18   Chris.Baugh  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/hig_user_login_util.pkh-arc   1.2   Feb 22 2017 11:10:04   Chris.Baugh  $
 --       Module Name      : $Workfile:   hig_user_login_util.pkh  $
---       Date into PVCS   : $Date:   Nov 29 2016 13:38:18  $
---       Date fetched Out : $Modtime:   Nov 29 2016 13:36:14  $
---       PVCS Version     : $Revision:   1.1  $
+--       Date into PVCS   : $Date:   Feb 22 2017 11:10:04  $
+--       Date fetched Out : $Modtime:   Feb 16 2017 11:34:22  $
+--       PVCS Version     : $Revision:   1.2  $
 --
 --   Author : Vikas Mhetre
 --
@@ -19,7 +19,7 @@ CREATE OR REPLACE PACKAGE hig_user_login_util AS
 --
 -- all global package variables here
 --
-   g_sccsid     constant varchar2(30) :='"$Revision:   1.1  $"';
+   g_sccsid     constant varchar2(30) :='"$Revision:   1.2  $"';
 
 -- This function returns the current SCCS version
   FUNCTION get_version
@@ -52,6 +52,12 @@ CREATE OR REPLACE PACKAGE hig_user_login_util AS
   PROCEDURE alter_profile(alter_profile_text IN VARCHAR2,
                           error_code         OUT NUMBER,
                           error_message      OUT VARCHAR2);
+--
+-----------------------------------------------------------------------------
+--
+  FUNCTION validate_user_pwd_fn (p_username    hig_users.hus_username%TYPE,
+                                 p_password    VARCHAR2)
+    RETURN VARCHAR2;
 --
 -----------------------------------------------------------------------------
 --
