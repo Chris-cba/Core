@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_nw_edit
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_nw_edit.pkb-arc   1.2   Feb 22 2017 13:20:50   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_nw_edit.pkb-arc   1.3   Feb 23 2017 22:23:04   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_nw_edit.pkb  $
-   --       Date into PVCS   : $Date:   Feb 22 2017 13:20:50  $
-   --       Date fetched Out : $Modtime:   Feb 22 2017 13:17:08  $
-   --       PVCS Version     : $Revision:   1.2  $
+   --       Date into PVCS   : $Date:   Feb 23 2017 22:23:04  $
+   --       Date fetched Out : $Modtime:   Feb 23 2017 22:22:46  $
+   --       PVCS Version     : $Revision:   1.3  $
    --
    --   Author : R.A. Coupe
    --
@@ -17,7 +17,7 @@ AS
    ----------------------------------------------------------------------------
    --
 
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.2  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.3  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_get';
 
@@ -183,7 +183,7 @@ AS
                        p_transaction_id   IN INTEGER)
    IS
    BEGIN
-      nm_debug.debug ('close original locations');
+      nm_debug.debug ('close original locations for '||p_ne1||','||p_ne2);
 
       close_current (p_ne1,
                      p_ne2,
@@ -191,11 +191,11 @@ AS
                      p_effective_date);
 
 
-      UPDATE nm_locations_all
-         SET nm_end_date = p_effective_date,
-             transaction_id = p_transaction_id,
-             nm_status = 1
-       WHERE nm_ne_id_of IN (p_ne1, p_ne2) AND nm_end_date IS NULL;
+--      UPDATE nm_locations_all
+--         SET nm_end_date = p_effective_date,
+--             transaction_id = p_transaction_id,
+--             nm_status = 1
+--       WHERE nm_ne_id_of IN (p_ne1, p_ne2) AND nm_end_date IS NULL;
 
       nm_debug.debug ('insert new locations');
 
@@ -439,7 +439,7 @@ AS
                                                                        2
                                                                  END
                                                                     orderby
-                                                            FROM nm_elements
+                                                            FROM nm_elements_all
                                                            WHERE ne_id IN
                                                                     (p_ne1,
                                                                      p_ne2)))
@@ -580,8 +580,7 @@ AS
                                                                   --                                                 AND i.nm_ne_id_in = 1268208
                                                                   AND i.nm_ne_id_of =
                                                                          e.ne_id
-                                                                  AND nm_end_date
-                                                                         IS NULL
+                                                                  AND transaction_id = p_transaction_id
                                                          ORDER BY orderby) t1)
                                                 t2) t3) t4) t5) t6;
 
@@ -815,7 +814,8 @@ AS
       SELECT transaction_id
         INTO l_transaction_id
         FROM lb_element_history l, nm_element_history e
-       WHERE e.neh_id = l.neh_id AND e.neh_ne_id_new = p_ne_id;
+       WHERE e.neh_id = l.neh_id AND e.neh_ne_id_new = p_ne_id
+       group by transaction_id;
 
       lb_undo (p_transaction_id => l_transaction_id);
    END;
@@ -871,11 +871,12 @@ AS
                 nm_ne_id_in,
                 nm_obj_type,
                 nm_loc_id,
-                SDO_LRS.offset_geom_segment (geoloc,
+                sdo_lrs.convert_to_std_geom(
+                     SDO_LRS.offset_geom_segment (geoloc,
                                              nm_begin_mp,
                                              nm_end_mp,
-                                             nm_offset_st,
-                                             0.005)
+                                             nvl(nm_offset_st,0),
+                                             0.005))
            FROM nm_locations_all, V_LB_NLT_GEOMETRY
           WHERE     nm_nlt_id = nlt_id
                 AND ne_id = nm_ne_id_of
@@ -919,6 +920,7 @@ AS
                             p_effective_date   IN DATE)
    IS
    BEGIN
+      nm_debug.debug('close_current on '||p_ne1||','||p_ne2||' transaction '||p_transaction_id||' Date '||to_char(p_effective_date, 'DD-MON-YYYY') );
       UPDATE nm_locations_all
          SET nm_end_date = p_effective_date,
              transaction_id = p_transaction_id,
