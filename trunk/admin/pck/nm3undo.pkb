@@ -4,11 +4,11 @@ IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3undo.pkb-arc   2.30   Feb 20 2017 17:20:46   Rob.Coupe  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3undo.pkb-arc   2.31   Feb 23 2017 22:35:08   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3undo.pkb  $
---       Date into PVCS   : $Date:   Feb 20 2017 17:20:46  $
---       Date fetched Out : $Modtime:   Feb 20 2017 17:21:24  $
---       PVCS Version     : $Revision:   2.30  $
+--       Date into PVCS   : $Date:   Feb 23 2017 22:35:08  $
+--       Date fetched Out : $Modtime:   Feb 23 2017 22:35:04  $
+--       PVCS Version     : $Revision:   2.31  $
 --
 --   Author : ITurnbull
 --
@@ -19,7 +19,7 @@ IS
 -- Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '"$Revision:   2.30  $"';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '"$Revision:   2.31  $"';
 --  g_body_sccsid is the SCCS ID for the package body
    g_package_name   CONSTANT VARCHAR2 (2000) := 'nm3undo';
 --
@@ -523,7 +523,7 @@ END undo_scheme;
                 || CHR (10)|| 'END;'
             USING IN p_ne_id_1, p_ne_id_2, p_ne_id_3;
 --
-         ELSIF p_operation = c_merge     
+         ELSIF p_operation = c_merge
          THEN
 
             EXECUTE IMMEDIATE 'BEGIN'
@@ -541,7 +541,7 @@ END undo_scheme;
 
          ELSIF p_operation = c_replace
          THEN
-         
+
             EXECUTE IMMEDIATE 'BEGIN'
                 || CHR (10)|| '   ukprepl.undo_replace( p_new_rse      => :p_ne_id_1'
                 || CHR (10)|| '                        ,p_original_rse => :p_ne_id_2);'
@@ -556,7 +556,7 @@ END undo_scheme;
                 || CHR (10)|| '                       ,p_op_date => :p_op_date);'
                 || CHR (10)|| 'END;'
             USING IN p_ne_id_1, p_op_date;
-            
+
          END IF;
 
       END IF;
@@ -569,18 +569,18 @@ END undo_scheme;
         If p_Operation = c_Split Then
           -- passes the ne_ids of the 2 new/split elements
           Execute Immediate 'Begin'                                                       || Chr (10) ||
-                            '  Nsg_Split.Undo_Split_Esu ('                                || Chr (10) ||                            
-                            '                           p_Old_Ne_Id    => :p_Ne_Id_1,'    || Chr (10) || 
+                            '  Nsg_Split.Undo_Split_Esu ('                                || Chr (10) ||
+                            '                           p_Old_Ne_Id    => :p_Ne_Id_1,'    || Chr (10) ||
                             '                           p_New_Ne_Id_1  => :p_Ne_Id_2,'    || Chr (10) ||
                             '                           p_New_Ne_Id_2  => :p_Ne_Id_3,'    || Chr (10) ||
                             '                           p_Op_Date      => :p_Op_Date'     || Chr (10) ||
-                            '                           );'                               || Chr (10) ||                            
+                            '                           );'                               || Chr (10) ||
                             'End;'
           Using In p_Ne_Id_1, p_Ne_Id_2, p_Ne_Id_3, p_Op_Date;
-        
+
         Elsif p_Operation = c_Merge Then
           -- passes the ne_id of the new/merged element
-          Execute Immediate    'Begin'                                                              ||  Chr (10)  || 
+          Execute Immediate    'Begin'                                                              ||  Chr (10)  ||
                                '  Nsg_Merge.Undo_Merge_Esu  ('                                      ||  Chr (10)  ||
                                '                            p_New_Ne_Id       =>    :p_Ne_Id_1,'    ||  Chr (10)  ||
                                '                            p_Old_Ne_Id_1     =>    :p_Ne_Id_2,'    ||  Chr (10)  ||
@@ -589,14 +589,14 @@ END undo_scheme;
                                '                            );'                                     ||  Chr (10)  ||
                                'End;'
           Using In p_Ne_Id_1, p_Ne_Id_2, p_Ne_Id_3,p_Op_Date;
-        
+
         Elsif p_Operation = c_Replace  Then
           -- passes the ne_id of the new element
           Execute Immediate   'Begin'                                                             ||  Chr (10)  ||
                               '  Nsg_Replace.Undo_Replace_Esu ('                                  ||  Chr (10)  ||
                               '                               p_New_Ne_Id       =>  :p_Ne_Id_1,'  ||  Chr (10)  ||
                               '                               p_Old_Ne_Id       =>  :p_Ne_Id_2,'  ||  Chr (10)  ||
-                              '                               p_Effective_Date  =>  :p_Op_Date'   ||  Chr (10)  ||                              
+                              '                               p_Effective_Date  =>  :p_Op_Date'   ||  Chr (10)  ||
                               '                               );'                                 ||  Chr (10)  ||
                               'End;'
           Using In p_Ne_Id_1, p_Ne_Id_2,p_Op_Date;
@@ -606,13 +606,13 @@ END undo_scheme;
           Execute Immediate   'Begin'                                                           ||  Chr(10) ||
                               ' Nsg_Close.Undo_Close_Esu  ('                                    ||  Chr(10) ||
                               '                           p_Ne_Id           =>    :p_Ne_Id_1,'  ||  Chr(10) ||
-                              '                           p_Effective_Date  =>    :p_Op_Date'   ||  Chr(10) ||                              
+                              '                           p_Effective_Date  =>    :p_Op_Date'   ||  Chr(10) ||
                               '                           );'                                   ||  Chr(10) ||
                               'End;'
           Using In p_Ne_Id_1,p_Op_Date;
          End If;
       End If;
-      
+
       Nm_Debug.proc_end (g_package_name, 'UNDO_OTHER_PRODUCTS');
 
    END undo_other_products;
@@ -1160,7 +1160,7 @@ END undo_scheme;
          pi_effective_date   IN   DATE
       )
       IS
-         l_tab_ne_id_of     Nm3type.tab_number; 
+         l_tab_ne_id_of     Nm3type.tab_number;
          l_rec_nm           nm_members%ROWTYPE;
       BEGIN
          nm_debug.debug_on;
@@ -1170,23 +1170,23 @@ END undo_scheme;
           INTO l_tab_ne_id_of
 		from  (
         SELECT distinct nm_ne_id_of, nm_start_date
-          FROM nm_members_all, 
-               nm_elements_all, 
-               nm_element_history a, 
+          FROM nm_members_all,
+               nm_elements_all,
+               nm_element_history a,
                nm_element_history b
          WHERE nm_ne_id_in = pi_ne_id
            AND nm_ne_id_of = ne_id
-           AND a.neh_ne_id_old = nm_ne_id_of 
+           AND a.neh_ne_id_old = nm_ne_id_of
            AND a.neh_operation = 'S'
            AND a.neh_effective_date = b.neh_effective_date
-           AND b.neh_ne_id_old = pi_ne_id 
+           AND b.neh_ne_id_old = pi_ne_id
            AND b.neh_operation = 'S'
-           AND nvl(a.neh_descr, '£$%^') = nvl(b.neh_descr, '£$%^')
+           AND nvl(a.neh_descr, 'Â£$%^') = nvl(b.neh_descr, 'Â£$%^')
            AND nm_end_date = a.neh_effective_date
            order by nm_start_date desc
            )
 		where rownum = 1;
-         
+
          -- unclose the element
          error_loc := 20 ;
          UPDATE NM_ELEMENTS_ALL
@@ -1287,24 +1287,24 @@ END undo_scheme;
                                     );
             error_loc := 33 ;
 
-         
+
         --nm_debug.debug('==> Tab Count = '||l_tab_ne_id_of.COUNT);
-        IF l_tab_ne_id_of.COUNT >0 
+        IF l_tab_ne_id_of.COUNT >0
           THEN
           FOR i IN 1..l_tab_ne_id_of.COUNT LOOP
            -- nm_debug.debug('==> unsplitting ' ||l_tab_ne_id_of(i));
-            
+
             unsplit (p_ne_id => l_tab_ne_id_of(i));
-          
+
           END LOOP;
          END IF;
-         
-            
+
+
       END unsplit_group;
    BEGIN
       error_loc := 40 ;
       Nm_Debug.proc_start (g_package_name, 'unsplit_datum_or_group');
-      NM3LOCK.LOCK_ELEMENT_AND_MEMBERS(p_ne_id, TRUE);     
+      NM3LOCK.LOCK_ELEMENT_AND_MEMBERS(p_ne_id, TRUE);
       Nm3ausec.set_status (Nm3type.c_off);
       Nm3merge.set_nw_operation_in_progress;
 
@@ -1343,13 +1343,13 @@ END undo_scheme;
            EXECUTE IMMEDIATE 'BEGIN xncc_herm_xsp.unclose_herm_xsp(:p_ne_id); END;' USING p_ne_id;
          END IF;
          --
-         
+
          error_loc := 431;
-               
+
          if hig.is_product_licensed('LB') then
             lb_nw_edit.lb_undo(p_ne_id => l_ne_id_1 );
          end if;
-         
+
          IF Nm3net.element_is_a_datum (pi_ne_id => p_ne_id)
          THEN
            error_loc := 44 ;
@@ -1512,12 +1512,12 @@ END undo_scheme;
             UPDATE NM_NODE_USAGES_ALL
                SET nnu_end_date = NULL
              WHERE nnu_ne_id IN (pi_ne_id_1, pi_ne_id_2);
-               
+
             if hig.is_product_licensed('LB') then
                error_loc := 1041;
                lb_nw_edit.lb_undo(p_ne_id => pi_ne_id );
             end if;
-             
+
 
             error_loc := 105 ;
             undo_other_products (p_ne_id_1        => pi_ne_id_1,
@@ -1610,8 +1610,8 @@ END undo_scheme;
                                       pi_old_ne_id2      => pi_ne_id_2
                                      );
             END IF;
-*/            
-            
+*/
+
             error_loc := 109 ;
 
             -- delete the history
@@ -1667,7 +1667,7 @@ END undo_scheme;
          UPDATE NM_MEMBERS_ALL
             SET nm_end_date = NULL
           WHERE nm_ne_id_in IN (pi_ne_id_1, pi_ne_id_2)
-            AND nm_end_date = pi_effective_date            
+            AND nm_end_date = pi_effective_date
             AND nm_ne_id_of IN (SELECT nm_ne_id_of
                                   FROM NM_MEMBERS_ALL
                                  WHERE nm_ne_id_in = pi_ne_id);
@@ -1844,7 +1844,7 @@ END undo_scheme;
       END set_for_return;
    BEGIN
       Nm_Debug.proc_start (g_package_name, 'unreplace');
-      NM3LOCK.LOCK_ELEMENT_AND_MEMBERS(p_ne_id, TRUE);      
+      NM3LOCK.LOCK_ELEMENT_AND_MEMBERS(p_ne_id, TRUE);
       Nm3ausec.set_status (Nm3type.c_off);
       Nm3merge.set_nw_operation_in_progress;
 
@@ -1927,9 +1927,9 @@ END undo_scheme;
             THEN
                Nm3nwad.do_ad_unreplace (pi_old_ne_id => v_ne_id);
             END IF;
-            
+
             if hig.is_product_licensed('LB') then
-               lb_nw_edit.lb_undo(p_ne_id => p_ne_id );
+               lb_nw_edit.lb_undo(p_ne_id => v_ne_id );
             end if;
 
 
@@ -1984,7 +1984,7 @@ END undo_scheme;
 --
 ------------------------------------------------------------------------------------------------
 --
-   PROCEDURE unclose ( p_ne_id            NM_ELEMENTS.ne_id%TYPE 
+   PROCEDURE unclose ( p_ne_id            NM_ELEMENTS.ne_id%TYPE
                       ,p_include_datums   BOOLEAN DEFAULT TRUE)   IS
       CURSOR c1
       IS
@@ -1999,8 +1999,8 @@ END undo_scheme;
       IS
          SELECT 1
            FROM nm_members_all
-               ,nm_elements_all 
-          WHERE ne_id = nm_ne_id_in 
+               ,nm_elements_all
+          WHERE ne_id = nm_ne_id_in
             AND nm_ne_id_of = c_ne_id
             AND ne_end_date IS NOT NULL;
 --
@@ -2025,7 +2025,7 @@ END undo_scheme;
       Nm3nwval.network_operations_check (Nm3nwval.c_unclose, p_ne_id);
 --
       Nm3ausec.set_status (Nm3type.c_off);
-      
+
       Nm3merge.set_nw_operation_in_progress;
 
       -- get the date the element was closed
@@ -2090,7 +2090,7 @@ END undo_scheme;
            )
            IS
            SELECT ne_id
-             FROM nm_element_history, 
+             FROM nm_element_history,
                   nm_elements_all
             WHERE neh_ne_id_old = ne_id
               AND neh_operation = c_close
@@ -2109,21 +2109,21 @@ END undo_scheme;
            FETCH cs_neh
            BULK COLLECT INTO l_neh_ne_id;
            CLOSE cs_neh;
-            
+
            -- Unclose elements
            FORALL i IN 1 .. l_neh_ne_id.COUNT
               UPDATE nm_elements_all
                  SET ne_end_date = NULL
                WHERE ne_id = l_neh_ne_id (i)
                  AND ne_end_date = v_close_date;
-           
+
            -- Un-end date the membership records
            FORALL i IN 1 .. l_neh_ne_id.COUNT
               UPDATE nm_members_all
                  SET nm_end_date = NULL
                WHERE nm_ne_id_in = l_neh_ne_id (i)
                  AND nm_end_date = v_close_date;
-                 
+
            -- Un end date the inventory on the children
            FORALL i IN 1 .. l_neh_ne_id.COUNT
            UPDATE nm_inv_items_all
@@ -2142,22 +2142,22 @@ END undo_scheme;
                  SET nm_end_date = NULL
                WHERE nm_ne_id_of = l_neh_ne_id (i)
                  AND nm_end_date = v_close_date;
-                 
-           -- Delete element history records 
+
+           -- Delete element history records
            FORALL i IN 1 .. l_neh_ne_id.COUNT
               DELETE nm_element_history
                WHERE neh_ne_id_new = l_neh_ne_id(i)
                  AND neh_ne_id_old = l_neh_ne_id(i)
                  AND neh_effective_date = v_close_date
                  AND neh_operation = 'C';
-           
+
            -- Delete the membership history records
            FORALL i IN 1 .. l_neh_ne_id.COUNT
               DELETE nm_member_history
                WHERE nmh_nm_ne_id_in = l_neh_ne_id(i)
                  AND nmh_nm_ne_id_of_new = l_neh_ne_id(i)
                  AND nmh_nm_ne_id_of_old = l_neh_ne_id (i);
-           
+
            -- Unclose other products.
            FOR i IN 1 .. l_neh_ne_id.COUNT LOOP
            undo_other_products (p_ne_id_1        => l_neh_ne_id(i)
@@ -2258,10 +2258,10 @@ END undo_scheme;
                AND nm_start_date = l_tab_start_date (i);
       END;
       --
---RC> Problems here - code has been uncommented since group members and assets were not being unlcosed.      
+--RC> Problems here - code has been uncommented since group members and assets were not being unlcosed.
 --    Also, added the v_close_date below because otherwise, a member that was closed at the max date (not at the close date of the element) would be unclosed!      --
 --
-	  
+
     UPDATE NM_MEMBERS_ALL
     SET nm_end_date = NULL
     WHERE nm_ne_id_of = p_ne_id
