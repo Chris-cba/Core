@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm3replace IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3replace.pkb-arc   2.9   Feb 17 2017 14:29:22   Rob.Coupe  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3replace.pkb-arc   2.10   Feb 23 2017 22:18:08   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3replace.pkb  $
---       Date into PVCS   : $Date:   Feb 17 2017 14:29:22  $
---       Date fetched Out : $Modtime:   Feb 17 2017 14:29:46  $
---       PVCS Version     : $Revision:   2.9  $
+--       Date into PVCS   : $Date:   Feb 23 2017 22:18:08  $
+--       Date fetched Out : $Modtime:   Feb 23 2017 22:17:50  $
+--       PVCS Version     : $Revision:   2.10  $
 --
 --
 --   Author : ITurnbull
@@ -17,10 +17,10 @@ CREATE OR REPLACE PACKAGE BODY nm3replace IS
 --   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.9  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.10  $"';
 --  g_body_sccsid is the SCCS ID for the package body
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3replace';
-   
+
    g_transaction_id  INTEGER;
 ------------------------------------------------------------------------------------------------
 --
@@ -43,7 +43,7 @@ END get_body_version;
                               )
    IS
    BEGIN
-         -- end date the original element 
+         -- end date the original element
       UPDATE nm_elements
       SET ne_end_date = p_effective_date
       WHERE ne_id IN ( p_ne_id );
@@ -128,7 +128,7 @@ END get_body_version;
    v_ne_sub_class nm_elements.ne_sub_class%TYPE := p_ne_sub_class;
    v_ne_nsg_ref nm_elements.ne_nsg_ref%TYPE := p_ne_nsg_ref;
    v_ne_version_no nm_elements.ne_version_no%TYPE := p_ne_version_no;
-   
+
    l_orig_ne_length nm_elements.ne_length%type;
 
    BEGIN
@@ -173,7 +173,7 @@ END get_body_version;
         END LOOP;
 
         l_orig_ne_length := c1rec.ne_length;
-        
+
         IF v_ne_length IS NULL THEN
            v_ne_length := l_orig_ne_length;
         END IF;
@@ -236,13 +236,13 @@ END get_body_version;
          l_rec_neh.neh_old_ne_length  := l_orig_ne_length;
          l_rec_neh.neh_new_ne_length  := v_ne_length;
          l_rec_neh.neh_descr          := p_neh_descr; --CWS 0108990 12/03/2010
-         
+
          nm3nw_edit.ins_neh(l_rec_neh); --CWS 0108990 12/03/2010
-         
+
          if HIG.IS_PRODUCT_LICENSED('LB') then
             execute immediate 'begin lb_nw_edit.log_transaction( :g_transaction_id, :neh_id ); end; ' using g_transaction_id, l_rec_neh.neh_id;
          end if;
-         
+
       END;
    END;
 --
@@ -433,8 +433,8 @@ END get_body_version;
 					 ;
 	  END IF;
 
-	  
-	  -- Check if MAI is installed and do replace 
+
+	  -- Check if MAI is installed and do replace
       IF hig.is_product_licensed( 'MAI' ) THEN
 	     -- do str replace
 		 EXECUTE IMMEDIATE
@@ -449,8 +449,8 @@ END get_body_version;
                      ,p_effective_date
 					 ;
 	  END IF;
-    
-    
+
+
     -- Schemes
     if hig.is_product_licensed(nm3type.c_stp) then
       execute immediate
@@ -462,12 +462,12 @@ END get_body_version;
       ||cr||'  );'
       ||cr||'end;'
       using p_ne_id_new, p_ne_id, p_effective_date;
-      
-    end if;    
-    
-      -- Check if UKPMS is installed and do replace 
+
+    end if;
+
+      -- Check if UKPMS is installed and do replace
       IF hig.is_product_licensed(nm3type.c_ukp) THEN
-      
+
          -- do ukpms replace
          EXECUTE IMMEDIATE
             'BEGIN' || CHR(10) ||
@@ -479,27 +479,27 @@ END get_body_version;
                      ,p_ne_id_new;
 
       END IF;
-      
+
      --NSG
      If Hig.Is_Product_Licensed(Nm3type.c_Nsg) Then
-               
+
        Execute Immediate  'Begin'                                                             || Chr(10) ||
                           '  Nsg_Replace.Replace_Esu  ('                                      || Chr(10) ||
                           '                           p_Old_Ne_Id       => :p_Ne_Id,'         || Chr(10) ||
                           '                           p_New_Ne_Id       => :p_Ne_Id_New,'     || Chr(10) ||
-                          '                           p_Effective_Date  => :p_Effective_Date' || Chr(10) ||                          
+                          '                           p_Effective_Date  => :p_Effective_Date' || Chr(10) ||
                           '                           );'                                     || Chr(10) ||
                           'End;'
         Using In p_Ne_Id,
                  p_Ne_Id_New,
                  p_Effective_Date;
 
-     End If;    
+     End If;
    END replace_other_products;
 --
 ------------------------------------------------------------------------------------------------
 --
-PROCEDURE check_other_products 
+PROCEDURE check_other_products
                     (p_ne_id_1           IN nm_elements.ne_id%TYPE
 					,p_ne_id_2           IN nm_elements.ne_id%TYPE
 					,p_sect_no			 IN VARCHAR2 DEFAULT NULL
@@ -507,25 +507,25 @@ PROCEDURE check_other_products
 					,p_errors           OUT NUMBER
                     ,p_err_text         OUT VARCHAR2
 					) IS
-					
+
    l_block    VARCHAR2(32767);
-   
+
 BEGIN
 --
-  
+
    nm_debug.proc_start(g_package_name,'check_other_products');
 --
   -- Check if MM is installed and check for data
    IF hig.is_product_licensed(nm3type.c_mai)
     THEN
---	
-      
---	
+--
+
+--
       l_block :=            'BEGIN'
                  ||CHR(10)||'    mairepl.check_data'
                  ||CHR(10)||'              (p_rse_he_id_1    => :p_ne_id_1'
                  ||CHR(10)||'              ,p_rse_he_id_2    => :p_ne_id_2'
-                 ||CHR(10)||'              ,p_sect_no        => :p_sect_no'				 
+                 ||CHR(10)||'              ,p_sect_no        => :p_sect_no'
                  ||CHR(10)||'              ,p_effective_date => :p_effective'
 				 ||CHR(10)||'              ,p_errors         => :p_errors'
 				 ||CHR(10)||'              ,p_error_string   => :p_err_text'
@@ -537,14 +537,14 @@ BEGIN
                ,p_sect_no
                ,p_effective
 	    ,IN OUT p_errors
-		,IN OUT p_err_text;			   
---		   
-	 
+		,IN OUT p_err_text;
+--
+
 --
   END IF;
 --
    nm_debug.proc_end(g_package_name,'check_other_products');
-  
+
 --
 END check_other_products;
 --
@@ -598,7 +598,7 @@ END check_other_products;
    BEGIN
 --
       nm_debug.proc_start(g_package_name , 'do_replace');
-     
+
       nm3ausec.set_status(nm3type.c_off);
       nm3merge.set_nw_operation_in_progress;
 --
@@ -614,6 +614,19 @@ END check_other_products;
                                        );
 --
 
+      g_transaction_id := next_transaction_id;
+
+
+      if HIG.IS_PRODUCT_LICENSED('LB') then
+         declare
+           l_block varchar2(2000);
+         begin
+            l_block := 'BEGIN LB_NW_EDIT.CHECK_OPERATION(:p_op, :p_ne1, :p_ne2, :p_start_m, :p_shift_m, :p_effective_date, :p_length ); end; ';
+            execute immediate l_block using 'C', p_ne_id, 0, 0, 0, p_effective_date, 0;
+         end;
+      end if;
+
+
    -- NM - Add check here for other products
    check_other_products ( p_ne_id_1        => p_ne_id
                          ,p_ne_id_2        => null
@@ -622,7 +635,7 @@ END check_other_products;
                          ,p_errors         => v_errors
      				 ,p_err_text       => v_err_text
     				    );
- 
+
    IF v_err_text IS NOT NULL
     THEN
        hig.raise_ner(pi_appl               => nm3type.c_mai
@@ -660,16 +673,16 @@ END check_other_products;
       IF NVL(hig.get_sysopt('XSPOFFSET'),'N') = 'Y'
       THEN
            EXECUTE IMMEDIATE 'BEGIN ' ||
-                             'xncc_herm_xsp.populate_herm_xsp( p_ne_id          => :p_ne_id ' || 
+                             'xncc_herm_xsp.populate_herm_xsp( p_ne_id          => :p_ne_id ' ||
                                                             ', p_ne_id_new      => :p_ne_id_new ' ||
                                                             ', p_effective_date => :p_effective_date ' ||
-                                                            '); ' || 
+                                                            '); ' ||
                              'END;' USING p_ne_id, p_ne_id_new, p_effective_date;
       END IF;
    /* nm3sdo.change_affected_shapes (p_layer      => g_nth.nth_theme_id,
                                    p_ne_id      => p_ne_id_new);*/
        /*IF HIG.GET_SYSOPT(
-       EXECUTE IMMEDIATE 'xncc_herm_xsp.populate_herm_xsp( p_ne_id => p_ne_id 
+       EXECUTE IMMEDIATE 'xncc_herm_xsp.populate_herm_xsp( p_ne_id => p_ne_id
                                                          , p_ne_id_new => p_ne_id_new
                                                          , p_effective_date => p_effective_date
                                                          );'*/
@@ -690,39 +703,37 @@ END check_other_products;
                              ,p_effective_date
                             );
 
-         g_transaction_id := next_transaction_id;
-   
-  
+
          if HIG.IS_PRODUCT_LICENSED('LB') then
             declare
                l_block varchar2(2000);
-            begin 
+            begin
                l_block := 'begin lb_nw_edit.lb_replace(:p_ne1, :p_ne2, :p_effective_date, :p_transaction_id); end; ';
 --
                execute immediate l_block using p_ne_id, p_ne_id_new, p_effective_date, g_transaction_id;
             end;
-         end if;                            
-          
+         end if;
+
 	     replace_other_products ( p_ne_id
                                  ,p_ne_id_new
 	        					 ,p_effective_date
 							    );
-                                
+
          IF nm3nwad.ad_data_exist(p_ne_id) THEN
-     
+
             nm3nwad.do_ad_replace( p_ne_id
                                  , p_ne_id_new
                                  );
-            
-         END IF;                         
-  
+
+         END IF;
+
          end_date_element ( p_ne_id
                            ,p_effective_date
                           );
-        
-        
+
+
      -- end if;
-     -- Insert the stored NM_MEMBER_HISTORY records   
+     -- Insert the stored NM_MEMBER_HISTORY records
         nm3merge.ins_nmh;
 --
       set_for_return;
