@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_nw_edit
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_nw_edit.pkb-arc   1.3   Feb 23 2017 22:23:04   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_nw_edit.pkb-arc   1.4   Feb 24 2017 15:46:44   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_nw_edit.pkb  $
-   --       Date into PVCS   : $Date:   Feb 23 2017 22:23:04  $
-   --       Date fetched Out : $Modtime:   Feb 23 2017 22:22:46  $
-   --       PVCS Version     : $Revision:   1.3  $
+   --       Date into PVCS   : $Date:   Feb 24 2017 15:46:44  $
+   --       Date fetched Out : $Modtime:   Feb 24 2017 15:46:42  $
+   --       PVCS Version     : $Revision:   1.4  $
    --
    --   Author : R.A. Coupe
    --
@@ -17,9 +17,13 @@ AS
    ----------------------------------------------------------------------------
    --
 
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.3  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.4  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_get';
+
+   PROCEDURE adjust_aggregates (p_ne               IN INTEGER,
+                                p_effective_date   IN DATE,
+                                p_transaction_id   IN INTEGER);
 
    --
    FUNCTION get_version
@@ -66,6 +70,8 @@ AS
    PROCEDURE reinstate (p_edit_tab lb_edit_transaction_tab);
 
    PROCEDURE check_forward_dates (p_ne IN INTEGER, p_effective_date IN DATE);
+
+   PROCEDURE check_undo_dates (p_ne1 IN INTEGER, p_ne2 IN INTEGER);
 
    PROCEDURE check_overhangs (p_ne               IN INTEGER,
                               p_start_m          IN NUMBER,
@@ -183,7 +189,8 @@ AS
                        p_transaction_id   IN INTEGER)
    IS
    BEGIN
-      nm_debug.debug ('close original locations for '||p_ne1||','||p_ne2);
+      nm_debug.debug (
+         'close original locations for ' || p_ne1 || ',' || p_ne2);
 
       close_current (p_ne1,
                      p_ne2,
@@ -191,11 +198,11 @@ AS
                      p_effective_date);
 
 
---      UPDATE nm_locations_all
---         SET nm_end_date = p_effective_date,
---             transaction_id = p_transaction_id,
---             nm_status = 1
---       WHERE nm_ne_id_of IN (p_ne1, p_ne2) AND nm_end_date IS NULL;
+      --      UPDATE nm_locations_all
+      --         SET nm_end_date = p_effective_date,
+      --             transaction_id = p_transaction_id,
+      --             nm_status = 1
+      --       WHERE nm_ne_id_of IN (p_ne1, p_ne2) AND nm_end_date IS NULL;
 
       nm_debug.debug ('insert new locations');
 
@@ -580,7 +587,8 @@ AS
                                                                   --                                                 AND i.nm_ne_id_in = 1268208
                                                                   AND i.nm_ne_id_of =
                                                                          e.ne_id
-                                                                  AND transaction_id = p_transaction_id
+                                                                  AND transaction_id =
+                                                                         p_transaction_id
                                                          ORDER BY orderby) t1)
                                                 t2) t3) t4) t5) t6;
 
@@ -790,7 +798,12 @@ AS
                        p_transaction_id   IN INTEGER)
    IS
    BEGIN
-      NULL;
+      close_current (p_ne,
+                     NULL,
+                     p_transaction_id,
+                     p_effective_date);
+
+      adjust_aggregates (p_ne, p_effective_date, p_transaction_id);
    END;
 
    PROCEDURE lb_undo (p_neh_id IN INTEGER)
@@ -811,11 +824,11 @@ AS
    IS
       l_transaction_id   INTEGER;
    BEGIN
-      SELECT transaction_id
-        INTO l_transaction_id
-        FROM lb_element_history l, nm_element_history e
-       WHERE e.neh_id = l.neh_id AND e.neh_ne_id_new = p_ne_id
-       group by transaction_id;
+        SELECT transaction_id
+          INTO l_transaction_id
+          FROM lb_element_history l, nm_element_history e
+         WHERE e.neh_id = l.neh_id AND e.neh_ne_id_new = p_ne_id
+      GROUP BY transaction_id;
 
       lb_undo (p_transaction_id => l_transaction_id);
    END;
@@ -871,12 +884,12 @@ AS
                 nm_ne_id_in,
                 nm_obj_type,
                 nm_loc_id,
-                sdo_lrs.convert_to_std_geom(
-                     SDO_LRS.offset_geom_segment (geoloc,
-                                             nm_begin_mp,
-                                             nm_end_mp,
-                                             nvl(nm_offset_st,0),
-                                             0.005))
+                SDO_LRS.convert_to_std_geom (SDO_LRS.offset_geom_segment (
+                                                geoloc,
+                                                nm_begin_mp,
+                                                nm_end_mp,
+                                                NVL (nm_offset_st, 0),
+                                                0.005))
            FROM nm_locations_all, V_LB_NLT_GEOMETRY
           WHERE     nm_nlt_id = nlt_id
                 AND ne_id = nm_ne_id_of
@@ -920,7 +933,16 @@ AS
                             p_effective_date   IN DATE)
    IS
    BEGIN
-      nm_debug.debug('close_current on '||p_ne1||','||p_ne2||' transaction '||p_transaction_id||' Date '||to_char(p_effective_date, 'DD-MON-YYYY') );
+      nm_debug.debug (
+            'close_current on '
+         || p_ne1
+         || ','
+         || p_ne2
+         || ' transaction '
+         || p_transaction_id
+         || ' Date '
+         || TO_CHAR (p_effective_date, 'DD-MON-YYYY'));
+
       UPDATE nm_locations_all
          SET nm_end_date = p_effective_date,
              transaction_id = p_transaction_id,
@@ -1017,6 +1039,9 @@ AS
                              p_shift_m,
                              p_effective_date,
                              p_length);
+         WHEN c_undo
+         THEN
+            check_undo_dates (p_ne1, p_ne2);
       END CASE;
    END;
 
@@ -1041,6 +1066,36 @@ AS
       END IF;
    END;
 
+   PROCEDURE check_undo_dates (p_ne1 IN INTEGER, p_ne2 IN INTEGER)
+   IS
+      l_dummy   INTEGER;
+   BEGIN
+      SELECT 1
+        INTO l_dummy
+        FROM DUAL
+       WHERE EXISTS
+                (SELECT 1
+                   FROM nm_element_history e,
+                        lb_element_history l,
+                        nm_locations_all   m
+                  WHERE     l.neh_id = e.neh_id
+                        AND e.neh_ne_id_new IN (p_ne1, p_ne2)
+                        AND nm_ne_id_of = neh_ne_id_new
+                        AND (   l.transaction_id != m.transaction_id
+                             OR (   nm_start_date > neh_actioned_date
+                                 OR nm_end_date > neh_actioned_date)));
+
+      IF l_dummy IS NOT NULL
+      THEN
+         hig.raise_ner ('NET', 378);
+      END IF;
+   EXCEPTION
+      WHEN NO_DATA_FOUND
+      THEN
+         NULL;
+   END;
+
+   ---
    PROCEDURE check_overhangs (p_ne               IN INTEGER,
                               p_start_m          IN NUMBER,
                               p_shift_m          IN NUMBER,
@@ -1090,6 +1145,30 @@ AS
          THEN
             NULL;
       END;
+   END;
+
+   PROCEDURE adjust_aggregates (p_ne               IN INTEGER,
+                                p_effective_date   IN DATE,
+                                p_transaction_id   IN INTEGER)
+   IS
+      l_obj_on_ne   lb_obj_id_tab;
+   BEGIN
+        SELECT CAST (
+                  COLLECT (lb_obj_id (nm_obj_type, nal_asset_id)) AS lb_obj_id_tab)
+          INTO l_obj_on_ne
+          FROM nm_locations_all, nm_asset_locations_all
+         WHERE     nm_ne_id_of = p_ne
+               AND transaction_id = p_transaction_id
+               AND nal_id = nm_ne_id_in
+      GROUP BY nal_nit_type, nal_asset_id;
+
+      FOR i IN 1 .. l_obj_on_ne.COUNT
+      LOOP
+         lb_load.aggregate_geometry (l_obj_on_ne (i).obj_id,
+                                     'N',
+                                     l_obj_on_ne (i).obj_type,
+                                     p_effective_date);
+      END LOOP;
    END;
 END;
 /
