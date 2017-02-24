@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3close AS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3close.pkb-arc   2.18   Jul 26 2016 09:52:32   Chris.Baugh  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3close.pkb-arc   2.19   Feb 24 2017 15:55:32   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3close.pkb  $
---       Date into PVCS   : $Date:   Jul 26 2016 09:52:32  $
---       Date fetched Out : $Modtime:   Jul 22 2016 13:48:00  $
---       PVCS Version     : $Revision:   2.18  $
+--       Date into PVCS   : $Date:   Feb 24 2017 15:55:32  $
+--       Date fetched Out : $Modtime:   Feb 24 2017 15:47:56  $
+--       PVCS Version     : $Revision:   2.19  $
 --
 --
 --   Author : I Turnbull
@@ -21,7 +21,7 @@ CREATE OR REPLACE PACKAGE BODY nm3close AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.18  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.19  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3close';
@@ -36,6 +36,8 @@ CREATE OR REPLACE PACKAGE BODY nm3close AS
    g_tab_rte_memb_end_date_flag         nm3type.tab_varchar4;
 --
    g_multi_check Boolean := TRUE;   
+--
+   g_transaction_id INTEGER;
 --
 -----------------------------------------------------------------------------
 --
@@ -106,6 +108,12 @@ BEGIN
   l_rec_neh.neh_descr          := p_neh_descr; --CWS 0108990 12/03/2010
 --
   nm3nw_edit.ins_neh(l_rec_neh); --CWS 0108990 12/03/2010
+  
+  if HIG.IS_PRODUCT_LICENSED('LB') then
+     execute immediate 'begin lb_nw_edit.log_transaction( :g_transaction_id, :neh_id ); end; ' using g_transaction_id, l_rec_neh.neh_id;
+  end if;
+
+  
 --
   nm_debug.proc_end(g_package_name , 'insert_nm_element_history');
 --
@@ -425,6 +433,13 @@ PROCEDURE do_close(p_ne_id          NM_ELEMENTS.ne_id%TYPE
       nm3merge.set_nw_operation_in_progress(FALSE);
    END set_for_return;
 --
+  function next_transaction_id return integer is
+  retval integer;
+  begin
+    select lb_transaction_id_seq.nextval into retval from dual;
+    return retval;
+  end;
+
 BEGIN
    nm_debug.proc_start(g_package_name , 'do_close');
    nm3merge.set_nw_operation_in_progress;
@@ -435,6 +450,15 @@ BEGIN
       IF p_effective_date > TRUNC(SYSDATE) THEN
          RAISE_APPLICATION_ERROR( -20001, 'Future Effective DATE NOT allowed' );
       END IF;
+
+      if HIG.IS_PRODUCT_LICENSED('LB') then
+         declare
+           l_block varchar2(2000);
+         begin
+            l_block := 'BEGIN LB_NW_EDIT.CHECK_OPERATION(:p_op, :p_ne1, :p_ne2, :p_start_m, :p_shift_m, :p_effective_date, :p_length ); end; ';
+            execute immediate l_block using 'C', p_ne_id, 0, 0, 0, p_effective_date, 0;
+         end;
+      end if;
 
 
 -- NM - Add check here for other products
@@ -529,12 +553,26 @@ BEGIN
       SET ne_end_date = p_effective_date
       WHERE ne_id = p_ne_id;
 --
+      g_transaction_id := next_transaction_id;
+
       insert_nm_element_history( p_ne_id
                                , p_effective_date
                                , p_neh_descr --CWS 0108990 12/03/2010
                                );
      -- Insert the stored NM_MEMBER_HISTORY records
      nm3merge.ins_nmh;
+     
+     if HIG.IS_PRODUCT_LICENSED('LB') then
+        declare
+           l_block varchar2(2000);
+        begin 
+           l_block := 'begin lb_nw_edit.lb_close(:p_ne, :p_effective_date, :p_transaction_id); end; ';
+--
+           execute immediate l_block using p_ne_id, p_effective_date, g_transaction_id;
+        end;
+     end if;                            
+      
+ 
       close_other_products ( p_ne_id
                             ,p_effective_date
                             );
