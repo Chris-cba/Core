@@ -4,11 +4,11 @@ IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3undo.pkb-arc   2.31   Feb 23 2017 22:35:08   Rob.Coupe  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3undo.pkb-arc   2.32   Feb 24 2017 15:37:04   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3undo.pkb  $
---       Date into PVCS   : $Date:   Feb 23 2017 22:35:08  $
---       Date fetched Out : $Modtime:   Feb 23 2017 22:35:04  $
---       PVCS Version     : $Revision:   2.31  $
+--       Date into PVCS   : $Date:   Feb 24 2017 15:37:04  $
+--       Date fetched Out : $Modtime:   Feb 24 2017 15:36:38  $
+--       PVCS Version     : $Revision:   2.32  $
 --
 --   Author : ITurnbull
 --
@@ -19,7 +19,7 @@ IS
 -- Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '"$Revision:   2.31  $"';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '"$Revision:   2.32  $"';
 --  g_body_sccsid is the SCCS ID for the package body
    g_package_name   CONSTANT VARCHAR2 (2000) := 'nm3undo';
 --
@@ -810,6 +810,17 @@ END undo_scheme;
                                   'Elements membership has been modified'
                                  );
       END IF;
+      
+      if HIG.IS_PRODUCT_LICENSED('LB') then
+         declare
+            l_block varchar2(2000);
+         begin
+            l_block := 'BEGIN LB_NW_EDIT.CHECK_OPERATION(:p_op, :p_ne1, :p_ne2, :p_start_m, :p_shift_m, :p_effective_date, :p_length ); end; ';
+            execute immediate l_block using 'U', pi_ne_id_new1, pi_ne_id_new2, 0, 0, trunc(sysdate), 0;
+         end;
+      end if;
+
+
 
       Nm_Debug.proc_end (g_package_name, 'check_members_added');
    END check_members_added;
@@ -1181,7 +1192,7 @@ END undo_scheme;
            AND a.neh_effective_date = b.neh_effective_date
            AND b.neh_ne_id_old = pi_ne_id
            AND b.neh_operation = 'S'
-           AND nvl(a.neh_descr, 'Â£$%^') = nvl(b.neh_descr, 'Â£$%^')
+           AND nvl(a.neh_descr, 'Ã‚Â£$%^') = nvl(b.neh_descr, 'Ã‚Â£$%^')
            AND nm_end_date = a.neh_effective_date
            order by nm_start_date desc
            )
@@ -1333,7 +1344,7 @@ END undo_scheme;
                               pi_ne_id_new1      => l_ne_id_1,
                               pi_ne_id_new2      => l_ne_id_1
                              );
-
+                             
          error_loc := 43 ;
          --CWS 0111024 Lateral Offsets
          IF NVL(hig.get_sysopt('XSPOFFSET'),'N') = 'Y'
