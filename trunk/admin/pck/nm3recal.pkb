@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3recal IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3recal.pkb-arc   2.9   Dec 08 2015 12:01:04   Rob.Coupe  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3recal.pkb-arc   2.10   Feb 24 2017 16:08:22   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3recal.pkb  $
---       Date into PVCS   : $Date:   Dec 08 2015 12:01:04  $
---       Date fetched Out : $Modtime:   Dec 08 2015 12:00:14  $
---       PVCS Version     : $Revision:   2.9  $
+--       Date into PVCS   : $Date:   Feb 24 2017 16:08:22  $
+--       Date fetched Out : $Modtime:   Feb 17 2017 15:52:44  $
+--       PVCS Version     : $Revision:   2.10  $
 --
 --
 --   Author : Jonathan Mills
@@ -25,7 +25,7 @@ CREATE OR REPLACE PACKAGE BODY nm3recal IS
   PT 05.12.07 mairecal.recal_data() brough in line with the others in recalibrate_other_products()
 */
 
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.9  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.10  $"';
    g_package_name    CONSTANT  varchar2(30) := 'nm3recal';
 --
    g_tab_rec_nm      nm3type.tab_rec_nm;
@@ -50,9 +50,12 @@ CREATE OR REPLACE PACKAGE BODY nm3recal IS
    g_recal_begin_mp     nm_members.nm_begin_mp%TYPE;
    g_recal_new_length_to_end nm_elements.ne_length%TYPE;
 --
+   g_transaction_id INTEGER;
 -----------------------------------------------------------------------------
 --
 PROCEDURE reset_for_return;
+
+function next_transaction_id return integer;
 --
 -----------------------------------------------------------------------------
 --
@@ -165,6 +168,15 @@ BEGIN
       Hig.raise_ner(Nm3type.c_net,172);
          --raise_application_error(-20902, 'You may not change this record');
    END IF;
+
+   if HIG.IS_PRODUCT_LICENSED('LB') then
+      declare
+         l_block varchar2(2000);
+      begin
+         l_block := 'BEGIN LB_NW_EDIT.CHECK_OPERATION(:p_op, :p_ne1, :p_ne2, :p_start_m, :p_shift_m, :p_effective_date, :p_length ); end; ';
+         execute immediate l_block using 'B', pi_ne_id, 0, pi_begin_mp, 0, trunc(sysdate), 0;
+      end;
+   end if;
   
 --
    nm3ausec.set_status(nm3type.c_off);
@@ -293,6 +305,17 @@ BEGIN
       END IF;
    END LOOP;
 --
+   g_transaction_id := next_transaction_id;
+
+   if HIG.IS_PRODUCT_LICENSED('LB') then
+      declare
+         l_block varchar2(2000);
+      begin 
+         l_block := 'begin lb_nw_edit.lb_reclaibrate(:p_ne, :p_original_length, :p_start_m, :p_new_length_to_end, :p_transaction_id); end; ';
+--
+         execute immediate l_block using pi_ne_id, g_element_length, g_recal_begin_mp, g_recal_new_length_to_end, g_transaction_id;
+      end;
+   end if;                            
 
   -- PT 
   -- this runs throuh ok
@@ -318,6 +341,10 @@ BEGIN
    --
    nm3nw_edit.ins_neh(p_rec_neh => l_neh_rec); --CWS 0108990 12/03/2010
    --
+   if HIG.IS_PRODUCT_LICENSED('LB') then
+      execute immediate 'begin lb_nw_edit.log_transaction( :g_transaction_id, :neh_id ); end; ' using g_transaction_id, l_neh_rec.neh_id;
+   end if;
+   
    reset_for_return;
 --
    nm_debug.proc_end(g_package_name,'recalibrate_section');
@@ -525,6 +552,16 @@ BEGIN
                    ,pi_supplementary_info => 'pi_shift_distance'
                    );
    END IF;
+   
+   if HIG.IS_PRODUCT_LICENSED('LB') then
+      declare
+         l_block varchar2(2000);
+      begin
+         l_block := 'BEGIN LB_NW_EDIT.CHECK_OPERATION(:p_op, :p_ne1, :p_ne2, :p_start_m, :p_shift_m, :p_effective_date, :p_length ); end; ';
+         execute immediate l_block using 'H', pi_ne_id, 0, pi_begin_mp, pi_shift_distance, trunc(sysdate), 0;
+      end;
+   end if;
+
 
    -- NM - Add check here for other products
    check_other_products ( p_ne_id1         => pi_ne_id
@@ -571,6 +608,20 @@ BEGIN
                                );
    END LOOP;
 --
+
+   g_transaction_id := next_transaction_id;
+
+   if HIG.IS_PRODUCT_LICENSED('LB') then
+      declare
+         l_block varchar2(2000);
+      begin 
+         l_block := 'begin lb_nw_edit.lb_shift(:p_ne, :p_start_m, :p_shift_m, :p_length, :p_transaction_id); end; ';
+--
+         execute immediate l_block using pi_ne_id, l_begin_mp, pi_shift_distance, g_element_length, g_transaction_id;
+      end;
+   end if;                            
+
+
    shift_other_products (pi_ne_id          => pi_ne_id
                         ,pi_shift_start_mp => l_begin_mp
                         ,pi_shift_distance => pi_shift_distance
@@ -590,6 +641,10 @@ BEGIN
    --
    nm3nw_edit.ins_neh(p_rec_neh => l_neh_rec); --CWS 0108990 12/03/2010
    --
+   if HIG.IS_PRODUCT_LICENSED('LB') then
+      execute immediate 'begin lb_nw_edit.log_transaction( :g_transaction_id, :neh_id ); end; ' using g_transaction_id, l_neh_rec.neh_id;
+   end if;
+   
    reset_for_return;
 --
    nm_debug.proc_end(g_package_name,'shift_section');
@@ -980,6 +1035,13 @@ END get_mp_translation_shift;
 --
 -----------------------------------------------------------------------------
 --
+  function next_transaction_id return integer is
+  retval integer;
+  begin
+    select lb_transaction_id_seq.nextval into retval from dual;
+    return retval;
+  end;
+
 END nm3recal;
 /
 
