@@ -1,0 +1,2 @@
+javac -cp .\lib\log4j.jar;.\lib\DJNativeSwing.jar;.\lib\DJNativeSwing-SWT.jar;.\lib\frmall.jar;.\lib\ojdbc6.jar bentley\exor\*.java bentley\exor\login\*.java bentley\exor\pwdenc\*.java bentley\exor\log\*.java
+jar -cvfm exor_login_util.jar .\MANIFEST.MF bentley\exor\*.class bentley\exor\login\*.class bentley\exor\pwdenc\*.class bentley\exor\log\*.class bentley\exor\login\images\
