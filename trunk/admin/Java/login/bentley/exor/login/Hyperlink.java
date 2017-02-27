@@ -1,23 +1,25 @@
 /**
  *	PVCS Identifiers :-
  *
- *		PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/Java/login/bentley/exor/login/Hyperlink.java-arc   1.0   Nov 24 2016 11:53:54   Upendra.Hukeri  $
+ *		PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/Java/login/bentley/exor/login/Hyperlink.java-arc   1.1   Feb 27 2017 06:59:08   Upendra.Hukeri  $
  *		Module Name      : $Workfile:   Hyperlink.java  $
  *		Author			 : $Author:   Upendra.Hukeri  $
- *		Date Into PVCS   : $Date:   Nov 24 2016 11:53:54  $
- *		Date Fetched Out : $Modtime:   Feb 22 2016 07:24:16  $
- *		PVCS Version     : $Revision:   1.0  $
+ *		Date Into PVCS   : $Date:   Feb 27 2017 06:59:08  $
+ *		Date Fetched Out : $Modtime:   Feb 14 2017 07:56:56  $
+ *		PVCS Version     : $Revision:   1.1  $
  *
  *	Based on the original source from Idiom - decompile using JAD.
  *	Used to render Hyperlinks on Oracle Forms as Java Beans.
  *
  ****************************************************************************************************
- *	  Copyright (c) 2016 Bentley Systems Incorporated.  All rights reserved.
+ *	  Copyright (c) 2017 Bentley Systems Incorporated.  All rights reserved.
  ****************************************************************************************************
  *
  */
 
 package bentley.exor.login;
+
+import bentley.exor.ExorDebugger;
 
 import java.awt.*;
 import java.awt.event.*;

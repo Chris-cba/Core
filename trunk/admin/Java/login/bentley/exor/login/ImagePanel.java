@@ -1,18 +1,18 @@
 /**
  *	PVCS Identifiers :-
  *
- *		PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/Java/login/bentley/exor/login/ImagePanel.java-arc   1.0   Nov 24 2016 11:53:54   Upendra.Hukeri  $
+ *		PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/Java/login/bentley/exor/login/ImagePanel.java-arc   1.1   Feb 27 2017 06:59:08   Upendra.Hukeri  $
  *		Module Name      : $Workfile:   ImagePanel.java  $
  *		Author			 : $Author:   Upendra.Hukeri  $
- *		Date Into PVCS   : $Date:   Nov 24 2016 11:53:54  $
- *		Date Fetched Out : $Modtime:   Feb 24 2016 04:41:06  $
- *		PVCS Version     : $Revision:   1.0  $
+ *		Date Into PVCS   : $Date:   Feb 27 2017 06:59:08  $
+ *		Date Fetched Out : $Modtime:   Feb 17 2017 09:25:04  $
+ *		PVCS Version     : $Revision:   1.1  $
  *
  *	This class is used to render high quality images on Oracle Forms either from within the Jar 
- *	or from Application Server.
+ *	or From Application Server.
  *
  ****************************************************************************************************
- *	  Copyright (c) 2016 Bentley Systems Incorporated.  All rights reserved.
+ *	  Copyright (c) 2017 Bentley Systems Incorporated.  All rights reserved.
  ****************************************************************************************************
  *
  */
@@ -20,7 +20,10 @@
 package bentley.exor.login;
 
 import java.awt.*;
+import java.awt.event.*;
 import java.awt.image.BufferedImage;
+
+import bentley.exor.ExorDebugger;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -199,5 +202,5 @@ public class ImagePanel extends JPanel {
 		
 		this.toolTipText = text;
 		this.setToolTipText(text);
-	}
+	}	
 }
