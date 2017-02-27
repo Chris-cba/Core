@@ -1,0 +1,17 @@
+com\auth10\federation\FederatedLoginManager.class
+com\auth10\federation\FederatedPrincipal.class
+com\auth10\federation\ClaimType.class
+com\auth10\federation\FederatedHttpServletRequest.class
+com\auth10\federation\WSFederationFilter.class
+com\auth10\federation\FederatedAuthenticationListener.class
+com\auth10\federation\Claim.class
+com\auth10\federation\URLUTF8Encoder.class
+com\auth10\federation\FederatedConfiguration.class
+com\auth10\federation\WSFederationActive$1.class
+com\auth10\federation\FederationException.class
+com\auth10\federation\FederationMetadata.class
+com\auth10\federation\SamlTokenValidator.class
+com\auth10\federation\WSFederationActive.class
+com\auth10\federation\RequestSecurityTokenResponse.class
+com\auth10\federation\RequestSecurityToken.class
+com\auth10\federation\FederationBootstrap.class
