@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_get
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_get.pkb-arc   1.22   Jan 06 2017 17:27:28   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_get.pkb-arc   1.23   Mar 17 2017 16:32:44   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_get.pkb  $
-   --       Date into PVCS   : $Date:   Jan 06 2017 17:27:28  $
-   --       Date fetched Out : $Modtime:   Jan 06 2017 17:26:46  $
-   --       PVCS Version     : $Revision:   1.22  $
+   --       Date into PVCS   : $Date:   Mar 17 2017 16:32:44  $
+   --       Date fetched Out : $Modtime:   Mar 17 2017 16:31:46  $
+   --       PVCS Version     : $Revision:   1.23  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,7 +16,7 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.22  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.23  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_get';
 
@@ -417,7 +417,7 @@ AS
       cur_str   VARCHAR2 (4000);
       l_str     VARCHAR2 (2000);
    BEGIN
-      SELECT LISTAGG (case_stmt, CHR (13)) WITHIN GROUP (ORDER BY nlt_id)
+      SELECT LISTAGG (case_stmt, ' '||CHR(10)) WITHIN GROUP (ORDER BY nlt_id)
         INTO l_str
         FROM (SELECT nlt_id,
                      nlt_nt_type,
