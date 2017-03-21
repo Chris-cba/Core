@@ -1,10 +1,10 @@
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/lb/install/lb_ddl.sql-arc   1.7   Oct 29 2015 07:35:48   Rob.Coupe  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/lb/install/lb_ddl.sql-arc   1.8   Mar 21 2017 13:23:12   Rob.Coupe  $
 --       Module Name      : $Workfile:   lb_ddl.sql  $
---       Date into PVCS   : $Date:   Oct 29 2015 07:35:48  $
---       Date fetched Out : $Modtime:   Oct 29 2015 07:36:06  $
---       PVCS Version     : $Revision:   1.7  $
+--       Date into PVCS   : $Date:   Mar 21 2017 13:23:12  $
+--       Date fetched Out : $Modtime:   Mar 21 2017 13:22:58  $
+--       PVCS Version     : $Revision:   1.8  $
 --
 --   Author : R.A. Coupe
 --
@@ -962,7 +962,8 @@ CREATE TABLE lb_units
    external_unit_name  VARCHAR2(2000),
    exor_unit_id        NUMBER(4) NOT NULL,
    exor_unit_name      VARCHAR2(20) NOT NULL,
-      CONSTRAINT lb_units_uk1 UNIQUE ( external_unit_id )
+      CONSTRAINT lb_units_uk1 UNIQUE ( external_unit_id ),
+	  CONSTRAINT lb_units_uk2 UNIQUE ( exor_unit_id )
 --      ,
 --      CONSTRAINT lb_units_uk2 UNIQUE ( exor_unit_name )
 );
