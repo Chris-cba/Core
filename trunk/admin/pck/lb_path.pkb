@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_path
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_path.pkb-arc   1.7   Oct 09 2015 10:47:28   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_path.pkb-arc   1.8   Mar 24 2017 15:20:40   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_path.pkb  $
-   --       Date into PVCS   : $Date:   Oct 09 2015 10:47:28  $
-   --       Date fetched Out : $Modtime:   Oct 09 2015 10:47:44  $
-   --       PVCS Version     : $Revision:   1.7  $
+   --       Date into PVCS   : $Date:   Mar 24 2017 15:20:40  $
+   --       Date fetched Out : $Modtime:   Mar 24 2017 15:20:24  $
+   --       PVCS Version     : $Revision:   1.8  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,7 +16,7 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.7  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.8  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_path';
 
@@ -41,6 +41,13 @@ AS
    BEGIN
       RETURN g_body_sccsid;
    END get_body_version;
+
+   FUNCTION get_g_nw_types
+      RETURN ptr_vc_array_type
+   IS
+   BEGIN
+      RETURN g_nw_types;
+   END;
 
    --
    -----------------------------------------------------------------------------
@@ -189,16 +196,28 @@ AS
       indx1          NUMBER;
       var1_numeric   NUMBER;
       var1_array     SDO_NUMBER_ARRAY;
+      nw_exists      EXCEPTION;
+      PRAGMA EXCEPTION_INIT (nw_exists, -29532);
    BEGIN
       res_string := SDO_NET_MEM.NETWORK_MANAGER.LIST_NETWORKS;
 
-      IF res_string = net_mem
-      THEN
-         NULL;
-      ELSE
-         nm_debug.debug ('net-mem = ' || net_mem);
-         SDO_NET_MEM.NETWORK_MANAGER.READ_NETWORK (net_mem, 'TRUE');
-      END IF;
+      nm_debug.debug (
+            'get_sdo_path from nodes - net_mem = '
+         || net_mem
+         || ', res_string = ');
+      --      IF res_string = net_mem
+      --      THEN
+      --         NULL;
+      --      ELSE
+      --         nm_debug.debug ('net-mem = ' || net_mem);
+      --         begin
+      --            SDO_NET_MEM.NETWORK_MANAGER.READ_NETWORK (net_mem, 'TRUE');
+      --         exception
+      --            when nw_exists then SDO_NET_MEM.NETWORK_MANAGER.DROP_NETWORK(net_mem);
+      --            SDO_NET_MEM.NETWORK_MANAGER.READ_NETWORK (net_mem, 'TRUE');
+      --         end;
+      --
+      --      END IF;
 
       --
       res_string :=
@@ -282,22 +301,97 @@ AS
    --   END;
 
    --
-    PROCEDURE set_network (pi_network IN VARCHAR2 default NULL)
+   PROCEDURE set_network (pi_network_name   IN VARCHAR2,
+                          pi_asset_type     IN VARCHAR2 DEFAULT NULL,
+                          pi_xmin           IN NUMBER DEFAULT NULL,
+                          pi_ymin           IN NUMBER DEFAULT NULL,
+                          pi_xmax           IN NUMBER DEFAULT NULL,
+                          pi_ymax           IN NUMBER DEFAULT NULL)
    IS
+      res_string   VARCHAR2 (1000);
+      net_mem      VARCHAR2 (100);
+      nw_exists    EXCEPTION;
+      PRAGMA EXCEPTION_INIT (nw_exists, -29532);
+      use_spatial_filter Boolean := FALSE;
+   --      cost           NUMBER;
+   --      res_numeric    NUMBER;
+   --      res_array      SDO_NUMBER_ARRAY;
+   --      indx           NUMBER;
+   --      indx1          NUMBER;
+   --      var1_numeric   NUMBER;
+   --      var1_array     SDO_NUMBER_ARRAY;
+
    BEGIN
-      if pi_network is NULL then
-         begin
-           select network into g_network 
-           from all_sdo_network_metadata where owner = sys_context('NM3CORE', 'APPLICATION_OWNER');
-         exception
-           when too_many_rows then
-             raise_application_error(-20001, 'There is more than one network registered, please specifiy a network name');
-           when no_data_found then
-             raise_application_error(-20002, 'You do not have access to a network');
-         end;   
-      else               
-        g_network := pi_network;
-      end if;
+      IF pi_network_name IS NULL
+      THEN
+         raise_application_error (-20002, 'You must specify a network name');
+      ELSE
+      
+         if pi_xmin is null then
+            use_spatial_filter := FALSE;
+         else
+            use_spatial_filter := TRUE;
+         end if;  
+            nm3ctx.set_context('LB_SPATIAL_FILTER_XMIN', to_char(pi_xmin) );
+            nm3ctx.set_context('LB_SPATIAL_FILTER_YMIN', to_char(pi_ymin) );
+            nm3ctx.set_context('LB_SPATIAL_FILTER_XMAX', to_char(pi_xmax) );
+            nm3ctx.set_context('LB_SPATIAL_FILTER_YMAX', to_char(pi_ymax) );
+            
+         BEGIN
+            SELECT network
+              INTO g_network
+              FROM all_sdo_network_metadata
+             WHERE     owner = SYS_CONTEXT ('NM3CORE', 'APPLICATION_OWNER')
+                   AND network = pi_network_name;
+         EXCEPTION
+            WHEN TOO_MANY_ROWS
+            THEN
+               raise_application_error (
+                  -20003,
+                  'There is more than one network registered, please specifiy a network name');
+            WHEN NO_DATA_FOUND
+            THEN
+               raise_application_error (
+                  -20004,
+                     'You do not have access to a network of name '
+                  || pi_network_name);
+         END;
+      END IF;
+
+      net_mem := g_network;
+
+      IF pi_asset_type IS NULL
+      THEN
+         SELECT ptr_vc (ROWNUM, nt_type)
+           BULK COLLECT INTO g_nw_types
+           FROM nm_types
+          WHERE nt_node_type = 'ROAD';
+      ELSE
+         SELECT ptr_vc (ROWNUM, nin_nw_type)
+           BULK COLLECT INTO g_nw_types
+           FROM nm_inv_nw
+          WHERE nin_nit_inv_code = pi_asset_type;
+      END IF;
+
+      res_string := SDO_NET_MEM.NETWORK_MANAGER.LIST_NETWORKS;
+
+      IF res_string = net_mem
+      THEN
+               SDO_NET_MEM.NETWORK_MANAGER.DROP_NETWORK (net_mem);
+      END IF;
+         nm_debug.debug ('net-mem = ' || net_mem);
+
+--         if NOT use_spatial_filter then
+         BEGIN
+            SDO_NET_MEM.NETWORK_MANAGER.READ_NETWORK (net_mem, 'TRUE');
+         EXCEPTION
+            WHEN nw_exists
+            THEN
+               SDO_NET_MEM.NETWORK_MANAGER.DROP_NETWORK (net_mem);
+               SDO_NET_MEM.NETWORK_MANAGER.READ_NETWORK (net_mem, 'TRUE');
+         END;
+--         end if;
+--      END IF;
    END;
 
    --
@@ -335,16 +429,16 @@ AS
         INTO retval
         FROM (SELECT e.ne_id,
                      nlt_id,
-                     'PATH' obj_type,
-                     1 obj_id,
-                     1 seg_id,
+                     'PATH'      obj_type,
+                     1           obj_id,
+                     1           seg_id,
                      path_seq,
                      dir_flag,
-                     0 start_m,
+                     0           start_m,
                      p.ne_length end_m,
                      nlt_units
                 FROM nm_linear_types,
-                     nm_elements e,
+                     nm_elements              e,
                      v_lb_directed_path_links p
                WHERE     e.ne_id = p.ne_id
                      AND e.ne_nt_type = nlt_nt_type
@@ -372,12 +466,12 @@ AS
         INTO retval
         FROM (SELECT e.ne_id,
                      nlt_id,
-                     'PATH' obj_type,
-                     1 obj_id,
-                     1 seg_id,
+                     'PATH'      obj_type,
+                     1           obj_id,
+                     1           seg_id,
                      path_seq,
                      dir_flag,
-                     0 start_m,
+                     0           start_m,
                      p.ne_length end_m,
                      nlt_units
                 FROM nm_linear_types,
@@ -552,7 +646,8 @@ AS
                                                               t.lr_ne_id,
                                                               t.lr_offset
                                                          FROM TABLE (
-                                                                 pi_lref_array) t)))
+                                                                 pi_lref_array)
+                                                              t)))
                               SELECT rn,
                                      --rn, lr_ne_id, lr_offset, next_lr_ne_id, next_lr_offset
                                      LB_PATH.get_sdo_path (
@@ -603,22 +698,22 @@ AS
       RETURN retval;
    END;
 --
-BEGIN
-   set_network; --('XHA_ESU_NETWORK');
-
-   DECLARE
-      net_mem      VARCHAR2 (100) := g_network;
-      res_string   VARCHAR2 (1000);
-   BEGIN
-      res_string := SDO_NET_MEM.NETWORK_MANAGER.LIST_NETWORKS;
-
-      IF res_string = net_mem
-      THEN
-         NULL;
-      ELSE
-         nm_debug.debug ('net-mem = ' || net_mem);
-         SDO_NET_MEM.NETWORK_MANAGER.READ_NETWORK (net_mem, 'TRUE');
-      END IF;
-   END;
+--BEGIN
+--   set_network; --('XHA_ESU_NETWORK');
+--
+--   DECLARE
+--      net_mem      VARCHAR2 (100) := g_network;
+--      res_string   VARCHAR2 (1000);
+--   BEGIN
+--      res_string := SDO_NET_MEM.NETWORK_MANAGER.LIST_NETWORKS;
+--
+--      IF res_string = net_mem
+--      THEN
+--         NULL;
+--      ELSE
+--         nm_debug.debug ('net-mem = ' || net_mem);
+--         SDO_NET_MEM.NETWORK_MANAGER.READ_NETWORK (net_mem, 'TRUE');
+--      END IF;
+--   END;
 END lb_path;
 /
