@@ -2,15 +2,15 @@ CREATE OR REPLACE FUNCTION GetAssetLinearLocationsTab (
    AssetId         IN INTEGER, -- ID of a linearly located asset
    AssetType       IN INTEGER, -- Type of the linearly located asset
    NetworkTypeID   IN INTEGER) -- Network element type to report locations against
-   RETURN linear_locations
+   RETURN lb_linear_locations
 IS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/eB_interface/GetAssetLinearLocationsTab.fnc-arc   1.0   Oct 09 2015 13:30:10   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/eB_interface/GetAssetLinearLocationsTab.fnc-arc   1.1   Mar 24 2017 13:55:04   Rob.Coupe  $
    --       Module Name      : $Workfile:   GetAssetLinearLocationsTab.fnc  $
-   --       Date into PVCS   : $Date:   Oct 09 2015 13:30:10  $
-   --       Date fetched Out : $Modtime:   Oct 07 2015 11:34:20  $
-   --       PVCS Version     : $Revision:   1.0  $
+   --       Date into PVCS   : $Date:   Mar 24 2017 13:55:04  $
+   --       Date fetched Out : $Modtime:   Mar 24 2017 13:53:56  $
+   --       PVCS Version     : $Revision:   1.1  $
    --
    --   Author : R.A. Coupe
    --
@@ -23,7 +23,7 @@ IS
 
    cur                 SYS_REFCURSOR;
    rowcount            PLS_INTEGER := 0;
-   retval              linear_locations;
+   retval              lb_linear_locations;
    l_AssetId           NUMBER(38);    -- ID of the linearly located object
    l_AssetType         NUMBER(38);    -- Type of the linearly located object
    LocationId          NUMBER(38);    -- ID of the linear location
@@ -39,7 +39,7 @@ IS
    JXP                 VARCHAR2(80);  -- Juxtaposition for this location
 BEGIN
    cur := GetAssetLinearLocations (AssetId, AssetType, NetworkTypeID);
-   retval := linear_locations();
+   retval := lb_linear_locations();
    LOOP
       FETCH cur INTO l_AssetId, l_AssetType, LocationId, LocationDescription, l_NetworkTypeId,
          NetworkElementId, StartM, EndM, ExorUnitName, NetworkElementName, NetworkElementDescr, JXP;
@@ -58,7 +58,7 @@ BEGIN
 
       retval.extend;
       rowcount := rowcount + 1;
-      retval(rowcount) := linear_location (l_AssetId, l_AssetType, LocationId, LocationDescription,
+      retval(rowcount) := lb_linear_location (l_AssetId, l_AssetType, LocationId, LocationDescription,
          l_NetworkTypeId, NetworkElementId, StartM, EndM, ExternalUnitId, NetworkElementName, NetworkElementDescr, JXP);
    END LOOP;
    CLOSE cur;
