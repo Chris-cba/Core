@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_get
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_get.pkb-arc   1.23   Mar 17 2017 16:32:44   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_get.pkb-arc   1.24   Mar 24 2017 18:08:18   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_get.pkb  $
-   --       Date into PVCS   : $Date:   Mar 17 2017 16:32:44  $
-   --       Date fetched Out : $Modtime:   Mar 17 2017 16:31:46  $
-   --       PVCS Version     : $Revision:   1.23  $
+   --       Date into PVCS   : $Date:   Mar 24 2017 18:08:18  $
+   --       Date fetched Out : $Modtime:   Mar 24 2017 18:06:58  $
+   --       PVCS Version     : $Revision:   1.24  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,7 +16,7 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.23  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.24  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_get';
 
@@ -1546,11 +1546,12 @@ FUNCTION get_lb_RPt_D_tab (p_lb_RPt_tab IN lb_RPt_tab)
                                        AND l.nlt_g_i_d = 'D'
                                        AND l.nlt_nt_type = ne_nt_type
                                        AND rm.nm_ne_id_in = im.refnt
-                                       AND (   (    nvl(im.start_m, rm.nm_end_slk) <= rm.nm_end_slk
-                                                AND nvl(im.end_m, rm.nm_slk) >= rm.nm_slk
-                                                AND nvl(im.end_m, rm.nm_end_slk) > nvl(im.start_m, rm.nm_end_slk -1))
-                                            OR (    nvl(im.start_m,0) = nvl(im.end_m, 0)
-                                                AND nvl(im.end_m, rm.nm_end_slk) <= rm.nm_end_slk
+                                       and  ( nvl(im.start_m, 0) != nvl(im.end_m, rm.nm_end_slk ) 
+                                       AND (   (    nvl(im.start_m, rm.nm_end_slk) < rm.nm_end_slk
+                                                AND nvl(im.end_m, rm.nm_slk) > rm.nm_slk
+                                                AND nvl(im.end_m, rm.nm_end_slk) > nvl(im.start_m, rm.nm_end_slk -1)) )                                                
+                                       OR (    nvl(im.start_m,0) = nvl(im.end_m, 0)
+                                                AND nvl(im.end_m, rm.nm_end_slk) < rm.nm_end_slk
                                                 AND nvl(im.start_m, rm.nm_slk) >= rm.nm_slk))
                                  AND UC_UNIT_ID_IN  = nlt_units
                                  AND UC_UNIT_ID_OUT = m_unit
