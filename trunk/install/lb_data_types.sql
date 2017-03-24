@@ -1,10 +1,10 @@
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/lb/install/lb_data_types.sql-arc   1.7   May 26 2016 10:34:34   Rob.Coupe  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/lb/install/lb_data_types.sql-arc   1.8   Mar 24 2017 15:16:24   Rob.Coupe  $
 --       Module Name      : $Workfile:   lb_data_types.sql  $
---       Date into PVCS   : $Date:   May 26 2016 10:34:34  $
---       Date fetched Out : $Modtime:   May 26 2016 10:35:02  $
---       PVCS Version     : $Revision:   1.7  $
+--       Date into PVCS   : $Date:   Mar 24 2017 15:16:24  $
+--       Date fetched Out : $Modtime:   Mar 24 2017 15:15:56  $
+--       PVCS Version     : $Revision:   1.8  $
 --
 --   Author : R.A. Coupe
 --
@@ -344,10 +344,14 @@ TYPE LINEAR_LOCATION AS OBJECT(
 
 drop type LINEAR_ELEMENT_TYPES FORCE;
 
+drop type LB_LINEAR_ELEMENT_TYPES FORCE;
+
 drop type LINEAR_ELEMENT_TYPE FORCE;
 
+drop type LB_LINEAR_ELEMENT_TYPE FORCE;
+
 CREATE OR REPLACE
-TYPE LINEAR_ELEMENT_TYPE                                         AS OBJECT(
+TYPE LB_LINEAR_ELEMENT_TYPE                                         AS OBJECT(
    linearlyLocatableType  NUMBER,        -- ID of a linearly locatable type
    linearElementTypeId    NUMBER,        -- ID of the linear element type
    linearElementTypeName  VARCHAR2(30),  -- Unique name of the linear element type
@@ -356,27 +360,13 @@ TYPE LINEAR_ELEMENT_TYPE                                         AS OBJECT(
 /
 
 CREATE OR REPLACE
-TYPE  LINEAR_ELEMENT_TYPES AS TABLE OF linear_element_type;
+TYPE  LB_LINEAR_ELEMENT_TYPES AS TABLE OF lb_linear_element_type;
 /
 
-CREATE OR REPLACE
-TYPE LINEAR_LOCATION AS OBJECT(
-   AssetId             NUMBER(38),    -- ID of the linearly located asset
-   AssetType           NUMBER(38),    -- Type of the asset
-   LocationId          NUMBER(38),    -- ID of the linear location
-   LocationDescription VARCHAR2(240), -- Linear location description
-   NetworkTypeId       INTEGER,       -- Network element type
-   NetworkElementId    INTEGER,       -- Network element ID
-   StartM              NUMBER,        -- Absolute position of start of linear range
-   EndM                NUMBER,        -- Optional absolute position of end of linear range
-   Unit                INTEGER,       -- Exor ID of Units of start and end position
-   NetworkElementName  VARCHAR2(30),  -- Network element unique name
-   NetworkElementDescr VARCHAR2(240), -- Optional network element description
-   JXP                 VARCHAR2(80)); -- Juxtaposition of owning linear location
-/
+
 
 CREATE OR REPLACE
-TYPE LINEAR_LOCATIONS AS TABLE OF linear_location;
+TYPE LB_LINEAR_LOCATIONS AS TABLE OF lb_linear_location;
 /
 
 
