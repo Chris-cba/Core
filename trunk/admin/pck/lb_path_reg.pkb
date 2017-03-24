@@ -2,24 +2,27 @@ CREATE OR REPLACE PACKAGE BODY lb_path_reg
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_path_reg.pkb-arc   1.0   Jan 15 2015 15:24:00   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_path_reg.pkb-arc   1.1   Mar 24 2017 15:29:10   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_path_reg.pkb  $
-   --       Date into PVCS   : $Date:   Jan 15 2015 15:24:00  $
-   --       Date fetched Out : $Modtime:   Jan 15 2015 15:23:26  $
-   --       PVCS Version     : $Revision:   1.0  $
+   --       Date into PVCS   : $Date:   Mar 24 2017 15:29:10  $
+   --       Date fetched Out : $Modtime:   Mar 24 2017 15:29:02  $
+   --       PVCS Version     : $Revision:   1.1  $
    --
    --   Author : R.A. Coupe
    --
-   --   Location Bridge package for registration of route/pathing metadada 
+   --   Location Bridge package for registration of route/pathing metadada
    --
    -----------------------------------------------------------------------------
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.0  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.1  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_path_reg';
 
+   procedure drop_network_objects (pi_network_name in varchar2);
+   
+   procedure generate_nw_view (pi_network_name in varchar2);
    --
    -----------------------------------------------------------------------------
    --
@@ -61,8 +64,6 @@ AS
       --
       l_nt_list    VARCHAR2 (2000);
       --
-      not_exists   EXCEPTION;
-      PRAGMA EXCEPTION_INIT (not_exists, -942);
 
       FUNCTION get_nt_list (pi_nt IN ptr_vc_array_type)
          RETURN VARCHAR2
@@ -103,63 +104,56 @@ AS
       DBMS_OUTPUT.put_line (l_nt_list);
 
       BEGIN
-         SDO_NET.DROP_NETWORK (pi_network_name || '_NETWORK');
-      EXCEPTION
-         WHEN OTHERS
-         THEN
-            raise_application_error (
-               -20003,
-               'failure to drop existing network definition');
+         SDO_NET.DROP_NETWORK (pi_network_name );
+--      EXCEPTION
+--         WHEN OTHERS
+--         THEN
+--            raise_application_error (
+--               -20003,
+--               'failure to drop existing network definition');
       END;
 
       --
 
-      BEGIN
-         EXECUTE IMMEDIATE 'drop table ' || pi_network_name || '_LINK';
-      EXCEPTION
-         WHEN not_exists
-         THEN
-            NULL;
-      END;
-
-      --
-      BEGIN
-         EXECUTE IMMEDIATE 'drop table ' || pi_network_name || '_NO';
-      EXCEPTION
-         WHEN not_exists
-         THEN
-            NULL;
-      END;
 
       BEGIN
-         SDO_NET.CREATE_LOGICAL_NETWORK (pi_network_name || '_NETWORK',
+         SDO_NET.CREATE_LOGICAL_NETWORK (pi_network_name,
                                          1,
                                          FALSE,
                                          pi_network_name || '_NO',
                                          'XNO_COST',
                                          pi_network_name || '_LINK',
                                          'XNW_COST',
-                                         'XNW_PATH',
-                                         'XNW_PATH_LINK',
-                                         'XNW_SUB_PATH',
+                                         pi_network_name || '_PATH',
+                                         pi_network_name || '_PATH_LINK',
+                                         pi_network_name || '_SUB_PATH',
                                          FALSE,
                                          NULL);
       EXCEPTION
          WHEN OTHERS
          THEN
-            raise_application_error (-20003,
+            raise_application_error (-20004,
                                      'failure to register ' || SQLERRM);
       END;
 
       --
-      lb_path.g_network := pi_network_name || '_NETWORK';
+      lb_path.g_network := pi_network_name;
 
+      execute immediate 'rename '||pi_network_name||'_LINK to '||pi_network_name||'_LINK_TABLE';
+      
+            nm3ctx.set_context('LB_SPATIAL_FILTER_XMIN', '' );
+            nm3ctx.set_context('LB_SPATIAL_FILTER_YMIN', '' );
+            nm3ctx.set_context('LB_SPATIAL_FILTER_XMAX', '' );
+            nm3ctx.set_context('LB_SPATIAL_FILTER_YMAX', '' );
+
+      generate_nw_view (pi_network_name);
+      
       --
       BEGIN
          EXECUTE IMMEDIATE
                'insert into '
             || pi_network_name
-            || '_LINK'
+            || '_LINK_TABLE'
             || ' ( link_id, link_name, start_node_id, end_node_id, link_type, active, link_level, xnw_cost ) '
             || '  select ne_id, ne_unique, ne_no_start, ne_no_end, ne_nt_type, '
             || ''''
@@ -181,10 +175,7 @@ AS
             || pi_network_name
             || '_NO '
             || ' (node_id, node_name, node_type, active, partition_id, xno_cost ) '
-            || ' select no_node_id, no_node_name, '
-            || ''''
-            || 'N'
-            || ''''
+            || ' select no_node_id, no_node_name, no_node_type '
             || ', '
             || ''''
             || 'Y'
@@ -194,39 +185,92 @@ AS
             || ' where no_end_date is null '
             || ' and exists ( select 1 from nm_node_usages_all where nnu_no_node_id = no_node_id '
             || '          and nnu_end_date is null ) ';
+            
+                     
+            
       END;
    END;
 --
-procedure drop_network( pi_network in varchar2) is
+procedure drop_network( pi_network_name in varchar2) is
 lnw_row user_sdo_network_metadata%rowtype;
 not_exists exception;
 pragma exception_init( not_exists, -942 );
 begin
 --
-  select * into lnw_row from user_sdo_network_metadata where network = pi_network;
+  begin
+     select * into lnw_row from user_sdo_network_metadata where network = pi_network_name;
+  exception
+    when no_data_found then
+       raise_application_error(-20005, 'The network does not exist' );
+  end;
 --
 begin
-    SDO_NET.DROP_NETWORK(pi_network);
-  exception
-    when others then
-      raise_application_error(-20003, 'failure to drop existing network definition');
+    SDO_NET.DROP_NETWORK(pi_network_name);
+--  exception
+--    when others then
+--      raise_application_error(-20006, 'failure to drop existing network definition');
   end;
 --
+  drop_network_objects(pi_network_name);
 
-  begin
-    execute immediate 'drop table '||lnw_row.link_table_name;
-  exception
-   when not_exists then
-     NULL;
-  end;
---
-  begin
-    execute immediate 'drop table '||lnw_row.node_table_name;
-  exception
-   when not_exists then
-     NULL;
-  end;
-  
+end;
+
+procedure drop_network_objects (pi_network_name in varchar2 ) is
+   not_exists   EXCEPTION;
+   PRAGMA EXCEPTION_INIT (not_exists, -942);
+begin
+      BEGIN
+         EXECUTE IMMEDIATE 'drop table ' || pi_network_name || '_LINK_TABLE';
+      EXCEPTION
+         WHEN not_exists
+         THEN
+            NULL;
+      END;
+
+      --
+      BEGIN
+         EXECUTE IMMEDIATE 'drop table ' || pi_network_name || '_NO';
+      EXCEPTION
+         WHEN not_exists
+         THEN
+            NULL;
+      END;
+
+      BEGIN
+         EXECUTE IMMEDIATE 'drop table ' || pi_network_name || '_PATH';
+      EXCEPTION
+         WHEN not_exists
+         THEN
+            NULL;
+      END;
+
+      BEGIN
+         EXECUTE IMMEDIATE 'drop table ' || pi_network_name || '_PATH_LINK';
+      EXCEPTION
+         WHEN not_exists
+         THEN
+            NULL;
+      END;
+
+      BEGIN
+         EXECUTE IMMEDIATE 'drop table ' || pi_network_name || '_SUB_PATH';
+      EXCEPTION
+         WHEN not_exists
+         THEN
+            NULL;
+      END;
+   end;
+   
+procedure generate_nw_view (pi_network_name in varchar2) is
+begin
+execute immediate 'create or replace view '||pi_network_name||'_LINK '||
+       ' as select * from '||pi_network_name||'_LINK_TABLE '||
+       ' where link_type in ( select ptr_value from table ( lb_path.get_g_nw_types )) '||
+' and ( ( link_id in ( select ne_id from v_lb_nlt_geometry2 where sdo_filter ( geoloc, sdo_geometry( 2003, 27700, NULL, sdo_elem_info_array( 1, 1003, 3), '||
+'         sdo_ordinate_array( nvl(to_number(sys_context('||''''||'NM3SQL'||''''||', '||''''||'LB_SPATIAL_FILTER_XMIN'||''''||')), -999999999 ), '|| 
+'                             nvl(to_number(sys_context('||''''||'NM3SQL'||''''||', '||''''||'LB_SPATIAL_FILTER_YMIN'||''''||')), -999999999 ), '||
+'                             nvl(to_number(sys_context('||''''||'NM3SQL'||''''||', '||''''||'LB_SPATIAL_FILTER_XMAX'||''''||')), 999999999 ), '||
+'                             nvl(to_number(sys_context('||''''||'NM3SQL'||''''||', '||''''||'LB_SPATIAL_FILTER_YMAX'||''''||')), 999999999 ) ))) = '||''''||'TRUE'||''''||')))';
 end;   
-END;
+end;
 /
