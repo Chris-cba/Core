@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_get
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_get.pkb-arc   1.25   Mar 27 2017 11:33:24   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_get.pkb-arc   1.26   Mar 27 2017 14:22:56   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_get.pkb  $
-   --       Date into PVCS   : $Date:   Mar 27 2017 11:33:24  $
-   --       Date fetched Out : $Modtime:   Mar 27 2017 11:32:24  $
-   --       PVCS Version     : $Revision:   1.25  $
+   --       Date into PVCS   : $Date:   Mar 27 2017 14:22:56  $
+   --       Date fetched Out : $Modtime:   Mar 27 2017 14:23:04  $
+   --       PVCS Version     : $Revision:   1.26  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,7 +16,7 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.25  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.26  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_get';
 
@@ -1604,12 +1604,16 @@ AS
                                        nlt_units       datum_unit,
                                        im.m_unit       group_unit,
                                        NVL (uc_conversion_factor, 1),
-                                       ROW_NUMBER ()
-                                       OVER (
-                                          PARTITION BY im.obj_id,
-                                                       rm.nm_ne_id_in
-                                          ORDER BY im.start_m)
-                                          rn
+                                       case 
+                                          when im.start_m = im.end_m
+                                            then ROW_NUMBER ()
+                                                 OVER (
+                                                 PARTITION BY im.obj_id,
+                                                              rm.nm_ne_id_in
+                                                 ORDER BY im.start_m)
+                                          else NULL
+                                       end
+                                       rn
                                   FROM itab          im,
                                        nm_members    rm,
                                        nm_elements   e,
@@ -1655,7 +1659,7 @@ AS
                                        AND UC_UNIT_ID_OUT = m_unit
                               ORDER BY rm.nm_seg_no, rm.nm_seq_no, im.start_m)
                              t1
-                       WHERE rn = 1));
+                       WHERE  rn = 1 or rn is NULL));
 
       RETURN retval;
    END;
