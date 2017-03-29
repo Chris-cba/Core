@@ -3,11 +3,11 @@ AS
   -------------------------------------------------------------------------
   --   PVCS Identifiers :-
   --
-  --       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/hig_relationship_api.pkb-arc   1.0   Jan 12 2017 13:19:28   Chris.Baugh  $
+  --       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/hig_relationship_api.pkb-arc   1.1   Mar 29 2017 08:19:22   Chris.Baugh  $
   --       Module Name      : $Workfile:   hig_relationship_api.pkb  $
-  --       Date into PVCS   : $Date:   Jan 12 2017 13:19:28  $
-  --       Date fetched Out : $Modtime:   Dec 15 2016 12:46:58  $
-  --       Version          : $Revision:   1.0  $
+  --       Date into PVCS   : $Date:   Mar 29 2017 08:19:22  $
+  --       Date fetched Out : $Modtime:   Mar 28 2017 16:28:34  $
+  --       Version          : $Revision:   1.1  $
   --       Based on SCCS version :
   ------------------------------------------------------------------
   --   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
@@ -19,7 +19,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.0  $';
+  g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.1  $';
 
   g_package_name   CONSTANT VARCHAR2 (30) := 'hig_relationship_api';
 
@@ -281,12 +281,25 @@ AS
                          pi_salt         => hir_attribute4) attribute1
      BULK COLLECT INTO lt_usernames
      FROM hig_relationship
-    WHERE hir_attribute3 = 'Y';
+    WHERE hir_attribute3 = 'N';
    
     FOR i IN 1 .. lt_usernames.COUNT LOOP
       --
       lv_password := exor_password_engine.f_generate(lt_usernames(i));
-      nm_debug.debug('==> password = '||lv_password);
+      
+      -- need to update mcp password details
+      IF hig.is_product_licensed('MCP')
+      THEN
+        BEGIN
+          EXECUTE IMMEDIATE
+            'BEGIN '||
+            '  nm3mcp_sde.STORE_PASSWORD(:pi_username, :pi_password); '||
+            'END;'
+          USING IN lt_usernames(i), IN lv_password;
+        EXCEPTION
+          WHEN OTHERS THEN NULL;
+        END;
+      END IF;
       
       EXECUTE IMMEDIATE 'ALTER USER '||lt_usernames(i)||' IDENTIFIED BY "'||lv_password||'"';
       --
