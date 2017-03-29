@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_path_reg
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_path_reg.pkb-arc   1.1   Mar 24 2017 15:29:10   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_path_reg.pkb-arc   1.2   Mar 29 2017 17:37:34   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_path_reg.pkb  $
-   --       Date into PVCS   : $Date:   Mar 24 2017 15:29:10  $
-   --       Date fetched Out : $Modtime:   Mar 24 2017 15:29:02  $
-   --       PVCS Version     : $Revision:   1.1  $
+   --       Date into PVCS   : $Date:   Mar 29 2017 17:37:34  $
+   --       Date fetched Out : $Modtime:   Mar 29 2017 17:38:08  $
+   --       PVCS Version     : $Revision:   1.2  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,7 +16,7 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.1  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.2  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_path_reg';
 
@@ -262,11 +262,14 @@ begin
    end;
    
 procedure generate_nw_view (pi_network_name in varchar2) is
+l_srid integer;
 begin
+select a.geoloc.sdo_srid into l_srid from v_lb_nlt_geometry2 a where rownum = 1;
+--
 execute immediate 'create or replace view '||pi_network_name||'_LINK '||
        ' as select * from '||pi_network_name||'_LINK_TABLE '||
        ' where link_type in ( select ptr_value from table ( lb_path.get_g_nw_types )) '||
-' and ( ( link_id in ( select ne_id from v_lb_nlt_geometry2 where sdo_filter ( geoloc, sdo_geometry( 2003, 27700, NULL, sdo_elem_info_array( 1, 1003, 3), '||
+' and ( ( link_id in ( select ne_id from v_lb_nlt_geometry2 where sdo_filter ( geoloc, sdo_geometry( 2003, '||to_char(l_srid)||', NULL, sdo_elem_info_array( 1, 1003, 3), '||
 '         sdo_ordinate_array( nvl(to_number(sys_context('||''''||'NM3SQL'||''''||', '||''''||'LB_SPATIAL_FILTER_XMIN'||''''||')), -999999999 ), '|| 
 '                             nvl(to_number(sys_context('||''''||'NM3SQL'||''''||', '||''''||'LB_SPATIAL_FILTER_YMIN'||''''||')), -999999999 ), '||
 '                             nvl(to_number(sys_context('||''''||'NM3SQL'||''''||', '||''''||'LB_SPATIAL_FILTER_XMAX'||''''||')), 999999999 ), '||
