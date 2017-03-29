@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_path
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_path.pkb-arc   1.8   Mar 24 2017 15:20:40   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_path.pkb-arc   1.9   Mar 29 2017 17:42:28   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_path.pkb  $
-   --       Date into PVCS   : $Date:   Mar 24 2017 15:20:40  $
-   --       Date fetched Out : $Modtime:   Mar 24 2017 15:20:24  $
-   --       PVCS Version     : $Revision:   1.8  $
+   --       Date into PVCS   : $Date:   Mar 29 2017 17:42:28  $
+   --       Date fetched Out : $Modtime:   Mar 29 2017 17:42:52  $
+   --       PVCS Version     : $Revision:   1.9  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,7 +16,7 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.8  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.9  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_path';
 
@@ -302,6 +302,7 @@ AS
 
    --
    PROCEDURE set_network (pi_network_name   IN VARCHAR2,
+                          pi_node_type      IN VARCHAR2 DEFAULT NULL,
                           pi_asset_type     IN VARCHAR2 DEFAULT NULL,
                           pi_xmin           IN NUMBER DEFAULT NULL,
                           pi_ymin           IN NUMBER DEFAULT NULL,
@@ -325,18 +326,20 @@ AS
       IF pi_network_name IS NULL
       THEN
          raise_application_error (-20002, 'You must specify a network name');
+      ELSIF pi_node_type is NULL and pi_asset_type is NULL then
+         raise_application_error (-20005, 'You must specify a node type or an asset type to define the network elements to be configured');
       ELSE
-      
+
          if pi_xmin is null then
             use_spatial_filter := FALSE;
          else
             use_spatial_filter := TRUE;
-         end if;  
+         end if;
             nm3ctx.set_context('LB_SPATIAL_FILTER_XMIN', to_char(pi_xmin) );
             nm3ctx.set_context('LB_SPATIAL_FILTER_YMIN', to_char(pi_ymin) );
             nm3ctx.set_context('LB_SPATIAL_FILTER_XMAX', to_char(pi_xmax) );
             nm3ctx.set_context('LB_SPATIAL_FILTER_YMAX', to_char(pi_ymax) );
-            
+
          BEGIN
             SELECT network
               INTO g_network
@@ -360,12 +363,12 @@ AS
 
       net_mem := g_network;
 
-      IF pi_asset_type IS NULL
+      IF pi_asset_type IS NULL and pi_node_type is not null
       THEN
          SELECT ptr_vc (ROWNUM, nt_type)
            BULK COLLECT INTO g_nw_types
            FROM nm_types
-          WHERE nt_node_type = 'ROAD';
+          WHERE nt_node_type = pi_node_type;
       ELSE
          SELECT ptr_vc (ROWNUM, nin_nw_type)
            BULK COLLECT INTO g_nw_types
