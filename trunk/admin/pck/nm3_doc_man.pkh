@@ -4,11 +4,11 @@ Is
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3_doc_man.pkh-arc   3.7   Jun 22 2016 11:39:52   linesh.sorathia  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3_doc_man.pkh-arc   3.8   Apr 03 2017 09:45:20   linesh.sorathia  $
 --       Module Name      : $Workfile:   nm3_doc_man.pkh  $
---       Date into PVCS   : $Date:   Jun 22 2016 11:39:52  $
---       Date fetched Out : $Modtime:   Apr 20 2016 19:55:30  $
---       Version          : $Revision:   3.7  $
+--       Date into PVCS   : $Date:   Apr 03 2017 09:45:20  $
+--       Date fetched Out : $Modtime:   Mar 31 2017 19:48:18  $
+--       Version          : $Revision:   3.8  $
 --       Based on SCCS version : 
 ------------------------------------------------------------------
 --   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
@@ -20,7 +20,7 @@ Is
   --constants
   -----------
   --g_sccsid is the SCCS ID for the package
-  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.7  $';
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.8  $';
 
   Type g_association_rec Is Record (featue_table_name Varchar2(500)
                                    ,feature_id        Varchar2(500)) ;
@@ -109,5 +109,9 @@ Procedure check_docs(pi_gateway_name   In  Varchar2
 Function get_url_for_gis_session_id(pi_gdo_session_id In  Number)
 Return Varchar2;
 -- 
+-- This is just the place holder for ALIM Document Manager
+PROCEDURE delete_associations(pi_gateway_name In  Varchar2
+                             ,pi_feature_id   In  Varchar2);
+--
 End nm3_doc_man;
 /
