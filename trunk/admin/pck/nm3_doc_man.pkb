@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3_doc_man.pkb-arc   3.7   Jun 22 2016 11:39:56   linesh.sorathia  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3_doc_man.pkb-arc   3.8   Apr 03 2017 09:45:08   linesh.sorathia  $
 --       Module Name      : $Workfile:   nm3_doc_man.pkb  $
---       Date into PVCS   : $Date:   Jun 22 2016 11:39:56  $
---       Date fetched Out : $Modtime:   Apr 27 2016 10:20:04  $
---       Version          : $Revision:   3.7  $
+--       Date into PVCS   : $Date:   Apr 03 2017 09:45:08  $
+--       Date fetched Out : $Modtime:   Apr 03 2017 09:13:44  $
+--       Version          : $Revision:   3.8  $
 --       Based on SCCS version : 
 ------------------------------------------------------------------
 --   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
@@ -19,7 +19,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.7  $';
+  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.8  $';
 
   g_package_name CONSTANT varchar2(30) := 'nm3_doc_man';
 --
@@ -361,6 +361,16 @@ Begin
    po_document_id := l_eB_doc_id;
 --
 End create_document_and_assocs;
+--
+PROCEDURE delete_associations(pi_gateway_name In  Varchar2
+                             ,pi_feature_id   In  Varchar2)
+Is
+Begin
+--
+   Null; 
+   -- For ALIM this needs to be left null.
+--
+End delete_associations;
 --
 End nm3_doc_man;
 /
