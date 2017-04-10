@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_ref
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_ref.pkb-arc   1.8   Sep 16 2016 15:00:30   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_ref.pkb-arc   1.9   Apr 10 2017 16:11:26   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_ref.pkb  $
-   --       Date into PVCS   : $Date:   Sep 16 2016 15:00:30  $
-   --       Date fetched Out : $Modtime:   Sep 16 2016 14:58:36  $
-   --       PVCS Version     : $Revision:   1.8  $
+   --       Date into PVCS   : $Date:   Apr 10 2017 16:11:26  $
+   --       Date fetched Out : $Modtime:   Apr 10 2017 16:11:28  $
+   --       PVCS Version     : $Revision:   1.9  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,7 +16,7 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.8  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.9  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_ref';
 
@@ -64,6 +64,9 @@ AS
    IS
       retval   lb_linear_type_tab;
    BEGIN
+
+      nm3ctx.set_context ('NLT_DATA_INV_TYPE', pi_inv_type);
+
       SELECT lb_linear_type (nlt_id,
                              nt_type,
                              nlt_g_i_d,
