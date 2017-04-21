@@ -1,13 +1,14 @@
+/* Formatted on 21/04/2017 14:45:46 (QP5 v5.294) */
 --
 -----------------------------------------------------------------------------
 --
 --   PVCS Identifiers :-
 --
---       pvcsid                 : $Header:   //new_vm_latest/archives/lb/admin/utl/drop_lb.sql-arc   1.10   Dec 03 2015 16:35:30   Rob.Coupe  $
+--       pvcsid                 : $Header:   //new_vm_latest/archives/lb/admin/utl/drop_lb.sql-arc   1.11   Apr 21 2017 14:48:58   Rob.Coupe  $
 --       Module Name      : $Workfile:   drop_lb.sql  $
---       Date into PVCS   : $Date:   Dec 03 2015 16:35:30  $
---       Date fetched Out : $Modtime:   Dec 03 2015 16:35:38  $
---       PVCS Version     : $Revision:   1.10  $
+--       Date into PVCS   : $Date:   Apr 21 2017 14:48:58  $
+--       Date fetched Out : $Modtime:   Apr 21 2017 14:48:42  $
+--       PVCS Version     : $Revision:   1.11  $
 --
 --   Author : Rob Coupe
 --
@@ -18,7 +19,7 @@
 -----------------------------------------------------------------------------
 --
 
-Prompt Dropping object dependency list
+PROMPT Dropping object dependency list
 
 DECLARE
    not_exists   EXCEPTION;
@@ -32,7 +33,7 @@ EXCEPTION
 END;
 /
 
-Prompt Dropping objects in LB object registry
+PROMPT Dropping objects in LB object registry
 
 DECLARE
    CURSOR c1
@@ -89,7 +90,7 @@ EXCEPTION
 END;
 /
 
-Prompt Test for remnants
+PROMPT Test for remnants
 
 SELECT object_name, object_type, 'Remains in existence'
   FROM lb_objects lo
@@ -99,7 +100,7 @@ SELECT object_name, object_type, 'Remains in existence'
             WHERE lo.object_name = o.object_name)
 /
 
-Prompt Removal of LB object list 
+PROMPT Removal of LB object list
 
 DECLARE
    not_exists   EXCEPTION;
@@ -113,7 +114,7 @@ EXCEPTION
 END;
 /
 
-Prompt Clean up any residual metadata
+PROMPT Clean up any residual metadata
 
 DECLARE
    CURSOR c1
@@ -121,10 +122,20 @@ DECLARE
       SELECT nit_inv_type
         FROM nm_inv_types_all
        WHERE nit_category = 'L';
+
 BEGIN
    FOR irec IN c1
    LOOP
+
+      nm3sdm.drop_layers_by_inv_type(irec.nit_inv_type, FALSE);       
+
       BEGIN
+         EXECUTE IMMEDIATE
+               'delete from nm_inv_nw where nin_nit_inv_code = '
+            || ''''
+            || irec.nit_inv_type
+            || '''';
+
          EXECUTE IMMEDIATE
                'delete from nm_inv_type_attribs where ita_inv_type = '
             || ''''
@@ -154,3 +165,6 @@ END;
 PROMPT Completed lb_drop script
 /
 
+COMMIT;
+
+EXIT;
