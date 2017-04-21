@@ -1,15 +1,15 @@
 /**
  *	PVCS Identifiers :-
  *
- *		PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/Java/login/bentley/exor/login/LoginUtil.java-arc   1.0   Apr 21 2017 07:53:54   Upendra.Hukeri  $
+ *		PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/Java/login/bentley/exor/login/LoginUtil.java-arc   1.1   Apr 21 2017 07:56:10   Upendra.Hukeri  $
  *		Module Name      : $Workfile:   LoginUtil.java  $
  *		Author			 : $Author:   Upendra.Hukeri  $
- *		Date Into PVCS   : $Date:   Apr 21 2017 07:53:54  $
- *		Date Fetched Out : $Modtime:   Apr 21 2017 07:53:14  $
- *		PVCS Version     : $Revision:   1.0  $
+ *		Date Into PVCS   : $Date:   Apr 21 2017 07:56:10  $
+ *		Date Fetched Out : $Modtime:   Feb 22 2017 12:55:10  $
+ *		PVCS Version     : $Revision:   1.1  $
  *
  *	This class is used to make a connection to Oracle Database using a WebLogic Data Source
- *	(jdbc/<TNS-NAME>_LOGINDS) and fire queries using it, when connection is not available from Oracle 
+ *	(jdbc/<TNS-NAME>LOGINDS) and fire queries using it, when connection is not available from Oracle 
  *	Forms Session (generally before logging in to a Forms' Session).
  *
  ****************************************************************************************************
@@ -22,6 +22,9 @@ package bentley.exor.login;
 
 import java.awt.*;
 import java.awt.image.*;
+
+import bentley.exor.ExorDebugger;
+import bentley.exor.pwdenc.AESEncryptDecryptProvider;
 
 import java.io.*;
 
@@ -135,6 +138,51 @@ public class LoginUtil {
 			result = java.lang.Boolean.toString(cstmt.execute());
 		}
 		
+		else if(mode.equalsIgnoreCase("executeref")) {
+			ExorDebugger.reportDebugInfo("doSQL(): Processing EXECUTE Statement (REF CURSOR)...");
+			
+			String[] procParam = sqlStmt.split(":");
+			
+			sqlStmt = "BEGIN " + procParam[0] + "(";
+			
+			for(int i=1; i < procParam.length; i++) {
+				if(i == (procParam.length - 1)) {
+					sqlStmt += "?";
+				} else {
+					sqlStmt += "?, ";
+				}
+			}
+			
+			sqlStmt += ");" + " END;";
+			
+			CallableStatement cstmt  = conn.prepareCall(sqlStmt);
+			
+			for(int i=1; i < (procParam.length - 1); i++) {
+				cstmt.setString (i, procParam[i]);
+			}
+			
+			cstmt.registerOutParameter((procParam.length - 1), OracleTypes.CURSOR);
+			
+			cstmt.execute();
+			ResultSet rset = (ResultSet)cstmt.getObject(procParam.length - 1);
+			int fetchSize = 0;
+			
+			while (rset.next()) {
+				fetchSize++;
+				
+				if(fetchSize > 1) {
+					result = "Multiple records";
+					break;
+				} else {
+					result = rset.getString(procParam[procParam.length - 1]).trim();
+				}
+			}
+			
+			if(fetchSize < 1) {
+				result = "No record found";
+			}
+		}
+		
 		conn.close();
 		
 		return result;
@@ -233,5 +281,39 @@ public class LoginUtil {
 		}
 		
 		return imageDataStringArr;
+	}
+	/*
+	public static String getUserPassword(String encryptedUserPwd) {
+		AESEncryptDecryptProvider aes = new AESEncryptDecryptProvider();
+		
+		if(encryptedUserPwd != null && encryptedUserPwd.length() > 0) {
+			return aes.decrypt(encryptedUserPwd, "I9ir93FJd92jdnuh");
+		} else {
+			return "ORA-20099: null encrypted string passed";
+		}
+	}
+	*/
+	public static String[] getDBConnDetails(String dbConnectionString, int subStringCnt) {
+		String [] returnStrArr = null;
+		
+		try {
+			returnStrArr = new String[subStringCnt];
+			int i = 0;
+			
+			for(; i<=subStringCnt-2; i++) {
+				int dollarPos      = dbConnectionString.indexOf('$', 0);
+				int strLen         = Integer.parseInt(dbConnectionString.substring(0, dollarPos));
+				
+				returnStrArr[i]    = dbConnectionString.substring(dollarPos + 1, dollarPos + strLen + 1);
+				dbConnectionString = dbConnectionString.substring(dollarPos + strLen + 1);
+			}
+			
+			returnStrArr[subStringCnt - 1] = dbConnectionString;
+		} catch(Exception e) {
+			returnStrArr = new String[1];
+			returnStrArr[0] = "ORA-20099: " + e.getMessage();
+		} finally {
+			return returnStrArr;
+		}
 	}
 }
