@@ -4,11 +4,11 @@
 --
 --   PVCS Identifiers :-
 --
---       pvcsid                 : $Header:   //new_vm_latest/archives/lb/admin/utl/drop_lb.sql-arc   1.11   Apr 21 2017 14:48:58   Rob.Coupe  $
+--       pvcsid                 : $Header:   //new_vm_latest/archives/lb/admin/utl/drop_lb.sql-arc   1.12   Apr 21 2017 15:25:34   Rob.Coupe  $
 --       Module Name      : $Workfile:   drop_lb.sql  $
---       Date into PVCS   : $Date:   Apr 21 2017 14:48:58  $
---       Date fetched Out : $Modtime:   Apr 21 2017 14:48:42  $
---       PVCS Version     : $Revision:   1.11  $
+--       Date into PVCS   : $Date:   Apr 21 2017 15:25:34  $
+--       Date fetched Out : $Modtime:   Apr 21 2017 15:25:44  $
+--       PVCS Version     : $Revision:   1.12  $
 --
 --   Author : Rob Coupe
 --
@@ -131,7 +131,7 @@ BEGIN
 
       BEGIN
          EXECUTE IMMEDIATE
-               'delete from nm_inv_nw where nin_nit_inv_code = '
+               'delete from nm_inv_nw_all where nin_nit_inv_code = '
             || ''''
             || irec.nit_inv_type
             || '''';
