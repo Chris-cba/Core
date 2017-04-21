@@ -4,11 +4,11 @@ CREATE OR REPLACE FUNCTION GetNetworkLinearLocations (
 IS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/eB_interface/GetNetworkLinearLocations.fnc-arc   1.0   Oct 09 2015 13:32:12   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/eB_interface/GetNetworkLinearLocations.fnc-arc   1.1   Apr 21 2017 15:41:58   Rob.Coupe  $
    --       Module Name      : $Workfile:   GetNetworkLinearLocations.fnc  $
-   --       Date into PVCS   : $Date:   Oct 09 2015 13:32:12  $
-   --       Date fetched Out : $Modtime:   Oct 07 2015 11:17:10  $
-   --       PVCS Version     : $Revision:   1.0  $
+   --       Date into PVCS   : $Date:   Apr 21 2017 15:41:58  $
+   --       Date fetched Out : $Modtime:   Apr 21 2017 15:38:16  $
+   --       PVCS Version     : $Revision:   1.1  $
    --
    --   Author : R.A. Coupe/David Stow
    --
@@ -38,7 +38,9 @@ BEGIN
                WHERE     najx_inv_type = lb_exor_inv_type
                      AND najx_njxt_id = njx_njxt_id
                      AND njx_code = nal_jxp)
-                JXP
+                JXP,
+			nal_start_date StartDate,
+			nal_end_date EndDate
         FROM nm_asset_locations,
              lb_types,
              TABLE (LB_LOC.GET_PREF_LOCATION_TAB (nal_id, NetworkTypeID)) t,
