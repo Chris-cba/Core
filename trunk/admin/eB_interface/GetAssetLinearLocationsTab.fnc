@@ -6,11 +6,11 @@ CREATE OR REPLACE FUNCTION GetAssetLinearLocationsTab (
 IS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/eB_interface/GetAssetLinearLocationsTab.fnc-arc   1.1   Mar 24 2017 13:55:04   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/eB_interface/GetAssetLinearLocationsTab.fnc-arc   1.2   Apr 26 2017 12:19:04   Rob.Coupe  $
    --       Module Name      : $Workfile:   GetAssetLinearLocationsTab.fnc  $
-   --       Date into PVCS   : $Date:   Mar 24 2017 13:55:04  $
-   --       Date fetched Out : $Modtime:   Mar 24 2017 13:53:56  $
-   --       PVCS Version     : $Revision:   1.1  $
+   --       Date into PVCS   : $Date:   Apr 26 2017 12:19:04  $
+   --       Date fetched Out : $Modtime:   Apr 26 2017 12:18:40  $
+   --       PVCS Version     : $Revision:   1.2  $
    --
    --   Author : R.A. Coupe
    --
@@ -37,12 +37,14 @@ IS
    NetworkElementName  VARCHAR2(30);  -- Network element unique name
    NetworkElementDescr VARCHAR2(240); -- Optional network element description
    JXP                 VARCHAR2(80);  -- Juxtaposition for this location
+   StartDate           DATE;          -- Start date of asset location
+   EndDate             DATE;          -- End date of asset location
 BEGIN
    cur := GetAssetLinearLocations (AssetId, AssetType, NetworkTypeID);
    retval := lb_linear_locations();
    LOOP
       FETCH cur INTO l_AssetId, l_AssetType, LocationId, LocationDescription, l_NetworkTypeId,
-         NetworkElementId, StartM, EndM, ExorUnitName, NetworkElementName, NetworkElementDescr, JXP;
+         NetworkElementId, StartM, EndM, ExorUnitName, NetworkElementName, NetworkElementDescr, JXP, StartDate, EndDate;
       EXIT WHEN cur%NOTFOUND;
 
       -- Map exor unit name to external unit ID
@@ -59,7 +61,7 @@ BEGIN
       retval.extend;
       rowcount := rowcount + 1;
       retval(rowcount) := lb_linear_location (l_AssetId, l_AssetType, LocationId, LocationDescription,
-         l_NetworkTypeId, NetworkElementId, StartM, EndM, ExternalUnitId, NetworkElementName, NetworkElementDescr, JXP);
+         l_NetworkTypeId, NetworkElementId, StartM, EndM, ExternalUnitId, NetworkElementName, NetworkElementDescr, JXP, StartDate, EndDate);
    END LOOP;
    CLOSE cur;
    RETURN retval;
