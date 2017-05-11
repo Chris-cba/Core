@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY nm3wrap AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3wrap.pkb-arc   2.4   Oct 13 2016 14:51:46   Chris.Baugh  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3wrap.pkb-arc   2.5   May 11 2017 12:22:20   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm3wrap.pkb  $
---       Date into PVCS   : $Date:   Oct 13 2016 14:51:46  $
---       Date fetched Out : $Modtime:   Oct 13 2016 09:24:08  $
---       Version          : $Revision:   2.4  $
+--       Date into PVCS   : $Date:   May 11 2017 12:22:20  $
+--       Date fetched Out : $Modtime:   May 10 2017 08:43:18  $
+--       Version          : $Revision:   2.5  $
 --       Based on SCCS version : 1.19
 ------------------------------------------------------------------
 --   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
@@ -21,7 +21,7 @@ CREATE OR REPLACE PACKAGE BODY nm3wrap AS
 --
 ------------------------------------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '$Revision:   2.4  $';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '$Revision:   2.5  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3wrap';
@@ -228,6 +228,12 @@ BEGIN
   OPEN c2(pi_node_id);
   FETCH c2 INTO lv_poe_type,
                 lv_poe;
+                
+  IF c2%NOTFOUND THEN
+    lv_poe_type := 'Not a POE';
+    lv_poe :=0;
+  END IF;
+  
   CLOSE c2;
   --
   po_poe_type               := lv_poe_type;
