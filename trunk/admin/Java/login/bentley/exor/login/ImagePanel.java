@@ -1,15 +1,15 @@
 /**
  *	PVCS Identifiers :-
  *
- *		PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/Java/login/bentley/exor/login/ImagePanel.java-arc   1.1   Feb 27 2017 06:59:08   Upendra.Hukeri  $
+ *		PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/Java/login/bentley/exor/login/ImagePanel.java-arc   1.2   May 30 2017 13:43:36   Upendra.Hukeri  $
  *		Module Name      : $Workfile:   ImagePanel.java  $
  *		Author			 : $Author:   Upendra.Hukeri  $
- *		Date Into PVCS   : $Date:   Feb 27 2017 06:59:08  $
- *		Date Fetched Out : $Modtime:   Feb 17 2017 09:25:04  $
- *		PVCS Version     : $Revision:   1.1  $
+ *		Date Into PVCS   : $Date:   May 30 2017 13:43:36  $
+ *		Date Fetched Out : $Modtime:   May 30 2017 13:42:02  $
+ *		PVCS Version     : $Revision:   1.2  $
  *
  *	This class is used to render high quality images on Oracle Forms either from within the Jar 
- *	or From Application Server.
+ *	or from Application Server.
  *
  ****************************************************************************************************
  *	  Copyright (c) 2017 Bentley Systems Incorporated.  All rights reserved.
@@ -19,11 +19,10 @@
 
 package bentley.exor.login;
 
-import java.awt.*;
-import java.awt.event.*;
-import java.awt.image.BufferedImage;
-
 import bentley.exor.ExorDebugger;
+
+import java.awt.*;
+import java.awt.image.BufferedImage;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -43,7 +42,7 @@ import javax.imageio.ImageTranscoder;
 import javax.swing.*;
 
 public class ImagePanel extends JPanel {
-	private Image     img          = null;
+	private transient Image img    = null;
 	
 	private double    imgWidth     = 0;
 	private double    imgHeight    = 0;
@@ -70,7 +69,7 @@ public class ImagePanel extends JPanel {
 	}
 	
 	public void setImageSource(String imageSource) {
-		if(imageSource.equalsIgnoreCase("AppServer")) {
+		if("AppServer".equalsIgnoreCase(imageSource)) {
 			fromAppServ = true;
 		} else {
 			fromAppServ = false;
@@ -78,7 +77,7 @@ public class ImagePanel extends JPanel {
 	}
 	
 	public void appendImageStr(String imgStr) {
-		if((imgStr != null) && !(imgStr.equalsIgnoreCase("null"))) {
+		if((imgStr != null) && !("null".equalsIgnoreCase(imgStr))) {
 			if(imageString == null) {
 				imageString = imgStr;
 			} else {
@@ -202,5 +201,5 @@ public class ImagePanel extends JPanel {
 		
 		this.toolTipText = text;
 		this.setToolTipText(text);
-	}	
+	}
 }
