@@ -1,12 +1,12 @@
 /**
  *	PVCS Identifiers :-
  *
- *		PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/Java/login/bentley/exor/ManifestInfo.java-arc   1.0   Feb 27 2017 09:44:46   Upendra.Hukeri  $
+ *		PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/Java/login/bentley/exor/ManifestInfo.java-arc   1.1   May 30 2017 13:37:30   Upendra.Hukeri  $
  *		Module Name      : $Workfile:   ManifestInfo.java  $
  *		Author			 : $Author:   Upendra.Hukeri  $
- *		Date Into PVCS   : $Date:   Feb 27 2017 09:44:46  $
- *		Date Fetched Out : $Modtime:   Feb 27 2017 09:43:44  $
- *		PVCS Version     : $Revision:   1.0  $
+ *		Date Into PVCS   : $Date:   May 30 2017 13:37:30  $
+ *		Date Fetched Out : $Modtime:   May 30 2017 13:36:06  $
+ *		PVCS Version     : $Revision:   1.1  $
  *
  *	This class is used to get PVCS version information about the Jar.
  *
@@ -18,6 +18,8 @@
 
 package bentley.exor;
 
+import java.io.IOException;
+
 import java.lang.Package;
 
 import java.net.URL;
@@ -27,7 +29,6 @@ import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 
 public class ManifestInfo extends java.lang.ClassLoader {
-	private String jarName;
 	private Manifest manifest;
 	private URL manifestURL;
 	private String jarPath;
@@ -42,15 +43,15 @@ public class ManifestInfo extends java.lang.ClassLoader {
 			} else {
 				mi = new ManifestInfo();
 				
-				ExorDebugger.reportDebugInfo("Jar Information - ");
-				ExorDebugger.reportDebugInfo("  Application Name       : " + mi.getManifestMainAttibuteVal("Application-Name"));
-				ExorDebugger.reportDebugInfo("  Package Name           : " + mi.getName());
-				ExorDebugger.reportDebugInfo("  Specification Title    : " + mi.getSpecificationTitle());
-				ExorDebugger.reportDebugInfo("  Specification Vendor   : " + mi.getSpecificationVendor());
-				ExorDebugger.reportDebugInfo("  Specification Version  : " + mi.getSpecificationVersion() + " (Jar version)");
-				ExorDebugger.reportDebugInfo("  Implementation Title   : " + mi.getImplementationTitle());
-				ExorDebugger.reportDebugInfo("  Implementation Vendor  : " + mi.getImplementationVendor());
-				ExorDebugger.reportDebugInfo("  Implementation Version : " + mi.getImplementationVersion() + " (Product version)");
+				ExorDebugger.reportDebugInfo("Applet Information - ");
+				ExorDebugger.reportDebugInfo("  Application Name       : ", mi.getManifestMainAttibuteVal("Application-Name"));
+				ExorDebugger.reportDebugInfo("  Package Name           : ", mi.getName());
+				ExorDebugger.reportDebugInfo("  Specification Title    : ", mi.getSpecificationTitle());
+				ExorDebugger.reportDebugInfo("  Specification Vendor   : ", mi.getSpecificationVendor());
+				ExorDebugger.reportDebugInfo("  Specification Version  : ", mi.getSpecificationVersion(), " (Applet version)");
+				ExorDebugger.reportDebugInfo("  Implementation Title   : ", mi.getImplementationTitle());
+				ExorDebugger.reportDebugInfo("  Implementation Vendor  : ", mi.getImplementationVendor());
+				ExorDebugger.reportDebugInfo("  Implementation Version : ", mi.getImplementationVersion(), " (Product version)");
 			}
 		} catch (Exception mainExp) {
 			ExorDebugger.reportDebugInfo("Exception mainExp caught...\n");
@@ -69,16 +70,16 @@ public class ManifestInfo extends java.lang.ClassLoader {
 	}
 	
 	public ManifestInfo(String jarName) {
-		jarPath = this.getClass().getProtectionDomain().getCodeSource().getLocation().toExternalForm();
-		jarPath = jarPath.substring(0, jarPath.lastIndexOf("/") + 1) + jarName;
+		String classPath = this.getClass().getProtectionDomain().getCodeSource().getLocation().toExternalForm();
+		jarPath = classPath.substring(0, classPath.lastIndexOf('/') + 1) + jarName;
 		initialize();
 	}
 	
-	protected void initialize() {
+	protected final void initialize() {
 		try {
 			manifestURL   = new URL("jar:" + jarPath + "!/META-INF/MANIFEST.MF");
 			this.manifest = new Manifest(manifestURL.openStream());
-		} catch (Exception initializeExp) {
+		} catch (IOException initializeExp) {
 			ExorDebugger.reportDebugInfo("Exception initializeExp caught...\n");
 			initializeExp.printStackTrace();
 		}
@@ -112,7 +113,7 @@ public class ManifestInfo extends java.lang.ClassLoader {
 		return this.getClass().getPackage().getImplementationVersion();
 	}
 	
-	public String getManifestMainAttibuteVal(String attributeName) {
+	private String getManifestMainAttibuteVal(String attributeName) {
 		try {
 			Attributes mainEntries = manifest.getMainAttributes();
 			
