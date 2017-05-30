@@ -1,12 +1,12 @@
 /**
  *	PVCS Identifiers :-
  *
- *		PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/Java/login/bentley/exor/ExorDebugger.java-arc   1.0   Feb 27 2017 07:05:26   Upendra.Hukeri  $
+ *		PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/Java/login/bentley/exor/ExorDebugger.java-arc   1.1   May 30 2017 13:34:58   Upendra.Hukeri  $
  *		Module Name      : $Workfile:   ExorDebugger.java  $
  *		Author			 : $Author:   Upendra.Hukeri  $
- *		Date Into PVCS   : $Date:   Feb 27 2017 07:05:26  $
- *		Date Fetched Out : $Modtime:   Feb 20 2017 10:18:30  $
- *		PVCS Version     : $Revision:   1.0  $
+ *		Date Into PVCS   : $Date:   May 30 2017 13:34:58  $
+ *		Date Fetched Out : $Modtime:   May 30 2017 13:32:32  $
+ *		PVCS Version     : $Revision:   1.1  $
  *
  *	This class is used to print debug messages on console.
  *
@@ -26,8 +26,8 @@ public class ExorDebugger {
 	public static void setDebugLevel(int p_debugLevel) {
 		debugLevel = p_debugLevel;
 	}
-
-	public static void reportDebugInfo(String exorMessage) {
+	
+	public static void reportDebugInfo(String... exorMessages) {
 		if (debugLevel > 0) {
 			Calendar currentTime = Calendar.getInstance();
 			int currentHours = currentTime.get(Calendar.HOUR_OF_DAY);
@@ -41,9 +41,15 @@ public class ExorDebugger {
 			String secs = df.format(currentSecs);
 			df = new java.text.DecimalFormat("000");
 			String milli = df.format(currentMilli);
-			String currentTimeField = hours + ":" + mins + ":" + secs + ":" + milli;
 			
-			System.out.println("Exor (" + currentTimeField + ") : INFO : " + exorMessage);
+			StringBuilder strBld = new StringBuilder();
+			strBld.append("Exor (").append(hours).append(':').append(mins).append(':').append(secs).append(':').append(milli).append(") : INFO : ");
+			
+			for(String message:exorMessages)  {
+				strBld.append(message);
+			}
+			
+			System.out.println(strBld.toString());
 		}
 	}
 }
