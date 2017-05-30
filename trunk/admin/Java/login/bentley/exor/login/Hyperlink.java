@@ -1,12 +1,12 @@
 /**
  *	PVCS Identifiers :-
  *
- *		PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/Java/login/bentley/exor/login/Hyperlink.java-arc   1.1   Feb 27 2017 06:59:08   Upendra.Hukeri  $
+ *		PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/Java/login/bentley/exor/login/Hyperlink.java-arc   1.2   May 30 2017 13:40:32   Upendra.Hukeri  $
  *		Module Name      : $Workfile:   Hyperlink.java  $
  *		Author			 : $Author:   Upendra.Hukeri  $
- *		Date Into PVCS   : $Date:   Feb 27 2017 06:59:08  $
- *		Date Fetched Out : $Modtime:   Feb 14 2017 07:56:56  $
- *		PVCS Version     : $Revision:   1.1  $
+ *		Date Into PVCS   : $Date:   May 30 2017 13:40:32  $
+ *		Date Fetched Out : $Modtime:   May 30 2017 13:39:44  $
+ *		PVCS Version     : $Revision:   1.2  $
  *
  *	Based on the original source from Idiom - decompile using JAD.
  *	Used to render Hyperlinks on Oracle Forms as Java Beans.
@@ -48,17 +48,18 @@ public class Hyperlink extends JLabel implements MouseListener {
     private Color          m_normalColor;
     private Color          m_activeColor;
     private Color          m_visitedColor;
-    private ActionListener m_actionListener;
-    private MouseListener  m_mouseListener;
+	
+    private volatile ActionListener m_actionListener;
+    private volatile MouseListener  m_mouseListener;
+	
     private Font           mFont;
 	private Color          m_bulletColor;
     private boolean        m_debug;
 	private Main           mFormsMain;
-    private Component      Xe;
-    private ExtendedFrame  Ef;
+    private Component      component;
+    private ExtendedFrame  extendedFrame;
     private VBean          vB;
 	
-    private static boolean m_debugAll;
 	private static Color   DEFAULTNORMAL;
     private static Color   DEFAULTACTIVE;
     private static Color   DEFAULTVISITED = Color.decode("#840084");
@@ -124,38 +125,38 @@ public class Hyperlink extends JLabel implements MouseListener {
         discover();
         discoverVBean();
 		
-        return !Ef.isActive();
+        return !extendedFrame.isActive();
     }
 	
-    public void discoverVBean() {
-        Xe = this;
+    private void discoverVBean() {
+        component = this;
         
-        while (!Xe.getClass().getName().equals("oracle.forms.ui.VBean")) {
-            Xe = Xe.getParent();
+        while (!"oracle.forms.ui.VBean".equals(component.getClass().getName())) {
+            component = component.getParent();
         }
 
-        vB = (VBean)Xe;
+        vB = (VBean)component;
     }
 
-    public void discover() {
-        for(Xe = this; !Xe.getClass().getName().equals("oracle.forms.ui.ExtendedFrame"); Xe = Xe.getParent());
+    private void discover() {
+        for(component = this; !"oracle.forms.ui.ExtendedFrame".equals(component.getClass().getName()); component = component.getParent());
 		
-        Ef = (ExtendedFrame)Xe;
+        extendedFrame = (ExtendedFrame)component;
     }
 	
-    public void setLabel(String label) {
-        String lclValue = new String("");
+    public final void setLabel(String label) {
+        String lclValue = "";
         
-        if ((label != null )&&(!label.equalsIgnoreCase("null"))) {
+        if ((label != null )&&(!"null".equalsIgnoreCase(label))) {
           lclValue = label;
         }
 		
-        ExorDebugger.reportDebugInfo("setLabel(): label - " + lclValue);
+        ExorDebugger.reportDebugInfo("setLabel(): label - ", lclValue);
         m_isClicked = false;
 		
         super.setText(lclValue);
 		
-        if(label.trim().compareTo("") == 0)  {
+        if((label != null ) && "".compareTo(label.trim()) == 0)  {
             m_showBullet = false;
             resizeForNoBullet();
         }
@@ -190,14 +191,14 @@ public class Hyperlink extends JLabel implements MouseListener {
         return super.getText();
     }
 	
-    public void setURL(String URL) {        
+    public final void setURL(String URL) {        
         if (URL != null) {
-           ExorDebugger.reportDebugInfo("setURL(): URL - " + URL);
+           ExorDebugger.reportDebugInfo("setURL(): URL - ", URL);
         }
 		
         m_isClicked = false;
         
-        if ( (URL != null) && (URL.equalsIgnoreCase("null"))) {
+        if ( (URL != null) && ("null".equalsIgnoreCase(URL))) {
           m_URL = null;
         } else {
            m_URL = URL;        
@@ -217,36 +218,36 @@ public class Hyperlink extends JLabel implements MouseListener {
     }
 	
     public void setBackgroundColor(Color backColor) {
-        ExorDebugger.reportDebugInfo("setBackgroundColor(): backColor - " + backColor.toString());
+        ExorDebugger.reportDebugInfo("setBackgroundColor(): backColor - ", backColor.toString());
         setBackground(backColor);
 		
         repaint();
     }
 	
-    public void setVisitedColor(Color newVisitedColor) {
-        ExorDebugger.reportDebugInfo("setVisitedColor(): newVisitedColor - " + newVisitedColor.toString());
+    public final void setVisitedColor(Color newVisitedColor) {
+        ExorDebugger.reportDebugInfo("setVisitedColor(): newVisitedColor - ", newVisitedColor.toString());
         m_visitedColor = newVisitedColor;
 		
         repaint();
     }
 	
     public void setBulletColor(Color newBulletColor) {
-        ExorDebugger.reportDebugInfo("setBulletColor(): newBulletColor - " + newBulletColor.toString());
+        ExorDebugger.reportDebugInfo("setBulletColor(): newBulletColor - ", newBulletColor.toString());
         m_bulletColor = newBulletColor;
 		
         repaint();
     }
 	
-    public void setNormalColor(Color newNormalColor) {
-        ExorDebugger.reportDebugInfo("setNormalColor(): newNormalColor - " + newNormalColor.toString());
+    public final void setNormalColor(Color newNormalColor) {
+        ExorDebugger.reportDebugInfo("setNormalColor(): newNormalColor - ", newNormalColor.toString());
         m_normalColor = newNormalColor;
         setForeground(m_normalColor);
 		
         repaint();
     }
 	
-    public void setActiveColor(Color newActiveColor) {
-        ExorDebugger.reportDebugInfo("setActiveColor(): newActiveColor - " + newActiveColor.toString());
+    public final void setActiveColor(Color newActiveColor) {
+        ExorDebugger.reportDebugInfo("setActiveColor(): newActiveColor - ", newActiveColor.toString());
         m_activeColor = newActiveColor;
 		
         repaint();
@@ -300,30 +301,22 @@ public class Hyperlink extends JLabel implements MouseListener {
 	
 	public Dimension getPreferredSize() {
 		FontMetrics metrics = getFontMetrics(getFont());
-		Dimension d = new Dimension(metrics.stringWidth(getText()) + 25, metrics.getHeight() + 5);
-		
-		return d;
+		return new Dimension(metrics.stringWidth(getText()) + 25, metrics.getHeight() + 5);
 	}
 	
 	public Dimension getMaximumSize() {
 		FontMetrics metrics = getFontMetrics(getFont());
-		Dimension d = new Dimension(metrics.stringWidth(getText()) + 25, metrics.getHeight() + 5);
-		
-		return d;
+		return new Dimension(metrics.stringWidth(getText()) + 25, metrics.getHeight() + 5);
 	}
 	
 	public Dimension getMinimumSize() {
 		FontMetrics metrics = getFontMetrics(getFont());
-		Dimension d = new Dimension(metrics.stringWidth(getText()) + 25, metrics.getHeight() + 5);
-		
-		return d;
+		return new Dimension(metrics.stringWidth(getText()) + 25, metrics.getHeight() + 5);
 	}
 	
 	public Dimension getSize() {
 		FontMetrics metrics = getFontMetrics(getFont());
-		Dimension d = new Dimension(metrics.stringWidth(getText()) + 25, metrics.getHeight() + 5);
-		
-		return d;
+		return new Dimension(metrics.stringWidth(getText()) + 25, metrics.getHeight() + 5);
 	}
 	
     public synchronized void addActionListener(ActionListener listener) {
@@ -382,7 +375,7 @@ public class Hyperlink extends JLabel implements MouseListener {
         setCursor(new Cursor(12));
 		
         if(!m_isClicked) {
-            if(m_URL != null && m_URL.trim().compareTo("") != 0) {
+            if(m_URL != null && "".compareTo(m_URL.trim()) != 0) {
                 setForeground(m_activeColor);
             }
 		}
@@ -422,8 +415,9 @@ public class Hyperlink extends JLabel implements MouseListener {
     }
 	
     private void log(String msg) {
-        if(m_debug || m_debugAll) {
+		if(m_debug) {
             System.out.println(CLASSNAME + ": " + msg);
 		}
     }
 }
+ 
