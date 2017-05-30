@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY hig_user_login_util AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/hig_user_login_util.pkb-arc   1.2   Feb 22 2017 11:09:44   Chris.Baugh  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/hig_user_login_util.pkb-arc   1.3   May 30 2017 10:49:40   Chris.Baugh  $
 --       Module Name      : $Workfile:   hig_user_login_util.pkb  $
---       Date into PVCS   : $Date:   Feb 22 2017 11:09:44  $
---       Date fetched Out : $Modtime:   Feb 16 2017 11:33:02  $
---       PVCS Version     : $Revision:   1.2  $
+--       Date into PVCS   : $Date:   May 30 2017 10:49:40  $
+--       Date fetched Out : $Modtime:   May 25 2017 15:55:36  $
+--       PVCS Version     : $Revision:   1.3  $
 --
 --   Author : Vikas Mhetre
 --
@@ -19,7 +19,7 @@ CREATE OR REPLACE PACKAGE BODY hig_user_login_util AS
 --
 -- all global package variables here
 --
-   g_body_sccsid     constant varchar2(30) :='"$Revision:   1.2  $"';
+   g_body_sccsid     constant varchar2(30) :='"$Revision:   1.3  $"';
 --
    g_package_name    CONSTANT  VARCHAR2(30)   := 'hig_user_login_util';
 --
@@ -74,7 +74,8 @@ CREATE OR REPLACE PACKAGE BODY hig_user_login_util AS
         key_string       => g_key,
         decrypted_string => l_answer );
 --  
-    RETURN l_answer;
+    RETURN TRIM(BOTH CHR(0) FROM l_answer);
+--
   END decrypt_answer;
 --
 --------------------------------------------------------------------------------------------------
@@ -166,7 +167,7 @@ CREATE OR REPLACE PACKAGE BODY hig_user_login_util AS
     utl_smtp.close_data(conn);
     utl_smtp.quit(conn);
 --
-    RETURN 'success';
+    RETURN 'Y';
 --
   EXCEPTION 
     WHEN OTHERS THEN
@@ -191,41 +192,329 @@ CREATE OR REPLACE PACKAGE BODY hig_user_login_util AS
 --
 --------------------------------------------------------------------------------------------------
 --
-  FUNCTION validate_user_pwd_fn (p_username    hig_users.hus_username%TYPE,
-                                 p_password    VARCHAR2)
+/*#############################
+  # APIs used by HIGLOGN form #
+  #############################*/
+  
+--
+--------------------------------------------------------------------------------------------------
+--
+  FUNCTION validate_password (p_username    hig_users.hus_username%TYPE,
+                              p_password    VARCHAR2)
     RETURN VARCHAR2
   IS
-        lv_pwd_raw      RAW (128);
-        lv_enc_raw      RAW (2048);
-        lv_hash_found   VARCHAR2 (300);
-        --
-        CURSOR c_main (cp_user IN VARCHAR2)
-        IS
-              SELECT SUBSTR (spare4, 3, 40) hash,
-              SUBSTR (spare4, 43, 20) SALT,
-              spare4
-              FROM sys.user$
-              WHERE name = cp_user;
-        --
-        lv_user         c_main%ROWTYPE;
-        --
+    lv_pwd_raw      RAW (128);
+    lv_enc_raw      RAW (2048);
+    lv_hash_found   VARCHAR2 (300);
+    --
+    CURSOR c_main (cp_user IN VARCHAR2)
+    IS
+      SELECT SUBSTR (spare4, 3, 40) hash,
+             SUBSTR (spare4, 43, 20) SALT,
+             spare4
+       FROM sys.user$
+      WHERE name = cp_user;
+    --
+    lv_user         c_main%ROWTYPE;
+    --
   BEGIN
-        OPEN  c_main (UPPER (p_username));
-        FETCH c_main INTO lv_user;
-        CLOSE c_main;
+    --
+    OPEN  c_main (UPPER (p_username));
+    FETCH c_main INTO lv_user;
+    CLOSE c_main;
+    --
+    lv_pwd_raw := UTL_RAW.CAST_TO_RAW (p_password) || HEXTORAW (lv_user.salt);
+    --
+    lv_enc_raw := SYS.DBMS_CRYPTO.HASH (lv_pwd_raw, 3);
+    --
+    lv_hash_found := UTL_RAW.CAST_TO_VARCHAR2 (lv_enc_raw);
+    --
+    IF lv_enc_raw = lv_user.hash THEN
+          RETURN 'Y';
+    ELSE
+          RETURN 'N';
+    END IF;
+    --
+  END validate_password;
+--
+--------------------------------------------------------------------------------------------------
+--
+  FUNCTION get_user_id(pi_username  IN  VARCHAR2)
+    RETURN NUMBER
+  IS
+    --
+    CURSOR c1 IS
+    SELECT hus_user_id
+      FROM hig_users
+     WHERE hus_username = pi_username;
+     --
+     lv_return      hig_users.hus_user_id%TYPE;
+     lv_row_found   BOOLEAN;
+     --
+  BEGIN
+    --
+    OPEN c1;
+    FETCH c1 INTO lv_return;
+    lv_row_found := c1%FOUND;
+    CLOSE c1;
+    --
+    IF lv_row_found THEN
+      --
+      RETURN lv_return;
+      --
+    ELSE
+      --
+      RETURN 0;
+      --
+    END IF;
+    --
+  END get_user_id;
+--
+--------------------------------------------------------------------------------------------------
+--
+  FUNCTION email_unlock(pi_username  IN  VARCHAR2)
+    RETURN VARCHAR2
+  IS
+    --
+    CURSOR c1 IS
+    SELECT 1
+      FROM nm_mail_users,
+           hig_users
+     WHERE nmu_hus_user_id = hus_user_id
+       AND hus_username = pi_username;
+    --
+    CURSOR c2 IS
+    SELECT 1
+      FROM nm_mail_users,
+           hig_users
+     WHERE nmu_hus_user_id = hus_user_id
+       AND hus_is_hig_owner_flag = 'Y'
+       AND nmu_email_address IS NOT NULL;
+    --
+    lv_row_found       BOOLEAN;
+    lv_dummy           PLS_INTEGER;
+    --
+  BEGIN
+    --
+    OPEN c1;
+    FETCH c1 INTO lv_dummy;
+    lv_row_found := c1%FOUND;
+    CLOSE c1;
+    --
+    IF NOT lv_row_found  THEN
+      --
+      RETURN 'N';
+      --
+    ELSE
+      --
+      OPEN c2;
+      FETCH c2 INTO lv_dummy;
+      lv_row_found := c2%FOUND;
+      CLOSE c2;
+      
+      IF lv_row_found THEN
         --
-        lv_pwd_raw := UTL_RAW.CAST_TO_RAW (p_password) || HEXTORAW (lv_user.salt);
+        RETURN 'Y';
         --
-        lv_enc_raw := SYS.DBMS_CRYPTO.HASH (lv_pwd_raw, 3);
+      ELSE
         --
-        lv_hash_found := UTL_RAW.CAST_TO_VARCHAR2 (lv_enc_raw);
-        --
-        IF lv_enc_raw = lv_user.hash THEN
-              RETURN 'Y';
-        ELSE
-              RETURN 'N';
-        END IF;
-  END validate_user_pwd_fn;
+        RETURN 'N';
+      END IF;
+    END IF;
+    --
+  END email_unlock;
+--
+--------------------------------------------------------------------------------------------------
+--
+  FUNCTION email_system_admin(pi_username  IN  VARCHAR2)
+    RETURN VARCHAR2
+  IS
+    --
+    CURSOR c1 IS
+    SELECT hus_username
+      FROM nm_mail_users,
+           hig_users
+     WHERE nmu_hus_user_id = hus_user_id
+       AND hus_is_hig_owner_flag = 'Y'
+       AND nmu_email_address IS NOT NULL;
+    --
+    lv_sys_username   hig_users.hus_username%TYPE;
+    lv_email_text     VARCHAR2(32767);
+    lv_result         VARCHAR2(32767);
+    --
+  BEGIN
+    --
+    lv_email_text := 'EXOR System Administrator,' || CHR(10) || 
+                     'This is to notify you that user ' || UPPER(pi_username) || ' has locked their EXOR user account and requires it to be unlocked.'|| CHR(10) ||
+                     'Thank you. ';
+ 	  --
+    OPEN c1;
+    FETCH c1 INTO lv_sys_username;
+    CLOSE c1;
+    --
+    lv_result := send_mail(msg_from_uname => NVL(pi_username,SYS_CONTEXT('NM3_SECURITY_CTX', 'USERNAME'))
+                          ,msg_to_uname   => lv_sys_username
+                          ,msg_subject    => 'Exor Auto-generated unlock account Request'
+                          ,msg_text       => lv_email_text
+                          );
+    --
+    RETURN lv_result;
+    --
+  END email_system_admin;
+--
+--------------------------------------------------------------------------------------------------
+--
+  FUNCTION check_birthdate(pi_user_id   IN hig_user_access_security.huas_hus_user_id%TYPE
+                          ,pi_birthdate IN VARCHAR2)
+    RETURN VARCHAR2
+  IS
+    --
+    CURSOR c1 IS
+    SELECT TO_CHAR(huas_birthdate, 'DD-MON-RRRR')
+      FROM hig_user_access_security
+     WHERE huas_hus_user_id = pi_user_id;
+    --
+    lv_dob         VARCHAR2(11);
+    lv_row_found   BOOLEAN;
+    --
+  BEGIN
+    --
+    OPEN c1;
+    FETCH c1 INTO lv_dob;
+    lv_row_found := c1%FOUND;
+    CLOSE c1;
+    --
+    IF NOT lv_row_found THEN
+      --
+      RETURN 'Not Defined';
+      --
+    ELSIF UPPER(pi_birthdate) = UPPER(lv_dob) THEN
+      --
+      RETURN 'Y';
+      --
+    ELSE 
+      --
+      RETURN 'N';
+      --
+    END IF;
+    --
+  END check_birthdate;
+--
+--------------------------------------------------------------------------------------------------
+--
+  FUNCTION check_security_answer(pi_user_id          IN  hig_user_access_security.huas_hus_user_id%TYPE
+                                ,pi_security_answer  IN  VARCHAR2)
+    RETURN VARCHAR2
+  IS
+    --
+    CURSOR c1 IS
+    SELECT huas_answer
+      FROM hig_user_access_security, hig_users 
+     WHERE huas_hus_user_id = hus_user_id         	                                                    
+       AND hus_user_id =  pi_user_id;
+    --
+    lv_security_answer   VARCHAR2(32767);
+    lv_decrypt_answer    VARCHAR2(32767);
+    lv_row_found         BOOLEAN;
+    --
+  BEGIN
+    --
+    OPEN c1;
+    FETCH c1 INTO lv_security_answer;
+    lv_row_found := c1%FOUND;
+    CLOSE c1;
+    --
+    IF NOT lv_row_found THEN
+      --
+      RETURN 'Not Defined';
+      --
+    END IF;
+    --
+    lv_decrypt_answer := hig_user_login_util.decrypt_answer(lv_security_answer);
+    --
+    IF UPPER(lv_decrypt_answer) = UPPER(pi_security_answer) THEN
+      --
+      RETURN 'Y';  
+      --
+    ELSE       
+      --
+      RETURN 'N';   
+      --
+    END IF;
+    --
+  END check_security_answer;
+--
+--------------------------------------------------------------------------------------------------
+--
+  PROCEDURE get_login_image(po_cursor  OUT SYS_REFCURSOR)
+  IS 
+    --
+  BEGIN
+    --
+    OPEN po_cursor FOR 'SELECT hig.get_sysopt(''LOGONIMAGE'')'||
+                       '  FROM dual';
+    --
+  END get_login_image;
+--
+--------------------------------------------------------------------------------------------------
+--
+  PROCEDURE get_user_security_question(pi_user_id   IN  hig_user_access_security.huas_hus_user_id%TYPE
+                                      ,po_cursor    OUT SYS_REFCURSOR)
+  IS
+    --
+  BEGIN
+    --
+    OPEN po_cursor FOR 'SELECT hc.hco_meaning security_question'||
+		                   '  FROM hig_domains hd, '||
+		                   '       hig_codes hc, '||
+		                   '       hig_user_access_security huas '||
+		                   '  WHERE hd.hdo_domain = hc.hco_domain (+) '||
+		                   '  AND hc.hco_code = huas.huas_ques_code '||
+		                   '  AND huas.huas_hus_user_id = ' || pi_user_id || 
+		                   '  AND hd.hdo_domain = ''SECURITY_QUESTIONS'''||
+		                   '  AND hc.hco_end_date IS NULL';
+    --
+  END get_user_security_question;
+--
+--------------------------------------------------------------------------------------------------
+--
+  FUNCTION generate_user_password(pi_username  IN  VARCHAR2)
+    RETURN VARCHAR2
+  IS
+     --
+     lv_new_password   VARCHAR2(32767);
+     lv_email_text     VARCHAR2(32767);
+     lv_result         VARCHAR2(32767);
+     --
+   BEGIN
+     -- Generate the new password
+     lv_new_password := sys.exor_password_engine.f_generate(pi_username);
+   	                               
+     -- Define Email text
+     lv_email_text := 'Dear EXOR user,' || CHR(10) ||
+   	                  'A new password has been generated by EXOR for you. Please use this new password, along with your username, the next time you login to EXOR.' || CHR(10) ||
+   	                  'Login Id: ' || UPPER(pi_username) || '' || CHR(10) ||
+   	                  'Password: ' || lv_new_password || '' || CHR(10) ||
+   	                  'You will be prompted to change this password the first time you login.' || CHR(10) ||
+   	                  'Thank you. ';
+   	                                 
+     -- so now get the email id of the user from the system and send the temporary one time password to user on the registered email 
+     lv_result := send_mail(msg_from_uname => NULL
+                           ,msg_to_uname   => pi_username
+                           ,msg_subject    => 'Exor Auto-generated Password Notification'
+                           ,msg_text       => lv_email_text
+                           );
+   		
+   	IF lv_result = 'Y' THEN		
+      
+       -- change the password
+       nm3ddl.change_user_password(pi_user       => pi_username
+                                  ,pi_new_passwd => lv_new_password);
+    END IF;
+    
+    RETURN lv_result;
+   
+   END;
 --
 --------------------------------------------------------------------------------------------------
 --
