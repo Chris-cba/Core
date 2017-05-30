@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE hig_user_login_util AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/hig_user_login_util.pkh-arc   1.2   Feb 22 2017 11:10:04   Chris.Baugh  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/hig_user_login_util.pkh-arc   1.3   May 30 2017 10:50:00   Chris.Baugh  $
 --       Module Name      : $Workfile:   hig_user_login_util.pkh  $
---       Date into PVCS   : $Date:   Feb 22 2017 11:10:04  $
---       Date fetched Out : $Modtime:   Feb 16 2017 11:34:22  $
---       PVCS Version     : $Revision:   1.2  $
+--       Date into PVCS   : $Date:   May 30 2017 10:50:00  $
+--       Date fetched Out : $Modtime:   May 26 2017 11:43:34  $
+--       PVCS Version     : $Revision:   1.3  $
 --
 --   Author : Vikas Mhetre
 --
@@ -19,7 +19,7 @@ CREATE OR REPLACE PACKAGE hig_user_login_util AS
 --
 -- all global package variables here
 --
-   g_sccsid     constant varchar2(30) :='"$Revision:   1.2  $"';
+   g_sccsid     constant varchar2(30) :='"$Revision:   1.3  $"';
 
 -- This function returns the current SCCS version
   FUNCTION get_version
@@ -37,29 +37,64 @@ CREATE OR REPLACE PACKAGE hig_user_login_util AS
 --
 -----------------------------------------------------------------------------
 --
-  FUNCTION decrypt_answer( pi_string IN VARCHAR2) RETURN VARCHAR2;
---
------------------------------------------------------------------------------
---
-  FUNCTION send_mail(msg_from_uname hig_users.hus_username%TYPE,
-                     msg_to_uname   hig_users.hus_username%TYPE,
-                     msg_subject    VARCHAR2,
-                     msg_text       VARCHAR2 
-                     ) RETURN VARCHAR2;
---
------------------------------------------------------------------------------
---
   PROCEDURE alter_profile(alter_profile_text IN VARCHAR2,
                           error_code         OUT NUMBER,
                           error_message      OUT VARCHAR2);
 --
 -----------------------------------------------------------------------------
 --
-  FUNCTION validate_user_pwd_fn (p_username    hig_users.hus_username%TYPE,
-                                 p_password    VARCHAR2)
+/*#############################
+  # APIs used by HIGLOGN form #
+  #############################*/
+--
+-----------------------------------------------------------------------------
+-- 
+  FUNCTION validate_password (p_username    hig_users.hus_username%TYPE,
+                              p_password    VARCHAR2)
     RETURN VARCHAR2;
 --
 -----------------------------------------------------------------------------
+--
+  FUNCTION get_user_id(pi_username  IN  VARCHAR2)
+    RETURN NUMBER;
+--
+--------------------------------------------------------------------------------------------------
+--
+  FUNCTION email_unlock(pi_username  IN  VARCHAR2)
+    RETURN VARCHAR2;
+--
+--------------------------------------------------------------------------------------------------
+--
+  FUNCTION email_system_admin(pi_username  IN  VARCHAR2)
+    RETURN VARCHAR2;
+--
+--------------------------------------------------------------------------------------------------
+--
+  FUNCTION check_birthdate(pi_user_id   IN hig_user_access_security.huas_hus_user_id%TYPE
+                          ,pi_birthdate IN VARCHAR2)
+    RETURN VARCHAR2;
+--
+--------------------------------------------------------------------------------------------------
+--
+  FUNCTION check_security_answer(pi_user_id          IN  hig_user_access_security.huas_hus_user_id%TYPE
+                                ,pi_security_answer  IN  VARCHAR2)
+    RETURN VARCHAR2;
+--
+--------------------------------------------------------------------------------------------------
+--
+  PROCEDURE get_login_image(po_cursor  OUT SYS_REFCURSOR);
+--
+--------------------------------------------------------------------------------------------------
+--
+  PROCEDURE get_user_security_question(pi_user_id   IN  hig_user_access_security.huas_hus_user_id%TYPE
+                                      ,po_cursor    OUT SYS_REFCURSOR);
+--
+--------------------------------------------------------------------------------------------------
+--
+  FUNCTION generate_user_password(pi_username  IN  VARCHAR2)
+    RETURN VARCHAR2;
+--
+--------------------------------------------------------------------------------------------------
 --
 END hig_user_login_util;
 /
