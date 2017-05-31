@@ -1,12 +1,12 @@
 /**
  *	PVCS Identifiers :-
  *
- *		PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/Java/login/bentley/exor/login/LoginUtil.java-arc   1.0.1.0   Apr 21 2017 07:59:22   Upendra.Hukeri  $
+ *		PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/Java/login/bentley/exor/login/LoginUtil.java-arc   1.0.1.1   May 31 2017 07:09:12   Upendra.Hukeri  $
  *		Module Name      : $Workfile:   LoginUtil.java  $
  *		Author			 : $Author:   Upendra.Hukeri  $
- *		Date Into PVCS   : $Date:   Apr 21 2017 07:59:22  $
- *		Date Fetched Out : $Modtime:   Apr 21 2017 07:46:48  $
- *		PVCS Version     : $Revision:   1.0.1.0  $
+ *		Date Into PVCS   : $Date:   May 31 2017 07:09:12  $
+ *		Date Fetched Out : $Modtime:   May 31 2017 07:07:46  $
+ *		PVCS Version     : $Revision:   1.0.1.1  $
  *
  *	This class is used to make a connection to Oracle Database using a WebLogic Data Source
  *	(jdbc/<TNS-NAME>_LOGINDS) and fire queries using it, when connection is not available from Oracle 
@@ -19,6 +19,8 @@
  */
 
 package bentley.exor.login;
+
+import bentley.exor.log.IMSLogger;
 
 import java.awt.*;
 import java.awt.image.*;
@@ -41,6 +43,7 @@ import oracle.jdbc.*;
 public class LoginUtil {
 	private String formsURL   = null;
 	private String dataSource = null;
+	private static final String errorMessage = "Something went wrong!\nPlease contact your System Administrator.";
 	
 	public static String changePassword(String connectionString, String userName, String oldPassword, String newPassword) {
 		Connection conn   = null;
@@ -48,30 +51,34 @@ public class LoginUtil {
 		String     result = null;
 			
 		try {
-			ExorDebugger.reportDebugInfo("changePassword(): Changing password...");
+			IMSLogger.log("changePassword(): Changing password...", IMSLogger.DEBUG);
 			
 			if ((connectionString != null) && (userName != null) && (oldPassword != null) && (newPassword != null)) {
 				connectionString = "jdbc:oracle:oci8:@" + connectionString;
 				
 				info   = new Properties();
 				
-				info.put("user", userName);
-				info.put("password", oldPassword);
-				info.put("OCINewPassword", newPassword);
+				info.setProperty("user", userName);
+				info.setProperty("password", oldPassword);
+				info.setProperty("OCINewPassword", newPassword);
 				
 				conn = DriverManager.getConnection(connectionString, info);
 				
-				result = "success";
-				ExorDebugger.reportDebugInfo("changePassword(): Password changed successfully");
+				if(conn != null) {
+					result = "success";
+				} else {
+					result = errorMessage;
+				}
+				
+				IMSLogger.log("changePassword(): Password changed successfully", IMSLogger.DEBUG);
 			} else {
 				result = "Invalid parameters passed";
-				ExorDebugger.reportDebugInfo("changePassword(): Invalid parameters passed");
+				IMSLogger.log("changePassword(): Invalid parameters passed", IMSLogger.DEBUG);
 			}
 		} catch(Exception changePasswordException) {
-			ExorDebugger.reportDebugInfo("changePassword(): changePasswordException Exception caught...");
-			changePasswordException.printStackTrace();
+			logException(changePasswordException, "changePassword", IMSLogger.ERROR);
 			
-			result = changePasswordException.getMessage();
+			result = errorMessage;
 		}
 		
 		return result;
@@ -82,7 +89,7 @@ public class LoginUtil {
 	}
 	
 	private OracleConnection getOracleConnection() throws Exception {
-		ExorDebugger.reportDebugInfo("getOracleConnection(): Getting Oracle DB Connection...");
+		IMSLogger.log("getOracleConnection(): Getting Oracle DB Connection...", IMSLogger.DEBUG);
 		
 		Hashtable env = new Hashtable();
 		env.put(Context.INITIAL_CONTEXT_FACTORY, "weblogic.jndi.WLInitialContextFactory");
@@ -94,96 +101,11 @@ public class LoginUtil {
 		
 		//you will need to create a Data Source with JNDI name LOGINDS
 		ds   = (javax.sql.DataSource) context.lookup (dataSource);
-		conn = (OracleConnection) ds.getConnection();
-		
-		return conn; 
-	}
-	
-	public String doSQL(String sqlStmt, String mode) throws Exception {
-		OracleConnection  conn      = getOracleConnection();
-		ResultSet 		  rs        = null;
-		Statement         stmt      = null;
-		CallableStatement cstmt  	= null;
-		String            result    = null;
-		
-		try {
-			if(mode.equalsIgnoreCase("select")) {
-				ExorDebugger.reportDebugInfo("doSQL(): Performing SELECT Query...");
-				
-				stmt = conn.createStatement();
-				rs	 = stmt.executeQuery(sqlStmt);
-				
-				int              fetchSize = 0;
-				
-				while (rs.next()) {
-					fetchSize++;
-					
-					if(fetchSize > 1) {
-						result = "Multiple records";
-						break;
-					} else {
-						result = rs.getString(1).trim();
-					}
-				}
-				
-				if(fetchSize < 1) {
-					result = "No rows selected";
-				}
-			} else if(mode.equalsIgnoreCase("update")) {
-				ExorDebugger.reportDebugInfo("doSQL(): Processing UPDATE Statement...");
-				
-				stmt   = conn.createStatement();
-				result = java.lang.Integer.toString(stmt.executeUpdate(sqlStmt)) + " rows processed";
-			} else if(mode.equalsIgnoreCase("execute")) {
-				ExorDebugger.reportDebugInfo("doSQL(): Processing EXECUTE Statement...");
-				
-				cstmt  = conn.prepareCall(sqlStmt);
-				result = java.lang.Boolean.toString(cstmt.execute());
-			}
-		} finally {
-			if(rs != null) {
-				rs.close();
-			}
-			
-			if(stmt != null) {
-				stmt.close();
-			}
-			
-			if(cstmt != null) {
-				cstmt.close();
-			}
-			
-			if(conn != null) {
-				conn.close();
-			}
-		}
-		
-		return result;
+		return (OracleConnection) ds.getConnection();
 	}
 	
 	private void setFormsURL(String formsURL) {
 		this.formsURL = "t3://" + formsURL;
-	}
-	
-	public static String dbUtility(String formsURL, String sqlStmt, String mode, String dataSource) {
-		String result = null;
-		
-		try {
-			LoginUtil dsc = new LoginUtil();
-			
-			dsc.setFormsURL(formsURL);
-			dsc.setDataSource(dataSource);
-			result = dsc.doSQL(sqlStmt, mode);
-			
-			return result;
-		} catch(Exception dbUtilityException) {
-			ExorDebugger.reportDebugInfo("dbUtility(): dbUtilityException Exception caught...");
-			dbUtilityException.printStackTrace();
-			
-			result = "ORA-20099: " + dbUtilityException.getMessage();
-		}
-		
-		return result;
 	}
 	
 	/**
@@ -192,7 +114,7 @@ public class LoginUtil {
      * @param imagePath - java.lang.String - full path of the image
      * @return java.lang.String[]
      */
-	public static String[] getAppServImage(String imagePath) throws Exception {
+	public static String[] getAppServImage() {
 		File            imageFile          = null;
 		FileInputStream imageInFile        = null;
 		String          imageDataString    = null;
@@ -208,51 +130,399 @@ public class LoginUtil {
 		 */
 		int             arrElmtLen         = 4096;
 		
-		if ((imagePath != null) && (!imagePath.equalsIgnoreCase("null"))) {
-			try {
-				imageFile   = new File(imagePath);
-				imageInFile = new FileInputStream(imageFile);
-				imageData   = new byte[(int) imageFile.length()];
+		try {
+			String classPath = LoginUtil.class.getProtectionDomain().getCodeSource().getLocation().toExternalForm();
+			String imagePath = classPath.substring(classPath.indexOf('/') + 1, classPath.lastIndexOf('/') + 1) + "resources/login_background.jpg";
+			
+			imageFile   = new File(imagePath);
+			imageInFile = new FileInputStream(imageFile);
+			imageData   = new byte[(int) imageFile.length()];
+			
+			if(ImageIO.read(imageFile) != null) {
+				IMSLogger.log("getAppServImage(): reading image into a byte array...", IMSLogger.DEBUG);
+				int bytesRead = imageInFile.read(imageData);
 				
-				ExorDebugger.reportDebugInfo("getAppServImage(): reading image into a byte array...");
-				imageInFile.read(imageData);
-				imageInFile.close();
-				
-				ExorDebugger.reportDebugInfo("getAppServImage(): converting image to a String...");
-				imageDataString = ImageEncoderAndDecoder.encodeImage(imageData);
-				
-				if(imageDataString.length()%arrElmtLen == 0) {
-					imageDataStringArr = new String[imageDataString.length()/arrElmtLen];
+				if(bytesRead > 0) {
+					IMSLogger.log("getAppServImage(): converting image to a String...", IMSLogger.DEBUG);
+					imageDataString = ImageEncoderAndDecoder.encodeImage(imageData);
+					
+					int imageDataStringLen = imageDataString.length();
+					
+					if(imageDataStringLen%arrElmtLen == 0) {
+						imageDataStringArr = new String[imageDataStringLen/arrElmtLen];
+					} else {
+						imageDataStringArr = new String[imageDataStringLen/arrElmtLen + 1];
+					}
+					
+					int start = 0;
+					int end   = 0;
+					
+					IMSLogger.log("getAppServImage(): splitting image String into a String array - each element of length 4096...", IMSLogger.DEBUG);
+					
+					for(int i=0; i<imageDataStringArr.length - 1; i++) {
+						end  = (i+1)*(arrElmtLen + 1) - (i + 1);
+						
+						imageDataStringArr[i] = imageDataString.substring(start, end);
+						
+						start = end;
+					}
+					
+					int imgLen = imageDataStringArr.length;
+					
+					imageDataStringArr[imgLen - 1] = imageDataString.substring(start);
 				} else {
-					imageDataStringArr = new String[imageDataString.length()/arrElmtLen + 1];
-				}
-				
-				int start = 0;
-				int end   = 0;
-				
-				ExorDebugger.reportDebugInfo("getAppServImage(): splitting image String into a String array - each element of length " + arrElmtLen + "...");
-				for(int i=0; i<imageDataStringArr.length - 1; i++) {
-					end  = (i+1)*(arrElmtLen + 1) - (i + 1);
+					imageDataStringArr = new String[1];
+					imageDataStringArr[0] = "1";
 					
-					imageDataStringArr[i] = imageDataString.substring(start, end);
-					
-					start = end;
+					IMSLogger.log("getAppServImage(): Bad image", IMSLogger.ERROR);
 				}
-				
-				int imgLen = imageDataStringArr.length;
-				
-				imageDataStringArr[imgLen - 1] = imageDataString.substring(start);
-			} catch (Exception e) {
+			} else {
 				imageDataStringArr = new String[1];
-				imageDataStringArr[0] = "ORA-20099: " + e.getMessage();
-				e.printStackTrace();
+				imageDataStringArr[0] = "1";
+				
+				IMSLogger.log("getAppServImage(): NOT an image", IMSLogger.ERROR);
 			}
-        } else {
+		} catch (FileNotFoundException fnfe) {
 			imageDataStringArr = new String[1];
-			imageDataStringArr[0] = "ORA-20099: null Image Path passed";
-			ExorDebugger.reportDebugInfo("getAppServImage(): null Image Path passed");
+			imageDataStringArr[0] = "0";
+			
+			IMSLogger.log("getAppServImage(): Image not found", IMSLogger.TRACE);
+		} catch (Exception e) {
+			imageDataStringArr = new String[1];
+			imageDataStringArr[0] = "1";
+			
+			logException(e, "getAppServImage", IMSLogger.ERROR);
+		} finally {
+			try {
+				if(imageInFile != null) {
+					imageInFile.close();
+				}
+			} catch(IOException ioe) {
+				logException(ioe, "getAppServImage", IMSLogger.WARN);
+			}
+		}
+		return imageDataStringArr;
+	}
+	
+	public static String validatePassword(String formsURL, String dataSource, String username, String password) {
+		String logMessage = formDebugMessage("validatePassword", "Forms URL", formsURL, "Datasource", dataSource, "Username", username, "Password", "*******");
+		IMSLogger.log(logMessage, IMSLogger.DEBUG);
+		
+		OracleConnection  conn    = null;
+		CallableStatement cstmt   = null;
+		String            result  = null;
+		String 			  sqlStmt = null;
+		
+		try {
+			LoginUtil dsc = new LoginUtil();
+			dsc.setFormsURL(formsURL);
+			dsc.setDataSource(dataSource);
+			conn = dsc.getOracleConnection();
+			
+			sqlStmt = "{? = call hig_user_login_util.validate_password(?, ?)}";
+			cstmt  = conn.prepareCall(sqlStmt);
+			cstmt.registerOutParameter(1, java.sql.Types.VARCHAR);
+			cstmt.setString(2, username);
+			cstmt.setString(3, password);
+			cstmt.execute();
+			
+			result = cstmt.getString(1);
+			
+			return result;
+		} catch(Exception validatePasswordException) {
+			logException(validatePasswordException, "validatePassword", IMSLogger.ERROR);
+			return errorMessage;
+		} finally {
+			closeOracle("validatePassword", cstmt, conn);
+		}
+	}
+	
+	public static int getUserId(String formsURL, String dataSource, String username) {
+		String logMessage = formDebugMessage("getUserId", "Forms URL", formsURL, "Datasource", dataSource, "Username", username);
+		IMSLogger.log(logMessage, IMSLogger.DEBUG);
+		
+		OracleConnection  conn    = null;
+		CallableStatement cstmt   = null;
+		int            	  result  = -1;
+		String 			  sqlStmt = null;
+		
+		try {
+			LoginUtil dsc = new LoginUtil();
+			dsc.setFormsURL(formsURL);
+			dsc.setDataSource(dataSource);
+			conn = dsc.getOracleConnection();
+			
+			sqlStmt = "{? = call hig_user_login_util.get_user_id(?)}";
+			cstmt  = conn.prepareCall(sqlStmt);
+			cstmt.registerOutParameter(1, java.sql.Types.NUMERIC);
+			cstmt.setString(2, username);
+			cstmt.execute();
+			
+			result = cstmt.getInt(1);
+		} catch(Exception getUserIdException) {
+			logException(getUserIdException, "getUserId", IMSLogger.ERROR);
+		} finally {
+			closeOracle("getUserId", cstmt, conn);
 		}
 		
-		return imageDataStringArr;
+		return result;
+	}
+	
+	public static String emailUnlock(String formsURL, String dataSource, String username) {
+		String logMessage = formDebugMessage("emailUnlock", "Forms URL", formsURL, "Datasource", dataSource, "Username", username);
+		IMSLogger.log(logMessage, IMSLogger.DEBUG);
+		
+		OracleConnection  conn    = null;
+		CallableStatement cstmt   = null;
+		String            result  = null;
+		String 			  sqlStmt = null;
+		
+		try {
+			LoginUtil dsc = new LoginUtil();
+			dsc.setFormsURL(formsURL);
+			dsc.setDataSource(dataSource);
+			conn = dsc.getOracleConnection();
+			
+			sqlStmt = "{? = call hig_user_login_util.email_unlock(?)}";
+			cstmt  = conn.prepareCall(sqlStmt);
+			cstmt.registerOutParameter(1, java.sql.Types.VARCHAR);
+			cstmt.setString(2, username);
+			cstmt.execute();
+			
+			result = cstmt.getString(1);
+			
+			return result;
+		} catch(Exception getUserIdException) {
+			logException(getUserIdException, "emailUnlock", IMSLogger.ERROR);
+			return errorMessage;
+		} finally {
+			closeOracle("emailUnlock", cstmt, conn);
+		}
+	}
+	
+	public static String emailSystemAdmin(String formsURL, String dataSource, String username) {
+		String logMessage = formDebugMessage("emailSystemAdmin", "Forms URL", formsURL, "Datasource", dataSource, "Username", username);
+		IMSLogger.log(logMessage, IMSLogger.DEBUG);
+		
+		OracleConnection  conn    = null;
+		CallableStatement cstmt   = null;
+		String            result  = null;
+		String 			  sqlStmt = null;
+		
+		try {
+			LoginUtil dsc = new LoginUtil();
+			dsc.setFormsURL(formsURL);
+			dsc.setDataSource(dataSource);
+			conn = dsc.getOracleConnection();
+			
+			sqlStmt = "{? = call hig_user_login_util.email_system_admin(?)}";
+			cstmt  = conn.prepareCall(sqlStmt);
+			cstmt.registerOutParameter(1, java.sql.Types.VARCHAR);
+			cstmt.setString(2, username);
+			cstmt.execute();
+			
+			result = cstmt.getString(1);
+			
+			if("Y".equals(result)) {
+				return result;
+			} else {
+				throw new Exception(result);
+			}
+		} catch(Exception getUserIdException) {
+			logException(getUserIdException, "emailSystemAdmin", IMSLogger.ERROR);
+			return errorMessage;
+		} finally {
+			closeOracle("emailSystemAdmin", cstmt, conn);
+		}
+	}
+	
+	public static String checkBirthDate(String formsURL, String dataSource, int userId, String birthDate) {
+		String logMessage = formDebugMessage("checkBirthDate", "Forms URL", formsURL, "Datasource", dataSource, "User Id", String.valueOf(userId), "Birthdate", "*******");
+		IMSLogger.log(logMessage, IMSLogger.DEBUG);
+		
+		OracleConnection  conn    = null;
+		CallableStatement cstmt   = null;
+		String            result  = null;
+		String 			  sqlStmt = null;
+		
+		try {
+			LoginUtil dsc = new LoginUtil();
+			dsc.setFormsURL(formsURL);
+			dsc.setDataSource(dataSource);
+			conn = dsc.getOracleConnection();
+			
+			sqlStmt = "{? = call hig_user_login_util.check_birthdate(?, ?)}";
+			cstmt  = conn.prepareCall(sqlStmt);
+			cstmt.registerOutParameter(1, java.sql.Types.VARCHAR);
+			cstmt.setInt(2, userId);
+			cstmt.setString(3, birthDate);
+			cstmt.execute();
+			
+			result = cstmt.getString(1);
+			
+			return result;
+		} catch(Exception checkBirthDateException) {
+			logException(checkBirthDateException, "checkBirthDate", IMSLogger.ERROR);
+			return errorMessage;
+		} finally {
+			closeOracle("checkBirthDate", cstmt, conn);
+		}
+	}
+	
+	public static String checkSecurityAnswer(String formsURL, String dataSource, int userId, String securityAnswer) {
+		String logMessage = formDebugMessage("checkSecurityAnswer", "Forms URL", formsURL, "Datasource", dataSource, "User Id", String.valueOf(userId), "Security Answer", "*******");
+		IMSLogger.log(logMessage, IMSLogger.DEBUG);
+		
+		OracleConnection  conn    = null;
+		CallableStatement cstmt   = null;
+		String            result  = null;
+		String 			  sqlStmt = null;
+		
+		try {
+			LoginUtil dsc = new LoginUtil();
+			dsc.setFormsURL(formsURL);
+			dsc.setDataSource(dataSource);
+			conn = dsc.getOracleConnection();
+			
+			sqlStmt = "{? = call hig_user_login_util.check_security_answer(?, ?)}";
+			cstmt  = conn.prepareCall(sqlStmt);
+			cstmt.registerOutParameter(1, java.sql.Types.VARCHAR);
+			cstmt.setInt(2, userId);
+			cstmt.setString(3, securityAnswer);
+			cstmt.execute();
+			
+			result = cstmt.getString(1);
+			
+			return result;
+		} catch(Exception checkSecurityAnswerException) {
+			logException(checkSecurityAnswerException, "checkSecurityAnswer", IMSLogger.ERROR);
+			return errorMessage;
+		} finally {
+			closeOracle("checkSecurityAnswer", cstmt, conn);
+		}
+	}
+	
+	public static String getUserSecurityQuestion(String formsURL, String dataSource, int userId) {
+		String logMessage = formDebugMessage("getUserSecurityQuestion", "Forms URL", formsURL, "Datasource", dataSource, "User Id", String.valueOf(userId));
+		IMSLogger.log(logMessage, IMSLogger.DEBUG);
+		
+		OracleConnection  conn    = null;
+		CallableStatement cstmt   = null;
+		String            result  = null;
+		String 			  sqlStmt = null;
+		
+		try {
+			LoginUtil dsc = new LoginUtil();
+			dsc.setFormsURL(formsURL);
+			dsc.setDataSource(dataSource);
+			conn = dsc.getOracleConnection();
+			
+			sqlStmt = "{call hig_user_login_util.get_user_security_question(?, ?)}";
+			cstmt  = conn.prepareCall(sqlStmt);
+			cstmt.setInt(1, userId);
+			cstmt.registerOutParameter(2, OracleTypes.CURSOR);
+			cstmt.execute();
+			ResultSet rset = (ResultSet)cstmt.getObject(2);
+			
+			int fetchSize = 0;
+			while (rset.next()) {
+				fetchSize++;
+				
+				if(fetchSize > 1) {
+					result = "Multiple records";
+					break;
+				} else {
+					result = rset.getString(1);
+				}
+			}
+			
+			if(fetchSize < 1) {
+				result = "No record found";
+			}
+			
+			return result;
+		} catch(Exception getUserSecurityQuestionException) {
+			logException(getUserSecurityQuestionException, "getUserSecurityQuestion", IMSLogger.ERROR);
+			return errorMessage;
+		} finally {
+			closeOracle("getUserSecurityQuestion", cstmt, conn);
+		}
+	}
+	
+	public static String generateUserPassword(String formsURL, String dataSource, String username) {
+		String logMessage = formDebugMessage("generateUserPassword", "Forms URL", formsURL, "Datasource", dataSource, "Username", username);
+		IMSLogger.log(logMessage, IMSLogger.DEBUG);
+		
+		OracleConnection  conn    = null;
+		CallableStatement cstmt   = null;
+		String            result  = null;
+		String 			  sqlStmt = null;
+		
+		try {
+			LoginUtil dsc = new LoginUtil();
+			dsc.setFormsURL(formsURL);
+			dsc.setDataSource(dataSource);
+			conn = dsc.getOracleConnection();
+			
+			sqlStmt = "{? = call hig_user_login_util.generate_user_password(?)}";
+			cstmt  = conn.prepareCall(sqlStmt);
+			cstmt.registerOutParameter(1, java.sql.Types.VARCHAR);
+			cstmt.setString(2, username);
+			cstmt.execute();
+			
+			result = cstmt.getString(1);
+			
+			if("Y".equals(result)) {
+				return result;
+			} else {
+				throw new Exception(result);
+			}
+		} catch(Exception generateUserPasswordException) {
+			logException(generateUserPasswordException, "generateUserPassword", IMSLogger.ERROR);
+			return errorMessage;
+		} finally {
+			closeOracle("generateUserPassword", cstmt, conn);
+		}
+	}
+	
+	private static String formDebugMessage(String functionName, String... params) {
+		StringBuilder logMessage = new StringBuilder();
+		logMessage.append(functionName).append("()");
+		
+		int count = 1;
+		
+		for(String s:params) {
+			if(count%2 != 0) {
+				logMessage.append("\n\t").append(s).append(" - ");
+			} else {
+				logMessage.append(s);
+			}
+			
+			count++;
+		}
+		
+		return logMessage.toString();
+	}
+	
+	private static void logException(Exception e, String functionName, int logLevel) {
+		StringWriter errors = new StringWriter();
+		errors.append(functionName).append("() : Exception caught...\n");
+		e.printStackTrace(new PrintWriter(errors));
+		
+		IMSLogger.log(errors.toString(), logLevel);
+	}
+	
+	private static void closeOracle(String functionName, CallableStatement cstmt, OracleConnection conn) {
+		try {
+			if(cstmt != null) {
+				cstmt.close();
+			}
+			
+			if(conn != null) {
+				conn.close();
+			}
+		} catch(Exception closeException) {
+			logException(closeException, functionName, IMSLogger.WARN);
+		}
 	}
 }
