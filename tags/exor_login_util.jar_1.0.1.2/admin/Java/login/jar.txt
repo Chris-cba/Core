@@ -1,0 +1,3 @@
+javac -cp .\log4j.jar;.\weblogic.jar;.\frmall.jar;.\ojdbc6.jar;.\esapi.jar bentley\exor\log\*.java bentley\exor\login\*.java bentley\exor\*.java
+
+jar -cvfm exor_login_util.jar .\MANIFEST.MF bentley\exor\login\*.class bentley\exor\login\images\ bentley\exor\log\*.class bentley\exor\*.class
