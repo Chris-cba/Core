@@ -1,11 +1,11 @@
 /**
  *    PVCS Identifiers :-
  *
- *       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/Java/shapefile/bentley/exor/gis/SDE2SHP.java-arc   1.1   Aug 17 2015 07:25:06   Upendra.Hukeri  $
+ *       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/Java/shapefile/bentley/exor/gis/SDE2SHP.java-arc   1.2   May 31 2017 12:33:58   Upendra.Hukeri  $
  *       Module Name      : $Workfile:   SDE2SHP.java  $
- *       Date into SCCS   : $Date:   Aug 17 2015 07:25:06  $
- *       Date fetched Out : $Modtime:   Jul 31 2015 14:00:24  $
- *       SCCS Version     : $Revision:   1.1  $
+ *       Date into SCCS   : $Date:   May 31 2017 12:33:58  $
+ *       Date fetched Out : $Modtime:   May 31 2017 12:32:46  $
+ *       SCCS Version     : $Revision:   1.2  $
  *       Based on 
  *
  *
@@ -14,7 +14,7 @@
  *
  *    SDE2SHP.java
  ****************************************************************************************************
- *	  Copyright (c) 2015 Bentley Systems Incorporated.  All rights reserved.
+ *	  Copyright (c) 2017 Bentley Systems Incorporated.  All rights reserved.
  ****************************************************************************************************
  *
  */
@@ -412,14 +412,19 @@ public class SDE2SHP {
 					size = viewMD.getColumnDisplaySize(i);							
 				} else if (classTypeName.equals("java.math.BigDecimal") && viewMD.getScale(i) == 0) {
 					int precision = viewMD.getPrecision(i);
-							
-					if (precision <= 9) {
-						classTypeName = "java.lang.Integer";
-					} else if (precision <= 18) {
-						classTypeName = "java.lang.Long";
+					
+					if(precision > 0) {
+						if (precision <= 9) {
+							classTypeName = "java.lang.Integer";
+						} else if (precision <= 18) {
+							classTypeName = "java.lang.Long";
+						}
+						
+						size = precision;
+					} else {
+						size = 38;
 					}
 					
-					size = precision;
 				} else if (classTypeName.equals("java.math.BigDecimal") && viewMD.getScale(i) != 0) {
 					size = 38;
 				}
