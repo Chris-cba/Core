@@ -1,10 +1,10 @@
 Permissions: all-permissions
 Application-Name: Exor Login Utility (exor_login_util.jar)
-Class-Path: log4j.jar
+Class-Path: log4j.jar esapi.jar resources/
 
 Name: bentley/exor/
 Specification-Title: Java Helper API for Exor Login Security
-Specification-Version: 1.0
+Specification-Version: 1.0.1.1
 Specification-Vendor: Bentley Systems, Inc.
 Implementation-Title: bentley.exor
 Implementation-Version: 4.7.0.1
