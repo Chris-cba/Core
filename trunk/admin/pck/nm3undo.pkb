@@ -4,11 +4,11 @@ IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3undo.pkb-arc   2.32   Feb 24 2017 15:37:04   Rob.Coupe  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3undo.pkb-arc   2.33   Jun 15 2017 14:16:02   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm3undo.pkb  $
---       Date into PVCS   : $Date:   Feb 24 2017 15:37:04  $
---       Date fetched Out : $Modtime:   Feb 24 2017 15:36:38  $
---       PVCS Version     : $Revision:   2.32  $
+--       Date into PVCS   : $Date:   Jun 15 2017 14:16:02  $
+--       Date fetched Out : $Modtime:   Jun 13 2017 09:52:12  $
+--       PVCS Version     : $Revision:   2.33  $
 --
 --   Author : ITurnbull
 --
@@ -19,7 +19,7 @@ IS
 -- Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '"$Revision:   2.32  $"';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '"$Revision:   2.33  $"';
 --  g_body_sccsid is the SCCS ID for the package body
    g_package_name   CONSTANT VARCHAR2 (2000) := 'nm3undo';
 --
@@ -2009,11 +2009,13 @@ END undo_scheme;
       CURSOR c_check_parent (c_ne_id nm_elements.ne_id%TYPE)
       IS
          SELECT 1
-           FROM nm_members_all
-               ,nm_elements_all
-          WHERE ne_id = nm_ne_id_in
-            AND nm_ne_id_of = c_ne_id
-            AND ne_end_date IS NOT NULL;
+           FROM nm_elements
+          WHERE ne_id =
+                   Nm3net.get_parent_ne_id
+                          (c_ne_id,
+                           Nm3net.get_parent_type (Nm3net.Get_Nt_Type (c_ne_id)
+                                                  )
+                          );
 --
       l_parent_exists           NUMBER (1);
 --
@@ -2070,7 +2072,7 @@ END undo_scheme;
          FETCH c_check_parent
           INTO l_parent_exists;
 
-         IF c_check_parent%FOUND
+         IF c_check_parent%NOTFOUND
          THEN
             RAISE_APPLICATION_ERROR
                        (-20002,
@@ -2121,6 +2123,15 @@ END undo_scheme;
            BULK COLLECT INTO l_neh_ne_id;
            CLOSE cs_neh;
 
+           -- Unclose child elements
+           FORALL i IN 1 .. l_neh_ne_id.COUNT
+              UPDATE nm_elements_all
+                 SET ne_end_date = NULL
+               WHERE ne_id in (SELECT nm_ne_id_of
+                                 FROM nm_members_all
+                                WHERE nm_ne_id_in = l_neh_ne_id (i)
+                                   AND nm_end_date = v_close_date);
+           
            -- Unclose elements
            FORALL i IN 1 .. l_neh_ne_id.COUNT
               UPDATE nm_elements_all
