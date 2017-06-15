@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY nm3rsc AS
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3rsc.pkb-arc   2.14   Jul 20 2016 11:42:36   Chris.Baugh  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3rsc.pkb-arc   2.15   Jun 15 2017 14:13:12   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm3rsc.pkb  $
---       Date into PVCS   : $Date:   Jul 20 2016 11:42:36  $
---       Date fetched Out : $Modtime:   Jul 20 2016 11:21:50  $
---       PVCS Version     : $Revision:   2.14  $
+--       Date into PVCS   : $Date:   Jun 15 2017 14:13:12  $
+--       Date fetched Out : $Modtime:   Jun 13 2017 09:49:12  $
+--       PVCS Version     : $Revision:   2.15  $
 --
 --   Author : R.A. Coupe
 --
@@ -19,7 +19,7 @@ CREATE OR REPLACE PACKAGE BODY nm3rsc AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(30) :='"$Revision:   2.14  $"';
+   g_body_sccsid     CONSTANT  varchar2(30) :='"$Revision:   2.15  $"';
 
 --  g_body_sccsid is the SCCS ID for the package body
 --
@@ -227,26 +227,18 @@ END rescale_route;
 --
 -----------------------------------------------------------------------------
 --
-FUNCTION loop_check RETURN boolean IS
+FUNCTION loop_check RETURN Boolean IS
+dummy integer;
+begin
+   select 1 into dummy from dual 
+   where exists ( select 1 from v_nm_ordered_members ) -- not empty
+   and exists ( select 1 from v_nm_ordered_members where NVL(has_prior,0) != 1 ); -- check for no terminations
+   return FALSE;
+exception
+  when no_data_found then
+    return TRUE;
+end;
 
-  CURSOR c_loop_check IS
-    SELECT 1 FROM nm_rescale_write
-    WHERE s_ne_id = -1;
-
-  CURSOR c_no_members IS
-    SELECT 1 FROM nm_rescale_write;
-
-l_loop  boolean;
-l_dummy number;
-
-BEGIN
-  OPEN c_loop_check;
-  FETCH c_loop_check INTO l_dummy;
-  l_loop := c_loop_check%NOTFOUND;
-  CLOSE c_loop_check;
-
-  RETURN l_loop;
-END;
 --
 -----------------------------------------------------------------------------
 --
@@ -748,7 +740,7 @@ CURSOR C2 IS
                                                                       or a.ne_id = to_number(sys_context('NM3SQL', 'RSC_START'))
                                                                       OR (dir_flag = 1 AND nm_begin_mp > 0)
                                                                       OR (dir_flag = -1 AND nm_end_mp < ne_length)
-                                                                      and rownum = 1																	  
+                                                                      and rownum = 1                                                                      
                                                             UNION ALL
                                                             SELECT a.ne_id,
                                                                    b.ne_id,
