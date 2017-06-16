@@ -1,10 +1,10 @@
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/lb/install/exnm04070005en_updt55.sql-arc   1.1   Apr 26 2017 15:01:02   Rob.Coupe  $
+--       sccsid           : $Header:   //new_vm_latest/archives/lb/install/exnm04070005en_updt55.sql-arc   1.2   Jun 16 2017 10:49:16   Rob.Coupe  $
 --       Module Name      : $Workfile:   exnm04070005en_updt55.sql  $ 
---       Date into PVCS   : $Date:   Apr 26 2017 15:01:02  $
---       Date fetched Out : $Modtime:   Apr 26 2017 15:00:08  $
---       PVCS Version     : $Revision:   1.1  $
+--       Date into PVCS   : $Date:   Jun 16 2017 10:49:16  $
+--       Date fetched Out : $Modtime:   Jun 16 2017 10:48:30  $
+--       PVCS Version     : $Revision:   1.2  $
 --
 ----------------------------------------------------------------------------
 --   Copyright (c) 2015 Bentley Systems Incorporated.  All rights reserved.
@@ -78,10 +78,10 @@ Begin
   Into    n
   From    Hig_Products
   Where   Hpr_Product = 'LB' 
-  and hpr_version in ('4.2', '4,3', '4.4', '4.5');  
+  and hpr_version in ('4.2', '4,3', '4.4', '4.5', '4.7.0.0');  
   
   update Hig_Products
-  set hpr_version = '4.6'
+  set hpr_version = '4.7.0.0'
   Where Hpr_product = 'LB';
   
 --
@@ -98,10 +98,10 @@ Begin
 --  LB is installed, add the product code
       begin
 	    insert into hig_products ( hpr_product, hpr_product_name, hpr_version, hpr_key, hpr_sequence )
-        values ('LB', 'Location Bridge', '4.6', '76', 99);  
+        values ('LB', 'Location Bridge', '4.7.0.0', '76', 99);  
       exception
 	    when dup_val_on_index then
-		  update hig_products set hpr_version = '4.6' where hpr_product = 'LB';
+		  update hig_products set hpr_version = '4.7.0.0' where hpr_product = 'LB';
       end;
 --    else
 --      raise_application_error( -20001, 'LB packages are at an incorrect state for this upgrade');
@@ -616,8 +616,8 @@ BEGIN
 --
   hig2.upgrade(p_product        => 'LB'
               ,p_upgrade_script => 'exnm04070005en_updt55.sql'
-              ,p_remarks        => 'NET 4700 FIX 55 Build 5 - LB version 4.6.0.5'
-              ,p_to_version     => '4.6.0.5');
+              ,p_remarks        => 'NET 4700 FIX 55 Build 5 - LB version 4.7.0.0'
+              ,p_to_version     => '4.7.0.0');
 --
   commit;
 --
