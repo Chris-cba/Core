@@ -1,10 +1,10 @@
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/lb/install/lb_install.sql-arc   1.11   Oct 29 2015 09:38:04   Rob.Coupe  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/lb/install/lb_install.sql-arc   1.12   Jun 16 2017 10:43:18   Rob.Coupe  $
 --       Module Name      : $Workfile:   lb_install.sql  $
---       Date into PVCS   : $Date:   Oct 29 2015 09:38:04  $
---       Date fetched Out : $Modtime:   Oct 29 2015 09:38:26  $
---       PVCS Version     : $Revision:   1.11  $
+--       Date into PVCS   : $Date:   Jun 16 2017 10:43:18  $
+--       Date fetched Out : $Modtime:   Jun 16 2017 10:42:20  $
+--       PVCS Version     : $Revision:   1.12  $
 --
 --   Author : R.A. Coupe
 --
@@ -15,6 +15,25 @@
 -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
 ----------------------------------------------------------------------------
 --
+  
+WHENEVER SQLERROR EXIT
+
+DECLARE cnt NUMBER;
+BEGIN
+   SELECT COUNT(1) INTO cnt FROM hig_products WHERE hpr_product = 'LB';
+        -- Check if user is already exist or not
+   IF cnt <> 0 THEN
+      raise_application_error(-20001, 'LB Already Installed..');
+   END IF;
+
+   SELECT COUNT(1) INTO cnt FROM user_objects WHERE object_name = 'LB_GET';
+   IF cnt <> 0 THEN
+      raise_application_error(-20001, 'LB Already Installed..');
+   END IF;
+END;
+/
+
+WHENEVER SQLERROR CONTINUE
 
 Prompt Installation of Location Bridge
 
@@ -187,7 +206,7 @@ prompt Creating synonyms
 declare
   cursor c1 is
     select * from lb_objects l
-    where object_type in ('PACKAGE', 'TABLE', 'VIEW', 'PROCEDURE', 'SEQUENCE' );
+    where object_type in ('PACKAGE', 'TABLE', 'VIEW', 'PROCEDURE', 'SEQUENCE', 'PACKAGE BODY', 'TYPE' );
 begin
   if nvl(hig.get_sysopt('HIGPUBSYN'),'Y') = 'Y' 
   then
@@ -200,10 +219,17 @@ begin
 end;    
 /
 
+insert into hig_products 
+(hpr_product, hpr_product_name, hpr_version, hpr_key, hpr_sequence)
+values
+('LB', 'Location Bridge', '4.7.0.0', '76', 99)
+
+/
+
 insert into hig_upgrades
 (hup_product, date_upgraded, from_version, to_version, upgrade_script, executed_by, remarks )
 values
-('NET', sysdate, '4.0.0.0', '4.1.0.0', 'lb_install', user, 'Location Bridge development version 4.1' )
+('LB', sysdate, '4.7.0.0', '4.7.0.0', 'lb_install.sql', user, 'Location Bridge development version 4.7.0.0' )
 /
 
 commit;
