@@ -2,10 +2,10 @@ CREATE OR REPLACE PACKAGE BODY lb_path_reg
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_path_reg.pkb-arc   1.3   Jun 23 2017 14:20:46   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_path_reg.pkb-arc   1.4   Jun 23 2017 15:46:12   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_path_reg.pkb  $
-   --       Date into PVCS   : $Date:   Jun 23 2017 14:20:46  $
-   --       Date fetched Out : $Modtime:   Jun 23 2017 13:00:44  $
+   --       Date into PVCS   : $Date:   Jun 23 2017 15:46:12  $
+   --       Date fetched Out : $Modtime:   Jun 23 2017 15:44:28  $
    --       PVCS Version     : $Rev ision:   1.2  $
    --
    --   Author : R.A. Coupe
@@ -16,7 +16,7 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.3  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.4  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_path_reg';
 
@@ -64,6 +64,7 @@ AS
       --
       l_nt_list    VARCHAR2 (2000);
       --
+      l_user       VARCHAR2(100);
 
       FUNCTION get_nt_list (pi_nt IN ptr_vc_array_type)
          RETURN VARCHAR2
@@ -114,7 +115,20 @@ AS
       END;
 
       --
+      nm_debug.delete_debug(TRUE);
+      nm_debug.debug_on;
+      
+      select user into l_user from dual;
 
+      nm_debug.debug('current schema = '||l_user );
+            
+      execute immediate 'ALTER SESSION SET CURRENT_SCHEMA = WARWICK';
+
+      nm_debug.debug('schema after alter session = '||user );
+      
+      select user into l_user from dual;
+
+      nm_debug.debug('schema after select = '||l_user );
 
       BEGIN
          SDO_NET.CREATE_LOGICAL_NETWORK (pi_network_name,
@@ -129,9 +143,19 @@ AS
                                          pi_network_name || '_SUB_PATH',
                                          FALSE,
                                          NULL);
+
+        update  mdsys.sdo_network_metadata_table
+        set sdo_owner = sys_context('NM3CORE', 'APPLICATION_OWNER')
+        where sdo_owner = l_user
+        and network = pi_network_name;                                       
+
+        execute immediate 'ALTER SESSION SET CURRENT_SCHEMA = '||l_user;
+
+                                         
       EXCEPTION
          WHEN OTHERS
          THEN
+            execute immediate 'ALTER SESSION SET CURRENT_SCHEMA = '||l_user;
             raise_application_error (-20004,
                                      'failure to register ' || SQLERRM);
       END;
@@ -171,6 +195,8 @@ AS
             || 'S'
             || ''''
             || ' and ne_end_date is null ';
+            
+            commit;
 
          --
          EXECUTE IMMEDIATE
@@ -190,18 +216,18 @@ AS
             || '          and nnu_end_date is null ) ';
             
                      
-            
+            commit;
       END;
    END;
 --
 procedure drop_network( pi_network_name in varchar2) is
-lnw_row user_sdo_network_metadata%rowtype;
+lnw_row mdsys.sdo_network_metadata_table%rowtype;
 not_exists exception;
 pragma exception_init( not_exists, -942 );
 begin
 --
   begin
-     select * into lnw_row from user_sdo_network_metadata where network = pi_network_name;
+     select * into lnw_row from mdsys.sdo_network_metadata_table where network = pi_network_name;
   exception
     when no_data_found then
        raise_application_error(-20005, 'The network does not exist' );
@@ -215,6 +241,12 @@ begin
   end;
 --
   drop_network_objects(pi_network_name);
+  
+  delete from mdsys.sdo_network_metadata_table
+  where network = pi_network_name
+  and sdo_owner = sys_context('NM3CORE', 'APPLICATION_OWNER');
+  
+  commit;
 
 end;
 
