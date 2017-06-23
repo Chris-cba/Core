@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_path_reg
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_path_reg.pkb-arc   1.4   Jun 23 2017 15:46:12   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_path_reg.pkb-arc   1.5   Jun 23 2017 15:53:32   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_path_reg.pkb  $
-   --       Date into PVCS   : $Date:   Jun 23 2017 15:46:12  $
-   --       Date fetched Out : $Modtime:   Jun 23 2017 15:44:28  $
-   --       PVCS Version     : $Rev ision:   1.2  $
+   --       Date into PVCS   : $Date:   Jun 23 2017 15:53:32  $
+   --       Date fetched Out : $Modtime:   Jun 23 2017 15:53:18  $
+   --       PVCS Version     : $Revision:   1.5  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,7 +16,7 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.4  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.5  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_path_reg';
 
