@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_path_reg
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_path_reg.pkb-arc   1.5   Jun 23 2017 15:53:32   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_path_reg.pkb-arc   1.6   Jun 23 2017 16:46:06   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_path_reg.pkb  $
-   --       Date into PVCS   : $Date:   Jun 23 2017 15:53:32  $
-   --       Date fetched Out : $Modtime:   Jun 23 2017 15:53:18  $
-   --       PVCS Version     : $Revision:   1.5  $
+   --       Date into PVCS   : $Date:   Jun 23 2017 16:46:06  $
+   --       Date fetched Out : $Modtime:   Jun 23 2017 16:46:30  $
+   --       PVCS Version     : $Revision:   1.6  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,13 +16,14 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.5  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.6  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_path_reg';
 
-   procedure drop_network_objects (pi_network_name in varchar2);
-   
-   procedure generate_nw_view (pi_network_name in varchar2);
+   PROCEDURE drop_network_objects (pi_network_name IN VARCHAR2);
+
+   PROCEDURE generate_nw_view (pi_network_name IN VARCHAR2);
+
    --
    -----------------------------------------------------------------------------
    --
@@ -44,6 +45,7 @@ AS
    BEGIN
       RETURN g_body_sccsid;
    END get_body_version;
+
    --
    -----------------------------------------------------------------------------
    --
@@ -64,7 +66,7 @@ AS
       --
       l_nt_list    VARCHAR2 (2000);
       --
-      l_user       VARCHAR2(100);
+      l_user       VARCHAR2 (100);
 
       FUNCTION get_nt_list (pi_nt IN ptr_vc_array_type)
          RETURN VARCHAR2
@@ -105,30 +107,30 @@ AS
       DBMS_OUTPUT.put_line (l_nt_list);
 
       BEGIN
-         SDO_NET.DROP_NETWORK (pi_network_name );
---      EXCEPTION
---         WHEN OTHERS
---         THEN
---            raise_application_error (
---               -20003,
---               'failure to drop existing network definition');
+         SDO_NET.DROP_NETWORK (pi_network_name);
+      --      EXCEPTION
+      --         WHEN OTHERS
+      --         THEN
+      --            raise_application_error (
+      --               -20003,
+      --               'failure to drop existing network definition');
       END;
 
       --
-      nm_debug.delete_debug(TRUE);
-      nm_debug.debug_on;
-      
-      select user into l_user from dual;
+--      nm_debug.delete_debug (TRUE);
+--      nm_debug.debug_on;
 
-      nm_debug.debug('current schema = '||l_user );
-            
-      execute immediate 'ALTER SESSION SET CURRENT_SCHEMA = WARWICK';
+      SELECT USER INTO l_user FROM DUAL;
 
-      nm_debug.debug('schema after alter session = '||user );
-      
-      select user into l_user from dual;
+--      nm_debug.debug ('current schema = ' || l_user);
 
-      nm_debug.debug('schema after select = '||l_user );
+      EXECUTE IMMEDIATE 'ALTER SESSION SET CURRENT_SCHEMA = '||SYS_CONTEXT ('NM3CORE', 'APPLICATION_OWNER');
+
+--      nm_debug.debug ('schema after alter session = ' || USER);
+
+      SELECT USER INTO l_user FROM DUAL;
+
+      nm_debug.debug ('schema after select = ' || l_user);
 
       BEGIN
          SDO_NET.CREATE_LOGICAL_NETWORK (pi_network_name,
@@ -144,18 +146,16 @@ AS
                                          FALSE,
                                          NULL);
 
-        update  mdsys.sdo_network_metadata_table
-        set sdo_owner = sys_context('NM3CORE', 'APPLICATION_OWNER')
-        where sdo_owner = l_user
-        and network = pi_network_name;                                       
+         UPDATE mdsys.sdo_network_metadata_table
+            SET sdo_owner = SYS_CONTEXT ('NM3CORE', 'APPLICATION_OWNER')
+          WHERE sdo_owner = l_user AND network = pi_network_name;
 
-        execute immediate 'ALTER SESSION SET CURRENT_SCHEMA = '||l_user;
-
-                                         
+         EXECUTE IMMEDIATE 'ALTER SESSION SET CURRENT_SCHEMA = ' || l_user;
       EXCEPTION
          WHEN OTHERS
          THEN
-            execute immediate 'ALTER SESSION SET CURRENT_SCHEMA = '||l_user;
+            EXECUTE IMMEDIATE 'ALTER SESSION SET CURRENT_SCHEMA = ' || l_user;
+
             raise_application_error (-20004,
                                      'failure to register ' || SQLERRM);
       END;
@@ -163,18 +163,23 @@ AS
       --
       lb_path.g_network := pi_network_name;
 
-      execute immediate 'rename '||pi_network_name||'_LINK to '||pi_network_name||'_LINK_TABLE';
-      
-            nm3ctx.set_context('LB_SPATIAL_FILTER_XMIN', '' );
-            nm3ctx.set_context('LB_SPATIAL_FILTER_YMIN', '' );
-            nm3ctx.set_context('LB_SPATIAL_FILTER_XMAX', '' );
-            nm3ctx.set_context('LB_SPATIAL_FILTER_YMAX', '' );
+      EXECUTE IMMEDIATE
+            'rename '
+         || pi_network_name
+         || '_LINK to '
+         || pi_network_name
+         || '_LINK_TABLE';
 
-      nm3ddl.create_synonym_for_object(pi_network_name||'_LINK_TABLE');
-      nm3ddl.create_synonym_for_object(pi_network_name||'_NO');
-      
+      nm3ctx.set_context ('LB_SPATIAL_FILTER_XMIN', '');
+      nm3ctx.set_context ('LB_SPATIAL_FILTER_YMIN', '');
+      nm3ctx.set_context ('LB_SPATIAL_FILTER_XMAX', '');
+      nm3ctx.set_context ('LB_SPATIAL_FILTER_YMAX', '');
+
+      nm3ddl.create_synonym_for_object (pi_network_name || '_LINK_TABLE');
+      nm3ddl.create_synonym_for_object (pi_network_name || '_NO');
+
       generate_nw_view (pi_network_name);
-      
+
       --
       BEGIN
          EXECUTE IMMEDIATE
@@ -195,8 +200,8 @@ AS
             || 'S'
             || ''''
             || ' and ne_end_date is null ';
-            
-            commit;
+
+         COMMIT;
 
          --
          EXECUTE IMMEDIATE
@@ -214,46 +219,60 @@ AS
             || ' where no_end_date is null '
             || ' and exists ( select 1 from nm_node_usages_all where nnu_no_node_id = no_node_id '
             || '          and nnu_end_date is null ) ';
-            
-                     
-            commit;
+
+
+         COMMIT;
       END;
    END;
---
-procedure drop_network( pi_network_name in varchar2) is
-lnw_row mdsys.sdo_network_metadata_table%rowtype;
-not_exists exception;
-pragma exception_init( not_exists, -942 );
-begin
---
-  begin
-     select * into lnw_row from mdsys.sdo_network_metadata_table where network = pi_network_name;
-  exception
-    when no_data_found then
-       raise_application_error(-20005, 'The network does not exist' );
-  end;
---
-begin
-    SDO_NET.DROP_NETWORK(pi_network_name);
---  exception
---    when others then
---      raise_application_error(-20006, 'failure to drop existing network definition');
-  end;
---
-  drop_network_objects(pi_network_name);
-  
-  delete from mdsys.sdo_network_metadata_table
-  where network = pi_network_name
-  and sdo_owner = sys_context('NM3CORE', 'APPLICATION_OWNER');
-  
-  commit;
 
-end;
+   --
+   PROCEDURE drop_network (pi_network_name IN VARCHAR2)
+   IS
+      lnw_row      MDSYS.sdo_network_metadata_table%ROWTYPE;
+      not_exists   EXCEPTION;
+      PRAGMA EXCEPTION_INIT (not_exists, -942);
+   BEGIN
+      --
+      BEGIN
+         SELECT *
+           INTO lnw_row
+           FROM mdsys.sdo_network_metadata_table
+          WHERE network = pi_network_name;
+      EXCEPTION
+         WHEN NO_DATA_FOUND
+         THEN
+            raise_application_error (-20005, 'The network does not exist');
+      END;
 
-procedure drop_network_objects (pi_network_name in varchar2 ) is
-   not_exists   EXCEPTION;
-   PRAGMA EXCEPTION_INIT (not_exists, -942);
-begin
+      --
+      BEGIN
+         SDO_NET.DROP_NETWORK (pi_network_name);
+      --  exception
+      --    when others then
+      --      raise_application_error(-20006, 'failure to drop existing network definition');
+      END;
+
+      --
+      drop_network_objects (pi_network_name);
+
+      DELETE FROM mdsys.sdo_network_metadata_table
+            WHERE     network = pi_network_name
+                  AND sdo_owner =
+                         SYS_CONTEXT ('NM3CORE', 'APPLICATION_OWNER');
+
+      NM3DDL.DROP_SYNONYM_FOR_OBJECT (pi_network_name || '_LINK');
+      NM3DDL.DROP_SYNONYM_FOR_OBJECT (pi_network_name || '_LINK_TABLE');
+      NM3DDL.DROP_SYNONYM_FOR_OBJECT (pi_network_name || '_NO');
+
+
+      COMMIT;
+   END;
+
+   PROCEDURE drop_network_objects (pi_network_name IN VARCHAR2)
+   IS
+      not_exists   EXCEPTION;
+      PRAGMA EXCEPTION_INIT (not_exists, -942);
+   BEGIN
       BEGIN
          EXECUTE IMMEDIATE 'drop table ' || pi_network_name || '_LINK_TABLE';
       EXCEPTION
@@ -294,24 +313,71 @@ begin
          THEN
             NULL;
       END;
-   end;
-   
-procedure generate_nw_view (pi_network_name in varchar2) is
-l_srid integer;
-begin
-select a.geoloc.sdo_srid into l_srid from v_lb_nlt_geometry2 a where rownum = 1;
---
-execute immediate 'create or replace view '||pi_network_name||'_LINK '||
-       ' as select * from '||pi_network_name||'_LINK_TABLE '||
-       ' where link_type in ( select ptr_value from table ( lb_path.get_g_nw_types )) '||
-' and ( ( link_id in ( select ne_id from v_lb_nlt_geometry2 where sdo_filter ( geoloc, sdo_geometry( 2003, '||to_char(l_srid)||', NULL, sdo_elem_info_array( 1, 1003, 3), '||
-'         sdo_ordinate_array( nvl(to_number(sys_context('||''''||'NM3SQL'||''''||', '||''''||'LB_SPATIAL_FILTER_XMIN'||''''||')), -999999999 ), '|| 
-'                             nvl(to_number(sys_context('||''''||'NM3SQL'||''''||', '||''''||'LB_SPATIAL_FILTER_YMIN'||''''||')), -999999999 ), '||
-'                             nvl(to_number(sys_context('||''''||'NM3SQL'||''''||', '||''''||'LB_SPATIAL_FILTER_XMAX'||''''||')), 999999999 ), '||
-'                             nvl(to_number(sys_context('||''''||'NM3SQL'||''''||', '||''''||'LB_SPATIAL_FILTER_YMAX'||''''||')), 999999999 ) ))) = '||''''||'TRUE'||''''||')))';
+   END;
 
-nm3ddl.create_synonym_for_object(pi_network_name||'_LINK');
+   PROCEDURE generate_nw_view (pi_network_name IN VARCHAR2)
+   IS
+      l_srid   INTEGER;
+   BEGIN
+      SELECT a.geoloc.sdo_srid
+        INTO l_srid
+        FROM v_lb_nlt_geometry2 a
+       WHERE ROWNUM = 1;
 
-end;   
-end;
+      --
+      EXECUTE IMMEDIATE
+            'create or replace view '
+         || pi_network_name
+         || '_LINK '
+         || ' as select * from '
+         || pi_network_name
+         || '_LINK_TABLE '
+         || ' where link_type in ( select ptr_value from table ( lb_path.get_g_nw_types )) '
+         || ' and ( ( link_id in ( select ne_id from v_lb_nlt_geometry2 where sdo_filter ( geoloc, sdo_geometry( 2003, '
+         || TO_CHAR (l_srid)
+         || ', NULL, sdo_elem_info_array( 1, 1003, 3), '
+         || '         sdo_ordinate_array( nvl(to_number(sys_context('
+         || ''''
+         || 'NM3SQL'
+         || ''''
+         || ', '
+         || ''''
+         || 'LB_SPATIAL_FILTER_XMIN'
+         || ''''
+         || ')), -999999999 ), '
+         || '                             nvl(to_number(sys_context('
+         || ''''
+         || 'NM3SQL'
+         || ''''
+         || ', '
+         || ''''
+         || 'LB_SPATIAL_FILTER_YMIN'
+         || ''''
+         || ')), -999999999 ), '
+         || '                             nvl(to_number(sys_context('
+         || ''''
+         || 'NM3SQL'
+         || ''''
+         || ', '
+         || ''''
+         || 'LB_SPATIAL_FILTER_XMAX'
+         || ''''
+         || ')), 999999999 ), '
+         || '                             nvl(to_number(sys_context('
+         || ''''
+         || 'NM3SQL'
+         || ''''
+         || ', '
+         || ''''
+         || 'LB_SPATIAL_FILTER_YMAX'
+         || ''''
+         || ')), 999999999 ) ))) = '
+         || ''''
+         || 'TRUE'
+         || ''''
+         || ')))';
+
+      nm3ddl.create_synonym_for_object (pi_network_name || '_LINK');
+   END;
+END;
 /
