@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_path_reg
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_path_reg.pkb-arc   1.2   Mar 29 2017 17:37:34   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_path_reg.pkb-arc   1.3   Jun 23 2017 14:20:46   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_path_reg.pkb  $
-   --       Date into PVCS   : $Date:   Mar 29 2017 17:37:34  $
-   --       Date fetched Out : $Modtime:   Mar 29 2017 17:38:08  $
-   --       PVCS Version     : $Revision:   1.2  $
+   --       Date into PVCS   : $Date:   Jun 23 2017 14:20:46  $
+   --       Date fetched Out : $Modtime:   Jun 23 2017 13:00:44  $
+   --       PVCS Version     : $Rev ision:   1.2  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,7 +16,7 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.2  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.3  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_path_reg';
 
@@ -146,6 +146,9 @@ AS
             nm3ctx.set_context('LB_SPATIAL_FILTER_XMAX', '' );
             nm3ctx.set_context('LB_SPATIAL_FILTER_YMAX', '' );
 
+      nm3ddl.create_synonym_for_object(pi_network_name||'_LINK_TABLE');
+      nm3ddl.create_synonym_for_object(pi_network_name||'_NO');
+      
       generate_nw_view (pi_network_name);
       
       --
@@ -274,6 +277,9 @@ execute immediate 'create or replace view '||pi_network_name||'_LINK '||
 '                             nvl(to_number(sys_context('||''''||'NM3SQL'||''''||', '||''''||'LB_SPATIAL_FILTER_YMIN'||''''||')), -999999999 ), '||
 '                             nvl(to_number(sys_context('||''''||'NM3SQL'||''''||', '||''''||'LB_SPATIAL_FILTER_XMAX'||''''||')), 999999999 ), '||
 '                             nvl(to_number(sys_context('||''''||'NM3SQL'||''''||', '||''''||'LB_SPATIAL_FILTER_YMAX'||''''||')), 999999999 ) ))) = '||''''||'TRUE'||''''||')))';
+
+nm3ddl.create_synonym_for_object(pi_network_name||'_LINK');
+
 end;   
 end;
 /
