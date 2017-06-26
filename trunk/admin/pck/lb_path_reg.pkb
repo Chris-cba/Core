@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_path_reg
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_path_reg.pkb-arc   1.6   Jun 23 2017 16:46:06   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_path_reg.pkb-arc   1.7   Jun 26 2017 11:34:54   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_path_reg.pkb  $
-   --       Date into PVCS   : $Date:   Jun 23 2017 16:46:06  $
-   --       Date fetched Out : $Modtime:   Jun 23 2017 16:46:30  $
-   --       PVCS Version     : $Revision:   1.6  $
+   --       Date into PVCS   : $Date:   Jun 26 2017 11:34:54  $
+   --       Date fetched Out : $Modtime:   Jun 26 2017 11:34:52  $
+   --       PVCS Version     : $Revision:   1.7  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,7 +16,7 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.6  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.7  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_path_reg';
 
@@ -117,20 +117,25 @@ AS
       END;
 
       --
---      nm_debug.delete_debug (TRUE);
---      nm_debug.debug_on;
+      --      nm_debug.delete_debug (TRUE);
+      --      nm_debug.debug_on;
 
       SELECT USER INTO l_user FROM DUAL;
 
---      nm_debug.debug ('current schema = ' || l_user);
+      --      nm_debug.debug ('current schema = ' || l_user);
 
-      EXECUTE IMMEDIATE 'ALTER SESSION SET CURRENT_SCHEMA = '||SYS_CONTEXT ('NM3CORE', 'APPLICATION_OWNER');
+      IF l_user != SYS_CONTEXT ('NM3CORE', 'APPLICATION_OWNER')
+      THEN
+         EXECUTE IMMEDIATE
+               'ALTER SESSION SET CURRENT_SCHEMA = '
+            || SYS_CONTEXT ('NM3CORE', 'APPLICATION_OWNER');
+      END IF;
 
---      nm_debug.debug ('schema after alter session = ' || USER);
+      --      nm_debug.debug ('schema after alter session = ' || USER);
 
-      SELECT USER INTO l_user FROM DUAL;
+      --      SELECT USER INTO l_user FROM DUAL;
 
-      nm_debug.debug ('schema after select = ' || l_user);
+      --      nm_debug.debug ('schema after select = ' || l_user);
 
       BEGIN
          SDO_NET.CREATE_LOGICAL_NETWORK (pi_network_name,
@@ -146,9 +151,12 @@ AS
                                          FALSE,
                                          NULL);
 
-         UPDATE mdsys.sdo_network_metadata_table
-            SET sdo_owner = SYS_CONTEXT ('NM3CORE', 'APPLICATION_OWNER')
-          WHERE sdo_owner = l_user AND network = pi_network_name;
+         IF l_user != SYS_CONTEXT ('NM3CORE', 'APPLICATION_OWNER')
+         THEN
+            UPDATE mdsys.sdo_network_metadata_table
+               SET sdo_owner = SYS_CONTEXT ('NM3CORE', 'APPLICATION_OWNER')
+             WHERE sdo_owner = l_user AND network = pi_network_name;
+         END IF;
 
          EXECUTE IMMEDIATE 'ALTER SESSION SET CURRENT_SCHEMA = ' || l_user;
       EXCEPTION
