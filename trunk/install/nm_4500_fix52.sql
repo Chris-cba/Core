@@ -1,11 +1,11 @@
 ----------------------------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm_4500_fix52.sql-arc   1.0   Jun 26 2017 07:17:28   Chris.Baugh  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm_4500_fix52.sql-arc   1.1   Jun 26 2017 10:56:42   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm_4500_fix52.sql  $ 
---       Date into PVCS   : $Date:   Jun 26 2017 07:17:28  $
---       Date fetched Out : $Modtime:   Jun 26 2017 07:05:38  $
---       Version     	  : $Revision:   1.0  $
+--       Date into PVCS   : $Date:   Jun 26 2017 10:56:42  $
+--       Date fetched Out : $Modtime:   Jun 26 2017 10:54:56  $
+--       Version     	  : $Revision:   1.1  $
 --
 ----------------------------------------------------------------------------------------------------
 --   Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
@@ -63,6 +63,18 @@ BEGIN
 END;
 /
 WHENEVER SQLERROR CONTINUE
+--
+--------------------------------------------------------------------------------
+-- HIG_MODULES
+--------------------------------------------------------------------------------
+--
+SET TERM ON 
+PROMPT HIG_MODULES 
+SET TERM OFF
+--
+UPDATE hig_modules
+   SET hmo_title = 'My Standard Text Usage'
+ WHERE hmo_module = 'HIG4025';
 --
 --------------------------------------------------------------------------------
 -- Package Bodies
