@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY hig_user_login_util AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/hig_user_login_util.pkb-arc   1.3   May 30 2017 10:49:40   Chris.Baugh  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/hig_user_login_util.pkb-arc   1.4   Jun 29 2017 09:46:22   Chris.Baugh  $
 --       Module Name      : $Workfile:   hig_user_login_util.pkb  $
---       Date into PVCS   : $Date:   May 30 2017 10:49:40  $
---       Date fetched Out : $Modtime:   May 25 2017 15:55:36  $
---       PVCS Version     : $Revision:   1.3  $
+--       Date into PVCS   : $Date:   Jun 29 2017 09:46:22  $
+--       Date fetched Out : $Modtime:   Jun 16 2017 16:10:36  $
+--       PVCS Version     : $Revision:   1.4  $
 --
 --   Author : Vikas Mhetre
 --
@@ -19,7 +19,7 @@ CREATE OR REPLACE PACKAGE BODY hig_user_login_util AS
 --
 -- all global package variables here
 --
-   g_body_sccsid     constant varchar2(30) :='"$Revision:   1.3  $"';
+   g_body_sccsid     constant varchar2(30) :='"$Revision:   1.4  $"';
 --
    g_package_name    CONSTANT  VARCHAR2(30)   := 'hig_user_login_util';
 --
@@ -510,6 +510,10 @@ CREATE OR REPLACE PACKAGE BODY hig_user_login_util AS
        -- change the password
        nm3ddl.change_user_password(pi_user       => pi_username
                                   ,pi_new_passwd => lv_new_password);
+                                  
+       -- expire password
+       EXECUTE IMMEDIATE 'ALTER USER '||pi_username||' PASSWORD EXPIRE';
+       
     END IF;
     
     RETURN lv_result;
