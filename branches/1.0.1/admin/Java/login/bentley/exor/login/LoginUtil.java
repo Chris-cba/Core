@@ -1,12 +1,12 @@
 /**
  *	PVCS Identifiers :-
  *
- *		PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/Java/login/bentley/exor/login/LoginUtil.java-arc   1.0.1.1   May 31 2017 07:09:12   Upendra.Hukeri  $
+ *		PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/Java/login/bentley/exor/login/LoginUtil.java-arc   1.0.1.2   Jul 04 2017 10:07:34   Upendra.Hukeri  $
  *		Module Name      : $Workfile:   LoginUtil.java  $
  *		Author			 : $Author:   Upendra.Hukeri  $
- *		Date Into PVCS   : $Date:   May 31 2017 07:09:12  $
- *		Date Fetched Out : $Modtime:   May 31 2017 07:07:46  $
- *		PVCS Version     : $Revision:   1.0.1.1  $
+ *		Date Into PVCS   : $Date:   Jul 04 2017 10:07:34  $
+ *		Date Fetched Out : $Modtime:   Jul 04 2017 10:02:04  $
+ *		PVCS Version     : $Revision:   1.0.1.2  $
  *
  *	This class is used to make a connection to Oracle Database using a WebLogic Data Source
  *	(jdbc/<TNS-NAME>_LOGINDS) and fire queries using it, when connection is not available from Oracle 
@@ -57,7 +57,6 @@ public class LoginUtil {
 				connectionString = "jdbc:oracle:oci8:@" + connectionString;
 				
 				info   = new Properties();
-				
 				info.setProperty("user", userName);
 				info.setProperty("password", oldPassword);
 				info.setProperty("OCINewPassword", newPassword);
@@ -74,19 +73,32 @@ public class LoginUtil {
 			} else {
 				result = "Invalid parameters passed";
 				IMSLogger.log("changePassword(): Invalid parameters passed", IMSLogger.DEBUG);
-			}
+			} 
+		} catch(SQLException changePasswordSQLException) {
+			logException(changePasswordSQLException, "changePassword", IMSLogger.ERROR);
+			String error = changePasswordSQLException.getMessage();
+			
+			if(error.contains("password verification for the specified password failed")) {
+				result = error.substring(error.lastIndexOf(": ") + 2);
+			} else if(error.contains("invalid username/password; logon denied")) {
+				result = "Invalid username/password";
+			} else if(error.contains("the account is locked")) {
+				result = "The account is locked";
+			} else {
+				result = errorMessage;
+			} 
 		} catch(Exception changePasswordException) {
 			logException(changePasswordException, "changePassword", IMSLogger.ERROR);
 			
 			result = errorMessage;
-		}
+		} 
 		
 		return result;
-	}
+	} 
 	
 	private void setDataSource(String dataSource) {
 		this.dataSource = "jdbc/" + dataSource + "_LOGINDS";
-	}
+	} 
 	
 	private OracleConnection getOracleConnection() throws Exception {
 		IMSLogger.log("getOracleConnection(): Getting Oracle DB Connection...", IMSLogger.DEBUG);
@@ -99,14 +111,14 @@ public class LoginUtil {
 		DataSource ds = null;
 		Context context = new InitialContext(env);
 		
-		//you will need to create a Data Source with JNDI name LOGINDS
+		//you will need to create a Data Source with JNDI name <TNS-NAME>_LOGINDS
 		ds   = (javax.sql.DataSource) context.lookup (dataSource);
 		return (OracleConnection) ds.getConnection();
-	}
+	} 
 	
 	private void setFormsURL(String formsURL) {
 		this.formsURL = "t3://" + formsURL;
-	}
+	} 
 	
 	/**
      * Used to read an image and convert it into a java.lang.String array
@@ -116,10 +128,17 @@ public class LoginUtil {
      */
 	public static String[] getAppServImage() {
 		File            imageFile          = null;
+		File            resizedImgFile     = null;
 		FileInputStream imageInFile        = null;
 		String          imageDataString    = null;
-		byte            imageData[]        = null;
+		byte[]          imageData          = null;
 		String[]        imageDataStringArr = null;
+		double 			orgImgWidth   	   = 0;
+		double 			orgImgHeight  	   = 0;
+		double 			imgWidth   		   = 512;
+		double 			imgHeight  		   = 277;
+		BufferedImage 	originalImage 	   = null;
+		BufferedImage 	resizedImage 	   = null;
 		
 		/**
 		 * Because of the below bug, the length of String element in the retruning 
@@ -128,59 +147,120 @@ public class LoginUtil {
 		 * BUG#993409
 		 * But,this is the problem of JDBC thin driver.   
 		 */
-		int             arrElmtLen         = 4096;
+		int 			arrElmtLen 		   = 4096;
 		
 		try {
 			String classPath = LoginUtil.class.getProtectionDomain().getCodeSource().getLocation().toExternalForm();
 			String imagePath = classPath.substring(classPath.indexOf('/') + 1, classPath.lastIndexOf('/') + 1) + "resources/login_background.jpg";
 			
-			imageFile   = new File(imagePath);
-			imageInFile = new FileInputStream(imageFile);
-			imageData   = new byte[(int) imageFile.length()];
+			String resourcesDir = classPath.substring(classPath.indexOf('/') + 1, classPath.lastIndexOf('/') + 1) + "resources";
+			File f = new File(resourcesDir);
 			
-			if(ImageIO.read(imageFile) != null) {
-				IMSLogger.log("getAppServImage(): reading image into a byte array...", IMSLogger.DEBUG);
-				int bytesRead = imageInFile.read(imageData);
+			IMSLogger.log("getAppServImage(): checking 'resources' directory for write privileges...", IMSLogger.DEBUG);
+			
+			if(!f.canWrite()) { 
+			  throw new Exception("No write privileges on 'resources' directory");
+			}
+			
+			imageFile = new File(imagePath);
+			
+			if(imageFile.exists()) {
+				long   lastModified   = imageFile.lastModified();
+				String resizedImgPath = imagePath.replace("login_background", String.valueOf(lastModified));
 				
-				if(bytesRead > 0) {
-					IMSLogger.log("getAppServImage(): converting image to a String...", IMSLogger.DEBUG);
-					imageDataString = ImageEncoderAndDecoder.encodeImage(imageData);
+				resizedImgFile = new File(resizedImgPath);
+				
+				if(!resizedImgFile.exists()) {
+					originalImage = ImageIO.read(imageFile);
 					
-					int imageDataStringLen = imageDataString.length();
+					if(originalImage != null) {
+						IMSLogger.log("getAppServImage(): resizing image to fit image panel...", IMSLogger.DEBUG);
+						
+						int type = originalImage.getType() == 0 ? BufferedImage.TYPE_INT_ARGB : originalImage.getType();
+						
+						orgImgWidth   = originalImage.getWidth(null);
+						orgImgHeight  = originalImage.getHeight(null);
+						
+						while(!((imgWidth >= orgImgWidth) && (imgHeight >= orgImgHeight))) {
+							if(imgWidth < orgImgWidth) {
+								orgImgHeight = orgImgHeight * (imgWidth/orgImgWidth);
+								orgImgWidth  = imgWidth;
+							} 
+							
+							if(imgHeight < orgImgHeight) {
+								orgImgWidth  = orgImgWidth * (imgHeight/orgImgHeight);
+								orgImgHeight = imgHeight;
+							}
+						}
+						
+						resizedImage = new BufferedImage((int)orgImgWidth, (int)orgImgHeight, type);
+						Graphics2D g = resizedImage.createGraphics();
+						g.drawImage(originalImage, 0, 0, (int)orgImgWidth, (int)orgImgHeight, null);
+						g.dispose();
+						
+						ImageIO.write(resizedImage, "jpg", resizedImgFile);
+						
+						while(!resizedImgFile.exists()) {
+							continue;
+						}
+					}
+				} else {
+					resizedImage = ImageIO.read(resizedImgFile);
+				}
+				
+				if(resizedImage != null) {
+					imageInFile = new FileInputStream(resizedImgFile);
+					imageData   = new byte[(int) resizedImgFile.length()];
 					
-					if(imageDataStringLen%arrElmtLen == 0) {
-						imageDataStringArr = new String[imageDataStringLen/arrElmtLen];
+					IMSLogger.log("getAppServImage(): reading image into a byte array...", IMSLogger.DEBUG);
+					
+					int bytesRead = imageInFile.read(imageData);
+					
+					if(bytesRead > 0) {
+						IMSLogger.log("getAppServImage(): converting image to a String...", IMSLogger.DEBUG);
+						imageDataString = ImageEncoderAndDecoder.encodeImage(imageData);
+						
+						int imageDataStringLen = imageDataString.length();
+						
+						if(imageDataStringLen%arrElmtLen == 0) {
+							imageDataStringArr = new String[imageDataStringLen/arrElmtLen];
+						} else {
+							imageDataStringArr = new String[imageDataStringLen/arrElmtLen + 1];
+						} 
+						
+						int start = 0;
+						int end   = 0;
+						
+						IMSLogger.log("getAppServImage(): splitting image String into a String array - each element of length 4096...", IMSLogger.DEBUG);
+						
+						for(int i=0; i<imageDataStringArr.length - 1; i++) {
+							end  = (i+1)*(arrElmtLen + 1) - (i + 1);
+							
+							imageDataStringArr[i] = imageDataString.substring(start, end);
+							
+							start = end;
+						} 
+						
+						int imgLen = imageDataStringArr.length;
+						
+						imageDataStringArr[imgLen - 1] = imageDataString.substring(start);
 					} else {
-						imageDataStringArr = new String[imageDataStringLen/arrElmtLen + 1];
-					}
-					
-					int start = 0;
-					int end   = 0;
-					
-					IMSLogger.log("getAppServImage(): splitting image String into a String array - each element of length 4096...", IMSLogger.DEBUG);
-					
-					for(int i=0; i<imageDataStringArr.length - 1; i++) {
-						end  = (i+1)*(arrElmtLen + 1) - (i + 1);
+						imageDataStringArr = new String[1];
+						imageDataStringArr[0] = "1";
 						
-						imageDataStringArr[i] = imageDataString.substring(start, end);
-						
-						start = end;
-					}
-					
-					int imgLen = imageDataStringArr.length;
-					
-					imageDataStringArr[imgLen - 1] = imageDataString.substring(start);
+						IMSLogger.log("getAppServImage(): Bad image", IMSLogger.ERROR);
+					} 
 				} else {
 					imageDataStringArr = new String[1];
 					imageDataStringArr[0] = "1";
 					
-					IMSLogger.log("getAppServImage(): Bad image", IMSLogger.ERROR);
-				}
+					IMSLogger.log("getAppServImage(): NOT an image", IMSLogger.ERROR);
+				} 
 			} else {
 				imageDataStringArr = new String[1];
-				imageDataStringArr[0] = "1";
+				imageDataStringArr[0] = "0";
 				
-				IMSLogger.log("getAppServImage(): NOT an image", IMSLogger.ERROR);
+				IMSLogger.log("getAppServImage(): Image not found", IMSLogger.TRACE);
 			}
 		} catch (FileNotFoundException fnfe) {
 			imageDataStringArr = new String[1];
@@ -200,7 +280,7 @@ public class LoginUtil {
 			} catch(IOException ioe) {
 				logException(ioe, "getAppServImage", IMSLogger.WARN);
 			}
-		}
+		} 
 		return imageDataStringArr;
 	}
 	
@@ -234,7 +314,7 @@ public class LoginUtil {
 			return errorMessage;
 		} finally {
 			closeOracle("validatePassword", cstmt, conn);
-		}
+		} 
 	}
 	
 	public static int getUserId(String formsURL, String dataSource, String username) {
@@ -425,6 +505,7 @@ public class LoginUtil {
 			ResultSet rset = (ResultSet)cstmt.getObject(2);
 			
 			int fetchSize = 0;
+			
 			while (rset.next()) {
 				fetchSize++;
 				
@@ -474,6 +555,11 @@ public class LoginUtil {
 			
 			if("Y".equals(result)) {
 				return result;
+			} else if(  result.contains("Missing email-id") 
+					 || result.contains("Email address not specified in the system for user")
+					 || result.contains("Missing SMTP settings")
+			         ) {
+				return result.substring(result.lastIndexOf(": ") + 2);
 			} else {
 				throw new Exception(result);
 			}
