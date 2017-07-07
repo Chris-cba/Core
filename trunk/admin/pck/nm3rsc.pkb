@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY nm3rsc AS
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3rsc.pkb-arc   2.15   Jun 15 2017 14:13:12   Chris.Baugh  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3rsc.pkb-arc   2.16   Jul 07 2017 08:03:52   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm3rsc.pkb  $
---       Date into PVCS   : $Date:   Jun 15 2017 14:13:12  $
---       Date fetched Out : $Modtime:   Jun 13 2017 09:49:12  $
---       PVCS Version     : $Revision:   2.15  $
+--       Date into PVCS   : $Date:   Jul 07 2017 08:03:52  $
+--       Date fetched Out : $Modtime:   Jul 07 2017 08:02:46  $
+--       PVCS Version     : $Revision:   2.16  $
 --
 --   Author : R.A. Coupe
 --
@@ -19,7 +19,7 @@ CREATE OR REPLACE PACKAGE BODY nm3rsc AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(30) :='"$Revision:   2.15  $"';
+   g_body_sccsid     CONSTANT  varchar2(30) :='"$Revision:   2.16  $"';
 
 --  g_body_sccsid is the SCCS ID for the package body
 --
@@ -972,7 +972,13 @@ exception
 end;   
 BEGIN
 
-  instantiate_data(  pi_ne_id => pi_ne_id
+   if pi_ne_start is not null then
+     nm3ctx.set_context('RSC_START', to_char(pi_ne_start));
+   else
+     nm3ctx.set_context('RSC_START', NULL);
+   end if;
+
+   instantiate_data(  pi_ne_id => pi_ne_id
                     ,pi_effective_date => NULL );
 
   empty_route_check( pi_ne_id, To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY'), 'N', l_empty_flag );
