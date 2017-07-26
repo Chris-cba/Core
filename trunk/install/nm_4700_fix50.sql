@@ -1,11 +1,11 @@
 ----------------------------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm_4700_fix50.sql-arc   1.0   Jun 16 2017 09:51:42   Chris.Baugh  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm_4700_fix50.sql-arc   1.1   Jul 26 2017 15:04:48   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm_4700_fix50.sql  $ 
---       Date into PVCS   : $Date:   Jun 16 2017 09:51:42  $
---       Date fetched Out : $Modtime:   Jun 15 2017 15:34:10  $
---       Version     	  : $Revision:   1.0  $
+--       Date into PVCS   : $Date:   Jul 26 2017 15:04:48  $
+--       Date fetched Out : $Modtime:   Jul 26 2017 15:01:10  $
+--       Version     	  : $Revision:   1.1  $
 --
 ----------------------------------------------------------------------------------------------------
 --   Copyright (c) 2017 Bentley Systems Incorporated. All rights reserved.
@@ -85,25 +85,17 @@ SET FEEDBACK ON
 START nm3flx.pkh
 SET FEEDBACK OFF
 
-SET TERM ON 
-PROMPT creating Package Header hig_process_security.pkh
-SET TERM OFF
---
-SET FEEDBACK ON
-START hig_process_security.pkh
-SET FEEDBACK OFF
-
 --
 --------------------------------------------------------------------------------
 -- Package Bodies
 --------------------------------------------------------------------------------
 --
 SET TERM ON 
-PROMPT creating Package Body nm3ausec.pkw
+PROMPT creating Package Body nm3pla.pkw
 SET TERM OFF
 --
 SET FEEDBACK ON
-START nm3ausec.pkw
+START nm3pla.pkw
 SET FEEDBACK OFF
 
 SET TERM ON 
@@ -139,7 +131,7 @@ BEGIN
 	--
 	hig2.upgrade(p_product        => 'NET'
 				,p_upgrade_script => 'log_nm_4700_fix50.sql'
-				,p_remarks        => 'NET 4700 FIX 50 (Build 1)'
+				,p_remarks        => 'NET 4700 FIX 50 (Build 2)'
 				,p_to_version     => NULL
 				);
 	--
