@@ -1,10 +1,10 @@
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/lb/install/lb_install.sql-arc   1.12   Jun 16 2017 10:43:18   Rob.Coupe  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/lb/install/lb_install.sql-arc   1.13   Aug 02 2017 11:28:16   Rob.Coupe  $
 --       Module Name      : $Workfile:   lb_install.sql  $
---       Date into PVCS   : $Date:   Jun 16 2017 10:43:18  $
---       Date fetched Out : $Modtime:   Jun 16 2017 10:42:20  $
---       PVCS Version     : $Revision:   1.12  $
+--       Date into PVCS   : $Date:   Aug 02 2017 11:28:16  $
+--       Date fetched Out : $Modtime:   Aug 02 2017 11:16:48  $
+--       PVCS Version     : $Revision:   1.13  $
 --
 --   Author : R.A. Coupe
 --
@@ -206,7 +206,7 @@ prompt Creating synonyms
 declare
   cursor c1 is
     select * from lb_objects l
-    where object_type in ('PACKAGE', 'TABLE', 'VIEW', 'PROCEDURE', 'SEQUENCE', 'PACKAGE BODY', 'TYPE' );
+    where object_type in ('PACKAGE', 'TABLE', 'VIEW', 'PROCEDURE', 'SEQUENCE', 'PACKAGE BODY', 'TYPE', 'FUNCTION' );
 begin
   if nvl(hig.get_sysopt('HIGPUBSYN'),'Y') = 'Y' 
   then
