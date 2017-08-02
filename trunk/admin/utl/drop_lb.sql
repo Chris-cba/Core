@@ -4,11 +4,11 @@
 --
 --   PVCS Identifiers :-
 --
---       pvcsid                 : $Header:   //new_vm_latest/archives/lb/admin/utl/drop_lb.sql-arc   1.12   Apr 21 2017 15:25:34   Rob.Coupe  $
+--       pvcsid                 : $Header:   //new_vm_latest/archives/lb/admin/utl/drop_lb.sql-arc   1.13   Aug 02 2017 12:09:02   Rob.Coupe  $
 --       Module Name      : $Workfile:   drop_lb.sql  $
---       Date into PVCS   : $Date:   Apr 21 2017 15:25:34  $
---       Date fetched Out : $Modtime:   Apr 21 2017 15:25:44  $
---       PVCS Version     : $Revision:   1.12  $
+--       Date into PVCS   : $Date:   Aug 02 2017 12:09:02  $
+--       Date fetched Out : $Modtime:   Aug 02 2017 12:00:48  $
+--       PVCS Version     : $Revision:   1.13  $
 --
 --   Author : Rob Coupe
 --
@@ -115,6 +115,12 @@ END;
 /
 
 PROMPT Clean up any residual metadata
+
+delete from hig_roles where hro_product = 'LB';
+
+delete from hig_upgrades where hup_product = 'LB';
+
+delete from hig_products where hpr_product = 'LB';
 
 DECLARE
    CURSOR c1
