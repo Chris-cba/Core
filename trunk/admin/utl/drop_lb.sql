@@ -3,11 +3,11 @@
 --
 --   PVCS Identifiers :-
 --
---       pvcsid                 : $Header:   //new_vm_latest/archives/lb/admin/utl/drop_lb.sql-arc   1.15   Aug 02 2017 15:07:06   Rob.Coupe  $
+--       pvcsid                 : $Header:   //new_vm_latest/archives/lb/admin/utl/drop_lb.sql-arc   1.16   Aug 02 2017 16:36:26   Rob.Coupe  $
 --       Module Name      : $Workfile:   drop_lb.sql  $
---       Date into PVCS   : $Date:   Aug 02 2017 15:07:06  $
---       Date fetched Out : $Modtime:   Aug 02 2017 14:49:04  $
---       PVCS Version     : $Revision:   1.15  $
+--       Date into PVCS   : $Date:   Aug 02 2017 16:36:26  $
+--       Date fetched Out : $Modtime:   Aug 02 2017 16:35:38  $
+--       PVCS Version     : $Revision:   1.16  $
 --
 --   Author : Rob Coupe
 --
@@ -36,27 +36,28 @@ PROMPT Dropping objects in LB object registry
 
 
 DECLARE
-   LB_OBJECTS_EXISTS   BOOLEAN
-                          := nm3ddl.does_object_exist ('LB_OBJECTS', 'TABLE');
+   --   LB_OBJECTS_EXISTS   BOOLEAN
+   --                          := nm3ddl.does_object_exist ('LB_OBJECTS', 'TABLE');
 
    TYPE cur_type IS REF CURSOR;
 
-   c1                  cur_type;
-   CURSTR              VARCHAR2 (2000)
-      := 'select object_name, object_type from lb_objects lo ';
-   obj_name            NM3TYPE.tab_varchar30;
-   obj_type            NM3TYPE.tab_varchar30;
+   c1         cur_type;
+   CURSTR     VARCHAR2 (2000)
+      :=    'select object_name, object_type from lb_objects lo '
+         || ' where exists ( select 1 from user_objects o where o.object_name = lo.object_name '
+         || ' and o.object_type = lo.object_type ) ';
+   obj_name   NM3TYPE.tab_varchar30;
+   obj_type   NM3TYPE.tab_varchar30;
 BEGIN
-   IF LB_OBJECTS_EXISTS
-   THEN
-      OPEN c1 FOR CURSTR;
+   OPEN c1 FOR CURSTR;
 
-      FETCH c1 BULK COLLECT INTO obj_name, obj_type;
+   FETCH c1 BULK COLLECT INTO obj_name, obj_type;
 
-      CLOSE c1;
+   CLOSE c1;
 
-      FOR i IN 1 .. obj_name.COUNT
-      LOOP
+   FOR i IN 1 .. obj_name.COUNT
+   LOOP
+      BEGIN
          IF obj_type (i) = 'TABLE'
          THEN
             BEGIN
@@ -86,9 +87,18 @@ BEGIN
          END IF;
 
          NM3DDL.DROP_SYNONYM_FOR_OBJECT (obj_name (i));
-      END LOOP; 
-   END IF;
-EXCEPTION WHEN OTHERS THEN NULL ;      
+      EXCEPTION
+         WHEN OTHERS
+         THEN
+            NULL;
+      --            nm_debug.debug('problem with '||obj_name(i));
+      --            raise_application_error ( -20001, obj_name(i) || sqlerrm );
+      END;
+   END LOOP;
+EXCEPTION
+   WHEN OTHERS
+   THEN
+      NULL;
 END;
 /
 
@@ -137,19 +147,17 @@ END;
 
 PROMPT Removal of LB object list if exists
 
-DECLARE
-   not_exists   EXCEPTION;
-   PRAGMA EXCEPTION_INIT (not_exists, -942);
-BEGIN
-   EXECUTE IMMEDIATE 'drop table lb_objects';
-   NM3DDL.DROP_SYNONYM_FOR_OBJECT ('LB_OBJECTS');
-
-EXCEPTION
-   WHEN not_exists
-   THEN
-      NULL;
-END;
-/
+--DECLARE
+--   not_exists   EXCEPTION;
+--   PRAGMA EXCEPTION_INIT (not_exists, -942);
+--BEGIN
+--   EXECUTE IMMEDIATE 'drop table lb_objects';
+--EXCEPTION
+--   WHEN not_exists
+--   THEN
+--      NULL;
+--END;
+--/
 
 PROMPT Clean up any residual metadata (asset types etc. ) if present
 
