@@ -1,14 +1,13 @@
-/* Formatted on 21/04/2017 14:45:46 (QP5 v5.294) */
 --
 -----------------------------------------------------------------------------
 --
 --   PVCS Identifiers :-
 --
---       pvcsid                 : $Header:   //new_vm_latest/archives/lb/admin/utl/drop_lb.sql-arc   1.13   Aug 02 2017 12:09:02   Rob.Coupe  $
+--       pvcsid                 : $Header:   //new_vm_latest/archives/lb/admin/utl/drop_lb.sql-arc   1.14   Aug 02 2017 14:12:08   Rob.Coupe  $
 --       Module Name      : $Workfile:   drop_lb.sql  $
---       Date into PVCS   : $Date:   Aug 02 2017 12:09:02  $
---       Date fetched Out : $Modtime:   Aug 02 2017 12:00:48  $
---       PVCS Version     : $Revision:   1.13  $
+--       Date into PVCS   : $Date:   Aug 02 2017 14:12:08  $
+--       Date fetched Out : $Modtime:   Aug 02 2017 14:11:12  $
+--       PVCS Version     : $Revision:   1.14  $
 --
 --   Author : Rob Coupe
 --
@@ -35,20 +34,35 @@ END;
 
 PROMPT Dropping objects in LB object registry
 
+
 DECLARE
-   CURSOR c1
-   IS
-      SELECT * FROM lb_objects;
+   LB_OBJECTS_EXISTS   BOOLEAN
+                          := nm3ddl.does_object_exist ('LB_OBJECTS', 'TABLE');
+
+   TYPE cur_type IS REF CURSOR;
+
+   c1                  cur_type;
+   CURSTR              VARCHAR2 (2000)
+      := 'select object_name, object_type from lb_objects lo ';
+   obj_name            NM3TYPE.tab_varchar30;
+   obj_type            NM3TYPE.tab_varchar30;
 BEGIN
-   FOR irec IN c1
-   LOOP
-      BEGIN
-         IF irec.object_type = 'TABLE'
+   IF LB_OBJECTS_EXISTS
+   THEN
+      OPEN c1 FOR CURSTR;
+
+      FETCH c1 BULK COLLECT INTO obj_name, obj_type;
+
+      CLOSE c1;
+
+      FOR i IN 1 .. obj_name.COUNT
+      LOOP
+         IF obj_type (i) = 'TABLE'
          THEN
             BEGIN
                EXECUTE IMMEDIATE
                      ' alter table '
-                  || irec.object_name
+                  || obj_name (i)
                   || ' drop primary key cascade ';
             EXCEPTION
                WHEN OTHERS
@@ -57,50 +71,71 @@ BEGIN
             END;
 
             EXECUTE IMMEDIATE
-               ' drop table ' || irec.object_name || ' cascade constraints ';
-         ELSIF irec.object_type IN ('VIEW',
-                                    'SEQUENCE',
-                                    'PACKAGE',
-                                    'PROCEDURE',
-                                    'FUNCTION')
+               ' drop table ' || obj_name (i) || ' cascade constraints ';
+         ELSIF obj_type (i) IN ('VIEW',
+                                'SEQUENCE',
+                                'PACKAGE',
+                                'PROCEDURE',
+                                'FUNCTION')
+         THEN
+            EXECUTE IMMEDIATE ' drop ' || obj_type (i) || ' ' || obj_name (i);
+         ELSIF obj_type (i) IN ('TYPE', 'TYPE BODY ')
          THEN
             EXECUTE IMMEDIATE
-               ' drop ' || irec.object_type || ' ' || irec.object_name;
-         ELSIF irec.object_type IN ('TYPE', 'TYPE BODY ')
-         THEN
-            EXECUTE IMMEDIATE
-                  ' drop '
-               || irec.object_type
-               || ' '
-               || irec.object_name
-               || ' FORCE';
+               ' drop ' || obj_type (i) || ' ' || obj_name (i) || ' FORCE';
          END IF;
 
-         NM3DDL.DROP_SYNONYM_FOR_OBJECT (irec.object_name);
-      EXCEPTION
-         WHEN OTHERS
-         THEN
-            NULL;
-      END;
-   END LOOP;
-EXCEPTION
-   WHEN OTHERS
-   THEN
-      NULL;
+         NM3DDL.DROP_SYNONYM_FOR_OBJECT (obj_name (i));
+      END LOOP; 
+   END IF;
+EXCEPTION WHEN OTHERS THEN NULL ;      
 END;
 /
 
 PROMPT Test for remnants
 
-SELECT object_name, object_type, 'Remains in existence'
-  FROM lb_objects lo
- WHERE EXISTS
-          (SELECT 1
-             FROM user_objects o
-            WHERE lo.object_name = o.object_name)
+SET SERVEROUTPUT ON;
+
+DECLARE
+   LB_OBJECTS_EXISTS   BOOLEAN
+                          := nm3ddl.does_object_exist ('LB_OBJECTS', 'TABLE');
+
+   TYPE cur_type IS REF CURSOR;
+
+   c1                  cur_type;
+   CURSTR              VARCHAR2 (2000)
+      :=    'select object_name, object_type from lb_objects lo '
+         || 'where exists ( select 1 from user_objects o WHERE lo.object_name = o.object_name) ';
+   obj_name            NM3TYPE.tab_varchar30;
+   obj_type            NM3TYPE.tab_varchar30;
+BEGIN
+   --   DBMS_OUTPUT.enable (buffer_size => NULL);
+
+   IF LB_OBJECTS_EXISTS
+   THEN
+      OPEN c1 FOR CURSTR;
+
+      FETCH c1 BULK COLLECT INTO obj_name, obj_type;
+
+      CLOSE c1;
+
+      FOR i IN 1 .. obj_name.COUNT
+      LOOP
+         DBMS_OUTPUT.put_line (
+               ' The object '
+            || obj_name (i)
+            || ' of type '
+            || obj_type (i)
+            || ' remains');
+      END LOOP;
+   ELSE
+      DBMS_OUTPUT.put_line (' The object registry has already been dropped');
+   END IF;
+--   DBMS_OUTPUT.disable;
+END;
 /
 
-PROMPT Removal of LB object list
+PROMPT Removal of LB object list if exists
 
 DECLARE
    not_exists   EXCEPTION;
@@ -114,13 +149,16 @@ EXCEPTION
 END;
 /
 
-PROMPT Clean up any residual metadata
+PROMPT Clean up any residual metadata (asset types etc. ) if present
 
-delete from hig_roles where hro_product = 'LB';
+DELETE FROM hig_roles
+      WHERE hro_product = 'LB';
 
-delete from hig_upgrades where hup_product = 'LB';
+DELETE FROM hig_upgrades
+      WHERE hup_product = 'LB';
 
-delete from hig_products where hpr_product = 'LB';
+DELETE FROM hig_products
+      WHERE hpr_product = 'LB';
 
 DECLARE
    CURSOR c1
@@ -128,12 +166,10 @@ DECLARE
       SELECT nit_inv_type
         FROM nm_inv_types_all
        WHERE nit_category = 'L';
-
 BEGIN
    FOR irec IN c1
    LOOP
-
-      nm3sdm.drop_layers_by_inv_type(irec.nit_inv_type, FALSE);       
+      nm3sdm.drop_layers_by_inv_type (irec.nit_inv_type, FALSE);
 
       BEGIN
          EXECUTE IMMEDIATE
