@@ -3,11 +3,11 @@
 --
 --   PVCS Identifiers :-
 --
---       pvcsid                 : $Header:   //new_vm_latest/archives/lb/admin/utl/drop_lb.sql-arc   1.14   Aug 02 2017 14:12:08   Rob.Coupe  $
+--       pvcsid                 : $Header:   //new_vm_latest/archives/lb/admin/utl/drop_lb.sql-arc   1.15   Aug 02 2017 15:07:06   Rob.Coupe  $
 --       Module Name      : $Workfile:   drop_lb.sql  $
---       Date into PVCS   : $Date:   Aug 02 2017 14:12:08  $
---       Date fetched Out : $Modtime:   Aug 02 2017 14:11:12  $
---       PVCS Version     : $Revision:   1.14  $
+--       Date into PVCS   : $Date:   Aug 02 2017 15:07:06  $
+--       Date fetched Out : $Modtime:   Aug 02 2017 14:49:04  $
+--       PVCS Version     : $Revision:   1.15  $
 --
 --   Author : Rob Coupe
 --
@@ -142,6 +142,8 @@ DECLARE
    PRAGMA EXCEPTION_INIT (not_exists, -942);
 BEGIN
    EXECUTE IMMEDIATE 'drop table lb_objects';
+   NM3DDL.DROP_SYNONYM_FOR_OBJECT ('LB_OBJECTS');
+
 EXCEPTION
    WHEN not_exists
    THEN
