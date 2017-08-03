@@ -1,13 +1,14 @@
+/* Formatted on 03/08/2017 12:33:33 (QP5 v5.294) */
 --
 -----------------------------------------------------------------------------
 --
 --   PVCS Identifiers :-
 --
---       pvcsid                 : $Header:   //new_vm_latest/archives/lb/admin/utl/drop_lb.sql-arc   1.16   Aug 02 2017 16:36:26   Rob.Coupe  $
+--       pvcsid                 : $Header:   //new_vm_latest/archives/lb/admin/utl/drop_lb.sql-arc   1.17   Aug 03 2017 12:34:34   Rob.Coupe  $
 --       Module Name      : $Workfile:   drop_lb.sql  $
---       Date into PVCS   : $Date:   Aug 02 2017 16:36:26  $
---       Date fetched Out : $Modtime:   Aug 02 2017 16:35:38  $
---       PVCS Version     : $Revision:   1.16  $
+--       Date into PVCS   : $Date:   Aug 03 2017 12:34:34  $
+--       Date fetched Out : $Modtime:   Aug 03 2017 12:33:44  $
+--       PVCS Version     : $Revision:   1.17  $
 --
 --   Author : Rob Coupe
 --
@@ -147,17 +148,17 @@ END;
 
 PROMPT Removal of LB object list if exists
 
---DECLARE
---   not_exists   EXCEPTION;
---   PRAGMA EXCEPTION_INIT (not_exists, -942);
---BEGIN
---   EXECUTE IMMEDIATE 'drop table lb_objects';
---EXCEPTION
---   WHEN not_exists
---   THEN
---      NULL;
---END;
---/
+DECLARE
+   not_exists   EXCEPTION;
+   PRAGMA EXCEPTION_INIT (not_exists, -942);
+BEGIN
+   EXECUTE IMMEDIATE 'drop table lb_objects';
+EXCEPTION
+   WHEN not_exists
+   THEN
+      NULL;
+END;
+/
 
 PROMPT Clean up any residual metadata (asset types etc. ) if present
 
