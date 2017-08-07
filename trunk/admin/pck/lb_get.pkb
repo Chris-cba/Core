@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_get
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_get.pkb-arc   1.26   Mar 27 2017 14:22:56   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_get.pkb-arc   1.27   Aug 07 2017 08:19:02   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_get.pkb  $
-   --       Date into PVCS   : $Date:   Mar 27 2017 14:22:56  $
-   --       Date fetched Out : $Modtime:   Mar 27 2017 14:23:04  $
-   --       PVCS Version     : $Revision:   1.26  $
+   --       Date into PVCS   : $Date:   Aug 07 2017 08:19:02  $
+   --       Date fetched Out : $Modtime:   Aug 04 2017 13:39:42  $
+   --       PVCS Version     : $Revision:   1.27  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,7 +16,7 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.26  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.27  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_get';
 
@@ -1514,13 +1514,15 @@ AS
                              t1."INV_END",
                              t1."NE_LENGTH",
                              t1.ne_nt_type,
-                             ROUND (inv_start, 2) inv_datum_start,
+							 inv_start inv_datum_start,
+                             -- ROUND (inv_start, 2) inv_datum_start,
                              --                             round(CASE route_dir_flag
                              --                                WHEN 1 THEN inv_start
                              --                                ELSE ne_length - inv_end
                              --                             END, 2 )
                              --                                inv_datum_start,
-                             ROUND (inv_end, 2)   inv_datum_end,
+							 inv_end inv_datum_end,
+                             -- ROUND (inv_end, 2)   inv_datum_end,
                              --                             round(CASE route_dir_flag
                              --                                WHEN 1 THEN inv_end
                              --                                ELSE ne_length  - inv_start
