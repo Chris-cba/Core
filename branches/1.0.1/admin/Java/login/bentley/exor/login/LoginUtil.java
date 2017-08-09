@@ -1,12 +1,12 @@
 /**
  *	PVCS Identifiers :-
  *
- *		PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/Java/login/bentley/exor/login/LoginUtil.java-arc   1.0.1.2   Jul 04 2017 10:07:34   Upendra.Hukeri  $
+ *		PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/Java/login/bentley/exor/login/LoginUtil.java-arc   1.0.1.3   Aug 09 2017 12:08:04   Upendra.Hukeri  $
  *		Module Name      : $Workfile:   LoginUtil.java  $
  *		Author			 : $Author:   Upendra.Hukeri  $
- *		Date Into PVCS   : $Date:   Jul 04 2017 10:07:34  $
- *		Date Fetched Out : $Modtime:   Jul 04 2017 10:02:04  $
- *		PVCS Version     : $Revision:   1.0.1.2  $
+ *		Date Into PVCS   : $Date:   Aug 09 2017 12:08:04  $
+ *		Date Fetched Out : $Modtime:   Aug 09 2017 12:07:16  $
+ *		PVCS Version     : $Revision:   1.0.1.3  $
  *
  *	This class is used to make a connection to Oracle Database using a WebLogic Data Source
  *	(jdbc/<TNS-NAME>_LOGINDS) and fire queries using it, when connection is not available from Oracle 
@@ -76,7 +76,7 @@ public class LoginUtil {
 			} 
 		} catch(SQLException changePasswordSQLException) {
 			logException(changePasswordSQLException, "changePassword", IMSLogger.ERROR);
-			String error = changePasswordSQLException.getMessage();
+			String error = changePasswordSQLException.getMessage().toLowerCase();
 			
 			if(error.contains("password verification for the specified password failed")) {
 				result = error.substring(error.lastIndexOf(": ") + 2);
@@ -84,6 +84,8 @@ public class LoginUtil {
 				result = "Invalid username/password";
 			} else if(error.contains("the account is locked")) {
 				result = "The account is locked";
+			} else if(error.contains("the password cannot be reused")) {
+				result = "The password cannot be reused";
 			} else {
 				result = errorMessage;
 			} 
