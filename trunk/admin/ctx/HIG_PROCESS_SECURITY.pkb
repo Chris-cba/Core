@@ -4,16 +4,16 @@ CREATE OR REPLACE PACKAGE body hig_process_security AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/ctx/HIG_PROCESS_SECURITY.pkb-arc   1.0   Jun 15 2017 14:27:44   Chris.Baugh  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/ctx/HIG_PROCESS_SECURITY.pkb-arc   1.1   Aug 10 2017 11:17:46   James.Wadsworth  $
 --       Module Name      : $Workfile:   HIG_PROCESS_SECURITY.pkb  $
---       Date into SCCS   : $Date:   Jun 15 2017 14:27:44  $
---       Date fetched Out : $Modtime:   Jun 15 2017 13:31:52  $
---       SCCS Version     : $Revision:   1.0  $
+--       Date into SCCS   : $Date:   Aug 10 2017 11:17:46  $
+--       Date fetched Out : $Modtime:   Aug 10 2017 10:32:52  $
+--       SCCS Version     : $Revision:   1.1  $
 --
 -----------------------------------------------------------------------------
 --    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
-g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   1.0  $"';
+g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   1.1  $"';
 
   FUNCTION get_version RETURN VARCHAR2 IS
   BEGIN
@@ -69,7 +69,7 @@ retval varchar2(8000) := '((( hp_process_type_id IN '||
                     ' WHERE     hptr_process_type_id = hp_process_type_id '||
                     '       AND hur_username = '||usern||
                           ' AND hur_role = hptr_role) '||
-               ' OR  hp_process_type_id IN (-1501, -1502, -1503, -1504, 1505, -1506)) ';
+               ' OR  hp_process_type_id IN (-1501, -1502, -1503, -1504, -1505, -1506)) ';
 
                                                                                                           
 begin  
