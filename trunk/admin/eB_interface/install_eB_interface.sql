@@ -1,10 +1,10 @@
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/eB_interface/install_eB_interface.sql-arc   1.4   Oct 29 2015 09:00:30   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/eB_interface/install_eB_interface.sql-arc   1.5   Aug 11 2017 15:17:44   Rob.Coupe  $
    --       Module Name      : $Workfile:   install_eB_interface.sql  $
-   --       Date into PVCS   : $Date:   Oct 29 2015 09:00:30  $
-   --       Date fetched Out : $Modtime:   Oct 29 2015 09:00:54  $
-   --       PVCS Version     : $Revision:   1.4  $
+   --       Date into PVCS   : $Date:   Aug 11 2017 15:17:44  $
+   --       Date fetched Out : $Modtime:   Aug 11 2017 15:17:10  $
+   --       PVCS Version     : $Revision:   1.5  $
    --
    --   Author : R.A. Coupe
    --
@@ -15,25 +15,171 @@
    ----------------------------------------------------------------------------
    --
 --start ..\admin\eB_interface\eB_interface.tyh  --RAC the types in this script are already absorbed into main LB installation
-start ..\admin\eB_interface\CloseLinearLocation.prc
-start ..\admin\eB_interface\CreateLinearLocation.prc
-start ..\admin\eB_interface\CreateLinearRange.prc
-start ..\admin\eB_interface\GetAssetLinearLocations.fnc
-start ..\admin\eB_interface\GetAssetLinearLocationsTab.fnc
-start ..\admin\eB_interface\GetLinearElementTypes.prc
-start ..\admin\eB_interface\GetLinearLocations.fnc
-start ..\admin\eB_interface\GetLinearRanges.fnc
-start ..\admin\eB_interface\GetNetworkElementMeasures.fnc
-start ..\admin\eB_interface\GetNetworkElements.fnc
-start ..\admin\eB_interface\GetNetworkTypes.fnc
-start ..\admin\eB_interface\GetXspList.fnc
-start ..\admin\eB_interface\GetNetworkLinearLocations.fnc
-start ..\admin\eB_interface\GetNetworkLinearLocationsTab.fnc
-start ..\admin\eB_interface\lb_register_units.sql
-start ..\admin\eB_interface\UpdateLinearLocation.prc
-start ..\admin\eB_interface\v_network_elements.sql
-start ..\admin\eB_interface\v_network_types.sql
 
+SET TERM ON
+PROMPT CloseLinearLocation.prc                                                                                                                                                                                                            
+SET TERM OFF
+SET DEFINE ON
+SELECT '&exor_base'||'lb'||'&terminator'||'admin'||'&terminator'||'eB_interface'||'&terminator'||'CloseLinearLocation.prc' run_file 
+FROM dual
+/
+start '&run_file'
+
+
+SET TERM ON
+PROMPT CreateLinearLocation.prc                                                                                                                                                                                                         
+SET TERM OFF
+SET DEFINE ON
+SELECT '&exor_base'||'lb'||'&terminator'||'admin'||'&terminator'||'eB_interface'||'&terminator'||'CreateLinearLocation.prc' run_file 
+FROM dual
+/
+start '&run_file'
+
+SET TERM ON
+PROMPT CreateLinearRange.prc                                                                                                                                                                                                            
+SET TERM OFF
+SET DEFINE ON
+SELECT '&exor_base'||'lb'||'&terminator'||'admin'||'&terminator'||'eB_interface'||'&terminator'||'CreateLinearRange.prc' run_file 
+FROM dual
+/
+start '&run_file'
+
+SET TERM ON
+PROMPT GetAssetLinearLocations.fnc                                                                                                                                                                                                           
+SET TERM OFF
+SET DEFINE ON
+SELECT '&exor_base'||'lb'||'&terminator'||'admin'||'&terminator'||'eB_interface'||'&terminator'||'GetAssetLinearLocations.fnc' run_file 
+FROM dual
+/
+start '&run_file'
+
+start ..\admin\eB_interface\GetAssetLinearLocationsTab.fnc
+SET TERM ON
+PROMPT GetAssetLinearLocationsTab.fnc                                                                                                                                                                                                           
+SET TERM OFF
+SET DEFINE ON
+SELECT '&exor_base'||'lb'||'&terminator'||'admin'||'&terminator'||'eB_interface'||'&terminator'||'GetAssetLinearLocationsTab.fnc' run_file 
+FROM dual
+/
+start '&run_file'
+
+
+SET TERM ON
+PROMPT GetLinearElementTypes.prc                                                                                                                                                                                                          
+SET TERM OFF
+SET DEFINE ON
+SELECT '&exor_base'||'lb'||'&terminator'||'admin'||'&terminator'||'eB_interface'||'&terminator'||'GetLinearElementTypes.prc' run_file 
+FROM dual
+/
+start '&run_file'
+
+SET TERM ON
+PROMPT GetLinearLocations.fnc                                                                                                                                                                                                          
+SET TERM OFF
+SET DEFINE ON
+SELECT '&exor_base'||'lb'||'&terminator'||'admin'||'&terminator'||'eB_interface'||'&terminator'||'GetLinearLocations.fnc' run_file 
+FROM dual
+/
+start '&run_file'
+
+SET TERM ON
+PROMPT GetLinearRanges.fnc                                                                                                                                                                                                            
+SET TERM OFF
+SET DEFINE ON
+SELECT '&exor_base'||'lb'||'&terminator'||'admin'||'&terminator'||'eB_interface'||'&terminator'||'GetLinearRanges.fnc' run_file 
+FROM dual
+/
+start '&run_file'
+
+SET TERM ON
+PROMPT GetNetworkElementMeasures.fnc                                                                                                                                                                                                        
+SET TERM OFF
+SET DEFINE ON
+SELECT '&exor_base'||'lb'||'&terminator'||'admin'||'&terminator'||'eB_interface'||'&terminator'||'GetNetworkElementMeasures.fnc' run_file 
+FROM dual
+/
+start '&run_file'
+
+SET TERM ON
+PROMPT GetNetworkElements.fnc                                                                                                                                                                                                         
+SET TERM OFF
+SET DEFINE ON
+SELECT '&exor_base'||'lb'||'&terminator'||'admin'||'&terminator'||'eB_interface'||'&terminator'||'GetNetworkElements.fnc' run_file 
+FROM dual
+/
+start '&run_file'
+
+SET TERM ON
+PROMPT GetNetworkTypes.fnc                                                                                                                                                                                                          
+SET TERM OFF
+SET DEFINE ON
+SELECT '&exor_base'||'lb'||'&terminator'||'admin'||'&terminator'||'eB_interface'||'&terminator'||'GetNetworkTypes.fnc' run_file 
+FROM dual
+/
+start '&run_file'
+
+SET TERM ON
+PROMPT GetXspList.fnc                                                                                                                                                                                                          
+SET TERM OFF
+SET DEFINE ON
+SELECT '&exor_base'||'lb'||'&terminator'||'admin'||'&terminator'||'eB_interface'||'&terminator'||'GetXspList.fnc' run_file 
+FROM dual
+/
+start '&run_file'
+
+SET TERM ON
+PROMPT GetNetworkLinearLocations.fnc                                                                                                                                                                                                          
+SET TERM OFF
+SET DEFINE ON
+SELECT '&exor_base'||'lb'||'&terminator'||'admin'||'&terminator'||'eB_interface'||'&terminator'||'GetNetworkLinearLocations.fnc' run_file 
+FROM dual
+/
+start '&run_file'
+
+SET TERM ON
+PROMPT GetNetworkLinearLocationsTab.fnc                                                                                                                                                                                                            
+SET TERM OFF
+SET DEFINE ON
+SELECT '&exor_base'||'lb'||'&terminator'||'admin'||'&terminator'||'eB_interface'||'&terminator'||'GetNetworkLinearLocationsTab.fnc' run_file 
+FROM dual
+/
+start '&run_file'
+
+SET TERM ON
+PROMPT lb_register_units.sql                                                                                                                                                                                                          
+SET TERM OFF
+SET DEFINE ON
+SELECT '&exor_base'||'lb'||'&terminator'||'admin'||'&terminator'||'eB_interface'||'&terminator'||'lb_register_units.sql' run_file 
+FROM dual
+/
+start '&run_file'
+
+SET TERM ON
+PROMPT UpdateLinearLocation.prc                                                                                                                                                                                                         
+SET TERM OFF
+SET DEFINE ON
+SELECT '&exor_base'||'lb'||'&terminator'||'admin'||'&terminator'||'eB_interface'||'&terminator'||'UpdateLinearLocation.prc' run_file 
+FROM dual
+/
+start '&run_file'
+
+SET TERM ON
+PROMPT v_network_types.sql                                                                                                                                                                                                      
+SET TERM OFF
+SET DEFINE ON
+SELECT '&exor_base'||'lb'||'&terminator'||'admin'||'&terminator'||'eB_interface'||'&terminator'||'v_network_types.sql' run_file 
+FROM dual
+/
+start '&run_file'
+
+SET TERM ON
+PROMPT v_network_elements.sql                                                                                                                                                                                                      
+SET TERM OFF
+SET DEFINE ON
+SELECT '&exor_base'||'lb'||'&terminator'||'admin'||'&terminator'||'eB_interface'||'&terminator'||'v_network_elements.sql' run_file 
+FROM dual
+/
+start '&run_file'
 
 DECLARE
    TYPE object_name_type IS TABLE OF VARCHAR2 (123) INDEX BY binary_integer;
