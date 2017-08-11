@@ -15,18 +15,17 @@ CREATE OR REPLACE FORCE VIEW V_NM_INV_ON_NETWORK
 )
 AS
    SELECT 
-                                                      --   SCCS Identifiers :-
-                                                                            --
-                   --       sccsid           : @(#)nm_elements.vw 1.3 03/24/05
-                                    --       Module Name      : nm_elements.vw
-                                 --       Date into SCCS   : 05/03/24 16:15:06
-                                 --       Date fetched Out : 07/06/13 17:08:05
-                                               --       SCCS Version     : 1.3
-                                                                            --
- -----------------------------------------------------------------------------
-    --   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
- -----------------------------------------------------------------------------
-                                                                            --   
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
+--       PVCS id          : $Header:   //new_vm_latest/archives/lb/admin/views/v_nm_inv_on_network.vw-arc   1.1   Aug 11 2017 15:00:14   Rob.Coupe  $
+--       Module Name      : $Workfile:   v_nm_inv_on_network.vw  $
+--       Date into PVCS   : $Date:   Aug 11 2017 15:00:14  $
+--       Date fetched Out : $Modtime:   Aug 11 2017 14:59:54  $
+--       Version          : $Revision:   1.1  $
+--------------------------------------------------------------------------
+--   Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
+--------------------------------------------------------------------------
+----
           nit_inv_type,
           nit_table_name,
           nit_foreign_pk_column,
