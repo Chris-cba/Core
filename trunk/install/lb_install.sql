@@ -1,11 +1,11 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/lb/install/lb_install.sql-arc   1.14   Aug 11 2017 13:01:14   Rob.Coupe  $
+--       sccsid           : $Header:   //new_vm_latest/archives/lb/install/lb_install.sql-arc   1.15   Aug 11 2017 15:42:32   Rob.Coupe  $
 --       Module Name      : $Workfile:   lb_install.sql  $
---       Date into PVCS   : $Date:   Aug 11 2017 13:01:14  $
---       Date fetched Out : $Modtime:   Aug 11 2017 13:00:44  $
---       PVCS Version     : $Revision:   1.14  $
+--       Date into PVCS   : $Date:   Aug 11 2017 15:42:32  $
+--       Date fetched Out : $Modtime:   Aug 11 2017 15:30:28  $
+--       PVCS Version     : $Revision:   1.15  $
 --
 --------------------------------------------------------------------------------
 --   Copyright (c) 2017 Bentley Systems Incorporated. All rights reserved.
@@ -49,11 +49,13 @@ WHENEVER SQLERROR EXIT
 DECLARE
   l_version            VARCHAR2(10);
   ex_already_installed EXCEPTION;
-
+  exor_core_not_configured EXCEPTION;
+  
   TYPE                 refcur IS REF CURSOR;
   rc                   refcur;
   cnt                  integer;
   v_sql                VARCHAR2(1000);
+  l_count              integer;
 
 BEGIN
    --
@@ -82,9 +84,24 @@ BEGIN
    IF cnt <> 0 THEN
       RAISE ex_already_installed;
    END IF;
+   
+   select count(1) into l_count  
+   from nm_nw_themes, 
+        nm_themes_all, 
+		nm_linear_types
+   WHERE     nth_theme_id = nnth_nth_theme_id
+   AND nlt_id = nnth_nlt_id
+   AND nth_base_table_theme IS NULL;
+   
+   IF l_count <> 0 THEN
+      RAISE exor_core_not_configured.
+   END IF;
+ 
 EXCEPTION
   WHEN ex_already_installed THEN
     RAISE_APPLICATION_ERROR(-20001,'LB version '||l_version||' already installed.');
+  WHEN exor_core_not_configured THEN 
+    RAISE_APPLICATION_ERROR( -20002, 'LB install has a pre-requisite on network and linear types and theme, please configure this in Exor core';
  WHEN others THEN
     Null;
 END;
