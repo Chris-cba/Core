@@ -1,212 +1,290 @@
+--------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/lb/install/lb_install.sql-arc   1.13   Aug 02 2017 11:28:16   Rob.Coupe  $
+--       sccsid           : $Header:   //new_vm_latest/archives/lb/install/lb_install.sql-arc   1.14   Aug 11 2017 13:01:14   Rob.Coupe  $
 --       Module Name      : $Workfile:   lb_install.sql  $
---       Date into PVCS   : $Date:   Aug 02 2017 11:28:16  $
---       Date fetched Out : $Modtime:   Aug 02 2017 11:16:48  $
---       PVCS Version     : $Revision:   1.13  $
+--       Date into PVCS   : $Date:   Aug 11 2017 13:01:14  $
+--       Date fetched Out : $Modtime:   Aug 11 2017 13:00:44  $
+--       PVCS Version     : $Revision:   1.14  $
 --
---   Author : R.A. Coupe
+--------------------------------------------------------------------------------
+--   Copyright (c) 2017 Bentley Systems Incorporated. All rights reserved.
+--------------------------------------------------------------------------------
 --
---   Script for initial installation of LB - to be replaced by formal product 
---   install and upgrade scripts
+set echo off
+set linesize 120
+set heading off
+set feedback off
+
 --
------------------------------------------------------------------------------
--- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
-----------------------------------------------------------------------------
+-- Grab date/time to append to log file names this is standard to all upgrade/install scripts
 --
-  
+undefine log_extension
+col      log_extension new_value log_extension noprint
+set term off
+select  TO_CHAR(sysdate,'DDMONYYYY_HH24MISS')||'.LOG' log_extension from dual
+/
+set term on
+--
+---------------------------------------------------------------------------------------------------
+--
+--
+-- Spool to Logfile
+--
+define logfile1='lb_install_1_&log_extension'
+--define logfile2='lb_install_2_&log_extension'
+spool &logfile1
+--
+---------------------------------------------------------------------------------------------------
+--
+select 'Installation Date ' || to_char(sysdate, 'DD-MON-YYYY HH24:MM:SS') from dual;
+
+SELECT 'Install Running on ' ||LOWER(USER||'@'||instance_name||'.'||host_name)||' - DB ver : '||version
+FROM v$instance;
+
 WHENEVER SQLERROR EXIT
+--
+-- Check that LB has not already been installed
+--
+DECLARE
+  l_version            VARCHAR2(10);
+  ex_already_installed EXCEPTION;
 
-DECLARE cnt NUMBER;
+  TYPE                 refcur IS REF CURSOR;
+  rc                   refcur;
+  cnt                  integer;
+  v_sql                VARCHAR2(1000);
+
 BEGIN
-   SELECT COUNT(1) INTO cnt FROM hig_products WHERE hpr_product = 'LB';
-        -- Check if user is already exist or not
-   IF cnt <> 0 THEN
-      raise_application_error(-20001, 'LB Already Installed..');
-   END IF;
+   --
+--
+-- Check NM3 installed at appropriate version 
+--
+   hig2.product_exists_at_version (p_product    => 'NET'
+                                  ,p_version    => '4.7.0.0'
+                                  );
+--
+--Now check if LB is already installed
+--
+   v_sql := 'SELECT hpr_version FROM hig_products WHERE hpr_product = ''LB''';
+   --
+   OPEN rc FOR v_sql;
+   FETCH rc INTO l_version;
+   CLOSE rc;
 
+   IF l_version IS NOT NULL THEN
+       RAISE ex_already_installed;
+   END IF;
+   
+   l_version := '4.1';
+   
    SELECT COUNT(1) INTO cnt FROM user_objects WHERE object_name = 'LB_GET';
    IF cnt <> 0 THEN
-      raise_application_error(-20001, 'LB Already Installed..');
+      RAISE ex_already_installed;
    END IF;
+EXCEPTION
+  WHEN ex_already_installed THEN
+    RAISE_APPLICATION_ERROR(-20001,'LB version '||l_version||' already installed.');
+ WHEN others THEN
+    Null;
 END;
 /
-
 WHENEVER SQLERROR CONTINUE
-
-Prompt Installation of Location Bridge
-
-Prompt Objects and Data Types
-
-start lb_data_types.sql;
-
-Prompt DDL Script - tables, indexes, constraints etc
-
-start lb_ddl.sql;
-
-Prompt Packages
-
-start ..\admin\pck\LB_GET.pkh;
-start ..\admin\pck\LB_LOAD.pkh;
-start ..\admin\pck\LB_LOC.pkh;
-start ..\admin\pck\LB_OPS.pkh;
-start ..\admin\pck\LB_PATH.pkh;
-start ..\admin\pck\LB_REF.pkh;
-start ..\admin\pck\LB_REG.pkh;
-start ..\admin\pck\LB_PATH_REG.pkh;
-
-Prompt Views
-
-start lb_views.sql;
-
-start ..\admin\views\views.sql
-
-Prompt Stand alone procedures
-
---start ..\admin\pck\get_lb_rpt_d_tab.prc;
---start ..\admin\pck\get_lb_rpt_r_tab.prc;
-
-start ..\admin\pck\create_nlt_geometry_view.prc;
-
-begin
-CREATE_NLT_GEOMETRY_VIEW;
-end;
+--
+---------------------------------------------------------------------------------------------------
+--                        ****************   TABLES  *******************
+SET TERM ON
+prompt Tables...
+SET TERM OFF
+SET DEFINE ON
+select '&exor_base'||'lb'||'&terminator'||'install'||
+        '&terminator'||'lb.tab' run_file
+from dual
 /
-
-Prompt Package bodies
-
-start ..\admin\pck\LB_PATH_REG.pkb;
-start ..\admin\pck\LB_OPS.pkb
-start ..\admin\pck\LB_REG.pkb;
-start ..\admin\pck\LB_REF.pkb;
-start ..\admin\pck\LB_GET.pkb;
-start ..\admin\pck\LB_LOAD.pkb;
-start ..\admin\pck\LB_LOC.pkb;
-start ..\admin\pck\LB_PATH.pkb;
-
-prompt Creating the registry of Location Bridge Objects
-
-DECLARE
-   TYPE object_name_type IS TABLE OF VARCHAR2 (123) INDEX BY binary_integer;
-
-   TYPE object_type_type IS TABLE OF VARCHAR2 (23) INDEX BY binary_integer;
-
-   l_object_name   object_name_type;
-   l_object_type   object_type_type;
-
-   PROCEDURE add_object (p_object_name VARCHAR2, p_object_type VARCHAR2)
-   IS
-      i   CONSTANT PLS_INTEGER := l_object_name.COUNT + 1;
-   BEGIN
-      l_object_name (i) := p_object_name;
-      l_object_type (i) := p_object_type;
-   END add_object;
-BEGIN
-   add_object( 'CREATE_NLT_GEOMETRY_VIEW','PROCEDURE');
-   add_object( 'LB_ASSET_TYPE_NETWORK','TYPE');
-   add_object( 'LB_ASSET_TYPE_NETWORK_TAB','TYPE');
-   add_object( 'LB_GET','PACKAGE');
-   add_object( 'LB_GET','PACKAGE BODY');
-   add_object( 'LB_INV_SECURITY','TABLE');
-   add_object( 'LB_JXP','TYPE');
-   add_object( 'LB_JXP_TAB','TYPE');
-   add_object( 'LB_LINEAR_REFNT','TYPE');
-   add_object( 'LB_LINEAR_REFNT_TAB','TYPE');
-   add_object( 'LB_LINEAR_TYPE','TYPE');
-   add_object( 'LB_LINEAR_TYPE_TAB','TYPE');
-   add_object( 'LB_LOAD','PACKAGE');
-   add_object( 'LB_LOAD','PACKAGE BODY');
-   add_object( 'LB_LOC','PACKAGE');
-   add_object( 'LB_LOC','PACKAGE BODY');
-   add_object( 'LB_LOCATION_ID','TYPE');
-   add_object( 'LB_LOCATION_ID_TAB','TYPE');
-   add_object( 'LB_LOC_ERROR','TYPE');
-   add_object( 'LB_LOC_ERROR_TAB','TYPE');
-   add_object( 'LB_OBJ_GEOM','TYPE');
-   add_object( 'LB_OBJ_GEOM_TAB','TYPE');
-   add_object( 'LB_OBJ_ID','TYPE');
-   add_object( 'LB_OBJ_ID_TAB','TYPE');
-   add_object( 'LB_OPS','PACKAGE');
-   add_object( 'LB_OPS','PACKAGE BODY');
-   add_object( 'LB_PATH','PACKAGE');
-   add_object( 'LB_PATH','PACKAGE BODY');
-   add_object( 'LB_PATH_REG','PACKAGE');
-   add_object( 'LB_PATH_REG','PACKAGE BODY');
-   add_object( 'LB_REF','PACKAGE');
-   add_object( 'LB_REF','PACKAGE BODY');
-   add_object( 'LB_REFNT_MEASURE','TYPE');
-   add_object( 'LB_REFNT_MEASURE_TAB','TYPE');
-   add_object( 'LB_REG','PACKAGE');
-   add_object( 'LB_REG','PACKAGE BODY');
-   add_object( 'LB_RPT','TYPE');
-   add_object( 'LB_RPT_GEOM','TYPE');
-   add_object( 'LB_RPT_GEOM_TAB','TYPE');
-   add_object( 'LB_RPT_TAB','TYPE');
-   add_object( 'LB_STATS','TYPE');
-   add_object( 'LB_STATS','TYPE BODY');
-   add_object( 'LB_TYPES','TABLE');
-   add_object( 'LB_XSP','TYPE');
-   add_object( 'LB_XSP_TAB','TYPE');
-   add_object( 'LINEAR_ELEMENT_TYPE','TYPE');
-   add_object( 'LINEAR_ELEMENT_TYPES','TYPE');
-   add_object( 'LINEAR_LOCATION','TYPE');
-   add_object( 'LINEAR_LOCATIONS','TYPE');
-   add_object( 'NAL_ID_SEQ','SEQUENCE');
-   add_object( 'NLG_ID_SEQ','SEQUENCE');
-   add_object( 'NAG_ID_SEQ','SEQUENCE');
-   add_object( 'NM_ASSET_GEOMETRY','VIEW');
-   add_object( 'NM_ASSET_GEOMETRY_ALL','TABLE');
-   add_object( 'NM_ASSET_LOCATIONS','VIEW');
-   add_object( 'NM_ASSET_LOCATIONS_ALL','TABLE');
-   add_object( 'NM_ASSET_TYPE_JUXTAPOSITIONS','TABLE');
-   add_object( 'NM_JUXTAPOSITIONS','TABLE');
-   add_object( 'NM_JUXTAPOSITION_TYPES','TABLE');
-   add_object( 'NM_LOCATIONS','VIEW');
-   add_object( 'NM_LOCATIONS_ALL','TABLE');
-   add_object( 'NM_LOCATION_GEOMETRY','TABLE');
-   add_object( 'NM_LOC_ID_SEQ','SEQUENCE');
-   add_object( 'V_LB_INV_NLT_DATA','VIEW');
-   add_object( 'V_LB_NETWORKTYPES','VIEW');
-   add_object( 'V_LB_NLT_GEOMETRY','VIEW');
-   add_object( 'V_LB_NLT_REFNTS','VIEW');
-   add_object( 'V_LB_XSP_LIST','VIEW');
-   add_object( 'V_NM_NLT_DATA','VIEW');
-   add_object( 'V_NM_NLT_MEASURES','VIEW');
-   add_object( 'V_NM_NLT_REFNTS','VIEW');
-   add_object( 'V_NM_NLT_UNIT_CONVERSIONS','VIEW');
-   add_object('V_LB_DIRECTED_PATH_LINKS','VIEW');  
-   add_object('LB_UNITS','TABLE'); 
-   add_object('V_LB_PATH_LINKS', 'VIEW');
-   add_object('V_LB_PATH_BETWEEN_POINTS', 'VIEW');
-   add_object('V_NETWORK_ELEMENTS', 'VIEW');
-   
-   --   
-   FOR i IN 1 .. l_object_name.COUNT
-   LOOP
-     begin
-      INSERT INTO lb_objects (object_name, object_type)
-           VALUES (l_object_name (i), l_object_type (i));
-     exception
-       when dup_val_on_index then
-         NULL;
-     end;
-   END LOOP;
-END;
+SET FEEDBACK ON
+start '&&run_file'
+SET FEEDBACK OFF
+--
+---------------------------------------------------------------------------------------------------
+--                        ****************   INDEXES  *******************
+SET TERM ON
+prompt Indexes...
+SET TERM OFF
+SET DEFINE ON
+select '&exor_base'||'lb'||'&terminator'||'install'||
+        '&terminator'||'lb.ind' run_file
+from dual
 /
+SET FEEDBACK ON
+start '&&run_file'
+SET FEEDBACK OFF
+--
+---------------------------------------------------------------------------------------------------
+--                        ****************   CONSTRAINTS  *******************
+SET TERM ON
+prompt Constraints...
+SET TERM OFF
+SET DEFINE ON
+select '&exor_base'||'lb'||'&terminator'||'install'||
+        '&terminator'||'lb.con' run_file
+from dual
+/
+SET FEEDBACK ON
+start '&&run_file'
+SET FEEDBACK OFF
+--
+---------------------------------------------------------------------------------------------------
+--                        ****************   SEQUENCES  *******************
+SET TERM ON
+prompt Sequences...
+SET TERM OFF
+SET DEFINE ON
+select '&exor_base'||'lb'||'&terminator'||'install'||
+        '&terminator'||'lb.sqs' run_file
+from dual
+/
+SET FEEDBACK ON
+start '&&run_file'
+SET FEEDBACK OFF
 
-commit;
+--
+---------------------------------------------------------------------------------------------------
+--                        ****************   TYPES  *******************
+SET TERM ON
+prompt Types...
+SET TERM OFF
+SET DEFINE ON
+select '&exor_base'||'lb'||'&terminator'||'admin'||'&terminator'||'typ'||
+        '&terminator'||'lbtyp.sql' run_file
+from dual
+/
+SET FEEDBACK ON
+start '&&run_file'
+SET FEEDBACK OFF
 
-prompt Creating eB interface modules
+--
+---------------------------------------------------------------------------------------------------
+--                        ****************   PACKAGE HEADERS  *******************
+SET TERM ON
+prompt Package Headers...
+SET TERM OFF
+SET DEFINE ON
+select '&exor_base'||'lb'||'&terminator'||'admin'||
+        '&terminator'||'pck'||'&terminator'||'lbpkh.sql' run_file
+from dual
+/
+SET FEEDBACK ON
+start '&&run_file'
+SET FEEDBACK OFF
+--
+---------------------------------------------------------------------------------------------------
+--                            ****************   VIEWS  *******************
+SET TERM ON
+prompt Views...
+SET TERM OFF
+SET DEFINE ON
+select '&exor_base'||'lb'||'&terminator'||'admin'||'&terminator'||'views'||
+        '&terminator'||'lbviews.sql' run_file
+from dual
+/
+SET FEEDBACK ON
+start '&&run_file'
+SET FEEDBACK OFF
+--
+---------------------------------------------------------------------------------------------------
+--                         ****************   PACKAGE BODIES  *******************
+SET TERM ON
+prompt Package Bodies...
+SET TERM OFF
+SET DEFINE ON
+select '&exor_base'||'lb'||'&terminator'||'admin'||
+        '&terminator'||'pck'||'&terminator'||'lbpkb.sql' run_file
+from dual
+/
+SET FEEDBACK ON
+start '&&run_file'
+SET FEEDBACK OFF
+--
+---------------------------------------------------------------------------------------------------
+--                         ****************   TRIGGERS  *******************
+SET TERM ON
+prompt Triggers...
+SET TERM OFF
+SET DEFINE ON
+select '&exor_base'||'lb'||'&terminator'||'admin'||
+        '&terminator'||'trg'||'&terminator'||'lbtrg.sql' run_file
+from dual
+/
+SET FEEDBACK ON
+start '&&run_file'
+SET FEEDBACK OFF
 
-start ..\admin\eB_interface\install_eB_interface.sql
+--
+---------------------------------------------------------------------------------------------------
+--                        ****************   eB Interface modules  *******************
+SET TERM ON
+prompt eB interface...
+SET TERM OFF
+SET DEFINE ON
+select '&exor_base'||'lb'||'&terminator'||'admin'||'&terminator'||'eB_Interface'||
+        '&terminator'||'install_eB_interface' run_file
+from dual
+/
+SET FEEDBACK ON
+start '&&run_file'
+SET FEEDBACK OFF
 
-prompt Creating synonyms
+SET TERM ON
+PROMPT Meta-Data
+SET TERM OFF
+SET DEFINE ON
+select '&exor_base'||'lb'||'&terminator'||'install'||
+        '&terminator'||'lbdata.sql' run_file
+from dual
+/
+SET FEEDBACK ON
+start '&&run_file'
+SET FEEDBACK OFF
+
+--
+---------------------------------------------------------------------------------------------------
+--                        ****************   COMPILE SCHEMA   *******************
+SET TERM ON
+Prompt Compiling LB objects...
+SET TERM OFF
+--SPOOL OFF
+
+--SET DEFINE ON
+--SELECT '&exor_base'||'lb'||'&terminator'||'admin'||
+--'&terminator'||'utl'||'&terminator'||'compile_lb_objects.sql' run_file
+--FROM dual
+--/
+--START '&run_file'
+
+SET DEFINE ON
+Prompt Dependency Order View.
+SELECT '&exor_base'||'lb'||'&terminator'||'admin'||
+'&terminator'||'utl'||'&terminator'||'lb_dependendency_order.vw' run_file
+FROM dual
+/
+START '&run_file'
+
+SET DEFINE ON
+Prompt Compilation...
+SELECT '&exor_base'||'lb'||'&terminator'||'admin'||
+'&terminator'||'utl'||'&terminator'||'compile_lb_objects2.sql' run_file
+FROM dual
+/
+SET SERVEROUTPUT ON;
+
+START '&run_file'
+
+Prompt Creating synonyms
 
 declare
   cursor c1 is
     select * from lb_objects l
-    where object_type in ('PACKAGE', 'TABLE', 'VIEW', 'PROCEDURE', 'SEQUENCE', 'PACKAGE BODY', 'TYPE', 'FUNCTION' );
+    where object_type in ('PACKAGE', 'TABLE', 'VIEW', 'PROCEDURE', 'SEQUENCE' );
 begin
   if nvl(hig.get_sysopt('HIGPUBSYN'),'Y') = 'Y' 
   then
@@ -219,19 +297,44 @@ begin
 end;    
 /
 
-insert into hig_products 
-(hpr_product, hpr_product_name, hpr_version, hpr_key, hpr_sequence)
-values
-('LB', 'Location Bridge', '4.7.0.0', '76', 99)
+--spool &logfile2
 
+--get some db info
+select 'Install Date ' || to_char(sysdate, 'DD-MON-YYYY HH24:MM:SS') from dual;
+SELECT 'Install Running on ' ||LOWER(username||'@'||instance_name||'.'||host_name)||' - DB ver : '||version
+FROM v$instance
+    ,user_users;
+
+--START compile_lb.sql
+--
+--SET FEEDBACK ON
+--start &&run_file
+--SET FEEDBACK OFF
+
+--
+---------------------------------------------------------------------------------------------------
+--                        ***********  Product and Version Number  *******************
+insert into hig_products ( hpr_product, hpr_product_name, hpr_version, hpr_key, hpr_sequence )
+values ('LB', 'Location Bridge', '4.7.0.3', '76', 99);  
+
+
+SET TERM ON
+Prompt Setting The Version Number...
+SET TERM OFF
+BEGIN
+      hig2.upgrade('LB','lb_install.sql','Installed','4.7.0.3');
+END;
 /
+COMMIT;
 
-insert into hig_upgrades
-(hup_product, date_upgraded, from_version, to_version, upgrade_script, executed_by, remarks )
-values
-('LB', sysdate, '4.7.0.0', '4.7.0.0', 'lb_install.sql', user, 'Location Bridge development version 4.7.0.0' )
-/
+SET TERM ON
+SELECT 'Product installed at version '||hpr_product||' ' ||hpr_version details
+FROM hig_products
+WHERE hpr_product IN ('LB')
+order by hpr_product;
+--
+--
+spool off
 
-commit;
+exit;
 
-prompt End of Location Bridge Installation
