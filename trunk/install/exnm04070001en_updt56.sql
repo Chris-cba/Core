@@ -1,10 +1,10 @@
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/exnm04070001en_updt56.sql-arc   1.1   Aug 15 2017 17:20:46   Rob.Coupe  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/exnm04070001en_updt56.sql-arc   1.2   Aug 15 2017 17:36:42   Rob.Coupe  $
 --       Module Name      : $Workfile:   exnm04070001en_updt56.sql  $ 
---       Date into PVCS   : $Date:   Aug 15 2017 17:20:46  $
---       Date fetched Out : $Modtime:   Aug 15 2017 17:20:22  $
---       PVCS Version     : $Revision:   1.1  $
+--       Date into PVCS   : $Date:   Aug 15 2017 17:36:42  $
+--       Date fetched Out : $Modtime:   Aug 15 2017 17:36:08  $
+--       PVCS Version     : $Revision:   1.2  $
 --
 ----------------------------------------------------------------------------
 --   Copyright (c) 2015 Bentley Systems Incorporated.  All rights reserved.
@@ -66,11 +66,7 @@ DECLARE
       AND EXISTS 
               (SELECT 1
                  FROM hig_upgrades
-                WHERE hup_product = 'NET' AND remarks like 'NET 4700 FIX 32%')
-      AND EXISTS 
-              (SELECT 1
-                 FROM hig_upgrades
-                WHERE hup_product = 'NET' AND remarks like 'NET 4700 FIX 51%');     	  
+                WHERE hup_product = 'NET' AND remarks like 'NET 4700 FIX 32%');
 --				
 BEGIN
 --
@@ -92,7 +88,7 @@ BEGIN
 	CLOSE c1;
 	--
 	IF l_dummy_c IS NULL THEN
-		RAISE_APPLICATION_ERROR(-20001, 'NET 4700 FIXES 32, 43, 45 and 51 must be applied before proceeding - contact exor support for further information');
+		RAISE_APPLICATION_ERROR(-20001, 'NET 4700 FIXES 32, 43 and 45 must be applied before proceeding - contact exor support for further information');
 	END IF;
 	
 	if HIG.IS_PRODUCT_LICENSED('LB') then
