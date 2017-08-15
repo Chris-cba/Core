@@ -1,10 +1,10 @@
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/exnm04070001en_updt56.sql-arc   1.0   Aug 15 2017 17:17:42   Rob.Coupe  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/exnm04070001en_updt56.sql-arc   1.1   Aug 15 2017 17:20:46   Rob.Coupe  $
 --       Module Name      : $Workfile:   exnm04070001en_updt56.sql  $ 
---       Date into PVCS   : $Date:   Aug 15 2017 17:17:42  $
---       Date fetched Out : $Modtime:   Aug 15 2017 17:15:04  $
---       PVCS Version     : $Revision:   1.0  $
+--       Date into PVCS   : $Date:   Aug 15 2017 17:20:46  $
+--       Date fetched Out : $Modtime:   Aug 15 2017 17:20:22  $
+--       PVCS Version     : $Revision:   1.1  $
 --
 ----------------------------------------------------------------------------
 --   Copyright (c) 2015 Bentley Systems Incorporated.  All rights reserved.
@@ -119,7 +119,25 @@ END;
 WHENEVER SQLERROR CONTINUE
 --
 
-start exnm04070001en_updt56.ddl
+Prompt Database changes ....
+
+prompt Transaction_ID sequence
+
+declare
+  already_exists exception;
+  pragma exception_init (already_exists, -955 );
+begin
+  execute immediate 'create sequence LB_TRANSACTION_ID_SEQ start with 1';
+exception
+  when already_exists then NULL;
+end;
+/
+
+begin
+NM3DDL.CREATE_SYNONYM_FOR_OBJECT('LB_TRANSACTION_ID_SEQ');
+end;
+/
+
 
 prompt Package body
 
