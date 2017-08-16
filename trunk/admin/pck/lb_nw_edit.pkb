@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_nw_edit
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_nw_edit.pkb-arc   1.4   Feb 24 2017 15:46:44   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_nw_edit.pkb-arc   1.5   Aug 16 2017 16:57:48   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_nw_edit.pkb  $
-   --       Date into PVCS   : $Date:   Feb 24 2017 15:46:44  $
-   --       Date fetched Out : $Modtime:   Feb 24 2017 15:46:42  $
-   --       PVCS Version     : $Revision:   1.4  $
+   --       Date into PVCS   : $Date:   Aug 16 2017 16:57:48  $
+   --       Date fetched Out : $Modtime:   Aug 16 2017 16:56:44  $
+   --       PVCS Version     : $Revision:   1.5  $
    --
    --   Author : R.A. Coupe
    --
@@ -17,7 +17,7 @@ AS
    ----------------------------------------------------------------------------
    --
 
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.4  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.5  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_get';
 
@@ -230,7 +230,7 @@ AS
                 p_ne,
                 'I',
                 new_inv_start,
-                p_effective_date,
+                TRUNC (SYSDATE),                           --p_effective_date,
                 NULL,
                 new_inv_end,
                 new_direction,
@@ -257,11 +257,9 @@ AS
                                     CASE relative_dir
                                        WHEN 1
                                        THEN
-                                          inv_start + prior_ne_length
+                                          inv_start + first_length --prior_ne_length
                                        ELSE
-                                            ne_length
-                                          - inv_end
-                                          + next_ne_length
+                                          ne_length - inv_end + second_length -- next_ne_length
                                     END
                                  ELSE
                                     CASE relative_dir
@@ -285,11 +283,11 @@ AS
                                     CASE relative_dir
                                        WHEN 1
                                        THEN
-                                          inv_end + prior_ne_length
+                                          inv_end + first_length --prior_ne_length
                                        ELSE
                                             ne_length
                                           - inv_start
-                                          + prior_ne_length
+                                          + first_length     --prior_ne_length
                                     END
                                  ELSE
                                     CASE relative_dir
@@ -336,7 +334,7 @@ AS
                               END
                            ELSE
                               CASE
-                                 WHEN prior_dir_flag = 1
+                                 WHEN NVL (prior_dir_flag, 1) = 1
                                  THEN
                                     CASE relative_dir
                                        WHEN 1 THEN nm_offset_end
@@ -357,7 +355,10 @@ AS
                                          ne_no_start,
                                          ne_no_end,
                                          ne_length,
-                                         relative_dir
+                                         relative_dir,
+                                         sum_length,
+                                         first_length,
+                                         second_length
                                     FROM (SELECT t1.*,
                                                  CASE orderby
                                                     WHEN 1
@@ -402,7 +403,7 @@ AS
                                                              END
                                                        END
                                                  END
-                                                    relative_dir
+                                                    relative_dir --, first_length, second_length
                                             FROM (SELECT ne_id,
                                                          ne_no_start,
                                                          ne_no_end,
@@ -432,7 +433,26 @@ AS
                                                             1)
                                                          OVER (
                                                             ORDER BY orderby)
-                                                            prior_end_node
+                                                            prior_end_node,
+                                                         sum_length,
+                                                         FIRST_VALUE (
+                                                            ne_length)
+                                                         OVER (
+                                                            ORDER BY orderby
+                                                            ROWS BETWEEN UNBOUNDED
+                                                                         PRECEDING
+                                                                 AND     UNBOUNDED
+                                                                         FOLLOWING)
+                                                            first_length,
+                                                         LAST_VALUE (
+                                                            ne_length)
+                                                         OVER (
+                                                            ORDER BY orderby
+                                                            ROWS BETWEEN UNBOUNDED
+                                                                         PRECEDING
+                                                                 AND     UNBOUNDED
+                                                                         FOLLOWING)
+                                                            second_length
                                                     FROM (SELECT ne_id,
                                                                  ne_no_start,
                                                                  ne_no_end,
@@ -445,11 +465,16 @@ AS
                                                                     ELSE
                                                                        2
                                                                  END
-                                                                    orderby
+                                                                    orderby,
+                                                                 SUM (
+                                                                    ne_length)
+                                                                 OVER (
+                                                                    ORDER BY
+                                                                       1)
+                                                                    sum_length
                                                             FROM nm_elements_all
-                                                           WHERE ne_id IN
-                                                                    (p_ne1,
-                                                                     p_ne2)))
+                                                           WHERE ne_id IN (p_ne1,
+                                                                           p_ne2)))
                                                  t1))
                          SELECT t4.*,
                                 CASE
@@ -477,9 +502,10 @@ AS
                                 END
                                    cnct
                            FROM (SELECT t3.*,
-                                        SUM (ne_length)
-                                           OVER (PARTITION BY inv_id)
-                                           new_length,
+                                        sum_length new_length,
+                                        --                                        SUM (ne_length)
+                                        --                                           OVER (order by 1) --PARTITION BY inv_id)
+                                        --                                           new_length,
                                         LAG (
                                            ne_id,
                                            1)
@@ -492,53 +518,65 @@ AS
                                         OVER (PARTITION BY inv_id
                                               ORDER BY orderby)
                                            prior_node,
-                                        LAG (
-                                           ne_length,
-                                           1)
-                                        OVER (PARTITION BY inv_id
-                                              ORDER BY orderby)
+                                        NVL (
+                                           LAG (ne_length, 1)
+                                              OVER (     --PARTITION BY inv_id
+                                                    ORDER BY orderby),
+                                           0)
                                            prior_ne_length,
-                                        LAG (
-                                           inv_start,
-                                           1)
-                                        OVER (PARTITION BY inv_id
-                                              ORDER BY orderby)
+                                        NVL (
+                                           LAG (
+                                              inv_start,
+                                              1)
+                                           OVER (PARTITION BY inv_id
+                                                 ORDER BY orderby),
+                                           0)
                                            prior_inv_start,
-                                        LAG (
-                                           inv_end,
-                                           1)
-                                        OVER (PARTITION BY inv_id
-                                              ORDER BY orderby)
+                                        NVL (
+                                           LAG (
+                                              inv_end,
+                                              1)
+                                           OVER (PARTITION BY inv_id
+                                                 ORDER BY orderby),
+                                           0)
                                            prior_inv_end,
-                                        LAG (
-                                           relative_dir,
+                                        NVL (
+                                           LAG (
+                                              relative_dir,
+                                              1)
+                                           OVER (PARTITION BY inv_id
+                                                 ORDER BY orderby),
                                            1)
-                                        OVER (PARTITION BY inv_id
-                                              ORDER BY orderby)
                                            prior_dir_flag,
-                                        LEAD (
-                                           ne_length,
-                                           1)
-                                        OVER (PARTITION BY inv_id
-                                              ORDER BY orderby)
+                                        NVL (
+                                           LEAD (ne_length, 1)
+                                              OVER (     --PARTITION BY inv_id
+                                                    ORDER BY orderby),
+                                           0)
                                            next_ne_length,
-                                        LEAD (
-                                           inv_start,
-                                           1)
-                                        OVER (PARTITION BY inv_id
-                                              ORDER BY orderby)
+                                        NVL (
+                                           LEAD (
+                                              inv_start,
+                                              1)
+                                           OVER (PARTITION BY inv_id
+                                                 ORDER BY orderby),
+                                           0)
                                            next_inv_start,
-                                        LEAD (
-                                           inv_end,
-                                           1)
-                                        OVER (PARTITION BY inv_id
-                                              ORDER BY orderby)
+                                        NVL (
+                                           LEAD (
+                                              inv_end,
+                                              1)
+                                           OVER (PARTITION BY inv_id
+                                                 ORDER BY orderby),
+                                           0)
                                            next_inv_end,
-                                        LEAD (
-                                           relative_dir,
+                                        NVL (
+                                           LEAD (
+                                              relative_dir,
+                                              1)
+                                           OVER (PARTITION BY inv_id
+                                                 ORDER BY orderby),
                                            1)
-                                        OVER (PARTITION BY inv_id
-                                              ORDER BY orderby)
                                            next_dir_flag
                                    FROM (SELECT t2.*,
                                                 CASE relative_dir
@@ -576,9 +614,11 @@ AS
                                                                   OVER (
                                                                      PARTITION BY i.nm_ne_id_in)
                                                                      ic,
-                                                                  orderby
-                                                             FROM nm_locations_all
-                                                                  i,
+                                                                  orderby,
+                                                                  sum_length,
+                                                                  first_length,
+                                                                  second_length
+                                                             FROM nm_locations_all i,
                                                                   ne_data e
                                                             WHERE     e.ne_id =
                                                                          i.nm_ne_id_of
@@ -955,13 +995,12 @@ AS
    IS
    BEGIN
       DELETE FROM nm_location_geometry
-            WHERE nlg_loc_id IN
-                     (SELECT nm_loc_id
-                        FROM nm_locations_all
-                       WHERE     nm_end_date IS NULL
-                             AND transaction_id IN
-                                    (SELECT t.t_id
-                                       FROM TABLE (p_edit_tab) t));
+            WHERE nlg_loc_id IN (SELECT nm_loc_id
+                                   FROM nm_locations_all
+                                  WHERE     nm_end_date IS NULL
+                                        AND transaction_id IN (SELECT t.t_id
+                                                                 FROM TABLE (
+                                                                         p_edit_tab) t));
 
       DELETE FROM nm_locations_all
             WHERE     nm_end_date IS NULL
@@ -1077,7 +1116,7 @@ AS
                 (SELECT 1
                    FROM nm_element_history e,
                         lb_element_history l,
-                        nm_locations_all   m
+                        nm_locations_all m
                   WHERE     l.neh_id = e.neh_id
                         AND e.neh_ne_id_new IN (p_ne1, p_ne2)
                         AND nm_ne_id_of = neh_ne_id_new
