@@ -1,10 +1,10 @@
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/exnm04070001en_updt56.sql-arc   1.2   Aug 15 2017 17:36:42   Rob.Coupe  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/exnm04070001en_updt56.sql-arc   1.3   Aug 16 2017 09:24:48   Rob.Coupe  $
 --       Module Name      : $Workfile:   exnm04070001en_updt56.sql  $ 
---       Date into PVCS   : $Date:   Aug 15 2017 17:36:42  $
---       Date fetched Out : $Modtime:   Aug 15 2017 17:36:08  $
---       PVCS Version     : $Revision:   1.2  $
+--       Date into PVCS   : $Date:   Aug 16 2017 09:24:48  $
+--       Date fetched Out : $Modtime:   Aug 16 2017 09:24:24  $
+--       PVCS Version     : $Revision:   1.3  $
 --
 ----------------------------------------------------------------------------
 --   Copyright (c) 2015 Bentley Systems Incorporated.  All rights reserved.
@@ -138,22 +138,22 @@ end;
 prompt Package body
 
 prompt nm3recal...
-start nm3recal.pkb
+start nm3recal.pkw
 
 prompt nm3merge...
-start nm3merge.pkb
+start nm3merge.pkw
 
 prompt nm3split...
-start nm3split.pkb
+start nm3split.pkw
 
 prompt nm3replace...
-start nm3replace.pkb
+start nm3replace.pkw
 
 prompt nm3undo...
-start nm3undo.pkb
+start nm3undo.pkw
 
 prompt nm3close...
-start nm3close.pkb
+start nm3close.pkw
 
 --------------------------------------------------------------------------------
 -- Update hig_upgrades with fix ID
