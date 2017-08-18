@@ -1,12 +1,13 @@
+/* Formatted on 18/08/2017 11:31:56 (QP5 v5.294) */
 CREATE OR REPLACE PACKAGE BODY lb_load
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_load.pkb-arc   1.25   Jan 10 2017 17:11:02   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_load.pkb-arc   1.26   Aug 18 2017 11:39:56   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_load.pkb  $
-   --       Date into PVCS   : $Date:   Jan 10 2017 17:11:02  $
-   --       Date fetched Out : $Modtime:   Jan 10 2017 17:11:18  $
-   --       PVCS Version     : $Revision:   1.25  $
+   --       Date into PVCS   : $Date:   Aug 18 2017 11:39:56  $
+   --       Date fetched Out : $Modtime:   Aug 18 2017 11:32:18  $
+   --       PVCS Version     : $Revision:   1.26  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,7 +17,7 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.25  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.26  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_load';
 
@@ -363,9 +364,12 @@ AS
            RETURNING nm_loc_id
                 BULK COLLECT INTO l_loc_tab;
 
-         if int_array(l_loc_tab).is_empty then
-            raise_application_error( -20007, 'There is no location to load, please check the input arguments');
-         end if;                
+      IF int_array (l_loc_tab).is_empty
+      THEN
+         raise_application_error (
+            -20007,
+            'There is no location to load, please check the input arguments');
+      END IF;
 
 
       --      FOR i IN 1 .. l_loc_tab.COUNT
@@ -590,6 +594,9 @@ AS
                        WHERE     nal_id = pi_nal_id
                              AND nal_id = nm_ne_id_in
                              AND nal_nit_type = nm_obj_type);
+
+      DELETE FROM NM_ASSET_LOCATIONS_ALL
+            WHERE nal_id = pi_nal_id;
 
       aggregate_geometry (pi_nal_id       => pi_nal_id,
                           pi_start_date   => TRUNC (SYSDATE));
