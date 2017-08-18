@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_reg
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_reg.pkb-arc   1.13   Jan 11 2017 16:44:32   Rob.Coupe  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_reg.pkb-arc   1.14   Aug 18 2017 12:07:22   Rob.Coupe  $
 --       Module Name      : $Workfile:   lb_reg.pkb  $
---       Date into PVCS   : $Date:   Jan 11 2017 16:44:32  $
---       Date fetched Out : $Modtime:   Jan 11 2017 16:40:04  $
---       PVCS Version     : $Revision:   1.13  $
+--       Date into PVCS   : $Date:   Aug 18 2017 12:07:22  $
+--       Date fetched Out : $Modtime:   Aug 18 2017 12:06:40  $
+--       PVCS Version     : $Revision:   1.14  $
 --
 --   Author : R.A. Coupe
 --
@@ -19,7 +19,7 @@ AS
    --
    --all global package variables here
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (30) := '"$Revision:   1.13  $"';
+   g_body_sccsid    CONSTANT VARCHAR2 (30) := '"$Revision:   1.14  $"';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'NM3RSC';
    --
@@ -217,6 +217,9 @@ nm_debug.debug('insert NIN');
 
       --
       create_lb_sdo_view (pi_exor_type);
+	  
+	  create_lb_aggr_sdo_view (pi_exor_type);
+
    END;
 
 
