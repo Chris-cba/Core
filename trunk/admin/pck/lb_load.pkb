@@ -1,13 +1,12 @@
-/* Formatted on 18/08/2017 11:31:56 (QP5 v5.294) */
 CREATE OR REPLACE PACKAGE BODY lb_load
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_load.pkb-arc   1.26   Aug 18 2017 11:39:56   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_load.pkb-arc   1.27   Aug 24 2017 10:34:56   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_load.pkb  $
-   --       Date into PVCS   : $Date:   Aug 18 2017 11:39:56  $
-   --       Date fetched Out : $Modtime:   Aug 18 2017 11:32:18  $
-   --       PVCS Version     : $Revision:   1.26  $
+   --       Date into PVCS   : $Date:   Aug 24 2017 10:34:56  $
+   --       Date fetched Out : $Modtime:   Aug 24 2017 10:17:58  $
+   --       PVCS Version     : $Revision:   1.27  $
    --
    --   Author : R.A. Coupe
    --
@@ -17,7 +16,7 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.26  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.27  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_load';
 
@@ -395,10 +394,10 @@ AS
                                                 NVL (
                                                    nm_offset_st * nm_dir_flag,
                                                    0),
-                                                0.005 --                                               ,'unit=m'
+                                                g_sdo_tolerance --                                               ,'unit=m'
                                                      )),
-                                          0.005,
-                                          'arc_tolerance=0.05')
+                                          g_sdo_tolerance,
+                                          'arc_tolerance='||to_char(g_sdo_arc_tolerance))
                    geoloc
            FROM nm_locations_all, v_lb_nlt_geometry
           WHERE     nm_ne_id_of = ne_id
@@ -754,7 +753,7 @@ AS
                         ELSE end_date
                      END
                         end_date,
-                     sdo_aggr_union (sdoaggrtype (geoloc, 0.005))
+                     sdo_aggr_union (sdoaggrtype (geoloc, g_sdo_tolerance))
                 FROM (WITH date_tracked_assets
                            AS (SELECT                       /* +materialize */
                                      nal_asset_id,
@@ -815,10 +814,10 @@ AS
                                               NVL (
                                                  nm_offset_st,
                                                  0),
-                                              0.0005 --                                               ,'unit=m'
+                                              g_sdo_tolerance  --                                               ,'unit=m'
                                                     )),
-                                        0.005,
-                                        'arc_tolerance=0.05')
+                                        g_sdo_tolerance,
+                                        'arc_tolerance='||to_char(g_sdo_arc_tolerance))
                                         geoloc
                                 FROM date_tracked_assets d,
                                      nm_locations_all  l,
