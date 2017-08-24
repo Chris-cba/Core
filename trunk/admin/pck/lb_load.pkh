@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE lb_load
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_load.pkh-arc   1.7   Feb 11 2016 11:13:12   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_load.pkh-arc   1.8   Aug 24 2017 10:33:18   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_load.pkh  $
-   --       Date into PVCS   : $Date:   Feb 11 2016 11:13:12  $
-   --       Date fetched Out : $Modtime:   Feb 11 2016 11:11:50  $
-   --       PVCS Version     : $Revision:   1.7  $
+   --       Date into PVCS   : $Date:   Aug 24 2017 10:33:18  $
+   --       Date fetched Out : $Modtime:   Aug 24 2017 10:12:56  $
+   --       PVCS Version     : $Revision:   1.8  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,8 +16,10 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.7  $';
-   g_nvl      VARCHAR2(4) := nm3type.c_nvl;
+   g_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.8  $';
+   g_nvl               VARCHAR2(4) := nm3type.c_nvl;
+   g_sdo_tolerance     NUMBER := 0.005;
+   g_sdo_arc_tolerance NUMBER := 0.05;
 
    FUNCTION get_version
       RETURN VARCHAR2;
