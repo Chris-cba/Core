@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_path_reg
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_path_reg.pkb-arc   1.7   Jun 26 2017 11:34:54   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_path_reg.pkb-arc   1.8   Aug 29 2017 12:56:32   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_path_reg.pkb  $
-   --       Date into PVCS   : $Date:   Jun 26 2017 11:34:54  $
-   --       Date fetched Out : $Modtime:   Jun 26 2017 11:34:52  $
-   --       PVCS Version     : $Revision:   1.7  $
+   --       Date into PVCS   : $Date:   Aug 29 2017 12:56:32  $
+   --       Date fetched Out : $Modtime:   Aug 29 2017 12:54:52  $
+   --       PVCS Version     : $Revision:   1.8  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,7 +16,7 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.7  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.8  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_path_reg';
 
@@ -226,7 +226,9 @@ AS
             || ' from nm_nodes_all '
             || ' where no_end_date is null '
             || ' and exists ( select 1 from nm_node_usages_all where nnu_no_node_id = no_node_id '
-            || '          and nnu_end_date is null ) ';
+            || '          and nnu_end_date is null ) '
+            || ' and no_node_type = :node_type'
+            using pi_node_type;
 
 
          COMMIT;
