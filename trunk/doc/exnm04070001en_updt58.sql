@@ -1,10 +1,10 @@
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/doc/exnm04070001en_updt58.sql-arc   1.0   Aug 29 2017 09:36:16   Rob.Coupe  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/doc/exnm04070001en_updt58.sql-arc   1.1   Aug 29 2017 09:41:08   Rob.Coupe  $
 --       Module Name      : $Workfile:   exnm04070001en_updt58.sql  $ 
---       Date into PVCS   : $Date:   Aug 29 2017 09:36:16  $
---       Date fetched Out : $Modtime:   Aug 29 2017 09:30:44  $
---       PVCS Version     : $Revision:   1.0  $
+--       Date into PVCS   : $Date:   Aug 29 2017 09:41:08  $
+--       Date fetched Out : $Modtime:   Aug 29 2017 09:40:00  $
+--       PVCS Version     : $Revision:   1.1  $
 --
 ----------------------------------------------------------------------------
 --   Copyright (c) 2017 Bentley Systems Incorporated.  All rights reserved.
@@ -105,7 +105,7 @@ start nm_inv_sdo_aggr.pkw;
 --------------------------------------------------------------------------------
 --
 SET TERM ON
-PROMPT log_nm_4700_fix56.sql
+PROMPT logging the upgrade
 --
 SET FEEDBACK ON
 BEGIN
