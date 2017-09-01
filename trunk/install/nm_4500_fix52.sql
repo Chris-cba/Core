@@ -1,11 +1,11 @@
 ----------------------------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm_4500_fix52.sql-arc   1.1   Jun 26 2017 10:56:42   Chris.Baugh  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm_4500_fix52.sql-arc   1.2   Sep 01 2017 09:16:26   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm_4500_fix52.sql  $ 
---       Date into PVCS   : $Date:   Jun 26 2017 10:56:42  $
---       Date fetched Out : $Modtime:   Jun 26 2017 10:54:56  $
---       Version     	  : $Revision:   1.1  $
+--       Date into PVCS   : $Date:   Sep 01 2017 09:16:26  $
+--       Date fetched Out : $Modtime:   Sep 01 2017 09:15:56  $
+--       Version     	  : $Revision:   1.2  $
 --
 ----------------------------------------------------------------------------------------------------
 --   Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
@@ -105,7 +105,7 @@ BEGIN
 	--
 	hig2.upgrade(p_product        => 'NET'
 				      ,p_upgrade_script => 'log_nm_4500_fix52.sql'
-				      ,p_remarks        => 'NET 4500 FIX 52 (Build 1)'
+				      ,p_remarks        => 'NET 4500 FIX 52 (Build 2)'
 				      ,p_to_version     => NULL
 				      );
 	--
