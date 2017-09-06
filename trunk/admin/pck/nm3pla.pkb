@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3pla AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3pla.pkb-arc   2.21   26 Jul 2017 14:36:46   Mike.Huitson  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3pla.pkb-arc   2.22   Sep 06 2017 09:29:16   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm3pla.pkb  $
---       Date into PVCS   : $Date:   26 Jul 2017 14:36:46  $
---       Date fetched Out : $Modtime:   25 Jul 2017 16:47:54  $
---       Version          : $Revision:   2.21  $
+--       Date into PVCS   : $Date:   Sep 06 2017 09:29:16  $
+--       Date fetched Out : $Modtime:   Sep 05 2017 08:32:22  $
+--       Version          : $Revision:   2.22  $
 --       Based on SCCS version : 1.61
 ------------------------------------------------------------------------
 --
@@ -19,7 +19,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3pla AS
 -------------------------------------------------------------------------------------------
 -- Global variables - tree definitions etc.
    --g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"@(#)nm3pla.pkb    1.61 11/29/06"';
-   g_body_sccsid     CONSTANT varchar2(2000) := '$Revision:   2.21  $';
+   g_body_sccsid     CONSTANT varchar2(2000) := '$Revision:   2.22  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT VARCHAR2(30) := 'nm3pla';
@@ -2069,184 +2069,303 @@ BEGIN
 --
 END get_next_element2;
 -----------------------------------------------------------------------------
-FUNCTION get_connected_extent( pi_st_lref IN nm_lref,
-                               pi_end_lref IN nm_lref,
-                               pi_route  IN nm_elements.ne_id%TYPE,
-                               pi_sub_class IN nm_elements.ne_sub_class%TYPE )
-              RETURN nm_placement_array IS
+FUNCTION get_connected_extent (
+   pi_st_lref     IN nm_lref,
+   pi_end_lref    IN nm_lref,
+   pi_route       IN nm_elements.ne_id%TYPE,
+   pi_sub_class   IN nm_elements.ne_sub_class%TYPE)
+   RETURN nm_placement_array
+IS
+   -- Note that the supplied sub-class is an excluded sub-class
 
--- Note that the supplied sub-class is an excluded sub-class
+   e_no_connectivity   EXCEPTION;
+   --
+   l_sub_class         nm_elements.ne_sub_class%TYPE := pi_sub_class;
 
-  e_no_connectivity EXCEPTION;
-  --
-  l_sub_class nm_elements.ne_sub_class%TYPE := pi_sub_class;
-  --
-  CURSOR c1 (c_ne_id IN nm_elements.ne_id%TYPE, c_sub_class IN nm_elements.ne_sub_class%TYPE) 
-  IS
-    SELECT * FROM 
-    (SELECT CONNECT_BY_ISCYCLE connectby, ne_id, ne_length, Nm3net.get_cardinality(c_ne_id, ne_id) ne_cardinality
-    FROM nm_elements
-    WHERE NVL(ne_sub_class, '÷÷÷÷') != NVL(c_sub_class,'÷$%^')
-    CONNECT BY NOCYCLE PRIOR get_next_element2(c_ne_id, ne_id, c_sub_class) = ne_id
-    AND NVL(ne_sub_class, '÷÷÷÷') != NVL(c_sub_class,'÷$%^')
-    START WITH ne_id = get_next_element2(c_ne_id, pi_st_lref.lr_ne_id, c_sub_class )
-    AND NVL(ne_sub_class, '÷÷÷÷') != NVL(c_sub_class,'÷$%^'))
-    WHERE connectby = 0;
+   --
+   CURSOR c1 (
+      c_ne_id       IN nm_elements.ne_id%TYPE,
+      c_sub_class   IN nm_elements.ne_sub_class%TYPE)
+   IS
+      WITH all_route_data (ne_id,
+                           ne_length,
+                           ne_cardinality,
+                           nm_seg_no,
+                           nm_seq_no,
+                           ne_sub_class,
+                           start_node,
+                           end_node)
+           AS (SELECT ne_id,
+                      ne_length,
+                      nm_cardinality ne_cardinality,
+                      nm_seg_no,
+                      nm_seq_no,
+                      ne_sub_class,
+                      CASE nm_cardinality
+                         WHEN 1 THEN ne_no_start
+                         WHEN -1 THEN ne_no_end
+                      END
+                         start_node,
+                      CASE nm_cardinality
+                         WHEN -1 THEN ne_no_start
+                         WHEN 1 THEN ne_no_end
+                      END
+                         end_node
+                 FROM nm_elements, nm_members
+                WHERE     nm_ne_id_in = c_ne_id
+                      AND ne_id = nm_ne_id_of
+                      AND NVL (ne_sub_class, '÷÷÷÷') !=
+                             NVL (c_sub_class, '÷$%^')),
+           recursive_route_data (ne_id,
+                                 ne_length,
+                                 ne_cardinality,
+                                 nm_seg_no,
+                                 nm_seq_no,
+                                 ne_sub_class,
+                                 start_node,
+                                 end_node)
+           AS (SELECT p.ne_id,
+                      p.ne_length,
+                      p.ne_cardinality,
+                      p.nm_seg_no,
+                      p.nm_seq_no,
+                      p.ne_sub_class,
+                      p.start_node,
+                      p.end_node
+                 FROM all_route_data p
+                WHERE ne_id = pi_st_lref.lr_ne_id
+               UNION ALL
+               SELECT c.ne_id,
+                      c.ne_length,
+                      c.ne_cardinality,
+                      c.nm_seg_no,
+                      c.nm_seq_no,
+                      c.ne_sub_class,
+                      c.start_node,
+                      c.end_node
+                 FROM all_route_data c, recursive_route_data p
+                WHERE c.start_node = p.end_node)
+              SEARCH DEPTH FIRST BY ne_id SET order1
+              CYCLE ne_id SET is_cycle TO '1' DEFAULT '0'
+      SELECT ne_id,
+             ne_length,
+             ne_cardinality,
+             nm_seg_no,
+             nm_seq_no,
+             ne_sub_class,
+             start_node,
+             end_node,
+             is_cycle
+        FROM recursive_route_data
+       WHERE is_cycle = '0';
 
-  l_st_true  NUMBER := Nm3lrs.get_element_true( pi_route, pi_st_lref.lr_ne_id );
-  l_end_true NUMBER := Nm3lrs.get_element_true( pi_route, pi_end_lref.lr_ne_id );
+   --order by order1;
 
-  l_st_seg    NUMBER := Nm3lrs.get_element_seg_no( pi_route, pi_st_lref.lr_ne_id );
-  l_end_seg   NUMBER := Nm3lrs.get_element_seg_no( pi_route, pi_end_lref.lr_ne_id );
+   l_st_true           NUMBER
+      := Nm3lrs.get_element_true (pi_route, pi_st_lref.lr_ne_id);
+   l_end_true          NUMBER
+      := Nm3lrs.get_element_true (pi_route, pi_end_lref.lr_ne_id);
 
-  retval     nm_placement_array := Nm3pla.initialise_placement_array;
-  l_pl       nm_placement;
-  l_measure  NUMBER := 0;
+   l_st_seg            NUMBER
+      := Nm3lrs.get_element_seg_no (pi_route, pi_st_lref.lr_ne_id);
+   l_end_seg           NUMBER
+      := Nm3lrs.get_element_seg_no (pi_route, pi_end_lref.lr_ne_id);
 
-  l_st_cardinality NUMBER := Nm3net.get_cardinality( pi_route, pi_st_lref.lr_ne_id );
+   retval              nm_placement_array
+                          := Nm3pla.initialise_placement_array;
+   l_pl                nm_placement;
+   l_measure           NUMBER := 0;
 
-  l_start_offset NUMBER;
-  l_end_offset   NUMBER;
+   l_st_cardinality    NUMBER
+      := Nm3net.get_cardinality (pi_route, pi_st_lref.lr_ne_id);
 
+   l_start_offset      NUMBER;
+   l_end_offset        NUMBER;
+
+   ic                  INTEGER := 0;
 BEGIN
+   --  Nm_Debug.proc_start(g_package_name,'get_connected_extent');
+   --
+   IF nm3net.is_gty_reversible (nm3get.get_ne (pi_route).ne_gty_group_type) =
+         'Y'
+   THEN
+      l_sub_class := NULL;
+   ELSE
+      l_sub_class := pi_sub_class;
+   END IF;
 
-  Nm_Debug.proc_start(g_package_name,'get_connected_extent');
-  --
-  IF nm3net.is_gty_reversible(nm3get.get_ne(pi_route).ne_gty_group_type) = 'Y' THEN
-    l_sub_class := NULL;
-  ELSE
-    l_sub_class := pi_sub_class;
-  END IF; 
-  --
-  IF l_sub_class IS NULL AND NOT nm3lrs.unique_sub_class(pi_route, l_st_true, l_end_true) THEN
-    RAISE_APPLICATION_ERROR (-20043, 'No unique sub-class supplied');
-  END IF;
-  --
-  IF l_st_seg = l_end_seg
-  THEN
-    IF (pi_st_lref.lr_ne_id = pi_end_lref.lr_ne_id
-        AND ((l_st_cardinality = 1
-              AND pi_st_lref.lr_offset > pi_end_lref.lr_offset)
-             OR
-              (l_st_cardinality = -1
-               AND pi_end_lref.lr_offset > pi_st_lref.lr_offset)))
-       OR l_st_true > l_end_true
-    THEN
-      RAISE_APPLICATION_ERROR ( -20041, 'Start position is further along the route than the end');
-    END IF;
-  ELSE
-    --
-    --  Different segment numbers, check true distance at start/end of segments
-    --
---    nm_debug.debug('NOT Same seg');
-    IF Nm3lrs.min_seg_true( pi_route, l_end_seg ) <=
-       Nm3lrs.max_seg_true( pi_route, l_st_seg )
-    THEN
---      nm_debug.debug( 'No connectivity - segs are '||TO_CHAR( nm3lrs.min_seg_true( pi_route, l_end_seg ) )||
---                      '<='||TO_CHAR(nm3lrs.max_seg_true( pi_route, l_st_seg )));
+   --
+   IF     l_sub_class IS NULL
+      AND NOT nm3lrs.unique_sub_class (pi_route, l_st_true, l_end_true)
+   THEN
+      RAISE_APPLICATION_ERROR (-20043, 'No unique sub-class supplied');
+   END IF;
 
-      RAISE e_no_connectivity;
-    END IF;
-  END IF;
-
-  --If no sub-class supplied, then check the sub-class of elements between the two
-  --values and if more than one then force a sub-class.
-
-  IF l_st_cardinality = 1 THEN
-
-    l_pl := nm_placement( pi_st_lref.lr_ne_id, pi_st_lref.lr_offset,
-                          Nm3net.get_datum_element_length( pi_st_lref.lr_ne_id ), 0);
-  ELSE
-
-    l_pl := nm_placement( pi_st_lref.lr_ne_id, 0, pi_st_lref.lr_offset, 0);
-
-  END IF;
-
---  nm_debug.debug('Init pl ');
-
-  IF pi_st_lref.lr_ne_id = pi_end_lref.lr_ne_id
-  THEN
-    IF l_st_cardinality = -1
-      AND pi_st_lref.lr_offset > pi_end_lref.lr_offset
-    THEN
-      l_start_offset := pi_end_lref.lr_offset;
-      l_end_offset   := pi_st_lref.lr_offset;
-    ELSE
-      l_start_offset := pi_st_lref.lr_offset;
-      l_end_offset   := pi_end_lref.lr_offset;
-    END IF;
-
-    l_pl := nm_placement(pi_st_lref.lr_ne_id, l_start_offset, l_end_offset, 0);
-
-           add_element_to_pl_arr (pio_pl_arr => retval
-                                 ,pi_pl      => l_pl
-                                 ,pi_mrg_mem => TRUE
-                                 );
-
-  ELSE
-           add_element_to_pl_arr (pio_pl_arr => retval
-                                 ,pi_pl      => l_pl
-                                 ,pi_mrg_mem => TRUE
-                                 );
-    l_measure := Nm3net.get_datum_element_length( pi_st_lref.lr_ne_id ) - pi_st_lref.lr_offset;
-
---    nm3pla.dump_placement_array(retval);
-
-    FOR irec IN c1(pi_route, l_sub_class)
-    LOOP
-
-      --   loop over all elements between the two true values, restricted by the optional sub-class,
-      --   insert all the sub-elements into the extent tables
-
-      --   within the loop, if any element has a true distance which is greater than the end then fail.
-
-      l_pl := nm_placement( irec.ne_id, 0, irec.ne_length, l_measure);
-
-      IF irec.ne_id = pi_end_lref.lr_ne_id
+   --
+   IF l_st_seg = l_end_seg
+   THEN
+      IF    (    pi_st_lref.lr_ne_id = pi_end_lref.lr_ne_id
+             AND (   (    l_st_cardinality = 1
+                      AND pi_st_lref.lr_offset > pi_end_lref.lr_offset)
+                  OR (    l_st_cardinality = -1
+                      AND pi_end_lref.lr_offset > pi_st_lref.lr_offset)))
+         OR l_st_true > l_end_true
       THEN
-        --      end of loop
-        IF irec.ne_cardinality = 1 THEN
-          l_pl := nm_placement( irec.ne_id, 0, pi_end_lref.lr_offset, l_measure);
+         RAISE_APPLICATION_ERROR (
+            -20041,
+            'Start position is further along the route than the end');
+      END IF;
+   ELSE
+      --
+      --  Different segment numbers, check true distance at start/end of segments
+      --
+      nm_debug.debug ('NOT Same seg');
 
-           add_element_to_pl_arr (pio_pl_arr => retval
-                                 ,pi_pl      => l_pl
-                                 ,pi_mrg_mem => TRUE
-                                 );
-        ELSE
+      IF Nm3lrs.min_seg_true (pi_route, l_end_seg) <=
+            Nm3lrs.max_seg_true (pi_route, l_st_seg)
+      THEN
+         nm_debug.debug (
+               'No connectivity - segs are '
+            || TO_CHAR (nm3lrs.min_seg_true (pi_route, l_end_seg))
+            || '<='
+            || TO_CHAR (nm3lrs.max_seg_true (pi_route, l_st_seg)));
 
-          l_pl := nm_placement( irec.ne_id, pi_end_lref.lr_offset, irec.ne_length, l_measure);
+         RAISE e_no_connectivity;
+      END IF;
+   END IF;
 
-           add_element_to_pl_arr (pio_pl_arr => retval
-                                 ,pi_pl      => l_pl
-                                 ,pi_mrg_mem => TRUE
-                                 );
-        END IF;
+   --If no sub-class supplied, then check the sub-class of elements between the two
+   --values and if more than one then force a sub-class.
 
-        EXIT;
+   IF l_st_cardinality = 1
+   THEN
+      l_pl :=
+         nm_placement (pi_st_lref.lr_ne_id,
+                       pi_st_lref.lr_offset,
+                       Nm3net.get_datum_element_length (pi_st_lref.lr_ne_id),
+                       0);
+   ELSE
+      l_pl :=
+         nm_placement (pi_st_lref.lr_ne_id,
+                       0,
+                       pi_st_lref.lr_offset,
+                       0);
+   END IF;
+
+   nm_debug.debug ('Init pl ');
+
+   IF pi_st_lref.lr_ne_id = pi_end_lref.lr_ne_id
+   THEN
+      IF     l_st_cardinality = -1
+         AND pi_st_lref.lr_offset > pi_end_lref.lr_offset
+      THEN
+         l_start_offset := pi_end_lref.lr_offset;
+         l_end_offset := pi_st_lref.lr_offset;
       ELSE
-        l_measure := l_measure + irec.ne_length;
+         l_start_offset := pi_st_lref.lr_offset;
+         l_end_offset := pi_end_lref.lr_offset;
       END IF;
 
-           add_element_to_pl_arr (pio_pl_arr => retval
-                                 ,pi_pl      => l_pl
-                                 ,pi_mrg_mem => TRUE
-                                 );
-    END LOOP;
-  END IF;
-  
-  IF retval.get_entry(retval.placement_count).pl_ne_id <> pi_end_lref.get_ne_id
-  THEN
-    RAISE e_no_connectivity;
-  END IF;
-  
-  Nm_Debug.proc_start(g_package_name,'get_connected_extent');
+      l_pl :=
+         nm_placement (pi_st_lref.lr_ne_id,
+                       l_start_offset,
+                       l_end_offset,
+                       0);
 
-  RETURN retval;
+      nm3pla.add_element_to_pl_arr (pio_pl_arr   => retval,
+                                    pi_pl        => l_pl,
+                                    pi_mrg_mem   => TRUE);
+   ELSE
+      nm3pla.add_element_to_pl_arr (pio_pl_arr   => retval,
+                                    pi_pl        => l_pl,
+                                    pi_mrg_mem   => TRUE);
+      l_measure :=
+           Nm3net.get_datum_element_length (pi_st_lref.lr_ne_id)
+         - pi_st_lref.lr_offset;
 
+      nm3pla.dump_placement_array (retval);
+
+      FOR irec IN c1 (pi_route, l_sub_class)
+      LOOP
+         nm_debug.debug ('start of cursor loop');
+         ic := ic + 1;
+
+         IF ic > 1
+         THEN
+            --   loop over all elements between the two true values, restricted by the optional sub-class,
+            --   insert all the sub-elements into the extent tables
+
+            --   within the loop, if any element has a true distance which is greater than the end then fail.
+
+            l_pl :=
+               nm_placement (irec.ne_id,
+                             0,
+                             irec.ne_length,
+                             l_measure);
+
+            IF irec.ne_id = pi_end_lref.lr_ne_id
+            THEN
+               nm_debug.debug ('end of loop detected');
+
+               --      end of loop
+               IF irec.ne_cardinality = 1
+               THEN
+                  l_pl :=
+                     nm_placement (irec.ne_id,
+                                   0,
+                                   pi_end_lref.lr_offset,
+                                   l_measure);
+
+                  nm3pla.add_element_to_pl_arr (pio_pl_arr   => retval,
+                                                pi_pl        => l_pl,
+                                                pi_mrg_mem   => TRUE);
+               ELSE
+                  l_pl :=
+                     nm_placement (irec.ne_id,
+                                   pi_end_lref.lr_offset,
+                                   irec.ne_length,
+                                   l_measure);
+
+                  nm3pla.add_element_to_pl_arr (pio_pl_arr   => retval,
+                                                pi_pl        => l_pl,
+                                                pi_mrg_mem   => TRUE);
+               END IF;
+
+               nm_debug.debug ('added ' || irec.ne_id);
+               EXIT;
+            ELSE
+               l_measure := l_measure + irec.ne_length;
+            END IF;
+
+            nm_debug.debug ('added ' || irec.ne_id);
+            nm3pla.add_element_to_pl_arr (pio_pl_arr   => retval,
+                                          pi_pl        => l_pl,
+                                          pi_mrg_mem   => TRUE);
+            nm_debug.debug ('end of loop');
+         END IF;
+      END LOOP;
+   END IF;
+
+   IF retval.get_entry (retval.placement_count).pl_ne_id <>
+         pi_end_lref.get_ne_id
+   THEN
+      nm_debug.debug (
+            'no connectivity - test on '
+         || retval.get_entry (retval.placement_count).pl_ne_id
+         || ' and '
+         || pi_end_lref.get_ne_id);
+      RAISE e_no_connectivity;
+   END IF;
+
+   --  Nm_Debug.proc_start(g_package_name,'get_connected_extent');
+
+   RETURN retval;
 EXCEPTION
-  WHEN e_no_connectivity
-  THEN
-    RAISE_APPLICATION_ERROR ( -20042, 'Cannot establish connectivity between the start and end');
+   WHEN e_no_connectivity
+   THEN
+      RAISE_APPLICATION_ERROR (
+         -20042,
+         'Cannot establish connectivity between the start and end');
 END get_connected_extent;
 --
 --------------------------------------------------------------------------------------------------------------------
