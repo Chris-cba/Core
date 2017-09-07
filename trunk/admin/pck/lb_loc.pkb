@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_loc
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_loc.pkb-arc   1.6   Dec 09 2016 09:13:20   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_loc.pkb-arc   1.7   Sep 07 2017 09:33:20   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_loc.pkb  $
-   --       Date into PVCS   : $Date:   Dec 09 2016 09:13:20  $
-   --       Date fetched Out : $Modtime:   Dec 09 2016 09:12:26  $
-   --       PVCS Version     : $Revision:   1.6  $
+   --       Date into PVCS   : $Date:   Sep 07 2017 09:33:20  $
+   --       Date fetched Out : $Modtime:   Sep 07 2017 09:31:38  $
+   --       PVCS Version     : $Revision:   1.7  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,7 +16,7 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.6  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.7  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_loc';
 
@@ -420,58 +420,60 @@ AS
    IS
       retval   lb_xsp_tab;
    BEGIN
+   
+      retval := LB_REF.GET_XSP_ON_LB_RPT_TAB(p_lb_rpt_tab => p_lb_rpt_tab, P_INV_TYPE => p_exor_inv_type);
       --
-      SELECT CAST (COLLECT (lb_xsp (xsp, nwx_descr)) AS lb_xsp_tab)
-        INTO retval
-        FROM (select distinct xsp, nwx_descr from 
-        nm_xsp,(select xsr_x_sect_value xsp
-        from ( SELECT DISTINCT xsr_x_sect_value
-                FROM (WITH datum_range
-                           AS (SELECT t1.*,
-                                      SUM (1) OVER (PARTITION BY 1)
-                                         datum_count
-                                 FROM (SELECT /*+materialise*/
-                                             * FROM TABLE (p_lb_rpt_tab)) t1)
-                        SELECT ne_id,
-                               ne_nt_type,
-                               ne_sub_class,
-                               xsr_x_sect_value,
-                               xsr_descr,
-                               COUNT (
-                                  1)
-                               OVER (
-                                  PARTITION BY xsr_x_sect_value)
-                                  sc_count,
-                               datum_count
-                          FROM (SELECT d.ne_id,
-                                       d.ne_nt_type,
-                                       d.ne_gty_group_type,
-                                       d.ne_sub_class,
-                                       datum_count
-                                  FROM nm_elements d, datum_range
-                                 WHERE refnt = ne_id
-                                --and ne_sub_class is not null
-                                UNION ALL
-                                SELECT /*+INDEX(m nm_obj_type_ne_id_of_ind) */
-                                      nm_ne_id_of,
-                                       g.ne_nt_type,
-                                       g.ne_gty_group_type,
-                                       g.ne_sub_class,
-                                       datum_count
-                                  FROM nm_members m, nm_elements g, datum_range
-                                 WHERE     nm_ne_id_of = refnt
-                                       AND nm_ne_id_in = g.ne_id
-                                       AND nm_obj_type = g.ne_gty_group_type --and g.ne_sub_class is not null
-                                                                            ) t,
-                               xsp_restraints
-                         WHERE     xsr_nw_type(+) = ne_nt_type
-                               AND xsr_scl_class(+) = ne_sub_class
-                               AND xsr_ity_inv_code = p_exor_inv_type
-                      ORDER BY ne_id,
-                               ne_nt_type,
-                               ne_sub_class,
-                               xsr_x_sect_value)
-               WHERE sc_count = datum_count))where nwx_x_sect = xsp);
+--      SELECT CAST (COLLECT (lb_xsp (xsp, nwx_descr)) AS lb_xsp_tab)
+--        INTO retval
+--        FROM (select distinct xsp, nwx_descr from 
+--        nm_xsp,(select xsr_x_sect_value xsp
+--        from ( SELECT DISTINCT xsr_x_sect_value
+--                FROM (WITH datum_range
+--                           AS (SELECT t1.*,
+--                                      SUM (1) OVER (PARTITION BY 1)
+--                                         datum_count
+--                                 FROM (SELECT /*+materialise*/
+--                                             * FROM TABLE (p_lb_rpt_tab)) t1)
+--                        SELECT ne_id,
+--                               ne_nt_type,
+--                               ne_sub_class,
+--                               xsr_x_sect_value,
+--                               xsr_descr,
+--                               COUNT (
+--                                  1)
+--                               OVER (
+--                                  PARTITION BY xsr_x_sect_value)
+--                                  sc_count,
+--                               datum_count
+--                          FROM (SELECT d.ne_id,
+--                                       d.ne_nt_type,
+--                                       d.ne_gty_group_type,
+--                                       d.ne_sub_class,
+--                                       datum_count
+--                                  FROM nm_elements d, datum_range
+--                                 WHERE refnt = ne_id
+--                                --and ne_sub_class is not null
+--                                UNION ALL
+--                                SELECT /*+INDEX(m nm_obj_type_ne_id_of_ind) */
+--                                      nm_ne_id_of,
+--                                       g.ne_nt_type,
+--                                       g.ne_gty_group_type,
+--                                       g.ne_sub_class,
+--                                       datum_count
+--                                  FROM nm_members m, nm_elements g, datum_range
+--                                 WHERE     nm_ne_id_of = refnt
+--                                       AND nm_ne_id_in = g.ne_id
+--                                       AND nm_obj_type = g.ne_gty_group_type --and g.ne_sub_class is not null
+--                                                                            ) t,
+--                               xsp_restraints
+--                         WHERE     xsr_nw_type(+) = ne_nt_type
+--                               AND xsr_scl_class(+) = ne_sub_class
+--                               AND xsr_ity_inv_code = p_exor_inv_type
+--                      ORDER BY ne_id,
+--                               ne_nt_type,
+--                               ne_sub_class,
+--                               xsr_x_sect_value)
+--               WHERE sc_count = datum_count))where nwx_x_sect = xsp);
 
       RETURN retval;
    END;
