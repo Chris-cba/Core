@@ -1,12 +1,12 @@
 /**
  *	PVCS Identifiers :-
  *
- *		PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/Java/login/bentley/exor/pwdenc/ClientMachineInfo.java-arc   1.1   Sep 07 2017 14:39:46   Upendra.Hukeri  $
+ *		PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/Java/login/bentley/exor/pwdenc/ClientMachineInfo.java-arc   1.2   Sep 07 2017 15:21:26   Upendra.Hukeri  $
  *		Module Name      : $Workfile:   ClientMachineInfo.java  $
  *		Author			 : $Author:   Upendra.Hukeri  $
- *		Date Into PVCS   : $Date:   Sep 07 2017 14:39:46  $
- *		Date Fetched Out : $Modtime:   Sep 07 2017 11:39:10  $
- *		PVCS Version     : $Revision:   1.1  $
+ *		Date Into PVCS   : $Date:   Sep 07 2017 15:21:26  $
+ *		Date Fetched Out : $Modtime:   Sep 07 2017 15:20:14  $
+ *		PVCS Version     : $Revision:   1.2  $
  *
  *	
  *
@@ -32,6 +32,7 @@ import oracle.forms.ui.VBean;
 
 public class ClientMachineInfo extends VBean {
 	private transient IHandler handler;
+	private transient ID GET_HOST_NAME = ID.registerProperty("GET_HOST_NAME");
 	private transient ID GET_CLIENT_MACHINE_DETAILS = ID.registerProperty("GET_CLIENT_MACHINE_DETAILS");
 	
 	public void init(IHandler handler) {
@@ -42,11 +43,20 @@ public class ClientMachineInfo extends VBean {
 	public boolean setProperty(ID paramID, Object valueObj) {
 		if(paramID == GET_CLIENT_MACHINE_DETAILS) {
 			getClientMachineDetails();
+		} else if(paramID == GET_HOST_NAME) {
+			getClientMachineName();
 		}
 		
 		return super.setProperty(paramID, valueObj);
 	}
+	
+	protected void getClientMachineName() {
+		String clientHostName = MachineInfo.getMachineName();
+		ExorDebugger.reportDebugInfo("getClientMachineName() : client machine - host name: " + clientHostName.substring(0, clientHostName.indexOf(':')).toUpperCase(Locale.ENGLISH));
 		
+		dispatchCustomEvent("HostNameEvent", clientHostName);
+	}
+	
 	protected void getClientMachineDetails() {
 		String clientHostName = MachineInfo.getMachineName();
 		clientHostName = clientHostName.substring(0, clientHostName.indexOf(':')).toUpperCase(Locale.ENGLISH);
