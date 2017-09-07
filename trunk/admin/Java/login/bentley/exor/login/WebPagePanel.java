@@ -1,12 +1,12 @@
 /**
  *	PVCS Identifiers :-
  *
- *		PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/Java/login/bentley/exor/login/WebPagePanel.java-arc   1.0   Feb 27 2017 07:03:56   Upendra.Hukeri  $
+ *		PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/Java/login/bentley/exor/login/WebPagePanel.java-arc   1.1   Sep 07 2017 14:41:40   Upendra.Hukeri  $
  *		Module Name      : $Workfile:   WebPagePanel.java  $
  *		Author			 : $Author:   Upendra.Hukeri  $
- *		Date Into PVCS   : $Date:   Feb 27 2017 07:03:56  $
- *		Date Fetched Out : $Modtime:   Feb 16 2017 11:27:12  $
- *		PVCS Version     : $Revision:   1.0  $
+ *		Date Into PVCS   : $Date:   Sep 07 2017 14:41:40  $
+ *		Date Fetched Out : $Modtime:   Sep 07 2017 14:21:54  $
+ *		PVCS Version     : $Revision:   1.1  $
  *
  *	
  *
@@ -47,22 +47,17 @@ import oracle.forms.ui.VBean;
 import org.w3c.dom.*;
 
 public class WebPagePanel extends VBean {
-	private JPanel    statusBar 	= null;
+	private transient ID 		RUN_PAGE	= ID.registerProperty("RUN_PAGE");
+	private transient ID 		TNS_NAME	= ID.registerProperty("TNS_NAME");
+	private transient IHandler 	handler		= null;
+	private transient JPanel 	statusBar 	= null;
 	
-	private ID 		  RUN_PAGE		= ID.registerProperty("RUN_PAGE");
-	private ID 		  TNS_NAME		= ID.registerProperty("TNS_NAME");
-	
-	private String 	  tnsName		= null;
-	private String 	  url 			= null;
-	
-	private StringBuffer token 		= new StringBuffer();
-	
-	private Frame 	  jw 			= null;
-	
-	private JWebBrowser webBrowser	= null;
-    private final JProgressBar progressBar = new JProgressBar();
-	
-	private IHandler handler;
+	private JProgressBar 	progressBar = new JProgressBar();
+	private String 	  		tnsName		= null;
+	private String 	  		url			= null;
+	private StringBuffer 	token		= new StringBuffer();
+	private Frame 	  		jw			= null;
+	private JWebBrowser 	webBrowser	= null;
 	
 	public WebPagePanel() {
 		super();
@@ -96,6 +91,10 @@ public class WebPagePanel extends VBean {
 	
     private void initComponents() {
 		try {
+			for (StackTraceElement ste : Thread.currentThread().getStackTrace()) {
+				System.out.println(ste);
+			}
+			
 			jw = (Frame)SwingUtilities.windowForComponent(this);
 			
 			jw.setVisible(false);
@@ -111,51 +110,70 @@ public class WebPagePanel extends VBean {
 			java.util.List<String> location = map.get("Location");
 			
 			if (location == null) {
-				BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+				BufferedReader bufferedReader = null;
 				
-				String line = null;
+				try {
+					bufferedReader = new BufferedReader(new InputStreamReader(conn.getInputStream(), "UTF-8"));
 				
-				while ((line = bufferedReader.readLine()) != null) {
-					String tokenTag = "<input id=\"wresult\" type=\"hidden\" value='";
-					
-					if(line.trim().startsWith(tokenTag)) {
-						token.append(line.trim().replace(tokenTag, "").replace("' />", ""));
-						
-						ExorDebugger.reportDebugInfo("initComponents(): 1. IMS Tokens found...");
-						
-						break;
-					}
-				}
-				
-				bufferedReader.close();
-			} else {
-				for (String header : location) {
-					obj = new URL(header);
-					conn = obj.openConnection();
-					map = conn.getHeaderFields();
-					
-					BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-					
 					String line = null;
 					
 					while ((line = bufferedReader.readLine()) != null) {
-						String tokenTag = "<input type=\"hidden\" name=\"wresult\" value=\"";
+						String tokenTag = "<input id=\"wresult\" type=\"hidden\" value='";
 						
-						if(line.contains(tokenTag)) {
-							token.append(HtmlEntities.decode(line.substring(line.indexOf(tokenTag) + tokenTag.length(), line.indexOf("\" />", line.indexOf(tokenTag)))));
+						line = line.trim();
+						
+						if(line.startsWith(tokenTag)) {
+							token.append(line.replace(tokenTag, "").replace("' />", ""));
 							
-							ExorDebugger.reportDebugInfo("initComponents(): 2. IMS Tokens found...");
+							ExorDebugger.reportDebugInfo("initComponents(): 1. IMS Tokens found...");
 							
 							break;
 						}
 					}
+				} finally {
+					if(bufferedReader != null) {
+						try {
+							bufferedReader.close();
+						} catch(IOException ioe) {
+						}
+					}
+				}
+			} else {
+				for (String header : location) {
+					obj = new URL(header);
+					conn = obj.openConnection();
 					
-					bufferedReader.close();
+					BufferedReader bufferedReader = null;
+					
+					try {
+						bufferedReader = new BufferedReader(new InputStreamReader(conn.getInputStream(), "UTF-8"));
+						
+						String line = null;
+						
+						while ((line = bufferedReader.readLine()) != null) {
+							String tokenTag = "<input type=\"hidden\" name=\"wresult\" value=\"";
+							
+							if(line.contains(tokenTag)) {
+								token.append(HtmlEntities.decode(line.substring(line.indexOf(tokenTag) + tokenTag.length(), line.indexOf("\" />", line.indexOf(tokenTag)))));
+								
+								ExorDebugger.reportDebugInfo("initComponents(): 2. IMS Tokens found...");
+								
+								break;
+							}
+						}
+					} finally {
+						if(bufferedReader != null) {
+							try {
+								bufferedReader.close();
+							} catch(IOException ioe) {
+							}
+						}
+					}
 				}
 			}
 			
+			JWebBrowser.clearSessionCookies();
 			webBrowser = new JWebBrowser();
-			webBrowser.clearSessionCookies();
 			
 			SwingUtilities.invokeLater(new Runnable() {
 				public void run() {
@@ -178,7 +196,7 @@ public class WebPagePanel extends VBean {
 						
 						ExorDebugger.reportDebugInfo("initComponents(): Navigating to Eoxr-IMS application...");
 						
-						if(token != null && token.toString().length() != 0) {
+						if(token.toString().length() != 0) {
 							webBrowser.navigate(url, wbnp);
 						} else {
 							webBrowser.navigate(url);
@@ -226,7 +244,7 @@ public class WebPagePanel extends VBean {
 										
 										String obj = (String)webBrowser.executeJavascriptWithResult("return getTestString()");
 										
-										if((obj != null) && !obj.equals("null")) {
+										if((obj != null) && !"null".equals(obj)) {
 											WebPagePanel.this.setSize(0, 0);
 											WebPagePanel.this.setVisible(false);
 											
@@ -260,17 +278,7 @@ public class WebPagePanel extends VBean {
 						progressBar.setForeground(new Color(95, 115, 245));
 						progressBar.setBorderPainted(false);
 						
-						statusBar = new JPanel(new BorderLayout()){
-							public void paintComponent(Graphics gl) {
-								int width = (int)this.getSize().getWidth();
-								int height = 5;
-								
-								progressBar.setSize(new Dimension(width, height));
-								progressBar.setPreferredSize(new Dimension(width, height));
-								progressBar.setMinimumSize(new Dimension(width, height));
-								progressBar.setMaximumSize(new Dimension(width, height));
-							}
-						};
+						statusBar = new WebPageStatusPanel(progressBar);
 						
 						statusBar.add(progressBar, BorderLayout.SOUTH);
 						
@@ -342,5 +350,25 @@ public class WebPagePanel extends VBean {
 		}
 		
 		super.destroy();
+	}
+	
+	private static class WebPageStatusPanel extends JPanel {
+		private JProgressBar progressBar = null;
+		
+		WebPageStatusPanel(JProgressBar progressBar) {
+			super(new BorderLayout());
+			
+			this.progressBar = progressBar;
+		}
+		
+		public void paintComponent(Graphics gl) {
+			int width = (int)this.getSize().getWidth();
+			int height = 5;
+			
+			progressBar.setSize(new Dimension(width, height));
+			progressBar.setPreferredSize(new Dimension(width, height));
+			progressBar.setMinimumSize(new Dimension(width, height));
+			progressBar.setMaximumSize(new Dimension(width, height));
+		}
 	}
 }
