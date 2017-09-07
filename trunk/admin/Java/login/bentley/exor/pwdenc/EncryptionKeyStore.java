@@ -1,12 +1,12 @@
 /**
  *	PVCS Identifiers :-
  *
- *		PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/Java/login/bentley/exor/pwdenc/EncryptionKeyStore.java-arc   1.0   Feb 27 2017 07:05:52   Upendra.Hukeri  $
+ *		PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/Java/login/bentley/exor/pwdenc/EncryptionKeyStore.java-arc   1.1   Sep 07 2017 14:39:56   Upendra.Hukeri  $
  *		Module Name      : $Workfile:   EncryptionKeyStore.java  $
  *		Author			 : $Author:   Upendra.Hukeri  $
- *		Date Into PVCS   : $Date:   Feb 27 2017 07:05:52  $
- *		Date Fetched Out : $Modtime:   Feb 23 2017 11:26:36  $
- *		PVCS Version     : $Revision:   1.0  $
+ *		Date Into PVCS   : $Date:   Sep 07 2017 14:39:56  $
+ *		Date Fetched Out : $Modtime:   Sep 04 2017 15:57:18  $
+ *		PVCS Version     : $Revision:   1.1  $
  *
  *	
  *
@@ -41,18 +41,21 @@ public class EncryptionKeyStore {
 	
 	protected static String getPath() {
 		try {
-			EncryptionKeyStore eks = new EncryptionKeyStore();
+			String jarPath = EncryptionKeyStore.class.getProtectionDomain().getCodeSource().getLocation().toExternalForm();
 			
-			String jarPath = eks.getClass().getProtectionDomain().getCodeSource().getLocation().toExternalForm();
-			
-			int beginIndex = jarPath.indexOf("/") + 1;
-			int endIndex = jarPath.lastIndexOf("/") + 1;
+			int beginIndex = jarPath.indexOf('/') + 1;
+			int endIndex = jarPath.lastIndexOf('/') + 1;
 			
 			String keyStorePath = jarPath.substring(beginIndex, endIndex) + "exor_keystore/";
 			
 			File f = new File(keyStorePath);
+			
 			if(!f.exists()) {
-				f.mkdir();
+				boolean keyStoredCreated = f.mkdir();
+				
+				if(!keyStoredCreated) {
+					return "failure - unable to create key store";
+				}
 			}
 			
 			return keyStorePath;
@@ -66,36 +69,47 @@ public class EncryptionKeyStore {
 			String keyStorePath = getPath();
 			
 			if(!keyStorePath.startsWith("failure - ")) {
-				FileOutputStream fos = new FileOutputStream(keyStorePath + keyStoreName);
+				FileOutputStream fos = null;
 				
-				KeyStore ks = KeyStore.getInstance("JCEKS");
-				ks.load(null, storePasswordStr.toCharArray());
-				
-				Key key = new Key() {
-					public static final long serialVersionUID = 1234567890L;
+				try {
+					fos = new FileOutputStream(keyStorePath + keyStoreName);
 					
-					@Override
-					public String getAlgorithm() {
-						return keyStr;
-					}
+					KeyStore ks = KeyStore.getInstance("JCEKS");
+					char[] storePasswordChrArr = storePasswordStr.toCharArray();
+					ks.load(null, storePasswordChrArr);
 					
-					@Override
-					public byte[] getEncoded() {
-						return null;
-					}
+					Key key = new Key() {
+						private static final long serialVersionUID = 1234567890L;
+						
+						@Override
+						public String getAlgorithm() {
+							return keyStr;
+						}
+						
+						@Override
+						public byte[] getEncoded() {
+							return new byte[0];
+						}
+						
+						@Override
+						public String getFormat() {
+							return null;
+						}
+					};
 					
-					@Override
-					public String getFormat() {
-						return null;
+					ks.setKeyEntry(alias, key, keyPasswordStr.toCharArray(), null);
+					
+					ks.store(fos, storePasswordChrArr);
+					
+					fos.flush();
+				} finally {
+					if(fos != null) {
+						try {
+							fos.close();
+						} catch(IOException ioe) {
+						}
 					}
-				};
-				
-				ks.setKeyEntry(alias, key, keyPasswordStr.toCharArray(), null);
-				
-				ks.store(fos, storePasswordStr.toCharArray());
-				
-				fos.flush();
-				fos.close();
+				}
 				
 				return "success";
 			} else {
@@ -112,10 +126,19 @@ public class EncryptionKeyStore {
 			
 			if(!keyStorePath.startsWith("failure - ")) {
 				KeyStore ks = KeyStore.getInstance("JCEKS");
-				FileInputStream fis = new FileInputStream(keyStorePath + keyStoreName);
-				ks.load(fis, storePasswordStr.toCharArray());
+				FileInputStream fis = null;
 				
-				fis.close();
+				try {
+					fis = new FileInputStream(keyStorePath + keyStoreName);
+					ks.load(fis, storePasswordStr.toCharArray());
+				} finally {
+					if(fis != null) {
+						try {
+							fis.close();
+						} catch(IOException ioe) {
+						}
+					}
+				}
 				
 				return ks.getKey(alias, keyPasswordStr.toCharArray()).getAlgorithm();
 			} else {
