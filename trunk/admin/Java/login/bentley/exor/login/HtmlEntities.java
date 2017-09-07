@@ -1,12 +1,12 @@
 /**
  *	PVCS Identifiers :-
  *
- *		PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/Java/login/bentley/exor/login/HtmlEntities.java-arc   1.0   Feb 27 2017 07:03:56   Upendra.Hukeri  $
+ *		PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/Java/login/bentley/exor/login/HtmlEntities.java-arc   1.1   Sep 07 2017 14:41:08   Upendra.Hukeri  $
  *		Module Name      : $Workfile:   HtmlEntities.java  $
  *		Author			 : $Author:   Upendra.Hukeri  $
- *		Date Into PVCS   : $Date:   Feb 27 2017 07:03:56  $
- *		Date Fetched Out : $Modtime:   Feb 14 2017 07:56:46  $
- *		PVCS Version     : $Revision:   1.0  $
+ *		Date Into PVCS   : $Date:   Sep 07 2017 14:41:08  $
+ *		Date Fetched Out : $Modtime:   Sep 07 2017 14:12:36  $
+ *		PVCS Version     : $Revision:   1.1  $
  *
  *	Based on original source from - http://yagudaev.com/posts/jsp-escaping-html/
  *  This class offers methods to decode and encode html entities.
@@ -149,24 +149,13 @@ public class HtmlEntities
      */
     private static String findValue(char value)
     {
-    	Set<String> keySet = map.keySet();
-    	Iterator<String> i = keySet.iterator();
-    	String key = i.next(); // key
-    	boolean found = false;
-    	String result = null;
-    	
-    	while(i.hasNext() && !found)
-    	{
-    		if(map.get(key).charValue() == value)
-    		{
-    			found = true;
-    			result = key;
-    		}
-    		
-    		key = i.next();
-    	}
-    	
-    	return result;
+		for (Map.Entry<String, Character> entry : map.entrySet()) {
+			if(entry.getValue() == value) {
+				return entry.getKey();
+			}
+		}
+		
+		return null;
     }
     
     /**
