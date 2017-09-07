@@ -1,12 +1,12 @@
 /**
  *	PVCS Identifiers :-
  *
- *		PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/Java/login/bentley/exor/login/Hyperlink.java-arc   1.2   May 30 2017 13:40:32   Upendra.Hukeri  $
+ *		PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/Java/login/bentley/exor/login/Hyperlink.java-arc   1.3   Sep 07 2017 14:41:20   Upendra.Hukeri  $
  *		Module Name      : $Workfile:   Hyperlink.java  $
  *		Author			 : $Author:   Upendra.Hukeri  $
- *		Date Into PVCS   : $Date:   May 30 2017 13:40:32  $
- *		Date Fetched Out : $Modtime:   May 30 2017 13:39:44  $
- *		PVCS Version     : $Revision:   1.2  $
+ *		Date Into PVCS   : $Date:   Sep 07 2017 14:41:20  $
+ *		Date Fetched Out : $Modtime:   Sep 04 2017 15:51:12  $
+ *		PVCS Version     : $Revision:   1.3  $
  *
  *	Based on the original source from Idiom - decompile using JAD.
  *	Used to render Hyperlinks on Oracle Forms as Java Beans.
@@ -412,12 +412,6 @@ public class Hyperlink extends JLabel implements MouseListener {
     }
 	
     public void mouseReleased(MouseEvent mouseevent1) {
-    }
-	
-    private void log(String msg) {
-		if(m_debug) {
-            System.out.println(CLASSNAME + ": " + msg);
-		}
     }
 }
  
