@@ -1,12 +1,12 @@
 /**
  *	PVCS Identifiers :-
  *
- *		PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/Java/login/bentley/exor/pwdenc/ClientMachineInfo.java-arc   1.0   Feb 27 2017 07:05:52   Upendra.Hukeri  $
+ *		PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/Java/login/bentley/exor/pwdenc/ClientMachineInfo.java-arc   1.1   Sep 07 2017 14:39:46   Upendra.Hukeri  $
  *		Module Name      : $Workfile:   ClientMachineInfo.java  $
  *		Author			 : $Author:   Upendra.Hukeri  $
- *		Date Into PVCS   : $Date:   Feb 27 2017 07:05:52  $
- *		Date Fetched Out : $Modtime:   Feb 17 2017 06:12:30  $
- *		PVCS Version     : $Revision:   1.0  $
+ *		Date Into PVCS   : $Date:   Sep 07 2017 14:39:46  $
+ *		Date Fetched Out : $Modtime:   Sep 07 2017 11:39:10  $
+ *		PVCS Version     : $Revision:   1.1  $
  *
  *	
  *
@@ -20,6 +20,8 @@ package bentley.exor.pwdenc;
 
 import bentley.exor.ExorDebugger;
 
+import java.util.Locale;
+
 import javax.swing.SwingUtilities;
 
 import oracle.forms.handler.IHandler;
@@ -29,9 +31,8 @@ import oracle.forms.ui.CustomListener;
 import oracle.forms.ui.VBean;
 
 public class ClientMachineInfo extends VBean {
-	private IHandler handler;
-	private ID GET_HOST_NAME = ID.registerProperty("GET_HOST_NAME");
-	private ID GET_USER_NAME = ID.registerProperty("GET_USER_NAME");
+	private transient IHandler handler;
+	private transient ID GET_CLIENT_MACHINE_DETAILS = ID.registerProperty("GET_CLIENT_MACHINE_DETAILS");
 	
 	public void init(IHandler handler) {
 		this.handler = handler;
@@ -39,29 +40,22 @@ public class ClientMachineInfo extends VBean {
     }
 	
 	public boolean setProperty(ID paramID, Object valueObj) {
-		if(paramID == GET_HOST_NAME) {
-			getClientMachineName();
-		} else if(paramID == GET_USER_NAME) {
-			getClientMachineUserName();
+		if(paramID == GET_CLIENT_MACHINE_DETAILS) {
+			getClientMachineDetails();
 		}
 		
 		return super.setProperty(paramID, valueObj);
 	}
 		
-	protected void getClientMachineName() {
+	protected void getClientMachineDetails() {
 		String clientHostName = MachineInfo.getMachineName();
+		clientHostName = clientHostName.substring(0, clientHostName.indexOf(':')).toUpperCase(Locale.ENGLISH);
+		ExorDebugger.reportDebugInfo("getClientMachineDetails() : client machine - host name: " + clientHostName);
 		
-		ExorDebugger.reportDebugInfo("getClientMachineName() : client host name: " + clientHostName);
-		
-		dispatchCustomEvent("HostNameEvent", clientHostName);
-	}
-	
-	protected void getClientMachineUserName() {
 		String clientMachineUserName = MachineInfo.getMachineUserName();
+		ExorDebugger.reportDebugInfo("getClientMachineDetails() : client machine - user name: " + clientMachineUserName);
 		
-		ExorDebugger.reportDebugInfo("getClientMachineUserName() : client machine user name: " + clientMachineUserName);
-		
-		dispatchCustomEvent("UserNameEvent", clientMachineUserName);
+		dispatchCustomEvent("ClientMachineDetails", clientHostName + ':' + clientMachineUserName);
 	}
 	
 	protected void dispatchCustomEvent(String eventType, String name) {
