@@ -1,12 +1,12 @@
 /**
  *	PVCS Identifiers :-
  *
- *		PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/Java/login/bentley/exor/log/IMSLogger.java-arc   1.1   May 30 2017 13:38:34   Upendra.Hukeri  $
+ *		PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/Java/login/bentley/exor/log/IMSLogger.java-arc   1.2   Sep 07 2017 14:40:38   Upendra.Hukeri  $
  *		Module Name      : $Workfile:   IMSLogger.java  $
  *		Author			 : $Author:   Upendra.Hukeri  $
- *		Date Into PVCS   : $Date:   May 30 2017 13:38:34  $
- *		Date Fetched Out : $Modtime:   May 30 2017 10:12:52  $
- *		PVCS Version     : $Revision:   1.1  $
+ *		Date Into PVCS   : $Date:   Sep 07 2017 14:40:38  $
+ *		Date Fetched Out : $Modtime:   Sep 07 2017 14:00:00  $
+ *		PVCS Version     : $Revision:   1.2  $
  *
  *	
  *
@@ -73,9 +73,9 @@ public class IMSLogger {
 	
 	private static String removeCRLF(String message) {
 		// ensure no CRLF injection into logs for forging records
-		String clean = message.replace( '\n', '_' ).replace( '\r', '_' );
+		String clean = message.replace('\n', '_').replace('\r', '_');
 		
-		if ( ESAPI.securityConfiguration().getLogEncodingRequired() ) {
+		if ( ESAPI.securityConfiguration().getBooleanProp("Logger.LogEncodingRequired") ) {
 			clean = ESAPI.encoder().encodeForHTML(message);
 			
 			if (!message.equals(clean)) {
