@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_get
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_get.pkb-arc   1.27   Aug 07 2017 08:19:02   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_get.pkb-arc   1.28   Sep 07 2017 16:36:32   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_get.pkb  $
-   --       Date into PVCS   : $Date:   Aug 07 2017 08:19:02  $
-   --       Date fetched Out : $Modtime:   Aug 04 2017 13:39:42  $
-   --       PVCS Version     : $Revision:   1.27  $
+   --       Date into PVCS   : $Date:   Sep 07 2017 16:36:32  $
+   --       Date fetched Out : $Modtime:   Sep 07 2017 16:34:46  $
+   --       PVCS Version     : $Revision:   1.28  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,7 +16,7 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.27  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.28  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_get';
 
@@ -1039,7 +1039,8 @@ AS
                        inv_segment_id               seg_id,
                        ROUND (INV_START_SLK, l_round) start_m,
                        ROUND (inv_end_slk, l_round) end_m,
-                       l_refnt_type.nlt_units       unit_m
+                       l_refnt_type.nlt_units       unit_m,
+					   min_seq_id
                   FROM (SELECT route_id,
                                l.inv_id,
                                l.inv_segment_id,
@@ -1065,7 +1066,8 @@ AS
                                OVER (
                                   PARTITION BY route_id, inv_id, inv_segment_id)
                                   end_seg,
-                               datum_unit
+                               datum_unit,
+                               min_seq_id
                           FROM (SELECT k.*,
                                          --sum( conn_flag ) over (order by nm_seg_no, nm_seq_no rows between unbounded preceding and current row ) as segment_id,
                                          SUM (
@@ -1292,7 +1294,8 @@ AS
                                                                 datum_st * dir,
                                                                 datum_end * dir),
                                                           ce)
-                                                          inv_prior_datum_st
+                                                          inv_prior_datum_st,
+                                                    min( seq_id ) over ( partition by route_id ) min_seq_id
                                                   FROM (WITH INV_IDS
                                                              AS (SELECT itab.obj_id
                                                                            inv_id,
@@ -1305,7 +1308,8 @@ AS
                                                                         itab.end_m
                                                                            datum_end,
                                                                         itab.m_unit
-                                                                           datum_unit
+                                                                           datum_unit,
+                                                                        itab.seq_id
                                                                    FROM itab) --nm_members where nm_ne_id_of in ( select nm_ne_id_of from nm_members c where c.nm_ne_id_in = 1887))
                                                           SELECT i.*,
                                                                  m.nm_ne_id_in
@@ -1459,8 +1463,9 @@ AS
                        inv_end_slk,
                        start_seg,
                        end_seg,
-                       datum_unit
-              ORDER BY route_id, inv_start_slk);
+                       datum_unit,
+                       min_seq_id
+              ORDER BY min_seq_id, route_id, inv_start_slk);
 
       RETURN retval;
    END;
