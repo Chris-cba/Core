@@ -1,12 +1,12 @@
 /**
  *	PVCS Identifiers :-
  *
- *		PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/Java/login/bentley/exor/login/ErrorMessagePane.java-arc   1.0   Feb 27 2017 07:03:56   Upendra.Hukeri  $
+ *		PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/Java/login/bentley/exor/login/ErrorMessagePane.java-arc   1.1   Sep 07 2017 14:40:58   Upendra.Hukeri  $
  *		Module Name      : $Workfile:   ErrorMessagePane.java  $
  *		Author			 : $Author:   Upendra.Hukeri  $
- *		Date Into PVCS   : $Date:   Feb 27 2017 07:03:56  $
- *		Date Fetched Out : $Modtime:   Feb 17 2017 12:06:14  $
- *		PVCS Version     : $Revision:   1.0  $
+ *		Date Into PVCS   : $Date:   Sep 07 2017 14:40:58  $
+ *		Date Fetched Out : $Modtime:   Sep 07 2017 14:11:16  $
+ *		PVCS Version     : $Revision:   1.1  $
  *
  *	
  *
@@ -37,14 +37,14 @@ import oracle.forms.ui.CustomListener;
 import oracle.forms.ui.VBean;
 
 public class ErrorMessagePane extends VBean {
-	private IHandler handler;
+	private transient IHandler handler;
 	
 	private String errorMessage = null;
 	private String windowName 	= null;
 	
-	private ID SET_MESSAGE	 	= ID.registerProperty("SET_MESSAGE");
-	private ID SET_WIN_NAME	 	= ID.registerProperty("SET_WIN_NAME");
-	private ID SHOW_MESSAGE	 	= ID.registerProperty("SHOW_MESSAGE");
+	private transient ID SET_MESSAGE  = ID.registerProperty("SET_MESSAGE");
+	private transient ID SET_WIN_NAME = ID.registerProperty("SET_WIN_NAME");
+	private transient ID SHOW_MESSAGE = ID.registerProperty("SHOW_MESSAGE");
 	
 	public void init(IHandler handler) {
 		this.handler = handler;
@@ -64,9 +64,7 @@ public class ErrorMessagePane extends VBean {
 	}
 	
 	public void showMessage() {
-		JOptionPane jop = new JOptionPane();
-		
-		jop.getRootFrame().addWindowListener(new WindowListener(){
+		JOptionPane.getRootFrame().addWindowListener(new WindowListener(){
 			public void windowActivated(WindowEvent e) {
 			}
 
@@ -90,7 +88,7 @@ public class ErrorMessagePane extends VBean {
 			}
 		});
 		
-		int input = jop.showOptionDialog(null, errorMessage, windowName, JOptionPane.OK_CANCEL_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
+		int input = JOptionPane.showOptionDialog(null, errorMessage, windowName, JOptionPane.OK_CANCEL_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
 		
 		if(input == JOptionPane.OK_OPTION || input == JOptionPane.CANCEL_OPTION) {
 			this.closeWindow();
@@ -133,7 +131,7 @@ public class ErrorMessagePane extends VBean {
 			}
 		}
 		
-		if(rootContainer != null && rootContainer instanceof JBufferedFrame) {
+		if(rootContainer instanceof JBufferedFrame) {
 			ExorDebugger.reportDebugInfo("Closing Forms window...");
 			
 			((JBufferedFrame)rootContainer).dispose();
