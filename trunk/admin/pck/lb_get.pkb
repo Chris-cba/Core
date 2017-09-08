@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_get
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_get.pkb-arc   1.28   Sep 07 2017 16:36:32   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_get.pkb-arc   1.29   Sep 08 2017 11:48:14   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_get.pkb  $
-   --       Date into PVCS   : $Date:   Sep 07 2017 16:36:32  $
-   --       Date fetched Out : $Modtime:   Sep 07 2017 16:34:46  $
-   --       PVCS Version     : $Revision:   1.28  $
+   --       Date into PVCS   : $Date:   Sep 08 2017 11:48:14  $
+   --       Date fetched Out : $Modtime:   Sep 08 2017 11:46:42  $
+   --       PVCS Version     : $Revision:   1.29  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,7 +16,7 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.28  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.29  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_get';
 
@@ -1027,7 +1027,7 @@ AS
                      obj_id,
                      seg_id,
                      ROWNUM,
-                     1,
+                     relative_dir,
                      start_m,
                      end_m,
                      unit_m)
@@ -1040,7 +1040,8 @@ AS
                        ROUND (INV_START_SLK, l_round) start_m,
                        ROUND (inv_end_slk, l_round) end_m,
                        l_refnt_type.nlt_units       unit_m,
-					   min_seq_id
+					   min_seq_id,
+					   relative_dir
                   FROM (SELECT route_id,
                                l.inv_id,
                                l.inv_segment_id,
@@ -1067,7 +1068,8 @@ AS
                                   PARTITION BY route_id, inv_id, inv_segment_id)
                                   end_seg,
                                datum_unit,
-                               min_seq_id
+                               min_seq_id,
+                               relative_dir
                           FROM (SELECT k.*,
                                          --sum( conn_flag ) over (order by nm_seg_no, nm_seq_no rows between unbounded preceding and current row ) as segment_id,
                                          SUM (
@@ -1309,7 +1311,8 @@ AS
                                                                            datum_end,
                                                                         itab.m_unit
                                                                            datum_unit,
-                                                                        itab.seq_id
+                                                                        itab.seq_id,
+                                                                        itab.dir_flag
                                                                    FROM itab) --nm_members where nm_ne_id_of in ( select nm_ne_id_of from nm_members c where c.nm_ne_id_in = 1887))
                                                           SELECT i.*,
                                                                  m.nm_ne_id_in
@@ -1331,8 +1334,9 @@ AS
                                                                     ne_no_end)
                                                                     end_node,
                                                                  ne_length,
-                                                                 m.nm_cardinality
+                                                                 m.nm_cardinality 
                                                                     dir,
+                                                                 m.nm_cardinality * i.dir_flag relative_dir,
                                                                  DECODE (
                                                                     ne_sub_class,
                                                                     'S', 'S/L',
@@ -1464,7 +1468,8 @@ AS
                        start_seg,
                        end_seg,
                        datum_unit,
-                       min_seq_id
+                       min_seq_id,
+                       relative_dir
               ORDER BY min_seq_id, route_id, inv_start_slk);
 
       RETURN retval;
