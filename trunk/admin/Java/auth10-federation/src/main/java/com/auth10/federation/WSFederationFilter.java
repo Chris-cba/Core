@@ -5,6 +5,23 @@
 // - Added federation metadata check.
 // - Corrected error message typo.
 // ----------------------------------------------------------------------------------------------
+/**
+ *	PVCS Identifiers :-
+ *
+ *		PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/Java/auth10-federation/src/main/java/com/auth10/federation/WSFederationFilter.java-arc   1.1   Sep 08 2017 11:16:34   Upendra.Hukeri  $
+ *		Module Name      : $Workfile:   WSFederationFilter.java  $
+ *		Author			 : $Author:   Upendra.Hukeri  $
+ *		Date Into PVCS   : $Date:   Sep 08 2017 11:16:34  $
+ *		Date Fetched Out : $Modtime:   Sep 08 2017 11:16:40  $
+ *		PVCS Version     : $Revision:   1.1  $
+ *
+ *	
+ *
+ ****************************************************************************************************
+ *	  Copyright (c) 2017 Bentley Systems Incorporated.  All rights reserved.
+ ****************************************************************************************************
+ *
+ */
 
 package com.auth10.federation;
 
@@ -42,11 +59,34 @@ public class WSFederationFilter implements Filter {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response,
             FilterChain chain) throws IOException, ServletException {
-
         FederatedPrincipal principal = null;
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         HttpServletResponse httpResponse = (HttpServletResponse) response;
-
+        
+        if(httpResponse.containsHeader("Content-Type")) {
+        	httpResponse.setContentType("text/html; charset=ISO-8859-1");
+        } else {
+        	httpResponse.addHeader("Content-Type", "text/html; charset=ISO-8859-1");
+        }
+        
+        if(httpResponse.containsHeader("X-Frame-Options")) {
+        	httpResponse.setHeader("X-Frame-Options", "SAMEORIGIN");
+        } else {
+        	httpResponse.addHeader("X-Frame-Options", "SAMEORIGIN");
+        }
+        
+        if(httpResponse.containsHeader("X-Content-Type-Options")) {
+        	httpResponse.setHeader("X-Content-Type-Options", "nosniff");
+        } else {
+        	httpResponse.addHeader("X-Content-Type-Options", "nosniff");
+        }
+        
+        if(httpResponse.containsHeader("X-XSS-Protection")) {
+        	httpResponse.setIntHeader("X-XSS-Protection", 1);
+        } else {
+        	httpResponse.addIntHeader("X-XSS-Protection", 1);
+        }
+        
         // is the request is a token?
         if (this.isSignInResponse(httpRequest)) {
             FederationMetadata metadata = FederationMetadata.getInstance();
