@@ -3,11 +3,11 @@ AS
   -------------------------------------------------------------------------
   --   PVCS Identifiers :-
   --
-  --       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/hig_relationship_api.pkb-arc   1.1   Mar 29 2017 08:19:22   Chris.Baugh  $
+  --       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/hig_relationship_api.pkb-arc   1.2   Sep 20 2017 11:16:08   Chris.Baugh  $
   --       Module Name      : $Workfile:   hig_relationship_api.pkb  $
-  --       Date into PVCS   : $Date:   Mar 29 2017 08:19:22  $
-  --       Date fetched Out : $Modtime:   Mar 28 2017 16:28:34  $
-  --       Version          : $Revision:   1.1  $
+  --       Date into PVCS   : $Date:   Sep 20 2017 11:16:08  $
+  --       Date fetched Out : $Modtime:   Sep 20 2017 10:09:22  $
+  --       Version          : $Revision:   1.2  $
   --       Based on SCCS version :
   ------------------------------------------------------------------
   --   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
@@ -19,7 +19,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.1  $';
+  g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.2  $';
 
   g_package_name   CONSTANT VARCHAR2 (30) := 'hig_relationship_api';
 
@@ -47,6 +47,44 @@ AS
   BEGIN
     RETURN g_body_sccsid;
   END get_body_version;
+  --
+  -----------------------------------------------------------------------------
+  --
+  FUNCTION f_generate_password 
+    RETURN VARCHAR2 
+  IS
+    --
+    CURSOR c_valid_pwd(pi_pwd   VARCHAR2) IS
+    SELECT TRANSLATE (pi_pwd,'?0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-_:*!£$.,\', '?') 
+     FROM  DUAL; 
+    --
+    lv_pwdlength     INTEGER;
+    lv_return        VARCHAR2(12);
+    lv_dummy         VARCHAR2(100);
+    -- 
+  BEGIN
+  
+     -- Pick a random password length between 8 and 12
+  
+     lv_pwdlength := 8+MOD(ABS(DBMS_RANDOM.RANDOM), 5);
+  
+     -- Generate the Password
+  
+     LOOP
+     	 --
+       lv_return := DBMS_RANDOM.STRING( 'p', lv_pwdlength );
+             
+       OPEN c_valid_pwd(pi_pwd => lv_return);
+       FETCH c_valid_pwd INTO lv_dummy;
+       CLOSE c_valid_pwd;
+        
+       EXIT WHEN lv_dummy IS NULL;    
+       -- 
+     END LOOP;
+  
+     RETURN lv_return;
+     
+  END f_generate_password;
   --
   -----------------------------------------------------------------------------
   --
@@ -285,7 +323,7 @@ AS
    
     FOR i IN 1 .. lt_usernames.COUNT LOOP
       --
-      lv_password := exor_password_engine.f_generate(lt_usernames(i));
+      lv_password := f_generate_password;
       
       -- need to update mcp password details
       IF hig.is_product_licensed('MCP')
