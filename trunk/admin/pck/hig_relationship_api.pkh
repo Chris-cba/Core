@@ -3,17 +3,17 @@ AS
   -------------------------------------------------------------------------
   --   PVCS Identifiers :-
   --
-  --       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/hig_relationship_api.pkh-arc   1.0   Jan 12 2017 13:19:28   Chris.Baugh  $
+  --       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/hig_relationship_api.pkh-arc   1.1   Sep 20 2017 11:13:32   Chris.Baugh  $
   --       Module Name      : $Workfile:   hig_relationship_api.pkh  $
-  --       Date into PVCS   : $Date:   Jan 12 2017 13:19:28  $
-  --       Date fetched Out : $Modtime:   Dec 12 2016 09:26:22  $
-  --       Version          : $Revision:   1.0  $
+  --       Date into PVCS   : $Date:   Sep 20 2017 11:13:32  $
+  --       Date fetched Out : $Modtime:   Sep 20 2017 10:18:56  $
+  --       Version          : $Revision:   1.1  $
   --       Based on SCCS version :
   ------------------------------------------------------------------
   --   Copyright (c) 2016 Bentley Systems Incorporated. All rights reserved.
   ------------------------------------------------------------------
   --g_sccsid is the SCCS ID for the package
-  g_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.0  $';
+  g_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.1  $';
   --
   -----------------------------------------------------------------------------
   --
@@ -26,6 +26,11 @@ AS
   --
   FUNCTION get_body_version
     RETURN VARCHAR2;
+  --
+  -----------------------------------------------------------------------------
+  --
+  FUNCTION f_generate_password 
+    RETURN VARCHAR2; 
   --
   -----------------------------------------------------------------------------
   --
