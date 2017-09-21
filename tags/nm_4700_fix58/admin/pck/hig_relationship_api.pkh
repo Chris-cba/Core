@@ -1,0 +1,102 @@
+CREATE OR REPLACE PACKAGE hig_relationship_api
+AS
+  -------------------------------------------------------------------------
+  --   PVCS Identifiers :-
+  --
+  --       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/hig_relationship_api.pkh-arc   1.2   Sep 21 2017 15:59:40   Chris.Baugh  $
+  --       Module Name      : $Workfile:   hig_relationship_api.pkh  $
+  --       Date into PVCS   : $Date:   Sep 21 2017 15:59:40  $
+  --       Date fetched Out : $Modtime:   Sep 21 2017 14:11:22  $
+  --       Version          : $Revision:   1.2  $
+  --       Based on SCCS version :
+  ------------------------------------------------------------------
+  --   Copyright (c) 2016 Bentley Systems Incorporated. All rights reserved.
+  ------------------------------------------------------------------
+  --g_sccsid is the SCCS ID for the package
+  g_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.2  $';
+  --
+  -----------------------------------------------------------------------------
+  --
+  -- This function returns the current SCCS version
+  FUNCTION get_version
+    RETURN VARCHAR2;
+
+  --
+  -----------------------------------------------------------------------------
+  --
+  FUNCTION get_body_version
+    RETURN VARCHAR2;
+  --
+  -----------------------------------------------------------------------------
+  --
+  FUNCTION f_generate_password 
+    RETURN VARCHAR2; 
+  --
+  -----------------------------------------------------------------------------
+  --
+  FUNCTION encrypt_input(pi_input_string   VARCHAR2,
+                         pi_key            RAW)
+    RETURN RAW;
+  --
+  -----------------------------------------------------------------------------
+  --
+  FUNCTION decrypt_input(pi_input_string   RAW,
+                         pi_key            RAW)
+    RETURN VARCHAR2;
+  --
+  -----------------------------------------------------------------------------
+  --
+  FUNCTION get_user_key(pi_attribute1 IN  hig_relationship.hir_attribute1%TYPE)
+    RETURN VARCHAR2;
+  --
+  -----------------------------------------------------------------------------
+  --
+  FUNCTION pwd_autogenerate_user(pi_username IN  VARCHAR2)
+    RETURN VARCHAR2;
+  --
+  -----------------------------------------------------------------------------
+  --
+  PROCEDURE get_username_orm(po_cursor     OUT sys_refcursor
+                            ,pi_attribute1 IN  hig_relationship.hir_attribute1%TYPE);
+  --
+  -----------------------------------------------------------------------------
+  --
+  PROCEDURE get_username(pi_attribute1 IN  hig_relationship.hir_attribute1%TYPE
+                        ,po_cursor     OUT sys_refcursor);
+
+  --
+  -----------------------------------------------------------------------------
+  --
+  PROCEDURE create_relationship(pi_relationship IN  hig_relationship%ROWTYPE);
+  --
+  -----------------------------------------------------------------------------
+  --
+  PROCEDURE update_relationship(pi_key        IN  hig_relationship.hir_attribute1%TYPE,
+                                pi_attribute1 IN  hig_relationship.hir_attribute1%TYPE,
+                                pi_attribute3 IN  hig_relationship.hir_attribute3%TYPE);
+  --
+  -----------------------------------------------------------------------------
+  --
+  PROCEDURE delete_relationship(pi_attribute1 IN  hig_relationship.hir_attribute1%TYPE);
+  --
+  -----------------------------------------------------------------------------
+  --
+  PROCEDURE refresh_auto_passwords;
+  
+  --
+  -----------------------------------------------------------------------------
+  -- Function used in hig_relationship policy to determine if user is allowed Insert, Update or Delete
+  --
+  FUNCTION f_hig_relationship_admin( schema_in VARCHAR2, name_in VARCHAR2)
+    RETURN VARCHAR2;
+  --
+  -----------------------------------------------------------------------------
+  -- Function used in hig_relationship policy to determine if user is allowed to Select
+  --
+  FUNCTION f_hig_relationship_select( schema_in VARCHAR2, name_in VARCHAR2)
+    RETURN VARCHAR2;
+--
+-----------------------------------------------------------------------------
+--
+END hig_relationship_api;
+/
