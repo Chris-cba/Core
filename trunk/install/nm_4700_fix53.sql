@@ -1,11 +1,11 @@
 ----------------------------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm_4700_fix53.sql-arc   1.0   Mar 31 2017 16:27:40   Chris.Baugh  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm_4700_fix53.sql-arc   1.1   Sep 21 2017 16:03:36   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm_4700_fix53.sql  $ 
---       Date into PVCS   : $Date:   Mar 31 2017 16:27:40  $
---       Date fetched Out : $Modtime:   Mar 20 2017 09:36:10  $
---       Version     	  : $Revision:   1.0  $
+--       Date into PVCS   : $Date:   Sep 21 2017 16:03:36  $
+--       Date fetched Out : $Modtime:   Sep 21 2017 15:34:30  $
+--       Version     	  : $Revision:   1.1  $
 --
 ----------------------------------------------------------------------------------------------------
 --   Copyright (c) 2016 Bentley Systems Incorporated. All rights reserved.
@@ -77,10 +77,10 @@ DECLARE
  pragma exception_init (table_exists,-955);
 BEGIN
   EXECUTE IMMEDIATE 'CREATE TABLE HIG_RELATIONSHIP                        '||CHR(10)||
-                    '( HIR_ATTRIBUTE1  VARCHAR2(50)               NOT NULL'||CHR(10)|| -- Email Address 
-                    ' ,HIR_ATTRIBUTE2  RAW(2000)                  NOT NULL'||CHR(10)|| -- Encrypted Username
-                    ' ,HIR_ATTRIBUTE3  VARCHAR2(1)  DEFAULT ''Y'' NOT NULL'||CHR(10)|| -- Automatic Management enabled (Y/N)
-                    ' ,HIR_ATTRIBUTE4  RAW(2000)                          '||CHR(10)|| -- Salt
+                    '( HIR_ATTRIBUTE1  VARCHAR2(50)               NOT NULL'||CHR(10)||  
+                    ' ,HIR_ATTRIBUTE2  RAW(2000)                  NOT NULL'||CHR(10)|| 
+                    ' ,HIR_ATTRIBUTE3  VARCHAR2(1)  DEFAULT ''Y'' NOT NULL'||CHR(10)|| 
+                    ' ,HIR_ATTRIBUTE4  RAW(2000)                          '||CHR(10)|| 
                     ')';
 EXCEPTION
   WHEN table_exists THEN
@@ -148,6 +148,88 @@ SET TERM OFF
 SET FEEDBACK ON
 START hig_sso_api.pkw
 SET FEEDBACK OFF
+--
+--
+--------------------------------------------------------------------------------
+-- Create HIG_RELATIONSHIP policies
+--------------------------------------------------------------------------------
+--
+--
+SET TERM ON
+PROMPT Drop HIG_RELATIONSHIP Policies
+SET TERM OFF
+--
+DECLARE
+  --
+  no_policy Exception;
+  Pragma Exception_Init(no_policy, -28102); 
+  --
+BEGIN
+  
+  dbms_rls.drop_policy (object_schema => Sys_Context('NM3CORE','APPLICATION_OWNER')
+                       ,object_name   => 'HIG_RELATIONSHIP'
+                       ,policy_name   => 'hig_relationship_admin'
+                        );
+EXCEPTION
+  WHEN no_policy THEN
+    NULL;
+  WHEN OTHERS THEN
+    RAISE;
+END;
+/
+
+DECLARE
+  --
+  no_policy Exception;
+  Pragma Exception_Init(no_policy, -28102); 
+  --
+BEGIN
+  
+  dbms_rls.drop_policy (object_schema => Sys_Context('NM3CORE','APPLICATION_OWNER')
+                       ,object_name   => 'HIG_RELATIONSHIP'
+                       ,policy_name   => 'hig_relationship_select'
+                        );
+EXCEPTION
+  WHEN no_policy THEN
+    NULL;
+  WHEN OTHERS THEN
+    RAISE;
+END;
+/
+--
+
+SET TERM ON
+PROMPT Create HIG_RELATIONSHIP Policies
+SET TERM OFF
+
+BEGIN
+  dbms_rls.add_policy
+     (object_schema   => Sys_Context('NM3CORE','APPLICATION_OWNER')
+     ,object_name     => 'HIG_RELATIONSHIP'
+     ,policy_name     => 'hig_relationship_admin'
+     ,function_schema => Sys_Context('NM3CORE','APPLICATION_OWNER')
+     ,policy_function => 'hig_relationship_api.f_hig_relationship_admin'
+     ,statement_types => 'INSERT,UPDATE,DELETE'
+     ,update_check    => TRUE
+     ,enable          => TRUE
+     ,static_policy   => FALSE
+     );
+  --
+  dbms_rls.add_policy
+     (object_schema   => Sys_Context('NM3CORE','APPLICATION_OWNER')
+     ,object_name     => 'HIG_RELATIONSHIP'
+     ,policy_name     => 'hig_relationship_select'
+     ,function_schema => Sys_Context('NM3CORE','APPLICATION_OWNER')
+     ,policy_function => 'hig_relationship_api.f_hig_relationship_select'
+     ,statement_types => 'SELECT'
+     ,update_check    => TRUE
+     ,enable          => TRUE
+     ,static_policy   => FALSE
+     );
+
+END;
+/
+
 --
 --
 --------------------------------------------------------------------------------
