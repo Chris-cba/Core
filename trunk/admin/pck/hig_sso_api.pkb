@@ -3,11 +3,11 @@ AS
   -------------------------------------------------------------------------
   --   PVCS Identifiers :-
   --
-  --       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/hig_sso_api.pkb-arc   1.2   Feb 22 2017 08:40:50   Chris.Baugh  $
+  --       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/hig_sso_api.pkb-arc   1.3   Sep 26 2017 14:00:46   Chris.Baugh  $
   --       Module Name      : $Workfile:   hig_sso_api.pkb  $
-  --       Date into PVCS   : $Date:   Feb 22 2017 08:40:50  $
-  --       Date fetched Out : $Modtime:   Feb 22 2017 08:40:20  $
-  --       Version          : $Revision:   1.2  $
+  --       Date into PVCS   : $Date:   Sep 26 2017 14:00:46  $
+  --       Date fetched Out : $Modtime:   Sep 26 2017 13:59:56  $
+  --       Version          : $Revision:   1.3  $
   --       Based on SCCS version :
   ------------------------------------------------------------------
   --   Copyright (c) 2017 Bentley Systems Incorporated. All rights reserved.
@@ -19,7 +19,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.2  $';
+  g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.3  $';
 
   g_package_name   CONSTANT VARCHAR2 (30) := 'hig_sso_api';
   --
@@ -67,7 +67,7 @@ AS
     --
     OPEN po_cursor FOR
     SELECT hig_relationship_api.decrypt_input(pi_input_string => hir_attribute2,
-                                              pi_salt         => hir_attribute4) attribute1
+                                              pi_key         => hir_attribute4) attribute1
       FROM hig_relationship,
            dba_users,
            hig_users
@@ -75,7 +75,7 @@ AS
        AND NVL(account_status, 'MISSING') != 'LOCKED'
        AND username = hus_username
        AND hus_username = hig_relationship_api.decrypt_input(pi_input_string => hir_attribute2,
-                                                             pi_salt         => hir_attribute4)
+                                                             pi_key         => hir_attribute4)
        AND NVL(hus_end_date, TRUNC(sysdate+1)) >= TRUNC(sysdate);
     --
   END get_relationship;
