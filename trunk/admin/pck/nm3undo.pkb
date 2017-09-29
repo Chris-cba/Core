@@ -4,11 +4,11 @@ IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3undo.pkb-arc   2.33   Jun 15 2017 14:16:02   Chris.Baugh  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3undo.pkb-arc   2.34   Sep 29 2017 15:22:54   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm3undo.pkb  $
---       Date into PVCS   : $Date:   Jun 15 2017 14:16:02  $
---       Date fetched Out : $Modtime:   Jun 13 2017 09:52:12  $
---       PVCS Version     : $Revision:   2.33  $
+--       Date into PVCS   : $Date:   Sep 29 2017 15:22:54  $
+--       Date fetched Out : $Modtime:   Sep 05 2017 11:52:28  $
+--       PVCS Version     : $Revision:   2.34  $
 --
 --   Author : ITurnbull
 --
@@ -19,7 +19,7 @@ IS
 -- Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '"$Revision:   2.33  $"';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '"$Revision:   2.34  $"';
 --  g_body_sccsid is the SCCS ID for the package body
    g_package_name   CONSTANT VARCHAR2 (2000) := 'nm3undo';
 --
@@ -1358,7 +1358,7 @@ END undo_scheme;
          error_loc := 431;
 
          if hig.is_product_licensed('LB') then
-            lb_nw_edit.lb_undo(p_ne_id => l_ne_id_1 );
+            EXECUTE IMMEDIATE 'BEGIN lb_nw_edit.lb_undo(p_ne_id => :l_ne_id_1 ); END; ' USING l_ne_id_1;
          end if;
 
          IF Nm3net.element_is_a_datum (pi_ne_id => p_ne_id)
@@ -1526,7 +1526,7 @@ END undo_scheme;
 
             if hig.is_product_licensed('LB') then
                error_loc := 1041;
-               lb_nw_edit.lb_undo(p_ne_id => pi_ne_id );
+               EXECUTE IMMEDIATE 'BEGIN lb_nw_edit.lb_undo(p_ne_id => :pi_ne_id ); END; ' USING pi_ne_id;
             end if;
 
 
@@ -1940,7 +1940,7 @@ END undo_scheme;
             END IF;
 
             if hig.is_product_licensed('LB') then
-               lb_nw_edit.lb_undo(p_ne_id => v_ne_id );
+               EXECUTE IMMEDIATE 'BEGIN lb_nw_edit.lb_undo(p_ne_id => :v_ne_id ); END; ' USING v_ne_id;
             end if;
 
 
@@ -2288,6 +2288,7 @@ END undo_scheme;
     SET nm_end_date = NULL
     WHERE nm_ne_id_of = p_ne_id
     AND nm_type = 'G'
+    AND nm_end_date = v_close_date
     AND TRUNC(nm_date_modified) = ( SELECT MAX(TRUNC(nm_date_modified))
                              FROM NM_MEMBERS_ALL
                              WHERE nm_ne_id_of = p_ne_id
