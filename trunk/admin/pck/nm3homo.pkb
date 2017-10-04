@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3homo AS
    --
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3homo.pkb-arc   2.26   02 Dec 2016 17:14:02   Mike.Huitson  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3homo.pkb-arc   2.27   Oct 04 2017 15:56:34   Chris.Baugh  $
    --       Module Name      : $Workfile:   nm3homo.pkb  $
-   --       Date into PVCS   : $Date:   02 Dec 2016 17:14:02  $
-   --       Date fetched Out : $Modtime:   02 Dec 2016 17:07:04  $
-   --       PVCS Version     : $Revision:   2.26  $
+   --       Date into PVCS   : $Date:   Oct 04 2017 15:56:34  $
+   --       Date fetched Out : $Modtime:   Oct 04 2017 10:03:16  $
+   --       PVCS Version     : $Revision:   2.27  $
    --
    --
    --   Author : Jonathan Mills
@@ -55,7 +55,7 @@ CREATE OR REPLACE PACKAGE BODY nm3homo AS
 
    -- Log 713421
 
-   g_body_sccsid        CONSTANT VARCHAR2 (2000) := '"$Revision:   2.26  $"';
+   g_body_sccsid        CONSTANT VARCHAR2 (2000) := '"$Revision:   2.27  $"';
    --  g_body_sccsid is the SCCS ID for the package body
    --
    g_package_name       CONSTANT VARCHAR2 (30) := 'nm3homo';
@@ -733,7 +733,8 @@ CREATE OR REPLACE PACKAGE BODY nm3homo AS
                                           l_new_inv_pl_arr,
                                           NM3PLA.GET_PLACEMENT_FROM_NE (
                                              i.nm_ne_id_in)).npa_placement_array) x)
-                      WHERE ne_id IS NOT NULL;
+                      WHERE ne_id IS NOT NULL
+                        AND ROWNUM = 1;
                   --
                   EXCEPTION
                      WHEN NO_DATA_FOUND
@@ -775,9 +776,10 @@ CREATE OR REPLACE PACKAGE BODY nm3homo AS
                            END IF;
                         --
                         END;
+                        
                      WHEN OTHERS
                      THEN
-                        NULL;
+                        RAISE;
                   END;
                END LOOP;
 
@@ -1578,7 +1580,8 @@ CREATE OR REPLACE PACKAGE BODY nm3homo AS
                                           l_child_ne_rec.iit_ne_id),
                                        NM3PLA.GET_PLACEMENT_FROM_NE (
                                           i.nm_ne_id_in)).npa_placement_array) x)
-                   WHERE ne_id IS NOT NULL;
+                   WHERE ne_id IS NOT NULL
+                     AND ROWNUM = 1;
                --
                EXCEPTION
                   WHEN NO_DATA_FOUND
@@ -1634,7 +1637,12 @@ CREATE OR REPLACE PACKAGE BODY nm3homo AS
                         END IF;
                      --
                      END;
+                     
+                 WHEN OTHERS
+                   THEN
+                     RAISE;
                END;
+               
             END LOOP;
 
             IF NOT l_found_par
@@ -1727,7 +1735,8 @@ CREATE OR REPLACE PACKAGE BODY nm3homo AS
                                           j.iit_ne_id),
                                        NM3PLA.GET_PLACEMENT_FROM_NE (
                                           l_par_iit_rec.iit_ne_id)).npa_placement_array) x)
-                   WHERE ne_id IS NOT NULL;
+                   WHERE ne_id IS NOT NULL
+                     AND ROWNUM = 1;
                --
                EXCEPTION
                   WHEN NO_DATA_FOUND
@@ -1774,6 +1783,10 @@ CREATE OR REPLACE PACKAGE BODY nm3homo AS
                         END;
                      --
                      END;
+                     
+                  WHEN OTHERS
+                  THEN
+                     RAISE;
                END;
             END LOOP;
          END LOOP;
