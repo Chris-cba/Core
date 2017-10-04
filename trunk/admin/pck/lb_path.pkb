@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_path
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_path.pkb-arc   1.9   Mar 29 2017 17:42:28   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_path.pkb-arc   1.10   Oct 04 2017 15:02:02   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_path.pkb  $
-   --       Date into PVCS   : $Date:   Mar 29 2017 17:42:28  $
-   --       Date fetched Out : $Modtime:   Mar 29 2017 17:42:52  $
-   --       PVCS Version     : $Revision:   1.9  $
+   --       Date into PVCS   : $Date:   Oct 04 2017 15:02:02  $
+   --       Date fetched Out : $Modtime:   Oct 04 2017 14:58:08  $
+   --       PVCS Version     : $Revision:   1.10  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,7 +16,7 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.9  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.10  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_path';
 
@@ -270,13 +270,118 @@ AS
       retval   lb_rpt_tab;
    --
    BEGIN
-      nm3ctx.set_context ('L1_NE_ID', TO_CHAR (l1.lr_ne_id));
-      nm3ctx.set_context ('L1_OFFSET', TO_CHAR (l1.lr_offset));
-      nm3ctx.set_context ('L2_NE_ID', TO_CHAR (l2.lr_ne_id));
-      nm3ctx.set_context ('L2_OFFSET', TO_CHAR (l2.lr_offset));
+      IF l1.lr_ne_id = l2.lr_ne_id
+      THEN
+         WITH nlt
+              AS (SELECT ne_id,
+                         ne_length,
+                         ne_no_start,
+                         ne_no_end,
+                         nlt_id,
+                         nlt_units
+                    FROM nm_linear_types, nm_elements
+                   WHERE ne_id = l1.lr_ne_id AND nlt_nt_type = ne_nt_type),
+              t1
+              AS (SELECT ne_id,
+                         nlt_id,
+                         ne_length,
+                         CASE SIGN (l1.lr_offset - l2.lr_offset)
+                            WHEN 1 THEN -1
+                            ELSE 1
+                         END
+                            dir_flag,
+                         LEAST (l1.lr_offset, l2.lr_offset) start_m,
+                         GREATEST (l1.lr_offset, l2.lr_offset) end_m,
+                         nlt_units,
+                         circular_or_linear
+                    FROM (SELECT ne_id,
+                                 nlt_id,
+                                 ne_length,
+                                 ne_no_start,
+                                 ne_no_end,
+                                 nlt_units,
+                                 CASE
+                                    WHEN ne_no_start = ne_no_end
+                                    THEN
+                                       'CIRCULAR'
+                                    ELSE
+                                       'LINEAR'
+                                 END
+                                    circular_or_linear
+                            FROM nlt))
+         SELECT lb_tab
+           INTO retval
+           FROM (SELECT t1.*,
+                        CASE circular_or_linear
+                           WHEN 'CIRCULAR'
+                           THEN
+                              CASE
+                                 WHEN ABS (end_m - start_m) > ne_length / 2
+                                 THEN
+                                    (SELECT CAST (
+                                               COLLECT (lb_tab) AS lb_rpt_tab)
+                                       FROM (SELECT lb_rpt (l1.lr_ne_id,
+                                                            nlt_id,
+                                                            'PATH',
+                                                            1,
+                                                            1,
+                                                            1,
+                                                            dir_flag * -1,
+                                                            end_m,
+                                                            ne_length,
+                                                            nlt_units)
+                                                       lb_tab
+                                               FROM t1
+                                             UNION ALL
+                                             SELECT lb_rpt (l1.lr_ne_id,
+                                                            nlt_id,
+                                                            'PATH',
+                                                            1,
+                                                            1,
+                                                            1,
+                                                            dir_flag,
+                                                            0,
+                                                            t1.start_m,
+                                                            nlt_units)
+                                               FROM t1))
+                                 ELSE
+                                    (SELECT lb_rpt_tab (lb_rpt (l1.lr_ne_id,
+                                                                nlt_id,
+                                                                'PATH',
+                                                                1,
+                                                                1,
+                                                                1,
+                                                                dir_flag,
+                                                                t1.start_m,
+                                                                t1.end_m,
+                                                                nlt_units))
+                                       FROM t1)
+                              END
+                           ELSE
+                              (SELECT lb_rpt_tab (lb_rpt (l1.lr_ne_id,
+                                                          nlt_id,
+                                                          'PATH',
+                                                          1,
+                                                          1,
+                                                          1,
+                                                          dir_flag,
+                                                          t1.start_m,
+                                                          t1.end_m,
+                                                          nlt_units))
+                                 FROM t1)
+                        END
+                           lb_tab
+                   FROM t1);
+      ELSE
+         nm3ctx.set_context ('L1_NE_ID', TO_CHAR (l1.lr_ne_id));
+         nm3ctx.set_context ('L1_OFFSET', TO_CHAR (l1.lr_offset));
+         nm3ctx.set_context ('L2_NE_ID', TO_CHAR (l2.lr_ne_id));
+         nm3ctx.set_context ('L2_OFFSET', TO_CHAR (l2.lr_offset));
 
-      --
-      SELECT * INTO retval FROM v_lb_path_between_points;
+
+         --
+         SELECT * INTO retval FROM v_lb_path_between_points;
+      END IF;
 
       RETURN retval;
    END;
@@ -309,11 +414,11 @@ AS
                           pi_xmax           IN NUMBER DEFAULT NULL,
                           pi_ymax           IN NUMBER DEFAULT NULL)
    IS
-      res_string   VARCHAR2 (1000);
-      net_mem      VARCHAR2 (100);
-      nw_exists    EXCEPTION;
+      res_string           VARCHAR2 (1000);
+      net_mem              VARCHAR2 (100);
+      nw_exists            EXCEPTION;
       PRAGMA EXCEPTION_INIT (nw_exists, -29532);
-      use_spatial_filter Boolean := FALSE;
+      use_spatial_filter   BOOLEAN := FALSE;
    --      cost           NUMBER;
    --      res_numeric    NUMBER;
    --      res_array      SDO_NUMBER_ARRAY;
@@ -326,19 +431,23 @@ AS
       IF pi_network_name IS NULL
       THEN
          raise_application_error (-20002, 'You must specify a network name');
-      ELSIF pi_node_type is NULL and pi_asset_type is NULL then
-         raise_application_error (-20005, 'You must specify a node type or an asset type to define the network elements to be configured');
+      ELSIF pi_node_type IS NULL AND pi_asset_type IS NULL
+      THEN
+         raise_application_error (
+            -20005,
+            'You must specify a node type or an asset type to define the network elements to be configured');
       ELSE
-
-         if pi_xmin is null then
+         IF pi_xmin IS NULL
+         THEN
             use_spatial_filter := FALSE;
-         else
+         ELSE
             use_spatial_filter := TRUE;
-         end if;
-            nm3ctx.set_context('LB_SPATIAL_FILTER_XMIN', to_char(pi_xmin) );
-            nm3ctx.set_context('LB_SPATIAL_FILTER_YMIN', to_char(pi_ymin) );
-            nm3ctx.set_context('LB_SPATIAL_FILTER_XMAX', to_char(pi_xmax) );
-            nm3ctx.set_context('LB_SPATIAL_FILTER_YMAX', to_char(pi_ymax) );
+         END IF;
+
+         nm3ctx.set_context ('LB_SPATIAL_FILTER_XMIN', TO_CHAR (pi_xmin));
+         nm3ctx.set_context ('LB_SPATIAL_FILTER_YMIN', TO_CHAR (pi_ymin));
+         nm3ctx.set_context ('LB_SPATIAL_FILTER_XMAX', TO_CHAR (pi_xmax));
+         nm3ctx.set_context ('LB_SPATIAL_FILTER_YMAX', TO_CHAR (pi_ymax));
 
          BEGIN
             SELECT network
@@ -363,7 +472,7 @@ AS
 
       net_mem := g_network;
 
-      IF pi_asset_type IS NULL and pi_node_type is not null
+      IF pi_asset_type IS NULL AND pi_node_type IS NOT NULL
       THEN
          SELECT ptr_vc (ROWNUM, nt_type)
            BULK COLLECT INTO g_nw_types
@@ -380,21 +489,29 @@ AS
 
       IF res_string = net_mem
       THEN
-               SDO_NET_MEM.NETWORK_MANAGER.DROP_NETWORK (net_mem);
+         SDO_NET_MEM.NETWORK_MANAGER.DROP_NETWORK (net_mem);
       END IF;
-         nm_debug.debug ('net-mem = ' || net_mem);
 
---         if NOT use_spatial_filter then
-         BEGIN
-            SDO_NET_MEM.NETWORK_MANAGER.READ_NETWORK (net_mem, 'TRUE');
-         EXCEPTION
-            WHEN nw_exists
-            THEN
+      nm_debug.debug ('net-mem = ' || net_mem);
+
+      --         if NOT use_spatial_filter then
+      BEGIN
+         SDO_NET_MEM.NETWORK_MANAGER.READ_NETWORK (net_mem, 'TRUE');
+      EXCEPTION
+         WHEN nw_exists
+         THEN
+            BEGIN
                SDO_NET_MEM.NETWORK_MANAGER.DROP_NETWORK (net_mem);
-               SDO_NET_MEM.NETWORK_MANAGER.READ_NETWORK (net_mem, 'TRUE');
-         END;
---         end if;
---      END IF;
+            EXCEPTION
+               WHEN OTHERS
+               THEN
+                  NULL;
+            END;
+
+            SDO_NET_MEM.NETWORK_MANAGER.READ_NETWORK (net_mem, 'TRUE');
+      END;
+   --         end if;
+   --      END IF;
    END;
 
    --
@@ -432,16 +549,16 @@ AS
         INTO retval
         FROM (SELECT e.ne_id,
                      nlt_id,
-                     'PATH'      obj_type,
-                     1           obj_id,
-                     1           seg_id,
+                     'PATH' obj_type,
+                     1 obj_id,
+                     1 seg_id,
                      path_seq,
                      dir_flag,
-                     0           start_m,
+                     0 start_m,
                      p.ne_length end_m,
                      nlt_units
                 FROM nm_linear_types,
-                     nm_elements              e,
+                     nm_elements e,
                      v_lb_directed_path_links p
                WHERE     e.ne_id = p.ne_id
                      AND e.ne_nt_type = nlt_nt_type
@@ -469,12 +586,12 @@ AS
         INTO retval
         FROM (SELECT e.ne_id,
                      nlt_id,
-                     'PATH'      obj_type,
-                     1           obj_id,
-                     1           seg_id,
+                     'PATH' obj_type,
+                     1 obj_id,
+                     1 seg_id,
                      path_seq,
                      dir_flag,
-                     0           start_m,
+                     0 start_m,
                      p.ne_length end_m,
                      nlt_units
                 FROM nm_linear_types,
@@ -649,8 +766,7 @@ AS
                                                               t.lr_ne_id,
                                                               t.lr_offset
                                                          FROM TABLE (
-                                                                 pi_lref_array)
-                                                              t)))
+                                                                 pi_lref_array) t)))
                               SELECT rn,
                                      --rn, lr_ne_id, lr_offset, next_lr_ne_id, next_lr_offset
                                      LB_PATH.get_sdo_path (
