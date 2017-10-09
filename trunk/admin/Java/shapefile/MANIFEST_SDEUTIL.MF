@@ -1,0 +1,14 @@
+Application-Name: Java Shapefile Extract-Upload Tool (sdeutil.jar)
+Build-Timestamp: 09-Oct-2017
+Build-Jdk: 1.7.0_25
+Built-By: Upendra Hukeri
+Class-Path: ojdbc6.jar
+Name: bentley/exor/gis/
+Permissions: all-permissions
+Specification-Vendor: Bentley Systems, Inc.
+Specification-Title: Java API for extracting/uploading shapefiles from/to Oracle database
+Specification-Version: 1.0
+Implementation-Title: bentley.exor.gis
+Implementation-Version: 4.7.0.1
+Implementation-Vendor: Bentley Systems, Inc.
+
