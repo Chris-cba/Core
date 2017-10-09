@@ -1,20 +1,20 @@
 /**
  *    PVCS Identifiers :-
  *
- *       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/Java/shapefile/bentley/exor/gis/SHP2SDE.java-arc   1.1   Aug 17 2015 07:25:48   Upendra.Hukeri  $
+ *       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/Java/shapefile/bentley/exor/gis/SHP2SDE.java-arc   1.2   Oct 09 2017 09:59:20   Upendra.Hukeri  $
  *       Module Name      : $Workfile:   SHP2SDE.java  $
- *       Date into SCCS   : $Date:   Aug 17 2015 07:25:48  $
- *       Date fetched Out : $Modtime:   Aug 17 2015 07:06:14  $
- *       SCCS Version     : $Revision:   1.1  $
+ *       Date into SCCS   : $Date:   Oct 09 2017 09:59:20  $
+ *       Date fetched Out : $Modtime:   Oct 09 2017 08:20:08  $
+ *       SCCS Version     : $Revision:   1.2  $
  *       Based on 
  *
  *
  *
  *    Author : Upendra Hukeri
- *
  *    SHP2SDE.java
+ *
  ****************************************************************************************************
- *	  Copyright (c) 2015 Bentley Systems Incorporated.  All rights reserved.
+ *	  Copyright (c) 2017 Bentley Systems Incorporated.  All rights reserved.
  ****************************************************************************************************
  *
  */
@@ -22,31 +22,44 @@
 package bentley.exor.gis;
 
 import com.vividsolutions.jts.geom.Geometry;
-import java.io.*;
 
-import java.sql.*;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
+import java.nio.charset.StandardCharsets;
 
-import java.util.Calendar;
+import java.sql.CallableStatement;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.SQLSyntaxErrorException;
+import java.sql.Statement;
+import java.sql.Types;
+
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.Date;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Locale;
+import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.TreeSet;
-import java.util.Vector;
 
-import oracle.jdbc.driver.*;
 import oracle.jdbc.OracleConnection;
 
-import oracle.spatial.util.*;
+import oracle.spatial.util.ShapefileReaderJGeom;
 
 import oracle.sql.STRUCT;
 
@@ -71,984 +84,921 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * database.
  */
 
-public class SHP2SDE {
-	private String 	m_host 				= null;
-	private String 	m_port 				= null;
-	private String 	m_sid 				= null;
-	private String 	m_user 				= null;
-	private String 	m_password		 	= null;
-	private String 	m_tableName 		= null;
-	private String 	m_shapefileName 	= null;
-	private String 	m_idName 			= null;
-	private int 	m_srid 				= 0;
-	private String 	geomMetaDataTable 	= "user_sdo_geom_metadata";
-	private String 	m_geom	 			= "GEOMETRY";
-	private String 	min_x 				= "-180";
-	private String	min_y 				= "-90";
-	private String 	max_x 				= "180";
-	private String 	max_y 				= "90";
-	private String 	m_tolerance 		= "0.05";
-	private String 	mg_tolerance 		= "0.000000005";
-	private int 	m_start_id 			= 1;
-	private int 	m_commit_interval 	= -1;
-	private String 	dimArray 			= null;
-	private String 	dimArrayMig 		= null;
-	private boolean defaultX 			= true;
-	private boolean defaultY 			= true;
-	private String 	operation			= null;
+public class SHP2SDE extends ShapefileUtility {
+	private String 		 idColName 			= null;
+	private int 		 userSRID 			= 0;
+	private int 		 dbOracleSRID		= 0;
+	private int 		 dbEPSGSRID			= 0;
+	private int 		 shpDims			= 0;
+	private double 		 minX               = -180d;
+	private double 		 maxX               = 180d;
+	private double 		 minY               = -90d;
+	private double 		 maxY               = 90d;
+	private double 		 minZ               = 0;
+	private double 		 maxZ               = 0;
+	private double 		 minMeasure         = 0;
+	private double 		 maxMeasure         = 0;
+	private double 		 mTolerance         = 0.05d;
+	private double 		 mgTolerance 		= 0.000000005d;
+	private int 		 startID 			= 1;
+	private int 		 commitInterval 	= -1;
+	private int 		 geodeticSRIDCount	= 0;
+	private int 		 numOfAffectedRecs	= 0;
+	private String 		 relSchema 			= null;
+	private boolean 	 defaultX 			= true;
+	private boolean 	 defaultY 			= true;
+	private String 		 operation			= null;
+	private Set<Integer> atrbFileCols		= new TreeSet<Integer>();
 	
-	private String	attributeMode	 	= null;
-	private Map<String, String> 	attributeMap	 = new HashMap<String, String>();
-	private boolean	useAttribMapping 	= false;
-	
-	private String 	usage 				= "\nError: The following mandatory key(s)/value(s) is/are missing: ";
-	private static final String 	SHPFAILUREMSG 		= "shapefile upload failed!";
-	private static final String 	SHPSUCCESSMSG 		= "success";
-	
-	private static final int 		SHPSUCCESSMSGNUM 		= 1;
-	
-	private static String			errorMsg 			= null;
-	
-	private String 	value				= null;
-	private String 	key					= null;
-	
-	private HashMap hm 					= new HashMap();
-	
-	private Vector 	v 					= new Vector();
-	
-	private int 	skip_create_table 	= 0;
-	private int 	delete_rows 		= 0;
-	
-	private File 	logFile				= null;
-	private String	logFilePath		 	= null;
-	
-	private static 	BufferedWriter logger = null;
-	
-	private Set<Integer> atrbFileCols	= new TreeSet<Integer>();
-	
-	public SHP2SDE () {
-		errorMsg  = "\n\t\tUSAGE: java -jar shp2sde.jar -h db_host -p db_port -s db_sid -u db_username -d db_password -t db_table -f shapefile_name -i table_id_column_name -r srid -g db_geometry_column -x max_x,min_x -y max_y,min_y -m tolerance -o {append|create|init} -n start_id -c commit_interval -a attribute_map_file";
-		errorMsg += "\n\t\tUsage explanation (parameters used):";
-		errorMsg += "\n\t\t<-h>: Host machine with existing Oracle database";
-		errorMsg += "\n\t\t<-p>: Host machine's port with existing Oracle database (e.g. 1521)";
-		errorMsg += "\n\t\t<-s>: Host machine's SID with existing Oracle database";
-		errorMsg += "\n\t\t<-u>: Database user";
-		errorMsg += "\n\t\t<-d>: Database user's password";
-		errorMsg += "\n\t\t<-t>: Table name for the result";
-		errorMsg += "\n\t\t<-f>: File name of an input Shapefile WITHOUT EXTENSION";
-		errorMsg += "\n\t\t[-i]: Column name for unique numeric ID; if required";
-		errorMsg += "\n\t\t[-r]: Valid Oracle SRID for coordinate system; use 0 if unknown";
-		errorMsg += "\n\t\t[-g]: Preferred or valid SDO_GEOMETRY column name";
-		errorMsg += "\n\t\t[-x]: Bounds for the X dimension; use -180,180 if unknown";
-		errorMsg += "\n\t\t[-y]: Bounds for the Y dimension; use -90,90 if unknown";
-		errorMsg += "\n\t\t[-m]: Load tolerance fields (x and y) in metadata, if not specified, tolerance fields are 0.05";
-		errorMsg += "\n\t\t[-o]: Mode to add shapefile data to a table. Possible Values - {append|create|init} (values are CASE-SENSITIVE)";
-		errorMsg += "\n\t\t[-n]: Start ID for column specified in -i parameter";
-		errorMsg += "\n\t\t[-c]: Commit interval. Default, only commits at the end of a run.";
-		errorMsg += "\n\t\t[-a]: Attribute Mapping File WITH EXTENSION";
-		errorMsg += "\n\n\t\tNOTE: \t<> indicates MANDATORY field";
-		errorMsg += "\n\t\t\t\t[] indicates OPTIONAL field";
-		
+	public SHP2SDE() {
+		super();
 	}
 	
-	public SHP2SDE (String args[]) {
-		int numOfErrors = 0;
-		String[] missingKV = new String[7];
+	protected String getHelpMessage() {
+		StringBuilder helpMsg  = new StringBuilder();
+		
+		helpMsg.append("\nUSAGE: java -cp sdeutil.jar bentley.exor.gis.SHP2SDE -help -nc -h db_host -p db_port -s db_sid -u db_username -d db_password -t db_table -f shapefile_name -i table_id_column_name -r srid -g db_geometry_column -x max_x,min_x -y max_y,min_y -m tolerance -o {append|create|init} -n start_id -c commit_interval -a column_name_mapping_file");
+		helpMsg.append("\n\tUsage explanation (parameters used):");
+		helpMsg.append("\n\t[-help]: Specify this option to see the command line usage of Shapefile Uploader (for command line use only)");
+		helpMsg.append("\n\t(-nc)  : Specify this option, if the jar is loaded in database and called from a PL/SQL procedure or function");
+		helpMsg.append("\n\t(-h)   : Host machine with existing Oracle database");
+		helpMsg.append("\n\t(-p)   : Host machine's port with existing Oracle database (e.g. 1521)");
+		helpMsg.append("\n\t(-s)   : Host machine's SID with existing Oracle database");
+		helpMsg.append("\n\t(-u)   : Database user");
+		helpMsg.append("\n\t(-d)   : Database user's password");
+		helpMsg.append("\n\t<-t>   : Table name for the result");
+		helpMsg.append("\n\t<-f>   : File name of an input Shapefile WITHOUT EXTENSION");
+		helpMsg.append("\n\t[-i]   : Column name for unique numeric ID; if required");
+		helpMsg.append("\n\t[-r]   : Valid Oracle SRID for coordinate system; use 0 if unknown");
+		helpMsg.append("\n\t[-g]   : Preferred or valid SDO_GEOMETRY column name");
+		helpMsg.append("\n\t[-x]   : Bounds for the X dimension; use -180,180 if unknown");
+		helpMsg.append("\n\t[-y]   : Bounds for the Y dimension; use -90,90 if unknown");
+		helpMsg.append("\n\t[-m]   : Load tolerance fields (x and y) in metadata, if not specified, tolerance fields are 0.05");
+		helpMsg.append("\n\t<-o>   : Mode to add shapefile data to a table. Possible Values - {append|create|init}");
+		helpMsg.append("\n\t[-n]   : Start ID for column specified in -i parameter");
+		helpMsg.append("\n\t[-c]   : Commit interval. Default - only commits at the end of a run.");
+		helpMsg.append("\n\t[-a]   : File name containing column-name(attribute) mappings WITH EXTENSION");
+		helpMsg.append("\n\n\tNOTE: \t() indicate MANDATORY ALTERNATE field e.g. either (-nc) or (-h -p -s -u -d)");
+		helpMsg.append("\n\t\t<> indicate MANDATORY field");
+		helpMsg.append("\n\t\t[] indicate OPTIONAL field");
+		
+		return helpMsg.toString();
+	}
+	
+	private void init(String[] nuh) {
+		int			 numOfErrors 	= 0;
+		
+		Set <String> validKeySet	= new HashSet<String>(Arrays.asList(ShapefileUtility.validUploadKeysArray));
+		List<String> missingKV 		= new ArrayList<String>();
+		List<String> argumentsList 	= new ArrayList<String>(Arrays.asList(nuh));
+		Map <String, String> hm		= new HashMap<String, String>();
 		
 		try {
-			for (int j = 0; args.length > j; j++) {
-				v.add(j, args[j]);
-			}
-
-			for (Enumeration e = v.elements(); e.hasMoreElements();) {
-				try {
-					key = (String) e.nextElement();
-					value = (String) e.nextElement();
+			for (Enumeration e = Collections.enumeration(argumentsList); e.hasMoreElements();) {
+				String key   = null;
+				String value = null;
+				
+				key = (String) e.nextElement();
+				boolean isNormalParam = true;
+				
+				if("-nc".equals(key)) {
+					hm.put(key, null);
+					isNormalParam = false;
+				}
+				
+				if(isNormalParam) {
+					try {
+						value = (String) e.nextElement();
+					} catch(NoSuchElementException nseException) {
+						missingKV.add("missing value for: " + key);
+						numOfErrors++;
+					}
 					
-					if (key != null && value != null) {
+					if (key != null && value != null && !key.isEmpty() && !value.isEmpty()) {
 						hm.put(key, value);
 					}
-				} catch (Exception ex) {
-					writeLog(logger, "\nError: One of your key-value pairs failed. Please try again." + errorMsg);
-					systemExit(logger);
 				}
 			}
-
-			if (hm.containsKey("-h")) {
-				writeLog(logger, "host: " + (String) hm.get("-h"));
-				m_host = (String) hm.get("-h");
-			} else {
-				missingKV[numOfErrors] = "-h db_host";
-				numOfErrors++;
+			
+			if (hm.containsKey("-nc")) {
+				writeLog("use_nested_connection: true", false);
 			}
+			
+			if(!getUseNestedConn()) {
+				if (hm.containsKey("-h")) {
+					setHost((String) hm.get("-h"));
+					writeLog("host: " + getHost(), false);
+				} else {
+					missingKV.add("-h db_host");
+					numOfErrors++;
+				}
 
-			if (hm.containsKey("-p")) {
-				writeLog(logger, "port: " + (String) hm.get("-p"));
-				m_port = (String) hm.get("-p");
-			} else {
-				missingKV[numOfErrors] = "-p db_port";
-				numOfErrors++;
+				if (hm.containsKey("-p")) {
+					try {
+						setPort(Integer.parseInt((String) hm.get("-p")));
+						writeLog("port: " + getPort(), false);
+					} catch(NumberFormatException nfePort) {
+						missingKV.add("not a number, please enter a valid Port number (-p)");
+						numOfErrors++;
+					}
+				} else {
+					missingKV.add("-p db_port");
+					numOfErrors++;
+				}
+
+				if (hm.containsKey("-s")) {
+					setSID((String) hm.get("-s"));
+					writeLog("sid: " + getSID(), false);
+				} else {
+					missingKV.add("-s db_sid");
+					numOfErrors++;
+				}
+
+				if (hm.containsKey("-u")) {
+					setUserName((String) hm.get("-u"));
+					writeLog("db_username: " + getUserName(), false);
+				} else {
+					missingKV.add("-u db_username");
+					numOfErrors++;
+				}
+
+				if (hm.containsKey("-d")) {
+					setPassword((String) hm.get("-d"));
+					writeLog("db_password: *******", false);
+				} else {
+					missingKV.add("-d password");
+					numOfErrors++;
+				}
 			}
-
-			if (hm.containsKey("-s")) {
-				writeLog(logger, "sid: " + (String) hm.get("-s"));
-				m_sid = (String) hm.get("-s");
-			} else {
-				missingKV[numOfErrors] = "-s db_sid";
-				numOfErrors++;
-			}
-
-			if (hm.containsKey("-u")) {
-				writeLog(logger, "db_username: " + (String) hm.get("-u"));
-				m_user = (String) hm.get("-u");
-			} else {
-				missingKV[numOfErrors] = "-u db_username";
-				numOfErrors++;
-			}
-
-			if (hm.containsKey("-d")) {
-				writeLog(logger, "db_password: ******");
-				m_password = (String) hm.get("-d");
-			} else {
-				missingKV[numOfErrors] = "-d password";
-				numOfErrors++;
-			}
-
+			
 			if (hm.containsKey("-t")) {
-				writeLog(logger, "db_tablename: " + (String) hm.get("-t"));
-				m_tableName = (String) hm.get("-t");
+				setViewName(((String) hm.get("-t")));
+				
+				if(!conformOracleNamingConvention(getViewName())) {
+					missingKV.add("wrong value passed to -t, special characters not allowed in table name (allowed: A-Z a-z 0-9 _ $ #)");
+					numOfErrors++;
+				}
+				
+				writeLog("db_tablename: " + getViewName(), false);
 			} else {
-				missingKV[numOfErrors] = "-t tablename";
+				missingKV.add("-t tablename");
 				numOfErrors++;
 			}
 
 			if (hm.containsKey("-f")) {
-				writeLog(logger, "shapefile_name: " + ((String) hm.get("-f")).replace("\\\\", "\\") + ".shp");
-				m_shapefileName = ((String) hm.get("-f")) + ".shp";
+				setSHPFileName(((String) hm.get("-f")));
+				writeLog("shapefile_name: " + getSHPFileName() + ".shp", false);
+				
+				if(getSHPFileName().indexOf('\\') > -1 || getSHPFileName().indexOf('/') > -1) {
+					missingKV.add("wrong value passed to -f, path not allowed here");
+					numOfErrors++;
+				}
 			} else {
-				missingKV[numOfErrors] = "-f shapefile_name";
+				missingKV.add("-f shapefile_name");
 				numOfErrors++;
 			}
 			
 			if (hm.containsKey("-i")) {
-				writeLog(logger, "table_id_column_name: " + (String) hm.get("-i"));
-				m_idName = (String) hm.get("-i");
+				idColName = (String) hm.get("-i");
+				
+				if(!conformOracleNamingConvention(idColName)) {
+					missingKV.add("wrong value passed to -i, special characters not allowed in ID column name (allowed: A-Z a-z 0-9 _ $ #)");
+					numOfErrors++;
+				}
+				
+				writeLog("table_id_column_name: " + idColName, false);
 			}
 
 			if (hm.containsKey("-r")) {
-				writeLog(logger, "SRID: " + (String) hm.get("-r"));
-				m_srid = Integer.parseInt((String) hm.get("-r"));
+				try {
+					userSRID = Integer.parseInt((String) hm.get("-r"));
+					writeLog("SRID: " + userSRID, false);
+				} catch(NumberFormatException nfeSRID) {
+					missingKV.add("not a number, please enter a valid SRID (-r)");
+					numOfErrors++;
+				}
 			}
 
 			if (hm.containsKey("-g")) {
-				writeLog(logger, "db_geometry_column: " + (String) hm.get("-g"));
-				m_geom = (String) hm.get("-g");
+				setGeomColName((String) hm.get("-g"));
+				
+				if(!conformOracleNamingConvention(getGeomColName())) {
+					missingKV.add("wrong value passed to -g, special characters not allowed in geometry column name (allowed: A-Z a-z 0-9 _ $ #)");
+					numOfErrors++;
+				}
+				
+				writeLog("db_geometry_column: " + getGeomColName(), false);
+			} else {
+				setGeomColName("GEOMETRY");
 			}
-
+			
 			if (hm.containsKey("-x")) {
-				writeLog(logger, "X: " + (String) hm.get("-x"));
-				StringTokenizer stx = new StringTokenizer((String) hm.get("-x"), ",");
-				while (stx.hasMoreTokens()) {
-					min_x = stx.nextToken();
-					max_x = stx.nextToken();
-					defaultX = false;
+				String xValue = (String) hm.get("-x");
+				writeLog("X: " + xValue, false);
+				
+				StringTokenizer stx = new StringTokenizer(xValue, ",");
+				
+				try {
+					while (stx.hasMoreTokens()) {
+						minX = Double.parseDouble(stx.nextToken());
+						maxX = Double.parseDouble(stx.nextToken());
+						
+						defaultX = false;
+					}
+				} catch(NumberFormatException nfeXValue) {
+					missingKV.add("not a number, please enter valid bounds for the X dimension (-x)");
+					numOfErrors++;
 				}
 			}
 
 			if (hm.containsKey("-y")) {
-				writeLog(logger, "Y: " + (String) hm.get("-y"));
-				StringTokenizer sty = new StringTokenizer((String) hm.get("-y"),
-						",");
-				while (sty.hasMoreTokens()) {
-					min_y = sty.nextToken();
-					max_y = sty.nextToken();
-					defaultY = false;
+				String yValue = (String) hm.get("-y");
+				writeLog("Y: " + yValue, false);
+				
+				StringTokenizer sty = new StringTokenizer(yValue, ",");
+				
+				try {
+					while (sty.hasMoreTokens()) {
+						minY = Double.parseDouble(sty.nextToken());
+						maxY = Double.parseDouble(sty.nextToken());
+						
+						defaultY = false;
+					}
+				} catch(NumberFormatException nfeYValue) {
+					missingKV.add("not a number, please enter valid bounds for the Y dimension (-y)");
+					numOfErrors++;
 				}
 			}
 
 			if (hm.containsKey("-m")) {
-				writeLog(logger, "tolerance: " + (String) hm.get("-o"));
-				m_tolerance = (String) hm.get("-o");
+				try {
+					mTolerance = Double.parseDouble((String) hm.get("-m"));
+					writeLog("tolerance: " + mTolerance, false);
+				} catch(NumberFormatException nfeTolerance) {
+					missingKV.add("not a number, please enter a valid tolerance value (-m)");
+					numOfErrors++;
+				}
 			}
 			
 			if (hm.containsKey("-o")) {
-				writeLog(logger, "operation: " + (String) hm.get("-o"));
-				operation = (String) hm.get("-o");
+				operation = (String) hm.get("-o").toLowerCase(Locale.ENGLISH);
+				writeLog("operation: " + operation, false);
 				
-				if (operation.equals("append")) {
-					skip_create_table = 1;
-					delete_rows = 0;
-				} else if (operation.equals("create")) {
-					skip_create_table = 0;
-				} else if (operation.equals("init")) {
-					skip_create_table = 1;
-					delete_rows = 1;
-				} else {
-					missingKV[numOfErrors] = "wrong value passed to argument -o: possible values - append|create|init";
+				if (!("append".equals(operation) || "create".equals(operation) || "init".equals(operation))) {
+					missingKV.add("wrong value passed to argument -o: possible values - append|create|init");
 					numOfErrors++;
 				}
 			} else {
-				missingKV[numOfErrors] = "-o operation";
+				missingKV.add("-o operation");
 				numOfErrors++;
 			}
 			
 			if (hm.containsKey("-n")) {
-				writeLog(logger, "start_id: " + (String) hm.get("-n"));
-				m_start_id = Integer.parseInt((String) hm.get("-n"));
+				try {
+					startID = Integer.parseInt((String) hm.get("-n"));
+					writeLog("start_id: " + startID, false);
+				} catch(NumberFormatException nfeStartID) {
+					missingKV.add("not a number, please enter a valid Start ID (-n)");
+					numOfErrors++;
+				}
 			}
 
 			if (hm.containsKey("-c")) {
-				writeLog(logger, "commit_interval: " + (String) hm.get("-c"));
-				m_commit_interval = Integer.parseInt((String) hm.get("-c"));
+				try {
+					commitInterval = Integer.parseInt((String) hm.get("-c"));
+					writeLog("commit_interval: " + commitInterval, false);
+				} catch(NumberFormatException nfeCommitInterval) {
+					missingKV.add("not a number, please enter a valid Commit Interval (-c)");
+					numOfErrors++;
+				}
 			}
 			
 			if (hm.containsKey("-a")) {
-				writeLog(logger, "attribute_map_file: " + (String) hm.get("-a"));
-				this.attributeMode = (String) hm.get("-a");
-			} else {
-				this.attributeMode = "";
-			}
-			
-			if (numOfErrors > 0) {
-				writeLog(logger, usage);
+				setColMapFileName((String) hm.get("-a"));
+				writeLog("use_column_mapping: true, file name: " + getColMapFileName(), false);
 				
-				for (int i=0; i<missingKV.length; i++) {
-					String missingKVDescr = missingKV[i];
-					
-					if (missingKVDescr != null) {
-						writeLog(logger, "\t\t" + missingKVDescr);
-					}
+				if(getColMapFileName().indexOf('\\') > -1 || getColMapFileName().indexOf('/') > -1) {
+					missingKV.add("wrong value passed to -a, path not allowed here");
+					numOfErrors++;
 				}
 				
-				systemExit(logger);
-			}
-			
-			logFile				= setLogFile();
-			
-			File f_shp = new File(m_shapefileName);
-				
-			if (!f_shp.exists()) {
-				writeLog(logger, "\nError: Cannot find the shapefile specified - " + ((String) hm.get("-f")).replace("\\\\", "\\") + ".shp");
-				
-				systemExit(logger);
+				setUseColumnMapping(true);
 			} else {
-				f_shp = null;
+				writeLog("use_column_mapping: false", false);
 			}
 			
-			if(new File(logFilePath).isDirectory()) {
-				logger.flush();
-				logger.close();
+			Set<String> keySet 		= hm.keySet();
+			Iterator 	keyIterator = keySet.iterator();
+			
+			while(keyIterator.hasNext()) {
+				String currKey = (String)keyIterator.next();
 				
-				logger = new BufferedWriter(new FileWriter(logFile));
-				writeLog(logger, new Date().toString() + ": starting upload process...");
-			} else {
-				writeLog(logger, "\nError: Cannot find the path specified to create Log file - " + logFilePath.replace("\\\\", "\\"));
-				
-				systemExit(logger);
+				if(!validKeySet.contains(currKey)) {
+					setErrorMsg("\nError: invalid key - " + currKey);
+					writeLog(getErrorMsg(), false);
+					setExitSystem(true);
+				}
 			}
 			
-			this.setAttributeMap();
-		} catch (Exception constructorException) {
-			writeLog(logger, "\nError: Exception constructorException caught...");
-			StringWriter stw = new StringWriter();
-			PrintWriter pw = new PrintWriter(stw);
-			constructorException.printStackTrace(pw);
-			writeLog(logger, stw.toString());
-			writeLog(logger, "Error: " + SHPFAILUREMSG);
-			systemExit(logger);
+			if(!getExitSystem()) {
+				if (numOfErrors > 0) {
+					writeLog("\nError: following key(s)/value(s) is/are missing: ", false);
+					
+					Iterator itr = missingKV.iterator();
+					
+					while(itr.hasNext()) {
+						writeLog("\t\t" + itr.next(), false);
+					}
+					
+					setErrorMsg("\nError: missing key(s), please check system log file for more details");
+					setExitSystem(true);
+				} else {
+					systemExit();
+					setLogger(new BufferedWriter(new OutputStreamWriter(new FileOutputStream(setLogFile("shp2sde")), StandardCharsets.UTF_8)));
+					writeLog("starting upload process...");
+				}
+			}
+		} catch (Exception initException) {
+			setErrorMsg("\nError: " + initException.getMessage());
+			logException(initException, "<init>");
+			writeLog(ShapefileUtility.SHP2SDEFAILUREMSG, false);
+			setExitSystem(true);
 		}
 	}
 	
-	public static void main(String args[]) {
+	public static String uploadShapeFileDB(java.sql.Array array) {
+		String[] nuh = null;
+		
 		try {
-			SHP2SDE shp2sde = new SHP2SDE();
+			Object params = array.getArray();
+			int arrayLength = java.lang.reflect.Array.getLength(params);
+			nuh = new String[arrayLength];
 			
-			String currentDir = shp2sde.getClass().getProtectionDomain().getCodeSource().getLocation().toURI().getPath().replace("shp2sde.jar", "");
-			shp2sde = null;
-			
-			File systemLog = new File(currentDir + "\\log");
-			
-			if (!systemLog.isDirectory()) {
-				boolean dirCreated = systemLog.mkdir();
-				
-				if (!dirCreated) {
-					System.out.println("\nError: Cannot create system log file.");
-					System.exit(1);
-				}
+			for (int i=0; i<arrayLength; i++) {
+				nuh[i] = String.valueOf(java.lang.reflect.Array.get(params, i));
 			}
+		} catch(SQLException createShapeFileDBException) {
+			return createShapeFileDBException.getMessage();
+		}
+		
+		SHP2SDE shp2sde = new SHP2SDE();
+		shp2sde.doUpload(nuh, shp2sde);
+		String errorMessage = shp2sde.getErrorMsg();
+		
+		if(errorMessage != null) {
+			errorMessage = shp2sde.getSystemLogFileName() + '\n' + errorMessage;
 			
-			DateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
-			Calendar cal = Calendar.getInstance();
-			String timeExtension = dateFormat.format(cal.getTime());
+			if(errorMessage.length() > 32767) {
+				return errorMessage.substring(0, 32767);
+			} 
 			
-			systemLog = new File(currentDir + "\\log\\shp2sde_" + timeExtension + ".log");
-			
-			System.out.println(systemLog.toString());
-						
-			logger = new BufferedWriter(new FileWriter(systemLog));
-			
-			if (args.length <= 1) {				
-				writeLog(logger, new Date().toString() + ": Error: Invalid argument/s passed..." + errorMsg);
-			} else {
-				shp2sde = new SHP2SDE(args);
-				String[] rowsAdded = shp2sde.uploadShapeFile().split(":");
+			return errorMessage;
+		} else {
+			return "success" + '\n' + shp2sde.getSystemLogFileName();
+		}
+	}
+	
+	public static void main(String nuh[]) {
+		SHP2SDE shp2sde = new SHP2SDE();
+		shp2sde.doUpload(nuh, shp2sde);
+	}
+	
+	protected void doUpload(String[] nuh, SHP2SDE shp2sde) {
+		try {
+			if(nuh != null && nuh.length >= 1) {
+				if(Arrays.asList(nuh).contains("-nc")) {
+					shp2sde.setUseNestedConn(true);
+				}
 				
-				int addedRows = Integer.parseInt(rowsAdded[0]);
-				int errorRows = Integer.parseInt(rowsAdded[1]);
-				
-				writeLog(logger, new Date().toString() + ": " + errorRows + " errors occurred while adding rows to the table.");
-				writeLog(logger, new Date().toString() + ": " + (addedRows - errorRows) + " rows added to the table.");
-				
-				if (errorRows > 0) {
-					writeLog(logger, new Date().toString() + ": shapefile is uploaded to table '" + shp2sde.m_tableName + "' with error/s");
-					
-					System.out.println(SHPFAILUREMSG);
+				if(Arrays.asList(nuh).contains("-help")) {
+					if(shp2sde.getUseNestedConn()) {
+						shp2sde.setErrorMsg("Error: -help is for command line usage only");
+					} else {
+						System.out.println(shp2sde.getHelpMessage());
+					}
 				} else {
-					writeLog(logger, new Date().toString() + ": shapefile is uploaded successfully to table '" + shp2sde.m_tableName + "'");
+					String result = shp2sde.setBasicDirectories("shp2sde");
 					
-					System.out.println(SHPSUCCESSMSG);
-					//System.out.print(SHPSUCCESSMSGNUM);
+					if("Y".equals(result)) {
+						shp2sde.init(nuh);
+						
+						if(!shp2sde.getExitSystem()) {
+							shp2sde.setColumnMap();
+							
+							if(!shp2sde.getExitSystem()) {
+								String[] rowsAdded = shp2sde.uploadShapeFile().split(":");
+								
+								int addedRows = Integer.parseInt(rowsAdded[0]);
+								int errorRows = Integer.parseInt(rowsAdded[1]);
+								
+								if(addedRows == -1 && errorRows == -1) {
+									writeLog(ShapefileUtility.SHP2SDEFAILUREMSG, false);
+								} else {
+									writeLog(errorRows + " errors occurred while adding rows to the table");
+									writeLog((addedRows - errorRows) + " rows added to the table");
+									
+									if (errorRows > 0) {
+										shp2sde.setErrorMsg("shapefile is uploaded to table '" + shp2sde.getViewName() + "' with error/s");
+										writeLog(shp2sde.getErrorMsg());
+										writeLog(ShapefileUtility.SHP2SDEFAILUREMSG, false);
+									} else {
+										writeLog("shapefile is uploaded successfully to table '" + shp2sde.getViewName() + "'");
+										System.out.println(ShapefileUtility.SHPSUCCESSMSG);
+									}
+								}
+							} else {
+								writeLog(ShapefileUtility.SHP2SDEFAILUREMSG, false);
+							}
+						}
+					} else {
+						shp2sde.setErrorMsg(result);
+					}
 				}
-			}
-		} catch (Exception mainException) {
-			String error = new Date().toString() + ": Error: Exception mainException caught...\n";
-			
-			StringWriter stw = new StringWriter();
-			PrintWriter pw = new PrintWriter(stw);
-			
-			mainException.printStackTrace(pw);
-			
-			writeLog(logger, error + stw.toString());
-			writeLog(logger, "Error: " + SHPFAILUREMSG);
+			} else {
+				System.out.println("\nError: Invalid argument/s passed..." + shp2sde.getHelpMessage());
+			} 
+		} catch (Throwable doUploadException) {
+			shp2sde.logException(doUploadException, "doUpload");
+			shp2sde.writeLog(ShapefileUtility.SHP2SDEFAILUREMSG, false);
 		} finally {
-			systemExit(logger);
+			shp2sde.systemExit();
 		}
 	}
 	
 	protected String uploadShapeFile() 
-	throws Exception {
-		File shapeFile = new File(m_shapefileName);
-		ShapefileDataStore ds = new ShapefileDataStore(shapeFile.toURI().toURL());
-		FeatureSource fs = ds.getFeatureSource();
-		FeatureCollection fc = fs.getFeatures();
-
-		SimpleFeatureType ft = (SimpleFeatureType) fs.getSchema();
+	throws Throwable {
+		File 	shapeFile = new File(getDirectoryPath(Directory.UPLOADDIR) + getSHPFileName() + ".shp");
+		String 	returnStr = "-1:-1";
 		
-		// Make connection to DB
-		writeLog(logger, new Date().toString() + ": connecting to Oracle Database...");
-		
-		String url = "jdbc:oracle:thin:@ " + m_host + ":" + m_port + ":" + m_sid;
-		
-		OracleConnection conn = null;
-		
-		DriverManager.registerDriver(new OracleDriver());
-		
-		conn = (OracleConnection) DriverManager.getConnection(url, m_user, m_password);
-		conn.setAutoCommit(false);
-		
-		writeLog(logger, new Date().toString() + ": connected to Oracle Database successfully!");
-		
-		String sridQuery = "SELECT sdo_cs.map_oracle_srid_to_epsg(NVL(nm3sdo.get_nw_srids, 0)) srid FROM DUAL";
-		
-		Statement statement = conn.createStatement();
-		ResultSet sridData = statement.executeQuery(sridQuery);
-		
-		int db_srid = 0;
-		int prj_srid = 0;
-		
-		if(sridData.next()) {
-			db_srid = sridData.getInt("srid");
+		if(!shapeFile.exists()) {
+			setErrorMsg("\nError: Shapefile not found - " +  getSHPFileName() + ".shp");
+			writeLog(getErrorMsg(), false);
 			
-			writeLog(logger, new Date().toString() + ": database default SRID - " + db_srid);
-		} else {
-			writeLog(logger, new Date().toString() + ": Error: Error in getting database default SRID!\n");
-			
-			systemExit(logger);
+			return returnStr;
 		}
 		
-		File prjFile = new File(m_shapefileName.replace(".shp", ".prj"));
+		ShapefileDataStore 	ds		  = new ShapefileDataStore(shapeFile.toURI().toURL());
+		FeatureSource 		fs		  = ds.getFeatureSource();
+		FeatureCollection 	fc		  = fs.getFeatures();
+		SimpleFeatureType 	ft		  = (SimpleFeatureType) fs.getSchema();
 		
-		if (prjFile.isFile()) {
-			try {
-				CoordinateReferenceSystem crs = ft.getCoordinateReferenceSystem();
+		Connection 			conn 	  = getConnection();
+		
+		String 				result 	  = getSRID2();
+		
+		try {
+			if(!"Y".equals(result)) {
+				writeLog(getErrorMsg(), false);
 				
-				prj_srid = CRS.lookupEpsgCode(crs, true);
+				return returnStr;
+			} else if(dbEPSGSRID == 0) {
+				setErrorMsg("\nError: Error in getting database default SRID!");
+				writeLog(getErrorMsg(), false);
 				
-				writeLog(logger, new Date().toString() + ": SRID from '.prj' file - " + prj_srid);
-			} catch (Exception noCRSException) {
-				writeLog(logger, new Date().toString() + ": Error: Error in getting SRID from '.prj' file\n");
+				return returnStr;
+			}
+			
+		writeLog("database default SRID: Oracle SRID - " + dbOracleSRID + ", EPSG SRID - " + dbEPSGSRID);
+			
+			int  prjSRID = 0;
+			File prjFile = new File(getDirectoryPath(Directory.UPLOADDIR) + getSHPFileName() + ".prj");
+			
+			if (prjFile.isFile()) {
+				try {
+					CoordinateReferenceSystem crs = ft.getCoordinateReferenceSystem();
+					prjSRID = CRS.lookupEpsgCode(crs, true);
 					
-				systemExit(logger);
-			}
-			
-			if (prj_srid != db_srid) {
-				writeLog(logger, new Date().toString() + ": Error: SRID retrieved from '.prj' file does not match the database default SRID\n");
-				
-				systemExit(logger);
-			} else {
-				
-			}
-			
-			m_srid = prj_srid;
-		} else if (m_srid != 0) {
-			writeLog(logger, "\n" + new Date().toString() + ": Warning: No '.prj' file found! Using SRID from command line argument '-r' - " + m_srid + "\n");
-			
-			if (m_srid != db_srid) {
-				writeLog(logger, new Date().toString() + ": Error: SRID provided with command line argument '-r' does not match the database default SRID\n");
-				
-				systemExit(logger);
-			} 
-		} else {
-			writeLog(logger, "\n" + new Date().toString() + ": Error: No SRID found! Check if '.prj' file exists or command line argument '-r' is specified\n");
-				
-			systemExit(logger);
-		}
-		
-		ShapefileReaderJGeom sfh = new ShapefileReaderJGeom(m_shapefileName);
-
-		int shpFileType = sfh.getShpFileType();
-		
-		double minMeasure = sfh.getMinMeasure();
-		double maxMeasure = sfh.getMaxMeasure();
-		
-		if (maxMeasure <= -10E38) {
-			maxMeasure = Double.NaN;
-		}
-		
-		double minZ = sfh.getMinZ();
-		double maxZ = sfh.getMaxZ();
-
-		// Get X,Y extents if srid is not geodetic
-		if (defaultX && m_srid != 0) {
-			PreparedStatement psSrid = conn.prepareStatement("SELECT COUNT(*) cnt FROM MDSYS.GEODETIC_SRIDS WHERE srid = ?");
-			psSrid.setInt(1, m_srid);
-			
-			ResultSet rs = psSrid.executeQuery();
-			
-			if (rs.next()) {
-				if (rs.getInt("cnt") == 0) {
-					min_x = String.valueOf(sfh.getMinX());
-					max_x = String.valueOf(sfh.getMaxX());
-					writeLog(logger, new Date().toString() + ": X: " + min_x +", "+ max_x);
+					writeLog("SRID from '.prj' file - " + prjSRID);
+				} catch (Exception noCRSException) {
+					writeLog("\nError: Error in getting SRID from '.prj' file\n");
+					logException(noCRSException, "uploadShapeFile");
+					setExitSystem(true);
+					
+					return returnStr;
 				}
-			}
-			
-			psSrid.close();
-		}
-		
-		if (defaultY && m_srid != 0) {
-			PreparedStatement psSrid = conn.prepareStatement("SELECT COUNT(*) cnt FROM MDSYS.GEODETIC_SRIDS WHERE srid = ?");
-			psSrid.setInt(1, m_srid);
-			
-			ResultSet rs = psSrid.executeQuery();
-			
-			if (rs.next()) {
-				if (rs.getInt("cnt") == 0) {
-					min_y = String.valueOf(sfh.getMinY());
-					max_y = String.valueOf(sfh.getMaxY());
-					writeLog(logger, new Date().toString() + ": Y: " + min_y +", "+ max_y);
-				}
-			}
-			
-			psSrid.close();
-		}
-
-		// Get dimension of shapefile
-		int shpDims = sfh.getShpDims(shpFileType, maxMeasure);
-
-		// Construct dimArrarys
-		if (shpDims == 2 || shpDims == 0) {
-			dimArray = "MDSYS.SDO_DIM_ARRAY(MDSYS.SDO_DIM_ELEMENT('X', "
-					+ min_x + ", " + max_x + ", " + m_tolerance + "), "
-					+ "MDSYS.SDO_DIM_ELEMENT('Y', " + min_y + ", " + max_y
-					+ ", " + m_tolerance + "))";
-			dimArrayMig = "MDSYS.SDO_DIM_ARRAY(MDSYS.SDO_DIM_ELEMENT('X', "
-					+ min_x + ", " + max_x + ", " + mg_tolerance + "), "
-					+ "MDSYS.SDO_DIM_ELEMENT('Y', " + min_y + ", " + max_y
-					+ ", " + mg_tolerance + "))";
-		} else if (shpDims == 3 && Double.isNaN(maxMeasure)) {
-			dimArray = "MDSYS.SDO_DIM_ARRAY(MDSYS.SDO_DIM_ELEMENT('X', "
-					+ min_x + ", " + max_x + ", " + m_tolerance + "), "
-					+ "MDSYS.SDO_DIM_ELEMENT('Y', " + min_y + ", " + max_y
-					+ ", " + m_tolerance + "), "
-					+ "MDSYS.SDO_DIM_ELEMENT('Z', " + minZ + ", " + maxZ + ", "
-					+ m_tolerance + "))";
-			dimArrayMig = "MDSYS.SDO_DIM_ARRAY(MDSYS.SDO_DIM_ELEMENT('X', "
-					+ min_x + ", " + max_x + ", " + mg_tolerance + "), "
-					+ "MDSYS.SDO_DIM_ELEMENT('Y', " + min_y + ", " + max_y
-					+ ", " + mg_tolerance + "), "
-					+ "MDSYS.SDO_DIM_ELEMENT('Z', " + minZ + ", " + maxZ + ", "
-					+ mg_tolerance + "))";
-		} else if (shpDims == 3) {
-			dimArray = "MDSYS.SDO_DIM_ARRAY(MDSYS.SDO_DIM_ELEMENT('X', "
-					+ min_x + ", " + max_x + ", " + m_tolerance + "), "
-					+ "MDSYS.SDO_DIM_ELEMENT('Y', " + min_y + ", " + max_y
-					+ ", " + m_tolerance + "), "
-					+ "MDSYS.SDO_DIM_ELEMENT('M', " + minMeasure + ", "
-					+ maxMeasure + ", " + m_tolerance + "))";
-			dimArrayMig = "MDSYS.SDO_DIM_ARRAY(MDSYS.SDO_DIM_ELEMENT('X', "
-					+ min_x + ", " + max_x + ", " + mg_tolerance + "), "
-					+ "MDSYS.SDO_DIM_ELEMENT('Y', " + min_y + ", " + max_y
-					+ ", " + mg_tolerance + "), "
-					+ "MDSYS.SDO_DIM_ELEMENT('M', " + minMeasure + ", "
-					+ maxMeasure + ", " + mg_tolerance + "))";
-		} else if (shpDims == 4) {
-			dimArray = "MDSYS.SDO_DIM_ARRAY(MDSYS.SDO_DIM_ELEMENT('X', "
-					+ min_x + ", " + max_x + ", " + m_tolerance + "), "
-					+ "MDSYS.SDO_DIM_ELEMENT('Y', " + min_y + ", " + max_y
-					+ ", " + m_tolerance + "), "
-					+ "MDSYS.SDO_DIM_ELEMENT('Z', " + minZ + ", " + maxZ + ", "
-					+ m_tolerance + "), " + "MDSYS.SDO_DIM_ELEMENT('M', "
-					+ minMeasure + ", " + maxMeasure + ", " + m_tolerance
-					+ "))";
-			dimArrayMig = "MDSYS.SDO_DIM_ARRAY(MDSYS.SDO_DIM_ELEMENT('X', "
-					+ min_x + ", " + max_x + ", " + mg_tolerance + "), "
-					+ "MDSYS.SDO_DIM_ELEMENT('Y', " + min_y + ", " + max_y
-					+ ", " + mg_tolerance + "), "
-					+ "MDSYS.SDO_DIM_ELEMENT('Z', " + minZ + ", " + maxZ + ", "
-					+ mg_tolerance + "), " + "MDSYS.SDO_DIM_ELEMENT('M', "
-					+ minMeasure + ", " + maxMeasure + ", " + mg_tolerance
-					+ "))";
-		}
-		
-		sfh.closeShapefile();
-		
-		String relSchema = null;
-		String columns	 = null;
-		
-		List<AttributeType> l = ft.getTypes();
-		ListIterator<AttributeType> lItr = l.listIterator();
-		
-		String columnName = null;
-		String columnDataType = null;
-		String javaObjectType = null;
-		String geomColDataType = "SDO_GEOMETRY";
 				
-		int numFields = 0;
-		
-		int size = 10;
-		
-		while (lItr.hasNext()) {
-			AttributeType at = lItr.next();
-						
-			List<Filter> rest = at.getRestrictions();
-
-			Iterator<Filter> restItr = rest.iterator();
-			
-			while (restItr.hasNext()) {
-				Filter flt = restItr.next();
-
-				String fltStr = flt.toString();
-				
-				if (fltStr.contains("length")) {
-					int i = fltStr.indexOf("=", fltStr.indexOf("length")) + 2;
-					int j = fltStr.indexOf(" ", i);
-					try {
-						size = Integer.parseInt(fltStr.substring(i, j));
-					} catch (NumberFormatException nfe) {
-						size = 10;
-					}
-				}
-			}
-			
-			columnName = at.getName().toString();
-			
-			if (useAttribMapping) {
-				columnName = this.getAttributeAlias(columnName);
-			}
-			
-			javaObjectType = at.getBinding().getName();
-						
-			if (javaObjectType.startsWith("com.vividsolutions.jts.geom.")) {
-				continue;
-			}
-			
-			if (javaObjectType.equals("java.lang.String") && size == 1)
-				javaObjectType = "Char";
-			
-			columnDataType = getODBDataType(javaObjectType, size);
-			
-			if (columnDataType == null) {
-				throw new RuntimeException("Unsupported Column Type");
-			} else if (columnDataType.length() == 0 || columnDataType.isEmpty()) {
-				throw new RuntimeException("Unsupported Column Type");
-			} else if (columnName != null) {
-				atrbFileCols.add(numFields);
-				
-				if (relSchema == null) {
-					relSchema = columnName + " " + columnDataType;
-					columns	  = columnName;
+				if ((prjSRID == dbEPSGSRID) || (prjSRID == dbOracleSRID)) {
+					userSRID = dbEPSGSRID;
 				} else {
-					relSchema = relSchema + ", " + columnName + " " + columnDataType;
-					columns	  = columns + ", " + columnName;
+					setErrorMsg("\nError: SRID retrieved from '.prj' file does not match the database default SRID\n");
+					writeLog(getErrorMsg(), false);
+					setExitSystem(true);
+					
+					return returnStr;
 				}
+			} else if (userSRID != 0) {
+				writeLog("Warning: No '.prj' file found! Using SRID from command line argument '-r' - " + userSRID);
+				
+				if ((userSRID == dbEPSGSRID) || (userSRID == dbOracleSRID)) {
+					userSRID = dbEPSGSRID;
+				} else {
+					setErrorMsg("\nError: SRID provided with command line argument '-r' does not match the database default SRID\n");
+					writeLog(getErrorMsg(), false);
+					setExitSystem(true);
+					
+					return returnStr;
+				} 
+			} else {
+				setErrorMsg("\nError: No SRID found! Check if '.prj' file exists or command line argument '-r' is specified\n");
+				writeLog(getErrorMsg(), false);
+				setExitSystem(true);
+				
+				return returnStr;
+			}
+			
+			ShapefileReaderJGeom sfh = new ShapefileReaderJGeom(getDirectoryPath(Directory.UPLOADDIR) + getSHPFileName() + ".shp");
+
+			int shpFileType = sfh.getShpFileType();
+			
+			minMeasure = sfh.getMinMeasure();
+			maxMeasure = sfh.getMaxMeasure();
+			
+			if (maxMeasure <= -10E38) {
+				maxMeasure = Double.NaN;
+			}
+			
+			minZ = sfh.getMinZ();
+			maxZ = sfh.getMaxZ();
+			
+			// Get X,Y extents if srid is not geodetic
+			if("Y".equals(getGeodeticSRIDCount())) {
+				if (geodeticSRIDCount == 0 && userSRID != 0) {
+					if (defaultX) {
+						minX = Double.parseDouble(String.valueOf(sfh.getMinX()));
+						maxX = Double.parseDouble(String.valueOf(sfh.getMaxX()));
+						
+						writeLog("X: " + minX +", "+ maxX);
+					} 
+					
+					if(defaultY) {
+						minY = Double.parseDouble(String.valueOf(sfh.getMinY()));
+						maxY = Double.parseDouble(String.valueOf(sfh.getMaxY()));
+						
+						writeLog("Y: " + minY +", "+ maxY);
+					}
+				}
+			} else {
+				setExitSystem(true);
+				return returnStr;
+			}
+			
+			// Get dimension of shapefile
+			shpDims = ShapefileReaderJGeom.getShpDims(shpFileType, maxMeasure);
+			
+			// Construct dimArrays
+			String dimArrayMig = getDimArray(mgTolerance);
+			
+			sfh.closeShapefile();
+			
+			int	   numFields 		= 0;
+			int	   size 			= 10;
+			
+			String columns	 		= null;
+			String columnName 		= null;
+			String columnDataType 	= null;
+			String javaObjectType 	= null;
+			String geomColDataType 	= "SDO_GEOMETRY";
+			
+			List<AttributeType> l 	= ft.getTypes();
+			ListIterator<AttributeType> lItr = l.listIterator();
+			
+			
+			while (lItr.hasNext()) {
+				AttributeType at   = lItr.next();
+				List<Filter>  rest = at.getRestrictions();
+				Iterator<Filter> restItr = rest.iterator();
+				
+				while (restItr.hasNext()) {
+					Filter flt	  = restItr.next();
+					String fltStr = flt.toString();
+					
+					if (fltStr.contains("length")) {
+						int i = fltStr.indexOf('=', fltStr.indexOf("length")) + 2;
+						int j = fltStr.indexOf(' ', i);
+						
+						try {
+							size = Integer.parseInt(fltStr.substring(i, j));
+						} catch (NumberFormatException nfe) {
+							size = 10;
+						}
+					}
+				}
+				
+				columnName = at.getName().toString();
+				
+				if(!conformOracleNamingConvention(columnName)) {
+					setErrorMsg("\nError: special characters not allowed in column name (allowed: A-Z a-z 0-9 _ $ #) - '" + columnName + '\'');
+					writeLog(getErrorMsg(), false);
+					setExitSystem(true);
+					
+					return returnStr;
+				}
+				
+				if (getUseColumnMapping()) {
+					columnName = getAttributeAlias(columnName);
+				}
+				
+				javaObjectType = at.getBinding().getName();
+				
+				if (javaObjectType.startsWith("com.vividsolutions.jts.geom.")) {
+					continue;
+				}
+				
+				if (size == 1 && "java.lang.String".equals(javaObjectType)) {
+					javaObjectType = "Char";
+				}
+				
+				columnDataType = getODBDataType(javaObjectType, size);
+				
+				if(columnDataType != null && !columnDataType.isEmpty()) {
+					if (columnName != null && !columnName.isEmpty()) {
+						atrbFileCols.add(numFields);
+						
+						relSchema = (relSchema == null) ? (columnName + " " + columnDataType) : (relSchema + ", " + columnName + " " + columnDataType);
+						columns	  = (columns == null) ? (columnName) : (columns + ", " + columnName);
+					}
+				} else {
+					setErrorMsg("\nError: Unsupported Column Type - NULL\n");
+					writeLog(getErrorMsg(), false);
+					
+					return returnStr;
+				}
+				
+				numFields++;
 			}
 			
 			numFields++;
-		}
-		
-		numFields++;
-		
-		if(m_idName == null) {
-			relSchema = relSchema + ", " + m_geom + " " + geomColDataType;
-			columns	  = columns + ", " + m_geom;
-		} else {
-			relSchema = m_idName + " NUMBER, " + relSchema + ", " + m_geom + " " + geomColDataType;
-			columns	  = m_idName + ", " + columns + ", " + m_geom;
 			
-			numFields++;
+			relSchema = (idColName == null) ? (relSchema + ", " + getGeomColName() + " " + geomColDataType) : (idColName + " NUMBER PRIMARY KEY, " + relSchema + ", " + getGeomColName() + " " + geomColDataType);
+			columns	  = (idColName == null) ? (columns + ", " + getGeomColName()) : (idColName + ", " + columns + ", " + getGeomColName());
 			
-			atrbFileCols.add(-1);
-		}
-		
-		String appendAddLog = null;
-		
-		// Call create table
-		if (skip_create_table == 0) {
-			prepareTableForData(conn, relSchema);
-			appendAddLog = "adding";
-		} else {
-			appendAddLog = "appending";
-			writeLog(logger, new Date().toString() + ": checking if table exists in database?");
+			if(idColName != null) {
+				numFields++;
+				atrbFileCols.add(-1);
+			}
 			
-			String checkTableQuery = "SELECT 1 FROM " + m_tableName;
-			Statement checkTableStmt = conn.createStatement();
-			ResultSet rset = checkTableStmt.executeQuery(checkTableQuery);
-		}
-		
-		if (delete_rows == 1) {
-			writeLog(logger, new Date().toString() + ": deleting existing records from table...");
+			String appendAddLog = "adding";
+			int i = 0;
 			
-			Statement deleteRowsStmt = conn.createStatement();
-			String deleteRoewQuery = "DELETE FROM " + m_tableName;
-			int numOfAffectedRecs = deleteRowsStmt.executeUpdate(deleteRoewQuery);
-			deleteRowsStmt.close();
-			
-			writeLog(logger, new Date().toString() + ": " + numOfAffectedRecs + " records are deleted from table...");
-			writeLog(logger, new Date().toString() + ": adding records from shapefile to table...");
-		} else {
-			writeLog(logger, new Date().toString() + ": " + appendAddLog + " records from shapefile to table...");
-		}
-		
-		FeatureIterator featureItr = fc.features();
-		
-		int numRecords = fc.size();
-		
-		// Open shp and input files
-		int error_cnt = 0;
-	 	 
-		String params = null;
-		String paramsM = null;
-	 
-		params = "(";
-		for (int i=0; i <= atrbFileCols.size(); i++) {
-		if (i==0)
-			params = params + " ?";
-		else
-			params = params + ", ?";
-		}
-		params = params + ")";
-		paramsM = params.substring(0,(params.length()-2)) + "MDSYS.SDO_MIGRATE.TO_CURRENT(?, " + dimArrayMig + "))";
-		
-		// Create prepared statements
-		String insertRec = "INSERT INTO " + m_tableName + "(" + columns + ")" + " VALUES" + params;
-		PreparedStatement ps = conn.prepareStatement(insertRec);
-		
-		PreparedStatement psCom = conn.prepareStatement("COMMIT");
-		
-		String insertMig = "INSERT INTO " + m_tableName + "(" + columns + ")" + " VALUES" + paramsM;
-		PreparedStatement psMig = conn.prepareStatement(insertMig);
-		
-		ResultSet resMig = null;
-		STRUCT str = null;
-		
-		int i = 0;
-		
-		for (; featureItr.hasNext(); i++) {			
-			SimpleFeature feature = (SimpleFeature) featureItr.next();
-			Collection<Property> propertyColl = feature.getProperties();
-			Iterator<Property> propertyItr = propertyColl.iterator();
-			
-			oracle.sql.STRUCT geometry = null;
-			
-			if (m_idName == null) {
-				try {  
-					// Migrate geometry if polygon, polygonz, or polygonm
-					if (shpFileType == 5 || shpFileType == 15 || shpFileType == 25) {
-						for (int j=0, k=0; propertyItr.hasNext(); j++) {
-							Property p =  propertyItr.next();
-							Class<?> propertyClass = p.getType().getBinding();
-							
-							if (!atrbFileCols.contains(j) && !propertyClass.getName().startsWith("com.vividsolutions.jts.geom.")) {
-								continue;
-							}
-							
-							Object propertyValue = p.getValue();
-							
-							if (propertyValue == null) {
-								psMig.setNull((k+1), (java.sql.Types.NULL));
-							} else if (propertyClass.getName().startsWith("com.vividsolutions.jts.geom.")) {
-								Geometry g = (Geometry)propertyValue;
-								GeometryConverter gc = new GeometryConverter(conn);
-								geometry = (oracle.sql.STRUCT)gc.toSDO(g, m_srid);
-								
-								j--;
-								continue;
-							} else {
-								setXXX(psMig, propertyClass, (k+1), propertyValue);
-							}
-							
-							k++;
-						}
-						psMig.setObject(atrbFileCols.size()+1, geometry);
-						psMig.executeUpdate();
-					} else {
-						for (int j=0, k=0; propertyItr.hasNext(); j++) {
-							Property p =  propertyItr.next();
-							Class<?> propertyClass = p.getType().getBinding();
-							
-							if (!atrbFileCols.contains(j) && !propertyClass.getName().startsWith("com.vividsolutions.jts.geom.")) {
-								continue;
-							}
-							
-							Object propertyValue = p.getValue();
-							
-							if (propertyValue == null) {
-								ps.setNull((k+1), (java.sql.Types.NULL));
-							} else if (propertyClass.getName().startsWith("com.vividsolutions.jts.geom.")) {
-								Geometry g = (Geometry)propertyValue;
-								GeometryConverter gc = new GeometryConverter(conn);
-								geometry = (oracle.sql.STRUCT)gc.toSDO(g, m_srid);
-								
-								j--;
-								continue;
-							} else {
-								setXXX(ps, propertyClass, (k+1), propertyValue);
-							}
-							
-							k++;
-						}
-						ps.setObject(atrbFileCols.size()+1, geometry);
-						ps.executeUpdate();
-					}
-				} catch (SQLException e) {
-					error_cnt = error_cnt + 1;
-					
-					StringWriter stw = new StringWriter();
-					PrintWriter pw = new PrintWriter(stw);
-					e.printStackTrace(pw);
-					writeLog(logger, new Date().toString() + ": Error: " + stw.toString() + "\nrecord #" + (i+1) + " not converted.");
+			// Call create table
+			if ("create".equals(operation)) {
+				if(!"Y".equals(prepareTableForData())) {
+					return returnStr;
 				}
 			} else {
-				int id = i + m_start_id;
+				writeLog("checking if table exists in database...");
+				
+				if("Y".equals(validateTableName())) {
+					if("init".equals(operation)) {
+						writeLog("deleting existing records from table...");
+						
+						if("Y".equals(initView())) {
+							writeLog(numOfAffectedRecs + " records are deleted from table...");
+						} else {
+							return returnStr;
+						}
+					} else if("append".equals(operation)) {
+						appendAddLog = "appending";
+					}
+				} else {
+					return returnStr;
+				}
+			}
+			
+			writeLog(appendAddLog + " records from shapefile to table...");
+			
+			FeatureIterator featureItr = fc.features();
+			
+			// Open shp and input files
+			int 	errorCount 	= 0;
+			String 	params		= null;
+			
+			for (int nu=0; nu <= atrbFileCols.size(); nu++) {
+				if (nu==0)
+					params = " ?";
+				else
+					params = params + ", ?";
+			}
+			
+			// Migrate geometry if polygon, polygonz, or polygonm
+			if (shpFileType == 5 || shpFileType == 15 || shpFileType == 25) {
+				params = params.substring(0, (params.length() - 1)) + "MDSYS.SDO_MIGRATE.TO_CURRENT(?, " + dimArrayMig + "))";
+			}
+			
+			String insertRec = "INSERT INTO " + getViewName() + "(" + columns + ")" + " VALUES(" + params + ')';
+			
+			// Create prepared statements
+			PreparedStatement ps = conn.prepareStatement(insertRec);
+			
+			ResultSet resMig = null;
+			STRUCT str = null;
+			
+			for (; featureItr.hasNext(); i++) {			
+				SimpleFeature feature = (SimpleFeature) featureItr.next();
+				Collection<Property> propertyColl = feature.getProperties();
+				Iterator<Property> propertyItr = propertyColl.iterator();
+				
+				oracle.sql.STRUCT geometry = null;
 				
 				try {
-					// Migrate geometry if polygon, polygonz, or polygonm
-					if (shpFileType == 5 || shpFileType == 15 || shpFileType == 25) {
-						for (int j=0,k=0; propertyItr.hasNext(); j++) {
-							psMig.setInt(1, id);
-					  
-							Property p =  propertyItr.next();
-							Class<?> propertyClass = p.getType().getBinding();
-							
-							if (!atrbFileCols.contains(j) && !propertyClass.getName().startsWith("com.vividsolutions.jts.geom.")) {
-								continue;
-							}
-							
-							Object propertyValue = p.getValue();
-							
-							if (propertyValue == null) {
-								psMig.setNull((k+2), (java.sql.Types.NULL));
-							} else if (propertyClass.getName().startsWith("com.vividsolutions.jts.geom.")) {
-								Geometry g = (Geometry)propertyValue;
-								GeometryConverter gc = new GeometryConverter(conn);
-								geometry = (oracle.sql.STRUCT)gc.toSDO(g, m_srid);
-								
-								j--;
-								continue;
-							} else {
-								setXXX(psMig, propertyClass, (k+2), propertyValue);
-							}
-							
-							k++;
-						}
-						psMig.setObject(atrbFileCols.size()+1, geometry);
-						psMig.executeUpdate();
-					} else {
-						for (int j=0, k=0; propertyItr.hasNext(); j++) {
-							ps.setInt(1, id);
-							
-							Property p =  propertyItr.next();
-							Class<?> propertyClass = p.getType().getBinding();
-							
-							if (!atrbFileCols.contains(j) && !propertyClass.getName().startsWith("com.vividsolutions.jts.geom.")) {
-								continue;
-							}
-							
-							Object propertyValue = p.getValue();
-							
-							if (propertyValue == null) {
-								ps.setNull((k+2), (java.sql.Types.NULL));
-							} else if (propertyClass.getName().startsWith("com.vividsolutions.jts.geom.")) {
-								Geometry g = (Geometry)propertyValue;
-								GeometryConverter gc = new GeometryConverter(conn);
-								geometry = (oracle.sql.STRUCT)gc.toSDO(g, m_srid);
-								
-								j--;
-								continue;
-							} else {
-								setXXX(ps, propertyClass, (k+2), propertyValue);
-							}
-							
-							k++;
-						}
-						ps.setObject(atrbFileCols.size()+1, geometry);
-						ps.executeUpdate();
-					}
-				} catch (SQLException e) {
-					error_cnt = error_cnt + 1;
+					int idCounter = 1;
 					
-					StringWriter stw = new StringWriter();
-					PrintWriter pw = new PrintWriter(stw);
-					e.printStackTrace(pw);
-					writeLog(logger, new Date().toString() + ": Error: " + stw.toString() + "\nrecord #" + (i+1) + " not converted.");
-				}
-			}
-				  
-			//Edit to adjust, or comment to remove COMMIT interval; default 1000
-			if (m_commit_interval == -1) {
-				if ((i+1)%1000 == 0)
-					conn.commit();
-			} else {
-				if ((i+1)%m_commit_interval == 0)
-					conn.commit();
-			}
-			//end_for_each_record
-		}
-		
-		conn.commit();
-		
-		if (!conn.isClosed()) {
-			conn.close();
-		}
-		
-		featureItr.close();
-		ds.dispose();
-		
-		return (i + ":" + error_cnt);
-	}
-
-	protected void prepareTableForData(Connection conn, String relSchema) 
-	throws IOException, SQLException, Exception {
-		// Preparation of the database
-		
-		// Drop table
-		Statement stmt 	= null;
-		String update	= null;
-		
-		// Try to find and replace instances of "geometry" with m_geom
-		String updatedRelSchema = replaceAllWords(relSchema, "GEOMETRY", m_geom);
-		
-		// Create feature table
-		writeLog(logger, new Date().toString() + ": creating new table...");
-		
-		stmt = conn.createStatement();
-		update = "CREATE TABLE " + m_tableName + " (" + updatedRelSchema + ")";
-				
-		stmt.executeUpdate(update);
-		stmt.close();
-		
-		writeLog(logger, new Date().toString() + ": adding reference to Geometry MetaData Table...");
-		
-		String geomMDTabTableName = m_tableName;
-		
-		if (geomMDTabTableName.contains(".")) {
-			String[] s = geomMDTabTableName.split("\\.");
-			geomMDTabTableName = s[1];
-		}
+					if (idColName != null) {
+						int id = i + startID;
+						idCounter = 2;
+						ps.setInt(1, id);
+					}
+					
+					for (int j=0, k=0; propertyItr.hasNext(); j++) {
+						Property p =  propertyItr.next();
+						Class<?> propertyClass = p.getType().getBinding();
 						
-		if (m_srid != 0) {
-			// Add reference to geometry MetaData Table.
-			stmt = conn.createStatement();
-			update = "INSERT INTO " + geomMetaDataTable + " VALUES ('" + geomMDTabTableName + "', '" + m_geom.toUpperCase() + "', " + dimArray + ", " + m_srid + ")";
-			stmt.executeUpdate(update);
+						if (!atrbFileCols.contains(j) && !propertyClass.getName().startsWith("com.vividsolutions.jts.geom.")) {
+							continue;
+						}
+						
+						Object propertyValue = p.getValue();
+						
+						if (propertyValue == null) {
+							ps.setNull((k + idCounter), (java.sql.Types.NULL));
+						} else if (propertyClass.getName().startsWith("com.vividsolutions.jts.geom.")) {
+							Geometry g = (Geometry)propertyValue;
+							GeometryConverter gc = new GeometryConverter((OracleConnection)conn);
+							geometry = (oracle.sql.STRUCT)gc.toSDO(g, userSRID);
+							
+							j--;
+							continue;
+						} else {
+							setXXX(ps, propertyClass, (k + idCounter), propertyValue);
+						}
+						
+						k++;
+					}
+					
+					ps.setObject(atrbFileCols.size() + 1, geometry);
+					ps.executeUpdate();
+				} catch (SQLException e) {
+					errorCount = errorCount + 1;
+					logException(e, "uploadShapeFile");
+					writeLog("record #" + (i + 1) + " not converted.");
+				}
+				
+				//Edit to adjust, or comment to remove COMMIT interval; default 1000
+				if (commitInterval == -1) {
+					if ((i + 1)%1000 == 0) {
+						conn.commit();
+					}
+				} else {
+					if ((i + 1)%commitInterval == 0) {
+						conn.commit();
+					}
+				}
+				//end_for_each_record
+			}
+			
 			conn.commit();
-			stmt.close();
-		} else {
-			// Add reference to geometry MetaData Table.
-			stmt = conn.createStatement();
-			update = "INSERT INTO " + geomMetaDataTable + " VALUES ('" + geomMDTabTableName + "', '" + m_geom.toUpperCase() + "', " + dimArray + ", NULL)";
-			stmt.executeUpdate(update);
-			conn.commit();
-			stmt.close();
+			
+			featureItr.close();
+			ds.dispose();
+			
+			return (i + ":" + errorCount);
+		} finally {
+			closeOracle("uploadShapeFile", null, conn, null);
 		}
 	}
-
+	
+	private String getDimArray(double tolerance) {
+		StringBuilder dimArray 			= new StringBuilder();
+		StringBuilder dimArrayBase 		= new StringBuilder();
+		StringBuilder dimArray3Measure 	= new StringBuilder();
+		StringBuilder dimArray3 		= new StringBuilder();
+		
+		dimArrayBase.append("MDSYS.SDO_DIM_ARRAY(MDSYS.SDO_DIM_ELEMENT('X', ").append(minX).append(", ").append(maxX).append(", ").append(tolerance).append("), ").append("MDSYS.SDO_DIM_ELEMENT('Y', ").append(minY).append(", ").append(maxY).append(", ").append(tolerance);
+		
+		dimArray3Measure.append("), ").append("MDSYS.SDO_DIM_ELEMENT('Z', ").append(minZ).append(", ").append(maxZ).append(", ").append(mTolerance).append("))");
+		
+		dimArray3.append("), ").append("MDSYS.SDO_DIM_ELEMENT('M', ").append(minMeasure).append(", ").append(maxMeasure).append(", ").append(mTolerance).append("))");
+		
+		if (shpDims == 2 || shpDims == 0) {
+			dimArray.append(dimArrayBase);
+		} else if (shpDims == 3 && Double.isNaN(maxMeasure)) {
+			dimArray.append(dimArrayBase.append(dimArray3Measure));
+		} else if (shpDims == 3) {
+			dimArray.append(dimArrayBase.append(dimArray3));
+		} else if (shpDims == 4) {
+			dimArray.append(dimArrayBase.append(dimArray3Measure).append(dimArray3));
+		}
+		
+		dimArray.append("))");
+		
+		return dimArray.toString();
+	}
+	
+	private String prepareTableForData() 
+	throws IOException, SQLException, Exception {
+		Connection conn = null;
+		Statement  stmt = null;
+		
+		try {
+			// Get database connection
+			conn = getConnection();
+			
+			// Preparation of the database
+			
+			// Drop table
+			String 	  update = null;
+			
+			// Try to find and replace instances of "geometry" with getGeomColName()
+			String updatedRelSchema = replaceAllWords(relSchema, "GEOMETRY", getGeomColName());
+			
+			// Create feature table
+			writeLog("creating new table...");
+			
+			stmt = conn.createStatement();
+			update = "CREATE TABLE " + getViewName() + " (" + updatedRelSchema + ")";
+			stmt.executeUpdate(update);
+			
+			writeLog("adding reference to Geometry MetaData Table...");
+			
+			return updateSDOGeomMetadata();
+		} catch(SQLSyntaxErrorException sqlSyntaxErrorException) {
+			if(sqlSyntaxErrorException.getMessage().indexOf("name is already used by an existing object") >= 0) {
+				setErrorMsg("\nError: Table/View - " + getViewName() + " - already exists in database");
+				writeLog(getErrorMsg(), false);
+				
+				return "N";
+			} else {
+				throw sqlSyntaxErrorException;
+			}
+		} finally {
+			closeOracle("prepareTableForData", stmt, conn, null);
+		}
+	}
+	
 	protected String replaceAllWords(String original, String find, String replacement) {
-		String result = "";
+		StringBuilder result = new StringBuilder();
 		String delimiters = "+-*/(),. ";
 		StringTokenizer st = new StringTokenizer(original, delimiters, true);
 		
 		while (st.hasMoreTokens()) {
 			String w = st.nextToken();
+			
 			if (w.equals(find)) {
-				result = result + replacement;
+				result.append(replacement);
 			} else {
-				result = result + w;
+				result.append(w);
 			}
 		}
-		return result;
+		return result.toString();
 	}
 	
-	protected String getODBDataType (String className, int size) {
+	protected String getODBDataType(String className, int size) {
 		String odbDataType = null;
 		
 		try {
-			if (className.equals("java.lang.Integer") || className.equals("java.lang.Byte") || className.equals("java.lang.Short") || className.equals("java.lang.Long"))
+			if ("java.lang.Integer".equals(className) || "java.lang.Byte".equals(className) || "java.lang.Short".equals(className) || "java.lang.Long".equals(className))
 				odbDataType = "NUMBER(" + size + ")";
-			else if (className.equals("java.lang.Double") || className.equals("java.math.BigDecimal") || className.equals("java.lang.Float") || className.equals("oracle.sql.NUMBER"))
+			else if ("java.lang.Double".equals(className) || "java.math.BigDecimal".equals(className) || "java.lang.Float".equals(className) || "oracle.sql.NUMBER".equals(className))
 				odbDataType = "NUMBER";
-			else if (className.equals("java.lang.String"))
+			else if ("java.lang.String".equals(className))
 				odbDataType = "VARCHAR2(" + size + ")";
-			else if (className.equals("Char"))
+			else if ("Char".equals(className))
 				odbDataType = "CHAR";
-			else if (className.equals("java.util.Date") || className.equals("oracle.sql.DATE") || className.equals("java.sql.Time") || className.equals("java.sql.Date"))
+			else if ("java.util.Date".equals(className) || "oracle.sql.DATE".equals(className) || "java.sql.Time".equals(className) || "java.sql.Date".equals(className))
 				odbDataType = "DATE";
-			else if (className.equals("java.lang.Boolean"))
+			else if ("java.lang.Boolean".equals(className))
 				odbDataType = "BOOLEAN";
-			else if (className.equals("oracle.sql.ROWID") || className.equals("java.sql.RowId"))
+			else if ("oracle.sql.ROWID".equals(className) || "java.sql.RowId".equals(className))
 				odbDataType = "ROWID";
-			else if (className.equals("java.sql.Clob") || className.equals("oracle.sql.CLOB") || className.equals("java.io.Reader"))
+			else if ("java.sql.Clob".equals(className) || "oracle.sql.CLOB".equals(className) || "java.io.Reader".equals(className))
 				odbDataType = "CLOB";
-			else if (className.equals("java.sql.Blob") || className.equals("oracle.sql.BLOB") || className.equals("java.io.InputStream"))
+			else if ("java.sql.Blob".equals(className) || "oracle.sql.BLOB".equals(className) || "java.io.InputStream".equals(className))
 				odbDataType = "BLOB";
-			else if (className.equals("oracle.sql.BFILE"))
+			else if ("oracle.sql.BFILE".equals(className))
 				odbDataType = "BFILE";
-			else if (className.equals("java.sql.Array") || className.equals("oracle.sql.ARRAY"))
+			else if ("java.sql.Array".equals(className) || "oracle.sql.ARRAY".equals(className))
 				odbDataType = "VARRAY";
-			else if (className.equals("oracle.sql.BINARY_FLOAT"))
+			else if ("oracle.sql.BINARY_FLOAT".equals(className))
 				odbDataType = "BINARY_FLOAT";
-			else if (className.equals("oracle.sql.BINARY_DOUBLE"))
+			else if ("oracle.sql.BINARY_DOUBLE".equals(className))
 				odbDataType = "BINARY_DOUBLE";
-			else if (className.equals("java.sql.Timestamp") || className.equals("oracle.sql.TIMESTAMP"))
+			else if ("java.sql.Timestamp".equals(className) || "oracle.sql.TIMESTAMP".equals(className))
 				odbDataType = "TIMESTAMP";
-			else if (className.equals("oracle.sql.TIMESTAMPTZ"))
+			else if ("oracle.sql.TIMESTAMPTZ".equals(className))
 				odbDataType = "TIMESTAMP WITH TIME ZONE";
-			else if (className.equals("oracle.sql.TIMESTAMPLTZ"))
+			else if ("oracle.sql.TIMESTAMPLTZ".equals(className))
 				odbDataType = "TIMESTAMP WITH LOCAL TIME ZONE";
-			else if (className.equals("oracle.xdb.XMLType") || className.equals("java.sql.SQLXML"))
+			else if ("oracle.xdb.XMLType".equals(className) || "java.sql.SQLXML".equals(className))
 				odbDataType = "XMLTYPEE";
-			else if (className.equals("java.sql.NClob") || className.equals("oracle.sql.NCLOB"))
+			else if ("java.sql.NClob".equals(className) || "oracle.sql.NCLOB".equals(className))
 				odbDataType = "NCLOB";
-			else if (className.equals("java.net.URL"))
+			else if ("java.net.URL".equals(className))
 				odbDataType = "URITYPE";
-		
+			
 			return odbDataType;
 		} catch (Exception e) {
-			StringWriter stw = new StringWriter();
-			PrintWriter pw = new PrintWriter(stw);
-			e.printStackTrace(pw);
-			writeLog(logger, new Date().toString() + ": Error: unsupported column type\n" + stw.toString());
+			writeLog("\nError: unsupported column type - " + className, false);
+			logException(e, "getODBDataType");
 			
 			return null;
 		}
@@ -1154,95 +1104,196 @@ public class SHP2SDE {
 			else
 				pstmt.setObject((cloNo), propertyValue);
 		} catch (Exception e) {
-			StringWriter stw = new StringWriter();
-			PrintWriter pw = new PrintWriter(stw);
-			e.printStackTrace(pw);
-			writeLog(logger, new Date().toString() + ": Error: unsupported column type\n" + stw.toString());
-		}
-	}
-		
-	protected File setLogFile() {
-		File logFile = null;
-		
-		if (this.m_shapefileName != null) 
-			if (!this.m_shapefileName.isEmpty())
-					logFile = new File(this.m_shapefileName.substring(0, (this.m_shapefileName.length() - 4)) + ".log");
-		
-		this.logFilePath = this.m_shapefileName.substring(0, (this.m_shapefileName.lastIndexOf('\\') - 1));
-		
-		return logFile;
-	}
-		
-	protected File getAttributeMapFile() 
-	throws FileNotFoundException {
-		File attribMappingFile = null;
-		
-		if (this.attributeMode != null) {
-			if (!this.attributeMode.isEmpty()) {
-				attribMappingFile = new File(this.attributeMode);
-				if (!attribMappingFile.exists()) {
-					throw new FileNotFoundException("File - " + this.attributeMode + " - not found!");
-				}
-			}
-		}
-		
-		return attribMappingFile;
-	}
-	
-	protected void setAttributeMap () 
-	throws IOException, Exception {
-		writeLog(logger, new Date().toString() + ": reading attribute mapping file...");
-		
-		File attribMappingFile = getAttributeMapFile();
-		
-		if (attribMappingFile != null) {
-			BufferedReader attribMappingReader = new BufferedReader(new FileReader(attribMappingFile));
-			
-			String read = null;
-			
-			while ((read = attribMappingReader.readLine()) != null) {
-				String[] keyValue = read.split(" ");
-				this.attributeMap.put(keyValue[0], keyValue[1]);
-			}
-						
-			useAttribMapping = true;
+			writeLog("\nError: unsupported column type\n", false);
+			logException(e, "setXXX");
 		}
 	}
 	
-	protected String getAttributeAlias (String dbColumnName) 
-	throws Exception {			
-		String shpColumnName = null;
+	private String getSRID2() 
+	throws SQLException, ClassNotFoundException, Exception {
+		Connection        conn    = null;
+		CallableStatement cstmt   = null;
+		String 			  result  = null;
+		String 			  sqlStmt = null;
 		
-		if (this.attributeMap.containsKey(dbColumnName)) {
-			shpColumnName = this.attributeMap.get(dbColumnName);
-		}
-		
-		return shpColumnName;
-	}
-	
-	protected static void writeLog(BufferedWriter logger, String log) {
 		try {
-			logger.write(log);
-			logger.newLine();
-		} catch (IOException ioe) {
-			System.out.println("Exception IOException caught...\n");
-			ioe.printStackTrace();
-		}
-	}
-	
-	protected static void systemExit(BufferedWriter logger) {
-		try {
-			logger.flush();
-			logger.close();
-		} catch (IOException ioe) {
-			System.out.println("Exception IOException caught...\n");
-			ioe.printStackTrace();
+			conn = getConnection();
+			
+			sqlStmt = "{? = call sde_util.get_srid2(?, ?)}";
+			cstmt   = conn.prepareCall(sqlStmt);
+			cstmt.registerOutParameter(1, Types.VARCHAR);
+			cstmt.registerOutParameter(2, Types.NUMERIC);
+			cstmt.registerOutParameter(3, Types.NUMERIC);
+			cstmt.execute();
+			
+			result = cstmt.getString(1);
+			
+			if("Y".equals(result)) {
+				dbOracleSRID = cstmt.getInt(2);
+				dbEPSGSRID 	 = cstmt.getInt(3);
+				
+				return "Y";
+			} else {
+				setErrorMsg("\nError: " + result);
+				return "N";
+			}
 		} finally {
-			System.exit(1);
+			closeOracle("getSRID2", cstmt, conn, null);
 		}
 	}
 	
-	protected static void systemPrint(String s) {
-		System.out.println(s);
+	private String updateSDOGeomMetadata() 
+	throws SQLException, ClassNotFoundException, Exception {
+		Connection        conn    = null;
+		CallableStatement cstmt   = null;
+		String 			  result  = null;
+		String 			  sqlStmt = null;
+		
+		try {
+			String geomMDTabTableName = getViewName();
+			
+			if (geomMDTabTableName.contains(".")) {
+				String[] s = geomMDTabTableName.split("\\.");
+				geomMDTabTableName = s[1];
+			}
+			
+			conn = getConnection();
+			
+			sqlStmt = "{? = call sde_util.update_sdo_geom_metadata(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)}";
+			cstmt   = conn.prepareCall(sqlStmt);
+			cstmt.registerOutParameter(1, Types.VARCHAR);
+			cstmt.setString(2, geomMDTabTableName);
+			cstmt.setString(3, getGeomColName());
+			cstmt.setDouble(4, shpDims);
+			cstmt.setDouble(5, minX);
+			cstmt.setDouble(6, maxX);
+			cstmt.setDouble(7, minY);
+			cstmt.setDouble(8, maxY);
+			cstmt.setDouble(9, minZ);
+			cstmt.setDouble(10, maxZ);
+			cstmt.setDouble(11, minMeasure);
+			cstmt.setDouble(12, maxMeasure);
+			cstmt.setDouble(13, mTolerance);
+			
+			cstmt.execute();
+			
+			result = cstmt.getString(1);
+			
+			if(!"Y".equals(result)) {
+				if(result.indexOf("duplicate entry for ") >= 0) {
+					setErrorMsg("\nError: Reference for table/view - " + getViewName() + " - already present in Geometry MetaData Table");
+					writeLog(getErrorMsg(), false);
+				} else {
+					setErrorMsg("\nError: " + result);
+					writeLog(getErrorMsg(), false);
+				}
+				
+				result = "N";
+			}
+			
+			return result;
+		} finally {
+			closeOracle("updateSDOGeomMetadata", cstmt, conn, null);
+		}
 	}
+	
+	private String getGeodeticSRIDCount() 
+	throws SQLException, ClassNotFoundException, Exception {
+		Connection        conn    = null;
+		CallableStatement cstmt   = null;
+		String 			  result  = null;
+		String 			  sqlStmt = null;
+		
+		try {
+			conn = getConnection();
+			
+			sqlStmt = "{? = call sde_util.get_geodetic_srid_count(?, ?)}";
+			cstmt   = conn.prepareCall(sqlStmt);
+			cstmt.registerOutParameter(1, Types.VARCHAR);
+			cstmt.setInt(2, Types.NUMERIC);
+			cstmt.registerOutParameter(3, Types.NUMERIC);
+			cstmt.execute();
+			
+			result = cstmt.getString(1);
+			
+			if("Y".equals(result)) {
+				geodeticSRIDCount = cstmt.getInt(3);
+			} else {
+				setErrorMsg("\nError: " + result);
+				writeLog(getErrorMsg(), false);
+				result = "N";
+			}
+			
+			return result;
+		} finally {
+			closeOracle("getGeodeticSRIDCount", cstmt, conn, null);
+		}
+	}
+	
+	private String initView() 
+	throws SQLException, ClassNotFoundException, Exception {
+		Connection        conn    = null;
+		CallableStatement cstmt   = null;
+		String 			  result  = null;
+		String 			  sqlStmt = null;
+		
+		try {
+			conn = getConnection();
+			
+			sqlStmt = "{? = call sde_util.init_view(?, ?)}";
+			cstmt   = conn.prepareCall(sqlStmt);
+			cstmt.registerOutParameter(1, Types.VARCHAR);
+			cstmt.setString(2, getViewName());
+			cstmt.registerOutParameter(3, Types.NUMERIC);
+			cstmt.execute();
+			
+			result = cstmt.getString(1);
+			
+			if("Y".equals(result)) {
+				numOfAffectedRecs = cstmt.getInt(3);
+			} else {
+				setErrorMsg("\nError: " + result);
+				writeLog(getErrorMsg(), false);
+				result = "N";
+			}
+			
+			return result;
+		} finally {
+			closeOracle("initView", cstmt, conn, null);
+		}
+	}
+	
+	private String validateTableName() 
+	throws SQLException, ClassNotFoundException, Exception {
+		Connection        conn    = null;
+		CallableStatement cstmt   = null;
+		String 			  result  = null;
+		String 			  sqlStmt = null;
+		
+		try {
+			conn = getConnection();
+			
+			sqlStmt = "{? = call sde_util.validate_table_name(?)}";
+			cstmt   = conn.prepareCall(sqlStmt);
+			cstmt.registerOutParameter(1, Types.VARCHAR);
+			cstmt.setString(2, getViewName());
+			cstmt.execute();
+			
+			result = cstmt.getString(1);
+			
+			if(!"Y".equals(result)) {
+				setErrorMsg("\nError: " + result);
+				writeLog(getErrorMsg(), false);
+				result = "N";
+			}
+			
+			return result;
+		} finally {
+			closeOracle("validateTableName", cstmt, conn, null);
+		}
+	}
+	
+	public String toString() { 
+        return super.toString().replace("ShapefileUtility:", "SHP2SDE:");
+    }
 }
