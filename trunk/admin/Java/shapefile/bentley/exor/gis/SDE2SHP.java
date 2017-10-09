@@ -1,18 +1,18 @@
 /**
  *    PVCS Identifiers :-
  *
- *       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/Java/shapefile/bentley/exor/gis/SDE2SHP.java-arc   1.2   May 31 2017 12:33:58   Upendra.Hukeri  $
+ *       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/Java/shapefile/bentley/exor/gis/SDE2SHP.java-arc   1.3   Oct 09 2017 10:07:40   Upendra.Hukeri  $
  *       Module Name      : $Workfile:   SDE2SHP.java  $
- *       Date into SCCS   : $Date:   May 31 2017 12:33:58  $
- *       Date fetched Out : $Modtime:   May 31 2017 12:32:46  $
- *       SCCS Version     : $Revision:   1.2  $
+ *       Date into SCCS   : $Date:   Oct 09 2017 10:07:40  $
+ *       Date fetched Out : $Modtime:   Oct 09 2017 08:20:10  $
+ *       SCCS Version     : $Revision:   1.3  $
  *       Based on 
  *
  *
  *
  *    Author : Upendra Hukeri
- *
  *    SDE2SHP.java
+ *
  ****************************************************************************************************
  *	  Copyright (c) 2017 Bentley Systems Incorporated.  All rights reserved.
  ****************************************************************************************************
@@ -23,33 +23,39 @@ package bentley.exor.gis;
 
 import com.vividsolutions.jts.geom.Geometry;
 
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.FileNotFoundException;
-import java.io.PrintWriter;
+import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
 import java.io.Serializable;
-import java.io.StringWriter;
 
 import java.net.URI;
 
-import java.sql.*;
+import java.nio.charset.StandardCharsets;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
+import java.sql.CallableStatement;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.sql.Types;
 
+import java.util.Arrays;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
-import java.util.Vector;
+import java.util.NoSuchElementException;
+import java.util.Set;
+
+import oracle.jdbc.OracleTypes;
 
 import oracle.sql.STRUCT;
 
@@ -68,523 +74,651 @@ import org.opengis.feature.simple.SimpleFeatureType;
  * and also creates corresponding supporting files.
  */
 
-public class SDE2SHP {
-	private String 	host 			 = null;
-	private int 	port			 = 0;
-	private String 	userName		 = null;
-	private String 	password		 = null;
-	private String 	sid				 = null;
-	private String 	viewName		 = null; 
-	private String 	whereClause		 = null;
-	private String  shpFileName 	 = null;
+public class SDE2SHP extends ShapefileUtility {
+	private		  String 		whereClause		 	= null;
+	private		  String  		whereClauseParams	= null;
+	private		  List<String> 	whereClauseValList 	= new ArrayList<String>();
+	private		  String[] 		whereClauseValArray = null;
+	private		  File 			shapeFile			= null;
+	private		  boolean 		needWhereHelp 		= false;
+	private		  String 		whereClauseID		= null;
+	private		  int    		oracleSRID		   	= 0;
+	private		  int    		epsgSRID		   	= 0;
 	
-	private String	attributeMode	 = null;
-	private Map<String, String> 	attributeMap	 = new HashMap<String, String>();
-	private boolean	useAttribMapping = false;
-	private String	queryColumns	 = null;
+	private	static final String ID					= " ID";
+	private	static final String WHERE_CLAUSE		= " WHERE CLAUSE";
+	private	static final String DESCRIPTION			= " DESCRIPTION";
 	
-	private String  geomColName 	 = null;
-	
-	private File 	shapeFile 		 = null;
-	private File 	logFile			 = null;
-	private String	logFilePath		 = null;
-	
-	private static 	BufferedWriter logger = null;
-	
-	private Vector 	v 				= new Vector();
-	private HashMap hm 				= new HashMap();
-	
-	private String 	value 			= null;
-	private String 	key 			= null;
-	
-	private String 	usage 			= "\nError: The following mandatory key(s)/value(s) is/are missing: ";
-	private static final String 	SHPFAILUREMSG 		= "shapefile creation failed!";
-	private static final String 	SHPSUCCESSMSG 		= "success";
-	
-	private static final int 		SHPSUCCESSMSGNUM 		= 1;
-	
-	private static String 			errorMsg = null;
-	
-	public SDE2SHP () {
-		errorMsg  = "\n\t\tUSAGE: java -jar sde2shp.jar -h db_host -p db_port -s db_sid -u db_username -d db_password -t db_tablename,column_name -w where_clause -f shapefile_name -a attribute_map_file";
-		errorMsg += "\n\t\tUsage explanation (parameters used):";
-		errorMsg += "\n\t\t<-h>: Host machine with existing Oracle database";
-		errorMsg += "\n\t\t<-p>: Host machine's port with existing Oracle database (e.g. 1521)";
-		errorMsg += "\n\t\t<-s>: Host machine's SID with existing Oracle database";
-		errorMsg += "\n\t\t<-u>: Database user";
-		errorMsg += "\n\t\t<-d>: Database user's password";
-		errorMsg += "\n\t\t<-t>: Input feature table name and spatial column name (separated by COMMA only)";
-		errorMsg += "\n\t\t[-w]: Where Clause for the query";
-		errorMsg += "\n\t\t<-f>: File name of an output Shapefile WITHOUT EXTENSION";
-		errorMsg += "\n\t\t[-a]: Attribute Mapping File WITH EXTENSION";
-		errorMsg += "\n\n\t\tNOTE: \t<> indicates MANDATORY field";
-		errorMsg += "\n\t\t\t\t[] indicates OPTIONAL field";
+	public SDE2SHP() {
+		super();
 	}
 	
-	public SDE2SHP (String[] args) {
-		int numOfErrors = 0;
-		String[] missingKV = new String[8];
+	protected String getHelpMessage() {
+		StringBuilder helpMsg  = new StringBuilder();
+		
+		helpMsg.append("\nUSAGE: java -cp sdeutil.jar bentley.exor.gis.SDE2SHP -help -nc -h db_host -p db_port -s db_sid -u db_username -d db_password -t db_tablename,column_name -w where_clause_id [where_clause_parameters] -f shapefile_name -a column_name_mapping_file -whelp where_clause_id");
+		helpMsg.append("\n\tUsage explaination (parameters used):");
+		helpMsg.append("\n\t[-help] : Specify this option to see the command line usage of Shapefile Extractor (for command line use only)");
+		helpMsg.append("\n\t(-nc)   : Specify this option, if the jar is loaded in database and called from a PL/SQL procedure or function");
+		helpMsg.append("\n\t          (no values for this parameter)");
+		helpMsg.append("\n\t(-h)    : Host machine with existing Oracle database");
+		helpMsg.append("\n\t(-p)    : Host machine's port with existing Oracle database (e.g. 1521)");
+		helpMsg.append("\n\t(-s)    : Host machine's SID with existing Oracle database");
+		helpMsg.append("\n\t(-u)    : Database user");
+		helpMsg.append("\n\t(-d)    : Database user's password");
+		helpMsg.append("\n\t(-t)    : Input feature table name and spatial column name (separated by COMMA only)");
+		helpMsg.append("\n\t[-w]    : WHERE Clause ID for the query followed by any parameters enclosed in square brackets [] separated by space");
+		helpMsg.append("\n\t          (in case parameter value contains space itself enclose the value in double quotes)");
+		helpMsg.append("\n\t(-f)    : File name of an output Shapefile WITHOUT EXTENSION");
+		helpMsg.append("\n\t[-a]    : File name containing column-name(attribute) mappings WITH EXTENSION");
+		helpMsg.append("\n\t(-whelp): WHERE Clause ID for which details are required (for command line use only)");
+		helpMsg.append("\n\t          (use ID 'all' for details of all available WHERE clauses)");
+		helpMsg.append("\n\n\tNOTE: \t() indicate MANDATORY ALTERNATE field e.g. either (-nc) or (-h -p -s -u -d) AND  either (-whelp) or (-t -f)");
+		helpMsg.append("\n\t\t[] indicate OPTIONAL field");
+		
+		return helpMsg.toString();
+	}
+	
+	private void init(String[] nuh) {
+		String		 usage			= "\nError: following key(s)/value(s) is/are missing: ";
+		String 		 cmdLineArgsStr	= Arrays.deepToString(nuh);
+		int			 numOfErrors 	= 0;
+		
+		Set <String> validKeySet	= new HashSet<String>(Arrays.asList(ShapefileUtility.validExtractKeysArray));
+		List<String> argumentsList 	= new ArrayList<String>(Arrays.asList(nuh));
+		List<String> missingKV 		= new ArrayList<String>();
+		Map <String, String> hm  	= new HashMap<String, String>();
 		
 		try {
-			for (int j = 0; args.length > j; j++) {
-				v.add(j, args[j]);
-			}
-
-			for (Enumeration e = v.elements(); e.hasMoreElements();) {
-				try {
-					key = (String) e.nextElement();
-					value = (String) e.nextElement();
+			for (Enumeration e = Collections.enumeration(argumentsList); e.hasMoreElements();) {
+				String key   = null;
+				String value = null;
+		
+				key = (String) e.nextElement();
+				boolean isNormalParam = true;
+				
+				if("-nc".equals(key)) {
+					hm.put(key, null);
+					isNormalParam = false;
+				} else if ("-w".equals(key)) {
+					try {
+						value = (String) e.nextElement();
+						
+						if (value != null && !value.isEmpty()) {
+							hm.put(key, value);
+							
+							try {
+								key = (String) e.nextElement();
+								
+								if(key.startsWith("[")) {
+									isNormalParam = false;
+									
+									if((cmdLineArgsStr.length() > (cmdLineArgsStr.replace("[", "").length() + 2)) || (cmdLineArgsStr.length() > (cmdLineArgsStr.replace("]", "").length() + 2))) { 
+										setErrorMsg("\nError: square brackets [] not allowed in WHERE clause values");
+										writeLog(getErrorMsg(), false);
+										setExitSystem(true);
+									} else {
+										boolean isCloseBracket = false;
+										
+										if("[".equals(key)) {
+											key = (String) e.nextElement();
+										} else {
+											key = key.substring(1);
+										}
+											
+										if(key.endsWith("]")) {
+											key = key.substring(0, key.length() - 1);
+											whereClauseParams = key.length() + "$" + key;
+											whereClauseValList.add(key);
+											isCloseBracket = true;
+											
+											continue;
+										}
+									
+										whereClauseParams = key.length() + "$" + key;
+										whereClauseValList.add(key);
+										
+										while(e.hasMoreElements()) {
+											key = (String) e.nextElement();
+											
+											if("]".equals(key)) {
+												isCloseBracket = true;
+												break;
+											} else if(key.endsWith("]")) {
+												key = key.substring(0, key.length() - 1);
+												whereClauseParams += key.length() + "$" + key;
+												whereClauseValList.add(key);
+												
+												isCloseBracket = true;
+												
+												break;
+											}
+											
+											whereClauseParams += key.length() + "$" + key;
+											whereClauseValList.add(key);
+										}
+										
+										if(!isCloseBracket) {
+											setErrorMsg("\nError: missing WHERE clause parameters closing bracket");
+											writeLog(getErrorMsg(), false);
+											setExitSystem(true);
+											
+											break;
+										}
+									}
+								}
+							} catch(NoSuchElementException nseException) {
+								isNormalParam = false;
+							}
+						}
+					} catch(NoSuchElementException nseException) {
+						missingKV.add("missing value for: " + key);
+						numOfErrors++;
+					}
+				} 
+				
+				if(isNormalParam) {
+					try {
+						value = (String) e.nextElement();
+					} catch(NoSuchElementException nseException) {
+						missingKV.add("missing value for: " + key);
+						numOfErrors++;
+					}
 					
-					if (key != null && value != null) {
+					if (key != null && value != null && !key.isEmpty() && !value.isEmpty()) {
 						hm.put(key, value);
 					}
-				} catch (Exception ex) {
-					writeLog(logger, "\nError: One of your key-value pairs failed. Please try again." + errorMsg);
-					systemExit(logger);
-				}
-			}
-						
-			if (hm.containsKey("-h")) {
-				writeLog(logger, "host: " + (String) hm.get("-h"));
-				this.host = (String) hm.get("-h");
-			} else {
-				missingKV[numOfErrors] = "-h db_host";
-				numOfErrors++;
-			}
-
-			if (hm.containsKey("-p")) {
-				writeLog(logger, "port: " + (String) hm.get("-p"));
-				this.port = Integer.parseInt((String) hm.get("-p"));
-			} else {
-				missingKV[numOfErrors] = "-p db_port";
-				numOfErrors++;
-			}
-
-			if (hm.containsKey("-s")) {
-				writeLog(logger, "sid: " + (String) hm.get("-s"));
-				this.sid = (String) hm.get("-s");
-			} else {
-				missingKV[numOfErrors] = "-s db_sid";
-				numOfErrors++;
-			}
-
-			if (hm.containsKey("-u")) {
-				writeLog(logger, "db_username: " + (String) hm.get("-u"));
-				this.userName = (String) hm.get("-u");
-			} else {
-				missingKV[numOfErrors] = "-u db_username";
-				numOfErrors++;
-			}
-
-			if (hm.containsKey("-d")) {
-				writeLog(logger, "db_password: ******");
-				this.password = (String) hm.get("-d");
-			} else {
-				missingKV[numOfErrors] = "-d password";
-				numOfErrors++;
-			}
-
-			if (hm.containsKey("-t")) {
-				writeLog(logger, "db_tablename: " + ((String) hm.get("-t")).toUpperCase());
-				String[] tabCol = ((String) hm.get("-t")).toUpperCase().split(",");
-				
-				if (tabCol.length != 2) {
-					writeLog(logger, "\nError: wrong value passed to -t: usage: -t db_tablename,column_name");
-					systemExit(logger);
-				}
-				
-				this.viewName = tabCol[0];
-				this.geomColName = tabCol[1];
-			} else {
-				missingKV[numOfErrors] = "-t db_tablename,column_name";
-				numOfErrors++;
-			}
-
-			if (hm.containsKey("-w")) {
-				writeLog(logger, "where_clause: " + (String) hm.get("-w"));
-				this.whereClause = (String) hm.get("-w");
-			} else {
-				this.whereClause = "";
-			}
-
-			if (hm.containsKey("-f")) {
-				writeLog(logger, "shapefile_name: " + ((String) hm.get("-f")).replace("\\\\", "\\") + ".shp");
-				this.shpFileName = (String) hm.get("-f");
-			} else {
-				missingKV[numOfErrors] = "-f shapefile_name";
-				numOfErrors++;
-			}
-			
-			if (hm.containsKey("-a")) {
-				writeLog(logger, "attribute_map_file: " + (String) hm.get("-a"));
-				this.attributeMode = (String) hm.get("-a");
-			} else {
-				this.attributeMode = "";
-			}
-			
-			if (numOfErrors > 0) {
-				writeLog(logger, usage);
-				
-				for (int i=0; i<missingKV.length; i++) {
-					String missingKVDescr = missingKV[i];
-					
-					if (missingKVDescr != null) {
-						writeLog(logger, "\t\t" + missingKVDescr);
-					}
-				}
-				
-				systemExit(logger);
-			}
-			
-			shapeFile 			= getNewShapeFile();
-			logFile				= setLogFile();
-						
-			if(new File(logFilePath).isDirectory()) {
-				logger.flush();
-				logger.close();
-				
-				logger = new BufferedWriter(new FileWriter(logFile));
-				writeLog(logger, new Date().toString() + ": starting extract process...");
-			} else {
-				writeLog(logger, "\nError: Cannot find the path specified to create Log file - " + logFilePath.replace("\\\\", "\\"));
-				
-				systemExit(logger);
-			}
-			
-			
-			this.setAttributeMap();
-		} catch (Exception constructorException) {
-			writeLog(logger, "\nError: Exception constructorException caught...");
-			StringWriter stw = new StringWriter();
-			PrintWriter pw = new PrintWriter(stw);
-			constructorException.printStackTrace(pw);
-			writeLog(logger, stw.toString());
-			writeLog(logger, new Date().toString() + ": Error: " + SHPFAILUREMSG);
-			systemExit(logger);
-		}
-	}
-	
-	public static void main(String[] args) {
-		try {
-			SDE2SHP sde2shp = new SDE2SHP();
-			
-			String currentDir = sde2shp.getClass().getProtectionDomain().getCodeSource().getLocation().toURI().getPath().replace("sde2shp.jar", "");
-			sde2shp = null;
-			
-			File systemLog = new File(currentDir + "\\log");
-			
-			if (!systemLog.isDirectory()) {
-				boolean dirCreated = systemLog.mkdir();
-				
-				if (!dirCreated) {
-					System.out.println("\nError: Cannot create system log file.");
-					System.exit(1);
 				}
 			}
 			
-			DateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
-			Calendar cal = Calendar.getInstance();
-			String timeExtension = dateFormat.format(cal.getTime());
-			
-			systemLog = new File(currentDir + "\\log\\sde2shp_" + timeExtension + ".log");
-			
-			System.out.println(systemLog.toString());
-			
-			logger = new BufferedWriter(new FileWriter(systemLog));
-			
-			if (args.length <= 1) {
-				writeLog(logger, new Date().toString() + ": Error: Invalid argument/s passed..." + errorMsg);
-			} else {
-				sde2shp = new SDE2SHP(args);
-				int numOfRows = sde2shp.generateShapeFile();
-				
-				if (numOfRows > 0) {
-					writeLog(logger, new Date().toString() + ": " + numOfRows + " features added to shapefile");
-					writeLog(logger, new Date().toString() + ": shapefile creation is complete: " + sde2shp.shapeFile.getName());
-					
-					System.out.println(SHPSUCCESSMSG);
-					//System.out.print(SHPSUCCESSMSGNUM);
-				} else {
-					writeLog(logger, new Date().toString() + ": Error: no records found...");
-					writeLog(logger, new Date().toString() + ": Error: " + SHPFAILUREMSG);
+			if(!getExitSystem()) {
+				if (hm.containsKey("-nc")) {
+					writeLog("use_nested_connection: true", false);
 				}
 				
-			}
-		} catch (Exception mainException) {
-			String error = new Date().toString() + ": Error: Exception mainException caught...\n";
-			
-			StringWriter stw = new StringWriter();
-			PrintWriter pw = new PrintWriter(stw);
-			
-			mainException.printStackTrace(pw);
-			
-			writeLog(logger, error + stw.toString());
-			writeLog(logger, new Date().toString() + ": Error: " + SHPFAILUREMSG);
-		} finally {
-			systemExit(logger);
-		}
-	}
-	
-	protected int generateShapeFile () 
-	throws ClassNotFoundException, SQLException, IOException, Exception {
-		int 				numOfRows		= 0;
-		int 				numOfColumns 	= 0;
-		int 				srid			= 0;
-		
-		String 				shapeQuery 		= null;
-		String 				sridQuery 		= null;
-		String 				typeName2 		= null;
-		
-		ResultSet 			viewData 		= null;
-		ResultSet 			sridData 		= null;
-		ResultSetMetaData 	viewMD 			= null;
-		Connection 			con				= null;
-		
-		boolean 			checkSRID		= true;
-		
-		ShapefileDataStore 	newDataStore 	= null;
-		
-		ShapefileDataStoreFactory dataStoreFactory = new ShapefileDataStoreFactory();
-		
-		Map<String, Serializable> params 	= null;
-				
-		String dirPath = shpFileName.substring(0, shpFileName.lastIndexOf("\\") - 1);
-		
-		File dir = new File(dirPath);
-		
-		if (!dir.exists()) {
-			throw new FileNotFoundException("Path - " + dirPath + " - not found!");
-		}
-		
-		if (useAttribMapping) {
-			shapeQuery = "SELECT " + queryColumns + " FROM ";
-		} else {
-			shapeQuery = "SELECT * FROM ";
-		}
-		
-		if (this.whereClause == null)
-			shapeQuery += this.viewName;
-		else if (this.whereClause.isEmpty() || this.whereClause.equalsIgnoreCase("null"))
-			shapeQuery += this.viewName;
-		else
-			shapeQuery += this.viewName + " WHERE " + this.whereClause;
-		
-		writeLog(logger, new Date().toString() + ": extract running on: '" + this.viewName + "' with query: '" + shapeQuery + "'");
-		
-		
-		con = this.getConnection();
-		
-		viewData 		= getViewData(con, shapeQuery);
-		viewMD 			= viewData.getMetaData();
-		
-		numOfColumns 	= viewMD.getColumnCount();
-		
-		List<SimpleFeature> features = new ArrayList<SimpleFeature>();
-		SimpleFeatureType TYPE = null;
-		SimpleFeatureType TYPEPrevs = null;
-		
-		FeatureWriter<SimpleFeatureType, SimpleFeature> sfw = null;
-		
-		while (viewData.next()) {
-			List columns 	= null;
-			List row 		= null;
-			
-			columns 		= new ArrayList();
-			row 			= new ArrayList();
-			
-			SimpleFeatureBuilder featureBuilder = null;
-						
-			for (int i = 1; i <= numOfColumns; i++) {
-				int 		size 			= -1;
-				
-				String 		columnName 		= viewMD.getColumnName(i);
-				String 		classTypeName 	= viewMD.getColumnClassName(i);
-				String 		typeName 		= viewMD.getColumnTypeName(i);
-				String 		srs 			= null;
-				
-				int 		nullable		= viewMD.isNullable(i);
-								
-				Map 		typeForShp 		= new HashMap();
-				
-				Class<?> 	cls 			= null;
-								
-				if (classTypeName.equals("java.lang.String")) {
-					size = viewMD.getColumnDisplaySize(i);							
-				} else if (classTypeName.equals("java.math.BigDecimal") && viewMD.getScale(i) == 0) {
-					int precision = viewMD.getPrecision(i);
-					
-					if(precision > 0) {
-						if (precision <= 9) {
-							classTypeName = "java.lang.Integer";
-						} else if (precision <= 18) {
-							classTypeName = "java.lang.Long";
-						}
-						
-						size = precision;
+				if(!getUseNestedConn()) {
+					if (hm.containsKey("-h")) {
+						setHost((String) hm.get("-h"));
+						writeLog("host: " + getHost(), false);
 					} else {
-						size = 38;
+						missingKV.add("-h db_host");
+						numOfErrors++;
 					}
 					
-				} else if (classTypeName.equals("java.math.BigDecimal") && viewMD.getScale(i) != 0) {
-					size = 38;
+					if (hm.containsKey("-p")) {
+						setPort(Integer.parseInt((String) hm.get("-p")));
+						writeLog("port: " + getPort(), false);
+					} else {
+						missingKV.add("-p db_port");
+						numOfErrors++;
+					}
+					
+					if (hm.containsKey("-s")) {
+						setSID((String) hm.get("-s"));
+						writeLog("sid: " + getSID(), false);
+					} else {
+						missingKV.add("-s db_sid");
+						numOfErrors++;
+					}
+					
+					if (hm.containsKey("-u")) {
+						setUserName((String) hm.get("-u"));
+						writeLog("db_username: " + getUserName(), false);
+					} else {
+						missingKV.add("-u db_username");
+						numOfErrors++;
+					}
+					
+					if (hm.containsKey("-d")) {
+						setPassword((String) hm.get("-d"));
+						writeLog("db_password: *******", false);
+					} else {
+						missingKV.add("-d password");
+						numOfErrors++;
+					}
 				}
 				
-				if (classTypeName.equals("oracle.sql.STRUCT")) {
-					if (checkSRID) {
-						String viewNameWOSchema = this.viewName;
+				if (hm.containsKey("-t")) {
+					String tableColumn = ((String) hm.get("-t")).toUpperCase(Locale.ENGLISH);
+					writeLog("db_tablename: " + tableColumn, false);
+					
+					String[] tabCol = tableColumn.split(",");
+					
+					if (tabCol.length != 2) {
+						missingKV.add("wrong value passed to -t, usage: -t db_tablename,column_name");
+						numOfErrors++;
+					} else {
+						setViewName(tabCol[0]);
 						
-						if (viewNameWOSchema.contains(".")) {
-							String[] s = viewNameWOSchema.split("\\.");
-							viewNameWOSchema = s[1];
+						if(!conformOracleNamingConvention(getViewName())) {
+							missingKV.add("wrong value passed to -t, special characters not allowed in table name (allowed: A-Z a-z 0-9 _ $ #)");
+							numOfErrors++;
 						}
 						
-						sridQuery = "SELECT sdo_cs.map_oracle_srid_to_epsg(NVL(srid, 0)) srid FROM user_sdo_geom_metadata WHERE table_name = '" + viewNameWOSchema + "' and column_name = '" + columnName + "'";
+						setGeomColName(tabCol[1]);
 						
-						sridData		= getViewData(con, sridQuery);
-						
-						if(sridData.next()) {
-							srid			= sridData.getInt("srid");
-						} else {
-							writeLog(logger, new Date().toString() + ": Error: No SRID found! Check the Geometry for column: '" + columnName + "'");
-							
-							systemExit(logger);
+						if(!conformOracleNamingConvention(getGeomColName())) {
+							missingKV.add("wrong value passed to -t, special characters not allowed in geometry column name (allowed: A-Z a-z 0-9 _ $ #)");
+							numOfErrors++;
 						}
-						
-						writeLog(logger, new Date().toString() + ": found geometry column: '" + columnName + "' with SRID: " + srid);
-						
-						
-						checkSRID = false;
 					}
+				} else if(!hm.containsKey("-whelp")) {
+					missingKV.add("-t db_tablename,column_name");
+					numOfErrors++;
+				}
+				
+				if (hm.containsKey("-w")) {
+					whereClause = (String) hm.get("-w");
+					writeLog("where_clause_id: " + whereClause, false);
 					
-					STRUCT sqlGeo = (STRUCT) viewData.getObject(columnName);
-
-					GeometryConverter gc = new GeometryConverter((oracle.jdbc.OracleConnection) con);
-					Geometry gt = gc.asGeometry(sqlGeo);
-
-					row.add(0, gt);
-					
-					classTypeName = gt.getClass().toString().split(" ")[1];
-					
-					srs = "EPSG:" + srid;
-					
-					gt = null;
-					gc = null;
-					sqlGeo = null;
-				} else if (classTypeName.equals("com.vividsolutions.jts.geom.Point")) {
-					classTypeName = "com.vividsolutions.jts.geom.MultiPoint";
-				} else if (classTypeName.equals("com.vividsolutions.jts.geom.LineString")) {
-					classTypeName = "com.vividsolutions.jts.geom.MultiLineString";
-				} else if (classTypeName.equals("com.vividsolutions.jts.geom.Polygon")) {
-					classTypeName = "com.vividsolutions.jts.geom.MultiPolygon";
+					if(whereClauseParams != null && !whereClauseParams.isEmpty()) {
+						writeLog("where_clause_parameters: " + Arrays.deepToString(whereClauseValList.toArray()), false);
+					}
 				} else {
-					Map<String, Class<?>> m = new HashMap<String, Class<?>>();
-					cls = viewMD.getClass();
-					m.put(typeName, cls);
-
-					Object value = viewData.getObject(columnName, m);
-					
-					row.add(value);
-					
-					value = null;
+					whereClause = "";
 				}
 				
-				if (numOfRows == 0) {
-					if (useAttribMapping && (!columnName.equals(geomColName))) {
-						columnName = this.getAttributeAlias(columnName);
+				if (hm.containsKey("-whelp")) {
+					whereClauseID = (String) hm.get("-whelp");
+					needWhereHelp = true;
+					writeLog("need_where_clause_details: " + whereClauseID, false);
+				} else {
+					whereClauseID = "";
+				}
+				
+				if (hm.containsKey("-f")) {
+					setSHPFileName((String) hm.get("-f"));
+					writeLog("shapefile_name: " + getSHPFileName() + ".shp", false);
+					
+					if(getSHPFileName().indexOf('\\') > -1 || getSHPFileName().indexOf('/') > -1) {
+						missingKV.add("wrong value passed to -f, path not allowed here");
+						numOfErrors++;
+					}
+				} else if(!hm.containsKey("-whelp")) {
+					missingKV.add("-f shapefile_name");
+					numOfErrors++;
+				}
+					
+				if (hm.containsKey("-a")) {
+					setColMapFileName((String) hm.get("-a"));
+					writeLog("use_column_mapping: true, file name: " + getColMapFileName(), false);
+					
+					if(getColMapFileName().indexOf('\\') > -1 || getColMapFileName().indexOf('/') > -1) {
+						missingKV.add("wrong value passed to -a, path not allowed here");
+						numOfErrors++;
 					}
 					
-					typeForShp.put("name", columnName);
-					typeForShp.put("className", classTypeName);
-					typeForShp.put("size", size);
-					typeForShp.put("srs", srs);
-					typeForShp.put("nullable", nullable);
+					setUseColumnMapping(true);
+				} else {
+					writeLog("use_column_mapping: false", false);
+				}
+				
+				Set<String> keySet 		= hm.keySet();
+				Iterator 	keyIterator = keySet.iterator();
+				
+				while(keyIterator.hasNext()) {
+					String currKey = (String)keyIterator.next();
 					
-					columns.add(typeForShp);
+					if(!validKeySet.contains(currKey)) {
+						setErrorMsg("\nError: invalid key - " + currKey);
+						writeLog(getErrorMsg(), false);
+						setExitSystem(true);
+					}
+				}
+				
+				if(!getExitSystem()) {
+					if (numOfErrors > 0) {
+						writeLog(usage, false);
+						
+						Iterator itr = missingKV.iterator();
+						
+						while(itr.hasNext()) {
+							writeLog("\t\t" + itr.next(), false);
+						}
+						
+						setErrorMsg("\nError: missing key(s), please check system log file for more details");
+						setExitSystem(true);
+					} else if (!needWhereHelp) {
+						shapeFile = getNewShapeFile();
+						
+						systemExit();							
+						setLogger(new BufferedWriter(new OutputStreamWriter(new FileOutputStream(setLogFile("sde2shp")), StandardCharsets.UTF_8)));
+						writeLog("starting extract process...");
+					}
 				}
 			}
+		} catch (Exception initException) {
+			setErrorMsg("\nError: " + initException.getMessage());
+			logException(initException, "<init>");
+			writeLog(ShapefileUtility.SDE2SHPFAILUREMSG, false);
+			setExitSystem(true);
+		}
+	}
+	
+	public static String createShapeFileDB(java.sql.Array array) {
+		String[] nuh = null;
+		
+		try {
+			Object params = array.getArray();
+			int arrayLength = java.lang.reflect.Array.getLength(params);
+			nuh = new String[arrayLength];
 			
-			if (numOfRows == 0) {
-				writeLog(logger, new Date().toString() + ": writing features to shapefile...");
-				
-				
-				TYPE = getFeatureType(viewName, columns);
-				
-				params = new HashMap<String, Serializable>();
-				params.put("url", shapeFile.toURI().toURL());
-				params.put("create spatial index", Boolean.TRUE);
-				newDataStore = (ShapefileDataStore) dataStoreFactory.createNewDataStore(params);
-				
-				newDataStore.createSchema(TYPE);
-				typeName2 = newDataStore.getTypeNames()[0];
-				
-				sfw = newDataStore.getFeatureWriter(typeName2, Transaction.AUTO_COMMIT);
-				sfw.hasNext();
-				
-				SimpleFeature feature = (SimpleFeature) sfw.next();
-				feature.setAttributes(row);
-				
-				sfw.write();
-				sfw.close();
-				
-				numOfRows++;
-				
-				continue;
+			for (int i=0; i<arrayLength; i++) {
+				nuh[i] = String.valueOf(java.lang.reflect.Array.get(params, i));
+			}
+		} catch(SQLException createShapeFileDBException) {
+			return createShapeFileDBException.getMessage();
+		}
+		
+		SDE2SHP sde2shp = new SDE2SHP();
+		sde2shp.doExtract(nuh, sde2shp);
+		String errorMessage = sde2shp.getErrorMsg();
+		
+		if(errorMessage != null) {
+			errorMessage = sde2shp.getSystemLogFileName() + '\n' + errorMessage;
+			
+			if(errorMessage.length() > 32767) {
+				return errorMessage.substring(0, 32767);
 			} 
 			
-			if (numOfRows == 1) {
-				newDataStore = (ShapefileDataStore) dataStoreFactory.createDataStore(shapeFile.toURI().toURL());
-				newDataStore.getSchema();					
-				sfw = newDataStore.getFeatureWriterAppend(typeName2, Transaction.AUTO_COMMIT);
+			return errorMessage;
+		} else {
+			return "success" + '\n' + sde2shp.getSystemLogFileName();
+		}
+	}
+	
+	public static void main(String[] nuh) {
+		SDE2SHP sde2shp = new SDE2SHP();
+		sde2shp.doExtract(nuh, sde2shp);
+	}
+	
+	protected void doExtract(String[] nuh, SDE2SHP sde2shp) {
+		try {
+			if(nuh != null && nuh.length >= 1) {
+				if(Arrays.asList(nuh).contains("-nc")) {
+					sde2shp.setUseNestedConn(true);
+				}
+				
+				if(Arrays.asList(nuh).contains("-help")) {
+					if(sde2shp.getUseNestedConn()) {
+						sde2shp.setErrorMsg("Error: -help is for command line usage only");
+					} else {
+						System.out.println(sde2shp.getHelpMessage());
+					}
+				} else {
+					if(sde2shp.getUseNestedConn() && Arrays.asList(nuh).contains("-whelp")) {
+						sde2shp.setErrorMsg("Error: -whelp is for command line usage only");
+					} else {
+						String result = sde2shp.setBasicDirectories("sde2shp");
+						
+						if("Y".equals(result)) {
+							sde2shp.init(nuh);
+							
+							if(!sde2shp.getExitSystem()) {
+								if(sde2shp.needWhereHelp) {
+									System.out.println(sde2shp.displayWhereClauseDetails(sde2shp.whereClauseID));
+								} else {
+									sde2shp.setColumnMap();
+									
+									if(!sde2shp.getExitSystem()) {
+										int numOfRows = sde2shp.generateShapeFile();
+										
+										if (numOfRows > 0) {
+											sde2shp.writeLog(String.valueOf(numOfRows) + " features added to shapefile");
+											sde2shp.writeLog("shapefile creation is complete: " + sde2shp.shapeFile.getName());
+											
+											System.out.println(ShapefileUtility.SHPSUCCESSMSG);
+										} else {
+											if(numOfRows == 0) {
+												sde2shp.writeLog("\nError: no records found...", false);
+											} else if(numOfRows == -1) {
+												sde2shp.writeLog(sde2shp.getErrorMsg(), false);
+											}
+											
+											sde2shp.writeLog(ShapefileUtility.SDE2SHPFAILUREMSG, false);
+										}
+									} else {
+										writeLog(ShapefileUtility.SHP2SDEFAILUREMSG, false);
+									}
+								}
+							}
+						} else {
+							sde2shp.setErrorMsg(result);
+						}
+					}
+				}
+			} else {
+				System.out.println("\nError: Invalid argument/s passed..." + sde2shp.getHelpMessage());
+			}
+		} catch (Throwable doExtractException) {
+			sde2shp.logException(doExtractException, "doExtract");
+			sde2shp.writeLog(ShapefileUtility.SDE2SHPFAILUREMSG, false);
+		} finally {
+			sde2shp.systemExit();
+		}
+	}
+	
+	protected int generateShapeFile() 
+	throws Throwable {
+		int 					  numOfRows			= 0;
+		int 					  numOfColumns 		= 0;
+		String 					  shapeQuery 		= null;
+		String 					  sridQuery 		= null;
+		String 					  typeName2 		= null;
+		QuerryConnectionDetails	  shapefileData 	= null;
+		ResultSet				  viewData 			= null;
+		ResultSetMetaData 		  viewMD 			= null;
+		Connection 				  con				= null;
+		boolean 				  checkSRID			= true;
+		ShapefileDataStore 		  newDataStore 		= null;
+		ShapefileDataStoreFactory dataStoreFactory 	= null;
+		Map<String, Serializable> params 			= null;
+		File 					  dir				= null;
+		
+		try {
+			dataStoreFactory = new ShapefileDataStoreFactory();
+			dir = new File(getDirectoryPath(Directory.EXTRACTDIR));
+			
+			if (!dir.exists()) {
+				throw new FileNotFoundException("Path - " + getDirectoryPath(Directory.EXTRACTDIR) + " - not found!");
 			}
 			
-			sfw.hasNext();
+			shapefileData   = getData();
 			
-			SimpleFeature feature = (SimpleFeature) sfw.next();
-			feature.setAttributes(row);
+			if(shapefileData != null) {
+				con 			= shapefileData.conn;
+				viewData 		= shapefileData.resultSet;
+				viewMD 			= viewData.getMetaData();
+				numOfColumns 	= viewMD.getColumnCount();
+				
+				SimpleFeatureType TYPE 		 = null;
+				SimpleFeatureType TYPEPrevs  = null;
+				
+				FeatureWriter<SimpleFeatureType, SimpleFeature> sfw = null;
+				
+				while (viewData.next()) {
+					List columns = new ArrayList();
+					List row = new ArrayList();
+					
+					SimpleFeatureBuilder featureBuilder = null;
+					
+					for (int i = 1; i <= numOfColumns; i++) {
+						int 		size 			= -1;
+						String 		columnName 		= viewMD.getColumnName(i);
+						String 		classTypeName 	= viewMD.getColumnClassName(i);
+						String 		typeName 		= viewMD.getColumnTypeName(i);
+						String 		srs 			= null;
+						int 		nullable		= viewMD.isNullable(i);
+						Map 		typeForShp 		= new HashMap();
+						Class<?> 	cls 			= null;
+						
+						if("get_data_exp".equalsIgnoreCase(columnName)) {
+							String errorText = viewData.getString(columnName);
+							setErrorMsg("\nError: " + errorText);
+							
+							return -1;
+						}
+						
+						if ("java.lang.String".equals(classTypeName)) {
+							size = viewMD.getColumnDisplaySize(i);							
+						} else if ("java.math.BigDecimal".equals(classTypeName) && viewMD.getScale(i) == 0) {
+							int precision = viewMD.getPrecision(i);
+							
+							if(precision > 0) {
+								if (precision <= 9) {
+									classTypeName = "java.lang.Integer";
+								} else if (precision <= 18) {
+									classTypeName = "java.lang.Long";
+								}
+								
+								size = precision;
+							} else {
+								size = 38;
+							}
+						} else if ("java.math.BigDecimal".equals(classTypeName) && viewMD.getScale(i) != 0) {
+							size = 38;
+						}
+						
+						if (getGeometryColumnClass().equals(classTypeName)) {
+							if (checkSRID) {
+								String viewNameWOSchema = getViewName();
+								
+								if (viewNameWOSchema.contains(".")) {
+									String[] s = viewNameWOSchema.split("\\.");
+									viewNameWOSchema = s[1];
+								}
+								
+								String result = getSRID();
+								
+								if(!"Y".equals(result)) {
+									return -1;
+								} else if(epsgSRID == 0) {
+									setErrorMsg("\nError: no SRID found, check the Geometry for column: '" + columnName + "'");
+									return -1;
+								}
+								
+								writeLog("found geometry column: '" + columnName + "' with Oracle SRID: " + oracleSRID + " (EPSG SRID - " + epsgSRID + ')');
+								
+								
+								checkSRID = false;
+							}
+							
+							Object geometry = viewData.getObject(columnName);
+							STRUCT sqlGeo   = getSTRUCT(geometry);
+							
+							GeometryConverter gc = new GeometryConverter((oracle.jdbc.OracleConnection) con);
+							Geometry gt = gc.asGeometry(sqlGeo);
+	
+							row.add(0, gt);
+							
+							classTypeName = gt.getClass().toString().split(" ")[1];
+							
+							srs = "EPSG:" + epsgSRID;
+							
+							gt = null;
+							gc = null;
+							sqlGeo = null;
+						} else if ("com.vividsolutions.jts.geom.Point".equals(classTypeName)) {
+							classTypeName = "com.vividsolutions.jts.geom.MultiPoint";
+						} else if ("com.vividsolutions.jts.geom.LineString".equals(classTypeName)) {
+							classTypeName = "com.vividsolutions.jts.geom.MultiLineString";
+						} else if ("com.vividsolutions.jts.geom.Polygon".equals(classTypeName)) {
+							classTypeName = "com.vividsolutions.jts.geom.MultiPolygon";
+						} else {
+							Map<String, Class<?>> m = new HashMap<String, Class<?>>();
+							cls = viewMD.getClass();
+							m.put(typeName, cls);
+							
+							Object value = viewData.getObject(columnName, m);
+							
+							row.add(value);
+							
+							value = null;
+						}
+						
+						if (numOfRows == 0) {
+							typeForShp.put("name", columnName);
+							typeForShp.put("className", classTypeName);
+							typeForShp.put("size", size);
+							typeForShp.put("srs", srs);
+							typeForShp.put("nullable", nullable);
+							
+							columns.add(typeForShp);
+						}
+					}
+					
+					if (numOfRows == 0) {
+						writeLog("writing features to shapefile...");
+						TYPE = getFeatureType(getViewName(), columns);
+						params = new HashMap<String, Serializable>();
+						params.put("url", shapeFile.toURI().toURL());
+						params.put("create spatial index", Boolean.TRUE);
+						newDataStore = (ShapefileDataStore) dataStoreFactory.createNewDataStore(params);
+						
+						newDataStore.createSchema(TYPE);
+						typeName2 = newDataStore.getTypeNames()[0];
+						sfw = newDataStore.getFeatureWriter(typeName2, Transaction.AUTO_COMMIT);
+						sfw.hasNext();
+						
+						SimpleFeature feature = (SimpleFeature) sfw.next();
+						feature.setAttributes(row);
+						
+						sfw.write();
+						sfw.close();
+						
+						newDataStore.dispose();
+						
+						numOfRows++;
+						
+						continue;
+					} 
+					
+					if (numOfRows == 1) {
+						newDataStore = (ShapefileDataStore) dataStoreFactory.createDataStore(shapeFile.toURI().toURL());
+						newDataStore.getSchema();					
+						sfw = newDataStore.getFeatureWriterAppend(typeName2, Transaction.AUTO_COMMIT);
+					}
+					
+					sfw.hasNext();
+					
+					SimpleFeature feature = (SimpleFeature) sfw.next();
+					feature.setAttributes(row);
+					
+					sfw.write();
+					
+					numOfRows++;
+				}
+				
+				if (numOfRows > 0) {
+					sfw.close();
+					newDataStore.dispose();
+				}
+				
+				if (!viewData.isClosed())
+					viewData.close();
+				if (!con.isClosed())
+					con.close();
+			} else {
+				return -2;
+			}
 			
-			sfw.write();
-			
-			numOfRows++;
+			return numOfRows;
+		} finally {
+			if(shapefileData != null) {
+				closeOracle("generateShapeFile", shapefileData.cstmt, shapefileData.conn, shapefileData.resultSet);
+			}
 		}
-		
-		if (numOfRows > 0) {
-			sfw.close();
-		}
-		
-		if (!viewData.isClosed())
-			viewData.close();
-		if (!con.isClosed())
-			con.close();
-		
-		return numOfRows;
 	}
 	
-	protected Connection getConnection () 
-	throws SQLException, ClassNotFoundException, Exception {
-		Class.forName("oracle.jdbc.driver.OracleDriver");
-		Connection connection = DriverManager.getConnection("jdbc:oracle:thin:@" + this.host + ":" + this.port + ":" + this.sid, this.userName, this.password);
-		
-		return connection;
-	}
-	
-	protected ResultSet getViewData (Connection con, String query)
-	throws SQLException, ClassNotFoundException, Exception {
-		Statement statement = con.createStatement();
-		ResultSet rs = statement.executeQuery(query);
-		
-		return rs;
-	}
-	
-	protected SimpleFeatureType getFeatureType (String featureTypeName, List attributes) 
+	protected SimpleFeatureType getFeatureType(String featureTypeName, List attributes) 
 	throws ClassNotFoundException, IOException, Exception {
 		SimpleFeatureTypeBuilder builder = new SimpleFeatureTypeBuilder();
-				
+		
 		String 	name 		= null;
 		String 	className 	= null;
 		String 	srs  		= null;
 		int 	size 		= -1;
 		int 	nullable  	= -1;
-		
 		
 		builder.setName(featureTypeName);
 		URI namespaceURI = null;
@@ -593,6 +727,7 @@ public class SDE2SHP {
 		Iterator attribItr = attributes.iterator();
 		
 		while (attribItr.hasNext()) {
+			
 			Map attribute = (HashMap) attribItr.next();
 			
 			name 		= (String)  attribute.get("name");
@@ -600,7 +735,7 @@ public class SDE2SHP {
 			srs 		= (String)  attribute.get("srs");
 			size 		= (Integer) attribute.get("size");
 			nullable	= (Integer) attribute.get("nullable");
-					
+			
 			if ((name != null) && (className != null)) {
 				if (srs != null) {
 					builder.srs(srs);
@@ -620,115 +755,247 @@ public class SDE2SHP {
 			}
 		}
 		
-		final SimpleFeatureType TYPE = builder.buildFeatureType();
-		
-		return TYPE;
+		return builder.buildFeatureType();
 	}
 	
-	protected File getNewShapeFile() {
+	protected final File getNewShapeFile() {
 		File shapeFile = null;
 		
-		if (this.shpFileName != null) 
-			if (!this.shpFileName.isEmpty())
-					shapeFile = new File(this.shpFileName + ".shp");
+		if (getSHPFileName() != null) 
+			if (!getSHPFileName().isEmpty()) {
+				shapeFile = new File(getDirectoryPath(Directory.EXTRACTDIR) + getSHPFileName() + ".shp");
+			}
 		
 		return shapeFile;
 	}
 	
-	protected File setLogFile() {
-		File logFile = null;
-		
-		if (this.shpFileName != null) 
-			if (!this.shpFileName.isEmpty())
-					logFile = new File(this.shpFileName + ".log");
-		
-		this.logFilePath = this.shpFileName.substring(0, (this.shpFileName.lastIndexOf('\\') - 1));
-		
-		return logFile;
-	}
-	
-	protected File getAttributeMapFile() 
-	throws FileNotFoundException {
-		File attribMappingFile = null;
-		
-		if (this.attributeMode != null) {
-			if (!this.attributeMode.isEmpty()) {
-				attribMappingFile = new File(this.attributeMode);
-				if (!attribMappingFile.exists()) {
-					throw new FileNotFoundException("File - " + this.attributeMode + " - not found!");
-				}
-			}
+	protected String getGeometryColumnClass() {
+		if(getUseNestedConn()) {
+			return "oracle.jdbc.OracleStruct";
+		} else {
+			return "oracle.sql.STRUCT";
 		}
-		
-		return attribMappingFile;
 	}
 	
-	protected void setAttributeMap () 
-	throws IOException, Exception {
-		writeLog(logger, new Date().toString() + ": reading attribute mapping file...");
+	protected STRUCT getSTRUCT(Object geometry) throws Exception  {
+		return (STRUCT) geometry;
+	}
+	
+	protected void writeLog(String log) {
+		writeLog(log, true);
+	}
+	
+	private QuerryConnectionDetails getData() {
+		String 		  				sqlStmt			= null;
+		QuerryConnectionDetails 	shapefileData	= new QuerryConnectionDetails();
+		oracle.sql.ArrayDescriptor 	des				= null;
+		oracle.sql.ARRAY 			colArrToPass	= null;
+		oracle.sql.ARRAY 			whereArrToPass	= null;
 		
-		File attribMappingFile = getAttributeMapFile();
-		
-		if (attribMappingFile != null) {
-			BufferedReader attribMappingReader = new BufferedReader(new FileReader(attribMappingFile));
+		try {
+			shapefileData.conn = getConnection();
 			
-			String read = null;
+			if(getColumnMapArray() != null && getColumnMapArray().length > 0) {
+				des = oracle.sql.ArrayDescriptor.createDescriptor("SDE_VARCHAR_2D_ARRAY", shapefileData.conn);
+				colArrToPass = new oracle.sql.ARRAY(des, shapefileData.conn, getColumnMapArray());
+			}
 			
-			while ((read = attribMappingReader.readLine()) != null) {
-				String[] keyValue = read.split(" ");
-				this.attributeMap.put(keyValue[0], keyValue[1]);
+			if(whereClauseValList.size() > 0) {
+				whereClauseValArray = whereClauseValList.toArray(new String[whereClauseValList.size()]);
 				
-				if (queryColumns == null) {
-					queryColumns = keyValue[0];
-				} else {
-					queryColumns = queryColumns + ", " + keyValue[0];
-				}
+				des = oracle.sql.ArrayDescriptor.createDescriptor("SDE_VARCHAR_ARRAY", shapefileData.conn);
+				whereArrToPass = new oracle.sql.ARRAY(des, shapefileData.conn, whereClauseValArray);
 			}
 			
-			if (queryColumns == null) {
-				queryColumns = geomColName;
+			sqlStmt = "{? = call sde_util.get_data(?, ?, ?, ?)}";
+			shapefileData.cstmt   = shapefileData.conn.prepareCall(sqlStmt);
+			shapefileData.cstmt.registerOutParameter(1, OracleTypes.CURSOR);
+			shapefileData.cstmt.setString(2, getViewName());
+			
+			if(colArrToPass == null) {
+				shapefileData.cstmt.setNull(3, Types.ARRAY, "SDE_VARCHAR_2D_ARRAY");
 			} else {
-				queryColumns = queryColumns + ", " + geomColName;
+				shapefileData.cstmt.setArray(3, colArrToPass);
 			}
 			
-			useAttribMapping = true;
+			shapefileData.cstmt.setString(4, whereClause);
+			
+			if(whereArrToPass == null) {
+				shapefileData.cstmt.setNull(5, Types.ARRAY, "SDE_VARCHAR_ARRAY");
+			} else {
+				shapefileData.cstmt.setArray(5, whereArrToPass);
+			}
+			
+			shapefileData.cstmt.execute();
+			
+			shapefileData.resultSet = (ResultSet)shapefileData.cstmt.getObject(1);
+			
+			return shapefileData;
+		} catch(Exception getDataException) {
+			logException(getDataException, "getData");
+			
+			return null;
 		}
 	}
 	
-	protected String getAttributeAlias (String dbColumnName) 
-	throws Exception {
-		String shpColumnName = dbColumnName;
+	private String getSRID() 
+	throws SQLException, ClassNotFoundException, Exception {
+		Connection        conn    = null;
+		CallableStatement cstmt   = null;
+		String 			  result  = null;
+		String 			  sqlStmt = null;
 		
-		if (this.attributeMap.containsKey(shpColumnName)) {
-			shpColumnName = this.attributeMap.get(shpColumnName);
-		}
-		
-		return shpColumnName;
-	}
-	
-	protected static void writeLog(BufferedWriter logger, String log) {
 		try {
-			logger.write(log);
-			logger.newLine();
-		} catch (IOException ioe) {
-			System.out.println("\nError: Exception IOException caught...\n");
-			ioe.printStackTrace();
-		}
-	}
-	
-	protected static void systemExit(BufferedWriter logger) {
-		try {
-			logger.flush();
-			logger.close();
-		} catch (IOException ioe) {
-			System.out.println("\nError: Exception IOException caught...\n");
-			ioe.printStackTrace();
+			conn = getConnection();
+			
+			sqlStmt = "{? = call sde_util.get_srid(?, ?, ?, ?)}";
+			cstmt   = conn.prepareCall(sqlStmt);
+			cstmt.registerOutParameter(1, Types.VARCHAR);
+			cstmt.setString(2, getViewName());
+			cstmt.setString(3, getGeomColName());
+			cstmt.registerOutParameter(4, Types.NUMERIC);
+			cstmt.registerOutParameter(5, Types.NUMERIC);
+			cstmt.execute();
+			
+			result = cstmt.getString(1);
+			
+			if("Y".equals(result)) {
+				oracleSRID 	= cstmt.getInt(4);
+				epsgSRID 	= cstmt.getInt(5);
+				
+				return "Y";
+			} else {
+				setErrorMsg("\nError: " + result);
+				return "N";
+			}
 		} finally {
-			System.exit(1);
+			closeOracle("getSRID", cstmt, conn, null);
 		}
 	}
 	
-	protected static void systemPrint(String s) {
-		System.out.println(s);
+	private QuerryConnectionDetails getWhereCaluseDetails(String whereClauseID) 
+	throws SQLException {
+		String 			  			sqlStmt 		= null;
+		QuerryConnectionDetails     whereClauseData = new QuerryConnectionDetails();
+		
+		try {
+			if("all".equalsIgnoreCase(whereClauseID)) {
+				whereClauseID = null;
+			}
+			
+			whereClauseData.conn = getConnection();
+			sqlStmt = "{? = call sde_util.get_where_clause_details(?)}";
+			whereClauseData.cstmt   = whereClauseData.conn.prepareCall(sqlStmt);
+			whereClauseData.cstmt.registerOutParameter(1, OracleTypes.CURSOR);
+			whereClauseData.cstmt.setString(2, whereClauseID);
+			whereClauseData.cstmt.execute();
+			whereClauseData.resultSet = (ResultSet)whereClauseData.cstmt.getObject(1);
+			
+			return whereClauseData;
+		} catch(Exception validateColumnNamesException) {
+			logException(validateColumnNamesException, "validateColumnNames");
+		}
+		
+		return whereClauseData;
 	}
+	
+	private String displayWhereClauseDetails(String whereClauseID) {
+		ResultSet 		  		whereClauseDetails	= null;
+		ResultSetMetaData 		whereMD				= null;
+		int 			  		numOfColumns		= 0;
+		QuerryConnectionDetails	whereClauseData		= null;
+		List<List<String>>		details			 	= null;
+		
+		final StringBuilder whereClauseDetailsStr 	= new StringBuilder();
+		
+		List<Integer> maxLenList = new ArrayList<Integer>();
+		
+		maxLenList.add(ID.length());
+		maxLenList.add(WHERE_CLAUSE.length());
+		maxLenList.add(DESCRIPTION.length());
+		
+		try {
+			whereClauseData = getWhereCaluseDetails(whereClauseID);
+			
+			if(whereClauseData != null && whereClauseData.resultSet != null) {
+				details				= new ArrayList<List<String>>();
+				whereClauseDetails 	= whereClauseData.resultSet;
+				whereMD 		 	= whereClauseDetails.getMetaData();
+				numOfColumns 		= whereMD.getColumnCount();
+				
+				while (whereClauseDetails.next()) {
+					List<String> row = new ArrayList<String>();
+					
+					for (int i = 1; i <= numOfColumns; i++) {
+						String columnName = whereMD.getColumnName(i);
+						String value 	  = whereClauseDetails.getString(columnName);
+						int    valuelen   = value.length();
+						
+						if("where_clause_exp".equalsIgnoreCase(columnName)) {
+							return value;
+						}
+						
+						row.add(value);
+						maxLenList.set(i-1, maxLenList.get(i-1) > valuelen ? maxLenList.get(i-1) : valuelen);
+					}
+					
+					details.add(row);
+				}
+				
+				if(details.size() > 0) {
+					Iterator rowIterator = details.iterator();
+					
+					int totalMaxLen = maxLenList.get(0) + maxLenList.get(1) + maxLenList.get(2) + 12;
+					
+					whereClauseDetailsStr.append('\n');
+					
+					whereClauseDetailsStr.append(String.format("%1$-" + totalMaxLen     		 + "s", "").replace(' ', '-')).append('\n');
+					whereClauseDetailsStr.append(String.format("%1$-" + (maxLenList.get(0) 	+ 4) + "s", ID));
+					whereClauseDetailsStr.append(String.format("%1$-" + (maxLenList.get(1) 	+ 4) + "s", WHERE_CLAUSE));
+					whereClauseDetailsStr.append(String.format("%1$-" + (maxLenList.get(2) 	+ 4) + "s", DESCRIPTION)).append('\n');
+					whereClauseDetailsStr.append(String.format("%1$-" + totalMaxLen     		 + "s", "").replace(' ', '-')).append('\n');
+					
+					while(rowIterator.hasNext()) {
+						Iterator colIterator = ((List)rowIterator.next()).iterator();
+						int j = 0;
+						
+						while(colIterator.hasNext()) {
+							String value = ' ' + (String)colIterator.next();
+							whereClauseDetailsStr.append(String.format("%1$-" + (maxLenList.get(j) + 4) + "s", value));
+							j++;
+						}
+						
+						whereClauseDetailsStr.append('\n');
+					}
+					
+					whereClauseDetailsStr.append(String.format("%1$-" + totalMaxLen + "s", "").replace(' ', '-')).append('\n');
+					maxLenList.clear();
+					
+					return whereClauseDetailsStr.toString();
+				} else {
+					return "No records found";
+				}
+				
+			} else {
+				return "Error: something went wrong, error getting WHERE clause details";
+			}
+		} catch(Exception displayWhereClauseDetailsException) {
+			logException(displayWhereClauseDetailsException, "displayWhereClauseDetails");
+			return displayWhereClauseDetailsException.getMessage();
+		} finally {
+			if(whereClauseData != null) {
+				closeOracle("displayWhereClauseDetails", whereClauseData.cstmt, whereClauseData.conn, whereClauseData.resultSet);
+			}
+		}
+	}
+	
+	private class QuerryConnectionDetails {
+		Connection        conn      = null;
+		CallableStatement cstmt     = null;
+		ResultSet         resultSet = null;
+	}
+	
+	public String toString() { 
+        return super.toString().replace("ShapefileUtility:", "SDE2SHP:");
+    }
 }
