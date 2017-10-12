@@ -1,11 +1,11 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/lb/install/lb_install.sql-arc   1.15   Aug 11 2017 15:42:32   Rob.Coupe  $
+--       sccsid           : $Header:   //new_vm_latest/archives/lb/install/lb_install.sql-arc   1.16   Oct 12 2017 10:50:58   Rob.Coupe  $
 --       Module Name      : $Workfile:   lb_install.sql  $
---       Date into PVCS   : $Date:   Aug 11 2017 15:42:32  $
---       Date fetched Out : $Modtime:   Aug 11 2017 15:30:28  $
---       PVCS Version     : $Revision:   1.15  $
+--       Date into PVCS   : $Date:   Oct 12 2017 10:50:58  $
+--       Date fetched Out : $Modtime:   Oct 12 2017 10:50:04  $
+--       PVCS Version     : $Revision:   1.16  $
 --
 --------------------------------------------------------------------------------
 --   Copyright (c) 2017 Bentley Systems Incorporated. All rights reserved.
@@ -94,14 +94,14 @@ BEGIN
    AND nth_base_table_theme IS NULL;
    
    IF l_count <> 0 THEN
-      RAISE exor_core_not_configured.
+      RAISE exor_core_not_configured;
    END IF;
  
 EXCEPTION
   WHEN ex_already_installed THEN
     RAISE_APPLICATION_ERROR(-20001,'LB version '||l_version||' already installed.');
   WHEN exor_core_not_configured THEN 
-    RAISE_APPLICATION_ERROR( -20002, 'LB install has a pre-requisite on network and linear types and theme, please configure this in Exor core';
+    RAISE_APPLICATION_ERROR( -20002, 'LB install has a pre-requisite on network and linear types and theme, please configure this in Exor core');
  WHEN others THEN
     Null;
 END;
