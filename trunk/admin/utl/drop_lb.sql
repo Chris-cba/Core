@@ -4,11 +4,11 @@
 --
 --   PVCS Identifiers :-
 --
---       pvcsid                 : $Header:   //new_vm_latest/archives/lb/admin/utl/drop_lb.sql-arc   1.17   Aug 03 2017 12:34:34   Rob.Coupe  $
+--       pvcsid                 : $Header:   //new_vm_latest/archives/lb/admin/utl/drop_lb.sql-arc   1.18   Oct 12 2017 10:21:54   Rob.Coupe  $
 --       Module Name      : $Workfile:   drop_lb.sql  $
---       Date into PVCS   : $Date:   Aug 03 2017 12:34:34  $
---       Date fetched Out : $Modtime:   Aug 03 2017 12:33:44  $
---       PVCS Version     : $Revision:   1.17  $
+--       Date into PVCS   : $Date:   Oct 12 2017 10:21:54  $
+--       Date fetched Out : $Modtime:   Oct 12 2017 10:10:04  $
+--       PVCS Version     : $Revision:   1.18  $
 --
 --   Author : Rob Coupe
 --
@@ -18,6 +18,19 @@
 --   Copyright (c) 2014 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
+
+DECLARE
+l_restricted varchar2(20);
+begin
+   select sys_context('NM3CORE', 'UNRESTRICTED_INVENTORY') into l_restricted from dual;
+   if l_restricted != 'TRUE' or l_restricted is NULL then
+      raise_application_error( -20001, 'The script must be executed from an unrestricted session/account' );
+   end if;
+exception
+   when no_data_found then
+      raise_application_error( -20002, 'There is a problem in the configuration of context variables, this script must be executed from an unrestricted session/account' );
+end;
+
 
 PROMPT Dropping object dependency list
 
@@ -161,6 +174,9 @@ END;
 /
 
 PROMPT Clean up any residual metadata (asset types etc. ) if present
+
+DELETE FROM NM_INV_TYPE_ROLES
+where itr_inv_type in ( select nit_inv_type from nm_inv_types_all where nit_category = 'L' );
 
 DELETE FROM hig_roles
       WHERE hro_product = 'LB';
