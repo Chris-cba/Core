@@ -3,11 +3,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/typ/nm3typ.sql-arc   2.11   Jan 16 2015 10:22:54   Mike.Huitson  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/typ/nm3typ.sql-arc   2.12   Oct 12 2017 10:16:04   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm3typ.sql  $
---       Date into PVCS   : $Date:   Jan 16 2015 10:22:54  $
---       Date fetched Out : $Modtime:   Jan 16 2015 10:22:18  $
---       Version          : $Revision:   2.11  $
+--       Date into PVCS   : $Date:   Oct 12 2017 10:16:04  $
+--       Date fetched Out : $Modtime:   Oct 12 2017 10:15:32  $
+--       Version          : $Revision:   2.12  $
 --
 --   Product upgrade script
 --
@@ -2084,6 +2084,32 @@ set define on
 set feedback off
 select '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'typ'||
         '&terminator'||'nm_msv_style_size.tyh' run_file
+from dual
+/
+start '&&run_file'
+--
+--------------------------------------------------------------------------------------------
+--
+set term on
+prompt sde_varchar_2d_array.tyh header
+set term off
+set define on
+set feedback off
+select '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'typ'||
+        '&terminator'||'sde_varchar_2d_array.tyh' run_file
+from dual
+/
+start '&&run_file'
+--
+--------------------------------------------------------------------------------------------
+--
+set term on
+prompt sde_varchar_array.tyh header
+set term off
+set define on
+set feedback off
+select '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'typ'||
+        '&terminator'||'sde_varchar_array.tyh' run_file
 from dual
 /
 start '&&run_file'
