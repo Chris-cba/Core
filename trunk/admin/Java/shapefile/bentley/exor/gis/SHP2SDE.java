@@ -1,11 +1,11 @@
 /**
  *    PVCS Identifiers :-
  *
- *       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/Java/shapefile/bentley/exor/gis/SHP2SDE.java-arc   1.3   Oct 17 2017 14:30:32   Upendra.Hukeri  $
+ *       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/Java/shapefile/bentley/exor/gis/SHP2SDE.java-arc   1.4   Oct 17 2017 15:14:06   Upendra.Hukeri  $
  *       Module Name      : $Workfile:   SHP2SDE.java  $
- *       Date into SCCS   : $Date:   Oct 17 2017 14:30:32  $
- *       Date fetched Out : $Modtime:   Oct 17 2017 14:27:04  $
- *       SCCS Version     : $Revision:   1.3  $
+ *       Date into SCCS   : $Date:   Oct 17 2017 15:14:06  $
+ *       Date fetched Out : $Modtime:   Oct 17 2017 14:57:48  $
+ *       SCCS Version     : $Revision:   1.4  $
  *       Based on 
  *
  *
@@ -117,7 +117,7 @@ public class SHP2SDE extends ShapefileUtility {
 	protected String getHelpMessage() {
 		StringBuilder helpMsg  = new StringBuilder();
 		
-		helpMsg.append("\nUSAGE: java -cp sdeutil.jar -shp2sde -help -nc -h db_host -p db_port -s db_sid -u db_username -d db_password -t db_table -f shapefile_name -i table_id_column_name -r srid -g db_geometry_column -x max_x,min_x -y max_y,min_y -m tolerance -o {append|create|init} -n start_id -c commit_interval -a column_name_mapping_file");
+		helpMsg.append("\nUSAGE: java -jar sdeutil.jar -shp2sde -help -nc -h db_host -p db_port -s db_sid -u db_username -d db_password -t db_table -f shapefile_name -i table_id_column_name -r srid -g db_geometry_column -x max_x,min_x -y max_y,min_y -m tolerance -o {append|create|init} -n start_id -c commit_interval -a column_name_mapping_file");
 		helpMsg.append("\n\tUsage explanation (parameters used):");
 		helpMsg.append("\n\t[-help]: Specify this option to see the command line usage of Shapefile Uploader");
 		helpMsg.append("\n\t(-nc)  : Specify this option, if the jar is loaded in database and called from a PL/SQL procedure or function");
