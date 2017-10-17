@@ -1,11 +1,11 @@
 /**
  *    PVCS Identifiers :-
  *
- *       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/Java/shapefile/bentley/exor/gis/SDE2SHP.java-arc   1.4   Oct 17 2017 14:30:24   Upendra.Hukeri  $
+ *       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/Java/shapefile/bentley/exor/gis/SDE2SHP.java-arc   1.5   Oct 17 2017 15:14:12   Upendra.Hukeri  $
  *       Module Name      : $Workfile:   SDE2SHP.java  $
- *       Date into SCCS   : $Date:   Oct 17 2017 14:30:24  $
- *       Date fetched Out : $Modtime:   Oct 17 2017 14:27:36  $
- *       SCCS Version     : $Revision:   1.4  $
+ *       Date into SCCS   : $Date:   Oct 17 2017 15:14:12  $
+ *       Date fetched Out : $Modtime:   Oct 17 2017 14:57:12  $
+ *       SCCS Version     : $Revision:   1.5  $
  *       Based on 
  *
  *
@@ -96,7 +96,7 @@ public class SDE2SHP extends ShapefileUtility {
 	protected String getHelpMessage() {
 		StringBuilder helpMsg  = new StringBuilder();
 		
-		helpMsg.append("\nUSAGE: java -cp sdeutil.jar -sde2shp -help -nc -h db_host -p db_port -s db_sid -u db_username -d db_password -t db_tablename,column_name -w where_clause_id [where_clause_parameters] -f shapefile_name -a column_name_mapping_file -whelp where_clause_id");
+		helpMsg.append("\nUSAGE: java -jar sdeutil.jar -sde2shp -help -nc -h db_host -p db_port -s db_sid -u db_username -d db_password -t db_tablename,column_name -w where_clause_id [where_clause_parameters] -f shapefile_name -a column_name_mapping_file -whelp where_clause_id");
 		helpMsg.append("\n\tUsage explaination (parameters used):");
 		helpMsg.append("\n\t[-help] : Specify this option to see the command line usage of Shapefile Extractor");
 		helpMsg.append("\n\t(-nc)   : Specify this option, if the jar is loaded in database and called from a PL/SQL procedure or function");
