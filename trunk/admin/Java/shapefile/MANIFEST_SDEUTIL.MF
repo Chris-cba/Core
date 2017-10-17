@@ -11,4 +11,4 @@ Specification-Version: 1.0
 Implementation-Title: bentley.exor.gis
 Implementation-Version: 4.7.0.1
 Implementation-Vendor: Bentley Systems, Inc.
-
+Main-Class: bentley.exor.gis.ShapefileUtility
