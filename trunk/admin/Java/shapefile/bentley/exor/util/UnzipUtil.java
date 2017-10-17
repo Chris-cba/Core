@@ -1,11 +1,11 @@
 /**
  *    PVCS Identifiers :-
  *
- *       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/Java/shapefile/bentley/exor/util/UnzipUtil.java-arc   1.0   Oct 13 2017 10:14:56   Upendra.Hukeri  $
+ *       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/Java/shapefile/bentley/exor/util/UnzipUtil.java-arc   1.1   Oct 17 2017 14:30:46   Upendra.Hukeri  $
  *       Module Name      : $Workfile:   UnzipUtil.java  $
- *       Date into SCCS   : $Date:   Oct 13 2017 10:14:56  $
- *       Date fetched Out : $Modtime:   Oct 13 2017 10:13:16  $
- *       SCCS Version     : $Revision:   1.0  $
+ *       Date into SCCS   : $Date:   Oct 17 2017 14:30:46  $
+ *       Date fetched Out : $Modtime:   Oct 17 2017 14:11:52  $
+ *       SCCS Version     : $Revision:   1.1  $
  *       Based on 
  *
  *
@@ -67,18 +67,18 @@ public class UnzipUtil {
 			while (entry != null) {
 				String entryFilePath = destDirectoryStr + entry.getName();
 				
-				if(entry.isDirectory()) {
-					File entryFile = new File(entryFilePath);
-					
-					if(!entryFile.exists()) {
+				File entryFile = new File(entryFilePath);
+				
+				if(!entryFile.exists()) {
+					if(entry.isDirectory()) {
 						boolean created = entryFile.mkdir();
 						
 						if(!created) {
 							return "failed to create destination directory for extracting the zip - " + entryFilePath;
 						}
+					} else {
+						extractFile(zipInputStream, entryFilePath);
 					}
-				} else {
-					extractFile(zipInputStream, entryFilePath);
 				}
 				
 				zipInputStream.closeEntry();
