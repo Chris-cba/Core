@@ -1,11 +1,11 @@
 /**
  *    PVCS Identifiers :-
  *
- *       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/Java/shapefile/bentley/exor/gis/ShapefileUtility.java-arc   1.1   Oct 17 2017 14:30:16   Upendra.Hukeri  $
+ *       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/Java/shapefile/bentley/exor/gis/ShapefileUtility.java-arc   1.2   Oct 17 2017 15:50:42   Upendra.Hukeri  $
  *       Module Name      : $Workfile:   ShapefileUtility.java  $
- *       Date into SCCS   : $Date:   Oct 17 2017 14:30:16  $
- *       Date fetched Out : $Modtime:   Oct 17 2017 14:26:16  $
- *       SCCS Version     : $Revision:   1.1  $
+ *       Date into SCCS   : $Date:   Oct 17 2017 15:50:42  $
+ *       Date fetched Out : $Modtime:   Oct 17 2017 15:49:10  $
+ *       SCCS Version     : $Revision:   1.2  $
  *       Based on 
  *
  *
@@ -91,6 +91,9 @@ public class ShapefileUtility {
 	private	String			systemLogFileName  = null;
 	
 	private	boolean			exitSystem  		= false;
+	
+	private static String	usage 				= "\nUsage: java -jar sdeutil.jar -help OR -setup OR -sde2shp [parameters for sde2shp] OR -shp2sde [parameters for shp2sde]";
+	private static String 	errorMessage 		= "printThisWrong parameters passed!" + usage;
 	
 	private static ShapefileUtility shpUtil 	= null;
 	
@@ -345,8 +348,11 @@ public class ShapefileUtility {
 				
 				System.setProperty("EPSG-HSQL.directory", epsgDbDir);
 			} catch(Throwable epsgDbDirExp) {
-				logException(epsgDbDirExp, "setBasicDirectories");
-				return epsgDbDirExp.getMessage();
+				StringWriter errors = new StringWriter();
+				errors.append("setBasicDirectories() : Exception caught...\n");
+				epsgDbDirExp.printStackTrace(new PrintWriter(errors));
+				
+				return errors.toString();
 			}
 		} else if("N".equals(result)) {
 			return "error creating epsg database directory";
@@ -561,21 +567,22 @@ public class ShapefileUtility {
     }
 	
 	private static String doSDE(String[] nuh) {
-		String usage 		= "\nUsage: java -cp sdeutil.jar -setup OR -sde2shp [parameters for sde2shp] OR -shp2sde [parameters for shp2sde]";
-		String errorMessage = "Wrong parameters passed!" + usage;
-		
 		if(nuh != null) {
 			int paramLength = nuh.length;
 			
 			if(paramLength >= 1) {
 				if(nuh.length == 1) {
 					if("-help".equals(nuh[0])) {
-						return usage;
+						return "printThis" + usage;
 					} else if("-setup".equals(nuh[0])) {
 						shpUtil = new ShapefileUtility();
-						shpUtil.setBasicDirectories("setup");
+						String result = shpUtil.setBasicDirectories("setup");
 						
-						return "success";
+						if("Y".equals(result)) {
+							return "printThissuccess";
+						} else {
+							return "printThis" + result;
+						}
 					}
 				} else if(nuh.length >= 2) {
 					if("-sde2shp".equals(nuh[0])) {
@@ -592,13 +599,13 @@ public class ShapefileUtility {
 		}
 		
 		if(shpUtil != null && (shpUtil instanceof SDE2SHP || shpUtil instanceof SHP2SDE)) {	
-			errorMessage = shpUtil.getErrorMsg();
+			String errorStr = shpUtil.getErrorMsg();
 			
-			if(errorMessage != null) {
+			if(errorStr != null) {
 				String systemLogFileName = shpUtil.getSystemLogFileName();
-				errorMessage = (systemLogFileName == null ? "" : systemLogFileName) + '\n' + errorMessage;
+				errorStr = (systemLogFileName == null ? "" : systemLogFileName) + '\n' + errorStr;
 				
-				return errorMessage;
+				return errorStr;
 			} else {
 				return "success" + '\n' + shpUtil.getSystemLogFileName();
 			}
@@ -609,6 +616,10 @@ public class ShapefileUtility {
 	
 	public static void main(String[] nuh) {
 		String result = ShapefileUtility.doSDE(nuh);
+		
+		if(result.startsWith("printThis")) {
+			System.out.println(result.substring(result.indexOf("printThis") +  "printThis".length()));
+		}
 	}
 	
 	public static String callFromDB(java.sql.Array array) {
@@ -628,6 +639,10 @@ public class ShapefileUtility {
 		
 		String result = ShapefileUtility.doSDE(nuh);
 		
+		if(result.startsWith("printThis")) {
+			result = result.substring(result.indexOf("printThis") + "printThis".length());
+		}
+		
 		if(result.length() > 32767) {
 			return result.substring(0, 32767);
 		}
@@ -635,8 +650,4 @@ public class ShapefileUtility {
 		return result;
 	}
 }
-
-
-
-
 
