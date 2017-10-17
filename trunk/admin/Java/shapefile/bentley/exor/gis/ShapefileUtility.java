@@ -1,11 +1,11 @@
 /**
  *    PVCS Identifiers :-
  *
- *       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/Java/shapefile/bentley/exor/gis/ShapefileUtility.java-arc   1.0   Oct 13 2017 10:15:26   Upendra.Hukeri  $
+ *       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/Java/shapefile/bentley/exor/gis/ShapefileUtility.java-arc   1.1   Oct 17 2017 14:30:16   Upendra.Hukeri  $
  *       Module Name      : $Workfile:   ShapefileUtility.java  $
- *       Date into SCCS   : $Date:   Oct 13 2017 10:15:26  $
- *       Date fetched Out : $Modtime:   Oct 13 2017 10:14:14  $
- *       SCCS Version     : $Revision:   1.0  $
+ *       Date into SCCS   : $Date:   Oct 17 2017 14:30:16  $
+ *       Date fetched Out : $Modtime:   Oct 17 2017 14:26:16  $
+ *       SCCS Version     : $Revision:   1.1  $
  *       Based on 
  *
  *
@@ -50,6 +50,7 @@ import java.sql.Statement;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -63,33 +64,35 @@ import java.util.regex.Pattern;
  */
 
 public class ShapefileUtility {
-	private	boolean 		useNestedConn 	  	= false;
-	private	String 			host 			  	= null;
+	private	boolean			useNestedConn 	  	= false;
+	private	String			host 			  	= null;
 	private	int				port			  	= 0;
-	private	String 			userName		  	= null;
-	private	String 			password			= null;
-	private	String 			sid				 	= null;
-	private	String 			viewName			= null; 
-	private	String  		geomColName			= null;
-	private	String  		shpFileName			= null;
+	private	String			userName		  	= null;
+	private	String			password			= null;
+	private	String			sid					= null;
+	private	String			viewName			= null; 
+	private	String			geomColName			= null;
+	private	String			shpFileName			= null;
 	private	String			colMapFileName		= null;
 	private	boolean			useColumnMapping	= false;
 	
 	private	String[][] 		columnMapArray		= null;
 	private Map<String, String> columnMap		= new HashMap<String, String>();
 	
-	private	BufferedWriter  logger				= null;
-	private	String 		    errorMsg			= null;
+	private	BufferedWriter 	logger				= null;
+	private	String			errorMsg			= null;
 	
-	private	String 			extractDir   		= null;
-	private	String 			uploadDir   		= null;
-	private	String 			colMapDir    		= null;
-	private	String 			systemLogDir		= null;
-	private	String 			epsgDbDir			= null;
+	private	String			extractDir   		= null;
+	private	String			uploadDir   		= null;
+	private	String			colMapDir    		= null;
+	private	String			systemLogDir		= null;
+	private	String			epsgDbDir			= null;
 	
-	private	String 			systemLogFileName  	= null;
+	private	String			systemLogFileName  = null;
 	
-	private	boolean 		exitSystem  		= false;
+	private	boolean			exitSystem  		= false;
+	
+	private static ShapefileUtility shpUtil 	= null;
 	
 	static final String[] validExtractKeysArray = {"-help", "-nc", "-h", "-p", "-s", "-u", "-d", "-t", "-w", "-f", "-a", "-whelp"};
 	static final String[] validUploadKeysArray  = {"-help", "-nc", "-h", "-p", "-s", "-u", "-d", "-t", "-f", "-i", "-r", "-g", "-x", "-y", "-m", "-o", "-n", "-c", "-a"};
@@ -231,8 +234,8 @@ public class ShapefileUtility {
 	}
 	
 	protected String setBasicDirectories(String operation) {
-		String jarDir		= null;
-				
+		String jarDir = null;
+		
 		//1. SETTING BASIC DIRECTORY PATHS
 		try {
 			jarDir = System.getenv("SDE_UTIL_PATH");
@@ -266,24 +269,26 @@ public class ShapefileUtility {
 		String result = createDir(systemLogDir);
 		
 		if("Y".equals(result)) {
-			try {
-				DateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
-				Calendar cal = Calendar.getInstance();
-				String timeExtension = dateFormat.format(cal.getTime());
-				
-				if("SDE2SHP".equalsIgnoreCase(operation)) {
-					systemLogFileName = "sde2shp_" + timeExtension + ".log";
-				} else if("SHP2SDE".equalsIgnoreCase(operation)) {
-					systemLogFileName = "shp2sde_" + timeExtension + ".log";
+			if("SDE2SHP".equalsIgnoreCase(operation) || "SHP2SDE".equalsIgnoreCase(operation)) {
+				try {
+					DateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+					Calendar cal = Calendar.getInstance();
+					String timeExtension = dateFormat.format(cal.getTime());
+					
+					if("SDE2SHP".equalsIgnoreCase(operation)) {
+						systemLogFileName = "sde2shp_" + timeExtension + ".log";
+					} else if("SHP2SDE".equalsIgnoreCase(operation)) {
+						systemLogFileName = "shp2sde_" + timeExtension + ".log";
+					}
+					
+					File systemLogFile = new File(systemLogDir + systemLogFileName);
+					
+					setLogger(new BufferedWriter(new OutputStreamWriter(new FileOutputStream(systemLogFile), StandardCharsets.UTF_8)));
+					
+					System.out.println(systemLogFile.toString());
+				} catch(IOException ie) {
+					return ie.getMessage();
 				}
-				
-				File systemLogFile = new File(systemLogDir + systemLogFileName);
-				
-				setLogger(new BufferedWriter(new OutputStreamWriter(new FileOutputStream(systemLogFile), StandardCharsets.UTF_8)));
-				
-				System.out.println(systemLogFile.toString());
-			} catch(IOException ie) {
-				return ie.getMessage();
 			}
 		} else if("N".equals(result)) {
 			return "error creating system log directory";
@@ -328,9 +333,10 @@ public class ShapefileUtility {
 		//6. SETTING EPSG DATABASE DIRECTORY
 		result = createDir(epsgDbDir);
 		
-		if("Y".equals(result)) {
+		if("Y".equals(result)) {			
 			try {
 				InputStream zipfileInputStream = getClass().getResourceAsStream("/resources/EPSG.zip");
+				
 				result = UnzipUtil.unzip(zipfileInputStream, jarDir);
 				
 				if(!"success".equals(result)) {
@@ -338,7 +344,8 @@ public class ShapefileUtility {
 				}
 				
 				System.setProperty("EPSG-HSQL.directory", epsgDbDir);
-			} catch (Throwable epsgDbDirExp) {
+			} catch(Throwable epsgDbDirExp) {
+				logException(epsgDbDirExp, "setBasicDirectories");
 				return epsgDbDirExp.getMessage();
 			}
 		} else if("N".equals(result)) {
@@ -408,7 +415,7 @@ public class ShapefileUtility {
 					writeLog(getErrorMsg(), false);
 					setExitSystem(true);
 					
-					colMapFile = null; 
+					colMapFile = null;
 				}
 		}
 		
@@ -552,4 +559,84 @@ public class ShapefileUtility {
 	public String toString() { 
         return "ShapefileUtility: " + userName + '@' + sid + " on " + viewName + " to " + shpFileName;
     }
+	
+	private static String doSDE(String[] nuh) {
+		String usage 		= "\nUsage: java -cp sdeutil.jar -setup OR -sde2shp [parameters for sde2shp] OR -shp2sde [parameters for shp2sde]";
+		String errorMessage = "Wrong parameters passed!" + usage;
+		
+		if(nuh != null) {
+			int paramLength = nuh.length;
+			
+			if(paramLength >= 1) {
+				if(nuh.length == 1) {
+					if("-help".equals(nuh[0])) {
+						return usage;
+					} else if("-setup".equals(nuh[0])) {
+						shpUtil = new ShapefileUtility();
+						shpUtil.setBasicDirectories("setup");
+						
+						return "success";
+					}
+				} else if(nuh.length >= 2) {
+					if("-sde2shp".equals(nuh[0])) {
+						SDE2SHP sde2shp = new SDE2SHP();
+						sde2shp.doExtract(Arrays.copyOfRange(nuh, 1, nuh.length), sde2shp);
+						shpUtil = sde2shp;
+					} else if("-shp2sde".equals(nuh[0])) {
+						SHP2SDE shp2sde = new SHP2SDE();
+						shp2sde.doUpload(Arrays.copyOfRange(nuh, 1, nuh.length), shp2sde);
+						shpUtil = shp2sde;
+					}
+				}
+			}
+		}
+		
+		if(shpUtil != null && (shpUtil instanceof SDE2SHP || shpUtil instanceof SHP2SDE)) {	
+			errorMessage = shpUtil.getErrorMsg();
+			
+			if(errorMessage != null) {
+				String systemLogFileName = shpUtil.getSystemLogFileName();
+				errorMessage = (systemLogFileName == null ? "" : systemLogFileName) + '\n' + errorMessage;
+				
+				return errorMessage;
+			} else {
+				return "success" + '\n' + shpUtil.getSystemLogFileName();
+			}
+		}
+		
+		return errorMessage;
+	}
+	
+	public static void main(String[] nuh) {
+		String result = ShapefileUtility.doSDE(nuh);
+	}
+	
+	public static String callFromDB(java.sql.Array array) {
+		String[] nuh = null;
+		
+		try {
+			Object params = array.getArray();
+			int arrayLength = java.lang.reflect.Array.getLength(params);
+			nuh = new String[arrayLength];
+			
+			for (int i=0; i<arrayLength; i++) {
+				nuh[i] = String.valueOf(java.lang.reflect.Array.get(params, i));
+			}
+		} catch(SQLException createShapeFileDBException) {
+			return createShapeFileDBException.getMessage();
+		}
+		
+		String result = ShapefileUtility.doSDE(nuh);
+		
+		if(result.length() > 32767) {
+			return result.substring(0, 32767);
+		}
+		
+		return result;
+	}
 }
+
+
+
+
+
