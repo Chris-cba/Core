@@ -1,11 +1,11 @@
 /**
  *    PVCS Identifiers :-
  *
- *       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/Java/shapefile/bentley/exor/gis/SDE2SHP.java-arc   1.3   Oct 09 2017 10:07:40   Upendra.Hukeri  $
+ *       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/Java/shapefile/bentley/exor/gis/SDE2SHP.java-arc   1.4   Oct 17 2017 14:30:24   Upendra.Hukeri  $
  *       Module Name      : $Workfile:   SDE2SHP.java  $
- *       Date into SCCS   : $Date:   Oct 09 2017 10:07:40  $
- *       Date fetched Out : $Modtime:   Oct 09 2017 08:20:10  $
- *       SCCS Version     : $Revision:   1.3  $
+ *       Date into SCCS   : $Date:   Oct 17 2017 14:30:24  $
+ *       Date fetched Out : $Modtime:   Oct 17 2017 14:27:36  $
+ *       SCCS Version     : $Revision:   1.4  $
  *       Based on 
  *
  *
@@ -96,9 +96,9 @@ public class SDE2SHP extends ShapefileUtility {
 	protected String getHelpMessage() {
 		StringBuilder helpMsg  = new StringBuilder();
 		
-		helpMsg.append("\nUSAGE: java -cp sdeutil.jar bentley.exor.gis.SDE2SHP -help -nc -h db_host -p db_port -s db_sid -u db_username -d db_password -t db_tablename,column_name -w where_clause_id [where_clause_parameters] -f shapefile_name -a column_name_mapping_file -whelp where_clause_id");
+		helpMsg.append("\nUSAGE: java -cp sdeutil.jar -sde2shp -help -nc -h db_host -p db_port -s db_sid -u db_username -d db_password -t db_tablename,column_name -w where_clause_id [where_clause_parameters] -f shapefile_name -a column_name_mapping_file -whelp where_clause_id");
 		helpMsg.append("\n\tUsage explaination (parameters used):");
-		helpMsg.append("\n\t[-help] : Specify this option to see the command line usage of Shapefile Extractor (for command line use only)");
+		helpMsg.append("\n\t[-help] : Specify this option to see the command line usage of Shapefile Extractor");
 		helpMsg.append("\n\t(-nc)   : Specify this option, if the jar is loaded in database and called from a PL/SQL procedure or function");
 		helpMsg.append("\n\t          (no values for this parameter)");
 		helpMsg.append("\n\t(-h)    : Host machine with existing Oracle database");
@@ -111,7 +111,7 @@ public class SDE2SHP extends ShapefileUtility {
 		helpMsg.append("\n\t          (in case parameter value contains space itself enclose the value in double quotes)");
 		helpMsg.append("\n\t(-f)    : File name of an output Shapefile WITHOUT EXTENSION");
 		helpMsg.append("\n\t[-a]    : File name containing column-name(attribute) mappings WITH EXTENSION");
-		helpMsg.append("\n\t(-whelp): WHERE Clause ID for which details are required (for command line use only)");
+		helpMsg.append("\n\t(-whelp): WHERE Clause ID for which details are required");
 		helpMsg.append("\n\t          (use ID 'all' for details of all available WHERE clauses)");
 		helpMsg.append("\n\n\tNOTE: \t() indicate MANDATORY ALTERNATE field e.g. either (-nc) or (-h -p -s -u -d) AND  either (-whelp) or (-t -f)");
 		helpMsg.append("\n\t\t[] indicate OPTIONAL field");
@@ -395,43 +395,6 @@ public class SDE2SHP extends ShapefileUtility {
 		}
 	}
 	
-	public static String createShapeFileDB(java.sql.Array array) {
-		String[] nuh = null;
-		
-		try {
-			Object params = array.getArray();
-			int arrayLength = java.lang.reflect.Array.getLength(params);
-			nuh = new String[arrayLength];
-			
-			for (int i=0; i<arrayLength; i++) {
-				nuh[i] = String.valueOf(java.lang.reflect.Array.get(params, i));
-			}
-		} catch(SQLException createShapeFileDBException) {
-			return createShapeFileDBException.getMessage();
-		}
-		
-		SDE2SHP sde2shp = new SDE2SHP();
-		sde2shp.doExtract(nuh, sde2shp);
-		String errorMessage = sde2shp.getErrorMsg();
-		
-		if(errorMessage != null) {
-			errorMessage = sde2shp.getSystemLogFileName() + '\n' + errorMessage;
-			
-			if(errorMessage.length() > 32767) {
-				return errorMessage.substring(0, 32767);
-			} 
-			
-			return errorMessage;
-		} else {
-			return "success" + '\n' + sde2shp.getSystemLogFileName();
-		}
-	}
-	
-	public static void main(String[] nuh) {
-		SDE2SHP sde2shp = new SDE2SHP();
-		sde2shp.doExtract(nuh, sde2shp);
-	}
-	
 	protected void doExtract(String[] nuh, SDE2SHP sde2shp) {
 		try {
 			if(nuh != null && nuh.length >= 1) {
@@ -440,55 +403,56 @@ public class SDE2SHP extends ShapefileUtility {
 				}
 				
 				if(Arrays.asList(nuh).contains("-help")) {
-					if(sde2shp.getUseNestedConn()) {
-						sde2shp.setErrorMsg("Error: -help is for command line usage only");
-					} else {
-						System.out.println(sde2shp.getHelpMessage());
-					}
+					String helpMsg = sde2shp.getHelpMessage();
+					
+					sde2shp.setErrorMsg(helpMsg);
+					System.out.println(helpMsg);
 				} else {
-					if(sde2shp.getUseNestedConn() && Arrays.asList(nuh).contains("-whelp")) {
-						sde2shp.setErrorMsg("Error: -whelp is for command line usage only");
-					} else {
-						String result = sde2shp.setBasicDirectories("sde2shp");
+					String result = sde2shp.setBasicDirectories("sde2shp");
+					
+					if("Y".equals(result)) {
+						sde2shp.init(nuh);
 						
-						if("Y".equals(result)) {
-							sde2shp.init(nuh);
-							
-							if(!sde2shp.getExitSystem()) {
-								if(sde2shp.needWhereHelp) {
-									System.out.println(sde2shp.displayWhereClauseDetails(sde2shp.whereClauseID));
-								} else {
-									sde2shp.setColumnMap();
+						if(!sde2shp.getExitSystem()) {
+							if(sde2shp.needWhereHelp) {
+								String whereClauseDetails = sde2shp.displayWhereClauseDetails(sde2shp.whereClauseID);
+								
+								sde2shp.setErrorMsg(whereClauseDetails);
+								System.out.println(whereClauseDetails);
+							} else {
+								sde2shp.setColumnMap();
+								
+								if(!sde2shp.getExitSystem()) {
+									int numOfRows = sde2shp.generateShapeFile();
 									
-									if(!sde2shp.getExitSystem()) {
-										int numOfRows = sde2shp.generateShapeFile();
+									if (numOfRows > 0) {
+										sde2shp.writeLog(String.valueOf(numOfRows) + " features added to shapefile");
+										sde2shp.writeLog("shapefile creation is complete: " + sde2shp.shapeFile.getName());
 										
-										if (numOfRows > 0) {
-											sde2shp.writeLog(String.valueOf(numOfRows) + " features added to shapefile");
-											sde2shp.writeLog("shapefile creation is complete: " + sde2shp.shapeFile.getName());
-											
-											System.out.println(ShapefileUtility.SHPSUCCESSMSG);
-										} else {
-											if(numOfRows == 0) {
-												sde2shp.writeLog("\nError: no records found...", false);
-											} else if(numOfRows == -1) {
-												sde2shp.writeLog(sde2shp.getErrorMsg(), false);
-											}
-											
-											sde2shp.writeLog(ShapefileUtility.SDE2SHPFAILUREMSG, false);
-										}
+										System.out.println(ShapefileUtility.SHPSUCCESSMSG);
 									} else {
-										writeLog(ShapefileUtility.SHP2SDEFAILUREMSG, false);
+										if(numOfRows == 0) {
+											sde2shp.writeLog("\nError: no records found...", false);
+										} else if(numOfRows == -1) {
+											sde2shp.writeLog(sde2shp.getErrorMsg(), false);
+										}
+										
+										sde2shp.writeLog(ShapefileUtility.SDE2SHPFAILUREMSG, false);
 									}
+								} else {
+									writeLog(ShapefileUtility.SHP2SDEFAILUREMSG, false);
 								}
 							}
-						} else {
-							sde2shp.setErrorMsg(result);
 						}
+					} else {
+						sde2shp.setErrorMsg(result);
 					}
 				}
 			} else {
-				System.out.println("\nError: Invalid argument/s passed..." + sde2shp.getHelpMessage());
+				String invalidArgErrM = "\nError: Invalid argument/s passed..." + sde2shp.getHelpMessage();
+				
+				sde2shp.setErrorMsg(invalidArgErrM);
+				System.out.println(invalidArgErrM);
 			}
 		} catch (Throwable doExtractException) {
 			sde2shp.logException(doExtractException, "doExtract");
