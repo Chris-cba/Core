@@ -1,11 +1,11 @@
 /**
  *    PVCS Identifiers :-
  *
- *       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/Java/shapefile/bentley/exor/gis/SHP2SDE.java-arc   1.2   Oct 09 2017 09:59:20   Upendra.Hukeri  $
+ *       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/Java/shapefile/bentley/exor/gis/SHP2SDE.java-arc   1.3   Oct 17 2017 14:30:32   Upendra.Hukeri  $
  *       Module Name      : $Workfile:   SHP2SDE.java  $
- *       Date into SCCS   : $Date:   Oct 09 2017 09:59:20  $
- *       Date fetched Out : $Modtime:   Oct 09 2017 08:20:08  $
- *       SCCS Version     : $Revision:   1.2  $
+ *       Date into SCCS   : $Date:   Oct 17 2017 14:30:32  $
+ *       Date fetched Out : $Modtime:   Oct 17 2017 14:27:04  $
+ *       SCCS Version     : $Revision:   1.3  $
  *       Based on 
  *
  *
@@ -117,9 +117,9 @@ public class SHP2SDE extends ShapefileUtility {
 	protected String getHelpMessage() {
 		StringBuilder helpMsg  = new StringBuilder();
 		
-		helpMsg.append("\nUSAGE: java -cp sdeutil.jar bentley.exor.gis.SHP2SDE -help -nc -h db_host -p db_port -s db_sid -u db_username -d db_password -t db_table -f shapefile_name -i table_id_column_name -r srid -g db_geometry_column -x max_x,min_x -y max_y,min_y -m tolerance -o {append|create|init} -n start_id -c commit_interval -a column_name_mapping_file");
+		helpMsg.append("\nUSAGE: java -cp sdeutil.jar -shp2sde -help -nc -h db_host -p db_port -s db_sid -u db_username -d db_password -t db_table -f shapefile_name -i table_id_column_name -r srid -g db_geometry_column -x max_x,min_x -y max_y,min_y -m tolerance -o {append|create|init} -n start_id -c commit_interval -a column_name_mapping_file");
 		helpMsg.append("\n\tUsage explanation (parameters used):");
-		helpMsg.append("\n\t[-help]: Specify this option to see the command line usage of Shapefile Uploader (for command line use only)");
+		helpMsg.append("\n\t[-help]: Specify this option to see the command line usage of Shapefile Uploader");
 		helpMsg.append("\n\t(-nc)  : Specify this option, if the jar is loaded in database and called from a PL/SQL procedure or function");
 		helpMsg.append("\n\t(-h)   : Host machine with existing Oracle database");
 		helpMsg.append("\n\t(-p)   : Host machine's port with existing Oracle database (e.g. 1521)");
@@ -426,43 +426,6 @@ public class SHP2SDE extends ShapefileUtility {
 		}
 	}
 	
-	public static String uploadShapeFileDB(java.sql.Array array) {
-		String[] nuh = null;
-		
-		try {
-			Object params = array.getArray();
-			int arrayLength = java.lang.reflect.Array.getLength(params);
-			nuh = new String[arrayLength];
-			
-			for (int i=0; i<arrayLength; i++) {
-				nuh[i] = String.valueOf(java.lang.reflect.Array.get(params, i));
-			}
-		} catch(SQLException createShapeFileDBException) {
-			return createShapeFileDBException.getMessage();
-		}
-		
-		SHP2SDE shp2sde = new SHP2SDE();
-		shp2sde.doUpload(nuh, shp2sde);
-		String errorMessage = shp2sde.getErrorMsg();
-		
-		if(errorMessage != null) {
-			errorMessage = shp2sde.getSystemLogFileName() + '\n' + errorMessage;
-			
-			if(errorMessage.length() > 32767) {
-				return errorMessage.substring(0, 32767);
-			} 
-			
-			return errorMessage;
-		} else {
-			return "success" + '\n' + shp2sde.getSystemLogFileName();
-		}
-	}
-	
-	public static void main(String nuh[]) {
-		SHP2SDE shp2sde = new SHP2SDE();
-		shp2sde.doUpload(nuh, shp2sde);
-	}
-	
 	protected void doUpload(String[] nuh, SHP2SDE shp2sde) {
 		try {
 			if(nuh != null && nuh.length >= 1) {
@@ -471,11 +434,10 @@ public class SHP2SDE extends ShapefileUtility {
 				}
 				
 				if(Arrays.asList(nuh).contains("-help")) {
-					if(shp2sde.getUseNestedConn()) {
-						shp2sde.setErrorMsg("Error: -help is for command line usage only");
-					} else {
-						System.out.println(shp2sde.getHelpMessage());
-					}
+					String helpMsg = shp2sde.getHelpMessage();
+					
+					shp2sde.setErrorMsg(helpMsg);
+					System.out.println(helpMsg);
 				} else {
 					String result = shp2sde.setBasicDirectories("shp2sde");
 					
@@ -515,8 +477,11 @@ public class SHP2SDE extends ShapefileUtility {
 					}
 				}
 			} else {
-				System.out.println("\nError: Invalid argument/s passed..." + shp2sde.getHelpMessage());
-			} 
+				String invalidArgErrM = "\nError: Invalid argument/s passed..." + shp2sde.getHelpMessage();
+				
+				shp2sde.setErrorMsg(invalidArgErrM);
+				System.out.println(invalidArgErrM);
+			}
 		} catch (Throwable doUploadException) {
 			shp2sde.logException(doUploadException, "doUpload");
 			shp2sde.writeLog(ShapefileUtility.SHP2SDEFAILUREMSG, false);
