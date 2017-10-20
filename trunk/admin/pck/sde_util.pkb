@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY sde_util AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sde_util.pkb-arc   1.0   Oct 12 2017 09:30:08   Chris.Baugh  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sde_util.pkb-arc   1.1   Oct 20 2017 14:13:16   Upendra.Hukeri  $
 --       Module Name      : $Workfile:   sde_util.pkb  $
---       Date into PVCS   : $Date:   Oct 12 2017 09:30:08  $
---       Date fetched Out : $Modtime:   Oct 09 2017 10:31:54  $
---       PVCS Version     : $Revision:   1.0  $
+--       Date into PVCS   : $Date:   Oct 20 2017 14:13:16  $
+--       Date fetched Out : $Modtime:   Oct 20 2017 14:11:36  $
+--       PVCS Version     : $Revision:   1.1  $
 --
 --   Author : Upendra Hukeri
 --
@@ -19,7 +19,7 @@ CREATE OR REPLACE PACKAGE BODY sde_util AS
 --
 -- all global package variables here
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(30) := '"$Revision:   1.0  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(30) := '"$Revision:   1.1  $"';
    g_package_name    CONSTANT  VARCHAR2(30) := 'sde_util';
 --
 ---------------------------------------------------------------------------------------------------
@@ -578,20 +578,12 @@ END update_sdo_geom_metadata;
 --
 ---------------------------------------------------------------------------------------------------
 --
-FUNCTION sde2shp(p_command IN sde_varchar_array)
+FUNCTION shputil(p_command IN sde_varchar_array)
 RETURN VARCHAR2
 	AS LANGUAGE JAVA
-	NAME 'bentley.exor.gis.SDE2SHP.createShapeFileDB(oracle.sql.ARRAY) return java.lang.String';
---
----------------------------------------------------------------------------------------------------
---
-FUNCTION shp2sde(p_command IN sde_varchar_array)
-RETURN VARCHAR2
-	AS LANGUAGE JAVA
-	NAME 'bentley.exor.gis.SHP2SDE.uploadShapeFileDB(oracle.sql.ARRAY) return java.lang.String';
+	NAME 'bentley.exor.gis.ShapefileUtility.callFromDB(oracle.sql.ARRAY) return java.lang.String';
 --
 ---------------------------------------------------------------------------------------------------
 --
 END sde_util;
 /
-
