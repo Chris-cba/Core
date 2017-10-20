@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE sde_util AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sde_util.pkh-arc   1.0   Oct 12 2017 09:30:08   Chris.Baugh  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sde_util.pkh-arc   1.1   Oct 20 2017 14:13:06   Upendra.Hukeri  $
 --       Module Name      : $Workfile:   sde_util.pkh  $
---       Date into PVCS   : $Date:   Oct 12 2017 09:30:08  $
---       Date fetched Out : $Modtime:   Oct 09 2017 10:31:56  $
---       PVCS Version     : $Revision:   1.0  $
+--       Date into PVCS   : $Date:   Oct 20 2017 14:13:06  $
+--       Date fetched Out : $Modtime:   Oct 20 2017 14:12:16  $
+--       PVCS Version     : $Revision:   1.1  $
 --
 --   Author : Upendra Hukeri
 --
@@ -19,7 +19,7 @@ CREATE OR REPLACE PACKAGE sde_util AS
 --
 -- all global package variables here
 --
-g_sccsid CONSTANT VARCHAR2(30) := '"$Revision:   1.0  $"';
+g_sccsid CONSTANT VARCHAR2(30) := '"$Revision:   1.1  $"';
 --
 -- This function returns the current SCCS version
 FUNCTION get_version
@@ -98,12 +98,7 @@ RETURN VARCHAR2;
 --
 ---------------------------------------------------------------------------------------------------
 --
-FUNCTION sde2shp(p_command IN sde_varchar_array)
-RETURN VARCHAR2;
---
----------------------------------------------------------------------------------------------------
---
-FUNCTION shp2sde(p_command IN sde_varchar_array)
+FUNCTION shputil(p_command IN sde_varchar_array)
 RETURN VARCHAR2;
 --
 ---------------------------------------------------------------------------------------------------
