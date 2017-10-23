@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_path_reg
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_path_reg.pkb-arc   1.8   Aug 29 2017 12:56:32   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_path_reg.pkb-arc   1.9   Oct 23 2017 15:01:40   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_path_reg.pkb  $
-   --       Date into PVCS   : $Date:   Aug 29 2017 12:56:32  $
-   --       Date fetched Out : $Modtime:   Aug 29 2017 12:54:52  $
-   --       PVCS Version     : $Revision:   1.8  $
+   --       Date into PVCS   : $Date:   Oct 23 2017 15:01:40  $
+   --       Date fetched Out : $Modtime:   Oct 23 2017 15:00:30  $
+   --       PVCS Version     : $Revision:   1.9  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,7 +16,7 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.8  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.9  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_path_reg';
 
@@ -270,10 +270,28 @@ AS
                   AND sdo_owner =
                          SYS_CONTEXT ('NM3CORE', 'APPLICATION_OWNER');
 
-      NM3DDL.DROP_SYNONYM_FOR_OBJECT (pi_network_name || '_LINK');
-      NM3DDL.DROP_SYNONYM_FOR_OBJECT (pi_network_name || '_LINK_TABLE');
-      NM3DDL.DROP_SYNONYM_FOR_OBJECT (pi_network_name || '_NO');
+      DECLARE
+         no_syn exception;
+         pragma exception_init( no_syn, -20304);
+      begin
+        begin 
+          NM3DDL.DROP_SYNONYM_FOR_OBJECT (pi_network_name || '_LINK');
+        exception
+          when no_syn then NULL;
+        end;
+        
+        begin 
+          NM3DDL.DROP_SYNONYM_FOR_OBJECT (pi_network_name || '_LINK_TABLE');
+        exception
+          when no_syn then NULL;
+        end;
 
+        begin 
+          NM3DDL.DROP_SYNONYM_FOR_OBJECT (pi_network_name || '_NO');
+        exception
+          when no_syn then NULL;
+        end;
+      end;
 
       COMMIT;
    END;
