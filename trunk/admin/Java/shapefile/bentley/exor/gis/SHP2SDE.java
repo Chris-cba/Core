@@ -1,11 +1,11 @@
 /**
  *    PVCS Identifiers :-
  *
- *       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/Java/shapefile/bentley/exor/gis/SHP2SDE.java-arc   1.4   Oct 17 2017 15:14:06   Upendra.Hukeri  $
+ *       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/Java/shapefile/bentley/exor/gis/SHP2SDE.java-arc   1.5   Oct 30 2017 08:26:54   Upendra.Hukeri  $
  *       Module Name      : $Workfile:   SHP2SDE.java  $
- *       Date into SCCS   : $Date:   Oct 17 2017 15:14:06  $
- *       Date fetched Out : $Modtime:   Oct 17 2017 14:57:48  $
- *       SCCS Version     : $Revision:   1.4  $
+ *       Date into SCCS   : $Date:   Oct 30 2017 08:26:54  $
+ *       Date fetched Out : $Modtime:   Oct 30 2017 08:26:38  $
+ *       SCCS Version     : $Revision:   1.5  $
  *       Based on 
  *
  *
@@ -121,6 +121,7 @@ public class SHP2SDE extends ShapefileUtility {
 		helpMsg.append("\n\tUsage explanation (parameters used):");
 		helpMsg.append("\n\t[-help]: Specify this option to see the command line usage of Shapefile Uploader");
 		helpMsg.append("\n\t(-nc)  : Specify this option, if the jar is loaded in database and called from a PL/SQL procedure or function");
+		helpMsg.append("\n\t         (no values for this parameter)");
 		helpMsg.append("\n\t(-h)   : Host machine with existing Oracle database");
 		helpMsg.append("\n\t(-p)   : Host machine's port with existing Oracle database (e.g. 1521)");
 		helpMsg.append("\n\t(-s)   : Host machine's SID with existing Oracle database");
@@ -509,22 +510,9 @@ public class SHP2SDE extends ShapefileUtility {
 		
 		Connection 			conn 	  = getConnection();
 		
-		String 				result 	  = getSRID2();
+		String 				result 	  = null;
 		
 		try {
-			if(!"Y".equals(result)) {
-				writeLog(getErrorMsg(), false);
-				
-				return returnStr;
-			} else if(dbEPSGSRID == 0) {
-				setErrorMsg("\nError: Error in getting database default SRID!");
-				writeLog(getErrorMsg(), false);
-				
-				return returnStr;
-			}
-			
-		writeLog("database default SRID: Oracle SRID - " + dbOracleSRID + ", EPSG SRID - " + dbEPSGSRID);
-			
 			int  prjSRID = 0;
 			File prjFile = new File(getDirectoryPath(Directory.UPLOADDIR) + getSHPFileName() + ".prj");
 			
@@ -542,10 +530,11 @@ public class SHP2SDE extends ShapefileUtility {
 					return returnStr;
 				}
 				
-				if ((prjSRID == dbEPSGSRID) || (prjSRID == dbOracleSRID)) {
-					userSRID = dbEPSGSRID;
+				result = validateSRID(prjSRID);
+				
+				if("Y".equals(result)) {
+					userSRID = prjSRID;
 				} else {
-					setErrorMsg("\nError: SRID retrieved from '.prj' file does not match the database default SRID\n");
 					writeLog(getErrorMsg(), false);
 					setExitSystem(true);
 					
@@ -554,15 +543,14 @@ public class SHP2SDE extends ShapefileUtility {
 			} else if (userSRID != 0) {
 				writeLog("Warning: No '.prj' file found! Using SRID from command line argument '-r' - " + userSRID);
 				
-				if ((userSRID == dbEPSGSRID) || (userSRID == dbOracleSRID)) {
-					userSRID = dbEPSGSRID;
-				} else {
-					setErrorMsg("\nError: SRID provided with command line argument '-r' does not match the database default SRID\n");
+				result = validateSRID(userSRID);
+				
+				if(!"Y".equals(result)) {
 					writeLog(getErrorMsg(), false);
 					setExitSystem(true);
 					
 					return returnStr;
-				} 
+				}
 			} else {
 				setErrorMsg("\nError: No SRID found! Check if '.prj' file exists or command line argument '-r' is specified\n");
 				writeLog(getErrorMsg(), false);
@@ -1074,7 +1062,7 @@ public class SHP2SDE extends ShapefileUtility {
 		}
 	}
 	
-	private String getSRID2() 
+	private String validateSRID(int srid) 
 	throws SQLException, ClassNotFoundException, Exception {
 		Connection        conn    = null;
 		CallableStatement cstmt   = null;
@@ -1084,26 +1072,24 @@ public class SHP2SDE extends ShapefileUtility {
 		try {
 			conn = getConnection();
 			
-			sqlStmt = "{? = call sde_util.get_srid2(?, ?)}";
+			sqlStmt = "{? = call sde_util.validate_srid(?, ?, ?)}";
 			cstmt   = conn.prepareCall(sqlStmt);
 			cstmt.registerOutParameter(1, Types.VARCHAR);
-			cstmt.registerOutParameter(2, Types.NUMERIC);
-			cstmt.registerOutParameter(3, Types.NUMERIC);
+			cstmt.setInt(2, srid);
+			cstmt.setString(3, getViewName());
+			cstmt.setString(4, getGeomColName());
 			cstmt.execute();
 			
 			result = cstmt.getString(1);
 			
 			if("Y".equals(result)) {
-				dbOracleSRID = cstmt.getInt(2);
-				dbEPSGSRID 	 = cstmt.getInt(3);
-				
 				return "Y";
 			} else {
 				setErrorMsg("\nError: " + result);
 				return "N";
 			}
 		} finally {
-			closeOracle("getSRID2", cstmt, conn, null);
+			closeOracle("validateSRID", cstmt, conn, null);
 		}
 	}
 	
@@ -1175,7 +1161,7 @@ public class SHP2SDE extends ShapefileUtility {
 			sqlStmt = "{? = call sde_util.get_geodetic_srid_count(?, ?)}";
 			cstmt   = conn.prepareCall(sqlStmt);
 			cstmt.registerOutParameter(1, Types.VARCHAR);
-			cstmt.setInt(2, Types.NUMERIC);
+			cstmt.setInt(2, userSRID);
 			cstmt.registerOutParameter(3, Types.NUMERIC);
 			cstmt.execute();
 			
