@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY sde_util AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sde_util.pkb-arc   1.1   Oct 20 2017 14:13:16   Upendra.Hukeri  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sde_util.pkb-arc   1.2   Oct 30 2017 07:51:56   Upendra.Hukeri  $
 --       Module Name      : $Workfile:   sde_util.pkb  $
---       Date into PVCS   : $Date:   Oct 20 2017 14:13:16  $
---       Date fetched Out : $Modtime:   Oct 20 2017 14:11:36  $
---       PVCS Version     : $Revision:   1.1  $
+--       Date into PVCS   : $Date:   Oct 30 2017 07:51:56  $
+--       Date fetched Out : $Modtime:   Oct 30 2017 07:51:14  $
+--       PVCS Version     : $Revision:   1.2  $
 --
 --   Author : Upendra Hukeri
 --
@@ -19,7 +19,7 @@ CREATE OR REPLACE PACKAGE BODY sde_util AS
 --
 -- all global package variables here
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(30) := '"$Revision:   1.1  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(30) := '"$Revision:   1.2  $"';
    g_package_name    CONSTANT  VARCHAR2(30) := 'sde_util';
 --
 ---------------------------------------------------------------------------------------------------
@@ -393,33 +393,41 @@ END get_srid;
 --
 ---------------------------------------------------------------------------------------------------
 --
-FUNCTION get_srid2(p_oracle_srid OUT NUMBER
-				  ,p_epsg_srid   OUT NUMBER) 
+FUNCTION validate_srid(p_srid IN NUMBER
+					  ,p_table_name  IN VARCHAR2
+					  ,p_column_name IN VARCHAR2
+					  )
 RETURN VARCHAR2 
 IS
+	v_oracle_srid NUMBER;
+	v_epsg_srid   NUMBER;
 BEGIN
-	SELECT NVL(nm3sdo.get_nw_srids, 0) oracle_srid, NVL(sdo_cs.map_oracle_srid_to_epsg(nm3sdo.get_nw_srids), 0) epsg_srid 
-	  INTO p_oracle_srid, p_epsg_srid
-      FROM DUAL;
-	--
-	IF p_oracle_srid = 0 THEN
-        RAISE NO_DATA_FOUND;
+	IF REGEXP_REPLACE(p_table_name, '[^a-zA-Z0-9_$#]+', '') <> p_table_name THEN
+		RETURN 'table name with special characters not allowed - ' || p_table_name || ' (allowed: A-Z a-z 0-9 _ $ #)';
 	END IF;
 	--
-	RETURN 'Y';
+	IF REGEXP_REPLACE(p_column_name, '[^a-zA-Z0-9_$#]+', '') <> p_column_name THEN
+		RETURN 'column name with special characters not allowed - ' || p_column_name || ' (allowed: A-Z a-z 0-9 _ $ #)';
+	END IF;
+	--
+	SELECT NVL(srid, 0) oracle_srid, NVL(sdo_cs.map_oracle_srid_to_epsg(srid), 0) epsg_srid 
+	  INTO v_oracle_srid, v_epsg_srid
+      FROM user_sdo_geom_metadata 
+	 WHERE table_name  = p_table_name 
+	   AND column_name = p_column_name;
+	--
+	IF (v_oracle_srid = 0) OR (v_oracle_srid = p_srid) OR (v_epsg_srid = p_srid) THEN
+        RETURN 'Y';
+	ELSE
+		RETURN 'SRID ''' || p_srid || ''' does not match the SRID in user_sdo_geom_metadata for - ' || p_table_name || ', ' || p_column_name;
+	END IF;
 EXCEPTION
 	WHEN NO_DATA_FOUND THEN
-		p_oracle_srid := 0;
-		p_epsg_srid   := 0;
-		--
-		RETURN 'no default database SRID found';
+		RETURN 'Y';
 	--
-	WHEN OTHERS THEN 
-		p_oracle_srid := 0;
-		p_epsg_srid   := 0;
-		--
+	WHEN OTHERS THEN
 		RETURN SQLERRM;
-END get_srid2;
+END validate_srid;
 --
 ---------------------------------------------------------------------------------------------------
 --
