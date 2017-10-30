@@ -6,11 +6,11 @@ FOR EACH ROW
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/trg/sde_where_1_trg.trg-arc   1.0   Oct 13 2017 09:02:40   Chris.Baugh  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/trg/sde_where_1_trg.trg-arc   1.1   Oct 30 2017 09:46:48   Upendra.Hukeri  $
 --       Module Name      : $Workfile:   sde_where_1_trg.trg  $
---       Date into PVCS   : $Date:   Oct 13 2017 09:02:40  $
---       Date fetched Out : $Modtime:   Oct 13 2017 09:00:20  $
---       Version          : $Revision:   1.0  $
+--       Date into PVCS   : $Date:   Oct 30 2017 09:46:48  $
+--       Date fetched Out : $Modtime:   Oct 30 2017 09:45:56  $
+--       Version          : $Revision:   1.1  $
 --
 --
 -----------------------------------------------------------------------------
@@ -32,7 +32,7 @@ BEGIN
 	CLOSE check_privilege;
 	--
 	IF l_dummy_c IS NULL THEN
-		RAISE_APPLICATION_ERROR(-20343, 'Only SDE Administrator can insert records');
+		RAISE_APPLICATION_ERROR(-20343, 'Only SDE Administrator can insert, update or delete record(s)');
 	ELSE 
 		:new.sw_id := sw_unique_seq.NEXTVAL;
 		:new.sw_unique := UPPER(:new.sw_unique);
