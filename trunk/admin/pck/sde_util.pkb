@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY sde_util AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sde_util.pkb-arc   1.2   Oct 30 2017 07:51:56   Upendra.Hukeri  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sde_util.pkb-arc   1.3   Oct 31 2017 09:06:52   Upendra.Hukeri  $
 --       Module Name      : $Workfile:   sde_util.pkb  $
---       Date into PVCS   : $Date:   Oct 30 2017 07:51:56  $
---       Date fetched Out : $Modtime:   Oct 30 2017 07:51:14  $
---       PVCS Version     : $Revision:   1.2  $
+--       Date into PVCS   : $Date:   Oct 31 2017 09:06:52  $
+--       Date fetched Out : $Modtime:   Oct 31 2017 09:01:32  $
+--       PVCS Version     : $Revision:   1.3  $
 --
 --   Author : Upendra Hukeri
 --
@@ -19,7 +19,7 @@ CREATE OR REPLACE PACKAGE BODY sde_util AS
 --
 -- all global package variables here
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(30) := '"$Revision:   1.2  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(30) := '"$Revision:   1.3  $"';
    g_package_name    CONSTANT  VARCHAR2(30) := 'sde_util';
 --
 ---------------------------------------------------------------------------------------------------
@@ -543,6 +543,7 @@ END build_dim_array;
 --
 FUNCTION update_sdo_geom_metadata(p_table_name 	IN VARCHAR2
 								 ,p_column_name IN VARCHAR2
+								 ,p_srid 		IN 	NUMBER
 								 ,p_shp_dims 	IN 	NUMBER
 								 ,p_min_x 		IN 	NUMBER
 								 ,p_max_x 		IN 	NUMBER
@@ -562,7 +563,7 @@ IS
 	v_sgm_insert_query 	VARCHAR2(32767);
 	v_dim_array			VARCHAR2(32767);
 BEGIN
-	v_result := get_srid2(v_oracle_srid, v_epsg_srid);
+	v_result := validate_srid(p_srid, p_table_name, p_column_name);
 	--
 	IF v_result = 'Y' THEN
 		v_result := build_dim_array(p_shp_dims ,p_min_x ,p_max_x ,p_min_y ,p_max_y ,p_min_z ,p_max_z ,p_min_measure ,p_max_measure ,p_tolerance, v_dim_array);
