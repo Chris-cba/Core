@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3sdo_Edit AS
 --
 --   SCCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3sdo_edit.pkb-arc   2.22   Nov 02 2016 13:50:10   Chris.Baugh  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3sdo_edit.pkb-arc   2.23   Oct 31 2017 11:58:30   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm3sdo_edit.pkb  $
---       Date into SCCS   : $Date:   Nov 02 2016 13:50:10  $
---       Date fetched Out : $Modtime:   Nov 01 2016 14:57:40  $
---       SCCS Version     : $Revision:   2.22  $
+--       Date into SCCS   : $Date:   Oct 31 2017 11:58:30  $
+--       Date fetched Out : $Modtime:   Oct 25 2017 14:04:32  $
+--       SCCS Version     : $Revision:   2.23  $
 --
 --
 --  Author :  R Coupe
@@ -23,7 +23,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3sdo_Edit AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid   CONSTANT  VARCHAR2(2000)  :=  '$Revision:   2.22  $';
+  g_body_sccsid   CONSTANT  VARCHAR2(2000)  :=  '$Revision:   2.23  $';
   g_package_name  CONSTANT  VARCHAR2(30)    :=  'nm3sdo_edit';
 --
 -----------------------------------------------------------------------------
@@ -63,7 +63,7 @@ begin
                  where nthr_theme_id = nth_theme_id
                  and nthr_role = hur_role
                  and hur_username = SYS_CONTEXT ('NM3_SECURITY_CTX', 'USERNAME')
-                 and nthr_mode = 'NORMAL' ) ;
+                 and (nthr_mode = 'NORMAL' OR hig.get_sysopt('THMEROLOVR') = 'Y'));
 --
   if l_normal = 1 then
     retval := TRUE;
