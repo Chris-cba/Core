@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_load
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_load.pkb-arc   1.28   Oct 31 2017 11:12:12   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_load.pkb-arc   1.29   Oct 31 2017 11:27:06   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_load.pkb  $
-   --       Date into PVCS   : $Date:   Oct 31 2017 11:12:12  $
-   --       Date fetched Out : $Modtime:   Oct 31 2017 11:11:24  $
-   --       PVCS Version     : $Revision:   1.28  $
+   --       Date into PVCS   : $Date:   Oct 31 2017 11:27:06  $
+   --       Date fetched Out : $Modtime:   Oct 31 2017 11:26:12  $
+   --       PVCS Version     : $Revision:   1.29  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,7 +16,7 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.28  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.29  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_load';
 
@@ -139,7 +139,7 @@ AS
       pi_unit           IN nm_units.un_unit_id%TYPE,
       pi_xsp            IN VARCHAR2,
       pi_start_date     IN nm_asset_locations_all.nal_start_date%TYPE,
---      pi_range_seq_no   IN INTEGER,      
+      pi_range_seq_no   IN INTEGER,      
       pi_security_id    IN nm_asset_locations_all.nal_security_key%TYPE)
    IS
       loc_error       lb_loc_error_tab;
@@ -152,7 +152,6 @@ AS
       l_reverse       INTEGER := 1;
       l_start_m         NUMBER := pi_start_m;
       l_end_m          NUMBER := pi_end_m;  
-      pi_range_seq_no INTEGER;    
    BEGIN
       --
       IF pi_g_i_d IS NULL
