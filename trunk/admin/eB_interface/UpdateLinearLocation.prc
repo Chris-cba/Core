@@ -8,6 +8,7 @@ CREATE OR REPLACE PROCEDURE UpdateLinearLocation (
    JXP                   IN     VARCHAR2,
    LocationDescription   IN     VARCHAR2,
    startDate             IN     DATE DEFAULT TRUNC (SYSDATE),
+   RangeSequence         IN     INTEGER,
    LocationIdOut            OUT INTEGER)
 AS
    --
@@ -15,11 +16,11 @@ AS
    --
    --   PVCS Identifiers :-
    --
-   --       pvcsid                 : $Header:   //new_vm_latest/archives/lb/admin/eB_interface/UpdateLinearLocation.prc-arc   1.0   Oct 19 2015 21:00:30   Rob.Coupe  $
+   --       pvcsid                 : $Header:   //new_vm_latest/archives/lb/admin/eB_interface/UpdateLinearLocation.prc-arc   1.1   Oct 31 2017 11:46:58   Rob.Coupe  $
    --       Module Name      : $Workfile:   UpdateLinearLocation.prc  $
-   --       Date into PVCS   : $Date:   Oct 19 2015 21:00:30  $
-   --       Date fetched Out : $Modtime:   Oct 19 2015 21:00:18  $
-   --       PVCS Version     : $Revision:   1.0  $
+   --       Date into PVCS   : $Date:   Oct 31 2017 11:46:58  $
+   --       Date fetched Out : $Modtime:   Oct 31 2017 11:46:22  $
+   --       PVCS Version     : $Revision:   1.1  $
    --
    --   Author : Rob Coupe/David Stow
    --
@@ -98,6 +99,7 @@ BEGIN
                         NULL,
                         NULL,
                         startDate,
+                        RangeSequence,
                         l_security_key);
 END;
 /
