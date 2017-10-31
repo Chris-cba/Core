@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_get
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_get.pkb-arc   1.29   Sep 08 2017 11:48:14   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_get.pkb-arc   1.30   Oct 31 2017 11:33:46   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_get.pkb  $
-   --       Date into PVCS   : $Date:   Sep 08 2017 11:48:14  $
-   --       Date fetched Out : $Modtime:   Sep 08 2017 11:46:42  $
-   --       PVCS Version     : $Revision:   1.29  $
+   --       Date into PVCS   : $Date:   Oct 31 2017 11:33:46  $
+   --       Date fetched Out : $Modtime:   Oct 31 2017 11:32:26  $
+   --       PVCS Version     : $Revision:   1.30  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,7 +16,7 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.29  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.30  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_get';
 
@@ -1334,7 +1334,7 @@ AS
                                                                     ne_no_end)
                                                                     end_node,
                                                                  ne_length,
-                                                                 m.nm_cardinality 
+                                                                 m.nm_cardinality
                                                                     dir,
                                                                  m.nm_cardinality * i.dir_flag relative_dir,
                                                                  DECODE (
@@ -1511,7 +1511,7 @@ AS
                              t1."NM_SEQ_NO",
                              t1."NM_SEG_NO",
                              t1.datum_ne_id,
-                             t1."ROUTE_DIR_FLAG",
+                             t1.route_dir_flag * obj_dir_flag "ROUTE_DIR_FLAG",
                              t1."ROUTE_START_ON_ESU",
                              t1."ROUTE_END_ON_ESU",
                              t1."ROUTE_START_M",
@@ -1616,7 +1616,7 @@ AS
                                        nlt_units       datum_unit,
                                        im.m_unit       group_unit,
                                        NVL (uc_conversion_factor, 1),
-                                       case 
+                                       case
                                           when im.start_m = im.end_m
                                             then ROW_NUMBER ()
                                                  OVER (
@@ -1625,7 +1625,8 @@ AS
                                                  ORDER BY im.start_m)
                                           else NULL
                                        end
-                                       rn
+                                       rn,
+                                       im.dir_flag obj_dir_flag
                                   FROM itab          im,
                                        nm_members    rm,
                                        nm_elements   e,
