@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_load
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_load.pkb-arc   1.27   Aug 24 2017 10:34:56   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_load.pkb-arc   1.28   Oct 31 2017 11:12:12   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_load.pkb  $
-   --       Date into PVCS   : $Date:   Aug 24 2017 10:34:56  $
-   --       Date fetched Out : $Modtime:   Aug 24 2017 10:17:58  $
-   --       PVCS Version     : $Revision:   1.27  $
+   --       Date into PVCS   : $Date:   Oct 31 2017 11:12:12  $
+   --       Date fetched Out : $Modtime:   Oct 31 2017 11:11:24  $
+   --       PVCS Version     : $Revision:   1.28  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,7 +16,7 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.27  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.28  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_load';
 
@@ -139,6 +139,7 @@ AS
       pi_unit           IN nm_units.un_unit_id%TYPE,
       pi_xsp            IN VARCHAR2,
       pi_start_date     IN nm_asset_locations_all.nal_start_date%TYPE,
+--      pi_range_seq_no   IN INTEGER,      
       pi_security_id    IN nm_asset_locations_all.nal_security_key%TYPE)
    IS
       loc_error       lb_loc_error_tab;
@@ -148,6 +149,10 @@ AS
       l_start         NUMBER;
       l_end           NUMBER;
       l_unit          INTEGER;
+      l_reverse       INTEGER := 1;
+      l_start_m         NUMBER := pi_start_m;
+      l_end_m          NUMBER := pi_end_m;  
+      pi_range_seq_no INTEGER;    
    BEGIN
       --
       IF pi_g_i_d IS NULL
@@ -177,13 +182,17 @@ AS
             'The start and end measures must be the same for point asset types');
       ELSIF l_pnt_or_cont = 'C' AND pi_start_m >= NVL (pi_end_m, pi_start_m)
       THEN
-         raise_application_error (
-            -20002,
-            'The end measure must be provided and greater than the start measure');
+         l_reverse := -1;
+         l_start_m := pi_end_m;
+         l_end_m   := pi_start_m;
+         
+--         raise_application_error (
+--            -20002,
+--            'The end measure must be provided and greater than the start measure');
       END IF;
 
-      SELECT pi_start_m * NVL (uc_conversion_factor, 1),
-             pi_end_m * NVL (uc_conversion_factor, 1),
+      SELECT l_start_m * NVL (uc_conversion_factor, 1),
+             l_end_m * NVL (uc_conversion_factor, 1),
              nlt_units
         INTO l_start, l_end, l_unit
         FROM nm_unit_conversions, nm_linear_types, nm_elements
@@ -193,7 +202,7 @@ AS
              AND nlt_nt_type = ne_nt_type
              AND NVL (ne_gty_group_type, '%^&*') = NVL (nlt_gty_type, '%^&*')
       UNION
-      SELECT pi_start_m, pi_end_m, nlt_units
+      SELECT l_start_m, l_end_m, nlt_units
         FROM nm_linear_types, nm_elements
        WHERE     nlt_units = pi_unit
              AND ne_id = pi_refnt
@@ -209,9 +218,9 @@ AS
                                                                pi_nlt_id,
                                                                NULL,
                                                                NULL,
-                                                               NULL,
-                                                               NULL,
                                                                1,
+                                                               pi_range_seq_no,
+                                                               l_reverse,
                                                                l_start,
                                                                l_end,
                                                                l_unit)),
@@ -231,7 +240,7 @@ AS
                                                                   NULL,
                                                                   NULL,
                                                                   NULL,
-                                                                  1,
+                                                                  l_reverse,
                                                                   l_start,
                                                                   l_end,
                                                                   l_unit))),
@@ -308,7 +317,9 @@ AS
                                        nm_dir_flag,
                                        nm_nlt_id,
                                        nm_offset_st,
-                                       nm_offset_end)
+                                       nm_offset_end,
+                                       nm_seg_no,
+                                       nm_seq_no)
                  VALUES (
                            p_obj_Rpt (i).refnt,
                            p_obj_Rpt (i).obj_type,
@@ -332,7 +343,7 @@ AS
                            p_xsp,
                            p_obj_Rpt (i).dir_flag,
                            p_obj_Rpt (i).refnt_type,
-                           (SELECT nwx_offset * p_obj_Rpt (i).dir_flag
+                           (SELECT nwx_offset * p_obj_Rpt (i).dir_flag 
                               FROM nm_nw_xsp, nm_elements
                              WHERE     nwx_nw_type = ne_nt_type
                                    AND ne_id = p_obj_Rpt (i).refnt
@@ -359,7 +370,9 @@ AS
                              WHERE     nwx_nw_type = ne_nt_type
                                    AND ne_id = p_obj_Rpt (i).refnt
                                    AND nwx_x_sect = p_xsp
-                                   AND nwx_nsc_sub_class = ne_sub_class))
+                                   AND nwx_nsc_sub_class = ne_sub_class),
+                           p_obj_Rpt(i).seg_id,
+                           p_obj_Rpt(i).seq_id)
            RETURNING nm_loc_id
                 BULK COLLECT INTO l_loc_tab;
 
