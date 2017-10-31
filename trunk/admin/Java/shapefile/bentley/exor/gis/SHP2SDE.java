@@ -1,11 +1,11 @@
 /**
  *    PVCS Identifiers :-
  *
- *       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/Java/shapefile/bentley/exor/gis/SHP2SDE.java-arc   1.5   Oct 30 2017 08:26:54   Upendra.Hukeri  $
+ *       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/Java/shapefile/bentley/exor/gis/SHP2SDE.java-arc   1.6   Oct 31 2017 09:07:22   Upendra.Hukeri  $
  *       Module Name      : $Workfile:   SHP2SDE.java  $
- *       Date into SCCS   : $Date:   Oct 30 2017 08:26:54  $
- *       Date fetched Out : $Modtime:   Oct 30 2017 08:26:38  $
- *       SCCS Version     : $Revision:   1.5  $
+ *       Date into SCCS   : $Date:   Oct 31 2017 09:07:22  $
+ *       Date fetched Out : $Modtime:   Oct 31 2017 09:03:40  $
+ *       SCCS Version     : $Revision:   1.6  $
  *       Based on 
  *
  *
@@ -1110,21 +1110,22 @@ public class SHP2SDE extends ShapefileUtility {
 			
 			conn = getConnection();
 			
-			sqlStmt = "{? = call sde_util.update_sdo_geom_metadata(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)}";
+			sqlStmt = "{? = call sde_util.update_sdo_geom_metadata(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)}";
 			cstmt   = conn.prepareCall(sqlStmt);
 			cstmt.registerOutParameter(1, Types.VARCHAR);
 			cstmt.setString(2, geomMDTabTableName);
 			cstmt.setString(3, getGeomColName());
-			cstmt.setDouble(4, shpDims);
-			cstmt.setDouble(5, minX);
-			cstmt.setDouble(6, maxX);
-			cstmt.setDouble(7, minY);
-			cstmt.setDouble(8, maxY);
-			cstmt.setDouble(9, minZ);
-			cstmt.setDouble(10, maxZ);
-			cstmt.setDouble(11, minMeasure);
-			cstmt.setDouble(12, maxMeasure);
-			cstmt.setDouble(13, mTolerance);
+			cstmt.setInt(4, userSRID);
+			cstmt.setDouble(5, shpDims);
+			cstmt.setDouble(6, minX);
+			cstmt.setDouble(7, maxX);
+			cstmt.setDouble(8, minY);
+			cstmt.setDouble(9, maxY);
+			cstmt.setDouble(10, minZ);
+			cstmt.setDouble(11, maxZ);
+			cstmt.setDouble(12, minMeasure);
+			cstmt.setDouble(13, maxMeasure);
+			cstmt.setDouble(14, mTolerance);
 			
 			cstmt.execute();
 			
