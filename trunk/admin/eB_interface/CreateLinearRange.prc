@@ -11,16 +11,17 @@ CREATE OR REPLACE PROCEDURE CreateLinearRange (
    endDistanceUnits   IN  lb_units.external_unit_id%TYPE,
    endXsp             IN  nm_nw_xsp.nwx_x_sect%TYPE,
    startDate          IN  DATE default trunc(sysdate),
+   RangeSequence      IN  INTEGER,
    SecurityKey        IN  INTEGER,
    linearRangeId      OUT INTEGER)
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/eB_interface/CreateLinearRange.prc-arc   1.0   Oct 09 2015 13:29:14   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/eB_interface/CreateLinearRange.prc-arc   1.1   Oct 31 2017 10:59:30   Rob.Coupe  $
    --       Module Name      : $Workfile:   CreateLinearRange.prc  $
-   --       Date into PVCS   : $Date:   Oct 09 2015 13:29:14  $
-   --       Date fetched Out : $Modtime:   Oct 07 2015 11:31:34  $
-   --       PVCS Version     : $Revision:   1.0  $
+   --       Date into PVCS   : $Date:   Oct 31 2017 10:59:30  $
+   --       Date fetched Out : $Modtime:   Oct 31 2017 10:45:36  $
+   --       PVCS Version     : $Revision:   1.1  $
    --
    --   Author : R.A. Coupe
    --
@@ -78,6 +79,7 @@ BEGIN
                       l_exorUnitId,
                       l_xsp,
                       trunc (startDate),
+                      NVL(RangeSequence,1),
                       SecurityKey);
 
    linearRangeId := 1; -- TODO - get from lb_load.lb_ld_RPt
