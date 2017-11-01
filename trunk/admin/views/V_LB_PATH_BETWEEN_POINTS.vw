@@ -10,11 +10,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/lb/admin/views/V_LB_PATH_BETWEEN_POINTS.vw-arc   1.4   Nov 01 2017 10:57:56   Rob.Coupe  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/lb/admin/views/V_LB_PATH_BETWEEN_POINTS.vw-arc   1.5   Nov 01 2017 11:02:24   Rob.Coupe  $
 --       Module Name      : $Workfile:   V_LB_PATH_BETWEEN_POINTS.vw  $
---       Date into PVCS   : $Date:   Nov 01 2017 10:57:56  $
---       Date fetched Out : $Modtime:   Nov 01 2017 10:56:58  $
---       Version          : $Revision:   1.4  $
+--       Date into PVCS   : $Date:   Nov 01 2017 11:02:24  $
+--       Date fetched Out : $Modtime:   Nov 01 2017 11:02:04  $
+--       Version          : $Revision:   1.5  $
 ------------------------------------------------------------------
 --   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 ------------------------------------------------------------------
@@ -415,4 +415,3 @@ AS
                                            SYS_CONTEXT ('NM3SQL',
                                                         'L2_OFFSET'))
                                    AND nnu_ne_id = ne_id)) t3);
-/
