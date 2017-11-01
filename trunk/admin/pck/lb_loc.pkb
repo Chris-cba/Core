@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_loc
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_loc.pkb-arc   1.10   Nov 01 2017 16:19:40   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_loc.pkb-arc   1.11   Nov 01 2017 16:35:04   Rob.Coupe  $
     --       Module Name      : $Workfile:   lb_loc.pkb  $
-    --       Date into PVCS   : $Date:   Nov 01 2017 16:19:40  $
-    --       Date fetched Out : $Modtime:   Nov 01 2017 16:18:52  $
-    --       PVCS Version     : $Revision:   1.10  $
+    --       Date into PVCS   : $Date:   Nov 01 2017 16:35:04  $
+    --       Date fetched Out : $Modtime:   Nov 01 2017 16:33:34  $
+    --       PVCS Version     : $Revision:   1.11  $
     --
     --   Author : R.A. Coupe
     --
@@ -16,7 +16,7 @@ AS
     -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
     ----------------------------------------------------------------------------
     --
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.10  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.11  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'lb_loc';
 
@@ -220,7 +220,8 @@ AS
                AND nal_id = nm_ne_id_in
                AND nal_asset_id = pi_asset_id
                AND nal_nit_type = pi_nal_nit_type
-               AND ne_nt_type = nlt_nt_type;
+               AND ne_nt_type = nlt_nt_type
+		 ORDER BY nm_seq_no;
 
         --
         --
@@ -254,7 +255,8 @@ AS
                AND nal_id = nm_ne_id_in
                AND nal_id = pi_nal_id
                AND ne_nt_type = nlt_nt_type
-               AND nlt_id = NVL (pi_refnt_type, nlt_id);
+               AND nlt_id = NVL (pi_refnt_type, nlt_id)
+         ORDER BY nm_seq_no;
 
         --
         --
