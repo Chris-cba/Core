@@ -2,11 +2,11 @@
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3pkh.sql-arc   2.43   Oct 12 2017 09:50:08   Chris.Baugh  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3pkh.sql-arc   2.44   Nov 01 2017 10:53:16   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm3pkh.sql  $
---       Date into PVCS   : $Date:   Oct 12 2017 09:50:08  $
---       Date fetched Out : $Modtime:   Oct 12 2017 09:49:32  $
---       PVCS Version     : $Revision:   2.43  $
+--       Date into PVCS   : $Date:   Nov 01 2017 10:53:16  $
+--       Date fetched Out : $Modtime:   Nov 01 2017 10:52:48  $
+--       PVCS Version     : $Revision:   2.44  $
 --
 --
 --   Author : Graeme Johnson
@@ -2582,17 +2582,6 @@ PROMPT hig_relationship.pkh
 SET TERM OFF
 SET DEFINE ON 
 SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'pck'||'&terminator'||'hig_relationship.pkh' run_file
-FROM dual 
-/ 
-start '&run_file'
---
------------------------------------------------------------------------------------------ 
---
-SET TERM ON 
-PROMPT sde_util.pkh
-SET TERM OFF
-SET DEFINE ON 
-SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'pck'||'&terminator'||'sde_util.pkh' run_file
 FROM dual 
 / 
 start '&run_file'
