@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3extent IS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3extent.pkb-arc   2.8   Jul 04 2013 15:33:48   James.Wadsworth  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3extent.pkb-arc   2.9   Nov 01 2017 11:14:46   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm3extent.pkb  $
---       Date into SCCS   : $Date:   Jul 04 2013 15:33:48  $
---       Date fetched Out : $Modtime:   Jul 04 2013 14:25:10  $
---       SCCS Version     : $Revision:   2.8  $
+--       Date into SCCS   : $Date:   Nov 01 2017 11:14:46  $
+--       Date fetched Out : $Modtime:   Nov 01 2017 08:38:32  $
+--       SCCS Version     : $Revision:   2.9  $
 --       Based on 
 --
 --
@@ -22,7 +22,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3extent IS
   g_package_name CONSTANT VARCHAR2(30) := 'nm3extent';
   --
   --g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"@(#)nm3extent.pkb	1.77 05/02/06"';
-  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.8  $';
+  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.9  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
   g_extent_exception EXCEPTION;
@@ -652,9 +652,28 @@ CREATE OR REPLACE PACKAGE BODY Nm3extent IS
                            ,pi_ignore_non_linear_parents IN     BOOLEAN DEFAULT FALSE
                            ,pi_source_id_2               IN     NM_PBI_QUERY_RESULTS.nqr_source_id%TYPE DEFAULT NULL
                            ) IS
+  --
+    lv_min_slk   nm_members.nm_slk%TYPE;
+    lv_max_slk   nm_members.nm_slk%TYPE;
+  --
   BEGIN
   --
      Nm_Debug.proc_start(g_package_name,'create_temp_ne');
+  --
+    lv_min_slk   := nm3net.get_min_slk(pi_source_id);
+    lv_max_slk   := nm3net.get_max_slk(pi_source_id);
+    
+     IF pi_begin_mp < lv_min_slk 
+     THEN
+        g_extent_exc_code  := -20001;
+        g_extent_exc_msg   := 'begin_mp ('||pi_begin_mp||') cannot be < min_slk('||lv_min_slk||').';
+        RAISE g_extent_exception;
+     ELSIF pi_end_mp > lv_max_slk 
+     THEN
+        g_extent_exc_code  := -20002;
+        g_extent_exc_msg   := 'end_mp ('||pi_end_mp||') cannot be > max_slk('||lv_max_slk||').';
+        RAISE g_extent_exception;
+     END IF;
   --
      check_valid_source(pi_source);
   --
