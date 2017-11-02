@@ -3,11 +3,11 @@
 --
 --   PVCS Identifiers :-
 --
---       pvcsid                 : $Header:   //new_vm_latest/archives/lb/install/lbdata.sql-arc   1.0   Aug 11 2017 13:08:10   Rob.Coupe  $
+--       pvcsid                 : $Header:   //new_vm_latest/archives/lb/install/lbdata.sql-arc   1.1   Nov 02 2017 14:22:42   Rob.Coupe  $
 --       Module Name      : $Workfile:   lbdata.sql  $
---       Date into PVCS   : $Date:   Aug 11 2017 13:08:10  $
---       Date fetched Out : $Modtime:   Aug 11 2017 13:07:16  $
---       PVCS Version     : $Revision:   1.0  $
+--       Date into PVCS   : $Date:   Nov 02 2017 14:22:42  $
+--       Date fetched Out : $Modtime:   Nov 02 2017 14:21:46  $
+--       PVCS Version     : $Revision:   1.1  $
 --
 --   Author : Rob Coupe
 --
@@ -158,3 +158,42 @@ where not exists ( select 1 from nm_au_types where nat_admin_type = 'NONE' )
 
 commit;
 
+Prompt Location Bridge Unit Translation Data
+
+Insert into LB_UNITS
+   (EXTERNAL_UNIT_ID, EXTERNAL_UNIT_NAME, EXOR_UNIT_ID, EXOR_UNIT_NAME)
+ select 50, 'METRE', 1, 'Metres' 
+ from dual where not exists ( select 1 from lb_units where exor_unit_id = 1 )
+ and exists ( select 1 from nm_units where un_unit_id = 1 );
+ 
+Insert into LB_UNITS
+   (EXTERNAL_UNIT_ID, EXTERNAL_UNIT_NAME, EXOR_UNIT_ID, EXOR_UNIT_NAME)
+Select 236, 'KILOMETRE', 2, 'Kilometers'
+from dual where not exists ( select 1 from lb_units where exor_unit_id = 2 )
+ and exists ( select 1 from nm_units where un_unit_id = 2 );
+ 
+Insert into LB_UNITS
+   (EXTERNAL_UNIT_ID, EXTERNAL_UNIT_NAME, EXOR_UNIT_ID, EXOR_UNIT_NAME)
+Select 51, 'CENTIMETRE', 3, 'Centimetres'
+from dual where not exists ( select 1 from lb_units where exor_unit_id = 3 )
+ and exists ( select 1 from nm_units where un_unit_id = 3 );
+ 
+Insert into LB_UNITS
+   (EXTERNAL_UNIT_ID, EXTERNAL_UNIT_NAME, EXOR_UNIT_ID, EXOR_UNIT_NAME)
+Select 321, 'MILE', 4, 'Miles'
+from dual where not exists ( select 1 from lb_units where exor_unit_id = 4 )
+ and exists ( select 1 from nm_units where un_unit_id = 4 );
+
+Insert into LB_UNITS
+   (EXTERNAL_UNIT_ID, EXTERNAL_UNIT_NAME, EXOR_UNIT_ID, EXOR_UNIT_NAME)
+Select 77, 'DEGREE', 5, 'Degrees'
+from dual where not exists ( select 1 from lb_units where exor_unit_id = 5 )
+ and exists ( select 1 from nm_units where un_unit_id = 5 );
+
+Insert into LB_UNITS
+   (EXTERNAL_UNIT_ID, EXTERNAL_UNIT_NAME, EXOR_UNIT_ID, EXOR_UNIT_NAME)
+Select 13, 'RADIAN', 6, 'Radians'
+from dual where not exists ( select 1 from lb_units where exor_unit_id = 6 )
+ and exists ( select 1 from nm_units where un_unit_id = 6 );
+
+commit;
