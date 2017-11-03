@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_get
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_get.pkb-arc   1.30   Oct 31 2017 11:33:46   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_get.pkb-arc   1.31   Nov 03 2017 13:03:38   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_get.pkb  $
-   --       Date into PVCS   : $Date:   Oct 31 2017 11:33:46  $
-   --       Date fetched Out : $Modtime:   Oct 31 2017 11:32:26  $
-   --       PVCS Version     : $Revision:   1.30  $
+   --       Date into PVCS   : $Date:   Nov 03 2017 13:03:38  $
+   --       Date fetched Out : $Modtime:   Nov 03 2017 12:58:32  $
+   --       PVCS Version     : $Revision:   1.31  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,7 +16,7 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.30  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.31  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_get';
 
@@ -1018,6 +1018,7 @@ AS
 
       --
       -- just going up the hierarchy to aggregate the data according to linear type
+      
       WITH itab
            AS (SELECT t.*
                  FROM TABLE (p_lb_RPt_tab) t)
@@ -1027,7 +1028,7 @@ AS
                      obj_id,
                      seg_id,
                      ROWNUM,
-                     relative_dir,
+                     1, --relative_dir,
                      start_m,
                      end_m,
                      unit_m)
@@ -1040,8 +1041,8 @@ AS
                        ROUND (INV_START_SLK, l_round) start_m,
                        ROUND (inv_end_slk, l_round) end_m,
                        l_refnt_type.nlt_units       unit_m,
-					   min_seq_id,
-					   relative_dir
+                       min_seq_id,
+                       1 --relative_dir
                   FROM (SELECT route_id,
                                l.inv_id,
                                l.inv_segment_id,
@@ -1198,7 +1199,7 @@ AS
                                                              nm_seg_no,
                                                              1)
                                                           OVER (
-                                                             PARTITION BY inv_id
+                                                             PARTITION BY route_id, inv_id
                                                              ORDER BY
                                                                 nm_seg_no,
                                                                 nm_seq_no,
@@ -1213,7 +1214,7 @@ AS
                                                              datum_id,
                                                              1)
                                                           OVER (
-                                                             PARTITION BY inv_id
+                                                             PARTITION BY route_id, inv_id
                                                              ORDER BY
                                                                 nm_seg_no,
                                                                 nm_seq_no,
@@ -1228,7 +1229,7 @@ AS
                                                              end_node,
                                                              1)
                                                           OVER (
-                                                             PARTITION BY inv_id
+                                                             PARTITION BY route_id, inv_id
                                                              ORDER BY
                                                                 nm_seg_no,
                                                                 nm_seq_no,
@@ -1243,7 +1244,7 @@ AS
                                                              cs,
                                                              1)
                                                           OVER (
-                                                             PARTITION BY inv_id
+                                                             PARTITION BY route_id, inv_id
                                                              ORDER BY
                                                                 nm_seg_no,
                                                                 nm_seq_no,
@@ -1258,7 +1259,7 @@ AS
                                                              ce,
                                                              1)
                                                           OVER (
-                                                             PARTITION BY inv_id
+                                                             PARTITION BY route_id, inv_id
                                                              ORDER BY
                                                                 nm_seg_no,
                                                                 nm_seq_no,
@@ -1287,7 +1288,7 @@ AS
                                                              datum_end,
                                                              1)
                                                           OVER (
-                                                             PARTITION BY inv_id
+                                                             PARTITION BY route_id, inv_id
                                                              ORDER BY
                                                                 nm_seg_no,
                                                                 nm_seq_no,
@@ -1468,8 +1469,8 @@ AS
                        start_seg,
                        end_seg,
                        datum_unit,
-                       min_seq_id,
-                       relative_dir
+                       min_seq_id--,
+--                       relative_dir
               ORDER BY min_seq_id, route_id, inv_start_slk);
 
       RETURN retval;
