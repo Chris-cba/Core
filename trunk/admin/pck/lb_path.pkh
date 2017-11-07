@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE lb_path
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_path.pkh-arc   1.8   Nov 07 2017 12:22:54   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_path.pkh-arc   1.9   Nov 07 2017 12:29:50   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_path.pkh  $
-   --       Date into PVCS   : $Date:   Nov 07 2017 12:22:54  $
-   --       Date fetched Out : $Modtime:   Nov 07 2017 12:22:22  $
-   --       PVCS Version     : $Revision:   1.8  $
+   --       Date into PVCS   : $Date:   Nov 07 2017 12:29:50  $
+   --       Date fetched Out : $Modtime:   Nov 07 2017 12:29:16  $
+   --       PVCS Version     : $Revision:   1.9  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,9 +16,9 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.8  $';
+   g_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.9  $';
    --
-   g_network           VARCHAR2 (30);
+   g_network           VARCHAR2 (30) := 'LB_NETWORK';
 
    g_nw_types          ptr_vc_array_type;
 
