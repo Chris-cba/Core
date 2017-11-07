@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_get
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_get.pkb-arc   1.31   Nov 03 2017 13:03:38   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_get.pkb-arc   1.32   Nov 07 2017 11:51:58   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_get.pkb  $
-   --       Date into PVCS   : $Date:   Nov 03 2017 13:03:38  $
-   --       Date fetched Out : $Modtime:   Nov 03 2017 12:58:32  $
-   --       PVCS Version     : $Revision:   1.31  $
+   --       Date into PVCS   : $Date:   Nov 07 2017 11:51:58  $
+   --       Date fetched Out : $Modtime:   Nov 07 2017 11:51:18  $
+   --       PVCS Version     : $Revision:   1.32  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,13 +16,20 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.31  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.32  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_get';
 
    --
    -----------------------------------------------------------------------------
    --
+   FUNCTION get_refnt_RPt_tab_from_geom (
+      p_geom          IN MDSYS.sdo_geometry,
+      p_nlt_ids       IN int_array_type,
+      p_mask_array    IN VARCHAR2 DEFAULT 'ANYINTERACT',
+      p_cardinality   IN INTEGER)
+      RETURN lb_RPt_tab;
+
    FUNCTION get_FT_retrieval_str (p_obj_type   IN VARCHAR2,
                                   p_obj_id     IN INTEGER)
       RETURN VARCHAR2;
@@ -160,7 +167,7 @@ AS
                       END,
                       nt_length_unit)
               BULK COLLECT INTO retval
-              FROM nm_members          m,
+              FROM nm_members m,
                    nm_linear_types,
                    nm_elements,
                    nm_types,
@@ -183,14 +190,15 @@ AS
                                                 AND NVL (t.end_m, ne_length)))
                    AND (       p_whole_only = 'TRUE'
                            AND NOT EXISTS
-                                  (SELECT 1
-                                     FROM nm_locations l
-                                    WHERE     l.nm_ne_id_in = m.nm_ne_id_in
-                                          AND l.nm_obj_type = m.nm_obj_type
-                                          AND l.nm_ne_id_of NOT IN
-                                                 (SELECT refnt
-                                                    FROM TABLE (p_refnt_tab)
-                                                         t))
+                                      (SELECT 1
+                                         FROM nm_locations l
+                                        WHERE     l.nm_ne_id_in =
+                                                     m.nm_ne_id_in
+                                              AND l.nm_obj_type =
+                                                     m.nm_obj_type
+                                              AND l.nm_ne_id_of NOT IN (SELECT refnt
+                                                                          FROM TABLE (
+                                                                                  p_refnt_tab) t))
                         OR p_whole_only = 'FALSE')
             UNION ALL
             SELECT lb_RPt (
@@ -222,7 +230,7 @@ AS
                             END
                       END,
                       nt_length_unit)
-              FROM nm_locations_all    m,
+              FROM nm_locations_all m,
                    nm_linear_types,
                    nm_elements,
                    nm_types,
@@ -244,14 +252,15 @@ AS
                                                 AND NVL (t.end_m, ne_length)))
                    AND (       p_whole_only = 'TRUE'
                            AND NOT EXISTS
-                                  (SELECT 1
-                                     FROM nm_locations l
-                                    WHERE     l.nm_ne_id_in = m.nm_ne_id_in
-                                          AND l.nm_obj_type = m.nm_obj_type
-                                          AND l.nm_ne_id_of NOT IN
-                                                 (SELECT refnt
-                                                    FROM TABLE (p_refnt_tab)
-                                                         t))
+                                      (SELECT 1
+                                         FROM nm_locations l
+                                        WHERE     l.nm_ne_id_in =
+                                                     m.nm_ne_id_in
+                                              AND l.nm_obj_type =
+                                                     m.nm_obj_type
+                                              AND l.nm_ne_id_of NOT IN (SELECT refnt
+                                                                          FROM TABLE (
+                                                                                  p_refnt_tab) t))
                         OR p_whole_only = 'FALSE');
          END;
       END IF;
@@ -306,6 +315,117 @@ AS
    --
    END;
 
+   FUNCTION get_refnt_RPt_tab_from_geom (
+      p_geom          IN MDSYS.sdo_geometry,
+      p_inv_type      IN lb_types.lb_exor_inv_type%TYPE,
+      p_cardinality   IN INTEGER)
+      RETURN lb_RPt_tab
+   IS
+      --
+      retval      lb_RPt_tab;
+      l_nlt_ids   int_array_type := nm3array.init_int_array ().ia;
+   BEGIN
+      IF p_inv_type IS NOT NULL
+      THEN
+         SELECT CAST (COLLECT (nlt_id) AS int_array_type)
+           INTO l_nlt_ids
+           FROM nm_linear_types, nm_inv_nw
+          WHERE nlt_nt_type = nin_nw_type AND nin_nit_inv_code = p_inv_type;
+      END IF;
+
+      --
+      RETURN get_refnt_RPt_tab_from_geom (p_geom          => p_geom,
+                                          p_nlt_ids       => l_nlt_ids,
+                                          p_mask_array    => 'ANYINTERACT',
+                                          p_cardinality   => 100);
+   END;
+
+   FUNCTION get_refnt_RPt_tab_from_geom (
+      p_geom          IN MDSYS.sdo_geometry,
+      p_nlt_ids       IN int_array_type,
+      p_mask_array    IN VARCHAR2 DEFAULT 'ANYINTERACT',
+      p_cardinality   IN INTEGER)
+      RETURN lb_RPt_tab
+   IS
+      --
+      retval         lb_RPt_tab;
+      qq             CHAR (1) := CHR (39);
+      --      nth      nm_themes_all%ROWTYPE := nm3get.get_nth (p_theme_id);
+      lstr           VARCHAR2 (4000);
+      --      p_intersect varchar2(1) := 'N';
+      nlt_is_empty   VARCHAR2 (1);
+   --
+   BEGIN
+      IF int_array (p_nlt_ids).is_empty
+      THEN
+         nlt_is_empty := 'Y';
+      ELSE
+         nlt_is_empty := 'N';
+      END IF;
+
+      SELECT    'with geom_tab as ( select :geom geoloc from dual ) '
+             || ' select cast (collect( lb_rpt( ne_id, nlt_id, NULL, ne_id, 1, 1, 1, 0, ne_length, nlt_units)) as lb_rpt_tab )'
+             || ' from ( select /*+INDEX(e NE_PK) */ e.ne_id, e.ne_length, nlt_id, nlt_units, shape '
+             || CHR (10)
+             || 'from ( Select /*+MATERIALIZE*/ * from ('
+             || CHR (10)
+             || LISTAGG (select_string, CHR (10) || 'UNION ALL' || CHR (10))
+                   WITHIN GROUP (ORDER BY nlt_id)
+             || CHR (10)
+             || ')) s, nm_elements e where e.ne_id = s.ne_id )'
+                aggr_str
+        INTO lstr
+        FROM (SELECT nlt_id, nlt_units, select_string
+                FROM (SELECT nlt_id,
+                             nlt_units,
+                                'select '
+                             || nlt_id
+                             || ' nlt_id, '
+                             || nlt_units
+                             || ' nlt_units, '
+                             || pk
+                             || ' NE_ID, '
+                             || shape
+                             || ' SHAPE '
+                             || 'from '
+                             || feat_tab
+                             || ' f, geom_tab g where sdo_relate(f.'
+                             || shape
+                             || ', g.geoloc, '
+                             || ''''
+                             || 'mask=ANYINTERACT'
+                             || ''''
+                             || ' ) = '
+                             || ''''
+                             || 'TRUE'
+                             || ''''
+                                select_string
+                        FROM (SELECT nlt_id,
+                                     nlt_units,
+                                     nth_feature_pk_column pk,
+                                     nth_feature_shape_column shape,
+                                     nth_feature_table feat_tab
+                                FROM v_nm_datum_themes
+                               --                               WHERE
+                               --                               nlt_id IN (SELECT COLUMN_VALUE
+                               --                                                  FROM TABLE (p_nlt_ids)))));
+                               --                                     OR nlt_is_empty = 'Y')));
+                               WHERE    (    nlt_is_empty = 'N'
+                                         AND nlt_id IN (SELECT COLUMN_VALUE
+                                                          FROM TABLE (
+                                                                  p_nlt_ids)))
+                                     OR nlt_is_empty = 'Y')));
+
+
+
+      nm_debug.debug_on;
+      nm_debug.debug (lstr);
+
+      EXECUTE IMMEDIATE lstr INTO retval USING p_geom;
+
+      RETURN retval;
+   --
+   END;
 
    FUNCTION get_refnt_RPt_tab_from_nspe (
       p_nspe_id       IN INTEGER,
@@ -767,11 +887,11 @@ AS
                             nm_slk,
                             nm_end_slk)
            AS (SELECT /*+materialize*/
-                     1                      levl,
-                      nm_ne_id_in           top_group,
-                      nm_ne_id_in           parent_group,
-                      nm_ne_id_of           child_group,
-                      nm_obj_type           parent_type,
+                     1 levl,
+                      nm_ne_id_in top_group,
+                      nm_ne_id_in parent_group,
+                      nm_ne_id_of child_group,
+                      nm_obj_type parent_type,
                       TO_CHAR (nm_ne_id_in) path_string,
                       nm_begin_mp,
                       nm_end_mp,
@@ -793,8 +913,8 @@ AS
                       p.nm_end_slk
                  FROM group_hierarchy t, nm_members p
                 WHERE t.child_group = p.nm_ne_id_in)
-              SEARCH DEPTH FIRST BY parent_group SET order1
-                     CYCLE parent_group SET cycle TO 1 DEFAULT 0
+                 SEARCH DEPTH FIRST BY parent_group SET order1
+                 CYCLE parent_group SET cycle TO 1 DEFAULT 0
       --select * from group_hierarchy
       SELECT CAST (COLLECT (lb_rpt (nm_ne_id_of,
                                     nlt_id,
@@ -815,11 +935,11 @@ AS
                      nm_seq_no,
                      nm_dir_flag,
                      GREATEST (m.nm_begin_mp, g.nm_begin_mp) nm_begin_mp,
-                     LEAST (m.nm_end_mp, g.nm_end_mp)        nm_end_mp,
+                     LEAST (m.nm_end_mp, g.nm_end_mp) nm_end_mp,
                      nlt_units
                 FROM group_hierarchy g,
-                     nm_elements     e,
-                     nm_locations    m,
+                     nm_elements e,
+                     nm_locations m,
                      nm_linear_types,
                      lb_types
                --                     TABLE (p_asset_types)
@@ -838,13 +958,14 @@ AS
                      --                                                             end
                      AND (       p_whole_only = 'TRUE'
                              AND NOT EXISTS
-                                    (SELECT 1
-                                       FROM nm_locations l
-                                      WHERE     l.nm_ne_id_in = m.nm_ne_id_in
-                                            AND l.nm_obj_type = m.nm_obj_type
-                                            AND l.nm_ne_id_of NOT IN
-                                                   (SELECT child_group
-                                                      FROM group_hierarchy))
+                                        (SELECT 1
+                                           FROM nm_locations l
+                                          WHERE     l.nm_ne_id_in =
+                                                       m.nm_ne_id_in
+                                                AND l.nm_obj_type =
+                                                       m.nm_obj_type
+                                                AND l.nm_ne_id_of NOT IN (SELECT child_group
+                                                                            FROM group_hierarchy))
                           OR p_whole_only = 'FALSE')
               UNION ALL
               SELECT nm_ne_id_of,
@@ -855,11 +976,11 @@ AS
                      nm_seq_no,
                      nm_cardinality,
                      GREATEST (m.nm_begin_mp, g.nm_begin_mp) nm_begin_mp,
-                     LEAST (m.nm_end_mp, g.nm_end_mp)        nm_end_mp,
+                     LEAST (m.nm_end_mp, g.nm_end_mp) nm_end_mp,
                      nlt_units
                 FROM group_hierarchy g,
-                     nm_elements     e,
-                     nm_members      m,
+                     nm_elements e,
+                     nm_members m,
                      nm_linear_types
                --                     TABLE (p_asset_types)
                WHERE     ne_id = m.nm_ne_id_of
@@ -869,13 +990,14 @@ AS
                      AND nm_obj_type = NVL (p_inv_type, nm_obj_type) --asset_type);
                      AND (       p_whole_only = 'TRUE'
                              AND NOT EXISTS
-                                    (SELECT 1
-                                       FROM nm_members l
-                                      WHERE     l.nm_ne_id_in = m.nm_ne_id_in
-                                            AND l.nm_obj_type = m.nm_obj_type
-                                            AND l.nm_ne_id_of NOT IN
-                                                   (SELECT child_group
-                                                      FROM group_hierarchy))
+                                        (SELECT 1
+                                           FROM nm_members l
+                                          WHERE     l.nm_ne_id_in =
+                                                       m.nm_ne_id_in
+                                                AND l.nm_obj_type =
+                                                       m.nm_obj_type
+                                                AND l.nm_ne_id_of NOT IN (SELECT child_group
+                                                                            FROM group_hierarchy))
                           OR p_whole_only = 'FALSE'));
 
       RETURN retval;
@@ -1018,7 +1140,7 @@ AS
 
       --
       -- just going up the hierarchy to aggregate the data according to linear type
-      
+
       WITH itab
            AS (SELECT t.*
                  FROM TABLE (p_lb_RPt_tab) t)
@@ -1028,21 +1150,21 @@ AS
                      obj_id,
                      seg_id,
                      ROWNUM,
-                     1, --relative_dir,
+                     1,                                        --relative_dir,
                      start_m,
                      end_m,
                      unit_m)
         BULK COLLECT INTO retval
-        FROM (  SELECT route_id                     refnt,
-                       l_refnt_type.nlt_id          refnt_type,
-                       inv_type                     obj_type,
-                       inv_id                       obj_id,
-                       inv_segment_id               seg_id,
+        FROM (  SELECT route_id refnt,
+                       l_refnt_type.nlt_id refnt_type,
+                       inv_type obj_type,
+                       inv_id obj_id,
+                       inv_segment_id seg_id,
                        ROUND (INV_START_SLK, l_round) start_m,
                        ROUND (inv_end_slk, l_round) end_m,
-                       l_refnt_type.nlt_units       unit_m,
+                       l_refnt_type.nlt_units unit_m,
                        min_seq_id,
-                       1 --relative_dir
+                       1                                        --relative_dir
                   FROM (SELECT route_id,
                                l.inv_id,
                                l.inv_segment_id,
@@ -1199,7 +1321,8 @@ AS
                                                              nm_seg_no,
                                                              1)
                                                           OVER (
-                                                             PARTITION BY route_id, inv_id
+                                                             PARTITION BY route_id,
+                                                                          inv_id
                                                              ORDER BY
                                                                 nm_seg_no,
                                                                 nm_seq_no,
@@ -1214,7 +1337,8 @@ AS
                                                              datum_id,
                                                              1)
                                                           OVER (
-                                                             PARTITION BY route_id, inv_id
+                                                             PARTITION BY route_id,
+                                                                          inv_id
                                                              ORDER BY
                                                                 nm_seg_no,
                                                                 nm_seq_no,
@@ -1229,7 +1353,8 @@ AS
                                                              end_node,
                                                              1)
                                                           OVER (
-                                                             PARTITION BY route_id, inv_id
+                                                             PARTITION BY route_id,
+                                                                          inv_id
                                                              ORDER BY
                                                                 nm_seg_no,
                                                                 nm_seq_no,
@@ -1244,7 +1369,8 @@ AS
                                                              cs,
                                                              1)
                                                           OVER (
-                                                             PARTITION BY route_id, inv_id
+                                                             PARTITION BY route_id,
+                                                                          inv_id
                                                              ORDER BY
                                                                 nm_seg_no,
                                                                 nm_seq_no,
@@ -1259,7 +1385,8 @@ AS
                                                              ce,
                                                              1)
                                                           OVER (
-                                                             PARTITION BY route_id, inv_id
+                                                             PARTITION BY route_id,
+                                                                          inv_id
                                                              ORDER BY
                                                                 nm_seg_no,
                                                                 nm_seq_no,
@@ -1288,7 +1415,8 @@ AS
                                                              datum_end,
                                                              1)
                                                           OVER (
-                                                             PARTITION BY route_id, inv_id
+                                                             PARTITION BY route_id,
+                                                                          inv_id
                                                              ORDER BY
                                                                 nm_seg_no,
                                                                 nm_seq_no,
@@ -1298,7 +1426,11 @@ AS
                                                                 datum_end * dir),
                                                           ce)
                                                           inv_prior_datum_st,
-                                                    min( seq_id ) over ( partition by route_id ) min_seq_id
+                                                       MIN (
+                                                          seq_id)
+                                                       OVER (
+                                                          PARTITION BY route_id)
+                                                          min_seq_id
                                                   FROM (WITH INV_IDS
                                                              AS (SELECT itab.obj_id
                                                                            inv_id,
@@ -1337,7 +1469,9 @@ AS
                                                                  ne_length,
                                                                  m.nm_cardinality
                                                                     dir,
-                                                                 m.nm_cardinality * i.dir_flag relative_dir,
+                                                                   m.nm_cardinality
+                                                                 * i.dir_flag
+                                                                    relative_dir,
                                                                  DECODE (
                                                                     ne_sub_class,
                                                                     'S', 'S/L',
@@ -1469,8 +1603,8 @@ AS
                        start_seg,
                        end_seg,
                        datum_unit,
-                       min_seq_id--,
---                       relative_dir
+                       min_seq_id                                          --,
+              --                       relative_dir
               ORDER BY min_seq_id, route_id, inv_start_slk);
 
       RETURN retval;
@@ -1498,21 +1632,22 @@ AS
                      end_m,
                      datum_unit)
         BULK COLLECT INTO retval
-        FROM (SELECT datum_ne_id     refnt,
+        FROM (SELECT datum_ne_id refnt,
                      refnt_type,
                      obj_type,
                      obj_id,
-                     nm_seg_no       seg_id,
+                     nm_seg_no seg_id,
                      ROWNUM,
-                     route_dir_flag  dir_flag,
+                     route_dir_flag dir_flag,
                      inv_datum_start start_m,
-                     inv_datum_end   end_m,
+                     inv_datum_end end_m,
                      datum_unit
                 FROM (SELECT t1."SECTION_ID",
                              t1."NM_SEQ_NO",
                              t1."NM_SEG_NO",
                              t1.datum_ne_id,
-                             t1.route_dir_flag * obj_dir_flag "ROUTE_DIR_FLAG",
+                             t1.route_dir_flag * obj_dir_flag
+                                "ROUTE_DIR_FLAG",
                              t1."ROUTE_START_ON_ESU",
                              t1."ROUTE_END_ON_ESU",
                              t1."ROUTE_START_M",
@@ -1525,14 +1660,14 @@ AS
                              t1."INV_END",
                              t1."NE_LENGTH",
                              t1.ne_nt_type,
-							 inv_start inv_datum_start,
+                             inv_start inv_datum_start,
                              -- ROUND (inv_start, 2) inv_datum_start,
                              --                             round(CASE route_dir_flag
                              --                                WHEN 1 THEN inv_start
                              --                                ELSE ne_length - inv_end
                              --                             END, 2 )
                              --                                inv_datum_start,
-							 inv_end inv_datum_end,
+                             inv_end inv_datum_end,
                              -- ROUND (inv_end, 2)   inv_datum_end,
                              --                             round(CASE route_dir_flag
                              --                                WHEN 1 THEN inv_end
@@ -1541,15 +1676,15 @@ AS
                              --                                inv_datum_end,
                              refnt_type,
                              datum_unit
-                        FROM (  SELECT rm.nm_ne_id_in  section_id,
+                        FROM (  SELECT rm.nm_ne_id_in section_id,
                                        rm.nm_seq_no,
                                        rm.nm_seg_no,
-                                       rm.nm_ne_id_of  datum_ne_id,
+                                       rm.nm_ne_id_of datum_ne_id,
                                        rm.nm_cardinality route_dir_flag,
-                                       rm.nm_begin_mp  route_start_on_esu,
-                                       rm.nm_end_mp    route_end_on_esu,
-                                       rm.nm_slk       route_start_m,
-                                       rm.nm_end_slk   route_end_m,
+                                       rm.nm_begin_mp route_start_on_esu,
+                                       rm.nm_end_mp route_end_on_esu,
+                                       rm.nm_slk route_start_m,
+                                       rm.nm_end_slk route_end_m,
                                        im.obj_id,
                                        im.obj_type,
                                        im.start_m,
@@ -1613,24 +1748,26 @@ AS
                                           inv_end,
                                        e.ne_length,
                                        e.ne_nt_type,
-                                       nlt_id          refnt_type,
-                                       nlt_units       datum_unit,
-                                       im.m_unit       group_unit,
+                                       nlt_id refnt_type,
+                                       nlt_units datum_unit,
+                                       im.m_unit group_unit,
                                        NVL (uc_conversion_factor, 1),
-                                       case
-                                          when im.start_m = im.end_m
-                                            then ROW_NUMBER ()
-                                                 OVER (
-                                                 PARTITION BY im.obj_id,
-                                                              rm.nm_ne_id_in
-                                                 ORDER BY im.start_m)
-                                          else NULL
-                                       end
-                                       rn,
+                                       CASE
+                                          WHEN im.start_m = im.end_m
+                                          THEN
+                                             ROW_NUMBER ()
+                                             OVER (
+                                                PARTITION BY im.obj_id,
+                                                             rm.nm_ne_id_in
+                                                ORDER BY im.start_m)
+                                          ELSE
+                                             NULL
+                                       END
+                                          rn,
                                        im.dir_flag obj_dir_flag
-                                  FROM itab          im,
-                                       nm_members    rm,
-                                       nm_elements   e,
+                                  FROM itab im,
+                                       nm_members rm,
+                                       nm_elements e,
                                        nm_linear_types l,
                                        (SELECT uc_unit_id_in,
                                                uc_unit_id_out,
@@ -1665,15 +1802,15 @@ AS
                                                        rm.nm_end_slk
                                                 AND NVL (im.start_m, rm.nm_slk) >=
                                                        rm.nm_slk) --                                       OR (    nvl(im.start_m,0) = nvl(im.end_m, 0)
- --                                                AND nvl(im.end_m, rm.nm_end_slk) = rm.nm_end_slk and rownum = 1
- ----                                                AND nvl(im.start_m, rm.nm_slk)   = rm.nm_slk
-                           --                                                )
+                                                                 --                                                AND nvl(im.end_m, rm.nm_end_slk) = rm.nm_end_slk and rownum = 1
+                                                                 ----                                                AND nvl(im.start_m, rm.nm_slk)   = rm.nm_slk
+                                                                 --                                                )
                                            )
                                        AND UC_UNIT_ID_IN = nlt_units
                                        AND UC_UNIT_ID_OUT = m_unit
                               ORDER BY rm.nm_seg_no, rm.nm_seq_no, im.start_m)
                              t1
-                       WHERE  rn = 1 or rn is NULL));
+                       WHERE rn = 1 OR rn IS NULL));
 
       RETURN retval;
    END;
@@ -1876,6 +2013,44 @@ AS
       EXECUTE IMMEDIATE l_str INTO retval USING p_rpt_tab;
 
       --
+      RETURN retval;
+   END;
+
+   FUNCTION get_geom_from_lrefs (pi_lrefs IN nm_lref_array)
+      RETURN SDO_GEOMETRY
+   IS
+      retval   SDO_GEOMETRY;
+   BEGIN
+      WITH input_data
+           AS (SELECT objectid,
+                      rn,
+                      lr_ne_id,
+                      lr_offset,
+                      g1.g.x x,
+                      g1.g.y y
+                 FROM (SELECT 1 objectid,
+                              ROW_NUMBER () OVER (ORDER BY 1) rn,
+                              t.*,
+                              nm3sdo.get_2d_pt (
+                                 SDO_LRS.locate_pt (geoloc, lr_offset, 0.005)).sdo_point
+                                 g
+                         FROM v_lb_nlt_geometry,
+                              TABLE (pi_lrefs.nla_lref_array) t
+                        WHERE lr_ne_id = ne_id) g1)
+      --select * from input_data
+      SELECT sdo_geometry (2002,
+                           27700,
+                           NULL,
+                           sdo_elem_info_array (1, 2, 1),
+                           ords)
+        INTO retval
+        FROM (SELECT CAST (COLLECT (ordinate) AS sdo_ordinate_array) ords
+                FROM (  SELECT ordinate
+                          FROM (SELECT rn, 1 cn, x ordinate FROM input_data
+                                UNION ALL
+                                SELECT rn, 2 cn, y ordinate FROM input_data)
+                      ORDER BY rn, cn));
+
       RETURN retval;
    END;
 END;
