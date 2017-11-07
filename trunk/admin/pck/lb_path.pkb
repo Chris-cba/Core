@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_path
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_path.pkb-arc   1.10   Oct 04 2017 15:02:02   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_path.pkb-arc   1.11   Nov 07 2017 12:36:12   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_path.pkb  $
-   --       Date into PVCS   : $Date:   Oct 04 2017 15:02:02  $
-   --       Date fetched Out : $Modtime:   Oct 04 2017 14:58:08  $
-   --       PVCS Version     : $Revision:   1.10  $
+   --       Date into PVCS   : $Date:   Nov 07 2017 12:36:12  $
+   --       Date fetched Out : $Modtime:   Nov 07 2017 12:35:34  $
+   --       PVCS Version     : $Revision:   1.11  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,13 +16,16 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.10  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.11  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_path';
 
    --
    -----------------------------------------------------------------------------
    --
+   PROCEDURE make_nw_from_geom (
+      pi_inv_type   IN lb_types.lb_exor_inv_type%TYPE,
+      pi_geom       IN SDO_GEOMETRY);
 
    FUNCTION get_version
       RETURN VARCHAR2
@@ -199,27 +202,8 @@ AS
       nw_exists      EXCEPTION;
       PRAGMA EXCEPTION_INIT (nw_exists, -29532);
    BEGIN
-      res_string := SDO_NET_MEM.NETWORK_MANAGER.LIST_NETWORKS;
 
-      nm_debug.debug (
-            'get_sdo_path from nodes - net_mem = '
-         || net_mem
-         || ', res_string = ');
-      --      IF res_string = net_mem
-      --      THEN
-      --         NULL;
-      --      ELSE
-      --         nm_debug.debug ('net-mem = ' || net_mem);
-      --         begin
-      --            SDO_NET_MEM.NETWORK_MANAGER.READ_NETWORK (net_mem, 'TRUE');
-      --         exception
-      --            when nw_exists then SDO_NET_MEM.NETWORK_MANAGER.DROP_NETWORK(net_mem);
-      --            SDO_NET_MEM.NETWORK_MANAGER.READ_NETWORK (net_mem, 'TRUE');
-      --         end;
-      --
-      --      END IF;
-
-      --
+      net_mem := 'LB_NETWORK';
       res_string :=
          SDO_NET_MEM.NETWORK_MANAGER.IS_REACHABLE (net_mem, p_no_1, p_no_2);
       DBMS_OUTPUT.PUT_LINE (
@@ -260,6 +244,7 @@ AS
             'Path ' || res_numeric || ' has links - being returned: ');
       END IF;
 
+      nm_debug.debug ('Path returned between two nodes');
       --
       RETURN res_array;
    END;
@@ -514,6 +499,28 @@ AS
    --      END IF;
    END;
 
+   PROCEDURE read_network
+   IS
+      net_mem      VARCHAR2 (1000);
+   BEGIN
+
+      net_mem := 'LB_NETWORK'; 
+
+      DECLARE
+         nw_exists   EXCEPTION;
+         PRAGMA EXCEPTION_INIT (nw_exists, -29532);
+      --
+      BEGIN
+         SDO_NET_MEM.NETWORK_MANAGER.READ_NETWORK (net_mem, 'TRUE');
+      EXCEPTION
+         WHEN nw_exists
+         THEN
+            SDO_NET_MEM.NETWORK_MANAGER.drop_network (net_mem);
+            SDO_NET_MEM.NETWORK_MANAGER.READ_NETWORK (net_mem, 'TRUE');
+      END;
+   END;
+
+   --
    --
    FUNCTION node_state (p_node_id IN INTEGER)
       RETURN VARCHAR2
@@ -816,23 +823,105 @@ AS
       --
       RETURN retval;
    END;
---
---BEGIN
---   set_network; --('XHA_ESU_NETWORK');
---
---   DECLARE
---      net_mem      VARCHAR2 (100) := g_network;
---      res_string   VARCHAR2 (1000);
---   BEGIN
---      res_string := SDO_NET_MEM.NETWORK_MANAGER.LIST_NETWORKS;
---
---      IF res_string = net_mem
---      THEN
---         NULL;
---      ELSE
---         nm_debug.debug ('net-mem = ' || net_mem);
---         SDO_NET_MEM.NETWORK_MANAGER.READ_NETWORK (net_mem, 'TRUE');
---      END IF;
---   END;
+
+   --
+   --BEGIN
+   --   set_network; --('XHA_ESU_NETWORK');
+   --
+   --   DECLARE
+   --      net_mem      VARCHAR2 (100) := g_network;
+   --      res_string   VARCHAR2 (1000);
+   --   BEGIN
+   --      res_string := SDO_NET_MEM.NETWORK_MANAGER.LIST_NETWORKS;
+   --
+   --      IF res_string = net_mem
+   --      THEN
+   --         NULL;
+   --      ELSE
+   --         nm_debug.debug ('net-mem = ' || net_mem);
+   --         SDO_NET_MEM.NETWORK_MANAGER.READ_NETWORK (net_mem, 'TRUE');
+   --      END IF;
+   --   END;
+
+   PROCEDURE make_nw_from_lrefs (
+      pi_inv_type       IN lb_types.lb_exor_inv_type%TYPE,
+      pi_lrefs          IN nm_lref_array,
+      pi_buffer         IN NUMBER DEFAULT 50,
+      pi_buffer_units   IN nm_units.un_unit_id%TYPE DEFAULT 1)
+   IS
+      --
+      l_geom      SDO_GEOMETRY;
+      l_geom1     SDO_GEOMETRY;
+      l_rpt       lb_rpt_tab;
+      --
+      l_no        nm_cnct_no_array;
+      l_ne        nm_cnct_ne_array;
+      l_nte_seq   INTEGER := Nm3seq.next_nte_id_seq;
+      l_int       int_array := NM3ARRAY.INIT_INT_ARRAY;
+
+
+      g_tol       NUMBER := 0.05;
+   BEGIN
+      nm_debug.debug ('make nw start - get geom');
+      l_geom := lb_get.get_geom_from_lrefs (pi_lrefs);
+      nm_debug.debug ('make nw get buffer');
+
+      SELECT SDO_GEOM.sdo_buffer (l_geom, pi_buffer, g_tol)
+        INTO l_geom1
+        FROM DUAL;
+
+      nm_debug.debug ('call make nw from geom ');
+      make_nw_from_geom (pi_inv_type, l_geom1);
+   END;
+
+
+   PROCEDURE make_nw_from_geom (
+      pi_inv_type   IN lb_types.lb_exor_inv_type%TYPE,
+      pi_geom       IN SDO_GEOMETRY)
+   IS
+      l_rpt   lb_rpt_tab;
+   BEGIN
+      l_rpt := LB_GET.GET_REFNT_RPT_TAB_FROM_GEOM (pi_geom, pi_inv_type, 100);
+
+      DELETE FROM LB_NETWORK_LINK;
+
+      DELETE FROM LB_NETWORK_NO;
+
+      INSERT INTO LB_NETWORK_LINK (link_id,
+                                   link_name,
+                                   start_node_id,
+                                   end_node_id,
+                                   link_type,
+                                   active,
+                                   link_level,
+                                   xnw_cost)
+         SELECT ne_id,
+                ne_unique,
+                ne_no_start,
+                ne_no_end,
+                ne_nt_type,
+                'Y',
+                NULL,
+                ne_length
+           FROM nm_elements, TABLE (l_rpt)
+          WHERE refnt = ne_id;
+
+      INSERT INTO LB_NETWORK_NO (node_id,
+                                 node_name,
+                                 node_type,
+                                 active,
+                                 partition_id,
+                                 xno_cost)
+         SELECT DISTINCT nnu_no_node_id,
+                         TO_CHAR (nnu_no_node_id),
+                         no_node_type,
+                         'Y',
+                         NULL,
+                         0
+           FROM nm_node_usages, nm_nodes, TABLE (l_rpt)
+          WHERE refnt = nnu_ne_id AND nnu_no_node_id = no_node_id;
+
+      read_network;
+   END;
 END lb_path;
 /
