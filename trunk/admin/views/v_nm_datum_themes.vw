@@ -10,19 +10,18 @@ CREATE OR REPLACE FORCE VIEW V_NM_DATUM_THEMES
    nth_feature_shape_column
 )
 AS
-   SELECT -----------------------------------------------------------------------------
-                                                                            --
-                                                      --   SCCS Identifiers :-
-                                                                            --
-           --       sccsid           : @(#)v_nm_net_themes_all.vw 1.2 03/07/06
-                            --       Module Name      : v_nm_net_themes_all.vw
-                                 --       Date into SCCS   : 06/03/07 17:19:49
-                                 --       Date fetched Out : 07/06/13 17:08:38
-                                               --       SCCS Version     : 1.2
-                                                                            --
- -----------------------------------------------------------------------------
-                                  --  Copyright (c) exor corporation ltd, 2006
- -----------------------------------------------------------------------------
+   SELECT -------------------------------------------------------------------------
+            --   PVCS Identifiers :-
+            --
+            --       PVCS id          : $Header:   //new_vm_latest/archives/lb/admin/views/v_nm_datum_themes.vw-arc   1.1   Nov 07 2017 12:01:04   Rob.Coupe  $
+            --       Module Name      : $Workfile:   v_nm_datum_themes.vw  $
+            --       Date into PVCS   : $Date:   Nov 07 2017 12:01:04  $
+            --       Date fetched Out : $Modtime:   Nov 07 2017 12:00:42  $
+            --       Version          : $Revision:   1.1  $
+            ------------------------------------------------------------------
+            --   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+            ------------------------------------------------------------------
+            ----
    NTH_THEME_ID,
    NTH_THEME_NAME,
    NLT_ID,
