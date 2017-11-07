@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE lb_get
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_get.pkh-arc   1.12   Oct 07 2016 14:15:12   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_get.pkh-arc   1.13   Nov 07 2017 11:44:18   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_get.pkh  $
-   --       Date into PVCS   : $Date:   Oct 07 2016 14:15:12  $
-   --       Date fetched Out : $Modtime:   Oct 07 2016 14:15:26  $
-   --       PVCS Version     : $Revision:   1.12  $
+   --       Date into PVCS   : $Date:   Nov 07 2017 11:44:18  $
+   --       Date fetched Out : $Modtime:   Nov 07 2017 11:43:14  $
+   --       PVCS Version     : $Revision:   1.13  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,7 +16,7 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.12  $';
+   g_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.13  $';
 
    --
    FUNCTION get_version
@@ -34,19 +34,26 @@ AS
       RETURN lb_RPt_tab;
 
    FUNCTION get_refnt_RPt_tab_from_geom (
-      p_geom         IN MDSYS.sdo_geometry,
-      p_theme_id     IN nm_themes_all.nth_theme_id%TYPE,
-      p_mask_array   IN VARCHAR2 DEFAULT 'ANYINTERACT',
-      p_cardinality  IN INTEGER )
+      p_geom          IN MDSYS.sdo_geometry,
+      p_theme_id      IN nm_themes_all.nth_theme_id%TYPE,
+      p_mask_array    IN VARCHAR2 DEFAULT 'ANYINTERACT',
+      p_cardinality   IN INTEGER)
       RETURN lb_RPt_tab;
 
-   FUNCTION get_refnt_RPt_tab_from_nspe (
-      p_nspe_id      IN INTEGER,
-      p_theme_id     IN nm_themes_all.nth_theme_id%TYPE,
-      p_mask_array   IN VARCHAR2 := 'ANYINTERACT',
-      p_cardinality  IN INTEGER )
+   FUNCTION get_refnt_RPt_tab_from_geom (
+      p_geom          IN MDSYS.sdo_geometry,
+      p_inv_type      IN lb_types.lb_exor_inv_type%TYPE,
+      p_cardinality   IN INTEGER)
       RETURN lb_RPt_tab;
-      
+
+
+   FUNCTION get_refnt_RPt_tab_from_nspe (
+      p_nspe_id       IN INTEGER,
+      p_theme_id      IN nm_themes_all.nth_theme_id%TYPE,
+      p_mask_array    IN VARCHAR2 := 'ANYINTERACT',
+      p_cardinality   IN INTEGER)
+      RETURN lb_RPt_tab;
+
 
    FUNCTION get_RPT_geom_tab_from_RPt (p_rpt_tab IN lb_RPt_tab)
       RETURN lb_RPt_geom_tab;
@@ -86,30 +93,17 @@ AS
                             p_intsct        IN VARCHAR DEFAULT 'FALSE',
                             p_m_unit        IN INTEGER,
                             p_lb_only       IN VARCHAR2 DEFAULT 'FALSE',
-                            p_whole_only    IN VARCHAR2 DEFAULT 'FALSE',                            
+                            p_whole_only    IN VARCHAR2 DEFAULT 'FALSE',
                             p_cardinality   IN INTEGER)
       RETURN lb_RPt_tab;
 
    FUNCTION g_of_g_search (p_group_id      IN INTEGER,
---                           p_asset_types   IN lb_asset_type_tab,
+                           --                           p_asset_types   IN lb_asset_type_tab,
                            p_inv_type      IN VARCHAR2 DEFAULT NULL,
                            p_LB_only       IN VARCHAR2 DEFAULT 'TRUE',
-						   p_whole_only    IN VARCHAR2 DEFAULT 'FALSE',
+                           p_whole_only    IN VARCHAR2 DEFAULT 'FALSE',
                            p_cardinality   IN INTEGER)
       RETURN lb_rpt_tab;
-
---
---   FUNCTION g_of_g_search (p_group_id      IN INTEGER,
---                           p_asset_types   IN lb_asset_type_tab,
---                           p_LB_only       IN VARCHAR2 DEFAULT 'TRUE',
---                           p_cardinality   IN INTEGER)
---      RETURN lb_rpt_tab;
---      
---   FUNCTION g_of_g_search (p_group_id IN INTEGER, 
---                           p_obj_type IN VARCHAR2,
---                           p_LB_only       IN VARCHAR2 DEFAULT 'TRUE',
---                           p_cardinality   IN INTEGER)
---      RETURN lb_rpt_tab;
 
 
    FUNCTION get_lb_RPt_cur (p_refnt         IN INTEGER,
@@ -138,7 +132,7 @@ AS
    FUNCTION get_obj_id_as_rpt_tab (pi_obj_id     IN INTEGER,
                                    pi_obj_type   IN VARCHAR2)
       RETURN lb_rpt_tab;
-   
+
    FUNCTION get_ft_rpt_tab (p_rpt_tab      IN lb_rpt_tab,
                             p_table_name   IN VARCHAR2,
                             p_inv_type     IN VARCHAR2,
@@ -148,5 +142,7 @@ AS
                             p_end_col      IN VARCHAR2)
       RETURN lb_rpt_tab;
 
+   FUNCTION get_geom_from_lrefs (pi_lrefs IN nm_lref_array)
+      RETURN SDO_GEOMETRY;
 END;
 /
