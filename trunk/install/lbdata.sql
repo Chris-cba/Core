@@ -3,11 +3,11 @@
 --
 --   PVCS Identifiers :-
 --
---       pvcsid                 : $Header:   //new_vm_latest/archives/lb/install/lbdata.sql-arc   1.1   Nov 02 2017 14:22:42   Rob.Coupe  $
+--       pvcsid                 : $Header:   //new_vm_latest/archives/lb/install/lbdata.sql-arc   1.2   Nov 08 2017 15:00:26   Rob.Coupe  $
 --       Module Name      : $Workfile:   lbdata.sql  $
---       Date into PVCS   : $Date:   Nov 02 2017 14:22:42  $
---       Date fetched Out : $Modtime:   Nov 02 2017 14:21:46  $
---       PVCS Version     : $Revision:   1.1  $
+--       Date into PVCS   : $Date:   Nov 08 2017 15:00:26  $
+--       Date fetched Out : $Modtime:   Nov 08 2017 14:59:10  $
+--       PVCS Version     : $Revision:   1.2  $
 --
 --   Author : Rob Coupe
 --
@@ -122,6 +122,8 @@ BEGIN
    add_object('LB_LINEAR_ELEMENT_TYPES','TYPE');
    add_object('NAJX_ID_SEQ', 'SEQUENCE');
    add_object('NJX_ID_SEQ', 'SEQUENCE');
+   add_object('V_NM_DATUM_THEMES', 'VIEW');
+   add_object('MAKE_NW_FROM_LREFS', 'PROCEDURE');
    --   
    FOR i IN 1 .. l_object_name.COUNT
    LOOP
@@ -197,3 +199,19 @@ from dual where not exists ( select 1 from lb_units where exor_unit_id = 6 )
  and exists ( select 1 from nm_units where un_unit_id = 6 );
 
 commit;
+
+Prompt New System option for network graph generation
+
+insert into hig_option_list
+(hol_id, hol_product, hol_name, hol_remarks, hol_domain, hol_datatype, hol_mixed_case, hol_user_option, hol_max_length )
+select 'LBNWBUFFER', 'LB', 'LB Graph Buffer', 'The size of the buffer in meters around an object to from the spatial intersection for construction of a dynamic network property graph',
+       NULL, 'NUMBER', 'N', 'N', 2000 from dual
+where not exists ( select 1 from hig_option_list where hol_id = 'LBNWBUFFER'   ); 
+
+insert into hig_option_values
+( hov_id, hov_value )
+select 'LBNWBUFFER', '200'
+from dual
+where not exists ( select 1 from hig_option_values where hov_id = 'LBNWBUFFER' );
+
+commit;   
