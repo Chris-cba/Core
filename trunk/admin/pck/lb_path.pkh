@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE lb_path
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_path.pkh-arc   1.9   Nov 07 2017 12:29:50   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_path.pkh-arc   1.10   Nov 08 2017 15:07:20   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_path.pkh  $
-   --       Date into PVCS   : $Date:   Nov 07 2017 12:29:50  $
-   --       Date fetched Out : $Modtime:   Nov 07 2017 12:29:16  $
-   --       PVCS Version     : $Revision:   1.9  $
+   --       Date into PVCS   : $Date:   Nov 08 2017 15:07:20  $
+   --       Date fetched Out : $Modtime:   Nov 08 2017 15:06:02  $
+   --       PVCS Version     : $Revision:   1.10  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,11 +16,13 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.9  $';
+   g_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.10  $';
    --
    g_network           VARCHAR2 (30) := 'LB_NETWORK';
 
    g_nw_types          ptr_vc_array_type;
+   
+   g_buffer_size       NUMBER := nvl(to_number(hig.get_sysopt('LBNWBUFFER')), 200);
 
    --
    ----------------------------------------------------------------------------
@@ -88,7 +90,7 @@ AS
    PROCEDURE make_nw_from_lrefs (
       pi_inv_type       IN lb_types.lb_exor_inv_type%TYPE,
       pi_lrefs          IN nm_lref_array,
-      pi_buffer         IN NUMBER DEFAULT 50,
+      pi_buffer         IN NUMBER DEFAULT g_buffer_size,
       pi_buffer_units   IN nm_units.un_unit_id%TYPE DEFAULT 1);
 END lb_path;
 /
