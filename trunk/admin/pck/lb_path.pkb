@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_path
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_path.pkb-arc   1.12   Nov 08 2017 11:03:58   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_path.pkb-arc   1.13   Nov 08 2017 15:07:50   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_path.pkb  $
-   --       Date into PVCS   : $Date:   Nov 08 2017 11:03:58  $
-   --       Date fetched Out : $Modtime:   Nov 08 2017 11:03:00  $
-   --       PVCS Version     : $Revision:   1.12  $
+   --       Date into PVCS   : $Date:   Nov 08 2017 15:07:50  $
+   --       Date fetched Out : $Modtime:   Nov 08 2017 15:05:58  $
+   --       PVCS Version     : $Revision:   1.13  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,7 +16,7 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.12  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.13  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_path';
 
@@ -846,7 +846,7 @@ AS
    PROCEDURE make_nw_from_lrefs (
       pi_inv_type       IN lb_types.lb_exor_inv_type%TYPE,
       pi_lrefs          IN nm_lref_array,
-      pi_buffer         IN NUMBER DEFAULT 50,
+      pi_buffer         IN NUMBER DEFAULT g_buffer_size,
       pi_buffer_units   IN nm_units.un_unit_id%TYPE DEFAULT 1)
    IS
       --
