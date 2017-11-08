@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_path
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_path.pkb-arc   1.13   Nov 08 2017 15:07:50   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_path.pkb-arc   1.14   Nov 08 2017 21:05:34   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_path.pkb  $
-   --       Date into PVCS   : $Date:   Nov 08 2017 15:07:50  $
-   --       Date fetched Out : $Modtime:   Nov 08 2017 15:05:58  $
-   --       PVCS Version     : $Revision:   1.13  $
+   --       Date into PVCS   : $Date:   Nov 08 2017 21:05:34  $
+   --       Date fetched Out : $Modtime:   Nov 08 2017 21:04:42  $
+   --       PVCS Version     : $Revision:   1.14  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,7 +16,7 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.13  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.14  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_path';
 
@@ -206,13 +206,13 @@ AS
       net_mem := 'LB_NETWORK';
       res_string :=
          SDO_NET_MEM.NETWORK_MANAGER.IS_REACHABLE (net_mem, p_no_1, p_no_2);
-      nm_debug.debug (
-            'Can node '
-         || p_no_1
-         || ' reach node '
-         || p_no_2
-         || ' - '
-         || res_string);
+--      nm_debug.debug (
+--            'Can node '
+--         || p_no_1
+--         || ' reach node '
+--         || p_no_2
+--         || ' - '
+--         || res_string);
 
       IF res_string != 'TRUE'
       THEN
@@ -221,30 +221,30 @@ AS
 
       res_numeric :=
          SDO_NET_MEM.NETWORK_MANAGER.SHORTEST_PATH (net_mem, p_no_1, p_no_2);
-      nm_debug.debug (
-            'The shortest path from node '
-         || p_no_1
-         || ' reach node '
-         || p_no_2
-         || ' is path ID: '
-         || res_numeric);
-      nm_debug.debug (
-         'The following are characteristics of this shortest path: ');
+--      nm_debug.debug (
+--            'The shortest path from node '
+--         || p_no_1
+--         || ' reach node '
+--         || p_no_2
+--         || ' is path ID: '
+--         || res_numeric);
+--      nm_debug.debug (
+--         'The following are characteristics of this shortest path: ');
 
       IF res_numeric IS NOT NULL
       THEN
          cost := SDO_NET_MEM.PATH.GET_COST (net_mem, res_numeric);
-         nm_debug.debug (
-            'Path ' || res_numeric || ' has cost: ' || cost);
-         res_string := SDO_NET_MEM.PATH.IS_CLOSED (net_mem, res_numeric);
-         nm_debug.debug (
-            'Is path ' || res_numeric || ' closed? ' || res_string);
+--         nm_debug.debug (
+--            'Path ' || res_numeric || ' has cost: ' || cost);
+--         res_string := SDO_NET_MEM.PATH.IS_CLOSED (net_mem, res_numeric);
+--         nm_debug.debug (
+--            'Is path ' || res_numeric || ' closed? ' || res_string);
          res_array := SDO_NET_MEM.PATH.GET_LINK_IDS (net_mem, res_numeric);
-         nm_debug.debug (
-            'Path ' || res_numeric || ' has links - being returned: ');
+--         nm_debug.debug (
+--            'Path ' || res_numeric || ' has links - being returned: ');
       END IF;
 
-      nm_debug.debug ('Path returned between two nodes');
+--      nm_debug.debug ('Path returned between two nodes');
       --
       RETURN res_array;
    END;
@@ -866,7 +866,7 @@ AS
       l_geom := lb_get.get_geom_from_lrefs (pi_lrefs);
       nm_debug.debug ('make nw get buffer');
 
-      SELECT SDO_GEOM.sdo_buffer (l_geom, pi_buffer, g_tol)
+      SELECT SDO_GEOM.sdo_buffer (l_geom, pi_buffer, g_tol, 'units=METER arc_tolerance = 0.5')
         INTO l_geom1
         FROM DUAL;
 
