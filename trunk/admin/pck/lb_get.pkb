@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_get
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_get.pkb-arc   1.33   Nov 08 2017 11:08:56   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_get.pkb-arc   1.34   Nov 08 2017 21:02:00   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_get.pkb  $
-   --       Date into PVCS   : $Date:   Nov 08 2017 11:08:56  $
-   --       Date fetched Out : $Modtime:   Nov 08 2017 11:07:20  $
-   --       PVCS Version     : $Revision:   1.33  $
+   --       Date into PVCS   : $Date:   Nov 08 2017 21:02:00  $
+   --       Date fetched Out : $Modtime:   Nov 08 2017 20:59:54  $
+   --       PVCS Version     : $Revision:   1.34  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,7 +16,7 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.33  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.34  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_get';
 
@@ -331,6 +331,11 @@ AS
            INTO l_nlt_ids
            FROM nm_linear_types, nm_inv_nw
           WHERE nlt_nt_type = nin_nw_type AND nin_nit_inv_code = p_inv_type;
+      ELSE
+         SELECT CAST (COLLECT (nlt_id) AS int_array_type)
+           INTO l_nlt_ids
+           FROM nm_linear_types
+          WHERE nlt_gty_type is NULL;
       END IF;
 
       --
@@ -358,9 +363,7 @@ AS
    BEGIN
       IF int_array (p_nlt_ids).is_empty
       THEN
-         nlt_is_empty := 'Y';
-      ELSE
-         nlt_is_empty := 'N';
+         raise_application_error(-20010, 'No network type has been supplied in call to geenrate a spatial intersection');
       END IF;
 
       SELECT    'with geom_tab as ( select :geom geoloc from dual ) '
@@ -410,11 +413,10 @@ AS
                                --                               nlt_id IN (SELECT COLUMN_VALUE
                                --                                                  FROM TABLE (p_nlt_ids)))));
                                --                                     OR nlt_is_empty = 'Y')));
-                               WHERE    (    nlt_is_empty = 'N'
-                                         AND nlt_id IN (SELECT COLUMN_VALUE
+                               WHERE   nlt_id IN (SELECT COLUMN_VALUE
                                                           FROM TABLE (
-                                                                  p_nlt_ids)))
-                                     OR nlt_is_empty = 'Y')));
+                                                                  p_nlt_ids)))));
+--                                     OR nlt_is_empty = 'Y')));
 
 
 
@@ -2044,7 +2046,7 @@ AS
                            NULL,
                            sdo_elem_info_array (1, 2, 1),
                            ords)
-      into retval                           
+      into retval
         FROM (SELECT base_srid, CAST (COLLECT (ordinate) AS sdo_ordinate_array) ords
                 FROM (  SELECT ordinate, base_srid
                           FROM (SELECT rn, 1 cn, x ordinate, base_srid FROM input_data ip
