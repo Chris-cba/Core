@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_path
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_path.pkb-arc   1.11   Nov 07 2017 12:36:12   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_path.pkb-arc   1.12   Nov 08 2017 11:03:58   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_path.pkb  $
-   --       Date into PVCS   : $Date:   Nov 07 2017 12:36:12  $
-   --       Date fetched Out : $Modtime:   Nov 07 2017 12:35:34  $
-   --       PVCS Version     : $Revision:   1.11  $
+   --       Date into PVCS   : $Date:   Nov 08 2017 11:03:58  $
+   --       Date fetched Out : $Modtime:   Nov 08 2017 11:03:00  $
+   --       PVCS Version     : $Revision:   1.12  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,7 +16,7 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.11  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.12  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_path';
 
@@ -206,7 +206,7 @@ AS
       net_mem := 'LB_NETWORK';
       res_string :=
          SDO_NET_MEM.NETWORK_MANAGER.IS_REACHABLE (net_mem, p_no_1, p_no_2);
-      DBMS_OUTPUT.PUT_LINE (
+      nm_debug.debug (
             'Can node '
          || p_no_1
          || ' reach node '
@@ -221,26 +221,26 @@ AS
 
       res_numeric :=
          SDO_NET_MEM.NETWORK_MANAGER.SHORTEST_PATH (net_mem, p_no_1, p_no_2);
-      DBMS_OUTPUT.PUT_LINE (
+      nm_debug.debug (
             'The shortest path from node '
          || p_no_1
          || ' reach node '
          || p_no_2
          || ' is path ID: '
          || res_numeric);
-      DBMS_OUTPUT.PUT_LINE (
+      nm_debug.debug (
          'The following are characteristics of this shortest path: ');
 
       IF res_numeric IS NOT NULL
       THEN
          cost := SDO_NET_MEM.PATH.GET_COST (net_mem, res_numeric);
-         DBMS_OUTPUT.PUT_LINE (
+         nm_debug.debug (
             'Path ' || res_numeric || ' has cost: ' || cost);
          res_string := SDO_NET_MEM.PATH.IS_CLOSED (net_mem, res_numeric);
-         DBMS_OUTPUT.PUT_LINE (
+         nm_debug.debug (
             'Is path ' || res_numeric || ' closed? ' || res_string);
          res_array := SDO_NET_MEM.PATH.GET_LINK_IDS (net_mem, res_numeric);
-         DBMS_OUTPUT.PUT (
+         nm_debug.debug (
             'Path ' || res_numeric || ' has links - being returned: ');
       END IF;
 
@@ -504,7 +504,7 @@ AS
       net_mem      VARCHAR2 (1000);
    BEGIN
 
-      net_mem := 'LB_NETWORK'; 
+      net_mem := 'LB_NETWORK';
 
       DECLARE
          nw_exists   EXCEPTION;
