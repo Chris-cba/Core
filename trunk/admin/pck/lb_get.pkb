@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_get
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_get.pkb-arc   1.35   Nov 09 2017 14:42:22   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_get.pkb-arc   1.36   Nov 09 2017 14:46:24   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_get.pkb  $
-   --       Date into PVCS   : $Date:   Nov 09 2017 14:42:22  $
-   --       Date fetched Out : $Modtime:   Nov 09 2017 14:40:50  $
-   --       PVCS Version     : $Revision:   1.35  $
+   --       Date into PVCS   : $Date:   Nov 09 2017 14:46:24  $
+   --       Date fetched Out : $Modtime:   Nov 09 2017 14:45:40  $
+   --       PVCS Version     : $Revision:   1.36  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,7 +16,7 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.35  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.36  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_get';
 
@@ -2048,7 +2048,7 @@ AS
                            ords)
       into retval
         FROM (SELECT base_srid, CAST (COLLECT (ordinate order by rn, cn) AS sdo_ordinate_array) ords
-                FROM (  SELECT ordinate, base_srid
+                FROM (  SELECT rn, cn, ordinate, base_srid
                           FROM (SELECT rn, 1 cn, x ordinate, base_srid FROM input_data ip
                                 UNION ALL
                                 SELECT rn, 2 cn, y ordinate, base_srid FROM input_data ip)
