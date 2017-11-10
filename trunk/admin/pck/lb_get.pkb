@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_get
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_get.pkb-arc   1.36   Nov 09 2017 14:46:24   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_get.pkb-arc   1.37   Nov 10 2017 07:43:38   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_get.pkb  $
-   --       Date into PVCS   : $Date:   Nov 09 2017 14:46:24  $
-   --       Date fetched Out : $Modtime:   Nov 09 2017 14:45:40  $
-   --       PVCS Version     : $Revision:   1.36  $
+   --       Date into PVCS   : $Date:   Nov 10 2017 07:43:38  $
+   --       Date fetched Out : $Modtime:   Nov 10 2017 07:42:20  $
+   --       PVCS Version     : $Revision:   1.37  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,7 +16,7 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.36  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.37  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_get';
 
@@ -2023,7 +2023,9 @@ AS
    IS
       retval   SDO_GEOMETRY;
    BEGIN
-      WITH input_data
+         WITH lrdata as
+      ( select rownum ordnum, t.* from TABLE (pi_lrefs.nla_lref_array) t )
+      , input_data
            AS (SELECT objectid,
                       rn,
                       lr_ne_id,
@@ -2033,26 +2035,30 @@ AS
                       g1.base_srid
                  FROM (SELECT 1 objectid,
                               ROW_NUMBER () OVER (ORDER BY 1) rn,
-                              t.*,
+                              l.*,
                               nm3sdo.get_2d_pt (
                                  SDO_LRS.locate_pt (geoloc, lr_offset, 0.005)).sdo_point
                                  g,
                                  s.geoloc.sdo_srid base_srid
-                         FROM v_lb_nlt_geometry s,
-                              TABLE (pi_lrefs.nla_lref_array) t
-                        WHERE lr_ne_id = ne_id) g1)
+                         FROM v_lb_nlt_geometry s, lrdata l                               
+                        WHERE lr_ne_id = ne_id order by ordnum) g1)
       SELECT sdo_geometry (2002,
                            base_srid,
                            NULL,
                            sdo_elem_info_array (1, 2, 1),
                            ords)
       into retval
-        FROM (SELECT base_srid, CAST (COLLECT (ordinate order by rn, cn) AS sdo_ordinate_array) ords
+        FROM (SELECT 
+        base_srid, 
+        CAST (COLLECT (ordinate order by rn, cn) AS sdo_ordinate_array) ords
                 FROM (  SELECT rn, cn, ordinate, base_srid
                           FROM (SELECT rn, 1 cn, x ordinate, base_srid FROM input_data ip
                                 UNION ALL
                                 SELECT rn, 2 cn, y ordinate, base_srid FROM input_data ip)
-                         ORDER BY rn, cn) group by base_srid );
+--                         ORDER BY rn, cn
+                         ) 
+                         group by base_srid
+                          );
 
       RETURN retval;
    END;
