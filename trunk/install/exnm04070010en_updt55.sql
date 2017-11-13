@@ -1,10 +1,10 @@
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/lb/install/exnm04070010en_updt55.sql-arc   1.0   Nov 13 2017 13:28:30   Rob.Coupe  $
+--       sccsid           : $Header:   //new_vm_latest/archives/lb/install/exnm04070010en_updt55.sql-arc   1.1   Nov 13 2017 13:35:22   Rob.Coupe  $
 --       Module Name      : $Workfile:   exnm04070010en_updt55.sql  $ 
---       Date into PVCS   : $Date:   Nov 13 2017 13:28:30  $
---       Date fetched Out : $Modtime:   Nov 10 2017 10:34:42  $
---       PVCS Version     : $Revision:   1.0  $
+--       Date into PVCS   : $Date:   Nov 13 2017 13:35:22  $
+--       Date fetched Out : $Modtime:   Nov 13 2017 13:34:44  $
+--       PVCS Version     : $Revision:   1.1  $
 --
 ----------------------------------------------------------------------------
 --   Copyright (c) 2015 Bentley Systems Incorporated.  All rights reserved.
@@ -923,8 +923,8 @@ BEGIN
 --
   hig2.upgrade(p_product        => 'LB'
               ,p_upgrade_script => 'exnm04070009en_updt55.sql'
-              ,p_remarks        => 'NET 4700 FIX 55 Build 9 - LB version 4.7.0.3'
-              ,p_to_version     => '4.7.0.3');
+              ,p_remarks        => 'NET 4700 FIX 55 Build 10 - LB version 4.7.0.4'
+              ,p_to_version     => '4.7.0.4');
 --
   commit;
 --
