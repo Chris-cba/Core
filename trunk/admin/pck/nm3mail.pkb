@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY nm3mail AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mail.pkb-arc   2.15   Jul 04 2013 16:14:38   James.Wadsworth  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3mail.pkb-arc   2.16   Nov 14 2017 15:11:04   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm3mail.pkb  $
---       Date into PVCS   : $Date:   Jul 04 2013 16:14:38  $
---       Date fetched Out : $Modtime:   Jul 04 2013 15:46:14  $
---       Version          : $Revision:   2.15  $
+--       Date into PVCS   : $Date:   Nov 14 2017 15:11:04  $
+--       Date fetched Out : $Modtime:   Nov 08 2017 09:35:16  $
+--       Version          : $Revision:   2.16  $
 --       Based on SCCS version : 1.12
 -------------------------------------------------------------------------
 --   Author : Jonathan Mills
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3mail AS
 --
 --all global package variables here
 --
-  g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.15  $';
+  g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.16  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3mail';
@@ -1090,22 +1090,39 @@ IS
    --g_smtp_server   CONSTANT hig_options.hop_value%TYPE := 'gbexor284' ;     --hig.get_sysopt(g_server_sysopt);
    --g_smtp_port     CONSTANT hig_options.hop_value%TYPE := '25' ;            --hig.get_sysopt(g_port_sysopt);
    --g_smtp_domain   CONSTANT hig_options.hop_value%TYPE := 'exorcorp.local' ;--hig.get_sysopt(g_domain_sysopt);
-   --g_mail_conn     utl_smtp.connection;
-   v_length integer := 0;
-   v_buffer_size integer := 57;
-   v_offset integer := 1;
-   v_raw raw(57);
-   crlf    VARCHAR2(2)  := chr(13)||chr(10);
-   i       Number ;
-   j       Number ;
-   l_email Varchar2(500);
+   g_mail_conn     utl_smtp.connection;
+   --
    CURSOR cs_sender
    IS
    SELECT nmu_name||' <'||nmu_email_address||'>' sender_name
          ,nmu_email_address sender_email
    FROM  nm_mail_users
    WHERE nmu_hus_user_id = To_Number(Sys_Context('NM3CORE','USER_ID'));
-   l_sender_rec cs_sender%ROWTYPE;
+   --
+   CURSOR c_connection IS
+   SELECT hfc_ftp_username
+         ,nm3ftp.get_password(hfc_ftp_password)
+    FROM hig_ftp_connections
+        ,hig_ftp_types
+   WHERE hft_type = 'MAIL'
+     AND hfc_hft_id = hft_id;
+
+   v_length      INTEGER := 0;
+   v_buffer_size INTEGER := 57;
+   v_offset      INTEGER := 1;
+   v_raw         RAW(57);
+   crlf          VARCHAR2(2)  := CHR(13)||CHR(10);
+   i             NUMBER ;
+   j             NUMBER ;
+   l_email       VARCHAR2(500);
+   l_sender_rec  cs_sender%ROWTYPE;
+   --
+   lv_username       hig_ftp_connections.hfc_ftp_username%TYPE;
+   lv_password       VARCHAR2(100);
+   lv_b64_username   VARCHAR2(100);   
+   lv_b64_password   VARCHAR2(100); 
+   lv_authenticated  VARCHAR2(1) := hig.get_sysopt('AUTHMAIL');   
+   
    PROCEDURE send_header(name IN VARCHAR2, header IN VARCHAR2)
    IS
    BEGIN
@@ -1119,11 +1136,33 @@ BEGIN
 --dbms_output.put_line(g_smtp_server||' '||g_smtp_port||' '||g_smtp_domain);
 --   nm_debug.debug_on;
    nm_debug.debug(g_smtp_server||' '||g_smtp_port||' '||g_smtp_domain);
+   
    OPEN  cs_sender ;
    FETCH cs_sender INTO l_sender_rec;
    CLOSE cs_sender;
+   
    g_mail_conn := utl_smtp.open_connection(g_smtp_server, g_smtp_port);
-   utl_smtp.helo(g_mail_conn, g_smtp_domain);
+   
+   IF lv_authenticated = 'Y' 
+   THEN
+     --
+     nm3ctx.set_context('NM3FTPPASSWORD','Y');
+     OPEN c_connection;
+     FETCH c_connection INTO lv_username
+                            ,lv_password;
+     CLOSE c_connection;
+     
+     lv_b64_username := UTL_RAW.cast_to_varchar2(UTL_ENCODE.base64_encode(UTL_RAW.cast_to_raw(lv_username)));
+     lv_b64_password := UTL_RAW.cast_to_varchar2(UTL_ENCODE.base64_encode(UTL_RAW.cast_to_raw(lv_password)));
+     
+     utl_smtp.ehlo(g_mail_conn,g_smtp_domain);  
+     utl_smtp.command(g_mail_conn, 'AUTH LOGIN');  
+     utl_smtp.command(g_mail_conn,lv_b64_username);  
+     utl_smtp.command(g_mail_conn,lv_b64_password);  
+   ELSE
+     utl_smtp.helo(g_mail_conn, g_smtp_domain);
+   END IF;
+   
    utl_smtp.mail(g_mail_conn, l_sender_rec.sender_email);
    IF pi_recipient_to IS NOT NULL
    THEN
