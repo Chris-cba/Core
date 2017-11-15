@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY nm3mail AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3mail.pkb-arc   2.17   Nov 15 2017 15:02:40   Chris.Baugh  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3mail.pkb-arc   2.18   Nov 15 2017 16:23:32   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm3mail.pkb  $
---       Date into PVCS   : $Date:   Nov 15 2017 15:02:40  $
---       Date fetched Out : $Modtime:   Nov 15 2017 14:07:46  $
---       Version          : $Revision:   2.17  $
+--       Date into PVCS   : $Date:   Nov 15 2017 16:23:32  $
+--       Date fetched Out : $Modtime:   Nov 15 2017 16:22:56  $
+--       Version          : $Revision:   2.18  $
 --       Based on SCCS version : 1.12
 -------------------------------------------------------------------------
 --   Author : Jonathan Mills
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3mail AS
 --
 --all global package variables here
 --
-  g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.17  $';
+  g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.18  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3mail';
@@ -1329,7 +1329,7 @@ EXCEPTION
   WHEN no_connection
   THEN
     po_error_text := 'SMTP Authentication details have not been defined';
-  - RETURN  FALSE;
+    RETURN  FALSE;
 
   WHEN ex_acl_failure
   THEN
