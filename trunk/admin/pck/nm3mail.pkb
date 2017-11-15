@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY nm3mail AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3mail.pkb-arc   2.16   Nov 14 2017 15:11:04   Chris.Baugh  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3mail.pkb-arc   2.17   Nov 15 2017 15:02:40   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm3mail.pkb  $
---       Date into PVCS   : $Date:   Nov 14 2017 15:11:04  $
---       Date fetched Out : $Modtime:   Nov 08 2017 09:35:16  $
---       Version          : $Revision:   2.16  $
+--       Date into PVCS   : $Date:   Nov 15 2017 15:02:40  $
+--       Date fetched Out : $Modtime:   Nov 15 2017 14:07:46  $
+--       Version          : $Revision:   2.17  $
 --       Based on SCCS version : 1.12
 -------------------------------------------------------------------------
 --   Author : Jonathan Mills
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3mail AS
 --
 --all global package variables here
 --
-  g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.16  $';
+  g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.17  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3mail';
@@ -1090,6 +1090,7 @@ IS
    --g_smtp_server   CONSTANT hig_options.hop_value%TYPE := 'gbexor284' ;     --hig.get_sysopt(g_server_sysopt);
    --g_smtp_port     CONSTANT hig_options.hop_value%TYPE := '25' ;            --hig.get_sysopt(g_port_sysopt);
    --g_smtp_domain   CONSTANT hig_options.hop_value%TYPE := 'exorcorp.local' ;--hig.get_sysopt(g_domain_sysopt);
+   no_connection   EXCEPTION;
    g_mail_conn     utl_smtp.connection;
    --
    CURSOR cs_sender
@@ -1121,7 +1122,8 @@ IS
    lv_password       VARCHAR2(100);
    lv_b64_username   VARCHAR2(100);   
    lv_b64_password   VARCHAR2(100); 
-   lv_authenticated  VARCHAR2(1) := hig.get_sysopt('AUTHMAIL');   
+   lv_authenticated  VARCHAR2(1) := hig.get_sysopt('AUTHMAIL'); 
+   lv_row_found      BOOLEAN;   
    
    PROCEDURE send_header(name IN VARCHAR2, header IN VARCHAR2)
    IS
@@ -1141,8 +1143,6 @@ BEGIN
    FETCH cs_sender INTO l_sender_rec;
    CLOSE cs_sender;
    
-   g_mail_conn := utl_smtp.open_connection(g_smtp_server, g_smtp_port);
-   
    IF lv_authenticated = 'Y' 
    THEN
      --
@@ -1150,8 +1150,16 @@ BEGIN
      OPEN c_connection;
      FETCH c_connection INTO lv_username
                             ,lv_password;
+     lv_row_found := c_connection%FOUND;                       
      CLOSE c_connection;
+
+     IF NOT lv_row_found
+     THEN
+       RAISE no_connection;
+     END IF;
      
+     g_mail_conn := utl_smtp.open_connection(g_smtp_server, g_smtp_port);
+    
      lv_b64_username := UTL_RAW.cast_to_varchar2(UTL_ENCODE.base64_encode(UTL_RAW.cast_to_raw(lv_username)));
      lv_b64_password := UTL_RAW.cast_to_varchar2(UTL_ENCODE.base64_encode(UTL_RAW.cast_to_raw(lv_password)));
      
@@ -1160,6 +1168,8 @@ BEGIN
      utl_smtp.command(g_mail_conn,lv_b64_username);  
      utl_smtp.command(g_mail_conn,lv_b64_password);  
    ELSE
+     g_mail_conn := utl_smtp.open_connection(g_smtp_server, g_smtp_port);
+   
      utl_smtp.helo(g_mail_conn, g_smtp_domain);
    END IF;
    
@@ -1316,6 +1326,11 @@ BEGIN
    RETURN  TRUE;
 EXCEPTION
 --
+  WHEN no_connection
+  THEN
+    po_error_text := 'SMTP Authentication details have not been defined';
+  - RETURN  FALSE;
+
   WHEN ex_acl_failure
   THEN
     po_error_text := hig.get_ner(nm3type.c_hig,551).ner_descr;
