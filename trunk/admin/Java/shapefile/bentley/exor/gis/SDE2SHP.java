@@ -1,11 +1,11 @@
 /**
  *    PVCS Identifiers :-
  *
- *       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/Java/shapefile/bentley/exor/gis/SDE2SHP.java-arc   1.5   Oct 17 2017 15:14:12   Upendra.Hukeri  $
+ *       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/Java/shapefile/bentley/exor/gis/SDE2SHP.java-arc   1.6   Nov 23 2017 07:11:54   Upendra.Hukeri  $
  *       Module Name      : $Workfile:   SDE2SHP.java  $
- *       Date into SCCS   : $Date:   Oct 17 2017 15:14:12  $
- *       Date fetched Out : $Modtime:   Oct 17 2017 14:57:12  $
- *       SCCS Version     : $Revision:   1.5  $
+ *       Date into SCCS   : $Date:   Nov 23 2017 07:11:54  $
+ *       Date fetched Out : $Modtime:   Nov 23 2017 06:55:40  $
+ *       SCCS Version     : $Revision:   1.6  $
  *       Based on 
  *
  *
@@ -76,18 +76,9 @@ import org.opengis.feature.simple.SimpleFeatureType;
 
 public class SDE2SHP extends ShapefileUtility {
 	private		  String 		whereClause		 	= null;
-	private		  String  		whereClauseParams	= null;
-	private		  List<String> 	whereClauseValList 	= new ArrayList<String>();
-	private		  String[] 		whereClauseValArray = null;
 	private		  File 			shapeFile			= null;
-	private		  boolean 		needWhereHelp 		= false;
-	private		  String 		whereClauseID		= null;
 	private		  int    		oracleSRID		   	= 0;
 	private		  int    		epsgSRID		   	= 0;
-	
-	private	static final String ID					= " ID";
-	private	static final String WHERE_CLAUSE		= " WHERE CLAUSE";
-	private	static final String DESCRIPTION			= " DESCRIPTION";
 	
 	public SDE2SHP() {
 		super();
@@ -96,7 +87,7 @@ public class SDE2SHP extends ShapefileUtility {
 	protected String getHelpMessage() {
 		StringBuilder helpMsg  = new StringBuilder();
 		
-		helpMsg.append("\nUSAGE: java -jar sdeutil.jar -sde2shp -help -nc -h db_host -p db_port -s db_sid -u db_username -d db_password -t db_tablename,column_name -w where_clause_id [where_clause_parameters] -f shapefile_name -a column_name_mapping_file -whelp where_clause_id");
+		helpMsg.append("\nUSAGE: java -jar sdeutil.jar -sde2shp -help -nc -h db_host -p db_port -s db_sid -u db_username -d db_password -t db_tablename,column_name -w where_clause -f shapefile_name -a column_name_mapping_file");
 		helpMsg.append("\n\tUsage explaination (parameters used):");
 		helpMsg.append("\n\t[-help] : Specify this option to see the command line usage of Shapefile Extractor");
 		helpMsg.append("\n\t(-nc)   : Specify this option, if the jar is loaded in database and called from a PL/SQL procedure or function");
@@ -106,14 +97,12 @@ public class SDE2SHP extends ShapefileUtility {
 		helpMsg.append("\n\t(-s)    : Host machine's SID with existing Oracle database");
 		helpMsg.append("\n\t(-u)    : Database user");
 		helpMsg.append("\n\t(-d)    : Database user's password");
-		helpMsg.append("\n\t(-t)    : Input feature table name and spatial column name (separated by COMMA only)");
-		helpMsg.append("\n\t[-w]    : WHERE Clause ID for the query followed by any parameters enclosed in square brackets [] separated by space");
-		helpMsg.append("\n\t          (in case parameter value contains space itself enclose the value in double quotes)");
-		helpMsg.append("\n\t(-f)    : File name of an output Shapefile WITHOUT EXTENSION");
+		helpMsg.append("\n\t<-t>    : Input feature table name and spatial column name (separated by COMMA only)");
+		helpMsg.append("\n\t[-w]    : WHERE Clause for the query");
+		helpMsg.append("\n\t<-f>    : File name of an output Shapefile WITHOUT EXTENSION");
 		helpMsg.append("\n\t[-a]    : File name containing column-name(attribute) mappings WITH EXTENSION");
-		helpMsg.append("\n\t(-whelp): WHERE Clause ID for which details are required");
-		helpMsg.append("\n\t          (use ID 'all' for details of all available WHERE clauses)");
-		helpMsg.append("\n\n\tNOTE: \t() indicate MANDATORY ALTERNATE field e.g. either (-nc) or (-h -p -s -u -d) AND  either (-whelp) or (-t -f)");
+		helpMsg.append("\n\n\tNOTE: \t() indicate MANDATORY ALTERNATE field e.g. either (-nc) or (-h -p -s -u -d)");
+		helpMsg.append("\n\t\t<> indicate MANDATORY field");
 		helpMsg.append("\n\t\t[] indicate OPTIONAL field");
 		
 		return helpMsg.toString();
@@ -121,7 +110,6 @@ public class SDE2SHP extends ShapefileUtility {
 	
 	private void init(String[] nuh) {
 		String		 usage			= "\nError: following key(s)/value(s) is/are missing: ";
-		String 		 cmdLineArgsStr	= Arrays.deepToString(nuh);
 		int			 numOfErrors 	= 0;
 		
 		Set <String> validKeySet	= new HashSet<String>(Arrays.asList(ShapefileUtility.validExtractKeysArray));
@@ -140,81 +128,6 @@ public class SDE2SHP extends ShapefileUtility {
 				if("-nc".equals(key)) {
 					hm.put(key, null);
 					isNormalParam = false;
-				} else if ("-w".equals(key)) {
-					try {
-						value = (String) e.nextElement();
-						
-						if (value != null && !value.isEmpty()) {
-							hm.put(key, value);
-							
-							try {
-								key = (String) e.nextElement();
-								
-								if(key.startsWith("[")) {
-									isNormalParam = false;
-									
-									if((cmdLineArgsStr.length() > (cmdLineArgsStr.replace("[", "").length() + 2)) || (cmdLineArgsStr.length() > (cmdLineArgsStr.replace("]", "").length() + 2))) { 
-										setErrorMsg("\nError: square brackets [] not allowed in WHERE clause values");
-										writeLog(getErrorMsg(), false);
-										setExitSystem(true);
-									} else {
-										boolean isCloseBracket = false;
-										
-										if("[".equals(key)) {
-											key = (String) e.nextElement();
-										} else {
-											key = key.substring(1);
-										}
-											
-										if(key.endsWith("]")) {
-											key = key.substring(0, key.length() - 1);
-											whereClauseParams = key.length() + "$" + key;
-											whereClauseValList.add(key);
-											isCloseBracket = true;
-											
-											continue;
-										}
-									
-										whereClauseParams = key.length() + "$" + key;
-										whereClauseValList.add(key);
-										
-										while(e.hasMoreElements()) {
-											key = (String) e.nextElement();
-											
-											if("]".equals(key)) {
-												isCloseBracket = true;
-												break;
-											} else if(key.endsWith("]")) {
-												key = key.substring(0, key.length() - 1);
-												whereClauseParams += key.length() + "$" + key;
-												whereClauseValList.add(key);
-												
-												isCloseBracket = true;
-												
-												break;
-											}
-											
-											whereClauseParams += key.length() + "$" + key;
-											whereClauseValList.add(key);
-										}
-										
-										if(!isCloseBracket) {
-											setErrorMsg("\nError: missing WHERE clause parameters closing bracket");
-											writeLog(getErrorMsg(), false);
-											setExitSystem(true);
-											
-											break;
-										}
-									}
-								}
-							} catch(NoSuchElementException nseException) {
-								isNormalParam = false;
-							}
-						}
-					} catch(NoSuchElementException nseException) {
-						missingKV.add("missing value for: " + key);
-						numOfErrors++;
-					}
 				} 
 				
 				if(isNormalParam) {
@@ -309,21 +222,9 @@ public class SDE2SHP extends ShapefileUtility {
 				
 				if (hm.containsKey("-w")) {
 					whereClause = (String) hm.get("-w");
-					writeLog("where_clause_id: " + whereClause, false);
-					
-					if(whereClauseParams != null && !whereClauseParams.isEmpty()) {
-						writeLog("where_clause_parameters: " + Arrays.deepToString(whereClauseValList.toArray()), false);
-					}
+					writeLog("where_clause: " + whereClause, false);
 				} else {
 					whereClause = "";
-				}
-				
-				if (hm.containsKey("-whelp")) {
-					whereClauseID = (String) hm.get("-whelp");
-					needWhereHelp = true;
-					writeLog("need_where_clause_details: " + whereClauseID, false);
-				} else {
-					whereClauseID = "";
 				}
 				
 				if (hm.containsKey("-f")) {
@@ -378,7 +279,7 @@ public class SDE2SHP extends ShapefileUtility {
 						
 						setErrorMsg("\nError: missing key(s), please check system log file for more details");
 						setExitSystem(true);
-					} else if (!needWhereHelp) {
+					} else {
 						shapeFile = getNewShapeFile();
 						
 						systemExit();							
@@ -414,34 +315,27 @@ public class SDE2SHP extends ShapefileUtility {
 						sde2shp.init(nuh);
 						
 						if(!sde2shp.getExitSystem()) {
-							if(sde2shp.needWhereHelp) {
-								String whereClauseDetails = sde2shp.displayWhereClauseDetails(sde2shp.whereClauseID);
+							sde2shp.setColumnMap();
+							
+							if(!sde2shp.getExitSystem()) {
+								int numOfRows = sde2shp.generateShapeFile();
 								
-								sde2shp.setErrorMsg(whereClauseDetails);
-								System.out.println(whereClauseDetails);
-							} else {
-								sde2shp.setColumnMap();
-								
-								if(!sde2shp.getExitSystem()) {
-									int numOfRows = sde2shp.generateShapeFile();
+								if (numOfRows > 0) {
+									sde2shp.writeLog(String.valueOf(numOfRows) + " features added to shapefile");
+									sde2shp.writeLog("shapefile creation is complete: " + sde2shp.shapeFile.getName());
 									
-									if (numOfRows > 0) {
-										sde2shp.writeLog(String.valueOf(numOfRows) + " features added to shapefile");
-										sde2shp.writeLog("shapefile creation is complete: " + sde2shp.shapeFile.getName());
-										
-										System.out.println(ShapefileUtility.SHPSUCCESSMSG);
-									} else {
-										if(numOfRows == 0) {
-											sde2shp.writeLog("\nError: no records found...", false);
-										} else if(numOfRows == -1) {
-											sde2shp.writeLog(sde2shp.getErrorMsg(), false);
-										}
-										
-										sde2shp.writeLog(ShapefileUtility.SDE2SHPFAILUREMSG, false);
-									}
+									System.out.println(ShapefileUtility.SHPSUCCESSMSG);
 								} else {
-									writeLog(ShapefileUtility.SHP2SDEFAILUREMSG, false);
+									if(numOfRows == 0) {
+										sde2shp.writeLog("\nError: no records found...", false);
+									} else if(numOfRows == -1) {
+										sde2shp.writeLog(sde2shp.getErrorMsg(), false);
+									}
+									
+									sde2shp.writeLog(ShapefileUtility.SDE2SHPFAILUREMSG, false);
 								}
+							} else {
+								writeLog(ShapefileUtility.SHP2SDEFAILUREMSG, false);
 							}
 						}
 					} else {
@@ -764,14 +658,7 @@ public class SDE2SHP extends ShapefileUtility {
 				colArrToPass = new oracle.sql.ARRAY(des, shapefileData.conn, getColumnMapArray());
 			}
 			
-			if(whereClauseValList.size() > 0) {
-				whereClauseValArray = whereClauseValList.toArray(new String[whereClauseValList.size()]);
-				
-				des = oracle.sql.ArrayDescriptor.createDescriptor("SDE_VARCHAR_ARRAY", shapefileData.conn);
-				whereArrToPass = new oracle.sql.ARRAY(des, shapefileData.conn, whereClauseValArray);
-			}
-			
-			sqlStmt = "{? = call sde_util.get_data(?, ?, ?, ?)}";
+			sqlStmt = "{? = call sde_util.get_data(?, ?, ?)}";
 			shapefileData.cstmt   = shapefileData.conn.prepareCall(sqlStmt);
 			shapefileData.cstmt.registerOutParameter(1, OracleTypes.CURSOR);
 			shapefileData.cstmt.setString(2, getViewName());
@@ -783,12 +670,6 @@ public class SDE2SHP extends ShapefileUtility {
 			}
 			
 			shapefileData.cstmt.setString(4, whereClause);
-			
-			if(whereArrToPass == null) {
-				shapefileData.cstmt.setNull(5, Types.ARRAY, "SDE_VARCHAR_ARRAY");
-			} else {
-				shapefileData.cstmt.setArray(5, whereArrToPass);
-			}
 			
 			shapefileData.cstmt.execute();
 			
@@ -834,122 +715,6 @@ public class SDE2SHP extends ShapefileUtility {
 			}
 		} finally {
 			closeOracle("getSRID", cstmt, conn, null);
-		}
-	}
-	
-	private QuerryConnectionDetails getWhereCaluseDetails(String whereClauseID) 
-	throws SQLException {
-		String 			  			sqlStmt 		= null;
-		QuerryConnectionDetails     whereClauseData = new QuerryConnectionDetails();
-		
-		try {
-			if("all".equalsIgnoreCase(whereClauseID)) {
-				whereClauseID = null;
-			}
-			
-			whereClauseData.conn = getConnection();
-			sqlStmt = "{? = call sde_util.get_where_clause_details(?)}";
-			whereClauseData.cstmt   = whereClauseData.conn.prepareCall(sqlStmt);
-			whereClauseData.cstmt.registerOutParameter(1, OracleTypes.CURSOR);
-			whereClauseData.cstmt.setString(2, whereClauseID);
-			whereClauseData.cstmt.execute();
-			whereClauseData.resultSet = (ResultSet)whereClauseData.cstmt.getObject(1);
-			
-			return whereClauseData;
-		} catch(Exception validateColumnNamesException) {
-			logException(validateColumnNamesException, "validateColumnNames");
-		}
-		
-		return whereClauseData;
-	}
-	
-	private String displayWhereClauseDetails(String whereClauseID) {
-		ResultSet 		  		whereClauseDetails	= null;
-		ResultSetMetaData 		whereMD				= null;
-		int 			  		numOfColumns		= 0;
-		QuerryConnectionDetails	whereClauseData		= null;
-		List<List<String>>		details			 	= null;
-		
-		final StringBuilder whereClauseDetailsStr 	= new StringBuilder();
-		
-		List<Integer> maxLenList = new ArrayList<Integer>();
-		
-		maxLenList.add(ID.length());
-		maxLenList.add(WHERE_CLAUSE.length());
-		maxLenList.add(DESCRIPTION.length());
-		
-		try {
-			whereClauseData = getWhereCaluseDetails(whereClauseID);
-			
-			if(whereClauseData != null && whereClauseData.resultSet != null) {
-				details				= new ArrayList<List<String>>();
-				whereClauseDetails 	= whereClauseData.resultSet;
-				whereMD 		 	= whereClauseDetails.getMetaData();
-				numOfColumns 		= whereMD.getColumnCount();
-				
-				while (whereClauseDetails.next()) {
-					List<String> row = new ArrayList<String>();
-					
-					for (int i = 1; i <= numOfColumns; i++) {
-						String columnName = whereMD.getColumnName(i);
-						String value 	  = whereClauseDetails.getString(columnName);
-						int    valuelen   = value.length();
-						
-						if("where_clause_exp".equalsIgnoreCase(columnName)) {
-							return value;
-						}
-						
-						row.add(value);
-						maxLenList.set(i-1, maxLenList.get(i-1) > valuelen ? maxLenList.get(i-1) : valuelen);
-					}
-					
-					details.add(row);
-				}
-				
-				if(details.size() > 0) {
-					Iterator rowIterator = details.iterator();
-					
-					int totalMaxLen = maxLenList.get(0) + maxLenList.get(1) + maxLenList.get(2) + 12;
-					
-					whereClauseDetailsStr.append('\n');
-					
-					whereClauseDetailsStr.append(String.format("%1$-" + totalMaxLen     		 + "s", "").replace(' ', '-')).append('\n');
-					whereClauseDetailsStr.append(String.format("%1$-" + (maxLenList.get(0) 	+ 4) + "s", ID));
-					whereClauseDetailsStr.append(String.format("%1$-" + (maxLenList.get(1) 	+ 4) + "s", WHERE_CLAUSE));
-					whereClauseDetailsStr.append(String.format("%1$-" + (maxLenList.get(2) 	+ 4) + "s", DESCRIPTION)).append('\n');
-					whereClauseDetailsStr.append(String.format("%1$-" + totalMaxLen     		 + "s", "").replace(' ', '-')).append('\n');
-					
-					while(rowIterator.hasNext()) {
-						Iterator colIterator = ((List)rowIterator.next()).iterator();
-						int j = 0;
-						
-						while(colIterator.hasNext()) {
-							String value = ' ' + (String)colIterator.next();
-							whereClauseDetailsStr.append(String.format("%1$-" + (maxLenList.get(j) + 4) + "s", value));
-							j++;
-						}
-						
-						whereClauseDetailsStr.append('\n');
-					}
-					
-					whereClauseDetailsStr.append(String.format("%1$-" + totalMaxLen + "s", "").replace(' ', '-')).append('\n');
-					maxLenList.clear();
-					
-					return whereClauseDetailsStr.toString();
-				} else {
-					return "No records found";
-				}
-				
-			} else {
-				return "Error: something went wrong, error getting WHERE clause details";
-			}
-		} catch(Exception displayWhereClauseDetailsException) {
-			logException(displayWhereClauseDetailsException, "displayWhereClauseDetails");
-			return displayWhereClauseDetailsException.getMessage();
-		} finally {
-			if(whereClauseData != null) {
-				closeOracle("displayWhereClauseDetails", whereClauseData.cstmt, whereClauseData.conn, whereClauseData.resultSet);
-			}
 		}
 	}
 	
