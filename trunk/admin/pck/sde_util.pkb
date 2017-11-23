@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY sde_util AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sde_util.pkb-arc   1.4   Nov 06 2017 10:57:00   Upendra.Hukeri  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sde_util.pkb-arc   1.5   Nov 23 2017 07:11:30   Upendra.Hukeri  $
 --       Module Name      : $Workfile:   sde_util.pkb  $
---       Date into PVCS   : $Date:   Nov 06 2017 10:57:00  $
---       Date fetched Out : $Modtime:   Nov 06 2017 10:56:28  $
---       PVCS Version     : $Revision:   1.4  $
+--       Date into PVCS   : $Date:   Nov 23 2017 07:11:30  $
+--       Date fetched Out : $Modtime:   Nov 23 2017 06:58:40  $
+--       PVCS Version     : $Revision:   1.5  $
 --
 --   Author : Upendra Hukeri
 --
@@ -19,7 +19,7 @@ CREATE OR REPLACE PACKAGE BODY sde_util AS
 --
 -- all global package variables here
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(30) := '"$Revision:   1.4  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(30) := '"$Revision:   1.5  $"';
    g_package_name    CONSTANT  VARCHAR2(30) := 'sde_util';
 --
 ---------------------------------------------------------------------------------------------------
@@ -249,15 +249,12 @@ END validate_table_name;
 FUNCTION get_data(p_table_name   IN VARCHAR2
 				 ,p_column_array IN sde_varchar_2d_array DEFAULT NULL
 				 ,p_where_clause IN VARCHAR2 			 DEFAULT NULL
-				 ,p_values 		 IN sde_varchar_array	 DEFAULT NULL
 				 ) 
 RETURN SYS_REFCURSOR 
 IS
 	v_query_data   		SYS_REFCURSOR;
 	v_result 	   		VARCHAR2(32767) := 'Y';
 	v_query 	   		VARCHAR2(32767) := NULL;
-	v_where_clause 		VARCHAR2(32767) := p_where_clause;
-	v_values			sde_varchar_array;
 	v_column_alias		VARCHAR2(32767) := NULL;
 BEGIN
 	BEGIN
@@ -277,14 +274,8 @@ BEGIN
 					v_query := 'SELECT * FROM ' || p_table_name;
 				END IF;
 				--
-				IF v_result = 'Y' AND v_where_clause IS NOT NULL THEN
-					v_result := get_where_clause(v_where_clause, p_values);
-					--
-					IF v_result <> 'Y' THEN
-						v_query   := 'SELECT q''[' || v_result || ']'' get_data_exp FROM DUAL';
-					ELSE
-						v_query := v_query || ' WHERE ' || v_where_clause;
-					END IF;
+				IF v_result = 'Y' AND p_where_clause IS NOT NULL THEN
+					v_query := v_query || ' WHERE ' || p_where_clause;
 				END IF;
 			ELSE
 				v_query   := 'SELECT q''[' || v_result || ']'' get_data_exp FROM DUAL';
