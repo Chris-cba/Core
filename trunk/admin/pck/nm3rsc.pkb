@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY nm3rsc AS
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3rsc.pkb-arc   2.16   Jul 07 2017 08:03:52   Chris.Baugh  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3rsc.pkb-arc   2.17   Nov 24 2017 16:15:22   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3rsc.pkb  $
---       Date into PVCS   : $Date:   Jul 07 2017 08:03:52  $
---       Date fetched Out : $Modtime:   Jul 07 2017 08:02:46  $
---       PVCS Version     : $Revision:   2.16  $
+--       Date into PVCS   : $Date:   Nov 24 2017 16:15:22  $
+--       Date fetched Out : $Modtime:   Nov 24 2017 16:13:58  $
+--       PVCS Version     : $Revision:   2.17  $
 --
 --   Author : R.A. Coupe
 --
@@ -19,7 +19,7 @@ CREATE OR REPLACE PACKAGE BODY nm3rsc AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(30) :='"$Revision:   2.16  $"';
+   g_body_sccsid     CONSTANT  varchar2(30) :='"$Revision:   2.17  $"';
 
 --  g_body_sccsid is the SCCS ID for the package body
 --
@@ -181,7 +181,7 @@ BEGIN
 
   if l_empty_flag = 'N' then
 
-    set_start_points;
+--  set_start_points;
 
     connect_route( pi_ne_id, l_offset_st, pi_ne_start );
 
@@ -215,7 +215,7 @@ BEGIN
    nm_debug.proc_end(g_package_name,'rescale_route');
 --
 EXCEPTION
---
+
   WHEN others
    THEN
      -- Set AU Securuty on and effective_date back to initial value
@@ -985,7 +985,7 @@ BEGIN
 
   IF l_empty_flag = 'N' THEN
 
-    set_start_points;
+    --set_start_points;
 
     connect_route( pi_ne_id, 0, pi_ne_start );
 
@@ -1193,20 +1193,20 @@ CURSOR c1 IS
   WHERE ne_id = pi_ne_id
   FOR UPDATE OF ne_id NOWAIT;
 
-CURSOR c2 IS
-  SELECT /*+ index(n ne_pk) full ( w ) */ n.ne_id ne_id
-  FROM nm_elements n, nm_rescale_write w
-  WHERE n.ne_id = w.ne_id
-  AND n.ne_type = 'D';
-
-CURSOR c3 ( c_ne_id nm_elements.ne_id%TYPE, c_gty nm_elements.ne_gty_group_type%TYPE ) IS
-  SELECT ws.ne_sub_class ne_sub_class
-  FROM nm_rescale_write w1, nm_rescale_write ws, nm_rescale_write we
-  WHERE w1.ne_id = c_ne_id
-  AND ws.ne_no_end    = w1.ne_no_start
-  AND we.ne_no_start  = w1.ne_no_end
-  AND we.ne_sub_class = ws.ne_sub_class
-  ORDER BY ws.ne_sub_class;
+--CURSOR c2 IS
+--  SELECT /*+ index(n ne_pk) full ( w ) */ n.ne_id ne_id
+--  FROM nm_elements n, nm_rescale_write w
+--  WHERE n.ne_id = w.ne_id
+--  AND n.ne_type = 'D';
+--
+--CURSOR c3 ( c_ne_id nm_elements.ne_id%TYPE, c_gty nm_elements.ne_gty_group_type%TYPE ) IS
+--  SELECT ws.ne_sub_class ne_sub_class
+--  FROM nm_rescale_write w1, nm_rescale_write ws, nm_rescale_write we
+--  WHERE w1.ne_id = c_ne_id
+--  AND ws.ne_no_end    = w1.ne_no_start
+--  AND we.ne_no_start  = w1.ne_no_end
+--  AND we.ne_sub_class = ws.ne_sub_class
+--  ORDER BY ws.ne_sub_class;
 --
 BEGIN
 --
@@ -1262,14 +1262,22 @@ BEGIN
     nm_end_mp,
     s_ne_id,
     connect_level )
-  SELECT ne_id, ne_no_start, ne_no_end, ne_length,
-         nm_slk, NULL, NULL, NULL, ne_nt_type,
-         nm_cardinality, DECODE( g_use_sub_class, 'Y',
-        TO_CHAR(nm3net.get_sub_class_seq( g_gty, ne_sub_class)), NULL),
-         nm_begin_mp, nm_end_mp, NULL, NULL
-  FROM nm_elements, nm_members
-  WHERE ne_id = nm_ne_id_of
-  AND nm_ne_id_in = pi_ne_id;
+select ne_id,
+case dir_flag when 1 then start_node else end_node end,
+case dir_flag when -1 then start_node else end_node end,
+ne_length,
+    nm_slk,
+    NULL,
+    NULL,
+    NULL,
+    ne_nt_type,
+    dir_flag,
+    DECODE( g_use_sub_class, 'Y', nsc_seq_no, NULL),
+    nm_begin_mp,
+    nm_end_mp,
+    nvl(prior_ne,-1),
+    NULL
+    from v_nm_ordered_members;  
 
   INSERT INTO nm_rescale_read (
     ne_id,
@@ -1287,33 +1295,41 @@ BEGIN
     nm_end_mp,
     s_ne_id,
     connect_level )
-  SELECT ne_id, ne_no_start, ne_no_end, ne_length,
-         nm_slk, NULL, NULL, nm_seq_no, ne_nt_type,
-         nm_cardinality, DECODE( g_use_sub_class, 'Y',
-        TO_CHAR(nm3net.get_sub_class_seq( g_gty, ne_sub_class)), NULL),
-         nm_begin_mp, nm_end_mp, NULL, NULL
-  FROM nm_elements, nm_members
-  WHERE ne_id = nm_ne_id_of
-  AND nm_ne_id_in = pi_ne_id;
+select ne_id,
+case dir_flag when 1 then start_node else end_node end,
+case dir_flag when -1 then start_node else end_node end,
+ne_length,
+    nm_slk,
+    NULL,
+    NULL,
+    NULL,
+    ne_nt_type,
+    dir_flag,
+    null,--DECODE( g_use_sub_class, 'Y', nsc_seq_no, NULL),
+    nm_begin_mp,
+    nm_end_mp,
+    nvl(prior_ne, -1),
+    NULL
+    from v_nm_ordered_members;    
 
 --problems exist with distance-breaks - they do not have a sensible sub-class.
 --set the sub-class to be a default of 'S' but if they have a start and end of L then choose L
 --and if they have a start and end of R then choose R
 
-  FOR irec IN c2 LOOP
-
-    FOR jrec IN c3( irec.ne_id, g_gty ) LOOP
-
-      UPDATE nm_rescale_write
-      SET ne_sub_class = jrec.ne_sub_class
-      WHERE ne_id = irec.ne_id;
-
-      UPDATE nm_rescale_read
-      SET ne_sub_class = jrec.ne_sub_class
-      WHERE ne_id = irec.ne_id;
-
-    END LOOP;
-  END LOOP;
+--  FOR irec IN c2 LOOP
+--
+--    FOR jrec IN c3( irec.ne_id, g_gty ) LOOP
+--
+--      UPDATE nm_rescale_write
+--      SET ne_sub_class = jrec.ne_sub_class
+--      WHERE ne_id = irec.ne_id;
+--
+--      UPDATE nm_rescale_read
+--      SET ne_sub_class = jrec.ne_sub_class
+--      WHERE ne_id = irec.ne_id;
+--
+--    END LOOP;
+--  END LOOP;
 
 END;
 --
@@ -1501,7 +1517,7 @@ BEGIN
     instantiate_from_route_nte ( p_nte_job_id, p_route_id );
   end if;
 
-  set_start_points;
+--  set_start_points;
 
   connect_route( p_nte_job_id, 0, p_start_ne );
 
