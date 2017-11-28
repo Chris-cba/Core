@@ -2,11 +2,11 @@
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/views/v_obj_on_route.vw-arc   1.3   Apr 27 2015 11:38:20   Chris.Baugh  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/views/v_obj_on_route.vw-arc   1.4   Nov 28 2017 12:06:54   Chris.Baugh  $
 --       Module Name      : $Workfile:   v_obj_on_route.vw  $
---       Date into PVCS   : $Date:   Apr 27 2015 11:38:20  $
---       Date fetched Out : $Modtime:   Apr 27 2015 11:35:24  $
---       Version          : $Revision:   1.3  $
+--       Date into PVCS   : $Date:   Nov 28 2017 12:06:54  $
+--       Date fetched Out : $Modtime:   Nov 24 2017 10:24:32  $
+--       Version          : $Revision:   1.4  $
 -------------------------------------------------------------------------
 --
 -----------------------------------------------------------------------------
@@ -45,11 +45,33 @@ SELECT t.*
                                                           nm_begin_mp,
                                                           nm_end_mp,
                                                           1)) AS lb_rpt_tab),
-                                   SYS_CONTEXT('NM3SQL', 'MV_ROUTE_TYPE'),
+                                   SYS_CONTEXT ('NM3SQL', 'MV_ROUTE_TYPE'),
                                    1000)
             FROM nm_members
-           WHERE nm_type = 'I'       
-                              ) t;
+           WHERE nm_type = 'I' and nm_obj_type NOT IN ('ALNE', 'ALTI', 'ALXE', 'TSUP', 'NEVT', 'NIG', 'NIGL' )
+           and nm_obj_type IN (select distinct nm_obj_type
+                                                     from nm_members 
+                                                    where substr(nm_obj_type, 1,1) between 'A' and 'J')) t
+UNION ALL
+SELECT t.*
+  FROM TABLE (
+          SELECT GET_LB_RPT_R_TAB (CAST (COLLECT (lb_rpt (nm_ne_id_of,
+                                                          2,
+                                                          nm_obj_type,
+                                                          nm_ne_id_in,
+                                                          NULL,
+                                                          NULL,
+                                                          NULL,
+                                                          nm_begin_mp,
+                                                          nm_end_mp,
+                                                          1)) AS lb_rpt_tab),
+                                   SYS_CONTEXT ('NM3SQL', 'MV_ROUTE_TYPE'),
+                                   1000)
+            FROM nm_members
+           WHERE nm_type = 'I' and nm_obj_type NOT IN ('ALNE', 'ALTI', 'ALXE', 'TSUP', 'NEVT', 'NIG', 'NIGL' )
+           and nm_obj_type IN (select distinct nm_obj_type
+                                                     from nm_members 
+                                                    where substr(nm_obj_type, 1,1) between 'K' and 'Z')) t;
 
 
 COMMENT ON MATERIALIZED VIEW V_OBJ_ON_ROUTE IS 'Snapshot table for all assets on a section'
