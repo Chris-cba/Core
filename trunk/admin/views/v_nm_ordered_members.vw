@@ -25,48 +25,54 @@ AS
         q1
         AS
             (SELECT  /*+MATERIALIZE*/
-                    nm_ne_id_in,
-                    ne_nt_type,
-                    nm_seg_no,
-                    nm_seq_no,
-                    nm_ne_id_of
-                        ne_id,
-                    nm_cardinality
-                        dir_flag,
-                    CASE nm_cardinality
-                        WHEN 1 THEN nm_begin_mp
-                        ELSE ne_length - nm_end_mp
-                    END
-                        nm_begin_mp,
-                    CASE nm_cardinality
-                        WHEN 1 THEN nm_end_mp
-                        ELSE ne_length - nm_begin_mp
-                    END
-                        nm_end_mp,
-                    nm_slk,
-                    nm_end_slk,
-                    CASE nm_cardinality
-                        WHEN 1 THEN ne_no_start
-                        ELSE ne_no_end
-                    END
-                        start_node,
-                    CASE nm_cardinality
-                        WHEN 1 THEN ne_no_end
-                        ELSE ne_no_start
-                    END
-                        end_node,
-                    ne_length,
-                    nm_true,
-                    nm_end_true,
-                    ne_sub_class,
-                    (SELECT nsc_seq_no
-                       FROM nm_type_subclass
-                      WHERE     nsc_nw_type = ne_nt_type
-                            AND nsc_sub_class = ne_sub_class)
-                        nsc_seq_no
-               FROM nm_members, nm_elements
-              WHERE     nm_ne_id_in = SYS_CONTEXT ('NM3SQL', 'ORDERED_ROUTE')
-                    AND nm_ne_id_of = ne_id)
+                                                                            --
+                                                      --   SCCS Identifiers :-
+                                                                            --
+                   --       sccsid           : @(#)nm_elements.vw 1.3 03/24/05
+                                    --       Module Name      : nm_elements.vw
+                                 --       Date into SCCS   : 05/03/24 16:15:06
+                                 --       Date fetched Out : 07/06/13 17:08:05
+                                               --       SCCS Version     : 1.3
+                                                                            --
+-----------------------------------------------------------------------------
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+                   nm_ne_id_in,
+                   ne_nt_type,
+                   nm_seg_no,
+                   nm_seq_no,
+                   nm_ne_id_of
+                       ne_id,
+                   nm_cardinality
+                       dir_flag,
+                   CASE nm_cardinality
+                       WHEN 1 THEN nm_begin_mp
+                       ELSE ne_length - nm_end_mp
+                   END
+                       nm_begin_mp,
+                   CASE nm_cardinality
+                       WHEN 1 THEN nm_end_mp
+                       ELSE ne_length - nm_begin_mp
+                   END
+                       nm_end_mp,
+                   nm_slk,
+                   nm_end_slk,
+                   CASE nm_cardinality WHEN 1 THEN ne_no_start ELSE ne_no_end END
+                       start_node,
+                   CASE nm_cardinality WHEN 1 THEN ne_no_end ELSE ne_no_start END
+                       end_node,
+                   ne_length,
+                   nm_true,
+                   nm_end_true,
+                   ne_sub_class,
+                   (SELECT nsc_seq_no
+                      FROM nm_type_subclass
+                     WHERE     nsc_nw_type = ne_nt_type
+                           AND nsc_sub_class = ne_sub_class)
+                       nsc_seq_no
+              FROM nm_members, nm_elements
+             WHERE     nm_ne_id_in = SYS_CONTEXT ('NM3SQL', 'ORDERED_ROUTE')
+                   AND nm_ne_id_of = ne_id)
       SELECT q2."NM_NE_ID_IN",
              q2."NE_NT_TYPE",
              q2."NM_SEG_NO",
@@ -144,5 +150,4 @@ AS
                        nsc_seq_no,
                        prior_ne) q2
     ORDER BY nm_seg_no, nm_seq_no;
-
-
+	
