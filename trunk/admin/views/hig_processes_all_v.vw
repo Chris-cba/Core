@@ -28,6 +28,7 @@ Hpj_Repeat_Interval,
 Hpj_Job_State,
 Hpj_Run_Count,
 Hpj_Run_Failure_Count,
+Hpj_Last_Start_Date,
 Hpj_Last_Run_Date,
 Hpj_Next_Run_Date,
 Hp_Requires_Attention_Flag,
@@ -41,11 +42,11 @@ Select  --
         -------------------------------------------------------------------------
         --   PVCS Identifiers :-
         --
-        --       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/hig_processes_all_v.vw-arc   3.2   Jul 04 2013 11:20:06   James.Wadsworth  $
+        --       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/views/hig_processes_all_v.vw-arc   3.3   Nov 28 2017 13:52:44   Chris.Baugh  $
         --       Module Name      : $Workfile:   hig_processes_all_v.vw  $
-        --       Date into PVCS   : $Date:   Jul 04 2013 11:20:06  $
-        --       Date fetched Out : $Modtime:   Jul 04 2013 10:55:54  $
-        --       Version          : $Revision:   3.2  $
+        --       Date into PVCS   : $Date:   Nov 28 2017 13:52:44  $
+        --       Date fetched Out : $Modtime:   Nov 24 2017 11:13:44  $
+        --       Version          : $Revision:   3.3  $
         -----------------------------------------------------------------------------
         --    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
         -----------------------------------------------------------------------------
@@ -99,6 +100,7 @@ Select  --
         Where     hpjr.Hpjr_Process_Id      =   hp.Hp_Process_Id
         And       hpjr.Hpjr_Success_Flag    =   'N'
         )                                                                           Hpj_Run_Failure_Count,
+        dsj.Last_Start_Date                                                         Hpj_Last_Start_Date,
         Cast(Cast (dsj.Last_Start_Date As Timestamp With Local Time Zone) As Date)  Hpj_Last_Run_Date,
         (
         Case
