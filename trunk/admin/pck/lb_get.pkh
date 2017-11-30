@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE lb_get
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_get.pkh-arc   1.13   Nov 07 2017 11:44:18   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_get.pkh-arc   1.14   Nov 30 2017 17:06:36   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_get.pkh  $
-   --       Date into PVCS   : $Date:   Nov 07 2017 11:44:18  $
-   --       Date fetched Out : $Modtime:   Nov 07 2017 11:43:14  $
-   --       PVCS Version     : $Revision:   1.13  $
+   --       Date into PVCS   : $Date:   Nov 30 2017 17:06:36  $
+   --       Date fetched Out : $Modtime:   Nov 30 2017 17:05:52  $
+   --       PVCS Version     : $Revision:   1.14  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,7 +16,7 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.13  $';
+   g_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.14  $';
 
    --
    FUNCTION get_version
@@ -75,6 +75,13 @@ AS
       p_theme_id     IN nm_themes_all.nth_theme_id%TYPE,
       p_mask_array      VARCHAR2 := 'coveredby+inside+anyinteract')
       RETURN lb_RPt_geom_tab;
+
+   FUNCTION get_obj_ids_at_loc (pi_rpt_tab     IN lb_rpt_tab,
+                                pi_obj_type    IN VARCHAR2,
+                                lb_only        IN VARCHAR2 DEFAULT 'FALSE',
+                                p_whole_only   IN VARCHAR2 DEFAULT 'FALSE',
+                                CARDINALITY    IN INTEGER)
+      RETURN lb_obj_id_tab;
 
    FUNCTION get_obj_ids_at_loc (pi_ne_id      IN INTEGER,
                                 pi_begin_mp      NUMBER,
