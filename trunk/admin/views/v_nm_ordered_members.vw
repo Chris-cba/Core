@@ -5,6 +5,8 @@ CREATE OR REPLACE FORCE VIEW V_NM_ORDERED_MEMBERS
     NM_SEG_NO,
     NM_SEQ_NO,
     NE_ID,
+    NE_UNIQUE,
+    NE_TYPE,
     DIR_FLAG,
     NM_BEGIN_MP,
     NM_END_MP,
@@ -27,21 +29,23 @@ AS
             (SELECT  /*+MATERIALIZE*/
                     -------------------------------------------------------------------------
                                                       --   PVCS Identifiers :-
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/views/v_nm_ordered_members.vw-arc   1.7   Nov 28 2017 12:26:28   Rob.Coupe  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/views/v_nm_ordered_members.vw-arc   1.8   Nov 30 2017 09:22:06   Rob.Coupe  $
 --       Module Name      : $Workfile:   v_nm_ordered_members.vw  $
---       Date into PVCS   : $Date:   Nov 28 2017 12:26:28  $
---       Date fetched Out : $Modtime:   Nov 28 2017 12:26:04  $
-                               --       Version          : $Revision:   1.7  $
+--       Date into PVCS   : $Date:   Nov 30 2017 09:22:06  $
+--       Date fetched Out : $Modtime:   Nov 30 2017 09:21:26  $
+                               --       Version          : $Revision:   1.8  $
 --------------------------------------------------------------------------
 --   Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
 --------------------------------------------------------------------------
-                                                                          ----
+
                     nm_ne_id_in,
                     ne_nt_type,
                     nm_seg_no,
                     nm_seq_no,
                     nm_ne_id_of
                         ne_id,
+                    ne_unique,
+                    ne_type,
                     nm_cardinality
                         dir_flag,
                     CASE nm_cardinality
@@ -83,6 +87,8 @@ AS
              q2."NM_SEG_NO",
              q2."NM_SEQ_NO",
              q2."NE_ID",
+             q2."NE_UNIQUE",
+             q2."NE_TYPE",
              q2."DIR_FLAG",
              q2."NM_BEGIN_MP",
              q2."NM_END_MP",
@@ -103,6 +109,8 @@ AS
                                a.nm_seg_no,
                                a.nm_seq_no,
                                a.ne_id,
+                               a.ne_unique,
+                               a.ne_type,
                                a.dir_flag,
                                a.nm_begin_mp,
                                a.nm_end_mp,
@@ -141,6 +149,8 @@ AS
                        nm_seg_no,
                        nm_seq_no,
                        ne_id,
+                       ne_unique,
+                       ne_type,
                        dir_flag,
                        nm_begin_mp,
                        nm_end_mp,
@@ -155,4 +165,3 @@ AS
                        nsc_seq_no,
                        prior_ne) q2
     ORDER BY nm_seg_no, nm_seq_no;
-    
