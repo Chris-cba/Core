@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_get
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_get.pkb-arc   1.37   Nov 10 2017 07:43:38   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_get.pkb-arc   1.38   Nov 30 2017 17:15:26   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_get.pkb  $
-   --       Date into PVCS   : $Date:   Nov 10 2017 07:43:38  $
-   --       Date fetched Out : $Modtime:   Nov 10 2017 07:42:20  $
-   --       PVCS Version     : $Revision:   1.37  $
+   --       Date into PVCS   : $Date:   Nov 30 2017 17:15:26  $
+   --       Date fetched Out : $Modtime:   Nov 30 2017 17:14:18  $
+   --       PVCS Version     : $Revision:   1.38  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,7 +16,7 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.37  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.38  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_get';
 
@@ -335,7 +335,7 @@ AS
          SELECT CAST (COLLECT (nlt_id) AS int_array_type)
            INTO l_nlt_ids
            FROM nm_linear_types
-          WHERE nlt_gty_type is NULL;
+          WHERE nlt_gty_type IS NULL;
       END IF;
 
       --
@@ -363,7 +363,9 @@ AS
    BEGIN
       IF int_array (p_nlt_ids).is_empty
       THEN
-         raise_application_error(-20010, 'No network type has been supplied in call to geenrate a spatial intersection');
+         raise_application_error (
+            -20010,
+            'No network type has been supplied in call to geenrate a spatial intersection');
       END IF;
 
       SELECT    'with geom_tab as ( select :geom geoloc from dual ) '
@@ -388,7 +390,8 @@ AS
                              || ' nlt_units, '
                              || pk
                              || ' NE_ID, '
-                             || 'f.'||shape
+                             || 'f.'
+                             || shape
                              || ' SHAPE '
                              || 'from '
                              || feat_tab
@@ -413,10 +416,10 @@ AS
                                --                               nlt_id IN (SELECT COLUMN_VALUE
                                --                                                  FROM TABLE (p_nlt_ids)))));
                                --                                     OR nlt_is_empty = 'Y')));
-                               WHERE   nlt_id IN (SELECT COLUMN_VALUE
-                                                          FROM TABLE (
-                                                                  p_nlt_ids)))));
---                                     OR nlt_is_empty = 'Y')));
+                               WHERE nlt_id IN (SELECT COLUMN_VALUE
+                                                  FROM TABLE (p_nlt_ids)))));
+
+      --                                     OR nlt_is_empty = 'Y')));
 
 
 
@@ -681,6 +684,82 @@ AS
    --
    END;
 
+   FUNCTION get_obj_ids_at_loc (pi_rpt_tab     IN lb_rpt_tab,
+                                pi_obj_type    IN VARCHAR2,
+                                p_lb_only      IN VARCHAR2 DEFAULT 'FALSE',
+                                p_whole_only   IN VARCHAR2 DEFAULT 'FALSE',
+                                CARDINALITY    IN INTEGER)
+      RETURN lb_obj_id_tab
+   IS
+      retval   lb_obj_id_tab;
+   BEGIN
+        SELECT lb_obj_id (nm_obj_type, nm_ne_id_in)
+          BULK COLLECT INTO retval
+          FROM (SELECT nm_ne_id_in, nm_obj_type
+                  FROM nm_locations m, TABLE (pi_rpt_tab) t
+                 WHERE     nm_obj_type = NVL (pi_obj_type, nm_obj_type)
+                       AND nm_ne_id_of = refnt
+                       AND (   (nm_begin_mp < t.end_m AND nm_end_mp > t.start_m)
+                            OR (    nm_begin_mp = nm_end_mp
+                                AND nm_begin_mp BETWEEN t.start_m AND t.end_m))
+                       AND (       p_whole_only = 'TRUE'
+                               AND (    NOT EXISTS
+                                               (SELECT 1
+                                                  FROM nm_locations l
+                                                 WHERE     nm_ne_id_in =
+                                                              m.nm_ne_id_in
+                                                       AND l.nm_ne_id_of NOT IN (SELECT refnt
+                                                                                   FROM TABLE (
+                                                                                           pi_rpt_tab)))
+                                    AND NOT EXISTS
+                                               (SELECT 1
+                                                  FROM nm_locations l,
+                                                       TABLE (pi_rpt_tab)
+                                                 WHERE     nm_ne_id_in =
+                                                              m.nm_ne_id_in
+                                                       AND refnt =
+                                                              l.nm_ne_id_of
+                                                       AND (   l.nm_begin_mp <
+                                                                  start_m
+                                                            OR l.nm_end_mp >
+                                                                  end_m)))
+                            OR p_whole_only = 'FALSE')
+                UNION ALL
+                SELECT nm_ne_id_in, nm_obj_type
+                  FROM nm_members m, TABLE (pi_rpt_tab) t
+                 WHERE     p_lb_only = 'FALSE'
+                       AND nm_obj_type = NVL (pi_obj_type, nm_obj_type)
+                       AND nm_ne_id_of = refnt
+                       AND (   (nm_begin_mp < t.end_m AND nm_end_mp > t.start_m)
+                            OR (    nm_begin_mp = nm_end_mp
+                                AND nm_begin_mp BETWEEN t.start_m AND t.end_m))
+                       AND (       p_whole_only = 'TRUE'
+                               AND (    NOT EXISTS
+                                               (SELECT 1
+                                                  FROM nm_locations l
+                                                 WHERE     nm_ne_id_in =
+                                                              m.nm_ne_id_in
+                                                       AND l.nm_ne_id_of NOT IN (SELECT refnt
+                                                                                   FROM TABLE (
+                                                                                           pi_rpt_tab)))
+                                    AND NOT EXISTS
+                                               (SELECT 1
+                                                  FROM nm_locations l,
+                                                       TABLE (pi_rpt_tab)
+                                                 WHERE     nm_ne_id_in =
+                                                              m.nm_ne_id_in
+                                                       AND refnt =
+                                                              l.nm_ne_id_of
+                                                       AND (   l.nm_begin_mp <
+                                                                  start_m
+                                                            OR l.nm_end_mp >
+                                                                  end_m)))
+                            OR p_whole_only = 'FALSE'))
+      GROUP BY nm_ne_id_in, nm_obj_type;
+
+      RETURN retval;
+   END;
+
    --
    FUNCTION get_obj_ids_at_loc (pi_ne_id      IN INTEGER,
                                 pi_begin_mp      NUMBER,
@@ -916,7 +995,7 @@ AS
                  FROM group_hierarchy t, nm_members p
                 WHERE t.child_group = p.nm_ne_id_in)
                  SEARCH DEPTH FIRST BY parent_group SET order1
-                 CYCLE parent_group SET cycle TO 1 DEFAULT 0
+                  CYCLE parent_group SET cycle TO 1 DEFAULT 0
       --select * from group_hierarchy
       SELECT CAST (COLLECT (lb_rpt (nm_ne_id_of,
                                     nlt_id,
@@ -2023,9 +2102,10 @@ AS
    IS
       retval   SDO_GEOMETRY;
    BEGIN
-         WITH lrdata as
-      ( select rownum ordnum, t.* from TABLE (pi_lrefs.nla_lref_array) t )
-      , input_data
+      WITH lrdata
+           AS (SELECT ROWNUM ordnum, t.*
+                 FROM TABLE (pi_lrefs.nla_lref_array) t),
+           input_data
            AS (SELECT objectid,
                       rn,
                       lr_ne_id,
@@ -2033,32 +2113,43 @@ AS
                       g1.g.x x,
                       g1.g.y y,
                       g1.base_srid
-                 FROM (SELECT 1 objectid,
-                              ROW_NUMBER () OVER (ORDER BY 1) rn,
-                              l.*,
-                              nm3sdo.get_2d_pt (
-                                 SDO_LRS.locate_pt (geoloc, lr_offset, 0.005)).sdo_point
-                                 g,
-                                 s.geoloc.sdo_srid base_srid
-                         FROM v_lb_nlt_geometry s, lrdata l                               
-                        WHERE lr_ne_id = ne_id order by ordnum) g1)
+                 FROM (  SELECT 1 objectid,
+                                ROW_NUMBER () OVER (ORDER BY 1) rn,
+                                l.*,
+                                nm3sdo.get_2d_pt (
+                                   SDO_LRS.locate_pt (geoloc, lr_offset, 0.005)).sdo_point
+                                   g,
+                                s.geoloc.sdo_srid base_srid
+                           FROM v_lb_nlt_geometry s, lrdata l
+                          WHERE lr_ne_id = ne_id
+                       ORDER BY ordnum) g1)
       SELECT sdo_geometry (2002,
                            base_srid,
                            NULL,
                            sdo_elem_info_array (1, 2, 1),
                            ords)
-      into retval
-        FROM (SELECT 
-        base_srid, 
-        CAST (COLLECT (ordinate order by rn, cn) AS sdo_ordinate_array) ords
-                FROM (  SELECT rn, cn, ordinate, base_srid
-                          FROM (SELECT rn, 1 cn, x ordinate, base_srid FROM input_data ip
+        INTO retval
+        FROM (  SELECT base_srid,
+                       CAST (
+                          COLLECT (ordinate ORDER BY rn, cn) AS sdo_ordinate_array)
+                          ords
+                  FROM (SELECT rn,
+                               cn,
+                               ordinate,
+                               base_srid
+                          FROM (SELECT rn,
+                                       1 cn,
+                                       x ordinate,
+                                       base_srid
+                                  FROM input_data ip
                                 UNION ALL
-                                SELECT rn, 2 cn, y ordinate, base_srid FROM input_data ip)
---                         ORDER BY rn, cn
-                         ) 
-                         group by base_srid
-                          );
+                                SELECT rn,
+                                       2 cn,
+                                       y ordinate,
+                                       base_srid
+                                  FROM input_data ip) --                         ORDER BY rn, cn
+                                                     )
+              GROUP BY base_srid);
 
       RETURN retval;
    END;
