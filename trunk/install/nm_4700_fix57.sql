@@ -1,11 +1,11 @@
 ----------------------------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm_4700_fix57.sql-arc   1.0   Apr 03 2017 10:18:38   Upendra.Hukeri  $   
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm_4700_fix57.sql-arc   1.1   Dec 04 2017 14:09:14   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm_4700_fix57.sql  $ 
---       Date into PVCS   : $Date:   Apr 03 2017 10:18:38  $
---       Date fetched Out : $Modtime:   Apr 03 2017 10:15:48  $
---       Version     	  : $Revision:   1.0  $
+--       Date into PVCS   : $Date:   Dec 04 2017 14:09:14  $
+--       Date fetched Out : $Modtime:   Dec 04 2017 10:17:28  $
+--       Version     	  : $Revision:   1.1  $
 --
 ----------------------------------------------------------------------------------------------------
 --   Copyright (c) 2017 Bentley Systems Incorporated. All rights reserved.
@@ -26,8 +26,8 @@ SELECT  TO_CHAR(SYSDATE, 'DDMONYYYY_HH24MISS') || '.LOG' log_extension FROM DUAL
 SET TERM ON
 --
 --------------------------------------------------------------------------------
+--
 -- Spool to Logfile
---------------------------------------------------------------------------------
 --
 DEFINE logfile1='nm_4700_fix57_&log_extension'
 spool &logfile1
@@ -41,80 +41,164 @@ FROM v$instance;
 --
 SELECT 'Current version of ' || hpr_product || ' ' || hpr_version
 FROM hig_products
-WHERE hpr_product IN ('HIG', 'NET', 'AST');
---
---------------------------------------------------------------------------------
--- 	Check(s)
---------------------------------------------------------------------------------
+WHERE hpr_product IN ('HIG', 'NET');
 --
 WHENEVER SQLERROR EXIT
 --
-DECLARE
-	--
-	CURSOR c1 is
-		SELECT 'Y'
-		FROM   hig_upgrades
-		WHERE  hup_product = 'NET'
-		AND    remarks = 'NET 4700 FIX 42 (Build 1)';
-	--
-	l_dummy_c1 VARCHAR2(1);
 BEGIN
-	--
-	-- Check that the user isn't SYS or SYSTEM
-	--
-	IF USER IN ('SYS', 'SYSTEM') THEN
-		RAISE_APPLICATION_ERROR(-20000, 'You cannot install this product as ' || USER);
-	END IF;
-	--
-	-- Check that HIG has been installed @ v4.7.0.x
-	--
-	hig2.product_exists_at_version  (p_product        => 'HIG'
-									,p_VERSION        => '4.7.0.1'
-									);
-	--
-        --
-	-- 	Check that NET 4700 FIX 42 (Build 1) has already been applied
-	--
-	OPEN  c1;
-	FETCH c1 INTO l_dummy_c1;
-	CLOSE c1;
-	--
-	IF l_dummy_c1 IS NULL THEN
-		RAISE_APPLICATION_ERROR(-20001,'NET 4700 FIX 42 (Build 1) must be applied before proceeding - contact exor support for further information');
-	END IF;
-	--
+ --
+ -- Check that the user isn't SYS or SYSTEM
+ --
+ IF USER IN ('SYS', 'SYSTEM')
+ THEN
+	RAISE_APPLICATION_ERROR(-20000, 'You cannot install this product as ' || USER);
+ END IF;
+ --
+ -- Check that NET has been installed @ v4.7.0.0
+ --
+ hig2.product_exists_at_version (p_product        => 'NET'
+                                ,p_VERSION        => '4.7.0.0'
+                                );
+
 END;
 /
---
 WHENEVER SQLERROR CONTINUE
+
+--
+--------------------------------------------------------------------------------
+-- Type
+--------------------------------------------------------------------------------
+--
+SET TERM ON 
+PROMPT Creating type sde_varchar_2d_array
+SET TERM OFF
+--
+SET FEEDBACK ON
+start sde_varchar_2d_array.tyh
+SET FEEDBACK OFF
+
+SET TERM ON 
+PROMPT Creating type sde_varchar_array
+SET TERM OFF
+--
+SET FEEDBACK ON
+start sde_varchar_array.tyh
+SET FEEDBACK OFF
+
+--
+--------------------------------------------------------------------------------
+-- Function
+--------------------------------------------------------------------------------
+--
+SET TERM ON 
+PROMPT Creating function get_lb_RPt_r_tab
+SET TERM OFF
+--
+SET FEEDBACK ON
+start get_lb_RPt_r_tab.fnw
+SET FEEDBACK OFF
+
+--
+--------------------------------------------------------------------------------
+-- Views
+--------------------------------------------------------------------------------
+--
+SET TERM ON 
+PROMPT creating View hig_processes_all_v
+SET TERM OFF
+--
+SET FEEDBACK ON
+START hig_processes_all_v.vw
+SET FEEDBACK OFF
+
+SET TERM ON 
+PROMPT creating View hig_processes_v
+SET TERM OFF
+--
+SET FEEDBACK ON
+START hig_processes_v.vw
+SET FEEDBACK OFF
+
+SET TERM ON 
+PROMPT creating View v_obj_on_route
+SET TERM OFF
+--
+SET FEEDBACK ON
+START v_obj_on_route.vw
+SET FEEDBACK OFF
+
+SET TERM ON 
+PROMPT creating View v_nm_ordered_members
+SET TERM OFF
+--
+SET FEEDBACK ON
+START v_nm_ordered_members.vw
+SET FEEDBACK OFF
+
+--
+--------------------------------------------------------------------------------
+-- Package Headers
+--------------------------------------------------------------------------------
+--
+SET TERM ON 
+PROMPT creating Package Header sde_util.pkh
+SET TERM OFF
+--
+SET FEEDBACK ON
+START sde_util.pkh
+SET FEEDBACK OFF
+
+--
+--------------------------------------------------------------------------------
+-- Package Bodies
+--------------------------------------------------------------------------------
+--
+SET TERM ON 
+PROMPT creating Package Body sde_util.pkw
+SET TERM OFF
+--
+SET FEEDBACK ON
+START sde_util.pkw
+SET FEEDBACK OFF
+
+SET TERM ON 
+PROMPT creating Package Body nm3rsc.pkw
+SET TERM OFF
+--
+SET FEEDBACK ON
+START nm3rsc.pkw
+SET FEEDBACK OFF
+
+--
 --------------------------------------------------------------------------------
 -- Update hig_upgrades with fix ID
 --------------------------------------------------------------------------------
 --
-SET TERM ON 
-PROMPT Compiling nm3_doc_man.pkh
-SET TERM OFF
+BEGIN
+	--
+	hig2.upgrade(p_product        => 'NET'
+				,p_upgrade_script => 'log_nm_4700_fix57.sql'
+				,p_remarks        => 'NET 4700 FIX 57 (Build 1)'
+				,p_to_version     => NULL
+				);
+	--
+	COMMIT;
+	--
+EXCEPTION 
+	WHEN OTHERS THEN
+	--
+		NULL;
+	--
+END;
+/
+COMMIT;
 --
-SET FEEDBACK ON
-start nm3_doc_man.pkh
-SET FEEDBACK OFF
 
-SET TERM ON 
-PROMPT Compiling nm3_doc_man.pkw
-SET TERM OFF
---
-SET FEEDBACK ON
-start nm3_doc_man.pkw
-SET FEEDBACK OFF
-
-SET TERM ON 
-PROMPT log_nm_4700_fix57.sql
-SET TERM OFF
---
-SET FEEDBACK ON
-START log_nm_4700_fix57.sql
-SET FEEDBACK OFF
---
 SPOOL OFF
 --
 EXIT
+--
+---------------------------------------------------------------------------------------------------
+--                        ****************   END OF SCRIPT   *******************
+---------------------------------------------------------------------------------------------------
+--
