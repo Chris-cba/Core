@@ -7,7 +7,22 @@ CREATE OR REPLACE FUNCTION GET_LB_RPT_R_TAB (p_lb_RPt_tab        IN lb_RPt_tab,
       l_refnt_type   nm_linear_types%ROWTYPE;
       l_round        INTEGER;
    BEGIN
-      SELECT *
+      SELECT 
+        --
+        --
+        -------------------------------------------------------------------------
+        --   PVCS Identifiers :-
+        --
+        --       PVCS id          : $Header:   //new_vm_latest/archives/lb/admin/pck/get_lb_RPt_r_tab.fnc-arc   1.2   Dec 04 2017 10:29:22   Chris.Baugh  $
+        --       Module Name      : $Workfile:   get_lb_RPt_r_tab.fnc  $
+        --       Date into PVCS   : $Date:   Dec 04 2017 10:29:22  $
+        --       Date fetched Out : $Modtime:   Dec 04 2017 10:27:50  $
+        --       Version          : $Revision:   1.2  $
+        -----------------------------------------------------------------------------
+        --    Copyright (c) 2017 Bentley Systems Incorporated. All rights reserved.
+        -----------------------------------------------------------------------------
+        --
+        *
         INTO l_refnt_type
         FROM nm_linear_types
        WHERE nlt_g_i_d = 'G' AND nlt_gty_type = p_linear_obj_type;
