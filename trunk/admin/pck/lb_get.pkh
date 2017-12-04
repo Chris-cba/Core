@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE lb_get
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_get.pkh-arc   1.16   Dec 01 2017 16:26:56   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_get.pkh-arc   1.17   Dec 04 2017 11:39:56   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_get.pkh  $
-   --       Date into PVCS   : $Date:   Dec 01 2017 16:26:56  $
-   --       Date fetched Out : $Modtime:   Dec 01 2017 16:24:52  $
-   --       PVCS Version     : $Revision:   1.16  $
+   --       Date into PVCS   : $Date:   Dec 04 2017 11:39:56  $
+   --       Date fetched Out : $Modtime:   Dec 04 2017 11:39:26  $
+   --       PVCS Version     : $Revision:   1.17  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,7 +16,7 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.16  $';
+   g_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.17  $';
 
    --
    FUNCTION get_version
@@ -27,6 +27,7 @@ AS
 
    FUNCTION get_obj_RPt_tab (p_refnt_tab     IN lb_RPt_tab,
                              p_obj_type      IN VARCHAR2,
+                             p_obj_id        IN INTEGER,
                              p_intsct        IN VARCHAR2 DEFAULT 'FALSE',
                              p_lb_only       IN VARCHAR2 DEFAULT 'FALSE',
                              p_whole_only    IN VARCHAR2 DEFAULT 'FALSE',
@@ -78,7 +79,7 @@ AS
 
    FUNCTION get_obj_ids_at_loc (pi_rpt_tab     IN lb_rpt_tab,
                                 pi_obj_type    IN VARCHAR2,
-                                p_lb_only      IN VARCHAR2 DEFAULT 'FALSE',
+                                p_lb_only        IN VARCHAR2 DEFAULT 'FALSE',
                                 p_whole_only   IN VARCHAR2 DEFAULT 'FALSE',
                                 CARDINALITY    IN INTEGER)
       RETURN lb_obj_id_tab;
@@ -132,14 +133,14 @@ AS
                               p_linear_obj_type   IN VARCHAR2,
                               p_cardinality       IN INTEGER DEFAULT NULL)
       RETURN lb_RPt_tab;
-
-   FUNCTION get_asset_ids_at_loc (pi_rpt_tab     IN lb_rpt_tab,
-                                  pi_obj_type    IN VARCHAR2,
-                                  p_lb_only      IN VARCHAR2 DEFAULT 'FALSE',
-                                  p_whole_only   IN VARCHAR2 DEFAULT 'FALSE',
-                                  CARDINALITY    IN INTEGER)
-      RETURN lb_obj_id_tab;
-
+FUNCTION get_asset_ids_at_loc (
+    pi_rpt_tab     IN lb_rpt_tab,
+    pi_obj_type    IN VARCHAR2,
+    p_lb_only      IN VARCHAR2 DEFAULT 'FALSE',
+    p_whole_only   IN VARCHAR2 DEFAULT 'FALSE',
+    CARDINALITY    IN INTEGER)
+    RETURN lb_obj_id_tab;
+      
 
    FUNCTION get_lb_RPt_D_tab (p_lb_RPt_tab IN lb_RPt_tab)
       RETURN lb_RPt_tab;
