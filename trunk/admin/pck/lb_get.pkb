@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_get
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_get.pkb-arc   1.39   Dec 01 2017 16:30:34   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_get.pkb-arc   1.40   Dec 04 2017 11:37:54   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_get.pkb  $
-   --       Date into PVCS   : $Date:   Dec 01 2017 16:30:34  $
-   --       Date fetched Out : $Modtime:   Dec 01 2017 16:30:10  $
-   --       PVCS Version     : $Revision:   1.39  $
+   --       Date into PVCS   : $Date:   Dec 04 2017 11:37:54  $
+   --       Date fetched Out : $Modtime:   Dec 04 2017 11:36:20  $
+   --       PVCS Version     : $Revision:   1.40  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,7 +16,7 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.39  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.40  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_get';
 
@@ -77,6 +77,7 @@ AS
 
    FUNCTION get_obj_RPt_tab (p_refnt_tab     IN lb_RPt_tab,
                              p_obj_type      IN VARCHAR2,
+                             p_obj_id        IN INTEGER,
                              p_intsct        IN VARCHAR2 DEFAULT 'FALSE',
                              p_lb_only       IN VARCHAR2 DEFAULT 'FALSE',
                              p_whole_only    IN VARCHAR2 DEFAULT 'FALSE',
@@ -176,6 +177,7 @@ AS
              WHERE     nal_nit_type = NVL (p_obj_type, nal_nit_type)
                    AND nlt_id = m.nm_nlt_id
                    AND ne_id = nm_ne_id_of
+                   and nm_ne_id_in = NVL( p_obj_id, nm_ne_id_in)
                    AND nm_start_date <=
                           TO_DATE (SYS_CONTEXT ('NM3CORE', 'EFFECTIVE_DATE'),
                                    'DD-MON-YYYY')
@@ -260,6 +262,7 @@ AS
                    AND nlt_nt_type = ne_nt_type
                    AND nlt_g_i_d = 'D'
                    AND nm_obj_type = NVL (p_obj_type, nm_obj_type)
+                   and nm_ne_id_in = NVL( p_obj_id, nm_ne_id_in)
                    AND nm_ne_id_of = refnt
                    AND (   (nm_begin_mp < t.end_m AND nm_end_mp > t.start_m)
                         OR (    nm_begin_mp = nm_end_mp
@@ -866,6 +869,7 @@ AS
                                        NVL (p_end_m, ne_length),
                                        l_units)),
                    p_obj_type,
+                   p_obj_id,
                    p_intsct,
                    p_lb_only,
                    p_whole_only,
@@ -886,6 +890,7 @@ AS
                                                          p_end_m,
                                                          l_units))),
                    p_obj_type,
+                   p_obj_id,
                    p_intsct,
                    p_lb_only,
                    p_whole_only,
