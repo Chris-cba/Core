@@ -3,11 +3,11 @@ AS
 -----------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/web_user_info.pkb-arc   3.8   Sep 11 2015 11:25:58   Upendra.Hukeri  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/web_user_info.pkb-arc   3.9   Dec 14 2017 07:52:50   Upendra.Hukeri  $
 --       Module Name      : $Workfile:   web_user_info.pkb  $
---       Date into PVCS   : $Date:   Sep 11 2015 11:25:58  $
---       Date fetched Out : $Modtime:   Sep 11 2015 07:29:00  $
---       Version          : $Revision:   3.8  $
+--       Date into PVCS   : $Date:   Dec 14 2017 07:52:50  $
+--       Date fetched Out : $Modtime:   Dec 14 2017 07:50:52  $
+--       Version          : $Revision:   3.9  $
 --       Based on SCCS version :
 -----------------------------------------------------------------------------
 --   Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
@@ -17,7 +17,7 @@ AS
   --Constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-	g_Body_Sccsid CONSTANT  VARCHAR2(2000) :=  '$Revision:   3.8  $';
+	g_Body_Sccsid CONSTANT  VARCHAR2(2000) :=  '$Revision:   3.9  $';
   -----------
   --Variables
   -----------
@@ -239,7 +239,7 @@ BEGIN
 		set_context(sub_user, error_msg);
 		--
 		IF error_msg IS NOT NULL THEN
-			htp.p('<script>alert("Error occured while setting context for user - ' || sub_user || '.\n' || error_msg || '.\n\n' || 'Results will be shown as HIGHWAYS OWNER.");</script>');
+			htp.p('<script>document.cookie = "SUBUSERNAME=;expires=Thu, 01 Jan 1900 00:00:01 GMT;";alert("Error occured while setting context for user - ' || sub_user || '.\n' || error_msg || '\n\n' || 'Results will be shown as HIGHWAYS OWNER.");</script>');
 		END IF;
 	END IF;
 END set_subuser;
