@@ -1,11 +1,11 @@
 ----------------------------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm_4500_fix53.sql-arc   1.0   Dec 14 2017 08:55:12   Upendra.Hukeri  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm_4500_fix53.sql-arc   1.1   Dec 14 2017 09:50:52   Upendra.Hukeri  $
 --       Module Name      : $Workfile:   nm_4500_fix53.sql  $ 
---       Date into PVCS   : $Date:   Dec 14 2017 08:55:12  $
---       Date fetched Out : $Modtime:   Dec 14 2017 08:49:02  $
---       Version     	  : $Revision:   1.0  $
+--       Date into PVCS   : $Date:   Dec 14 2017 09:50:52  $
+--       Date fetched Out : $Modtime:   Dec 14 2017 09:50:32  $
+--       Version     	  : $Revision:   1.1  $
 --
 ----------------------------------------------------------------------------------------------------
 --   Copyright (c) 2017 Bentley Systems Incorporated. All rights reserved.
@@ -49,6 +49,16 @@ WHERE hpr_product IN ('HIG', 'NET');
 --
 WHENEVER SQLERROR EXIT
 --
+DECLARE
+	--
+	CURSOR c1 is
+		SELECT 'Y'
+		FROM   hig_upgrades
+		WHERE  hup_product 	= 'NET'
+		AND    remarks 		= 'NET 4500 FIX 45';
+	--
+	l_dummy_c VARCHAR2(1);
+	--
 BEGIN
 	--
 	-- Check that the user isn't SYS or SYSTEM
@@ -62,6 +72,21 @@ BEGIN
 	hig2.product_exists_at_version  (p_product        => 'NET'
 									,p_VERSION        => '4.5.0.0'
 									);
+	--
+	--
+	-- 	Check that NET 4500 FIX 45 has already been applied
+	--
+	l_dummy_c := NULL;
+	--
+	OPEN  c1;
+	FETCH c1 INTO l_dummy_c;
+	CLOSE c1;
+	--
+	IF l_dummy_c IS NULL THEN
+		RAISE_APPLICATION_ERROR(-20002, 'NET 4500 FIX 45 must be applied before proceeding - contact exor support for further information');
+		--
+		NULL;
+	END IF;
 	--
 END;
 /
