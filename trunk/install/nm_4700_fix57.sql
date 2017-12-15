@@ -1,11 +1,11 @@
 ----------------------------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm_4700_fix57.sql-arc   1.1   Dec 04 2017 14:09:14   Chris.Baugh  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm_4700_fix57.sql-arc   1.2   Dec 15 2017 13:19:46   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm_4700_fix57.sql  $ 
---       Date into PVCS   : $Date:   Dec 04 2017 14:09:14  $
---       Date fetched Out : $Modtime:   Dec 04 2017 10:17:28  $
---       Version     	  : $Revision:   1.1  $
+--       Date into PVCS   : $Date:   Dec 15 2017 13:19:46  $
+--       Date fetched Out : $Modtime:   Dec 14 2017 10:10:52  $
+--       Version     	  : $Revision:   1.2  $
 --
 ----------------------------------------------------------------------------------------------------
 --   Copyright (c) 2017 Bentley Systems Incorporated. All rights reserved.
@@ -169,6 +169,18 @@ SET FEEDBACK ON
 START nm3rsc.pkw
 SET FEEDBACK OFF
 
+--
+--------------------------------------------------------------------------------
+-- Removal of product options SHPJAVAEX and SHPJAVAUP 
+--------------------------------------------------------------------------------
+--
+DELETE from hig_option_values
+WHERE hov_id IN ('SHPJAVAEX','SHPJAVAUP')
+/
+
+DELETE from hig_option_list
+WHERE hol_id IN ('SHPJAVAEX','SHPJAVAUP')
+/
 --
 --------------------------------------------------------------------------------
 -- Update hig_upgrades with fix ID
