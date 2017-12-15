@@ -2,11 +2,11 @@ CREATE OR REPLACE PROCEDURE create_nlt_geometry_view
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/create_nlt_geometry_view.prc-arc   1.3   Dec 15 2017 11:14:10   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/create_nlt_geometry_view.prc-arc   1.4   Dec 15 2017 11:38:38   Rob.Coupe  $
    --       Module Name      : $Workfile:   create_nlt_geometry_view.prc  $
-   --       Date into PVCS   : $Date:   Dec 15 2017 11:14:10  $
-   --       Date fetched Out : $Modtime:   Dec 15 2017 11:11:40  $
-   --       PVCS Version     : $Revision:   1.3  $
+   --       Date into PVCS   : $Date:   Dec 15 2017 11:38:38  $
+   --       Date fetched Out : $Modtime:   Dec 15 2017 11:36:16  $
+   --       PVCS Version     : $Revision:   1.4  $
    --
    --   Author : R.A. Coupe
    --
@@ -45,17 +45,13 @@ BEGIN
                         ELSE
                               ' AND '
                            || nth_start_date_column
-                           || ' <=  to_date( SYS_CONTEXT ('
+                           || ' <=  SYS_CONTEXT ('
                            || ''''
                            || 'NM3CORE'
                            || ''''
                            || ','
                            || ''''
                            || 'EFFECTIVE_DATE'
-                           || ''''
-                           || '), '
-                           || ''''
-                           || 'YYYYMMDD'
                            || ''''
                            || ') '
                            || 'AND NVL('
@@ -69,17 +65,13 @@ BEGIN
                            || 'YYYYMMDD'
                            || ''''
                            || ')) '
-                           || ' >  to_date( SYS_CONTEXT ('
+                           || ' >  SYS_CONTEXT ('
                            || ''''
                            || 'NM3CORE'
                            || ''''
                            || ','
                            || ''''
                            || 'EFFECTIVE_DATE'
-                           || ''''
-                           || '), '
-                           || ''''
-                           || 'YYYYMMDD'
                            || ''''
                            || ') '
                      END
