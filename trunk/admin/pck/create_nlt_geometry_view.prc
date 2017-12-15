@@ -2,11 +2,11 @@ CREATE OR REPLACE PROCEDURE create_nlt_geometry_view
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/create_nlt_geometry_view.prc-arc   1.2   Mar 29 2017 15:49:54   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/create_nlt_geometry_view.prc-arc   1.3   Dec 15 2017 11:14:10   Rob.Coupe  $
    --       Module Name      : $Workfile:   create_nlt_geometry_view.prc  $
-   --       Date into PVCS   : $Date:   Mar 29 2017 15:49:54  $
-   --       Date fetched Out : $Modtime:   Mar 29 2017 15:49:04  $
-   --       PVCS Version     : $Revision:   1.2  $
+   --       Date into PVCS   : $Date:   Dec 15 2017 11:14:10  $
+   --       Date fetched Out : $Modtime:   Dec 15 2017 11:11:40  $
+   --       PVCS Version     : $Revision:   1.3  $
    --
    --   Author : R.A. Coupe
    --
@@ -91,14 +91,19 @@ BEGIN
                   AND nth_base_table_theme IS NULL);
 
    --
-
+   --
+   
+   if l_str1 is NULL then
+     l_str1 := ' mdsys.sdo_geometry( NULL, NULL, NULL, NULL, NULL) ';
+   else
+     l_str1 := 'case nlt_Id '||l_str1||' end ';
+   end if;
+   
    l_str2 :=
          'create or replace view v_lb_nlt_geometry '
       || ' ( nlt_id, ne_id, geoloc )  '
       || ' as select nlt_id, ne_id, '
-      || '  case nlt_id '
       || l_str1
-      || ' end  '
       || ' from nm_elements e, nm_linear_types '
       || ' where nlt_nt_type = ne_nt_type '
       || ' and nvl(nlt_gty_type, '
