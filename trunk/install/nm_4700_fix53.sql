@@ -1,14 +1,14 @@
 ----------------------------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm_4700_fix53.sql-arc   1.1   Sep 21 2017 16:03:36   Chris.Baugh  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm_4700_fix53.sql-arc   1.2   Dec 18 2017 10:36:16   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm_4700_fix53.sql  $ 
---       Date into PVCS   : $Date:   Sep 21 2017 16:03:36  $
---       Date fetched Out : $Modtime:   Sep 21 2017 15:34:30  $
---       Version     	  : $Revision:   1.1  $
+--       Date into PVCS   : $Date:   Dec 18 2017 10:36:16  $
+--       Date fetched Out : $Modtime:   Dec 18 2017 10:34:58  $
+--       Version     	  : $Revision:   1.2  $
 --
 ----------------------------------------------------------------------------------------------------
---   Copyright (c) 2016 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2017 Bentley Systems Incorporated. All rights reserved.
 ----------------------------------------------------------------------------------------------------
 --
 SET ECHO OFF
@@ -63,70 +63,6 @@ BEGIN
 END;
 /
 WHENEVER SQLERROR CONTINUE
---
---------------------------------------------------------------------------------
--- Table Definitions
---------------------------------------------------------------------------------
---
-SET TERM ON 
-PROMPT Creating HIG_RELATIONSHIP table
-SET TERM OFF
---
-DECLARE
- table_exists exception;
- pragma exception_init (table_exists,-955);
-BEGIN
-  EXECUTE IMMEDIATE 'CREATE TABLE HIG_RELATIONSHIP                        '||CHR(10)||
-                    '( HIR_ATTRIBUTE1  VARCHAR2(50)               NOT NULL'||CHR(10)||  
-                    ' ,HIR_ATTRIBUTE2  RAW(2000)                  NOT NULL'||CHR(10)|| 
-                    ' ,HIR_ATTRIBUTE3  VARCHAR2(1)  DEFAULT ''Y'' NOT NULL'||CHR(10)|| 
-                    ' ,HIR_ATTRIBUTE4  RAW(2000)                          '||CHR(10)|| 
-                    ')';
-EXCEPTION
-  WHEN table_exists THEN
-    Null;
-   WHEN others THEN
-     RAISE;
-END;
-/
---
--- Add PK constraint
---
-
-DECLARE
- constraint_exists exception;
- pragma exception_init (constraint_exists,-2260);
-BEGIN
-  EXECUTE IMMEDIATE 'ALTER TABLE HIG_RELATIONSHIP'||CHR(10)||
-                    'ADD CONSTRAINT HIR_PK PRIMARY KEY (HIR_ATTRIBUTE1)';
-EXCEPTION
-  WHEN constraint_exists THEN
-    Null;
-   WHEN others THEN
-     RAISE;
-END;
-/
-
---
---------------------------------------------------------------------------------
--- Package Headers
---------------------------------------------------------------------------------
---
-SET TERM ON 
-PROMPT creating Package Header hig_relationship_api.pkh
-SET TERM OFF
---
-SET FEEDBACK ON
-START hig_relationship_api.pkh
-SET FEEDBACK OFF
-
-SET TERM ON 
-PROMPT creating Package Header hig_sso_api.pkh
-SET TERM OFF
---
-SET FEEDBACK ON
-START hig_sso_api.pkh
-SET FEEDBACK OFF
 
 --
 --------------------------------------------------------------------------------
@@ -134,245 +70,75 @@ SET FEEDBACK OFF
 --------------------------------------------------------------------------------
 --
 SET TERM ON 
-PROMPT creating Package Body hig_relationship_api.pkw
+PROMPT creating Package Body nm3mail.pkw
 SET TERM OFF
 --
 SET FEEDBACK ON
-START hig_relationship_api.pkw
+START nm3mail.pkw
 SET FEEDBACK OFF
 
-SET TERM ON 
-PROMPT creating Package Body hig_sso_api.pkw
-SET TERM OFF
---
-SET FEEDBACK ON
-START hig_sso_api.pkw
-SET FEEDBACK OFF
---
 --
 --------------------------------------------------------------------------------
--- Create HIG_RELATIONSHIP policies
---------------------------------------------------------------------------------
---
---
-SET TERM ON
-PROMPT Drop HIG_RELATIONSHIP Policies
-SET TERM OFF
---
-DECLARE
-  --
-  no_policy Exception;
-  Pragma Exception_Init(no_policy, -28102); 
-  --
-BEGIN
-  
-  dbms_rls.drop_policy (object_schema => Sys_Context('NM3CORE','APPLICATION_OWNER')
-                       ,object_name   => 'HIG_RELATIONSHIP'
-                       ,policy_name   => 'hig_relationship_admin'
-                        );
-EXCEPTION
-  WHEN no_policy THEN
-    NULL;
-  WHEN OTHERS THEN
-    RAISE;
-END;
-/
-
-DECLARE
-  --
-  no_policy Exception;
-  Pragma Exception_Init(no_policy, -28102); 
-  --
-BEGIN
-  
-  dbms_rls.drop_policy (object_schema => Sys_Context('NM3CORE','APPLICATION_OWNER')
-                       ,object_name   => 'HIG_RELATIONSHIP'
-                       ,policy_name   => 'hig_relationship_select'
-                        );
-EXCEPTION
-  WHEN no_policy THEN
-    NULL;
-  WHEN OTHERS THEN
-    RAISE;
-END;
-/
---
-
-SET TERM ON
-PROMPT Create HIG_RELATIONSHIP Policies
-SET TERM OFF
-
-BEGIN
-  dbms_rls.add_policy
-     (object_schema   => Sys_Context('NM3CORE','APPLICATION_OWNER')
-     ,object_name     => 'HIG_RELATIONSHIP'
-     ,policy_name     => 'hig_relationship_admin'
-     ,function_schema => Sys_Context('NM3CORE','APPLICATION_OWNER')
-     ,policy_function => 'hig_relationship_api.f_hig_relationship_admin'
-     ,statement_types => 'INSERT,UPDATE,DELETE'
-     ,update_check    => TRUE
-     ,enable          => TRUE
-     ,static_policy   => FALSE
-     );
-  --
-  dbms_rls.add_policy
-     (object_schema   => Sys_Context('NM3CORE','APPLICATION_OWNER')
-     ,object_name     => 'HIG_RELATIONSHIP'
-     ,policy_name     => 'hig_relationship_select'
-     ,function_schema => Sys_Context('NM3CORE','APPLICATION_OWNER')
-     ,policy_function => 'hig_relationship_api.f_hig_relationship_select'
-     ,statement_types => 'SELECT'
-     ,update_check    => TRUE
-     ,enable          => TRUE
-     ,static_policy   => FALSE
-     );
-
-END;
-/
-
---
---
---------------------------------------------------------------------------------
--- HIG_PROCESS_TYPES
---------------------------------------------------------------------------------
---
---
-SET TERM ON
-PROMPT hig_process_types
-SET TERM OFF
-
-INSERT INTO HIG_PROCESS_TYPES
-       (HPT_PROCESS_TYPE_ID
-       ,HPT_NAME
-       ,HPT_DESCR
-       ,HPT_WHAT_TO_CALL
-       ,HPT_INITIATION_MODULE
-       ,HPT_INTERNAL_MODULE
-       ,HPT_INTERNAL_MODULE_PARAM
-       ,HPT_PROCESS_LIMIT
-       ,HPT_RESTARTABLE
-       ,HPT_SEE_IN_HIG2510
-       ,HPT_POLLING_ENABLED
-       ,HPT_POLLING_FTP_TYPE_ID
-       ,HPT_AREA_TYPE
-       )
-SELECT 
-        -6
-       ,'Refresh Auto-generated Passwords'
-       ,'Refreshes User passwords for users where the password is automatically generated'
-       ,'hig_relationship_api.refresh_auto_passwords;'
-       ,''
-       ,''
-       ,''
-       ,''
-       ,'Y'
-       ,'Y'
-       ,'N'
-       ,null
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_PROCESS_TYPES
-                   WHERE HPT_PROCESS_TYPE_ID = -6);
-
---
---------------------------------------------------------------------------------
--- HIG_PROCESS_TYPE_ROLES
---------------------------------------------------------------------------------
---
-SET TERM ON
-PROMPT hig_process_type_roles
-SET TERM OFF
-
-INSERT INTO HIG_PROCESS_TYPE_ROLES
-       (HPTR_PROCESS_TYPE_ID
-       ,HPTR_ROLE
-       )
-SELECT 
-        -6
-       ,'HIG_ADMIN' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_PROCESS_TYPE_ROLES
-                   WHERE HPTR_PROCESS_TYPE_ID = -6
-                    AND  HPTR_ROLE = 'HIG_ADMIN');
---
-COMMIT;
---
---------------------------------------------------------------------------------
--- Synonyms
---------------------------------------------------------------------------------
---
-SET FEEDBACK ON
---
-BEGIN
-  nm3ddl.refresh_all_synonyms;
-END;
-/
---
-SET FEEDBACK OFF
---
---------------------------------------------------------------------------------
--- CREATE PROXY_OWNER role
---------------------------------------------------------------------------------
---
-SET TERM ON
-PROMPT hig_roles
-SET TERM OFF
-
-DECLARE
-  role_exists Exception;
-  Pragma Exception_Init(role_exists, -1921); 
-BEGIN
-  EXECUTE IMMEDIATE 'CREATE ROLE PROXY_OWNER';
-  NULL;
-EXCEPTION
-WHEN role_exists
-THEN 
-  Null;
-END;
-/
-
-INSERT INTO HIG_ROLES
-      (HRO_ROLE
-      ,HRO_PRODUCT
-      ,HRO_DESCR
-      ) 
-SELECT  
-       'PROXY_OWNER'
-      ,'HIG'
-      ,'Role which allows proxy connections for users, with this user as the Proxy Owner' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_ROLES
-                    WHERE HRO_ROLE = 'PROXY_OWNER');
-                      
---
---------------------------------------------------------------------------------
--- Grants
---------------------------------------------------------------------------------
---
-GRANT execute ON hig_relationship_api to HIG_USER;
-GRANT execute ON hig_sso_api to HIG_USER;
-
---
---------------------------------------------------------------------------------
--- Who Triggers
+-- HIG_OPTION_LIST
 --------------------------------------------------------------------------------
 --
 SET TERM ON 
-PROMPT Calling Who_Trg.sql
+PROMPT Adding new product option AUTHMAIL into HIG_OPTION_LIST
 SET TERM OFF
-
-SET FEEDBACK ON
-start who_trg.sql
-SET FEEDBACK OFF
+--
+INSERT INTO HIG_OPTION_LIST 
+           (HOL_ID,
+            HOL_PRODUCT,
+            HOL_NAME,
+            HOL_REMARKS,
+            HOL_DOMAIN,
+            HOL_DATATYPE,
+            HOL_MIXED_CASE,
+            HOL_USER_OPTION,
+            HOL_MAX_LENGTH
+            )
+SELECT 'AUTHMAIL'
+      ,'NET'
+      ,'Email Authentication'
+      ,'Defines whether SMTP Server requires Username/Password authentication.'
+      ,'Y_OR_N'
+      ,'VARCHAR2'
+      ,'N'
+      ,'N'
+      ,1
+FROM DUAL
+WHERE NOT EXISTS (SELECT 1
+                    FROM HIG_OPTION_LIST
+                   WHERE HOL_ID = 'AUTHMAIL'
+                 )
+/
+--
+--
+--
+--------------------------------------------------------------------------------
+-- HIG_OPTION_VALUES
+--------------------------------------------------------------------------------
+--
+SET TERM ON 
+PROMPT Adding option values to HIG_OPTION_VALUES for AUTHMAIL
+SET TERM OFF
+--
+INSERT INTO HIG_OPTION_VALUES
+           (HOV_ID, 
+            HOV_VALUE
+           )  
+SELECT 'AUTHMAIL'
+      ,'N'
+FROM DUAL
+WHERE NOT EXISTS (SELECT 1
+                    FROM HIG_OPTION_VALUES
+                   WHERE HOV_ID = 'AUTHMAIL'
+                 )
+/
 --
 --------------------------------------------------------------------------------
 -- Update hig_upgrades with fix ID
 --------------------------------------------------------------------------------
---
-SET TERM ON 
-PROMPT log_nm_4700_fix53.sql
-SET TERM OFF
---
-SET FEEDBACK ON
-START log_nm_4700_fix53.sql
-SET FEEDBACK OFF
 --
 BEGIN
 	--
@@ -391,6 +157,8 @@ EXCEPTION
 	--
 END;
 /
+COMMIT;
+--
 
 SPOOL OFF
 --
