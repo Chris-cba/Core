@@ -1,11 +1,11 @@
 ----------------------------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm_4700_fix54.sql-arc   1.0   Nov 16 2017 14:29:04   Chris.Baugh  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm_4700_fix54.sql-arc   1.1   Dec 20 2017 11:39:06   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm_4700_fix54.sql  $ 
---       Date into PVCS   : $Date:   Nov 16 2017 14:29:04  $
---       Date fetched Out : $Modtime:   Nov 15 2017 16:19:36  $
---       Version     	  : $Revision:   1.0  $
+--       Date into PVCS   : $Date:   Dec 20 2017 11:39:06  $
+--       Date fetched Out : $Modtime:   Dec 20 2017 11:38:30  $
+--       Version     	  : $Revision:   1.1  $
 --
 ----------------------------------------------------------------------------------------------------
 --   Copyright (c) 2017 Bentley Systems Incorporated. All rights reserved.
@@ -141,14 +141,6 @@ SET FEEDBACK ON
 START nm3sdo_edit.pkw
 SET FEEDBACK OFF
 
-SET TERM ON 
-PROMPT creating Package Body nm3mail.pkw
-SET TERM OFF
---
-SET FEEDBACK ON
-START nm3mail.pkw
-SET FEEDBACK OFF
-
 --
 --------------------------------------------------------------------------------
 -- HIG_OPTION_LIST
@@ -216,37 +208,6 @@ WHERE NOT EXISTS (SELECT 1
                  )
 /
 --
-SET TERM ON 
-PROMPT Adding new product option AUTHMAIL into HIG_OPTION_LIST
-SET TERM OFF
---
-INSERT INTO HIG_OPTION_LIST 
-           (HOL_ID,
-            HOL_PRODUCT,
-            HOL_NAME,
-            HOL_REMARKS,
-            HOL_DOMAIN,
-            HOL_DATATYPE,
-            HOL_MIXED_CASE,
-            HOL_USER_OPTION,
-            HOL_MAX_LENGTH
-            )
-SELECT 'AUTHMAIL'
-      ,'NET'
-      ,'Email Authentication'
-      ,'Defines whether SMTP Server requires Username/Password authentication.'
-      ,'Y_OR_N'
-      ,'VARCHAR2'
-      ,'N'
-      ,'N'
-      ,1
-FROM DUAL
-WHERE NOT EXISTS (SELECT 1
-                    FROM HIG_OPTION_LIST
-                   WHERE HOL_ID = 'AUTHMAIL'
-                 )
-/
---
 --
 --
 --------------------------------------------------------------------------------
@@ -287,22 +248,6 @@ WHERE NOT EXISTS (SELECT 1
                  )
 /
 --
-SET TERM ON 
-PROMPT Adding option values to HIG_OPTION_VALUES for AUTHMAIL
-SET TERM OFF
---
-INSERT INTO HIG_OPTION_VALUES
-           (HOV_ID, 
-            HOV_VALUE
-           )  
-SELECT 'AUTHMAIL'
-      ,'N'
-FROM DUAL
-WHERE NOT EXISTS (SELECT 1
-                    FROM HIG_OPTION_VALUES
-                   WHERE HOV_ID = 'AUTHMAIL'
-                 )
-/
 --
 --------------------------------------------------------------------------------
 -- Update hig_upgrades with fix ID
@@ -312,7 +257,7 @@ BEGIN
 	--
 	hig2.upgrade(p_product        => 'NET'
 				,p_upgrade_script => 'log_nm_4700_fix54.sql'
-				,p_remarks        => 'NET 4700 FIX 54 (Build 1)'
+				,p_remarks        => 'NET 4700 FIX 54 (Build 2)'
 				,p_to_version     => NULL
 				);
 	--
