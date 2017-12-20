@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3extent IS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3extent.pkb-arc   2.11   Dec 20 2017 09:32:20   Chris.Baugh  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3extent.pkb-arc   2.12   Dec 20 2017 14:12:48   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm3extent.pkb  $
---       Date into SCCS   : $Date:   Dec 20 2017 09:32:20  $
---       Date fetched Out : $Modtime:   Dec 11 2017 09:07:04  $
---       SCCS Version     : $Revision:   2.11  $
+--       Date into SCCS   : $Date:   Dec 20 2017 14:12:48  $
+--       Date fetched Out : $Modtime:   Dec 20 2017 14:11:52  $
+--       SCCS Version     : $Revision:   2.12  $
 --       Based on 
 --
 --
@@ -22,7 +22,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3extent IS
   g_package_name CONSTANT VARCHAR2(30) := 'nm3extent';
   --
   --g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"@(#)nm3extent.pkb	1.77 05/02/06"';
-  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.11  $';
+  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.12  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
   g_extent_exception EXCEPTION;
@@ -677,7 +677,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3extent IS
                                        ,pi_not_found_sqlcode => -20999
                                        );
                                        
-        IF lr_rec_ne.ne_gty_group_type IS NOT NULL And
+        IF lr_rec_ne.ne_gty_group_type IS NOT NULL 
         THEN
           lv_min_slk   := nm3net.get_min_slk(pi_source_id);
           lv_max_slk   := nm3net.get_max_slk(pi_source_id);
