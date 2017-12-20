@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3extent IS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3extent.pkb-arc   2.10   Nov 10 2017 16:25:54   Chris.Baugh  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3extent.pkb-arc   2.11   Dec 20 2017 09:32:20   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm3extent.pkb  $
---       Date into SCCS   : $Date:   Nov 10 2017 16:25:54  $
---       Date fetched Out : $Modtime:   Nov 10 2017 16:03:36  $
---       SCCS Version     : $Revision:   2.10  $
+--       Date into SCCS   : $Date:   Dec 20 2017 09:32:20  $
+--       Date fetched Out : $Modtime:   Dec 11 2017 09:07:04  $
+--       SCCS Version     : $Revision:   2.11  $
 --       Based on 
 --
 --
@@ -22,7 +22,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3extent IS
   g_package_name CONSTANT VARCHAR2(30) := 'nm3extent';
   --
   --g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"@(#)nm3extent.pkb	1.77 05/02/06"';
-  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.10  $';
+  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.11  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
   g_extent_exception EXCEPTION;
@@ -661,40 +661,43 @@ CREATE OR REPLACE PACKAGE BODY Nm3extent IS
   --
      Nm_Debug.proc_start(g_package_name,'create_temp_ne');
   --
-  nm_debug.debug('==>create_temp_ne');
-    lr_rec_ne := nm3get.get_ne_all (pi_ne_id             => pi_source_id
-                                   ,pi_not_found_sqlcode => -20999
-                                   );
-    IF lr_rec_ne.ne_gty_group_type IS NOT NULL 
-    THEN
-      lv_min_slk   := nm3net.get_min_slk(pi_source_id);
-      lv_max_slk   := nm3net.get_max_slk(pi_source_id);
-      
-       IF pi_begin_mp < lv_min_slk 
-       THEN
-          g_extent_exc_code  := -20001;
-          g_extent_exc_msg   := 'begin_mp ('||pi_begin_mp||') cannot be < min_slk('||lv_min_slk||').';
-          RAISE g_extent_exception;
-       ELSIF pi_end_mp > lv_max_slk 
-       THEN
-          g_extent_exc_code  := -20002;
-          g_extent_exc_msg   := 'end_mp ('||pi_end_mp||') cannot be > max_slk('||lv_max_slk||').';
-          RAISE g_extent_exception;
-       END IF;
-  --  
-       check_valid_source(pi_source);
-  --  
-       IF    pi_source <> c_route
-        AND (pi_begin_mp IS NOT NULL
-             OR pi_end_mp IS NOT NULL
-            )
-        THEN
-          g_extent_exc_code  := -20215;
-          g_extent_exc_msg   := 'begin_mp and end_mp only valid for source of '||c_route;
-          RAISE g_extent_exception;
-       END IF;
-     END IF;
+     check_valid_source(pi_source);
   --
+     IF    pi_source <> c_route
+      AND (pi_begin_mp IS NOT NULL
+           OR pi_end_mp IS NOT NULL
+          )
+      THEN
+        g_extent_exc_code  := -20215;
+        g_extent_exc_msg   := 'begin_mp and end_mp only valid for source of '||c_route;
+        RAISE g_extent_exception;
+     ELSE
+  --
+        lr_rec_ne := nm3get.get_ne_all (pi_ne_id             => pi_source_id
+                                       ,pi_not_found_sqlcode => -20999
+                                       );
+                                       
+        IF lr_rec_ne.ne_gty_group_type IS NOT NULL And
+        THEN
+          lv_min_slk   := nm3net.get_min_slk(pi_source_id);
+          lv_max_slk   := nm3net.get_max_slk(pi_source_id);
+          
+           IF pi_begin_mp < lv_min_slk 
+           THEN
+              g_extent_exc_code  := -20001;
+              g_extent_exc_msg   := 'begin_mp ('||pi_begin_mp||') cannot be < min_slk('||lv_min_slk||').';
+              RAISE g_extent_exception;
+           ELSIF pi_end_mp > lv_max_slk 
+           THEN
+              g_extent_exc_code  := -20002;
+              g_extent_exc_msg   := 'end_mp ('||pi_end_mp||') cannot be > max_slk('||lv_max_slk||').';
+              RAISE g_extent_exception;
+           END IF;
+  --  
+        END IF;
+  --
+     END IF;
+
      DECLARE
         l_temp_ne_source EXCEPTION;
      BEGIN
