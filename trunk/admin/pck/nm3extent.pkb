@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3extent IS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3extent.pkb-arc   2.12   Dec 20 2017 14:12:48   Chris.Baugh  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3extent.pkb-arc   2.13   Dec 29 2017 10:29:06   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm3extent.pkb  $
---       Date into SCCS   : $Date:   Dec 20 2017 14:12:48  $
---       Date fetched Out : $Modtime:   Dec 20 2017 14:11:52  $
---       SCCS Version     : $Revision:   2.12  $
+--       Date into SCCS   : $Date:   Dec 29 2017 10:29:06  $
+--       Date fetched Out : $Modtime:   Dec 28 2017 14:10:22  $
+--       SCCS Version     : $Revision:   2.13  $
 --       Based on 
 --
 --
@@ -22,7 +22,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3extent IS
   g_package_name CONSTANT VARCHAR2(30) := 'nm3extent';
   --
   --g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"@(#)nm3extent.pkb	1.77 05/02/06"';
-  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.12  $';
+  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.13  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
   g_extent_exception EXCEPTION;
@@ -671,30 +671,46 @@ CREATE OR REPLACE PACKAGE BODY Nm3extent IS
         g_extent_exc_code  := -20215;
         g_extent_exc_msg   := 'begin_mp and end_mp only valid for source of '||c_route;
         RAISE g_extent_exception;
-     ELSE
+     END IF;
   --
-        lr_rec_ne := nm3get.get_ne_all (pi_ne_id             => pi_source_id
-                                       ,pi_not_found_sqlcode => -20999
-                                       );
-                                       
-        IF lr_rec_ne.ne_gty_group_type IS NOT NULL 
-        THEN
-          lv_min_slk   := nm3net.get_min_slk(pi_source_id);
-          lv_max_slk   := nm3net.get_max_slk(pi_source_id);
-          
-           IF pi_begin_mp < lv_min_slk 
-           THEN
-              g_extent_exc_code  := -20001;
-              g_extent_exc_msg   := 'begin_mp ('||pi_begin_mp||') cannot be < min_slk('||lv_min_slk||').';
-              RAISE g_extent_exception;
-           ELSIF pi_end_mp > lv_max_slk 
-           THEN
-              g_extent_exc_code  := -20002;
-              g_extent_exc_msg   := 'end_mp ('||pi_end_mp||') cannot be > max_slk('||lv_max_slk||').';
-              RAISE g_extent_exception;
-           END IF;
-  --  
-        END IF;
+ 
+     IF pi_source = c_route
+     THEN
+        --
+        DECLARE
+           l_rec_ne   nm_elements%ROWTYPE;
+           no_nm_elements_found EXCEPTION;
+           PRAGMA EXCEPTION_INIT (no_nm_elements_found,-20001);
+        BEGIN
+
+          -- 
+           l_rec_ne  := Nm3net.get_ne (pi_source_id);
+                                         
+          IF lr_rec_ne.ne_gty_group_type IS NOT NULL 
+          THEN
+            lv_min_slk   := nm3net.get_min_slk(pi_source_id);
+            lv_max_slk   := nm3net.get_max_slk(pi_source_id);
+            
+             IF pi_begin_mp < lv_min_slk 
+             THEN
+                g_extent_exc_code  := -20001;
+                g_extent_exc_msg   := 'begin_mp ('||pi_begin_mp||') cannot be < min_slk('||lv_min_slk||').';
+                RAISE g_extent_exception;
+             ELSIF pi_end_mp > lv_max_slk 
+             THEN
+                g_extent_exc_code  := -20002;
+                g_extent_exc_msg   := 'end_mp ('||pi_end_mp||') cannot be > max_slk('||lv_max_slk||').';
+                RAISE g_extent_exception;
+             END IF;
+          --  
+          END IF;
+          --
+        EXCEPTION
+           WHEN no_nm_elements_found
+            THEN
+              -- If no NM_ELEMENTS record found it must be an inventory item
+              NULL;
+        END;
   --
      END IF;
 
