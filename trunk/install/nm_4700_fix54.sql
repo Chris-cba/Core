@@ -1,11 +1,11 @@
 ----------------------------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm_4700_fix54.sql-arc   1.3   Jan 02 2018 14:53:38   Chris.Baugh  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm_4700_fix54.sql-arc   1.4   Jan 08 2018 10:14:48   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm_4700_fix54.sql  $ 
---       Date into PVCS   : $Date:   Jan 02 2018 14:53:38  $
---       Date fetched Out : $Modtime:   Jan 02 2018 14:51:06  $
---       Version     	  : $Revision:   1.3  $
+--       Date into PVCS   : $Date:   Jan 08 2018 10:14:48  $
+--       Date fetched Out : $Modtime:   Jan 08 2018 10:14:18  $
+--       Version     	  : $Revision:   1.4  $
 --
 ----------------------------------------------------------------------------------------------------
 --   Copyright (c) 2017 Bentley Systems Incorporated. All rights reserved.
@@ -125,6 +125,14 @@ SET FEEDBACK ON
 START nm3sdo_edit.pkw
 SET FEEDBACK OFF
 
+SET TERM ON 
+PROMPT creating Package Body nm3extent.pkw
+SET TERM OFF
+--
+SET FEEDBACK ON
+START nm3extent.pkw
+SET FEEDBACK OFF
+
 --
 --------------------------------------------------------------------------------
 -- HIG_OPTION_LIST
@@ -241,7 +249,7 @@ BEGIN
 	--
 	hig2.upgrade(p_product        => 'NET'
 				,p_upgrade_script => 'log_nm_4700_fix54.sql'
-				,p_remarks        => 'NET 4700 FIX 54 (Build 4)'
+				,p_remarks        => 'NET 4700 FIX 54 (Build 5)'
 				,p_to_version     => NULL
 				);
 	--
