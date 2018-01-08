@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3extent IS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3extent.pkb-arc   2.13   Dec 29 2017 10:29:06   Chris.Baugh  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3extent.pkb-arc   2.14   Jan 08 2018 09:54:26   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm3extent.pkb  $
---       Date into SCCS   : $Date:   Dec 29 2017 10:29:06  $
---       Date fetched Out : $Modtime:   Dec 28 2017 14:10:22  $
---       SCCS Version     : $Revision:   2.13  $
+--       Date into SCCS   : $Date:   Jan 08 2018 09:54:26  $
+--       Date fetched Out : $Modtime:   Jan 08 2018 09:51:52  $
+--       SCCS Version     : $Revision:   2.14  $
 --       Based on 
 --
 --
@@ -22,7 +22,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3extent IS
   g_package_name CONSTANT VARCHAR2(30) := 'nm3extent';
   --
   --g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"@(#)nm3extent.pkb	1.77 05/02/06"';
-  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.13  $';
+  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.14  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
   g_extent_exception EXCEPTION;
@@ -653,7 +653,6 @@ CREATE OR REPLACE PACKAGE BODY Nm3extent IS
                            ,pi_source_id_2               IN     NM_PBI_QUERY_RESULTS.nqr_source_id%TYPE DEFAULT NULL
                            ) IS
   --
-    lr_rec_ne    nm_elements_all%ROWTYPE;
     lv_min_slk   nm_members.nm_slk%TYPE;
     lv_max_slk   nm_members.nm_slk%TYPE;
   --
@@ -686,7 +685,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3extent IS
           -- 
            l_rec_ne  := Nm3net.get_ne (pi_source_id);
                                          
-          IF lr_rec_ne.ne_gty_group_type IS NOT NULL 
+          IF l_rec_ne.ne_gty_group_type IS NOT NULL 
           THEN
             lv_min_slk   := nm3net.get_min_slk(pi_source_id);
             lv_max_slk   := nm3net.get_max_slk(pi_source_id);
