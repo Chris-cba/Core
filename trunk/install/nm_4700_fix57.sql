@@ -1,11 +1,11 @@
 ----------------------------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm_4700_fix57.sql-arc   1.3   Jan 18 2018 09:06:56   Chris.Baugh  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm_4700_fix57.sql-arc   1.4   Jan 18 2018 10:57:22   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm_4700_fix57.sql  $ 
---       Date into PVCS   : $Date:   Jan 18 2018 09:06:56  $
---       Date fetched Out : $Modtime:   Jan 18 2018 09:05:56  $
---       Version     	  : $Revision:   1.3  $
+--       Date into PVCS   : $Date:   Jan 18 2018 10:57:22  $
+--       Date fetched Out : $Modtime:   Jan 18 2018 10:56:58  $
+--       Version     	  : $Revision:   1.4  $
 --
 ----------------------------------------------------------------------------------------------------
 --   Copyright (c) 2017 Bentley Systems Incorporated. All rights reserved.
@@ -125,6 +125,14 @@ SET TERM OFF
 --
 SET FEEDBACK ON
 START nm3rsc.pkw
+SET FEEDBACK OFF
+
+SET TERM ON 
+PROMPT creating Package Body nm3undo.pkw
+SET TERM OFF
+--
+SET FEEDBACK ON
+START nm3undo.pkw
 SET FEEDBACK OFF
 
 --
