@@ -1,11 +1,11 @@
 ----------------------------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm_4700_fix57.sql-arc   1.2   Dec 15 2017 13:19:46   Chris.Baugh  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm_4700_fix57.sql-arc   1.3   Jan 18 2018 09:06:56   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm_4700_fix57.sql  $ 
---       Date into PVCS   : $Date:   Dec 15 2017 13:19:46  $
---       Date fetched Out : $Modtime:   Dec 14 2017 10:10:52  $
---       Version     	  : $Revision:   1.2  $
+--       Date into PVCS   : $Date:   Jan 18 2018 09:06:56  $
+--       Date fetched Out : $Modtime:   Jan 18 2018 09:05:56  $
+--       Version     	  : $Revision:   1.3  $
 --
 ----------------------------------------------------------------------------------------------------
 --   Copyright (c) 2017 Bentley Systems Incorporated. All rights reserved.
@@ -66,27 +66,6 @@ WHENEVER SQLERROR CONTINUE
 
 --
 --------------------------------------------------------------------------------
--- Type
---------------------------------------------------------------------------------
---
-SET TERM ON 
-PROMPT Creating type sde_varchar_2d_array
-SET TERM OFF
---
-SET FEEDBACK ON
-start sde_varchar_2d_array.tyh
-SET FEEDBACK OFF
-
-SET TERM ON 
-PROMPT Creating type sde_varchar_array
-SET TERM OFF
---
-SET FEEDBACK ON
-start sde_varchar_array.tyh
-SET FEEDBACK OFF
-
---
---------------------------------------------------------------------------------
 -- Function
 --------------------------------------------------------------------------------
 --
@@ -137,30 +116,9 @@ SET FEEDBACK OFF
 
 --
 --------------------------------------------------------------------------------
--- Package Headers
---------------------------------------------------------------------------------
---
-SET TERM ON 
-PROMPT creating Package Header sde_util.pkh
-SET TERM OFF
---
-SET FEEDBACK ON
-START sde_util.pkh
-SET FEEDBACK OFF
-
---
---------------------------------------------------------------------------------
 -- Package Bodies
 --------------------------------------------------------------------------------
 --
-SET TERM ON 
-PROMPT creating Package Body sde_util.pkw
-SET TERM OFF
---
-SET FEEDBACK ON
-START sde_util.pkw
-SET FEEDBACK OFF
-
 SET TERM ON 
 PROMPT creating Package Body nm3rsc.pkw
 SET TERM OFF
@@ -190,7 +148,7 @@ BEGIN
 	--
 	hig2.upgrade(p_product        => 'NET'
 				,p_upgrade_script => 'log_nm_4700_fix57.sql'
-				,p_remarks        => 'NET 4700 FIX 57 (Build 1)'
+				,p_remarks        => 'NET 4700 FIX 57 (Build 2)'
 				,p_to_version     => NULL
 				);
 	--
