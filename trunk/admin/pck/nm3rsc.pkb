@@ -4,11 +4,11 @@ AS
     --------------------------------------------------------------------------------
     --   PVCS Identifiers :-
     --
-    --       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3rsc.pkb-arc   2.18   Nov 28 2017 11:49:30   Rob.Coupe  $
+    --       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3rsc.pkb-arc   2.19   Jan 19 2018 13:54:22   Chris.Baugh  $
     --       Module Name      : $Workfile:   nm3rsc.pkb  $
-    --       Date into PVCS   : $Date:   Nov 28 2017 11:49:30  $
-    --       Date fetched Out : $Modtime:   Nov 28 2017 11:47:34  $
-    --       PVCS Version     : $Revision:   2.18  $
+    --       Date into PVCS   : $Date:   Jan 19 2018 13:54:22  $
+    --       Date fetched Out : $Modtime:   Jan 19 2018 13:52:36  $
+    --       PVCS Version     : $Revision:   2.19  $
     --
     --   Author : R.A. Coupe
     --
@@ -20,7 +20,7 @@ AS
     --
     --all global package variables here
     --
-    g_body_sccsid    CONSTANT VARCHAR2 (30) := '"$Revision:   2.18  $"';
+    g_body_sccsid    CONSTANT VARCHAR2 (30) := '"$Revision:   2.19  $"';
 
     --  g_body_sccsid is the SCCS ID for the package body
     --
@@ -266,15 +266,15 @@ AS
 
         nm_debug.proc_end (g_package_name, 'rescale_route');
     --
-    --EXCEPTION
-    --
-    --  WHEN others
-    --   THEN
-    --     -- Set AU Securuty on and effective_date back to initial value
-    --     nm3ausec.set_status(nm3type.c_on);
-    --     nm3user.set_effective_date (c_initial_effective_date);
-    --     RAISE;
-    --
+    EXCEPTION
+    
+      WHEN others
+       THEN
+         -- Set AU Securuty on and effective_date back to initial value
+         nm3ausec.set_status(nm3type.c_on);
+         nm3user.set_effective_date (c_initial_effective_date);
+         RAISE;
+    
     END rescale_route;
 
     --
