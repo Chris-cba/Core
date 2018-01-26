@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_get
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_get.pkb-arc   1.40   Dec 04 2017 11:37:54   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_get.pkb-arc   1.41   Jan 26 2018 16:25:00   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_get.pkb  $
-   --       Date into PVCS   : $Date:   Dec 04 2017 11:37:54  $
-   --       Date fetched Out : $Modtime:   Dec 04 2017 11:36:20  $
-   --       PVCS Version     : $Revision:   1.40  $
+   --       Date into PVCS   : $Date:   Jan 26 2018 16:25:00  $
+   --       Date fetched Out : $Modtime:   Jan 26 2018 16:15:32  $
+   --       PVCS Version     : $Revision:   1.41  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,7 +16,7 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.40  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.41  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_get';
 
@@ -1308,7 +1308,7 @@ AS
                                             inv_conn_flag)
                                          OVER (
                                             PARTITION BY route_id, inv_id
-                                            ORDER BY nm_seg_no, nm_seq_no
+                                            ORDER BY nm_seg_no, nm_seq_no, nm_slk
                                             ROWS BETWEEN UNBOUNDED PRECEDING
                                                  AND     CURRENT ROW)
                                        + 1
