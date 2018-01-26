@@ -1,11 +1,11 @@
 ----------------------------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm_4700_fix57.sql-arc   1.5   Jan 19 2018 14:34:20   Chris.Baugh  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm_4700_fix57.sql-arc   1.6   Jan 26 2018 10:04:22   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm_4700_fix57.sql  $ 
---       Date into PVCS   : $Date:   Jan 19 2018 14:34:20  $
---       Date fetched Out : $Modtime:   Jan 19 2018 14:33:54  $
---       Version     	  : $Revision:   1.5  $
+--       Date into PVCS   : $Date:   Jan 26 2018 10:04:22  $
+--       Date fetched Out : $Modtime:   Jan 26 2018 10:03:16  $
+--       Version     	  : $Revision:   1.6  $
 --
 ----------------------------------------------------------------------------------------------------
 --   Copyright (c) 2017 Bentley Systems Incorporated. All rights reserved.
@@ -137,18 +137,6 @@ SET FEEDBACK OFF
 
 --
 --------------------------------------------------------------------------------
--- Removal of product options SHPJAVAEX and SHPJAVAUP 
---------------------------------------------------------------------------------
---
-DELETE from hig_option_values
-WHERE hov_id IN ('SHPJAVAEX','SHPJAVAUP')
-/
-
-DELETE from hig_option_list
-WHERE hol_id IN ('SHPJAVAEX','SHPJAVAUP')
-/
---
---------------------------------------------------------------------------------
 -- Update hig_upgrades with fix ID
 --------------------------------------------------------------------------------
 --
@@ -156,7 +144,7 @@ BEGIN
 	--
 	hig2.upgrade(p_product        => 'NET'
 				,p_upgrade_script => 'log_nm_4700_fix57.sql'
-				,p_remarks        => 'NET 4700 FIX 57 (Build 3)'
+				,p_remarks        => 'NET 4700 FIX 57 (Build 4)'
 				,p_to_version     => NULL
 				);
 	--
