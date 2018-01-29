@@ -13,11 +13,11 @@ CREATE OR REPLACE FUNCTION GET_LB_RPT_R_TAB (p_lb_RPt_tab        IN lb_RPt_tab,
         -------------------------------------------------------------------------
         --   PVCS Identifiers :-
         --
-        --       PVCS id          : $Header:   //new_vm_latest/archives/lb/admin/pck/get_lb_RPt_r_tab.fnc-arc   1.2   Dec 04 2017 10:29:22   Chris.Baugh  $
+        --       PVCS id          : $Header:   //new_vm_latest/archives/lb/admin/pck/get_lb_RPt_r_tab.fnc-arc   1.3   Jan 29 2018 16:35:34   Rob.Coupe  $
         --       Module Name      : $Workfile:   get_lb_RPt_r_tab.fnc  $
-        --       Date into PVCS   : $Date:   Dec 04 2017 10:29:22  $
-        --       Date fetched Out : $Modtime:   Dec 04 2017 10:27:50  $
-        --       Version          : $Revision:   1.2  $
+        --       Date into PVCS   : $Date:   Jan 29 2018 16:35:34  $
+        --       Date fetched Out : $Modtime:   Jan 29 2018 16:31:04  $
+        --       Version          : $Revision:   1.3  $
         -----------------------------------------------------------------------------
         --    Copyright (c) 2017 Bentley Systems Incorporated. All rights reserved.
         -----------------------------------------------------------------------------
@@ -103,7 +103,7 @@ CREATE OR REPLACE FUNCTION GET_LB_RPT_R_TAB (p_lb_RPt_tab        IN lb_RPt_tab,
                                             inv_conn_flag)
                                          OVER (
                                             PARTITION BY route_id, inv_id
-                                            ORDER BY nm_seg_no, nm_seq_no
+                                            ORDER BY nm_seg_no, nm_seq_no, nm_slk
                                             ROWS BETWEEN UNBOUNDED PRECEDING
                                                  AND     CURRENT ROW)
                                        + 1
