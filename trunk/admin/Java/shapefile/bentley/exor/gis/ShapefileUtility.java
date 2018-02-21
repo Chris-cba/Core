@@ -1,11 +1,11 @@
 /**
  *    PVCS Identifiers :-
  *
- *       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/Java/shapefile/bentley/exor/gis/ShapefileUtility.java-arc   1.2   Oct 17 2017 15:50:42   Upendra.Hukeri  $
+ *       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/Java/shapefile/bentley/exor/gis/ShapefileUtility.java-arc   1.3   Feb 21 2018 09:50:10   Upendra.Hukeri  $
  *       Module Name      : $Workfile:   ShapefileUtility.java  $
- *       Date into SCCS   : $Date:   Oct 17 2017 15:50:42  $
- *       Date fetched Out : $Modtime:   Oct 17 2017 15:49:10  $
- *       SCCS Version     : $Revision:   1.2  $
+ *       Date into SCCS   : $Date:   Feb 21 2018 09:50:10  $
+ *       Date fetched Out : $Modtime:   Feb 21 2018 09:41:56  $
+ *       SCCS Version     : $Revision:   1.3  $
  *       Based on 
  *
  *
@@ -14,7 +14,7 @@
  *    ShapefileUtility.java
  *
  ****************************************************************************************************
- *	  Copyright (c) 2017 Bentley Systems Incorporated.  All rights reserved.
+ *	  Copyright (c) 2018 Bentley Systems Incorporated.  All rights reserved.
  ****************************************************************************************************
  *
  */
@@ -64,41 +64,42 @@ import java.util.regex.Pattern;
  */
 
 public class ShapefileUtility {
-	private	boolean			useNestedConn 	  	= false;
-	private	String			host 			  	= null;
-	private	int				port			  	= 0;
-	private	String			userName		  	= null;
-	private	String			password			= null;
-	private	String			sid					= null;
-	private	String			viewName			= null; 
-	private	String			geomColName			= null;
-	private	String			shpFileName			= null;
-	private	String			colMapFileName		= null;
-	private	boolean			useColumnMapping	= false;
+	private	boolean			useNestedConn 	  	 = false;
+	private	String			host 			  	 = null;
+	private	int				port			  	 = 0;
+	private	String			userName		  	 = null;
+	private	String			password			 = null;
+	private	String			sid					 = null;
+	private	String			viewName			 = null; 
+	private	String			geomColName			 = null;
+	private	String			shpFileName			 = null;
+	private	String			colMapFileName		 = null;
+	private	boolean			useColumnMapping	 = false;
 	
-	private	String[][] 		columnMapArray		= null;
-	private Map<String, String> columnMap		= new HashMap<String, String>();
+	private	String[][] 		columnMapArray		 = null;
+	private Map<String, String> columnMap		 = new HashMap<String, String>();
 	
-	private	BufferedWriter 	logger				= null;
-	private	String			errorMsg			= null;
+	private	BufferedWriter 	logger				 = null;
+	private	String			errorMsg			 = null;
 	
-	private	String			extractDir   		= null;
-	private	String			uploadDir   		= null;
-	private	String			colMapDir    		= null;
-	private	String			systemLogDir		= null;
-	private	String			epsgDbDir			= null;
+	private	String			extractDir   		 = null;
+	private	String			uploadDir   		 = null;
+	private	String			colMapDir    		 = null;
+	private	String			systemLogDir		 = null;
+	private	String			epsgDbDir			 = null;
 	
-	private	String			systemLogFileName  = null;
+	private	String			systemLogFileName    = null;
 	
-	private	boolean			exitSystem  		= false;
+	private	boolean			exitSystem  		 = false;
 	
-	private static String	usage 				= "\nUsage: java -jar sdeutil.jar -help OR -setup OR -sde2shp [parameters for sde2shp] OR -shp2sde [parameters for shp2sde]";
-	private static String 	errorMessage 		= "printThisWrong parameters passed!" + usage;
+	private static String	usage 				 = "\nUsage: java -jar sdeutil.jar -help OR -setup OR -sde2shp [parameters for sde2shp] OR -shp2sde [parameters for shp2sde]";
+	private static String 	errorMessage 		 = "printThisWrong parameters passed!" + usage;
 	
-	private static ShapefileUtility shpUtil 	= null;
+	private static ShapefileUtility shpUtil 	 = null;
 	
-	static final String[] validExtractKeysArray = {"-help", "-nc", "-h", "-p", "-s", "-u", "-d", "-t", "-w", "-f", "-a", "-whelp"};
-	static final String[] validUploadKeysArray  = {"-help", "-nc", "-h", "-p", "-s", "-u", "-d", "-t", "-f", "-i", "-r", "-g", "-x", "-y", "-m", "-o", "-n", "-c", "-a"};
+	static final String[] validExtractKeysArray  = {"-help", "-nc", "-h", "-p", "-s", "-u", "-d", "-t", "-w", "-f", "-a", "-whelp"};
+	static final String[] validUploadKeysArray   = {"-help", "-nc", "-h", "-p", "-s", "-u", "-d", "-t", "-f", "-i", "-r", "-g", "-x", "-y", "-m", "-o", "-n", "-c", "-a"};
+	static final String[] validRegistryKeysArray = {"-help", "-nc", "-h", "-p", "-s", "-u", "-d", "-rt", "-ut", "-dt", "-rw", "-uw", "-dw"};
 	
 	protected enum Directory {SYSTEMLOGDIR, EXTRACTDIR, UPLOADDIR, COLMAPDIR, EPSGDBDIR}
 	
@@ -570,44 +571,50 @@ public class ShapefileUtility {
 		if(nuh != null) {
 			int paramLength = nuh.length;
 			
-			if(paramLength >= 1) {
-				if(nuh.length == 1) {
-					if("-help".equals(nuh[0])) {
-						return "printThis" + usage;
-					} else if("-setup".equals(nuh[0])) {
-						shpUtil = new ShapefileUtility();
-						String result = shpUtil.setBasicDirectories("setup");
-						
-						if("Y".equals(result)) {
-							return "printThissuccess";
-						} else {
-							return "printThis" + result;
-						}
+			if(paramLength == 1) {
+				if("-help".equals(nuh[0])) {
+					return "printThis" + usage;
+				} else if("-setup".equals(nuh[0])) {
+					shpUtil = new ShapefileUtility();
+					String result = shpUtil.setBasicDirectories("setup");
+					
+					if("Y".equals(result)) {
+						return "printThissuccess";
+					} else {
+						return "printThis" + result;
 					}
-				} else if(nuh.length >= 2) {
-					if("-sde2shp".equals(nuh[0])) {
-						SDE2SHP sde2shp = new SDE2SHP();
-						sde2shp.doExtract(Arrays.copyOfRange(nuh, 1, nuh.length), sde2shp);
-						shpUtil = sde2shp;
-					} else if("-shp2sde".equals(nuh[0])) {
-						SHP2SDE shp2sde = new SHP2SDE();
-						shp2sde.doUpload(Arrays.copyOfRange(nuh, 1, nuh.length), shp2sde);
-						shpUtil = shp2sde;
-					}
+				}
+			} else if(paramLength >= 2) {
+				if("-shpreg".equals(nuh[0])) {
+					SHPREG shpreg = new SHPREG();
+					shpreg.doRegister(Arrays.copyOfRange(nuh, 1, nuh.length), shpreg);
+					shpUtil = shpreg;
+				} else if("-sde2shp".equals(nuh[0])) {
+					SDE2SHP sde2shp = new SDE2SHP();
+					sde2shp.doExtract(Arrays.copyOfRange(nuh, 1, nuh.length), sde2shp);
+					shpUtil = sde2shp;
+				} else if("-shp2sde".equals(nuh[0])) {
+					SHP2SDE shp2sde = new SHP2SDE();
+					shp2sde.doUpload(Arrays.copyOfRange(nuh, 1, nuh.length), shp2sde);
+					shpUtil = shp2sde;
 				}
 			}
 		}
 		
-		if(shpUtil != null && (shpUtil instanceof SDE2SHP || shpUtil instanceof SHP2SDE)) {	
+		if(shpUtil != null) {
 			String errorStr = shpUtil.getErrorMsg();
 			
-			if(errorStr != null) {
-				String systemLogFileName = shpUtil.getSystemLogFileName();
-				errorStr = (systemLogFileName == null ? "" : systemLogFileName) + '\n' + errorStr;
-				
-				return errorStr;
-			} else {
-				return "success" + '\n' + shpUtil.getSystemLogFileName();
+			if(shpUtil instanceof SDE2SHP || shpUtil instanceof SHP2SDE) {
+				if(errorStr != null) {
+					String systemLogFileName = shpUtil.getSystemLogFileName();
+					errorStr = (systemLogFileName == null ? "" : systemLogFileName) + '\n' + errorStr;
+					
+					return errorStr;
+				} else {
+					return "success" + '\n' + shpUtil.getSystemLogFileName();
+				}
+			} else if(shpUtil instanceof SHPREG) {
+				return (errorStr == null ? "success" : errorStr);
 			}
 		}
 		
