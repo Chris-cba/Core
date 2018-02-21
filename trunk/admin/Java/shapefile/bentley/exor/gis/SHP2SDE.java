@@ -1,11 +1,11 @@
 /**
  *    PVCS Identifiers :-
  *
- *       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/Java/shapefile/bentley/exor/gis/SHP2SDE.java-arc   1.6   Oct 31 2017 09:07:22   Upendra.Hukeri  $
+ *       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/Java/shapefile/bentley/exor/gis/SHP2SDE.java-arc   1.7   Feb 21 2018 09:50:52   Upendra.Hukeri  $
  *       Module Name      : $Workfile:   SHP2SDE.java  $
- *       Date into SCCS   : $Date:   Oct 31 2017 09:07:22  $
- *       Date fetched Out : $Modtime:   Oct 31 2017 09:03:40  $
- *       SCCS Version     : $Revision:   1.6  $
+ *       Date into SCCS   : $Date:   Feb 21 2018 09:50:52  $
+ *       Date fetched Out : $Modtime:   Feb 21 2018 09:42:12  $
+ *       SCCS Version     : $Revision:   1.7  $
  *       Based on 
  *
  *
@@ -14,7 +14,7 @@
  *    SHP2SDE.java
  *
  ****************************************************************************************************
- *	  Copyright (c) 2017 Bentley Systems Incorporated.  All rights reserved.
+ *	  Copyright (c) 2018 Bentley Systems Incorporated.  All rights reserved.
  ****************************************************************************************************
  *
  */
@@ -87,8 +87,6 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 public class SHP2SDE extends ShapefileUtility {
 	private String 		 idColName 			= null;
 	private int 		 userSRID 			= 0;
-	private int 		 dbOracleSRID		= 0;
-	private int 		 dbEPSGSRID			= 0;
 	private int 		 shpDims			= 0;
 	private double 		 minX               = -180d;
 	private double 		 maxX               = 180d;
