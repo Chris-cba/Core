@@ -1,11 +1,11 @@
 /**
  *    PVCS Identifiers :-
  *
- *       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/Java/shapefile/bentley/exor/gis/ShapefileUtility.java-arc   1.3   Feb 21 2018 09:50:10   Upendra.Hukeri  $
+ *       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/Java/shapefile/bentley/exor/gis/ShapefileUtility.java-arc   1.4   Feb 22 2018 12:03:52   Upendra.Hukeri  $
  *       Module Name      : $Workfile:   ShapefileUtility.java  $
- *       Date into SCCS   : $Date:   Feb 21 2018 09:50:10  $
- *       Date fetched Out : $Modtime:   Feb 21 2018 09:41:56  $
- *       SCCS Version     : $Revision:   1.3  $
+ *       Date into SCCS   : $Date:   Feb 22 2018 12:03:52  $
+ *       Date fetched Out : $Modtime:   Feb 22 2018 12:02:08  $
+ *       SCCS Version     : $Revision:   1.4  $
  *       Based on 
  *
  *
@@ -92,8 +92,8 @@ public class ShapefileUtility {
 	
 	private	boolean			exitSystem  		 = false;
 	
-	private static String	usage 				 = "\nUsage: java -jar sdeutil.jar -help OR -setup OR -sde2shp [parameters for sde2shp] OR -shp2sde [parameters for shp2sde]";
-	private static String 	errorMessage 		 = "printThisWrong parameters passed!" + usage;
+	private static final String	USAGE            = "\nUSAGE1: java -jar sdeutil.jar -help\nUSAGE2: java -jar sdeutil.jar -setup\nUSAGE3: java -jar sdeutil.jar -sde2shp [parameters for sde2shp]\nUSAGE4: java -jar sdeutil.jar -shp2sde [parameters for shp2sde]\nUSAGE5: java -jar sdeutil.jar -shpreg  [parameters for shpreg]";
+	private static final String ERROR_MESSAGE     = "printThisWrong parameters passed!" + USAGE;
 	
 	private static ShapefileUtility shpUtil 	 = null;
 	
@@ -247,6 +247,10 @@ public class ShapefileUtility {
 			if(jarDir != null && !jarDir.isEmpty()) {
 				jarDir = jarDir.endsWith("\\") ? jarDir.substring(0, jarDir.length() - 1) : jarDir;
 				jarDir = jarDir.replace('\\', '/');
+				
+				if (!(new File(jarDir)).exists()) {
+					System.out.println("Error: Directory specified in environment variable - SDE_UTIL_PATH - not found");
+				}
 			} else {
 				if(useNestedConn) {
 					jarDir = System.getProperty("user.dir");
@@ -573,7 +577,7 @@ public class ShapefileUtility {
 			
 			if(paramLength == 1) {
 				if("-help".equals(nuh[0])) {
-					return "printThis" + usage;
+					return "printThis" + USAGE;
 				} else if("-setup".equals(nuh[0])) {
 					shpUtil = new ShapefileUtility();
 					String result = shpUtil.setBasicDirectories("setup");
@@ -618,7 +622,7 @@ public class ShapefileUtility {
 			}
 		}
 		
-		return errorMessage;
+		return ERROR_MESSAGE;
 	}
 	
 	public static void main(String[] nuh) {
