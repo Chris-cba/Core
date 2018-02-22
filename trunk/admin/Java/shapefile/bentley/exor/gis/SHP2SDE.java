@@ -1,11 +1,11 @@
 /**
  *    PVCS Identifiers :-
  *
- *       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/Java/shapefile/bentley/exor/gis/SHP2SDE.java-arc   1.7   Feb 21 2018 09:50:52   Upendra.Hukeri  $
+ *       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/Java/shapefile/bentley/exor/gis/SHP2SDE.java-arc   1.8   Feb 22 2018 11:55:46   Upendra.Hukeri  $
  *       Module Name      : $Workfile:   SHP2SDE.java  $
- *       Date into SCCS   : $Date:   Feb 21 2018 09:50:52  $
- *       Date fetched Out : $Modtime:   Feb 21 2018 09:42:12  $
- *       SCCS Version     : $Revision:   1.7  $
+ *       Date into SCCS   : $Date:   Feb 22 2018 11:55:46  $
+ *       Date fetched Out : $Modtime:   Feb 22 2018 11:07:26  $
+ *       SCCS Version     : $Revision:   1.8  $
  *       Based on 
  *
  *
@@ -528,26 +528,30 @@ public class SHP2SDE extends ShapefileUtility {
 					return returnStr;
 				}
 				
-				result = validateSRID(prjSRID);
-				
-				if("Y".equals(result)) {
-					userSRID = prjSRID;
-				} else {
-					writeLog(getErrorMsg(), false);
-					setExitSystem(true);
+				if("init".equals(operation) || "append".equals(operation)) {
+					result = validateSRID(prjSRID);
 					
-					return returnStr;
+					if("Y".equals(result)) {
+						userSRID = prjSRID;
+					} else {
+						writeLog(getErrorMsg(), false);
+						setExitSystem(true);
+						
+						return returnStr;
+					}
 				}
 			} else if (userSRID != 0) {
 				writeLog("Warning: No '.prj' file found! Using SRID from command line argument '-r' - " + userSRID);
 				
-				result = validateSRID(userSRID);
-				
-				if(!"Y".equals(result)) {
-					writeLog(getErrorMsg(), false);
-					setExitSystem(true);
+				if("init".equals(operation) || "append".equals(operation)) {
+					result = validateSRID(userSRID);
 					
-					return returnStr;
+					if(!"Y".equals(result)) {
+						writeLog(getErrorMsg(), false);
+						setExitSystem(true);
+						
+						return returnStr;
+					}
 				}
 			} else {
 				setErrorMsg("\nError: No SRID found! Check if '.prj' file exists or command line argument '-r' is specified\n");
@@ -868,6 +872,14 @@ public class SHP2SDE extends ShapefileUtility {
 			stmt = conn.createStatement();
 			update = "CREATE TABLE " + getViewName() + " (" + updatedRelSchema + ")";
 			stmt.executeUpdate(update);
+			
+			writeLog("registering the newly created table with Shapefile Utility...");
+			
+			String result = registerTable();
+			
+			if(!"Y".equals(result)) {
+				return result;
+			}
 			
 			writeLog("adding reference to Geometry MetaData Table...");
 			
@@ -1240,6 +1252,55 @@ public class SHP2SDE extends ShapefileUtility {
 			return result;
 		} finally {
 			closeOracle("validateTableName", cstmt, conn, null);
+		}
+	}
+	
+	
+	private String registerTable() 
+	throws SQLException, ClassNotFoundException, Exception {
+		Connection        conn    = null;
+		CallableStatement cstmt   = null;
+		String 			  result  = null;
+		String 			  sqlStmt = null;
+		
+		String[] tableNamesArray  = new String[] {getViewName()};
+		oracle.sql.ARRAY  tablesArrToPass  = null;
+		oracle.sql.ArrayDescriptor des     = null;
+		
+		try {
+			conn = getConnection();
+			
+			des = oracle.sql.ArrayDescriptor.createDescriptor("SDE_VARCHAR_ARRAY", conn);
+			
+			if(tableNamesArray != null && tableNamesArray.length > 0) {
+				tablesArrToPass = new oracle.sql.ARRAY(des, conn, tableNamesArray);
+			}
+			
+			sqlStmt = "{? = call sde_util.register_table(?, ?)}";
+			cstmt   = conn.prepareCall(sqlStmt);
+			cstmt.registerOutParameter(1, Types.VARCHAR);
+			
+			if(tablesArrToPass == null) {
+				cstmt.setNull(2, Types.ARRAY, "SDE_VARCHAR_ARRAY");
+			} else {
+				cstmt.setArray(2, tablesArrToPass);
+			}
+			
+			cstmt.setNull(3, Types.ARRAY, "SDE_VARCHAR_ARRAY");
+			
+			cstmt.execute();
+			
+			result = cstmt.getString(1);
+			
+			if(!"Y".equals(result)) {
+				setErrorMsg("\nError: " + result);
+				writeLog(getErrorMsg(), false);
+				result = "N";
+			}
+			
+			return result;
+		} finally {
+			closeOracle("registerTable", cstmt, conn, null);
 		}
 	}
 	
