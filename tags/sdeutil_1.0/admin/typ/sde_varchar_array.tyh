@@ -1,0 +1,19 @@
+--
+---------------------------------------------------------------------------------------------------
+--
+--   PVCS Identifiers :-
+--
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/typ/sde_varchar_array.tyh-arc   1.0   Feb 23 2018 07:37:58   Upendra.Hukeri  $
+--       Module Name      : $Workfile:   sde_varchar_array.tyh  $
+--       Date into PVCS   : $Date:   Feb 23 2018 07:37:58  $
+--       Date fetched Out : $Modtime:   Feb 23 2018 07:34:54  $
+--       PVCS Version     : $Revision:   1.0  $
+--
+--   Author : Upendra Hukeri
+--
+---------------------------------------------------------------------------------------------------
+-- Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
+---------------------------------------------------------------------------------------------------
+--
+CREATE OR REPLACE TYPE sde_varchar_array IS TABLE OF VARCHAR2(32767);
+/
