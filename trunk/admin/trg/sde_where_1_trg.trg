@@ -6,22 +6,22 @@ FOR EACH ROW
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/trg/sde_where_1_trg.trg-arc   1.1   Oct 30 2017 09:46:48   Upendra.Hukeri  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/trg/sde_where_1_trg.trg-arc   1.2   Feb 23 2018 07:43:18   Upendra.Hukeri  $
 --       Module Name      : $Workfile:   sde_where_1_trg.trg  $
---       Date into PVCS   : $Date:   Oct 30 2017 09:46:48  $
---       Date fetched Out : $Modtime:   Oct 30 2017 09:45:56  $
---       Version          : $Revision:   1.1  $
+--       Date into PVCS   : $Date:   Feb 23 2018 07:43:18  $
+--       Date fetched Out : $Modtime:   Feb 19 2018 11:29:46  $
+--       Version          : $Revision:   1.2  $
 --
 --
 -----------------------------------------------------------------------------
---    Copyright (c) 2017 Bentley Systems Incorporated. All rights reserved.
+--    Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 DECLARE
 	CURSOR check_privilege IS
 		SELECT 'Y' 
-		FROM user_role_privs 
-		WHERE granted_role = 'SDE_ADMIN'
-		AND   username     = USER;
+		  FROM user_role_privs 
+		 WHERE granted_role = 'SDE_ADMIN'
+		   AND username     = USER;
 	--
 	l_dummy_c VARCHAR2(1);
 BEGIN
@@ -32,10 +32,15 @@ BEGIN
 	CLOSE check_privilege;
 	--
 	IF l_dummy_c IS NULL THEN
-		RAISE_APPLICATION_ERROR(-20343, 'Only SDE Administrator can insert, update or delete record(s)');
+		RAISE_APPLICATION_ERROR(-20343, 'Only Shapefile Administrator can insert, update or delete record(s)');
 	ELSE 
-		:new.sw_id := sw_unique_seq.NEXTVAL;
-		:new.sw_unique := UPPER(:new.sw_unique);
+		IF INSERTING THEN
+		    :new.sw_where_id  := sw_unique_seq_1.NEXTVAL;
+		END IF;
+		--
+		IF INSERTING OR UPDATING THEN
+		    :new.sw_unique    := UPPER(:new.sw_unique);
+		END IF;
 	END IF;
 END sde_where_1_trg;
 /
