@@ -1,30 +1,29 @@
-CREATE OR REPLACE PACKAGE sde_util AS
+CREATE OR REPLACE PACKAGE HIGHWAYS.sde_util AS
 --
 ---------------------------------------------------------------------------------------------------
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sde_util.pkh-arc   1.5   Nov 23 2017 11:33:32   Upendra.Hukeri  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sde_util.pkh-arc   1.6   Feb 23 2018 07:54:12   Upendra.Hukeri  $
 --       Module Name      : $Workfile:   sde_util.pkh  $
---       Date into PVCS   : $Date:   Nov 23 2017 11:33:32  $
---       Date fetched Out : $Modtime:   Nov 23 2017 09:50:04  $
---       PVCS Version     : $Revision:   1.5  $
+--       Date into PVCS   : $Date:   Feb 23 2018 07:54:12  $
+--       Date fetched Out : $Modtime:   Feb 21 2018 07:36:50  $
+--       PVCS Version     : $Revision:   1.6  $
 --
 --   Author : Upendra Hukeri
 --
 ---------------------------------------------------------------------------------------------------
--- Copyright (c) 2017 Bentley Systems Incorporated. All rights reserved.
+-- Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 ---------------------------------------------------------------------------------------------------
 --
 --
 -- all global package variables here
 --
-g_sccsid CONSTANT VARCHAR2(30) := '"$Revision:   1.5  $"';
+    g_sccsid CONSTANT VARCHAR2(30) := '"$Revision:   1.6  $"';
 --
 -- This function returns the current SCCS version
 FUNCTION get_version
 RETURN VARCHAR2;
-
 --
 ---------------------------------------------------------------------------------------------------
 --
@@ -33,69 +32,139 @@ RETURN VARCHAR2;
 --
 ---------------------------------------------------------------------------------------------------
 --
-FUNCTION get_srid(p_table_name  IN  VARCHAR2
-				 ,p_column_name IN  VARCHAR2
-				 ,p_oracle_srid OUT NUMBER
-				 ,p_epsg_srid 	OUT NUMBER
-				 ) 
-RETURN VARCHAR2 ;
+FUNCTION validate_table_name(
+                            p_table_name IN sde_tables.st_table_name%TYPE
+							)
+RETURN VARCHAR2;
 --
 ---------------------------------------------------------------------------------------------------
 --
-FUNCTION validate_srid(p_srid IN NUMBER
-					  ,p_table_name  IN VARCHAR2
-					  ,p_column_name IN VARCHAR2
+FUNCTION register_table(
+                       p_table_names   IN sde_varchar_array,
+                       p_where_uniques IN sde_varchar_array
+					   )
+RETURN VARCHAR2;
+--
+---------------------------------------------------------------------------------------------------
+--
+FUNCTION update_table(
+                     p_table_name    IN sde_tables.st_table_name%TYPE,
+                     p_update_action IN VARCHAR2                       DEFAULT 'APPEND',
+                     p_where_uniques IN sde_varchar_array
+					 )
+RETURN VARCHAR2;
+--
+---------------------------------------------------------------------------------------------------
+--
+FUNCTION unregister_table(
+                         p_table_names IN sde_varchar_array
+					     )
+RETURN VARCHAR2;
+--
+---------------------------------------------------------------------------------------------------
+--
+FUNCTION get_data(
+                 p_table_name          IN VARCHAR2,
+				 p_column_array        IN sde_varchar_2d_array     DEFAULT NULL,
+				 p_where_clause_unique IN sde_where.sw_unique%TYPE DEFAULT NULL,
+				 p_values              IN sde_varchar_array        DEFAULT NULL
+				 )
+RETURN SYS_REFCURSOR;
+--
+---------------------------------------------------------------------------------------------------
+--
+FUNCTION get_where_clause_details(
+                                 p_where_clause_unique IN sde_where.sw_unique%TYPE DEFAULT NULL
+								 )
+RETURN SYS_REFCURSOR;
+--
+---------------------------------------------------------------------------------------------------
+--
+FUNCTION register_where_clause(
+                               p_where_clause_unique IN sde_where.sw_unique%TYPE,
+                               p_where_clause        IN sde_where.sw_where_clause%TYPE,
+                               p_where_clause_descr  IN sde_where.sw_where_descr%TYPE  DEFAULT NULL,
+                               p_table_names         IN sde_varchar_array              DEFAULT NULL
+							  )
+RETURN VARCHAR2;
+--
+---------------------------------------------------------------------------------------------------
+--
+FUNCTION update_where_clause(
+                               p_where_clause_unique IN sde_where.sw_unique%TYPE,
+                               p_where_clause        IN sde_where.sw_where_clause%TYPE DEFAULT NULL,
+                               p_where_clause_descr  IN sde_where.sw_where_descr%TYPE  DEFAULT NULL,
+                               p_table_names         IN sde_varchar_array              DEFAULT NULL,
+							   p_table_update_action IN VARCHAR2                       DEFAULT 'APPEND'
+							  )
+RETURN VARCHAR2;
+--
+---------------------------------------------------------------------------------------------------
+--
+FUNCTION unregister_where_clause(
+                                p_where_clause_uniques IN sde_varchar_array
+							    )
+RETURN VARCHAR2;
+--
+---------------------------------------------------------------------------------------------------
+--
+FUNCTION get_srid(
+                 p_table_name  IN  VARCHAR2,
+				 p_column_name IN  VARCHAR2,
+				 p_oracle_srid OUT NUMBER,
+				 p_epsg_srid   OUT NUMBER
+				 )
+RETURN VARCHAR2;
+--
+---------------------------------------------------------------------------------------------------
+--
+FUNCTION validate_srid(
+                      p_srid        IN NUMBER,
+					  p_table_name  IN VARCHAR2,
+					  p_column_name IN VARCHAR2
 					  )
 RETURN VARCHAR2;
 --
 ---------------------------------------------------------------------------------------------------
 --
-FUNCTION validate_table_name(p_table_name IN VARCHAR2)
+FUNCTION get_geodetic_srid_count(
+                                p_srid 	   IN  NUMBER,
+								p_gs_count OUT NUMBER
+								)
 RETURN VARCHAR2;
 --
 ---------------------------------------------------------------------------------------------------
 --
-FUNCTION get_data(p_table_name   IN VARCHAR2
-				 ,p_column_array IN sde_varchar_2d_array DEFAULT NULL
-				 ,p_where_clause IN VARCHAR2 			 DEFAULT NULL
-				 ) 
-RETURN SYS_REFCURSOR;
---
----------------------------------------------------------------------------------------------------
---
-FUNCTION get_geodetic_srid_count(p_srid 	IN  NUMBER
-								,p_gs_count OUT NUMBER
-								) 
-RETURN VARCHAR2;
---
----------------------------------------------------------------------------------------------------
---
-FUNCTION init_view(p_table_name 		IN	VARCHAR2
-				   ,p_records_deleted 	OUT	NUMBER
+FUNCTION init_view(
+                   p_table_name      IN	 VARCHAR2,
+				   p_records_deleted OUT NUMBER
 				  )
 RETURN VARCHAR2;
 --
 ---------------------------------------------------------------------------------------------------
 --
-FUNCTION update_sdo_geom_metadata(p_table_name 	IN VARCHAR2
-								 ,p_column_name IN VARCHAR2
-								 ,p_srid 		IN 	NUMBER
-								 ,p_shp_dims 	IN 	NUMBER
-								 ,p_min_x 		IN 	NUMBER
-								 ,p_max_x 		IN 	NUMBER
-								 ,p_min_y 		IN 	NUMBER
-								 ,p_max_y 		IN 	NUMBER
-								 ,p_min_z 		IN 	NUMBER
-								 ,p_max_z 		IN 	NUMBER
-								 ,p_min_measure	IN 	NUMBER
-								 ,p_max_measure	IN 	NUMBER
-								 ,p_tolerance  	IN 	NUMBER
-								 ) 
+FUNCTION update_sdo_geom_metadata(
+                                 p_table_name  IN VARCHAR2,
+								 p_column_name IN VARCHAR2,
+								 p_srid        IN NUMBER,
+								 p_sde_dims    IN NUMBER,
+								 p_min_x       IN NUMBER,
+								 p_max_x       IN NUMBER,
+								 p_min_y       IN NUMBER,
+								 p_max_y       IN NUMBER,
+								 p_min_z       IN NUMBER,
+								 p_max_z       IN NUMBER,
+								 p_min_measure IN NUMBER,
+								 p_max_measure IN NUMBER,
+								 p_tolerance   IN NUMBER
+								 )
 RETURN VARCHAR2;
 --
 ---------------------------------------------------------------------------------------------------
 --
-FUNCTION shputil(p_command IN sde_varchar_array)
+FUNCTION shputil(
+                p_command IN sde_varchar_array
+				)
 RETURN VARCHAR2;
 --
 ---------------------------------------------------------------------------------------------------
