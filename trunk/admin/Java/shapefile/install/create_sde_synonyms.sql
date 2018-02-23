@@ -1,20 +1,3 @@
---
----------------------------------------------------------------------------------------------------
---
---   PVCS Identifiers :-
---
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/Java/shapefile/install/create_sde_synonyms.sql-arc   1.0   Nov 29 2017 09:45:54   Upendra.Hukeri  $
---       Module Name      : $Workfile:   create_sde_synonyms.sql  $
---       Date into PVCS   : $Date:   Nov 29 2017 09:45:54  $
---       Date fetched Out : $Modtime:   Nov 29 2017 09:42:06  $
---       PVCS Version     : $Revision:   1.0  $
---
---   Author : Upendra Hukeri
---
----------------------------------------------------------------------------------------------------
--- Copyright (c) 2017 Bentley Systems Incorporated. All rights reserved.
----------------------------------------------------------------------------------------------------
---
 SET ECHO OFF
 SET LINESIZE 120
 SET HEADING OFF
@@ -33,6 +16,16 @@ SET FEEDBACK ON
 CREATE OR REPLACE PUBLIC SYNONYM sde_varchar_array FOR sde_varchar_array;
 --
 CREATE OR REPLACE PUBLIC SYNONYM sde_varchar_2d_array FOR sde_varchar_2d_array;
+--
+CREATE OR REPLACE PUBLIC SYNONYM sde_where FOR sde_where;
+--
+CREATE OR REPLACE PUBLIC SYNONYM sde_tables FOR sde_tables;
+--
+CREATE OR REPLACE PUBLIC SYNONYM sde_registry FOR sde_registry;
+--
+CREATE OR REPLACE PUBLIC SYNONYM sw_unique_seq_1 FOR sw_unique_seq_1;
+--
+CREATE OR REPLACE PUBLIC SYNONYM st_unique_seq_1 FOR st_unique_seq_1;
 --
 CREATE OR REPLACE PUBLIC SYNONYM sde_util FOR sde_util;
 --
