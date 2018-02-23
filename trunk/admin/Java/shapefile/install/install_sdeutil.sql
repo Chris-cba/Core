@@ -3,11 +3,11 @@
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/Java/shapefile/install/install_sdeutil.sql-arc   1.1   Jan 17 2018 09:03:16   Upendra.Hukeri  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/Java/shapefile/install/install_sdeutil.sql-arc   1.2   Feb 23 2018 07:50:08   Upendra.Hukeri  $
 --       Module Name      : $Workfile:   install_sdeutil.sql  $
---       Date into PVCS   : $Date:   Jan 17 2018 09:03:16  $
---       Date fetched Out : $Modtime:   Jan 17 2018 09:02:24  $
---       PVCS Version     : $Revision:   1.1  $
+--       Date into PVCS   : $Date:   Feb 23 2018 07:50:08  $
+--       Date fetched Out : $Modtime:   Feb 22 2018 10:20:44  $
+--       PVCS Version     : $Revision:   1.2  $
 --
 --   Author : Upendra Hukeri
 --
@@ -20,6 +20,10 @@ SET LINESIZE 120
 SET HEADING OFF
 SET FEEDBACK OFF
 SET SERVEROUTPUT ON
+--
+VARIABLE tab_file_name VARCHAR2(50);
+--
+COLUMN :tab_file_name NEW_VALUE tab_file NOPRINT;
 --
 -- Grab date/time to append to log file name
 --
@@ -93,12 +97,27 @@ START sde_varchar_2d_array.tyh
 SET FEEDBACK OFF
 --
 --------------------------------------------------------------------------------
--- ROLE
+-- ROLES
 --------------------------------------------------------------------------------
 --
 SET TERM ON
 PROMPT Creating Role SDE_USER
 SET TERM OFF
+--
+BEGIN
+	EXECUTE IMMEDIATE 'CREATE ROLE SDE_ADMIN';
+	--
+	dbms_output.put_line(CHR(10) || 'Role created.' || CHR(10));
+EXCEPTION
+	WHEN OTHERS THEN
+		-- ORA-01921: If The role name exists, ignore the error.
+		IF SQLCODE = -01921 THEN
+			dbms_output.put_line(CHR(10) || 'Role already exists.' || CHR(10));
+		ELSE
+			RAISE;
+		END IF;
+END;
+/
 --
 BEGIN
 	EXECUTE IMMEDIATE 'CREATE ROLE SDE_USER';
@@ -114,6 +133,97 @@ EXCEPTION
 		END IF;
 END;
 /
+--
+--------------------------------------------------------------------------------
+-- TABLES
+--------------------------------------------------------------------------------
+--
+SET TERM ON
+PROMPT Creating Table SDE_WHERE
+SET TERM OFF
+--
+DECLARE
+	CURSOR check_table IS
+	SELECT  1 
+	  FROM user_tables
+	 WHERE UPPER(table_name) = 'SDE_WHERE';
+	--
+	v_temp NUMBER := NULL;
+BEGIN
+	OPEN check_table;
+	FETCH check_table INTO v_temp;
+	CLOSE check_table;
+	--
+	IF v_temp IS NULL THEN 
+		:tab_file_name := 'sde_where.tab';
+	ELSE
+		dbms_output.put_line(CHR(10) || 'Table already exists.' || CHR(10));
+		:tab_file_name := 'null.sql';
+	END IF;
+END;
+/
+--
+SELECT :tab_file_name FROM DUAL;
+@@&tab_file;
+--
+SET TERM ON
+PROMPT Creating Table SDE_TABLES
+SET TERM OFF
+--
+DECLARE
+	CURSOR check_table IS
+	SELECT  1 
+	  FROM user_tables
+	 WHERE UPPER(table_name) = 'SDE_TABLES';
+	--
+	v_temp NUMBER := NULL;
+BEGIN
+	OPEN check_table;
+	FETCH check_table INTO v_temp;
+	CLOSE check_table;
+	--
+	IF v_temp IS NULL THEN 
+		:tab_file_name := 'sde_tables.tab';
+	ELSE
+		dbms_output.put_line(CHR(10) || 'Table already exists.' || CHR(10));
+		:tab_file_name := 'null.sql';
+	END IF;
+END;
+/
+--
+SELECT :tab_file_name FROM DUAL;
+@@&tab_file;
+--
+SET TERM ON
+PROMPT Creating Table SDE_REGISTRY
+SET TERM OFF
+--
+DECLARE
+	CURSOR check_table IS
+	SELECT  1 
+	  FROM user_tables
+	 WHERE UPPER(table_name) = 'SDE_REGISTRY';
+	--
+	v_temp NUMBER := NULL;
+BEGIN
+	OPEN check_table;
+	FETCH check_table INTO v_temp;
+	CLOSE check_table;
+	--
+	IF v_temp IS NULL THEN 
+		:tab_file_name := 'sde_registry.tab';
+	ELSE
+		dbms_output.put_line(CHR(10) || 'Table already exists.' || CHR(10));
+		:tab_file_name := 'null.sql';
+	END IF;
+END;
+/
+--
+SET TERM OFF
+SELECT :tab_file_name FROM DUAL;
+--
+@@&tab_file;
+SET TERM ON
 --
 --------------------------------------------------------------------------------
 -- PACKAGE HEADER
