@@ -1,11 +1,11 @@
 /**
  *    PVCS Identifiers :-
  *
- *       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/Java/shapefile/bentley/exor/gis/ShapefileUtility.java-arc   1.4   Feb 22 2018 12:03:52   Upendra.Hukeri  $
+ *       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/Java/shapefile/bentley/exor/gis/ShapefileUtility.java-arc   1.5   Feb 26 2018 06:04:22   Upendra.Hukeri  $
  *       Module Name      : $Workfile:   ShapefileUtility.java  $
- *       Date into SCCS   : $Date:   Feb 22 2018 12:03:52  $
- *       Date fetched Out : $Modtime:   Feb 22 2018 12:02:08  $
- *       SCCS Version     : $Revision:   1.4  $
+ *       Date into SCCS   : $Date:   Feb 26 2018 06:04:22  $
+ *       Date fetched Out : $Modtime:   Feb 26 2018 06:03:48  $
+ *       SCCS Version     : $Revision:   1.5  $
  *       Based on 
  *
  *
@@ -92,7 +92,7 @@ public class ShapefileUtility {
 	
 	private	boolean			exitSystem  		 = false;
 	
-	private static final String	USAGE            = "\nUSAGE1: java -jar sdeutil.jar -help\nUSAGE2: java -jar sdeutil.jar -setup\nUSAGE3: java -jar sdeutil.jar -sde2shp [parameters for sde2shp]\nUSAGE4: java -jar sdeutil.jar -shp2sde [parameters for shp2sde]\nUSAGE5: java -jar sdeutil.jar -shpreg  [parameters for shpreg]";
+	private static final String	USAGE            = "\nUSAGE1: java -jar sdeutil.jar -help\nUSAGE2: java -jar sdeutil.jar -setup\nUSAGE3: java -jar sdeutil.jar -shpreg  [parameters for shpreg]\nUSAGE4: java -jar sdeutil.jar -sde2shp [parameters for sde2shp]\nUSAGE5: java -jar sdeutil.jar -shp2sde [parameters for shp2sde]";
 	private static final String ERROR_MESSAGE     = "printThisWrong parameters passed!" + USAGE;
 	
 	private static ShapefileUtility shpUtil 	 = null;
