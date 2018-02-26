@@ -1,11 +1,11 @@
 /**
  *    PVCS Identifiers :-
  *
- *       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/Java/shapefile/bentley/exor/gis/SHPREG.java-arc   1.0   Feb 21 2018 09:51:40   Upendra.Hukeri  $
+ *       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/Java/shapefile/bentley/exor/gis/SHPREG.java-arc   1.1   Feb 26 2018 06:04:50   Upendra.Hukeri  $
  *       Module Name      : $Workfile:   SHPREG.java  $
- *       Date into SCCS   : $Date:   Feb 21 2018 09:51:40  $
- *       Date fetched Out : $Modtime:   Feb 21 2018 09:41:48  $
- *       SCCS Version     : $Revision:   1.0  $
+ *       Date into SCCS   : $Date:   Feb 26 2018 06:04:50  $
+ *       Date fetched Out : $Modtime:   Feb 26 2018 05:55:40  $
+ *       SCCS Version     : $Revision:   1.1  $
  *       Based on 
  *
  *
@@ -70,33 +70,36 @@ public class SHPREG extends ShapefileUtility {
 		helpMsg.append("\n\nUSAGE4: java -jar sdeutil.jar -shpreg [-uw] [-nc | -h db_host -p db_port -s db_sid -u db_username -d db_password] [-wid where_clause_id] (-wh where_clause) (-wd where_clause_description) (-wt {-append|-init|-delete} db_tablename/s | -wt {-append|-delete} \"*\")");
 		helpMsg.append("\n\nUSAGE5: java -jar sdeutil.jar -shpreg [-dw] [-nc | -h db_host -p db_port -s db_sid -u db_username -d db_password] [-wid where_clause_id/s | -wid \"*\"]");
 		helpMsg.append("\n\nUsage explaination (parameters used):");
-		helpMsg.append("\n\t-help : Specify this option to see the command line usage of Shapefile-Registry Utility (no values for this parameter)");
-		helpMsg.append("\n\t-rt   : Specify this option to register table/view for Shapefile-Utility");
-		helpMsg.append("\n\t-ut   : Specify this option to update a registered table/view for Shapefile-Utility");
-		helpMsg.append("\n\t-dt   : Specify this option to unregister table/view from Shapefile-Utility");
+		helpMsg.append("\n\t-help : Specify this option to see the command line usage of Shapefile-Registration-Utility (no values for this parameter)");
+		helpMsg.append("\n\t-rt   : Specify this option to register table(s) for Shapefile-Utility");
+		helpMsg.append("\n\t-ut   : Specify this option to update a registered table for Shapefile-Utility");
+		helpMsg.append("\n\t-dt   : Specify this option to unregister table(s) from Shapefile-Utility");
 		helpMsg.append("\n\t-rw   : Specify this option to register WHERE clause for Shapefile-Utility");
 		helpMsg.append("\n\t-uw   : Specify this option to update a registered WHERE clause for Shapefile-Utility");
-		helpMsg.append("\n\t-dw   : Specify this option to unregister WHERE clause from Shapefile-Utility");
+		helpMsg.append("\n\t-dw   : Specify this option to unregister WHERE clause(s) from Shapefile-Utility");
 		helpMsg.append("\n\t-nc   : Specify this option, if the jar is loaded in database and called from a PL/SQL procedure or function (no values for this parameter)");
 		helpMsg.append("\n\t-h    : Host machine name or IP address with existing Oracle database");
 		helpMsg.append("\n\t-p    : Port to connect to existing Oracle database (e.g. 1521)");
 		helpMsg.append("\n\t-s    : SID of existing Oracle database (e.g. orcl)");
 		helpMsg.append("\n\t-u    : Database user's username");
 		helpMsg.append("\n\t-d    : Database user's password");
-		helpMsg.append("\n\t-t    : Feature table/view name(s) that need to be registered with Shapefile-Utility (separated by COMMA only)");
-		helpMsg.append("\n\t-w    : WHERE clause IDs to be registered with table specified in '-t' option (separated by COMMA only)");
+		helpMsg.append("\n\t-t    : Feature table name(s) that need to be registered with Shapefile-Utility (separated by COMMA only)");
+		helpMsg.append("\n\t-w    : WHERE clause ID(s) to be registered with table specified in '-t' option (separated by COMMA only)");
 		helpMsg.append("\n\t-wid  : ID for WHERE clause to be registered with Shapefile-Utility, maximum 50 characters long (allowed characters: A-Z a-z 0-9 _ $ #)");
 		helpMsg.append("\n\t-wh   : WHERE clause to be registered with Shapefile-Utility (in case WHERE clause contains space itself enclose it in double quotes)");
 		helpMsg.append("\n\t-wd   : Description for WHERE clause to be registered with Shapefile-Utility");
-		helpMsg.append("\n\t-wt   : Feature table/view name(s) to be registered with WHERE clause ID specified in '-wid' option (separated by COMMA only)");
-		helpMsg.append("\n\n\tNOTE: \t[] indicate MANDATORY field");
-		helpMsg.append("\n\t\t() indicate OPTIONAL field");
-		helpMsg.append("\n\n\t\t| represents OR for ");
-		helpMsg.append("\n\n\t\t\"*\" represents all registered table(s)/view(s) OR WHERE clause ID(s) as applicable, * MUST ALWAYS BE ENCLOSED IN DOUBLE QUOTES");
-		helpMsg.append("\n\n\t\t{-append|-init|-delete} represent type update action to be performed - ");
-		helpMsg.append("\n\t\t   -append - To add specified tables/views to existing list of tables/roles for WHERE clause");
-		helpMsg.append("\n\t\t   -init   - To replace existing list of tables/views for WHERE clause with specified tables/roles");
-		helpMsg.append("\n\t\t   -delete - To delete  specified tables/views from existing list of tables/roles for WHERE clause");
+		helpMsg.append("\n\t-wt   : Feature table name(s) to be registered with WHERE clause ID specified in '-wid' option (separated by COMMA only)");
+		helpMsg.append("\n\n\tNOTE: \t[] indicate MANDATORY field in USAGE");
+		helpMsg.append("\n\t\t() indicate OPTIONAL field in USAGE");
+		helpMsg.append("\n\n\t\t| represents OR");
+		helpMsg.append("\n\n\t\t\"*\" represents all registered table(s) OR WHERE clause ID(s) as applicable, * MUST ALWAYS BE ENCLOSED IN DOUBLE QUOTES");
+		helpMsg.append("\n\n\t\t{-append|-init|-delete} represent update action to be performed - ");
+		helpMsg.append("\n\t\t   -append - To add specified table(s) to existing list of tables for a WHERE clause ID OR");
+		helpMsg.append("\n\t\t           - To add specified WHERE clause ID(s) to existing list of WHERE clause IDs for a table");
+		helpMsg.append("\n\t\t   -init   - To replace existing list of tables for a WHERE clause ID with specified tables OR");
+		helpMsg.append("\n\t\t           - To replace existing list of WHERE clause IDs for a table with specified WHERE clause ID(s)");
+		helpMsg.append("\n\t\t   -delete - To delete specified tables from existing list of tables for a WHERE clause ID OR");
+		helpMsg.append("\n\t\t           - To delete specified WHERE clause ID(s) from existing list of tables for a table");
 		
 		return helpMsg.toString();
 	}
