@@ -1,4 +1,4 @@
-CREATE OR REPLACE FORCE VIEW WARWICK.V_NLT_XSPS
+CREATE OR REPLACE FORCE VIEW V_NLT_XSPS
 (
     ELEMENT_NLT_ID,
     XSP_NLT_ID,
@@ -15,11 +15,11 @@ AS
           --
           --   PVCS Identifiers :-
           --
-          --       pvcsid                 : $Header:   //new_vm_latest/archives/lb/admin/views/v_nlt_xsps.vw-arc   1.0   Mar 02 2018 18:46:14   Rob.Coupe  $
+          --       pvcsid                 : $Header:   //new_vm_latest/archives/lb/admin/views/v_nlt_xsps.vw-arc   1.1   Mar 02 2018 18:52:56   Rob.Coupe  $
           --       Module Name      : $Workfile:   v_nlt_xsps.vw  $
-          --       Date into PVCS   : $Date:   Mar 02 2018 18:46:14  $
-          --       Date fetched Out : $Modtime:   Mar 02 2018 18:46:28  $
-          --       PVCS Version     : $Revision:   1.0  $
+          --       Date into PVCS   : $Date:   Mar 02 2018 18:52:56  $
+          --       Date fetched Out : $Modtime:   Mar 02 2018 18:53:26  $
+          --       PVCS Version     : $Revision:   1.1  $
           --
           --   Author : Rob Coupe
           --
@@ -29,7 +29,6 @@ AS
           --   Copyright (c) 2014 Bentley Systems Incorporated. All rights reserved.
           -----------------------------------------------------------------------------
           --     
-
 	       e.nlt_id        element_nlt_id,
            g.nlt_id        xsp_nlt_id,
            nng_nt_type     element_type,
