@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE lb_loc
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_loc.pkh-arc   1.4   Oct 21 2016 10:31:48   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_loc.pkh-arc   1.5   Mar 02 2018 15:15:44   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_loc.pkh  $
-   --       Date into PVCS   : $Date:   Oct 21 2016 10:31:48  $
-   --       Date fetched Out : $Modtime:   Oct 20 2016 13:40:46  $
-   --       PVCS Version     : $Revision:   1.4  $
+   --       Date into PVCS   : $Date:   Mar 02 2018 15:15:44  $
+   --       Date fetched Out : $Modtime:   Mar 02 2018 15:15:40  $
+   --       PVCS Version     : $Revision:   1.5  $
    --
    --   Author : R.A. Coupe
    --
@@ -17,10 +17,13 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.4  $';
+   g_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.5  $';
 
-   FUNCTION get_version return varchar2;
-   FUNCTION get_body_version return varchar2;
+   FUNCTION get_version
+      RETURN VARCHAR2;
+
+   FUNCTION get_body_version
+      RETURN VARCHAR2;
 
    --function to return a set of asset locations and JXPs (query by asset-id and exor asset type)
    FUNCTION get_nal (
@@ -58,10 +61,10 @@ AS
       pi_nal_nit_type   IN nm_asset_locations_all.nal_nit_type%TYPE)
       RETURN SYS_REFCURSOR;
 
-   FUNCTION translate_nlt (pi_lb_rpt_tab    IN lb_RPt_tab,
-                           pi_refnt_type    IN INTEGER,
-                           pi_inner_join_flag IN VARCHAR2 DEFAULT 'Y',
-                           pi_cardinality   IN INTEGER)
+   FUNCTION translate_nlt (pi_lb_rpt_tab        IN lb_RPt_tab,
+                           pi_refnt_type        IN INTEGER,
+                           pi_inner_join_flag   IN VARCHAR2 DEFAULT 'Y',
+                           pi_cardinality       IN INTEGER)
       RETURN lb_RPt_tab;
 
    --function to return the location of an asset as a set of ref-points relative to the preferred referencing system.
@@ -76,15 +79,29 @@ AS
       pi_refnt_type   IN INTEGER)
       RETURN lb_RPt_tab;
 
+   FUNCTION translate_xnlt (pi_lb_xrpt_tab       IN lb_XRPt_tab,
+                            pi_refnt_type        IN INTEGER,
+                            pi_inner_join_flag   IN VARCHAR2 DEFAULT 'Y',
+                            pi_cardinality       IN INTEGER)
+      RETURN lb_XRPt_tab;
+
+
+   FUNCTION get_asset_location_tab (
+      pi_asset_id       IN nm_asset_locations_all.nal_asset_id%TYPE,
+      pi_nal_nit_type   IN nm_asset_locations_all.nal_nit_type%TYPE,
+      pi_nal_id         IN nm_asset_locations_all.nal_id%TYPE,
+      pi_refnt_type     IN INTEGER)
+      RETURN lb_XRPt_tab;
+
    FUNCTION get_pref_location (
       pi_asset_id       IN nm_asset_locations_all.nal_asset_id%TYPE,
       pi_nal_nit_type   IN nm_asset_locations_all.nal_nit_type%TYPE,
       pi_refnt_type     IN INTEGER)
       RETURN SYS_REFCURSOR;
-   FUNCTION xsps_for_asset_location (
-      p_lb_rpt_tab      IN lb_rpt_tab,
-      p_exor_inv_type   IN VARCHAR2)
-      RETURN lb_xsp_tab;      
+
+   FUNCTION xsps_for_asset_location (p_lb_rpt_tab      IN lb_rpt_tab,
+                                     p_exor_inv_type   IN VARCHAR2)
+      RETURN lb_xsp_tab;
 --
 END lb_loc;
 /
