@@ -1,11 +1,11 @@
 ----------------------------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/log_nm_4700_fix42.sql-arc   1.2   Jun 22 2016 15:00:46   linesh.sorathia  $   
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/log_nm_4700_fix42.sql-arc   1.3   Mar 08 2018 16:14:58   Chris.Baugh  $   
 --       Module Name      : $Workfile:   log_nm_4700_fix42.sql  $ 
---       Date into PVCS   : $Date:   Jun 22 2016 15:00:46  $
---       Date fetched Out : $Modtime:   Jun 22 2016 14:57:42  $
---       Version     	  : $Revision:   1.2  $
+--       Date into PVCS   : $Date:   Mar 08 2018 16:14:58  $
+--       Date fetched Out : $Modtime:   Mar 08 2018 16:13:54  $
+--       Version     	  : $Revision:   1.3  $
 --
 ----------------------------------------------------------------------------------------------------
 --   Copyright (c) 2016 Bentley Systems Incorporated. All rights reserved.
@@ -137,7 +137,7 @@ End ;
 /
 
 Begin
-   Execute Immediate ' GRANT EXECUTE ON NM3_DOC_MAN   TO public ' ;
+   Execute Immediate ' GRANT EXECUTE ON NM3_DOC_MAN TO HIG_USER' ;
 End ;
 /
 
