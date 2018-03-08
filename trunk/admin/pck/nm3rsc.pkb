@@ -4,11 +4,11 @@ AS
     --------------------------------------------------------------------------------
     --   PVCS Identifiers :-
     --
-    --       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3rsc.pkb-arc   2.19   Jan 19 2018 13:54:22   Chris.Baugh  $
+    --       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3rsc.pkb-arc   2.20   Mar 08 2018 15:17:40   Rob.Coupe  $
     --       Module Name      : $Workfile:   nm3rsc.pkb  $
-    --       Date into PVCS   : $Date:   Jan 19 2018 13:54:22  $
-    --       Date fetched Out : $Modtime:   Jan 19 2018 13:52:36  $
-    --       PVCS Version     : $Revision:   2.19  $
+    --       Date into PVCS   : $Date:   Mar 08 2018 15:17:40  $
+    --       Date fetched Out : $Modtime:   Mar 08 2018 15:15:42  $
+    --       PVCS Version     : $Revision:   2.20  $
     --
     --   Author : R.A. Coupe
     --
@@ -20,7 +20,7 @@ AS
     --
     --all global package variables here
     --
-    g_body_sccsid    CONSTANT VARCHAR2 (30) := '"$Revision:   2.19  $"';
+    g_body_sccsid    CONSTANT VARCHAR2 (30) := '"$Revision:   2.20  $"';
 
     --  g_body_sccsid is the SCCS ID for the package body
     --
@@ -1880,7 +1880,7 @@ AS
             instantiate_from_route_nte (p_nte_job_id, p_route_id);
         END IF;
 
-        --  set_start_points;
+        set_start_points;
 
         connect_route (p_nte_job_id, 0, p_start_ne);
 
