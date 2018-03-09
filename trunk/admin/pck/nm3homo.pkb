@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3homo AS
    --
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3homo.pkb-arc   2.27   Oct 04 2017 15:56:34   Chris.Baugh  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3homo.pkb-arc   2.28   Mar 09 2018 15:38:32   Mike.Huitson  $
    --       Module Name      : $Workfile:   nm3homo.pkb  $
-   --       Date into PVCS   : $Date:   Oct 04 2017 15:56:34  $
-   --       Date fetched Out : $Modtime:   Oct 04 2017 10:03:16  $
-   --       PVCS Version     : $Revision:   2.27  $
+   --       Date into PVCS   : $Date:   Mar 09 2018 15:38:32  $
+   --       Date fetched Out : $Modtime:   Feb 19 2018 11:19:04  $
+   --       PVCS Version     : $Revision:   2.28  $
    --
    --
    --   Author : Jonathan Mills
@@ -55,7 +55,7 @@ CREATE OR REPLACE PACKAGE BODY nm3homo AS
 
    -- Log 713421
 
-   g_body_sccsid        CONSTANT VARCHAR2 (2000) := '"$Revision:   2.27  $"';
+   g_body_sccsid        CONSTANT VARCHAR2 (2000) := '"$Revision:   2.28  $"';
    --  g_body_sccsid is the SCCS ID for the package body
    --
    g_package_name       CONSTANT VARCHAR2 (30) := 'nm3homo';
@@ -776,7 +776,6 @@ CREATE OR REPLACE PACKAGE BODY nm3homo AS
                            END IF;
                         --
                         END;
-                        
                      WHEN OTHERS
                      THEN
                         RAISE;
@@ -1231,123 +1230,113 @@ CREATE OR REPLACE PACKAGE BODY nm3homo AS
                   THEN
                      FOR l_count IN 1..l_member_arr.npa_placement_array.COUNT LOOP
                        DECLARE
-                           l_rec_nm         NM_MEMBERS%ROWTYPE := cs_rec;
-                           l_rec_chi_nm     NM_MEMBERS%ROWTYPE;
-
-                           --Log 713412:Linesh:Start
-                           --Added Following to move the Subordinate Asset Location to that of the Parent
-                           CURSOR c_child_nm (
-                              qp_nm_ne_id_in    nm_members.nm_ne_id_in%TYPE)
-                           IS
-                              SELECT DISTINCT nm_ne_id_in,
-                                              NULL nm_ne_id_of,
-                                              nm_type,
-                                              nm_obj_type,
-                                              NULL nm_begin_mp,
-                                              NULL nm_start_date,
-                                              NULL nm_end_date,
-                                              NULL nm_end_mp,
-                                              NULL nm_slk,
-                                              NULL nm_cardinality,
-                                              NULL nm_admin_unit,
-                                              NULL nm_date_created,
-                                              NULL nm_date_modified,
-                                              NULL nm_modified_by,
-                                              NULL nm_created_by,
-                                              NULL nm_seq_no,
-                                              NULL nm_seg_no,
-                                              NULL nm_true,
-                                              NULL nm_end_slk,
-                                              NULL nm_end_true
-                                FROM nm_members_all nm
-                               WHERE     nm_ne_id_in IN (SELECT iit.iit_ne_id
-                                                           FROM NM_INV_ITEMS iit,
-                                                                NM_INV_ITEMS iit_p,
-                                                                NM_INV_TYPE_GROUPINGS,
-                                                                NM_INV_ITEM_GROUPINGS
-                                                          WHERE     iit.iit_ne_id IN (    SELECT iig_item_id
-                                                                                            FROM NM_INV_ITEM_GROUPINGS
-                                                                                      START WITH iig_parent_id =
-                                                                                                    qp_nm_ne_id_in
-                                                                                      CONNECT BY iig_parent_id =
-                                                                                                    PRIOR iig_item_id)
-                                                                AND iig_parent_id =
-                                                                       iit_p.iit_ne_id
-                                                                AND iig_item_id =
-                                                                       iit.iit_ne_id
-                                                                AND iit.iit_inv_type =
-                                                                       itg_inv_type
-                                                                AND itg_relation =
-                                                                       'AT' --LOG 713421
-                                                                AND iit_p.iit_inv_type =
-                                                                       itg_parent_inv_type)
-                                     AND nm_type = 'I';
-
-                           l_child_nm_rec   NM_MEMBERS%ROWTYPE;
-                        --Log 713412:Linesh:End
-                        BEGIN
-                           l_rec_nm.nm_begin_mp := l_member_arr.npa_placement_array(l_count).pl_start;
-                           l_rec_nm.nm_end_mp := l_member_arr.npa_placement_array(l_count).pl_end;
-                           l_rec_nm.nm_start_date := p_effective_date;
-                           --                      nm_debug.debug('IN : '||l_rec_nm.nm_ne_id_in||' : OF : '||l_rec_nm.nm_ne_id_of||' : BEGIN : '||l_rec_nm.nm_begin_mp||' : END : '||l_rec_nm.nm_end_mp);
-                           xattr_off;
+                         --
+                         l_rec_nm      NM_MEMBERS%ROWTYPE := cs_rec;
+                         l_rec_chi_nm  NM_MEMBERS%ROWTYPE;
+                         --
+                         CURSOR c_child_nm(qp_nm_ne_id_in  nm_members.nm_ne_id_in%TYPE)
+                             IS
+                         SELECT DISTINCT nm_ne_id_in
+                               ,NULL nm_ne_id_of
+                               ,nm_type
+                               ,nm_obj_type
+                               ,NULL nm_begin_mp
+                               ,NULL nm_start_date
+                               ,NULL nm_end_date
+                               ,NULL nm_end_mp
+                               ,NULL nm_slk
+                               ,NULL nm_cardinality
+                               ,NULL nm_admin_unit
+                               ,NULL nm_date_created
+                               ,NULL nm_date_modified
+                               ,NULL nm_modified_by
+                               ,NULL nm_created_by
+                               ,NULL nm_seq_no
+                               ,NULL nm_seg_no
+                               ,NULL nm_true
+                               ,NULL nm_end_slk
+                               ,NULL nm_end_true
+                           FROM nm_members_all nm
+                          WHERE nm_ne_id_in IN(SELECT iit.iit_ne_id
+                                                 FROM nm_inv_items iit,
+                                                      nm_inv_items iit_p,
+                                                      nm_inv_type_groupings,
+                                                      nm_inv_item_groupings
+                                                WHERE iit.iit_ne_id IN(SELECT iig_item_id
+                                                                         FROM nm_inv_item_groupings
+                                                                        START WITH iig_parent_id = qp_nm_ne_id_in
+                                                                      CONNECT BY iig_parent_id = PRIOR iig_item_id)
+                                                  AND iig_parent_id = iit_p.iit_ne_id
+                                                  AND iig_item_id = iit.iit_ne_id
+                                                  AND iit.iit_inv_type = itg_inv_type
+                                                  AND itg_relation = 'AT' --LOG 713421
+                                                  AND iit_p.iit_inv_type = itg_parent_inv_type)
+                            AND nm_type = 'I'
+                              ;
+                         --
+                         l_child_nm_rec   NM_MEMBERS%ROWTYPE;
+                         --
+                       BEGIN
+                         --
+                         l_rec_nm.nm_begin_mp := l_member_arr.npa_placement_array(l_count).pl_start;
+                         l_rec_nm.nm_end_mp := l_member_arr.npa_placement_array(l_count).pl_end;
+                         l_rec_nm.nm_start_date := p_effective_date;
+                         --                      nm_debug.debug('IN : '||l_rec_nm.nm_ne_id_in||' : OF : '||l_rec_nm.nm_ne_id_of||' : BEGIN : '||l_rec_nm.nm_begin_mp||' : END : '||l_rec_nm.nm_end_mp);
+                         xattr_off;
+                         BEGIN
                            nm3net.ins_nm (l_rec_nm);
-                           xattr_on;
-                           --Log 713412:Linesh:Start
-                           xattr_off;
-
-                           OPEN c_child_nm (l_rec_nm.nm_ne_id_in);
-
-                           LOOP
-                              FETCH c_child_nm INTO l_child_nm_rec;
-
-                              EXIT WHEN c_child_nm%NOTFOUND;
-                              l_rec_chi_nm := l_rec_nm;
-                              l_rec_chi_nm.nm_ne_id_in :=
-                                 l_child_nm_rec.nm_ne_id_in;
-                              l_rec_chi_nm.nm_type := l_child_nm_rec.nm_type;
-                              l_rec_chi_nm.nm_obj_type :=
-                                 l_child_nm_rec.nm_obj_type;
-                              nm3net.ins_nm (l_rec_chi_nm);
-                           END LOOP;
-
-                           CLOSE c_child_nm;
-
-                           xattr_on;
-                        --Log 713412:Linesh:End
-                        EXCEPTION
-                           WHEN DUP_VAL_ON_INDEX
-                           THEN
-                              --Log 713412:Linesh:Start
-                              --                             hig.raise_ner(pi_appl               => 'NET'
-                              --                                          ,pi_id                 => 104
-                              --                                          ,pi_supplementary_info => Null);
-                              --xattr_off;
-                              --UPDATE NM_MEMBERS_ALL
-                              --SET   nm_end_date = l_rec_nm.nm_end_date
-                              --    ,nm_end_mp   = l_rec_nm.nm_end_mp
-                              --WHERE  ROWID       = l_mem_rowid;
-                              --xattr_on;
-                              --Log 713412:Linesh:End
-                              --                           g_homo_exc_code := -20516;
-                              --                           g_homo_exc_msg  := 'Inventory Locations already exist for affected inventory at this point with this start date';
-                              --                           RAISE g_homo_exception;
-
-                              -- Task 0109972
-                              -- Reverted this code back to how it used to be so that you can locate
-                              -- the same asset on the same day twice without failure
-                              xattr_off;
-
-                              UPDATE NM_MEMBERS_ALL
-                                 SET nm_end_date = l_rec_nm.nm_end_date,
-                                     nm_end_mp = l_rec_nm.nm_end_mp
-                               WHERE ROWID = l_mem_rowid;
-
-                              xattr_on;
-                        END;
+                         EXCEPTION
+                           WHEN dup_val_on_index
+                            THEN
+                               UPDATE nm_members_all
+                                  SET nm_end_date = l_rec_nm.nm_end_date
+                                     ,nm_end_mp = l_rec_nm.nm_end_mp
+                                WHERE ROWID = l_mem_rowid
+                                    ;
+                         END;
+                         --
+                         OPEN c_child_nm (l_rec_nm.nm_ne_id_in);
+                         LOOP
+                           FETCH c_child_nm INTO l_child_nm_rec;
+                           --
+                           EXIT WHEN c_child_nm%NOTFOUND;
+                           --
+                           l_rec_chi_nm := l_rec_nm;
+                           l_rec_chi_nm.nm_ne_id_in := l_child_nm_rec.nm_ne_id_in;
+                           l_rec_chi_nm.nm_type := l_child_nm_rec.nm_type;
+                           l_rec_chi_nm.nm_obj_type := l_child_nm_rec.nm_obj_type;
+                           --
+                           BEGIN
+                             nm3net.ins_nm(l_rec_chi_nm);
+                           EXCEPTION
+                             WHEN dup_val_on_index
+                              THEN
+                                 UPDATE nm_members_all
+                                    SET nm_end_date = l_rec_chi_nm.nm_end_date
+                                       ,nm_end_mp = l_rec_chi_nm.nm_end_mp
+                                  WHERE nm_ne_id_in = l_rec_chi_nm.nm_ne_id_in
+                                    AND nm_ne_id_of = l_rec_chi_nm.nm_ne_id_of
+                                    AND nm_begin_mp = l_rec_chi_nm.nm_begin_mp
+                                    AND nm_start_date = l_rec_chi_nm.nm_start_date
+                                      ;
+                           END;
+                           --
+                         END LOOP;
+                         --
+                         CLOSE c_child_nm;
+                         --
+                         xattr_on;
+                         --
+                       EXCEPTION
+                         WHEN others
+                          THEN
+                             xattr_on;
+                             RAISE;
+                       END;
+                       --
                      END LOOP;
                   END IF;
-               --
+                  --
                EXCEPTION
                   WHEN l_not_correct_xsp
                   THEN
@@ -1637,12 +1626,10 @@ CREATE OR REPLACE PACKAGE BODY nm3homo AS
                         END IF;
                      --
                      END;
-                     
                  WHEN OTHERS
                    THEN
                      RAISE;
                END;
-               
             END LOOP;
 
             IF NOT l_found_par
@@ -1783,7 +1770,6 @@ CREATE OR REPLACE PACKAGE BODY nm3homo AS
                         END;
                      --
                      END;
-                     
                   WHEN OTHERS
                   THEN
                      RAISE;
