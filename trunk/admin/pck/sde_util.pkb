@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY HIGHWAYS.sde_util AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sde_util.pkb-arc   1.7   Feb 23 2018 07:53:56   Upendra.Hukeri  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sde_util.pkb-arc   1.8   Mar 20 2018 04:30:06   Upendra.Hukeri  $
 --       Module Name      : $Workfile:   sde_util.pkb  $
---       Date into PVCS   : $Date:   Feb 23 2018 07:53:56  $
---       Date fetched Out : $Modtime:   Feb 22 2018 11:50:54  $
---       PVCS Version     : $Revision:   1.7  $
+--       Date into PVCS   : $Date:   Mar 20 2018 04:30:06  $
+--       Date fetched Out : $Modtime:   Mar 20 2018 04:29:32  $
+--       PVCS Version     : $Revision:   1.8  $
 --
 --   Author : Upendra Hukeri
 --
@@ -19,7 +19,7 @@ CREATE OR REPLACE PACKAGE BODY HIGHWAYS.sde_util AS
 --
 -- all global package variables here
 --
-   g_body_sccsid      CONSTANT VARCHAR2(30)  := '"$Revision:   1.7  $"';
+   g_body_sccsid      CONSTANT VARCHAR2(30)  := '"$Revision:   1.8  $"';
    g_package_name     CONSTANT VARCHAR2(30)  := 'sde_util';
    g_insuff_privs_msg CONSTANT VARCHAR2(100) := 'you do not have privileges to perform this action';
    --
@@ -1421,4 +1421,4 @@ RETURN VARCHAR2
 ---------------------------------------------------------------------------------------------------
 --
 END sde_util;
-/ 
+/
