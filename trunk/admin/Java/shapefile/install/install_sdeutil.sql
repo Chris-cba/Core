@@ -3,11 +3,11 @@
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/Java/shapefile/install/install_sdeutil.sql-arc   1.2   Feb 23 2018 07:50:08   Upendra.Hukeri  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/Java/shapefile/install/install_sdeutil.sql-arc   1.3   Mar 20 2018 04:36:22   Upendra.Hukeri  $
 --       Module Name      : $Workfile:   install_sdeutil.sql  $
---       Date into PVCS   : $Date:   Feb 23 2018 07:50:08  $
---       Date fetched Out : $Modtime:   Feb 22 2018 10:20:44  $
---       PVCS Version     : $Revision:   1.2  $
+--       Date into PVCS   : $Date:   Mar 20 2018 04:36:22  $
+--       Date fetched Out : $Modtime:   Mar 20 2018 03:50:02  $
+--       PVCS Version     : $Revision:   1.3  $
 --
 --   Author : Upendra Hukeri
 --
@@ -22,8 +22,10 @@ SET FEEDBACK OFF
 SET SERVEROUTPUT ON
 --
 VARIABLE tab_file_name VARCHAR2(50);
+VARIABLE trg_file_name VARCHAR2(50);
 --
 COLUMN :tab_file_name NEW_VALUE tab_file NOPRINT;
+COLUMN :trg_file_name NEW_VALUE trg_file NOPRINT;
 --
 -- Grab date/time to append to log file name
 --
@@ -156,15 +158,20 @@ BEGIN
 	--
 	IF v_temp IS NULL THEN 
 		:tab_file_name := 'sde_where.tab';
+		:trg_file_name := 'sde_where_1_trg.trg';
 	ELSE
 		dbms_output.put_line(CHR(10) || 'Table already exists.' || CHR(10));
 		:tab_file_name := 'null.sql';
+		:trg_file_name := 'null.sql';
 	END IF;
 END;
 /
 --
 SELECT :tab_file_name FROM DUAL;
 @@&tab_file;
+--
+SELECT :trg_file_name FROM DUAL;
+@@&trg_file;
 --
 SET TERM ON
 PROMPT Creating Table SDE_TABLES
@@ -184,15 +191,20 @@ BEGIN
 	--
 	IF v_temp IS NULL THEN 
 		:tab_file_name := 'sde_tables.tab';
+		:trg_file_name := 'sde_tables_1_trg.trg';
 	ELSE
 		dbms_output.put_line(CHR(10) || 'Table already exists.' || CHR(10));
 		:tab_file_name := 'null.sql';
+		:trg_file_name := 'null.sql';
 	END IF;
 END;
 /
 --
 SELECT :tab_file_name FROM DUAL;
 @@&tab_file;
+--
+SELECT :trg_file_name FROM DUAL;
+@@&trg_file;
 --
 SET TERM ON
 PROMPT Creating Table SDE_REGISTRY
