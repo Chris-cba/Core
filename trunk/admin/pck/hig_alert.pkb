@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/hig_alert.pkb-arc   3.19   Mar 16 2015 11:23:30   Shivani.Gaind  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/hig_alert.pkb-arc   3.20   Mar 20 2018 14:47:38   Chris.Baugh  $
 --       Module Name      : $Workfile:   hig_alert.pkb  $
---       Date into PVCS   : $Date:   Mar 16 2015 11:23:30  $
---       Date fetched Out : $Modtime:   Mar 16 2015 11:18:04  $
---       Version          : $Revision:   3.19  $
+--       Date into PVCS   : $Date:   Mar 20 2018 14:47:38  $
+--       Date fetched Out : $Modtime:   Mar 15 2018 14:15:10  $
+--       Version          : $Revision:   3.20  $
 --       Based on SCCS version : 
 -----------------------------------------------------------------------------
 --    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
@@ -19,7 +19,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid   CONSTANT varchar2(2000) := '$Revision:   3.19  $';
+  g_body_sccsid   CONSTANT varchar2(2000) := '$Revision:   3.20  $';
 
   c_date_format   CONSTANT varchar2(30) := 'DD-Mon-YYYY HH24:MI:SS';
   g_trigger_text  clob;
@@ -2680,7 +2680,7 @@ BEGIN
    SET    halt_trigger_name = Null 
    WHERE  halt_id           = pi_halt_id ;
 
-   Execute Immediate 'DROP TRIGGER '||pi_trigger_name;
+   Execute Immediate 'DROP TRIGGER '||Sys_Context('NM3CORE','APPLICATION_OWNER')||'.'||pi_trigger_name;
  
    Commit ;
    
