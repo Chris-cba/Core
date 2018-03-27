@@ -42,11 +42,11 @@ Select  --
         -------------------------------------------------------------------------
         --   PVCS Identifiers :-
         --
-        --       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/views/hig_processes_all_v.vw-arc   3.3   Nov 28 2017 13:52:44   Chris.Baugh  $
+        --       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/views/hig_processes_all_v.vw-arc   3.4   Mar 27 2018 08:51:32   Chris.Baugh  $
         --       Module Name      : $Workfile:   hig_processes_all_v.vw  $
-        --       Date into PVCS   : $Date:   Nov 28 2017 13:52:44  $
-        --       Date fetched Out : $Modtime:   Nov 24 2017 11:13:44  $
-        --       Version          : $Revision:   3.3  $
+        --       Date into PVCS   : $Date:   Mar 27 2018 08:51:32  $
+        --       Date fetched Out : $Modtime:   Mar 22 2018 10:29:40  $
+        --       Version          : $Revision:   3.4  $
         -----------------------------------------------------------------------------
         --    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
         -----------------------------------------------------------------------------
@@ -101,7 +101,17 @@ Select  --
         And       hpjr.Hpjr_Success_Flag    =   'N'
         )                                                                           Hpj_Run_Failure_Count,
         dsj.Last_Start_Date                                                         Hpj_Last_Start_Date,
-        Cast(Cast (dsj.Last_Start_Date As Timestamp With Local Time Zone) As Date)  Hpj_Last_Run_Date,
+        (CASE
+            WHEN dsj.Last_Start_Date IS NULL
+            THEN
+              (SELECT CAST (
+              CAST (MAX(hpjr_start) AS TIMESTAMP WITH LOCAL TIME ZONE) AS DATE)
+                 FROM hig_process_job_runs
+                WHERE hpjr_process_id = hp_process_id)
+            ELSE
+              CAST (
+              CAST (dsj.Last_Start_Date AS TIMESTAMP WITH LOCAL TIME ZONE) AS DATE)
+            END)                                                                    Hpj_Last_Run_Date,
         (
         Case
           When dsj.State = 'SCHEDULED' Then
