@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3homo AS
    --
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3homo.pkb-arc   2.28   Mar 09 2018 15:38:32   Mike.Huitson  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3homo.pkb-arc   2.29   Apr 03 2018 15:38:26   Chris.Baugh  $
    --       Module Name      : $Workfile:   nm3homo.pkb  $
-   --       Date into PVCS   : $Date:   Mar 09 2018 15:38:32  $
-   --       Date fetched Out : $Modtime:   Feb 19 2018 11:19:04  $
-   --       PVCS Version     : $Revision:   2.28  $
+   --       Date into PVCS   : $Date:   Apr 03 2018 15:38:26  $
+   --       Date fetched Out : $Modtime:   Apr 03 2018 15:18:12  $
+   --       PVCS Version     : $Revision:   2.29  $
    --
    --
    --   Author : Jonathan Mills
@@ -55,7 +55,7 @@ CREATE OR REPLACE PACKAGE BODY nm3homo AS
 
    -- Log 713421
 
-   g_body_sccsid        CONSTANT VARCHAR2 (2000) := '"$Revision:   2.28  $"';
+   g_body_sccsid        CONSTANT VARCHAR2 (2000) := '"$Revision:   2.29  $"';
    --  g_body_sccsid is the SCCS ID for the package body
    --
    g_package_name       CONSTANT VARCHAR2 (30) := 'nm3homo';
@@ -784,15 +784,8 @@ CREATE OR REPLACE PACKAGE BODY nm3homo AS
 
                IF NOT l_found_par
                THEN
-                  IF     NVL (l_loc_man, 'N') = 'N'
-                     AND NVL (l_rel_mandatory.itg_mandatory, 'N') = 'N'
-                  THEN
-                     UPDATE nm_inv_item_groupings
-                        SET iig_end_date = p_effective_date
-                      WHERE iig_item_id = l_rec_iit.iit_ne_id;
-                  ELSIF     NVL (l_loc_man, 'N') = 'Y'
-                        AND NVL (l_rel_mandatory.itg_mandatory, 'N') = 'N'
-                        AND l_rel_mandatory.itg_relation =
+                  IF NVL (l_rel_mandatory.itg_mandatory, 'N') = 'N'
+                     AND l_rel_mandatory.itg_relation =
                                nm3invval.c_derived_relation
                   THEN
                      UPDATE nm_inv_item_groupings
