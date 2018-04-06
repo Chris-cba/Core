@@ -1,11 +1,11 @@
 ----------------------------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm_4700_fix59.sql-arc   1.0   Apr 06 2018 15:07:10   Chris.Baugh  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm_4700_fix59.sql-arc   1.1   Apr 06 2018 16:30:04   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm_4700_fix59.sql  $ 
---       Date into PVCS   : $Date:   Apr 06 2018 15:07:10  $
---       Date fetched Out : $Modtime:   Mar 27 2018 10:09:34  $
---       Version     	  : $Revision:   1.0  $
+--       Date into PVCS   : $Date:   Apr 06 2018 16:30:04  $
+--       Date fetched Out : $Modtime:   Apr 06 2018 16:29:06  $
+--       Version     	  : $Revision:   1.1  $
 --
 ----------------------------------------------------------------------------------------------------
 --   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
@@ -113,7 +113,7 @@ DECLARE
   obj_exists EXCEPTION;
   PRAGMA exception_init( obj_exists, -955);
 BEGIN
-  EXECUTE IMMEDIATE 'CREATE INDEX nex_ind1 ON nm_elements_xrefs(nex_id1)';
+  EXECUTE IMMEDIATE 'CREATE INDEX nex_ind1 ON nm_element_xrefs(nex_id1)';
 EXCEPTION
   WHEN obj_exists THEN
     NULL;
@@ -124,7 +124,7 @@ DECLARE
   obj_exists EXCEPTION;
   PRAGMA exception_init( obj_exists, -955);
 BEGIN
-  EXECUTE IMMEDIATE 'CREATE INDEX nex_ind2 ON nm_elements_xrefs(nex_id2)';
+  EXECUTE IMMEDIATE 'CREATE INDEX nex_ind2 ON nm_element_xrefs(nex_id2)';
 EXCEPTION
   WHEN obj_exists THEN
     NULL;
