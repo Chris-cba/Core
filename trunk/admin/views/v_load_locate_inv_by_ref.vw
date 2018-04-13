@@ -16,7 +16,7 @@ SELECT
 --   v_load_locate_inv_by_ref
 --
 -----------------------------------------------------------------------------
---    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--    Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
   iit.iit_ne_id,
   iit.iit_start_date effective_date,

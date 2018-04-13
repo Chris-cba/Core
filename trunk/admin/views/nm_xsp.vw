@@ -16,15 +16,15 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/nm_xsp.vw-arc   2.2   Sep 15 2014 14:34:16   Chris.Baugh  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/views/nm_xsp.vw-arc   2.3   Apr 13 2018 11:47:22   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   nm_xsp.vw  $
---       Date into PVCS   : $Date:   Sep 15 2014 14:34:16  $
---       Date fetched Out : $Modtime:   Sep 03 2014 14:09:28  $
---       Version          : $Revision:   2.2  $
+--       Date into PVCS   : $Date:   Apr 13 2018 11:47:22  $
+--       Date fetched Out : $Modtime:   Apr 13 2018 11:36:08  $
+--       Version          : $Revision:   2.3  $
 -------------------------------------------------------------------------
 --
 -----------------------------------------------------------------------------
---   Copyright (c) 2014 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
    SELECT nwx_nw_type,

@@ -17,7 +17,7 @@ SELECT
 --   Used as part of the network model validation
 --
 -----------------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 ----------------------------------------------------------------------------- 
           hau_authority_code agency_code
         , hau_name

@@ -10,15 +10,15 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/nm_xsp_related_inv_types.vw-arc   1.0   Sep 15 2014 14:19:20   Chris.Baugh  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/views/nm_xsp_related_inv_types.vw-arc   1.1   Apr 13 2018 11:47:22   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   nm_xsp_related_inv_types.vw  $
---       Date into PVCS   : $Date:   Sep 15 2014 14:19:20  $
---       Date fetched Out : $Modtime:   Sep 03 2014 14:50:12  $
---       Version          : $Revision:   1.0  $
+--       Date into PVCS   : $Date:   Apr 13 2018 11:47:22  $
+--       Date fetched Out : $Modtime:   Apr 13 2018 11:36:08  $
+--       Version          : $Revision:   1.1  $
 -------------------------------------------------------------------------
 --
 -----------------------------------------------------------------------------
---   Copyright (c) 2014 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
    SELECT nit_screen_seq,

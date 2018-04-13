@@ -14,7 +14,7 @@ SELECT
 --   Dummy view for loading nm_members records through CSV loader interface
 --
 -----------------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
        ne_unique       ne_unique
       ,ne_nt_type      ne_nt_type

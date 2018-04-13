@@ -4,14 +4,14 @@ SELECT
 -----------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/views/nm_user_aus.vw-arc   2.4   Jul 04 2013 11:20:52   James.Wadsworth  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/views/nm_user_aus.vw-arc   2.5   Apr 13 2018 11:47:22   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   nm_user_aus.vw  $
---       Date into PVCS   : $Date:   Jul 04 2013 11:20:52  $
---       Date fetched Out : $Modtime:   Jul 04 2013 10:33:42  $
---       PVCS Version     : $Revision:   2.4  $
+--       Date into PVCS   : $Date:   Apr 13 2018 11:47:22  $
+--       Date fetched Out : $Modtime:   Apr 13 2018 11:36:08  $
+--       PVCS Version     : $Revision:   2.5  $
 --
 -----------------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
        *

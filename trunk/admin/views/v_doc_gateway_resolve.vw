@@ -9,14 +9,14 @@ Select
         -------------------------------------------------------------------------
         --   PVCS Identifiers :-
         --
-        --       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/v_doc_gateway_resolve.vw-arc   1.1   Jul 04 2013 11:35:12   James.Wadsworth  $
+        --       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/views/v_doc_gateway_resolve.vw-arc   1.2   Apr 13 2018 11:47:22   Gaurav.Gaurkar  $
         --       Module Name      : $Workfile:   v_doc_gateway_resolve.vw  $
-        --       Date into PVCS   : $Date:   Jul 04 2013 11:35:12  $
-        --       Date fetched Out : $Modtime:   Jul 04 2013 11:29:02  $
-        --       Version          : $Revision:   1.1  $
+        --       Date into PVCS   : $Date:   Apr 13 2018 11:47:22  $
+        --       Date fetched Out : $Modtime:   Apr 13 2018 11:36:08  $
+        --       Version          : $Revision:   1.2  $
         --       Based on SCCS version : 
         -----------------------------------------------------------------------------
-        --   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+        --   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
         -----------------------------------------------------------------------------
         --
         Gateway_Name,

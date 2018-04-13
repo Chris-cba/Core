@@ -14,7 +14,7 @@ SELECT
 --   Dummy view used to rescale routes from the CSV loader
 --
 -----------------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
         ne_unique
        ,ne_nt_type

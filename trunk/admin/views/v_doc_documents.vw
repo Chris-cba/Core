@@ -3,12 +3,16 @@ CREATE OR REPLACE FORCE VIEW v_doc_documents
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/v_doc_documents.vw-arc   2.1   Jul 04 2013 11:20:52   James.Wadsworth  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/views/v_doc_documents.vw-arc   2.2   Apr 13 2018 11:47:22   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   v_doc_documents.vw  $
---       Date into PVCS   : $Date:   Jul 04 2013 11:20:52  $
---       Date fetched Out : $Modtime:   Jul 04 2013 10:33:42  $
---       Version          : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   Apr 13 2018 11:47:22  $
+--       Date fetched Out : $Modtime:   Apr 13 2018 11:36:08  $
+--       Version          : $Revision:   2.2  $
 -------------------------------------------------------------------------
+--
+-----------------------------------------------------------------------------
+-- Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
 --
 (
 	doc_id
