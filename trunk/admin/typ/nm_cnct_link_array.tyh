@@ -14,7 +14,7 @@ CREATE OR REPLACE TYPE nm_cnct_link_array AS OBJECT
 --   NM3 Connectivity object - link array type
 --
 -------------------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 
 ( ncla_link nm_cnct_link_array_type

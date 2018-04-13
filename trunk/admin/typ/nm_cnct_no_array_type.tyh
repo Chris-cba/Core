@@ -14,7 +14,7 @@ CREATE OR REPLACE TYPE nm_cnct_no_array_type AS
 --   NM3 Connectivity object - node array type
 --
 -------------------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 
 VARRAY(1048576) OF nm_cnct_no;

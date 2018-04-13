@@ -7,6 +7,9 @@ CREATE OR REPLACE type nm_code_name_meaning_type as object (
 --       Date fetched Out : 07/06/13 17:04:31
 --       SCCS Version     : 1.1
 --
+-----------------------------------------------------------------------------
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
 --
 --   Author : Priid Tanava
 --

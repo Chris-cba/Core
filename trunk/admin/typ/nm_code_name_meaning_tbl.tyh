@@ -8,6 +8,10 @@ CREATE OR REPLACE type nm_code_name_meaning_tbl
 --       SCCS Version     : 1.1
 --
 --
+-----------------------------------------------------------------------------
+--    Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
 --   Author : Priid Tanava
 --
 --   Generic type

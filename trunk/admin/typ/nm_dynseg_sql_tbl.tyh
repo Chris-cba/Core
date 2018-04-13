@@ -3,17 +3,17 @@ type nm_dynseg_sql_tbl
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/typ/nm_dynseg_sql_tbl.tyh-arc   2.1   Jul 04 2013 10:14:06   James.Wadsworth  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/typ/nm_dynseg_sql_tbl.tyh-arc   2.2   Apr 13 2018 10:14:38   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   nm_dynseg_sql_tbl.tyh  $
---       Date into PVCS   : $Date:   Jul 04 2013 10:14:06  $
---       Date fetched Out : $Modtime:   Jul 04 2013 09:59:38  $
---       PVCS Version     : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   Apr 13 2018 10:14:38  $
+--       Date fetched Out : $Modtime:   Apr 13 2018 10:07:30  $
+--       PVCS Version     : $Revision:   2.2  $
 --       Based on sccs version : 
 --
 --   Author : Priidu Tanava
 --
 -----------------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 as table of nm_dynseg_sql_type
 /
