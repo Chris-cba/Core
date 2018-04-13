@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY Pre_Migration_Check AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/mig/pre_migration_check.pkb-arc   2.4   Jul 04 2013 16:49:10   James.Wadsworth  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/mig/pre_migration_check.pkb-arc   2.5   Apr 13 2018 07:38:18   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   pre_migration_check.pkb  $
---       Date into PVCS   : $Date:   Jul 04 2013 16:49:10  $
---       Date fetched Out : $Modtime:   Jul 04 2013 16:46:22  $
---       PVCS Version     : $Revision:   2.4  $
+--       Date into PVCS   : $Date:   Apr 13 2018 07:38:18  $
+--       Date fetched Out : $Modtime:   Apr 13 2018 07:25:08  $
+--       PVCS Version     : $Revision:   2.5  $
 --
 --
 --   Author : Darren Cope/Stuart Marshall/Graeme Johnson
@@ -16,7 +16,7 @@ CREATE OR REPLACE PACKAGE BODY Pre_Migration_Check AS
 --   pre_migration_check body
 --
 -----------------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 --all global package variables here
@@ -25,7 +25,7 @@ CREATE OR REPLACE PACKAGE BODY Pre_Migration_Check AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT VARCHAR2(2000) := '"$Revision:   2.4  $"';
+  g_body_sccsid  CONSTANT VARCHAR2(2000) := '"$Revision:   2.5  $"';
 
   g_package_name CONSTANT VARCHAR2(30) := 'pre_migration_check';
 
