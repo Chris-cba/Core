@@ -3,16 +3,16 @@ SELECT
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/views/v_node_proximity_check.vw-arc   1.0   Mar 12 2015 13:51:10   Chris.Baugh  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/views/v_node_proximity_check.vw-arc   1.1   Apr 13 2018 11:47:26   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   v_node_proximity_check.vw  $
---       Date into PVCS   : $Date:   Mar 12 2015 13:51:10  $
---       Date fetched Out : $Modtime:   Mar 11 2015 10:42:58  $
---       Version          : $Revision:   1.0  $
+--       Date into PVCS   : $Date:   Apr 13 2018 11:47:26  $
+--       Date fetched Out : $Modtime:   Apr 13 2018 11:44:40  $
+--       Version          : $Revision:   1.1  $
 --
 --   Product upgrade script
 --
 -----------------------------------------------------------------------------
---   Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
        ROW_NUMBER () OVER (ORDER BY ne_id, distance) objectid,

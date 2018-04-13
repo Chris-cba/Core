@@ -2,18 +2,18 @@
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/views/v_nm_sde_column_registry.vw-arc   1.2   Jul 04 2013 11:24:48   James.Wadsworth  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/views/v_nm_sde_column_registry.vw-arc   1.3   Apr 13 2018 11:47:26   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   v_nm_sde_column_registry.vw  $
---       Date into PVCS   : $Date:   Jul 04 2013 11:24:48  $
---       Date fetched Out : $Modtime:   Jul 04 2013 10:33:42  $
---       PVCS Version     : $Revision:   1.2  $
+--       Date into PVCS   : $Date:   Apr 13 2018 11:47:26  $
+--       Date fetched Out : $Modtime:   Apr 13 2018 11:44:38  $
+--       PVCS Version     : $Revision:   1.3  $
 --
 --   Author : R.A. Coupe
 --
 --   View used to predict values in the SDE column_registry
 --
 -----------------------------------------------------------------------------
--- Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-- Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 CREATE OR REPLACE VIEW v_nm_sde_column_registry
@@ -22,18 +22,18 @@ AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/views/v_nm_sde_column_registry.vw-arc   1.2   Jul 04 2013 11:24:48   James.Wadsworth  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/views/v_nm_sde_column_registry.vw-arc   1.3   Apr 13 2018 11:47:26   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   v_nm_sde_column_registry.vw  $
---       Date into PVCS   : $Date:   Jul 04 2013 11:24:48  $
---       Date fetched Out : $Modtime:   Jul 04 2013 10:33:42  $
---       PVCS Version     : $Revision:   1.2  $
+--       Date into PVCS   : $Date:   Apr 13 2018 11:47:26  $
+--       Date fetched Out : $Modtime:   Apr 13 2018 11:44:38  $
+--       PVCS Version     : $Revision:   1.3  $
 --
 --   Author : R.A. Coupe
 --
 --   View used to predict values in the SDE column_registry
 --
 -----------------------------------------------------------------------------
--- Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-- Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --  
           CAST (SYS_CONTEXT ('NM3SQL', 'NSCR_TABLE_NAME') AS NVARCHAR2 (160))

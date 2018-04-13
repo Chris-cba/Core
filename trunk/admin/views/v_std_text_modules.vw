@@ -10,14 +10,14 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/v_std_text_modules.vw-arc   1.1   Jul 04 2013 11:35:14   James.Wadsworth  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/views/v_std_text_modules.vw-arc   1.2   Apr 13 2018 11:47:26   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   v_std_text_modules.vw  $
---       Date into PVCS   : $Date:   Jul 04 2013 11:35:14  $
---       Date fetched Out : $Modtime:   Jul 04 2013 11:33:48  $
---       Version          : $Revision:   1.1  $
+--       Date into PVCS   : $Date:   Apr 13 2018 11:47:26  $
+--       Date fetched Out : $Modtime:   Apr 13 2018 11:44:38  $
+--       Version          : $Revision:   1.2  $
 --       Based on SCCS version : 
 -----------------------------------------------------------------------------
---    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--    Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 -- 
      hmi_module_item_id, hmi_module_name, hmo_title, hmi_field_desc,

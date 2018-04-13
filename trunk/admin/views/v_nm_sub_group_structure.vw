@@ -17,18 +17,18 @@ AS
 select 
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/views/v_nm_sub_group_structure.vw-arc   1.0   May 05 2015 12:10:48   Rob.Coupe  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/views/v_nm_sub_group_structure.vw-arc   1.1   Apr 13 2018 11:47:26   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   v_nm_sub_group_structure.vw  $
---       Date into PVCS   : $Date:   May 05 2015 12:10:48  $
---       Date fetched Out : $Modtime:   May 05 2015 12:09:50  $
---       PVCS Version     : $Revision:   1.0  $
+--       Date into PVCS   : $Date:   Apr 13 2018 11:47:26  $
+--       Date fetched Out : $Modtime:   Apr 13 2018 11:44:38  $
+--       PVCS Version     : $Revision:   1.1  $
 --
 --   Author : R.A. Coupe
 --
 --   A context driven view to expose components of a group type hierarchy, used in the generation of groups of groups layers
 --
 -----------------------------------------------------------------------------
--- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
+-- Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 ----------------------------------------------------------------------------
 --
 t.*, 

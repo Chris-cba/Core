@@ -1,4 +1,9 @@
 CREATE OR replace force view v_nse_datums AS
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
 SELECT
   nsm_nse_id nse_id,
   nsm_id,
