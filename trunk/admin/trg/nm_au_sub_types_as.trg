@@ -16,7 +16,7 @@ ON NM_AU_SUB_TYPES
 --
 --
 -----------------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 BEGIN
   nm3api_admin_unit.process_g_tab_nsty;
