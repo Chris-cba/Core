@@ -17,7 +17,7 @@ DECLARE
 --    nm_nt_groupings_all_a_stm
 --
 -----------------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 BEGIN
   nm3nwval.process_nng_tab;

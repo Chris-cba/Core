@@ -8,11 +8,11 @@ DECLARE
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm_members_sdo_trg.trg-arc   2.2   Jul 04 2013 09:53:32   James.Wadsworth  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/trg/nm_members_sdo_trg.trg-arc   2.3   Apr 13 2018 11:06:36   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   nm_members_sdo_trg.trg  $
---       Date into SCCS   : $Date:   Jul 04 2013 09:53:32  $
---       Date fetched Out : $Modtime:   Jul 04 2013 09:35:32  $
---       SCCS Version     : $Revision:   2.2  $
+--       Date into SCCS   : $Date:   Apr 13 2018 11:06:36  $
+--       Date fetched Out : $Modtime:   Apr 13 2018 10:58:46  $
+--       SCCS Version     : $Revision:   2.3  $
 --       Based on 
 --
 --
@@ -25,7 +25,7 @@ DECLARE
 --
 --
 -----------------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 

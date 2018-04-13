@@ -19,7 +19,7 @@ DECLARE
 --   Create NM_LINEAR_TYPES trigger
 --
 -----------------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 	 
    l_rec_nt			nm_types%ROWTYPE;

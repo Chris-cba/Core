@@ -6,11 +6,16 @@ for each row
 declare
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm_nw_ad_link_whole_flag_trg.sql-arc   2.1   Jul 04 2013 09:54:28   James.Wadsworth  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/trg/nm_nw_ad_link_whole_flag_trg.sql-arc   2.2   Apr 13 2018 11:06:36   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   nm_nw_ad_link_whole_flag_trg.sql  $
---       Date into PVCS   : $Date:   Jul 04 2013 09:54:28  $
---       Date fetched Out : $Modtime:   Jul 04 2013 09:35:32  $
---       PVCS Version     : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   Apr 13 2018 11:06:36  $
+--       Date fetched Out : $Modtime:   Apr 13 2018 10:50:04  $
+--       PVCS Version     : $Revision:   2.2  $
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
 begin
   if :new.nad_whole_road = '0' then
     :new.nad_member_id := :new.nad_iit_ne_id;

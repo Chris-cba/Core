@@ -18,7 +18,7 @@ DECLARE
 --    so that stored results don't hang around
 --
 -----------------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 BEGIN
    DELETE FROM nm_upload_files

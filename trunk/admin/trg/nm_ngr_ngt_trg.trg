@@ -3,14 +3,14 @@ CREATE OR REPLACE TRIGGER nm_ngr_ngt_trg
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm_ngr_ngt_trg.trg-arc   3.1   Jul 04 2013 09:58:54   James.Wadsworth  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/trg/nm_ngr_ngt_trg.trg-arc   3.2   Apr 13 2018 11:06:36   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   nm_ngr_ngt_trg.trg  $
---       Date into PVCS   : $Date:   Jul 04 2013 09:58:54  $
---       Date fetched Out : $Modtime:   Jul 04 2013 09:57:16  $
---       PVCS Version     : $Revision:   3.1  $
+--       Date into PVCS   : $Date:   Apr 13 2018 11:06:36  $
+--       Date fetched Out : $Modtime:   Apr 13 2018 10:58:46  $
+--       PVCS Version     : $Revision:   3.2  $
 --
 ------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 ------------------------------------------------------------------
 --
 BEFORE INSERT OR UPDATE
