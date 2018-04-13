@@ -2,14 +2,14 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/utl/728768_partial_ddl_upg.sql-arc   3.1   Jul 04 2013 10:29:56   James.Wadsworth  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/utl/728768_partial_ddl_upg.sql-arc   3.2   Apr 13 2018 12:53:20   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   728768_partial_ddl_upg.sql  $
---       Date into PVCS   : $Date:   Jul 04 2013 10:29:56  $
---       Date fetched Out : $Modtime:   Jul 04 2013 10:19:34  $
---       PVCS Version     : $Revision:   3.1  $
+--       Date into PVCS   : $Date:   Apr 13 2018 12:53:20  $
+--       Date fetched Out : $Modtime:   Apr 13 2018 12:49:46  $
+--       PVCS Version     : $Revision:   3.2  $
 --
 -----------------------------------------------------------------------------
---    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--    Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 
