@@ -16,7 +16,7 @@ as select
 --       SCCS Version     : 1.1
 --
 -----------------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
   NTF_NTH_THEME_ID,
   NTF_HMO_MODULE,

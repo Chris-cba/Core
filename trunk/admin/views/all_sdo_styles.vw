@@ -13,14 +13,14 @@ SELECT
 -----------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/views/all_sdo_styles.vw-arc   1.0   Jul 20 2015 15:07:22   Upendra.Hukeri  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/views/all_sdo_styles.vw-arc   1.1   Apr 13 2018 11:47:14   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   all_sdo_styles.vw  $
---       Date into PVCS   : $Date:   Jul 20 2015 15:07:22  $
---       Date fetched Out : $Modtime:   Jul 14 2015 16:12:00  $
---       Version          : $Revision:   1.0  $
+--       Date into PVCS   : $Date:   Apr 13 2018 11:47:14  $
+--       Date fetched Out : $Modtime:   Apr 13 2018 11:30:00  $
+--       Version          : $Revision:   1.1  $
 --
 -----------------------------------------------------------------------------------
--- Copyright (c) 2015 Bentley Systems Incorporated.  All rights reserved.
+-- Copyright (c) 2018 Bentley Systems Incorporated.  All rights reserved.
 -----------------------------------------------------------------------------------
 --
 	HUS_USERNAME OWNER

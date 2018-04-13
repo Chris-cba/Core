@@ -18,7 +18,7 @@ SELECT
 -- along with the read/write permission of the current user
 --
 -----------------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
        hdir.hdir_name

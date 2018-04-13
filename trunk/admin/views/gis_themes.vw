@@ -12,7 +12,7 @@ SELECT
 --   gis_themes View
 --
 -----------------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
        *
  FROM  gis_themes_all

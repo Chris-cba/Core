@@ -18,7 +18,7 @@ SELECT
 -- where the current user has write permission (granted via a role)
 --
 -----------------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
       hdir.hdir_name

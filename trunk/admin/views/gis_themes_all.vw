@@ -17,7 +17,7 @@ select
 --       SCCS Version     : 1.1
 --
 -----------------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 NTH_THEME_ID, 
 NTH_THEME_NAME, 
