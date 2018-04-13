@@ -2,15 +2,15 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/sql/log_nm_4700_fix11.sql-arc   3.1   Feb 09 2017 10:30:48   James.Wadsworth  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/sql/log_nm_4700_fix11.sql-arc   3.2   Apr 13 2018 13:21:46   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   log_nm_4700_fix11.sql  $
---       Date into PVCS   : $Date:   Feb 09 2017 10:30:48  $
---       Date fetched Out : $Modtime:   Feb 09 2017 09:49:44  $
---       PVCS Version     : $Revision:   3.1  $
+--       Date into PVCS   : $Date:   Apr 13 2018 13:21:46  $
+--       Date fetched Out : $Modtime:   Apr 13 2018 13:20:38  $
+--       PVCS Version     : $Revision:   3.2  $
 --
 --
 --------------------------------------------------------------------------------
---   Copyright (c) 2017 Bentley Systems Incorporated.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 --------------------------------------------------------------------------------
 --
 BEGIN

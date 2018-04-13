@@ -15,7 +15,7 @@ DECLARE
 --    %YourObjectname%
 --
 -----------------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 CURSOR cs_had IS
   SELECT hig_address.rowid
