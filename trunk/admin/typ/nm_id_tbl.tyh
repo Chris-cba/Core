@@ -13,7 +13,7 @@ CREATE OR REPLACE TYPE nm_id_tbl
 --   Author : %USERNAME%
 --
 -----------------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 as table of number(12)
 /
