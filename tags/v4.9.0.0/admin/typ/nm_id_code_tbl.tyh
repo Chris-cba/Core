@@ -1,0 +1,19 @@
+CREATE OR REPLACE
+type nm_id_code_tbl
+--
+--   PVCS Identifiers :-
+--
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/typ/nm_id_code_tbl.tyh-arc   2.2   Apr 13 2018 10:14:40   Gaurav.Gaurkar  $
+--       Module Name      : $Workfile:   nm_id_code_tbl.tyh  $
+--       Date into PVCS   : $Date:   Apr 13 2018 10:14:40  $
+--       Date fetched Out : $Modtime:   Apr 13 2018 10:07:28  $
+--       PVCS Version     : $Revision:   2.2  $
+--       Based on sccs version : 
+--
+--   Author : Priidu Tanava
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+as table of nm_id_code_type
+/
