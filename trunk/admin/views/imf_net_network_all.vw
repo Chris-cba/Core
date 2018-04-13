@@ -26,14 +26,14 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/imf_net_network_all.vw-arc   3.1   Jul 04 2013 11:20:30   James.Wadsworth  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/views/imf_net_network_all.vw-arc   3.2   Apr 13 2018 11:47:16   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   imf_net_network_all.vw  $
---       Date into PVCS   : $Date:   Jul 04 2013 11:20:30  $
---       Date fetched Out : $Modtime:   Jul 04 2013 11:03:32  $
---       Version          : $Revision:   3.1  $
+--       Date into PVCS   : $Date:   Apr 13 2018 11:47:16  $
+--       Date fetched Out : $Modtime:   Apr 13 2018 11:32:38  $
+--       Version          : $Revision:   3.2  $
 -- All network elements with an ID, Unique Reference and Description and generic flexible attributes
 -----------------------------------------------------------------------------
---    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--    Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
    ne.ne_id network_element_id,
    CASE

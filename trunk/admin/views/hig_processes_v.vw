@@ -42,13 +42,13 @@ SELECT
         -------------------------------------------------------------------------
         --   PVCS Identifiers :-
         --
-        --       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/views/hig_processes_v.vw-arc   3.6   Nov 28 2017 13:52:04   Chris.Baugh  $
+        --       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/views/hig_processes_v.vw-arc   3.7   Apr 13 2018 11:47:16   Gaurav.Gaurkar  $
         --       Module Name      : $Workfile:   hig_processes_v.vw  $
-        --       Date into PVCS   : $Date:   Nov 28 2017 13:52:04  $
-        --       Date fetched Out : $Modtime:   Nov 24 2017 11:19:52  $
-        --       Version          : $Revision:   3.6  $
+        --       Date into PVCS   : $Date:   Apr 13 2018 11:47:16  $
+        --       Date fetched Out : $Modtime:   Apr 13 2018 11:31:38  $
+        --       Version          : $Revision:   3.7  $
         -----------------------------------------------------------------------------
-        --    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+        --    Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
         -----------------------------------------------------------------------------
         --
    HP_PROCESS_ID,

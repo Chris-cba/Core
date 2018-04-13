@@ -10,7 +10,7 @@ SELECT
 --       SCCS Version     : 1.5
 --
 -----------------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
     nau_admin_unit

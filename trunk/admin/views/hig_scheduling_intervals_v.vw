@@ -4,13 +4,13 @@ SELECT
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/hig_scheduling_intervals_v.vw-arc   3.1   Jul 04 2013 11:20:06   James.Wadsworth  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/views/hig_scheduling_intervals_v.vw-arc   3.2   Apr 13 2018 11:47:16   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   hig_scheduling_intervals_v.vw  $
---       Date into PVCS   : $Date:   Jul 04 2013 11:20:06  $
---       Date fetched Out : $Modtime:   Jul 04 2013 10:58:18  $
---       Version          : $Revision:   3.1  $
+--       Date into PVCS   : $Date:   Apr 13 2018 11:47:16  $
+--       Date fetched Out : $Modtime:   Apr 13 2018 11:31:38  $
+--       Version          : $Revision:   3.2  $
 -----------------------------------------------------------------------------
---    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--    Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
        hsfr_frequency_id

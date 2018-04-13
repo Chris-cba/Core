@@ -11,13 +11,13 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/hist_undo_views.vw-arc   2.2   Jul 04 2013 11:20:06   James.Wadsworth  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/views/hist_undo_views.vw-arc   2.3   Apr 13 2018 11:47:16   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   hist_undo_views.vw  $
---       Date into PVCS   : $Date:   Jul 04 2013 11:20:06  $
---       Date fetched Out : $Modtime:   Jul 04 2013 11:00:34  $
---       Version          : $Revision:   2.2  $
+--       Date into PVCS   : $Date:   Apr 13 2018 11:47:16  $
+--       Date fetched Out : $Modtime:   Apr 13 2018 11:32:38  $
+--       Version          : $Revision:   2.3  $
 -----------------------------------------------------------------------------
---    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--    Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 SELECT DISTINCT old_ne_id
@@ -38,11 +38,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/hist_undo_views.vw-arc   2.2   Jul 04 2013 11:20:06   James.Wadsworth  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/views/hist_undo_views.vw-arc   2.3   Apr 13 2018 11:47:16   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   hist_undo_views.vw  $
---       Date into PVCS   : $Date:   Jul 04 2013 11:20:06  $
---       Date fetched Out : $Modtime:   Jul 04 2013 11:00:34  $
---       Version          : $Revision:   2.2  $
+--       Date into PVCS   : $Date:   Apr 13 2018 11:47:16  $
+--       Date fetched Out : $Modtime:   Apr 13 2018 11:32:38  $
+--       Version          : $Revision:   2.3  $
 -------------------------------------------------------------------------
 --
 SELECT DISTINCT new_ne_id

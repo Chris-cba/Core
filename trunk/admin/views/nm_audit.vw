@@ -13,7 +13,7 @@ SELECT
 --  nm_audit: view providing old interface to new audit table structure 
 --
 -----------------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
   na_audit_id, 
   nach_column_id  na_column_id, 
