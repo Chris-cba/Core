@@ -1,14 +1,14 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/trg/nm_inv_items_all_del_mem_chk.trg-arc   2.2   Jul 04 2013 09:53:24   James.Wadsworth  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/trg/nm_inv_items_all_del_mem_chk.trg-arc   2.3   Apr 13 2018 11:06:28   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   nm_inv_items_all_del_mem_chk.trg  $
---       Date into PVCS   : $Date:   Jul 04 2013 09:53:24  $
---       Date fetched Out : $Modtime:   Jul 04 2013 09:49:30  $
---       Version          : $Revision:   2.2  $
+--       Date into PVCS   : $Date:   Apr 13 2018 11:06:28  $
+--       Date fetched Out : $Modtime:   Apr 13 2018 10:56:02  $
+--       Version          : $Revision:   2.3  $
 --
 -----------------------------------------------------------------------------
---    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--    Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 CREATE OR REPLACE TRIGGER nm_inv_items_all_del_mem_chk

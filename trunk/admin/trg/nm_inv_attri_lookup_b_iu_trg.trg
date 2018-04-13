@@ -23,7 +23,7 @@ DECLARE
 --       FOR   EACH ROW
 --
 -----------------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
    l_rec_id nm_inv_domains_all%ROWTYPE;
