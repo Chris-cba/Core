@@ -6,11 +6,11 @@ CREATE OR REPLACE TRIGGER a_ins_nm_elements
 DECLARE
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm_elements_trg.sql-arc   2.5   Jul 04 2013 09:53:20   James.Wadsworth  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/trg/nm_elements_trg.sql-arc   2.6   Apr 13 2018 11:06:24   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   nm_elements_trg.sql  $
---       Date into SCCS   : $Date:   Jul 04 2013 09:53:20  $
---       Date fetched Out : $Modtime:   Jul 04 2013 09:35:32  $
---       SCCS Version     : $Revision:   2.5  $
+--       Date into SCCS   : $Date:   Apr 13 2018 11:06:24  $
+--       Date fetched Out : $Modtime:   Apr 13 2018 10:50:04  $
+--       SCCS Version     : $Revision:   2.6  $
 --       Based on 
 --       Based on 1.11
 --
@@ -20,7 +20,7 @@ DECLARE
 --       FOR    EACH ROW
 --
 -----------------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
    l_tab_nnu_no_node_id nm3type.tab_number;
@@ -86,11 +86,11 @@ CREATE OR REPLACE TRIGGER b_upd_nm_elements
 DECLARE
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm_elements_trg.sql-arc   2.5   Jul 04 2013 09:53:20   James.Wadsworth  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/trg/nm_elements_trg.sql-arc   2.6   Apr 13 2018 11:06:24   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   nm_elements_trg.sql  $
---       Date into SCCS   : $Date:   Jul 04 2013 09:53:20  $
---       Date fetched Out : $Modtime:   Jul 04 2013 09:35:32  $
---       SCCS Version     : $Revision:   2.5  $
+--       Date into SCCS   : $Date:   Apr 13 2018 11:06:24  $
+--       Date fetched Out : $Modtime:   Apr 13 2018 10:50:04  $
+--       SCCS Version     : $Revision:   2.6  $
 --       Based on 
 --       Based on 1.11
 --
@@ -100,7 +100,7 @@ DECLARE
 --       FOR     EACH ROW
 --
 -----------------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
    c_dummy_date CONSTANT date   := TO_DATE('01011801','DDMMYYYY');
@@ -210,11 +210,11 @@ CREATE OR REPLACE TRIGGER b_ins_nm_elements
 BEGIN
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm_elements_trg.sql-arc   2.5   Jul 04 2013 09:53:20   James.Wadsworth  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/trg/nm_elements_trg.sql-arc   2.6   Apr 13 2018 11:06:24   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   nm_elements_trg.sql  $
---       Date into SCCS   : $Date:   Jul 04 2013 09:53:20  $
---       Date fetched Out : $Modtime:   Jul 04 2013 09:35:32  $
---       SCCS Version     : $Revision:   2.5  $
+--       Date into SCCS   : $Date:   Apr 13 2018 11:06:24  $
+--       Date fetched Out : $Modtime:   Apr 13 2018 10:50:04  $
+--       SCCS Version     : $Revision:   2.6  $
 --       Based on 
 --       Based on 1.11
 --
@@ -224,7 +224,7 @@ BEGIN
 --       FOR     EACH ROW
 --
 -----------------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
   --MJA add 31-Aug-07
   --New functionality to allow override
@@ -266,11 +266,11 @@ CREATE OR REPLACE TRIGGER a_del_nm_elements
 DECLARE
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm_elements_trg.sql-arc   2.5   Jul 04 2013 09:53:20   James.Wadsworth  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/trg/nm_elements_trg.sql-arc   2.6   Apr 13 2018 11:06:24   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   nm_elements_trg.sql  $
---       Date into SCCS   : $Date:   Jul 04 2013 09:53:20  $
---       Date fetched Out : $Modtime:   Jul 04 2013 09:35:32  $
---       SCCS Version     : $Revision:   2.5  $
+--       Date into SCCS   : $Date:   Apr 13 2018 11:06:24  $
+--       Date fetched Out : $Modtime:   Apr 13 2018 10:50:04  $
+--       SCCS Version     : $Revision:   2.6  $
 --       Based on 
 --
 --     TRIGGER a_del_nm_elements
@@ -279,7 +279,7 @@ DECLARE
 --       FOR     EACH ROW
 --
 -----------------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
    no_spatial_exists EXCEPTION;
@@ -368,11 +368,11 @@ DECLARE
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm_elements_trg.sql-arc   2.5   Jul 04 2013 09:53:20   James.Wadsworth  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/trg/nm_elements_trg.sql-arc   2.6   Apr 13 2018 11:06:24   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   nm_elements_trg.sql  $
---       Date into SCCS   : $Date:   Jul 04 2013 09:53:20  $
---       Date fetched Out : $Modtime:   Jul 04 2013 09:35:32  $
---       SCCS Version     : $Revision:   2.5  $
+--       Date into SCCS   : $Date:   Apr 13 2018 11:06:24  $
+--       Date fetched Out : $Modtime:   Apr 13 2018 10:50:04  $
+--       SCCS Version     : $Revision:   2.6  $
 --       Based on 
 --       Based on 1.11
 --
@@ -382,7 +382,7 @@ DECLARE
 --       FOR     EACH ROW
 --
 -----------------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
    CURSOR cs_other_usages (p_ne_id    nm_node_usages_all.nnu_ne_id%TYPE
