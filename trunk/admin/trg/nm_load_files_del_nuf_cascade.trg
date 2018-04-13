@@ -20,7 +20,7 @@ DECLARE
 --   NM_LOAD_FILES trigger to cascade delete associated NM_UPLOAD_FILES records
 --
 -----------------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 BEGIN

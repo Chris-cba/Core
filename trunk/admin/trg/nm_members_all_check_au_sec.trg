@@ -13,7 +13,7 @@ BEGIN
 --    AFTER INSERT OR UPDATE ON NM_MEMBERS_ALL
 --
 -----------------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 --  dbms_output.put_line( 'Checking security - after statement');

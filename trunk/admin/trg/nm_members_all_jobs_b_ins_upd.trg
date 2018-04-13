@@ -20,7 +20,7 @@ DECLARE
 --     Handles locking of items being operated on by an NM3 job.
 --
 -----------------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 BEGIN
   nm3job.check_job_member_lock(pi_nm_type     => :NEW.nm_type

@@ -8,11 +8,11 @@ DECLARE
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm_members_all_nw_edit_audit.trg-arc   2.1   Jul 04 2013 09:53:32   James.Wadsworth  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/trg/nm_members_all_nw_edit_audit.trg-arc   2.2   Apr 13 2018 11:06:34   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   nm_members_all_nw_edit_audit.trg  $
---       Date into PVCS   : $Date:   Jul 04 2013 09:53:32  $
---       Date fetched Out : $Modtime:   Jul 04 2013 09:35:32  $
---       PVCS Version     : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   Apr 13 2018 11:06:34  $
+--       Date fetched Out : $Modtime:   Apr 13 2018 10:58:46  $
+--       PVCS Version     : $Revision:   2.2  $
 --
 --
 --   Author : Kevin Angus
@@ -20,7 +20,7 @@ DECLARE
 --    nm_members_all_nw_edit_audit
 --
 -----------------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 BEGIN
   if    :new.nm_type = 'G'

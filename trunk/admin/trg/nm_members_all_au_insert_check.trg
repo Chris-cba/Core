@@ -4,11 +4,11 @@ CREATE OR REPLACE TRIGGER NM_MEMBERS_ALL_AU_INSERT_CHECK
 DECLARE
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/trg/nm_members_all_au_insert_check.trg-arc   2.3   Nov 06 2015 15:22:44   Rob.Coupe  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/trg/nm_members_all_au_insert_check.trg-arc   2.4   Apr 13 2018 11:06:34   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   nm_members_all_au_insert_check.trg  $
---       Date into SCCS   : $Date:   Nov 06 2015 15:22:44  $
---       Date fetched Out : $Modtime:   Nov 06 2015 15:23:36  $
---       SCCS Version     : $Revision:   2.3  $
+--       Date into SCCS   : $Date:   Apr 13 2018 11:06:34  $
+--       Date fetched Out : $Modtime:   Apr 13 2018 10:58:46  $
+--       SCCS Version     : $Revision:   2.4  $
 --       Based on 
 --
 --   TRIGGER NM_MEMBERS_ALL_AU_INSERT_CHECK
@@ -16,7 +16,7 @@ DECLARE
 --    FOR EACH ROW
 --
 -----------------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
    l_rec_each_nm nm3ausec.rec_each_nm;
