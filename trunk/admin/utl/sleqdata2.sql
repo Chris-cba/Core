@@ -1,14 +1,14 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/utl/sleqdata2.sql-arc   2.1   Jul 04 2013 10:30:14   James.Wadsworth  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/utl/sleqdata2.sql-arc   2.2   Apr 13 2018 12:53:22   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   sleqdata2.sql  $
---       Date into PVCS   : $Date:   Jul 04 2013 10:30:14  $
---       Date fetched Out : $Modtime:   Jul 04 2013 10:28:40  $
---       Version          : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   Apr 13 2018 12:53:22  $
+--       Date fetched Out : $Modtime:   Apr 13 2018 12:51:54  $
+--       Version          : $Revision:   2.2  $
 --
 -----------------------------------------------------------------------------
---    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--    Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 --

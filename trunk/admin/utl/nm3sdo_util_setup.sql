@@ -1,14 +1,14 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/utl/nm3sdo_util_setup.sql-arc   1.2   Jul 04 2013 10:30:12   James.Wadsworth  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/utl/nm3sdo_util_setup.sql-arc   1.3   Apr 13 2018 12:53:22   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   nm3sdo_util_setup.sql  $
---       Date into PVCS   : $Date:   Jul 04 2013 10:30:12  $
---       Date fetched Out : $Modtime:   Jul 04 2013 10:25:20  $
---       Version          : $Revision:   1.2  $
+--       Date into PVCS   : $Date:   Apr 13 2018 12:53:22  $
+--       Date fetched Out : $Modtime:   Apr 13 2018 12:51:54  $
+--       Version          : $Revision:   1.3  $
 --
 -----------------------------------------------------------------------------
---    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--    Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 DECLARE

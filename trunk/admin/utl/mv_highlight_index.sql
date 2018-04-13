@@ -2,14 +2,14 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/utl/mv_highlight_index.sql-arc   3.2   Jul 04 2013 10:30:12   James.Wadsworth  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/utl/mv_highlight_index.sql-arc   3.3   Apr 13 2018 12:53:22   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   mv_highlight_index.sql  $
---       Date into PVCS   : $Date:   Jul 04 2013 10:30:12  $
---       Date fetched Out : $Modtime:   Jul 04 2013 10:24:58  $
---       PVCS Version     : $Revision:   3.2  $
+--       Date into PVCS   : $Date:   Apr 13 2018 12:53:22  $
+--       Date fetched Out : $Modtime:   Apr 13 2018 12:51:54  $
+--       PVCS Version     : $Revision:   3.3  $
 --
 -----------------------------------------------------------------------------
---    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--    Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 --
