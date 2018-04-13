@@ -1,3 +1,8 @@
+--
+------------------------------------------------------------------
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
+------------------------------------------------------------------
+--
 Insert into hig_option_list (Select 'NEWDOCMAN','HIG','New Document Manager','If this is "Y" the documents are stored in eB else documents are stored in exor.','Y_OR_N','VARCHAR2','N','N',1 From dual 
 Where Not Exists (Select 1 From hig_option_list
                   Where hol_id = 'NEWDOCMAN' ))
