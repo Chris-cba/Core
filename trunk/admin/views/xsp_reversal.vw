@@ -13,15 +13,15 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/xsp_reversal.vw-arc   2.2   Sep 15 2014 14:37:24   Chris.Baugh  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/views/xsp_reversal.vw-arc   2.3   Apr 13 2018 11:47:28   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   xsp_reversal.vw  $
---       Date into PVCS   : $Date:   Sep 15 2014 14:37:24  $
---       Date fetched Out : $Modtime:   Sep 03 2014 14:10:00  $
---       Version          : $Revision:   2.2  $
+--       Date into PVCS   : $Date:   Apr 13 2018 11:47:28  $
+--       Date fetched Out : $Modtime:   Apr 13 2018 11:44:38  $
+--       Version          : $Revision:   2.3  $
 -------------------------------------------------------------------------
 --
 -----------------------------------------------------------------------------
---   Copyright (c) 2014 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
    SELECT XRV_NW_TYPE,
