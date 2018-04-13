@@ -12,7 +12,10 @@ DECLARE
 --
 --
 --   Author : R.A. Coupe
-
+-----------------------------------------------------------------------------
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
 l_ndse_id integer;
 BEGIN
    l_ndse_id := 0;

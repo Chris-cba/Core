@@ -21,7 +21,7 @@ BEGIN
 --    FOR EACH ROW
 --
 -----------------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
    IF :new.nmc_sec_or_val = 'VAL'
