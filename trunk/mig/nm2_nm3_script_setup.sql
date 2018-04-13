@@ -6,11 +6,11 @@ clear screen
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/mig/nm2_nm3_script_setup.sql-arc   2.3   Jul 04 2013 16:49:10   James.Wadsworth  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/nm3/mig/nm2_nm3_script_setup.sql-arc   2.4   Apr 13 2018 07:38:16   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   nm2_nm3_script_setup.sql  $
---       Date into PVCS   : $Date:   Jul 04 2013 16:49:10  $
+--       Date into PVCS   : $Date:   Apr 13 2018 07:38:16  $
 --       Date fetched Out : $Modtime:   Jul 04 2013 16:46:22  $
---       PVCS Version     : $Revision:   2.3  $
+--       PVCS Version     : $Revision:   2.4  $
 --       Based on SCCS version :
 --
 -----------------------------------------------------------------------------
