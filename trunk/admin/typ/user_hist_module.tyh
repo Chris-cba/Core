@@ -13,7 +13,7 @@ CREATE OR REPLACE TYPE user_hist_module AS object  (
 --    TYPE user_hist_module
 --
 -----------------------------------------------------------------------------
---    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--    Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
    uhi_module varchar2(30)
