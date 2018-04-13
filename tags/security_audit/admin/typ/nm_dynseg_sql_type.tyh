@@ -1,0 +1,30 @@
+CREATE OR REPLACE
+type nm_dynseg_sql_type
+--
+--   PVCS Identifiers :-
+--
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/typ/nm_dynseg_sql_type.tyh-arc   2.2   Apr 13 2018 10:14:38   Gaurav.Gaurkar  $
+--       Module Name      : $Workfile:   nm_dynseg_sql_type.tyh  $
+--       Date into PVCS   : $Date:   Apr 13 2018 10:14:38  $
+--       Date fetched Out : $Modtime:   Apr 13 2018 10:07:30  $
+--       PVCS Version     : $Revision:   2.2  $
+--       Based on sccs version : 
+--
+--   Author : Priidu Tanava
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+as object (
+   call_func      varchar2(30)
+  ,call_invtype   varchar2(4)
+  ,call_xsp       varchar2(4)
+  ,call_attrib    varchar2(30)
+  ,call_value     varchar2(50)
+  ,nit_table      varchar2(30)
+  ,ita_attrib     varchar2(30)
+  ,iit_attrib     varchar2(30)
+  ,ita_format     varchar2(10)
+)
+/
+
