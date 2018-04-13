@@ -14,7 +14,7 @@
 --    nm_type_columns_biu_row_trg
 --
 -----------------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 CREATE OR REPLACE TRIGGER hov_hol_length_trg
