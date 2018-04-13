@@ -4,11 +4,11 @@ CREATE OR REPLACE TRIGGER nm_inv_items_all_sdo_b_upd
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm_inv_items_all_sdo_b_upd.trg-arc   2.2   Jul 04 2013 09:53:24   James.Wadsworth  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/trg/nm_inv_items_all_sdo_b_upd.trg-arc   2.3   Apr 13 2018 11:06:30   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   nm_inv_items_all_sdo_b_upd.trg  $
---       Date into SCCS   : $Date:   Jul 04 2013 09:53:24  $
---       Date fetched Out : $Modtime:   Jul 04 2013 09:38:46  $
---       SCCS Version     : $Revision:   2.2  $
+--       Date into SCCS   : $Date:   Apr 13 2018 11:06:30  $
+--       Date fetched Out : $Modtime:   Apr 13 2018 10:56:54  $
+--       SCCS Version     : $Revision:   2.3  $
 --       Based on 
 --
 --   Author  : Ade Edwards
@@ -16,7 +16,7 @@ CREATE OR REPLACE TRIGGER nm_inv_items_all_sdo_b_upd
 --             which are then posted to nm3sdo_edit global array for
 --             regeneration of shapes
 -----------------------------------------------------------------------------
---    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--    Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 --
