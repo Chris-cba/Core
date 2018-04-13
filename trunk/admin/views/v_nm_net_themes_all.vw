@@ -18,9 +18,11 @@ SELECT
 --       Date fetched Out : 07/06/13 17:08:38
 --       SCCS Version     : 1.2
 --
------------------------------------------------------------------------------
---  Copyright (c) exor corporation ltd, 2006
------------------------------------------------------------------------------
+--
+--------------------------------------------------------------------------------------------------------------------
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
+--------------------------------------------------------------------------------------------------------------------
+--
        nth_theme_id, nth_theme_name, nth_base_table_theme, 'L', nlt_nt_type,
        nlt_gty_type, nlt_g_i_d
   FROM nm_themes_all, nm_nw_themes, nm_linear_types

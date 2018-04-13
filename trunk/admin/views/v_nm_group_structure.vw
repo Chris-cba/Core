@@ -11,19 +11,21 @@ AS
    SELECT 
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/views/v_nm_group_structure.vw-arc   1.0   May 05 2015 12:26:26   Rob.Coupe  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/views/v_nm_group_structure.vw-arc   1.1   Apr 13 2018 11:47:24   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   v_nm_group_structure.vw  $
---       Date into PVCS   : $Date:   May 05 2015 12:26:26  $
---       Date fetched Out : $Modtime:   May 05 2015 12:25:52  $
---       PVCS Version     : $Revision:   1.0  $
+--       Date into PVCS   : $Date:   Apr 13 2018 11:47:24  $
+--       Date fetched Out : $Modtime:   Apr 13 2018 11:41:12  $
+--       PVCS Version     : $Revision:   1.1  $
 --
 --   Author : R.A. Coupe
 --
 --   A view to provide the group-type structure.
 --
------------------------------------------------------------------------------
--- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
-----------------------------------------------------------------------------
+--
+--------------------------------------------------------------------------------------------------------------------
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
+--------------------------------------------------------------------------------------------------------------------
+--
 --    
           ngr_parent_group_type parent_group_type,
           ngr_child_group_type child_group_type,

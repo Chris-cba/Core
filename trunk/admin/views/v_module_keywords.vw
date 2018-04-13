@@ -1,4 +1,7 @@
 CREATE OR replace force view V_MODULE_KEYWORDS AS
+-----------------------------------------------------------------------------
+--    Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
 SELECT
   hmk_hmo_module,
   hmo_title,

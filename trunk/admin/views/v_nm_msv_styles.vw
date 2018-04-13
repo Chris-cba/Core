@@ -5,16 +5,16 @@ SELECT
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/views/v_nm_msv_styles.vw-arc   3.1   Jun 22 2015 08:13:52   Upendra.Hukeri  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/views/v_nm_msv_styles.vw-arc   3.2   Apr 13 2018 11:47:24   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   v_nm_msv_styles.vw  $
---       Date into PVCS   : $Date:   Jun 22 2015 08:13:52  $
---       Date fetched Out : $Modtime:   Jun 19 2015 05:31:44  $
---       PVCS Version     : $Revision:   3.1  $
+--       Date into PVCS   : $Date:   Apr 13 2018 11:47:24  $
+--       Date fetched Out : $Modtime:   Apr 13 2018 11:41:12  $
+--       PVCS Version     : $Revision:   3.2  $
 --
 --   Product upgrade script
 --
 --------------------------------------------------------------------------------------------------------------------
---   Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 --------------------------------------------------------------------------------------------------------------------
 --
     theme.name theme_name,

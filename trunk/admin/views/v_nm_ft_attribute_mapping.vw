@@ -4,14 +4,14 @@ AS
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/v_nm_ft_attribute_mapping.vw-arc   2.2   Jul 04 2013 11:35:14   James.Wadsworth  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/views/v_nm_ft_attribute_mapping.vw-arc   2.3   Apr 13 2018 11:47:24   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   v_nm_ft_attribute_mapping.vw  $
---       Date into PVCS   : $Date:   Jul 04 2013 11:35:14  $
---       Date fetched Out : $Modtime:   Jul 04 2013 11:31:18  $
---       Version          : $Revision:   2.2  $
+--       Date into PVCS   : $Date:   Apr 13 2018 11:47:24  $
+--       Date fetched Out : $Modtime:   Apr 13 2018 11:38:10  $
+--       Version          : $Revision:   2.3  $
 --
 -----------------------------------------------------------------------------
---    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--    Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 select

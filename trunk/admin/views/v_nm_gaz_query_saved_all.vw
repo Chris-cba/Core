@@ -30,14 +30,14 @@ AS
     -------------------------------------------------------------------------
     --   PVCS Identifiers :-
     --
-    --       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/v_nm_gaz_query_saved_all.vw-arc   3.1   Jul 04 2013 11:35:14   James.Wadsworth  $
+    --       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/views/v_nm_gaz_query_saved_all.vw-arc   3.2   Apr 13 2018 11:47:24   Gaurav.Gaurkar  $
     --       Module Name      : $Workfile:   v_nm_gaz_query_saved_all.vw  $
-    --       Date into PVCS   : $Date:   Jul 04 2013 11:35:14  $
-    --       Date fetched Out : $Modtime:   Jul 04 2013 11:32:30  $
-    --       Version          : $Revision:   3.1  $
+    --       Date into PVCS   : $Date:   Apr 13 2018 11:47:24  $
+    --       Date fetched Out : $Modtime:   Apr 13 2018 11:41:12  $
+    --       Version          : $Revision:   3.2  $
     --       Based on SCCS version : 
     -----------------------------------------------------------------------------
-    --    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+    --    Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
     -----------------------------------------------------------------------------
              ngqs_ngq_id,
              ngqs_source_id,
