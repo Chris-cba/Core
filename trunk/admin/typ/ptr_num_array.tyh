@@ -17,7 +17,7 @@ OBJECT (
 --   TYPE ptr_num_array
 --
 -----------------------------------------------------------------------------
---    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--    Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 pa ptr_num_array_type 

@@ -15,7 +15,7 @@ CREATE OR REPLACE TYPE PTR_ARRAY AS OBJECT (
 --   TYPE ptr_array
 --
 -----------------------------------------------------------------------------
---    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--    Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
   pa ptr_array_type

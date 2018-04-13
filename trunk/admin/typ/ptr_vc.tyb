@@ -16,7 +16,7 @@ CREATE OR REPLACE type body ptr_vc is
 --   TYPE ptr_vc
 --
 -----------------------------------------------------------------------------
---    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--    Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 
