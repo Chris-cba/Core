@@ -4,14 +4,14 @@
 -----------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       pvcsid                     : $Header:   //vm_latest/archives/nm3/admin/trg/who_trg.sql-arc   2.5   Jul 04 2013 09:55:36   James.Wadsworth  $
+--       pvcsid                     : $Header:   //new_vm_latest/archives/nm3/admin/trg/who_trg.sql-arc   2.6   Apr 13 2018 11:06:58   Gaurav.Gaurkar  $
 --       Module Name                : $Workfile:   who_trg.sql  $
---       Date into PVCS             : $Date:   Jul 04 2013 09:55:36  $
---       Date fetched Out           : $Modtime:   Jul 04 2013 09:41:42  $
---       PVCS Version               : $Revision:   2.5  $
+--       Date into PVCS             : $Date:   Apr 13 2018 11:06:58  $
+--       Date fetched Out           : $Modtime:   Apr 13 2018 10:50:04  $
+--       PVCS Version               : $Revision:   2.6  $
 --       Based on SCCS version      : 1.4
 -----------------------------------------------------------------------------
--- Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-- Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 set serveroutput on size 100000
 --
@@ -44,16 +44,16 @@ BEGIN
    l_tab_comments(1)  := '--';
    l_tab_comments(2)  := '--   SCCS Identifiers :-';
    l_tab_comments(3)  := '--';
-   l_tab_comments(4)  := '--       pvcsid                     : $Header:   //vm_latest/archives/nm3/admin/trg/who_trg.sql-arc   2.5   Jul 04 2013 09:55:36   James.Wadsworth  $';
+   l_tab_comments(4)  := '--       pvcsid                     : $Header:   //new_vm_latest/archives/nm3/admin/trg/who_trg.sql-arc   2.6   Apr 13 2018 11:06:58   Gaurav.Gaurkar  $';
    l_tab_comments(5)  := '--       Module Name                : $Workfile:   who_trg.sql  $';
-   l_tab_comments(6)  := '--       Date into PVCS             : $Date:   Jul 04 2013 09:55:36  $';
-   l_tab_comments(7)  := '--       Date fetched Out           : $Modtime:   Jul 04 2013 09:41:42  $';
-   l_tab_comments(8)  := '--       PVCS Version               : $Revision:   2.5  $';
+   l_tab_comments(6)  := '--       Date into PVCS             : $Date:   Apr 13 2018 11:06:58  $';
+   l_tab_comments(7)  := '--       Date fetched Out           : $Modtime:   Apr 13 2018 10:50:04  $';
+   l_tab_comments(8)  := '--       PVCS Version               : $Revision:   2.6  $';
    l_tab_comments(9)  := '--';
    l_tab_comments(10) := '--   table_name_WHO trigger';
    l_tab_comments(11) := '--';
    l_tab_comments(12) := '-----------------------------------------------------------------------------';
-   l_tab_comments(13) := '--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.';
+   l_tab_comments(13) := '--    Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.';
    l_tab_comments(14) := '-----------------------------------------------------------------------------';
    l_tab_comments(15) := '--';
 

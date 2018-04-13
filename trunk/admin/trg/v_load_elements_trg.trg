@@ -19,7 +19,7 @@ DECLARE
 --   v_load_elements_trg Trigger
 --
 -----------------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
    CURSOR cs_node_exists ( c_no_node_id NM_NODES.no_node_id%TYPE )
