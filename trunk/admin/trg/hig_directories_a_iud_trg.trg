@@ -22,7 +22,7 @@ DECLARE
 --
 --
 -----------------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 
  l_hdir_rec_old  hig_directories%ROWTYPE;

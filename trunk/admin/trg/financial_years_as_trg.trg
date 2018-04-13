@@ -13,7 +13,7 @@ DECLARE
 --       SCCS Version     : 1.1
 --
 -----------------------------------------------------------------------------
---    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--    Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 BEGIN
    hig_tab_fyr.enforce_contiguous_sequence;
