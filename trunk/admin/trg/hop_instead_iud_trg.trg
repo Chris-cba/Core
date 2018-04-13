@@ -20,7 +20,7 @@ DECLARE
 --   hop_instead_iud_trg INSTEAD OF trigger on HIG_OPTIONS
 --
 -----------------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
    l_rec_hol   hig_option_list%ROWTYPE;
