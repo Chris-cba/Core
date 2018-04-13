@@ -19,7 +19,7 @@ DECLARE
 --    nm_type_columns_biu_row_trg
 --
 -----------------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
    
   l_ntc_old_rec nm_type_columns%ROWTYPE;

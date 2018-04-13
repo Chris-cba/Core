@@ -17,7 +17,7 @@ DECLARE
 --    nm_type_columns_aiud_stm_trg
 --
 -----------------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 
   l_db_action  varchar2(10);
