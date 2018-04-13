@@ -1,14 +1,14 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/mig/dbtune_sdo_geometry.sql-arc   2.1   Jul 04 2013 16:49:08   James.Wadsworth  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/mig/dbtune_sdo_geometry.sql-arc   2.2   Apr 13 2018 07:38:08   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   dbtune_sdo_geometry.sql  $
---       Date into PVCS   : $Date:   Jul 04 2013 16:49:08  $
---       Date fetched Out : $Modtime:   Jul 04 2013 16:47:14  $
---       Version          : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   Apr 13 2018 07:38:08  $
+--       Date fetched Out : $Modtime:   Apr 13 2018 07:24:50  $
+--       Version          : $Revision:   2.2  $
 --
 -----------------------------------------------------------------------------
---    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--    Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 REM sccsid = '"@(#)dbtune_sdo_geometry.sql	1.2 02/09/05"'

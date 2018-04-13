@@ -1,14 +1,14 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/mig/migrate_failed_locations.sql-arc   2.1   Jul 04 2013 16:49:08   James.Wadsworth  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/mig/migrate_failed_locations.sql-arc   2.2   Apr 13 2018 07:38:08   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   migrate_failed_locations.sql  $
---       Date into PVCS   : $Date:   Jul 04 2013 16:49:08  $
---       Date fetched Out : $Modtime:   Jul 04 2013 16:48:08  $
---       Version          : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   Apr 13 2018 07:38:08  $
+--       Date fetched Out : $Modtime:   Apr 13 2018 07:24:28  $
+--       Version          : $Revision:   2.2  $
 --
 -----------------------------------------------------------------------------
---    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--    Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 define sccsid = '"@(#)migrate_failed_locations.sql	1.1 12/24/04"'
