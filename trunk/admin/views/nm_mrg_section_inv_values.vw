@@ -1,14 +1,14 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/nm_mrg_section_inv_values.vw-arc   2.2   Jul 04 2013 11:20:34   James.Wadsworth  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/views/nm_mrg_section_inv_values.vw-arc   2.3   Apr 13 2018 11:47:20   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   nm_mrg_section_inv_values.vw  $
---       Date into PVCS   : $Date:   Jul 04 2013 11:20:34  $
---       Date fetched Out : $Modtime:   Jul 04 2013 10:46:36  $
---       Version          : $Revision:   2.2  $
+--       Date into PVCS   : $Date:   Apr 13 2018 11:47:20  $
+--       Date fetched Out : $Modtime:   Apr 13 2018 11:34:00  $
+--       Version          : $Revision:   2.3  $
 --
 -----------------------------------------------------------------------------
---    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--    Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 DECLARE
@@ -46,7 +46,7 @@ BEGIN
    append ('--       SCCS Version     : 1.1');
    append ('--');
    append ('-----------------------------------------------------------------------------');
-   append ('--	Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.');
+   append ('--	Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.');
    append ('-----------------------------------------------------------------------------');
    append ('--');
    append ('        *');

@@ -15,7 +15,7 @@ SELECT /*+ INDEX (nmf nmf_nmq_fk_ind) */
 --   Author : Jonathan Mills
 --
 -----------------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
        nmf.*
