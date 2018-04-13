@@ -1,3 +1,8 @@
+--
+------------------------------------------------------------------
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
+------------------------------------------------------------------
+--
 clear screen
 
 undefine p_midtieruser
