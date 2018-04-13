@@ -2,13 +2,13 @@ CREATE OR REPLACE TYPE BODY nm_placement_array AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/typ/nm_placement_array.tyb-arc   2.3   02 Dec 2016 18:52:42   Mike.Huitson  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/typ/nm_placement_array.tyb-arc   2.4   Apr 13 2018 10:14:52   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   nm_placement_array.tyb  $
---       Date into PVCS   : $Date:   02 Dec 2016 18:52:42  $
---       Date fetched Out : $Modtime:   02 Dec 2016 18:52:00  $
---       Version          : $Revision:   2.3  $
+--       Date into PVCS   : $Date:   Apr 13 2018 10:14:52  $
+--       Date fetched Out : $Modtime:   Apr 13 2018 10:03:14  $
+--       Version          : $Revision:   2.4  $
 -------------------------------------------------------------------------
---   Copyright (c) 2016 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -------------------------------------------------------------------------
 --
 --
@@ -194,7 +194,7 @@ END dump_placement_array;
 STATIC FUNCTION get_body_version
   RETURN VARCHAR2 IS
 BEGIN
-  RETURN '$Revision:   2.3  $';
+  RETURN '$Revision:   2.4  $';
 END get_body_version;
 --
 ------------------------------------------------------------------------------------------------
