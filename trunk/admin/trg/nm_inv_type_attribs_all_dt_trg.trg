@@ -14,7 +14,7 @@ DECLARE
 --       SCCS Version     : %I%
 --
 -----------------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
    l_start_date DATE := :NEW.ITA_START_DATE;

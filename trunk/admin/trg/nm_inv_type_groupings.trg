@@ -17,7 +17,7 @@ DECLARE
 --       for     each row
 --
 -----------------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
    l_rec_itg nm_inv_type_groupings%ROWTYPE;
 BEGIN
