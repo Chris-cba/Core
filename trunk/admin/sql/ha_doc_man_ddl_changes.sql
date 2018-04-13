@@ -1,4 +1,8 @@
-
+--
+------------------------------------------------------------------
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
+------------------------------------------------------------------
+--
 Declare
 --
    l_exception exception;
