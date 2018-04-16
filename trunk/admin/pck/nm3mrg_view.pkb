@@ -1,11 +1,11 @@
 create or replace package body nm3mrg_view as
 --   PVCS Identifiers :-
 --
---       pvcsid                 : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mrg_view.pkb-arc   2.8   Jul 04 2013 16:16:08   James.Wadsworth  $
+--       pvcsid                 : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3mrg_view.pkb-arc   2.9   Apr 16 2018 09:23:04   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   nm3mrg_view.pkb  $
---       Date into PVCS   : $Date:   Jul 04 2013 16:16:08  $
---       Date fetched Out : $Modtime:   Jul 04 2013 14:25:16  $
---       PVCS Version     : $Revision:   2.8  $
+--       Date into PVCS   : $Date:   Apr 16 2018 09:23:04  $
+--       Date fetched Out : $Modtime:   Apr 16 2018 09:01:36  $
+--       PVCS Version     : $Revision:   2.9  $
 --       Based on SCCS version     : 1.38
 --
 --
@@ -14,7 +14,7 @@ create or replace package body nm3mrg_view as
 --   NM3 Merge View Creation Package body
 --
 -----------------------------------------------------------------------------
--- Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-- Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 
@@ -29,7 +29,7 @@ create or replace package body nm3mrg_view as
 */
 
 
-   g_body_sccsid      CONSTANT  VARCHAR2(200) := '"$Revision:   2.8  $"';
+   g_body_sccsid      CONSTANT  VARCHAR2(200) := '"$Revision:   2.9  $"';
    g_package_name     CONSTANT  VARCHAR2(30)  := 'nm3mrg_view';
    
    cr constant varchar2(1) := chr(10);

@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE nm3mrg_view AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mrg_view.pkh-arc   2.2   Jul 04 2013 16:16:08   James.Wadsworth  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3mrg_view.pkh-arc   2.3   Apr 16 2018 09:23:04   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   nm3mrg_view.pkh  $
---       Date into PVCS   : $Date:   Jul 04 2013 16:16:08  $
---       Date fetched Out : $Modtime:   Jul 04 2013 14:25:16  $
---       Version          : $Revision:   2.2  $
+--       Date into PVCS   : $Date:   Apr 16 2018 09:23:04  $
+--       Date fetched Out : $Modtime:   Apr 16 2018 09:16:12  $
+--       Version          : $Revision:   2.3  $
 --       Based on SCCS version : 1.10
 -------------------------------------------------------------------------
 --
@@ -16,12 +16,12 @@ CREATE OR REPLACE PACKAGE nm3mrg_view AS
 --   NM3 Merge View Creation Package
 --
 -----------------------------------------------------------------------------
--- Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-- Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
 --  g_sccsid is the SCCS ID for the package
-   g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.2  $';
+   g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.3  $';
 --
   g_views_to_del   nm3type.tab_varchar30;
   g_tab_nmq_id_del nm3type.tab_number;
