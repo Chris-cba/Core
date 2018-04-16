@@ -13,6 +13,11 @@ CREATE OR REPLACE PACKAGE Timer AS
 --
 --   Timer package
 --
+--
+---------------------------------------------------------------------------------------------------
+-- Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
+---------------------------------------------------------------------------------------------------
+--
 -------------------------------------------------------------------------------
 g_time_values ptr_num_array := Nm3array.init_ptr_num_array;
 g_time_text   ptr_vc_array := Nm3array.init_ptr_vc_array;

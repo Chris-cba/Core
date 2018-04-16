@@ -3,21 +3,21 @@ AS
 -----------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/web_user_info.pkh-arc   3.4   Jul 17 2015 16:09:36   Upendra.Hukeri  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/web_user_info.pkh-arc   3.5   Apr 16 2018 09:24:02   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   web_user_info.pkh  $
---       Date into PVCS   : $Date:   Jul 17 2015 16:09:36  $
---       Date fetched Out : $Modtime:   Jul 17 2015 12:27:46  $
---       Version          : $Revision:   3.4  $
+--       Date into PVCS   : $Date:   Apr 16 2018 09:24:02  $
+--       Date fetched Out : $Modtime:   Apr 16 2018 09:19:36  $
+--       Version          : $Revision:   3.5  $
 --       Based on SCCS version :
 -----------------------------------------------------------------------------
---   Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
   -----------
   --constants
   -----------
 	--g_sccsid is the SCCS ID for the package
-	  g_Sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.4  $';
+	  g_Sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.5  $';
 	  g_account_user_id  integer;
 	  g_account_unrestricted Char(1);
 	  g_account_owner char(1);

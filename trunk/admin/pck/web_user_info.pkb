@@ -3,21 +3,21 @@ AS
 -----------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/web_user_info.pkb-arc   3.9   Dec 14 2017 07:52:50   Upendra.Hukeri  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/web_user_info.pkb-arc   3.10   Apr 16 2018 09:24:02   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   web_user_info.pkb  $
---       Date into PVCS   : $Date:   Dec 14 2017 07:52:50  $
---       Date fetched Out : $Modtime:   Dec 14 2017 07:50:52  $
---       Version          : $Revision:   3.9  $
+--       Date into PVCS   : $Date:   Apr 16 2018 09:24:02  $
+--       Date fetched Out : $Modtime:   Apr 16 2018 09:08:16  $
+--       Version          : $Revision:   3.10  $
 --       Based on SCCS version :
 -----------------------------------------------------------------------------
---   Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
   -----------
   --Constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-	g_Body_Sccsid CONSTANT  VARCHAR2(2000) :=  '$Revision:   3.9  $';
+	g_Body_Sccsid CONSTANT  VARCHAR2(2000) :=  '$Revision:   3.10  $';
   -----------
   --Variables
   -----------
