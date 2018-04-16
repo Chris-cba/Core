@@ -4,14 +4,14 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/hig_alert.pkh-arc   3.8   Mar 12 2015 15:25:30   Shivani.Gaind  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/hig_alert.pkh-arc   3.9   Apr 16 2018 09:21:52   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   hig_alert.pkh  $
---       Date into PVCS   : $Date:   Mar 12 2015 15:25:30  $
---       Date fetched Out : $Modtime:   Feb 13 2015 13:39:52  $
---       Version          : $Revision:   3.8  $
+--       Date into PVCS   : $Date:   Apr 16 2018 09:21:52  $
+--       Date fetched Out : $Modtime:   Apr 16 2018 09:09:50  $
+--       Version          : $Revision:   3.9  $
 --       Based on SCCS version :
 -----------------------------------------------------------------------------
---    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--    Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
@@ -20,7 +20,7 @@ AS
   --constants
   -----------
   --g_sccsid is the SCCS ID for the package
-  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.8  $';
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.9  $';
 --</GLOBVAR>
 --
 -----------------------------------------------------------------------------
