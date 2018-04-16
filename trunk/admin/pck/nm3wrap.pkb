@@ -3,14 +3,14 @@ CREATE OR REPLACE PACKAGE BODY nm3wrap AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3wrap.pkb-arc   2.5   May 11 2017 12:22:20   Chris.Baugh  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3wrap.pkb-arc   2.6   Apr 16 2018 09:23:50   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   nm3wrap.pkb  $
---       Date into PVCS   : $Date:   May 11 2017 12:22:20  $
---       Date fetched Out : $Modtime:   May 10 2017 08:43:18  $
---       Version          : $Revision:   2.5  $
+--       Date into PVCS   : $Date:   Apr 16 2018 09:23:50  $
+--       Date fetched Out : $Modtime:   Apr 16 2018 09:06:20  $
+--       Version          : $Revision:   2.6  $
 --       Based on SCCS version : 1.19
 ------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 ------------------------------------------------------------------
 --   Author : Kevin Angus
 --
@@ -21,7 +21,7 @@ CREATE OR REPLACE PACKAGE BODY nm3wrap AS
 --
 ------------------------------------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '$Revision:   2.5  $';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '$Revision:   2.6  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3wrap';
