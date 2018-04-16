@@ -3,13 +3,17 @@ AS
   -------------------------------------------------------------------------
   --   PVCS Identifiers :-
   --
-  --       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3info_tool.pkb-arc   3.3   Jul 04 2013 16:04:12   James.Wadsworth  $
+  --       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3info_tool.pkb-arc   3.4   Apr 16 2018 09:22:36   Gaurav.Gaurkar  $
   --       Module Name      : $Workfile:   nm3info_tool.pkb  $
-  --       Date into PVCS   : $Date:   Jul 04 2013 16:04:12  $
-  --       Date fetched Out : $Modtime:   Jul 04 2013 14:25:12  $
-  --       Version          : $Revision:   3.3  $
+  --       Date into PVCS   : $Date:   Apr 16 2018 09:22:36  $
+  --       Date fetched Out : $Modtime:   Apr 16 2018 09:00:30  $
+  --       Version          : $Revision:   3.4  $
   --       Based on SCCS version :
   -------------------------------------------------------------------------
+  --
+  ------------------------------------------------------------------
+  --   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
+  ------------------------------------------------------------------
   --
   --all global package variables here
 
@@ -17,7 +21,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid   CONSTANT VARCHAR2(2000) := '$Revision:   3.3  $';
+  g_body_sccsid   CONSTANT VARCHAR2(2000) := '$Revision:   3.4  $';
   g_package_name  CONSTANT VARCHAR2(30) := 'nm3info_tool';
   g_inv_attrs     nm3inv.tab_nita;
   g_is_ft         BOOLEAN; -- is the query a ft query

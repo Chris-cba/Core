@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3ins IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ins.pkb-arc   2.25   Jul 04 2013 16:04:30   James.Wadsworth  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3ins.pkb-arc   2.27   Apr 16 2018 09:22:36   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   nm3ins.pkb  $
---       Date into PVCS   : $Date:   Jul 04 2013 16:04:30  $
---       Date fetched Out : $Modtime:   Jul 04 2013 14:25:12  $
---       PVCS Version     : $Revision:   2.25  $
+--       Date into PVCS   : $Date:   Apr 16 2018 09:22:36  $
+--       Date fetched Out : $Modtime:   Apr 16 2018 09:00:30  $
+--       PVCS Version     : $Revision:   2.27  $
 --
 --
 --   Author : Jonathan Mills
@@ -16,15 +16,15 @@ CREATE OR REPLACE PACKAGE BODY nm3ins IS
 --   Generated package DO NOT MODIFY
 --
 --   nm3get_gen header : "@(#)nm3get_gen.pkh	1.3 12/05/05"
---   nm3get_gen body   : "$Revision:   2.25  $"
+--   nm3get_gen body   : "$Revision:   2.27  $"
 --
 -----------------------------------------------------------------------------
 --
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 --
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid CONSTANT  VARCHAR2(2000) := '"$Revision:   2.25  $"';
+   g_body_sccsid CONSTANT  VARCHAR2(2000) := '"$Revision:   2.27  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3ins';
@@ -6931,6 +6931,16 @@ BEGIN
 --
    p_rec_iit_all.iit_start_date                 := NVL(p_rec_iit_all.iit_start_date,TO_DATE('05111605','DDMMYYYY') );
 --
+  --
+  -- For Asset Attribute History CSV loader proceed with standard
+  -- asset insert if audit type is not set (normal asset insert) or
+  -- if it is set to nm3inv_item_aud.g_insert ('I' - Insert), 
+  -- i.e. is being inserted by the CSV Loader.
+  -- For other audit types assume this is an update to an existing asset and 
+  -- update the existing row. The audit trigger will take care of the rest of the processing.
+  --
+  if nvl(p_rec_iit_all.iit_audit_type, nm3inv_item_aud.g_insert) = nm3inv_item_aud.g_insert
+  THEN
    INSERT INTO nm_inv_items_all
             (iit_ne_id
             ,iit_inv_type
@@ -7606,6 +7616,17 @@ BEGIN
             ,p_rec_iit_all.iit_num_attrib113
             ,p_rec_iit_all.iit_num_attrib114
             ,p_rec_iit_all.iit_num_attrib115;
+  ELSE
+    --
+    -- Update to an existing Asset (Asset Attribute History)
+    --
+    -- The passed in record includes the appropriate value for iit_audit_type.
+    --
+    --nm3inv_item_aud.nii_set_audit_type(p_rec_iit_all.iit_audit_type);
+    
+    nm3inv_update.date_track_update_item(p_rec_iit_all.iit_ne_id
+                                        ,p_rec_iit_all);
+  END IF;
 --
    nm_debug.proc_end(g_package_name,'ins_iit_all');
 --
