@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY new_metadata_generate IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid                 : $Header:   //vm_latest/archives/nm3/admin/pck/new_metadata_generate.pkb-arc   3.3   Jul 04 2013 15:07:20   James.Wadsworth  $
+--       pvcsid                 : $Header:   //new_vm_latest/archives/nm3/admin/pck/new_metadata_generate.pkb-arc   3.4   Apr 16 2018 09:22:02   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   new_metadata_generate.pkb  $
---       Date into PVCS   : $Date:   Jul 04 2013 15:07:20  $
---       Date fetched Out : $Modtime:   Jul 04 2013 14:25:08  $
---       PVCS Version     : $Revision:   3.3  $
+--       Date into PVCS   : $Date:   Apr 16 2018 09:22:02  $
+--       Date fetched Out : $Modtime:   Apr 16 2018 08:54:24  $
+--       PVCS Version     : $Revision:   3.4  $
 --       Based on SCCS version : 
 --
 --   Author : Graeme Johnson
@@ -14,10 +14,10 @@ CREATE OR REPLACE PACKAGE BODY new_metadata_generate IS
 --   Package to generate the metadata creation scripts
 --
 -----------------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  varchar2(100) :='"$Revision:   3.3  $"';
+   g_body_sccsid     CONSTANT  varchar2(100) :='"$Revision:   3.4  $"';
 
 --  g_body_sccsid is the SCCS ID for the package body
 --

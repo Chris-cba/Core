@@ -3,19 +3,19 @@ CREATE OR REPLACE PACKAGE BODY Mapviewer AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/mapviewer.pkb-arc   2.11   Dec 08 2015 12:37:38   Rob.Coupe  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/mapviewer.pkb-arc   2.12   Apr 16 2018 09:22:02   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   mapviewer.pkb  $
---       Date into PVCS   : $Date:   Dec 08 2015 12:37:38  $
---       Date fetched Out : $Modtime:   Dec 08 2015 12:35:54  $
---       PVCS Version     : $Revision:   2.11  $
+--       Date into PVCS   : $Date:   Apr 16 2018 09:22:02  $
+--       Date fetched Out : $Modtime:   Apr 16 2018 08:54:24  $
+--       PVCS Version     : $Revision:   2.12  $
 
 
 --
 -----------------------------------------------------------------------------
---   Copyright (c) 2014 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(30) := '"$Revision:   2.11  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(30) := '"$Revision:   2.12  $"';
 
 
 FUNCTION Get_Scale RETURN NUMBER;

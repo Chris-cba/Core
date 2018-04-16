@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY Nm_Cncts IS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm_cncts.pkb-arc   2.3   Jul 04 2013 15:07:20   James.Wadsworth  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm_cncts.pkb-arc   2.4   Apr 16 2018 09:22:02   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   nm_cncts.pkb  $
---       Date into PVCS   : $Date:   Jul 04 2013 15:07:20  $
---       Date fetched Out : $Modtime:   Jul 04 2013 14:25:22  $
---       PVCS Version     : $Revision:   2.3  $
+--       Date into PVCS   : $Date:   Apr 16 2018 09:22:02  $
+--       Date fetched Out : $Modtime:   Apr 16 2018 08:54:24  $
+--       PVCS Version     : $Revision:   2.4  $
 --       Based on            1.5
 --
 --   Author : Rob Coupe
@@ -15,7 +15,7 @@ CREATE OR REPLACE PACKAGE BODY Nm_Cncts IS
 --   NM3 Connectivity package
 --
 -------------------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 
 

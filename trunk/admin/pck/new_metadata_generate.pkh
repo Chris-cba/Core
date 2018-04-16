@@ -3,22 +3,22 @@ CREATE OR REPLACE PACKAGE new_Metadata_Generate IS
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/new_metadata_generate.pkh-arc   3.1   Jul 04 2013 15:07:20   James.Wadsworth  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/new_metadata_generate.pkh-arc   3.2   Apr 16 2018 09:22:02   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   new_metadata_generate.pkh  $
---       Date into PVCS   : $Date:   Jul 04 2013 15:07:20  $
---       Date fetched Out : $Modtime:   Jul 04 2013 14:25:08  $
---       Version          : $Revision:   3.1  $
+--       Date into PVCS   : $Date:   Apr 16 2018 09:22:02  $
+--       Date fetched Out : $Modtime:   Apr 16 2018 09:11:40  $
+--       Version          : $Revision:   3.2  $
 --
 --   Author : Graeme Johnson
 --
 --   Package to generate the metadata creation scripts
 --
 -----------------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
-  g_sccsid      CONSTANT  VARCHAR2(80) := '$Revision:   3.1  $';
+  g_sccsid      CONSTANT  VARCHAR2(80) := '$Revision:   3.2  $';
 --  g_sccsid is the SCCS ID for the package
   g_trace                 BOOLEAN      := FALSE;
 -- g_trace is a variable which, if set will allow the package to output debugging messages

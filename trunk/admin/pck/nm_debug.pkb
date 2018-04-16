@@ -16,7 +16,7 @@ CREATE OR REPLACE PACKAGE BODY nm_debug AS
 --   Debug Package body
 --
 -----------------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 --all global package variables here
