@@ -3,30 +3,32 @@ CREATE OR REPLACE PACKAGE Nm3inv AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv.pkh-arc   2.5   Jul 04 2013 16:08:14   James.Wadsworth  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3inv.pkh-arc   2.7   Apr 16 2018 09:22:48   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   nm3inv.pkh  $
---       Date into SCCS   : $Date:   Jul 04 2013 16:08:14  $
---       Date fetched Out : $Modtime:   Jul 04 2013 16:07:50  $
---       SCCS Version     : $Revision:   2.5  $
+--       Date into SCCS   : $Date:   Apr 16 2018 09:22:48  $
+--       Date fetched Out : $Modtime:   Apr 16 2018 09:13:16  $
+--       SCCS Version     : $Revision:   2.7  $
 --       Based on 
 --
 --   nm3inv package header
 --
 -----------------------------------------------------------------------------
---    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--    Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 -- Amendments:-
 -- 30/11/2005  CParkinson  Add function get_inv_domain_value
 -- 24/01/2006  PStanton Added overloaded version of get_all_attrib_values to be used when
 --             when dealing with foreign table assets
+-- 10/10/2014  Added overloaded functions with effective date for get_attrib_value
+--             and get_all_attrib_values.
 --
 -----------------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 
 --</PACKAGE>
 --<GLOBVAR>
-  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.5  $';
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.7  $';
 --  some common error messages - prevent more than one database lookup
   g_thing_already_exists	VARCHAR2(2000);
   g_thing_does_not_exist	VARCHAR2(2000);
@@ -464,6 +466,19 @@ FUNCTION get_all_attribs(pi_inv_type IN NM_INV_TYPE_ATTRIBS.ita_inv_type%TYPE
   FUNCTION get_all_attrib_values(p_ne_id IN NM_INV_ITEMS.iit_ne_id%TYPE
                                 ,p_inv_type IN NM_INV_ITEMS.iit_inv_type%TYPE )
            RETURN attrib_table;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_all_attrib_values">
+-- This function returns a table containing attribute names and their values for a given
+-- inventory item. This is overloaded for use with foreign tabe assets, inv type is required
+-- since we have no control over the ne_id's of foreign items
+FUNCTION get_all_attrib_values(p_ne_id IN NM_INV_ITEMS.iit_ne_id%TYPE
+                              ,p_inv_type IN NM_INV_ITEMS.iit_inv_type%TYPE
+                              ,p_effective_date IN DATE )
+         RETURN nm3inv.attrib_table;
+
 --</PROC>
 --
 ----------------------------------------------------------------------------------------------

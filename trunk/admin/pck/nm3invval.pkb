@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY nm3invval IS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3invval.pkb-arc   2.20   Nov 06 2015 15:19:08   Rob.Coupe  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3invval.pkb-arc   2.21   Apr 16 2018 09:22:48   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   nm3invval.pkb  $
---       Date into PVCS   : $Date:   Nov 06 2015 15:19:08  $
---       Date fetched Out : $Modtime:   Nov 06 2015 15:18:54  $
---       Version          : $Revision:   2.20  $
+--       Date into PVCS   : $Date:   Apr 16 2018 09:22:48  $
+--       Date fetched Out : $Modtime:   Apr 16 2018 09:01:36  $
+--       Version          : $Revision:   2.21  $
 --       Based on SCCS version : 1.30
 -------------------------------------------------------------------------
 --
@@ -16,10 +16,10 @@ CREATE OR REPLACE PACKAGE BODY nm3invval IS
 --   NM3 Inventory validation package
 --
 -----------------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.20  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.21  $"';
 --  g_body_sccsid is the SCCS ID for the package body
    g_package_name    CONSTANT  varchar2(30)   := 'nm3invval';
 --

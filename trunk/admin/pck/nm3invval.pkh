@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE Nm3invval IS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3invval.pkh-arc   2.7   Jul 04 2013 16:11:38   James.Wadsworth  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3invval.pkh-arc   2.8   Apr 16 2018 09:22:48   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   nm3invval.pkh  $
---       Date into PVCS   : $Date:   Jul 04 2013 16:11:38  $
---       Date fetched Out : $Modtime:   Jul 04 2013 14:25:14  $
---       Version          : $Revision:   2.7  $
+--       Date into PVCS   : $Date:   Apr 16 2018 09:22:48  $
+--       Date fetched Out : $Modtime:   Apr 16 2018 09:14:32  $
+--       Version          : $Revision:   2.8  $
 --       Based on SCCS version : 1.13
 -------------------------------------------------------------------------
 --
@@ -17,12 +17,12 @@ CREATE OR REPLACE PACKAGE Nm3invval IS
 --   NM3 Inventory validation package
 --
 -----------------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --</PACKAGE>
 --
 --<GLOBVAR>
-  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.7  $';
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.8  $';
 --
    TYPE tab_nin IS TABLE OF nm_inv_nw%ROWTYPE INDEX BY BINARY_INTEGER;
 --
