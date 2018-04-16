@@ -3,20 +3,20 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3layer_tool.pkb-arc   2.40   May 12 2015 09:40:52   Chris.Baugh  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3layer_tool.pkb-arc   2.41   Apr 16 2018 09:22:50   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   nm3layer_tool.pkb  $
---       Date into PVCS   : $Date:   May 12 2015 09:40:52  $
---       Date fetched Out : $Modtime:   May 12 2015 09:30:18  $
---       Version          : $Revision:   2.40  $
+--       Date into PVCS   : $Date:   Apr 16 2018 09:22:50  $
+--       Date fetched Out : $Modtime:   Apr 16 2018 09:01:36  $
+--       Version          : $Revision:   2.41  $
 --       Based on SCCS version : 1.11
 ------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 ------------------------------------------------------------------
 
 --
 --all global package variables here
 --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000)       := '$Revision:   2.40  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000)       := '$Revision:   2.41  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name   CONSTANT VARCHAR2 (30)         := 'NM3LAYER_TOOL';

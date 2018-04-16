@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3job AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3job.pkb-arc   2.6   Nov 06 2015 15:56:10   Rob.Coupe  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3job.pkb-arc   2.7   Apr 16 2018 09:22:50   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   nm3job.pkb  $
---       Date into PVCS   : $Date:   Nov 06 2015 15:56:10  $
---       Date fetched Out : $Modtime:   Nov 06 2015 15:56:42  $
---       PVCS Version     : $Revision:   2.6  $
+--       Date into PVCS   : $Date:   Apr 16 2018 09:22:50  $
+--       Date fetched Out : $Modtime:   Apr 16 2018 09:01:36  $
+--       PVCS Version     : $Revision:   2.7  $
 
 --       Based on SCCS Version     : 1.19
 --
@@ -18,14 +18,14 @@ CREATE OR REPLACE PACKAGE BODY nm3job AS
 --   NM3 Job Management package body
 --
 -----------------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 --all global package variables here
 --
 -- g_body_sccsid is the SCCS ID for the package body
 
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.6  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.7  $"';
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3job';
 

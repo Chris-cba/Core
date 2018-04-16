@@ -16,7 +16,7 @@ CREATE OR REPLACE PACKAGE BODY nm3locator AS
 --   nm3locator body
 --
 -----------------------------------------------------------------------------
--- Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-- Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 --all global package variables here
@@ -25,7 +25,7 @@ CREATE OR REPLACE PACKAGE BODY nm3locator AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000) := '"$Revision:   2.13  $"';
+  g_body_sccsid  CONSTANT varchar2(2000) := '"$Revision:   2.15  $"';
 
   g_package_name CONSTANT varchar2(30) := 'nm3locator';
 
@@ -774,12 +774,19 @@ BEGIN
 
     l_data_source := 'nm3locator.g_inv_rec';
 
+    --
+    -- Replace sub query in following dynamic SQL with explicit 
+    -- table join to improve
+    -- performance on changing nm_inv_items view definition
+    -- for Asset Attribute History requirements.
+    -- S.J.Sewell. 20th October 2014
+    --
     add('  CURSOR '||c_cursor_name||' (pi_session_id IN gis_data_objects.gdo_session_id%TYPE) IS');
-    add('  SELECT /*+ INDEX(iit inv_items_all_pk) */ iit.* ');
-    add('  FROM  nm_inv_items iit ');
-    add('  WHERE iit.iit_ne_id IN (SELECT gdo.gdo_pk_id ');
-    add('                          FROM   gis_data_objects gdo ');
-    add('                          WHERE  gdo.gdo_session_id = pi_session_id);');
+    add('  SELECT iit.* ');
+    add('  FROM  gis_data_objects gdo ');
+    add('       ,nm_inv_items iit ');
+    add('  WHERE gdo.gdo_session_id = pi_session_id ');
+    add('  and iit.iit_ne_id = gdo.gdo_pk_id; ');
   END IF;
 
   add('');
@@ -1572,6 +1579,8 @@ BEGIN
   -- as a store of the contents of the pl/sql table
   clear_sql;
 
+nm_debug.debug('Creating Global temporary table: '||l_table_name);
+
   add('CREATE GLOBAL TEMPORARY TABLE '||l_table_name);
   add('(');
   add('   iit_ne_id    number');
@@ -1643,6 +1652,10 @@ BEGIN
   ELSE
     add('   nm3locator.set_inv_detail_record(irec);');
   END IF;
+
+  nm_debug.debug('nm3locator: nm3locator.g_inv_rec.iit_ne_id: '||to_char(nm3locator.g_inv_rec.iit_ne_id));
+  nm_debug.debug('nm3locator: nm3locator.g_inv_rec.iit_inv_type: '||nm3locator.g_inv_rec.iit_inv_type);
+  debug_sql;
 
   -- now deal with the placement
   IF pi_inc_lrm THEN
@@ -2191,6 +2204,393 @@ EXCEPTION
   WHEN NO_DATA_FOUND
   THEN raise_application_error (-20999,'No coords exist for '||pi_gis_session_id||' in GIS_DATA_OBJECTS table');
 END is_gdo_multi_coord;
+--
+-----------------------------------------------------------------------------
+--
+FUNCTION ins_nm_locator_results(pi_ne_id in nm_inv_items_all.iit_ne_id%type)
+RETURN BOOLEAN
+IS
+  --
+  -- Allow insertion into the NM_LOCATOR_RESULTS table for a given iit_ne_id so that
+  -- other forms than NM0572 can borrow the functionality to export CSV and XML files.
+  --
+  -- 16th December 2014. S.J.Sewell.
+  --
+
+BEGIN
+  INSERT
+  INTO NM_LOCATOR_RESULTS
+  (
+    IIT_NE_ID,
+    IIT_INV_TYPE,
+    IIT_PRIMARY_KEY,
+    IIT_START_DATE,
+    IIT_DATE_CREATED,
+    IIT_DATE_MODIFIED,
+    IIT_CREATED_BY,
+    IIT_MODIFIED_BY,
+    IIT_ADMIN_UNIT,
+    IIT_DESCR,
+    IIT_END_DATE,
+    IIT_FOREIGN_KEY,
+    IIT_LOCATED_BY,
+    IIT_POSITION,
+    IIT_X_COORD,
+    IIT_Y_COORD,
+    IIT_NUM_ATTRIB16,
+    IIT_NUM_ATTRIB17,
+    IIT_NUM_ATTRIB18,
+    IIT_NUM_ATTRIB19,
+    IIT_NUM_ATTRIB20,
+    IIT_NUM_ATTRIB21,
+    IIT_NUM_ATTRIB22,
+    IIT_NUM_ATTRIB23,
+    IIT_NUM_ATTRIB24,
+    IIT_NUM_ATTRIB25,
+    IIT_CHR_ATTRIB26,
+    IIT_CHR_ATTRIB27,
+    IIT_CHR_ATTRIB28,
+    IIT_CHR_ATTRIB29,
+    IIT_CHR_ATTRIB30,
+    IIT_CHR_ATTRIB31,
+    IIT_CHR_ATTRIB32,
+    IIT_CHR_ATTRIB33,
+    IIT_CHR_ATTRIB34,
+    IIT_CHR_ATTRIB35,
+    IIT_CHR_ATTRIB36,
+    IIT_CHR_ATTRIB37,
+    IIT_CHR_ATTRIB38,
+    IIT_CHR_ATTRIB39,
+    IIT_CHR_ATTRIB40,
+    IIT_CHR_ATTRIB41,
+    IIT_CHR_ATTRIB42,
+    IIT_CHR_ATTRIB43,
+    IIT_CHR_ATTRIB44,
+    IIT_CHR_ATTRIB45,
+    IIT_CHR_ATTRIB46,
+    IIT_CHR_ATTRIB47,
+    IIT_CHR_ATTRIB48,
+    IIT_CHR_ATTRIB49,
+    IIT_CHR_ATTRIB50,
+    IIT_CHR_ATTRIB51,
+    IIT_CHR_ATTRIB52,
+    IIT_CHR_ATTRIB53,
+    IIT_CHR_ATTRIB54,
+    IIT_CHR_ATTRIB55,
+    IIT_CHR_ATTRIB56,
+    IIT_CHR_ATTRIB57,
+    IIT_CHR_ATTRIB58,
+    IIT_CHR_ATTRIB59,
+    IIT_CHR_ATTRIB60,
+    IIT_CHR_ATTRIB61,
+    IIT_CHR_ATTRIB62,
+    IIT_CHR_ATTRIB63,
+    IIT_CHR_ATTRIB64,
+    IIT_CHR_ATTRIB65,
+    IIT_CHR_ATTRIB66,
+    IIT_CHR_ATTRIB67,
+    IIT_CHR_ATTRIB68,
+    IIT_CHR_ATTRIB69,
+    IIT_CHR_ATTRIB70,
+    IIT_CHR_ATTRIB71,
+    IIT_CHR_ATTRIB72,
+    IIT_CHR_ATTRIB73,
+    IIT_CHR_ATTRIB74,
+    IIT_CHR_ATTRIB75,
+    IIT_NUM_ATTRIB76,
+    IIT_NUM_ATTRIB77,
+    IIT_NUM_ATTRIB78,
+    IIT_NUM_ATTRIB79,
+    IIT_NUM_ATTRIB80,
+    IIT_NUM_ATTRIB81,
+    IIT_NUM_ATTRIB82,
+    IIT_NUM_ATTRIB83,
+    IIT_NUM_ATTRIB84,
+    IIT_NUM_ATTRIB85,
+    IIT_DATE_ATTRIB86,
+    IIT_DATE_ATTRIB87,
+    IIT_DATE_ATTRIB88,
+    IIT_DATE_ATTRIB89,
+    IIT_DATE_ATTRIB90,
+    IIT_DATE_ATTRIB91,
+    IIT_DATE_ATTRIB92,
+    IIT_DATE_ATTRIB93,
+    IIT_DATE_ATTRIB94,
+    IIT_DATE_ATTRIB95,
+    IIT_ANGLE,
+    IIT_ANGLE_TXT,
+    IIT_CLASS,
+    IIT_CLASS_TXT,
+    IIT_COLOUR,
+    IIT_COLOUR_TXT,
+    IIT_COORD_FLAG,
+    IIT_DESCRIPTION,
+    IIT_DIAGRAM,
+    IIT_DISTANCE,
+    IIT_END_CHAIN,
+    IIT_GAP,
+    IIT_HEIGHT,
+    IIT_HEIGHT_2,
+    IIT_ID_CODE,
+    IIT_INSTAL_DATE,
+    IIT_INVENT_DATE,
+    IIT_INV_OWNERSHIP,
+    IIT_ITEMCODE,
+    IIT_LCO_LAMP_CONFIG_ID,
+    IIT_LENGTH,
+    IIT_MATERIAL,
+    IIT_MATERIAL_TXT,
+    IIT_METHOD,
+    IIT_METHOD_TXT,
+    IIT_NOTE,
+    IIT_NO_OF_UNITS,
+    IIT_OPTIONS,
+    IIT_OPTIONS_TXT,
+    IIT_OUN_ORG_ID_ELEC_BOARD,
+    IIT_OWNER,
+    IIT_OWNER_TXT,
+    IIT_PEO_INVENT_BY_ID,
+    IIT_PHOTO,
+    IIT_POWER,
+    IIT_PROV_FLAG,
+    IIT_REV_BY,
+    IIT_REV_DATE,
+    IIT_TYPE,
+    IIT_TYPE_TXT,
+    IIT_WIDTH,
+    IIT_XTRA_CHAR_1,
+    IIT_XTRA_DATE_1,
+    IIT_XTRA_DOMAIN_1,
+    IIT_XTRA_DOMAIN_TXT_1,
+    IIT_XTRA_NUMBER_1,
+    IIT_X_SECT,
+    IIT_DET_XSP,
+    IIT_OFFSET,
+    IIT_X,
+    IIT_Y,
+    IIT_Z,
+    IIT_NUM_ATTRIB96,
+    IIT_NUM_ATTRIB97,
+    IIT_NUM_ATTRIB98,
+    IIT_NUM_ATTRIB99,
+    IIT_NUM_ATTRIB100,
+    IIT_NUM_ATTRIB101,
+    IIT_NUM_ATTRIB102,
+    IIT_NUM_ATTRIB103,
+    IIT_NUM_ATTRIB104,
+    IIT_NUM_ATTRIB105,
+    IIT_NUM_ATTRIB106,
+    IIT_NUM_ATTRIB107,
+    IIT_NUM_ATTRIB108,
+    IIT_NUM_ATTRIB109,
+    IIT_NUM_ATTRIB110,
+    IIT_NUM_ATTRIB111,
+    IIT_NUM_ATTRIB112,
+    IIT_NUM_ATTRIB113,
+    IIT_NUM_ATTRIB114,
+    IIT_NUM_ATTRIB115
+  )
+  select
+    IIT_NE_ID,
+    IIT_INV_TYPE,
+    IIT_PRIMARY_KEY,
+    IIT_START_DATE,
+    IIT_DATE_CREATED,
+    IIT_DATE_MODIFIED,
+    IIT_CREATED_BY,
+    IIT_MODIFIED_BY,
+    IIT_ADMIN_UNIT,
+    IIT_DESCR,
+    IIT_END_DATE,
+    IIT_FOREIGN_KEY,
+    IIT_LOCATED_BY,
+    IIT_POSITION,
+    IIT_X_COORD,
+    IIT_Y_COORD,
+    IIT_NUM_ATTRIB16,
+    IIT_NUM_ATTRIB17,
+    IIT_NUM_ATTRIB18,
+    IIT_NUM_ATTRIB19,
+    IIT_NUM_ATTRIB20,
+    IIT_NUM_ATTRIB21,
+    IIT_NUM_ATTRIB22,
+    IIT_NUM_ATTRIB23,
+    IIT_NUM_ATTRIB24,
+    IIT_NUM_ATTRIB25,
+    IIT_CHR_ATTRIB26,
+    IIT_CHR_ATTRIB27,
+    IIT_CHR_ATTRIB28,
+    IIT_CHR_ATTRIB29,
+    IIT_CHR_ATTRIB30,
+    IIT_CHR_ATTRIB31,
+    IIT_CHR_ATTRIB32,
+    IIT_CHR_ATTRIB33,
+    IIT_CHR_ATTRIB34,
+    IIT_CHR_ATTRIB35,
+    IIT_CHR_ATTRIB36,
+    IIT_CHR_ATTRIB37,
+    IIT_CHR_ATTRIB38,
+    IIT_CHR_ATTRIB39,
+    IIT_CHR_ATTRIB40,
+    IIT_CHR_ATTRIB41,
+    IIT_CHR_ATTRIB42,
+    IIT_CHR_ATTRIB43,
+    IIT_CHR_ATTRIB44,
+    IIT_CHR_ATTRIB45,
+    IIT_CHR_ATTRIB46,
+    IIT_CHR_ATTRIB47,
+    IIT_CHR_ATTRIB48,
+    IIT_CHR_ATTRIB49,
+    IIT_CHR_ATTRIB50,
+    IIT_CHR_ATTRIB51,
+    IIT_CHR_ATTRIB52,
+    IIT_CHR_ATTRIB53,
+    IIT_CHR_ATTRIB54,
+    IIT_CHR_ATTRIB55,
+    IIT_CHR_ATTRIB56,
+    IIT_CHR_ATTRIB57,
+    IIT_CHR_ATTRIB58,
+    IIT_CHR_ATTRIB59,
+    IIT_CHR_ATTRIB60,
+    IIT_CHR_ATTRIB61,
+    IIT_CHR_ATTRIB62,
+    IIT_CHR_ATTRIB63,
+    IIT_CHR_ATTRIB64,
+    IIT_CHR_ATTRIB65,
+    IIT_CHR_ATTRIB66,
+    IIT_CHR_ATTRIB67,
+    IIT_CHR_ATTRIB68,
+    IIT_CHR_ATTRIB69,
+    IIT_CHR_ATTRIB70,
+    IIT_CHR_ATTRIB71,
+    IIT_CHR_ATTRIB72,
+    IIT_CHR_ATTRIB73,
+    IIT_CHR_ATTRIB74,
+    IIT_CHR_ATTRIB75,
+    IIT_NUM_ATTRIB76,
+    IIT_NUM_ATTRIB77,
+    IIT_NUM_ATTRIB78,
+    IIT_NUM_ATTRIB79,
+    IIT_NUM_ATTRIB80,
+    IIT_NUM_ATTRIB81,
+    IIT_NUM_ATTRIB82,
+    IIT_NUM_ATTRIB83,
+    IIT_NUM_ATTRIB84,
+    IIT_NUM_ATTRIB85,
+    IIT_DATE_ATTRIB86,
+    IIT_DATE_ATTRIB87,
+    IIT_DATE_ATTRIB88,
+    IIT_DATE_ATTRIB89,
+    IIT_DATE_ATTRIB90,
+    IIT_DATE_ATTRIB91,
+    IIT_DATE_ATTRIB92,
+    IIT_DATE_ATTRIB93,
+    IIT_DATE_ATTRIB94,
+    IIT_DATE_ATTRIB95,
+    IIT_ANGLE,
+    IIT_ANGLE_TXT,
+    IIT_CLASS,
+    IIT_CLASS_TXT,
+    IIT_COLOUR,
+    IIT_COLOUR_TXT,
+    IIT_COORD_FLAG,
+    IIT_DESCRIPTION,
+    IIT_DIAGRAM,
+    IIT_DISTANCE,
+    IIT_END_CHAIN,
+    IIT_GAP,
+    IIT_HEIGHT,
+    IIT_HEIGHT_2,
+    IIT_ID_CODE,
+    IIT_INSTAL_DATE,
+    IIT_INVENT_DATE,
+    IIT_INV_OWNERSHIP,
+    IIT_ITEMCODE,
+    IIT_LCO_LAMP_CONFIG_ID,
+    IIT_LENGTH,
+    IIT_MATERIAL,
+    IIT_MATERIAL_TXT,
+    IIT_METHOD,
+    IIT_METHOD_TXT,
+    IIT_NOTE,
+    IIT_NO_OF_UNITS,
+    IIT_OPTIONS,
+    IIT_OPTIONS_TXT,
+    IIT_OUN_ORG_ID_ELEC_BOARD,
+    IIT_OWNER,
+    IIT_OWNER_TXT,
+    IIT_PEO_INVENT_BY_ID,
+    IIT_PHOTO,
+    IIT_POWER,
+    IIT_PROV_FLAG,
+    IIT_REV_BY,
+    IIT_REV_DATE,
+    IIT_TYPE,
+    IIT_TYPE_TXT,
+    IIT_WIDTH,
+    IIT_XTRA_CHAR_1,
+    IIT_XTRA_DATE_1,
+    IIT_XTRA_DOMAIN_1,
+    IIT_XTRA_DOMAIN_TXT_1,
+    IIT_XTRA_NUMBER_1,
+    IIT_X_SECT,
+    IIT_DET_XSP,
+    IIT_OFFSET,
+    IIT_X,
+    IIT_Y,
+    IIT_Z,
+    IIT_NUM_ATTRIB96,
+    IIT_NUM_ATTRIB97,
+    IIT_NUM_ATTRIB98,
+    IIT_NUM_ATTRIB99,
+    IIT_NUM_ATTRIB100,
+    IIT_NUM_ATTRIB101,
+    IIT_NUM_ATTRIB102,
+    IIT_NUM_ATTRIB103,
+    IIT_NUM_ATTRIB104,
+    IIT_NUM_ATTRIB105,
+    IIT_NUM_ATTRIB106,
+    IIT_NUM_ATTRIB107,
+    IIT_NUM_ATTRIB108,
+    IIT_NUM_ATTRIB109,
+    IIT_NUM_ATTRIB110,
+    IIT_NUM_ATTRIB111,
+    IIT_NUM_ATTRIB112,
+    IIT_NUM_ATTRIB113,
+    IIT_NUM_ATTRIB114,
+    IIT_NUM_ATTRIB115
+  from NM_INV_ITEMS_ALL
+  where IIT_NE_ID = pi_ne_id;
+
+  if SQL%ROWCOUNT <> 1
+  THEN
+    rollback;
+    return FALSE;
+  end if;
+  return TRUE;
+end ins_nm_locator_results;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE set_inv_type(pi_inv_type in nm_inv_items_all.iit_inv_type%type)
+IS
+  --
+  -- Set value of global g_inv_type.
+  --
+BEGIN
+  g_inv_type := pi_inv_type;
+END; 
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE set_is_ft(pi_is_ft in BOOLEAN)
+IS
+  --
+  -- Set value of global g_is_ft.
+  --
+BEGIN
+  g_is_ft := pi_is_ft;
+END; 
 --
 -----------------------------------------------------------------------------
 --

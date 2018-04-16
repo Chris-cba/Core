@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY nm3javautil AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3javautil.pkb-arc   2.3   Jul 04 2013 16:11:38   James.Wadsworth  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3javautil.pkb-arc   2.4   Apr 16 2018 09:22:50   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   nm3javautil.pkb  $
---       Date into PVCS   : $Date:   Jul 04 2013 16:11:38  $
---       Date fetched Out : $Modtime:   Jul 04 2013 14:25:14  $
---       Version          : $Revision:   2.3  $
+--       Date into PVCS   : $Date:   Apr 16 2018 09:22:50  $
+--       Date fetched Out : $Modtime:   Apr 16 2018 09:01:36  $
+--       Version          : $Revision:   2.4  $
 --       Based on SCCS version : 1.6
 -------------------------------------------------------------------------
 --   Author : I Turnbull
@@ -15,13 +15,13 @@ CREATE OR REPLACE PACKAGE BODY nm3javautil AS
 --   nm3javautil body
 --
 -----------------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 --all global package variables here
 
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.3  $';
+  g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.4  $';
   g_package_name CONSTANT VARCHAR2(30) := 'nm3javautil';
 --
    c_dirrepstrn CONSTANT VARCHAR2(1) := hig.get_sysopt(p_option_id => 'DIRREPSTRN');  
