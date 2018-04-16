@@ -5,19 +5,23 @@ AS
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sde_check.pkh-arc   2.1   Jun 19 2008 17:59:36   aedwards  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3sde_check.pkh-arc   2.2   Apr 16 2018 09:23:26   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   nm3sde_check.pkh  $
---       Date into PVCS   : $Date:   Jun 19 2008 17:59:36  $
---       Date fetched Out : $Modtime:   Jun 19 2008 17:58:40  $
---       PVCS Version     : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   Apr 16 2018 09:23:26  $
+--       Date fetched Out : $Modtime:   Apr 16 2018 09:16:12  $
+--       PVCS Version     : $Revision:   2.2  $
 --
 --   AEdwards
 --   SDE Metadata checker
 --
+--
+------------------------------------------------------------------
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
+------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --
 --</PACKAGE>
-  g_sccsid           CONSTANT varchar2(2000)  := '"$Revision:   2.1  $"';
+  g_sccsid           CONSTANT varchar2(2000)  := '"$Revision:   2.2  $"';
 --
 --------------------------------------------------------------------------------
 --
