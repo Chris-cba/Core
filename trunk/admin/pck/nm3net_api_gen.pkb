@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY nm3net_api_gen AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3net_api_gen.pkb-arc   2.4   Jul 04 2013 16:19:14   James.Wadsworth  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3net_api_gen.pkb-arc   2.5   Apr 16 2018 09:23:10   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   nm3net_api_gen.pkb  $
---       Date into PVCS   : $Date:   Jul 04 2013 16:19:14  $
---       Date fetched Out : $Modtime:   Jul 04 2013 15:47:58  $
---       Version          : $Revision:   2.4  $
+--       Date into PVCS   : $Date:   Apr 16 2018 09:23:10  $
+--       Date fetched Out : $Modtime:   Apr 16 2018 09:04:32  $
+--       Version          : $Revision:   2.5  $
 --       Based on SCCS version : 1.7
 ---------------------------------------------------------------------------
 --   Author : Jonathan Mills
@@ -15,12 +15,12 @@ CREATE OR REPLACE PACKAGE BODY nm3net_api_gen AS
 --   network API generation package body
 --
 -----------------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '$Revision:   2.4  $';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '$Revision:   2.5  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3net_api_gen';
@@ -96,7 +96,7 @@ BEGIN
    append_both('--  User         : '||USER);
    append_both('--');
    append_both('-----------------------------------------------------------------------------');
-   append_both('--	Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.');
+   append_both('--	Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.');
    append_both('-----------------------------------------------------------------------------');
    append_both('--');
 END append_sccs;
