@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm3pedif AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3pedif.pkb-arc   2.2   Jul 04 2013 16:21:08   James.Wadsworth  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3pedif.pkb-arc   2.3   Apr 16 2018 09:23:16   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   nm3pedif.pkb  $
---       Date into PVCS   : $Date:   Jul 04 2013 16:21:08  $
---       Date fetched Out : $Modtime:   Jul 04 2013 14:25:18  $
---       Version          : $Revision:   2.2  $
+--       Date into PVCS   : $Date:   Apr 16 2018 09:23:16  $
+--       Date fetched Out : $Modtime:   Apr 16 2018 09:04:32  $
+--       Version          : $Revision:   2.3  $
 --       Based on SCCS version : 1.5
 -------------------------------------------------------------------------
 --   Author : Jonathan Mills
@@ -14,13 +14,13 @@ CREATE OR REPLACE PACKAGE BODY nm3pedif AS
 --   NM3 edif file production body
 --
 -----------------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 --all global package variables here
 --
 --  g_body_sccsid is the SCCS ID for the package body
-   g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.2  $';
+   g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.3  $';
    g_package_name    CONSTANT  varchar2(30)   := 'nm3pedif';
 --
    g_tab_lines        nm3type.tab_varchar32767;

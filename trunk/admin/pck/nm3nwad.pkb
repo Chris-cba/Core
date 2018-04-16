@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3nwad AS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3nwad.pkb-arc   2.15   Jul 04 2013 16:21:08   James.Wadsworth  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3nwad.pkb-arc   2.16   Apr 16 2018 09:23:16   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   nm3nwad.pkb  $
---       Date into PVCS   : $Date:   Jul 04 2013 16:21:08  $
---       Date fetched Out : $Modtime:   Jul 04 2013 15:49:16  $
---       PVCS Version     : $Revision:   2.15  $
+--       Date into PVCS   : $Date:   Apr 16 2018 09:23:16  $
+--       Date fetched Out : $Modtime:   Apr 16 2018 09:04:32  $
+--       PVCS Version     : $Revision:   2.16  $
 --
 --
 -- Author : A Edwards/P Stanton/G Johnson
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3nwad AS
 --                       Also amended end_date_date_nadl to accept effective date parameter.
 --
 ------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 ------------------------------------------------------------------
 --all global package variables here
 
@@ -35,7 +35,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3nwad AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT VARCHAR2(2000) := '"$Revision:   2.15  $"';
+  g_body_sccsid  CONSTANT VARCHAR2(2000) := '"$Revision:   2.16  $"';
 
   g_package_name CONSTANT VARCHAR2(30) := 'nm3nwad';
 
