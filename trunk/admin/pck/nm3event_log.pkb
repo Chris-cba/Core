@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3event_log AS
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3event_log.pkb-arc   2.2   Jul 04 2013 15:33:48   James.Wadsworth  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3event_log.pkb-arc   2.3   Apr 16 2018 09:22:22   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   nm3event_log.pkb  $
---       Date into PVCS   : $Date:   Jul 04 2013 15:33:48  $
---       Date fetched Out : $Modtime:   Jul 04 2013 14:25:10  $
---       Version          : $Revision:   2.2  $
+--       Date into PVCS   : $Date:   Apr 16 2018 09:22:22  $
+--       Date fetched Out : $Modtime:   Apr 16 2018 09:00:30  $
+--       Version          : $Revision:   2.3  $
 --       Based on SCCS version :  1.2
 --
 --   Author : Kevin Angus
@@ -16,13 +16,13 @@ CREATE OR REPLACE PACKAGE BODY nm3event_log AS
 --   Procs/Functions for manipulating the NM3 event log
 --
 -----------------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 --all global package variables here
 
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.2  $';
+  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.3  $';
   g_package_name     CONSTANT  varchar2(30) := 'nm3event_log';
   c_session_id       CONSTANT number       := NVL(USERENV('SESSIONID'),-1);
   c_terminal         CONSTANT varchar2(30) := NVL(USERENV('TERMINAL'),'Unknown');

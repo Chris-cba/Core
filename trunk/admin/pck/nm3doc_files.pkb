@@ -3,14 +3,14 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3doc_files.pkb-arc   2.13   Jul 04 2013 15:37:04   James.Wadsworth  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3doc_files.pkb-arc   2.14   Apr 16 2018 09:22:22   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   nm3doc_files.pkb  $
---       Date into PVCS   : $Date:   Jul 04 2013 15:37:04  $
---       Date fetched Out : $Modtime:   Jul 04 2013 15:35:08  $
---       Version          : $Revision:   2.13  $
+--       Date into PVCS   : $Date:   Apr 16 2018 09:22:22  $
+--       Date fetched Out : $Modtime:   Apr 16 2018 08:57:42  $
+--       Version          : $Revision:   2.14  $
 --       Based on SCCS version :
 ------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 ------------------------------------------------------------------
 
 --
@@ -20,7 +20,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid     CONSTANT VARCHAR2(2000) := '$Revision:   2.13  $';
+  g_body_sccsid     CONSTANT VARCHAR2(2000) := '$Revision:   2.14  $';
   g_package_name    CONSTANT VARCHAR2(30)   := 'nm3doc_files';
 --
   g_sep                      VARCHAR2(1)    := NVL(hig.get_sysopt('DIRREPSTRN'),'\');

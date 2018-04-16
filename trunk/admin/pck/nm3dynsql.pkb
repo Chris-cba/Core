@@ -2,11 +2,11 @@ CREATE OR REPLACE package body nm3dynsql as
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3dynsql.pkb-arc   2.13   Jul 04 2013 15:33:46   James.Wadsworth  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3dynsql.pkb-arc   2.14   Apr 16 2018 09:22:22   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   nm3dynsql.pkb  $
---       Date into PVCS   : $Date:   Jul 04 2013 15:33:46  $
---       Date fetched Out : $Modtime:   Jul 04 2013 15:28:16  $
---       PVCS Version     : $Revision:   2.13  $
+--       Date into PVCS   : $Date:   Apr 16 2018 09:22:22  $
+--       Date fetched Out : $Modtime:   Apr 16 2018 08:57:42  $
+--       PVCS Version     : $Revision:   2.14  $
 --       Based on sccs version :
 --
 --
@@ -15,7 +15,7 @@ CREATE OR REPLACE package body nm3dynsql as
 --   Package for standard reusable dynamic sql
 --
 ------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 ------------------------------------------------------------------
 --
 /* History
@@ -38,7 +38,7 @@ CREATE OR REPLACE package body nm3dynsql as
                 in sql_route_connectivity() added connectivity check to ensure pieces of same datum are connected
 */
 
-  g_body_sccsid     constant  varchar2(30) := '"$Revision:   2.13  $"';
+  g_body_sccsid     constant  varchar2(30) := '"$Revision:   2.14  $"';
   g_package_name    constant  varchar2(30) := 'nm3dynsql';
 
 
