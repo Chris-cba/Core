@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3split IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3split.pkb-arc   2.19   Feb 17 2017 13:56:00   Rob.Coupe  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3split.pkb-arc   2.20   Apr 16 2018 09:23:36   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   nm3split.pkb  $
---       Date into PVCS   : $Date:   Feb 17 2017 13:56:00  $
---       Date fetched Out : $Modtime:   Feb 17 2017 13:56:18  $
---       PVCS Version     : $Revision:   2.19  $
+--       Date into PVCS   : $Date:   Apr 16 2018 09:23:36  $
+--       Date fetched Out : $Modtime:   Apr 16 2018 09:06:20  $
+--       PVCS Version     : $Revision:   2.20  $
 --
 --
 --   Author : ITurnbull
@@ -14,13 +14,13 @@ CREATE OR REPLACE PACKAGE BODY Nm3split IS
 --     nm3split package body.
 --
 -----------------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 
 -- 03.06.08 PT added p_no_purpose parameter throughout where node is created.
 
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.19  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.20  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(2000) := 'nm3split';

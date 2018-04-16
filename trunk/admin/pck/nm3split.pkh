@@ -1,11 +1,11 @@
 CREATE OR REPLACE PACKAGE nm3split IS
 --   PVCS Identifiers :-
 --
---       pvcsid                 : $Header:   //vm_latest/archives/nm3/admin/pck/nm3split.pkh-arc   2.5   Jul 04 2013 16:32:58   James.Wadsworth  $
+--       pvcsid                 : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3split.pkh-arc   2.6   Apr 16 2018 09:23:36   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   nm3split.pkh  $
---       Date into PVCS   : $Date:   Jul 04 2013 16:32:58  $
---       Date fetched Out : $Modtime:   Jul 04 2013 14:25:20  $
---       PVCS Version     : $Revision:   2.5  $
+--       Date into PVCS   : $Date:   Apr 16 2018 09:23:36  $
+--       Date fetched Out : $Modtime:   Apr 16 2018 09:17:20  $
+--       PVCS Version     : $Revision:   2.6  $
 --       Based on SCCS version : 1.7
 --
 --
@@ -14,12 +14,12 @@ CREATE OR REPLACE PACKAGE nm3split IS
 --     nm3split package. Used for
 --
 -----------------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 
 -- 03.06.08 PT added no_purpose parameter to create_node(), do_split_datum_or_group() and do_geo_split()
 
-  g_sccsid      CONSTANT  VARCHAR2(80)  := '"$Revision:   2.5  $"';
+  g_sccsid      CONSTANT  VARCHAR2(80)  := '"$Revision:   2.6  $"';
 --
    g_rec_ne_old   nm_elements%ROWTYPE;
    g_rec_ne_new_1 nm_elements%ROWTYPE;

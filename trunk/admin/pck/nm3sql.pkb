@@ -2,11 +2,11 @@ CREATE OR REPLACE package body nm3sql as
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sql.pkb-arc   2.4   Jul 04 2013 16:32:58   James.Wadsworth  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3sql.pkb-arc   2.5   Apr 16 2018 09:23:36   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   nm3sql.pkb  $
---       Date into PVCS   : $Date:   Jul 04 2013 16:32:58  $
---       Date fetched Out : $Modtime:   Jul 04 2013 14:25:20  $
---       PVCS Version     : $Revision:   2.4  $
+--       Date into PVCS   : $Date:   Apr 16 2018 09:23:36  $
+--       Date fetched Out : $Modtime:   Apr 16 2018 09:06:20  $
+--       PVCS Version     : $Revision:   2.5  $
 --       Based on sccs version : 
 --
 --   Author : Priidu Tanava
@@ -14,7 +14,7 @@ CREATE OR REPLACE package body nm3sql as
 --   package for generic context 'sql' used to pass bind variables into views
 --
 -----------------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 /*History
   07.09.07 PT added implementation for split_code_tbl()
@@ -22,7 +22,7 @@ CREATE OR REPLACE package body nm3sql as
 */
 
 
-  g_body_sccsid     constant  varchar2(30) := '"$Revision:   2.4  $"';
+  g_body_sccsid     constant  varchar2(30) := '"$Revision:   2.5  $"';
   g_package_name    constant  varchar2(30) := 'nm3sql';
 
   m_date_format constant varchar2(20) := 'DD-MON-YYYY';

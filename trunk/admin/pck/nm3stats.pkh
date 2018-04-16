@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE nm3stats AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3stats.pkh-arc   2.2   Jul 04 2013 16:32:58   James.Wadsworth  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3stats.pkh-arc   2.3   Apr 16 2018 09:23:36   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   nm3stats.pkh  $
---       Date into PVCS   : $Date:   Jul 04 2013 16:32:58  $
---       Date fetched Out : $Modtime:   Jul 04 2013 14:25:20  $
---       Version          : $Revision:   2.2  $
+--       Date into PVCS   : $Date:   Apr 16 2018 09:23:36  $
+--       Date fetched Out : $Modtime:   Apr 16 2018 09:17:20  $
+--       Version          : $Revision:   2.3  $
 --       Based on SCCS version : 1.5
 -------------------------------------------------------------------------
 --   Author : Jonathan Mills
@@ -15,11 +15,11 @@ CREATE OR REPLACE PACKAGE nm3stats AS
 --   NM3 Statistics package
 --
 -----------------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
-  g_sccsid      CONSTANT  VARCHAR2(2000) := '$Revision:   2.2  $';
+  g_sccsid      CONSTANT  VARCHAR2(2000) := '$Revision:   2.3  $';
 --  g_sccsid is the SCCS ID for the package
 --
 --</GLOBVAR>
