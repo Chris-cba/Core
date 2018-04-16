@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE nm3sdo_wms AS
   -------------------------------------------------------------------------
   --   PVCS Identifiers :-
   --
-  --       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_wms.pkh-arc   3.0   Sep 18 2014 13:10:04   Mike.Huitson  $
+  --       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3sdo_wms.pkh-arc   3.1   Apr 16 2018 09:23:32   Gaurav.Gaurkar  $
   --       Module Name      : $Workfile:   nm3sdo_wms.pkh  $
-  --       Date into PVCS   : $Date:   Sep 18 2014 13:10:04  $
-  --       Date fetched Out : $Modtime:   Sep 16 2014 15:19:08  $
-  --       Version          : $Revision:   3.0  $
+  --       Date into PVCS   : $Date:   Apr 16 2018 09:23:32  $
+  --       Date fetched Out : $Modtime:   Apr 16 2018 09:17:20  $
+  --       Version          : $Revision:   3.1  $
   --       Based on SCCS version : 1.1
   -------------------------------------------------------------------------
   --   Author : I Turnbull
@@ -14,10 +14,10 @@ CREATE OR REPLACE PACKAGE nm3sdo_wms AS
   --    nm3sdo_xml
   --
   -----------------------------------------------------------------------------
-  --   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+  --   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
   -----------------------------------------------------------------------------
   --g_sccsid is the SCCS ID for the package
-  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.0  $';
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.1  $';
   --
   TYPE wms_theme_rec IS RECORD(nwt_id                  nm_wms_themes.nwt_id%TYPE
                               ,nwt_name                nm_wms_themes.nwt_name%TYPE

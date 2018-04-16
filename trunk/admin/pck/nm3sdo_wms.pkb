@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo_wms AS
   -------------------------------------------------------------------------
   --   PVCS Identifiers :-
   --
-  --       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_wms.pkb-arc   3.0   Sep 18 2014 13:10:06   Mike.Huitson  $
+  --       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3sdo_wms.pkb-arc   3.1   Apr 16 2018 09:23:32   Gaurav.Gaurkar  $
   --       Module Name      : $Workfile:   nm3sdo_wms.pkb  $
-  --       Date into PVCS   : $Date:   Sep 18 2014 13:10:06  $
-  --       Date fetched Out : $Modtime:   Sep 17 2014 12:57:20  $
-  --       Version          : $Revision:   3.0  $
+  --       Date into PVCS   : $Date:   Apr 16 2018 09:23:32  $
+  --       Date fetched Out : $Modtime:   Apr 16 2018 09:06:20  $
+  --       Version          : $Revision:   3.1  $
   --       Based on SCCS version : 1.1
   ---------------------------------------------------------------------------
   --   Author : I Turnbull
@@ -15,7 +15,7 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo_wms AS
   --   nm3sdo_xml body
   --
   -----------------------------------------------------------------------------
-  --   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+  --   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
   -----------------------------------------------------------------------------
   --
   --all global package variables here
@@ -23,7 +23,7 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo_wms AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT VARCHAR2(2000) := '$Revision:   3.0  $';
+  g_body_sccsid  CONSTANT VARCHAR2(2000) := '$Revision:   3.1  $';
   g_package_name CONSTANT VARCHAR2(30) := 'nm3sdo_xml';
   --
   -----------------------------------------------------------------------------
