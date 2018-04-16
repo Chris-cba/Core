@@ -3,11 +3,11 @@ create or replace package nm3inv_copy as
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_copy.pkh-arc   2.2   Jul 04 2013 16:04:32   James.Wadsworth  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3inv_copy.pkh-arc   2.3   Apr 16 2018 09:22:42   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   nm3inv_copy.pkh  $
---       Date into PVCS   : $Date:   Jul 04 2013 16:04:32  $
---       Date fetched Out : $Modtime:   Jul 04 2013 14:25:14  $
---       Version          : $Revision:   2.2  $
+--       Date into PVCS   : $Date:   Apr 16 2018 09:22:42  $
+--       Date fetched Out : $Modtime:   Apr 16 2018 09:14:32  $
+--       Version          : $Revision:   2.3  $
 --       Based on SCCS version : 1.1
 -------------------------------------------------------------------------
 --   Author : Jonathan Mills
@@ -15,11 +15,11 @@ create or replace package nm3inv_copy as
 --   Inventory Copy package
 --
 -----------------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
-  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.2  $';
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.3  $';
 --  g_sccsid is the SCCS ID for the package
 --
    g_rec_iit_1   nm_inv_items%ROWTYPE;
