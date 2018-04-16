@@ -17,7 +17,7 @@ CREATE OR REPLACE PACKAGE BODY hig_health AS
 --   Package is called through the GRI (module HIG2100) and the use of wrapper script (HIG2100.sql)
 --
 -----------------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 --all global package variables here

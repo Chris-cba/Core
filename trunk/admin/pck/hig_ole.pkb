@@ -3,14 +3,14 @@ AS
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_ole.pkb-arc   2.3   Jul 04 2013 14:52:06   James.Wadsworth  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/hig_ole.pkb-arc   2.4   Apr 16 2018 09:21:56   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   hig_ole.pkb  $
---       Date into PVCS   : $Date:   Jul 04 2013 14:52:06  $
---       Date fetched Out : $Modtime:   Jul 04 2013 14:49:26  $
---       Version          : $Revision:   2.3  $
+--       Date into PVCS   : $Date:   Apr 16 2018 09:21:56  $
+--       Date fetched Out : $Modtime:   Apr 16 2018 08:53:04  $
+--       Version          : $Revision:   2.4  $
 --
 -----------------------------------------------------------------------------
---    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--    Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 --   Author : Ian Smith

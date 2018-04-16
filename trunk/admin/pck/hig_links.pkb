@@ -4,18 +4,18 @@ CREATE OR REPLACE package body hig_links as
 --
 --   SCCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/hig_links.pkb-arc   3.2   Jul 04 2013 14:47:36   James.Wadsworth  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/hig_links.pkb-arc   3.3   Apr 16 2018 09:21:56   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   hig_links.pkb  $
---       Date into SCCS   : $Date:   Jul 04 2013 14:47:36  $
---       Date fetched Out : $Modtime:   Jul 04 2013 14:25:08  $
---       SCCS Version     : $Revision:   3.2  $
+--       Date into SCCS   : $Date:   Apr 16 2018 09:21:56  $
+--       Date fetched Out : $Modtime:   Apr 16 2018 08:53:04  $
+--       SCCS Version     : $Revision:   3.3  $
 --
 -----------------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
-    g_sccsid      CONSTANT  VARCHAR2(2000) := '$Revision:   3.2  $';
+    g_sccsid      CONSTANT  VARCHAR2(2000) := '$Revision:   3.3  $';
 --  g_sccsid is the SCCS ID for the package
 --</GLOBVAR>
 --

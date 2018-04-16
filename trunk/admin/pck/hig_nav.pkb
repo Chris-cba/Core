@@ -3,13 +3,18 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/hig_nav.pkb-arc   3.20   Jun 22 2016 14:11:30   linesh.sorathia  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/hig_nav.pkb-arc   3.21   Apr 16 2018 09:21:56   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   hig_nav.pkb  $
---       Date into PVCS   : $Date:   Jun 22 2016 14:11:30  $
---       Date fetched Out : $Modtime:   Jun 17 2015 11:02:46  $
---       Version          : $Revision:   3.20  $
+--       Date into PVCS   : $Date:   Apr 16 2018 09:21:56  $
+--       Date fetched Out : $Modtime:   Apr 16 2018 08:53:04  $
+--       Version          : $Revision:   3.21  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
+--
+--
+-----------------------------------------------------------------------------
+--    Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
 --
 --all global package variables here
 
@@ -17,7 +22,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.20  $';
+  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.21  $';
 
   g_package_name CONSTANT varchar2(30) := 'hig_nav';
   l_top_id       nav_id := nav_id(Null);
