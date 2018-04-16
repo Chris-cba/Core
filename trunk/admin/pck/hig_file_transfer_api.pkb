@@ -3,14 +3,14 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_file_transfer_api.pkb-arc   3.4   Jul 04 2013 14:45:42   James.Wadsworth  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/hig_file_transfer_api.pkb-arc   3.5   Apr 16 2018 09:21:54   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   hig_file_transfer_api.pkb  $
---       Date into PVCS   : $Date:   Jul 04 2013 14:45:42  $
---       Date fetched Out : $Modtime:   Jul 04 2013 14:43:18  $
---       Version          : $Revision:   3.4  $
+--       Date into PVCS   : $Date:   Apr 16 2018 09:21:54  $
+--       Date fetched Out : $Modtime:   Apr 16 2018 08:53:04  $
+--       Version          : $Revision:   3.5  $
 --       Based on SCCS version : 
 ------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 ------------------------------------------------------------------
 --
 --all global package variables here
@@ -19,7 +19,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid    CONSTANT VARCHAR2(2000) := '$Revision:   3.4  $';
+  g_body_sccsid    CONSTANT VARCHAR2(2000) := '$Revision:   3.5  $';
   g_package_name   CONSTANT varchar2(30) := 'hig_file_transfer_api';
   g_pending        CONSTANT varchar2(30) := 'PENDING';
   g_internal       CONSTANT varchar2(30) := 'INTERNAL'; 

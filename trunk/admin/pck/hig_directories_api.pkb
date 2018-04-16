@@ -15,9 +15,7 @@ CREATE OR REPLACE PACKAGE BODY hig_directories_api AS
 --
 --
 -----------------------------------------------------------------------------
---
---  Copyright (c) exor corporation ltd, 2005
---
+--    Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
    g_body_sccsid CONSTANT  VARCHAR2(2000) := '"@(#)hig_directories_api.pkb	1.6 05/04/07"';

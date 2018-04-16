@@ -18,7 +18,7 @@ CREATE OR REPLACE PACKAGE BODY hig_hd_insert AS
 --   Package of dynamic sql routines used in xml file insertion
 --
 -----------------------------------------------------------------------------
---    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--    Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 -- all global package variables here
