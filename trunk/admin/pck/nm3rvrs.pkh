@@ -14,7 +14,7 @@ CREATE OR REPLACE PACKAGE nm3rvrs AS
 --   Package to reverse a route
 --
 -----------------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>

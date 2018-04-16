@@ -4,23 +4,23 @@ AS
     --------------------------------------------------------------------------------
     --   PVCS Identifiers :-
     --
-    --       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3rsc.pkb-arc   2.20   Mar 08 2018 15:17:40   Rob.Coupe  $
+    --       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3rsc.pkb-arc   2.21   Apr 16 2018 09:23:22   Gaurav.Gaurkar  $
     --       Module Name      : $Workfile:   nm3rsc.pkb  $
-    --       Date into PVCS   : $Date:   Mar 08 2018 15:17:40  $
-    --       Date fetched Out : $Modtime:   Mar 08 2018 15:15:42  $
-    --       PVCS Version     : $Revision:   2.20  $
+    --       Date into PVCS   : $Date:   Apr 16 2018 09:23:22  $
+    --       Date fetched Out : $Modtime:   Apr 16 2018 09:04:32  $
+    --       PVCS Version     : $Revision:   2.21  $
     --
     --   Author : R.A. Coupe
     --
     --   Package for the rescaling and resequencing of route members
     --
     -----------------------------------------------------------------------------
-    -- Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+    -- Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
     ----------------------------------------------------------------------------
     --
     --all global package variables here
     --
-    g_body_sccsid    CONSTANT VARCHAR2 (30) := '"$Revision:   2.20  $"';
+    g_body_sccsid    CONSTANT VARCHAR2 (30) := '"$Revision:   2.21  $"';
 
     --  g_body_sccsid is the SCCS ID for the package body
     --

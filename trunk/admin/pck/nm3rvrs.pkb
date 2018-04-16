@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3rvrs AS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3rvrs.pkb-arc   2.4   10 Dec 2014 11:03:12   Mike.Huitson  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3rvrs.pkb-arc   2.7   Apr 16 2018 09:23:22   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   nm3rvrs.pkb  $
---       Date into PVCS   : $Date:   10 Dec 2014 11:03:12  $
---       Date fetched Out : $Modtime:   24 Nov 2014 11:08:28  $
---       PVCS Version     : $Revision:   2.4  $
+--       Date into PVCS   : $Date:   Apr 16 2018 09:23:22  $
+--       Date fetched Out : $Modtime:   Apr 16 2018 09:04:32  $
+--       PVCS Version     : $Revision:   2.7  $
 --
 --
 --   Author : R.A. Coupe
@@ -16,10 +16,10 @@ CREATE OR REPLACE PACKAGE BODY nm3rvrs AS
 --   Package to reverse a route
 --
 -----------------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.4  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.7  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'NM3RVRS';
@@ -874,7 +874,7 @@ BEGIN
                            ) IS
         SELECT iit.ROWID iit_rowid
               ,reverse_xsp (p_nt_type,p_subclass,iit.iit_x_sect,'N') new_xsp
-         FROM  nm_inv_items iit
+         FROM  nm_inv_items_all iit
         WHERE  iit.iit_ne_id             = p_iit_ne_id
         FOR UPDATE OF iit_x_sect NOWAIT;
      BEGIN
@@ -895,10 +895,14 @@ BEGIN
         END LOOP;
      END;
     --
+    -- Don't update the row if the x_sect value is unchanged
+    -- as it affects the Asset Attribute History.
+    --
      FORALL i IN 1..l_tab_inv_rowid.COUNT
-       UPDATE nm_inv_items
+       UPDATE nm_inv_items_all
         SET  iit_x_sect = l_tab_x_sect(i)
-       WHERE ROWID      = l_tab_inv_rowid(i);
+       WHERE ROWID      = l_tab_inv_rowid(i)
+       AND iit_x_sect <> l_tab_x_sect(i);
    --
       l_tab_inv_rowid.DELETE;
       l_tab_x_sect.DELETE;
