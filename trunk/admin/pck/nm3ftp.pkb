@@ -4,20 +4,20 @@ AS
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ftp.pkb-arc   3.23   Jul 04 2013 15:33:50   James.Wadsworth  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3ftp.pkb-arc   3.24   Apr 16 2018 09:22:26   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   nm3ftp.pkb  $
---       Date into PVCS   : $Date:   Jul 04 2013 15:33:50  $
---       Date fetched Out : $Modtime:   Jul 04 2013 15:30:34  $
---       PVCS Version     : $Revision:   3.23  $
+--       Date into PVCS   : $Date:   Apr 16 2018 09:22:26  $
+--       Date fetched Out : $Modtime:   Apr 16 2018 09:00:30  $
+--       PVCS Version     : $Revision:   3.24  $
 --
 -------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -------------------------------------------------------------------
    g_reply                   t_string_table := t_string_table ();
    g_binary                  BOOLEAN        := TRUE;
    g_debug                   BOOLEAN        := TRUE;
    g_convert_crlf            BOOLEAN        := TRUE;
-   g_body_sccsid    CONSTANT VARCHAR2(30)   :='"$Revision:   3.23  $"';
+   g_body_sccsid    CONSTANT VARCHAR2(30)   :='"$Revision:   3.24  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name   CONSTANT VARCHAR2(30)   := 'nm3ftp';

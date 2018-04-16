@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY nm3ft_mapping AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3ft_mapping.pkb-arc   2.5   Feb 03 2016 10:25:12   Rob.Coupe  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3ft_mapping.pkb-arc   2.6   Apr 16 2018 09:22:26   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   nm3ft_mapping.pkb  $
---       Date into PVCS   : $Date:   Feb 03 2016 10:25:12  $
---       Date fetched Out : $Modtime:   Feb 03 2016 10:24:40  $
---       Version          : $Revision:   2.5  $
+--       Date into PVCS   : $Date:   Apr 16 2018 09:22:26  $
+--       Date fetched Out : $Modtime:   Apr 16 2018 09:00:30  $
+--       Version          : $Revision:   2.6  $
 --       Based on SCCS version : 1.2
 -------------------------------------------------------------------------
 --   Author : M Huitson.
@@ -15,7 +15,7 @@ CREATE OR REPLACE PACKAGE BODY nm3ft_mapping AS
 --   nm3ft_mapping body
 --
 ------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 ------------------------------------------------------------------
 --
 --all global package variables here
@@ -24,7 +24,7 @@ CREATE OR REPLACE PACKAGE BODY nm3ft_mapping AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.5  $';
+  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.6  $';
   g_package_name CONSTANT varchar2(30) := 'nm3ft_mapping';
 --
 -----------------------------------------------------------------------------

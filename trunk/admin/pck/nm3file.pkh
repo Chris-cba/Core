@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE nm3file authid current_user AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3file.pkh-arc   2.10   Dec 28 2016 10:05:34   Upendra.Hukeri  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3file.pkh-arc   2.11   Apr 16 2018 09:22:26   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   nm3file.pkh  $
---       Date into PVCS   : $Date:   Dec 28 2016 10:05:34  $
---       Date fetched Out : $Modtime:   Dec 26 2016 10:27:32  $
---       Version          : $Revision:   2.10  $
+--       Date into PVCS   : $Date:   Apr 16 2018 09:22:26  $
+--       Date fetched Out : $Modtime:   Apr 16 2018 09:13:16  $
+--       Version          : $Revision:   2.11  $
 --       Based on SCCS version : 1.14
 -------------------------------------------------------------------------
 --
@@ -16,14 +16,14 @@ CREATE OR REPLACE PACKAGE nm3file authid current_user AS
 --   NM3 UTL_FILE wrapper package
 --
 -----------------------------------------------------------------------------
---   Copyright (c) 2016 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --</PACKAGE>
 --
 --<GLOBVAR>
 --
 --  g_sccsid is the SCCS ID for the package
-  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.10  $';
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.11  $';
 --
   c_read_mode        CONSTANT  VARCHAR2(1)    := 'R';
   c_append_mode      CONSTANT  VARCHAR2(1)    := 'A';
