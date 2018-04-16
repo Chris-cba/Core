@@ -1,0 +1,72 @@
+CREATE OR REPLACE PACKAGE nm3sdo_check
+AS
+--<PACKAGE>
+--
+--------------------------------------------------------------------------------
+--   PVCS Identifiers :-
+--
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3sdo_check.pkh-arc   2.4   Apr 16 2018 09:23:28   Gaurav.Gaurkar  $
+--       Module Name      : $Workfile:   nm3sdo_check.pkh  $
+--       Date into PVCS   : $Date:   Apr 16 2018 09:23:28  $
+--       Date fetched Out : $Modtime:   Apr 16 2018 09:17:20  $
+--       PVCS Version     : $Revision:   2.4  $
+--
+------------------------------------------------------------------
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
+------------------------------------------------------------------
+--   AEdwards
+--   SDO/THEMES Metadata checker
+--
+--------------------------------------------------------------------------------
+--
+--</PACKAGE>
+  g_sccsid           CONSTANT varchar2(2000)  := '"$Revision:   2.4  $"';
+--
+--------------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+  FUNCTION get_version 
+    RETURN VARCHAR2;
+--</PROC>
+--
+--------------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version
+  FUNCTION get_body_version 
+    RETURN VARCHAR2;
+--</PROC>
+--
+--------------------------------------------------------------------------------
+--
+--<PROC NAME="GET_ORACLE_SUMMARY">
+-- This function returns the current Oracle version 
+  FUNCTION get_oracle_summary
+  RETURN VARCHAR2;
+--</PROC>
+--
+--------------------------------------------------------------------------------
+--
+--<PROC NAME="RUN_SDO_CHECK">
+-- This procedure calls the SDO checker
+  PROCEDURE run_sdo_check
+                 ( pi_location    IN VARCHAR2 DEFAULT NULL
+                 , pi_filename    IN VARCHAR2 DEFAULT NULL
+                 , pi_skip_gtypes IN BOOLEAN  DEFAULT FALSE);
+--</PROC>
+--
+--------------------------------------------------------------------------------
+--
+--<PROC NAME="RUN_THEME_CHECK">
+-- This procedure calls the THEME checker
+  PROCEDURE run_theme_check
+                 ( pi_location         IN VARCHAR2 DEFAULT NULL
+                 , pi_filename         IN VARCHAR2 DEFAULT NULL
+                 , pi_supress_warnings IN BOOLEAN  DEFAULT FALSE );
+--</PROC>
+--
+--------------------------------------------------------------------------------
+--
+END nm3sdo_check;
+/
