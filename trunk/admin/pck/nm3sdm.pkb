@@ -5,23 +5,23 @@ As
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.78   Jun 29 2016 15:31:50   Rob.Coupe  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.79   Apr 16 2018 09:23:28   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   nm3sdm.pkb  $
---       Date into PVCS   : $Date:   Jun 29 2016 15:31:50  $
---       Date fetched Out : $Modtime:   Jun 29 2016 15:31:26  $
---       PVCS Version     : $Revision:   2.78  $
+--       Date into PVCS   : $Date:   Apr 16 2018 09:23:28  $
+--       Date fetched Out : $Modtime:   Apr 16 2018 09:04:32  $
+--       PVCS Version     : $Revision:   2.79  $
 --
 --   Author : R.A. Coupe
 --
 --   Spatial Data Manager specific package body
 --
 -----------------------------------------------------------------------------
---  Copyright (c) exor corporation ltd, 2011
+-- Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 --all global package variables here
 --
-  g_Body_Sccsid     Constant Varchar2 (2000) := '"$Revision:   2.78  $"';
+  g_Body_Sccsid     Constant Varchar2 (2000) := '"$Revision:   2.79  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
   g_Package_Name    Constant Varchar2 (30)   := 'NM3SDM';
@@ -7479,7 +7479,7 @@ Begin
   Append ('--       Version          : ' || G_Body_Sccsid);
   Append ('--');
   Append ('-----------------------------------------------------------------------------');
-  Append ('--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.');
+  Append ('--    Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.');
   Append ('-----------------------------------------------------------------------------');
   Append ('-- Author : R Coupe');
   Append ('--          G Johnson / A Edwards');

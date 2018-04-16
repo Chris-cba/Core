@@ -3,13 +3,13 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_dynseg.pkb-arc   3.6   Jul 04 2013 16:29:32   James.Wadsworth  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3sdo_dynseg.pkb-arc   3.7   Apr 16 2018 09:23:28   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   nm3sdo_dynseg.pkb  $
---       Date into PVCS   : $Date:   Jul 04 2013 16:29:32  $
---       Date fetched Out : $Modtime:   Jul 04 2013 16:27:00  $
---       Version          : $Revision:   3.6  $
+--       Date into PVCS   : $Date:   Apr 16 2018 09:23:28  $
+--       Date fetched Out : $Modtime:   Apr 16 2018 09:04:32  $
+--       Version          : $Revision:   3.7  $
 ------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 ------------------------------------------------------------------
 
 --
@@ -19,7 +19,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.6  $';
+  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.7  $';
 
   g_package_name CONSTANT varchar2(30) := 'nm3sdo_dynseg';
 --

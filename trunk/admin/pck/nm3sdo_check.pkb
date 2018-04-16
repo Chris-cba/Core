@@ -4,18 +4,18 @@ AS
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_check.pkb-arc   2.15   Jul 04 2013 16:29:30   James.Wadsworth  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3sdo_check.pkb-arc   2.16   Apr 16 2018 09:23:28   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   nm3sdo_check.pkb  $
---       Date into PVCS   : $Date:   Jul 04 2013 16:29:30  $
---       Date fetched Out : $Modtime:   Jul 04 2013 16:26:16  $
---       PVCS Version     : $Revision:   2.15  $
+--       Date into PVCS   : $Date:   Apr 16 2018 09:23:28  $
+--       Date fetched Out : $Modtime:   Apr 16 2018 09:04:32  $
+--       PVCS Version     : $Revision:   2.16  $
 --
 ------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 ------------------------------------------------------------------
 --
   g_package_name          CONSTANT varchar2(30)    := 'nm3sdo_check';
-  g_body_sccsid           CONSTANT varchar2(2000)  := '"$Revision:   2.15  $"';
+  g_body_sccsid           CONSTANT varchar2(2000)  := '"$Revision:   2.16  $"';
   lf                      CONSTANT VARCHAR2(30)    := chr(10);
   g_write_to_file                  BOOLEAN         := FALSE;
   l_results                        nm3type.tab_varchar32767;
