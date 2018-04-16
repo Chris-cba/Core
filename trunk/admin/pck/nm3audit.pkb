@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3audit AS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3audit.pkb-arc   2.4   Jul 04 2013 15:23:04   James.Wadsworth  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3audit.pkb-arc   2.5   Apr 16 2018 09:22:12   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   nm3audit.pkb  $
---       Date into PVCS   : $Date:   Jul 04 2013 15:23:04  $
---       Date fetched Out : $Modtime:   Jul 04 2013 15:17:06  $
---       PVCS Version     : $Revision:   2.4  $
+--       Date into PVCS   : $Date:   Apr 16 2018 09:22:12  $
+--       Date fetched Out : $Modtime:   Apr 16 2018 08:57:42  $
+--       PVCS Version     : $Revision:   2.5  $
 --       Based on SCCS version : 
 --
 --
@@ -17,10 +17,10 @@ CREATE OR REPLACE PACKAGE BODY nm3audit AS
 --   NM3 Auditing package body
 --
 -----------------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.4  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.5  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3audit';
@@ -321,7 +321,7 @@ BEGIN
    append ('--   Body   : '||get_body_version);
    append ('--');
    append ('-----------------------------------------------------------------------------');
-   append ('--	Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.');
+   append ('--	Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.');
    append ('-----------------------------------------------------------------------------');
    append ('--');
    append ('   l_aud_seq    nm_audit_temp.nat_audit_id%TYPE;');

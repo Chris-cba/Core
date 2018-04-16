@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm3ausec_maint AS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid                 : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ausec_maint.pkb-arc   2.6   Jul 04 2013 15:23:04   James.Wadsworth  $
+--       pvcsid                 : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3ausec_maint.pkb-arc   2.7   Apr 16 2018 09:22:12   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   nm3ausec_maint.pkb  $
---       Date into PVCS   : $Date:   Jul 04 2013 15:23:04  $
---       Date fetched Out : $Modtime:   Jul 04 2013 14:25:10  $
---       PVCS Version     : $Revision:   2.6  $
+--       Date into PVCS   : $Date:   Apr 16 2018 09:22:12  $
+--       Date fetched Out : $Modtime:   Apr 16 2018 08:57:42  $
+--       PVCS Version     : $Revision:   2.7  $
 --       Based on SCCS version : 1.4
 --
 --   Author : Jonathan Mills
@@ -14,7 +14,7 @@ CREATE OR REPLACE PACKAGE BODY nm3ausec_maint AS
 --   NM3 Admin Unit Security Maintenance package body
 --
 -----------------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 
 /* History
@@ -24,7 +24,7 @@ CREATE OR REPLACE PACKAGE BODY nm3ausec_maint AS
 */
 
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.6  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.7  $"';
    g_package_name    CONSTANT  varchar2(30)   := 'nm3ausec_maint';
 --
    TYPE rec_parent IS RECORD

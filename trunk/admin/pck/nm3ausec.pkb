@@ -3,11 +3,11 @@ AS
    --
    --   PVCS Identifiers :-
    --
-   --       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3ausec.pkb-arc   2.15   Jan 24 2017 12:52:18   Rob.Coupe  $
+   --       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3ausec.pkb-arc   2.16   Apr 16 2018 09:22:12   Gaurav.Gaurkar  $
    --       Module Name      : $Workfile:   nm3ausec.pkb  $
-   --       Date into PVCS   : $Date:   Jan 24 2017 12:52:18  $
-   --       Date fetched Out : $Modtime:   Jan 24 2017 12:51:50  $
-   --       PVCS Version     : $Revision:   2.15  $
+   --       Date into PVCS   : $Date:   Apr 16 2018 09:22:12  $
+   --       Date fetched Out : $Modtime:   Apr 16 2018 08:57:42  $
+   --       PVCS Version     : $Revision:   2.16  $
    --       Based on
    --
    --   Author : Rob Coupe
@@ -15,12 +15,12 @@ AS
    --   NM3 Admin Unit Security package body
    --
    -----------------------------------------------------------------------------
-   -- Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+   -- Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
    -----------------------------------------------------------------------------
    --
    --all global package variables here
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '"$Revision:   2.15  $"';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '"$Revision:   2.16  $"';
 
    --  g_body_sccsid is the SCCS ID for the package body
    --
