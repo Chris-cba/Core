@@ -1,21 +1,21 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_router_params_utils.pkb-arc   5.5   Jul 04 2013 14:57:02   James.Wadsworth  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/hig_router_params_utils.pkb-arc   5.6   Apr 16 2018 09:21:58   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   hig_router_params_utils.pkb  $
---       Date into PVCS   : $Date:   Jul 04 2013 14:57:02  $
---       Date fetched Out : $Modtime:   Jul 04 2013 14:53:58  $
---       Version          : $Revision:   5.5  $
+--       Date into PVCS   : $Date:   Apr 16 2018 09:21:58  $
+--       Date fetched Out : $Modtime:   Apr 16 2018 08:53:04  $
+--       Version          : $Revision:   5.6  $
 --
 -----------------------------------------------------------------------------
---    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--    Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 Create Or Replace Package Body Hig_Router_Params_Utils
 Is
     
   --g_body_sccsid is the SCCS ID for the package body
-  g_Body_Sccsid             Constant  Varchar2(2000)              :=  '$Revision:   5.5  $';
+  g_Body_Sccsid             Constant  Varchar2(2000)              :=  '$Revision:   5.6  $';
   --
   -----------------------------------------------------------------------------
   --

@@ -3,14 +3,14 @@ AS
   -------------------------------------------------------------------------
   --   PVCS Identifiers :-
   --
-  --       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/hig_sso_api.pkb-arc   1.3   Sep 26 2017 14:00:46   Chris.Baugh  $
+  --       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/hig_sso_api.pkb-arc   1.4   Apr 16 2018 09:21:58   Gaurav.Gaurkar  $
   --       Module Name      : $Workfile:   hig_sso_api.pkb  $
-  --       Date into PVCS   : $Date:   Sep 26 2017 14:00:46  $
-  --       Date fetched Out : $Modtime:   Sep 26 2017 13:59:56  $
-  --       Version          : $Revision:   1.3  $
+  --       Date into PVCS   : $Date:   Apr 16 2018 09:21:58  $
+  --       Date fetched Out : $Modtime:   Apr 16 2018 08:50:58  $
+  --       Version          : $Revision:   1.4  $
   --       Based on SCCS version :
   ------------------------------------------------------------------
-  --   Copyright (c) 2017 Bentley Systems Incorporated. All rights reserved.
+  --   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
   ------------------------------------------------------------------
   --
   --all global package variables here
@@ -19,7 +19,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.3  $';
+  g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.4  $';
 
   g_package_name   CONSTANT VARCHAR2 (30) := 'hig_sso_api';
   --

@@ -5,11 +5,11 @@ CREATE OR REPLACE PACKAGE BODY hig2 IS
 -----------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       pvcsid                     : $Header:   //vm_latest/archives/nm3/admin/pck/hig2.pkb-arc   2.5   Oct 22 2013 17:30:18   Rob.Coupe  $
+--       pvcsid                     : $Header:   //new_vm_latest/archives/nm3/admin/pck/hig2.pkb-arc   2.6   Apr 16 2018 09:21:58   Gaurav.Gaurkar  $
 --       Module Name                : $Workfile:   hig2.pkb  $
---       Date into PVCS             : $Date:   Oct 22 2013 17:30:18  $
---       Date fetched Out           : $Modtime:   Oct 22 2013 17:23:12  $
---       PVCS Version               : $Revision:   2.5  $
+--       Date into PVCS             : $Date:   Apr 16 2018 09:21:58  $
+--       Date fetched Out           : $Modtime:   Apr 16 2018 08:54:26  $
+--       PVCS Version               : $Revision:   2.6  $
 --       Based on SCCS version      : 1.4
 --
 --
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY hig2 IS
 -- Procedures which are executed sporadically should be held in hig2.pck.
 --
 -----------------------------------------------------------------------------
---    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--    Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
    g_body_sccsid     CONSTANT  VARCHAR2(80) := '"@(#)hig2.pkb    1.4 02/22/06"';
 --  g_body_sccsid is the SCCS ID for the package body

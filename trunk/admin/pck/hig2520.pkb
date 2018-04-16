@@ -5,21 +5,21 @@ As
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig2520.pkb-arc   1.1   Jul 04 2013 15:01:10   James.Wadsworth  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/hig2520.pkb-arc   1.2   Apr 16 2018 09:21:58   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   hig2520.pkb  $
---       Date into PVCS   : $Date:   Jul 04 2013 15:01:10  $
---       Date fetched Out : $Modtime:   Jul 04 2013 14:58:30  $
---       Version          : $Revision:   1.1  $
+--       Date into PVCS   : $Date:   Apr 16 2018 09:21:58  $
+--       Date fetched Out : $Modtime:   Apr 16 2018 08:54:26  $
+--       Version          : $Revision:   1.2  $
 --       Based on SCCS version :
 ------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 ------------------------------------------------------------------
 
   -----------
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_Body_Sccsid               Constant  Varchar2(2000)                      :=  '$Revision:   1.1  $';
+  g_Body_Sccsid               Constant  Varchar2(2000)                      :=  '$Revision:   1.2  $';
 
 --
 -----------------------------------------------------------------------------

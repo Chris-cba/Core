@@ -5,13 +5,13 @@ AS
 --
 --       PVCS id          : $Header   //vm_latest/archives/nm3/admin/pck/hig_user_utility.pkb-arc   3.0 Mar 31 2009 10:10:10   Linesh Sorathia  $
 --       Module Name      : $Workfile:   hig_users_utility.pkb  $
---       Date into PVCS   : $Date:   Jul 04 2013 14:57:10  $
---       Date fetched Out : $Modtime:   Jul 04 2013 14:56:26  $
---       Version          : $Revision:   3.4  $
+--       Date into PVCS   : $Date:   Apr 16 2018 09:21:58  $
+--       Date fetched Out : $Modtime:   Apr 16 2018 08:54:24  $
+--       Version          : $Revision:   3.5  $
 --       Based on SCCS version : 
 --
 -----------------------------------------------------------------------------
---    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--    Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 --
@@ -21,7 +21,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.4  $';
+  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.5  $';
 
   g_package_name CONSTANT varchar2(30) := 'hig_users_utility';
 --

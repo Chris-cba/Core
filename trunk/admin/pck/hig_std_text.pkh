@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE hig_std_text AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/tma/admin/pck/hig_std_text.pkh-arc   3.4   Jul 03 2013 10:19:46   James.Wadsworth  $
+--       sccsid           : $Header:   //new_vm_latest/archives/tma/admin/pck/hig_std_text.pkh-arc   3.5   Apr 16 2018 09:21:58   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   hig_std_text.pkh  $
---       Date into SCCS   : $Date:   Jul 03 2013 10:19:46  $
---       Date fetched Out : $Modtime:   Jul 03 2013 09:37:10  $
---       SCCS Version     : $Revision:   3.4  $
+--       Date into SCCS   : $Date:   Apr 16 2018 09:21:58  $
+--       Date fetched Out : $Modtime:   Apr 16 2018 09:09:50  $
+--       SCCS Version     : $Revision:   3.5  $
 --       Based on 
 --
 --
@@ -17,11 +17,11 @@ CREATE OR REPLACE PACKAGE hig_std_text AS
 --  the implementation of Standard Text.
 --
 -----------------------------------------------------------------------------
---    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--    Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
-   g_sccsid   CONSTANT varchar2(30) :='"$Revision:   3.4  $"';
+   g_sccsid   CONSTANT varchar2(30) :='"$Revision:   3.5  $"';
 --</GLOBVAR>
 --
 -----------------------------------------------------------------------------

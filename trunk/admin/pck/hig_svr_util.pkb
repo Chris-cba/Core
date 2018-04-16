@@ -3,15 +3,15 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_svr_util.pkb-arc   2.6   Jul 04 2013 14:57:08   James.Wadsworth  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/hig_svr_util.pkb-arc   2.7   Apr 16 2018 09:21:58   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   hig_svr_util.pkb  $
---       Date into PVCS   : $Date:   Jul 04 2013 14:57:08  $
---       Date fetched Out : $Modtime:   Jul 04 2013 14:55:24  $
---       Version          : $Revision:   2.6  $
+--       Date into PVCS   : $Date:   Apr 16 2018 09:21:58  $
+--       Date fetched Out : $Modtime:   Apr 16 2018 08:53:04  $
+--       Version          : $Revision:   2.7  $
 --       Based on SCCS version : 
 --
 -----------------------------------------------------------------------------
---    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--    Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 --
@@ -21,7 +21,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT VARCHAR2(2000) := '$Revision:   2.6  $';
+  g_body_sccsid  CONSTANT VARCHAR2(2000) := '$Revision:   2.7  $';
   g_package_name CONSTANT VARCHAR2(30)   := 'hig_svr_util';
   g_dos                   BOOLEAN;
   g_slash                 VARCHAR2(1);

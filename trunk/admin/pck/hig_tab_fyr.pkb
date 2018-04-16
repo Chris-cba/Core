@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY hig_tab_fyr AS
 --
 -----------------------------------------------------------------------------
 --
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 --
 -----------------------------------------------------------------------------
 --
