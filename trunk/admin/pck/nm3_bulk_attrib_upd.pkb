@@ -3,14 +3,14 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3_bulk_attrib_upd.pkb-arc   3.11   Jul 04 2013 15:10:52   James.Wadsworth  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3_bulk_attrib_upd.pkb-arc   3.12   Apr 16 2018 09:22:04   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   nm3_bulk_attrib_upd.pkb  $
---       Date into PVCS   : $Date:   Jul 04 2013 15:10:52  $
---       Date fetched Out : $Modtime:   Jul 04 2013 15:08:24  $
---       Version          : $Revision:   3.11  $
+--       Date into PVCS   : $Date:   Apr 16 2018 09:22:04  $
+--       Date fetched Out : $Modtime:   Apr 16 2018 08:54:24  $
+--       Version          : $Revision:   3.12  $
 --       Based on SCCS version : 
 ------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 ------------------------------------------------------------------
 
 --
@@ -20,7 +20,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.11  $';
+  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.12  $';
 
   g_package_name CONSTANT varchar2(30) := 'nm3_bulk_attrib_upd';
 --

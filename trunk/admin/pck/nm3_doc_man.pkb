@@ -3,14 +3,14 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3_doc_man.pkb-arc   3.8   Apr 03 2017 09:45:08   linesh.sorathia  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3_doc_man.pkb-arc   3.9   Apr 16 2018 09:22:04   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   nm3_doc_man.pkb  $
---       Date into PVCS   : $Date:   Apr 03 2017 09:45:08  $
---       Date fetched Out : $Modtime:   Apr 03 2017 09:13:44  $
---       Version          : $Revision:   3.8  $
+--       Date into PVCS   : $Date:   Apr 16 2018 09:22:04  $
+--       Date fetched Out : $Modtime:   Apr 16 2018 08:54:24  $
+--       Version          : $Revision:   3.9  $
 --       Based on SCCS version : 
 ------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 ------------------------------------------------------------------
 --
 --all global package variables here
@@ -19,7 +19,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.8  $';
+  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.9  $';
 
   g_package_name CONSTANT varchar2(30) := 'nm3_doc_man';
 --

@@ -3,19 +3,19 @@ CREATE OR REPLACE PACKAGE BODY nm3_msv_util AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3_msv_util.pkb-arc   3.1   Jun 22 2015 08:06:04   Upendra.Hukeri  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3_msv_util.pkb-arc   3.2   Apr 16 2018 09:22:04   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   nm3_msv_util.pkb  $
---       Date into PVCS   : $Date:   Jun 22 2015 08:06:04  $
---       Date fetched Out : $Modtime:   Jun 19 2015 05:30:40  $
---       PVCS Version     : $Revision:   3.1  $
+--       Date into PVCS   : $Date:   Apr 16 2018 09:22:04  $
+--       Date fetched Out : $Modtime:   Apr 16 2018 08:54:24  $
+--       PVCS Version     : $Revision:   3.2  $
 --
 --   Product upgrade script
 --
 --------------------------------------------------------------------------------------------------------------------
---   Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 --------------------------------------------------------------------------------------------------------------------
 --
-	g_body_sccsid CONSTANT VARCHAR2(30) := '"$Revision:   3.1  $"';
+	g_body_sccsid CONSTANT VARCHAR2(30) := '"$Revision:   3.2  $"';
 --
 --------------------------------------------------------------------------------------------------------------------
 --

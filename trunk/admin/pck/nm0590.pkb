@@ -12,8 +12,12 @@ CREATE OR REPLACE PACKAGE BODY nm0590 AS
 --
 --  Package containing functions and procedures that form NM0590 - Asset Maitenance
 --  uses.
+--
+--  15-MAY-2015 S.J.Sewell. Changed source from nm_inv_items_all to nm_inv_items
+--                          so that data returned is date tracked.
+--
 -----------------------------------------------------------------------------
---  Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--  Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 --<PROC NAME="get_category_types">
@@ -438,7 +442,7 @@ BEGIN
             ,iit_num_attrib113
             ,iit_num_attrib114
             ,iit_num_attrib115
-        FROM nm_inv_items_all
+        FROM nm_inv_items
             ,nm_assets_on_route_holding
        WHERE narh_job_id  = pi_ngqi_job_id
          AND narh_ne_id_in = iit_ne_id(+)
@@ -791,7 +795,7 @@ BEGIN
             ,iit_num_attrib113
             ,iit_num_attrib114
             ,iit_num_attrib115
-        FROM nm_inv_items_all
+        FROM nm_inv_items
             ,v_nm_gaz_query_item_list
        WHERE ngqi_job_id = pi_ngqi_job_id
          AND ngqi_item_id = iit_ne_id(+)
@@ -1222,7 +1226,7 @@ SELECT  unique nith_nit_id
             ,iit_num_attrib113
             ,iit_num_attrib114
             ,iit_num_attrib115
-        FROM nm_inv_items_all
+        FROM nm_inv_items
        WHERE iit_ne_id IN(SELECT gdo_pk_id
                             FROM gis_data_objects
                            WHERE gdo_session_id = pi_gdo_session_id)
@@ -1617,7 +1621,7 @@ BEGIN
             ,iit_num_attrib113
             ,iit_num_attrib114
             ,iit_num_attrib115
-        FROM nm_inv_items_all
+        FROM nm_inv_items
        WHERE iit_ne_id IN(SELECT iit_ne_id
                             FROM nm_locator_results)
            ;
