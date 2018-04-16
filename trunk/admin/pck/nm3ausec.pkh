@@ -14,12 +14,12 @@ CREATE OR REPLACE PACKAGE nm3ausec AS
 --   NM3 Admin Unit Security package
 --
 ------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 ------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
 --  g_sccsid is the SCCS ID for the package
-    g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.4  $';
+    g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.5  $';
 --
    TYPE rec_each_nm IS RECORD
       (nm_ne_id_in       nm_members.nm_ne_id_in%TYPE

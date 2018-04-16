@@ -2,11 +2,11 @@ create or replace package body nm3dbg as
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3dbg.pkb-arc   2.3   Jul 04 2013 15:23:06   James.Wadsworth  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3dbg.pkb-arc   2.4   Apr 16 2018 09:22:14   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   nm3dbg.pkb  $
---       Date into PVCS   : $Date:   Jul 04 2013 15:23:06  $
---       Date fetched Out : $Modtime:   Jul 04 2013 14:25:10  $
---       PVCS Version     : $Revision:   2.3  $
+--       Date into PVCS   : $Date:   Apr 16 2018 09:22:14  $
+--       Date fetched Out : $Modtime:   Apr 16 2018 08:57:42  $
+--       PVCS Version     : $Revision:   2.4  $
 --       Based on sccs version :
 --
 --   Author : Priidu Tanava
@@ -14,7 +14,7 @@ create or replace package body nm3dbg as
 --   package to implement indented and timed debug
 --
 -----------------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 /* History
@@ -25,7 +25,7 @@ create or replace package body nm3dbg as
 */
 
 
-  g_body_sccsid     constant  varchar2(2000) := '"$Revision:   2.3  $"';
+  g_body_sccsid     constant  varchar2(2000) := '"$Revision:   2.4  $"';
   g_package_name    constant  varchar2(30)   := 'nm3dbg';
 
   

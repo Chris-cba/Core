@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE nm3clob AS
 --<PACKAGE>
 -- PVCS Identifiers :-
 --
--- pvcsid : $Header:   //vm_latest/archives/nm3/admin/pck/nm3clob.pkh-arc   2.5   Jul 04 2013 15:23:06   James.Wadsworth  $
+-- pvcsid : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3clob.pkh-arc   2.6   Apr 16 2018 09:22:14   Gaurav.Gaurkar  $
 -- Module Name : $Workfile:   nm3clob.pkh  $
--- Date into PVCS : $Date:   Jul 04 2013 15:23:06  $
--- Date fetched Out : $Modtime:   Jul 04 2013 14:25:10  $
--- PVCS Version : $Revision:   2.5  $
+-- Date into PVCS : $Date:   Apr 16 2018 09:22:14  $
+-- Date fetched Out : $Modtime:   Apr 16 2018 09:13:16  $
+-- PVCS Version : $Revision:   2.6  $
 -- Based on SCCS version : 
 --
 --   Author : Jonathan Mills
@@ -14,11 +14,11 @@ CREATE OR REPLACE PACKAGE nm3clob AS
 --   NM3 CLOB handling package
 --
 -----------------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
-  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.5  $';
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.6  $';
 --  g_sccsid is the SCCS ID for the package
 --
 -- This global is used internally within nm3clob. do not use it for any other

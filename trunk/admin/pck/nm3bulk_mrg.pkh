@@ -2,11 +2,11 @@ create or replace package nm3bulk_mrg as
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkh-arc   2.8   Jul 04 2013 15:23:06   James.Wadsworth  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkh-arc   2.9   Apr 16 2018 09:22:14   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   nm3bulk_mrg.pkh  $
---       Date into PVCS   : $Date:   Jul 04 2013 15:23:06  $
---       Date fetched Out : $Modtime:   Jul 04 2013 14:25:10  $
---       PVCS Version     : $Revision:   2.8  $
+--       Date into PVCS   : $Date:   Apr 16 2018 09:22:14  $
+--       Date fetched Out : $Modtime:   Apr 16 2018 09:13:16  $
+--       PVCS Version     : $Revision:   2.9  $
 --       Based on sccs version :
 --
 --   Author : Priidu Tanava
@@ -14,10 +14,10 @@ create or replace package nm3bulk_mrg as
 --   Bulk merge functinality
 --
 -----------------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 
-  g_sccsid      constant  varchar2(2000) := '"$Revision:   2.8  $"';
+  g_sccsid      constant  varchar2(2000) := '"$Revision:   2.9  $"';
   
   
   -- values copied from nm3extent
