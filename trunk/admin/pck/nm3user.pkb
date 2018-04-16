@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm3user AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3user.pkb-arc   2.9   Jul 04 2013 16:35:54   James.Wadsworth  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3user.pkb-arc   2.10   Apr 16 2018 09:23:44   Gaurav.Gaurkar  $
 --       Mg_user_id_tabodule Name      : $Workfile:   nm3user.pkb  $
---       Date into PVCS   : $Date:   Jul 04 2013 16:35:54  $
---       Date fetched Out : $Modtime:   Jul 04 2013 14:25:20  $
---       Version          : $Revision:   2.9  $
+--       Date into PVCS   : $Date:   Apr 16 2018 09:23:44  $
+--       Date fetched Out : $Modtime:   Apr 16 2018 09:06:20  $
+--       Version          : $Revision:   2.10  $
 --       Based on SCCS version : 1.21
 -------------------------------------------------------------------------
 --   Author : Rob Coupe
@@ -14,9 +14,9 @@ CREATE OR REPLACE PACKAGE BODY nm3user AS
 --   NM3 user package
 --
 -----------------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
-   g_body_sccsid     CONSTANT  varchar2(2000) := '$Revision:   2.9  $';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '$Revision:   2.10  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name CONSTANT  varchar2(2000) := 'nm3user';

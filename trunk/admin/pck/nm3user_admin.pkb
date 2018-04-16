@@ -3,21 +3,21 @@ As
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3user_admin.pkb-arc   3.4   Feb 22 2017 11:06:08   Chris.Baugh  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3user_admin.pkb-arc   3.5   Apr 16 2018 09:23:44   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   nm3user_admin.pkb  $
---       Date into PVCS   : $Date:   Feb 22 2017 11:06:08  $
---       Date fetched Out : $Modtime:   Feb 16 2017 15:53:14  $
---       Version          : $Revision:   3.4  $
+--       Date into PVCS   : $Date:   Apr 16 2018 09:23:44  $
+--       Date fetched Out : $Modtime:   Apr 16 2018 09:06:20  $
+--       Version          : $Revision:   3.5  $
 -------------------------------------------------------------------------
 --   Author : Steven Cooper
 --
 --   NM3 user Admin package
 --
 ------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 ------------------------------------------------------------------
 
-  gc_Body_Version  Constant  Varchar2(100) := '$Revision:   3.4  $';
+  gc_Body_Version  Constant  Varchar2(100) := '$Revision:   3.5  $';
 
   gc_Package_Name  Constant  Varchar2(30)  := 'nm3User_Admin';
  

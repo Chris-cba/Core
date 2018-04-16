@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE nm3user AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3user.pkh-arc   2.8   Jul 04 2013 16:35:54   James.Wadsworth  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3user.pkh-arc   2.9   Apr 16 2018 09:23:44   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   nm3user.pkh  $
---       Date into PVCS   : $Date:   Jul 04 2013 16:35:54  $
---       Date fetched Out : $Modtime:   Jul 04 2013 14:25:20  $
---       Version          : $Revision:   2.8  $
+--       Date into PVCS   : $Date:   Apr 16 2018 09:23:44  $
+--       Date fetched Out : $Modtime:   Apr 16 2018 09:17:20  $
+--       Version          : $Revision:   2.9  $
 --       Based on SCCS version : 1.18
 -------------------------------------------------------------------------
 --   Author : Rob Coupe
@@ -15,11 +15,11 @@ CREATE OR REPLACE PACKAGE nm3user AS
 --   NM3 user package
 --
 -----------------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
-  g_sccsid      CONSTANT  varchar2(2000) := '$Revision:   2.8  $';
+  g_sccsid      CONSTANT  varchar2(2000) := '$Revision:   2.9  $';
 --  g_sccsid is the SCCS ID for the package
 
 --
