@@ -10,7 +10,7 @@ CREATE OR REPLACE FUNCTION gety RETURN NUMBER IS
 --       SCCS Version     : 1.1
 --
 -----------------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 BEGIN
  DECLARE

@@ -12,7 +12,7 @@ CREATE OR REPLACE function get_search_group_no ( p_gty in nm_group_types_all.ngt
 -----------------------------------------------------------------------------
 --   Originally taken from 
 -----------------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 ngt_row nm_group_types%rowtype;
 

@@ -3,15 +3,15 @@ CREATE OR REPLACE procedure drop_layer ( p_table in varchar2, p_column in varcha
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/drop_layer.fnc-arc   2.2   Jul 04 2013 14:31:28   James.Wadsworth  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/drop_layer.fnc-arc   2.3   Apr 16 2018 09:21:50   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   drop_layer.fnc  $
---       Date into SCCS   : $Date:   Jul 04 2013 14:31:28  $
---       Date fetched Out : $Modtime:   Jul 04 2013 14:25:06  $
---       SCCS Version     : $Revision:   2.2  $
+--       Date into SCCS   : $Date:   Apr 16 2018 09:21:50  $
+--       Date fetched Out : $Modtime:   Apr 16 2018 08:49:36  $
+--       SCCS Version     : $Revision:   2.3  $
 --       Based on SCCS Version     : 1.1
 --
 -----------------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 cur_string varchar2(2000);
 qq         char := chr(39);

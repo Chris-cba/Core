@@ -1,11 +1,11 @@
 CREATE OR REPLACE PACKAGE BODY doc AS
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/doc.pkb-arc   2.4   Jul 04 2013 14:31:26   James.Wadsworth  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/doc.pkb-arc   2.5   Apr 16 2018 09:21:50   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   doc.pkb  $
---       Date into SCCS   : $Date:   Jul 04 2013 14:31:26  $
---       Date fetched Out : $Modtime:   Jul 04 2013 14:25:06  $
---       SCCS Version     : $Revision:   2.4  $
+--       Date into SCCS   : $Date:   Apr 16 2018 09:21:50  $
+--       Date fetched Out : $Modtime:   Apr 16 2018 08:53:04  $
+--       SCCS Version     : $Revision:   2.5  $
 --       Based on SCCS Version     : 1.12
 --
 --
@@ -14,11 +14,11 @@ CREATE OR REPLACE PACKAGE BODY doc AS
 --   DOCUMENTS application generic utilities package
 --
 -----------------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------------------
 
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.4  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.5  $"';
    g_package_name    CONSTANT varchar2(30) := 'doc';
 --  g_body_sccsid is the SCCS ID for the package body
 --

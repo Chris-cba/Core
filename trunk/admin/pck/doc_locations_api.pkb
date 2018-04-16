@@ -3,14 +3,14 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/doc_locations_api.pkb-arc   2.11   Jul 04 2013 14:31:26   James.Wadsworth  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/doc_locations_api.pkb-arc   2.12   Apr 16 2018 09:21:50   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   doc_locations_api.pkb  $
---       Date into PVCS   : $Date:   Jul 04 2013 14:31:26  $
---       Date fetched Out : $Modtime:   Jul 04 2013 14:29:06  $
---       Version          : $Revision:   2.11  $
+--       Date into PVCS   : $Date:   Apr 16 2018 09:21:50  $
+--       Date fetched Out : $Modtime:   Apr 16 2018 08:53:04  $
+--       Version          : $Revision:   2.12  $
 --       Based on SCCS version : 
 ------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 ------------------------------------------------------------------
 --
 --all global package variables here
@@ -19,7 +19,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.11  $';
+  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.12  $';
 --
   g_package_name CONSTANT varchar2(30) := 'doc_locations_api';
 --
@@ -459,16 +459,16 @@ BEGIN
      l_tab_comments(1)  := '--';
      l_tab_comments(2)  := '--   SCCS Identifiers :-';
      l_tab_comments(3)  := '--';
-     l_tab_comments(4)  := '--       pvcsid                     : $Header:   //vm_latest/archives/nm3/admin/pck/doc_locations_api.pkb-arc   2.11   Jul 04 2013 14:31:26   James.Wadsworth  $';
+     l_tab_comments(4)  := '--       pvcsid                     : $Header:   //new_vm_latest/archives/nm3/admin/pck/doc_locations_api.pkb-arc   2.12   Apr 16 2018 09:21:50   Gaurav.Gaurkar  $';
      l_tab_comments(5)  := '--       Module Name                : $Workfile:   doc_locations_api.pkb  $';
-     l_tab_comments(6)  := '--       Date into PVCS             : $Date:   Jul 04 2013 14:31:26  $';
-     l_tab_comments(7)  := '--       Date fetched Out           : $Modtime:   Jul 04 2013 14:29:06  $';
-     l_tab_comments(8)  := '--       PVCS Version               : $Revision:   2.11  $';
+     l_tab_comments(6)  := '--       Date into PVCS             : $Date:   Apr 16 2018 09:21:50  $';
+     l_tab_comments(7)  := '--       Date fetched Out           : $Modtime:   Apr 16 2018 08:53:04  $';
+     l_tab_comments(8)  := '--       PVCS Version               : $Revision:   2.12  $';
      l_tab_comments(9)  := '--';
      l_tab_comments(10) := '--   table_name_WHO trigger';
      l_tab_comments(11) := '--';
      l_tab_comments(12) := '-----------------------------------------------------------------------------';
-     l_tab_comments(13) := '--    Copyright (c) exor corporation ltd, 2007';
+     l_tab_comments(13) := '--    Copyright (c) exor corporation ltd, 2018';
      l_tab_comments(14) := '-----------------------------------------------------------------------------';
      l_tab_comments(15) := '--';
   --

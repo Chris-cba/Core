@@ -15,7 +15,7 @@ CREATE OR REPLACE function get_error_string (pi_err_id in nm_x_errors.nxe_id%TYP
 --   X-Attr Validation get_error_string function
 --
 -----------------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
    cursor c1 (c_err_id nm_x_errors.nxe_id%TYPE) is
