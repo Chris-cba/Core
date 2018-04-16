@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3asset_display AS
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3asset_display.pkb-arc   2.5   Jul 04 2013 15:15:40   James.Wadsworth  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3asset_display.pkb-arc   2.6   Apr 16 2018 09:22:10   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   nm3asset_display.pkb  $
---       Date into PVCS   : $Date:   Jul 04 2013 15:15:40  $
---       Date fetched Out : $Modtime:   Jul 04 2013 14:25:08  $
---       Version          : $Revision:   2.5  $
+--       Date into PVCS   : $Date:   Apr 16 2018 09:22:10  $
+--       Date fetched Out : $Modtime:   Apr 16 2018 08:57:42  $
+--       Version          : $Revision:   2.6  $
 --       Based on SCCS version : 1.4
 --
 --   Author : Kevin Angus
@@ -16,14 +16,14 @@ CREATE OR REPLACE PACKAGE BODY nm3asset_display AS
 --   nm3asset_display body
 --
 -----------------------------------------------------------------------------
--- Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-- Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
   -----------
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.5  $';
+  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.6  $';
   g_package_name CONSTANT VARCHAR2(30) := 'nm3asset_display';
   c_nl CONSTANT VARCHAR2(1) := CHR(10);
 

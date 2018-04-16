@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY nm3asset_rep AS
 -----------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3asset_rep.pkb-arc   2.3   Jul 04 2013 15:15:40   James.Wadsworth  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3asset_rep.pkb-arc   2.4   Apr 16 2018 09:22:10   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   nm3asset_rep.pkb  $
---       Date into PVCS   : $Date:   Jul 04 2013 15:15:40  $
---       Date fetched Out : $Modtime:   Jul 04 2013 14:25:10  $
---       Version          : $Revision:   2.3  $
+--       Date into PVCS   : $Date:   Apr 16 2018 09:22:10  $
+--       Date fetched Out : $Modtime:   Apr 16 2018 08:57:42  $
+--       Version          : $Revision:   2.4  $
 --       Based on SCCS version : 1.2
 --
 --   Author : Kevin Angus
@@ -15,7 +15,7 @@ CREATE OR REPLACE PACKAGE BODY nm3asset_rep AS
 --   nm3asset_rep body
 --
 -----------------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 --all global package variables here
@@ -24,7 +24,7 @@ CREATE OR REPLACE PACKAGE BODY nm3asset_rep AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.3  $';
+  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.4  $';
   g_package_name           CONSTANT varchar2(30) := 'nm3asset_rep';
   c_nl                     CONSTANT varchar2(1) := CHR(10);
   c_aor_filename           CONSTANT hig_modules.hmo_filename%TYPE := 'NM0560';
