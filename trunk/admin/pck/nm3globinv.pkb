@@ -3,25 +3,27 @@ CREATE OR REPLACE PACKAGE BODY nm3globinv AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3globinv.pkb-arc   2.3   Jul 04 2013 16:04:12   James.Wadsworth  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3globinv.pkb-arc   2.5   Apr 16 2018 09:22:32   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   nm3globinv.pkb  $
---       Date into PVCS   : $Date:   Jul 04 2013 16:04:12  $
---       Date fetched Out : $Modtime:   Jul 04 2013 14:25:12  $
---       Version          : $Revision:   2.3  $
+--       Date into PVCS   : $Date:   Apr 16 2018 09:22:32  $
+--       Date fetched Out : $Modtime:   Apr 16 2018 09:00:30  $
+--       Version          : $Revision:   2.5  $
 --       Based on SCCS version : 1.7
 -------------------------------------------------------------------------
 --   Author : Jonathan Mills
 --
 --   Global Inventory Update Package body
 --
+--   19-MAY-2015  S.J.Sewell.   Exclude Inventory Assets from update if they 
+--                              are not the latest version.
 -----------------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 --all global package variables here
 --
 --  g_body_sccsid is the SCCS ID for the package body
-   g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.3  $';
+   g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.5  $';
    g_package_name    CONSTANT  varchar2(30)   := 'nm3globinv';
 --
    g_tab_pre_val_format  nm3type.tab_varchar30;
@@ -372,6 +374,17 @@ BEGIN
          l_dont_process   EXCEPTION;
          l_iit_ne_id      nm_inv_items.iit_ne_id%TYPE := l_tab_all(l_count);
       BEGIN
+        --
+        -- If this is not the latest version of an Inventory Asset then
+        -- exclude it from the list of ids by checking the iit_ne_id and
+        -- context effective date. 
+        --
+        if nm3inv_item_aud.nii_is_inv_category(nm3asset.get_category_for_inv_type(pi_inv_type)) AND
+          nm3inv_item_aud.nii_is_latest_version_char(l_iit_ne_id) = 'FALSE'
+        THEN
+          nm_debug.debug('GLOBINV iit_ne_id '||to_char(l_iit_ne_id)||' not processed as is not the latest version of asset.');
+          RAISE l_dont_process;
+        END IF;
          IF   pi_overhang_rule = c_leave
           AND l_tab_overhangs.EXISTS(l_iit_ne_id)
           THEN
