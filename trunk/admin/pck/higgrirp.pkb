@@ -1,11 +1,11 @@
 CREATE OR REPLACE PACKAGE BODY higgrirp AS
 --   PVCS Identifiers :-
 --
---       pvcsid               : $Header:   //vm_latest/archives/nm3/admin/pck/higgrirp.pkb-arc   2.3   Jul 04 2013 15:01:12   James.Wadsworth  $
+--       pvcsid               : $Header:   //new_vm_latest/archives/nm3/admin/pck/higgrirp.pkb-arc   2.4   Apr 16 2018 09:22:00   Gaurav.Gaurkar  $
 --       Module Name          : $Workfile:   higgrirp.pkb  $
---       Date into PVCS       : $Date:   Jul 04 2013 15:01:12  $
---       Date fetched Out     : $Modtime:   Jul 04 2013 14:25:06  $
---       PVCS Version         : $Revision:   2.3  $
+--       Date into PVCS       : $Date:   Apr 16 2018 09:22:00  $
+--       Date fetched Out     : $Modtime:   Apr 16 2018 08:54:24  $
+--       PVCS Version         : $Revision:   2.4  $
 --       Based on SCCS version : 1.5
 --
 --   Author :
@@ -13,7 +13,7 @@ CREATE OR REPLACE PACKAGE BODY higgrirp AS
 --   suite of functions used by programs/reports to retrieve GRI values
 --
 -----------------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 
 /* History
@@ -23,7 +23,7 @@ CREATE OR REPLACE PACKAGE BODY higgrirp AS
                 (use dbms_lock.sleep() to give time to ohter sessions if needed)
 */
 
-  g_body_sccsid            constant  varchar2(200) := '"$Revision:   2.3  $"';
+  g_body_sccsid            constant  varchar2(200) := '"$Revision:   2.4  $"';
   g_package_name           constant varchar2(30) := 'higgrirp';
   
   c_reports_file_extension CONSTANT varchar2(4) := '.rep';

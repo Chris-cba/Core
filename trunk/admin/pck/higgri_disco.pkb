@@ -16,7 +16,7 @@ create or replace package body higgri_disco as
 --   HIGGRI_DISCO package
 --
 ------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 ------------------------------------------------------------------
 --
    g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"@(#)higgri_disco.pkb	1.1 03/01/01"';

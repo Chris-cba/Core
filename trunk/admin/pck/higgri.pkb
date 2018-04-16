@@ -20,10 +20,10 @@ CREATE OR REPLACE PACKAGE BODY higgri AS
 --   The GRI package
 --
 -----------------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  varchar2(80) := '"$Revision:   2.12  $"';
+   g_body_sccsid     CONSTANT  varchar2(80) := '"$Revision:   2.13  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30) := 'higgri';
