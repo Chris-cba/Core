@@ -11,7 +11,7 @@ CREATE OR REPLACE PACKAGE BODY Run_Gis AS
 --       Author   Rob Coupe
 --
 -----------------------------------------------------------------------------
---    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--    Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --</PACKAGE>
   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '@(#)run_gis.pkb	1.6 06/12/07';
