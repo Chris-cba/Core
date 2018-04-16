@@ -1,14 +1,14 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3web_eng_dynseg.pkb-arc   2.11   Jul 04 2013 16:35:54   James.Wadsworth  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3web_eng_dynseg.pkb-arc   2.12   Apr 16 2018 09:23:46   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   nm3web_eng_dynseg.pkb  $
---       Date into PVCS   : $Date:   Jul 04 2013 16:35:54  $
---       Date fetched Out : $Modtime:   Jul 04 2013 15:55:10  $
---       Version          : $Revision:   2.11  $
+--       Date into PVCS   : $Date:   Apr 16 2018 09:23:46  $
+--       Date fetched Out : $Modtime:   Apr 16 2018 09:06:20  $
+--       Version          : $Revision:   2.12  $
 --
 -----------------------------------------------------------------------------
---    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--    Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 CREATE OR REPLACE PACKAGE BODY nm3web_eng_dynseg AS
@@ -17,7 +17,7 @@ CREATE OR REPLACE PACKAGE BODY nm3web_eng_dynseg AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.11  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.12  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3web_eng_dynseg';
@@ -95,11 +95,11 @@ BEGIN
    htp.p('--');
    htp.p('--   PVCS Identifiers :-');
    htp.p('--');
-   htp.p('--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3web_eng_dynseg.pkb-arc   2.11   Jul 04 2013 16:35:54   James.Wadsworth  $');
+   htp.p('--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3web_eng_dynseg.pkb-arc   2.12   Apr 16 2018 09:23:46   Gaurav.Gaurkar  $');
    htp.p('--       Module Name      : $Workfile:   nm3web_eng_dynseg.pkb  $');
-   htp.p('--       Date into PVCS   : $Date:   Jul 04 2013 16:35:54  $');
-   htp.p('--       Date fetched Out : $Modtime:   Jul 04 2013 15:55:10  $');
-   htp.p('--       PVCS Version     : $Revision:   2.11  $');
+   htp.p('--       Date into PVCS   : $Date:   Apr 16 2018 09:23:46  $');
+   htp.p('--       Date fetched Out : $Modtime:   Apr 16 2018 09:06:20  $');
+   htp.p('--       PVCS Version     : $Revision:   2.12  $');
    htp.p('--       Based on SCCS Version     : 1.23');
    htp.p('--');
    htp.p('--');
@@ -108,7 +108,7 @@ BEGIN
    htp.p('--   NM3 Web Engineering DynSeg package body');
    htp.p('--');
    htp.p('-----------------------------------------------------------------------------');
-   htp.p('--    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.');
+   htp.p('--    Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.');
    htp.p('-----------------------------------------------------------------------------');
    htp.p('--');
    htp.p('-->');

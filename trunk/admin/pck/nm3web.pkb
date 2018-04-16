@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3web IS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3web.pkb-arc   2.5   Sep 30 2013 15:51:14   Rob.Coupe  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3web.pkb-arc   2.6   Apr 16 2018 09:23:46   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   nm3web.pkb  $
---       Date into PVCS   : $Date:   Sep 30 2013 15:51:14  $
---       Date fetched Out : $Modtime:   Sep 30 2013 15:39:24  $
---       PVCS Version     : $Revision:   2.5  $
+--       Date into PVCS   : $Date:   Apr 16 2018 09:23:46  $
+--       Date fetched Out : $Modtime:   Apr 16 2018 09:06:20  $
+--       PVCS Version     : $Revision:   2.6  $
 --       Based on         : 1.55
 --
 --
@@ -17,12 +17,12 @@ CREATE OR REPLACE PACKAGE BODY nm3web IS
 --   NM3 Web Standard Components package body
 --
 -----------------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.5  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.6  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3web';
@@ -170,7 +170,7 @@ BEGIN
    htp.COMMENT('       SCCS Version     : 1.55');
    htp.COMMENT(NULL);
    htp.COMMENT('-----------------------------------------------------------------------------');
-   htp.COMMENT('	Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.');
+   htp.COMMENT('	Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.');
    htp.COMMENT('-----------------------------------------------------------------------------');
    htp.COMMENT(NULL);
 --

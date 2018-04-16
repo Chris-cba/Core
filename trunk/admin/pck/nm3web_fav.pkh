@@ -2,11 +2,11 @@ create or replace package nm3web_fav as
 --<PACKAGE>
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3web_fav.pkh-arc   2.2   Jul 04 2013 16:35:56   James.Wadsworth  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3web_fav.pkh-arc   2.3   Apr 16 2018 09:23:46   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   nm3web_fav.pkh  $
---       Date into PVCS   : $Date:   Jul 04 2013 16:35:56  $
---       Date fetched Out : $Modtime:   Jul 04 2013 14:25:20  $
---       PVCS Version     : $Revision:   2.2  $
+--       Date into PVCS   : $Date:   Apr 16 2018 09:23:46  $
+--       Date fetched Out : $Modtime:   Apr 16 2018 09:17:20  $
+--       PVCS Version     : $Revision:   2.3  $
 --       Based on         : 1.1
 --
 --
@@ -15,11 +15,11 @@ create or replace package nm3web_fav as
 --   nm3 web favourites package
 --
 -----------------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
-  g_sccsid      CONSTANT  VARCHAR2(2000) := '"$Revision:   2.2  $"';
+  g_sccsid      CONSTANT  VARCHAR2(2000) := '"$Revision:   2.3  $"';
 --  g_sccsid is the SCCS ID for the package
 --</GLOBVAR>
 --
