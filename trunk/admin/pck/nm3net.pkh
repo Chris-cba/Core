@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE nm3net AS
 --<PACKAGE>
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3net.pkh-arc   2.6   Jul 04 2013 16:19:16   James.Wadsworth  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3net.pkh-arc   2.7   Apr 16 2018 09:23:14   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   nm3net.pkh  $
---       Date into SCCS   : $Date:   Jul 04 2013 16:19:16  $
---       Date fetched Out : $Modtime:   Jul 04 2013 14:25:18  $
---       SCCS Version     : $Revision:   2.6  $
+--       Date into SCCS   : $Date:   Apr 16 2018 09:23:14  $
+--       Date fetched Out : $Modtime:   Apr 16 2018 09:16:12  $
+--       SCCS Version     : $Revision:   2.7  $
 --       Based on 
 --
 --
@@ -15,12 +15,12 @@ CREATE OR REPLACE PACKAGE nm3net AS
 --     nm3net package
 --
 -----------------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 
 -- 03.06.08 PT added pi_no_purpose parameter to create_node()
 
-  g_sccsid      CONSTANT  varchar2(80) := '"$Revision:   2.6  $"';
+  g_sccsid      CONSTANT  varchar2(80) := '"$Revision:   2.7  $"';
 --  g_sccsid is the SCCS_ID
 --
 

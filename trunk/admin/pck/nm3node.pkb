@@ -3,19 +3,19 @@ create or replace package body nm3node as
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3node.pkb-arc   3.3   Jul 04 2013 16:20:10   James.Wadsworth  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3node.pkb-arc   3.4   Apr 16 2018 09:23:14   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   nm3node.pkb  $
---       Date into PVCS   : $Date:   Jul 04 2013 16:20:10  $
---       Date fetched Out : $Modtime:   Jul 04 2013 16:20:00  $
---       PVCS Version     : $Revision:   3.3  $
+--       Date into PVCS   : $Date:   Apr 16 2018 09:23:14  $
+--       Date fetched Out : $Modtime:   Apr 16 2018 09:04:32  $
+--       PVCS Version     : $Revision:   3.4  $
 --
 ------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 ------------------------------------------------------------------
 
 --
 -- g_body_sccsid is the SCCS ID for the package body
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   3.3  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   3.4  $"';
 --
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3node';
 
