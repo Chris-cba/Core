@@ -5,14 +5,14 @@ AS
    --
    ---   PVCS Identifiers :-
    --
-   --       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.96   Sep 05 2016 09:52:54   Chris.Baugh  $
+   --       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.97   Apr 16 2018 09:23:34   Gaurav.Gaurkar  $
    --       Module Name      : $Workfile:   nm3sdo.pkb  $
-   --       Date into PVCS   : $Date:   Sep 05 2016 09:52:54  $
-   --       Date fetched Out : $Modtime:   Sep 02 2016 15:10:34  $
-   --       PVCS Version     : $Revision:   2.96  $
+   --       Date into PVCS   : $Date:   Apr 16 2018 09:23:34  $
+   --       Date fetched Out : $Modtime:   Apr 16 2018 09:04:32  $
+   --       PVCS Version     : $Revision:   2.97  $
    --       Based on
    ------------------------------------------------------------------
-   --   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+   --   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
    ------------------------------------------------------------------
    --
    --   Author : Rob Coupe
@@ -20,10 +20,10 @@ AS
    --   NM3 Package for Oracle Spatial links
    --
    -------------------------------------------------------------------------------
-   -- Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+   -- Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
    -----------------------------------------------------------------------------
 
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '"$Revision:   2.96  $"';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '"$Revision:   2.97  $"';
    g_package_name   CONSTANT VARCHAR2 (30) := 'NM3SDO';
    g_batch_size              INTEGER
       := NVL (TO_NUMBER (Hig.get_sysopt ('SDOBATSIZE')), 10);
