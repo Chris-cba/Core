@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY nm3mail AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3mail.pkb-arc   2.18   Nov 15 2017 16:23:32   Chris.Baugh  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3mail.pkb-arc   2.19   Apr 16 2018 09:22:54   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   nm3mail.pkb  $
---       Date into PVCS   : $Date:   Nov 15 2017 16:23:32  $
---       Date fetched Out : $Modtime:   Nov 15 2017 16:22:56  $
---       Version          : $Revision:   2.18  $
+--       Date into PVCS   : $Date:   Apr 16 2018 09:22:54  $
+--       Date fetched Out : $Modtime:   Apr 16 2018 09:01:36  $
+--       Version          : $Revision:   2.19  $
 --       Based on SCCS version : 1.12
 -------------------------------------------------------------------------
 --   Author : Jonathan Mills
@@ -15,12 +15,12 @@ CREATE OR REPLACE PACKAGE BODY nm3mail AS
 --   nm3mail package
 --
 -----------------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 --all global package variables here
 --
-  g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.18  $';
+  g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.19  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3mail';
@@ -811,7 +811,7 @@ BEGIN
              ||CHR(10)||'--   nm3mail sending job'
              ||CHR(10)||'--'
              ||CHR(10)||'-----------------------------------------------------------------------------'
-             ||CHR(10)||'--	Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.'
+             ||CHR(10)||'--	Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.'
              ||CHR(10)||'-----------------------------------------------------------------------------'
              ||CHR(10)||'--'
              ||CHR(10)||'   l_server_not_there EXCEPTION;'

@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3lock_gen IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3lock_gen.pkb-arc   2.21   Jul 04 2013 16:11:52   James.Wadsworth  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3lock_gen.pkb-arc   2.23   Apr 16 2018 09:22:54   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   nm3lock_gen.pkb  $
---       Date into PVCS   : $Date:   Jul 04 2013 16:11:52  $
---       Date fetched Out : $Modtime:   Jul 04 2013 14:25:16  $
---       PVCS Version     : $Revision:   2.21  $
+--       Date into PVCS   : $Date:   Apr 16 2018 09:22:54  $
+--       Date fetched Out : $Modtime:   Apr 16 2018 09:01:36  $
+--       PVCS Version     : $Revision:   2.23  $
 --
 --
 --   Author : Jonathan Mills
@@ -16,15 +16,15 @@ CREATE OR REPLACE PACKAGE BODY nm3lock_gen IS
 --   Generated package DO NOT MODIFY
 --
 --   nm3get_gen header : "@(#)nm3get_gen.pkh	1.3 12/05/05"
---   nm3get_gen body   : "$Revision:   2.21  $"
+--   nm3get_gen body   : "$Revision:   2.23  $"
 --
 -----------------------------------------------------------------------------
 --
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 --
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid CONSTANT  VARCHAR2(2000) := '"$Revision:   2.21  $"';
+   g_body_sccsid CONSTANT  VARCHAR2(2000) := '"$Revision:   2.23  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3lock_gen';
@@ -11482,7 +11482,7 @@ FUNCTION lock_iit (pi_iit_ne_id         nm_inv_items.iit_ne_id%TYPE
 --
    CURSOR cs_iit IS
    SELECT /*+ INDEX (iit INV_ITEMS_ALL_PK) */ ROWID
-    FROM  nm_inv_items iit
+    FROM  nm_inv_items_all iit
    WHERE  iit.iit_ne_id = pi_iit_ne_id
    FOR UPDATE NOWAIT;
 --
@@ -11569,7 +11569,7 @@ FUNCTION lock_iit (pi_iit_primary_key   nm_inv_items.iit_primary_key%TYPE
 --
    CURSOR cs_iit IS
    SELECT /*+ INDEX (iit IIT_UK) */ ROWID
-    FROM  nm_inv_items iit
+    FROM  nm_inv_items_all iit
    WHERE  iit.iit_primary_key = pi_iit_primary_key
     AND   iit.iit_inv_type    = pi_iit_inv_type
     AND   iit.iit_start_date  = pi_iit_start_date
@@ -11665,7 +11665,7 @@ FUNCTION lock_iit (pi_iit_primary_key   nm_inv_items.iit_primary_key%TYPE
 --
    CURSOR cs_iit IS
    SELECT /*+ INDEX (iit IIT_UK) */ ROWID
-    FROM  nm_inv_items iit
+    FROM  nm_inv_items_all iit
    WHERE  iit.iit_primary_key = pi_iit_primary_key
     AND   iit.iit_inv_type    = pi_iit_inv_type
    FOR UPDATE NOWAIT;

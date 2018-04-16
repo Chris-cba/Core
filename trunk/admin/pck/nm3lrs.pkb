@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3lrs.pkb-arc   2.9   Feb 19 2015 13:27:02   Chris.Baugh  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3lrs.pkb-arc   2.10   Apr 16 2018 09:22:54   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   nm3lrs.pkb  $
---       Date into PVCS   : $Date:   Feb 19 2015 13:27:02  $
---       Date fetched Out : $Modtime:   Feb 18 2015 15:16:38  $
---       Version          : $Revision:   2.9  $
+--       Date into PVCS   : $Date:   Apr 16 2018 09:22:54  $
+--       Date fetched Out : $Modtime:   Apr 16 2018 09:01:36  $
+--       Version          : $Revision:   2.10  $
 --       Based on SCCS version : 1.45
 -------------------------------------------------------------------------
 --   Author : Rob Coupe
@@ -15,10 +15,10 @@ AS
 --  nm3lrs package
 --
 -----------------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
    --g_body_sccsid     CONSTANT  varchar2(2000) := '"@(#)nm3lrs.pkb	1.45 09/25/06"';
-   g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.9  $';
+   g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.10  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3lrs';
