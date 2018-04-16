@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm3extlov  AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3extlov.pkb-arc   2.6   Jul 04 2013 15:33:48   James.Wadsworth  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3extlov.pkb-arc   2.7   Apr 16 2018 09:22:24   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   nm3extlov.pkb  $
---       Date into PVCS   : $Date:   Jul 04 2013 15:33:48  $
---       Date fetched Out : $Modtime:   Jul 04 2013 14:25:10  $
---       Version          : $Revision:   2.6  $
+--       Date into PVCS   : $Date:   Apr 16 2018 09:22:24  $
+--       Date fetched Out : $Modtime:   Apr 16 2018 09:00:30  $
+--       Version          : $Revision:   2.7  $
 --       Based on SCCS version : 1.12
 -------------------------------------------------------------------------
 --
@@ -15,10 +15,10 @@ CREATE OR REPLACE PACKAGE BODY nm3extlov  AS
 --   Extended List of Values package
 --
 -----------------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
-  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.6  $';
+  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.7  $';
 --  g_body_sccsid is the SCCS ID for the package body
 -----------------------------------------------------------------------------
 --
