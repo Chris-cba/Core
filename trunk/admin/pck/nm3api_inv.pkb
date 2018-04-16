@@ -4,25 +4,25 @@ CREATE OR REPLACE PACKAGE BODY nm3api_inv AS
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3api_inv.pkb-arc   2.7   Jul 04 2013 15:15:38   James.Wadsworth  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3api_inv.pkb-arc   2.8   Apr 16 2018 09:22:08   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   nm3api_inv.pkb  $
---       Date into PVCS   : $Date:   Jul 04 2013 15:15:38  $
---       Date fetched Out : $Modtime:   Jul 04 2013 14:25:08  $
---       Version          : $Revision:   2.7  $
+--       Date into PVCS   : $Date:   Apr 16 2018 09:22:08  $
+--       Date fetched Out : $Modtime:   Apr 16 2018 08:57:42  $
+--       Version          : $Revision:   2.8  $
 --
 --   Author : Jonathan Mills
 --
 --   Inventory API package body
 --
 -----------------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 --all global package variables here
 --
 
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.7  $';
+  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.8  $';
   
 --   g_body_sccsid     CONSTANT  varchar2(2000) := '"@(#)nm3api_inv.pkb	1.6 12/18/03"';
 --  g_body_sccsid is the SCCS ID for the package body

@@ -5,11 +5,11 @@ CREATE OR REPLACE package nm3api_trans as
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3api_trans.pkh-arc   2.2   Jul 04 2013 15:15:38   James.Wadsworth  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3api_trans.pkh-arc   2.3   Apr 16 2018 09:22:08   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   nm3api_trans.pkh  $
---       Date into PVCS   : $Date:   Jul 04 2013 15:15:38  $
---       Date fetched Out : $Modtime:   Jul 04 2013 14:25:08  $
---       Version          : $Revision:   2.2  $
+--       Date into PVCS   : $Date:   Apr 16 2018 09:22:08  $
+--       Date fetched Out : $Modtime:   Apr 16 2018 09:11:40  $
+--       Version          : $Revision:   2.3  $
 --       Based on SCCS version : 1.2
 -------------------------------------------------------------------------
 --
@@ -27,11 +27,11 @@ CREATE OR REPLACE package nm3api_trans as
 --   type tends to be quite long and typically covers several datum elements.
 --
 -----------------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
-    g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.2  $';
+    g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.3  $';
 --  g_sccsid is the SCCS ID for the package
 --</GLOBVAR>
 --

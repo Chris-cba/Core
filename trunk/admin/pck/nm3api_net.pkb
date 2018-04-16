@@ -1,11 +1,11 @@
 CREATE OR REPLACE PACKAGE BODY nm3api_net AS
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3api_net.pkb-arc   2.3   Jul 04 2013 15:15:38   James.Wadsworth  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3api_net.pkb-arc   2.4   Apr 16 2018 09:22:08   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   nm3api_net.pkb  $
---       Date into PVCS   : $Date:   Jul 04 2013 15:15:38  $
---       Date fetched Out : $Modtime:   Jul 04 2013 14:25:08  $
---       PVCS Version     : $Revision:   2.3  $
+--       Date into PVCS   : $Date:   Apr 16 2018 09:22:08  $
+--       Date fetched Out : $Modtime:   Apr 16 2018 08:57:42  $
+--       PVCS Version     : $Revision:   2.4  $
 --       Based on SCCS version : 1.2
 --
 --
@@ -14,12 +14,12 @@ CREATE OR REPLACE PACKAGE BODY nm3api_net AS
 --   Network API package body
 --
 -----------------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 
 -- 03.06.08 PT added p_no_purpose parameter to create_node() func and proc
 --
-   g_body_sccsid     CONSTANT  varchar2(200) :='"$Revision:   2.3  $"';
+   g_body_sccsid     CONSTANT  varchar2(200) :='"$Revision:   2.4  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3api_net';

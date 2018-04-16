@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE nm3api_inv AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3api_inv.pkh-arc   2.3   Jul 04 2013 15:15:38   James.Wadsworth  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3api_inv.pkh-arc   2.4   Apr 16 2018 09:22:08   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   nm3api_inv.pkh  $
---       Date into PVCS   : $Date:   Jul 04 2013 15:15:38  $
---       Date fetched Out : $Modtime:   Jul 04 2013 14:25:08  $
---       Version          : $Revision:   2.3  $
+--       Date into PVCS   : $Date:   Apr 16 2018 09:22:08  $
+--       Date fetched Out : $Modtime:   Apr 16 2018 09:11:40  $
+--       Version          : $Revision:   2.4  $
 --       Based on SCCS version : 1.5
 -------------------------------------------------------------------------
 --
@@ -21,11 +21,11 @@ CREATE OR REPLACE PACKAGE nm3api_inv AS
 --   list of programmer interface modules.
 --
 -----------------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
-    g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.3  $';
+    g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.4  $';
 --  g_sccsid is the SCCS ID for the package
 --
    c_replace CONSTANT varchar2(7) := 'REPLACE';
