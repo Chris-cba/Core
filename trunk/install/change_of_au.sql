@@ -1,13 +1,13 @@
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/change_of_au.sql-arc   1.1   Jan 28 2016 12:56:28   Rob.Coupe  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/change_of_au.sql-arc   1.2   Apr 18 2018 15:29:16   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   change_of_au.sql  $ 
---       Date into PVCS   : $Date:   Jan 28 2016 12:56:28  $
---       Date fetched Out : $Modtime:   Jan 28 2016 12:56:10  $
---       PVCS Version     : $Revision:   1.1  $
+--       Date into PVCS   : $Date:   Apr 18 2018 15:29:16  $
+--       Date fetched Out : $Modtime:   Apr 18 2018 15:28:02  $
+--       PVCS Version     : $Revision:   1.2  $
 --
 ----------------------------------------------------------------------------
---   Copyright (c) 2015 Bentley Systems Incorporated.  All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated.  All rights reserved.
 ----------------------------------------------------------------------------
 --
 --
