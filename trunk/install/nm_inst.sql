@@ -1,14 +1,14 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm_inst.sql-arc   2.3   Jul 04 2013 13:48:10   James.Wadsworth  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/nm_inst.sql-arc   2.4   Apr 18 2018 16:09:44   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   nm_inst.sql  $
---       Date into PVCS   : $Date:   Jul 04 2013 13:48:10  $
---       Date fetched Out : $Modtime:   Jul 04 2013 13:34:58  $
---       PVCS Version     : $Revision:   2.3  $
+--       Date into PVCS   : $Date:   Apr 18 2018 16:09:44  $
+--       Date fetched Out : $Modtime:   Apr 18 2018 16:02:10  $
+--       PVCS Version     : $Revision:   2.4  $
 --
 -----------------------------------------------------------------------------
---    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--    Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 -- Check that the user isn't sys or system
