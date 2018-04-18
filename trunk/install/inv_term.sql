@@ -1,15 +1,15 @@
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/inv_term.sql-arc   2.1   Jul 04 2013 13:45:34   James.Wadsworth  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/inv_term.sql-arc   2.2   Apr 18 2018 16:09:14   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   inv_term.sql  $
---       Date into PVCS   : $Date:   Jul 04 2013 13:45:34  $
---       Date fetched Out : $Modtime:   Jul 04 2013 13:16:02  $
---       Version          : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   Apr 18 2018 16:09:14  $
+--       Date fetched Out : $Modtime:   Apr 18 2018 16:02:10  $
+--       Version          : $Revision:   2.2  $
 --       Based on SCCS version : 1.1
 --
 -----------------------------------------------------------------------------
---    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--    Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 

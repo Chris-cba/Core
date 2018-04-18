@@ -2,14 +2,14 @@
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/higroles.sql-arc   2.15   Sep 16 2015 10:29:54   Steve.Cooper  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/higroles.sql-arc   2.16   Apr 18 2018 16:09:14   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   higroles.sql  $
---       Date into PVCS   : $Date:   Sep 16 2015 10:29:54  $
---       Date fetched Out : $Modtime:   Sep 16 2015 10:29:36  $
---       Version          : $Revision:   2.15  $
+--       Date into PVCS   : $Date:   Apr 18 2018 16:09:14  $
+--       Date fetched Out : $Modtime:   Apr 18 2018 16:02:10  $
+--       Version          : $Revision:   2.16  $
 --
 -----------------------------------------------------------------------------
---    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--    Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 --

@@ -1,14 +1,14 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/higviews.sql-arc   2.4   Jul 04 2013 13:45:32   James.Wadsworth  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/higviews.sql-arc   2.5   Apr 18 2018 16:09:14   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   higviews.sql  $
---       Date into PVCS   : $Date:   Jul 04 2013 13:45:32  $
---       Date fetched Out : $Modtime:   Jul 04 2013 12:02:08  $
---       Version          : $Revision:   2.4  $
+--       Date into PVCS   : $Date:   Apr 18 2018 16:09:14  $
+--       Date fetched Out : $Modtime:   Apr 18 2018 16:02:10  $
+--       Version          : $Revision:   2.5  $
 --
 -----------------------------------------------------------------------------
---    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--    Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 REM **************************************************************************
@@ -20,11 +20,11 @@ REM SCCS ID Keyword, do no remove
 
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/higviews.sql-arc   2.4   Jul 04 2013 13:45:32   James.Wadsworth  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/higviews.sql-arc   2.5   Apr 18 2018 16:09:14   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   higviews.sql  $
---       Date into SCCS   : $Date:   Jul 04 2013 13:45:32  $
---       Date fetched Out : $Modtime:   Jul 04 2013 12:02:08  $
---       SCCS Version     : $Revision:   2.4  $
+--       Date into SCCS   : $Date:   Apr 18 2018 16:09:14  $
+--       Date fetched Out : $Modtime:   Apr 18 2018 16:02:10  $
+--       SCCS Version     : $Revision:   2.5  $
 --       Based on 
 --
 rem   ------------------------------------------------------------------------------

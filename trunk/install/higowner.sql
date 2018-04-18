@@ -1,18 +1,18 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/higowner.sql-arc   2.17   Jul 04 2013 13:45:32   James.Wadsworth  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/higowner.sql-arc   2.18   Apr 18 2018 16:09:14   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   higowner.sql  $
---       Date into PVCS   : $Date:   Jul 04 2013 13:45:32  $
---       Date fetched Out : $Modtime:   Jul 04 2013 12:01:08  $
---       Version          : $Revision:   2.17  $
+--       Date into PVCS   : $Date:   Apr 18 2018 16:09:14  $
+--       Date fetched Out : $Modtime:   Apr 18 2018 16:02:10  $
+--       Version          : $Revision:   2.18  $
 --
 -----------------------------------------------------------------------------
---    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--    Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 REM SCCS ID Keyword, do no remove
-define sccsid = '"$Revision::   2.17     $"';
+define sccsid = '"$Revision::   2.18     $"';
 clear screen
 -- creates the following tables
 -- HIG_USERS
