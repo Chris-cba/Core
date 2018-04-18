@@ -2,14 +2,14 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/mav_grant.sql-arc   3.1   Jul 04 2013 13:46:36   James.Wadsworth  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/mav_grant.sql-arc   3.2   Apr 18 2018 16:09:30   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   mav_grant.sql  $
---       Date into PVCS   : $Date:   Jul 04 2013 13:46:36  $
---       Date fetched Out : $Modtime:   Jul 04 2013 13:27:20  $
---       PVCS Version     : $Revision:   3.1  $
+--       Date into PVCS   : $Date:   Apr 18 2018 16:09:30  $
+--       Date fetched Out : $Modtime:   Apr 18 2018 16:02:10  $
+--       PVCS Version     : $Revision:   3.2  $
 --
 --------------------------------------------------------------------------------
---    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--    Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 
