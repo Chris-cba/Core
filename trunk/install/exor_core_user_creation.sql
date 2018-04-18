@@ -9,16 +9,16 @@ SET serveroutput ON
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/exor_core_user_creation.sql-arc   3.5   Sep 16 2015 10:33:46   Steve.Cooper  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/exor_core_user_creation.sql-arc   3.6   Apr 18 2018 15:47:20   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   exor_core_user_creation.sql  $
---       Date into PVCS   : $Date:   Sep 16 2015 10:33:46  $
---       Date fetched Out : $Modtime:   Sep 16 2015 10:33:14  $
---       Version          : $Revision:   3.5  $
+--       Date into PVCS   : $Date:   Apr 18 2018 15:47:20  $
+--       Date fetched Out : $Modtime:   Apr 18 2018 15:46:12  $
+--       Version          : $Revision:   3.6  $
 --       Based on SCCS version : 1.1
 --       This scripts creates new user EXOR_CORE 
 --
 -----------------------------------------------------------------------------
---    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--    Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 DECLARE
