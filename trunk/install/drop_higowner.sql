@@ -36,7 +36,7 @@ DECLARE
 --    all of it's subordinate users
 --
 -----------------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
    p_user     CONSTANT varchar2(30) := UPPER('&P_USER');
