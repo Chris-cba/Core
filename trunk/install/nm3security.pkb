@@ -3,17 +3,17 @@ As
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm3security.pkb-arc   3.2   Sep 14 2015 15:10:12   Steve.Cooper  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm3security.pkb-arc   3.3   Apr 18 2018 16:09:48   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   nm3security.pkb  $
---       Date into PVCS   : $Date:   Sep 14 2015 15:10:12  $
---       Date fetched Out : $Modtime:   Sep 14 2015 14:41:24  $
---       Version          : $Revision:   3.2  $
+--       Date into PVCS   : $Date:   Apr 18 2018 16:09:48  $
+--       Date fetched Out : $Modtime:   Apr 18 2018 16:02:10  $
+--       Version          : $Revision:   3.3  $
 --       Based on SCCS version :
 -----------------------------------------------------------------------------
---    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--    Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
-  gc_Body_Sccsid              Constant  Varchar2(2000)                  :=  '$Revision:   3.2  $';
+  gc_Body_Sccsid              Constant  Varchar2(2000)                  :=  '$Revision:   3.3  $';
   
   --This is the context that should be used when the context and attribute name are fixed and not set via the call.
   --  this is more secure if the context attribute/value does not need to be secure then use nm3ctx.Set_Context 
