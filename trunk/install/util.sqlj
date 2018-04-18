@@ -2,11 +2,11 @@
 /*
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/util.sqlj-arc   2.2   Dec 04 2007 18:08:56   jwadsworth  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/util.sqlj-arc   2.3   Apr 18 2018 16:09:58   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   util.sqlj  $
---       Date into SCCS   : $Date:   Dec 04 2007 18:08:56  $
---       Date fetched Out : $Modtime:   Dec 04 2007 18:08:34  $
---       SCCS Version     : $Revision:   2.2  $
+--       Date into SCCS   : $Date:   Apr 18 2018 16:09:58  $
+--       Date fetched Out : $Modtime:   Apr 18 2018 16:02:36  $
+--       SCCS Version     : $Revision:   2.3  $
 --       Based on 
 --
 --
@@ -15,7 +15,7 @@
 --
 --    Util.java
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2002
+--    Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 */
   import java.io.*;
