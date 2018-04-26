@@ -1,14 +1,14 @@
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/ctx/drop_nm3nwausec_policies.sql-arc   1.2   Jul 04 2013 09:23:56   James.Wadsworth  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/ctx/drop_nm3nwausec_policies.sql-arc   1.3   Apr 26 2018 08:46:04   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   drop_nm3nwausec_policies.sql  $
---       Date into SCCS   : $Date:   Jul 04 2013 09:23:56  $
---       Date fetched Out : $Modtime:   Jul 04 2013 09:22:04  $
---       SCCS Version     : $Revision:   1.2  $
+--       Date into SCCS   : $Date:   Apr 26 2018 08:46:04  $
+--       Date fetched Out : $Modtime:   Apr 26 2018 08:44:16  $
+--       SCCS Version     : $Revision:   1.3  $
 --
 -----------------------------------------------------------------------------
---    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--    Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 
 declare

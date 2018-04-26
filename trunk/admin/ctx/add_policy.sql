@@ -5,17 +5,17 @@ DECLARE
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/ctx/add_policy.sql-arc   2.4   Jul 04 2013 09:23:56   James.Wadsworth  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/ctx/add_policy.sql-arc   2.6   Apr 26 2018 08:46:04   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   add_policy.sql  $
---       Date into SCCS   : $Date:   Jul 04 2013 09:23:56  $
---       Date fetched Out : $Modtime:   Jul 04 2013 09:22:04  $
---       SCCS Version     : $Revision:   2.4  $
+--       Date into SCCS   : $Date:   Apr 26 2018 08:46:04  $
+--       Date fetched Out : $Modtime:   Apr 26 2018 08:44:16  $
+--       SCCS Version     : $Revision:   2.6  $
 --       Based on SCCS Version     : 1.11
 --
 --   Create Inventory/Merge security policies
 --
 -----------------------------------------------------------------------------
---   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
    l_tab_policy_name     nm3type.tab_varchar30;
@@ -65,6 +65,12 @@ BEGIN
               ,p_statement_types => 'SELECT'
               );
 --
+   add_policy (p_policy_name     => 'INV_AU_POLICY_READ'
+              ,p_object_name     => 'NM_INV_ITEMS_ALL_J'
+              ,p_policy_function => 'INVSEC.INV_PREDICATE_READ'
+              ,p_statement_types => 'SELECT'
+              );
+--
    add_policy (p_policy_name     => 'INV_TYPE_ROLE_POLICY_READ'
               ,p_object_name     => 'NM_INV_TYPES_ALL'
               ,p_policy_function => 'INVSEC.INV_TYPE_PREDICATE_READ'
@@ -81,6 +87,12 @@ BEGIN
 --
    add_policy (p_policy_name     => 'INV_AU_POLICY'
               ,p_object_name     => 'NM_INV_ITEMS_ALL'
+              ,p_policy_function => 'INVSEC.INV_PREDICATE'
+              ,p_statement_types => 'INSERT,UPDATE,DELETE'
+              );
+--
+   add_policy (p_policy_name     => 'INV_AU_POLICY'
+              ,p_object_name     => 'NM_INV_ITEMS_ALL_J'
               ,p_policy_function => 'INVSEC.INV_PREDICATE'
               ,p_statement_types => 'INSERT,UPDATE,DELETE'
               );

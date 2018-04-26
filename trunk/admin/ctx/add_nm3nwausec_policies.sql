@@ -1,14 +1,14 @@
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/ctx/add_nm3nwausec_policies.sql-arc   1.6   Nov 03 2015 07:56:14   Rob.Coupe  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/ctx/add_nm3nwausec_policies.sql-arc   1.7   Apr 26 2018 08:46:04   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   add_nm3nwausec_policies.sql  $
---       Date into SCCS   : $Date:   Nov 03 2015 07:56:14  $
---       Date fetched Out : $Modtime:   Nov 03 2015 07:55:56  $
---       SCCS Version     : $Revision:   1.6  $
+--       Date into SCCS   : $Date:   Apr 26 2018 08:46:04  $
+--       Date fetched Out : $Modtime:   Apr 26 2018 08:44:16  $
+--       SCCS Version     : $Revision:   1.7  $
 --
 -----------------------------------------------------------------------------
---    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--    Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 
 
@@ -17,7 +17,7 @@ SET SERVEROUTPUT ON SIZE 1000000
 DECLARE
 --
 -----------------------------------------------------------------------------
---    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--    Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
    l_tab_policy_name     nm3type.tab_varchar30;

@@ -4,16 +4,16 @@ CREATE OR REPLACE PACKAGE body hig_process_security AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/ctx/HIG_PROCESS_SECURITY.pkb-arc   1.1   Aug 10 2017 11:17:46   James.Wadsworth  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/ctx/HIG_PROCESS_SECURITY.pkb-arc   1.2   Apr 26 2018 08:46:04   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   HIG_PROCESS_SECURITY.pkb  $
---       Date into SCCS   : $Date:   Aug 10 2017 11:17:46  $
---       Date fetched Out : $Modtime:   Aug 10 2017 10:32:52  $
---       SCCS Version     : $Revision:   1.1  $
+--       Date into SCCS   : $Date:   Apr 26 2018 08:46:04  $
+--       Date fetched Out : $Modtime:   Apr 26 2018 08:44:16  $
+--       SCCS Version     : $Revision:   1.2  $
 --
 -----------------------------------------------------------------------------
---    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--    Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
-g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   1.1  $"';
+g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   1.2  $"';
 
   FUNCTION get_version RETURN VARCHAR2 IS
   BEGIN
