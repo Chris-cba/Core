@@ -2,15 +2,15 @@
 --------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/ctx/nm3ctx.sql-arc   2.5   Apr 26 2018 08:46:06   Gaurav.Gaurkar  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/ctx/nm3ctx.sql-arc   2.6   Apr 26 2018 08:56:42   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   nm3ctx.sql  $
---       Date into PVCS   : $Date:   Apr 26 2018 08:46:06  $
---       Date fetched Out : $Modtime:   Apr 26 2018 08:44:16  $
---       Version          : $Revision:   2.5  $
+--       Date into PVCS   : $Date:   Apr 26 2018 08:56:42  $
+--       Date fetched Out : $Modtime:   Apr 26 2018 08:50:48  $
+--       Version          : $Revision:   2.6  $
 --       Based on SCCS version : 2.0
 --------------------------------------------------------------------
 -- SCCS ID -- Do NOT remove -----
-define sccsid = '$Revision:   2.5  $'
+define sccsid = '$Revision:   2.6  $'
 -------------------------------------------------------------------------
 --   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 --
@@ -66,4 +66,20 @@ start '&run_file'
 --from dual
 --/
 --start '&run_file'
+--
+--
+set define on
+select '&exor_base'||'nm3'||'&terminator'||'admin'||
+         '&terminator'||'ctx'||'&terminator'||'HIG_PROCESS_SECURITY.pkh' run_file
+from dual
+/
+start '&run_file'
+--
+--
+set define on
+select '&exor_base'||'nm3'||'&terminator'||'admin'||
+         '&terminator'||'ctx'||'&terminator'||'HIG_PROCESS_SECURITY.pkw' run_file
+from dual
+/
+start '&run_file'
 --
