@@ -2,11 +2,11 @@
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3pkb.sql-arc   2.46   Apr 16 2018 09:23:16   Gaurav.Gaurkar  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3pkb.sql-arc   2.47   Apr 26 2018 09:29:16   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   nm3pkb.sql  $
---       Date into PVCS   : $Date:   Apr 16 2018 09:23:16  $
---       Date fetched Out : $Modtime:   Apr 16 2018 09:20:44  $
---       PVCS Version     : $Revision:   2.46  $
+--       Date into PVCS   : $Date:   Apr 26 2018 09:29:16  $
+--       Date fetched Out : $Modtime:   Apr 26 2018 09:23:38  $
+--       PVCS Version     : $Revision:   2.47  $
 --
 --
 --   Author : Graeme Johnson
@@ -2393,6 +2393,28 @@ PROMPT hig_relationship.pkw
 SET TERM OFF
 SET DEFINE ON 
 SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'pck'||'&terminator'||'hig_relationship.pkw' run_file
+FROM dual 
+/ 
+start '&run_file'
+--
+----------------------------------------------------------------------------------------- 
+--
+SET TERM ON 
+PROMPT nm_inv_sdo_aggr.pkw
+SET TERM OFF
+SET DEFINE ON 
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'pck'||'&terminator'||'nm_inv_sdo_aggr.pkw' run_file
+FROM dual 
+/ 
+start '&run_file'
+--
+----------------------------------------------------------------------------------------- 
+--
+SET TERM ON 
+PROMPT nm3_doc_man.pkw
+SET TERM OFF
+SET DEFINE ON 
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'pck'||'&terminator'||'nm3_doc_man.pkw' run_file
 FROM dual 
 / 
 start '&run_file'
