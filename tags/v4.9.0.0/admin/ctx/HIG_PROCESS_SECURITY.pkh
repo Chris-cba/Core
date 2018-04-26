@@ -1,0 +1,28 @@
+CREATE OR REPLACE PACKAGE hig_process_security AS 
+--
+-----------------------------------------------------------------------------
+--
+--   PVCS Identifiers :-
+--
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/ctx/HIG_PROCESS_SECURITY.pkh-arc   1.1   Apr 26 2018 08:46:06   Gaurav.Gaurkar  $
+--       Module Name      : $Workfile:   HIG_PROCESS_SECURITY.pkh  $
+--       Date into SCCS   : $Date:   Apr 26 2018 08:46:06  $
+--       Date fetched Out : $Modtime:   Apr 26 2018 08:44:16  $
+--       SCCS Version     : $Revision:   1.1  $
+--
+-----------------------------------------------------------------------------
+--    Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+
+g_sccsid          CONSTANT  VARCHAR2(2000) := '$Revision:   1.1  $';
+
+  FUNCTION get_version RETURN VARCHAR2;
+--
+  FUNCTION get_body_version
+    RETURN VARCHAR2;
+--
+
+function HP_PREDICATE_READ( schema_in varchar2, name_in varchar2) RETURN varchar2;
+function MILB_PREDICATE_READ( schema_in varchar2, name_in varchar2) RETURN varchar2;
+end;
+/
