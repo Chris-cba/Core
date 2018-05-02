@@ -47,7 +47,7 @@
 	<body onload="setFocus();">
 		<div class="navbar-header pull-left logo-container">
 			<a href="https://www.bentley.com">
-				<img alt="Bentley" src="/exor-ims/images/bentley-logo.png" />
+				<img alt="Bentley" src="/exor-ims/images/bentley-logo.jpg" />
 			</a>
 		</div>
 		<div id="back" class="divBack"></div>    
