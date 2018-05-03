@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<meta http-equiv="X-UA-Compatible" content="IE=11" />
 <html>
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
@@ -47,7 +48,25 @@
 	<body onload="setFocus();">
 		<div class="navbar-header pull-left logo-container">
 			<a href="https://www.bentley.com">
-				<img alt="Bentley" src="/exor-ims/images/bentley-logo.jpg" />
+				<%@ page import="java.io.*"%>
+				<%@page import="javax.xml.bind.DatatypeConverter"%>
+				<%
+					String imageString = null;
+					
+					try {
+						File            f         = new File(application.getRealPath("/images/bentley-logo.jpg"));
+						FileInputStream fin       = new FileInputStream(f);
+						byte[]          imageData = new byte[(int)f.length()];
+						String          fileName  = f.getName();
+						
+						fin.read(imageData);
+						
+						imageString = DatatypeConverter.printBase64Binary(imageData);
+					} catch(Exception e) {
+						
+					}
+				%>
+				<img alt="Logo Image" src="data:image/jpg;base64, <%=imageString%>" />
 			</a>
 		</div>
 		<div id="back" class="divBack"></div>    
