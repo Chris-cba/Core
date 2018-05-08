@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3homo AS
    --
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3homo.pkb-arc   2.30   Apr 16 2018 09:22:36   Gaurav.Gaurkar  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3homo.pkb-arc   2.31   May 08 2018 14:26:08   Chris.Baugh  $
    --       Module Name      : $Workfile:   nm3homo.pkb  $
-   --       Date into PVCS   : $Date:   Apr 16 2018 09:22:36  $
-   --       Date fetched Out : $Modtime:   Apr 16 2018 09:00:30  $
-   --       PVCS Version     : $Revision:   2.30  $
+   --       Date into PVCS   : $Date:   May 08 2018 14:26:08  $
+   --       Date fetched Out : $Modtime:   May 08 2018 14:24:50  $
+   --       PVCS Version     : $Revision:   2.31  $
    --
    --
    --   Author : Jonathan Mills
@@ -55,7 +55,7 @@ CREATE OR REPLACE PACKAGE BODY nm3homo AS
 
    -- Log 713421
 
-   g_body_sccsid        CONSTANT VARCHAR2 (2000) := '"$Revision:   2.30  $"';
+   g_body_sccsid        CONSTANT VARCHAR2 (2000) := '"$Revision:   2.31  $"';
    --  g_body_sccsid is the SCCS ID for the package body
    --
    g_package_name       CONSTANT VARCHAR2 (30) := 'nm3homo';
@@ -1666,111 +1666,115 @@ CREATE OR REPLACE PACKAGE BODY nm3homo AS
       END LOOP;
 
       l_child_ne_tab.delete;
-
-      DECLARE
-         l_par_iit_rec   nm_inv_items%ROWTYPE;
-      BEGIN
-         FOR i IN 1 .. l_par_iit_tab.COUNT
-         LOOP
-            l_par_iit_rec := l_par_iit_tab (i);
-
-            FOR j
-               IN (SELECT DISTINCT iit_ne_id
-                     FROM nm_inv_items iit, nm_members nm
-                    WHERE     iit.iit_ne_id = nm.nm_ne_id_in
-                          AND nm.nm_ne_id_of IN (SELECT nm_ne_id_of
-                                                   FROM nm_members
-                                                  WHERE nm_ne_id_in =
-                                                           l_par_iit_rec.iit_ne_id)
-                          AND EXISTS
-                                 (SELECT 'x'
-                                    FROM nm_inv_type_groupings
-                                   WHERE     itg_parent_inv_type =
-                                                l_par_iit_rec.iit_inv_type
-                                         AND itg_inv_type = iit.iit_inv_type
-                                         AND (   (itg_relation =
-                                                     nm3invval.c_derived_relation)
-                                              OR (    itg_relation =
-                                                         nm3invval.c_in_relation
-                                                  AND 'Y' IN (SELECT nin_loc_mandatory
-                                                                FROM nm_inv_nw
-                                                               WHERE nin_nit_inv_code =
-                                                                        iit.iit_inv_type))))
-                          AND NOT EXISTS
-                                 (SELECT 'x'
-                                    FROM nm_inv_item_groupings
-                                   WHERE iig_item_ID = iit.iit_ne_id))
-            LOOP
-               DECLARE
-                  --
-                  l_ne_id   NUMBER;
-               BEGIN
-                  --
-                  SELECT ne_id
-                    INTO l_ne_id
-                    FROM (SELECT x.pl_ne_id ne_id
-                            FROM TABLE (
-                                    NM3PLA.SUBTRACT_PL_FROM_PL (
-                                       NM3PLA.GET_PLACEMENT_FROM_NE (
-                                          j.iit_ne_id),
-                                       NM3PLA.GET_PLACEMENT_FROM_NE (
-                                          l_par_iit_rec.iit_ne_id)).npa_placement_array) x)
-                   WHERE ne_id IS NOT NULL
-                     AND ROWNUM = 1;
-               --
-               EXCEPTION
-                  WHEN NO_DATA_FOUND
-                  THEN
-                     DECLARE
-                        --
-                        l_iig_rec   nm_inv_item_groupings%ROWTYPE;
-
-                        CURSOR c_parent
-                        IS
-                           SELECT iig_parent_id, iit.iit_inv_type
-                             FROM nm_inv_item_groupings iig, nm_inv_items iit
-                            WHERE     iig_item_id = l_child_ne_rec.iit_ne_id
-                                  AND iig_parent_id = iit.iit_ne_id;
-
-                        l_rec       c_parent%ROWTYPE;
-                     --
-                     BEGIN
-                        --
-                        OPEN c_parent;
-
-                        FETCH c_parent INTO l_rec;
-
-                        CLOSE c_parent;
-
-                        --
-                        l_iig_rec.iig_top_id :=
-                           nm3invval.get_iig_top_id (l_par_iit_rec.iit_ne_id);
-                        l_iig_rec.iig_item_id := j.iit_ne_id;
-                        l_iig_rec.iig_parent_id := l_par_iit_rec.iit_ne_id;
-                        l_iig_rec.iig_start_date := p_effective_date;
-
-                        BEGIN
-                           nm3ins.ins_iig (l_iig_rec);
-                        EXCEPTION
-                           WHEN DUP_VAL_ON_INDEX
-                           THEN
-                              UPDATE nm_inv_item_groupings_all
-                                 SET iig_end_date = NULL
-                               WHERE     iig_item_id = j.iit_ne_id
-                                     AND iig_parent_id =
-                                            l_par_iit_rec.iit_ne_id
-                                     AND iig_start_date = p_effective_date;
-                        END;
-                     --
-                     END;
-                  WHEN OTHERS
-                  THEN
-                     RAISE;
-               END;
-            END LOOP;
-         END LOOP;
-      END;
-
+      
+      IF has_children(p_iit_ne_id) THEN
+        --
+        DECLARE
+           l_par_iit_rec   nm_inv_items%ROWTYPE;
+        BEGIN
+           FOR i IN 1 .. l_par_iit_tab.COUNT
+           LOOP
+              l_par_iit_rec := l_par_iit_tab (i);
+   
+              FOR j
+                 IN (SELECT DISTINCT iit_ne_id
+                       FROM nm_inv_items iit, nm_members nm
+                      WHERE     iit.iit_ne_id = nm.nm_ne_id_in
+                            AND nm.nm_ne_id_of IN (SELECT nm_ne_id_of
+                                                     FROM nm_members
+                                                    WHERE nm_ne_id_in =
+                                                             l_par_iit_rec.iit_ne_id)
+                            AND EXISTS
+                                   (SELECT 'x'
+                                      FROM nm_inv_type_groupings
+                                     WHERE     itg_parent_inv_type =
+                                                  l_par_iit_rec.iit_inv_type
+                                           AND itg_inv_type = iit.iit_inv_type
+                                           AND (   (itg_relation =
+                                                       nm3invval.c_derived_relation)
+                                                OR (    itg_relation =
+                                                           nm3invval.c_in_relation
+                                                    AND 'Y' IN (SELECT nin_loc_mandatory
+                                                                  FROM nm_inv_nw
+                                                                 WHERE nin_nit_inv_code =
+                                                                          iit.iit_inv_type))))
+                            AND NOT EXISTS
+                                   (SELECT 'x'
+                                      FROM nm_inv_item_groupings
+                                     WHERE iig_item_ID = iit.iit_ne_id))
+              LOOP
+                 DECLARE
+                    --
+                    l_ne_id   NUMBER;
+                 BEGIN
+                    --
+                    SELECT ne_id
+                      INTO l_ne_id
+                      FROM (SELECT x.pl_ne_id ne_id
+                              FROM TABLE (
+                                      NM3PLA.SUBTRACT_PL_FROM_PL (
+                                         NM3PLA.GET_PLACEMENT_FROM_NE (
+                                            j.iit_ne_id),
+                                         NM3PLA.GET_PLACEMENT_FROM_NE (
+                                            l_par_iit_rec.iit_ne_id)).npa_placement_array) x)
+                     WHERE ne_id IS NOT NULL
+                       AND ROWNUM = 1;
+                 --
+                 EXCEPTION
+                    WHEN NO_DATA_FOUND
+                    THEN
+                       DECLARE
+                          --
+                          l_iig_rec   nm_inv_item_groupings%ROWTYPE;
+   
+                          CURSOR c_parent
+                          IS
+                             SELECT iig_parent_id, iit.iit_inv_type
+                               FROM nm_inv_item_groupings iig, nm_inv_items iit
+                              WHERE     iig_item_id = l_child_ne_rec.iit_ne_id
+                                    AND iig_parent_id = iit.iit_ne_id;
+   
+                          l_rec       c_parent%ROWTYPE;
+                       --
+                       BEGIN
+                          --
+                          OPEN c_parent;
+   
+                          FETCH c_parent INTO l_rec;
+   
+                          CLOSE c_parent;
+   
+                          --
+                          l_iig_rec.iig_top_id :=
+                             nm3invval.get_iig_top_id (l_par_iit_rec.iit_ne_id);
+                          l_iig_rec.iig_item_id := j.iit_ne_id;
+                          l_iig_rec.iig_parent_id := l_par_iit_rec.iit_ne_id;
+                          l_iig_rec.iig_start_date := p_effective_date;
+   
+                          BEGIN
+                             nm3ins.ins_iig (l_iig_rec);
+                          EXCEPTION
+                             WHEN DUP_VAL_ON_INDEX
+                             THEN
+                                UPDATE nm_inv_item_groupings_all
+                                   SET iig_end_date = NULL
+                                 WHERE     iig_item_id = j.iit_ne_id
+                                       AND iig_parent_id =
+                                              l_par_iit_rec.iit_ne_id
+                                       AND iig_start_date = p_effective_date;
+                          END;
+                       --
+                       END;
+                    WHEN OTHERS
+                    THEN
+                       RAISE;
+                 END;
+              END LOOP;
+           END LOOP;
+        END;
+        --
+      END IF;
+      
       l_par_iit_tab.delete;
 
       -- LOG 713421
