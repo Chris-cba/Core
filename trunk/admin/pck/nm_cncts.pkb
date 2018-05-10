@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY Nm_Cncts IS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm_cncts.pkb-arc   2.4   Apr 16 2018 09:22:02   Gaurav.Gaurkar  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm_cncts.pkb-arc   2.5   May 10 2018 13:43:24   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   nm_cncts.pkb  $
---       Date into PVCS   : $Date:   Apr 16 2018 09:22:02  $
---       Date fetched Out : $Modtime:   Apr 16 2018 08:54:24  $
---       PVCS Version     : $Revision:   2.4  $
+--       Date into PVCS   : $Date:   May 10 2018 13:43:24  $
+--       Date fetched Out : $Modtime:   May 10 2018 13:42:00  $
+--       PVCS Version     : $Revision:   2.5  $
 --       Based on            1.5
 --
 --   Author : Rob Coupe
@@ -18,6 +18,32 @@ CREATE OR REPLACE PACKAGE BODY Nm_Cncts IS
 --   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 
+--all global package variables here
+
+  -----------
+  --constants
+  -----------
+  --g_body_sccsid is the SCCS ID for the package body
+  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.5  $';
+ 
+--
+--
+-----------------------------------------------------------------------------
+--
+FUNCTION get_version RETURN varchar2 IS
+BEGIN
+   RETURN g_sccsid;
+END get_version;
+--
+-----------------------------------------------------------------------------
+--
+FUNCTION get_body_version RETURN varchar2 IS
+BEGIN
+   RETURN g_body_sccsid;
+END get_body_version;
+--
+-----------------------------------------------------------------------------
+--	
 
 FUNCTION Set_Ia_Ptr ( p_ia IN int_array ) RETURN ptr_array;
 FUNCTION Get_Cnct_No ( p_ne_id IN nm_elements.ne_id%TYPE ) RETURN nm_cnct_no_array;
