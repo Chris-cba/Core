@@ -3,11 +3,11 @@ AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/tma/admin/pck/hig_std_text.pkb-arc   3.6   Apr 16 2018 09:21:58   Gaurav.Gaurkar  $
+--       sccsid           : $Header:   //new_vm_latest/archives/tma/admin/pck/hig_std_text.pkb-arc   3.7   May 10 2018 13:33:54   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   hig_std_text.pkb  $
---       Date into SCCS   : $Date:   Apr 16 2018 09:21:58  $
---       Date fetched Out : $Modtime:   Apr 16 2018 08:53:04  $
---       SCCS Version     : $Revision:   3.6  $
+--       Date into SCCS   : $Date:   May 10 2018 13:33:54  $
+--       Date fetched Out : $Modtime:   May 10 2018 13:32:28  $
+--       SCCS Version     : $Revision:   3.7  $
 --       Based on 
 --
 --
@@ -19,11 +19,27 @@ AS
 -----------------------------------------------------------------------------
 --    Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
-   g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.6  $';
+   g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.7  $';
    g_package_name CONSTANT varchar2(30) := 'tma_fpns_api';
 
---sccsid constant varchar2(30) :='"$Revision:   3.6  $"';
+--sccsid constant varchar2(30) :='"$Revision:   3.7  $"';
 --   g_body_sccsid is the SCCS ID for the package body
+
+--
+-----------------------------------------------------------------------------
+--
+FUNCTION get_version RETURN varchar2 IS
+BEGIN
+   RETURN g_sccsid;
+END get_version;
+--
+-----------------------------------------------------------------------------
+--
+FUNCTION get_body_version RETURN varchar2 IS
+BEGIN
+   RETURN g_body_sccsid;
+END get_body_version;
+--
 --
 --------------------------------------------------------------------------------
 --
