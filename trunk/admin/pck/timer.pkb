@@ -1,13 +1,14 @@
 CREATE OR REPLACE PACKAGE BODY Timer AS
 -----------------------------------------------------------------------------
 --
---   SCCS Identifiers :-
+--   PVCS Identifiers :-
 --
---       sccsid           : @(#)timer.pkb	1.1 07/18/06
---       Module Name      : timer.pkb
---       Date into SCCS   : 06/07/18 15:55:37
---       Date fetched Out : 07/06/13 14:14:03
---       SCCS Version     : 1.1
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/timer.pkb-arc   2.3   May 10 2018 11:27:16   Gaurav.Gaurkar  $
+--       Module Name      : $Workfile:   timer.pkb  $
+--       Date into SCCS   : $Date:   May 10 2018 11:27:16  $
+--       Date fetched Out : $Modtime:   May 10 2018 11:25:54  $
+--       SCCS Version     : $Revision:   2.3  $
+--
 --
 --   Author : Rob Coupe
 --
@@ -17,6 +18,33 @@ CREATE OR REPLACE PACKAGE BODY Timer AS
 -----------------------------------------------------------------------------
 --
 -------------------------------------------------------------------------------
+--
+--all global package variables here
+
+  -----------
+  --constants
+  -----------
+  --g_body_sccsid is the SCCS ID for the package body
+  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.3  $';
+
+  g_package_name CONSTANT varchar2(30) := 'timer';
+  
+--
+-----------------------------------------------------------------------------
+--
+FUNCTION get_version RETURN varchar2 IS
+BEGIN
+   RETURN g_sccsid;
+END get_version;
+--
+-----------------------------------------------------------------------------
+--
+FUNCTION get_body_version RETURN varchar2 IS
+BEGIN
+   RETURN g_body_sccsid;
+END get_body_version;
+--
+-----------------------------------------------------------------------------
 
 PROCEDURE set_timer IS
 BEGIN
