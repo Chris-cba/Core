@@ -1,12 +1,12 @@
 CREATE OR REPLACE PACKAGE NM3_inv_locations AS
 --<PACKAGE>
---   SCCS Identifiers :-
+--   PVCS Identifiers :-
 --
---       sccsid           : @(#)nm3_inv_locations.pkh	1.2 09/21/05
---       Module Name      : nm3_inv_locations.pkh
---       Date into SCCS   : 05/09/21 13:59:59
---       Date fetched Out : 07/06/13 14:10:47
---       SCCS Version     : 1.2
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3_inv_locations.pkh-arc   2.3   May 10 2018 14:00:30   Gaurav.Gaurkar  $
+--       Module Name      : $Workfile:   nm3_inv_locations.pkh  $
+--       Date into SCCS   : $Date:   May 10 2018 14:00:30  $
+--       Date fetched Out : $Modtime:   May 10 2018 13:54:08  $
+--       SCCS Version     : $Revision:   2.3  $
 --
 --
 --   Author : P. Stanton 
@@ -19,11 +19,15 @@ CREATE OR REPLACE PACKAGE NM3_inv_locations AS
 --<GLOBVAR>
 
   --g_sccsid is the SCCS ID for the package
-   g_sccsid      CONSTANT  varchar2(80) := '"@(#)nm3_inv_locations.pkh	1.2 09/21/05"';
+    g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.3  $';
 
 --
 --</GLOBVAR>
 --
+
+  FUNCTION get_version RETURN varchar2;
+
+  FUNCTION get_body_version RETURN varchar2;
 -----------------------------------------------------------------------------
 --
 --<PROC NAME="delete_log_table">
