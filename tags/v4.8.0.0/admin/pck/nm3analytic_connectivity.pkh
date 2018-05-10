@@ -1,0 +1,88 @@
+create or replace package nm3analytic_connectivity as
+--<PACKAGE>
+--   PVCS Identifiers :-
+--
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3analytic_connectivity.pkh-arc   2.3   May 10 2018 14:22:10   Gaurav.Gaurkar  $
+--       Module Name      : $Workfile:   nm3analytic_connectivity.pkh  $
+--       Date into SCCS   : $Date:   May 10 2018 14:22:10  $
+--       Date fetched Out : $Modtime:   May 10 2018 14:20:02  $
+--       SCCS Version     : $Revision:   2.3  $
+--
+--
+--   Author : Priidu Tanava
+--
+--   This package supports the nm_analytic_chunk_type
+--    that in turn supports the custom group function group_chunk_no_seq
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+
+  -----------
+  --constants
+  -----------
+  --g_sccsid is the SCCS ID for the package
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.3  $';
+  
+  
+--</GLOBVAR>
+
+  FUNCTION get_version RETURN varchar2;
+
+  FUNCTION get_body_version RETURN varchar2;
+
+/*
+  type nm_obj_type_tbl is table of nm_members_all.nm_obj_type%type index by binary_integer;
+  type ita_mapping_rec is record (
+     inv_type           nm_inv_types_all.nit_inv_type%type
+    ,mrg_attrib         nm_mrg_query_attribs.nqa_attrib_name%type
+    ,iit_attrib         nm_inv_type_attribs_all.ita_attrib_name%type     
+    ,table_name         nm_inv_types_all.nit_table_name%type
+    ,table_pk_column    nm_inv_types_all.nit_foreign_pk_column%type
+    ,table_ne_column    nm_inv_types_all.nit_lr_ne_column_name%type
+    ,table_begin_column nm_inv_types_all.nit_lr_st_chain%type
+    ,table_view_column  nm_inv_type_attribs_all.ita_view_attri%type
+  );
+  type ita_mapping_tbl is table of ita_mapping_rec index by binary_integer;
+  type split_results_tbl is table of nm_mrg_split_results_tmp%rowtype index by binary_integer;
+  type iit_tbl is table of nm_inv_items_all%rowtype index by binary_integer;
+
+  
+  procedure group_member_no_init;
+  function group_member_no_iterate(
+     p_value in varchar2
+  ) return number;
+  function group_member_no_terminate return number;
+  
+  type double_hash_rec is record (
+    chunk_no binary_integer
+   ,hash_value varchar2(13)
+  );
+  type double_hash_tbl is table of double_hash_rec index by binary_integer;
+  
+*/
+  
+  type road_chunk_rec is record (
+    row_num     binary_integer
+   ,chunk_no    number(6)
+   ,order_by    number(6)
+   ,row_num2    binary_integer
+  );
+  type road_chunk_tbl is table of road_chunk_rec index by binary_integer;
+  
+  procedure chunk_no_init;
+  function chunk_no_iterate(
+     p_value in varchar2
+  ) return number;
+  procedure process_mt_chunks;
+  --function chunk_no_terminate return number;
+  --function chunk_seq_terminate return number;
+  
+  function chunk_terminate return varchar2;
+  
+--  function temp_get_value return varchar2;
+   
+end;
+/
