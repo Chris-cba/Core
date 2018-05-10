@@ -1,0 +1,53 @@
+CREATE OR REPLACE PACKAGE Timer AS
+-----------------------------------------------------------------------------
+--
+--   PVCS Identifiers :-
+--
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/timer.pkh-arc   2.3   May 10 2018 11:27:18   Gaurav.Gaurkar  $
+--       Module Name      : $Workfile:   timer.pkh  $
+--       Date into SCCS   : $Date:   May 10 2018 11:27:18  $
+--       Date fetched Out : $Modtime:   May 10 2018 11:23:54  $
+--       SCCS Version     : $Revision:   2.3  $
+--
+--
+--   Author : Rob Coupe
+--
+--   Timer package
+--
+--
+---------------------------------------------------------------------------------------------------
+-- Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
+---------------------------------------------------------------------------------------------------
+--
+-------------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+
+  -----------
+  --constants
+  -----------
+  --g_sccsid is the SCCS ID for the package
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.3  $';
+  
+  
+--</GLOBVAR>
+--
+
+FUNCTION get_version RETURN varchar2;
+
+FUNCTION get_body_version RETURN varchar2;
+  
+g_time_values ptr_num_array := Nm3array.init_ptr_num_array;
+g_time_text   ptr_vc_array := Nm3array.init_ptr_vc_array;
+g_id          INTEGER := 0;
+g_start       NUMBER := DBMS_UTILITY.GET_TIME;
+
+
+PROCEDURE set_timer;
+PROCEDURE set_time  ( p_text IN VARCHAR2 );
+FUNCTION  get_timer_values RETURN ptr_num_array;
+FUNCTION  get_timer_text   RETURN ptr_vc_array;
+PROCEDURE debug_timer;
+
+END;
+/
