@@ -1,12 +1,13 @@
 CREATE OR REPLACE PACKAGE BODY nm0590 AS
 --
---   SCCS Identifiers :-
+--   PVCS Identifiers :-
 --
---       sccsid           : @(#)nm0590.pkb	1.8 11/02/06
---       Module Name      : nm0590.pkb
---       Date into SCCS   : 06/11/02 17:26:44
---       Date fetched Out : 07/06/13 14:10:46
---       SCCS Version     : 1.8
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm0590.pkb-arc   2.7   May 10 2018 11:46:38   Gaurav.Gaurkar  $
+--       Module Name      : $Workfile:   nm0590.pkb  $
+--       Date into SCCS   : $Date:   May 10 2018 11:46:38  $
+--       Date fetched Out : $Modtime:   May 10 2018 11:44:54  $
+--       SCCS Version     : $Revision:   2.7  $
+--
 --
 --   Author : P. Stanton
 --
@@ -19,6 +20,31 @@ CREATE OR REPLACE PACKAGE BODY nm0590 AS
 -----------------------------------------------------------------------------
 --  Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
+--
+--
+--all global package variables here
+
+  -----------
+  --constants
+  -----------
+  --g_body_sccsid is the SCCS ID for the package body
+  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.7  $';
+  
+--
+-----------------------------------------------------------------------------
+--
+FUNCTION get_version RETURN varchar2 IS
+BEGIN
+   RETURN g_sccsid;
+END get_version;
+--
+-----------------------------------------------------------------------------
+--
+FUNCTION get_body_version RETURN varchar2 IS
+BEGIN
+   RETURN g_body_sccsid;
+END get_body_version;
+--
 --
 --<PROC NAME="get_category_types">
 -- return a list of inventory types to the from based on a list of catagory types
