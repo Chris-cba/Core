@@ -1,18 +1,38 @@
 CREATE OR REPLACE PACKAGE BODY NM3_inv_locations AS
 -----------------------------------------------------------------------------
 --
---   SCCS Identifiers :- 
+--   PVCS Identifiers :-
 --
---       sccsid           : @(#)nm3_inv_locations.pkb	1.3 10/20/05 
---       Module Name      : nm3_inv_locations.pkb 
---       Date into SCCS   : 05/10/20 09:17:44 
---       Date fetched Out : 05/10/28 13:32:17  
---       SCCS Version     : 1.3  
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3_inv_locations.pkb-arc   2.3   May 10 2018 14:00:32   Gaurav.Gaurkar  $
+--       Module Name      : $Workfile:   nm3_inv_locations.pkb  $
+--       Date into SCCS   : $Date:   May 10 2018 14:00:32  $
+--       Date fetched Out : $Modtime:   May 10 2018 13:56:10  $
+--       SCCS Version     : $Revision:   2.3  $
 --
 --   Author : P. Stanton 
 -----------------------------------------------------------------------------
 --   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
+--
+-----------
+--constants
+-----------
+--g_body_sccsid is the SCCS ID for the package body
+  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.3  $';
+--
+-----------------------------------------------------------------------------
+--
+FUNCTION get_version RETURN varchar2 IS
+BEGIN
+   RETURN g_sccsid;
+END get_version;
+--
+-----------------------------------------------------------------------------
+--
+FUNCTION get_body_version RETURN varchar2 IS
+BEGIN
+   RETURN g_body_sccsid;
+END get_body_version;
 --
 ---------------------------------------------------------------------------
 --
