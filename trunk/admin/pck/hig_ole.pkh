@@ -1,11 +1,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/hig_ole.pkh-arc   2.3   Apr 16 2018 09:21:56   Gaurav.Gaurkar  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/hig_ole.pkh-arc   2.4   May 10 2018 10:52:26   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   hig_ole.pkh  $
---       Date into PVCS   : $Date:   Apr 16 2018 09:21:56  $
---       Date fetched Out : $Modtime:   Apr 16 2018 09:09:50  $
---       Version          : $Revision:   2.3  $
+--       Date into PVCS   : $Date:   May 10 2018 10:52:26  $
+--       Date fetched Out : $Modtime:   May 10 2018 10:50:04  $
+--       Version          : $Revision:   2.4  $
 --
 -----------------------------------------------------------------------------
 --    Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
@@ -30,6 +30,24 @@ AS
  --
   * *****************************************************
   */
+--</PACKAGE>
+--<GLOBVAR>
+
+  -----------
+  --constants
+  -----------
+  --g_sccsid is the SCCS ID for the package
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.4  $';
+  
+  
+--</GLOBVAR>
+--
+
+
+  FUNCTION get_version RETURN varchar2;
+
+
+  FUNCTION get_body_version RETURN varchar2;
 
   FUNCTION strget_template_sql ( strtemplate   IN VARCHAR2
                                , strpkvalue    IN VARCHAR2 )
