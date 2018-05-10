@@ -1,13 +1,13 @@
 CREATE OR REPLACE PACKAGE Nm_Cncts AS
 -----------------------------------------------------------------------------
 --
---   SCCS Identifiers :-
+--   PVCS Identifiers :-
 --
---       sccsid           : @(#)nm_cncts.pkh	1.1 07/18/06
---       Module Name      : nm_cncts.pkh
---       Date into SCCS   : 06/07/18 15:55:08
---       Date fetched Out : 07/06/13 14:10:42
---       SCCS Version     : 1.1
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm_cncts.pkh-arc   2.3   May 10 2018 13:43:26   Gaurav.Gaurkar  $
+--       Module Name      : $Workfile:   nm_cncts.pkh  $
+--       Date into SCCS   : $Date:   May 10 2018 13:43:26  $
+--       Date fetched Out : $Modtime:   May 10 2018 13:41:56  $
+--       SCCS Version     : $Revision:   2.3  $
 --
 --   Author : Rob Coupe
 --
@@ -16,8 +16,10 @@ CREATE OR REPLACE PACKAGE Nm_Cncts AS
 -------------------------------------------------------------------------------
 --   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
-
-
+-- 
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.3  $';
+--
+-------------------------------------------------------------------------------
   g_cnct nm_cnct;
   
   g_cnct_instantiated BOOLEAN := FALSE;
@@ -28,6 +30,10 @@ CREATE OR REPLACE PACKAGE Nm_Cncts AS
 
   g_start_node        INTEGER;
   g_end_node          INTEGER;
+  
+  FUNCTION get_version RETURN varchar2;
+
+  FUNCTION get_body_version RETURN varchar2;
 
 
   FUNCTION get_cnct RETURN nm_cnct;
