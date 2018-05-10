@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE hig_std_text AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/tma/admin/pck/hig_std_text.pkh-arc   3.5   Apr 16 2018 09:21:58   Gaurav.Gaurkar  $
+--       sccsid           : $Header:   //new_vm_latest/archives/tma/admin/pck/hig_std_text.pkh-arc   3.6   May 10 2018 13:33:56   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   hig_std_text.pkh  $
---       Date into SCCS   : $Date:   Apr 16 2018 09:21:58  $
---       Date fetched Out : $Modtime:   Apr 16 2018 09:09:50  $
---       SCCS Version     : $Revision:   3.5  $
+--       Date into SCCS   : $Date:   May 10 2018 13:33:56  $
+--       Date fetched Out : $Modtime:   May 10 2018 13:31:24  $
+--       SCCS Version     : $Revision:   3.6  $
 --       Based on 
 --
 --
@@ -21,7 +21,7 @@ CREATE OR REPLACE PACKAGE hig_std_text AS
 -----------------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
-   g_sccsid   CONSTANT varchar2(30) :='"$Revision:   3.5  $"';
+   g_sccsid   CONSTANT varchar2(30) :='"$Revision:   3.6  $"';
 --</GLOBVAR>
 --
 -----------------------------------------------------------------------------
@@ -42,6 +42,10 @@ type stdtab is table of stdrec index by binary_integer;
 g_std_text        hig_standard_text.hst_text%type default null;
 g_append_std_text hig_standard_text.hst_text%type default null;
     
+--
+  FUNCTION get_version RETURN varchar2;
+
+  FUNCTION get_body_version RETURN varchar2;
 --
 --------------------------------------------------------------------------------
 --
