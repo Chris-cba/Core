@@ -2,13 +2,13 @@ CREATE OR REPLACE PACKAGE BODY nm3analytic_connectivity AS
 --
 -----------------------------------------------------------------------------
 --
---   SCCS Identifiers :-
+--   PVCS Identifiers :-
 --
---       sccsid           : @(#)nm3analytic_connectivity.pkb	1.1 02/01/07
---       Module Name      : nm3analytic_connectivity.pkb
---       Date into SCCS   : 07/02/01 15:45:26
---       Date fetched Out : 07/06/13 14:10:53
---       SCCS Version     : 1.1
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3analytic_connectivity.pkb-arc   2.3   May 10 2018 14:22:10   Gaurav.Gaurkar  $
+--       Module Name      : $Workfile:   nm3analytic_connectivity.pkb  $
+--       Date into SCCS   : $Date:   May 10 2018 14:22:10  $
+--       Date fetched Out : $Modtime:   May 10 2018 14:20:46  $
+--       SCCS Version     : $Revision:   2.3  $
 --
 --
 --   Author : Priidu Tanava
@@ -18,9 +18,32 @@ CREATE OR REPLACE PACKAGE BODY nm3analytic_connectivity AS
 -----------------------------------------------------------------------------
 --   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
+--
+--all global package variables here
 
-  g_body_sccsid     CONSTANT  varchar2(2000) := '"@(#)nm3analytic_connectivity.pkb	1.1 02/01/07"';
-  g_package_name    CONSTANT  varchar2(30)   := 'nm3analytic_connectivity';
+  -----------
+  --constants
+  -----------
+  --g_body_sccsid is the SCCS ID for the package body
+  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.3  $';
+
+  g_package_name CONSTANT varchar2(30) := 'nm3analytic_connectivity';
+  
+--
+-----------------------------------------------------------------------------
+--
+FUNCTION get_version RETURN varchar2 IS
+BEGIN
+   RETURN g_sccsid;
+END get_version;
+--
+-----------------------------------------------------------------------------
+--
+FUNCTION get_body_version RETURN varchar2 IS
+BEGIN
+   RETURN g_body_sccsid;
+END get_body_version;
+--
   
   mc_iterate      number;
   mc_terminate    number;
