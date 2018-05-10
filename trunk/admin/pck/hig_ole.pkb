@@ -3,17 +3,45 @@ AS
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/hig_ole.pkb-arc   2.4   Apr 16 2018 09:21:56   Gaurav.Gaurkar  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/hig_ole.pkb-arc   2.5   May 10 2018 10:52:20   Gaurav.Gaurkar  $
 --       Module Name      : $Workfile:   hig_ole.pkb  $
---       Date into PVCS   : $Date:   Apr 16 2018 09:21:56  $
---       Date fetched Out : $Modtime:   Apr 16 2018 08:53:04  $
---       Version          : $Revision:   2.4  $
+--       Date into PVCS   : $Date:   May 10 2018 10:52:20  $
+--       Date fetched Out : $Modtime:   May 10 2018 10:50:44  $
+--       Version          : $Revision:   2.5  $
 --
 -----------------------------------------------------------------------------
 --    Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 --   Author : Ian Smith
+--
+--all global package variables here
+
+  -----------
+  --constants
+  -----------
+  --g_body_sccsid is the SCCS ID for the package body
+  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.5  $';
+
+  g_package_name CONSTANT varchar2(30) := 'hig_ole';
+  
+--
+-----------------------------------------------------------------------------
+--
+FUNCTION get_version RETURN varchar2 IS
+BEGIN
+   RETURN g_sccsid;
+END get_version;
+--
+-----------------------------------------------------------------------------
+--
+FUNCTION get_body_version RETURN varchar2 IS
+BEGIN
+   RETURN g_body_sccsid;
+END get_body_version;
+--
+-----------------------------------------------------------------------------
+--
 
   c_strdateformat   VARCHAR2 ( 100 );
   c_strvarchar      CONSTANT VARCHAR2 ( 30 ) := 'VARCHAR2';
