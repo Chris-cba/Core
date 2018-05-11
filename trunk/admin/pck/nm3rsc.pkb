@@ -4,11 +4,11 @@ AS
     --------------------------------------------------------------------------------
     --   PVCS Identifiers :-
     --
-    --       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3rsc.pkb-arc   2.21   Apr 16 2018 09:23:22   Gaurav.Gaurkar  $
+    --       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3rsc.pkb-arc   2.22   May 11 2018 10:59:56   Chris.Baugh  $
     --       Module Name      : $Workfile:   nm3rsc.pkb  $
-    --       Date into PVCS   : $Date:   Apr 16 2018 09:23:22  $
-    --       Date fetched Out : $Modtime:   Apr 16 2018 09:04:32  $
-    --       PVCS Version     : $Revision:   2.21  $
+    --       Date into PVCS   : $Date:   May 11 2018 10:59:56  $
+    --       Date fetched Out : $Modtime:   May 11 2018 10:56:40  $
+    --       PVCS Version     : $Revision:   2.22  $
     --
     --   Author : R.A. Coupe
     --
@@ -20,7 +20,7 @@ AS
     --
     --all global package variables here
     --
-    g_body_sccsid    CONSTANT VARCHAR2 (30) := '"$Revision:   2.21  $"';
+    g_body_sccsid    CONSTANT VARCHAR2 (30) := '"$Revision:   2.22  $"';
 
     --  g_body_sccsid is the SCCS ID for the package body
     --
@@ -1239,6 +1239,16 @@ AS
         ELSE
             nm3ctx.set_context ('RSC_START', NULL);
         END IF;
+
+        declare 
+          l_mode nm_user_aus.nua_mode%type;
+        begin
+          select nm3ausec.get_au_mode(sys_context('NM3_SECURITY_CTX','USERNAME'), ne_admin_unit ) into l_mode from nm_elements where ne_id = pi_ne_id;
+          if l_mode != 'NORMAL' then
+             hig.raise_ner (pi_appl               => nm3type.c_net
+                           ,pi_id                 => 236 );
+          end if;
+        end;
 
         instantiate_data (pi_ne_id => pi_ne_id, pi_effective_date => NULL);
 
@@ -2565,7 +2575,30 @@ AS
         nm_debug.proc_end (p_package_name     => g_package_name,
                            p_procedure_name   => 'get_datums_for_resize');
     END get_datums_for_resize;
-
+    --
+    -----------------------------------------------------------------------------
+    --
+    PROCEDURE resize_other_products(pi_ne_id       IN nm_elements.ne_id%TYPE
+                                   ,pi_orig_length IN NUMBER
+                                   ,pi_new_length  IN NUMBER) IS
+      --
+    BEGIN
+      /*
+      ||MAI.
+      */
+      IF hig.is_product_licensed(nm3type.c_mai)
+       THEN
+          EXECUTE IMMEDIATE 'BEGIN'
+                 ||CHR(10)||'  mairecal.resize_data(pi_ne_id       => :pi_ne_id'
+                 ||CHR(10)||'                      ,pi_orig_length => :pi_orig_length'
+                 ||CHR(10)||'                      ,pi_new_length  => :pi_new_length);'
+                 ||CHR(10)||'END;'
+          USING IN pi_ne_id
+                  ,pi_orig_length
+                  ,pi_new_length;
+      END IF;
+      --
+    END resize_other_products;
     --
     -----------------------------------------------------------------------------
     --
@@ -2590,6 +2623,12 @@ AS
     BEGIN
         nm_debug.proc_start (p_package_name     => g_package_name,
                              p_procedure_name   => 'resize_route');
+
+        declare 
+          l_mode nm_user_aus.nua_mode%type;
+        begin
+          select nm3ausec.get_au_mode(sys_context('NM3_SECURITY_CTX','USERNAME'), ne_admin_unit ) into l_mode from nm_elements where ne_id = pi_ne_id;
+        end;
 
         l_ne_rec := nm3get.get_ne (pi_ne_id => pi_ne_id);
 
@@ -2677,7 +2716,12 @@ AS
                     'N',
                 pi_ne_start =>
                     pi_ne_start);
-        END IF;
+      --
+      resize_other_products(pi_ne_id       => pi_ne_id
+                           ,pi_orig_length => l_current_length
+                           ,pi_new_length  => l_new_length);
+      --
+    END IF;
 
         nm_debug.proc_end (p_package_name     => g_package_name,
                            p_procedure_name   => 'resize_route');
