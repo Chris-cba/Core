@@ -27,11 +27,11 @@ AS
      -------------------------------------------------------------------------
                                                       --   PVCS Identifiers :-
                                                                             --
- --       PVCS id          : $Header:   //new_vm_latest/archives/lb/admin/views/V_LB_REP_ASSET_LOCATIONS.vw-arc   1.2   May 14 2018 19:39:24   Rob.Coupe  $
+ --       PVCS id          : $Header:   //new_vm_latest/archives/lb/admin/views/V_LB_REP_ASSET_LOCATIONS.vw-arc   1.3   May 14 2018 21:05:06   Rob.Coupe  $
                --       Module Name      : $Workfile:   V_LB_REP_ASSET_LOCATIONS.vw  $
-                  --       Date into PVCS   : $Date:   May 14 2018 19:39:24  $
-               --       Date fetched Out : $Modtime:   May 14 2018 19:39:02  $
-                               --       Version          : $Revision:   1.2  $
+                  --       Date into PVCS   : $Date:   May 14 2018 21:05:06  $
+               --       Date fetched Out : $Modtime:   May 14 2018 21:04:36  $
+                               --       Version          : $Revision:   1.3  $
  -----------------------------------------------------------------------------------------------------
     --   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
  -----------------------------------------------------------------------------------------------------
@@ -188,6 +188,8 @@ COMMENT ON COLUMN V_LB_REP_ASSET_LOCATIONS.end_measure IS
     'The measure along the referenced element at which the asset is deemed to end';
 COMMENT ON COLUMN V_LB_REP_ASSET_LOCATIONS.network_name_descr IS
     'A concatenation of network name and description to provide text-based indexing';
+
+ALTER TABLE V_LB_REP_ASSET_LOCATIONS ADD CONSTRAINT PK_V_LB_REP_ASSET_LOCATIONS PRIMARY KEY (guid);
 
 CREATE INDEX lb_rep_al_asset_idx
     ON V_LB_REP_ASSET_LOCATIONS (asset_id, asset_source);
