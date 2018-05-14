@@ -27,12 +27,11 @@ AS
      -------------------------------------------------------------------------
                                                       --   PVCS Identifiers :-
                                                                             --
- --       PVCS id          : $Header:   //new_vm_latest/archives/lb/admin/views/V_LB_REP_ASSET_LOCATIONS.vw-arc   1.1   May 14 2018 19:38:22   Rob.Coupe  $
+ --       PVCS id          : $Header:   //new_vm_latest/archives/lb/admin/views/V_LB_REP_ASSET_LOCATIONS.vw-arc   1.2   May 14 2018 19:39:24   Rob.Coupe  $
                --       Module Name      : $Workfile:   V_LB_REP_ASSET_LOCATIONS.vw  $
-                  --       Date into PVCS   : $Date:   May 14 2018 19:38:22  $
-               --       Date fetched Out : $Modtime:   May 14 2018 19:38:02  $
-                               --       Version          : $Revision:   1.1  $
-                                         --       Based on SCCS version : 1.22
+                  --       Date into PVCS   : $Date:   May 14 2018 19:39:24  $
+               --       Date fetched Out : $Modtime:   May 14 2018 19:39:02  $
+                               --       Version          : $Revision:   1.2  $
  -----------------------------------------------------------------------------------------------------
     --   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
  -----------------------------------------------------------------------------------------------------
