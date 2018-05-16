@@ -35,11 +35,11 @@ AS
           -------------------------------------------------------------------------
           --   PVCS Identifiers :-
           --
-          --       PVCS id          : $Header:   //new_vm_latest/archives/lb/admin/views/V_LB_REP_ASSET_LOCATIONS.vw-arc   1.4   May 16 2018 15:01:32   Rob.Coupe  $
+          --       PVCS id          : $Header:   //new_vm_latest/archives/lb/admin/views/V_LB_REP_ASSET_LOCATIONS.vw-arc   1.5   May 16 2018 15:04:08   Rob.Coupe  $
           --       Module Name      : $Workfile:   V_LB_REP_ASSET_LOCATIONS.vw  $
-          --       Date into PVCS   : $Date:   May 16 2018 15:01:32  $
-          --       Date fetched Out : $Modtime:   May 16 2018 15:01:10  $
-          --       Version          : $Revision:   1.4  $
+          --       Date into PVCS   : $Date:   May 16 2018 15:04:08  $
+          --       Date fetched Out : $Modtime:   May 16 2018 15:03:26  $
+          --       Version          : $Revision:   1.5  $
           -----------------------------------------------------------------------------------------------------
           --   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
           -----------------------------------------------------------------------------------------------------
@@ -60,7 +60,7 @@ AS
           start_measure, -- The measure along the referenced element at which the asset is deemed to start
           end_measure, -- The measure along the referenced element at which the asset is deemed to end
           ne_unique || ne_descr network_name_descr, -- A concatenation of network name and description to provide text-based indexing
-          '$Revision:   1.4  $' Revision 
+          '$Revision:   1.5  $' Revision 
      FROM (WITH inv_types
                 AS (SELECT CASE nit_category WHEN 'L' THEN 'L' ELSE 'I' END
                               category,
@@ -110,7 +110,7 @@ AS
                      WHERE     nm_obj_type = nit_inv_type
                            AND category = 'I'
                            AND nm_ne_id_in = iit_ne_id
-                           and rownum < 20),
+                           ),
                 lb_membs
                 AS (SELECT category,
                            asset_type_descr,
@@ -148,7 +148,7 @@ AS
                            AND nit_inv_type = lb_exor_inv_type
                            AND nal_id = nm_ne_id_in
                            AND nm_end_date IS NULL
-                           and rownum < 20)
+                           )
            SELECT category,
                   asset_type_descr,
                   asset_id,
