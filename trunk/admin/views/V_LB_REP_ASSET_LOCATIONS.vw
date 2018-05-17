@@ -1,4 +1,18 @@
-DROP MATERIALIZED VIEW v_lb_rep_asset_locations;
+-- See body of materialized view for version, comments and description
+
+DECLARE
+   not_exists   EXCEPTION;
+   PRAGMA EXCEPTION_INIT (not_exists, -12003);
+BEGIN
+   EXECUTE IMMEDIATE 'DROP MATERIALIZED VIEW v_lb_rep_asset_locations';
+EXCEPTION
+   WHEN not_exists
+   THEN
+      NULL;
+END;
+/
+
+
 
 CREATE MATERIALIZED VIEW V_LB_REP_ASSET_LOCATIONS
    (
@@ -35,11 +49,11 @@ AS
           -------------------------------------------------------------------------
           --   PVCS Identifiers :-
           --
-          --       PVCS id          : $Header:   //new_vm_latest/archives/lb/admin/views/V_LB_REP_ASSET_LOCATIONS.vw-arc   1.5   May 16 2018 15:04:08   Rob.Coupe  $
+          --       PVCS id          : $Header:   //new_vm_latest/archives/lb/admin/views/V_LB_REP_ASSET_LOCATIONS.vw-arc   1.6   May 17 2018 09:52:48   Rob.Coupe  $
           --       Module Name      : $Workfile:   V_LB_REP_ASSET_LOCATIONS.vw  $
-          --       Date into PVCS   : $Date:   May 16 2018 15:04:08  $
-          --       Date fetched Out : $Modtime:   May 16 2018 15:03:26  $
-          --       Version          : $Revision:   1.5  $
+          --       Date into PVCS   : $Date:   May 17 2018 09:52:48  $
+          --       Date fetched Out : $Modtime:   May 17 2018 09:51:48  $
+          --       Version          : $Revision:   1.6  $
           -----------------------------------------------------------------------------------------------------
           --   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
           -----------------------------------------------------------------------------------------------------
@@ -60,7 +74,7 @@ AS
           start_measure, -- The measure along the referenced element at which the asset is deemed to start
           end_measure, -- The measure along the referenced element at which the asset is deemed to end
           ne_unique || ne_descr network_name_descr, -- A concatenation of network name and description to provide text-based indexing
-          '$Revision:   1.5  $' Revision 
+          '$Revision:   1.6  $' Revision
      FROM (WITH inv_types
                 AS (SELECT CASE nit_category WHEN 'L' THEN 'L' ELSE 'I' END
                               category,
@@ -109,8 +123,7 @@ AS
                       FROM nm_members, inv_types, nm_inv_items
                      WHERE     nm_obj_type = nit_inv_type
                            AND category = 'I'
-                           AND nm_ne_id_in = iit_ne_id
-                           ),
+                           AND nm_ne_id_in = iit_ne_id),
                 lb_membs
                 AS (SELECT category,
                            asset_type_descr,
@@ -122,10 +135,18 @@ AS
                               THEN
                                  NULL
                               ELSE
-                                 (SELECT NVL (rvrs_xsp, nm_x_sect_st)
-                                    FROM v_nm_element_xsp_rvrs r
-                                   WHERE     r.xsp_element_id = nm_ne_id_of
-                                         AND r.element_xsp = nm_x_sect_st)
+                                 CASE nm_dir_flag
+                                    WHEN 1
+                                    THEN
+                                       nm_x_sect_st
+                                    ELSE
+                                       (SELECT NVL (rvrs_xsp, nm_x_sect_st)
+                                          FROM v_nm_element_xsp_rvrs r
+                                         WHERE     r.xsp_element_id =
+                                                      nm_ne_id_of
+                                               AND r.element_xsp =
+                                                      nm_x_sect_st)
+                                 END
                            END
                               new_xsp,
                            nm_ne_id_in location_id,
@@ -147,8 +168,7 @@ AS
                            AND category = 'L'
                            AND nit_inv_type = lb_exor_inv_type
                            AND nal_id = nm_ne_id_in
-                           AND nm_end_date IS NULL
-                           )
+                           AND nm_end_date IS NULL)
            SELECT category,
                   asset_type_descr,
                   asset_id,
@@ -288,6 +308,8 @@ COMMENT ON COLUMN V_LB_REP_ASSET_LOCATIONS.eB_object_type IS
    'The eB object as defined in the LB_TYPES table for the specific asset type (NULL for Exor inventory)';
 COMMENT ON COLUMN V_LB_REP_ASSET_LOCATIONS.Exor_asset_type IS
    'The Exor Inventory type or LB foreign table type (Exor NIT_INV_TYPE)';
+COMMENT ON COLUMN V_LB_REP_ASSET_LOCATIONS.asset_type_descr IS
+   'The description of the asset type - drawn from either the Exor Inventory type description or the text used at the time of registration of the asset type in LB';
 COMMENT ON COLUMN V_LB_REP_ASSET_LOCATIONS.XSP IS
    'The Cross-Sectional-Position of the asset location (relative to the network element in the case of LB data)';
 COMMENT ON COLUMN V_LB_REP_ASSET_LOCATIONS.network_element_id IS
@@ -300,12 +322,18 @@ COMMENT ON COLUMN V_LB_REP_ASSET_LOCATIONS.network_element_group_type IS
    'Exor network element group type (NULL for Datums)';
 COMMENT ON COLUMN V_LB_REP_ASSET_LOCATIONS.network_element_description IS
    'Exor network element description';
+COMMENT ON COLUMN V_LB_REP_ASSET_LOCATIONS.direction_indicator IS
+   'A value of + or - 1 to indicate the direction of the recording of the asset relative to that of the linear element';
 COMMENT ON COLUMN V_LB_REP_ASSET_LOCATIONS.start_measure IS
    'The measure along the referenced element at which the asset is deemed to start';
 COMMENT ON COLUMN V_LB_REP_ASSET_LOCATIONS.end_measure IS
    'The measure along the referenced element at which the asset is deemed to end';
 COMMENT ON COLUMN V_LB_REP_ASSET_LOCATIONS.network_name_descr IS
    'A concatenation of network name and description to provide text-based indexing';
+COMMENT ON COLUMN V_LB_REP_ASSET_LOCATIONS.REVISION IS
+   'PVCS Revision Tag at time of extraction from PVCS source safe';
+
+
 
 ALTER TABLE V_LB_REP_ASSET_LOCATIONS ADD CONSTRAINT PK_V_LB_REP_ASSET_LOCATIONS PRIMARY KEY (guid);
 
