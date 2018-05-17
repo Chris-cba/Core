@@ -45,15 +45,18 @@ AS
           -- The persisted data in brought back as two of the components, each feeding into the aggregation procedure for that particular data.
           -- The network text data is concatenated to provide a text based index to operate on both name
           -- and description simultaneously.
+          -- Function lb_get.get_lb_xrpt_r_tab return the aggregated locations including XSP and dates
+          --          lb_get.get_lb_rpt_r_tab return aggregated locations but does not include XSP data and is
+          --                 suitable for asset types that use no XSP or LB assets that do not support the use of XSP.
           --
           -------------------------------------------------------------------------
           --   PVCS Identifiers :-
           --
-          --       PVCS id          : $Header:   //new_vm_latest/archives/lb/admin/views/V_LB_REP_ASSET_LOCATIONS.vw-arc   1.6   May 17 2018 09:52:48   Rob.Coupe  $
+          --       PVCS id          : $Header:   //new_vm_latest/archives/lb/admin/views/V_LB_REP_ASSET_LOCATIONS.vw-arc   1.7   May 17 2018 15:14:00   Rob.Coupe  $
           --       Module Name      : $Workfile:   V_LB_REP_ASSET_LOCATIONS.vw  $
-          --       Date into PVCS   : $Date:   May 17 2018 09:52:48  $
-          --       Date fetched Out : $Modtime:   May 17 2018 09:51:48  $
-          --       Version          : $Revision:   1.6  $
+          --       Date into PVCS   : $Date:   May 17 2018 15:14:00  $
+          --       Date fetched Out : $Modtime:   May 17 2018 15:13:40  $
+          --       Version          : $Revision:   1.7  $
           -----------------------------------------------------------------------------------------------------
           --   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
           -----------------------------------------------------------------------------------------------------
@@ -74,9 +77,10 @@ AS
           start_measure, -- The measure along the referenced element at which the asset is deemed to start
           end_measure, -- The measure along the referenced element at which the asset is deemed to end
           ne_unique || ne_descr network_name_descr, -- A concatenation of network name and description to provide text-based indexing
-          '$Revision:   1.6  $' Revision
+          '$Revision:   1.7  $' Revision
      FROM (WITH inv_types
-                AS (SELECT CASE nit_category WHEN 'L' THEN 'L' ELSE 'I' END
+                AS (SELECT -- gather the Exor asset types and split between those LB and standard inventory - this is needed because th ebehaviour of XSP is different
+                          CASE nit_category WHEN 'L' THEN 'L' ELSE 'I' END
                               category,
                            nit_inv_type,
                            CASE nit_category
@@ -92,7 +96,8 @@ AS
                       FROM nm_inv_types
                      WHERE nit_category IN ('I', 'L')), -- and nit_inv_type = 'EW'),
                 gty
-                AS (  SELECT nin_nit_inv_code inv_type,
+                AS (  SELECT -- gather up the list of network types over which the asset types may be located
+                            nin_nit_inv_code inv_type,
                              nng_group_type linear_group_type
                         FROM nm_inv_nw,
                              nm_nt_groupings,
@@ -103,7 +108,8 @@ AS
                              AND nin_nit_inv_code = nit_inv_type
                     GROUP BY nin_nit_inv_code, nng_group_type),
                 inv_membs
-                AS (SELECT category,
+                AS (SELECT -- the list of all available asset locations and XSP drawn from the asset locations table (nm_members)
+                          category,
                            asset_type_descr,
                            nm_ne_id_in Asset_id,
                            NULL eB_object_type,
@@ -125,7 +131,8 @@ AS
                            AND category = 'I'
                            AND nm_ne_id_in = iit_ne_id),
                 lb_membs
-                AS (SELECT category,
+                AS (SELECT -- the list of all available LB locations and XSP drawn from the LB locations table (nm_locations)
+                          category,
                            asset_type_descr,
                            nal_asset_id Asset_Id,
                            lb_object_type eB_object_type,
@@ -169,7 +176,8 @@ AS
                            AND nit_inv_type = lb_exor_inv_type
                            AND nal_id = nm_ne_id_in
                            AND nm_end_date IS NULL)
-           SELECT category,
+           SELECT                                   --Exor inventory locations
+                 category,
                   asset_type_descr,
                   asset_id,
                   eB_object_type,
@@ -182,7 +190,8 @@ AS
                   end_measure
              FROM inv_membs
            UNION ALL
-           SELECT category,
+           SELECT                                         --LB asset locations
+                 category,
                   asset_type_descr,
                   asset_id,
                   eB_object_type,
@@ -195,7 +204,8 @@ AS
                   end_measure
              FROM lb_membs
            UNION ALL
-           SELECT category,
+           SELECT -- the Exor inventory locations aggregated across all group-based etwork types (route-types)
+                 category,
                   asset_type_descr,
                   asset_id,
                   eB_object_type,
@@ -241,7 +251,8 @@ AS
                                               10)) t
             WHERE exor_asset_type = inv_type
            UNION ALL
-           SELECT category,
+           SELECT -- the LB asset locations aggregated across all group-based etwork types (route-types)
+                 category,
                   asset_type_descr,
                   asset_id,
                   eB_object_type,
@@ -357,4 +368,5 @@ CREATE INDEX lb_rep_al_network_name_idx
 CREATE INDEX lb_rep_al_net_concat_idx
    ON V_LB_REP_ASSET_LOCATIONS (network_name_descr)
    INDEXTYPE IS ctxsys.context;
+
    
