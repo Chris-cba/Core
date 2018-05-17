@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_get
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_get.pkb-arc   1.42   Mar 02 2018 15:10:22   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_get.pkb-arc   1.43   May 17 2018 10:22:40   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_get.pkb  $
-   --       Date into PVCS   : $Date:   Mar 02 2018 15:10:22  $
-   --       Date fetched Out : $Modtime:   Mar 02 2018 15:10:12  $
-   --       PVCS Version     : $Revision:   1.42  $
+   --       Date into PVCS   : $Date:   May 17 2018 10:22:40  $
+   --       Date fetched Out : $Modtime:   May 17 2018 10:21:42  $
+   --       PVCS Version     : $Revision:   1.43  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,7 +16,7 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.42  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.43  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_get';
 
@@ -1720,7 +1720,7 @@ AS
    END;
 
 
-   FUNCTION get_lb_xrpt_r_tab (p_lb_XRPt_tab        IN lb_XRPt_tab,
+FUNCTION get_lb_xrpt_r_tab (p_lb_XRPt_tab        IN lb_XRPt_tab,
                               p_linear_obj_type   IN VARCHAR2,
                               p_cardinality       IN INTEGER DEFAULT NULL)
       RETURN lb_XRPt_tab
@@ -1751,9 +1751,21 @@ AS
 
       --
       -- just going up the hierarchy to aggregate the data according to linear type
-      WITH itab
+WITH input_tab
            AS (SELECT t.*
-                 FROM TABLE (p_lb_XRPt_tab) t)
+                 FROM TABLE ( p_lb_XRPt_tab) t),
+itab as (                  select refnt, refnt_type, obj_type, obj_id, seg_id, seq_id, dir_flag, start_m, end_m, m_unit,
+                 xsp,
+                 offset,
+                 start_date,
+                 end_date,
+                 case 
+                   when xsp is NULL then NULL
+                   else ( select nvl(rvrs_xsp, xsp) from v_nm_element_xsp_rvrs r
+                          where r.xsp_element_id = refnt
+                          and r.element_xsp = i.xsp )
+                 end rvrs_xsp
+                 from input_tab i )
       SELECT lb_XRPt (refnt,
                      refnt_type,
                      obj_type,
@@ -2056,7 +2068,8 @@ AS
                                                                         itab.xsp xsp,
                                                                         itab.offset,
                                                                         itab.start_date,
-                                                                        itab.end_date
+                                                                        itab.end_date,
+                                                                        itab.rvrs_xsp
                                                                    FROM itab) --nm_members where nm_ne_id_of in ( select nm_ne_id_of from nm_members c where c.nm_ne_id_in = 1887))
                                                           SELECT i.*,
                                                                  m.nm_ne_id_in
@@ -2173,7 +2186,7 @@ AS
                                                             FROM INV_IDS i,
                                                                  nm_members m,
                                                                  nm_elements e,
-                                                                 v_nm_element_xsp_rvrs x,
+--                                                                 v_nm_element_xsp_rvrs x,
                                                                  (SELECT uc_unit_id_in,
                                                                          uc_unit_id_out,
                                                                          uc_conversion_factor
@@ -2201,8 +2214,8 @@ AS
                                                                         l_refnt_type.nlt_units
                                                                  AND uc_unit_id_in =
                                                                         i.datum_unit
-                                                                        and  datum_id = x.xsp_element_id (+)
-                                                                        and i.xsp = x.element_xsp
+--                                                                        and  datum_id = xsp_element_id
+--                                                                        and i.xsp = x.element_xsp (+)
                                                         ORDER BY m.nm_ne_id_in,
                                                                  nm_seg_no,
                                                                  nm_seq_no,
@@ -2532,7 +2545,8 @@ AS
          SELECT DECODE (nit_table_name, NULL, 'N', 'Y'), nit_category
            INTO l_ft_flag, l_category
            FROM nm_inv_types
-          WHERE nit_inv_type = pi_obj_type;
+          WHERE nit_inv_type = pi_obj_type
+          and not exists ( select 1 from nm_nt_groupings where nng_group_type = pi_obj_type );
       EXCEPTION
          WHEN NO_DATA_FOUND
          THEN
