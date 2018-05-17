@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_loc
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_loc.pkb-arc   1.12   Mar 02 2018 15:12:46   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_loc.pkb-arc   1.13   May 17 2018 13:21:30   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_loc.pkb  $
-   --       Date into PVCS   : $Date:   Mar 02 2018 15:12:46  $
-   --       Date fetched Out : $Modtime:   Mar 02 2018 15:12:18  $
-   --       PVCS Version     : $Revision:   1.12  $
+   --       Date into PVCS   : $Date:   May 17 2018 13:21:30  $
+   --       Date fetched Out : $Modtime:   May 17 2018 13:20:22  $
+   --       PVCS Version     : $Revision:   1.13  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,7 +16,7 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.12  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.13  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_loc';
 
@@ -465,8 +465,15 @@ AS
                    WHEN 'TRUE'
                    THEN
                       CASE nm_dir_flag
-                         WHEN 1 THEN nm_x_sect_st
-                         WHEN -1 THEN xrv_new_xsp
+                         WHEN 1
+                         THEN
+                            nm_x_sect_st
+                         WHEN -1
+                         THEN
+                            (SELECT xrv_new_xsp
+                               FROM v_nlt_element_xsps
+                              WHERE     element_id = nm_ne_id_of
+                                    AND nwx_x_sect = nm_x_sect_st)
                       END
                    ELSE
                       nm_x_sect_st
@@ -475,21 +482,16 @@ AS
                 nm_start_date,
                 nm_end_date)
         BULK COLLECT INTO retval
-        --select nal_id, nal_nit_type, nm_ne_id_of, nm_begin_mp, nm_end_mp, nm_dir_flag, nm_x_sect_st, nm_offset_st, xrv_new_sub_class, xrv_new_xsp
-        FROM nm_asset_locations,
-             nm_locations_all,
-             v_nlt_element_xsps,
-             nm_linear_types
+        FROM nm_asset_locations, nm_locations_all, nm_linear_types
        WHERE     nal_asset_id = NVL (pi_asset_id, nal_asset_id)
              AND nal_id = NVL (pi_nal_id, nal_id)
              AND nal_nit_type = pi_nal_nit_type
              AND nm_ne_id_in = nal_id
-             AND element_id = nm_ne_id_of
-             AND nwx_x_sect = nm_x_sect_st
              AND nlt_id = nm_nlt_id;
 
       RETURN retval;
    END;
+
 
    FUNCTION translate_xnlt (pi_lb_xrpt_tab       IN lb_XRPt_tab,
                             pi_refnt_type        IN INTEGER,
