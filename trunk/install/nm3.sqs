@@ -1,17 +1,16 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
---
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/nm3.sqs-arc   2.15   Apr 18 2018 16:09:46   Gaurav.Gaurkar  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/nm3.sqs-arc   2.16   May 17 2018 16:16:34   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm3.sqs  $
---       Date into PVCS   : $Date:   Apr 18 2018 16:09:46  $
---       Date fetched Out : $Modtime:   Apr 18 2018 16:02:12  $
---       PVCS Version     : $Revision:   2.15  $
+--       Date into PVCS   : $Date:   May 17 2018 16:16:34  $
+--       Date fetched Out : $Modtime:   May 17 2018 15:19:20  $
+--       PVCS Version     : $Revision:   2.16  $
 --
 -----------------------------------------------------------------------------
 --    Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
--- Generated for Oracle 10g on Mon Jul 16  14:47:24 2012 by Server Generator 10.1.2.9.28
+-- Generated for Oracle 10g on Thu May 17  15:07:48 2018 by Server Generator 10.1.2.9.28
  
 PROMPT Creating Sequence 'BATCH_ID_SEQ'
 CREATE SEQUENCE BATCH_ID_SEQ
@@ -408,7 +407,7 @@ CREATE SEQUENCE HIG_ROUTER_PARAMS_SEQ
  NOMAXVALUE
  NOMINVALUE
  NOCYCLE
- NOCACHE
+ CACHE 20
 /
 
 PROMPT Creating Sequence 'HMLC_ID_SEQ'
@@ -942,6 +941,13 @@ CREATE SEQUENCE NTH_THEME_ID_SEQ
  NOMINVALUE
  NOCYCLE
  NOCACHE
+/
+
+PROMPT Creating Sequence 'NWT_ID_SEQ'
+CREATE SEQUENCE NWT_ID_SEQ
+ NOMAXVALUE
+ NOMINVALUE
+ NOCYCLE
 /
 
 PROMPT Creating Sequence 'NXIC_ID_SEQ'

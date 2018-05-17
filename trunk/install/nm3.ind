@@ -1,16 +1,16 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/nm3.ind-arc   2.29   Apr 18 2018 16:09:46   Gaurav.Gaurkar  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/nm3.ind-arc   2.30   May 17 2018 16:16:34   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm3.ind  $
---       Date into PVCS   : $Date:   Apr 18 2018 16:09:46  $
---       Date fetched Out : $Modtime:   Apr 18 2018 16:02:10  $
---       PVCS Version     : $Revision:   2.29  $
+--       Date into PVCS   : $Date:   May 17 2018 16:16:34  $
+--       Date fetched Out : $Modtime:   May 17 2018 15:19:08  $
+--       PVCS Version     : $Revision:   2.30  $
 --
 -----------------------------------------------------------------------------
 --    Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
--- Generated for Oracle 10g on Fri Jul 12  13:48:05 2013 by Server Generator 10.1.2.9.28
+-- Generated for Oracle 10g on Thu May 17  15:07:47 2018 by Server Generator 10.1.2.9.28
   
 
 PROMPT Creating Index 'DOC_FK_DLC_IND'
@@ -920,6 +920,18 @@ CREATE INDEX IAL_NVA_FK_IND ON NM_INV_ATTRI_LOOKUP_ALL
  (IAL_NVA_ID)
 /
 
+PROMPT Creating Index 'NIG_PK_IDX'
+CREATE UNIQUE INDEX NIG_PK_IDX ON NM_INV_GEOMETRY_ALL
+ (ASSET_ID
+ ,ASSET_TYPE
+ ,START_DATE)
+/
+
+PROMPT Creating Index 'NIG_TYPE_IDX'
+CREATE INDEX NIG_TYPE_IDX ON NM_INV_GEOMETRY_ALL
+ (ASSET_TYPE)
+/
+
 PROMPT Creating Index 'IIT_LOCATED_FK_IND'
 CREATE INDEX IIT_LOCATED_FK_IND ON NM_INV_ITEMS_ALL
  (IIT_LOCATED_BY)
@@ -1529,11 +1541,28 @@ CREATE INDEX NVA_NFP_FK_IND ON NM_VISUAL_ATTRIBUTES
  (NVA_NFP_ID)
 /
 
+PROMPT Creating Index 'NWTR_FK_HRO_IND'
+CREATE INDEX NWTR_FK_HRO_IND ON NM_WMS_THEME_ROLES
+ (NWTR_ROLE)
+/
+
+PROMPT Creating Index 'NWTR_FK_NWT_IND'
+CREATE INDEX NWTR_FK_NWT_IND ON NM_WMS_THEME_ROLES
+ (NWTR_NWT_ID)
+/
+
 PROMPT Creating Index 'XSR_NWX_FK_IND'
 CREATE INDEX XSR_NWX_FK_IND ON NM_XSP_RESTRAINTS
  (XSR_NW_TYPE
  ,XSR_X_SECT_VALUE
  ,XSR_SCL_CLASS)
+/
+
+PROMPT Creating Index 'XRV_FK_NEW_XSP'
+CREATE INDEX XRV_FK_NEW_XSP ON NM_XSP_REVERSAL
+ (XRV_NW_TYPE
+ ,XRV_NEW_SUB_CLASS
+ ,XRV_NEW_XSP)
 /
 
 PROMPT Creating Index 'NXD_NXIC_FK_IND'
