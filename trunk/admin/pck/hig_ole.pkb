@@ -3,11 +3,11 @@ AS
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/hig_ole.pkb-arc   2.5   May 10 2018 10:52:20   Gaurav.Gaurkar  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/hig_ole.pkb-arc   2.6   May 18 2018 10:53:56   Chris.Baugh  $
 --       Module Name      : $Workfile:   hig_ole.pkb  $
---       Date into PVCS   : $Date:   May 10 2018 10:52:20  $
---       Date fetched Out : $Modtime:   May 10 2018 10:50:44  $
---       Version          : $Revision:   2.5  $
+--       Date into PVCS   : $Date:   May 18 2018 10:53:56  $
+--       Date fetched Out : $Modtime:   May 18 2018 10:52:38  $
+--       Version          : $Revision:   2.6  $
 --
 -----------------------------------------------------------------------------
 --    Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
@@ -21,10 +21,21 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.5  $';
+  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.6  $';
 
   g_package_name CONSTANT varchar2(30) := 'hig_ole';
   
+  c_strdateformat   VARCHAR2 ( 100 );
+  c_strvarchar      CONSTANT VARCHAR2 ( 30 ) := 'VARCHAR2';
+  c_strdate         CONSTANT VARCHAR2 ( 30 ) := 'DATE';
+  c_strnumeric      CONSTANT VARCHAR2 ( 30 ) := 'NUMBER';
+  c_sccs_id CONSTANT VARCHAR2 ( 200 ) := '@(#)hig_ole.pck	1.9 11/04/98' ;
+
+  mc_template_pk    VARCHAR2 ( 32767 ) := NULL;
+  mc_no_of_pks      INTEGER;
+  mc_delimiter      CONSTANT VARCHAR2 ( 3 ) := '$@$';
+  mc_no_of_cols     INTEGER;
+
 --
 -----------------------------------------------------------------------------
 --
@@ -42,17 +53,6 @@ END get_body_version;
 --
 -----------------------------------------------------------------------------
 --
-
-  c_strdateformat   VARCHAR2 ( 100 );
-  c_strvarchar      CONSTANT VARCHAR2 ( 30 ) := 'VARCHAR2';
-  c_strdate         CONSTANT VARCHAR2 ( 30 ) := 'DATE';
-  c_strnumeric      CONSTANT VARCHAR2 ( 30 ) := 'NUMBER';
-  c_sccs_id CONSTANT VARCHAR2 ( 200 ) := '@(#)hig_ole.pck	1.9 11/04/98' ;
-
-  mc_template_pk    VARCHAR2 ( 32767 ) := NULL;
-  mc_no_of_pks      INTEGER;
-  mc_delimiter      CONSTANT VARCHAR2 ( 3 ) := '$@$';
-  mc_no_of_cols     INTEGER;
 
 
   FUNCTION strget_template_sql ( strtemplate   IN VARCHAR2
