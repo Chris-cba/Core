@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3analytic_connectivity AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3analytic_connectivity.pkb-arc   2.3   May 10 2018 14:22:10   Gaurav.Gaurkar  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3analytic_connectivity.pkb-arc   2.4   May 18 2018 10:57:26   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm3analytic_connectivity.pkb  $
---       Date into SCCS   : $Date:   May 10 2018 14:22:10  $
---       Date fetched Out : $Modtime:   May 10 2018 14:20:46  $
---       SCCS Version     : $Revision:   2.3  $
+--       Date into SCCS   : $Date:   May 18 2018 10:57:26  $
+--       Date fetched Out : $Modtime:   May 18 2018 10:56:20  $
+--       SCCS Version     : $Revision:   2.4  $
 --
 --
 --   Author : Priidu Tanava
@@ -25,9 +25,16 @@ CREATE OR REPLACE PACKAGE BODY nm3analytic_connectivity AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.3  $';
+  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.4  $';
 
   g_package_name CONSTANT varchar2(30) := 'nm3analytic_connectivity';
+  
+  mc_iterate      number;
+  mc_terminate    number;
+  mt_chunks       road_chunk_tbl;
+  mt_chunk_dups   road_chunk_tbl;
+  m_chunk_no      number := 0;
+  m_chunk_offset  number := 0;
   
 --
 -----------------------------------------------------------------------------
@@ -44,13 +51,6 @@ BEGIN
    RETURN g_body_sccsid;
 END get_body_version;
 --
-  
-  mc_iterate      number;
-  mc_terminate    number;
-  mt_chunks       road_chunk_tbl;
-  mt_chunk_dups   road_chunk_tbl;
-  m_chunk_no      number := 0;
-  m_chunk_offset  number := 0;
   
   
   procedure debug_chunks_tbl(
