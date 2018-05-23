@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3homo AS
    --
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3homo.pkb-arc   2.31   May 08 2018 14:26:08   Chris.Baugh  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3homo.pkb-arc   2.32   May 23 2018 13:33:36   Chris.Baugh  $
    --       Module Name      : $Workfile:   nm3homo.pkb  $
-   --       Date into PVCS   : $Date:   May 08 2018 14:26:08  $
-   --       Date fetched Out : $Modtime:   May 08 2018 14:24:50  $
-   --       PVCS Version     : $Revision:   2.31  $
+   --       Date into PVCS   : $Date:   May 23 2018 13:33:36  $
+   --       Date fetched Out : $Modtime:   May 23 2018 13:30:50  $
+   --       PVCS Version     : $Revision:   2.32  $
    --
    --
    --   Author : Jonathan Mills
@@ -55,7 +55,7 @@ CREATE OR REPLACE PACKAGE BODY nm3homo AS
 
    -- Log 713421
 
-   g_body_sccsid        CONSTANT VARCHAR2 (2000) := '"$Revision:   2.31  $"';
+   g_body_sccsid        CONSTANT VARCHAR2 (2000) := '"$Revision:   2.32  $"';
    --  g_body_sccsid is the SCCS ID for the package body
    --
    g_package_name       CONSTANT VARCHAR2 (30) := 'nm3homo';
@@ -4731,7 +4731,7 @@ CREATE OR REPLACE PACKAGE BODY nm3homo AS
                                     := NVL (
                                           hig.get_sysopt (
                                              p_option_id   => c_force_orig_hu),
-                                          'N') = 'Y' ;
+                                          'Y') = 'Y' ;
    BEGIN
       nm_debug.proc_start (p_package_name     => g_package_name,
                            p_procedure_name   => 'homo_update');
