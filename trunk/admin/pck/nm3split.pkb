@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3split IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3split.pkb-arc   2.20   Apr 16 2018 09:23:36   Gaurav.Gaurkar  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3split.pkb-arc   2.21   May 30 2018 15:59:30   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm3split.pkb  $
---       Date into PVCS   : $Date:   Apr 16 2018 09:23:36  $
---       Date fetched Out : $Modtime:   Apr 16 2018 09:06:20  $
---       PVCS Version     : $Revision:   2.20  $
+--       Date into PVCS   : $Date:   May 30 2018 15:59:30  $
+--       Date fetched Out : $Modtime:   May 30 2018 15:57:46  $
+--       PVCS Version     : $Revision:   2.21  $
 --
 --
 --   Author : ITurnbull
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3split IS
 -- 03.06.08 PT added p_no_purpose parameter throughout where node is created.
 
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.20  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.21  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(2000) := 'nm3split';
@@ -583,7 +583,9 @@ BEGIN
       --insert history for second new element
       --Nm3merge.ins_neh (l_rec_neh);
       nm3nw_edit.ins_neh(l_rec_neh); --CWS 0108990 12/03/2010
-      lb_nw_edit.log_transaction( g_transaction_id, l_rec_neh.neh_id );
+      if HIG.IS_PRODUCT_LICENSED('LB') then
+         execute immediate 'begin lb_nw_edit.log_transaction( :g_transaction_id, :neh_id ); end; ' using g_transaction_id, l_rec_neh.neh_id;
+      end if;
 
    END;
 --
