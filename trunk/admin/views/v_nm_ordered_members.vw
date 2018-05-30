@@ -29,17 +29,16 @@ AS
             (SELECT  /*+MATERIALIZE*/
                     -------------------------------------------------------------------------
                                                       --   PVCS Identifiers :-
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/views/v_nm_ordered_members.vw-arc   1.9   Apr 13 2018 11:47:24   Gaurav.Gaurkar  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/views/v_nm_ordered_members.vw-arc   1.10   May 30 2018 14:02:44   Chris.Baugh  $
 --       Module Name      : $Workfile:   v_nm_ordered_members.vw  $
---       Date into PVCS   : $Date:   Apr 13 2018 11:47:24  $
---       Date fetched Out : $Modtime:   Apr 13 2018 11:41:12  $
-                               --       Version          : $Revision:   1.9  $
+--       Date into PVCS   : $Date:   May 30 2018 14:02:44  $
+--       Date fetched Out : $Modtime:   May 30 2018 14:02:18  $
+                               --       Version          : $Revision:   1.10  $
 --
 --------------------------------------------------------------------------------------------------------------------
 --   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 --------------------------------------------------------------------------------------------------------------------
 --
-
                     nm_ne_id_in,
                     ne_nt_type,
                     nm_seg_no,
