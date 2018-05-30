@@ -1,13 +1,13 @@
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm3data1.sql-arc   2.61   May 17 2018 16:16:36   Chris.Baugh  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm3data1.sql-arc   2.62   May 30 2018 10:38:34   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm3data1.sql  $
---       Date into PVCS   : $Date:   May 17 2018 16:16:36  $
---       Date fetched Out : $Modtime:   May 17 2018 15:22:14  $
---       Version          : $Revision:   2.61  $
+--       Date into PVCS   : $Date:   May 30 2018 10:38:34  $
+--       Date fetched Out : $Modtime:   May 30 2018 10:33:30  $
+--       Version          : $Revision:   2.62  $
 --       Table Owner      : NM3_METADATA
---       Generation Date  : 17-MAY-2018 15:22
+--       Generation Date  : 30-MAY-2018 10:33
 --
 --   Product metadata script
 --   As at Release 4.7.1.0
@@ -38656,31 +38656,6 @@ INSERT
       ,HOL_MIXED_CASE
       ,HOL_USER_OPTION
       ,HOL_MAX_LENGTH)
-SELECT 'USEORIGHU'
-      ,'NET'
-      ,'Use original homo update'
-      ,'Used in the historic asset loader, if set to Y this reverts to the original homo update code completely'
-      ,'Y_OR_N'
-      ,'VARCHAR2'
-      ,'N'
-      ,'N'
-      ,1
-  FROM DUAL
- WHERE NOT EXISTS(SELECT 1
-                    FROM HIG_OPTION_LIST
-                   WHERE HOL_ID = 'USEORIGHU');
---
-INSERT
-  INTO HIG_OPTION_LIST
-      (HOL_ID
-      ,HOL_PRODUCT
-      ,HOL_NAME
-      ,HOL_REMARKS
-      ,HOL_DOMAIN
-      ,HOL_DATATYPE
-      ,HOL_MIXED_CASE
-      ,HOL_USER_OPTION
-      ,HOL_MAX_LENGTH)
 SELECT 'USRPROFILE'
       ,'HIG'
       ,'Default User Profile'
@@ -40604,17 +40579,6 @@ SELECT 'USEINVXSP'
  WHERE NOT EXISTS(SELECT 1
                     FROM HIG_OPTION_VALUES
                    WHERE HOV_ID = 'USEINVXSP');
---
-INSERT
-  INTO HIG_OPTION_VALUES
-      (HOV_ID
-      ,HOV_VALUE)
-SELECT 'USEORIGHU'
-      ,'Y'
-  FROM DUAL
- WHERE NOT EXISTS(SELECT 1
-                    FROM HIG_OPTION_VALUES
-                   WHERE HOV_ID = 'USEORIGHU');
 --
 INSERT
   INTO HIG_OPTION_VALUES
