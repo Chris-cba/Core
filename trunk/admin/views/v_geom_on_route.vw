@@ -2,11 +2,11 @@
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/views/v_geom_on_route.vw-arc   1.7   May 31 2018 11:12:22   Chris.Baugh  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/views/v_geom_on_route.vw-arc   1.8   May 31 2018 15:24:08   Chris.Baugh  $
 --       Module Name      : $Workfile:   v_geom_on_route.vw  $
---       Date into PVCS   : $Date:   May 31 2018 11:12:22  $
---       Date fetched Out : $Modtime:   May 31 2018 11:09:22  $
---       Version          : $Revision:   1.7  $
+--       Date into PVCS   : $Date:   May 31 2018 15:24:08  $
+--       Date fetched Out : $Modtime:   May 31 2018 15:22:52  $
+--       Version          : $Revision:   1.8  $
 -------------------------------------------------------------------------
 --
 -----------------------------------------------------------------------------
@@ -128,8 +128,6 @@ BEGIN
    --
    EXECUTE IMMEDIATE lv_str;
 
-   NM3DDL.CREATE_SYNONYM_FOR_OBJECT('V_GEOM_ON_ROUTE');
-   --
  END IF;
  --
 END;
