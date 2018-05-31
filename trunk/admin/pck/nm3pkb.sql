@@ -2,11 +2,11 @@
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3pkb.sql-arc   2.47   Apr 26 2018 09:29:16   Gaurav.Gaurkar  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3pkb.sql-arc   2.48   May 31 2018 12:31:12   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm3pkb.sql  $
---       Date into PVCS   : $Date:   Apr 26 2018 09:29:16  $
---       Date fetched Out : $Modtime:   Apr 26 2018 09:23:38  $
---       PVCS Version     : $Revision:   2.47  $
+--       Date into PVCS   : $Date:   May 31 2018 12:31:12  $
+--       Date fetched Out : $Modtime:   May 31 2018 12:13:04  $
+--       PVCS Version     : $Revision:   2.48  $
 --
 --
 --   Author : Graeme Johnson
@@ -2389,10 +2389,10 @@ start '&run_file'
 ----------------------------------------------------------------------------------------- 
 --
 SET TERM ON 
-PROMPT hig_relationship.pkw
+PROMPT hig_relationship_api.pkw
 SET TERM OFF
 SET DEFINE ON 
-SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'pck'||'&terminator'||'hig_relationship.pkw' run_file
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'pck'||'&terminator'||'hig_relationship_api.pkw' run_file
 FROM dual 
 / 
 start '&run_file'
