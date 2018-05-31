@@ -7,11 +7,11 @@ AS
    SELECT                                                                   --
                                                       --   PVCS Identifiers :-
                                                                             --
- --       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/views/v_nm_user_inv_mode.vw-arc   1.2   Dec 15 2015 20:37:58   Rob.Coupe  $
+ --       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/views/v_nm_user_inv_mode.vw-arc   1.3   May 31 2018 15:30:06   Chris.Baugh  $
                   --       Module Name      : $Workfile:   v_nm_user_inv_mode.vw  $
-                  --       Date into SCCS   : $Date:   Dec 15 2015 20:37:58  $
-               --       Date fetched Out : $Modtime:   Dec 15 2015 20:37:40  $
-                               --       SCCS Version     : $Revision:   1.2  $
+                  --       Date into SCCS   : $Date:   May 31 2018 15:30:06  $
+               --       Date fetched Out : $Modtime:   May 31 2018 15:29:24  $
+                               --       SCCS Version     : $Revision:   1.3  $
                                                                             --
  -----------------------------------------------------------------------------
    --    Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
@@ -27,28 +27,3 @@ AS
     WHERE     hur_username = SYS_CONTEXT ('NM3_SECURITY_CTX', 'USERNAME')
           AND hur_role = itr_hro_role
 /          
-
-
-begin
-  if NVL(hig.get_sysopt('HIGPUBSYN'), 'Y' ) = 'Y' then
-     declare
-        already_exists exception;
-        pragma exception_init (already_exists, -955);
-     begin
-        execute immediate 'create public synonym v_nm_user_inv_mode for '||sys_context('NM3CORE', 'APPLICATION_OWNER')||'.V_NM_USER_INV_MODE';
-     exception 
-       when already_exists then NULL;
-     end;
-  else
-    for i in ( select hus_username from hig_users, dba_users
-               where hus_username = username
-               and hus_is_hig_owner_flag  = 'N'  ) loop
-        begin
-           execute immediate 'create synonym '||i.hus_username||'.V_NM_USER_INV_MODE for '||sys_context('NM3_SECURITY_CTX', 'HIG_OWNER')||'.V_NM_USER_INV_MODE';
-        exception
-           when others then NULL;
-        end;
-    end loop;
-  end if;
-end;
-/
