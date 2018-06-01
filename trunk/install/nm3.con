@@ -1,16 +1,6 @@
---------------------------------------------------------------------------------
---   PVCS Identifiers :-
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/nm3.con-arc   2.42   May 17 2018 16:16:32   Chris.Baugh  $
---       Module Name      : $Workfile:   nm3.con  $
---       Date into PVCS   : $Date:   May 17 2018 16:16:32  $
---       Date fetched Out : $Modtime:   May 17 2018 15:18:48  $
---       PVCS Version     : $Revision:   2.42  $
+-- C:\clbtemp\nm3.con
 --
------------------------------------------------------------------------------
---    Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
------------------------------------------------------------------------------
---
--- Generated for Oracle 10g on Thu May 17  15:07:48 2018 by Server Generator 10.1.2.9.28
+-- Generated for Oracle 10g on Fri Jun 01  11:22:47 2018 by Server Generator 10.1.2.9.28
   
 PROMPT Creating Primary Key on 'ANALYSE_ALL_TABS_LOG'
 ALTER TABLE ANALYSE_ALL_TABS_LOG
@@ -842,6 +832,12 @@ PROMPT Creating Primary Key on 'HIG_QUERY_TYPE_ATTRIBUTES'
 ALTER TABLE HIG_QUERY_TYPE_ATTRIBUTES
  ADD (CONSTRAINT HQTA_PK PRIMARY KEY 
   (HQTA_ID))
+/
+
+PROMPT Creating Primary Key on 'HIG_RELATIONSHIP'
+ALTER TABLE HIG_RELATIONSHIP
+ ADD (CONSTRAINT HIR_PK PRIMARY KEY 
+  (HIR_ATTRIBUTE1))
 /
 
 PROMPT Creating Primary Key on 'HIG_REPORT_STYLES'
@@ -3227,7 +3223,7 @@ PROMPT Creating Check Constraint on 'HIG_QUERY_TYPES'
 ALTER TABLE HIG_QUERY_TYPES
  ADD (CONSTRAINT HQT_SECURITY_CHK CHECK (HQT_SECURITY IN ('R','P')))
 /
-    
+     
 PROMPT Creating Check Constraint on 'HIG_ROUTER_PARAMS'
 ALTER TABLE HIG_ROUTER_PARAMS
  ADD (CONSTRAINT HIG_ROUTER_PARAMS_MUTUAL_EX CHECK (( Hrp_Param_Value_Varchar Is Null 
