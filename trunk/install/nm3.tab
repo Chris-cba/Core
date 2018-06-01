@@ -1,16 +1,6 @@
---------------------------------------------------------------------------------
---   PVCS Identifiers :-
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/nm3.tab-arc   2.45   May 17 2018 16:16:34   Chris.Baugh  $
---       Module Name      : $Workfile:   nm3.tab  $
---       Date into PVCS   : $Date:   May 17 2018 16:16:34  $
---       Date fetched Out : $Modtime:   May 17 2018 15:19:26  $
---       PVCS Version     : $Revision:   2.45  $
+-- C:\clbtemp\nm3.tab
 --
------------------------------------------------------------------------------
---    Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
------------------------------------------------------------------------------
---
--- Generated for Oracle 10g on Thu May 17  15:07:45 2018 by Server Generator 10.1.2.9.28
+-- Generated for Oracle 10g on Fri Jun 01  11:22:44 2018 by Server Generator 10.1.2.9.28
  
 
 
@@ -3778,6 +3768,15 @@ COMMENT ON COLUMN HIG_QUERY_TYPE_ATTRIBUTES.HQTA_MODIFIED_BY IS 'Audit details'
 /
 
 COMMENT ON COLUMN HIG_QUERY_TYPE_ATTRIBUTES.HQTA_INV_TYPE IS 'Identifies the asset metamodel used for the selected column'
+/
+
+PROMPT Creating Table 'HIG_RELATIONSHIP'
+CREATE TABLE HIG_RELATIONSHIP
+ (HIR_ATTRIBUTE1 VARCHAR2(50) NOT NULL
+ ,HIR_ATTRIBUTE2 RAW(2000) NOT NULL
+ ,HIR_ATTRIBUTE3 VARCHAR2(1) DEFAULT 'Y' NOT NULL
+ ,HIR_ATTRIBUTE4 RAW(2000)
+ )
 /
 
 PROMPT Creating Table 'HIG_REPORT_STYLES'
