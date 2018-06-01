@@ -1,16 +1,6 @@
---------------------------------------------------------------------------------
---   PVCS Identifiers :-
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/nm3.ind-arc   2.30   May 17 2018 16:16:34   Chris.Baugh  $
---       Module Name      : $Workfile:   nm3.ind  $
---       Date into PVCS   : $Date:   May 17 2018 16:16:34  $
---       Date fetched Out : $Modtime:   May 17 2018 15:19:08  $
---       PVCS Version     : $Revision:   2.30  $
+-- C:\clbtemp\nm3.ind
 --
------------------------------------------------------------------------------
---    Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
------------------------------------------------------------------------------
---
--- Generated for Oracle 10g on Thu May 17  15:07:47 2018 by Server Generator 10.1.2.9.28
+-- Generated for Oracle 10g on Fri Jun 01  11:22:47 2018 by Server Generator 10.1.2.9.28
   
 
 PROMPT Creating Index 'DOC_FK_DLC_IND'
@@ -862,6 +852,16 @@ PROMPT Creating Index 'NEH_NE_ID_OLD_NEW_IND'
 CREATE INDEX NEH_NE_ID_OLD_NEW_IND ON NM_ELEMENT_HISTORY
  (NEH_NE_ID_OLD
  ,NEH_NE_ID_NEW)
+/
+
+PROMPT Creating Index 'NEX_IND1'
+CREATE INDEX NEX_IND1 ON NM_ELEMENT_XREFS
+ (NEX_ID1)
+/
+
+PROMPT Creating Index 'NEX_IND2'
+CREATE INDEX NEX_IND2 ON NM_ELEMENT_XREFS
+ (NEX_ID2)
 /
 
 PROMPT Creating Index 'NGQAS_FK_ITA_IND'
