@@ -1,17 +1,17 @@
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/sql/drop_policies.sql-arc   1.0   Nov 09 2015 11:39:54   Rob.Coupe  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/sql/drop_policies.sql-arc   1.1   Jun 06 2018 09:39:58   Chris.Baugh  $
 --       Module Name      : $Workfile:   drop_policies.sql  $
---       Date into SCCS   : $Date:   Nov 09 2015 11:39:54  $
---       Date fetched Out : $Modtime:   Oct 28 2015 12:07:48  $
---       SCCS Version     : $Revision:   1.0  $
+--       Date into SCCS   : $Date:   Jun 06 2018 09:39:58  $
+--       Date fetched Out : $Modtime:   Jun 06 2018 09:39:32  $
+--       SCCS Version     : $Revision:   1.1  $
 --
 -----------------------------------------------------------------------------
---    Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+--    Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 /*
-Script to remove policies that are deemed extraneous for the HE data access to work as desired.
+Script to remove policies that are deemed extraneous for data access to work as desired.
 */
 declare
   cursor c1 is
