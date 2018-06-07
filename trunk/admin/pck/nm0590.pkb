@@ -1,22 +1,17 @@
 CREATE OR REPLACE PACKAGE BODY nm0590 AS
 --
---   PVCS Identifiers :-
+--   SCCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm0590.pkb-arc   2.7   May 10 2018 11:46:38   Gaurav.Gaurkar  $
---       Module Name      : $Workfile:   nm0590.pkb  $
---       Date into SCCS   : $Date:   May 10 2018 11:46:38  $
---       Date fetched Out : $Modtime:   May 10 2018 11:44:54  $
---       SCCS Version     : $Revision:   2.7  $
---
+--       sccsid           : @(#)nm0590.pkb	1.8 11/02/06
+--       Module Name      : nm0590.pkb
+--       Date into SCCS   : 06/11/02 17:26:44
+--       Date fetched Out : 07/06/13 14:10:46
+--       SCCS Version     : 1.8
 --
 --   Author : P. Stanton
 --
 --  Package containing functions and procedures that form NM0590 - Asset Maitenance
 --  uses.
---
---  15-MAY-2015 S.J.Sewell. Changed source from nm_inv_items_all to nm_inv_items
---                          so that data returned is date tracked.
---
 -----------------------------------------------------------------------------
 --  Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
@@ -28,7 +23,7 @@ CREATE OR REPLACE PACKAGE BODY nm0590 AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.7  $';
+  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.8  $';
   
 --
 -----------------------------------------------------------------------------
@@ -468,7 +463,7 @@ BEGIN
             ,iit_num_attrib113
             ,iit_num_attrib114
             ,iit_num_attrib115
-        FROM nm_inv_items
+        FROM nm_inv_items_all
             ,nm_assets_on_route_holding
        WHERE narh_job_id  = pi_ngqi_job_id
          AND narh_ne_id_in = iit_ne_id(+)
@@ -821,7 +816,7 @@ BEGIN
             ,iit_num_attrib113
             ,iit_num_attrib114
             ,iit_num_attrib115
-        FROM nm_inv_items
+        FROM nm_inv_items_all
             ,v_nm_gaz_query_item_list
        WHERE ngqi_job_id = pi_ngqi_job_id
          AND ngqi_item_id = iit_ne_id(+)
@@ -1252,7 +1247,7 @@ SELECT  unique nith_nit_id
             ,iit_num_attrib113
             ,iit_num_attrib114
             ,iit_num_attrib115
-        FROM nm_inv_items
+        FROM nm_inv_items_all
        WHERE iit_ne_id IN(SELECT gdo_pk_id
                             FROM gis_data_objects
                            WHERE gdo_session_id = pi_gdo_session_id)
@@ -1647,7 +1642,7 @@ BEGIN
             ,iit_num_attrib113
             ,iit_num_attrib114
             ,iit_num_attrib115
-        FROM nm_inv_items
+        FROM nm_inv_items_all
        WHERE iit_ne_id IN(SELECT iit_ne_id
                             FROM nm_locator_results)
            ;
