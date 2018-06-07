@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_update AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3inv_update.pkb-arc   2.9   Apr 16 2018 09:22:46   Gaurav.Gaurkar  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3inv_update.pkb-arc   2.10   Jun 07 2018 10:25:30   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm3inv_update.pkb  $
---       Date into PVCS   : $Date:   Apr 16 2018 09:22:46  $
---       Date fetched Out : $Modtime:   Apr 16 2018 09:01:36  $
---       Version          : $Revision:   2.9  $
+--       Date into PVCS   : $Date:   Jun 07 2018 10:25:30  $
+--       Date fetched Out : $Modtime:   Jun 07 2018 10:23:20  $
+--       Version          : $Revision:   2.10  $
 --       Based on SCCS version : 1.5 
 -------------------------------------------------------------------------
 --   Author : Kevin Angus
@@ -25,7 +25,7 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_update AS
   -----------
   --g_body_sccsid is the SCCS ID for the package body
   --g_body_sccsid  CONSTANT varchar2(2000) := '"@(#)nm3inv_update.pkb	1.5 04/27/06"';
-  g_body_sccsid  CONSTANT varchar2(2000) := '"$Revision:   2.9  $"';
+  g_body_sccsid  CONSTANT varchar2(2000) := '"$Revision:   2.10  $"';
 
   g_package_name CONSTANT varchar2(30) := 'nm3inv_update';
 
@@ -394,14 +394,6 @@ PROCEDURE date_track_update_item (pi_iit_ne_id_old IN     nm_inv_items.iit_ne_id
                                  ,pio_rec_iit      IN OUT nm_inv_items%ROWTYPE
                                  ) IS
 --
--- Prevent creation of new row in NM_INV_ITEMS_ALL table by
--- changing operation of this procedure to just update the
--- NM_INV_ITEMS_ALL row and allow table trigger to insert
--- row into Journal table NM_INV_ITEMS_ALL_J.
--- This will maintain an easy to follow audit trail for this asset
--- and reduce unnecessary duplication of mapping information.
--- S.J.Sewell. 22-SEP-2014
---
    c_init_eff_date CONSTANT DATE    := To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY');
    c_xattr_status  CONSTANT BOOLEAN := nm3inv_xattr.g_xattr_active;
 --
@@ -458,128 +450,121 @@ BEGIN
 --
    nm_debug.proc_start(g_package_name,'date_track_update_item');
 --
---   nm3user.set_effective_date (pio_rec_iit.iit_start_date);
+   nm3user.set_effective_date (pio_rec_iit.iit_start_date);
 --
---   l_rec_iit_old := nm3get.get_iit (pi_iit_ne_id => pi_iit_ne_id_old);
+   l_rec_iit_old := nm3get.get_iit (pi_iit_ne_id => pi_iit_ne_id_old);
 --
---   IF l_rec_iit_old.iit_inv_type != pio_rec_iit.iit_inv_type
---    THEN
---      hig.raise_ner (pi_appl               => nm3type.c_hig
---                    ,pi_id                 => 114
---                    ,pi_supplementary_info => l_rec_iit_old.iit_inv_type||' != '||pio_rec_iit.iit_inv_type
---                    );
---   END IF;
-----
---   IF l_rec_iit_old.iit_start_date = pio_rec_iit.iit_start_date
---    THEN
---      hig.raise_ner (pi_appl               => nm3type.c_net
---                    ,pi_id                 => 307
---                    ,pi_supplementary_info => to_char(pio_rec_iit.iit_start_date,Sys_Context('NM3CORE','USER_DATE_MASK'))
---                    );
---   END IF;
-----
---   nm3extent.create_temp_ne (pi_source_id => pi_iit_ne_id_old
---                            ,pi_source    => nm3extent.c_route  --also works with inv
---                            ,po_job_id    => l_nte_job_id
---                            );
-----
---   l_tab_iit_ne_id_old(0) := pi_iit_ne_id_old;
-----
---   --LS 17/04
---   /*
---   FOR cs_rec IN cs_children (pi_iit_ne_id_old)
---    LOOP
---      l_iit_rec                         := nm3get.get_iit(cs_rec.iit_ne_id)
---      l_count                           := l_count + 1;
---      l_rec_iit_child                   := l_iit_rec;
---      l_tab_iit_ne_id_old(l_count)      := l_iit_rec.iit_ne_id;
---      l_rec_iit_child.iit_ne_id         := nm3net.get_next_ne_id;
---      l_rec_iit_child.iit_start_date    := pio_rec_iit.iit_start_date;
---      l_rec_iit_child.iit_foreign_key   := pio_rec_iit.iit_primary_key;
---      l_tab_rec_iit_child(l_count)      := l_rec_iit_child;
---      FOR cs_grandchild IN cs_children_of_children (cs_rec.iit_ne_id)
---       LOOP
---         l_count                        := l_count + 1;
---         l_rec_iit_child                := cs_grandchild;
---         l_tab_iit_ne_id_old(l_count)   := cs_grandchild.iit_ne_id;
---         l_rec_iit_child.iit_ne_id      := nm3net.get_next_ne_id;
---         l_rec_iit_child.iit_start_date := pio_rec_iit.iit_start_date;
---         l_tab_rec_iit_child(l_count)   := l_rec_iit_child;
---      END LOOP;
---   END LOOP;
---   */
---   FOR cs_rec IN cs_child_assets (pi_iit_ne_id_old)
---    LOOP
---      l_iit_rec                         := nm3get.get_iit(cs_rec.iit_ne_id) ;
---      l_count                           := l_count + 1;
---      l_rec_iit_child                   := l_iit_rec;
---      l_tab_iit_ne_id_old(l_count)      := l_iit_rec.iit_ne_id;
---      l_rec_iit_child.iit_ne_id         := nm3net.get_next_ne_id ;                  
---      l_rec_iit_child.iit_start_date    := pio_rec_iit.iit_start_date;
---      l_tab_rec_iit_child(l_count)      := l_rec_iit_child;     
---      l_rec_iit_child_end_dated         := l_iit_rec;
---      l_rec_iit_child_end_dated.iit_start_date   := pio_rec_iit.iit_start_date;
---      IF cs_rec.level =  1
---      THEN
---          l_rec_iit_child.iit_foreign_key           := pio_rec_iit.iit_primary_key;
---          l_rec_iit_child_end_dated.iit_foreign_key := pio_rec_iit.iit_primary_key;       
---      --ELSE
---      --    l_rec_iit_child.iit_foreign_key            := l_iit_rec.iit_primary_key;
---      --    l_rec_iit_child_end_dated.iit_foreign_key  := l_iit_rec.iit_primary_key;
---      END IF ;
---      nm3mapcapture_ins_inv.l_iit_tab(nm3mapcapture_ins_inv.l_iit_tab.Count+1)    := l_rec_iit_child_end_dated; --  LS Hierarchical asset changes
---   END LOOP ;
---   --  
-----
---   -- Lock all the old inventory items and their member records
---   FOR i IN l_tab_iit_ne_id_old.FIRST..l_tab_iit_ne_id_old.LAST
---    LOOP
---      nm3lock.lock_inv_item_and_members (pi_iit_ne_id      => l_tab_iit_ne_id_old(i)
---                                        ,p_lock_for_update => TRUE
---                                        );
---   END LOOP;
-----
---   nm3inv_xattr.g_xattr_active := FALSE;
-  --
-  -- Note that table trigger stores all changed and unchanged values for attributes
-  -- so only item we need to update here is the start date which may have been set to a date other than today (SYSDATE).
-  -- Value defaults to SYSDATE in table trigger otherwise.
-  -- The action of updating the row triggers the insertion of a journal row
-  -- and the setting of updated values for audit columns.
-  --
+   IF l_rec_iit_old.iit_inv_type != pio_rec_iit.iit_inv_type
+    THEN
+      hig.raise_ner (pi_appl               => nm3type.c_hig
+                    ,pi_id                 => 114
+                    ,pi_supplementary_info => l_rec_iit_old.iit_inv_type||' != '||pio_rec_iit.iit_inv_type
+                    );
+   END IF;
+--
+   IF l_rec_iit_old.iit_start_date = pio_rec_iit.iit_start_date
+    THEN
+      hig.raise_ner (pi_appl               => nm3type.c_net
+                    ,pi_id                 => 307
+                    ,pi_supplementary_info => to_char(pio_rec_iit.iit_start_date,Sys_Context('NM3CORE','USER_DATE_MASK'))
+                    );
+   END IF;
+--
+   nm3extent.create_temp_ne (pi_source_id => pi_iit_ne_id_old
+                            ,pi_source    => nm3extent.c_route  --also works with inv
+                            ,po_job_id    => l_nte_job_id
+                            );
+--
+   l_tab_iit_ne_id_old(0) := pi_iit_ne_id_old;
+--
+   --LS 17/04
+   /*
+   FOR cs_rec IN cs_children (pi_iit_ne_id_old)
+    LOOP
+      l_iit_rec                         := nm3get.get_iit(cs_rec.iit_ne_id)
+      l_count                           := l_count + 1;
+      l_rec_iit_child                   := l_iit_rec;
+      l_tab_iit_ne_id_old(l_count)      := l_iit_rec.iit_ne_id;
+      l_rec_iit_child.iit_ne_id         := nm3net.get_next_ne_id;
+      l_rec_iit_child.iit_start_date    := pio_rec_iit.iit_start_date;
+      l_rec_iit_child.iit_foreign_key   := pio_rec_iit.iit_primary_key;
+      l_tab_rec_iit_child(l_count)      := l_rec_iit_child;
+      FOR cs_grandchild IN cs_children_of_children (cs_rec.iit_ne_id)
+       LOOP
+         l_count                        := l_count + 1;
+         l_rec_iit_child                := cs_grandchild;
+         l_tab_iit_ne_id_old(l_count)   := cs_grandchild.iit_ne_id;
+         l_rec_iit_child.iit_ne_id      := nm3net.get_next_ne_id;
+         l_rec_iit_child.iit_start_date := pio_rec_iit.iit_start_date;
+         l_tab_rec_iit_child(l_count)   := l_rec_iit_child;
+      END LOOP;
+   END LOOP;
+   */
+   FOR cs_rec IN cs_child_assets (pi_iit_ne_id_old)
+    LOOP
+      l_iit_rec                         := nm3get.get_iit(cs_rec.iit_ne_id) ;
+      l_count                           := l_count + 1;
+      l_rec_iit_child                   := l_iit_rec;
+      l_tab_iit_ne_id_old(l_count)      := l_iit_rec.iit_ne_id;
+      l_rec_iit_child.iit_ne_id         := nm3net.get_next_ne_id ;                  
+      l_rec_iit_child.iit_start_date    := pio_rec_iit.iit_start_date;
+      l_tab_rec_iit_child(l_count)      := l_rec_iit_child;     
+      l_rec_iit_child_end_dated         := l_iit_rec;
+      l_rec_iit_child_end_dated.iit_start_date   := pio_rec_iit.iit_start_date;
+      IF cs_rec.level =  1
+      THEN
+          l_rec_iit_child.iit_foreign_key           := pio_rec_iit.iit_primary_key;
+          l_rec_iit_child_end_dated.iit_foreign_key := pio_rec_iit.iit_primary_key;       
+      --ELSE
+      --    l_rec_iit_child.iit_foreign_key            := l_iit_rec.iit_primary_key;
+      --    l_rec_iit_child_end_dated.iit_foreign_key  := l_iit_rec.iit_primary_key;
+      END IF ;
+      nm3mapcapture_ins_inv.l_iit_tab(nm3mapcapture_ins_inv.l_iit_tab.Count+1)    := l_rec_iit_child_end_dated; --  LS Hierarchical asset changes
+   END LOOP ;
+   --  
+--
+   -- Lock all the old inventory items and their member records
+   FOR i IN l_tab_iit_ne_id_old.FIRST..l_tab_iit_ne_id_old.LAST
+    LOOP
+      nm3lock.lock_inv_item_and_members (pi_iit_ne_id      => l_tab_iit_ne_id_old(i)
+                                        ,p_lock_for_update => TRUE
+                                        );
+   END LOOP;
+--
+   nm3inv_xattr.g_xattr_active := FALSE;
    UPDATE nm_inv_items_all
-   SET       IIT_START_DATE = pio_rec_iit.IIT_START_DATE
+    SET   iit_end_date = pio_rec_iit.iit_start_date
    WHERE  iit_ne_id    = pi_iit_ne_id_old;
---   nm3inv_xattr.g_xattr_active := c_xattr_status;
-----
---   IF  (pio_rec_iit.iit_ne_id IS NOT NULL
---        AND nm3get.get_iit_all (pi_iit_ne_id       => pio_rec_iit.iit_ne_id
---                               ,pi_raise_not_found => FALSE
---                               ).iit_inv_type IS NOT NULL
---       )
---    OR  pio_rec_iit.iit_ne_id IS NULL
---    THEN
---      pio_rec_iit.iit_ne_id := nm3net.get_next_ne_id;
---   END IF;
-----
---   nm3ins.ins_iit_all  (p_rec_iit_all => pio_rec_iit);
-----
---   nm3homo.homo_update (p_temp_ne_id_in  => l_nte_job_id
---                       ,p_iit_ne_id      => pio_rec_iit.iit_ne_id
---                       ,p_effective_date => pio_rec_iit.iit_start_date
---                       );
-----
---   -- Stopped creating of child asset when called from mapcapture
---   IF Nvl(nm3mapcapture_ins_inv.l_mapcap_run,'N') = 'N'
---   THEN 
---       FOR i IN 1..l_tab_rec_iit_child.COUNT
---       LOOP
---           nm3ins.ins_iit_all  (p_rec_iit_all => l_tab_rec_iit_child(i));
---       END LOOP;
---   END IF ;
-----
---   set_for_return;
-----
+   nm3inv_xattr.g_xattr_active := c_xattr_status;
+--
+   IF  (pio_rec_iit.iit_ne_id IS NOT NULL
+        AND nm3get.get_iit_all (pi_iit_ne_id       => pio_rec_iit.iit_ne_id
+                               ,pi_raise_not_found => FALSE
+                               ).iit_inv_type IS NOT NULL
+       )
+    OR  pio_rec_iit.iit_ne_id IS NULL
+    THEN
+      pio_rec_iit.iit_ne_id := nm3net.get_next_ne_id;
+   END IF;
+--
+   nm3ins.ins_iit_all  (p_rec_iit_all => pio_rec_iit);
+--
+   nm3homo.homo_update (p_temp_ne_id_in  => l_nte_job_id
+                       ,p_iit_ne_id      => pio_rec_iit.iit_ne_id
+                       ,p_effective_date => pio_rec_iit.iit_start_date
+                       );
+--
+   -- Stopped creating of child asset when called from mapcapture
+   IF Nvl(nm3mapcapture_ins_inv.l_mapcap_run,'N') = 'N'
+   THEN 
+       FOR i IN 1..l_tab_rec_iit_child.COUNT
+       LOOP
+           nm3ins.ins_iit_all  (p_rec_iit_all => l_tab_rec_iit_child(i));
+       END LOOP;
+   END IF ;
+--
+   set_for_return;
+--
    nm_debug.proc_end(g_package_name,'date_track_update_item');
 --
 EXCEPTION
