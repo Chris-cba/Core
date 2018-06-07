@@ -6,11 +6,11 @@ CREATE OR REPLACE TRIGGER nm_inv_items_all_b_dt_trg
 DECLARE
 --   SCCS Identifiers :-
 --
---       pvcsid                     : $Header:   //new_vm_latest/archives/nm3/admin/trg/nm_inv_items_all_b_dt_trg.trg-arc   2.4   Apr 13 2018 11:06:28   Gaurav.Gaurkar  $
---       Module Name                : $Workfile:   nm_inv_items_all_b_dt_trg.trg  $
---       Date into PVCS             : $Date:   Apr 13 2018 11:06:28  $
---       Date fetched Out           : $Modtime:   Apr 13 2018 10:56:02  $
---       PVCS Version               : $Revision:   2.4  $
+--       sccsid           : @(#)nm_inv_items_all_b_dt_trg.trg	1.3 01/07/03
+--       Module Name      : nm_inv_items_all_b_dt_trg.trg
+--       Date into SCCS   : 03/01/07 16:38:21
+--       Date fetched Out : 07/06/13 17:02:53
+--       SCCS Version     : 1.3
 --
 -- TRIGGER nm_inv_items_all_b_dt_trg
 -- BEFORE INSERT
@@ -42,12 +42,6 @@ DECLARE
    l_nvl_date CONSTANT DATE := TO_DATE('01/01/0001','DD/MM/YYYY');
 --
 BEGIN
-  --
-  -- Allow trigger to be bypassed. S.J.Sewell. 11th March 2015
-  -- this is to allow update of start date on posted record in nm0510.
-  --
-  If Not nm3inv.bypass_inv_items_all_trgs
-  Then
    IF UPDATING
     AND l_old_start_date <> l_start_date
     THEN
@@ -87,7 +81,6 @@ BEGIN
                                  ,l_mode
                                  );
    END IF;
-  END IF;
 --
 EXCEPTION
 --
