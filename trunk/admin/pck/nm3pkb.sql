@@ -2,11 +2,11 @@
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3pkb.sql-arc   2.50   Jun 15 2018 10:16:14   Chris.Baugh  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3pkb.sql-arc   2.51   Jun 15 2018 11:23:48   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm3pkb.sql  $
---       Date into PVCS   : $Date:   Jun 15 2018 10:16:14  $
---       Date fetched Out : $Modtime:   Jun 15 2018 10:14:52  $
---       PVCS Version     : $Revision:   2.50  $
+--       Date into PVCS   : $Date:   Jun 15 2018 11:23:48  $
+--       Date fetched Out : $Modtime:   Jun 15 2018 11:22:34  $
+--       PVCS Version     : $Revision:   2.51  $
 --
 --
 --   Author : Graeme Johnson
@@ -2426,6 +2426,28 @@ PROMPT runcommand.fnw
 SET TERM OFF
 SET DEFINE ON 
 SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'pck'||'&terminator'||'runcommand.fnw' run_file
+FROM dual 
+/ 
+start '&run_file'
+--
+----------------------------------------------------------------------------------------- 
+--
+SET TERM ON 
+PROMPT get_passw_exp_date.fnw
+SET TERM OFF
+SET DEFINE ON 
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'pck'||'&terminator'||'get_passw_exp_date.fnw' run_file
+FROM dual 
+/ 
+start '&run_file'
+--
+----------------------------------------------------------------------------------------- 
+--
+SET TERM ON 
+PROMPT get_pl_from_ft.fnw
+SET TERM OFF
+SET DEFINE ON 
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'pck'||'&terminator'||'get_pl_from_ft.fnw' run_file
 FROM dual 
 / 
 start '&run_file'
