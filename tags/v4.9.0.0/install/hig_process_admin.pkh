@@ -1,0 +1,47 @@
+CREATE OR REPLACE PACKAGE hig_process_admin
+AS
+  -------------------------------------------------------------------------
+  --   PVCS Identifiers :-
+  --
+  --       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/hig_process_admin.pkh-arc   1.0   Jun 18 2018 16:26:44   Chris.Baugh  $
+  --       Module Name      : $Workfile:   hig_process_admin.pkh  $
+  --       Date into PVCS   : $Date:   Jun 18 2018 16:26:44  $
+  --       Date fetched Out : $Modtime:   Feb 06 2018 10:03:22  $
+  --       Version          : $Revision:   1.0  $
+  --       Based on SCCS version :
+  ------------------------------------------------------------------
+  --   Copyright (c) 2016 Bentley Systems Incorporated. All rights reserved.
+  ------------------------------------------------------------------
+  --g_sccsid is the SCCS ID for the package
+  g_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.0  $';
+  --
+  -----------------------------------------------------------------------------
+  --
+  -- This function returns the current SCCS version
+  FUNCTION get_version
+    RETURN VARCHAR2;
+
+  --
+  -----------------------------------------------------------------------------
+  --
+  FUNCTION get_body_version
+    RETURN VARCHAR2;
+  --
+  -----------------------------------------------------------------------------
+  --
+  FUNCTION scheduler_disabled
+    RETURN VARCHAR2;
+  --
+  -----------------------------------------------------------------------------
+  --
+  FUNCTION pluggable_database
+    RETURN BOOLEAN;
+  --
+  -----------------------------------------------------------------------------
+  --
+  PROCEDURE set_scheduler_state(pi_scheduler_state  VARCHAR2);
+--
+-----------------------------------------------------------------------------
+--
+END hig_process_admin;
+/
