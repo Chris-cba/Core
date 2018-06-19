@@ -1,11 +1,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/utl/compile_schema.sql-arc   2.13   Apr 13 2018 12:53:22   Gaurav.Gaurkar  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/utl/compile_schema.sql-arc   2.14   Jun 19 2018 09:10:14   Chris.Baugh  $
 --       Module Name      : $Workfile:   compile_schema.sql  $
---       Date into PVCS   : $Date:   Apr 13 2018 12:53:22  $
---       Date fetched Out : $Modtime:   Apr 13 2018 12:49:46  $
---       Version          : $Revision:   2.13  $
+--       Date into PVCS   : $Date:   Jun 19 2018 09:10:14  $
+--       Date fetched Out : $Modtime:   Jun 19 2018 09:01:10  $
+--       Version          : $Revision:   2.14  $
 --
 -----------------------------------------------------------------------------
 --    Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
@@ -108,7 +108,7 @@ select '--' FROM DUAL;
 select 'BEGIN' FROM DUAL;
 select '--' FROM DUAL;
 select '   BEGIN' FROM DUAL;
-select '     dbms_scheduler.set_scheduler_attribute(''SCHEDULER_DISABLED'', ''TRUE'');' FROM DUAL;
+select '     hig_process_admin.set_scheduler_state(''DOWN'');' FROM DUAL;
 select '     l_shut_down_initiated := TRUE; ' FROM DUAL;
 select '     -- flag up that we were able to switch off the scheduler' FROM DUAL;
 select '   EXCEPTION' FROM DUAL;
