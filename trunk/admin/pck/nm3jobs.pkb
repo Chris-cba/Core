@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3jobs AS
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3jobs.pkb-arc   3.13   Jul 04 2013 16:11:40   James.Wadsworth  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3jobs.pkb-arc   3.14   Jun 19 2018 11:07:28   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm3jobs.pkb  $
---       Date into PVCS   : $Date:   Jul 04 2013 16:11:40  $
---       Date fetched Out : $Modtime:   Jul 04 2013 14:25:14  $
---       PVCS Version     : $Revision:   3.13  $
+--       Date into PVCS   : $Date:   Jun 19 2018 11:07:28  $
+--       Date fetched Out : $Modtime:   Feb 06 2018 10:48:30  $
+--       PVCS Version     : $Revision:   3.14  $
 --
 --   NM3 DBMS_SCHEDULER wrapper
 --
@@ -23,7 +23,7 @@ CREATE OR REPLACE PACKAGE BODY nm3jobs AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid          CONSTANT VARCHAR2(2000) :='"$Revision:   3.13  $"';
+  g_body_sccsid          CONSTANT VARCHAR2(2000) :='"$Revision:   3.14  $"';
   g_package_name         CONSTANT VARCHAR2(30)   := 'nm3jobs';
   ex_resource_busy                EXCEPTION;
   g_default_comment               VARCHAR2(500)  := 'Created by nm3job ';
@@ -636,29 +636,40 @@ FUNCTION get_scheduler_state RETURN VARCHAR2 IS
 
   l_scheduler_disabled dba_scheduler_global_attribute.value%TYPE;
   l_retval             varchar2(20);
---
+  --
 BEGIN
---
- select value
- into l_scheduler_disabled 
- from dba_scheduler_global_attribute 
- where attribute_name='SCHEDULER_DISABLED';
+  --
+  -- Check if using a Pluggable Database (PDB) configuration
+  --
+  IF hig_process_admin.pluggable_database
+  THEN
+    --
+    l_scheduler_disabled := hig_process_admin.scheduler_disabled;
+    --
+  ELSE
+    --
+    SELECT value
+      INTO l_scheduler_disabled 
+      FROM dba_scheduler_global_attribute 
+     WHERE attribute_name='SCHEDULER_DISABLED';
+    --
+  END IF;
+  
+  IF NVL(l_scheduler_disabled,'FALSE') = 'TRUE' THEN
+  
+    IF count_running_processes = 0 THEN
+       l_retval := 'DOWN';
+    ELSE
+       l_retval := 'SHUTTING DOWN';
+    END IF;
+    
+  ELSE
+  
+   l_retval := 'UP';  
+          
+  END IF;
 
- IF NVL(l_scheduler_disabled,'FALSE') = 'TRUE' THEN
- 
-   IF count_running_processes = 0 THEN
-      l_retval := 'DOWN';
-   ELSE
-      l_retval := 'SHUTTING DOWN';
-   END IF;
-   
- ELSE
- 
-  l_retval := 'UP';  
-         
- END IF;
-
- RETURN l_retval;
+  RETURN l_retval;
 
 EXCEPTION
   WHEN no_data_found THEN
