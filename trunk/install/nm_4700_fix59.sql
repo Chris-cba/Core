@@ -1,11 +1,11 @@
 ----------------------------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm_4700_fix59.sql-arc   1.2   May 23 2018 14:28:42   Chris.Baugh  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm_4700_fix59.sql-arc   1.3   Jun 20 2018 16:19:52   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm_4700_fix59.sql  $ 
---       Date into PVCS   : $Date:   May 23 2018 14:28:42  $
---       Date fetched Out : $Modtime:   May 23 2018 14:18:24  $
---       Version     	  : $Revision:   1.2  $
+--       Date into PVCS   : $Date:   Jun 20 2018 16:19:52  $
+--       Date fetched Out : $Modtime:   Jun 20 2018 15:45:46  $
+--       Version     	  : $Revision:   1.3  $
 --
 ----------------------------------------------------------------------------------------------------
 --   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
@@ -180,8 +180,8 @@ GRANT DROP ANY TRIGGER TO ALERT_ADMIN;
 DELETE FROM hig_option_values
 WHERE hov_id = 'USEORIGHU';
 
-DELETE FROM hig_options
-WHERE hop_id = 'USEORIGHU';
+DELETE FROM hig_option_list
+WHERE hol_id = 'USEORIGHU';
 --
 --------------------------------------------------------------------------------
 -- Update hig_upgrades with fix ID
@@ -191,7 +191,7 @@ BEGIN
 	--
 	hig2.upgrade(p_product        => 'NET'
 				,p_upgrade_script => 'log_nm_4700_fix59.sql'
-				,p_remarks        => 'NET 4700 FIX 59 (Build 2)'
+				,p_remarks        => 'NET 4700 FIX 59 (Build 3)'
 				,p_to_version     => NULL
 				);
 	--
