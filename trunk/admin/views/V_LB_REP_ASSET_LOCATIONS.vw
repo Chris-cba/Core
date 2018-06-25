@@ -52,11 +52,11 @@ AS
           -------------------------------------------------------------------------
           --   PVCS Identifiers :-
           --
-          --       PVCS id          : $Header:   //new_vm_latest/archives/lb/admin/views/V_LB_REP_ASSET_LOCATIONS.vw-arc   1.7   May 17 2018 15:14:00   Rob.Coupe  $
+          --       PVCS id          : $Header:   //new_vm_latest/archives/lb/admin/views/V_LB_REP_ASSET_LOCATIONS.vw-arc   1.8   Jun 25 2018 15:53:26   Rob.Coupe  $
           --       Module Name      : $Workfile:   V_LB_REP_ASSET_LOCATIONS.vw  $
-          --       Date into PVCS   : $Date:   May 17 2018 15:14:00  $
-          --       Date fetched Out : $Modtime:   May 17 2018 15:13:40  $
-          --       Version          : $Revision:   1.7  $
+          --       Date into PVCS   : $Date:   Jun 25 2018 15:53:26  $
+          --       Date fetched Out : $Modtime:   Jun 25 2018 15:52:34  $
+          --       Version          : $Revision:   1.8  $
           -----------------------------------------------------------------------------------------------------
           --   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
           -----------------------------------------------------------------------------------------------------
@@ -77,7 +77,7 @@ AS
           start_measure, -- The measure along the referenced element at which the asset is deemed to start
           end_measure, -- The measure along the referenced element at which the asset is deemed to end
           ne_unique || ne_descr network_name_descr, -- A concatenation of network name and description to provide text-based indexing
-          '$Revision:   1.7  $' Revision
+          '$Revision:   1.8  $' Revision
      FROM (WITH inv_types
                 AS (SELECT -- gather the Exor asset types and split between those LB and standard inventory - this is needed because th ebehaviour of XSP is different
                           CASE nit_category WHEN 'L' THEN 'L' ELSE 'I' END
@@ -147,12 +147,12 @@ AS
                                     THEN
                                        nm_x_sect_st
                                     ELSE
-                                       (SELECT NVL (rvrs_xsp, nm_x_sect_st)
+                                       nvl((SELECT NVL (rvrs_xsp, nm_x_sect_st)
                                           FROM v_nm_element_xsp_rvrs r
                                          WHERE     r.xsp_element_id =
                                                       nm_ne_id_of
                                                AND r.element_xsp =
-                                                      nm_x_sect_st)
+                                                      nm_x_sect_st), nm_x_sect_st)
                                  END
                            END
                               new_xsp,
