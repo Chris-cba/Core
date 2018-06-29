@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_get
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_get.pkb-arc   1.43   May 17 2018 10:22:40   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_get.pkb-arc   1.44   Jun 29 2018 22:34:54   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_get.pkb  $
-   --       Date into PVCS   : $Date:   May 17 2018 10:22:40  $
-   --       Date fetched Out : $Modtime:   May 17 2018 10:21:42  $
-   --       PVCS Version     : $Revision:   1.43  $
+   --       Date into PVCS   : $Date:   Jun 29 2018 22:34:54  $
+   --       Date fetched Out : $Modtime:   Jun 29 2018 22:33:34  $
+   --       PVCS Version     : $Revision:   1.44  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,7 +16,7 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.43  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.44  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_get';
 
@@ -1023,7 +1023,7 @@ AS
                  FROM group_hierarchy t, nm_members p
                 WHERE t.child_group = p.nm_ne_id_in)
                  SEARCH DEPTH FIRST BY parent_group SET order1
-                 CYCLE parent_group SET cycle TO 1 DEFAULT 0
+                 CYCLE parent_group SET cycle TO '1' DEFAULT '0'
       --select * from group_hierarchy
       SELECT CAST (COLLECT (lb_rpt (nm_ne_id_of,
                                     nlt_id,
