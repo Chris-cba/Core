@@ -1,13 +1,12 @@
-/* Formatted on 03/07/2018 10:18:25 (QP5 v5.326) */
 CREATE OR REPLACE PACKAGE BODY lb_ops
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_ops.pkb-arc   1.5   Jul 03 2018 10:33:02   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_ops.pkb-arc   1.6   Jul 03 2018 16:52:20   Rob.Coupe  $
     --       Module Name      : $Workfile:   lb_ops.pkb  $
-    --       Date into PVCS   : $Date:   Jul 03 2018 10:33:02  $
-    --       Date fetched Out : $Modtime:   Jul 03 2018 10:18:42  $
-    --       PVCS Version     : $Revision:   1.5  $
+    --       Date into PVCS   : $Date:   Jul 03 2018 16:52:20  $
+    --       Date fetched Out : $Modtime:   Jul 03 2018 16:51:42  $
+    --       PVCS Version     : $Revision:   1.6  $
     --
     --   Author : R.A. Coupe
     --
@@ -17,7 +16,7 @@ AS
     -- Copyright (c) 2015 Bentley Systems Incorporated . All rights reserved.
     ----------------------------------------------------------------------------
     --
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.5  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.6  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'lb_ops';
 
@@ -160,7 +159,7 @@ AS
                                  typ,
                                  CASE op WHEN 'B' THEN 'E' --start or end of the minus array is always considered an end
                                                              --  else case typ
-                                                      --     when 'E' then 'R'
+                                  --     when 'E' then 'R'
                                   ELSE typ                            --   end
                                            END     typ1
                             FROM (SELECT ROW_NUMBER ()
@@ -435,7 +434,7 @@ AS
                        dir_flag,
                        start_m * uc.uc_conversion_factor,
                        end_m * uc.uc_conversion_factor,
-                       m_unit)
+                       uc.uc_unit_id_out)
           BULK COLLECT INTO retval
           FROM TABLE (pi_rpt_tab)   t,
                nm_linear_types      nlt,
@@ -443,6 +442,89 @@ AS
          WHERE     uc.uc_unit_id_in = t.m_unit
                AND uc.uc_unit_id_out = nlt.nlt_units
                AND nlt.nlt_id = t.refnt_type;
+
+        --
+        RETURN retval;
+    END;
+
+    FUNCTION translate_rpt_tab_units (pi_rpt_tab   IN lb_rpt_tab,
+                                      unit_out     IN INTEGER)
+        RETURN lb_rpt_tab
+    IS
+        retval   lb_rpt_tab;
+    BEGIN
+        SELECT lb_rpt (refnt,
+                       refnt_type,
+                       obj_type,
+                       obj_id,
+                       seg_id,
+                       seq_id,
+                       dir_flag,
+                       start_m * uc.uc_conversion_factor,
+                       end_m * uc.uc_conversion_factor,
+                       unit_out)
+          BULK COLLECT INTO retval
+          FROM TABLE (pi_rpt_tab) t, nm_unit_conversions uc
+         WHERE uc.uc_unit_id_in = t.m_unit AND uc.uc_unit_id_out = unit_out;
+
+        --
+        RETURN retval;
+    END;
+
+    FUNCTION normalize_xrpt_tab (pi_xrpt_tab IN lb_xrpt_tab)
+        RETURN lb_xrpt_tab
+    IS
+        retval   lb_xrpt_tab;
+    BEGIN
+        SELECT lb_xrpt (refnt,
+                        refnt_type,
+                        obj_type,
+                        obj_id,
+                        seg_id,
+                        seq_id,
+                        dir_flag,
+                        start_m * uc.uc_conversion_factor,
+                        end_m * uc.uc_conversion_factor,
+                        uc.uc_unit_id_out,
+                        xsp,
+                        offset,
+                        start_date,
+                        end_date)
+          BULK COLLECT INTO retval
+          FROM TABLE (pi_xrpt_tab)  t,
+               nm_linear_types      nlt,
+               nm_unit_conversions  uc
+         WHERE     uc.uc_unit_id_in = t.m_unit
+               AND uc.uc_unit_id_out = nlt.nlt_units
+               AND nlt.nlt_id = t.refnt_type;
+
+        --
+        RETURN retval;
+    END;
+
+    FUNCTION translate_xrpt_tab_units (pi_xrpt_tab   IN lb_xrpt_tab,
+                                       unit_out      IN INTEGER)
+        RETURN lb_xrpt_tab
+    IS
+        retval   lb_xrpt_tab;
+    BEGIN
+        SELECT lb_xrpt (refnt,
+                        refnt_type,
+                        obj_type,
+                        obj_id,
+                        seg_id,
+                        seq_id,
+                        dir_flag,
+                        start_m * uc.uc_conversion_factor,
+                        end_m * uc.uc_conversion_factor,
+                        unit_out,
+                        xsp,
+                        offset,
+                        start_date,
+                        end_date)
+          BULK COLLECT INTO retval
+          FROM TABLE (pi_xrpt_tab) t, nm_unit_conversions uc
+         WHERE uc.uc_unit_id_in = t.m_unit AND uc.uc_unit_id_out = unit_out;
 
         --
         RETURN retval;
