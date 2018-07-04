@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_get
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_get.pkb-arc   1.46   Jul 04 2018 09:38:50   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_get.pkb-arc   1.47   Jul 04 2018 11:39:40   Rob.Coupe  $
     --       Module Name      : $Workfile:   lb_get.pkb  $
-    --       Date into PVCS   : $Date:   Jul 04 2018 09:38:50  $
-    --       Date fetched Out : $Modtime:   Jul 04 2018 09:34:42  $
-    --       PVCS Version     : $Revision:   1.46  $
+    --       Date into PVCS   : $Date:   Jul 04 2018 11:39:40  $
+    --       Date fetched Out : $Modtime:   Jul 04 2018 11:39:22  $
+    --       PVCS Version     : $Revision:   1.47  $
     --
     --   Author : R.A. Coupe
     --
@@ -16,7 +16,7 @@ AS
     -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
     ----------------------------------------------------------------------------
     --
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.46  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.47  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'lb_get';
 
@@ -2473,13 +2473,13 @@ AS
                                          CASE rm.nm_cardinality
                                              WHEN 1
                                              THEN
-                                                   --                                                 CASE
-                                                   --                                                     WHEN im.start_m >= nm_slk
-                                                   --                                                     THEN
-                                                   (start_m - nm_slk)
-                                                 / NVL (uc_conversion_factor,
-                                                        1)
-                                             --                                                         + nm_begin_mp
+                                                     --                                                 CASE
+                                                     --                                                     WHEN im.start_m >= nm_slk
+                                                     --                                                     THEN
+                                                     (start_m - nm_slk)
+                                                   / NVL (uc_conversion_factor,
+                                                          1)
+                                                 + nm_begin_mp
                                              --                                                     ELSE
                                              --                                                         nm_begin_mp
                                              --                                                 END
@@ -2501,15 +2501,15 @@ AS
                                          CASE rm.nm_cardinality
                                              WHEN 1
                                              THEN
-                                                   --                                                 CASE
-                                                   --                                                     WHEN end_m >= nm_end_slk
-                                                   --                                                     THEN
-                                                   --                                                         nm_end_mp
-                                                   --                                                     ELSE
-                                                   (end_m - nm_slk)
-                                                 / NVL (uc_conversion_factor,
-                                                        1)
-                                             --                                                         + nm_begin_mp
+                                                     --                                                 CASE
+                                                     --                                                     WHEN end_m >= nm_end_slk
+                                                     --                                                     THEN
+                                                     --                                                         nm_end_mp
+                                                     --                                                     ELSE
+                                                     (end_m - nm_slk)
+                                                   / NVL (uc_conversion_factor,
+                                                          1)
+                                                 + nm_begin_mp
                                              --                                                 END
                                              ELSE
                                                    --                                                 CASE
