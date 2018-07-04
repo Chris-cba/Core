@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_get
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_get.pkb-arc   1.45   Jul 03 2018 16:32:40   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_get.pkb-arc   1.46   Jul 04 2018 09:38:50   Rob.Coupe  $
     --       Module Name      : $Workfile:   lb_get.pkb  $
-    --       Date into PVCS   : $Date:   Jul 03 2018 16:32:40  $
-    --       Date fetched Out : $Modtime:   Jul 03 2018 16:27:08  $
-    --       PVCS Version     : $Revision:   1.45  $
+    --       Date into PVCS   : $Date:   Jul 04 2018 09:38:50  $
+    --       Date fetched Out : $Modtime:   Jul 04 2018 09:34:42  $
+    --       PVCS Version     : $Revision:   1.46  $
     --
     --   Author : R.A. Coupe
     --
@@ -16,7 +16,7 @@ AS
     -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
     ----------------------------------------------------------------------------
     --
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.45  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.46  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'lb_get';
 
@@ -1292,7 +1292,7 @@ AS
             itab
             AS
                 (SELECT t.*
-                   FROM TABLE (p_lb_RPt_tab) t)
+                   FROM TABLE (lb_ops.normalize_rpt_tab (p_lb_RPt_tab)) t)
         SELECT lb_RPt (refnt,
                        refnt_type,
                        obj_type,
@@ -1304,14 +1304,16 @@ AS
                        end_m,
                        unit_m)
           BULK COLLECT INTO retval
-          FROM (  SELECT route_id                           refnt,
-                         l_refnt_type.nlt_id                refnt_type,
-                         inv_type                           obj_type,
-                         inv_id                             obj_id,
-                         inv_segment_id                     seg_id,
-                         ROUND (INV_START_SLK, l_round)     start_m,
-                         ROUND (inv_end_slk, l_round)       end_m,
-                         l_refnt_type.nlt_units             unit_m,
+          FROM (  SELECT route_id                   refnt,
+                         l_refnt_type.nlt_id        refnt_type,
+                         inv_type                   obj_type,
+                         inv_id                     obj_id,
+                         inv_segment_id             seg_id,
+                         --                       ROUND (INV_START_SLK, l_round) start_m,
+                         --                       ROUND (inv_end_slk, l_round) end_m,
+                         INV_START_SLK              start_m,
+                         inv_end_slk                end_m,
+                         l_refnt_type.nlt_units     unit_m,
                          min_seq_id,
                          1                                      --relative_dir
                     FROM (SELECT route_id,
@@ -1689,14 +1691,15 @@ AS
                                                                    DECODE (
                                                                        nm_cardinality,
                                                                        1, (  nm_slk
-                                                                           +   GREATEST (
-                                                                                   datum_st,
-                                                                                   nm_begin_mp)
+                                                                           +   (  GREATEST (
+                                                                                      datum_st,
+                                                                                      nm_begin_mp)
+                                                                                - nm_begin_mp)
                                                                              * NVL (
                                                                                    uc_conversion_factor,
                                                                                    1)),
                                                                        -1, (  nm_slk
-                                                                            +   (  ne_length
+                                                                            +   (  nm_end_mp
                                                                                  - LEAST (
                                                                                        datum_end,
                                                                                        nm_end_mp))
@@ -1707,14 +1710,15 @@ AS
                                                                    DECODE (
                                                                        nm_cardinality,
                                                                        1, (  nm_slk
-                                                                           +   LEAST (
-                                                                                   datum_end,
-                                                                                   nm_end_mp)
+                                                                           +   (  LEAST (
+                                                                                      datum_end,
+                                                                                      nm_end_mp)
+                                                                                - nm_begin_mp)
                                                                              * NVL (
                                                                                    uc_conversion_factor,
                                                                                    1)),
                                                                        -1, (  nm_slk
-                                                                            +   (  ne_length
+                                                                            +   (  nm_end_mp
                                                                                  - GREATEST (
                                                                                        datum_st,
                                                                                        nm_begin_mp))
@@ -1791,6 +1795,7 @@ AS
     END;
 
 
+
     FUNCTION get_lb_xrpt_r_tab (p_lb_XRPt_tab       IN lb_XRPt_tab,
                                 p_linear_obj_type   IN VARCHAR2,
                                 p_cardinality       IN INTEGER DEFAULT NULL)
@@ -1848,10 +1853,14 @@ AS
                             THEN
                                 NULL
                             ELSE
-                                (SELECT NVL (rvrs_xsp, xsp)
-                                   FROM v_nm_element_xsp_rvrs r
-                                  WHERE     r.xsp_element_id = refnt
-                                        AND r.element_xsp = i.xsp)
+                                (SELECT NVL (
+                                            (SELECT NVL (rvrs_xsp, xsp)
+                                               FROM v_nm_element_xsp_rvrs r
+                                              WHERE     r.xsp_element_id =
+                                                        refnt
+                                                    AND r.element_xsp = i.xsp),
+                                            xsp)
+                                   FROM DUAL)
                         END
                             rvrs_xsp
                    FROM input_tab i)
@@ -2249,13 +2258,18 @@ AS
                                                                    DECODE (
                                                                        nm_cardinality,
                                                                        1, (  nm_slk
-                                                                           +   datum_st
+                                                                           +   (  GREATEST (
+                                                                                      datum_st,
+                                                                                      nm_begin_mp)
+                                                                                - nm_begin_mp)
                                                                              * NVL (
                                                                                    uc_conversion_factor,
                                                                                    1)),
                                                                        -1, (  nm_slk
-                                                                            +   (  ne_length
-                                                                                 - datum_end)
+                                                                            +   (  nm_end_mp
+                                                                                 - LEAST (
+                                                                                       datum_end,
+                                                                                       nm_end_mp))
                                                                               * NVL (
                                                                                     uc_conversion_factor,
                                                                                     1)))
@@ -2263,13 +2277,18 @@ AS
                                                                    DECODE (
                                                                        nm_cardinality,
                                                                        1, (  nm_slk
-                                                                           +   datum_end
+                                                                           +   (  LEAST (
+                                                                                      datum_end,
+                                                                                      nm_end_mp)
+                                                                                - nm_begin_mp)
                                                                              * NVL (
                                                                                    uc_conversion_factor,
                                                                                    1)),
                                                                        -1, (  nm_slk
-                                                                            +   (  ne_length
-                                                                                 - datum_st)
+                                                                            +   (  nm_end_mp
+                                                                                 - GREATEST (
+                                                                                       datum_st,
+                                                                                       nm_begin_mp))
                                                                               * NVL (
                                                                                     uc_conversion_factor,
                                                                                     1)))
@@ -2314,12 +2333,6 @@ AS
                                                                        NVL (
                                                                            p_linear_obj_type,
                                                                            nm_obj_type)
-                                                                   --                                                             NVL (
-                                                                   --                                                                SYS_CONTEXT (
-                                                                   --                                                                   'NM3SQL',
-                                                                   --                                                                   'ROUTE_OBJ_TYPE'),
-                                                                   --                                                                nm_obj_type)
-                                                                   --                                                      AND m.nm_type = 'G'
                                                                    AND datum_id =
                                                                        e.ne_id
                                                                    AND nm_ne_id_of =
@@ -2328,8 +2341,18 @@ AS
                                                                        l_refnt_type.nlt_units
                                                                    AND uc_unit_id_in =
                                                                        i.datum_unit
-                                                          --                                                                        and  datum_id = xsp_element_id
-                                                          --                                                                        and i.xsp = x.element_xsp (+)
+                                                                   AND (   (    m.nm_begin_mp <
+                                                                                datum_end
+                                                                            AND m.nm_end_mp >
+                                                                                datum_st
+                                                                            AND datum_end >
+                                                                                datum_st)
+                                                                        OR     m.nm_begin_mp <=
+                                                                               datum_end
+                                                                           AND nm_end_mp >=
+                                                                               datum_st
+                                                                           AND datum_st =
+                                                                               datum_end)
                                                           ORDER BY m.nm_ne_id_in,
                                                                    nm_seg_no,
                                                                    nm_seq_no,
@@ -2369,6 +2392,7 @@ AS
             AS
                 (SELECT t.*
                    FROM TABLE (lb_ops.normalize_rpt_tab (p_lb_RPt_tab)) t)
+        --                   FROM TABLE (p_lb_RPt_tab) t)
         SELECT lb_RPt (refnt,
                        refnt_type,
                        obj_type,
@@ -2449,59 +2473,55 @@ AS
                                          CASE rm.nm_cardinality
                                              WHEN 1
                                              THEN
-                                                 CASE
-                                                     WHEN im.start_m >= nm_slk
-                                                     THEN
-                                                             (start_m - nm_slk)
-                                                           / NVL (
-                                                                 uc_conversion_factor,
-                                                                 1)
-                                                         + nm_begin_mp
-                                                     ELSE
-                                                         nm_begin_mp
-                                                 END
+                                                   --                                                 CASE
+                                                   --                                                     WHEN im.start_m >= nm_slk
+                                                   --                                                     THEN
+                                                   (start_m - nm_slk)
+                                                 / NVL (uc_conversion_factor,
+                                                        1)
+                                             --                                                         + nm_begin_mp
+                                             --                                                     ELSE
+                                             --                                                         nm_begin_mp
+                                             --                                                 END
                                              ELSE
-                                                 CASE
-                                                     WHEN im.end_m >=
-                                                          nm_end_slk
-                                                     THEN
-                                                         nm_begin_mp
-                                                     ELSE
-                                                           ne_length
-                                                         -   (end_m - nm_slk)
-                                                           / NVL (
-                                                                 uc_conversion_factor,
-                                                                 1)
-                                                         + nm_begin_mp
-                                                 END
+                                                   --                                                 CASE
+                                                   --                                                     WHEN im.end_m >=
+                                                   --                                                          nm_end_slk
+                                                   --                                                     THEN
+                                                   --                                                         nm_begin_mp
+                                                   --                                                     ELSE
+                                                   nm_end_mp
+                                                 -   (end_m - nm_slk)
+                                                   / NVL (uc_conversion_factor,
+                                                          1)
+                                         --                                                         + nm_begin_mp
+                                         --                                             END
                                          END
                                              inv_start,
                                          CASE rm.nm_cardinality
                                              WHEN 1
                                              THEN
-                                                 CASE
-                                                     WHEN end_m >= nm_end_slk
-                                                     THEN
-                                                         nm_end_mp
-                                                     ELSE
-                                                             (end_m - nm_slk)
-                                                           / NVL (
-                                                                 uc_conversion_factor,
-                                                                 1)
-                                                         + nm_begin_mp
-                                                 END
+                                                   --                                                 CASE
+                                                   --                                                     WHEN end_m >= nm_end_slk
+                                                   --                                                     THEN
+                                                   --                                                         nm_end_mp
+                                                   --                                                     ELSE
+                                                   (end_m - nm_slk)
+                                                 / NVL (uc_conversion_factor,
+                                                        1)
+                                             --                                                         + nm_begin_mp
+                                             --                                                 END
                                              ELSE
-                                                 CASE
-                                                     WHEN start_m <= nm_slk
-                                                     THEN
-                                                         nm_end_mp
-                                                     ELSE
-                                                           ne_length
-                                                         -   (start_m - nm_slk)
-                                                           / NVL (
-                                                                 uc_conversion_factor,
-                                                                 1)
-                                                 END
+                                                   --                                                 CASE
+                                                   --                                                     WHEN start_m <= nm_slk
+                                                   --                                                     THEN
+                                                   --                                                         nm_end_mp
+                                                   --                                                     ELSE
+                                                   nm_end_mp
+                                                 -   (start_m - nm_slk)
+                                                   / NVL (uc_conversion_factor,
+                                                          1)
+                                         --                                                 END
                                          END
                                              inv_end,
                                          e.ne_length,
@@ -2527,6 +2547,263 @@ AS
                                              rn,
                                          im.dir_flag
                                              obj_dir_flag
+                                    FROM itab           im,
+                                         nm_members     rm,
+                                         nm_elements    e,
+                                         nm_linear_types l,
+                                         (SELECT uc_unit_id_in,
+                                                 uc_unit_id_out,
+                                                 uc_conversion_factor
+                                            FROM nm_unit_conversions
+                                          UNION
+                                          SELECT un_unit_id, un_unit_id, 1
+                                            FROM nm_units)
+                                   WHERE     e.ne_id = rm.nm_ne_id_of
+                                         AND l.nlt_g_i_d = 'D'
+                                         AND l.nlt_nt_type = ne_nt_type
+                                         AND rm.nm_ne_id_in = im.refnt
+                                         AND (       NVL (im.start_m, 0) !=
+                                                     NVL (im.end_m,
+                                                          rm.nm_end_slk)
+                                                 AND ((    NVL (im.start_m,
+                                                                rm.nm_end_slk) <
+                                                           rm.nm_end_slk
+                                                       AND NVL (im.end_m,
+                                                                rm.nm_slk) >
+                                                           rm.nm_slk
+                                                       AND NVL (im.end_m,
+                                                                rm.nm_end_slk) >
+                                                           NVL (
+                                                               im.start_m,
+                                                                 rm.nm_end_slk
+                                                               - 1)))
+                                              OR (    NVL (im.start_m, 0) =
+                                                      NVL (im.end_m, 0)
+                                                  AND NVL (im.end_m,
+                                                           rm.nm_end_slk) <=
+                                                      rm.nm_end_slk
+                                                  AND NVL (im.start_m,
+                                                           rm.nm_slk) >=
+                                                      rm.nm_slk) --                                       OR (    nvl(im.start_m,0) = nvl(im.end_m, 0)
+                                                                --                                                AND nvl(im.end_m, rm.nm_end_slk) = rm.nm_end_slk and rownum = 1
+                                                                ----                                                AND nvl(im.start_m, rm.nm_slk)   = rm.nm_slk
+                                                                --                                                )
+                                                                )
+                                         AND UC_UNIT_ID_IN = nlt_units
+                                         AND UC_UNIT_ID_OUT = m_unit
+                                ORDER BY rm.nm_seg_no,
+                                         rm.nm_seq_no,
+                                         im.start_m) t1
+                         WHERE rn = 1 OR rn IS NULL));
+
+        RETURN retval;
+    END;
+
+    FUNCTION get_lb_XRPt_D_tab (p_lb_XRPt_tab IN lb_XRPt_tab)
+        RETURN lb_XRPt_tab
+    IS
+        retval         lb_XRPt_tab;
+        l_refnt_type   nm_linear_types%ROWTYPE;
+    BEGIN
+        -- just going down the hierarchy to diseeminate the data according to linear type
+        WITH
+            itab
+            AS
+                (SELECT t.*
+                   FROM TABLE (lb_ops.normalize_xrpt_tab (p_lb_XRPt_tab)) t)
+        SELECT lb_XRPt (refnt,
+                        refnt_type,
+                        obj_type,
+                        obj_id,
+                        seg_id,
+                        ROWNUM,
+                        dir_flag,
+                        start_m,
+                        end_m,
+                        datum_unit,
+                        xsp,
+                        offset,
+                        start_date,
+                        end_date)
+          BULK COLLECT INTO retval
+          FROM (SELECT datum_ne_id         refnt,
+                       refnt_type,
+                       obj_type,
+                       obj_id,
+                       nm_seg_no           seg_id,
+                       ROWNUM,
+                       route_dir_flag      dir_flag,
+                       inv_datum_start     start_m,
+                       inv_datum_end       end_m,
+                       datum_unit,
+                       NULL                xsp,
+                       NULL                offset,
+                       NULL                start_date,
+                       NULL                end_date
+                  FROM (SELECT t1."SECTION_ID",
+                               t1."NM_SEQ_NO",
+                               t1."NM_SEG_NO",
+                               t1.datum_ne_id,
+                               t1.route_dir_flag * obj_dir_flag
+                                   "ROUTE_DIR_FLAG",
+                               t1."ROUTE_START_ON_ESU",
+                               t1."ROUTE_END_ON_ESU",
+                               t1."ROUTE_START_M",
+                               t1."ROUTE_END_M",
+                               obj_id,
+                               t1.obj_type,
+                               t1."START_M",
+                               t1."END_M",
+                               t1."INV_START",
+                               t1."INV_END",
+                               t1."NE_LENGTH",
+                               t1.ne_nt_type,
+                               inv_start
+                                   inv_datum_start,
+                               -- ROUND (inv_start, 2) inv_datum_start,
+                               --                             round(CASE route_dir_flag
+                               --                                WHEN 1 THEN inv_start
+                               --                                ELSE ne_length - inv_end
+                               --                             END, 2 )
+                               --                                inv_datum_start,
+                               inv_end
+                                   inv_datum_end,
+                               -- ROUND (inv_end, 2)   inv_datum_end,
+                               --                             round(CASE route_dir_flag
+                               --                                WHEN 1 THEN inv_end
+                               --                                ELSE ne_length  - inv_start
+                               --                             END, 2)
+                               --                                inv_datum_end,
+                               refnt_type,
+                               datum_unit,
+                               xsp,
+                               offset,
+                               start_date,
+                               end_date
+                          FROM (  SELECT rm.nm_ne_id_in
+                                             section_id,
+                                         rm.nm_seq_no,
+                                         rm.nm_seg_no,
+                                         rm.nm_ne_id_of
+                                             datum_ne_id,
+                                         rm.nm_cardinality
+                                             route_dir_flag,
+                                         rm.nm_begin_mp
+                                             route_start_on_esu,
+                                         rm.nm_end_mp
+                                             route_end_on_esu,
+                                         rm.nm_slk
+                                             route_start_m,
+                                         rm.nm_end_slk
+                                             route_end_m,
+                                         im.obj_id,
+                                         im.obj_type,
+                                         im.start_m,
+                                         im.end_m,
+                                         CASE rm.nm_cardinality
+                                             WHEN 1
+                                             THEN
+                                                   --                                                 CASE
+                                                   --                                                     WHEN im.start_m >= nm_slk
+                                                   --                                                     THEN
+                                                   (start_m - nm_slk)
+                                                 / NVL (uc_conversion_factor,
+                                                        1)
+                                             --                                                         + nm_begin_mp
+                                             --                                                     ELSE
+                                             --                                                         nm_begin_mp
+                                             --                                                 END
+                                             ELSE
+                                                   --                                                 CASE
+                                                   --                                                     WHEN im.end_m >=
+                                                   --                                                          nm_end_slk
+                                                   --                                                     THEN
+                                                   --                                                         nm_begin_mp
+                                                   --                                                     ELSE
+                                                   nm_end_mp
+                                                 -   (end_m - nm_slk)
+                                                   / NVL (uc_conversion_factor,
+                                                          1)
+                                         --                                                         + nm_begin_mp
+                                         --                                             END
+                                         END
+                                             inv_start,
+                                         CASE rm.nm_cardinality
+                                             WHEN 1
+                                             THEN
+                                                   --                                                 CASE
+                                                   --                                                     WHEN end_m >= nm_end_slk
+                                                   --                                                     THEN
+                                                   --                                                         nm_end_mp
+                                                   --                                                     ELSE
+                                                   (end_m - nm_slk)
+                                                 / NVL (uc_conversion_factor,
+                                                        1)
+                                             --                                                         + nm_begin_mp
+                                             --                                                 END
+                                             ELSE
+                                                   --                                                 CASE
+                                                   --                                                     WHEN start_m <= nm_slk
+                                                   --                                                     THEN
+                                                   --                                                         nm_end_mp
+                                                   --                                                     ELSE
+                                                   nm_end_mp
+                                                 -   (start_m - nm_slk)
+                                                   / NVL (uc_conversion_factor,
+                                                          1)
+                                         --                                                 END
+                                         END
+                                             inv_end,
+                                         e.ne_length,
+                                         e.ne_nt_type,
+                                         nlt_id
+                                             refnt_type,
+                                         nlt_units
+                                             datum_unit,
+                                         im.m_unit
+                                             group_unit,
+                                         NVL (uc_conversion_factor, 1),
+                                         CASE
+                                             WHEN im.start_m = im.end_m
+                                             THEN
+                                                 ROW_NUMBER ()
+                                                     OVER (
+                                                         PARTITION BY im.obj_id,
+                                                                      rm.nm_ne_id_in
+                                                         ORDER BY im.start_m)
+                                             ELSE
+                                                 NULL
+                                         END
+                                             rn,
+                                         im.dir_flag
+                                             obj_dir_flag,
+                                         CASE (rm.nm_cardinality * im.dir_flag)
+                                             WHEN 1
+                                             THEN
+                                                 im.xsp
+                                             WHEN -1
+                                             THEN
+                                                 (SELECT NVL (
+                                                             (SELECT NVL (
+                                                                         rvrs_xsp,
+                                                                         xsp)
+                                                                FROM v_nm_element_xsp_rvrs
+                                                                     r
+                                                               WHERE     r.xsp_element_id =
+                                                                         refnt
+                                                                     AND r.element_xsp =
+                                                                         im.xsp),
+                                                             xsp)
+                                                    FROM DUAL)
+                                         END
+                                             xsp,
+                                         CASE (rm.nm_cardinality * im.dir_flag)
+                                             WHEN 1 THEN im.offset
+                                             WHEN -1 THEN im.offset * -1 --reversed
+                                         END
+                                             offset,
+                                         im.start_date,
+                                         im.end_date
                                     FROM itab           im,
                                          nm_members     rm,
                                          nm_elements    e,
