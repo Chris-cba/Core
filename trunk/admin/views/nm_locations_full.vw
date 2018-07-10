@@ -1,14 +1,18 @@
 CREATE OR REPLACE VIEW nm_locations_full
 AS
-    SELECT                                                                  --
-                                                      --   SCCS Identifiers :-
-                                                                            --
-                   --       sccsid           : @(#)nm_locations_full.vw 1.3 03/24/05
-                                    --       Module Name      : nm_locations_full.vw
-                                 --       Date into SCCS   : 05/03/24 16:15:06
-                                 --       Date fetched Out : 07/06/13 17:08:05
-                                               --       SCCS Version     : 1.3
-                                                                            --
+    SELECT
+    --   PVCS Identifiers :-
+    --
+    --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/views/nm_locations_full.vw-arc   1.2   Jul 10 2018 15:09:32   Rob.Coupe  $
+    --       Module Name      : $Workfile:   nm_locations_full.vw  $
+    --       Date into PVCS   : $Date:   Jul 10 2018 15:09:32  $
+    --       Date fetched Out : $Modtime:   Jul 10 2018 15:09:12  $
+    --       PVCS Version     : $Revision:   1.2  $
+    --
+    --   Author : R.A. Coupe
+    --
+    --   Location Bridge union view of main locations data
+    --
  -----------------------------------------------------------------------------
     --   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
  -----------------------------------------------------------------------------
