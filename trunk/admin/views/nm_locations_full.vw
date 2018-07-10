@@ -3,8 +3,8 @@ AS
     SELECT                                                                  --
                                                       --   SCCS Identifiers :-
                                                                             --
-                   --       sccsid           : @(#)nm_elements.vw 1.3 03/24/05
-                                    --       Module Name      : nm_elements.vw
+                   --       sccsid           : @(#)nm_locations_full.vw 1.3 03/24/05
+                                    --       Module Name      : nm_locations_full.vw
                                  --       Date into SCCS   : 05/03/24 16:15:06
                                  --       Date fetched Out : 07/06/13 17:08:05
                                                --       SCCS Version     : 1.3
@@ -33,5 +33,5 @@ AS
            nm_dir_flag,
            nm_seg_no,
            nm_seq_no
-      FROM nm_locations nm_elements
+      FROM nm_locations
 /      
