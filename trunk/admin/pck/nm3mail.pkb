@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY nm3mail AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3mail.pkb-arc   2.19   Apr 16 2018 09:22:54   Gaurav.Gaurkar  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3mail.pkb-arc   2.20   Jul 10 2018 14:32:42   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm3mail.pkb  $
---       Date into PVCS   : $Date:   Apr 16 2018 09:22:54  $
---       Date fetched Out : $Modtime:   Apr 16 2018 09:01:36  $
---       Version          : $Revision:   2.19  $
+--       Date into PVCS   : $Date:   Jul 10 2018 14:32:42  $
+--       Date fetched Out : $Modtime:   Jul 10 2018 13:30:16  $
+--       Version          : $Revision:   2.20  $
 --       Based on SCCS version : 1.12
 -------------------------------------------------------------------------
 --   Author : Jonathan Mills
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3mail AS
 --
 --all global package variables here
 --
-  g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.19  $';
+  g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.20  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3mail';
@@ -80,7 +80,22 @@ PROCEDURE send_stored_mail IS
                    FROM  nm_mail_message_text
                   WHERE  nmmt_nmm_id = nmm_id
                  );
+   --
+   CURSOR c_connection IS
+   SELECT hfc_ftp_username
+         ,nm3ftp.get_password(hfc_ftp_password)
+    FROM hig_ftp_connections
+        ,hig_ftp_types
+   WHERE hft_type = 'MAIL'
+     AND hfc_hft_id = hft_id;
 --
+   no_connection   EXCEPTION;
+   lv_username       hig_ftp_connections.hfc_ftp_username%TYPE;
+   lv_password       VARCHAR2(100);
+   lv_b64_username   VARCHAR2(100);   
+   lv_b64_password   VARCHAR2(100); 
+   lv_authenticated  VARCHAR2(1) := hig.get_sysopt('AUTHMAIL'); 
+   lv_row_found      BOOLEAN;   
    l_open_connection boolean := FALSE;
 --
 BEGIN
@@ -93,13 +108,42 @@ BEGIN
     LOOP
 --
       IF NOT l_open_connection
-       THEN
-         --nm_debug.debug('Opening connection : '||g_smtp_server||' port '||g_smtp_port);
-         g_mail_conn := utl_smtp.open_connection(g_smtp_server, g_smtp_port);
-         --nm_debug.debug('Helo');
-         utl_smtp.helo(g_mail_conn, g_smtp_domain);
-         l_open_connection := TRUE;
-         --nm_debug.debug('Connection open');
+      THEN
+        --
+        IF lv_authenticated = 'Y' 
+        THEN
+          --
+          nm3ctx.set_context('NM3FTPPASSWORD','Y');
+          OPEN c_connection;
+          FETCH c_connection INTO lv_username
+                                 ,lv_password;
+          lv_row_found := c_connection%FOUND;                       
+          CLOSE c_connection;
+      
+          IF NOT lv_row_found
+          THEN
+            RAISE no_connection;
+          END IF;
+          
+          g_mail_conn := utl_smtp.open_connection(g_smtp_server, g_smtp_port);
+        
+          lv_b64_username := UTL_RAW.cast_to_varchar2(UTL_ENCODE.base64_encode(UTL_RAW.cast_to_raw(lv_username)));
+          lv_b64_password := UTL_RAW.cast_to_varchar2(UTL_ENCODE.base64_encode(UTL_RAW.cast_to_raw(lv_password)));
+          
+          utl_smtp.ehlo(g_mail_conn,g_smtp_domain);  
+          utl_smtp.command(g_mail_conn, 'AUTH LOGIN');  
+          utl_smtp.command(g_mail_conn,lv_b64_username);  
+          utl_smtp.command(g_mail_conn,lv_b64_password);  
+        ELSE
+           --nm_debug.debug('Opening connection : '||g_smtp_server||' port '||g_smtp_port);
+           g_mail_conn := utl_smtp.open_connection(g_smtp_server, g_smtp_port);
+           --nm_debug.debug('Helo');
+           utl_smtp.helo(g_mail_conn, g_smtp_domain);
+        END IF;
+        --
+          l_open_connection := TRUE;
+          --nm_debug.debug('Connection open');
+        
       END IF;
 --
       send_individual (cs_rec);
@@ -115,7 +159,6 @@ BEGIN
    IF l_open_connection
     THEN
       --nm_debug.debug('Closing connection');
-      utl_smtp.quit(g_mail_conn);
       l_open_connection := FALSE;
       --nm_debug.debug('Connection closed');
    END IF;
@@ -123,11 +166,16 @@ BEGIN
    nm_debug.proc_end(g_package_name,'send_stored_mail');
 --
 EXCEPTION
+--
+  WHEN no_connection
+  THEN
+    Raise_Application_Error(-20001,'SMTP Authentication details have not been defined');
   WHEN ex_acl_failure
   THEN utl_smtp.quit(g_mail_conn);
        hig.raise_ner(nm3type.c_hig,551);
   WHEN OTHERS
-  THEN utl_smtp.quit(g_mail_conn);
+  THEN 
+     utl_smtp.quit(g_mail_conn);
        RAISE;
 END send_stored_mail;
 --
