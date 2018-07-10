@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_get
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_get.pkb-arc   1.47   Jul 04 2018 11:39:40   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_get.pkb-arc   1.48   Jul 10 2018 14:17:36   Rob.Coupe  $
     --       Module Name      : $Workfile:   lb_get.pkb  $
-    --       Date into PVCS   : $Date:   Jul 04 2018 11:39:40  $
-    --       Date fetched Out : $Modtime:   Jul 04 2018 11:39:22  $
-    --       PVCS Version     : $Revision:   1.47  $
+    --       Date into PVCS   : $Date:   Jul 10 2018 14:17:36  $
+    --       Date fetched Out : $Modtime:   Jul 10 2018 14:16:44  $
+    --       PVCS Version     : $Revision:   1.48  $
     --
     --   Author : R.A. Coupe
     --
@@ -16,7 +16,7 @@ AS
     -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
     ----------------------------------------------------------------------------
     --
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.47  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.48  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'lb_get';
 
@@ -89,17 +89,20 @@ AS
         l_ft_flag    VARCHAR2 (1);
         l_category   VARCHAR2 (1);
     BEGIN
-        --
-        DECLARE
-            not_an_asset_type   EXCEPTION;
-            PRAGMA EXCEPTION_INIT (not_an_asset_type, -20000);
-        BEGIN
-            l_nit_row := nm3get.get_nit (p_obj_type);
-        EXCEPTION
-            WHEN not_an_asset_type
-            THEN
-                NULL;
-        END;
+        --        if p_obj_type is not null then
+        --        --
+        --        DECLARE
+        --            not_an_asset_type   EXCEPTION;
+        --            PRAGMA EXCEPTION_INIT (not_an_asset_type, -20000);
+        --        BEGIN
+        --            l_nit_row := nm3get.get_nit (p_obj_type);
+        --        EXCEPTION
+        --            WHEN not_an_asset_type
+        --            THEN
+        --                --check if it is a road group
+        --                NULL;
+        --        END;
+        --        end if;
 
         BEGIN
             SELECT DECODE (nit_table_name, NULL, 'N', 'Y'), nit_category
@@ -131,175 +134,316 @@ AS
                     p_ne_key       => l_nit_row.nit_lr_ne_column_name,
                     p_start_col    => l_nit_row.nit_lr_st_chain,
                     p_end_col      => l_nit_row.nit_lr_end_chain);
+        ELSIF p_refnt_tab IS NOT NULL
+        THEN
+            IF p_intsct = 'TRUE'
+            THEN
+                SELECT lb_ops.rpt_intersection (rpt_tab, p_refnt_tab, 20)
+                  INTO retval
+                  FROM (SELECT CAST (COLLECT (rpt) AS lb_rpt_tab)     rpt_tab
+                          FROM (SELECT lb_RPt (nm_ne_id_of,
+                                               nlt_id,
+                                               nm_obj_type,
+                                               nm_ne_id_in,
+                                               nm_seg_no,
+                                               nm_seq_no,
+                                               nm_dir_flag,
+                                               nm_begin_mp,
+                                               nm_end_mp,
+                                               nlt_units)
+                                           rpt
+                                  FROM nm_asset_locations   nal,
+                                       nm_locations_all     m,
+                                       nm_linear_types,
+                                       nm_elements,
+                                       TABLE (p_refnt_tab)  t
+                                 WHERE     nal_nit_type =
+                                           NVL (p_obj_type, nal_nit_type)
+                                       AND nlt_id = m.nm_nlt_id
+                                       AND ne_id = nm_ne_id_of
+                                       AND nm_ne_id_in =
+                                           NVL (p_obj_id, nm_ne_id_in)
+                                       AND nm_start_date <=
+                                           TO_DATE (
+                                               SYS_CONTEXT ('NM3CORE',
+                                                            'EFFECTIVE_DATE'),
+                                               'DD-MON-YYYY')
+                                       AND NVL (
+                                               nm_end_date,
+                                               TO_DATE ('99991231',
+                                                        'YYYYMMDD')) >
+                                           TO_DATE (
+                                               SYS_CONTEXT ('NM3CORE',
+                                                            'EFFECTIVE_DATE'),
+                                               'DD-MON-YYYY')
+                                       AND nal_id = nm_ne_id_in
+                                       AND nm_ne_id_of = refnt
+                                       AND (   (    nm_begin_mp < t.end_m
+                                                AND nm_end_mp > t.start_m)
+                                            OR (    nm_begin_mp = nm_end_mp
+                                                AND nm_begin_mp BETWEEN t.start_m
+                                                                    AND t.end_m))
+                                       AND (       p_whole_only = 'TRUE'
+                                               AND (    NOT EXISTS
+                                                            (SELECT 1
+                                                               FROM nm_asset_locations
+                                                                    nal1,
+                                                                    nm_locations
+                                                                    l
+                                                              WHERE     nal1.nal_nit_type =
+                                                                        nal.nal_nit_type
+                                                                    AND nal1.nal_asset_id =
+                                                                        nal.nal_asset_id
+                                                                    AND nm_ne_id_in =
+                                                                        nal1.nal_id
+                                                                    AND l.nm_ne_id_of NOT IN
+                                                                            (SELECT refnt
+                                                                               FROM TABLE (
+                                                                                        p_refnt_tab)))
+                                                    AND NOT EXISTS
+                                                            (SELECT 1
+                                                               FROM nm_locations
+                                                                    l,
+                                                                    TABLE (
+                                                                        p_refnt_tab)
+                                                              WHERE     l.nm_ne_id_in =
+                                                                        nal.nal_id
+                                                                    AND nm_ne_id_in =
+                                                                        m.nm_ne_id_in
+                                                                    AND refnt =
+                                                                        l.nm_ne_id_of
+                                                                    AND (   l.nm_begin_mp <
+                                                                            start_m
+                                                                         OR l.nm_end_mp >
+                                                                            end_m)))
+                                            OR p_whole_only = 'FALSE')
+                                UNION ALL
+                                SELECT lb_RPt (nm_ne_id_of,
+                                               nlt_id,
+                                               nm_obj_type,
+                                               nm_ne_id_in,
+                                               nm_seg_no,
+                                               nm_seq_no,
+                                               nm_cardinality,
+                                               nm_begin_mp,
+                                               nm_end_mp,
+                                               nlt_units)
+                                  FROM nm_members           m,
+                                       nm_linear_types,
+                                       nm_elements,
+                                       TABLE (p_refnt_tab)  t
+                                 WHERE     p_lb_only = 'FALSE'
+                                       AND nm_ne_id_of = ne_id
+                                       AND nlt_nt_type = ne_nt_type
+                                       AND nlt_g_i_d = 'D'
+                                       AND nm_obj_type =
+                                           NVL (p_obj_type, nm_obj_type)
+                                       AND nm_ne_id_in =
+                                           NVL (p_obj_id, nm_ne_id_in)
+                                       AND nm_ne_id_of = refnt
+                                       AND (   (    nm_begin_mp < t.end_m
+                                                AND nm_end_mp > t.start_m)
+                                            OR (    nm_begin_mp = nm_end_mp
+                                                AND nm_begin_mp BETWEEN t.start_m
+                                                                    AND t.end_m))
+                                       AND (       p_whole_only = 'TRUE'
+                                               AND (    NOT EXISTS
+                                                            (SELECT 1
+                                                               FROM nm_locations
+                                                                    l
+                                                              WHERE     nm_ne_id_in =
+                                                                        m.nm_ne_id_in
+                                                                    AND l.nm_ne_id_of NOT IN
+                                                                            (SELECT refnt
+                                                                               FROM TABLE (
+                                                                                        p_refnt_tab)))
+                                                    AND NOT EXISTS
+                                                            (SELECT 1
+                                                               FROM nm_locations
+                                                                    l,
+                                                                    TABLE (
+                                                                        p_refnt_tab)
+                                                              WHERE     nm_ne_id_in =
+                                                                        m.nm_ne_id_in
+                                                                    AND refnt =
+                                                                        l.nm_ne_id_of
+                                                                    AND (   l.nm_begin_mp <
+                                                                            start_m
+                                                                         OR l.nm_end_mp >
+                                                                            end_m)))
+                                            OR p_whole_only = 'FALSE')));
+            ELSIF p_intsct = 'FALSE'
+            THEN
+                --                               SELECT lb_ops.rpt_intersection( rpt_tab, p_refnt_tab, 20)
+                --                into retval from ( select cast( collect (rpt ) as lb_rpt_tab ) rpt_tab
+                SELECT CAST (COLLECT (rpt) AS lb_rpt_tab)     rpt_tab
+                  INTO retval
+                  FROM (SELECT lb_RPt (nm_ne_id_of,
+                                       nlt_id,
+                                       nm_obj_type,
+                                       nm_ne_id_in,
+                                       nm_seg_no,
+                                       nm_seq_no,
+                                       nm_dir_flag,
+                                       nm_begin_mp,
+                                       nm_end_mp,
+                                       nlt_units)
+                                   rpt
+                          FROM nm_asset_locations  nal,
+                               nm_locations_all    m,
+                               nm_linear_types
+                         WHERE     nal_nit_type =
+                                   NVL (p_obj_type, nal_nit_type)
+                               AND nlt_id = m.nm_nlt_id
+                               AND nlt_g_i_d = 'D'
+                               AND nm_ne_id_in = NVL (p_obj_id, nm_ne_id_in)
+                               AND nm_start_date <=
+                                   TO_DATE (
+                                       SYS_CONTEXT ('NM3CORE',
+                                                    'EFFECTIVE_DATE'),
+                                       'DD-MON-YYYY')
+                               AND NVL (nm_end_date,
+                                        TO_DATE ('99991231', 'YYYYMMDD')) >
+                                   TO_DATE (
+                                       SYS_CONTEXT ('NM3CORE',
+                                                    'EFFECTIVE_DATE'),
+                                       'DD-MON-YYYY')
+                               AND nal_id = nm_ne_id_in
+                               AND EXISTS
+                                       (SELECT 1
+                                          FROM nm_locations         c,
+                                               TABLE (p_refnt_tab)  t
+                                         WHERE     c.nm_ne_id_of = refnt
+                                               AND c.nm_ne_id_in =
+                                                   m.nm_ne_id_in
+                                               AND (   (    c.nm_begin_mp <
+                                                            t.end_m
+                                                        AND c.nm_end_mp >
+                                                            t.start_m)
+                                                    OR (    c.nm_begin_mp =
+                                                            nm_end_mp
+                                                        AND c.nm_begin_mp BETWEEN t.start_m
+                                                                              AND t.end_m))
+                                               AND (       p_whole_only =
+                                                           'TRUE'
+                                                       AND (    NOT EXISTS
+                                                                    (SELECT 1
+                                                                       FROM nm_asset_locations
+                                                                            nal1,
+                                                                            nm_locations
+                                                                            l
+                                                                      WHERE     nal1.nal_nit_type =
+                                                                                nal.nal_nit_type
+                                                                            AND nal1.nal_asset_id =
+                                                                                nal.nal_asset_id
+                                                                            AND nm_ne_id_in =
+                                                                                nal1.nal_id
+                                                                            AND l.nm_ne_id_of NOT IN
+                                                                                    (SELECT refnt
+                                                                                       FROM TABLE (
+                                                                                                p_refnt_tab)))
+                                                            AND NOT EXISTS
+                                                                    (SELECT 1
+                                                                       FROM nm_locations
+                                                                            l,
+                                                                            TABLE (
+                                                                                p_refnt_tab)
+                                                                      WHERE     l.nm_ne_id_in =
+                                                                                nal.nal_id
+                                                                            AND nm_ne_id_in =
+                                                                                m.nm_ne_id_in
+                                                                            AND refnt =
+                                                                                l.nm_ne_id_of
+                                                                            AND (   l.nm_begin_mp <
+                                                                                    start_m
+                                                                                 OR l.nm_end_mp >
+                                                                                    end_m)))
+                                                    OR p_whole_only = 'FALSE'))
+                        UNION ALL
+                        SELECT lb_RPt (nm_ne_id_of,
+                                       nlt_id,
+                                       nm_obj_type,
+                                       nm_ne_id_in,
+                                       nm_seg_no,
+                                       nm_seq_no,
+                                       nm_cardinality,
+                                       nm_begin_mp,
+                                       nm_end_mp,
+                                       nlt_units)
+                          FROM nm_members m, nm_linear_types, nm_elements
+                         WHERE     p_lb_only = 'FALSE'
+                               AND nlt_nt_type = ne_nt_type
+                               AND nm_ne_id_of = ne_id
+                               AND nlt_g_i_d = 'D'
+                               AND nm_obj_type =
+                                   NVL (p_obj_type, nm_obj_type)
+                               AND nm_ne_id_in = NVL (p_obj_id, nm_ne_id_in)
+                               AND EXISTS
+                                       (SELECT 1
+                                          FROM nm_members           c,
+                                               TABLE (p_refnt_tab)  t
+                                         WHERE     c.nm_ne_id_of = refnt
+                                               AND c.nm_ne_id_in =
+                                                   m.nm_ne_id_in
+                                               AND (   (    c.nm_begin_mp <
+                                                            t.end_m
+                                                        AND c.nm_end_mp >
+                                                            t.start_m)
+                                                    OR (    c.nm_begin_mp =
+                                                            nm_end_mp
+                                                        AND c.nm_begin_mp BETWEEN t.start_m
+                                                                              AND t.end_m))
+                                               AND (       p_whole_only =
+                                                           'TRUE'
+                                                       AND (    NOT EXISTS
+                                                                    (SELECT 1
+                                                                       FROM nm_locations
+                                                                            l
+                                                                      WHERE     nm_ne_id_in =
+                                                                                m.nm_ne_id_in
+                                                                            AND l.nm_ne_id_of NOT IN
+                                                                                    (SELECT refnt
+                                                                                       FROM TABLE (
+                                                                                                p_refnt_tab)))
+                                                            AND NOT EXISTS
+                                                                    (SELECT 1
+                                                                       FROM nm_locations
+                                                                            l,
+                                                                            TABLE (
+                                                                                p_refnt_tab)
+                                                                      WHERE     nm_ne_id_in =
+                                                                                m.nm_ne_id_in
+                                                                            AND refnt =
+                                                                                l.nm_ne_id_of
+                                                                            AND (   l.nm_begin_mp <
+                                                                                    start_m
+                                                                                 OR l.nm_end_mp >
+                                                                                    end_m)))
+                                                    OR p_whole_only = 'FALSE'))); --);
+            END IF;                             -- end p_refnt_tab is not null
+        ELSIF p_obj_id IS NOT NULL
+        THEN
+        nm_debug.debug('By obj_id ');
+            retval := get_obj_id_as_rpt_tab (p_obj_id, p_obj_type);
         ELSE
-            BEGIN
-                SELECT lb_RPt (
-                           nm_ne_id_of,
-                           nlt_id,
-                           nm_obj_type,
-                           nm_ne_id_in,
-                           nm_seg_no,
-                           nm_seq_no,
-                           nm_dir_flag,
-                           CASE p_intsct
-                               WHEN 'FALSE'
-                               THEN
-                                   nm_begin_mp
-                               ELSE
-                                   CASE
-                                       WHEN (nm_begin_mp <=
-                                             NVL (t.start_m, 0))
-                                       THEN
-                                           NVL (t.start_m, 0)
-                                       ELSE
-                                           nm_begin_mp
-                                   END
-                           END,
-                           CASE p_intsct
-                               WHEN 'FALSE'
-                               THEN
-                                   nm_end_mp
-                               ELSE
-                                   CASE
-                                       WHEN (nm_end_mp >=
-                                             NVL (t.end_m, ne_length))
-                                       THEN
-                                           NVL (t.end_m, ne_length)
-                                       ELSE
-                                           nm_end_mp
-                                   END
-                           END,
-                           nlt_units)
-                  BULK COLLECT INTO retval
-                  FROM nm_asset_locations   nal,
-                       nm_locations_all     m,
-                       nm_linear_types,
-                       nm_elements,
-                       TABLE (p_refnt_tab)  t
-                 WHERE     nal_nit_type = NVL (p_obj_type, nal_nit_type)
-                       AND nlt_id = m.nm_nlt_id
-                       AND ne_id = nm_ne_id_of
-                       AND nm_ne_id_in = NVL (p_obj_id, nm_ne_id_in)
-                       AND nm_start_date <=
-                           TO_DATE (
-                               SYS_CONTEXT ('NM3CORE', 'EFFECTIVE_DATE'),
-                               'DD-MON-YYYY')
-                       AND NVL (nm_end_date,
-                                TO_DATE ('99991231', 'YYYYMMDD')) >
-                           TO_DATE (
-                               SYS_CONTEXT ('NM3CORE', 'EFFECTIVE_DATE'),
-                               'DD-MON-YYYY')
-                       AND nal_id = nm_ne_id_in
-                       AND nm_ne_id_of = refnt
-                       AND (   (    nm_begin_mp < t.end_m
-                                AND nm_end_mp > t.start_m)
-                            OR (    nm_begin_mp = nm_end_mp
-                                AND nm_begin_mp BETWEEN t.start_m AND t.end_m))
-                       AND (       p_whole_only = 'TRUE'
-                               AND (    NOT EXISTS
-                                            (SELECT 1
-                                               FROM nm_asset_locations  nal1,
-                                                    nm_locations        l
-                                              WHERE     nal1.nal_nit_type =
-                                                        nal.nal_nit_type
-                                                    AND nal1.nal_asset_id =
-                                                        nal.nal_asset_id
-                                                    AND nm_ne_id_in =
-                                                        nal1.nal_id
-                                                    AND l.nm_ne_id_of NOT IN
-                                                            (SELECT refnt
-                                                               FROM TABLE (
-                                                                        p_refnt_tab)))
-                                    AND NOT EXISTS
-                                            (SELECT 1
-                                               FROM nm_locations  l,
-                                                    TABLE (p_refnt_tab)
-                                              WHERE     l.nm_ne_id_in =
-                                                        nal.nal_id
-                                                    AND nm_ne_id_in =
-                                                        m.nm_ne_id_in
-                                                    AND refnt = l.nm_ne_id_of
-                                                    AND (   l.nm_begin_mp <
-                                                            start_m
-                                                         OR l.nm_end_mp >
-                                                            end_m)))
-                            OR p_whole_only = 'FALSE')
-                UNION ALL
-                SELECT lb_RPt (
-                           nm_ne_id_of,
+            SELECT lb_rpt (nm_ne_id_of,
                            nlt_id,
                            nm_obj_type,
                            nm_ne_id_in,
                            nm_seg_no,
                            nm_seq_no,
                            nm_cardinality,
-                           CASE p_intsct
-                               WHEN 'FALSE'
-                               THEN
-                                   nm_begin_mp
-                               ELSE
-                                   CASE
-                                       WHEN (nm_begin_mp <=
-                                             NVL (t.start_m, 0))
-                                       THEN
-                                           NVL (t.start_m, 0)
-                                       ELSE
-                                           nm_begin_mp
-                                   END
-                           END,
-                           CASE p_intsct
-                               WHEN 'FALSE'
-                               THEN
-                                   nm_end_mp
-                               ELSE
-                                   CASE
-                                       WHEN (nm_end_mp >=
-                                             NVL (t.end_m, ne_length))
-                                       THEN
-                                           NVL (t.end_m, ne_length)
-                                       ELSE
-                                           nm_end_mp
-                                   END
-                           END,
+                           nm_begin_mp,
+                           nm_end_mp,
                            nlt_units)
-                  FROM nm_members           m,
-                       nm_linear_types,
-                       nm_elements,
-                       TABLE (p_refnt_tab)  t
-                 WHERE     p_lb_only = 'FALSE'
-                       AND nm_ne_id_of = ne_id
-                       AND nlt_nt_type = ne_nt_type
-                       AND nlt_g_i_d = 'D'
-                       AND nm_obj_type = NVL (p_obj_type, nm_obj_type)
-                       AND nm_ne_id_in = NVL (p_obj_id, nm_ne_id_in)
-                       AND nm_ne_id_of = refnt
-                       AND (   (    nm_begin_mp < t.end_m
-                                AND nm_end_mp > t.start_m)
-                            OR (    nm_begin_mp = nm_end_mp
-                                AND nm_begin_mp BETWEEN t.start_m AND t.end_m))
-                       AND (       p_whole_only = 'TRUE'
-                               AND (    NOT EXISTS
-                                            (SELECT 1
-                                               FROM nm_locations l
-                                              WHERE     nm_ne_id_in =
-                                                        m.nm_ne_id_in
-                                                    AND l.nm_ne_id_of NOT IN
-                                                            (SELECT refnt
-                                                               FROM TABLE (
-                                                                        p_refnt_tab)))
-                                    AND NOT EXISTS
-                                            (SELECT 1
-                                               FROM nm_locations  l,
-                                                    TABLE (p_refnt_tab)
-                                              WHERE     nm_ne_id_in =
-                                                        m.nm_ne_id_in
-                                                    AND refnt = l.nm_ne_id_of
-                                                    AND (   l.nm_begin_mp <
-                                                            start_m
-                                                         OR l.nm_end_mp >
-                                                            end_m)))
-                            OR p_whole_only = 'FALSE');
-            END;
+              BULK COLLECT INTO retval
+              FROM nm_locations_full, nm_linear_types, nm_elements
+             WHERE     nm_obj_type = p_obj_type
+                   AND ne_id = nm_ne_id_of
+                   AND ne_nt_type = nlt_nt_type
+                   AND NVL (ne_gty_group_type, '£$%^') =
+                       NVL (nlt_gty_type, '£$%^');
+        -- just based on type
         END IF;
 
         RETURN retval;
@@ -755,6 +899,9 @@ AS
                          AND nm_ne_id_of = refnt
                          AND (   (    nm_begin_mp < t.end_m
                                   AND nm_end_mp > t.start_m)
+                              OR (    t.start_m = t.end_m
+                                  AND (   nm_begin_mp = t.start_m
+                                       OR nm_end_mp = t.end_m))
                               OR (    nm_begin_mp = nm_end_mp
                                   AND nm_begin_mp BETWEEN t.start_m AND t.end_m))
                          AND (       p_whole_only = 'TRUE'
@@ -787,6 +934,9 @@ AS
                          AND nm_ne_id_of = refnt
                          AND (   (    nm_begin_mp < t.end_m
                                   AND nm_end_mp > t.start_m)
+                              OR (    t.start_m = t.end_m
+                                  AND (   nm_begin_mp = t.start_m
+                                       OR nm_end_mp = t.start_m))
                               OR (    nm_begin_mp = nm_end_mp
                                   AND nm_begin_mp BETWEEN t.start_m AND t.end_m))
                          AND (       p_whole_only = 'TRUE'
@@ -867,58 +1017,86 @@ AS
                              p_cardinality   IN INTEGER)
         RETURN lb_RPt_tab
     IS
-        l_g_i_d        VARCHAR2 (1);
-        l_refnt_type   INTEGER;
+        l_g_i_d        VARCHAR2 (1) := NULL;
+        l_refnt_type   INTEGER := NULL;
         l_units        INTEGER;
         retval         lb_Rpt_tab;
     BEGIN
-        SELECT nlt_g_i_d, nlt_id, nlt_units
-          INTO l_g_i_d, l_refnt_type, l_units
-          FROM nm_linear_types, nm_elements
-         WHERE     ne_id = p_refnt
-               -- and nlt_id = nvl(pi_refrnt_type, nlt_id)
-               AND nlt_nt_type = ne_nt_type
-               AND NVL (nlt_gty_type, '¿$%^') =
-                   NVL (ne_gty_group_type, '¿$%^');
+        IF p_refnt IS NOT NULL
+        THEN
+            BEGIN
+                SELECT nlt_g_i_d, nlt_id, nlt_units
+                  INTO l_g_i_d, l_refnt_type, l_units
+                  FROM nm_linear_types, nm_elements
+                 WHERE     ne_id = p_refnt
+                       -- and nlt_id = nvl(pi_refrnt_type, nlt_id)
+                       AND nlt_nt_type = ne_nt_type
+                       AND NVL (nlt_gty_type, '¿$%^') =
+                           NVL (ne_gty_group_type, '¿$%^');
+            EXCEPTION
+                WHEN NO_DATA_FOUND
+                THEN
+                    raise_application_error (
+                        -200011,
+                        'Supplied linear element ID not found');
+            END;
+        END IF;
 
         -- dbms_output.put_line('G or D '||l_g_i_d );
         --
 
+        IF p_refnt_type IS NOT NULL AND p_refnt_type <> l_refnt_type
+        THEN
+            raise_application_error (
+                -20010,
+                'Mismatching linear type and referent ID');
+        END IF;
 
         IF l_g_i_d = 'D'
         THEN
-            SELECT lb_get.get_obj_RPt_tab (
-                       lb_rpt_tab (lb_rpt (p_refnt,
-                                           l_refnt_type,
-                                           NULL,
-                                           NULL,
-                                           NULL,
-                                           NULL,
-                                           1,
-                                           NVL (p_start_m, 0),
-                                           NVL (p_end_m, ne_length),
-                                           l_units)),
-                       p_obj_type,
-                       p_obj_id,
-                       p_intsct,
-                       p_lb_only,
-                       p_whole_only,
-                       20)
+            SELECT lb_get.get_obj_RPt_tab (LB_OPS.NORMALIZE_RPT_TAB (
+                                               lb_rpt_tab (
+                                                   lb_rpt (
+                                                       p_refnt,
+                                                       l_refnt_type,
+                                                       NULL,
+                                                       NULL,
+                                                       NULL,
+                                                       NULL,
+                                                       1,
+                                                       NVL (p_start_m, 0),
+                                                       NVL (p_end_m,
+                                                            ne_length),
+                                                       l_units))),
+                                           p_obj_type,
+                                           p_obj_id,
+                                           p_intsct,
+                                           p_lb_only,
+                                           p_whole_only,
+                                           20)
               INTO retval
               FROM nm_elements
              WHERE ne_id = NVL (p_refnt, ne_id);
-        ELSE
-            SELECT lb_get.get_obj_RPt_tab (
-                       get_lb_rpt_d_tab (lb_rpt_tab (lb_rpt (p_refnt,
-                                                             l_refnt_type,
-                                                             NULL,
-                                                             NULL,
-                                                             NULL,
-                                                             NULL,
-                                                             1,
-                                                             p_start_m,
-                                                             p_end_m,
-                                                             l_units))),
+        ELSIF l_g_i_d = 'G'
+        THEN
+            SELECT get_obj_RPt_tab (
+                       get_lb_rpt_d_tab (lb_ops.normalize_rpt_tab (
+                                             lb_rpt_tab (
+                                                 lb_rpt (
+                                                     p_refnt,
+                                                     l_refnt_type,
+                                                     NULL,
+                                                     NULL,
+                                                     NULL,
+                                                     NULL,
+                                                     1,
+                                                     NVL (
+                                                         p_start_m,
+                                                         default_start),
+                                                     NVL (
+                                                         p_end_m,
+                                                         default_end),
+                                                     l_units)))),
                        p_obj_type,
                        p_obj_id,
                        p_intsct,
@@ -926,7 +1104,39 @@ AS
                        p_whole_only,
                        20)
               INTO retval
-              FROM DUAL;
+              FROM (  SELECT nm_ne_id_in,
+                             MIN (nm_slk)         default_start,
+                             MAX (nm_end_slk)     default_end
+                        FROM nm_members
+                       WHERE nm_ne_id_in = p_refnt
+                    GROUP BY nm_ne_id_in);
+        ELSIF p_obj_type IS NULL AND p_obj_id IS NULL
+        THEN
+            raise_application_error (
+                -200012,
+                'No network or asset data provided to from the query');
+        ELSIF p_obj_id IS NOT NULL
+        THEN
+            retval := get_obj_id_as_rpt_tab (p_obj_id, p_obj_type);
+        ELSE
+            SELECT lb_rpt (nm_ne_id_of,
+                           nlt_id,
+                           nm_obj_type,
+                           nm_ne_id_in,
+                           nm_seg_no,
+                           nm_seq_no,
+                           nm_cardinality,
+                           nm_begin_mp,
+                           nm_end_mp,
+                           nlt_units)
+              BULK COLLECT INTO retval
+              FROM nm_locations_full, nm_linear_types, nm_elements
+             WHERE     nm_obj_type = p_obj_type
+                   AND ne_id = nm_ne_id_of
+                   AND ne_nt_type = nlt_nt_type
+                   AND NVL (ne_gty_group_type, '£$%^') =
+                       NVL (nlt_gty_type, '£$%^');
+        -- just based on type
         END IF;
 
         RETURN retval;
@@ -2473,55 +2683,59 @@ AS
                                          CASE rm.nm_cardinality
                                              WHEN 1
                                              THEN
-                                                     --                                                 CASE
-                                                     --                                                     WHEN im.start_m >= nm_slk
-                                                     --                                                     THEN
-                                                     (start_m - nm_slk)
-                                                   / NVL (uc_conversion_factor,
-                                                          1)
-                                                 + nm_begin_mp
-                                             --                                                     ELSE
-                                             --                                                         nm_begin_mp
-                                             --                                                 END
+                                                 CASE
+                                                     WHEN im.start_m >= nm_slk
+                                                     THEN
+                                                             (start_m - nm_slk)
+                                                           / NVL (
+                                                                 uc_conversion_factor,
+                                                                 1)
+                                                         + nm_begin_mp
+                                                     ELSE
+                                                         nm_begin_mp
+                                                 END
                                              ELSE
-                                                   --                                                 CASE
-                                                   --                                                     WHEN im.end_m >=
-                                                   --                                                          nm_end_slk
-                                                   --                                                     THEN
-                                                   --                                                         nm_begin_mp
-                                                   --                                                     ELSE
-                                                   nm_end_mp
-                                                 -   (end_m - nm_slk)
-                                                   / NVL (uc_conversion_factor,
-                                                          1)
-                                         --                                                         + nm_begin_mp
-                                         --                                             END
+                                                 CASE
+                                                     WHEN im.end_m >=
+                                                          nm_end_slk
+                                                     THEN
+                                                         nm_begin_mp
+                                                     ELSE
+                                                           nm_end_mp
+                                                         -   (end_m - nm_slk)
+                                                           / NVL (
+                                                                 uc_conversion_factor,
+                                                                 1)
+                                                         + nm_begin_mp
+                                                 END
                                          END
                                              inv_start,
                                          CASE rm.nm_cardinality
                                              WHEN 1
                                              THEN
-                                                     --                                                 CASE
-                                                     --                                                     WHEN end_m >= nm_end_slk
-                                                     --                                                     THEN
-                                                     --                                                         nm_end_mp
-                                                     --                                                     ELSE
-                                                     (end_m - nm_slk)
-                                                   / NVL (uc_conversion_factor,
-                                                          1)
-                                                 + nm_begin_mp
-                                             --                                                 END
+                                                 CASE
+                                                     WHEN end_m >= nm_end_slk
+                                                     THEN
+                                                         nm_end_mp
+                                                     ELSE
+                                                             (end_m - nm_slk)
+                                                           / NVL (
+                                                                 uc_conversion_factor,
+                                                                 1)
+                                                         + nm_begin_mp
+                                                 END
                                              ELSE
-                                                   --                                                 CASE
-                                                   --                                                     WHEN start_m <= nm_slk
-                                                   --                                                     THEN
-                                                   --                                                         nm_end_mp
-                                                   --                                                     ELSE
-                                                   nm_end_mp
-                                                 -   (start_m - nm_slk)
-                                                   / NVL (uc_conversion_factor,
-                                                          1)
-                                         --                                                 END
+                                                 CASE
+                                                     WHEN start_m <= nm_slk
+                                                     THEN
+                                                         nm_end_mp
+                                                     ELSE
+                                                           nm_end_mp
+                                                         -   (start_m - nm_slk)
+                                                           / NVL (
+                                                                 uc_conversion_factor,
+                                                                 1)
+                                                 END
                                          END
                                              inv_end,
                                          e.ne_length,
