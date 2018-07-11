@@ -4,18 +4,18 @@
 --
 --   PVCS Identifiers :-
 --
---       pvcsid                 : $Header:   //new_vm_latest/archives/lb/admin/utl/drop_lb.sql-arc   1.18   Oct 12 2017 10:21:54   Rob.Coupe  $
+--       pvcsid                 : $Header:   //new_vm_latest/archives/lb/admin/utl/drop_lb.sql-arc   1.19   Jul 11 2018 12:50:42   Rob.Coupe  $
 --       Module Name      : $Workfile:   drop_lb.sql  $
---       Date into PVCS   : $Date:   Oct 12 2017 10:21:54  $
---       Date fetched Out : $Modtime:   Oct 12 2017 10:10:04  $
---       PVCS Version     : $Revision:   1.18  $
+--       Date into PVCS   : $Date:   Jul 11 2018 12:50:42  $
+--       Date fetched Out : $Modtime:   Jul 11 2018 12:49:54  $
+--       PVCS Version     : $Revision:   1.19  $
 --
 --   Author : Rob Coupe
 --
 --   Location Bridge drop script.
 --
 -----------------------------------------------------------------------------
---   Copyright (c) 2014 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 
@@ -30,6 +30,7 @@ exception
    when no_data_found then
       raise_application_error( -20002, 'There is a problem in the configuration of context variables, this script must be executed from an unrestricted session/account' );
 end;
+/
 
 
 PROMPT Dropping object dependency list
@@ -183,6 +184,12 @@ DELETE FROM hig_roles
 
 DELETE FROM hig_upgrades
       WHERE hup_product = 'LB';
+      
+DELETE FROM hig_option_values
+where hov_id in ( select hol_id from hig_option_list where hol_product = 'LB' );      
+
+DELETE FROM hig_option_list
+where hol_product = 'LB';      
 
 DELETE FROM hig_products
       WHERE hpr_product = 'LB';
