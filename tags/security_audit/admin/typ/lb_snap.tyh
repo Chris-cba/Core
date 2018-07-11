@@ -1,0 +1,32 @@
+CREATE OR REPLACE TYPE lb_snap AS OBJECT
+(
+--   PVCS Identifiers :-
+       --
+       --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/typ/lb_snap.tyh-arc   1.0   Jul 11 2018 22:29:02   Rob.Coupe  $
+       --       Module Name      : $Workfile:   lb_snap.tyh  $
+       --       Date into PVCS   : $Date:   Jul 11 2018 22:29:02  $
+       --       Date fetched Out : $Modtime:   Jul 11 2018 20:56:44  $
+       --       PVCS Version     : $Revision:   1.0  $
+       --
+       --   Author : R.A. Coupe
+       --
+       --   Location Bridge object holding information relevant to snapping or net-coding
+       --
+       -----------------------------------------------------------------------------
+       -- Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
+       ----------------------------------------------------------------------------
+       --
+    ne_id INTEGER,  --NW element to which a geometry is snapped
+    nlt_id INTEGER, --Linear Type identifier (not used as yet)
+    ne_nt_type VARCHAR2(4), --The network type (unique is ony unique for a given type) 
+    ne_gty_type VARCHAR2(4), -- The group type (or NULL for a datum) of the network element to which the point is snapped.
+    ne_unique VARCHAR2 (30), -- Unique reference of the element to which the geometry has been snapped
+    ne_descr VARCHAR2 (240), -- Description of the element 
+    measure NUMBER,  -- The measure along the element at which the geometry is projected  
+    distance_from NUMBER, -- The distance from the geometry to the snapped element
+    unit_id   INTEGER, --The Exor Unit ID of the distances in the object
+    unit_name VARCHAR2(30), -- The Exor Unit name of the distances.
+    nw_geom MDSYS.sdo_geometry, --the geometry of the element to which the geometry is snapped
+    proj_pt MDSYS.sdo_geometry -- The point on the element which is the projection from the point geometry
+);
+/
