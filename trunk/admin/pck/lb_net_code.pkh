@@ -1,0 +1,35 @@
+CREATE OR REPLACE PACKAGE lb_net_code
+AS
+    --   PVCS Identifiers :-
+    --
+    --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_net_code.pkh-arc   1.0   Jul 11 2018 22:59:02   Rob.Coupe  $
+    --       Module Name      : $Workfile:   lb_net_code.pkh  $
+    --       Date into PVCS   : $Date:   Jul 11 2018 22:59:02  $
+    --       Date fetched Out : $Modtime:   Jul 11 2018 22:52:18  $
+    --       PVCS Version     : $Revision:   1.0  $
+    --
+    --   Author : R.A. Coupe
+    --
+    --   Location Bridge package for snapping and net-coding
+    --
+    -----------------------------------------------------------------------------
+    -- Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
+    ----------------------------------------------------------------------------
+    --
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.0  $';
+
+    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_net_code';
+    
+    FUNCTION lb_snap_xy_to_nw (pi_x          IN NUMBER,
+                               pi_y          IN NUMBER,
+                               pi_in_srid    IN NUMBER,
+                               pi_buffer     IN NUMBER,
+                               pi_in_uol     IN nm_units.un_unit_id%TYPE,
+                               pi_out_srid   IN NUMBER,
+                               pi_out_uol    IN nm_units.un_unit_id%TYPE,
+                               pi_themes     IN nm_theme_array_type,
+                               CARDINALITY   IN INTEGER)
+        RETURN lb_snap_tab;
+END;
+/
+
