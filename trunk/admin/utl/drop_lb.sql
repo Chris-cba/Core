@@ -1,21 +1,20 @@
-/* Formatted on 03/08/2017 12:33:33 (QP5 v5.294) */
 --
 -----------------------------------------------------------------------------
 --
 --   PVCS Identifiers :-
 --
---       pvcsid                 : $Header:   //new_vm_latest/archives/lb/admin/utl/drop_lb.sql-arc   1.19   Jul 11 2018 12:50:42   Rob.Coupe  $
+--       pvcsid                 : $Header:   //new_vm_latest/archives/lb/admin/utl/drop_lb.sql-arc   1.20   Jul 12 2018 14:31:06   Rob.Coupe  $
 --       Module Name      : $Workfile:   drop_lb.sql  $
---       Date into PVCS   : $Date:   Jul 11 2018 12:50:42  $
---       Date fetched Out : $Modtime:   Jul 11 2018 12:49:54  $
---       PVCS Version     : $Revision:   1.19  $
+--       Date into PVCS   : $Date:   Jul 12 2018 14:31:06  $
+--       Date fetched Out : $Modtime:   Jul 12 2018 14:29:50  $
+--       PVCS Version     : $Revision:   1.20  $
 --
 --   Author : Rob Coupe
 --
 --   Location Bridge drop script.
 --
 -----------------------------------------------------------------------------
---   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2014 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 
@@ -178,6 +177,11 @@ PROMPT Clean up any residual metadata (asset types etc. ) if present
 
 DELETE FROM NM_INV_TYPE_ROLES
 where itr_inv_type in ( select nit_inv_type from nm_inv_types_all where nit_category = 'L' );
+
+BEGIN
+execute immediate 'ALTER PACKAGE NM3SDM COMPILE';
+END;
+/
 
 DELETE FROM hig_roles
       WHERE hro_product = 'LB';
