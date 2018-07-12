@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3acl.pkb-arc   3.8   Apr 16 2018 09:22:08   Gaurav.Gaurkar  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3acl.pkb-arc   3.9   Jul 12 2018 15:39:04   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm3acl.pkb  $
---       Date into PVCS   : $Date:   Apr 16 2018 09:22:08  $
---       Date fetched Out : $Modtime:   Apr 16 2018 08:54:24  $
---       Version          : $Revision:   3.8  $
+--       Date into PVCS   : $Date:   Jul 12 2018 15:39:04  $
+--       Date fetched Out : $Modtime:   Jul 12 2018 15:38:02  $
+--       Version          : $Revision:   3.9  $
 --       Based on SCCS version : 
 ------------------------------------------------------------------
 --   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
@@ -26,7 +26,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid        CONSTANT VARCHAR2(2000) := '$Revision:   3.8  $';
+  g_body_sccsid        CONSTANT VARCHAR2(2000) := '$Revision:   3.9  $';
   g_package_name       CONSTANT varchar2(30) := 'nm3acl';
 --
   c_ftp_role           CONSTANT VARCHAR2(30) := 'FTP_USER';
@@ -108,7 +108,12 @@ FUNCTION check_privilege ( pi_acl_name  IN VARCHAR2
                          , pi_privilege IN VARCHAR )
 RETURN BOOLEAN
 IS
+ --
+ acl_does_not_exist exception;
+ pragma exception_init (acl_does_not_exist,-46114); -- added for 12c
+ --
 BEGIN
+ 
   IF dbms_network_acl_admin.check_privilege(pi_acl_name,pi_user,pi_privilege) != 1
   OR  dbms_network_acl_admin.check_privilege(pi_acl_name,pi_user,pi_privilege) IS NULL
     THEN RETURN FALSE;
@@ -116,6 +121,12 @@ BEGIN
   END IF;
 --  RETURN ( dbms_network_acl_admin.check_privilege(pi_acl_name,pi_user,pi_privilege) = 1 
 --        OR NOT (dbms_network_acl_admin.check_privilege(pi_acl_name,pi_user,pi_privilege) IS NULL ));
+EXCEPTION
+  WHEN acl_does_not_exist THEN
+    RETURN FALSE;
+  WHEN OTHERS THEN
+    RAISE;
+    
 END check_privilege;
 --
 -----------------------------------------------------------------------------
