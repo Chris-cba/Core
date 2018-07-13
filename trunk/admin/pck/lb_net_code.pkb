@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE body lb_net_code
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_net_code.pkb-arc   1.0   Jul 11 2018 22:59:40   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_net_code.pkb-arc   1.1   Jul 13 2018 14:14:26   Rob.Coupe  $
     --       Module Name      : $Workfile:   lb_net_code.pkb  $
-    --       Date into PVCS   : $Date:   Jul 11 2018 22:59:40  $
-    --       Date fetched Out : $Modtime:   Jul 11 2018 22:58:10  $
-    --       PVCS Version     : $Revision:   1.0  $
+    --       Date into PVCS   : $Date:   Jul 13 2018 14:14:26  $
+    --       Date fetched Out : $Modtime:   Jul 13 2018 14:13:14  $
+    --       PVCS Version     : $Revision:   1.1  $
     --
     --   Author : R.A. Coupe
     --
@@ -16,7 +16,7 @@ AS
     -- Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
     ----------------------------------------------------------------------------
     --
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.0  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.1  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'lb_net_code';
     
@@ -180,7 +180,7 @@ BEGIN
          || ' case base_srid when out_srid then geom else sdo_cs.transform(geom, out_srid) end, '
          || ' case base_srid when out_srid then proj_pt else sdo_cs.transform(proj_pt, out_srid) end '
          || ' )) as lb_snap_tab ) '
-         || ' FROM (SELECT s.ne_id, s.nlt_id, e.ne_unique, e.ne_descr, e.ne_nt_type, e.ne_gty_group_type, pt_input_geom, in_srid, out_srid, base_srid,'
+         || ' FROM (SELECT /*+INDEX(e NE_PK) */ s.ne_id, s.nlt_id, e.ne_unique, e.ne_descr, e.ne_nt_type, e.ne_gty_group_type, pt_input_geom, in_srid, out_srid, base_srid,'
          || '  SDO_LRS.project_pt ( geom, pt_input_geom) '
          || '   proj_pt, '
          || '  sdo_geom.sdo_distance ( geom, pt_input_geom, :tol, '
