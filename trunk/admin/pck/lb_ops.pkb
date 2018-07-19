@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_ops
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_ops.pkb-arc   1.8   Jul 19 2018 10:35:54   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_ops.pkb-arc   1.9   Jul 19 2018 10:59:52   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_ops.pkb  $
-   --       Date into PVCS   : $Date:   Jul 19 2018 10:35:54  $
-   --       Date fetched Out : $Modtime:   Jul 19 2018 10:33:56  $
-   --       PVCS Version     : $Revision:   1.8  $
+   --       Date into PVCS   : $Date:   Jul 19 2018 10:59:52  $
+   --       Date fetched Out : $Modtime:   Jul 19 2018 10:58:52  $
+   --       PVCS Version     : $Revision:   1.9  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,7 +16,7 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated . All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.8  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.9  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_ops';
 
@@ -65,7 +65,10 @@ AS
                                  AND t1.end_m >= t2.start_m)
                              OR (    t1.start_m < t1.end_m
                                  AND t1.start_m < t2.end_m
-                                 AND t1.end_m > t2.start_m)))
+                                 AND t1.end_m > t2.start_m)
+                             OR ( t2.start_m = t2.end_m 
+                                 AND t1.start_m <= t2.end_m
+                                 AND t1.end_m >= t2.start_m)))
         SELECT lb_RPt (refnt,
                        refnt_type,
                        obj_type,
