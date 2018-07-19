@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_ops
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_ops.pkb-arc   1.7   Jul 06 2018 00:38:42   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_ops.pkb-arc   1.8   Jul 19 2018 10:35:54   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_ops.pkb  $
-   --       Date into PVCS   : $Date:   Jul 06 2018 00:38:42  $
-   --       Date fetched Out : $Modtime:   Jul 06 2018 00:35:24  $
-   --       PVCS Version     : $Revision:   1.7  $
+   --       Date into PVCS   : $Date:   Jul 19 2018 10:35:54  $
+   --       Date fetched Out : $Modtime:   Jul 19 2018 10:33:56  $
+   --       PVCS Version     : $Revision:   1.8  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,7 +16,7 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated . All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.7  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.8  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_ops';
 
@@ -47,35 +47,40 @@ AS
    --
 
    FUNCTION RPt_intersection (p_Rpt1             lb_RPt_tab,
-                              p_Rpt2             lb_RPt_tab,
-                              p_cardinality   IN INTEGER)
-      RETURN lb_RPt_tab
-   AS
-      retval   lb_RPt_tab;
-   --
-   BEGIN
-      WITH lrs_intsct
-           AS (SELECT t1.*, t2.start_m start_m2, t2.end_m end_m2
-                 FROM TABLE (p_Rpt1) t1, TABLE (p_Rpt2) t2
-                WHERE     t1.refnt = t2.refnt
-                      AND t1.start_m < t2.end_m
-                      AND t1.end_m > t2.start_m)
-      SELECT lb_RPt (refnt,
-                     refnt_type,
-                     obj_type,
-                     obj_id,
-                     seg_id,
-                     seq_id,
-                     dir_flag,
-                     GREATEST (start_m, start_m2),
-                     LEAST (end_m, end_m2),
-                     m_unit)
-        BULK COLLECT INTO retval
-        FROM lrs_intsct;
+                               p_Rpt2             lb_RPt_tab,
+                               p_cardinality   IN INTEGER)
+        RETURN lb_RPt_tab
+    AS
+        retval   lb_RPt_tab;
+    --
+    BEGIN
+        WITH
+            lrs_intsct
+            AS
+                (SELECT t1.*, t2.start_m start_m2, t2.end_m end_m2
+                   FROM TABLE (p_Rpt1) t1, TABLE (p_Rpt2) t2
+                  WHERE     t1.refnt = t2.refnt
+                        AND (   (    t1.start_m = t1.end_m
+                                 AND t1.start_m <= t2.end_m
+                                 AND t1.end_m >= t2.start_m)
+                             OR (    t1.start_m < t1.end_m
+                                 AND t1.start_m < t2.end_m
+                                 AND t1.end_m > t2.start_m)))
+        SELECT lb_RPt (refnt,
+                       refnt_type,
+                       obj_type,
+                       obj_id,
+                       seg_id,
+                       seq_id,
+                       dir_flag,
+                       GREATEST (start_m, start_m2),
+                       LEAST (end_m, end_m2),
+                       m_unit)
+          BULK COLLECT INTO retval
+          FROM lrs_intsct;
 
-      RETURN retval;
-   END;
-
+        RETURN retval;
+    END;
    --
    FUNCTION rpt_minus (p_Rpt1             lb_rpt_tab,
                        p_Rpt2             lb_rpt_tab,
