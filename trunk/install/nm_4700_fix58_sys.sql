@@ -1,11 +1,11 @@
 ----------------------------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm_4700_fix58_sys.sql-arc   1.0   Dec 18 2017 09:37:52   Chris.Baugh  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm_4700_fix58_sys.sql-arc   1.1   Jul 20 2018 11:01:54   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm_4700_fix58_sys.sql  $ 
---       Date into PVCS   : $Date:   Dec 18 2017 09:37:52  $
---       Date fetched Out : $Modtime:   Dec 18 2017 09:34:10  $
---       Version     	  : $Revision:   1.0  $
+--       Date into PVCS   : $Date:   Jul 20 2018 11:01:54  $
+--       Date fetched Out : $Modtime:   Jul 19 2018 09:50:54  $
+--       Version     	  : $Revision:   1.1  $
 --
 ----------------------------------------------------------------------------------------------------
 --   Copyright (c) 2016 Bentley Systems Incorporated. All rights reserved.
@@ -84,17 +84,9 @@ SET TERM ON
 PROMPT Granting Privileges
 SET TERM OFF
 
-DECLARE
-  username hig_users.hus_username%TYPE;
 BEGIN
-  SELECT hus_username 
-  INTO username
-  FROM hig_users 
-  WHERE hus_is_hig_owner_flag = 'Y';
-
-  EXECUTE IMMEDIATE 'GRANT EXECUTE ON DBMS_CRYPTO TO ' || username;
-  EXECUTE IMMEDIATE 'GRANT SELECT ON PROXY_USERS TO HIG_USER';
-
+  EXECUTE IMMEDIATE 'GRANT EXECUTE ON DBMS_CRYPTO TO SYSTEM WITH GRANT OPTION';
+  EXECUTE IMMEDIATE 'GRANT SELECT ON PROXY_USERS TO SYSTEM WITH GRANT OPTION';
 END;
 /
 --
