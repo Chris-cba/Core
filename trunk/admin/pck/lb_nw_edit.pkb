@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_nw_edit
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_nw_edit.pkb-arc   1.5   Aug 16 2017 16:57:48   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_nw_edit.pkb-arc   1.6   Jul 23 2018 21:55:40   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_nw_edit.pkb  $
-   --       Date into PVCS   : $Date:   Aug 16 2017 16:57:48  $
-   --       Date fetched Out : $Modtime:   Aug 16 2017 16:56:44  $
-   --       PVCS Version     : $Revision:   1.5  $
+   --       Date into PVCS   : $Date:   Jul 23 2018 21:55:40  $
+   --       Date fetched Out : $Modtime:   Jul 23 2018 21:39:20  $
+   --       PVCS Version     : $Revision:   1.6  $
    --
    --   Author : R.A. Coupe
    --
@@ -17,7 +17,7 @@ AS
    ----------------------------------------------------------------------------
    --
 
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.5  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.6  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_get';
 
@@ -1208,6 +1208,9 @@ AS
                                      l_obj_on_ne (i).obj_type,
                                      p_effective_date);
       END LOOP;
+   EXCEPTION
+      WHEN NO_DATA_FOUND 
+	  THEN NULL;
    END;
 END;
 /
