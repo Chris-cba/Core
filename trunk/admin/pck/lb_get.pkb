@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_get
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_get.pkb-arc   1.48   Jul 10 2018 14:17:36   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_get.pkb-arc   1.49   Jul 24 2018 10:50:12   Rob.Coupe  $
     --       Module Name      : $Workfile:   lb_get.pkb  $
-    --       Date into PVCS   : $Date:   Jul 10 2018 14:17:36  $
-    --       Date fetched Out : $Modtime:   Jul 10 2018 14:16:44  $
-    --       PVCS Version     : $Revision:   1.48  $
+    --       Date into PVCS   : $Date:   Jul 24 2018 10:50:12  $
+    --       Date fetched Out : $Modtime:   Jul 24 2018 10:49:00  $
+    --       PVCS Version     : $Revision:   1.49  $
     --
     --   Author : R.A. Coupe
     --
@@ -16,7 +16,7 @@ AS
     -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
     ----------------------------------------------------------------------------
     --
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.48  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.49  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'lb_get';
 
@@ -104,16 +104,34 @@ AS
         --        END;
         --        end if;
 
-        BEGIN
-            SELECT DECODE (nit_table_name, NULL, 'N', 'Y'), nit_category
-              INTO l_ft_flag, l_category
-              FROM nm_inv_types
-             WHERE nit_inv_type = p_obj_type;
-        EXCEPTION
-            WHEN NO_DATA_FOUND
+
+        IF p_obj_type IS NULL
+        THEN
+            IF p_obj_id IS NULL
             THEN
-                NULL;
-        END;
+                IF lb_rpt_tab_has_network (p_refnt_tab) = 'FALSE'
+                THEN
+                    raise_application_error (
+                        -20015,
+                        'Inadequate input arguments to from a valid query');
+                END IF;                 -- allow a query based on network only
+            ELSE
+                raise_application_error (
+                    -20016,
+                    'A query cannot be built on a specified ID without a type');
+            END IF;
+
+            BEGIN
+                SELECT DECODE (nit_table_name, NULL, 'N', 'Y'), nit_category
+                  INTO l_ft_flag, l_category
+                  FROM nm_inv_types
+                 WHERE nit_inv_type = p_obj_type;
+            EXCEPTION
+                WHEN NO_DATA_FOUND
+                THEN
+                    NULL;
+            END;
+        END IF;
 
         IF l_ft_flag = 'Y' AND l_category = 'F'
         THEN
@@ -134,7 +152,8 @@ AS
                     p_ne_key       => l_nit_row.nit_lr_ne_column_name,
                     p_start_col    => l_nit_row.nit_lr_st_chain,
                     p_end_col      => l_nit_row.nit_lr_end_chain);
-        ELSIF p_refnt_tab IS NOT NULL
+        ELSIF     p_refnt_tab IS NOT NULL
+              AND lb_rpt_tab_has_network (p_refnt_tab) = 'TRUE'
         THEN
             IF p_intsct = 'TRUE'
             THEN
@@ -182,7 +201,10 @@ AS
                                                 AND nm_end_mp > t.start_m)
                                             OR (    nm_begin_mp = nm_end_mp
                                                 AND nm_begin_mp BETWEEN t.start_m
-                                                                    AND t.end_m))
+                                                                    AND t.end_m)
+                                            OR (    t.start_m = t.end_m
+                                                AND nm_begin_mp <= t.end_m
+                                                AND nm_end_mp >= t.start_m))
                                        AND (       p_whole_only = 'TRUE'
                                                AND (    NOT EXISTS
                                                             (SELECT 1
@@ -245,7 +267,10 @@ AS
                                                 AND nm_end_mp > t.start_m)
                                             OR (    nm_begin_mp = nm_end_mp
                                                 AND nm_begin_mp BETWEEN t.start_m
-                                                                    AND t.end_m))
+                                                                    AND t.end_m)
+                                            OR (    t.start_m = t.end_m
+                                                AND nm_begin_mp <= t.end_m
+                                                AND nm_end_mp >= t.start_m))
                                        AND (       p_whole_only = 'TRUE'
                                                AND (    NOT EXISTS
                                                             (SELECT 1
@@ -323,7 +348,15 @@ AS
                                                     OR (    c.nm_begin_mp =
                                                             nm_end_mp
                                                         AND c.nm_begin_mp BETWEEN t.start_m
-                                                                              AND t.end_m))
+                                                                              AND t.end_m)
+                                                    OR (    t.start_m IS NULL
+                                                        AND t.end_m IS NULL)
+                                                    OR (    t.start_m =
+                                                            t.end_m
+                                                        AND nm_begin_mp <=
+                                                            t.end_m
+                                                        AND nm_end_mp >=
+                                                            t.start_m))
                                                AND (       p_whole_only =
                                                            'TRUE'
                                                        AND (    NOT EXISTS
@@ -421,11 +454,19 @@ AS
                                                                                     end_m)))
                                                     OR p_whole_only = 'FALSE'))); --);
             END IF;                             -- end p_refnt_tab is not null
-        ELSIF p_obj_id IS NOT NULL
-        THEN
-        nm_debug.debug('By obj_id ');
-            retval := get_obj_id_as_rpt_tab (p_obj_id, p_obj_type);
+        --        ELSIF p_obj_id IS NOT NULL
+        --        THEN
+        --        nm_debug.debug('By obj_id ');
+        --            retval := get_obj_id_as_rpt_tab (p_obj_id, p_obj_type);
         ELSE
+            IF p_whole_only = 'TRUE' OR p_intsct = 'TRUE'
+            THEN
+                raise_application_error (
+                    -20013,
+                    'Use of the intersection or whole-only option is only valid when accompanied by a network reference');
+            END IF;
+
+            --
             SELECT lb_rpt (nm_ne_id_of,
                            nlt_id,
                            nm_obj_type,
@@ -1021,6 +1062,17 @@ AS
         l_refnt_type   INTEGER := NULL;
         l_units        INTEGER;
         retval         lb_Rpt_tab;
+        l_start_m number;
+        l_end_m   number;
+        l_tol     number;
+        
+    function get_unit_tolerance(pi_unit_id in integer) return number is
+    retval number;
+    begin
+       retval := NM3UNIT.GET_TOL_FROM_UNIT_MASK(pi_unit_id);
+       return retval;
+    end;
+--       
     BEGIN
         IF p_refnt IS NOT NULL
         THEN
@@ -1040,6 +1092,13 @@ AS
                         -200011,
                         'Supplied linear element ID not found');
             END;
+        ELSE
+            IF p_intsct = 'TRUE' OR p_whole_only = 'TRUE'
+            THEN
+                raise_application_error (
+                    -20013,
+                    'Use of the intersection or whole-only option is only valid when accompanied by a network reference');
+            END IF;
         END IF;
 
         -- dbms_output.put_line('G or D '||l_g_i_d );
@@ -1054,6 +1113,8 @@ AS
 
         IF l_g_i_d = 'D'
         THEN
+            nm_debug.debug ('datum based');
+
             SELECT lb_get.get_obj_RPt_tab (LB_OPS.NORMALIZE_RPT_TAB (
                                                lb_rpt_tab (
                                                    lb_rpt (
@@ -1079,6 +1140,16 @@ AS
              WHERE ne_id = NVL (p_refnt, ne_id);
         ELSIF l_g_i_d = 'G'
         THEN
+            nm_debug.debug ('route based');
+            l_start_m := p_start_m;
+            l_end_m   := p_end_m;
+--            
+            if l_start_m = l_end_m then
+              l_tol     := get_unit_tolerance(l_units)/10;
+              l_start_m := l_start_m - l_tol;
+              l_end_m   := l_end_m + l_tol;
+            end if;
+              
             SELECT get_obj_RPt_tab (
                        get_lb_rpt_d_tab (lb_ops.normalize_rpt_tab (
                                              lb_rpt_tab (
@@ -1091,10 +1162,10 @@ AS
                                                      NULL,
                                                      1,
                                                      NVL (
-                                                         p_start_m,
+                                                         l_start_m,
                                                          default_start),
                                                      NVL (
-                                                         p_end_m,
+                                                         l_end_m,
                                                          default_end),
                                                      l_units)))),
                        p_obj_type,
@@ -1113,30 +1184,74 @@ AS
         ELSIF p_obj_type IS NULL AND p_obj_id IS NULL
         THEN
             raise_application_error (
-                -200012,
-                'No network or asset data provided to from the query');
+                -20012,
+                'No network or asset data provided to form the query');
         ELSIF p_obj_id IS NOT NULL
         THEN
-            retval := get_obj_id_as_rpt_tab (p_obj_id, p_obj_type);
+            nm_debug.debug ('object based');
+
+            SELECT CAST (COLLECT (lb_rpt (refnt,
+                                          refnt_type,
+                                          obj_type,
+                                          obj_id,
+                                          seg_id,
+                                          seq_id,
+                                          dir_flag,
+                                          start_m,
+                                          end_m,
+                                          m_unit)) AS lb_rpt_tab)
+              INTO retval
+              FROM TABLE (get_obj_id_as_rpt_tab (p_obj_id, p_obj_type)),
+                   nm_linear_types,
+                   nm_elements
+             WHERE     ne_id = refnt
+                   AND nlt_id = refnt_type
+                   AND refnt_type = NVL (p_refnt_type, refnt_type)
+                   AND (   (    start_m = end_m
+                            AND start_m <= p_end_m
+                            AND end_m >= p_start_m)
+                        OR (    p_start_m = p_end_m
+                            AND start_m <= p_end_m
+                            AND end_m >= p_start_m)
+                        OR (p_start_m < end_m AND p_end_m > start_m)
+                        OR (p_start_m IS NULL AND p_end_m IS NULL));
         ELSE
-            SELECT lb_rpt (nm_ne_id_of,
-                           nlt_id,
-                           nm_obj_type,
-                           nm_ne_id_in,
-                           nm_seg_no,
-                           nm_seq_no,
-                           nm_cardinality,
-                           nm_begin_mp,
-                           nm_end_mp,
-                           nlt_units)
-              BULK COLLECT INTO retval
-              FROM nm_locations_full, nm_linear_types, nm_elements
-             WHERE     nm_obj_type = p_obj_type
-                   AND ne_id = nm_ne_id_of
-                   AND ne_nt_type = nlt_nt_type
-                   AND NVL (ne_gty_group_type, '£$%^') =
-                       NVL (nlt_gty_type, '£$%^');
-        -- just based on type
+            nm_debug.debug ('catch-all');
+
+--            IF p_start_m IS NOT NULL OR p_end_m IS NOT NULL
+--            THEN
+--                raise_application_error (
+--                    -20017,
+--                    'Measure based arguments are not usable in this context');
+--            ELSE
+                SELECT lb_rpt (nm_ne_id_of,
+                               nlt_id,
+                               nm_obj_type,
+                               nm_ne_id_in,
+                               nm_seg_no,
+                               nm_seq_no,
+                               nm_cardinality,
+                               nm_begin_mp,
+                               nm_end_mp,
+                               nlt_units)
+                  BULK COLLECT INTO retval
+                  FROM nm_locations_full, nm_linear_types, nm_elements
+                 WHERE     nm_obj_type = p_obj_type
+                       AND ne_id = nm_ne_id_of
+                       AND ne_nt_type = nlt_nt_type
+                       AND NVL (ne_gty_group_type, '£$%^') =
+                           NVL (nlt_gty_type, '£$%^')
+                   AND (   (    nm_begin_mp = nm_end_mp
+                            AND nm_begin_mp <= p_end_m
+                            AND nm_end_mp >= p_start_m)
+                        OR (    p_start_m = p_end_m
+                            AND nm_begin_mp <= p_end_m
+                            AND nm_end_mp >= p_start_m)
+                        OR (p_start_m < nm_end_mp AND p_end_m > nm_begin_mp)
+                        OR (p_start_m IS NULL AND p_end_m IS NULL));
+                           
+            -- just based on type
+--            END IF;
         END IF;
 
         RETURN retval;
@@ -2684,9 +2799,13 @@ AS
                                              WHEN 1
                                              THEN
                                                  CASE
-                                                     WHEN im.start_m >= nm_slk
+                                                     WHEN NVL (im.start_m,
+                                                               nm_slk) >=
+                                                          nm_slk
                                                      THEN
-                                                             (start_m - nm_slk)
+                                                             (  NVL (start_m,
+                                                                     nm_slk)
+                                                              - nm_slk)
                                                            / NVL (
                                                                  uc_conversion_factor,
                                                                  1)
@@ -2696,13 +2815,17 @@ AS
                                                  END
                                              ELSE
                                                  CASE
-                                                     WHEN im.end_m >=
+                                                     WHEN NVL (im.end_m,
+                                                               nm_end_slk) >=
                                                           nm_end_slk
                                                      THEN
                                                          nm_begin_mp
                                                      ELSE
                                                            nm_end_mp
-                                                         -   (end_m - nm_slk)
+                                                         -   (  NVL (
+                                                                    end_m,
+                                                                    nm_end_slk)
+                                                              - nm_slk)
                                                            / NVL (
                                                                  uc_conversion_factor,
                                                                  1)
@@ -2714,11 +2837,16 @@ AS
                                              WHEN 1
                                              THEN
                                                  CASE
-                                                     WHEN end_m >= nm_end_slk
+                                                     WHEN NVL (end_m,
+                                                               nm_end_slk) >=
+                                                          nm_end_slk
                                                      THEN
                                                          nm_end_mp
                                                      ELSE
-                                                             (end_m - nm_slk)
+                                                             (  NVL (
+                                                                    end_m,
+                                                                    nm_end_slk)
+                                                              - nm_slk)
                                                            / NVL (
                                                                  uc_conversion_factor,
                                                                  1)
@@ -2726,12 +2854,15 @@ AS
                                                  END
                                              ELSE
                                                  CASE
-                                                     WHEN start_m <= nm_slk
+                                                     WHEN NVL (start_m, nm_slk) <=
+                                                          nm_slk
                                                      THEN
                                                          nm_end_mp
                                                      ELSE
                                                            nm_end_mp
-                                                         -   (start_m - nm_slk)
+                                                         -   (  NVL (start_m,
+                                                                     nm_slk)
+                                                              - nm_slk)
                                                            / NVL (
                                                                  uc_conversion_factor,
                                                                  1)
@@ -3164,24 +3295,27 @@ AS
         RETURN lb_rpt_tab
     IS
         retval       lb_rpt_tab;
-        l_ft_flag    VARCHAR2 (1);
-        l_category   VARCHAR2 (1);
+        l_ft_flag    VARCHAR2 (1) := NULL;
+        l_category   VARCHAR2 (1) := NULL;
     BEGIN
         --
-        BEGIN
-            SELECT DECODE (nit_table_name, NULL, 'N', 'Y'), nit_category
-              INTO l_ft_flag, l_category
-              FROM nm_inv_types
-             WHERE     nit_inv_type = pi_obj_type
-                   AND NOT EXISTS
-                           (SELECT 1
-                              FROM nm_nt_groupings
-                             WHERE nng_group_type = pi_obj_type);
-        EXCEPTION
-            WHEN NO_DATA_FOUND
-            THEN
-                NULL;
-        END;
+        IF pi_obj_type IS NOT NULL
+        THEN
+            BEGIN
+                SELECT DECODE (nit_table_name, NULL, 'N', 'Y'), nit_category
+                  INTO l_ft_flag, l_category
+                  FROM nm_inv_types
+                 WHERE     nit_inv_type = pi_obj_type
+                       AND NOT EXISTS
+                               (SELECT 1
+                                  FROM nm_nt_groupings
+                                 WHERE nng_group_type = pi_obj_type);
+            EXCEPTION
+                WHEN NO_DATA_FOUND
+                THEN
+                    NULL;
+            END;
+        END IF;
 
         IF l_ft_flag = 'Y' AND l_category = 'F'
         THEN
@@ -3217,7 +3351,7 @@ AS
                            AND NVL (nlt_gty_type, '¿$%^') =
                                NVL (ne_gty_group_type, '¿$%^')
                            AND nm_ne_id_in = pi_obj_id
-                           AND nm_obj_type = pi_obj_type
+                           AND nm_obj_type = NVL (pi_obj_type, nm_obj_type)
                     UNION ALL
                     SELECT nm_ne_id_of,
                            nlt_id,
@@ -3235,7 +3369,7 @@ AS
                            AND NVL (nlt_gty_type, '¿$%^') =
                                NVL (ne_gty_group_type, '¿$%^')
                            AND nm_ne_id_in = pi_obj_id
-                           AND nm_obj_type = pi_obj_type);
+                           AND nm_obj_type = NVL (pi_obj_type, nm_obj_type));
         END IF;
 
         RETURN retval;
