@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_get
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_get.pkb-arc   1.49   Jul 24 2018 10:50:12   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_get.pkb-arc   1.50   Jul 24 2018 15:34:22   Rob.Coupe  $
     --       Module Name      : $Workfile:   lb_get.pkb  $
-    --       Date into PVCS   : $Date:   Jul 24 2018 10:50:12  $
-    --       Date fetched Out : $Modtime:   Jul 24 2018 10:49:00  $
-    --       PVCS Version     : $Revision:   1.49  $
+    --       Date into PVCS   : $Date:   Jul 24 2018 15:34:22  $
+    --       Date fetched Out : $Modtime:   Jul 24 2018 15:33:30  $
+    --       PVCS Version     : $Revision:   1.50  $
     --
     --   Author : R.A. Coupe
     --
@@ -16,7 +16,7 @@ AS
     -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
     ----------------------------------------------------------------------------
     --
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.49  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.50  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'lb_get';
 
@@ -109,7 +109,7 @@ AS
         THEN
             IF p_obj_id IS NULL
             THEN
-                IF lb_rpt_tab_has_network (p_refnt_tab) = 'FALSE'
+                IF lb_ops.lb_rpt_tab_has_network (p_refnt_tab) = 'FALSE'
                 THEN
                     raise_application_error (
                         -20015,
@@ -153,7 +153,7 @@ AS
                     p_start_col    => l_nit_row.nit_lr_st_chain,
                     p_end_col      => l_nit_row.nit_lr_end_chain);
         ELSIF     p_refnt_tab IS NOT NULL
-              AND lb_rpt_tab_has_network (p_refnt_tab) = 'TRUE'
+              AND lb_ops.lb_rpt_tab_has_network (p_refnt_tab) = 'TRUE'
         THEN
             IF p_intsct = 'TRUE'
             THEN
