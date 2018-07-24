@@ -1,0 +1,79 @@
+CREATE OR REPLACE PACKAGE lb_ops
+AS
+    --   PVCS Identifiers :-
+    --
+    --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_ops.pkh-arc   1.8   Jul 24 2018 15:25:58   Rob.Coupe  $
+    --       Module Name      : $Workfile:   lb_ops.pkh  $
+    --       Date into PVCS   : $Date:   Jul 24 2018 15:25:58  $
+    --       Date fetched Out : $Modtime:   Jul 24 2018 15:25:18  $
+    --       PVCS Version     : $Revision:   1.8  $
+    --
+    --   Author : R.A. Coupe
+    --
+    --   Location Bridge package for loading LRS placements
+    --
+    -----------------------------------------------------------------------------
+    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
+    ----------------------------------------------------------------------------
+    --
+    g_sccsid         CONSTANT VARCHAR2 (2000) := '$Revision:   1.8  $';
+
+    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_ops';
+
+    FUNCTION get_version
+        RETURN VARCHAR2;
+
+    FUNCTION get_body_version
+        RETURN VARCHAR2;
+
+    FUNCTION RPt_intersection (p_Rpt1             lb_RPt_tab,
+                               p_Rpt2             lb_RPt_tab,
+                               p_cardinality   IN INTEGER)
+        RETURN lb_RPt_tab;
+
+    FUNCTION RPt_minus (p_Rpt1             lb_RPt_tab,
+                        p_Rpt2             lb_RPt_tab,
+                        p_cardinality   IN INTEGER)
+        RETURN lb_RPt_tab;
+
+    FUNCTION RPt_union (p_Rpt1             lb_RPt_tab,
+                        p_Rpt2             lb_RPt_tab,
+                        p_cardinality   IN INTEGER)
+        RETURN lb_RPt_tab;
+
+    FUNCTION merge_lb_rpt_tab (p_ne_id         IN INTEGER,
+                               p_obj_type      IN VARCHAR2,
+                               p_tab           IN lb_RPt_tab,
+                               p_cardinality   IN INTEGER)
+        RETURN lb_RPt_tab;
+
+    FUNCTION group_lb_rpt_tab (p_tab IN lb_RPt_Tab, p_cardinality IN INTEGER)
+        RETURN lb_RPt_tab;
+
+    FUNCTION is_contiguous (p_lb_rpt_tab IN lb_rpt_tab)
+        RETURN VARCHAR2;
+
+    FUNCTION normalize_rpt_tab (pi_rpt_tab IN lb_rpt_tab)
+        RETURN lb_rpt_tab;
+
+    FUNCTION translate_rpt_tab_units (pi_rpt_tab   IN lb_rpt_tab,
+                                      unit_out     IN INTEGER)
+        RETURN lb_rpt_tab;
+
+    FUNCTION normalize_xrpt_tab (pi_xrpt_tab IN lb_xrpt_tab)
+        RETURN lb_xrpt_tab;
+
+    FUNCTION translate_xrpt_tab_units (pi_xrpt_tab   IN lb_xrpt_tab,
+                                       unit_out      IN INTEGER)
+        RETURN lb_xrpt_tab;
+
+    FUNCTION explode_rpt_tab (pi_rpt_tab IN lb_rpt_tab)
+        RETURN lb_rpt_tab;
+
+    FUNCTION lb_rpt_tab_has_network (pi_rpt_tab IN lb_rpt_tab)
+        RETURN VARCHAR2;
+
+    FUNCTION check_lb_rpt_tab (pi_rpt_tab IN lb_rpt_tab)
+        RETURN VARCHAR2;
+END;
+/
