@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE lb_net_code
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_net_code.pkh-arc   1.1   Jul 11 2018 23:10:02   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_net_code.pkh-arc   1.2   Jul 24 2018 12:48:32   Rob.Coupe  $
     --       Module Name      : $Workfile:   lb_net_code.pkh  $
-    --       Date into PVCS   : $Date:   Jul 11 2018 23:10:02  $
-    --       Date fetched Out : $Modtime:   Jul 11 2018 23:09:42  $
-    --       PVCS Version     : $Revision:   1.1  $
+    --       Date into PVCS   : $Date:   Jul 24 2018 12:48:32  $
+    --       Date fetched Out : $Modtime:   Jul 24 2018 12:48:06  $
+    --       PVCS Version     : $Revision:   1.2  $
     --
     --   Author : R.A. Coupe
     --
@@ -16,9 +16,18 @@ AS
     -- Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
     ----------------------------------------------------------------------------
     --
-    g_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.1  $';
+    g_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.2  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'lb_net_code';
+	
+	
+    --
+    FUNCTION get_version
+        RETURN VARCHAR2;
+
+    FUNCTION get_body_version
+        RETURN VARCHAR2;
+
     
     FUNCTION lb_snap_xy_to_nw (pi_x          IN NUMBER,
                                pi_y          IN NUMBER,
