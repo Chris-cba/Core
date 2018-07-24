@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_ops
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_ops.pkb-arc   1.9   Jul 19 2018 10:59:52   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_ops.pkb-arc   1.10   Jul 24 2018 10:59:00   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_ops.pkb  $
-   --       Date into PVCS   : $Date:   Jul 19 2018 10:59:52  $
-   --       Date fetched Out : $Modtime:   Jul 19 2018 10:58:52  $
-   --       PVCS Version     : $Revision:   1.9  $
+   --       Date into PVCS   : $Date:   Jul 24 2018 10:59:00  $
+   --       Date fetched Out : $Modtime:   Jul 24 2018 10:57:52  $
+   --       PVCS Version     : $Revision:   1.10  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,7 +16,7 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated . All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.9  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.10  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_ops';
 
@@ -415,8 +415,8 @@ AS
    IS
       retval   lb_rpt_tab;
    BEGIN
-      SELECT lb_rpt (refnt,
-                     refnt_type,
+      SELECT lb_rpt (ne_id,
+                     nlt_id,
                      obj_type,
                      obj_id,
                      seg_id,
@@ -428,11 +428,38 @@ AS
         BULK COLLECT INTO retval
         FROM TABLE (pi_rpt_tab) t,
              nm_linear_types nlt,
-             nm_unit_conversions uc
-       WHERE     uc.uc_unit_id_in = t.m_unit
-             AND uc.uc_unit_id_out = nlt.nlt_units
-             AND nlt.nlt_id = t.refnt_type;
-
+             nm_unit_conversions uc,
+             nm_elements 
+       WHERE     uc.uc_unit_id_in = nvl(t.m_unit, nlt_units)
+             AND uc.uc_unit_id_out = nvl(t.m_unit, nlt.nlt_units)
+             AND nlt.nlt_id = nvl(t.refnt_type, nlt.nlt_id )
+             and nlt_nt_type = ne_nt_type
+             and NVL(ne_gty_group_type,'£$%^') = nvl(nlt_gty_type,'£$%^')
+             and ne_id = refnt
+             and refnt is not null
+             UNION ALL
+SELECT lb_rpt (refnt,
+                     nlt_id,
+                     obj_type,
+                     obj_id,
+                     seg_id,
+                     seq_id,
+                     dir_flag,
+                     start_m * uc.uc_conversion_factor,
+                     end_m * uc.uc_conversion_factor,
+                     uc.uc_unit_id_out)
+--        BULK COLLECT INTO retval
+        FROM TABLE (pi_rpt_tab) t,
+             nm_linear_types nlt,
+             nm_unit_conversions uc,
+             nm_inv_nw
+       WHERE     uc.uc_unit_id_in = nvl(t.m_unit, nlt_units)
+             AND uc.uc_unit_id_out = nvl(t.m_unit, nlt.nlt_units)
+             AND nlt.nlt_id = nvl(t.refnt_type, nlt.nlt_id )
+             and nlt_nt_type = nin_nw_type
+             and refnt is null
+             and obj_type = nin_nit_inv_code
+             and obj_type is not null and refnt is null;             
       --
       RETURN retval;
    END;
@@ -443,6 +470,10 @@ AS
    IS
       retval   lb_rpt_tab;
    BEGIN
+      if unit_out is NULL then
+         raise_application_error(-200017, 'A unit must be specified');
+      end if;
+--      
       SELECT lb_rpt (refnt,
                      refnt_type,
                      obj_type,
