@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_nw_edit
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_nw_edit.pkb-arc   1.6   Jul 23 2018 21:55:40   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_nw_edit.pkb-arc   1.7   Jul 24 2018 17:48:52   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_nw_edit.pkb  $
-   --       Date into PVCS   : $Date:   Jul 23 2018 21:55:40  $
-   --       Date fetched Out : $Modtime:   Jul 23 2018 21:39:20  $
-   --       PVCS Version     : $Revision:   1.6  $
+   --       Date into PVCS   : $Date:   Jul 24 2018 17:48:52  $
+   --       Date fetched Out : $Modtime:   Jul 24 2018 17:47:24  $
+   --       PVCS Version     : $Revision:   1.7  $
    --
    --   Author : R.A. Coupe
    --
@@ -17,13 +17,15 @@ AS
    ----------------------------------------------------------------------------
    --
 
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.6  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.7  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_get';
 
    PROCEDURE adjust_aggregates (p_ne               IN INTEGER,
                                 p_effective_date   IN DATE,
                                 p_transaction_id   IN INTEGER);
+
+   PROCEDURE remove_transaction (p_transaction_id IN INTEGER);
 
    --
    FUNCTION get_version
@@ -856,6 +858,10 @@ AS
        WHERE neh_id = p_neh_id;
 
       lb_undo (p_transaction_id => l_transaction_id);
+   EXCEPTION
+      WHEN NO_DATA_FOUND
+      THEN
+         NULL; -- undo ops can make a few references to the delete neh and each s preceded by a call to the lb remove transaction data
    END;
 
    --
@@ -871,6 +877,10 @@ AS
       GROUP BY transaction_id;
 
       lb_undo (p_transaction_id => l_transaction_id);
+   EXCEPTION
+      WHEN NO_DATA_FOUND
+      THEN
+         NULL; -- undo ops can make a few references to the delete neh and each s preceded by a call to the lb remove transaction data
    END;
 
    --
@@ -895,6 +905,8 @@ AS
         FROM nm_element_history e, lb_element_history l
        WHERE e.neh_id = l.neh_id AND l.transaction_id = p_transaction_id;
 
+      nm_debug.debug_on;
+
       IF l_edit_tab (1).t_op = c_split
       THEN
          lb_unsplit (l_edit_tab);
@@ -906,8 +918,16 @@ AS
          lb_unreplace (l_edit_tab);
       ELSIF l_edit_tab (1).t_op = c_close
       THEN
+         nm_debug.debug ('Unclose');
          lb_unclose (l_edit_tab);
       END IF;
+
+      nm_debug.debug ('transaction = ' || p_transaction_id);
+      remove_transaction (p_transaction_id);
+   EXCEPTION
+      WHEN NO_DATA_FOUND
+      THEN
+         NULL; -- undo ops can make a few references to the delete neh and each s preceded by a call to the lb remove transaction data
    END;
 
    PROCEDURE generate_datum_geoms (p_transaction_id   IN INTEGER,
@@ -1209,8 +1229,20 @@ AS
                                      p_effective_date);
       END LOOP;
    EXCEPTION
-      WHEN NO_DATA_FOUND 
-	  THEN NULL;
+      WHEN NO_DATA_FOUND
+      THEN
+         NULL;
+   END;
+
+   PROCEDURE remove_transaction (p_transaction_id IN INTEGER)
+   IS
+   BEGIN
+      DELETE FROM LB_ELEMENT_HISTORY
+            WHERE transaction_id = p_transaction_id;
+   EXCEPTION
+      WHEN NO_DATA_FOUND
+      THEN
+         NULL;
    END;
 END;
 /
