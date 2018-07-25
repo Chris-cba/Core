@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3split IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3split.pkb-arc   2.21   May 30 2018 15:59:30   Chris.Baugh  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3split.pkb-arc   2.22   Jul 25 2018 23:01:28   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3split.pkb  $
---       Date into PVCS   : $Date:   May 30 2018 15:59:30  $
---       Date fetched Out : $Modtime:   May 30 2018 15:57:46  $
---       PVCS Version     : $Revision:   2.21  $
+--       Date into PVCS   : $Date:   Jul 25 2018 23:01:28  $
+--       Date fetched Out : $Modtime:   Jul 25 2018 23:01:00  $
+--       PVCS Version     : $Revision:   2.22  $
 --
 --
 --   Author : ITurnbull
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3split IS
 -- 03.06.08 PT added p_no_purpose parameter throughout where node is created.
 
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.21  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.22  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(2000) := 'nm3split';
@@ -541,16 +541,6 @@ BEGIN
    g_transaction_id := next_transaction_id;
    
    nm_debug.debug('Transaction_id = '||g_transaction_id||', now start lb_split procedure' );
-   
-   if HIG.IS_PRODUCT_LICENSED('LB') then
-      declare
-         l_block varchar2(2000);
-      begin 
-         l_block := 'begin lb_nw_edit.lb_split(:p_ne_id, :p_ne_length_1, :p_ne_id_1, :p_ne_id_2, :p_effective_date, :g_transaction_id); end; ';
---
-         execute immediate l_block using p_ne_id, p_ne_length_1, p_ne_id_1, p_ne_id_2, p_effective_date, g_transaction_id;
-      end;
-   end if;
               
    -- update the element history
    DECLARE
@@ -583,6 +573,7 @@ BEGIN
       --insert history for second new element
       --Nm3merge.ins_neh (l_rec_neh);
       nm3nw_edit.ins_neh(l_rec_neh); --CWS 0108990 12/03/2010
+      
       if HIG.IS_PRODUCT_LICENSED('LB') then
          execute immediate 'begin lb_nw_edit.log_transaction( :g_transaction_id, :neh_id ); end; ' using g_transaction_id, l_rec_neh.neh_id;
       end if;
@@ -1342,6 +1333,19 @@ BEGIN
                  ,p_split_measure  => l_split_measure
                  ,p_effective_date => p_effective_date
                  );
+                 
+   
+   if HIG.IS_PRODUCT_LICENSED('LB') then
+      declare
+         l_block varchar2(2000);
+      begin 
+         l_block := 'begin lb_nw_edit.lb_split(:p_ne_id, :p_ne_length_1, :p_ne_id_1, :p_ne_id_2, :p_effective_date, :g_transaction_id); end; ';
+--       nm_debug.debug('ne='||p_ne_id||', length='||p_ne_length_1||', ne1 = '||p_ne_id_1||', ne2 => '||p_ne_id_2||', trans = '||g_transaction_id );
+         execute immediate l_block using p_ne_id, l_split_measure, p_ne_id_1, p_ne_id_2, p_effective_date, g_transaction_id;
+      end;
+   end if;
+
+                 
 --
    split_other_products (p_ne_id          => p_ne_id
                         ,p_ne_id_1        => p_ne_id_1
