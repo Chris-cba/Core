@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3recal IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3recal.pkb-arc   2.11   Apr 16 2018 09:23:16   Gaurav.Gaurkar  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3recal.pkb-arc   2.12   Jul 25 2018 22:56:22   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3recal.pkb  $
---       Date into PVCS   : $Date:   Apr 16 2018 09:23:16  $
---       Date fetched Out : $Modtime:   Apr 16 2018 09:04:32  $
---       PVCS Version     : $Revision:   2.11  $
+--       Date into PVCS   : $Date:   Jul 25 2018 22:56:22  $
+--       Date fetched Out : $Modtime:   Jul 25 2018 22:55:50  $
+--       PVCS Version     : $Revision:   2.12  $
 --
 --
 --   Author : Jonathan Mills
@@ -25,7 +25,7 @@ CREATE OR REPLACE PACKAGE BODY nm3recal IS
   PT 05.12.07 mairecal.recal_data() brough in line with the others in recalibrate_other_products()
 */
 
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.11  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.12  $"';
    g_package_name    CONSTANT  varchar2(30) := 'nm3recal';
 --
    g_tab_rec_nm      nm3type.tab_rec_nm;
@@ -151,7 +151,7 @@ PROCEDURE recalibrate_section (pi_ne_id             IN nm_elements.ne_id%TYPE
    l_ne_row nm_elements%rowtype;
 --
 BEGIN
-  nm_debug.debug_on;
+--  nm_debug.debug_on;
 
    nm_debug.proc_start(g_package_name,'recalibrate_section');
    
@@ -169,12 +169,14 @@ BEGIN
          --raise_application_error(-20902, 'You may not change this record');
    END IF;
 
+  --nm_debug.debug('check LB op = '||'B ne = '||pi_ne_id||', start = 0, start_m = '||pi_begin_mp||', shift = 0, p_length = l_new_length');
+
    if HIG.IS_PRODUCT_LICENSED('LB') then
       declare
          l_block varchar2(2000);
       begin
          l_block := 'BEGIN LB_NW_EDIT.CHECK_OPERATION(:p_op, :p_ne1, :p_ne2, :p_start_m, :p_shift_m, :p_effective_date, :p_length ); end; ';
-         execute immediate l_block using 'B', pi_ne_id, 0, pi_begin_mp, 0, trunc(sysdate), 0;
+         execute immediate l_block using 'B', pi_ne_id, 0, pi_begin_mp, 0, trunc(sysdate), l_new_length;
       end;
    end if;
   
@@ -226,7 +228,7 @@ BEGIN
     
     l_length_ratio := pi_new_length_to_end / l_old_length_to_end;
     
-  
+/*  
   nm_debug.debug(
       'pi_ne_id='||pi_ne_id
   ||', pi_begin_mp='||pi_begin_mp
@@ -236,7 +238,7 @@ BEGIN
   ||', l_old_length_to_end='||l_old_length_to_end
   ||', l_length_ratio='||l_length_ratio
   ||')');
-    
+*/    
 --
    IF l_old_length_to_end = pi_new_length_to_end
     THEN
@@ -311,7 +313,7 @@ BEGIN
       declare
          l_block varchar2(2000);
       begin 
-         l_block := 'begin lb_nw_edit.lb_reclaibrate(:p_ne, :p_original_length, :p_start_m, :p_new_length_to_end, :p_transaction_id); end; ';
+         l_block := 'begin lb_nw_edit.lb_recalibrate(:p_ne, :p_original_length, :p_start_m, :p_new_length_to_end, :p_transaction_id); end; ';
 --
          execute immediate l_block using pi_ne_id, g_element_length, g_recal_begin_mp, g_recal_new_length_to_end, g_transaction_id;
       end;
@@ -553,12 +555,14 @@ BEGIN
                    );
    END IF;
    
+--   nm_debug.debug('check LB op = '||'H ne = '||pi_ne_id||', start = 0, start_m = '||pi_begin_mp||', shift = '||pi_shift_distance||', p_length = '||nm3net.get_ne_length(pi_ne_id));
+   
    if HIG.IS_PRODUCT_LICENSED('LB') then
       declare
          l_block varchar2(2000);
       begin
          l_block := 'BEGIN LB_NW_EDIT.CHECK_OPERATION(:p_op, :p_ne1, :p_ne2, :p_start_m, :p_shift_m, :p_effective_date, :p_length ); end; ';
-         execute immediate l_block using 'H', pi_ne_id, 0, pi_begin_mp, pi_shift_distance, trunc(sysdate), 0;
+         execute immediate l_block using 'H', pi_ne_id, 0, pi_begin_mp, pi_shift_distance, trunc(sysdate), nm3net.get_ne_length(pi_ne_id);
       end;
    end if;
 
