@@ -1,11 +1,11 @@
 ----------------------------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm_4700_fix59.sql-arc   1.4   Jul 10 2018 14:39:04   Chris.Baugh  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm_4700_fix59.sql-arc   1.5   Jul 25 2018 11:53:04   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm_4700_fix59.sql  $ 
---       Date into PVCS   : $Date:   Jul 10 2018 14:39:04  $
---       Date fetched Out : $Modtime:   Jul 10 2018 14:38:28  $
---       Version     	  : $Revision:   1.4  $
+--       Date into PVCS   : $Date:   Jul 25 2018 11:53:04  $
+--       Date fetched Out : $Modtime:   Jul 25 2018 11:52:20  $
+--       Version     	  : $Revision:   1.5  $
 --
 ----------------------------------------------------------------------------------------------------
 --   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
@@ -199,7 +199,7 @@ BEGIN
 	--
 	hig2.upgrade(p_product        => 'NET'
 				,p_upgrade_script => 'log_nm_4700_fix59.sql'
-				,p_remarks        => 'NET 4700 FIX 59 (Build 3)'
+				,p_remarks        => 'NET 4700 FIX 59 (Build 4)'
 				,p_to_version     => NULL
 				);
 	--
