@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3close AS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3close.pkb-arc   2.20   Apr 16 2018 09:22:14   Gaurav.Gaurkar  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3close.pkb-arc   2.21   Jul 25 2018 23:04:48   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3close.pkb  $
---       Date into PVCS   : $Date:   Apr 16 2018 09:22:14  $
---       Date fetched Out : $Modtime:   Apr 16 2018 08:57:42  $
---       PVCS Version     : $Revision:   2.20  $
+--       Date into PVCS   : $Date:   Jul 25 2018 23:04:48  $
+--       Date fetched Out : $Modtime:   Jul 25 2018 23:04:26  $
+--       PVCS Version     : $Revision:   2.21  $
 --
 --
 --   Author : I Turnbull
@@ -21,7 +21,7 @@ CREATE OR REPLACE PACKAGE BODY nm3close AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.20  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.21  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3close';
@@ -109,6 +109,7 @@ BEGIN
 --
   nm3nw_edit.ins_neh(l_rec_neh); --CWS 0108990 12/03/2010
   
+  nm_debug.debug('Transaction = '||g_transaction_id);
   if HIG.IS_PRODUCT_LICENSED('LB') then
      execute immediate 'begin lb_nw_edit.log_transaction( :g_transaction_id, :neh_id ); end; ' using g_transaction_id, l_rec_neh.neh_id;
   end if;
@@ -549,10 +550,6 @@ BEGIN
       END;
       --
 --
-      UPDATE NM_ELEMENTS
-      SET ne_end_date = p_effective_date
-      WHERE ne_id = p_ne_id;
---
       g_transaction_id := next_transaction_id;
 
       insert_nm_element_history( p_ne_id
@@ -560,8 +557,7 @@ BEGIN
                                , p_neh_descr --CWS 0108990 12/03/2010
                                );
      -- Insert the stored NM_MEMBER_HISTORY records
-     nm3merge.ins_nmh;
-     
+
      if HIG.IS_PRODUCT_LICENSED('LB') then
         declare
            l_block varchar2(2000);
@@ -572,6 +568,13 @@ BEGIN
         end;
      end if;                            
       
+     
+      UPDATE NM_ELEMENTS
+      SET ne_end_date = p_effective_date
+      WHERE ne_id = p_ne_id;
+     
+     nm3merge.ins_nmh;
+     
  
       close_other_products ( p_ne_id
                             ,p_effective_date
