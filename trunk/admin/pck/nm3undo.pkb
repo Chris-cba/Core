@@ -4,11 +4,11 @@ IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3undo.pkb-arc   2.35   Apr 16 2018 09:23:42   Gaurav.Gaurkar  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3undo.pkb-arc   2.36   Jul 25 2018 23:07:34   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3undo.pkb  $
---       Date into PVCS   : $Date:   Apr 16 2018 09:23:42  $
---       Date fetched Out : $Modtime:   Apr 16 2018 09:06:20  $
---       PVCS Version     : $Revision:   2.35  $
+--       Date into PVCS   : $Date:   Jul 25 2018 23:07:34  $
+--       Date fetched Out : $Modtime:   Jul 25 2018 23:07:14  $
+--       PVCS Version     : $Revision:   2.36  $
 --
 --   Author : ITurnbull
 --
@@ -19,7 +19,7 @@ IS
 -- Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '"$Revision:   2.35  $"';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '"$Revision:   2.36  $"';
 --  g_body_sccsid is the SCCS ID for the package body
    g_package_name   CONSTANT VARCHAR2 (2000) := 'nm3undo';
 --
@@ -2210,6 +2210,11 @@ END undo_scheme;
       UPDATE nm_elements_all
          SET ne_end_date = NULL
        WHERE ne_id = p_ne_id;
+       
+         if hig.is_product_licensed('LB') then
+            EXECUTE IMMEDIATE 'BEGIN lb_nw_edit.lb_undo(p_ne_id => :l_ne_id_1 ); END; ' USING p_ne_id;
+         end if;
+       
 --
 --  Remove element close history
 --
