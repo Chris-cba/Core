@@ -18,11 +18,11 @@ AS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid                 : $Header:   //new_vm_latest/archives/lb/admin/views/v_nm_element_xsp.vw-arc   1.0   Mar 02 2018 16:20:24   Rob.Coupe  $
+--       pvcsid                 : $Header:   //new_vm_latest/archives/lb/admin/views/v_nm_element_xsp.vw-arc   1.1   Jul 26 2018 19:02:38   Rob.Coupe  $
 --       Module Name      : $Workfile:   v_nm_element_xsp.vw  $
---       Date into PVCS   : $Date:   Mar 02 2018 16:20:24  $
---       Date fetched Out : $Modtime:   Mar 02 2018 16:19:16  $
---       PVCS Version     : $Revision:   1.0  $
+--       Date into PVCS   : $Date:   Jul 26 2018 19:02:38  $
+--       Date fetched Out : $Modtime:   Jul 26 2018 19:01:36  $
+--       PVCS Version     : $Revision:   1.1  $
 --
 --   Author : Rob Coupe
 --
@@ -36,7 +36,7 @@ AS
            'S'             xsp_ne_type,
            ne_nt_type      xsp_ne_nt_type,
            ne_id           xsp_group_id,
-           nng_group_type  xsp_group_type,
+           ngt_group_type  xsp_group_type,
            ngt_nt_type,
            nwx_nsc_sub_class,
            nwx_x_sect,
@@ -44,17 +44,15 @@ AS
            'Inherited XSP' XSP_inheritance
       FROM nm_elements  ne,
            nm_members,
-           nm_nt_groupings_all,
            nm_group_types,
            nm_nw_xsp
-     WHERE     nng_group_type = ngt_group_type
-           AND nwx_nw_type = ngt_nt_type
+     WHERE     nwx_nw_type = ngt_nt_type
            AND nm_ne_id_in = ne_id
            AND ngt_group_type = nm_obj_type
            AND ngt_nt_type = nwx_nw_type
            AND nm_type = 'G'
            AND ngt_linear_flag = 'Y'
-           AND ne_gty_group_type = nng_group_type
+           AND ne_gty_group_type = nm_obj_type
            AND ne_sub_class = nwx_nsc_sub_class
     UNION ALL
     SELECT  /*+INDEX(ne ne_pkxxx) */
