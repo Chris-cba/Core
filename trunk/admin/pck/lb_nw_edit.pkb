@@ -1,13 +1,12 @@
-/* Formatted on 25/07/2018 18:26:15 (QP5 v5.326) */
-CREATE OR REPLACE PACKAGE BODY RTD.lb_nw_edit
+CREATE OR REPLACE PACKAGE BODY lb_nw_edit
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_nw_edit.pkb-arc   1.8   Jul 26 2018 08:52:10   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_nw_edit.pkb-arc   1.9   Jul 26 2018 13:35:52   Rob.Coupe  $
     --       Module Name      : $Workfile:   lb_nw_edit.pkb  $
-    --       Date into PVCS   : $Date:   Jul 26 2018 08:52:10  $
-    --       Date fetched Out : $Modtime:   Jul 26 2018 08:51:16  $
-    --       PVCS Version     : $Revision:   1.8  $
+    --       Date into PVCS   : $Date:   Jul 26 2018 13:35:52  $
+    --       Date fetched Out : $Modtime:   Jul 26 2018 13:35:32  $
+    --       PVCS Version     : $Revision:   1.9  $
     --
     --   Author : R.A. Coupe
     --
@@ -18,7 +17,7 @@ AS
     ----------------------------------------------------------------------------
     --
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.8  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.9  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'lb_get';
 
