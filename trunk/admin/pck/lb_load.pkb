@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_load
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_load.pkb-arc   1.30   Feb 06 2018 17:41:48   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_load.pkb-arc   1.31   Jul 26 2018 09:00:28   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_load.pkb  $
-   --       Date into PVCS   : $Date:   Feb 06 2018 17:41:48  $
-   --       Date fetched Out : $Modtime:   Feb 06 2018 17:40:12  $
-   --       PVCS Version     : $Revision:   1.30  $
+   --       Date into PVCS   : $Date:   Jul 26 2018 09:00:28  $
+   --       Date fetched Out : $Modtime:   Jul 26 2018 08:59:50  $
+   --       PVCS Version     : $Revision:   1.31  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,7 +16,7 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.30  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.31  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_load';
 
@@ -152,6 +152,8 @@ AS
       l_reverse       INTEGER := 1;
       l_start_m         NUMBER := pi_start_m;
       l_end_m          NUMBER := pi_end_m;  
+      l_min_start_m    NUMBER;
+      l_max_end_m      NUMBER;
    BEGIN
       --
       IF pi_g_i_d IS NULL
@@ -192,8 +194,12 @@ AS
 
       SELECT l_start_m * NVL (uc_conversion_factor, 1),
              l_end_m * NVL (uc_conversion_factor, 1),
-             nlt_units
-        INTO l_start, l_end, l_unit
+             nlt_units,              
+             case when ne_gty_group_type is NOT NULL then 
+                 ( select min(nm_slk) from nm_members where nm_ne_id_in = pi_refnt ) else 0 end min_start_m,
+             case when ne_gty_group_type is NOT NULL then 
+             ( select min(nm_slk) from nm_members where nm_ne_id_in = pi_refnt ) else ne_length end max_end_m
+        INTO l_start, l_end, l_unit, l_min_start_m, l_max_end_m
         FROM nm_unit_conversions, nm_linear_types, nm_elements
        WHERE     nlt_units = uc_unit_id_out
              AND uc_unit_id_in = pi_unit
@@ -201,13 +207,21 @@ AS
              AND nlt_nt_type = ne_nt_type
              AND NVL (ne_gty_group_type, '%^&*') = NVL (nlt_gty_type, '%^&*')
       UNION
-      SELECT l_start_m, l_end_m, nlt_units
+      SELECT l_start_m, l_end_m, nlt_units,
+             case when ne_gty_group_type is NOT NULL then 
+                 ( select min(nm_slk) from nm_members where nm_ne_id_in = pi_refnt ) else 0 end min_start_m,
+             case when ne_gty_group_type is NOT NULL then 
+             ( select min(nm_slk) from nm_members where nm_ne_id_in = pi_refnt ) else ne_length end max_end_m      
         FROM nm_linear_types, nm_elements
        WHERE     nlt_units = pi_unit
              AND ne_id = pi_refnt
              AND nlt_nt_type = ne_nt_type
              AND NVL (ne_gty_group_type, '%^&*') = NVL (nlt_gty_type, '%^&*');
 
+      if l_start_m < l_min_start_m OR
+         l_end_m > l_max_end_m then
+           raise_application_error(-20002, 'The range measures must be within the measures of the referent');
+      end if;
       --
       IF l_g_i_d = 'D'
       THEN
