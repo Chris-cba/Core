@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_get
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_get.pkb-arc   1.50   Jul 24 2018 15:34:22   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_get.pkb-arc   1.51   Jul 27 2018 17:19:14   Rob.Coupe  $
     --       Module Name      : $Workfile:   lb_get.pkb  $
-    --       Date into PVCS   : $Date:   Jul 24 2018 15:34:22  $
-    --       Date fetched Out : $Modtime:   Jul 24 2018 15:33:30  $
-    --       PVCS Version     : $Revision:   1.50  $
+    --       Date into PVCS   : $Date:   Jul 27 2018 17:19:14  $
+    --       Date fetched Out : $Modtime:   Jul 27 2018 17:17:52  $
+    --       PVCS Version     : $Revision:   1.51  $
     --
     --   Author : R.A. Coupe
     --
@@ -16,9 +16,11 @@ AS
     -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
     ----------------------------------------------------------------------------
     --
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.50  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.51  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'lb_get';
+    
+    g_tol            NUMBER   := 0.00000001;
 
     --
     -----------------------------------------------------------------------------
@@ -157,6 +159,8 @@ AS
         THEN
             IF p_intsct = 'TRUE'
             THEN
+            nm_debug.debug_on;
+            nm_debug.debug('intersect using tolerance of '||g_tol);
                 SELECT lb_ops.rpt_intersection (rpt_tab, p_refnt_tab, 20)
                   INTO retval
                   FROM (SELECT CAST (COLLECT (rpt) AS lb_rpt_tab)     rpt_tab
@@ -197,14 +201,14 @@ AS
                                                'DD-MON-YYYY')
                                        AND nal_id = nm_ne_id_in
                                        AND nm_ne_id_of = refnt
-                                       AND (   (    nm_begin_mp < t.end_m
-                                                AND nm_end_mp > t.start_m)
+                                       AND (   (    nm_begin_mp < t.end_m + g_tol
+                                                AND nm_end_mp > t.start_m - g_tol)
                                             OR (    nm_begin_mp = nm_end_mp
-                                                AND nm_begin_mp BETWEEN t.start_m
-                                                                    AND t.end_m)
+                                                AND nm_begin_mp BETWEEN t.start_m - g_tol
+                                                                    AND t.end_m + g_tol)
                                             OR (    t.start_m = t.end_m
-                                                AND nm_begin_mp <= t.end_m
-                                                AND nm_end_mp >= t.start_m))
+                                                AND nm_begin_mp <= t.end_m + g_tol
+                                                AND nm_end_mp >= t.start_m - g_tol))
                                        AND (       p_whole_only = 'TRUE'
                                                AND (    NOT EXISTS
                                                             (SELECT 1
@@ -266,11 +270,11 @@ AS
                                        AND (   (    nm_begin_mp < t.end_m
                                                 AND nm_end_mp > t.start_m)
                                             OR (    nm_begin_mp = nm_end_mp
-                                                AND nm_begin_mp BETWEEN t.start_m
-                                                                    AND t.end_m)
+                                                AND nm_begin_mp BETWEEN t.start_m - g_tol
+                                                                    AND t.end_m + g_tol)
                                             OR (    t.start_m = t.end_m
-                                                AND nm_begin_mp <= t.end_m
-                                                AND nm_end_mp >= t.start_m))
+                                                AND nm_begin_mp <= t.end_m + g_tol
+                                                AND nm_end_mp >= t.start_m - g_tol ))
                                        AND (       p_whole_only = 'TRUE'
                                                AND (    NOT EXISTS
                                                             (SELECT 1
@@ -347,16 +351,16 @@ AS
                                                             t.start_m)
                                                     OR (    c.nm_begin_mp =
                                                             nm_end_mp
-                                                        AND c.nm_begin_mp BETWEEN t.start_m
-                                                                              AND t.end_m)
+                                                        AND c.nm_begin_mp BETWEEN t.start_m - g_tol
+                                                                              AND t.end_m + g_tol)
                                                     OR (    t.start_m IS NULL
                                                         AND t.end_m IS NULL)
                                                     OR (    t.start_m =
                                                             t.end_m
                                                         AND nm_begin_mp <=
-                                                            t.end_m
+                                                            t.end_m + g_tol
                                                         AND nm_end_mp >=
-                                                            t.start_m))
+                                                            t.start_m - g_tol))
                                                AND (       p_whole_only =
                                                            'TRUE'
                                                        AND (    NOT EXISTS
@@ -1065,14 +1069,14 @@ AS
         l_start_m number;
         l_end_m   number;
         l_tol     number;
-        
+
     function get_unit_tolerance(pi_unit_id in integer) return number is
     retval number;
     begin
        retval := NM3UNIT.GET_TOL_FROM_UNIT_MASK(pi_unit_id);
        return retval;
     end;
---       
+--
     BEGIN
         IF p_refnt IS NOT NULL
         THEN
@@ -1143,13 +1147,14 @@ AS
             nm_debug.debug ('route based');
             l_start_m := p_start_m;
             l_end_m   := p_end_m;
---            
+--
             if l_start_m = l_end_m then
-              l_tol     := get_unit_tolerance(l_units)/10;
-              l_start_m := l_start_m - l_tol;
-              l_end_m   := l_end_m + l_tol;
+              g_tol     := get_unit_tolerance(l_units);
+              nm3ctx.set_context('LB_TOLERANCE', to_char(g_tol));
+--              l_start_m := l_start_m - l_tol;
+--              l_end_m   := l_end_m + l_tol;
             end if;
-              
+
             SELECT get_obj_RPt_tab (
                        get_lb_rpt_d_tab (lb_ops.normalize_rpt_tab (
                                              lb_rpt_tab (
@@ -1249,7 +1254,7 @@ AS
                             AND nm_end_mp >= p_start_m)
                         OR (p_start_m < nm_end_mp AND p_end_m > nm_begin_mp)
                         OR (p_start_m IS NULL AND p_end_m IS NULL));
-                           
+
             -- just based on type
 --            END IF;
         END IF;
