@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_ops
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_ops.pkb-arc   1.11   Jul 24 2018 15:28:52   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_ops.pkb-arc   1.12   Jul 27 2018 17:14:10   Rob.Coupe  $
     --       Module Name      : $Workfile:   lb_ops.pkb  $
-    --       Date into PVCS   : $Date:   Jul 24 2018 15:28:52  $
-    --       Date fetched Out : $Modtime:   Jul 24 2018 15:28:20  $
-    --       PVCS Version     : $Revision:   1.11  $
+    --       Date into PVCS   : $Date:   Jul 27 2018 17:14:10  $
+    --       Date fetched Out : $Modtime:   Jul 27 2018 17:13:08  $
+    --       PVCS Version     : $Revision:   1.12  $
     --
     --   Author : R.A. Coupe
     --
@@ -16,9 +16,13 @@ AS
     -- Copyright (c) 2015 Bentley Systems Incorporated . All rights reserved.
     ----------------------------------------------------------------------------
     --
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.11  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.12  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'lb_ops';
+
+    g_tol                     NUMBER
+        := NVL (TO_NUMBER (SYS_CONTEXT ('NM3SQL', 'LB_TOLERANCE')), 0.000005);
+    g_rnd                     INTEGER := ABS (ROUND (LOG (10, g_tol)));
 
     --
     -----------------------------------------------------------------------------
@@ -57,7 +61,35 @@ AS
         WITH
             lrs_intsct
             AS
-                (SELECT t1.*, t2.start_m start_m2, t2.end_m end_m2
+                (SELECT t1.*,
+                        t2.start_m
+                            start_m2,
+                        t2.end_m
+                            end_m2,
+                        CASE
+                            WHEN ABS (t2.start_m - t2.end_m) < g_tol
+                            THEN                 -- It is a point intersection
+                                'POINT'
+                            ELSE
+                                'LINE'
+                        END
+                            porl,
+                        (SELECT NVL (
+                                    LENGTH (SUBSTR (fm, INSTR (fm, '.') + 1)),
+                                    0)
+                           FROM (SELECT u.*,
+                                        CASE
+                                            WHEN INSTR (un_format_mask, '.') =
+                                                 0
+                                            THEN
+                                                un_format_mask || '.'
+                                            ELSE
+                                                un_format_mask
+                                        END
+                                            fm
+                                   FROM nm_units u
+                                  WHERE un_unit_id = t1.m_unit) u1)
+                            rnd
                    FROM TABLE (p_Rpt1) t1, TABLE (p_Rpt2) t2
                   WHERE     t1.refnt = t2.refnt
                         AND (   (    t1.start_m = t1.end_m
@@ -67,18 +99,40 @@ AS
                                  AND t1.start_m < t2.end_m
                                  AND t1.end_m > t2.start_m)
                              OR (    t2.start_m = t2.end_m
-                                 AND t1.start_m <= t2.end_m
-                                 AND t1.end_m >= t2.start_m)))
-        SELECT lb_RPt (refnt,
-                       refnt_type,
-                       obj_type,
-                       obj_id,
-                       seg_id,
-                       seq_id,
-                       dir_flag,
-                       GREATEST (start_m, start_m2),
-                       LEAST (end_m, end_m2),
-                       m_unit)
+                                 AND t1.start_m <= t2.end_m + g_tol
+                                 AND t1.end_m >= t2.start_m - g_tol)))
+        SELECT lb_RPt (
+                   refnt,
+                   refnt_type,
+                   obj_type,
+                   obj_id,
+                   seg_id,
+                   seq_id,
+                   dir_flag,
+                   --                       case when porl = 'POINT'  then   -- point intersection
+                   --                         case when abs(start_m - start_m2) < g_tol then start_m
+                   --                         else start_m
+                   --                         end
+                   --                       else
+                   CASE
+                       WHEN ABS (start_m - start_m2) < g_tol THEN start_m
+                       ELSE ROUND (GREATEST (start_m, start_m2), rnd)
+                   --                         end
+                   END,
+                   --                       case when porl = 'POINT'  then   -- point intersection
+                   --                         case when abs(end_m - end_m2) < g_tol then start_m
+                   --                         else  end_m
+                   --                         end
+                   --                       else
+                   CASE
+                       WHEN ABS (end_m - end_m2) < g_tol THEN end_m
+                       ELSE ROUND (LEAST (end_m, end_m2), 
+                       
+                       
+                       rnd)
+                   --                         end
+                   END,
+                   m_unit)
           BULK COLLECT INTO retval
           FROM lrs_intsct;
 
@@ -438,7 +492,7 @@ AS
                 -20019,
                 'You must specify a network referent or referent type');
         END IF;
-    
+
         SELECT lb_rpt (ne_id,
                        nlt_id,
                        obj_type,
@@ -458,8 +512,8 @@ AS
                AND uc.uc_unit_id_out = nlt.nlt_units
                AND nlt.nlt_id = NVL (t.refnt_type, nlt.nlt_id)
                AND nlt_nt_type = ne_nt_type
-               AND NVL (ne_gty_group_type, '£$%^') =
-                   NVL (nlt_gty_type, '£$%^')
+               AND NVL (ne_gty_group_type, 'Â£$%^') =
+                   NVL (nlt_gty_type, 'Â£$%^')
                AND ne_id = refnt
                AND m_unit IS NOT NULL
         UNION ALL
@@ -481,8 +535,8 @@ AS
                AND uc.uc_unit_id_out = NVL (t.m_unit, nlt.nlt_units)
                AND nlt.nlt_id = NVL (t.refnt_type, nlt.nlt_id)
                AND nlt_nt_type = ne_nt_type
-               AND NVL (ne_gty_group_type, '£$%^') =
-                   NVL (nlt_gty_type, '£$%^')
+               AND NVL (ne_gty_group_type, 'Â£$%^') =
+                   NVL (nlt_gty_type, 'Â£$%^')
                AND ne_id = refnt
                AND refnt IS NOT NULL
                AND m_unit IS NULL
@@ -584,8 +638,8 @@ AS
                AND uc.uc_unit_id_out = unit_out
                AND ne_id = refnt
                AND nlt_nt_type = ne_nt_type
-               AND NVL (nlt_gty_type, '�$%^') =
-                   NVL (ne_gty_group_type, '�$%^')
+               AND NVL (nlt_gty_type, '£$%^') =
+                   NVL (ne_gty_group_type, '£$%^')
                AND m_unit IS NULL
                AND refnt_type IS NULL
                AND refnt IS NOT NULL;
@@ -599,7 +653,6 @@ AS
     IS
         retval   lb_xrpt_tab;
     BEGIN
-    
         SELECT lb_xrpt (refnt,
                         refnt_type,
                         obj_type,
