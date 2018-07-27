@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_get
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_get.pkb-arc   1.51   Jul 27 2018 17:19:14   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_get.pkb-arc   1.52   Jul 27 2018 17:27:40   Rob.Coupe  $
     --       Module Name      : $Workfile:   lb_get.pkb  $
-    --       Date into PVCS   : $Date:   Jul 27 2018 17:19:14  $
-    --       Date fetched Out : $Modtime:   Jul 27 2018 17:17:52  $
-    --       PVCS Version     : $Revision:   1.51  $
+    --       Date into PVCS   : $Date:   Jul 27 2018 17:27:40  $
+    --       Date fetched Out : $Modtime:   Jul 27 2018 17:26:34  $
+    --       PVCS Version     : $Revision:   1.52  $
     --
     --   Author : R.A. Coupe
     --
@@ -16,7 +16,7 @@ AS
     -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
     ----------------------------------------------------------------------------
     --
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.51  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.52  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'lb_get';
     
@@ -1062,6 +1062,55 @@ AS
                              p_cardinality   IN INTEGER)
         RETURN lb_RPt_tab
     IS
+--------------------------------------------------------------------------------
+/*
+Function lb_get.get_lb_rpt_tab
+
+Purpose To provide a means of searching for and retrieving a set of similar structured location data out of an Exor and Location Bridge database. 
+Data is retrieved in a nested table of type LB_RPT_TAB. This encapsulates all of the information relating to the locations.
+The argument list is based on the LB_RPT (LB reference point). This object consists of some data which is derivable from the database, 
+given other attributes of the type (denormalized) and some attributes of this object such as seg_id and seq_id are relative to the data being 
+retrieved and so are ignored in the search.
+Arguments
+p_refnt			INTEGER		A reference to a linear network element in the Exor NM_ELEMENTS table, either a datum or linear group.
+p_refnt_type	INTEGER		A reference to the network type of the referent, this integer relates directly to the nlt_id of the network type in the NM_LINEAR_TYPES table
+p_obj_type		VARCHAR2	The exor asset type of the locations to be retrieved
+p_obj_id		INTEGER		The object-id of the asset whose location is to be retrieved
+p_seg_id		INTEGER		A pointer to the segment number of the location. A difference in segment numbers indicate a discontinuity of measure or a point 
+							of loss of connectivity over the network. This is unused in the query.
+p_seq_id		INTEGER		A pointer to the sequence number of the location. Sequence numbers are incremented to indicate the order of the 
+							location of the asset thus indicating a direction. This is relative to the network data being retrieved and so is ignored in the query.
+p_dir_flag		INTEGER		A direction flag taking the value of plus or minus one indicating the asset direction relative to the network. 
+							This is formed when the asset location is created. For an asset type whose location is persisted on a network datum, the value is inherited from the route direction flag if located relative to a route or is set to +1 if the location is created relative to a datum. It has no useful purpose in the query and is ignored.
+p_start_m		NUMBER		The start measure relative to the referent. This provides a lower bound of the asset location within the query 
+p_end_m			NUMBER		The end measure relative to the referent. This provides a upper bound of the asset location within the query
+p_intsct		VARCHAR2	A flag to denote whether the returned location data should be that of the intersection of the asset location 
+                            with the specified range. This is ignored if the range or referent is not entered. It takes the value of ‘TRUE’ or ‘FALSE’
+p_m_unit		INTEGER		This is usually a denormalized reference to the Exor unit of measure of the network type referenced in the referent 
+                            and referent type. Unit identifiers which are not the value of the network type being queried will indicate that the start and 
+							end measures are converted into the natural unit of the network for the query to work
+p_lb_only		VARCHAR2	A flag to indicate if asset data should be retrieved from the location bridge silo of location data. It takes the value of ‘TRUE’ 
+                            or ‘FALSE’. If set to TRUE, the function will retrieve only those asset locations which are configured in Location Bridge 
+							(for example those which relate directly to assets within eB ). If the value is set to ‘FALSE’ then the location data of 
+							standard Exor assets will be retrieved. 
+p_cardinality	INTEGER		An indicator of the number of rows expected. This allows statistics to be used by the Oracle optimizer in cases where the resultant 
+                            nested table is joined to another table. This depends on the version of Oracle. A value of 10 is a reasonable 
+							compromise but in later releases of Oracle, the value will be ignored as the optimizer uses the accumulated statistics of the 
+							nested table at execution time.
+		
+
+The function relates to the LB_RPT object and returns a nested table of LB_RPT data as an object type (LB_RPT_TAB). This table holds much of what is important in relation to asset locations and is commonly used for further translations and manipulations of data in the nested table. The functions main arguments are optional although insufficient attribute data to formulate a sensible query will raise an exception and generate an error. 
+•	If an argument is omitted, the function will attempt to make use of the database to normalize the information in the query. 
+•	If a unit specifier is omitted, the natural unit of measure for the specified network referent or the network on which the asset type resides will be used. If a unit of measure is specified, the start and end measure will be converted to the natural unit of the network or asset type prior to execution of the query. 
+•	As stated above, some of the data relates to attributes within the LB_RPT object and are currently unused and will be deprecated.
+•	Here are some examples of the data being retrieved and example of some common translation functions applied to the query results.
+•	If the referent type is omitted, the correct referent type will be generated on the output. 
+•	Attempts to request an intersection without specifying a network reference will raise an exception ( ORA-20013: Use of the intersection or whole-only option is only valid when accompanied by a network reference).
+•	Attempts to execute the query with insufficient arguments – neither object based nor network based will raise an exception (ORA-20012: No network or asset data provided to form the query).
+•	If a referent is used and no start or end measure then the range is full range of the element supplied. 
+
+*/
+--------------------------------------------------------------------------------	
         l_g_i_d        VARCHAR2 (1) := NULL;
         l_refnt_type   INTEGER := NULL;
         l_units        INTEGER;
