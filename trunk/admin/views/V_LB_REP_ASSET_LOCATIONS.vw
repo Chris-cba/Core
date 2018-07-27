@@ -1,5 +1,7 @@
 -- See body of materialized view for version, comments and description
 
+-- See body of materialized view for version, comments and description
+
 DECLARE
    not_exists   EXCEPTION;
    PRAGMA EXCEPTION_INIT (not_exists, -12003);
@@ -52,11 +54,11 @@ AS
           -------------------------------------------------------------------------
           --   PVCS Identifiers :-
           --
-          --       PVCS id          : $Header:   //new_vm_latest/archives/lb/admin/views/V_LB_REP_ASSET_LOCATIONS.vw-arc   1.8   Jun 25 2018 15:53:26   Rob.Coupe  $
+          --       PVCS id          : $Header:   //new_vm_latest/archives/lb/admin/views/V_LB_REP_ASSET_LOCATIONS.vw-arc   1.9   Jul 27 2018 16:50:56   Rob.Coupe  $
           --       Module Name      : $Workfile:   V_LB_REP_ASSET_LOCATIONS.vw  $
-          --       Date into PVCS   : $Date:   Jun 25 2018 15:53:26  $
-          --       Date fetched Out : $Modtime:   Jun 25 2018 15:52:34  $
-          --       Version          : $Revision:   1.8  $
+          --       Date into PVCS   : $Date:   Jul 27 2018 16:50:56  $
+          --       Date fetched Out : $Modtime:   Jul 27 2018 16:49:38  $
+          --       Version          : $Revision:   1.9  $
           -----------------------------------------------------------------------------------------------------
           --   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
           -----------------------------------------------------------------------------------------------------
@@ -77,7 +79,7 @@ AS
           start_measure, -- The measure along the referenced element at which the asset is deemed to start
           end_measure, -- The measure along the referenced element at which the asset is deemed to end
           ne_unique || ne_descr network_name_descr, -- A concatenation of network name and description to provide text-based indexing
-          '$Revision:   1.8  $' Revision
+          '$Revision:   1.9  $' Revision
      FROM (WITH inv_types
                 AS (SELECT -- gather the Exor asset types and split between those LB and standard inventory - this is needed because th ebehaviour of XSP is different
                           CASE nit_category WHEN 'L' THEN 'L' ELSE 'I' END
@@ -94,7 +96,7 @@ AS
                            END
                               asset_type_descr
                       FROM nm_inv_types
-                     WHERE nit_category IN ('I', 'L')), -- and nit_inv_type = 'EW'),
+                     WHERE ( nit_category IN ('I', 'L') or (nit_category = 'A' and nit_table_name is NULL))), -- and nit_inv_type = 'EW'),
                 gty
                 AS (  SELECT -- gather up the list of network types over which the asset types may be located
                             nin_nit_inv_code inv_type,
