@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE lb_reg
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_reg.pkh-arc   1.4   Jul 30 2018 10:40:40   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_reg.pkh-arc   1.5   Jul 30 2018 11:25:36   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_reg.pkh  $
-   --       Date into PVCS   : $Date:   Jul 30 2018 10:40:40  $
-   --       Date fetched Out : $Modtime:   Jul 30 2018 09:17:50  $
-   --       PVCS Version     : $Revision:   1.4  $
+   --       Date into PVCS   : $Date:   Jul 30 2018 11:25:36  $
+   --       Date fetched Out : $Modtime:   Jul 30 2018 11:25:08  $
+   --       PVCS Version     : $Revision:   1.5  $
    -----------------------------------------------------------------------------
    --   Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    -----------------------------------------------------------------------------
@@ -24,7 +24,7 @@ procedures may fail as data will be checked on insert by the FGAC security mecha
 */    
    -----------------------------------------------------------------------------   
 
-   g_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.4  $';
+   g_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.5  $';
 
    FUNCTION get_version
       RETURN VARCHAR2;
@@ -38,8 +38,6 @@ procedures may fail as data will be checked on insert by the FGAC security mecha
    PROCEDURE register_lb_asset_type
    
    
-Function lb_get.get_lb_rpt_tab
-
 Purpose To register a new asset type wthin the Exor asset metamodel and provide a lookup method for a supplied eB asset type code. 
 
 Arguments
@@ -51,39 +49,47 @@ Arguments
       pi_nlt_id           IN INTEGER        The network type on which the asset type may be placed. This argument is a reference to the key to linear types in the
 	                                        table NM_LINEAR_TYPES. Use this in cases where the inventory type relates to a single network. Defaults to NULL.
       pi_role             IN VARCHAR2       A role which is assigned to the inventory type to allow other users to read or edit data of this type. Note that the
-	                                        account executing the procedure must be able to see 
-      pi_role_mode        IN VARCHAR2 DEFAULT 'NORMAL',
-      pi_start_date       IN DATE DEFAULT TRUNC (SYSDATE),
-      pi_p_or_c           IN VARCHAR2 DEFAULT 'C',
-      pi_security_type    IN VARCHAR2 DEFAULT 'NONE');
-		
+	                                        account executing the procedure must be able to administer this role as an unrestricted user and having been granted 
+	                                        admin privileges on the role. The role is a pointer to a record in the Exor table HIG_ROLES and if the role is to be
+	                                        administered within an Exor system, the role should also be a database role. The role will be registered in the table
+	                                        NM_INV_TYPE_ROLES against the specified inventory type. 
+      pi_role_mode        IN VARCHAR2       The mode in which the role is registered in table NM_INV_TYPE_ROLES. The rgument should take the value 'NORMAL' or 'READONLY' as 
+                                            expected and constrained through the ITR_MODE_CHK constraint.
+       
+      pi_start_date       IN DATE           The start date of the inventory registration - note that for an Exor inventory type, no instance of an inventory of this type
+                                            would be allowed to exist prior to this date. The value defaults to the start of the day at the current sysdate. 
+      pi_p_or_c           IN VARCHAR2       A flag to indicate whether inventory items of the specified type will relate to the network as a point or line relationship. The argument
+                                            takes the value 'P' for 'Point' or 'C' for 'Continuous'. Inventory of types registered as point items will be allowed a point location 
+                                            where the network references are restricted to a single measure value relative to the network element. Those registered as continuous 
+                                            will be allowed a network reference defined by a range where a start measure relative to the network element must be less than the end 
+                                            measure.
+      pi_security_type    IN VARCHAR2       This argument was intended to allow FGAC on the related data and was intended to allow scopes based security or Exor admin-unit 
+                                            based security. This feature has not been implemented and the flag may be deprecated. It defaults to the string "NONE" and this should be
+                                            used until further notice.
 
-The function relates to the LB_RPT object and returns a nested table of LB_RPT data as an object type (LB_RPT_TAB). This table holds much of what is important in relation to asset locations and is commonly used for further translations and manipulations of data in the nested table. The functions main arguments are optional although insufficient attribute data to formulate a sensible query will raise an exception and generate an error. 
-•	If an argument is omitted, the function will attempt to make use of the database to normalize the information in the query. 
-•	If a unit specifier is omitted, the natural unit of measure for the specified network referent or the network on which the asset type resides will be used. If a unit of measure is specified, the start and end measure will be converted to the natural unit of the network or asset type prior to execution of the query. 
-•	As stated above, some of the data relates to attributes within the LB_RPT object and are currently unused and will be deprecated.
-•	Here are some examples of the data being retrieved and example of some common translation functions applied to the query results.
-•	If the referent type is omitted, the correct referent type will be generated on the output. 
-•	Attempts to request an intersection without specifying a network reference will raise an exception ( ORA-20013: Use of the intersection or whole-only option is only valid when accompanied by a network reference).
-•	Attempts to execute the query with insufficient arguments – neither object based nor network based will raise an exception (ORA-20012: No network or asset data provided to form the query).
-•	If a referent is used and no start or end measure then the range is full range of the element supplied. 
-   
-   
-   
-   
-   
-   
+The procedure will raise various exceptions should the arguments not conform to expectations. 
+•	All LB inventory types must relate to the network. Hence, supplying a null value for the network type reference will raise ORA-20001: LB assets must be on-network.
+•	The Exor API used to register the inventory type needs a role and mode. Failure to supply these will result in ORA-20005: Inventory type must be supplied with a role and mode with a value of NORMAL or READONLY
+•	Failure to supply a valid Exor role results in ORA-20006: The supplied Exor role does not exist.
 
+In line with other Exor registrations and in line with the approach taken to register Exor foreign tables, the procedure creates views to extract the relevant data and allow 
+the inventory type to be registered as a foreign table within the Exor system. Three views are created: 
+•	V_LB_<inv_type>             a view to provide the basic asset type, ids and network references
+•	V_LB_<inv-type>_SDO         a view to provide IDs, network locations and geometry fragments 
+•	V_LB_<inv_type>_AGGR_SDO    an asset-centric view showing the asset ids data and an aggregated view of the geometries relating to the asset.
 	  
+Notes
+•   Note that the procedure creates the views as mentioned above and since this is a DDL (Data Definition) operation, there is an implicit commit in the executon of the procedure.	
+
 */	  
    PROCEDURE register_lb_asset_type (
       pi_lb_object_type   IN INTEGER,
       pi_LB_asset_class   IN VARCHAR2,
       pi_exor_type        IN VARCHAR2,
       pi_xsp_flag         IN BOOLEAN,
-      pi_nlt_id           IN INTEGER DEFAULT NULL,
-      pi_role             IN VARCHAR2 DEFAULT NULL,
-      pi_role_mode        IN VARCHAR2 DEFAULT 'NORMAL',
+      pi_nlt_id           IN INTEGER,
+      pi_role             IN VARCHAR2,
+      pi_role_mode        IN VARCHAR2,
       pi_start_date       IN DATE DEFAULT TRUNC (SYSDATE),
       pi_p_or_c           IN VARCHAR2 DEFAULT 'C',
       pi_security_type    IN VARCHAR2 DEFAULT 'NONE');
@@ -92,9 +98,12 @@ The function relates to the LB_RPT object and returns a nested table of LB_RPT d
    --
 /*
 
-   PROCEDURE register_lb_asset_type 
+   PROCEDURE register_lb_asset_type
+   
+Purpose To register a new asset type wthin the Exor asset metamodel and provide a lookup method for a supplied eB asset type code. 
 
-	  
+Arguments are as above except the pi_nlt_id network reference is replaced by an array of NLT_IDs to allow assets to be placed over multiple network types.
+
 */	  
 
    PROCEDURE register_lb_asset_type (
@@ -102,22 +111,33 @@ The function relates to the LB_RPT object and returns a nested table of LB_RPT d
       pi_LB_asset_class   IN VARCHAR2,
       pi_exor_type        IN VARCHAR2,
       pi_xsp_flag         IN BOOLEAN,
-      pi_nlt_ids          IN INT_ARRAY DEFAULT NULL,
-      pi_role             IN VARCHAR2 DEFAULT NULL,
-      pi_role_mode        IN VARCHAR2 DEFAULT 'NORMAL',
+      pi_nlt_ids          IN INT_ARRAY,
+      pi_role             IN VARCHAR2,
+      pi_role_mode        IN VARCHAR2,
       pi_start_date       IN DATE DEFAULT TRUNC (SYSDATE),
       pi_p_or_c           IN VARCHAR2 DEFAULT 'C',
       pi_security_type    IN VARCHAR2 DEFAULT 'NONE');
 
+   -----------------------------------------------------------------------------   
+   --
    -----------------------------------------------------------------------------   
    --
 /*
 
    PROCEDURE drop_lb_asset_type
+   
+Purpose To remove all references to the location-bridge asset type by reference to the object-type identifier.  
 
-	  
-*/	  
+Arguments
 
+      pi_lb_object_type   IN INTEGER		A code used to identify the asset class in other systems such as eB.
+      pi_exor_type        IN VARCHAR2		The exor inventory code to be dropped. Defaults to NUll so only the first argument is required. 
+
+Notes
+•	There are a great many foreign keys to the inventory types table and removal of data from this table can take a relatively long time. 
+•	The procedure will remove the views that are created by the registration procedure so again, an implicit commit is executed.
+
+*/
    PROCEDURE drop_lb_asset_type (pi_lb_object_type   IN INTEGER,
                                  pi_exor_type        IN VARCHAR2 DEFAULT NULL);
 
@@ -127,6 +147,13 @@ The function relates to the LB_RPT object and returns a nested table of LB_RPT d
 
    PROCEDURE drop_lb_asset_type
 
+Arguments
+
+      pi_exor_type   IN VARCHAR2	The inventory type to be dropped. 
+      
+Notes
+•	There are a great many foreign keys to the inventory types table and removal of data from this table can take a relatively long time. 
+•	The procedure will remove the views that are created by the registration procedure so again, an implicit commit is executed.
 	  
 */	  
 
@@ -137,12 +164,25 @@ The function relates to the LB_RPT object and returns a nested table of LB_RPT d
 /*
 
    PROCEDURE register_unit
+   
+Purpose To register a new external unit which is deemed the same as that registered in the standard Exor unit metadata. Data
+        registered in this table allows functions to retrieve data in the units of choice with names and defined in the external system such as eB
+        rather than those defined within the Exor system 
 
+Arguments
+
+      external_unit_id     IN INTEGER	    A pointer to an ID of a unit in an external unit system such as eB.
+      external_unit_name   IN VARCHAR2      A name given to the external unit
+      exor_unit_id         IN INTEGER       An integer pointer to the UN_UNIT_ID in the Exor table NM_UNITS. 
+      
+Notes
+•	There are a great many foreign keys to the inventory types table and removal of data from this table can take a relatively long time. 
 	  
+•	   
 */	  
    
    PROCEDURE register_unit (external_unit_id     IN INTEGER,
                             external_unit_name   IN VARCHAR2,
-                            exor_unit_id         IN NUMBER);
+                            exor_unit_id         IN INTEGER);
 END;
 /
