@@ -2,16 +2,29 @@ CREATE OR REPLACE PACKAGE lb_reg
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_reg.pkh-arc   1.3   Jan 06 2016 14:33:28   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_reg.pkh-arc   1.4   Jul 30 2018 10:40:40   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_reg.pkh  $
-   --       Date into PVCS   : $Date:   Jan 06 2016 14:33:28  $
-   --       Date fetched Out : $Modtime:   Jan 06 2016 14:32:56  $
-   --       PVCS Version     : $Revision:   1.3  $
+   --       Date into PVCS   : $Date:   Jul 30 2018 10:40:40  $
+   --       Date fetched Out : $Modtime:   Jul 30 2018 09:17:50  $
+   --       PVCS Version     : $Revision:   1.4  $
    -----------------------------------------------------------------------------
    --   Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    -----------------------------------------------------------------------------
+/*
 
-   g_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.3  $';
+Package designed to facilitate the generation of metadata within an Exor system to support 
+Location Bridge asset types and their placement on an Exor network.
+Also facilitates registration of metadata supporting translation of asset type codes and
+units to and from those registered in other systems such as eB
+
+Procedures in this package must be executed as Exor users with privileges to create and see
+records in the NM_INV_TYPES_ALL table. i.e. those flagged as "unrestricted". Without this the
+procedures may fail as data will be checked on insert by the FGAC security mechanism.
+
+*/    
+   -----------------------------------------------------------------------------   
+
+   g_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.4  $';
 
    FUNCTION get_version
       RETURN VARCHAR2;
@@ -19,6 +32,50 @@ AS
    FUNCTION get_body_version
       RETURN VARCHAR2;
 
+   -----------------------------------------------------------------------------   
+/*
+
+   PROCEDURE register_lb_asset_type
+   
+   
+Function lb_get.get_lb_rpt_tab
+
+Purpose To register a new asset type wthin the Exor asset metamodel and provide a lookup method for a supplied eB asset type code. 
+
+Arguments
+
+      pi_lb_object_type   IN INTEGER		A code used to identify the asset class in other systems such as eB.
+      pi_LB_asset_class   IN VARCHAR2		A text string to describe the asset class as used in other systems such as eB.
+      pi_exor_type        IN VARCHAR2		The Exor inventory type to be regeistered as an LB foreign table.
+      pi_xsp_flag         IN BOOLEAN		A flag to indicate whether the new asset type will suppport the use of cross-sectional-position or XSP 
+      pi_nlt_id           IN INTEGER        The network type on which the asset type may be placed. This argument is a reference to the key to linear types in the
+	                                        table NM_LINEAR_TYPES. Use this in cases where the inventory type relates to a single network. Defaults to NULL.
+      pi_role             IN VARCHAR2       A role which is assigned to the inventory type to allow other users to read or edit data of this type. Note that the
+	                                        account executing the procedure must be able to see 
+      pi_role_mode        IN VARCHAR2 DEFAULT 'NORMAL',
+      pi_start_date       IN DATE DEFAULT TRUNC (SYSDATE),
+      pi_p_or_c           IN VARCHAR2 DEFAULT 'C',
+      pi_security_type    IN VARCHAR2 DEFAULT 'NONE');
+		
+
+The function relates to the LB_RPT object and returns a nested table of LB_RPT data as an object type (LB_RPT_TAB). This table holds much of what is important in relation to asset locations and is commonly used for further translations and manipulations of data in the nested table. The functions main arguments are optional although insufficient attribute data to formulate a sensible query will raise an exception and generate an error. 
+•	If an argument is omitted, the function will attempt to make use of the database to normalize the information in the query. 
+•	If a unit specifier is omitted, the natural unit of measure for the specified network referent or the network on which the asset type resides will be used. If a unit of measure is specified, the start and end measure will be converted to the natural unit of the network or asset type prior to execution of the query. 
+•	As stated above, some of the data relates to attributes within the LB_RPT object and are currently unused and will be deprecated.
+•	Here are some examples of the data being retrieved and example of some common translation functions applied to the query results.
+•	If the referent type is omitted, the correct referent type will be generated on the output. 
+•	Attempts to request an intersection without specifying a network reference will raise an exception ( ORA-20013: Use of the intersection or whole-only option is only valid when accompanied by a network reference).
+•	Attempts to execute the query with insufficient arguments – neither object based nor network based will raise an exception (ORA-20012: No network or asset data provided to form the query).
+•	If a referent is used and no start or end measure then the range is full range of the element supplied. 
+   
+   
+   
+   
+   
+   
+
+	  
+*/	  
    PROCEDURE register_lb_asset_type (
       pi_lb_object_type   IN INTEGER,
       pi_LB_asset_class   IN VARCHAR2,
@@ -31,7 +88,14 @@ AS
       pi_p_or_c           IN VARCHAR2 DEFAULT 'C',
       pi_security_type    IN VARCHAR2 DEFAULT 'NONE');
 
+   -----------------------------------------------------------------------------   
    --
+/*
+
+   PROCEDURE register_lb_asset_type 
+
+	  
+*/	  
 
    PROCEDURE register_lb_asset_type (
       pi_lb_object_type   IN INTEGER,
@@ -45,14 +109,38 @@ AS
       pi_p_or_c           IN VARCHAR2 DEFAULT 'C',
       pi_security_type    IN VARCHAR2 DEFAULT 'NONE');
 
+   -----------------------------------------------------------------------------   
    --
+/*
+
+   PROCEDURE drop_lb_asset_type
+
+	  
+*/	  
+
    PROCEDURE drop_lb_asset_type (pi_lb_object_type   IN INTEGER,
                                  pi_exor_type        IN VARCHAR2 DEFAULT NULL);
 
+   -----------------------------------------------------------------------------   
    --
+/*
+
+   PROCEDURE drop_lb_asset_type
+
+	  
+*/	  
 
    PROCEDURE drop_lb_asset_type (pi_exor_type IN VARCHAR2);
 
+   -----------------------------------------------------------------------------   
+   --
+/*
+
+   PROCEDURE register_unit
+
+	  
+*/	  
+   
    PROCEDURE register_unit (external_unit_id     IN INTEGER,
                             external_unit_name   IN VARCHAR2,
                             exor_unit_id         IN NUMBER);
