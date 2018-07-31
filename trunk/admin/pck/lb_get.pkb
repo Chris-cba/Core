@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_get
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_get.pkb-arc   1.53   Jul 30 2018 08:47:56   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_get.pkb-arc   1.54   Jul 31 2018 14:29:54   Rob.Coupe  $
     --       Module Name      : $Workfile:   lb_get.pkb  $
-    --       Date into PVCS   : $Date:   Jul 30 2018 08:47:56  $
-    --       Date fetched Out : $Modtime:   Jul 30 2018 08:45:38  $
-    --       PVCS Version     : $Revision:   1.53  $
+    --       Date into PVCS   : $Date:   Jul 31 2018 14:29:54  $
+    --       Date fetched Out : $Modtime:   Jul 31 2018 14:27:58  $
+    --       PVCS Version     : $Revision:   1.54  $
     --
     --   Author : R.A. Coupe
     --
@@ -16,7 +16,7 @@ AS
     -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
     ----------------------------------------------------------------------------
     --
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.53  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.54  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'lb_get';
     
@@ -1132,7 +1132,7 @@ AS
                                                        NVL (p_start_m, 0),
                                                        NVL (p_end_m,
                                                             ne_length),
-                                                       l_units))),
+                                                       p_m_unit))),
                                            p_obj_type,
                                            p_obj_id,
                                            p_intsct,
