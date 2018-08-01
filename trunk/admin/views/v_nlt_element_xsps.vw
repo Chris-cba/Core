@@ -1,7 +1,4 @@
-DROP VIEW HIGHWAYS.V_NLT_ELEMENT_XSPS;
-
-/* Formatted on 8/1/2018 10:08:30 AM (QP5 v5.256.13226.35538) */
-CREATE OR REPLACE FORCE VIEW HIGHWAYS.V_NLT_ELEMENT_XSPS
+CREATE OR REPLACE FORCE VIEW V_NLT_ELEMENT_XSPS
 (
    ELEMENT_ID,
    XSP_ELEMENT_ID,
@@ -23,11 +20,11 @@ AS
                                                                             --
                                                       --   PVCS Identifiers :-
                                                                             --
- --       pvcsid                 : $Header:   //new_vm_latest/archives/lb/admin/views/v_nlt_element_xsps.vw-arc   1.1   Aug 01 2018 11:52:28   Rob.Coupe  $
+ --       pvcsid                 : $Header:   //new_vm_latest/archives/lb/admin/views/v_nlt_element_xsps.vw-arc   1.2   Aug 01 2018 15:58:48   Rob.Coupe  $
              --       Module Name      : $Workfile:   v_nlt_element_xsps.vw  $
-                  --       Date into PVCS   : $Date:   Aug 01 2018 11:52:28  $
-               --       Date fetched Out : $Modtime:   Aug 01 2018 11:51:20  $
-                               --       PVCS Version     : $Revision:   1.1  $
+                  --       Date into PVCS   : $Date:   Aug 01 2018 15:58:48  $
+               --       Date fetched Out : $Modtime:   Aug 01 2018 15:58:14  $
+                               --       PVCS Version     : $Revision:   1.2  $
                                                                             --
                                                        --   Author : Rob Coupe
                                                                             --
@@ -73,6 +70,3 @@ AS
           r."XRV_NEW_XSP"
      FROM v_nlt_xsp_rvrs r, nm_elements
     WHERE ne_sub_class = nwx_nsc_sub_class AND ne_nt_type = xsp_nt_type;
-
-
-CREATE OR REPLACE PUBLIC SYNONYM V_NLT_ELEMENT_XSPS FOR HIGHWAYS.V_NLT_ELEMENT_XSPS;
