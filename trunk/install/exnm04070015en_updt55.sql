@@ -1,11 +1,11 @@
 /* Formatted on 11/07/2018 22:06:11 (QP5 v5.326) */
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/lb/install/exnm04070015en_updt55.sql-arc   1.0   Aug 01 2018 21:51:02   Rob.Coupe  $
+--       sccsid           : $Header:   //new_vm_latest/archives/lb/install/exnm04070015en_updt55.sql-arc   1.1   Aug 02 2018 08:46:48   Rob.Coupe  $
 --       Module Name      : $Workfile:   exnm04070015en_updt55.sql  $
---       Date into PVCS   : $Date:   Aug 01 2018 21:51:02  $
---       Date fetched Out : $Modtime:   Aug 01 2018 12:15:22  $
---       PVCS Version     : $Revision:   1.0  $
+--       Date into PVCS   : $Date:   Aug 02 2018 08:46:48  $
+--       Date fetched Out : $Modtime:   Aug 02 2018 08:46:10  $
+--       PVCS Version     : $Revision:   1.1  $
 --
 ----------------------------------------------------------------------------
 --   Copyright (c) 2015 Bentley Systems Incorporated.  All rights reserved.
@@ -218,7 +218,7 @@ create or replace procedure drop_transient_types (p_type in varchar2 ) is
   and name like 'SYSTP%==';
 begin
   for irec in c1 loop
-    execute immediate 'drop type "'||irec.name||'"';
+    execute immediate 'drop type "'||irec.name||'" FORCE';
   end loop;
 end;
 /
@@ -420,22 +420,23 @@ CREATE OR REPLACE TYPE lb_edit_transaction_tab
 
 PROMPT lb_snap...
 
-declare
-not_exists exception;
-pragma exception_init(not_exists, -4043);
-begin
-   begin
-      execute immediate 'drop type lb_snap_tab';
-   exception
-      when not_exists then NULL;
-   end;
---   
-   begin
-      execute immediate 'drop type lb_snap';
-   exception
-      when not_exists then NULL;
-   end;
-end;
+DECLARE
+    l_dummy   INTEGER;
+BEGIN
+    DECLARE
+        not_exists   EXCEPTION;
+        PRAGMA EXCEPTION_INIT (not_exists, -4043);
+    BEGIN
+        EXECUTE IMMEDIATE 'drop type LB_SNAP_TAB FORCE';
+        drop_transient_types('LB_SNAP_TAB');
+        EXECUTE IMMEDIATE 'drop type LB_SNAP FORCE';		
+        drop_transient_types('LB_SNAP');
+    EXCEPTION
+        WHEN not_exists
+        THEN
+            NULL;
+    END;
+END;	
 /
 
 
@@ -755,7 +756,7 @@ BEGIN
         not_exists   EXCEPTION;
         PRAGMA EXCEPTION_INIT (not_exists, -4043);
     BEGIN
-        EXECUTE IMMEDIATE 'drop type LB_XRPT_TAB';
+        EXECUTE IMMEDIATE 'drop type LB_XRPT_TAB FORCE';
         drop_transient_types('LB_XRPT_TAB');
         drop_transient_types('LB_XRPT');
     EXCEPTION
