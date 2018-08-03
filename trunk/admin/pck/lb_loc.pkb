@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_loc
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_loc.pkb-arc   1.13   May 17 2018 13:21:30   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_loc.pkb-arc   1.14   Aug 03 2018 08:11:22   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_loc.pkb  $
-   --       Date into PVCS   : $Date:   May 17 2018 13:21:30  $
-   --       Date fetched Out : $Modtime:   May 17 2018 13:20:22  $
-   --       PVCS Version     : $Revision:   1.13  $
+   --       Date into PVCS   : $Date:   Aug 03 2018 08:11:22  $
+   --       Date fetched Out : $Modtime:   Aug 03 2018 08:10:22  $
+   --       PVCS Version     : $Revision:   1.14  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,7 +16,7 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.13  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.14  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_loc';
 
@@ -455,8 +455,8 @@ AS
                 nm_nlt_id,
                 nal_nit_type,
                 nal_id,
-                NULL,
-                NULL,
+                nm_seg_no,
+                nm_seq_no,
                 nm_dir_flag,
                 nm_begin_mp,
                 nm_end_mp,
@@ -519,7 +519,7 @@ AS
                       obj_type,
                       obj_id,
                       seg_id,
-                      ROWNUM,
+                      seq_id,
                       dir_flag,
                       start_m,
                       end_m,
