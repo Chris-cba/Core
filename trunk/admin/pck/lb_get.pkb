@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_get
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_get.pkb-arc   1.54   Jul 31 2018 14:29:54   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_get.pkb-arc   1.55   Aug 03 2018 14:45:50   Rob.Coupe  $
     --       Module Name      : $Workfile:   lb_get.pkb  $
-    --       Date into PVCS   : $Date:   Jul 31 2018 14:29:54  $
-    --       Date fetched Out : $Modtime:   Jul 31 2018 14:27:58  $
-    --       PVCS Version     : $Revision:   1.54  $
+    --       Date into PVCS   : $Date:   Aug 03 2018 14:45:50  $
+    --       Date fetched Out : $Modtime:   Aug 03 2018 14:45:26  $
+    --       PVCS Version     : $Revision:   1.55  $
     --
     --   Author : R.A. Coupe
     --
@@ -16,11 +16,11 @@ AS
     -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
     ----------------------------------------------------------------------------
     --
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.54  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.55  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'lb_get';
-    
-    g_tol            NUMBER   := 0.00000001;
+
+    g_tol                     NUMBER := 0.00000001;
 
     --
     -----------------------------------------------------------------------------
@@ -159,8 +159,9 @@ AS
         THEN
             IF p_intsct = 'TRUE'
             THEN
-            nm_debug.debug_on;
-            nm_debug.debug('intersect using tolerance of '||g_tol);
+                nm_debug.debug_on;
+                nm_debug.debug ('intersect using tolerance of ' || g_tol);
+
                 SELECT lb_ops.rpt_intersection (rpt_tab, p_refnt_tab, 20)
                   INTO retval
                   FROM (SELECT CAST (COLLECT (rpt) AS lb_rpt_tab)     rpt_tab
@@ -201,14 +202,20 @@ AS
                                                'DD-MON-YYYY')
                                        AND nal_id = nm_ne_id_in
                                        AND nm_ne_id_of = refnt
-                                       AND (   (    nm_begin_mp < t.end_m + g_tol
-                                                AND nm_end_mp > t.start_m - g_tol)
+                                       AND (   (    nm_begin_mp <
+                                                    t.end_m + g_tol
+                                                AND nm_end_mp >
+                                                    t.start_m - g_tol)
                                             OR (    nm_begin_mp = nm_end_mp
-                                                AND nm_begin_mp BETWEEN t.start_m - g_tol
-                                                                    AND t.end_m + g_tol)
+                                                AND nm_begin_mp BETWEEN   t.start_m
+                                                                        - g_tol
+                                                                    AND   t.end_m
+                                                                        + g_tol)
                                             OR (    t.start_m = t.end_m
-                                                AND nm_begin_mp <= t.end_m + g_tol
-                                                AND nm_end_mp >= t.start_m - g_tol))
+                                                AND nm_begin_mp <=
+                                                    t.end_m + g_tol
+                                                AND nm_end_mp >=
+                                                    t.start_m - g_tol))
                                        AND (       p_whole_only = 'TRUE'
                                                AND (    NOT EXISTS
                                                             (SELECT 1
@@ -270,11 +277,15 @@ AS
                                        AND (   (    nm_begin_mp < t.end_m
                                                 AND nm_end_mp > t.start_m)
                                             OR (    nm_begin_mp = nm_end_mp
-                                                AND nm_begin_mp BETWEEN t.start_m - g_tol
-                                                                    AND t.end_m + g_tol)
+                                                AND nm_begin_mp BETWEEN   t.start_m
+                                                                        - g_tol
+                                                                    AND   t.end_m
+                                                                        + g_tol)
                                             OR (    t.start_m = t.end_m
-                                                AND nm_begin_mp <= t.end_m + g_tol
-                                                AND nm_end_mp >= t.start_m - g_tol ))
+                                                AND nm_begin_mp <=
+                                                    t.end_m + g_tol
+                                                AND nm_end_mp >=
+                                                    t.start_m - g_tol))
                                        AND (       p_whole_only = 'TRUE'
                                                AND (    NOT EXISTS
                                                             (SELECT 1
@@ -351,8 +362,10 @@ AS
                                                             t.start_m)
                                                     OR (    c.nm_begin_mp =
                                                             nm_end_mp
-                                                        AND c.nm_begin_mp BETWEEN t.start_m - g_tol
-                                                                              AND t.end_m + g_tol)
+                                                        AND c.nm_begin_mp BETWEEN   t.start_m
+                                                                                  - g_tol
+                                                                              AND   t.end_m
+                                                                                  + g_tol)
                                                     OR (    t.start_m IS NULL
                                                         AND t.end_m IS NULL)
                                                     OR (    t.start_m =
@@ -1066,17 +1079,19 @@ AS
         l_refnt_type   INTEGER := NULL;
         l_units        INTEGER;
         retval         lb_Rpt_tab;
-        l_start_m number;
-        l_end_m   number;
-        l_tol     number;
+        l_start_m      NUMBER;
+        l_end_m        NUMBER;
+        l_tol          NUMBER;
 
-    function get_unit_tolerance(pi_unit_id in integer) return number is
-    retval number;
-    begin
-       retval := NM3UNIT.GET_TOL_FROM_UNIT_MASK(pi_unit_id);
-       return retval;
-    end;
---
+        FUNCTION get_unit_tolerance (pi_unit_id IN INTEGER)
+            RETURN NUMBER
+        IS
+            retval   NUMBER;
+        BEGIN
+            retval := NM3UNIT.GET_TOL_FROM_UNIT_MASK (pi_unit_id);
+            RETURN retval;
+        END;
+    --
     BEGIN
         IF p_refnt IS NOT NULL
         THEN
@@ -1146,14 +1161,16 @@ AS
         THEN
             nm_debug.debug ('route based');
             l_start_m := p_start_m;
-            l_end_m   := p_end_m;
---
-            if l_start_m = l_end_m then
-              g_tol     := get_unit_tolerance(l_units);
-              nm3ctx.set_context('LB_TOLERANCE', to_char(g_tol));
---              l_start_m := l_start_m - l_tol;
---              l_end_m   := l_end_m + l_tol;
-            end if;
+            l_end_m := p_end_m;
+
+            --
+            IF l_start_m = l_end_m
+            THEN
+                g_tol := get_unit_tolerance (l_units);
+                nm3ctx.set_context ('LB_TOLERANCE', TO_CHAR (g_tol));
+            --              l_start_m := l_start_m - l_tol;
+            --              l_end_m   := l_end_m + l_tol;
+            END IF;
 
             SELECT get_obj_RPt_tab (
                        get_lb_rpt_d_tab (lb_ops.normalize_rpt_tab (
@@ -1223,29 +1240,29 @@ AS
         ELSE
             nm_debug.debug ('catch-all');
 
---            IF p_start_m IS NOT NULL OR p_end_m IS NOT NULL
---            THEN
---                raise_application_error (
---                    -20017,
---                    'Measure based arguments are not usable in this context');
---            ELSE
-                SELECT lb_rpt (nm_ne_id_of,
-                               nlt_id,
-                               nm_obj_type,
-                               nm_ne_id_in,
-                               nm_seg_no,
-                               nm_seq_no,
-                               nm_cardinality,
-                               nm_begin_mp,
-                               nm_end_mp,
-                               nlt_units)
-                  BULK COLLECT INTO retval
-                  FROM nm_locations_full, nm_linear_types, nm_elements
-                 WHERE     nm_obj_type = p_obj_type
-                       AND ne_id = nm_ne_id_of
-                       AND ne_nt_type = nlt_nt_type
-                       AND NVL (ne_gty_group_type, '£$%^') =
-                           NVL (nlt_gty_type, '£$%^')
+            --            IF p_start_m IS NOT NULL OR p_end_m IS NOT NULL
+            --            THEN
+            --                raise_application_error (
+            --                    -20017,
+            --                    'Measure based arguments are not usable in this context');
+            --            ELSE
+            SELECT lb_rpt (nm_ne_id_of,
+                           nlt_id,
+                           nm_obj_type,
+                           nm_ne_id_in,
+                           nm_seg_no,
+                           nm_seq_no,
+                           nm_cardinality,
+                           nm_begin_mp,
+                           nm_end_mp,
+                           nlt_units)
+              BULK COLLECT INTO retval
+              FROM nm_locations_full, nm_linear_types, nm_elements
+             WHERE     nm_obj_type = p_obj_type
+                   AND ne_id = nm_ne_id_of
+                   AND ne_nt_type = nlt_nt_type
+                   AND NVL (ne_gty_group_type, '£$%^') =
+                       NVL (nlt_gty_type, '£$%^')
                    AND (   (    nm_begin_mp = nm_end_mp
                             AND nm_begin_mp <= p_end_m
                             AND nm_end_mp >= p_start_m)
@@ -1254,9 +1271,8 @@ AS
                             AND nm_end_mp >= p_start_m)
                         OR (p_start_m < nm_end_mp AND p_end_m > nm_begin_mp)
                         OR (p_start_m IS NULL AND p_end_m IS NULL));
-
-            -- just based on type
---            END IF;
+        -- just based on type
+        --            END IF;
         END IF;
 
         RETURN retval;
@@ -2209,18 +2225,20 @@ AS
                         new_start_date,
                         new_end_date)
           BULK COLLECT INTO retval
-          FROM (  SELECT route_id                           refnt,
-                         l_refnt_type.nlt_id                refnt_type,
-                         inv_type                           obj_type,
-                         inv_id                             obj_id,
-                         inv_segment_id                     seg_id,
-                         ROUND (INV_START_SLK, l_round)     start_m,
-                         ROUND (inv_end_slk, l_round)       end_m,
-                         l_refnt_type.nlt_units             unit_m,
+          FROM (  SELECT route_id                   refnt,
+                         l_refnt_type.nlt_id        refnt_type,
+                         inv_type                   obj_type,
+                         inv_id                     obj_id,
+                         inv_segment_id             seg_id,
+                         --                       ROUND (INV_START_SLK, l_round)     start_m,
+                         --                       ROUND (inv_end_slk, l_round)       end_m,
+                         INV_START_SLK              start_m,
+                         inv_end_slk                end_m,
+                         l_refnt_type.nlt_units     unit_m,
                          new_xsp,
                          new_offset,
-                         MIN (new_start_date)               new_start_date,
-                         MAX (new_end_date)                 new_end_date
+                         MIN (new_start_date)       new_start_date,
+                         MAX (new_end_date)         new_end_date
                     FROM (SELECT route_id,
                                  l.inv_id,
                                  l.inv_segment_id,
