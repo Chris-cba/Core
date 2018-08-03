@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_load
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_load.pkb-arc   1.31   Jul 26 2018 09:00:28   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_load.pkb-arc   1.32   Aug 03 2018 13:37:56   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_load.pkb  $
-   --       Date into PVCS   : $Date:   Jul 26 2018 09:00:28  $
-   --       Date fetched Out : $Modtime:   Jul 26 2018 08:59:50  $
-   --       PVCS Version     : $Revision:   1.31  $
+   --       Date into PVCS   : $Date:   Aug 03 2018 13:37:56  $
+   --       Date fetched Out : $Modtime:   Aug 03 2018 13:37:10  $
+   --       PVCS Version     : $Revision:   1.32  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,7 +16,7 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.31  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.32  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_load';
 
@@ -198,7 +198,7 @@ AS
              case when ne_gty_group_type is NOT NULL then 
                  ( select min(nm_slk) from nm_members where nm_ne_id_in = pi_refnt ) else 0 end min_start_m,
              case when ne_gty_group_type is NOT NULL then 
-             ( select min(nm_slk) from nm_members where nm_ne_id_in = pi_refnt ) else ne_length end max_end_m
+             ( select max(nm_end_slk) from nm_members where nm_ne_id_in = pi_refnt ) else ne_length end max_end_m
         INTO l_start, l_end, l_unit, l_min_start_m, l_max_end_m
         FROM nm_unit_conversions, nm_linear_types, nm_elements
        WHERE     nlt_units = uc_unit_id_out
@@ -211,7 +211,7 @@ AS
              case when ne_gty_group_type is NOT NULL then 
                  ( select min(nm_slk) from nm_members where nm_ne_id_in = pi_refnt ) else 0 end min_start_m,
              case when ne_gty_group_type is NOT NULL then 
-             ( select min(nm_slk) from nm_members where nm_ne_id_in = pi_refnt ) else ne_length end max_end_m      
+             ( select max(nm_end_slk) from nm_members where nm_ne_id_in = pi_refnt ) else ne_length end max_end_m      
         FROM nm_linear_types, nm_elements
        WHERE     nlt_units = pi_unit
              AND ne_id = pi_refnt
