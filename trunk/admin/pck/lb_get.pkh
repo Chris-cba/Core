@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE lb_get
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_get.pkh-arc   1.21   Aug 02 2018 09:03:22   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_get.pkh-arc   1.22   Aug 03 2018 14:05:02   Rob.Coupe  $
     --       Module Name      : $Workfile:   lb_get.pkh  $
-    --       Date into PVCS   : $Date:   Aug 02 2018 09:03:22  $
-    --       Date fetched Out : $Modtime:   Aug 02 2018 09:02:16  $
-    --       PVCS Version     : $Revision:   1.21  $
+    --       Date into PVCS   : $Date:   Aug 03 2018 14:05:02  $
+    --       Date fetched Out : $Modtime:   Aug 03 2018 14:04:36  $
+    --       PVCS Version     : $Revision:   1.22  $
     --
     --   Author : R.A. Coupe
     --
@@ -16,7 +16,7 @@ AS
     -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
     ----------------------------------------------------------------------------
     --
-    g_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.21  $';
+    g_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.22  $';
 
     --
     FUNCTION get_version
@@ -120,6 +120,7 @@ p_lb_only       VARCHAR2    A flag to indicate if asset data should be retrieved
                             or ‘FALSE’. If set to TRUE, the function will retrieve only those asset locations which are configured in Location Bridge 
                             (for example those which relate directly to assets within eB ). If the value is set to ‘FALSE’ then the location data of 
                             standard Exor assets will be retrieved. 
+p_whole_only    VARCHAR2    A flag to indicate if asset location data should be returned if part of the asset location lies outside of any range specified.
 p_cardinality   INTEGER     An indicator of the number of rows expected. This allows statistics to be used by the Oracle optimizer in cases where the resultant 
                             nested table is joined to another table. This depends on the version of Oracle. A value of 10 is a reasonable 
                             compromise but in later releases of Oracle, the value will be ignored as the optimizer uses the accumulated statistics of the 
