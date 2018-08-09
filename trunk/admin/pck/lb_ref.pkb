@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_ref
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_ref.pkb-arc   1.9   Apr 10 2017 16:11:26   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_ref.pkb-arc   1.10   Aug 09 2018 16:07:56   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_ref.pkb  $
-   --       Date into PVCS   : $Date:   Apr 10 2017 16:11:26  $
-   --       Date fetched Out : $Modtime:   Apr 10 2017 16:11:28  $
-   --       PVCS Version     : $Revision:   1.9  $
+   --       Date into PVCS   : $Date:   Aug 09 2018 16:07:56  $
+   --       Date fetched Out : $Modtime:   Aug 09 2018 16:06:48  $
+   --       PVCS Version     : $Revision:   1.10  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,7 +16,7 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.9  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.10  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_ref';
 
@@ -168,7 +168,7 @@ AS
              AND un_unit_name = pi_unit_name
              AND uc_unit_id_out = nlt_units
              AND nlt_id = pi_network_type
-      UNION ALL
+      UNION
       SELECT pi_value
         FROM nm_linear_types, nm_units
        WHERE     nlt_units = un_unit_id
