@@ -7,11 +7,11 @@ AS
    SELECT                            /* +INDEX( e NE_PK) +CARDINALITY(t 10) */
           --   PVCS Identifiers :-
           --
-          --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/views/v_lb_xsp_list.vw-arc   1.0   Aug 11 2017 15:01:52   Rob.Coupe  $
+          --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/views/v_lb_xsp_list.vw-arc   1.1   Aug 10 2018 10:55:30   Rob.Coupe  $
           --       Module Name      : $Workfile:   v_lb_xsp_list.vw  $
-          --       Date into PVCS   : $Date:   Aug 11 2017 15:01:52  $
-          --       Date fetched Out : $Modtime:   Aug 07 2017 22:11:04  $
-          --       PVCS Version     : $Revision:   1.0  $
+          --       Date into PVCS   : $Date:   Aug 10 2018 10:55:30  $
+          --       Date fetched Out : $Modtime:   Aug 10 2018 10:54:38  $
+          --       PVCS Version     : $Revision:   1.1  $
           --
           --   Author : R.A. Coupe
           --
@@ -35,8 +35,8 @@ AS
                           NULL,
                           NULL,
                           1,
-                          TO_NUMBER (SYS_CONTEXT ('NMSQL', 'START_MEASURE')), --l_startM,
-                          TO_NUMBER (SYS_CONTEXT ('NMSQL', 'END_MEASURE')), --l_endM,
+                          TO_NUMBER (SYS_CONTEXT ('NM3SQL', 'START_MEASURE')), --l_startM,
+                          TO_NUMBER (SYS_CONTEXT ('NM3SQL', 'END_MEASURE')), --l_endM,
                           NULL)))) t
     WHERE     ne_sub_class = xsr_scl_class
           AND xsr_ity_inv_code = SYS_CONTEXT ('NM3SQL', 'NLT_DATA_INV_TYPE')
@@ -59,8 +59,8 @@ AS
                           NULL,
                           NULL,
                           1,
-                          TO_NUMBER (SYS_CONTEXT ('NMSQL', 'START_MEASURE')), --l_startM,
-                          TO_NUMBER (SYS_CONTEXT ('NMSQL', 'END_MEASURE')), --l_endM,
+                          TO_NUMBER (SYS_CONTEXT ('NM3SQL', 'START_MEASURE')), --l_startM,
+                          TO_NUMBER (SYS_CONTEXT ('NM3SQL', 'END_MEASURE')), --l_endM,
                           NULL)))) t
     WHERE     nm_ne_id_of = refnt
           AND nm_ne_id_in = ne_id
@@ -75,6 +75,8 @@ AS
           AND xsr_ity_inv_code = SYS_CONTEXT ('NM3SQL', 'NLT_DATA_INV_TYPE')
           AND xsr_nw_type = ne_nt_type
           AND ne_id = TO_NUMBER (SYS_CONTEXT ('NM3SQL', 'NLT_NE_ID'))
+          AND SYS_CONTEXT('NM3SQL', 'START_MEASURE') is NULL
+          AND SYS_CONTEXT('NM3SQL', 'END_MEASURE') is NULL
    UNION ALL
    SELECT /*+ INDEX(m NM_OBJ_TYPE_NE_ID_OF_IND) CARDINALITY(t 10)  */
           DISTINCT xsr_x_sect_value, xsr_descr
@@ -84,4 +86,6 @@ AS
           AND ne_sub_class = xsr_scl_class
           AND xsr_ity_inv_code = SYS_CONTEXT ('NM3SQL', 'NLT_DATA_INV_TYPE')
           AND xsr_nw_type = ne_nt_type
+          AND SYS_CONTEXT('NM3SQL', 'START_MEASURE') is NULL
+          AND SYS_CONTEXT('NM3SQL', 'END_MEASURE') is NULL
 /
