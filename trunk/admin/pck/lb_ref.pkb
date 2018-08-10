@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_ref
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_ref.pkb-arc   1.10   Aug 09 2018 16:07:56   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_ref.pkb-arc   1.11   Aug 10 2018 11:15:40   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_ref.pkb  $
-   --       Date into PVCS   : $Date:   Aug 09 2018 16:07:56  $
-   --       Date fetched Out : $Modtime:   Aug 09 2018 16:06:48  $
-   --       PVCS Version     : $Revision:   1.10  $
+   --       Date into PVCS   : $Date:   Aug 10 2018 11:15:40  $
+   --       Date fetched Out : $Modtime:   Aug 10 2018 11:14:10  $
+   --       PVCS Version     : $Revision:   1.11  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,7 +16,7 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.10  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.11  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_ref';
 
@@ -409,8 +409,8 @@ AS
       --   Convert units to exor base units from eB uniot translations
 
       nm3ctx.set_context ('NLT_NE_ID', TO_CHAR (NetworkElementId));
-      nm3ctx.set_context ('START_MEASURE', TO_CHAR (StartDistance));
-      nm3ctx.set_context ('END_MEASURE', TO_CHAR (EndDistance));
+      nm3ctx.set_context ('START_MEASURE', TO_CHAR (l_startM));
+      nm3ctx.set_context ('END_MEASURE', TO_CHAR (l_endM));
 
       --
       OPEN retval FOR SELECT xsp, xsp_descr FROM v_lb_xsp_list;
