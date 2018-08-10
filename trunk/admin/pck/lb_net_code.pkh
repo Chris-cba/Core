@@ -1,13 +1,13 @@
-/* Formatted on 30/07/2018 11:42:52 (QP5 v5.326) */
 CREATE OR REPLACE PACKAGE lb_net_code
 AS
+--<PACKAGE>
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_net_code.pkh-arc   1.3   Jul 30 2018 11:44:44   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_net_code.pkh-arc   1.4   Aug 10 2018 17:40:02   Rob.Coupe  $
     --       Module Name      : $Workfile:   lb_net_code.pkh  $
-    --       Date into PVCS   : $Date:   Jul 30 2018 11:44:44  $
-    --       Date fetched Out : $Modtime:   Jul 30 2018 11:42:58  $
-    --       PVCS Version     : $Revision:   1.3  $
+    --       Date into PVCS   : $Date:   Aug 10 2018 17:40:02  $
+    --       Date fetched Out : $Modtime:   Aug 10 2018 17:36:54  $
+    --       PVCS Version     : $Revision:   1.4  $
     --
     --   Author : R.A. Coupe
     --
@@ -17,62 +17,78 @@ AS
     -- Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
     ----------------------------------------------------------------------------
     --
-    g_sccsid         CONSTANT VARCHAR2 (2000) := '$Revision:   1.3  $';
+--</PACKAGE>
+--<GLOBVAR>
+--
+    g_sccsid         CONSTANT VARCHAR2 (2000) := '$Revision:   1.4  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'lb_net_code';
 
+--</GLOBVAR>
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+--
+-- This function returns the current PVCS version of the package 
 
-    --
-    FUNCTION get_version
-        RETURN VARCHAR2;
+   FUNCTION get_version
+      RETURN VARCHAR2;
+--</PROC>
 
-    FUNCTION get_body_version
-        RETURN VARCHAR2;
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+--
+-- This function returns the current PVCS version of the package body		
+   FUNCTION get_body_version
+      RETURN VARCHAR2;
+--</PROC>
 
-    --------------------------------------------------------------------------------------
-    /*
-
-        FUNCTION lb_snap_xy_to_nw
-
-     Purpose - To provide a set of reference point and related information from an Exor network and an XY coordinate pair.
-
-        Arguments:
-
-            pi_x     Number     X ordinate of source point
-            pi_y     Number     Y ordinate of source point
-            pi_in_srid Number     Coordinate system of the source XY expressed as a SRID (eb 27700 for UK national grid)
-            pi_buffer Number     Buffer or search radius around the input point to define the candidate area for selection of the network to which the XY will be snapped.
-            pi_in_uol Integer  The Exor unit of length used in the buffer distance
-            pi_out_srid Number     Coordinate system of returned geometry
-            pi_out_uol Integer     The Exor unit of length used in the returned values of distance-from and measure
-            pi_themes nm_theme_array_type The list of themes to which the XY will be snapped
-            cardinality Integer         An estimate of the number of returned items (used in optimiser statistics in some versions of server)
-
-        The function returns an array or table of lb_snap object data comprising:
-
-          ne_id         Integer         Primary key of network element to which the XY is snapped.
-          nlt_id     Integer         A pointer to the linear type of network to which the XY is snapped
-          ne_nt_type varchar2(4)     The network type of the element
-          ne_gty_group_type varchar2(4) The group-type of the element (NULL if a datum)
-          ne_unique     Varchar2(30) The unique reference of the element (unique in conjunction with ne_nt_type)
-          ne_descr     Varchar2(240 The description of the element.
-          measure     Number         The measure along the element at the projection point.
-          distance_from Number         The minimum distance from the projection point to the input point.
-          unit_id     Integer         The unit of length used in returned values
-          unit_name     Varchar2(30) The name of the unit of length used in returned values
-          nw_geom     sdo_geometry The geometry of the candidate element (as use din highlighting)
-          proj_pt     sdo_geometry The geometry of the projection point.
-    --
-    Notes:
-
-          Ideally, the code would be used against the date-tracked views of the Exor network otherwise linear references may be
-          returned which are outside of the current effective date. The list of themes must hold a valid table-name, primary key
-          identifier spatial column name which are in accordnance with the sdo-metadata. The units must exist and the SRIDs must be
-          valid Oracle spatial reference identifiers. The cardinality flag is likely to be deprecated as it is only of use when
-          as an aid to using optimiser statistics in a join of the returned nested table with another table and this aid is not
-          required in more recent versions of Oracle.
-    */
-
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="LB_SNAP_XY_TO_NW">
+-- 
+--        FUNCTION lb_snap_xy_to_nw
+--
+--     Purpose - To provide a set of reference point and related information from an Exor network and an XY coordinate pair.
+--
+--        Arguments:
+--
+--            pi_x          Number                X ordinate of source point
+--            pi_y          Number                Y ordinate of source point
+--            pi_in_srid    Number                Coordinate system of the source XY expressed as a SRID (eg 27700 
+--                                                for UK national grid)
+--            pi_buffer     Number                Buffer or search radius around the input point to define the candidate 
+--                                                area for selection of the network to which the XY will be snapped.
+--            pi_in_uol     Integer               The Exor unit of length used in the buffer distance
+--            pi_out_srid   Number                Coordinate system of returned geometry
+--            pi_out_uol    Integer               The Exor unit of length used in the returned values of distance-from and measure
+--            pi_themes     nm_theme_array_type   The list of themes to which the XY will be snapped
+--            cardinality   Integer               An estimate of the number of returned items (used in optimiser statistics in some versions of server)
+--
+--        The function returns an array or table of lb_snap object data comprising:
+--
+--          ne_id             Integer         Primary key of network element to which the XY is snapped.
+--          nlt_id            Integer         A pointer to the linear type of network to which the XY is snapped
+--          ne_nt_type        varchar2(4)     The network type of the element
+--          ne_gty_group_type varchar2(4)     The group-type of the element (NULL if a datum)
+--          ne_unique         Varchar2(30)    The unique reference of the element (unique in conjunction with ne_nt_type)
+--          ne_descr          Varchar2(240    The description of the element.
+--          measure           Number          The measure along the element at the projection point.
+--          distance_from     Number          The minimum distance from the projection point to the input point.
+--          unit_id           Integer         The unit of length used in returned values
+--          unit_name         Varchar2(30)    The name of the unit of length used in returned values
+--          nw_geom           sdo_geometry    The geometry of the candidate element (as use din highlighting)
+--          proj_pt           sdo_geometry    The geometry of the projection point.
+--    --
+--    Notes:
+--
+--          Ideally, the code would be used against the date-tracked views of the Exor network otherwise linear references may be
+--          returned which are outside of the current effective date. The list of themes must hold a valid table-name, primary key
+--          identifier spatial column name which are in accordnance with the sdo-metadata. The units must exist and the SRIDs must be
+--          valid Oracle spatial reference identifiers. The cardinality flag is likely to be deprecated as it is only of use when
+--          as an aid to using optimiser statistics in a join of the returned nested table with another table and this aid is not
+--          required in more recent versions of Oracle.
 
     FUNCTION lb_snap_xy_to_nw (pi_x          IN NUMBER,
                                pi_y          IN NUMBER,
@@ -84,5 +100,6 @@ AS
                                pi_themes     IN nm_theme_array_type,
                                CARDINALITY   IN INTEGER)
         RETURN lb_snap_tab;
+--</PROC>        
 END;
 /
