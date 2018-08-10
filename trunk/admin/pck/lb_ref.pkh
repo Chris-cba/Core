@@ -1,42 +1,173 @@
 CREATE OR REPLACE PACKAGE lb_ref
 AS
+--<PACKAGE>
+--------------------------------------------------------------------------------
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_ref.pkh-arc   1.9   Sep 23 2016 11:24:50   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_ref.pkh-arc   1.10   Aug 10 2018 16:13:40   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_ref.pkh  $
-   --       Date into PVCS   : $Date:   Sep 23 2016 11:24:50  $
-   --       Date fetched Out : $Modtime:   Sep 23 2016 11:24:38  $
-   --       PVCS Version     : $Revision:   1.9  $
+   --       Date into PVCS   : $Date:   Aug 10 2018 16:13:40  $
+   --       Date fetched Out : $Modtime:   Aug 10 2018 16:10:52  $
+   --       PVCS Version     : $Revision:   1.10  $
    --
    --   Author : R.A. Coupe
    --
    --   Location Bridge ref-data package - that is to return cursors for basic reference data validation.
    --
-   -----------------------------------------------------------------------------
-   -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
-   ----------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+   -- Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
+--------------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
    --
-   g_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.9  $';
+   g_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.10  $';
 
-   --
+--</GLOBVAR>
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+--
+-- This function returns the current PVCS version of the package 
+
    FUNCTION get_version
       RETURN VARCHAR2;
+--</PROC>
 
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+--
+-- This function returns the current PVCS version of the package body		
    FUNCTION get_body_version
       RETURN VARCHAR2;
+--</PROC>
 
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_LINEAR_TYPES">
+-- 
+-- To return a cursor of the linear types that may be used as a means of placing an inventory type on the network.
+-- Note that the cursor returns all linear types including linear group types which are derived from the network on
+-- which the inventory location is persisted and its place in the group hierarchy.  
+--
+--Arguments
+--
+--      pi_inv_type   IN VARCHAR2        A coded string used to identify the Exor inventory type to be placed on network.
+--
+--returns
+--          sys_refcursor containing:
+--
+--                       nlt_g_i_d       VARCHAR2(1)    A flag to denote whether the linear type is a datum or a linear group (G or D)
+--                       nt_type         VARCHAR2(4)    The Exor network type
+--                       nt_unique       VARCHAR2(30)   The name given to the Exor network type
+--                       nt_descr        VARCHAR2(80)   A description of the Exor network type
+--                       gty_type        VARCHAR2(4)    The Exor group type (NULL if a datum type)
+--                       datum_type      VARCHAR2(4)    If a group type, then the datum types that underpin it. If a datum type then the network type itself
+--                       nlt_id          INTEGER        The linear network identifier, used in LB within the refnt_type attribute of the LB_RPT type
+--                       nlt_seq_no      INTEGER        An ordering parameter
+--                       nlt_units       INTEGER        The Exor unit-id used for the measures which relate to this linear type
+--                       un_unit_name    VARCHAR2(20)   The name given to the units of measure
+--                       un_format_mask  VARCHAR2(80)   The format mask of displayed data in the format of a number mask such as "999999999990.00" 
+--
    FUNCTION get_linear_types (pi_inv_type IN nm_inv_types.nit_inv_type%TYPE)
       RETURN SYS_REFCURSOR;
+--</PROC>
+
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_LINEAR_TYPES_TAB">
+-- 
+-- To return a table of linear types that may be used as a means of placing an inventory type on the network.
+-- Note that the table contains all linear types including linear group types which are derived from the network on
+-- which the inventory location is persisted and its place in the group hierarchy.  
+--
+--Arguments
+--
+--      pi_inv_type   IN VARCHAR2        A coded string used to identify the Exor inventory type to be placed on network.
+--
+--returns
+--          Nested table of lb_linear_type comprising:-
+--
+--                       networktypeid       INTEGER        The linear network identifier, used in LB within the refnt_type attribute of the LB_RPT type
+--                       networktype         VARCHAR2(4)    The 4 character code representing the network type
+--                       networkflag         VARCHAR2(1)    A flag to denote whether the linear type is a datum or a linear group (G or D)
+--                       networktypedescr    VARCHAR2(80)   A description of the Exor network type
+--                       unit                VARCHAR2(20)   The name given to the units of measure
+--                       unitmask            VARCHAR2(80)   The format mask of displayed data in the format of a number mask such as "999999999990.00" 
+--
 
    FUNCTION get_linear_types_tab (
       pi_inv_type   IN nm_inv_types.nit_inv_type%TYPE)
       RETURN lb_linear_type_tab;
+--</PROC>
+
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_LINEAR_REFNT">
+-- 
+-- To return a cursor of referents (elements in Exor) elements that may be used to place a specific inventory type. 
+-- The list of referents is optionally restricted by inventory type, the linear network type and/or the unique key of the element.
+-- The last of these may be restricted by a part string and the use of a like clause.
+--
+--Arguments
+--
+--      pi_inv_type   IN VARCHAR2       An optional coded string used to identify the Exor inventory type to be placed on network.
+--      pi_nlt_id     IN INTEGER        An otional restriction based on the the linear network identifier (which is used in LB 
+--                                      within the refnt_type attribute of the LB_RPT type)
+--      pi_unique     IN VARCHAR2       An optional restriction of the result set based on a part/pattern match on the 
+--                                      network element name (NE_UNIQUE)
+--
+--returns
+--          SYS_REFCURSOR of network element data along with units for measure values. The returned cursor contains:
+--
+--                       ne_id           INTEGER        The network element internal key
+--                       ne_unique       VARCHAR2(30)   The name of the network element (NE_UNIQUE in the NM_ELEMENTS table)
+--                       ne_descr        VARCHAR2(240)  The description of the element.
+--                       nlt_g_i_d       VARCHAR2(1)    A flag to denote whether the linear type is a datum or a linear group (G or D)
+--                       nt_type         VARCHAR2(4)    The Exor network type
+--                       nt_unique       VARCHAR2(30)   The name given to the Exor network type
+--                       nt_descr        VARCHAR2(80)   A description of the Exor network type
+--                       gty_type        VARCHAR2(4)    The Exor group type (NULL if a datum type)
+--                       datum_type      VARCHAR2(4)    If a group type, then the datum types that underpin it. If a datum type then the network type itself
+--                       nlt_id          INTEGER        The linear network identifier, used in LB within the refnt_type attribute of the LB_RPT type
+--                       nlt_seq_no      INTEGER        An ordering parameter
+--                       nlt_units       INTEGER        The Exor unit-id used for the measures which relate to this linear type
+--                       un_unit_name    VARCHAR2(20)   The name given to the units of measure
+--                       un_format_mask  VARCHAR2(80)   The format mask of displayed data in the format of a number mask such as "999999999990.00" 
+--
 
    FUNCTION get_linear_refnt (
       pi_inv_type   IN nm_inv_types.nit_inv_type%TYPE DEFAULT NULL,
       pi_nlt_id     IN nm_linear_types.nlt_id%TYPE DEFAULT NULL,
       pi_unique     IN VARCHAR2 DEFAULT NULL)
       RETURN SYS_REFCURSOR;
+--</PROC>      
+
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_LINEAR_REFNT_TAB">
+-- 
+-- To return a table of linear referents that may be used as a means of placing an inventory type on the network.
+-- Note that the table contains all linear types including linear group types which are derived from the network on
+-- which the inventory location is persisted and its place in the group hierarchy.  
+--
+--Arguments
+--
+--      pi_inv_type   IN VARCHAR2       An optional coded string used to identify the Exor inventory type to be placed on network.
+--      pi_nlt_id     IN INTEGER        An otional restriction based on the the linear network identifier (which is used in LB 
+--                                      within the refnt_type attribute of the LB_RPT type)
+--      pi_unique     IN VARCHAR2       An optional restriction of the result set based on a part/pattern match on the 
+--
+--returns
+--          Nested table of lb_linear_refnt comprising:-
+--
+--                       networktypeid         INTEGER        The linear network identifier, used in LB within the refnt_type attribute of the LB_RPT type
+--                       networkelementid      INTEGER        The internal ID of the referent. 
+--                       networkelementname    VARCHAR2(30)   The neame of the referent (element) held in the NE_UNIQUE column of nm_elements
+--                       networkelementdescr   VARCHAR2(80)   A description of the Exor network type
+--                       networkelementtype    VARCHAR2(4)    The 4 character code representing the network type
+--                       networktypedescr      VARCHAR2(80)   A description of the Exor network type
+--                       unit                  VARCHAR2(20)   The name given to the units of measure associated with this referent
 
    FUNCTION get_linear_refnt_tab (
       pi_inv_type   IN nm_inv_types.nit_inv_type%TYPE DEFAULT NULL,
@@ -44,31 +175,215 @@ AS
       pi_unique     IN VARCHAR2 DEFAULT NULL)
       RETURN lb_linear_refnt_tab;
 
+--</PROC>      
+
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_REFNT_MEASURES">
+-- 
+-- To return a cursor of the limit of available measures relating to s specified referent (element).
+--
+--Arguments
+--
+--      pi_ne_id      IN INTEGER        The referent of which the mesure details will be retrieved.
+--
+--returns
+--          SYS_REFCURSOR of network element and limits of measures relating to that element, comprsing:
+--
+--                       ne_id           INTEGER        The network element internal key
+--                       ne_unique       VARCHAR2(30)   The name of the network element (NE_UNIQUE in the NM_ELEMENTS table)
+--                       ne_descr        VARCHAR2(240)  The description of the element.
+--                       start_measure   NUMBER         The minimum measure that may exist for the element
+--                       end_measure     NUMBER         The maximum measure that may exist for the element
+--Notes
+--  ***  The data returned in this cursor is optionally restricted by the value of a specific inventory type
+--       in the context value SYS_CONTEXT ('NM3SQL', 'LB_ASSET_TYPE') as used in the view V_LB_NETWORKTYPES
+--       which restricts networks based on the LB asset types that are located on them. Hence, if no LB asset 
+--       types are registered, the view will return no rows and the cursor will be empty.
 
    FUNCTION get_refnt_measures (pi_ne_id IN INTEGER)
       RETURN SYS_REFCURSOR;
+--</PROC>      
+
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_REFNT_MEASURES_TAB">
+-- 
+-- To return a table of information relating to limits of measures on elements. 
+--
+--Arguments
+--
+--      pi_ne_id      IN INTEGER        The referent of which the mesure details will be retrieved.
+--
+--return
+--
+--          Nested table of LB_refnt_measure comprising:-
+-- 
+--                       NetworkElementId   INTEGER        -- Network element ID
+--                       NetworkElementName VARCHAR2(30)   -- Network element unique name
+--                       StartM             NUMBER         -- Minimum absolute linear measure
+--                       EndM               NUMBER         -- Maximum absolute linear measure
+--                       Unit               VARCHAR2(20)   -- Units of minimum and maximum measures
+--Notes
+--  ***  The data returned in the driving cursor for the return of the table of data is optionally restricted 
+--       by the value of a specific inventory type in the context value SYS_CONTEXT ('NM3SQL', 'LB_ASSET_TYPE') 
+--       as used in the view V_LB_NETWORKTYPES which restricts networks based on the LB asset types that are located 
+--       on them. Hence, if no LB asset types are registered, the view will return no rows and the table will be empty.
 
    FUNCTION get_refnt_measures_tab (pi_ne_id IN INTEGER)
       RETURN LB_refnt_measure_tab;
+      
+--</PROC>      
+
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_UNIT">
+-- 
+-- To return a table of information relating to limits of measures on elements. 
+--
+--Arguments
+--
+--      pi_ne_id      IN INTEGER        The referent of which the mesure details will be retrieved.
+--
+--return
+--
+--          Nested table of LB_refnt_measure comprising:-
+-- 
+--                       NetworkElementId   INTEGER        -- Network element ID
 
    FUNCTION get_unit (pi_unit_name      IN VARCHAR2,
                       pi_network_type   IN INTEGER,
                       pi_value          IN NUMBER)
       RETURN NUMBER;
+--</PROC>      
 
-   --
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GETLOCATIONIDS">
+-- 
+-- To return a cursor to geenrate location ids of eB asset data. 
+--
+--Arguments
+--
+--      AssetType      IN INTEGER        The asset type of location of which is to be retrieved 
+--                                       (as registered in the LB_TYPES table in LB_OBJECT_TYPE) 
+--      AssetID        IN INTEGER        The asset Id the location of which is to be retrieved
+--
+--return
+--
+--          SYS_REFCURSOR delivering asset location details consisting of:
+-- 
+--                       locationid            INTEGER        The asset location identifier or NAL_ID. This is the
+--                                                            same ID as the object_id inside the LB_RPT object 
+--                       locationdescription   VARCHAR2(240)  The text description of the asset location as stored 
+--                                                            in NAL_DESCR column.
+--                       jxp                   INTEGER        The Juxtaposition code (JXP_CODE)
+--                       jxp_descr             VARCHAR2(80)   The description/meaning of the JXP code.
+
    FUNCTION GetLocationIDs (AssetType IN INTEGER, AssetID IN INTEGER)
       RETURN SYS_REFCURSOR;
+--</PROC>
+
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GETLOCATIONIDS_TAB">
+-- 
+-- To return a table of location ids and details relating to an external asset 
+--
+--Arguments
+--
+--      AssetType      IN INTEGER        The asset type of location of which is to be retrieved 
+--                                       (as registered in the LB_TYPES table in LB_OBJECT_TYPE) 
+--      AssetID        IN INTEGER        The asset Id the location of which is to be retrieved
+--
+--returns
+--
+--       LB_LOCATION_ID_TAB delivering asset location details consisting of:
+-- 
+--                       locationid            INTEGER        The asset location identifier or NAL_ID. This is the
+--                                                            same ID as the object_id inside the LB_RPT object 
+--                       locationdescription   VARCHAR2(240)  The text description of the asset location as stored 
+--                                                            in NAL_DESCR column.
+--                       jxp                   INTEGER        The Juxtaposition code (JXP_CODE)
+--                       jxp_descr             VARCHAR2(80)   The description/meaning of the JXP code.
 
    FUNCTION GetLocationIDs_tab (AssetType IN INTEGER, AssetID IN INTEGER)
       RETURN lb_location_id_tab;
+--</PROC>
 
-   --
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GETXSPLIST">
+-- 
+-- To return a cursor which provides a list of all available XSPs over the network covered by
+-- the specified location ID. Used to provide lists of XSPs for update of asset locations. The list
+-- is dependent on the XSPs available to a specific asset type and the XSPs that are available
+-- over the network and network sub-class regimes in the location specified.
+--
+--Arguments
+--
+--      LocationId     IN INTEGER        The location ID of an existing asset. This is the NAL_ID in the table
+--                                       NM_ASSET_LOCATIONS and maps to the NM_NE_ID_IN in the NM_LOCATONS table. 
+--returns
+--
+--       SYS_REFCURSOR delivering a set of XSP values and descriptions which are available over the location. Consisting of:
+--
+--                       XSP                   VARCHAR2(4)    The coded string representing the XSP
+--                       XSP_DESCR             VARCHAR2(80)   A description of the XSP
+--
    FUNCTION GetXSPList (LocationId IN INTEGER)
       RETURN SYS_REFCURSOR;
 
+--</PROC>
+
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GETXSP_TAB">
+-- 
+-- To return a table of XSP related data containing a list of all available XSPs over the network covered by
+-- the specified location ID. Used to provide lists of XSPs for update of asset locations. The list
+-- is dependent on the XSPs available to a specific asset type and the XSPs that are available
+-- over the network and network sub-class regimes in the location specified.
+--
+--Arguments
+--
+--      LocationId     IN INTEGER        The location ID of an existing asset. This is the NAL_ID in the table
+--                                       NM_ASSET_LOCATIONS and maps to the NM_NE_ID_IN in the NM_LOCATONS table. 
+--returns
+--
+--       LB_XSP_TAB - a nested table LB_XSP type delivering a set of XSP values and descriptions which are available over the location. Consisting of:
+--
+--                       XSP                   VARCHAR2(4)    The coded string representing the XSP
+--                       XSP_DESCR             VARCHAR2(80)   A description of the XSP
+--
+
    FUNCTION GetXSP_TAB (LocationId IN INTEGER)
       RETURN LB_XSP_TAB;
+--</PROC>
+
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GETXSPLIST">
+-- 
+-- To return a cursor which provides a list of all available XSPs over a network area specified by
+-- a network element and range and also restricted by asset type. The list
+-- is dependent on the XSPs available to a specific asset type and the XSPs that are available
+-- over the network and network sub-class regimes in the location specified.
+--
+--Arguments
+--
+--      Inv_type           IN VARCHAR2        The Exor inventory type used to restrict the range of XSPs
+--      NetworkElementID   IN INTEGER         The NE_ID of an Exor network linear element (group or datum)
+--      StartDistance      IN NUMBER          The start measure of the range relative to the network element
+--      EndDistance        IN NUMBER          The end measure of the range relative to the network element      
+                        
+--returns
+--
+--       SYS_REFCURSOR delivering a set of XSP values and descriptions which are available over the location. Consisting of:
+--
+--                       XSP                   VARCHAR2(4)    The coded string representing the XSP
+--                       XSP_DESCR             VARCHAR2(80)   A description of the XSP
+--
 
    FUNCTION GetXSPList (Inv_type           IN VARCHAR2,
                         NetworkElementID   IN INTEGER,
@@ -76,12 +391,70 @@ AS
                         EndDistance        IN NUMBER)
       RETURN SYS_REFCURSOR;
 
+--</PROC>
+
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GETXSP_TAB">
+-- 
+-- To return a table of XSP related data containing a list of all available XSPs over a network area specified by
+-- a network element and range and also restricted by asset type. The list
+-- is dependent on the XSPs available to a specific asset type and the XSPs that are available
+-- over the network and network sub-class regimes in the location specified.
+--
+--Arguments
+--
+--      Inv_type           IN VARCHAR2        The Exor inventory type used to restrict the range of XSPs
+--      NetworkElementID   IN INTEGER         The NE_ID of an Exor network linear element (group or datum)
+--      StartDistance      IN NUMBER          The start measure of the range relative to the network element
+--      EndDistance        IN NUMBER          The end measure of the range relative to the network element      
+                        
+--returns
+--
+--       LB_XSP_TAB  a nested table LB_XSP type delivering a set of XSP values and descriptions which are available over the location. Consisting of:
+--
+--                       XSP                   VARCHAR2(4)    The coded string representing the XSP
+--                       XSP_DESCR             VARCHAR2(80)   A description of the XSP
+--
 
    FUNCTION GetXSP_tab (Inv_type           IN VARCHAR2,
                         NetworkElementID   IN INTEGER,
                         StartDistance      IN NUMBER,
                         EndDistance        IN NUMBER)
       RETURN lb_xsp_tab;
+
+--</PROC>
+
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GETXSPLIST">
+-- 
+-- To return a cursor which provides a list of all available XSPs over a network area specified by
+-- a network element and range which is specified in non-standard units of measure. The list is also
+-- restricted by asset type using the extrenal asset type identifier (integer). The list is dependent 
+-- on the XSPs available to a specific asset type and the XSPs that are available over the network and 
+-- network sub-class regimes in the location specified.
+--
+--Arguments
+--
+--      AssetType          IN INTEGER         The External asset type (the LB_OBJECT_TYPE in table LB_TYPES which is 
+--                                            translated to an Exor inventory type which is used used to restrict the 
+--                                            range of XSPs
+--      NetworkTypeID      IN INTEGER         The network type code for the network element
+--      NetworkElementID   IN INTEGER         The NE_ID of an Exor network linear element (group or datum)
+--      StartDistance      IN NUMBER          The start measure of the range relative to the network element
+--      StartDistanceUnit  IN VARCHAR2        The name of the units of measure used to define the StarDistance
+--      EndDistance        IN NUMBER          The end measure of the range relative to the network element    
+--      EndDistanceUnit    IN VARCHAR2        The name of the units of measure used to define the EndDistance
+  
+                        
+--returns
+--
+--       SYS_REFCURSOR delivering a set of XSP values and descriptions which are available over the location. Consisting of:
+--
+--                       XSP                   VARCHAR2(4)    The coded string representing the XSP
+--                       XSP_DESCR             VARCHAR2(80)   A description of the XSP
+--
 
    FUNCTION GetXSPList (AssetType           IN INTEGER,
                         NetworkTypeID       IN INTEGER,
@@ -92,6 +465,40 @@ AS
                         EndDistanceUnit     IN VARCHAR2)
       RETURN SYS_REFCURSOR;
 
+--</PROC>
+
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GETXSP_TAB">
+-- 
+-- To return a a table of XSP related data containing a list of all available XSPs over a network area 
+-- specified by a network element and range which is specified in non-standard units of measure. The list is 
+-- also restricted by asset type using the extrenal asset type identifier (integer). The list is dependent 
+-- on the XSPs available to a specific asset type and the XSPs that are available over the network and 
+-- network sub-class regimes in the location specified.
+--
+--Arguments
+--
+--      AssetType          IN INTEGER         The External asset type (the LB_OBJECT_TYPE in table LB_TYPES which is 
+--                                            translated to an Exor inventory type which is used used to restrict the 
+--                                            range of XSPs
+--      NetworkTypeID      IN INTEGER         The network type code for the network element
+--      NetworkElementID   IN INTEGER         The NE_ID of an Exor network linear element (group or datum)
+--      StartDistance      IN NUMBER          The start measure of the range relative to the network element
+--      StartDistanceUnit  IN VARCHAR2        The name of the units of measure used to define the StarDistance
+--      EndDistance        IN NUMBER          The end measure of the range relative to the network element    
+--      EndDistanceUnit    IN VARCHAR2        The name of the units of measure used to define the EndDistance
+  
+                        
+--returns
+--
+--       LB_XSP_TAB      A table of LB_XSP data delivering a set of XSP values and descriptions which are available over 
+--                       the location. Consisting of:
+--
+--                       XSP                   VARCHAR2(4)    The coded string representing the XSP
+--                       XSP_DESCR             VARCHAR2(80)   A description of the XSP
+--
+
    FUNCTION GetXSP_tab (AssetType           IN INTEGER,
                         NetworkTypeID       IN INTEGER,
                         NetworkElementID    IN INTEGER,
@@ -100,44 +507,270 @@ AS
                         EndDistance         IN NUMBER,
                         EndDistanceUnit     IN VARCHAR2)
       RETURN lb_xsp_tab;
+--</PROC>
 
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GETJXP">
+-- 
+-- To return a a cursor delivering a list of JXP codes and meanings which are valid for a specific asset type 
+--
+--Arguments
+--
+--      AssetType          IN INTEGER         The External asset type (the LB_OBJECT_TYPE in table LB_TYPES) 
+--                                            for which the returned list of JXPs are valid. 
+--returns
+--
+--       SYS_REFCURSOR      delivering a set of JXP codes and descriptions which are available for the given asset type.
+--                          Consisting of:
+--
+--                       NJX_CODE                   VARCHAR2(4)    The coded string representing the JXP
+--                       NJX_MEANING                VARCHAR2(80)   A description of the JXP
 
    FUNCTION getJXP (AssetType IN INTEGER)
       RETURN SYS_REFCURSOR;
 
+--</PROC>
+
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GETJXP_TAB">
+-- 
+-- To return a a cursor delivering a list of JXP codes and meanings which are valid for a specific asset type 
+--
+--Arguments
+--
+--      AssetType          IN INTEGER         The External asset type (the LB_OBJECT_TYPE in table LB_TYPES) 
+--                                            for which the returned list of JXPs are valid. 
+--returns
+--
+--       LB_JXP_TAB         A table of JXP codes and meanings which are available for the given asset type.
+--                          Consisting of:
+--
+--                       NJX_CODE                   VARCHAR2(4)    The coded string representing the JXP
+--                       NJX_MEANING                VARCHAR2(80)   A description of the JXP
+
    FUNCTION getJXP_TAB (AssetType IN INTEGER)
       RETURN lb_jxp_tab;
+
+--</PROC>
+
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GETASSETYPENETWORKTYPES">
+--
+-- To return a cursor delivering a list of network types and their units of measure for a
+-- specified asset type 
+--
+--Arguments
+--
+--      AssetType          IN INTEGER         The External asset type (the LB_OBJECT_TYPE in table LB_TYPES) 
+--                                            for which the returned list of JXPs are valid. 
+--returns
+--
+--       SYS_REFCURSOR      A cursor delivering a list of network types and units available for an asset type
+--                          Consisting of:
+--
+--                      ASSETTYPE              INTEGER    The External asset type (the LB_OBJECT_TYPE in table LB_TYPES)
+--                      NETWORKTYPEID          INTEGER    The integer key to the linear type
+--                      NETWORKTYPENAME        VARCHAR2   The name of the linear network type
+--                      NETWORKTYPEDESCR       VARCHAR2   The description of the linear network type
+--                      UNITNAME               VARCHAR2   The name of the units used to persist measures on this network 
 
    FUNCTION GETASSETYPENETWORKTYPES (AssetType IN INTEGER DEFAULT NULL)
       RETURN SYS_REFCURSOR;
 
+--</PROC>
+
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GETASSETYPENETWORKTYPE_TAB">
+--
+-- To return a table of information relating to the network types that are available as a basis for the
+-- placement of a specific asset type. Note that the returned cursor includes the network types that are
+-- groups which contain the datum type used to persist the asset locations. 
+--
+--Arguments
+--
+--      AssetType          IN INTEGER         The External asset type (the LB_OBJECT_TYPE in table LB_TYPES) 
+--                                            for which the returned list of JXPs are valid. 
+--returns
+--
+--       LB_ASSET_TYPE_NETWORK_TAB      a table of information relating to the network types that are available 
+--                                      as a basis for the placement of a specific asset type.
+--
+--                          Consisting of:
+--
+--                      ASSETTYPE              INTEGER    The External asset type (the LB_OBJECT_TYPE in table LB_TYPES)
+--                      NETWORKTYPEID          INTEGER    The integer key to the linear type
+--                      NETWORKTYPENAME        VARCHAR2   The name of the linear network type
+--                      NETWORKTYPEDESCR       VARCHAR2   The description of the linear network type
+--                      UNITNAME               VARCHAR2   The name of the units used to persist measures on this network 
+--
    FUNCTION GETASSETYPENETWORKTYPE_TAB (AssetType IN INTEGER DEFAULT NULL)
       RETURN lb_asset_type_network_tab;
 
+--</PROC>
+
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GETASSETNETWORKELEMENTS">
+-----------------------------------------------------------------------------
+--
+-- To return a cursor of data relating to the network element
+-- Note that this will be deprecated.
+--
+--Arguments
+--
+--      AssetType          IN INTEGER         This is unused. 
+--      NetworkTypeID      IN INTEGER         The integer key to the linear type
+--      NetworkElement     IN VARCHAR2        The name of the network element
+ --
+--returns
+--
+--       SYS_REFCURSOR      a cursor of data relating to the linear element. 
+--
+--                          Consisting of:
+--
+--                      NE_ID           The internal key of the network element
+--                      NE_UNIQUE       The name assigned to the network element
+--                      NE_DESCR        The description of the network element
+--                      NLT_G_I_D       A flag to indicate if the element is a datum or a group
+--                      NT_TYPE         The code assigned to the network type of this element
+--                      NT_UNIQUE       The name assigned to the network type of this element
+--                      NT_DESCR        The description of the network type
+--                      GTY_TYPE        If a group, th egroup type of the element
+--                      DATUM_TYPE      If a datum, the network type, if a group type then the 
+--                                      datum type related to the group type
+--                      NLT_ID          The internal key of the linear type
+--                      NLT_SEQ_NO      A sequence number assigned to the linear type
+--                      NLT_UNITS       The Exor units used for the persisted measures relating to the element
+----                    UN_UNIT_NAME    The name of the Exor units
+--                      UN_FORMAT_MASK  The format of the number data in the specified unit of measure
+--                      
    FUNCTION GETASSETNETWORKELEMENTS (
       ASSETTYPE        IN INTEGER DEFAULT NULL,
       NETWORKTYPEID    IN INTEGER DEFAULT NULL,
       NETWORKELEMENT   IN VARCHAR2 DEFAULT NULL)
       RETURN SYS_REFCURSOR;
 
+--</PROC>
+
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GETASSETNETWORKELEMENTS_TAB">
+-----------------------------------------------------------------------------
+--
+-- To return a table of data relating to the network element
+-- Note that this will be deprecated.
+--
+--Arguments
+--
+--      AssetType          IN INTEGER         This is unused. 
+--      NetworkTypeID      IN INTEGER         The integer key to the linear type
+--      NetworkElement     IN VARCHAR2        The name of the network element
+ --
+--returns
+--
+--           LB_LINEAR_REFNT_TAB  a table of data relating to the linear element. 
+--
+--                          Consisting of:
+--
+--                      NETWORKTYPEID          The internal key of the linear type
+--                      NETWORKELEMENTID       The internal key of the network element
+--                      NETWORKELEMENTNAME     The name assigned to the network element
+--                      NETWORKELEMENTDESCR    The description of the network element
+--                      NETWORKELEMENTTYPE     The code assigned to the network type of this element
+--                      NETWORKTYPEDESCR       The description of the network type
+--                      UNIT                   The name of the Exor units
+--                      
    FUNCTION GETASSETNETWORKELEMENTS_TAB (
       ASSETTYPE        IN INTEGER DEFAULT NULL,
       NETWORKTYPEID    IN INTEGER DEFAULT NULL,
       NETWORKELEMENT   IN VARCHAR2 DEFAULT NULL)
       RETURN lb_linear_refnt_tab;
 
+--</PROC>
+
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_POINT_OR_CONTINUOUS">
+-----------------------------------------------------------------------------
+--
+-- To return the flag of P or C to indicate if an asset type is Point or Continuous
+--
+--Arguments
+--
+--      AssetType     IN INTEGER       The External Asset type (as in LB_TYPES.LB_OBJECT_TYPE) 
+--
+--returns
+--
+--           VARCHAR2 - a single character code of P for Point or C for Continuous
+-- 
    FUNCTION GET_POINT_OR_CONTINUOUS (ASSETTYPE IN INTEGER)
       RETURN VARCHAR2;
 
+--</PROC>
+
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_POINT_OR_CONTINUOUS">
+-----------------------------------------------------------------------------
+--
+-- To return the flag of P or C to indicate if an asset type is Point or Continuous
+--
+--Arguments
+--
+--      Inv_Type      IN VARCHAR2     The Exor inventory type 
+--
+--returns
+--
+--           VARCHAR2 - a single character code of P for Point or C for Continuous
+--
    FUNCTION GET_POINT_OR_CONTINUOUS (INV_TYPE IN VARCHAR2)
       RETURN VARCHAR2;
 
-   --
+--</PROC>
+
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="CHECK_JXP">
+-----------------------------------------------------------------------------
+--
+-- To validate a JXP value for a specified asset type
+--
+--Arguments
+--
+--      AssetType     IN INTEGER      The External Asset type (as in LB_TYPES.LB_OBJECT_TYPE) 
+--      JXP           IN VARCHAR2     The JXP string to be validated (e.g. "Over")
+--
+--  Procedure will raise an exception when JXP string is invalid:
+--     ORA-20001: Juxtaposition not known
+--
+--
    PROCEDURE CHECK_JXP (ASSETTYPE IN INTEGER, JXP IN VARCHAR2);
+
+--</PROC>
+
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_XSP_ON_LB_RPT_TAB">
+-----------------------------------------------------------------------------
+--
+-- A function to return a table of XSPs that are suitable for a specified Exor inventory type
+-- over a location specified in a nested table of references. 
+--
+--Arguments
+--
+--      p_lb_rpt_tab  IN   LB_RPT_TAB   A table of locations 
+--      p_inv_type    IN   VARCHAR2     The Exor inventory type 
+--
 
    FUNCTION get_xsp_on_lb_rpt_tab (
       p_lb_rpt_tab   IN lb_rpt_tab,
       p_inv_type     IN LB_TYPES.LB_EXOR_INV_TYPE%TYPE)
       RETURN lb_xsp_tab;
+--</PROC>
+
 END lb_ref;
 /
