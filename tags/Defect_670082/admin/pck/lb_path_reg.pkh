@@ -1,0 +1,94 @@
+CREATE OR REPLACE PACKAGE lb_path_reg
+AS
+--<PACKAGE>
+
+   --   PVCS Identifiers :-
+   --
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_path_reg.pkh-arc   1.4   Aug 10 2018 17:05:58   Rob.Coupe  $
+   --       Module Name      : $Workfile:   lb_path_reg.pkh  $
+   --       Date into PVCS   : $Date:   Aug 10 2018 17:05:58  $
+   --       Date fetched Out : $Modtime:   Aug 10 2018 17:05:34  $
+   --       PVCS Version     : $Revision:   1.4  $
+   --
+   --   Author : R.A. Coupe
+   --
+   --   Location Bridge package for registering network metadata for pathing
+   --   Recently, the lb_path package was changed to use fixed global temporary tables 
+   --   and views which are populated on demand. This makes the registration of 
+   --   sets of metadata and the creation of static tables redundant. The package 
+   --   remains as it is currently used in the upgrade scripts as the transition is
+   --   made from the old way of working to the new. It will be deprecated at the
+   --   next major build.     
+   --
+   -----------------------------------------------------------------------------
+   -- Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
+   ----------------------------------------------------------------------------
+   --
+--</PACKAGE>
+--<GLOBVAR>
+
+   g_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.4  $';
+
+--</GLOBVAR>   
+   
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+--
+-- This function returns the current PVCS version of the package body		
+
+   FUNCTION get_version
+      RETURN VARCHAR2;
+--</PROC>
+--
+
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+--
+-- This function returns the current PVCS version of the package body		
+
+   FUNCTION get_body_version
+      RETURN VARCHAR2;
+--</PROC>
+--
+
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="REGISTER_NW_TYPES">
+--
+-- This procedure generates Oracle Spatial network metadata for a specific node type
+-- The procedure creates and populates the tables/views and metadata. 
+--
+--Arguments
+--
+--      pi_network_name      IN VARCHAR2     The name with which the network is to be known. Note that the name
+--                                           is also used as a sub-string in table names associated with the 
+--                                           network.
+--      pi_node_type         IN VARCHAR2     The node type. This defines a set of network elements of types which
+--                                           relate to the specified node type, these network elements and the nodes
+--                                           of the specified type are hived off for use in the Oracle network
+--                                           pathing tools.  
+
+   PROCEDURE register_nw_types (pi_network_name   IN VARCHAR2,
+                                pi_node_type      IN VARCHAR2);
+--</PROC>
+--
+   
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="DROP_NETWORK">
+--
+-- This procedure removes all references to a specified network - this means that
+-- the tables and views relating to the network along with all the metadata are removed.
+--
+--Arguments
+--	
+--      pi_network_name      IN VARCHAR2     The name with which the network is known. Note that the name
+--                                           is also used as a sub-string in table names associated with the 
+--                                           network and these tables are removed along with related metadata.
+   PROCEDURE drop_network (pi_network_name IN VARCHAR2);
+--</PROC>
+--
+END;
+/
