@@ -1,82 +1,278 @@
+/* Formatted on 13/08/2018 10:50:56 (QP5 v5.326) */
 CREATE OR REPLACE PACKAGE lb_nw_edit
 AS
-   --   PVCS Identifiers :-
-   --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_nw_edit.pkh-arc   1.1   Feb 22 2017 13:22:14   Rob.Coupe  $
-   --       Module Name      : $Workfile:   lb_nw_edit.pkh  $
-   --       Date into PVCS   : $Date:   Feb 22 2017 13:22:14  $
-   --       Date fetched Out : $Modtime:   Feb 22 2017 13:22:08  $
-   --       PVCS Version     : $Revision:   1.1  $
-   --
-   --   Author : R.A. Coupe
-   --
-   --   Network Edit package - performing updates to linear locations during network changes
-   --
-   -----------------------------------------------------------------------------
-   -- Copyright (c) 2016 Bentley Systems Incorporated. All rights reserved.
-   ----------------------------------------------------------------------------
-   --
-   g_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.1  $';
+    --<PACKAGE>
+    --------------------------------------------------------------------------------
+    --   PVCS Identifiers :-
+    --
+    --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_nw_edit.pkh-arc   1.2   Aug 13 2018 11:03:58   Rob.Coupe  $
+    --       Module Name      : $Workfile:   lb_nw_edit.pkh  $
+    --       Date into PVCS   : $Date:   Aug 13 2018 11:03:58  $
+    --       Date fetched Out : $Modtime:   Aug 13 2018 10:51:04  $
+    --       PVCS Version     : $Revision:   1.2  $
+    --
+    --   Author : R.A. Coupe
+    --
+    --   Network Edit package - performing updates to linear locations during network changes
+    --
+    -----------------------------------------------------------------------------
+    -- Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
+    ----------------------------------------------------------------------------
+    --
+    --</PACKAGE>
+    --<GLOBVAR>
+    --
+    g_sccsid        CONSTANT VARCHAR2 (2000) := '$Revision:   1.2  $';
 
-   c_split     CONSTANT VARCHAR2 (1) := 'S';
-   c_merge     CONSTANT VARCHAR2 (1) := 'M';
-   c_replace   CONSTANT VARCHAR2 (1) := 'R';
-   c_close     CONSTANT VARCHAR2 (1) := 'C';
-   
-   c_shift CONSTANT VARCHAR2(1) := 'H';
-   c_recalibrate CONSTANT VARCHAR2(1) := 'B';
-   
-   c_undo CONSTANT VARCHAR2(1) := 'U';
+    -----------------------------------------------------------------------------
+    c_split         CONSTANT VARCHAR2 (1) := 'S';
+    c_merge         CONSTANT VARCHAR2 (1) := 'M';
+    c_replace       CONSTANT VARCHAR2 (1) := 'R';
+    c_close         CONSTANT VARCHAR2 (1) := 'C';
 
-   FUNCTION get_version
-      RETURN VARCHAR2;
-   FUNCTION get_body_version
-      RETURN VARCHAR2;
+    c_shift         CONSTANT VARCHAR2 (1) := 'H';
+    c_recalibrate   CONSTANT VARCHAR2 (1) := 'B';
 
-   --
-   PROCEDURE lb_split (p_ne               IN INTEGER,
-                       p_split_m          IN NUMBER,
-                       p_ne1              IN INTEGER,
-                       p_ne2              IN INTEGER,
-                       p_effective_date   IN DATE,
-                       p_transaction_id   IN INTEGER);
+    c_undo          CONSTANT VARCHAR2 (1) := 'U';
 
-   PROCEDURE lb_merge (p_ne1              IN INTEGER,
-                       p_ne2              IN INTEGER,
-                       p_ne               IN INTEGER,
-                       p_effective_date   IN DATE,
-                       p_transaction_id   IN INTEGER);
+    --</GLOBVAR>
+    -----------------------------------------------------------------------------
+    --
+    --<PROC NAME="GET_VERSION">
+    --
+    -- This function returns the current PVCS version of the package
 
-   PROCEDURE lb_replace (p_ne1              IN INTEGER,
-                         p_ne2              IN INTEGER,
-                         p_effective_date   IN DATE,
-                         p_transaction_id   IN INTEGER);
+    FUNCTION get_version
+        RETURN VARCHAR2;
 
-   PROCEDURE lb_recalibrate (p_ne_id_of            IN NUMBER,
-                             p_original_length     IN NUMBER,
-                             p_start_m             IN NUMBER,
-                             p_new_length_to_end   IN NUMBER,
-                             p_transaction_id      IN INTEGER);
+    --</PROC>
 
-   PROCEDURE lb_shift (p_ne               IN INTEGER,
-                       p_start_m          IN NUMBER,
-                       p_shift_m          IN NUMBER,
-                       p_length           IN NUMBER,
-                       p_transaction_id   IN INTEGER);
+    -----------------------------------------------------------------------------
+    --
+    --<PROC NAME="GET_BODY_VERSION">
+    --
+    -- This function returns the current PVCS version of the package body
+    FUNCTION get_body_version
+        RETURN VARCHAR2;
 
-   PROCEDURE lb_close (p_ne               IN INTEGER,
-                       p_effective_date   IN DATE,
-                       p_transaction_id   IN INTEGER);
+    --</PROC>
+    -----------------------------------------------------------------------------
+    --
+    --<PROC NAME="LB_SPLIT">
+    --
+    -- A procedure which will split the locations relating to a network element into two new elements
+    --
+    --Arguments
+    --
+    --      p_ne             IN INTEGER        The original element which is being split.
+    --      p_split_m        IN NUMBER         The measure of the split point along the original element
+    --      p_ne1            IN INTEGER        The first of the resultant elements
+    --      p_ne2            IN INTEGER        The second of the resultant elements
+    --      p_effective_date IN DATE           The date at which the split becomes active
+    --      p_transaction_id IN INTEGER        an identifier which is used to log the split transaction
+    --                                         in the LB_ELEMENT_HISTORY table. The transaction_id is also
+    --                                         logged on the resultant location data.
 
-   PROCEDURE lb_undo (p_transaction_id IN INTEGER);
-   
-   PROCEDURE lb_undo (p_neh_id IN INTEGER);
+    PROCEDURE lb_split (p_ne               IN INTEGER,
+                        p_split_m          IN NUMBER,
+                        p_ne1              IN INTEGER,
+                        p_ne2              IN INTEGER,
+                        p_effective_date   IN DATE,
+                        p_transaction_id   IN INTEGER);
 
-   PROCEDURE lb_undo (p_ne_id IN INTEGER);   
+    --</PROC>
+    -----------------------------------------------------------------------------
+    --
+    --<PROC NAME="LB_MERGE">
+    --
+    -- A procedure which will merge the locations relating to two network elements into one new element.
+    --
+    --Arguments
+    --
+    --      p_ne1            IN INTEGER        The first original element which is being merged
+    --      p_ne2            IN INTEGER        The second original element which is being merged
+    --      p_ne             IN INTEGER        The ne_id of the new element formed from merging p_ne1 nd p_ne2
+    --      p_effective_date IN DATE           The date at which the merge becomes active
+    --      p_transaction_id IN INTEGER        an identifier which is used to log the merge transaction
+    --                                         in the LB_ELEMENT_HISTORY table. The transaction_id is also
+    --                                         logged on the resultant location data.
 
-   PROCEDURE log_transaction (p_transaction_id   IN INTEGER,
-                              p_neh_id           IN INTEGER);
+    PROCEDURE lb_merge (p_ne1              IN INTEGER,
+                        p_ne2              IN INTEGER,
+                        p_ne               IN INTEGER,
+                        p_effective_date   IN DATE,
+                        p_transaction_id   IN INTEGER);
 
-   PROCEDURE check_operation( p_op in VARCHAR2, p_ne1 in INTEGER, p_ne2 in INTEGER, p_start_m in number, p_shift_m in number, p_effective_date in date, p_length in number );                               
+    --</PROC>
+    -----------------------------------------------------------------------------
+    --
+    --<PROC NAME="LB_REPLACE">
+    --
+    -- A procedure which will replace the locations relating to one element onto a new element.
+    --
+    --Arguments
+    --
+    --      p_ne1            IN INTEGER        The original element which is being replaced
+    --      p_ne2            IN INTEGER        The new element which replaces p_ne1
+    --      p_effective_date IN DATE           The date at which the replace operation becomes active
+    --      p_transaction_id IN INTEGER        an identifier which is used to log the merge transaction
+    --                                         in the LB_ELEMENT_HISTORY table. The transaction_id is also
+    --                                         logged on the resultant location data.
+    --
+    PROCEDURE lb_replace (p_ne1              IN INTEGER,
+                          p_ne2              IN INTEGER,
+                          p_effective_date   IN DATE,
+                          p_transaction_id   IN INTEGER);
+
+    --</PROC>
+    -----------------------------------------------------------------------------
+    --
+    --<PROC NAME="LB_RECALIBRATE">
+    --
+    -- A procedure which will replace the locations relating to one element onto a new element.
+    --
+    --Arguments
+    --
+    --      p_ne_id_of           IN INTEGER       The element to be reclaibrated
+    --      p_original_length    IN NUMBER        The original length of element before reclalibration.
+    --      p_start_m            IN NUMBER        The start measure - the point after which the measures are affected.
+    --      p_new_length_to_end  IN NUMBER        The new length to the end of the element from the start point.
+    --      p_transaction_id IN INTEGER           an identifier which is used to log the merge transaction
+    --                                            in the LB_ELEMENT_HISTORY table. The transaction_id is also
+    --                                            logged on the resultant location data.
+    --
+
+    PROCEDURE lb_recalibrate (p_ne_id_of            IN NUMBER,
+                              p_original_length     IN NUMBER,
+                              p_start_m             IN NUMBER,
+                              p_new_length_to_end   IN NUMBER,
+                              p_transaction_id      IN INTEGER);
+
+    --</PROC>
+    -----------------------------------------------------------------------------
+    --
+    --<PROC NAME="LB_SHIFT">
+    --
+    -- A procedure which will replace the locations relating to one element onto a new element.
+    --
+    --Arguments
+    --
+    --      p_ne                 IN INTEGER       The element on which asset measures are to be shifted.
+    --      p_start_m            IN NUMBER        The start measure - the point after which the measures are affected.
+    --      p_shift_m            IN NUMBER        The amount by which asset measures are shifted.
+    --      p_length             IN NUMBER        The length of the element.
+    --      p_transaction_id     IN INTEGER       An identifier which is used to log the merge transaction
+    --                                            in the LB_ELEMENT_HISTORY table. The transaction_id is also
+    --                                            logged on the resultant location data.
+    --
+
+    PROCEDURE lb_shift (p_ne               IN INTEGER,
+                        p_start_m          IN NUMBER,
+                        p_shift_m          IN NUMBER,
+                        p_length           IN NUMBER,
+                        p_transaction_id   IN INTEGER);
+
+    --</PROC>
+    -----------------------------------------------------------------------------
+    --
+    --<PROC NAME="LB_CLOSE">
+    --
+    -- A procedure which will close (end-date) locations related to an element.
+    --
+    --Arguments
+    --
+    --      p_ne                 IN INTEGER       The element on which asset locations will be closed.
+    --      p_effective_date     IN DATE          The date at which the close operation becomes active
+    --      p_transaction_id     IN INTEGER       An identifier which is used to log the merge transaction
+    --                                            in the LB_ELEMENT_HISTORY table. The transaction_id is also
+    --                                            logged on the resultant location data.
+    --
+    PROCEDURE lb_close (p_ne               IN INTEGER,
+                        p_effective_date   IN DATE,
+                        p_transaction_id   IN INTEGER);
+
+    --</PROC>
+    -----------------------------------------------------------------------------
+    --
+    --<PROC NAME="LB_UNDO">
+    --
+    -- A procedure which will undo a previous edit operation (by transaction-id).
+    --
+    --Arguments
+    --
+    --      p_transaction_id     IN INTEGER       An identifier which is used to identify the edit to be undone.
+    --
+    PROCEDURE lb_undo (p_transaction_id IN INTEGER);
+
+    --</PROC>
+    -----------------------------------------------------------------------------
+    --
+    --<PROC NAME="LB_UNDO">
+    --
+    -- A procedure which will undo a previous edit operation (by element-hisory-id).
+    --
+    --Arguments
+    --
+    --      p_neh_id            IN INTEGER       The element history id as logged in the NM_ELEMENT_H1STORY table.
+    --
+
+    PROCEDURE lb_undo (p_neh_id IN INTEGER);
+
+    --</PROC>
+    -----------------------------------------------------------------------------
+    --
+    --<PROC NAME="LB_UNDO">
+    --
+    -- A procedure which will undo a previous edit operation (by element-ID).
+    --
+    --Arguments
+    --
+    --      p_ne_id             IN INTEGER       The element on thich the last operation is to be undone.
+    --
+
+    PROCEDURE lb_undo (p_ne_id IN INTEGER);
+
+    --</PROC>
+    -----------------------------------------------------------------------------
+    --
+    --<PROC NAME="LOG_TRANSACTION">
+    --
+    -- A procedure which will log the transaction of an edit.
+    --
+    --Arguments
+    --
+    --      p_transaction_id      IN INTEGER       The transaction_id to be logged.
+    --      p_neh_id              IN INTEGER       The element history of the transaction
+    --
+
+    PROCEDURE log_transaction (p_transaction_id   IN INTEGER,
+                               p_neh_id           IN INTEGER);
+
+    --</PROC>
+    -----------------------------------------------------------------------------
+    --
+    --<PROC NAME="CHECK_OPERATION">
+    --
+    -- A procedure which will check an operation is valid. The procedure will raise an exception
+    -- in cases where the transaction should be prevented due to possible violations of integrity
+    -- for example ORA-20056: Shift causes overhang of LB data at beginning of element
+    --
+    --Arguments
+    --
+    --      p_op             IN VARCHAR2       The operation type to be checked (see table at top of specification)
+    --      p_ne1            IN INTEGER        The first element in the operation to be checked.
+    --      p_ne2            IN INTEGER        The second element (if used) in the operation to be checked.
+    --      p_start_m        IN NUMBER         The start measure or split measure.
+    --      p_shift_m        IN NUMBER         The shift measure (if used)
+    --      p_effective_date IN DATE           The date of the operation
+    --
+    --
+    PROCEDURE check_operation (p_op               IN VARCHAR2,
+                               p_ne1              IN INTEGER,
+                               p_ne2              IN INTEGER,
+                               p_start_m          IN NUMBER,
+                               p_shift_m          IN NUMBER,
+                               p_effective_date   IN DATE,
+                               p_length           IN NUMBER);
 END;
 /
