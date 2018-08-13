@@ -1,22 +1,34 @@
 CREATE OR REPLACE PACKAGE lb_path
 AS
+--<PACKAGE>
+--------------------------------------------------------------------------------
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_path.pkh-arc   1.10   Nov 08 2017 15:07:20   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_path.pkh-arc   1.11   Aug 13 2018 17:09:34   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_path.pkh  $
-   --       Date into PVCS   : $Date:   Nov 08 2017 15:07:20  $
-   --       Date fetched Out : $Modtime:   Nov 08 2017 15:06:02  $
-   --       PVCS Version     : $Revision:   1.10  $
+   --       Date into PVCS   : $Date:   Aug 13 2018 17:09:34  $
+   --       Date fetched Out : $Modtime:   Aug 13 2018 17:07:08  $
+   --       PVCS Version     : $Revision:   1.11  $
    --
    --   Author : R.A. Coupe
    --
-   --   Location Bridge package for handling path data
+   --   Location Bridge package for handling path data. Path procedures operate with the Oracle
+   --   In-Memory network. A network must be registered and this can be done using the 
+   --   LB_PATH_REG.REGISTER_NW_TYPES which creates all the necessary tables for the handling 
+   --   of network and the least-cost path tools. This method is no-longer used and has been 
+   --   replaced by the registration of network which is performed at installation time.
+   --   This is done by passing a string of linear references and a buffer around which a
+   --   network and graph are created.
    --
    -----------------------------------------------------------------------------
-   -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
+   -- Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.10  $';
+   --</PACKAGE>
+--<GLOBVAR>
+   --
+
+   g_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.11  $';
    --
    g_network           VARCHAR2 (30) := 'LB_NETWORK';
 
@@ -25,45 +37,243 @@ AS
    g_buffer_size       NUMBER := nvl(to_number(hig.get_sysopt('LBNWBUFFER')), 200);
 
    --
-   ----------------------------------------------------------------------------
-   --
+--</GLOBVAR>
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+--
+-- This function returns the current PVCS version of the package 
+
    FUNCTION get_version
       RETURN VARCHAR2;
+--</PROC>
 
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+--
+-- This function returns the current PVCS version of the package body		
    FUNCTION get_body_version
       RETURN VARCHAR2;
+--</PROC>
 
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_G_NW_TYPES">
+--
+-- This function returns an array of the network types that are currently registered
+-- in memory - ( returns a NULL array if the network is not registered)
+-- Code to be deprecated
+-- 		
    FUNCTION get_g_nw_types
       RETURN ptr_vc_array_type;
+
+--</PROC>
+
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_PATH">
+--
+-- This function returns a cursor providing the least cost path between two nodes 
+-- using the currently registered network graph.  
+-- Code to be deprecated
+--
+--Arguments
+--
+--      pi_node1   IN INTEGER        A node used as the starting point for a least cost path
+--      pi_node2   IN INTEGER        A node used as the end point for a least cost path
+--
+--returns
+--      SYS_REFCURSOR providing data which is the least cost path between the two nodes.		
 
    FUNCTION get_path (pi_node1 IN INTEGER, pi_node2 IN INTEGER)
       RETURN SYS_REFCURSOR;
 
+--</PROC>
+
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_TSP_PATH">
+--
+-- This function returns a cursor providing the so-called TSP pth (or travelling saleman 
+-- problem which is the least cost path passing through all points). Points are defined
+-- as a collection of nodes in an array.
+-- Code to be deprecated		
+--
+--Arguments
+--
+--      pi_nodes   IN SDO_NUMBER_ARRAY   An array of nodes over which the least cost path is
+--                                       generated. 
+--
+--return
+--       SYS_REFCURSOR providing data which is the least cost path travelling through every node
+--       in the array.
+
    FUNCTION get_tsp_path (p_nodes IN sdo_number_array)
       RETURN SYS_REFCURSOR;
+--</PROC>
+
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_PATH_FROM_GDO">
+--
+-- This function returns a cursor providing the least cost path between nodes as
+-- provided through the GIS_DATA_OBJECS interface. 
+-- Code to be deprecated	
+--
+--Arguments
+--
+--      pi_gdo_session_id   IN INTEGER   The key to the data in the GIS_DATA_OBJECTS interface.
+--
+--return
+--       SYS_REFCURSOR providing data which is the least cost path between the nodes specified
+--       through the GIS_DATA_OBJECTS. 
+
 
    FUNCTION get_path_from_gdo (pi_gdo_session_id IN INTEGER)
       RETURN SYS_REFCURSOR;
+--</PROC>
+
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_TSP_PATH_FROM_GDO">
+--
+-- This function returns a cursor providing the so-called TSP pth (or travelling saleman 
+-- problem which is the least cost path passing through all points). Points are defined
+-- as a collection of nodes selected from a map and created in the interface table GIS_DATA_OBJECTS
+-- Code to be deprecated	
+-- 
+-- Arguments
+--
+--    pi_gdo_session_id   IN INTEGER    The key to the data through the GIS_DATA_OBJECTS table
+--
+--return
+--       SYS_REFCURSOR providing data which is the least cost path travelling through every node
+--       in the GIS_DATA_OBJECTS interface.
+--  
 
    FUNCTION get_tsp_path_from_gdo (pi_gdo_session_id IN INTEGER)
       RETURN SYS_REFCURSOR;
+--</PROC>
 
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_PATH_GEOMETRY">
+--
+-- This function returns a cursor providing the geometry of the elements in the path. 
+-- Code to be deprecated	
+-- 
+-- Arguments
+--
+--    pi_path   IN SDO_NUMBER_ARRAY     An array of elements formed into a path. 
+--
+--return
+--       SYS_REFCURSOR providing geometry of the path.
+-- 
    FUNCTION get_path_geometry (pi_path IN sdo_number_array)
       RETURN SYS_REFCURSOR;
 
-   --
+--</PROC>
+
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_SDO_PATH_GEOMETRY">
+--
+-- This function returns the sdo_geometry representing the path. 
+-- Code to be deprecated	
+-- 
+-- Arguments
+--
+--    pi_path   IN SDO_NUMBER_ARRAY     An array of elements formed into a path. 
+--
+--return
+--       SDO_GEOMETRY representing the path.
+--
    FUNCTION get_sdo_path_geometry (pi_path IN sdo_number_array)
       RETURN MDSYS.sdo_geometry;
+--</PROC>
 
-   --
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_SDO_PATH">
+--
+-- This function returns the least cost path between two nodes as calculated from the
+-- currently registered graph  
+-- 
+-- Arguments
+--
+--    p_no_1   IN INTEGER     The start node of the path.
+--    p_no_2   IN INTEGER     The end node of the path. 
+--
+--return
+--       SDO_NUMBER_ARRAY representing the path.
+--
+
    FUNCTION get_sdo_path (p_no_1 INTEGER, p_no_2 INTEGER)
       RETURN sdo_number_array;
+--</PROC>
+
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_SDO_PATH">
+--
+-- This function returns the least cost path between two linear references as calculated from the
+-- currently registered graph  
+-- 
+-- Arguments
+--
+--    l1   IN   NM_LREF     The start point of the path specified as a linear reference. 
+--    l2   IN   NM_LREF     The end point of the path specified as a linear reference. 
+--
+--return
+--       LB_RPT_TAB representing the path (an array of reference points)
+--
 
    FUNCTION get_sdo_path (l1 IN nm_lref, l2 IN nm_lref)
       RETURN lb_rpt_tab;
+--</PROC>
+
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_TSP_SDO_PATH">
+--
+-- This function returns the TSP path between nodes in the array as calculated from the
+-- currently registered graph  
+-- 
+-- Arguments
+--
+--    p_nodes    IN   SDO_NUMBER_ARRAY     A set of nodes which defines the TSP path. 
+--
+--return
+--       SDO_NUMBER_ARRAY representing the path (whole elements).
+--
 
    FUNCTION get_tsp_sdo_path (p_nodes IN sdo_number_array)
       RETURN sdo_number_array;
+--</PROC>
+
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="SET_NETWORK">
+--
+-- This function uses the data registered after the LB_PATH_REG register network procedure 
+-- has been used. The arguments of the procedure set specific values to restrict the data that
+-- is generated as the graph.  
+-- Code to be deprecated
+-- 
+-- Arguments
+--
+--    pi_network_name   IN   VARCHAR2     The network name which provides the set of nodes and elements
+--                                        from which the graph is computed. 
+--    pi_node_type      IN   VARCHAR2     An optional value of node type to restrict the graph to a specific node type
+--    pi_asset_type     IN   VARCHAR2     An optional value for an asset type which, through its relationship to the network
+--                                        restricts the elements in the graph.
+--    pi_xmin           IN   NUMBER       An optional minimum X value to restrict the elements of the graph through a spatial query
+--    pi_ymin           IN   NUMBER       An optional minimum Y value to restrict the elements of the graph through a spatial query
+--    pi_xmax           IN   NUMBER       An optional maximum X value to restrict the elements of the graph through a spatial query
+--    pi_ymax           IN   NUMBER       An optional maximum Y value to restrict the elements of the graph through a spatial query 
+--
+--
 
    PROCEDURE set_network (pi_network_name   IN VARCHAR2,
                           pi_node_type      IN VARCHAR2 DEFAULT NULL,
@@ -73,19 +283,102 @@ AS
                           pi_xmax           IN NUMBER DEFAULT NULL,
                           pi_ymax           IN NUMBER DEFAULT NULL);
 
-   --
+--</PROC>
+
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="NODE_STATE">
+--
+-- This function return the state of a node id within the connectivity graph. 
+-- Code to be deprecated
+-- 
+-- Arguments
+--
+--    p_node_id   IN   INTEGER     The node ID, the state of which is retrieved.
+--
+--Return VARCHAR2 - the state of the node in the graph  
+--
+
    FUNCTION node_state (p_node_id IN INTEGER)
       RETURN VARCHAR2;
+
+--</PROC>
+
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_PATH_AS_LB_RPT_TAB">
+--
+-- This function returns the least cost path between the two nodes as a nested table of linear references.
+-- 
+-- Arguments
+--
+--    p_no_1   IN   INTEGER     The start node ID of the path specified. 
+--    p_no_2   IN   INTEGER     The end node ID of the path specified. 
+--
+--return
+--       LB_RPT_TAB representing the path (an array of reference points)
+--
 
    FUNCTION get_path_as_lb_rpt_tab (p_no_1 INTEGER, p_no_2 INTEGER)
       RETURN lb_rpt_tab;
 
+--</PROC>
+
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_PATH_AS_LB_RPT_TAB">
+--
+-- This function converts the least-cost path from a simple array of elements into a nested table
+-- of  ordered/directed linear references.
+-- 
+-- Arguments
+--
+--    pi_path   IN   SDO_NUMBER_ARRAY     The path as specified by an array of element IDs.  
+--
+--return
+--       LB_RPT_TAB representing the path (as a ordered/directed array of reference points)
+--
+
    FUNCTION get_path_as_lb_rpt_tab (pi_path IN sdo_number_array)
       RETURN lb_rpt_tab;
+
+--</PROC>
+
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_LB_RPT_TAB_FROM_LREF_ARRAY">
+--
+-- This function generates a least cost path through the points specified by the array of linear references.
+-- Note that this differs from a TSP problem in that the path is generated from A to B to C .... etc. in the
+-- order of the array as opposed to finding a path of minimum distance that passes through each point at least once.
+-- 
+-- Arguments
+--
+--    pi_lref_array   IN   NM_LREF_ARRAY_TYPE     An array of points specifying the path.  
+--
+--return
+--       LB_RPT_TAB representing the path (as a ordered/directed array of reference points)
+--
 
    FUNCTION get_lb_rpt_tab_from_lref_array (
       pi_lref_array   IN nm_lref_array_type)
       RETURN lb_rpt_tab;
+--</PROC>
+
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="MAKE_NW_FROM_LREFS">
+--
+-- This function registers the network data and forms the graph from a set of linear references and
+-- a spatial buffer. An asste type is provided so as to restrict the types of elements in the graph. 
+-- 
+-- Arguments
+--
+--    pi_inv_type       IN   VARCHAR2               The Exor inventory type that restricts the list of elements being assembled.
+--    pi_lrefs          IN   NM_LREF_ARRAY          An array of points specifying the rough outline of the path
+--    pi_buffer         IN   NUMBER                 The spatial buffer around the line with vertices formed by the array of linear references 
+--    pi_buffer_units   IN   INTEGER                The Exor unit ID used in the specification of the buffer distance.
+--
 
    PROCEDURE make_nw_from_lrefs (
       pi_inv_type       IN lb_types.lb_exor_inv_type%TYPE,
