@@ -1,32 +1,76 @@
 CREATE OR REPLACE PACKAGE lb_load
 AS
+--<PACKAGE>
+--------------------------------------------------------------------------------
+
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_load.pkh-arc   1.9   Oct 31 2017 11:22:14   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_load.pkh-arc   1.10   Aug 14 2018 16:59:56   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_load.pkh  $
-   --       Date into PVCS   : $Date:   Oct 31 2017 11:22:14  $
-   --       Date fetched Out : $Modtime:   Oct 31 2017 11:21:40  $
-   --       PVCS Version     : $Revision:   1.9  $
+   --       Date into PVCS   : $Date:   Aug 14 2018 16:59:56  $
+   --       Date fetched Out : $Modtime:   Aug 14 2018 16:57:38  $
+   --       PVCS Version     : $Revision:   1.10  $
    --
    --   Author : R.A. Coupe
    --
-   --   Text description
+   --   Location Bridge package for the loading of location data
    --
    -----------------------------------------------------------------------------
-   -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
+   -- Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.9  $';
+--</PACKAGE>
+--<GLOBVAR>
+   --
+   g_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.10  $';
    g_nvl               VARCHAR2(4) := nm3type.c_nvl;
    g_sdo_tolerance     NUMBER := 0.005;
    g_sdo_arc_tolerance NUMBER := 0.05;
 
+--</GLOBVAR>
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+--
+-- This function returns the current PVCS version of the package 
+
    FUNCTION get_version
       RETURN VARCHAR2;
+--</PROC>
 
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+--
+-- This function returns the current PVCS version of the package body		
    FUNCTION get_body_version
       RETURN VARCHAR2;
+--</PROC>
 
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="LD_NAL">
+--
+-- This function loads data into the asset locations table. This table is a header for 
+-- the many spatial and network-based locations that an asset may have.
+--
+--Arguments
+--
+--      p_nal_nit_type       IN VARCHAR2  The Exor asset type of the asset
+--      p_nal_asset_id       IN INTEGER   The asset identifier (external asset id, not the Exor/LB OBJ_ID )
+--      p_nal_descr          IN VARCHAR2  A description of the asset location
+--      p_nal_jxp            IN INTEGER   The coded value representing a juxtaposition (JXP) 
+--      p_nal_primary        IN VARCHAR2  A simple value of Y or N refelecting whether the asset location is a primary one
+--      p_nal_location_type  IN VARCHAR2  A flag to indicate whether the location is network based (N) or Geometry based (G)
+--      p_nal_start_date     IN DATE      The date the asset location was deemed to start
+--      p_nal_security       IN INTEGER   A security key - would be used in cases where securty is based on a denormalised 
+--                                        security identifie such as sccope or admin unit. No security is deployed at present
+--                                        so a NULL value can be used.
+--
+--Return  
+--
+--       NAL_ID          INTEGER   The intenal key of the NM_ASSET_LOCATIONS data after it is created.
+-- 		
    FUNCTION ld_nal (
       p_nal_nit_type        IN nm_asset_locations_all.nal_nit_type%TYPE,
       p_nal_asset_id        IN nm_asset_locations_all.nal_asset_id%TYPE,
@@ -38,7 +82,27 @@ AS
       p_nal_security        IN nm_asset_locations_all.nal_security_key%TYPE)
       RETURN INTEGER;
 
-   --
+--</PROC>
+
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="LB_LD_RPT">
+--
+-- This function loads data into the detailed locations table. This table is the 
+-- main set of network based locations and relates the asset location to a set of 
+-- exor network elements.
+--
+--Arguments
+--
+--      pi_nal_id        IN INTEGER     The Exor internal ID of the asset location.
+--      pi_nal_nit_type  IN VARCHAR2    The Exor asset type of the asset
+--      pi_Rpt           IN LB_RPT_TAB  A nested table of location data 
+--      pi_xsp           IN VARCHAR2    A character code representing a cross-sectional position or XSP
+--      pi_start_date    IN DATE        The date at which the locations are deemed to have started 
+--      pi_security_id   IN INTEGER     A security key - would be used in cases where securty is based on a denormalised 
+--                                      security identifie such as sccope or admin unit. No security is deployed at present
+--                                      so a NULL value can be used.
+--
    PROCEDURE lb_ld_Rpt (
       pi_nal_id         IN nm_asset_locations_all.nal_id%TYPE,
       pi_nal_nit_type   IN nm_asset_locations_all.nal_nit_type%TYPE,
@@ -46,8 +110,32 @@ AS
       pi_xsp            IN VARCHAR2,
       pi_start_date     IN nm_asset_locations_all.nal_start_date%TYPE,
       pi_security_id    IN nm_asset_locations_all.nal_security_key%TYPE);
+--</PROC>
 
-   --
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="LB_LD_RANGE">
+--
+-- This function loads data into the detailed locations table via a range of measures
+-- relative to a known Exor network referent. 
+--
+--Arguments
+--
+--      pi_nal_id        IN INTEGER     The Exor internal ID of the asset location.
+--      pi_nal_nit_type  IN VARCHAR2    The Exor asset type of the asset
+--      pi_refnt         IN INTEGER     The key of an Exor network element used as a range linear reference
+--      pi_g_i_d         IN VARCHAR2    A flag to indicate if the location os based on a road group or a datum
+--      pi_nlt_id        IN INTEGER     The key of the network linear type
+--      pi_start_m       IN NUMBER      The start measure of the range relative to network referent
+--      pi_end_m         IN NUMBER      The end measure of the range relative to network referent
+--      pi_unit          IN INTEGER     The Exor unit-id of the measures provided. 
+--      pi_xsp           IN VARCHAR2    A character code representing a cross-sectional position or XSP
+--      pi_start_date    IN DATE        The date at which the locations are deemed to have started 
+--      pi_range_seq_no  IN INTEGER     An optional sequence number applied to the network locations from the range
+--      pi_security_id   IN INTEGER     A security key - would be used in cases where securty is based on a denormalised 
+--                                      security identifie such as sccope or admin unit. No security is deployed at present
+--                                      so a NULL value can be used.
+--
    PROCEDURE lb_ld_range (
       pi_nal_id         IN nm_asset_locations_all.nal_id%TYPE,
       pi_nal_nit_type   IN nm_asset_locations_all.nal_nit_type%TYPE,
@@ -61,8 +149,32 @@ AS
       pi_start_date     IN nm_asset_locations_all.nal_start_date%TYPE,
       pi_range_seq_no   IN INTEGER,      
       pi_security_id    IN nm_asset_locations_all.nal_security_key%TYPE);
+--</PROC>
 
-   --
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="LB_LD_PATH">
+--
+-- This function loads data into the detailed locations table via a least cost
+-- path between the start and end linear location definitions. 
+--
+--Arguments
+--
+--      pi_nal_id        IN INTEGER     The Exor internal ID of the asset location.
+--      pi_nal_nit_type  IN VARCHAR2    The Exor asset type of the asset
+--      pi_start_refnt   IN INTEGER     The key of an Exor network element used as a starting point of the path.
+--      pi_start_nlt_id  IN INTEGER     The key of the network linear type of the supplied start referent
+--      pi_start_m       IN NUMBER      The start measure of the path relative to start network referent
+--      pi_start_xsp     IN VARCHAR2    A character code representing an XSP on the start element.
+--      pi_end_refnt     IN INTEGER     The key of an Exor network element used as a end point of the path.
+--      pi_end_nlt_id    IN INTEGER     The key of the network linear type of the supplied end referent
+--      pi_end_m         IN NUMBER      The end measure of the path relative to end network referent
+--      pi_end_xsp       IN VARCHAR2    A character code representing an XSP on the end element.
+--      pi_start_date    IN DATE        The date at which the locations are deemed to have started 
+--      pi_security_id   IN INTEGER     A security key - would be used in cases where securty is based on a denormalised 
+--                                      security identifie such as sccope or admin unit. No security is deployed at present
+--                                      so a NULL value can be used.
+--
    PROCEDURE lb_ld_path (
       pi_nal_id         IN nm_asset_locations_all.nal_id%TYPE,
       pi_nal_nit_type   IN nm_asset_locations_all.nal_nit_type%TYPE,
@@ -76,8 +188,26 @@ AS
       pi_end_xsp        IN VARCHAR2,
       pi_start_date     IN nm_asset_locations_all.nal_start_date%TYPE,
       pi_security_id    IN nm_asset_locations_all.nal_security_key%TYPE);
+--</PROC>
 
-   --
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="LB_LD_LREF_ARRAY">
+--
+-- This function loads data into the detailed locations table via a range of measures
+-- relative to a known Exor network referent. 
+--
+--Arguments
+--
+--      pi_nal_id        IN INTEGER             The Exor internal ID of the asset location.
+--      pi_nal_nit_type  IN VARCHAR2            The Exor asset type of the asset
+--      pi_lref_array    IN NM_LREF_ARRAY_TYPE  An array of linear references used as the basis of a least cost path.
+--      pi_xsp           IN VARCHAR2            A character code representing an XSP of the location.
+--      pi_start_date    IN DATE                The date at which the locations are deemed to have started 
+--      pi_security_id   IN INTEGER             A security key - would be used in cases where securty is based on a denormalised 
+--                                              security identifie such as sccope or admin unit. No security is deployed at present
+--                                              so a NULL value can be used.
+
    PROCEDURE lb_ld_lref_array (
       pi_nal_id         IN nm_asset_locations_all.nal_id%TYPE,
       pi_nal_nit_type   IN nm_asset_locations_all.nal_nit_type%TYPE,
@@ -85,40 +215,155 @@ AS
       pi_xsp            IN VARCHAR2,
       pi_start_date     IN nm_asset_locations_all.nal_start_date%TYPE,
       pi_security_id    IN nm_asset_locations_all.nal_security_key%TYPE);
+--</PROC>
 
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="LB_LD_GEOM">
+--
+-- This function loads geometry based data into the geometry tables. This is when
+-- assets are deemed to have a geometry that is independent of the network.  
+--
+--Arguments
+--
+--      pi_nal_id        IN INTEGER             The Exor internal ID of the asset location.
+--      pi_nal_nit_type  IN VARCHAR2            The Exor asset type of the asset
+--      pi_geom          IN SDO_GEOMETRY        The geometry of the asset location
+--      pi_start_date    IN DATE                The date at which the locations are deemed to have started 
+--      pi_security_id   IN INTEGER             A security key - would be used in cases where securty is based on a denormalised 
+--                                              security identifie such as sccope or admin unit. No security is deployed at present
+-- 
    PROCEDURE lb_ld_geom (
       pi_nal_id         IN nm_asset_locations_all.nal_id%TYPE,
       pi_nal_nit_type   IN nm_asset_locations_all.nal_nit_type%TYPE,
       pi_geom           IN MDSYS.sdo_geometry,
       pi_start_date     IN nm_asset_locations_all.nal_start_date%TYPE,
       pi_security_id    IN nm_asset_locations_all.nal_security_key%TYPE);
+--</PROC>
 
-
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="DELETE_ASSET_LOCATION">
+--
+-- This function deletes an asset location(s) by reference to an asset id and type
+-- and optional JXP reference. The code will remove all location details and any geometry
+-- that is derived and/or aggregated.
+--
+--Arguments
+--
+--      pi_nal_asset_id  IN INTEGER             The Exor internal ID of the asset location.
+--      pi_nal_nit_type  IN VARCHAR2            The Exor asset type of the asset
+--      pi_geom          IN SDO_GEOMETRY        The geometry of the asset location
+--      pi_nal_jxp       IN VARCHAR2            The JXP meaning of the asset location to be deleted. 
+-- 
    PROCEDURE delete_asset_location (
       pi_nal_asset_id   IN INTEGER,
       pi_nal_nit_type   IN VARCHAR2,
       pi_nal_jxp        IN VARCHAR2 DEFAULT NULL);
+--</PROC>
 
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="DELETE_LOCATION">
+--
+-- This function deletes all location details including any geometry
+-- that is derived and/or aggregated.
+--
+--Arguments
+--
+--      pi_nal_id  IN INTEGER             The Exor internal ID of the asset location.
+-- 
    PROCEDURE delete_location (pi_nal_id IN INTEGER);
+--</PROC>
 
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="CLOSE_ASSET_LOCATION">
+--
+-- This function end-dates (closes) all location details relating to the 
+-- specified asset including any geometry that is derived and/or aggregated.
+--
+--Arguments
+--
+--      pi_nal_asset_id  IN INTEGER             The Exor internal ID of the asset location.
+--      pi_nal_nit_type  IN VARCHAR2            The Exor asset type of the asset
+--      pi_end_date      IN DATE                The date that the locations will be closed
+--      pi_nal_jxp       IN VARCHAR2            The JXP of the asset locations being closed
+--
    PROCEDURE close_asset_location (
       pi_nal_asset_id   IN INTEGER,
       pi_nal_nit_type   IN VARCHAR2,
       pi_end_date       IN DATE,
       pi_nal_jxp        IN VARCHAR2 DEFAULT NULL);
+--</PROC>
+
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="CLOSE_LOCATION">
+--
+-- This function closes all location details including any geometry
+-- that is derived and/or aggregated.
+--
+--Arguments
+--
+--      pi_nal_id  IN INTEGER             The Exor internal ID of the asset location.
+-- 
 
    PROCEDURE close_location (pi_nal_id IN INTEGER, pi_end_date IN DATE);
+--</PROC>
+
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="AGGREGATE_GEOMETRY">
+--
+-- This function refreshes the aggregated asset geometry. It uses all locations for 
+-- the asset identified by the singular asset location ID. 
+--
+--Arguments
+--
+--      pi_nal_id     IN INTEGER             The Exor internal ID of the asset location.
+--      pi_start_date IN DATE                The start-date of the aggregated geometry
 
    PROCEDURE aggregate_geometry (pi_nal_id IN INTEGER, pi_start_date IN DATE);
+--</PROC>
 
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="AGGREGATE_GEOMETRY">
+--
+-- This function refreshes the aggregated asset geometry. It uses all locations for 
+-- the asset. 
+--
+--Arguments
+--
+--      pi_asset_id       IN INTEGER    The asset identifier
+--      pi_location_type  IN VARCHAR2   A coded value of N or G to indicate if the asset geometry is 
+--                                      one that is derived from or is independent from the network
+--      pi_obj_type       IN VARCHAR2   The Exor inventory type of the asset locations
+--      pi_start_date     IN DATE       The start-date of the aggregated geometry
+--
    PROCEDURE aggregate_geometry (pi_asset_id        IN INTEGER,
                                  pi_location_type   IN VARCHAR2,
                                  pi_obj_type        IN VARCHAR2,
                                  pi_start_date      IN DATE);
+--</PROC>
 
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="UPDATE_LOCATION">
+--
+-- This function updates information on the asset location record.  
+--
+--Arguments
+--
+--      p_nal_id     IN INTEGER             The Exor internal ID of the asset location.
+--      p_nal_descr  IN VARCHAR2            The description of the asset location
+--      p_jxp       IN VARCHAR2            The JXP meaning of the asset location to be deleted. 
+--
    PROCEDURE update_location (
       p_nal_id      IN nm_asset_locations_all.nal_id%TYPE,
       p_nal_descr   IN nm_asset_locations_all.nal_descr%TYPE DEFAULT g_nvl,
       p_jxp         IN nm_juxtapositions.njx_meaning%TYPE DEFAULT g_nvl);
+--</PROC>      
 END lb_load;
 /
