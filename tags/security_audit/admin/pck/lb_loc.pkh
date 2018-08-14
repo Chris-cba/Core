@@ -1,0 +1,372 @@
+CREATE OR REPLACE PACKAGE lb_loc
+AS
+--<PACKAGE>
+--------------------------------------------------------------------------------
+--
+   --   PVCS Identifiers :-
+   --
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_loc.pkh-arc   1.6   Aug 14 2018 14:47:26   Rob.Coupe  $
+   --       Module Name      : $Workfile:   lb_loc.pkh  $
+   --       Date into PVCS   : $Date:   Aug 14 2018 14:47:26  $
+   --       Date fetched Out : $Modtime:   Aug 14 2018 14:35:40  $
+   --       PVCS Version     : $Revision:   1.6  $
+   --
+   --   Author : R.A. Coupe
+   --
+   --   Location Bridge package for handling locations
+
+   --
+   -----------------------------------------------------------------------------
+   -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
+   ----------------------------------------------------------------------------
+   --
+--
+   --</PACKAGE>
+--<GLOBVAR>
+   --
+
+   g_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.6  $';
+   --
+--</GLOBVAR>
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+--
+-- This function returns the current PVCS version of the package 
+
+   FUNCTION get_version
+      RETURN VARCHAR2;
+--</PROC>
+
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+--
+-- This function returns the current PVCS version of the package body		
+   FUNCTION get_body_version
+      RETURN VARCHAR2;
+--</PROC>
+
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_NAL">
+--
+-- Function to return a cursor of asset locations and JXPs (query by asset-id and exor asset type)
+--
+--Arguments
+--
+--      pi_asset_id     IN INTEGER   The asset identifier (external asset id, not the Exor/LB OBJ_ID )
+--      pi_nal_nit_type IN VARCHAR2  The Exor asset type of the asset
+--
+--Return   SYS_REFCURSOR of asset location header details consisting of:
+--
+--       NAL_ID          INTEGER   The intenal key of the NM_ASSET_LOCATIONS data
+--       NAL_ASSET_ID    INTEGER   The asset identifier
+--       NAL_NIT_TYPE    VARCHAR2  The Exor inventory type of the asset
+--       NAL_DESCR       VARCHAR2  The description assigned to the asset location
+--       NAL_JXP         INTEGER   The code representing the juxtaposition (JXP)
+--       NAL_PRMARY      VARCHAR2  A single character of Y/N which indicates if the location is considered primary
+--  
+--
+   FUNCTION get_nal (
+      pi_asset_id       IN nm_asset_locations_all.nal_asset_id%TYPE,
+      pi_nal_nit_type   IN nm_asset_locations_all.nal_nit_type%TYPE)
+      RETURN SYS_REFCURSOR;
+--</PROC>
+
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_LOCATION">
+--
+-- Function to return a set of locations for a location identifier. This is the location data in its
+-- persisted state. i.e. ids, native network references and measures, for a specific asset location ID
+--
+--Arguments
+--
+--      pi_nal_id       IN INTEGER   The asset location identifier 
+--
+--Return   SYS_REFCURSOR of asset location details consisting of:
+--
+--       NM_NE_ID_OF     INTEGER   The intenal key of the network element of the linear location
+--       NE_UNIQUE       INTEGER   The name of the network element 
+--       NM_BEGIN_MP     VARCHAR2  The start measure relative to the network element of the asset location
+--       NM_END_MP       VARCHAR2  The end measure relative to the network element of the asset location
+--       UN_UNIT_NAME    VARCHAR2  The name of the units of the start and end measures.
+--  
+    FUNCTION get_location (pi_nal_id nm_asset_locations_all.nal_id%TYPE)
+      RETURN SYS_REFCURSOR;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_ASSET_LOCATION">
+--
+-- Function to return cursor of locations for an asset id and type. This is the location data in its
+-- persisted state. i.e. ids, native network references and measures, for a specific asset id and typelocation ID
+--
+--Arguments
+--
+--      pi_asset_id       IN INTEGER   The asset identifier 
+--      pi_nal_nit_type   IN VARCHAR2  The Exor inventory type of the asset
+--
+--Return   SYS_REFCURSOR of asset location details consisting of:
+--
+--       NM_NE_ID_OF     INTEGER   The intenal key of the network element of the linear location
+--       NE_UNIQUE       INTEGER   The name of the network element 
+--       NM_BEGIN_MP     VARCHAR2  The start measure relative to the network element of the asset location
+--       NM_END_MP       VARCHAR2  The end measure relative to the network element of the asset location
+--       UN_UNIT_NAME    VARCHAR2  The name of the units of the start and end measures.
+--  
+   FUNCTION get_asset_location (
+      pi_asset_id       IN nm_asset_locations_all.nal_asset_id%TYPE,
+      pi_nal_nit_type   IN nm_asset_locations_all.nal_nit_type%TYPE)
+      RETURN SYS_REFCURSOR;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_NAL_GEOM">
+--
+-- Function to return a cursor consisting of the aggregated geometry representing 
+-- the asset location. 
+--
+--Arguments
+--
+--      pi_nal_id       IN INTEGER   The asset location identifier 
+--
+--Return   SYS_REFCURSOR of SDO_GEOMETRY - the aggregated geometry representing asset location.
+--
+   FUNCTION get_nal_geom (pi_nal_id nm_asset_locations_all.nal_id%TYPE)
+      RETURN SYS_REFCURSOR;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_ASSET_GEOM">
+--
+-- Function to return a cursor consisting of the aggregated geometry for a specific 
+-- asset id and exor asset type
+--
+--Arguments
+--
+--      pi_asset_id       IN INTEGER   The asset identifier 
+--      pi_nal_nit_type   IN VARCHAR2  The Exor inventory type of the asset
+--
+--Return   SYS_REFCURSOR of SDO_GEOMETRY - the aggregated geometry representing the asset
+--
+   FUNCTION get_asset_geom (
+      pi_asset_id       IN nm_asset_locations_all.nal_asset_id%TYPE,
+      pi_nal_nit_type   IN nm_asset_locations_all.nal_nit_type%TYPE)
+      RETURN SYS_REFCURSOR;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_NAL_GEOM_MBR">
+--
+-- Function to return a cursor consisting of the minimum bounding rectangle of the
+-- aggregated geometry for a specific asset location ID
+--
+--Arguments
+--
+--      pi_nal_id       IN INTEGER   The asset location identifier 
+--
+--Return   SYS_REFCURSOR of SDO_GEOMETRY - the mbr of the aggregated geometry of the asset location
+--
+   FUNCTION get_nal_geom_mbr (pi_nal_id nm_asset_locations_all.nal_id%TYPE)
+      RETURN SYS_REFCURSOR;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_ASSET_GEOM_MBR">
+--
+-- Function to return a cursor consisting of the MBR of the aggregated geometry 
+-- for a specific asset id and exor asset type
+--
+--Arguments
+--
+--      pi_asset_id       IN INTEGER   The asset identifier 
+--      pi_nal_nit_type   IN VARCHAR2  The Exor inventory type of the asset
+--
+--Return   SYS_REFCURSOR of SDO_GEOMETRY - the MBR of the aggregated geometry representing the asset
+--
+
+   FUNCTION get_asset_geom_mbr (
+      pi_asset_id       IN nm_asset_locations_all.nal_asset_id%TYPE,
+      pi_nal_nit_type   IN nm_asset_locations_all.nal_nit_type%TYPE)
+      RETURN SYS_REFCURSOR;
+
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="translate_nlt">
+--
+-- Function to translate a table of locations from their usual persisted state to 
+-- locations relative to a different referent type (group). There is an option to 
+-- use an inner or outer join flag which indicates that the original datum location
+-- should be included if there is no translation.   
+--
+--Arguments
+--
+--      pi_lb_rpt_tab       IN LB_RPT_TAB  The table of locations 
+--      pi_refnt_type       IN INTEGER     The referent type - a key to the Exor network linear type (NLT_ID)
+--                                         to which the locations should be translated.
+--      pi_inner_join_flag  IN VARCHAR2    A flag to indicate if locations should be included 
+--                                         if no translation exists
+--      pi_cardinality      IN INTEGER     An estimate of the rows retrieved to be used in some cases
+--                                         of Oracle to assist the
+--
+--Return   LB_RPT_TAB - the table of locations after translation.
+--
+   FUNCTION translate_nlt (pi_lb_rpt_tab        IN lb_RPt_tab,
+                           pi_refnt_type        IN INTEGER,
+                           pi_inner_join_flag   IN VARCHAR2 DEFAULT 'Y',
+                           pi_cardinality       IN INTEGER)
+      RETURN lb_RPt_tab;
+
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_PREF_LOCATION_TAB">
+-- Function to return the location of an asset as a set of ref-points relative to the preferred referencing system.
+   
+--
+--Arguments
+--
+--      pi_asset_id       IN INTEGER     The asset ID 
+--      pi_nal_nit_type   IN VARCHAR2    The Exor inventory type of the asset.
+--      pi_refnt_type     IN INTEGER     The referent type relative to which asset locations are retrieved
+--
+--Return   LB_RPT_TAB - the table of locations as preferred references.
+--
+   FUNCTION get_pref_location_tab (
+      pi_asset_id       IN nm_asset_locations_all.nal_asset_id%TYPE,
+      pi_nal_nit_type   IN nm_asset_locations_all.nal_nit_type%TYPE,
+      pi_refnt_type     IN INTEGER)
+      RETURN lb_RPt_tab;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_PREF_LOCATION_TAB">
+-- Function to return the location details of an asset location as a set of ref-points relative 
+-- to the preferred referencing system.
+--
+--Arguments
+--
+--      pi_nal_id         IN INTEGER     The asset location ID 
+--      pi_refnt_type     IN INTEGER     The referent type relative to which asset locations are retrieved
+--
+--Return   LB_RPT_TAB - the table of locations as preferred references. 
+--
+
+   FUNCTION get_pref_location_tab (
+      pi_nal_id       IN nm_asset_locations_all.nal_id%TYPE,
+      pi_refnt_type   IN INTEGER)
+      RETURN lb_RPt_tab;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="translate_xnlt">
+--
+-- Function to translate a table of locations and XSPs from their usual persisted state to 
+-- locations relative to a different referent type (group). There is an option to 
+-- use an inner or outer join flag which indicates that the original datum location
+-- should be included if there is no translation. XSPs are reversed if XSP reversal
+-- rules are present.  
+--
+--Arguments
+--
+--      pi_lb_xrpt_tab      IN LB_RPT_TAB  The table of locations 
+--      pi_refnt_type       IN INTEGER     The referent type - a key to the Exor network linear type (NLT_ID)
+--                                         to which the locations should be translated.
+--      pi_inner_join_flag  IN VARCHAR2    A flag to indicate if locations should be included 
+--                                         if no translation exists
+--      pi_cardinality      IN INTEGER     An estimate of the rows retrieved to be used in some cases
+--                                         of Oracle to assist the
+--
+--Return   LB_XRPT_TAB - the table of locations and XSPs after translation/reversal
+--
+
+   FUNCTION translate_xnlt (pi_lb_xrpt_tab       IN lb_XRPt_tab,
+                            pi_refnt_type        IN INTEGER,
+                            pi_inner_join_flag   IN VARCHAR2 DEFAULT 'Y',
+                            pi_cardinality       IN INTEGER)
+      RETURN lb_XRPt_tab;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_ASSET_LOCATION_TAB">
+--
+-- Function to retrieve and translate an asset location from their usual persisted 
+-- state to locations relative to a different referent type (group).  
+--
+--Arguments
+--
+--      pi_asset_id      IN INTEGER    The asset ID
+--      pi_nal_nit_type  IN VARCHAR2   The Exor inventory type of the asset 
+--      pi_nal_id        IN INTEGER    The internal key of the asset location
+--      pi_refnt_type    IN VARCHAR2   The referent type of the retrieved location data
+--
+--Return   LB_XRPT_TAB - the table of locations and XSPs after translation/reversal
+--
+   FUNCTION get_asset_location_tab (
+      pi_asset_id       IN nm_asset_locations_all.nal_asset_id%TYPE,
+      pi_nal_nit_type   IN nm_asset_locations_all.nal_nit_type%TYPE,
+      pi_nal_id         IN nm_asset_locations_all.nal_id%TYPE,
+      pi_refnt_type     IN INTEGER)
+      RETURN lb_XRPt_tab;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_PREF_LOCATION">
+--
+-- Function to retrieve and translate an asset location from their usual persisted 
+-- state to locations relative to a different referent type (group).  
+--
+--Arguments
+--
+--      pi_asset_id      IN INTEGER    The asset ID
+--      pi_nal_nit_type  IN VARCHAR2   The Exor inventory type of the asset 
+--      pi_refnt_type    IN VARCHAR2   The referent type of the retrieved location data
+--
+--Return   SYS_REFCURSOR  Cursor of locations and XSPs after translation/reversal
+--
+
+   FUNCTION get_pref_location (
+      pi_asset_id       IN nm_asset_locations_all.nal_asset_id%TYPE,
+      pi_nal_nit_type   IN nm_asset_locations_all.nal_nit_type%TYPE,
+      pi_refnt_type     IN INTEGER)
+      RETURN SYS_REFCURSOR;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="XSPS_FOR_ASSET_LOCATION">
+--
+-- Function to retrieve the set of available XSPs for an Exor inventory type
+-- over a set of locations in a nested table. This will be deprecated in the
+-- next major release as it is just a wrapper function making reference to
+-- LB_REF.GET_XSP_ON_LB_RPT_TAB
+--
+--Arguments
+--
+--      p_lb_rpt_tab     IN LB_RPT_TAB A nested table of locations
+--      p_exor_inv_type  IN VARCHAR2   The Exor inventory type of the asset 
+--
+--Return   LB_XSP_TAB - a table of valid XSPs and descriptions that are deemed valid
+--         over the locations in the nested table and valid for the specified inventory type.
+--
+   FUNCTION xsps_for_asset_location (p_lb_rpt_tab      IN lb_rpt_tab,
+                                     p_exor_inv_type   IN VARCHAR2)
+      RETURN lb_xsp_tab;
+--</PROC>
+--
+END lb_loc;
+/
