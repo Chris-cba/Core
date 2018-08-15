@@ -1,0 +1,637 @@
+CREATE OR REPLACE PACKAGE lb_get
+AS
+--<PACKAGE>
+--------------------------------------------------------------------------------
+    --   PVCS Identifiers :-
+    --
+    --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_get.pkh-arc   1.23   Aug 15 2018 16:49:14   Rob.Coupe  $
+    --       Module Name      : $Workfile:   lb_get.pkh  $
+    --       Date into PVCS   : $Date:   Aug 15 2018 16:49:14  $
+    --       Date fetched Out : $Modtime:   Aug 15 2018 16:47:52  $
+    --       PVCS Version     : $Revision:   1.23  $
+    --
+    --   Author : R.A. Coupe
+    --
+    --   Location Bridge package for retrieving asset and their locations
+    --
+    -----------------------------------------------------------------------------
+    -- Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
+    ----------------------------------------------------------------------------
+    --
+--</PACKAGE>
+--<GLOBVAR>
+   --
+    g_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.23  $';
+
+--</GLOBVAR>
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+--
+-- This function returns the current PVCS version of the package 
+
+   FUNCTION get_version
+      RETURN VARCHAR2;
+--</PROC>
+
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+--
+-- This function returns the current PVCS version of the package body		
+   FUNCTION get_body_version
+      RETURN VARCHAR2;
+--</PROC>
+
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_OBJ_RPT_TAB">
+--
+-- This function retrieves the set of locations for an object, optionally restricted by a set of locations
+-- in the from of a nested table. Various options exist on the query to perform intersections or to restrict 
+-- the query to those assets that are in LB only or those assets that are wholly contained in the locations.
+--
+--Arguments
+--
+--      p_refnt_tab      IN VARCHAR2  A set of locations which optionally restrict the list of asset locations retrieved.
+--      p_obj_type       IN VARCHAR2  The Exor inventory type to restrict the asset locations being retrieved. 
+--      p_obj_id         IN INTEGER   The Exor ID of the asset data being retrieved
+--      p_intsct         IN VARCHAR2  A flag to denote whether the returned location data should be that of the intersection of the asset location 
+--                                    with the specified range. This is ignored if the range or referent is not entered. It takes the value of ˜TRUE or ˜FALSE
+--      p_lb_only        IN VARCHAR2  A flag to indicate if asset data should be retrieved from the location bridge silo of location data. 
+--                                    It takes the value of TRUE or ˜FALSE. If set to TRUE, the function will retrieve only those asset 
+--                                    locations which are configured in Location Bridge (for example those which relate directly to assets 
+--                                    within eB ). If the value is set to FALSE then the location data of standard Exor assets will 
+--                                    be retrieved. 
+--      p_whole_only     IN VARCHAR2  A flag to indicate if asset location data should be returned if part of the asset location lies outside of any range specified.
+--      p_cardinality    IN INTEGER   An indicator of the number of rows expected. This allows statistics to be used by the Oracle optimizer in cases where the resultant 
+--                                    nested table is joined to another table. This depends on the version of Oracle. A value of 10 is a reasonable 
+--                                    compromise but in later releases of Oracle, the value will be ignored as the optimizer uses the accumulated statistics of the 
+--                                    nested table at execution time.
+--
+-- Return     LB_RPT_TAB - a list of asset location IDs, locations and related data in the from of a nested table.
+
+    FUNCTION get_obj_RPt_tab (p_refnt_tab     IN lb_RPt_tab,
+                              p_obj_type      IN VARCHAR2,
+                              p_obj_id        IN INTEGER,
+                              p_intsct        IN VARCHAR2 DEFAULT 'FALSE',
+                              p_lb_only       IN VARCHAR2 DEFAULT 'FALSE',
+                              p_whole_only    IN VARCHAR2 DEFAULT 'FALSE',
+                              p_cardinality   IN INTEGER)
+        RETURN lb_RPt_tab;
+--</PROC>
+
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_REFNT_RPT_TAB_FROM_GEOM">
+--
+-- This function retrieves a nested table of network locations which have a spatial relationship
+-- to the specified geometry. Note that currently the code operates only with an ANYINTERACT mask.
+-- The returned location is in the form of a nested table which can be used by other procedures.
+-- The theme ID should be the theme of an Exor network table. Use the other version of this 
+-- procedure to query back asset data based on geometry.
+--
+--Arguments
+--
+--      p_geom         IN SDO_GEOMETRY  A geometry used as the basis of the query.
+--      p_theme_id     IN INTEGER       The Exor theme identifier.
+--      p_mask_array   IN VARCHAR2      A string of separated topological relationships - currently restricted to ANYINTERACT
+--      p_cardinality  IN INTEGER       An indicator of the number of rows expected. This allows statistics to be used by the Oracle optimizer in cases where the resultant 
+--                                      nested table is joined to another table. This depends on the version of Oracle. A value of 10 is a reasonable 
+--                                      compromise but in later releases of Oracle, the value will be ignored as the optimizer uses the accumulated statistics of the 
+--                                      nested table at execution time.
+--
+-- Return     LB_RPT_TAB - a list of location IDs, locations and related data in the from of a nested table.
+
+    FUNCTION get_refnt_RPt_tab_from_geom (
+        p_geom          IN MDSYS.sdo_geometry,
+        p_theme_id      IN nm_themes_all.nth_theme_id%TYPE,
+        p_mask_array    IN VARCHAR2 DEFAULT 'ANYINTERACT',
+        p_cardinality   IN INTEGER)
+        RETURN lb_RPt_tab;
+--</PROC>
+
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_REFNT_RPT_TAB_FROM_GEOM">
+--
+-- This function retrieves a nested table of asset related network locations which have a 
+-- spatial relationship to the specified geometry. 
+-- The returned location is in the form of a nested table which can be used by other procedures
+--
+--Arguments
+--
+--      p_geom         IN SDO_GEOMETRY  A geometry used as the basis of the query.
+--      p_inv_type     IN VARCHAR2      The inventory type to be queried. 
+--      p_cardinality  IN INTEGER       An indicator of the number of rows expected. This allows statistics to be used by the Oracle optimizer in cases where the resultant 
+--                                      nested table is joined to another table. This depends on the version of Oracle. A value of 10 is a reasonable 
+--                                      compromise but in later releases of Oracle, the value will be ignored as the optimizer uses the accumulated statistics of the 
+--                                      nested table at execution time.
+--
+-- Return     LB_RPT_TAB - a list of location IDs, locations and related data in the from of a nested table.
+
+    FUNCTION get_refnt_RPt_tab_from_geom (
+        p_geom          IN MDSYS.sdo_geometry,
+        p_inv_type      IN lb_types.lb_exor_inv_type%TYPE,
+        p_cardinality   IN INTEGER)
+        RETURN lb_RPt_tab;
+--</PROC>
+
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_REFNT_RPT_TAB_FROM_NSPE">
+--
+-- This function retrieves a nested table of asset related network locations from a saved
+-- spatial extent.
+-- The returned location is in the form of a nested table which can be used by other procedures
+--
+--Arguments
+--
+--      p_nspe_id      IN INTEGER       The id of the spatial extent.
+--      p_theme_id     IN INTEGER       The Exor theme identifier. 
+--      p_mask_array   IN VARCHAR2      A string of separated topological relationships - currently restricted to ANYINTERACT
+--      p_cardinality  IN INTEGER       An indicator of the number of rows expected. This allows statistics to be used by the Oracle optimizer in cases where the resultant 
+--                                      nested table is joined to another table. This depends on the version of Oracle. A value of 10 is a reasonable 
+--                                      compromise but in later releases of Oracle, the value will be ignored as the optimizer uses the accumulated statistics of the 
+--                                      nested table at execution time.
+--
+-- Return     LB_RPT_TAB - a list of location IDs, locations and related data in the from of a nested table.
+
+
+    FUNCTION get_refnt_RPt_tab_from_nspe (
+        p_nspe_id       IN INTEGER,
+        p_theme_id      IN nm_themes_all.nth_theme_id%TYPE,
+        p_mask_array    IN VARCHAR2 := 'ANYINTERACT',
+        p_cardinality   IN INTEGER)
+        RETURN lb_RPt_tab;
+--</PROC>
+
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_RPT_GEOM_TAB_FROM_RPT">
+--
+-- This function converts a nested table of linear locations into their related datum
+-- geometries. 
+--
+--Arguments
+--
+--      p_rpt_tab      IN LB_RPT_TAB    A nested table of locations
+--
+-- Return  lb_RPt_geom_tab which is a nested table of locations suplemented by their 
+--         traced geometries.
+
+    FUNCTION get_RPT_geom_tab_from_RPt (p_rpt_tab IN lb_RPt_tab)
+        RETURN lb_RPt_geom_tab;
+
+--</PROC>
+
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_REFNT_RPT_TAB_FROM_GEOM">
+--
+-- This function retrieves a nested table of network locations which have a spatial relationship
+-- to the specified geometry. Note that currently the code operates only with an ANYINTERACT mask.
+-- The returned location is in the form of a nested table which can be used by other procedures.
+-- The theme ID should be the theme of an Exor network table. Use the other version of this 
+-- procedure to query back asset data based on geometry.
+--
+--Arguments
+--
+--      p_geom         IN SDO_GEOMETRY  A geometry used as the basis of the query.
+--      p_theme_id     IN INTEGER       The Exor theme identifier.
+--      p_mask_array   IN VARCHAR2      A string of separated topological relationships - currently restricted to ANYINTERACT
+--      p_cardinality  IN INTEGER       An indicator of the number of rows expected. This allows statistics to be used by the Oracle optimizer in cases where the resultant 
+--                                      nested table is joined to another table. This depends on the version of Oracle. A value of 10 is a reasonable 
+--                                      compromise but in later releases of Oracle, the value will be ignored as the optimizer uses the accumulated statistics of the 
+--                                      nested table at execution time.
+--
+-- Return     LB_RPT_TAB - a list of location IDs, locations, related data and geometry
+--            in the from of a nested table.
+
+    FUNCTION get_lb_RPt_geom_tab_from_geom (
+        p_geom         IN MDSYS.sdo_geometry,
+        p_theme_id     IN nm_themes_all.nth_theme_id%TYPE,
+        p_mask_array      VARCHAR2 := 'coveredby+inside+anyinteract')
+        RETURN lb_RPt_geom_tab;
+--</PROC>
+
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_X_RPT_TAB_FROM_GEOM">
+--
+-- This function retrieves the intersection of network with a speciied geometry.
+--
+--Arguments
+--
+--      p_geom         IN SDO_GEOMETRY  A geometry used as the basis of the query.
+--      p_theme_id     IN INTEGER       The Exor theme identifier.
+--      p_mask_array   IN VARCHAR2      A string of separated topological relationships.
+--
+-- Return     LB_RPT_TAB - a list of location IDs, locations and related data in the from of a nested table.
+
+    FUNCTION get_x_RPt_tab_from_geom (
+        p_geom         IN MDSYS.sdo_geometry,
+        p_theme_id     IN nm_themes_all.nth_theme_id%TYPE,
+        p_mask_array      VARCHAR2 := 'coveredby+inside+anyinteract')
+        RETURN lb_RPt_tab;
+--</PROC>
+
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_X_RPT_GEOM_TAB_FROM_GEOM">
+--
+-- This function retrieves the intersection of network with a speciied geometry,
+-- returning the intersection of network supplemented by the spatial intersection.
+--
+--Arguments
+--
+--      p_geom         IN SDO_GEOMETRY  A geometry used as the basis of the query.
+--      p_theme_id     IN INTEGER       The Exor theme identifier.
+--      p_mask_array   IN VARCHAR2      A string of separated topological relationships.
+--
+-- Return     LB_RPT_GEOM_TAB - a list of location IDs, locations and related data and geometry 
+--            in the from of a nested table.
+
+    FUNCTION get_x_RPt_geom_tab_from_geom (
+        p_geom         IN MDSYS.sdo_geometry,
+        p_theme_id     IN nm_themes_all.nth_theme_id%TYPE,
+        p_mask_array      VARCHAR2 := 'coveredby+inside+anyinteract')
+        RETURN lb_RPt_geom_tab;
+--</PROC>
+
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_OBJ_IDS_AT_LOC">
+--
+-- This function retrieves a list of location object IDs over the location table 
+-- specified in the nested table.. 
+--
+--Arguments
+--
+--      pi_rpt_tab     IN  lb_rpt_tab     A nested table of location data
+--      pi_obj_type    IN  VARCHAR2       The Exor inventory type of the object to be retrieved.
+--      p_lb_only        IN VARCHAR2  A flag to indicate if asset data should be retrieved from the location bridge silo of location data. 
+--                                    It takes the value of TRUE or ˜FALSE. If set to TRUE, the function will retrieve only those asset 
+--                                    locations which are configured in Location Bridge (for example those which relate directly to assets 
+--                                    within eB ). If the value is set to FALSE then the location data of standard Exor assets will 
+--                                    be retrieved. 
+--      p_whole_only     IN VARCHAR2  A flag to indicate if asset location data should be returned if part of the asset location lies outside of any range specified.
+--      p_cardinality    IN INTEGER   An indicator of the number of rows expected. This allows statistics to be used by the Oracle optimizer in cases where the resultant 
+--                                    nested table is joined to another table. This depends on the version of Oracle. A value of 10 is a reasonable 
+--                                    compromise but in later releases of Oracle, the value will be ignored as the optimizer uses the accumulated statistics of the 
+--                                    nested table at execution time.
+--
+-- Return     LB_OBJ_ID_TAB - a list of location IDs and types in a nested table 
+--      
+    FUNCTION get_obj_ids_at_loc (pi_rpt_tab     IN lb_rpt_tab,
+                                 pi_obj_type    IN VARCHAR2,
+                                 p_lb_only      IN VARCHAR2 DEFAULT 'FALSE',
+                                 p_whole_only   IN VARCHAR2 DEFAULT 'FALSE',
+                                 CARDINALITY    IN INTEGER)
+        RETURN lb_obj_id_tab;
+--</PROC>
+
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_OBJ_IDS_AT_LOC">
+--
+-- A scalar version of the function to retrieve a list of objects over a range
+-- on a network element. Note that this uses the Exor gaz query so has embedded DML
+--
+--Arguments
+--
+--      pi_ne_id     IN  INTEGER     An Exor network element ID
+--      pi_begin_mp  IN  NUMBER      The start measure of the range
+--      pi_end_mp    IN  NUMBER      The end measure of the range
+--
+-- Return     LB_OBJ_ID_TAB - a list of location IDs and types in a nested table 
+--      
+    FUNCTION get_obj_ids_at_loc (pi_ne_id      IN INTEGER,
+                                 pi_begin_mp      NUMBER,
+                                 pi_end_mp        NUMBER)
+        RETURN lb_obj_id_tab;
+
+--</PROC>
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_LB_RPT_TAB">
+--
+--Purpose To provide a means of searching for and retrieving a set of similar structured location data out of an Exor and Location Bridge database. 
+--Data is retrieved in a nested table of type LB_RPT_TAB. This encapsulates all of the information relating to the locations.
+--The argument list is based on the LB_RPT (LB reference point). This object consists of some data which is derivable from the database, 
+--given other attributes of the type (denormalized) and some attributes of this object such as seg_id and seq_id are relative to the data being 
+--retrieved and so are ignored in the search.
+--
+--Arguments
+--      p_refnt         INTEGER     A reference to a linear network element in the Exor NM_ELEMENTS table, either a datum or linear group.
+--      p_refnt_type    INTEGER     A reference to the network type of the referent, this integer relates directly to the nlt_id of the network type in the NM_LINEAR_TYPES table
+--      p_obj_type      VARCHAR2    The exor asset type of the locations to be retrieved
+--      p_obj_id        INTEGER     The object-id of the asset whose location is to be retrieved
+--      p_seg_id        INTEGER     A pointer to the segment number of the location. A difference in segment numbers indicate a discontinuity of measure or a point 
+--                                  of loss of connectivity over the network. This is unused in the query.
+--      p_seq_id        INTEGER     A pointer to the sequence number of the location. Sequence numbers are incremented to indicate the order of the 
+--                                  location of the asset thus indicating a direction. This is relative to the network data being retrieved and so is ignored in the query.
+--      p_dir_flag      INTEGER     A direction flag taking the value of plus or minus one indicating the asset direction relative to the network. 
+--                                  This is formed when the asset location is created. For an asset type whose location is persisted on a network datum, 
+--                                  the value is inherited from the route direction flag if located relative to a route or is set to +1 if the location 
+--                                  is created relative to a datum. It has no useful purpose in the query and is ignored.
+--      p_start_m       NUMBER      The start measure relative to the referent. This provides a lower bound of the asset location within the query 
+--      p_end_m         NUMBER      The end measure relative to the referent. This provides a upper bound of the asset location within the query
+--      p_intsct        VARCHAR2    A flag to denote whether the returned location data should be that of the intersection of the asset location 
+--                                  with the specified range. This is ignored if the range or referent is not entered. It takes the value of TRUE or FALSE
+--      p_m_unit        INTEGER     This is usually a denormalized reference to the Exor unit of measure of the network type referenced in the referent 
+--                                  and referent type. Unit identifiers which are not the value of the network type being queried will indicate that the start and 
+--                                  end measures are converted into the natural unit of the network for the query to work
+--      p_lb_only       VARCHAR2    A flag to indicate if asset data should be retrieved from the location bridge silo of location data. It takes the value of TRUE
+--                                  or FALSE. If set to TRUE, the function will retrieve only those asset locations which are configured in Location Bridge 
+--                                  (for example those which relate directly to assets within eB ). If the value is set to ˜FALSE then the location data of 
+--                                  standard Exor assets will be retrieved. 
+--      p_whole_only    VARCHAR2    A flag to indicate if asset location data should be returned if part of the asset location lies outside of any range specified.
+--      p_cardinality   INTEGER     An indicator of the number of rows expected. This allows statistics to be used by the Oracle optimizer in cases where the resultant 
+--                                  nested table is joined to another table. This depends on the version of Oracle. A value of 10 is a reasonable 
+--                                  compromise but in later releases of Oracle, the value will be ignored as the optimizer uses the accumulated statistics of the 
+--                                  nested table at execution time.
+--
+--  The function relates to the LB_RPT object and returns a nested table of LB_RPT data as an object type (LB_RPT_TAB). This table holds much of what is important in relation to asset locations and is commonly used for further translations and manipulations of data in the nested table. The functions main arguments are optional although insufficient attribute data to formulate a sensible query will raise an exception and generate an error. 
+--   - If an argument is omitted, the function will attempt to make use of the database to normalize the information in the query. 
+--   - If a unit specifier is omitted, the natural unit of measure for the specified network referent or the network on which the asset type resides will be used. If a unit of measure is specified, the start and end measure will be converted to the natural unit of the network or asset type prior to execution of the query. 
+--   - As stated above, some of the data relates to attributes within the LB_RPT object and are currently unused and will be deprecated.
+--   - Here are some examples of the data being retrieved and example of some common translation functions applied to the query results.
+--   - If the referent type is omitted, the correct referent type will be generated on the output. 
+--   - Attempts to request an intersection without specifying a network reference will raise an exception ( ORA-20013: Use of the intersection or whole-only option is only valid when accompanied by a network reference).
+--   - Attempts to execute the query with insufficient arguments â€“ neither object based nor network based will raise an exception (ORA-20012: No network or asset data provided to form the query).
+--   - If a referent is used and no start or end measure then the range is full range of the element supplied. 
+
+
+    FUNCTION get_lb_RPt_tab (p_refnt         IN INTEGER,
+                             p_refnt_type    IN INTEGER,
+                             p_obj_type      IN VARCHAR2,
+                             p_obj_id        IN INTEGER,
+                             p_seg_id        IN INTEGER,
+                             p_seq_id        IN INTEGER,
+                             p_dir_flag      IN INTEGER,
+                             p_start_m       IN NUMBER,
+                             p_end_m         IN NUMBER,
+                             p_intsct        IN VARCHAR DEFAULT 'FALSE',
+                             p_m_unit        IN INTEGER,
+                             p_lb_only       IN VARCHAR2 DEFAULT 'FALSE',
+                             p_whole_only    IN VARCHAR2 DEFAULT 'FALSE',
+                             p_cardinality   IN INTEGER)
+        RETURN lb_RPt_tab;
+--</PROC>
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="G_OF_G_SEARCH">
+--
+-- The procedure produces a set of locations of inventory within a group or 
+-- group of groups.
+--
+--Arguments
+
+--      p_group_id      INTEGER     The network element ID of an Exor network group
+--      p_inv_type      VARCHAR2    The inventory type of the data to be retrieved.
+--      p_lb_only       VARCHAR2    A flag to indicate if asset data should be retrieved from the location bridge silo of location data. It takes the value of TRUE
+--                                  or FALSE. If set to TRUE, the function will retrieve only those asset locations which are configured in Location Bridge 
+--                                  (for example those which relate directly to assets within eB ). If the value is set to ˜FALSE then the location data of 
+--                                  standard Exor assets will be retrieved. 
+--      p_whole_only    VARCHAR2    A flag to indicate if asset location data should be returned if part of the asset location lies outside of any range specified.
+--      p_cardinality   INTEGER     An indicator of the number of rows expected. This allows statistics to be used by the Oracle optimizer in cases where the resultant 
+--                                  nested table is joined to another table. This depends on the version of Oracle. A value of 10 is a reasonable 
+--                                  compromise but in later releases of Oracle, the value will be ignored as the optimizer uses the accumulated statistics of the 
+--                                  nested table at execution time.
+--
+    FUNCTION g_of_g_search (p_group_id      IN INTEGER,
+                            p_inv_type      IN VARCHAR2 DEFAULT NULL,
+                            p_LB_only       IN VARCHAR2 DEFAULT 'TRUE',
+                            p_whole_only    IN VARCHAR2 DEFAULT 'FALSE',
+                            p_cardinality   IN INTEGER)
+        RETURN lb_rpt_tab;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_LB_RPT_CUR">
+--
+-- The function returning a cursor of location data.
+-- This is a cursor equivalent of the get_lb_rpt_tab function. It merely opens a cursor which is
+-- a query on the resultant nested table. As such it's purpose is somewhat limited and the table
+-- function option is preferred.
+--
+--Arguments
+--      p_refnt       IN  INTEGER     A reference to a linear network element in the Exor NM_ELEMENTS table, either a datum or linear group.
+--      p_refnt_type  IN  INTEGER     A reference to the network type of the referent, this integer relates directly to the nlt_id of the network type in the NM_LINEAR_TYPES table
+--      p_obj_type    IN  VARCHAR2    The exor asset type of the locations to be retrieved
+--      p_obj_id      IN  INTEGER     The object-id of the asset whose location is to be retrieved
+--      p_seg_id      IN  INTEGER     A pointer to the segment number of the location. A difference in segment numbers indicate a discontinuity of measure or a point 
+--                                    of loss of connectivity over the network. This is unused in the query.
+--      p_seq_id      IN  INTEGER     A pointer to the sequence number of the location. Sequence numbers are incremented to indicate the order of the 
+--                                    location of the asset thus indicating a direction. This is relative to the network data being retrieved and so is ignored in the query.
+--      p_dir_flag    IN  INTEGER     A direction flag taking the value of plus or minus one indicating the asset direction relative to the network. 
+--                                    This is formed when the asset location is created. For an asset type whose location is persisted on a network datum, 
+--                                    the value is inherited from the route direction flag if located relative to a route or is set to +1 if the location 
+--                                    is created relative to a datum. It has no useful purpose in the query and is ignored.
+--      p_start_m     IN  NUMBER      The start measure relative to the referent. This provides a lower bound of the asset location within the query 
+--      p_end_m       IN  NUMBER      The end measure relative to the referent. This provides a upper bound of the asset location within the query
+--      p_intsct      IN  VARCHAR2    A flag to denote whether the returned location data should be that of the intersection of the asset location 
+--                                    with the specified range. This is ignored if the range or referent is not entered. It takes the value of TRUE or FALSE
+--      p_m_unit      IN  INTEGER     This is usually a denormalized reference to the Exor unit of measure of the network type referenced in the referent 
+--                                    and referent type. Unit identifiers which are not the value of the network type being queried will indicate that the start and 
+--      p_cardinality IN  INTEGER     An indicator of the number of rows expected. This allows statistics to be used by the Oracle optimizer in cases where the resultant 
+--                                    nested table is joined to another table. This depends on the version of Oracle. A value of 10 is a reasonable 
+--                                    compromise but in later releases of Oracle, the value will be ignored as the optimizer uses the accumulated statistics of the 
+--                                    nested table at execution time.
+--
+-- Return    SYS_REFCURSOR a cursor of location data consisting of:
+--
+--       refnt       INTEGER    The pointer to an Exor network element id 
+--       refnt_type  INTEGER    The linear type of the referent 
+--       obj_type    VARCHAR2   The object-type (Exor inventory type) at the location
+--       obj_id      INTEGER    The asset location ID of the asset at the location
+--       seg_id      INTEGER    An integer indicator of connectivity 
+--       seq_id      INTEGER    A sequence number of the returned data
+--       dir_flag    INTEGER    A flag set to plus or minus 1 to indicate the relative direction of the object and referent
+--       start_m     NUMBER     The starting measure of the location on the element
+--       end_m       NUMBER     The end measure of the location on the element
+--       m_unit      INTEGER    The Exor unit id of the start and end measures.
+--
+    FUNCTION get_lb_RPt_cur (p_refnt         IN INTEGER,
+                             p_refnt_type    IN INTEGER,
+                             p_obj_type      IN VARCHAR2,
+                             p_obj_id        IN INTEGER,
+                             p_seg_id        IN INTEGER,
+                             p_seq_id        IN INTEGER,
+                             p_dir_flag      IN INTEGER,
+                             p_start_m       IN NUMBER,
+                             p_end_m         IN NUMBER,
+                             p_intsct        IN VARCHAR2 DEFAULT 'FALSE',
+                             p_m_unit        IN INTEGER,
+                             p_cardinality   IN INTEGER)
+        RETURN SYS_REFCURSOR;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_LB_RPT_R_TAB">
+--
+-- The function which converts/aggregates a nested table of locations to reference a linear group type.
+--
+--Arguments
+--      p_lb_RPt_tab       IN    lb_RPt_tab     A table of locations, usually as a set of references to datum elements.
+--      p_linear_obj_type  IN    VARCHAR2       The route (group-type) over which the datum locations are aggregated. 
+--      p_cardinality      IN    INTEGER     An indicator of the number of rows expected. This allows statistics to be used by the Oracle optimizer in cases where the resultant 
+--                                           nested table is joined to another table. This depends on the version of Oracle. A value of 10 is a reasonable 
+--                                           compromise but in later releases of Oracle, the value will be ignored as the optimizer uses the accumulated statistics of the 
+--                                           nested table at execution time.
+--Return  lb_RPt_tab - a table of locations
+--
+    FUNCTION get_lb_RPt_r_tab (p_lb_RPt_tab        IN lb_RPt_tab,
+                               p_linear_obj_type   IN VARCHAR2,
+                               p_cardinality       IN INTEGER DEFAULT NULL)
+        RETURN lb_RPt_tab;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_LB_XRPT_R_TAB">
+--
+-- The function which converts/aggregates a nested table of locations and XSPs to reference a linear group type.
+-- Note that XSP values will be reversed and aggregated depending on direction settings and reversal rules.
+--
+--Arguments
+--      p_lb_RPt_tab       IN    lb_RPt_tab     A table of locations, usually as a set of references to datum elements.
+--      p_linear_obj_type  IN    VARCHAR2       The route (group-type) over which the datum locations are aggregated. 
+--      p_cardinality      IN    INTEGER     An indicator of the number of rows expected. This allows statistics to be used by the Oracle optimizer in cases where the resultant 
+--                                           nested table is joined to another table. This depends on the version of Oracle. A value of 10 is a reasonable 
+--                                           compromise but in later releases of Oracle, the value will be ignored as the optimizer uses the accumulated statistics of the 
+--                                           nested table at execution time.
+--return lb_XRPt_tab - a set of locations and XSPs
+
+    FUNCTION get_lb_xrpt_r_tab (p_lb_XRPt_tab       IN lb_XRPt_tab,
+                                p_linear_obj_type   IN VARCHAR2,
+                                p_cardinality       IN INTEGER DEFAULT NULL)
+        RETURN lb_XRPt_tab;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_ASSET_IDS_AT_LOC">
+--
+-- return a list of object-ids and types which are placed at the given locations. 
+--
+--Arguments
+--      pi_rpt_tab   IN  LB_RPT_TAB  A table of locations
+--      pi_obj_type  IN  VARCHAR2    The route (group-type) over which the datum locations are aggregated.
+--      p_lb_only    IN  VARCHAR2    A flag to indicate if asset data should be retrieved from the location bridge silo of location data. It takes the value of TRUE
+--                                   or FALSE. If set to TRUE, the function will retrieve only those asset locations which are configured in Location Bridge 
+--                                   (for example those which relate directly to assets within eB ). If the value is set to ˜FALSE then the location data of 
+--                                   standard Exor assets will be retrieved. 
+--      p_whole_only  IN VARCHAR2    A flag to indicate if asset location data should be returned if part of the asset location lies outside of any range specified.
+--      p_cardinality IN INTEGER     An indicator of the number of rows expected. This allows statistics to be used by the Oracle optimizer in cases where the resultant 
+--                                   nested table is joined to another table. This depends on the version of Oracle. A value of 10 is a reasonable 
+--                                   compromise but in later releases of Oracle, the value will be ignored as the optimizer uses the accumulated statistics of the 
+--                                   nested table at execution time.
+-- return  LB_OBJ_ID_TAB - a table of ids and types of the assets located on the specified table of network references.
+--
+    FUNCTION get_asset_ids_at_loc (
+        pi_rpt_tab     IN lb_rpt_tab,
+        pi_obj_type    IN VARCHAR2,
+        p_lb_only      IN VARCHAR2 DEFAULT 'FALSE',
+        p_whole_only   IN VARCHAR2 DEFAULT 'FALSE',
+        CARDINALITY    IN INTEGER)
+        RETURN lb_obj_id_tab;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_LB_RPT_D_TAB">
+--
+-- The function which converts a nested table of locations and XSPs from references
+-- relative to linear groups to a table of references relative to their underlying datums.
+--
+--Arguments
+--      p_lb_RPt_tab       IN    lb_RPt_tab     A table of locations, usually as a set of references to route elements.
+--
+--return lb_RPt_tab - a set of locations referencing datums.
+
+    FUNCTION get_lb_RPt_D_tab (p_lb_RPt_tab IN lb_RPt_tab)
+        RETURN lb_RPt_tab;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_LB_XRPT_D_TAB">
+--
+-- The function which converts a nested table of locations and XSPs from references
+-- relative to linear groups to a table of references relative to their underlying datums.
+--
+--Arguments
+--      p_lb_XRPt_tab       IN    lb_XRPt_tab     A table of locations and XSPs, usually as a set of references to route elements.
+--
+--return lb_XRPt_tab - a set of locations and XSPs referencing datums.
+
+    FUNCTION get_lb_XRPt_D_tab (p_lb_XRPt_tab IN lb_XRPt_tab)
+        RETURN lb_XRPt_tab;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_OBJ_ID_AS_RPT_TAB">
+--
+-- The function which takes an asset location identifier and retrieves all the location 
+-- data into a location table. 
+--
+--Arguments
+--      pi_obj_id       IN    INTEGER   The object id of the asset data to be retrieved. This can be 
+--                                      an asset location ID, an Exor inventory ID or a road group ID.
+--      pi_obj_type     IN    VARCHAR2  The Exor inventory type or road group type
+--
+--return lb_RPt_tab - a set of locations and XSPs referencing datums.
+
+    FUNCTION get_obj_id_as_rpt_tab (pi_obj_id     IN INTEGER,
+                                    pi_obj_type   IN VARCHAR2)
+        RETURN lb_rpt_tab;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_FT_RPT_TAB">
+--
+-- The function which retrieves a set of Exor foreign table assets and locations from a table of locations. 
+--
+--Arguments
+--      p_rpt_tab       IN    lb_rpt_tab   A table of linear locations over which the foreign table is to be queried.  
+--      p_table_name    IN    VARCHAR2     The table name of the Exor foreign table inventory type
+--      p_inv_type      IN    VARCHAR2     The Exor inventory type of the FT    
+--      p_key           IN    VARCHAR2     The primary key column name of the foreign table 
+--      p_ne_key        IN    VARCHAR2     The foreign key column on the foreign tabel which references the network
+--      p_start_col     IN    VARCHAR2     The column used to hold the start measure
+--      p_end_col       IN    VARCHAR2     The column used to hold the end measure
+--
+--return lb_RPt_tab - a set of foreign table asset ids and their locations
+--
+    FUNCTION get_ft_rpt_tab (p_rpt_tab      IN lb_rpt_tab,
+                             p_table_name   IN VARCHAR2,
+                             p_inv_type     IN VARCHAR2,
+                             p_key          IN VARCHAR2,
+                             p_ne_key       IN VARCHAR2,
+                             p_start_col    IN VARCHAR2,
+                             p_end_col      IN VARCHAR2)
+        RETURN lb_rpt_tab;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_GEOM_FROM_LREFS">
+--
+-- The function which retrieves a geometry representing a set of linear references. 
+--
+--Arguments
+--      pi_lrefs       IN    nm_lref_array   A table of linear references  
+--
+--Return  SDO_GEOMETRY
+
+    FUNCTION get_geom_from_lrefs (pi_lrefs IN nm_lref_array)
+        RETURN SDO_GEOMETRY;
+--</PROC>
+END;
+/
