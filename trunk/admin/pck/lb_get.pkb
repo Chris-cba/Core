@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_get
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_get.pkb-arc   1.56   Aug 16 2018 21:09:20   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_get.pkb-arc   1.57   Aug 17 2018 07:46:22   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_get.pkb  $
-   --       Date into PVCS   : $Date:   Aug 16 2018 21:09:20  $
-   --       Date fetched Out : $Modtime:   Aug 16 2018 21:08:32  $
-   --       PVCS Version     : $Revision:   1.56  $
+   --       Date into PVCS   : $Date:   Aug 17 2018 07:46:22  $
+   --       Date fetched Out : $Modtime:   Aug 17 2018 07:45:50  $
+   --       PVCS Version     : $Revision:   1.57  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,7 +16,7 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.56  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.57  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_get';
 
@@ -91,21 +91,6 @@ AS
       l_ft_flag    VARCHAR2 (1);
       l_category   VARCHAR2 (1);
    BEGIN
-      --        if p_obj_type is not null then
-      --        --
-      --        DECLARE
-      --            not_an_asset_type   EXCEPTION;
-      --            PRAGMA EXCEPTION_INIT (not_an_asset_type, -20000);
-      --        BEGIN
-      --            l_nit_row := nm3get.get_nit (p_obj_type);
-      --        EXCEPTION
-      --            WHEN not_an_asset_type
-      --            THEN
-      --                --check if it is a road group
-      --                NULL;
-      --        END;
-      --        end if;
-
 
       IF p_obj_type IS NULL
       THEN
@@ -279,7 +264,7 @@ AS
                                    AND (       p_whole_only = 'TRUE'
                                            AND (    NOT EXISTS
                                                            (SELECT 1
-                                                              FROM nm_locations l
+                                                              FROM nm_members l
                                                              WHERE     nm_ne_id_in =
                                                                           m.nm_ne_id_in
                                                                    AND l.nm_ne_id_of NOT IN (SELECT refnt
@@ -287,7 +272,7 @@ AS
                                                                                                        p_refnt_tab)))
                                                 AND NOT EXISTS
                                                            (SELECT 1
-                                                              FROM nm_locations l,
+                                                              FROM nm_members l,
                                                                    TABLE (
                                                                       p_refnt_tab)
                                                              WHERE     nm_ne_id_in =
@@ -319,10 +304,10 @@ AS
                       FROM nm_asset_locations nal,
                            nm_locations_all m,
                            nm_linear_types
-                     WHERE     nal_nit_type = NVL (p_obj_type, nal_nit_type)
+                     WHERE     nal_nit_type||'' = NVL (p_obj_type, nal_nit_type)
                            AND nlt_id = m.nm_nlt_id
                            AND nlt_g_i_d = 'D'
-                           AND nm_ne_id_in = NVL (p_obj_id, nm_ne_id_in)
+                           AND nm_ne_id_in+0 = NVL (p_obj_id, nm_ne_id_in)
                            AND nm_start_date <=
                                   TO_DATE (
                                      SYS_CONTEXT ('NM3CORE',
