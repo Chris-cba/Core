@@ -1,17 +1,17 @@
 /**
  *	PVCS Identifiers :-
  *
- *		PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/Java/login/bentley/exor/log/IMSLogger.java-arc   1.2   Sep 07 2017 14:40:38   Upendra.Hukeri  $
+ *		PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/Java/login/bentley/exor/log/IMSLogger.java-arc   1.3   Aug 31 2018 11:13:20   Upendra.Hukeri  $
  *		Module Name      : $Workfile:   IMSLogger.java  $
  *		Author			 : $Author:   Upendra.Hukeri  $
- *		Date Into PVCS   : $Date:   Sep 07 2017 14:40:38  $
- *		Date Fetched Out : $Modtime:   Sep 07 2017 14:00:00  $
- *		PVCS Version     : $Revision:   1.2  $
+ *		Date Into PVCS   : $Date:   Aug 31 2018 11:13:20  $
+ *		Date Fetched Out : $Modtime:   Aug 31 2018 10:14:22  $
+ *		PVCS Version     : $Revision:   1.3  $
  *
  *	
  *
  ****************************************************************************************************
- *	  Copyright (c) 2017 Bentley Systems Incorporated.  All rights reserved.
+ *	  Copyright (c) 2018 Bentley Systems Incorporated.  All rights reserved.
  ****************************************************************************************************
  *
  */
@@ -43,14 +43,9 @@ public class IMSLogger {
 				break;
 				
 			case INFO:
+			case TRACE:
 				if(logger.isInfoEnabled()) {
 					logger.info(message);
-				}
-				break;
-			
-			case TRACE:
-				if(logger.isTraceEnabled()) {
-					logger.trace(message);
 				}
 				break;
 			
