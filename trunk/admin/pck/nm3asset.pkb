@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3asset AS
 --
 --   SCCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3asset.pkb-arc   2.27   Apr 16 2018 09:22:10   Gaurav.Gaurkar  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3asset.pkb-arc   2.28   Sep 21 2018 18:07:50   Mike.Huitson  $
 --       Module Name      : $Workfile:   nm3asset.pkb  $
---       Date into PVCS   : $Date:   Apr 16 2018 09:22:10  $
---       Date fetched Out : $Modtime:   Apr 16 2018 08:57:42  $
---       PVCS Version     : $Revision:   2.27  $
+--       Date into PVCS   : $Date:   Sep 21 2018 18:07:50  $
+--       Date fetched Out : $Modtime:   Sep 21 2018 13:12:44  $
+--       PVCS Version     : $Revision:   2.28  $
 --
 --
 --   Author : Rob Coupe
@@ -21,7 +21,7 @@ CREATE OR REPLACE PACKAGE BODY nm3asset AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.27  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.28  $"';
    g_gos_ne_id                    nm_members_all.nm_ne_id_in%type ;
 --  g_body_sccsid is the SCCS ID for the package body
 --
@@ -2375,8 +2375,6 @@ BEGIN
                ||CHR(10)||' WHERE '||l_rec_nit.nit_foreign_pk_column||' = :pk'
                ||CHR(10)||'   AND '||l_rec_nit.nit_lr_ne_column_name||' = :ne_id';
               --
-                nm_debug.debug(l_sql);
-              --
                 EXECUTE IMMEDIATE l_sql INTO l_pl USING pi_iit_ne_id, l_ne_id(items);
               --
                 FOR i IN 1..l_pl.placement_count
@@ -2389,8 +2387,8 @@ BEGIN
                     l_tab_datum_loc_dets(l_ind).nm_end_mp   := l_pl.get_entry(i).pl_end;
                   END;
                 END LOOP;
-              EXCEPTION
-                WHEN NO_DATA_FOUND THEN NULL;
+              --EXCEPTION
+              --  WHEN NO_DATA_FOUND THEN NULL;
               END;
             --
             ELSE
@@ -2423,12 +2421,12 @@ BEGIN
           --
           END IF;
         --
-          DECLARE
-            l_ind NUMBER := po_tab_datum_loc_dets.COUNT+1;
-          BEGIN
-          --
-            FOR retvals IN 1..l_tab_datum_loc_dets.COUNT 
-            LOOP
+          FOR retvals IN 1..l_tab_datum_loc_dets.COUNT 
+          LOOP
+            DECLARE
+              l_ind NUMBER := po_tab_datum_loc_dets.COUNT+1;
+            BEGIN
+              --
               po_tab_datum_loc_dets(l_ind).datum_ne_id             := l_tab_datum_loc_dets(retvals).datum_ne_id;
               po_tab_datum_loc_dets(l_ind).datum_ne_unique         := l_tab_datum_loc_dets(retvals).datum_ne_unique;
               po_tab_datum_loc_dets(l_ind).datum_ne_descr          := l_tab_datum_loc_dets(retvals).datum_ne_descr;
@@ -2442,9 +2440,9 @@ BEGIN
               po_tab_datum_loc_dets(l_ind).nm_seg_no               := l_tab_datum_loc_dets(retvals).nm_seg_no;
               po_tab_datum_loc_dets(l_ind).nm_true                 := l_tab_datum_loc_dets(retvals).nm_true;
               po_tab_datum_loc_dets(l_ind).nm_slk                  := l_tab_datum_loc_dets(retvals).nm_slk;
-            END LOOP;
+            END;
+          END LOOP;
           --
-          END;
           l_tab_datum_loc_dets.DELETE;
       --
         END LOOP;
