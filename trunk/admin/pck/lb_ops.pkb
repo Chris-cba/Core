@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_ops
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_ops.pkb-arc   1.13   Jul 30 2018 14:53:56   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_ops.pkb-arc   1.14   Sep 26 2018 15:39:26   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_ops.pkb  $
-   --       Date into PVCS   : $Date:   Jul 30 2018 14:53:56  $
-   --       Date fetched Out : $Modtime:   Jul 30 2018 14:47:36  $
-   --       PVCS Version     : $Revision:   1.13  $
+   --       Date into PVCS   : $Date:   Sep 26 2018 15:39:26  $
+   --       Date fetched Out : $Modtime:   Sep 26 2018 14:13:44  $
+   --       PVCS Version     : $Revision:   1.14  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,7 +16,7 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated . All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.13  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.14  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_ops';
 
@@ -358,6 +358,243 @@ AS
 
       RETURN retval;
    END;
+
+   FUNCTION lb_append (p_Rpt1        IN lb_rpt_tab,
+                                                 p_Rpt2        IN lb_rpt_tab,
+                                                 CARDINALITY      INTEGER)
+   RETURN lb_rpt_tab
+IS
+   retval           lb_rpt_tab;
+   l1c              INTEGER := p_Rpt1.COUNT;
+   l_cnct           INTEGER := 0;
+   l_part           INTEGER := 0;
+   last_refnt       INTEGER;
+   last_seg_id      INTEGER;
+   last_seq_id      INTEGER;
+   last_dir_flag    INTEGER;
+   last_start_m     NUMBER;
+   last_end_m       NUMBER;
+   first_refnt      INTEGER;
+   first_seg_id     INTEGER;
+   first_seq_id     INTEGER;
+   first_dir_flag   INTEGER;
+   first_start_m    NUMBER;
+   first_end_m      NUMBER;
+
+   --
+   FUNCTION is_connected (refnt1      IN INTEGER,
+                          dir_flag1   IN INTEGER,
+                          start_m1    IN NUMBER,
+                          end_m1      IN NUMBER,
+                          refnt2      IN INTEGER,
+                          dir_flag2   IN INTEGER,
+                          start_m2    IN NUMBER,
+                          end_m2      IN NUMBER)
+      RETURN BOOLEAN
+   IS
+      retval    BOOLEAN;
+      l_dummy   INTEGER;
+   BEGIN
+      BEGIN
+         SELECT 1
+           INTO l_dummy
+           FROM DUAL
+          WHERE EXISTS
+                   (SELECT 1
+                      FROM nm_elements e1,
+                           nm_elements e2,
+                           nm_node_usages n1,
+                           nm_node_usages n2
+                     WHERE     e1.ne_id = refnt1
+                           AND N1.NNU_NE_ID = e1.ne_id
+                           AND n1.nnu_no_node_id = n2.nnu_no_node_id
+                           AND N2.NNU_NE_ID = e2.ne_id
+                           AND e2.ne_id = refnt2
+                           AND n1.nnu_node_type =
+                                  CASE dir_flag1 WHEN 1 THEN 'E' ELSE 'S' END
+                           AND n2.nnu_node_type =
+                                  CASE dir_flag2 WHEN 1 THEN 'S' ELSE 'E' END
+                           AND CASE dir_flag1
+                                  WHEN 1 THEN end_m1
+                                  ELSE start_m1
+                               END =
+                                  CASE dir_flag1
+                                     WHEN 1 THEN e1.ne_length
+                                     ELSE 0
+                                  END
+                           AND CASE dir_flag2
+                                  WHEN 1 THEN start_m2
+                                  ELSE end_m2
+                               END =
+                                  CASE dir_flag2
+                                     WHEN 1 THEN 0
+                                     ELSE e2.ne_length
+                                  END);
+
+         retval := TRUE;
+      EXCEPTION
+         WHEN NO_DATA_FOUND
+         THEN
+            retval := FALSE;
+      END;
+
+      RETURN retval;
+   END;
+--
+BEGIN
+   last_refnt := p_Rpt1 (l1c).refnt;
+   last_seg_id := p_Rpt1 (l1c).seg_id;
+   last_seq_id := p_Rpt1 (l1c).seq_id;
+   last_dir_flag := p_Rpt1 (l1c).dir_flag;
+   last_start_m := p_Rpt1 (l1c).start_m;
+   last_end_m := p_Rpt1 (l1c).end_m;
+   first_refnt := p_Rpt2 (1).refnt;
+   first_seg_id := p_Rpt2 (1).seg_id;
+   first_seq_id := p_Rpt2 (1).seq_id;
+   first_dir_flag := p_Rpt2 (1).dir_flag;
+   first_start_m := p_Rpt2 (1).start_m;
+   first_end_m := p_Rpt2 (1).end_m;
+
+   --
+   IF last_refnt = first_refnt
+   THEN
+      IF last_dir_flag = first_dir_flag
+      THEN
+         IF last_dir_flag = 1
+         THEN
+            IF last_end_m = first_start_m
+            THEN
+               l_cnct := 1;
+               l_part := 1;
+            ELSE
+               l_cnct := 0;
+               l_part := 0;
+            END IF;
+         ELSE
+            IF last_start_m = first_end_m
+            THEN
+               l_cnct := 1;
+               l_part := 1;
+            ELSE
+               l_cnct := 0;
+            END IF;
+         END IF;
+      ELSE
+         l_cnct := 0;
+      END IF;
+   ELSE
+      --   check connectivity at the node level
+      IF is_connected (last_refnt,
+                       last_dir_flag,
+                       last_start_m,
+                       last_end_m,
+                       first_refnt,
+                       first_dir_flag,
+                       first_start_m,
+                       first_end_m)
+      THEN
+         l_cnct := 1;
+         l_part := 0;
+      ELSE
+         l_cnct := 0;
+         l_part := 0;
+      END IF;
+   END IF;
+
+   nm_debug.debug_on;
+   nm_debug.debug (
+         'cnct = '
+      || l_cnct
+      || ', part = '
+      || l_part
+      || 'last_refnt = '
+      || last_refnt
+      || ', dir1 = '
+      || last_dir_flag
+      || ', dir2='
+      || first_dir_flag
+      || ' start1 = '
+      || last_start_m
+      || ' start2 = '
+      || first_start_m);
+
+   --
+   SELECT CAST (COLLECT (lb_rpt (refnt,
+                                 refnt_type,
+                                 obj_type,
+                                 obj_id,
+                                 seg_id,
+                                 seq_id,
+                                 dir_flag,
+                                 start_m,
+                                 end_m,
+                                 m_unit)) AS lb_rpt_tab)
+     INTO retval
+     FROM (SELECT 1 table_number,
+                  ROWNUM rn,
+                  t1.refnt,
+                  t1.refnt_type,
+                  t1.obj_type,
+                  t1.obj_id,
+                  t1.seg_id,
+                  t1.seq_id,
+                  t1.dir_flag,
+                  CASE
+                     WHEN refnt = first_refnt AND l_cnct = 1 AND l_part = 1
+                     THEN
+                        CASE
+                           WHEN dir_flag = 1 THEN t1.start_m
+                           ELSE first_start_m
+                        END
+                     ELSE
+                        t1.start_m
+                  END
+                     start_m,
+                  CASE
+                     WHEN refnt = first_refnt AND l_cnct = 1 AND l_part = 1
+                     THEN
+                        CASE
+                           WHEN dir_flag = 1 THEN first_end_m
+                           ELSE t1.end_m
+                        END
+                     ELSE
+                        t1.end_m
+                  END
+                     end_m,
+                  t1.m_unit
+             FROM TABLE (p_Rpt1) t1
+           UNION ALL
+           SELECT 2 table_number,
+                  ROWNUM rn,
+                  t2.refnt,
+                  t2.refnt_type,
+                  t2.obj_type,
+                  t2.obj_id,
+                  CASE
+                     WHEN l_cnct = 1 THEN last_seg_id
+                     ELSE t2.seg_id + last_seg_id
+                  END
+                     seg_id,
+                  CASE
+                     WHEN l_cnct = 1
+                     THEN
+                          last_seq_id
+                        + t2.seq_id
+                        - (CASE WHEN l_part = 1 THEN 1 ELSE 0 END)
+                     ELSE
+                        t2.seq_id
+                  END
+                     seq_id,
+                  t2.dir_flag,
+                  t2.start_m,
+                  t2.end_m,
+                  t2.m_unit
+             FROM TABLE (p_Rpt2) t2
+            WHERE l_part = 0 OR (l_part = 1 AND t2.refnt != last_refnt));
+
+   --
+   RETURN retval;
+END;
 
    --
    FUNCTION group_lb_rpt_tab (p_tab IN lb_RPt_Tab, p_cardinality IN INTEGER)
