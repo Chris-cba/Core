@@ -4,11 +4,11 @@ AS
 -------------------------------------------------------------------------
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_ops.pkh-arc   1.9   Aug 09 2018 11:58:00   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_ops.pkh-arc   1.10   Sep 26 2018 15:39:14   Rob.Coupe  $
     --       Module Name      : $Workfile:   lb_ops.pkh  $
-    --       Date into PVCS   : $Date:   Aug 09 2018 11:58:00  $
-    --       Date fetched Out : $Modtime:   Aug 09 2018 10:19:30  $
-    --       PVCS Version     : $Revision:   1.9  $
+    --       Date into PVCS   : $Date:   Sep 26 2018 15:39:14  $
+    --       Date fetched Out : $Modtime:   Sep 26 2018 15:38:02  $
+    --       PVCS Version     : $Revision:   1.10  $
     --
     --   Author : R.A. Coupe
     
@@ -23,7 +23,7 @@ AS
 --</PACKAGE>
 --<GLOBVAR>
 
-    g_sccsid         CONSTANT VARCHAR2 (2000) := '$Revision:   1.9  $';
+    g_sccsid         CONSTANT VARCHAR2 (2000) := '$Revision:   1.10  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'lb_ops';
 	
@@ -101,7 +101,8 @@ Notes  - The two nested tables must be at the same level of the network hierarch
 --<PROC NAME="RPT_UNION">
 --
 /*
-   Purpose - This function returns a nested table which is the location-based UNION of the two input tables.. 
+   Purpose - This function returns a nested table which is the location-based UNION of the two input tables. That is a multi-set union.
+   Note that the results make no distinction of connectivity or make any attempt to aggregate multiple rows on the same referent. 
    
    Arguments - p_rpt1       IN    LB_RPT_TAB        The first area of network held as a table of lb reference point data.
                p_rpt2       IN    LB_RPT_TAB        A second area of network held as a table of lb reference point data.   
@@ -152,7 +153,7 @@ Returns                           LB_RPT_TAB        Returns the "merged" set of 
 /*
    Purpose - This function returns a "grouped" nested table of location data. The grouping operaton will modify the table
              grouping over the referent, the object id and type, segment identifier and unit. This allows min and max measures
-             and is intended to remove overlaps in the range.
+             and is intended to remove overlaps in the range. 
    
    Arguments - p_tab          IN    LB_RPT_TAB     The table of  locations to be grouped 
 
@@ -163,6 +164,31 @@ Returns                           LB_RPT_TAB        Returns the "grouped" set of
         RETURN lb_RPt_tab;
 
 --</PROC>
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="RPT_APPEND">
+--
+/*
+   Purpose - This function returns a nested table which results from the second table being appended to the first. This differs
+   from a multiset union in the sense that any aggregation over the referent only occurs at points of connectivity. It is essentially
+   a method of linking two connected paths.
+   
+   Arguments - p_rpt1       IN    LB_RPT_TAB        The first set of network held as a table of lb reference point data.
+               p_rpt2       IN    LB_RPT_TAB        A second set of network held as a table of lb reference point data.   
+
+Returns                           LB_RPT_TAB        Returns the linear location set UNION of the two tables..
+
+Notes  - The two nested tables must be at the same level of the network hierarchy, no attempt is made within this code
+         to translate routes to datums and vice-versa. 			   
+   
+*/
+    FUNCTION RPt_append (p_Rpt1          IN lb_RPt_tab,
+                         p_Rpt2          IN lb_RPt_tab,
+                         p_cardinality   IN INTEGER)
+        RETURN lb_RPt_tab;
+
+--</PROC>
+
 -----------------------------------------------------------------------------
 --
 --<PROC NAME="IS_CONTIGUOUS">
