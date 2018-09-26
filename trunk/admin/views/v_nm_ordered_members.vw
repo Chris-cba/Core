@@ -29,11 +29,11 @@ AS
             (SELECT  /*+MATERIALIZE*/
                     -------------------------------------------------------------------------
                                                       --   PVCS Identifiers :-
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/views/v_nm_ordered_members.vw-arc   1.10   May 30 2018 14:02:44   Chris.Baugh  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/views/v_nm_ordered_members.vw-arc   1.11   Sep 26 2018 19:45:26   Rob.Coupe  $
 --       Module Name      : $Workfile:   v_nm_ordered_members.vw  $
---       Date into PVCS   : $Date:   May 30 2018 14:02:44  $
---       Date fetched Out : $Modtime:   May 30 2018 14:02:18  $
-                               --       Version          : $Revision:   1.10  $
+--       Date into PVCS   : $Date:   Sep 26 2018 19:45:26  $
+--       Date fetched Out : $Modtime:   Sep 26 2018 19:43:08  $
+                               --       Version          : $Revision:   1.11  $
 --
 --------------------------------------------------------------------------------------------------------------------
 --   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
@@ -139,7 +139,8 @@ AS
                                        END,
                                        DECODE (NVL (b.nsc_seq_no, 0),
                                                0, 99999,
-                                               b.nsc_seq_no)
+                                               b.nsc_seq_no),
+                                       CASE when a.ne_id = b.ne_id then 2 else 1 end
                                    ROWS BETWEEN UNBOUNDED PRECEDING
                                         AND     UNBOUNDED FOLLOWING)
                                    prior_ne
