@@ -1,12 +1,13 @@
+/* Formatted on 10/9/2018 1:26:43 PM (QP5 v5.256.13226.35538) */
 CREATE OR REPLACE PACKAGE BODY lb_get
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_get.pkb-arc   1.57   Aug 17 2018 07:46:22   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_get.pkb-arc   1.58   Oct 09 2018 13:28:04   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_get.pkb  $
-   --       Date into PVCS   : $Date:   Aug 17 2018 07:46:22  $
-   --       Date fetched Out : $Modtime:   Aug 17 2018 07:45:50  $
-   --       PVCS Version     : $Revision:   1.57  $
+   --       Date into PVCS   : $Date:   Oct 09 2018 13:28:04  $
+   --       Date fetched Out : $Modtime:   Oct 09 2018 13:27:08  $
+   --       PVCS Version     : $Revision:   1.58  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,7 +17,7 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.57  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.58  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_get';
 
@@ -91,7 +92,6 @@ AS
       l_ft_flag    VARCHAR2 (1);
       l_category   VARCHAR2 (1);
    BEGIN
-
       IF p_obj_type IS NULL
       THEN
          IF p_obj_id IS NULL
@@ -304,10 +304,11 @@ AS
                       FROM nm_asset_locations nal,
                            nm_locations_all m,
                            nm_linear_types
-                     WHERE     nal_nit_type||'' = NVL (p_obj_type, nal_nit_type)
+                     WHERE     nal_nit_type || '' =
+                                  NVL (p_obj_type, nal_nit_type)
                            AND nlt_id = m.nm_nlt_id
                            AND nlt_g_i_d = 'D'
-                           AND nm_ne_id_in+0 = NVL (p_obj_id, nm_ne_id_in)
+                           AND nm_ne_id_in + 0 = NVL (p_obj_id, nm_ne_id_in)
                            AND nm_start_date <=
                                   TO_DATE (
                                      SYS_CONTEXT ('NM3CORE',
@@ -1884,7 +1885,12 @@ AS
                                                                         itab.m_unit
                                                                            datum_unit,
                                                                         itab.seq_id,
-                                                                        itab.dir_flag
+                                                                        itab.dir_flag,
+                                                                        MAX (
+                                                                           itab.seq_id)
+                                                                        OVER (
+                                                                           PARTITION BY obj_id)
+                                                                           max_seq
                                                                    FROM itab) --nm_members where nm_ne_id_of in ( select nm_ne_id_of from nm_members c where c.nm_ne_id_in = 1887))
                                                           SELECT i.*,
                                                                  m.nm_ne_id_in
@@ -1926,43 +1932,55 @@ AS
                                                                  --                                                                 ne_length, 0,
                                                                  --                                                                 0) --1)
                                                                  --                                                                 ce,
-                                                                 CASE nm_cardinality
+                                                                 CASE seq_id
                                                                     WHEN 1
                                                                     THEN
-                                                                       CASE datum_st
-                                                                          WHEN 0
-                                                                          THEN
-                                                                             0
-                                                                          ELSE
-                                                                             1
-                                                                       END
+                                                                       0
                                                                     ELSE
-                                                                       CASE datum_end
-                                                                          WHEN ne_length
+                                                                       CASE nm_cardinality
+                                                                          WHEN 1
                                                                           THEN
-                                                                             0
+                                                                             CASE datum_st
+                                                                                WHEN 0
+                                                                                THEN
+                                                                                   0
+                                                                                ELSE
+                                                                                   1
+                                                                             END
                                                                           ELSE
-                                                                             1
+                                                                             CASE datum_end
+                                                                                WHEN ne_length
+                                                                                THEN
+                                                                                   0
+                                                                                ELSE
+                                                                                   1
+                                                                             END
                                                                        END
                                                                  END
                                                                     cs,
-                                                                 CASE nm_cardinality
-                                                                    WHEN 1
+                                                                 CASE seq_id
+                                                                    WHEN max_seq
                                                                     THEN
-                                                                       CASE datum_end
-                                                                          WHEN ne_length
-                                                                          THEN
-                                                                             0
-                                                                          ELSE
-                                                                             1
-                                                                       END
+                                                                       0
                                                                     ELSE
-                                                                       CASE datum_st
-                                                                          WHEN 0
+                                                                       CASE nm_cardinality
+                                                                          WHEN 1
                                                                           THEN
-                                                                             0
+                                                                             CASE datum_end
+                                                                                WHEN ne_length
+                                                                                THEN
+                                                                                   0
+                                                                                ELSE
+                                                                                   1
+                                                                             END
                                                                           ELSE
-                                                                             1
+                                                                             CASE datum_st
+                                                                                WHEN 0
+                                                                                THEN
+                                                                                   0
+                                                                                ELSE
+                                                                                   1
+                                                                             END
                                                                        END
                                                                  END
                                                                     ce,
