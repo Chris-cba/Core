@@ -1,0 +1,338 @@
+CREATE OR REPLACE PACKAGE lb_ops
+AS
+--<PACKAGE>
+-------------------------------------------------------------------------
+    --   PVCS Identifiers :-
+    --
+    --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_ops.pkh-arc   1.11   Oct 10 2018 18:12:40   Rob.Coupe  $
+    --       Module Name      : $Workfile:   lb_ops.pkh  $
+    --       Date into PVCS   : $Date:   Oct 10 2018 18:12:40  $
+    --       Date fetched Out : $Modtime:   Oct 10 2018 18:11:54  $
+    --       PVCS Version     : $Revision:   1.11  $
+    --
+    --   Author : R.A. Coupe
+    
+    --   Location Bridge package for handling operations on the main nested table type such as union, minus and intersection.
+	--   It also has functions to test the structural integrity of the nested tables, convert units and normalize and explode
+	--   the data within the tables.
+    --
+    -----------------------------------------------------------------------------
+    -- Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
+    ----------------------------------------------------------------------------
+    --
+--</PACKAGE>
+--<GLOBVAR>
+
+    g_sccsid         CONSTANT VARCHAR2 (2000) := '$Revision:   1.11  $';
+
+    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_ops';
+	
+--</GLOBVAR>
+	
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+--
+-- This function returns the current PVCS version
+
+    FUNCTION get_version
+        RETURN VARCHAR2;
+--</PROC>
+--
+
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+--
+-- This function returns the current PVCS version of the package body		
+    FUNCTION get_body_version
+        RETURN VARCHAR2;
+--</PROC>
+--
+
+-----------------------------------------------------------------------------
+--
+/*
+   <PROC NAME="RPT_INTERSECTION">
+
+   Purpose - This function returns a nested table which is the location intersection of the two 
+   input nested tables.
+   
+   Arguments - p_Rpt1       IN    LB_RPT_TAB        The first area of network held as a table of lb reference point data.
+               p_Rpt2       IN    LB_RPT_TAB        A second area of network held as a table of lb reference point data.   
+
+Returns                           LB_RPT_TAB        Returns the linear location intersection of the two nested tables.
+
+Notes  - The two nested tables must be at the same level of the network hierarchy, no attempt is made within this code
+         to translate routes to datums and vice-versa. 			   
+   
+*/
+
+		FUNCTION RPt_intersection (p_Rpt1             lb_RPt_tab,
+                               p_Rpt2             lb_RPt_tab,
+                               p_cardinality   IN INTEGER)
+        RETURN lb_RPt_tab;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="RPT_MINUS">
+--
+/*
+   Purpose - This function returns a nested table which is the location-based MINUS of the second from the first. 
+   
+   Arguments - p_rpt1       IN    LB_RPT_TAB        The first area of network held as a table of lb reference point data.
+               p_rpt2       IN    LB_RPT_TAB        A second area of network held as a table of lb reference point data.   
+
+Returns                           LB_RPT_TAB        Returns the linear location set MINUS - i.e. p_Rpt1 MINUS p_rpt2.
+
+Notes  - The two nested tables must be at the same level of the network hierarchy, no attempt is made within this code
+         to translate routes to datums and vice-versa. 			   
+   
+*/
+		FUNCTION RPt_minus (p_Rpt1             lb_RPt_tab,
+                        p_Rpt2             lb_RPt_tab,
+                        p_cardinality   IN INTEGER)
+        RETURN lb_RPt_tab;
+
+--</PROC>
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="RPT_UNION">
+--
+/*
+   Purpose - This function returns a nested table which is the location-based UNION of the two input tables. That is a multi-set union.
+   Note that the results make no distinction of connectivity or make any attempt to aggregate multiple rows on the same referent. 
+   
+   Arguments - p_rpt1       IN    LB_RPT_TAB        The first area of network held as a table of lb reference point data.
+               p_rpt2       IN    LB_RPT_TAB        A second area of network held as a table of lb reference point data.   
+
+Returns                           LB_RPT_TAB        Returns the linear location set UNION of the two tables..
+
+Notes  - The two nested tables must be at the same level of the network hierarchy, no attempt is made within this code
+         to translate routes to datums and vice-versa. 			   
+   
+*/
+    FUNCTION RPt_union (p_Rpt1             lb_RPt_tab,
+                        p_Rpt2             lb_RPt_tab,
+                        p_cardinality   IN INTEGER)
+        RETURN lb_RPt_tab;
+
+--</PROC>
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="MERGE_LB_RPT_TAB">
+--
+/*
+   Purpose - This function returns a "merged" nested table of location data. The merge operation will add a specific
+             identifier and object-type to all location records in the table. This is used when (say) an asset ID and type
+             are being loaded into the database.
+   
+   Arguments - p_ne_id        IN    INTEGER        The object-id to be pushed into the table of locations.
+               p_obj_type     IN    VARCHAR2       The object-type to be pushed into the table of locations.   
+               p_tab          IN    LB_RPT_TAB     The table of  "pure" locations - i.e. a nested table of network references 
+                                                   usually without reference to object id or type.
+               p_cardinality  IN    INTEGER        An indicator of the number of rows in the nested table. It is used by Oracle
+                                                   optimizer when statistics are required on the use of a join between native heap
+                                                   table data and the data within a nested table.
+
+Returns                           LB_RPT_TAB        Returns the "merged" set of locations as a location table (LB_RPT_TAB).
+
+*/
+		FUNCTION merge_lb_rpt_tab (p_ne_id         IN INTEGER,
+                               p_obj_type      IN VARCHAR2,
+                               p_tab           IN lb_RPt_tab,
+                               p_cardinality   IN INTEGER)
+        RETURN lb_RPt_tab;
+
+--</PROC>
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GROUP_LB_RPT_TAB">
+--
+/*
+   Purpose - This function returns a "grouped" nested table of location data. The grouping operaton will modify the table
+             grouping over the referent, the object id and type, segment identifier and unit. This allows min and max measures
+             and is intended to remove overlaps in the range. 
+   
+   Arguments - p_tab          IN    LB_RPT_TAB     The table of  locations to be grouped 
+
+Returns                           LB_RPT_TAB        Returns the "grouped" set of locations as a location table (LB_RPT_TAB).
+
+*/
+    FUNCTION group_lb_rpt_tab (p_tab IN lb_RPt_Tab, p_cardinality IN INTEGER)
+        RETURN lb_RPt_tab;
+
+--</PROC>
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="RPT_APPEND">
+--
+/*
+   Purpose - This function returns a nested table which results from the second table being appended to the first. This differs
+   from a multiset union in the sense that any aggregation over the referent only occurs at points of connectivity. It is essentially
+   a method of linking two connected paths.
+   
+   Arguments - p_rpt1       IN    LB_RPT_TAB        The first set of network held as a table of lb reference point data.
+               p_rpt2       IN    LB_RPT_TAB        A second set of network held as a table of lb reference point data.  
+               cardinality  IN    INTEGER           An expected number of rows which is used by certain versions of the optimizer 
+
+Returns                           LB_RPT_TAB        Returns the linear location set UNION of the two tables..
+
+Notes  - The two nested tables must be at the same level of the network hierarchy, no attempt is made within this code
+         to translate routes to datums and vice-versa. 			   
+   
+*/
+    FUNCTION RPt_append (p_Rpt1          IN lb_RPt_tab,
+                         p_Rpt2          IN lb_RPt_tab,
+                         cardinality   IN INTEGER)
+        RETURN lb_RPt_tab;
+
+--</PROC>
+
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="IS_CONTIGUOUS">
+--
+/*
+   Purpose - This function returns a TRUE or FALSE as a string if the location data in the supplied data represents a single 
+             contiguous linear location.
+   
+   Arguments - p_lb_rpt_tab   IN    LB_RPT_TAB     The table of  locations to be checked for contiguity 
+
+Returns                           VARCHAR2        Returns the a "TRUE" or "FALSE" string.
+
+*/
+
+    FUNCTION is_contiguous (p_lb_rpt_tab IN lb_rpt_tab)
+        RETURN VARCHAR2;
+
+--</PROC>
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="NORMALIZE_RPT_TAB">
+--
+/*
+   Purpose - This function normalises the location table by converting units of measure to the unit type
+             used by the specific referent, or if this is unavailable, the units of the network related to
+             the asset location rules. 
+   
+   Arguments - pi_rpt_tab   IN    LB_RPT_TAB     The table of  locations to be "normalized"
+
+Returns                           LB_RPT_TAB      The resultant "normalized" table of data.
+
+*/
+    FUNCTION normalize_rpt_tab (pi_rpt_tab IN lb_rpt_tab)
+        RETURN lb_rpt_tab;
+
+--</PROC>
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="TRANSLATE_RPT_TAB_UNITS">
+--
+/*
+   Purpose - This function converts the units of measure of the start and end components of the location table to the units specified. 
+   
+   Arguments - pi_rpt_tab   IN    LB_RPT_TAB     The table of  locations of which the measure values are to be converted.
+               unit_out     IN    INTEGER        The Exor unit type specifier.
+
+Returns                           LB_RPT_TAB      The resultant table of location data with the converted emasure values. .
+
+*/
+		FUNCTION translate_rpt_tab_units (pi_rpt_tab   IN lb_rpt_tab,
+                                      unit_out     IN INTEGER)
+        RETURN lb_rpt_tab;
+
+--</PROC>
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="NORMALIZE_XRPT_TAB">
+--
+/*
+   Purpose - This function normalises the XSP location table by converting units of measure to the unit type
+             used by the specific referent, or if this is unavailable, the units of the network related to
+             the asset location rules. 
+   
+   Arguments - pi_xrpt_tab   IN    LB_XRPT_TAB     The table of  XSP and locations to be "normalized"
+
+Returns                           LB_XRPT_TAB      The resultant "normalized" table of data.
+
+*/
+		FUNCTION normalize_xrpt_tab (pi_xrpt_tab IN lb_xrpt_tab)
+        RETURN lb_xrpt_tab;
+
+--</PROC>
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="TRANSLATE_XRPT_TAB_UNITS">
+--
+/*
+   Purpose - This function converts the units of measure of the start and end components of the XSP location table to the units specified. 
+   
+   Arguments - pi_xrpt_tab   IN    LB_XRPT_TAB     The table of XSP locations of which the measure values are to be converted.
+               unit_out      IN    INTEGER         The Exor unit type specifier.
+
+Returns                           LB_XRPT_TAB      The resultant table of XSP location data with the converted emasure values. .
+
+*/
+    FUNCTION translate_xrpt_tab_units (pi_xrpt_tab   IN lb_xrpt_tab,
+                                       unit_out      IN INTEGER)
+        RETURN lb_xrpt_tab;
+
+--</PROC>
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="EXPLODE_RPT_TAB">
+--
+/*
+   Purpose - This function "explodes" the location table in the sense that the resultant location table will be formed from
+             the union of the supplied table with any datum-based locations translated from any rouet-based location data in
+             the original. 
+   
+   Arguments - pi_rpt_tab   IN    LB_RPT_TAB     The table of locations to be "exploded".
+
+Returns                           LB_RPT_TAB     The resultant exploded table of location data.
+
+*/
+    FUNCTION explode_rpt_tab (pi_rpt_tab IN lb_rpt_tab)
+        RETURN lb_rpt_tab;
+
+--</PROC>
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="LB_RPT_TAB_HAS_NETWORK">
+--
+/*
+   Purpose - This function checks that all rows of the location table have suitable referent information. It retruns "TRUE" or "FALSE"
+
+   
+   Arguments - pi_rpt_tab   IN    LB_RPT_TAB     The table of locations to be checked for network content
+
+Returns                           VARCHAR2       A string of "TRUE" or "FALSE" depending on whether all rows have a 
+                                                 referent or not.
+*/
+    FUNCTION lb_rpt_tab_has_network (pi_rpt_tab IN lb_rpt_tab)
+        RETURN VARCHAR2;
+
+--</PROC>
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="CHECK_LB_RPT_TAB">
+--
+/*
+   Purpose - This function checks the integrity of the location table to ensure that adequate information is available
+             in the attributes of the location table for its use a query predicate. Note that the table has both object 
+             and network based components which may be used in tandem or in isolation. Hence, a location table is deemed
+             inadequate only if the referent, referent type and unit specifier are all NULL. Existence of a row with these
+             attributes set to NULL will mean a return value of "FALSE". It retruns "TRUE" or "FALSE"
+
+   
+   Arguments - pi_rpt_tab   IN    LB_RPT_TAB     The table of locations to be checked.
+
+Returns                           VARCHAR2       A string of "TRUE" or "FALSE" depending on whether all rows have all 
+                                                 network components or not.
+*/
+    FUNCTION check_lb_rpt_tab (pi_rpt_tab IN lb_rpt_tab)
+        RETURN VARCHAR2;
+END;
+/
