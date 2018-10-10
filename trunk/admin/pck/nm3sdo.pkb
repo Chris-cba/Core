@@ -5,11 +5,11 @@ AS
    --
    ---   PVCS Identifiers :-
    --
-   --       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.97   Apr 16 2018 09:23:34   Gaurav.Gaurkar  $
+   --       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.98   Oct 10 2018 09:18:36   Chris.Baugh  $
    --       Module Name      : $Workfile:   nm3sdo.pkb  $
-   --       Date into PVCS   : $Date:   Apr 16 2018 09:23:34  $
-   --       Date fetched Out : $Modtime:   Apr 16 2018 09:04:32  $
-   --       PVCS Version     : $Revision:   2.97  $
+   --       Date into PVCS   : $Date:   Oct 10 2018 09:18:36  $
+   --       Date fetched Out : $Modtime:   Sep 25 2018 09:54:04  $
+   --       PVCS Version     : $Revision:   2.98  $
    --       Based on
    ------------------------------------------------------------------
    --   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
@@ -23,7 +23,7 @@ AS
    -- Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
    -----------------------------------------------------------------------------
 
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '"$Revision:   2.97  $"';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '"$Revision:   2.98  $"';
    g_package_name   CONSTANT VARCHAR2 (30) := 'NM3SDO';
    g_batch_size              INTEGER
       := NVL (TO_NUMBER (Hig.get_sysopt ('SDOBATSIZE')), 10);
@@ -3651,8 +3651,8 @@ AS
                                                  v_nm_network_themes t
                                            WHERE     g.child_nt_type = t.nt_type
                                                  AND NVL (g.child_group_type,
-                                                          '£$%^') =
-                                                        NVL (t.gty_type, '£$%^')
+                                                          'Â£$%^') =
+                                                        NVL (t.gty_type, 'Â£$%^')
                                                  AND nth_base_table_theme IS NULL
                                                  AND nth_feature_table NOT LIKE
                                                         'SECT_SS%'
@@ -4501,35 +4501,37 @@ AS
       -- No longer used
       --:= strip_user_parts( p_geom );
       ltype   NUMBER := Nm3sdo.get_type_from_gtype (p_geom.sdo_gtype);
+      l_geom sdo_geometry;
    BEGIN
-      IF ltype = 1
+      l_geom := sdo_util.extract( p_geom, 1);
+      IF ltype in ( 1, 5)
       THEN                                -- a point - test how data is stored
-         IF p_geom.sdo_point IS NULL
+         IF l_geom.sdo_point IS NULL
          THEN
             RETURN mdsys.sdo_geometry (
                       2001,
-                      p_geom.sdo_srid,
-                      mdsys.sdo_point_type (p_geom.sdo_ordinates (1),
-                                            p_geom.sdo_ordinates (2),
+                      l_geom.sdo_srid,
+                      mdsys.sdo_point_type (l_geom.sdo_ordinates (1),
+                                            l_geom.sdo_ordinates (2),
                                             NULL),
                       NULL,
                       NULL);
          ELSE
             RETURN mdsys.sdo_geometry (
                       2001,
-                      p_geom.sdo_srid,
-                      mdsys.sdo_point_type (p_geom.sdo_point.x,
-                                            p_geom.sdo_point.y,
+                      l_geom.sdo_srid,
+                      mdsys.sdo_point_type (l_geom.sdo_point.x,
+                                            l_geom.sdo_point.y,
                                             NULL),
                       NULL,
                       NULL);
          END IF;
-      ELSIF ltype = 2
+      ELSIF ltype in ( 2, 6 )
       THEN                                 -- line - always use ordinate array
-         RETURN get_2d_pt (Nm3sdo.get_midpoint (p_geom));
-      ELSIF ltype = 3
+         RETURN get_2d_pt (nm3sdo.get_midpoint (l_geom));
+      ELSIF ltype in (3, 7)
       THEN -- polygon - always use ordinate array, exception when the sdo_point is used. (mapinfo often stores the centroid)
-         RETURN get_2d_pt (SDO_GEOM.sdo_centroid (p_geom, .001));
+         RETURN get_2d_pt (SDO_GEOM.sdo_centroid (l_geom, .001));
       ELSE
          Hig.raise_ner (pi_appl      => Nm3type.c_hig,
                         pi_id        => 287,
