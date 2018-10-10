@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3close AS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3close.pkb-arc   2.21   Jul 25 2018 23:04:48   Rob.Coupe  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3close.pkb-arc   2.22   Oct 10 2018 12:01:54   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm3close.pkb  $
---       Date into PVCS   : $Date:   Jul 25 2018 23:04:48  $
---       Date fetched Out : $Modtime:   Jul 25 2018 23:04:26  $
---       PVCS Version     : $Revision:   2.21  $
+--       Date into PVCS   : $Date:   Oct 10 2018 12:01:54  $
+--       Date fetched Out : $Modtime:   Oct 09 2018 09:59:36  $
+--       PVCS Version     : $Revision:   2.22  $
 --
 --
 --   Author : I Turnbull
@@ -21,7 +21,7 @@ CREATE OR REPLACE PACKAGE BODY nm3close AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.21  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.22  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3close';
@@ -420,12 +420,21 @@ PROCEDURE do_close(p_ne_id          NM_ELEMENTS.ne_id%TYPE
                   ,p_effective_date DATE DEFAULT  To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                   ,p_neh_descr      nm_element_history.neh_descr%TYPE DEFAULT NULL --CWS 0108990 12/03/2010
                   ) IS
+--
+   CURSOR c_check_close IS
+   SELECT 1
+     FROM nm_elements_all
+    WHERE ne_id = p_ne_id
+      AND ne_end_date IS NOT NULL;
+--
    c_xattr_status BOOLEAN := nm3inv_xattr.g_xattr_active;
 --
    v_errors                NUMBER;
    v_err_text              VARCHAR2(10000);
 --   
    l_aggr_list             ptr_vc_array_type;
+   l_row_found             BOOLEAN;
+   l_dummy                 PLS_INTEGER;
 
 --
    PROCEDURE set_for_return IS
@@ -434,15 +443,24 @@ PROCEDURE do_close(p_ne_id          NM_ELEMENTS.ne_id%TYPE
       nm3merge.set_nw_operation_in_progress(FALSE);
    END set_for_return;
 --
-  function next_transaction_id return integer is
-  retval integer;
-  begin
-    select lb_transaction_id_seq.nextval into retval from dual;
-    return retval;
-  end;
 
 BEGIN
    nm_debug.proc_start(g_package_name , 'do_close');
+   
+   --
+   -- Check if element has already been closed
+   --
+   OPEN c_check_close;
+   FETCH c_check_close INTO l_dummy;
+   l_row_found := c_check_close%FOUND;
+   CLOSE c_check_close;
+   
+   IF l_row_found THEN
+     --
+     RAISE_APPLICATION_ERROR( -20001, 'Cannot close an element that has already been closed' );
+     --
+   END IF;
+   
    nm3merge.set_nw_operation_in_progress;
       -- This effective date check stops future dates
       -- *********************
@@ -550,8 +568,6 @@ BEGIN
       END;
       --
 --
-      g_transaction_id := next_transaction_id;
-
       insert_nm_element_history( p_ne_id
                                , p_effective_date
                                , p_neh_descr --CWS 0108990 12/03/2010
@@ -562,9 +578,12 @@ BEGIN
         declare
            l_block varchar2(2000);
         begin 
-           l_block := 'begin lb_nw_edit.lb_close(:p_ne, :p_effective_date, :p_transaction_id); end; ';
---
-           execute immediate l_block using p_ne_id, p_effective_date, g_transaction_id;
+          --
+          execute immediate 'select lb_transaction_id_seq.nextval from dual' INTO g_transaction_id;
+          --
+          l_block := 'begin lb_nw_edit.lb_close(:p_ne, :p_effective_date, :p_transaction_id); end; ';
+          --
+          execute immediate l_block using p_ne_id, p_effective_date, g_transaction_id;
         end;
      end if;                            
       
