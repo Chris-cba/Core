@@ -4,11 +4,11 @@ AS
 -------------------------------------------------------------------------
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_ops.pkh-arc   1.10   Sep 26 2018 15:39:14   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_ops.pkh-arc   1.11   Oct 10 2018 18:12:40   Rob.Coupe  $
     --       Module Name      : $Workfile:   lb_ops.pkh  $
-    --       Date into PVCS   : $Date:   Sep 26 2018 15:39:14  $
-    --       Date fetched Out : $Modtime:   Sep 26 2018 15:38:02  $
-    --       PVCS Version     : $Revision:   1.10  $
+    --       Date into PVCS   : $Date:   Oct 10 2018 18:12:40  $
+    --       Date fetched Out : $Modtime:   Oct 10 2018 18:11:54  $
+    --       PVCS Version     : $Revision:   1.11  $
     --
     --   Author : R.A. Coupe
     
@@ -23,7 +23,7 @@ AS
 --</PACKAGE>
 --<GLOBVAR>
 
-    g_sccsid         CONSTANT VARCHAR2 (2000) := '$Revision:   1.10  $';
+    g_sccsid         CONSTANT VARCHAR2 (2000) := '$Revision:   1.11  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'lb_ops';
 	
@@ -174,7 +174,8 @@ Returns                           LB_RPT_TAB        Returns the "grouped" set of
    a method of linking two connected paths.
    
    Arguments - p_rpt1       IN    LB_RPT_TAB        The first set of network held as a table of lb reference point data.
-               p_rpt2       IN    LB_RPT_TAB        A second set of network held as a table of lb reference point data.   
+               p_rpt2       IN    LB_RPT_TAB        A second set of network held as a table of lb reference point data.  
+               cardinality  IN    INTEGER           An expected number of rows which is used by certain versions of the optimizer 
 
 Returns                           LB_RPT_TAB        Returns the linear location set UNION of the two tables..
 
@@ -184,7 +185,7 @@ Notes  - The two nested tables must be at the same level of the network hierarch
 */
     FUNCTION RPt_append (p_Rpt1          IN lb_RPt_tab,
                          p_Rpt2          IN lb_RPt_tab,
-                         p_cardinality   IN INTEGER)
+                         cardinality   IN INTEGER)
         RETURN lb_RPt_tab;
 
 --</PROC>
