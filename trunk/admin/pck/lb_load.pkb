@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_load
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_load.pkb-arc   1.32   Aug 03 2018 13:37:56   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_load.pkb-arc   1.33   Oct 24 2018 14:24:56   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_load.pkb  $
-   --       Date into PVCS   : $Date:   Aug 03 2018 13:37:56  $
-   --       Date fetched Out : $Modtime:   Aug 03 2018 13:37:10  $
-   --       PVCS Version     : $Revision:   1.32  $
+   --       Date into PVCS   : $Date:   Oct 24 2018 14:24:56  $
+   --       Date fetched Out : $Modtime:   Oct 24 2018 14:23:28  $
+   --       PVCS Version     : $Revision:   1.33  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,7 +16,7 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.32  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.33  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_load';
 
@@ -64,6 +64,9 @@ AS
    FUNCTION validate_xsp_on_RPt_tab (pi_xsp       IN VARCHAR2,
                                      pi_rpt_tab      lb_RPt_tab)
       RETURN lb_loc_error_tab;
+
+   FUNCTION validate_inv_nw_constraint (p_rpt_tab IN lb_rpt_tab)
+      RETURN VARCHAR2;
 
 
    FUNCTION ld_nal (
@@ -139,7 +142,7 @@ AS
       pi_unit           IN nm_units.un_unit_id%TYPE,
       pi_xsp            IN VARCHAR2,
       pi_start_date     IN nm_asset_locations_all.nal_start_date%TYPE,
-      pi_range_seq_no   IN INTEGER,      
+      pi_range_seq_no   IN INTEGER,
       pi_security_id    IN nm_asset_locations_all.nal_security_key%TYPE)
    IS
       loc_error       lb_loc_error_tab;
@@ -150,10 +153,10 @@ AS
       l_end           NUMBER;
       l_unit          INTEGER;
       l_reverse       INTEGER := 1;
-      l_start_m         NUMBER := pi_start_m;
-      l_end_m          NUMBER := pi_end_m;  
-      l_min_start_m    NUMBER;
-      l_max_end_m      NUMBER;
+      l_start_m       NUMBER := pi_start_m;
+      l_end_m         NUMBER := pi_end_m;
+      l_min_start_m   NUMBER;
+      l_max_end_m     NUMBER;
    BEGIN
       --
       IF pi_g_i_d IS NULL
@@ -179,27 +182,45 @@ AS
       IF l_pnt_or_cont = 'P' AND pi_start_m <> NVL (pi_end_m, pi_start_m)
       THEN
          raise_application_error (
-            -20001,
+            -20002,
             'The start and end measures must be the same for point asset types');
       ELSIF l_pnt_or_cont = 'C' AND pi_start_m >= NVL (pi_end_m, pi_start_m)
       THEN
          l_reverse := -1;
          l_start_m := pi_end_m;
-         l_end_m   := pi_start_m;
-         
---         raise_application_error (
---            -20002,
---            'The end measure must be provided and greater than the start measure');
+         l_end_m := pi_start_m;
+      --         raise_application_error (
+      --            -20002,
+      --            'The end measure must be provided and greater than the start measure');
       END IF;
-
       SELECT l_start_m * NVL (uc_conversion_factor, 1),
              l_end_m * NVL (uc_conversion_factor, 1),
-             nlt_units,              
-             case when ne_gty_group_type is NOT NULL then 
-                 ( select min(nm_slk) from nm_members where nm_ne_id_in = pi_refnt ) else 0 end min_start_m,
-             case when ne_gty_group_type is NOT NULL then 
-             ( select max(nm_end_slk) from nm_members where nm_ne_id_in = pi_refnt ) else ne_length end max_end_m
-        INTO l_start, l_end, l_unit, l_min_start_m, l_max_end_m
+             nlt_units,
+             CASE
+                WHEN ne_gty_group_type IS NOT NULL
+                THEN
+                   (SELECT MIN (nm_slk)
+                      FROM nm_members
+                     WHERE nm_ne_id_in = pi_refnt)
+                ELSE
+                   0
+             END
+                min_start_m,
+             CASE
+                WHEN ne_gty_group_type IS NOT NULL
+                THEN
+                   (SELECT MAX (nm_end_slk)
+                      FROM nm_members
+                     WHERE nm_ne_id_in = pi_refnt)
+                ELSE
+                   ne_length
+             END
+                max_end_m
+        INTO l_start,
+             l_end,
+             l_unit,
+             l_min_start_m,
+             l_max_end_m
         FROM nm_unit_conversions, nm_linear_types, nm_elements
        WHERE     nlt_units = uc_unit_id_out
              AND uc_unit_id_in = pi_unit
@@ -207,37 +228,59 @@ AS
              AND nlt_nt_type = ne_nt_type
              AND NVL (ne_gty_group_type, '%^&*') = NVL (nlt_gty_type, '%^&*')
       UNION
-      SELECT l_start_m, l_end_m, nlt_units,
-             case when ne_gty_group_type is NOT NULL then 
-                 ( select min(nm_slk) from nm_members where nm_ne_id_in = pi_refnt ) else 0 end min_start_m,
-             case when ne_gty_group_type is NOT NULL then 
-             ( select max(nm_end_slk) from nm_members where nm_ne_id_in = pi_refnt ) else ne_length end max_end_m      
+      SELECT l_start_m,
+             l_end_m,
+             nlt_units,
+             CASE
+                WHEN ne_gty_group_type IS NOT NULL
+                THEN
+                   (SELECT MIN (nm_slk)
+                      FROM nm_members
+                     WHERE nm_ne_id_in = pi_refnt)
+                ELSE
+                   0
+             END
+                min_start_m,
+             CASE
+                WHEN ne_gty_group_type IS NOT NULL
+                THEN
+                   (SELECT MAX (nm_end_slk)
+                      FROM nm_members
+                     WHERE nm_ne_id_in = pi_refnt)
+                ELSE
+                   ne_length
+             END
+                max_end_m
         FROM nm_linear_types, nm_elements
        WHERE     nlt_units = pi_unit
              AND ne_id = pi_refnt
              AND nlt_nt_type = ne_nt_type
              AND NVL (ne_gty_group_type, '%^&*') = NVL (nlt_gty_type, '%^&*');
 
-      if l_start_m < l_min_start_m OR
-         l_end_m > l_max_end_m then
-           raise_application_error(-20002, 'The range measures must be within the measures of the referent');
-      end if;
+      IF l_start_m < l_min_start_m OR l_end_m > l_max_end_m
+      THEN
+         raise_application_error (
+            -20003,
+            'The range measures must be within the measures of the referent');
+      END IF;
+
       --
       IF l_g_i_d = 'D'
       THEN
-         lb_load (lb_ops.merge_lb_rpt_tab (pi_nal_id,
-                                           pi_nal_nit_type,
-                                           LB_RPT_TAB (LB_RPt (pi_refnt,
-                                                               pi_nlt_id,
-                                                               NULL,
-                                                               NULL,
-                                                               1,
-                                                               pi_range_seq_no,
-                                                               l_reverse,
-                                                               l_start,
-                                                               l_end,
-                                                               l_unit)),
-                                           10),
+         lb_load (lb_ops.merge_lb_rpt_tab (
+                     pi_nal_id,
+                     pi_nal_nit_type,
+                     LB_RPT_TAB (LB_RPt (pi_refnt,
+                                         pi_nlt_id,
+                                         NULL,
+                                         NULL,
+                                         1,
+                                         pi_range_seq_no,
+                                         l_reverse,
+                                         l_start,
+                                         l_end,
+                                         l_unit)),
+                     10),
                   pi_nal_id,
                   pi_start_date,
                   pi_security_id,
@@ -284,7 +327,7 @@ AS
       THEN
          --        if l_err_tab(1).error_code is not null then
          raise_application_error (
-            -20001,
+            -20004,
             'XSP is invalid - count = ' || l_err_tab.COUNT);
       --        end if;
       END IF;
@@ -307,7 +350,7 @@ AS
 
          --
          raise_application_error (
-            -20002,
+            -20005,
             'Asset location has a point/line reference when asset type is flagged as line/point');
       EXCEPTION
          WHEN NO_DATA_FOUND
@@ -315,6 +358,11 @@ AS
             NULL;
       END;
 
+      if nvl(validate_inv_nw_constraint(p_obj_rpt), 'FALSE') = 'FALSE' then
+         raise_application_error (
+            -20006,
+            'Asset locations fail to fit with network constraints');
+      end if;      
 
       FORALL i IN 1 .. p_obj_Rpt.COUNT
          INSERT INTO nm_locations_all (nm_ne_id_of,
@@ -356,7 +404,7 @@ AS
                            p_xsp,
                            p_obj_Rpt (i).dir_flag,
                            p_obj_Rpt (i).refnt_type,
-                           (SELECT nwx_offset * p_obj_Rpt (i).dir_flag 
+                           (SELECT nwx_offset * p_obj_Rpt (i).dir_flag
                               FROM nm_nw_xsp, nm_elements
                              WHERE     nwx_nw_type = ne_nt_type
                                    AND ne_id = p_obj_Rpt (i).refnt
@@ -384,8 +432,8 @@ AS
                                    AND ne_id = p_obj_Rpt (i).refnt
                                    AND nwx_x_sect = p_xsp
                                    AND nwx_nsc_sub_class = ne_sub_class),
-                           p_obj_Rpt(i).seg_id,
-                           p_obj_Rpt(i).seq_id)
+                           p_obj_Rpt (i).seg_id,
+                           p_obj_Rpt (i).seq_id)
            RETURNING nm_loc_id
                 BULK COLLECT INTO l_loc_tab;
 
@@ -412,18 +460,17 @@ AS
                 p_nal_id,
                 'N',
                 nm_obj_type,
-                SDO_GEOM.sdo_arc_densify (SDO_LRS.convert_to_std_geom (
-                                             SDO_LRS.OFFSET_GEOM_SEGMENT (
-                                                geoloc,
-                                                nm_begin_mp,
-                                                nm_end_mp,
-                                                NVL (
-                                                   nm_offset_st,
-                                                   0),
-                                                g_sdo_tolerance --                                               ,'unit=m'
-                                                     )),
-                                          g_sdo_tolerance,
-                                          'arc_tolerance='||to_char(g_sdo_arc_tolerance))
+                SDO_GEOM.sdo_arc_densify (
+                   SDO_LRS.convert_to_std_geom (
+                      SDO_LRS.OFFSET_GEOM_SEGMENT (
+                         geoloc,
+                         nm_begin_mp,
+                         nm_end_mp,
+                         NVL (nm_offset_st, 0),
+                         g_sdo_tolerance --                                               ,'unit=m'
+                                        )),
+                   g_sdo_tolerance,
+                   'arc_tolerance=' || TO_CHAR (g_sdo_arc_tolerance))
                    geoloc
            FROM nm_locations_all, v_lb_nlt_geometry
           WHERE     nm_ne_id_of = ne_id
@@ -695,22 +742,22 @@ AS
         INTO retval
         FROM TABLE (pi_rpt_tab)
        WHERE     NOT EXISTS
-                    (SELECT 1
-                       FROM nm_elements, xsp_restraints
-                      WHERE     ne_id = refnt
-                            AND ne_sub_class = xsr_scl_class
-                            AND obj_type = xsr_ity_inv_code
-                            AND xsr_nw_type = ne_nt_type
-                            AND xsr_x_sect_value = pi_xsp)
+                        (SELECT 1
+                           FROM nm_elements, xsp_restraints
+                          WHERE     ne_id = refnt
+                                AND ne_sub_class = xsr_scl_class
+                                AND obj_type = xsr_ity_inv_code
+                                AND xsr_nw_type = ne_nt_type
+                                AND xsr_x_sect_value = pi_xsp)
              AND NOT EXISTS
-                    (SELECT 1
-                       FROM nm_elements, xsp_restraints, nm_members
-                      WHERE     nm_ne_id_of = refnt
-                            AND nm_ne_id_in = ne_id
-                            AND ne_sub_class = xsr_scl_class
-                            AND obj_type = xsr_ity_inv_code
-                            AND xsr_nw_type = ne_nt_type
-                            AND xsr_x_sect_value = pi_xsp)
+                        (SELECT 1
+                           FROM nm_elements, xsp_restraints, nm_members
+                          WHERE     nm_ne_id_of = refnt
+                                AND nm_ne_id_in = ne_id
+                                AND ne_sub_class = xsr_scl_class
+                                AND obj_type = xsr_ity_inv_code
+                                AND xsr_nw_type = ne_nt_type
+                                AND xsr_x_sect_value = pi_xsp)
              AND EXISTS
                     (SELECT 1
                        FROM nm_inv_types
@@ -726,7 +773,7 @@ AS
       WHEN OTHERS
       THEN
          --    return_code := 1;
-         raise_application_error (-20001, 'Problem in XSP validation');
+         raise_application_error (-20008, 'Problem in XSP validation');
    END;
 
    --
@@ -840,13 +887,14 @@ AS
                                               NVL (
                                                  nm_offset_st,
                                                  0),
-                                              g_sdo_tolerance  --                                               ,'unit=m'
-                                                    )),
+                                              g_sdo_tolerance --                                               ,'unit=m'
+                                                             )),
                                         g_sdo_tolerance,
-                                        'arc_tolerance='||to_char(g_sdo_arc_tolerance))
+                                           'arc_tolerance='
+                                        || TO_CHAR (g_sdo_arc_tolerance))
                                         geoloc
                                 FROM date_tracked_assets d,
-                                     nm_locations_all  l,
+                                     nm_locations_all l,
                                      V_LB_NLT_GEOMETRY g
                                WHERE     nm_ne_id_of = ne_id
                                      AND l.nm_ne_id_in = d.nm_ne_id_in
@@ -890,7 +938,7 @@ AS
          EXCEPTION
             WHEN NO_DATA_FOUND
             THEN
-               raise_application_error (-20001, 'Juxtaposition not known');
+               raise_application_error (-20009, 'Juxtaposition not known');
          END;
       ELSIF p_jxp IS NULL
       THEN
@@ -901,6 +949,55 @@ AS
          SET nal_descr = DECODE (p_nal_descr, g_nvl, nal_descr, p_nal_descr),
              nal_jxp = DECODE (p_jxp, g_nvl, nal_jxp, l_exor_njx_code)
        WHERE nal_id = p_nal_id;
+   END;
+
+   FUNCTION validate_inv_nw_constraint (p_rpt_tab IN lb_rpt_tab)
+      RETURN VARCHAR2
+   IS
+      retval            VARCHAR2 (10);
+      l_dummy           INTEGER;
+      constraint_code   VARCHAR2 (2000);
+      validation_sql    VARCHAR2 (2000);
+   BEGIN
+      BEGIN
+         SELECT LISTAGG (get_constraint (ninc_id), ' AND ')
+                   WITHIN GROUP (ORDER BY 1)
+           INTO constraint_code
+           FROM (  SELECT ninc_nlt_id,
+                          ninc_inv_type,
+                          ninc_id,
+                          COUNT (*),
+                          get_constraint (ninc_id) constraint_list
+                     FROM nm_inv_nw_constraints, TABLE (p_rpt_tab) t
+                    WHERE     t.obj_type = ninc_inv_type
+                          AND t.refnt_type = ninc_nlt_id
+                 GROUP BY ninc_inv_type, ninc_nlt_id, ninc_id);
+
+         --
+         validation_sql :=
+               'select 1  from dual '
+            || 'where exists ( select 1 from table(:b_rpt_tab) t '
+            || 'where not exists ( '
+            || ' select ne_id, ne_nt_type '
+            || ' from nm_elements, nm_linear_types '
+            || ' where t.refnt_type = nlt_id '
+            || ' and ne_nt_type = nlt_nt_type '
+            || ' and ne_id = t.refnt '
+            || ' and '
+            || constraint_code
+            || '))';
+         nm_debug.debug (validation_sql);
+
+         EXECUTE IMMEDIATE validation_sql INTO l_dummy USING p_rpt_tab;
+
+         retval := 'FALSE';
+      EXCEPTION
+         WHEN NO_DATA_FOUND
+         THEN
+            retval := 'TRUE';
+      END;
+
+      RETURN retval;
    END;
 END lb_load;
 /
