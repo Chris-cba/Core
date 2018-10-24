@@ -1,13 +1,12 @@
-/* Formatted on 10/9/2018 1:26:43 PM (QP5 v5.256.13226.35538) */
 CREATE OR REPLACE PACKAGE BODY lb_get
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_get.pkb-arc   1.58   Oct 09 2018 13:28:04   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_get.pkb-arc   1.59   Oct 24 2018 12:59:36   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_get.pkb  $
-   --       Date into PVCS   : $Date:   Oct 09 2018 13:28:04  $
-   --       Date fetched Out : $Modtime:   Oct 09 2018 13:27:08  $
-   --       PVCS Version     : $Revision:   1.58  $
+   --       Date into PVCS   : $Date:   Oct 24 2018 12:59:36  $
+   --       Date fetched Out : $Modtime:   Oct 24 2018 12:57:58  $
+   --       PVCS Version     : $Revision:   1.59  $
    --
    --   Author : R.A. Coupe
    --
@@ -17,18 +16,20 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.58  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.59  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_get';
 
    g_tol                     NUMBER := 0.00000001;
 
    --
-   -----------------------------------------------------------------------------
-   --
+   FUNCTION get_aggr_constraint (p_inv_type IN VARCHAR2)
+      RETURN VARCHAR2;
+
    FUNCTION get_refnt_RPt_tab_from_geom (
       p_geom          IN MDSYS.sdo_geometry,
       p_nlt_ids       IN int_array_type,
+      p_constraint    IN VARCHAR2,
       p_mask_array    IN VARCHAR2 DEFAULT 'ANYINTERACT',
       p_cardinality   IN INTEGER)
       RETURN lb_RPt_tab;
@@ -553,15 +554,18 @@ AS
       END IF;
 
       --
-      RETURN get_refnt_RPt_tab_from_geom (p_geom          => p_geom,
-                                          p_nlt_ids       => l_nlt_ids,
-                                          p_mask_array    => 'ANYINTERACT',
-                                          p_cardinality   => 100);
+      RETURN get_refnt_RPt_tab_from_geom (
+                p_geom          => p_geom,
+                p_nlt_ids       => l_nlt_ids,
+                p_constraint    => get_aggr_constraint (p_inv_type),
+                p_mask_array    => 'ANYINTERACT',
+                p_cardinality   => 100);
    END;
 
    FUNCTION get_refnt_RPt_tab_from_geom (
       p_geom          IN MDSYS.sdo_geometry,
       p_nlt_ids       IN int_array_type,
+      p_constraint    IN VARCHAR2,
       p_mask_array    IN VARCHAR2 DEFAULT 'ANYINTERACT',
       p_cardinality   IN INTEGER)
       RETURN lb_RPt_tab
@@ -582,6 +586,8 @@ AS
             'No network type has been supplied in call to geenrate a spatial intersection');
       END IF;
 
+nm_debug.debug('cons = '||p_constraint);
+
       SELECT    'with geom_tab as ( select :geom geoloc from dual ) '
              || ' select cast (collect( lb_rpt( ne_id, nlt_id, NULL, ne_id, 1, 1, 1, 0, ne_length, nlt_units)) as lb_rpt_tab )'
              || ' from ( select /*+INDEX(e NE_PK) */ e.ne_id, e.ne_length, nlt_id, nlt_units, shape '
@@ -591,7 +597,7 @@ AS
              || LISTAGG (select_string, CHR (10) || 'UNION ALL' || CHR (10))
                    WITHIN GROUP (ORDER BY nlt_id)
              || CHR (10)
-             || ')) s, nm_elements e where e.ne_id = s.ne_id )'
+             || ')) s, nm_elements e where e.ne_id = s.ne_id and '||p_constraint||')'
                 aggr_str
         INTO lstr
         FROM (SELECT nlt_id, nlt_units, select_string
@@ -644,6 +650,31 @@ AS
 
       RETURN retval;
    --
+   END;
+
+   FUNCTION get_aggr_constraint (p_inv_type IN VARCHAR2)
+      --, p_nlt_ids in int_array_type )
+      RETURN VARCHAR2
+   IS
+      retval   VARCHAR2 (2000) := '1=1';
+   BEGIN
+      SELECT nvl(LISTAGG (get_constraint (ninc_id), ' AND ')
+                WITHIN GROUP (ORDER BY 1), '1=1')
+        INTO retval
+        FROM (  SELECT ninc_nlt_id,
+                       ninc_inv_type,
+                       ninc_id,
+                       COUNT (*),
+                       get_constraint (ninc_id) constraint_list
+                  FROM nm_inv_nw_constraints
+                 WHERE ninc_inv_type = p_inv_type
+              GROUP BY ninc_inv_type, ninc_nlt_id, ninc_id);
+
+      RETURN retval;
+   EXCEPTION
+      WHEN NO_DATA_FOUND
+      THEN
+         RETURN '1 = 1';
    END;
 
    FUNCTION get_refnt_RPt_tab_from_nspe (
