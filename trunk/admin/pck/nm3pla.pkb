@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3pla AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3pla.pkb-arc   2.23   Apr 16 2018 09:23:16   Gaurav.Gaurkar  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3pla.pkb-arc   2.24   Oct 26 2018 09:13:28   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm3pla.pkb  $
---       Date into PVCS   : $Date:   Apr 16 2018 09:23:16  $
---       Date fetched Out : $Modtime:   Apr 16 2018 09:04:32  $
---       Version          : $Revision:   2.23  $
+--       Date into PVCS   : $Date:   Oct 26 2018 09:13:28  $
+--       Date fetched Out : $Modtime:   Oct 25 2018 16:06:00  $
+--       Version          : $Revision:   2.24  $
 --       Based on SCCS version : 1.61
 ------------------------------------------------------------------------
 --
@@ -19,7 +19,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3pla AS
 -------------------------------------------------------------------------------------------
 -- Global variables - tree definitions etc.
    --g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"@(#)nm3pla.pkb    1.61 11/29/06"';
-   g_body_sccsid     CONSTANT varchar2(2000) := '$Revision:   2.23  $';
+   g_body_sccsid     CONSTANT varchar2(2000) := '$Revision:   2.24  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT VARCHAR2(30) := 'nm3pla';
@@ -4327,53 +4327,17 @@ l_rowcount NUMBER;
 --
 BEGIN
    --  
-   IF pi_route_datum = 'G'
-   THEN    
-       l_sql := ' Select count(*) FROM '||
-                '  ( '||
-                ' Select t.* '||
-                ' FROM '||
-                ' ( '||
-                ' select cast ( collect (nm_placement( i.nm_ne_id_of, i.nm_begin_mp, i.nm_end_mp, 0)) as nm_placement_array_type) ipl_arr '||
-                ' from nm_members i, nm_inv_items, nm_members g '||
-                ' where i.nm_obj_type = '''||pi_inv_type||''''||
-                ' and i.nm_ne_id_in = iit_ne_id '||
-                ' and Nvl(iit_x_sect,''X'') = Nvl('''||pi_xsp||''', Nvl(iit_x_sect,''X'')) '||
-                ' and i.nm_ne_id_of = g.nm_ne_id_of '||
-                ' and g.nm_ne_id_in = '||pi_ne_id||') asset_data,  '||
-                ' ( select cast ( collect (nm_placement( r.nm_ne_id_of, r.nm_begin_mp, r.nm_end_mp, 0)) as nm_placement_array_type) rpl_arr '||
-                ' from nm_members r '||
-                ' where r.nm_ne_id_in = '||pi_ne_id||
-                '   and nm_ne_id_of IN ( select ne_id '||
-                '    from nm_elements_all '||
-                '   where ne_type <> ''D'') '||
-                ' ) route_data, '||
-                ' table (NM3PLA.SUBTRACT_PL_FROM_PL(nm_placement_array(rpl_arr), nm_placement_array(ipl_arr)).npa_placement_array) t '||
-                ' )   '||
-                ' WHERE pl_ne_id is not null';
-   ELSE
-        l_sql := ' Select count(*) FROM '||
-                ' ( '||
-                '  Select t.* '||
-                '  FROM '||
-                ' ( '||
-                ' Select cast ( collect (nm_placement( i.nm_ne_id_of, i.nm_begin_mp, i.nm_end_mp, 0)) as nm_placement_array_type) ipl_arr '||
-                ' From nm_members i, nm_inv_items '||
-                ' Where i.nm_obj_type = '''||pi_inv_type||''''||
-                ' And i.nm_ne_id_in = iit_ne_id '||
-                ' And Nvl(iit_x_sect,''X'') = Nvl('''||pi_xsp||''', Nvl(iit_x_sect,''X'')) '||
-                ' And i.nm_ne_id_of = '||pi_ne_id||
-                ' ) asset_data, '||
-                ' (Select nm_placement_array_type( nm_placement( ne_id, 0, ne_length, 0)) rpl_arr '||
-                ' From nm_elements '||
-                ' where ne_id = '||pi_ne_id||
-                ' ) route_data, '||
-                ' table (NM3PLA.SUBTRACT_PL_FROM_PL(nm_placement_array(rpl_arr), nm_placement_array(ipl_arr)).npa_placement_array) t '||
-                ' ) '|| 
-                ' WHERE pl_ne_id is not null ' ;
-   END IF ;  
-   --
-   EXECUTE IMMEDIATE l_sql INTO L_ROWCOUNT;
+   nm3ctx.set_context(p_Attribute  => 'CONTIGUOUS_OVER_NE' 
+                     ,p_Value      =>  TO_CHAR(pi_ne_id));
+   nm3ctx.set_context(p_Attribute  => 'CONTIGUOUS_ASSET_TYPE'
+                     ,p_Value      =>  pi_inv_type);
+   nm3ctx.set_context(p_Attribute  => 'CONTIGUOUS_XSP'
+                     ,p_Value      =>  pi_xsp);
+					 
+   SELECT COUNT(*)
+     INTO l_rowcount
+     FROM v_contiguity_check;
+	 
    RETURN L_ROWCOUNT > 0;
 END;
 --
