@@ -2,11 +2,11 @@
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/higroles.sql-arc   2.16   Apr 18 2018 16:09:14   Gaurav.Gaurkar  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/higroles.sql-arc   2.17   Oct 31 2018 10:40:14   Chris.Baugh  $
 --       Module Name      : $Workfile:   higroles.sql  $
---       Date into PVCS   : $Date:   Apr 18 2018 16:09:14  $
---       Date fetched Out : $Modtime:   Apr 18 2018 16:02:10  $
---       Version          : $Revision:   2.16  $
+--       Date into PVCS   : $Date:   Oct 31 2018 10:40:14  $
+--       Date fetched Out : $Modtime:   Jul 04 2018 11:21:54  $
+--       Version          : $Revision:   2.17  $
 --
 -----------------------------------------------------------------------------
 --    Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
@@ -126,6 +126,7 @@ grant select on dba_ts_quotas to hig_user;
 grant select on dba_roles to hig_user;
 grant select on dba_profiles to hig_user;
 GRANT ANALYZE ANY TO hig_user;
+GRANT SELECT ON PROXY_USERS TO HIG_USER;
 
 rem --------------------------------------------------------------------------
 rem	CREATE a ROLE FOR granting TO readonly highways users.
@@ -347,7 +348,6 @@ THEN
   Null;
 END;
 /
-
 BEGIN
    EXECUTE IMMEDIATE 'grant net_readonly to '||USER;
    EXECUTE IMMEDIATE 'grant net_readonly to '||USER||' with admin option';
@@ -360,6 +360,65 @@ GRANT CREATE VIEW  TO net_readonly;
 GRANT SELECT ANY SEQUENCE TO net_readonly;
 GRANT EXECUTE ANY PROCEDURE TO net_readonly;
 GRANT CREATE SESSION TO net_readonly;
+
+rem --------------------------------------------------------------------------
+rem	CREATE a ROLE FOR granting TO Alert Admin Users
+
+prompt CREATE ROLE ALERT_ADMIN;
+
+DECLARE
+  role_exists Exception;
+  Pragma Exception_Init(role_exists, -1921); 
+BEGIN
+  EXECUTE IMMEDIATE 'CREATE ROLE ALERT_ADMIN';
+  NULL;
+EXCEPTION
+WHEN role_exists
+THEN 
+  Null;
+END;
+/
+--
+GRANT CREATE TRIGGER TO ALERT_ADMIN;
+GRANT DROP ANY TRIGGER TO ALERT_ADMIN;
+--
+
+rem --------------------------------------------------------------------------
+rem	CREATE a ROLE FOR Allowing user proxying
+
+prompt CREATE ROLE EXOR_ALLOW_USER_PROXY;
+
+DECLARE
+  role_exists Exception;
+  Pragma Exception_Init(role_exists, -1921); 
+BEGIN
+  EXECUTE IMMEDIATE 'CREATE ROLE EXOR_ALLOW_USER_PROXY';
+  NULL;
+EXCEPTION
+WHEN role_exists
+THEN 
+  Null;
+END;
+/
+
+rem --------------------------------------------------------------------------
+rem	CREATE a ROLE FOR to define a Proxy Owner
+
+prompt CREATE ROLE PROXY_OWNER;
+
+DECLARE
+  role_exists Exception;
+  Pragma Exception_Init(role_exists, -1921); 
+BEGIN
+  EXECUTE IMMEDIATE 'CREATE ROLE PROXY_OWNER';
+  NULL;
+EXCEPTION
+WHEN role_exists
+THEN 
+  Null;
+END;
+/
+
 
 rem -----------------------------------------------------------------
 rem
