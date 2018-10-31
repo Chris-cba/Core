@@ -1,11 +1,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/hig_sys_grants.sql-arc   2.6   Apr 18 2018 16:09:14   Gaurav.Gaurkar  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/hig_sys_grants.sql-arc   2.7   Oct 31 2018 10:39:18   Chris.Baugh  $
 --       Module Name      : $Workfile:   hig_sys_grants.sql  $
---       Date into PVCS   : $Date:   Apr 18 2018 16:09:14  $
---       Date fetched Out : $Modtime:   Apr 18 2018 16:04:54  $
---       Version          : $Revision:   2.6  $
+--       Date into PVCS   : $Date:   Oct 31 2018 10:39:18  $
+--       Date fetched Out : $Modtime:   Jul 03 2018 10:21:12  $
+--       Version          : $Revision:   2.7  $
 --
 -----------------------------------------------------------------------------
 --    Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
@@ -49,5 +49,8 @@ BEGIN
   EXECUTE IMMEDIATE 'grant execute on dbms_scheduler to system with grant option';
   EXECUTE IMMEDIATE 'grant execute on dbms_network_acl_admin to system with grant option';
   EXECUTE IMMEDIATE 'Grant Select on Sys.Dba_Scheduler_Jobs To system with grant option';
+  EXECUTE IMMEDIATE 'Grant execute on DBMS_CRYPTO To system with grant option';
+  EXECUTE IMMEDIATE 'Grant Select on PROXY_USERS To system with grant option';
+  EXECUTE IMMEDIATE 'Grant Select on SYS.USER$ To system with grant option';
 END;
 /
