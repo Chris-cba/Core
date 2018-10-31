@@ -1,22 +1,22 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/higowner.sql-arc   2.18   Apr 18 2018 16:09:14   Gaurav.Gaurkar  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/higowner.sql-arc   2.19   Oct 31 2018 10:39:50   Chris.Baugh  $
 --       Module Name      : $Workfile:   higowner.sql  $
---       Date into PVCS   : $Date:   Apr 18 2018 16:09:14  $
---       Date fetched Out : $Modtime:   Apr 18 2018 16:02:10  $
---       Version          : $Revision:   2.18  $
+--       Date into PVCS   : $Date:   Oct 31 2018 10:39:50  $
+--       Date fetched Out : $Modtime:   Jul 06 2018 09:06:56  $
+--       Version          : $Revision:   2.19  $
 --
 -----------------------------------------------------------------------------
 --    Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 REM SCCS ID Keyword, do no remove
-define sccsid = '"$Revision::   2.18     $"';
+define sccsid = '"$Revision::   2.19     $"';
 clear screen
 -- creates the following tables
 -- HIG_USERS
--- NM_AU_TYPES
+-- NM_AU_TYPES_FULL
 -- NM_ADMIN_UNITS_ALL
 -- NM_USER_AUS_ALL
 -- NM_ADMIN_GROUPS
@@ -70,83 +70,22 @@ DECLARE
   l_oracle10gr2 boolean;
   l_oracle11gr1 boolean;
   l_oracle11gr2 boolean;
+  l_oracle12gr2 boolean;
 --
 -------------------------------------------------------------------------------
 --
-  FUNCTION db_is_9i RETURN boolean IS
+  FUNCTION check_db_version(pi_banner VARCHAR2) RETURN boolean IS
     l_dummy pls_integer;
   BEGIN
     SELECT 1 INTO l_dummy FROM dual
      WHERE EXISTS
        (SELECT 1 FROM v$version
-         WHERE UPPER(banner) LIKE '%ORACLE9I%');
+         WHERE UPPER(banner) LIKE pi_banner);
     RETURN TRUE;
   EXCEPTION
     WHEN no_data_found
     THEN RETURN FALSE;
-  END db_is_9i;
---
--------------------------------------------------------------------------------
---
-  FUNCTION db_is_10gr1 RETURN boolean IS
-    l_dummy pls_integer;
-  BEGIN
-    SELECT 1 INTO l_dummy FROM dual
-    WHERE EXISTS
-      (SELECT 1 FROM v$version
-        WHERE UPPER(banner) LIKE '%10.1%');
-    RETURN TRUE;
-  EXCEPTION
-    WHEN no_data_found
-    THEN RETURN FALSE;
-  END db_is_10gr1;
---
--------------------------------------------------------------------------------
---
-  FUNCTION db_is_10gr2 RETURN boolean IS
-    l_dummy pls_integer;
-  BEGIN
-    SELECT 1 INTO l_dummy FROM dual
-    WHERE EXISTS
-      (SELECT 1 FROM v$version
-        WHERE UPPER(banner) LIKE '%10.2%');
-    RETURN TRUE;
-  EXCEPTION
-    WHEN no_data_found
-    THEN RETURN FALSE;
-  END db_is_10gr2;
---
--------------------------------------------------------------------------------
---
-  FUNCTION db_is_11gr1 RETURN boolean IS
-    l_dummy pls_integer;
-  BEGIN
-    SELECT 1 INTO l_dummy FROM dual
-     WHERE EXISTS
-       (SELECT 1 FROM v$version
-         WHERE UPPER(banner) LIKE '%11.1%');
-    RETURN TRUE;
-  EXCEPTION
-    WHEN no_data_found
-    THEN
-      RETURN FALSE;
-  END db_is_11gr1;
---
--------------------------------------------------------------------------------
---
-  FUNCTION db_is_11gr2 RETURN boolean IS
-    l_dummy pls_integer;
-  BEGIN
-    SELECT 1 INTO l_dummy FROM dual
-     WHERE EXISTS
-       (SELECT 1 FROM v$version
-         WHERE UPPER(banner) LIKE '%11.2%');
-    RETURN TRUE;
-  EXCEPTION
-    WHEN no_data_found
-    THEN
-      RETURN FALSE;
-  END db_is_11gr2;
+  END check_db_version;
 --
 -------------------------------------------------------------------------------
 --
@@ -365,7 +304,7 @@ DECLARE
      
      -- Cannot grant quota on temporary tablespace for 10gR2
 
-    IF l_oracle10gr2 OR l_oracle11gr1 OR l_oracle11gr2 THEN
+    IF l_oracle10gr2 OR l_oracle11gr1 OR l_oracle11gr2 OR l_oracle12gr2 THEN
       EXECUTE IMMEDIATE 'CREATE USER '|| p_user
            || CHR(10) ||' IDENTIFIED BY '||p_pass
            || CHR(10) ||' DEFAULT TABLESPACE '||p_deftab
@@ -430,24 +369,24 @@ DECLARE
     EXECUTE IMMEDIATE 'GRANT DROP ANY SYNONYM TO  ' || p_user;                 -- Added by GJ 17-MAY-2007
     EXECUTE IMMEDIATE 'GRANT ANALYZE ANY TO '||p_user||' WITH ADMIN OPTION';   -- Task 0108303  - GRANT ANALYZE ANY TO hig_user/admin
   --
-    IF l_oracle9i OR l_oracle10gr1 OR l_oracle10gr2 OR l_oracle11gr1 OR l_oracle11gr2
-    THEN
-      EXECUTE IMMEDIATE 'grant create job to  '                          || p_user || ' with admin option'; -- Added by AE - 10-07-2009
-      EXECUTE IMMEDIATE 'grant execute on sys.dbms_scheduler to '        || p_user || ' with grant option'; -- Added by AE - 10-07-2009
-      EXECUTE IMMEDIATE 'grant select any dictionary to '                || p_user || ' with admin option';
-      EXECUTE IMMEDIATE 'grant execute on sys.dbms_pipe to '             || p_user || ' with grant option';
-      EXECUTE IMMEDIATE 'grant execute on sys.dbms_rls to '              || p_user || ' with grant option';
-      EXECUTE IMMEDIATE 'grant execute on sys.dbms_lock to '             || p_user || ' with grant option';
-      EXECUTE IMMEDIATE 'grant select on dba_sys_privs to '              || p_user || ' with grant option';
-      EXECUTE IMMEDIATE 'grant select on dba_users to '                  || p_user || ' with grant option';
-      EXECUTE IMMEDIATE 'grant select on dba_role_privs to '             || p_user || ' with grant option';
-      EXECUTE IMMEDIATE 'grant select on dba_ts_quotas to '              || p_user || ' with grant option';
-      EXECUTE IMMEDIATE 'grant select on dba_tab_privs to '              || p_user || ' with grant option';
-      EXECUTE IMMEDIATE 'grant select on dba_roles to '                  || p_user || ' with grant option';
-      EXECUTE IMMEDIATE 'grant select on dba_profiles to '               || p_user || ' with grant option';
-      EXECUTE IMMEDIATE 'grant execute on sys.dbms_network_acl_admin to '|| p_user || ' with grant option'; -- Task 0110486 - ACL for 11gr2
-    END IF;
+    EXECUTE IMMEDIATE 'grant create job to  '                          || p_user || ' with admin option'; -- Added by AE - 10-07-2009
+    EXECUTE IMMEDIATE 'grant execute on sys.dbms_scheduler to '        || p_user || ' with grant option'; -- Added by AE - 10-07-2009
+    EXECUTE IMMEDIATE 'grant select any dictionary to '                || p_user || ' with admin option';
+    EXECUTE IMMEDIATE 'grant execute on sys.dbms_pipe to '             || p_user || ' with grant option';
+    EXECUTE IMMEDIATE 'grant execute on sys.dbms_rls to '              || p_user || ' with grant option';
+    EXECUTE IMMEDIATE 'grant execute on sys.dbms_lock to '             || p_user || ' with grant option';
+    EXECUTE IMMEDIATE 'grant select on dba_sys_privs to '              || p_user || ' with grant option';
+    EXECUTE IMMEDIATE 'grant select on dba_users to '                  || p_user || ' with grant option';
+    EXECUTE IMMEDIATE 'grant select on dba_role_privs to '             || p_user || ' with grant option';
+    EXECUTE IMMEDIATE 'grant select on dba_ts_quotas to '              || p_user || ' with grant option';
+    EXECUTE IMMEDIATE 'grant select on dba_tab_privs to '              || p_user || ' with grant option';
+    EXECUTE IMMEDIATE 'grant select on dba_roles to '                  || p_user || ' with grant option';
+    EXECUTE IMMEDIATE 'grant select on dba_profiles to '               || p_user || ' with grant option';
+    EXECUTE IMMEDIATE 'grant execute on sys.dbms_network_acl_admin to '|| p_user || ' with grant option'; -- Task 0110486 - ACL for 11gr2
   --
+    EXECUTE IMMEDIATE 'GRANT EXECUTE ON DBMS_CRYPTO TO '|| p_user; 
+    EXECUTE IMMEDIATE 'GRANT SELECT ON SYS.USER$ TO '|| p_user; 
+
   END do_grants;
 --
 --------------------------------------------------------------------------------
@@ -504,8 +443,8 @@ DECLARE
          || CHR(10) ||' (decode(hus_is_hig_owner_flag, ''Y'', -999, hus_user_id ))';
 
 --
-    -- NM_AU_TYPES
-    EXECUTE IMMEDIATE 'CREATE TABLE '||p_user||'.NM_AU_TYPES'
+    -- NM_AU_TYPES_FULL
+    EXECUTE IMMEDIATE 'CREATE TABLE '||p_user||'.NM_AU_TYPES_FULL'
          || CHR(10) ||'  (NAT_ADMIN_TYPE VARCHAR2(4) NOT NULL'
          || CHR(10) ||'  ,NAT_DESCR VARCHAR2(80) NOT NULL'
          || CHR(10) ||'  ,NAT_DATE_CREATED DATE NOT NULL'
@@ -515,7 +454,7 @@ DECLARE
          || CHR(10) ||'  )';
 
 --
-    EXECUTE IMMEDIATE 'ALTER TABLE '||p_user||'.NM_AU_TYPES'
+    EXECUTE IMMEDIATE 'ALTER TABLE '||p_user||'.NM_AU_TYPES_FULL'
          || CHR(10) ||'ADD CONSTRAINT NAT_PK PRIMARY KEY (NAT_ADMIN_TYPE)';
 
 --
@@ -563,7 +502,7 @@ DECLARE
 --
     EXECUTE IMMEDIATE 'ALTER TABLE '||p_user||'.NM_ADMIN_UNITS_ALL ADD CONSTRAINT'
          || CHR(10) ||'NAU_NAT_FK FOREIGN KEY '
-         || CHR(10) ||'  (NAU_ADMIN_TYPE) REFERENCES '||p_user||'.NM_AU_TYPES'
+         || CHR(10) ||'  (NAU_ADMIN_TYPE) REFERENCES '||p_user||'.NM_AU_TYPES_FULL'
          || CHR(10) ||'(NAT_ADMIN_TYPE)';
 --
     EXECUTE IMMEDIATE 'CREATE INDEX '||p_user||'.NAU_ADDRESS1_IND ON '||p_user||'.NM_ADMIN_UNITS_ALL (NAU_ADDRESS1)' ;
@@ -695,8 +634,8 @@ DECLARE
      USING l_startdate;
 
 --
-    -- NM_AU_TYPES
-    EXECUTE IMMEDIATE 'INSERT INTO  '||p_user||'.NM_AU_TYPES'
+    -- NM_AU_TYPES_FULL
+    EXECUTE IMMEDIATE 'INSERT INTO  '||p_user||'.NM_AU_TYPES_FULL'
          || CHR(10) ||'(NAT_ADMIN_TYPE '
          || CHR(10) ||',NAT_DESCR'
          || CHR(10) ||',NAT_DATE_CREATED'
@@ -824,13 +763,24 @@ DECLARE
 --
 --------------------------------------------------------------------------------
 --
+  PROCEDURE process_admin_role
+  IS
+  BEGIN
+     EXECUTE IMMEDIATE 'CREATE PUBLIC SYNONYM sdo_geometry FOR MDSYS.SDO_GEOMETRY';
+  EXCEPTION
+     WHEN OTHERS THEN NULL;
+  END process_admin_role;
+--
+--------------------------------------------------------------------------------
+--
 BEGIN
 --
-  l_oracle9i  := db_is_9i;
-  l_oracle10gr1 := db_is_10gr1;
-  l_oracle10gr2 := db_is_10gr2;
-  l_oracle11gr1 := db_is_11gr1;
-  l_oracle11gr2 := db_is_11gr2;
+  l_oracle9i  := check_db_version('%ORACLE9I%');
+  l_oracle10gr1 := check_db_version('%10.1%');
+  l_oracle10gr2 := check_db_version('%10.2%');
+  l_oracle11gr1 := check_db_version('%11.1%');
+  l_oracle11gr2 := check_db_version('%11.2%');
+  l_oracle12gr2 := check_db_version('%12.2%');
 --
   check_listener_locks;
 -- 
@@ -844,6 +794,8 @@ BEGIN
                 ,p_admin_unit_code
                 ,p_admin_unit_name
                 );
+--
+  process_admin_role;
 --
   create_user( p_user => p_user
               ,p_pass => p_pass
