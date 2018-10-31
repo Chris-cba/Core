@@ -1,11 +1,11 @@
 ----------------------------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm_4700_fix60.sql-arc   1.0   Oct 12 2018 14:27:30   Chris.Baugh  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm_4700_fix60.sql-arc   1.1   Oct 31 2018 15:38:34   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm_4700_fix60.sql  $ 
---       Date into PVCS   : $Date:   Oct 12 2018 14:27:30  $
---       Date fetched Out : $Modtime:   Oct 10 2018 16:43:50  $
---       Version     	  : $Revision:   1.0  $
+--       Date into PVCS   : $Date:   Oct 31 2018 15:38:34  $
+--       Date fetched Out : $Modtime:   Oct 31 2018 15:38:14  $
+--       Version     	  : $Revision:   1.1  $
 --
 ----------------------------------------------------------------------------------------------------
 --   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
@@ -77,65 +77,6 @@ SET FEEDBACK ON
 START nm3sdo.pkw
 SET FEEDBACK OFF
 
-SET TERM ON 
-PROMPT creating Package Body nm3gaz_qry.pkw
-SET TERM OFF
---
-SET FEEDBACK ON
-START nm3gaz_qry.pkw
-SET FEEDBACK OFF
-
-SET TERM ON 
-PROMPT creating Package Body nm3asset.pkw
-SET TERM OFF
---
-SET FEEDBACK ON
-START nm3asset.pkw
-SET FEEDBACK OFF
-
-SET TERM ON 
-PROMPT creating Package Body hig_process_api.pkw
-SET TERM OFF
---
-SET FEEDBACK ON
-START hig_process_api.pkw
-SET FEEDBACK OFF
-
-SET TERM ON 
-PROMPT creating Package Body nm3close.pkw
-SET TERM OFF
---
-SET FEEDBACK ON
-START nm3close.pkw
-SET FEEDBACK OFF
-
-SET TERM ON 
-PROMPT creating Package Body nm3undo.pkw
-SET TERM OFF
---
-SET FEEDBACK ON
-START nm3undo.pkw
-SET FEEDBACK OFF
-
---------------------------------------------------------------------------------
--- Views
---------------------------------------------------------------------------------
---
-SET TERM ON 
-PROMPT creating View v_nm_ordered_members.vw
-SET TERM OFF
---
-SET FEEDBACK ON
-START v_nm_ordered_members.vw
-SET FEEDBACK OFF
-
-SET TERM ON 
-PROMPT creating View v_nm_ordered_route_details.vw
-SET TERM OFF
---
-SET FEEDBACK ON
-START v_nm_ordered_route_details.vw
-SET FEEDBACK OFF
 
 --
 --------------------------------------------------------------------------------
@@ -146,7 +87,7 @@ BEGIN
 	--
 	hig2.upgrade(p_product        => 'NET'
 				,p_upgrade_script => 'log_nm_4700_fix60.sql'
-				,p_remarks        => 'NET 4700 FIX 60 (Build 1)'
+				,p_remarks        => 'NET 4700 FIX 60 (Build 2)'
 				,p_to_version     => NULL
 				);
 	--
