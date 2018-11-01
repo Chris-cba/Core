@@ -1,18 +1,18 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/higowner.sql-arc   2.19   Oct 31 2018 10:39:50   Chris.Baugh  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/higowner.sql-arc   2.20   Nov 01 2018 10:14:42   Chris.Baugh  $
 --       Module Name      : $Workfile:   higowner.sql  $
---       Date into PVCS   : $Date:   Oct 31 2018 10:39:50  $
---       Date fetched Out : $Modtime:   Jul 06 2018 09:06:56  $
---       Version          : $Revision:   2.19  $
+--       Date into PVCS   : $Date:   Nov 01 2018 10:14:42  $
+--       Date fetched Out : $Modtime:   Jul 12 2018 12:59:32  $
+--       Version          : $Revision:   2.20  $
 --
 -----------------------------------------------------------------------------
 --    Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 REM SCCS ID Keyword, do no remove
-define sccsid = '"$Revision::   2.19     $"';
+define sccsid = '"$Revision::   2.20     $"';
 clear screen
 -- creates the following tables
 -- HIG_USERS
@@ -386,6 +386,8 @@ DECLARE
   --
     EXECUTE IMMEDIATE 'GRANT EXECUTE ON DBMS_CRYPTO TO '|| p_user; 
     EXECUTE IMMEDIATE 'GRANT SELECT ON SYS.USER$ TO '|| p_user; 
+    EXECUTE IMMEDIATE 'GRANT SELECT ON SYS.PROXY_USERS TO '|| p_user|| ' with grant option'; 
+    EXECUTE IMMEDIATE 'GRANT PROCESS_ADMIN TO '|| p_user; 
 
   END do_grants;
 --
@@ -451,12 +453,17 @@ DECLARE
          || CHR(10) ||'  ,NAT_DATE_MODIFIED DATE NOT NULL'
          || CHR(10) ||'  ,NAT_MODIFIED_BY VARCHAR2(30) NOT NULL'
          || CHR(10) ||'  ,NAT_CREATED_BY VARCHAR2(30) NOT NULL'
+         || CHR(10) ||'  ,NAT_EXCLUSIVE VARCHAR2(1) DEFAULT ''Y'''
          || CHR(10) ||'  )';
 
 --
     EXECUTE IMMEDIATE 'ALTER TABLE '||p_user||'.NM_AU_TYPES_FULL'
          || CHR(10) ||'ADD CONSTRAINT NAT_PK PRIMARY KEY (NAT_ADMIN_TYPE)';
 
+--
+    EXECUTE IMMEDIATE 'ALTER TABLE '||p_user||'.NM_AU_TYPES_FULL'
+         || CHR(10) ||'ADD CONSTRAINT NM_AU_TYPES_EXCL_YN'
+         || CHR(10) ||'CHECK (nat_exclusive IN (''Y'', ''N''))';
 --
     -- NM_ADMIN_UNITS_ALL
     EXECUTE IMMEDIATE 'CREATE TABLE '||p_user||'.NM_ADMIN_UNITS_ALL'
@@ -763,16 +770,6 @@ DECLARE
 --
 --------------------------------------------------------------------------------
 --
-  PROCEDURE process_admin_role
-  IS
-  BEGIN
-     EXECUTE IMMEDIATE 'CREATE PUBLIC SYNONYM sdo_geometry FOR MDSYS.SDO_GEOMETRY';
-  EXCEPTION
-     WHEN OTHERS THEN NULL;
-  END process_admin_role;
---
---------------------------------------------------------------------------------
---
 BEGIN
 --
   l_oracle9i  := check_db_version('%ORACLE9I%');
@@ -794,8 +791,6 @@ BEGIN
                 ,p_admin_unit_code
                 ,p_admin_unit_name
                 );
---
-  process_admin_role;
 --
   create_user( p_user => p_user
               ,p_pass => p_pass
