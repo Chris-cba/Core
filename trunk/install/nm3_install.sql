@@ -1,11 +1,11 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/nm3_install.sql-arc   2.42   Apr 18 2018 16:09:46   Gaurav.Gaurkar  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/nm3_install.sql-arc   2.43   Nov 01 2018 09:49:58   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm3_install.sql  $
---       Date into PVCS   : $Date:   Apr 18 2018 16:09:46  $
---       Date fetched Out : $Modtime:   Apr 18 2018 16:02:10  $
---       PVCS Version     : $Revision:   2.42  $
+--       Date into PVCS   : $Date:   Nov 01 2018 09:49:58  $
+--       Date fetched Out : $Modtime:   Jul 12 2018 14:32:36  $
+--       PVCS Version     : $Revision:   2.43  $
 --
 --------------------------------------------------------------------------------
 --   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
@@ -55,20 +55,20 @@ DECLARE
   v_sql                VARCHAR2(1000);
 
   Cursor c_db_version Is
-  Select '11gr2' 
+  Select '12gr2' 
   From   v$version
-  Where  banner Like '%11.2.0.2%';
+  Where  banner Like '%12.2.0.1%';
   --
-  l_11gr2 Varchar2(10);
+  l_12gr2 Varchar2(10);
   
   ex_incorrect_db Exception;
 
 BEGIN
    Open  c_db_version;
-   Fetch c_db_version Into l_11gr2;
+   Fetch c_db_version Into l_12gr2;
    Close c_db_version;
    --
-   If l_11gr2 Is Null
+   If l_12gr2 Is Null
    Then
      Raise ex_incorrect_db;
    End If;
@@ -84,7 +84,7 @@ BEGIN
    END IF;
 EXCEPTION
   WHEN ex_incorrect_db THEN
-    RAISE_APPLICATION_ERROR(-20000,'The database version does not comply with the certification matrix - contact exor support for further information'); 
+    RAISE_APPLICATION_ERROR(-20000,'The database version does not comply with the Bentley Exor Release Configuration - contact exor support for further information'); 
   WHEN ex_already_installed THEN
     RAISE_APPLICATION_ERROR(-20001,'NM3 version '||l_version||' already installed.');
  WHEN others THEN
@@ -99,6 +99,24 @@ WHENEVER SQLERROR CONTINUE
 --  After intial object creation the exor_core account is not needed to be logged into, so lock it.
 Alter User Exor_Core Account Lock
 /
+--
+---------------------------------------------------------------------------------------------------
+--                        **************** Create LB Objects *******************
+--
+-- Create LB Objects to enable module compiles, this is a temporary
+-- solution until LB integration is decided
+SET TERM ON
+PROMPT Creating LB Objects...
+SET TERM OFF
+SET DEFINE ON
+SET VERIFY OFF
+SELECT '&exor_base'||'nm3'||'&terminator'||'install'||
+        '&terminator'||'nm4700_nm4800_lb_objects.sql' run_file
+FROM dual
+/
+SET FEEDBACK ON
+start &&run_file
+SET FEEDBACK OFF
 --
 ---------------------------------------------------------------------------------------------------
 --                        ****************   TYPES  *******************
@@ -419,6 +437,22 @@ SET FEEDBACK OFF
 
 --
 ---------------------------------------------------------------------------------------------------
+--                ****************   v_geom_on_route View  *******************
+--
+--
+SET TERM ON
+PROMPT Creating v_geom_on_route View 
+SET TERM OFF
+SET DEFINE ON
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'views'||'&terminator'||'v_geom_on_route.vw ' run_file 
+FROM dual 
+/ 
+
+SET FEEDBACK ON
+start '&&run_file'
+SET FEEDBACK OFF
+--
+---------------------------------------------------------------------------------------------------
 --                        ****************   COMPILE SCHEMA   *******************
 SET TERM ON
 Prompt Creating Compiling Schema Script...
@@ -625,7 +659,12 @@ Declare
   l_Job_Name              Hig_Processes.Hp_Job_Name%Type;
   l_Scheduled_Start_Date  Date;
 Begin
-  dbms_scheduler.set_scheduler_attribute('SCHEDULER_DISABLED', 'FALSE');
+  -- If Process Framework is Down, start it
+  IF hig_process_admin.scheduler_disabled = 'TRUE' THEN
+  
+    hig_process_admin.set_scheduler_state('UP');
+    
+  END IF;
 --
   Hig_Process_Api.Create_And_Schedule_Process (
                                               pi_Process_Type_Id           =>   -3,
@@ -636,7 +675,7 @@ Begin
                                               po_Job_Name                  =>   l_Job_Name,
                                               po_Scheduled_Start_Date      =>   l_Scheduled_Start_Date
                                               );
-  dbms_scheduler.set_scheduler_attribute('SCHEDULER_DISABLED', 'TRUE');
+	hig_process_admin.set_scheduler_state('UP');
 --
    Commit;
   Dbms_Output.Put_Line('Created Core Houseleeping Process');                                              
@@ -652,11 +691,11 @@ SET TERM ON
 Prompt Setting The Version Number...
 SET TERM OFF
 BEGIN
-      hig2.upgrade('HIG','nm3_install.sql','Installed','4.7.0.1');
-      hig2.upgrade('NET','nm3_install.sql','Installed','4.7.0.1');
-      hig2.upgrade('DOC','nm3_install.sql','Installed','4.7.0.1');
-      hig2.upgrade('AST','nm3_install.sql','Installed','4.7.0.1');
-      hig2.upgrade('WMP','nm3_install.sql','Installed','4.7.0.1');
+      hig2.upgrade('HIG','nm3_install.sql','Installed','4.8.0.1');
+      hig2.upgrade('NET','nm3_install.sql','Installed','4.8.0.1');
+      hig2.upgrade('DOC','nm3_install.sql','Installed','4.8.0.1');
+      hig2.upgrade('AST','nm3_install.sql','Installed','4.8.0.1');
+      hig2.upgrade('WMP','nm3_install.sql','Installed','4.8.0.1');
 END;
 /
 COMMIT;
