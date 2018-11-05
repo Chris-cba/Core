@@ -1,11 +1,11 @@
 ----------------------------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm_4700_fix61.sql-arc   1.0   Oct 26 2018 14:59:54   Chris.Baugh  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm_4700_fix61.sql-arc   1.1   Nov 05 2018 14:52:02   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm_4700_fix61.sql  $ 
---       Date into PVCS   : $Date:   Oct 26 2018 14:59:54  $
---       Date fetched Out : $Modtime:   Oct 26 2018 13:35:32  $
---       Version     	  : $Revision:   1.0  $
+--       Date into PVCS   : $Date:   Nov 05 2018 14:52:02  $
+--       Date fetched Out : $Modtime:   Nov 05 2018 14:47:56  $
+--       Version     	  : $Revision:   1.1  $
 --
 ----------------------------------------------------------------------------------------------------
 --   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
@@ -77,6 +77,46 @@ SET FEEDBACK ON
 START nm3pla.pkw
 SET FEEDBACK OFF
 
+SET TERM ON 
+PROMPT creating Package Body hig_process_api.pkw
+SET TERM OFF
+--
+SET FEEDBACK ON
+START hig_process_api.pkw
+SET FEEDBACK OFF
+
+SET TERM ON 
+PROMPT creating Package Body nm3asset.pkw
+SET TERM OFF
+--
+SET FEEDBACK ON
+START nm3asset.pkw
+SET FEEDBACK OFF
+
+SET TERM ON 
+PROMPT creating Package Body nm3close.pkw
+SET TERM OFF
+--
+SET FEEDBACK ON
+START nm3close.pkw
+SET FEEDBACK OFF
+
+SET TERM ON 
+PROMPT creating Package Body nm3gaz_qry.pkw
+SET TERM OFF
+--
+SET FEEDBACK ON
+START nm3gaz_qry.pkw
+SET FEEDBACK OFF
+
+SET TERM ON 
+PROMPT creating Package Body nm3undo.pkw
+SET TERM OFF
+--
+SET FEEDBACK ON
+START nm3undo.pkw
+SET FEEDBACK OFF
+
 
 --------------------------------------------------------------------------------
 -- Views
@@ -88,6 +128,22 @@ SET TERM OFF
 --
 SET FEEDBACK ON
 START v_contiguity_check.vw
+SET FEEDBACK OFF
+
+SET TERM ON 
+PROMPT creating View v_nm_ordered_members.vw
+SET TERM OFF
+--
+SET FEEDBACK ON
+START v_nm_ordered_members.vw
+SET FEEDBACK OFF
+
+SET TERM ON 
+PROMPT creating View v_nm_ordered_route_details.vw
+SET TERM OFF
+--
+SET FEEDBACK ON
+START v_nm_ordered_route_details.vw
 SET FEEDBACK OFF
 
 --
