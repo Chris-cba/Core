@@ -1,17 +1,17 @@
 /**
  *	PVCS Identifiers :-
  *
- *		PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/Java/login/bentley/exor/login/WebPagePanel.java-arc   1.1   Sep 07 2017 14:41:40   Upendra.Hukeri  $
+ *		PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/Java/login/bentley/exor/login/WebPagePanel.java-arc   1.2   Nov 22 2018 14:55:12   Upendra.Hukeri  $
  *		Module Name      : $Workfile:   WebPagePanel.java  $
  *		Author			 : $Author:   Upendra.Hukeri  $
- *		Date Into PVCS   : $Date:   Sep 07 2017 14:41:40  $
- *		Date Fetched Out : $Modtime:   Sep 07 2017 14:21:54  $
- *		PVCS Version     : $Revision:   1.1  $
+ *		Date Into PVCS   : $Date:   Nov 22 2018 14:55:12  $
+ *		Date Fetched Out : $Modtime:   Nov 22 2018 14:51:26  $
+ *		PVCS Version     : $Revision:   1.2  $
  *
  *	
  *
  ****************************************************************************************************
- *	  Copyright (c) 2017 Bentley Systems Incorporated.  All rights reserved.
+ *	  Copyright (c) 2018 Bentley Systems Incorporated.  All rights reserved.
  ****************************************************************************************************
  *
  */
@@ -91,9 +91,11 @@ public class WebPagePanel extends VBean {
 	
     private void initComponents() {
 		try {
+			/*
 			for (StackTraceElement ste : Thread.currentThread().getStackTrace()) {
 				System.out.println(ste);
 			}
+			*/
 			
 			jw = (Frame)SwingUtilities.windowForComponent(this);
 			
@@ -109,23 +111,30 @@ public class WebPagePanel extends VBean {
 			
 			java.util.List<String> location = map.get("Location");
 			
-			if (location == null) {
+			int counter = (location == null) ? 1 : location.size(); 
+			
+			//System.out.println("counter: " + counter); 
+			
+			for (int i=0; i<counter; i++) {
+				if(location != null) {
+					obj = new URL((String)location.get(i));
+					conn = obj.openConnection();
+				}
+				
 				BufferedReader bufferedReader = null;
 				
 				try {
 					bufferedReader = new BufferedReader(new InputStreamReader(conn.getInputStream(), "UTF-8"));
-				
+					
 					String line = null;
 					
 					while ((line = bufferedReader.readLine()) != null) {
-						String tokenTag = "<input id=\"wresult\" type=\"hidden\" value='";
+						String tokenTag = "<input type=\"hidden\" name=\"wresult\" value=\"";
 						
-						line = line.trim();
-						
-						if(line.startsWith(tokenTag)) {
-							token.append(line.replace(tokenTag, "").replace("' />", ""));
+						if(line.contains(tokenTag)) {
+							token.append(HtmlEntities.decode(line.substring(line.indexOf(tokenTag) + tokenTag.length(), line.indexOf("\" />", line.indexOf(tokenTag)))));
 							
-							ExorDebugger.reportDebugInfo("initComponents(): 1. IMS Tokens found...");
+							ExorDebugger.reportDebugInfo("initComponents(): IMS Tokens found...");
 							
 							break;
 						}
@@ -135,38 +144,6 @@ public class WebPagePanel extends VBean {
 						try {
 							bufferedReader.close();
 						} catch(IOException ioe) {
-						}
-					}
-				}
-			} else {
-				for (String header : location) {
-					obj = new URL(header);
-					conn = obj.openConnection();
-					
-					BufferedReader bufferedReader = null;
-					
-					try {
-						bufferedReader = new BufferedReader(new InputStreamReader(conn.getInputStream(), "UTF-8"));
-						
-						String line = null;
-						
-						while ((line = bufferedReader.readLine()) != null) {
-							String tokenTag = "<input type=\"hidden\" name=\"wresult\" value=\"";
-							
-							if(line.contains(tokenTag)) {
-								token.append(HtmlEntities.decode(line.substring(line.indexOf(tokenTag) + tokenTag.length(), line.indexOf("\" />", line.indexOf(tokenTag)))));
-								
-								ExorDebugger.reportDebugInfo("initComponents(): 2. IMS Tokens found...");
-								
-								break;
-							}
-						}
-					} finally {
-						if(bufferedReader != null) {
-							try {
-								bufferedReader.close();
-							} catch(IOException ioe) {
-							}
 						}
 					}
 				}
@@ -194,7 +171,7 @@ public class WebPagePanel extends VBean {
 						wbnp.setHeaders(headerMap);
 						wbnp.setPostData(paramMap);
 						
-						ExorDebugger.reportDebugInfo("initComponents(): Navigating to Eoxr-IMS application...");
+						ExorDebugger.reportDebugInfo("initComponents(): Navigating to Exor-IMS application...");
 						
 						if(token.toString().length() != 0) {
 							webBrowser.navigate(url, wbnp);
