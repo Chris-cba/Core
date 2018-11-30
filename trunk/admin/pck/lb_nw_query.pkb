@@ -1,26 +1,27 @@
+/* Formatted on 11/30/2018 1:47:21 PM (QP5 v5.256.13226.35538) */
 CREATE OR REPLACE PACKAGE BODY lb_nw_query
 AS
-    --   PVCS Identifiers :-
-    --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_nw_query.pkb-arc   1.0   Nov 30 2018 13:01:30   Rob.Coupe  $
-    --       Module Name      : $Workfile:   lb_nw_query.pkb  $
-    --       Date into PVCS   : $Date:   Nov 30 2018 13:01:30  $
-    --       Date fetched Out : $Modtime:   Nov 30 2018 12:59:30  $
-    --       PVCS Version     : $Revision:   1.0  $
-    --
-    --   Author : R.A. Coupe
-    --
-    --   Location Bridge package for handling minor set operators
-    --
-    -----------------------------------------------------------------------------
-    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
-    ----------------------------------------------------------------------------
-    --
-    
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.0  $';
+   --   PVCS Identifiers :-
+   --
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_nw_query.pkb-arc   1.1   Nov 30 2018 13:51:48   Rob.Coupe  $
+   --       Module Name      : $Workfile:   lb_nw_query.pkb  $
+   --       Date into PVCS   : $Date:   Nov 30 2018 13:51:48  $
+   --       Date fetched Out : $Modtime:   Nov 30 2018 13:50:16  $
+   --       PVCS Version     : $Revision:   1.1  $
+   --
+   --   Author : R.A. Coupe
+   --
+   --   Location Bridge package for handling minor set operators
+   --
+   -----------------------------------------------------------------------------
+   -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
+   ----------------------------------------------------------------------------
+   --
+
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.1  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_get';
-    
+
    FUNCTION get_version
       RETURN VARCHAR2
    IS
@@ -40,27 +41,27 @@ AS
    END get_body_version;
 
 
-      FUNCTION get_group_query (p_target_nt_type    IN VARCHAR2,
-                                p_target_gty_type   IN VARCHAR2,
-                                p_conditions        IN nw_qry_condition_tab)
-         RETURN VARCHAR2;
-
-      FUNCTION get_sub_group_query (p_target_nt_type    IN VARCHAR2,
-                                    p_target_gty_type   IN VARCHAR2,
-                                    p_conditions        IN nw_qry_condition_tab)
-         RETURN VARCHAR2;
-
-/*
-      FUNCTION get_attr_predicates (p_target_nt_type    IN VARCHAR2,
-                                    p_target_gty_type   IN VARCHAR2,
-                                    p_conditions        IN nw_qry_condition_tab)
-         RETURN VARCHAR2;
-
-      FUNCTION get_ad_query (p_target_nt_type    IN VARCHAR2,
+   FUNCTION get_group_query (p_target_nt_type    IN VARCHAR2,
                              p_target_gty_type   IN VARCHAR2,
                              p_conditions        IN nw_qry_condition_tab)
-         RETURN VARCHAR2;
-*/
+      RETURN VARCHAR2;
+
+   FUNCTION get_sub_group_query (p_target_nt_type    IN VARCHAR2,
+                                 p_target_gty_type   IN VARCHAR2,
+                                 p_conditions        IN nw_qry_condition_tab)
+      RETURN VARCHAR2;
+
+   /*
+         FUNCTION get_attr_predicates (p_target_nt_type    IN VARCHAR2,
+                                       p_target_gty_type   IN VARCHAR2,
+                                       p_conditions        IN nw_qry_condition_tab)
+            RETURN VARCHAR2;
+
+         FUNCTION get_ad_query (p_target_nt_type    IN VARCHAR2,
+                                p_target_gty_type   IN VARCHAR2,
+                                p_conditions        IN nw_qry_condition_tab)
+            RETURN VARCHAR2;
+   */
 
    FUNCTION get_network_query (p_target_nt_type    IN VARCHAR2,
                                p_target_gty_type   IN VARCHAR2,
@@ -70,9 +71,16 @@ AS
       retval   SYS_REFCURSOR;
    BEGIN
       OPEN retval FOR
-            'select nt_unique, ne_id, ne_unique, ne_descr, ne_start_date, nau_unit_code, nau_name, '||
-            'case when nt_datum = '||''''||'Y'||''''||' then ne_length else case when nt_linear = '||''''||'Y'||''''||
-            ' then ( select max(nm_end_slk) - min(nm_slk) from nm_members where nm_ne_id_in = ne_id ) else NULL end end element_length '
+            'select nt_unique, ne_id, ne_unique, ne_descr, ne_start_date, nau_unit_code, nau_name, '
+         || 'case when nt_datum = '
+         || ''''
+         || 'Y'
+         || ''''
+         || ' then ne_length else case when nt_linear = '
+         || ''''
+         || 'Y'
+         || ''''
+         || ' then ( select max(nm_end_slk) - min(nm_slk) from nm_members where nm_ne_id_in = ne_id ) else NULL end end element_length '
          || ' from nm_elements, nm_types, nm_admin_units where ne_nt_type = nt_type and ne_admin_unit = nau_admin_unit and ne_nt_type = '
          || ''''
          || p_target_nt_type
@@ -90,20 +98,21 @@ AS
          || '$%^&'
          || ''''
          || ') '
-         ||get_network_query_string (p_target_nt_type,
-                                   p_target_gty_type,
-                                   p_conditions);
+         || get_network_query_string (p_target_nt_type,
+                                      p_target_gty_type,
+                                      p_conditions);
 
       RETURN retval;
    END;
 
-   FUNCTION get_network_ids   (p_target_nt_type    IN VARCHAR2,
-                               p_target_gty_type   IN VARCHAR2,
-                               p_conditions        IN nw_qry_condition_tab)
-      RETURN int_array_type is
-retval int_array_type := NM3ARRAY.INIT_INT_ARRAY().ia;
-begin
-execute immediate
+   FUNCTION get_network_ids (p_target_nt_type    IN VARCHAR2,
+                             p_target_gty_type   IN VARCHAR2,
+                             p_conditions        IN nw_qry_condition_tab)
+      RETURN int_array_type
+   IS
+      retval   int_array_type := NM3ARRAY.INIT_INT_ARRAY ().ia;
+   BEGIN
+      EXECUTE IMMEDIATE
             'select ne_id from nm_elements where ne_nt_type = '
          || ''''
          || p_target_nt_type
@@ -121,14 +130,14 @@ execute immediate
          || '$%^&'
          || ''''
          || ') '
-         ||get_network_query_string (p_target_nt_type,
-                                   p_target_gty_type,
-                                   p_conditions)
-bulk collect into retval;         
+         || get_network_query_string (p_target_nt_type,
+                                      p_target_gty_type,
+                                      p_conditions)
+         BULK COLLECT INTO retval;
 
-return retval;
-end;
-    
+      RETURN retval;
+   END;
+
 
    FUNCTION get_network_query_string (
       p_target_nt_type    IN VARCHAR2,
@@ -139,7 +148,7 @@ end;
       retval   VARCHAR2 (4000);
    BEGIN
       retval :=
-          get_group_query (P_TARGET_NT_TYPE,
+            get_group_query (P_TARGET_NT_TYPE,
                              P_TARGET_GTY_TYPE,
                              P_CONDITIONS)
          || get_sub_group_query (P_TARGET_NT_TYPE,
@@ -150,7 +159,7 @@ end;
                                  P_CONDITIONS)
          || get_ad_query (P_TARGET_NT_TYPE, P_TARGET_GTY_TYPE, P_CONDITIONS);
       --
-      
+
       RETURN retval;
    END;
 
@@ -217,12 +226,11 @@ end;
        WHERE aggrstr IS NOT NULL;
 
       RETURN retval;
-         EXCEPTION
+   EXCEPTION
       WHEN NO_DATA_FOUND
       THEN
          retval := ' ';
          RETURN retval;
-
    END;
 
    FUNCTION get_sub_group_query (p_target_nt_type    IN VARCHAR2,
@@ -301,7 +309,6 @@ end;
       THEN
          retval := ' ';
          RETURN retval;
-      
    END;
 
    FUNCTION get_attr_predicates (p_target_nt_type    IN VARCHAR2,
@@ -362,7 +369,6 @@ end;
       THEN
          retval := ' ';
          RETURN retval;
-         
    END;
 
    FUNCTION get_ad_query (p_target_nt_type    IN VARCHAR2,
@@ -448,30 +454,62 @@ end;
          retval := ' ';
          RETURN retval;
    END;
-   
+
    FUNCTION get_LOV (p_network_type   IN VARCHAR2,
                      p_group_type     IN VARCHAR2,
                      p_column_name    IN VARCHAR2)
-      RETURN SYS_REFCURSOR IS
-retval sys_refcursor;
-l_sql varchar2(4000);
-begin
-   select       lov_query into l_sql from v_nm_nw_columns
-   where network_type = p_network_type
-   and nvl(group_type, 'NULL') = nvl(p_group_type, 'NULL')
-   and column_name = p_column_name;
---
-   if l_sql is null then
-      raise_application_error(-20002, 'A list of values is not available for this network column');
-   end if;
-   
-   open retval for l_sql;
-   
-   return retval;
-exception
-   when no_data_found then 
-   raise_application_error( -20001, 'Network attribute not found');
-end;   
-   
+      RETURN SYS_REFCURSOR
+   IS
+      retval   SYS_REFCURSOR;
+      l_sql    VARCHAR2 (4000);
+   BEGIN
+      SELECT lov_query
+        INTO l_sql
+        FROM v_nm_nw_columns
+       WHERE     network_type = p_network_type
+             AND NVL (group_type, 'NULL') = NVL (p_group_type, 'NULL')
+             AND column_name = p_column_name;
+
+      --
+      IF l_sql IS NULL
+      THEN
+         raise_application_error (
+            -20002,
+            'A list of values is not available for this network column');
+      END IF;
+
+      OPEN retval FOR l_sql;
+
+      RETURN retval;
+   EXCEPTION
+      WHEN NO_DATA_FOUND
+      THEN
+         raise_application_error (-20001, 'Network attribute not found');
+   END;
+
+   FUNCTION get_nw_and_group_types (
+      p_target_nt_type    IN VARCHAR2,
+      p_target_gty_type   IN VARCHAR2,
+      p_direction         IN VARCHAR2 DEFAULT NULL)
+      RETURN SYS_REFCURSOR
+   IS
+      retval   SYS_REFCURSOR;
+   BEGIN
+      OPEN retval FOR
+         SELECT v.direction Hierarchy_direction,
+                v.nt_type type_code,
+                nt_unique network_type_name,
+                group_type group_type_code,
+                ngt_descr group_type_descr
+           FROM V_GROUP_INSTANCE_HIERARCHY v, nm_types t, nm_group_types g
+          WHERE     start_nt_type = p_target_nt_type
+                AND NVL (start_group_type, 'NULL') =
+                       NVL (p_target_gty_type, 'NULL')
+                AND t.nt_type = v.nt_type
+                AND group_type = ngt_group_type(+)
+                AND direction = NVL (p_direction, direction);
+
+      RETURN retval;
+   END;
 END;
 /
