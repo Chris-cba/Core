@@ -1,0 +1,118 @@
+CREATE OR REPLACE PACKAGE lb_nw_query
+AS
+--<PACKAGE>
+   --   PVCS Identifiers :-
+   --
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_nw_query.pkh-arc   1.0   Nov 30 2018 13:00:44   Rob.Coupe  $
+   --       Module Name      : $Workfile:   lb_nw_query.pkh  $
+   --       Date into PVCS   : $Date:   Nov 30 2018 13:00:44  $
+   --       Date fetched Out : $Modtime:   Nov 30 2018 12:58:58  $
+   --       PVCS Version     : $Revision:   1.0  $
+   --
+   --   Author : R.A. Coupe
+   --
+   --   Location Bridge package for handling network queries
+   --
+   -----------------------------------------------------------------------------
+   -- Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
+   ----------------------------------------------------------------------------
+   -- The main query function is the get_network_query which takes a set of criteria applied
+   -- to a target network/group type
+--</PACKAGE>
+   
+    g_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.0  $';   
+
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+--
+-- This function returns the current PVCS version of the package 
+
+   FUNCTION get_version
+      RETURN VARCHAR2;
+--</PROC>
+
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+--
+-- This function returns the current PVCS version of the package body        
+   FUNCTION get_body_version
+      RETURN VARCHAR2;
+--</PROC>
+
+-----------------------------------------------------------------------------
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_NETWORK_QUERY">
+--
+-- This function returns the cursor of element data matching the type and conditions        
+   FUNCTION get_network_query (p_target_nt_type    IN VARCHAR2,
+                               p_target_gty_type   IN VARCHAR2,
+                               p_conditions        IN nw_qry_condition_tab)
+      RETURN SYS_REFCURSOR;
+--</PROC>
+
+
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_NETWORK_IDS">
+--
+-- This function returns the list of element IDs matching the type and conditions        
+   FUNCTION get_network_ids (p_target_nt_type    IN VARCHAR2,
+                             p_target_gty_type   IN VARCHAR2,
+                             p_conditions        IN nw_qry_condition_tab)
+      RETURN int_array_type;
+--</PROC>
+
+
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_NETWORK_QUERY_STRING">
+--
+-- This function returns the SQL string corresponding to a query of the elements of the specified type and conditions        
+   FUNCTION get_network_query_string (
+      p_target_nt_type    IN VARCHAR2,
+      p_target_gty_type   IN VARCHAR2,
+      p_conditions        IN nw_qry_condition_tab)
+      RETURN VARCHAR2;
+--</PROC>
+
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_ATTR_PREDICATES">
+--
+-- This function returns a string of aggregated attribute-based predicates from the conditions table.        
+   FUNCTION get_attr_predicates (p_target_nt_type    IN VARCHAR2,
+                                 p_target_gty_type   IN VARCHAR2,
+                                 p_conditions        IN nw_qry_condition_tab)
+      RETURN VARCHAR2;
+--</PROC>
+
+
+
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_AD_QUERY">
+--
+-- This function return a string of aggregated AD predicates from the list of conditions        
+   FUNCTION get_ad_query (p_target_nt_type    IN VARCHAR2,
+                          p_target_gty_type   IN VARCHAR2,
+                          p_conditions        IN nw_qry_condition_tab)
+      RETURN VARCHAR2;
+--</PROC>
+
+
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_LOV">
+--
+-- This function returns a cursor of available values in ID/CODE, NAme and Description format        
+   FUNCTION get_LOV (p_network_type   IN VARCHAR2,
+                     p_group_type     IN VARCHAR2,
+                     p_column_name    IN VARCHAR2)
+      RETURN SYS_REFCURSOR;
+--</PROC>
+
+END;
+/
