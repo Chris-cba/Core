@@ -14,11 +14,24 @@ CREATE OR REPLACE FORCE VIEW V_NM_NW_COLUMNS
    LOV_QUERY
 )
 AS
-   SELECT /*
-          View definition to cater for query tool operating on the attributes of network elements be they the
-          fixed column attributes of the NM_ELEMENTS table, the flexible attributes mapped through the NM_TYPE_COLUMNS
-          or through the additional data types (NM_NW_AD_TYPES)
-          */
+   SELECT 
+--
+--       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/views/v_nm_nw_columns.vw-arc   1.1   Nov 30 2018 12:18:30   Rob.Coupe  $
+--       Module Name      : $Workfile:   v_nm_nw_columns.vw  $
+--       Date into PVCS   : $Date:   Nov 30 2018 12:18:30  $
+--       Date fetched Out : $Modtime:   Nov 30 2018 12:18:10  $
+--       PVCS Version     : $Revision:   1.1  $
+--
+--   Author : R.A. Coupe
+--
+--          View definition to cater for query tool operating on the attributes of network elements be they the
+--          fixed column attributes of the NM_ELEMENTS table, the flexible attributes mapped through the NM_TYPE_COLUMNS
+--          or through the additional data types (NM_NW_AD_TYPES)
+--
+-----------------------------------------------------------------------------
+-- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--   
          ROW_NUMBER ()
           OVER (
              ORDER BY
@@ -174,3 +187,33 @@ AS
                   AND nt_type = ngt_nt_type(+))
 --order by case attrib_source when 'HC' then 'A' when 'TC' then 'B' else 'C'||attrib_source end, seq_no
 /
+
+
+
+comment on table v_nm_nw_columns is 'A view to provide all possible attributes of a network type and group type combination. Attributes are included from fixed and flexible column attributes,as well as primary AD data';
+
+comment on  column v_nm_nw_columns.rn is 'An indicative order derived by the source of the attribute and the order of the attribute within that source';
+
+comment on  column v_nm_nw_columns.network_type is 'The network type to which the list of attributes relate';
+
+comment on  column v_nm_nw_columns.group_type is 'The network group type to which the list of attributes relate';
+
+comment on  column v_nm_nw_columns.column_name is 'The column name of the attribute - this can be an NM_ELEMENTS column or an AD type';
+
+comment on  column v_nm_nw_columns.attrib_source is 'An indicator of the source of the attribute  - HC is a hard-coded attribute from the NM_ELEMENTS table, TC is a flexible attribute configured as a type-column. If the attribute is from an AD type, the attrib_source points to the NM_NW_AD_TYPES.NAD_INV_TYPE';
+
+comment on  column v_nm_nw_columns.seq_no is 'The sequence of the attribute within a source type - for example the sequence from NM_TYPE_COLUMNS or the column_id or the attribute sequence from NM_INV_TYPE_ATTRIBS';
+
+comment on  column v_nm_nw_columns.column_prompt is 'The prompt for the column'; 
+
+comment on  column v_nm_nw_columns.field_type is 'The type of the column - either NUMBER, VARCHAR2 or DATE';
+
+comment on  column v_nm_nw_columns.field_length is 'The length of the attribute';
+
+comment on  column v_nm_nw_columns.dec_places is 'The number of decimal places used in the attribute value - NULL for non numeric columns'; 
+
+comment on  column v_nm_nw_columns.format_mask is 'The format mask of the attributefor date attributes';
+
+comment on  column v_nm_nw_columns.lov_query is 'The list of available values for the attribute';
+
+
