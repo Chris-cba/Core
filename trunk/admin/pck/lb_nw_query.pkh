@@ -3,11 +3,11 @@ AS
    --<PACKAGE>
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_nw_query.pkh-arc   1.2   Dec 04 2018 16:36:18   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_nw_query.pkh-arc   1.3   Dec 04 2018 16:51:54   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_nw_query.pkh  $
-   --       Date into PVCS   : $Date:   Dec 04 2018 16:36:18  $
-   --       Date fetched Out : $Modtime:   Dec 04 2018 16:35:44  $
-   --       PVCS Version     : $Revision:   1.2  $
+   --       Date into PVCS   : $Date:   Dec 04 2018 16:51:54  $
+   --       Date fetched Out : $Modtime:   Dec 04 2018 16:50:56  $
+   --       PVCS Version     : $Revision:   1.3  $
    --
    --   Author : R.A. Coupe
    --
@@ -20,7 +20,7 @@ AS
    -- to a target network/group type
    --</PACKAGE>
 
-   g_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.2  $';
+   g_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.3  $';
 
    -----------------------------------------------------------------------------
    --
@@ -138,7 +138,17 @@ AS
    --
    --<PROC NAME="GET_PARENT_GROUPS">
    --
-   -- This function returns a cursor consisting of a hierarchy of group members for an asset id and type
+   -- This function returns a cursor consisting of a hierarchy of group members for an asset id and type.
+   -- The cursor returns:
+   -- levl       - the level of the parent group type going up the hierarchy
+   -- order_id - the order of the record in the hierarchy - ordered by depth first
+   -- child_id - the child of the parent group - note that lower level (source) locations are given an ID of 1  these are not really required to be displayed as the level and the parent should be sufficient to make sense of the tree. If the true child-IDs were included, the tree structure would be needlessly messy.
+   -- parent_id - the parent road group
+   -- group_type - the group type of the parent group
+   -- group_type_descr - the description of the group type
+   -- element_name - the name of the parent group (NE_UNIQUE)
+   -- element_descr - the description of the parent group (NE_DESCR)
+   --
    FUNCTION get_parent_groups (pi_asset_id   IN INTEGER,
                                pi_obj_type   IN VARCHAR2)
       RETURN SYS_REFCURSOR;
@@ -150,6 +160,16 @@ AS
    --<PROC NAME="GET_PARENT_GROUPS">
    --
    -- This function returns a cursor consisting of a hierarchy of group members for a table of locations
+   -- The cursor returns:
+   -- levl       - the level of the parent group type going up the hierarchy
+   -- order_id - the order of the record in the hierarchy - ordered by depth first
+   -- child_id - the child of the parent group - note that lower level (source) locations are given an ID of 1  these are not really required to be displayed as the level and the parent should be sufficient to make sense of the tree. If the true child-IDs were included, the tree structure would be needlessly messy.
+   -- parent_id - the parent road group
+   -- group_type - the group type of the parent group
+   -- group_type_descr - the description of the group type
+   -- element_name - the name of the parent group (NE_UNIQUE)
+   -- element_descr - the description of the parent group (NE_DESCR)
+   --
    FUNCTION get_parent_groups (pi_rpt_tab IN lb_rpt_tab)
       RETURN SYS_REFCURSOR;
 --</PROC>
