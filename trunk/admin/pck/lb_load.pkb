@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_load
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_load.pkb-arc   1.33   Oct 24 2018 14:24:56   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_load.pkb-arc   1.34   Dec 04 2018 13:53:58   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_load.pkb  $
-   --       Date into PVCS   : $Date:   Oct 24 2018 14:24:56  $
-   --       Date fetched Out : $Modtime:   Oct 24 2018 14:23:28  $
-   --       PVCS Version     : $Revision:   1.33  $
+   --       Date into PVCS   : $Date:   Dec 04 2018 13:53:58  $
+   --       Date fetched Out : $Modtime:   Dec 04 2018 13:52:48  $
+   --       PVCS Version     : $Revision:   1.34  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,7 +16,7 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.33  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.34  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_load';
 
@@ -61,6 +61,11 @@ AS
                       p_loc_error        OUT lb_loc_error_tab);
 
    --
+   FUNCTION validate_admin_unit (pi_user_id   IN INTEGER,
+                                 pi_rpt_tab      lb_RPt_tab --, return_code OUT integer
+                                                           )
+      RETURN lb_loc_error_tab;
+
    FUNCTION validate_xsp_on_RPt_tab (pi_xsp       IN VARCHAR2,
                                      pi_rpt_tab      lb_RPt_tab)
       RETURN lb_loc_error_tab;
@@ -332,6 +337,21 @@ AS
       --        end if;
       END IF;
 
+      l_err_tab :=
+         validate_admin_unit (
+            PI_USER_ID   => TO_NUMBER (SYS_CONTEXT ('NM3CORE', 'USER_ID')),
+            PI_RPT_TAB   => p_obj_Rpt);
+
+      IF l_err_tab.COUNT IS NOT NULL AND l_err_tab.COUNT > 0
+      THEN
+         --        if l_err_tab(1).error_code is not null then
+         raise_application_error (
+            -20011,
+               'The user has no admin-unit privileges to place asset on the network - count = '
+            || l_err_tab.COUNT);
+      --        end if;
+      END IF;
+
       DECLARE
          problem   VARCHAR2 (7) := NULL;
       BEGIN
@@ -358,11 +378,12 @@ AS
             NULL;
       END;
 
-      if nvl(validate_inv_nw_constraint(p_obj_rpt), 'FALSE') = 'FALSE' then
+      IF NVL (validate_inv_nw_constraint (p_obj_rpt), 'FALSE') = 'FALSE'
+      THEN
          raise_application_error (
             -20006,
             'Asset locations fail to fit with network constraints');
-      end if;      
+      END IF;
 
       FORALL i IN 1 .. p_obj_Rpt.COUNT
          INSERT INTO nm_locations_all (nm_ne_id_of,
@@ -729,6 +750,38 @@ AS
    END;
 
    --
+   FUNCTION validate_admin_unit (pi_user_id   IN INTEGER,
+                                 pi_rpt_tab      lb_RPt_tab --, return_code OUT integer
+                                                           )
+      RETURN lb_loc_error_tab
+   AS
+      retval   lb_loc_error_tab;
+   BEGIN
+      SELECT CAST (
+                COLLECT (
+                   lb_loc_error (refnt, -99, 'No Admin Unit Privileges')) AS lb_loc_error_tab)
+        INTO retval
+        FROM nm_elements, TABLE (pi_rpt_tab)
+       WHERE     refnt = ne_id
+             AND NOT EXISTS
+                        (SELECT 1
+                           FROM nm_user_aus, nm_admin_groups
+                          WHERE     nag_parent_admin_unit = nua_admin_unit
+                                --                          AND nua_mode = 'NORMAL'  -- any admin-unit mode as long as the user has been granted the network access
+                                AND nag_child_admin_unit = ne_admin_unit
+                                AND nua_user_id =
+                                       TO_NUMBER (
+                                          SYS_CONTEXT ('NM3CORE', 'USER_ID')));
+
+      RETURN retval;
+   EXCEPTION
+      WHEN OTHERS
+      THEN
+         --    return_code := 1;
+         raise_application_error (-20010, 'Problem in Admin-unit check');
+   END;
+
+
 
    FUNCTION validate_xsp_on_RPt_tab (pi_xsp       IN VARCHAR2,
                                      pi_rpt_tab      lb_RPt_tab --, return_code OUT integer
