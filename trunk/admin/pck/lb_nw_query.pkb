@@ -1,13 +1,12 @@
-/* Formatted on 11/30/2018 1:47:21 PM (QP5 v5.256.13226.35538) */
 CREATE OR REPLACE PACKAGE BODY lb_nw_query
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_nw_query.pkb-arc   1.1   Nov 30 2018 13:51:48   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_nw_query.pkb-arc   1.2   Dec 04 2018 16:34:46   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_nw_query.pkb  $
-   --       Date into PVCS   : $Date:   Nov 30 2018 13:51:48  $
-   --       Date fetched Out : $Modtime:   Nov 30 2018 13:50:16  $
-   --       PVCS Version     : $Revision:   1.1  $
+   --       Date into PVCS   : $Date:   Dec 04 2018 16:34:46  $
+   --       Date fetched Out : $Modtime:   Dec 04 2018 16:33:38  $
+   --       PVCS Version     : $Revision:   1.2  $
    --
    --   Author : R.A. Coupe
    --
@@ -18,7 +17,7 @@ AS
    ----------------------------------------------------------------------------
    --
 
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.1  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.2  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_get';
 
@@ -508,6 +507,127 @@ AS
                 AND t.nt_type = v.nt_type
                 AND group_type = ngt_group_type(+)
                 AND direction = NVL (p_direction, direction);
+
+      RETURN retval;
+   END;
+
+   FUNCTION get_parent_groups (pi_asset_id   IN INTEGER,
+                               pi_obj_type   IN VARCHAR2)
+      RETURN SYS_REFCURSOR
+   IS
+      retval   SYS_REFCURSOR;
+   BEGIN
+      OPEN retval FOR
+         WITH locations (levl,
+                         c_id,
+                         m_type,
+                         child_element,
+                         parent_element,
+                         begin_mp,
+                         end_mp)
+              AS (SELECT 0 levl,
+                         1,
+                         nm_obj_type,
+                         nm_ne_id_of,
+                         nm_ne_id_of,
+                         nm_begin_mp,
+                         nm_end_mp
+                    FROM nm_asset_locations, nm_locations
+                   WHERE     nal_asset_id = pi_asset_id
+                         AND nal_nit_type = pi_obj_type
+                         AND nm_ne_id_in = nal_id
+                  UNION ALL
+                  SELECT 0 levl,
+                         1,
+                         nm_obj_type,
+                         nm_ne_id_of,
+                         nm_ne_id_of,
+                         nm_begin_mp,
+                         nm_end_mp
+                    FROM nm_members
+                   WHERE     nm_ne_id_in = pi_asset_id
+                         AND nm_obj_type = pi_obj_type),
+              groups (levl,
+                      c_id,
+                      p_id,
+                      obj_type)
+              AS (SELECT DISTINCT 1,
+                                  c_id,
+                                  m.nm_ne_id_in,
+                                  m.nm_obj_type
+                    FROM locations, nm_members m
+                   WHERE nm_type = 'G' AND nm_ne_id_of = child_element
+                  UNION ALL
+                  SELECT levl + 1,
+                         p_id,
+                         nm_ne_id_in,
+                         nm_obj_type
+                    FROM groups, nm_members
+                   WHERE nm_ne_id_of = p_id)
+                    SEARCH DEPTH FIRST BY c_id SET order_id
+         SELECT levl,
+                order_id,
+                c_id child_id,
+                p_id parent_id,
+                obj_type group_type,
+                ngt_descr group_type_descr,
+                ne_unique element_name,
+                ne_descr element_descr
+           FROM groups, nm_elements, nm_group_types
+          WHERE ne_id = p_id AND ne_gty_group_type = ngt_group_type;
+
+      RETURN retval;
+   END;
+
+   FUNCTION get_parent_groups (pi_rpt_tab IN lb_rpt_tab)
+      RETURN SYS_REFCURSOR
+   IS
+      retval   SYS_REFCURSOR;
+   BEGIN
+      OPEN retval FOR
+         WITH locations (levl,
+                         c_id,
+                         m_type,
+                         child_element,
+                         parent_element,
+                         begin_mp,
+                         end_mp)
+              AS (SELECT 0 levl,
+                         1,
+                         obj_type,
+                         refnt,
+                         refnt,
+                         start_m,
+                         end_m
+                    FROM TABLE (pi_rpt_tab)),
+              groups (levl,
+                      c_id,
+                      p_id,
+                      obj_type)
+              AS (SELECT DISTINCT 1,
+                                  c_id,
+                                  m.nm_ne_id_in,
+                                  m.nm_obj_type
+                    FROM locations, nm_members m
+                   WHERE nm_type = 'G' AND nm_ne_id_of = child_element
+                  UNION ALL
+                  SELECT levl + 1,
+                         p_id,
+                         nm_ne_id_in,
+                         nm_obj_type
+                    FROM groups, nm_members
+                   WHERE nm_ne_id_of = p_id)
+                    SEARCH DEPTH FIRST BY c_id SET order_id
+         SELECT levl,
+                order_id,
+                c_id child_id,
+                p_id parent_id,
+                obj_type group_type,
+                ngt_descr group_type_descr,
+                ne_unique element_name,
+                ne_descr element_descr
+           FROM groups, nm_elements, nm_group_types
+          WHERE ne_id = p_id AND ne_gty_group_type = ngt_group_type;
 
       RETURN retval;
    END;
