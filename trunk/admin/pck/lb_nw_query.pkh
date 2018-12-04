@@ -1,14 +1,13 @@
-/* Formatted on 11/30/2018 1:45:47 PM (QP5 v5.256.13226.35538) */
 CREATE OR REPLACE PACKAGE lb_nw_query
 AS
    --<PACKAGE>
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_nw_query.pkh-arc   1.1   Nov 30 2018 13:53:12   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_nw_query.pkh-arc   1.2   Dec 04 2018 16:36:18   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_nw_query.pkh  $
-   --       Date into PVCS   : $Date:   Nov 30 2018 13:53:12  $
-   --       Date fetched Out : $Modtime:   Nov 30 2018 13:52:22  $
-   --       PVCS Version     : $Revision:   1.1  $
+   --       Date into PVCS   : $Date:   Dec 04 2018 16:36:18  $
+   --       Date fetched Out : $Modtime:   Dec 04 2018 16:35:44  $
+   --       PVCS Version     : $Revision:   1.2  $
    --
    --   Author : R.A. Coupe
    --
@@ -21,7 +20,7 @@ AS
    -- to a target network/group type
    --</PACKAGE>
 
-   g_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.1  $';
+   g_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.2  $';
 
    -----------------------------------------------------------------------------
    --
@@ -130,7 +129,28 @@ AS
    FUNCTION get_nw_and_group_types (
       p_target_nt_type    IN VARCHAR2,
       p_target_gty_type   IN VARCHAR2,
-      p_direction           IN VARCHAR2 DEFAULT NULL)
+      p_direction         IN VARCHAR2 DEFAULT NULL)
+      RETURN SYS_REFCURSOR;
+
+   --</PROC>
+
+   -----------------------------------------------------------------------------
+   --
+   --<PROC NAME="GET_PARENT_GROUPS">
+   --
+   -- This function returns a cursor consisting of a hierarchy of group members for an asset id and type
+   FUNCTION get_parent_groups (pi_asset_id   IN INTEGER,
+                               pi_obj_type   IN VARCHAR2)
+      RETURN SYS_REFCURSOR;
+
+   --</PROC>
+
+   -----------------------------------------------------------------------------
+   --
+   --<PROC NAME="GET_PARENT_GROUPS">
+   --
+   -- This function returns a cursor consisting of a hierarchy of group members for a table of locations
+   FUNCTION get_parent_groups (pi_rpt_tab IN lb_rpt_tab)
       RETURN SYS_REFCURSOR;
 --</PROC>
 END;
