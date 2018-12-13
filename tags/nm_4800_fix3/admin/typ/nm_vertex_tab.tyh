@@ -1,0 +1,19 @@
+create or replace type nm_vertex_tab as 
+   --   PVCS Identifiers :-
+   --
+   --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/typ/nm_vertex_tab.tyh-arc   1.0   Dec 13 2018 11:10:34   Rob.Coupe  $
+   --       Module Name      : $Workfile:   nm_vertex_tab.tyh  $
+   --       Date into PVCS   : $Date:   Dec 13 2018 11:10:34  $
+   --       Date fetched Out : $Modtime:   Dec 13 2018 11:06:16  $
+   --       PVCS Version     : $Revision:   1.0  $
+   --
+   --   Author : R.A. Coupe
+   --
+   --   A data type modelling a table of vertices in the sdo_lrs replacement code.
+   --
+   -----------------------------------------------------------------------------
+   -- Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
+   ----------------------------------------------------------------------------
+   --
+table of nm_vertex;
+/
