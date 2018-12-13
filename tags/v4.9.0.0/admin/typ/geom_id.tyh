@@ -1,0 +1,19 @@
+create or replace type geom_id as object( 
+   --   PVCS Identifiers :-
+   --
+   --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/typ/geom_id.tyh-arc   1.0   Dec 13 2018 11:07:58   Rob.Coupe  $
+   --       Module Name      : $Workfile:   geom_id.tyh  $
+   --       Date into PVCS   : $Date:   Dec 13 2018 11:07:58  $
+   --       Date fetched Out : $Modtime:   Dec 13 2018 10:54:46  $
+   --       PVCS Version     : $Revision:   1.0  $
+   --
+   --   Author : R.A. Coupe
+   --
+   --   A data type providing an ordered geometry, mainly used in a table or ordered geometries.
+   --
+   -----------------------------------------------------------------------------
+   -- Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
+   ----------------------------------------------------------------------------
+   --
+id integer, geom mdsys.sdo_geometry );
+/
