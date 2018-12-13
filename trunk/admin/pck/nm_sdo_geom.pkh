@@ -1,0 +1,71 @@
+CREATE OR REPLACE PACKAGE nm_sdo_geom
+AS
+--<PACKAGE>
+   --   PVCS Identifiers :-
+   --
+   --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm_sdo_geom.pkh-arc   1.0   Dec 13 2018 10:12:06   Rob.Coupe  $
+   --       Module Name      : $Workfile:   nm_sdo_geom.pkh  $
+   --       Date into PVCS   : $Date:   Dec 13 2018 10:12:06  $
+   --       Date fetched Out : $Modtime:   Dec 13 2018 10:01:56  $
+   --       PVCS Version     : $Revision:   1.0  $
+   --
+   --   Author : R.A. Coupe
+   --
+   --   Package for handling SDO LRS data
+   --
+   -----------------------------------------------------------------------------
+   -- Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
+   ----------------------------------------------------------------------------
+   -- The main purpose of this package is to replicate the functions inside the SDO_LRS package as
+   -- supplied under the MDSYS schema and licensed under the Oracle Spatial license on EE.
+--</PACKAGE>
+
+   g_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.0  $';
+
+   -----------------------------------------------------------------------------
+   --
+   --<PROC NAME="GET_VERSION">
+   --
+   -- This function returns the current PVCS version of the package
+
+   FUNCTION get_version
+      RETURN VARCHAR2;
+   --</PROC>
+
+   -----------------------------------------------------------------------------
+   --
+   --<PROC NAME="GET_BODY_VERSION">
+   --
+   -- This function returns the current PVCS version of the package body
+   FUNCTION get_body_version
+      RETURN VARCHAR2;
+   --</PROC>
+
+
+    FUNCTION get_dims (geom IN SDO_GEOMETRY)
+        RETURN INTEGER;
+
+    FUNCTION get_lr_dim (geom IN SDO_GEOMETRY)
+        RETURN INTEGER;
+
+    FUNCTION set_pt_measure (p_pt IN SDO_GEOMETRY, p_measure IN NUMBER)
+        RETURN SDO_GEOMETRY;
+
+    FUNCTION extract_id_geom (geom IN SDO_GEOMETRY)
+        RETURN geom_id_tab;
+
+    FUNCTION extract_ords (ords          sdo_ordinate_array,
+                           start_id   IN INTEGER,
+                           end_id        INTEGER)
+        RETURN sdo_ordinate_array;
+
+    FUNCTION test_equivalence (geom1         IN SDO_GEOMETRY,
+                               geom2         IN SDO_GEOMETRY,
+                               tolerance        NUMBER DEFAULT 0.005,
+                               measure_tol      NUMBER DEFAULT 0.005)
+        RETURN VARCHAR2;
+
+    FUNCTION get_vertices_as_pts (geom IN SDO_GEOMETRY)
+        RETURN geom_id_tab;
+END;
+/
