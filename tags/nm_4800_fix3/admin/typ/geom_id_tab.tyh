@@ -1,0 +1,19 @@
+create or replace type geom_id_tab as 
+   --   PVCS Identifiers :-
+   --
+   --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/typ/geom_id_tab.tyh-arc   1.0   Dec 13 2018 11:08:28   Rob.Coupe  $
+   --       Module Name      : $Workfile:   geom_id_tab.tyh  $
+   --       Date into PVCS   : $Date:   Dec 13 2018 11:08:28  $
+   --       Date fetched Out : $Modtime:   Dec 13 2018 10:51:34  $
+   --       PVCS Version     : $Revision:   1.0  $
+   --
+   --   Author : R.A. Coupe
+   --
+   --   A data type providing an ordered geometry, mainly used in a table or ordered geometries.
+   --
+   -----------------------------------------------------------------------------
+   -- Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
+   ----------------------------------------------------------------------------
+   --
+table of geom_id;
+/
