@@ -1,0 +1,312 @@
+CREATE OR REPLACE package sdo_lrs as
+--<PACKAGE>
+   --   PVCS Identifiers :-
+   --
+   --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdo_lrs.pkh-arc   1.0   Dec 13 2018 10:15:14   Rob.Coupe  $
+   --       Module Name      : $Workfile:   sdo_lrs.pkh  $
+   --       Date into PVCS   : $Date:   Dec 13 2018 10:15:14  $
+   --       Date fetched Out : $Modtime:   Dec 13 2018 09:59:10  $
+   --       PVCS Version     : $Revision:   1.0  $
+   --
+   --   Author : R.A. Coupe
+   --
+   --   Package for handling SDO LRS data
+   --
+   -----------------------------------------------------------------------------
+   -- Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
+   ----------------------------------------------------------------------------
+   -- The main purpose of this package is to replicate the functions inside the SDO_LRS package as
+   -- supplied under the MDSYS schema and licensed under the Oracle Spatial license on EE.
+--</PACKAGE>
+   g_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.0  $';
+
+   -----------------------------------------------------------------------------
+   --
+   --<PROC NAME="GET_VERSION">
+   --
+   -- This function returns the current PVCS version of the package
+
+   FUNCTION get_version
+      RETURN VARCHAR2;
+   --</PROC>
+
+   -----------------------------------------------------------------------------
+   --
+   --<PROC NAME="GET_BODY_VERSION">
+   --
+   -- This function returns the current PVCS version of the package body
+   FUNCTION get_body_version
+      RETURN VARCHAR2;
+   --</PROC>
+
+   FUNCTION locate_pt(geom_segment IN MDSYS.SDO_GEOMETRY,
+                      dim_array    IN MDSYS.SDO_DIM_ARRAY,
+                      measure      IN NUMBER,
+                      offset       IN NUMBER DEFAULT 0)
+   RETURN MDSYS.SDO_GEOMETRY DETERMINISTIC PARALLEL_ENABLE;
+
+   FUNCTION locate_pt(geom_segment IN MDSYS.SDO_GEOMETRY,
+                      measure      IN NUMBER,
+                      offset       IN NUMBER default 0,
+                      tolerance    IN NUMBER default 1.0e-8)
+   RETURN MDSYS.SDO_GEOMETRY DETERMINISTIC PARALLEL_ENABLE;
+
+
+   FUNCTION connected_geom_segments(geom_segment_1 IN MDSYS.SDO_GEOMETRY,
+                                    dim_array_1    IN MDSYS.SDO_DIM_ARRAY,
+                                    geom_segment_2 IN MDSYS.SDO_GEOMETRY,
+                                    dim_array_2    IN MDSYS.SDO_DIM_ARRAY)
+   RETURN VARCHAR2 PARALLEL_ENABLE;
+
+
+   FUNCTION concatenate_geom_segments(geom_segment_1 IN MDSYS.SDO_GEOMETRY,
+                                      dim_array_1    IN MDSYS.SDO_DIM_ARRAY,
+                                      geom_segment_2 IN MDSYS.SDO_GEOMETRY,
+                                      dim_array_2    IN MDSYS.SDO_DIM_ARRAY)
+   RETURN MDSYS.SDO_GEOMETRY DETERMINISTIC PARALLEL_ENABLE;
+
+   FUNCTION clip_geom_segment(geom_segment  IN MDSYS.SDO_GEOMETRY,
+                              dim_array     IN MDSYS.SDO_DIM_ARRAY,
+                              start_measure IN NUMBER,
+                              end_measure   IN NUMBER)
+   RETURN MDSYS.SDO_GEOMETRY DETERMINISTIC PARALLEL_ENABLE;
+
+   FUNCTION clip_geom_segment(geom_segment  IN MDSYS.SDO_GEOMETRY,
+                              start_measure IN NUMBER,
+                              end_measure   IN NUMBER,
+                              tolerance     IN NUMBER DEFAULT 1.0e-8)
+   RETURN MDSYS.SDO_GEOMETRY DETERMINISTIC PARALLEL_ENABLE;
+   
+   PROCEDURE split_geom_segment(geom_segment  IN  MDSYS.SDO_GEOMETRY,
+                                dim_array     IN  MDSYS.SDO_DIM_ARRAY,
+                                split_measure IN  NUMBER,
+                                segment_1     OUT MDSYS.SDO_GEOMETRY,
+                                segment_2     OUT MDSYS.SDO_GEOMETRY);
+
+   PROCEDURE split_geom_segment(geom_segment  IN  MDSYS.SDO_GEOMETRY,
+                                split_measure IN  NUMBER,
+                                segment_1     OUT MDSYS.SDO_GEOMETRY,
+                                segment_2     OUT MDSYS.SDO_GEOMETRY,
+                                tolerance     IN  NUMBER DEFAULT 1.0e-8);
+
+   FUNCTION scale_geom_segment(geom_segment  IN MDSYS.SDO_GEOMETRY,
+                               dim_array     IN MDSYS.SDO_DIM_ARRAY,
+                               start_measure IN NUMBER,
+                               end_measure   IN NUMBER,
+                               shift_measure IN NUMBER)
+   RETURN MDSYS.SDO_GEOMETRY DETERMINISTIC PARALLEL_ENABLE;
+
+   FUNCTION scale_geom_segment(geom_segment  IN MDSYS.SDO_GEOMETRY,
+                               start_measure IN NUMBER,
+                               end_measure   IN NUMBER,
+                               shift_measure IN NUMBER,
+                               tolerance     IN NUMBER DEFAULT 1.0e-8)
+   RETURN MDSYS.SDO_GEOMETRY DETERMINISTIC PARALLEL_ENABLE;
+
+   FUNCTION geom_segment_start_measure(geom_segment IN MDSYS.SDO_GEOMETRY,
+                                     dim_array    IN MDSYS.SDO_DIM_ARRAY)
+   RETURN NUMBER PARALLEL_ENABLE;
+
+   FUNCTION geom_segment_start_measure(geom_segment IN MDSYS.SDO_GEOMETRY)
+   RETURN NUMBER PARALLEL_ENABLE;
+
+   FUNCTION geom_segment_end_measure(geom_segment IN MDSYS.SDO_GEOMETRY,
+                                     dim_array    IN MDSYS.SDO_DIM_ARRAY)
+   RETURN NUMBER PARALLEL_ENABLE;
+
+   FUNCTION geom_segment_end_measure(geom_segment IN MDSYS.SDO_GEOMETRY)
+   RETURN NUMBER PARALLEL_ENABLE;
+
+   FUNCTION geom_segment_start_pt(geom_segment IN MDSYS.SDO_GEOMETRY,
+                                dim_array    IN MDSYS.SDO_DIM_ARRAY)
+   RETURN MDSYS.SDO_GEOMETRY DETERMINISTIC PARALLEL_ENABLE;
+
+   FUNCTION geom_segment_start_pt(geom_segment IN MDSYS.SDO_GEOMETRY)
+   RETURN MDSYS.SDO_GEOMETRY DETERMINISTIC PARALLEL_ENABLE;
+
+   FUNCTION geom_segment_end_pt(geom_segment IN MDSYS.SDO_GEOMETRY,
+                                dim_array    IN MDSYS.SDO_DIM_ARRAY)
+   RETURN MDSYS.SDO_GEOMETRY DETERMINISTIC PARALLEL_ENABLE;
+
+   FUNCTION geom_segment_end_pt(geom_segment IN MDSYS.SDO_GEOMETRY)
+   RETURN MDSYS.SDO_GEOMETRY DETERMINISTIC PARALLEL_ENABLE;
+
+   PROCEDURE redefine_geom_segment(geom_segment  IN OUT MDSYS.SDO_GEOMETRY,
+                                   dim_array     IN MDSYS.SDO_DIM_ARRAY,
+                                   start_measure IN NUMBER ,
+                                   end_measure   IN NUMBER );
+
+   PROCEDURE redefine_geom_segment(geom_segment  IN OUT MDSYS.SDO_GEOMETRY,
+                                   dim_array     IN MDSYS.SDO_DIM_ARRAY);
+
+   PROCEDURE redefine_geom_segment(geom_segment  IN OUT MDSYS.SDO_GEOMETRY,
+                                   start_measure IN NUMBER ,
+                                   end_measure   IN NUMBER ,
+                                   tolerance     IN NUMBER DEFAULT 1.0e-8);
+
+   PROCEDURE redefine_geom_segment(geom_segment  IN OUT MDSYS.SDO_GEOMETRY,
+                                   tolerance     IN NUMBER DEFAULT 1.0e-8);
+
+--   FUNCTION convert_to_lrs_dim_array(dim_array   IN MDSYS.SDO_DIM_ARRAY,
+--                                     dim_name    IN VARCHAR2,
+--                                     dim_pos     IN INTEGER,
+--                                     lower_bound IN NUMBER DEFAULT NULL,
+--                                     upper_bound IN NUMBER DEFAULT NULL,
+--                                     tolerance   IN NUMBER DEFAULT NULL)
+--   RETURN MDSYS.SDO_DIM_ARRAY PARALLEL_ENABLE;
+
+--   FUNCTION convert_to_lrs_dim_array(dim_array   IN MDSYS.SDO_DIM_ARRAY,
+--                                     dim_name    IN VARCHAR2,
+--                                     lower_bound IN NUMBER DEFAULT NULL,
+--                                     upper_bound IN NUMBER DEFAULT NULL,
+--                                     tolerance   IN NUMBER DEFAULT NULL)
+--   RETURN MDSYS.SDO_DIM_ARRAY PARALLEL_ENABLE;
+
+   FUNCTION convert_to_lrs_dim_array(dim_array   IN MDSYS.SDO_DIM_ARRAY,
+                                     lower_bound IN NUMBER DEFAULT NULL,
+                                     upper_bound IN NUMBER DEFAULT NULL,
+                                     tolerance   IN NUMBER DEFAULT NULL)
+   RETURN MDSYS.SDO_DIM_ARRAY PARALLEL_ENABLE;
+
+--   FUNCTION convert_to_lrs_geom(standard_geom IN MDSYS.SDO_GEOMETRY,
+--                                dim_array     IN MDSYS.SDO_DIM_ARRAY,
+--                                m_pos         IN INTEGER,
+--                                start_measure IN NUMBER ,
+--                                end_measure   IN NUMBER )
+--   RETURN MDSYS.SDO_GEOMETRY DETERMINISTIC PARALLEL_ENABLE;
+--
+--   FUNCTION convert_to_lrs_geom(standard_geom IN MDSYS.SDO_GEOMETRY,
+--                                dim_array     IN MDSYS.SDO_DIM_ARRAY,
+--                                m_pos         IN INTEGER DEFAULT NULL)
+--   RETURN MDSYS.SDO_GEOMETRY DETERMINISTIC PARALLEL_ENABLE;
+--
+--   FUNCTION convert_to_lrs_geom(standard_geom IN MDSYS.SDO_GEOMETRY,
+--                                dim_array     IN MDSYS.SDO_DIM_ARRAY,
+--                                start_measure IN NUMBER ,
+--                                end_measure   IN NUMBER )
+--   RETURN MDSYS.SDO_GEOMETRY DETERMINISTIC PARALLEL_ENABLE;
+
+--   FUNCTION convert_to_lrs_geom(standard_geom IN MDSYS.SDO_GEOMETRY,
+--                                m_pos         IN INTEGER,
+--                                start_measure IN NUMBER,
+--                                end_measure   IN NUMBER)
+--   RETURN MDSYS.SDO_GEOMETRY DETERMINISTIC PARALLEL_ENABLE;
+
+   FUNCTION convert_to_lrs_geom(standard_geom IN MDSYS.SDO_GEOMETRY,
+                                start_measure IN NUMBER,
+                                end_measure   IN NUMBER)
+   RETURN MDSYS.SDO_GEOMETRY DETERMINISTIC PARALLEL_ENABLE;
+
+--   FUNCTION convert_to_lrs_geom(standard_geom IN MDSYS.SDO_GEOMETRY,
+--                                m_pos         IN INTEGER)
+--   RETURN MDSYS.SDO_GEOMETRY DETERMINISTIC PARALLEL_ENABLE;
+
+   FUNCTION convert_to_lrs_geom(standard_geom IN MDSYS.SDO_GEOMETRY)
+   RETURN MDSYS.SDO_GEOMETRY DETERMINISTIC PARALLEL_ENABLE;
+
+   FUNCTION convert_to_std_dim_array(dim_array   IN MDSYS.SDO_DIM_ARRAY)
+   RETURN MDSYS.SDO_DIM_ARRAY PARALLEL_ENABLE;
+
+--   FUNCTION convert_to_std_dim_array(dim_array   IN MDSYS.SDO_DIM_ARRAY,
+--                                     m_pos       IN INTEGER)
+--   RETURN MDSYS.SDO_DIM_ARRAY PARALLEL_ENABLE;
+
+   FUNCTION convert_to_std_geom(lrs_geom IN MDSYS.SDO_GEOMETRY,
+                                dim_array     IN MDSYS.SDO_DIM_ARRAY)
+   RETURN MDSYS.SDO_GEOMETRY DETERMINISTIC PARALLEL_ENABLE;
+
+   FUNCTION convert_to_std_geom(lrs_geom IN MDSYS.SDO_GEOMETRY)
+   RETURN MDSYS.SDO_GEOMETRY DETERMINISTIC PARALLEL_ENABLE;
+
+   FUNCTION offset_geom_segment(geom_segment  IN MDSYS.SDO_GEOMETRY,
+                                dim_array     IN MDSYS.SDO_DIM_ARRAY,
+                                start_measure IN NUMBER,
+                                end_measure   IN NUMBER,
+                                offset        IN NUMBER,
+                                unit          IN VARCHAR2)
+   RETURN MDSYS.SDO_GEOMETRY DETERMINISTIC PARALLEL_ENABLE;
+
+   FUNCTION offset_geom_segment(geom_segment  IN MDSYS.SDO_GEOMETRY,
+                                start_measure IN NUMBER,
+                                end_measure   IN NUMBER,
+                                offset        IN NUMBER,
+                                tolerance     IN NUMBER,
+                                unit          IN VARCHAR2)
+   RETURN MDSYS.SDO_GEOMETRY DETERMINISTIC PARALLEL_ENABLE;
+
+   FUNCTION offset_geom_segment(geom_segment  IN MDSYS.SDO_GEOMETRY,
+                                dim_array     IN MDSYS.SDO_DIM_ARRAY,
+                                start_measure IN NUMBER,
+                                end_measure   IN NUMBER,
+                                offset        IN NUMBER)
+   RETURN MDSYS.SDO_GEOMETRY DETERMINISTIC PARALLEL_ENABLE;
+
+   FUNCTION offset_geom_segment(geom_segment  IN MDSYS.SDO_GEOMETRY,
+                                start_measure IN NUMBER,
+                                end_measure   IN NUMBER,
+                                offset        IN NUMBER,
+                                tolerance     IN NUMBER)
+   RETURN MDSYS.SDO_GEOMETRY DETERMINISTIC PARALLEL_ENABLE;
+
+   FUNCTION offset_geom_segment(geom_segment  IN MDSYS.SDO_GEOMETRY,
+                                start_measure IN NUMBER,
+                                end_measure   IN NUMBER,
+                                offset        IN NUMBER)
+   RETURN MDSYS.SDO_GEOMETRY DETERMINISTIC PARALLEL_ENABLE;
+
+   FUNCTION find_measure(geom_segment           IN MDSYS.SDO_GEOMETRY,
+                         dim_array              IN MDSYS.SDO_DIM_ARRAY,
+                         point                  IN MDSYS.SDO_GEOMETRY,
+                         point_dim_array        IN MDSYS.SDO_DIM_ARRAY DEFAULT NULL)
+   RETURN NUMBER PARALLEL_ENABLE;
+
+   FUNCTION find_measure(geom_segment IN MDSYS.SDO_GEOMETRY,
+                         point        IN MDSYS.SDO_GEOMETRY,
+                         tolerance    IN NUMBER DEFAULT 1.0e-8)
+   RETURN NUMBER PARALLEL_ENABLE;
+   
+   FUNCTION reverse_measure(geom_segment IN MDSYS.SDO_GEOMETRY,
+                            dim_array    IN MDSYS.SDO_DIM_ARRAY)
+   RETURN MDSYS.SDO_GEOMETRY DETERMINISTIC PARALLEL_ENABLE;
+
+   FUNCTION reverse_measure(geom_segment IN MDSYS.SDO_GEOMETRY)
+   RETURN MDSYS.SDO_GEOMETRY DETERMINISTIC PARALLEL_ENABLE;
+
+   FUNCTION reverse_geometry(geom          IN MDSYS.SDO_GEOMETRY,
+                             dim_array     IN MDSYS.SDO_DIM_ARRAY)
+   RETURN MDSYS.SDO_GEOMETRY DETERMINISTIC PARALLEL_ENABLE;
+
+   FUNCTION reverse_geometry(geom          IN MDSYS.SDO_GEOMETRY)
+   RETURN MDSYS.SDO_GEOMETRY DETERMINISTIC PARALLEL_ENABLE;
+
+   FUNCTION project_pt(geom_segment    IN MDSYS.SDO_GEOMETRY,
+                       dim_array       IN MDSYS.SDO_DIM_ARRAY,
+                       point           IN MDSYS.SDO_GEOMETRY,
+                       point_dim_array IN MDSYS.SDO_DIM_ARRAY )
+   RETURN MDSYS.SDO_GEOMETRY DETERMINISTIC PARALLEL_ENABLE;
+
+   FUNCTION project_pt(geom_segment    IN MDSYS.SDO_GEOMETRY,
+                       dim_array       IN MDSYS.SDO_DIM_ARRAY,
+                       point           IN MDSYS.SDO_GEOMETRY)
+   RETURN MDSYS.SDO_GEOMETRY DETERMINISTIC PARALLEL_ENABLE;
+
+   FUNCTION project_pt(geom_segment    IN  MDSYS.SDO_GEOMETRY,
+                       dim_array       IN  MDSYS.SDO_DIM_ARRAY,
+                       point           IN  MDSYS.SDO_GEOMETRY,
+                       point_dim_array IN  MDSYS.SDO_DIM_ARRAY,
+                       offset          OUT NUMBER)
+   RETURN MDSYS.SDO_GEOMETRY DETERMINISTIC PARALLEL_ENABLE;
+
+   FUNCTION project_pt(geom_segment    IN MDSYS.SDO_GEOMETRY,
+                       point           IN MDSYS.SDO_GEOMETRY,
+                       tolerance       IN NUMBER DEFAULT 1.0e-8)
+   RETURN MDSYS.SDO_GEOMETRY DETERMINISTIC PARALLEL_ENABLE;
+
+   FUNCTION project_pt(geom_segment    IN  MDSYS.SDO_GEOMETRY,
+                       point           IN  MDSYS.SDO_GEOMETRY,
+                       tolerance       IN  NUMBER,
+                       offset          OUT NUMBER )
+   RETURN MDSYS.SDO_GEOMETRY DETERMINISTIC PARALLEL_ENABLE;
+
+end;
+/
