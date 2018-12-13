@@ -1,0 +1,25 @@
+create or replace type nm_vertex 
+     as object ( 
+   --   PVCS Identifiers :-
+   --
+   --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/typ/nm_vertex.tyh-arc   1.0   Dec 13 2018 11:10:12   Rob.Coupe  $
+   --       Module Name      : $Workfile:   nm_vertex.tyh  $
+   --       Date into PVCS   : $Date:   Dec 13 2018 11:10:12  $
+   --       Date fetched Out : $Modtime:   Dec 13 2018 10:58:58  $
+   --       PVCS Version     : $Revision:   1.0  $
+   --
+   --   Author : R.A. Coupe
+   --
+   --   A data type modelling a vertex, used in a table of vertices in the sdo_lrs replacement code.
+   --
+   -----------------------------------------------------------------------------
+   -- Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
+   ----------------------------------------------------------------------------
+   --     
+       id integer
+      ,x  number
+      ,y  number
+      ,z  number
+      ,m  number );
+/      
+
