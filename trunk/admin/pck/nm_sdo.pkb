@@ -1,42 +1,43 @@
+/* Formatted on 13/12/2018 18:16:18 (QP5 v5.336) */
 CREATE OR REPLACE PACKAGE BODY nm_sdo
 AS
-   --   PVCS Identifiers :-
-   --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm_sdo.pkb-arc   1.0   Dec 13 2018 10:05:56   Rob.Coupe  $
-   --       Module Name      : $Workfile:   nm_sdo.pkb  $
-   --       Date into PVCS   : $Date:   Dec 13 2018 10:05:56  $
-   --       Date fetched Out : $Modtime:   Dec 13 2018 09:59:40  $
-   --       PVCS Version     : $Revision:   1.0  $
-   --
-   --   Author : R.A. Coupe
-   --
-   --   Package for handling SDO data - acts as a the basis for the replacement of SDO_LRS
-   --
-   -----------------------------------------------------------------------------
-   -- Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
-   ----------------------------------------------------------------------------
-   -- The main purpose of this package is to replicate the functions inside the SDO_LRS package as
-   -- supplied under the MDSYS schema and licensed under the Oracle Spatial license on EE.
+    --   PVCS Identifiers :-
+    --
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm_sdo.pkb-arc   1.1   Dec 13 2018 18:20:50   Rob.Coupe  $
+    --       Module Name      : $Workfile:   nm_sdo.pkb  $
+    --       Date into PVCS   : $Date:   Dec 13 2018 18:20:50  $
+    --       Date fetched Out : $Modtime:   Dec 13 2018 18:20:04  $
+    --       PVCS Version     : $Revision:   1.1  $
+    --
+    --   Author : R.A. Coupe
+    --
+    --   Package for handling SDO data - acts as a the basis for the replacement of SDO_LRS
+    --
+    -----------------------------------------------------------------------------
+    -- Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
+    ----------------------------------------------------------------------------
+    -- The main purpose of this package is to replicate the functions inside the SDO_LRS package as
+    -- supplied under the MDSYS schema and licensed under the Oracle Spatial license on EE.
 
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.0  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.1  $';
 
-   g_package_name   CONSTANT VARCHAR2 (30) := 'NM_SDO';
+    g_package_name   CONSTANT VARCHAR2 (30) := 'NM_SDO';
 
-   FUNCTION get_version
-      RETURN VARCHAR2
-   IS
-   BEGIN
-      RETURN g_sccsid;
-   END get_version;
+    FUNCTION get_version
+        RETURN VARCHAR2
+    IS
+    BEGIN
+        RETURN g_sccsid;
+    END get_version;
 
-   FUNCTION get_body_version
-      RETURN VARCHAR2
-   IS
-   BEGIN
-      RETURN g_body_sccsid;
-   END get_body_version;
+    FUNCTION get_body_version
+        RETURN VARCHAR2
+    IS
+    BEGIN
+        RETURN g_body_sccsid;
+    END get_body_version;
 
-   --
+    --
 
     FUNCTION scale_vertices (geom            IN SDO_GEOMETRY,
                              geom_length     IN NUMBER DEFAULT NULL,
@@ -166,13 +167,18 @@ AS
         DETERMINISTIC
         PARALLEL_ENABLE
     IS
-        ord_array   sdo_ordinate_array;
-        retval      SDO_GEOMETRY;
+        ord_array     sdo_ordinate_array;
+        retval        SDO_GEOMETRY;
+        check_count   INTEGER;
+        sm            NUMBER := SDO_LRS.geom_segment_start_measure (geom);
+        em            NUMBER := SDO_LRS.geom_segment_end_measure (geom);
     BEGIN
-        IF     start_measure = geom_segment_start_measure (geom)
-           AND end_measure = geom_segment_end_measure (geom)
+        IF start_measure = sm AND end_measure = em
         THEN
             retval := geom;
+        ELSIF start_measure > em OR end_measure < sm
+        THEN
+            retval := NULL;
         ELSE
               SELECT sdo_geometry (
                          3302,
@@ -180,14 +186,18 @@ AS
                          NULL,
                          sdo_elem_info_array (1, 2, 1),
                          CAST (COLLECT (VALUE        /*ORDER BY rn, ordinate*/
-                                             ) AS sdo_ordinate_array))
-                INTO retval
+                                             ) AS sdo_ordinate_array)),
+                     COUNT (*)
+                         check_count
+                INTO retval, check_count
                 FROM (WITH
                           ranges
                           AS
                               (SELECT start_measure, end_measure, q1.*
                                  FROM (SELECT ROW_NUMBER () OVER (ORDER BY 1)
                                                   rn,
+                                              COUNT (*) OVER (PARTITION BY 'A')
+                                                  rc,
                                               t.COLUMN_VALUE
                                                   x1,
                                               LEAD (t.COLUMN_VALUE, 1)
@@ -210,36 +220,44 @@ AS
                                       AND m1 <= end_measure
                                       AND m2 >= start_measure)
                       --select r.* from ranges r ),
-                      SELECT rn,   -- this will retrieve all vertices which are wholly between the two measures 
+                      SELECT rn, -- this will retrieve all vertices which are wholly between the two measures
                              x1     A,
                              y1     B,
                              m1     C
                         FROM ranges
-                       WHERE m1 > start_measure AND m2 < end_measure                       
+                       WHERE m1 > start_measure AND m2 < end_measure
                       UNION ALL
-                      SELECT -1 rn,  -- this is where the start measure is between two vertices - interpolate the xy's 
+                      SELECT -1     rn, -- this is where the start measure is between two vertices - interpolate the xy's
                              x1 + (start_measure - m1) * (x2 - x1) / (m2 - m1),
                              y1 + (start_measure - m1) * (y2 - y1) / (m2 - m1),
                              start_measure
                         FROM ranges
                        WHERE m1 <= start_measure AND m2 > start_measure
                       UNION ALL
---                      SELECT rn,
---                             x1,
---                             y1,
---                             m1
---                        FROM ranges
---                       WHERE m2 >= end_measure
---                      UNION ALL
-                      SELECT 99999 rn,  -- This is to ensure that the end vertex is included, possibly interpolated - may be better performance if the 
+                      --                      SELECT rn,
+                      --                             x1,
+                      --                             y1,
+                      --                             m1
+                      --                        FROM ranges
+                      --                       WHERE m2 >= end_measure
+                      --                      UNION ALL
+                      SELECT 99999     rn, -- This is to ensure that the end vertex is included, possibly interpolated - may be better performance if the
                              x1 + (end_measure - m1) * (x2 - x1) / (m2 - m1),
                              y1 + (end_measure - m1) * (y2 - y1) / (m2 - m1),
                              end_measure
                         FROM ranges
-                       WHERE m2 >= end_measure AND m1 < end_measure AND m2 > m1
+                       WHERE rn = rc - 5 -- m2 >= end_measure AND m1 < end_measure AND m2 > m1
                       ORDER BY rn)
                      UNPIVOT EXCLUDE NULLS (VALUE FOR ordinate IN (A, B, C))
             ORDER BY rn, ordinate;
+
+            IF check_count < 6
+            --        OR
+            --           retval.sdo_ordinates(3) <> start_measure OR
+            --           retval.sdo_ordinates.last <> end_measure
+            THEN
+                raise_application_error (-20001, 'Invalid LRS Measure');
+            END IF;
         END IF;
 
         RETURN retval;
@@ -829,7 +847,7 @@ AS
         THEN
             RETURN geom.sdo_ordinates (3);
         ELSE
-            raise_application_error (-20001, 'Invalid Geometry Type');
+            raise_application_error (-20002, 'Invalid Geometry Type');
         END IF;
     END;
 
@@ -845,7 +863,7 @@ AS
         THEN
             RETURN geom.sdo_ordinates (geom.sdo_ordinates.LAST);
         ELSE
-            raise_application_error (-20001, 'Invalid Geometry Type');
+            raise_application_error (-20002, 'Invalid Geometry Type');
         END IF;
     END;
 
@@ -949,7 +967,7 @@ AS
                      UNPIVOT EXCLUDE NULLS (VALUE FOR ordinate IN (X, Y))
             ORDER BY rn, ordinate;
         ELSE
-            raise_application_error (-20001, 'Invalid geometry type');
+            raise_application_error (-20002, 'Invalid geometry type');
         END IF;
 
         RETURN retval;
@@ -965,7 +983,7 @@ AS
         THEN
             retval := nm_sdo.scale_geom_l (geom, geom_length);
         ELSE
-            raise_application_error (-20001, 'Invalid Geometry');
+            raise_application_error (-20003, 'Invalid Geometry');
         END IF;
 
         RETURN retval;
@@ -1190,7 +1208,7 @@ AS
     BEGIN
         geom1 := nm_sdo.clip (geom, 0, split_measure);
         geom2 :=
-             NM_SDO.SCALE_GEOM (
+            NM_SDO.SCALE_GEOM (
                 nm_sdo.clip (geom,
                              split_measure,
                              nm_sdo.geom_segment_end_measure (geom)));
@@ -1584,10 +1602,10 @@ AS
     BEGIN
         IF point.sdo_gtype NOT IN (3301, 3001)
         THEN
-            raise_application_error (-20001, 'Invalid Point Geometry');
+            raise_application_error (-20004, 'Invalid Point Geometry');
         ELSIF point.sdo_ordinates.COUNT < l_dim
         THEN
-            raise_application_error (-20001, 'Invalid Geometry');
+            raise_application_error (-20003, 'Invalid Geometry');
         END IF;
 
         RETURN CASE l_dim
@@ -1679,107 +1697,114 @@ AS
     END;
 
 
-FUNCTION set_measure_on_intsct (
-    p_lrs_geom   IN SDO_GEOMETRY,
-    p_parts      IN SDO_GEOMETRY)
-    RETURN SDO_GEOMETRY
-IS
-    retval   SDO_GEOMETRY;
-
-    CURSOR get_m_values (c_elem_info IN sdo_elem_info_array)
+    FUNCTION set_measure_on_intsct (p_lrs_geom   IN SDO_GEOMETRY,
+                                    p_parts      IN SDO_GEOMETRY)
+        RETURN SDO_GEOMETRY
     IS
-        WITH
-            vertices
-            AS
-                (SELECT v_part_id,
-                        (v_id - 1) * 3 + ord_offset + 2     v_id,
-                        vx,
-                        vy,
-                        vrc
-                   FROM (SELECT v1.*,
-                                (SELECT ord_offset
-                                   FROM (SELECT ROWNUM             rn,
-                                                t.COLUMN_VALUE     ord_offset
-                                           FROM TABLE (c_elem_info) t)
-                                  WHERE rn = (v_part_id - 1) * 3 + 1)    ord_offset
-                           FROM (SELECT part_id                            v_part_id,
-                                        id                                 v_id,
-                                        v.x                                vx,
-                                        v.y                                vy,
-                                        COUNT (*) OVER (PARTITION BY 1)    vrc
-                                   FROM (SELECT part_id, part_geom, p_parts
-                                           FROM (SELECT t.id       part_id,
-                                                        t.geom     part_geom,
-                                                        p_parts
-                                                   FROM TABLE (
-                                                            NM_SDO_GEOM.EXTRACT_ID_GEOM (
-                                                                p_parts)) t)),
-                                        TABLE (
-                                            SDO_UTIL.getvertices (part_geom))
-                                        v
-                                  WHERE ( v.z = 0 or v.z is null)) v1)),
-            element_vertices
-            AS
-                (SELECT id                                  e_id,
-                        v.x                                 ex,
-                        v.y                                 ey,
-                        v.z                                 ez,
-                        COUNT (*) OVER (PARTITION BY 1)     erc
-                   FROM TABLE (SDO_UTIL.getvertices (p_lrs_geom)) v),
-            element_ranges
-            AS
-                (SELECT e_id,
-                        ex                                    ex1,
-                        ey                                    ey1,
-                        ez                                    ez1,
-                        LEAD (ex, 1) OVER (ORDER BY e_id)     ex2,
-                        LEAD (ey, 1) OVER (ORDER BY e_id)     ey2,
-                        LEAD (ez, 1) OVER (ORDER BY e_id)     ez2
-                   FROM element_vertices),
-            measure_values
-            AS
-                (SELECT e.*,
-                        v.*,
-                          ez1
-                        +   (ez2 - ez1)
-                          * SQRT (
-                                POWER ((vx - ex1), 2) + POWER ((vy - ey1), 2))
-                          / SQRT (
-                                  POWER ((ex2 - ex1), 2)
-                                + POWER ((ey2 - ey1), 2))    measure
-                   FROM element_ranges e, vertices v
-                  WHERE vx BETWEEN ex1 AND ex2 AND vy BETWEEN ey1 AND ey2)
-        SELECT v_part_id,
-               v_id,
-               vx,
-               vy,
-               measure
-          FROM measure_values;
-BEGIN
-    FOR irec IN (SELECT COLUMN_VALUE FROM TABLE (p_parts.sdo_elem_info))
-    LOOP
-        nm_debug.debug ('column_value = ' || irec.COLUMN_VALUE);
-    END LOOP;
+        retval   SDO_GEOMETRY;
 
-    --
-    retval := p_parts;
+        CURSOR get_m_values (c_elem_info IN sdo_elem_info_array)
+        IS
+            WITH
+                vertices
+                AS
+                    (SELECT v_part_id,
+                            (v_id - 1) * 3 + ord_offset + 2     v_id,
+                            vx,
+                            vy,
+                            vrc
+                       FROM (SELECT v1.*,
+                                    (SELECT ord_offset
+                                       FROM (SELECT ROWNUM            rn,
+                                                    t.COLUMN_VALUE    ord_offset
+                                               FROM TABLE (c_elem_info) t)
+                                      WHERE rn = (v_part_id - 1) * 3 + 1)    ord_offset
+                               FROM (SELECT part_id                            v_part_id,
+                                            id                                 v_id,
+                                            v.x                                vx,
+                                            v.y                                vy,
+                                            COUNT (*) OVER (PARTITION BY 1)    vrc
+                                       FROM (SELECT part_id,
+                                                    part_geom,
+                                                    p_parts
+                                               FROM (SELECT t.id
+                                                                part_id,
+                                                            t.geom
+                                                                part_geom,
+                                                            p_parts
+                                                       FROM TABLE (
+                                                                NM_SDO_GEOM.EXTRACT_ID_GEOM (
+                                                                    p_parts))
+                                                            t)),
+                                            TABLE (
+                                                SDO_UTIL.getvertices (
+                                                    part_geom)) v
+                                      WHERE (v.z = 0 OR v.z IS NULL)) v1)),
+                element_vertices
+                AS
+                    (SELECT id                                  e_id,
+                            v.x                                 ex,
+                            v.y                                 ey,
+                            v.z                                 ez,
+                            COUNT (*) OVER (PARTITION BY 1)     erc
+                       FROM TABLE (SDO_UTIL.getvertices (p_lrs_geom)) v),
+                element_ranges
+                AS
+                    (SELECT e_id,
+                            ex                                    ex1,
+                            ey                                    ey1,
+                            ez                                    ez1,
+                            LEAD (ex, 1) OVER (ORDER BY e_id)     ex2,
+                            LEAD (ey, 1) OVER (ORDER BY e_id)     ey2,
+                            LEAD (ez, 1) OVER (ORDER BY e_id)     ez2
+                       FROM element_vertices),
+                measure_values
+                AS
+                    (SELECT e.*,
+                            v.*,
+                              ez1
+                            +   (ez2 - ez1)
+                              * SQRT (
+                                      POWER ((vx - ex1), 2)
+                                    + POWER ((vy - ey1), 2))
+                              / SQRT (
+                                      POWER ((ex2 - ex1), 2)
+                                    + POWER ((ey2 - ey1), 2))    measure
+                       FROM element_ranges e, vertices v
+                      WHERE vx BETWEEN ex1 AND ex2 AND vy BETWEEN ey1 AND ey2)
+            SELECT v_part_id,
+                   v_id,
+                   vx,
+                   vy,
+                   measure
+              FROM measure_values;
+    BEGIN
+        FOR irec IN (SELECT COLUMN_VALUE FROM TABLE (p_parts.sdo_elem_info))
+        LOOP
+            nm_debug.debug ('column_value = ' || irec.COLUMN_VALUE);
+        END LOOP;
 
-    FOR irec IN get_m_values (p_parts.sdo_elem_info)
-    LOOP
-        nm_debug.debug (
-               'part-id ='
-            || irec.v_part_id
-            || ', id = '
-            || irec.v_id
-            || ', measure = '
-            || irec.measure);
-            if irec.v_id is not null then
-        retval.sdo_ordinates (irec.v_id) := irec.measure;
-        end if;
-    END LOOP;
+        --
+        retval := p_parts;
 
-    RETURN retval;
-END;
+        FOR irec IN get_m_values (p_parts.sdo_elem_info)
+        LOOP
+            nm_debug.debug (
+                   'part-id ='
+                || irec.v_part_id
+                || ', id = '
+                || irec.v_id
+                || ', measure = '
+                || irec.measure);
+
+            IF irec.v_id IS NOT NULL
+            THEN
+                retval.sdo_ordinates (irec.v_id) := irec.measure;
+            END IF;
+        END LOOP;
+
+        RETURN retval;
+    END;
 
     PROCEDURE reset_measure (p_geom IN OUT NOCOPY SDO_GEOMETRY)
     IS
