@@ -1,13 +1,12 @@
-/* Formatted on 13/12/2018 18:16:18 (QP5 v5.336) */
 CREATE OR REPLACE PACKAGE BODY nm_sdo
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm_sdo.pkb-arc   1.1   Dec 13 2018 18:20:50   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm_sdo.pkb-arc   1.2   Dec 13 2018 18:29:30   Rob.Coupe  $
     --       Module Name      : $Workfile:   nm_sdo.pkb  $
-    --       Date into PVCS   : $Date:   Dec 13 2018 18:20:50  $
-    --       Date fetched Out : $Modtime:   Dec 13 2018 18:20:04  $
-    --       PVCS Version     : $Revision:   1.1  $
+    --       Date into PVCS   : $Date:   Dec 13 2018 18:29:30  $
+    --       Date fetched Out : $Modtime:   Dec 13 2018 18:28:26  $
+    --       PVCS Version     : $Revision:   1.2  $
     --
     --   Author : R.A. Coupe
     --
@@ -19,7 +18,7 @@ AS
     -- The main purpose of this package is to replicate the functions inside the SDO_LRS package as
     -- supplied under the MDSYS schema and licensed under the Oracle Spatial license on EE.
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.1  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.2  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'NM_SDO';
 
@@ -147,10 +146,10 @@ AS
                     FROM ranges
                    WHERE m2 >= end_measure
                   UNION ALL
-                  SELECT 99999,
-                         x1 + (end_measure - m1) * (x2 - x1) / (m2 - m1),
-                         y1 + (end_measure - m1) * (y2 - y1) / (m2 - m1),
-                         end_measure
+                      SELECT 99999 rn,  -- This is to ensure that the end vertex is included, possibly interpolated - may be better performance if the 
+                             x1 + (least(m2,end_measure) - m1) * (x2 - x1) / (m2 - m1),
+                             y1 + (least(m2,end_measure) - m1) * (y2 - y1) / (m2 - m1),
+                             least(m2,end_measure)
                     FROM ranges
                    WHERE m2 >= end_measure
                   ORDER BY rn)
@@ -241,10 +240,10 @@ AS
                       --                        FROM ranges
                       --                       WHERE m2 >= end_measure
                       --                      UNION ALL
-                      SELECT 99999     rn, -- This is to ensure that the end vertex is included, possibly interpolated - may be better performance if the
-                             x1 + (end_measure - m1) * (x2 - x1) / (m2 - m1),
-                             y1 + (end_measure - m1) * (y2 - y1) / (m2 - m1),
-                             end_measure
+                      SELECT 99999 rn,  -- This is to ensure that the end vertex is included, possibly interpolated - may be better performance if the 
+                             x1 + (least(m2,end_measure) - m1) * (x2 - x1) / (m2 - m1),
+                             y1 + (least(m2,end_measure) - m1) * (y2 - y1) / (m2 - m1),
+                             least(m2,end_measure)
                         FROM ranges
                        WHERE rn = rc - 5 -- m2 >= end_measure AND m1 < end_measure AND m2 > m1
                       ORDER BY rn)
