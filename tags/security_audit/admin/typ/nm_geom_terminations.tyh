@@ -1,0 +1,19 @@
+create or replace type nm_geom_terminations as object (
+   --   PVCS Identifiers :-
+   --
+   --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/typ/nm_geom_terminations.tyh-arc   1.0   Dec 13 2018 11:09:32   Rob.Coupe  $
+   --       Module Name      : $Workfile:   nm_geom_terminations.tyh  $
+   --       Date into PVCS   : $Date:   Dec 13 2018 11:09:32  $
+   --       Date fetched Out : $Modtime:   Dec 13 2018 10:56:28  $
+   --       PVCS Version     : $Revision:   1.0  $
+   --
+   --   Author : R.A. Coupe
+   --
+   --   A data type providing an ordered geometry, mainly used in a table or ordered geometries.
+   --
+   -----------------------------------------------------------------------------
+   -- Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
+   ----------------------------------------------------------------------------
+   --
+XS number, YS number, MS number, XE number, YE number, ME number, rowc integer );
+/
