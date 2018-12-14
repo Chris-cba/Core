@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY SDO_LRS
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdo_lrs.pkb-arc   1.0   Dec 13 2018 10:08:30   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdo_lrs.pkb-arc   1.1   Dec 14 2018 18:50:04   Rob.Coupe  $
    --       Module Name      : $Workfile:   sdo_lrs.pkb  $
-   --       Date into PVCS   : $Date:   Dec 13 2018 10:08:30  $
-   --       Date fetched Out : $Modtime:   Dec 13 2018 10:01:22  $
-   --       PVCS Version     : $Revision:   1.0  $
+   --       Date into PVCS   : $Date:   Dec 14 2018 18:50:04  $
+   --       Date fetched Out : $Modtime:   Dec 14 2018 18:44:46  $
+   --       PVCS Version     : $Revision:   1.1  $
    --
    --   Author : R.A. Coupe
    --
@@ -18,7 +18,7 @@ AS
    -- The main purpose of this package is to replicate the functions inside the SDO_LRS package as
    -- supplied under the MDSYS schema and licensed under the Oracle Spatial license on EE.
 
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.0  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.1  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'SDO_LRS';
 
@@ -116,23 +116,25 @@ AS
         PARALLEL_ENABLE
     IS
     BEGIN
-        RETURN NM_SDO.CLIP (geom_segment,
-                            start_measure,
-                            end_measure);
+        RETURN NM_SDO.CLIP (geom=>geom_segment,
+                            start_measure => start_measure,
+                            end_measure => end_measure,
+                            tolerance => dim_array(1).sdo_tolerance);
     END;
 
     FUNCTION clip_geom_segment (geom_segment    IN MDSYS.SDO_GEOMETRY,
                                 start_measure   IN NUMBER,
                                 end_measure     IN NUMBER,
-                                tolerance       IN NUMBER)
+                                tolerance       IN NUMBER DEFAULT 1.0e-8 )
         RETURN MDSYS.SDO_GEOMETRY
         DETERMINISTIC
         PARALLEL_ENABLE
     IS
     BEGIN
-        RETURN NM_SDO.CLIP (geom_segment,
-                            start_measure,
-                            end_measure );
+        RETURN NM_SDO.CLIP (geom => geom_segment,
+                            start_measure => start_measure,
+                            end_measure => end_measure,
+                            tolerance => tolerance );
     END;
 
 
@@ -145,6 +147,7 @@ AS
     BEGIN
         NM_SDO.SPLIT (geom_segment,
                       split_measure,
+                      dim_array(1).sdo_tolerance,
                       segment_1,
                       segment_2);
     END;
@@ -159,6 +162,7 @@ AS
     BEGIN
         NM_SDO.SPLIT (geom_segment,
                       split_measure,
+                      tolerance,
                       segment_1,
                       segment_2);
     END;
