@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm_sdo
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm_sdo.pkb-arc   1.2   Dec 13 2018 18:29:30   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm_sdo.pkb-arc   1.3   Dec 14 2018 18:56:30   Rob.Coupe  $
     --       Module Name      : $Workfile:   nm_sdo.pkb  $
-    --       Date into PVCS   : $Date:   Dec 13 2018 18:29:30  $
-    --       Date fetched Out : $Modtime:   Dec 13 2018 18:28:26  $
-    --       PVCS Version     : $Revision:   1.2  $
+    --       Date into PVCS   : $Date:   Dec 14 2018 18:56:30  $
+    --       Date fetched Out : $Modtime:   Dec 14 2018 18:46:14  $
+    --       PVCS Version     : $Revision:   1.3  $
     --
     --   Author : R.A. Coupe
     --
@@ -18,7 +18,7 @@ AS
     -- The main purpose of this package is to replicate the functions inside the SDO_LRS package as
     -- supplied under the MDSYS schema and licensed under the Oracle Spatial license on EE.
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.2  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.3  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'NM_SDO';
 
@@ -132,10 +132,17 @@ AS
                     FROM ranges
                    WHERE m1 > start_measure AND m2 < end_measure
                   UNION ALL
-                  SELECT -1,
-                         x1 + (start_measure - m1) * (x2 - x1) / (m2 - m1),
-                         y1 + (start_measure - m1) * (y2 - y1) / (m2 - m1),
-                         start_measure
+                  SELECT -1
+                             rn, -- this is where the start measure is between two vertices - interpolate the xy's
+                           x1
+                         +   (GREATEST (m1, start_measure) - m1)
+                           * (x2 - x1)
+                           / (m2 - m1),
+                           y1
+                         +   (GREATEST (m1, start_measure) - m1)
+                           * (y2 - y1)
+                           / (m2 - m1),
+                         GREATEST (m1, start_measure)
                     FROM ranges
                    WHERE m1 <= start_measure
                   UNION ALL
@@ -146,10 +153,17 @@ AS
                     FROM ranges
                    WHERE m2 >= end_measure
                   UNION ALL
-                      SELECT 99999 rn,  -- This is to ensure that the end vertex is included, possibly interpolated - may be better performance if the 
-                             x1 + (least(m2,end_measure) - m1) * (x2 - x1) / (m2 - m1),
-                             y1 + (least(m2,end_measure) - m1) * (y2 - y1) / (m2 - m1),
-                             least(m2,end_measure)
+                  SELECT 99999
+                             rn, -- This is to ensure that the end vertex is included, possibly interpolated - may be better performance if the
+                           x1
+                         +   (LEAST (m2, end_measure) - m1)
+                           * (x2 - x1)
+                           / (m2 - m1),
+                           y1
+                         +   (LEAST (m2, end_measure) - m1)
+                           * (y2 - y1)
+                           / (m2 - m1),
+                         LEAST (m2, end_measure)
                     FROM ranges
                    WHERE m2 >= end_measure
                   ORDER BY rn)
@@ -161,7 +175,8 @@ AS
 
     FUNCTION clip (geom            IN SDO_GEOMETRY,
                    start_measure   IN NUMBER,
-                   end_measure     IN NUMBER)
+                   end_measure     IN NUMBER,
+                   tolerance       IN NUMBER DEFAULT 1.0e-8)
         RETURN SDO_GEOMETRY
         DETERMINISTIC
         PARALLEL_ENABLE
@@ -192,7 +207,12 @@ AS
                 FROM (WITH
                           ranges
                           AS
-                              (SELECT start_measure, end_measure, q1.*
+                              (SELECT start_measure,
+                                      end_measure,
+                                      MIN (rn) OVER (PARTITION BY 'A')
+                                          min_rn,
+                                      tolerance,
+                                      q1.*
                                  FROM (SELECT ROW_NUMBER () OVER (ORDER BY 1)
                                                   rn,
                                               COUNT (*) OVER (PARTITION BY 'A')
@@ -216,46 +236,65 @@ AS
                                                   m2
                                          FROM TABLE (geom.sdo_ordinates) t) q1
                                 WHERE     MOD (rn, 3) = 1 --and m2 is not null
-                                      AND m1 <= end_measure
-                                      AND m2 >= start_measure)
-                      --select r.* from ranges r ),
+                                      AND m1 <= end_measure + tolerance
+                                      AND m2 >= start_measure - tolerance)
+                      --                      select r.* from ranges r
                       SELECT rn, -- this will retrieve all vertices which are wholly between the two measures
                              x1     A,
                              y1     B,
                              m1     C
                         FROM ranges
-                       WHERE m1 > start_measure AND m2 < end_measure
+                       WHERE     m1 >= start_measure - tolerance
+                             AND m1 <= end_measure + tolerance
                       UNION ALL
-                      SELECT -1     rn, -- this is where the start measure is between two vertices - interpolate the xy's
-                             x1 + (start_measure - m1) * (x2 - x1) / (m2 - m1),
-                             y1 + (start_measure - m1) * (y2 - y1) / (m2 - m1),
-                             start_measure
+                      SELECT -1
+                                 rn, -- this is where the start measure is between two vertices - interpolate the xy's
+                               x1
+                             +   (GREATEST (m1, start_measure) - m1)
+                               * (x2 - x1)
+                               / (m2 - m1),
+                               y1
+                             +   (GREATEST (m1, start_measure) - m1)
+                               * (y2 - y1)
+                               / (m2 - m1),
+                             GREATEST (m1, start_measure)
                         FROM ranges
-                       WHERE m1 <= start_measure AND m2 > start_measure
+                       WHERE     rn = min_rn
+                             AND m1 < start_measure
+                             AND m2 > start_measure
+                             AND ABS (m1 - start_measure) > tolerance
+                             AND ABS (m2 - start_measure) > tolerance
+                      --                       and (abs(m1-greatest(start_measure, m1)) > tolerance )
                       UNION ALL
-                      --                      SELECT rn,
-                      --                             x1,
-                      --                             y1,
-                      --                             m1
-                      --                        FROM ranges
-                      --                       WHERE m2 >= end_measure
-                      --                      UNION ALL
-                      SELECT 99999 rn,  -- This is to ensure that the end vertex is included, possibly interpolated - may be better performance if the 
-                             x1 + (least(m2,end_measure) - m1) * (x2 - x1) / (m2 - m1),
-                             y1 + (least(m2,end_measure) - m1) * (y2 - y1) / (m2 - m1),
-                             least(m2,end_measure)
+                      SELECT 99999
+                                 rn, -- This is to ensure that the end vertex is included, possibly interpolated - may be better performance if the
+                               x1
+                             +   (LEAST (m2, end_measure) - m1)
+                               * (x2 - x1)
+                               / (m2 - m1),
+                               y1
+                             +   (LEAST (m2, end_measure) - m1)
+                               * (y2 - y1)
+                               / (m2 - m1),
+                             LEAST (m2, end_measure)
                         FROM ranges
-                       WHERE rn = rc - 5 -- m2 >= end_measure AND m1 < end_measure AND m2 > m1
+                       WHERE     m1 < end_measure
+                             AND m2 >= end_measure - tolerance
+                             AND rn = rc
                       ORDER BY rn)
                      UNPIVOT EXCLUDE NULLS (VALUE FOR ordinate IN (A, B, C))
             ORDER BY rn, ordinate;
 
             IF check_count < 6
-            --        OR
-            --           retval.sdo_ordinates(3) <> start_measure OR
-            --           retval.sdo_ordinates.last <> end_measure
             THEN
-                raise_application_error (-20001, 'Invalid LRS Measure');
+                IF check_count = 3
+                THEN
+                    retval.sdo_gtype := 3301;
+                    retval.sdo_elem_info := sdo_elem_info_array (1, 1, 1);
+                ELSE
+                    DBMS_OUTPUT.put_line ('Check count = ' || check_count);
+                    raise_application_error (-20001, 'Invalid LRS Measure');
+                END IF;
             END IF;
         END IF;
 
@@ -1199,18 +1238,25 @@ AS
 
     PROCEDURE split (geom            IN     SDO_GEOMETRY,
                      split_measure   IN     NUMBER,
+                     tolerance       IN     NUMBER,
                      geom1              OUT SDO_GEOMETRY,
                      geom2              OUT SDO_GEOMETRY)
     IS
         l_old_end   NUMBER := nm_sdo.geom_segment_end_measure (geom);
         l_new_end   NUMBER := l_old_end - split_measure;
     BEGIN
-        geom1 := nm_sdo.clip (geom, 0, split_measure);
+        geom1 :=
+            nm_sdo.clip (geom            => geom,
+                         start_measure   => 0,
+                         end_measure     => split_measure,
+                         tolerance       => tolerance);
         geom2 :=
-            NM_SDO.SCALE_GEOM (
-                nm_sdo.clip (geom,
-                             split_measure,
-                             nm_sdo.geom_segment_end_measure (geom)));
+            NM_SDO.SCALE_GEOM (nm_sdo.clip (
+                                   geom            => geom,
+                                   start_measure   => split_measure,
+                                   end_measure     =>
+                                       nm_sdo.geom_segment_end_measure (geom),
+                                   tolerance       => tolerance));
     END;
 
     FUNCTION get_terminations (geom IN SDO_GEOMETRY)
