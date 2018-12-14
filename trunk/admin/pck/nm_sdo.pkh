@@ -3,11 +3,11 @@ AS
 --<PACKAGE>
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm_sdo.pkh-arc   1.0   Dec 13 2018 10:06:34   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm_sdo.pkh-arc   1.1   Dec 14 2018 18:57:34   Rob.Coupe  $
    --       Module Name      : $Workfile:   nm_sdo.pkh  $
-   --       Date into PVCS   : $Date:   Dec 13 2018 10:06:34  $
-   --       Date fetched Out : $Modtime:   Dec 13 2018 08:41:14  $
-   --       PVCS Version     : $Revision:   1.0  $
+   --       Date into PVCS   : $Date:   Dec 14 2018 18:57:34  $
+   --       Date fetched Out : $Modtime:   Dec 14 2018 18:45:10  $
+   --       PVCS Version     : $Revision:   1.1  $
    --
    --   Author : R.A. Coupe
    --
@@ -19,7 +19,7 @@ AS
    -- The main purpose of this package is to replicate the functions inside the SDO_LRS package as
    -- supplied under the MDSYS schema and licensed under the Oracle Spatial license on EE.
 --</PACKAGE>
-   g_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.0  $';
+   g_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.1  $';
 
    -----------------------------------------------------------------------------
    --
@@ -50,7 +50,8 @@ AS
 
     FUNCTION clip (geom            IN SDO_GEOMETRY,
                    start_measure   IN NUMBER,
-                   end_measure     IN NUMBER)
+                   end_measure     IN NUMBER,
+				   tolerance       IN NUMBER DEFAULT 1.0e-8)
         RETURN SDO_GEOMETRY
         DETERMINISTIC
         PARALLEL_ENABLE;
@@ -172,6 +173,7 @@ AS
 
     PROCEDURE split (geom            IN     SDO_GEOMETRY,
                      split_measure   IN     NUMBER,
+                     tolerance       IN     NUMBER,
                      geom1              OUT SDO_GEOMETRY,
                      geom2              OUT SDO_GEOMETRY);
 
