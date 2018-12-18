@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm_sdo
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm_sdo.pkb-arc   1.4   Dec 18 2018 10:50:54   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm_sdo.pkb-arc   1.5   Dec 18 2018 12:17:28   Rob.Coupe  $
     --       Module Name      : $Workfile:   nm_sdo.pkb  $
-    --       Date into PVCS   : $Date:   Dec 18 2018 10:50:54  $
-    --       Date fetched Out : $Modtime:   Dec 18 2018 08:49:40  $
-    --       PVCS Version     : $Revision:   1.4  $
+    --       Date into PVCS   : $Date:   Dec 18 2018 12:17:28  $
+    --       Date fetched Out : $Modtime:   Dec 18 2018 11:43:24  $
+    --       PVCS Version     : $Revision:   1.5  $
     --
     --   Author : R.A. Coupe
     --
@@ -18,7 +18,7 @@ AS
     -- The main purpose of this package is to replicate the functions inside the SDO_LRS package as
     -- supplied under the MDSYS schema and licensed under the Oracle Spatial license on EE.
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.4  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.5  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'NM_SDO';
 
@@ -68,9 +68,9 @@ AS
 
 
     FUNCTION clip_dbug (id              IN INTEGER,
-                   geom            IN SDO_GEOMETRY,
-                   start_measure   IN NUMBER,
-                   end_measure     IN NUMBER)
+                        geom            IN SDO_GEOMETRY,
+                        start_measure   IN NUMBER,
+                        end_measure     IN NUMBER)
         RETURN SDO_GEOMETRY
         DETERMINISTIC
         PARALLEL_ENABLE
@@ -189,14 +189,20 @@ AS
         l_tolerance   NUMBER; -- tolerance adjusted from XY unots to M units or meters
     BEGIN
         l_tolerance := tolerance;
-        if geom.sdo_srid is not null then
-           if nm_sdo_geom.is_geodetic(geom.sdo_srid) = 'TRUE' then
-              NULL;
-           else
-              l_tolerance := tolerance * sdo_lrs.geom_segment_end_measure(geom)/ sdo_geom.sdo_length(geom);
-           end if;
-        end if;
-        
+
+        IF geom.sdo_srid IS NOT NULL
+        THEN
+            IF nm_sdo_geom.is_geodetic (geom.sdo_srid) = 'TRUE'
+            THEN
+                NULL;
+            ELSE
+                l_tolerance :=
+                      tolerance
+                    * SDO_LRS.geom_segment_end_measure (geom)
+                    / SDO_GEOM.sdo_length (geom);
+            END IF;
+        END IF;
+
         IF start_measure = sm AND end_measure = em
         THEN
             retval := geom;
@@ -221,7 +227,7 @@ AS
                                       end_measure,
                                       MIN (rn) OVER (PARTITION BY 'A')
                                           min_rn,
-                                      MAX (rn ) OVER (PARTITION BY 'A')
+                                      MAX (rn) OVER (PARTITION BY 'A')
                                           max_rn,
                                       l_tolerance,
                                       q1.*
@@ -250,8 +256,8 @@ AS
                                 WHERE     MOD (rn, 3) = 1 --and m2 is not null
                                       AND m1 <= end_measure + l_tolerance
                                       AND m2 >= start_measure - l_tolerance)
---                                            select r.* from ranges r
---                                                                                        
+                      --                                            select r.* from ranges r
+                      --
                       SELECT rn, -- this will retrieve all vertices which are wholly between the two measures
                              x1     A,
                              y1     B,
@@ -292,8 +298,7 @@ AS
                              LEAST (m2, end_measure)
                         FROM ranges
                        WHERE     m1 < end_measure
-                             AND 
-                             m2 >= end_measure - l_tolerance
+                             AND m2 >= end_measure - l_tolerance
                              AND rn = max_rn
                       ORDER BY rn)
                      UNPIVOT EXCLUDE NULLS (VALUE FOR ordinate IN (A, B, C))
@@ -316,9 +321,9 @@ AS
     END;
 
     FUNCTION clip_l (geom            IN SDO_GEOMETRY,
-                   geom_length     IN NUMBER,
-                   start_measure   IN NUMBER,
-                   end_measure     IN NUMBER)
+                     geom_length     IN NUMBER,
+                     start_measure   IN NUMBER,
+                     end_measure     IN NUMBER)
         RETURN SDO_GEOMETRY
     IS
     BEGIN
@@ -1532,7 +1537,9 @@ AS
         RETURN retval;
     END;
 
-    FUNCTION merge (geom1 IN SDO_GEOMETRY, geom2 IN SDO_GEOMETRY, tolerance in NUMBER)
+    FUNCTION merge (geom1       IN SDO_GEOMETRY,
+                    geom2       IN SDO_GEOMETRY,
+                    tolerance   IN NUMBER)
         RETURN SDO_GEOMETRY
     IS
         retval   SDO_GEOMETRY;
@@ -1653,8 +1660,14 @@ AS
         RETURN retval;
     END;
 
-    FUNCTION get_measure (point       IN SDO_GEOMETRY,
-                          dim_array   IN sdo_dim_array DEFAULT NULL)
+    FUNCTION get_measure (point IN SDO_GEOMETRY, dim_array IN sdo_dim_array)
+        RETURN NUMBER
+    IS
+    BEGIN
+        RETURN get_measure (point);
+    END;
+
+    FUNCTION get_measure (point IN SDO_GEOMETRY)
         RETURN NUMBER
     IS
         l_dim   INTEGER := nm_sdo_geom.get_dims (point);
@@ -1662,9 +1675,15 @@ AS
         IF point.sdo_gtype NOT IN (3301, 3001)
         THEN
             raise_application_error (-20004, 'Invalid Point Geometry');
-        ELSIF point.sdo_ordinates.COUNT < l_dim
+        ELSIF    point.sdo_ordinates IS NULL
+              OR point.sdo_ordinates.COUNT < l_dim
         THEN
-            raise_application_error (-20003, 'Invalid Geometry');
+            IF point.sdo_point.z IS NOT NULL
+            THEN
+                RETURN point.sdo_point.z;
+            ELSE
+                raise_application_error (-20003, 'Invalid Geometry');
+            END IF;
         END IF;
 
         RETURN CASE l_dim
@@ -1942,6 +1961,26 @@ AS
         END IF;
 
         RETURN retval;
+    END;
+
+    FUNCTION geom_segment_length (geom_segment   IN MDSYS.SDO_GEOMETRY,
+                                  dim_array      IN MDSYS.SDO_DIM_ARRAY)
+        RETURN NUMBER
+    IS
+    BEGIN
+        RETURN ABS (
+                     geom_segment_end_measure (geom_segment)
+                   - geom_segment_start_measure (geom_segment));
+    END;
+
+    FUNCTION geom_segment_length (geom_segment   IN MDSYS.SDO_GEOMETRY,
+                                  tolerance      IN NUMBER DEFAULT 1.0e-8)
+        RETURN NUMBER
+    IS
+    BEGIN
+        RETURN ABS (
+                     geom_segment_end_measure (geom_segment)
+                   - geom_segment_start_measure (geom_segment));
     END;
 END;
 /
