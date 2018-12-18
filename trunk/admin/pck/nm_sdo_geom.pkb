@@ -1,40 +1,40 @@
 CREATE OR REPLACE PACKAGE BODY nm_sdo_geom
 AS
-   --   PVCS Identifiers :-
-   --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm_sdo_geom.pkb-arc   1.0   Dec 13 2018 10:07:34   Rob.Coupe  $
-   --       Module Name      : $Workfile:   nm_sdo_geom.pkb  $
-   --       Date into PVCS   : $Date:   Dec 13 2018 10:07:34  $
-   --       Date fetched Out : $Modtime:   Dec 13 2018 10:01:54  $
-   --       PVCS Version     : $Revision:   1.0  $
-   --
-   --   Author : R.A. Coupe
-   --
-   --   Package for handling SDO data - acts as a the basis for the replacement of SDO_LRS
-   --
-   -----------------------------------------------------------------------------
-   -- Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
-   ----------------------------------------------------------------------------
-   -- The main purpose of this package is to replicate the functions inside the SDO_LRS package as
-   -- supplied under the MDSYS schema and licensed under the Oracle Spatial license on EE.
+    --   PVCS Identifiers :-
+    --
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm_sdo_geom.pkb-arc   1.1   Dec 18 2018 10:52:58   Rob.Coupe  $
+    --       Module Name      : $Workfile:   nm_sdo_geom.pkb  $
+    --       Date into PVCS   : $Date:   Dec 18 2018 10:52:58  $
+    --       Date fetched Out : $Modtime:   Dec 17 2018 23:19:48  $
+    --       PVCS Version     : $Revision:   1.1  $
+    --
+    --   Author : R.A. Coupe
+    --
+    --   Package for handling SDO data - acts as a the basis for the replacement of SDO_LRS
+    --
+    -----------------------------------------------------------------------------
+    -- Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
+    ----------------------------------------------------------------------------
+    -- The main purpose of this package is to replicate the functions inside the SDO_LRS package as
+    -- supplied under the MDSYS schema and licensed under the Oracle Spatial license on EE.
 
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.0  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.1  $';
 
-   g_package_name   CONSTANT VARCHAR2 (30) := 'NM_SDO_GEOM';
+    g_package_name   CONSTANT VARCHAR2 (30) := 'NM_SDO_GEOM';
 
-   FUNCTION get_version
-      RETURN VARCHAR2
-   IS
-   BEGIN
-      RETURN g_sccsid;
-   END get_version;
+    FUNCTION get_version
+        RETURN VARCHAR2
+    IS
+    BEGIN
+        RETURN g_sccsid;
+    END get_version;
 
-   FUNCTION get_body_version
-      RETURN VARCHAR2
-   IS
-   BEGIN
-      RETURN g_body_sccsid;
-   END get_body_version;
+    FUNCTION get_body_version
+        RETURN VARCHAR2
+    IS
+    BEGIN
+        RETURN g_body_sccsid;
+    END get_body_version;
 
     FUNCTION get_dims (geom IN SDO_GEOMETRY)
         RETURN INTEGER
@@ -95,9 +95,10 @@ AS
         IF geom.sdo_gtype = 2005
         THEN
             SELECT CAST (
-                       COLLECT (geom_id (ROWNUM,
-                                         sdo_geometry (
-                                             2001,
+                       COLLECT (
+                           geom_id (
+                               ROWNUM,
+                               sdo_geometry (2001,
                                              geom.sdo_srid,
                                              NULL,
                                              sdo_elem_info_array (1, 1, 1),
@@ -106,7 +107,10 @@ AS
               INTO retval
               FROM (SELECT t.*
                       FROM TABLE (SDO_UTIL.getvertices (geom)) t);
-        ELSIF geom.sdo_gtype IN (3005, 3305, 3001, 3301)
+        ELSIF geom.sdo_gtype IN (3005,
+                                 3305,
+                                 3001,
+                                 3301)
         THEN
             SELECT CAST (
                        COLLECT (geom_id (ROWNUM,
@@ -293,27 +297,54 @@ AS
 
         RETURN retval;
     END;
-FUNCTION get_vertices_as_pts (geom IN SDO_GEOMETRY)
-    RETURN geom_id_tab
-IS
-    retval   geom_id_tab;
-    dims     INTEGER := nm_sdo_geom.get_dims (geom);
-BEGIN
-    SELECT CAST (
-               COLLECT (
-                   geom_id (
-                       t.id,
-                       sdo_geometry (
-                           CASE dims WHEN 2 THEN 2001 WHEN 3 THEN 3301 END,
-                           geom.sdo_srid,
-                           NULL,
-                           sdo_elem_info_array (1, 1, 1),
-                           sdo_ordinate_array (t.x, t.y, t.m))))
-                   AS geom_id_tab)
-      INTO retval
-      FROM TABLE (nm_sdo.get_vertices (geom)) t;
 
-    RETURN retval;
-END;    
+    FUNCTION get_vertices_as_pts (geom IN SDO_GEOMETRY)
+        RETURN geom_id_tab
+    IS
+        retval   geom_id_tab;
+        dims     INTEGER := nm_sdo_geom.get_dims (geom);
+    BEGIN
+        SELECT CAST (
+                   COLLECT (
+                       geom_id (
+                           t.id,
+                           sdo_geometry (
+                               CASE dims
+                                   WHEN 2 THEN 2001
+                                   WHEN 3 THEN 3301
+                               END,
+                               geom.sdo_srid,
+                               NULL,
+                               sdo_elem_info_array (1, 1, 1),
+                               sdo_ordinate_array (t.x, t.y, t.m))))
+                       AS geom_id_tab)
+          INTO retval
+          FROM TABLE (nm_sdo.get_vertices (geom)) t;
+
+        RETURN retval;
+    END;
+
+    FUNCTION is_geodetic (pi_srid IN INTEGER)
+        RETURN VARCHAR2
+    IS
+        retval    VARCHAR2 (10);
+        l_dummy   VARCHAR2 (6);
+    BEGIN
+        SELECT UPPER (SUBSTR (wktext, 1, 6))
+          INTO l_dummy
+          FROM mdsys.cs_srs
+         WHERE srid = pi_srid;
+
+        IF l_dummy = 'GEOGCS'
+        THEN
+            RETURN 'TRUE';
+        ELSE
+            RETURN 'FALSE';
+        END IF;
+    EXCEPTION
+        WHEN NO_DATA_FOUND
+        THEN
+            raise_application_error (-20001, 'Unknown SRID');
+    END;
 END;
 /
