@@ -1,45 +1,47 @@
 CREATE OR REPLACE PACKAGE nm_sdo_geom
 AS
---<PACKAGE>
-   --   PVCS Identifiers :-
-   --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm_sdo_geom.pkh-arc   1.0   Dec 13 2018 10:12:06   Rob.Coupe  $
-   --       Module Name      : $Workfile:   nm_sdo_geom.pkh  $
-   --       Date into PVCS   : $Date:   Dec 13 2018 10:12:06  $
-   --       Date fetched Out : $Modtime:   Dec 13 2018 10:01:56  $
-   --       PVCS Version     : $Revision:   1.0  $
-   --
-   --   Author : R.A. Coupe
-   --
-   --   Package for handling SDO LRS data
-   --
-   -----------------------------------------------------------------------------
-   -- Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
-   ----------------------------------------------------------------------------
-   -- The main purpose of this package is to replicate the functions inside the SDO_LRS package as
-   -- supplied under the MDSYS schema and licensed under the Oracle Spatial license on EE.
---</PACKAGE>
+    --<PACKAGE>
+    --   PVCS Identifiers :-
+    --
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm_sdo_geom.pkh-arc   1.1   Dec 18 2018 10:52:24   Rob.Coupe  $
+    --       Module Name      : $Workfile:   nm_sdo_geom.pkh  $
+    --       Date into PVCS   : $Date:   Dec 18 2018 10:52:24  $
+    --       Date fetched Out : $Modtime:   Dec 17 2018 23:18:50  $
+    --       PVCS Version     : $Revision:   1.1  $
+    --
+    --   Author : R.A. Coupe
+    --
+    --   Package for handling SDO LRS data
+    --
+    -----------------------------------------------------------------------------
+    -- Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
+    ----------------------------------------------------------------------------
+    -- The main purpose of this package is to replicate the functions inside the SDO_LRS package as
+    -- supplied under the MDSYS schema and licensed under the Oracle Spatial license on EE.
+    --</PACKAGE>
 
-   g_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.0  $';
+    g_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.1  $';
 
-   -----------------------------------------------------------------------------
-   --
-   --<PROC NAME="GET_VERSION">
-   --
-   -- This function returns the current PVCS version of the package
+    -----------------------------------------------------------------------------
+    --
+    --<PROC NAME="GET_VERSION">
+    --
+    -- This function returns the current PVCS version of the package
 
-   FUNCTION get_version
-      RETURN VARCHAR2;
-   --</PROC>
+    FUNCTION get_version
+        RETURN VARCHAR2;
 
-   -----------------------------------------------------------------------------
-   --
-   --<PROC NAME="GET_BODY_VERSION">
-   --
-   -- This function returns the current PVCS version of the package body
-   FUNCTION get_body_version
-      RETURN VARCHAR2;
-   --</PROC>
+    --</PROC>
+
+    -----------------------------------------------------------------------------
+    --
+    --<PROC NAME="GET_BODY_VERSION">
+    --
+    -- This function returns the current PVCS version of the package body
+    FUNCTION get_body_version
+        RETURN VARCHAR2;
+
+    --</PROC>
 
 
     FUNCTION get_dims (geom IN SDO_GEOMETRY)
@@ -67,5 +69,8 @@ AS
 
     FUNCTION get_vertices_as_pts (geom IN SDO_GEOMETRY)
         RETURN geom_id_tab;
+
+    FUNCTION is_geodetic (pi_srid IN INTEGER)
+        RETURN VARCHAR2;
 END;
 /
