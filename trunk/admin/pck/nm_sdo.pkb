@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm_sdo
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm_sdo.pkb-arc   1.3   Dec 14 2018 18:56:30   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm_sdo.pkb-arc   1.4   Dec 18 2018 10:50:54   Rob.Coupe  $
     --       Module Name      : $Workfile:   nm_sdo.pkb  $
-    --       Date into PVCS   : $Date:   Dec 14 2018 18:56:30  $
-    --       Date fetched Out : $Modtime:   Dec 14 2018 18:46:14  $
-    --       PVCS Version     : $Revision:   1.3  $
+    --       Date into PVCS   : $Date:   Dec 18 2018 10:50:54  $
+    --       Date fetched Out : $Modtime:   Dec 18 2018 08:49:40  $
+    --       PVCS Version     : $Revision:   1.4  $
     --
     --   Author : R.A. Coupe
     --
@@ -18,7 +18,7 @@ AS
     -- The main purpose of this package is to replicate the functions inside the SDO_LRS package as
     -- supplied under the MDSYS schema and licensed under the Oracle Spatial license on EE.
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.3  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.4  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'NM_SDO';
 
@@ -67,7 +67,7 @@ AS
         RETURN SDO_GEOMETRY;
 
 
-    FUNCTION clip (id              IN INTEGER,
+    FUNCTION clip_dbug (id              IN INTEGER,
                    geom            IN SDO_GEOMETRY,
                    start_measure   IN NUMBER,
                    end_measure     IN NUMBER)
@@ -186,7 +186,17 @@ AS
         check_count   INTEGER;
         sm            NUMBER := SDO_LRS.geom_segment_start_measure (geom);
         em            NUMBER := SDO_LRS.geom_segment_end_measure (geom);
+        l_tolerance   NUMBER; -- tolerance adjusted from XY unots to M units or meters
     BEGIN
+        l_tolerance := tolerance;
+        if geom.sdo_srid is not null then
+           if nm_sdo_geom.is_geodetic(geom.sdo_srid) = 'TRUE' then
+              NULL;
+           else
+              l_tolerance := tolerance * sdo_lrs.geom_segment_end_measure(geom)/ sdo_geom.sdo_length(geom);
+           end if;
+        end if;
+        
         IF start_measure = sm AND end_measure = em
         THEN
             retval := geom;
@@ -211,7 +221,9 @@ AS
                                       end_measure,
                                       MIN (rn) OVER (PARTITION BY 'A')
                                           min_rn,
-                                      tolerance,
+                                      MAX (rn ) OVER (PARTITION BY 'A')
+                                          max_rn,
+                                      l_tolerance,
                                       q1.*
                                  FROM (SELECT ROW_NUMBER () OVER (ORDER BY 1)
                                                   rn,
@@ -236,16 +248,17 @@ AS
                                                   m2
                                          FROM TABLE (geom.sdo_ordinates) t) q1
                                 WHERE     MOD (rn, 3) = 1 --and m2 is not null
-                                      AND m1 <= end_measure + tolerance
-                                      AND m2 >= start_measure - tolerance)
-                      --                      select r.* from ranges r
+                                      AND m1 <= end_measure + l_tolerance
+                                      AND m2 >= start_measure - l_tolerance)
+--                                            select r.* from ranges r
+--                                                                                        
                       SELECT rn, -- this will retrieve all vertices which are wholly between the two measures
                              x1     A,
                              y1     B,
                              m1     C
                         FROM ranges
-                       WHERE     m1 >= start_measure - tolerance
-                             AND m1 <= end_measure + tolerance
+                       WHERE     m1 >= start_measure - l_tolerance
+                             AND m1 <= end_measure + l_tolerance
                       UNION ALL
                       SELECT -1
                                  rn, -- this is where the start measure is between two vertices - interpolate the xy's
@@ -262,8 +275,8 @@ AS
                        WHERE     rn = min_rn
                              AND m1 < start_measure
                              AND m2 > start_measure
-                             AND ABS (m1 - start_measure) > tolerance
-                             AND ABS (m2 - start_measure) > tolerance
+                             AND ABS (m1 - start_measure) > l_tolerance
+                             AND ABS (m2 - start_measure) > l_tolerance
                       --                       and (abs(m1-greatest(start_measure, m1)) > tolerance )
                       UNION ALL
                       SELECT 99999
@@ -279,8 +292,9 @@ AS
                              LEAST (m2, end_measure)
                         FROM ranges
                        WHERE     m1 < end_measure
-                             AND m2 >= end_measure - tolerance
-                             AND rn = rc
+                             AND 
+                             m2 >= end_measure - l_tolerance
+                             AND rn = max_rn
                       ORDER BY rn)
                      UNPIVOT EXCLUDE NULLS (VALUE FOR ordinate IN (A, B, C))
             ORDER BY rn, ordinate;
@@ -301,7 +315,7 @@ AS
         RETURN retval;
     END;
 
-    FUNCTION clip (geom            IN SDO_GEOMETRY,
+    FUNCTION clip_l (geom            IN SDO_GEOMETRY,
                    geom_length     IN NUMBER,
                    start_measure   IN NUMBER,
                    end_measure     IN NUMBER)
@@ -1518,11 +1532,11 @@ AS
         RETURN retval;
     END;
 
-    FUNCTION merge (geom1 IN SDO_GEOMETRY, geom2 IN SDO_GEOMETRY)
+    FUNCTION merge (geom1 IN SDO_GEOMETRY, geom2 IN SDO_GEOMETRY, tolerance in NUMBER)
         RETURN SDO_GEOMETRY
     IS
         retval   SDO_GEOMETRY;
-        cnct     INTEGER := is_connected (geom1, geom2, 0.005);
+        cnct     INTEGER := is_connected (geom1, geom2, tolerance);
     BEGIN
         IF cnct = 11
         THEN
