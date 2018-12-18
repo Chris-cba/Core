@@ -3,11 +3,11 @@ AS
 --<PACKAGE>
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm_sdo.pkh-arc   1.1   Dec 14 2018 18:57:34   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm_sdo.pkh-arc   1.2   Dec 18 2018 10:51:26   Rob.Coupe  $
    --       Module Name      : $Workfile:   nm_sdo.pkh  $
-   --       Date into PVCS   : $Date:   Dec 14 2018 18:57:34  $
-   --       Date fetched Out : $Modtime:   Dec 14 2018 18:45:10  $
-   --       PVCS Version     : $Revision:   1.1  $
+   --       Date into PVCS   : $Date:   Dec 18 2018 10:51:26  $
+   --       Date fetched Out : $Modtime:   Dec 18 2018 08:49:46  $
+   --       PVCS Version     : $Revision:   1.2  $
    --
    --   Author : R.A. Coupe
    --
@@ -19,7 +19,7 @@ AS
    -- The main purpose of this package is to replicate the functions inside the SDO_LRS package as
    -- supplied under the MDSYS schema and licensed under the Oracle Spatial license on EE.
 --</PACKAGE>
-   g_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.1  $';
+   g_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.2  $';
 
    -----------------------------------------------------------------------------
    --
@@ -40,7 +40,7 @@ AS
       RETURN VARCHAR2;
    --</PROC>
 
-    FUNCTION clip (id              IN INTEGER,
+    FUNCTION clip_dbug(id              IN INTEGER,
                    geom            IN SDO_GEOMETRY,
                    start_measure   IN NUMBER,
                    end_measure     IN NUMBER)
@@ -56,7 +56,7 @@ AS
         DETERMINISTIC
         PARALLEL_ENABLE;
 
-    FUNCTION clip (geom            IN SDO_GEOMETRY,
+    FUNCTION clip_l (geom            IN SDO_GEOMETRY,
                    geom_length     IN NUMBER,
                    start_measure   IN NUMBER,
                    end_measure     IN NUMBER)
@@ -187,7 +187,7 @@ AS
                           connected   IN VARCHAR2 DEFAULT 'TRUE')
         RETURN SDO_GEOMETRY;
 
-    FUNCTION merge (geom1 IN SDO_GEOMETRY, geom2 IN SDO_GEOMETRY)
+    FUNCTION merge (geom1 IN SDO_GEOMETRY, geom2 IN SDO_GEOMETRY, tolerance in NUMBER)
         RETURN SDO_GEOMETRY;
 
     FUNCTION get_measure_array (lr_geom IN SDO_GEOMETRY, pts IN SDO_GEOMETRY)
