@@ -1,10 +1,10 @@
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/eB_interface/install_eB_interface.sql-arc   1.5   Aug 11 2017 15:17:44   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/eB_interface/install_eB_interface.sql-arc   1.6   Dec 19 2018 10:46:28   Chris.Baugh  $
    --       Module Name      : $Workfile:   install_eB_interface.sql  $
-   --       Date into PVCS   : $Date:   Aug 11 2017 15:17:44  $
-   --       Date fetched Out : $Modtime:   Aug 11 2017 15:17:10  $
-   --       PVCS Version     : $Revision:   1.5  $
+   --       Date into PVCS   : $Date:   Dec 19 2018 10:46:28  $
+   --       Date fetched Out : $Modtime:   Dec 19 2018 10:45:40  $
+   --       PVCS Version     : $Revision:   1.6  $
    --
    --   Author : R.A. Coupe
    --
@@ -141,15 +141,6 @@ PROMPT GetNetworkLinearLocationsTab.fnc
 SET TERM OFF
 SET DEFINE ON
 SELECT '&exor_base'||'lb'||'&terminator'||'admin'||'&terminator'||'eB_interface'||'&terminator'||'GetNetworkLinearLocationsTab.fnc' run_file 
-FROM dual
-/
-start '&run_file'
-
-SET TERM ON
-PROMPT lb_register_units.sql                                                                                                                                                                                                          
-SET TERM OFF
-SET DEFINE ON
-SELECT '&exor_base'||'lb'||'&terminator'||'admin'||'&terminator'||'eB_interface'||'&terminator'||'lb_register_units.sql' run_file 
 FROM dual
 /
 start '&run_file'
