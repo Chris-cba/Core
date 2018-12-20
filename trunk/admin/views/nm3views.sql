@@ -1676,14 +1676,214 @@ SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'views'||'&te
 FROM dual 
 / 
 start '&run_file'
---
+
 ----------------------------------------------------------------------------------------- 
---
-SET TERM ON 
-PROMPT v_contiguity_check.vw 
+-- Location Bridge views
+----------------------------------------------------------------------------------------- 
+
+SET TERM ON
+PROMPT v_nm_nlt_data.vw                                                                                                                                                                                                                    
 SET TERM OFF
-SET DEFINE ON 
-SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'views'||'&terminator'||'v_contiguity_check.vw .vw ' run_file 
-FROM dual 
-/ 
+SET DEFINE ON
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'views'||'&terminator'||'v_nm_nlt_data.vw' run_file 
+FROM dual
+/
+start '&run_file'
+
+SET TERM ON
+PROMPT v_lb_networkTypes.vw                                                                                                                                                                                                                    
+SET TERM OFF
+SET DEFINE ON
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'views'||'&terminator'||'v_lb_networkTypes.vw' run_file 
+FROM dual
+/
+start '&run_file'
+
+SET TERM ON
+PROMPT v_nm_nlt_unit_conversions.vw                                                                                                                                                                                                                    
+SET TERM OFF
+SET DEFINE ON
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'views'||'&terminator'||'v_nm_nlt_unit_conversions.vw' run_file 
+FROM dual
+/
+start '&run_file'
+
+SET TERM ON
+PROMPT v_nm_nlt_refnts.vw                                                                                                                                                                                                                    
+SET TERM OFF
+SET DEFINE ON
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'views'||'&terminator'||'v_nm_nlt_refnts.vw' run_file 
+FROM dual
+/
+start '&run_file'
+
+SET TERM ON
+PROMPT v_lb_nlt_refnts.vw                                                                                                                                                                                                                    
+SET TERM OFF
+SET DEFINE ON
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'views'||'&terminator'||'v_lb_nlt_refnts.vw' run_file 
+FROM dual
+/
+start '&run_file'
+
+SET TERM ON
+PROMPT v_nm_nlt_measures.vw                                                                                                                                                                                                                    
+SET TERM OFF
+SET DEFINE ON
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'views'||'&terminator'||'v_nm_nlt_measures.vw' run_file 
+FROM dual
+/
+start '&run_file'
+
+SET TERM ON
+PROMPT nm_asset_locations.vw                                                                                                                                                                                                                    
+SET TERM OFF
+SET DEFINE ON
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'views'||'&terminator'||'nm_asset_locations.vw' run_file 
+FROM dual
+/
+start '&run_file'
+
+SET TERM ON
+PROMPT nm_locations.vw                                                                                                                                                                                                                    
+SET TERM OFF
+SET DEFINE ON
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'views'||'&terminator'||'nm_locations.vw' run_file 
+FROM dual
+/
+start '&run_file'
+
+SET TERM ON
+PROMPT nm_locations_full.vw                                                                                                                                                                                                                    
+SET TERM OFF
+SET DEFINE ON
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'views'||'&terminator'||'nm_locations_full.vw' run_file 
+FROM dual
+/
+start '&run_file'
+
+SET TERM ON
+PROMPT v_lb_inv_nlt_data.vw                                                                                                                                                                                                                    
+SET TERM OFF
+SET DEFINE ON
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'views'||'&terminator'||'v_lb_inv_nlt_data.vw' run_file 
+FROM dual
+/
+start '&run_file'
+
+SET TERM ON
+PROMPT v_lb_xsp_list.vw                                                                                                                                                                                                                    
+SET TERM OFF
+SET DEFINE ON
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'views'||'&terminator'||'v_lb_xsp_list.vw' run_file 
+FROM dual
+/
+start '&run_file'
+
+SET TERM ON
+PROMPT v_lb_path_links.vw                                                                                                                                                                                                                    
+SET TERM OFF
+SET DEFINE ON
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'views'||'&terminator'||'v_lb_path_links.vw' run_file 
+FROM dual
+/
+start '&run_file'
+
+SET TERM ON
+PROMPT v_lb_directed_path_links.vw                                                                                                                                                                                                                    
+SET TERM OFF
+SET DEFINE ON
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'views'||'&terminator'||'v_lb_directed_path_links.vw' run_file 
+FROM dual
+/
+start '&run_file'
+
+SET TERM ON
+PROMPT V_LB_PATH_BETWEEN_POINTS.vw                                                                                                                                                                                                                  
+SET TERM OFF
+SET DEFINE ON
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'views'||'&terminator'||'V_LB_PATH_BETWEEN_POINTS.vw' run_file 
+FROM dual
+/
+start '&run_file'
+
+SET TERM ON
+PROMPT v_nm_inv_on_network.vw                                                                                                                                                                                                                
+SET TERM OFF
+SET DEFINE ON
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'views'||'&terminator'||'v_nm_inv_on_network.vw' run_file 
+FROM dual
+/
+start '&run_file'
+
+SET TERM ON
+PROMPT v_nm_datum_themes.vw                                                                                                                                                                                                              
+SET TERM OFF
+SET DEFINE ON
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'views'||'&terminator'||'v_nm_datum_themes.vw' run_file 
+FROM dual
+/
+start '&run_file'
+
+SET TERM ON
+PROMPT v_nm_element_xsp_rvrs.vw                                                                                                                                                                                                                
+SET TERM OFF
+SET DEFINE ON
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'views'||'&terminator'||'v_nm_element_xsp_rvrs.vw' run_file 
+FROM dual
+/
+start '&run_file'
+
+SET TERM ON
+PROMPT v_nm_element_xsp.vw                                                                                                                                                                                                                
+SET TERM OFF
+SET DEFINE ON
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'views'||'&terminator'||'v_nm_element_xsp.vw' run_file 
+FROM dual
+/
+start '&run_file'
+
+SET TERM ON
+PROMPT v_nlt_element_xsps.vw                                                                                                                                                                                                                
+SET TERM OFF
+SET DEFINE ON
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'views'||'&terminator'||'v_nlt_element_xsps.vw' run_file 
+FROM dual
+/
+start '&run_file'
+
+SET TERM ON
+PROMPT v_nlt_xsp_rvrs.vw                                                                                                                                                                                                                
+SET TERM OFF
+SET DEFINE ON
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'views'||'&terminator'||'v_nlt_xsp_rvrs.vw' run_file 
+FROM dual
+/
+start '&run_file'
+
+SET TERM ON
+PROMPT v_nlt_xsps.vw                                                                                                                                                                                                                
+SET TERM OFF
+SET DEFINE ON
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'views'||'&terminator'||'v_nlt_xsps.vw' run_file 
+FROM dual
+/
+start '&run_file'
+
+SET TERM ON
+PROMPT v_lb_type_nw_flags.vw                                                                                                                                                                                                                
+SET TERM OFF
+SET DEFINE ON
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'views'||'&terminator'||'v_lb_type_nw_flags.vw' run_file 
+FROM dual
+/
+start '&run_file'
+
+SET TERM ON
+PROMPT nm_asset_geometry.vw                                                                                                                                                                                                                
+SET TERM OFF
+SET DEFINE ON
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'views'||'&terminator'||'nm_asset_geometry.vw' run_file 
+FROM dual
+/
 start '&run_file'
