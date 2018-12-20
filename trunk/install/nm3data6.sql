@@ -1,13 +1,13 @@
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm3data6.sql-arc   2.17   May 17 2018 16:16:42   Chris.Baugh  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm3data6.sql-arc   2.18   Dec 20 2018 16:22:18   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm3data6.sql  $
---       Date into PVCS   : $Date:   May 17 2018 16:16:42  $
---       Date fetched Out : $Modtime:   May 17 2018 15:22:28  $
---       Version          : $Revision:   2.17  $
+--       Date into PVCS   : $Date:   Dec 20 2018 16:22:18  $
+--       Date fetched Out : $Modtime:   Dec 18 2018 11:04:44  $
+--       Version          : $Revision:   2.18  $
 --       Table Owner      : NM3_METADATA
---       Generation Date  : 17-MAY-2018 15:22
+--       Generation Date  : 18-DEC-2018 11:04
 --
 --   Product metadata script
 --   As at Release 4.7.1.0
@@ -32,6 +32,7 @@
 --   NM_FILL_PATTERNS
 --   NM_VISUAL_ATTRIBUTES
 --   NM_AU_TYPES
+--   LB_UNITS
 --
 -----------------------------------------------------------------------------
 --
@@ -103,7 +104,7 @@ INSERT
       ,UN_FORMAT_MASK)
 SELECT 1
       ,1
-      ,'Metres'
+      ,'Meter'
       ,'999999999990.000'
   FROM DUAL
  WHERE NOT EXISTS(SELECT 1
@@ -118,7 +119,7 @@ INSERT
       ,UN_FORMAT_MASK)
 SELECT 1
       ,2
-      ,'Kilometers'
+      ,'Kilometer'
       ,'99999990.000'
   FROM DUAL
  WHERE NOT EXISTS(SELECT 1
@@ -133,7 +134,7 @@ INSERT
       ,UN_FORMAT_MASK)
 SELECT 1
       ,3
-      ,'Centimetres'
+      ,'Centimeter'
       ,'99999999999999990'
   FROM DUAL
  WHERE NOT EXISTS(SELECT 1
@@ -148,7 +149,7 @@ INSERT
       ,UN_FORMAT_MASK)
 SELECT 1
       ,4
-      ,'Miles'
+      ,'Mile'
       ,'9990.00'
   FROM DUAL
  WHERE NOT EXISTS(SELECT 1
@@ -196,6 +197,24 @@ SELECT 2
 SET TERM ON
 PROMPT nm_unit_conversions
 SET TERM OFF
+--
+INSERT
+  INTO NM_UNIT_CONVERSIONS
+      (UC_UNIT_ID_IN
+      ,UC_UNIT_ID_OUT
+      ,UC_FUNCTION
+      ,UC_CONVERSION
+      ,UC_CONVERSION_FACTOR)
+SELECT 1
+      ,1
+      ,'NULL_CONVERSION'
+      ,'CREATE OR REPLACE FUNCTION NULL_CONVERSION ( UNITSIN IN NUMBER )RETURN NUMBER IS RETVAL NUMBER; BEGIN   RETVAL := UNITSIN;   RETURN RETVAL; END;'
+      ,1
+  FROM DUAL
+ WHERE NOT EXISTS(SELECT 1
+                    FROM NM_UNIT_CONVERSIONS
+                   WHERE UC_UNIT_ID_IN = 1
+                     AND UC_UNIT_ID_OUT = 1);
 --
 INSERT
   INTO NM_UNIT_CONVERSIONS
@@ -277,6 +296,24 @@ INSERT
       ,UC_CONVERSION
       ,UC_CONVERSION_FACTOR)
 SELECT 2
+      ,2
+      ,'NULL_CONVERSION'
+      ,'CREATE OR REPLACE FUNCTION NULL_CONVERSION ( UNITSIN IN NUMBER )RETURN NUMBER IS RETVAL NUMBER; BEGIN   RETVAL := UNITSIN;   RETURN RETVAL; END;'
+      ,1
+  FROM DUAL
+ WHERE NOT EXISTS(SELECT 1
+                    FROM NM_UNIT_CONVERSIONS
+                   WHERE UC_UNIT_ID_IN = 2
+                     AND UC_UNIT_ID_OUT = 2);
+--
+INSERT
+  INTO NM_UNIT_CONVERSIONS
+      (UC_UNIT_ID_IN
+      ,UC_UNIT_ID_OUT
+      ,UC_FUNCTION
+      ,UC_CONVERSION
+      ,UC_CONVERSION_FACTOR)
+SELECT 2
       ,3
       ,'KM_TO_CM'
       ,'CREATE OR REPLACE FUNCTION KM_TO_CM'||CHR(10)||'        (UNITSIN IN NUMBER) RETURN NUMBER IS'||CHR(10)||'BEGIN'||CHR(10)||'   RETURN UNITSIN*100000;'||CHR(10)||'END KM_TO_CM;'
@@ -340,6 +377,24 @@ SELECT 3
                     FROM NM_UNIT_CONVERSIONS
                    WHERE UC_UNIT_ID_IN = 3
                      AND UC_UNIT_ID_OUT = 2);
+--
+INSERT
+  INTO NM_UNIT_CONVERSIONS
+      (UC_UNIT_ID_IN
+      ,UC_UNIT_ID_OUT
+      ,UC_FUNCTION
+      ,UC_CONVERSION
+      ,UC_CONVERSION_FACTOR)
+SELECT 3
+      ,3
+      ,'NULL_CONVERSION'
+      ,'CREATE OR REPLACE FUNCTION NULL_CONVERSION ( UNITSIN IN NUMBER )RETURN NUMBER IS RETVAL NUMBER; BEGIN   RETVAL := UNITSIN;   RETURN RETVAL; END;'
+      ,1
+  FROM DUAL
+ WHERE NOT EXISTS(SELECT 1
+                    FROM NM_UNIT_CONVERSIONS
+                   WHERE UC_UNIT_ID_IN = 3
+                     AND UC_UNIT_ID_OUT = 3);
 --
 INSERT
   INTO NM_UNIT_CONVERSIONS
@@ -420,6 +475,42 @@ INSERT
       ,UC_FUNCTION
       ,UC_CONVERSION
       ,UC_CONVERSION_FACTOR)
+SELECT 4
+      ,4
+      ,'NULL_CONVERSION'
+      ,'CREATE OR REPLACE FUNCTION NULL_CONVERSION ( UNITSIN IN NUMBER )RETURN NUMBER IS RETVAL NUMBER; BEGIN   RETVAL := UNITSIN;   RETURN RETVAL; END;'
+      ,1
+  FROM DUAL
+ WHERE NOT EXISTS(SELECT 1
+                    FROM NM_UNIT_CONVERSIONS
+                   WHERE UC_UNIT_ID_IN = 4
+                     AND UC_UNIT_ID_OUT = 4);
+--
+INSERT
+  INTO NM_UNIT_CONVERSIONS
+      (UC_UNIT_ID_IN
+      ,UC_UNIT_ID_OUT
+      ,UC_FUNCTION
+      ,UC_CONVERSION
+      ,UC_CONVERSION_FACTOR)
+SELECT 5
+      ,5
+      ,'NULL_CONVERSION'
+      ,'CREATE OR REPLACE FUNCTION NULL_CONVERSION ( UNITSIN IN NUMBER )RETURN NUMBER IS RETVAL NUMBER; BEGIN   RETVAL := UNITSIN;   RETURN RETVAL; END;'
+      ,1
+  FROM DUAL
+ WHERE NOT EXISTS(SELECT 1
+                    FROM NM_UNIT_CONVERSIONS
+                   WHERE UC_UNIT_ID_IN = 5
+                     AND UC_UNIT_ID_OUT = 5);
+--
+INSERT
+  INTO NM_UNIT_CONVERSIONS
+      (UC_UNIT_ID_IN
+      ,UC_UNIT_ID_OUT
+      ,UC_FUNCTION
+      ,UC_CONVERSION
+      ,UC_CONVERSION_FACTOR)
 SELECT 5
       ,6
       ,'DEG_TO_RADS'
@@ -448,6 +539,24 @@ SELECT 6
                     FROM NM_UNIT_CONVERSIONS
                    WHERE UC_UNIT_ID_IN = 6
                      AND UC_UNIT_ID_OUT = 5);
+--
+INSERT
+  INTO NM_UNIT_CONVERSIONS
+      (UC_UNIT_ID_IN
+      ,UC_UNIT_ID_OUT
+      ,UC_FUNCTION
+      ,UC_CONVERSION
+      ,UC_CONVERSION_FACTOR)
+SELECT 6
+      ,6
+      ,'NULL_CONVERSION'
+      ,'CREATE OR REPLACE FUNCTION NULL_CONVERSION ( UNITSIN IN NUMBER )RETURN NUMBER IS RETVAL NUMBER; BEGIN   RETVAL := UNITSIN;   RETURN RETVAL; END;'
+      ,1
+  FROM DUAL
+ WHERE NOT EXISTS(SELECT 1
+                    FROM NM_UNIT_CONVERSIONS
+                   WHERE UC_UNIT_ID_IN = 6
+                     AND UC_UNIT_ID_OUT = 6);
 --
 ----------------------------------------------------------------------------------------
 -- COLOURS
@@ -2653,6 +2762,17 @@ SELECT 'I'
  WHERE NOT EXISTS(SELECT 1
                     FROM NM_INV_CATEGORIES
                    WHERE NIC_CATEGORY = 'I');
+--
+INSERT
+  INTO NM_INV_CATEGORIES
+      (NIC_CATEGORY
+      ,NIC_DESCR)
+SELECT 'L'
+      ,'Location Bridge'
+  FROM DUAL
+ WHERE NOT EXISTS(SELECT 1
+                    FROM NM_INV_CATEGORIES
+                   WHERE NIC_CATEGORY = 'L');
 --
 INSERT
   INTO NM_INV_CATEGORIES
@@ -6591,6 +6711,119 @@ SELECT 'NETW'
  WHERE NOT EXISTS(SELECT 1
                     FROM NM_AU_TYPES
                    WHERE NAT_ADMIN_TYPE = 'NETW');
+--
+INSERT
+  INTO NM_AU_TYPES
+      (NAT_ADMIN_TYPE
+      ,NAT_DESCR
+      ,NAT_DATE_CREATED
+      ,NAT_DATE_MODIFIED
+      ,NAT_MODIFIED_BY
+      ,NAT_CREATED_BY)
+SELECT 'NONE'
+      ,'No Admin-Unit Security'
+      ,to_date('20181218095058','YYYYMMDDHH24MISS')
+      ,to_date('20181218095058','YYYYMMDDHH24MISS')
+      ,'NM3_METADATA'
+      ,'NM3_METADATA'
+  FROM DUAL
+ WHERE NOT EXISTS(SELECT 1
+                    FROM NM_AU_TYPES
+                   WHERE NAT_ADMIN_TYPE = 'NONE');
+--
+----------------------------------------------------------------------------------------
+-- LB_UNITS
+--
+-- WARNING - TABLE DOES NOT HAVE A UNIQUE KEY
+--
+----------------------------------------------------------------------------------------
+SET TERM ON
+PROMPT lb_units
+SET TERM OFF
+--
+INSERT
+  INTO LB_UNITS
+      (EXTERNAL_UNIT_ID
+      ,EXTERNAL_UNIT_NAME
+      ,EXOR_UNIT_ID
+      ,EXOR_UNIT_NAME)
+SELECT 50
+      ,'METRE'
+      ,1
+      ,'Meter'
+  FROM DUAL
+ WHERE NOT EXISTS(SELECT 1
+                    FROM LB_UNITS);
+--
+INSERT
+  INTO LB_UNITS
+      (EXTERNAL_UNIT_ID
+      ,EXTERNAL_UNIT_NAME
+      ,EXOR_UNIT_ID
+      ,EXOR_UNIT_NAME)
+SELECT 236
+      ,'KILOMETRE'
+      ,2
+      ,'Kilometer'
+  FROM DUAL
+ WHERE NOT EXISTS(SELECT 1
+                    FROM LB_UNITS);
+--
+INSERT
+  INTO LB_UNITS
+      (EXTERNAL_UNIT_ID
+      ,EXTERNAL_UNIT_NAME
+      ,EXOR_UNIT_ID
+      ,EXOR_UNIT_NAME)
+SELECT 51
+      ,'CENTIMETRE'
+      ,3
+      ,'Centimeter'
+  FROM DUAL
+ WHERE NOT EXISTS(SELECT 1
+                    FROM LB_UNITS);
+--
+INSERT
+  INTO LB_UNITS
+      (EXTERNAL_UNIT_ID
+      ,EXTERNAL_UNIT_NAME
+      ,EXOR_UNIT_ID
+      ,EXOR_UNIT_NAME)
+SELECT 321
+      ,'MILE'
+      ,4
+      ,'Mile'
+  FROM DUAL
+ WHERE NOT EXISTS(SELECT 1
+                    FROM LB_UNITS);
+--
+INSERT
+  INTO LB_UNITS
+      (EXTERNAL_UNIT_ID
+      ,EXTERNAL_UNIT_NAME
+      ,EXOR_UNIT_ID
+      ,EXOR_UNIT_NAME)
+SELECT 77
+      ,'DEGREE'
+      ,5
+      ,'Degrees'
+  FROM DUAL
+ WHERE NOT EXISTS(SELECT 1
+                    FROM LB_UNITS);
+--
+INSERT
+  INTO LB_UNITS
+      (EXTERNAL_UNIT_ID
+      ,EXTERNAL_UNIT_NAME
+      ,EXOR_UNIT_ID
+      ,EXOR_UNIT_NAME)
+SELECT 13
+      ,'RADIAN'
+      ,6
+      ,'Radians'
+  FROM DUAL
+ WHERE NOT EXISTS(SELECT 1
+                    FROM LB_UNITS);
 --
 ----------------------------------------------------------------------------------------
 --
