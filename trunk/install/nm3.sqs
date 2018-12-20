@@ -1,16 +1,6 @@
---------------------------------------------------------------------------------
---   PVCS Identifiers :-
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/nm3.sqs-arc   2.16   May 17 2018 16:16:34   Chris.Baugh  $
---       Module Name      : $Workfile:   nm3.sqs  $
---       Date into PVCS   : $Date:   May 17 2018 16:16:34  $
---       Date fetched Out : $Modtime:   May 17 2018 15:19:20  $
---       PVCS Version     : $Revision:   2.16  $
+-- C:\clbtemp\nm3.sqs
 --
------------------------------------------------------------------------------
---    Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
------------------------------------------------------------------------------
---
--- Generated for Oracle 10g on Thu May 17  15:07:48 2018 by Server Generator 10.1.2.9.28
+-- Generated for Oracle 10g on Thu Dec 13  14:48:14 2018 by Server Generator 10.1.2.9.28
  
 PROMPT Creating Sequence 'BATCH_ID_SEQ'
 CREATE SEQUENCE BATCH_ID_SEQ
@@ -407,7 +397,7 @@ CREATE SEQUENCE HIG_ROUTER_PARAMS_SEQ
  NOMAXVALUE
  NOMINVALUE
  NOCYCLE
- CACHE 20
+ NOCACHE
 /
 
 PROMPT Creating Sequence 'HMLC_ID_SEQ'
@@ -519,6 +509,14 @@ CREATE SEQUENCE ITD_BAND_SEQ_SEQ
  NOCACHE
 /
 
+PROMPT Creating Sequence 'LB_TRANSACTION_ID_SEQ'
+CREATE SEQUENCE LB_TRANSACTION_ID_SEQ
+ START WITH 1
+ NOMAXVALUE
+ NOMINVALUE
+ NOCYCLE
+/
+
 PROMPT Creating Sequence 'MUH_ID_SEQ'
 CREATE SEQUENCE MUH_ID_SEQ
  NOMAXVALUE
@@ -548,6 +546,30 @@ CREATE SEQUENCE NAD_ID_SEQ
  NOMINVALUE
  NOCYCLE
  NOCACHE
+/
+
+PROMPT Creating Sequence 'NAG_ID_SEQ'
+CREATE SEQUENCE NAG_ID_SEQ
+ START WITH 1
+ NOMAXVALUE
+ NOMINVALUE
+ NOCYCLE
+/
+
+PROMPT Creating Sequence 'NAJX_ID_SEQ'
+CREATE SEQUENCE NAJX_ID_SEQ
+ START WITH 1
+ NOMAXVALUE
+ NOMINVALUE
+ NOCYCLE
+/
+
+PROMPT Creating Sequence 'NAL_ID_SEQ'
+CREATE SEQUENCE NAL_ID_SEQ
+ START WITH 1
+ NOMAXVALUE
+ NOMINVALUE
+ NOCYCLE
 /
 
 PROMPT Creating Sequence 'NAL_SEQ'
@@ -695,6 +717,22 @@ CREATE SEQUENCE NJO_ID_SEQ
  NOCACHE
 /
 
+PROMPT Creating Sequence 'NJXT_ID_SEQ'
+CREATE SEQUENCE NJXT_ID_SEQ
+ START WITH 1
+ NOMAXVALUE
+ NOMINVALUE
+ NOCYCLE
+/
+
+PROMPT Creating Sequence 'NJX_ID_SEQ'
+CREATE SEQUENCE NJX_ID_SEQ
+ START WITH 1
+ NOMAXVALUE
+ NOMINVALUE
+ NOCYCLE
+/
+
 PROMPT Creating Sequence 'NLD_ID_SEQ'
 CREATE SEQUENCE NLD_ID_SEQ
  INCREMENT BY 1
@@ -713,6 +751,14 @@ CREATE SEQUENCE NLF_ID_SEQ
  MINVALUE 1
  NOCYCLE
  CACHE 20
+/
+
+PROMPT Creating Sequence 'NLG_ID_SEQ'
+CREATE SEQUENCE NLG_ID_SEQ
+ START WITH 1
+ NOMAXVALUE
+ NOMINVALUE
+ NOCYCLE
 /
 
 PROMPT Creating Sequence 'NLS_SET_ID_SEQ'
@@ -849,6 +895,14 @@ CREATE SEQUENCE NM_DB_SEQ
  NOMINVALUE
  NOCYCLE
  NOCACHE
+/
+
+PROMPT Creating Sequence 'NM_LOC_ID_SEQ'
+CREATE SEQUENCE NM_LOC_ID_SEQ
+ START WITH 1
+ NOMAXVALUE
+ NOMINVALUE
+ NOCYCLE
 /
 
 PROMPT Creating Sequence 'NM_MRG_QUERY_STAGING_SEQ'
