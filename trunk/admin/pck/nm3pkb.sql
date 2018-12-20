@@ -2,11 +2,11 @@
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3pkb.sql-arc   2.51   Jun 15 2018 11:23:48   Chris.Baugh  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3pkb.sql-arc   2.52   Dec 20 2018 14:46:06   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm3pkb.sql  $
---       Date into PVCS   : $Date:   Jun 15 2018 11:23:48  $
---       Date fetched Out : $Modtime:   Jun 15 2018 11:22:34  $
---       PVCS Version     : $Revision:   2.51  $
+--       Date into PVCS   : $Date:   Dec 20 2018 14:46:06  $
+--       Date fetched Out : $Modtime:   Dec 19 2018 09:29:30  $
+--       PVCS Version     : $Revision:   2.52  $
 --
 --
 --   Author : Graeme Johnson
@@ -2451,6 +2451,143 @@ SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'pck'||'&term
 FROM dual 
 / 
 start '&run_file'
+--
+----------------------------------------------------------------------------------------- 
+--
+SET TERM ON 
+PROMPT nm_sdo.pkw
+SET TERM OFF
+SET DEFINE ON 
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'pck'||'&terminator'||'nm_sdo.pkw' run_file
+FROM dual 
+/ 
+start '&run_file'
+--
+----------------------------------------------------------------------------------------- 
+--
+SET TERM ON 
+PROMPT nm_sdo_geom.pkw
+SET TERM OFF
+SET DEFINE ON 
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'pck'||'&terminator'||'nm_sdo_geom.pkw' run_file
+FROM dual 
+/ 
+start '&run_file'
+--
+----------------------------------------------------------------------------------------- 
+--
+SET TERM ON 
+PROMPT sdo_lrs.pkw
+SET TERM OFF
+SET DEFINE ON 
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'pck'||'&terminator'||'sdo_lrs.pkw' run_file
+FROM dual 
+/ 
+start '&run_file'
+
+SET TERM ON
+PROMPT lb_ops.pkw                                                                                                                                                                                                                    
+SET TERM OFF
+SET DEFINE ON
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'pck'||'&terminator'||'lb_ops.pkw' run_file 
+FROM dual
+/
+start '&run_file'
+
+
+SET TERM ON
+PROMPT lb_ref.pkw                                                                                                                                                                                                                    
+SET TERM OFF
+SET DEFINE ON
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'pck'||'&terminator'||'lb_ref.pkw' run_file 
+FROM dual
+/
+start '&run_file'
+
+SET TERM ON
+PROMPT lb_ref.pkw                                                                                                                                                                                                                    
+SET TERM OFF
+SET DEFINE ON
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'pck'||'&terminator'||'lb_reg.pkw' run_file 
+FROM dual
+/
+start '&run_file'
+
+SET TERM ON
+PROMPT lb_path.pkw                                                                                                                                                                                                                    
+SET TERM OFF
+SET DEFINE ON
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'pck'||'&terminator'||'lb_path.pkw' run_file 
+FROM dual
+/
+start '&run_file'
+
+SET TERM ON
+PROMPT lb_path_reg.pkw                                                                                                                                                                                                                    
+SET TERM OFF
+SET DEFINE ON
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'pck'||'&terminator'||'lb_path_reg.pkw' run_file 
+FROM dual
+/
+start '&run_file'
+
+SET TERM ON
+PROMPT lb_get.pkw                                                                                                                                                                                                                 
+SET TERM OFF
+SET DEFINE ON
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'pck'||'&terminator'||'lb_get.pkw' run_file 
+FROM dual
+/
+start '&run_file'
+
+SET TERM ON
+PROMPT lb_load.pkw
+SET TERM OFF
+SET DEFINE ON
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'pck'||'&terminator'||'lb_load.pkw' run_file 
+FROM dual
+/
+start '&run_file'
+
+
+SET TERM ON
+PROMPT lb_loc.pkw                                                                                                                                                                                                                    
+SET TERM OFF
+SET DEFINE ON
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'pck'||'&terminator'||'lb_loc.pkw' run_file 
+FROM dual
+/
+start '&run_file'
+
+SET TERM ON
+PROMPT lb_net_code.pkw                                                                                                                                                                                                                    
+SET TERM OFF
+SET DEFINE ON
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'pck'||'&terminator'||'lb_net_code.pkw' run_file 
+FROM dual
+/
+start '&run_file'
+
+SET TERM ON
+PROMPT lb_nw_edit.pkw                                                                                                                                                                                                                    
+SET TERM OFF
+SET DEFINE ON
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'pck'||'&terminator'||'lb_nw_edit.pkw' run_file 
+FROM dual
+/
+start '&run_file'
+
+SET TERM ON
+PROMPT lb_aggr.pkw                                                                                                                                                                                                                    
+SET TERM OFF
+SET DEFINE ON
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'pck'||'&terminator'||'lb_aggr.pkw' run_file 
+FROM dual
+/
+start '&run_file'
+
+
+
 --
 ----------------------------------------------------------------------------------------- 
 --
