@@ -1,13 +1,13 @@
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm3data1.sql-arc   2.62   May 30 2018 10:38:34   Chris.Baugh  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm3data1.sql-arc   2.63   Dec 20 2018 16:24:54   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm3data1.sql  $
---       Date into PVCS   : $Date:   May 30 2018 10:38:34  $
---       Date fetched Out : $Modtime:   May 30 2018 10:33:30  $
---       Version          : $Revision:   2.62  $
+--       Date into PVCS   : $Date:   Dec 20 2018 16:24:54  $
+--       Date fetched Out : $Modtime:   Dec 18 2018 09:30:54  $
+--       Version          : $Revision:   2.63  $
 --       Table Owner      : NM3_METADATA
---       Generation Date  : 30-MAY-2018 10:33
+--       Generation Date  : 18-DEC-2018 09:30
 --
 --   Product metadata script
 --   As at Release 4.7.1.0
@@ -35631,6 +35631,31 @@ INSERT
       ,HOL_MIXED_CASE
       ,HOL_USER_OPTION
       ,HOL_MAX_LENGTH)
+SELECT 'DEFSSO'
+      ,'HIG'
+      ,'User SSO Default'
+      ,'This defines whether new users are defined as Single Sign-On users as default.'
+      ,'Y_OR_N'
+      ,'VARCHAR2'
+      ,'N'
+      ,'N'
+      ,1
+  FROM DUAL
+ WHERE NOT EXISTS(SELECT 1
+                    FROM HIG_OPTION_LIST
+                   WHERE HOL_ID = 'DEFSSO');
+--
+INSERT
+  INTO HIG_OPTION_LIST
+      (HOL_ID
+      ,HOL_PRODUCT
+      ,HOL_NAME
+      ,HOL_REMARKS
+      ,HOL_DOMAIN
+      ,HOL_DATATYPE
+      ,HOL_MIXED_CASE
+      ,HOL_USER_OPTION
+      ,HOL_MAX_LENGTH)
 SELECT 'DEFUNITID'
       ,'HIG'
       ,'Default Unit Identifier'
@@ -36819,6 +36844,31 @@ SELECT 'JPRIVLEVEL'
  WHERE NOT EXISTS(SELECT 1
                     FROM HIG_OPTION_LIST
                    WHERE HOL_ID = 'JPRIVLEVEL');
+--
+INSERT
+  INTO HIG_OPTION_LIST
+      (HOL_ID
+      ,HOL_PRODUCT
+      ,HOL_NAME
+      ,HOL_REMARKS
+      ,HOL_DOMAIN
+      ,HOL_DATATYPE
+      ,HOL_MIXED_CASE
+      ,HOL_USER_OPTION
+      ,HOL_MAX_LENGTH)
+SELECT 'LBNWBUFFER'
+      ,'NET'
+      ,'LB Graph Buffer'
+      ,'The size of the buffer in meters around an object to from the spatial intersection for construction of a dynamic network property graph'
+      ,''
+      ,'NUMBER'
+      ,'N'
+      ,'N'
+      ,2000
+  FROM DUAL
+ WHERE NOT EXISTS(SELECT 1
+                    FROM HIG_OPTION_LIST
+                   WHERE HOL_ID = 'LBNWBUFFER');
 --
 INSERT
   INTO HIG_OPTION_LIST
@@ -39539,6 +39589,17 @@ INSERT
   INTO HIG_OPTION_VALUES
       (HOV_ID
       ,HOV_VALUE)
+SELECT 'DEFSSO'
+      ,'N'
+  FROM DUAL
+ WHERE NOT EXISTS(SELECT 1
+                    FROM HIG_OPTION_VALUES
+                   WHERE HOV_ID = 'DEFSSO');
+--
+INSERT
+  INTO HIG_OPTION_VALUES
+      (HOV_ID
+      ,HOV_VALUE)
 SELECT 'DEFUNITID'
       ,'1'
   FROM DUAL
@@ -39974,6 +40035,17 @@ SELECT 'JPRIVLEVEL'
  WHERE NOT EXISTS(SELECT 1
                     FROM HIG_OPTION_VALUES
                    WHERE HOV_ID = 'JPRIVLEVEL');
+--
+INSERT
+  INTO HIG_OPTION_VALUES
+      (HOV_ID
+      ,HOV_VALUE)
+SELECT 'LBNWBUFFER'
+      ,'200'
+  FROM DUAL
+ WHERE NOT EXISTS(SELECT 1
+                    FROM HIG_OPTION_VALUES
+                   WHERE HOV_ID = 'LBNWBUFFER');
 --
 INSERT
   INTO HIG_OPTION_VALUES
