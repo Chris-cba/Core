@@ -1,13 +1,13 @@
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm3data3.sql-arc   2.32   May 17 2018 16:16:38   Chris.Baugh  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm3data3.sql-arc   2.33   Dec 20 2018 16:23:40   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm3data3.sql  $
---       Date into PVCS   : $Date:   May 17 2018 16:16:38  $
---       Date fetched Out : $Modtime:   May 17 2018 15:22:24  $
---       Version          : $Revision:   2.32  $
+--       Date into PVCS   : $Date:   Dec 20 2018 16:23:40  $
+--       Date fetched Out : $Modtime:   Dec 18 2018 09:31:02  $
+--       Version          : $Revision:   2.33  $
 --       Table Owner      : NM3_METADATA
---       Generation Date  : 17-MAY-2018 15:22
+--       Generation Date  : 18-DEC-2018 09:31
 --
 --   Product metadata script
 --   As at Release 4.7.1.0
@@ -60,6 +60,19 @@ SELECT 'ACC_ADMIN'
  WHERE NOT EXISTS(SELECT 1
                     FROM HIG_ROLES
                    WHERE HRO_ROLE = 'ACC_ADMIN');
+--
+INSERT
+  INTO HIG_ROLES
+      (HRO_ROLE
+      ,HRO_PRODUCT
+      ,HRO_DESCR)
+SELECT 'ALERT_ADMIN'
+      ,'HIG'
+      ,'Alert Administration'
+  FROM DUAL
+ WHERE NOT EXISTS(SELECT 1
+                    FROM HIG_ROLES
+                   WHERE HRO_ROLE = 'ALERT_ADMIN');
 --
 INSERT
   INTO HIG_ROLES
@@ -281,6 +294,19 @@ SELECT 'PROCESS_USER'
  WHERE NOT EXISTS(SELECT 1
                     FROM HIG_ROLES
                    WHERE HRO_ROLE = 'PROCESS_USER');
+--
+INSERT
+  INTO HIG_ROLES
+      (HRO_ROLE
+      ,HRO_PRODUCT
+      ,HRO_DESCR)
+SELECT 'PROXY_OWNER'
+      ,'HIG'
+      ,'Role which allows proxy connections for users, with this user as the Proxy Owner'
+  FROM DUAL
+ WHERE NOT EXISTS(SELECT 1
+                    FROM HIG_ROLES
+                   WHERE HRO_ROLE = 'PROXY_OWNER');
 --
 INSERT
   INTO HIG_ROLES
@@ -5038,6 +5064,39 @@ INSERT
       ,HPT_POLLING_ENABLED
       ,HPT_POLLING_FTP_TYPE_ID
       ,HPT_AREA_TYPE)
+SELECT -6
+      ,'Refresh Auto-generated Passwords'
+      ,'Refreshes User passwords for users where the password is automatically generated'
+      ,'hig_relationship_api.refresh_auto_passwords;'
+      ,''
+      ,''
+      ,''
+      ,null
+      ,'Y'
+      ,'Y'
+      ,'N'
+      ,null
+      ,''
+  FROM DUAL
+ WHERE NOT EXISTS(SELECT 1
+                    FROM HIG_PROCESS_TYPES
+                   WHERE HPT_PROCESS_TYPE_ID = -6);
+--
+INSERT
+  INTO HIG_PROCESS_TYPES
+      (HPT_PROCESS_TYPE_ID
+      ,HPT_NAME
+      ,HPT_DESCR
+      ,HPT_WHAT_TO_CALL
+      ,HPT_INITIATION_MODULE
+      ,HPT_INTERNAL_MODULE
+      ,HPT_INTERNAL_MODULE_PARAM
+      ,HPT_PROCESS_LIMIT
+      ,HPT_RESTARTABLE
+      ,HPT_SEE_IN_HIG2510
+      ,HPT_POLLING_ENABLED
+      ,HPT_POLLING_FTP_TYPE_ID
+      ,HPT_AREA_TYPE)
 SELECT -5
       ,'Group of Groups Theme Refresh'
       ,'Refreshes Materialized views used in the production of shapefiles'
@@ -5199,6 +5258,18 @@ SELECT -1
 SET TERM ON
 PROMPT hig_process_type_roles
 SET TERM OFF
+--
+INSERT
+  INTO HIG_PROCESS_TYPE_ROLES
+      (HPTR_PROCESS_TYPE_ID
+      ,HPTR_ROLE)
+SELECT -6
+      ,'HIG_ADMIN'
+  FROM DUAL
+ WHERE NOT EXISTS(SELECT 1
+                    FROM HIG_PROCESS_TYPE_ROLES
+                   WHERE HPTR_PROCESS_TYPE_ID = -6
+                     AND HPTR_ROLE = 'HIG_ADMIN');
 --
 INSERT
   INTO HIG_PROCESS_TYPE_ROLES
