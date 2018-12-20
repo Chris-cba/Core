@@ -1,6 +1,15 @@
--- C:\clbtemp\nm3.sqs
+--------------------------------------------------------------------------------
+--   PVCS Identifiers :-
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/nm3.sqs-arc   2.18   Dec 20 2018 16:18:20   Chris.Baugh  $
+--       Module Name      : $Workfile:   nm3.sqs  $
+--       Date into PVCS   : $Date:   Dec 20 2018 16:18:20  $
+--       Date fetched Out : $Modtime:   Dec 20 2018 16:18:02  $
+--       PVCS Version     : $Revision:   2.18  $
 --
--- Generated for Oracle 10g on Thu Dec 13  14:48:14 2018 by Server Generator 10.1.2.9.28
+-----------------------------------------------------------------------------
+--    Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+---- Generated for Oracle 10g on Thu Dec 13  14:48:14 2018 by Server Generator 10.1.2.9.28
  
 PROMPT Creating Sequence 'BATCH_ID_SEQ'
 CREATE SEQUENCE BATCH_ID_SEQ
