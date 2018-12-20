@@ -1,11 +1,11 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/nm3_install.sql-arc   2.43   Nov 01 2018 09:49:58   Chris.Baugh  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/nm3_install.sql-arc   2.44   Dec 20 2018 16:25:52   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm3_install.sql  $
---       Date into PVCS   : $Date:   Nov 01 2018 09:49:58  $
---       Date fetched Out : $Modtime:   Jul 12 2018 14:32:36  $
---       PVCS Version     : $Revision:   2.43  $
+--       Date into PVCS   : $Date:   Dec 20 2018 16:25:52  $
+--       Date fetched Out : $Modtime:   Dec 19 2018 11:26:28  $
+--       PVCS Version     : $Revision:   2.44  $
 --
 --------------------------------------------------------------------------------
 --   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
@@ -99,24 +99,6 @@ WHENEVER SQLERROR CONTINUE
 --  After intial object creation the exor_core account is not needed to be logged into, so lock it.
 Alter User Exor_Core Account Lock
 /
---
----------------------------------------------------------------------------------------------------
---                        **************** Create LB Objects *******************
---
--- Create LB Objects to enable module compiles, this is a temporary
--- solution until LB integration is decided
-SET TERM ON
-PROMPT Creating LB Objects...
-SET TERM OFF
-SET DEFINE ON
-SET VERIFY OFF
-SELECT '&exor_base'||'nm3'||'&terminator'||'install'||
-        '&terminator'||'nm4700_nm4800_lb_objects.sql' run_file
-FROM dual
-/
-SET FEEDBACK ON
-start &&run_file
-SET FEEDBACK OFF
 --
 ---------------------------------------------------------------------------------------------------
 --                        ****************   TYPES  *******************
@@ -453,6 +435,31 @@ start '&&run_file'
 SET FEEDBACK OFF
 --
 ---------------------------------------------------------------------------------------------------
+--                            ****************   Create v_lb_nlt_geometry View  *******************
+
+SET TERM ON
+Prompt Setting The Version Number...
+SET TERM OFF
+BEGIN
+  create_nlt_geometry_view;
+END;
+/
+--
+---------------------------------------------------------------------------------------------------
+--                        ****************   eB Interface modules  *******************
+SET TERM ON
+prompt eB interface...
+SET TERM OFF
+SET DEFINE ON
+select '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'eB_Interface'||
+        '&terminator'||'install_eB_interface' run_file
+from dual
+/
+SET FEEDBACK ON
+start '&&run_file'
+SET FEEDBACK OFF
+--
+---------------------------------------------------------------------------------------------------
 --                        ****************   COMPILE SCHEMA   *******************
 SET TERM ON
 Prompt Creating Compiling Schema Script...
@@ -579,6 +586,38 @@ from dual
 SET FEEDBACK ON
 start &&run_file
 SET FEEDBACK OFF
+--
+---------------------------------------------------------------------------------------------------
+--                        ****************   Location Bridge META-DATA  *******************
+PROMPT create LB_NETWORK metadata
+
+INSERT INTO user_sdo_network_metadata (network,
+                                       network_id,
+                                       network_category,
+                                       no_of_hierarchy_levels,
+                                       no_of_partitions,
+                                       node_table_name,
+                                       node_cost_column,
+                                       link_table_name,
+                                       link_direction,
+                                       link_cost_column,
+                                       path_table_name,
+                                       path_link_table_name,
+                                       subpath_table_name)
+     VALUES ('LB_NETWORK',
+             1,
+             'LOGICAL',
+             1,
+             0,
+             'LB_NETWORK_NO',
+             'XNO_COST',
+             'LB_NETWORK_LINK',
+             'UNDIRECTED',
+             'XNW_COST',
+             'LB_NETWORK_PATH',
+             'LB_NETWORK_PATH_LINK',
+             'LB_NETWORK_SUB_PATH');
+
 --
 ---------------------------------------------------------------------------------------------------
 --                        ****************   SYNONYMS   *******************
