@@ -2,11 +2,11 @@
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/trg/nm3trg.sql-arc   2.22   May 01 2018 09:13:56   Chris.Baugh  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/trg/nm3trg.sql-arc   2.23   Dec 20 2018 15:15:22   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm3trg.sql  $
---       Date into PVCS   : $Date:   May 01 2018 09:13:56  $
---       Date fetched Out : $Modtime:   May 01 2018 09:13:14  $
---       PVCS Version     : $Revision:   2.22  $
+--       Date into PVCS   : $Date:   Dec 20 2018 15:15:22  $
+--       Date fetched Out : $Modtime:   Dec 17 2018 14:48:32  $
+--       PVCS Version     : $Revision:   2.23  $
 --
 --
 --   Author : Graeme Johnson
@@ -1650,6 +1650,59 @@ SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'trg'||'&term
 FROM dual 
 / 
 start '&run_file' 
+
+-------------------------------------------------------------------------
+-- Location Bridge Triggers (prior to who_trg)
+-------------------------------------------------------------------------
+
+--
+-------------------------------------------------------------------------
+--
+SET define ON
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'trg'||'&terminator'||'najx_id_seq_trg.trg' run_file
+FROM dual
+/
+START '&run_file'
+--
+-------------------------------------------------------------------------
+--
+SET define ON
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'trg'||'&terminator'||'nal_jxp_validtion.trg' run_file
+FROM dual
+/
+START '&run_file'
+--
+-------------------------------------------------------------------------
+--
+SET define ON
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'trg'||'&terminator'||'njx_id_seq_trg.trg' run_file
+FROM dual
+/
+START '&run_file'
+--
+-------------------------------------------------------------------------
+--
+SET define ON
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'trg'||'&terminator'||'njxt_id_seq_trg.trg' run_file
+FROM dual
+/
+START '&run_file'
+--
+-------------------------------------------------------------------------
+--
+SET define ON
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'trg'||'&terminator'||'nm_asset_geometry_all_trg.trg' run_file
+FROM dual
+/
+START '&run_file'
+--
+-------------------------------------------------------------------------
+--
+SET define ON
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'trg'||'&terminator'||'nm_location_geometry_trg.trg' run_file
+FROM dual
+/
+START '&run_file'
 --
 ----------------------------------------------------------------------------------------- 
 --
@@ -1749,40 +1802,6 @@ SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'trg'||'&term
 FROM dual 
 / 
 start '&run_file' 
---
------------------------------------------------------------------------------------------ 
---
---SET TERM ON 
---PROMPT user_sdo_maps_ins_trg.trg
---SET TERM OFF
---SET DEFINE ON 
---SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'trg'||'&terminator'||'user_sdo_maps_ins_trg.trg' run_file 
---FROM dual 
---/ 
---start '&run_file' 
---
------------------------------------------------------------------------------------------ 
---
---SET TERM ON 
---PROMPT user_sdo_themes_ins_trg.trg
---SET TERM OFF
---SET DEFINE ON 
---SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'trg'||'&terminator'||'user_sdo_themes_ins_trg.trg' run_file 
---FROM dual 
---/ 
---start '&run_file' 
---
------------------------------------------------------------------------------------------ 
---
---SET TERM ON 
---PROMPT user_sdo_styles_ins_trg.trg
---SET TERM OFF
---SET DEFINE ON 
---SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'trg'||'&terminator'||'user_sdo_styles_ins_trg.trg' run_file 
---FROM dual 
---/ 
---start '&run_file' 
---
 ----------------------------------------------------------------------------------------- 
 --
 --
@@ -1796,7 +1815,6 @@ FROM dual
 start '&run_file' 
 --
 ----------------------------------------------------------------------------------------- 
---
 --
 SET TERM ON 
 PROMPT nm_gaz_query_b_ins.trg
@@ -1928,6 +1946,31 @@ SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'trg'||'&term
 FROM dual 
 / 
 start '&run_file' 
+-------------------------------------------------------------------------
+-- Location Bridge Triggers 
+-------------------------------------------------------------------------
+--
+-------------------------------------------------------------------------
+--
+SET define ON
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'trg'||'&terminator'||'nm_loc_id_seq_usage_who.trg' run_file
+FROM dual
+/
+START '&run_file'
+--
+-------------------------------------------------------------------------
+--
+-------------------------------------------------------------------------
+--
+SET define ON
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'trg'||'&terminator'||'nal_asset_locations_all_who.trg' run_file
+FROM dual
+/
+START '&run_file'
+
+SET TERM ON
+
+
 --
 -----------------------------------------------------------------------------------------
 --
