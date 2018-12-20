@@ -1,6 +1,15 @@
--- C:\clbtemp\nm3.ind
+--------------------------------------------------------------------------------
+--   PVCS Identifiers :-
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/nm3.ind-arc   2.33   Dec 20 2018 16:17:22   Chris.Baugh  $
+--       Module Name      : $Workfile:   nm3.ind  $
+--       Date into PVCS   : $Date:   Dec 20 2018 16:17:22  $
+--       Date fetched Out : $Modtime:   Dec 20 2018 16:17:00  $
+--       PVCS Version     : $Revision:   2.33  $
 --
--- Generated for Oracle 10g on Wed Dec 19  10:51:44 2018 by Server Generator 10.1.2.9.28
+-----------------------------------------------------------------------------
+--    Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+---- Generated for Oracle 10g on Wed Dec 19  10:51:44 2018 by Server Generator 10.1.2.9.28
   
 
 PROMPT Creating Index 'DOC_FK_DLC_IND'
