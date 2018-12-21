@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY SDO_LRS
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdo_lrs.pkb-arc   1.3   Dec 18 2018 12:17:28   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdo_lrs.pkb-arc   1.4   Dec 21 2018 11:06:36   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdo_lrs.pkb  $
-    --       Date into PVCS   : $Date:   Dec 18 2018 12:17:28  $
-    --       Date fetched Out : $Modtime:   Dec 18 2018 11:43:44  $
-    --       PVCS Version     : $Revision:   1.3  $
+    --       Date into PVCS   : $Date:   Dec 21 2018 11:06:36  $
+    --       Date fetched Out : $Modtime:   Dec 21 2018 10:48:10  $
+    --       PVCS Version     : $Revision:   1.4  $
     --
     --   Author : R.A. Coupe
     --
@@ -18,7 +18,7 @@ AS
     -- The main purpose of this package is to replicate the functions inside the SDO_LRS package as
     -- supplied under the MDSYS schema and licensed under the Oracle Spatial license on EE.
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.3  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.4  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'SDO_LRS';
 
@@ -428,7 +428,11 @@ AS
         PARALLEL_ENABLE
     IS
     BEGIN
-        RETURN NM_SDO.CLIP (geom_segment, start_measure, end_measure);
+        RETURN NM_SDO.offset_geom_segment (geom_segment,
+                                           start_measure,
+                                           end_measure,
+                                           offset,
+                                           dim_array (1).sdo_tolerance);
     END;
 
     FUNCTION offset_geom_segment (geom_segment    IN MDSYS.SDO_GEOMETRY,
@@ -442,7 +446,11 @@ AS
         PARALLEL_ENABLE
     IS
     BEGIN
-        RETURN NM_SDO.CLIP (geom_segment, start_measure, end_measure);
+        RETURN NM_SDO.offset_geom_segment (geom_segment,
+                                           start_measure,
+                                           end_measure,
+                                           offset,
+                                           tolerance);
     END;
 
     FUNCTION offset_geom_segment (geom_segment    IN MDSYS.SDO_GEOMETRY,
@@ -455,7 +463,11 @@ AS
         PARALLEL_ENABLE
     IS
     BEGIN
-        RETURN NM_SDO.CLIP (geom_segment, start_measure, end_measure);
+        RETURN NM_SDO.offset_geom_segment (geom_segment,
+                                           start_measure,
+                                           end_measure,
+                                           offset,
+                                           dim_array (1).sdo_tolerance);
     END;
 
     FUNCTION offset_geom_segment (geom_segment    IN MDSYS.SDO_GEOMETRY,
@@ -468,7 +480,11 @@ AS
         PARALLEL_ENABLE
     IS
     BEGIN
-        RETURN NM_SDO.CLIP (geom_segment, start_measure, end_measure);
+        RETURN NM_SDO.offset_geom_segment (geom_segment,
+                                           start_measure,
+                                           end_measure,
+                                           offset,
+                                           tolerance);
     END;
 
     FUNCTION offset_geom_segment (geom_segment    IN MDSYS.SDO_GEOMETRY,
@@ -634,19 +650,23 @@ AS
     BEGIN
         RETURN nm_sdo.lrs_intersection (geom_1, geom_2);
     END;
-   FUNCTION geom_segment_length(geom_segment IN MDSYS.SDO_GEOMETRY,
-                                dim_array    IN MDSYS.SDO_DIM_ARRAY)
-   RETURN NUMBER PARALLEL_ENABLE is
-   begin
-      return nm_sdo.geom_segment_length( geom_segment, dim_array );
-   end;
 
-   FUNCTION geom_segment_length(geom_segment IN MDSYS.SDO_GEOMETRY,
-                                tolerance    IN NUMBER DEFAULT 1.0e-8)
-   RETURN NUMBER PARALLEL_ENABLE is
-   begin
-      return nm_sdo.geom_segment_length( geom_segment, tolerance );
-   end;
-   
+    FUNCTION geom_segment_length (geom_segment   IN MDSYS.SDO_GEOMETRY,
+                                  dim_array      IN MDSYS.SDO_DIM_ARRAY)
+        RETURN NUMBER
+        PARALLEL_ENABLE
+    IS
+    BEGIN
+        RETURN nm_sdo.geom_segment_length (geom_segment, dim_array);
+    END;
+
+    FUNCTION geom_segment_length (geom_segment   IN MDSYS.SDO_GEOMETRY,
+                                  tolerance      IN NUMBER DEFAULT 1.0e-8)
+        RETURN NUMBER
+        PARALLEL_ENABLE
+    IS
+    BEGIN
+        RETURN nm_sdo.geom_segment_length (geom_segment, tolerance);
+    END;
 END;
 /
