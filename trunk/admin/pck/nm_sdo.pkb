@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm_sdo
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm_sdo.pkb-arc   1.5   Dec 18 2018 12:17:28   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm_sdo.pkb-arc   1.6   Dec 21 2018 11:07:28   Rob.Coupe  $
     --       Module Name      : $Workfile:   nm_sdo.pkb  $
-    --       Date into PVCS   : $Date:   Dec 18 2018 12:17:28  $
-    --       Date fetched Out : $Modtime:   Dec 18 2018 11:43:24  $
-    --       PVCS Version     : $Revision:   1.5  $
+    --       Date into PVCS   : $Date:   Dec 21 2018 11:07:28  $
+    --       Date fetched Out : $Modtime:   Dec 21 2018 10:43:14  $
+    --       PVCS Version     : $Revision:   1.6  $
     --
     --   Author : R.A. Coupe
     --
@@ -18,9 +18,15 @@ AS
     -- The main purpose of this package is to replicate the functions inside the SDO_LRS package as
     -- supplied under the MDSYS schema and licensed under the Oracle Spatial license on EE.
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.5  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.6  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'NM_SDO';
+
+    FUNCTION offset_whole_geom (geom        IN SDO_GEOMETRY,
+                                offset      IN NUMBER,
+                                tolerance      NUMBER)
+        RETURN SDO_GEOMETRY
+        DETERMINISTIC;
 
     FUNCTION get_version
         RETURN VARCHAR2
@@ -1963,8 +1969,8 @@ AS
         RETURN retval;
     END;
 
-    FUNCTION geom_segment_length (geom_segment   IN MDSYS.SDO_GEOMETRY,
-                                  dim_array      IN MDSYS.SDO_DIM_ARRAY)
+    FUNCTION geom_segment_length (geom_segment   IN SDO_GEOMETRY,
+                                  dim_array      IN SDO_DIM_ARRAY)
         RETURN NUMBER
     IS
     BEGIN
@@ -1973,7 +1979,7 @@ AS
                    - geom_segment_start_measure (geom_segment));
     END;
 
-    FUNCTION geom_segment_length (geom_segment   IN MDSYS.SDO_GEOMETRY,
+    FUNCTION geom_segment_length (geom_segment   IN SDO_GEOMETRY,
                                   tolerance      IN NUMBER DEFAULT 1.0e-8)
         RETURN NUMBER
     IS
@@ -1981,6 +1987,256 @@ AS
         RETURN ABS (
                      geom_segment_end_measure (geom_segment)
                    - geom_segment_start_measure (geom_segment));
+    END;
+
+    FUNCTION offset_geom_segment (geom            IN SDO_GEOMETRY,
+                                  start_measure   IN NUMBER,
+                                  end_measure     IN NUMBER,
+                                  offset          IN NUMBER,
+                                  tolerance       IN NUMBER DEFAULT 1.0e-8)
+        RETURN SDO_GEOMETRY
+        DETERMINISTIC
+        PARALLEL_ENABLE
+    IS
+        retval        SDO_GEOMETRY;
+        check_count   INTEGER;
+        sm            NUMBER := SDO_LRS.geom_segment_start_measure (geom);
+        em            NUMBER := SDO_LRS.geom_segment_end_measure (geom);
+        l_tolerance   NUMBER; -- tolerance adjusted from XY unots to M units or meters
+    BEGIN
+        l_tolerance := tolerance;
+
+        IF geom.sdo_srid IS NOT NULL
+        THEN
+            IF nm_sdo_geom.is_geodetic (geom.sdo_srid) = 'TRUE'
+            THEN
+                NULL;
+            ELSE
+                l_tolerance :=
+                      tolerance
+                    * SDO_LRS.geom_segment_end_measure (geom)
+                    / SDO_GEOM.sdo_length (geom);
+            END IF;
+        END IF;
+
+        IF start_measure = sm AND end_measure = em
+        THEN
+            retval := offset_whole_geom (geom, offset, tolerance);
+        ELSIF start_measure > em OR end_measure < sm
+        THEN
+            retval := NULL;
+        ELSE
+              SELECT sdo_geometry (
+                         3302,
+                         geom.sdo_srid,
+                         NULL,
+                         sdo_elem_info_array (1, 2, 1),
+                         CAST (COLLECT (VALUE        /*ORDER BY rn, ordinate*/
+                                             ) AS sdo_ordinate_array)),
+                     COUNT (*)
+                         check_count
+                INTO retval, check_count
+                FROM (WITH
+                          ranges
+                          AS
+                              (SELECT start_measure,
+                                      end_measure,
+                                      MIN (rn) OVER (PARTITION BY 'A')
+                                          min_rn,
+                                      MAX (rn) OVER (PARTITION BY 'A')
+                                          max_rn,
+                                      l_tolerance,
+                                        offset
+                                      * (y1 - y2)
+                                      / SQRT (
+                                              POWER ((x2 - x1), 2)
+                                            + POWER ((y2 - y1), 2))
+                                          x_offset,
+                                        offset
+                                      * (x2 - x1)
+                                      / SQRT (
+                                              POWER ((x2 - x1), 2)
+                                            + POWER ((y2 - y1), 2))
+                                          y_offset,
+                                      q1.*
+                                 FROM (SELECT ROW_NUMBER () OVER (ORDER BY 1)
+                                                  rn,
+                                              COUNT (*) OVER (PARTITION BY 'A')
+                                                  rc,
+                                              t.COLUMN_VALUE
+                                                  x1,
+                                              LEAD (t.COLUMN_VALUE, 1)
+                                                  OVER (ORDER BY 1)
+                                                  y1,
+                                              LEAD (t.COLUMN_VALUE, 2)
+                                                  OVER (ORDER BY 1)
+                                                  m1,
+                                              LEAD (t.COLUMN_VALUE, 3)
+                                                  OVER (ORDER BY 1)
+                                                  x2,
+                                              LEAD (t.COLUMN_VALUE, 4)
+                                                  OVER (ORDER BY 1)
+                                                  y2,
+                                              LEAD (t.COLUMN_VALUE, 5)
+                                                  OVER (ORDER BY 1)
+                                                  m2
+                                         FROM TABLE (geom.sdo_ordinates) t) q1
+                                WHERE     MOD (rn, 3) = 1 --and m2 is not null
+                                      AND m1 <= end_measure + l_tolerance
+                                      AND m2 >= start_measure - l_tolerance)
+                      --                                            select r.* from ranges r
+                      --
+                      SELECT rn, -- this will retrieve all vertices which are wholly between the two measures
+                             x1 + x_offset     A,
+                             y1 + y_offset     B,
+                             m1                C
+                        FROM ranges
+                       WHERE     m1 >= start_measure - l_tolerance
+                             AND m1 <= end_measure + l_tolerance
+                      UNION ALL
+                      SELECT -1
+                                 rn, -- this is where the start measure is between two vertices - interpolate the xy's
+                               x1
+                             +   (GREATEST (m1, start_measure) - m1)
+                               * (x2 - x1)
+                               / (m2 - m1)
+                             + x_offset,
+                               y1
+                             +   (GREATEST (m1, start_measure) - m1)
+                               * (y2 - y1)
+                               / (m2 - m1)
+                             + y_offset,
+                             GREATEST (m1, start_measure)
+                        FROM ranges
+                       WHERE     rn = min_rn
+                             AND m1 < start_measure
+                             AND m2 > start_measure
+                             AND ABS (m1 - start_measure) > l_tolerance
+                             AND ABS (m2 - start_measure) > l_tolerance
+                      --                       and (abs(m1-greatest(start_measure, m1)) > tolerance )
+                      UNION ALL
+                      SELECT 99999
+                                 rn, -- This is to ensure that the end vertex is included, possibly interpolated - may be better performance if the
+                               x1
+                             +   (LEAST (m2, end_measure) - m1)
+                               * (x2 - x1)
+                               / (m2 - m1)
+                             + x_offset,
+                               y1
+                             +   (LEAST (m2, end_measure) - m1)
+                               * (y2 - y1)
+                               / (m2 - m1)
+                             + y_offset,
+                             LEAST (m2, end_measure)
+                        FROM ranges
+                       WHERE     m1 < end_measure
+                             AND m2 >= end_measure - l_tolerance
+                             AND rn = max_rn
+                      ORDER BY rn)
+                     UNPIVOT EXCLUDE NULLS (VALUE FOR ordinate IN (A, B, C))
+            ORDER BY rn, ordinate;
+
+            IF check_count < 6
+            THEN
+                IF check_count = 3
+                THEN
+                    retval.sdo_gtype := 3301;
+                    retval.sdo_elem_info := sdo_elem_info_array (1, 1, 1);
+                ELSE
+                    DBMS_OUTPUT.put_line ('Check count = ' || check_count);
+                    raise_application_error (-20001, 'Invalid LRS Measure');
+                END IF;
+            END IF;
+        END IF;
+
+        RETURN retval;
+    END;
+
+    FUNCTION offset_whole_geom (geom        IN SDO_GEOMETRY,
+                                offset      IN NUMBER,
+                                tolerance      NUMBER)
+        RETURN SDO_GEOMETRY
+        DETERMINISTIC
+    IS
+        retval   SDO_GEOMETRY;
+    BEGIN
+        WITH
+            ranges
+            AS
+                (SELECT t.x                                  x1,
+                        t.y                                  y1,
+                        t.z                                  m1,
+                        LEAD (t.x, 1) OVER (ORDER BY id)     x2,
+                        LEAD (t.y, 1) OVER (ORDER BY id)     y2,
+                        LEAD (t.z, 1) OVER (ORDER BY id)     m2
+                   FROM TABLE (SDO_UTIL.getvertices (geom)) t),
+            offsets
+            AS
+                (SELECT rn,
+                        x1 + x_offset     x1,
+                        y1 + y_offset     y1,
+                        m1,
+                        x2 + x_offset     x2,
+                        y2 + y_offset     y2,
+                        m2
+                   FROM (SELECT ROWNUM                           rn,
+                                x1,
+                                y1,
+                                m1,
+                                x2,
+                                y2,
+                                m2,
+                                  offset
+                                * (y1 - y2)
+                                / SQRT (
+                                        POWER ((x2 - x1), 2)
+                                      + POWER ((y2 - y1), 2))    x_offset,
+                                  offset
+                                * (x2 - x1)
+                                / SQRT (
+                                        POWER ((x2 - x1), 2)
+                                      + POWER ((y2 - y1), 2))    y_offset
+                           FROM ranges
+                          WHERE x2 IS NOT NULL))
+        SELECT sdo_geometry (CASE MAX (rn) WHEN 1 THEN 3302 ELSE 3306 END,
+                             geom.sdo_srid,
+                             NULL,
+                             get_pline_parts_elem_info (MAX (rn)),
+                             CAST (COLLECT (VALUE) AS sdo_ordinate_array))
+          INTO retval
+          FROM (SELECT rn, 1, x1 X, y1 Y, m1 M FROM offsets
+                UNION ALL
+                SELECT rn, 2, x2 X, y2 Y, m2 M FROM offsets
+                ORDER BY 1, 2)
+               UNPIVOT EXCLUDE NULLS (VALUE FOR ordinate IN (X, Y, M));
+
+        RETURN retval;
+    END;
+
+    FUNCTION get_pline_parts_elem_info (rc IN INTEGER)
+        RETURN sdo_elem_info_array
+    IS
+        retval   sdo_elem_info_array;
+    BEGIN
+        WITH
+            rn
+            AS
+                (    SELECT LEVEL     rn
+                       FROM DUAL
+                 CONNECT BY LEVEL <= rc)
+        SELECT CAST (COLLECT (VALUE) AS sdo_elem_info_array)
+          INTO retval
+          FROM (SELECT (rn - 1) * 6 + 1     sdo_starting_offset,
+                       2                    sdo_etype,
+                       1                    sdo_interpretation
+                  FROM rn)
+               UNPIVOT EXCLUDE NULLS (VALUE
+                                     FOR elem_info
+                                     IN (sdo_starting_offset,
+                                        sdo_etype,
+                                        sdo_interpretation));
+
+        RETURN retval;
     END;
 END;
 /
