@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm_sdo
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm_sdo.pkb-arc   1.6   Dec 21 2018 11:07:28   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm_sdo.pkb-arc   1.7   Jan 01 2019 11:19:40   Rob.Coupe  $
     --       Module Name      : $Workfile:   nm_sdo.pkb  $
-    --       Date into PVCS   : $Date:   Dec 21 2018 11:07:28  $
-    --       Date fetched Out : $Modtime:   Dec 21 2018 10:43:14  $
-    --       PVCS Version     : $Revision:   1.6  $
+    --       Date into PVCS   : $Date:   Jan 01 2019 11:19:40  $
+    --       Date fetched Out : $Modtime:   Jan 01 2019 00:51:36  $
+    --       PVCS Version     : $Revision:   1.7  $
     --
     --   Author : R.A. Coupe
     --
@@ -18,7 +18,7 @@ AS
     -- The main purpose of this package is to replicate the functions inside the SDO_LRS package as
     -- supplied under the MDSYS schema and licensed under the Oracle Spatial license on EE.
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.6  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.7  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'NM_SDO';
 
@@ -215,12 +215,14 @@ AS
         ELSIF start_measure > em OR end_measure < sm
         THEN
             retval := NULL;
-        ELSE
+        ELSIF abs(end_measure - start_measure) < l_tolerance  then
+		    retval := locate_pt(geom, start_measure);
+		ELSE
               SELECT sdo_geometry (
-                         3302,
+                         case when abs(end_measure - start_measure) < l_tolerance then 3301 else  3302 end,
                          geom.sdo_srid,
                          NULL,
-                         sdo_elem_info_array (1, 2, 1),
+                         case when abs(end_measure - start_measure) < l_tolerance then sdo_elem_info_array (1, 1, 1) else sdo_elem_info_array (1, 2, 1) end,
                          CAST (COLLECT (VALUE        /*ORDER BY rn, ordinate*/
                                              ) AS sdo_ordinate_array)),
                      COUNT (*)
