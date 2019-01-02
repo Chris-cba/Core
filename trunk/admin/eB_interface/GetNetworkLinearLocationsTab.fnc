@@ -4,18 +4,18 @@ CREATE OR REPLACE FUNCTION GetNetworkLinearLocationsTab (
 IS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/eB_interface/GetNetworkLinearLocationsTab.fnc-arc   1.2   Apr 26 2017 12:14:50   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/eB_interface/GetNetworkLinearLocationsTab.fnc-arc   1.3   Jan 02 2019 11:38:48   Chris.Baugh  $
    --       Module Name      : $Workfile:   GetNetworkLinearLocationsTab.fnc  $
-   --       Date into PVCS   : $Date:   Apr 26 2017 12:14:50  $
-   --       Date fetched Out : $Modtime:   Apr 26 2017 12:14:10  $
-   --       PVCS Version     : $Revision:   1.2  $
+   --       Date into PVCS   : $Date:   Jan 02 2019 11:38:48  $
+   --       Date fetched Out : $Modtime:   Jan 02 2019 11:38:30  $
+   --       PVCS Version     : $Revision:   1.3  $
    --
    --   Author : R.A. Coupe/David Stow
    --
    --   Location Bridge package for DB retrieval into objects
    --
    -----------------------------------------------------------------------------
-   -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
+   -- Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
    --
