@@ -4,18 +4,18 @@ CREATE OR REPLACE FUNCTION GetNetworkElementMeasures (
 IS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/eB_interface/GetNetworkElementMeasures.fnc-arc   1.0   Oct 19 2015 11:18:58   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/eB_interface/GetNetworkElementMeasures.fnc-arc   1.1   Jan 02 2019 11:36:38   Chris.Baugh  $
    --       Module Name      : $Workfile:   GetNetworkElementMeasures.fnc  $
-   --       Date into PVCS   : $Date:   Oct 19 2015 11:18:58  $
-   --       Date fetched Out : $Modtime:   Oct 19 2015 11:17:44  $
-   --       PVCS Version     : $Revision:   1.0  $
+   --       Date into PVCS   : $Date:   Jan 02 2019 11:36:38  $
+   --       Date fetched Out : $Modtime:   Jan 02 2019 11:36:24  $
+   --       PVCS Version     : $Revision:   1.1  $
    --
    --   Author : R.A. Coupe
    --
    --   Location Bridge procedure to retrieve element and start and end measures
    --
    -----------------------------------------------------------------------------
-   -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
+   -- Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
 
