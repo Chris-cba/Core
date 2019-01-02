@@ -4,18 +4,18 @@ CREATE OR REPLACE FORCE VIEW V_LB_TYPE_NW_FLAGS
 AS
 SELECT --   PVCS Identifiers :-
        --
-       --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/views/v_lb_type_nw_flags.vw-arc   1.0   May 20 2016 11:10:30   Rob.Coupe  $
+       --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/views/v_lb_type_nw_flags.vw-arc   1.1   Jan 02 2019 14:15:10   Chris.Baugh  $
        --       Module Name      : $Workfile:   v_lb_type_nw_flags.vw  $
-       --       Date into PVCS   : $Date:   May 20 2016 11:10:30  $
-       --       Date fetched Out : $Modtime:   May 20 2016 11:09:46  $
-       --       PVCS Version     : $Revision:   1.0  $
+       --       Date into PVCS   : $Date:   Jan 02 2019 14:15:10  $
+       --       Date fetched Out : $Modtime:   Dec 07 2018 10:18:42  $
+       --       PVCS Version     : $Revision:   1.1  $
        --
        --   Author : R.A. Coupe
        --
        --   Location Bridge view describing various network flags for an asset type
        --
        -----------------------------------------------------------------------------
-       -- Copyright (c) 2016 Bentley Systems Incorporated. All rights reserved.
+       -- Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
        ----------------------------------------------------------------------------
        --
        lb_object_type,
