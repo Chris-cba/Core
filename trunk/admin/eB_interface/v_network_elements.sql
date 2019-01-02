@@ -14,13 +14,13 @@ CREATE OR REPLACE VIEW v_network_elements
 AS
    -------------------------------------------------------------------------
    --   PVCS Identifiers :-
-   --       PVCS id          : $Header:   //new_vm_latest/archives/lb/admin/eB_interface/v_network_elements.sql-arc   1.0   Oct 19 2015 11:42:18   Rob.Coupe  $
+   --       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/eB_interface/v_network_elements.sql-arc   1.1   Jan 02 2019 11:43:40   Chris.Baugh  $
    --       Module Name      : $Workfile:   v_network_elements.sql  $
-   --       Date into PVCS   : $Date:   Oct 19 2015 11:42:18  $
-   --       Date fetched Out : $Modtime:   Oct 19 2015 11:40:50  $
-   --       Version          : $Revision:   1.0  $
+   --       Date into PVCS   : $Date:   Jan 02 2019 11:43:40  $
+   --       Date fetched Out : $Modtime:   Jan 02 2019 11:43:28  $
+   --       Version          : $Revision:   1.1  $
    ------------------------------------------------------------------
-   --   Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
+   --   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
    -----------------------------------------------------------------
    --
    SELECT lb_object_type,
