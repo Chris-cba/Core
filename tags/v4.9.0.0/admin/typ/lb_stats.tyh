@@ -1,0 +1,38 @@
+CREATE OR REPLACE TYPE lb_stats AS OBJECT (
+-----------------------------------------------------------------------------
+--
+--
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)ptr.tyh	1.1 02/15/06
+--       Module Name      : ptr.tyh
+--       Date into SCCS   : 06/02/15 08:26:46
+--       Date fetched Out : 07/06/13 17:04:59
+--       SCCS Version     : 1.1
+--
+--   Author : Rob Coupe
+--
+--
+--   TYPE ptr
+--
+-----------------------------------------------------------------------------
+--    Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
+--
+--Location Bridge Stats object type
+--
+  dummy INTEGER,
+--  
+  STATIC FUNCTION ODCIGetInterfaces (
+    p_interfaces OUT SYS.ODCIObjectList
+  ) RETURN NUMBER,
+--
+  STATIC FUNCTION ODCIStatsTableFunction (
+    p_function    IN  SYS.ODCIFuncInfo,
+    p_stats       OUT SYS.ODCITabFuncStats,
+    p_args        IN  SYS.ODCIArgDescList,
+    p_cardinality IN INTEGER
+  ) RETURN NUMBER
+);
+/

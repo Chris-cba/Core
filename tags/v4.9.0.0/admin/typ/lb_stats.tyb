@@ -1,0 +1,45 @@
+CREATE OR REPLACE TYPE BODY lb_stats AS
+  STATIC FUNCTION ODCIGetInterfaces (
+-----------------------------------------------------------------------------
+--
+--
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)ptr.tyb	1.1 02/14/06
+--       Module Name      : ptr.tyb
+--       Date into SCCS   : 06/02/14 15:26:03
+--       Date fetched Out : 07/06/13 17:04:59
+--       SCCS Version     : 1.1
+--
+--   Author : Rob Coupe
+--
+--
+--   TYPE ptr_array
+--
+-----------------------------------------------------------------------------
+--    Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
+    p_interfaces OUT SYS.ODCIObjectList
+  ) RETURN NUMBER IS
+  BEGIN
+    p_interfaces := SYS.ODCIObjectList(
+                      SYS.ODCIObject ('SYS', 'ODCISTATS2')
+                    );
+    RETURN ODCIConst.success;
+  END ODCIGetInterfaces;
+
+  STATIC FUNCTION ODCIStatsTableFunction (
+                    p_function    IN  SYS.ODCIFuncInfo,
+                    p_stats       OUT SYS.ODCITabFuncStats,
+                    p_args        IN  SYS.ODCIArgDescList,
+                    p_cardinality IN INTEGER
+                  ) RETURN NUMBER IS
+  BEGIN
+    p_stats := SYS.ODCITabFuncStats(NULL);
+    p_stats.num_rows := p_cardinality;
+    RETURN ODCIConst.success;
+  END ODCIStatsTableFunction;
+END;
+/
+

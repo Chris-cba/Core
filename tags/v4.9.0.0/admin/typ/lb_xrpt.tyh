@@ -1,0 +1,37 @@
+CREATE OR REPLACE TYPE lb_xrpt AS OBJECT ( 
+-----------------------------------------------------------------------------
+--
+--
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)ptr.tyh	1.1 02/15/06
+--       Module Name      : ptr.tyh
+--       Date into SCCS   : 06/02/15 08:26:46
+--       Date fetched Out : 07/06/13 17:04:59
+--       SCCS Version     : 1.1
+--
+--   Author : Rob Coupe
+--
+--
+--   TYPE ptr
+--
+-----------------------------------------------------------------------------
+--    Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
+   refnt integer, 
+   refnt_type integer, 
+   obj_type varchar2(4), 
+   obj_id integer, 
+   seg_id integer, 
+   seq_id integer, 
+   dir_flag integer, 
+   start_m number, 
+   end_m number, 
+   m_unit integer, 
+   xsp varchar2(4), 
+   offset number, 
+   start_date date, 
+   end_date date  
+);
+/
