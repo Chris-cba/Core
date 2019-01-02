@@ -1,0 +1,30 @@
+CREATE OR REPLACE TYPE lb_linear_refnt AS OBJECT(
+-----------------------------------------------------------------------------
+--
+--
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)ptr.tyh	1.1 02/15/06
+--       Module Name      : ptr.tyh
+--       Date into SCCS   : 06/02/15 08:26:46
+--       Date fetched Out : 07/06/13 17:04:59
+--       SCCS Version     : 1.1
+--
+--   Author : Rob Coupe
+--
+--
+--   TYPE ptr
+--
+-----------------------------------------------------------------------------
+--    Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
+    NetworkTypeId       NUMBER,        -- ID of the network type
+    NetworkElementID    NUMBER(9),     -- Network element ID
+    NetworkElementName  VARCHAR2(50),  -- Network element unique name
+    NetworkElementDescr VARCHAR2(240), -- Optional network element description
+    NetworkElementType  VARCHAR2(4),   -- Network element type code
+    NetworkTypeDescr    VARCHAR2(80),  -- Optional description of the network type
+    Unit                VARCHAR2(20)   -- Default length unit 
+);                                                      
+/

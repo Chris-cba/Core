@@ -1,0 +1,23 @@
+CREATE OR REPLACE TYPE lb_edit_transaction_tab AS
+-----------------------------------------------------------------------------
+--
+--
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)ptr.tyh	1.1 02/15/06
+--       Module Name      : ptr.tyh
+--       Date into SCCS   : 06/02/15 08:26:46
+--       Date fetched Out : 07/06/13 17:04:59
+--       SCCS Version     : 1.1
+--
+--   Author : Rob Coupe
+--
+--
+--   TYPE ptr
+--
+-----------------------------------------------------------------------------
+--    Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
+  TABLE OF lb_edit_transaction;
+/
