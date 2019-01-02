@@ -1,0 +1,37 @@
+CREATE OR REPLACE TYPE linear_location AS OBJECT(
+-----------------------------------------------------------------------------
+--
+--
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)ptr.tyh	1.1 02/15/06
+--       Module Name      : ptr.tyh
+--       Date into SCCS   : 06/02/15 08:26:46
+--       Date fetched Out : 07/06/13 17:04:59
+--       SCCS Version     : 1.1
+--
+--   Author : Rob Coupe
+--
+--
+--   TYPE ptr
+--
+-----------------------------------------------------------------------------
+--    Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
+    AssetId              NUMBER(38),     -- ID of the linearly located asset
+    AssetType            NUMBER(38),     -- Type of the asset
+    LocationId           NUMBER(38),     -- ID of the linear location
+    LocationDescription  VARCHAR2(240),  -- Linear location description
+    NetworkTypeId        INTEGER,        -- Network element type
+    NetworkElementId     INTEGER,        -- Network element ID
+    StartM               NUMBER,         -- Absolute position of start of linear range
+    EndM                 NUMBER,         -- Optional absolute position of end of linear range
+    Unit                 INTEGER,        -- Exor ID of Units of start and end position
+    NetworkElementName   VARCHAR2(30),   -- Network element unique name
+    NetworkElementDescr  VARCHAR2(240),  -- Optional network element description
+    JXP                  VARCHAR2(80),   -- Juxtaposition of owning linear location
+    StartDate            DATE,           -- Start date of the asset location 
+    EndDate              DATE            -- End date of the asset location 
+);                                  
+/
