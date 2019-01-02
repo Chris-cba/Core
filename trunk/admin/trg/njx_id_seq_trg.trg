@@ -8,18 +8,18 @@ BEGIN
 --
 --   PVCS Identifiers :-
 --
---       pvcsid                 : $Header:   //new_vm_latest/archives/lb/admin/trg/njx_id_seq_trg.trg-arc   1.0   Aug 11 2017 13:26:20   Rob.Coupe  $
+--       pvcsid                 : $Header:   //new_vm_latest/archives/nm3/admin/trg/njx_id_seq_trg.trg-arc   1.1   Jan 02 2019 10:04:52   Chris.Baugh  $
 --       Module Name      : $Workfile:   njx_id_seq_trg.trg  $
---       Date into PVCS   : $Date:   Aug 11 2017 13:26:20  $
---       Date fetched Out : $Modtime:   Aug 11 2017 13:25:30  $
---       PVCS Version     : $Revision:   1.0  $
+--       Date into PVCS   : $Date:   Jan 02 2019 10:04:52  $
+--       Date fetched Out : $Modtime:   Jan 02 2019 10:04:26  $
+--       PVCS Version     : $Revision:   1.1  $
 --
 --   Author : Rob Coupe
 --
 --   Location Bridge data script.
 --
 -----------------------------------------------------------------------------
---   Copyright (c) 2014 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
   if :new.njx_id is null then
