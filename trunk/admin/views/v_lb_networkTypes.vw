@@ -4,13 +4,13 @@ AS
         AS (SELECT 
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
---       PVCS id          : $Header:   //new_vm_latest/archives/lb/admin/views/v_lb_networkTypes.vw-arc   1.0   Aug 11 2017 15:06:22   Rob.Coupe  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/views/v_lb_networkTypes.vw-arc   1.1   Jan 02 2019 12:02:48   Chris.Baugh  $
 --       Module Name      : $Workfile:   v_lb_networkTypes.vw  $
---       Date into PVCS   : $Date:   Aug 11 2017 15:06:22  $
---       Date fetched Out : $Modtime:   Aug 11 2017 15:05:34  $
---       Version          : $Revision:   1.0  $
+--       Date into PVCS   : $Date:   Jan 02 2019 12:02:48  $
+--       Date fetched Out : $Modtime:   Jan 02 2019 12:02:28  $
+--       Version          : $Revision:   1.1  $
 --------------------------------------------------------------------------
---   Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 --------------------------------------------------------------------------
 ----
                    d.*,
@@ -51,11 +51,11 @@ AS
    SELECT 
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/views/v_lb_networkTypes.vw-arc   1.0   Aug 11 2017 15:06:22   Rob.Coupe  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/views/v_lb_networkTypes.vw-arc   1.1   Jan 02 2019 12:02:48   Chris.Baugh  $
 --       Module Name      : $Workfile:   v_lb_networkTypes.vw  $
---       Date into PVCS   : $Date:   Aug 11 2017 15:06:22  $
---       Date fetched Out : $Modtime:   Aug 11 2017 15:05:34  $
---       PVCS Version     : $Revision:   1.0  $
+--       Date into PVCS   : $Date:   Jan 02 2019 12:02:48  $
+--       Date fetched Out : $Modtime:   Jan 02 2019 12:02:28  $
+--       PVCS Version     : $Revision:   1.1  $
 --
 --   Author : R.A. Coupe
 --
