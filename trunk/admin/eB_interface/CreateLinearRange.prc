@@ -17,18 +17,18 @@ CREATE OR REPLACE PROCEDURE CreateLinearRange (
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/eB_interface/CreateLinearRange.prc-arc   1.1   Oct 31 2017 10:59:30   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/eB_interface/CreateLinearRange.prc-arc   1.2   Jan 02 2019 11:21:42   Chris.Baugh  $
    --       Module Name      : $Workfile:   CreateLinearRange.prc  $
-   --       Date into PVCS   : $Date:   Oct 31 2017 10:59:30  $
-   --       Date fetched Out : $Modtime:   Oct 31 2017 10:45:36  $
-   --       PVCS Version     : $Revision:   1.1  $
+   --       Date into PVCS   : $Date:   Jan 02 2019 11:21:42  $
+   --       Date fetched Out : $Modtime:   Jan 02 2019 11:19:44  $
+   --       PVCS Version     : $Revision:   1.2  $
    --
    --   Author : R.A. Coupe
    --
    --   Location Bridge package for DB retrieval into objects
    --
    -----------------------------------------------------------------------------
-   -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
+   -- Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
 
