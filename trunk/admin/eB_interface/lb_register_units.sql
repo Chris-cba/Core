@@ -1,18 +1,18 @@
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/eB_interface/lb_register_units.sql-arc   1.1   Oct 29 2015 07:20:38   Rob.Coupe  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/eB_interface/lb_register_units.sql-arc   1.2   Jan 02 2019 11:41:04   Chris.Baugh  $
 --       Module Name      : $Workfile:   lb_register_units.sql  $
---       Date into PVCS   : $Date:   Oct 29 2015 07:20:38  $
---       Date fetched Out : $Modtime:   Oct 29 2015 07:21:06  $
---       PVCS Version     : $Revision:   1.1  $
+--       Date into PVCS   : $Date:   Jan 02 2019 11:41:04  $
+--       Date fetched Out : $Modtime:   Jan 02 2019 11:40:50  $
+--       PVCS Version     : $Revision:   1.2  $
 --
 --   Author : R.A. Coupe fro David Stow
 --
 --   Script for registration of unit translation metadata.
 --
 -----------------------------------------------------------------------------
---   Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 ------------------------------
 BEGIN
    lb_reg.register_unit(50, 'METRE', 1);
