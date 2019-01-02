@@ -16,18 +16,18 @@ AS
    --
    --   PVCS Identifiers :-
    --
-   --       pvcsid                 : $Header:   //new_vm_latest/archives/lb/admin/eB_interface/UpdateLinearLocation.prc-arc   1.1   Oct 31 2017 11:46:58   Rob.Coupe  $
+   --       pvcsid                 : $Header:   //new_vm_latest/archives/nm3/admin/eB_interface/UpdateLinearLocation.prc-arc   1.2   Jan 02 2019 11:41:36   Chris.Baugh  $
    --       Module Name      : $Workfile:   UpdateLinearLocation.prc  $
-   --       Date into PVCS   : $Date:   Oct 31 2017 11:46:58  $
-   --       Date fetched Out : $Modtime:   Oct 31 2017 11:46:22  $
-   --       PVCS Version     : $Revision:   1.1  $
+   --       Date into PVCS   : $Date:   Jan 02 2019 11:41:36  $
+   --       Date fetched Out : $Modtime:   Jan 02 2019 11:41:22  $
+   --       PVCS Version     : $Revision:   1.2  $
    --
    --   Author : Rob Coupe/David Stow
    --
    --   Location Bridge procedure to update a linear location.
    --
    -----------------------------------------------------------------------------
-   --   Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
+   --   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
    -----------------------------------------------------------------------------
    --
 
