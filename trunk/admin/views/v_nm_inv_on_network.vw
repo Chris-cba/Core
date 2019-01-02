@@ -17,13 +17,13 @@ AS
    SELECT 
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
---       PVCS id          : $Header:   //new_vm_latest/archives/lb/admin/views/v_nm_inv_on_network.vw-arc   1.1   Aug 11 2017 15:00:14   Rob.Coupe  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/views/v_nm_inv_on_network.vw-arc   1.2   Jan 02 2019 14:17:58   Chris.Baugh  $
 --       Module Name      : $Workfile:   v_nm_inv_on_network.vw  $
---       Date into PVCS   : $Date:   Aug 11 2017 15:00:14  $
---       Date fetched Out : $Modtime:   Aug 11 2017 14:59:54  $
---       Version          : $Revision:   1.1  $
+--       Date into PVCS   : $Date:   Jan 02 2019 14:17:58  $
+--       Date fetched Out : $Modtime:   Dec 07 2018 10:18:26  $
+--       Version          : $Revision:   1.2  $
 --------------------------------------------------------------------------
---   Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 --------------------------------------------------------------------------
 ----
           nit_inv_type,
