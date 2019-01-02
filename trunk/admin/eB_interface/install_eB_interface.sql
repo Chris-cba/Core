@@ -1,17 +1,17 @@
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/eB_interface/install_eB_interface.sql-arc   1.6   Dec 19 2018 10:46:28   Chris.Baugh  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/eB_interface/install_eB_interface.sql-arc   1.7   Jan 02 2019 11:40:30   Chris.Baugh  $
    --       Module Name      : $Workfile:   install_eB_interface.sql  $
-   --       Date into PVCS   : $Date:   Dec 19 2018 10:46:28  $
-   --       Date fetched Out : $Modtime:   Dec 19 2018 10:45:40  $
-   --       PVCS Version     : $Revision:   1.6  $
+   --       Date into PVCS   : $Date:   Jan 02 2019 11:40:30  $
+   --       Date fetched Out : $Modtime:   Jan 02 2019 11:40:16  $
+   --       PVCS Version     : $Revision:   1.7  $
    --
    --   Author : R.A. Coupe
    --
    --   Location Bridge interface for eB install script.
    --
    -----------------------------------------------------------------------------
-   -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
+   -- Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
 --start ..\admin\eB_interface\eB_interface.tyh  --RAC the types in this script are already absorbed into main LB installation
