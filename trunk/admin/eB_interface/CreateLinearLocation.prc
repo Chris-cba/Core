@@ -9,18 +9,18 @@ CREATE OR REPLACE PROCEDURE CreateLinearLocation (
 AS
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/eB_interface/CreateLinearLocation.prc-arc   1.1   Oct 19 2015 11:02:46   Rob.Coupe  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/eB_interface/CreateLinearLocation.prc-arc   1.2   Jan 02 2019 11:19:00   Chris.Baugh  $
 --       Module Name      : $Workfile:   CreateLinearLocation.prc  $
---       Date into PVCS   : $Date:   Oct 19 2015 11:02:46  $
---       Date fetched Out : $Modtime:   Oct 19 2015 11:02:10  $
---       PVCS Version     : $Revision:   1.1  $
+--       Date into PVCS   : $Date:   Jan 02 2019 11:19:00  $
+--       Date fetched Out : $Modtime:   Jan 02 2019 11:18:40  $
+--       PVCS Version     : $Revision:   1.2  $
 --
 --   Author : R.A. Coupe/David Stow
 --
 --   eB Interface procedure to add a linear location header record
 --
 -----------------------------------------------------------------------------
--- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
+-- Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 ----------------------------------------------------------------------------
 --
    l_exor_type       lb_types.lb_exor_inv_type%TYPE;
