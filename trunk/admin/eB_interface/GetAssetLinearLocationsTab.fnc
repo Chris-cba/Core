@@ -6,18 +6,18 @@ CREATE OR REPLACE FUNCTION GetAssetLinearLocationsTab (
 IS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/eB_interface/GetAssetLinearLocationsTab.fnc-arc   1.2   Apr 26 2017 12:19:04   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/eB_interface/GetAssetLinearLocationsTab.fnc-arc   1.3   Jan 02 2019 11:32:58   Chris.Baugh  $
    --       Module Name      : $Workfile:   GetAssetLinearLocationsTab.fnc  $
-   --       Date into PVCS   : $Date:   Apr 26 2017 12:19:04  $
-   --       Date fetched Out : $Modtime:   Apr 26 2017 12:18:40  $
-   --       PVCS Version     : $Revision:   1.2  $
+   --       Date into PVCS   : $Date:   Jan 02 2019 11:32:58  $
+   --       Date fetched Out : $Modtime:   Jan 02 2019 11:32:30  $
+   --       PVCS Version     : $Revision:   1.3  $
    --
    --   Author : R.A. Coupe
    --
    --   Location Bridge package for DB retrieval into objects
    --
    -----------------------------------------------------------------------------
-   -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
+   -- Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
 
