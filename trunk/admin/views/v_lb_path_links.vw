@@ -11,13 +11,13 @@ CREATE OR REPLACE FORCE VIEW V_LB_PATH_LINKS
 AS
    SELECT -------------------------------------------------------------------------
           --   PVCS Identifiers :-
-          --       PVCS id          : $Header:   //new_vm_latest/archives/lb/admin/views/v_lb_path_links.vw-arc   1.0   Oct 08 2015 13:37:38   Rob.Coupe  $
+          --       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/views/v_lb_path_links.vw-arc   1.1   Jan 02 2019 14:14:52   Chris.Baugh  $
           --       Module Name      : $Workfile:   v_lb_path_links.vw  $
-          --       Date into PVCS   : $Date:   Oct 08 2015 13:37:38  $
-          --       Date fetched Out : $Modtime:   Oct 08 2015 13:37:58  $
-          --       Version          : $Revision:   1.0  $
+          --       Date into PVCS   : $Date:   Jan 02 2019 14:14:52  $
+          --       Date fetched Out : $Modtime:   Dec 07 2018 10:18:50  $
+          --       Version          : $Revision:   1.1  $
           --------------------------------------------------------------------------
-          --   Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
+          --   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
           --------------------------------------------------------------------------
           --
           path_seq,
