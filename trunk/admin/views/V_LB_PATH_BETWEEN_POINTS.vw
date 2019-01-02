@@ -9,13 +9,13 @@ AS
             (-------------------------------------------------------------------------
              --   PVCS Identifiers :-
              --
-             --       PVCS id          : $Header:   //new_vm_latest/archives/lb/admin/views/V_LB_PATH_BETWEEN_POINTS.vw-arc   1.6   Nov 01 2017 13:10:32   Rob.Coupe  $
+             --       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/views/V_LB_PATH_BETWEEN_POINTS.vw-arc   1.7   Jan 02 2019 14:14:26   Chris.Baugh  $
              --       Module Name      : $Workfile:   V_LB_PATH_BETWEEN_POINTS.vw  $
-             --       Date into PVCS   : $Date:   Nov 01 2017 13:10:32  $
-             --       Date fetched Out : $Modtime:   Nov 01 2017 13:07:52  $
-             --       Version          : $Revision:   1.6  $
+             --       Date into PVCS   : $Date:   Jan 02 2019 14:14:26  $
+             --       Date fetched Out : $Modtime:   Dec 07 2018 10:18:16  $
+             --       Version          : $Revision:   1.7  $
              ------------------------------------------------------------------
-             --   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+             --   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
              ------------------------------------------------------------------
              ----
              SELECT 'S',
