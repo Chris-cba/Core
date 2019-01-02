@@ -2,13 +2,13 @@ CREATE OR REPLACE VIEW v_network_types
 AS
      SELECT -------------------------------------------------------------------------
             --   PVCS Identifiers :-
-            --       PVCS id          : $Header:   //new_vm_latest/archives/lb/admin/eB_interface/v_network_types.sql-arc   1.3   Sep 23 2016 11:32:04   Rob.Coupe  $
+            --       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/eB_interface/v_network_types.sql-arc   1.4   Jan 02 2019 11:44:16   Chris.Baugh  $
             --       Module Name      : $Workfile:   v_network_types.sql  $
-            --       Date into PVCS   : $Date:   Sep 23 2016 11:32:04  $
-            --       Date fetched Out : $Modtime:   Sep 23 2016 11:31:58  $
-            --       Version          : $Revision:   1.3  $
+            --       Date into PVCS   : $Date:   Jan 02 2019 11:44:16  $
+            --       Date fetched Out : $Modtime:   Jan 02 2019 11:43:56  $
+            --       Version          : $Revision:   1.4  $
             ------------------------------------------------------------------
-            --   Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
+            --   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
             -----------------------------------------------------------------
             --
             a.nlt_id,                        -- Network type ID (essentially, the network element type ID)
