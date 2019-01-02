@@ -18,18 +18,18 @@ AS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid                 : $Header:   //new_vm_latest/archives/lb/admin/views/v_nm_element_xsp.vw-arc   1.1   Jul 26 2018 19:02:38   Rob.Coupe  $
+--       pvcsid                 : $Header:   //new_vm_latest/archives/nm3/admin/views/v_nm_element_xsp.vw-arc   1.2   Jan 02 2019 14:17:38   Chris.Baugh  $
 --       Module Name      : $Workfile:   v_nm_element_xsp.vw  $
---       Date into PVCS   : $Date:   Jul 26 2018 19:02:38  $
---       Date fetched Out : $Modtime:   Jul 26 2018 19:01:36  $
---       PVCS Version     : $Revision:   1.1  $
+--       Date into PVCS   : $Date:   Jan 02 2019 14:17:38  $
+--       Date fetched Out : $Modtime:   Dec 07 2018 10:16:22  $
+--       PVCS Version     : $Revision:   1.2  $
 --
 --   Author : Rob Coupe
 --
 --   Location Bridge data script.
 --
 -----------------------------------------------------------------------------
---   Copyright (c) 2014 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --   
            nm_ne_id_of     element_id,
