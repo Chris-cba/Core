@@ -35,18 +35,18 @@ AS
    SELECT 
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/views/nm_locations.vw-arc   1.0   Aug 11 2017 15:09:42   Rob.Coupe  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/views/nm_locations.vw-arc   1.1   Jan 02 2019 12:00:46   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm_locations.vw  $
---       Date into PVCS   : $Date:   Aug 11 2017 15:09:42  $
---       Date fetched Out : $Modtime:   Aug 07 2017 22:08:20  $
---       PVCS Version     : $Revision:   1.0  $
+--       Date into PVCS   : $Date:   Jan 02 2019 12:00:46  $
+--       Date fetched Out : $Modtime:   Jan 02 2019 12:00:28  $
+--       PVCS Version     : $Revision:   1.1  $
 --
 --   Author : R.A. Coupe
 --
 --   View definition script for interim install of Location Bridge
 --
 -----------------------------------------------------------------------------
--- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
+-- Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 ----------------------------------------------------------------------------
 --
           "NM_NE_ID_OF",
