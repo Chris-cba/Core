@@ -3,18 +3,18 @@ CREATE OR REPLACE FUNCTION GetNetworkTypes (AssetType IN INTEGER)
 IS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/eB_interface/GetNetworkTypes.fnc-arc   1.0   Oct 19 2015 11:28:24   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/eB_interface/GetNetworkTypes.fnc-arc   1.1   Jan 02 2019 11:39:20   Chris.Baugh  $
    --       Module Name      : $Workfile:   GetNetworkTypes.fnc  $
-   --       Date into PVCS   : $Date:   Oct 19 2015 11:28:24  $
-   --       Date fetched Out : $Modtime:   Oct 19 2015 11:27:38  $
-   --       PVCS Version     : $Revision:   1.0  $
+   --       Date into PVCS   : $Date:   Jan 02 2019 11:39:20  $
+   --       Date fetched Out : $Modtime:   Jan 02 2019 11:39:06  $
+   --       PVCS Version     : $Revision:   1.1  $
    --
    --   Author : R.A. Coupe
    --
    --   Location Bridge procedure to generate a cursor for asset type and network relations.
    --
    -----------------------------------------------------------------------------
-   -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
+   -- Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
 
