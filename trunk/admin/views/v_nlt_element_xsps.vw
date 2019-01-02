@@ -15,25 +15,26 @@ CREATE OR REPLACE FORCE VIEW V_NLT_ELEMENT_XSPS
    XRV_NEW_XSP
 )
 AS
-   SELECT                                                                   --
- -----------------------------------------------------------------------------
-                                                                            --
-                                                      --   PVCS Identifiers :-
-                                                                            --
- --       pvcsid                 : $Header:   //new_vm_latest/archives/lb/admin/views/v_nlt_element_xsps.vw-arc   1.2   Aug 01 2018 15:58:48   Rob.Coupe  $
-             --       Module Name      : $Workfile:   v_nlt_element_xsps.vw  $
-                  --       Date into PVCS   : $Date:   Aug 01 2018 15:58:48  $
-               --       Date fetched Out : $Modtime:   Aug 01 2018 15:58:14  $
-                               --       PVCS Version     : $Revision:   1.2  $
-                                                                            --
-                                                       --   Author : Rob Coupe
-                                                                            --
-                                                  --   Network types and XSPs.
-                                                                            --
- -----------------------------------------------------------------------------
-    --   Copyright (c) 2014 Bentley Systems Incorporated. All rights reserved.
- -----------------------------------------------------------------------------
-                                                                            --
+   SELECT 
+   --
+   -----------------------------------------------------------------------------
+   --
+   --   PVCS Identifiers :-
+   --
+   --       pvcsid                 : $Header:   //new_vm_latest/archives/nm3/admin/views/v_nlt_element_xsps.vw-arc   1.3   Jan 02 2019 14:15:32   Chris.Baugh  $
+   --       Module Name      : $Workfile:   v_nlt_element_xsps.vw  $
+   --       Date into PVCS   : $Date:   Jan 02 2019 14:15:32  $
+   --       Date fetched Out : $Modtime:   Dec 07 2018 10:15:50  $
+   --       PVCS Version     : $Revision:   1.3  $
+   --
+   --   Author : Rob Coupe
+   --
+   --   Network types and XSPs.
+   --
+   -----------------------------------------------------------------------------
+   --   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
+   -----------------------------------------------------------------------------
+   --
          nm_ne_id_of element_id,
          nm_ne_id_in xsp_element_id,
          nm_cardinality xsp_direction,
