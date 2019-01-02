@@ -15,18 +15,18 @@ AS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid                 : $Header:   //new_vm_latest/archives/lb/admin/views/nm_asset_geometry.vw-arc   1.0   Aug 11 2017 15:11:16   Rob.Coupe  $
+--       pvcsid                 : $Header:   //new_vm_latest/archives/nm3/admin/views/nm_asset_geometry.vw-arc   1.1   Jan 02 2019 11:58:36   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm_asset_geometry.vw  $
---       Date into PVCS   : $Date:   Aug 11 2017 15:11:16  $
---       Date fetched Out : $Modtime:   Aug 11 2017 15:10:52  $
---       PVCS Version     : $Revision:   1.0  $
+--       Date into PVCS   : $Date:   Jan 02 2019 11:58:36  $
+--       Date fetched Out : $Modtime:   Jan 02 2019 11:58:14  $
+--       PVCS Version     : $Revision:   1.1  $
 --
 --   Author : Rob Coupe
 --
 --   Location Bridge data script.
 --
 -----------------------------------------------------------------------------
---   Copyright (c) 2014 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --   
           "NAG_ID",
