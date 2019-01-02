@@ -9,18 +9,18 @@ DECLARE
 --
 --   PVCS Identifiers :-
 --
---       pvcsid                 : $Header:   //new_vm_latest/archives/lb/admin/trg/nal_jxp_validtion.trg-arc   1.0   Aug 11 2017 13:24:52   Rob.Coupe  $
+--       pvcsid                 : $Header:   //new_vm_latest/archives/nm3/admin/trg/nal_jxp_validtion.trg-arc   1.1   Jan 02 2019 09:56:08   Chris.Baugh  $
 --       Module Name      : $Workfile:   nal_jxp_validtion.trg  $
---       Date into PVCS   : $Date:   Aug 11 2017 13:24:52  $
---       Date fetched Out : $Modtime:   Aug 11 2017 13:24:18  $
---       PVCS Version     : $Revision:   1.0  $
+--       Date into PVCS   : $Date:   Jan 02 2019 09:56:08  $
+--       Date fetched Out : $Modtime:   Jan 02 2019 09:55:38  $
+--       PVCS Version     : $Revision:   1.1  $
 --
 --   Author : Rob Coupe
 --
 --   Location Bridge data script.
 --
 -----------------------------------------------------------------------------
---   Copyright (c) 2014 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 retval integer;
