@@ -1,21 +1,22 @@
 CREATE OR REPLACE VIEW v_lb_type_nw_flags
 AS
-   SELECT                                             --   PVCS Identifiers :-
-                                                                            --
- --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/eB_interface/v_lb_type_nw_flags.vw-arc   1.0   May 06 2016 15:05:08   Rob.Coupe  $
-                        --       Module Name      : $Workfile:   v_lb_type_nw_flags.vw  $
-                  --       Date into PVCS   : $Date:   May 06 2016 15:05:08  $
-               --       Date fetched Out : $Modtime:   May 06 2016 15:05:04  $
-                               --       PVCS Version     : $Revision:   1.0  $
-                                                                            --
-                                                      --   Author : R.A. Coupe
-                                                                            --
-  --   Location Bridge view describing various network flags for an asset type
-                                                                            --
- -----------------------------------------------------------------------------
-      -- Copyright (c) 2016 Bentley Systems Incorporated. All rights reserved.
-  ----------------------------------------------------------------------------
-                                                                            --
+   SELECT                                             
+   --   PVCS Identifiers :-
+   --
+   --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/eB_interface/v_lb_type_nw_flags.vw-arc   1.1   Jan 02 2019 11:43:14   Chris.Baugh  $
+   --       Module Name      : $Workfile:   v_lb_type_nw_flags.vw  $
+   --       Date into PVCS   : $Date:   Jan 02 2019 11:43:14  $
+   --       Date fetched Out : $Modtime:   Jan 02 2019 11:43:00  $
+   --       PVCS Version     : $Revision:   1.1  $
+   --
+   --   Author : R.A. Coupe
+   --
+   --   Location Bridge view describing various network flags for an asset type
+   --
+   -----------------------------------------------------------------------------
+   -- Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
+   ----------------------------------------------------------------------------
+   --
         lb_object_type,
         lb_asset_group,
         lb_exor_inv_type,
