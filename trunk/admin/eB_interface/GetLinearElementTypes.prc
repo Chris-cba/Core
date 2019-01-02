@@ -3,18 +3,18 @@ CREATE OR REPLACE FUNCTION GetLinearElementTypes
 IS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/eB_interface/GetLinearElementTypes.prc-arc   1.1   Mar 24 2017 14:05:40   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/eB_interface/GetLinearElementTypes.prc-arc   1.2   Jan 02 2019 11:34:02   Chris.Baugh  $
    --       Module Name      : $Workfile:   GetLinearElementTypes.prc  $
-   --       Date into PVCS   : $Date:   Mar 24 2017 14:05:40  $
-   --       Date fetched Out : $Modtime:   Mar 24 2017 14:05:18  $
-   --       PVCS Version     : $Revision:   1.1  $
+   --       Date into PVCS   : $Date:   Jan 02 2019 11:34:02  $
+   --       Date fetched Out : $Modtime:   Jan 02 2019 11:33:38  $
+   --       PVCS Version     : $Revision:   1.2  $
    --
    --   Author : R.A. Coupe/David Stow
    --
    --   Location Bridge package for DB retrieval into objects
    --
    -----------------------------------------------------------------------------
-   -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
+   -- Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
    --
