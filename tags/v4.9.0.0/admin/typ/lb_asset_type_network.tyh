@@ -1,0 +1,31 @@
+CREATE OR REPLACE TYPE lb_asset_type_network AS OBJECT(
+-----------------------------------------------------------------------------
+--
+--
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)ptr.tyh	1.1 02/15/06
+--       Module Name      : ptr.tyh
+--       Date into SCCS   : 06/02/15 08:26:46
+--       Date fetched Out : 07/06/13 17:04:59
+--       SCCS Version     : 1.1
+--
+--   Author : Rob Coupe
+--
+--
+--   TYPE ptr
+--
+-----------------------------------------------------------------------------
+--    Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
+   AssetType        INTEGER,
+   NetworkTypeId    INTEGER,
+   NetworkType      VARCHAR2 (4),
+   NetworkTypeName  VARCHAR2 (30),
+   NetworkFlag      VARCHAR2 (1),
+   NetworkTypeDescr VARCHAR2 (80),
+   UnitName         VARCHAR2 (40),
+   UnitMask         VARCHAR2 (80)
+);
+/
