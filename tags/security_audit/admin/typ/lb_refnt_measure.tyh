@@ -1,0 +1,28 @@
+CREATE OR REPLACE TYPE lb_refnt_measure AS OBJECT(
+-----------------------------------------------------------------------------
+--
+--
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)ptr.tyh	1.1 02/15/06
+--       Module Name      : ptr.tyh
+--       Date into SCCS   : 06/02/15 08:26:46
+--       Date fetched Out : 07/06/13 17:04:59
+--       SCCS Version     : 1.1
+--
+--   Author : Rob Coupe
+--
+--
+--   TYPE ptr
+--
+-----------------------------------------------------------------------------
+--    Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
+    NetworkElementId   INTEGER,       -- Network element ID
+    NetworkElementName VARCHAR2(30),  -- Network element unique name
+    StartM             NUMBER,        -- Minimum absolute linear measure
+    EndM               NUMBER,        -- Maximum absolute linear measure
+    Unit               VARCHAR2(20)   -- Units of minimum and maximum measures
+);                                  
+/
