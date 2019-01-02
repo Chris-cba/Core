@@ -7,18 +7,18 @@ AS
    SELECT                            /* +INDEX( e NE_PK) +CARDINALITY(t 10) */
           --   PVCS Identifiers :-
           --
-          --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/views/v_lb_xsp_list.vw-arc   1.1   Aug 10 2018 10:55:30   Rob.Coupe  $
+          --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/views/v_lb_xsp_list.vw-arc   1.2   Jan 02 2019 12:05:16   Chris.Baugh  $
           --       Module Name      : $Workfile:   v_lb_xsp_list.vw  $
-          --       Date into PVCS   : $Date:   Aug 10 2018 10:55:30  $
-          --       Date fetched Out : $Modtime:   Aug 10 2018 10:54:38  $
-          --       PVCS Version     : $Revision:   1.1  $
+          --       Date into PVCS   : $Date:   Jan 02 2019 12:05:16  $
+          --       Date fetched Out : $Modtime:   Jan 02 2019 12:04:54  $
+          --       PVCS Version     : $Revision:   1.2  $
           --
           --   Author : R.A. Coupe
           --
           --   View definition script for interim install of Location Bridge
           --
           -----------------------------------------------------------------------------
-          -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
+          -- Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
           ----------------------------------------------------------------------------
           --
           DISTINCT xsr_x_sect_value XSP, xsr_descr XSP_DESCR
