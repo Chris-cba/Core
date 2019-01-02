@@ -19,13 +19,13 @@ AS
         AS (SELECT
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
---       PVCS id          : $Header:   //new_vm_latest/archives/lb/admin/views/v_lb_directed_path_links.vw-arc   1.0   Sep 21 2015 14:09:20   Rob.Coupe  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/views/v_lb_directed_path_links.vw-arc   1.1   Jan 02 2019 14:14:06   Chris.Baugh  $
 --       Module Name      : $Workfile:   v_lb_directed_path_links.vw  $
---       Date into PVCS   : $Date:   Sep 21 2015 14:09:20  $
---       Date fetched Out : $Modtime:   Sep 21 2015 14:08:20  $
---       Version          : $Revision:   1.0  $
+--       Date into PVCS   : $Date:   Jan 02 2019 14:14:06  $
+--       Date fetched Out : $Modtime:   Dec 07 2018 10:19:00  $
+--       Version          : $Revision:   1.1  $
 --------------------------------------------------------------------------
---   Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 --------------------------------------------------------------------------
 ----
                    p.path_seq,
