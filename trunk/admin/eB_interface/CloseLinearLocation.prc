@@ -4,18 +4,18 @@ CREATE OR REPLACE PROCEDURE CloseLinearLocation (
 AS
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/eB_interface/CloseLinearLocation.prc-arc   1.1   Oct 19 2015 10:55:40   Rob.Coupe  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/eB_interface/CloseLinearLocation.prc-arc   1.2   Jan 02 2019 11:17:46   Chris.Baugh  $
 --       Module Name      : $Workfile:   CloseLinearLocation.prc  $
---       Date into PVCS   : $Date:   Oct 19 2015 10:55:40  $
---       Date fetched Out : $Modtime:   Oct 19 2015 10:55:14  $
---       PVCS Version     : $Revision:   1.1  $
+--       Date into PVCS   : $Date:   Jan 02 2019 11:17:46  $
+--       Date fetched Out : $Modtime:   Jan 02 2019 11:17:18  $
+--       PVCS Version     : $Revision:   1.2  $
 --
 --   Author : R.A. Coupe/David Stow
 --
 --   eB Interface procedure to close a linear location by location ID.
 --
 -----------------------------------------------------------------------------
--- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
+-- Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 ----------------------------------------------------------------------------
 --
 
