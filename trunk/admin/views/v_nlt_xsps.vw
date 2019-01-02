@@ -15,18 +15,18 @@ AS
           --
           --   PVCS Identifiers :-
           --
-          --       pvcsid                 : $Header:   //new_vm_latest/archives/lb/admin/views/v_nlt_xsps.vw-arc   1.1   Mar 02 2018 18:52:56   Rob.Coupe  $
+          --       pvcsid                 : $Header:   //new_vm_latest/archives/nm3/admin/views/v_nlt_xsps.vw-arc   1.2   Jan 02 2019 14:16:28   Chris.Baugh  $
           --       Module Name      : $Workfile:   v_nlt_xsps.vw  $
-          --       Date into PVCS   : $Date:   Mar 02 2018 18:52:56  $
-          --       Date fetched Out : $Modtime:   Mar 02 2018 18:53:26  $
-          --       PVCS Version     : $Revision:   1.1  $
+          --       Date into PVCS   : $Date:   Jan 02 2019 14:16:28  $
+          --       Date fetched Out : $Modtime:   Dec 07 2018 10:17:04  $
+          --       PVCS Version     : $Revision:   1.2  $
           --
           --   Author : Rob Coupe
           --
           --   Network types and XSP.
           --
           -----------------------------------------------------------------------------
-          --   Copyright (c) 2014 Bentley Systems Incorporated. All rights reserved.
+          --   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
           -----------------------------------------------------------------------------
           --     
 	       e.nlt_id        element_nlt_id,
