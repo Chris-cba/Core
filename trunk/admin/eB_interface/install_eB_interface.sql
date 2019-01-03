@@ -1,10 +1,10 @@
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/eB_interface/install_eB_interface.sql-arc   1.7   Jan 02 2019 11:40:30   Chris.Baugh  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/eB_interface/install_eB_interface.sql-arc   1.8   Jan 03 2019 10:20:18   Chris.Baugh  $
    --       Module Name      : $Workfile:   install_eB_interface.sql  $
-   --       Date into PVCS   : $Date:   Jan 02 2019 11:40:30  $
-   --       Date fetched Out : $Modtime:   Jan 02 2019 11:40:16  $
-   --       PVCS Version     : $Revision:   1.7  $
+   --       Date into PVCS   : $Date:   Jan 03 2019 10:20:18  $
+   --       Date fetched Out : $Modtime:   Jan 03 2019 10:19:30  $
+   --       PVCS Version     : $Revision:   1.8  $
    --
    --   Author : R.A. Coupe
    --
@@ -20,7 +20,7 @@ SET TERM ON
 PROMPT CloseLinearLocation.prc                                                                                                                                                                                                            
 SET TERM OFF
 SET DEFINE ON
-SELECT '&exor_base'||'lb'||'&terminator'||'admin'||'&terminator'||'eB_interface'||'&terminator'||'CloseLinearLocation.prc' run_file 
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'eB_interface'||'&terminator'||'CloseLinearLocation.prc' run_file 
 FROM dual
 /
 start '&run_file'
@@ -30,7 +30,7 @@ SET TERM ON
 PROMPT CreateLinearLocation.prc                                                                                                                                                                                                         
 SET TERM OFF
 SET DEFINE ON
-SELECT '&exor_base'||'lb'||'&terminator'||'admin'||'&terminator'||'eB_interface'||'&terminator'||'CreateLinearLocation.prc' run_file 
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'eB_interface'||'&terminator'||'CreateLinearLocation.prc' run_file 
 FROM dual
 /
 start '&run_file'
@@ -39,7 +39,7 @@ SET TERM ON
 PROMPT CreateLinearRange.prc                                                                                                                                                                                                            
 SET TERM OFF
 SET DEFINE ON
-SELECT '&exor_base'||'lb'||'&terminator'||'admin'||'&terminator'||'eB_interface'||'&terminator'||'CreateLinearRange.prc' run_file 
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'eB_interface'||'&terminator'||'CreateLinearRange.prc' run_file 
 FROM dual
 /
 start '&run_file'
@@ -48,7 +48,7 @@ SET TERM ON
 PROMPT GetAssetLinearLocations.fnc                                                                                                                                                                                                           
 SET TERM OFF
 SET DEFINE ON
-SELECT '&exor_base'||'lb'||'&terminator'||'admin'||'&terminator'||'eB_interface'||'&terminator'||'GetAssetLinearLocations.fnc' run_file 
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'eB_interface'||'&terminator'||'GetAssetLinearLocations.fnc' run_file 
 FROM dual
 /
 start '&run_file'
@@ -58,7 +58,7 @@ SET TERM ON
 PROMPT GetAssetLinearLocationsTab.fnc                                                                                                                                                                                                           
 SET TERM OFF
 SET DEFINE ON
-SELECT '&exor_base'||'lb'||'&terminator'||'admin'||'&terminator'||'eB_interface'||'&terminator'||'GetAssetLinearLocationsTab.fnc' run_file 
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'eB_interface'||'&terminator'||'GetAssetLinearLocationsTab.fnc' run_file 
 FROM dual
 /
 start '&run_file'
@@ -68,7 +68,7 @@ SET TERM ON
 PROMPT GetLinearElementTypes.prc                                                                                                                                                                                                          
 SET TERM OFF
 SET DEFINE ON
-SELECT '&exor_base'||'lb'||'&terminator'||'admin'||'&terminator'||'eB_interface'||'&terminator'||'GetLinearElementTypes.prc' run_file 
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'eB_interface'||'&terminator'||'GetLinearElementTypes.prc' run_file 
 FROM dual
 /
 start '&run_file'
@@ -77,7 +77,7 @@ SET TERM ON
 PROMPT GetLinearLocations.fnc                                                                                                                                                                                                          
 SET TERM OFF
 SET DEFINE ON
-SELECT '&exor_base'||'lb'||'&terminator'||'admin'||'&terminator'||'eB_interface'||'&terminator'||'GetLinearLocations.fnc' run_file 
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'eB_interface'||'&terminator'||'GetLinearLocations.fnc' run_file 
 FROM dual
 /
 start '&run_file'
@@ -86,7 +86,7 @@ SET TERM ON
 PROMPT GetLinearRanges.fnc                                                                                                                                                                                                            
 SET TERM OFF
 SET DEFINE ON
-SELECT '&exor_base'||'lb'||'&terminator'||'admin'||'&terminator'||'eB_interface'||'&terminator'||'GetLinearRanges.fnc' run_file 
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'eB_interface'||'&terminator'||'GetLinearRanges.fnc' run_file 
 FROM dual
 /
 start '&run_file'
@@ -95,7 +95,7 @@ SET TERM ON
 PROMPT GetNetworkElementMeasures.fnc                                                                                                                                                                                                        
 SET TERM OFF
 SET DEFINE ON
-SELECT '&exor_base'||'lb'||'&terminator'||'admin'||'&terminator'||'eB_interface'||'&terminator'||'GetNetworkElementMeasures.fnc' run_file 
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'eB_interface'||'&terminator'||'GetNetworkElementMeasures.fnc' run_file 
 FROM dual
 /
 start '&run_file'
@@ -104,7 +104,7 @@ SET TERM ON
 PROMPT GetNetworkElements.fnc                                                                                                                                                                                                         
 SET TERM OFF
 SET DEFINE ON
-SELECT '&exor_base'||'lb'||'&terminator'||'admin'||'&terminator'||'eB_interface'||'&terminator'||'GetNetworkElements.fnc' run_file 
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'eB_interface'||'&terminator'||'GetNetworkElements.fnc' run_file 
 FROM dual
 /
 start '&run_file'
@@ -113,7 +113,7 @@ SET TERM ON
 PROMPT GetNetworkTypes.fnc                                                                                                                                                                                                          
 SET TERM OFF
 SET DEFINE ON
-SELECT '&exor_base'||'lb'||'&terminator'||'admin'||'&terminator'||'eB_interface'||'&terminator'||'GetNetworkTypes.fnc' run_file 
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'eB_interface'||'&terminator'||'GetNetworkTypes.fnc' run_file 
 FROM dual
 /
 start '&run_file'
@@ -122,7 +122,7 @@ SET TERM ON
 PROMPT GetXspList.fnc                                                                                                                                                                                                          
 SET TERM OFF
 SET DEFINE ON
-SELECT '&exor_base'||'lb'||'&terminator'||'admin'||'&terminator'||'eB_interface'||'&terminator'||'GetXspList.fnc' run_file 
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'eB_interface'||'&terminator'||'GetXspList.fnc' run_file 
 FROM dual
 /
 start '&run_file'
@@ -131,7 +131,7 @@ SET TERM ON
 PROMPT GetNetworkLinearLocations.fnc                                                                                                                                                                                                          
 SET TERM OFF
 SET DEFINE ON
-SELECT '&exor_base'||'lb'||'&terminator'||'admin'||'&terminator'||'eB_interface'||'&terminator'||'GetNetworkLinearLocations.fnc' run_file 
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'eB_interface'||'&terminator'||'GetNetworkLinearLocations.fnc' run_file 
 FROM dual
 /
 start '&run_file'
@@ -140,7 +140,7 @@ SET TERM ON
 PROMPT GetNetworkLinearLocationsTab.fnc                                                                                                                                                                                                            
 SET TERM OFF
 SET DEFINE ON
-SELECT '&exor_base'||'lb'||'&terminator'||'admin'||'&terminator'||'eB_interface'||'&terminator'||'GetNetworkLinearLocationsTab.fnc' run_file 
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'eB_interface'||'&terminator'||'GetNetworkLinearLocationsTab.fnc' run_file 
 FROM dual
 /
 start '&run_file'
@@ -149,7 +149,7 @@ SET TERM ON
 PROMPT UpdateLinearLocation.prc                                                                                                                                                                                                         
 SET TERM OFF
 SET DEFINE ON
-SELECT '&exor_base'||'lb'||'&terminator'||'admin'||'&terminator'||'eB_interface'||'&terminator'||'UpdateLinearLocation.prc' run_file 
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'eB_interface'||'&terminator'||'UpdateLinearLocation.prc' run_file 
 FROM dual
 /
 start '&run_file'
@@ -158,7 +158,7 @@ SET TERM ON
 PROMPT v_network_types.sql                                                                                                                                                                                                      
 SET TERM OFF
 SET DEFINE ON
-SELECT '&exor_base'||'lb'||'&terminator'||'admin'||'&terminator'||'eB_interface'||'&terminator'||'v_network_types.sql' run_file 
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'eB_interface'||'&terminator'||'v_network_types.sql' run_file 
 FROM dual
 /
 start '&run_file'
@@ -167,7 +167,7 @@ SET TERM ON
 PROMPT v_network_elements.sql                                                                                                                                                                                                      
 SET TERM OFF
 SET DEFINE ON
-SELECT '&exor_base'||'lb'||'&terminator'||'admin'||'&terminator'||'eB_interface'||'&terminator'||'v_network_elements.sql' run_file 
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'eB_interface'||'&terminator'||'v_network_elements.sql' run_file 
 FROM dual
 /
 start '&run_file'
