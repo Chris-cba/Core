@@ -7,11 +7,11 @@ IS
    --
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/register_aggr_theme.prc-arc   1.0   Jun 30 2016 10:44:30   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/register_aggr_theme.prc-arc   1.1   Jan 04 2019 10:41:40   Rob.Coupe  $
    --       Module Name      : $Workfile:   register_aggr_theme.prc  $
-   --       Date into PVCS   : $Date:   Jun 30 2016 10:44:30  $
-   --       Date fetched Out : $Modtime:   Jun 30 2016 10:42:54  $
-   --       PVCS Version     : $Revision:   1.0  $
+   --       Date into PVCS   : $Date:   Jan 04 2019 10:41:40  $
+   --       Date fetched Out : $Modtime:   Jan 04 2019 10:41:04  $
+   --       PVCS Version     : $Revision:   1.1  $
    --
    --
    --   Author : Rob Coupe
@@ -147,7 +147,7 @@ BEGIN
 
    IF NVL (hig.get_sysopt ('REGSDELAY'), 'N') = 'Y'
    THEN
-      NM3SDE.register_sde_layer (l_theme);
+      execute immediate 'begin NM3SDE.register_sde_layer (:l_theme); end' using l_theme;
    END IF;
 
    INSERT INTO nm_theme_roles
