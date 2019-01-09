@@ -5,11 +5,11 @@ AS
     --
     --   PVCS Identifiers :-
     --
-    --       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.80   Jan 03 2019 12:26:42   Rob.Coupe  $
+    --       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.81   Jan 09 2019 13:41:44   Rob.Coupe  $
     --       Module Name      : $Workfile:   nm3sdm.pkb  $
-    --       Date into PVCS   : $Date:   Jan 03 2019 12:26:42  $
-    --       Date fetched Out : $Modtime:   Jan 03 2019 12:17:56  $
-    --       PVCS Version     : $Revision:   2.80  $
+    --       Date into PVCS   : $Date:   Jan 09 2019 13:41:44  $
+    --       Date fetched Out : $Modtime:   Jan 09 2019 13:40:24  $
+    --       PVCS Version     : $Revision:   2.81  $
     --
     --   Author : R.A. Coupe
     --
@@ -21,7 +21,7 @@ AS
     --
     --all global package variables here
     --
-    g_Body_Sccsid    CONSTANT VARCHAR2 (2000) := '"$Revision:   2.80  $"';
+    g_Body_Sccsid    CONSTANT VARCHAR2 (2000) := '"$Revision:   2.81  $"';
     --  g_body_sccsid is the SCCS ID for the package body
     --
     g_Package_Name   CONSTANT VARCHAR2 (30) := 'NM3SDM';
@@ -9235,6 +9235,10 @@ AS
             --
             nm_inv_sdo_aggr.reshape_aggregated_geometry (p_ne_id);
         END IF;
+
+        UPDATE nm_elements
+           SET ne_date_modified = SYSDATE
+         WHERE ne_id = p_ne_id;            -- trigger will handled modified-by
     END reshape_element;
 
     --
