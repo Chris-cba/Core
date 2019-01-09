@@ -2,11 +2,11 @@
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/views/v_geom_on_route.vw-arc   1.8   May 31 2018 15:24:08   Chris.Baugh  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/views/v_geom_on_route.vw-arc   1.9   Jan 09 2019 09:21:08   Chris.Baugh  $
 --       Module Name      : $Workfile:   v_geom_on_route.vw  $
---       Date into PVCS   : $Date:   May 31 2018 15:24:08  $
---       Date fetched Out : $Modtime:   May 31 2018 15:22:52  $
---       Version          : $Revision:   1.8  $
+--       Date into PVCS   : $Date:   Jan 09 2019 09:21:08  $
+--       Date fetched Out : $Modtime:   Jan 09 2019 09:20:28  $
+--       Version          : $Revision:   1.9  $
 -------------------------------------------------------------------------
 --
 -----------------------------------------------------------------------------
@@ -22,12 +22,21 @@ DECLARE
   lv_str                  VARCHAR2(3000);
 BEGIN
   --
-  SELECT ne_nt_type
-        ,ne_gty_group_type
-    INTO lv_ne_nt_type,
-         lv_ne_gty_group_type
-    FROM nm_elements, (SELECT rse_he_id FROM road_sections WHERE ROWNUM = 1 )
-   WHERE ne_id = rse_he_id;
+  BEGIN
+    --
+    SELECT ne_nt_type
+          ,ne_gty_group_type
+      INTO lv_ne_nt_type,
+           lv_ne_gty_group_type
+      FROM nm_elements, (SELECT rse_he_id FROM road_sections WHERE ROWNUM = 1 )
+     WHERE ne_id = rse_he_id;
+	 --
+  EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+	  NULL;
+	WHEN OTHERS THEN
+	  RAISE;
+  END;
   --
   IF lv_ne_gty_group_type IS NOT NULL
   THEN
