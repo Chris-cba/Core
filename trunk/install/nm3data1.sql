@@ -1,11 +1,11 @@
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm3data1.sql-arc   2.63   Dec 20 2018 16:24:54   Chris.Baugh  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm3data1.sql-arc   2.64   Jan 10 2019 12:22:22   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm3data1.sql  $
---       Date into PVCS   : $Date:   Dec 20 2018 16:24:54  $
---       Date fetched Out : $Modtime:   Dec 18 2018 09:30:54  $
---       Version          : $Revision:   2.63  $
+--       Date into PVCS   : $Date:   Jan 10 2019 12:22:22  $
+--       Date fetched Out : $Modtime:   Jan 10 2019 12:21:38  $
+--       Version          : $Revision:   2.64  $
 --       Table Owner      : NM3_METADATA
 --       Generation Date  : 18-DEC-2018 09:30
 --
@@ -38988,7 +38988,7 @@ SELECT 'WEBMAPDSRC'
       ,''
       ,'VARCHAR2'
       ,'N'
-      ,'Y'
+      ,'N'
       ,2000
   FROM DUAL
  WHERE NOT EXISTS(SELECT 1
