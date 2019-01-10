@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm_gty_sdo_aggr
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm_gty_sdo_aggr.pkb-arc   1.0   Jan 10 2019 14:15:40   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm_gty_sdo_aggr.pkb-arc   1.1   Jan 10 2019 16:01:00   Rob.Coupe  $
    --       Module Name      : $Workfile:   nm_gty_sdo_aggr.pkb  $
-   --       Date into PVCS   : $Date:   Jan 10 2019 14:15:40  $
-   --       Date fetched Out : $Modtime:   Jan 10 2019 13:34:50  $
-   --       PVCS Version     : $Revision:   1.0  $
+   --       Date into PVCS   : $Date:   Jan 10 2019 16:01:00  $
+   --       Date fetched Out : $Modtime:   Jan 10 2019 15:58:54  $
+   --       PVCS Version     : $Revision:   1.1  $
    --
    --   Author : R.A. Coupe
    --
@@ -17,7 +17,8 @@ AS
    ----------------------------------------------------------------------------
    --
    
-   g_body_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.0  $';
+   g_body_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.1  $';
+   c_nvl_date      CONSTANT DATE := NM3TYPE.c_nvl_date;
 
    qq                       VARCHAR2 (1) := CHR (39);
    TABLE_NOT_EXISTS         EXCEPTION;
@@ -37,6 +38,8 @@ AS
    procedure reg_aggr_gty_type (pi_gty_type in varchar2);
 
    procedure set_refresh_date (pi_gty_type in varchar2);
+   
+   procedure lock_aggregation (pi_gty_type in varchar2);
 
    FUNCTION get_version
       RETURN VARCHAR2
@@ -128,7 +131,7 @@ AS
       IF NOT nm3ddl.does_object_exist (l_gty_table, 'VIEW')
       THEN
          raise_application_error (
-            -20002,
+            -20001,
                'The group view '
             || l_gty_table
             || ' does not exist, cannot create a join view');
@@ -178,7 +181,7 @@ AS
       WHEN TABLE_NOT_EXISTS
       THEN
          RAISE_APPLICATION_ERROR (
-            -20004,
+            -20002,
             'Problem in the join view components, check the group type metadata and views');
    END;
 
@@ -221,10 +224,7 @@ AS
    EXCEPTION
       WHEN already_deferred
       THEN
-         NULL;
-      WHEN OTHERS
-      THEN
-         RAISE;
+         raise_application_error(-20003, 'The index is set to deferred so the process may already be running');
    END;
 
    PROCEDURE SYNCH_GTY_INDEX
@@ -263,6 +263,11 @@ AS
       dml_errors         EXCEPTION;
       PRAGMA EXCEPTION_INIT (dml_errors, -24381);
    BEGIN
+   
+      IF nm3net.get_gty_sub_group_allowed(pi_group_type => pi_gty_type ) = 'Y' then
+        raise_application_error( -20009, 'The group type allows sub-groups use he group-of-groups aggregation procedure');
+      END IF;
+   
       BEGIN
          SELECT nth_feature_table,
                 nth_feature_fk_column,
@@ -283,9 +288,11 @@ AS
          WHEN NO_DATA_FOUND
          THEN
             raise_application_error (
-               -20001,
+               -20004,
                'The base spatial representation for the group type cannot be found');
       END;
+
+      lock_aggregation(pi_gty_type);  -- Not of any real benefit, index deferal is used as the real test
 
       set_gty_index_deferred;
 
@@ -368,7 +375,7 @@ AS
          WHEN NO_DATA_FOUND
          THEN
             raise_application_error (
-               -20001,
+               -20005,
                'Aggregated layer is not available for this group type');
       END;
 
@@ -470,7 +477,7 @@ AS
          WHEN DUP_VAL_ON_INDEX
          THEN
             raise_application_error (
-               -20002,
+               -20006,
                'Aggregated asset geometry view is already registered as a theme');
       END;
 
@@ -587,7 +594,7 @@ AS
          WHEN NO_DATA_FOUND
          THEN
             raise_application_error (
-               -20001,
+               -20007,
                'The base spatial representation for the group type cannot be found');
       END;
 
@@ -596,10 +603,9 @@ AS
       IF NOT nm_gty_sdo_aggr.is_gty_type_aggregated (pi_gty_type)
       THEN
          raise_application_error (
-            -20001,
+            -20008,
             'Aggregated group layer does not exist so cannot be refreshed');
       END IF;
-
 
       OPEN c1 (pi_gty_type);
 
@@ -653,5 +659,13 @@ AS
 
       SYNCH_GTY_INDEX;
    END;
+   
+   procedure lock_aggregation (pi_gty_type in varchar2) is
+   dummy varchar2(4);
+   begin   
+      select ngt_group_type into dummy from nm_gty_aggr_sdo_types
+      where ngt_group_type = pi_gty_type
+      for update of ngt_group_type; 
+   end;
 END;
 /
