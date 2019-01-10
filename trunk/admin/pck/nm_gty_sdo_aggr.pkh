@@ -1,0 +1,51 @@
+CREATE OR REPLACE PACKAGE nm_gty_sdo_aggr
+AS
+   --   PVCS Identifiers :-
+   --
+   --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm_gty_sdo_aggr.pkh-arc   1.0   Jan 10 2019 14:12:56   Rob.Coupe  $
+   --       Module Name      : $Workfile:   nm_gty_sdo_aggr.pkh  $
+   --       Date into PVCS   : $Date:   Jan 10 2019 14:12:56  $
+   --       Date fetched Out : $Modtime:   Jan 10 2019 13:33:14  $
+   --       PVCS Version     : $Revision:   1.0  $
+   --
+   --   Author : R.A. Coupe
+   --
+   --   Package for code which produces aggregated geometry for assets.
+   --
+   -----------------------------------------------------------------------------
+   -- Copyright (c) 2016 Bentley Systems Incorporated. All rights reserved.
+   ----------------------------------------------------------------------------
+   --
+   g_sccsid     CONSTANT VARCHAR2 (80) := '"$Revision:   1.0  $"';
+
+   FUNCTION get_version
+      RETURN VARCHAR2;
+
+   FUNCTION get_body_version
+      RETURN VARCHAR2;
+
+   PROCEDURE create_gty_aggr_sdo_view (
+      pi_gty_type    IN nm_group_types.ngt_group_type%TYPE,
+      pi_view_name   IN VARCHAR2 DEFAULT NULL);
+
+   PROCEDURE create_gty_aggr_join_view (
+      pi_gty_type    IN nm_group_types.ngt_group_type%TYPE,
+      pi_view_name   IN VARCHAR2 DEFAULT NULL);
+
+   FUNCTION is_gty_type_aggregated (
+      pi_gty_type   IN nm_group_types.ngt_group_type%TYPE)
+      RETURN BOOLEAN;
+
+   PROCEDURE aggregate_current_gty (
+      pi_gty_type   IN nm_group_types.ngt_group_type%TYPE,
+      p_limit       IN INTEGER DEFAULT 100);
+
+   PROCEDURE register_aggr_theme (
+      p_gty_type   IN nm_group_types.ngt_group_type%TYPE,
+      p_role       IN nm_theme_roles.nthr_role%TYPE);
+
+   PROCEDURE refresh_gty_aggr (pi_gty_type   IN VARCHAR2,
+                               pi_limit      IN INTEGER DEFAULT 100);
+      
+END;
+/
