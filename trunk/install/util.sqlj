@@ -2,11 +2,11 @@
 /*
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/util.sqlj-arc   2.3   Apr 18 2018 16:09:58   Gaurav.Gaurkar  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/util.sqlj-arc   2.4   Jan 17 2019 11:32:34   Chris.Baugh  $
 --       Module Name      : $Workfile:   util.sqlj  $
---       Date into SCCS   : $Date:   Apr 18 2018 16:09:58  $
---       Date fetched Out : $Modtime:   Apr 18 2018 16:02:36  $
---       SCCS Version     : $Revision:   2.3  $
+--       Date into SCCS   : $Date:   Jan 17 2019 11:32:34  $
+--       Date fetched Out : $Modtime:   Jan 17 2019 11:31:40  $
+--       SCCS Version     : $Revision:   2.4  $
 --       Based on 
 --
 --
@@ -101,7 +101,16 @@
       for(int i = 0; i < list.length; i++)
       {
           element = list[i];
-          #sql { CALL nm3file.append_file_to_dir_list( :element) };
+          //#sql { CALL nm3file.append_file_to_dir_list( :element) };
+		  
+		  Connection conn = DriverManager.getConnection("jdbc:default:connection:");
+		  String sql = "{CALL nm3file.append_file_to_dir_list(?)}";
+		  
+		  CallableStatement cstmt = conn.prepareCall(sql);
+	      cstmt.setString(1, element);
+          
+	      cstmt.execute();
+	      cstmt.close();
       }      
     }
   
