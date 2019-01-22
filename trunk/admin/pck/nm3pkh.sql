@@ -2,11 +2,11 @@
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3pkh.sql-arc   2.49   Dec 20 2018 14:46:44   Chris.Baugh  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3pkh.sql-arc   2.50   Jan 22 2019 09:29:56   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm3pkh.sql  $
---       Date into PVCS   : $Date:   Dec 20 2018 14:46:44  $
---       Date fetched Out : $Modtime:   Dec 18 2018 08:25:18  $
---       PVCS Version     : $Revision:   2.49  $
+--       Date into PVCS   : $Date:   Jan 22 2019 09:29:56  $
+--       Date fetched Out : $Modtime:   Jan 22 2019 09:27:52  $
+--       PVCS Version     : $Revision:   2.50  $
 --
 --
 --   Author : Graeme Johnson
@@ -2651,39 +2651,6 @@ start '&run_file'
 --
 ----------------------------------------------------------------------------------------- 
 --
-SET TERM ON 
-PROMPT nm_sdo.pkh
-SET TERM OFF
-SET DEFINE ON 
-SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'pck'||'&terminator'||'nm_sdo.pkh' run_file
-FROM dual 
-/ 
-start '&run_file'
-
---
------------------------------------------------------------------------------------------ 
---
-SET TERM ON 
-PROMPT nm_sdo_geom.pkh
-SET TERM OFF
-SET DEFINE ON 
-SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'pck'||'&terminator'||'nm_sdo_geom.pkh' run_file
-FROM dual 
-/ 
-start '&run_file'
-
---
------------------------------------------------------------------------------------------ 
---
-SET TERM ON 
-PROMPT sdo_lrs.pkh
-SET TERM OFF
-SET DEFINE ON 
-SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'pck'||'&terminator'||'sdo_lrs.pkh' run_file
-FROM dual 
-/ 
-start '&run_file'
-
 SET TERM ON
 PROMPT lb_ref.pkh                                                                                                                                                                                                                    
 SET TERM OFF
