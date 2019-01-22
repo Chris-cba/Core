@@ -8,11 +8,11 @@ CREATE OR REPLACE FORCE VIEW V_CONTIGUITY_CHECK
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/views/v_contiguity_check.vw-arc   1.1   Jan 22 2019 10:37:44   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/views/v_contiguity_check.vw-arc   1.2   Jan 22 2019 11:12:32   Chris.Baugh  $
     --       Module Name      : $Workfile:   v_contiguity_check.vw  $
-    --       Date into PVCS   : $Date:   Jan 22 2019 10:37:44  $
-    --       Date fetched Out : $Modtime:   Jan 22 2019 10:36:30  $
-    --       PVCS Version     : $Revision:   1.1  $
+    --       Date into PVCS   : $Date:   Jan 22 2019 11:12:32  $
+    --       Date fetched Out : $Modtime:   Jan 22 2019 11:11:48  $
+    --       PVCS Version     : $Revision:   1.2  $
     --
     --   Author : R.A. Coupe
     --
@@ -21,7 +21,6 @@ AS
     -----------------------------------------------------------------------------
     -- Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
     -----------------------------------------------------------------------------
-
     WITH
         membs
         AS
