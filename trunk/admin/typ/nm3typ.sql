@@ -3,11 +3,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/typ/nm3typ.sql-arc   2.15   Dec 20 2018 15:56:58   Chris.Baugh  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/typ/nm3typ.sql-arc   2.16   Jan 22 2019 09:31:08   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm3typ.sql  $
---       Date into PVCS   : $Date:   Dec 20 2018 15:56:58  $
---       Date fetched Out : $Modtime:   Dec 19 2018 10:24:50  $
---       Version          : $Revision:   2.15  $
+--       Date into PVCS   : $Date:   Jan 22 2019 09:31:08  $
+--       Date fetched Out : $Modtime:   Jan 22 2019 09:15:46  $
+--       Version          : $Revision:   2.16  $
 --
 --   Product upgrade script
 --
@@ -211,11 +211,6 @@ BEGIN
   drop_type('hig_navigator_tab');
   drop_type('hig_navigator_type');
   drop_type('nav_id');
-  drop_type('nm_vertex_tab');
-  drop_type('nm_vertex');
-  drop_type('geom_id_tab');
-  drop_type('geom_id');
-  drop_type('nm_geom_terminations');
   --
   -- Location Bridge Types
   --
@@ -1608,72 +1603,6 @@ set define on
 set feedback off
 select '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'typ'||
         '&terminator'||'nm_msv_style_size.tyh' run_file
-from dual
-/
-start '&&run_file'
-
---
---------------------------------------------------------------------------------------------
---
-set term on
-prompt nm_vertex.tyh header
-set term off
-set define on
-set feedback off
-select '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'typ'||
-        '&terminator'||'nm_vertex.tyh' run_file
-from dual
-/
-start '&&run_file'
---
---------------------------------------------------------------------------------------------
---
-set term on
-prompt nm_vertex_tab.tyh header
-set term off
-set define on
-set feedback off
-select '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'typ'||
-        '&terminator'||'nm_vertex_tab.tyh' run_file
-from dual
-/
-start '&&run_file'
---
---------------------------------------------------------------------------------------------
---
-set term on
-prompt geom_id.tyh header
-set term off
-set define on
-set feedback off
-select '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'typ'||
-        '&terminator'||'geom_id.tyh' run_file
-from dual
-/
-start '&&run_file'
---
---------------------------------------------------------------------------------------------
---
-set term on
-prompt geom_id_tab.tyh header
-set term off
-set define on
-set feedback off
-select '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'typ'||
-        '&terminator'||'geom_id_tab.tyh' run_file
-from dual
-/
-start '&&run_file'
---
---------------------------------------------------------------------------------------------
---
-set term on
-prompt nm_geom_terminations.tyh header
-set term off
-set define on
-set feedback off
-select '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'typ'||
-        '&terminator'||'nm_geom_terminations.tyh' run_file
 from dual
 /
 start '&&run_file'
