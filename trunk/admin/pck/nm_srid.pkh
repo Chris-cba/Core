@@ -1,0 +1,81 @@
+/* Formatted on 22/01/2019 15:38:31 (QP5 v5.336) */
+CREATE OR REPLACE PACKAGE nm_srid
+AS
+    --<PACKAGE>
+    --   PVCS Identifiers :-
+    --
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm_srid.pkh-arc   1.0   Jan 22 2019 15:46:14   Rob.Coupe  $
+    --       Module Name      : $Workfile:   nm_srid.pkh  $
+    --       Date into PVCS   : $Date:   Jan 22 2019 15:46:14  $
+    --       Date fetched Out : $Modtime:   Jan 22 2019 15:38:40  $
+    --       PVCS Version     : $Revision:   1.0  $
+    --
+    --   Author : R.A. Coupe
+    --
+    --   Package for handling SDO LRS data
+    --
+    -----------------------------------------------------------------------------
+    -- Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
+    ----------------------------------------------------------------------------
+    -- The main purpose of this package is to handle conversions relating to the Oracle SRID
+    --</PACKAGE>
+
+    g_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.0  $';
+
+    -----------------------------------------------------------------------------
+    --
+    --<PROC NAME="GET_VERSION">
+    --
+    -- This function returns the current PVCS version of the package
+
+    FUNCTION get_version
+        RETURN VARCHAR2;
+
+    --</PROC>
+
+    -----------------------------------------------------------------------------
+    --
+    --<PROC NAME="GET_BODY_VERSION">
+    --
+    -- This function returns the current PVCS version of the package body
+    FUNCTION get_body_version
+        RETURN VARCHAR2;
+
+    --</PROC>
+
+    FUNCTION is_geodetic (pi_srid IN INTEGER)
+        RETURN VARCHAR2;
+
+    -- function get_unit return the Exor unit ID relating to the XY data of the SRID
+    FUNCTION get_unit (srid IN NUMBER)
+        RETURN NUMBER;
+
+    --function get_xy_to_m_conversion takes a SRID and the themes relating to the networks and return the network unit and a conversion value
+    --between the XY unit of the SRID and the measure unit of the network.
+    FUNCTION get_xy_to_m_conversion (srid         IN     NUMBER,
+                                     themes       IN     nm_theme_array_type,
+                                     po_nw_unit      OUT INTEGER)
+        RETURN NUMBER;
+
+    --function get_xy_to_m_conversion takes a SRID and the themes relating to the networks and return  a conversion value
+    --between the XY unit of the SRID and the measure unit of the network.
+
+    FUNCTION get_xy_to_m_conversion (srid     IN NUMBER,
+                                     themes   IN nm_theme_array_type)
+        RETURN NUMBER;
+
+    --function get_m_to_xy_conversion takes a SRID and the themes relating to the networks and return the network unit and a conversion value
+    --between the the measure unit of the network and XY unit of the SRID.
+
+    FUNCTION get_m_to_xy_conversion (srid         IN     NUMBER,
+                                     themes       IN     nm_theme_array_type,
+                                     po_nw_unit      OUT INTEGER)
+        RETURN NUMBER;
+
+    --function get_m_to_xy_conversion takes a SRID and the themes relating to the networks and return a conversion value
+    --between the the measure unit of the network and XY unit of the SRID.
+    FUNCTION get_m_to_xy_conversion (srid     IN NUMBER,
+                                     themes   IN nm_theme_array_type)
+        RETURN NUMBER;
+END;
+/
