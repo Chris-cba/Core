@@ -3,11 +3,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm4700_nm4800_upg.sql-arc   1.1   Jan 10 2019 12:23:34   Chris.Baugh  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm4700_nm4800_upg.sql-arc   1.2   Jan 23 2019 12:10:02   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm4700_nm4800_upg.sql  $
---       Date into PVCS   : $Date:   Jan 10 2019 12:23:34  $
---       Date fetched Out : $Modtime:   Jan 10 2019 12:23:00  $
---       Version          : $Revision:   1.1  $
+--       Date into PVCS   : $Date:   Jan 23 2019 12:10:02  $
+--       Date fetched Out : $Modtime:   Jan 23 2019 11:22:12  $
+--       Version          : $Revision:   1.2  $
 --
 --   Product upgrade script
 --
@@ -304,6 +304,23 @@ select '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'eB_Interface
         '&terminator'||'install_eB_interface' run_file
 from dual
 /
+SET FEEDBACK ON
+start '&&run_file'
+SET FEEDBACK OFF
+--
+---------------------------------------------------------------------------------------------------
+--                        ****************   Apply SDO_LRS replacement code if Oracle Standard Edition (ie. not Enterprise)  *******************
+SET TERM ON
+Prompt Applying SDO_LRS replacement, if Oracle Standard Edition...
+SET TERM OFF
+
+SELECT DECODE(INSTR(UPPER(banner), 'ENTERPRISE'), 
+                    0, '&exor_base'||'nm3'||'&terminator'||'install'||'&terminator'||'install_sdo_lrs_replacement',
+                       '&exor_base'||'nm3'||'&terminator'||'install'||'&terminator'||'dummy') run_file
+  FROM v$version 
+WHERE UPPER(banner) LIKE '%ORACLE DATABASE%'
+/
+
 SET FEEDBACK ON
 start '&&run_file'
 SET FEEDBACK OFF
