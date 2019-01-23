@@ -1,11 +1,11 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/nm3_install.sql-arc   2.44   Dec 20 2018 16:25:52   Chris.Baugh  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/nm3_install.sql-arc   2.45   Jan 23 2019 12:10:48   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm3_install.sql  $
---       Date into PVCS   : $Date:   Dec 20 2018 16:25:52  $
---       Date fetched Out : $Modtime:   Dec 19 2018 11:26:28  $
---       PVCS Version     : $Revision:   2.44  $
+--       Date into PVCS   : $Date:   Jan 23 2019 12:10:48  $
+--       Date fetched Out : $Modtime:   Jan 23 2019 11:21:16  $
+--       PVCS Version     : $Revision:   2.45  $
 --
 --------------------------------------------------------------------------------
 --   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
@@ -455,6 +455,23 @@ select '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'eB_Interface
         '&terminator'||'install_eB_interface' run_file
 from dual
 /
+SET FEEDBACK ON
+start '&&run_file'
+SET FEEDBACK OFF
+--
+---------------------------------------------------------------------------------------------------
+--                        ****************   Apply SDO_LRS replacement code if Oracle Standard Edition (ie. not Enterprise)  *******************
+SET TERM ON
+Prompt Applying SDO_LRS replacement, if Oracle Standard Edition...
+SET TERM OFF
+
+SELECT DECODE(INSTR(UPPER(banner), 'ENTERPRISE'), 
+                    0, '&exor_base'||'nm3'||'&terminator'||'install'||'&terminator'||'install_sdo_lrs_replacement',
+                       '&exor_base'||'nm3'||'&terminator'||'install'||'&terminator'||'dummy') run_file
+  FROM v$version 
+WHERE UPPER(banner) LIKE '%ORACLE DATABASE%'
+/
+
 SET FEEDBACK ON
 start '&&run_file'
 SET FEEDBACK OFF
