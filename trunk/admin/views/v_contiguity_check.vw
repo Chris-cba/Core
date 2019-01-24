@@ -12,11 +12,11 @@ AS
             (    SELECT *
                    --   PVCS Identifiers :-
                    --
-                   --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/views/v_contiguity_check.vw-arc   1.5   Jan 24 2019 18:10:08   Rob.Coupe  $
+                   --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/views/v_contiguity_check.vw-arc   1.6   Jan 24 2019 18:11:32   Rob.Coupe  $
                    --       Module Name      : $Workfile:   v_contiguity_check.vw  $
-                   --       Date into PVCS   : $Date:   Jan 24 2019 18:10:08  $
-                   --       Date fetched Out : $Modtime:   Jan 24 2019 18:08:08  $
-                   --       PVCS Version     : $Revision:   1.5  $
+                   --       Date into PVCS   : $Date:   Jan 24 2019 18:11:32  $
+                   --       Date fetched Out : $Modtime:   Jan 24 2019 18:11:04  $
+                   --       PVCS Version     : $Revision:   1.6  $
                    --
                    --   Author : R.A. Coupe
                    --
@@ -357,4 +357,5 @@ and im.nm_obj_type =  SYS_CONTEXT ('NM3SQL', 'CONTIGUOUS_ASSET_TYPE')
     GROUP BY ne_id,
              gap_overlap,
              start_m,
-             end_m
+             end_m;
+			 
