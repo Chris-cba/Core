@@ -12,11 +12,11 @@ AS
             (    SELECT *
                    --   PVCS Identifiers :-
                    --
-                   --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/views/v_contiguity_check.vw-arc   1.4   Jan 24 2019 17:42:56   Rob.Coupe  $
+                   --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/views/v_contiguity_check.vw-arc   1.5   Jan 24 2019 18:10:08   Rob.Coupe  $
                    --       Module Name      : $Workfile:   v_contiguity_check.vw  $
-                   --       Date into PVCS   : $Date:   Jan 24 2019 17:42:56  $
-                   --       Date fetched Out : $Modtime:   Jan 24 2019 17:41:32  $
-                   --       PVCS Version     : $Revision:   1.4  $
+                   --       Date into PVCS   : $Date:   Jan 24 2019 18:10:08  $
+                   --       Date fetched Out : $Modtime:   Jan 24 2019 18:08:08  $
+                   --       PVCS Version     : $Revision:   1.5  $
                    --
                    --   Author : R.A. Coupe
                    --
@@ -70,7 +70,7 @@ AS
                             AND i.nm_end_mp >= m.nm_begin_mp
                             AND i.nm_ne_id_in = iit_ne_id
                             --                                             and i.nm_begin_mp <> 0.042
-                            AND CASE
+                           AND CASE
                                     WHEN SYS_CONTEXT ('NM3SQL',
                                                       'CONTIGUOUS_XSP')
                                              IS NULL or nit_x_sect_allow_flag = 'N'
@@ -161,7 +161,41 @@ where not exists ( select 1 from datum_membs b where a.ne_id = b.ne_id and b.nm_
     GROUP BY ne_id,
              gap_overlap,
              start_m,
-             end_m             
+             end_m    
+union all
+select ne_id, gap_overlap,
+             start_m,
+             end_m  
+from (             
+select m.nm_ne_id_of ne_id, 'GAP' gap_overlap, 0 start_m, ne_length end_m
+from membs m, nm_elements
+where ne_type = 'S' 
+and ne_id = m.nm_ne_id_of and not exists ( select 1 from nm_members im, nm_inv_items i, nm_inv_types  where im.nm_ne_id_of = m.nm_ne_id_of and i.iit_ne_id = im.nm_ne_id_in
+and nit_inv_type = SYS_CONTEXT ('NM3SQL', 'CONTIGUOUS_ASSET_TYPE')
+and im.nm_obj_type =  SYS_CONTEXT ('NM3SQL', 'CONTIGUOUS_ASSET_TYPE') 
+                           AND CASE
+                                    WHEN SYS_CONTEXT ('NM3SQL',
+                                                      'CONTIGUOUS_XSP')
+                                             IS NULL or nit_x_sect_allow_flag = 'N'
+                                    THEN
+                                        '£$%^'
+                                    ELSE
+                                        SYS_CONTEXT ('NM3SQL',
+                                                     'CONTIGUOUS_XSP')
+                                END =
+                                CASE
+                                    WHEN SYS_CONTEXT ('NM3SQL',
+                                                      'CONTIGUOUS_XSP')
+                                             IS NULL or nit_x_sect_allow_flag = 'N'
+                                    THEN
+                                        '£$%^'
+                                    ELSE
+                                        iit_x_sect
+                                END))
+    GROUP BY ne_id,
+             gap_overlap,
+             start_m,
+             end_m    
     UNION ALL
      SELECT ne_id,
              GAP_OVERLAP,
@@ -286,5 +320,41 @@ where not exists ( select 1 from datum_membs b where b.nm_begin_mp <= a.nm_begin
     GROUP BY ne_id,
              gap_overlap,
              start_m,
-             end_m;
-			 
+             end_m
+union all
+select ne_id, gap_overlap,
+             start_m,
+             end_m  
+from (             
+select ne_id, 'GAP' gap_overlap, 0 start_m, ne_length end_m
+from nm_elements
+where ne_id =                                           TO_NUMBER (
+                                              SYS_CONTEXT (
+                                                  'NM3SQL',
+                                                  'CONTIGUOUS_OVER_NE'))
+and not exists ( select 1 from nm_members im, nm_inv_items i, nm_inv_types  where im.nm_ne_id_of = ne_id and i.iit_ne_id = im.nm_ne_id_in
+and nit_inv_type = SYS_CONTEXT ('NM3SQL', 'CONTIGUOUS_ASSET_TYPE')
+and im.nm_obj_type =  SYS_CONTEXT ('NM3SQL', 'CONTIGUOUS_ASSET_TYPE') 
+                           AND CASE
+                                    WHEN SYS_CONTEXT ('NM3SQL',
+                                                      'CONTIGUOUS_XSP')
+                                             IS NULL or nit_x_sect_allow_flag = 'N'
+                                    THEN
+                                        '£$%^'
+                                    ELSE
+                                        SYS_CONTEXT ('NM3SQL',
+                                                     'CONTIGUOUS_XSP')
+                                END =
+                                CASE
+                                    WHEN SYS_CONTEXT ('NM3SQL',
+                                                      'CONTIGUOUS_XSP')
+                                             IS NULL or nit_x_sect_allow_flag = 'N'
+                                    THEN
+                                        '£$%^'
+                                    ELSE
+                                        iit_x_sect
+                                END))
+    GROUP BY ne_id,
+             gap_overlap,
+             start_m,
+             end_m
