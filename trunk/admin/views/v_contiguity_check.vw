@@ -12,11 +12,11 @@ AS
             (    SELECT *
                    --   PVCS Identifiers :-
                    --
-                   --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/views/v_contiguity_check.vw-arc   1.6   Jan 24 2019 18:11:32   Rob.Coupe  $
+                   --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/views/v_contiguity_check.vw-arc   1.7   Jan 24 2019 18:17:28   Rob.Coupe  $
                    --       Module Name      : $Workfile:   v_contiguity_check.vw  $
-                   --       Date into PVCS   : $Date:   Jan 24 2019 18:11:32  $
-                   --       Date fetched Out : $Modtime:   Jan 24 2019 18:11:04  $
-                   --       PVCS Version     : $Revision:   1.6  $
+                   --       Date into PVCS   : $Date:   Jan 24 2019 18:17:28  $
+                   --       Date fetched Out : $Modtime:   Jan 24 2019 18:16:56  $
+                   --       PVCS Version     : $Revision:   1.7  $
                    --
                    --   Author : R.A. Coupe
                    --
@@ -332,6 +332,7 @@ where ne_id =                                           TO_NUMBER (
                                               SYS_CONTEXT (
                                                   'NM3SQL',
                                                   'CONTIGUOUS_OVER_NE'))
+and ne_type = 'S'												  
 and not exists ( select 1 from nm_members im, nm_inv_items i, nm_inv_types  where im.nm_ne_id_of = ne_id and i.iit_ne_id = im.nm_ne_id_in
 and nit_inv_type = SYS_CONTEXT ('NM3SQL', 'CONTIGUOUS_ASSET_TYPE')
 and im.nm_obj_type =  SYS_CONTEXT ('NM3SQL', 'CONTIGUOUS_ASSET_TYPE') 
