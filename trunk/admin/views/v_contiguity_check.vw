@@ -8,11 +8,11 @@ CREATE OR REPLACE FORCE VIEW V_CONTIGUITY_CHECK
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/views/v_contiguity_check.vw-arc   1.2   Jan 22 2019 11:12:32   Chris.Baugh  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/views/v_contiguity_check.vw-arc   1.3   Jan 24 2019 09:44:04   Rob.Coupe  $
     --       Module Name      : $Workfile:   v_contiguity_check.vw  $
-    --       Date into PVCS   : $Date:   Jan 22 2019 11:12:32  $
-    --       Date fetched Out : $Modtime:   Jan 22 2019 11:11:48  $
-    --       PVCS Version     : $Revision:   1.2  $
+    --       Date into PVCS   : $Date:   Jan 24 2019 09:44:04  $
+    --       Date fetched Out : $Modtime:   Jan 24 2019 09:40:48  $
+    --       PVCS Version     : $Revision:   1.3  $
     --
     --   Author : R.A. Coupe
     --
@@ -102,16 +102,17 @@ AS
                                                WHERE     ne_id = nm_ne_id_of
                                                      AND ne_type = 'S') m,
                                              nm_members i,
-                                             nm_inv_items
+                                             nm_inv_items, nm_inv_types
                                        WHERE     i.nm_ne_id_of = ne_id
                                              AND i.nm_obj_type =
                                                  SYS_CONTEXT (
                                                      'NM3SQL',
                                                      'CONTIGUOUS_ASSET_TYPE')
+                                             AND nm_obj_type = nit_inv_type
                                              AND m.nm_end_mp >= i.nm_begin_mp
                                              AND i.nm_end_mp >= m.nm_begin_mp
                                              AND i.nm_ne_id_in = iit_ne_id
---                                             and i.nm_begin_mp <> 0.042
+                                             --                                             and i.nm_begin_mp <> 0.042
                                              AND CASE
                                                      WHEN SYS_CONTEXT (
                                                               'NM3SQL',
@@ -189,7 +190,7 @@ AS
                                                       iit_x_sect
                                          ORDER BY nm_begin_mp),
                                  0)            prior_end
-                        FROM nm_members, nm_elements, nm_inv_items
+                        FROM nm_members, nm_elements, nm_inv_items, nm_inv_types
                        WHERE     nm_type = 'I'
                              AND nm_ne_id_of =
                                  TO_NUMBER (
@@ -197,11 +198,12 @@ AS
                                                   'CONTIGUOUS_OVER_NE'))
                              AND ne_id = nm_ne_id_of
                              AND nm_ne_id_in = iit_ne_id
---                             and nm_begin_mp <> 0.042
+                             and iit_inv_type = nit_inv_type
+                             --                             and nm_begin_mp <> 0.042
                              AND CASE
                                      WHEN SYS_CONTEXT ('NM3SQL',
                                                        'CONTIGUOUS_XSP')
-                                              IS NULL
+                                              IS NULL or nit_x_sect_allow_flag = 'N'
                                      THEN
                                          '$%^&'
                                      ELSE
@@ -211,7 +213,7 @@ AS
                                  CASE
                                      WHEN SYS_CONTEXT ('NM3SQL',
                                                        'CONTIGUOUS_XSP')
-                                              IS NULL
+                                              IS NULL or nit_x_sect_allow_flag = 'N'
                                      THEN
                                          '$%^&'
                                      ELSE
@@ -220,9 +222,9 @@ AS
                              AND nm_obj_type =
                                  SYS_CONTEXT ('NM3SQL',
                                               'CONTIGUOUS_ASSET_TYPE'))
-               WHERE (prior_end < nm_begin_mp OR next_begin > nm_end_mp))
+               WHERE (prior_end < nm_begin_mp OR next_begin > nm_end_mp)
+               )
     GROUP BY ne_id,
              gap_overlap,
              start_m,
              end_m;
-			 
