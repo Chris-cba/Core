@@ -12,11 +12,11 @@ AS
             (    SELECT *
                    --   PVCS Identifiers :-
                    --
-                   --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/views/v_contiguity_check.vw-arc   1.7   Jan 24 2019 18:17:28   Rob.Coupe  $
+                   --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/views/v_contiguity_check.vw-arc   1.8   Jan 25 2019 08:51:24   Rob.Coupe  $
                    --       Module Name      : $Workfile:   v_contiguity_check.vw  $
-                   --       Date into PVCS   : $Date:   Jan 24 2019 18:17:28  $
-                   --       Date fetched Out : $Modtime:   Jan 24 2019 18:16:56  $
-                   --       PVCS Version     : $Revision:   1.7  $
+                   --       Date into PVCS   : $Date:   Jan 25 2019 08:51:24  $
+                   --       Date fetched Out : $Modtime:   Jan 25 2019 08:49:44  $
+                   --       PVCS Version     : $Revision:   1.8  $
                    --
                    --   Author : R.A. Coupe
                    --
@@ -34,14 +34,14 @@ AS
                             SYS_CONTEXT ('NM3SQL', 'CONTIGUOUS_OVER_NE'))),
         datum_membs
         AS ( select rownum rn, m.* from 
-            (SELECT nm_ne_id_in,
+            (SELECT --nm_ne_id_in,
                     ne_id,
                     ne_length,
                     nm_obj_type,
                     iit_x_sect,
                     nm_begin_mp,
                     nm_end_mp
-               FROM (SELECT i.nm_ne_id_in,
+               FROM (SELECT --i.nm_ne_id_in,
                             ne_id,
                             ne_length,
                             ne_nt_type,
@@ -88,7 +88,7 @@ AS
                                         '£$%^'
                                     ELSE
                                         iit_x_sect
-                                END)group by nm_ne_id_in,
+                                END)group by --nm_ne_id_in,
                     ne_id,
                     ne_length,
                     nm_obj_type,
@@ -291,7 +291,7 @@ membs as ( select q1.*, NVL (
                                           0)            prior_end
 from (
 select a.* from datum_membs a
-where not exists ( select 1 from datum_membs b where b.nm_begin_mp <= a.nm_begin_mp and b.nm_end_mp >= a.nm_end_mp and a.rn != b.rn )
+where not exists ( select 1 from datum_membs b where a.ne_id = b.ne_id and b.nm_begin_mp <= a.nm_begin_mp and b.nm_end_mp >= a.nm_end_mp and a.rn != b.rn )
 ) q1 )
                       SELECT 'S'     gap_type,
                              ne_id,
