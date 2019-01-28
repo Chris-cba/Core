@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm_sdo
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm_sdo.pkb-arc   1.8   Jan 18 2019 17:01:42   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm_sdo.pkb-arc   1.9   Jan 28 2019 11:19:20   Rob.Coupe  $
     --       Module Name      : $Workfile:   nm_sdo.pkb  $
-    --       Date into PVCS   : $Date:   Jan 18 2019 17:01:42  $
-    --       Date fetched Out : $Modtime:   Jan 18 2019 16:56:46  $
-    --       PVCS Version     : $Revision:   1.8  $
+    --       Date into PVCS   : $Date:   Jan 28 2019 11:19:20  $
+    --       Date fetched Out : $Modtime:   Jan 28 2019 11:17:50  $
+    --       PVCS Version     : $Revision:   1.9  $
     --
     --   Author : R.A. Coupe
     --
@@ -18,7 +18,7 @@ AS
     -- The main purpose of this package is to replicate the functions inside the SDO_LRS package as
     -- supplied under the MDSYS schema and licensed under the Oracle Spatial license on EE.
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.8  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.9  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'NM_SDO';
 
@@ -193,7 +193,10 @@ AS
         sm            NUMBER := SDO_LRS.geom_segment_start_measure (geom);
         em            NUMBER := SDO_LRS.geom_segment_end_measure (geom);
         l_tolerance   NUMBER; -- tolerance adjusted from XY unots to M units or meters
+        l_start_measure number := least( start_measure, end_measure);
+        l_end_measure number := greatest( start_measure, end_measure);
     BEGIN
+   
         l_tolerance := tolerance;
 
         IF geom.sdo_srid IS NOT NULL
@@ -209,20 +212,20 @@ AS
             END IF;
         END IF;
 
-        IF start_measure = sm AND end_measure = em
+        IF l_start_measure = sm AND l_end_measure = em
         THEN
             retval := geom;
-        ELSIF start_measure > em OR end_measure < sm
+        ELSIF l_start_measure > em OR l_end_measure < sm
         THEN
             retval := NULL;
-        ELSIF abs(end_measure - start_measure) < l_tolerance  then
-		    retval := locate_pt(geom, start_measure);
+        ELSIF abs(l_end_measure - l_start_measure) < l_tolerance  then
+		    retval := locate_pt(geom, l_start_measure);
 		ELSE
               SELECT sdo_geometry (
-                         case when abs(end_measure - start_measure) < l_tolerance then 3301 else  3302 end,
+                         case when abs(l_end_measure - l_start_measure) < l_tolerance then 3301 else  3302 end,
                          geom.sdo_srid,
                          NULL,
-                         case when abs(end_measure - start_measure) < l_tolerance then sdo_elem_info_array (1, 1, 1) else sdo_elem_info_array (1, 2, 1) end,
+                         case when abs(l_end_measure - l_start_measure) < l_tolerance then sdo_elem_info_array (1, 1, 1) else sdo_elem_info_array (1, 2, 1) end,
                          CAST (COLLECT (VALUE        /*ORDER BY rn, ordinate*/
                                              ) AS sdo_ordinate_array)),
                      COUNT (*)
@@ -231,8 +234,8 @@ AS
                 FROM (WITH
                           ranges
                           AS
-                              (SELECT start_measure,
-                                      end_measure,
+                              (SELECT l_start_measure,
+                                      l_end_measure,
                                       MIN (rn) OVER (PARTITION BY 'A')
                                           min_rn,
                                       MAX (rn) OVER (PARTITION BY 'A')
@@ -262,8 +265,8 @@ AS
                                                   m2
                                          FROM TABLE (geom.sdo_ordinates) t) q1
                                 WHERE     MOD (rn, 3) = 1 --and m2 is not null
-                                      AND m1 <= end_measure + l_tolerance
-                                      AND m2 >= start_measure - l_tolerance)
+                                      AND m1 <= l_end_measure + l_tolerance
+                                      AND m2 >= l_start_measure - l_tolerance)
                       --                                            select r.* from ranges r
                       --
                       SELECT rn, -- this will retrieve all vertices which are wholly between the two measures
@@ -271,42 +274,42 @@ AS
                              y1     B,
                              m1     C
                         FROM ranges
-                       WHERE     m1 >= start_measure - l_tolerance
-                             AND m1 <= end_measure + l_tolerance
+                       WHERE     m1 >= l_start_measure - l_tolerance
+                             AND m1 <= l_end_measure + l_tolerance
                       UNION ALL
                       SELECT -1
                                  rn, -- this is where the start measure is between two vertices - interpolate the xy's
                                x1
-                             +   (GREATEST (m1, start_measure) - m1)
+                             +   (GREATEST (m1, l_start_measure) - m1)
                                * (x2 - x1)
                                / (m2 - m1),
                                y1
-                             +   (GREATEST (m1, start_measure) - m1)
+                             +   (GREATEST (m1, l_start_measure) - m1)
                                * (y2 - y1)
                                / (m2 - m1),
-                             GREATEST (m1, start_measure)
+                             GREATEST (m1, l_start_measure)
                         FROM ranges
                        WHERE     rn = min_rn
-                             AND m1 < start_measure
-                             AND m2 > start_measure
-                             AND ABS (m1 - start_measure) > l_tolerance
-                             AND ABS (m2 - start_measure) > l_tolerance
+                             AND m1 < l_start_measure
+                             AND m2 > l_start_measure
+                             AND ABS (m1 - l_start_measure) > l_tolerance
+                             AND ABS (m2 - l_start_measure) > l_tolerance
                       --                       and (abs(m1-greatest(start_measure, m1)) > tolerance )
                       UNION ALL
                       SELECT 99999
                                  rn, -- This is to ensure that the end vertex is included, possibly interpolated - may be better performance if the
                                x1
-                             +   (LEAST (m2, end_measure) - m1)
+                             +   (LEAST (m2, l_end_measure) - m1)
                                * (x2 - x1)
                                / (m2 - m1),
                                y1
-                             +   (LEAST (m2, end_measure) - m1)
+                             +   (LEAST (m2, l_end_measure) - m1)
                                * (y2 - y1)
                                / (m2 - m1),
-                             LEAST (m2, end_measure)
+                             LEAST (m2, l_end_measure)
                         FROM ranges
-                       WHERE     m1 < end_measure
-                             AND m2 >= end_measure - l_tolerance
+                       WHERE     m1 < l_end_measure
+                             AND m2 >= l_end_measure - l_tolerance
                              AND rn = max_rn
                       ORDER BY rn)
                      UNPIVOT EXCLUDE NULLS (VALUE FOR ordinate IN (A, B, C))
