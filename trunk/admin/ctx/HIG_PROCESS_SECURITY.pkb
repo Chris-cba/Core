@@ -4,16 +4,16 @@ CREATE OR REPLACE PACKAGE body hig_process_security AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/ctx/HIG_PROCESS_SECURITY.pkb-arc   1.2   Apr 26 2018 08:46:04   Gaurav.Gaurkar  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/ctx/HIG_PROCESS_SECURITY.pkb-arc   1.3   Jan 30 2019 14:18:08   Chris.Baugh  $
 --       Module Name      : $Workfile:   HIG_PROCESS_SECURITY.pkb  $
---       Date into SCCS   : $Date:   Apr 26 2018 08:46:04  $
---       Date fetched Out : $Modtime:   Apr 26 2018 08:44:16  $
---       SCCS Version     : $Revision:   1.2  $
+--       Date into SCCS   : $Date:   Jan 30 2019 14:18:08  $
+--       Date fetched Out : $Modtime:   Jan 30 2019 14:13:44  $
+--       SCCS Version     : $Revision:   1.3  $
 --
 -----------------------------------------------------------------------------
 --    Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
-g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   1.2  $"';
+g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   1.3  $"';
 
   FUNCTION get_version RETURN VARCHAR2 IS
   BEGIN
@@ -50,10 +50,10 @@ retval varchar2(8000) := '((( hp_process_type_id IN '||
                                        ' AND hur_username = '||usern||')'||
                          ' OR EXISTS '||
                                ' (SELECT 1 '||
-                                ' FROM contractor_users '||
-                                 ' WHERE     cou_oun_org_id = hp_area_id '||
+                                ' FROM v_all_contractor_users '||
+                                 ' WHERE oun_org_id = hp_area_id '||
                                   ' AND Sys_Context('||''''||'NM3SQL'||''''||','||''''||'CONSECMODE'||''''||') = '||''''||'U'||''''||
-                                  ' AND cou_hus_user_id = '||userid||'))'||
+                                  ' AND hus_user_id = '||userid||'))'||
                  'OR     hp_process_type_id IN '||
                           ' (SELECT hpt_process_type_id '||
                            '   FROM hig_process_types '||
