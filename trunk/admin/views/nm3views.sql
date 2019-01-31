@@ -6,7 +6,7 @@
 --       Module Name      : nm3views.sql
 --       Date into SCCS   : 06/12/22 15:57:40
 --       Date fetched Out : 07/06/13 17:08:24
---       PVCS Version     : $Revision:   2.44  $
+--       PVCS Version     : $Revision:   2.45  $
 --
 --
 --   Author : Graeme Johnson
@@ -1893,6 +1893,15 @@ PROMPT v_contiguity_check.vw
 SET TERM OFF
 SET DEFINE ON
 SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'views'||'&terminator'||'v_contiguity_check.vw' run_file 
+FROM dual
+/
+start '&run_file'
+
+SET TERM ON
+PROMPT v_all_contractor_users.vw                                                                                                                                                                                                                
+SET TERM OFF
+SET DEFINE ON
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'views'||'&terminator'||'v_all_contractor_users.vw' run_file 
 FROM dual
 /
 start '&run_file'
