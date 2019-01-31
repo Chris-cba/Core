@@ -1,0 +1,275 @@
+CREATE OR REPLACE PACKAGE lb_net_code
+AS
+    --<PACKAGE>
+    --   PVCS Identifiers :-
+    --
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/lb_net_code.pkh-arc   1.5   Jan 31 2019 15:13:34   Rob.Coupe  $
+    --       Module Name      : $Workfile:   lb_net_code.pkh  $
+    --       Date into PVCS   : $Date:   Jan 31 2019 15:13:34  $
+    --       Date fetched Out : $Modtime:   Jan 31 2019 14:56:18  $
+    --       PVCS Version     : $Revision:   1.5  $
+    --
+    --   Author : R.A. Coupe
+    --
+    --   Location Bridge package for snapping and net-coding
+    --
+    -----------------------------------------------------------------------------
+    -- Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
+    ----------------------------------------------------------------------------
+    --
+    --</PACKAGE>
+    --<GLOBVAR>
+    --
+    g_sccsid         CONSTANT VARCHAR2 (2000) := '$Revision:   1.5  $';
+
+    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_net_code';
+
+    --</GLOBVAR>
+    -----------------------------------------------------------------------------
+    --
+    --<PROC NAME="GET_VERSION">
+    --
+    -- This function returns the current PVCS version of the package
+
+    FUNCTION get_version
+        RETURN VARCHAR2;
+
+    --</PROC>
+
+    -----------------------------------------------------------------------------
+    --
+    --<PROC NAME="GET_BODY_VERSION">
+    --
+    -- This function returns the current PVCS version of the package body
+    FUNCTION get_body_version
+        RETURN VARCHAR2;
+
+    --</PROC>
+
+    -----------------------------------------------------------------------------
+    --
+    --<PROC NAME="LB_SNAP_XY_TO_NW">
+    --
+    --        FUNCTION lb_snap_xy_to_nw
+    --
+    --     Purpose - To provide a set of reference point and related information from an Exor network and an XY coordinate pair.
+    --
+    --        Arguments:
+    --
+    --            pi_x          Number                X ordinate of source point
+    --            pi_y          Number                Y ordinate of source point
+    --            pi_in_srid    Number                Coordinate system of the source XY expressed as a SRID (eg 27700
+    --                                                for UK national grid)
+    --            pi_buffer     Number                Buffer or search radius around the input point to define the candidate
+    --                                                area for selection of the network to which the XY will be snapped.
+    --            pi_in_uol     Integer               The Exor unit of length used in the buffer distance
+    --            pi_out_srid   Number                Coordinate system of returned geometry
+    --            pi_measure_out_uol    Integer       The Exor unit of length used in the returned values of measure
+    --            pi_distance_out_uol   Integer       The Exor unit of length used in the returned values of distance-from
+    --            pi_themes     nm_theme_array_type   The list of themes to which the XY will be snapped
+    --            cardinality   Integer               An estimate of the number of returned items (used in optimiser statistics in some versions of server)
+    --
+
+    --        The function returns an array or table of lb_snap object data comprising:
+    --
+    --          ne_id             Integer         Primary key of network element to which the XY is snapped.
+    --          nlt_id            Integer         A pointer to the linear type of network to which the XY is snapped
+    --          ne_nt_type        varchar2(4)     The network type of the element
+    --          ne_gty_type       varchar2(4)     The group-type of the element (NULL if a datum)
+    --          ne_unique         Varchar2(30)    The unique reference of the element (unique in conjunction with ne_nt_type)
+    --          ne_descr          Varchar2(240    The description of the element.
+    --          measure           Number          The measure along the element at the projection point.
+    --          measure_unit_id   Integer         The Exor unit id used for the measure values (i.e. distance along linear feature)
+    --          measure_unit_name Varchar2(30)    The Exor unit name for the measure values
+    --          distance_from     Number          The minimum distance from the projection point to the input point.
+    --          distance_unit_id  Integer         The unit of length used in returned distance values (i.e. those distances that relate to the SDO XY values)
+    --          distance_unit_name  Varchar2(30)    The name of the unit of length used in returned values
+    --          nw_geom           sdo_geometry    The geometry of the candidate element (as use din highlighting)
+    --          proj_pt           sdo_geometry    The geometry of the projection point.
+    --    --
+    --    Notes:
+    --
+    --          Ideally, the code would be used against the date-tracked views of the Exor network otherwise linear references may be
+    --          returned which are outside of the current effective date. The list of themes must hold a valid table-name, primary key
+    --          identifier spatial column name which are in accordnance with the sdo-metadata. The units must exist and the SRIDs must be
+    --          valid Oracle spatial reference identifiers. The cardinality flag is likely to be deprecated as it is only of use when
+    --          as an aid to using optimiser statistics in a join of the returned nested table with another table and this aid is not
+    --          required in more recent versions of Oracle.
+
+    FUNCTION lb_snap_xy_to_nw (
+        pi_x                  IN NUMBER,
+        pi_y                  IN NUMBER,
+        pi_in_srid            IN NUMBER,
+        pi_buffer             IN NUMBER,
+        pi_in_uol             IN nm_units.un_unit_id%TYPE,
+        pi_out_srid           IN NUMBER,
+        pi_measure_out_uol    IN nm_units.un_unit_id%TYPE,
+        pi_distance_out_uol   IN nm_units.un_unit_id%TYPE,
+        pi_themes             IN nm_theme_array_type,
+        CARDINALITY           IN INTEGER)
+        RETURN lb_snap_tab;
+
+    --</PROC>
+
+--  Same as above but the themes are replaced by an asset-type from which the themes are derived.
+
+    FUNCTION lb_snap_xy_to_nw (
+        pi_x                  IN NUMBER,
+        pi_y                  IN NUMBER,
+        pi_in_srid            IN NUMBER,
+        pi_buffer             IN NUMBER,
+        pi_in_uol             IN nm_units.un_unit_id%TYPE,
+        pi_out_srid           IN NUMBER,
+        pi_measure_out_uol    IN nm_units.un_unit_id%TYPE,
+        pi_distance_out_uol   IN nm_units.un_unit_id%TYPE,
+        pi_inv_type           IN VARCHAR2,
+        CARDINALITY           IN INTEGER)
+        RETURN lb_snap_tab;
+
+-- Same as above exception the snapping is based on a pre-existing network (LB_NETWORK_LINK)
+
+    FUNCTION lb_snap_xy_to_links (
+        pi_x                  IN NUMBER,
+        pi_y                  IN NUMBER,
+        pi_in_srid            IN NUMBER,
+        pi_buffer             IN NUMBER,
+        pi_buffer_uol         IN nm_units.un_unit_id%TYPE,
+        pi_out_srid           IN NUMBER,
+        pi_base_nw_unit       IN INTEGER,
+        pi_base_srid          IN INTEGER,
+        pi_measure_out_uol    IN nm_units.un_unit_id%TYPE,
+        pi_distance_out_uol   IN nm_units.un_unit_id%TYPE,
+        pi_tolerance          IN NUMBER,
+        CARDINALITY           IN INTEGER)
+        RETURN lb_snap_tab;
+
+    --</PROC>
+
+    -----------------------------------------------------------------------------
+    --
+    --<PROC NAME="TRACE_GEOM">
+    --
+    --     Purpose - To provide a set of continuous reference point location data from tracing a geometry along a neighbouring set of spatial
+    --     representations of networks.
+    --     The code attempts to find the optimal matching set of network through the use of a function value which is computed from such data as average
+    --     distance from the network, closeness of the resultant traced network and the geometry length.
+    --
+    --        Arguments:
+    --
+    --            pi_geom          SDO_GEOMETRY          The geometry to be traced.
+    --            pi_inv_type      Varchar2              The asset type - which determines which NW/themes and constrainst are used.
+    --            pi_must_connect  Varchar2              A value of Y or N - if N, then the tracing can jump areas of disconnectivity such as grade separations
+    --            pi_buffer        Number                The search radius to use which restricts the candidsate network to those elements "close" to the geometry.
+    --            pi_buffer_unit   Integer               The Exor unit ID of the buffer value.
+    --            pi_ratio_limit   Number                A ratio computed from the difference between the geometry segment length and the traced network length
+    --                                                   divided by the geometry segment length. Should this raio be greater than the limit, the traced network is deemed to
+    --                                                   be no-connected. It is used to prevent looping back of network over a longer path when in reality, a loss of connectivity
+    --                                                   is deemed appropiate.
+    --            pi_tolerance     Number                The spatial tolerance
+    --            po_trace_text    CLOB                  Some textual output describing the trace and decisions taken
+
+
+-- This version will trace a geometry by generating a map buffer and projecting the candidate snapping points and derive
+-- the traced path. Th einventory type is used to derive the themes that are to be used and these are restricted by any
+-- optional constraint that may have been configured (NM_NW_CONSTRAINTS)
+
+    FUNCTION trace_geom_for_inv_type (
+        pi_geom           IN     SDO_GEOMETRY,
+        pi_inv_type       IN     VARCHAR2,
+        pi_must_connect   IN     VARCHAR2,
+        pi_buffer         IN     NUMBER DEFAULT 20,
+        pi_buffer_unit    IN     INTEGER DEFAULT 1,                 /*meters*/
+        pi_ratio_limit    IN     NUMBER,
+        pi_tolerance      IN     NUMBER,
+        po_trace_text     IN OUT CLOB)
+        RETURN lb_rpt_tab;
+
+    -----------------------------------------------------------------------------
+    --
+    --<PROC NAME="GET_MINIMAL_ADJOINING_PATH">
+    --
+    --     Purpose - To provide a set of continuous reference point location data from tracing a geometry along a neighbouring set of spatial
+    --     representations of networks from an existing linear reference along that network
+    --     The code attempts to find the optimal matching set of network through the use of a function value which is computed from such data as average
+    --     distance from the network, closeness of the resultant traced network and the geometry length.
+    --
+    --        Arguments:
+    --
+    --            pi_geom          SDO_GEOMETRY       The geometry to be traced.
+    --            pi_pt_geom       SDO_GEOMETRY       A point geometry from the vertex from which the path is to be traced.
+    --            pi_lref          NM_LREF            The point on the network from which the trace will originate (as element/measure pair)
+    --            pi_buffer        Number             The search radius to use which restricts the candidsate network to those elements "close" to the geometry.
+    --            pi_in_uol        Integer            The Exor unit ID of the buffer value.
+    --            pi_vid           Integer            The vertex ID of the geometry to be connected
+    --            pi_nw_unit       Integer            The Exor unit ID relating to the network measured distances.
+    --            pi_distance_unit Integer            The Exor unit ID relating to the map distances.
+    --            pi_conv_factor   Number             The conversion factor between the units of the map (xy) and the units of the network theme measures
+    --            pi_ratio_limit   Number             A ratio computed from the difference between the geometry segment length and the traced network length
+    --                                                divided by the geometry segment length. Should this raio be greater than the limit, the traced network is deemed to
+    --                                                be no-connected. It is used to prevent looping back of network over a longer path when in reality, a loss of connectivity
+    --                                                is deemed appropiate.
+    --            pi_tolerance     Number             The spatial tolerance used in SDO functions
+    --            po_trace_text    CLOB              Some textual output describing the trace and decisions taken
+
+    FUNCTION get_minimal_adjoining_path (pi_geom            IN     SDO_GEOMETRY,
+                                         pi_pt_geom         IN     SDO_GEOMETRY,
+                                         pi_lref            IN     nm_lref,
+                                         pi_buffer          IN     NUMBER,
+                                         pi_in_uol          IN     INTEGER,
+                                         pi_vid             IN     INTEGER,
+                                         pi_nw_unit         IN     INTEGER,
+                                         pi_distance_unit   IN     INTEGER,
+                                         pi_conv_factor     IN     NUMBER,
+                                         pi_ratio_limit     IN     NUMBER,
+                                         pi_tolerance       IN     NUMBER,
+                                         po_trace_text      IN OUT CLOB)
+        RETURN lb_rpt_tab;
+
+--
+    --</PROC>
+
+    -----------------------------------------------------------------------------
+    --
+    --<PROC NAME="GET_MINIMAL_PATH_FROM_VERTICES">
+    --
+    --     Purpose - To provide a set of continuous reference point location data from tracing a geometry along a neighbouring set of spatial
+    --     representations of networks from a pair of vertices of the original geometry.
+    --     The code attempts to find the optimal matching set of network through the use of a function value which is computed from such data as average
+    --     distance from the network, closeness of the resultant traced network and the geometry length.
+    --
+    --        Arguments:
+    --
+    --            pi_geom          SDO_GEOMETRY       The geometry to be traced.
+    --            pi_vid1          Integer            The vertex ID of the geometry from which the path should traverse.
+    --            pi_vid2          Integer            The vertex ID of the geometry to which the path should traverse.
+    --            pi_themes        NM_THEME_ARRAY_TYPE   The Exor themes representing the networks to which the geometr should be snapped.
+    --            pi_buffer        Number             The search radius to use which restricts the candidsate network to those elements "close" to the geometry.
+    --            pi_in_uol        Integer            The Exor unit ID of the buffer value.
+    --            pi_nw_unit       Integer            The Exor unit ID relating to the network measured distances.
+    --            pi_distance_unit Integer            The Exor unit ID relating to the map distances.
+    --            pi_conv_factor   Number             The conversion factor between the units of the map (xy) and the units of the network theme measures
+    --            pi_ratio_limit   Number             A ratio computed from the difference between the geometry segment length and the traced network length
+    --                                                divided by the geometry segment length. Should this raio be greater than the limit, the traced network is deemed to
+    --                                                be no-connected. It is used to prevent looping back of network over a longer path when in reality, a loss of connectivity
+    --                                                is deemed appropiate.
+    --            pi_tolerance     Number             The spatial tolerance used in SDO functions
+    --            po_trace_text    CLOB               Some textual output describing the trace and decisions taken
+
+--
+    --</PROC>
+
+    FUNCTION get_minimal_path_from_vertices (
+        pi_geom            IN     SDO_GEOMETRY,
+        pi_vid1            IN     INTEGER,
+        pi_vid2            IN     INTEGER,
+        pi_buffer          IN     NUMBER,
+        pi_in_uol          IN     INTEGER,
+        pi_nw_unit         IN     INTEGER,
+        pi_distance_unit   IN     INTEGER,
+        pi_conv_factor     IN     NUMBER,
+        pi_ratio_limit     IN     NUMBER,
+        pi_tolerance       IN     NUMBER,
+        po_trace_text      IN OUT CLOB)
+        RETURN lb_rpt_tab;
+END;
+/
