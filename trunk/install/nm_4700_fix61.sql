@@ -1,11 +1,11 @@
 ----------------------------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm_4700_fix61.sql-arc   1.3   Jan 29 2019 09:31:48   Chris.Baugh  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm_4700_fix61.sql-arc   1.4   Jan 31 2019 09:27:46   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm_4700_fix61.sql  $ 
---       Date into PVCS   : $Date:   Jan 29 2019 09:31:48  $
---       Date fetched Out : $Modtime:   Jan 29 2019 09:31:16  $
---       Version     	  : $Revision:   1.3  $
+--       Date into PVCS   : $Date:   Jan 31 2019 09:27:46  $
+--       Date fetched Out : $Modtime:   Jan 31 2019 09:27:06  $
+--       Version     	  : $Revision:   1.4  $
 --
 ----------------------------------------------------------------------------------------------------
 --   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
@@ -117,6 +117,14 @@ SET FEEDBACK ON
 START nm3undo.pkw
 SET FEEDBACK OFF
 
+SET TERM ON 
+PROMPT creating Package Body HIG_PROCESS_SECURITY.pkw
+SET TERM OFF
+--
+SET FEEDBACK ON
+START HIG_PROCESS_SECURITY.pkw
+SET FEEDBACK OFF
+
 
 --------------------------------------------------------------------------------
 -- Views
@@ -146,6 +154,14 @@ SET FEEDBACK ON
 START v_nm_ordered_route_details.vw
 SET FEEDBACK OFF
 
+SET TERM ON 
+PROMPT creating View v_all_contractor_users.vw
+SET TERM OFF
+--
+SET FEEDBACK ON
+START v_all_contractor_users.vw.vw
+SET FEEDBACK OFF
+
 --
 --------------------------------------------------------------------------------
 -- Update hig_upgrades with fix ID
@@ -155,7 +171,7 @@ BEGIN
 	--
 	hig2.upgrade(p_product        => 'NET'
 				,p_upgrade_script => 'log_nm_4700_fix61.sql'
-				,p_remarks        => 'NET 4700 FIX 61 (Build 3)'
+				,p_remarks        => 'NET 4700 FIX 61 (Build 4)'
 				,p_to_version     => NULL
 				);
 	--
