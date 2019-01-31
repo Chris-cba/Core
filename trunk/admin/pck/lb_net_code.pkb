@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_net_code
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/lb_net_code.pkb-arc   1.3   Jan 31 2019 15:13:58   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/lb_net_code.pkb-arc   1.4   Jan 31 2019 15:17:18   Rob.Coupe  $
     --       Module Name      : $Workfile:   lb_net_code.pkb  $
-    --       Date into PVCS   : $Date:   Jan 31 2019 15:13:58  $
-    --       Date fetched Out : $Modtime:   Jan 30 2019 15:02:00  $
-    --       PVCS Version     : $Revision:   1.3  $
+    --       Date into PVCS   : $Date:   Jan 31 2019 15:17:18  $
+    --       Date fetched Out : $Modtime:   Jan 31 2019 14:55:54  $
+    --       PVCS Version     : $Revision:   1.4  $
     --
     --   Author : R.A. Coupe
     --
@@ -16,7 +16,7 @@ AS
     -- Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
     ----------------------------------------------------------------------------
     --
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.3  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.4  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'lb_net_code';
 
@@ -116,6 +116,11 @@ AS
               INTO l_measure_units_out
               FROM nm_units
              WHERE un_unit_id = pi_measure_out_uol;
+
+            SELECT un_unit_name
+              INTO l_distance_units_out
+              FROM nm_units
+             WHERE un_unit_id = pi_distance_out_uol;
         EXCEPTION
             WHEN NO_DATA_FOUND
             THEN
@@ -221,16 +226,23 @@ AS
                 || l_units_in
                 || qq
                 || ' buffer_string, '
-                || '  sdo_geometry(2001, :in_srid, sdo_point_type( :x , :y, NULL), NULL, NULL) pt_input_geom, :out_srid out_srid, :out_uom out_uom from dual ), '
+                || '  sdo_geometry(2001, :in_srid, sdo_point_type( :x , :y, NULL), NULL, NULL) pt_input_geom, :out_srid out_srid, :out_m_uom out_m_uom, :out_d_uom out_d_uom from dual ), '
                 || ' snaps AS ( '
                 || l_sql
                 || ')'
                 || ' SELECT CAST (COLLECT (lb_snap(q1.ne_id, nlt_id, q1.ne_nt_type, q1.ne_gty_group_type, q1.ne_unique, q1.ne_descr, '
-                || 'sdo_lrs.geom_segment_start_measure(proj_pt)*uc_conversion_factor, distance, '
+                || 'sdo_lrs.geom_segment_start_measure(proj_pt)*uc_conversion_factor, '
                 || TO_CHAR (pi_measure_out_uol)
                 || ', '
                 || qq
                 || l_measure_units_out
+                || qq
+                || ', '
+                || ' distance, '
+                || TO_CHAR (pi_distance_out_uol)
+                || ', '
+                || qq
+                || l_distance_units_out
                 || qq
                 || ','
                 || ' case base_srid when out_srid then geom else sdo_cs.transform(geom, out_srid) end, '
@@ -242,16 +254,17 @@ AS
                 || '  sdo_geom.sdo_distance ( geom, pt_input_geom, :tol, '
                 || qq
                 || 'unit='
-                || l_measure_units_out
+                || l_distance_units_out
                 || qq
                 || ') distance, '
                 || ' geom, '
                 || ' base_nw_unit '
                 || ' FROM snaps s, nm_elements e '
-                || '     WHERE s.ne_id = e.ne_id order by 8 ) q1, nm_unit_conversions where uc_unit_id_in = base_nw_unit and uc_unit_id_out = :out_uol '
+                || '     WHERE s.ne_id = e.ne_id order by 8 ) q1, nm_unit_conversions m '
+                || ' where m.uc_unit_id_in = base_nw_unit and m.uc_unit_id_out = :out_m_uol '
                 || '        order by distance ';
 
-            --       nm_debug.debug (l_sql);
+            nm_debug.debug (l_sql);
 
             EXECUTE IMMEDIATE l_sql
                 INTO retval
@@ -261,8 +274,9 @@ AS
                       pi_y,
                       pi_out_srid,
                       pi_measure_out_uol,
+                      pi_distance_out_uol,
                       tol,
-                      pi_distance_out_uol;
+                      pi_measure_out_uol;
         EXCEPTION
             WHEN invalid_unit
             THEN
@@ -273,23 +287,6 @@ AS
 
         RETURN retval;
     END;
-
-    FUNCTION lb_snap_xy_to_rpt_tab (
-        pi_x                  IN NUMBER,
-        pi_y                  IN NUMBER,
-        pi_in_srid            IN NUMBER,
-        pi_buffer             IN NUMBER,
-        pi_in_uol             IN nm_units.un_unit_id%TYPE,
-        pi_out_srid           IN NUMBER,
-        pi_measure_out_uol    IN nm_units.un_unit_id%TYPE,
-        pi_distance_out_uol   IN nm_units.un_unit_id%TYPE,
-        CARDINALITY           IN INTEGER)
-        RETURN lb_snap_tab
-    IS
-    BEGIN
-        RETURN NULL;
-    END;
-
 
     FUNCTION lb_snap_xy_to_nw (
         pi_x                  IN NUMBER,
@@ -329,22 +326,189 @@ AS
                               CARDINALITY           => CARDINALITY);
         RETURN retval;
     END;
-    
-    --
 
-    FUNCTION trace_geom (pi_geom           IN     SDO_GEOMETRY,
-                         pi_themes         IN     nm_theme_array_type,
-                         pi_must_connect   IN     VARCHAR2,
-                         pi_buffer         IN     NUMBER DEFAULT 20,
-                         pi_buffer_unit    IN     INTEGER DEFAULT 1, /*meters*/
-                         pi_ratio_limit    IN     NUMBER,
-                         po_trace_text     IN OUT CLOB)
+    FUNCTION lb_snap_xy_to_links (
+        pi_x                  IN NUMBER,
+        pi_y                  IN NUMBER,
+        pi_in_srid            IN NUMBER,
+        pi_buffer             IN NUMBER,
+        pi_buffer_uol         IN nm_units.un_unit_id%TYPE,
+        pi_out_srid           IN NUMBER,
+        pi_base_nw_unit       IN INTEGER,
+        pi_base_srid          IN INTEGER,
+        pi_measure_out_uol    IN nm_units.un_unit_id%TYPE,
+        pi_distance_out_uol   IN nm_units.un_unit_id%TYPE,
+        pi_tolerance          IN NUMBER,
+        CARDINALITY           IN INTEGER)
+        RETURN lb_snap_tab
+    AS
+        retval                 lb_snap_tab;
+        l_sql                  VARCHAR2 (4000);
+        qq                     CHAR (1) := CHR (39);
+        tol                    NUMBER := 0.005;
+        l_units_in             nm_units.un_unit_name%TYPE;
+        l_measure_units_out    nm_units.un_unit_name%TYPE;
+        l_distance_units_out   nm_units.un_unit_name%TYPE;
+        l_buffer_unit          nm_units.un_unit_name%TYPE;
+        invalid_unit           EXCEPTION;
+        PRAGMA EXCEPTION_INIT (invalid_unit, -29902);
+    BEGIN
+        /*
+          Check the supplied units
+        */
+
+        BEGIN
+            SELECT un_unit_name
+              INTO l_measure_units_out
+              FROM nm_units
+             WHERE un_unit_id = pi_measure_out_uol;
+
+            SELECT un_unit_name
+              INTO l_distance_units_out
+              FROM nm_units
+             WHERE un_unit_id = pi_distance_out_uol;
+
+            SELECT un_unit_name
+              INTO l_buffer_unit
+              FROM nm_units
+             WHERE un_unit_id = pi_buffer_uol;
+        EXCEPTION
+            WHEN NO_DATA_FOUND
+            THEN
+                raise_application_error (
+                    -20010,
+                    'Unit of measure not found, check Exor units data');
+        END;
+
+        SELECT l_snap_tab
+          INTO retval
+          FROM (                                               --with in_pt as
+                --( select  :out_m_uom out_m_uom, 'Mile' out_uom_text, :out_d_uom out_d_uom, 'Meter' out_uod_text
+                --       from nm_unit_conversions where uc_unit_id_in = 4 and uc_unit_id_out = :out_d_uom ),
+                WITH
+                    vertices
+                    AS
+                        (SELECT sdo_geometry (
+                                    2001,
+                                    pi_base_srid,
+                                    sdo_point_type (pi_x, pi_y, NULL),
+                                    NULL,
+                                    NULL)    pt_input_geom
+                           FROM DUAL),
+                    --                       rc_geom, TABLE (SDO_UTIL.getvertices (rg_geom)) t
+                    --                      WHERE rg_id = 181),
+                    snaps
+                    AS
+                        (SELECT *
+                           FROM vertices            v,
+                                V_LB_NLT_GEOMETRY2  n,
+                                lb_network_link     l
+                          WHERE     sdo_within_distance (
+                                        n.geoloc,
+                                        pt_input_geom,
+                                           'distance = '
+                                        || TO_CHAR (pi_buffer)
+                                        || ' unit='
+                                        || l_buffer_unit) =
+                                    'TRUE'
+                                AND l.link_id = n.ne_id)
+                --select * from snaps
+                --
+                SELECT CAST (
+                           COLLECT (
+                               lb_snap (
+                                   q1.ne_id,
+                                   nlt_id,
+                                   q1.ne_nt_type,
+                                   q1.ne_gty_group_type,
+                                   q1.ne_unique,
+                                   q1.ne_descr,
+                                     SDO_LRS.geom_segment_start_measure (
+                                         proj_pt)
+                                   * uc_conversion_factor,
+                                   pi_measure_out_uol,
+                                   l_measure_units_out,
+                                   distance,
+                                   pi_distance_out_uol,
+                                   l_distance_units_out,
+                                   CASE pi_base_srid
+                                       WHEN pi_out_srid
+                                       THEN
+                                           geom
+                                       ELSE
+                                           SDO_CS.transform (geom,
+                                                             pi_out_srid)
+                                   END,
+                                   CASE pi_base_srid
+                                       WHEN pi_out_srid
+                                       THEN
+                                           proj_pt
+                                       ELSE
+                                           SDO_CS.transform (proj_pt,
+                                                             pi_out_srid)
+                                   END)) AS lb_snap_tab)    l_snap_tab
+                  FROM (SELECT /*+INDEX(e NE_PK) */
+                               s.ne_id,
+                               1
+                                   nlt_id,                         --s.nlt_id,
+                               e.ne_unique,
+                               e.ne_descr,
+                               e.ne_nt_type,
+                               e.ne_gty_group_type,
+                               pt_input_geom,
+                               pi_in_srid,
+                               pi_out_srid,
+                               pi_base_srid,
+                               pi_measure_out_uol,
+                               l_measure_units_out,
+                               pi_distance_out_uol,
+                               l_distance_units_out,
+                               mdsys.SDO_LRS.project_pt (geoloc,
+                                                         pt_input_geom)
+                                   proj_pt,
+                               mdsys.SDO_GEOM.sdo_distance (
+                                   geoloc,
+                                   pt_input_geom,
+                                   pi_tolerance,
+                                      'unit='
+                                   || ''''
+                                   || l_measure_units_out
+                                   || '''')
+                                   distance,
+                               geoloc
+                                   geom,
+                               uc_conversion_factor
+                          --                 base_nw_unit
+                          FROM snaps s, nm_elements e, nm_unit_conversions
+                         WHERE     s.ne_id = e.ne_id
+                               AND uc_unit_id_in = pi_base_nw_unit
+                               AND uc_unit_id_out = pi_measure_out_uol) q1);
+
+        RETURN retval;
+    EXCEPTION
+        WHEN invalid_unit
+        THEN
+            raise_application_error (
+                -20902,
+                'Invalid Unit, the Exor unit name must match the unit name in SDO_DIST_UNITS table');
+    END;
+
+    FUNCTION trace_geom_for_inv_type (
+        pi_geom           IN     SDO_GEOMETRY,
+        pi_inv_type       IN     VARCHAR2,
+        pi_must_connect   IN     VARCHAR2,
+        pi_buffer         IN     NUMBER DEFAULT 20,
+        pi_buffer_unit    IN     INTEGER DEFAULT 1,                 /*meters*/
+        pi_ratio_limit    IN     NUMBER,
+        pi_tolerance      IN     NUMBER,
+        po_trace_text     IN OUT CLOB)
         RETURN lb_rpt_tab
     IS
         retval                 lb_rpt_tab;
         vertices               nm_vertex_tab := nm_sdo.get_vertices (pi_geom);
         l_initial_path         lb_rpt_tab;
         l_vertex_count         INTEGER := vertices.COUNT;
+        first_lr               INTEGER := -1;
         l_path                 lb_rpt_tab;
         l_lref                 nm_lref;
         no_connectivity        EXCEPTION;
@@ -352,19 +516,40 @@ AS
         l_lost_connectivity    BOOLEAN := FALSE;
         l_xy_to_m_conversion   NUMBER;
         l_nw_unit              INTEGER;
+        l_themes               NM_THEME_ARRAY_TYPE;
+        l_buff                 SDO_GEOMETRY;
     --
     BEGIN
         --
         --        nm_debug.debug ('Start of trace');
         po_trace_text := 'Start of trace';
 
+        l_themes := get_nw_themes_for_inv_type (pi_inv_type);
+
+        l_buff :=
+            SDO_GEOM.sdo_buffer (pi_geom,
+                                 pi_buffer,
+                                 0.005,
+                                 'unit=METER');
+        --    nm_debug.debug ('make NW');
+        -- make nw
+        --
+        --    nm_debug.debug_off;
+        lb_path.make_nw_from_geom (pi_inv_type, l_buff);
+
         l_xy_to_m_conversion :=
             nm_srid.get_xy_to_m_conversion (pi_geom.sdo_srid,
-                                            pi_themes,
+                                            l_themes,
                                             l_nw_unit);
 
-        append_text ('Conversion factor = ' || l_xy_to_m_conversion,
-                     po_trace_text);
+        append_text (
+               'Conversion factor = '
+            || l_xy_to_m_conversion
+            || ' from srid '
+            || pi_geom.sdo_srid
+            || ' to unit id '
+            || l_nw_unit,
+            po_trace_text);
 
         --
         -- if there is only one vertex then just use the snapped value and return the point
@@ -380,235 +565,250 @@ AS
             --nm_debug.delete_debug(true);
             --nm_debug.debug_on;
             --
-            -- get the initial minimal path from the first two vertices
+            -- loop over sets of vertices until an LR is found.
             --            nm_debug.debug (
             --                'get the initial minimal path from the first two vertices');
 
-            BEGIN
-                retval :=
-                    get_minimal_path_from_vertices (pi_geom,
-                                                    retval,
-                                                    1,
-                                                    2,
-                                                    pi_themes,
-                                                    pi_buffer,
-                                                    pi_buffer_unit,
-                                                    l_nw_unit,
-                                                    l_xy_to_m_conversion,
-                                                    pi_ratio_limit,
-                                                    po_trace_text);
-
-                append_text (
-                    'Retrieved inital path between first two vertices',
-                    po_trace_text);
-            EXCEPTION
-                WHEN no_connectivity
-                THEN
-                    --                    nm_debug.debug (
-                    --                        'No connectivity between vertices 1 and 2 ');
-                    append_text ('No connectivity at the start of tracing',
-                                 po_trace_text);
-                    raise_application_error (
-                        -20001,
-                        'No Connectivity at the start of tracing');
-            END;
-
-            --            nm_debug.debug (
-            --                   'Retrieved minial LCP from first two vertices, terminating at nm_lref('
-            --                || retval (retval.LAST).refnt
-            --                || ', '
-            --                || CASE retval (retval.LAST).dir_flag
-            --                       WHEN 1 THEN retval (retval.LAST).end_m
-            --                       ELSE retval (retval.LAST).start_m
-            --                   END
-            --                || ')');
-
-            FOR iv IN 3 .. vertices.COUNT
+            FOR i IN 1 .. vertices.COUNT
             LOOP
-                --                nm_debug.debug ('In loop at vertex ' || TO_CHAR (iv));
-                l_lref :=
-                    nm_lref (
-                        retval (retval.LAST).refnt,
-                        CASE retval (retval.LAST).dir_flag
-                            WHEN 1 THEN retval (retval.LAST).end_m
-                            ELSE retval (retval.LAST).start_m
-                        END);
-
-                append_text (
-                       'Last linear reference of path = nm_lref('
-                    || l_lref.lr_ne_id
-                    || ','
-                    || l_lref.lr_offset
-                    || ')',
-                    po_trace_text);
-
-                append_text ('Attempt to trace to vertex ' || iv,
-                             po_trace_text);
-
-                --                nm_debug.debug (
-                --                       'In loop - count = '
-                --                    || iv
-                --                    || ' attempt join from terminating nm_lref('
-                --                    || l_lref.lr_ne_id
-                --                    || ', '
-                --                    || l_lref.lr_offset
-                --                    || ')');
+                nm_debug.debug ('start of loop 1 - I = ' || TO_CHAR (i));
 
                 BEGIN
-                    l_path :=
-                        get_minimal_adjoining_path (
-                            pi_geom,
-                            retval,
-                            sdo_geometry (
-                                2001,
-                                pi_geom.sdo_srid,
-                                sdo_point_type (vertices (iv - 1).x,
-                                                vertices (iv - 1).y,
-                                                NULL),
-                                NULL,
-                                NULL),
-                            l_lref,
-                            iv,
-                            pi_themes,
-                            pi_buffer,
-                            pi_buffer_unit,
-                            l_nw_unit,
-                            l_xy_to_m_conversion,
-                            pi_ratio_limit,
-                            po_trace_text);
+                    retval :=
+                        get_minimal_path_from_vertices (pi_geom,
+                                                        i,
+                                                        i + 1,
+                                                        pi_buffer,
+                                                        pi_buffer_unit,
+                                                        l_nw_unit,
+                                                        l_nw_unit,
+                                                        l_xy_to_m_conversion,
+                                                        pi_ratio_limit,
+                                                        pi_tolerance,
+                                                        po_trace_text);
 
-                    IF l_path IS NULL
-                    THEN
-                        append_text (
-                            'No path retrieved, raising no-connectivity',
-                            po_trace_text);
-                        --                        nm_debug.debug (
-                        --                            'Path count is zero, raise no-connectivity');
-                        RAISE no_connectivity;
-                    END IF;
+                    append_text (
+                           'Retrieved inital path between first two vertices '
+                        || TO_CHAR (i)
+                        || ' and '
+                        || TO_CHAR (i + 1),
+                        po_trace_text);
+
+                    nm_debug.debug (
+                           'Retrieved inital path between first two vertices '
+                        || TO_CHAR (i)
+                        || ' and '
+                        || TO_CHAR (i + 1));
+
+
+                    first_lr := i;
+
+                    EXIT;
                 EXCEPTION
                     WHEN no_connectivity
                     THEN
-                        --                   nm_debug.debug_on;
-                        IF pi_must_connect = 'Y'
-                        THEN
-                            raise_application_error (
-                                -20099,
-                                'Using with the must-connect flag set on an no connectivity');
-                        END IF;
-
-                        l_lost_connectivity := TRUE; -- we need to terminate existing table and append a new segment using the minimal LCP from vertex iv to the next.
-
-                        --                        nm_debug.debug (
-                        --                               'no-connectivity between last LR and new vertex '
-                        --                            || TO_CHAR (iv));
-
-                        BEGIN
-                            append_text (
-                                   'Find path between vertices '
-                                || TO_CHAR (iv - 1)
-                                || ' and '
-                                || TO_CHAR (iv),
-                                po_trace_text);
-                            l_path :=
-                                get_minimal_path_from_vertices (
-                                    pi_geom,
-                                    retval,
-                                    iv - 1,
-                                    iv,
-                                    pi_themes,
-                                    pi_buffer,
-                                    pi_buffer_unit,
-                                    l_nw_unit,
-                                    l_xy_to_m_conversion,
-                                    pi_ratio_limit,
-                                    po_trace_text);
-                            l_lost_connectivity := FALSE;
-                        --                            nm_debug.debug (
-                        --                                   'Now using path between vertices '
-                        --                                || TO_CHAR (iv - 1)
-                        --                                || ' and '
-                        --                                || TO_CHAR (iv));
-                        EXCEPTION
-                            WHEN no_connectivity
-                            THEN
-                                append_text (
-                                    'No connectivity raised in get_minimal_path_from_vertices',
-                                    po_trace_text);
-
-                                l_lost_connectivity := TRUE;
-                        END;
-                --                    IF l_path.COUNT = 0
-                --                    THEN
-                ----                        nm_debug.debug('Setting no connectivity flag');
-                --                        l_lost_connectivity := TRUE;
-                --                    END IF;
-                END;
-
-                IF NOT l_lost_connectivity AND l_path IS NOT NULL
-                THEN
-                    BEGIN
-                        retval := lb_ops.rpt_append (retval, l_path, 10);
-                        --                nm_debug.debug (
-                        --                       'Append terminating at '
-                        --                    || retval (retval.LAST).refnt
-                        --                    || ', '
-                        --                    || CASE retval (retval.LAST).dir_flag
-                        --                           WHEN 1 THEN retval (retval.LAST).end_m
-                        --                           ELSE retval (retval.LAST).start_m end );
+                        --                    nm_debug.debug (
+                        --                        'No connectivity between vertices 1 and 2 ');
                         append_text (
-                               'Path appended terminating at nm_lref('
-                            || retval (retval.LAST).refnt
-                            || CASE retval (retval.LAST).dir_flag
-                                   WHEN 1 THEN retval (retval.LAST).end_m
-                                   ELSE retval (retval.LAST).start_m
-                               END
-                            || ')',
+                               'No connectivity between vertices '
+                            || TO_CHAR (i)
+                            || ' and '
+                            || TO_CHAR (i + 1),
                             po_trace_text);
-                    END;
-                END IF;
+                END;
             END LOOP;
+
+            IF first_lr < 0
+            THEN
+                nm_debug.debug ('Dropping through - no connectivity');
+
+                --if it drops through here then no connectivity over the network
+
+                raise_application_error (
+                    -20001,
+                    'No Connectivity at the start of tracing');
+            END IF;
         END IF;
 
+        nm_debug.debug (
+               'Retrieved minial LCP from vertices '
+            || TO_CHAR (first_lr)
+            || ' and '
+            || TO_CHAR (first_lr + 1)
+            || ', terminating at nm_lref('
+            || retval (retval.LAST).refnt
+            || ', '
+            || CASE retval (retval.LAST).dir_flag
+                   WHEN 1 THEN retval (retval.LAST).end_m
+                   ELSE retval (retval.LAST).start_m
+               END
+            || ')');
+
+        FOR iv IN first_lr + 2 .. vertices.COUNT
+        LOOP
+            nm_debug.debug ('In loop at vertex ' || TO_CHAR (iv));
+            l_lref :=
+                nm_lref (
+                    retval (retval.LAST).refnt,
+                    CASE retval (retval.LAST).dir_flag
+                        WHEN 1 THEN retval (retval.LAST).end_m
+                        ELSE retval (retval.LAST).start_m
+                    END);
+
+            append_text (
+                   'Last linear reference of path = nm_lref('
+                || l_lref.lr_ne_id
+                || ','
+                || l_lref.lr_offset
+                || ')',
+                po_trace_text);
+
+            append_text ('Attempt to trace to vertex ' || iv, po_trace_text);
+
+            nm_debug.debug (
+                   'In loop - count = '
+                || iv
+                || ' attempt join from terminating nm_lref('
+                || l_lref.lr_ne_id
+                || ', '
+                || l_lref.lr_offset
+                || ')');
+
+            BEGIN
+                l_path :=
+                    get_minimal_adjoining_path (
+                        pi_geom,
+                        sdo_geometry (
+                            2001,
+                            pi_geom.sdo_srid,
+                            sdo_point_type (vertices (iv - 1).x,
+                                            vertices (iv - 1).y,
+                                            NULL),
+                            NULL,
+                            NULL),
+                        l_lref,
+                        pi_buffer,
+                        pi_buffer_unit,
+                        iv,
+                        l_nw_unit,
+                        l_nw_unit,
+                        l_xy_to_m_conversion,
+                        pi_ratio_limit,
+                        pi_tolerance,
+                        po_trace_text);
+
+                IF l_path IS NULL
+                THEN
+                    append_text (
+                        'No path retrieved, raising no-connectivity',
+                        po_trace_text);
+                    --                        nm_debug.debug (
+                    --                            'Path count is zero, raise no-connectivity');
+                    RAISE no_connectivity;
+                END IF;
+            EXCEPTION
+                WHEN no_connectivity
+                THEN
+                    --                   nm_debug.debug_on;
+                    IF pi_must_connect = 'Y'
+                    THEN
+                        raise_application_error (
+                            -20099,
+                            'Using with the must-connect flag set on an no connectivity');
+                    END IF;
+
+                    l_lost_connectivity := TRUE; -- we need to terminate existing table and append a new segment using the minimal LCP from vertex iv to the next.
+
+                    --                        nm_debug.debug (
+                    --                               'no-connectivity between last LR and new vertex '
+                    --                            || TO_CHAR (iv));
+
+                    BEGIN
+                        append_text (
+                               'Find path between vertices '
+                            || TO_CHAR (iv - 1)
+                            || ' and '
+                            || TO_CHAR (iv),
+                            po_trace_text);
+                        l_path :=
+                            get_minimal_path_from_vertices (
+                                pi_geom,
+                                iv - 1,
+                                iv,
+                                pi_buffer,
+                                pi_buffer_unit,
+                                l_nw_unit,
+                                l_nw_unit,
+                                l_xy_to_m_conversion,
+                                pi_ratio_limit,
+                                pi_tolerance,
+                                po_trace_text);
+
+                        l_lost_connectivity := FALSE;
+                    --                            nm_debug.debug (
+                    --                                   'Now using path between vertices '
+                    --                                || TO_CHAR (iv - 1)
+                    --                                || ' and '
+                    --                                || TO_CHAR (iv));
+                    EXCEPTION
+                        WHEN no_connectivity
+                        THEN
+                            append_text (
+                                   'No connectivity raised in get_minimal_path_from_vertices '
+                                || TO_CHAR (iv - 1)
+                                || ' to '
+                                || TO_CHAR (iv),
+                                po_trace_text);
+
+                            l_lost_connectivity := TRUE;
+                    END;
+            --                    IF l_path.COUNT = 0
+            --                    THEN
+            ----                        nm_debug.debug('Setting no connectivity flag');
+            --                        l_lost_connectivity := TRUE;
+            --                    END IF;
+            END;
+
+            IF NOT l_lost_connectivity AND l_path IS NOT NULL
+            THEN
+                BEGIN
+                    retval := lb_ops.rpt_append (retval, l_path, 10);
+                    --                nm_debug.debug (
+                    --                       'Append terminating at '
+                    --                    || retval (retval.LAST).refnt
+                    --                    || ', '
+                    --                    || CASE retval (retval.LAST).dir_flag
+                    --                           WHEN 1 THEN retval (retval.LAST).end_m
+                    --                           ELSE retval (retval.LAST).start_m end );
+                    append_text (
+                           'Path appended terminating at nm_lref('
+                        || retval (retval.LAST).refnt
+                        || ','
+                        || CASE retval (retval.LAST).dir_flag
+                               WHEN 1 THEN retval (retval.LAST).end_m
+                               ELSE retval (retval.LAST).start_m
+                           END
+                        || ')',
+                        po_trace_text);
+                END;
+            END IF;
+        END LOOP;
+
         RETURN retval;
     END;
 
-    FUNCTION trace_geom (pi_geom           IN SDO_GEOMETRY,
-                         pi_themes         IN nm_theme_array_type,
-                         pi_must_connect   IN VARCHAR2,
-                         pi_buffer         IN NUMBER DEFAULT 20,
-                         pi_buffer_unit    IN INTEGER DEFAULT 1,    /*meters*/
-                         pi_ratio_limit    IN NUMBER)
-        RETURN lb_rpt_tab
-    IS
-        l_trace_output   CLOB;
-        retval           lb_rpt_tab;
-    BEGIN
-        retval :=
-            lb_net_code.trace_geom (pi_geom           => pi_geom,
-                                    pi_themes         => pi_themes,
-                                    pi_must_connect   => pi_must_connect,
-                                    pi_buffer         => pi_buffer,
-                                    pi_buffer_unit    => pi_buffer_unit,
-                                    pi_ratio_limit    => pi_ratio_limit,
-                                    po_trace_text     => l_trace_output);
-        RETURN retval;
-    END;
-
-
-    FUNCTION get_minimal_adjoining_path (
-        pi_geom          IN     SDO_GEOMETRY,
-        existing_path    IN     lb_rpt_tab,
-        pi_pt_geom       IN     SDO_GEOMETRY,
-        pi_lref          IN     nm_lref,
-        pi_vid           IN     INTEGER,
-        pi_themes        IN     nm_theme_array_type,
-        pi_buffer        IN     NUMBER,
-        pi_buffer_unit   IN     INTEGER,
-        pi_nw_unit       IN     INTEGER,
-        pi_conv_factor   IN     NUMBER,
-        pi_ratio_limit   IN     NUMBER,
-        po_trace_text    IN OUT CLOB)
+    FUNCTION get_minimal_adjoining_path (pi_geom            IN     SDO_GEOMETRY,
+                                         pi_pt_geom         IN     SDO_GEOMETRY,
+                                         pi_lref            IN     nm_lref,
+                                         pi_buffer          IN     NUMBER,
+                                         pi_in_uol          IN     INTEGER,
+                                         pi_vid             IN     INTEGER,
+                                         pi_nw_unit         IN     INTEGER,
+                                         pi_distance_unit   IN     INTEGER,
+                                         pi_conv_factor     IN     NUMBER,
+                                         pi_ratio_limit     IN     NUMBER,
+                                         pi_tolerance       IN     NUMBER,
+                                         po_trace_text      IN OUT CLOB)
         RETURN lb_rpt_tab
     IS
         retval                lb_rpt_tab;
@@ -674,16 +874,18 @@ AS
                                 measure,
                                 distance_from
                            FROM trace_vertices,
-                                TABLE (LB_NET_CODE.LB_SNAP_XY_TO_NW (
+                                TABLE (LB_NET_CODE.LB_SNAP_XY_TO_LINKS (
                                            v_x,
                                            v_y,
                                            pi_geom.sdo_srid,
                                            pi_buffer,
-                                           pi_buffer_unit,
+                                           pi_in_uol,
                                            pi_geom.sdo_srid,
                                            pi_nw_unit,
+                                           pi_geom.sdo_srid,
                                            pi_nw_unit,
-                                           pi_themes,
+                                           pi_distance_unit,
+                                           pi_tolerance,
                                            10)) t
                           WHERE v_id = pi_vid),
                     v_snap
@@ -721,8 +923,8 @@ AS
                                  MAX (distance_from) OVER (PARTITION BY v_id)
                                      max_distance_from
                             FROM (SELECT t1.*,
-                                         lb_get.get_count (v_path)         p_count,
-                                         lb_get.get_length (v_path, 1)     p_len
+                                         lb_get.get_count (v_path)        p_count,
+                                         lb_get.get_length (v_path, 1)    p_len
                                     FROM (SELECT v_id,
                                                  ne_id,
                                                  measure,
@@ -799,6 +1001,7 @@ AS
             || ', path_count = '
             || l_path_count,
             po_trace_text);
+
         nm_debug.debug (
                'Path from LR nm_lref('
             || pi_lref.lr_ne_id
@@ -824,18 +1027,19 @@ AS
             RAISE no_connectivity;
     END;
 
+
     FUNCTION get_minimal_path_from_vertices (
-        pi_geom          IN     SDO_GEOMETRY,
-        existing_path    IN     lb_rpt_tab,
-        pi_vid1          IN     INTEGER,
-        pi_vid2          IN     INTEGER,
-        pi_themes        IN     nm_theme_array_type,
-        pi_buffer        IN     NUMBER,
-        pi_buffer_unit   IN     INTEGER,
-        pi_nw_unit       IN     INTEGER,
-        pi_conv_factor   IN     NUMBER,
-        pi_ratio_limit   IN     NUMBER,
-        po_trace_text    IN OUT CLOB)
+        pi_geom            IN     SDO_GEOMETRY,
+        pi_vid1            IN     INTEGER,
+        pi_vid2            IN     INTEGER,
+        pi_buffer          IN     NUMBER,
+        pi_in_uol          IN     INTEGER,
+        pi_nw_unit         IN     INTEGER,
+        pi_distance_unit   IN     INTEGER,
+        pi_conv_factor     IN     NUMBER,
+        pi_ratio_limit     IN     NUMBER,
+        pi_tolerance       IN     NUMBER,
+        po_trace_text      IN OUT CLOB)
         RETURN lb_rpt_tab
     IS
         retval                lb_rpt_tab;
@@ -903,16 +1107,18 @@ AS
                                 measure,
                                 t.distance_from
                            FROM trace_vertices,
-                                TABLE (LB_NET_CODE.LB_SNAP_XY_TO_NW (
+                                TABLE (LB_NET_CODE.LB_SNAP_XY_TO_LINKS (
                                            v_x,
                                            v_y,
                                            pi_geom.sdo_srid,
                                            pi_buffer,
-                                           pi_buffer_unit,
+                                           pi_in_uol,
                                            pi_geom.sdo_srid,
                                            pi_nw_unit,
+                                           pi_geom.sdo_srid,
                                            pi_nw_unit,
-                                           pi_themes,
+                                           pi_distance_unit,
+                                           pi_tolerance,
                                            10)) t
                           WHERE v_id IN (pi_vid1, pi_vid2)),
                     v_interval (v1_id,
@@ -973,8 +1179,8 @@ AS
                                  COUNT (*) OVER (PARTITION BY v1_id)
                                      path_count
                             FROM (SELECT t1.*,
-                                         lb_get.get_count (v_path)         p_count,
-                                         lb_get.get_length (v_path, 1)     p_len
+                                         lb_get.get_count (v_path)        p_count,
+                                         lb_get.get_length (v_path, 1)    p_len
                                     --                             min_distance_from,
                                     --                             max_distance_from
                                     FROM (SELECT v1_id,
@@ -1006,21 +1212,22 @@ AS
                                                                           )
          WHERE ROWNUM = 1;
 
-        --        IF ABS (l_path_length - l_distance_between) / l_distance_between > pi_ratio_limit
-        --        THEN                                        --p_length_difference then
-        --            nm_debug.debug_on;
-        --            nm_debug.debug (
-        --                   'Problem with path between vertices '
-        --                || pi_vid1
-        --                || ', '
-        --                || pi_vid2
-        --                || ' -  path length and distance between vertices = '
-        --                || l_path_length
-        --                || ','
-        --                || l_distance_between);
-        --            nm_debug.debug_off;
-        --            RAISE no_connectivity;
-        --        END IF;
+        IF ABS (l_path_length - l_distance_between) / l_distance_between >
+           pi_ratio_limit
+        THEN                                        --p_length_difference then
+            nm_debug.debug_on;
+            nm_debug.debug (
+                   'Problem with path between vertices '
+                || pi_vid1
+                || ', '
+                || pi_vid2
+                || ' -  path length and distance between vertices = '
+                || l_path_length
+                || ','
+                || l_distance_between);
+            nm_debug.debug_off;
+            RAISE no_connectivity;
+        END IF;
 
         --
         --    IF l_dbg
@@ -1063,6 +1270,7 @@ AS
                 po_trace_text);
 
             --      nm_debug.debug('get_minimal_adjoining_path - no-data-found from LR nm_lref('||pi_lref.lr_ne_id||','||pi_lref.lr_offset||') to vertex '||vid );
+
             RAISE no_connectivity;
     END;
 END;
