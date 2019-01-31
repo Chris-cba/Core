@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_get
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_get.pkb-arc   1.59   Oct 24 2018 12:59:36   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/lb_get.pkb-arc   1.60   Jan 31 2019 16:04:24   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_get.pkb  $
-   --       Date into PVCS   : $Date:   Oct 24 2018 12:59:36  $
-   --       Date fetched Out : $Modtime:   Oct 24 2018 12:57:58  $
-   --       PVCS Version     : $Revision:   1.59  $
+   --       Date into PVCS   : $Date:   Jan 31 2019 16:04:24  $
+   --       Date fetched Out : $Modtime:   Jan 30 2019 15:02:42  $
+   --       PVCS Version     : $Revision:   1.60  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,16 +16,13 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.59  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.60  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_get';
 
    g_tol                     NUMBER := 0.00000001;
 
    --
-   FUNCTION get_aggr_constraint (p_inv_type IN VARCHAR2)
-      RETURN VARCHAR2;
-
    FUNCTION get_refnt_RPt_tab_from_geom (
       p_geom          IN MDSYS.sdo_geometry,
       p_nlt_ids       IN int_array_type,
@@ -554,12 +551,14 @@ AS
       END IF;
 
       --
-      RETURN get_refnt_RPt_tab_from_geom (
+      return get_refnt_RPt_tab_from_geom (
                 p_geom          => p_geom,
                 p_nlt_ids       => l_nlt_ids,
-                p_constraint    => get_aggr_constraint (p_inv_type),
+                p_constraint    => lb_nw_cons.get_aggr_constraint (p_inv_type),
                 p_mask_array    => 'ANYINTERACT',
                 p_cardinality   => 100);
+                
+                      
    END;
 
    FUNCTION get_refnt_RPt_tab_from_geom (
@@ -650,31 +649,6 @@ nm_debug.debug('cons = '||p_constraint);
 
       RETURN retval;
    --
-   END;
-
-   FUNCTION get_aggr_constraint (p_inv_type IN VARCHAR2)
-      --, p_nlt_ids in int_array_type )
-      RETURN VARCHAR2
-   IS
-      retval   VARCHAR2 (2000) := '1=1';
-   BEGIN
-      SELECT nvl(LISTAGG (get_constraint (ninc_id), ' AND ')
-                WITHIN GROUP (ORDER BY 1), '1=1')
-        INTO retval
-        FROM (  SELECT ninc_nlt_id,
-                       ninc_inv_type,
-                       ninc_id,
-                       COUNT (*),
-                       get_constraint (ninc_id) constraint_list
-                  FROM nm_inv_nw_constraints
-                 WHERE ninc_inv_type = p_inv_type
-              GROUP BY ninc_inv_type, ninc_nlt_id, ninc_id);
-
-      RETURN retval;
-   EXCEPTION
-      WHEN NO_DATA_FOUND
-      THEN
-         RETURN '1 = 1';
    END;
 
    FUNCTION get_refnt_RPt_tab_from_nspe (
@@ -3493,5 +3467,24 @@ nm_debug.debug('cons = '||p_constraint);
 
       RETURN retval;
    END;
+   
+function get_count ( pi_rpt_tab in lb_rpt_tab ) return integer is
+retval number;
+begin
+   select count(*) into retval
+   from table ( pi_rpt_tab );
+   return retval;
+end;   
+   
+function get_length ( pi_rpt_tab in lb_rpt_tab, pi_unit in integer ) return number is
+retval number;
+begin
+   select sum(abs(end_m - start_m)) into retval
+   from table ( pi_rpt_tab );
+   if retval = 0 then
+      raise_application_error(-20098, 'The path has zero length' );
+   end if;
+   return retval;
+end;   
 END;
 /
