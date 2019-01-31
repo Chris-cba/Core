@@ -1,0 +1,94 @@
+CREATE OR REPLACE PACKAGE lb_nw_cons
+AS
+    --<PACKAGE>
+    --   PVCS Identifiers :-
+    --
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/lb_nw_cons.pkh-arc   1.0   Jan 31 2019 15:39:10   Rob.Coupe  $
+    --       Module Name      : $Workfile:   lb_nw_cons.pkh  $
+    --       Date into PVCS   : $Date:   Jan 31 2019 15:39:10  $
+    --       Date fetched Out : $Modtime:   Jan 31 2019 15:35:02  $
+    --       PVCS Version     : $Revision:   1.0  $
+    --
+    --   Author : R.A. Coupe
+    --
+    --   Location Bridge package for applying network constraints
+    --
+    -----------------------------------------------------------------------------
+    -- Copyright (c) 2019 Bentley Systems Incorporated. All rights reserved.
+    ----------------------------------------------------------------------------
+    --
+    --</PACKAGE>
+    --<GLOBVAR>
+    --
+    g_sccsid         CONSTANT VARCHAR2 (2000) := '$Revision:   1.0  $';
+
+    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_nw_cons';
+
+    --</GLOBVAR>
+    -----------------------------------------------------------------------------
+    --
+    --<PROC NAME="GET_VERSION">
+    --
+    -- This function returns the current PVCS version of the package
+
+    FUNCTION get_version
+        RETURN VARCHAR2;
+
+    --</PROC>
+
+    -----------------------------------------------------------------------------
+    --
+    --<PROC NAME="GET_BODY_VERSION">
+    --
+    -- This function returns the current PVCS version of the package body
+    FUNCTION get_body_version
+        RETURN VARCHAR2;
+
+    --</PROC>
+
+    -----------------------------------------------------------------------------
+    --
+    --<PROC NAME="GET_AGGR_CONSTRAINT">
+    --
+    -- This function returns an aggregated SQL string to apply all constraints for a specific network type
+    --
+    --  p_inv_type      IN Varchar2      The Exor invetory type for which the constraint string is to be retrieved
+    --
+    --  returns Varchar2
+
+    FUNCTION get_aggr_constraint (p_inv_type IN VARCHAR2)
+        --, p_nlt_ids in int_array_type )
+        RETURN VARCHAR2;
+
+    --</PROC>
+
+    -----------------------------------------------------------------------------
+    --
+    --<PROC NAME="GET_CONSTRAINT">
+    --
+    -- This function returns the string related to a specific constraint
+    --
+    --  p_ninc_id      IN Integer      The specific inventory constraint (see table nm_inv_nw_constraints)
+    --
+    --  returns Varchar2
+
+    FUNCTION get_constraint (p_ninc_id IN INTEGER)
+        RETURN VARCHAR2;
+
+    --</PROC>
+
+    -----------------------------------------------------------------------------
+    --
+    --<PROC NAME="VALIDATE_INV_NW_CONSTRAINT">
+    --
+    -- This function validates a set of locations.
+    --
+    --  p_rpt_tab      IN LB_Rpt_Tab      The set of locations to be validated. The obj_type values within the table of locations
+    --                                    are used to retrieve inventory specific constraints.
+    --
+    --  returns Varchar2
+
+    FUNCTION validate_inv_nw_constraint (p_rpt_tab IN lb_rpt_tab)
+        RETURN VARCHAR2;
+END;
+/
