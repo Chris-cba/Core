@@ -1,11 +1,11 @@
 ----------------------------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm_4700_fix61.sql-arc   1.4   Jan 31 2019 09:27:46   Chris.Baugh  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm_4700_fix61.sql-arc   1.5   Jan 31 2019 09:55:04   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm_4700_fix61.sql  $ 
---       Date into PVCS   : $Date:   Jan 31 2019 09:27:46  $
---       Date fetched Out : $Modtime:   Jan 31 2019 09:27:06  $
---       Version     	  : $Revision:   1.4  $
+--       Date into PVCS   : $Date:   Jan 31 2019 09:55:04  $
+--       Date fetched Out : $Modtime:   Jan 31 2019 09:53:54  $
+--       Version     	  : $Revision:   1.5  $
 --
 ----------------------------------------------------------------------------------------------------
 --   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
@@ -159,7 +159,7 @@ PROMPT creating View v_all_contractor_users.vw
 SET TERM OFF
 --
 SET FEEDBACK ON
-START v_all_contractor_users.vw.vw
+START v_all_contractor_users.vw
 SET FEEDBACK OFF
 
 --
