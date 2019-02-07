@@ -5,11 +5,11 @@ AS
 
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/lb_load.pkh-arc   1.11   Feb 07 2019 10:26:30   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/lb_load.pkh-arc   1.12   Feb 07 2019 11:07:30   Rob.Coupe  $
     --       Module Name      : $Workfile:   lb_load.pkh  $
-    --       Date into PVCS   : $Date:   Feb 07 2019 10:26:30  $
-    --       Date fetched Out : $Modtime:   Feb 07 2019 10:24:18  $
-    --       PVCS Version     : $Revision:   1.11  $
+    --       Date into PVCS   : $Date:   Feb 07 2019 11:07:30  $
+    --       Date fetched Out : $Modtime:   Feb 07 2019 10:43:44  $
+    --       PVCS Version     : $Revision:   1.12  $
     --
     --   Author : R.A. Coupe
     --
@@ -22,7 +22,7 @@ AS
     --</PACKAGE>
     --<GLOBVAR>
     --
-    g_sccsid     CONSTANT VARCHAR2 (2000) := '$Revision:   1.11  $';
+    g_sccsid     CONSTANT VARCHAR2 (2000) := '$Revision:   1.12  $';
     g_nvl                 VARCHAR2 (4) := nm3type.c_nvl;
     g_sdo_tolerance       NUMBER := 0.005;
     g_sdo_arc_tolerance   NUMBER := 0.05;
@@ -393,9 +393,14 @@ AS
     --
     --Arguments
     --
-    --      p_nal_id     IN INTEGER             The Exor internal ID of the asset location.
-    --      p_nal_descr  IN VARCHAR2            The description of the asset location
-    --      p_jxp       IN VARCHAR2            The JXP meaning of the asset location to be deleted.
+    --      pi_nal_id       IN INTEGER             The Exor internal ID of the asset location.
+    --      pi_nal_nit_type IN VARCHAR2            The asset type
+    --      pi_rpt          IN lb_rpt_tab          The location data
+    --      pi_xsp          IN varchar2            The XSP coded value
+    --      pi_start_date   IN date                The start date of the new location
+    --      pi_security_id  IN integer             A security flag, currently unused
+    --      pi_use_history  IN varchar2            A flag (Y/N) to indicate if the location should be closed and replaced or removed and replaced/
+    --
     --
     PROCEDURE replace_location (
         pi_nal_id         IN nm_asset_locations_all.nal_id%TYPE,
@@ -407,13 +412,36 @@ AS
         pi_use_history    IN VARCHAR2 DEFAULT 'N');
 --</PROC>
 
+
+    -----------------------------------------------------------------------------
+    --
+    --<PROC NAME="UPDATE_LB_RPT_TAB">
+    --
+    -- This function updates the supplied rpt_tab by making adjustments to start and end measures for
+    -- the specified rownum.
+    --
+    --Arguments
+    --
+    --      pi_rpt_tab    IN   lb_rpt_tab     The location data to be adjusted.
+    --      pi_rn         IN   integer        The rownumber of the array to be edited. 
+    --      pi_start_m    IN   number         The new start measure for the specified row (NULL for no change)
+    --      pi_end_m      IN   number         The new end measure for the specified row (NULL for no change)
+    
+    FUNCTION update_lb_rpt_tab (pi_rpt_tab   IN lb_rpt_tab,
+                                pi_rn        IN INTEGER,
+                                pi_start_m   IN NUMBER,
+                                pi_end_m     IN NUMBER)
+        RETURN lb_rpt_tab;
+
+--</PROC>
+
    -----------------------------------------------------------------------------
     --
     --<PROC NAME="RETRIEVE_GLOBAL_RPT_TAB">
     --
     -- This function retrieves the global package variable g_load_tab
     --
-   
+    
     FUNCTION retrieve_global_rpt_tab return lb_rpt_tab;
 --</PROC>
     
