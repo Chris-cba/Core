@@ -4,11 +4,11 @@ AS
     --------------------------------------------------------------------------------
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/lb_get.pkh-arc   1.24   Jan 31 2019 16:01:52   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/lb_get.pkh-arc   1.25   Feb 07 2019 11:05:02   Rob.Coupe  $
     --       Module Name      : $Workfile:   lb_get.pkh  $
-    --       Date into PVCS   : $Date:   Jan 31 2019 16:01:52  $
-    --       Date fetched Out : $Modtime:   Jan 28 2019 13:44:08  $
-    --       PVCS Version     : $Revision:   1.24  $
+    --       Date into PVCS   : $Date:   Feb 07 2019 11:05:02  $
+    --       Date fetched Out : $Modtime:   Feb 07 2019 10:48:14  $
+    --       PVCS Version     : $Revision:   1.25  $
     --
     --   Author : R.A. Coupe
     --
@@ -21,7 +21,7 @@ AS
     --</PACKAGE>
     --<GLOBVAR>
     --
-    g_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.24  $';
+    g_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.25  $';
 
     --</GLOBVAR>
     -----------------------------------------------------------------------------
@@ -685,5 +685,24 @@ AS
     FUNCTION get_length (pi_rpt_tab IN lb_rpt_tab, pi_unit IN INTEGER)
         RETURN NUMBER;
 --</PROC>
+
+   -----------------------------------------------------------------------------
+    --
+    --<PROC NAME="GET_EDITABLE_RANGES">
+    --
+    -- This function will retrieve the location data and associated element data and is supplemented 
+    -- by the range of start/end measures that may be applied to the values. The restrictions are 
+    -- based on other values within the table of data.  
+    --
+    --Arguments
+    --
+    --      pi_rpt_tab      IN lb_rpt_tab             The location data to be analysed and retrieved
+    
+    FUNCTION get_editable_ranges (pi_rpt_tab IN lb_rpt_tab)
+        RETURN SYS_REFCURSOR;
+
+--</PROC>
+
+
 END;
 /
