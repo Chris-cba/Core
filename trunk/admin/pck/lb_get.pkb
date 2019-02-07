@@ -1,12 +1,12 @@
-CREATE OR REPLACE PACKAGE BODY lb_get
+CREATE OR REPLACE PACKAGE BODY ATLAS.lb_get
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/lb_get.pkb-arc   1.60   Jan 31 2019 16:04:24   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/lb_get.pkb-arc   1.61   Feb 07 2019 11:05:36   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_get.pkb  $
-   --       Date into PVCS   : $Date:   Jan 31 2019 16:04:24  $
-   --       Date fetched Out : $Modtime:   Jan 30 2019 15:02:42  $
-   --       PVCS Version     : $Revision:   1.60  $
+   --       Date into PVCS   : $Date:   Feb 07 2019 11:05:36  $
+   --       Date fetched Out : $Modtime:   Feb 07 2019 10:47:48  $
+   --       PVCS Version     : $Revision:   1.61  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,7 +16,7 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.60  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.61  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_get';
 
@@ -3481,10 +3481,90 @@ retval number;
 begin
    select sum(abs(end_m - start_m)) into retval
    from table ( pi_rpt_tab );
-   if retval = 0 then
-      raise_application_error(-20098, 'The path has zero length' );
-   end if;
+--   if retval = 0 then
+--      raise_application_error(-20098, 'The path has zero length' );
+--   end if;
    return retval;
-end;   
+end;
+
+    FUNCTION get_editable_ranges (pi_rpt_tab IN lb_rpt_tab)
+        RETURN SYS_REFCURSOR
+    IS
+        retval   SYS_REFCURSOR;
+    BEGIN
+        OPEN retval FOR
+            WITH
+                locs
+                AS
+                    (SELECT nlt_g_i_d, t.*
+                       FROM TABLE (pi_rpt_tab) t, nm_linear_types
+                      WHERE nlt_id = t.refnt_type),
+                loc_terminals
+                AS
+                    (SELECT t1.*, 0 min_start, ne_length max_end
+                       FROM locs t1, nm_elements
+                      WHERE ne_id = refnt AND nlt_g_i_d = 'D'
+                     UNION ALL
+                     SELECT t1.*,
+                            nm3net.get_min_slk (refnt),
+                            nm3net.get_max_slk (refnt)
+                       FROM locs t1
+                      WHERE nlt_g_i_d = 'G'),
+                tab
+                AS
+                    (SELECT ROWNUM            rn,
+                            ne_id,
+                            t.*,
+                            NVL (
+                                LEAD (start_m, 1)
+                                    OVER (PARTITION BY refnt, obj_type
+                                          ORDER BY start_m ASC, end_m DESC),
+                                max_end)      next_start,
+                            NVL (
+                                LAG (end_m, 1)
+                                    OVER (PARTITION BY refnt, obj_type
+                                          ORDER BY start_m ASC, end_m DESC),
+                                min_start)    prior_end
+                       FROM loc_terminals t, nm_elements
+                      WHERE ne_id = refnt) --                  select * from tab
+                                                                            --
+                ,
+                ranges
+                AS
+                    (SELECT t.rn,
+                            t.refnt,
+                            t.refnt_type,
+                            t.obj_type,
+                            t.obj_id,
+                            t.seg_id,
+                            t.seq_id,
+                            t.dir_flag,
+                            t.start_m,
+                            t.end_m,
+                            t.m_unit,
+                            CASE WHEN start_m > prior_end THEN 'S' END
+                                s_updatable,
+                            CASE WHEN start_m > prior_end THEN prior_end END
+                                s_range_start,
+                            CASE WHEN start_m > prior_end THEN start_m END
+                                s_range_end,
+                            CASE WHEN end_m < next_start THEN 'E' END
+                                e_updatable,
+                            CASE WHEN end_m < next_start THEN end_m END
+                                e_range_start,
+                            CASE WHEN end_m < next_start THEN next_start END
+                                e_range_end
+                       FROM tab t)
+              SELECT ne_id,
+                     ne_unique,
+                     ne_descr,
+                     t.*
+                FROM ranges t, nm_elements
+               WHERE ne_id = t.refnt
+            ORDER BY seg_id, seq_id;
+
+        RETURN retval;
+    END;
+   
 END;
 /
