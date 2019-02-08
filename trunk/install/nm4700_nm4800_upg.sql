@@ -3,11 +3,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm4700_nm4800_upg.sql-arc   1.2   Jan 23 2019 12:10:02   Chris.Baugh  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm4700_nm4800_upg.sql-arc   1.3   Feb 08 2019 10:48:56   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm4700_nm4800_upg.sql  $
---       Date into PVCS   : $Date:   Jan 23 2019 12:10:02  $
---       Date fetched Out : $Modtime:   Jan 23 2019 11:22:12  $
---       Version          : $Revision:   1.2  $
+--       Date into PVCS   : $Date:   Feb 08 2019 10:48:56  $
+--       Date fetched Out : $Modtime:   Feb 08 2019 10:39:48  $
+--       Version          : $Revision:   1.3  $
 --
 --   Product upgrade script
 --
@@ -309,16 +309,15 @@ start '&&run_file'
 SET FEEDBACK OFF
 --
 ---------------------------------------------------------------------------------------------------
---                        ****************   Apply SDO_LRS replacement code if Oracle Standard Edition (ie. not Enterprise)  *******************
+--                        ****************   Apply SDO_LRS replacement code if Oracle Spatial is not installed *******************
 SET TERM ON
-Prompt Applying SDO_LRS replacement, if Oracle Standard Edition...
+Prompt Applying SDO_LRS replacement, if Oracle Spatial not installed...
 SET TERM OFF
 
-SELECT DECODE(INSTR(UPPER(banner), 'ENTERPRISE'), 
-                    0, '&exor_base'||'nm3'||'&terminator'||'install'||'&terminator'||'install_sdo_lrs_replacement',
-                       '&exor_base'||'nm3'||'&terminator'||'install'||'&terminator'||'dummy') run_file
-  FROM v$version 
-WHERE UPPER(banner) LIKE '%ORACLE DATABASE%'
+select decode(status , 'VALID', '&exor_base'||'nm3'||'&terminator'||'install'||'&terminator'||'dummy',
+                                '&exor_base'||'nm3'||'&terminator'||'install'||'&terminator'||'install_sdo_lrs_replacement') run_file
+from dba_registry 
+where comp_name='Spatial'
 /
 
 SET FEEDBACK ON
