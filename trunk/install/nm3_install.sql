@@ -1,11 +1,11 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/nm3_install.sql-arc   2.45   Jan 23 2019 12:10:48   Chris.Baugh  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/nm3_install.sql-arc   2.46   Feb 08 2019 10:47:04   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm3_install.sql  $
---       Date into PVCS   : $Date:   Jan 23 2019 12:10:48  $
---       Date fetched Out : $Modtime:   Jan 23 2019 11:21:16  $
---       PVCS Version     : $Revision:   2.45  $
+--       Date into PVCS   : $Date:   Feb 08 2019 10:47:04  $
+--       Date fetched Out : $Modtime:   Feb 08 2019 10:39:16  $
+--       PVCS Version     : $Revision:   2.46  $
 --
 --------------------------------------------------------------------------------
 --   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
@@ -460,16 +460,15 @@ start '&&run_file'
 SET FEEDBACK OFF
 --
 ---------------------------------------------------------------------------------------------------
---                        ****************   Apply SDO_LRS replacement code if Oracle Standard Edition (ie. not Enterprise)  *******************
+--                        ****************   Apply SDO_LRS replacement code if Oracle Spatial is not installed *******************
 SET TERM ON
-Prompt Applying SDO_LRS replacement, if Oracle Standard Edition...
+Prompt Applying SDO_LRS replacement, if Oracle Spatial not installed...
 SET TERM OFF
 
-SELECT DECODE(INSTR(UPPER(banner), 'ENTERPRISE'), 
-                    0, '&exor_base'||'nm3'||'&terminator'||'install'||'&terminator'||'install_sdo_lrs_replacement',
-                       '&exor_base'||'nm3'||'&terminator'||'install'||'&terminator'||'dummy') run_file
-  FROM v$version 
-WHERE UPPER(banner) LIKE '%ORACLE DATABASE%'
+select decode(status , 'VALID', '&exor_base'||'nm3'||'&terminator'||'install'||'&terminator'||'dummy',
+                                '&exor_base'||'nm3'||'&terminator'||'install'||'&terminator'||'install_sdo_lrs_replacement') run_file
+from dba_registry 
+where comp_name='Spatial'
 /
 
 SET FEEDBACK ON
