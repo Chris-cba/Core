@@ -1,13 +1,12 @@
-/* Formatted on 12/02/2019 14:36:34 (QP5 v5.336) */
 CREATE OR REPLACE PACKAGE BODY lb_nw_cons
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/lb_nw_cons.pkb-arc   1.1   Feb 12 2019 14:38:52   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/lb_nw_cons.pkb-arc   1.2   Feb 12 2019 14:42:40   Rob.Coupe  $
     --       Module Name      : $Workfile:   lb_nw_cons.pkb  $
-    --       Date into PVCS   : $Date:   Feb 12 2019 14:38:52  $
-    --       Date fetched Out : $Modtime:   Feb 12 2019 14:37:42  $
-    --       PVCS Version     : $Revision:   1.1  $
+    --       Date into PVCS   : $Date:   Feb 12 2019 14:42:40  $
+    --       Date fetched Out : $Modtime:   Feb 12 2019 14:41:54  $
+    --       PVCS Version     : $Revision:   1.2  $
     --
     --   Author : R.A. Coupe
     --
@@ -17,11 +16,9 @@ AS
     -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
     ----------------------------------------------------------------------------
     --
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.1  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.2  $';
 
-    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_get';
-
-    g_tol                     NUMBER := 0.00000001;
+    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_nw_cons';
 
     FUNCTION get_version
         RETURN VARCHAR2
@@ -63,7 +60,7 @@ AS
                           FROM nm_nw_cons_columns,
                                nm_inv_nw_constraints,
                                nm_nw_constraints
-                         WHERE     ninc_inv_type = 'EBKM'
+                         WHERE     ninc_inv_type = p_inv_type
                                AND nncc_nnc_id = nnc_id
                                AND nncc_nnc_id = nncc_nnc_id
                                AND (   LENGTH (
