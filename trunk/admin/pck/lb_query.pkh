@@ -1,0 +1,109 @@
+CREATE OR REPLACE PACKAGE lb_query
+AS
+    --<PACKAGE>
+    --   PVCS Identifiers :-
+    --
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/lb_query.pkh-arc   1.0   Feb 14 2019 14:12:42   Rob.Coupe  $
+    --       Module Name      : $Workfile:   lb_query.pkh  $
+    --       Date into PVCS   : $Date:   Feb 14 2019 14:12:42  $
+    --       Date fetched Out : $Modtime:   Feb 14 2019 14:08:16  $
+    --       PVCS Version     : $Revision:   1.0  $
+    --
+    --   Author : R.A. Coupe
+    --
+    --   Location Bridge package for handling network queries
+    --
+    -----------------------------------------------------------------------------
+    -- Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
+    ----------------------------------------------------------------------------
+    -- The main query function is the get_network_query which takes a set of criteria applied
+    -- to a target network/group type
+    --</PACKAGE>
+
+    g_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.0  $';
+
+    -----------------------------------------------------------------------------
+    --
+    --<PROC NAME="GET_VERSION">
+    --
+    -- This function returns the current PVCS version of the package
+
+    FUNCTION get_version
+        RETURN VARCHAR2;
+
+    --</PROC>
+
+    -----------------------------------------------------------------------------
+    --
+    --<PROC NAME="GET_BODY_VERSION">
+    --
+    -- This function returns the current PVCS version of the package body
+    FUNCTION get_body_version
+        RETURN VARCHAR2;
+
+
+    --</PROC>
+
+    -----------------------------------------------------------------------------
+    --
+    --<PROC NAME="GET_ASSET_DATA">
+    --
+    -- This function returns an LB_RPT_TAB table of asset ids, types and locations of the asset data in either
+    --   a group of group
+    --   a group of datums (linear or non-linear)
+    --   a linear group or datum and range
+    --
+    --  Arguments:
+    --
+    --   p_ne_id         IN INTEGER            the network element over which asset ids are too be queried
+    --   p_start_m       IN NUMBER             the start measure, part of an optional range restriction (relative to the linear element p_ne_id)
+    --   p_end_m         IN NUMBER             the end measure, part of an optional range restriction (relative to the linear element p_ne_id)
+    --   p_unit          IN NUMBER             the unit of measure of the start and end measures
+    --   p_obj_types     IN lb_asset_type_tab  the array of inventory types to be retrieved
+    --   p_intsct        IN VARCHAR2           return locations which are intersecting, i.e. inside the range specified or limited to the element specified - DEFAULT 'FALSE',
+    --   p_lb_only       IN VARCHAR2           return only assets of a type that are flagged as part of location bridge - DEFAULT 'FALSE',
+    --   p_whole_only    IN VARCHAR2           return only those assets that are wholly within the specified element or range - DEFAULT 'FALSE',
+    --   p_cardinality   IN INTEGER            An integer which provides an expected number of rows to be retrieved (used in Oracle 11 when statistics are applied)
+
+
+    FUNCTION get_asset_data (p_ne_id         IN INTEGER,
+                             p_start_m       IN NUMBER,
+                             p_end_m         IN NUMBER,
+                             p_unit          IN NUMBER,
+                             p_obj_types     IN lb_asset_type_tab,
+                             p_intsct        IN VARCHAR2 DEFAULT 'FALSE',
+                             p_lb_only       IN VARCHAR2 DEFAULT 'FALSE',
+                             p_whole_only    IN VARCHAR2 DEFAULT 'FALSE',
+                             p_cardinality   IN INTEGER)
+        RETURN lb_RPt_tab;
+
+    --</PROC>
+
+    -----------------------------------------------------------------------------
+    --
+    --<PROC NAME="GET_ASSET_DATA_FROM_RPT_TAB">
+    --
+    -- This function returns an LB_RPT_TAB table of asset ids, types and locations of the asset data in either
+    --   a group of group
+    --   a group of datums (linear or non-linear)
+    --   a linear group or datum and range
+    --
+    --  Arguments:
+    --
+    --   p_refnt_tab     IN lb_RPt_tab,
+    --   p_obj_types     IN lb_asset_type_tab  the array of inventory types to be retrieved
+    --   p_intsct        IN VARCHAR2           return locations which are intersecting, i.e. inside the range specified or limited to the element specified - DEFAULT 'FALSE',
+    --   p_lb_only       IN VARCHAR2           return only assets of a type that are flagged as part of location bridge - DEFAULT 'FALSE',
+    --   p_whole_only    IN VARCHAR2           return only those assets that are wholly within the specified element or range - DEFAULT 'FALSE',
+    --   p_cardinality   IN INTEGER            An integer which provides an expected number of rows to be retrieved (used in Oracle 11 when statistics are applied)
+
+    FUNCTION get_asset_data_from_rpt_tab (
+        p_refnt_tab     IN lb_RPt_tab,
+        p_obj_types     IN lb_asset_type_tab,
+        p_intsct        IN VARCHAR2 DEFAULT 'FALSE',
+        p_lb_only       IN VARCHAR2 DEFAULT 'FALSE',
+        p_whole_only    IN VARCHAR2 DEFAULT 'FALSE',
+        p_cardinality   IN INTEGER)
+        RETURN lb_RPt_tab;
+END;
+/
