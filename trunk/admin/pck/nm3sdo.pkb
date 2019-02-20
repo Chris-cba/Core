@@ -5,11 +5,11 @@ AS
     --
     ---   PVCS Identifiers :-
     --
-    --       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.100   Jan 28 2019 15:52:38   Rob.Coupe  $
+    --       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.101   Feb 20 2019 12:59:10   Rob.Coupe  $
     --       Module Name      : $Workfile:   nm3sdo.pkb  $
-    --       Date into PVCS   : $Date:   Jan 28 2019 15:52:38  $
-    --       Date fetched Out : $Modtime:   Jan 28 2019 15:49:58  $
-    --       PVCS Version     : $Revision:   2.100  $
+    --       Date into PVCS   : $Date:   Feb 20 2019 12:59:10  $
+    --       Date fetched Out : $Modtime:   Feb 20 2019 12:57:10  $
+    --       PVCS Version     : $Revision:   2.101  $
     --       Based on
     ------------------------------------------------------------------
     --   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
@@ -23,7 +23,7 @@ AS
     -- Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
     -----------------------------------------------------------------------------
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '"$Revision:   2.100  $"';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '"$Revision:   2.101  $"';
     g_package_name   CONSTANT VARCHAR2 (30) := 'NM3SDO';
     g_batch_size              INTEGER
         := NVL (TO_NUMBER (Hig.get_sysopt ('SDOBATSIZE')), 10);
@@ -799,7 +799,7 @@ AS
             || g_usgm.column_name
             || ', :diminfo, '
             || 'mdsys.sdo_geometry( 2001, :srid, null, mdsys.sdo_elem_info_array( 1,1,1), '
-            || 'mdsys.sdo_ordinate_array( :x, :y, null )) ) '
+            || 'mdsys.sdo_ordinate_array( :x, :y )) ) '
             || ' from '
             || g_usgm.table_name
             || ' where '
