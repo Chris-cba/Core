@@ -3,11 +3,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm4700_nm4800_upg.sql-arc   1.3   Feb 08 2019 10:48:56   Chris.Baugh  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm4700_nm4800_upg.sql-arc   1.4   Feb 20 2019 15:07:38   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm4700_nm4800_upg.sql  $
---       Date into PVCS   : $Date:   Feb 08 2019 10:48:56  $
---       Date fetched Out : $Modtime:   Feb 08 2019 10:39:48  $
---       Version          : $Revision:   1.3  $
+--       Date into PVCS   : $Date:   Feb 20 2019 15:07:38  $
+--       Date fetched Out : $Modtime:   Feb 18 2019 08:17:38  $
+--       Version          : $Revision:   1.4  $
 --
 --   Product upgrade script
 --
@@ -358,13 +358,15 @@ END;
 -- re-create the policies that were dropped at the beginning of the upgrade
 --
 SET TERM ON
-PROMPT Adding Policies...
+prompt Apply Policies if using Oracle Enterprise Edition...
 SET TERM OFF
 SET DEFINE ON
-SET VERIFY OFF
-SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||
-    '&terminator'||'ctx'||'&terminator'||'add_policy' run_file
-FROM dual
+SELECT DECODE(INSTR(UPPER(banner), 'ENTERPRISE'), 
+                    0, '&exor_base'||'nm3'||'&terminator'||'install'||'&terminator'||'dummy',
+                       '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'ctx'||'&terminator'||'add_policy'
+                       ) run_file
+  FROM v$version 
+WHERE UPPER(banner) LIKE '%ORACLE DATABASE%'
 /
 SET FEEDBACK ON
 start &&run_file
