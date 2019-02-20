@@ -1,11 +1,11 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/nm3_install.sql-arc   2.46   Feb 08 2019 10:47:04   Chris.Baugh  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/nm3_install.sql-arc   2.47   Feb 20 2019 15:05:14   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm3_install.sql  $
---       Date into PVCS   : $Date:   Feb 08 2019 10:47:04  $
---       Date fetched Out : $Modtime:   Feb 08 2019 10:39:16  $
---       PVCS Version     : $Revision:   2.46  $
+--       Date into PVCS   : $Date:   Feb 20 2019 15:05:14  $
+--       Date fetched Out : $Modtime:   Feb 15 2019 09:51:14  $
+--       PVCS Version     : $Revision:   2.47  $
 --
 --------------------------------------------------------------------------------
 --   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
@@ -330,13 +330,17 @@ commit;
 ---------------------------------------------------------------------------------------------------
 --                         ****************   POLICIES  *******************
 SET TERM ON
-prompt Policies...
+prompt Apply Policies if using Oracle Enterprise Edition...
 SET TERM OFF
 SET DEFINE ON
-select '&exor_base'||'nm3'||'&terminator'||'admin'||
-        '&terminator'||'ctx'||'&terminator'||'add_policy' run_file
-from dual
+SELECT DECODE(INSTR(UPPER(banner), 'ENTERPRISE'), 
+                    0, '&exor_base'||'nm3'||'&terminator'||'install'||'&terminator'||'dummy',
+                       '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'ctx'||'&terminator'||'add_policy'
+                       ) run_file
+  FROM v$version 
+WHERE UPPER(banner) LIKE '%ORACLE DATABASE%'
 /
+
 SET FEEDBACK ON
 start '&&run_file'
 SET FEEDBACK OFF
