@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm_sdo
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm_sdo.pkb-arc   1.11   Feb 21 2019 14:59:24   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm_sdo.pkb-arc   1.12   Feb 21 2019 15:44:32   Rob.Coupe  $
     --       Module Name      : $Workfile:   nm_sdo.pkb  $
-    --       Date into PVCS   : $Date:   Feb 21 2019 14:59:24  $
-    --       Date fetched Out : $Modtime:   Feb 21 2019 14:59:00  $
-    --       PVCS Version     : $Revision:   1.11  $
+    --       Date into PVCS   : $Date:   Feb 21 2019 15:44:32  $
+    --       Date fetched Out : $Modtime:   Feb 21 2019 15:38:48  $
+    --       PVCS Version     : $Revision:   1.12  $
     --
     --   Author : R.A. Coupe
     --
@@ -18,7 +18,7 @@ AS
     -- The main purpose of this package is to replicate the functions inside the SDO_LRS package as
     -- supplied under the MDSYS schema and licensed under the Oracle Spatial license on EE.
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.11  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.12  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'NM_SDO';
     
@@ -917,7 +917,7 @@ AS
                                  3001,
                                  3301)
         THEN
-            RETURN geom.sdo_ordinates (3);
+            RETURN round(geom.sdo_ordinates (3), g_round);
         ELSE
             raise_application_error (-20002, 'Invalid Geometry Type');
         END IF;
@@ -933,7 +933,7 @@ AS
             RETURN geom.sdo_point.z;
         ELSIF geom.sdo_gtype IN (3302, 3306)
         THEN
-            RETURN geom.sdo_ordinates (geom.sdo_ordinates.LAST);
+            RETURN round(geom.sdo_ordinates (geom.sdo_ordinates.LAST), g_round);
         ELSE
             raise_application_error (-20002, 'Invalid Geometry Type');
         END IF;
@@ -1248,7 +1248,7 @@ AS
         geoma := nm_sdo.get_projection (p_pt_geom, p_lrs_geom, 0.005);
         --
         retval := nm_sdo.geom_segment_start_measure (geoma);
-        RETURN retval;
+        RETURN round(retval, g_round);
     END;
 
     FUNCTION add_m (p_geom IN SDO_GEOMETRY)
@@ -1613,7 +1613,7 @@ AS
     IS
         retval   NUMBER := SQRT (POWER ((x2 - x1), 2) + POWER ((y2 - y1), 2));
     BEGIN
-        RETURN retval;
+        RETURN round(retval, g_round);
     END;
 
     FUNCTION get_measure_array (lr_geom IN SDO_GEOMETRY, pts IN SDO_GEOMETRY)
@@ -1703,10 +1703,10 @@ AS
             END IF;
         END IF;
 
-        RETURN CASE l_dim
+        RETURN round(CASE l_dim
                    WHEN 3 THEN point.sdo_ordinates (3)
                    WHEN 4 THEN point.sdo_ordinates (4)
-               END;
+               END, g_round);
     END;
 
 
@@ -1985,9 +1985,9 @@ AS
         RETURN NUMBER
     IS
     BEGIN
-        RETURN ABS (
+        RETURN round( ABS (
                      geom_segment_end_measure (geom_segment)
-                   - geom_segment_start_measure (geom_segment));
+                   - geom_segment_start_measure (geom_segment)), g_round);
     END;
 
     FUNCTION geom_segment_length (geom_segment   IN SDO_GEOMETRY,
@@ -1995,9 +1995,9 @@ AS
         RETURN NUMBER
     IS
     BEGIN
-        RETURN ABS (
+        RETURN round(ABS (
                      geom_segment_end_measure (geom_segment)
-                   - geom_segment_start_measure (geom_segment));
+                   - geom_segment_start_measure (geom_segment)), g_round);
     END;
 
     FUNCTION offset_geom_segment (geom            IN SDO_GEOMETRY,
