@@ -1,12 +1,12 @@
-CREATE OR REPLACE PACKAGE BODY nm_sdo
+CREATE OR REPLACE PACKAGE BODY ATLAS.nm_sdo
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm_sdo.pkb-arc   1.9   Jan 28 2019 11:19:20   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm_sdo.pkb-arc   1.10   Feb 21 2019 14:52:26   Rob.Coupe  $
     --       Module Name      : $Workfile:   nm_sdo.pkb  $
-    --       Date into PVCS   : $Date:   Jan 28 2019 11:19:20  $
-    --       Date fetched Out : $Modtime:   Jan 28 2019 11:17:50  $
-    --       PVCS Version     : $Revision:   1.9  $
+    --       Date into PVCS   : $Date:   Feb 21 2019 14:52:26  $
+    --       Date fetched Out : $Modtime:   Feb 21 2019 14:51:52  $
+    --       PVCS Version     : $Revision:   1.10  $
     --
     --   Author : R.A. Coupe
     --
@@ -18,9 +18,13 @@ AS
     -- The main purpose of this package is to replicate the functions inside the SDO_LRS package as
     -- supplied under the MDSYS schema and licensed under the Oracle Spatial license on EE.
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.9  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.10  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'NM_SDO';
+    
+    g_round          CONSTANT INTEGER := 18; -- the number of DP to round number return values. SDO_LRS is linked to code which
+                                       -- return Java based-values. This means the values will be standard floating point values
+                                       -- and are likely not to have the same number of decimal places. 
 
     FUNCTION offset_whole_geom (geom        IN SDO_GEOMETRY,
                                 offset      IN NUMBER,
