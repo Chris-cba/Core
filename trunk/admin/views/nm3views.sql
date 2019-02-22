@@ -6,7 +6,7 @@
 --       Module Name      : nm3views.sql
 --       Date into SCCS   : 06/12/22 15:57:40
 --       Date fetched Out : 07/06/13 17:08:24
---       PVCS Version     : $Revision:   2.45  $
+--       PVCS Version     : $Revision:   2.46  $
 --
 --
 --   Author : Graeme Johnson
@@ -254,6 +254,17 @@ start '&run_file'
 ----------------------------------------------------------------------------------------- 
 --
 SET TERM ON 
+PROMPT nm_user_aus.vw 
+SET TERM OFF
+SET DEFINE ON 
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'views'||'&terminator'||'nm_user_aus.vw' run_file
+FROM dual 
+/ 
+start '&run_file' 
+--
+----------------------------------------------------------------------------------------- 
+--
+SET TERM ON 
 PROMPT nm_inv_items.vw
 SET TERM OFF
 SET DEFINE ON 
@@ -375,6 +386,17 @@ start '&run_file'
 ----------------------------------------------------------------------------------------- 
 --
 SET TERM ON 
+PROMPT nm_mrg_query_types.vw
+SET TERM OFF
+SET DEFINE ON 
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'views'||'&terminator'||'nm_mrg_query_types.vw' run_file 
+FROM dual 
+/ 
+start '&run_file' 
+--
+----------------------------------------------------------------------------------------- 
+--
+SET TERM ON 
 PROMPT nm_mrg_query_executable.vw 
 SET TERM OFF
 SET DEFINE ON 
@@ -390,17 +412,6 @@ PROMPT nm_mrg_query_results.vw
 SET TERM OFF
 SET DEFINE ON 
 SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'views'||'&terminator'||'nm_mrg_query_results.vw' run_file 
-FROM dual 
-/ 
-start '&run_file' 
---
------------------------------------------------------------------------------------------ 
---
-SET TERM ON 
-PROMPT nm_mrg_query_types.vw
-SET TERM OFF
-SET DEFINE ON 
-SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'views'||'&terminator'||'nm_mrg_query_types.vw' run_file 
 FROM dual 
 / 
 start '&run_file' 
@@ -500,17 +511,6 @@ PROMPT nm_type_layers.vw
 SET TERM OFF
 SET DEFINE ON 
 SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'views'||'&terminator'||'nm_type_layers.vw' run_file 
-FROM dual 
-/ 
-start '&run_file' 
---
------------------------------------------------------------------------------------------ 
---
-SET TERM ON 
-PROMPT nm_user_aus.vw 
-SET TERM OFF
-SET DEFINE ON 
-SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'views'||'&terminator'||'nm_user_aus.vw' run_file
 FROM dual 
 / 
 start '&run_file' 
