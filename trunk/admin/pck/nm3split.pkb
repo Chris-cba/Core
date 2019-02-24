@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3split IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3split.pkb-arc   2.22   Jul 25 2018 23:01:28   Rob.Coupe  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3split.pkb-arc   2.23   Feb 24 2019 10:07:38   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3split.pkb  $
---       Date into PVCS   : $Date:   Jul 25 2018 23:01:28  $
---       Date fetched Out : $Modtime:   Jul 25 2018 23:01:00  $
---       PVCS Version     : $Revision:   2.22  $
+--       Date into PVCS   : $Date:   Feb 24 2019 10:07:38  $
+--       Date fetched Out : $Modtime:   Oct 23 2018 20:26:50  $
+--       PVCS Version     : $Revision:   2.23  $
 --
 --
 --   Author : ITurnbull
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3split IS
 -- 03.06.08 PT added p_no_purpose parameter throughout where node is created.
 
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.22  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.23  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(2000) := 'nm3split';
@@ -965,14 +965,16 @@ BEGIN
               ||  CHR(10) ||  '                         p_Old_Ne_Id       =>  :p_Ne_Id,'
               ||  CHR(10) ||  '                         p_New_Ne_Id_1     =>  :p_Ne_Id_1,'
               ||  CHR(10) ||  '                         p_New_Ne_Id_2     =>  :p_Ne_Id_2,'
-              ||  CHR(10) ||  '                         p_Effective_Date  =>  :p_Effective_Date'
+              ||  CHR(10) ||  '                         p_Effective_Date  =>  :p_Effective_Date,'
+              ||  CHR(10) ||  '                         p_Measure         =>  :p_Split_Measure'
               ||  CHR(10) ||  '                         );'
               ||  CHR(10) ||  'End;';
       Execute Immediate l_Block
       Using In  p_Ne_Id,
                 p_Ne_Id_1,
                 p_Ne_Id_2,
-                p_Effective_Date;                 
+                p_Effective_Date,
+                p_Split_Measure;                 
   End If;
 
   --
