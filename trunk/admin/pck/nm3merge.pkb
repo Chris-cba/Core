@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm3merge IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3merge.pkb-arc   2.23   Apr 16 2018 09:23:00   Gaurav.Gaurkar  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3merge.pkb-arc   2.24   Feb 24 2019 10:07:40   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3merge.pkb  $
---       Date into PVCS   : $Date:   Apr 16 2018 09:23:00  $
---       Date fetched Out : $Modtime:   Apr 16 2018 09:01:36  $
---       PVCS Version     : $Revision:   2.23  $
+--       Date into PVCS   : $Date:   Feb 24 2019 10:07:40  $
+--       Date fetched Out : $Modtime:   Oct 26 2018 13:48:14  $
+--       PVCS Version     : $Revision:   2.24  $
 --
 --   Author : ITurnbull
 --
@@ -16,7 +16,7 @@ CREATE OR REPLACE PACKAGE BODY nm3merge IS
 --   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.23  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.24  $"';
 --  g_body_sccsid is the SCCS ID for the package body
    g_package_name    CONSTANT  varchar2(30)   := 'nm3merge';
 --
@@ -826,17 +826,21 @@ BEGIN
    --NSG
    If Hig.Is_Product_Licensed( Nm3type.c_Nsg )  Then   
             
-     Execute Immediate 'Begin'                                                          ||  Chr(10) ||
-                       '  Nsg_Merge.Merge_Esu ('                                        ||  Chr(10) || 
-                       '                      p_Old_Ne_Id_1     =>  :p_Ne_Id_1,'        ||  Chr(10) ||
-                       '                      p_Old_Ne_Id_2     =>  :p_Ne_Id_2,'        ||  Chr(10) ||
-                       '                      p_New_Ne_Id       =>  :p_Ne_Id_New,'      ||  Chr(10) ||
-                       '                      p_Effective_Date  =>  :p_Effective_Date'  ||  Chr(10) ||
-                       '                      );'                                       ||  Chr(10) ||
+     Execute Immediate 'Begin'                                                                          ||  Chr(10) ||
+                       '  Nsg_Merge.Merge_Esu ('                                                        ||  Chr(10) || 
+                       '                      p_Old_Ne_Id_1             =>  :p_Ne_Id_1,'                ||  Chr(10) ||
+                       '                      p_Old_Ne_Id_2             =>  :p_Ne_Id_2,'                ||  Chr(10) ||
+                       '                      p_New_Ne_Id               =>  :p_Ne_Id_New,'              ||  Chr(10) ||
+                       '                      p_New_Starting_Ne_Id      =>  :p_New_Starting_Ne_Id'      ||  Chr(10) ||
+                       '                      p_Flip_Cardinality_Of_2   =>  :p_Flip_Cardinality_Of_2'   ||  Chr(10) ||                       
+                       '                      p_Effective_Date          =>  :p_Effective_Date'          ||  Chr(10) ||
+                       '                      );'                                                       ||  Chr(10) ||
                        'End;'
      Using In p_Ne_Id_1,
               p_Ne_Id_2,
               p_Ne_Id_New,
+              p_New_Starting_Ne_Id,
+              p_Flip_Cardinality_Of_2,
               p_Effective_Date;
    End If;
 --
