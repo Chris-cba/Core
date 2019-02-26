@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_load
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/lb_load.pkb-arc   1.36   Feb 07 2019 11:07:06   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/lb_load.pkb-arc   1.37   Feb 26 2019 13:30:54   Rob.Coupe  $
     --       Module Name      : $Workfile:   lb_load.pkb  $
-    --       Date into PVCS   : $Date:   Feb 07 2019 11:07:06  $
-    --       Date fetched Out : $Modtime:   Feb 07 2019 10:43:50  $
-    --       PVCS Version     : $Revision:   1.36  $
+    --       Date into PVCS   : $Date:   Feb 26 2019 13:30:54  $
+    --       Date fetched Out : $Modtime:   Feb 26 2019 13:30:24  $
+    --       PVCS Version     : $Revision:   1.37  $
     --
     --   Author : R.A. Coupe
     --
@@ -16,7 +16,7 @@ AS
     -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
     ----------------------------------------------------------------------------
     --
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.36  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.37  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'lb_load';
 
@@ -694,6 +694,14 @@ AS
                                 AND nal_id = nm_ne_id_in
                                 AND nal_nit_type = nm_obj_type);
 
+        DELETE FROM nm_asset_geometry_all
+              WHERE EXISTS
+                        (SELECT 1
+                           FROM nm_asset_locations_all
+                          WHERE     nal_id = pi_nal_id
+                                AND nal_nit_type = nag_obj_type
+                                AND nag_asset_id = nal_asset_id);
+
         DELETE FROM NM_ASSET_LOCATIONS_ALL
               WHERE nal_id = pi_nal_id;
 
@@ -848,15 +856,21 @@ AS
         l_start_date      DATE;
         l_end_date        DATE;
     BEGIN
-        SELECT nal_asset_id, nal_location_type, nal_nit_type
-          INTO l_asset_id, l_location_type, l_obj_type
-          FROM nm_asset_locations_all
-         WHERE nal_id = pi_nal_id;
+        BEGIN
+            SELECT nal_asset_id, nal_location_type, nal_nit_type
+              INTO l_asset_id, l_location_type, l_obj_type
+              FROM nm_asset_locations_all
+             WHERE nal_id = pi_nal_id;
 
-        aggregate_geometry (pi_asset_id        => l_asset_id,
-                            pi_location_type   => l_location_type,
-                            pi_obj_type        => l_obj_type,
-                            pi_start_date      => pi_start_date);
+            aggregate_geometry (pi_asset_id        => l_asset_id,
+                                pi_location_type   => l_location_type,
+                                pi_obj_type        => l_obj_type,
+                                pi_start_date      => pi_start_date);
+        EXCEPTION
+            WHEN NO_DATA_FOUND
+            THEN
+                NULL;
+        END;
     END;
 
     --
@@ -1041,6 +1055,11 @@ AS
                              AND t.refnt_type = ninc_nlt_id
                     GROUP BY ninc_inv_type, ninc_nlt_id, ninc_id);
 
+            IF constraint_code IS NULL
+            THEN
+                RAISE NO_DATA_FOUND;
+            END IF;
+
             --
             validation_sql :=
                    'select 1  from dual '
@@ -1054,7 +1073,7 @@ AS
                 || ' and '
                 || constraint_code
                 || '))';
-            nm_debug.debug (validation_sql);
+            nm_debug.debug ('validation_sql ' || validation_sql);
 
             EXECUTE IMMEDIATE validation_sql
                 INTO l_dummy
@@ -1082,17 +1101,62 @@ AS
     BEGIN
         IF pi_use_history = 'N'
         THEN
-            delete_location (pi_nal_id);
-        ELSE
-            close_location (pi_nal_id, pi_start_date);
-        END IF;
+            DELETE FROM nm_location_geometry
+                  WHERE     nlg_nal_id = pi_nal_id
+                        AND nlg_obj_type = pi_nal_nit_type;
 
-        lb_ld_rpt (pi_nal_id,
-                   pi_nal_nit_type,
-                   pi_Rpt,
-                   pi_xsp,
-                   pi_start_date,
-                   pi_security_id);
+            DELETE FROM nm_locations_all
+                  WHERE     nm_ne_id_in = pi_nal_id
+                        AND nm_obj_type = pi_nal_nit_type;
+
+            lb_ld_rpt (pi_nal_id,
+                       pi_nal_nit_type,
+                       pi_Rpt,
+                       pi_xsp,
+                       pi_start_date,
+                       pi_security_id);
+        ELSE
+            BEGIN
+                UPDATE nm_locations
+                   SET nm_end_date = pi_start_date
+                 WHERE     nm_ne_id_in = pi_nal_id
+                       AND nm_obj_type = pi_nal_nit_type;
+
+                DECLARE
+                    loc_errors   lb_loc_error_tab;
+                BEGIN
+                    lb_load (p_obj_Rpt       => pi_rpt,
+                             p_nal_id        => pi_nal_id,
+                             p_start_date    => pi_start_date,
+                             p_security_id   => pi_security_id,
+                             p_xsp           => pi_xsp,
+                             p_loc_error     => loc_errors);
+                END;
+            EXCEPTION
+                WHEN DUP_VAL_ON_INDEX
+                THEN
+                    DELETE FROM nm_locations_all
+                          WHERE     nm_ne_id_in = pi_nal_id
+                                AND nm_obj_type = pi_nal_nit_type;
+
+                    DECLARE
+                        loc_errors   lb_loc_error_tab;
+                    BEGIN
+                        lb_load (p_obj_Rpt       => pi_rpt,
+                                 p_nal_id        => pi_nal_id,
+                                 p_start_date    => pi_start_date,
+                                 p_security_id   => pi_security_id,
+                                 p_xsp           => pi_xsp,
+                                 p_loc_error     => loc_errors);
+                    END;
+            --                    lb_ld_rpt (pi_nal_id,
+            --                               pi_nal_nit_type,
+            --                               pi_Rpt,
+            --                               pi_xsp,
+            --                               pi_start_date,
+            --                               pi_security_id);
+            END;
+        END IF;
     END;
 
 
@@ -1110,24 +1174,45 @@ AS
         -- check if the start and end can be updated
         BEGIN
             WITH
+                locs
+                AS
+                    (SELECT 
+                      rownum rn,
+                            t.*
+                       FROM TABLE (pi_rpt_tab) t
+                      ),
+                locs2 as ( select nlt_g_i_d, lb_get.get_count (pi_rpt_tab) rowcnt, l.* from locs l, nm_linear_types
+                where nlt_id = refnt_type ),
+                loc_terminals
+                AS
+                    (SELECT t1.*, 0 min_start, ne_length max_end
+                       FROM locs2 t1, nm_elements
+                      WHERE ne_id = refnt AND nlt_g_i_d = 'D'
+                     UNION ALL
+                     SELECT t1.*,
+                            nm3net.get_min_slk (refnt),
+                            nm3net.get_max_slk (refnt)
+                       FROM locs2 t1
+                      WHERE nlt_g_i_d = 'G'),
                 tab
                 AS
-                    (SELECT ROWNUM            rn,
+                    (SELECT 
                             ne_id,
-                            ne_length,
                             t.*,
                             NVL (
                                 LEAD (start_m, 1)
                                     OVER (PARTITION BY refnt, obj_type
                                           ORDER BY start_m ASC, end_m DESC),
-                                ne_length)    next_start,
+                                max_end)      next_start,
                             NVL (
                                 LAG (end_m, 1)
                                     OVER (PARTITION BY refnt, obj_type
                                           ORDER BY start_m ASC, end_m DESC),
-                                0)            prior_end
-                       FROM TABLE (pi_rpt_tab) t, nm_elements
-                      WHERE ne_id = refnt),
+                                min_start)    prior_end
+                       FROM loc_terminals t, nm_elements
+                      WHERE ne_id = refnt) --                  select * from tab
+                                                                            --
+                ,
                 ranges
                 AS
                     (SELECT t.rn,
@@ -1141,45 +1226,90 @@ AS
                             t.start_m,
                             t.end_m,
                             t.m_unit,
-                            CASE WHEN start_m > prior_end THEN 'S' END
-                                s_updatable,
-                            CASE WHEN start_m > prior_end THEN prior_end END
-                                s_range_start,
-                            CASE WHEN start_m > prior_end THEN start_m END
-                                s_range_end,
-                            CASE WHEN end_m < next_start THEN 'E' END
-                                e_updatable,
-                            CASE WHEN end_m < next_start THEN end_m END
-                                e_range_start,
-                            CASE WHEN end_m < next_start THEN next_start END
-                                e_range_end
+                            CASE
+                                WHEN rowcnt = 1
+                                THEN
+                                    'S'
+                                ELSE
+                                    CASE
+                                        WHEN start_m > prior_end THEN 'S'
+                                    END
+                            END    s_updatable,
+                            CASE
+                                WHEN rowcnt > 1
+                                THEN
+                                    CASE
+                                        WHEN start_m > prior_end
+                                        THEN
+                                            prior_end
+                                    END
+                                ELSE
+                                    prior_end
+                            END    s_range_start,
+                            CASE
+                                WHEN rowcnt > 1
+                                THEN
+                                    CASE
+                                        WHEN start_m > prior_end THEN start_m
+                                    END
+                                ELSE
+                                    next_start
+                            END    s_range_end,
+                            CASE
+                                WHEN rowcnt = 1
+                                THEN
+                                    'E'
+                                ELSE
+                                    CASE WHEN end_m < next_start THEN 'E' END
+                            END    e_updatable,
+                            CASE
+                                WHEN rowcnt > 1
+                                THEN
+                                    CASE
+                                        WHEN end_m < next_start THEN end_m
+                                    END
+                                ELSE
+                                    prior_end
+                            END    e_range_start,
+                            CASE
+                                WHEN rowcnt > 1
+                                THEN
+                                    CASE
+                                        WHEN end_m < next_start
+                                        THEN
+                                            next_start
+                                    END
+                                ELSE
+                                    next_start
+                            END    e_range_end
                        FROM tab t)
             SELECT 1
               INTO dummy
               FROM DUAL
-             WHERE    EXISTS
-                          (SELECT 1
-                             FROM ranges
-                            WHERE     rn = pi_rn
-                                  AND pi_start_m IS NOT NULL
-                                  AND (   s_updatable IS NULL
-                                       OR (   pi_start_m < s_range_start
-                                           OR pi_start_m > s_range_end)))
-                   OR EXISTS
-                          (SELECT 1
-                             FROM ranges
-                            WHERE     rn = pi_rn
-                                  AND pi_end_m IS NOT NULL
-                                  AND (   e_updatable IS NULL
-                                       OR (   pi_end_m < e_range_start
-                                           OR pi_end_m > e_range_end)));
+             WHERE    (   EXISTS
+                              (SELECT 1
+                                 FROM ranges
+                                WHERE     rn = pi_rn
+                                      AND pi_start_m IS NOT NULL
+                                      AND (   s_updatable IS NULL
+                                           OR (   pi_start_m < s_range_start
+                                               OR pi_start_m > s_range_end)) )
+                       OR EXISTS
+                              (SELECT 1
+                                 FROM ranges
+                                WHERE     rn = pi_rn
+                                      AND pi_end_m IS NOT NULL
+                                      AND (   e_updatable IS NULL
+                                           OR (   pi_end_m < e_range_start
+                                               OR pi_end_m > e_range_end))) )
+                   OR pi_start_m > pi_end_m;
 
             --
             IF dummy != 0
             THEN
                 raise_application_error (
                     -20095,
-                    'The values to be updated on this record are either not allowed or are out of range');
+                    'The values to be updated on this record are either illegal, not allowed or are out of range');
             END IF;
         --
         EXCEPTION
