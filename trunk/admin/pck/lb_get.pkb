@@ -1,12 +1,12 @@
-CREATE OR REPLACE PACKAGE BODY ATLAS.lb_get
+CREATE OR REPLACE PACKAGE BODY lb_get
 AS
    --   PVCS Identifiers :-
    --
-   --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/lb_get.pkb-arc   1.61   Feb 07 2019 11:05:36   Rob.Coupe  $
+   --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/lb_get.pkb-arc   1.62   Feb 27 2019 11:26:42   Rob.Coupe  $
    --       Module Name      : $Workfile:   lb_get.pkb  $
-   --       Date into PVCS   : $Date:   Feb 07 2019 11:05:36  $
-   --       Date fetched Out : $Modtime:   Feb 07 2019 10:47:48  $
-   --       PVCS Version     : $Revision:   1.61  $
+   --       Date into PVCS   : $Date:   Feb 27 2019 11:26:42  $
+   --       Date fetched Out : $Modtime:   Feb 27 2019 11:25:54  $
+   --       PVCS Version     : $Revision:   1.62  $
    --
    --   Author : R.A. Coupe
    --
@@ -16,7 +16,7 @@ AS
    -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
    ----------------------------------------------------------------------------
    --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.61  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.62  $';
 
    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_get';
 
@@ -3487,16 +3487,183 @@ begin
    return retval;
 end;
 
-    FUNCTION get_editable_ranges (pi_rpt_tab IN lb_rpt_tab)
-        RETURN SYS_REFCURSOR
-    IS
-        retval   SYS_REFCURSOR;
+FUNCTION get_editable_ranges (pi_rpt_tab IN lb_rpt_tab)
+    RETURN SYS_REFCURSOR
+IS
+    retval       SYS_REFCURSOR;
+    l_type_chk   VARCHAR2 (1);
+    l_ref_type   INTEGER;
+BEGIN
+    --
+    DECLARE
+        l_gty_exclusive   INTEGER;
     BEGIN
+        SELECT 1
+          INTO l_gty_exclusive
+          FROM DUAL
+         WHERE EXISTS
+                   (SELECT 1
+                      FROM TABLE (pi_rpt_tab)  t,
+                           nm_linear_types,
+                           nm_group_types
+                     WHERE     nlt_id = refnt_type
+                           AND ngt_group_type = nlt_gty_type
+                           AND ngt_exclusive_flag = 'N');
+
+        raise_application_error (
+            -20001,
+            'Editable ranges are not possible on non-exclusive group types');
+    EXCEPTION
+        WHEN NO_DATA_FOUND
+        THEN
+            NULL;
+    END;
+
+    BEGIN
+          SELECT refnt_type, nlt_g_i_d
+            INTO l_ref_type, l_type_chk
+            FROM nm_linear_types, TABLE (pi_rpt_tab) t
+           WHERE nlt_id = refnt_type
+        GROUP BY refnt_type, nlt_g_i_d
+          HAVING COUNT (*) = 1;
+    EXCEPTION
+        WHEN NO_DATA_FOUND
+        THEN
+            raise_application_error (
+                -20002,
+                'Editable ranges are only available across the same network type');
+    END;
+
+    IF l_type_chk = 'D'
+    THEN
+        OPEN retval FOR
+            WITH
+                l1
+                AS
+                    (SELECT ROW_NUMBER ()
+                                OVER (PARTITION BY obj_id
+                                      ORDER BY seg_id, seq_id)    rn,
+                            t.*
+                       FROM TABLE (pi_rpt_tab) t),
+                l2
+                AS
+                    (SELECT l.*,
+                            ne_id,
+                            ne_unique,
+                            ne_descr,
+                            ne_length,
+                            CASE dir_flag
+                                WHEN 1 THEN ne_no_start
+                                ELSE ne_no_end
+                            END    start_node,
+                            CASE dir_flag
+                                WHEN -1 THEN ne_no_start
+                                ELSE ne_no_end
+                            END    end_node
+                       FROM l1 l, nm_elements
+                      WHERE ne_id = refnt),
+                l3
+                AS
+                    (SELECT l2.*,
+                            LAG (end_node, 1)
+                                OVER (PARTITION BY obj_id ORDER BY rn)
+                                prior_node,
+                            LEAD (start_node, 1)
+                                OVER (PARTITION BY obj_id ORDER BY rn)
+                                next_node
+                       FROM l2 l2),
+                l4
+                AS
+                    (SELECT l3.*,
+                            CASE
+                                WHEN     prior_node = start_node
+                                     AND CASE dir_flag
+                                             WHEN 1 THEN 0
+                                             ELSE ne_length
+                                         END =
+                                         CASE dir_flag
+                                             WHEN 1 THEN start_m
+                                             ELSE end_m
+                                         END
+                                THEN
+                                    1
+                                ELSE
+                                    0
+                            END    s_c,
+                            CASE
+                                WHEN     next_node = end_node
+                                     AND CASE dir_flag
+                                             WHEN -1 THEN 0
+                                             ELSE ne_length
+                                         END =
+                                         CASE dir_flag
+                                             WHEN -1 THEN start_m
+                                             ELSE end_m
+                                         END
+                                THEN
+                                    1
+                                ELSE
+                                    0
+                            END    e_c
+                       FROM l3),
+                l5
+                AS
+                    (SELECT l4.*,
+                            CASE
+                                WHEN s_c = 0
+                                THEN
+                                    CASE
+                                        WHEN dir_flag = 1 THEN 'S'
+                                        ELSE 'E'
+                                    END
+                            END
+                                s_updatable,
+                            CASE WHEN s_c = 0 THEN 0 ELSE NULL END
+                                s_range_start,
+                            CASE WHEN s_c = 0 THEN ne_length ELSE NULL END
+                                s_range_end,
+                            CASE
+                                WHEN e_c = 0
+                                THEN
+                                    CASE
+                                        WHEN dir_flag = -1 THEN 'S'
+                                        ELSE 'E'
+                                    END
+                            END
+                                e_updatable,
+                            CASE WHEN e_c = 0 THEN 0 ELSE NULL END
+                                e_range_start,
+                            CASE WHEN e_c = 0 THEN ne_length ELSE NULL END
+                                e_range_end
+                       FROM l4)
+            SELECT rn,
+                   ne_id,
+                   ne_unique,
+                   ne_descr,
+                   refnt_type,
+                   obj_type,
+                   obj_id,
+                   seg_id,
+                   seq_id,
+                   dir_flag,
+                   start_m,
+                   end_m,
+                   m_unit,
+                   s_updatable,
+                   s_range_start,
+                   s_range_end,
+                   e_updatable,
+                   e_range_start,
+                   e_range_end
+              FROM l5;
+    ELSE
         OPEN retval FOR
             WITH
                 locs
                 AS
-                    (SELECT nlt_g_i_d, t.*
+                    (SELECT nlt_g_i_d,
+                            get_count (pi_rpt_tab)     rowcnt,
+                            t.*
                        FROM TABLE (pi_rpt_tab) t, nm_linear_types
                       WHERE nlt_id = t.refnt_type),
                 loc_terminals
@@ -3512,19 +3679,22 @@ end;
                       WHERE nlt_g_i_d = 'G'),
                 tab
                 AS
-                    (SELECT ROWNUM            rn,
+                    (SELECT ROW_NUMBER () OVER (ORDER BY seg_id, seq_id)
+                                rn,
                             ne_id,
                             t.*,
                             NVL (
                                 LEAD (start_m, 1)
                                     OVER (PARTITION BY refnt, obj_type
                                           ORDER BY start_m ASC, end_m DESC),
-                                max_end)      next_start,
+                                max_end)
+                                next_start,
                             NVL (
                                 LAG (end_m, 1)
                                     OVER (PARTITION BY refnt, obj_type
                                           ORDER BY start_m ASC, end_m DESC),
-                                min_start)    prior_end
+                                min_start)
+                                prior_end
                        FROM loc_terminals t, nm_elements
                       WHERE ne_id = refnt) --                  select * from tab
                                                                             --
@@ -3542,18 +3712,62 @@ end;
                             t.start_m,
                             t.end_m,
                             t.m_unit,
-                            CASE WHEN start_m > prior_end THEN 'S' END
-                                s_updatable,
-                            CASE WHEN start_m > prior_end THEN prior_end END
-                                s_range_start,
-                            CASE WHEN start_m > prior_end THEN start_m END
-                                s_range_end,
-                            CASE WHEN end_m < next_start THEN 'E' END
-                                e_updatable,
-                            CASE WHEN end_m < next_start THEN end_m END
-                                e_range_start,
-                            CASE WHEN end_m < next_start THEN next_start END
-                                e_range_end
+                            CASE
+                                WHEN rowcnt = 1
+                                THEN
+                                    'S'
+                                ELSE
+                                    CASE
+                                        WHEN start_m > prior_end THEN 'S'
+                                    END
+                            END    s_updatable,
+                            CASE
+                                WHEN rowcnt > 1
+                                THEN
+                                    CASE
+                                        WHEN start_m > prior_end
+                                        THEN
+                                            prior_end
+                                    END
+                                ELSE
+                                    prior_end
+                            END    s_range_start,
+                            CASE
+                                WHEN rowcnt > 1
+                                THEN
+                                    CASE
+                                        WHEN start_m > prior_end THEN start_m
+                                    END
+                                ELSE
+                                    next_start
+                            END    s_range_end,
+                            CASE
+                                WHEN rowcnt = 1
+                                THEN
+                                    'E'
+                                ELSE
+                                    CASE WHEN end_m < next_start THEN 'E' END
+                            END    e_updatable,
+                            CASE
+                                WHEN rowcnt > 1
+                                THEN
+                                    CASE
+                                        WHEN end_m < next_start THEN end_m
+                                    END
+                                ELSE
+                                    prior_end
+                            END    e_range_start,
+                            CASE
+                                WHEN rowcnt > 1
+                                THEN
+                                    CASE
+                                        WHEN end_m < next_start
+                                        THEN
+                                            next_start
+                                    END
+                                ELSE
+                                    next_start
+                            END    e_range_end
                        FROM tab t)
               SELECT ne_id,
                      ne_unique,
@@ -3562,9 +3776,9 @@ end;
                 FROM ranges t, nm_elements
                WHERE ne_id = t.refnt
             ORDER BY seg_id, seq_id;
+    END IF;
 
-        RETURN retval;
-    END;
-   
+    RETURN retval;
+END;   
 END;
 /
