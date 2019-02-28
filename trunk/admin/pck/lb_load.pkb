@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_load
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/lb_load.pkb-arc   1.37   Feb 26 2019 13:30:54   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/lb_load.pkb-arc   1.38   Feb 28 2019 11:37:54   Rob.Coupe  $
     --       Module Name      : $Workfile:   lb_load.pkb  $
-    --       Date into PVCS   : $Date:   Feb 26 2019 13:30:54  $
-    --       Date fetched Out : $Modtime:   Feb 26 2019 13:30:24  $
-    --       PVCS Version     : $Revision:   1.37  $
+    --       Date into PVCS   : $Date:   Feb 28 2019 11:37:54  $
+    --       Date fetched Out : $Modtime:   Feb 28 2019 11:31:50  $
+    --       PVCS Version     : $Revision:   1.38  $
     --
     --   Author : R.A. Coupe
     --
@@ -16,7 +16,7 @@ AS
     -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
     ----------------------------------------------------------------------------
     --
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.37  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.38  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'lb_load';
 
@@ -1169,147 +1169,164 @@ AS
         retval   lb_rpt_tab;
         dummy    INTEGER := 0;
     BEGIN
-        g_load_tab := pi_rpt_tab;
-
         -- check if the start and end can be updated
         BEGIN
             WITH
-                locs
+                l1
                 AS
-                    (SELECT 
-                      rownum rn,
+                    (SELECT ROW_NUMBER ()
+                                OVER (PARTITION BY obj_id
+                                      ORDER BY seg_id, seq_id)    rn,
                             t.*
-                       FROM TABLE (pi_rpt_tab) t
-                      ),
-                locs2 as ( select nlt_g_i_d, lb_get.get_count (pi_rpt_tab) rowcnt, l.* from locs l, nm_linear_types
-                where nlt_id = refnt_type ),
-                loc_terminals
+                       FROM TABLE (pi_rpt_tab) t),
+                l2
                 AS
-                    (SELECT t1.*, 0 min_start, ne_length max_end
-                       FROM locs2 t1, nm_elements
-                      WHERE ne_id = refnt AND nlt_g_i_d = 'D'
-                     UNION ALL
-                     SELECT t1.*,
-                            nm3net.get_min_slk (refnt),
-                            nm3net.get_max_slk (refnt)
-                       FROM locs2 t1
-                      WHERE nlt_g_i_d = 'G'),
-                tab
-                AS
-                    (SELECT 
+                    (SELECT l.*,
                             ne_id,
-                            t.*,
-                            NVL (
-                                LEAD (start_m, 1)
-                                    OVER (PARTITION BY refnt, obj_type
-                                          ORDER BY start_m ASC, end_m DESC),
-                                max_end)      next_start,
-                            NVL (
-                                LAG (end_m, 1)
-                                    OVER (PARTITION BY refnt, obj_type
-                                          ORDER BY start_m ASC, end_m DESC),
-                                min_start)    prior_end
-                       FROM loc_terminals t, nm_elements
-                      WHERE ne_id = refnt) --                  select * from tab
-                                                                            --
-                ,
+                            ne_unique,
+                            ne_descr,
+                            CASE
+                                WHEN ne_gty_group_type IS NULL THEN 0
+                                ELSE nm3net.get_min_slk (ne_id)
+                            END    min_measure,
+                            CASE
+                                WHEN ne_gty_group_type IS NULL THEN ne_length
+                                ELSE nm3net.get_max_slk (ne_id)
+                            END    max_measure,
+                            CASE dir_flag
+                                WHEN 1 THEN ne_no_start
+                                ELSE ne_no_end
+                            END    start_node,
+                            CASE dir_flag
+                                WHEN -1 THEN ne_no_start
+                                ELSE ne_no_end
+                            END    end_node
+                       FROM l1 l, nm_elements
+                      WHERE ne_id = refnt),
+                l3
+                AS
+                    (SELECT l2.*,
+                            LAG (end_node, 1)
+                                OVER (PARTITION BY obj_id ORDER BY rn)
+                                prior_node,
+                            LEAD (start_node, 1)
+                                OVER (PARTITION BY obj_id ORDER BY rn)
+                                next_node
+                       FROM l2 l2),
+                l4
+                AS
+                    (SELECT l3.*,
+                            CASE
+                                WHEN     NVL (prior_node, -999) =
+                                         NVL (start_node, -999)
+                                     AND CASE dir_flag
+                                             WHEN 1 THEN min_measure
+                                             ELSE max_measure
+                                         END =
+                                         CASE dir_flag
+                                             WHEN 1 THEN start_m
+                                             ELSE end_m
+                                         END
+                                THEN
+                                    1
+                                ELSE
+                                    0
+                            END    s_c,
+                            CASE
+                                WHEN     NVL (next_node, -999) =
+                                         NVL (end_node, -999)
+                                     AND CASE dir_flag
+                                             WHEN -1 THEN min_measure
+                                             ELSE max_measure
+                                         END =
+                                         CASE dir_flag
+                                             WHEN -1 THEN start_m
+                                             ELSE end_m
+                                         END
+                                THEN
+                                    1
+                                ELSE
+                                    0
+                            END    e_c
+                       FROM l3),
                 ranges
                 AS
-                    (SELECT t.rn,
-                            t.refnt,
-                            t.refnt_type,
-                            t.obj_type,
-                            t.obj_id,
-                            t.seg_id,
-                            t.seq_id,
-                            t.dir_flag,
-                            t.start_m,
-                            t.end_m,
-                            t.m_unit,
+                    (SELECT l4.*,
                             CASE
-                                WHEN rowcnt = 1
-                                THEN
-                                    'S'
-                                ELSE
-                                    CASE
-                                        WHEN start_m > prior_end THEN 'S'
-                                    END
-                            END    s_updatable,
-                            CASE
-                                WHEN rowcnt > 1
+                                WHEN s_c = 0
                                 THEN
                                     CASE
-                                        WHEN start_m > prior_end
-                                        THEN
-                                            prior_end
+                                        WHEN dir_flag = 1 THEN 'S'
+                                        ELSE 'E'
                                     END
-                                ELSE
-                                    prior_end
-                            END    s_range_start,
+                            END
+                                s_updatable,
+                            CASE WHEN s_c = 0 THEN min_measure ELSE NULL END
+                                s_range_start,
+                            CASE WHEN s_c = 0 THEN max_measure ELSE NULL END
+                                s_range_end,
                             CASE
-                                WHEN rowcnt > 1
+                                WHEN e_c = 0
                                 THEN
                                     CASE
-                                        WHEN start_m > prior_end THEN start_m
+                                        WHEN dir_flag = -1 THEN 'S'
+                                        ELSE 'E'
                                     END
-                                ELSE
-                                    next_start
-                            END    s_range_end,
-                            CASE
-                                WHEN rowcnt = 1
-                                THEN
-                                    'E'
-                                ELSE
-                                    CASE WHEN end_m < next_start THEN 'E' END
-                            END    e_updatable,
-                            CASE
-                                WHEN rowcnt > 1
-                                THEN
-                                    CASE
-                                        WHEN end_m < next_start THEN end_m
-                                    END
-                                ELSE
-                                    prior_end
-                            END    e_range_start,
-                            CASE
-                                WHEN rowcnt > 1
-                                THEN
-                                    CASE
-                                        WHEN end_m < next_start
-                                        THEN
-                                            next_start
-                                    END
-                                ELSE
-                                    next_start
-                            END    e_range_end
-                       FROM tab t)
+                            END
+                                e_updatable,
+                            CASE WHEN e_c = 0 THEN min_measure ELSE NULL END
+                                e_range_start,
+                            CASE WHEN e_c = 0 THEN max_measure ELSE NULL END
+                                e_range_end
+                       FROM l4)
+            --            SELECT rn,
+            --                   ne_id,
+            --                   ne_unique,
+            --                   ne_descr,
+            --                   refnt_type,
+            --                   obj_type,
+            --                   obj_id,
+            --                   seg_id,
+            --                   seq_id,
+            --                   dir_flag,
+            --                   start_m,
+            --                   end_m,
+            --                   m_unit,
+            --                   s_updatable,
+            --                   s_range_start,
+            --                   s_range_end,
+            --                   e_updatable,
+            --                   e_range_start,
+            --                   e_range_end
+            --              FROM l5 )
             SELECT 1
               INTO dummy
               FROM DUAL
-             WHERE    (   EXISTS
-                              (SELECT 1
-                                 FROM ranges
-                                WHERE     rn = pi_rn
-                                      AND pi_start_m IS NOT NULL
-                                      AND (   s_updatable IS NULL
-                                           OR (   pi_start_m < s_range_start
-                                               OR pi_start_m > s_range_end)) )
-                       OR EXISTS
-                              (SELECT 1
-                                 FROM ranges
-                                WHERE     rn = pi_rn
-                                      AND pi_end_m IS NOT NULL
-                                      AND (   e_updatable IS NULL
-                                           OR (   pi_end_m < e_range_start
-                                               OR pi_end_m > e_range_end))) )
-                   OR pi_start_m > pi_end_m;
+             WHERE                                                     --1 = 2
+                      --         and
+                      EXISTS
+                          (SELECT 1
+                             FROM ranges
+                            WHERE     rn = pi_rn
+                                  AND pi_start_m IS NOT NULL
+                                  AND (   s_updatable IS NULL
+                                       OR (   pi_start_m < s_range_start
+                                           OR pi_start_m > s_range_end)))
+                   OR EXISTS
+                          (SELECT 1
+                             FROM ranges
+                            WHERE     rn = pi_rn
+                                  AND pi_end_m IS NOT NULL
+                                  AND (   e_updatable IS NULL
+                                       OR (   pi_end_m < e_range_start
+                                           OR pi_end_m > e_range_end)));
 
             --
             IF dummy != 0
             THEN
                 raise_application_error (
                     -20095,
-                    'The values to be updated on this record are either illegal, not allowed or are out of range');
+                    'The values to be updated on this record are either not allowed or are out of range');
             END IF;
         --
         EXCEPTION
@@ -1351,9 +1368,11 @@ AS
           FROM tab t;
 
         g_load_tab := retval;
+
         --
         RETURN retval;
     END;
+
 
     FUNCTION retrieve_global_rpt_tab
         RETURN lb_rpt_tab
