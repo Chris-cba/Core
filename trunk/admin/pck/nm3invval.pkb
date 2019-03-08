@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY nm3invval IS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3invval.pkb-arc   2.21   Apr 16 2018 09:22:48   Gaurav.Gaurkar  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3invval.pkb-arc   2.22   Mar 08 2019 11:16:26   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm3invval.pkb  $
---       Date into PVCS   : $Date:   Apr 16 2018 09:22:48  $
---       Date fetched Out : $Modtime:   Apr 16 2018 09:01:36  $
---       Version          : $Revision:   2.21  $
+--       Date into PVCS   : $Date:   Mar 08 2019 11:16:26  $
+--       Date fetched Out : $Modtime:   Feb 20 2019 16:18:48  $
+--       Version          : $Revision:   2.22  $
 --       Based on SCCS version : 1.30
 -------------------------------------------------------------------------
 --
@@ -16,10 +16,10 @@ CREATE OR REPLACE PACKAGE BODY nm3invval IS
 --   NM3 Inventory validation package
 --
 -----------------------------------------------------------------------------
---   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.21  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.22  $"';
 --  g_body_sccsid is the SCCS ID for the package body
    g_package_name    CONSTANT  varchar2(30)   := 'nm3invval';
 --
@@ -488,6 +488,13 @@ PROCEDURE process_insert_for_child (pi_rec_nii rec_nii) IS
 --
 BEGIN
    --
+   --nm_debug.debug_on;
+   --nm_debug.debug('==> getting parent');
+   --nm_debug.debug('==> pi_rec_nii.inv_type    ='||pi_rec_nii.inv_type); 
+   --nm_debug.debug('==> pi_rec_nii.foreign_key ='||pi_rec_nii.foreign_key); 
+   --nm_debug.debug('==> pi_rec_nii.start_date  ='||pi_rec_nii.start_date); 
+   --nm_debug.debug('==> pi_rec_nii.end_date    ='||pi_rec_nii.end_date);  
+   
    OPEN  cs_get_parent (p_inv_type    => pi_rec_nii.inv_type
                        ,p_primary_key => pi_rec_nii.foreign_key
                        ,p_start_date  => pi_rec_nii.start_date
@@ -556,6 +563,12 @@ BEGIN
    END IF;
    -- Create the NM_INV_ITEM_GROUPINGS record
    --
+   --nm_debug.debug('==> creating iig rec');
+   --nm_debug.debug('==> l_rec_iig.iig_top_id     = '||get_iig_top_id (l_rec_parent.iit_ne_id));
+   --nm_debug.debug('==> l_rec_iig.iig_item_id    = '||pi_rec_nii.ne_id);
+   --nm_debug.debug('==> l_rec_iig.iig_parent_id  = '||l_rec_parent.iit_ne_id);
+   --nm_debug.debug('==> l_rec_iig.iig_start_date = '||GREATEST(pi_rec_nii.start_date, l_rec_parent.iit_start_date));
+   
    l_rec_iig.iig_top_id     := get_iig_top_id (l_rec_parent.iit_ne_id);
    l_rec_iig.iig_item_id    := pi_rec_nii.ne_id;
    l_rec_iig.iig_parent_id  := l_rec_parent.iit_ne_id;
@@ -581,9 +594,15 @@ BEGIN
    END IF;
    --
    insert_iig (l_rec_iig);
+   
+   --for l_rec in (select iig_top_id,iig_parent_id from nm_inv_item_groupings where iig_item_id = pi_rec_nii.ne_id) loop
+   --   nm_debug.debug('==>## iig_top_id     = '||l_rec.iig_top_id);
+   --   nm_debug.debug('==>## iig_parent_id  = '||l_rec.iig_parent_id);
+   --end loop;
    --
    IF l_rec_iig.iig_end_date < NVL(pi_rec_nii.end_date,c_max_date)
     THEN
+      --nm_debug.debug('==>?? Updating nm_inv_items');
       UPDATE nm_inv_items
        SET   iit_end_date = l_rec_iig.iig_end_date
       WHERE  iit_ne_id    = pi_rec_nii.ne_id;
@@ -600,6 +619,10 @@ BEGIN
                            );
    END IF;
    --
+   --for l_rec in (select iig_top_id,iig_parent_id from nm_inv_item_groupings where iig_item_id = pi_rec_nii.ne_id) loop
+   --   nm_debug.debug('==>2## iig_top_id     = '||l_rec.iig_top_id);
+   --   nm_debug.debug('==>2## iig_parent_id  = '||l_rec.iig_parent_id);
+   --end loop;
 END process_insert_for_child;
 --
 ----------------------------------------------------------------------------------------------
@@ -792,12 +815,12 @@ PROCEDURE check_inv_dates ( p_rec_nii    rec_date_chk) IS
           ,nm_inv_items_all
     WHERE  iig_parent_id = c_iit_ne_id
      AND   iig_item_id   = iit_ne_id
-     AND  (iit_start_date < c_start_date
+     AND  (iit_start_date <= c_start_date
             OR (   (iit_end_date IS     NULL AND c_end_date IS NOT NULL)
                 OR (iit_end_date IS NOT NULL AND c_end_date IS NOT NULL AND iit_end_date > c_end_date)
                )
           )
-     AND  (iig_start_date < c_start_date
+     AND  (iig_start_date <= c_start_date
             OR (   (iig_end_date IS     NULL AND c_end_date IS NOT NULL)
                 OR (iig_end_date IS NOT NULL AND c_end_date IS NOT NULL AND iig_end_date > c_end_date)
                )
@@ -912,18 +935,17 @@ BEGIN
    --
    OPEN  c4 ( p_rec_nii.ne_id);
    FETCH c4 INTO l_parent_start_date, l_parent_end_date, l_hier_start_date, l_hier_end_date;
+   --nm_debug.debug('==> '||p_rec_nii.ne_id||'/'||l_parent_start_date||'/'||l_parent_end_date||'/'||l_hier_start_date||'/'||l_hier_end_date);
    while c4%found loop
       IF l_parent_end_date IS NULL AND l_hier_end_date is NULL
        THEN
          NULL; -- Dont worry about it
-      ELSIF p_rec_nii.end_date IS NULL
-       OR   p_rec_nii.end_date >  l_parent_end_date
+      ELSIF NVL(p_rec_nii.end_date, TO_DATE('31122099', 'DDMMYYYY')) > NVL(l_parent_end_date, TO_DATE('31122099', 'DDMMYYYY'))
        THEN
          l_ner_id             := 12;
          l_supplementary_info := l_supplementary_info||' - NM_INV_ITEMS_ALL (parent)';
          RAISE l_end_date_out_of_range;
-      ELSIF p_rec_nii.end_date IS NULL
-       OR   p_rec_nii.end_date <  l_hier_end_date
+      ELSIF NVL(p_rec_nii.end_date, TO_DATE('31122099', 'DDMMYYYY')) <  NVL(l_hier_end_date, TO_DATE('31122099', 'DDMMYYYY'))
        THEN
          l_ner_id             := 12;
          l_supplementary_info := l_supplementary_info||' - NM_INV_ITEM_GROUPINGS_ALL (parent)';
@@ -952,11 +974,13 @@ BEGIN
    -- Check for children
    --
  --nm_debug.debug('cs_child_iig');
+   --nm_debug.debug('==> ne_id = '||p_rec_nii.ne_id||' start_date = '||p_rec_nii.start_date||' end_date = '||p_rec_nii.end_date);
 
    OPEN  cs_child_iig (p_rec_nii.ne_id, p_rec_nii.start_date, p_rec_nii.end_date);
    FETCH cs_child_iig INTO l_dummy;
    IF cs_child_iig%FOUND
    THEN
+   --	nm_debug.debug('==> children found');
        CLOSE cs_child_iig;
        --Log 696122:Linesh:04-Feb-2009:Start
        --Commneted the exception rasied now we have to end date all the child records
@@ -964,45 +988,45 @@ BEGIN
        --l_ner_id             := 14;
        --l_supplementary_info := l_supplementary_info||' - NM_INV_ITEMS_ALL (child)';
        --RAISE l_has_children;
-       IF p_rec_nii.end_date IS NOT NULL
-       THEN
            -- LOG 713421
            FOR l_rec IN (SELECT  iig_item_id
                                 ,itg_mandatory
                                 ,itg_relation
-                         FROM    nm_inv_item_groupings iig
-                                ,nm_inv_items iit
-                                ,nm_inv_type_groupings itg
+                         FROM    nm_inv_item_groupings_all iig
+                                ,nm_inv_items_all iit
+                                ,nm_inv_type_groupings_all itg
                          WHERE   iig.iig_item_id       = iit.iit_ne_id
                          AND     iit.iit_inv_type      = itg.itg_inv_type
                          CONNECT By PRIOR iig_item_id  = iig_parent_id
                          START   WITH iig_parent_id    = p_rec_nii.ne_id
                         )
            LOOP
+		   --nm_debug.debug('==> sorting the children');
                IF  NVL(l_rec.itg_mandatory,'N')  = 'Y'
                THEN
-                   UPDATE nm_members
+                   UPDATE nm_members_all
                    SET    nm_end_date = p_rec_nii.end_date
                    WHERE  nm_ne_id_in = l_rec.iig_item_id
                    AND    nm_type     = 'I' ;
 
-                   UPDATE nm_inv_item_groupings
+                   UPDATE nm_inv_item_groupings_all
                    SET    iig_end_date = p_rec_nii.end_date
                    WHERE  iig_item_id  = l_rec.iig_item_id ;
 
-                   UPDATE nm_inv_items
+                   UPDATE nm_inv_items_all
                    SET    iit_end_date = p_rec_nii.end_date
                    WHERE  iit_ne_id    = l_rec.iig_item_id ;
                ELSIF NVL(l_rec.itg_mandatory,'N')  = 'N'
                THEN
-                   UPDATE nm_inv_item_groupings
+
+			   UPDATE nm_inv_item_groupings_all	
                    SET    iig_end_date = p_rec_nii.end_date
                    WHERE  iig_item_id  = l_rec.iig_item_id ;
                END IF ;
            END LOOP;
            -- LOG 713421
-       END IF ;
-   ELSE
+
+		   ELSE
        CLOSE cs_child_iig;
    END IF;
    --Log 696122:Linesh:04-Feb-2009:End
