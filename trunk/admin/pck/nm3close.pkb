@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3close AS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3close.pkb-arc   2.22   Oct 10 2018 12:01:54   Chris.Baugh  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3close.pkb-arc   2.23   Mar 22 2019 16:10:56   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3close.pkb  $
---       Date into PVCS   : $Date:   Oct 10 2018 12:01:54  $
---       Date fetched Out : $Modtime:   Oct 09 2018 09:59:36  $
---       PVCS Version     : $Revision:   2.22  $
+--       Date into PVCS   : $Date:   Mar 22 2019 16:10:56  $
+--       Date fetched Out : $Modtime:   Mar 22 2019 16:10:08  $
+--       PVCS Version     : $Revision:   2.23  $
 --
 --
 --   Author : I Turnbull
@@ -21,7 +21,7 @@ CREATE OR REPLACE PACKAGE BODY nm3close AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.22  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.23  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3close';
@@ -539,7 +539,8 @@ BEGIN
                                 ,p_nm_ne_id_of_new => p_ne_id
                                 ,p_effective_date  => p_effective_date
                                 );
-      nm3inv_xattr.g_xattr_active := c_xattr_status;
+-- RC Defect 977215 - the XIV is switched back on too early commented out
+--      nm3inv_xattr.g_xattr_active := c_xattr_status;
 
 --
       -- End date any inventory which is not end location only which is left with no location
