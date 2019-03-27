@@ -1,12 +1,12 @@
-CREATE OR REPLACE PACKAGE BODY nm_sdo
+CREATE OR REPLACE PACKAGE BODY ATLAS.nm_sdo
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm_sdo.pkb-arc   1.12   Feb 21 2019 15:44:32   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm_sdo.pkb-arc   1.13   Mar 27 2019 14:14:36   Rob.Coupe  $
     --       Module Name      : $Workfile:   nm_sdo.pkb  $
-    --       Date into PVCS   : $Date:   Feb 21 2019 15:44:32  $
-    --       Date fetched Out : $Modtime:   Feb 21 2019 15:38:48  $
-    --       PVCS Version     : $Revision:   1.12  $
+    --       Date into PVCS   : $Date:   Mar 27 2019 14:14:36  $
+    --       Date fetched Out : $Modtime:   Mar 27 2019 14:13:38  $
+    --       PVCS Version     : $Revision:   1.13  $
     --
     --   Author : R.A. Coupe
     --
@@ -18,7 +18,7 @@ AS
     -- The main purpose of this package is to replicate the functions inside the SDO_LRS package as
     -- supplied under the MDSYS schema and licensed under the Oracle Spatial license on EE.
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.12  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.13  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'NM_SDO';
     
@@ -931,7 +931,11 @@ AS
         IF geom.sdo_point.x IS NOT NULL
         THEN
             RETURN geom.sdo_point.z;
-        ELSIF geom.sdo_gtype IN (3302, 3306)
+        ELSIF geom.sdo_gtype IN (3302,
+                                 3306,
+                                 3002,
+                                 3001,
+                                 3301)
         THEN
             RETURN round(geom.sdo_ordinates (geom.sdo_ordinates.LAST), g_round);
         ELSE
@@ -1897,6 +1901,10 @@ AS
                 retval.sdo_ordinates (irec.v_id) := irec.measure;
             END IF;
         END LOOP;
+
+        if retval.sdo_gtype = 3002 then
+           retval.sdo_gtype := 3302;
+        end if;
 
         RETURN retval;
     END;
