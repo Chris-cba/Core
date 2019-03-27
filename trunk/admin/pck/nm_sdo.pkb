@@ -1,12 +1,12 @@
-CREATE OR REPLACE PACKAGE BODY ATLAS.nm_sdo
+CREATE OR REPLACE PACKAGE BODY nm_sdo
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm_sdo.pkb-arc   1.13   Mar 27 2019 14:14:36   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm_sdo.pkb-arc   1.14   Mar 27 2019 14:18:34   Rob.Coupe  $
     --       Module Name      : $Workfile:   nm_sdo.pkb  $
-    --       Date into PVCS   : $Date:   Mar 27 2019 14:14:36  $
-    --       Date fetched Out : $Modtime:   Mar 27 2019 14:13:38  $
-    --       PVCS Version     : $Revision:   1.13  $
+    --       Date into PVCS   : $Date:   Mar 27 2019 14:18:34  $
+    --       Date fetched Out : $Modtime:   Mar 27 2019 14:18:14  $
+    --       PVCS Version     : $Revision:   1.14  $
     --
     --   Author : R.A. Coupe
     --
@@ -18,7 +18,7 @@ AS
     -- The main purpose of this package is to replicate the functions inside the SDO_LRS package as
     -- supplied under the MDSYS schema and licensed under the Oracle Spatial license on EE.
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.13  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.14  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'NM_SDO';
     
