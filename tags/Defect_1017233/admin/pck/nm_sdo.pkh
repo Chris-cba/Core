@@ -1,0 +1,245 @@
+CREATE OR REPLACE PACKAGE nm_sdo
+AS
+    --<PACKAGE>
+    --   PVCS Identifiers :-
+    --
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm_sdo.pkh-arc   1.5   Mar 28 2019 16:06:52   Rob.Coupe  $
+    --       Module Name      : $Workfile:   nm_sdo.pkh  $
+    --       Date into PVCS   : $Date:   Mar 28 2019 16:06:52  $
+    --       Date fetched Out : $Modtime:   Mar 28 2019 16:04:34  $
+    --       PVCS Version     : $Revision:   1.5  $
+    --
+    --   Author : R.A. Coupe
+    --
+    --   Package for handling SDO LRS data
+    --
+    -----------------------------------------------------------------------------
+    -- Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
+    ----------------------------------------------------------------------------
+    -- The main purpose of this package is to replicate the functions inside the SDO_LRS package as
+    -- supplied under the MDSYS schema and licensed under the Oracle Spatial license on EE.
+    --</PACKAGE>
+    g_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.5  $';
+
+    -----------------------------------------------------------------------------
+    --
+    --<PROC NAME="GET_VERSION">
+    --
+    -- This function returns the current PVCS version of the package
+
+    FUNCTION get_version
+        RETURN VARCHAR2;
+
+    --</PROC>
+
+    -----------------------------------------------------------------------------
+    --
+    --<PROC NAME="GET_BODY_VERSION">
+    --
+    -- This function returns the current PVCS version of the package body
+    FUNCTION get_body_version
+        RETURN VARCHAR2;
+
+    --</PROC>
+
+    FUNCTION clip_dbug (id              IN INTEGER,
+                        geom            IN SDO_GEOMETRY,
+                        start_measure   IN NUMBER,
+                        end_measure     IN NUMBER)
+        RETURN SDO_GEOMETRY
+        DETERMINISTIC
+        PARALLEL_ENABLE;
+
+    FUNCTION clip (geom            IN SDO_GEOMETRY,
+                   start_measure   IN NUMBER,
+                   end_measure     IN NUMBER,
+                   tolerance       IN NUMBER DEFAULT 1.0e-8)
+        RETURN SDO_GEOMETRY
+        DETERMINISTIC
+        PARALLEL_ENABLE;
+
+    FUNCTION clip_l (geom            IN SDO_GEOMETRY,
+                     geom_length     IN NUMBER,
+                     start_measure   IN NUMBER,
+                     end_measure     IN NUMBER)
+        RETURN SDO_GEOMETRY;
+
+    FUNCTION locate_pt_ptype (geom IN SDO_GEOMETRY, measure IN NUMBER)
+        RETURN SDO_GEOMETRY
+        DETERMINISTIC
+        PARALLEL_ENABLE;
+
+    FUNCTION locate_pt (geom IN SDO_GEOMETRY, measure IN NUMBER)
+        RETURN SDO_GEOMETRY
+        DETERMINISTIC
+        PARALLEL_ENABLE;
+
+    FUNCTION get_lr (geom            IN SDO_GEOMETRY,
+                     geom_length     IN NUMBER,
+                     start_percent   IN NUMBER,
+                     end_percent     IN NUMBER)
+        RETURN SDO_GEOMETRY;
+
+
+    FUNCTION scale_geom_l (geom            IN SDO_GEOMETRY,
+                           geom_length     IN NUMBER DEFAULT NULL,
+                           start_measure   IN NUMBER DEFAULT 0)
+        RETURN SDO_GEOMETRY;
+
+    FUNCTION scale_geom (geom            IN SDO_GEOMETRY,
+                         start_measure   IN NUMBER DEFAULT 0,
+                         end_measure     IN NUMBER DEFAULT NULL)
+        RETURN SDO_GEOMETRY;
+
+    FUNCTION scale_geom (geom            IN SDO_GEOMETRY,
+                         geom_length     IN NUMBER DEFAULT NULL,
+                         start_x         IN NUMBER,
+                         start_y         IN NUMBER,
+                         start_m            NUMBER,
+                         start_measure   IN NUMBER DEFAULT 0)
+        RETURN SDO_GEOMETRY;
+
+    FUNCTION redefine_geom_l (geom            IN SDO_GEOMETRY,
+                              geom_length     IN NUMBER DEFAULT NULL,
+                              start_measure   IN NUMBER DEFAULT 0)
+        RETURN SDO_GEOMETRY;
+
+    FUNCTION redefine_geom (geom            IN SDO_GEOMETRY,
+                            start_measure   IN NUMBER DEFAULT 0,
+                            end_measure     IN NUMBER DEFAULT NULL)
+        RETURN SDO_GEOMETRY;
+
+    FUNCTION get_geom (vertices   IN nm_vertex_tab,
+                       srid       IN INTEGER DEFAULT NULL)
+        RETURN SDO_GEOMETRY;
+
+    FUNCTION reverse_geometry (geom IN SDO_GEOMETRY)
+        RETURN SDO_GEOMETRY;
+
+    FUNCTION reverse_measure (geom IN SDO_GEOMETRY)
+        RETURN SDO_GEOMETRY;
+
+    FUNCTION reverse_geom_and_measure (geom IN SDO_GEOMETRY)
+        RETURN SDO_GEOMETRY;
+
+    FUNCTION geom_segment_start_pt (geom IN SDO_GEOMETRY)
+        RETURN SDO_GEOMETRY;
+
+    FUNCTION geom_segment_end_pt (geom IN SDO_GEOMETRY)
+        RETURN SDO_GEOMETRY;
+
+    FUNCTION geom_segment_start_measure (geom IN SDO_GEOMETRY)
+        RETURN NUMBER;
+
+    FUNCTION geom_segment_end_measure (geom IN SDO_GEOMETRY)
+        RETURN NUMBER;
+
+    FUNCTION convert_to_std_dim_array (dim_array sdo_dim_array)
+        RETURN sdo_dim_array;
+
+    FUNCTION convert_to_lrs_dim_array (dim_array        sdo_dim_array,
+                                       lower_bound   IN NUMBER DEFAULT NULL,
+                                       upper_bound   IN NUMBER DEFAULT NULL,
+                                       tolerance     IN NUMBER DEFAULT NULL)
+        RETURN sdo_dim_array;
+
+    FUNCTION convert_to_std_geom (geom IN SDO_GEOMETRY)
+        RETURN SDO_GEOMETRY;
+
+    FUNCTION convert_to_lrs_geom (geom          IN SDO_GEOMETRY,
+                                  geom_length   IN NUMBER DEFAULT NULL)
+        RETURN SDO_GEOMETRY;
+
+    FUNCTION get_vertices (geom IN SDO_GEOMETRY)
+        RETURN nm_vertex_tab;
+
+    FUNCTION get_projection (pt          IN SDO_GEOMETRY,
+                             geom        IN SDO_GEOMETRY,
+                             tolerance   IN NUMBER)
+        RETURN SDO_GEOMETRY;
+
+    FUNCTION project_pt (geom_segment   IN     SDO_GEOMETRY,
+                         point          IN     SDO_GEOMETRY,
+                         tolerance      IN     NUMBER,
+                         offset            OUT NUMBER)
+        RETURN SDO_GEOMETRY;
+
+    FUNCTION project_pt (geom_segment   IN SDO_GEOMETRY,
+                         point          IN SDO_GEOMETRY,
+                         tolerance      IN NUMBER)
+        RETURN SDO_GEOMETRY;
+
+    FUNCTION find_measure (p_lrs_geom   IN SDO_GEOMETRY,
+                           p_pt_geom    IN SDO_GEOMETRY)
+        RETURN NUMBER;
+
+    PROCEDURE split (geom            IN     SDO_GEOMETRY,
+                     split_measure   IN     NUMBER,
+                     tolerance       IN     NUMBER,
+                     geom1              OUT SDO_GEOMETRY,
+                     geom2              OUT SDO_GEOMETRY);
+
+    FUNCTION is_connected (geom1       IN SDO_GEOMETRY,
+                           geom2       IN SDO_GEOMETRY,
+                           tolerance   IN NUMBER)
+        RETURN INTEGER;
+
+    FUNCTION concat_geom (geom1       IN SDO_GEOMETRY,
+                          geom2       IN SDO_GEOMETRY,
+                          connected   IN VARCHAR2 DEFAULT 'TRUE')
+        RETURN SDO_GEOMETRY;
+
+    FUNCTION merge (geom1       IN SDO_GEOMETRY,
+                    geom2       IN SDO_GEOMETRY,
+                    tolerance   IN NUMBER)
+        RETURN SDO_GEOMETRY;
+
+    FUNCTION get_measure_array (lr_geom IN SDO_GEOMETRY, pts IN SDO_GEOMETRY, tolerance IN NUMBER DEFAULT 1.0e-8)
+        RETURN ptr_num_array;
+
+    FUNCTION get_measure (point IN SDO_GEOMETRY, dim_array IN sdo_dim_array)
+        RETURN NUMBER;
+
+    FUNCTION get_measure (point IN SDO_GEOMETRY)
+        RETURN NUMBER;
+
+    FUNCTION lrs_intersection (p_lrs_geom   IN SDO_GEOMETRY,
+                               p_geom       IN SDO_GEOMETRY)
+        RETURN SDO_GEOMETRY;
+
+    PROCEDURE reset_measure (p_geom IN OUT NOCOPY SDO_GEOMETRY);
+
+    PROCEDURE translate_measure (p_geom        IN OUT NOCOPY SDO_GEOMETRY,
+                                 translate_m   IN            NUMBER);
+
+    FUNCTION convert_to_std_elem_info (elem_info IN sdo_elem_info_array)
+        RETURN sdo_elem_info_array;
+
+    FUNCTION connected_geom_segments (geom_segment_1   IN SDO_GEOMETRY,
+                                      geom_segment_2   IN SDO_GEOMETRY,
+                                      tolerance        IN NUMBER)
+        RETURN VARCHAR2;
+
+    FUNCTION geom_segment_length (geom_segment   IN SDO_GEOMETRY,
+                                  dim_array      IN SDO_DIM_ARRAY)
+        RETURN NUMBER;
+
+    FUNCTION geom_segment_length (geom_segment   IN SDO_GEOMETRY,
+                                  tolerance      IN NUMBER DEFAULT 1.0e-8)
+        RETURN NUMBER;
+
+    FUNCTION offset_geom_segment (geom            IN SDO_GEOMETRY,
+                                  start_measure   IN NUMBER,
+                                  end_measure     IN NUMBER,
+                                  offset          IN NUMBER,
+                                  tolerance       IN NUMBER DEFAULT 1.0e-8)
+        RETURN SDO_GEOMETRY
+        DETERMINISTIC
+        PARALLEL_ENABLE;
+
+    FUNCTION get_pline_parts_elem_info (rc IN INTEGER)
+        RETURN sdo_elem_info_array;
+--  ideally this would be a private function but it is used inside some SQL
+
+END;
+/
