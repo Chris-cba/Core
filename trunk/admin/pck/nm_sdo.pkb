@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm_sdo
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm_sdo.pkb-arc   1.14   Mar 27 2019 14:18:34   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm_sdo.pkb-arc   1.15   Mar 28 2019 16:07:56   Rob.Coupe  $
     --       Module Name      : $Workfile:   nm_sdo.pkb  $
-    --       Date into PVCS   : $Date:   Mar 27 2019 14:18:34  $
-    --       Date fetched Out : $Modtime:   Mar 27 2019 14:18:14  $
-    --       PVCS Version     : $Revision:   1.14  $
+    --       Date into PVCS   : $Date:   Mar 28 2019 16:07:56  $
+    --       Date fetched Out : $Modtime:   Mar 28 2019 16:05:24  $
+    --       PVCS Version     : $Revision:   1.15  $
     --
     --   Author : R.A. Coupe
     --
@@ -18,7 +18,7 @@ AS
     -- The main purpose of this package is to replicate the functions inside the SDO_LRS package as
     -- supplied under the MDSYS schema and licensed under the Oracle Spatial license on EE.
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.14  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.15  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'NM_SDO';
     
@@ -1170,7 +1170,7 @@ AS
                                      lg);
         --distance := dist;
         measure :=    --ptr_num_array( ptr_num_array_type( ptr_num(1,20))); --
-                   get_measure_array (geom, retval);
+                   get_measure_array (geom, retval, tolerance);
 
         retval :=
             nm_sdo_geom.set_pt_measure (retval, measure.pa (1).ptr_value);
@@ -1214,7 +1214,7 @@ AS
                                      lg);
         --distance := dist;
         measure :=    --ptr_num_array( ptr_num_array_type( ptr_num(1,20))); --
-                   get_measure_array (geom_segment, retval);
+                   get_measure_array (geom_segment, retval, tolerance);
 
         retval :=
             nm_sdo_geom.set_pt_measure (retval, measure.pa (1).ptr_value);
@@ -1620,7 +1620,7 @@ AS
         RETURN round(retval, g_round);
     END;
 
-    FUNCTION get_measure_array (lr_geom IN SDO_GEOMETRY, pts IN SDO_GEOMETRY)
+    FUNCTION get_measure_array (lr_geom IN SDO_GEOMETRY, pts IN SDO_GEOMETRY, tolerance IN NUMBER DEFAULT 1.0e-8)
         RETURN ptr_num_array
     IS
         retval   ptr_num_array := NM3ARRAY.INIT_PTR_NUM_ARRAY;
@@ -1674,8 +1674,9 @@ AS
                            WHERE m2 IS NOT NULL
                         ORDER BY pt_id, id) q1,
                        TABLE (nm_sdo.get_vertices (pt_geom))  t1
-                 WHERE     t1.x BETWEEN LEAST (x1, x2) AND GREATEST (x1, x2)
-                       AND t1.y BETWEEN LEAST (y1, y2) AND GREATEST (y1, y2));
+                 WHERE     t1.x BETWEEN LEAST (x1, x2)-tolerance AND GREATEST (x1, x2)+tolerance
+                       AND t1.y BETWEEN LEAST (y1, y2)-tolerance AND GREATEST (y1, y2)+tolerance
+                       AND rownum = 1);
 
         --
         RETURN retval;
