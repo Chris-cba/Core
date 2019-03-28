@@ -3,11 +3,11 @@ AS
     --<PACKAGE>
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm_sdo.pkh-arc   1.4   Dec 21 2018 11:08:00   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm_sdo.pkh-arc   1.5   Mar 28 2019 16:06:52   Rob.Coupe  $
     --       Module Name      : $Workfile:   nm_sdo.pkh  $
-    --       Date into PVCS   : $Date:   Dec 21 2018 11:08:00  $
-    --       Date fetched Out : $Modtime:   Dec 21 2018 10:42:18  $
-    --       PVCS Version     : $Revision:   1.4  $
+    --       Date into PVCS   : $Date:   Mar 28 2019 16:06:52  $
+    --       Date fetched Out : $Modtime:   Mar 28 2019 16:04:34  $
+    --       PVCS Version     : $Revision:   1.5  $
     --
     --   Author : R.A. Coupe
     --
@@ -19,7 +19,7 @@ AS
     -- The main purpose of this package is to replicate the functions inside the SDO_LRS package as
     -- supplied under the MDSYS schema and licensed under the Oracle Spatial license on EE.
     --</PACKAGE>
-    g_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.4  $';
+    g_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.5  $';
 
     -----------------------------------------------------------------------------
     --
@@ -194,7 +194,7 @@ AS
                     tolerance   IN NUMBER)
         RETURN SDO_GEOMETRY;
 
-    FUNCTION get_measure_array (lr_geom IN SDO_GEOMETRY, pts IN SDO_GEOMETRY)
+    FUNCTION get_measure_array (lr_geom IN SDO_GEOMETRY, pts IN SDO_GEOMETRY, tolerance IN NUMBER DEFAULT 1.0e-8)
         RETURN ptr_num_array;
 
     FUNCTION get_measure (point IN SDO_GEOMETRY, dim_array IN sdo_dim_array)
