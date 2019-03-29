@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm_sdo
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm_sdo.pkb-arc   1.15   Mar 28 2019 16:07:56   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm_sdo.pkb-arc   1.16   Mar 29 2019 20:57:42   Rob.Coupe  $
     --       Module Name      : $Workfile:   nm_sdo.pkb  $
-    --       Date into PVCS   : $Date:   Mar 28 2019 16:07:56  $
-    --       Date fetched Out : $Modtime:   Mar 28 2019 16:05:24  $
-    --       PVCS Version     : $Revision:   1.15  $
+    --       Date into PVCS   : $Date:   Mar 29 2019 20:57:42  $
+    --       Date fetched Out : $Modtime:   Mar 29 2019 20:49:44  $
+    --       PVCS Version     : $Revision:   1.16  $
     --
     --   Author : R.A. Coupe
     --
@@ -18,7 +18,7 @@ AS
     -- The main purpose of this package is to replicate the functions inside the SDO_LRS package as
     -- supplied under the MDSYS schema and licensed under the Oracle Spatial license on EE.
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.15  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.16  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'NM_SDO';
     
@@ -368,14 +368,14 @@ AS
                            NULL)
                    WHEN measure = m1
                    THEN
-                       sdo_geometry (2001,
+                       sdo_geometry (3301,
                                      geom.sdo_srid,
                                      sdo_point_type (x1, y1, m1),
                                      NULL,
                                      NULL)
                    WHEN measure = m2
                    THEN
-                       sdo_geometry (2001,
+                       sdo_geometry (3301,
                                      geom.sdo_srid,
                                      sdo_point_type (x2, y2, m2),
                                      NULL,
@@ -436,18 +436,18 @@ AS
                                measure))
                    WHEN measure = m1
                    THEN
-                       sdo_geometry (2001,
+                       sdo_geometry (3301,
                                      geom.sdo_srid,
-                                     sdo_point_type (x1, y1, m1),
                                      NULL,
-                                     NULL)
+                                     sdo_elem_info_array (1, 1, 1),
+                                     sdo_ordinate_array (x1, y1, m1))
                    WHEN measure = m2
                    THEN
-                       sdo_geometry (2001,
+                       sdo_geometry (3301,
                                      geom.sdo_srid,
-                                     sdo_point_type (x2, y2, m2),
                                      NULL,
-                                     NULL)
+                                     sdo_elem_info_array (1, 1, 1),
+                                     sdo_ordinate_array (x2, y2, m2))
                    ELSE
                        NULL
                END
