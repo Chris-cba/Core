@@ -1,11 +1,11 @@
 ----------------------------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm_4700_fix62.sql-arc   1.0   Mar 25 2019 15:04:44   Chris.Baugh  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm_4700_fix62.sql-arc   1.1   Apr 01 2019 15:03:12   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm_4700_fix62.sql  $ 
---       Date into PVCS   : $Date:   Mar 25 2019 15:04:44  $
---       Date fetched Out : $Modtime:   Mar 25 2019 15:03:28  $
---       Version     	  : $Revision:   1.0  $
+--       Date into PVCS   : $Date:   Apr 01 2019 15:03:12  $
+--       Date fetched Out : $Modtime:   Apr 01 2019 15:00:38  $
+--       Version     	  : $Revision:   1.1  $
 --
 ----------------------------------------------------------------------------------------------------
 --   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
@@ -106,22 +106,6 @@ SET FEEDBACK OFF
 --------------------------------------------------------------------------------
 --
 SET TERM ON 
-PROMPT creating View nm_inv_items_all_sdo_b_upd.trg
-SET TERM OFF
---
-SET FEEDBACK ON
-START nm_inv_items_all_sdo_b_upd.trg
-SET FEEDBACK OFF
-
-SET TERM ON 
-PROMPT creating View nm_asset_locations_all_who.trg
-SET TERM OFF
---
-SET FEEDBACK ON
-START nm_asset_locations_all_who.trg
-SET FEEDBACK OFF
-
-SET TERM ON 
 PROMPT creating View nm_asset_locations_b_ins.trg
 SET TERM OFF
 --
@@ -138,7 +122,7 @@ BEGIN
 	--
 	hig2.upgrade(p_product        => 'NET'
 				,p_upgrade_script => 'log_nm_4700_fix62.sql'
-				,p_remarks        => 'NET 4700 FIX 62 (Build 1)'
+				,p_remarks        => 'NET 4700 FIX 62 (Build 2)'
 				,p_to_version     => NULL
 				);
 	--
