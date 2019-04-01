@@ -1,12 +1,13 @@
+/* Formatted on 01/04/2019 17:13:22 (QP5 v5.336) */
 CREATE OR REPLACE PACKAGE BODY nm_sdo
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm_sdo.pkb-arc   1.16   Mar 29 2019 20:57:42   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm_sdo.pkb-arc   1.17   Apr 01 2019 17:23:22   Rob.Coupe  $
     --       Module Name      : $Workfile:   nm_sdo.pkb  $
-    --       Date into PVCS   : $Date:   Mar 29 2019 20:57:42  $
-    --       Date fetched Out : $Modtime:   Mar 29 2019 20:49:44  $
-    --       PVCS Version     : $Revision:   1.16  $
+    --       Date into PVCS   : $Date:   Apr 01 2019 17:23:22  $
+    --       Date fetched Out : $Modtime:   Apr 01 2019 17:21:40  $
+    --       PVCS Version     : $Revision:   1.17  $
     --
     --   Author : R.A. Coupe
     --
@@ -18,13 +19,14 @@ AS
     -- The main purpose of this package is to replicate the functions inside the SDO_LRS package as
     -- supplied under the MDSYS schema and licensed under the Oracle Spatial license on EE.
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.16  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.17  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'NM_SDO';
-    
+
     g_round          CONSTANT INTEGER := 18; -- the number of DP to round number return values. SDO_LRS is linked to code which
-                                       -- return Java based-values. This means the values will be standard floating point values
-                                       -- and are likely not to have the same number of decimal places. 
+
+    -- return Java based-values. This means the values will be standard floating point values
+    -- and are likely not to have the same number of decimal places.
 
     FUNCTION offset_whole_geom (geom        IN SDO_GEOMETRY,
                                 offset      IN NUMBER,
@@ -191,143 +193,170 @@ AS
         DETERMINISTIC
         PARALLEL_ENABLE
     IS
-        ord_array     sdo_ordinate_array;
-        retval        SDO_GEOMETRY;
-        check_count   INTEGER;
-        sm            NUMBER := SDO_LRS.geom_segment_start_measure (geom);
-        em            NUMBER := SDO_LRS.geom_segment_end_measure (geom);
-        l_tolerance   NUMBER; -- tolerance adjusted from XY unots to M units or meters
-        l_start_measure number := least( start_measure, end_measure);
-        l_end_measure number := greatest( start_measure, end_measure);
+        ord_array         sdo_ordinate_array;
+        retval            SDO_GEOMETRY;
+        check_count       INTEGER;
+        sm                NUMBER := SDO_LRS.geom_segment_start_measure (geom);
+        em                NUMBER := SDO_LRS.geom_segment_end_measure (geom);
+        l_tolerance       NUMBER; -- tolerance adjusted from XY unots to M units or meters
+        l_start_measure   NUMBER := LEAST (start_measure, end_measure);
+        l_end_measure     NUMBER := GREATEST (start_measure, end_measure);
     BEGIN
-   
-        l_tolerance := tolerance;
-
-        IF geom.sdo_srid IS NOT NULL
-        THEN
-            IF nm_sdo_geom.is_geodetic (geom.sdo_srid) = 'TRUE'
-            THEN
-                NULL;
-            ELSE
-                l_tolerance :=
-                      tolerance
-                    * SDO_LRS.geom_segment_end_measure (geom)
-                    / SDO_GEOM.sdo_length (geom);
-            END IF;
-        END IF;
-
-        IF l_start_measure = sm AND l_end_measure = em
-        THEN
-            retval := geom;
-        ELSIF l_start_measure > em OR l_end_measure < sm
+        IF geom IS NULL
         THEN
             retval := NULL;
-        ELSIF abs(l_end_measure - l_start_measure) < l_tolerance  then
-		    retval := locate_pt(geom, l_start_measure);
-		ELSE
-              SELECT sdo_geometry (
-                         case when abs(l_end_measure - l_start_measure) < l_tolerance then 3301 else  3302 end,
-                         geom.sdo_srid,
-                         NULL,
-                         case when abs(l_end_measure - l_start_measure) < l_tolerance then sdo_elem_info_array (1, 1, 1) else sdo_elem_info_array (1, 2, 1) end,
-                         CAST (COLLECT (VALUE        /*ORDER BY rn, ordinate*/
-                                             ) AS sdo_ordinate_array)),
-                     COUNT (*)
-                         check_count
-                INTO retval, check_count
-                FROM (WITH
-                          ranges
-                          AS
-                              (SELECT l_start_measure,
-                                      l_end_measure,
-                                      MIN (rn) OVER (PARTITION BY 'A')
-                                          min_rn,
-                                      MAX (rn) OVER (PARTITION BY 'A')
-                                          max_rn,
-                                      l_tolerance,
-                                      q1.*
-                                 FROM (SELECT ROW_NUMBER () OVER (ORDER BY 1)
-                                                  rn,
-                                              COUNT (*) OVER (PARTITION BY 'A')
-                                                  rc,
-                                              t.COLUMN_VALUE
-                                                  x1,
-                                              LEAD (t.COLUMN_VALUE, 1)
-                                                  OVER (ORDER BY 1)
-                                                  y1,
-                                              LEAD (t.COLUMN_VALUE, 2)
-                                                  OVER (ORDER BY 1)
-                                                  m1,
-                                              LEAD (t.COLUMN_VALUE, 3)
-                                                  OVER (ORDER BY 1)
-                                                  x2,
-                                              LEAD (t.COLUMN_VALUE, 4)
-                                                  OVER (ORDER BY 1)
-                                                  y2,
-                                              LEAD (t.COLUMN_VALUE, 5)
-                                                  OVER (ORDER BY 1)
-                                                  m2
-                                         FROM TABLE (geom.sdo_ordinates) t) q1
-                                WHERE     MOD (rn, 3) = 1 --and m2 is not null
-                                      AND m1 <= l_end_measure + l_tolerance
-                                      AND m2 >= l_start_measure - l_tolerance)
-                      --                                            select r.* from ranges r
-                      --
-                      SELECT rn, -- this will retrieve all vertices which are wholly between the two measures
-                             x1     A,
-                             y1     B,
-                             m1     C
-                        FROM ranges
-                       WHERE     m1 >= l_start_measure - l_tolerance
-                             AND m1 <= l_end_measure + l_tolerance
-                      UNION ALL
-                      SELECT -1
-                                 rn, -- this is where the start measure is between two vertices - interpolate the xy's
-                               x1
-                             +   (GREATEST (m1, l_start_measure) - m1)
-                               * (x2 - x1)
-                               / (m2 - m1),
-                               y1
-                             +   (GREATEST (m1, l_start_measure) - m1)
-                               * (y2 - y1)
-                               / (m2 - m1),
-                             GREATEST (m1, l_start_measure)
-                        FROM ranges
-                       WHERE     rn = min_rn
-                             AND m1 < l_start_measure
-                             AND m2 > l_start_measure
-                             AND ABS (m1 - l_start_measure) > l_tolerance
-                             AND ABS (m2 - l_start_measure) > l_tolerance
-                      --                       and (abs(m1-greatest(start_measure, m1)) > tolerance )
-                      UNION ALL
-                      SELECT 99999
-                                 rn, -- This is to ensure that the end vertex is included, possibly interpolated - may be better performance if the
-                               x1
-                             +   (LEAST (m2, l_end_measure) - m1)
-                               * (x2 - x1)
-                               / (m2 - m1),
-                               y1
-                             +   (LEAST (m2, l_end_measure) - m1)
-                               * (y2 - y1)
-                               / (m2 - m1),
-                             LEAST (m2, l_end_measure)
-                        FROM ranges
-                       WHERE     m1 < l_end_measure
-                             AND m2 >= l_end_measure - l_tolerance
-                             AND rn = max_rn
-                      ORDER BY rn)
-                     UNPIVOT EXCLUDE NULLS (VALUE FOR ordinate IN (A, B, C))
-            ORDER BY rn, ordinate;
+        ELSE
+            l_tolerance := tolerance;
 
-            IF check_count < 6
+            IF geom.sdo_srid IS NOT NULL
             THEN
-                IF check_count = 3
+                IF nm_sdo_geom.is_geodetic (geom.sdo_srid) = 'TRUE'
                 THEN
-                    retval.sdo_gtype := 3301;
-                    retval.sdo_elem_info := sdo_elem_info_array (1, 1, 1);
+                    NULL;
                 ELSE
-                    DBMS_OUTPUT.put_line ('Check count = ' || check_count);
-                    raise_application_error (-20001, 'Invalid LRS Measure');
+                    l_tolerance :=
+                          tolerance
+                        * SDO_LRS.geom_segment_end_measure (geom)
+                        / SDO_GEOM.sdo_length (geom);
+                END IF;
+            END IF;
+
+            IF l_start_measure = sm AND l_end_measure = em
+            THEN
+                retval := geom;
+            ELSIF l_start_measure > em OR l_end_measure < sm
+            THEN
+                retval := NULL;
+            ELSIF ABS (l_end_measure - l_start_measure) < l_tolerance
+            THEN
+                retval := locate_pt (geom, l_start_measure);
+            ELSE
+                  SELECT sdo_geometry (
+                             CASE
+                                 WHEN ABS (l_end_measure - l_start_measure) <
+                                      l_tolerance
+                                 THEN
+                                     3301
+                                 ELSE
+                                     3302
+                             END,
+                             geom.sdo_srid,
+                             NULL,
+                             CASE
+                                 WHEN ABS (l_end_measure - l_start_measure) <
+                                      l_tolerance
+                                 THEN
+                                     sdo_elem_info_array (1, 1, 1)
+                                 ELSE
+                                     sdo_elem_info_array (1, 2, 1)
+                             END,
+                             CAST (COLLECT (VALUE    /*ORDER BY rn, ordinate*/
+                                                 ) AS sdo_ordinate_array)),
+                         COUNT (*)
+                             check_count
+                    INTO retval, check_count
+                    FROM (WITH
+                              ranges
+                              AS
+                                  (SELECT l_start_measure,
+                                          l_end_measure,
+                                          MIN (rn) OVER (PARTITION BY 'A')
+                                              min_rn,
+                                          MAX (rn) OVER (PARTITION BY 'A')
+                                              max_rn,
+                                          l_tolerance,
+                                          q1.*
+                                     FROM (SELECT ROW_NUMBER ()
+                                                      OVER (ORDER BY 1)
+                                                      rn,
+                                                  COUNT (*)
+                                                      OVER (PARTITION BY 'A')
+                                                      rc,
+                                                  t.COLUMN_VALUE
+                                                      x1,
+                                                  LEAD (t.COLUMN_VALUE, 1)
+                                                      OVER (ORDER BY 1)
+                                                      y1,
+                                                  LEAD (t.COLUMN_VALUE, 2)
+                                                      OVER (ORDER BY 1)
+                                                      m1,
+                                                  LEAD (t.COLUMN_VALUE, 3)
+                                                      OVER (ORDER BY 1)
+                                                      x2,
+                                                  LEAD (t.COLUMN_VALUE, 4)
+                                                      OVER (ORDER BY 1)
+                                                      y2,
+                                                  LEAD (t.COLUMN_VALUE, 5)
+                                                      OVER (ORDER BY 1)
+                                                      m2
+                                             FROM TABLE (geom.sdo_ordinates) t)
+                                          q1
+                                    WHERE     MOD (rn, 3) = 1 --and m2 is not null
+                                          AND m1 <= l_end_measure + l_tolerance
+                                          AND m2 >=
+                                              l_start_measure - l_tolerance)
+                          --                                            select r.* from ranges r
+                          --
+                          SELECT rn, -- this will retrieve all vertices which are wholly between the two measures
+                                 x1     A,
+                                 y1     B,
+                                 m1     C
+                            FROM ranges
+                           WHERE     m1 >= l_start_measure - l_tolerance
+                                 AND m1 <= l_end_measure + l_tolerance
+                          UNION ALL
+                          SELECT -1
+                                     rn, -- this is where the start measure is between two vertices - interpolate the xy's
+                                   x1
+                                 +   (GREATEST (m1, l_start_measure) - m1)
+                                   * (x2 - x1)
+                                   / (m2 - m1),
+                                   y1
+                                 +   (GREATEST (m1, l_start_measure) - m1)
+                                   * (y2 - y1)
+                                   / (m2 - m1),
+                                 GREATEST (m1, l_start_measure)
+                            FROM ranges
+                           WHERE     rn = min_rn
+                                 AND m1 < l_start_measure
+                                 AND m2 > l_start_measure
+                                 AND ABS (m1 - l_start_measure) > l_tolerance
+                                 AND ABS (m2 - l_start_measure) > l_tolerance
+                          --                       and (abs(m1-greatest(start_measure, m1)) > tolerance )
+                          UNION ALL
+                          SELECT 99999
+                                     rn, -- This is to ensure that the end vertex is included, possibly interpolated - may be better performance if the
+                                   x1
+                                 +   (LEAST (m2, l_end_measure) - m1)
+                                   * (x2 - x1)
+                                   / (m2 - m1),
+                                   y1
+                                 +   (LEAST (m2, l_end_measure) - m1)
+                                   * (y2 - y1)
+                                   / (m2 - m1),
+                                 LEAST (m2, l_end_measure)
+                            FROM ranges
+                           WHERE     m1 < l_end_measure
+                                 AND m2 >= l_end_measure - l_tolerance
+                                 AND rn = max_rn
+                          ORDER BY rn)
+                         UNPIVOT EXCLUDE NULLS (VALUE
+                                               FOR ordinate
+                                               IN (A, B, C))
+                ORDER BY rn, ordinate;
+
+                IF check_count < 6
+                THEN
+                    IF check_count = 3
+                    THEN
+                        retval.sdo_gtype := 3301;
+                        retval.sdo_elem_info := sdo_elem_info_array (1, 1, 1);
+                    ELSE
+                        DBMS_OUTPUT.put_line (
+                            'Check count = ' || check_count);
+                        raise_application_error (-20001,
+                                                 'Invalid LRS Measure');
+                    END IF;
                 END IF;
             END IF;
         END IF;
@@ -354,61 +383,68 @@ AS
     BEGIN
         --select sdo_geometry( 2001, NULL, sdo_point_type(x1 + start_measure * (x2 - x1) / (m2 - m1) ,
         --                              y1 + start_measure * (y2 - y1) / (m2 - m1), start_measure), null, null )
-        SELECT CASE
-                   WHEN measure > m1 AND measure < m2
-                   THEN
-                       sdo_geometry (
-                           3301,
-                           geom.sdo_srid,
-                           sdo_point_type (
-                               x1 + (measure - m1) * (x2 - x1) / (m2 - m1),
-                               y1 + (measure - m1) * (y2 - y1) / (m2 - m1),
-                               measure),
-                           NULL,
-                           NULL)
-                   WHEN measure = m1
-                   THEN
-                       sdo_geometry (3301,
-                                     geom.sdo_srid,
-                                     sdo_point_type (x1, y1, m1),
-                                     NULL,
-                                     NULL)
-                   WHEN measure = m2
-                   THEN
-                       sdo_geometry (3301,
-                                     geom.sdo_srid,
-                                     sdo_point_type (x2, y2, m2),
-                                     NULL,
-                                     NULL)
-                   ELSE
-                       NULL
-               END
-          INTO retval
-          FROM (SELECT ROW_NUMBER () OVER (ORDER BY rn)     rn,
-                       x1,
-                       y1,
-                       m1,
-                       x2,
-                       y2,
-                       m2
-                  FROM (SELECT ROW_NUMBER () OVER (ORDER BY 1)
-                                   rn,
-                               t.COLUMN_VALUE
-                                   x1,
-                               LEAD (t.COLUMN_VALUE, 1) OVER (ORDER BY 1)
-                                   y1,
-                               LEAD (t.COLUMN_VALUE, 2) OVER (ORDER BY 1)
-                                   m1,
-                               LEAD (t.COLUMN_VALUE, 3) OVER (ORDER BY 1)
-                                   x2,
-                               LEAD (t.COLUMN_VALUE, 4) OVER (ORDER BY 1)
-                                   y2,
-                               LEAD (t.COLUMN_VALUE, 5) OVER (ORDER BY 1)
-                                   m2
-                          FROM TABLE (geom.sdo_ordinates) t)
-                 WHERE MOD (rn, 3) = 1 AND m2 IS NOT NULL) q1
-         WHERE     measure BETWEEN LEAST (m1, m2) AND GREATEST (m1, m2)
-               AND ROWNUM = 1;
+        IF geom IS NULL
+        THEN
+            retval := NULL;
+        ELSE
+            SELECT CASE
+                       WHEN measure > m1 AND measure < m2
+                       THEN
+                           sdo_geometry (
+                               3301,
+                               geom.sdo_srid,
+                               sdo_point_type (
+                                     x1
+                                   + (measure - m1) * (x2 - x1) / (m2 - m1),
+                                     y1
+                                   + (measure - m1) * (y2 - y1) / (m2 - m1),
+                                   measure),
+                               NULL,
+                               NULL)
+                       WHEN measure = m1
+                       THEN
+                           sdo_geometry (3301,
+                                         geom.sdo_srid,
+                                         sdo_point_type (x1, y1, m1),
+                                         NULL,
+                                         NULL)
+                       WHEN measure = m2
+                       THEN
+                           sdo_geometry (3301,
+                                         geom.sdo_srid,
+                                         sdo_point_type (x2, y2, m2),
+                                         NULL,
+                                         NULL)
+                       ELSE
+                           NULL
+                   END
+              INTO retval
+              FROM (SELECT ROW_NUMBER () OVER (ORDER BY rn)     rn,
+                           x1,
+                           y1,
+                           m1,
+                           x2,
+                           y2,
+                           m2
+                      FROM (SELECT ROW_NUMBER () OVER (ORDER BY 1)
+                                       rn,
+                                   t.COLUMN_VALUE
+                                       x1,
+                                   LEAD (t.COLUMN_VALUE, 1) OVER (ORDER BY 1)
+                                       y1,
+                                   LEAD (t.COLUMN_VALUE, 2) OVER (ORDER BY 1)
+                                       m1,
+                                   LEAD (t.COLUMN_VALUE, 3) OVER (ORDER BY 1)
+                                       x2,
+                                   LEAD (t.COLUMN_VALUE, 4) OVER (ORDER BY 1)
+                                       y2,
+                                   LEAD (t.COLUMN_VALUE, 5) OVER (ORDER BY 1)
+                                       m2
+                              FROM TABLE (geom.sdo_ordinates) t)
+                     WHERE MOD (rn, 3) = 1 AND m2 IS NOT NULL) q1
+             WHERE     measure BETWEEN LEAST (m1, m2) AND GREATEST (m1, m2)
+                   AND ROWNUM = 1;
+        END IF;
 
         RETURN retval;
     END;
@@ -422,61 +458,68 @@ AS
     BEGIN
         --select sdo_geometry( 2001, NULL, sdo_point_type(x1 + start_measure * (x2 - x1) / (m2 - m1) ,
         --                              y1 + start_measure * (y2 - y1) / (m2 - m1), start_measure), null, null )
-        SELECT CASE
-                   WHEN measure > m1 AND measure < m2
-                   THEN
-                       sdo_geometry (
-                           3301,
-                           geom.sdo_srid,
-                           NULL,
-                           sdo_elem_info_array (1, 1, 1),
-                           sdo_ordinate_array (
-                               x1 + (measure - m1) * (x2 - x1) / (m2 - m1),
-                               y1 + (measure - m1) * (y2 - y1) / (m2 - m1),
-                               measure))
-                   WHEN measure = m1
-                   THEN
-                       sdo_geometry (3301,
-                                     geom.sdo_srid,
-                                     NULL,
-                                     sdo_elem_info_array (1, 1, 1),
-                                     sdo_ordinate_array (x1, y1, m1))
-                   WHEN measure = m2
-                   THEN
-                       sdo_geometry (3301,
-                                     geom.sdo_srid,
-                                     NULL,
-                                     sdo_elem_info_array (1, 1, 1),
-                                     sdo_ordinate_array (x2, y2, m2))
-                   ELSE
-                       NULL
-               END
-          INTO retval
-          FROM (SELECT ROW_NUMBER () OVER (ORDER BY rn)     rn,
-                       x1,
-                       y1,
-                       m1,
-                       x2,
-                       y2,
-                       m2
-                  FROM (SELECT ROW_NUMBER () OVER (ORDER BY 1)
-                                   rn,
-                               t.COLUMN_VALUE
-                                   x1,
-                               LEAD (t.COLUMN_VALUE, 1) OVER (ORDER BY 1)
-                                   y1,
-                               LEAD (t.COLUMN_VALUE, 2) OVER (ORDER BY 1)
-                                   m1,
-                               LEAD (t.COLUMN_VALUE, 3) OVER (ORDER BY 1)
-                                   x2,
-                               LEAD (t.COLUMN_VALUE, 4) OVER (ORDER BY 1)
-                                   y2,
-                               LEAD (t.COLUMN_VALUE, 5) OVER (ORDER BY 1)
-                                   m2
-                          FROM TABLE (geom.sdo_ordinates) t)
-                 WHERE MOD (rn, 3) = 1 AND m2 IS NOT NULL) q1
-         WHERE     measure BETWEEN LEAST (m1, m2) AND GREATEST (m1, m2)
-               AND ROWNUM = 1;
+        IF geom IS NULL
+        THEN
+            retval := NULL;
+        ELSE
+            SELECT CASE
+                       WHEN measure > m1 AND measure < m2
+                       THEN
+                           sdo_geometry (
+                               3301,
+                               geom.sdo_srid,
+                               NULL,
+                               sdo_elem_info_array (1, 1, 1),
+                               sdo_ordinate_array (
+                                     x1
+                                   + (measure - m1) * (x2 - x1) / (m2 - m1),
+                                     y1
+                                   + (measure - m1) * (y2 - y1) / (m2 - m1),
+                                   measure))
+                       WHEN measure = m1
+                       THEN
+                           sdo_geometry (3301,
+                                         geom.sdo_srid,
+                                         NULL,
+                                         sdo_elem_info_array (1, 1, 1),
+                                         sdo_ordinate_array (x1, y1, m1))
+                       WHEN measure = m2
+                       THEN
+                           sdo_geometry (3301,
+                                         geom.sdo_srid,
+                                         NULL,
+                                         sdo_elem_info_array (1, 1, 1),
+                                         sdo_ordinate_array (x2, y2, m2))
+                       ELSE
+                           NULL
+                   END
+              INTO retval
+              FROM (SELECT ROW_NUMBER () OVER (ORDER BY rn)     rn,
+                           x1,
+                           y1,
+                           m1,
+                           x2,
+                           y2,
+                           m2
+                      FROM (SELECT ROW_NUMBER () OVER (ORDER BY 1)
+                                       rn,
+                                   t.COLUMN_VALUE
+                                       x1,
+                                   LEAD (t.COLUMN_VALUE, 1) OVER (ORDER BY 1)
+                                       y1,
+                                   LEAD (t.COLUMN_VALUE, 2) OVER (ORDER BY 1)
+                                       m1,
+                                   LEAD (t.COLUMN_VALUE, 3) OVER (ORDER BY 1)
+                                       x2,
+                                   LEAD (t.COLUMN_VALUE, 4) OVER (ORDER BY 1)
+                                       y2,
+                                   LEAD (t.COLUMN_VALUE, 5) OVER (ORDER BY 1)
+                                       m2
+                              FROM TABLE (geom.sdo_ordinates) t)
+                     WHERE MOD (rn, 3) = 1 AND m2 IS NOT NULL) q1
+             WHERE     measure BETWEEN LEAST (m1, m2) AND GREATEST (m1, m2)
+                   AND ROWNUM = 1;
+        END IF;
 
         RETURN retval;
     END;
@@ -499,81 +542,90 @@ AS
     IS
         retval   nm_vertex_tab;
     BEGIN
-        WITH
-            mdata
-            AS
-                (SELECT q2.*,
-                        --                          :sm
-                        SUM (m1 - m2)
-                            OVER (
-                                ORDER BY id1
-                                ROWS BETWEEN UNBOUNDED PRECEDING
-                                     AND     0 FOLLOWING)
-                            interval_length,
-                        LAST_VALUE (m1)
-                            OVER (
-                                ORDER BY id1
-                                ROWS BETWEEN UNBOUNDED PRECEDING
-                                     AND     UNBOUNDED FOLLOWING)
-                            measured_length,
-                        SUM (pyth_length)
-                            OVER (
-                                ORDER BY id1
-                                ROWS BETWEEN UNBOUNDED PRECEDING
-                                     AND     0 FOLLOWING)
-                            cum_length,
-                        SUM (pyth_length)
-                            OVER (
-                                ORDER BY id1
-                                ROWS BETWEEN UNBOUNDED PRECEDING
-                                     AND     UNBOUNDED FOLLOWING)
-                            total_length
-                   FROM (SELECT q1.*,
-                                SQRT (
-                                      (x1 - x2) * (x1 - x2)
-                                    + (y1 - y2) * (y1 - y2)) --                              / 5280
-                                                                pyth_length
-                           FROM (SELECT t.id
-                                            id1,
-                                        t.x
-                                            x1,
-                                        t.y
-                                            y1,
-                                        t.z
-                                            m1,
-                                        LAG (t.id, 1) OVER (ORDER BY id)
-                                            id2,
-                                        LAG (t.x, 1) OVER (ORDER BY id)
-                                            x2,
-                                        LAG (t.y, 1) OVER (ORDER BY id)
-                                            y2,
-                                        LAG (t.z, 1) OVER (ORDER BY id)
-                                            m2
-                                   FROM TABLE (SDO_UTIL.getvertices (geom)) t)
-                                q1                      --where x2 is not null
-                                  ) q2)
-        SELECT CAST (
-                   COLLECT (
-                       nm_vertex (
-                           id1,
-                           x1,
-                           y1,
-                           NULL,
-                             NVL (
-                                   NVL (geom_length,
-                                        NVL (measured_length, total_length))
-                                 * CASE reuse_scale
-                                       WHEN 'Y'
-                                       THEN
-                                           NVL (interval_length, cum_length)
-                                       ELSE
-                                           cum_length
-                                   END
-                                 / NVL (measured_length, total_length),
-                                 0)
-                           + NVL (start_measure, 0))) AS nm_vertex_tab)
-          INTO retval
-          FROM mdata;
+        IF geom IS NULL
+        THEN
+            retval := NULL;
+        ELSE
+            WITH
+                mdata
+                AS
+                    (SELECT q2.*,
+                            --                          :sm
+                            SUM (m1 - m2)
+                                OVER (
+                                    ORDER BY id1
+                                    ROWS BETWEEN UNBOUNDED PRECEDING
+                                         AND     0 FOLLOWING)
+                                interval_length,
+                            LAST_VALUE (m1)
+                                OVER (
+                                    ORDER BY id1
+                                    ROWS BETWEEN UNBOUNDED PRECEDING
+                                         AND     UNBOUNDED FOLLOWING)
+                                measured_length,
+                            SUM (pyth_length)
+                                OVER (
+                                    ORDER BY id1
+                                    ROWS BETWEEN UNBOUNDED PRECEDING
+                                         AND     0 FOLLOWING)
+                                cum_length,
+                            SUM (pyth_length)
+                                OVER (
+                                    ORDER BY id1
+                                    ROWS BETWEEN UNBOUNDED PRECEDING
+                                         AND     UNBOUNDED FOLLOWING)
+                                total_length
+                       FROM (SELECT q1.*,
+                                    SQRT (
+                                          (x1 - x2) * (x1 - x2)
+                                        + (y1 - y2) * (y1 - y2)) --                              / 5280
+                                                                    pyth_length
+                               FROM (SELECT t.id
+                                                id1,
+                                            t.x
+                                                x1,
+                                            t.y
+                                                y1,
+                                            t.z
+                                                m1,
+                                            LAG (t.id, 1) OVER (ORDER BY id)
+                                                id2,
+                                            LAG (t.x, 1) OVER (ORDER BY id)
+                                                x2,
+                                            LAG (t.y, 1) OVER (ORDER BY id)
+                                                y2,
+                                            LAG (t.z, 1) OVER (ORDER BY id)
+                                                m2
+                                       FROM TABLE (
+                                                SDO_UTIL.getvertices (geom))
+                                            t) q1       --where x2 is not null
+                                                 ) q2)
+            SELECT CAST (
+                       COLLECT (
+                           nm_vertex (
+                               id1,
+                               x1,
+                               y1,
+                               NULL,
+                                 NVL (
+                                       NVL (
+                                           geom_length,
+                                           NVL (measured_length,
+                                                total_length))
+                                     * CASE reuse_scale
+                                           WHEN 'Y'
+                                           THEN
+                                               NVL (interval_length,
+                                                    cum_length)
+                                           ELSE
+                                               cum_length
+                                       END
+                                     / NVL (measured_length, total_length),
+                                     0)
+                               + NVL (start_measure, 0))) AS nm_vertex_tab)
+              INTO retval
+              FROM mdata;
+        END IF;
 
         RETURN retval;
     END;
@@ -585,12 +637,18 @@ AS
     IS
         retval   SDO_GEOMETRY;
     BEGIN
-        retval :=
-            get_geom (scale_vertices (geom,
-                                      geom_length,
-                                      start_measure,
-                                      'Y'),
-                      geom.sdo_srid);
+        IF geom IS NULL
+        THEN
+            retval := NULL;
+        ELSE
+            retval :=
+                get_geom (scale_vertices (geom,
+                                          geom_length,
+                                          start_measure,
+                                          'Y'),
+                          geom.sdo_srid);
+        END IF;
+
         RETURN retval;
     END;
 
@@ -602,12 +660,18 @@ AS
         retval     SDO_GEOMETRY;
         l_length   NUMBER := end_measure - start_measure;
     BEGIN
-        retval :=
-            get_geom (scale_vertices (geom,
-                                      l_length,
-                                      start_measure,
-                                      'Y'),
-                      geom.sdo_srid);
+        IF geom IS NULL
+        THEN
+            retval := NULL;
+        ELSE
+            retval :=
+                get_geom (scale_vertices (geom,
+                                          l_length,
+                                          start_measure,
+                                          'Y'),
+                          geom.sdo_srid);
+        END IF;
+
         RETURN retval;
     END;
 
@@ -630,12 +694,18 @@ AS
     IS
         retval   SDO_GEOMETRY;
     BEGIN
-        retval :=
-            get_geom (scale_vertices (geom,
-                                      geom_length,
-                                      start_measure,
-                                      'N'),
-                      geom.sdo_srid);
+        IF geom IS NULL
+        THEN
+            retval := NULL;
+        ELSE
+            retval :=
+                get_geom (scale_vertices (geom,
+                                          geom_length,
+                                          start_measure,
+                                          'N'),
+                          geom.sdo_srid);
+        END IF;
+
         RETURN retval;
     END;
 
@@ -648,12 +718,18 @@ AS
         retval     SDO_GEOMETRY;
         l_length   NUMBER := end_measure - start_measure;
     BEGIN
-        retval :=
-            get_geom (scale_vertices (geom,
-                                      l_length,
-                                      start_measure,
-                                      'N'),
-                      geom.sdo_srid);
+        IF geom IS NULL
+        THEN
+            retval := NULL;
+        ELSE
+            retval :=
+                get_geom (scale_vertices (geom,
+                                          l_length,
+                                          start_measure,
+                                          'N'),
+                          geom.sdo_srid);
+        END IF;
+
         RETURN retval;
     END;
 
@@ -700,41 +776,47 @@ AS
     IS
         retval   SDO_GEOMETRY;
     BEGIN
-        SELECT sdo_geometry (3302,
-                             geom.sdo_srid,
-                             NULL,
-                             sdo_elem_info_array (1, 2, 1),
-                             CAST (COLLECT (VALUE    /*ORDER BY rn, ordinate*/
-                                                 ) AS sdo_ordinate_array))
-          INTO retval
-          FROM (  SELECT *
-                    FROM (SELECT reversed_id     id,
-                                 x               A,
-                                 y               B,
-                                 m               C
-                            FROM (SELECT q1.*,
-                                         CASE
-                                             WHEN id = 1 THEN last_id
-                                             ELSE last_id - id + 1
-                                         END    reversed_id
-                                    FROM (SELECT t.id,
-                                                 t.x,
-                                                 t.y,
-                                                 t.z                                m,
-                                                 LAST_VALUE (id)
-                                                     OVER (
-                                                         ORDER BY id
-                                                         ROWS BETWEEN UNBOUNDED
-                                                                      PRECEDING
-                                                              AND     UNBOUNDED
-                                                                      FOLLOWING)    last_id
-                                            FROM TABLE (
-                                                     SDO_UTIL.getvertices (
-                                                         geom)) t) q1))
-                         UNPIVOT EXCLUDE NULLS (VALUE
-                                               FOR ordinate
-                                               IN (A, B, C))
-                ORDER BY id, ordinate);
+        IF geom IS NULL
+        THEN
+            retval := NULL;
+        ELSE
+            SELECT sdo_geometry (
+                       3302,
+                       geom.sdo_srid,
+                       NULL,
+                       sdo_elem_info_array (1, 2, 1),
+                       CAST (COLLECT (VALUE          /*ORDER BY rn, ordinate*/
+                                           ) AS sdo_ordinate_array))
+              INTO retval
+              FROM (  SELECT *
+                        FROM (SELECT reversed_id     id,
+                                     x               A,
+                                     y               B,
+                                     m               C
+                                FROM (SELECT q1.*,
+                                             CASE
+                                                 WHEN id = 1 THEN last_id
+                                                 ELSE last_id - id + 1
+                                             END    reversed_id
+                                        FROM (SELECT t.id,
+                                                     t.x,
+                                                     t.y,
+                                                     t.z                                m,
+                                                     LAST_VALUE (id)
+                                                         OVER (
+                                                             ORDER BY id
+                                                             ROWS BETWEEN UNBOUNDED
+                                                                          PRECEDING
+                                                                  AND     UNBOUNDED
+                                                                          FOLLOWING)    last_id
+                                                FROM TABLE (
+                                                         SDO_UTIL.getvertices (
+                                                             geom)) t) q1))
+                             UNPIVOT EXCLUDE NULLS (VALUE
+                                                   FOR ordinate
+                                                   IN (A, B, C))
+                    ORDER BY id, ordinate);
+        END IF;
 
         RETURN retval;
     END;
@@ -744,53 +826,59 @@ AS
     IS
         retval   SDO_GEOMETRY;
     BEGIN
-        SELECT sdo_geometry (3302,
-                             geom.sdo_srid,
-                             NULL,
-                             sdo_elem_info_array (1, 2, 1),
-                             CAST (COLLECT (VALUE    /*ORDER BY rn, ordinate*/
-                                                 ) AS sdo_ordinate_array))
-          INTO retval
-          FROM (  SELECT *
-                    FROM (SELECT id,
-                                 x              A,
-                                 y              B,
-                                 reversed_m     C
-                            FROM (SELECT q1.*,
-                                         CASE
-                                             WHEN id = 1 THEN end_m
-                                             ELSE end_m - m
-                                         END    reversed_m
-                                    FROM (SELECT t.id,
-                                                 t.x,
-                                                 t.y,
-                                                 t.z
-                                                     m,
-                                                 --               lag (t.z, 1) OVER (ORDER BY id )
-                                                 --                   prior_m,
-                                                 FIRST_VALUE (z)
-                                                     OVER (
-                                                         ORDER BY id
-                                                         ROWS BETWEEN UNBOUNDED
-                                                                      PRECEDING
-                                                              AND     UNBOUNDED
-                                                                      FOLLOWING)
-                                                     start_m,
-                                                 LAST_VALUE (z)
-                                                     OVER (
-                                                         ORDER BY id
-                                                         ROWS BETWEEN UNBOUNDED
-                                                                      PRECEDING
-                                                              AND     UNBOUNDED
-                                                                      FOLLOWING)
-                                                     end_m
-                                            FROM TABLE (
-                                                     SDO_UTIL.getvertices (
-                                                         geom)) t) q1))
-                         UNPIVOT EXCLUDE NULLS (VALUE
-                                               FOR ordinate
-                                               IN (A, B, C))
-                ORDER BY id, ordinate);
+        IF geom IS NULL
+        THEN
+            retval := NULL;
+        ELSE
+            SELECT sdo_geometry (
+                       3302,
+                       geom.sdo_srid,
+                       NULL,
+                       sdo_elem_info_array (1, 2, 1),
+                       CAST (COLLECT (VALUE          /*ORDER BY rn, ordinate*/
+                                           ) AS sdo_ordinate_array))
+              INTO retval
+              FROM (  SELECT *
+                        FROM (SELECT id,
+                                     x              A,
+                                     y              B,
+                                     reversed_m     C
+                                FROM (SELECT q1.*,
+                                             CASE
+                                                 WHEN id = 1 THEN end_m
+                                                 ELSE end_m - m
+                                             END    reversed_m
+                                        FROM (SELECT t.id,
+                                                     t.x,
+                                                     t.y,
+                                                     t.z
+                                                         m,
+                                                     --               lag (t.z, 1) OVER (ORDER BY id )
+                                                     --                   prior_m,
+                                                     FIRST_VALUE (z)
+                                                         OVER (
+                                                             ORDER BY id
+                                                             ROWS BETWEEN UNBOUNDED
+                                                                          PRECEDING
+                                                                  AND     UNBOUNDED
+                                                                          FOLLOWING)
+                                                         start_m,
+                                                     LAST_VALUE (z)
+                                                         OVER (
+                                                             ORDER BY id
+                                                             ROWS BETWEEN UNBOUNDED
+                                                                          PRECEDING
+                                                                  AND     UNBOUNDED
+                                                                          FOLLOWING)
+                                                         end_m
+                                                FROM TABLE (
+                                                         SDO_UTIL.getvertices (
+                                                             geom)) t) q1))
+                             UNPIVOT EXCLUDE NULLS (VALUE
+                                                   FOR ordinate
+                                                   IN (A, B, C))
+                    ORDER BY id, ordinate);
+        END IF;
 
         RETURN retval;
     END;
@@ -800,65 +888,71 @@ AS
     IS
         retval   SDO_GEOMETRY;
     BEGIN
-        SELECT sdo_geometry (3302,
-                             geom.sdo_srid,
-                             NULL,
-                             sdo_elem_info_array (1, 2, 1),
-                             CAST (COLLECT (VALUE    /*ORDER BY rn, ordinate*/
-                                                 ) AS sdo_ordinate_array))
-          INTO retval
-          FROM (  SELECT *
-                    FROM (SELECT reversed_id     id,
-                                 x               A,
-                                 y               B,
-                                 reversed_m      C
-                            FROM (SELECT q1.*,
-                                         CASE
-                                             WHEN id = 1 THEN end_m
-                                             ELSE end_m - m
-                                         END    reversed_m,
-                                         CASE
-                                             WHEN id = 1 THEN last_id
-                                             ELSE last_id - id + 1
-                                         END    reversed_id
-                                    FROM (SELECT t.id,
-                                                 t.x,
-                                                 t.y,
-                                                 t.z
-                                                     m,
-                                                 --               lag (t.z, 1) OVER (ORDER BY id )
-                                                 --                   prior_m,
-                                                 LAST_VALUE (id)
-                                                     OVER (
-                                                         ORDER BY id
-                                                         ROWS BETWEEN UNBOUNDED
-                                                                      PRECEDING
-                                                              AND     UNBOUNDED
-                                                                      FOLLOWING)
-                                                     last_id,
-                                                 FIRST_VALUE (z)
-                                                     OVER (
-                                                         ORDER BY id
-                                                         ROWS BETWEEN UNBOUNDED
-                                                                      PRECEDING
-                                                              AND     UNBOUNDED
-                                                                      FOLLOWING)
-                                                     start_m,
-                                                 LAST_VALUE (z)
-                                                     OVER (
-                                                         ORDER BY id
-                                                         ROWS BETWEEN UNBOUNDED
-                                                                      PRECEDING
-                                                              AND     UNBOUNDED
-                                                                      FOLLOWING)
-                                                     end_m
-                                            FROM TABLE (
-                                                     SDO_UTIL.getvertices (
-                                                         geom)) t) q1))
-                         UNPIVOT EXCLUDE NULLS (VALUE
-                                               FOR ordinate
-                                               IN (A, B, C))
-                ORDER BY id, ordinate);
+        IF geom IS NULL
+        THEN
+            retval := NULL;
+        ELSE
+            SELECT sdo_geometry (
+                       3302,
+                       geom.sdo_srid,
+                       NULL,
+                       sdo_elem_info_array (1, 2, 1),
+                       CAST (COLLECT (VALUE          /*ORDER BY rn, ordinate*/
+                                           ) AS sdo_ordinate_array))
+              INTO retval
+              FROM (  SELECT *
+                        FROM (SELECT reversed_id     id,
+                                     x               A,
+                                     y               B,
+                                     reversed_m      C
+                                FROM (SELECT q1.*,
+                                             CASE
+                                                 WHEN id = 1 THEN end_m
+                                                 ELSE end_m - m
+                                             END    reversed_m,
+                                             CASE
+                                                 WHEN id = 1 THEN last_id
+                                                 ELSE last_id - id + 1
+                                             END    reversed_id
+                                        FROM (SELECT t.id,
+                                                     t.x,
+                                                     t.y,
+                                                     t.z
+                                                         m,
+                                                     --               lag (t.z, 1) OVER (ORDER BY id )
+                                                     --                   prior_m,
+                                                     LAST_VALUE (id)
+                                                         OVER (
+                                                             ORDER BY id
+                                                             ROWS BETWEEN UNBOUNDED
+                                                                          PRECEDING
+                                                                  AND     UNBOUNDED
+                                                                          FOLLOWING)
+                                                         last_id,
+                                                     FIRST_VALUE (z)
+                                                         OVER (
+                                                             ORDER BY id
+                                                             ROWS BETWEEN UNBOUNDED
+                                                                          PRECEDING
+                                                                  AND     UNBOUNDED
+                                                                          FOLLOWING)
+                                                         start_m,
+                                                     LAST_VALUE (z)
+                                                         OVER (
+                                                             ORDER BY id
+                                                             ROWS BETWEEN UNBOUNDED
+                                                                          PRECEDING
+                                                                  AND     UNBOUNDED
+                                                                          FOLLOWING)
+                                                         end_m
+                                                FROM TABLE (
+                                                         SDO_UTIL.getvertices (
+                                                             geom)) t) q1))
+                             UNPIVOT EXCLUDE NULLS (VALUE
+                                                   FOR ordinate
+                                                   IN (A, B, C))
+                    ORDER BY id, ordinate);
+        END IF;
 
         RETURN retval;
     END;
@@ -869,15 +963,21 @@ AS
     IS
         retval   SDO_GEOMETRY;
     BEGIN
-        SELECT get_geom (CAST (COLLECT (nm_vertex (t.id,
-                                                   t.x,
-                                                   t.y,
-                                                   NULL,
-                                                   t.z)) AS nm_vertex_tab),
-                         geom.sdo_srid)
-          INTO retval
-          FROM TABLE (SDO_UTIL.getvertices (geom)) t
-         WHERE id = 1;
+        IF geom IS NULL
+        THEN
+            retval := NULL;
+        ELSE
+            SELECT get_geom (
+                       CAST (COLLECT (nm_vertex (t.id,
+                                                 t.x,
+                                                 t.y,
+                                                 NULL,
+                                                 t.z)) AS nm_vertex_tab),
+                       geom.sdo_srid)
+              INTO retval
+              FROM TABLE (SDO_UTIL.getvertices (geom)) t
+             WHERE id = 1;
+        END IF;
 
         RETURN retval;
     END;
@@ -888,18 +988,24 @@ AS
     IS
         retval   SDO_GEOMETRY;
     BEGIN
-        SELECT get_geom (CAST (COLLECT (v) AS nm_vertex_tab), geom.sdo_srid)
-          INTO retval
-          FROM (SELECT *
-                  FROM (SELECT MAX (id) OVER (PARTITION BY 1)    max_id,
-                               id,
-                               nm_vertex (t.id,
-                                          t.x,
-                                          t.y,
-                                          NULL,
-                                          t.z)                   v
-                          FROM TABLE (SDO_UTIL.getvertices (geom)) t)
-                 WHERE id = max_id);
+        IF geom IS NULL
+        THEN
+            retval := NULL;
+        ELSE
+            SELECT get_geom (CAST (COLLECT (v) AS nm_vertex_tab),
+                             geom.sdo_srid)
+              INTO retval
+              FROM (SELECT *
+                      FROM (SELECT MAX (id) OVER (PARTITION BY 1)    max_id,
+                                   id,
+                                   nm_vertex (t.id,
+                                              t.x,
+                                              t.y,
+                                              NULL,
+                                              t.z)                   v
+                              FROM TABLE (SDO_UTIL.getvertices (geom)) t)
+                     WHERE id = max_id);
+        END IF;
 
         RETURN retval;
     END;
@@ -908,18 +1014,23 @@ AS
         RETURN NUMBER
     IS
     BEGIN
-        IF geom.sdo_point.x IS NOT NULL
+        IF geom IS NULL
         THEN
-            RETURN geom.sdo_point.z;
-        ELSIF geom.sdo_gtype IN (3302,
-                                 3306,
-                                 3002,
-                                 3001,
-                                 3301)
-        THEN
-            RETURN round(geom.sdo_ordinates (3), g_round);
+            RETURN NULL;
         ELSE
-            raise_application_error (-20002, 'Invalid Geometry Type');
+            IF geom.sdo_point.x IS NOT NULL
+            THEN
+                RETURN geom.sdo_point.z;
+            ELSIF geom.sdo_gtype IN (3302,
+                                     3306,
+                                     3002,
+                                     3001,
+                                     3301)
+            THEN
+                RETURN ROUND (geom.sdo_ordinates (3), g_round);
+            ELSE
+                raise_application_error (-20002, 'Invalid Geometry Type');
+            END IF;
         END IF;
     END;
 
@@ -928,18 +1039,24 @@ AS
         RETURN NUMBER
     IS
     BEGIN
-        IF geom.sdo_point.x IS NOT NULL
+        IF geom IS NULL
         THEN
-            RETURN geom.sdo_point.z;
-        ELSIF geom.sdo_gtype IN (3302,
-                                 3306,
-                                 3002,
-                                 3001,
-                                 3301)
-        THEN
-            RETURN round(geom.sdo_ordinates (geom.sdo_ordinates.LAST), g_round);
+            RETURN NULL;
         ELSE
-            raise_application_error (-20002, 'Invalid Geometry Type');
+            IF geom.sdo_point.x IS NOT NULL
+            THEN
+                RETURN geom.sdo_point.z;
+            ELSIF geom.sdo_gtype IN (3302,
+                                     3306,
+                                     3002,
+                                     3001,
+                                     3301)
+            THEN
+                RETURN ROUND (geom.sdo_ordinates (geom.sdo_ordinates.LAST),
+                              g_round);
+            ELSE
+                raise_application_error (-20002, 'Invalid Geometry Type');
+            END IF;
         END IF;
     END;
 
@@ -995,57 +1112,60 @@ AS
     IS
         retval   SDO_GEOMETRY;
     BEGIN
-        IF geom.sdo_gtype IN (3302,
-                              3301,
-                              3002,
-                              3001,
-                              3306,
-                              3303)
+        IF geom IS NULL
         THEN
-              /* needs a case statement to cater for source gtypes of:
-              3301 - pt 2D +M
-              4401 - pt 3D +M
-              3302 - line 2D +M
-              4402 - line 3D +M
-              all others to be returned as an invalid geometry type
-              */
-              --if geom.sdo_gtype in (3302, 3301) then
-              SELECT sdo_geometry (
-                         CASE geom.sdo_gtype
-                             WHEN 3302 THEN 2002
-                             WHEN 3301 THEN 2001
-                             WHEN 3002 THEN 2002
-                             WHEN 3001 THEN 2001
-                             WHEN 3306 THEN 2002
-                             WHEN 3303 THEN 2003
-                         END,
-                         geom.sdo_srid,
-                         NULL,
-                         convert_to_std_elem_info (geom.sdo_elem_info),
-                         CAST (COLLECT (VALUE) AS sdo_ordinate_array))
-                -- sdo_geometry( geom.sdo_gtype,  geom.sdo_srid, NULL, sdo_elem_info_array(1,2,1), cast( collect (value) as sdo_ordinate_array))
-                --  when 3301 then
-                ---- sdo_geometry( case geom.sdo_gtype when 3302 then 2002 when 3301 then 2001 end, geom.sdo_srid, NULL, sdo_elem_info_array(1,2,1), cast( collect (value) as sdo_ordinate_array))
-                -- sdo_geometry( geom.sdo_gtype,  geom.sdo_srid, NULL, sdo_elem_info_array(1,2,1), cast( collect (value) as sdo_ordinate_array))
-                --else NULL
-                --end
-                INTO retval
-                FROM (  SELECT *
-                          FROM (SELECT ROW_NUMBER () OVER (ORDER BY 1)
-                                           rn,
-                                       t.COLUMN_VALUE
-                                           X,
-                                       LEAD (t.COLUMN_VALUE, 1) OVER (ORDER BY 1)
-                                           Y,
-                                       LEAD (t.COLUMN_VALUE, 2) OVER (ORDER BY 1)
-                                           Z
-                                  FROM TABLE (geom.sdo_ordinates) t)
-                         WHERE MOD (rn, 3) = 1
-                      ORDER BY rn)
-                     UNPIVOT EXCLUDE NULLS (VALUE FOR ordinate IN (X, Y))
-            ORDER BY rn, ordinate;
+            retval := NULL;
         ELSE
-            raise_application_error (-20002, 'Invalid geometry type');
+            IF geom.sdo_gtype IN (3302,
+                                  3301,
+                                  3002,
+                                  3001,
+                                  3306,
+                                  3303)
+            THEN
+                  /* needs a case statement to cater for source gtypes of:
+                  3301 - pt 2D +M
+                  4401 - pt 3D +M
+                  3302 - line 2D +M
+                  4402 - line 3D +M
+                  all others to be returned as an invalid geometry type
+                  */
+                  --if geom.sdo_gtype in (3302, 3301) then
+                  SELECT sdo_geometry (
+                             CASE geom.sdo_gtype
+                                 WHEN 3302 THEN 2002
+                                 WHEN 3301 THEN 2001
+                                 WHEN 3002 THEN 2002
+                                 WHEN 3001 THEN 2001
+                                 WHEN 3306 THEN 2002
+                                 WHEN 3303 THEN 2003
+                             END,
+                             geom.sdo_srid,
+                             NULL,
+                             convert_to_std_elem_info (geom.sdo_elem_info),
+                             CAST (COLLECT (VALUE) AS sdo_ordinate_array))
+                    -- sdo_geometry( geom.sdo_gtype,  geom.sdo_srid, NULL, sdo_elem_info_array(1,2,1), cast( collect (value) as sdo_ordinate_array))
+                    --  when 3301 then
+                    ---- sdo_geometry( case geom.sdo_gtype when 3302 then 2002 when 3301 then 2001 end, geom.sdo_srid, NULL, sdo_elem_info_array(1,2,1), cast( collect (value) as sdo_ordinate_array))
+                    -- sdo_geometry( geom.sdo_gtype,  geom.sdo_srid, NULL, sdo_elem_info_array(1,2,1), cast( collect (value) as sdo_ordinate_array))
+                    --else NULL
+                    --end
+                    INTO retval
+                    FROM (  SELECT *
+                              FROM (SELECT ROW_NUMBER () OVER (ORDER BY 1)    rn,
+                                           t.COLUMN_VALUE                     X,
+                                           LEAD (t.COLUMN_VALUE, 1)
+                                               OVER (ORDER BY 1)              Y,
+                                           LEAD (t.COLUMN_VALUE, 2)
+                                               OVER (ORDER BY 1)              Z
+                                      FROM TABLE (geom.sdo_ordinates) t)
+                             WHERE MOD (rn, 3) = 1
+                          ORDER BY rn)
+                         UNPIVOT EXCLUDE NULLS (VALUE FOR ordinate IN (X, Y))
+                ORDER BY rn, ordinate;
+            ELSE
+                raise_application_error (-20002, 'Invalid geometry type');
+            END IF;
         END IF;
 
         RETURN retval;
@@ -1057,11 +1177,16 @@ AS
     IS
         retval   SDO_GEOMETRY;
     BEGIN
-        IF geom.sdo_gtype = 2002 OR geom.sdo_gtype = 2001
+        IF geom IS NULL
         THEN
-            retval := nm_sdo.scale_geom_l (geom, geom_length);
+            retval := NULL;
         ELSE
-            raise_application_error (-20003, 'Invalid Geometry');
+            IF geom.sdo_gtype = 2002 OR geom.sdo_gtype = 2001
+            THEN
+                retval := nm_sdo.scale_geom_l (geom, geom_length);
+            ELSE
+                raise_application_error (-20003, 'Invalid Geometry');
+            END IF;
         END IF;
 
         RETURN retval;
@@ -1146,34 +1271,40 @@ AS
         geom_2d   SDO_GEOMETRY := geom;
         measure   ptr_num_array;
     BEGIN
-        IF nm_sdo_geom.get_dims (geom) = 3
+        IF geom IS NULL
         THEN
-            geom_2d := nm_sdo.convert_to_std_geom (geom);
-        --        ELSE
-        --            raise_application_error (
-        --                -20001,
-        --                'The linear geometry is expected to be of an LRS type');
+            retval := NULL;
+        ELSE
+            IF nm_sdo_geom.get_dims (geom) = 3
+            THEN
+                geom_2d := nm_sdo.convert_to_std_geom (geom);
+            --        ELSE
+            --            raise_application_error (
+            --                -20001,
+            --                'The linear geometry is expected to be of an LRS type');
+            END IF;
+
+            --
+            IF nm_sdo_geom.get_dims (pt) = 3
+            THEN
+                pt_2d := nm_sdo.convert_to_std_geom (pt);
+            END IF;
+
+            SDO_GEOM.SDO_CLOSEST_POINTS (geom_2d,
+                                         pt_2d,
+                                         tolerance,
+                                         'unit=METER',
+                                         dist,
+                                         retval,
+                                         lg);
+            --distance := dist;
+            measure := --ptr_num_array( ptr_num_array_type( ptr_num(1,20))); --
+                       get_measure_array (geom, retval, tolerance);
+
+            retval :=
+                nm_sdo_geom.set_pt_measure (retval, measure.pa (1).ptr_value);
         END IF;
 
-        --
-        IF nm_sdo_geom.get_dims (pt) = 3
-        THEN
-            pt_2d := nm_sdo.convert_to_std_geom (pt);
-        END IF;
-
-        SDO_GEOM.SDO_CLOSEST_POINTS (geom_2d,
-                                     pt_2d,
-                                     tolerance,
-                                     'unit=METER',
-                                     dist,
-                                     retval,
-                                     lg);
-        --distance := dist;
-        measure :=    --ptr_num_array( ptr_num_array_type( ptr_num(1,20))); --
-                   get_measure_array (geom, retval, tolerance);
-
-        retval :=
-            nm_sdo_geom.set_pt_measure (retval, measure.pa (1).ptr_value);
         --
         RETURN retval;
     END;
@@ -1190,35 +1321,41 @@ AS
         geom_2d   SDO_GEOMETRY := geom_segment;
         measure   ptr_num_array;
     BEGIN
-        IF nm_sdo_geom.get_dims (geom_segment) = 3
+        IF geom_segment IS NULL
         THEN
-            geom_2d := nm_sdo.convert_to_std_geom (geom_segment);
-        --        ELSE
-        --            raise_application_error (
-        --                -20001,
-        --                'The linear geometry is expected to be of an LRS type');
+            retval := NULL;
+        ELSE
+            IF nm_sdo_geom.get_dims (geom_segment) = 3
+            THEN
+                geom_2d := nm_sdo.convert_to_std_geom (geom_segment);
+            --        ELSE
+            --            raise_application_error (
+            --                -20001,
+            --                'The linear geometry is expected to be of an LRS type');
+            END IF;
+
+            --
+            IF nm_sdo_geom.get_dims (point) = 3
+            THEN
+                pt_2d := nm_sdo.convert_to_std_geom (point);
+            END IF;
+
+            SDO_GEOM.SDO_CLOSEST_POINTS (geom_2d,
+                                         pt_2d,
+                                         tolerance,
+                                         'unit=METER',
+                                         offset,
+                                         retval,
+                                         lg);
+            --distance := dist;
+            measure := --ptr_num_array( ptr_num_array_type( ptr_num(1,20))); --
+                       get_measure_array (geom_segment, retval, tolerance);
+
+            retval :=
+                nm_sdo_geom.set_pt_measure (retval, measure.pa (1).ptr_value);
+        --
         END IF;
 
-        --
-        IF nm_sdo_geom.get_dims (point) = 3
-        THEN
-            pt_2d := nm_sdo.convert_to_std_geom (point);
-        END IF;
-
-        SDO_GEOM.SDO_CLOSEST_POINTS (geom_2d,
-                                     pt_2d,
-                                     tolerance,
-                                     'unit=METER',
-                                     offset,
-                                     retval,
-                                     lg);
-        --distance := dist;
-        measure :=    --ptr_num_array( ptr_num_array_type( ptr_num(1,20))); --
-                   get_measure_array (geom_segment, retval, tolerance);
-
-        retval :=
-            nm_sdo_geom.set_pt_measure (retval, measure.pa (1).ptr_value);
-        --
         RETURN retval;
     END;
 
@@ -1230,11 +1367,17 @@ AS
         retval   SDO_GEOMETRY;
         dummy    NUMBER;
     BEGIN
-        retval :=
-            project_pt (geom_segment,
-                        point,
-                        tolerance,
-                        dummy);
+        IF geom_segment IS NULL
+        THEN
+            retval := NULL;
+        ELSE
+            retval :=
+                project_pt (geom_segment,
+                            point,
+                            tolerance,
+                            dummy);
+        END IF;
+
         RETURN retval;
     END;
 
@@ -1252,7 +1395,7 @@ AS
         geoma := nm_sdo.get_projection (p_pt_geom, p_lrs_geom, 0.005);
         --
         retval := nm_sdo.geom_segment_start_measure (geoma);
-        RETURN round(retval, g_round);
+        RETURN ROUND (retval, g_round);
     END;
 
     FUNCTION add_m (p_geom IN SDO_GEOMETRY)
@@ -1260,17 +1403,22 @@ AS
     IS
         retval   SDO_GEOMETRY := p_geom;
     BEGIN
-        IF p_geom.sdo_gtype = 2001
+        IF p_geom IS NULL
         THEN
-            IF p_geom.sdo_point IS NULL
+            retval := NULL;
+        ELSE
+            IF p_geom.sdo_gtype = 2001
             THEN
-                retval.sdo_ordinates.EXTEND;
-                retval.sdo_ordinates (3) := 0;
-            ELSE
-                retval.sdo_point.z := 0;
-            END IF;
+                IF p_geom.sdo_point IS NULL
+                THEN
+                    retval.sdo_ordinates.EXTEND;
+                    retval.sdo_ordinates (3) := 0;
+                ELSE
+                    retval.sdo_point.z := 0;
+                END IF;
 
-            retval.sdo_gtype := 3301;
+                retval.sdo_gtype := 3301;
+            END IF;
         END IF;
 
         RETURN retval;
@@ -1285,18 +1433,25 @@ AS
         l_old_end   NUMBER := nm_sdo.geom_segment_end_measure (geom);
         l_new_end   NUMBER := l_old_end - split_measure;
     BEGIN
-        geom1 :=
-            nm_sdo.clip (geom            => geom,
-                         start_measure   => 0,
-                         end_measure     => split_measure,
-                         tolerance       => tolerance);
-        geom2 :=
-            NM_SDO.SCALE_GEOM (nm_sdo.clip (
-                                   geom            => geom,
-                                   start_measure   => split_measure,
-                                   end_measure     =>
-                                       nm_sdo.geom_segment_end_measure (geom),
-                                   tolerance       => tolerance));
+        IF geom IS NULL
+        THEN
+            geom1 := NULL;
+            geom2 := NULL;
+        ELSE
+            geom1 :=
+                nm_sdo.clip (geom            => geom,
+                             start_measure   => 0,
+                             end_measure     => split_measure,
+                             tolerance       => tolerance);
+            geom2 :=
+                NM_SDO.SCALE_GEOM (nm_sdo.clip (
+                                       geom            => geom,
+                                       start_measure   => split_measure,
+                                       end_measure     =>
+                                           nm_sdo.geom_segment_end_measure (
+                                               geom),
+                                       tolerance       => tolerance));
+        END IF;
     END;
 
     FUNCTION get_terminations (geom IN SDO_GEOMETRY)
@@ -1617,10 +1772,12 @@ AS
     IS
         retval   NUMBER := SQRT (POWER ((x2 - x1), 2) + POWER ((y2 - y1), 2));
     BEGIN
-        RETURN round(retval, g_round);
+        RETURN ROUND (retval, g_round);
     END;
 
-    FUNCTION get_measure_array (lr_geom IN SDO_GEOMETRY, pts IN SDO_GEOMETRY, tolerance IN NUMBER DEFAULT 1.0e-8)
+    FUNCTION get_measure_array (lr_geom     IN SDO_GEOMETRY,
+                                pts         IN SDO_GEOMETRY,
+                                tolerance   IN NUMBER DEFAULT 1.0e-8)
         RETURN ptr_num_array
     IS
         retval   ptr_num_array := NM3ARRAY.INIT_PTR_NUM_ARRAY;
@@ -1674,9 +1831,11 @@ AS
                            WHERE m2 IS NOT NULL
                         ORDER BY pt_id, id) q1,
                        TABLE (nm_sdo.get_vertices (pt_geom))  t1
-                 WHERE     t1.x BETWEEN LEAST (x1, x2)-tolerance AND GREATEST (x1, x2)+tolerance
-                       AND t1.y BETWEEN LEAST (y1, y2)-tolerance AND GREATEST (y1, y2)+tolerance
-                       AND rownum = 1);
+                 WHERE     t1.x BETWEEN LEAST (x1, x2) - tolerance
+                                    AND GREATEST (x1, x2) + tolerance
+                       AND t1.y BETWEEN LEAST (y1, y2) - tolerance
+                                    AND GREATEST (y1, y2) + tolerance
+                       AND ROWNUM = 1);
 
         --
         RETURN retval;
@@ -1708,10 +1867,12 @@ AS
             END IF;
         END IF;
 
-        RETURN round(CASE l_dim
-                   WHEN 3 THEN point.sdo_ordinates (3)
-                   WHEN 4 THEN point.sdo_ordinates (4)
-               END, g_round);
+        RETURN ROUND (
+                   CASE l_dim
+                       WHEN 3 THEN point.sdo_ordinates (3)
+                       WHEN 4 THEN point.sdo_ordinates (4)
+                   END,
+                   g_round);
     END;
 
 
@@ -1903,9 +2064,10 @@ AS
             END IF;
         END LOOP;
 
-        if retval.sdo_gtype = 3002 then
-           retval.sdo_gtype := 3302;
-        end if;
+        IF retval.sdo_gtype = 3002
+        THEN
+            retval.sdo_gtype := 3302;
+        END IF;
 
         RETURN retval;
     END;
@@ -1994,9 +2156,11 @@ AS
         RETURN NUMBER
     IS
     BEGIN
-        RETURN round( ABS (
-                     geom_segment_end_measure (geom_segment)
-                   - geom_segment_start_measure (geom_segment)), g_round);
+        RETURN ROUND (
+                   ABS (
+                         geom_segment_end_measure (geom_segment)
+                       - geom_segment_start_measure (geom_segment)),
+                   g_round);
     END;
 
     FUNCTION geom_segment_length (geom_segment   IN SDO_GEOMETRY,
@@ -2004,9 +2168,11 @@ AS
         RETURN NUMBER
     IS
     BEGIN
-        RETURN round(ABS (
-                     geom_segment_end_measure (geom_segment)
-                   - geom_segment_start_measure (geom_segment)), g_round);
+        RETURN ROUND (
+                   ABS (
+                         geom_segment_end_measure (geom_segment)
+                       - geom_segment_start_measure (geom_segment)),
+                   g_round);
     END;
 
     FUNCTION offset_geom_segment (geom            IN SDO_GEOMETRY,
