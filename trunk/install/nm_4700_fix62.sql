@@ -1,11 +1,11 @@
 ----------------------------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm_4700_fix62.sql-arc   1.1   Apr 01 2019 15:03:12   Chris.Baugh  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm_4700_fix62.sql-arc   1.2   Apr 04 2019 15:37:44   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm_4700_fix62.sql  $ 
---       Date into PVCS   : $Date:   Apr 01 2019 15:03:12  $
---       Date fetched Out : $Modtime:   Apr 01 2019 15:00:38  $
---       Version     	  : $Revision:   1.1  $
+--       Date into PVCS   : $Date:   Apr 04 2019 15:37:44  $
+--       Date fetched Out : $Modtime:   Apr 04 2019 15:36:42  $
+--       Version     	  : $Revision:   1.2  $
 --
 ----------------------------------------------------------------------------------------------------
 --   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
@@ -106,11 +106,11 @@ SET FEEDBACK OFF
 --------------------------------------------------------------------------------
 --
 SET TERM ON 
-PROMPT creating View nm_asset_locations_b_ins.trg
+PROMPT creating View nm_inv_items_all_sdo_b_upd.trg
 SET TERM OFF
 --
 SET FEEDBACK ON
-START nm_asset_locations_b_ins.trg
+START nm_inv_items_all_sdo_b_upd.trg
 SET FEEDBACK OFF
 
 --
