@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm_sdo_geom
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm_sdo_geom.pkb-arc   1.1   Dec 18 2018 10:52:58   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm_sdo_geom.pkb-arc   1.2   Apr 04 2019 12:32:14   Rob.Coupe  $
     --       Module Name      : $Workfile:   nm_sdo_geom.pkb  $
-    --       Date into PVCS   : $Date:   Dec 18 2018 10:52:58  $
-    --       Date fetched Out : $Modtime:   Dec 17 2018 23:19:48  $
-    --       PVCS Version     : $Revision:   1.1  $
+    --       Date into PVCS   : $Date:   Apr 04 2019 12:32:14  $
+    --       Date fetched Out : $Modtime:   Apr 04 2019 12:30:54  $
+    --       PVCS Version     : $Revision:   1.2  $
     --
     --   Author : R.A. Coupe
     --
@@ -18,7 +18,7 @@ AS
     -- The main purpose of this package is to replicate the functions inside the SDO_LRS package as
     -- supplied under the MDSYS schema and licensed under the Oracle Spatial license on EE.
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.1  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.2  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'NM_SDO_GEOM';
 
@@ -316,7 +316,11 @@ AS
                                geom.sdo_srid,
                                NULL,
                                sdo_elem_info_array (1, 1, 1),
-                               sdo_ordinate_array (t.x, t.y, t.m))))
+                               case when dims = 3 then
+                               sdo_ordinate_array (t.x, t.y, t.m)
+                               else 
+                               sdo_ordinate_array(t.x, t.y)
+                               end)))
                        AS geom_id_tab)
           INTO retval
           FROM TABLE (nm_sdo.get_vertices (geom)) t;
