@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY nm_sdo
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm_sdo.pkb-arc   1.17   Apr 01 2019 17:23:22   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm_sdo.pkb-arc   1.18   Apr 04 2019 16:15:20   Rob.Coupe  $
     --       Module Name      : $Workfile:   nm_sdo.pkb  $
-    --       Date into PVCS   : $Date:   Apr 01 2019 17:23:22  $
-    --       Date fetched Out : $Modtime:   Apr 01 2019 17:21:40  $
-    --       PVCS Version     : $Revision:   1.17  $
+    --       Date into PVCS   : $Date:   Apr 04 2019 16:15:20  $
+    --       Date fetched Out : $Modtime:   Apr 04 2019 16:13:56  $
+    --       PVCS Version     : $Revision:   1.18  $
     --
     --   Author : R.A. Coupe
     --
@@ -19,7 +19,7 @@ AS
     -- The main purpose of this package is to replicate the functions inside the SDO_LRS package as
     -- supplied under the MDSYS schema and licensed under the Oracle Spatial license on EE.
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.17  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.18  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'NM_SDO';
 
@@ -739,27 +739,47 @@ AS
                        srid       IN INTEGER DEFAULT NULL)
         RETURN SDO_GEOMETRY
     IS
+        --only for point and line geometry
+
         retval   SDO_GEOMETRY;
         l_ords   sdo_ordinate_array;
+        v_c      INTEGER;                                      -- vertex count
+        v_t_c    INTEGER;                                 -- vertex type count
     BEGIN
-        SELECT CAST (COLLECT (ord_value) AS sdo_ordinate_array)
-          INTO l_ords
-          FROM (WITH
-                    vertex_list
-                    AS
-                        (SELECT t.*
-                           FROM TABLE (vertices) t)
-                  SELECT *
-                    FROM (SELECT id, 1 ordtype, x ord_value FROM vertex_list
-                          UNION ALL
-                          SELECT id, 2 ordtype, y ord_value FROM vertex_list
-                          UNION ALL
-                          SELECT id, 3 ordtype, m ord_value FROM vertex_list)
-                ORDER BY id, ordtype);
+          SELECT CAST (
+                     COLLECT (ord_value ORDER BY id, ord_type)
+                         AS sdo_ordinate_array),
+                 COUNT (DISTINCT ord_type),
+                 COUNT (*)
+            INTO l_ords, v_t_c, v_c
+            FROM (WITH
+                      vertex_list
+                      AS
+                          (SELECT t.*
+                             FROM TABLE (vertices) t)
+                  SELECT id, 1 ord_type, x ord_value
+                    FROM vertex_list
+                   WHERE x IS NOT NULL
+                  UNION ALL
+                  SELECT id, 2 ord_type, y ord_value
+                    FROM vertex_list
+                   WHERE y IS NOT NULL
+                  UNION ALL
+                  SELECT id, 3 ord_type, z ord_value
+                    FROM vertex_list
+                   WHERE z IS NOT NULL
+                  UNION ALL
+                  SELECT id, 4 ord_type, m ord_value
+                    FROM vertex_list
+                   WHERE m IS NOT NULL)
+        ORDER BY id, ord_type;
 
         retval :=
             sdo_geometry (
-                CASE WHEN l_ords.COUNT < 4 THEN 3301 ELSE 3302 END,
+                CASE v_t_c
+                    WHEN 3 THEN CASE WHEN v_c = 3 THEN 3301 ELSE 3302 END
+                    WHEN 2 THEN CASE WHEN v_c = 2 THEN 2001 ELSE 2002 END
+                END,
                 srid,
                 NULL,
                 CASE
