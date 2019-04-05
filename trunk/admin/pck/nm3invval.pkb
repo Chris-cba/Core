@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY nm3invval IS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3invval.pkb-arc   2.22   Mar 08 2019 11:16:26   Chris.Baugh  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3invval.pkb-arc   2.23   Apr 05 2019 15:48:48   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm3invval.pkb  $
---       Date into PVCS   : $Date:   Mar 08 2019 11:16:26  $
---       Date fetched Out : $Modtime:   Feb 20 2019 16:18:48  $
---       Version          : $Revision:   2.22  $
+--       Date into PVCS   : $Date:   Apr 05 2019 15:48:48  $
+--       Date fetched Out : $Modtime:   Apr 05 2019 15:47:00  $
+--       Version          : $Revision:   2.23  $
 --       Based on SCCS version : 1.30
 -------------------------------------------------------------------------
 --
@@ -19,7 +19,7 @@ CREATE OR REPLACE PACKAGE BODY nm3invval IS
 --   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.22  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.23  $"';
 --  g_body_sccsid is the SCCS ID for the package body
    g_package_name    CONSTANT  varchar2(30)   := 'nm3invval';
 --
@@ -1168,9 +1168,13 @@ BEGIN
    FOR l_count IN 1..g_tab_rec_date_chk.COUNT
     LOOP
       -- Deal with the record in a non-array style as it makes it simpler to read
-      l_rec_nii := g_tab_rec_date_chk(l_count);
+      IF g_tab_rec_date_chk.EXISTS(l_count)
+      THEN
+        l_rec_nii := g_tab_rec_date_chk(l_count);
 --
-      check_inv_dates (l_rec_nii);
+        check_inv_dates (l_rec_nii);
+		
+	  END IF;
 --
    END LOOP;
 --
