@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm3merge IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3merge.pkb-arc   2.20.1.0   Apr 03 2019 12:32:44   Steve.Cooper  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3merge.pkb-arc   2.20.1.1   Apr 10 2019 14:50:54   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3merge.pkb  $
---       Date into PVCS   : $Date:   Apr 03 2019 12:32:44  $
---       Date fetched Out : $Modtime:   Apr 03 2019 12:31:04  $
---       PVCS Version     : $Revision:   2.20.1.0  $
+--       Date into PVCS   : $Date:   Apr 10 2019 14:50:54  $
+--       Date fetched Out : $Modtime:   Apr 10 2019 11:03:30  $
+--       PVCS Version     : $Revision:   2.20.1.1  $
 --
 --   Author : ITurnbull
 --
@@ -16,7 +16,7 @@ CREATE OR REPLACE PACKAGE BODY nm3merge IS
 --   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.20.1.0  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.20.1.1  $"';
 --  g_body_sccsid is the SCCS ID for the package body
    g_package_name    CONSTANT  varchar2(30)   := 'nm3merge';
 --
@@ -692,9 +692,10 @@ PROCEDURE merge_other_products (p_ne_id_1        nm_elements.ne_id%TYPE
                                ,p_effective_date date                         DEFAULT TRUNC(SYSDATE)
                                ,p_node_id        nm_elements.ne_no_start%TYPE DEFAULT NULL
                                ) IS
-   l_node_id nm_elements.ne_no_start%TYPE := p_node_id;
-   l_block   varchar2(32767);
-   l_new_starting_section NUMBER;
+  l_Node_Id               Nm_Elements.Ne_No_Start%Type := P_Node_Id;
+  l_Block                 Varchar2(32767);
+  l_New_Starting_Section  Number;
+  l_Count                 Integer;
 BEGIN
 --
    nm_debug.proc_start(g_package_name,'merge_other_products');
@@ -812,23 +813,36 @@ BEGIN
    
    --NSG
    If Hig.Is_Product_Licensed( Nm3type.c_Nsg )  Then   
-            
-     Execute Immediate 'Begin'                                                                          ||  Chr(10) ||
-                       '  Nsg_Merge.Merge_Esu ('                                                        ||  Chr(10) || 
-                       '                      p_Old_Ne_Id_1             =>  :p_Ne_Id_1,'                ||  Chr(10) ||
-                       '                      p_Old_Ne_Id_2             =>  :p_Ne_Id_2,'                ||  Chr(10) ||
-                       '                      p_New_Ne_Id               =>  :p_Ne_Id_New,'              ||  Chr(10) ||
-                       '                      p_New_Starting_Ne_Id      =>  :p_New_Starting_Ne_Id,'     ||  Chr(10) ||
-                       '                      p_Flip_Cardinality_Of_2   =>  :p_Flip_Cardinality_Of_2,'  ||  Chr(10) ||                       
-                       '                      p_Effective_Date          =>  :p_Effective_Date'          ||  Chr(10) ||
-                       '                      );'                                                       ||  Chr(10) ||
-                       'End;'
-     Using In p_Ne_Id_1,
-              p_Ne_Id_2,
-              p_Ne_Id_New,
-              p_New_Starting_Ne_Id,
-              p_Flip_Cardinality_Of_2,
-              p_Effective_Date;
+    Begin
+      Select    Count(Ne_Id)
+      Into      l_Count  
+      From      Nm_Elements_All   nea
+      Where     Ne_Nt_Type  =     'ESU'
+      And       Ne_Id       In    (p_Ne_Id_1,p_Ne_Id_2);
+
+      --only do if both items are ESUS
+      If l_Count  = 2 Then
+       Execute Immediate 'Begin'                                                                          ||  Chr(10) ||
+                         '  Nsg_Merge.Merge_Esu ('                                                        ||  Chr(10) || 
+                         '                      p_Old_Ne_Id_1             =>  :p_Ne_Id_1,'                ||  Chr(10) ||
+                         '                      p_Old_Ne_Id_2             =>  :p_Ne_Id_2,'                ||  Chr(10) ||
+                         '                      p_New_Ne_Id               =>  :p_Ne_Id_New,'              ||  Chr(10) ||
+                         '                      p_New_Starting_Ne_Id      =>  :p_New_Starting_Ne_Id,'     ||  Chr(10) ||
+                         '                      p_Flip_Cardinality_Of_2   =>  :p_Flip_Cardinality_Of_2,'  ||  Chr(10) ||                       
+                         '                      p_Effective_Date          =>  :p_Effective_Date'          ||  Chr(10) ||
+                         '                      );'                                                       ||  Chr(10) ||
+                         'End;'
+       Using In p_Ne_Id_1,
+                p_Ne_Id_2,
+                p_Ne_Id_New,
+                p_New_Starting_Ne_Id,
+                p_Flip_Cardinality_Of_2,
+                p_Effective_Date;
+      End If;
+    Exception
+      When No_Data_Found Then
+        Null;
+    End;
    End If;
 --
    nm_debug.proc_end(g_package_name,'merge_other_products');
