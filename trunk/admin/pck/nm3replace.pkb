@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm3replace IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3replace.pkb-arc   2.11   Apr 16 2018 09:23:20   Gaurav.Gaurkar  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3replace.pkb-arc   2.12   Apr 10 2019 15:20:48   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3replace.pkb  $
---       Date into PVCS   : $Date:   Apr 16 2018 09:23:20  $
---       Date fetched Out : $Modtime:   Apr 16 2018 09:04:32  $
---       PVCS Version     : $Revision:   2.11  $
+--       Date into PVCS   : $Date:   Apr 10 2019 15:20:48  $
+--       Date fetched Out : $Modtime:   Apr 10 2019 15:15:56  $
+--       PVCS Version     : $Revision:   2.12  $
 --
 --
 --   Author : ITurnbull
@@ -17,7 +17,7 @@ CREATE OR REPLACE PACKAGE BODY nm3replace IS
 --   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.11  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.12  $"';
 --  g_body_sccsid is the SCCS ID for the package body
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3replace';
 
@@ -396,7 +396,8 @@ END get_body_version;
 	        					     ,p_effective_date nm_elements.ne_start_date%TYPE
 								     )
    IS
-    cr constant varchar2(1) := chr(10);
+    cr constant             varchar2(1) := chr(10);
+    l_Count                 Integer;
    BEGIN
 
 
@@ -482,17 +483,33 @@ END get_body_version;
 
      --NSG
      If Hig.Is_Product_Licensed(Nm3type.c_Nsg) Then
+      Begin
+        Select    Count(Ne_Id)
+        Into      l_Count  
+        From      Nm_Elements_All   nea
+        Where     Ne_Nt_Type  =     'ESU'
+        And       Ne_Id       In    (p_Ne_Id);
 
-       Execute Immediate  'Begin'                                                             || Chr(10) ||
-                          '  Nsg_Replace.Replace_Esu  ('                                      || Chr(10) ||
-                          '                           p_Old_Ne_Id       => :p_Ne_Id,'         || Chr(10) ||
-                          '                           p_New_Ne_Id       => :p_Ne_Id_New,'     || Chr(10) ||
-                          '                           p_Effective_Date  => :p_Effective_Date' || Chr(10) ||
-                          '                           );'                                     || Chr(10) ||
-                          'End;'
-        Using In p_Ne_Id,
-                 p_Ne_Id_New,
-                 p_Effective_Date;
+        --only do if both items are ESUS
+        If l_Count  = 2 Then
+
+
+          Execute Immediate  'Begin'                                                             || Chr(10) ||
+                            '  Nsg_Replace.Replace_Esu  ('                                      || Chr(10) ||
+                            '                           p_Old_Ne_Id       => :p_Ne_Id,'         || Chr(10) ||
+                            '                           p_New_Ne_Id       => :p_Ne_Id_New,'     || Chr(10) ||
+                            '                           p_Effective_Date  => :p_Effective_Date' || Chr(10) ||
+                            '                           );'                                     || Chr(10) ||
+                            'End;'
+          Using In p_Ne_Id,
+                   p_Ne_Id_New,
+                   p_Effective_Date;
+
+        End If;
+      Exception
+        When No_Data_Found Then
+          Null;
+      End;
 
      End If;
    END replace_other_products;
