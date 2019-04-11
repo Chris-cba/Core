@@ -3,11 +3,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm4700_nm4800_upg.sql-arc   1.5   Apr 08 2019 14:30:40   Chris.Baugh  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm4700_nm4800_upg.sql-arc   1.6   Apr 11 2019 10:00:06   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm4700_nm4800_upg.sql  $
---       Date into PVCS   : $Date:   Apr 08 2019 14:30:40  $
---       Date fetched Out : $Modtime:   Mar 29 2019 10:05:56  $
---       Version          : $Revision:   1.5  $
+--       Date into PVCS   : $Date:   Apr 11 2019 10:00:06  $
+--       Date fetched Out : $Modtime:   Apr 11 2019 09:59:22  $
+--       Version          : $Revision:   1.6  $
 --
 --   Product upgrade script
 --
@@ -315,7 +315,7 @@ Prompt Applying SDO_LRS replacement, if Oracle Spatial not installed...
 SET TERM OFF
 
 select decode(count(*), 0 , '&exor_base'||'nm3'||'&terminator'||'install'||'&terminator'||'install_sdo_lrs_replacement',
-                            '&exor_base'||'nm3'||'&terminator'||'install'||'&terminator'||'dummy')
+                            '&exor_base'||'nm3'||'&terminator'||'install'||'&terminator'||'dummy') run_file
 from dba_registry 
 where comp_name='Spatial'
 and status = 'VALID'
