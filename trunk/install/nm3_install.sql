@@ -1,11 +1,11 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/nm3_install.sql-arc   2.48   Apr 08 2019 14:31:00   Chris.Baugh  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/nm3_install.sql-arc   2.49   Apr 11 2019 09:59:46   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm3_install.sql  $
---       Date into PVCS   : $Date:   Apr 08 2019 14:31:00  $
---       Date fetched Out : $Modtime:   Mar 29 2019 10:06:28  $
---       PVCS Version     : $Revision:   2.48  $
+--       Date into PVCS   : $Date:   Apr 11 2019 09:59:46  $
+--       Date fetched Out : $Modtime:   Apr 11 2019 09:58:54  $
+--       PVCS Version     : $Revision:   2.49  $
 --
 --------------------------------------------------------------------------------
 --   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
@@ -470,7 +470,7 @@ Prompt Applying SDO_LRS replacement, if Oracle Spatial not installed...
 SET TERM OFF
 
 select decode(count(*), 0 , '&exor_base'||'nm3'||'&terminator'||'install'||'&terminator'||'install_sdo_lrs_replacement',
-                            '&exor_base'||'nm3'||'&terminator'||'install'||'&terminator'||'dummy')
+                            '&exor_base'||'nm3'||'&terminator'||'install'||'&terminator'||'dummy') run_file
 from dba_registry 
 where comp_name='Spatial'
 and status = 'VALID'
