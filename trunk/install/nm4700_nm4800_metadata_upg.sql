@@ -7,11 +7,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm4700_nm4800_metadata_upg.sql-arc   1.0   Jan 09 2019 10:25:36   Chris.Baugh  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm4700_nm4800_metadata_upg.sql-arc   1.1   Apr 12 2019 16:29:02   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm4700_nm4800_metadata_upg.sql  $
---       Date into PVCS   : $Date:   Jan 09 2019 10:25:36  $
---       Date fetched Out : $Modtime:   Dec 18 2018 11:00:48  $
---       Version          : $Revision:   1.0  $
+--       Date into PVCS   : $Date:   Apr 12 2019 16:29:02  $
+--       Date fetched Out : $Modtime:   Apr 12 2019 16:27:30  $
+--       Version          : $Revision:   1.1  $
 --
 ------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2014
@@ -678,7 +678,7 @@ INSERT INTO HIG_PRODUCTS
        ,HPR_IMAGE_TYPE
        )
 SELECT 
-        'PS '
+        'PS'
        ,'Professional Services Changes'
        ,'4.0.2.0'
        ,''
@@ -835,8 +835,9 @@ SET TERM OFF
 INSERT INTO GRI_PARAMS (GP_PARAM,                        GP_PARAM_TYPE,                        GP_TABLE,                        GP_COLUMN,                        GP_DESCR_COLUMN,                        GP_SHOWN_COLUMN,                        GP_SHOWN_TYPE,                        GP_DESCR_TYPE,                        GP_ORDER,                        GP_CASE,                        GP_GAZ_RESTRICTION)   SELECT 'HUS_STATUS',          'CHAR',          'GRI_PARAM_LOOKUP',          'GPL_VALUE',          'GPL_DESCR',          'GPL_VALUE',          'CHAR',          'CHAR',          NULL,          NULL,          NULL     FROM DUAL    WHERE NOT EXISTS             (SELECT 1                FROM GRI_PARAMS               WHERE GP_PARAM = 'HUS_STATUS');--INSERT INTO GRI_MODULE_PARAMS (GMP_MODULE,                               GMP_PARAM,                               GMP_SEQ,                               GMP_PARAM_DESCR,                               GMP_MANDATORY,                               GMP_NO_ALLOWED,                               GMP_WHERE,                               GMP_TAG_RESTRICTION,                               GMP_TAG_WHERE,                               GMP_DEFAULT_TABLE,                               GMP_DEFAULT_COLUMN,                               GMP_DEFAULT_WHERE,                               GMP_VISIBLE,                               GMP_GAZETTEER,                               GMP_LOV,                               GMP_VAL_GLOBAL,                               GMP_WILDCARD,                               GMP_HINT_TEXT,                               GMP_ALLOW_PARTIAL,                               GMP_BASE_TABLE,                               GMP_BASE_TABLE_COLUMN,                               GMP_OPERATOR)   SELECT 'HIG1864',          'HUS_STATUS',          3,          'Include End Dated?',          'N',          1,          'GPL_PARAM=''HUS_STATUS''',          'N',          NULL,          'GRI_PARAM_LOOKUP',          'GPL_VALUE',          'GPL_VALUE=''N'' AND GPL_PARAM=''HUS_STATUS''',          'Y',          'N',          'Y',          NULL,          'N',          'Include end dated users?',          'N',          NULL,          NULL,          NULL     FROM DUAL    WHERE NOT EXISTS             (SELECT 1                FROM GRI_MODULE_PARAMS               WHERE GMP_MODULE = 'HIG1864' AND GMP_PARAM = 'HUS_STATUS');--INSERT INTO GRI_PARAM_LOOKUP (GPL_PARAM, GPL_VALUE, GPL_DESCR)   SELECT 'HUS_STATUS', 'Y', 'Yes'     FROM DUAL    WHERE NOT EXISTS             (SELECT 1                FROM GRI_PARAM_LOOKUP               WHERE GPL_PARAM = 'HUS_STATUS' AND GPL_VALUE = 'Y');--INSERT INTO GRI_PARAM_LOOKUP (GPL_PARAM, GPL_VALUE, GPL_DESCR)   SELECT 'HUS_STATUS', 'N', 'No'     FROM DUAL    WHERE NOT EXISTS             (SELECT 1                FROM GRI_PARAM_LOOKUP               WHERE GPL_PARAM = 'HUS_STATUS' AND GPL_VALUE = 'N');
 ------------------------------------------------------------------
 SET TERM ON
-PROMPT Removal of USEORIGHU product option
+PROMPT Removal of USEORIGHU product option
 SET TERM OFF
+
 DELETE FROM hig_option_list
 WHERE hol_id = 'USEORIGHU';
 ------------------------------------------------------------------
