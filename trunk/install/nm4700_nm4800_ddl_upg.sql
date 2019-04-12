@@ -7,11 +7,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm4700_nm4800_ddl_upg.sql-arc   1.1   Apr 10 2019 10:52:28   Chris.Baugh  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm4700_nm4800_ddl_upg.sql-arc   1.2   Apr 12 2019 14:44:04   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm4700_nm4800_ddl_upg.sql  $
---       Date into PVCS   : $Date:   Apr 10 2019 10:52:28  $
---       Date fetched Out : $Modtime:   Apr 10 2019 10:47:18  $
---       Version          : $Revision:   1.1  $
+--       Date into PVCS   : $Date:   Apr 12 2019 14:44:04  $
+--       Date fetched Out : $Modtime:   Apr 12 2019 14:37:54  $
+--       Version          : $Revision:   1.2  $
 --
 ------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2014
@@ -480,20 +480,48 @@ CONSTRAINT niaggr_fk_nit
 SET TERM ON
 PROMPT nm_4700_fix31
 SET TERM OFF
-RENAME NM_AU_TYPES TO NM_AU_TYPES_FULL
+DECLARE
+ object_exists exception;
+ pragma exception_init (object_exists,-955);
+BEGIN
+  EXECUTE IMMEDIATE 'RENAME NM_AU_TYPES TO NM_AU_TYPES_FULL';
+EXCEPTION
+  WHEN object_exists THEN
+    Null;
+   WHEN others THEN
+     RAISE;
+END;
 /
 
-ALTER TABLE nm_au_types_FULL
-   ADD nat_exclusive VARCHAR2 (1) DEFAULT 'Y'
+DECLARE
+ col_exists exception;
+ pragma exception_init (col_exists,-1430);
+BEGIN
+  EXECUTE IMMEDIATE 'ALTER TABLE nm_au_types_FULL ADD nat_exclusive VARCHAR2 (1) DEFAULT ''Y''';
+EXCEPTION
+  WHEN col_exists THEN
+    Null;
+   WHEN others THEN
+     RAISE;
+END;
 /
 
-ALTER TABLE NM_AU_TYPES_FULL ADD
-CONSTRAINT NM_AU_TYPES_EXCL_YN
- CHECK (nat_exclusive IN ('Y', 'N'))
- ENABLE
- VALIDATE
+DECLARE
+ con_exists exception;
+ pragma exception_init (con_exists,-2264);
+BEGIN
+  EXECUTE IMMEDIATE 'ALTER TABLE NM_AU_TYPES_FULL ADD '||
+                    'CONSTRAINT NM_AU_TYPES_EXCL_YN '||
+                    'CHECK (nat_exclusive IN (''Y'', ''N'')) '||
+                    'ENABLE '||
+                    'VALIDATE';
+EXCEPTION
+  WHEN con_exists THEN
+    Null;
+   WHEN others THEN
+     RAISE;
+END;
 /
-
 DECLARE
  trigger_not_exists exception;
  pragma exception_init (trigger_not_exists,-4080);
