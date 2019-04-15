@@ -1,13 +1,12 @@
-/* Formatted on 01/04/2019 17:13:22 (QP5 v5.336) */
 CREATE OR REPLACE PACKAGE BODY nm_sdo
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm_sdo.pkb-arc   1.18   Apr 04 2019 16:15:20   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm_sdo.pkb-arc   1.19   Apr 15 2019 16:20:32   Rob.Coupe  $
     --       Module Name      : $Workfile:   nm_sdo.pkb  $
-    --       Date into PVCS   : $Date:   Apr 04 2019 16:15:20  $
-    --       Date fetched Out : $Modtime:   Apr 04 2019 16:13:56  $
-    --       PVCS Version     : $Revision:   1.18  $
+    --       Date into PVCS   : $Date:   Apr 15 2019 16:20:32  $
+    --       Date fetched Out : $Modtime:   Apr 15 2019 16:19:16  $
+    --       PVCS Version     : $Revision:   1.19  $
     --
     --   Author : R.A. Coupe
     --
@@ -19,7 +18,7 @@ AS
     -- The main purpose of this package is to replicate the functions inside the SDO_LRS package as
     -- supplied under the MDSYS schema and licensed under the Oracle Spatial license on EE.
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.18  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.19  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'NM_SDO';
 
@@ -620,7 +619,7 @@ AS
                                            ELSE
                                                cum_length
                                        END
-                                     / NVL (measured_length, total_length),
+                                     / case reuse_scale when 'Y' then NVL (measured_length, total_length) else total_length end,
                                      0)
                                + NVL (start_measure, 0))) AS nm_vertex_tab)
               INTO retval
