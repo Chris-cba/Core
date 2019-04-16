@@ -7,11 +7,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm4700_nm4800_ddl_upg.sql-arc   1.2   Apr 12 2019 14:44:04   Chris.Baugh  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm4700_nm4800_ddl_upg.sql-arc   1.3   Apr 16 2019 12:31:02   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm4700_nm4800_ddl_upg.sql  $
---       Date into PVCS   : $Date:   Apr 12 2019 14:44:04  $
---       Date fetched Out : $Modtime:   Apr 12 2019 14:37:54  $
---       Version          : $Revision:   1.2  $
+--       Date into PVCS   : $Date:   Apr 16 2019 12:31:02  $
+--       Date fetched Out : $Modtime:   Apr 16 2019 12:14:10  $
+--       Version          : $Revision:   1.3  $
 --
 ------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2014
@@ -644,8 +644,33 @@ DECLARE table_exists exception; pragma exception_init (table_exists,-955);BEG
 SET TERM ON
 PROMPT nm_4700_fix59
 SET TERM OFF
-CREATE INDEX nex_ind1 ON nm_element_xrefs(nex_id1);
-CREATE INDEX nex_ind2 ON nm_element_xrefs(nex_id2);
+DECLARE
+  obj_exists EXCEPTION;
+  PRAGMA exception_init( obj_exists, -955);
+BEGIN
+  EXECUTE IMMEDIATE 'CREATE INDEX nex_ind1 ON nm_element_xrefs(nex_id1)';
+EXCEPTION
+  WHEN obj_exists THEN
+    NULL;
+  WHEN OTHERS THEN 
+    RAISE;
+END;
+/
+
+DECLARE
+  obj_exists EXCEPTION;
+  PRAGMA exception_init( obj_exists, -955);
+BEGIN
+  EXECUTE IMMEDIATE 'CREATE INDEX nex_ind2 ON nm_element_xrefs(nex_id2)';
+EXCEPTION
+  WHEN obj_exists THEN
+    NULL;
+  WHEN OTHERS THEN 
+    RAISE;
+END;
+/
+
+
 
 ------------------------------------------------------------------
 SET TERM ON
@@ -2047,71 +2072,174 @@ END;
 SET TERM ON
 PROMPT Location Bridge Sequences
 SET TERM OFF
+/* Formatted on 16-Apr-19 11:57:24 AM (QP5 v5.300) */
 PROMPT Creating Sequence 'LB_TRANSACTION_ID_SEQ'
-CREATE SEQUENCE LB_TRANSACTION_ID_SEQ
- START WITH 1
- NOMAXVALUE
- NOMINVALUE
- NOCYCLE
+
+DECLARE
+    obj_exists   EXCEPTION;
+    PRAGMA EXCEPTION_INIT (obj_exists, -955);
+BEGIN
+    EXECUTE IMMEDIATE 'CREATE SEQUENCE LB_TRANSACTION_ID_SEQ
+                       START WITH 1
+                       NOMAXVALUE
+                       NOMINVALUE
+                       NOCYCLE';
+EXCEPTION
+    WHEN obj_exists
+    THEN
+        NULL;
+    WHEN OTHERS
+    THEN
+        RAISE;
+END;
 /
 
 PROMPT Creating Sequence 'NAG_ID_SEQ'
-CREATE SEQUENCE NAG_ID_SEQ
- START WITH 1
- NOMAXVALUE
- NOMINVALUE
- NOCYCLE
+
+DECLARE
+    obj_exists   EXCEPTION;
+    PRAGMA EXCEPTION_INIT (obj_exists, -955);
+BEGIN
+    EXECUTE IMMEDIATE 'CREATE SEQUENCE NAG_ID_SEQ
+                       START WITH 1
+                       NOMAXVALUE
+                       NOMINVALUE
+                       NOCYCLE';
+EXCEPTION
+    WHEN obj_exists
+    THEN
+        NULL;
+    WHEN OTHERS
+    THEN
+        RAISE;
+END;
 /
 
 PROMPT Creating Sequence 'NAJX_ID_SEQ'
-CREATE SEQUENCE NAJX_ID_SEQ
- START WITH 1
- NOMAXVALUE
- NOMINVALUE
- NOCYCLE
+
+DECLARE
+    obj_exists   EXCEPTION;
+    PRAGMA EXCEPTION_INIT (obj_exists, -955);
+BEGIN
+    EXECUTE IMMEDIATE 'CREATE SEQUENCE NAJX_ID_SEQ
+                       START WITH 1
+                       NOMAXVALUE
+                       NOMINVALUE
+                       NOCYCLE';
+EXCEPTION
+    WHEN obj_exists
+    THEN
+        NULL;
+    WHEN OTHERS
+    THEN
+        RAISE;
+END;
 /
 
 PROMPT Creating Sequence 'NAL_ID_SEQ'
-CREATE SEQUENCE NAL_ID_SEQ
- START WITH 1
- NOMAXVALUE
- NOMINVALUE
- NOCYCLE
+
+DECLARE
+    obj_exists   EXCEPTION;
+    PRAGMA EXCEPTION_INIT (obj_exists, -955);
+BEGIN
+    EXECUTE IMMEDIATE 'CREATE SEQUENCE NAL_ID_SEQ
+                       START WITH 1
+                       NOMAXVALUE
+                       NOMINVALUE
+                       NOCYCLE';
+EXCEPTION
+    WHEN obj_exists
+    THEN
+        NULL;
+    WHEN OTHERS
+    THEN
+        RAISE;
+END;
 /
 
 PROMPT Creating Sequence 'NJXT_ID_SEQ'
-CREATE SEQUENCE NJXT_ID_SEQ
- START WITH 1
- NOMAXVALUE
- NOMINVALUE
- NOCYCLE
+
+DECLARE
+    obj_exists   EXCEPTION;
+    PRAGMA EXCEPTION_INIT (obj_exists, -955);
+BEGIN
+    EXECUTE IMMEDIATE 'CREATE SEQUENCE NJXT_ID_SEQ
+                       START WITH 1
+                       NOMAXVALUE
+                       NOMINVALUE
+                       NOCYCLE';
+EXCEPTION
+    WHEN obj_exists
+    THEN
+        NULL;
+    WHEN OTHERS
+    THEN
+        RAISE;
+END;
 /
 
 PROMPT Creating Sequence 'NJX_ID_SEQ'
-CREATE SEQUENCE NJX_ID_SEQ
- START WITH 1
- NOMAXVALUE
- NOMINVALUE
- NOCYCLE
+
+DECLARE
+    obj_exists   EXCEPTION;
+    PRAGMA EXCEPTION_INIT (obj_exists, -955);
+BEGIN
+    EXECUTE IMMEDIATE 'CREATE SEQUENCE NJX_ID_SEQ
+                       START WITH 1
+                       NOMAXVALUE
+                       NOMINVALUE
+                       NOCYCLE';
+EXCEPTION
+    WHEN obj_exists
+    THEN
+        NULL;
+    WHEN OTHERS
+    THEN
+        RAISE;
+END;
 /
 
 PROMPT Creating Sequence 'NLG_ID_SEQ'
-CREATE SEQUENCE NLG_ID_SEQ
- START WITH 1
- NOMAXVALUE
- NOMINVALUE
- NOCYCLE
+
+DECLARE
+    obj_exists   EXCEPTION;
+    PRAGMA EXCEPTION_INIT (obj_exists, -955);
+BEGIN
+    EXECUTE IMMEDIATE 'CREATE SEQUENCE NLG_ID_SEQ
+                       START WITH 1
+                       NOMAXVALUE
+                       NOMINVALUE
+                       NOCYCLE';
+EXCEPTION
+    WHEN obj_exists
+    THEN
+        NULL;
+    WHEN OTHERS
+    THEN
+        RAISE;
+END;
 /
 
 PROMPT Creating Sequence 'NM_LOC_ID_SEQ'
-CREATE SEQUENCE NM_LOC_ID_SEQ
- START WITH 1
- NOMAXVALUE
- NOMINVALUE
- NOCYCLE
+
+DECLARE
+    obj_exists   EXCEPTION;
+    PRAGMA EXCEPTION_INIT (obj_exists, -955);
+BEGIN
+    EXECUTE IMMEDIATE 'CREATE SEQUENCE NM_LOC_ID_SEQ
+                       START WITH 1
+                       NOMAXVALUE
+                       NOMINVALUE
+                       NOCYCLE';
+EXCEPTION
+    WHEN obj_exists
+    THEN
+        NULL;
+    WHEN OTHERS
+    THEN
+        RAISE;
+END;
 /
-
-
 
 ------------------------------------------------------------------
 -- end of script 
