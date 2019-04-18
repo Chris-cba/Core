@@ -3,11 +3,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/typ/nm3typ.sql-arc   2.16   Jan 22 2019 09:31:08   Chris.Baugh  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/typ/nm3typ.sql-arc   2.17   Apr 18 2019 12:23:36   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm3typ.sql  $
---       Date into PVCS   : $Date:   Jan 22 2019 09:31:08  $
---       Date fetched Out : $Modtime:   Jan 22 2019 09:15:46  $
---       Version          : $Revision:   2.16  $
+--       Date into PVCS   : $Date:   Apr 18 2019 12:23:36  $
+--       Date fetched Out : $Modtime:   Apr 18 2019 12:22:12  $
+--       Version          : $Revision:   2.17  $
 --
 --   Product upgrade script
 --
@@ -252,6 +252,7 @@ BEGIN
   drop_type('LB_SNAP');
   drop_type('LB_LINEAR_ELEMENT_TYPES');
   drop_type('LB_LINEAR_ELEMENT_TYPE');
+  drop_type('LB_XRPT_TAB');
   --
 END;
 /
