@@ -3,11 +3,11 @@ SELECT
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/views/v_node_proximity_check.vw-arc   1.1   Apr 13 2018 11:47:26   Gaurav.Gaurkar  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/views/v_node_proximity_check.vw-arc   1.2   Apr 18 2019 14:56:50   Chris.Baugh  $
 --       Module Name      : $Workfile:   v_node_proximity_check.vw  $
---       Date into PVCS   : $Date:   Apr 13 2018 11:47:26  $
---       Date fetched Out : $Modtime:   Apr 13 2018 11:44:40  $
---       Version          : $Revision:   1.1  $
+--       Date into PVCS   : $Date:   Apr 18 2019 14:56:50  $
+--       Date fetched Out : $Modtime:   Mar 29 2019 09:35:38  $
+--       Version          : $Revision:   1.2  $
 --
 --   Product upgrade script
 --
@@ -49,7 +49,8 @@ SELECT
                                       END elem_shape 
                                  FROM nm_elements  
                                 WHERE ne_id = TO_NUMBER(SYS_CONTEXT('NM3SQL', 'PROX_NE_ID')))t ) 
-              SELECT ne_id,
+              SELECT /*+INDEX(n NN_NP_FK_IND) INDEX(p NM_POINT_LOCATIONS_SPIDX) */
+			         ne_id,
                      n.no_node_id,
                      n.no_node_name,
                      no_descr,
