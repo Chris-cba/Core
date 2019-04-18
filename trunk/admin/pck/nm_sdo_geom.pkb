@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm_sdo_geom
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm_sdo_geom.pkb-arc   1.3   Apr 12 2019 09:48:48   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm_sdo_geom.pkb-arc   1.4   Apr 18 2019 21:41:06   Rob.Coupe  $
     --       Module Name      : $Workfile:   nm_sdo_geom.pkb  $
-    --       Date into PVCS   : $Date:   Apr 12 2019 09:48:48  $
-    --       Date fetched Out : $Modtime:   Apr 12 2019 09:46:42  $
-    --       PVCS Version     : $Revision:   1.3  $
+    --       Date into PVCS   : $Date:   Apr 18 2019 21:41:06  $
+    --       Date fetched Out : $Modtime:   Apr 18 2019 21:40:28  $
+    --       PVCS Version     : $Revision:   1.4  $
     --
     --   Author : R.A. Coupe
     --
@@ -18,7 +18,7 @@ AS
     -- The main purpose of this package is to replicate the functions inside the SDO_LRS package as
     -- supplied under the MDSYS schema and licensed under the Oracle Spatial license on EE.
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.3  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.4  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'NM_SDO_GEOM';
 
@@ -127,7 +127,8 @@ AS
         ELSIF geom.sdo_gtype IN (3302,
                                  3002,
                                  3306,
-                                 3006)
+                                 3006,
+								 2006)
         THEN
             SELECT g_id
               INTO retval
