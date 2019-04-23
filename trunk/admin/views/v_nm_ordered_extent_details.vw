@@ -4,7 +4,20 @@ CREATE OR REPLACE FORCE VIEW V_NM_ORDERED_EXTENT_DETAILS
  NM_SLK_STORED, NM_END_SLK_STORED, NM_CALC_SEG_NO, NM_CALC_SEQ_NO, NM_SLK_CALC, NM_END_SLK_CALC, 
  WHOLE_OR_PART, SLK_DIFFERENCE, GAP_OR_OVRL_STORED, GAP_OR_OVRL_CALC)
 AS 
-SELECT SYS_CONTEXT ('NM3SQL', 'ORDERED_EXTENT') nm_ne_id_in,
+SELECT 
+-------------------------------------------------------------------------
+                   --   PVCS Identifiers :-
+                   --       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/views/v_nm_ordered_extent_details.vw-arc   1.1   Apr 23 2019 12:17:48   Rob.Coupe  $
+                   --       Module Name      : $Workfile:   v_nm_ordered_extent_details.vw  $
+                   --       Date into PVCS   : $Date:   Apr 23 2019 12:17:48  $
+                   --       Date fetched Out : $Modtime:   Apr 23 2019 12:17:32  $
+                               --       Version          : $Revision:   1.1  $
+--------------------------------------------------------------------------
+--   Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
+--------------------------------------------------------------------------
+                                                                          ----
+
+          SYS_CONTEXT ('NM3SQL', 'ORDERED_EXTENT') nm_ne_id_in,
           ne_id nm_ne_id_of,
           s_ne,
           ne_nt_type,
