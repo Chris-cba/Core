@@ -4,11 +4,11 @@ AS
     --------------------------------------------------------------------------------
     --   PVCS Identifiers :-
     --
-    --       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3rsc.pkb-arc   2.22   May 11 2018 10:59:56   Chris.Baugh  $
+    --       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3rsc.pkb-arc   2.23   Apr 23 2019 12:21:40   Rob.Coupe  $
     --       Module Name      : $Workfile:   nm3rsc.pkb  $
-    --       Date into PVCS   : $Date:   May 11 2018 10:59:56  $
-    --       Date fetched Out : $Modtime:   May 11 2018 10:56:40  $
-    --       PVCS Version     : $Revision:   2.22  $
+    --       Date into PVCS   : $Date:   Apr 23 2019 12:21:40  $
+    --       Date fetched Out : $Modtime:   Apr 23 2019 12:20:50  $
+    --       PVCS Version     : $Revision:   2.23  $
     --
     --   Author : R.A. Coupe
     --
@@ -20,7 +20,7 @@ AS
     --
     --all global package variables here
     --
-    g_body_sccsid    CONSTANT VARCHAR2 (30) := '"$Revision:   2.22  $"';
+    g_body_sccsid    CONSTANT VARCHAR2 (30) := '"$Revision:   2.23  $"';
 
     --  g_body_sccsid is the SCCS ID for the package body
     --
@@ -300,6 +300,27 @@ AS
         THEN
             RETURN TRUE;
     END;
+
+    FUNCTION loop_check_nte
+        RETURN BOOLEAN
+    IS
+        dummy   INTEGER;
+    BEGIN
+        SELECT 1
+          INTO dummy
+          FROM DUAL
+         WHERE     EXISTS (SELECT 1 FROM v_nm_ordered_extent)    -- not empty
+               AND EXISTS
+                       (SELECT 1
+                          FROM v_nm_ordered_extent
+                         WHERE NVL (has_prior, 0) != 1); -- check for no terminations
+
+        RETURN FALSE;
+    EXCEPTION
+        WHEN NO_DATA_FOUND
+        THEN
+            RETURN TRUE;
+    END;    
 
     --
     -----------------------------------------------------------------------------
@@ -1890,9 +1911,9 @@ AS
             instantiate_from_route_nte (p_nte_job_id, p_route_id);
         END IF;
 
-        set_start_points;
-
-        connect_route (p_nte_job_id, 0, p_start_ne);
+--        set_start_points;
+--
+--        connect_route (p_nte_job_id, 0, p_start_ne);
 
         retval := get_rescaled_pl;
     END rescale_temp_ne;
@@ -1970,8 +1991,10 @@ AS
         --trap the dup val on index - only possible with an unsuitable temp ne - one with
         --the same element in the extent more than once.
 
+        nm3ctx.set_context('ORDERED_EXTENT', to_char(p_nte_job_id));
+
         BEGIN
-            INSERT INTO nm_rescale_write (ne_id,
+                    INSERT INTO nm_rescale_write (ne_id,
                                           ne_no_start,
                                           ne_no_end,
                                           ne_length,
@@ -1986,28 +2009,27 @@ AS
                                           nm_end_mp,
                                           s_ne_id,
                                           connect_level)
-                SELECT ne_id,
-                       ne_no_start,
-                       ne_no_end,
+                SELECT nm_ne_id_of,
+                       case nm_cardinality when 1 then start_node else end_node end, 
+                       case nm_cardinality when -1 then start_node else end_node end, 
                        ne_length,
-                       NULL,
-                       NULL,
-                       NULL,
-                       NULL,
+                       nm_slk_calc,
+                       nm_slk_calc,
+                       1,
+                       nm_calc_seq_no,
                        ne_nt_type,
-                       nte_cardinality,
+                       nm_cardinality,
                        DECODE (
                            g_use_sub_class,
                            'Y', TO_CHAR (
                                     nm3net.get_sub_class_seq (g_gty,
                                                               ne_sub_class)),
                            NULL),
-                       nte_begin_mp,
-                       nte_end_mp,
-                       NULL,
+                       nm_begin_mp,
+                       nm_end_mp,
+                       s_ne_id,
                        NULL
-                  FROM nm_elements, nm_nw_temp_extents
-                 WHERE ne_id = nte_ne_id_of AND nte_job_id = p_nte_job_id;
+                  FROM v_nm_ordered_extent_details;
         EXCEPTION
             WHEN DUP_VAL_ON_INDEX
             THEN
@@ -2029,28 +2051,27 @@ AS
                                      nm_end_mp,
                                      s_ne_id,
                                      connect_level)
-            SELECT ne_id,
-                   ne_no_start,
-                   ne_no_end,
-                   ne_length,
-                   NULL,
-                   NULL,
-                   NULL,
-                   NULL,
-                   ne_nt_type,
-                   nte_cardinality,
-                   DECODE (
-                       g_use_sub_class,
-                       'Y', TO_CHAR (
-                                nm3net.get_sub_class_seq (g_gty,
-                                                          ne_sub_class)),
-                       NULL),
-                   nte_begin_mp,
-                   nte_end_mp,
-                   NULL,
-                   NULL
-              FROM nm_elements, nm_nw_temp_extents
-             WHERE ne_id = nte_ne_id_of AND nte_job_id = p_nte_job_id;
+                SELECT ne_id,
+                       case dir_flag when 1 then start_node else end_node end, 
+                       case dir_flag when -1 then start_node else end_node end, 
+                       ne_length,
+                       NULL,
+                       NULL,
+                       NULL,
+                       NULL,
+                       ne_nt_type,
+                       dir_flag,
+                       DECODE (
+                           g_use_sub_class,
+                           'Y', TO_CHAR (
+                                    nm3net.get_sub_class_seq (g_gty,
+                                                              ne_sub_class)),
+                           NULL),
+                       nte_begin_mp,
+                       nte_end_mp,
+                       prior_ne,
+                       NULL
+                  FROM v_nm_ordered_extent;
 
         --problems exist with distance-breaks - they do not have a sensible sub-class.
         --set the sub-class to be a default of 'S' but if they have a start and end of L then choose L
@@ -2114,111 +2135,115 @@ AS
         --trap the dup val on index - only possible with an unsuitable temp ne - one with
         --the same element in the extent more than once.
 
-        BEGIN
-            INSERT INTO nm_rescale_write (ne_id,
-                                          ne_no_start,
-                                          ne_no_end,
-                                          ne_length,
-                                          nm_slk,
-                                          nm_true,
-                                          nm_seg_no,
-                                          nm_seq_no,
-                                          ne_nt_type,
-                                          nm_cardinality,
-                                          ne_sub_class,
-                                          nm_begin_mp,
-                                          nm_end_mp,
-                                          s_ne_id,
-                                          connect_level)
-                SELECT ne_id,
-                       ne_no_start,
-                       ne_no_end,
-                       ne_length,
-                       NULL,
-                       NULL,
-                       NULL,
-                       NULL,
-                       ne_nt_type,
-                       nm_cardinality,
-                       DECODE (
-                           g_use_sub_class,
-                           'Y', TO_CHAR (
-                                    nm3net.get_sub_class_seq (g_gty,
-                                                              ne_sub_class)),
-                           NULL),
-                       nte_begin_mp,
-                       nte_end_mp,
-                       NULL,
-                       NULL
-                  FROM nm_elements, nm_nw_temp_extents, nm_members
-                 WHERE     ne_id = nte_ne_id_of
-                       AND ne_id = nm_ne_id_of
-                       AND nm_ne_id_in = p_route_id
-                       AND nte_job_id = p_nte_job_id;
-        EXCEPTION
-            WHEN DUP_VAL_ON_INDEX
-            THEN
-                hig.raise_ner (pi_appl => nm3type.c_net, pi_id => 317);
-        END;
+        begin
+        instantiate_data_from_temp_ne ( p_nte_job_id ); 
+        end;
 
-        INSERT INTO nm_rescale_read (ne_id,
-                                     ne_no_start,
-                                     ne_no_end,
-                                     ne_length,
-                                     nm_slk,
-                                     nm_true,
-                                     nm_seg_no,
-                                     nm_seq_no,
-                                     ne_nt_type,
-                                     nm_cardinality,
-                                     ne_sub_class,
-                                     nm_begin_mp,
-                                     nm_end_mp,
-                                     s_ne_id,
-                                     connect_level)
-            SELECT ne_id,
-                   ne_no_start,
-                   ne_no_end,
-                   ne_length,
-                   NULL,
-                   NULL,
-                   NULL,
-                   NULL,
-                   ne_nt_type,
-                   nm_cardinality,
-                   DECODE (
-                       g_use_sub_class,
-                       'Y', TO_CHAR (
-                                nm3net.get_sub_class_seq (g_gty,
-                                                          ne_sub_class)),
-                       NULL),
-                   nte_begin_mp,
-                   nte_end_mp,
-                   NULL,
-                   NULL
-              FROM nm_elements, nm_nw_temp_extents, nm_members
-             WHERE     ne_id = nte_ne_id_of
-                   AND ne_id = nm_ne_id_of
-                   AND nm_ne_id_in = p_route_id
-                   AND nte_job_id = p_nte_job_id;
-
-        --problems exist with distance-breaks - they do not have a sensible sub-class.
-        --set the sub-class to be a default of 'S' but if they have a start and end of L then choose L
-        --and if they have a start and end of R then choose R
-
-        FOR irec IN c2
-        LOOP
-            FOR jrec IN c3 (irec.ne_id, g_gty)
-            LOOP
-                UPDATE nm_rescale_write
-                   SET ne_sub_class = jrec.ne_sub_class
-                 WHERE ne_id = irec.ne_id;
-
-                UPDATE nm_rescale_read
-                   SET ne_sub_class = jrec.ne_sub_class
-                 WHERE ne_id = irec.ne_id;
-            END LOOP;
-        END LOOP;
+--        BEGIN
+--            INSERT INTO nm_rescale_write (ne_id,
+--                                          ne_no_start,
+--                                          ne_no_end,
+--                                          ne_length,
+--                                          nm_slk,
+--                                          nm_true,
+--                                          nm_seg_no,
+--                                          nm_seq_no,
+--                                          ne_nt_type,
+--                                          nm_cardinality,
+--                                          ne_sub_class,
+--                                          nm_begin_mp,
+--                                          nm_end_mp,
+--                                          s_ne_id,
+--                                          connect_level)
+--                SELECT ne_id,
+--                       ne_no_start,
+--                       ne_no_end,
+--                       ne_length,
+--                       NULL,
+--                       NULL,
+--                       NULL,
+--                       NULL,
+--                       ne_nt_type,
+--                       nm_cardinality,
+--                       DECODE (
+--                           g_use_sub_class,
+--                           'Y', TO_CHAR (
+--                                    nm3net.get_sub_class_seq (g_gty,
+--                                                              ne_sub_class)),
+--                           NULL),
+--                       nte_begin_mp,
+--                       nte_end_mp,
+--                       NULL,
+--                       NULL
+--                  FROM nm_elements, nm_nw_temp_extents, nm_members
+--                 WHERE     ne_id = nte_ne_id_of
+--                       AND ne_id = nm_ne_id_of
+--                       AND nm_ne_id_in = p_route_id
+--                       AND nte_job_id = p_nte_job_id;
+--        EXCEPTION
+--            WHEN DUP_VAL_ON_INDEX
+--            THEN
+--                hig.raise_ner (pi_appl => nm3type.c_net, pi_id => 317);
+--        END;
+--
+--        INSERT INTO nm_rescale_read (ne_id,
+--                                     ne_no_start,
+--                                     ne_no_end,
+--                                     ne_length,
+--                                     nm_slk,
+--                                     nm_true,
+--                                     nm_seg_no,
+--                                     nm_seq_no,
+--                                     ne_nt_type,
+--                                     nm_cardinality,
+--                                     ne_sub_class,
+--                                     nm_begin_mp,
+--                                     nm_end_mp,
+--                                     s_ne_id,
+--                                     connect_level)
+--            SELECT ne_id,
+--                   ne_no_start,
+--                   ne_no_end,
+--                   ne_length,
+--                   NULL,
+--                   NULL,
+--                   NULL,
+--                   NULL,
+--                   ne_nt_type,
+--                   nm_cardinality,
+--                   DECODE (
+--                       g_use_sub_class,
+--                       'Y', TO_CHAR (
+--                                nm3net.get_sub_class_seq (g_gty,
+--                                                          ne_sub_class)),
+--                       NULL),
+--                   nte_begin_mp,
+--                   nte_end_mp,
+--                   NULL,
+--                   NULL
+--              FROM nm_elements, nm_nw_temp_extents, nm_members
+--             WHERE     ne_id = nte_ne_id_of
+--                   AND ne_id = nm_ne_id_of
+--                   AND nm_ne_id_in = p_route_id
+--                   AND nte_job_id = p_nte_job_id;
+--
+--        --problems exist with distance-breaks - they do not have a sensible sub-class.
+--        --set the sub-class to be a default of 'S' but if they have a start and end of L then choose L
+--        --and if they have a start and end of R then choose R
+--
+--        FOR irec IN c2
+--        LOOP
+--            FOR jrec IN c3 (irec.ne_id, g_gty)
+--            LOOP
+--                UPDATE nm_rescale_write
+--                   SET ne_sub_class = jrec.ne_sub_class
+--                 WHERE ne_id = irec.ne_id;
+--
+--                UPDATE nm_rescale_read
+--                   SET ne_sub_class = jrec.ne_sub_class
+--                 WHERE ne_id = irec.ne_id;
+--            END LOOP;
+--        END LOOP;
     END instantiate_from_route_nte;
 
     --
