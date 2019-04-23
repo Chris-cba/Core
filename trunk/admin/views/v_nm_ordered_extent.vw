@@ -27,13 +27,13 @@ AS
             (SELECT /*+MATERIALIZE*/
      -------------------------------------------------------------------------
                                                       --   PVCS Identifiers :-
-                   --       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/views/v_nm_ordered_extent.vw-arc   1.0   Apr 23 2019 12:13:52   Rob.Coupe  $
+                   --       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/views/v_nm_ordered_extent.vw-arc   1.1   Apr 23 2019 12:20:06   Rob.Coupe  $
                    --       Module Name      : $Workfile:   v_nm_ordered_extent.vw  $
-                   --       Date into PVCS   : $Date:   Apr 23 2019 12:13:52  $
-                   --       Date fetched Out : $Modtime:   Apr 23 2019 12:08:42  $
-                               --       Version          : $Revision:   1.0  $
+                   --       Date into PVCS   : $Date:   Apr 23 2019 12:20:06  $
+                   --       Date fetched Out : $Modtime:   Apr 23 2019 12:19:46  $
+                               --       Version          : $Revision:   1.1  $
 --------------------------------------------------------------------------
---   Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2019 Bentley Systems Incorporated. All rights reserved.
 --------------------------------------------------------------------------
                                                                           ----
                    nte_job_id,
