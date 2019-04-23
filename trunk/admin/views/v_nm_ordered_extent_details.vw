@@ -7,13 +7,13 @@ AS
 SELECT 
 -------------------------------------------------------------------------
                    --   PVCS Identifiers :-
-                   --       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/views/v_nm_ordered_extent_details.vw-arc   1.1   Apr 23 2019 12:17:48   Rob.Coupe  $
+                   --       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/views/v_nm_ordered_extent_details.vw-arc   1.2   Apr 23 2019 12:19:18   Rob.Coupe  $
                    --       Module Name      : $Workfile:   v_nm_ordered_extent_details.vw  $
-                   --       Date into PVCS   : $Date:   Apr 23 2019 12:17:48  $
-                   --       Date fetched Out : $Modtime:   Apr 23 2019 12:17:32  $
-                               --       Version          : $Revision:   1.1  $
+                   --       Date into PVCS   : $Date:   Apr 23 2019 12:19:18  $
+                   --       Date fetched Out : $Modtime:   Apr 23 2019 12:19:02  $
+                               --       Version          : $Revision:   1.2  $
 --------------------------------------------------------------------------
---   Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2019 Bentley Systems Incorporated. All rights reserved.
 --------------------------------------------------------------------------
                                                                           ----
 
