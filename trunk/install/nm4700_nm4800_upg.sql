@@ -3,11 +3,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm4700_nm4800_upg.sql-arc   1.6   Apr 11 2019 10:00:06   Chris.Baugh  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm4700_nm4800_upg.sql-arc   1.7   Apr 24 2019 11:21:30   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm4700_nm4800_upg.sql  $
---       Date into PVCS   : $Date:   Apr 11 2019 10:00:06  $
---       Date fetched Out : $Modtime:   Apr 11 2019 09:59:22  $
---       Version          : $Revision:   1.6  $
+--       Date into PVCS   : $Date:   Apr 24 2019 11:21:30  $
+--       Date fetched Out : $Modtime:   Apr 24 2019 11:20:44  $
+--       Version          : $Revision:   1.7  $
 --
 --   Product upgrade script
 --
@@ -449,11 +449,11 @@ SET TERM ON
 Prompt Setting The Version Number...
 SET TERM OFF
 BEGIN
-      hig2.upgrade('HIG','nm4700_nm4800_upg.sql','Upgrade from 4.7.0.0 to 4.8.0.0','4.8.0.1');
-      hig2.upgrade('NET','nm4700_nm4800_upg.sql','Upgrade from 4.7.0.0 to 4.8.0.0','4.8.0.1');
-      hig2.upgrade('DOC','nm4700_nm4800_upg.sql','Upgrade from 4.7.0.0 to 4.8.0.0','4.8.0.1');
-      hig2.upgrade('AST','nm4700_nm4800_upg.sql','Upgrade from 4.7.0.0 to 4.8.0.0','4.8.0.1');
-      hig2.upgrade('WMP','nm4700_nm4800_upg.sql','Upgrade from 4.7.0.0 to 4.8.0.0','4.8.0.1');
+      hig2.upgrade('HIG','nm4700_nm4800_upg.sql','Upgrade from 4.7.0.0 to 4.8.0.0','4.8.0.2');
+      hig2.upgrade('NET','nm4700_nm4800_upg.sql','Upgrade from 4.7.0.0 to 4.8.0.0','4.8.0.2');
+      hig2.upgrade('DOC','nm4700_nm4800_upg.sql','Upgrade from 4.7.0.0 to 4.8.0.0','4.8.0.2');
+      hig2.upgrade('AST','nm4700_nm4800_upg.sql','Upgrade from 4.7.0.0 to 4.8.0.0','4.8.0.2');
+      hig2.upgrade('WMP','nm4700_nm4800_upg.sql','Upgrade from 4.7.0.0 to 4.8.0.0','4.8.0.2');
 END;
 /
 COMMIT;
