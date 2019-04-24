@@ -7,11 +7,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm4700_nm4800_ddl_upg.sql-arc   1.3   Apr 16 2019 12:31:02   Chris.Baugh  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm4700_nm4800_ddl_upg.sql-arc   1.4   Apr 24 2019 13:51:12   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm4700_nm4800_ddl_upg.sql  $
---       Date into PVCS   : $Date:   Apr 16 2019 12:31:02  $
---       Date fetched Out : $Modtime:   Apr 16 2019 12:14:10  $
---       Version          : $Revision:   1.3  $
+--       Date into PVCS   : $Date:   Apr 24 2019 13:51:12  $
+--       Date fetched Out : $Modtime:   Apr 24 2019 13:47:22  $
+--       Version          : $Revision:   1.4  $
 --
 ------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2014
@@ -632,9 +632,49 @@ END;
 SET TERM ON
 PROMPT Add NM_XSP_REVERSAL constraints
 SET TERM OFF
-ALTER TABLE NM_XSP_REVERSAL ADD CONSTRAINT XRV_FK_OLD_XSP FOREIGN KEY (XRV_NW_TYPE, XRV_OLD_SUB_CLASS, XRV_OLD_XSP) REFERENCES NM_NW_XSP (NWX_NW_TYPE, NWX_NSC_SUB_CLASS, NWX_X_SECT) ENABLE VALIDATE;
-ALTER TABLE NM_XSP_REVERSAL ADD CONSTRAINT XRV_FK_NEW_XSP FOREIGN KEY (XRV_NW_TYPE, XRV_NEW_SUB_CLASS, XRV_NEW_XSP) REFERENCES NM_NW_XSP (NWX_NW_TYPE, NWX_NSC_SUB_CLASS, NWX_X_SECT) ENABLE VALIDATE;
-create index XRV_FK_NEW_XSP on nm_xsp_reversal( XRV_NW_TYPE, XRV_NEW_SUB_CLASS, XRV_NEW_XSP );
+DECLARE
+  con_exists EXCEPTION;
+  PRAGMA exception_init( con_exists, -2275);
+BEGIN
+  EXECUTE IMMEDIATE 'ALTER TABLE NM_XSP_REVERSAL ADD 
+                     CONSTRAINT XRV_FK_OLD_XSP
+                      FOREIGN KEY (XRV_NW_TYPE, XRV_OLD_SUB_CLASS, XRV_OLD_XSP)
+                      REFERENCES NM_NW_XSP (NWX_NW_TYPE, NWX_NSC_SUB_CLASS, NWX_X_SECT)
+                      ENABLE
+                      VALIDATE';
+EXCEPTION
+  WHEN con_exists THEN
+    NULL;
+END;
+/
+
+DECLARE
+  con_exists EXCEPTION;
+  PRAGMA exception_init( con_exists, -2275);
+BEGIN
+  EXECUTE IMMEDIATE 'ALTER TABLE NM_XSP_REVERSAL ADD 
+                     CONSTRAINT XRV_FK_NEW_XSP
+                      FOREIGN KEY (XRV_NW_TYPE, XRV_NEW_SUB_CLASS, XRV_NEW_XSP)
+                      REFERENCES NM_NW_XSP (NWX_NW_TYPE, NWX_NSC_SUB_CLASS, NWX_X_SECT)
+                      ENABLE
+                      VALIDATE';
+EXCEPTION
+  WHEN con_exists THEN
+    NULL;
+END;
+/
+
+DECLARE
+  con_exists EXCEPTION;
+  PRAGMA exception_init( con_exists, -955);
+BEGIN
+  EXECUTE IMMEDIATE 'create index XRV_FK_NEW_XSP on nm_xsp_reversal
+                     ( XRV_NW_TYPE, XRV_NEW_SUB_CLASS, XRV_NEW_XSP )';
+EXCEPTION
+  WHEN con_exists THEN
+    NULL;
+END;
+/
 ------------------------------------------------------------------
 SET TERM ON
 PROMPT nm_4700_fix58
