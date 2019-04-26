@@ -1,27 +1,28 @@
 CREATE OR REPLACE FORCE VIEW V_NM_ORDERED_EXTENT_DETAILS
-(NM_NE_ID_IN, NM_NE_ID_OF, S_NE_ID, NE_NT_TYPE, NE_SUB_CLASS, NM_SEQ_NO, NM_CARDINALITY, 
- NM_BEGIN_MP, NM_END_MP, START_NODE, END_NODE, NE_LENGTH, 
- NM_SLK_STORED, NM_END_SLK_STORED, NM_CALC_SEG_NO, NM_CALC_SEQ_NO, NM_SLK_CALC, NM_END_SLK_CALC, 
- WHOLE_OR_PART, SLK_DIFFERENCE, GAP_OR_OVRL_STORED, GAP_OR_OVRL_CALC)
+(NM_NE_ID_IN, NM_NE_ID_OF, S_NE_ID, NE_NT_TYPE, NE_SUB_CLASS, NM_SEG_NO,
+ NM_SEQ_NO, NM_CARDINALITY, NM_BEGIN_MP, NM_END_MP, START_NODE, 
+ END_NODE, NE_LENGTH, NM_SLK_STORED, NM_END_SLK_STORED, NM_CALC_SEG_NO, 
+ NM_CALC_SEQ_NO, NM_SLK_CALC, NM_END_SLK_CALC, WHOLE_OR_PART, SLK_DIFFERENCE, 
+ GAP_OR_OVRL_STORED, GAP_OR_OVRL_CALC, CONNECT_LEVEL)
 AS 
 SELECT 
 -------------------------------------------------------------------------
                    --   PVCS Identifiers :-
-                   --       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/views/v_nm_ordered_extent_details.vw-arc   1.2   Apr 23 2019 12:19:18   Rob.Coupe  $
+                   --       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/views/v_nm_ordered_extent_details.vw-arc   1.3   Apr 26 2019 13:39:22   Rob.Coupe  $
                    --       Module Name      : $Workfile:   v_nm_ordered_extent_details.vw  $
-                   --       Date into PVCS   : $Date:   Apr 23 2019 12:19:18  $
-                   --       Date fetched Out : $Modtime:   Apr 23 2019 12:19:02  $
-                               --       Version          : $Revision:   1.2  $
+                   --       Date into PVCS   : $Date:   Apr 26 2019 13:39:22  $
+                   --       Date fetched Out : $Modtime:   Apr 26 2019 13:38:34  $
+                               --       Version          : $Revision:   1.3  $
 --------------------------------------------------------------------------
 --   Copyright (c) 2019 Bentley Systems Incorporated. All rights reserved.
 --------------------------------------------------------------------------
                                                                           ----
-
           SYS_CONTEXT ('NM3SQL', 'ORDERED_EXTENT') nm_ne_id_in,
           ne_id nm_ne_id_of,
           s_ne,
           ne_nt_type,
           ne_sub_class,
+          nm_seg_no,
           nm_seq_no,
           dir nm_cardinality,
           nm_begin_mp,
@@ -38,7 +39,8 @@ SELECT
           whole_or_part,
           slk_difference,
           gap_or_ovrl_stored,
-          gap_or_ovrl_calc
+          gap_or_ovrl_calc,
+          connect_level
      FROM (SELECT q6.*,
                   nm_slk - slk1 slk_difference,
                   nm_slk - NVL (p_end_slk, 0) gap_or_ovrl_stored,
@@ -70,18 +72,18 @@ SELECT
                                      p_end_slk
                              FROM (SELECT q3.*,
                                           NVL (
-                                             LAG (ne_length, 1)
+                                             LAG (nm_end_mp - nm_begin_mp, 1)
                                                 OVER (ORDER BY order1),
                                              0)
                                              s_length
                                      FROM ((SELECT *
-                                              FROM (
-WITH rsc3 (s_ne, ne_id, ne_nt_type, ne_sub_class, nm_seg_no, nm_seq_no, dir, nm_begin_mp, nm_end_mp, start_node, end_node, ne_length, nm_slk, nm_end_slk, has_prior)
-                                                         AS (SELECT -1,
+                                              FROM (        
+                                                         WITH rsc3 (s_ne, ne_id, ne_nt_type, ne_sub_class, nm_seg_no, nm_seq_no, dir, nm_begin_mp, nm_end_mp, start_node, end_node, ne_length, nm_slk, nm_end_slk, has_prior, connect_level)
+                                                         AS ( SELECT -1,
                                                                     a.ne_id,
                                                                     a.ne_nt_type,
                                                                     a.ne_sub_class,
-                                                                    1,
+                                                                    row_number() over (order by nte_seq_no) nte_seg_no,
                                                                     a.nte_seq_no,
                                                                     a.dir_flag,
                                                                     a.nte_begin_mp,
@@ -91,7 +93,8 @@ WITH rsc3 (s_ne, ne_id, ne_nt_type, ne_sub_class, nm_seg_no, nm_seq_no, dir, nm_
                                                                     a.ne_length,
                                                                     a.nte_slk,
                                                                     a.nte_end_slk,
-                                                                    a.has_prior
+                                                                    a.has_prior,
+                                                                    1
                                                                FROM v_nm_ordered_extent a
                                                               WHERE    has_prior
                                                                           IS NULL
@@ -105,7 +108,7 @@ WITH rsc3 (s_ne, ne_id, ne_nt_type, ne_sub_class, nm_seg_no, nm_seq_no, dir, nm_
                                                                     b.ne_id,
                                                                     b.ne_nt_type,
                                                                     b.ne_sub_class,
-                                                                    1,
+                                                                    a.nm_seg_no, 
                                                                     b.nte_seq_no,
                                                                     b.dir_flag,
                                                                     b.nte_begin_mp,
@@ -115,7 +118,8 @@ WITH rsc3 (s_ne, ne_id, ne_nt_type, ne_sub_class, nm_seg_no, nm_seq_no, dir, nm_
                                                                     b.ne_length,
                                                                     b.nte_slk,
                                                                     b.nte_end_slk,
-                                                                    b.has_prior
+                                                                    b.has_prior,
+                                                                    a.connect_level + 1
                                                                FROM    v_nm_ordered_extent b
                                                                     JOIN
                                                                        rsc3 a
@@ -125,10 +129,8 @@ WITH rsc3 (s_ne, ne_id, ne_nt_type, ne_sub_class, nm_seg_no, nm_seq_no, dir, nm_
                                                                                      nm_seq_no SET order1
                                                                CYCLE start_node SET is_cycle TO 'Y' DEFAULT 'N'
                                                     SELECT *
-                                                      FROM rsc3)
-                                             WHERE is_cycle = 'N'
+                                                      FROM rsc3 order by  nm_seq_no 
+                                                      )
+                                             WHERE is_cycle = 'N'                                             
                                              ) q3)) q4
                                   ) q5) q6);
-
-
-select * from v_nm_ordered_extent_details
