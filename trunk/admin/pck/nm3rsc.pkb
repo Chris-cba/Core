@@ -4,11 +4,11 @@ AS
     --------------------------------------------------------------------------------
     --   PVCS Identifiers :-
     --
-    --       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3rsc.pkb-arc   2.23   Apr 23 2019 12:21:40   Rob.Coupe  $
+    --       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3rsc.pkb-arc   2.24   Apr 26 2019 13:52:44   Rob.Coupe  $
     --       Module Name      : $Workfile:   nm3rsc.pkb  $
-    --       Date into PVCS   : $Date:   Apr 23 2019 12:21:40  $
-    --       Date fetched Out : $Modtime:   Apr 23 2019 12:20:50  $
-    --       PVCS Version     : $Revision:   2.23  $
+    --       Date into PVCS   : $Date:   Apr 26 2019 13:52:44  $
+    --       Date fetched Out : $Modtime:   Apr 26 2019 13:52:00  $
+    --       PVCS Version     : $Revision:   2.24  $
     --
     --   Author : R.A. Coupe
     --
@@ -20,7 +20,7 @@ AS
     --
     --all global package variables here
     --
-    g_body_sccsid    CONSTANT VARCHAR2 (30) := '"$Revision:   2.23  $"';
+    g_body_sccsid    CONSTANT VARCHAR2 (30) := '"$Revision:   2.24  $"';
 
     --  g_body_sccsid is the SCCS ID for the package body
     --
@@ -2015,7 +2015,7 @@ AS
                        ne_length,
                        nm_slk_calc,
                        nm_slk_calc,
-                       1,
+                       nm_seg_no,
                        nm_calc_seq_no,
                        ne_nt_type,
                        nm_cardinality,
@@ -2028,7 +2028,7 @@ AS
                        nm_begin_mp,
                        nm_end_mp,
                        s_ne_id,
-                       NULL
+                       connect_level
                   FROM v_nm_ordered_extent_details;
         EXCEPTION
             WHEN DUP_VAL_ON_INDEX
