@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY SDO_LRS
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdo_lrs.pkb-arc   1.5   Dec 30 2018 10:10:54   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdo_lrs.pkb-arc   1.6   May 07 2019 11:18:58   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdo_lrs.pkb  $
-    --       Date into PVCS   : $Date:   Dec 30 2018 10:10:54  $
-    --       Date fetched Out : $Modtime:   Dec 30 2018 09:49:42  $
-    --       PVCS Version     : $Revision:   1.5  $
+    --       Date into PVCS   : $Date:   May 07 2019 11:18:58  $
+    --       Date fetched Out : $Modtime:   May 07 2019 11:17:52  $
+    --       PVCS Version     : $Revision:   1.6  $
     --
     --   Author : R.A. Coupe
     --
@@ -18,7 +18,7 @@ AS
     -- The main purpose of this package is to replicate the functions inside the SDO_LRS package as
     -- supplied under the MDSYS schema and licensed under the Oracle Spatial license on EE.
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.5  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.6  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'SDO_LRS';
 
@@ -137,6 +137,36 @@ AS
                             start_measure   => start_measure,
                             end_measure     => end_measure,
                             tolerance       => tolerance);
+    END;
+
+    FUNCTION dynamic_segment (geom_segment    IN MDSYS.SDO_GEOMETRY,
+                              dim_array       IN MDSYS.SDO_DIM_ARRAY,
+                              start_measure   IN NUMBER,
+                              end_measure     IN NUMBER)
+        RETURN MDSYS.SDO_GEOMETRY
+        DETERMINISTIC
+        PARALLEL_ENABLE
+    IS
+    BEGIN
+        RETURN clip_geom_segment (geom_segment    => geom_segment,
+                                  dim_array       => dim_array,
+                                  start_measure   => start_measure,
+                                  end_measure     => end_measure);
+    END;
+
+    FUNCTION dynamic_segment (geom_segment    IN MDSYS.SDO_GEOMETRY,
+                              start_measure   IN NUMBER,
+                              end_measure     IN NUMBER,
+                              tolerance       IN NUMBER DEFAULT 1.0e-8)
+        RETURN MDSYS.SDO_GEOMETRY
+        DETERMINISTIC
+        PARALLEL_ENABLE
+    IS
+    BEGIN
+        RETURN clip_geom_segment (geom_segment    => geom_segment,
+                                  start_measure   => start_measure,
+                                  end_measure     => end_measure,
+                                  tolerance       => tolerance);
     END;
 
 
@@ -668,19 +698,22 @@ AS
     BEGIN
         RETURN nm_sdo.geom_segment_length (geom_segment, tolerance);
     END;
-    
-   FUNCTION get_measure(point     IN MDSYS.SDO_GEOMETRY,
-                        dim_array IN MDSYS.SDO_DIM_ARRAY)
-   RETURN NUMBER PARALLEL_ENABLE is
-   begin
-      return NM_SDO.GET_MEASURE(point, dim_array);
-   end;      
 
-   FUNCTION get_measure(point     IN MDSYS.SDO_GEOMETRY)
-   RETURN NUMBER PARALLEL_ENABLE is
-   begin
-      return NM_SDO.GET_MEASURE(point);
-   end;
+    FUNCTION get_measure (point       IN MDSYS.SDO_GEOMETRY,
+                          dim_array   IN MDSYS.SDO_DIM_ARRAY)
+        RETURN NUMBER
+        PARALLEL_ENABLE
+    IS
+    BEGIN
+        RETURN NM_SDO.GET_MEASURE (point, dim_array);
+    END;
 
+    FUNCTION get_measure (point IN MDSYS.SDO_GEOMETRY)
+        RETURN NUMBER
+        PARALLEL_ENABLE
+    IS
+    BEGIN
+        RETURN NM_SDO.GET_MEASURE (point);
+    END;
 END;
 /
