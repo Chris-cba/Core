@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm_sdo
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm_sdo.pkb-arc   1.19   Apr 15 2019 16:20:32   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm_sdo.pkb-arc   1.20   May 07 2019 17:00:14   Rob.Coupe  $
     --       Module Name      : $Workfile:   nm_sdo.pkb  $
-    --       Date into PVCS   : $Date:   Apr 15 2019 16:20:32  $
-    --       Date fetched Out : $Modtime:   Apr 15 2019 16:19:16  $
-    --       PVCS Version     : $Revision:   1.19  $
+    --       Date into PVCS   : $Date:   May 07 2019 17:00:14  $
+    --       Date fetched Out : $Modtime:   May 07 2019 16:57:20  $
+    --       PVCS Version     : $Revision:   1.20  $
     --
     --   Author : R.A. Coupe
     --
@@ -18,7 +18,7 @@ AS
     -- The main purpose of this package is to replicate the functions inside the SDO_LRS package as
     -- supplied under the MDSYS schema and licensed under the Oracle Spatial license on EE.
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.19  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.20  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'NM_SDO';
 
@@ -619,7 +619,14 @@ AS
                                            ELSE
                                                cum_length
                                        END
-                                     / case reuse_scale when 'Y' then NVL (measured_length, total_length) else total_length end,
+                                     / CASE reuse_scale
+                                           WHEN 'Y'
+                                           THEN
+                                               NVL (measured_length,
+                                                    total_length)
+                                           ELSE
+                                               total_length
+                                       END,
                                      0)
                                + NVL (start_measure, 0))) AS nm_vertex_tab)
               INTO retval
@@ -644,7 +651,7 @@ AS
                 get_geom (scale_vertices (geom,
                                           geom_length,
                                           start_measure,
-                                          'Y'),
+                                          'N'),
                           geom.sdo_srid);
         END IF;
 
@@ -684,6 +691,49 @@ AS
     IS
     BEGIN
         RETURN NULL;
+    END;
+
+    FUNCTION translate_measure (geom_segment   IN MDSYS.SDO_GEOMETRY,
+                                dim_array      IN MDSYS.SDO_DIM_ARRAY,
+                                translate_m    IN NUMBER)
+        RETURN MDSYS.SDO_GEOMETRY
+        DETERMINISTIC
+        PARALLEL_ENABLE
+    IS
+    BEGIN
+        RETURN translate_measure (geom_segment, translate_m);
+    END;
+
+
+    FUNCTION translate_measure (geom_segment   IN MDSYS.SDO_GEOMETRY,
+                                translate_m    IN NUMBER)
+        RETURN MDSYS.SDO_GEOMETRY
+        DETERMINISTIC
+        PARALLEL_ENABLE
+    IS
+        retval   SDO_GEOMETRY := geom_segment;
+    BEGIN
+        WITH
+            ords
+            AS
+                (SELECT t.id                  v_id,
+                        t.x,
+                        t.y,
+                        t.z + translate_m     m
+                   FROM TABLE (SDO_UTIL.getvertices (geom_segment)) t)
+        SELECT CAST (
+                   COLLECT (ord_value ORDER BY v_id, ord_id)
+                       AS sdo_ordinate_array)
+          INTO retval.sdo_ordinates
+          FROM (  SELECT *
+                    FROM (SELECT 'X' ord_id, v_id, x ord_value FROM ords
+                          UNION ALL
+                          SELECT 'Y' ord_id, v_id, y ord_value FROM ords
+                          UNION ALL
+                          SELECT 'Z' ord_id, v_id, m ord_value FROM ords)
+                ORDER BY v_id, ord_id);
+
+        RETURN retval;
     END;
 
     FUNCTION redefine_geom_l (geom            IN SDO_GEOMETRY,
