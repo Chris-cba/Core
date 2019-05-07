@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY SDO_LRS
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdo_lrs.pkb-arc   1.6   May 07 2019 11:18:58   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdo_lrs.pkb-arc   1.7   May 07 2019 17:14:38   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdo_lrs.pkb  $
-    --       Date into PVCS   : $Date:   May 07 2019 11:18:58  $
-    --       Date fetched Out : $Modtime:   May 07 2019 11:17:52  $
-    --       PVCS Version     : $Revision:   1.6  $
+    --       Date into PVCS   : $Date:   May 07 2019 17:14:38  $
+    --       Date fetched Out : $Modtime:   May 07 2019 17:13:28  $
+    --       PVCS Version     : $Revision:   1.7  $
     --
     --   Author : R.A. Coupe
     --
@@ -18,7 +18,7 @@ AS
     -- The main purpose of this package is to replicate the functions inside the SDO_LRS package as
     -- supplied under the MDSYS schema and licensed under the Oracle Spatial license on EE.
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.6  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.7  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'SDO_LRS';
 
@@ -225,6 +225,31 @@ AS
     BEGIN
         RETURN NM_SDO.SCALE_GEOM (geom_segment, start_measure, end_measure);
     END;
+
+    FUNCTION translate_measure (geom_segment   IN MDSYS.SDO_GEOMETRY,
+                                dim_array      IN MDSYS.SDO_DIM_ARRAY,
+                                translate_m    IN NUMBER)
+        RETURN MDSYS.SDO_GEOMETRY
+        DETERMINISTIC
+        PARALLEL_ENABLE
+    IS
+    BEGIN
+        RETURN nm_sdo.translate_measure (geom_segment,
+                                         dim_array,
+                                         translate_m);
+    END;
+
+
+    FUNCTION translate_measure (geom_segment   IN MDSYS.SDO_GEOMETRY,
+                                translate_m    IN NUMBER)
+        RETURN MDSYS.SDO_GEOMETRY
+        DETERMINISTIC
+        PARALLEL_ENABLE
+    IS
+    BEGIN
+        RETURN nm_sdo.translate_measure (geom_segment, translate_m);
+    END;
+
 
     FUNCTION geom_segment_start_measure (
         geom_segment   IN MDSYS.SDO_GEOMETRY,
