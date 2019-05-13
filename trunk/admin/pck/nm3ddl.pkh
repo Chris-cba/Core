@@ -180,6 +180,7 @@ PROCEDURE change_user_password(pi_user       IN VARCHAR2
 PROCEDURE refresh_public_synonyms;
 -- Possible errors raised are -
 -- -20307  Application is configured to run using PRIVATE synonyms. Not creating PUBLIC synonyms
+-- This procedure runs as an autonomous transaction
 --</PROC>
 --
 -----------------------------------------------------------------------------
@@ -190,6 +191,7 @@ PROCEDURE refresh_public_synonyms;
 PROCEDURE refresh_private_synonyms;
 -- Possible errors raised are -
 -- -20305  Application is configured to run using PUBLIC synonyms. Not creating private synonyms
+-- This procedure runs as an autonomous transaction
 --</PROC>
 --
 -----------------------------------------------------------------------------
@@ -215,6 +217,7 @@ PROCEDURE grant_on_object (p_grant_to     IN VARCHAR2
                           );
 -- Possible errors raised are -
 -- -20308 Must be at least one of SELECT, UPDATE, DELETE, INSERT
+-- This procedure runs as an autonomous transaction
 --
 --</PROC>
 --
@@ -343,6 +346,7 @@ PROCEDURE rebuild_all_sequences;
 --
 -- Sequence value will be moved up or down so it is just higher than the maximum
 -- of the associated column value. If the table is empty this is 0.
+-- This procedure runs as an autonomous transaction
 --
 PROCEDURE rebuild_sequence (pi_hsa_sequence_name HIG_SEQUENCE_ASSOCIATIONS.hsa_sequence_name%TYPE);
 --</PROC>
