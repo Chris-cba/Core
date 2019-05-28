@@ -4,11 +4,11 @@ IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3undo.pkb-arc   2.36   Jul 25 2018 23:07:34   Rob.Coupe  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3undo.pkb-arc   2.37   May 28 2019 11:30:56   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3undo.pkb  $
---       Date into PVCS   : $Date:   Jul 25 2018 23:07:34  $
---       Date fetched Out : $Modtime:   Jul 25 2018 23:07:14  $
---       PVCS Version     : $Revision:   2.36  $
+--       Date into PVCS   : $Date:   May 28 2019 11:30:56  $
+--       Date fetched Out : $Modtime:   May 28 2019 11:29:56  $
+--       PVCS Version     : $Revision:   2.37  $
 --
 --   Author : ITurnbull
 --
@@ -19,7 +19,7 @@ IS
 -- Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '"$Revision:   2.36  $"';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '"$Revision:   2.37  $"';
 --  g_body_sccsid is the SCCS ID for the package body
    g_package_name   CONSTANT VARCHAR2 (2000) := 'nm3undo';
 --
@@ -580,15 +580,15 @@ END undo_scheme;
 
         Elsif p_Operation = c_Merge Then
           -- passes the ne_id of the new/merged element
-          Execute Immediate    'Begin'                                                              ||  Chr (10)  ||
+          Execute Immediate    'Begin'                                                              ||  Chr (10)  || 
                                '  Nsg_Merge.Undo_Merge_Esu  ('                                      ||  Chr (10)  ||
-                               '                            p_New_Ne_Id       =>    :p_Ne_Id_1,'    ||  Chr (10)  ||
-                               '                            p_Old_Ne_Id_1     =>    :p_Ne_Id_2,'    ||  Chr (10)  ||
-                               '                            p_Old_Ne_Id_2     =>    :p_Ne_Id_3,'    ||  Chr (10)  ||
+                               '                            p_New_Ne_Id       =>    :p_Ne_Id_3,'    ||  Chr (10)  ||
+                               '                            p_Old_Ne_Id_1     =>    :p_Ne_Id_1,'    ||  Chr (10)  ||
+                               '                            p_Old_Ne_Id_2     =>    :p_Ne_Id_2,'    ||  Chr (10)  ||
                                '                            p_Effective_Date  =>    :p_Op_Date'     ||  Chr (10)  ||
                                '                            );'                                     ||  Chr (10)  ||
                                'End;'
-          Using In p_Ne_Id_1, p_Ne_Id_2, p_Ne_Id_3,p_Op_Date;
+          Using In p_Ne_Id_3, p_Ne_Id_1, p_Ne_Id_2,p_Op_Date;
 
         Elsif p_Operation = c_Replace  Then
           -- passes the ne_id of the new element
