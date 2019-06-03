@@ -5,11 +5,11 @@ AS
     --
     --   PVCS Identifiers :-
     --
-    --       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.81   Jan 09 2019 13:41:44   Rob.Coupe  $
+    --       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.82   Jun 03 2019 07:19:00   Steve.Cooper  $
     --       Module Name      : $Workfile:   nm3sdm.pkb  $
-    --       Date into PVCS   : $Date:   Jan 09 2019 13:41:44  $
-    --       Date fetched Out : $Modtime:   Jan 09 2019 13:40:24  $
-    --       PVCS Version     : $Revision:   2.81  $
+    --       Date into PVCS   : $Date:   Jun 03 2019 07:19:00  $
+    --       Date fetched Out : $Modtime:   May 31 2019 13:36:46  $
+    --       PVCS Version     : $Revision:   2.82  $
     --
     --   Author : R.A. Coupe
     --
@@ -21,7 +21,7 @@ AS
     --
     --all global package variables here
     --
-    g_Body_Sccsid    CONSTANT VARCHAR2 (2000) := '"$Revision:   2.81  $"';
+    g_Body_Sccsid    CONSTANT VARCHAR2 (2000) := '"$Revision:   2.82  $"';
     --  g_body_sccsid is the SCCS ID for the package body
     --
     g_Package_Name   CONSTANT VARCHAR2 (30) := 'NM3SDM';
@@ -9149,7 +9149,36 @@ AS
     -----------------------------------------------------------------------------
     --
     --
+    Procedure Reshape_Other_Product (
+                                    p_Ne_Id   In    Nm_Elements.Ne_Id%Type,
+                                    p_Geom    In    Mdsys.Sdo_Geometry
+                                    )
+    Is
 
+    Begin
+      Nm_Debug.Debug('Nm3sdm.Reshape_Other_Product - Called');
+      Nm_Debug.Debug('Parameter - p_Ne_Id: ' || To_Char(p_Ne_Id));
+
+      --NSG
+      If Hig.Is_Product_Licensed( Nm3type.c_Nsg )  Then   
+
+        Execute Immediate 'Begin'                                                 || Chr(10) ||
+                          '  Nsg_Reshape.Reshape_Esu    ('                        || Chr(10) ||
+                          '                             p_Ne_Id   =>  :p_Ne_Id,'  || Chr(10) ||
+                          '                             p_Geom    =>  :p_Geom'    || Chr(10) ||
+                          '                             );'                       || Chr(10) ||
+                          'End;'                                                  || Chr(10)
+        Using   p_Ne_Id,
+                p_Geom;
+      End If;
+
+      Nm_Debug.Debug('Nm3sdm.Reshape_Other_Product - Finished');
+    End Reshape_Other_Product;
+
+    --
+    -----------------------------------------------------------------------------
+    --
+    --
     PROCEDURE reshape_element (p_ne_id   IN nm_elements.ne_id%TYPE,
                                p_geom    IN MDSYS.SDO_GEOMETRY)
     IS
@@ -9239,6 +9268,12 @@ AS
         UPDATE nm_elements
            SET ne_date_modified = SYSDATE
          WHERE ne_id = p_ne_id;            -- trigger will handled modified-by
+
+      Reshape_Other_Product (
+                            p_Ne_Id   =>  p_Ne_Id,
+                            p_Geom    =>  p_Geom
+                            );
+
     END reshape_element;
 
     --
