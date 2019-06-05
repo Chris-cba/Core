@@ -1,11 +1,11 @@
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/exnm04070001en_updt64.sql-arc   1.0   Feb 26 2019 14:57:08   Steve.Cooper  $
---       Date into PVCS   : $Date:   Feb 26 2019 14:57:08  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/exnm04070001en_updt64.sql-arc   1.1   Jun 05 2019 12:54:46   Steve.Cooper  $
+--       Date into PVCS   : $Date:   Jun 05 2019 12:54:46  $
 --       Module Name      : $Workfile:   exnm04070001en_updt64.sql  $
---       Date fetched Out : $Modtime:   Feb 26 2019 14:55:14  $
---       Version          : $Revision:   1.0  $
+--       Date fetched Out : $Modtime:   Jun 05 2019 12:03:36  $
+--       Version          : $Revision:   1.1  $
 --
 -----------------------------------------------------------------------------------
 -- Copyright (c) 2016 Bentley Systems Incorporated.  All rights reserved.
@@ -55,30 +55,13 @@ BEGIN
    RAISE_APPLICATION_ERROR(-20000,'You cannot install this product as ' || USER);
  END IF;
  --
- -- Check that NSG has been installed @ v4.7.0.0
+ -- Check that NET has been installed @ v4.7.0.0
  --
  hig2.product_exists_at_version  (
                                  p_product        => 'NET',
                                  p_version        => '4.7.0.1'
                                  );
 END;
-/
---
-Declare
-  n  Varchar2(1);
-Begin
-  Select  Null
-  Into    n
-  From    Hig_Upgrades
-  Where   Hup_Product     =   'NET'
-  And     From_Version    =   '4.7.0.1'
-  And     Upgrade_Script  =   'log_nm_4700_fix56.sql'
-  And     rownum          =   1;
-Exception 
-  When No_Data_Found
-Then
-  RAISE_APPLICATION_ERROR(-20000,'Please install NET 4700 Fix 56 before proceding.');
-End;
 /
 
 WHENEVER SQLERROR CONTINUE
@@ -100,11 +83,35 @@ start nm3merge.pkw
 SET FEEDBACK OFF
 --
 SET TERM ON 
+PROMPT Compiling nm3replace.pkw
+SET TERM OFF
+--
+SET FEEDBACK ON
+start nm3replace.pkw
+SET FEEDBACK OFF
+--
+SET TERM ON 
+PROMPT Compiling nm3sdm.pkw
+SET TERM OFF
+--
+SET FEEDBACK ON
+start nm3sdm.pkw
+SET FEEDBACK OFF
+--
+SET TERM ON 
 PROMPT Compiling nm3split.pkw
 SET TERM OFF
 --
 SET FEEDBACK ON
 start nm3split.pkw
+SET FEEDBACK OFF
+--
+SET TERM ON 
+PROMPT Compiling nm3undo.pkw
+SET TERM OFF
+--
+SET FEEDBACK ON
+start nm3undo.pkw
 SET FEEDBACK OFF
 --
 --  
