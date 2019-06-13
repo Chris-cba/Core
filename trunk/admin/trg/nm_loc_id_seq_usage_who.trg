@@ -1,22 +1,19 @@
 CREATE OR REPLACE TRIGGER NM_LOC_ID_SEQ_USAGE_WHO
-BEFORE INSERT OR UPDATE
+BEFORE INSERT
 ON NM_LOCATIONS_ALL
 REFERENCING NEW AS New OLD AS Old
 FOR EACH ROW
-DECLARE
-   l_sysdate DATE;
-   l_user    VARCHAR2(30);
 BEGIN
 --
 -----------------------------------------------------------------------------
 --
 --   PVCS Identifiers :-
 --
---       pvcsid                 : $Header:   //new_vm_latest/archives/lb/admin/trg/nm_loc_id_seq_usage_who.trg-arc   1.0   Aug 11 2017 13:28:34   Rob.Coupe  $
+--       pvcsid                 : $Header:   //new_vm_latest/archives/nm3/admin/trg/nm_loc_id_seq_usage_who.trg-arc   1.1   Jun 13 2019 12:06:58   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm_loc_id_seq_usage_who.trg  $
---       Date into PVCS   : $Date:   Aug 11 2017 13:28:34  $
---       Date fetched Out : $Modtime:   Aug 11 2017 13:27:56  $
---       PVCS Version     : $Revision:   1.0  $
+--       Date into PVCS   : $Date:   Jun 13 2019 12:06:58  $
+--       Date fetched Out : $Modtime:   Jun 13 2019 12:06:10  $
+--       PVCS Version     : $Revision:   1.1  $
 --
 --   Author : Rob Coupe
 --
@@ -27,21 +24,12 @@ BEGIN
 -----------------------------------------------------------------------------
 --
 --
-   SELECT sysdate
-         ,Sys_Context('NM3_SECURITY_CTX','USERNAME')
-    INTO  l_sysdate
-         ,l_user
-    FROM  dual;
 --
-    IF inserting
+    IF inserting and :new.NM_LOC_ID is NULL
     THEN
       :new.NM_LOC_ID        := NM_LOC_ID_SEQ.nextval;
-      :new.NM_DATE_CREATED  := l_sysdate;
-      :new.NM_CREATED_BY    := l_user;
    END IF;
 --
-   :new.NM_DATE_MODIFIED := l_sysdate;
-   :new.NM_MODIFIED_BY   := l_user;
 --
 END nm_locations_all_who;
 /
