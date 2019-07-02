@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_nw_edit
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_nw_edit.pkb-arc   1.9   Jul 26 2018 13:35:52   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/lb_nw_edit.pkb-arc   1.10   Jul 02 2019 12:57:44   Rob.Coupe  $
     --       Module Name      : $Workfile:   lb_nw_edit.pkb  $
-    --       Date into PVCS   : $Date:   Jul 26 2018 13:35:52  $
-    --       Date fetched Out : $Modtime:   Jul 26 2018 13:35:32  $
-    --       PVCS Version     : $Revision:   1.9  $
+    --       Date into PVCS   : $Date:   Jul 02 2019 12:57:44  $
+    --       Date fetched Out : $Modtime:   Jul 02 2019 12:45:36  $
+    --       PVCS Version     : $Revision:   1.10  $
     --
     --   Author : R.A. Coupe
     --
@@ -17,7 +17,7 @@ AS
     ----------------------------------------------------------------------------
     --
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.9  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.10  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'lb_get';
 
@@ -1106,11 +1106,13 @@ AS
     BEGIN
         UPDATE nm_locations_all
            SET nm_end_date = NULL,
+               nm_status = NULL,
                transaction_id =
                    (SELECT prior_t_id
                       FROM TABLE (p_edit_tab) t
-                     WHERE     t_edit_id = transaction_id
-                           AND t_new_ne = nm_ne_id_of)
+                     WHERE     t_id = transaction_id
+                           AND t_old_ne = nm_ne_id_of
+                           AND rownum = 1)
          WHERE transaction_id IN (SELECT t.t_id
                                     FROM TABLE (p_edit_tab) t);
     END;
