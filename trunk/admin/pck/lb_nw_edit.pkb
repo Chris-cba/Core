@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_nw_edit
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/lb_nw_edit.pkb-arc   1.10   Jul 02 2019 12:57:44   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/lb_nw_edit.pkb-arc   1.11   Jul 02 2019 13:00:40   Rob.Coupe  $
     --       Module Name      : $Workfile:   lb_nw_edit.pkb  $
-    --       Date into PVCS   : $Date:   Jul 02 2019 12:57:44  $
-    --       Date fetched Out : $Modtime:   Jul 02 2019 12:45:36  $
-    --       PVCS Version     : $Revision:   1.10  $
+    --       Date into PVCS   : $Date:   Jul 02 2019 13:00:40  $
+    --       Date fetched Out : $Modtime:   Jul 02 2019 13:00:10  $
+    --       PVCS Version     : $Revision:   1.11  $
     --
     --   Author : R.A. Coupe
     --
@@ -17,9 +17,9 @@ AS
     ----------------------------------------------------------------------------
     --
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.10  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.11  $';
 
-    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_get';
+    g_package_name   CONSTANT VARCHAR2 (30) := 'lb_nw_edit';
 
     PROCEDURE adjust_aggregates (p_ne               IN INTEGER,
                                  p_effective_date   IN DATE,
