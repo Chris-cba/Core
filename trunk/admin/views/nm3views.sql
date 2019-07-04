@@ -6,7 +6,7 @@
 --       Module Name      : nm3views.sql
 --       Date into SCCS   : 06/12/22 15:57:40
 --       Date fetched Out : 07/06/13 17:08:24
---       PVCS Version     : $Revision:   2.46  $
+--       PVCS Version     : $Revision:   2.47  $
 --
 --
 --   Author : Graeme Johnson
@@ -1905,3 +1905,22 @@ SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'views'||'&te
 FROM dual
 /
 start '&run_file'
+
+SET TERM ON
+PROMPT v_nm_ordered_extent.vw                                                                                                                                                                                                               
+SET TERM OFF
+SET DEFINE ON
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'views'||'&terminator'||'v_nm_ordered_extent.vw' run_file 
+FROM dual
+/
+start '&run_file'
+
+SET TERM ON
+PROMPT v_nm_ordered_extent_details.vw                                                                                                                                                                                                                
+SET TERM OFF
+SET DEFINE ON
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'views'||'&terminator'||'v_nm_ordered_extent_details.vw' run_file 
+FROM dual
+/
+start '&run_file'
+
