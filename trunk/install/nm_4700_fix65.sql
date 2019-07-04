@@ -1,11 +1,11 @@
 ----------------------------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm_4700_fix65.sql-arc   1.0   Jul 04 2019 13:42:38   Chris.Baugh  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm_4700_fix65.sql-arc   1.1   Jul 04 2019 13:51:12   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm_4700_fix65.sql  $ 
---       Date into PVCS   : $Date:   Jul 04 2019 13:42:38  $
---       Date fetched Out : $Modtime:   Jul 04 2019 11:45:00  $
---       Version     	  : $Revision:   1.0  $
+--       Date into PVCS   : $Date:   Jul 04 2019 13:51:12  $
+--       Date fetched Out : $Modtime:   Jul 04 2019 13:50:30  $
+--       Version     	  : $Revision:   1.1  $
 --
 ----------------------------------------------------------------------------------------------------
 --   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
@@ -66,18 +66,6 @@ WHENEVER SQLERROR CONTINUE
 
 
 --------------------------------------------------------------------------------
--- Package Bodies
---------------------------------------------------------------------------------
---
-SET TERM ON 
-PROMPT Creating Package Body nm3rsc
-SET TERM OFF
---
-SET FEEDBACK ON
-start nm3rsc.pkw
-SET FEEDBACK OFF
-
---------------------------------------------------------------------------------
 -- Views
 --------------------------------------------------------------------------------
 --
@@ -96,6 +84,19 @@ SET TERM OFF
 SET FEEDBACK ON
 start v_nm_ordered_extent_details.vw
 SET FEEDBACK OFF
+
+--------------------------------------------------------------------------------
+-- Package Bodies
+--------------------------------------------------------------------------------
+--
+SET TERM ON 
+PROMPT Creating Package Body nm3rsc
+SET TERM OFF
+--
+SET FEEDBACK ON
+start nm3rsc.pkw
+SET FEEDBACK OFF
+
 
 --
 --------------------------------------------------------------------------------
