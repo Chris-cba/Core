@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY lb_get
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/lb_get.pkb-arc   1.55.1.0   Jul 04 2019 15:40:36   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/lb_get.pkb-arc   1.55.1.1   Jul 05 2019 09:35:24   Rob.Coupe  $
     --       Module Name      : $Workfile:   lb_get.pkb  $
-    --       Date into PVCS   : $Date:   Jul 04 2019 15:40:36  $
-    --       Date fetched Out : $Modtime:   Jul 04 2019 15:39:46  $
-    --       PVCS Version     : $Revision:   1.55.1.0  $
+    --       Date into PVCS   : $Date:   Jul 05 2019 09:35:24  $
+    --       Date fetched Out : $Modtime:   Jul 05 2019 09:29:20  $
+    --       PVCS Version     : $Revision:   1.55.1.1  $
     --
     --   Author : R.A. Coupe
     --
@@ -16,7 +16,7 @@ AS
     -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
     ----------------------------------------------------------------------------
     --
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.55.1.0  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.55.1.1  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'lb_get';
 
@@ -2715,14 +2715,17 @@ FUNCTION get_obj_RPt_tab (p_refnt_tab     IN lb_RPt_tab,
     IS
         retval         lb_RPt_tab;
         l_refnt_type   nm_linear_types%ROWTYPE;
+        l_tab          lb_Rpt_tab;
     BEGIN
         -- just going down the hierarchy to diseeminate the data according to linear type
+
+        l_tab := LB_OPS.NORMALIZE_RPT_TAB (p_lb_RPt_tab);
+
         WITH
             itab
             AS
                 (SELECT t.*
-                   FROM TABLE (lb_ops.normalize_rpt_tab (p_lb_RPt_tab)) t)
-        --                   FROM TABLE (p_lb_RPt_tab) t)
+                   FROM TABLE (l_tab) t)
         SELECT lb_RPt (refnt,
                        refnt_type,
                        obj_type,
@@ -2750,8 +2753,8 @@ FUNCTION get_obj_RPt_tab (p_refnt_tab     IN lb_RPt_tab,
                                t1.datum_ne_id,
                                t1.route_dir_flag * obj_dir_flag
                                    "ROUTE_DIR_FLAG",
-                               t1."ROUTE_START_ON_ESU",
-                               t1."ROUTE_END_ON_ESU",
+                               t1."ROUTE_START_ON_DATUM",
+                               t1."ROUTE_END_ON_DATUM",
                                t1."ROUTE_START_M",
                                t1."ROUTE_END_M",
                                obj_id,
@@ -2789,9 +2792,9 @@ FUNCTION get_obj_RPt_tab (p_refnt_tab     IN lb_RPt_tab,
                                          rm.nm_cardinality
                                              route_dir_flag,
                                          rm.nm_begin_mp
-                                             route_start_on_esu,
+                                             route_start_on_datum,
                                          rm.nm_end_mp
-                                             route_end_on_esu,
+                                             route_end_on_datum,
                                          rm.nm_slk
                                              route_start_m,
                                          rm.nm_end_slk
