@@ -2,11 +2,11 @@
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/higroles.sql-arc   2.17   Oct 31 2018 10:40:14   Chris.Baugh  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/higroles.sql-arc   2.18   Jul 09 2019 15:24:22   Steve.Cooper  $
 --       Module Name      : $Workfile:   higroles.sql  $
---       Date into PVCS   : $Date:   Oct 31 2018 10:40:14  $
---       Date fetched Out : $Modtime:   Jul 04 2018 11:21:54  $
---       Version          : $Revision:   2.17  $
+--       Date into PVCS   : $Date:   Jul 09 2019 15:24:22  $
+--       Date fetched Out : $Modtime:   Jul 09 2019 15:18:14  $
+--       Version          : $Revision:   2.18  $
 --
 -----------------------------------------------------------------------------
 --    Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
@@ -725,6 +725,38 @@ Exception
 End;  
 /
 
+Declare
+  Role_Already_Exists Exception;
+  Pragma Exception_Init(Role_Already_Exists,-1921);
+Begin
+  Execute Immediate ('Create Role Extract_Shape_File');
+Exception
+  When Role_Already_Exists Then
+    Null;
+End;  
+/
+
+Declare
+  Role_Already_Exists Exception;
+  Pragma Exception_Init(Role_Already_Exists,-1921);
+Begin
+  Execute Immediate ('Create Role Upload_Shape_File');
+Exception
+  When Role_Already_Exists Then
+    Null;
+End;  
+/
+
+Declare
+  Role_Already_Exists Exception;
+  Pragma Exception_Init(Role_Already_Exists,-1921);
+Begin
+  Execute Immediate ('Create Role Check_Xss');
+Exception
+  When Role_Already_Exists Then
+    Null;
+End;  
+/
 --
 REM End of command file
 rem
