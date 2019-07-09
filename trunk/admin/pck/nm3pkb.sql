@@ -2,11 +2,11 @@
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3pkb.sql-arc   2.53   Jan 22 2019 09:28:52   Chris.Baugh  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3pkb.sql-arc   2.54   Jul 09 2019 15:19:30   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3pkb.sql  $
---       Date into PVCS   : $Date:   Jan 22 2019 09:28:52  $
---       Date fetched Out : $Modtime:   Jan 22 2019 09:22:00  $
---       PVCS Version     : $Revision:   2.53  $
+--       Date into PVCS   : $Date:   Jul 09 2019 15:19:30  $
+--       Date fetched Out : $Modtime:   Jul 09 2019 15:17:06  $
+--       PVCS Version     : $Revision:   2.54  $
 --
 --
 --   Author : Graeme Johnson
@@ -2555,7 +2555,14 @@ FROM dual
 /
 start '&run_file'
 
-
+SET TERM ON
+PROMPT lb_aggr.pkw                                                                                                                                                                                                                    
+SET TERM OFF
+SET DEFINE ON
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'pck'||'&terminator'||'nm3_java_utils.pkw' run_file 
+FROM dual
+/
+start '&run_file'
 
 --
 ----------------------------------------------------------------------------------------- 
