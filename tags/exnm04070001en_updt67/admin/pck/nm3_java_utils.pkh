@@ -1,0 +1,87 @@
+Create Or Replace Package Nm3_Java_Utils
+As
+--<PACKAGE>
+-----------------------------------------------------------------------------
+--   PVCS Identifiers :-
+--
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3_java_utils.pkh-arc   1.0   Jul 09 2019 15:35:30   Steve.Cooper  $
+--       Module Name      : $Workfile:   nm3_java_utils.pkh  $
+--       Date into SCCS   : $Date:   Jul 09 2019 15:35:30  $
+--       Date fetched Out : $Modtime:   Jun 21 2019 16:22:30  $
+--       SCCS Version     : $Revision:   1.0  $
+--
+-----------------------------------------------------------------------------
+-- Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--</PACKAGE>
+
+--<GLOBVAR>
+
+  -----------
+  --constants
+  -----------
+  --g_sccsid is the SCCS ID for the package
+  G_Sccsid Constant Varchar2(2000) := '$Revision:   1.0  $';
+  
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+Function Get_Version Return Varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+Function Get_Body_Version Return Varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+Function Extract_Shape_File (
+                            p_Host                 In Varchar2,
+                            p_Port                 In Number,
+                            p_Sid                  In Varchar2,
+                            p_Username             In Varchar2,
+                            p_Password             In Varchar2,
+                            p_Table_Column         In Varchar2,
+                            p_File_Path            In Varchar2,
+                            p_Where_Clause         In Varchar2,
+                            p_Attrib_Map_File_Path In Varchar2
+                            ) Return Varchar2;   --  do_sde2shp
+--
+-----------------------------------------------------------------------------
+--
+Function Upload_Shape_File  (
+                            p_Host                     In     Varchar2,
+                            p_Port                     In     Number,
+                            p_Sid                      In     Varchar2,
+                            p_Username                 In     Varchar2,
+                            p_Password                 In     Varchar2,
+                            p_Table_Name               In     Varchar2,
+                            p_File_Path                In     Varchar2,
+                            p_Unique_Col_Name          In     Varchar2,
+                            p_Srid                     In     Number,
+                            p_Geom_Col_Name            In     Varchar2,
+                            p_X_Bounds                 In     Varchar2,
+                            p_Y_Bounds                 In     Varchar2,
+                            p_Tolerance                In     Varchar2,
+                            p_Mode_Of_Operation        In     Varchar2,
+                            p_Unique_Col_Start_Id      In     Number,
+                            p_Commit_Interval          In     Number,
+                            p_Attrib_Map_File_Path     In     Varchar2
+                            ) Return Varchar2; --do_shp2sde
+--
+-----------------------------------------------------------------------------
+--
+Function Check_For_Xss      (
+                            P_Url_Parameters     In  Varchar2
+                            ) Return Varchar2;
+--
+-----------------------------------------------------------------------------
+--
+End Nm3_Java_Utils;
+/
