@@ -1,11 +1,11 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/nm3_install.sql-arc   2.51   Jul 16 2019 13:06:24   Chris.Baugh  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/nm3_install.sql-arc   2.52   Jul 16 2019 13:09:42   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm3_install.sql  $
---       Date into PVCS   : $Date:   Jul 16 2019 13:06:24  $
---       Date fetched Out : $Modtime:   Jul 16 2019 10:18:56  $
---       PVCS Version     : $Revision:   2.51  $
+--       Date into PVCS   : $Date:   Jul 16 2019 13:09:42  $
+--       Date fetched Out : $Modtime:   Jul 16 2019 13:08:34  $
+--       PVCS Version     : $Revision:   2.52  $
 --
 --------------------------------------------------------------------------------
 --   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
@@ -761,11 +761,11 @@ SET TERM ON
 Prompt Setting The Version Number...
 SET TERM OFF
 BEGIN
-      hig2.upgrade('HIG','nm3_install.sql','Installed','4.8.0.2');
-      hig2.upgrade('NET','nm3_install.sql','Installed','4.8.0.2');
-      hig2.upgrade('DOC','nm3_install.sql','Installed','4.8.0.2');
-      hig2.upgrade('AST','nm3_install.sql','Installed','4.8.0.2');
-      hig2.upgrade('WMP','nm3_install.sql','Installed','4.8.0.2');
+      hig2.upgrade('HIG','nm3_install.sql','Installed','4.8.0.3');
+      hig2.upgrade('NET','nm3_install.sql','Installed','4.8.0.3');
+      hig2.upgrade('DOC','nm3_install.sql','Installed','4.8.0.3');
+      hig2.upgrade('AST','nm3_install.sql','Installed','4.8.0.3');
+      hig2.upgrade('WMP','nm3_install.sql','Installed','4.8.0.3');
 END;
 /
 COMMIT;
