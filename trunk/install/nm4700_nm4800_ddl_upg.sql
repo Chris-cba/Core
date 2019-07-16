@@ -7,11 +7,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm4700_nm4800_ddl_upg.sql-arc   1.4   Apr 24 2019 13:51:12   Chris.Baugh  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm4700_nm4800_ddl_upg.sql-arc   1.5   Jul 16 2019 13:07:16   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm4700_nm4800_ddl_upg.sql  $
---       Date into PVCS   : $Date:   Apr 24 2019 13:51:12  $
---       Date fetched Out : $Modtime:   Apr 24 2019 13:47:22  $
---       Version          : $Revision:   1.4  $
+--       Date into PVCS   : $Date:   Jul 16 2019 13:07:16  $
+--       Date fetched Out : $Modtime:   Jul 16 2019 12:03:12  $
+--       Version          : $Revision:   1.5  $
 --
 ------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2014
@@ -2280,6 +2280,43 @@ EXCEPTION
         RAISE;
 END;
 /
+------------------------------------------------------------------
+SET TERM ON
+PROMPT nm_4700_fix67
+SET TERM OFF
+Declare
+  Role_Already_Exists Exception;
+  Pragma Exception_Init(Role_Already_Exists,-1921);
+Begin
+  Execute Immediate ('Create Role Extract_Shape_File');
+Exception
+  When Role_Already_Exists Then
+    Null;
+End;  
+/
+
+Declare
+  Role_Already_Exists Exception;
+  Pragma Exception_Init(Role_Already_Exists,-1921);
+Begin
+  Execute Immediate ('Create Role Upload_Shape_File');
+Exception
+  When Role_Already_Exists Then
+    Null;
+End;  
+/
+
+Declare
+  Role_Already_Exists Exception;
+  Pragma Exception_Init(Role_Already_Exists,-1921);
+Begin
+  Execute Immediate ('Create Role Check_Xss');
+Exception
+  When Role_Already_Exists Then
+    Null;
+End;  
+/
+
 
 ------------------------------------------------------------------
 -- end of script 
