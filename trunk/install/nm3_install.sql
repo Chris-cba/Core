@@ -1,11 +1,11 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/nm3_install.sql-arc   2.50   Apr 24 2019 11:21:28   Chris.Baugh  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/nm3_install.sql-arc   2.51   Jul 16 2019 13:06:24   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm3_install.sql  $
---       Date into PVCS   : $Date:   Apr 24 2019 11:21:28  $
---       Date fetched Out : $Modtime:   Apr 24 2019 11:21:06  $
---       PVCS Version     : $Revision:   2.50  $
+--       Date into PVCS   : $Date:   Jul 16 2019 13:06:24  $
+--       Date fetched Out : $Modtime:   Jul 16 2019 10:18:56  $
+--       PVCS Version     : $Revision:   2.51  $
 --
 --------------------------------------------------------------------------------
 --   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
@@ -275,6 +275,16 @@ from dual
 SET FEEDBACK ON
 start '&&run_file'
 SET FEEDBACK OFF
+--
+SET DEFINE ON
+select '&exor_base'||'nm3'||'&terminator'||'admin'||
+        '&terminator'||'Java'||'&terminator'||'shapefile'||'&terminator'||'runcommand.fnw' run_file
+from dual
+/
+SET FEEDBACK ON
+start '&&run_file'
+SET FEEDBACK OFF
+
 --
 ---------------------------------------------------------------------------------------------------
 --                         ****************   TRIGGERS  *******************
