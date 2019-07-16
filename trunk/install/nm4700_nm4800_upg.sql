@@ -3,11 +3,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm4700_nm4800_upg.sql-arc   1.7   Apr 24 2019 11:21:30   Chris.Baugh  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm4700_nm4800_upg.sql-arc   1.8   Jul 16 2019 13:06:46   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm4700_nm4800_upg.sql  $
---       Date into PVCS   : $Date:   Apr 24 2019 11:21:30  $
---       Date fetched Out : $Modtime:   Apr 24 2019 11:20:44  $
---       Version          : $Revision:   1.7  $
+--       Date into PVCS   : $Date:   Jul 16 2019 13:06:46  $
+--       Date fetched Out : $Modtime:   Jul 16 2019 10:21:46  $
+--       Version          : $Revision:   1.8  $
 --
 --   Product upgrade script
 --
@@ -266,6 +266,16 @@ from dual
 SET FEEDBACK ON
 start '&&run_file'
 SET FEEDBACK OFF
+--
+SET DEFINE ON
+select '&exor_base'||'nm3'||'&terminator'||'admin'||
+        '&terminator'||'Java'||'&terminator'||'shapefile'||'&terminator'||'runcommand.fnw' run_file
+from dual
+/
+SET FEEDBACK ON
+start '&&run_file'
+SET FEEDBACK OFF
+
 --
 ---------------------------------------------------------------------------------------------------
 --                ****************   v_geom_on_route View  *******************
