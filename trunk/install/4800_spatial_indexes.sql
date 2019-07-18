@@ -1,10 +1,10 @@
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/nm3/install/4800_spatial_indexes.sql-arc   1.0   Jan 09 2019 11:45:38   Chris.Baugh  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/nm3/install/4800_spatial_indexes.sql-arc   1.1   Jul 18 2019 10:35:38   Chris.Baugh  $
 --       Module Name      : $Workfile:   4800_spatial_indexes.sql  $
---       Date into PVCS   : $Date:   Jan 09 2019 11:45:38  $
---       Date fetched Out : $Modtime:   Jan 09 2019 11:45:08  $
---       PVCS Version     : $Revision:   1.0  $
+--       Date into PVCS   : $Date:   Jul 18 2019 10:35:38  $
+--       Date fetched Out : $Modtime:   Jul 18 2019 10:34:34  $
+--       PVCS Version     : $Revision:   1.1  $
 --
 --   Author : R.A. Coupe
 --
@@ -97,4 +97,25 @@ PROMPT Creating Index NAG_SPIDX on NM_ASSET_GEOMETRY_ALL
 CREATE INDEX NAG_SPIDX ON NM_ASSET_GEOMETRY_ALL
 (NAG_GEOMETRY)
 INDEXTYPE IS MDSYS.SPATIAL_INDEX
+/
+
+Prompt Spatial metadata
+
+declare
+  duplicate_SDO_data exception;
+  pragma exception_init( duplicate_SDO_data, -13223); -- duplicate entry for NM_INV_GEOMETRY_ALL.SHAPE in SDO_GEOM_METADATA
+begin  
+   insert into user_sdo_geom_metadata
+   select 'NM_INV_GEOMETRY_ALL', 'SHAPE', diminfo, srid
+   from user_sdo_geom_metadata where table_name = 'NM_POINT_LOCATIONS';
+exception
+   when duplicate_SDO_data 
+     then NULL;
+end;
+/
+
+Prompt Spatial Index
+
+create index nig_spidx on nm_inv_geometry_all
+(shape) indextype is mdsys.spatial_index
 /
