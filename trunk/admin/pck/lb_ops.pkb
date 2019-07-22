@@ -1,13 +1,12 @@
-/* Formatted on 10/10/2018 18:09:54 (QP5 v5.326) */
 CREATE OR REPLACE PACKAGE BODY lb_ops
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_ops.pkb-arc   1.15   Oct 10 2018 18:15:14   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/lb_ops.pkb-arc   1.16   Jul 22 2019 12:29:16   Rob.Coupe  $
     --       Module Name      : $Workfile:   lb_ops.pkb  $
-    --       Date into PVCS   : $Date:   Oct 10 2018 18:15:14  $
-    --       Date fetched Out : $Modtime:   Oct 10 2018 18:14:32  $
-    --       PVCS Version     : $Revision:   1.15  $
+    --       Date into PVCS   : $Date:   Jul 22 2019 12:29:16  $
+    --       Date fetched Out : $Modtime:   Jul 22 2019 12:28:08  $
+    --       PVCS Version     : $Revision:   1.16  $
     --
     --   Author : R.A. Coupe
     --
@@ -17,7 +16,7 @@ AS
     -- Copyright (c) 2015 Bentley Systems Incorporated . All rights reserved.
     ----------------------------------------------------------------------------
     --
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.15  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.16  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'lb_ops';
 
@@ -63,18 +62,15 @@ AS
             lrs_intsct
             AS
                 (SELECT t1.*,
-                        t2.start_m
-                            start_m2,
-                        t2.end_m
-                            end_m2,
+                        t2.start_m                         start_m2,
+                        t2.end_m                           end_m2,
                         CASE
                             WHEN ABS (t2.start_m - t2.end_m) < g_tol
                             THEN                 -- It is a point intersection
                                 'POINT'
                             ELSE
                                 'LINE'
-                        END
-                            porl,
+                        END                                porl,
                         (SELECT CASE INSTR (un_format_mask, '.')
                                     WHEN 0
                                     THEN
@@ -86,11 +82,9 @@ AS
                                                   INSTR (un_format_mask, '.')
                                                 + 1,
                                                 LENGTH (un_format_mask)))
-                                END
-                                    rnd
+                                END    rnd
                            FROM nm_units
-                          WHERE un_unit_id = t1.m_unit)
-                            rnd
+                          WHERE un_unit_id = t1.m_unit)    rnd
                    FROM TABLE (p_Rpt1) t1, TABLE (p_Rpt2) t2
                   WHERE     t1.refnt = t2.refnt
                         AND (   (    t1.start_m = t1.end_m
@@ -186,26 +180,22 @@ AS
                                                 obj_type,
                                                 obj_id,
                                                 m_unit
-                                   ORDER BY rn)
-                             p_op,
+                                   ORDER BY rn)    p_op,
                          LAG (typ, 1)
                              OVER (PARTITION BY refnt,
                                                 refnt_type,
                                                 obj_type,
                                                 obj_id,
                                                 m_unit
-                                   ORDER BY rn)
-                             p_typ,
+                                   ORDER BY rn)    p_typ,
                          LAG (measure, 1)
                              OVER (PARTITION BY refnt,
                                                 refnt_type,
                                                 obj_type,
                                                 obj_id,
                                                 m_unit
-                                   ORDER BY rn)
-                             start_m,
-                         measure
-                             end_m
+                                   ORDER BY rn)    start_m,
+                         measure                   end_m
                     FROM (SELECT rn,
                                  op,
                                  refnt,
@@ -218,7 +208,7 @@ AS
                                  typ,
                                  CASE op WHEN 'B' THEN 'E' --start or end of the minus array is always considered an end
                                                              --  else case typ
-                                                      --     when 'E' then 'R'
+                                  --     when 'E' then 'R'
                                   ELSE typ                            --   end
                                            END     typ1
                             FROM (SELECT ROW_NUMBER ()
@@ -319,8 +309,7 @@ AS
                                    OVER (
                                        ORDER BY refnt, start_m, end_m
                                        ROWS BETWEEN UNBOUNDED PRECEDING
-                                            AND     CURRENT ROW)
-                                   seg
+                                            AND     CURRENT ROW)    seg
                           FROM (SELECT q2.*,
                                        CASE SIGN (
                                                 NVL (prior_end - end_m, -1))
@@ -329,8 +318,7 @@ AS
                                                1
                                            ELSE
                                                0
-                                       END
-                                           sc
+                                       END    sc
                                   FROM (SELECT q1.*
                                           FROM (  SELECT t.*,
                                                          LAG (end_m, 1)
@@ -338,8 +326,7 @@ AS
                                                                  PARTITION BY refnt
                                                                  ORDER BY
                                                                      start_m,
-                                                                     end_m)
-                                                             prior_end
+                                                                     end_m)    prior_end
                                                     FROM rpt_union t
                                                 ORDER BY refnt,
                                                          start_m,
@@ -552,10 +539,8 @@ AS
                                       end_m,
                                       m_unit)) AS lb_rpt_tab)
           INTO retval
-          FROM (SELECT 1
-                           table_number,
-                       ROWNUM
-                           rn,
+          FROM (SELECT 1         table_number,
+                       ROWNUM    rn,
                        t1.refnt,
                        t1.refnt_type,
                        t1.obj_type,
@@ -574,8 +559,7 @@ AS
                                END
                            ELSE
                                t1.start_m
-                       END
-                           start_m,
+                       END       start_m,
                        CASE
                            WHEN     refnt = first_refnt
                                 AND l_cnct = 1
@@ -587,15 +571,12 @@ AS
                                END
                            ELSE
                                t1.end_m
-                       END
-                           end_m,
+                       END       end_m,
                        t1.m_unit
                   FROM TABLE (p_Rpt1) t1
                 UNION ALL
-                SELECT 2
-                           table_number,
-                       ROWNUM
-                           rn,
+                SELECT 2         table_number,
+                       ROWNUM    rn,
                        t2.refnt,
                        t2.refnt_type,
                        t2.obj_type,
@@ -603,8 +584,7 @@ AS
                        CASE
                            WHEN l_cnct = 1 THEN last_seg_id
                            ELSE t2.seg_id + last_seg_id
-                       END
-                           seg_id,
+                       END       seg_id,
                        CASE
                            WHEN l_cnct = 1
                            THEN
@@ -613,8 +593,7 @@ AS
                                - (CASE WHEN l_part = 1 THEN 1 ELSE 0 END)
                            ELSE
                                t2.seq_id
-                       END
-                           seq_id,
+                       END       seq_id,
                        t2.dir_flag,
                        t2.start_m,
                        t2.end_m,
@@ -678,8 +657,7 @@ AS
                                    NVL (
                                        LAG (end_node, 1)
                                            OVER (ORDER BY seg_id, seq_id),
-                                       start_node)
-                                       prior_end_node
+                                       start_node)    prior_end_node
                               FROM (  SELECT t.*,
                                              CASE dir_flag
                                                  WHEN 1 THEN ne_no_start
@@ -735,86 +713,92 @@ AS
     IS
         retval   lb_rpt_tab;
     BEGIN
-        IF lb_rpt_tab_has_network (pi_rpt_tab) = 'FALSE'
+        IF pi_rpt_tab.COUNT = 0
         THEN
-            raise_application_error (
-                -20019,
-                'You must specify a network referent or referent type');
+            retval := pi_rpt_tab;
+        ELSE
+            --
+            IF lb_rpt_tab_has_network (pi_rpt_tab) = 'FALSE'
+            THEN
+                raise_application_error (
+                    -20019,
+                    'You must specify a network referent or referent type');
+            END IF;
+
+            SELECT lb_rpt (ne_id,
+                           nlt_id,
+                           obj_type,
+                           obj_id,
+                           seg_id,
+                           seq_id,
+                           dir_flag,
+                           start_m * uc.uc_conversion_factor,
+                           end_m * uc.uc_conversion_factor,
+                           uc.uc_unit_id_out)
+              BULK COLLECT INTO retval
+              FROM TABLE (pi_rpt_tab)   t,
+                   nm_linear_types      nlt,
+                   nm_unit_conversions  uc,
+                   nm_elements
+             WHERE     uc.uc_unit_id_in = t.m_unit
+                   AND uc.uc_unit_id_out = nlt.nlt_units
+                   AND nlt.nlt_id = NVL (t.refnt_type, nlt.nlt_id)
+                   AND nlt_nt_type = ne_nt_type
+                   AND NVL (ne_gty_group_type, '¿¿¿¿$%^') =
+                       NVL (nlt_gty_type, '¿¿¿¿$%^')
+                   AND ne_id = refnt
+                   AND m_unit IS NOT NULL
+            UNION ALL
+            SELECT lb_rpt (ne_id,
+                           nlt_id,
+                           obj_type,
+                           obj_id,
+                           seg_id,
+                           seq_id,
+                           dir_flag,
+                           start_m * uc.uc_conversion_factor,
+                           end_m * uc.uc_conversion_factor,
+                           uc.uc_unit_id_out)
+              FROM TABLE (pi_rpt_tab)   t,
+                   nm_linear_types      nlt,
+                   nm_unit_conversions  uc,
+                   nm_elements
+             WHERE     uc.uc_unit_id_in = NVL (t.m_unit, nlt_units)
+                   AND uc.uc_unit_id_out = NVL (t.m_unit, nlt.nlt_units)
+                   AND nlt.nlt_id = NVL (t.refnt_type, nlt.nlt_id)
+                   AND nlt_nt_type = ne_nt_type
+                   AND NVL (ne_gty_group_type, '¿¿¿¿$%^') =
+                       NVL (nlt_gty_type, '¿¿¿¿$%^')
+                   AND ne_id = refnt
+                   AND refnt IS NOT NULL
+                   AND m_unit IS NULL
+            UNION ALL
+            SELECT lb_rpt (refnt,
+                           nlt_id,
+                           obj_type,
+                           obj_id,
+                           seg_id,
+                           seq_id,
+                           dir_flag,
+                           start_m * uc.uc_conversion_factor,
+                           end_m * uc.uc_conversion_factor,
+                           uc.uc_unit_id_out)
+              --        BULK COLLECT INTO retval
+              FROM TABLE (pi_rpt_tab)   t,
+                   nm_linear_types      nlt,
+                   nm_unit_conversions  uc,
+                   nm_inv_nw
+             WHERE     uc.uc_unit_id_in = NVL (t.m_unit, nlt_units)
+                   AND uc.uc_unit_id_out = NVL (t.m_unit, nlt.nlt_units)
+                   AND nlt.nlt_id = NVL (t.refnt_type, nlt.nlt_id)
+                   AND nlt_nt_type = nin_nw_type
+                   AND refnt IS NULL
+                   AND obj_type = nin_nit_inv_code
+                   AND obj_type IS NOT NULL
+                   AND refnt IS NULL;
+        --
         END IF;
 
-        SELECT lb_rpt (ne_id,
-                       nlt_id,
-                       obj_type,
-                       obj_id,
-                       seg_id,
-                       seq_id,
-                       dir_flag,
-                       start_m * uc.uc_conversion_factor,
-                       end_m * uc.uc_conversion_factor,
-                       uc.uc_unit_id_out)
-          BULK COLLECT INTO retval
-          FROM TABLE (pi_rpt_tab)   t,
-               nm_linear_types      nlt,
-               nm_unit_conversions  uc,
-               nm_elements
-         WHERE     uc.uc_unit_id_in = t.m_unit
-               AND uc.uc_unit_id_out = nlt.nlt_units
-               AND nlt.nlt_id = NVL (t.refnt_type, nlt.nlt_id)
-               AND nlt_nt_type = ne_nt_type
-               AND NVL (ne_gty_group_type, '¿¿¿¿$%^') =
-                   NVL (nlt_gty_type, '¿¿¿¿$%^')
-               AND ne_id = refnt
-               AND m_unit IS NOT NULL
-        UNION ALL
-        SELECT lb_rpt (ne_id,
-                       nlt_id,
-                       obj_type,
-                       obj_id,
-                       seg_id,
-                       seq_id,
-                       dir_flag,
-                       start_m * uc.uc_conversion_factor,
-                       end_m * uc.uc_conversion_factor,
-                       uc.uc_unit_id_out)
-          FROM TABLE (pi_rpt_tab)   t,
-               nm_linear_types      nlt,
-               nm_unit_conversions  uc,
-               nm_elements
-         WHERE     uc.uc_unit_id_in = NVL (t.m_unit, nlt_units)
-               AND uc.uc_unit_id_out = NVL (t.m_unit, nlt.nlt_units)
-               AND nlt.nlt_id = NVL (t.refnt_type, nlt.nlt_id)
-               AND nlt_nt_type = ne_nt_type
-               AND NVL (ne_gty_group_type, '¿¿¿¿$%^') =
-                   NVL (nlt_gty_type, '¿¿¿¿$%^')
-               AND ne_id = refnt
-               AND refnt IS NOT NULL
-               AND m_unit IS NULL
-        UNION ALL
-        SELECT lb_rpt (refnt,
-                       nlt_id,
-                       obj_type,
-                       obj_id,
-                       seg_id,
-                       seq_id,
-                       dir_flag,
-                       start_m * uc.uc_conversion_factor,
-                       end_m * uc.uc_conversion_factor,
-                       uc.uc_unit_id_out)
-          --        BULK COLLECT INTO retval
-          FROM TABLE (pi_rpt_tab)   t,
-               nm_linear_types      nlt,
-               nm_unit_conversions  uc,
-               nm_inv_nw
-         WHERE     uc.uc_unit_id_in = NVL (t.m_unit, nlt_units)
-               AND uc.uc_unit_id_out = NVL (t.m_unit, nlt.nlt_units)
-               AND nlt.nlt_id = NVL (t.refnt_type, nlt.nlt_id)
-               AND nlt_nt_type = nin_nw_type
-               AND refnt IS NULL
-               AND obj_type = nin_nit_inv_code
-               AND obj_type IS NOT NULL
-               AND refnt IS NULL;
-
-        --
         RETURN retval;
     END;
 
@@ -824,76 +808,83 @@ AS
     IS
         retval   lb_rpt_tab;
     BEGIN
-        IF unit_out IS NULL
+        IF pi_rpt_tab.COUNT = 0
         THEN
-            raise_application_error (-200017, 'A unit must be specified');
-        END IF;
+            retval := pi_rpt_tab;
+        ELSE
+            IF unit_out IS NULL
+            THEN
+                raise_application_error (-200017, 'A unit must be specified');
+            END IF;
 
-        IF check_lb_rpt_tab (pi_rpt_tab) = 'FALSE'
-        THEN
-            raise_application_error (
-                -20018,
-                'You must specify a unit via the unit value or through the refnt or refnt_type values ');
-        END IF;
+            IF check_lb_rpt_tab (pi_rpt_tab) = 'FALSE'
+            THEN
+                raise_application_error (
+                    -20018,
+                    'You must specify a unit via the unit value or through the refnt or refnt_type values ');
+            END IF;
 
-        SELECT lb_rpt (refnt,
-                       refnt_type,
-                       obj_type,
-                       obj_id,
-                       seg_id,
-                       seq_id,
-                       dir_flag,
-                       start_m * uc.uc_conversion_factor,
-                       end_m * uc.uc_conversion_factor,
-                       unit_out)
-          BULK COLLECT INTO retval
-          FROM TABLE (pi_rpt_tab) t, nm_unit_conversions uc
-         WHERE     uc.uc_unit_id_in = t.m_unit
-               AND uc.uc_unit_id_out = unit_out
-               AND m_unit IS NOT NULL
-        UNION ALL
-        SELECT lb_rpt (refnt,
-                       refnt_type,
-                       obj_type,
-                       obj_id,
-                       seg_id,
-                       seq_id,
-                       dir_flag,
-                       start_m * uc.uc_conversion_factor,
-                       end_m * uc.uc_conversion_factor,
-                       unit_out)
-          FROM TABLE (pi_rpt_tab) t, nm_unit_conversions uc, nm_linear_types
-         WHERE     uc.uc_unit_id_in = nlt_units
-               AND uc.uc_unit_id_out = unit_out
-               AND nlt_id = refnt_type
-               AND m_unit IS NULL
-               AND refnt_type IS NOT NULL
-        UNION ALL
-        SELECT lb_rpt (refnt,
-                       refnt_type,
-                       obj_type,
-                       obj_id,
-                       seg_id,
-                       seq_id,
-                       dir_flag,
-                       start_m * uc.uc_conversion_factor,
-                       end_m * uc.uc_conversion_factor,
-                       unit_out)
-          FROM TABLE (pi_rpt_tab)   t,
-               nm_unit_conversions  uc,
-               nm_linear_types,
-               nm_elements
-         WHERE     uc.uc_unit_id_in = nlt_units
-               AND uc.uc_unit_id_out = unit_out
-               AND ne_id = refnt
-               AND nlt_nt_type = ne_nt_type
-               AND NVL (nlt_gty_type, '¿¿$%^') =
-                   NVL (ne_gty_group_type, '¿¿$%^')
-               AND m_unit IS NULL
-               AND refnt_type IS NULL
-               AND refnt IS NOT NULL;
-
+            SELECT lb_rpt (refnt,
+                           refnt_type,
+                           obj_type,
+                           obj_id,
+                           seg_id,
+                           seq_id,
+                           dir_flag,
+                           start_m * uc.uc_conversion_factor,
+                           end_m * uc.uc_conversion_factor,
+                           unit_out)
+              BULK COLLECT INTO retval
+              FROM TABLE (pi_rpt_tab) t, nm_unit_conversions uc
+             WHERE     uc.uc_unit_id_in = t.m_unit
+                   AND uc.uc_unit_id_out = unit_out
+                   AND m_unit IS NOT NULL
+            UNION ALL
+            SELECT lb_rpt (refnt,
+                           refnt_type,
+                           obj_type,
+                           obj_id,
+                           seg_id,
+                           seq_id,
+                           dir_flag,
+                           start_m * uc.uc_conversion_factor,
+                           end_m * uc.uc_conversion_factor,
+                           unit_out)
+              FROM TABLE (pi_rpt_tab)   t,
+                   nm_unit_conversions  uc,
+                   nm_linear_types
+             WHERE     uc.uc_unit_id_in = nlt_units
+                   AND uc.uc_unit_id_out = unit_out
+                   AND nlt_id = refnt_type
+                   AND m_unit IS NULL
+                   AND refnt_type IS NOT NULL
+            UNION ALL
+            SELECT lb_rpt (refnt,
+                           refnt_type,
+                           obj_type,
+                           obj_id,
+                           seg_id,
+                           seq_id,
+                           dir_flag,
+                           start_m * uc.uc_conversion_factor,
+                           end_m * uc.uc_conversion_factor,
+                           unit_out)
+              FROM TABLE (pi_rpt_tab)   t,
+                   nm_unit_conversions  uc,
+                   nm_linear_types,
+                   nm_elements
+             WHERE     uc.uc_unit_id_in = nlt_units
+                   AND uc.uc_unit_id_out = unit_out
+                   AND ne_id = refnt
+                   AND nlt_nt_type = ne_nt_type
+                   AND NVL (nlt_gty_type, '¿¿$%^') =
+                       NVL (ne_gty_group_type, '¿¿$%^')
+                   AND m_unit IS NULL
+                   AND refnt_type IS NULL
+                   AND refnt IS NOT NULL;
         --
+        END IF;
+
         RETURN retval;
     END;
 
@@ -973,8 +964,7 @@ AS
                                 dir_flag,
                                 start_m,
                                 end_m,
-                                m_unit)
-                            rpt,
+                                m_unit)    rpt,
                         nlt_g_i_d
                    FROM TABLE (pi_rpt_tab) t, nm_linear_types
                   WHERE nlt_id = refnt_type)
