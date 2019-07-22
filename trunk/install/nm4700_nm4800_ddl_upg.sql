@@ -7,11 +7,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm4700_nm4800_ddl_upg.sql-arc   1.5   Jul 16 2019 13:07:16   Chris.Baugh  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm4700_nm4800_ddl_upg.sql-arc   1.6   Jul 22 2019 10:23:34   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm4700_nm4800_ddl_upg.sql  $
---       Date into PVCS   : $Date:   Jul 16 2019 13:07:16  $
---       Date fetched Out : $Modtime:   Jul 16 2019 12:03:12  $
---       Version          : $Revision:   1.5  $
+--       Date into PVCS   : $Date:   Jul 22 2019 10:23:34  $
+--       Date fetched Out : $Modtime:   Jul 22 2019 10:01:50  $
+--       Version          : $Revision:   1.6  $
 --
 ------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2014
@@ -1651,6 +1651,23 @@ EXCEPTION
     NULL;
   WHEN OTHERS THEN 
     RAISE;
+END;
+/
+
+DECLARE
+    already_exists   EXCEPTION;
+    PRAGMA EXCEPTION_INIT (already_exists, -2261);
+BEGIN
+    EXECUTE IMMEDIATE
+           ' ALTER TABLE NM_JUXTAPOSITIONS ADD '
+        || ' CONSTRAINT njx_uk '
+        || ' UNIQUE (NJX_NJXT_ID, NJX_CODE) '
+        || ' ENABLE '
+        || ' VALIDATE';
+EXCEPTION
+    WHEN already_exists
+    THEN
+        NULL;
 END;
 /
 
