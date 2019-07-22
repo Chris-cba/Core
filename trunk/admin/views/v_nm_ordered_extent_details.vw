@@ -5,14 +5,14 @@ CREATE OR REPLACE FORCE VIEW V_NM_ORDERED_EXTENT_DETAILS
  NM_CALC_SEQ_NO, NM_SLK_CALC, NM_END_SLK_CALC, WHOLE_OR_PART, SLK_DIFFERENCE, 
  GAP_OR_OVRL_STORED, GAP_OR_OVRL_CALC, CONNECT_LEVEL)
 AS 
-SELECT 
+SELECT
 -------------------------------------------------------------------------
                    --   PVCS Identifiers :-
-                   --       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/views/v_nm_ordered_extent_details.vw-arc   1.3   Apr 26 2019 13:39:22   Rob.Coupe  $
+                   --       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/views/v_nm_ordered_extent_details.vw-arc   1.4   Jul 22 2019 09:55:56   Rob.Coupe  $
                    --       Module Name      : $Workfile:   v_nm_ordered_extent_details.vw  $
-                   --       Date into PVCS   : $Date:   Apr 26 2019 13:39:22  $
-                   --       Date fetched Out : $Modtime:   Apr 26 2019 13:38:34  $
-                               --       Version          : $Revision:   1.3  $
+                   --       Date into PVCS   : $Date:   Jul 22 2019 09:55:56  $
+                   --       Date fetched Out : $Modtime:   Jul 22 2019 09:53:44  $
+                               --       Version          : $Revision:   1.4  $
 --------------------------------------------------------------------------
 --   Copyright (c) 2019 Bentley Systems Incorporated. All rights reserved.
 --------------------------------------------------------------------------
@@ -77,8 +77,28 @@ SELECT
                                              0)
                                              s_length
                                      FROM ((SELECT *
-                                              FROM (        
-                                                         WITH rsc3 (s_ne, ne_id, ne_nt_type, ne_sub_class, nm_seg_no, nm_seq_no, dir, nm_begin_mp, nm_end_mp, start_node, end_node, ne_length, nm_slk, nm_end_slk, has_prior, connect_level)
+                                              FROM (
+                                                         WITH st_id as ( 
+														        select ne_id st_element 
+															    from v_nm_ordered_extent 
+															    where nte_seq_no = 1 
+															    and rownum = 1) ,                                 
+                                                             rsc3 (s_ne, 
+															       ne_id, 
+																   ne_nt_type, 
+																   ne_sub_class, 
+																   nm_seg_no, 
+																   nm_seq_no, 
+																   dir, 
+																   nm_begin_mp, 
+																   nm_end_mp, 
+																   start_node, 
+																   end_node, 
+																   ne_length, 
+																   nm_slk, 
+																   nm_end_slk, 
+																   has_prior, 
+																   connect_level)
                                                          AS ( SELECT -1,
                                                                     a.ne_id,
                                                                     a.ne_nt_type,
@@ -95,20 +115,20 @@ SELECT
                                                                     a.nte_end_slk,
                                                                     a.has_prior,
                                                                     1
-                                                               FROM v_nm_ordered_extent a
+                                                               FROM v_nm_ordered_extent a, st_id
                                                               WHERE    has_prior
                                                                           IS NULL
-                                                                    OR a.ne_id =
-                                                                          TO_NUMBER (
-                                                                             SYS_CONTEXT (
-                                                                                'NM3SQL',
-                                                                                'RSC_START'))
+                                                                    OR a.ne_id = st_element
+--                                                                          TO_NUMBER (
+--                                                                             SYS_CONTEXT (
+--                                                                                'NM3SQL',
+--                                                                                'RSC_START'))
                                                              UNION ALL
                                                              SELECT a.ne_id,
                                                                     b.ne_id,
                                                                     b.ne_nt_type,
                                                                     b.ne_sub_class,
-                                                                    a.nm_seg_no, 
+                                                                    a.nm_seg_no,
                                                                     b.nte_seq_no,
                                                                     b.dir_flag,
                                                                     b.nte_begin_mp,
@@ -129,8 +149,8 @@ SELECT
                                                                                      nm_seq_no SET order1
                                                                CYCLE start_node SET is_cycle TO 'Y' DEFAULT 'N'
                                                     SELECT *
-                                                      FROM rsc3 order by  nm_seq_no 
+                                                      FROM rsc3 order by  nm_seq_no
                                                       )
-                                             WHERE is_cycle = 'N'                                             
+                                             WHERE is_cycle = 'N'
                                              ) q3)) q4
                                   ) q5) q6);
