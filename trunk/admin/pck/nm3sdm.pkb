@@ -5,11 +5,11 @@ AS
     --
     --   PVCS Identifiers :-
     --
-    --       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.82   Jun 03 2019 07:19:00   Steve.Cooper  $
+    --       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.83   Jul 23 2019 10:48:36   Steve.Cooper  $
     --       Module Name      : $Workfile:   nm3sdm.pkb  $
-    --       Date into PVCS   : $Date:   Jun 03 2019 07:19:00  $
-    --       Date fetched Out : $Modtime:   May 31 2019 13:36:46  $
-    --       PVCS Version     : $Revision:   2.82  $
+    --       Date into PVCS   : $Date:   Jul 23 2019 10:48:36  $
+    --       Date fetched Out : $Modtime:   Jul 23 2019 10:46:56  $
+    --       PVCS Version     : $Revision:   2.83  $
     --
     --   Author : R.A. Coupe
     --
@@ -21,7 +21,7 @@ AS
     --
     --all global package variables here
     --
-    g_Body_Sccsid    CONSTANT VARCHAR2 (2000) := '"$Revision:   2.82  $"';
+    g_Body_Sccsid    CONSTANT VARCHAR2 (2000) := '"$Revision:   2.83  $"';
     --  g_body_sccsid is the SCCS ID for the package body
     --
     g_Package_Name   CONSTANT VARCHAR2 (30) := 'NM3SDM';
@@ -9191,8 +9191,9 @@ AS
     BEGIN
         --nm_debug.debug_on;
         --nm_debug.debug('changing shapes');
-        l_layer := get_nt_theme (Nm3get.get_ne (p_ne_id).ne_nt_type);
-        l_rec_nth := nm3get.get_nth (l_layer);
+        l_layer     := get_nt_theme (Nm3get.get_ne (p_ne_id).ne_nt_type);
+        l_rec_nth   := nm3get.get_nth (l_layer);
+        l_new_geom  := p_geom;
 
         IF Nm3sdo.element_has_shape (l_layer, p_ne_id) = 'TRUE'
         THEN
@@ -9200,10 +9201,7 @@ AS
             -- Brought across the code from 2.10.1.1 branch into the mainstream
             -- version so that the SRID is set on the reshape
 
-            l_old_geom :=
-                nm3sdo.get_layer_element_geometry (l_layer, p_ne_id);
-
-            l_new_geom := p_geom;
+            l_old_geom := nm3sdo.get_layer_element_geometry (l_layer, p_ne_id);
 
             IF NVL (l_old_geom.sdo_srid, -9999) !=
                NVL (l_new_geom.sdo_srid, -9999)
@@ -9271,7 +9269,7 @@ AS
 
       Reshape_Other_Product (
                             p_Ne_Id   =>  p_Ne_Id,
-                            p_Geom    =>  p_Geom
+                            p_Geom    =>  l_New_Geom
                             );
 
     END reshape_element;
