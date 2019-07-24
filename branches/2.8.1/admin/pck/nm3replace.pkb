@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm3replace IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3replace.pkb-arc   2.8.1.0   Apr 10 2019 14:49:26   Steve.Cooper  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3replace.pkb-arc   2.8.1.1   Jul 24 2019 15:37:22   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3replace.pkb  $
---       Date into PVCS   : $Date:   Apr 10 2019 14:49:26  $
---       Date fetched Out : $Modtime:   Apr 10 2019 13:29:06  $
---       PVCS Version     : $Revision:   2.8.1.0  $
+--       Date into PVCS   : $Date:   Jul 24 2019 15:37:22  $
+--       Date fetched Out : $Modtime:   Jul 24 2019 15:35:18  $
+--       PVCS Version     : $Revision:   2.8.1.1  $
 --
 --
 --   Author : ITurnbull
@@ -17,7 +17,7 @@ CREATE OR REPLACE PACKAGE BODY nm3replace IS
 --   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.8.1.0  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.8.1.1  $"';
 --  g_body_sccsid is the SCCS ID for the package body
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3replace';
 ------------------------------------------------------------------------------------------------
@@ -481,7 +481,7 @@ END get_body_version;
         Into      l_Count  
         From      Nm_Elements_All   nea
         Where     Ne_Nt_Type  =     'ESU'
-        And       Ne_Id       In    (p_Ne_Id);
+        And       Ne_Id       In    (p_Ne_Id,p_Ne_Id_New);
 
         --only do if both items are ESUS
         If l_Count  = 2 Then
