@@ -1,11 +1,11 @@
 ----------------------------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm_4700_fix66.sql-arc   1.0   Jul 15 2019 15:14:10   Chris.Baugh  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm_4700_fix66.sql-arc   1.1   Jul 25 2019 15:19:30   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm_4700_fix66.sql  $ 
---       Date into PVCS   : $Date:   Jul 15 2019 15:14:10  $
---       Date fetched Out : $Modtime:   Jul 15 2019 15:10:40  $
---       Version     	  : $Revision:   1.0  $
+--       Date into PVCS   : $Date:   Jul 25 2019 15:19:30  $
+--       Date fetched Out : $Modtime:   Jul 25 2019 15:18:30  $
+--       Version     	  : $Revision:   1.1  $
 --
 ----------------------------------------------------------------------------------------------------
 --   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
@@ -62,6 +62,24 @@ BEGIN
 
 END;
 /
+
+Declare
+  n  Varchar2(1);
+Begin
+  Select  Null
+  Into    n
+  From    Hig_Upgrades
+  Where   Hup_Product     =   'LB'
+  And     From_Version    =   '4.7.0.11'
+  And     Upgrade_Script  =   'exnm04070017en_updt55.sql'
+  And     rownum          =   1;
+Exception 
+  When No_Data_Found
+Then
+  RAISE_APPLICATION_ERROR(-20000,'Please install Core 4700 Fix 55 Build 17 before proceding.');
+End;
+/
+
 WHENEVER SQLERROR CONTINUE
 
 
@@ -141,7 +159,7 @@ BEGIN
 	--
 	hig2.upgrade(p_product        => 'NET'
 				,p_upgrade_script => 'log_nm_4700_fix66.sql'
-				,p_remarks        => 'NET 4700 FIX 66 (Build 1)'
+				,p_remarks        => 'NET 4700 FIX 66 (Build 2)'
 				,p_to_version     => NULL
 				);
 	--
