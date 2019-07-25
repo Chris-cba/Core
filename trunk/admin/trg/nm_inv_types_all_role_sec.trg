@@ -21,7 +21,21 @@ DECLARE
 --   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
+   CURSOR cs_mode (c_inv_type NM_INV_TYPE_ATTRIBS.ita_inv_type%TYPE
+                  ,c_username user_users.username%TYPE
+                  ) IS
+   SELECT NVL(DECODE(nad_nt_type, NULL, nad_nt_type, 'NORMAL' ),itr_mode)
+    FROM  NM_INV_TYPE_ROLES
+         ,HIG_USER_ROLES
+         ,nm_nw_ad_types
+   WHERE  itr_inv_type  (+) = c_inv_type     
+    AND   itr_hro_role = hur_role (+)
+    AND   hur_username (+) = c_username
+    and   nad_inv_type (+) = itr_inv_type
+    order by itr_mode;
+
    l_inv_type nm_inv_types.nit_inv_type%TYPE;
+   l_retval NM_INV_TYPE_ROLES.itr_mode%TYPE := NULL;
 --
 BEGIN
 --
@@ -37,7 +51,12 @@ BEGIN
       l_inv_type := :NEW.nit_inv_type;
    END IF;
 --
-   IF NVL(nm3inv.get_inv_mode_by_role(l_inv_type,Sys_Context('NM3_SECURITY_CTX','USERNAME')),nm3type.c_nvl) != nm3type.c_normal
+   OPEN  cs_mode (l_inv_type, Sys_Context('NM3_SECURITY_CTX','USERNAME'));
+   FETCH cs_mode INTO l_retval;
+   CLOSE cs_mode;
+   
+
+   IF l_retval != nm3type.c_normal
     THEN
       RAISE_APPLICATION_ERROR(-20901,'You do not have permission via NM_INV_TYPE_ROLES to perform this action');
    END IF;
