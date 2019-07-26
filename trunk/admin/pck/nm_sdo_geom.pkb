@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm_sdo_geom
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm_sdo_geom.pkb-arc   1.4   Apr 18 2019 21:41:06   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm_sdo_geom.pkb-arc   1.5   Jul 26 2019 14:23:38   Rob.Coupe  $
     --       Module Name      : $Workfile:   nm_sdo_geom.pkb  $
-    --       Date into PVCS   : $Date:   Apr 18 2019 21:41:06  $
-    --       Date fetched Out : $Modtime:   Apr 18 2019 21:40:28  $
-    --       PVCS Version     : $Revision:   1.4  $
+    --       Date into PVCS   : $Date:   Jul 26 2019 14:23:38  $
+    --       Date fetched Out : $Modtime:   Jul 26 2019 14:22:24  $
+    --       PVCS Version     : $Revision:   1.5  $
     --
     --   Author : R.A. Coupe
     --
@@ -18,7 +18,7 @@ AS
     -- The main purpose of this package is to replicate the functions inside the SDO_LRS package as
     -- supplied under the MDSYS schema and licensed under the Oracle Spatial license on EE.
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.4  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.5  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'NM_SDO_GEOM';
 
@@ -128,7 +128,7 @@ AS
                                  3002,
                                  3306,
                                  3006,
-								 2006)
+                                 2006)
         THEN
             SELECT g_id
               INTO retval
@@ -303,8 +303,15 @@ AS
         RETURN geom_id_tab
     IS
         retval   geom_id_tab;
-        dims     INTEGER := nm_sdo_geom.get_dims (geom);
+        dims     INTEGER;
     BEGIN
+        IF geom IS NULL
+        THEN
+            RETURN NULL;
+        END IF;
+
+        dims := nm_sdo_geom.get_dims (geom);
+
         SELECT CAST (
                    COLLECT (
                        geom_id (
@@ -317,12 +324,13 @@ AS
                                geom.sdo_srid,
                                NULL,
                                sdo_elem_info_array (1, 1, 1),
-                               case when dims = 3 then
-                               sdo_ordinate_array (t.x, t.y, t.m)
-                               else 
-                               sdo_ordinate_array(t.x, t.y)
-                               end)))
-                       AS geom_id_tab)
+                               CASE
+                                   WHEN dims = 3
+                                   THEN
+                                       sdo_ordinate_array (t.x, t.y, t.m)
+                                   ELSE
+                                       sdo_ordinate_array (t.x, t.y)
+                               END))) AS geom_id_tab)
           INTO retval
           FROM TABLE (nm_sdo.get_vertices (geom)) t;
 
@@ -351,5 +359,6 @@ AS
         THEN
             raise_application_error (-20001, 'Unknown SRID');
     END;
+
 END;
 /
