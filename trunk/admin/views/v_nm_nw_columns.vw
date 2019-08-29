@@ -1,4 +1,4 @@
-CREATE OR REPLACE FORCE VIEW V_NM_NW_COLUMNS
+CREATE OR REPLACE FORCE VIEW ATLAS.V_NM_NW_COLUMNS
 (
     RN,
     NETWORK_TYPE,
@@ -7,6 +7,7 @@ CREATE OR REPLACE FORCE VIEW V_NM_NW_COLUMNS
     ATTRIB_SOURCE,
     SEQ_NO,
     COLUMN_PROMPT,
+    MANDATORY,
     FIELD_TYPE,
     FIELD_LENGTH,
     DEC_PLACES,
@@ -16,23 +17,23 @@ CREATE OR REPLACE FORCE VIEW V_NM_NW_COLUMNS
 )
 BEQUEATH DEFINER
 AS
-    SELECT --
-           --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/views/v_nm_nw_columns.vw-arc   1.2   May 22 2019 14:17:38   Rob.Coupe  $
+    SELECT                                                                  --
+           --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/views/v_nm_nw_columns.vw-arc   1.3   Aug 29 2019 14:08:54   Rob.Coupe  $
            --       Module Name      : $Workfile:   v_nm_nw_columns.vw  $
-           --       Date into PVCS   : $Date:   May 22 2019 14:17:38  $
-           --       Date fetched Out : $Modtime:   May 22 2019 14:16:18  $
-           --       PVCS Version     : $Revision:   1.2  $
-           --
-           --   Author : R.A. Coupe
-           --
-           --          View definition to cater for query tool operating on the attributes of network elements be they the
-           --          fixed column attributes of the NM_ELEMENTS table, the flexible attributes mapped through the NM_TYPE_COLUMNS
-           --          or through the additional data types (NM_NW_AD_TYPES)
-           --
-           -----------------------------------------------------------------------------
-           -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
-           -----------------------------------------------------------------------------
-           --
+           --       Date into PVCS   : $Date:   Aug 29 2019 14:08:54  $
+           --       Date fetched Out : $Modtime:   Aug 29 2019 14:06:36  $
+           --       PVCS Version     : $Revision:   1.3  $
+                                                                            --
+--   Author : R.A. Coupe
+                                                                            --
+--          View definition to cater for query tool operating on the attributes of network elements be they the
+--          fixed column attributes of the NM_ELEMENTS table, the flexible attributes mapped through the NM_TYPE_COLUMNS
+--          or through the additional data types (NM_NW_AD_TYPES)
+                                                                            --
+-----------------------------------------------------------------------------
+-- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+                                                                            --
            ROW_NUMBER ()
                OVER (
                    ORDER BY
@@ -48,18 +49,20 @@ AS
            attrib_source,
            seq_no,
            ntc_prompt,
+           ntc_mandatory,
            data_type,
            field_length,
            dec_places,
            format_mask,
            domain,
            col_query
-      FROM (
-      SELECT nt_type,
+      FROM (SELECT nt_type,
                    ngt_group_type,
                    column_name,
-                   'HC'                                                 attrib_source,
-                   column_id                                            seq_no,
+                   'HC'
+                       attrib_source,
+                   column_id
+                       seq_no,
                    CASE column_name
                        WHEN 'NE_NT_TYPE'
                        THEN
@@ -70,7 +73,8 @@ AS
                        WHEN 'NE_GTY_GROUP_TYPE'
                        THEN
                            'SELECT NGT_GROUP_TYPE, NGT_GROUP_TYPE, NGT_DESCR from nm_group_types'
-                   END                                                  col_query,
+                   END
+                       col_query,
                    CASE column_name
                        WHEN 'NE_ID' THEN 'Element ID'
                        WHEN 'NE_UNIQUE' THEN 'Element Name'
@@ -84,14 +88,18 @@ AS
                        WHEN 'NE_SUB_CLASS' THEN 'Section/Sub-Class'
                        WHEN 'NE_NO_START' THEN 'Start Node'
                        WHEN 'NE_NO_END' THEN 'End Node'
-                   END                                                  ntc_prompt,
+                   END
+                       ntc_prompt,
+                   'N'
+                       ntc_mandatory,
                    data_type,
                    field_length,
-                   CASE data_type WHEN 'NUMBER' THEN 0 END              dec_places,
-                   CASE data_type WHEN 'DATE' THEN 'DD-MON-YYYY' END    format_mask,
+                   CASE data_type WHEN 'NUMBER' THEN 0 END
+                       dec_places,
+                   CASE data_type WHEN 'DATE' THEN 'DD-MON-YYYY' END
+                       format_mask,
                    domain
-              FROM (
-              SELECT nt_type,
+              FROM (SELECT nt_type,
                            ngt_group_type,
                            column_name,
                            column_id,
@@ -100,8 +108,8 @@ AS
                                WHEN 'VARCHAR2' THEN data_length
                                WHEN 'NUMBER' THEN data_precision
                                WHEN 'DATE' THEN 11
-                           END    field_length,
-                           null domain
+                           END     field_length,
+                           NULL    domain
                       FROM nm_types, nm_group_types, all_tab_columns
                      WHERE     owner =
                                SYS_CONTEXT ('NM3CORE', 'APPLICATION_OWNER')
@@ -149,6 +157,7 @@ AS
                    END
                        ntc_query,
                    ntc_prompt,
+                   ntc_mandatory,
                    ntc_column_type,
                    ntc_str_length
                        field_length,
@@ -156,10 +165,11 @@ AS
                        dec_places,
                    NULL
                        format_mask,
-                   ntc_domain domain
+                   ntc_domain
+                       domain
               FROM nm_type_columns, nm_group_types
-             WHERE ntc_nt_type = ngt_nt_type(+)  
-            UNION ALL            
+             WHERE ntc_nt_type = ngt_nt_type(+)
+            UNION ALL
             SELECT nad_nt_type,
                    nad_gty_type,
                    ita_view_col_name,
@@ -175,13 +185,14 @@ AS
                            || ' order by ial_seq '
                        ELSE
                            ita_query
-                   END    domain_query,
+                   END              domain_query,
                    ita_scrn_text,
+                   ita_mandatory_yn,
                    ita_format,
                    ita_fld_length,
                    ita_dec_places,
                    ita_format_mask,
-                   ita_id_domain domain
+                   ita_id_domain    domain
               FROM nm_inv_type_attribs,
                    nm_nw_ad_types,
                    nm_group_types,
@@ -189,12 +200,9 @@ AS
              WHERE     nad_nt_type = nt_type
                    AND nad_gty_type = ngt_group_type
                    AND ita_inv_type = nad_inv_type
-                   AND nt_type = ngt_nt_type(+))
+                   AND nt_type = ngt_nt_type(+));
                    
                    
---order by case attrib_source when 'HC' then 'A' when 'TC' then 'B' else 'C'||attrib_source end, seq_no
-;
-
 
 
 comment on table v_nm_nw_columns is 'A view to provide all possible attributes of a network type and group type combination. Attributes are included from fixed and flexible column attributes,as well as primary AD data';
@@ -212,6 +220,8 @@ comment on  column v_nm_nw_columns.attrib_source is 'An indicator of the source 
 comment on  column v_nm_nw_columns.seq_no is 'The sequence of the attribute within a source type - for example the sequence from NM_TYPE_COLUMNS or the column_id or the attribute sequence from NM_INV_TYPE_ATTRIBS';
 
 comment on  column v_nm_nw_columns.column_prompt is 'The prompt for the column'; 
+
+comment on  column v_nm_nw_columns.mandatory is 'The attribute is mandatory (Y/N)'; 
 
 comment on  column v_nm_nw_columns.field_type is 'The type of the column - either NUMBER, VARCHAR2 or DATE';
 
