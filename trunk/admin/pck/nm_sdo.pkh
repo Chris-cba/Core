@@ -3,11 +3,11 @@ AS
     --<PACKAGE>
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm_sdo.pkh-arc   1.6   May 07 2019 16:59:12   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm_sdo.pkh-arc   1.7   Aug 30 2019 12:34:10   Rob.Coupe  $
     --       Module Name      : $Workfile:   nm_sdo.pkh  $
-    --       Date into PVCS   : $Date:   May 07 2019 16:59:12  $
-    --       Date fetched Out : $Modtime:   May 07 2019 16:51:04  $
-    --       PVCS Version     : $Revision:   1.6  $
+    --       Date into PVCS   : $Date:   Aug 30 2019 12:34:10  $
+    --       Date fetched Out : $Modtime:   Aug 30 2019 12:32:52  $
+    --       PVCS Version     : $Revision:   1.7  $
     --
     --   Author : R.A. Coupe
     --
@@ -19,7 +19,7 @@ AS
     -- The main purpose of this package is to replicate the functions inside the SDO_LRS package as
     -- supplied under the MDSYS schema and licensed under the Oracle Spatial license on EE.
     --</PACKAGE>
-    g_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.6  $';
+    g_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.7  $';
 
     -----------------------------------------------------------------------------
     --
@@ -256,7 +256,15 @@ AS
 
     FUNCTION get_pline_parts_elem_info (rc IN INTEGER)
         RETURN sdo_elem_info_array;
---  ideally this would be a private function but it is used inside some SQL
 
+    --  ideally this would be a private function but it is used inside some SQL
+
+    FUNCTION multi_split (p_line IN SDO_GEOMETRY, pt_tab IN geom_id_tab)
+        RETURN geom_id_tab;
+
+    FUNCTION project_pt_m (p_geom      IN SDO_GEOMETRY,
+                           p_pt        IN SDO_GEOMETRY,
+                           tolerance   IN NUMBER)
+        RETURN geom_id_tab;
 END;
 /
