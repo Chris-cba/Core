@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY sdl_ddl
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_ddl.pkb-arc   1.0   Sep 09 2019 11:50:10   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_ddl.pkb-arc   1.1   Sep 09 2019 17:58:52   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_ddl.pkb  $
-    --       Date into PVCS   : $Date:   Sep 09 2019 11:50:10  $
-    --       Date fetched Out : $Modtime:   Sep 06 2019 13:26:10  $
-    --       PVCS Version     : $Revision:   1.0  $
+    --       Date into PVCS   : $Date:   Sep 09 2019 17:58:52  $
+    --       Date fetched Out : $Modtime:   Sep 09 2019 17:57:44  $
+    --       PVCS Version     : $Revision:   1.1  $
     --
     --   Author : R.A. Coupe
     --
@@ -19,7 +19,7 @@ AS
     -- The main purpose of this package is to provide DDL execution for creation of views and triggers
     -- to support the SDL.
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.0  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.1  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'SDL_DDL';
 
@@ -413,12 +413,11 @@ END IF;
 
     sql_str :=
            'create or replace view v_sdl_wip_'||l_profile_name||'_datums '
-        || ' ( batch_id, swd_id, SLD_KEY, DATUM_ID, GEOM, ne_length_g, ne_no_start, ne_no_end, ne_type, ne_nt_type, '
-        || l_col_list
+        || ' ( batch_id, swd_id, SLD_KEY, DATUM_ID, GEOM, ne_length_g, ne_no_start, ne_no_end, ne_type, ne_nt_type'
+        || case when l_col_list is not null then ', '||l_col_list else null end
         || ' ) as '
         || ' select d.batch_id, d.swd_id, d.SLD_KEY, d.DATUM_ID, d.GEOM, sdo_lrs.geom_segment_end_measure(d.geom) - sdo_lrs.geom_segment_start_measure(d.geom), '
-        || 'NULL, NULL, '||qq||'S'||qq||', '||qq||l_datum_nt||qq||','
-        || l_def_list
+        || 'NULL, NULL, '||qq||'S'||qq||', '||qq||l_datum_nt||qq||case when l_def_list is not null then ', '||l_def_list else null end
         || ' from sdl_wip_datums d, '
         || l_profile_view
         || ' l where d.sld_key = l.sld_key ';
