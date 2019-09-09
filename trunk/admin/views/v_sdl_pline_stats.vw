@@ -13,11 +13,11 @@ BEQUEATH DEFINER
 AS
     SELECT --   PVCS Identifiers :-
            --
-           --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/views/v_sdl_pline_stats.vw-arc   1.0   Sep 09 2019 16:45:24   Rob.Coupe  $
+           --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/views/v_sdl_pline_stats.vw-arc   1.1   Sep 09 2019 16:47:20   Rob.Coupe  $
            --       Module Name      : $Workfile:   v_sdl_pline_stats.vw  $
-           --       Date into PVCS   : $Date:   Sep 09 2019 16:45:24  $
-           --       Date fetched Out : $Modtime:   Sep 09 2019 16:44:14  $
-           --       PVCS Version     : $Revision:   1.0  $
+           --       Date into PVCS   : $Date:   Sep 09 2019 16:47:20  $
+           --       Date fetched Out : $Modtime:   Sep 09 2019 16:46:56  $
+           --       PVCS Version     : $Revision:   1.1  $
            --
            --   Author : R.A. Coupe
            --
@@ -39,13 +39,5 @@ AS
       FROM sdl_pline_statistics, sdl_geom_accuracy, sdl_load_data
      WHERE slps_slga_id = slga_id
      and slga_sld_key = sld_key
-     and sld_sfs_id = nvl(to_number(sys_context('NM3SQL', 'SDLCTX_SFS_ID')),sld_sfs_id)
+     and sld_sfs_id = nvl(to_number(sys_context('NM3SQL', 'SDLCTX_SFS_ID')),sld_sfs_id);
      
-select sys_context('NM3SQL', 'SDLCTX_SFS_ID') from dual
-
-begin
-nm3ctx.set_context('SDLCTX_SFS_ID', '4');
-end ;
-
-
-select * from V_SDL_PLINE_STATS_nth where batch_id = 4
