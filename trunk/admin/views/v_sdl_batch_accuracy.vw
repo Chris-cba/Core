@@ -14,17 +14,22 @@ CREATE OR REPLACE FORCE VIEW V_SDL_BATCH_ACCURACY
 BEQUEATH DEFINER
 AS
     SELECT --
-           --   SCCS Identifiers :-
-           --
-           --       sccsid           : @(#)nm_elements.vw 1.3 03/24/05
-           --       Module Name      : nm_elements.vw
-           --       Date into SCCS   : 05/03/24 16:15:06
-           --       Date fetched Out : 07/06/13 17:08:05
-           --       SCCS Version     : 1.3
-           --
-           -----------------------------------------------------------------------------
-           --   Copyright (c) 2019 Bentley Systems Incorporated. All rights reserved.
-           -----------------------------------------------------------------------------
+    --   PVCS Identifiers :-
+    --
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/views/v_sdl_batch_accuracy.vw-arc   1.1   Sep 09 2019 16:29:26   Rob.Coupe  $
+    --       Module Name      : $Workfile:   v_sdl_batch_accuracy.vw  $
+    --       Date into PVCS   : $Date:   Sep 09 2019 16:29:26  $
+    --       Date fetched Out : $Modtime:   Sep 09 2019 16:29:10  $
+    --       PVCS Version     : $Revision:   1.1  $
+    --
+    --   Author : R.A. Coupe
+    --
+    --   A view showing load data within an SDL load batch supplemented by
+	--   a measure of the spatial intersection with existing network.
+    --
+    -----------------------------------------------------------------------------
+    -- Copyright (c) 2019 Bentley Systems Incorporated. All rights reserved.
+    ----------------------------------------------------------------------------
            --
              slga_id,
              sld_sfs_id,
