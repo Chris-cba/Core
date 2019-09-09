@@ -1,20 +1,59 @@
 CREATE OR REPLACE PACKAGE BODY sdl_transfer
 AS
+    --   PVCS Identifiers :-
     --
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_transfer.pkb-arc   1.1   Sep 09 2019 12:17:08   Rob.Coupe  $
+    --       Module Name      : $Workfile:   sdl_transfer.pkb  $
+    --       Date into PVCS   : $Date:   Sep 09 2019 12:17:08  $
+    --       Date fetched Out : $Modtime:   Sep 09 2019 12:15:24  $
+    --       PVCS Version     : $Revision:   1.1  $
+    --
+    --   Author : R.A. Coupe
+    --
+    --   Package for handling the transfer of data from the SDL repository into the main database
+    --
+    -----------------------------------------------------------------------------
+    -- Copyright (c) 2019 Bentley Systems Incorporated. All rights reserved.
+    ----------------------------------------------------------------------------
+    --
+    -- The main purpose of this package is to handle the transfer of data from the SDL repository 
+	-- into the main database
+
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.1  $';
+
+    g_package_name   CONSTANT VARCHAR2 (30) := 'SDL_DDL';
+
+    FUNCTION get_version
+        RETURN VARCHAR2
+    IS
+    BEGIN
+        RETURN g_sccsid;
+    END get_version;
+
+    FUNCTION get_body_version
+        RETURN VARCHAR2
+    IS
+    BEGIN
+        RETURN g_body_sccsid;
+    END get_body_version;
+
 
     PROCEDURE transfer_datums (p_batch_id IN NUMBER)
     IS
-        np_no_ids        ptr_num_array_type;
-        ne_ids           ptr_num_array_type;
-        l_ins_str        VARCHAR2 (4000);
-        l_sel_str        VARCHAR2 (4000);
-        l_datum_geom     geom_id_tab;
-        l_view_name   VARCHAR2 (30);
-        l_node_type   varchar2(4);
+        np_no_ids      ptr_num_array_type;
+        ne_ids         ptr_num_array_type;
+        l_ins_str      VARCHAR2 (4000);
+        l_sel_str      VARCHAR2 (4000);
+        l_datum_geom   geom_id_tab;
+        l_view_name    VARCHAR2 (30);
+        l_node_type    VARCHAR2 (4);
+        l_table_name   varchar2(30);
+        l_pk_column    varchar2(30);
+        l_column_name  varchar2(30);
     BEGIN
         BEGIN
-            SELECT  'V_SDL_WIP_' || sp_name || '_DATUMS', node_type
-              INTO l_view_name, l_node_type
+            SELECT 'V_SDL_WIP_' || sp_name || '_DATUMS', node_type, spatial_table, spatial_pk_column, geometry_column
+              INTO l_view_name, l_node_type, l_table_name, l_pk_column, l_column_name
               FROM v_sdl_profile_nw_types, sdl_file_submissions
              WHERE     sfs_id = p_batch_id
                    AND sp_id = sfs_sp_id
@@ -22,7 +61,7 @@ AS
                            (SELECT 1
                               FROM all_views
                              WHERE     view_name =
-                                       'V_SDL_WIP_' || sp_name || '_DATUMS'
+                                       'V_SDL_WIP_' || upper(sp_name) || '_DATUMS'
                                    AND owner =
                                        SYS_CONTEXT ('NM3CORE',
                                                     'APPLICATION_OWNER'));
@@ -31,7 +70,7 @@ AS
             THEN
                 raise_application_error (
                     -20001,
-                    'There is a problem with the profile name and/or the profile datum view ');
+                    'There is a problem with the profile name and/or the profile datum view or the theme metadata ');
         END;
 
         SELECT ptr_num (np_id_seq.NEXTVAL, no_node_id_seq.NEXTVAL)
@@ -91,7 +130,18 @@ AS
         SELECT    'select t.ptr_value, ne_type, ne_nt_type, start_node, end_node, ne_length, '
                || LISTAGG (sdam_column_name, ',')
                       WITHIN GROUP (ORDER BY sdam_seq_no)
-               || ' from v_sdl_profile1_transfer, table(:ne_ids) t where batch_id = 4 and t.ptr_id = swd_id'
+               || ' from (select d.*, s.existing_node_id start_node, e.existing_node_id end_node '
+               || 'from '
+               || l_view_name
+               || ' d, V_SDL_NODE_USAGES n, sdl_wip_nodes s, sdl_wip_nodes e '
+               || 'where d.swd_id = n.swd_id '
+               || 'and d.batch_id = :batch_id '
+               || 'and n.start_node = s.hashcode '
+               || 'and n.end_node = e.hashcode '
+               || 'and exists ( select 1 from sdl_geom_accuracy where slga_sld_key = sld_key '
+               || 'and slga_datum_id = datum_id '
+               || 'and slga_pct_inside = 0 )), '
+               || 'table(:ne_ids) t where batch_id = :batch_id and t.ptr_id = swd_id'
           INTO l_sel_str
           FROM sdl_datum_attribute_mapping
          WHERE sdam_profile_id = 1;
@@ -106,14 +156,14 @@ AS
         nm_debug.debug (l_ins_str || ' ' || l_sel_str);
 
         EXECUTE IMMEDIATE l_ins_str || ' ' || l_sel_str
-            USING ne_ids;
+            USING p_batch_id, ne_ids, p_batch_id;
 
         COMMIT;
 
-        INSERT INTO xctdot_segm_sdo_table (ne_id, geom)
-            SELECT t.ptr_value, geom
-              FROM v_sdl_profile1_transfer, TABLE (ne_ids) t
-             WHERE t.ptr_id = swd_id;
+        execute immediate 'INSERT INTO '||l_table_name||' ( '||l_pk_column||', '||l_column_name||' ) '||
+            ' SELECT t.ptr_value, geom '||
+            '  FROM v_sdl_profile1_transfer, TABLE (:ne_ids) t '||
+            ' WHERE t.ptr_id = swd_id ' using ne_ids;
     END;
 END;
 /
