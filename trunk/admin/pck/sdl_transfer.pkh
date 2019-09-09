@@ -1,0 +1,3 @@
+create or replace package sdl_transfer as
+   procedure transfer_datums(p_batch_id in number);
+end;
