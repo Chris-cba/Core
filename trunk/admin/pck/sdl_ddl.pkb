@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY sdl_ddl
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_ddl.pkb-arc   1.3   Sep 10 2019 12:44:36   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_ddl.pkb-arc   1.4   Sep 10 2019 13:20:16   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_ddl.pkb  $
-    --       Date into PVCS   : $Date:   Sep 10 2019 12:44:36  $
-    --       Date fetched Out : $Modtime:   Sep 10 2019 12:43:16  $
-    --       PVCS Version     : $Revision:   1.3  $
+    --       Date into PVCS   : $Date:   Sep 10 2019 13:20:16  $
+    --       Date fetched Out : $Modtime:   Sep 10 2019 13:18:38  $
+    --       PVCS Version     : $Revision:   1.4  $
     --
     --   Author : R.A. Coupe
     --
@@ -19,7 +19,7 @@ AS
     -- The main purpose of this package is to provide DDL execution for creation of views and triggers
     -- to support the SDL.
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.3  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.4  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'SDL_DDL';
 
@@ -1169,10 +1169,12 @@ AS
                          'V_SDL_PLINE_STATS');
 
         DELETE FROM nm_themes_all
-              WHERE nth_feature_table LIKE
-                        (SELECT 'V_SDL_%' || UPPER (sp_name) || '%'
-                           FROM sdl_profiles);
+              WHERE nth_feature_table in
+                        (SELECT view_name from all_views, sdl_profiles where owner = sys_context('NM3CORE', 'APPLICATION_OWNER') and view_name like 'V_SDL_%' || UPPER (sp_name) || '%' );
 
+        DELETE FROM mdsys.sdo_geom_metadata_table
+              WHERE sdo_table_name in
+                        (SELECT view_name from all_views, sdl_profiles where owner = sys_context('NM3CORE', 'APPLICATION_OWNER') and view_name like 'V_SDL_%' || UPPER (sp_name) || '%' );
 
         DELETE FROM nm_themes_all
               WHERE nth_feature_table IN
