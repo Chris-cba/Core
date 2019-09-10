@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY sdl_validate
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_validate.pkb-arc   1.0   Sep 09 2019 11:57:32   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_validate.pkb-arc   1.1   Sep 10 2019 15:37:30   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_validate.pkb  $
-    --       Date into PVCS   : $Date:   Sep 09 2019 11:57:32  $
-    --       Date fetched Out : $Modtime:   Sep 09 2019 09:48:46  $
-    --       PVCS Version     : $Revision:   1.0  $
+    --       Date into PVCS   : $Date:   Sep 10 2019 15:37:30  $
+    --       Date fetched Out : $Modtime:   Sep 10 2019 15:36:52  $
+    --       PVCS Version     : $Revision:   1.1  $
     --
     --   Author : R.A. Coupe
     --
@@ -20,7 +20,7 @@ AS
     -- FK based checks
     -- format checks
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.0  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.1  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'SDL_VALIDATE';
 
@@ -281,7 +281,8 @@ AS
            SET sfs_mbr_geometry =
                    (SELECT sdo_aggr_mbr (sld_working_geometry)
                       FROM sdl_load_data
-                     WHERE sld_sfs_id = p_batch_id);
+                     WHERE sld_sfs_id = p_batch_id)
+        where sfs_id = p_batch_id;
     --
     END;
 
