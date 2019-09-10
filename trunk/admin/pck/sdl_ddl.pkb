@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY sdl_ddl
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_ddl.pkb-arc   1.4   Sep 10 2019 13:20:16   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_ddl.pkb-arc   1.5   Sep 10 2019 15:43:32   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_ddl.pkb  $
-    --       Date into PVCS   : $Date:   Sep 10 2019 13:20:16  $
-    --       Date fetched Out : $Modtime:   Sep 10 2019 13:18:38  $
-    --       PVCS Version     : $Revision:   1.4  $
+    --       Date into PVCS   : $Date:   Sep 10 2019 15:43:32  $
+    --       Date fetched Out : $Modtime:   Sep 10 2019 15:43:06  $
+    --       PVCS Version     : $Revision:   1.5  $
     --
     --   Author : R.A. Coupe
     --
@@ -19,7 +19,7 @@ AS
     -- The main purpose of this package is to provide DDL execution for creation of views and triggers
     -- to support the SDL.
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.4  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.5  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'SDL_DDL';
 
@@ -183,7 +183,7 @@ AS
                  || 'min_offset, '
                  || 'max_offset, '
                  || 'pct_std_dev, '
-                 || 'pct_average, '
+                 || 'nvl(pct_average, -1), '
                  || 'pct_median, '
                  || 'sld_working_geometry '
                  || ' from sdl_load_data, v_sdl_batch_accuracy '
@@ -242,7 +242,7 @@ AS
                  || 'min_offset, '
                  || 'max_offset, '
                  || 'pct_std_dev, '
-                 || 'pct_average, '
+                 || 'nvl(pct_average, -1), '
                  || 'pct_median, '
                  || 'sld_working_geometry '
                  || ' from sdl_load_data, v_sdl_batch_accuracy '
