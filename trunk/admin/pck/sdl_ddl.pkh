@@ -3,11 +3,11 @@ AS
     --<PACKAGE>
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_ddl.pkh-arc   1.0   Sep 09 2019 11:43:10   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_ddl.pkh-arc   1.1   Sep 10 2019 12:43:56   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_ddl.pkh  $
-    --       Date into PVCS   : $Date:   Sep 09 2019 11:43:10  $
-    --       Date fetched Out : $Modtime:   Sep 04 2019 08:43:18  $
-    --       PVCS Version     : $Revision:   1.0  $
+    --       Date into PVCS   : $Date:   Sep 10 2019 12:43:56  $
+    --       Date fetched Out : $Modtime:   Sep 10 2019 12:42:58  $
+    --       PVCS Version     : $Revision:   1.1  $
     --
     --   Author : R.A. Coupe
     --
@@ -21,7 +21,7 @@ AS
     -- to support the SDL.
 
     --</PACKAGE>
-    g_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.0  $';
+    g_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.1  $';
 
     -----------------------------------------------------------------------------
     --
@@ -74,5 +74,9 @@ AS
 
     PROCEDURE create_profile_themes (p_profile_id   IN INTEGER,
                                      p_role         IN VARCHAR2);
+
+    PROCEDURE refresh_base_sdl_themes;
+
+    PROCEDURE drop_sdl_themes;
 END sdl_ddl;
 /
