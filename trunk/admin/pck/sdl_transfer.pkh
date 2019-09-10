@@ -2,11 +2,11 @@ create or replace package sdl_transfer as
     --<PACKAGE>
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_transfer.pkh-arc   1.1   Sep 09 2019 12:03:04   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_transfer.pkh-arc   1.2   Sep 10 2019 12:50:28   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_transfer.pkh  $
-    --       Date into PVCS   : $Date:   Sep 09 2019 12:03:04  $
-    --       Date fetched Out : $Modtime:   Sep 09 2019 12:02:10  $
-    --       PVCS Version     : $Revision:   1.1  $
+    --       Date into PVCS   : $Date:   Sep 10 2019 12:50:28  $
+    --       Date fetched Out : $Modtime:   Sep 10 2019 12:50:06  $
+    --       PVCS Version     : $Revision:   1.2  $
     --
     --   Author : R.A. Coupe
     --
@@ -20,7 +20,7 @@ create or replace package sdl_transfer as
 	-- into the main database
 
     --</PACKAGE>
-    g_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.1  $';
+    g_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.2  $';
 
     -----------------------------------------------------------------------------
     --
@@ -47,3 +47,4 @@ create or replace package sdl_transfer as
 
    procedure transfer_datums(p_batch_id in number);
 end;
+/
