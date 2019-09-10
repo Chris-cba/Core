@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY sdl_ddl
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_ddl.pkb-arc   1.5   Sep 10 2019 15:43:32   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_ddl.pkb-arc   1.6   Sep 10 2019 15:56:38   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_ddl.pkb  $
-    --       Date into PVCS   : $Date:   Sep 10 2019 15:43:32  $
-    --       Date fetched Out : $Modtime:   Sep 10 2019 15:43:06  $
-    --       PVCS Version     : $Revision:   1.5  $
+    --       Date into PVCS   : $Date:   Sep 10 2019 15:56:38  $
+    --       Date fetched Out : $Modtime:   Sep 10 2019 15:47:56  $
+    --       PVCS Version     : $Revision:   1.6  $
     --
     --   Author : R.A. Coupe
     --
@@ -19,7 +19,7 @@ AS
     -- The main purpose of this package is to provide DDL execution for creation of views and triggers
     -- to support the SDL.
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.5  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.6  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'SDL_DDL';
 
@@ -179,7 +179,7 @@ AS
                  || LISTAGG ('sld_col_' || sam_col_id, ',')
                         WITHIN GROUP (ORDER BY sam_id)
                  || ' , buffer_size, '
-                 || 'pct_inside, '
+                 || 'nvl(pct_inside,-1), '
                  || 'min_offset, '
                  || 'max_offset, '
                  || 'pct_std_dev, '
@@ -238,7 +238,7 @@ AS
                  || LISTAGG ('sld_col_' || sam_col_id, ',')
                         WITHIN GROUP (ORDER BY sam_id)
                  || ' , buffer_size, '
-                 || 'pct_inside, '
+                 || 'nvl(pct_inside, -1), '
                  || 'min_offset, '
                  || 'max_offset, '
                  || 'pct_std_dev, '
