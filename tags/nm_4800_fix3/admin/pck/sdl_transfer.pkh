@@ -1,0 +1,50 @@
+create or replace package sdl_transfer as
+    --<PACKAGE>
+    --   PVCS Identifiers :-
+    --
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_transfer.pkh-arc   1.2   Sep 10 2019 12:50:28   Rob.Coupe  $
+    --       Module Name      : $Workfile:   sdl_transfer.pkh  $
+    --       Date into PVCS   : $Date:   Sep 10 2019 12:50:28  $
+    --       Date fetched Out : $Modtime:   Sep 10 2019 12:50:06  $
+    --       PVCS Version     : $Revision:   1.2  $
+    --
+    --   Author : R.A. Coupe
+    --
+    --   Package for handling the transfer of data from the SDL repository into the main database
+    --
+    -----------------------------------------------------------------------------
+    -- Copyright (c) 2019 Bentley Systems Incorporated. All rights reserved.
+    ----------------------------------------------------------------------------
+    --
+    -- The main purpose of this package is to handle the transfer of data from the SDL repository 
+	-- into the main database
+
+    --</PACKAGE>
+    g_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.2  $';
+
+    -----------------------------------------------------------------------------
+    --
+    --<PROC NAME="GET_VERSION">
+    --
+    -- This function returns the current PVCS version of the package
+
+    FUNCTION get_version
+        RETURN VARCHAR2;
+
+    --</PROC>
+
+    -----------------------------------------------------------------------------
+    --
+    --<PROC NAME="GET_BODY_VERSION">
+    --
+    -- This function returns the current PVCS version of the package body
+    FUNCTION get_body_version
+        RETURN VARCHAR2;
+
+    --</PROC>
+
+    -----------------------------------------------------------------------------
+
+   procedure transfer_datums(p_batch_id in number);
+end;
+/
