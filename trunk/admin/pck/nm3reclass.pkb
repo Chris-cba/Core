@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3reclass AS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3reclass.pkb-arc   2.16   Apr 16 2018 09:23:20   Gaurav.Gaurkar  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3reclass.pkb-arc   2.17   Sep 10 2019 09:56:24   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3reclass.pkb  $
---       Date into PVCS   : $Date:   Apr 16 2018 09:23:20  $
---       Date fetched Out : $Modtime:   Apr 16 2018 09:04:32  $
---       PVCS Version     : $Revision:   2.16  $
+--       Date into PVCS   : $Date:   Sep 10 2019 09:56:24  $
+--       Date fetched Out : $Modtime:   Sep 10 2019 09:55:32  $
+--       PVCS Version     : $Revision:   2.17  $
 --
 --
 --   Author : R.A. Coupe
@@ -21,7 +21,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3reclass AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.16  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.17  $"';
 -- g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3reclass';
@@ -2066,6 +2066,21 @@ BEGIN
 --      exec_reclass ('swr_reclassify.do_reclassify');
 --   END IF;   
    
+  If Hig.Is_Product_Licensed( Nm3Type.C_Nsg ) Then
+  
+      Execute Immediate 'Begin'                                                                           || Chr(10) ||
+                        ' Nsg_Reclassify.Reclassify  ('                                                   || Chr(10) ||
+                        '                            p_Old_Ne_Id          =>  :pi_Old_Ne_Id,'             || Chr(10) ||
+                        '                            p_New_Ne_Id          =>  :pi_New_Ne_Id,'             || Chr(10) ||
+                        '                            p_Effective_Date     =>  :pi_Effective_Date'         || Chr(10) ||
+                        '                            );'                                                  || Chr(10) ||
+                        'End;'
+      Using   Pi_Old_Ne_Id,
+              Pi_New_Ne_Id,
+              Pi_Effective_Date;
+  
+  End If;
+
 --
    Nm_Debug.proc_end(g_package_name,'reclassify_other_products');
 --

@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3recal IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3recal.pkb-arc   2.12   Jul 25 2018 22:56:22   Rob.Coupe  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3recal.pkb-arc   2.13   Sep 10 2019 09:56:24   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3recal.pkb  $
---       Date into PVCS   : $Date:   Jul 25 2018 22:56:22  $
---       Date fetched Out : $Modtime:   Jul 25 2018 22:55:50  $
---       PVCS Version     : $Revision:   2.12  $
+--       Date into PVCS   : $Date:   Sep 10 2019 09:56:24  $
+--       Date fetched Out : $Modtime:   Sep 10 2019 09:53:20  $
+--       PVCS Version     : $Revision:   2.13  $
 --
 --
 --   Author : Jonathan Mills
@@ -25,7 +25,7 @@ CREATE OR REPLACE PACKAGE BODY nm3recal IS
   PT 05.12.07 mairecal.recal_data() brough in line with the others in recalibrate_other_products()
 */
 
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.12  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.13  $"';
    g_package_name    CONSTANT  varchar2(30) := 'nm3recal';
 --
    g_tab_rec_nm      nm3type.tab_rec_nm;
@@ -882,6 +882,24 @@ BEGIN
                ,pi_dec_places;
 
    END IF;
+
+  If Hig.Is_Product_Licensed (Nm3Type.C_Nsg)  Then
+    Execute Immediate   'Begin'                                                                               || Chr (10) || 
+                        '  Nsg_Recalibrate.Recalibrate  ('                                                    || Chr (10) || 
+                        '                               p_Ne_Id                =>  :pi_Ne_Id,'                || Chr (10) || 
+                        '                               p_Recal_Start_Point    =>  :pi_Recal_Start_Point,'    || Chr (10) || 
+                        '                               p_Length_Ratio         =>  :pi_Length_Ratio,'         || Chr (10) || 
+                        '                               p_Dec_Places           =>  :pi_Dec_Places,'           || Chr (10) || 
+                        '                               p_New_Datum_Length     =>  :pi_New_Datum_Length'      || Chr (10) || 
+                        '                               );'                                                   || Chr (10) || 
+                      'End;'
+    Using   Pi_Ne_Id,
+            Pi_Recal_Start_Point,
+            Pi_Length_Ratio,
+            Pi_Dec_Places,
+            Pi_New_Datum_Length;
+  End If;
+
 --
 END recalibrate_other_products;
 --
