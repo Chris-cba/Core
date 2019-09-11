@@ -1,12 +1,13 @@
+/* Formatted on 11/09/2019 19:52:49 (QP5 v5.336) */
 CREATE OR REPLACE PACKAGE BODY sdl_ddl
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_ddl.pkb-arc   1.6   Sep 10 2019 15:56:38   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_ddl.pkb-arc   1.7   Sep 11 2019 20:00:10   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_ddl.pkb  $
-    --       Date into PVCS   : $Date:   Sep 10 2019 15:56:38  $
-    --       Date fetched Out : $Modtime:   Sep 10 2019 15:47:56  $
-    --       PVCS Version     : $Revision:   1.6  $
+    --       Date into PVCS   : $Date:   Sep 11 2019 20:00:10  $
+    --       Date fetched Out : $Modtime:   Sep 11 2019 19:57:20  $
+    --       PVCS Version     : $Revision:   1.7  $
     --
     --   Author : R.A. Coupe
     --
@@ -19,7 +20,7 @@ AS
     -- The main purpose of this package is to provide DDL execution for creation of views and triggers
     -- to support the SDL.
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.6  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.7  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'SDL_DDL';
 
@@ -42,6 +43,14 @@ AS
 
     PROCEDURE gen_profile_ne_stats_view (p_profile_id   IN     NUMBER,
                                          p_view_sql        OUT VARCHAR2);
+
+    PROCEDURE insert_theme (p_theme_name          IN VARCHAR2,
+                            p_object_name         IN VARCHAR2,
+                            p_base_theme_table    IN VARCHAR2,
+                            p_base_theme_column   IN VARCHAR2,
+                            p_key_name            IN VARCHAR2,
+                            p_geom_column_name    IN VARCHAR2,
+                            p_role                IN VARCHAR2);
 
     --
 
@@ -902,232 +911,34 @@ AS
           FROM sdl_profiles
          WHERE sp_id = p_profile_id;
 
-        BEGIN
-            INSERT INTO NM_THEMES_ALL (NTH_THEME_ID,
-                                       NTH_THEME_NAME,
-                                       NTH_TABLE_NAME,
-                                       NTH_PK_COLUMN,
-                                       NTH_LABEL_COLUMN,
-                                       NTH_FEATURE_TABLE,
-                                       NTH_FEATURE_PK_COLUMN,
-                                       NTH_FEATURE_FK_COLUMN,
-                                       NTH_FEATURE_SHAPE_COLUMN,
-                                       NTH_HPR_PRODUCT,
-                                       NTH_LOCATION_UPDATABLE,
-                                       NTH_THEME_TYPE,
-                                       NTH_DEPENDENCY,
-                                       NTH_STORAGE,
-                                       NTH_UPDATE_ON_EDIT,
-                                       NTH_USE_HISTORY,
-                                       NTH_BASE_TABLE_THEME,
-                                       NTH_SEQUENCE_NAME,
-                                       NTH_SNAP_TO_THEME,
-                                       NTH_LREF_MANDATORY,
-                                       NTH_TOLERANCE,
-                                       NTH_TOL_UNITS,
-                                       NTH_DYNAMIC_THEME)
-                SELECT nth_theme_id_seq.NEXTVAL,
-                       'SDL ' || UPPER (sp_name) || ' Load Statistics',
-                       'V_SDL_' || UPPER (sp_name) || '_LD_STATS',
-                       'SLD_KEY',
-                       'SLD_KEY',
-                       'V_SDL_' || UPPER (sp_name) || '_LD_STATS',
-                       'SLD_KEY',
-                       NULL,
-                       'GEOM',
-                       'NET',
-                       'N',
-                       'SDO',
-                       'I',
-                       'S',
-                       'N',
-                       'N',
-                       NULL,
-                       NULL,
-                       'N',
-                       'N',
-                       10,
-                       1,
-                       'N'
-                  FROM sdl_profiles
-                 WHERE     sp_id = p_profile_id
-                       AND EXISTS
-                               (SELECT 1
-                                  FROM dba_views
-                                 WHERE     view_name =
-                                              'V_SDL_'
-                                           || UPPER (sp_name)
-                                           || '_LD_STATS'
-                                       AND owner =
-                                           SYS_CONTEXT ('NM3CORE',
-                                                        'APPLICATION_OWNER'));
-        EXCEPTION
-            WHEN DUP_VAL_ON_INDEX
-            THEN
-                NULL;
-            WHEN NO_DATA_FOUND
-            THEN
-                raise_application_error (
-                    -20001,
-                    'The profile or base profile view does not exist');
-        END;
+        insert_theme (
+            p_theme_name          => 'SDL ' || UPPER (l_sp_name) || ' Load Statistics',
+            p_object_name         => 'V_SDL_' || UPPER (l_sp_name) || '_LD_STATS',
+            p_base_theme_table    => 'SLD_LOAD_DATA',
+            p_base_theme_column   => 'SLD_WORKING_GEOMETRY',
+            p_key_name            => 'SLD_KEY',
+            p_geom_column_name    => 'GEOM',
+            p_role                => p_role);
 
-        BEGIN
-            INSERT INTO mdsys.sdo_geom_metadata_table (sdo_owner,
-                                                       sdo_table_name,
-                                                       sdo_column_name,
-                                                       sdo_diminfo,
-                                                       sdo_srid)
-                SELECT SYS_CONTEXT ('NM3CORE', 'APPLICATION_OWNER'),
-                       'V_SDL_' || l_sp_name || '_LD_STATS',
-                       'GEOM',
-                       sdo_diminfo,
-                       sdo_srid
-                  FROM mdsys.sdo_geom_metadata_table
-                 WHERE     sdo_owner =
-                           SYS_CONTEXT ('NM3CORE', 'APPLICATION_OWNER')
-                       AND sdo_table_name = 'SDL_LOAD_DATA'
-                       AND sdo_column_name = 'SLD_WORKING_GEOMETRY';
-        EXCEPTION
-            WHEN DUP_VAL_ON_INDEX
-            THEN
-                NULL;
-        END;
 
-        BEGIN
-            INSERT INTO nm_theme_roles (nthr_theme_id, nthr_role, nthr_mode)
-                SELECT nth_theme_id, p_role, 'NORMAL'
-                  FROM nm_themes_all, sdl_profiles
-                 WHERE     sp_id = p_profile_id
-                       AND nth_feature_table =
-                           'V_SDL_' || UPPER (sp_name) || '_LD_STATS'
-                       AND NOT EXISTS
-                               (SELECT 1
-                                  FROM nm_theme_roles, nm_themes_all
-                                 WHERE     nth_feature_table =
-                                              'V_SDL_'
-                                           || UPPER (sp_name)
-                                           || '_LD_STATS'
-                                       AND nth_feature_shape_column = 'GEOM'
-                                       AND nthr_theme_id = nth_theme_id
-                                       AND nthr_role = nthr_role
-                                       AND nthr_mode = 'NORMAL');
-        EXCEPTION
-            WHEN DUP_VAL_ON_INDEX
-            THEN
-                NULL;
-        END;
+        insert_theme (
+            p_theme_name          =>  'SDL ' || UPPER (l_sp_name) || ' NE Statistics',
+            p_object_name         =>'V_SDL_' || UPPER (l_sp_name) || '_NE_STATS',
+            p_base_theme_table    => 'SLD_LOAD_DATA',
+            p_base_theme_column   => 'SLD_WORKING_GEOMETRY',
+            p_key_name            => 'SLD_KEY',
+            p_geom_column_name    => 'GEOM',
+            p_role                => p_role);
 
-        BEGIN
-            INSERT INTO NM_THEMES_ALL (NTH_THEME_ID,
-                                       NTH_THEME_NAME,
-                                       NTH_TABLE_NAME,
-                                       NTH_PK_COLUMN,
-                                       NTH_LABEL_COLUMN,
-                                       NTH_FEATURE_TABLE,
-                                       NTH_FEATURE_PK_COLUMN,
-                                       NTH_FEATURE_FK_COLUMN,
-                                       NTH_FEATURE_SHAPE_COLUMN,
-                                       NTH_HPR_PRODUCT,
-                                       NTH_LOCATION_UPDATABLE,
-                                       NTH_THEME_TYPE,
-                                       NTH_DEPENDENCY,
-                                       NTH_STORAGE,
-                                       NTH_UPDATE_ON_EDIT,
-                                       NTH_USE_HISTORY,
-                                       NTH_BASE_TABLE_THEME,
-                                       NTH_SEQUENCE_NAME,
-                                       NTH_SNAP_TO_THEME,
-                                       NTH_LREF_MANDATORY,
-                                       NTH_TOLERANCE,
-                                       NTH_TOL_UNITS,
-                                       NTH_DYNAMIC_THEME)
-                SELECT nth_theme_id_seq.NEXTVAL,
-                       'SDL ' || UPPER (sp_name) || ' NE Statistics',
-                       'V_SDL_' || UPPER (sp_name) || '_NE_STATS',
-                       'SLD_KEY',
-                       'SLD_KEY',
-                       'V_SDL_' || UPPER (sp_name) || '_NE_STATS',
-                       'SLD_KEY',
-                       NULL,
-                       'GEOM',
-                       'NET',
-                       'N',
-                       'SDO',
-                       'I',
-                       'S',
-                       'N',
-                       'N',
-                       NULL,
-                       NULL,
-                       'N',
-                       'N',
-                       10,
-                       1,
-                       'N'
-                  FROM sdl_profiles
-                 WHERE     sp_id = p_profile_id
-                       AND EXISTS
-                               (SELECT 1
-                                  FROM dba_views
-                                 WHERE     view_name =
-                                              'V_SDL_'
-                                           || UPPER (sp_name)
-                                           || '_NE_STATS'
-                                       AND owner =
-                                           SYS_CONTEXT ('NM3CORE',
-                                                        'APPLICATION_OWNER'));
-        --
-        EXCEPTION
-            WHEN DUP_VAL_ON_INDEX
-            THEN
-                NULL;
-            WHEN NO_DATA_FOUND
-            THEN
-                raise_application_error (
-                    -20001,
-                    'The profile or base profile view does not exist');
-        END;
+        insert_theme (
+            p_theme_name          => 'SDL ' || UPPER (l_sp_name) || ' Datum Statistics',
+            p_object_name         => 'V_SDL_WIP_' || UPPER (l_sp_name) || '_DATUMS',
+            p_base_theme_table    => 'SLD_WIP_DATUMS',
+            p_base_theme_column   => 'GEOM',
+            p_key_name            => 'SWD_ID',
+            p_geom_column_name    => 'GEOM',
+            p_role                => p_role);
 
-        INSERT INTO nm_theme_roles (nthr_theme_id, nthr_role, nthr_mode)
-            SELECT nth_theme_id, p_role, 'NORMAL'
-              FROM nm_themes_all, sdl_profiles
-             WHERE     sp_id = p_profile_id
-                   AND nth_feature_table =
-                       'V_SDL_' || UPPER (sp_name) || '_NE_STATS'
-                   AND NOT EXISTS
-                           (SELECT 1
-                              FROM nm_theme_roles, nm_themes_all
-                             WHERE     nth_feature_table =
-                                          'V_SDL_'
-                                       || UPPER (sp_name)
-                                       || '_NE_STATS'
-                                   AND nth_feature_shape_column = 'GEOM'
-                                   AND nthr_theme_id = nth_theme_id
-                                   AND nthr_role = nthr_role
-                                   AND nthr_mode = 'NORMAL');
-
-        BEGIN
-            INSERT INTO mdsys.sdo_geom_metadata_table (sdo_owner,
-                                                       sdo_table_name,
-                                                       sdo_column_name,
-                                                       sdo_diminfo,
-                                                       sdo_srid)
-                SELECT SYS_CONTEXT ('NM3CORE', 'APPLICATION_OWNER'),
-                       'V_SDL_' || l_sp_name || '_NE_STATS',
-                       'GEOM',
-                       sdo_diminfo,
-                       sdo_srid
-                  FROM mdsys.sdo_geom_metadata_table
-                 WHERE     sdo_owner =
-                           SYS_CONTEXT ('NM3CORE', 'APPLICATION_OWNER')
-                       AND sdo_table_name = 'SDL_LOAD_DATA'
-                       AND sdo_column_name = 'SLD_WORKING_GEOMETRY';
-        EXCEPTION
-            WHEN DUP_VAL_ON_INDEX
-            THEN
-                NULL;
-        END;
     --
     END;
 
@@ -1169,12 +980,24 @@ AS
                          'V_SDL_PLINE_STATS');
 
         DELETE FROM nm_themes_all
-              WHERE nth_feature_table in
-                        (SELECT view_name from all_views, sdl_profiles where owner = sys_context('NM3CORE', 'APPLICATION_OWNER') and view_name like 'V_SDL_%' || UPPER (sp_name) || '%' );
+              WHERE nth_feature_table IN
+                        (SELECT view_name
+                           FROM all_views, sdl_profiles
+                          WHERE     owner =
+                                    SYS_CONTEXT ('NM3CORE',
+                                                 'APPLICATION_OWNER')
+                                AND view_name LIKE
+                                        'V_SDL_%' || UPPER (sp_name) || '%');
 
         DELETE FROM mdsys.sdo_geom_metadata_table
-              WHERE sdo_table_name in
-                        (SELECT view_name from all_views, sdl_profiles where owner = sys_context('NM3CORE', 'APPLICATION_OWNER') and view_name like 'V_SDL_%' || UPPER (sp_name) || '%' );
+              WHERE sdo_table_name IN
+                        (SELECT view_name
+                           FROM all_views, sdl_profiles
+                          WHERE     owner =
+                                    SYS_CONTEXT ('NM3CORE',
+                                                 'APPLICATION_OWNER')
+                                AND view_name LIKE
+                                        'V_SDL_%' || UPPER (sp_name) || '%');
 
         DELETE FROM nm_themes_all
               WHERE nth_feature_table IN
@@ -1183,6 +1006,125 @@ AS
         DELETE FROM mdsys.sdo_geom_metadata_table
               WHERE sdo_table_name IN
                         ('SDL_LOAD_DATA', 'SDL_WIP_DATUMS', 'SDL_WIP_NODES');
+    END;
+
+    PROCEDURE insert_theme (p_theme_name          IN VARCHAR2,
+                            p_object_name         IN VARCHAR2,
+                            p_base_theme_table    IN VARCHAR2,
+                            p_base_theme_column   IN VARCHAR2,
+                            p_key_name            IN VARCHAR2,
+                            p_geom_column_name    IN VARCHAR2,
+                            p_role                IN VARCHAR2)
+    AS
+    BEGIN
+        BEGIN
+            INSERT INTO NM_THEMES_ALL (NTH_THEME_ID,
+                                       NTH_THEME_NAME,
+                                       NTH_TABLE_NAME,
+                                       NTH_PK_COLUMN,
+                                       NTH_LABEL_COLUMN,
+                                       NTH_FEATURE_TABLE,
+                                       NTH_FEATURE_PK_COLUMN,
+                                       NTH_FEATURE_FK_COLUMN,
+                                       NTH_FEATURE_SHAPE_COLUMN,
+                                       NTH_HPR_PRODUCT,
+                                       NTH_LOCATION_UPDATABLE,
+                                       NTH_THEME_TYPE,
+                                       NTH_DEPENDENCY,
+                                       NTH_STORAGE,
+                                       NTH_UPDATE_ON_EDIT,
+                                       NTH_USE_HISTORY,
+                                       NTH_BASE_TABLE_THEME,
+                                       NTH_SEQUENCE_NAME,
+                                       NTH_SNAP_TO_THEME,
+                                       NTH_LREF_MANDATORY,
+                                       NTH_TOLERANCE,
+                                       NTH_TOL_UNITS,
+                                       NTH_DYNAMIC_THEME)
+                SELECT nth_theme_id_seq.NEXTVAL,
+                       p_theme_name,
+                       p_object_name,
+                       p_key_name,
+                       p_key_name,
+                       p_object_name,
+                       p_key_name,
+                       NULL,
+                       p_geom_column_name,
+                       'NET',
+                       'N',
+                       'SDO',
+                       'I',
+                       'S',
+                       'N',
+                       'N',
+                       nth_theme_id,
+                       NULL,
+                       'N',
+                       'N',
+                       10,
+                       1,
+                       'N'
+                  FROM nm_themes_all
+                 WHERE     nth_feature_table = p_base_theme_table
+                       AND EXISTS
+                               (SELECT 1
+                                  FROM dba_objects
+                                 WHERE     object_name = p_object_name
+                                       AND owner =
+                                           SYS_CONTEXT ('NM3CORE',
+                                                        'APPLICATION_OWNER'));
+        EXCEPTION
+            WHEN DUP_VAL_ON_INDEX
+            THEN
+                NULL;
+            WHEN NO_DATA_FOUND
+            THEN
+                raise_application_error (
+                    -20001,
+                    'The base theme or profile view does not exist');
+        END;
+
+        BEGIN
+            INSERT INTO mdsys.sdo_geom_metadata_table (sdo_owner,
+                                                       sdo_table_name,
+                                                       sdo_column_name,
+                                                       sdo_diminfo,
+                                                       sdo_srid)
+                SELECT SYS_CONTEXT ('NM3CORE', 'APPLICATION_OWNER'),
+                       p_object_name,
+                       p_geom_column_name,
+                       sdo_diminfo,
+                       sdo_srid
+                  FROM mdsys.sdo_geom_metadata_table
+                 WHERE     sdo_owner =
+                           SYS_CONTEXT ('NM3CORE', 'APPLICATION_OWNER')
+                       AND sdo_table_name = p_base_theme_table
+                       AND sdo_column_name = p_base_theme_column;
+        EXCEPTION
+            WHEN DUP_VAL_ON_INDEX
+            THEN
+                NULL;
+        END;
+
+        BEGIN
+            INSERT INTO nm_theme_roles (nthr_theme_id, nthr_role, nthr_mode)
+                SELECT nth_theme_id, p_role, 'NORMAL'
+                  FROM nm_themes_all
+                 WHERE     nth_feature_table = p_object_name
+                       AND NOT EXISTS
+                               (SELECT 1
+                                  FROM nm_theme_roles, nm_themes_all
+                                 WHERE     nth_feature_table = p_object_name
+                                       AND nth_feature_shape_column =
+                                           p_geom_column_name
+                                       AND nthr_theme_id = nth_theme_id
+                                       AND nthr_role = nthr_role
+                                       AND nthr_mode = 'NORMAL');
+        EXCEPTION
+            WHEN DUP_VAL_ON_INDEX
+            THEN
+                NULL;
+        END;
     END;
 END sdl_ddl;
 /
