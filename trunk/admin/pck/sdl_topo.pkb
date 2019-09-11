@@ -1,12 +1,12 @@
-CREATE OR REPLACE PACKAGE BODY ATLAS.sdl_topo
+CREATE OR REPLACE PACKAGE BODY sdl_topo
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_topo.pkb-arc   1.0   Sep 09 2019 11:52:26   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_topo.pkb-arc   1.1   Sep 11 2019 14:49:32   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_topo.pkb  $
-    --       Date into PVCS   : $Date:   Sep 09 2019 11:52:26  $
-    --       Date fetched Out : $Modtime:   Aug 30 2019 12:52:00  $
-    --       PVCS Version     : $Revision:   1.0  $
+    --       Date into PVCS   : $Date:   Sep 11 2019 14:49:32  $
+    --       Date fetched Out : $Modtime:   Sep 11 2019 14:48:56  $
+    --       PVCS Version     : $Revision:   1.1  $
     --
     --   Author : R.A. Coupe
     --
@@ -17,7 +17,7 @@ AS
     ----------------------------------------------------------------------------
     -- The main purpose of this package is for breaking the loaded data into individual connected segments.
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.0  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.1  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'SDL_TOPO';
 
@@ -259,9 +259,8 @@ AS
         COMMIT;
 
         INSERT INTO sdl_wip_pt_arrays (batch_id, ia, hashcode)
-            SELECT /*+index(a SDL_WIP_PT_GEOM_IDX) */
-                   p_batch_id, ia, ORA_HASH (ia) hashcode
-              FROM (  SELECT a.id,
+            SELECT p_batch_id, ia, ORA_HASH (ia) hashcode
+              FROM (  SELECT  a.id,
                              CAST (
                                  COLLECT (b.id ORDER BY b.id) AS int_array_type)    ia
                         FROM sdl_wip_pt_geom a, sdl_wip_pt_geom b
@@ -343,7 +342,7 @@ AS
                                          hashcode,
                                          node_type,
                                          node_measure)
-            SELECT swd_id,
+            SELECT /*+INDEX ( N SDL_WIP_NODES_SPIDX) */ swd_id,
                    p_batch_id,
                    hashcode,
                    'S',
@@ -710,5 +709,3 @@ AS
     END;
 END;
 /
-
-
