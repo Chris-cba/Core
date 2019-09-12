@@ -1,12 +1,13 @@
+/* Formatted on 12/09/2019 15:54:01 (QP5 v5.336) */
 CREATE OR REPLACE PACKAGE BODY sdl_ddl
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_ddl.pkb-arc   1.8   Sep 12 2019 12:54:14   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_ddl.pkb-arc   1.9   Sep 12 2019 18:30:18   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_ddl.pkb  $
-    --       Date into PVCS   : $Date:   Sep 12 2019 12:54:14  $
-    --       Date fetched Out : $Modtime:   Sep 12 2019 12:52:20  $
-    --       PVCS Version     : $Revision:   1.8  $
+    --       Date into PVCS   : $Date:   Sep 12 2019 18:30:18  $
+    --       Date fetched Out : $Modtime:   Sep 12 2019 18:29:52  $
+    --       PVCS Version     : $Revision:   1.9  $
     --
     --   Author : R.A. Coupe
     --
@@ -19,16 +20,20 @@ AS
     -- The main purpose of this package is to provide DDL execution for creation of views and triggers
     -- to support the SDL.
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.8  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.9  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'SDL_DDL';
 
-    qq                        VARCHAR2 (1) := CHR (39);
+    g_diminfo                 sdo_dim_array := nm3sdo.coalesce_nw_diminfo;
+    g_2d_diminfo              sdo_dim_array
+        := SDO_LRS.convert_to_std_dim_array (g_diminfo);
 
-    PROCEDURE insert_sdo_metadata (p_table_name    IN VARCHAR2,
-                                   p_column_name   IN VARCHAR2,
-                                   p_diminfo          sdo_dim_array,
-                                   p_srid             NUMBER);
+    FUNCTION get_srid
+        RETURN NUMBER;
+
+    g_srid                    NUMBER := get_srid;
+
+    qq                        VARCHAR2 (1) := CHR (39);
 
     PROCEDURE gen_profile_ld_view (p_profile_id   IN     NUMBER,
                                    p_view_sql        OUT VARCHAR2);
@@ -49,9 +54,39 @@ AS
                             p_base_theme_column   IN VARCHAR2,
                             p_key_name            IN VARCHAR2,
                             p_geom_column_name    IN VARCHAR2,
-                            p_role                IN VARCHAR2);
+                            p_role                IN VARCHAR2,
+                            p_dim                 IN NUMBER);
 
-    --
+    PROCEDURE insert_sdo_metadata (p_table_name    IN VARCHAR2,
+                                   p_column_name   IN VARCHAR2,
+                                   p_diminfo          sdo_dim_array,
+                                   p_srid             NUMBER);
+
+
+
+    FUNCTION get_srid
+        RETURN NUMBER
+    IS
+    BEGIN
+        BEGIN
+            --
+            SELECT sdo_srid
+              INTO g_srid
+              FROM mdsys.sdo_geom_metadata_table, nm_themes_all, nm_nw_themes
+             WHERE     sdo_owner =
+                       SYS_CONTEXT ('NM3CORE', 'APPLICATION_OWNER')
+                   AND sdo_table_name = nth_feature_table
+                   AND sdo_column_name = nth_feature_shape_column
+                   AND nth_theme_id = nnth_nth_theme_id
+                   AND ROWNUM = 1;
+        EXCEPTION
+            WHEN NO_DATA_FOUND
+            THEN
+                NULL;
+        END;
+
+        RETURN g_srid;
+    END;
 
     FUNCTION get_version
         RETURN VARCHAR2
@@ -116,8 +151,8 @@ AS
         GROUP BY sp_name;
 
         --
-        nm_debug.debug_on;
-        nm_debug.debug (p_view_sql);
+        --        nm_debug.debug_on;
+        --        nm_debug.debug (p_view_sql);
 
         EXECUTE IMMEDIATE p_view_sql;
     --
@@ -159,9 +194,9 @@ AS
         GROUP BY sp_name;
 
         --
-        nm_debug.debug_on;
-        nm_debug.debug (p_view_sql);
-
+        --        nm_debug.debug_on;
+        --        nm_debug.debug (p_view_sql);
+        --
         EXECUTE IMMEDIATE p_view_sql;
     END;
 
@@ -216,8 +251,8 @@ AS
         GROUP BY sp_name;
 
         --
-        nm_debug.debug_on;
-        nm_debug.debug (p_view_sql);
+        --        nm_debug.debug_on;
+        --        nm_debug.debug (p_view_sql);
 
         EXECUTE IMMEDIATE p_view_sql;
     --
@@ -275,8 +310,8 @@ AS
         GROUP BY sp_name;
 
         --
-        nm_debug.debug_on;
-        nm_debug.debug (p_view_sql);
+        --        nm_debug.debug_on;
+        --        nm_debug.debug (p_view_sql);
 
         EXECUTE IMMEDIATE p_view_sql;
     END;
@@ -492,412 +527,88 @@ AS
             || l_profile_view
             || ' l where d.sld_key = l.sld_key ';
 
-        nm_debug.debug_on;
-        nm_debug.debug (sql_str);
+        --        nm_debug.debug_on;
+        --        nm_debug.debug (sql_str);
 
         EXECUTE IMMEDIATE sql_str;
     END;
 
     PROCEDURE refresh_base_sdl_themes
     IS
-        -- procedure to refresh base table metadat and thems relating to SDL geometry tables
-        l_diminfo   sdo_dim_array;
-        l_srid      NUMBER := NULL;
+    -- procedure to refresh base table metadat and thems relating to SDL geometry tables
     BEGIN
-        BEGIN
-            l_diminfo := nm3sdo.coalesce_nw_diminfo;
-
-            --
-            SELECT sdo_srid
-              INTO l_srid
-              FROM mdsys.sdo_geom_metadata_table, nm_themes_all, nm_nw_themes
-             WHERE     sdo_owner =
-                       SYS_CONTEXT ('NM3CORE', 'APPLICATION_OWNER')
-                   AND sdo_table_name = nth_feature_table
-                   AND sdo_column_name = nth_feature_shape_column
-                   AND nth_theme_id = nnth_nth_theme_id
-                   AND ROWNUM = 1;
-        EXCEPTION
-            WHEN NO_DATA_FOUND
-            THEN
-                NULL;
-        END;
-
-        IF l_srid IS NULL OR l_diminfo IS NULL
+        IF g_srid IS NULL OR g_diminfo IS NULL
         THEN
             raise_application_error (
                 -20001,
                 'The network spatial metadata has not been configured please re-run this script when the configuration is complete so spatial indexes can be created');
         END IF;
 
-        BEGIN
-            --first the base table of the load data
+        --first the base table of the load data
 
-            INSERT INTO NM_THEMES_ALL (NTH_THEME_ID,
-                                       NTH_THEME_NAME,
-                                       NTH_TABLE_NAME,
-                                       NTH_PK_COLUMN,
-                                       NTH_LABEL_COLUMN,
-                                       NTH_FEATURE_TABLE,
-                                       NTH_FEATURE_PK_COLUMN,
-                                       NTH_FEATURE_FK_COLUMN,
-                                       NTH_FEATURE_SHAPE_COLUMN,
-                                       NTH_HPR_PRODUCT,
-                                       NTH_LOCATION_UPDATABLE,
-                                       NTH_THEME_TYPE,
-                                       NTH_DEPENDENCY,
-                                       NTH_STORAGE,
-                                       NTH_UPDATE_ON_EDIT,
-                                       NTH_USE_HISTORY,
-                                       NTH_BASE_TABLE_THEME,
-                                       NTH_SEQUENCE_NAME,
-                                       NTH_SNAP_TO_THEME,
-                                       NTH_LREF_MANDATORY,
-                                       NTH_TOLERANCE,
-                                       NTH_TOL_UNITS,
-                                       NTH_DYNAMIC_THEME)
-                SELECT nth_theme_id_seq.NEXTVAL,
-                       'BASE SDL_LOAD DATA',
-                       'SDL_LOAD_DATA',
-                       'SLD_KEY',
-                       'SLD_KEY',
-                       'SDL_LOAD_DATA',
-                       'SLD_KEY',
-                       NULL,
-                       'SLD_WORKING_GEOMETRY',
-                       'NET',
-                       'N',
-                       'SDO',
-                       'I',
-                       'S',
-                       'N',
-                       'N',
-                       NULL,
-                       NULL,
-                       'N',
-                       'N',
-                       10,
-                       1,
-                       'N'
-                  FROM DUAL
-                 WHERE NOT EXISTS
-                           (SELECT 1
-                              FROM nm_themes_all
-                             WHERE nth_feature_table = 'SDL_LOAD_DATA');
-        END;
-
-        insert_sdo_metadata (P_TABLE_NAME    => 'SDL_LOAD_DATA',
-                             P_COLUMN_NAME   => 'SLD_WORKING_GEOMETRY',
-                             P_DIMINFO       => l_diminfo,
-                             P_SRID          => l_srid);
+        insert_theme (p_theme_name          => 'BASE SDL_LOAD DATA',
+                      p_object_name         => 'SDL_LOAD_DATA',
+                      p_base_theme_table    => NULL,
+                      p_base_theme_column   => NULL,
+                      p_key_name            => 'SLD_KEY',
+                      p_geom_column_name    => 'SLD_WORKING_GEOMETRY',
+                      p_role                => NULL,
+                      p_dim                 => 3);
 
         --
         --Now the base table of the WIP datums
 
-        BEGIN
-            INSERT INTO NM_THEMES_ALL (NTH_THEME_ID,
-                                       NTH_THEME_NAME,
-                                       NTH_TABLE_NAME,
-                                       NTH_PK_COLUMN,
-                                       NTH_LABEL_COLUMN,
-                                       NTH_FEATURE_TABLE,
-                                       NTH_FEATURE_PK_COLUMN,
-                                       NTH_FEATURE_FK_COLUMN,
-                                       NTH_FEATURE_SHAPE_COLUMN,
-                                       NTH_HPR_PRODUCT,
-                                       NTH_LOCATION_UPDATABLE,
-                                       NTH_THEME_TYPE,
-                                       NTH_DEPENDENCY,
-                                       NTH_STORAGE,
-                                       NTH_UPDATE_ON_EDIT,
-                                       NTH_USE_HISTORY,
-                                       NTH_BASE_TABLE_THEME,
-                                       NTH_SEQUENCE_NAME,
-                                       NTH_SNAP_TO_THEME,
-                                       NTH_LREF_MANDATORY,
-                                       NTH_TOLERANCE,
-                                       NTH_TOL_UNITS,
-                                       NTH_DYNAMIC_THEME)
-                SELECT nth_theme_id_seq.NEXTVAL,
-                       'BASE SDL DATUM DATA',
-                       'SDL_WIP_DATUMS',
-                       'SWD_ID',
-                       'SWD_ID',
-                       'SDL_WIP_DATUMS',
-                       'SWD_ID',
-                       NULL,
-                       'GEOM',
-                       'NET',
-                       'N',
-                       'SDO',
-                       'I',
-                       'S',
-                       'N',
-                       'N',
-                       NULL,
-                       NULL,
-                       'N',
-                       'N',
-                       10,
-                       1,
-                       'N'
-                  FROM DUAL
-                 WHERE NOT EXISTS
-                           (SELECT 1
-                              FROM nm_themes_all
-                             WHERE nth_feature_table = 'SDL_WIP_DATUMS');
-        END;
-
-        --
-        insert_sdo_metadata (P_TABLE_NAME    => 'SDL_WIP_DATUMS',
-                             P_COLUMN_NAME   => 'GEOM',
-                             P_DIMINFO       => l_diminfo,
-                             P_SRID          => l_srid);
+        insert_theme (p_theme_name          => 'SDL DATUMS AND STATS',
+                      p_object_name         => 'V_SDL_DATUM_ACCURACY',
+                      p_base_theme_table    => 'SDL_WIP_DATUMS',
+                      p_base_theme_column   => 'GEOM',
+                      p_key_name            => 'SWD_ID',
+                      p_geom_column_name    => 'GEOM',
+                      p_role                => NULL,
+                      p_dim                 => 3);
 
         --now the base table of the wip nodes
-        BEGIN
-            INSERT INTO NM_THEMES_ALL (NTH_THEME_ID,
-                                       NTH_THEME_NAME,
-                                       NTH_TABLE_NAME,
-                                       NTH_PK_COLUMN,
-                                       NTH_LABEL_COLUMN,
-                                       NTH_FEATURE_TABLE,
-                                       NTH_FEATURE_PK_COLUMN,
-                                       NTH_FEATURE_FK_COLUMN,
-                                       NTH_FEATURE_SHAPE_COLUMN,
-                                       NTH_HPR_PRODUCT,
-                                       NTH_LOCATION_UPDATABLE,
-                                       NTH_THEME_TYPE,
-                                       NTH_DEPENDENCY,
-                                       NTH_STORAGE,
-                                       NTH_UPDATE_ON_EDIT,
-                                       NTH_USE_HISTORY,
-                                       NTH_BASE_TABLE_THEME,
-                                       NTH_SEQUENCE_NAME,
-                                       NTH_SNAP_TO_THEME,
-                                       NTH_LREF_MANDATORY,
-                                       NTH_TOLERANCE,
-                                       NTH_TOL_UNITS,
-                                       NTH_DYNAMIC_THEME)
-                SELECT nth_theme_id_seq.NEXTVAL,
-                       'SDL NODE DATA',
-                       'SDL_WIP_NODES',
-                       'NODE_ID',
-                       'NODE_ID',
-                       'SDL_WIP_NODES',
-                       'NODE_ID',
-                       NULL,
-                       'NODE_GEOM',
-                       'NET',
-                       'N',
-                       'SDO',
-                       'I',
-                       'S',
-                       'N',
-                       'N',
-                       NULL,
-                       NULL,
-                       'N',
-                       'N',
-                       10,
-                       1,
-                       'N'
-                  FROM DUAL
-                 WHERE NOT EXISTS
-                           (SELECT 1
-                              FROM nm_themes_all
-                             WHERE nth_feature_table = 'SDL_WIP_NODES');
-        END;
 
-        insert_sdo_metadata (P_TABLE_NAME    => 'SDL_WIP_NODES',
-                             P_COLUMN_NAME   => 'GEOM',
-                             P_DIMINFO       => l_diminfo,
-                             P_SRID          => l_srid);
+        insert_theme (p_theme_name          => 'SDL NODE DATA',
+                      p_object_name         => 'SDL_WIP_NODES',
+                      p_base_theme_table    => NULL,
+                      p_base_theme_column   => NULL,
+                      p_key_name            => 'NODE_ID',
+                      p_geom_column_name    => 'NODE_GEOM',
+                      p_role                => NULL,
+                      p_dim                 => 2);
 
 
         -- now the datums, queryable by batch
 
-        BEGIN
-            INSERT INTO NM_THEMES_ALL (NTH_THEME_ID,
-                                       NTH_THEME_NAME,
-                                       NTH_TABLE_NAME,
-                                       NTH_PK_COLUMN,
-                                       NTH_LABEL_COLUMN,
-                                       NTH_FEATURE_TABLE,
-                                       NTH_FEATURE_PK_COLUMN,
-                                       NTH_FEATURE_FK_COLUMN,
-                                       NTH_FEATURE_SHAPE_COLUMN,
-                                       NTH_HPR_PRODUCT,
-                                       NTH_LOCATION_UPDATABLE,
-                                       NTH_THEME_TYPE,
-                                       NTH_DEPENDENCY,
-                                       NTH_STORAGE,
-                                       NTH_UPDATE_ON_EDIT,
-                                       NTH_USE_HISTORY,
-                                       NTH_BASE_TABLE_THEME,
-                                       NTH_SEQUENCE_NAME,
-                                       NTH_SNAP_TO_THEME,
-                                       NTH_LREF_MANDATORY,
-                                       NTH_TOLERANCE,
-                                       NTH_TOL_UNITS,
-                                       NTH_DYNAMIC_THEME)
-                SELECT nth_theme_id_seq.NEXTVAL,
-                       'SDL BATCH DATUM DATA',
-                       'V_SDL_WIP_DATUMS',
-                       'SWD_ID',
-                       'SWD_ID',
-                       'V_SDL_WIP_DATUMS',
-                       'SWD_ID',
-                       NULL,
-                       'GEOM',
-                       'NET',
-                       'N',
-                       'SDO',
-                       'I',
-                       'S',
-                       'N',
-                       'N',
-                       nth_theme_id,
-                       NULL,
-                       'N',
-                       'N',
-                       10,
-                       1,
-                       'N'
-                  FROM nm_themes_all
-                 WHERE     nth_feature_table = 'SDL_WIP_DATUMS'
-                       AND NOT EXISTS
-                               (SELECT 1
-                                  FROM nm_themes_all
-                                 WHERE nth_feature_table = 'V_SDL_WIP_DATUMS');
-        END;
-
-        --
-        insert_sdo_metadata (P_TABLE_NAME    => 'V_SDL_WIP_DATUMS',
-                             P_COLUMN_NAME   => 'GEOM',
-                             P_DIMINFO       => l_diminfo,
-                             P_SRID          => l_srid);
+        insert_theme (p_theme_name          => 'SDL BATCH DATUM DATA',
+                      p_object_name         => 'V_SDL_WIP_DATUMS',
+                      p_base_theme_table    => 'V_SDL_WIP_DATUMS',
+                      p_base_theme_column   => 'GEOM',
+                      p_key_name            => 'SWD_ID',
+                      p_geom_column_name    => 'GEOM',
+                      p_role                => NULL,
+                      p_dim                 => 3);
 
 
         --Now the nodes, queryable by batch
-        BEGIN
-            INSERT INTO NM_THEMES_ALL (NTH_THEME_ID,
-                                       NTH_THEME_NAME,
-                                       NTH_TABLE_NAME,
-                                       NTH_PK_COLUMN,
-                                       NTH_LABEL_COLUMN,
-                                       NTH_FEATURE_TABLE,
-                                       NTH_FEATURE_PK_COLUMN,
-                                       NTH_FEATURE_FK_COLUMN,
-                                       NTH_FEATURE_SHAPE_COLUMN,
-                                       NTH_HPR_PRODUCT,
-                                       NTH_LOCATION_UPDATABLE,
-                                       NTH_THEME_TYPE,
-                                       NTH_DEPENDENCY,
-                                       NTH_STORAGE,
-                                       NTH_UPDATE_ON_EDIT,
-                                       NTH_USE_HISTORY,
-                                       NTH_BASE_TABLE_THEME,
-                                       NTH_SEQUENCE_NAME,
-                                       NTH_SNAP_TO_THEME,
-                                       NTH_LREF_MANDATORY,
-                                       NTH_TOLERANCE,
-                                       NTH_TOL_UNITS,
-                                       NTH_DYNAMIC_THEME)
-                SELECT nth_theme_id_seq.NEXTVAL,
-                       'SDL BATCH NODE DATA',
-                       'V_SDL_WIP_NODES',
-                       'NODE_ID',
-                       'NODE_ID',
-                       'V_SDL_WIP_NODES',
-                       'NODE_ID',
-                       NULL,
-                       'NODE_GEOM',
-                       'NET',
-                       'N',
-                       'SDO',
-                       'I',
-                       'S',
-                       'N',
-                       'N',
-                       nth_theme_id,
-                       NULL,
-                       'N',
-                       'N',
-                       10,
-                       1,
-                       'N'
-                  FROM nm_themes_all
-                 WHERE     nth_feature_table = 'SDL_WIP_NODES'
-                       AND NOT EXISTS
-                               (SELECT 1
-                                  FROM nm_themes_all
-                                 WHERE nth_feature_table = 'V_SDL_WIP_NODES');
-        END;
+        insert_theme (p_theme_name          => 'SDL BATCH NODE DATA',
+                      p_object_name         => 'V_SDL_WIP_NODES',
+                      p_base_theme_table    => 'SDL_WIP_NODES',
+                      p_base_theme_column   => 'NODE_GEOM',
+                      p_key_name            => 'NODE_ID',
+                      p_geom_column_name    => 'NODE_GEOM',
+                      p_role                => NULL,
+                      p_dim                 => 2);
 
-        insert_sdo_metadata (P_TABLE_NAME    => 'V_SDL_WIP_NODES',
-                             P_COLUMN_NAME   => 'GEOM',
-                             P_DIMINFO       => l_diminfo,
-                             P_SRID          => l_srid);
-
-        BEGIN
-            INSERT INTO NM_THEMES_ALL (NTH_THEME_ID,
-                                       NTH_THEME_NAME,
-                                       NTH_TABLE_NAME,
-                                       NTH_PK_COLUMN,
-                                       NTH_LABEL_COLUMN,
-                                       NTH_FEATURE_TABLE,
-                                       NTH_FEATURE_PK_COLUMN,
-                                       NTH_FEATURE_FK_COLUMN,
-                                       NTH_FEATURE_SHAPE_COLUMN,
-                                       NTH_HPR_PRODUCT,
-                                       NTH_LOCATION_UPDATABLE,
-                                       NTH_THEME_TYPE,
-                                       NTH_DEPENDENCY,
-                                       NTH_STORAGE,
-                                       NTH_UPDATE_ON_EDIT,
-                                       NTH_USE_HISTORY,
-                                       NTH_BASE_TABLE_THEME,
-                                       NTH_SEQUENCE_NAME,
-                                       NTH_SNAP_TO_THEME,
-                                       NTH_LREF_MANDATORY,
-                                       NTH_TOLERANCE,
-                                       NTH_TOL_UNITS,
-                                       NTH_DYNAMIC_THEME)
-                SELECT nth_theme_id_seq.NEXTVAL,
-                       'SDL Match Detail',
-                       'V_SDL_PLINE_STATS',
-                       'SLPS_PLINE_ID',
-                       'SLPS_PLINE_ID',
-                       'V_SDL_PLINE_STATS',
-                       'SLPS_PLINE_ID',
-                       NULL,
-                       'GEOM',
-                       'NET',
-                       'N',
-                       'SDO',
-                       'I',
-                       'S',
-                       'N',
-                       'N',
-                       NULL,
-                       NULL,
-                       'N',
-                       'N',
-                       10,
-                       1,
-                       'N'
-                  FROM DUAL
-                 WHERE NOT EXISTS
-                           (SELECT 1
-                              FROM nm_themes_all
-                             WHERE nth_feature_table = 'V_SDL_PLINE_STATS');
-        END;
-
-        insert_sdo_metadata (P_TABLE_NAME    => 'V_SDL_PLINE_STATS',
-                             P_COLUMN_NAME   => 'GEOM',
-                             P_DIMINFO       => l_diminfo,
-                             P_SRID          => l_srid);
+        insert_theme (p_theme_name          => 'SDL Match Detail',
+                      p_object_name         => 'V_SDL_PLINE_STATS',
+                      p_base_theme_table    => NULL,
+                      p_base_theme_column   => NULL,
+                      p_key_name            => 'SLPS_PLINE_ID',
+                      p_geom_column_name    => 'GEOM',
+                      p_role                => NULL,
+                      p_dim                 => 2);
     END;
 
     PROCEDURE create_profile_themes (p_profile_id   IN INTEGER,
@@ -911,33 +622,37 @@ AS
          WHERE sp_id = p_profile_id;
 
         insert_theme (
-            p_theme_name          => 'SDL ' || UPPER (l_sp_name) || ' Load Statistics',
+            p_theme_name          =>
+                'SDL ' || UPPER (l_sp_name) || ' Load Statistics',
             p_object_name         => 'V_SDL_' || UPPER (l_sp_name) || '_LD_STATS',
             p_base_theme_table    => 'SLD_LOAD_DATA',
             p_base_theme_column   => 'SLD_WORKING_GEOMETRY',
             p_key_name            => 'SLD_KEY',
             p_geom_column_name    => 'GEOM',
-            p_role                => p_role);
+            p_role                => p_role,
+            p_dim                 => 3);
 
 
         insert_theme (
-            p_theme_name          =>  'SDL ' || UPPER (l_sp_name) || ' NE Statistics',
-            p_object_name         =>'V_SDL_' || UPPER (l_sp_name) || '_NE_STATS',
+            p_theme_name          => 'SDL ' || UPPER (l_sp_name) || ' NE Statistics',
+            p_object_name         => 'V_SDL_' || UPPER (l_sp_name) || '_NE_STATS',
             p_base_theme_table    => 'SLD_LOAD_DATA',
             p_base_theme_column   => 'SLD_WORKING_GEOMETRY',
             p_key_name            => 'SLD_KEY',
             p_geom_column_name    => 'GEOM',
-            p_role                => p_role);
+            p_role                => p_role,
+            p_dim                 => 3);
 
         insert_theme (
-            p_theme_name          => 'SDL ' || UPPER (l_sp_name) || ' Datum Statistics',
+            p_theme_name          =>
+                'SDL ' || UPPER (l_sp_name) || ' Datum Statistics',
             p_object_name         => 'V_SDL_WIP_' || UPPER (l_sp_name) || '_DATUMS',
             p_base_theme_table    => 'SLD_WIP_DATUMS',
             p_base_theme_column   => 'GEOM',
             p_key_name            => 'SWD_ID',
             p_geom_column_name    => 'GEOM',
-            p_role                => p_role);
-
+            p_role                => p_role,
+            p_dim                 => 3);
     --
     END;
 
@@ -1013,65 +728,122 @@ AS
                             p_base_theme_column   IN VARCHAR2,
                             p_key_name            IN VARCHAR2,
                             p_geom_column_name    IN VARCHAR2,
-                            p_role                IN VARCHAR2)
+                            p_role                IN VARCHAR2,
+                            p_dim                 IN NUMBER)
     AS
     BEGIN
         BEGIN
-            INSERT INTO NM_THEMES_ALL (NTH_THEME_ID,
-                                       NTH_THEME_NAME,
-                                       NTH_TABLE_NAME,
-                                       NTH_PK_COLUMN,
-                                       NTH_LABEL_COLUMN,
-                                       NTH_FEATURE_TABLE,
-                                       NTH_FEATURE_PK_COLUMN,
-                                       NTH_FEATURE_FK_COLUMN,
-                                       NTH_FEATURE_SHAPE_COLUMN,
-                                       NTH_HPR_PRODUCT,
-                                       NTH_LOCATION_UPDATABLE,
-                                       NTH_THEME_TYPE,
-                                       NTH_DEPENDENCY,
-                                       NTH_STORAGE,
-                                       NTH_UPDATE_ON_EDIT,
-                                       NTH_USE_HISTORY,
-                                       NTH_BASE_TABLE_THEME,
-                                       NTH_SEQUENCE_NAME,
-                                       NTH_SNAP_TO_THEME,
-                                       NTH_LREF_MANDATORY,
-                                       NTH_TOLERANCE,
-                                       NTH_TOL_UNITS,
-                                       NTH_DYNAMIC_THEME)
-                SELECT nth_theme_id_seq.NEXTVAL,
-                       p_theme_name,
-                       p_object_name,
-                       p_key_name,
-                       p_key_name,
-                       p_object_name,
-                       p_key_name,
-                       NULL,
-                       p_geom_column_name,
-                       'NET',
-                       'N',
-                       'SDO',
-                       'I',
-                       'S',
-                       'N',
-                       'N',
-                       nth_theme_id,
-                       NULL,
-                       'N',
-                       'N',
-                       10,
-                       1,
-                       'N'
-                  FROM nm_themes_all
-                 WHERE     nth_feature_table = p_base_theme_table
-                       AND EXISTS
+            IF p_base_theme_table IS NOT NULL
+            THEN
+                INSERT INTO NM_THEMES_ALL (NTH_THEME_ID,
+                                           NTH_THEME_NAME,
+                                           NTH_TABLE_NAME,
+                                           NTH_PK_COLUMN,
+                                           NTH_LABEL_COLUMN,
+                                           NTH_FEATURE_TABLE,
+                                           NTH_FEATURE_PK_COLUMN,
+                                           NTH_FEATURE_FK_COLUMN,
+                                           NTH_FEATURE_SHAPE_COLUMN,
+                                           NTH_HPR_PRODUCT,
+                                           NTH_LOCATION_UPDATABLE,
+                                           NTH_THEME_TYPE,
+                                           NTH_DEPENDENCY,
+                                           NTH_STORAGE,
+                                           NTH_UPDATE_ON_EDIT,
+                                           NTH_USE_HISTORY,
+                                           NTH_BASE_TABLE_THEME,
+                                           NTH_SEQUENCE_NAME,
+                                           NTH_SNAP_TO_THEME,
+                                           NTH_LREF_MANDATORY,
+                                           NTH_TOLERANCE,
+                                           NTH_TOL_UNITS,
+                                           NTH_DYNAMIC_THEME)
+                    SELECT nth_theme_id_seq.NEXTVAL,
+                           p_theme_name,
+                           p_object_name,
+                           p_key_name,
+                           p_key_name,
+                           p_object_name,
+                           p_key_name,
+                           NULL,
+                           p_geom_column_name,
+                           'NET',
+                           'N',
+                           'SDO',
+                           'I',
+                           'S',
+                           'N',
+                           'N',
+                           nth_theme_id,
+                           NULL,
+                           'N',
+                           'N',
+                           10,
+                           1,
+                           'N'
+                      FROM nm_themes_all
+                     WHERE     nth_feature_table = p_base_theme_table
+                           AND EXISTS
+                                   (SELECT 1
+                                      FROM dba_objects
+                                     WHERE     object_name = p_object_name
+                                           AND owner =
+                                               SYS_CONTEXT (
+                                                   'NM3CORE',
+                                                   'APPLICATION_OWNER'));
+            ELSE
+                INSERT INTO NM_THEMES_ALL (NTH_THEME_ID,
+                                           NTH_THEME_NAME,
+                                           NTH_TABLE_NAME,
+                                           NTH_PK_COLUMN,
+                                           NTH_LABEL_COLUMN,
+                                           NTH_FEATURE_TABLE,
+                                           NTH_FEATURE_PK_COLUMN,
+                                           NTH_FEATURE_FK_COLUMN,
+                                           NTH_FEATURE_SHAPE_COLUMN,
+                                           NTH_HPR_PRODUCT,
+                                           NTH_LOCATION_UPDATABLE,
+                                           NTH_THEME_TYPE,
+                                           NTH_DEPENDENCY,
+                                           NTH_STORAGE,
+                                           NTH_UPDATE_ON_EDIT,
+                                           NTH_USE_HISTORY,
+                                           NTH_BASE_TABLE_THEME,
+                                           NTH_SEQUENCE_NAME,
+                                           NTH_SNAP_TO_THEME,
+                                           NTH_LREF_MANDATORY,
+                                           NTH_TOLERANCE,
+                                           NTH_TOL_UNITS,
+                                           NTH_DYNAMIC_THEME)
+                    SELECT nth_theme_id_seq.NEXTVAL,
+                           p_theme_name,
+                           p_object_name,
+                           p_key_name,
+                           p_key_name,
+                           p_object_name,
+                           p_key_name,
+                           NULL,
+                           p_geom_column_name,
+                           'NET',
+                           'N',
+                           'SDO',
+                           'I',
+                           'S',
+                           'N',
+                           'N',
+                           NULL,
+                           NULL,
+                           'N',
+                           'N',
+                           10,
+                           1,
+                           'N'
+                      FROM DUAL
+                     WHERE NOT EXISTS
                                (SELECT 1
-                                  FROM dba_objects
-                                 WHERE     object_name = p_object_name
-                                       AND owner =
-                                           SYS_CONTEXT ('NM3CORE',
-                                                        'APPLICATION_OWNER'));
+                                  FROM nm_themes_all
+                                 WHERE nth_feature_table = p_object_name);
+            END IF;
         EXCEPTION
             WHEN DUP_VAL_ON_INDEX
             THEN
@@ -1084,46 +856,74 @@ AS
         END;
 
         BEGIN
-            INSERT INTO mdsys.sdo_geom_metadata_table (sdo_owner,
-                                                       sdo_table_name,
-                                                       sdo_column_name,
-                                                       sdo_diminfo,
-                                                       sdo_srid)
-                SELECT SYS_CONTEXT ('NM3CORE', 'APPLICATION_OWNER'),
-                       p_object_name,
-                       p_geom_column_name,
-                       sdo_diminfo,
-                       sdo_srid
-                  FROM mdsys.sdo_geom_metadata_table
-                 WHERE     sdo_owner =
-                           SYS_CONTEXT ('NM3CORE', 'APPLICATION_OWNER')
-                       AND sdo_table_name = p_base_theme_table
-                       AND sdo_column_name = p_base_theme_column;
+            IF p_base_theme_table IS NOT NULL
+            THEN
+                INSERT INTO mdsys.sdo_geom_metadata_table (sdo_owner,
+                                                           sdo_table_name,
+                                                           sdo_column_name,
+                                                           sdo_diminfo,
+                                                           sdo_srid)
+                    SELECT SYS_CONTEXT ('NM3CORE', 'APPLICATION_OWNER'),
+                           p_object_name,
+                           p_geom_column_name,
+                           sdo_diminfo,
+                           sdo_srid
+                      FROM mdsys.sdo_geom_metadata_table
+                     WHERE     sdo_owner =
+                               SYS_CONTEXT ('NM3CORE', 'APPLICATION_OWNER')
+                           AND sdo_table_name = p_base_theme_table
+                           AND sdo_column_name = p_base_theme_column;
+            ELSE
+                INSERT INTO mdsys.sdo_geom_metadata_table (sdo_owner,
+                                                           sdo_table_name,
+                                                           sdo_column_name,
+                                                           sdo_diminfo,
+                                                           sdo_srid)
+                    SELECT SYS_CONTEXT ('NM3CORE', 'APPLICATION_OWNER'),
+                           p_object_name,
+                           p_geom_column_name,
+                           CASE p_dim
+                               WHEN 3 THEN g_diminfo
+                               WHEN 2 THEN g_2d_diminfo
+                           END,
+                           g_srid
+                      FROM mdsys.sdo_geom_metadata_table
+                     WHERE     sdo_owner =
+                               SYS_CONTEXT ('NM3CORE', 'APPLICATION_OWNER')
+                           AND sdo_table_name = p_base_theme_table
+                           AND sdo_column_name = p_base_theme_column;
+            END IF;
         EXCEPTION
             WHEN DUP_VAL_ON_INDEX
             THEN
                 NULL;
         END;
 
-        BEGIN
-            INSERT INTO nm_theme_roles (nthr_theme_id, nthr_role, nthr_mode)
-                SELECT nth_theme_id, p_role, 'NORMAL'
-                  FROM nm_themes_all
-                 WHERE     nth_feature_table = p_object_name
-                       AND NOT EXISTS
-                               (SELECT 1
-                                  FROM nm_theme_roles, nm_themes_all
-                                 WHERE     nth_feature_table = p_object_name
-                                       AND nth_feature_shape_column =
-                                           p_geom_column_name
-                                       AND nthr_theme_id = nth_theme_id
-                                       AND nthr_role = nthr_role
-                                       AND nthr_mode = 'NORMAL');
-        EXCEPTION
-            WHEN DUP_VAL_ON_INDEX
-            THEN
-                NULL;
-        END;
+        IF p_role IS NOT NULL
+        THEN
+            BEGIN
+                INSERT INTO nm_theme_roles (nthr_theme_id,
+                                            nthr_role,
+                                            nthr_mode)
+                    SELECT nth_theme_id, p_role, 'NORMAL'
+                      FROM nm_themes_all
+                     WHERE     nth_feature_table = p_object_name
+                           AND NOT EXISTS
+                                   (SELECT 1
+                                      FROM nm_theme_roles, nm_themes_all
+                                     WHERE     nth_feature_table =
+                                               p_object_name
+                                           AND nth_feature_shape_column =
+                                               p_geom_column_name
+                                           AND nthr_theme_id = nth_theme_id
+                                           AND nthr_role = nthr_role
+                                           AND nthr_mode = 'NORMAL');
+            EXCEPTION
+                WHEN DUP_VAL_ON_INDEX
+                THEN
+                    NULL;
+            END;
+        END IF;
     END;
 END sdl_ddl;
 /
