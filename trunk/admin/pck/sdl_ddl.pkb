@@ -1,13 +1,12 @@
-/* Formatted on 11/09/2019 19:52:49 (QP5 v5.336) */
 CREATE OR REPLACE PACKAGE BODY sdl_ddl
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_ddl.pkb-arc   1.7   Sep 11 2019 20:00:10   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_ddl.pkb-arc   1.8   Sep 12 2019 12:54:14   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_ddl.pkb  $
-    --       Date into PVCS   : $Date:   Sep 11 2019 20:00:10  $
-    --       Date fetched Out : $Modtime:   Sep 11 2019 19:57:20  $
-    --       PVCS Version     : $Revision:   1.7  $
+    --       Date into PVCS   : $Date:   Sep 12 2019 12:54:14  $
+    --       Date fetched Out : $Modtime:   Sep 12 2019 12:52:20  $
+    --       PVCS Version     : $Revision:   1.8  $
     --
     --   Author : R.A. Coupe
     --
@@ -20,7 +19,7 @@ AS
     -- The main purpose of this package is to provide DDL execution for creation of views and triggers
     -- to support the SDL.
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.7  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.8  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'SDL_DDL';
 
@@ -953,7 +952,7 @@ AS
                                                    sdo_column_name,
                                                    sdo_diminfo,
                                                    sdo_srid)
-             VALUES (SYS_CONTEXT ('Nm3CORE', 'APPLICATION_OWNER'),
+             VALUES (SYS_CONTEXT ('NM3CORE', 'APPLICATION_OWNER'),
                      p_table_name,
                      p_column_name,
                      p_diminfo,
