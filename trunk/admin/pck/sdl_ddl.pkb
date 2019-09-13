@@ -1,13 +1,12 @@
-/* Formatted on 12/09/2019 15:54:01 (QP5 v5.336) */
 CREATE OR REPLACE PACKAGE BODY sdl_ddl
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_ddl.pkb-arc   1.9   Sep 12 2019 18:30:18   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_ddl.pkb-arc   1.10   Sep 13 2019 11:24:12   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_ddl.pkb  $
-    --       Date into PVCS   : $Date:   Sep 12 2019 18:30:18  $
-    --       Date fetched Out : $Modtime:   Sep 12 2019 18:29:52  $
-    --       PVCS Version     : $Revision:   1.9  $
+    --       Date into PVCS   : $Date:   Sep 13 2019 11:24:12  $
+    --       Date fetched Out : $Modtime:   Sep 13 2019 11:23:46  $
+    --       PVCS Version     : $Revision:   1.10  $
     --
     --   Author : R.A. Coupe
     --
@@ -20,7 +19,7 @@ AS
     -- The main purpose of this package is to provide DDL execution for creation of views and triggers
     -- to support the SDL.
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.9  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.10  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'SDL_DDL';
 
@@ -555,8 +554,24 @@ AS
                       p_role                => NULL,
                       p_dim                 => 3);
 
+        insert_theme (p_theme_name          => 'SDL LOAD AND STATS',
+                      p_object_name         => 'V_SDL_BATCH_ACCURACY',
+                      p_base_theme_table    => 'SDL_LOAD_DATA',
+                      p_base_theme_column   => 'SLD_WORKING_GEOMETRY',
+                      p_key_name            => 'SLD_KEY',
+                      p_geom_column_name    => 'SLD_WORKING_GEOMETRY',
+                      p_role                => NULL,
+                      p_dim                 => 3);
         --
-        --Now the base table of the WIP datums
+
+        insert_theme (p_theme_name          => 'SDL DATUMS',
+                      p_object_name         => 'SDL_WIP_DATUMS',
+                      p_base_theme_table    => NULL,
+                      p_base_theme_column   => NULL,
+                      p_key_name            => 'SWD_ID',
+                      p_geom_column_name    => 'GEOM',
+                      p_role                => NULL,
+                      p_dim                 => 3);
 
         insert_theme (p_theme_name          => 'SDL DATUMS AND STATS',
                       p_object_name         => 'V_SDL_DATUM_ACCURACY',
@@ -685,7 +700,9 @@ AS
               WHERE nth_feature_table IN
                         ('V_SDL_WIP_DATUMS',
                          'V_SDL_WIP_NODES',
-                         'V_SDL_PLINE_STATS');
+                         'V_SDL_PLINE_STATS',
+                         'V_SDL_BATCH_ACCURACY',
+                         'V_SDL_DATUM_ACCURACY');
 
         DELETE FROM mdsys.sdo_geom_metadata_table
               WHERE sdo_table_name IN
