@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY sdl_ddl
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_ddl.pkb-arc   1.10   Sep 13 2019 11:24:12   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_ddl.pkb-arc   1.11   Sep 13 2019 22:40:24   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_ddl.pkb  $
-    --       Date into PVCS   : $Date:   Sep 13 2019 11:24:12  $
-    --       Date fetched Out : $Modtime:   Sep 13 2019 11:23:46  $
-    --       PVCS Version     : $Revision:   1.10  $
+    --       Date into PVCS   : $Date:   Sep 13 2019 22:40:24  $
+    --       Date fetched Out : $Modtime:   Sep 13 2019 22:39:58  $
+    --       PVCS Version     : $Revision:   1.11  $
     --
     --   Author : R.A. Coupe
     --
@@ -19,13 +19,16 @@ AS
     -- The main purpose of this package is to provide DDL execution for creation of views and triggers
     -- to support the SDL.
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.10  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.11  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'SDL_DDL';
 
     g_diminfo                 sdo_dim_array := nm3sdo.coalesce_nw_diminfo;
     g_2d_diminfo              sdo_dim_array
         := SDO_LRS.convert_to_std_dim_array (g_diminfo);
+
+    g_default_role            VARCHAR2 (30)
+        := NVL (hig.get_sysopt ('SDL_ROLE'), 'SDL_USER');
 
     FUNCTION get_srid
         RETURN NUMBER;
@@ -47,14 +50,16 @@ AS
     PROCEDURE gen_profile_ne_stats_view (p_profile_id   IN     NUMBER,
                                          p_view_sql        OUT VARCHAR2);
 
-    PROCEDURE insert_theme (p_theme_name          IN VARCHAR2,
-                            p_object_name         IN VARCHAR2,
-                            p_base_theme_table    IN VARCHAR2,
-                            p_base_theme_column   IN VARCHAR2,
-                            p_key_name            IN VARCHAR2,
-                            p_geom_column_name    IN VARCHAR2,
-                            p_role                IN VARCHAR2,
-                            p_dim                 IN NUMBER);
+    PROCEDURE insert_theme (
+        p_theme_name          IN VARCHAR2,
+        p_object_name         IN VARCHAR2,
+        p_base_theme_table    IN VARCHAR2,
+        p_base_theme_column   IN VARCHAR2,
+        p_key_name            IN VARCHAR2,
+        p_geom_column_name    IN VARCHAR2,
+        p_role                IN VARCHAR2 DEFAULT g_default_role,
+        p_dim                 IN NUMBER,
+        p_gtype               IN NUMBER);
 
     PROCEDURE insert_sdo_metadata (p_table_name    IN VARCHAR2,
                                    p_column_name   IN VARCHAR2,
@@ -552,7 +557,8 @@ AS
                       p_key_name            => 'SLD_KEY',
                       p_geom_column_name    => 'SLD_WORKING_GEOMETRY',
                       p_role                => NULL,
-                      p_dim                 => 3);
+                      p_dim                 => 3,
+                      p_gtype               => 3002);
 
         insert_theme (p_theme_name          => 'SDL LOAD AND STATS',
                       p_object_name         => 'V_SDL_BATCH_ACCURACY',
@@ -560,8 +566,9 @@ AS
                       p_base_theme_column   => 'SLD_WORKING_GEOMETRY',
                       p_key_name            => 'SLD_KEY',
                       p_geom_column_name    => 'SLD_WORKING_GEOMETRY',
-                      p_role                => NULL,
-                      p_dim                 => 3);
+                      p_role                => g_default_role,
+                      p_dim                 => 3,
+                      p_gtype               => 3002);
         --
 
         insert_theme (p_theme_name          => 'SDL DATUMS',
@@ -571,7 +578,8 @@ AS
                       p_key_name            => 'SWD_ID',
                       p_geom_column_name    => 'GEOM',
                       p_role                => NULL,
-                      p_dim                 => 3);
+                      p_dim                 => 3,
+                      p_gtype               => 3002);
 
         insert_theme (p_theme_name          => 'SDL DATUMS AND STATS',
                       p_object_name         => 'V_SDL_DATUM_ACCURACY',
@@ -579,8 +587,9 @@ AS
                       p_base_theme_column   => 'GEOM',
                       p_key_name            => 'SWD_ID',
                       p_geom_column_name    => 'GEOM',
-                      p_role                => NULL,
-                      p_dim                 => 3);
+                      p_role                => g_default_role,
+                      p_dim                 => 3,
+                      p_gtype               => 3302);
 
         --now the base table of the wip nodes
 
@@ -591,7 +600,8 @@ AS
                       p_key_name            => 'NODE_ID',
                       p_geom_column_name    => 'NODE_GEOM',
                       p_role                => NULL,
-                      p_dim                 => 2);
+                      p_dim                 => 2,
+                      p_gtype               => 2001);
 
 
         -- now the datums, queryable by batch
@@ -602,8 +612,10 @@ AS
                       p_base_theme_column   => 'GEOM',
                       p_key_name            => 'SWD_ID',
                       p_geom_column_name    => 'GEOM',
-                      p_role                => NULL,
-                      p_dim                 => 3);
+                      p_role                => g_default_role,
+                      p_dim                 => 3,
+                      p_gtype               => 3302);
+
 
 
         --Now the nodes, queryable by batch
@@ -613,8 +625,10 @@ AS
                       p_base_theme_column   => 'NODE_GEOM',
                       p_key_name            => 'NODE_ID',
                       p_geom_column_name    => 'NODE_GEOM',
-                      p_role                => NULL,
-                      p_dim                 => 2);
+                      p_role                => g_default_role,
+                      p_dim                 => 2,
+                      p_gtype               => 2001);
+
 
         insert_theme (p_theme_name          => 'SDL Match Detail',
                       p_object_name         => 'V_SDL_PLINE_STATS',
@@ -622,8 +636,9 @@ AS
                       p_base_theme_column   => NULL,
                       p_key_name            => 'SLPS_PLINE_ID',
                       p_geom_column_name    => 'GEOM',
-                      p_role                => NULL,
-                      p_dim                 => 2);
+                      p_role                => g_default_role,
+                      p_dim                 => 2,
+                      p_gtype               => 2002);
     END;
 
     PROCEDURE create_profile_themes (p_profile_id   IN INTEGER,
@@ -645,29 +660,33 @@ AS
             p_key_name            => 'SLD_KEY',
             p_geom_column_name    => 'GEOM',
             p_role                => p_role,
-            p_dim                 => 3);
+            p_dim                 => 3,
+            p_gtype               => 3302);
 
 
         insert_theme (
             p_theme_name          => 'SDL ' || UPPER (l_sp_name) || ' NE Statistics',
             p_object_name         => 'V_SDL_' || UPPER (l_sp_name) || '_NE_STATS',
-            p_base_theme_table    => 'SLD_LOAD_DATA',
+            p_base_theme_table    => 'SDL_LOAD_DATA',
             p_base_theme_column   => 'SLD_WORKING_GEOMETRY',
             p_key_name            => 'SLD_KEY',
             p_geom_column_name    => 'GEOM',
             p_role                => p_role,
-            p_dim                 => 3);
+            p_dim                 => 3,
+            p_gtype               => 3002);
+
 
         insert_theme (
             p_theme_name          =>
                 'SDL ' || UPPER (l_sp_name) || ' Datum Statistics',
             p_object_name         => 'V_SDL_WIP_' || UPPER (l_sp_name) || '_DATUMS',
-            p_base_theme_table    => 'SLD_WIP_DATUMS',
+            p_base_theme_table    => 'SDL_WIP_DATUMS',
             p_base_theme_column   => 'GEOM',
             p_key_name            => 'SWD_ID',
             p_geom_column_name    => 'GEOM',
             p_role                => p_role,
-            p_dim                 => 3);
+            p_dim                 => 3,
+            p_gtype               => 3302);
     --
     END;
 
@@ -696,13 +715,14 @@ AS
     PROCEDURE drop_sdl_themes
     IS
     BEGIN
+        --theme-roles, theme-gtypes are cascaded
+
         DELETE FROM nm_themes_all
-              WHERE nth_feature_table IN
-                        ('V_SDL_WIP_DATUMS',
-                         'V_SDL_WIP_NODES',
-                         'V_SDL_PLINE_STATS',
-                         'V_SDL_BATCH_ACCURACY',
-                         'V_SDL_DATUM_ACCURACY');
+              WHERE nth_feature_table IN ('V_SDL_WIP_DATUMS',
+                                          'V_SDL_WIP_NODES',
+                                          'V_SDL_PLINE_STATS',
+                                          'V_SDL_BATCH_ACCURACY',
+                                          'V_SDL_DATUM_ACCURACY');
 
         DELETE FROM mdsys.sdo_geom_metadata_table
               WHERE sdo_table_name IN
@@ -746,7 +766,8 @@ AS
                             p_key_name            IN VARCHAR2,
                             p_geom_column_name    IN VARCHAR2,
                             p_role                IN VARCHAR2,
-                            p_dim                 IN NUMBER)
+                            p_dim                 IN NUMBER,
+                            p_gtype               IN NUMBER)
     AS
     BEGIN
         BEGIN
@@ -941,6 +962,23 @@ AS
                     NULL;
             END;
         END IF;
+
+
+        INSERT INTO nm_theme_gtypes (ntg_theme_id,
+                                     ntg_gtype,
+                                     ntg_seq_no,
+                                     ntg_xml_url)
+            SELECT nth_theme_id,
+                   p_gtype,
+                   1,
+                   NULL
+              FROM nm_themes_all
+             WHERE     nth_feature_table = p_object_name
+                   AND NOT EXISTS
+                           (SELECT 1
+                              FROM nm_theme_gtypes
+                             WHERE     ntg_theme_id = nth_theme_id
+                                   AND ntg_gtype = p_gtype);
     END;
 END sdl_ddl;
 /
