@@ -9,18 +9,19 @@ CREATE OR REPLACE FORCE VIEW V_SDL_BATCH_ACCURACY
     MAX_OFFSET,
     PCT_STD_DEV,
     PCT_AVERAGE,
-    PCT_MEDIAN
+    PCT_MEDIAN,
+    GEOM
 )
 BEQUEATH DEFINER
 AS
     SELECT --
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/views/v_sdl_batch_accuracy.vw-arc   1.1   Sep 09 2019 16:29:26   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/views/v_sdl_batch_accuracy.vw-arc   1.2   Sep 16 2019 14:37:38   Rob.Coupe  $
     --       Module Name      : $Workfile:   v_sdl_batch_accuracy.vw  $
-    --       Date into PVCS   : $Date:   Sep 09 2019 16:29:26  $
-    --       Date fetched Out : $Modtime:   Sep 09 2019 16:29:10  $
-    --       PVCS Version     : $Revision:   1.1  $
+    --       Date into PVCS   : $Date:   Sep 16 2019 14:37:38  $
+    --       Date fetched Out : $Modtime:   Sep 16 2019 14:36:14  $
+    --       PVCS Version     : $Revision:   1.2  $
     --
     --   Author : R.A. Coupe
     --
@@ -46,7 +47,8 @@ AS
                  average_accuracy,
              MEDIAN (LEAST (slga_pct_inside, 100))
                  OVER (PARTITION BY sld_sfs_id, slga_buffer_size)
-                 median_accuracy
+                 median_accuracy,
+             sld_working_geometry
         FROM sdl_geom_accuracy a, sdl_load_data
        WHERE sld_key = slga_sld_key AND slga_datum_id IS NULL
     ORDER BY sld_id, slga_buffer_size;
