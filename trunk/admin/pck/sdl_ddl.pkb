@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY sdl_ddl
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_ddl.pkb-arc   1.13   Sep 16 2019 16:13:04   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_ddl.pkb-arc   1.14   Sep 16 2019 17:28:56   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_ddl.pkb  $
-    --       Date into PVCS   : $Date:   Sep 16 2019 16:13:04  $
-    --       Date fetched Out : $Modtime:   Sep 16 2019 16:11:54  $
-    --       PVCS Version     : $Revision:   1.13  $
+    --       Date into PVCS   : $Date:   Sep 16 2019 17:28:56  $
+    --       Date fetched Out : $Modtime:   Sep 16 2019 17:25:46  $
+    --       PVCS Version     : $Revision:   1.14  $
     --
     --   Author : R.A. Coupe
     --
@@ -19,7 +19,7 @@ AS
     -- The main purpose of this package is to provide DDL execution for creation of views and triggers
     -- to support the SDL.
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.13  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.14  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'SDL_DDL';
 
@@ -222,7 +222,7 @@ AS
                  || 'pct_average, '
                  || 'pct_median, '
                  || ' geom '
-                 || ' ) as select sld_sfs_id, sld_id, sld_key, '
+                 || ' ) as select sld_sfs_id, sld_id, l.sld_key, '
                  || LISTAGG ('sld_col_' || sam_col_id, ',')
                         WITHIN GROUP (ORDER BY sam_id)
                  || ' , buffer_size, '
@@ -281,7 +281,7 @@ AS
                  || 'pct_average, '
                  || 'pct_median, '
                  || ' geom '
-                 || ' ) as select sld_sfs_id, sld_id, sld_key, '
+                 || ' ) as select sld_sfs_id, sld_id, l.sld_key, '
                  || LISTAGG ('sld_col_' || sam_col_id, ',')
                         WITHIN GROUP (ORDER BY sam_id)
                  || ' , buffer_size, '
