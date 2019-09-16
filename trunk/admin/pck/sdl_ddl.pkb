@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY sdl_ddl
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_ddl.pkb-arc   1.12   Sep 16 2019 15:13:22   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_ddl.pkb-arc   1.13   Sep 16 2019 16:13:04   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_ddl.pkb  $
-    --       Date into PVCS   : $Date:   Sep 16 2019 15:13:22  $
-    --       Date fetched Out : $Modtime:   Sep 16 2019 15:12:16  $
-    --       PVCS Version     : $Revision:   1.12  $
+    --       Date into PVCS   : $Date:   Sep 16 2019 16:13:04  $
+    --       Date fetched Out : $Modtime:   Sep 16 2019 16:11:54  $
+    --       PVCS Version     : $Revision:   1.13  $
     --
     --   Author : R.A. Coupe
     --
@@ -19,7 +19,7 @@ AS
     -- The main purpose of this package is to provide DDL execution for creation of views and triggers
     -- to support the SDL.
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.12  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.13  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'SDL_DDL';
 
@@ -232,10 +232,10 @@ AS
                  || 'pct_std_dev, '
                  || 'nvl(pct_average, -1), '
                  || 'pct_median, '
-                 || 'sld_working_geometry '
-                 || ' from sdl_load_data, v_sdl_batch_accuracy '
-                 || ' where sld_sfs_id = batch_id (+) '
-                 || ' and sld_id = record_id (+) '
+                 || 'l.sld_working_geometry '
+                 || ' from sdl_load_data l, v_sdl_batch_accuracy a '
+                 || ' where sld_sfs_id = batch_id '
+                 || ' and sld_id = record_id '
                  || ' and sld_sfs_id IN (SELECT sfs_id FROM sdl_file_submissions '
                  || ' WHERE sfs_sp_id = '
                  || TO_CHAR (p_profile_id)
@@ -291,10 +291,10 @@ AS
                  || 'pct_std_dev, '
                  || 'nvl(pct_average, -1), '
                  || 'pct_median, '
-                 || 'sld_working_geometry '
-                 || ' from sdl_load_data, v_sdl_batch_accuracy '
-                 || ' where sld_sfs_id = batch_id (+) '
-                 || ' and sld_id = record_id (+) '
+                 || 'l.sld_working_geometry '
+                 || ' from sdl_load_data l, v_sdl_batch_accuracy a '
+                 || ' where sld_sfs_id = batch_id '
+                 || ' and sld_id = record_id '
                  || ' and sld_sfs_id IN (SELECT sfs_id FROM sdl_file_submissions '
                  || ' WHERE sfs_sp_id = '
                  || TO_CHAR (p_profile_id)
