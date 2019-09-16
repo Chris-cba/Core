@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY sdl_ddl
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_ddl.pkb-arc   1.11   Sep 13 2019 22:40:24   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_ddl.pkb-arc   1.12   Sep 16 2019 15:13:22   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_ddl.pkb  $
-    --       Date into PVCS   : $Date:   Sep 13 2019 22:40:24  $
-    --       Date fetched Out : $Modtime:   Sep 13 2019 22:39:58  $
-    --       PVCS Version     : $Revision:   1.11  $
+    --       Date into PVCS   : $Date:   Sep 16 2019 15:13:22  $
+    --       Date fetched Out : $Modtime:   Sep 16 2019 15:12:16  $
+    --       PVCS Version     : $Revision:   1.12  $
     --
     --   Author : R.A. Coupe
     --
@@ -19,7 +19,7 @@ AS
     -- The main purpose of this package is to provide DDL execution for creation of views and triggers
     -- to support the SDL.
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.11  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.12  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'SDL_DDL';
 
@@ -925,11 +925,7 @@ AS
                                WHEN 2 THEN g_2d_diminfo
                            END,
                            g_srid
-                      FROM mdsys.sdo_geom_metadata_table
-                     WHERE     sdo_owner =
-                               SYS_CONTEXT ('NM3CORE', 'APPLICATION_OWNER')
-                           AND sdo_table_name = p_base_theme_table
-                           AND sdo_column_name = p_base_theme_column;
+                      FROM DUAL;
             END IF;
         EXCEPTION
             WHEN DUP_VAL_ON_INDEX
