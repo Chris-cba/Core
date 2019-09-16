@@ -10,18 +10,18 @@ CREATE OR REPLACE FORCE VIEW V_SDL_BATCH_ACCURACY
     PCT_STD_DEV,
     PCT_AVERAGE,
     PCT_MEDIAN,
-    GEOM
+    SLD_WORKING_GEOMETRY
 )
 BEQUEATH DEFINER
 AS
     SELECT --
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/views/v_sdl_batch_accuracy.vw-arc   1.2   Sep 16 2019 14:37:38   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/views/v_sdl_batch_accuracy.vw-arc   1.3   Sep 16 2019 15:06:12   Rob.Coupe  $
     --       Module Name      : $Workfile:   v_sdl_batch_accuracy.vw  $
-    --       Date into PVCS   : $Date:   Sep 16 2019 14:37:38  $
-    --       Date fetched Out : $Modtime:   Sep 16 2019 14:36:14  $
-    --       PVCS Version     : $Revision:   1.2  $
+    --       Date into PVCS   : $Date:   Sep 16 2019 15:06:12  $
+    --       Date fetched Out : $Modtime:   Sep 16 2019 15:05:52  $
+    --       PVCS Version     : $Revision:   1.3  $
     --
     --   Author : R.A. Coupe
     --
