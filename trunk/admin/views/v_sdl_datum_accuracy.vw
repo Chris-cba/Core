@@ -11,11 +11,11 @@ BEQUEATH DEFINER
 AS
     SELECT --   PVCS Identifiers :-
            --
-           --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/views/v_sdl_datum_accuracy.vw-arc   1.2   Sep 18 2019 08:02:34   Rob.Coupe  $
+           --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/views/v_sdl_datum_accuracy.vw-arc   1.3   Sep 18 2019 08:17:26   Rob.Coupe  $
            --       Module Name      : $Workfile:   v_sdl_datum_accuracy.vw  $
-           --       Date into PVCS   : $Date:   Sep 18 2019 08:02:34  $
-           --       Date fetched Out : $Modtime:   Sep 18 2019 08:01:46  $
-           --       PVCS Version     : $Revision:   1.2  $
+           --       Date into PVCS   : $Date:   Sep 18 2019 08:17:26  $
+           --       Date fetched Out : $Modtime:   Sep 18 2019 08:16:40  $
+           --       PVCS Version     : $Revision:   1.3  $
            --
            --   Author : R.A. Coupe
            --
@@ -33,4 +33,6 @@ AS
           datum_id,
           NVL (pct_match, -1),
           geom
-     FROM sdl_wip_datums;
+     FROM sdl_wip_datums
+     where batch_id = NVL (TO_NUMBER (SYS_CONTEXT ('NM3SQL', 'SDLCTX_SFS_ID')), batch_id);
+     
