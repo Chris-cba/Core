@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY sdl_ddl
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_ddl.pkb-arc   1.15   Sep 18 2019 08:21:32   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_ddl.pkb-arc   1.16   Sep 18 2019 09:18:38   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_ddl.pkb  $
-    --       Date into PVCS   : $Date:   Sep 18 2019 08:21:32  $
-    --       Date fetched Out : $Modtime:   Sep 18 2019 08:20:40  $
-    --       PVCS Version     : $Revision:   1.15  $
+    --       Date into PVCS   : $Date:   Sep 18 2019 09:18:38  $
+    --       Date fetched Out : $Modtime:   Sep 18 2019 09:17:44  $
+    --       PVCS Version     : $Revision:   1.16  $
     --
     --   Author : R.A. Coupe
     --
@@ -19,7 +19,7 @@ AS
     -- The main purpose of this package is to provide DDL execution for creation of views and triggers
     -- to support the SDL.
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.15  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.16  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'SDL_DDL';
 
@@ -550,7 +550,7 @@ AS
 
         --first the base table of the load data
 
-        insert_theme (p_theme_name          => 'ORIGINAL SDL SUBMISSION',
+        insert_theme (p_theme_name          => 'BASE SDL LOAD DATA',
                       p_object_name         => 'SDL_LOAD_DATA',
                       p_base_theme_table    => NULL,
                       p_base_theme_column   => NULL,
@@ -560,15 +560,15 @@ AS
                       p_dim                 => 3,
                       p_gtype               => 3002);
 
---        insert_theme (p_theme_name          => 'SDL LOAD AND STATS',
---                      p_object_name         => 'V_SDL_BATCH_ACCURACY',
---                      p_base_theme_table    => 'SDL_LOAD_DATA',
---                      p_base_theme_column   => 'SLD_WORKING_GEOMETRY',
---                      p_key_name            => 'SLD_KEY',
---                      p_geom_column_name    => 'SLD_WORKING_GEOMETRY',
---                      p_role                => g_default_role,
---                      p_dim                 => 3,
---                      p_gtype               => 3002);
+        insert_theme (p_theme_name          => 'ORIGINAL SDL SUBMISSION',
+                      p_object_name         => 'V_SDL_LOAD_DATA',
+                      p_base_theme_table    => 'SDL_LOAD_DATA',
+                      p_base_theme_column   => 'SLD_WORKING_GEOMETRY',
+                      p_key_name            => 'SLD_KEY',
+                      p_geom_column_name    => 'SLD_WORKING_GEOMETRY',
+                      p_role                => g_default_role,
+                      p_dim                 => 3,
+                      p_gtype               => 3002);
         --
 
         insert_theme (p_theme_name          => 'SDL DATUMS',
