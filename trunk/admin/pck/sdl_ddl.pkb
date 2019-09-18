@@ -2,15 +2,15 @@ CREATE OR REPLACE PACKAGE BODY sdl_ddl
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_ddl.pkb-arc   1.14   Sep 16 2019 17:28:56   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_ddl.pkb-arc   1.15   Sep 18 2019 08:21:32   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_ddl.pkb  $
-    --       Date into PVCS   : $Date:   Sep 16 2019 17:28:56  $
-    --       Date fetched Out : $Modtime:   Sep 16 2019 17:25:46  $
-    --       PVCS Version     : $Revision:   1.14  $
+    --       Date into PVCS   : $Date:   Sep 18 2019 08:21:32  $
+    --       Date fetched Out : $Modtime:   Sep 18 2019 08:20:40  $
+    --       PVCS Version     : $Revision:   1.15  $
     --
     --   Author : R.A. Coupe
     --
-    --   Package for handling the generation of views and triggers to support the SDLh
+    --   Package for handling the generation of views and triggers to support the SDL
     --
     -----------------------------------------------------------------------------
     -- Copyright (c) 2019 Bentley Systems Incorporated. All rights reserved.
@@ -19,7 +19,7 @@ AS
     -- The main purpose of this package is to provide DDL execution for creation of views and triggers
     -- to support the SDL.
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.14  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.15  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'SDL_DDL';
 
@@ -508,13 +508,13 @@ AS
                'create or replace view v_sdl_wip_'
             || l_profile_name
             || '_datums '
-            || ' ( batch_id, swd_id, SLD_KEY, DATUM_ID, GEOM, ne_length_g, ne_no_start, ne_no_end, ne_type, ne_nt_type'
+            || ' ( batch_id, swd_id, SLD_KEY, DATUM_ID, pct_match, GEOM, ne_length_g, ne_no_start, ne_no_end, ne_type, ne_nt_type'
             || CASE
                    WHEN l_col_list IS NOT NULL THEN ', ' || l_col_list
                    ELSE NULL
                END
             || ' ) as '
-            || ' select d.batch_id, d.swd_id, d.SLD_KEY, d.DATUM_ID, d.GEOM, sdo_lrs.geom_segment_end_measure(d.geom) - sdo_lrs.geom_segment_start_measure(d.geom), '
+            || ' select d.batch_id, d.swd_id, d.SLD_KEY, d.DATUM_ID, d.pct_match, d.GEOM, sdo_lrs.geom_segment_end_measure(d.geom) - sdo_lrs.geom_segment_start_measure(d.geom), '
             || 'NULL, NULL, '
             || qq
             || 'S'
@@ -550,7 +550,7 @@ AS
 
         --first the base table of the load data
 
-        insert_theme (p_theme_name          => 'BASE SDL_LOAD DATA',
+        insert_theme (p_theme_name          => 'ORIGINAL SDL SUBMISSION',
                       p_object_name         => 'SDL_LOAD_DATA',
                       p_base_theme_table    => NULL,
                       p_base_theme_column   => NULL,
@@ -560,15 +560,15 @@ AS
                       p_dim                 => 3,
                       p_gtype               => 3002);
 
-        insert_theme (p_theme_name          => 'SDL LOAD AND STATS',
-                      p_object_name         => 'V_SDL_BATCH_ACCURACY',
-                      p_base_theme_table    => 'SDL_LOAD_DATA',
-                      p_base_theme_column   => 'SLD_WORKING_GEOMETRY',
-                      p_key_name            => 'SLD_KEY',
-                      p_geom_column_name    => 'SLD_WORKING_GEOMETRY',
-                      p_role                => g_default_role,
-                      p_dim                 => 3,
-                      p_gtype               => 3002);
+--        insert_theme (p_theme_name          => 'SDL LOAD AND STATS',
+--                      p_object_name         => 'V_SDL_BATCH_ACCURACY',
+--                      p_base_theme_table    => 'SDL_LOAD_DATA',
+--                      p_base_theme_column   => 'SLD_WORKING_GEOMETRY',
+--                      p_key_name            => 'SLD_KEY',
+--                      p_geom_column_name    => 'SLD_WORKING_GEOMETRY',
+--                      p_role                => g_default_role,
+--                      p_dim                 => 3,
+--                      p_gtype               => 3002);
         --
 
         insert_theme (p_theme_name          => 'SDL DATUMS',
@@ -606,15 +606,15 @@ AS
 
         -- now the datums, queryable by batch
 
-        insert_theme (p_theme_name          => 'SDL BATCH DATUM DATA',
-                      p_object_name         => 'V_SDL_WIP_DATUMS',
-                      p_base_theme_table    => 'V_SDL_WIP_DATUMS',
-                      p_base_theme_column   => 'GEOM',
-                      p_key_name            => 'SWD_ID',
-                      p_geom_column_name    => 'GEOM',
-                      p_role                => g_default_role,
-                      p_dim                 => 3,
-                      p_gtype               => 3302);
+--        insert_theme (p_theme_name          => 'SDL BATCH DATUM DATA',
+--                      p_object_name         => 'V_SDL_WIP_DATUMS',
+--                      p_base_theme_table    => 'V_SDL_WIP_DATUMS',
+--                      p_base_theme_column   => 'GEOM',
+--                      p_key_name            => 'SWD_ID',
+--                      p_geom_column_name    => 'GEOM',
+--                      p_role                => g_default_role,
+--                      p_dim                 => 3,
+--                      p_gtype               => 3302);
 
 
 
