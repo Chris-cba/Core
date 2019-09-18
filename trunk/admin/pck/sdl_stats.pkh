@@ -3,11 +3,11 @@ AS
     --<PACKAGE>
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_stats.pkh-arc   1.0   Sep 09 2019 11:45:52   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_stats.pkh-arc   1.1   Sep 18 2019 08:25:30   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_stats.pkh  $
-    --       Date into PVCS   : $Date:   Sep 09 2019 11:45:52  $
-    --       Date fetched Out : $Modtime:   Sep 04 2019 13:01:20  $
-    --       PVCS Version     : $Revision:   1.0  $
+    --       Date into PVCS   : $Date:   Sep 18 2019 08:25:30  $
+    --       Date fetched Out : $Modtime:   Sep 17 2019 16:21:40  $
+    --       PVCS Version     : $Revision:   1.1  $
     --
     --   Author : R.A. Coupe
     --
@@ -18,7 +18,7 @@ AS
     ----------------------------------------------------------------------------
     -- The main purpose of this package is for handling statistics based on coincidence of loaded geometry with existing network.
     --</PACKAGE>
-    g_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.0  $';
+    g_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.1  $';
     --  g_plines            geom_id_tab;
     --  g_pline_lengths     PTR_NUM_ARRAY_TYPE;
 
@@ -76,7 +76,7 @@ AS
     --        The SDL Key is a unique idenfier of the loaded record.
     --        The datum ID is optional and when set points to a specific datum id which is a sub-feature of the original
     --        The sub_seg flag indcates that the statistics are to be computed at the sub-feature level.
-    --        p_buffer_tab is an array of buffer values, units are in Meters.
+    --        p_buffer is a number which provides the buffer size for the search.
     --
     --   This version sets the statistics for a specific load record or a record and one of its sub-component datums.
 
@@ -85,10 +85,7 @@ AS
         p_batch_id     IN NUMBER,
         p_sld_key      IN NUMBER DEFAULT NULL,
         p_datum_id     IN NUMBER DEFAULT NULL,
-        p_buffer_tab   IN SDO_NUMBER_ARRAY DEFAULT SDO_NUMBER_ARRAY (1,
-                                                                     3,
-                                                                     5,
-                                                                     10));
+        p_buffer       IN NUMBER DEFAULT 2 );
 
     --</PROC>
 
