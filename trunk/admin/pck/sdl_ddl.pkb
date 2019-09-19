@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY sdl_ddl
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_ddl.pkb-arc   1.16   Sep 18 2019 09:18:38   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_ddl.pkb-arc   1.17   Sep 19 2019 10:51:24   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_ddl.pkb  $
-    --       Date into PVCS   : $Date:   Sep 18 2019 09:18:38  $
-    --       Date fetched Out : $Modtime:   Sep 18 2019 09:17:44  $
-    --       PVCS Version     : $Revision:   1.16  $
+    --       Date into PVCS   : $Date:   Sep 19 2019 10:51:24  $
+    --       Date fetched Out : $Modtime:   Sep 19 2019 10:50:40  $
+    --       PVCS Version     : $Revision:   1.17  $
     --
     --   Author : R.A. Coupe
     --
@@ -19,7 +19,7 @@ AS
     -- The main purpose of this package is to provide DDL execution for creation of views and triggers
     -- to support the SDL.
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.16  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.17  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'SDL_DDL';
 
@@ -630,7 +630,7 @@ AS
                       p_gtype               => 2001);
 
 
-        insert_theme (p_theme_name          => 'SDL Match Detail',
+        insert_theme (p_theme_name          => 'SDL MATCH DETAIL',
                       p_object_name         => 'V_SDL_PLINE_STATS',
                       p_base_theme_table    => NULL,
                       p_base_theme_column   => NULL,
