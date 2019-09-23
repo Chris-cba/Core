@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY sdl_ddl
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_ddl.pkb-arc   1.17   Sep 19 2019 10:51:24   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_ddl.pkb-arc   1.18   Sep 23 2019 21:31:44   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_ddl.pkb  $
-    --       Date into PVCS   : $Date:   Sep 19 2019 10:51:24  $
-    --       Date fetched Out : $Modtime:   Sep 19 2019 10:50:40  $
-    --       PVCS Version     : $Revision:   1.17  $
+    --       Date into PVCS   : $Date:   Sep 23 2019 21:31:44  $
+    --       Date fetched Out : $Modtime:   Sep 23 2019 21:30:58  $
+    --       PVCS Version     : $Revision:   1.18  $
     --
     --   Author : R.A. Coupe
     --
@@ -19,7 +19,7 @@ AS
     -- The main purpose of this package is to provide DDL execution for creation of views and triggers
     -- to support the SDL.
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.17  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.18  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'SDL_DDL';
 
@@ -508,13 +508,13 @@ AS
                'create or replace view v_sdl_wip_'
             || l_profile_name
             || '_datums '
-            || ' ( batch_id, swd_id, SLD_KEY, DATUM_ID, pct_match, GEOM, ne_length_g, ne_no_start, ne_no_end, ne_type, ne_nt_type'
+            || ' ( batch_id, swd_id, SLD_KEY, DATUM_ID, pct_match, status, manual_override, GEOM, ne_length_g, ne_no_start, ne_no_end, ne_type, ne_nt_type'
             || CASE
                    WHEN l_col_list IS NOT NULL THEN ', ' || l_col_list
                    ELSE NULL
                END
             || ' ) as '
-            || ' select d.batch_id, d.swd_id, d.SLD_KEY, d.DATUM_ID, d.pct_match, d.GEOM, sdo_lrs.geom_segment_end_measure(d.geom) - sdo_lrs.geom_segment_start_measure(d.geom), '
+            || ' select d.batch_id, d.swd_id, d.SLD_KEY, d.DATUM_ID, d.pct_match, d.status, d.manual_override,  d.GEOM, sdo_lrs.geom_segment_end_measure(d.geom) - sdo_lrs.geom_segment_start_measure(d.geom), '
             || 'NULL, NULL, '
             || qq
             || 'S'
