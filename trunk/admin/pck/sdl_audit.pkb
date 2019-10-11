@@ -3,11 +3,11 @@ AS
     --<PACKAGE>
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_audit.pkb-arc   1.0   Oct 11 2019 13:48:58   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_audit.pkb-arc   1.1   Oct 11 2019 16:51:26   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_audit.pkb  $
-    --       Date into PVCS   : $Date:   Oct 11 2019 13:48:58  $
-    --       Date fetched Out : $Modtime:   Oct 11 2019 13:47:42  $
-    --       PVCS Version     : $Revision:   1.0  $
+    --       Date into PVCS   : $Date:   Oct 11 2019 16:51:26  $
+    --       Date fetched Out : $Modtime:   Oct 11 2019 16:50:58  $
+    --       PVCS Version     : $Revision:   1.1  $
     --
     --   Author : R.A. Coupe
     --
@@ -22,7 +22,7 @@ AS
     --</PACKAGE>
 
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.0  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.1  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'SDL_AUDIT';
 
@@ -143,7 +143,7 @@ AS
                 END IF;
             ELSIF l_status = 'LOAD'
             THEN
-                IF p_process != 'LOAD_VALIDATION'
+                IF p_process NOT IN ('ADJUST', 'LOAD_VALIDATION' )
                 THEN
                     raise_application_error (
                         -20003,
@@ -154,9 +154,22 @@ AS
                     NULL;
                 --lock the record and perform both attribute and geometry validation/generate working geometry etc.
                 END IF;
+            ELSIF l_status = 'ADJUST'
+            THEN
+                IF p_process NOT IN ('ADJUST', 'LOAD_VALIDATION' )
+                THEN
+                    raise_application_error (
+                        -20003,
+                           'The batch status of ADJUST prevents this '
+                        || p_process
+                        || ' operation');
+                ELSE
+                    NULL;
+                --lock the record and perform both attribute and geometry validation/generate working geometry etc.
+                END IF;
             ELSIF l_status = 'LOAD_VALIDATION'
             THEN
-                IF p_process NOT IN ('LOAD_VALIDATION', 'TOPO_GENERATION')
+                IF p_process NOT IN ('ADJUST', 'LOAD_VALIDATION', 'TOPO_GENERATION')
                 THEN
                     raise_application_error (
                         -20004,
