@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY sdl_stats
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_stats.pkb-arc   1.1   Sep 18 2019 08:26:38   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_stats.pkb-arc   1.2   Oct 11 2019 13:34:24   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_stats.pkb  $
-    --       Date into PVCS   : $Date:   Sep 18 2019 08:26:38  $
-    --       Date fetched Out : $Modtime:   Sep 18 2019 08:22:20  $
-    --       PVCS Version     : $Revision:   1.1  $
+    --       Date into PVCS   : $Date:   Oct 11 2019 13:34:24  $
+    --       Date fetched Out : $Modtime:   Oct 11 2019 13:30:20  $
+    --       PVCS Version     : $Revision:   1.2  $
     --
     --   Author : R.A. Coupe
     --
@@ -18,11 +18,11 @@ AS
     -- The main purpose of this package is to handle all the procedures for handling the accuracy
     -- of loaded network against the existing network.
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.1  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.2  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'SDL_STATS';
 
-    procedure remove_batch_datum_stats (p_batch_id in number);
+    PROCEDURE remove_batch_datum_stats (p_batch_id IN NUMBER);
 
     FUNCTION get_version
         RETURN VARCHAR2
@@ -39,12 +39,10 @@ AS
     END get_body_version;
 
     PROCEDURE generate_statistics_on_sld (
-        p_batch_id     IN NUMBER,
-        p_sld_key      IN NUMBER DEFAULT NULL,
-        p_buffer_tab   IN SDO_NUMBER_ARRAY DEFAULT SDO_NUMBER_ARRAY (1,
-                                                                     3,
-                                                                     5,
-                                                                     10))
+        p_batch_id    IN NUMBER,
+        p_buffer      IN NUMBER,
+        p_tolerance   IN NUMBER,
+        p_sld_key     IN NUMBER DEFAULT NULL)
     IS
     BEGIN
         -- we are performing a standard radial buffer assessment around either every record in the whole batch or a record within the batch.
@@ -70,12 +68,7 @@ AS
                    pctage_accuracy,
                    min_dist,
                    max_dist
-              FROM (WITH
-                        buffer_values
-                        AS
-                            (SELECT COLUMN_VALUE     buffer_distance
-                               FROM TABLE (p_buffer_tab) t)
-                      SELECT sld_key,
+              FROM (  SELECT sld_key,
                              MIN (dist_from)                            min_dist,
                              MAX (dist_from)                            max_dist,
                              buffer_distance,
@@ -84,7 +77,7 @@ AS
                                      ne_id,
                                      SDO_GEOM.sdo_distance (nw_geom,
                                                             load_geom,
-                                                            0.005,
+                                                            p_tolerance,
                                                             'unit=M')
                                          dist_from,
                                      buffer_distance,
@@ -93,28 +86,27 @@ AS
                                              SDO_LRS.convert_to_std_geom (
                                                  nw_geom),
                                              buffer_geom,
-                                             0.005),
-                                         0.005,
+                                             p_tolerance),
+                                         p_tolerance,
                                          'unit=M')
                                          intsct_length,
                                      SDO_GEOM.sdo_length (load_geom,
-                                                          0.005,
+                                                          p_tolerance,
                                                           'unit=M')
                                          load_length
                                 FROM (SELECT l.sld_key,
                                              n.ne_id,
-                                             buffer_distance,
+                                             p_buffer                buffer_distance,
                                              geoloc                  nw_geom,
                                              sld_working_geometry    load_geom,
                                              SDO_GEOM.sdo_buffer (
                                                  l.sld_working_geometry,
-                                                 buffer_distance,
-                                                 0.005,
+                                                 p_buffer,
+                                                 p_tolerance,
                                                  'unit=M')           buffer_geom
                                         FROM V_LB_NLT_GEOMETRY2 n,
                                              sdl_load_data     l,
-                                             nm_elements       e,
-                                             buffer_values
+                                             nm_elements       e
                                        WHERE     l.sld_sfs_id = p_batch_id
                                              AND l.sld_key =
                                                  NVL (p_sld_key, sld_key)
@@ -123,8 +115,8 @@ AS
                                                      geoloc,
                                                      SDO_GEOM.sdo_buffer (
                                                          l.sld_working_geometry,
-                                                         g_match_buffer,
-                                                         0.005,
+                                                         p_buffer,
+                                                         p_tolerance,
                                                          'unit=M'),
                                                      'mask=anyinteract') =
                                                  'TRUE'))
@@ -145,7 +137,7 @@ AS
         --                      FROM sdl_wip_datums
         --                     WHERE slwd_id = p_datum_id;
         --
-        --                    stats_on_pline_sub_segs (p_record_id,
+        --                     (p_record_id,
         --                                             'L',
         --                                             lgeom,
         --                                             5);
@@ -167,7 +159,7 @@ AS
         --            END IF;
         --
         --        END IF;
-        
+
         INSERT INTO sdl_geom_accuracy (slga_sld_key,
                                        slga_datum_id,
                                        slga_buffer_size,
@@ -176,58 +168,61 @@ AS
                                        slga_max_offset)
             SELECT sld_key,
                    NULL,
-                   column_value buffer_distance,
+                   p_buffer,
                    0,
                    NULL,
                    NULL
-                               FROM TABLE(p_buffer_tab) t, sdl_load_data
-                               where  sld_sfs_id  = p_batch_id
-                               and not exists ( select 1 from sdl_geom_accuracy where slga_sld_key = sld_key );        
+              FROM sdl_load_data
+             WHERE     sld_sfs_id = p_batch_id
+                   AND NOT EXISTS
+                           (SELECT 1
+                              FROM sdl_geom_accuracy
+                             WHERE slga_sld_key = sld_key);
 
         nm_debug.debug ('End of insert');
     END;
 
     PROCEDURE generate_statistics_on_swd (
-        p_batch_id        NUMBER,
-        p_sld_key      IN NUMBER DEFAULT NULL,
-        p_datum_id     IN NUMBER DEFAULT NULL,
-        p_buffer       IN NUMBER DEFAULT 2 )
+        p_batch_id    IN NUMBER,
+        p_buffer      IN NUMBER,
+        p_tolerance   IN NUMBER,
+        p_sld_key     IN NUMBER DEFAULT NULL,
+        p_datum_id    IN NUMBER DEFAULT NULL)
     IS
-
-    l_swd_ids int_array_type := nm3array.init_int_array().ia;
-    
+        l_swd_ids   int_array_type := nm3array.init_int_array ().ia;
     BEGIN
         remove_batch_datum_stats (p_batch_id);
-        
-        select swd_id
-        bulk collect into l_swd_ids
-        from sdl_wip_datums
-        where batch_id = p_batch_id ;
 
-        begin
-           nm3ctx.set_context('SDL_BUFFER_SIZE', to_char(p_buffer));
-           nm3ctx.set_context('SDL_BATCH_ID', to_char(p_batch_id));
-        end;
-        
-        for i in 1..l_swd_ids.count loop
-        
-           declare
-              l_pct number;
-           begin
-              nm3ctx.set_context('SDL_SWD_ID', to_char(l_swd_ids(i)));
-              
-              select pctage_accuracy into l_pct
-              from v_sdl_datum_stats_working;
-              
-              update sdl_wip_datums
-              set pct_match = l_pct
-              where swd_id = l_swd_ids(i);
-              
-              commit;
-              
-           end;
-                                        
-        end loop;
+        SELECT swd_id
+          BULK COLLECT INTO l_swd_ids
+          FROM sdl_wip_datums
+         WHERE batch_id = p_batch_id;
+
+        BEGIN
+            nm3ctx.set_context ('SDL_BUFFER_SIZE', TO_CHAR (p_buffer));
+            nm3ctx.set_context ('SDL_BATCH_ID', TO_CHAR (p_batch_id));
+        END;
+
+        FOR i IN 1 .. l_swd_ids.COUNT
+        LOOP
+            DECLARE
+                l_pct   NUMBER;
+            BEGIN
+                nm3ctx.set_context ('SDL_SWD_ID', TO_CHAR (l_swd_ids (i)));
+                nm3ctx.set_context ('SDL_BUFFER', TO_CHAR (p_buffer));
+                nm3ctx.set_context ('SDL_TOLERANCE', TO_CHAR (p_tolerance));
+
+                SELECT pctage_accuracy
+                  INTO l_pct
+                  FROM v_sdl_datum_stats_working;
+
+                UPDATE sdl_wip_datums
+                   SET pct_match = l_pct
+                 WHERE swd_id = l_swd_ids (i);
+
+                COMMIT;
+            END;
+        END LOOP;
     END;
 
     FUNCTION geom_as_pline_tab (pi_geom IN SDO_GEOMETRY)
@@ -264,7 +259,9 @@ AS
         RETURN retval;
     END;
 
-    FUNCTION gen_pline_boxes (p_geom IN SDO_GEOMETRY, offset IN NUMBER)
+    FUNCTION gen_pline_boxes (p_geom        IN SDO_GEOMETRY,
+                              p_offset      IN NUMBER,
+                              p_tolerance   IN NUMBER)
         RETURN pline_box_tab
     IS
         retval   pline_box_tab;
@@ -306,7 +303,7 @@ AS
                                          NULL,
                                          sdo_elem_info_array (1, 1003, 1),
                                          ords),
-                           SDO_GEOM.sdo_length (geom, 0.005, 'unit=M')))
+                           SDO_GEOM.sdo_length (geom, p_tolerance, 'unit=M')))
                        AS pline_box_tab)
           INTO retval
           FROM (SELECT gid,
@@ -322,12 +319,12 @@ AS
                                            x1 + xoffset,
                                            y1 + yoffset)    ords
                   FROM (SELECT p2.*,
-                                 offset
+                                 p_offset
                                * (y1 - y2)
                                / SQRT (
                                        POWER ((x2 - x1), 2)
                                      + POWER ((y2 - y1), 2))    xoffset,
-                                 offset
+                                 p_offset
                                * (x2 - x1)
                                / SQRT (
                                        POWER ((x2 - x1), 2)
@@ -338,24 +335,26 @@ AS
         RETURN retval;
     END;
 
-    PROCEDURE stats_on_load_pline_sub_segs (p_slga_id IN NUMBER)
+    PROCEDURE stats_on_load_pline_sub_segs (p_sld_key     IN NUMBER,
+                                            p_buffer      IN NUMBER,
+                                            p_tolerance   IN NUMBER)
     IS
-        l_load_row   ROWID;
-        l_buffer     NUMBER;
     BEGIN
-        SELECT l.ROWID, slga_buffer_size
-          INTO l_load_row, l_buffer
-          FROM sdl_load_data l, sdl_geom_accuracy
-         WHERE slga_id = p_slga_id AND slga_sld_key = sld_key;
+        --        SELECT l.ROWID, slga_buffer_size
+        --          INTO l_load_row, l_buffer
+        --          FROM sdl_load_data l, sdl_geom_accuracy
+        --         WHERE slga_id = p_slga_id AND slga_sld_key = sld_key;
 
         DELETE FROM sdl_pline_statistics
-              WHERE slps_slga_id = p_slga_id;
+              WHERE slps_sld_key = p_sld_key;
 
-        INSERT INTO sdl_pline_statistics (slps_slga_id,
+        INSERT INTO sdl_pline_statistics (slps_sld_key,
+                                          slps_buffer,
                                           slps_pline_segment_id,
                                           slps_pct_accuracy,
                                           slps_pline_geometry)
-            SELECT p_slga_id,
+            SELECT p_sld_key,
+                   p_buffer,
                    pline_id,
                    NVL (pct_accuracy, 0),
                    pline_geom
@@ -370,8 +369,8 @@ AS
                                     TABLE (
                                         sdl_stats.gen_pline_boxes (
                                             sld_working_geometry,
-                                            l_buffer)) t
-                              WHERE l.ROWID = l_load_row) --           select * from pline_boxes
+                                            p_buffer,
+                                            p_tolerance)) t where sld_key = p_sld_key )
                                                                             --
                         ,
                         all_box_relate
@@ -409,8 +408,8 @@ AS
                                                       SDO_LRS.convert_to_std_geom (
                                                           geoloc),
                                                       box_geom,
-                                                      0.005),
-                                                  0.005,
+                                                      p_tolerance),
+                                                  p_tolerance,
                                                   'unit=M')), --over (partition by box_id ),
                                           0)    intsct_length
                                  FROM box_relate
@@ -435,11 +434,13 @@ AS
                     SELECT pline_id, pline_geom, pct_accuracy
                       FROM box_stats);
 
-        INSERT INTO sdl_pline_statistics (slps_slga_id,
+        INSERT INTO sdl_pline_statistics (slps_sld_key,
+                                          slps_buffer,
                                           slps_pline_segment_id,
                                           slps_pct_accuracy,
                                           slps_pline_geometry)
-            SELECT p_slga_id,
+            SELECT p_sld_key,
+                   p_buffer,
                    box_id,
                    0,
                    line_geom
@@ -454,37 +455,35 @@ AS
                                     TABLE (
                                         sdl_stats.gen_pline_boxes (
                                             sld_working_geometry,
-                                            l_buffer)) t
-                              WHERE l.ROWID = l_load_row)
+                                            p_buffer,
+                                            p_tolerance)) t where sld_key = p_sld_key)
                     SELECT box_id, line_geom, 0
                       FROM pline_boxes
                      WHERE NOT EXISTS
                                (SELECT 1
                                   FROM sdl_pline_statistics
-                                 WHERE     slps_slga_id = p_slga_id
+                                 WHERE     slps_sld_key = p_sld_key
                                        AND box_id = slps_pline_segment_id));
     END;
 
-    PROCEDURE stats_on_datum_pline_sub_segs (p_slga_id IN NUMBER)
+    PROCEDURE stats_on_datum_pline_sub_segs (p_swd_id      IN NUMBER,
+                                             p_sld_key     IN NUMBER,
+                                             p_buffer      IN NUMBER,
+                                             p_tolerance   IN NUMBER)
     IS
-        l_load_row   ROWID;
-        l_buffer     NUMBER;
     BEGIN
-        SELECT d.ROWID, slga_buffer_size
-          INTO l_load_row, l_buffer
-          FROM sdl_wip_datums d, sdl_geom_accuracy
-         WHERE     slga_id = p_slga_id
-               AND slga_sld_key = sld_key
-               AND slga_datum_id = datum_id;
-
         DELETE FROM sdl_pline_statistics
-              WHERE slps_slga_id = p_slga_id;
+              WHERE slps_swd_id = p_swd_id;
 
-        INSERT INTO sdl_pline_statistics (slps_slga_id,
+        INSERT INTO sdl_pline_statistics (slps_swd_id,
+                                          slps_buffer,
+                                          slps_sld_key,
                                           slps_pline_segment_id,
                                           slps_pct_accuracy,
                                           slps_pline_geometry)
-            SELECT p_slga_id,
+            SELECT p_swd_id,
+                   p_buffer,
+                   p_sld_key,
                    pline_id,
                    NVL (pct_accuracy, 0),
                    pline_geom
@@ -497,12 +496,11 @@ AS
                                     t.line_geom
                                FROM sdl_wip_datums  d,
                                     TABLE (
-                                        sdl_stats.gen_pline_boxes (d.geom,
-                                                                   l_buffer))
-                                    t
-                              WHERE d.ROWID = l_load_row) --           select * from pline_boxes
-                                                                            --
-                        ,
+                                        sdl_stats.gen_pline_boxes (
+                                            d.geom,
+                                            p_buffer,
+                                            p_tolerance)) t where swd_id = p_swd_id )--
+                                                            ,
                         all_box_relate
                         AS
                             (SELECT /*+ LEADING (n p) */
@@ -538,8 +536,8 @@ AS
                                                       SDO_LRS.convert_to_std_geom (
                                                           geoloc),
                                                       box_geom,
-                                                      0.005),
-                                                  0.005,
+                                                      p_tolerance),
+                                                  p_tolerance,
                                                   'unit=M')), --over (partition by box_id ),
                                           0)    intsct_length
                                  FROM box_relate
@@ -564,33 +562,38 @@ AS
                     SELECT pline_id, pline_geom, pct_accuracy
                       FROM box_stats);
 
-        INSERT INTO sdl_pline_statistics (slps_slga_id,
+        INSERT INTO sdl_pline_statistics (slps_swd_id,
+                                          slps_sld_key,
+                                          slps_buffer,
                                           slps_pline_segment_id,
                                           slps_pct_accuracy,
                                           slps_pline_geometry)
-            SELECT p_slga_id,
+            SELECT p_swd_id,
+                   sld_key,
+                   p_buffer,
                    box_id,
                    0,
                    line_geom
               FROM (WITH
                         pline_boxes
                         AS
-                            (SELECT t.id     box_id,
+                            (SELECT d.sld_key,
+                                    t.id     box_id,
                                     t.box_geom,
                                     t.len,
                                     t.line_geom
                                FROM sdl_wip_datums  d,
                                     TABLE (
-                                        sdl_stats.gen_pline_boxes (d.geom,
-                                                                   l_buffer))
-                                    t
-                              WHERE d.ROWID = l_load_row)
-                    SELECT box_id, line_geom, 0
+                                        sdl_stats.gen_pline_boxes (
+                                            d.geom,
+                                            p_buffer,
+                                            p_tolerance)) t where swd_id = p_swd_id)
+                    SELECT box_id, sld_key, line_geom, 0
                       FROM pline_boxes
                      WHERE NOT EXISTS
                                (SELECT 1
                                   FROM sdl_pline_statistics
-                                 WHERE     slps_slga_id = p_slga_id
+                                 WHERE     slps_swd_id = p_swd_id
                                        AND box_id = slps_pline_segment_id));
     END;
 
@@ -600,28 +603,26 @@ AS
     BEGIN
         BEGIN
             DELETE FROM sdl_pline_statistics
-                  WHERE slps_slga_id IN
-                            (SELECT slga_id
-                               FROM sdl_geom_accuracy, sdl_load_data
-                              WHERE     slga_sld_key = sld_key
-                                    AND sld_sfs_id = p_batch_id
+                  WHERE slps_sld_key IN
+                            (SELECT sld_key
+                               FROM sdl_load_data
+                              WHERE     sld_sfs_id = p_batch_id
                                     AND sld_key = NVL (p_sld_key, sld_key));
         EXCEPTION
             WHEN NO_DATA_FOUND
             THEN
                 NULL;
         END;
-
-        BEGIN
-            DELETE FROM sdl_geom_accuracy
-                  WHERE slga_sld_key IN (SELECT sld_key
-                                           FROM sdl_load_data
-                                          WHERE sld_sfs_id = p_batch_id);
-        EXCEPTION
-            WHEN NO_DATA_FOUND
-            THEN
-                NULL;
-        END;
+    --        BEGIN
+    --            DELETE FROM sdl_geom_accuracy
+    --                  WHERE slga_sld_key IN (SELECT sld_key
+    --                                           FROM sdl_load_data
+    --                                          WHERE sld_sfs_id = p_batch_id);
+    --        EXCEPTION
+    --            WHEN NO_DATA_FOUND
+    --            THEN
+    --                NULL;
+    --        END;
     END;
 
     PROCEDURE delete_statistics_by_datum (
@@ -631,45 +632,42 @@ AS
     IS
     BEGIN
         DELETE FROM sdl_pline_statistics
-              WHERE slps_slga_id IN
-                        (SELECT slga_id
-                           FROM sdl_geom_accuracy, sdl_wip_datums d
-                          WHERE     slga_sld_key = sld_key
-                                AND d.batch_id = p_batch_id
+              WHERE slps_swd_id IN
+                        (SELECT swd_id
+                           FROM sdl_wip_datums d
+                          WHERE     d.batch_id = p_batch_id
                                 AND sld_key = NVL (p_sld_key, sld_key)
-                                AND slga_datum_id IS NOT NULL
                                 AND d.datum_id = NVL (p_datum_id, d.datum_id));
-
-        DELETE FROM sdl_geom_accuracy
-              WHERE slga_id IN
-                        (SELECT slga_id
-                           FROM sdl_geom_accuracy, sdl_wip_datums
-                          WHERE     slga_sld_key = sld_key
-                                AND slga_datum_id = datum_id
-                                AND batch_id = p_batch_id
-                                AND sld_key = NVL (p_sld_key, sld_key)
-                                AND datum_id = NVL (p_datum_id, datum_id));
-    EXCEPTION
-        WHEN NO_DATA_FOUND
-        THEN
-            NULL;
     END;
 
     --
-    PROCEDURE match_nodes (p_batch_id IN NUMBER)
+    PROCEDURE match_nodes (p_batch_id          IN NUMBER,
+                           p_match_tolerance   IN NUMBER,
+                           p_tolerance         IN NUMBER)
     IS
         l_load_node_id       NM3TYPE.tab_number;
         l_existing_node_id   NM3TYPE.tab_number;
         l_dist               NM3TYPE.tab_number;
+        qq                   CHAR (1) := CHR (39);
+        l_sdo_param          VARCHAR2 (50)
+            :=    'distance = '
+               || TO_CHAR (p_match_tolerance)
+               || ' unit = '
+               || qq
+               || 'METER'
+               || qq;
 
         --
         CURSOR retrieve_nodes IS
-            SELECT load_node_id, existing_node_id, dist
-              FROM (WITH
+SELECT load_node_id, existing_node_id, dist
+              FROM (
+ WITH
                         matching_nodes
                         AS
-                            (SELECT *
-                               FROM (SELECT ROW_NUMBER ()
+                            (  
+                            SELECT n.*, no_node_id, min(rn) over (partition by node_id) min_rn
+                               FROM (
+                               SELECT ROW_NUMBER ()
                                                 OVER (PARTITION BY node_id
                                                       ORDER BY dist)    rn,
                                             node_id,
@@ -678,7 +676,8 @@ AS
                                             npl_location,
                                             dist,
                                             min_dist
-                                       FROM (SELECT node_id,
+                                       FROM (
+                                       SELECT node_id,
                                                     node_geom,
                                                     npl_id,
                                                     npl_location,
@@ -686,37 +685,37 @@ AS
                                                     MIN (dist)
                                                         OVER (
                                                             PARTITION BY node_id)    min_dist
-                                               FROM (SELECT node_id,
+                                               FROM (
+                                               SELECT node_id,
                                                             node_geom,
                                                             npl_id,
                                                             npl_location,
                                                             SDO_GEOM.sdo_distance (
                                                                 npl_location,
                                                                 node_geom,
-                                                                0.005,
+                                                                p_tolerance,
                                                                 'unit=FOOT')    dist
                                                        FROM sdl_wip_nodes,
                                                             nm_point_locations
-                                                      WHERE     batch_id = 4
+                                                      WHERE     batch_id = p_batch_id
                                                             AND sdo_within_distance (
                                                                     npl_location,
                                                                     node_geom,
-                                                                    'distance=5 unit=FOOT') =
-                                                                'TRUE')))
-                              WHERE rn = 1)
+                                                                    l_sdo_param) =
+                                                                'TRUE'                                                                
+                                                                ))) n, nm_nodes where no_np_id = npl_id and dist = min_dist --and rownum = 1                                                                
+                              )  
                     SELECT node_id        load_node_id,
                            npl_id,
                            no_node_id     existing_node_id,
-                           dist
-                      FROM matching_nodes, nm_nodes
-                     WHERE no_np_id = npl_id);
+                           dist, rn, min_rn
+                      FROM matching_nodes  where rn = min_rn );
     --
     BEGIN
-    
-        update sdl_wip_nodes
-        set existing_node_id = NULL, distance_from = NULL
-        where batch_id = p_batch_id;
-        
+        UPDATE sdl_wip_nodes
+           SET existing_node_id = NULL, distance_from = NULL
+         WHERE batch_id = p_batch_id;
+
         OPEN retrieve_nodes;
 
         FETCH retrieve_nodes
@@ -730,12 +729,12 @@ AS
     --
     END;
 
-    procedure remove_batch_datum_stats (p_batch_id in number) is
-    begin
-       update sdl_wip_datums
-       set pct_match = NULL
-       where batch_id = p_batch_id;
-    end;
-    
+    PROCEDURE remove_batch_datum_stats (p_batch_id IN NUMBER)
+    IS
+    BEGIN
+        UPDATE sdl_wip_datums
+           SET pct_match = NULL
+         WHERE batch_id = p_batch_id;
+    END;
 END sdl_stats;
 /
