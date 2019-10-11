@@ -1,14 +1,13 @@
-/* Formatted on 10/10/2019 09:56:33 (QP5 v5.336) */
 CREATE OR REPLACE PACKAGE BODY sdl_process
 AS
     --<PACKAGE>
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_process.pkb-arc   1.0   Oct 11 2019 15:18:16   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_process.pkb-arc   1.1   Oct 11 2019 16:52:52   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_process.pkb  $
-    --       Date into PVCS   : $Date:   Oct 11 2019 15:18:16  $
-    --       Date fetched Out : $Modtime:   Oct 10 2019 09:59:52  $
-    --       PVCS Version     : $Revision:   1.0  $
+    --       Date into PVCS   : $Date:   Oct 11 2019 16:52:52  $
+    --       Date fetched Out : $Modtime:   Oct 11 2019 16:03:46  $
+    --       PVCS Version     : $Revision:   1.1  $
     --
     --   Author : R.A. Coupe
     --
@@ -23,7 +22,7 @@ AS
 
     --</PACKAGE>
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.0  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.1  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'SDL_PROCESS';
 
@@ -49,6 +48,10 @@ AS
     IS
     BEGIN
         set_working_parameters;
+        SDL_AUDIT.LOG_PROCESS_START(p_batch_id, 'ADJUST', NULL, NULL, NULL);
+        sdl_validate.VALIDATE_ADJUSTMENT_RULES(p_batch_id);
+        SDL_AUDIT.LOG_PROCESS_END (p_batch_id, 'ADJUST');
+--        
         SDL_AUDIT.LOG_PROCESS_START (p_batch_id,
                                      'LOAD_VALIDATION',
                                      g_buffer,
