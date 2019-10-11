@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY sdl_validate
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_validate.pkb-arc   1.2   Oct 11 2019 14:16:38   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_validate.pkb-arc   1.3   Oct 11 2019 14:40:32   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_validate.pkb  $
-    --       Date into PVCS   : $Date:   Oct 11 2019 14:16:38  $
-    --       Date fetched Out : $Modtime:   Oct 11 2019 14:15:30  $
-    --       PVCS Version     : $Revision:   1.2  $
+    --       Date into PVCS   : $Date:   Oct 11 2019 14:40:32  $
+    --       Date fetched Out : $Modtime:   Oct 11 2019 14:39:06  $
+    --       PVCS Version     : $Revision:   1.3  $
     --
     --   Author : R.A. Coupe
     --
@@ -20,7 +20,7 @@ AS
     -- FK based checks
     -- format checks
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.2  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.3  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'SDL_VALIDATE';
 
@@ -37,6 +37,47 @@ AS
     BEGIN
         RETURN g_body_sccsid;
     END get_body_version;
+
+    PROCEDURE UPDATE_BATCH_FOR_ADJUSTMENT (p_batch_id IN INTEGER)
+    IS
+        CURSOR c_update IS
+            SELECT DISTINCT
+                   'SLD_COL_' || sam.sam_col_id     load_column_name,
+                   sam.sam_col_id,
+                   saaa.saaa_adjusted_value
+              FROM sdl_attribute_mapping           sam,
+                   sdl_attribute_adjustment_audit  saaa
+             WHERE     sam.sam_id = saaa.saaa_sam_id
+                   AND saaa.saaa_sfs_id = p_batch_id;
+
+        sql_str   VARCHAR2 (4000);
+    BEGIN
+        FOR r_update IN c_update
+        LOOP
+            sql_str :=
+                   'UPDATE sdl_load_data '
+                || 'SET '
+                || r_update.load_column_name
+                || ' = '
+                || ''''
+                || r_update.saaa_adjusted_value
+                || ''''
+                || ','
+                || 'sld_status = '
+                || '''ADJUSTED'''
+                || ' WHERE sld_key IN (SELECT saaa.saaa_sld_key FROM sdl_attribute_adjustment_audit saaa WHERE saaa.saaa_sfs_id = '
+                || p_batch_id
+                || ' AND saaa.saaa_sam_id = '
+                || r_update.sam_col_id
+                || ')'
+                || ' AND sld_sfs_id = '
+                || p_batch_id;
+
+
+            EXECUTE IMMEDIATE sql_str;
+        END LOOP;
+    END update_batch_for_adjustment;
+
 
     PROCEDURE VALIDATE_BATCH (p_batch_id IN NUMBER)
     IS
@@ -200,6 +241,79 @@ AS
 
         EXECUTE IMMEDIATE sql_str;
     END;
+
+    PROCEDURE VALIDATE_ADJUSTMENT_RULES (p_batch_id IN NUMBER)
+    IS
+        sql_str   VARCHAR2 (4000);
+    BEGIN
+        --   DELETE FROM sdl_attribute_adjustment_audit
+        --        WHERE saaa_sfs_id = p_batch_id;
+
+        WITH
+            adjustment_rules
+            AS
+                (SELECT sam_id,
+                        sam_col_id,
+                        'sld_col_' || sam_col_id     load_column_name,
+                        sam_view_column_name,
+                        saar_id,
+                        saar_source_value,
+                        saar_adjust_to_value
+                   FROM (SELECT sam.sam_id,
+                                sam.sam_col_id,
+                                sam.sam_view_column_name,
+                                saar.saar_id,
+                                saar.saar_source_value,
+                                saar.saar_adjust_to_value
+                           FROM sdl_attribute_mapping           sam,
+                                sdl_file_submissions            sfs,
+                                sdl_attribute_adjustment_rules  saar
+                          WHERE     sfs.sfs_id = p_batch_id
+                                AND sam.sam_sp_id = sfs.sfs_sp_id
+                                AND sam.sam_sp_id = saar.saar_sp_id
+                                AND sam.sam_view_column_name =
+                                    saar.saar_target_attribute_name))
+        SELECT    'INSERT INTO sdl_attribute_adjustment_audit ( saaa_sld_key, saaa_sfs_id, saaa_saar_id, saaa_sam_id, saaa_original_value, saaa_adjusted_value) '
+               || LISTAGG (
+                         'SELECT '
+                      || 'sld_key'
+                      || ','
+                      || p_batch_id
+                      || ','
+                      || saar_id
+                      || ','
+                      || sam_id
+                      || ','
+                      || ''''
+                      || saar_source_value
+                      || ''''
+                      || ','
+                      || ''''
+                      || saar_adjust_to_value
+                      || ''''
+                      || ' FROM sdl_load_data WHERE sld_sfs_id = '
+                      || TO_CHAR (p_batch_id)
+                      || ' AND sld_key IN ( SELECT sld_key FROM sdl_load_data WHERE '
+                      || load_column_name
+                      || CASE
+                             WHEN saar_source_value IS NULL THEN ' IS NULL '
+                             ELSE ' = '
+                         END
+                      || saar_source_value
+                      || ')',
+                      ' UNION ALL ')
+                  WITHIN GROUP (ORDER BY sam_id)
+          INTO sql_str
+          FROM adjustment_rules;
+
+        nm_debug.debug_on;
+        nm_debug.debug (sql_str);
+
+        EXECUTE IMMEDIATE sql_str;
+
+        update_batch_for_adjustment (p_batch_id);
+    END VALIDATE_ADJUSTMENT_RULES;
+
 
     PROCEDURE VALIDATE_PROFILE (p_template_id IN NUMBER)
     IS
