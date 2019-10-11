@@ -1,12 +1,13 @@
+/* Formatted on 11/10/2019 16:49:01 (QP5 v5.336) */
 CREATE OR REPLACE PACKAGE BODY sdl_validate
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_validate.pkb-arc   1.3   Oct 11 2019 14:40:32   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_validate.pkb-arc   1.4   Oct 11 2019 16:50:36   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_validate.pkb  $
-    --       Date into PVCS   : $Date:   Oct 11 2019 14:40:32  $
-    --       Date fetched Out : $Modtime:   Oct 11 2019 14:39:06  $
-    --       PVCS Version     : $Revision:   1.3  $
+    --       Date into PVCS   : $Date:   Oct 11 2019 16:50:36  $
+    --       Date fetched Out : $Modtime:   Oct 11 2019 16:50:00  $
+    --       PVCS Version     : $Revision:   1.4  $
     --
     --   Author : R.A. Coupe
     --
@@ -20,7 +21,7 @@ AS
     -- FK based checks
     -- format checks
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.3  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.4  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'SDL_VALIDATE';
 
@@ -103,6 +104,18 @@ AS
         validate_mandatory_columns (p_batch_id);
 
         set_working_geometry (p_batch_id, l_unit_factor);
+
+        UPDATE sdl_load_data
+           SET sld_status =
+                   (SELECT CASE row_count
+                               WHEN 0 THEN 'VALID'
+                               ELSE 'INVALID'
+                           END
+                      FROM (SELECT COUNT (*)     row_count
+                              FROM sdl_validation_results
+                             WHERE svr_sfs_id = p_batch_id AND svr_sld_key = sld_key))
+         WHERE sld_sfs_id = 4;
+         
     END;
 
     PROCEDURE VALIDATE_DOMAIN_COLUMNS (p_batch_id IN NUMBER)
