@@ -3,11 +3,11 @@ AS
     --<PACKAGE>
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_validate.pkh-arc   1.0   Sep 09 2019 11:44:42   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_validate.pkh-arc   1.1   Oct 11 2019 14:19:06   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_validate.pkh  $
-    --       Date into PVCS   : $Date:   Sep 09 2019 11:44:42  $
-    --       Date fetched Out : $Modtime:   Sep 03 2019 15:40:18  $
-    --       PVCS Version     : $Revision:   1.0  $
+    --       Date into PVCS   : $Date:   Oct 11 2019 14:19:06  $
+    --       Date fetched Out : $Modtime:   Oct 11 2019 14:18:30  $
+    --       PVCS Version     : $Revision:   1.1  $
     --
     --   Author : R.A. Coupe
     --
@@ -23,7 +23,7 @@ AS
 
     -- assessments of accuracy of network over existing network.
     --</PACKAGE>
-    g_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.0  $';
+    g_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.1  $';
 
     -----------------------------------------------------------------------------
     --
@@ -88,18 +88,22 @@ AS
 
     --</PROC>
 
-    PROCEDURE set_working_geometry (p_batch_id IN NUMBER);
+    PROCEDURE set_working_geometry (p_batch_id IN NUMBER, p_unit_factor in number);
 
     FUNCTION guess_dim_and_gtype (p_batch_id IN NUMBER)
         RETURN NUMBER;
 
     FUNCTION sdl_set_gtype (p_geom     IN SDO_GEOMETRY,
                             p_gtype    IN NUMBER,
-                            p_length   IN NUMBER DEFAULT NULL)
+                            p_length   IN NUMBER DEFAULT NULL,
+                            p_unit_factor in number )
         RETURN SDO_GEOMETRY;
 
     PROCEDURE validate_datum_geometry (p_batch_id IN INTEGER);
 
     PROCEDURE check_self_intersections (p_batch_id IN INTEGER);
+
+    PROCEDURE set_datum_status (p_batch_id IN NUMBER);
+    
 END sdl_validate;
 /
