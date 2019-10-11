@@ -3,11 +3,11 @@ AS
     --<PACKAGE>
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_stats.pkh-arc   1.1   Sep 18 2019 08:25:30   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_stats.pkh-arc   1.2   Oct 11 2019 13:33:16   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_stats.pkh  $
-    --       Date into PVCS   : $Date:   Sep 18 2019 08:25:30  $
-    --       Date fetched Out : $Modtime:   Sep 17 2019 16:21:40  $
-    --       PVCS Version     : $Revision:   1.1  $
+    --       Date into PVCS   : $Date:   Oct 11 2019 13:33:16  $
+    --       Date fetched Out : $Modtime:   Oct 07 2019 14:46:54  $
+    --       PVCS Version     : $Revision:   1.2  $
     --
     --   Author : R.A. Coupe
     --
@@ -18,11 +18,10 @@ AS
     ----------------------------------------------------------------------------
     -- The main purpose of this package is for handling statistics based on coincidence of loaded geometry with existing network.
     --</PACKAGE>
-    g_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.1  $';
+    g_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.2  $';
+
     --  g_plines            geom_id_tab;
     --  g_pline_lengths     PTR_NUM_ARRAY_TYPE;
-
-    g_match_buffer      NUMBER := 5; -- temporary setting of search/match buffer
 
     -----------------------------------------------------------------------------
     --
@@ -54,17 +53,14 @@ AS
     --        The record ID relates to the loaded record held in the repository. The record ID is only unique within the batch
     --        The datum ID is optional and when set points to a specific datum id which is a sub-feature of the original
     --        The sub_seg flag indcates that the statistics are to be computed at the sub-feature level.
-    --        p_buffer_tab is an array of buffer values, units are in Meters.
+    --        The p_buffer value is a number and is used as the size of the search polygon n array of buffer values, units are in Meters.
     --
-    --   This version expects a value for a batch-id or a batch and a record pair (record is not unique) or a batch, record and datum ID
 
     PROCEDURE generate_statistics_on_sld (
-        p_batch_id     IN NUMBER,
-        p_sld_key      IN NUMBER DEFAULT NULL,
-        p_buffer_tab   IN SDO_NUMBER_ARRAY DEFAULT SDO_NUMBER_ARRAY (1,
-                                                                     3,
-                                                                     5,
-                                                                     10));
+        p_batch_id    IN NUMBER,
+        p_buffer      IN NUMBER,
+        p_tolerance   IN NUMBER,
+        p_sld_key     IN NUMBER DEFAULT NULL);
 
     --</PROC>
 
@@ -82,10 +78,11 @@ AS
 
 
     PROCEDURE generate_statistics_on_swd (
-        p_batch_id     IN NUMBER,
-        p_sld_key      IN NUMBER DEFAULT NULL,
-        p_datum_id     IN NUMBER DEFAULT NULL,
-        p_buffer       IN NUMBER DEFAULT 2 );
+        p_batch_id    IN NUMBER,
+        p_buffer      IN NUMBER,
+        p_tolerance   IN NUMBER,
+        p_sld_key     IN NUMBER DEFAULT NULL,
+        p_datum_id    IN NUMBER DEFAULT NULL);
 
     --</PROC>
 
@@ -93,12 +90,19 @@ AS
     FUNCTION geom_as_pline_tab (pi_geom IN SDO_GEOMETRY)
         RETURN geom_id_tab;
 
-    FUNCTION gen_pline_boxes (p_geom IN SDO_GEOMETRY, offset IN NUMBER)
+    FUNCTION gen_pline_boxes (p_geom        IN SDO_GEOMETRY,
+                              p_offset      IN NUMBER,
+                              p_tolerance   IN NUMBER)
         RETURN pline_box_tab;
 
-    PROCEDURE stats_on_load_pline_sub_segs (p_slga_id IN NUMBER);
+    PROCEDURE stats_on_load_pline_sub_segs (p_sld_key     IN NUMBER,
+                                            p_buffer      IN NUMBER,
+                                            p_tolerance   IN NUMBER);
 
-    PROCEDURE stats_on_datum_pline_sub_segs (p_slga_id IN NUMBER);
+    PROCEDURE stats_on_datum_pline_sub_segs (p_swd_id      IN NUMBER,
+                                             p_sld_key     IN NUMBER,
+                                             p_buffer      IN NUMBER,
+                                             p_tolerance   IN NUMBER);
 
     PROCEDURE delete_statistics (p_batch_id   IN NUMBER,
                                  p_sld_key    IN NUMBER DEFAULT NULL);
@@ -108,6 +112,8 @@ AS
         p_sld_key    IN NUMBER DEFAULT NULL,
         p_datum_id   IN NUMBER DEFAULT NULL);
 
-    PROCEDURE match_nodes (p_batch_id IN NUMBER);
+    PROCEDURE match_nodes (p_batch_id          IN NUMBER,
+                           p_match_tolerance   IN NUMBER,
+                           p_tolerance         IN NUMBER);
 END;
 /
