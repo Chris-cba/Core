@@ -1,13 +1,12 @@
-/* Formatted on 09/09/2019 15:39:56 (QP5 v5.336) */
 CREATE OR REPLACE PACKAGE BODY sdl_transfer
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_transfer.pkb-arc   1.3   Sep 09 2019 15:51:50   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_transfer.pkb-arc   1.4   Oct 11 2019 15:10:22   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_transfer.pkb  $
-    --       Date into PVCS   : $Date:   Sep 09 2019 15:51:50  $
-    --       Date fetched Out : $Modtime:   Sep 09 2019 15:43:56  $
-    --       PVCS Version     : $Revision:   1.3  $
+    --       Date into PVCS   : $Date:   Oct 11 2019 15:10:22  $
+    --       Date fetched Out : $Modtime:   Oct 11 2019 15:09:54  $
+    --       PVCS Version     : $Revision:   1.4  $
     --
     --   Author : R.A. Coupe
     --
@@ -20,9 +19,11 @@ AS
     -- The main purpose of this package is to handle the transfer of data from the SDL repository
     -- into the main database
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.3  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.4  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'SDL_DDL';
+    
+    qq char(1) := chr(39);
 
     FUNCTION get_version
         RETURN VARCHAR2
@@ -46,6 +47,7 @@ AS
         l_ins_str       VARCHAR2 (4000);
         l_sel_str       VARCHAR2 (4000);
         l_datum_geom    geom_id_tab;
+        l_sp_id         NUMBER(38);
         l_view_name     VARCHAR2 (30);
         l_node_type     VARCHAR2 (4);
         l_table_name    VARCHAR2 (30);
@@ -53,12 +55,14 @@ AS
         l_column_name   VARCHAR2 (30);
     BEGIN
         BEGIN
-            SELECT 'V_SDL_WIP_' || sp_name || '_DATUMS',
+            SELECT sp_id,
+                   'V_SDL_WIP_' || upper(sp_name) || '_DATUMS',
                    node_type,
                    spatial_table,
                    spatial_pk_column,
                    geometry_column
-              INTO l_view_name,
+              INTO l_sp_id,
+                   l_view_name,
                    l_node_type,
                    l_table_name,
                    l_pk_column,
@@ -87,7 +91,7 @@ AS
         SELECT ptr_num (np_id_seq.NEXTVAL, no_node_id_seq.NEXTVAL)
           BULK COLLECT INTO np_no_ids
           FROM sdl_wip_nodes
-         WHERE batch_id = 4 AND existing_node_id IS NULL;
+         WHERE batch_id = p_batch_id AND existing_node_id IS NULL;
 
         DECLARE
             x          NUMBER;
@@ -137,12 +141,7 @@ AS
                AND d.batch_id = p_batch_id
                AND n.start_node = s.hashcode
                AND n.end_node = e.hashcode
-               AND EXISTS
-                       (SELECT 1
-                          FROM sdl_geom_accuracy
-                         WHERE     slga_sld_key = sld_key
-                               AND slga_datum_id = datum_id
-                               AND slga_pct_inside = 0);
+               AND d.PCT_MATCH = 0;
 
         SELECT    'insert into nm_elements ( ne_id, ne_type, ne_nt_type, ne_no_start, ne_no_end, ne_length, '
                || LISTAGG (sdam_column_name, ',')
@@ -150,7 +149,7 @@ AS
                || ')'
           INTO l_ins_str
           FROM sdl_datum_attribute_mapping
-         WHERE sdam_profile_id = 1;
+         WHERE sdam_profile_id = l_sp_id;
 
         SELECT    'select t.ptr_value, ne_type, ne_nt_type, start_node, end_node, ne_length, '
                || LISTAGG (sdam_column_name, ',')
@@ -163,17 +162,17 @@ AS
                || 'and d.batch_id = :batch_id '
                || 'and n.start_node = s.hashcode '
                || 'and n.end_node = e.hashcode '
-               || 'and exists ( select 1 from sdl_geom_accuracy where slga_sld_key = sld_key '
-               || 'and slga_datum_id = datum_id '
-               || 'and slga_pct_inside = 0 )), '
+               || 'and d.pct_match = 0 '
+               || 'and (d.status = '||qq||'VALID'||qq||' '
+               || 'or d.manual_override = '||qq||'Y'||qq||') ), '
                || 'table(:ne_ids) t where batch_id = :batch_id and t.ptr_id = swd_id'
           INTO l_sel_str
           FROM sdl_datum_attribute_mapping
-         WHERE sdam_profile_id = 1;
+         WHERE sdam_profile_id = l_sp_id;
 
---        INSERT INTO ne_id_sav
---            SELECT t.ptr_value, t.ptr_id
---              FROM TABLE (ne_ids) t;
+        INSERT INTO ne_id_sav
+            SELECT t.ptr_value, t.ptr_id
+              FROM TABLE (ne_ids) t;
 
         COMMIT;
 
@@ -184,8 +183,8 @@ AS
             USING p_batch_id, ne_ids, p_batch_id;
 
         COMMIT;
-
-        EXECUTE IMMEDIATE   'INSERT INTO '
+        
+        l_ins_str :=  'INSERT INTO '
                          || l_table_name
                          || ' ( '
                          || l_pk_column
@@ -193,22 +192,28 @@ AS
                          || l_column_name
                          || ' ) '
                          || ' SELECT t.ptr_value, geom '
-                         || '  FROM (FROM sdl_wip_datums     d, '
+                         || '  FROM (select d.swd_id, d.geom from  sdl_wip_datums     d, '
                          || 'sdl_wip_nodes      s, '
                          || 'sdl_wip_nodes      e, '
                          || 'V_SDL_NODE_USAGES  n '
                          || 'WHERE     d.swd_id = n.swd_id '
-                         || 'AND d.batch_id = p_batch_id '
+                         || 'AND d.batch_id = :batch_id '
                          || 'AND n.start_node = s.hashcode '
                          || 'AND n.end_node = e.hashcode '
-                         || 'AND EXISTS '
-                         || '    (SELECT 1 '
-                         || '       FROM sdl_geom_accuracy '
-                         || '      WHERE     slga_sld_key = sld_key '
-                         || '           AND slga_datum_id = datum_id '
-                         || '            AND slga_pct_inside = 0)), TABLE (:ne_ids) t '
-                         || ' WHERE t.ptr_id = swd_id '
-            USING ne_ids;
+                         || 'AND d.pct_match = 0 '
+                         || 'AND d.status = '||qq||'VALID'||qq
+                         ||' ), TABLE (:ne_ids) t '
+                         || ' WHERE t.ptr_id = swd_id ';
+
+        nm_debug.debug_on;
+        nm_debug.debug (l_ins_str);
+                         
+        execute immediate l_ins_str USING p_batch_id, ne_ids;
+        
+        update sdl_wip_datums
+        set status = 'TRANSFERRED'
+        where swd_id in ( select ptr_value from table(ne_ids), nm_elements where ne_id = ptr_id );
+               
     END;
 END;
 /
