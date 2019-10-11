@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY sdl_ddl
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_ddl.pkb-arc   1.18   Sep 23 2019 21:31:44   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_ddl.pkb-arc   1.19   Oct 11 2019 15:02:40   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_ddl.pkb  $
-    --       Date into PVCS   : $Date:   Sep 23 2019 21:31:44  $
-    --       Date fetched Out : $Modtime:   Sep 23 2019 21:30:58  $
-    --       PVCS Version     : $Revision:   1.18  $
+    --       Date into PVCS   : $Date:   Oct 11 2019 15:02:40  $
+    --       Date fetched Out : $Modtime:   Oct 11 2019 15:00:58  $
+    --       PVCS Version     : $Revision:   1.19  $
     --
     --   Author : R.A. Coupe
     --
@@ -19,7 +19,7 @@ AS
     -- The main purpose of this package is to provide DDL execution for creation of views and triggers
     -- to support the SDL.
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.18  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.19  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'SDL_DDL';
 
@@ -508,7 +508,7 @@ AS
                'create or replace view v_sdl_wip_'
             || l_profile_name
             || '_datums '
-            || ' ( batch_id, swd_id, SLD_KEY, DATUM_ID, pct_match, status, manual_override, GEOM, ne_length_g, ne_no_start, ne_no_end, ne_type, ne_nt_type'
+            || ' ( batch_id, swd_id, SLD_KEY, DATUM_ID, pct_match, status, manual_override, GEOM, ne_length, ne_no_start, ne_no_end, ne_type, ne_nt_type'
             || CASE
                    WHEN l_col_list IS NOT NULL THEN ', ' || l_col_list
                    ELSE NULL
