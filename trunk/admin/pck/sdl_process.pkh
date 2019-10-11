@@ -1,0 +1,76 @@
+/* Formatted on 10/10/2019 09:55:54 (QP5 v5.336) */
+CREATE OR REPLACE PACKAGE sdl_process
+AS
+    --<PACKAGE>
+    --   PVCS Identifiers :-
+    --
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_process.pkh-arc   1.0   Oct 11 2019 15:15:30   Rob.Coupe  $
+    --       Module Name      : $Workfile:   sdl_process.pkh  $
+    --       Date into PVCS   : $Date:   Oct 11 2019 15:15:30  $
+    --       Date fetched Out : $Modtime:   Oct 10 2019 09:56:16  $
+    --       PVCS Version     : $Revision:   1.0  $
+    --
+    --   Author : R.A. Coupe
+    --
+    --   Package for handling the processes in SDL product
+    --
+    -----------------------------------------------------------------------------
+    -- Copyright (c) 2019 Bentley Systems Incorporated. All rights reserved.
+    ----------------------------------------------------------------------------
+    --
+    -- The main purpose of this package is to provide a single package as an interface to the
+    -- various SDL processes
+
+    --</PACKAGE>
+    g_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.0  $';
+
+    g_buffer            NUMBER := 2;
+    g_tolerance         NUMBER := 0.005;
+    g_match_tolerance   NUMBER := 5;
+
+    -----------------------------------------------------------------------------
+    --
+    --<PROC NAME="GET_VERSION">
+    --
+    -- This function returns the current PVCS version of the package
+
+    FUNCTION get_version
+        RETURN VARCHAR2;
+
+    --</PROC>
+
+    -----------------------------------------------------------------------------
+    --
+    --<PROC NAME="GET_BODY_VERSION">
+    --
+    -- This function returns the current PVCS version of the package body
+
+    FUNCTION get_body_version
+        RETURN VARCHAR2;
+
+    --</PROC>
+
+    PROCEDURE load_validate (p_batch_id    IN NUMBER,
+                             p_tolerance   IN NUMBER DEFAULT g_tolerance);
+
+    PROCEDURE topo_generation (
+        p_batch_id          IN NUMBER,
+        p_match_tolerance   IN NUMBER DEFAULT g_match_tolerance,
+        p_tolerance         IN NUMBER DEFAULT g_tolerance);
+
+    PROCEDURE datum_validation (
+        p_batch_id          IN NUMBER,
+        p_buffer            IN NUMBER DEFAULT g_buffer,
+        p_match_tolerance   IN NUMBER DEFAULT g_match_tolerance,
+        p_tolerance         IN NUMBER DEFAULT g_tolerance);
+
+    PROCEDURE analysis (p_batch_id    IN NUMBER,
+                        p_buffer      IN NUMBER DEFAULT g_buffer,
+                        p_tolerance   IN NUMBER DEFAULT g_tolerance,
+                        p_swd_id      IN NUMBER DEFAULT NULL);
+
+    PROCEDURE transfer (p_batch_id IN NUMBER);
+
+    PROCEDURE reject (p_batch_id IN NUMBER);
+END;
+/
