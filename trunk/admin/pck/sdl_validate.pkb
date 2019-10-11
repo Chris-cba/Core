@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY sdl_validate
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_validate.pkb-arc   1.1   Sep 10 2019 15:37:30   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_validate.pkb-arc   1.2   Oct 11 2019 14:16:38   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_validate.pkb  $
-    --       Date into PVCS   : $Date:   Sep 10 2019 15:37:30  $
-    --       Date fetched Out : $Modtime:   Sep 10 2019 15:36:52  $
-    --       PVCS Version     : $Revision:   1.1  $
+    --       Date into PVCS   : $Date:   Oct 11 2019 14:16:38  $
+    --       Date fetched Out : $Modtime:   Oct 11 2019 14:15:30  $
+    --       PVCS Version     : $Revision:   1.2  $
     --
     --   Author : R.A. Coupe
     --
@@ -20,7 +20,7 @@ AS
     -- FK based checks
     -- format checks
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.1  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.2  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'SDL_VALIDATE';
 
@@ -40,13 +40,28 @@ AS
 
     PROCEDURE VALIDATE_BATCH (p_batch_id IN NUMBER)
     IS
+        meta_row        V_SDL_PROFILE_NW_TYPES%ROWTYPE;
+        l_unit_factor   NUMBER;
     BEGIN
+        SELECT m.*
+          INTO meta_row
+          FROM V_SDL_PROFILE_NW_TYPES m, sdl_file_submissions
+         WHERE sfs_id = p_batch_id AND sp_id = sfs_sp_id;
+
+        --
+        SELECT conversion_factor
+          INTO l_unit_factor
+          FROM mdsys.sdo_dist_units
+         WHERE sdo_unit = meta_row.datum_unit_name;
+
         DELETE FROM sdl_validation_results
               WHERE svr_sfs_id = p_batch_id;
 
         validate_domain_columns (p_batch_id);
 
         validate_mandatory_columns (p_batch_id);
+
+        set_working_geometry (p_batch_id, l_unit_factor);
     END;
 
     PROCEDURE VALIDATE_DOMAIN_COLUMNS (p_batch_id IN NUMBER)
@@ -155,7 +170,7 @@ AS
                       || 'sld_key'
                       || ','
                       || ''''
-                      || 'D'
+                      || 'M'
                       || ''''
                       || ','
                       || TO_CHAR (sam_id)
@@ -226,12 +241,21 @@ AS
         END IF;
     END;
 
-    PROCEDURE set_working_geometry (p_batch_id IN NUMBER)
+    PROCEDURE set_working_geometry (p_batch_id      IN NUMBER,
+                                    p_unit_factor   IN NUMBER)
     IS
-        l_diminfo   sdo_dim_array;
-        l_gtype     NUMBER;
+        l_diminfo    sdo_dim_array;
+        l_gtype      NUMBER;
+        l_unit_str   VARCHAR2 (30);
+        meta_row     V_SDL_PROFILE_NW_TYPES%ROWTYPE;
     BEGIN
+        SELECT m.*
+          INTO meta_row
+          FROM V_SDL_PROFILE_NW_TYPES m, sdl_file_submissions
+         WHERE sfs_id = p_batch_id AND sp_id = sfs_sp_id;
+
         --
+
         DELETE FROM sdl_validation_results
               WHERE svr_validation_type = 'S' AND svr_sfs_id = p_batch_id;
 
@@ -257,19 +281,27 @@ AS
                    'SLD_LOAD_GEOMETRY',
                    -99,
                    SDO_GEOM.validate_geometry_with_context (
-                       sdl_set_gtype (sld_load_geometry, l_gtype),
+                       sdl_set_gtype (sld_load_geometry,
+                                      l_gtype,
+                                      NULL,
+                                      p_unit_factor),
                        l_diminfo)
               FROM sdl_load_data
              WHERE     sld_sfs_id = p_batch_id
                    AND SDO_GEOM.validate_geometry_with_context (
-                           sdl_set_gtype (sld_load_geometry, l_gtype),
-                           l_diminfo) !=
-                       'TRUE';
+                           sdl_set_gtype (sld_load_geometry,
+                                          l_gtype,
+                                          NULL,
+                                          p_unit_factor),
+                           l_diminfo) != 'TRUE';
 
         --
         UPDATE sdl_load_data a
            SET a.sld_working_geometry =
-                   sdl_set_gtype (sld_load_geometry, l_gtype)
+                   sdl_set_gtype (sld_load_geometry,
+                                  l_gtype,
+                                  NULL,
+                                  p_unit_factor)
          WHERE     sld_sfs_id = p_batch_id
                AND NOT EXISTS
                        (SELECT 1
@@ -282,7 +314,7 @@ AS
                    (SELECT sdo_aggr_mbr (sld_working_geometry)
                       FROM sdl_load_data
                      WHERE sld_sfs_id = p_batch_id)
-        where sfs_id = p_batch_id;
+         WHERE sfs_id = p_batch_id;
     --
     END;
 
@@ -325,13 +357,15 @@ AS
         RETURN retval;
     END;
 
-    FUNCTION sdl_set_gtype (p_geom     IN SDO_GEOMETRY,
-                            p_gtype    IN NUMBER,
-                            p_length   IN NUMBER DEFAULT NULL)
+    FUNCTION sdl_set_gtype (p_geom          IN SDO_GEOMETRY,
+                            p_gtype         IN NUMBER,
+                            p_length        IN NUMBER DEFAULT NULL,
+                            p_unit_factor   IN NUMBER)
         RETURN SDO_GEOMETRY
     IS
         retval    SDO_GEOMETRY := p_geom;
         l_parts   NUMBER;
+        qq        CHAR (1) := CHR (39);
     BEGIN
         SELECT COUNT (*) / 3 INTO l_parts FROM TABLE (retval.sdo_elem_info);
 
@@ -349,7 +383,12 @@ AS
                     SDO_LRS.convert_to_lrs_geom (
                         retval,
                         0,
-                        NVL (p_length, SDO_GEOM.sdo_length (retval)));
+                        NVL (
+                            p_length,
+                              SDO_GEOM.sdo_length (retval,
+                                                   0.005,
+                                                   'unit=METER')
+                            / p_unit_factor));
             END IF;
         END IF;
 
@@ -392,18 +431,17 @@ AS
                    swd_id,
                    'GEOM',
                    -99,
-                   SDO_GEOM.validate_geometry_with_context (
-                       sdl_set_gtype (geom, l_gtype),
-                       l_diminfo)
+                   SDO_GEOM.validate_geometry_with_context (geom, l_diminfo)
               FROM sdl_wip_datums
              WHERE     batch_id = p_batch_id
-                   AND SDO_GEOM.validate_geometry_with_context (
-                           sdl_set_gtype (geom, l_gtype),
-                           l_diminfo) !=
+                   AND SDO_GEOM.validate_geometry_with_context (geom,
+                                                                l_diminfo) !=
                        'TRUE';
 
         --
-        check_self_intersections (p_batch_id);
+        --        check_self_intersections (p_batch_id);
+
+        set_datum_status (p_batch_id);
     END;
 
 
@@ -448,6 +486,28 @@ AS
                        AND p1.id != p2.id
                        AND p1.id < p2.id - 1;
         END LOOP;
+    END;
+
+    PROCEDURE set_datum_status (p_batch_id IN NUMBER)
+    IS
+    BEGIN
+        UPDATE sdl_wip_datums
+           SET status = 'VALID'
+         WHERE     NOT EXISTS
+                       (SELECT 1
+                          FROM sdl_validation_results
+                         WHERE svr_swd_id = swd_id)
+               AND batch_id = p_batch_id
+               AND status IN ('NEW', 'VALID', 'INVALID');
+
+        UPDATE sdl_wip_datums
+           SET status = 'INVALID'
+         WHERE     EXISTS
+                       (SELECT 1
+                          FROM sdl_validation_results
+                         WHERE svr_swd_id = swd_id)
+               AND batch_id = p_batch_id
+               AND status IN ('NEW', 'VALID', 'INVALID');
     END;
 END sdl_validate;
 /
