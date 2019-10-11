@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY sdl_topo
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_topo.pkb-arc   1.1   Sep 11 2019 14:49:32   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_topo.pkb-arc   1.2   Oct 11 2019 14:44:14   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_topo.pkb  $
-    --       Date into PVCS   : $Date:   Sep 11 2019 14:49:32  $
-    --       Date fetched Out : $Modtime:   Sep 11 2019 14:48:56  $
-    --       PVCS Version     : $Revision:   1.1  $
+    --       Date into PVCS   : $Date:   Oct 11 2019 14:44:14  $
+    --       Date fetched Out : $Modtime:   Oct 10 2019 10:17:22  $
+    --       PVCS Version     : $Revision:   1.2  $
     --
     --   Author : R.A. Coupe
     --
@@ -17,7 +17,7 @@ AS
     ----------------------------------------------------------------------------
     -- The main purpose of this package is for breaking the loaded data into individual connected segments.
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.1  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.2  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'SDL_TOPO';
 
@@ -588,11 +588,10 @@ AS
     IS
     BEGIN
         DELETE FROM sdl_pline_statistics
-              WHERE slps_slga_id IN
-                        (SELECT slga_id
-                           FROM sdl_geom_accuracy, sdl_load_data
-                          WHERE     slga_sld_key = sld_key
-                                AND sld_sfs_id = p_batch_id);
+              WHERE slps_sld_key IN
+                        (SELECT sld_key
+                           FROM sdl_load_data
+                          WHERE     sld_sfs_id = p_batch_id);
 
         DELETE FROM sdl_geom_accuracy
               WHERE slga_sld_key IN (SELECT sld_key
