@@ -3,11 +3,11 @@ AS
     --<PACKAGE>
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_validate.pkh-arc   1.1   Oct 11 2019 14:19:06   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_validate.pkh-arc   1.2   Oct 11 2019 14:40:54   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_validate.pkh  $
-    --       Date into PVCS   : $Date:   Oct 11 2019 14:19:06  $
-    --       Date fetched Out : $Modtime:   Oct 11 2019 14:18:30  $
-    --       PVCS Version     : $Revision:   1.1  $
+    --       Date into PVCS   : $Date:   Oct 11 2019 14:40:54  $
+    --       Date fetched Out : $Modtime:   Oct 11 2019 14:38:22  $
+    --       PVCS Version     : $Revision:   1.2  $
     --
     --   Author : R.A. Coupe
     --
@@ -23,7 +23,7 @@ AS
 
     -- assessments of accuracy of network over existing network.
     --</PACKAGE>
-    g_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.1  $';
+    g_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.2  $';
 
     -----------------------------------------------------------------------------
     --
@@ -77,6 +77,13 @@ AS
 
     --</PROC>
 
+    -----------------------------------------------------------------------------
+    --
+    --<PROC NAME="VALIDATE_ADJUSTMENT_RULES">
+    --
+    -- This function validates the adjustment rules 
+
+    PROCEDURE VALIDATE_ADJUSTMENT_RULES (p_batch_id IN NUMBER);
 
     -----------------------------------------------------------------------------
     --
