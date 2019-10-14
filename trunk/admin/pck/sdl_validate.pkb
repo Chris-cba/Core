@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY sdl_validate
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_validate.pkb-arc   1.5   Oct 14 2019 14:50:00   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_validate.pkb-arc   1.6   Oct 14 2019 15:57:16   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_validate.pkb  $
-    --       Date into PVCS   : $Date:   Oct 14 2019 14:50:00  $
-    --       Date fetched Out : $Modtime:   Oct 14 2019 13:34:58  $
-    --       PVCS Version     : $Revision:   1.5  $
+    --       Date into PVCS   : $Date:   Oct 14 2019 15:57:16  $
+    --       Date fetched Out : $Modtime:   Oct 14 2019 15:51:04  $
+    --       PVCS Version     : $Revision:   1.6  $
     --
     --   Author : R.A. Coupe
     --
@@ -20,7 +20,7 @@ AS
     -- FK based checks
     -- format checks
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.5  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.6  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'SDL_VALIDATE';
 
@@ -585,7 +585,6 @@ AS
         --
         --        check_self_intersections (p_batch_id);
 
-        set_datum_status (p_batch_id);
     END;
 
 
@@ -684,6 +683,9 @@ AS
         validate_dtm_column_len (p_batch_id       => p_batch_id,
                                  p_profile_id     => meta_row.sp_id,
                                  p_profile_view   => l_view_name);
+                                 
+        set_datum_status (p_batch_id);
+                                 
     END;
 
     PROCEDURE VALIDATE_DATUM_DOMAIN_COLUMNS (p_batch_id       IN NUMBER,
