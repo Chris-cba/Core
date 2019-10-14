@@ -3,11 +3,11 @@ AS
     --<PACKAGE>
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_process.pkb-arc   1.1   Oct 11 2019 16:52:52   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_process.pkb-arc   1.2   Oct 14 2019 14:49:12   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_process.pkb  $
-    --       Date into PVCS   : $Date:   Oct 11 2019 16:52:52  $
-    --       Date fetched Out : $Modtime:   Oct 11 2019 16:03:46  $
-    --       PVCS Version     : $Revision:   1.1  $
+    --       Date into PVCS   : $Date:   Oct 14 2019 14:49:12  $
+    --       Date fetched Out : $Modtime:   Oct 14 2019 13:35:12  $
+    --       PVCS Version     : $Revision:   1.2  $
     --
     --   Author : R.A. Coupe
     --
@@ -22,7 +22,7 @@ AS
 
     --</PACKAGE>
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.1  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.2  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'SDL_PROCESS';
 
@@ -92,7 +92,7 @@ AS
                                      p_match_tolerance,
                                      p_tolerance);
         SDL_STATS.match_nodes (p_batch_id, p_match_tolerance, p_tolerance);
-        SDL_VALIDATE.validate_datum_geometry (p_batch_id => p_batch_id);
+        SDL_VALIDATE.validate_datums_in_batch (p_batch_id => p_batch_id);
         SDL_STATS.GENERATE_STATISTICS_ON_SWD (p_batch_id    => p_batch_id,
                                               p_buffer      => p_buffer,
                                               p_tolerance   => p_tolerance);
