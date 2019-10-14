@@ -1,13 +1,12 @@
-/* Formatted on 11/10/2019 16:49:01 (QP5 v5.336) */
 CREATE OR REPLACE PACKAGE BODY sdl_validate
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_validate.pkb-arc   1.4   Oct 11 2019 16:50:36   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_validate.pkb-arc   1.5   Oct 14 2019 14:50:00   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_validate.pkb  $
-    --       Date into PVCS   : $Date:   Oct 11 2019 16:50:36  $
-    --       Date fetched Out : $Modtime:   Oct 11 2019 16:50:00  $
-    --       PVCS Version     : $Revision:   1.4  $
+    --       Date into PVCS   : $Date:   Oct 14 2019 14:50:00  $
+    --       Date fetched Out : $Modtime:   Oct 14 2019 13:34:58  $
+    --       PVCS Version     : $Revision:   1.5  $
     --
     --   Author : R.A. Coupe
     --
@@ -21,9 +20,32 @@ AS
     -- FK based checks
     -- format checks
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.4  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.5  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'SDL_VALIDATE';
+
+    -----------------------------------------------------------------------------
+    -- This procedure generates and executes a SQL insert string to log all load records in a batch which have domain-based columns with illegal values.
+
+    PROCEDURE VALIDATE_DOMAIN_COLUMNS (p_batch_id IN NUMBER);
+
+    --
+    -- This procedure generates and executes a SQL insert string to log all load records in a batch which have mandatory columns without a value
+
+    PROCEDURE VALIDATE_MANDATORY_COLUMNS (p_batch_id IN NUMBER);
+
+    PROCEDURE VALIDATE_DATUM_DOMAIN_COLUMNS (p_batch_id       IN NUMBER,
+                                             p_profile_id     IN NUMBER,
+                                             p_profile_view   IN VARCHAR2);
+
+    PROCEDURE VALIDATE_DTM_MAND_COLUMNS (p_batch_id       IN NUMBER,
+                                         p_profile_id     IN NUMBER,
+                                         p_profile_view   IN VARCHAR2);
+
+    PROCEDURE VALIDATE_DTM_COLUMN_LEN (p_batch_id       IN NUMBER,
+                                       p_profile_id     IN NUMBER,
+                                       p_profile_view   IN VARCHAR2);
+
 
     FUNCTION get_version
         RETURN VARCHAR2
@@ -113,9 +135,9 @@ AS
                            END
                       FROM (SELECT COUNT (*)     row_count
                               FROM sdl_validation_results
-                             WHERE svr_sfs_id = p_batch_id AND svr_sld_key = sld_key))
-         WHERE sld_sfs_id = 4;
-         
+                             WHERE     svr_sfs_id = p_batch_id
+                                   AND svr_sld_key = sld_key))
+         WHERE sld_sfs_id = p_batch_id;
     END;
 
     PROCEDURE VALIDATE_DOMAIN_COLUMNS (p_batch_id IN NUMBER)
@@ -328,7 +350,7 @@ AS
     END VALIDATE_ADJUSTMENT_RULES;
 
 
-    PROCEDURE VALIDATE_PROFILE (p_template_id IN NUMBER)
+    PROCEDURE VALIDATE_PROFILE (p_profile_id IN NUMBER)
     IS
         l_dummy   NUMBER := 0;
     BEGIN
@@ -342,7 +364,7 @@ AS
                    AND NOT EXISTS
                            (SELECT 1
                               FROM sdl_attribute_mapping
-                             WHERE     sam_sp_id = 2
+                             WHERE     sam_sp_id = p_profile_id
                                    AND column_name = sam_ne_column_name)
                    AND column_name NOT IN ('NE_ID', -- assigned in upload to main DB
                                            'NE_NT_TYPE', --defined by the template itself
@@ -534,11 +556,6 @@ AS
         l_gtype     NUMBER;
     BEGIN
         --
-        DELETE FROM sdl_validation_results
-              WHERE     svr_validation_type = 'S'
-                    AND svr_sfs_id = p_batch_id
-                    AND svr_swd_id IS NOT NULL;
-
         SELECT diminfo
           INTO l_diminfo
           FROM user_sdo_geom_metadata
@@ -635,6 +652,204 @@ AS
                          WHERE svr_swd_id = swd_id)
                AND batch_id = p_batch_id
                AND status IN ('NEW', 'VALID', 'INVALID');
+    END;
+
+
+    PROCEDURE validate_datums_in_batch (p_batch_id IN NUMBER)
+    IS
+        meta_row      V_SDL_PROFILE_NW_TYPES%ROWTYPE;
+        l_view_name   VARCHAR2 (30);
+    BEGIN
+        l_view_name := 'V_SDL_WIP_' || meta_row.sp_name || '_DATUMS';
+
+        DELETE FROM sdl_validation_results
+              WHERE svr_sfs_id = p_batch_id
+                    AND svr_swd_id IS NOT NULL;
+
+        SELECT m.*
+          INTO meta_row
+          FROM V_SDL_PROFILE_NW_TYPES m, sdl_file_submissions
+         WHERE sfs_id = p_batch_id AND sp_id = sfs_sp_id;
+         
+        validate_datum_geometry (p_batch_id => p_batch_id );
+
+        validate_datum_domain_columns (p_batch_id       => p_batch_id,
+                                       p_profile_id     => meta_row.sp_id,
+                                       p_profile_view   => l_view_name);
+
+        validate_dtm_mand_columns (p_batch_id       => p_batch_id,
+                                   p_profile_id     => meta_row.sp_id,
+                                   p_profile_view   => l_view_name);
+
+        validate_dtm_column_len (p_batch_id       => p_batch_id,
+                                 p_profile_id     => meta_row.sp_id,
+                                 p_profile_view   => l_view_name);
+    END;
+
+    PROCEDURE VALIDATE_DATUM_DOMAIN_COLUMNS (p_batch_id       IN NUMBER,
+                                             p_profile_id     IN NUMBER,
+                                             p_profile_view   IN VARCHAR2)
+    IS
+        sql_str   VARCHAR2 (4000);
+    BEGIN
+        SELECT    'insert into sdl_validation_results (svr_sfs_id, svr_sld_key, svr_swd_id, svr_validation_type, svr_column_name, svr_current_value, svr_status_code, svr_message) '
+               || LISTAGG (
+                         'select '
+                      || p_batch_id
+                      || ','
+                      || 'sld_key'
+                      || ','
+                      || 'swd_id'
+                      || ','
+                      || ''''
+                      || 'D'
+                      || ''''
+                      || ','
+                      || ''''
+                      || column_name
+                      || ''''
+                      || ','
+                      || column_name
+                      || ','
+                      || ' -999, '
+                      || ''''
+                      || 'Domain '
+                      || domain
+                      || ' value '
+                      || column_name
+                      || ' is invalid'
+                      || ''''
+                      || ' from '
+                      || p_profile_view
+                      || ' where batch_id = '
+                      || TO_CHAR (p_batch_id)
+                      || ' and not exists ( select 1 from hig_codes where hco_domain = '
+                      || ''''
+                      || domain
+                      || ''''
+                      || ' and hco_code = '
+                      || column_name
+                      || ')',
+                      ' union all ')
+                  WITHIN GROUP (ORDER BY sdam_seq_no)
+          INTO sql_str
+          FROM SDL_DATUM_ATTRIBUTE_MAPPING a, v_nm_nw_columns n
+         WHERE     sdam_profile_id = p_profile_id
+               AND n.network_type = sdam_nw_type
+               AND sdam_column_name = n.column_name
+               AND domain IS NOT NULL;
+
+        nm_debug.debug_on;
+        nm_debug.debug (sql_str);
+
+        EXECUTE IMMEDIATE sql_str;
+    END;
+
+    PROCEDURE VALIDATE_DTM_MAND_COLUMNS (p_batch_id       IN NUMBER,
+                                         p_profile_id     IN NUMBER,
+                                         p_profile_view   IN VARCHAR2)
+    IS
+        sql_str   VARCHAR2 (4000);
+    BEGIN
+        SELECT    'insert into sdl_validation_results (svr_sfs_id, svr_sld_key, svr_swd_id, svr_validation_type, svr_column_name, svr_current_value, svr_status_code, svr_message) '
+               || LISTAGG (
+                         'select '
+                      || p_batch_id
+                      || ','
+                      || 'sld_key'
+                      || ','
+                      || 'swd_id'
+                      || ','
+                      || ''''
+                      || 'M'
+                      || ''''
+                      || ','
+                      || ''''
+                      || column_name
+                      || ''''
+                      || ','
+                      || column_name
+                      || ','
+                      || ' -999, '
+                      || ''''
+                      || 'Column is marked as mandatory but has no value '
+                      || ''''
+                      || ' from '
+                      || p_profile_view
+                      || ' where batch_id = '
+                      || TO_CHAR (p_batch_id)
+                      || ' and '
+                      || column_name
+                      || 'is NULL ',
+                      ' union all ')
+                  WITHIN GROUP (ORDER BY sdam_seq_no)
+          INTO sql_str
+          FROM SDL_DATUM_ATTRIBUTE_MAPPING a, v_nm_nw_columns n
+         WHERE     sdam_profile_id = p_profile_id
+               AND n.network_type = sdam_nw_type
+               AND sdam_column_name = n.column_name
+               AND mandatory = 'Y';
+
+        nm_debug.debug_on;
+        nm_debug.debug (sql_str);
+
+        EXECUTE IMMEDIATE sql_str;
+    END;
+
+    PROCEDURE VALIDATE_DTM_COLUMN_LEN (p_batch_id       IN NUMBER,
+                                       p_profile_id     IN NUMBER,
+                                       p_profile_view   IN VARCHAR2)
+    IS
+        sql_str   VARCHAR2 (4000);
+    BEGIN
+        SELECT    'insert into sdl_validation_results (svr_sfs_id, svr_sld_key, svr_swd_id, svr_validation_type, svr_column_name, svr_current_value, svr_status_code, svr_message) '
+               || LISTAGG (
+                         'select '
+                      || p_batch_id
+                      || ','
+                      || 'sld_key'
+                      || ','
+                      || 'swd_id'
+                      || ','
+                      || ''''
+                      || 'L'
+                      || ''''
+                      || ','
+                      || ''''
+                      || column_name
+                      || ''''
+                      || ','
+                      || column_name
+                      || ','
+                      || ' -999, '
+                      || ''''
+                      || 'Length of '
+                      || column_name
+                      || ' is invalid'
+                      || ''''
+                      || ' from '
+                      || p_profile_view
+                      || ' where batch_id = '
+                      || TO_CHAR (p_batch_id)
+                      || ' and '
+                      || 'length('
+                      || column_name
+                      || ') '
+                      || ' > '
+                      || TO_CHAR (field_length),
+                      ' union all ')
+                  WITHIN GROUP (ORDER BY sdam_seq_no)
+          INTO sql_str
+          FROM SDL_DATUM_ATTRIBUTE_MAPPING a, v_nm_nw_columns n
+         WHERE     sdam_profile_id = p_profile_id
+               AND n.network_type = sdam_nw_type
+               AND sdam_column_name = n.column_name
+               AND mandatory = 'Y';
+
+        nm_debug.debug_on;
+        nm_debug.debug (sql_str);
+
+        EXECUTE IMMEDIATE sql_str;
     END;
 END sdl_validate;
 /
