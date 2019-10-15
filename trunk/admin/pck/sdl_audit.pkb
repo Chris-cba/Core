@@ -3,11 +3,11 @@ AS
     --<PACKAGE>
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_audit.pkb-arc   1.1   Oct 11 2019 16:51:26   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_audit.pkb-arc   1.2   Oct 15 2019 09:35:36   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_audit.pkb  $
-    --       Date into PVCS   : $Date:   Oct 11 2019 16:51:26  $
-    --       Date fetched Out : $Modtime:   Oct 11 2019 16:50:58  $
-    --       PVCS Version     : $Revision:   1.1  $
+    --       Date into PVCS   : $Date:   Oct 15 2019 09:35:36  $
+    --       Date fetched Out : $Modtime:   Oct 15 2019 09:34:24  $
+    --       PVCS Version     : $Revision:   1.2  $
     --
     --   Author : R.A. Coupe
     --
@@ -22,7 +22,7 @@ AS
     --</PACKAGE>
 
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.1  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.2  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'SDL_AUDIT';
 
@@ -262,7 +262,7 @@ AS
                AND NVL (spa_sld_key, -999) = NVL (p_sld_key, -999);
 
         UPDATE sdl_file_submissions
-           SET sfs_status = SUBSTR (p_process, 1, 10)
+           SET sfs_status = p_process
          WHERE sfs_id = p_batch_id;
     END;
 
