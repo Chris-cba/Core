@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY sdl_validate
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_validate.pkb-arc   1.6   Oct 14 2019 15:57:16   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_validate.pkb-arc   1.7   Oct 18 2019 15:49:32   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_validate.pkb  $
-    --       Date into PVCS   : $Date:   Oct 14 2019 15:57:16  $
-    --       Date fetched Out : $Modtime:   Oct 14 2019 15:51:04  $
-    --       PVCS Version     : $Revision:   1.6  $
+    --       Date into PVCS   : $Date:   Oct 18 2019 15:49:32  $
+    --       Date fetched Out : $Modtime:   Oct 18 2019 15:47:00  $
+    --       PVCS Version     : $Revision:   1.7  $
     --
     --   Author : R.A. Coupe
     --
@@ -20,7 +20,7 @@ AS
     -- FK based checks
     -- format checks
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.6  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.7  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'SDL_VALIDATE';
 
@@ -86,8 +86,10 @@ AS
                 || r_update.saaa_adjusted_value
                 || ''''
                 || ','
-                || 'sld_status = '
-                || '''ADJUSTED'''
+                || 'sld_adjustment_rule_applied = '
+                || '''Y'''
+               -- || 'sld_status = '
+               -- || '''ADJUSTED'''
                 || ' WHERE sld_key IN (SELECT saaa.saaa_sld_key FROM sdl_attribute_adjustment_audit saaa WHERE saaa.saaa_sfs_id = '
                 || p_batch_id
                 || ' AND saaa.saaa_sam_id = '
@@ -143,6 +145,7 @@ AS
     PROCEDURE VALIDATE_DOMAIN_COLUMNS (p_batch_id IN NUMBER)
     IS
         sql_str   VARCHAR2 (4000);
+        max_id    NUMBER;
     BEGIN
         WITH
             domain_columns
@@ -165,7 +168,8 @@ AS
                                 AND sam_ne_column_name = column_name
                                 AND network_type = nlt_nt_type
                                 AND domain IS NOT NULL))
-        SELECT    'insert into sdl_validation_results (svr_sfs_id, svr_sld_key, svr_validation_type, svr_sam_id, svr_column_name, svr_current_value, svr_status_code, svr_message) '
+        SELECT MAX (sam_id),
+                  'insert into sdl_validation_results (svr_sfs_id, svr_sld_key, svr_validation_type, svr_sam_id, svr_column_name, svr_current_value, svr_status_code, svr_message) '
                || LISTAGG (
                          'select '
                       || p_batch_id
@@ -203,19 +207,23 @@ AS
                       || ')',
                       ' union all ')
                   WITHIN GROUP (ORDER BY sam_id)
-          INTO sql_str
+          INTO max_id, sql_str
           FROM domain_columns;
 
         nm_debug.debug_on;
         nm_debug.debug (sql_str);
 
-        EXECUTE IMMEDIATE sql_str;
+        IF max_id IS NOT NULL
+        THEN
+            EXECUTE IMMEDIATE sql_str;
+        END IF;
     END;
 
 
     PROCEDURE VALIDATE_MANDATORY_COLUMNS (p_batch_id IN NUMBER)
     IS
         sql_str   VARCHAR2 (4000);
+        max_id    NUMBER;
     BEGIN
         WITH
             mandatory_columns
@@ -238,7 +246,8 @@ AS
                                 AND sam_ne_column_name = column_name
                                 AND network_type = nlt_nt_type
                                 AND mandatory = 'Y'))
-        SELECT    'insert into sdl_validation_results (svr_sfs_id, svr_sld_key, svr_validation_type, svr_sam_id, svr_column_name, svr_current_value, svr_status_code, svr_message) '
+        SELECT MAX (sam_id),
+                  'insert into sdl_validation_results (svr_sfs_id, svr_sld_key, svr_validation_type, svr_sam_id, svr_column_name, svr_current_value, svr_status_code, svr_message) '
                || LISTAGG (
                          'select '
                       || p_batch_id
@@ -268,18 +277,22 @@ AS
                       || ' is null ',
                       ' union all ')
                   WITHIN GROUP (ORDER BY sam_id)
-          INTO sql_str
+          INTO max_id, sql_str
           FROM mandatory_columns;
 
         nm_debug.debug_on;
         nm_debug.debug (sql_str);
 
-        EXECUTE IMMEDIATE sql_str;
+        IF max_id IS NOT NULL
+        THEN
+            EXECUTE IMMEDIATE sql_str;
+        END IF;
     END;
 
     PROCEDURE VALIDATE_ADJUSTMENT_RULES (p_batch_id IN NUMBER)
     IS
         sql_str   VARCHAR2 (4000);
+        max_id    NUMBER;
     BEGIN
         --   DELETE FROM sdl_attribute_adjustment_audit
         --        WHERE saaa_sfs_id = p_batch_id;
@@ -308,7 +321,8 @@ AS
                                 AND sam.sam_sp_id = saar.saar_sp_id
                                 AND sam.sam_view_column_name =
                                     saar.saar_target_attribute_name))
-        SELECT    'INSERT INTO sdl_attribute_adjustment_audit ( saaa_sld_key, saaa_sfs_id, saaa_saar_id, saaa_sam_id, saaa_original_value, saaa_adjusted_value) '
+        SELECT MAX (sam_id),
+                  'INSERT INTO sdl_attribute_adjustment_audit ( saaa_sld_key, saaa_sfs_id, saaa_saar_id, saaa_sam_id, saaa_original_value, saaa_adjusted_value) '
                || LISTAGG (
                          'SELECT '
                       || 'sld_key'
@@ -338,15 +352,20 @@ AS
                       || ')',
                       ' UNION ALL ')
                   WITHIN GROUP (ORDER BY sam_id)
-          INTO sql_str
+          INTO max_id, sql_str
           FROM adjustment_rules;
 
-        nm_debug.debug_on;
-        nm_debug.debug (sql_str);
+        IF max_id IS NULL
+        THEN
+            nm_debug.debug ('No adjustment rules');
+        ELSE
+            nm_debug.debug_on;
+            nm_debug.debug (sql_str);
 
-        EXECUTE IMMEDIATE sql_str;
+            EXECUTE IMMEDIATE sql_str;
 
-        update_batch_for_adjustment (p_batch_id);
+            update_batch_for_adjustment (p_batch_id);
+        END IF;
     END VALIDATE_ADJUSTMENT_RULES;
 
 
@@ -581,9 +600,8 @@ AS
                    AND SDO_GEOM.validate_geometry_with_context (geom,
                                                                 l_diminfo) !=
                        'TRUE';
-
-        --
-        --        check_self_intersections (p_batch_id);
+    --
+    --        check_self_intersections (p_batch_id);
 
     END;
 
@@ -662,15 +680,14 @@ AS
         l_view_name := 'V_SDL_WIP_' || meta_row.sp_name || '_DATUMS';
 
         DELETE FROM sdl_validation_results
-              WHERE svr_sfs_id = p_batch_id
-                    AND svr_swd_id IS NOT NULL;
+              WHERE svr_sfs_id = p_batch_id AND svr_swd_id IS NOT NULL;
 
         SELECT m.*
           INTO meta_row
           FROM V_SDL_PROFILE_NW_TYPES m, sdl_file_submissions
          WHERE sfs_id = p_batch_id AND sp_id = sfs_sp_id;
-         
-        validate_datum_geometry (p_batch_id => p_batch_id );
+
+        validate_datum_geometry (p_batch_id => p_batch_id);
 
         validate_datum_domain_columns (p_batch_id       => p_batch_id,
                                        p_profile_id     => meta_row.sp_id,
@@ -683,9 +700,8 @@ AS
         validate_dtm_column_len (p_batch_id       => p_batch_id,
                                  p_profile_id     => meta_row.sp_id,
                                  p_profile_view   => l_view_name);
-                                 
+
         set_datum_status (p_batch_id);
-                                 
     END;
 
     PROCEDURE VALIDATE_DATUM_DOMAIN_COLUMNS (p_batch_id       IN NUMBER,
@@ -693,8 +709,10 @@ AS
                                              p_profile_view   IN VARCHAR2)
     IS
         sql_str   VARCHAR2 (4000);
+        max_id    NUMBER;
     BEGIN
-        SELECT    'insert into sdl_validation_results (svr_sfs_id, svr_sld_key, svr_swd_id, svr_validation_type, svr_column_name, svr_current_value, svr_status_code, svr_message) '
+        SELECT MAX (sdam_profile_id),
+                  'insert into sdl_validation_results (svr_sfs_id, svr_sld_key, svr_swd_id, svr_validation_type, svr_column_name, svr_current_value, svr_status_code, svr_message) '
                || LISTAGG (
                          'select '
                       || p_batch_id
@@ -734,7 +752,7 @@ AS
                       || ')',
                       ' union all ')
                   WITHIN GROUP (ORDER BY sdam_seq_no)
-          INTO sql_str
+          INTO max_id, sql_str
           FROM SDL_DATUM_ATTRIBUTE_MAPPING a, v_nm_nw_columns n
          WHERE     sdam_profile_id = p_profile_id
                AND n.network_type = sdam_nw_type
@@ -744,7 +762,10 @@ AS
         nm_debug.debug_on;
         nm_debug.debug (sql_str);
 
-        EXECUTE IMMEDIATE sql_str;
+        IF max_id IS NOT NULL
+        THEN
+            EXECUTE IMMEDIATE sql_str;
+        END IF;
     END;
 
     PROCEDURE VALIDATE_DTM_MAND_COLUMNS (p_batch_id       IN NUMBER,
@@ -752,8 +773,10 @@ AS
                                          p_profile_view   IN VARCHAR2)
     IS
         sql_str   VARCHAR2 (4000);
+        max_id    NUMBER;
     BEGIN
-        SELECT    'insert into sdl_validation_results (svr_sfs_id, svr_sld_key, svr_swd_id, svr_validation_type, svr_column_name, svr_current_value, svr_status_code, svr_message) '
+        SELECT MAX (sdam_profile_id),
+                  'insert into sdl_validation_results (svr_sfs_id, svr_sld_key, svr_swd_id, svr_validation_type, svr_column_name, svr_current_value, svr_status_code, svr_message) '
                || LISTAGG (
                          'select '
                       || p_batch_id
@@ -785,7 +808,7 @@ AS
                       || 'is NULL ',
                       ' union all ')
                   WITHIN GROUP (ORDER BY sdam_seq_no)
-          INTO sql_str
+          INTO max_id, sql_str
           FROM SDL_DATUM_ATTRIBUTE_MAPPING a, v_nm_nw_columns n
          WHERE     sdam_profile_id = p_profile_id
                AND n.network_type = sdam_nw_type
@@ -795,7 +818,10 @@ AS
         nm_debug.debug_on;
         nm_debug.debug (sql_str);
 
-        EXECUTE IMMEDIATE sql_str;
+        IF max_id IS NOT NULL
+        THEN
+            EXECUTE IMMEDIATE sql_str;
+        END IF;
     END;
 
     PROCEDURE VALIDATE_DTM_COLUMN_LEN (p_batch_id       IN NUMBER,
@@ -803,8 +829,10 @@ AS
                                        p_profile_view   IN VARCHAR2)
     IS
         sql_str   VARCHAR2 (4000);
+        max_id    NUMBER;
     BEGIN
-        SELECT    'insert into sdl_validation_results (svr_sfs_id, svr_sld_key, svr_swd_id, svr_validation_type, svr_column_name, svr_current_value, svr_status_code, svr_message) '
+        SELECT MAX (sdam_profile_id),
+                  'insert into sdl_validation_results (svr_sfs_id, svr_sld_key, svr_swd_id, svr_validation_type, svr_column_name, svr_current_value, svr_status_code, svr_message) '
                || LISTAGG (
                          'select '
                       || p_batch_id
@@ -841,7 +869,7 @@ AS
                       || TO_CHAR (field_length),
                       ' union all ')
                   WITHIN GROUP (ORDER BY sdam_seq_no)
-          INTO sql_str
+          INTO max_id, sql_str
           FROM SDL_DATUM_ATTRIBUTE_MAPPING a, v_nm_nw_columns n
          WHERE     sdam_profile_id = p_profile_id
                AND n.network_type = sdam_nw_type
@@ -851,7 +879,10 @@ AS
         nm_debug.debug_on;
         nm_debug.debug (sql_str);
 
-        EXECUTE IMMEDIATE sql_str;
+        IF max_id IS NOT NULL
+        THEN
+            EXECUTE IMMEDIATE sql_str;
+        END IF;
     END;
 END sdl_validate;
 /
