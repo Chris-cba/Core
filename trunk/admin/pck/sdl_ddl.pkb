@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY sdl_ddl
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_ddl.pkb-arc   1.19   Oct 11 2019 15:02:40   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_ddl.pkb-arc   1.20   Oct 22 2019 11:13:28   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_ddl.pkb  $
-    --       Date into PVCS   : $Date:   Oct 11 2019 15:02:40  $
-    --       Date fetched Out : $Modtime:   Oct 11 2019 15:00:58  $
-    --       PVCS Version     : $Revision:   1.19  $
+    --       Date into PVCS   : $Date:   Oct 22 2019 11:13:28  $
+    --       Date fetched Out : $Modtime:   Oct 22 2019 11:12:48  $
+    --       PVCS Version     : $Revision:   1.20  $
     --
     --   Author : R.A. Coupe
     --
@@ -19,7 +19,7 @@ AS
     -- The main purpose of this package is to provide DDL execution for creation of views and triggers
     -- to support the SDL.
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.19  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.20  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'SDL_DDL';
 
@@ -174,8 +174,28 @@ AS
                         WITHIN GROUP (ORDER BY sam_id)
                  || ', geom '
                  || ' ) as select sld_sfs_id, sld_id, sld_key, '
-                 || LISTAGG ('sld_col_' || sam_col_id, ',')
-                        WITHIN GROUP (ORDER BY sam_id)
+                 || LISTAGG (
+                        CASE field_type
+                            WHEN 'VARCHAR2'
+                            THEN
+                                'sld_col_' || sam_col_id
+                            WHEN 'DATE'
+                            THEN
+                                   'to_date(sld_col_'
+                                || sam_col_id
+                                || ','
+                                || ''''
+                                || 'YYYY/MM/DD'
+                                || ''''
+                                || ')'
+                            WHEN 'NUMBER'
+                            THEN
+                                   'cast (sld_col_'
+                                || sam_col_id
+                                || ' as number )'
+                        END,
+                        ',')
+                    WITHIN GROUP (ORDER BY sam_id)
                  || ', sld_working_geometry '
                  || ' FROM sdl_load_data '
                  || ' WHERE sld_sfs_id IN (SELECT sfs_id
@@ -193,14 +213,21 @@ AS
                  || qq
                  || ')),sld_sfs_id) '
             INTO p_view_sql
-            FROM SDL_ATTRIBUTE_MAPPING, sdl_profiles
-           WHERE sam_sp_id = sp_id AND sp_id = p_profile_id
+            FROM SDL_ATTRIBUTE_MAPPING,
+                 sdl_profiles,
+                 v_nm_nw_columns,
+                 nm_linear_types
+           WHERE     sam_sp_id = sp_id
+                 AND sp_id = p_profile_id
+                 AND column_name = sam_ne_column_name
+                 AND nlt_id = sp_nlt_id
+                 AND NVL (nlt_gty_type, '$%^&') = NVL (group_type, '$%^&')
+                 AND nlt_nt_type = network_type
         GROUP BY sp_name;
 
-        --
-        --        nm_debug.debug_on;
-        --        nm_debug.debug (p_view_sql);
-        --
+--        nm_debug.debug_on;
+--        nm_debug.debug (p_view_sql);
+
         EXECUTE IMMEDIATE p_view_sql;
     END;
 
@@ -606,15 +633,15 @@ AS
 
         -- now the datums, queryable by batch
 
---        insert_theme (p_theme_name          => 'SDL BATCH DATUM DATA',
---                      p_object_name         => 'V_SDL_WIP_DATUMS',
---                      p_base_theme_table    => 'V_SDL_WIP_DATUMS',
---                      p_base_theme_column   => 'GEOM',
---                      p_key_name            => 'SWD_ID',
---                      p_geom_column_name    => 'GEOM',
---                      p_role                => g_default_role,
---                      p_dim                 => 3,
---                      p_gtype               => 3302);
+        --        insert_theme (p_theme_name          => 'SDL BATCH DATUM DATA',
+        --                      p_object_name         => 'V_SDL_WIP_DATUMS',
+        --                      p_base_theme_table    => 'V_SDL_WIP_DATUMS',
+        --                      p_base_theme_column   => 'GEOM',
+        --                      p_key_name            => 'SWD_ID',
+        --                      p_geom_column_name    => 'GEOM',
+        --                      p_role                => g_default_role,
+        --                      p_dim                 => 3,
+        --                      p_gtype               => 3302);
 
 
 
