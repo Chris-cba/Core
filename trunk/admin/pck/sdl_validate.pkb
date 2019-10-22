@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY sdl_validate
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_validate.pkb-arc   1.7   Oct 18 2019 15:49:32   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_validate.pkb-arc   1.8   Oct 22 2019 11:10:36   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_validate.pkb  $
-    --       Date into PVCS   : $Date:   Oct 18 2019 15:49:32  $
-    --       Date fetched Out : $Modtime:   Oct 18 2019 15:47:00  $
-    --       PVCS Version     : $Revision:   1.7  $
+    --       Date into PVCS   : $Date:   Oct 22 2019 11:10:36  $
+    --       Date fetched Out : $Modtime:   Oct 22 2019 11:09:46  $
+    --       PVCS Version     : $Revision:   1.8  $
     --
     --   Author : R.A. Coupe
     --
@@ -20,7 +20,7 @@ AS
     -- FK based checks
     -- format checks
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.7  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.8  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'SDL_VALIDATE';
 
@@ -677,7 +677,6 @@ AS
         meta_row      V_SDL_PROFILE_NW_TYPES%ROWTYPE;
         l_view_name   VARCHAR2 (30);
     BEGIN
-        l_view_name := 'V_SDL_WIP_' || meta_row.sp_name || '_DATUMS';
 
         DELETE FROM sdl_validation_results
               WHERE svr_sfs_id = p_batch_id AND svr_swd_id IS NOT NULL;
@@ -686,6 +685,8 @@ AS
           INTO meta_row
           FROM V_SDL_PROFILE_NW_TYPES m, sdl_file_submissions
          WHERE sfs_id = p_batch_id AND sp_id = sfs_sp_id;
+
+        l_view_name := 'V_SDL_WIP_' || meta_row.sp_name || '_DATUMS';
 
         validate_datum_geometry (p_batch_id => p_batch_id);
 
@@ -805,7 +806,7 @@ AS
                       || TO_CHAR (p_batch_id)
                       || ' and '
                       || column_name
-                      || 'is NULL ',
+                      || ' is NULL ',
                       ' union all ')
                   WITHIN GROUP (ORDER BY sdam_seq_no)
           INTO max_id, sql_str
