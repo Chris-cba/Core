@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY sdl_stats
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_stats.pkb-arc   1.2   Oct 11 2019 13:34:24   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_stats.pkb-arc   1.3   Oct 22 2019 16:14:58   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_stats.pkb  $
-    --       Date into PVCS   : $Date:   Oct 11 2019 13:34:24  $
-    --       Date fetched Out : $Modtime:   Oct 11 2019 13:30:20  $
-    --       PVCS Version     : $Revision:   1.2  $
+    --       Date into PVCS   : $Date:   Oct 22 2019 16:14:58  $
+    --       Date fetched Out : $Modtime:   Oct 22 2019 16:13:52  $
+    --       PVCS Version     : $Revision:   1.3  $
     --
     --   Author : R.A. Coupe
     --
@@ -18,7 +18,7 @@ AS
     -- The main purpose of this package is to handle all the procedures for handling the accuracy
     -- of loaded network against the existing network.
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.2  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.3  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'SDL_STATS';
 
@@ -736,5 +736,62 @@ SELECT load_node_id, existing_node_id, dist
            SET pct_match = NULL
          WHERE batch_id = p_batch_id;
     END;
+
+function get_relative_overlap ( p_swd_id in number, p_stop_value in number default NULL, p_rnd in NUMBER default 2 ) return sys_refcursor is
+retval sys_refcursor;
+l_match_tol number;
+l_sdo_tol number;
+--
+begin
+--
+begin
+select spa_match_tolerance, spa_tolerance
+into l_match_tol, l_sdo_tol
+from sdl_process_audit, sdl_wip_datums
+where swd_id = p_swd_id
+and  spa_sfs_id = batch_id
+and  spa_process = 'TOPO_GENERATION';
+exception
+   when no_data_found then 
+      l_match_tol := 5;
+      l_sdo_tol := 0.005;
+end;      
+--
+   open retval for SELECT swd_id,
+       sld_key,
+       pct_match,
+       t.ne_id,
+       ne_descr,
+       ne_pct
+  FROM (SELECT s.ne_id,
+               swd_id,
+               sld_key,
+               ROUND (pct_match, p_rnd)    pct_match,
+               ROUND (
+                     SDO_GEOM.sdo_length (
+                         SDO_LRS.convert_to_std_geom (
+                             SDO_LRS.lrs_intersection (s.geoloc,
+                                                       d_buffer,
+                                                       l_sdo_tol)))
+                   / d_length
+                   * 100,
+                   p_rnd)                  ne_pct
+          FROM v_lb_nlt_geometry2  s,
+               (SELECT swd_id,
+                       sld_key,
+                       pct_match,
+                       SDO_GEOM.sdo_length (d.geom, l_sdo_tol)     d_length,
+                       SDO_GEOM.sdo_buffer (d.geom, 2)         d_buffer
+                  FROM sdl_wip_datums d
+                 WHERE swd_id = p_swd_id) b
+         WHERE sdo_anyinteract (s.geoloc, d_buffer) = 'TRUE') t,
+       nm_elements  e
+ WHERE e.ne_id = t.ne_id
+ and ne_pct > nvl(p_stop_value, -1)
+ order by ne_pct desc;
+--
+return retval;
+end;
+ 
 END sdl_stats;
 /
