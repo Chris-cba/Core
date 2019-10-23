@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm_sdo
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm_sdo.pkb-arc   1.21   Aug 30 2019 12:34:32   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm_sdo.pkb-arc   1.22   Oct 23 2019 12:26:48   Rob.Coupe  $
     --       Module Name      : $Workfile:   nm_sdo.pkb  $
-    --       Date into PVCS   : $Date:   Aug 30 2019 12:34:32  $
-    --       Date fetched Out : $Modtime:   Aug 30 2019 12:32:42  $
-    --       PVCS Version     : $Revision:   1.21  $
+    --       Date into PVCS   : $Date:   Oct 23 2019 12:26:48  $
+    --       Date fetched Out : $Modtime:   Oct 23 2019 12:23:42  $
+    --       PVCS Version     : $Revision:   1.22  $
     --
     --   Author : R.A. Coupe
     --
@@ -18,7 +18,7 @@ AS
     -- The main purpose of this package is to replicate the functions inside the SDO_LRS package as
     -- supplied under the MDSYS schema and licensed under the Oracle Spatial license on EE.
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.21  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.22  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'NM_SDO';
 
@@ -2136,6 +2136,8 @@ AS
         IF retval.sdo_gtype = 3002
         THEN
             retval.sdo_gtype := 3302;
+        ELSIF retval.sdo_gtype = 3006 then
+            retval.sdo_gtype := 3306;
         END IF;
 
         RETURN retval;
