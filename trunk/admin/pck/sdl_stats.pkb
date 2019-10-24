@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY sdl_stats
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_stats.pkb-arc   1.3   Oct 22 2019 16:14:58   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_stats.pkb-arc   1.4   Oct 24 2019 09:40:22   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_stats.pkb  $
-    --       Date into PVCS   : $Date:   Oct 22 2019 16:14:58  $
-    --       Date fetched Out : $Modtime:   Oct 22 2019 16:13:52  $
-    --       PVCS Version     : $Revision:   1.3  $
+    --       Date into PVCS   : $Date:   Oct 24 2019 09:40:22  $
+    --       Date fetched Out : $Modtime:   Oct 24 2019 09:39:22  $
+    --       PVCS Version     : $Revision:   1.4  $
     --
     --   Author : R.A. Coupe
     --
@@ -18,7 +18,7 @@ AS
     -- The main purpose of this package is to handle all the procedures for handling the accuracy
     -- of loaded network against the existing network.
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.3  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.4  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'SDL_STATS';
 
@@ -212,9 +212,14 @@ AS
                 nm3ctx.set_context ('SDL_BUFFER', TO_CHAR (p_buffer));
                 nm3ctx.set_context ('SDL_TOLERANCE', TO_CHAR (p_tolerance));
 
-                SELECT pctage_accuracy
-                  INTO l_pct
-                  FROM v_sdl_datum_stats_working;
+                begin
+                   SELECT pctage_accuracy
+                     INTO l_pct
+                     FROM v_sdl_datum_stats_working;
+                exception
+                   when no_data_found then
+                      l_pct := 0;
+                end;
 
                 UPDATE sdl_wip_datums
                    SET pct_match = l_pct
