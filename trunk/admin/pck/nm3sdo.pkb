@@ -5,11 +5,11 @@ AS
     --
     ---   PVCS Identifiers :-
     --
-    --       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.101   Feb 20 2019 12:59:10   Rob.Coupe  $
+    --       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.102   Oct 31 2019 18:22:02   Rob.Coupe  $
     --       Module Name      : $Workfile:   nm3sdo.pkb  $
-    --       Date into PVCS   : $Date:   Feb 20 2019 12:59:10  $
-    --       Date fetched Out : $Modtime:   Feb 20 2019 12:57:10  $
-    --       PVCS Version     : $Revision:   2.101  $
+    --       Date into PVCS   : $Date:   Oct 31 2019 18:22:02  $
+    --       Date fetched Out : $Modtime:   Oct 31 2019 18:19:38  $
+    --       PVCS Version     : $Revision:   2.102  $
     --       Based on
     ------------------------------------------------------------------
     --   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
@@ -23,7 +23,7 @@ AS
     -- Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
     -----------------------------------------------------------------------------
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '"$Revision:   2.101  $"';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '"$Revision:   2.102  $"';
     g_package_name   CONSTANT VARCHAR2 (30) := 'NM3SDO';
     g_batch_size              INTEGER
         := NVL (TO_NUMBER (Hig.get_sysopt ('SDOBATSIZE')), 10);
@@ -4572,7 +4572,19 @@ AS
         ltype    NUMBER := Nm3sdo.get_type_from_gtype (p_geom.sdo_gtype);
         l_geom   SDO_GEOMETRY;
     BEGIN
-        l_geom := SDO_UTIL.EXTRACT (p_geom, 1);
+        l_geom := p_geom;
+        
+        if ltype in ( 5,6,7) then  -- gtype suggests it is a collection
+           if p_geom.sdo_point is null then
+             if get_no_parts(p_geom) > 3 then
+              l_geom := SDO_UTIL.EXTRACT (p_geom, 1);
+             
+           else
+              -- single part (i.e.sdo_elem_info has only 3 entries), so set the gtype appropriately.
+              l_geom.sdo_gtype := l_geom.sdo_gtype - 4;
+           end if; 
+           end if;
+        end if;
 
         IF ltype IN (1, 5)
         THEN                              -- a point - test how data is stored
