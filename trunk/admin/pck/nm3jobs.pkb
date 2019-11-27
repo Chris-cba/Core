@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3jobs AS
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3jobs.pkb-arc   3.14   Jun 19 2018 11:07:28   Chris.Baugh  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3jobs.pkb-arc   3.15   Nov 27 2019 16:12:30   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm3jobs.pkb  $
---       Date into PVCS   : $Date:   Jun 19 2018 11:07:28  $
---       Date fetched Out : $Modtime:   Feb 06 2018 10:48:30  $
---       PVCS Version     : $Revision:   3.14  $
+--       Date into PVCS   : $Date:   Nov 27 2019 16:12:30  $
+--       Date fetched Out : $Modtime:   Nov 20 2019 13:52:58  $
+--       PVCS Version     : $Revision:   3.15  $
 --
 --   NM3 DBMS_SCHEDULER wrapper
 --
@@ -23,7 +23,7 @@ CREATE OR REPLACE PACKAGE BODY nm3jobs AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid          CONSTANT VARCHAR2(2000) :='"$Revision:   3.14  $"';
+  g_body_sccsid          CONSTANT VARCHAR2(2000) :='"$Revision:   3.15  $"';
   g_package_name         CONSTANT VARCHAR2(30)   := 'nm3jobs';
   ex_resource_busy                EXCEPTION;
   g_default_comment               VARCHAR2(500)  := 'Created by nm3job ';
@@ -219,10 +219,31 @@ CREATE OR REPLACE PACKAGE BODY nm3jobs AS
   ex_scheduler_down EXCEPTION;
   PRAGMA EXCEPTION_INIT(ex_scheduler_down, -27492);
   --
+    lv_curr_process  NUMBER;
+    lv_curr_job      NUMBER;
+    --
   BEGIN
+    --
+    lv_curr_process := TO_NUMBER(Sys_Context('NM3SQL','HP_PROCESS_ID'));
+    lv_curr_job := TO_NUMBER(Sys_Context('NM3SQL','HPJR_RUN_SEQ'));
+    --
     dbms_scheduler.run_job
         ( job_name            => pi_job_name
         , use_current_session => pi_use_current_session);
+		
+	-- Due to a bug with the Job Scheduler execution, need to reset the CONTEXT
+	-- details
+    IF Sys_Context('NM3_SECURITY_CTX','USERNAME') IS NULL
+    THEN
+	  nm3security.Set_User;
+      nm3context.initialise_context;
+      nm3user.instantiate_user;
+      --
+      hig_process_api.set_current_process_id(pi_process_id => lv_curr_process);
+      hig_process_api.set_current_job_run_seq(pi_job_run_seq => lv_curr_job);
+      --
+	END IF;
+	
   EXCEPTION
   WHEN ex_scheduler_down THEN
   --
