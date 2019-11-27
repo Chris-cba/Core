@@ -1,14 +1,14 @@
-Create Or Replace Package Nm3_Java_Utils
+Create Or Replace Package Nm3_Java_Utils Authid Current_User
 As
 --<PACKAGE>
 -----------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3_java_utils.pkh-arc   1.0   Jul 09 2019 15:35:30   Steve.Cooper  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3_java_utils.pkh-arc   1.1   Nov 27 2019 11:28:00   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3_java_utils.pkh  $
---       Date into SCCS   : $Date:   Jul 09 2019 15:35:30  $
---       Date fetched Out : $Modtime:   Jun 21 2019 16:22:30  $
---       SCCS Version     : $Revision:   1.0  $
+--       Date into SCCS   : $Date:   Nov 27 2019 11:28:00  $
+--       Date fetched Out : $Modtime:   Nov 27 2019 11:26:24  $
+--       SCCS Version     : $Revision:   1.1  $
 --
 -----------------------------------------------------------------------------
 -- Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
@@ -21,7 +21,7 @@ As
   --constants
   -----------
   --g_sccsid is the SCCS ID for the package
-  G_Sccsid Constant Varchar2(2000) := '$Revision:   1.0  $';
+  G_Sccsid Constant Varchar2(2000) := '$Revision:   1.1  $';
   
 --</GLOBVAR>
 --
