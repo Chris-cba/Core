@@ -1,11 +1,11 @@
 /**
  *    PVCS Identifiers :-
  *
- *       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/Java/shapefile/CMDUtilities.java-arc   1.1   Jul 11 2019 12:45:50   Upendra.Hukeri  $
+ *       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/Java/shapefile/CMDUtilities.java-arc   1.2   Dec 02 2019 19:34:16   Upendra.Hukeri  $
  *       Module Name      : $Workfile:   CMDUtilities.java  $
- *       Date into SCCS   : $Date:   Jul 11 2019 12:45:50  $
- *       Date fetched Out : $Modtime:   Jul 11 2019 12:43:26  $
- *       SCCS Version     : $Revision:   1.1  $
+ *       Date into SCCS   : $Date:   Dec 02 2019 19:34:16  $
+ *       Date fetched Out : $Modtime:   Dec 02 2019 19:32:48  $
+ *       SCCS Version     : $Revision:   1.2  $
  *       Based on 
  *
  *
@@ -22,7 +22,7 @@
 import java.io.*;
 
 public class CMDUtilities { 
-	private static final String revision = "$Revision:   1.1  $"; 
+	private static final String revision = "$Revision:   1.2  $"; 
 	
 	public static String getVersion() { 
 		return revision; 
@@ -91,7 +91,7 @@ public class CMDUtilities {
 			return "SDE_UTIL_PATH Environment Variable not found"; 
 		}
 		
-		String command = "java -jar \"" + sdeUtilPath + "\\lib\\sde2shp.jar\""; 
+		String command = "java -jar \"" + sdeUtilPath + "\\sde2shp.jar\""; 
 		
 		if(host != null && host.length() > 0) {
 			command += " -h " + host; 
@@ -138,7 +138,7 @@ public class CMDUtilities {
 			return "SDE_UTIL_PATH Environment Variable not found"; 
 		}
 		
-		String command = "java -jar \"" + sdeUtilPath + "\\lib\\shp2sde.jar\""; 
+		String command = "java -jar \"" + sdeUtilPath + "\\shp2sde.jar\""; 
 		
 		if(host != null && host.length() > 0) {
 			command += " -h " + host; 
