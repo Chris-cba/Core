@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm_sdo
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm_sdo.pkb-arc   1.22   Oct 23 2019 12:26:48   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm_sdo.pkb-arc   1.23   Jan 09 2020 15:08:12   Rob.Coupe  $
     --       Module Name      : $Workfile:   nm_sdo.pkb  $
-    --       Date into PVCS   : $Date:   Oct 23 2019 12:26:48  $
-    --       Date fetched Out : $Modtime:   Oct 23 2019 12:23:42  $
-    --       PVCS Version     : $Revision:   1.22  $
+    --       Date into PVCS   : $Date:   Jan 09 2020 15:08:12  $
+    --       Date fetched Out : $Modtime:   Jan 09 2020 15:07:16  $
+    --       PVCS Version     : $Revision:   1.23  $
     --
     --   Author : R.A. Coupe
     --
@@ -18,7 +18,7 @@ AS
     -- The main purpose of this package is to replicate the functions inside the SDO_LRS package as
     -- supplied under the MDSYS schema and licensed under the Oracle Spatial license on EE.
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.22  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.23  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'NM_SDO';
 
@@ -2136,7 +2136,8 @@ AS
         IF retval.sdo_gtype = 3002
         THEN
             retval.sdo_gtype := 3302;
-        ELSIF retval.sdo_gtype = 3006 then
+        ELSIF retval.sdo_gtype = 3006
+        THEN
             retval.sdo_gtype := 3306;
         END IF;
 
@@ -2504,15 +2505,19 @@ AS
         l_geom   SDO_GEOMETRY;
     BEGIN
         --
-        if p_line.sdo_gtype in (2002, 2006) then
-           l_geom := NM_SDO.REDEFINE_GEOM (p_line, 0, SDO_GEOM.sdo_length (p_line));
-        elsif p_line.sdo_gtype NOT IN (3302, 3306)
+        IF p_line.sdo_gtype IN (2002, 2006)
+        THEN
+            l_geom :=
+                NM_SDO.REDEFINE_GEOM (p_line,
+                                      0,
+                                      SDO_GEOM.sdo_length (p_line));
+        ELSIF p_line.sdo_gtype NOT IN (3302, 3306)
         THEN
             raise_application_error (
                 -20010,
                 'The functions requires an LRS geometry');
-        else
-           l_geom := p_line;
+        ELSE
+            l_geom := p_line;
         END IF;
 
         WITH
@@ -2524,8 +2529,7 @@ AS
             AS
                 (SELECT t.geom, t.geom.sdo_point.z mval
                    FROM geom_data,
-                        TABLE (project_pt_m (l_geom, p_geom, 0.005))
-                        t)
+                        TABLE (project_pt_m (l_geom, p_geom, 0.005))  t)
         SELECT CAST (COLLECT (geom_id (ROWNUM,
                                        nm_sdo.clip (l_geom,
                                                     prior_mval,
@@ -2566,14 +2570,15 @@ AS
           FROM (  SELECT x0, y0, m0
                     FROM (SELECT t1.*,
                                  CASE
-                                     WHEN ABS (x0 - x1) < 0.005 and ABS (y0 - y1) < 0.005
+                                     WHEN     ABS (x0 - x1) < tolerance
+                                          AND ABS (y0 - y1) < tolerance
                                      THEN
                                          m1
-                                     WHEN ABS (x0 - x2) < 0.005 and ABS (y0 - y2) < 0.005
+                                     WHEN ABS (x0 - x1) < tolerance
                                      THEN
-                                         m2
+                                         m1 + (m2 - m1) * (y0 - y1) / (y2 - y1)
                                      ELSE
-                                         m1 + (m2 - m1) * sqrt(power((x0 - x1),2)+power((y0-y1),2)) / sqrt(power(x2 - x1, 2)+power(y2 - y1, 2))
+                                         m1 + (m2 - m1) * (x0 - x1) / (x2 - x1)
                                  END    m0
                             FROM (SELECT id,
                                          x1,
@@ -2625,6 +2630,5 @@ AS
 
         RETURN retval;
     END;
-    
 END;
 /
