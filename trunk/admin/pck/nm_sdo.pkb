@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm_sdo
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm_sdo.pkb-arc   1.23   Jan 09 2020 15:08:12   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm_sdo.pkb-arc   1.24   Jan 10 2020 22:37:26   Rob.Coupe  $
     --       Module Name      : $Workfile:   nm_sdo.pkb  $
-    --       Date into PVCS   : $Date:   Jan 09 2020 15:08:12  $
-    --       Date fetched Out : $Modtime:   Jan 09 2020 15:07:16  $
-    --       PVCS Version     : $Revision:   1.23  $
+    --       Date into PVCS   : $Date:   Jan 10 2020 22:37:26  $
+    --       Date fetched Out : $Modtime:   Jan 10 2020 22:35:58  $
+    --       PVCS Version     : $Revision:   1.24  $
     --
     --   Author : R.A. Coupe
     --
@@ -18,7 +18,7 @@ AS
     -- The main purpose of this package is to replicate the functions inside the SDO_LRS package as
     -- supplied under the MDSYS schema and licensed under the Oracle Spatial license on EE.
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.23  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.24  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'NM_SDO';
 
@@ -2558,22 +2558,31 @@ AS
     AS
         retval   geom_id_tab;
     BEGIN
-        SELECT CAST (
-                   COLLECT (
-                       geom_id (ROWNUM,
-                                sdo_geometry (3301,
-                                              p_geom.sdo_srid,
-                                              sdo_point_type (x0, y0, m0),
-                                              NULL,
-                                              NULL))) AS geom_id_tab)
-          INTO retval
-          FROM (  SELECT x0, y0, m0
+          --with rnd as ( select ABS (TRUNC (LOG (10, sdo_tol))) + SIGN (LOG (10, sdo_tol) * -1) -1 sdo_rnd,
+          --ABS (TRUNC (LOG (10, sdo_tol))) + SIGN (LOG (10, sdo_tol) * -1) -1 m_rnd
+          --  from dual )
+          SELECT CAST (
+                     COLLECT (
+                         geom_id (ROWNUM,
+                                  sdo_geometry (3301,
+                                                p_geom.sdo_srid,
+                                                sdo_point_type (x0, y0, m0),
+                                                NULL,
+                                                NULL))) AS geom_id_tab)
+            INTO retval
+            FROM (SELECT x0, y0, m0
+                    --         from ( select round(x0, sdo_rnd) x0, round(y0, sdo_rnd) y0, round(m0,m_rnd) m0
+                    --         from ( select x0, y0, m0
                     FROM (SELECT t1.*,
                                  CASE
                                      WHEN     ABS (x0 - x1) < tolerance
                                           AND ABS (y0 - y1) < tolerance
                                      THEN
                                          m1
+                                     WHEN     ABS (x0 - x2) < tolerance
+                                          AND ABS (y0 - y2) < tolerance
+                                     THEN
+                                         m2
                                      WHEN ABS (x0 - x1) < tolerance
                                      THEN
                                          m1 + (m2 - m1) * (y0 - y1) / (y2 - y1)
@@ -2625,8 +2634,8 @@ AS
                                           AND y0 BETWEEN   LEAST (y1, y2)
                                                          - tolerance
                                                      AND   GREATEST (y1, y2)
-                                                         + tolerance)) t1)
-                GROUP BY x0, y0, m0);
+                                                         + tolerance)) t1))
+        GROUP BY x0, y0, m0;
 
         RETURN retval;
     END;
