@@ -3,11 +3,11 @@ AS
     --<PACKAGE>
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_topo.pkh-arc   1.0   Sep 09 2019 11:47:00   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_topo.pkh-arc   1.1   Jan 10 2020 23:04:26   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_topo.pkh  $
-    --       Date into PVCS   : $Date:   Sep 09 2019 11:47:00  $
-    --       Date fetched Out : $Modtime:   Aug 29 2019 12:31:26  $
-    --       PVCS Version     : $Revision:   1.0  $
+    --       Date into PVCS   : $Date:   Jan 10 2020 23:04:26  $
+    --       Date fetched Out : $Modtime:   Jan 10 2020 23:02:26  $
+    --       PVCS Version     : $Revision:   1.1  $
     --
     --   Author : R.A. Coupe
     --
@@ -18,7 +18,7 @@ AS
     ----------------------------------------------------------------------------
     -- The main purpose of this package is for breaking the loaded data into individual connected segments.
     --</PACKAGE>
-    g_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.0  $';
+    g_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.1  $';
 
     -----------------------------------------------------------------------------
     --
@@ -46,12 +46,17 @@ AS
         p_gen_self_intsct      VARCHAR2 DEFAULT 'FALSE',
         p_gen_grade_sep        VARCHAR2 DEFAULT 'FALSE');
 
-PROCEDURE generate_wip_nw (
-        p_batch_id          IN NUMBER );
+    PROCEDURE generate_wip_nw (p_batch_id IN NUMBER);
 
     PROCEDURE generate_self_intersections (p_batch_id IN NUMBER);
 
 
     PROCEDURE generate_grade_separations;
+
+    FUNCTION multi_split (p_line    IN SDO_GEOMETRY,
+                          pt_tab    IN geom_id_tab,
+                          sdo_tol   IN NUMBER,
+                          m_tol     IN NUMBER)
+        RETURN topo_nw_geom_id_tab;
 END;
 /
