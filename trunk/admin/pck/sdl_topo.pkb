@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY sdl_topo
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_topo.pkb-arc   1.3   Jan 09 2020 15:18:56   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_topo.pkb-arc   1.4   Jan 10 2020 23:06:34   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_topo.pkb  $
-    --       Date into PVCS   : $Date:   Jan 09 2020 15:18:56  $
-    --       Date fetched Out : $Modtime:   Jan 09 2020 15:17:56  $
-    --       PVCS Version     : $Revision:   1.3  $
+    --       Date into PVCS   : $Date:   Jan 10 2020 23:06:34  $
+    --       Date fetched Out : $Modtime:   Jan 10 2020 23:06:04  $
+    --       PVCS Version     : $Revision:   1.4  $
     --
     --   Author : R.A. Coupe
     --
@@ -17,7 +17,7 @@ AS
     ----------------------------------------------------------------------------
     -- The main purpose of this package is for breaking the loaded data into individual connected segments.
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.3  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.4  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'SDL_TOPO';
 
@@ -28,7 +28,7 @@ AS
 
     PROCEDURE generate_wip_datums (p_batch_id IN NUMBER, p_sld_key IN NUMBER);
 
-
+    PROCEDURE cleanup (p_batch_id IN NUMBER, tolerance IN NUMBER);
 
     FUNCTION get_version
         RETURN VARCHAR2
@@ -224,9 +224,12 @@ AS
         COMMIT;
 
         --This looks after all possible nodes arising from the load data itself.
-        --But, in some cases, such as CTDOT, the loaded data may be local routes and the routes may intersect with other networks which
-        --share a common node type - such as state owned network or RTE. We need to generate the list of possible nodes arising from
-        --intersections of this type - but, if required, we should exclude grade separations
+        --But, in some cases, the loaded data may be local routes and the routes may intersect with other networks which
+        --share a common node type. Also the user may wish to from nodes where load data intersects with the very network that 
+        -- it may be replacing. In some cases, a load geometry may be a valid new road which forms several intersections
+        -- with existing network, in other cases, the load geometry may weave around the existing network which could produce 
+        -- a great many intersections when the load geometry is intended to replace the existing network. This is difficult to 
+        -- establish spatially. If required, we shoudl exclude the positions already designated as grade separations. 
 
         INSERT INTO sdl_wip_intsct_geom (batch_id,
                                          r_id,
@@ -259,7 +262,8 @@ AS
                                         'determine',
                                         SDO_LRS.convert_to_std_geom (
                                             b.geoloc),
-                                        0.005)    relation
+                                        0.005)    relation,
+                                        count(*) over (partition by sld_key) rc
                                FROM sdl_load_data       a,
                                     v_lb_nlt_geometry2  b, --xctdot_segm_sdo_table  b,
                                     TABLE (
@@ -272,11 +276,12 @@ AS
                                     AND sdo_relate (
                                             b.geoloc,
                                             a.sld_working_geometry,
-                                            'mask=OVERLAPBDYDISJOINT+TOUCH') =
+                                            'mask=OVERLAPBDYDISJOINT+OVERLAPBDYINTERSECT+TOUCH') =
                                         'TRUE')
                     SELECT i.*, ne_nt_type
                       FROM intsct i, nm_elements e
                      WHERE     e.ne_id = i.ne_id
+                     and rc < 5
                            AND NOT EXISTS
                                    (SELECT 1
                                       FROM SDL_WIP_GRADE_SEPARATIONS
@@ -398,7 +403,7 @@ AS
 
         COMMIT;
 
-        --Now build the relationships
+        --Now build the relationships - only include the point data
 
         INSERT INTO sdl_wip_pt_geom (batch_id,
                                      id,
@@ -956,7 +961,7 @@ AS
                          AND l1.sld_key = nu.sld_key
                 GROUP BY l1.sld_key) nnu,
                sdl_load_data                                         l,
-               TABLE (multi_split (sld_working_geometry, node_tab))  t
+               TABLE (multi_split (sld_working_geometry, node_tab, 0.0005, 0.000005))  t
          WHERE l.sld_key = nnu.sld_key AND l.sld_key = p_sld_key;
 
 
@@ -998,6 +1003,8 @@ AS
                    AND d.datum_id = t.id
                    AND d.sld_key = p_sld_key
                    AND d.batch_id = p_batch_id;
+
+        cleanup (p_batch_id, 5);
     --
     --            SELECT p_batch_id,
     --                   p_sld_key,
@@ -1016,81 +1023,79 @@ AS
     --             WHERE l.sld_key = nnu.sld_key AND l.sld_key = p_sld_key;
     END;
 
-    --    FUNCTION multi_split (p_line IN SDO_GEOMETRY, pt_tab IN geom_id_tab)
-    --        RETURN geom_id_tab
-    --    IS
-    --        retval    geom_id_tab;
-    --        l_geom    SDO_GEOMETRY;
-    --        n_ptr     ptr_array_type;
-    --        seg_ids   int_array_type;
-    --    BEGIN
-    --        --
-    --        IF p_line.sdo_gtype IN (2002, 2006)
-    --        THEN
-    --            l_geom :=
-    --                NM_SDO.REDEFINE_GEOM (p_line,
-    --                                      0,
-    --                                      SDO_GEOM.sdo_length (p_line));
-    --        ELSIF p_line.sdo_gtype NOT IN (3302, 3306)
-    --        THEN
-    --            raise_application_error (
-    --                -20010,
-    --                'The functions requires an LRS geometry');
-    --        ELSE
-    --            l_geom := p_line;
-    --        END IF;
+FUNCTION multi_split (p_line      IN SDO_GEOMETRY,
+                                        pt_tab      IN geom_id_tab,
+                                        sdo_tol   IN NUMBER,
+                                        m_tol in NUMBER)
+    RETURN topo_nw_geom_id_tab
+IS
+    retval    topo_nw_geom_id_tab;
+    l_geom    SDO_GEOMETRY;
+    n_ptr     ptr_array_type;
+    seg_ids   int_array_type;
+BEGIN
     --
-    --        WITH
-    --            geom_data
-    --            AS
-    --                (SELECT p.id                                          p_id,
-    --                        nm_sdo.project_pt (l_geom, p.geom, 0.005)     p_geom,
-    --                        l_geom
-    --                   FROM TABLE (pt_tab) p),
-    --            geom_proj
-    --            AS
-    --                (SELECT p_id,
-    --                        ROW_NUMBER () OVER (ORDER BY t.geom.sdo_point.z)
-    --                            seg_id,
-    --                        l_geom,
-    --                        t.geom,
-    --                        t.geom.sdo_point.z
-    --                            mval
-    --                   FROM geom_data,
-    --                        TABLE (project_pt_m (l_geom, p_geom, 0.005))  t)
-    --        --select * from geom_proj
-    --        --
-    --        SELECT CAST (COLLECT (ptr (prev_id, p_id)) AS ptr_array_type)
-    --                   n_ptr,
-    --               CAST (COLLECT (ROWNUM) AS int_array_type)
-    --                   seg_ids,
-    --               CAST (COLLECT (geom_id (ROWNUM,
-    --                                       nm_sdo.clip (l_geom,
-    --                                                    prior_mval,
-    --                                                    mval,
-    --                                                    0.005))) AS geom_id_tab)
-    --          INTO n_ptr, seg_ids, retval
-    --          FROM (  SELECT p_id,
-    --                         seg_id,
-    --                         LAG (p_id, 1) OVER (ORDER BY mval)
-    --                             prev_id,
-    --                         l_geom,
-    --                         NVL (LAG (mval, 1) OVER (ORDER BY mval),
-    --                              nm_sdo.geom_segment_start_measure (l_geom))
-    --                             prior_mval,
-    --                         mval,
-    --                         NVL (LEAD (mval, 1) OVER (ORDER BY mval),
-    --                              nm_sdo.geom_segment_end_measure (l_geom))
-    --                             next_mval
-    --                    FROM (SELECT p_id, seg_id, l_geom, mval FROM geom_proj)
-    --                ORDER BY mval)
-    --         WHERE prior_mval > 0 OR mval > 0;
+    IF p_line.sdo_gtype IN (2002, 2006)
+    THEN
+        l_geom :=
+            NM_SDO.REDEFINE_GEOM (p_line, 0, SDO_GEOM.sdo_length (p_line));
+    ELSIF p_line.sdo_gtype NOT IN (3302, 3306)
+    THEN
+        raise_application_error (-20010,
+                                 'The function requires an LRS geometry');
+    ELSE
+        l_geom := p_line;
+    END IF;
+
+    WITH
+        geom_data
+        AS
+            --                (SELECT p.id p_id, nm_sdo.project_pt(  l_geom, p.geom, 0.005) p_geom, l_geom
+            --                   FROM TABLE (pt_tab) p),
+            (SELECT p.id p_id, p.geom p_geom
+               FROM TABLE (pt_tab) p),
+        geom_proj
+        AS
+            (SELECT p_id,
+                    ROW_NUMBER () OVER (ORDER BY t.geom.sdo_point.z)
+                        seg_id,
+                    l_geom,
+                    t.geom,
+                    t.geom.sdo_point.z
+                        mval
+               FROM geom_data,
+                    TABLE (nm_sdo.project_pt_m (l_geom, p_geom, sdo_tol, m_tol)) t)
+    --select * from geom_proj
     --
-    --        g_node_ptr := n_ptr;
-    --        g_segs     := seg_ids;
-    --
-    --        RETURN retval;
-    --    END;
+    SELECT     --cast (collect( ptr(prev_id, p_id)) as ptr_array_type ) n_ptr,
+                        --cast (collect( rownum ) as int_array_type ) seg_ids,
+          CAST (COLLECT (topo_nw_geom_id (ROWNUM,
+                                          nm_sdo.clip (l_geom,
+                                                       prior_mval,
+                                                       mval,
+                                                       0.005),
+                                          prev_id,
+                                          p_id)) AS topo_nw_geom_id_tab)
+     INTO retval
+     FROM (  SELECT p_id,
+                    seg_id,
+                    LAG (p_id, 1) OVER (ORDER BY mval)
+                        prev_id,
+                    l_geom,
+                    NVL (LAG (mval, 1) OVER (ORDER BY mval),
+                         nm_sdo.geom_segment_start_measure (l_geom))
+                        prior_mval,
+                    mval,
+                    NVL (LEAD (mval, 1) OVER (ORDER BY mval),
+                         nm_sdo.geom_segment_end_measure (l_geom))
+                        next_mval
+               FROM (SELECT p_id, seg_id, l_geom, mval FROM geom_proj)
+           ORDER BY mval)
+    WHERE prior_mval > 0 OR mval > 0;
+
+
+    RETURN retval;
+END;
 
     PROCEDURE cleanup (p_batch_id IN NUMBER, tolerance IN NUMBER)
     IS
@@ -1130,8 +1135,7 @@ AS
 
         DELETE FROM sdl_wip_datums
               WHERE swd_id IN (SELECT COLUMN_VALUE FROM TABLE (l_swd_ids));
-
---      Possible to clean up the nodes that are not related to datums
+    --      Possible to clean up the nodes that are not related to datums
 
     END;
 END;
