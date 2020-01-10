@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm_sdo
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm_sdo.pkb-arc   1.24   Jan 10 2020 22:37:26   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm_sdo.pkb-arc   1.25   Jan 10 2020 22:57:40   Rob.Coupe  $
     --       Module Name      : $Workfile:   nm_sdo.pkb  $
-    --       Date into PVCS   : $Date:   Jan 10 2020 22:37:26  $
-    --       Date fetched Out : $Modtime:   Jan 10 2020 22:35:58  $
-    --       PVCS Version     : $Revision:   1.24  $
+    --       Date into PVCS   : $Date:   Jan 10 2020 22:57:40  $
+    --       Date fetched Out : $Modtime:   Jan 10 2020 22:56:08  $
+    --       PVCS Version     : $Revision:   1.25  $
     --
     --   Author : R.A. Coupe
     --
@@ -18,7 +18,7 @@ AS
     -- The main purpose of this package is to replicate the functions inside the SDO_LRS package as
     -- supplied under the MDSYS schema and licensed under the Oracle Spatial license on EE.
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.24  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.25  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'NM_SDO';
 
@@ -2498,144 +2498,117 @@ AS
     END;
 
 
-    FUNCTION multi_split (p_line IN SDO_GEOMETRY, pt_tab IN geom_id_tab)
-        RETURN geom_id_tab
-    IS
-        retval   geom_id_tab;
-        l_geom   SDO_GEOMETRY;
-    BEGIN
-        --
-        IF p_line.sdo_gtype IN (2002, 2006)
-        THEN
-            l_geom :=
-                NM_SDO.REDEFINE_GEOM (p_line,
-                                      0,
-                                      SDO_GEOM.sdo_length (p_line));
-        ELSIF p_line.sdo_gtype NOT IN (3302, 3306)
-        THEN
-            raise_application_error (
-                -20010,
-                'The functions requires an LRS geometry');
-        ELSE
-            l_geom := p_line;
-        END IF;
-
-        WITH
-            geom_data
-            AS
-                (SELECT p.geom p_geom, l_geom
-                   FROM TABLE (pt_tab) p),
-            geom_proj
-            AS
-                (SELECT t.geom, t.geom.sdo_point.z mval
-                   FROM geom_data,
-                        TABLE (project_pt_m (l_geom, p_geom, 0.005))  t)
-        SELECT CAST (COLLECT (geom_id (ROWNUM,
-                                       nm_sdo.clip (l_geom,
-                                                    prior_mval,
-                                                    mval,
-                                                    0.005))) AS geom_id_tab)
-          INTO retval
-          FROM (  SELECT l_geom,
-                         NVL (LAG (mval, 1) OVER (ORDER BY mval),
-                              nm_sdo.geom_segment_start_measure (l_geom))
-                             prior_mval,
-                         mval,
-                         NVL (LEAD (mval, 1) OVER (ORDER BY mval),
-                              nm_sdo.geom_segment_end_measure (l_geom))
-                             next_mval
-                    FROM (SELECT l_geom, mval FROM geom_proj)
-                ORDER BY mval)
-         WHERE prior_mval > 0 OR mval > 0;
-
-        RETURN retval;
-    END;
-
-    FUNCTION project_pt_m (p_geom      IN SDO_GEOMETRY,
-                           p_pt        IN SDO_GEOMETRY,
-                           tolerance   IN NUMBER)
+    FUNCTION project_pt_m (p_geom    IN SDO_GEOMETRY,
+                           p_pt      IN SDO_GEOMETRY,
+                           sdo_tol   IN NUMBER,
+                           m_tol     IN NUMBER)
         RETURN geom_id_tab
     AS
         retval   geom_id_tab;
     BEGIN
-          --with rnd as ( select ABS (TRUNC (LOG (10, sdo_tol))) + SIGN (LOG (10, sdo_tol) * -1) -1 sdo_rnd,
-          --ABS (TRUNC (LOG (10, sdo_tol))) + SIGN (LOG (10, sdo_tol) * -1) -1 m_rnd
-          --  from dual )
-          SELECT CAST (
-                     COLLECT (
-                         geom_id (ROWNUM,
-                                  sdo_geometry (3301,
-                                                p_geom.sdo_srid,
-                                                sdo_point_type (x0, y0, m0),
-                                                NULL,
-                                                NULL))) AS geom_id_tab)
-            INTO retval
-            FROM (SELECT x0, y0, m0
-                    --         from ( select round(x0, sdo_rnd) x0, round(y0, sdo_rnd) y0, round(m0,m_rnd) m0
-                    --         from ( select x0, y0, m0
-                    FROM (SELECT t1.*,
-                                 CASE
-                                     WHEN     ABS (x0 - x1) < tolerance
-                                          AND ABS (y0 - y1) < tolerance
-                                     THEN
-                                         m1
-                                     WHEN     ABS (x0 - x2) < tolerance
-                                          AND ABS (y0 - y2) < tolerance
-                                     THEN
-                                         m2
-                                     WHEN ABS (x0 - x1) < tolerance
-                                     THEN
-                                         m1 + (m2 - m1) * (y0 - y1) / (y2 - y1)
-                                     ELSE
-                                         m1 + (m2 - m1) * (x0 - x1) / (x2 - x1)
-                                 END    m0
-                            FROM (SELECT id,
-                                         x1,
-                                         y1,
-                                         m1,
-                                         x2,
-                                         y2,
-                                         m2,
-                                         x0,
-                                         y0
-                                    FROM (SELECT t.id,
-                                                 t.x
-                                                     x1,
-                                                 t.y
-                                                     y1,
-                                                 t.z
-                                                     m1,
-                                                 LEAD (t.x, 1)
-                                                     OVER (ORDER BY t.id)
-                                                     x2,
-                                                 LEAD (t.y, 1)
-                                                     OVER (ORDER BY t.id)
-                                                     y2,
-                                                 LEAD (t.z, 1)
-                                                     OVER (ORDER BY t.id)
-                                                     m2,
-                                                 p.x
-                                                     x0,
-                                                 p.y
-                                                     y0
-                                            FROM TABLE (
-                                                     SDO_UTIL.getvertices (
-                                                         p_geom)) t,
-                                                 TABLE (
-                                                     SDO_UTIL.getvertices (
-                                                         p_pt)) p) --where x2 is not null
-                                   WHERE --( abs(x1-x0) < 0.05 and abs(y1-y0) < 0.05 )
+        WITH
+            rnd
+            AS
+                (SELECT   ABS (TRUNC (LOG (10, sdo_tol)))
+                        + SIGN (LOG (10, sdo_tol) * -1)
+                        - 1    sdo_rnd,
+                          ABS (TRUNC (LOG (10, sdo_tol)))
+                        + SIGN (LOG (10, sdo_tol) * -1)
+                        - 1    m_rnd
+                   FROM DUAL)
+        SELECT CAST (
+                   COLLECT (
+                       geom_id (ROWNUM,
+                                sdo_geometry (3301,
+                                              p_geom.sdo_srid,
+                                              sdo_point_type (x0, y0, m0),
+                                              NULL,
+                                              NULL))) AS geom_id_tab)
+          INTO retval
+          FROM (  SELECT x0, y0, m0
+                    FROM (SELECT ROUND (x0, sdo_rnd)     x0,
+                                 ROUND (y0, sdo_rnd)     y0,
+                                 ROUND (m0, m_rnd)       m0
+                            --         from ( select x0, y0, m0
+                            FROM rnd,
+                                 (SELECT t1.*,
+                                         CASE
+                                             WHEN     ABS (x0 - x1) < sdo_tol
+                                                  AND ABS (y0 - y1) < sdo_tol
+                                             THEN
+                                                 m1
+                                             WHEN     ABS (x0 - x2) < sdo_tol
+                                                  AND ABS (y0 - y2) < sdo_tol
+                                             THEN
+                                                 m2
+                                             WHEN ABS (x0 - x1) < sdo_tol
+                                             THEN
+                                                   m1
+                                                 +   (m2 - m1)
+                                                   * (y0 - y1)
+                                                   / (y2 - y1)
+                                             ELSE
+                                                   m1
+                                                 +   (m2 - m1)
+                                                   * (x0 - x1)
+                                                   / (x2 - x1)
+                                         END    m0
+                                    FROM (SELECT id,
+                                                 x1,
+                                                 y1,
+                                                 m1,
+                                                 x2,
+                                                 y2,
+                                                 m2,
+                                                 x0,
+                                                 y0
+                                            FROM (SELECT t.id,
+                                                         t.x
+                                                             x1,
+                                                         t.y
+                                                             y1,
+                                                         t.z
+                                                             m1,
+                                                         LEAD (t.x, 1)
+                                                             OVER (
+                                                                 ORDER BY t.id)
+                                                             x2,
+                                                         LEAD (t.y, 1)
+                                                             OVER (
+                                                                 ORDER BY t.id)
+                                                             y2,
+                                                         LEAD (t.z, 1)
+                                                             OVER (
+                                                                 ORDER BY t.id)
+                                                             m2,
+                                                         p.x
+                                                             x0,
+                                                         p.y
+                                                             y0
+                                                    FROM TABLE (
+                                                             SDO_UTIL.getvertices (
+                                                                 p_geom)) t,
+                                                         TABLE (
+                                                             SDO_UTIL.getvertices (
+                                                                 p_pt)) p) --where x2 is not null
+                                           WHERE --( abs(x1-x0) < 0.05 and abs(y1-y0) < 0.05 )
                                                                           --or
-                                         (    x2 IS NOT NULL
-                                          AND x0 BETWEEN   LEAST (x1, x2)
-                                                         - tolerance
-                                                     AND   GREATEST (x1, x2)
-                                                         + tolerance
-                                          AND y0 BETWEEN   LEAST (y1, y2)
-                                                         - tolerance
-                                                     AND   GREATEST (y1, y2)
-                                                         + tolerance)) t1))
-        GROUP BY x0, y0, m0;
+                                                 (    x2 IS NOT NULL
+                                                  AND x0 BETWEEN   LEAST (x1,
+                                                                          x2)
+                                                                 - sdo_tol
+                                                             AND   GREATEST (
+                                                                       x1,
+                                                                       x2)
+                                                                 + sdo_tol
+                                                  AND y0 BETWEEN   LEAST (y1,
+                                                                          y2)
+                                                                 - sdo_tol
+                                                             AND   GREATEST (
+                                                                       y1,
+                                                                       y2)
+                                                                 + sdo_tol)) t1))
+                GROUP BY x0, y0, m0);
 
         RETURN retval;
     END;
