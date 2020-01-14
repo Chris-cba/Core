@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm_sdo
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm_sdo.pkb-arc   1.25   Jan 10 2020 22:57:40   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm_sdo.pkb-arc   1.26   Jan 14 2020 17:07:42   Rob.Coupe  $
     --       Module Name      : $Workfile:   nm_sdo.pkb  $
-    --       Date into PVCS   : $Date:   Jan 10 2020 22:57:40  $
-    --       Date fetched Out : $Modtime:   Jan 10 2020 22:56:08  $
-    --       PVCS Version     : $Revision:   1.25  $
+    --       Date into PVCS   : $Date:   Jan 14 2020 17:07:42  $
+    --       Date fetched Out : $Modtime:   Jan 14 2020 17:07:00  $
+    --       PVCS Version     : $Revision:   1.26  $
     --
     --   Author : R.A. Coupe
     --
@@ -18,7 +18,7 @@ AS
     -- The main purpose of this package is to replicate the functions inside the SDO_LRS package as
     -- supplied under the MDSYS schema and licensed under the Oracle Spatial license on EE.
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.25  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.26  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'NM_SDO';
 
@@ -2512,8 +2512,8 @@ AS
                 (SELECT   ABS (TRUNC (LOG (10, sdo_tol)))
                         + SIGN (LOG (10, sdo_tol) * -1)
                         - 1    sdo_rnd,
-                          ABS (TRUNC (LOG (10, sdo_tol)))
-                        + SIGN (LOG (10, sdo_tol) * -1)
+                          ABS (TRUNC (LOG (10, m_tol)))
+                        + SIGN (LOG (10, m_tol) * -1)
                         - 1    m_rnd
                    FROM DUAL)
         SELECT CAST (
