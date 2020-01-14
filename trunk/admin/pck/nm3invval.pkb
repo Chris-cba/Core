@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY nm3invval IS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3invval.pkb-arc   2.23   Apr 05 2019 15:48:48   Chris.Baugh  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3invval.pkb-arc   2.24   Jan 14 2020 14:12:12   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm3invval.pkb  $
---       Date into PVCS   : $Date:   Apr 05 2019 15:48:48  $
---       Date fetched Out : $Modtime:   Apr 05 2019 15:47:00  $
---       Version          : $Revision:   2.23  $
+--       Date into PVCS   : $Date:   Jan 14 2020 14:12:12  $
+--       Date fetched Out : $Modtime:   Jan 10 2020 09:07:32  $
+--       Version          : $Revision:   2.24  $
 --       Based on SCCS version : 1.30
 -------------------------------------------------------------------------
 --
@@ -19,7 +19,7 @@ CREATE OR REPLACE PACKAGE BODY nm3invval IS
 --   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.23  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.24  $"';
 --  g_body_sccsid is the SCCS ID for the package body
    g_package_name    CONSTANT  varchar2(30)   := 'nm3invval';
 --
@@ -937,7 +937,8 @@ BEGIN
    FETCH c4 INTO l_parent_start_date, l_parent_end_date, l_hier_start_date, l_hier_end_date;
    --nm_debug.debug('==> '||p_rec_nii.ne_id||'/'||l_parent_start_date||'/'||l_parent_end_date||'/'||l_hier_start_date||'/'||l_hier_end_date);
    while c4%found loop
-      IF l_parent_end_date IS NULL AND l_hier_end_date is NULL
+      IF (l_parent_end_date IS NULL AND l_hier_end_date is NULL)
+         OR (l_parent_end_date IS NULL AND p_rec_nii.end_date IS NULL)
        THEN
          NULL; -- Dont worry about it
       ELSIF NVL(p_rec_nii.end_date, TO_DATE('31122099', 'DDMMYYYY')) > NVL(l_parent_end_date, TO_DATE('31122099', 'DDMMYYYY'))
@@ -989,45 +990,49 @@ BEGIN
        --l_supplementary_info := l_supplementary_info||' - NM_INV_ITEMS_ALL (child)';
        --RAISE l_has_children;
            -- LOG 713421
+       IF p_rec_nii.end_date IS NOT NULL
+       THEN
+           -- LOG 713421
            FOR l_rec IN (SELECT  iig_item_id
                                 ,itg_mandatory
                                 ,itg_relation
-                         FROM    nm_inv_item_groupings_all iig
-                                ,nm_inv_items_all iit
-                                ,nm_inv_type_groupings_all itg
+                         FROM    nm_inv_item_groupings iig
+                                ,nm_inv_items iit
+                                ,nm_inv_type_groupings itg
                          WHERE   iig.iig_item_id       = iit.iit_ne_id
                          AND     iit.iit_inv_type      = itg.itg_inv_type
                          CONNECT By PRIOR iig_item_id  = iig_parent_id
                          START   WITH iig_parent_id    = p_rec_nii.ne_id
                         )
            LOOP
-		   --nm_debug.debug('==> sorting the children');
+
                IF  NVL(l_rec.itg_mandatory,'N')  = 'Y'
                THEN
-                   UPDATE nm_members_all
+                   UPDATE nm_members
                    SET    nm_end_date = p_rec_nii.end_date
                    WHERE  nm_ne_id_in = l_rec.iig_item_id
                    AND    nm_type     = 'I' ;
 
-                   UPDATE nm_inv_item_groupings_all
+                   UPDATE nm_inv_item_groupings
                    SET    iig_end_date = p_rec_nii.end_date
                    WHERE  iig_item_id  = l_rec.iig_item_id ;
 
-                   UPDATE nm_inv_items_all
+                   UPDATE nm_inv_items
                    SET    iit_end_date = p_rec_nii.end_date
                    WHERE  iit_ne_id    = l_rec.iig_item_id ;
                ELSIF NVL(l_rec.itg_mandatory,'N')  = 'N'
                THEN
+                   UPDATE nm_inv_item_groupings
 
-			   UPDATE nm_inv_item_groupings_all	
                    SET    iig_end_date = p_rec_nii.end_date
                    WHERE  iig_item_id  = l_rec.iig_item_id ;
                END IF ;
            END LOOP;
            -- LOG 713421
+       END IF ;
 
-		   ELSE
-       CLOSE cs_child_iig;
+   ELSE
+     CLOSE cs_child_iig;
    END IF;
    --Log 696122:Linesh:04-Feb-2009:End
 --
