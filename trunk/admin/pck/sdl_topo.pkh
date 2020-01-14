@@ -3,11 +3,11 @@ AS
     --<PACKAGE>
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_topo.pkh-arc   1.1   Jan 10 2020 23:04:26   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_topo.pkh-arc   1.2   Jan 14 2020 11:02:02   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_topo.pkh  $
-    --       Date into PVCS   : $Date:   Jan 10 2020 23:04:26  $
-    --       Date fetched Out : $Modtime:   Jan 10 2020 23:02:26  $
-    --       PVCS Version     : $Revision:   1.1  $
+    --       Date into PVCS   : $Date:   Jan 14 2020 11:02:02  $
+    --       Date fetched Out : $Modtime:   Jan 14 2020 11:01:38  $
+    --       PVCS Version     : $Revision:   1.2  $
     --
     --   Author : R.A. Coupe
     --
@@ -18,7 +18,7 @@ AS
     ----------------------------------------------------------------------------
     -- The main purpose of this package is for breaking the loaded data into individual connected segments.
     --</PACKAGE>
-    g_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.1  $';
+    g_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.2  $';
 
     -----------------------------------------------------------------------------
     --
@@ -58,5 +58,10 @@ AS
                           sdo_tol   IN NUMBER,
                           m_tol     IN NUMBER)
         RETURN topo_nw_geom_id_tab;
+
+    FUNCTION set_terminal_vertex (p_geom            IN SDO_GEOMETRY,
+                                  p_pt              IN SDO_GEOMETRY,
+                                  p_terminal_type   IN VARCHAR2)
+        RETURN SDO_GEOMETRY;
 END;
 /
