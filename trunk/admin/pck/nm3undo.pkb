@@ -4,11 +4,11 @@ IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3undo.pkb-arc   2.37   May 28 2019 11:30:56   Steve.Cooper  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3undo.pkb-arc   2.38   Jan 14 2020 14:13:24   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm3undo.pkb  $
---       Date into PVCS   : $Date:   May 28 2019 11:30:56  $
---       Date fetched Out : $Modtime:   May 28 2019 11:29:56  $
---       PVCS Version     : $Revision:   2.37  $
+--       Date into PVCS   : $Date:   Jan 14 2020 14:13:24  $
+--       Date fetched Out : $Modtime:   Jan 10 2020 09:13:48  $
+--       PVCS Version     : $Revision:   2.38  $
 --
 --   Author : ITurnbull
 --
@@ -19,7 +19,7 @@ IS
 -- Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '"$Revision:   2.37  $"';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '"$Revision:   2.38  $"';
 --  g_body_sccsid is the SCCS ID for the package body
    g_package_name   CONSTANT VARCHAR2 (2000) := 'nm3undo';
 --
@@ -2309,6 +2309,57 @@ END undo_scheme;
                 WHERE nm_ne_id_of = p_ne_id
                   AND nm_type = 'I'
 				  AND nm_end_date = v_close_date );
+--
+--
+-- Update inventory, ensuring hierarchical assets are unclosed in the correct order
+  DECLARE
+   --
+    -- check if this is a hierarchical asset
+    CURSOR c1 IS
+    SELECT DISTINCT iig_top_id
+      FROM NM_INV_ITEM_GROUPINGS_ALL
+     WHERE iig_item_id IN (SELECT nm_ne_id_in
+                             FROM NM_MEMBERS_ALL
+                            WHERE nm_ne_id_of = p_ne_id
+                              AND nm_type = 'I'
+	                          AND nm_end_date = v_close_date);
+   --
+    CURSOR c2 (pi_top_id   nm_inv_item_groupings_all.iig_top_id%TYPE) IS
+    SELECT iig_item_id
+      FROM NM_INV_ITEM_GROUPINGS_ALL
+     WHERE iig_end_date = v_close_date	
+     START WITH iig_parent_id = pi_top_id
+   CONNECT BY  iig_parent_id = PRIOR iig_item_id;
+    --
+    lv_top_id      nm_inv_item_groupings_all.iig_top_id%TYPE;
+    lv_row_found   BOOLEAN;
+    --
+  BEGIN
+     OPEN c1;
+     FETCH c1 INTO lv_top_id;
+     lv_row_found := c1%FOUND;
+     CLOSE c1;
+     --
+     UPDATE NM_INV_ITEMS_ALL
+       SET iit_end_date = NULL
+       WHERE iit_end_date = v_close_date
+       AND iit_ne_id IN ( SELECT nm_ne_id_in
+                          FROM NM_MEMBERS_ALL
+                         WHERE nm_ne_id_of = p_ne_id
+                           AND nm_type = 'I'
+	          			   AND nm_end_date = v_close_date );
+     IF lv_row_found
+     THEN
+       -- This is a hierarchical asset so unclose the item groupings
+       FOR l_row IN C2(lv_top_id) LOOP
+         UPDATE NM_INV_ITEM_GROUPINGS_ALL
+            SET iig_end_date = NULL
+          WHERE iig_item_id = l_row.iig_item_id
+            AND iig_end_date = v_close_date;
+       END LOOP;		  
+       --       
+     END IF;
+  END;
 ----
 ---- unclose inv_items locations closed on the day the element was closed
 ---- could cause problems if inv_items are closed on same day that
