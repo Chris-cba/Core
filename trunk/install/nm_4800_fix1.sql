@@ -1,14 +1,14 @@
 ----------------------------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm_4800_fix1.sql-arc   1.0   Dec 23 2019 10:42:56   Chris.Baugh  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm_4800_fix1.sql-arc   1.1   Jan 14 2020 15:44:48   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm_4800_fix1.sql  $ 
---       Date into PVCS   : $Date:   Dec 23 2019 10:42:56  $
---       Date fetched Out : $Modtime:   Dec 23 2019 10:25:00  $
---       Version     	  : $Revision:   1.0  $
+--       Date into PVCS   : $Date:   Jan 14 2020 15:44:48  $
+--       Date fetched Out : $Modtime:   Jan 14 2020 15:42:48  $
+--       Version     	  : $Revision:   1.1  $
 --
 ----------------------------------------------------------------------------------------------------
---   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2020 Bentley Systems Incorporated. All rights reserved.
 ----------------------------------------------------------------------------------------------------
 --
 SET ECHO OFF
@@ -143,6 +143,22 @@ SET TERM OFF
 --
 SET FEEDBACK ON
 start sdo_lrs.pkw
+SET FEEDBACK OFF
+
+SET TERM ON 
+PROMPT Creating Package Body nm3invval
+SET TERM OFF
+--
+SET FEEDBACK ON
+start nm3invval.pkw
+SET FEEDBACK OFF
+
+SET TERM ON 
+PROMPT Creating Package Body nm3undo
+SET TERM OFF
+--
+SET FEEDBACK ON
+start nm3undo.pkw
 SET FEEDBACK OFF
 
 --------------------------------------------------------------------------------
