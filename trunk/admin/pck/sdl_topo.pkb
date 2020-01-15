@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY sdl_topo
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_topo.pkb-arc   1.5   Jan 14 2020 10:59:36   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_topo.pkb-arc   1.6   Jan 15 2020 12:19:16   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_topo.pkb  $
-    --       Date into PVCS   : $Date:   Jan 14 2020 10:59:36  $
-    --       Date fetched Out : $Modtime:   Jan 14 2020 10:59:08  $
-    --       PVCS Version     : $Revision:   1.5  $
+    --       Date into PVCS   : $Date:   Jan 15 2020 12:19:16  $
+    --       Date fetched Out : $Modtime:   Jan 15 2020 12:17:58  $
+    --       PVCS Version     : $Revision:   1.6  $
     --
     --   Author : R.A. Coupe
     --
@@ -17,7 +17,7 @@ AS
     ----------------------------------------------------------------------------
     -- The main purpose of this package is for breaking the loaded data into individual connected segments.
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.5  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.6  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'SDL_TOPO';
 
@@ -558,6 +558,8 @@ AS
         LOOP
             generate_wip_datums (irec.batch_id, irec.sld_key);
         END LOOP;
+		
+        cleanup (p_batch_id, 5);
 
         COMMIT;
 
@@ -950,9 +952,11 @@ AS
                              COLLECT (
                                  geom_id (
                                      n.node_id,
-                                     nm_sdo.project_pt (sld_working_geometry,
-                                                        node_geom,
-                                                        0.005))) AS geom_id_tab)    node_tab
+                                     node_geom
+--                                     nm_sdo.project_pt (sld_working_geometry,
+--                                                        node_geom,
+--                                                        0.005)
+                                                        )) AS geom_id_tab)    node_tab
                     FROM sdl_wip_route_nodes nu,
                          sdl_wip_nodes      n,
                          sdl_load_data      l1
@@ -978,7 +982,7 @@ AS
                    t.geom
               FROM TABLE (l_topo_nw_tab) t
              WHERE    sn_id != en_id
-                   OR SDO_GEOM.sdo_length (geom, 'unit=FOOT') > 5;
+                   OR SDO_GEOM.sdo_length (geom, 0.005, 'unit=FOOT') > 5;
 
         COMMIT;
 
@@ -1009,23 +1013,6 @@ AS
                    AND d.sld_key = p_sld_key
                    AND d.batch_id = p_batch_id;
 
-        cleanup (p_batch_id, 5);
-    --
-    --            SELECT p_batch_id,
-    --                   p_sld_key,
-    --                   t.id,
-    --                   t.geom
-    --              FROM (  SELECT sld_key,
-    --                             CAST (
-    --                                 COLLECT (geom_id (ROWNUM, node_geom))
-    --                                     AS geom_id_tab)    node_tab
-    --                        FROM sdl_wip_route_nodes nu, sdl_wip_nodes n
-    --                       WHERE sld_key = p_sld_key AND nu.hashcode = n.hashcode
-    --                    GROUP BY sld_key) nnu,
-    --                   sdl_load_data l,
-    --                   TABLE (
-    --                       nm_sdo.multi_split (sld_working_geometry, node_tab)) t
-    --             WHERE l.sld_key = nnu.sld_key AND l.sld_key = p_sld_key;
     END;
 
     FUNCTION multi_split (p_line    IN SDO_GEOMETRY,
@@ -1085,7 +1072,7 @@ AS
                                                            mval,
                                                            0.005),
                                               prev_id,
-                                              p_id)) AS topo_nw_geom_id_tab)
+                                              p_id) order by seg_id) AS topo_nw_geom_id_tab)
          INTO retval
          FROM (  SELECT p_id,
                         seg_id,
@@ -1100,8 +1087,8 @@ AS
                              nm_sdo.geom_segment_end_measure (l_geom))
                             next_mval
                    FROM (SELECT p_id, seg_id, l_geom, mval FROM geom_proj)
-               ORDER BY mval)
-        WHERE prior_mval > 0 OR mval > 0;
+               ORDER BY mval) where prev_id is not null;
+--        WHERE prior_mval > 0 OR mval > 0;
 
 
         RETURN retval;
