@@ -13,11 +13,11 @@ BEQUEATH DEFINER
 AS
    SELECT --   PVCS Identifiers :-
                                                                             --
-          --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/views/v_sdl_disconnected_network.vw-arc   1.0   Jan 17 2020 10:10:08   Rob.Coupe  $
+          --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/views/v_sdl_disconnected_network.vw-arc   1.1   Jan 17 2020 10:38:12   Rob.Coupe  $
           --       Module Name      : $Workfile:   v_sdl_disconnected_network.vw  $
-          --       Date into PVCS   : $Date:   Jan 17 2020 10:10:08  $
-          --       Date fetched Out : $Modtime:   Jan 17 2020 10:09:14  $
-          --       PVCS Version     : $Revision:   1.0  $
+          --       Date into PVCS   : $Date:   Jan 17 2020 10:38:12  $
+          --       Date fetched Out : $Modtime:   Jan 17 2020 10:37:28  $
+          --       PVCS Version     : $Revision:   1.1  $
           --
           --   Author : R.A. Coupe
                                                                             --
@@ -70,6 +70,7 @@ AS
                      AND column_name = 'SLD_WORKING_GEOMETRY'
                      AND ROWNUM = 1)
     ORDER BY dist;
+/    
 
 comment on table V_SDL_DISCONNECTED_NETWORK is 'A view which provides a list of datums that are spatially disconected from the nodes that underpin them';
 
