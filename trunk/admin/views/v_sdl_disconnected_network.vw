@@ -12,12 +12,12 @@ CREATE OR REPLACE FORCE VIEW v_sdl_disconnected_network
 BEQUEATH DEFINER
 AS
    SELECT --   PVCS Identifiers :-
-                                                                            --
-          --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/views/v_sdl_disconnected_network.vw-arc   1.1   Jan 17 2020 10:38:12   Rob.Coupe  $
+          --
+          --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/views/v_sdl_disconnected_network.vw-arc   1.2   Jan 17 2020 11:21:14   Rob.Coupe  $
           --       Module Name      : $Workfile:   v_sdl_disconnected_network.vw  $
-          --       Date into PVCS   : $Date:   Jan 17 2020 10:38:12  $
-          --       Date fetched Out : $Modtime:   Jan 17 2020 10:37:28  $
-          --       PVCS Version     : $Revision:   1.1  $
+          --       Date into PVCS   : $Date:   Jan 17 2020 11:21:14  $
+          --       Date fetched Out : $Modtime:   Jan 17 2020 11:20:50  $
+          --       PVCS Version     : $Revision:   1.2  $
           --
           --   Author : R.A. Coupe
                                                                             --
@@ -27,7 +27,6 @@ AS
           -----------------------------------------------------------------------------
           -- Copyright (c) 2019 Bentley Systems Incorporated. All rights reserved.
           ----------------------------------------------------------------------------
-
              "BATCH_ID",
              "SWD_ID",
              "SLD_KEY",
