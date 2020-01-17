@@ -1,4 +1,4 @@
-CREATE OR REPLACE FORCE VIEW ATLAS.V_NM_NW_COLUMNS
+CREATE OR REPLACE FORCE VIEW V_NM_NW_COLUMNS
 (
     RN,
     NETWORK_TYPE,
@@ -18,11 +18,11 @@ CREATE OR REPLACE FORCE VIEW ATLAS.V_NM_NW_COLUMNS
 BEQUEATH DEFINER
 AS
     SELECT                                                                  --
-           --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/views/v_nm_nw_columns.vw-arc   1.3   Aug 29 2019 14:08:54   Rob.Coupe  $
+           --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/views/v_nm_nw_columns.vw-arc   1.4   Jan 17 2020 10:34:20   Rob.Coupe  $
            --       Module Name      : $Workfile:   v_nm_nw_columns.vw  $
-           --       Date into PVCS   : $Date:   Aug 29 2019 14:08:54  $
-           --       Date fetched Out : $Modtime:   Aug 29 2019 14:06:36  $
-           --       PVCS Version     : $Revision:   1.3  $
+           --       Date into PVCS   : $Date:   Jan 17 2020 10:34:20  $
+           --       Date fetched Out : $Modtime:   Jan 17 2020 10:34:02  $
+           --       PVCS Version     : $Revision:   1.4  $
                                                                             --
 --   Author : R.A. Coupe
                                                                             --
