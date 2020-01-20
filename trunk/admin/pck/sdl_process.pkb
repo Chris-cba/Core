@@ -3,11 +3,11 @@ AS
     --<PACKAGE>
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_process.pkb-arc   1.2   Oct 14 2019 14:49:12   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_process.pkb-arc   1.3   Jan 20 2020 16:10:48   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_process.pkb  $
-    --       Date into PVCS   : $Date:   Oct 14 2019 14:49:12  $
-    --       Date fetched Out : $Modtime:   Oct 14 2019 13:35:12  $
-    --       PVCS Version     : $Revision:   1.2  $
+    --       Date into PVCS   : $Date:   Jan 20 2020 16:10:48  $
+    --       Date fetched Out : $Modtime:   Jan 20 2020 16:10:02  $
+    --       PVCS Version     : $Revision:   1.3  $
     --
     --   Author : R.A. Coupe
     --
@@ -22,11 +22,18 @@ AS
 
     --</PACKAGE>
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.2  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.3  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'SDL_PROCESS';
 
-    PROCEDURE set_working_parameters;
+    --p_batch_id => p_batch_id, p_tol_load => 5, p_tol_nw => 5, p_tol_unit_id => 7, p_stop_count => 5);
+
+
+    PROCEDURE set_working_parameters (p_batch_id      IN     NUMBER,
+                                      p_tol_load         OUT NUMBER,
+                                      p_tol_nw           OUT NUMBER,
+                                      p_tol_unit_id      OUT NUMBER,
+                                      p_stop_count       OUT NUMBER);
 
     FUNCTION get_version
         RETURN VARCHAR2
@@ -44,70 +51,109 @@ AS
 
 
 
-    PROCEDURE load_validate (p_batch_id IN NUMBER, p_tolerance IN NUMBER default g_tolerance)
+    PROCEDURE load_validate (p_batch_id IN NUMBER)
     IS
+        l_tol_load      NUMBER;
+        l_tol_nw        NUMBER;
+        l_tol_unit_id   NUMBER;
+        l_stop_count    NUMBER;
     BEGIN
-        set_working_parameters;
-        SDL_AUDIT.LOG_PROCESS_START(p_batch_id, 'ADJUST', NULL, NULL, NULL);
-        sdl_validate.VALIDATE_ADJUSTMENT_RULES(p_batch_id);
+        set_working_parameters (p_batch_id,
+                                l_tol_load,
+                                l_tol_nw,
+                                l_tol_unit_id,
+                                l_stop_count);
+
+        SDL_AUDIT.LOG_PROCESS_START (p_batch_id,
+                                     'ADJUST',
+                                     NULL,
+                                     NULL,
+                                     NULL);
+        sdl_validate.VALIDATE_ADJUSTMENT_RULES (p_batch_id);
         SDL_AUDIT.LOG_PROCESS_END (p_batch_id, 'ADJUST');
---        
+        --
         SDL_AUDIT.LOG_PROCESS_START (p_batch_id,
                                      'LOAD_VALIDATION',
-                                     g_buffer,
-                                     g_match_tolerance,
-                                     p_tolerance);
+                                     l_tol_nw,
+                                     l_tol_nw,
+                                     g_sdo_tol);
         SDL_VALIDATE.VALIDATE_BATCH (p_batch_id);
         SDL_AUDIT.LOG_PROCESS_END (p_batch_id, 'LOAD_VALIDATION');
     END;
 
     --
-    PROCEDURE topo_generation (p_batch_id          IN NUMBER,
-                               p_match_tolerance   IN NUMBER,
-                               p_tolerance         IN NUMBER default g_tolerance)
+    PROCEDURE topo_generation (p_batch_id IN NUMBER)
     IS
+        l_tol_load      NUMBER;
+        l_tol_nw        NUMBER;
+        l_tol_unit_id   NUMBER;
+        l_stop_count    NUMBER;
     BEGIN
-        set_working_parameters;
-        SDL_AUDIT.LOG_PROCESS_START (
-            p_batch_id,
-            'TOPO_GENERATION',
-            NULL,
-            NVL (p_match_tolerance, g_match_tolerance),
-            NVL (p_tolerance, g_tolerance));
-        SDL_TOPO.generate_wip_topo_nw (p_batch_id => p_batch_id);
+        set_working_parameters (p_batch_id,
+                                l_tol_load,
+                                l_tol_nw,
+                                l_tol_unit_id,
+                                l_stop_count);
+        SDL_AUDIT.LOG_PROCESS_START (p_batch_id          => p_batch_id,
+                                     p_process           => 'TOPO_GENERATION',
+                                     p_buffer            => l_tol_nw,
+                                     p_match_tolerance   => l_tol_load,
+                                     p_tolerance         => g_sdo_tol);
+        SDL_TOPO.generate_wip_topo_nw (p_batch_id      => p_batch_id,
+                                       p_tol_load      => l_tol_load,
+                                       p_tol_nw        => l_tol_nw,
+                                       p_tol_unit_id   => l_tol_unit_id,
+                                       p_stop_count    => l_stop_count);
         SDL_AUDIT.LOG_PROCESS_END (p_batch_id, 'TOPO_GENERATION');
     END;
 
     --
-    PROCEDURE datum_validation (p_batch_id          IN NUMBER,
-                                p_buffer            IN NUMBER,
-                                p_match_tolerance   IN NUMBER,
-                                p_tolerance         IN NUMBER default g_tolerance)
+    PROCEDURE datum_validation (p_batch_id IN NUMBER)
     IS
+        l_tol_load      NUMBER;
+        l_tol_nw        NUMBER;
+        l_tol_unit_id   NUMBER;
+        l_stop_count    NUMBER;
     BEGIN
-        set_working_parameters;
-        SDL_AUDIT.LOG_PROCESS_START (p_batch_id,
-                                     'DATUM_VALIDATION',
-                                     p_buffer,
-                                     p_match_tolerance,
-                                     p_tolerance);
-        SDL_STATS.match_nodes (p_batch_id, p_match_tolerance, p_tolerance);
+        set_working_parameters (p_batch_id,
+                                l_tol_load,
+                                l_tol_nw,
+                                l_tol_unit_id,
+                                l_stop_count);
+        --
+        SDL_AUDIT.LOG_PROCESS_START (p_batch_id          => p_batch_id,
+                                     p_process           => 'DATUM_VALIDATION',
+                                     p_buffer            => l_tol_nw,
+                                     p_match_tolerance   => l_tol_load,
+                                     p_tolerance         => g_sdo_tol);
+        SDL_STATS.match_nodes (p_batch_id, l_tol_nw, g_sdo_tol);
         SDL_VALIDATE.validate_datums_in_batch (p_batch_id => p_batch_id);
         SDL_STATS.GENERATE_STATISTICS_ON_SWD (p_batch_id    => p_batch_id,
-                                              p_buffer      => p_buffer,
-                                              p_tolerance   => p_tolerance);
+                                              p_buffer      => l_tol_nw,
+                                              p_tolerance   => g_sdo_tol);
         SDL_AUDIT.LOG_PROCESS_END (p_batch_id, 'DATUM_VALIDATION');
     END;
 
     --
-    PROCEDURE analysis (p_batch_id    IN NUMBER,
-                        p_buffer      IN NUMBER default g_buffer,
-                        p_tolerance   IN NUMBER default g_tolerance,
-                        p_swd_id      IN NUMBER DEFAULT NULL)
+    PROCEDURE analysis (p_batch_id   IN NUMBER,
+                        p_swd_id     IN NUMBER DEFAULT NULL)
     IS
+        l_tol_load      NUMBER;
+        l_tol_nw        NUMBER;
+        l_tol_unit_id   NUMBER;
+        l_stop_count    NUMBER;
     BEGIN
-        set_working_parameters;
-        SDL_AUDIT.LOG_PROCESS_START (p_batch_id, 'ANALYSIS', p_buffer, g_match_tolerance, p_tolerance);
+        set_working_parameters (p_batch_id,
+                                l_tol_load,
+                                l_tol_nw,
+                                l_tol_unit_id,
+                                l_stop_count);
+        --
+        SDL_AUDIT.LOG_PROCESS_START (p_batch_id          => p_batch_id,
+                                     p_process           => 'ANALYSIS',
+                                     p_buffer            => l_tol_nw,
+                                     p_match_tolerance   => l_tol_load,
+                                     p_tolerance         => g_sdo_tol);
         NULL;                     -- further analysis such as pline-stats etc.
         SDL_AUDIT.LOG_PROCESS_END (p_batch_id, 'ANALYSIS');
     END;
@@ -115,9 +161,22 @@ AS
     --
     PROCEDURE transfer (p_batch_id IN NUMBER)
     IS
+        l_tol_load      NUMBER;
+        l_tol_nw        NUMBER;
+        l_tol_unit_id   NUMBER;
+        l_stop_count    NUMBER;
     BEGIN
-        set_working_parameters;
-        SDL_AUDIT.LOG_PROCESS_START (p_batch_id, 'TRANSFER', NULL, NULL, NULL);
+        set_working_parameters (p_batch_id,
+                                l_tol_load,
+                                l_tol_nw,
+                                l_tol_unit_id,
+                                l_stop_count);
+
+        SDL_AUDIT.LOG_PROCESS_START (p_batch_id,
+                                     'TRANSFER',
+                                     NULL,
+                                     NULL,
+                                     NULL);
         SDL_TRANSFER.TRANSFER_DATUMS (p_batch_id => p_batch_id);
         SDL_AUDIT.LOG_PROCESS_END (p_batch_id, 'TRANSFER');
     END;
@@ -126,21 +185,48 @@ AS
     PROCEDURE reject (p_batch_id IN NUMBER)
     IS
     BEGIN
-        SDL_AUDIT.LOG_PROCESS_START (p_batch_id, 'REJECT', NULL, NULL, NULL);
+        SDL_AUDIT.LOG_PROCESS_START (p_batch_id,
+                                     'REJECT',
+                                     NULL,
+                                     NULL,
+                                     NULL);
         NULL;                                             -- set reject status
         SDL_AUDIT.LOG_PROCESS_END (p_batch_id, 'REJECT');
     END;
 
     --
-    PROCEDURE set_working_parameters
+    PROCEDURE set_working_parameters (p_batch_id      IN     NUMBER,
+                                      p_tol_load         OUT NUMBER,
+                                      p_tol_nw           OUT NUMBER,
+                                      p_tol_unit_id      OUT NUMBER,
+                                      p_stop_count       OUT NUMBER)
     IS
     BEGIN
-        g_buffer := 2;
-        g_tolerance := 0.005;
-        g_match_tolerance := 5;
+        SELECT sp_tol_load_search,
+               sp_tol_nw_search,
+               sp_tol_search_unit,
+               sp_stop_count
+          INTO p_tol_load,
+               p_tol_nw,
+               p_tol_unit_id,
+               p_stop_count
+          FROM sdl_profiles, sdl_file_submissions
+         WHERE sfs_id = p_batch_id AND sfs_sp_id = sp_id;
     END;
 --main segment to instantiate the default parameters
+
 BEGIN
-    set_working_parameters;
+    DECLARE
+        l_diminfo   sdo_dim_array;
+    BEGIN
+        SELECT m.sdo_diminfo
+          INTO l_diminfo
+          FROM mdsys.sdo_geom_metadata_table m
+         WHERE     sdo_owner = SYS_CONTEXT ('NM3CORE', 'APPLICATION_OWNER')
+               AND sdo_table_name = 'SDL_LOAD_DATA'
+               AND sdo_column_name = 'SLD_WORKING_GEOMETRY';
+
+        g_sdo_tol := l_diminfo (1).sdo_tolerance;
+    END;
 END;
 /
