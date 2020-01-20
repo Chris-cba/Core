@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY sdl_validate
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_validate.pkb-arc   1.8   Oct 22 2019 11:10:36   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_validate.pkb-arc   1.9   Jan 20 2020 11:05:06   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_validate.pkb  $
-    --       Date into PVCS   : $Date:   Oct 22 2019 11:10:36  $
-    --       Date fetched Out : $Modtime:   Oct 22 2019 11:09:46  $
-    --       PVCS Version     : $Revision:   1.8  $
+    --       Date into PVCS   : $Date:   Jan 20 2020 11:05:06  $
+    --       Date fetched Out : $Modtime:   Jan 20 2020 11:04:26  $
+    --       PVCS Version     : $Revision:   1.9  $
     --
     --   Author : R.A. Coupe
     --
@@ -20,7 +20,7 @@ AS
     -- FK based checks
     -- format checks
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.8  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.9  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'SDL_VALIDATE';
 
@@ -88,8 +88,8 @@ AS
                 || ','
                 || 'sld_adjustment_rule_applied = '
                 || '''Y'''
-               -- || 'sld_status = '
-               -- || '''ADJUSTED'''
+                -- || 'sld_status = '
+                -- || '''ADJUSTED'''
                 || ' WHERE sld_key IN (SELECT saaa.saaa_sld_key FROM sdl_attribute_adjustment_audit saaa WHERE saaa.saaa_sfs_id = '
                 || p_batch_id
                 || ' AND saaa.saaa_sam_id = '
@@ -108,13 +108,22 @@ AS
     IS
         meta_row        V_SDL_PROFILE_NW_TYPES%ROWTYPE;
         l_unit_factor   NUMBER;
+        l_round         NUMBER;
+        l_tol           NUMBER;
     BEGIN
         SELECT m.*
           INTO meta_row
           FROM V_SDL_PROFILE_NW_TYPES m, sdl_file_submissions
          WHERE sfs_id = p_batch_id AND sp_id = sfs_sp_id;
 
+        nm_debug.delete_debug(true);
+        nm_debug.debug_on;
+        nm_debug.debug( 'Group unit = '||meta_row.PROFILE_GROUP_UNIT_ID||' and datum unit = '|| meta_row.DATUM_UNIT_ID );   
         --
+        l_tol := nm3unit.get_tol_from_unit_mask (nvl(meta_row.PROFILE_GROUP_UNIT_ID, meta_row.DATUM_UNIT_ID));
+        
+        l_round := NM3UNIT.GET_ROUNDING(l_tol);
+        
         SELECT conversion_factor
           INTO l_unit_factor
           FROM mdsys.sdo_dist_units
@@ -127,7 +136,7 @@ AS
 
         validate_mandatory_columns (p_batch_id);
 
-        set_working_geometry (p_batch_id, l_unit_factor);
+        set_working_geometry (p_batch_id, l_unit_factor, l_round);
 
         UPDATE sdl_load_data
            SET sld_status =
@@ -400,17 +409,54 @@ AS
                 NULL;
         END;
 
-        --
+		  
         IF l_dummy != 0
         THEN
             raise_application_error (
                 -20001,
                 'Mandatory columns are not catered for in the load file profile');
+        else
+        l_dummy := 0;
+            BEGIN
+                SELECT 1
+                  INTO l_dummy
+                  FROM dba_tab_columns,
+                       nm_type_columns,
+                       sdl_profiles,
+                       nm_linear_types
+                 WHERE     owner =
+                           SYS_CONTEXT ('NM3CORE', 'APPLICATION_OWNER')
+                       AND table_name = 'NM_ELEMENTS_ALL'
+                       AND sp_id = 1
+                       AND ntc_nt_type = nlt_nt_type
+                       AND nlt_id = sp_nlt_id
+                       AND ntc_column_name = column_name
+                       AND ntc_unique_seq IS NOT NULL
+                       AND NOT EXISTS
+                               (SELECT 1
+                                  FROM sdl_attribute_mapping
+                                 WHERE     sam_sp_id = 1
+                                       AND column_name = sam_ne_column_name)
+                       AND ROWNUM = 1;
+            EXCEPTION
+                WHEN NO_DATA_FOUND
+                THEN
+                    NULL;
+            END;
+        END IF;
+
+        --
+        IF l_dummy != 0
+        THEN
+            raise_application_error (
+                -20001,
+                'Columns that are used to construct the unique key are not present in the profile attribute list');
         END IF;
     END;
 
     PROCEDURE set_working_geometry (p_batch_id      IN NUMBER,
-                                    p_unit_factor   IN NUMBER)
+                                    p_unit_factor   IN NUMBER,
+                                    p_round         IN NUMBER)
     IS
         l_diminfo    sdo_dim_array;
         l_gtype      NUMBER;
@@ -452,7 +498,7 @@ AS
                        sdl_set_gtype (sld_load_geometry,
                                       l_gtype,
                                       NULL,
-                                      p_unit_factor),
+                                      p_unit_factor, p_round),
                        l_diminfo)
               FROM sdl_load_data
              WHERE     sld_sfs_id = p_batch_id
@@ -460,7 +506,7 @@ AS
                            sdl_set_gtype (sld_load_geometry,
                                           l_gtype,
                                           NULL,
-                                          p_unit_factor),
+                                          p_unit_factor, p_round),
                            l_diminfo) != 'TRUE';
 
         --
@@ -469,7 +515,8 @@ AS
                    sdl_set_gtype (sld_load_geometry,
                                   l_gtype,
                                   NULL,
-                                  p_unit_factor)
+                                  p_unit_factor,
+                                  p_round)
          WHERE     sld_sfs_id = p_batch_id
                AND NOT EXISTS
                        (SELECT 1
@@ -528,7 +575,8 @@ AS
     FUNCTION sdl_set_gtype (p_geom          IN SDO_GEOMETRY,
                             p_gtype         IN NUMBER,
                             p_length        IN NUMBER DEFAULT NULL,
-                            p_unit_factor   IN NUMBER)
+                            p_unit_factor   IN NUMBER,
+                            p_round         IN NUMBER)
         RETURN SDO_GEOMETRY
     IS
         retval    SDO_GEOMETRY := p_geom;
@@ -551,12 +599,12 @@ AS
                     SDO_LRS.convert_to_lrs_geom (
                         retval,
                         0,
-                        NVL (
+                        round(NVL (
                             p_length,
                               SDO_GEOM.sdo_length (retval,
                                                    0.005,
                                                    'unit=METER')
-                            / p_unit_factor));
+                            / p_unit_factor), p_round));
             END IF;
         END IF;
 
