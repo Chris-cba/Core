@@ -1,12 +1,13 @@
+/* Formatted on 17/01/2020 15:59:32 (QP5 v5.336) */
 CREATE OR REPLACE PACKAGE BODY sdl_topo
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_topo.pkb-arc   1.6   Jan 15 2020 12:19:16   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_topo.pkb-arc   1.7   Jan 20 2020 11:15:14   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_topo.pkb  $
-    --       Date into PVCS   : $Date:   Jan 15 2020 12:19:16  $
-    --       Date fetched Out : $Modtime:   Jan 15 2020 12:17:58  $
-    --       PVCS Version     : $Revision:   1.6  $
+    --       Date into PVCS   : $Date:   Jan 20 2020 11:15:14  $
+    --       Date fetched Out : $Modtime:   Jan 20 2020 11:14:20  $
+    --       PVCS Version     : $Revision:   1.7  $
     --
     --   Author : R.A. Coupe
     --
@@ -17,9 +18,19 @@ AS
     ----------------------------------------------------------------------------
     -- The main purpose of this package is for breaking the loaded data into individual connected segments.
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.6  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.7  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'SDL_TOPO';
+
+    g_sdo_tol                 NUMBER;
+    g_m_tol                   NUMBER;
+
+    g_unit_name               VARCHAR2 (20);
+
+    g_unit_string             VARCHAR2 (30);
+
+    PROCEDURE initiate_tolerances (p_batch_id      IN NUMBER,
+                                   p_tol_unit_id   IN NUMBER DEFAULT NULL);
 
     PROCEDURE delete_stats_for_batch (p_batch_id IN NUMBER);
 
@@ -44,14 +55,82 @@ AS
         RETURN g_body_sccsid;
     END get_body_version;
 
+    PROCEDURE initiate_tolerances (p_batch_id      IN NUMBER,
+                                   p_tol_unit_id   IN NUMBER)
+    IS
+        l_diminfo   sdo_dim_array;
+    /*
+    -- we need to instantiate a few tolerance related bits of data
+    -- firstly we need the sdo tolerance from the layer metadata
+    -- note that the standard layer based tolerances are from the layer itself and are assumed
+    -- to be in the correct units - i.e. those of the layer itself.
+    -- The network tolerance is derived from the profile and its related network type.
+    -- Other tolerances will be supplied in a specified unit ID for which the unit name must be available
+    -- for the operators such as within-distance. If no unit is specified it
+    -- will default to being used with no unit specifier so the value will be either
+    -- in the units of the layer (for projected systems) or in meters for geodetics
+    -- The unit name must match a valid SDO_DIST_UNIT.UNIT_NAME.
+
+    */
+    BEGIN
+        SELECT m.sdo_diminfo
+          INTO l_diminfo
+          FROM mdsys.sdo_geom_metadata_table m
+         WHERE     sdo_owner = SYS_CONTEXT ('NM3CORE', 'APPLICATION_OWNER')
+               AND sdo_table_name = 'SDL_LOAD_DATA'
+               AND sdo_column_name = 'SLD_WORKING_GEOMETRY';
+
+        g_sdo_tol := l_diminfo (1).sdo_tolerance;
+
+        SELECT nm3unit.get_tol_from_unit_mask (nlt_units)
+          INTO g_m_tol
+          FROM sdl_profiles,
+               sdl_file_submissions,
+               nm_linear_types,
+               nm_units
+         WHERE     nlt_id = sp_nlt_id
+               AND sfs_id = p_batch_id
+               AND sfs_sp_id = sp_id
+               AND nlt_units = un_unit_id;
+
+        IF p_tol_unit_id IS NOT NULL
+        THEN
+            BEGIN
+                SELECT unit_name
+                  INTO g_unit_name
+                  FROM sdo_dist_units, nm_units
+                 WHERE     un_unit_id = p_tol_unit_id
+                       AND unit_name = un_unit_name
+                       AND ROWNUM = 1;      --sdo dist unit name is non unique
+            EXCEPTION
+                WHEN NO_DATA_FOUND
+                THEN
+                    raise_application_error (
+                        -20001,
+                        'The unit name must match one that exists in the SDO_DIST_UNITS table');
+            END;
+
+            g_unit_string := 'UNIT = ' || g_unit_name;
+        ELSE
+            g_unit_name := NULL;
+            g_unit_string := NULL;
+        END IF;
+    END;
 
 
     PROCEDURE generate_wip_topo_nw (
         p_batch_id          IN NUMBER,
         p_gen_self_intsct      VARCHAR2 DEFAULT 'FALSE',
-        p_gen_grade_sep        VARCHAR2 DEFAULT 'FALSE')
+        p_gen_grade_sep        VARCHAR2 DEFAULT 'FALSE',
+        p_tol_load          IN NUMBER,
+        p_tol_nw            IN NUMBER,
+        p_tol_unit_id       IN NUMBER,
+        p_stop_count        IN NUMBER)
     AS
     BEGIN
+    
+        initiate_tolerances( p_batch_id, p_tol_unit_id);
+        
         delete_stats_for_batch (p_batch_id);
 
         COMMIT;
@@ -87,7 +166,7 @@ AS
                        SDO_LRS.convert_to_std_geom (a.sld_working_geometry),
                        'determine',
                        SDO_LRS.convert_to_std_geom (b.sld_working_geometry),
-                       0.005),
+                       g_sdo_tol),
                    'LOAD INTERSECTION'
               FROM sdl_load_data  a,
                    sdl_load_data  b,
@@ -95,7 +174,7 @@ AS
                        nm_sdo_geom.extract_id_geom (
                            SDO_GEOM.sdo_intersection (a.sld_working_geometry,
                                                       b.sld_working_geometry,
-                                                      0.005))) t
+                                                      g_sdo_tol))) t
              WHERE     a.sld_key != b.sld_key
                    AND a.sld_sfs_id = p_batch_id
                    AND b.sld_sfs_id = p_batch_id
@@ -193,7 +272,7 @@ AS
                                       FROM sdl_load_data
                                      WHERE sld_sfs_id = p_batch_id);
 
-            generate_self_intersections (p_batch_id);
+            generate_self_intersections (p_batch_id, 5, 7);
         END IF;
 
         --        IF p_gen_grade_sep = 'TRUE'
@@ -262,7 +341,7 @@ AS
                                         'determine',
                                         SDO_LRS.convert_to_std_geom (
                                             b.geoloc),
-                                        0.005)                               relation,
+                                        g_sdo_tol)                               relation,
                                     COUNT (*) OVER (PARTITION BY sld_key)    rc
                                FROM sdl_load_data       a,
                                     v_lb_nlt_geometry2  b, --xctdot_segm_sdo_table  b,
@@ -271,7 +350,7 @@ AS
                                             SDO_GEOM.sdo_intersection (
                                                 a.sld_working_geometry,
                                                 b.geoloc,
-                                                0.005))) t
+                                                g_sdo_tol))) t
                               WHERE     a.sld_sfs_id = p_batch_id
                                     AND sdo_relate (
                                             b.geoloc,
@@ -281,15 +360,20 @@ AS
                     SELECT i.*, ne_nt_type
                       FROM intsct i, nm_elements e
                      WHERE     e.ne_id = i.ne_id
-                           AND rc < 5
+                           AND rc < p_stop_count
                            AND NOT EXISTS
                                    (SELECT 1
                                       FROM SDL_WIP_GRADE_SEPARATIONS
-                                     WHERE sdo_within_distance (
+--                                     WHERE sdo_within_distance (
+--                                               sgs_geom,
+--                                               geom,
+--                                               'distance = '||to_char(p_tol_nw)||' unit = '||g_unit_name ) =
+--                                           'TRUE'));
+                                     WHERE sdo_nn (
                                                sgs_geom,
                                                geom,
-                                               'distance = 5 unit = FOOT') =
-                                           'TRUE'));
+                                               'distance = 10 unit = M', 1 ) =
+                                           'TRUE' and sdo_nn_distance(1) < p_tol_nw));
 
         COMMIT;
 
@@ -338,18 +422,23 @@ AS
                             (SELECT t.*,
                                     SDO_LRS.project_pt (geoloc,
                                                         t.terminal,
-                                                        0.005)             geom,
+                                                        g_sdo_tol)             geom,
                                     ne_id,
                                     SDO_GEOM.sdo_distance (geoloc,
                                                            t.terminal,
-                                                           0.005,
+                                                           g_sdo_tol,
                                                            'UNIT=FOOT')    dist
                                FROM terminals t, v_lb_nlt_geometry2
-                              WHERE sdo_within_distance (
+--                              WHERE sdo_within_distance (
+--                                        geoloc,
+--                                        t.terminal,
+--                                        'distance=10 unit=FOOT') =
+--                                    'TRUE'),
+                              WHERE sdo_nn (
                                         geoloc,
                                         t.terminal,
-                                        'distance=10 unit=FOOT') =
-                                    'TRUE'),
+                                        'distance=20 unit=M', 1) =
+                                    'TRUE' and sdo_nn_distance(1) < p_tol_load),
                         nodes
                         AS
                             (SELECT t.*,
@@ -357,14 +446,19 @@ AS
                                     npl_id,
                                     SDO_GEOM.sdo_distance (npl_location,
                                                            t.terminal,
-                                                           0.005,
+                                                           g_sdo_tol,
                                                            'UNIT=FOOT')    dist
                                FROM terminals t, nm_point_locations
-                              WHERE sdo_within_distance (
+--                              WHERE sdo_within_distance (
+--                                        npl_location,
+--                                        t.terminal,
+--                                        'distance=10 unit=FOOT') =
+--                                    'TRUE')
+                              WHERE sdo_nn (
                                         npl_location,
                                         t.terminal,
-                                        'distance=10 unit=FOOT') =
-                                    'TRUE')
+                                        'distance=20 unit=M', 1) =
+                                    'TRUE' and sdo_nn_distance(1) < p_tol_nw)
                     SELECT x.*, e.ne_nt_type
                       FROM intscts x, nm_elements e
                      WHERE     e.ne_id = x.ne_id
@@ -435,10 +529,14 @@ AS
                         FROM sdl_wip_pt_geom a, sdl_wip_pt_geom b
                        WHERE     a.batch_id + 0 = p_batch_id
                              AND b.batch_id + 0 = p_batch_id
-                             AND sdo_within_distance (a.GEOM,
+--                             AND sdo_within_distance (a.GEOM,
+--                                                      b.GEOM,
+--                                                      'distance=5 unit=FOOT') =
+--                                 'TRUE'
+                             AND sdo_nn (a.GEOM,
                                                       b.GEOM,
-                                                      'distance=5 unit=FOOT') =
-                                 'TRUE'
+                                                      'distance=20 unit=M', 1) =
+                                 'TRUE' and sdo_nn_distance(1) <= p_tol_load
                     GROUP BY a.id);
 
         COMMIT;
@@ -477,7 +575,7 @@ AS
                              sdo_aggr_centroid (
                                  sdoaggrtype (
                                      SDO_LRS.convert_to_std_geom (a.geom),
-                                     0.005))    node_geom,
+                                     g_sdo_tol))    node_geom,
                              hashcode
                         FROM sdl_wip_pt_geom a, grouped_hashes, TABLE (ia)
                        WHERE     a.id = COLUMN_VALUE
@@ -489,7 +587,7 @@ AS
                              sdo_aggr_centroid (
                                  sdoaggrtype (
                                      SDO_LRS.convert_to_std_geom (a.geom),
-                                     0.005))    node_geom,
+                                     g_sdo_tol))    node_geom,
                              hashcode
                         FROM sdl_wip_pt_geom a, grouped_hashes, TABLE (ia)
                        WHERE     a.id = COLUMN_VALUE
@@ -558,7 +656,7 @@ AS
         LOOP
             generate_wip_datums (irec.batch_id, irec.sld_key);
         END LOOP;
-		
+
         cleanup (p_batch_id, 5);
 
         COMMIT;
@@ -607,7 +705,11 @@ AS
         COMMIT;
     END;
 
-    PROCEDURE generate_wip_nw (p_batch_id IN NUMBER)
+    PROCEDURE generate_wip_nw (p_batch_id      IN NUMBER,
+                               p_tol_load      IN NUMBER,
+                               p_tol_nw        IN NUMBER,
+                               p_tol_unit_id   IN NUMBER,
+                               p_stop_count    IN NUMBER)
     AS
     --
     -- Similar to topo-nw build but it does not from intersection points, just uses the existing geometries, assumed to be datums.
@@ -691,10 +793,14 @@ AS
                         FROM sdl_wip_pt_geom a, sdl_wip_pt_geom b
                        WHERE     a.batch_id + 0 = p_batch_id
                              AND b.batch_id + 0 = p_batch_id
-                             AND sdo_within_distance (a.GEOM,
+--                             AND sdo_within_distance (a.GEOM,
+--                                                      b.GEOM,
+--                                                      'distance=5 unit=FOOT') =
+--                                 'TRUE'
+                             AND sdo_nn (a.GEOM,
                                                       b.GEOM,
-                                                      'distance=5 unit=FOOT') =
-                                 'TRUE'
+                                                      'distance=20 unit=M', 1) =
+                                 'TRUE' and sdo_nn_distance(1) < p_tol_load
                     GROUP BY a.id);
 
         COMMIT;
@@ -703,7 +809,7 @@ AS
               SELECT p_batch_id,
                      sdo_aggr_centroid (
                          sdoaggrtype (SDO_LRS.convert_to_std_geom (a.geom),
-                                      0.005))    node_geom,
+                                      g_sdo_tol))    node_geom,
                      hashcode
                 FROM sdl_wip_pt_geom a,
                      (WITH
@@ -777,10 +883,15 @@ AS
                    'S',
                    0
               FROM sdl_wip_datums d, sdl_wip_nodes n
-             WHERE     sdo_within_distance (
+--             WHERE     sdo_within_distance (
+--                           node_geom,
+--                           SDO_LRS.geom_segment_start_pt (geom),
+--                           'distance=0.5 unit=FOOT') =
+--                       'TRUE'
+             WHERE     sdo_nn (
                            node_geom,
                            SDO_LRS.geom_segment_start_pt (geom),
-                           'distance=0.5 unit=FOOT') =
+                           'distance=10 unit=M', 1) =
                        'TRUE'
                    AND d.batch_id = p_batch_id
                    AND n.batch_id = p_batch_id;
@@ -798,18 +909,25 @@ AS
                    'E',
                    SDO_LRS.GEOM_SEGMENT_END_MEASURE (geom)
               FROM sdl_wip_datums d, sdl_wip_nodes n
-             WHERE     sdo_within_distance (
+--             WHERE     sdo_within_distance (
+--                           node_geom,
+--                           SDO_LRS.geom_segment_end_pt (geom),
+--                           'distance=0.5 unit=FOOT') =
+--                       'TRUE'
+             WHERE     sdo_nn (
                            node_geom,
                            SDO_LRS.geom_segment_end_pt (geom),
-                           'distance=0.5 unit=FOOT') =
+                           'distance=10 unit=M', 1) =
                        'TRUE'
                    AND d.batch_id = p_batch_id
-                   AND n.batch_id = p_batch_id;
+                   AND n.batch_id = p_batch_id
+                   and sdo_nn_distance(1)<= 0.5;
 
         COMMIT;
     END;
 
-    PROCEDURE generate_grade_separations
+    PROCEDURE generate_grade_separations (p_tol_nw        IN NUMBER,
+                                          p_tol_unit_id   IN NUMBER)
     AS
     BEGIN
         DELETE FROM sdl_wip_grade_separations;
@@ -822,7 +940,7 @@ AS
                             b.ne_id                              ne_id2,
                             SDO_GEOM.sdo_intersection (a.geoloc,
                                                        b.geoloc,
-                                                       0.005)    geom
+                                                       g_sdo_tol)    geom
                        FROM V_LB_NLT_GEOMETRY2 a, V_LB_NLT_GEOMETRY2 b
                       WHERE     sdo_overlapbdydisjoint (a.geoloc, b.geoloc) =
                                 'TRUE'
@@ -881,7 +999,9 @@ AS
               WHERE batch_id = p_batch_id;
     END;
 
-    PROCEDURE generate_self_intersections (p_batch_id IN NUMBER)
+    PROCEDURE generate_self_intersections (p_batch_id      IN NUMBER,
+                                           p_tol_load      IN NUMBER,
+                                           p_tol_unit_id   IN NUMBER)
     IS
         l_locl_ids   geom_id_tab;
     BEGIN
@@ -913,12 +1033,12 @@ AS
                            id1,
                        p2.id
                            id2,
-                       SDO_GEOM.sdo_intersection (p1.geom, p2.geom, 0.005)
+                       SDO_GEOM.sdo_intersection (p1.geom, p2.geom, g_sdo_tol)
                            intsct_geom,
                        SDO_GEOM.relate (p1.geom,
                                         'determine',
                                         p2.geom,
-                                        0.005)
+                                        g_sdo_tol)
                            relation
                   FROM plines p1, plines p2
                  WHERE     sdo_relate (p1.geom, p2.geom, 'mask=anyinteract') =
@@ -948,15 +1068,10 @@ AS
                                              t.en_id)) AS topo_nw_geom_id_tab)
           INTO l_topo_nw_tab
           FROM (  SELECT l1.sld_key,
-                         CAST (
-                             COLLECT (
-                                 geom_id (
-                                     n.node_id,
-                                     node_geom
---                                     nm_sdo.project_pt (sld_working_geometry,
---                                                        node_geom,
---                                                        0.005)
-                                                        )) AS geom_id_tab)    node_tab
+                         CAST (COLLECT (geom_id (n.node_id, node_geom --                                     nm_sdo.project_pt (sld_working_geometry,
+          --                                                        node_geom,
+              --                                                        g_sdo_tol)
+                                               )) AS geom_id_tab)     node_tab
                     FROM sdl_wip_route_nodes nu,
                          sdl_wip_nodes      n,
                          sdl_load_data      l1
@@ -967,8 +1082,8 @@ AS
                sdl_load_data  l,
                TABLE (multi_split (sld_working_geometry,
                                    node_tab,
-                                   0.0005,
-                                   0.000005)) t
+                                   g_sdo_tol,
+                                   g_m_tol)) t
          WHERE l.sld_key = nnu.sld_key AND l.sld_key = p_sld_key;
 
 
@@ -982,7 +1097,7 @@ AS
                    t.geom
               FROM TABLE (l_topo_nw_tab) t
              WHERE    sn_id != en_id
-                   OR SDO_GEOM.sdo_length (geom, 0.005, 'unit=FOOT') > 5;
+                   OR SDO_GEOM.sdo_length (geom, g_sdo_tol, 'unit=FOOT') > 5;
 
         COMMIT;
 
@@ -1012,13 +1127,12 @@ AS
                    AND d.datum_id = t.id
                    AND d.sld_key = p_sld_key
                    AND d.batch_id = p_batch_id;
-
     END;
 
-    FUNCTION multi_split (p_line    IN SDO_GEOMETRY,
-                          pt_tab    IN geom_id_tab,
-                          sdo_tol   IN NUMBER,
-                          m_tol     IN NUMBER)
+    FUNCTION multi_split (p_line          IN SDO_GEOMETRY,
+                          pt_tab          IN geom_id_tab,
+                          p_sdo_tol       IN NUMBER,
+                          p_m_tol         IN NUMBER)
         RETURN topo_nw_geom_id_tab
     IS
         retval    topo_nw_geom_id_tab;
@@ -1026,6 +1140,9 @@ AS
         n_ptr     ptr_array_type;
         seg_ids   int_array_type;
     BEGIN
+    nm_debug.debug_on;
+    nm_debug.delete_debug(true);
+    nm_debug.debug('Tols = '||p_sdo_tol||' and '||p_m_tol );
         --
         IF p_line.sdo_gtype IN (2002, 2006)
         THEN
@@ -1059,20 +1176,25 @@ AS
                             mval
                    FROM geom_data,
                         TABLE (nm_sdo.project_pt_m (l_geom,
-                                                    p_geom,
-                                                    sdo_tol,
-                                                    m_tol)) t)
+                                             p_geom,
+                                             p_sdo_tol,
+                                             p_m_tol)) t)
         --select * from geom_proj
         --
         SELECT --cast (collect( ptr(prev_id, p_id)) as ptr_array_type ) n_ptr,
                         --cast (collect( rownum ) as int_array_type ) seg_ids,
               CAST (COLLECT (topo_nw_geom_id (ROWNUM,
-                                              nm_sdo.clip (l_geom,
+--                                              mdsys.sdo_lrs.clip_geom_segment (l_geom,
+--                                                           prior_mval,
+--                                                           mval,
+--                                                           p_sdo_tol),
+                                             nm_sdo.clip (l_geom,
                                                            prior_mval,
                                                            mval,
-                                                           0.005),
+                                                           p_sdo_tol),
                                               prev_id,
-                                              p_id) order by seg_id) AS topo_nw_geom_id_tab)
+                                              p_id)
+                             ORDER BY seg_id) AS topo_nw_geom_id_tab)
          INTO retval
          FROM (  SELECT p_id,
                         seg_id,
@@ -1087,8 +1209,10 @@ AS
                              nm_sdo.geom_segment_end_measure (l_geom))
                             next_mval
                    FROM (SELECT p_id, seg_id, l_geom, mval FROM geom_proj)
-               ORDER BY mval) where prev_id is not null;
---        WHERE prior_mval > 0 OR mval > 0;
+               ORDER BY mval)
+        WHERE prev_id IS NOT NULL;
+
+        --        WHERE prior_mval > 0 OR mval > 0;
 
 
         RETURN retval;
@@ -1123,7 +1247,7 @@ AS
                                                AND relation =
                                                    'OVERLAPBDYDISJOINT')
                                AND SDO_GEOM.sdo_length (d.geom,
-                                                        0.005,
+                                                        g_sdo_tol,
                                                         'unit=FOOT') <
                                    tolerance);
 
