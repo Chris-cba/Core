@@ -1,14 +1,13 @@
-/* Formatted on 10/10/2019 09:55:54 (QP5 v5.336) */
 CREATE OR REPLACE PACKAGE sdl_process
 AS
     --<PACKAGE>
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_process.pkh-arc   1.0   Oct 11 2019 15:15:30   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_process.pkh-arc   1.1   Jan 20 2020 16:13:08   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_process.pkh  $
-    --       Date into PVCS   : $Date:   Oct 11 2019 15:15:30  $
-    --       Date fetched Out : $Modtime:   Oct 10 2019 09:56:16  $
-    --       PVCS Version     : $Revision:   1.0  $
+    --       Date into PVCS   : $Date:   Jan 20 2020 16:13:08  $
+    --       Date fetched Out : $Modtime:   Jan 20 2020 16:12:32  $
+    --       PVCS Version     : $Revision:   1.1  $
     --
     --   Author : R.A. Coupe
     --
@@ -22,11 +21,9 @@ AS
     -- various SDL processes
 
     --</PACKAGE>
-    g_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.0  $';
+    g_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.1  $';
 
-    g_buffer            NUMBER := 2;
-    g_tolerance         NUMBER := 0.005;
-    g_match_tolerance   NUMBER := 5;
+    g_sdo_tol           NUMBER := 0.005;
 
     -----------------------------------------------------------------------------
     --
@@ -50,24 +47,15 @@ AS
 
     --</PROC>
 
-    PROCEDURE load_validate (p_batch_id    IN NUMBER,
-                             p_tolerance   IN NUMBER DEFAULT g_tolerance);
+    PROCEDURE load_validate (p_batch_id IN NUMBER);
 
-    PROCEDURE topo_generation (
-        p_batch_id          IN NUMBER,
-        p_match_tolerance   IN NUMBER DEFAULT g_match_tolerance,
-        p_tolerance         IN NUMBER DEFAULT g_tolerance);
 
-    PROCEDURE datum_validation (
-        p_batch_id          IN NUMBER,
-        p_buffer            IN NUMBER DEFAULT g_buffer,
-        p_match_tolerance   IN NUMBER DEFAULT g_match_tolerance,
-        p_tolerance         IN NUMBER DEFAULT g_tolerance);
+    PROCEDURE topo_generation (p_batch_id IN NUMBER);
 
-    PROCEDURE analysis (p_batch_id    IN NUMBER,
-                        p_buffer      IN NUMBER DEFAULT g_buffer,
-                        p_tolerance   IN NUMBER DEFAULT g_tolerance,
-                        p_swd_id      IN NUMBER DEFAULT NULL);
+    PROCEDURE datum_validation (p_batch_id IN NUMBER);
+
+    PROCEDURE analysis (p_batch_id   IN NUMBER,
+                        p_swd_id     IN NUMBER DEFAULT NULL);
 
     PROCEDURE transfer (p_batch_id IN NUMBER);
 
