@@ -1,0 +1,79 @@
+CREATE OR REPLACE PACKAGE sdl_topo
+AS
+    --<PACKAGE>
+    --   PVCS Identifiers :-
+    --
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_topo.pkh-arc   1.3   Jan 20 2020 11:12:40   Rob.Coupe  $
+    --       Module Name      : $Workfile:   sdl_topo.pkh  $
+    --       Date into PVCS   : $Date:   Jan 20 2020 11:12:40  $
+    --       Date fetched Out : $Modtime:   Jan 20 2020 11:12:16  $
+    --       PVCS Version     : $Revision:   1.3  $
+    --
+    --   Author : R.A. Coupe
+    --
+    --   Package for handling the generation of a toplogical network from the loaded data.
+    --
+    -----------------------------------------------------------------------------
+    -- Copyright (c) 2019 Bentley Systems Incorporated. All rights reserved.
+    ----------------------------------------------------------------------------
+    -- The main purpose of this package is for breaking the loaded data into individual connected segments.
+    --</PACKAGE>
+    g_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.3  $';
+
+    -----------------------------------------------------------------------------
+    --
+    --<PROC NAME="GET_VERSION">
+    --
+    -- This function returns the current PVCS version of the package
+
+    FUNCTION get_version
+        RETURN VARCHAR2;
+
+    --</PROC>
+
+    -----------------------------------------------------------------------------
+    --
+    --<PROC NAME="GET_BODY_VERSION">
+    --
+    -- This function returns the current PVCS version of the package body
+    FUNCTION get_body_version
+        RETURN VARCHAR2;
+
+    --</PROC>
+
+    PROCEDURE generate_wip_topo_nw (
+        p_batch_id          IN NUMBER,
+        p_gen_self_intsct   IN VARCHAR2 DEFAULT 'FALSE',
+        p_gen_grade_sep     IN VARCHAR2 DEFAULT 'FALSE',
+        p_tol_load          IN NUMBER,
+        p_tol_nw            IN NUMBER,
+        p_tol_unit_id       IN NUMBER,
+        p_stop_count        IN NUMBER);
+
+    PROCEDURE generate_wip_nw (p_batch_id      IN NUMBER,
+                               p_tol_load      IN NUMBER,
+                               p_tol_nw        IN NUMBER,
+                               p_tol_unit_id   IN NUMBER,
+                               p_stop_count    IN NUMBER);
+
+    PROCEDURE generate_self_intersections (p_batch_id      IN NUMBER,
+                                           p_tol_load      IN NUMBER,
+                                           p_tol_unit_id   IN NUMBER);
+
+
+    PROCEDURE generate_grade_separations (p_tol_nw        IN NUMBER,
+                                          p_tol_unit_id   IN NUMBER);
+
+    FUNCTION multi_split (p_line          IN SDO_GEOMETRY,
+                          pt_tab          IN geom_id_tab,
+                          p_sdo_tol       IN NUMBER,
+                          p_m_tol         IN NUMBER)
+													
+        RETURN topo_nw_geom_id_tab;
+
+    FUNCTION set_terminal_vertex (p_geom            IN SDO_GEOMETRY,
+                                  p_pt              IN SDO_GEOMETRY,
+                                  p_terminal_type   IN VARCHAR2)
+        RETURN SDO_GEOMETRY;
+END;
+/
