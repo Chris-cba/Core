@@ -1,11 +1,11 @@
 ----------------------------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm_4800_fix1.sql-arc   1.1   Jan 14 2020 15:44:48   Chris.Baugh  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm_4800_fix1.sql-arc   1.2   Jan 22 2020 15:15:28   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm_4800_fix1.sql  $ 
---       Date into PVCS   : $Date:   Jan 14 2020 15:44:48  $
---       Date fetched Out : $Modtime:   Jan 14 2020 15:42:48  $
---       Version     	  : $Revision:   1.1  $
+--       Date into PVCS   : $Date:   Jan 22 2020 15:15:28  $
+--       Date fetched Out : $Modtime:   Jan 22 2020 15:12:46  $
+--       Version     	  : $Revision:   1.2  $
 --
 ----------------------------------------------------------------------------------------------------
 --   Copyright (c) 2020 Bentley Systems Incorporated. All rights reserved.
@@ -71,14 +71,6 @@ WHENEVER SQLERROR CONTINUE
 --------------------------------------------------------------------------------
 --
 SET TERM ON 
-PROMPT Creating Package Header nm3inv
-SET TERM OFF
---
-SET FEEDBACK ON
-start nm3inv.pkh
-SET FEEDBACK OFF
-
-SET TERM ON 
 PROMPT Creating Package Header nm3_java_utils
 SET TERM OFF
 --
@@ -130,14 +122,6 @@ start nm3web.pkw
 SET FEEDBACK OFF
 
 SET TERM ON 
-PROMPT Creating Package Body nm0575
-SET TERM OFF
---
-SET FEEDBACK ON
-start nm0575.pkw
-SET FEEDBACK OFF
-
-SET TERM ON 
 PROMPT Creating Package Body sdo_lrs
 SET TERM OFF
 --
@@ -173,18 +157,6 @@ SET FEEDBACK ON
 start register_aggr_theme.prw
 SET FEEDBACK OFF
 
---------------------------------------------------------------------------------
--- Triggers
---------------------------------------------------------------------------------
---
-SET TERM ON 
-PROMPT Creating Triggers for nm_inv_items
-SET TERM OFF
---
-SET FEEDBACK ON
-start nm_inv_items.trg
-SET FEEDBACK OFF
-
 --
 --------------------------------------------------------------------------------
 -- Update hig_upgrades with fix ID
@@ -194,7 +166,7 @@ BEGIN
 	--
 	hig2.upgrade(p_product        => 'NET'
 				,p_upgrade_script => 'log_nm_4800_fix1.sql'
-				,p_remarks        => 'NET 4800 FIX 1 (Build 1)'
+				,p_remarks        => 'NET 4800 FIX 1 (Build 2)'
 				,p_to_version     => NULL
 				);
 	--
