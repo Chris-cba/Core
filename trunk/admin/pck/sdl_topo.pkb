@@ -1,13 +1,12 @@
-/* Formatted on 17/01/2020 15:59:32 (QP5 v5.336) */
 CREATE OR REPLACE PACKAGE BODY sdl_topo
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_topo.pkb-arc   1.7   Jan 20 2020 11:15:14   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_topo.pkb-arc   1.8   Jan 22 2020 14:11:28   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_topo.pkb  $
-    --       Date into PVCS   : $Date:   Jan 20 2020 11:15:14  $
-    --       Date fetched Out : $Modtime:   Jan 20 2020 11:14:20  $
-    --       PVCS Version     : $Revision:   1.7  $
+    --       Date into PVCS   : $Date:   Jan 22 2020 14:11:28  $
+    --       Date fetched Out : $Modtime:   Jan 22 2020 14:10:46  $
+    --       PVCS Version     : $Revision:   1.8  $
     --
     --   Author : R.A. Coupe
     --
@@ -18,7 +17,7 @@ AS
     ----------------------------------------------------------------------------
     -- The main purpose of this package is for breaking the loaded data into individual connected segments.
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.7  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.8  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'SDL_TOPO';
 
@@ -1280,9 +1279,9 @@ AS
                 BEGIN
                     UPDATE sdl_wip_datums
                        SET geom =
-                               set_terminal_vertex (geom,
+                               sdo_util.remove_duplicate_vertices(set_terminal_vertex (geom,
                                                     irec.node_geom,
-                                                    irec.node_type)
+                                                    irec.node_type), g_sdo_tol)
                      WHERE swd_id = irec.swd_id;
                 END;
             END LOOP;
