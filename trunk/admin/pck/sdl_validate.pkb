@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY sdl_validate
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_validate.pkb-arc   1.9   Jan 20 2020 11:05:06   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_validate.pkb-arc   1.10   Jan 22 2020 14:27:36   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_validate.pkb  $
-    --       Date into PVCS   : $Date:   Jan 20 2020 11:05:06  $
-    --       Date fetched Out : $Modtime:   Jan 20 2020 11:04:26  $
-    --       PVCS Version     : $Revision:   1.9  $
+    --       Date into PVCS   : $Date:   Jan 22 2020 14:27:36  $
+    --       Date fetched Out : $Modtime:   Jan 22 2020 14:26:58  $
+    --       PVCS Version     : $Revision:   1.10  $
     --
     --   Author : R.A. Coupe
     --
@@ -20,7 +20,7 @@ AS
     -- FK based checks
     -- format checks
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.9  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.10  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'SDL_VALIDATE';
 
@@ -116,18 +116,26 @@ AS
           FROM V_SDL_PROFILE_NW_TYPES m, sdl_file_submissions
          WHERE sfs_id = p_batch_id AND sp_id = sfs_sp_id;
 
-        nm_debug.delete_debug(true);
+        nm_debug.delete_debug (TRUE);
         nm_debug.debug_on;
-        nm_debug.debug( 'Group unit = '||meta_row.PROFILE_GROUP_UNIT_ID||' and datum unit = '|| meta_row.DATUM_UNIT_ID );   
+        nm_debug.debug (
+               'Group unit = '
+            || meta_row.PROFILE_GROUP_UNIT_ID
+            || ' and datum unit = '
+            || meta_row.DATUM_UNIT_ID);
         --
-        l_tol := nm3unit.get_tol_from_unit_mask (nvl(meta_row.PROFILE_GROUP_UNIT_ID, meta_row.DATUM_UNIT_ID));
-        
-        l_round := NM3UNIT.GET_ROUNDING(l_tol);
-        
+        l_tol :=
+            nm3unit.get_tol_from_unit_mask (
+                NVL (meta_row.PROFILE_GROUP_UNIT_ID, meta_row.DATUM_UNIT_ID));
+
+        l_round := NM3UNIT.GET_ROUNDING (l_tol);
+
         SELECT conversion_factor
           INTO l_unit_factor
           FROM mdsys.sdo_dist_units
          WHERE sdo_unit = meta_row.datum_unit_name;
+
+        --delete any existing data, this will include any datum validations
 
         DELETE FROM sdl_validation_results
               WHERE svr_sfs_id = p_batch_id;
@@ -135,6 +143,10 @@ AS
         validate_domain_columns (p_batch_id);
 
         validate_mandatory_columns (p_batch_id);
+
+        --The following procedure will try and make sense of the gtype of the geometry, set the type to a 3302/3306 and
+        --will register any spatial related problems in the geometry such as measures not being incremental and having
+        --duplicate vertices.
 
         set_working_geometry (p_batch_id, l_unit_factor, l_round);
 
@@ -409,14 +421,15 @@ AS
                 NULL;
         END;
 
-		  
+
         IF l_dummy != 0
         THEN
             raise_application_error (
                 -20001,
                 'Mandatory columns are not catered for in the load file profile');
-        else
-        l_dummy := 0;
+        ELSE
+            l_dummy := 0;
+
             BEGIN
                 SELECT 1
                   INTO l_dummy
@@ -462,6 +475,7 @@ AS
         l_gtype      NUMBER;
         l_unit_str   VARCHAR2 (30);
         meta_row     V_SDL_PROFILE_NW_TYPES%ROWTYPE;
+        l_sdo_tol    NUMBER;
     BEGIN
         SELECT m.*
           INTO meta_row
@@ -478,6 +492,8 @@ AS
           FROM user_sdo_geom_metadata
          WHERE     table_name = 'SDL_LOAD_DATA'
                AND column_name = 'SLD_WORKING_GEOMETRY';
+
+        l_sdo_tol := l_diminfo (1).sdo_tolerance;
 
         --
         l_gtype := guess_dim_and_gtype (p_batch_id);
@@ -498,7 +514,9 @@ AS
                        sdl_set_gtype (sld_load_geometry,
                                       l_gtype,
                                       NULL,
-                                      p_unit_factor, p_round),
+                                      p_unit_factor,
+                                      p_round,
+                                      l_sdo_tol),
                        l_diminfo)
               FROM sdl_load_data
              WHERE     sld_sfs_id = p_batch_id
@@ -506,7 +524,9 @@ AS
                            sdl_set_gtype (sld_load_geometry,
                                           l_gtype,
                                           NULL,
-                                          p_unit_factor, p_round),
+                                          p_unit_factor,
+                                          p_round,
+                                          l_sdo_tol),
                            l_diminfo) != 'TRUE';
 
         --
@@ -516,7 +536,8 @@ AS
                                   l_gtype,
                                   NULL,
                                   p_unit_factor,
-                                  p_round)
+                                  p_round,
+                                  l_sdo_tol)
          WHERE     sld_sfs_id = p_batch_id
                AND NOT EXISTS
                        (SELECT 1
@@ -576,7 +597,8 @@ AS
                             p_gtype         IN NUMBER,
                             p_length        IN NUMBER DEFAULT NULL,
                             p_unit_factor   IN NUMBER,
-                            p_round         IN NUMBER)
+                            p_round         IN NUMBER,
+                            p_sdo_tol       IN NUMBER)
         RETURN SDO_GEOMETRY
     IS
         retval    SDO_GEOMETRY := p_geom;
@@ -599,12 +621,14 @@ AS
                     SDO_LRS.convert_to_lrs_geom (
                         retval,
                         0,
-                        round(NVL (
-                            p_length,
-                              SDO_GEOM.sdo_length (retval,
-                                                   0.005,
-                                                   'unit=METER')
-                            / p_unit_factor), p_round));
+                        ROUND (
+                            NVL (
+                                p_length,
+                                  SDO_GEOM.sdo_length (retval,
+                                                       0.005,
+                                                       'unit=METER')
+                                / p_unit_factor),
+                            p_round));
             END IF;
         END IF;
 
@@ -629,6 +653,9 @@ AS
          WHERE table_name = 'SDL_WIP_DATUMS' AND column_name = 'GEOM';
 
         --
+        --Try and extract the first error for each geometry, there may be more than one, this could be an enhancement - or perhaps the client
+        --can display all error messages relating to the specific geometry from a simple cursor?
+        --
         INSERT INTO sdl_validation_results (svr_sfs_id,
                                             svr_validation_type,
                                             svr_sld_key,
@@ -641,13 +668,45 @@ AS
                    sld_key,
                    swd_id,
                    'GEOM',
-                   -99,
-                   SDO_GEOM.validate_geometry_with_context (geom, l_diminfo)
-              FROM sdl_wip_datums
-             WHERE     batch_id = p_batch_id
-                   AND SDO_GEOM.validate_geometry_with_context (geom,
-                                                                l_diminfo) !=
-                       'TRUE';
+                   ERROR_CODE,
+                   error_msg
+              FROM (  SELECT sld_key,
+                             swd_id,
+                             ERROR_CODE,
+                             error_msg
+                        FROM (SELECT sld_key,
+                                     swd_id,
+                                     FIRST_VALUE (ERROR_CODE)
+                                         OVER (PARTITION BY swd_id
+                                               ORDER BY swd_id)    ERROR_CODE,
+                                     FIRST_VALUE (error_msg)
+                                         OVER (PARTITION BY swd_id
+                                               ORDER BY swd_id)    error_msg
+                                FROM (SELECT sld_key,
+                                             swd_id,
+                                             TO_NUMBER (
+                                                 SUBSTR (
+                                                     status,
+                                                     1,
+                                                     INSTR (status, ' ', 1)))
+                                                 ERROR_CODE,
+                                             status
+                                                 error_msg
+                                        FROM (SELECT sld_key,
+                                                     swd_id,
+                                                     SDO_GEOM.validate_geometry_with_context (
+                                                         geom,
+                                                         l_diminfo)    status
+                                                FROM sdl_wip_datums
+                                               WHERE     batch_id = p_batch_id
+                                                     AND SDO_GEOM.validate_geometry_with_context (
+                                                             geom,
+                                                             l_diminfo) !=
+                                                         'TRUE')))
+                    GROUP BY sld_key,
+                             swd_id,
+                             ERROR_CODE,
+                             error_msg);
     --
     --        check_self_intersections (p_batch_id);
 
@@ -725,7 +784,6 @@ AS
         meta_row      V_SDL_PROFILE_NW_TYPES%ROWTYPE;
         l_view_name   VARCHAR2 (30);
     BEGIN
-
         DELETE FROM sdl_validation_results
               WHERE svr_sfs_id = p_batch_id AND svr_swd_id IS NOT NULL;
 
