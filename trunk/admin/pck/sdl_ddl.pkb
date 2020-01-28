@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY sdl_ddl
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_ddl.pkb-arc   1.20   Oct 22 2019 11:13:28   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_ddl.pkb-arc   1.21   Jan 28 2020 15:42:08   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_ddl.pkb  $
-    --       Date into PVCS   : $Date:   Oct 22 2019 11:13:28  $
-    --       Date fetched Out : $Modtime:   Oct 22 2019 11:12:48  $
-    --       PVCS Version     : $Revision:   1.20  $
+    --       Date into PVCS   : $Date:   Jan 28 2020 15:42:08  $
+    --       Date fetched Out : $Modtime:   Jan 28 2020 15:41:08  $
+    --       PVCS Version     : $Revision:   1.21  $
     --
     --   Author : R.A. Coupe
     --
@@ -19,7 +19,7 @@ AS
     -- The main purpose of this package is to provide DDL execution for creation of views and triggers
     -- to support the SDL.
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.20  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.21  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'SDL_DDL';
 
@@ -388,16 +388,17 @@ AS
          WHERE sp_id = p_profile_id AND sp_nlt_id = nlt_id;
 
         --
+
         p_view_sql :=
                'create or replace view V_SDL_'
             || l_profile_name
             || '_MATCHES'
-            || ' ( batch_id, record_id, ne_id, element_unique, load_unique ) '
+            || ' ( batch_id, record_id, sld_key, ne_id, element_unique, load_unique ) '
             || ' as '
-            || ' select batch_id, record_id, e.ne_id, e.ne_unique element_unique, l.ne_unique load_unique from ( '
+            || ' select batch_id, record_id, sld_key, e.ne_id, e.ne_unique element_unique, l.ne_unique load_unique from ( '
             || ' select '
             || l_load_hash_code
-            || ' hash_code, batch_id, record_id, ne_unique '
+            || ' hash_code, batch_id, record_id, sld_key, ne_unique '
             || ' from V_SDL_'
             || l_profile_name
             || '_NE l '
