@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY sdl_ddl
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_ddl.pkb-arc   1.21   Jan 28 2020 15:42:08   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_ddl.pkb-arc   1.22   Jan 30 2020 15:48:08   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_ddl.pkb  $
-    --       Date into PVCS   : $Date:   Jan 28 2020 15:42:08  $
-    --       Date fetched Out : $Modtime:   Jan 28 2020 15:41:08  $
-    --       PVCS Version     : $Revision:   1.21  $
+    --       Date into PVCS   : $Date:   Jan 30 2020 15:48:08  $
+    --       Date fetched Out : $Modtime:   Jan 30 2020 15:47:42  $
+    --       PVCS Version     : $Revision:   1.22  $
     --
     --   Author : R.A. Coupe
     --
@@ -19,7 +19,7 @@ AS
     -- The main purpose of this package is to provide DDL execution for creation of views and triggers
     -- to support the SDL.
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.21  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.22  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'SDL_DDL';
 
@@ -172,6 +172,7 @@ AS
                  || ' ( batch_id, record_id, sld_key, '
                  || LISTAGG (sam_ne_column_name, ',')
                         WITHIN GROUP (ORDER BY sam_id)
+                 || ', status '
                  || ', geom '
                  || ' ) as select sld_sfs_id, sld_id, sld_key, '
                  || LISTAGG (
@@ -196,6 +197,7 @@ AS
                         END,
                         ',')
                     WITHIN GROUP (ORDER BY sam_id)
+                 || ', sld_status '
                  || ', sld_working_geometry '
                  || ' FROM sdl_load_data '
                  || ' WHERE sld_sfs_id IN (SELECT sfs_id
