@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY sdl_transfer
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_transfer.pkb-arc   1.6   Feb 04 2020 23:39:02   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_transfer.pkb-arc   1.7   Feb 05 2020 00:32:48   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_transfer.pkb  $
-    --       Date into PVCS   : $Date:   Feb 04 2020 23:39:02  $
-    --       Date fetched Out : $Modtime:   Feb 04 2020 23:36:06  $
-    --       PVCS Version     : $Revision:   1.6  $
+    --       Date into PVCS   : $Date:   Feb 05 2020 00:32:48  $
+    --       Date fetched Out : $Modtime:   Feb 05 2020 00:32:10  $
+    --       PVCS Version     : $Revision:   1.7  $
     --
     --   Author : R.A. Coupe
     --
@@ -19,7 +19,7 @@ AS
     -- The main purpose of this package is to handle the transfer of data from the SDL repository
     -- into the main database
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.6  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.7  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'SDL_DDL';
 
@@ -293,9 +293,9 @@ AS
           FROM sdl_datum_attribute_mapping
          WHERE sdam_profile_id = l_sp_id;
 
-                INSERT INTO ne_id_sav
-                    SELECT t.ptr_value, t.ptr_id
-                      FROM TABLE (ne_ids) t;
+--               INSERT INTO ne_id_sav
+--                    SELECT t.ptr_value, t.ptr_id
+--                      FROM TABLE (ne_ids) t;
 
         COMMIT;
 
