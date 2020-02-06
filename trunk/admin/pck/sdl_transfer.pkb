@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY sdl_transfer
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_transfer.pkb-arc   1.7   Feb 05 2020 00:32:48   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_transfer.pkb-arc   1.8   Feb 06 2020 16:01:02   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_transfer.pkb  $
-    --       Date into PVCS   : $Date:   Feb 05 2020 00:32:48  $
-    --       Date fetched Out : $Modtime:   Feb 05 2020 00:32:10  $
-    --       PVCS Version     : $Revision:   1.7  $
+    --       Date into PVCS   : $Date:   Feb 06 2020 16:01:02  $
+    --       Date fetched Out : $Modtime:   Feb 06 2020 16:00:02  $
+    --       PVCS Version     : $Revision:   1.8  $
     --
     --   Author : R.A. Coupe
     --
@@ -19,7 +19,7 @@ AS
     -- The main purpose of this package is to handle the transfer of data from the SDL repository
     -- into the main database
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.7  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.8  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'SDL_DDL';
 
@@ -70,6 +70,7 @@ AS
         l_sql             VARCHAR2 (4000);
 
         l_sdl_ne_tab      sdl_ne_tab;
+        l_attrib_list     ptr_vc_array_type;
     BEGIN
         BEGIN
             SELECT sp_id,
@@ -117,9 +118,9 @@ AS
                     'There is a problem with the profile name and/or the profile datum view or the theme metadata ');
         END;
 
---nm_debug.debug_on;
---nm_debug.delete_debug;
---delete from ne_id_sav;
+        --nm_debug.debug_on;
+        --nm_debug.delete_debug;
+        --delete from ne_id_sav;
 
         --First, grab the datum IDs that pass the test on whether they should be loaded. This comes from the review levels
         --or from the manual over-ride after a review.
@@ -136,19 +137,19 @@ AS
                AND d.batch_id = p_batch_id
                AND n.start_node = s.hashcode
                AND n.end_node = e.hashcode
-               AND d.status = 'VALID' 
+               AND d.status = 'VALID'
                AND sfs_id = d.batch_id
                AND sp_id = sfs_sp_id
-               AND ( EXISTS
-                       (SELECT 1
-                          FROM SDL_SPATIAL_REVIEW_LEVELS
-                         WHERE     ssrl_sp_id = sfs_sp_id
-                               AND d.PCT_MATCH BETWEEN ssrl_percent_from
-                                                   AND ssrl_percent_to
-                         AND ssrl_default_action = 'LOAD')
+               AND (   EXISTS
+                           (SELECT 1
+                              FROM SDL_SPATIAL_REVIEW_LEVELS
+                             WHERE     ssrl_sp_id = sfs_sp_id
+                                   AND d.PCT_MATCH BETWEEN ssrl_percent_from
+                                                       AND ssrl_percent_to
+                                   AND ssrl_default_action = 'LOAD')
                     OR d.manual_override = 'Y');
 
---nm_debug.debug('Have IDs - count = '||ne_ids.count);
+        --nm_debug.debug('Have IDs - count = '||ne_ids.count);
 
         --Now, for load files which relate directly to linear routes, grab the conversion
         -- factor so units relating to the route/load data can be converted to the units of the datum.
@@ -166,53 +167,98 @@ AS
             --It needs dynamic SQL for the view name which derives the unique key of the load file data.
             --It only inserts the rows with valid, transferrable datums
 
-            l_sql :=
-                   'insert into nm_elements (ne_id, ne_type,  ne_nt_type, ne_gty_group_type, ne_admin_unit, '
-                || 'ne_descr, ne_start_date, ne_owner, ne_prefix, ne_version_no, ne_group, ne_sub_type, ne_name_1, ne_name_2, ne_nsg_ref, ne_end_date  ) '
-                || ' select ne_id_seq.nextval, '
-                || ''''
-                || 'G'
-                || ''''
-                || ', :l_group_nt_type, :l_group_type, 1,  '
-                || ' ne_descr, ne_start_date, ne_owner, ne_prefix, ne_version_no, ne_group, ne_sub_type, ne_name_1, ne_name_2, ne_nsg_ref, ne_end_date '
-                || ' from '
-                || l_profile_view
-                || ' ln '
-                || ' where batch_id = :p_batch_id '
-                || ' and status = '
-                || ''''
-                || 'VALID'
-                || ''''
-                || ' and exists ( select 1 from sdl_wip_datums d, table(:ne_ids) t where t.ptr_id = swd_id and status = '
-                || ''''
-                || 'VALID'
-                || ''''
-                || '  and d.sld_key = ln.sld_key )'
-                || ' and not exists ( select 1 from  nm_elements e where ln.ne_unique = e.ne_unique and e.NE_NT_TYPE = :l_group_nt_type ) ';
---                || ' returning ptr(sld_key, ne_id) into :p_ptr ';
+            WITH
+                attrib_names
+                AS
+                    (SELECT sam_ne_column_name
+                       FROM sdl_attribute_mapping
+                      WHERE sam_sp_id = l_sp_id
+                     UNION
+                     SELECT 'NE_START_DATE' FROM DUAL
+                     UNION
+                     SELECT 'NE_END_DATE' FROM DUAL) --select * from attrib_names
+                                                    ,
+                attribs
+                AS
+                    (SELECT NVL (s1.sam_id, ROWNUM * (-1))     sam_id,
+                            a.sam_ne_column_name
+                       FROM attrib_names a, sdl_attribute_mapping s1
+                      WHERE     s1.sam_sp_id(+) = l_sp_id
+                            AND s1.sam_ne_column_name(+) =
+                                a.sam_ne_column_name)
+            SELECT CAST (
+                       COLLECT (ptr_vc (sam_id, sam_ne_column_name))
+                           AS ptr_vc_array_type)
+              INTO l_attrib_list
+              FROM attribs;
 
---            nm_debug.debug (l_sql);
+            SELECT ins_str
+              INTO l_ins_str
+              FROM (WITH
+                        attribs
+                        AS
+                            (SELECT ptr_id        sam_id,
+                                    ptr_value     sam_ne_column_name
+                               FROM TABLE (l_attrib_list))
+                    SELECT    'insert into nm_elements ( ne_id, ne_type, ne_nt_type, ne_gty_group_type, ne_admin_unit, '
+                           || LISTAGG (sam_ne_column_name, ',')
+                                  WITHIN GROUP (ORDER BY sam_id)
+                           || ')'    ins_str
+                      FROM attribs);
 
---nm_debug.debug('Inserting any missing routes');
+            SELECT sel_str
+              INTO l_sel_str
+              FROM (WITH
+                        attribs
+                        AS
+                            (SELECT ptr_id        sam_id,
+                                    ptr_value     sam_ne_column_name
+                               FROM TABLE (l_attrib_list))
+                    SELECT    ' select ne_id_seq.nextval, '
+                           || ''''
+                           || 'G'
+                           || ''''
+                           || ', :l_group_nt_type, :l_group_type, 1,  '
+                           || LISTAGG (
+                                  CASE
+                                      WHEN sam_id < 0 THEN 'NULL'
+                                      ELSE sam_ne_column_name
+                                  END,
+                                  ',')
+                              WITHIN GROUP (ORDER BY sam_id)
+                           || ' from '
+                           || l_profile_view
+                           || ' ln '
+                           || ' where batch_id = :p_batch_id '
+                           || ' and status = '
+                           || ''''
+                           || 'VALID'
+                           || ''''
+                           || ' and exists ( select 1 from sdl_wip_datums d, table(:ne_ids) t where t.ptr_id = swd_id and status = '
+                           || ''''
+                           || 'VALID'
+                           || ''''
+                           || '  and d.sld_key = ln.sld_key )'
+                           || ' and not exists ( select 1 from  nm_elements e where ln.ne_unique = e.ne_unique and e.NE_NT_TYPE = :l_group_nt_type ) '    sel_str
+                      FROM attribs);
 
-            EXECUTE IMMEDIATE l_sql
+            nm_debug.debug (l_ins_str);
+
+            nm_debug.debug (l_sel_str);
+
+            --raise_application_error(-20001, 'Stop');
+
+            EXECUTE IMMEDIATE l_ins_str || ' ' || l_sel_str
                 USING l_group_nt_type,
                       l_group_type,
                       p_batch_id,
                       ne_ids,
                       l_group_nt_type;
---                            RETURNING BULK COLLECT INTO l_ptr;
-
-            --
-            --capture the element id and unique with the sld_key
-
---            INSERT INTO sdl_loaded_elements (sld_key, ne_id)
---                SELECT sld_key, ne_id FROM TABLE (l_ptr);
         END IF;
 
         --consider re-setting the matching node-ids
 
---nm_debug.debug('Now for the nodes');
+        --nm_debug.debug('Now for the nodes');
 
         SELECT ptr_num (np_id_seq.NEXTVAL, no_node_id_seq.NEXTVAL)
           BULK COLLECT INTO np_no_ids
@@ -293,14 +339,14 @@ AS
           FROM sdl_datum_attribute_mapping
          WHERE sdam_profile_id = l_sp_id;
 
---               INSERT INTO ne_id_sav
---                    SELECT t.ptr_value, t.ptr_id
---                      FROM TABLE (ne_ids) t;
+        INSERT INTO ne_id_sav
+            SELECT t.ptr_value, t.ptr_id
+              FROM TABLE (ne_ids) t;
 
         COMMIT;
 
---        nm_debug.debug_on;
---        nm_debug.debug ('RC> INS' || l_ins_str || ' ' || l_sel_str);
+        --        nm_debug.debug_on;
+        --        nm_debug.debug ('RC> INS' || l_ins_str || ' ' || l_sel_str);
 
         EXECUTE IMMEDIATE l_ins_str || ' ' || l_sel_str
             USING p_batch_id, ne_ids, p_batch_id;
@@ -327,16 +373,19 @@ AS
             || ' ), TABLE (:ne_ids) t '
             || ' WHERE t.ptr_id = swd_id ';
 
---        nm_debug.debug_on;
---        nm_debug.debug (l_ins_str);
---
---nm_debug.debug('Just nserted the spatial data');
+        --        nm_debug.debug_on;
+        --        nm_debug.debug (l_ins_str);
+        --
+        --nm_debug.debug('Just nserted the spatial data');
 
         l_sdl_ne_tab := get_ne_data (p_batch_id, l_profile_view);
 
---nm_debug.debug('retrieved route data details, count = '||l_sdl_ne_tab.count );
+        --nm_debug.debug('retrieved route data details, count = '||l_sdl_ne_tab.count );
 
-        --Now we must rescale the routes that have been loaded
+        EXECUTE IMMEDIATE l_ins_str
+            USING p_batch_id, ne_ids;
+
+
 
         IF l_group_type IS NOT NULL
         THEN
@@ -426,29 +475,33 @@ AS
                            END
                                rescale_history
                       FROM TABLE (l_sdl_ne_tab) l, nm_elements e
-                     WHERE e.ne_unique = l.ne_unique AND status = 'VALID')
+                     WHERE     e.ne_unique = l.ne_unique
+                           AND status = 'VALID'
+                           AND EXISTS
+                                   (SELECT 1
+                                      FROM nm_members, TABLE (ne_ids)
+                                     WHERE     ptr_value = nm_ne_id_of
+                                           AND nm_ne_id_in = e.ne_id))
             LOOP
                 BEGIN
-
                     nm3rsc.rescale_route (irec.ne_id,
-                                          irec.last_date,
+                                          TRUNC (SYSDATE),   --irec.last_date,
                                           0,
                                           NULL,
                                           irec.rescale_history,
                                           NULL);
-                                          
+
+                    COMMIT;
                 --if we trap the problem of circular routes will need to find starting element and re-submit
                 --if we trap the problem of an attempt to rescale with history which is not allowed due to member dates
                 --then resubmit without history
-                
+
                 END;
             END LOOP;
         END IF;
 
---nm_debug.debug('Setting ne-id and status');
+        --nm_debug.debug('Setting ne-id and status');
 
-        EXECUTE IMMEDIATE l_ins_str
-            USING p_batch_id, ne_ids;
         UPDATE sdl_wip_datums d
            SET status = 'TRANSFERRED',
                new_ne_id =
@@ -458,9 +511,10 @@ AS
          WHERE     batch_id = p_batch_id
                AND swd_id IN (SELECT t.ptr_id
                                 FROM TABLE (ne_ids) t)
-               AND EXISTS (select 1 from nm_elements, table(ne_ids) where ne_id = ptr_value);
-        
-        
+               AND EXISTS
+                       (SELECT 1
+                          FROM nm_elements, TABLE (ne_ids)
+                         WHERE ne_id = ptr_value);
     END;
 
     FUNCTION get_ne_data (p_batch_id IN NUMBER, p_view_name IN VARCHAR2)
