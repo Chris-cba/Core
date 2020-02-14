@@ -3,11 +3,11 @@ AS
   -------------------------------------------------------------------------
   --   PVCS Identifiers :-
   --
-  --       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/hig_relationship_api.pkb-arc   1.4   Apr 16 2018 09:21:56   Gaurav.Gaurkar  $
+  --       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/hig_relationship_api.pkb-arc   1.5   Feb 14 2020 10:25:24   Chris.Baugh  $
   --       Module Name      : $Workfile:   hig_relationship_api.pkb  $
-  --       Date into PVCS   : $Date:   Apr 16 2018 09:21:56  $
-  --       Date fetched Out : $Modtime:   Apr 16 2018 08:53:04  $
-  --       Version          : $Revision:   1.4  $
+  --       Date into PVCS   : $Date:   Feb 14 2020 10:25:24  $
+  --       Date fetched Out : $Modtime:   Feb 13 2020 16:07:14  $
+  --       Version          : $Revision:   1.5  $
   --       Based on SCCS version :
   ------------------------------------------------------------------
   --   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
@@ -19,7 +19,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.4  $';
+  g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.5  $';
 
   g_package_name   CONSTANT VARCHAR2 (30) := 'hig_relationship_api';
 
@@ -376,7 +376,11 @@ AS
     --
       lv_return := 'EXISTS (SELECT 1
                               FROM proxy_users
-                             WHERE proxy IN (Sys_Context(''NM3_SECURITY_CTX'',''USERNAME''),Sys_Context(''NM3_SECURITY_CTX'',''ACTUAL_USERNAME''))
+                             WHERE proxy = USER 
+                               AND EXISTS (SELECT 1
+                                             FROM DBA_ROLE_PRIVS
+                                            WHERE grantee = SYS_CONTEXT (''USERENV'', ''SESSION_USER'')
+                                              AND granted_role = ''PROXY_OWNER'')
                             UNION
                             SELECT 1
                               FROM hig_user_roles
