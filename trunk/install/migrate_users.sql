@@ -32,9 +32,9 @@ prompt
     --
     CURSOR c_midtier IS
     SELECT 1
-      FROM hig_user_roles
-     WHERE hur_username = UPPER('&P_MIDTIERUSER')
-       AND hur_role = 'PROXY_OWNER';
+      FROM dba_role_privs
+     WHERE grantee= UPPER('&P_MIDTIERUSER')
+       AND granted_role = 'PROXY_OWNER';
     --
     lr_hig_relationship  hig_relationship%ROWTYPE;
     --
