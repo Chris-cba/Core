@@ -1,11 +1,11 @@
 ----------------------------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm_4800_fix2.sql-arc   1.0   Feb 14 2020 15:23:42   Chris.Baugh  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm_4800_fix2.sql-arc   1.1   Feb 18 2020 14:48:44   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm_4800_fix2.sql  $ 
---       Date into PVCS   : $Date:   Feb 14 2020 15:23:42  $
---       Date fetched Out : $Modtime:   Feb 14 2020 09:32:52  $
---       Version     	  : $Revision:   1.0  $
+--       Date into PVCS   : $Date:   Feb 18 2020 14:48:44  $
+--       Date fetched Out : $Modtime:   Feb 18 2020 14:42:52  $
+--       Version     	  : $Revision:   1.1  $
 --
 ----------------------------------------------------------------------------------------------------
 --   Copyright (c) 2020 Bentley Systems Incorporated. All rights reserved.
@@ -85,7 +85,7 @@ BEGIN
   --
   FOR l_rec IN c1 LOOP
     --
-    EXECUTE IMMEDIATE 'DELETE FROM hig_users WHERE hus_username = ''||l_rec.hus_username||''';
+    EXECUTE IMMEDIATE 'DELETE FROM hig_users WHERE hus_username = '''||l_rec.hus_username||'''';
     EXECUTE IMMEDIATE 'DELETE FROM hig_user_roles WHERE hur_username = '''||l_rec.hus_username||''' AND hur_role = ''PROXY_OWNER''';
     --
   END LOOP;
