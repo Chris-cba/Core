@@ -1,3 +1,16 @@
+----------------------------------------------------------------------------------------------------
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/migrate_users.sql-arc   1.2   Feb 20 2020 13:57:48   Chris.Baugh  $
+--       Module Name      : $Workfile:   migrate_users.sql  $ 
+--       Date into PVCS   : $Date:   Feb 20 2020 13:57:48  $
+--       Date fetched Out : $Modtime:   Feb 20 2020 13:57:18  $
+--       Version     	  : $Revision:   1.2  $
+--
+----------------------------------------------------------------------------------------------------
+--   Copyright (c) 2020 Bentley Systems Incorporated. All rights reserved.
+----------------------------------------------------------------------------------------------------
+--
 clear screen
 
 undefine p_midtieruser
