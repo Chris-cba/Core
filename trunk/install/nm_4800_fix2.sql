@@ -1,11 +1,11 @@
 ----------------------------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm_4800_fix2.sql-arc   1.3   Feb 26 2020 11:54:44   Chris.Baugh  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm_4800_fix2.sql-arc   1.4   Feb 26 2020 14:28:54   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm_4800_fix2.sql  $ 
---       Date into PVCS   : $Date:   Feb 26 2020 11:54:44  $
---       Date fetched Out : $Modtime:   Feb 26 2020 11:54:20  $
---       Version     	  : $Revision:   1.3  $
+--       Date into PVCS   : $Date:   Feb 26 2020 14:28:54  $
+--       Date fetched Out : $Modtime:   Feb 26 2020 14:25:58  $
+--       Version     	  : $Revision:   1.4  $
 --
 ----------------------------------------------------------------------------------------------------
 --   Copyright (c) 2020 Bentley Systems Incorporated. All rights reserved.
@@ -95,6 +95,31 @@ BEGIN
 END;
 /
 
+DECLARE
+  --
+  CURSOR c1 IS
+  SELECT hus_username
+    FROM hig_users 
+   WHERE hus_is_hig_owner_flag = 'Y';
+  -- 
+  lv_higowner  hig_users.hus_username%TYPE;
+  --
+  role_exists EXCEPTION;
+  PRAGMA EXCEPTION_INIT(role_exists, -1951); 
+  --
+BEGIN
+  --
+  OPEN c1;
+  FETCH c1 INTO lv_higowner;
+  CLOSE c1;
+  
+  EXECUTE IMMEDIATE 'REVOKE PROXY_OWNER FROM '||lv_higowner;
+  -- 
+EXCEPTION
+  WHEN role_exists
+  THEN NULL;
+END;
+/
 --------------------------------------------------------------------------------
 -- Grant privileges to PROXY_OWNER Role
 --------------------------------------------------------------------------------
@@ -112,6 +137,7 @@ EXCEPTION
   THEN NULL;
 END;
 /
+
 --------------------------------------------------------------------------------
 -- Package Bodies
 --------------------------------------------------------------------------------
