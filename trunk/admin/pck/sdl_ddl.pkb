@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY sdl_ddl
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_ddl.pkb-arc   1.23   Feb 27 2020 15:35:26   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_ddl.pkb-arc   1.24   Feb 27 2020 15:40:50   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_ddl.pkb  $
-    --       Date into PVCS   : $Date:   Feb 27 2020 15:35:26  $
-    --       Date fetched Out : $Modtime:   Feb 27 2020 15:34:32  $
-    --       PVCS Version     : $Revision:   1.23  $
+    --       Date into PVCS   : $Date:   Feb 27 2020 15:40:50  $
+    --       Date fetched Out : $Modtime:   Feb 27 2020 15:39:58  $
+    --       PVCS Version     : $Revision:   1.24  $
     --
     --   Author : R.A. Coupe
     --
@@ -19,7 +19,7 @@ AS
     -- The main purpose of this package is to provide DDL execution for creation of views and triggers
     -- to support the SDL.
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.23  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.24  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'SDL_DDL';
 
@@ -236,7 +236,7 @@ AS
                          '1'     attrib_used_flag,
                          sam_ne_column_name
                     FROM sdl_attribute_mapping
-                   WHERE sam_sp_id = 2
+                   WHERE sam_sp_id = p_profile_id
                   UNION ALL
                   SELECT ROW_NUMBER () OVER (ORDER BY column_name) * -1,
                          ROW_NUMBER () OVER (ORDER BY column_name) * -1,
