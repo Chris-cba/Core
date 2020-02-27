@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY sdl_ddl
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_ddl.pkb-arc   1.22   Jan 30 2020 15:48:08   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_ddl.pkb-arc   1.23   Feb 27 2020 15:35:26   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_ddl.pkb  $
-    --       Date into PVCS   : $Date:   Jan 30 2020 15:48:08  $
-    --       Date fetched Out : $Modtime:   Jan 30 2020 15:47:42  $
-    --       PVCS Version     : $Revision:   1.22  $
+    --       Date into PVCS   : $Date:   Feb 27 2020 15:35:26  $
+    --       Date fetched Out : $Modtime:   Feb 27 2020 15:34:32  $
+    --       PVCS Version     : $Revision:   1.23  $
     --
     --   Author : R.A. Coupe
     --
@@ -19,7 +19,7 @@ AS
     -- The main purpose of this package is to provide DDL execution for creation of views and triggers
     -- to support the SDL.
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.22  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.23  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'SDL_DDL';
 
@@ -179,21 +179,36 @@ AS
                         CASE field_type
                             WHEN 'VARCHAR2'
                             THEN
-                                'sld_col_' || sam_col_id
+                                CASE attrib_used_flag
+                                    WHEN '1' THEN 'sld_col_' || sam_col_id
+                                    ELSE 'NULL'
+                                END
                             WHEN 'DATE'
                             THEN
-                                   'to_date(sld_col_'
-                                || sam_col_id
-                                || ','
-                                || ''''
-                                || 'YYYY/MM/DD'
-                                || ''''
-                                || ')'
+                                CASE attrib_used_flag
+                                    WHEN '1'
+                                    THEN
+                                           'to_date(sld_col_'
+                                        || sam_col_id
+                                        || ','
+                                        || ''''
+                                        || 'YYYY/MM/DD'
+                                        || ''''
+                                        || ')'
+                                    ELSE
+                                        'NULL'
+                                END
                             WHEN 'NUMBER'
                             THEN
-                                   'cast (sld_col_'
-                                || sam_col_id
-                                || ' as number )'
+                                CASE attrib_used_flag
+                                    WHEN '1'
+                                    THEN
+                                           'cast (sld_col_'
+                                        || sam_col_id
+                                        || ' as number )'
+                                    ELSE
+                                        'NULL'
+                                END
                         END,
                         ',')
                     WITHIN GROUP (ORDER BY sam_id)
@@ -206,16 +221,41 @@ AS
                  || p_profile_id
                  || ') '
                  || 'and sld_sfs_id = nvl(to_number(sys_context('
-                 || qq
+                 || ''''
                  || 'NM3SQL'
-                 || qq
+                 || ''''
                  || ', '
-                 || qq
+                 || ''''
                  || 'SDLCTX_SFS_ID'
-                 || qq
+                 || ''''
                  || ')),sld_sfs_id) '
             INTO p_view_sql
-            FROM SDL_ATTRIBUTE_MAPPING,
+            FROM (SELECT sam_id,
+                         sam_col_id,
+                         sam_sp_id,
+                         '1'     attrib_used_flag,
+                         sam_ne_column_name
+                    FROM sdl_attribute_mapping
+                   WHERE sam_sp_id = 2
+                  UNION ALL
+                  SELECT ROW_NUMBER () OVER (ORDER BY column_name) * -1,
+                         ROW_NUMBER () OVER (ORDER BY column_name) * -1,
+                         p_profile_id,
+                         '0',
+                         column_name
+                    FROM dba_tab_columns
+                   WHERE     owner =
+                             SYS_CONTEXT ('NM3CORE', 'APPLICATION_OWNER')
+                         AND table_name = 'NM_ELEMENTS_ALL'
+                         AND column_name IN ('NE_UNIQUE',
+                                             'NE_DESCR',
+                                             'NE_START_DATE',
+                                             'NE_END_DATE')
+                         AND NOT EXISTS
+                                 (SELECT 1
+                                    FROM sdl_attribute_mapping
+                                   WHERE     sam_sp_id = p_profile_id
+                                         AND sam_ne_column_name = column_name)),
                  sdl_profiles,
                  v_nm_nw_columns,
                  nm_linear_types
@@ -227,8 +267,9 @@ AS
                  AND nlt_nt_type = network_type
         GROUP BY sp_name;
 
---        nm_debug.debug_on;
---        nm_debug.debug (p_view_sql);
+
+        --        nm_debug.debug_on;
+        --        nm_debug.debug (p_view_sql);
 
         EXECUTE IMMEDIATE p_view_sql;
     END;
