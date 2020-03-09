@@ -3,11 +3,11 @@ AS
     --<PACKAGE>
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_process.pkb-arc   1.3   Jan 20 2020 16:10:48   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_process.pkb-arc   1.4   Mar 09 2020 17:44:24   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_process.pkb  $
-    --       Date into PVCS   : $Date:   Jan 20 2020 16:10:48  $
-    --       Date fetched Out : $Modtime:   Jan 20 2020 16:10:02  $
-    --       PVCS Version     : $Revision:   1.3  $
+    --       Date into PVCS   : $Date:   Mar 09 2020 17:44:24  $
+    --       Date fetched Out : $Modtime:   Mar 09 2020 17:43:58  $
+    --       PVCS Version     : $Revision:   1.4  $
     --
     --   Author : R.A. Coupe
     --
@@ -22,7 +22,7 @@ AS
 
     --</PACKAGE>
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.3  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.4  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'SDL_PROCESS';
 
@@ -81,6 +81,27 @@ AS
         SDL_AUDIT.LOG_PROCESS_END (p_batch_id, 'LOAD_VALIDATION');
     END;
 
+    PROCEDURE reverse_geoms(p_batch_id in NUMBER, p_sld_keys in int_array_type) is
+    begin
+       for i in 1..p_sld_keys.count loop
+       SDL_AUDIT.LOG_PROCESS_START (p_batch_id,
+                                     'REVERSE',
+                                     NULL,
+                                     NULL,
+                                     NULL,
+                                     p_sld_keys(i));
+       end loop;                 
+       
+       sdl_edit.REVERSE_DATUM_GEOMETRIES(p_sld_keys);
+                           
+       for i in 1..p_sld_keys.count loop
+       SDL_AUDIT.LOG_PROCESS_END (p_batch_id,
+                                     'REVERSE',
+                                     p_sld_keys(i));
+       end loop;                 
+
+
+    end;
     --
     PROCEDURE topo_generation (p_batch_id IN NUMBER)
     IS
