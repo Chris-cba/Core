@@ -3,11 +3,11 @@ AS
     --<PACKAGE>
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_audit.pkh-arc   1.0   Oct 11 2019 15:12:32   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_audit.pkh-arc   1.1   Mar 12 2020 17:30:28   Vikas.Mhetre  $
     --       Module Name      : $Workfile:   sdl_audit.pkh  $
-    --       Date into PVCS   : $Date:   Oct 11 2019 15:12:32  $
-    --       Date fetched Out : $Modtime:   Oct 02 2019 17:52:46  $
-    --       PVCS Version     : $Revision:   1.0  $
+    --       Date into PVCS   : $Date:   Mar 12 2020 17:30:28  $
+    --       Date fetched Out : $Modtime:   Mar 12 2020 07:09:14  $
+    --       PVCS Version     : $Revision:   1.1  $
     --
     --   Author : R.A. Coupe
     --
@@ -20,19 +20,19 @@ AS
     -- The main purpose of this package is to provide tools for auditting and locking of SDL processes and data
 
     --</PACKAGE>
-    g_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.0  $';
-
+    g_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.1  $';
+    --
     -----------------------------------------------------------------------------
     --
     --<PROC NAME="GET_VERSION">
     --
     -- This function returns the current PVCS version of the package
-
+    --
     FUNCTION get_version
         RETURN VARCHAR2;
-
+    --
     --</PROC>
-
+    --
     -----------------------------------------------------------------------------
     --
     --<PROC NAME="GET_BODY_VERSION">
@@ -40,23 +40,32 @@ AS
     -- This function returns the current PVCS version of the package body
     FUNCTION get_body_version
         RETURN VARCHAR2;
-
+    --
     --</PROC>
+    --
+    -----------------------------------------------------------------------------
+    --	
     PROCEDURE check_process (p_batch_id   IN NUMBER,
                              p_process    IN VARCHAR2,
                              p_sld_key    IN NUMBER,
                              p_op         IN VARCHAR2);
-
+    --
     -----------------------------------------------------------------------------
+    --
     PROCEDURE log_process_start (p_batch_id          IN NUMBER,
                                  p_process           IN VARCHAR2,
                                  p_buffer            IN NUMBER,
                                  p_match_tolerance   IN NUMBER,
                                  p_tolerance         IN NUMBER,
                                  p_sld_key           IN NUMBER DEFAULT NULL);
-
+    --
+    -----------------------------------------------------------------------------
+    --
     PROCEDURE log_process_end (p_batch_id   IN NUMBER,
                                p_process    IN VARCHAR2,
                                p_sld_key    IN NUMBER DEFAULT NULL);
+    --
+    -----------------------------------------------------------------------------
+    --
 END sdl_audit;
 /
