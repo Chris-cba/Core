@@ -18,11 +18,11 @@ AS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/views/v_sdl_attrib_validation_result.vw-arc   1.0   Jan 29 2020 08:51:54   Vikas.Mhetre  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/views/v_sdl_attrib_validation_result.vw-arc   1.1   Mar 12 2020 08:41:36   Vikas.Mhetre  $
 --       Module Name      : $Workfile:   v_sdl_attrib_validation_result.vw  $
---       Date into PVCS   : $Date:   Jan 29 2020 08:51:54  $
---       Date fetched Out : $Modtime:   Jan 29 2020 08:48:14  $
---       PVCS Version     : $Revision:   1.0  $
+--       Date into PVCS   : $Date:   Mar 12 2020 08:41:36  $
+--       Date fetched Out : $Modtime:   Mar 12 2020 08:39:24  $
+--       PVCS Version     : $Revision:   1.1  $
 --
 --   Author : Vikas Mhetre
 --
@@ -39,11 +39,13 @@ SELECT svr.svr_id val_id
       ,svr.svr_sfs_id batch_id
       ,svr.svr_swd_id swd_id
       ,NULL rule_id
-      ,'INVALID' show_option 
+      ,'INVALID' show_option
       ,CASE WHEN svr.svr_validation_type = 'D'
             THEN 'Domain'
             WHEN svr.svr_validation_type = 'M'
             THEN 'Mandatory'
+            WHEN svr.svr_validation_type = 'L'
+            THEN 'Datum Mapping'
             ELSE 'Unknown'
         END validation_type
       ,svr.svr_sam_id sam_id
@@ -56,7 +58,7 @@ SELECT svr.svr_id val_id
   FROM sdl_validation_results svr
       ,sdl_load_data sld
  WHERE svr.svr_sld_key = sld.sld_key
-   AND svr_validation_type IN ('D','M')
+   AND svr_validation_type IN ('D','M','L')
    AND sld.sld_status = 'INVALID'
 UNION ALL
 -- Rejected Validation failed records
@@ -65,11 +67,15 @@ SELECT svr.svr_id val_id
       ,svr.svr_sfs_id batch_id
       ,svr.svr_swd_id swd_id
       ,NULL rule_id
-      ,'REJECTED' show_option 
+      ,'REJECTED' show_option
       ,CASE WHEN svr.svr_validation_type = 'D'
             THEN 'Domain'
             WHEN svr.svr_validation_type = 'M'
             THEN 'Mandatory'
+            WHEN svr.svr_validation_type = 'L'
+            THEN 'Datum Mapping'
+            WHEN svr.svr_validation_type = 'S'
+            THEN 'Geometry'
             ELSE 'Unknown'
         END validation_type
       ,svr.svr_sam_id sam_id
@@ -82,8 +88,39 @@ SELECT svr.svr_id val_id
   FROM sdl_validation_results svr
       ,sdl_load_data sld
  WHERE svr.svr_sld_key = sld.sld_key
-   AND svr_validation_type IN ('D','M')
+   AND svr.svr_validation_type IN ('D','M','L', 'S')
    AND sld.sld_status = 'REJECTED'
+UNION ALL
+-- Geometry Validation Failures
+SELECT svr.svr_id val_id
+      ,svr.svr_sld_key sld_key
+      ,svr.svr_sfs_id batch_id
+      ,svr.svr_swd_id swd_id
+      ,NULL rule_id
+      ,'GEOMINVALID' show_option
+      ,CASE WHEN svr.svr_validation_type = 'S'
+            THEN 'Geometry'
+            ELSE 'Unknown'
+        END validation_type
+      ,svr.svr_sam_id sam_id
+      ,svr.svr_column_name attribute_name
+      ,svr.svr_current_value original_value
+      ,'' adjusted_value
+      ,CASE WHEN svr.svr_swd_id IS NOT NULL
+            THEN swd.status
+            ELSE sld.sld_status
+       END status
+      ,svr.svr_status_code status_code
+      ,svr.svr_message message
+  FROM sdl_validation_results svr
+      ,sdl_load_data sld
+      ,sdl_wip_datums swd
+ WHERE svr.svr_sld_key = sld.sld_key
+   AND sld.sld_key = swd.sld_key(+)
+   AND sld.sld_sfs_id = swd.batch_id(+)
+   AND svr.svr_swd_id = swd.swd_id(+)
+   AND svr.svr_validation_type = 'S'
+   AND sld.sld_status = 'INVALID'
 UNION ALL
 -- Attribute adjustments
 SELECT saaa.saaa_id val_id
@@ -91,7 +128,7 @@ SELECT saaa.saaa_id val_id
       ,saaa.saaa_sfs_id batch_id
       ,NULL swd_id
       ,saaa.saaa_saar_id rule_id
-      ,'ADJUSTED' show_option 
+      ,'ADJUSTED' show_option
       ,'Adjustment Rule' validation_type
       ,saaa.saaa_sam_id sam_id
       ,sam.sam_view_column_name attribute_name
