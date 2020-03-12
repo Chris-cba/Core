@@ -3,11 +3,11 @@ AS
     --<PACKAGE>
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_ddl.pkh-arc   1.1   Sep 10 2019 12:43:56   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_ddl.pkh-arc   1.2   Mar 12 2020 17:35:30   Vikas.Mhetre  $
     --       Module Name      : $Workfile:   sdl_ddl.pkh  $
-    --       Date into PVCS   : $Date:   Sep 10 2019 12:43:56  $
-    --       Date fetched Out : $Modtime:   Sep 10 2019 12:42:58  $
-    --       PVCS Version     : $Revision:   1.1  $
+    --       Date into PVCS   : $Date:   Mar 12 2020 17:35:30  $
+    --       Date fetched Out : $Modtime:   Mar 12 2020 06:30:44  $
+    --       PVCS Version     : $Revision:   1.2  $
     --
     --   Author : R.A. Coupe
     --
@@ -19,21 +19,20 @@ AS
     --
     -- The main purpose of this package is to provide DDL execution for creation of views and triggers
     -- to support the SDL.
-
     --</PACKAGE>
-    g_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.1  $';
-
+    g_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.2  $';
+    --
     -----------------------------------------------------------------------------
     --
     --<PROC NAME="GET_VERSION">
     --
     -- This function returns the current PVCS version of the package
-
+    --
     FUNCTION get_version
         RETURN VARCHAR2;
-
+    --
     --</PROC>
-
+    --
     -----------------------------------------------------------------------------
     --
     --<PROC NAME="GET_BODY_VERSION">
@@ -41,42 +40,58 @@ AS
     -- This function returns the current PVCS version of the package body
     FUNCTION get_body_version
         RETURN VARCHAR2;
-
+    --
     --</PROC>
-
+    --
     -----------------------------------------------------------------------------
     --
     --<PROC NAME="GEN_SDL_PROFILE_VIEWS">
     --
     -- This procedure generates the load file and network element centric views on the load records.
-
+    --
     PROCEDURE gen_sdl_profile_views (p_profile_id IN NUMBER);
-
+    --
     --</PROC>
-
+    --
     -----------------------------------------------------------------------------
     --
     --<PROC NAME="get_hash_code">
     -- This function retrieves the ora-hash specification of all columns in a template
-
+    --
     FUNCTION get_hash_code (p_profile_id   IN NUMBER,
                             p_alias           VARCHAR2 DEFAULT NULL)
         RETURN VARCHAR2;
-
+    --
     --</PROC>
+    --
+    -----------------------------------------------------------------------------
+    --
     PROCEDURE gen_profile_match_view (p_profile_id   IN     NUMBER,
                                       p_view_sql        OUT VARCHAR2);
-
+    --
+    -----------------------------------------------------------------------------
+    --
     PROCEDURE gen_profile_no_match_view (p_profile_id   IN     NUMBER,
                                          p_view_sql        OUT VARCHAR2);
-
+    --
+    -----------------------------------------------------------------------------
+    --
     PROCEDURE gen_datum_view (p_profile IN NUMBER);
-
+    --
+    -----------------------------------------------------------------------------
+    --
     PROCEDURE create_profile_themes (p_profile_id   IN INTEGER,
                                      p_role         IN VARCHAR2);
-
+    --
+    -----------------------------------------------------------------------------
+    --
     PROCEDURE refresh_base_sdl_themes;
-
+    --
+    -----------------------------------------------------------------------------
+    --
     PROCEDURE drop_sdl_themes;
+    --
+    -----------------------------------------------------------------------------
+    --
 END sdl_ddl;
 /
