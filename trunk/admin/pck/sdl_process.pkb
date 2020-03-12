@@ -3,11 +3,11 @@ AS
     --<PACKAGE>
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_process.pkb-arc   1.5   Mar 12 2020 17:45:44   Vikas.Mhetre  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_process.pkb-arc   1.6   Mar 12 2020 18:18:06   Vikas.Mhetre  $
     --       Module Name      : $Workfile:   sdl_process.pkb  $
-    --       Date into PVCS   : $Date:   Mar 12 2020 17:45:44  $
-    --       Date fetched Out : $Modtime:   Mar 12 2020 08:56:54  $
-    --       PVCS Version     : $Revision:   1.5  $
+    --       Date into PVCS   : $Date:   Mar 12 2020 18:18:06  $
+    --       Date fetched Out : $Modtime:   Mar 12 2020 18:08:58  $
+    --       PVCS Version     : $Revision:   1.6  $
     --
     --   Author : R.A. Coupe
     --
@@ -22,7 +22,7 @@ AS
 
     --</PACKAGE>
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.5  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.6  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'SDL_PROCESS';
 
@@ -87,6 +87,29 @@ AS
     --
     ----------------------------------------------------------------------------
     --
+    PROCEDURE reverse_geoms(p_batch_id IN NUMBER, p_sld_keys IN int_array_type) IS
+    BEGIN
+       FOR i IN 1..p_sld_keys.COUNT LOOP
+       SDL_AUDIT.LOG_PROCESS_START (p_batch_id,
+                                     'REVERSE',
+                                     NULL,
+                                     NULL,
+                                     NULL,
+                                     p_sld_keys(i));
+       END LOOP;                 
+       
+       sdl_edit.reverse_datum_geometries(p_sld_keys);
+                           
+       FOR i IN 1..p_sld_keys.COUNT LOOP
+       SDL_AUDIT.LOG_PROCESS_END (p_batch_id,
+                                     'REVERSE',
+                                     p_sld_keys(i));
+       END LOOP;
+
+    END reverse_geoms;
+    --
+    ----------------------------------------------------------------------------
+    --	
     PROCEDURE topo_generation (p_batch_id IN NUMBER)
     IS
         l_tol_load      NUMBER;
