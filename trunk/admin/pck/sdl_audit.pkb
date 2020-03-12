@@ -3,11 +3,11 @@ AS
     --<PACKAGE>
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_audit.pkb-arc   1.2   Oct 15 2019 09:35:36   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_audit.pkb-arc   1.3   Mar 12 2020 17:32:54   Vikas.Mhetre  $
     --       Module Name      : $Workfile:   sdl_audit.pkb  $
-    --       Date into PVCS   : $Date:   Oct 15 2019 09:35:36  $
-    --       Date fetched Out : $Modtime:   Oct 15 2019 09:34:24  $
-    --       PVCS Version     : $Revision:   1.2  $
+    --       Date into PVCS   : $Date:   Mar 12 2020 17:32:54  $
+    --       Date fetched Out : $Modtime:   Mar 12 2020 07:11:52  $
+    --       PVCS Version     : $Revision:   1.3  $
     --
     --   Author : R.A. Coupe
     --
@@ -21,30 +21,37 @@ AS
 
     --</PACKAGE>
 
-
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.2  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.3  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'SDL_AUDIT';
 
     c_start          CONSTANT VARCHAR2 (5) := 'START';
     c_end            CONSTANT VARCHAR2 (3) := 'END';
-
-    PROCEDURE lock_process (p_rowid IN ROWID);
-
+    --
+    -----------------------------------------------------------------------------
+    --	
     FUNCTION get_version
         RETURN VARCHAR2
     IS
     BEGIN
         RETURN g_sccsid;
     END get_version;
-
+    --
+    -----------------------------------------------------------------------------
+    --	
     FUNCTION get_body_version
         RETURN VARCHAR2
     IS
     BEGIN
         RETURN g_body_sccsid;
     END get_body_version;
-
+    --
+    -----------------------------------------------------------------------------
+    --		
+    PROCEDURE lock_process (p_rowid IN ROWID);
+    --
+    -----------------------------------------------------------------------------
+    --		
     PROCEDURE check_process (p_batch_id   IN NUMBER,
                              p_process    IN VARCHAR2,
                              p_sld_key    IN NUMBER,
@@ -130,7 +137,10 @@ AS
 
             IF l_status = 'NEW'
             THEN
-                IF p_process NOT IN ('REJECT', 'LOAD')
+                IF p_process = 'NEW'
+                THEN 
+                  NULL; 
+                ELSIF p_process NOT IN ('REJECT', 'LOAD')
                 THEN
                     raise_application_error (
                         -20002,
@@ -210,9 +220,10 @@ AS
         --if OK to proceed, insert the record and lock the batch record for batch related processing else lock the record for sld releated processing
         NULL;
     END;
-
     --('NEW', 'ANALYSIS', 'DATUM_VALIDATION', 'LOAD', 'LOAD_VALIDATION', 'REJECT', 'TOPO_GENERATION', 'TRANSFER')
-
+    --
+    -----------------------------------------------------------------------------
+    --
     PROCEDURE log_process_start (p_batch_id          IN NUMBER,
                                  p_process           IN VARCHAR2,
                                  p_buffer            IN NUMBER,
@@ -237,13 +248,14 @@ AS
              VALUES (p_process,
                      p_batch_id,
                      p_sld_key,
-                     CURRENT_TIMESTAMP (9),
+                     SYSTIMESTAMP,
                      p_buffer,
                      p_match_tolerance,
                      p_tolerance);
     END;
-
-
+    --
+    -----------------------------------------------------------------------------
+    --
     PROCEDURE log_process_end (p_batch_id   IN NUMBER,
                                p_process    IN VARCHAR2,
                                p_sld_key    IN NUMBER DEFAULT NULL)
@@ -256,7 +268,7 @@ AS
                        c_end);
 
         UPDATE sdl_process_audit
-           SET spa_ended = CURRENT_TIMESTAMP (9)
+           SET spa_ended = SYSTIMESTAMP
          WHERE     spa_process = p_process
                AND spa_sfs_id = p_batch_id
                AND NVL (spa_sld_key, -999) = NVL (p_sld_key, -999);
@@ -265,11 +277,16 @@ AS
            SET sfs_status = p_process
          WHERE sfs_id = p_batch_id;
     END;
-
+    --
+    -----------------------------------------------------------------------------
+    --
     PROCEDURE lock_process (p_rowid IN ROWID)
     IS
     BEGIN
         NULL;
     END;
+    --
+    -----------------------------------------------------------------------------
+    --	
 END sdl_audit;
 /
