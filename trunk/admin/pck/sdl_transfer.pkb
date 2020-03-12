@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY sdl_transfer
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_transfer.pkb-arc   1.8   Feb 06 2020 16:01:02   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_transfer.pkb-arc   1.9   Mar 12 2020 17:27:16   Vikas.Mhetre  $
     --       Module Name      : $Workfile:   sdl_transfer.pkb  $
-    --       Date into PVCS   : $Date:   Feb 06 2020 16:01:02  $
-    --       Date fetched Out : $Modtime:   Feb 06 2020 16:00:02  $
-    --       PVCS Version     : $Revision:   1.8  $
+    --       Date into PVCS   : $Date:   Mar 12 2020 17:27:16  $
+    --       Date fetched Out : $Modtime:   Mar 12 2020 07:22:02  $
+    --       PVCS Version     : $Revision:   1.9  $
     --
     --   Author : R.A. Coupe
     --
@@ -19,30 +19,37 @@ AS
     -- The main purpose of this package is to handle the transfer of data from the SDL repository
     -- into the main database
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.8  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.9  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'SDL_DDL';
 
     qq                        CHAR (1) := CHR (39);
-
-    FUNCTION get_ne_data (p_batch_id IN NUMBER, p_view_name IN VARCHAR2)
-        RETURN sdl_ne_tab;
-
+    --
+    ----------------------------------------------------------------------------
+    --
     FUNCTION get_version
         RETURN VARCHAR2
     IS
     BEGIN
         RETURN g_sccsid;
     END get_version;
-
+    --
+    ----------------------------------------------------------------------------
+    --
     FUNCTION get_body_version
         RETURN VARCHAR2
     IS
     BEGIN
         RETURN g_body_sccsid;
     END get_body_version;
-
-
+    --
+    ----------------------------------------------------------------------------
+    --
+    FUNCTION get_ne_data (p_batch_id IN NUMBER, p_view_name IN VARCHAR2)
+        RETURN sdl_ne_tab;
+    --
+    ----------------------------------------------------------------------------
+    --
     PROCEDURE transfer_datums (p_batch_id IN NUMBER)
     IS
         np_no_ids         ptr_num_array_type;
@@ -137,7 +144,7 @@ AS
                AND d.batch_id = p_batch_id
                AND n.start_node = s.hashcode
                AND n.end_node = e.hashcode
-               AND d.status = 'VALID'
+               AND d.status = 'LOAD'
                AND sfs_id = d.batch_id
                AND sp_id = sfs_sp_id
                AND (   EXISTS
@@ -232,11 +239,11 @@ AS
                            || ' where batch_id = :p_batch_id '
                            || ' and status = '
                            || ''''
-                           || 'VALID'
+                           || 'LOAD'
                            || ''''
                            || ' and exists ( select 1 from sdl_wip_datums d, table(:ne_ids) t where t.ptr_id = swd_id and status = '
                            || ''''
-                           || 'VALID'
+                           || 'LOAD'
                            || ''''
                            || '  and d.sld_key = ln.sld_key )'
                            || ' and not exists ( select 1 from  nm_elements e where ln.ne_unique = e.ne_unique and e.NE_NT_TYPE = :l_group_nt_type ) '    sel_str
@@ -339,9 +346,9 @@ AS
           FROM sdl_datum_attribute_mapping
          WHERE sdam_profile_id = l_sp_id;
 
-        INSERT INTO ne_id_sav
+        /*INSERT INTO ne_id_sav 
             SELECT t.ptr_value, t.ptr_id
-              FROM TABLE (ne_ids) t;
+              FROM TABLE (ne_ids) t;*/
 
         COMMIT;
 
@@ -447,7 +454,7 @@ AS
                                AND l.ne_unique = g.ne_unique
                                AND d.sld_key = l.sld_key
                                AND t.ptr_id = d.swd_id
-                               AND l.status = 'VALID');
+                               AND l.status = 'LOAD');
 
             --                               AND EXISTS
             --                                       (SELECT 1
@@ -476,7 +483,7 @@ AS
                                rescale_history
                       FROM TABLE (l_sdl_ne_tab) l, nm_elements e
                      WHERE     e.ne_unique = l.ne_unique
-                           AND status = 'VALID'
+                           AND status = 'LOAD'
                            AND EXISTS
                                    (SELECT 1
                                       FROM nm_members, TABLE (ne_ids)
@@ -515,8 +522,26 @@ AS
                        (SELECT 1
                           FROM nm_elements, TABLE (ne_ids)
                          WHERE ne_id = ptr_value);
-    END;
-
+         
+         -- If all the datums of an associated load record are transferred 
+         -- then only update status of the associated load record to TRANSFERRED           
+         UPDATE sdl_load_data sld
+            SET sld.sld_status = 'TRANSFERRED'
+          WHERE sld.sld_sfs_id = p_batch_id
+            AND EXISTS (SELECT 1
+                          FROM sdl_wip_datums swd
+                         WHERE swd.batch_id = sld.sld_sfs_id
+                           AND swd.status = 'TRANSFERRED'
+                           AND swd.sld_key = sld.sld_key
+                           AND 1 = (SELECT APPROX_COUNT_DISTINCT (s.status)
+                                      FROM sdl_wip_datums s
+                                     WHERE s.batch_id = swd.batch_id
+                                       AND s.sld_key = swd.sld_key));             
+                         
+    END transfer_datums;
+    --
+    ----------------------------------------------------------------------------
+    --
     FUNCTION get_ne_data (p_batch_id IN NUMBER, p_view_name IN VARCHAR2)
         RETURN sdl_ne_tab
     AS
@@ -529,6 +554,9 @@ AS
             USING p_batch_id;
 
         RETURN retval;
-    END;
+    END get_ne_data;
+    --
+    ----------------------------------------------------------------------------
+    --	
 END;
 /
