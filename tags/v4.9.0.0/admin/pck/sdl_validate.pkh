@@ -1,0 +1,134 @@
+CREATE OR REPLACE PACKAGE sdl_validate
+AS
+    --<PACKAGE>
+    --   PVCS Identifiers :-
+    --
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_validate.pkh-arc   1.6   Mar 12 2020 17:22:38   Vikas.Mhetre  $
+    --       Module Name      : $Workfile:   sdl_validate.pkh  $
+    --       Date into PVCS   : $Date:   Mar 12 2020 17:22:38  $
+    --       Date fetched Out : $Modtime:   Mar 11 2020 18:57:40  $
+    --       PVCS Version     : $Revision:   1.6  $
+    --
+    --   Author : R.A. Coupe
+    --
+    --   Package for handling validation of attributes in a load batch
+    --
+    -----------------------------------------------------------------------------
+    -- Copyright (c) 2019 Bentley Systems Incorporated. All rights reserved.
+    ----------------------------------------------------------------------------
+    -- The main purpose of this package is to handle the validation of all the defined attributes in a batch:
+    -- Domain based checks
+    -- FK based checks
+    -- format checks
+
+    -- assessments of accuracy of network over existing network.
+    --</PACKAGE>
+    g_sccsid   CONSTANT VARCHAR2 (2000) := '$Revision:   1.6  $';
+
+    -----------------------------------------------------------------------------
+    --
+    --<PROC NAME="GET_VERSION">
+    --
+    -- This function returns the current PVCS version of the package
+    --
+    FUNCTION get_version
+        RETURN VARCHAR2;
+    --
+    --</PROC>
+    --
+    -----------------------------------------------------------------------------
+    --
+    --<PROC NAME="GET_BODY_VERSION">
+    --
+    -- This function returns the current PVCS version of the package body
+	--
+    FUNCTION get_body_version
+        RETURN VARCHAR2;
+    --
+    --</PROC>
+    --
+    -----------------------------------------------------------------------------
+    --
+    --<PROC NAME="VALIDATE_BATCH">
+    --
+    -- This procedure is a wrapper for smaller validation procedures operating on the load data and removes any residual
+    -- validation failures before refreshing them.
+    --
+    PROCEDURE validate_batch (p_batch_id IN NUMBER);
+    --
+    --</PROC>
+    --
+    -----------------------------------------------------------------------------
+    --
+    --<PROC NAME="VALIDATE_DATUMS_IN_BATCH">
+    --
+    -- This procedure is a wrapper for smaller validation procedures operating of the derived datums and removes any residual
+    -- validation failures before refreshing them.
+    --
+    PROCEDURE validate_datums_in_batch (p_batch_id IN NUMBER);
+    --
+    --</PROC>
+    --
+    -----------------------------------------------------------------------------
+    --
+    --<PROC NAME="VALIDATE_ADJUSTMENT_RULES">
+    --
+    -- This function validates the adjustment rules
+    --
+    PROCEDURE validate_adjustment_rules (p_batch_id IN NUMBER);
+    --
+    -----------------------------------------------------------------------------
+    --
+    --<PROC NAME="VALIDATE_PROFILE">
+    --
+    -- This procedure validates the profile
+    --
+    PROCEDURE validate_profile (p_profile_id IN NUMBER);
+    --
+    --</PROC>
+    --
+    -----------------------------------------------------------------------------
+    --
+    PROCEDURE set_working_geometry (p_batch_id      IN NUMBER,
+                                    p_unit_factor   IN NUMBER,
+                                    p_round         IN NUMBER);
+    --
+    -----------------------------------------------------------------------------
+    --
+    FUNCTION guess_dim_and_gtype (p_batch_id IN NUMBER)
+        RETURN NUMBER;
+    --
+    -----------------------------------------------------------------------------
+    --
+    FUNCTION sdl_set_gtype (p_geom          IN SDO_GEOMETRY,
+                            p_gtype         IN NUMBER,
+                            p_length        IN NUMBER DEFAULT NULL,
+                            p_unit_factor   IN NUMBER,
+                            p_round         IN NUMBER,
+							p_sdo_tol       IN NUMBER)
+        RETURN SDO_GEOMETRY;
+    --
+    -----------------------------------------------------------------------------
+    --
+    PROCEDURE validate_datum_geometry (p_batch_id IN INTEGER);
+    --
+    -----------------------------------------------------------------------------
+    --
+    PROCEDURE check_self_intersections (p_batch_id IN INTEGER);
+    --
+    -----------------------------------------------------------------------------
+    --
+    PROCEDURE set_datum_status (p_batch_id IN NUMBER);
+    --
+    -----------------------------------------------------------------------------
+    --    
+    PROCEDURE reset_load_status (p_batch_id IN NUMBER);
+    --
+    -----------------------------------------------------------------------------
+    --    
+    PROCEDURE update_load_datum_status (p_batch_id IN NUMBER);
+    --
+    -----------------------------------------------------------------------------
+    --        
+END sdl_validate;
+/
