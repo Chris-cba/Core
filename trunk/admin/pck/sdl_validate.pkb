@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY sdl_validate
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_validate.pkb-arc   1.11   Mar 12 2020 17:24:40   Vikas.Mhetre  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_validate.pkb-arc   1.12   Mar 12 2020 20:15:54   Vikas.Mhetre  $
     --       Module Name      : $Workfile:   sdl_validate.pkb  $
-    --       Date into PVCS   : $Date:   Mar 12 2020 17:24:40  $
-    --       Date fetched Out : $Modtime:   Mar 11 2020 19:12:06  $
-    --       PVCS Version     : $Revision:   1.11  $
+    --       Date into PVCS   : $Date:   Mar 12 2020 20:15:54  $
+    --       Date fetched Out : $Modtime:   Mar 12 2020 20:10:28  $
+    --       PVCS Version     : $Revision:   1.12  $
     --
     --   Author : R.A. Coupe
     --
@@ -20,7 +20,7 @@ AS
     -- FK based checks
     -- format checks
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.11  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.12  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'SDL_VALIDATE';
 
@@ -1056,7 +1056,7 @@ AS
 
       -- update status of load table VALID records based on profile review levels
       UPDATE sdl_load_data sld
-         SET sld_status = (SELECT ssrl.ssrl_default_action
+         SET sld_status = NVL((SELECT ssrl.ssrl_default_action
                              FROM sdl_spatial_review_levels ssrl, 
                                   sdl_file_submissions sfs,
                                   sdl_geom_accuracy sga
@@ -1064,19 +1064,19 @@ AS
                               AND sfs.sfs_id = sld.sld_sfs_id
                               AND sga.slga_sld_key = sld.sld_key
                               AND NVL(sga.slga_pct_inside,-1) BETWEEN ssrl.ssrl_percent_from
-                                                                  AND ssrl.ssrl_percent_to)
+                                                                  AND ssrl.ssrl_percent_to), 'REVIEW')
       WHERE sld.sld_sfs_id = p_batch_id
         AND sld.sld_status = 'VALID';
 
       -- update status of datum table VALID records based on profile review levels
       UPDATE sdl_wip_datums swd
-         SET swd.status = (SELECT ssrl.ssrl_default_action
+         SET swd.status = NVL((SELECT ssrl.ssrl_default_action
                              FROM sdl_spatial_review_levels ssrl, 
                                   sdl_file_submissions sfs
                             WHERE ssrl.ssrl_sp_id = sfs.sfs_sp_id
                               AND sfs.sfs_id = swd.batch_id
                               AND swd.pct_match BETWEEN ssrl.ssrl_percent_from
-                                                    AND ssrl.ssrl_percent_to)
+                                                    AND ssrl.ssrl_percent_to), 'REVIEW')
        WHERE swd.batch_id = p_batch_id
          AND swd.status = 'VALID';
 
