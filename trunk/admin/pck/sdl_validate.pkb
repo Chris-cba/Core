@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY sdl_validate
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_validate.pkb-arc   1.10   Jan 22 2020 14:27:36   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_validate.pkb-arc   1.11   Mar 12 2020 17:24:40   Vikas.Mhetre  $
     --       Module Name      : $Workfile:   sdl_validate.pkb  $
-    --       Date into PVCS   : $Date:   Jan 22 2020 14:27:36  $
-    --       Date fetched Out : $Modtime:   Jan 22 2020 14:26:58  $
-    --       PVCS Version     : $Revision:   1.10  $
+    --       Date into PVCS   : $Date:   Mar 12 2020 17:24:40  $
+    --       Date fetched Out : $Modtime:   Mar 11 2020 19:12:06  $
+    --       PVCS Version     : $Revision:   1.11  $
     --
     --   Author : R.A. Coupe
     --
@@ -20,58 +20,79 @@ AS
     -- FK based checks
     -- format checks
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.10  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.11  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'SDL_VALIDATE';
 
     -----------------------------------------------------------------------------
-    -- This procedure generates and executes a SQL insert string to log all load records in a batch which have domain-based columns with illegal values.
-
-    PROCEDURE VALIDATE_DOMAIN_COLUMNS (p_batch_id IN NUMBER);
-
     --
-    -- This procedure generates and executes a SQL insert string to log all load records in a batch which have mandatory columns without a value
-
-    PROCEDURE VALIDATE_MANDATORY_COLUMNS (p_batch_id IN NUMBER);
-
-    PROCEDURE VALIDATE_DATUM_DOMAIN_COLUMNS (p_batch_id       IN NUMBER,
-                                             p_profile_id     IN NUMBER,
-                                             p_profile_view   IN VARCHAR2);
-
-    PROCEDURE VALIDATE_DTM_MAND_COLUMNS (p_batch_id       IN NUMBER,
-                                         p_profile_id     IN NUMBER,
-                                         p_profile_view   IN VARCHAR2);
-
-    PROCEDURE VALIDATE_DTM_COLUMN_LEN (p_batch_id       IN NUMBER,
-                                       p_profile_id     IN NUMBER,
-                                       p_profile_view   IN VARCHAR2);
-
-
     FUNCTION get_version
         RETURN VARCHAR2
     IS
     BEGIN
         RETURN g_sccsid;
     END get_version;
-
+    --
+    -----------------------------------------------------------------------------
+    --
     FUNCTION get_body_version
         RETURN VARCHAR2
     IS
     BEGIN
         RETURN g_body_sccsid;
     END get_body_version;
-
-    PROCEDURE UPDATE_BATCH_FOR_ADJUSTMENT (p_batch_id IN INTEGER)
+    --
+    -----------------------------------------------------------------------------
+    --
+    -- This procedure generates and executes a SQL insert string to log all load records in a batch which have domain-based columns with illegal values.
+    --
+    PROCEDURE validate_domain_columns (p_batch_id IN NUMBER);
+    --
+    --
+    -----------------------------------------------------------------------------
+    --
+    -- This procedure generates and executes a SQL insert string to log all load records in a batch which have mandatory columns without a value
+    --
+    PROCEDURE validate_mandatory_columns (p_batch_id IN NUMBER);
+    --
+    -----------------------------------------------------------------------------
+    --
+    PROCEDURE validate_datum_domain_columns (p_batch_id       IN NUMBER,
+                                             p_profile_id     IN NUMBER,
+                                             p_profile_view   IN VARCHAR2);
+    --
+    -----------------------------------------------------------------------------
+    --
+    PROCEDURE validate_dtm_mand_columns (p_batch_id       IN NUMBER,
+                                         p_profile_id     IN NUMBER,
+                                         p_profile_view   IN VARCHAR2);
+    --
+    -----------------------------------------------------------------------------
+    --
+    PROCEDURE validate_dtm_column_len (p_batch_id       IN NUMBER,
+                                       p_profile_id     IN NUMBER,
+                                       p_profile_view   IN VARCHAR2);
+    --
+    -----------------------------------------------------------------------------
+    --                                       
+    PROCEDURE update_batch_for_adjustment (p_batch_id IN INTEGER)
     IS
         CURSOR c_update IS
-            SELECT DISTINCT
-                   'SLD_COL_' || sam.sam_col_id     load_column_name,
-                   sam.sam_col_id,
-                   saaa.saaa_adjusted_value
-              FROM sdl_attribute_mapping           sam,
-                   sdl_attribute_adjustment_audit  saaa
-             WHERE     sam.sam_id = saaa.saaa_sam_id
-                   AND saaa.saaa_sfs_id = p_batch_id;
+        SELECT 'SLD_COL_' || sam.sam_col_id     load_column_name,
+               sam.sam_id,
+               saar.saar_adjust_to_value
+          FROM sdl_attribute_mapping           sam,
+               sdl_attribute_adjustment_rules  saar,
+               sdl_file_submissions sfs
+         WHERE sam.sam_view_column_name = saar.saar_target_attribute_name
+           AND sam.sam_sp_id = saar.saar_sp_id
+           AND sam.sam_sp_id = sfs.sfs_sp_id
+           AND EXISTS ( SELECT 1 
+                          FROM sdl_attribute_adjustment_audit saaa 
+                         WHERE saaa.saaa_sam_id = sam.sam_id 
+                           AND saaa.saaa_sfs_id = sfs.sfs_id)
+           AND sfs.sfs_id = p_batch_id
+         ORDER BY saar.saar_id;
 
         sql_str   VARCHAR2 (4000);
     BEGIN
@@ -83,28 +104,26 @@ AS
                 || r_update.load_column_name
                 || ' = '
                 || ''''
-                || r_update.saaa_adjusted_value
+                || r_update.saar_adjust_to_value
                 || ''''
                 || ','
                 || 'sld_adjustment_rule_applied = '
                 || '''Y'''
-                -- || 'sld_status = '
-                -- || '''ADJUSTED'''
                 || ' WHERE sld_key IN (SELECT saaa.saaa_sld_key FROM sdl_attribute_adjustment_audit saaa WHERE saaa.saaa_sfs_id = '
                 || p_batch_id
                 || ' AND saaa.saaa_sam_id = '
-                || r_update.sam_col_id
+                || r_update.sam_id
                 || ')'
                 || ' AND sld_sfs_id = '
                 || p_batch_id;
 
-
             EXECUTE IMMEDIATE sql_str;
         END LOOP;
     END update_batch_for_adjustment;
-
-
-    PROCEDURE VALIDATE_BATCH (p_batch_id IN NUMBER)
+    --
+    -----------------------------------------------------------------------------
+    --
+    PROCEDURE validate_batch (p_batch_id IN NUMBER)
     IS
         meta_row        V_SDL_PROFILE_NW_TYPES%ROWTYPE;
         l_unit_factor   NUMBER;
@@ -161,9 +180,11 @@ AS
                              WHERE     svr_sfs_id = p_batch_id
                                    AND svr_sld_key = sld_key))
          WHERE sld_sfs_id = p_batch_id;
-    END;
-
-    PROCEDURE VALIDATE_DOMAIN_COLUMNS (p_batch_id IN NUMBER)
+    END validate_batch;
+    --
+    -----------------------------------------------------------------------------
+    --
+    PROCEDURE validate_domain_columns (p_batch_id IN NUMBER)
     IS
         sql_str   VARCHAR2 (4000);
         max_id    NUMBER;
@@ -204,7 +225,7 @@ AS
                       || TO_CHAR (sam_id)
                       || ', '
                       || ''''
-                      || load_column_name
+                      || sam_view_column_name
                       || ''''
                       || ','
                       || load_column_name
@@ -214,7 +235,7 @@ AS
                       || 'Domain '
                       || domain
                       || ' value '
-                      || load_column_name
+                      || sam_view_column_name
                       || ' is invalid'
                       || ''''
                       || ' from sdl_load_data where sld_sfs_id = '
@@ -238,10 +259,11 @@ AS
         THEN
             EXECUTE IMMEDIATE sql_str;
         END IF;
-    END;
-
-
-    PROCEDURE VALIDATE_MANDATORY_COLUMNS (p_batch_id IN NUMBER)
+    END validate_domain_columns;
+    --
+    -----------------------------------------------------------------------------
+    --
+    PROCEDURE validate_mandatory_columns (p_batch_id IN NUMBER)
     IS
         sql_str   VARCHAR2 (4000);
         max_id    NUMBER;
@@ -282,7 +304,7 @@ AS
                       || TO_CHAR (sam_id)
                       || ', '
                       || ''''
-                      || load_column_name
+                      || sam_view_column_name
                       || ''''
                       || ','
                       || load_column_name
@@ -308,9 +330,11 @@ AS
         THEN
             EXECUTE IMMEDIATE sql_str;
         END IF;
-    END;
-
-    PROCEDURE VALIDATE_ADJUSTMENT_RULES (p_batch_id IN NUMBER)
+    END validate_mandatory_columns;
+    --
+    -----------------------------------------------------------------------------
+    --
+    PROCEDURE validate_adjustment_rules (p_batch_id IN NUMBER)
     IS
         sql_str   VARCHAR2 (4000);
         max_id    NUMBER;
@@ -340,8 +364,8 @@ AS
                           WHERE     sfs.sfs_id = p_batch_id
                                 AND sam.sam_sp_id = sfs.sfs_sp_id
                                 AND sam.sam_sp_id = saar.saar_sp_id
-                                AND sam.sam_view_column_name =
-                                    saar.saar_target_attribute_name))
+                                AND sam.sam_view_column_name = saar.saar_target_attribute_name
+                                ORDER BY saar.saar_id))
         SELECT MAX (sam_id),
                   'INSERT INTO sdl_attribute_adjustment_audit ( saaa_sld_key, saaa_sfs_id, saaa_saar_id, saaa_sam_id, saaa_original_value, saaa_adjusted_value) '
                || LISTAGG (
@@ -367,9 +391,8 @@ AS
                       || load_column_name
                       || CASE
                              WHEN saar_source_value IS NULL THEN ' IS NULL '
-                             ELSE ' = '
+                             ELSE ' = ''' || saar_source_value || ''''
                          END
-                      || saar_source_value
                       || ')',
                       ' UNION ALL ')
                   WITHIN GROUP (ORDER BY sam_id)
@@ -387,10 +410,11 @@ AS
 
             update_batch_for_adjustment (p_batch_id);
         END IF;
-    END VALIDATE_ADJUSTMENT_RULES;
-
-
-    PROCEDURE VALIDATE_PROFILE (p_profile_id IN NUMBER)
+    END validate_adjustment_rules;
+    --
+    -----------------------------------------------------------------------------
+    --
+    PROCEDURE validate_profile (p_profile_id IN NUMBER)
     IS
         l_dummy   NUMBER := 0;
     BEGIN
@@ -465,8 +489,10 @@ AS
                 -20001,
                 'Columns that are used to construct the unique key are not present in the profile attribute list');
         END IF;
-    END;
-
+    END validate_profile;
+    --
+    -----------------------------------------------------------------------------
+    --
     PROCEDURE set_working_geometry (p_batch_id      IN NUMBER,
                                     p_unit_factor   IN NUMBER,
                                     p_round         IN NUMBER)
@@ -552,8 +578,10 @@ AS
                      WHERE sld_sfs_id = p_batch_id)
          WHERE sfs_id = p_batch_id;
     --
-    END;
-
+    END set_working_geometry;
+    --
+    -----------------------------------------------------------------------------
+    --
     FUNCTION guess_dim_and_gtype (p_batch_id IN NUMBER)
         RETURN NUMBER
     IS
@@ -591,8 +619,10 @@ AS
         END IF;
 
         RETURN retval;
-    END;
-
+    END guess_dim_and_gtype;
+    --
+    -----------------------------------------------------------------------------
+    --
     FUNCTION sdl_set_gtype (p_geom          IN SDO_GEOMETRY,
                             p_gtype         IN NUMBER,
                             p_length        IN NUMBER DEFAULT NULL,
@@ -639,8 +669,10 @@ AS
 
         --
         RETURN retval;
-    END;
-
+    END sdl_set_gtype;
+    --
+    -----------------------------------------------------------------------------
+    --
     PROCEDURE validate_datum_geometry (p_batch_id IN INTEGER)
     IS
         l_diminfo   sdo_dim_array;
@@ -710,9 +742,10 @@ AS
     --
     --        check_self_intersections (p_batch_id);
 
-    END;
-
-
+    END validate_datum_geometry;
+    --
+    -----------------------------------------------------------------------------
+    --
     PROCEDURE check_self_intersections (p_batch_id IN INTEGER)
     IS
         g_intersection_mask   VARCHAR2 (100) := 'OVERLAPBDYDISJOINT';
@@ -754,8 +787,10 @@ AS
                        AND p1.id != p2.id
                        AND p1.id < p2.id - 1;
         END LOOP;
-    END;
-
+    END check_self_intersections;
+    --
+    -----------------------------------------------------------------------------
+    --
     PROCEDURE set_datum_status (p_batch_id IN NUMBER)
     IS
     BEGIN
@@ -776,9 +811,10 @@ AS
                          WHERE svr_swd_id = swd_id)
                AND batch_id = p_batch_id
                AND status IN ('NEW', 'VALID', 'INVALID');
-    END;
-
-
+    END set_datum_status; 
+    --
+    -----------------------------------------------------------------------------
+    --
     PROCEDURE validate_datums_in_batch (p_batch_id IN NUMBER)
     IS
         meta_row      V_SDL_PROFILE_NW_TYPES%ROWTYPE;
@@ -809,9 +845,11 @@ AS
                                  p_profile_view   => l_view_name);
 
         set_datum_status (p_batch_id);
-    END;
-
-    PROCEDURE VALIDATE_DATUM_DOMAIN_COLUMNS (p_batch_id       IN NUMBER,
+    END validate_datums_in_batch;
+    --
+    -----------------------------------------------------------------------------
+    --
+    PROCEDURE validate_datum_domain_columns (p_batch_id       IN NUMBER,
                                              p_profile_id     IN NUMBER,
                                              p_profile_view   IN VARCHAR2)
     IS
@@ -873,9 +911,11 @@ AS
         THEN
             EXECUTE IMMEDIATE sql_str;
         END IF;
-    END;
-
-    PROCEDURE VALIDATE_DTM_MAND_COLUMNS (p_batch_id       IN NUMBER,
+    END validate_datum_domain_columns;
+    --
+    -----------------------------------------------------------------------------
+    --
+    PROCEDURE validate_dtm_mand_columns (p_batch_id       IN NUMBER,
                                          p_profile_id     IN NUMBER,
                                          p_profile_view   IN VARCHAR2)
     IS
@@ -929,9 +969,11 @@ AS
         THEN
             EXECUTE IMMEDIATE sql_str;
         END IF;
-    END;
-
-    PROCEDURE VALIDATE_DTM_COLUMN_LEN (p_batch_id       IN NUMBER,
+    END validate_dtm_mand_columns;
+    --
+    -----------------------------------------------------------------------------
+    --
+    PROCEDURE validate_dtm_column_len (p_batch_id       IN NUMBER,
                                        p_profile_id     IN NUMBER,
                                        p_profile_view   IN VARCHAR2)
     IS
@@ -990,6 +1032,57 @@ AS
         THEN
             EXECUTE IMMEDIATE sql_str;
         END IF;
-    END;
+    END validate_dtm_column_len;
+    --
+    -----------------------------------------------------------------------------
+    --
+    PROCEDURE reset_load_status (p_batch_id IN NUMBER)
+    IS
+    BEGIN
+       -- reset status of load table to VALID in case when re-executing spatial analysis.
+       -- it won't update status of any load records when it's a fresh run
+        UPDATE sdl_load_data
+        SET sld_status = 'VALID'
+        WHERE sld_sfs_id = p_batch_id
+        AND sld_status IN ('LOAD','SKIP','REVIEW');
+
+    END reset_load_status;
+    --
+    -----------------------------------------------------------------------------
+    --    
+    PROCEDURE update_load_datum_status (p_batch_id IN NUMBER)
+    IS
+    BEGIN
+
+      -- update status of load table VALID records based on profile review levels
+      UPDATE sdl_load_data sld
+         SET sld_status = (SELECT ssrl.ssrl_default_action
+                             FROM sdl_spatial_review_levels ssrl, 
+                                  sdl_file_submissions sfs,
+                                  sdl_geom_accuracy sga
+                            WHERE ssrl.ssrl_sp_id = sfs.sfs_sp_id
+                              AND sfs.sfs_id = sld.sld_sfs_id
+                              AND sga.slga_sld_key = sld.sld_key
+                              AND NVL(sga.slga_pct_inside,-1) BETWEEN ssrl.ssrl_percent_from
+                                                                  AND ssrl.ssrl_percent_to)
+      WHERE sld.sld_sfs_id = p_batch_id
+        AND sld.sld_status = 'VALID';
+
+      -- update status of datum table VALID records based on profile review levels
+      UPDATE sdl_wip_datums swd
+         SET swd.status = (SELECT ssrl.ssrl_default_action
+                             FROM sdl_spatial_review_levels ssrl, 
+                                  sdl_file_submissions sfs
+                            WHERE ssrl.ssrl_sp_id = sfs.sfs_sp_id
+                              AND sfs.sfs_id = swd.batch_id
+                              AND swd.pct_match BETWEEN ssrl.ssrl_percent_from
+                                                    AND ssrl.ssrl_percent_to)
+       WHERE swd.batch_id = p_batch_id
+         AND swd.status = 'VALID';
+
+    END update_load_datum_status;
+    --
+    -----------------------------------------------------------------------------
+    --        
 END sdl_validate;
 /
