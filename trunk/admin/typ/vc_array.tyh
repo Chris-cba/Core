@@ -1,0 +1,20 @@
+CREATE OR REPLACE TYPE VC_ARRAY
+/*
+    --   PVCS Identifiers :-
+    --
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/typ/vc_array.tyh-arc   1.0   Mar 17 2020 07:22:18   Vikas.Mhetre  $
+    --       Module Name      : $Workfile:   vc_array.tyh  $
+    --       Date into PVCS   : $Date:   Mar 17 2020 07:22:18  $
+    --       Date fetched Out : $Modtime:   Mar 17 2020 06:59:40  $
+    --       PVCS Version     : $Revision:   1.0  $
+    --
+    --   Author : R.A. Coupe
+    --
+-----------------------------------------------------------------------------
+--    Copyright (c) 2020 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
+*/
+IS VARRAY( 1048576 ) OF VARCHAR2(24);
+/
+
