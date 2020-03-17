@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY sdl_ddl
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_ddl.pkb-arc   1.25   Mar 12 2020 17:38:06   Vikas.Mhetre  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_ddl.pkb-arc   1.26   Mar 17 2020 14:28:36   Vikas.Mhetre  $
     --       Module Name      : $Workfile:   sdl_ddl.pkb  $
-    --       Date into PVCS   : $Date:   Mar 12 2020 17:38:06  $
-    --       Date fetched Out : $Modtime:   Mar 12 2020 08:50:22  $
-    --       PVCS Version     : $Revision:   1.25  $
+    --       Date into PVCS   : $Date:   Mar 17 2020 14:28:36  $
+    --       Date fetched Out : $Modtime:   Mar 17 2020 13:05:36  $
+    --       PVCS Version     : $Revision:   1.26  $
     --
     --   Author : R.A. Coupe
     --
@@ -19,7 +19,7 @@ AS
     -- The main purpose of this package is to provide DDL execution for creation of views and triggers
     -- to support the SDL.
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.25  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.26  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'SDL_DDL';
 
@@ -696,6 +696,16 @@ AS
                       p_role                => g_default_role,
                       p_dim                 => 3,
                       p_gtype               => 3302);
+
+        insert_theme (p_theme_name          => 'SDL TRANSFERRED DATUMS',
+                      p_object_name         => 'V_SDL_TRANSFERRED_DATUMS',
+                      p_base_theme_table    => '',
+                      p_base_theme_column   => '',
+                      p_key_name            => 'SWD_ID',
+                      p_geom_column_name    => 'GEOM',
+                      p_role                => g_default_role,
+                      p_dim                 => 3,
+                      p_gtype               => 3002);
 
         --now the base table of the wip nodes
 
