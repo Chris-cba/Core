@@ -2,11 +2,11 @@
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3pkb.sql-arc   2.54   Jul 09 2019 15:19:30   Steve.Cooper  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3pkb.sql-arc   2.55   Mar 17 2020 11:03:42   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm3pkb.sql  $
---       Date into PVCS   : $Date:   Jul 09 2019 15:19:30  $
---       Date fetched Out : $Modtime:   Jul 09 2019 15:17:06  $
---       PVCS Version     : $Revision:   2.54  $
+--       Date into PVCS   : $Date:   Mar 17 2020 11:03:42  $
+--       Date fetched Out : $Modtime:   Mar 17 2020 11:02:22  $
+--       PVCS Version     : $Revision:   2.55  $
 --
 --
 --   Author : Graeme Johnson
@@ -2563,6 +2563,73 @@ SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'pck'||'&term
 FROM dual
 /
 start '&run_file'
+--
+-- Spatial Data Loader Packages
+--
+
+SET TERM ON
+PROMPT sdl_audit.pkw
+SET TERM OFF
+SET DEFINE ON
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'pck'||'&terminator'||'sdl_audit.pkw' run_file 
+FROM dual
+/
+start '&run_file'
+
+SET TERM ON
+PROMPT sdl_ddl.pkw
+SET TERM OFF
+SET DEFINE ON
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'pck'||'&terminator'||'sdl_ddl.pkw' run_file 
+FROM dual
+/
+start '&run_file'
+
+SET TERM ON
+PROMPT sdl_process.pkw
+SET TERM OFF
+SET DEFINE ON
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'pck'||'&terminator'||'sdl_process.pkw' run_file 
+FROM dual
+/
+start '&run_file'
+
+SET TERM ON
+PROMPT sdl_stats.pkw
+SET TERM OFF
+SET DEFINE ON
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'pck'||'&terminator'||'sdl_stats.pkw' run_file 
+FROM dual
+/
+start '&run_file'
+
+SET TERM ON
+PROMPT sdl_topo.pkw
+SET TERM OFF
+SET DEFINE ON
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'pck'||'&terminator'||'sdl_topo.pkw' run_file 
+FROM dual
+/
+start '&run_file'
+
+SET TERM ON
+PROMPT sdl_transfer.pkw
+SET TERM OFF
+SET DEFINE ON
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'pck'||'&terminator'||'sdl_transfer.pkw' run_file 
+FROM dual
+/
+start '&run_file'
+
+SET TERM ON
+PROMPT sdl_validate.pkw
+SET TERM OFF
+SET DEFINE ON
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'pck'||'&terminator'||'sdl_validate.pkw' run_file 
+FROM dual
+/
+start '&run_file'
+
 
 --
 ----------------------------------------------------------------------------------------- 
