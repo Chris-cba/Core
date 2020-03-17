@@ -2,11 +2,11 @@
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/trg/nm3trg.sql-arc   2.23   Dec 20 2018 15:15:22   Chris.Baugh  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/trg/nm3trg.sql-arc   2.24   Mar 17 2020 10:37:04   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm3trg.sql  $
---       Date into PVCS   : $Date:   Dec 20 2018 15:15:22  $
---       Date fetched Out : $Modtime:   Dec 17 2018 14:48:32  $
---       PVCS Version     : $Revision:   2.23  $
+--       Date into PVCS   : $Date:   Mar 17 2020 10:37:04  $
+--       Date fetched Out : $Modtime:   Mar 17 2020 10:36:34  $
+--       PVCS Version     : $Revision:   2.24  $
 --
 --
 --   Author : Graeme Johnson
@@ -1964,6 +1964,149 @@ START '&run_file'
 --
 SET define ON
 SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'trg'||'&terminator'||'nal_asset_locations_all_who.trg' run_file
+FROM dual
+/
+START '&run_file'
+
+SET TERM ON
+-------------------------------------------------------------------------
+-- Spatial Data Loader Triggers 
+-------------------------------------------------------------------------
+--
+-------------------------------------------------------------------------
+--
+SET define ON
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'trg'||'&terminator'||'sdl_attribute_mapping_seq_trg.trg' run_file
+FROM dual
+/
+START '&run_file'
+
+SET TERM ON
+--
+-------------------------------------------------------------------------
+--
+SET define ON
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'trg'||'&terminator'||'sdl_attri_adjustment_r_seq_trg.trg' run_file
+FROM dual
+/
+START '&run_file'
+
+SET TERM ON
+--
+-------------------------------------------------------------------------
+--
+SET define ON
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'trg'||'&terminator'||'sdl_attri_adjust_audit_seq_trg.trg' run_file
+FROM dual
+/
+START '&run_file'
+
+SET TERM ON
+--
+-------------------------------------------------------------------------
+--
+SET define ON
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'trg'||'&terminator'||'sdl_geom_accuracy_seq_trg.trg' run_file
+FROM dual
+/
+START '&run_file'
+
+SET TERM ON
+--
+-------------------------------------------------------------------------
+--
+SET define ON
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'trg'||'&terminator'||'sdl_load_data_seq_trg.trg' run_file
+FROM dual
+/
+START '&run_file'
+
+SET TERM ON
+--
+-------------------------------------------------------------------------
+--
+SET define ON
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'trg'||'&terminator'||'sdl_pline_statistics_seq_trg.trg' run_file
+FROM dual
+/
+START '&run_file'
+
+SET TERM ON
+--
+-------------------------------------------------------------------------
+--
+SET define ON
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'trg'||'&terminator'||'sdl_process_audit_seq.trg' run_file
+FROM dual
+/
+START '&run_file'
+
+SET TERM ON
+--
+-------------------------------------------------------------------------
+--
+SET define ON
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'trg'||'&terminator'||'sdl_profiles_ai.trg' run_file
+FROM dual
+/
+START '&run_file'
+
+SET TERM ON
+--
+-------------------------------------------------------------------------
+--
+SET define ON
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'trg'||'&terminator'||'sdl_profiles_seq_trg.trg' run_file
+FROM dual
+/
+START '&run_file'
+
+SET TERM ON
+--
+-------------------------------------------------------------------------
+--
+SET define ON
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'trg'||'&terminator'||'sdl_spatial_review_lev_seq_trg.trg' run_file
+FROM dual
+/
+START '&run_file'
+
+SET TERM ON
+--
+-------------------------------------------------------------------------
+--
+SET define ON
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'trg'||'&terminator'||'sdl_user_profiles_seq_trg.trg' run_file
+FROM dual
+/
+START '&run_file'
+
+SET TERM ON
+--
+-------------------------------------------------------------------------
+--
+SET define ON
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'trg'||'&terminator'||'sdl_validation_results_seq_trg.trg' run_file
+FROM dual
+/
+START '&run_file'
+
+SET TERM ON
+--
+-------------------------------------------------------------------------
+--
+SET define ON
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'trg'||'&terminator'||'sdl_wip_datums_seq_trg.trg' run_file
+FROM dual
+/
+START '&run_file'
+
+SET TERM ON
+--
+-------------------------------------------------------------------------
+--
+SET define ON
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'trg'||'&terminator'||'sdl_wip_nodes_trg.trg' run_file
 FROM dual
 /
 START '&run_file'
