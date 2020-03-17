@@ -3,11 +3,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/typ/nm3typ.sql-arc   2.17   Apr 18 2019 12:23:36   Chris.Baugh  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/typ/nm3typ.sql-arc   2.18   Mar 17 2020 10:30:42   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm3typ.sql  $
---       Date into PVCS   : $Date:   Apr 18 2019 12:23:36  $
---       Date fetched Out : $Modtime:   Apr 18 2019 12:22:12  $
---       Version          : $Revision:   2.17  $
+--       Date into PVCS   : $Date:   Mar 17 2020 10:30:42  $
+--       Date fetched Out : $Modtime:   Mar 17 2020 10:28:34  $
+--       Version          : $Revision:   2.18  $
 --
 --   Product upgrade script
 --
@@ -253,6 +253,16 @@ BEGIN
   drop_type('LB_LINEAR_ELEMENT_TYPES');
   drop_type('LB_LINEAR_ELEMENT_TYPE');
   drop_type('LB_XRPT_TAB');
+  --
+  -- Spatial Data Loader
+  --
+  drop_type('VC_ARRAY');
+  drop_type('PLINE_BOX');
+  drop_type('PLINE_BOX_TAB');
+  drop_type('TOPO_NW_GEOM_ID');
+  drop_type('TOPO_NW_GEOM_ID_TAB');
+  drop_type('SDL_NE_DATA');
+  drop_type('SDL_NE_TAB');
   --
 END;
 /
@@ -2141,6 +2151,101 @@ select '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'typ'||
 from dual
 /
 start '&&run_file'
+--------------------------------------------------------------------------------------------
+-- Spatial Data Loader
+--------------------------------------------------------------------------------------------
+--
+--------------------------------------------------------------------------------------------
+--
+set term on
+prompt vc_array.tyh
+set term off
+set define on
+set feedback off
+select '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'typ'||
+        '&terminator'||'vc_array.tyh' run_file
+from dual
+/
+start '&&run_file'
+--
+--------------------------------------------------------------------------------------------
+--
+set term on
+prompt pline_box.tyh
+set term off
+set define on
+set feedback off
+select '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'typ'||
+        '&terminator'||'pline_box.tyh' run_file
+from dual
+/
+start '&&run_file'
+--
+--------------------------------------------------------------------------------------------
+--
+set term on
+prompt pline_box_tab.tyh
+set term off
+set define on
+set feedback off
+select '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'typ'||
+        '&terminator'||'pline_box_tab.tyh' run_file
+from dual
+/
+start '&&run_file'
+--
+--------------------------------------------------------------------------------------------
+--
+set term on
+prompt topo_nw_geom_id.tyh
+set term off
+set define on
+set feedback off
+select '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'typ'||
+        '&terminator'||'topo_nw_geom_id.tyh' run_file
+from dual
+/
+start '&&run_file'
+--
+--------------------------------------------------------------------------------------------
+--
+set term on
+prompt topo_nw_geom_id_tab.tyh
+set term off
+set define on
+set feedback off
+select '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'typ'||
+        '&terminator'||'topo_nw_geom_id_tab.tyh' run_file
+from dual
+/
+start '&&run_file'
+--
+--------------------------------------------------------------------------------------------
+--
+set term on
+prompt sdl_ne_data.tyh
+set term off
+set define on
+set feedback off
+select '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'typ'||
+        '&terminator'||'sdl_ne_data.tyh' run_file
+from dual
+/
+start '&&run_file'
+--
+--------------------------------------------------------------------------------------------
+--
+set term on
+prompt sdl_ne_tab.tyh
+set term off
+set define on
+set feedback off
+select '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'typ'||
+        '&terminator'||'sdl_ne_tab.tyh' run_file
+from dual
+/
+start '&&run_file'
+
 --
 --------------------------------------------------------------------------------------------
 --
