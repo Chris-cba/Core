@@ -4,11 +4,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/sdl_metadata_upg.sql-arc   1.0   Mar 17 2020 07:26:10   Vikas.Mhetre  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/sdl_metadata_upg.sql-arc   1.1   Mar 17 2020 14:39:56   Vikas.Mhetre  $
 --       Module Name      : $Workfile:   sdl_metadata_upg.sql  $
---       Date into PVCS   : $Date:   Mar 17 2020 07:26:10  $
---       Date fetched Out : $Modtime:   Mar 17 2020 07:19:48  $
---       Version          : $Revision:   1.0  $
+--       Date into PVCS   : $Date:   Mar 17 2020 14:39:56  $
+--       Date fetched Out : $Modtime:   Mar 17 2020 13:01:32  $
+--       Version          : $Revision:   1.1  $
 --
 -----------------------------------------------------------------------------
 --    Copyright (c) 2020 Bentley Systems Incorporated. All rights reserved.
@@ -183,7 +183,7 @@ SELECT 'SDLMAPNAME'
 INSERT INTO hig_option_values (hov_id
                               ,hov_value)
 SELECT 'SDLMAPNAME'
-      ,'CTDOT_SDL'
+      ,'SDL_MAP'
   FROM DUAL
  WHERE NOT EXISTS (SELECT 1
                      FROM hig_option_values
