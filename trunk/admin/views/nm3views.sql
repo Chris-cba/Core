@@ -6,7 +6,7 @@
 --       Module Name      : nm3views.sql
 --       Date into SCCS   : 06/12/22 15:57:40
 --       Date fetched Out : 07/06/13 17:08:24
---       PVCS Version     : $Revision:   2.48  $
+--       PVCS Version     : $Revision:   2.49  $
 --
 --
 --   Author : Graeme Johnson
@@ -1938,7 +1938,7 @@ FROM dual
 start '&run_file'
 
 SET TERM ON
-PROMPT v_nm_ordered_extent_details.vw                                                                                                                                                                                                                
+PROMPT v_sdl_batch_accuracy.vw                                                                                                                                                                                                                
 SET TERM OFF
 SET DEFINE ON
 SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'views'||'&terminator'||'v_sdl_batch_accuracy.vw' run_file 
@@ -1947,7 +1947,7 @@ FROM dual
 start '&run_file'
 
 SET TERM ON
-PROMPT v_nm_ordered_extent_details.vw                                                                                                                                                                                                                
+PROMPT v_sdl_datum_accuracy.vw                                                                                                                                                                                                                
 SET TERM OFF
 SET DEFINE ON
 SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'views'||'&terminator'||'v_sdl_datum_accuracy.vw' run_file 
@@ -1956,7 +1956,7 @@ FROM dual
 start '&run_file'
 
 SET TERM ON
-PROMPT v_nm_ordered_extent_details.vw                                                                                                                                                                                                                
+PROMPT v_sdl_datum_stats_working.vw                                                                                                                                                                                                                
 SET TERM OFF
 SET DEFINE ON
 SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'views'||'&terminator'||'v_sdl_datum_stats_working.vw' run_file 
@@ -1965,7 +1965,7 @@ FROM dual
 start '&run_file'
 
 SET TERM ON
-PROMPT v_nm_ordered_extent_details.vw                                                                                                                                                                                                                
+PROMPT v_sdl_disconnected_network.vw                                                                                                                                                                                                                
 SET TERM OFF
 SET DEFINE ON
 SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'views'||'&terminator'||'v_sdl_disconnected_network.vw' run_file 
@@ -1974,7 +1974,7 @@ FROM dual
 start '&run_file'
 
 SET TERM ON
-PROMPT v_nm_ordered_extent_details.vw                                                                                                                                                                                                                
+PROMPT v_sdl_load_data.vw                                                                                                                                                                                                                
 SET TERM OFF
 SET DEFINE ON
 SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'views'||'&terminator'||'v_sdl_load_data.vw' run_file 
@@ -1983,7 +1983,7 @@ FROM dual
 start '&run_file'
 
 SET TERM ON
-PROMPT v_nm_ordered_extent_details.vw                                                                                                                                                                                                                
+PROMPT v_sdl_new_intersections.vw                                                                                                                                                                                                                
 SET TERM OFF
 SET DEFINE ON
 SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'views'||'&terminator'||'v_sdl_new_intersections.vw' run_file 
@@ -1992,7 +1992,7 @@ FROM dual
 start '&run_file'
 
 SET TERM ON
-PROMPT v_nm_ordered_extent_details.vw                                                                                                                                                                                                                
+PROMPT v_sdl_node_usages.vw                                                                                                                                                                                                                
 SET TERM OFF
 SET DEFINE ON
 SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'views'||'&terminator'||'v_sdl_node_usages.vw' run_file 
@@ -2001,7 +2001,7 @@ FROM dual
 start '&run_file'
 
 SET TERM ON
-PROMPT v_nm_ordered_extent_details.vw                                                                                                                                                                                                                
+PROMPT v_sdl_pline_stats.vw                                                                                                                                                                                                                
 SET TERM OFF
 SET DEFINE ON
 SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'views'||'&terminator'||'v_sdl_pline_stats.vw' run_file 
@@ -2010,7 +2010,7 @@ FROM dual
 start '&run_file'
 
 SET TERM ON
-PROMPT v_nm_ordered_extent_details.vw                                                                                                                                                                                                                
+PROMPT v_sdl_profile_nw_types.vw                                                                                                                                                                                                                
 SET TERM OFF
 SET DEFINE ON
 SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'views'||'&terminator'||'v_sdl_profile_nw_types.vw' run_file 
@@ -2019,7 +2019,7 @@ FROM dual
 start '&run_file'
 
 SET TERM ON
-PROMPT v_nm_ordered_extent_details.vw                                                                                                                                                                                                                
+PROMPT v_sdl_wip_nodes.vw                                                                                                                                                                                                                
 SET TERM OFF
 SET DEFINE ON
 SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'views'||'&terminator'||'v_sdl_wip_nodes.vw' run_file 
@@ -2028,7 +2028,7 @@ FROM dual
 start '&run_file'
 
 SET TERM ON
-PROMPT v_nm_ordered_extent_details.vw                                                                                                                                                                                                                
+PROMPT v_sdl_actual_load_data.vw                                                                                                                                                                                                                
 SET TERM OFF
 SET DEFINE ON
 SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'views'||'&terminator'||'v_sdl_actual_load_data.vw' run_file 
@@ -2037,10 +2037,19 @@ FROM dual
 start '&run_file'
 
 SET TERM ON
-PROMPT v_nm_ordered_extent_details.vw                                                                                                                                                                                                                
+PROMPT v_sdl_attrib_validation_result.vw                                                                                                                                                                                                                
 SET TERM OFF
 SET DEFINE ON
 SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'views'||'&terminator'||'v_sdl_attrib_validation_result.vw' run_file 
+FROM dual
+/
+start '&run_file'
+
+SET TERM ON
+PROMPT v_sdl_transferred_datums.vw                                                                                                                                                                                                                
+SET TERM OFF
+SET DEFINE ON
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'views'||'&terminator'||'v_sdl_transferred_datums.vw' run_file 
 FROM dual
 /
 start '&run_file'
