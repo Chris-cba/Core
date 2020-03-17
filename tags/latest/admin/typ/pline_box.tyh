@@ -1,0 +1,20 @@
+CREATE OR REPLACE TYPE PLINE_BOX AS
+/*
+    --   PVCS Identifiers :-
+    --
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/typ/pline_box.tyh-arc   1.0   Mar 17 2020 07:22:18   Vikas.Mhetre  $
+    --       Module Name      : $Workfile:   pline_box.tyh  $
+    --       Date into PVCS   : $Date:   Mar 17 2020 07:22:18  $
+    --       Date fetched Out : $Modtime:   Mar 17 2020 07:04:16  $
+    --       PVCS Version     : $Revision:   1.0  $
+    --
+    --   Author : R.A. Coupe
+    --
+-----------------------------------------------------------------------------
+--    Copyright (c) 2020 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
+*/
+ OBJECT (ID INTEGER, LINE_GEOM MDSYS.SDO_GEOMETRY, BOX_GEOM MDSYS.SDO_GEOMETRY, LEN NUMBER);
+/
+

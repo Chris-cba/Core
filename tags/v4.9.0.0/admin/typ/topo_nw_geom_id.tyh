@@ -1,0 +1,19 @@
+CREATE OR REPLACE TYPE TOPO_NW_GEOM_ID AS
+/*
+    --   PVCS Identifiers :-
+    --
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/typ/topo_nw_geom_id.tyh-arc   1.0   Mar 17 2020 07:22:18   Vikas.Mhetre  $
+    --       Module Name      : $Workfile:   topo_nw_geom_id.tyh  $
+    --       Date into PVCS   : $Date:   Mar 17 2020 07:22:18  $
+    --       Date fetched Out : $Modtime:   Mar 17 2020 07:07:06  $
+    --       PVCS Version     : $Revision:   1.0  $
+    --
+    --   Author : R.A. Coupe
+    --
+-----------------------------------------------------------------------------
+--    Copyright (c) 2020 Bentley Systems Incorporated. All rights reserved.
+-----------------------------------------------------------------------------
+--
+*/
+OBJECT (ID INTEGER, GEOM MDSYS.SDO_GEOMETRY, SN_ID INTEGER, EN_ID INTEGER);
+/
