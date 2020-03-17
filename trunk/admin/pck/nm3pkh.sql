@@ -2,11 +2,11 @@
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3pkh.sql-arc   2.51   Jul 09 2019 15:19:34   Steve.Cooper  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3pkh.sql-arc   2.52   Mar 17 2020 10:58:14   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm3pkh.sql  $
---       Date into PVCS   : $Date:   Jul 09 2019 15:19:34  $
---       Date fetched Out : $Modtime:   Jul 09 2019 15:16:48  $
---       PVCS Version     : $Revision:   2.51  $
+--       Date into PVCS   : $Date:   Mar 17 2020 10:58:14  $
+--       Date fetched Out : $Modtime:   Mar 17 2020 10:57:54  $
+--       PVCS Version     : $Revision:   2.52  $
 --
 --
 --   Author : Graeme Johnson
@@ -2760,7 +2760,73 @@ SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'pck'||'&term
 FROM dual
 /
 start '&run_file'
+
 --
+-- Spatial Data Loader Packages
+--
+
+SET TERM ON
+PROMPT sdl_audit.pkh
+SET TERM OFF
+SET DEFINE ON
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'pck'||'&terminator'||'sdl_audit.pkh' run_file 
+FROM dual
+/
+start '&run_file'
+
+SET TERM ON
+PROMPT sdl_ddl.pkh
+SET TERM OFF
+SET DEFINE ON
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'pck'||'&terminator'||'sdl_ddl.pkh' run_file 
+FROM dual
+/
+start '&run_file'
+
+SET TERM ON
+PROMPT sdl_process.pkh
+SET TERM OFF
+SET DEFINE ON
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'pck'||'&terminator'||'sdl_process.pkh' run_file 
+FROM dual
+/
+start '&run_file'
+
+SET TERM ON
+PROMPT sdl_stats.pkh
+SET TERM OFF
+SET DEFINE ON
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'pck'||'&terminator'||'sdl_stats.pkh' run_file 
+FROM dual
+/
+start '&run_file'
+
+SET TERM ON
+PROMPT sdl_topo.pkh
+SET TERM OFF
+SET DEFINE ON
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'pck'||'&terminator'||'sdl_topo.pkh' run_file 
+FROM dual
+/
+start '&run_file'
+
+SET TERM ON
+PROMPT sdl_transfer.pkh
+SET TERM OFF
+SET DEFINE ON
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'pck'||'&terminator'||'sdl_transfer.pkh' run_file 
+FROM dual
+/
+start '&run_file'
+
+SET TERM ON
+PROMPT sdl_validate.pkh
+SET TERM OFF
+SET DEFINE ON
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'pck'||'&terminator'||'sdl_validate.pkh' run_file 
+FROM dual
+/
+start '&run_file'
 ----------------------------------------------------------------------------------------- 
 --
 -- New PACKAGE HEADERS above here
