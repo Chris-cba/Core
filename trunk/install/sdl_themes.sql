@@ -4,11 +4,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/sdl_themes.sql-arc   1.0   Mar 17 2020 14:42:58   Vikas.Mhetre  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/sdl_themes.sql-arc   1.1   Mar 18 2020 16:08:26   Chris.Baugh  $
 --       Module Name      : $Workfile:   sdl_themes.sql  $
---       Date into PVCS   : $Date:   Mar 17 2020 14:42:58  $
---       Date fetched Out : $Modtime:   Mar 17 2020 13:14:02  $
---       Version          : $Revision:   1.0  $
+--       Date into PVCS   : $Date:   Mar 18 2020 16:08:26  $
+--       Date fetched Out : $Modtime:   Mar 18 2020 16:07:44  $
+--       Version          : $Revision:   1.1  $
 --
 -- Description: To create base table metadata and themes relating to SDL geometry tables
 --
@@ -22,7 +22,7 @@ SET HEADING OFF
 SET FEEDBACK OFF
 
 SET TERM ON
-/*
+
 PROMPT Cleaning up existing SDL themes...
 -- Delete already created themes in case need to re-ran this script
 DELETE FROM nm_themes_all
@@ -136,27 +136,299 @@ WHERE table_name IN ('V_SDL_DATUM_ACCURACY_0_TO_20',
                      'V_SDL_WIP_NODES_OVER_1',
                      'V_SDL_WIP_NODES_UNDER_0');
 					 
-DROP VIEW V_SDL_DATUM_ACCURACY_0_TO_20;
-DROP VIEW V_SDL_DATUM_ACCURACY_20_TO_40;
-DROP VIEW V_SDL_DATUM_ACCURACY_40_TO_60;
-DROP VIEW V_SDL_DATUM_ACCURACY_60_TO_80;
-DROP VIEW V_SDL_DATUM_ACCURACY_80_TO_100;
-DROP VIEW V_SDL_DATUM_ACCURACY_NO_STATS;
-DROP VIEW V_SDL_DATUM_ACCURACY_OVER_100;
-DROP VIEW V_SDL_PLINE_STATS_0_TO_20;
-DROP VIEW V_SDL_PLINE_STATS_20_TO_40;
-DROP VIEW V_SDL_PLINE_STATS_40_TO_60;
-DROP VIEW V_SDL_PLINE_STATS_60_TO_80;
-DROP VIEW V_SDL_PLINE_STATS_80_TO_100;
-DROP VIEW V_SDL_PLINE_STATS_NO_STATS;
-DROP VIEW V_SDL_PLINE_STATS_OVER_100;
-DROP VIEW V_SDL_WIP_NODES_0_TO_1;
-DROP VIEW V_SDL_WIP_NODES_OVER_1;
-DROP VIEW V_SDL_WIP_NODES_UNDER_0;
+DECLARE
+  --
+  view_not_exist  EXCEPTION;
+  PRAGMA exception_init( view_not_exist, -942);
+  --
+BEGIN
+  --
+  EXECUTE IMMEDIATE 'DROP VIEW V_SDL_DATUM_ACCURACY_0_TO_20';
+  --
+EXCEPTION 
+  WHEN view_not_exist THEN
+    NULL;
+  WHEN OTHERS THEN
+    RAISE;
+END;
+/
+--
+DECLARE
+  --
+  view_not_exist  EXCEPTION;
+  PRAGMA exception_init( view_not_exist, -942);
+  --
+BEGIN
+  --
+  EXECUTE IMMEDIATE 'DROP VIEW V_SDL_DATUM_ACCURACY_20_TO_40';
+  --
+EXCEPTION 
+  WHEN view_not_exist THEN
+    NULL;
+  WHEN OTHERS THEN
+    RAISE;
+END;
+/
+--
+DECLARE
+  --
+  view_not_exist  EXCEPTION;
+  PRAGMA exception_init( view_not_exist, -942);
+  --
+BEGIN
+  --
+  EXECUTE IMMEDIATE 'DROP VIEW V_SDL_DATUM_ACCURACY_40_TO_60';
+  --
+EXCEPTION 
+  WHEN view_not_exist THEN
+    NULL;
+  WHEN OTHERS THEN
+    RAISE;
+END;
+/
+--
+DECLARE
+  --
+  view_not_exist  EXCEPTION;
+  PRAGMA exception_init( view_not_exist, -942);
+  --
+BEGIN
+  --
+  EXECUTE IMMEDIATE 'DROP VIEW V_SDL_DATUM_ACCURACY_60_TO_80';
+  --
+EXCEPTION 
+  WHEN view_not_exist THEN
+    NULL;
+  WHEN OTHERS THEN
+    RAISE;
+END;
+/
+--
+DECLARE
+  --
+  view_not_exist  EXCEPTION;
+  PRAGMA exception_init( view_not_exist, -942);
+  --
+BEGIN
+  --
+  EXECUTE IMMEDIATE 'DROP VIEW V_SDL_DATUM_ACCURACY_80_TO_100';
+  --
+EXCEPTION 
+  WHEN view_not_exist THEN
+    NULL;
+  WHEN OTHERS THEN
+    RAISE;
+END;
+/
+--
+DECLARE
+  --
+  view_not_exist  EXCEPTION;
+  PRAGMA exception_init( view_not_exist, -942);
+  --
+BEGIN
+  --
+  EXECUTE IMMEDIATE 'DROP VIEW V_SDL_DATUM_ACCURACY_NO_STATS';
+  --
+EXCEPTION 
+  WHEN view_not_exist THEN
+    NULL;
+  WHEN OTHERS THEN
+    RAISE;
+END;
+/
+--
+DECLARE
+  --
+  view_not_exist  EXCEPTION;
+  PRAGMA exception_init( view_not_exist, -942);
+  --
+BEGIN
+  --
+  EXECUTE IMMEDIATE 'DROP VIEW V_SDL_DATUM_ACCURACY_OVER_100';
+  --
+EXCEPTION 
+  WHEN view_not_exist THEN
+    NULL;
+  WHEN OTHERS THEN
+    RAISE;
+END;
+/
+--
+DECLARE
+  --
+  view_not_exist  EXCEPTION;
+  PRAGMA exception_init( view_not_exist, -942);
+  --
+BEGIN
+  --
+  EXECUTE IMMEDIATE 'DROP VIEW V_SDL_PLINE_STATS_0_TO_20';
+  --
+EXCEPTION 
+  WHEN view_not_exist THEN
+    NULL;
+  WHEN OTHERS THEN
+    RAISE;
+END;
+/
+--
+DECLARE
+  --
+  view_not_exist  EXCEPTION;
+  PRAGMA exception_init( view_not_exist, -942);
+  --
+BEGIN
+  --
+  EXECUTE IMMEDIATE 'DROP VIEW V_SDL_PLINE_STATS_20_TO_40';
+  --
+EXCEPTION 
+  WHEN view_not_exist THEN
+    NULL;
+  WHEN OTHERS THEN
+    RAISE;
+END;
+/
+--
+DECLARE
+  --
+  view_not_exist  EXCEPTION;
+  PRAGMA exception_init( view_not_exist, -942);
+  --
+BEGIN
+  --
+  EXECUTE IMMEDIATE 'DROP VIEW V_SDL_PLINE_STATS_40_TO_60';
+  --
+EXCEPTION 
+  WHEN view_not_exist THEN
+    NULL;
+  WHEN OTHERS THEN
+    RAISE;
+END;
+/
+--
+DECLARE
+  --
+  view_not_exist  EXCEPTION;
+  PRAGMA exception_init( view_not_exist, -942);
+  --
+BEGIN
+  --
+  EXECUTE IMMEDIATE 'DROP VIEW V_SDL_PLINE_STATS_60_TO_80';
+  --
+EXCEPTION 
+  WHEN view_not_exist THEN
+    NULL;
+  WHEN OTHERS THEN
+    RAISE;
+END;
+/
+--
+DECLARE
+  --
+  view_not_exist  EXCEPTION;
+  PRAGMA exception_init( view_not_exist, -942);
+  --
+BEGIN
+  --
+  EXECUTE IMMEDIATE 'DROP VIEW V_SDL_PLINE_STATS_80_TO_100';
+  --
+EXCEPTION 
+  WHEN view_not_exist THEN
+    NULL;
+  WHEN OTHERS THEN
+    RAISE;
+END;
+/
+--
+DECLARE
+  --
+  view_not_exist  EXCEPTION;
+  PRAGMA exception_init( view_not_exist, -942);
+  --
+BEGIN
+  --
+  EXECUTE IMMEDIATE 'DROP VIEW V_SDL_PLINE_STATS_NO_STATS';
+  --
+EXCEPTION 
+  WHEN view_not_exist THEN
+    NULL;
+  WHEN OTHERS THEN
+    RAISE;
+END;
+/
+--
+DECLARE
+  --
+  view_not_exist  EXCEPTION;
+  PRAGMA exception_init( view_not_exist, -942);
+  --
+BEGIN
+  --
+  EXECUTE IMMEDIATE 'DROP VIEW V_SDL_PLINE_STATS_OVER_100';
+  --
+EXCEPTION 
+  WHEN view_not_exist THEN
+    NULL;
+  WHEN OTHERS THEN
+    RAISE;
+END;
+/
+--
+DECLARE
+  --
+  view_not_exist  EXCEPTION;
+  PRAGMA exception_init( view_not_exist, -942);
+  --
+BEGIN
+  --
+  EXECUTE IMMEDIATE 'DROP VIEW V_SDL_WIP_NODES_0_TO_1';
+  --
+EXCEPTION 
+  WHEN view_not_exist THEN
+    NULL;
+  WHEN OTHERS THEN
+    RAISE;
+END;
+/
+--
+DECLARE
+  --
+  view_not_exist  EXCEPTION;
+  PRAGMA exception_init( view_not_exist, -942);
+  --
+BEGIN
+  --
+  EXECUTE IMMEDIATE 'DROP VIEW V_SDL_WIP_NODES_OVER_1';
+  --
+EXCEPTION 
+  WHEN view_not_exist THEN
+    NULL;
+  WHEN OTHERS THEN
+    RAISE;
+END;
+/
+--
+DECLARE
+  --
+  view_not_exist  EXCEPTION;
+  PRAGMA exception_init( view_not_exist, -942);
+  --
+BEGIN
+  --
+  EXECUTE IMMEDIATE 'DROP VIEW V_SDL_WIP_NODES_UNDER_0';
+  --
+EXCEPTION 
+  WHEN view_not_exist THEN
+    NULL;
+  WHEN OTHERS THEN
+    RAISE;
+END;
+/
 
 DELETE from user_sdo_maps 
 WHERE name = (SELECT hov_value FROM hig_option_values WHERE hov_id = 'SDLMAPNAME');
-*/
+
+
 PROMPT Create SDL Base themes...
 -- Create SDL Base themes 
 BEGIN
