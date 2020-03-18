@@ -4,11 +4,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/sdl_spidx.sql-arc   1.0   Mar 17 2020 14:42:58   Vikas.Mhetre  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/sdl_spidx.sql-arc   1.1   Mar 18 2020 07:50:02   Vikas.Mhetre  $
 --       Module Name      : $Workfile:   sdl_spidx.sql  $
---       Date into PVCS   : $Date:   Mar 17 2020 14:42:58  $
---       Date fetched Out : $Modtime:   Mar 17 2020 11:21:52  $
---       Version          : $Revision:   1.0  $
+--       Date into PVCS   : $Date:   Mar 18 2020 07:50:02  $
+--       Date fetched Out : $Modtime:   Mar 18 2020 07:37:02  $
+--       Version          : $Revision:   1.1  $
 --
 -----------------------------------------------------------------------------
 --    Copyright (c) 2020 Bentley Systems Incorporated. All rights reserved.
@@ -92,16 +92,16 @@ BEGIN
                              l_srid);
         insert_sdo_metadata ('SDL_FILE_SUBMISSIONS',
                              'SFS_MBR_GEOMETRY',
-                             l_diminfo,
+                             SDO_LRS.convert_to_std_dim_array (l_diminfo),
                              l_srid);
-        insert_sdo_metadata ('SDL_WIP_INTSCT_GEOM',
+     /* insert_sdo_metadata ('SDL_WIP_INTSCT_GEOM',
                              'GEOM',
                              l_diminfo,
                              l_srid);
         insert_sdo_metadata ('SDL_WIP_SELF_INTERSECTIONS',
                              'GEOM',
                              l_diminfo,
-                             l_srid);
+                             l_srid); */
 
         EXECUTE IMMEDIATE   'CREATE INDEX SDL_LOAD_DATA_SPIDX ON SDL_LOAD_DATA (SLD_WORKING_GEOMETRY) '
                          || ' INDEXTYPE IS MDSYS.SPATIAL_INDEX';
@@ -124,11 +124,11 @@ BEGIN
         EXECUTE IMMEDIATE   'CREATE INDEX SDL_FILE_SUBMISSIONS_SPIDX ON SDL_FILE_SUBMISSIONS (SFS_MBR_GEOMETRY) '
                          || ' INDEXTYPE IS MDSYS.SPATIAL_INDEX';
 
-        EXECUTE IMMEDIATE   'CREATE INDEX SDL_WIP_INTSCT_GEOM_SPIDX ON SDL_WIP_INTSCT_GEOM (GEOM) '
+     /* EXECUTE IMMEDIATE   'CREATE INDEX SDL_WIP_INTSCT_GEOM_SPIDX ON SDL_WIP_INTSCT_GEOM (GEOM) '
                          || ' INDEXTYPE IS MDSYS.SPATIAL_INDEX';
 
         EXECUTE IMMEDIATE   'CREATE INDEX SDL_WIP_SELF_INTERSECTIONS_SPIDX ON SDL_WIP_SELF_INTERSECTIONS (GEOM) '
-                         || ' INDEXTYPE IS MDSYS.SPATIAL_INDEX';
+                         || ' INDEXTYPE IS MDSYS.SPATIAL_INDEX'; */
     END IF;
 END;
 /
