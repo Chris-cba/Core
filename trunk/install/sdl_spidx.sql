@@ -4,11 +4,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/sdl_spidx.sql-arc   1.2   Mar 18 2020 11:20:12   Vikas.Mhetre  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/sdl_spidx.sql-arc   1.3   Mar 18 2020 16:22:04   Chris.Baugh  $
 --       Module Name      : $Workfile:   sdl_spidx.sql  $
---       Date into PVCS   : $Date:   Mar 18 2020 11:20:12  $
---       Date fetched Out : $Modtime:   Mar 18 2020 11:16:36  $
---       Version          : $Revision:   1.2  $
+--       Date into PVCS   : $Date:   Mar 18 2020 16:22:04  $
+--       Date fetched Out : $Modtime:   Mar 18 2020 16:21:30  $
+--       Version          : $Revision:   1.3  $
 --
 -----------------------------------------------------------------------------
 --    Copyright (c) 2020 Bentley Systems Incorporated. All rights reserved.
@@ -103,27 +103,132 @@ BEGIN
                              l_diminfo,
                              l_srid); */
 
-        EXECUTE IMMEDIATE   'CREATE INDEX SDL_LOAD_DATA_SPIDX ON SDL_LOAD_DATA (SLD_WORKING_GEOMETRY) '
-                         || ' INDEXTYPE IS MDSYS.SPATIAL_INDEX';
-
-        EXECUTE IMMEDIATE   'CREATE INDEX SDL_WIP_DATUMS_SPIDX ON SDL_WIP_DATUMS (GEOM) '
-                         || ' INDEXTYPE IS MDSYS.SPATIAL_INDEX';
-
-        EXECUTE IMMEDIATE   'CREATE INDEX SDL_PLINE_STATISTICS_SPIDX ON SDL_PLINE_STATISTICS (SLPS_PLINE_GEOMETRY) '
-                         || ' INDEXTYPE IS MDSYS.SPATIAL_INDEX';
-
-        EXECUTE IMMEDIATE   'CREATE INDEX SDL_WIP_PT_GEOM_SPIDX ON SDL_WIP_PT_GEOM (GEOM) '
-                         || ' INDEXTYPE IS MDSYS.SPATIAL_INDEX';
-
-        EXECUTE IMMEDIATE   'CREATE INDEX SDL_WIP_NODES_SPIDX ON SDL_WIP_NODES (NODE_GEOM) '
-                         || ' INDEXTYPE IS MDSYS.SPATIAL_INDEX';
-
-        EXECUTE IMMEDIATE   'CREATE INDEX SDL_WIP_GRADE_SEPARATIONS_SPIDX ON SDL_WIP_GRADE_SEPARATIONS (SGS_GEOM) '
-                         || ' INDEXTYPE IS MDSYS.SPATIAL_INDEX';
-
-        EXECUTE IMMEDIATE   'CREATE INDEX SDL_FILE_SUBMISSIONS_SPIDX ON SDL_FILE_SUBMISSIONS (SFS_MBR_GEOMETRY) '
-                         || ' INDEXTYPE IS MDSYS.SPATIAL_INDEX';
-
+        --
+        DECLARE
+          --
+          index_exists  EXCEPTION;
+          PRAGMA exception_init( index_exists, -955);
+          --
+        BEGIN
+          --
+          EXECUTE IMMEDIATE   'CREATE INDEX SDL_LOAD_DATA_SPIDX ON SDL_LOAD_DATA (SLD_WORKING_GEOMETRY) '
+                                 || ' INDEXTYPE IS MDSYS.SPATIAL_INDEX';
+          --
+        EXCEPTION 
+          WHEN index_exists THEN
+            NULL;
+          WHEN OTHERS THEN
+            RAISE;
+        END;
+        /        
+        --
+        DECLARE
+          --
+          index_exists  EXCEPTION;
+          PRAGMA exception_init( index_exists, -955);
+          --
+        BEGIN
+          --
+          EXECUTE IMMEDIATE   'CREATE INDEX SDL_WIP_DATUMS_SPIDX ON SDL_WIP_DATUMS (GEOM) '
+                                 || ' INDEXTYPE IS MDSYS.SPATIAL_INDEX';
+          --
+        EXCEPTION 
+          WHEN index_exists THEN
+            NULL;
+          WHEN OTHERS THEN
+            RAISE;
+        END;
+        /        
+        --
+        DECLARE
+          --
+          index_exists  EXCEPTION;
+          PRAGMA exception_init( index_exists, -955);
+          --
+        BEGIN
+          --
+          EXECUTE IMMEDIATE   'CREATE INDEX SDL_PLINE_STATISTICS_SPIDX ON SDL_PLINE_STATISTICS (SLPS_PLINE_GEOMETRY) '
+                                 || ' INDEXTYPE IS MDSYS.SPATIAL_INDEX';
+          --
+        EXCEPTION 
+          WHEN index_exists THEN
+            NULL;
+          WHEN OTHERS THEN
+            RAISE;
+        END;
+        /      
+        --
+        DECLARE
+          --
+          index_exists  EXCEPTION;
+          PRAGMA exception_init( index_exists, -955);
+          --
+        BEGIN
+          --
+          EXECUTE IMMEDIATE   'CREATE INDEX SDL_WIP_PT_GEOM_SPIDX ON SDL_WIP_PT_GEOM (GEOM) '
+                                 || ' INDEXTYPE IS MDSYS.SPATIAL_INDEX';
+          --
+        EXCEPTION 
+          WHEN index_exists THEN
+            NULL;
+          WHEN OTHERS THEN
+            RAISE;
+        END;
+        /              
+        --
+        DECLARE
+          --
+          index_exists  EXCEPTION;
+          PRAGMA exception_init( index_exists, -955);
+          --
+        BEGIN
+          --
+          EXECUTE IMMEDIATE   'CREATE INDEX SDL_WIP_NODES_SPIDX ON SDL_WIP_NODES (NODE_GEOM) '
+                                 || ' INDEXTYPE IS MDSYS.SPATIAL_INDEX';
+          --
+        EXCEPTION 
+          WHEN index_exists THEN
+            NULL;
+          WHEN OTHERS THEN
+            RAISE;
+        END;
+        /       
+        --
+        DECLARE
+          --
+          index_exists  EXCEPTION;
+          PRAGMA exception_init( index_exists, -955);
+          --
+        BEGIN
+          --
+          EXECUTE IMMEDIATE   'CREATE INDEX SDL_WIP_GRADE_SEPARATIONS_SPIDX ON SDL_WIP_GRADE_SEPARATIONS (SGS_GEOM) '
+                                 || ' INDEXTYPE IS MDSYS.SPATIAL_INDEX';
+          --
+        EXCEPTION 
+          WHEN index_exists THEN
+            NULL;
+          WHEN OTHERS THEN
+            RAISE;
+        END;
+        /             
+        --
+        DECLARE
+          --
+          index_exists  EXCEPTION;
+          PRAGMA exception_init( index_exists, -955);
+          --
+        BEGIN
+          --
+          EXECUTE IMMEDIATE   'CREATE INDEX SDL_FILE_SUBMISSIONS_SPIDX ON SDL_FILE_SUBMISSIONS (SFS_MBR_GEOMETRY) '
+                                 || ' INDEXTYPE IS MDSYS.SPATIAL_INDEX';
+          --
+        EXCEPTION 
+          WHEN index_exists THEN
+            NULL;
+          WHEN OTHERS THEN
+            RAISE;
+        END;
+        /  
      /* EXECUTE IMMEDIATE   'CREATE INDEX SDL_WIP_INTSCT_GEOM_SPIDX ON SDL_WIP_INTSCT_GEOM (GEOM) '
                          || ' INDEXTYPE IS MDSYS.SPATIAL_INDEX';
 
