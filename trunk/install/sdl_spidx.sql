@@ -4,11 +4,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/sdl_spidx.sql-arc   1.3   Mar 18 2020 16:22:04   Chris.Baugh  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/sdl_spidx.sql-arc   1.4   Mar 18 2020 16:29:38   Chris.Baugh  $
 --       Module Name      : $Workfile:   sdl_spidx.sql  $
---       Date into PVCS   : $Date:   Mar 18 2020 16:22:04  $
---       Date fetched Out : $Modtime:   Mar 18 2020 16:21:30  $
---       Version          : $Revision:   1.3  $
+--       Date into PVCS   : $Date:   Mar 18 2020 16:29:38  $
+--       Date fetched Out : $Modtime:   Mar 18 2020 16:26:46  $
+--       Version          : $Revision:   1.4  $
 --
 -----------------------------------------------------------------------------
 --    Copyright (c) 2020 Bentley Systems Incorporated. All rights reserved.
@@ -120,7 +120,6 @@ BEGIN
           WHEN OTHERS THEN
             RAISE;
         END;
-        /        
         --
         DECLARE
           --
@@ -138,7 +137,6 @@ BEGIN
           WHEN OTHERS THEN
             RAISE;
         END;
-        /        
         --
         DECLARE
           --
@@ -156,7 +154,6 @@ BEGIN
           WHEN OTHERS THEN
             RAISE;
         END;
-        /      
         --
         DECLARE
           --
@@ -174,7 +171,6 @@ BEGIN
           WHEN OTHERS THEN
             RAISE;
         END;
-        /              
         --
         DECLARE
           --
@@ -192,7 +188,6 @@ BEGIN
           WHEN OTHERS THEN
             RAISE;
         END;
-        /       
         --
         DECLARE
           --
@@ -210,7 +205,6 @@ BEGIN
           WHEN OTHERS THEN
             RAISE;
         END;
-        /             
         --
         DECLARE
           --
@@ -228,7 +222,6 @@ BEGIN
           WHEN OTHERS THEN
             RAISE;
         END;
-        /  
      /* EXECUTE IMMEDIATE   'CREATE INDEX SDL_WIP_INTSCT_GEOM_SPIDX ON SDL_WIP_INTSCT_GEOM (GEOM) '
                          || ' INDEXTYPE IS MDSYS.SPATIAL_INDEX';
 
