@@ -4,11 +4,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/sdl_spidx.sql-arc   1.1   Mar 18 2020 07:50:02   Vikas.Mhetre  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/sdl_spidx.sql-arc   1.2   Mar 18 2020 11:20:12   Vikas.Mhetre  $
 --       Module Name      : $Workfile:   sdl_spidx.sql  $
---       Date into PVCS   : $Date:   Mar 18 2020 07:50:02  $
---       Date fetched Out : $Modtime:   Mar 18 2020 07:37:02  $
---       Version          : $Revision:   1.1  $
+--       Date into PVCS   : $Date:   Mar 18 2020 11:20:12  $
+--       Date fetched Out : $Modtime:   Mar 18 2020 11:16:36  $
+--       Version          : $Revision:   1.2  $
 --
 -----------------------------------------------------------------------------
 --    Copyright (c) 2020 Bentley Systems Incorporated. All rights reserved.
@@ -88,7 +88,7 @@ BEGIN
                              l_srid);
         insert_sdo_metadata ('SDL_WIP_GRADE_SEPARATIONS',
                              'SGS_GEOM',
-                             SDO_LRS.convert_to_std_dim_array (l_diminfo),
+                             l_diminfo,
                              l_srid);
         insert_sdo_metadata ('SDL_FILE_SUBMISSIONS',
                              'SFS_MBR_GEOMETRY',
