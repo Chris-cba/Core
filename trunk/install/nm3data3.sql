@@ -1,19 +1,19 @@
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm3data3.sql-arc   2.33   Dec 20 2018 16:23:40   Chris.Baugh  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm3data3.sql-arc   2.34   Mar 20 2020 13:37:06   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm3data3.sql  $
---       Date into PVCS   : $Date:   Dec 20 2018 16:23:40  $
---       Date fetched Out : $Modtime:   Dec 18 2018 09:31:02  $
---       Version          : $Revision:   2.33  $
+--       Date into PVCS   : $Date:   Mar 20 2020 13:37:06  $
+--       Date fetched Out : $Modtime:   Mar 20 2020 10:21:04  $
+--       Version          : $Revision:   2.34  $
 --       Table Owner      : NM3_METADATA
---       Generation Date  : 18-DEC-2018 09:31
+--       Generation Date  : 20-MAR-2020 10:21
 --
 --   Product metadata script
 --   As at Release 4.7.1.0
 --
 -------------------------------------------------------------------------
---   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2020 Bentley Systems Incorporated. All rights reserved.
 -------------------------------------------------------------------------
 --
 --   TABLES PROCESSED
@@ -307,6 +307,32 @@ SELECT 'PROXY_OWNER'
  WHERE NOT EXISTS(SELECT 1
                     FROM HIG_ROLES
                    WHERE HRO_ROLE = 'PROXY_OWNER');
+--
+INSERT
+  INTO HIG_ROLES
+      (HRO_ROLE
+      ,HRO_PRODUCT
+      ,HRO_DESCR)
+SELECT 'SDL_ADMIN'
+      ,'NET'
+      ,'SDL Application Administrator'
+  FROM DUAL
+ WHERE NOT EXISTS(SELECT 1
+                    FROM HIG_ROLES
+                   WHERE HRO_ROLE = 'SDL_ADMIN');
+--
+INSERT
+  INTO HIG_ROLES
+      (HRO_ROLE
+      ,HRO_PRODUCT
+      ,HRO_DESCR)
+SELECT 'SDL_USER'
+      ,'NET'
+      ,'SDL Default User Role'
+  FROM DUAL
+ WHERE NOT EXISTS(SELECT 1
+                    FROM HIG_ROLES
+                   WHERE HRO_ROLE = 'SDL_USER');
 --
 INSERT
   INTO HIG_ROLES
@@ -3580,6 +3606,48 @@ SELECT 'NMWEB7057'
                     FROM HIG_MODULE_ROLES
                    WHERE HMR_MODULE = 'NMWEB7057'
                      AND HMR_ROLE = 'WEB_USER');
+--
+INSERT
+  INTO HIG_MODULE_ROLES
+      (HMR_MODULE
+      ,HMR_ROLE
+      ,HMR_MODE)
+SELECT 'SDL0001'
+      ,'SDL_ADMIN'
+      ,'NORMAL'
+  FROM DUAL
+ WHERE NOT EXISTS(SELECT 1
+                    FROM HIG_MODULE_ROLES
+                   WHERE HMR_MODULE = 'SDL0001'
+                     AND HMR_ROLE = 'SDL_ADMIN');
+--
+INSERT
+  INTO HIG_MODULE_ROLES
+      (HMR_MODULE
+      ,HMR_ROLE
+      ,HMR_MODE)
+SELECT 'SDL0002'
+      ,'SDL_ADMIN'
+      ,'NORMAL'
+  FROM DUAL
+ WHERE NOT EXISTS(SELECT 1
+                    FROM HIG_MODULE_ROLES
+                   WHERE HMR_MODULE = 'SDL0002'
+                     AND HMR_ROLE = 'SDL_ADMIN');
+--
+INSERT
+  INTO HIG_MODULE_ROLES
+      (HMR_MODULE
+      ,HMR_ROLE
+      ,HMR_MODE)
+SELECT 'SDL0002'
+      ,'SDL_USER'
+      ,'NORMAL'
+  FROM DUAL
+ WHERE NOT EXISTS(SELECT 1
+                    FROM HIG_MODULE_ROLES
+                   WHERE HMR_MODULE = 'SDL0002'
+                     AND HMR_ROLE = 'SDL_USER');
 --
 ----------------------------------------------------------------------------------------
 -- HIG_MODULE_KEYWORDS
