@@ -1,15 +1,15 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/nm3.sqs-arc   2.18   Dec 20 2018 16:18:20   Chris.Baugh  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/nm3.sqs-arc   2.19   Mar 20 2020 10:02:46   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm3.sqs  $
---       Date into PVCS   : $Date:   Dec 20 2018 16:18:20  $
---       Date fetched Out : $Modtime:   Dec 20 2018 16:18:02  $
---       PVCS Version     : $Revision:   2.18  $
+--       Date into PVCS   : $Date:   Mar 20 2020 10:02:46  $
+--       Date fetched Out : $Modtime:   Mar 20 2020 10:00:52  $
+--       PVCS Version     : $Revision:   2.19  $
 --
 -----------------------------------------------------------------------------
---    Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
------------------------------------------------------------------------------
----- Generated for Oracle 10g on Thu Dec 13  14:48:14 2018 by Server Generator 10.1.2.9.28
+--    Copyright (c) 2020 Bentley Systems Incorporated. All rights reserved.
+------------------------------------------------------------------------------- 
+-- Generated for Oracle 10g on Tue Mar 17  15:20:59 2020 by Server Generator 10.1.2.9.28
  
 PROMPT Creating Sequence 'BATCH_ID_SEQ'
 CREATE SEQUENCE BATCH_ID_SEQ
@@ -1045,6 +1045,156 @@ PROMPT Creating Sequence 'RTG_JOB_ID_SEQ'
 CREATE SEQUENCE RTG_JOB_ID_SEQ
  NOMAXVALUE
  NOMINVALUE
+ NOCYCLE
+ NOCACHE
+/
+
+PROMPT Creating Sequence 'SAAA_ID_SEQ'
+CREATE SEQUENCE SAAA_ID_SEQ
+ INCREMENT BY 1
+ START WITH 1
+ NOMAXVALUE
+ MINVALUE 1
+ NOCYCLE
+ NOCACHE
+/
+
+PROMPT Creating Sequence 'SAAR_ID_SEQ'
+CREATE SEQUENCE SAAR_ID_SEQ
+ INCREMENT BY 1
+ START WITH 1
+ NOMAXVALUE
+ MINVALUE 1
+ NOCYCLE
+ NOCACHE
+/
+
+PROMPT Creating Sequence 'SAM_ID_SEQ'
+CREATE SEQUENCE SAM_ID_SEQ
+ INCREMENT BY 1
+ START WITH 1
+ NOMAXVALUE
+ MINVALUE 1
+ NOCYCLE
+ NOCACHE
+/
+
+PROMPT Creating Sequence 'SDL_NODE_ID_SEQ'
+CREATE SEQUENCE SDL_NODE_ID_SEQ
+ INCREMENT BY 1
+ START WITH 1
+ NOMAXVALUE
+ MINVALUE 1
+ NOCYCLE
+ NOCACHE
+/
+
+PROMPT Creating Sequence 'SFS_ID_SEQ'
+CREATE SEQUENCE SFS_ID_SEQ
+ INCREMENT BY 1
+ START WITH 1
+ NOMAXVALUE
+ MINVALUE 1
+ NOCYCLE
+ NOCACHE
+/
+
+PROMPT Creating Sequence 'SLD_INTSCT_SEQ'
+CREATE SEQUENCE SLD_INTSCT_SEQ
+ INCREMENT BY 1
+ START WITH 1
+ NOMAXVALUE
+ MINVALUE 1
+ NOCYCLE
+ NOCACHE
+/
+
+PROMPT Creating Sequence 'SLD_KEY_SEQ'
+CREATE SEQUENCE SLD_KEY_SEQ
+ INCREMENT BY 1
+ START WITH 1
+ NOMAXVALUE
+ MINVALUE 1
+ NOCYCLE
+ NOCACHE
+/
+
+PROMPT Creating Sequence 'SLGA_ID_SEQ'
+CREATE SEQUENCE SLGA_ID_SEQ
+ INCREMENT BY 1
+ START WITH 1
+ NOMAXVALUE
+ MINVALUE 1
+ NOCYCLE
+ NOCACHE
+/
+
+PROMPT Creating Sequence 'SLPS_PLINE_ID_SEQ'
+CREATE SEQUENCE SLPS_PLINE_ID_SEQ
+ INCREMENT BY 1
+ START WITH 1
+ NOMAXVALUE
+ MINVALUE 1
+ NOCYCLE
+ NOCACHE
+/
+
+PROMPT Creating Sequence 'SPA_ID_SEQ'
+CREATE SEQUENCE SPA_ID_SEQ
+ INCREMENT BY 1
+ START WITH 1
+ NOMAXVALUE
+ MINVALUE 1
+ NOCYCLE
+ NOCACHE
+/
+
+PROMPT Creating Sequence 'SP_ID_SEQ'
+CREATE SEQUENCE SP_ID_SEQ
+ INCREMENT BY 1
+ START WITH 1
+ NOMAXVALUE
+ MINVALUE 1
+ NOCYCLE
+ NOCACHE
+/
+
+PROMPT Creating Sequence 'SSRL_ID_SEQ'
+CREATE SEQUENCE SSRL_ID_SEQ
+ INCREMENT BY 1
+ START WITH 1
+ NOMAXVALUE
+ MINVALUE 1
+ NOCYCLE
+ NOCACHE
+/
+
+PROMPT Creating Sequence 'SUP_ID_SEQ'
+CREATE SEQUENCE SUP_ID_SEQ
+ INCREMENT BY 1
+ START WITH 1
+ NOMAXVALUE
+ MINVALUE 1
+ NOCYCLE
+ NOCACHE
+/
+
+PROMPT Creating Sequence 'SVR_ID_SEQ'
+CREATE SEQUENCE SVR_ID_SEQ
+ INCREMENT BY 1
+ START WITH 1
+ NOMAXVALUE
+ MINVALUE 1
+ NOCYCLE
+ NOCACHE
+/
+
+PROMPT Creating Sequence 'SWD_ID_SEQ'
+CREATE SEQUENCE SWD_ID_SEQ
+ INCREMENT BY 1
+ START WITH 1
+ NOMAXVALUE
+ MINVALUE 1
  NOCYCLE
  NOCACHE
 /
