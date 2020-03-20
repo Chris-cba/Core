@@ -1,19 +1,19 @@
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm3data1.sql-arc   2.64   Jan 10 2019 12:22:22   Chris.Baugh  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm3data1.sql-arc   2.65   Mar 20 2020 13:37:04   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm3data1.sql  $
---       Date into PVCS   : $Date:   Jan 10 2019 12:22:22  $
---       Date fetched Out : $Modtime:   Jan 10 2019 12:21:38  $
---       Version          : $Revision:   2.64  $
+--       Date into PVCS   : $Date:   Mar 20 2020 13:37:04  $
+--       Date fetched Out : $Modtime:   Mar 20 2020 10:20:54  $
+--       Version          : $Revision:   2.65  $
 --       Table Owner      : NM3_METADATA
---       Generation Date  : 18-DEC-2018 09:30
+--       Generation Date  : 20-MAR-2020 10:20
 --
 --   Product metadata script
 --   As at Release 4.7.1.0
 --
 -------------------------------------------------------------------------
---   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2020 Bentley Systems Incorporated. All rights reserved.
 -------------------------------------------------------------------------
 --
 --   TABLES PROCESSED
@@ -16768,6 +16768,96 @@ INSERT
       ,HDO_PRODUCT
       ,HDO_TITLE
       ,HDO_CODE_LENGTH)
+SELECT 'SDL_FILE_TYPE'
+      ,'NET'
+      ,'SDL File Types'
+      ,5
+  FROM DUAL
+ WHERE NOT EXISTS(SELECT 1
+                    FROM HIG_DOMAINS
+                   WHERE HDO_DOMAIN = 'SDL_FILE_TYPE');
+--
+INSERT
+  INTO HIG_DOMAINS
+      (HDO_DOMAIN
+      ,HDO_PRODUCT
+      ,HDO_TITLE
+      ,HDO_CODE_LENGTH)
+SELECT 'SDL_LOAD_DATA_STATUS'
+      ,'NET'
+      ,'SDL load status codes for SLD_STATUS'
+      ,30
+  FROM DUAL
+ WHERE NOT EXISTS(SELECT 1
+                    FROM HIG_DOMAINS
+                   WHERE HDO_DOMAIN = 'SDL_LOAD_DATA_STATUS');
+--
+INSERT
+  INTO HIG_DOMAINS
+      (HDO_DOMAIN
+      ,HDO_PRODUCT
+      ,HDO_TITLE
+      ,HDO_CODE_LENGTH)
+SELECT 'SDL_MAX_IMPORT_LEVEL'
+      ,'NET'
+      ,'SDL Maximum Import level'
+      ,10
+  FROM DUAL
+ WHERE NOT EXISTS(SELECT 1
+                    FROM HIG_DOMAINS
+                   WHERE HDO_DOMAIN = 'SDL_MAX_IMPORT_LEVEL');
+--
+INSERT
+  INTO HIG_DOMAINS
+      (HDO_DOMAIN
+      ,HDO_PRODUCT
+      ,HDO_TITLE
+      ,HDO_CODE_LENGTH)
+SELECT 'SDL_PROCESSES'
+      ,'NET'
+      ,'Processes used by SDL'
+      ,30
+  FROM DUAL
+ WHERE NOT EXISTS(SELECT 1
+                    FROM HIG_DOMAINS
+                   WHERE HDO_DOMAIN = 'SDL_PROCESSES');
+--
+INSERT
+  INTO HIG_DOMAINS
+      (HDO_DOMAIN
+      ,HDO_PRODUCT
+      ,HDO_TITLE
+      ,HDO_CODE_LENGTH)
+SELECT 'SDL_REVIEW_ACTION'
+      ,'NET'
+      ,'SDL Spatial Review Actions'
+      ,30
+  FROM DUAL
+ WHERE NOT EXISTS(SELECT 1
+                    FROM HIG_DOMAINS
+                   WHERE HDO_DOMAIN = 'SDL_REVIEW_ACTION');
+--
+INSERT
+  INTO HIG_DOMAINS
+      (HDO_DOMAIN
+      ,HDO_PRODUCT
+      ,HDO_TITLE
+      ,HDO_CODE_LENGTH)
+SELECT 'SDL_TOPOLOGY_LEVEL'
+      ,'NET'
+      ,'SDL Topology Level'
+      ,12
+  FROM DUAL
+ WHERE NOT EXISTS(SELECT 1
+                    FROM HIG_DOMAINS
+                   WHERE HDO_DOMAIN = 'SDL_TOPOLOGY_LEVEL');
+--
+INSERT
+  INTO HIG_DOMAINS
+      (HDO_DOMAIN
+      ,HDO_PRODUCT
+      ,HDO_TITLE
+      ,HDO_CODE_LENGTH)
 SELECT 'SDORESEQ'
       ,'HIG'
       ,'Resequence Shape Options'
@@ -28726,6 +28816,644 @@ INSERT
       ,HCO_SEQ
       ,HCO_START_DATE
       ,HCO_END_DATE)
+SELECT 'SDL_FILE_TYPE'
+      ,'GEODB'
+      ,'File Geodatabase'
+      ,'Y'
+      ,2
+      ,to_date('20200318000000','YYYYMMDDHH24MISS')
+      ,null
+  FROM DUAL
+ WHERE NOT EXISTS(SELECT 1
+                    FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'SDL_FILE_TYPE'
+                     AND HCO_CODE = 'GEODB');
+--
+INSERT
+  INTO HIG_CODES
+      (HCO_DOMAIN
+      ,HCO_CODE
+      ,HCO_MEANING
+      ,HCO_SYSTEM
+      ,HCO_SEQ
+      ,HCO_START_DATE
+      ,HCO_END_DATE)
+SELECT 'SDL_FILE_TYPE'
+      ,'SHAPE'
+      ,'Shapefile'
+      ,'Y'
+      ,1
+      ,to_date('20200318000000','YYYYMMDDHH24MISS')
+      ,null
+  FROM DUAL
+ WHERE NOT EXISTS(SELECT 1
+                    FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'SDL_FILE_TYPE'
+                     AND HCO_CODE = 'SHAPE');
+--
+INSERT
+  INTO HIG_CODES
+      (HCO_DOMAIN
+      ,HCO_CODE
+      ,HCO_MEANING
+      ,HCO_SYSTEM
+      ,HCO_SEQ
+      ,HCO_START_DATE
+      ,HCO_END_DATE)
+SELECT 'SDL_LOAD_DATA_STATUS'
+      ,'INVALID'
+      ,'Invalid'
+      ,'Y'
+      ,3
+      ,to_date('20200318000000','YYYYMMDDHH24MISS')
+      ,null
+  FROM DUAL
+ WHERE NOT EXISTS(SELECT 1
+                    FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'SDL_LOAD_DATA_STATUS'
+                     AND HCO_CODE = 'INVALID');
+--
+INSERT
+  INTO HIG_CODES
+      (HCO_DOMAIN
+      ,HCO_CODE
+      ,HCO_MEANING
+      ,HCO_SYSTEM
+      ,HCO_SEQ
+      ,HCO_START_DATE
+      ,HCO_END_DATE)
+SELECT 'SDL_LOAD_DATA_STATUS'
+      ,'LOAD'
+      ,'Load'
+      ,'Y'
+      ,6
+      ,to_date('20200318000000','YYYYMMDDHH24MISS')
+      ,null
+  FROM DUAL
+ WHERE NOT EXISTS(SELECT 1
+                    FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'SDL_LOAD_DATA_STATUS'
+                     AND HCO_CODE = 'LOAD');
+--
+INSERT
+  INTO HIG_CODES
+      (HCO_DOMAIN
+      ,HCO_CODE
+      ,HCO_MEANING
+      ,HCO_SYSTEM
+      ,HCO_SEQ
+      ,HCO_START_DATE
+      ,HCO_END_DATE)
+SELECT 'SDL_LOAD_DATA_STATUS'
+      ,'NEW'
+      ,'New'
+      ,'Y'
+      ,1
+      ,to_date('20200318000000','YYYYMMDDHH24MISS')
+      ,null
+  FROM DUAL
+ WHERE NOT EXISTS(SELECT 1
+                    FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'SDL_LOAD_DATA_STATUS'
+                     AND HCO_CODE = 'NEW');
+--
+INSERT
+  INTO HIG_CODES
+      (HCO_DOMAIN
+      ,HCO_CODE
+      ,HCO_MEANING
+      ,HCO_SYSTEM
+      ,HCO_SEQ
+      ,HCO_START_DATE
+      ,HCO_END_DATE)
+SELECT 'SDL_LOAD_DATA_STATUS'
+      ,'REJECTED'
+      ,'Rejected'
+      ,'Y'
+      ,4
+      ,to_date('20200318000000','YYYYMMDDHH24MISS')
+      ,null
+  FROM DUAL
+ WHERE NOT EXISTS(SELECT 1
+                    FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'SDL_LOAD_DATA_STATUS'
+                     AND HCO_CODE = 'REJECTED');
+--
+INSERT
+  INTO HIG_CODES
+      (HCO_DOMAIN
+      ,HCO_CODE
+      ,HCO_MEANING
+      ,HCO_SYSTEM
+      ,HCO_SEQ
+      ,HCO_START_DATE
+      ,HCO_END_DATE)
+SELECT 'SDL_LOAD_DATA_STATUS'
+      ,'REVIEW'
+      ,'Review'
+      ,'Y'
+      ,5
+      ,to_date('20200318000000','YYYYMMDDHH24MISS')
+      ,null
+  FROM DUAL
+ WHERE NOT EXISTS(SELECT 1
+                    FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'SDL_LOAD_DATA_STATUS'
+                     AND HCO_CODE = 'REVIEW');
+--
+INSERT
+  INTO HIG_CODES
+      (HCO_DOMAIN
+      ,HCO_CODE
+      ,HCO_MEANING
+      ,HCO_SYSTEM
+      ,HCO_SEQ
+      ,HCO_START_DATE
+      ,HCO_END_DATE)
+SELECT 'SDL_LOAD_DATA_STATUS'
+      ,'SKIP'
+      ,'Skip'
+      ,'Y'
+      ,7
+      ,to_date('20200318000000','YYYYMMDDHH24MISS')
+      ,null
+  FROM DUAL
+ WHERE NOT EXISTS(SELECT 1
+                    FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'SDL_LOAD_DATA_STATUS'
+                     AND HCO_CODE = 'SKIP');
+--
+INSERT
+  INTO HIG_CODES
+      (HCO_DOMAIN
+      ,HCO_CODE
+      ,HCO_MEANING
+      ,HCO_SYSTEM
+      ,HCO_SEQ
+      ,HCO_START_DATE
+      ,HCO_END_DATE)
+SELECT 'SDL_LOAD_DATA_STATUS'
+      ,'VALID'
+      ,'Valid'
+      ,'Y'
+      ,2
+      ,to_date('20200318000000','YYYYMMDDHH24MISS')
+      ,null
+  FROM DUAL
+ WHERE NOT EXISTS(SELECT 1
+                    FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'SDL_LOAD_DATA_STATUS'
+                     AND HCO_CODE = 'VALID');
+--
+INSERT
+  INTO HIG_CODES
+      (HCO_DOMAIN
+      ,HCO_CODE
+      ,HCO_MEANING
+      ,HCO_SYSTEM
+      ,HCO_SEQ
+      ,HCO_START_DATE
+      ,HCO_END_DATE)
+SELECT 'SDL_MAX_IMPORT_LEVEL'
+      ,'LOADNE'
+      ,'Load into Production Network'
+      ,'Y'
+      ,4
+      ,to_date('20200318000000','YYYYMMDDHH24MISS')
+      ,null
+  FROM DUAL
+ WHERE NOT EXISTS(SELECT 1
+                    FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'SDL_MAX_IMPORT_LEVEL'
+                     AND HCO_CODE = 'LOADNE');
+--
+INSERT
+  INTO HIG_CODES
+      (HCO_DOMAIN
+      ,HCO_CODE
+      ,HCO_MEANING
+      ,HCO_SYSTEM
+      ,HCO_SEQ
+      ,HCO_START_DATE
+      ,HCO_END_DATE)
+SELECT 'SDL_MAX_IMPORT_LEVEL'
+      ,'SPATIAL'
+      ,'Spatial Analysis and Review'
+      ,'Y'
+      ,3
+      ,to_date('20200318000000','YYYYMMDDHH24MISS')
+      ,null
+  FROM DUAL
+ WHERE NOT EXISTS(SELECT 1
+                    FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'SDL_MAX_IMPORT_LEVEL'
+                     AND HCO_CODE = 'SPATIAL');
+--
+INSERT
+  INTO HIG_CODES
+      (HCO_DOMAIN
+      ,HCO_CODE
+      ,HCO_MEANING
+      ,HCO_SYSTEM
+      ,HCO_SEQ
+      ,HCO_START_DATE
+      ,HCO_END_DATE)
+SELECT 'SDL_MAX_IMPORT_LEVEL'
+      ,'UPLOAD'
+      ,'Upload File'
+      ,'Y'
+      ,1
+      ,to_date('20200318000000','YYYYMMDDHH24MISS')
+      ,null
+  FROM DUAL
+ WHERE NOT EXISTS(SELECT 1
+                    FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'SDL_MAX_IMPORT_LEVEL'
+                     AND HCO_CODE = 'UPLOAD');
+--
+INSERT
+  INTO HIG_CODES
+      (HCO_DOMAIN
+      ,HCO_CODE
+      ,HCO_MEANING
+      ,HCO_SYSTEM
+      ,HCO_SEQ
+      ,HCO_START_DATE
+      ,HCO_END_DATE)
+SELECT 'SDL_MAX_IMPORT_LEVEL'
+      ,'VALIDATE'
+      ,'Validate Attributes and Review'
+      ,'Y'
+      ,2
+      ,to_date('20200318000000','YYYYMMDDHH24MISS')
+      ,null
+  FROM DUAL
+ WHERE NOT EXISTS(SELECT 1
+                    FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'SDL_MAX_IMPORT_LEVEL'
+                     AND HCO_CODE = 'VALIDATE');
+--
+INSERT
+  INTO HIG_CODES
+      (HCO_DOMAIN
+      ,HCO_CODE
+      ,HCO_MEANING
+      ,HCO_SYSTEM
+      ,HCO_SEQ
+      ,HCO_START_DATE
+      ,HCO_END_DATE)
+SELECT 'SDL_PROCESSES'
+      ,'ADJUST'
+      ,'Adjust'
+      ,'Y'
+      ,3
+      ,to_date('20200318000000','YYYYMMDDHH24MISS')
+      ,null
+  FROM DUAL
+ WHERE NOT EXISTS(SELECT 1
+                    FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'SDL_PROCESSES'
+                     AND HCO_CODE = 'ADJUST');
+--
+INSERT
+  INTO HIG_CODES
+      (HCO_DOMAIN
+      ,HCO_CODE
+      ,HCO_MEANING
+      ,HCO_SYSTEM
+      ,HCO_SEQ
+      ,HCO_START_DATE
+      ,HCO_END_DATE)
+SELECT 'SDL_PROCESSES'
+      ,'ANALYSIS'
+      ,'Further analysis'
+      ,'Y'
+      ,7
+      ,to_date('20200318000000','YYYYMMDDHH24MISS')
+      ,null
+  FROM DUAL
+ WHERE NOT EXISTS(SELECT 1
+                    FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'SDL_PROCESSES'
+                     AND HCO_CODE = 'ANALYSIS');
+--
+INSERT
+  INTO HIG_CODES
+      (HCO_DOMAIN
+      ,HCO_CODE
+      ,HCO_MEANING
+      ,HCO_SYSTEM
+      ,HCO_SEQ
+      ,HCO_START_DATE
+      ,HCO_END_DATE)
+SELECT 'SDL_PROCESSES'
+      ,'DATUM_VALIDATION'
+      ,'Validation of geometry of datums and nodes'
+      ,'Y'
+      ,6
+      ,to_date('20200318000000','YYYYMMDDHH24MISS')
+      ,null
+  FROM DUAL
+ WHERE NOT EXISTS(SELECT 1
+                    FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'SDL_PROCESSES'
+                     AND HCO_CODE = 'DATUM_VALIDATION');
+--
+INSERT
+  INTO HIG_CODES
+      (HCO_DOMAIN
+      ,HCO_CODE
+      ,HCO_MEANING
+      ,HCO_SYSTEM
+      ,HCO_SEQ
+      ,HCO_START_DATE
+      ,HCO_END_DATE)
+SELECT 'SDL_PROCESSES'
+      ,'LOAD'
+      ,'Load'
+      ,'Y'
+      ,2
+      ,to_date('20200318000000','YYYYMMDDHH24MISS')
+      ,null
+  FROM DUAL
+ WHERE NOT EXISTS(SELECT 1
+                    FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'SDL_PROCESSES'
+                     AND HCO_CODE = 'LOAD');
+--
+INSERT
+  INTO HIG_CODES
+      (HCO_DOMAIN
+      ,HCO_CODE
+      ,HCO_MEANING
+      ,HCO_SYSTEM
+      ,HCO_SEQ
+      ,HCO_START_DATE
+      ,HCO_END_DATE)
+SELECT 'SDL_PROCESSES'
+      ,'LOAD_VALIDATION'
+      ,'Validation and generation of working geometry'
+      ,'Y'
+      ,4
+      ,to_date('20200318000000','YYYYMMDDHH24MISS')
+      ,null
+  FROM DUAL
+ WHERE NOT EXISTS(SELECT 1
+                    FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'SDL_PROCESSES'
+                     AND HCO_CODE = 'LOAD_VALIDATION');
+--
+INSERT
+  INTO HIG_CODES
+      (HCO_DOMAIN
+      ,HCO_CODE
+      ,HCO_MEANING
+      ,HCO_SYSTEM
+      ,HCO_SEQ
+      ,HCO_START_DATE
+      ,HCO_END_DATE)
+SELECT 'SDL_PROCESSES'
+      ,'NEW'
+      ,'A new file is being processed'
+      ,'Y'
+      ,1
+      ,to_date('20200318000000','YYYYMMDDHH24MISS')
+      ,null
+  FROM DUAL
+ WHERE NOT EXISTS(SELECT 1
+                    FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'SDL_PROCESSES'
+                     AND HCO_CODE = 'NEW');
+--
+INSERT
+  INTO HIG_CODES
+      (HCO_DOMAIN
+      ,HCO_CODE
+      ,HCO_MEANING
+      ,HCO_SYSTEM
+      ,HCO_SEQ
+      ,HCO_START_DATE
+      ,HCO_END_DATE)
+SELECT 'SDL_PROCESSES'
+      ,'REJECT'
+      ,'Reject'
+      ,'Y'
+      ,9
+      ,to_date('20200318000000','YYYYMMDDHH24MISS')
+      ,null
+  FROM DUAL
+ WHERE NOT EXISTS(SELECT 1
+                    FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'SDL_PROCESSES'
+                     AND HCO_CODE = 'REJECT');
+--
+INSERT
+  INTO HIG_CODES
+      (HCO_DOMAIN
+      ,HCO_CODE
+      ,HCO_MEANING
+      ,HCO_SYSTEM
+      ,HCO_SEQ
+      ,HCO_START_DATE
+      ,HCO_END_DATE)
+SELECT 'SDL_PROCESSES'
+      ,'TOPO_GENERATION'
+      ,'Generation of toplogical datums and nodes'
+      ,'Y'
+      ,5
+      ,to_date('20200318000000','YYYYMMDDHH24MISS')
+      ,null
+  FROM DUAL
+ WHERE NOT EXISTS(SELECT 1
+                    FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'SDL_PROCESSES'
+                     AND HCO_CODE = 'TOPO_GENERATION');
+--
+INSERT
+  INTO HIG_CODES
+      (HCO_DOMAIN
+      ,HCO_CODE
+      ,HCO_MEANING
+      ,HCO_SYSTEM
+      ,HCO_SEQ
+      ,HCO_START_DATE
+      ,HCO_END_DATE)
+SELECT 'SDL_PROCESSES'
+      ,'TRANSFER'
+      ,'Transfer to main database'
+      ,'Y'
+      ,8
+      ,to_date('20200318000000','YYYYMMDDHH24MISS')
+      ,null
+  FROM DUAL
+ WHERE NOT EXISTS(SELECT 1
+                    FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'SDL_PROCESSES'
+                     AND HCO_CODE = 'TRANSFER');
+--
+INSERT
+  INTO HIG_CODES
+      (HCO_DOMAIN
+      ,HCO_CODE
+      ,HCO_MEANING
+      ,HCO_SYSTEM
+      ,HCO_SEQ
+      ,HCO_START_DATE
+      ,HCO_END_DATE)
+SELECT 'SDL_REVIEW_ACTION'
+      ,'LOAD'
+      ,'Load'
+      ,'Y'
+      ,2
+      ,to_date('20200318000000','YYYYMMDDHH24MISS')
+      ,null
+  FROM DUAL
+ WHERE NOT EXISTS(SELECT 1
+                    FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'SDL_REVIEW_ACTION'
+                     AND HCO_CODE = 'LOAD');
+--
+INSERT
+  INTO HIG_CODES
+      (HCO_DOMAIN
+      ,HCO_CODE
+      ,HCO_MEANING
+      ,HCO_SYSTEM
+      ,HCO_SEQ
+      ,HCO_START_DATE
+      ,HCO_END_DATE)
+SELECT 'SDL_REVIEW_ACTION'
+      ,'NO_ACTION'
+      ,'No Action'
+      ,'Y'
+      ,4
+      ,to_date('20200318000000','YYYYMMDDHH24MISS')
+      ,null
+  FROM DUAL
+ WHERE NOT EXISTS(SELECT 1
+                    FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'SDL_REVIEW_ACTION'
+                     AND HCO_CODE = 'NO_ACTION');
+--
+INSERT
+  INTO HIG_CODES
+      (HCO_DOMAIN
+      ,HCO_CODE
+      ,HCO_MEANING
+      ,HCO_SYSTEM
+      ,HCO_SEQ
+      ,HCO_START_DATE
+      ,HCO_END_DATE)
+SELECT 'SDL_REVIEW_ACTION'
+      ,'REVIEW'
+      ,'Review'
+      ,'Y'
+      ,1
+      ,to_date('20200318000000','YYYYMMDDHH24MISS')
+      ,null
+  FROM DUAL
+ WHERE NOT EXISTS(SELECT 1
+                    FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'SDL_REVIEW_ACTION'
+                     AND HCO_CODE = 'REVIEW');
+--
+INSERT
+  INTO HIG_CODES
+      (HCO_DOMAIN
+      ,HCO_CODE
+      ,HCO_MEANING
+      ,HCO_SYSTEM
+      ,HCO_SEQ
+      ,HCO_START_DATE
+      ,HCO_END_DATE)
+SELECT 'SDL_REVIEW_ACTION'
+      ,'SKIP'
+      ,'Skip'
+      ,'Y'
+      ,3
+      ,to_date('20200318000000','YYYYMMDDHH24MISS')
+      ,null
+  FROM DUAL
+ WHERE NOT EXISTS(SELECT 1
+                    FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'SDL_REVIEW_ACTION'
+                     AND HCO_CODE = 'SKIP');
+--
+INSERT
+  INTO HIG_CODES
+      (HCO_DOMAIN
+      ,HCO_CODE
+      ,HCO_MEANING
+      ,HCO_SYSTEM
+      ,HCO_SEQ
+      ,HCO_START_DATE
+      ,HCO_END_DATE)
+SELECT 'SDL_TOPOLOGY_LEVEL'
+      ,'ENDPOINTONLY'
+      ,'Stitch End-Points Only'
+      ,'Y'
+      ,1
+      ,to_date('20200318000000','YYYYMMDDHH24MISS')
+      ,null
+  FROM DUAL
+ WHERE NOT EXISTS(SELECT 1
+                    FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'SDL_TOPOLOGY_LEVEL'
+                     AND HCO_CODE = 'ENDPOINTONLY');
+--
+INSERT
+  INTO HIG_CODES
+      (HCO_DOMAIN
+      ,HCO_CODE
+      ,HCO_MEANING
+      ,HCO_SYSTEM
+      ,HCO_SEQ
+      ,HCO_START_DATE
+      ,HCO_END_DATE)
+SELECT 'SDL_TOPOLOGY_LEVEL'
+      ,'FULLTOPOLOGY'
+      ,'Stitch All Intersects'
+      ,'Y'
+      ,3
+      ,to_date('20200318000000','YYYYMMDDHH24MISS')
+      ,null
+  FROM DUAL
+ WHERE NOT EXISTS(SELECT 1
+                    FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'SDL_TOPOLOGY_LEVEL'
+                     AND HCO_CODE = 'FULLTOPOLOGY');
+--
+INSERT
+  INTO HIG_CODES
+      (HCO_DOMAIN
+      ,HCO_CODE
+      ,HCO_MEANING
+      ,HCO_SYSTEM
+      ,HCO_SEQ
+      ,HCO_START_DATE
+      ,HCO_END_DATE)
+SELECT 'SDL_TOPOLOGY_LEVEL'
+      ,'IMPORTEDDATA'
+      ,'Stitching Not Allowed'
+      ,'Y'
+      ,2
+      ,to_date('20200318000000','YYYYMMDDHH24MISS')
+      ,null
+  FROM DUAL
+ WHERE NOT EXISTS(SELECT 1
+                    FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'SDL_TOPOLOGY_LEVEL'
+                     AND HCO_CODE = 'IMPORTEDDATA');
+--
+INSERT
+  INTO HIG_CODES
+      (HCO_DOMAIN
+      ,HCO_CODE
+      ,HCO_MEANING
+      ,HCO_SYSTEM
+      ,HCO_SEQ
+      ,HCO_START_DATE
+      ,HCO_END_DATE)
 SELECT 'SDORESEQ'
       ,'H'
       ,'Reshape - create new shape'
@@ -35209,6 +35937,56 @@ SELECT 'NMWEB7057'
                     FROM HIG_MODULES
                    WHERE HMO_MODULE = 'NMWEB7057');
 --
+INSERT
+  INTO HIG_MODULES
+      (HMO_MODULE
+      ,HMO_TITLE
+      ,HMO_FILENAME
+      ,HMO_MODULE_TYPE
+      ,HMO_FASTPATH_OPTS
+      ,HMO_FASTPATH_INVALID
+      ,HMO_USE_GRI
+      ,HMO_APPLICATION
+      ,HMO_MENU)
+SELECT 'SDL0001'
+      ,'SDL Manage Profiles'
+      ,'sdl0001'
+      ,'WEB'
+      ,''
+      ,'Y'
+      ,'N'
+      ,'NET'
+      ,''
+  FROM DUAL
+ WHERE NOT EXISTS(SELECT 1
+                    FROM HIG_MODULES
+                   WHERE HMO_MODULE = 'SDL0001');
+--
+INSERT
+  INTO HIG_MODULES
+      (HMO_MODULE
+      ,HMO_TITLE
+      ,HMO_FILENAME
+      ,HMO_MODULE_TYPE
+      ,HMO_FASTPATH_OPTS
+      ,HMO_FASTPATH_INVALID
+      ,HMO_USE_GRI
+      ,HMO_APPLICATION
+      ,HMO_MENU)
+SELECT 'SDL0002'
+      ,'SDL Load Spatial Data'
+      ,'sdl0002'
+      ,'WEB'
+      ,''
+      ,'Y'
+      ,'N'
+      ,'NET'
+      ,''
+  FROM DUAL
+ WHERE NOT EXISTS(SELECT 1
+                    FROM HIG_MODULES
+                   WHERE HMO_MODULE = 'SDL0002');
+--
 ----------------------------------------------------------------------------------------
 -- HIG_OPTION_LIST
 --
@@ -37856,6 +38634,31 @@ INSERT
       ,HOL_MIXED_CASE
       ,HOL_USER_OPTION
       ,HOL_MAX_LENGTH)
+SELECT 'SDLMAPNAME'
+      ,'NET'
+      ,'SDL Map Name'
+      ,'The name of the base map to be used by SDL.'
+      ,''
+      ,'VARCHAR2'
+      ,'N'
+      ,'N'
+      ,50
+  FROM DUAL
+ WHERE NOT EXISTS(SELECT 1
+                    FROM HIG_OPTION_LIST
+                   WHERE HOL_ID = 'SDLMAPNAME');
+--
+INSERT
+  INTO HIG_OPTION_LIST
+      (HOL_ID
+      ,HOL_PRODUCT
+      ,HOL_NAME
+      ,HOL_REMARKS
+      ,HOL_DOMAIN
+      ,HOL_DATATYPE
+      ,HOL_MIXED_CASE
+      ,HOL_USER_OPTION
+      ,HOL_MAX_LENGTH)
 SELECT 'SDMREGULYR'
       ,'HIG'
       ,'Register user layers for SDM'
@@ -40354,6 +41157,17 @@ SELECT 'SDERUNLE'
  WHERE NOT EXISTS(SELECT 1
                     FROM HIG_OPTION_VALUES
                    WHERE HOV_ID = 'SDERUNLE');
+--
+INSERT
+  INTO HIG_OPTION_VALUES
+      (HOV_ID
+      ,HOV_VALUE)
+SELECT 'SDLMAPNAME'
+      ,'SDL_MAP'
+  FROM DUAL
+ WHERE NOT EXISTS(SELECT 1
+                    FROM HIG_OPTION_VALUES
+                   WHERE HOV_ID = 'SDLMAPNAME');
 --
 INSERT
   INTO HIG_OPTION_VALUES
