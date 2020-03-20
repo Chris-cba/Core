@@ -1,15 +1,15 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/nm3.ind-arc   2.33   Dec 20 2018 16:17:22   Chris.Baugh  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/nm3.ind-arc   2.34   Mar 20 2020 10:02:44   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm3.ind  $
---       Date into PVCS   : $Date:   Dec 20 2018 16:17:22  $
---       Date fetched Out : $Modtime:   Dec 20 2018 16:17:00  $
---       PVCS Version     : $Revision:   2.33  $
+--       Date into PVCS   : $Date:   Mar 20 2020 10:02:44  $
+--       Date fetched Out : $Modtime:   Mar 20 2020 10:00:40  $
+--       PVCS Version     : $Revision:   2.34  $
 --
 -----------------------------------------------------------------------------
---    Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
------------------------------------------------------------------------------
----- Generated for Oracle 10g on Wed Dec 19  10:51:44 2018 by Server Generator 10.1.2.9.28
+--    Copyright (c) 2020 Bentley Systems Incorporated. All rights reserved.
+------------------------------------------------------------------------------- 
+-- Generated for Oracle 10g on Tue Mar 17  15:20:59 2020 by Server Generator 10.1.2.9.28
   
 
 PROMPT Creating Index 'DOC_FK_DLC_IND'
@@ -273,6 +273,11 @@ PROMPT Creating Index 'GRS_JOB_LINE_IND'
 CREATE INDEX GRS_JOB_LINE_IND ON GRI_SPOOL
  (GRS_JOB_ID
  ,GRS_LINE_NO)
+/
+
+PROMPT Creating Index 'HAD13'
+CREATE UNIQUE INDEX HAD13 ON HIG_ADDRESS
+ (HAD_UPRN)
 /
 
 PROMPT Creating Index 'HAD_IND1'
@@ -1724,6 +1729,113 @@ CREATE INDEX NXV_NXR_FK_IND ON NM_X_VAL_CONDITIONS
 PROMPT Creating Index 'RPA_PK_IDX'
 CREATE INDEX RPA_PK_IDX ON REPORT_PARAMS
  (REP_SESSIONID)
+/
+
+PROMPT Creating Index 'SDAM_NT_FK_IDX'
+CREATE INDEX SDAM_NT_FK_IDX ON SDL_DATUM_ATTRIBUTE_MAPPING
+ (SDAM_NW_TYPE)
+/
+
+PROMPT Creating Index 'SDAM_UK'
+CREATE UNIQUE INDEX SDAM_UK ON SDL_DATUM_ATTRIBUTE_MAPPING
+ (SDAM_PROFILE_ID
+ ,SDAM_NW_TYPE
+ ,SDAM_COLUMN_NAME)
+/
+
+PROMPT Creating Index 'SLPS_SLD_FK_IDX'
+CREATE INDEX SLPS_SLD_FK_IDX ON SDL_PLINE_STATISTICS
+ (SLPS_SLD_KEY)
+/
+
+PROMPT Creating Index 'SLPS_SWD_FK_IDX'
+CREATE INDEX SLPS_SWD_FK_IDX ON SDL_PLINE_STATISTICS
+ (SLPS_SWD_ID)
+/
+
+PROMPT Creating Index 'SPA_SFS_IDX'
+CREATE INDEX SPA_SFS_IDX ON SDL_PROCESS_AUDIT
+ (SPA_SFS_ID)
+/
+
+PROMPT Creating Index 'SPA_SLD_IDX'
+CREATE INDEX SPA_SLD_IDX ON SDL_PROCESS_AUDIT
+ (SPA_SLD_KEY)
+/
+
+PROMPT Creating Index 'SVR_SAM_FK_IDX'
+CREATE INDEX SVR_SAM_FK_IDX ON SDL_VALIDATION_RESULTS
+ (SVR_SAM_ID)
+/
+
+PROMPT Creating Index 'SVR_SLD_FK_IDX'
+CREATE INDEX SVR_SLD_FK_IDX ON SDL_VALIDATION_RESULTS
+ (SVR_SLD_KEY)
+/
+
+PROMPT Creating Index 'SVR_SWD_FK_IDX'
+CREATE INDEX SVR_SWD_FK_IDX ON SDL_VALIDATION_RESULTS
+ (SVR_SWD_ID)
+/
+
+PROMPT Creating Index 'SWD_BATCH_IDX'
+CREATE INDEX SWD_BATCH_IDX ON SDL_WIP_DATUMS
+ (BATCH_ID)
+/
+
+PROMPT Creating Index 'SWD_NEW_NE_IDX'
+CREATE INDEX SWD_NEW_NE_IDX ON SDL_WIP_DATUMS
+ (NEW_NE_ID)
+/
+
+PROMPT Creating Index 'SWD_SLD_UK'
+CREATE UNIQUE INDEX SWD_SLD_UK ON SDL_WIP_DATUMS
+ (SLD_KEY
+ ,DATUM_ID)
+/
+
+PROMPT Creating Index 'SWDN_SWN_FK_IDX'
+CREATE INDEX SWDN_SWN_FK_IDX ON SDL_WIP_DATUM_NODES
+ (HASHCODE
+ ,BATCH_ID)
+/
+
+PROMPT Creating Index 'SWDN_UK'
+CREATE UNIQUE INDEX SWDN_UK ON SDL_WIP_DATUM_NODES
+ (SWD_ID
+ ,HASHCODE
+ ,NODE_TYPE)
+/
+
+PROMPT Creating Index 'SDL_WIP_INTSCT_GEOM_IDX'
+CREATE INDEX SDL_WIP_INTSCT_GEOM_IDX ON SDL_WIP_INTSCT_GEOM
+ (BATCH_ID)
+/
+
+PROMPT Creating Index 'SWN_NO_UK'
+CREATE UNIQUE INDEX SWN_NO_UK ON SDL_WIP_NODES
+ (NODE_ID)
+/
+
+PROMPT Creating Index 'SDL_WIP_PT_ARRAYS_IDX'
+CREATE INDEX SDL_WIP_PT_ARRAYS_IDX ON SDL_WIP_PT_ARRAYS
+ (HASHCODE
+ ,BATCH_ID)
+/
+
+PROMPT Creating Index 'SDL_WIP_PT_GEOM_IDX'
+CREATE INDEX SDL_WIP_PT_GEOM_IDX ON SDL_WIP_PT_GEOM
+ (BATCH_ID)
+/
+
+PROMPT Creating Index 'SWRN_NO_IDX'
+CREATE INDEX SWRN_NO_IDX ON SDL_WIP_ROUTE_NODES
+ (HASHCODE)
+/
+
+PROMPT Creating Index 'SWRN_SLD_IDX'
+CREATE INDEX SWRN_SLD_IDX ON SDL_WIP_ROUTE_NODES
+ (SLD_KEY)
 /
 
 
