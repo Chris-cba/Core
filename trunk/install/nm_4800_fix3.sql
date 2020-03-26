@@ -1,11 +1,11 @@
 ----------------------------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm_4800_fix3.sql-arc   1.0   Mar 19 2020 09:07:00   Chris.Baugh  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm_4800_fix3.sql-arc   1.1   Mar 26 2020 15:21:16   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm_4800_fix3.sql  $ 
---       Date into PVCS   : $Date:   Mar 19 2020 09:07:00  $
---       Date fetched Out : $Modtime:   Mar 18 2020 14:11:08  $
---       Version     	  : $Revision:   1.0  $
+--       Date into PVCS   : $Date:   Mar 26 2020 15:21:16  $
+--       Date fetched Out : $Modtime:   Mar 26 2020 15:13:32  $
+--       Version     	  : $Revision:   1.1  $
 --
 ----------------------------------------------------------------------------------------------------
 --   Copyright (c) 2020 Bentley Systems Incorporated. All rights reserved.
@@ -191,6 +191,92 @@ EXCEPTION
 END;
 /
 --
+DECLARE
+  --
+  type_not_exist  EXCEPTION;
+  PRAGMA exception_init( type_not_exist, -4043);
+  --
+BEGIN
+  --
+  EXECUTE IMMEDIATE 'DROP TYPE nm_vertex_tab FORCE';
+  --
+EXCEPTION 
+  WHEN type_not_exist THEN
+    NULL;
+  WHEN OTHERS THEN
+    RAISE;
+END;
+/
+--
+DECLARE
+  --
+  type_not_exist  EXCEPTION;
+  PRAGMA exception_init( type_not_exist, -4043);
+  --
+BEGIN
+  --
+  EXECUTE IMMEDIATE 'DROP TYPE geom_id_tab FORCE';
+  --
+EXCEPTION 
+  WHEN type_not_exist THEN
+    NULL;
+  WHEN OTHERS THEN
+    RAISE;
+END;
+/
+--
+DECLARE
+  --
+  type_not_exist  EXCEPTION;
+  PRAGMA exception_init( type_not_exist, -4043);
+  --
+BEGIN
+  --
+  EXECUTE IMMEDIATE 'DROP TYPE nm_vertex FORCE';
+  --
+EXCEPTION 
+  WHEN type_not_exist THEN
+    NULL;
+  WHEN OTHERS THEN
+    RAISE;
+END;
+/
+--
+DECLARE
+  --
+  type_not_exist  EXCEPTION;
+  PRAGMA exception_init( type_not_exist, -4043);
+  --
+BEGIN
+  --
+  EXECUTE IMMEDIATE 'DROP TYPE geom_id FORCE';
+  --
+EXCEPTION 
+  WHEN type_not_exist THEN
+    NULL;
+  WHEN OTHERS THEN
+    RAISE;
+END;
+/
+--
+DECLARE
+  --
+  type_not_exist  EXCEPTION;
+  PRAGMA exception_init( type_not_exist, -4043);
+  --
+BEGIN
+  --
+  EXECUTE IMMEDIATE 'DROP TYPE nm_geom_terminations FORCE';
+  --
+EXCEPTION 
+  WHEN type_not_exist THEN
+    NULL;
+  WHEN OTHERS THEN
+    RAISE;
+END;
+/
+--
+--
 -- Create Types
 --
 SET TERM ON 
@@ -248,6 +334,51 @@ SET TERM OFF
 SET FEEDBACK ON
 start sdl_ne_tab.tyh
 SET FEEDBACK OFF
+
+SET TERM ON 
+PROMPT Creating Type nm_vertex header
+SET TERM OFF
+--
+SET FEEDBACK ON
+start nm_vertex.tyh
+SET FEEDBACK OFF
+
+
+SET TERM ON 
+PROMPT Creating Type nm_vertex_tab header
+SET TERM OFF
+--
+SET FEEDBACK ON
+start nm_vertex_tab.tyh
+SET FEEDBACK OFF
+
+
+SET TERM ON 
+PROMPT Creating Type geom_id header
+SET TERM OFF
+--
+SET FEEDBACK ON
+start geom_id.tyh
+SET FEEDBACK OFF
+
+
+SET TERM ON 
+PROMPT Creating Type geom_id_tab header
+SET TERM OFF
+--
+SET FEEDBACK ON
+start geom_id_tab.tyh
+SET FEEDBACK OFF
+
+
+SET TERM ON 
+PROMPT Creating Type nm_geom_terminations header
+SET TERM OFF
+--
+SET FEEDBACK ON
+start nm_geom_terminations.tyh
+SET FEEDBACK OFF
+
 --------------------------------------------------------------------------------
 -- DDL
 --------------------------------------------------------------------------------
@@ -269,6 +400,14 @@ SET TERM OFF
 --
 SET FEEDBACK ON
 start nm_sdo.pkh 
+SET FEEDBACK OFF
+
+SET TERM ON 
+PROMPT Creating Package nm_sdo_geom
+SET TERM OFF
+--
+SET FEEDBACK ON
+start nm_sdo_geom.pkh
 SET FEEDBACK OFF
 
 SET TERM ON 
