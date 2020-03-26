@@ -2,11 +2,11 @@
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3pkh.sql-arc   2.52   Mar 17 2020 10:58:14   Chris.Baugh  $
+--       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3pkh.sql-arc   2.53   Mar 26 2020 15:36:52   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm3pkh.sql  $
---       Date into PVCS   : $Date:   Mar 17 2020 10:58:14  $
---       Date fetched Out : $Modtime:   Mar 17 2020 10:57:54  $
---       PVCS Version     : $Revision:   2.52  $
+--       Date into PVCS   : $Date:   Mar 26 2020 15:36:52  $
+--       Date fetched Out : $Modtime:   Mar 26 2020 15:35:28  $
+--       PVCS Version     : $Revision:   2.53  $
 --
 --
 --   Author : Graeme Johnson
@@ -2824,6 +2824,23 @@ PROMPT sdl_validate.pkh
 SET TERM OFF
 SET DEFINE ON
 SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'pck'||'&terminator'||'sdl_validate.pkh' run_file 
+FROM dual
+/
+start '&run_file'
+SET TERM ON
+PROMPT nm_sdo_geom.pkh
+SET TERM OFF
+SET DEFINE ON
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'pck'||'&terminator'||'nm_sdo_geom.pkh' run_file
+FROM dual
+/
+start '&run_file'
+
+SET TERM ON
+PROMPT nm_sdo.pkh 
+SET TERM OFF
+SET DEFINE ON
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'pck'||'&terminator'||'nm_sdo.pkh' run_file
 FROM dual
 /
 start '&run_file'
