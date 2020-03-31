@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY sdl_topo
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_topo.pkb-arc   1.9   Mar 31 2020 13:18:22   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_topo.pkb-arc   1.10   Mar 31 2020 14:33:24   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_topo.pkb  $
-    --       Date into PVCS   : $Date:   Mar 31 2020 13:18:22  $
-    --       Date fetched Out : $Modtime:   Mar 31 2020 13:16:28  $
-    --       PVCS Version     : $Revision:   1.9  $
+    --       Date into PVCS   : $Date:   Mar 31 2020 14:33:24  $
+    --       Date fetched Out : $Modtime:   Mar 31 2020 14:32:32  $
+    --       PVCS Version     : $Revision:   1.10  $
     --
     --   Author : R.A. Coupe
     --
@@ -17,7 +17,7 @@ AS
     ----------------------------------------------------------------------------
     -- The main purpose of this package is for breaking the loaded data into individual connected segments.
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.9  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.10  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'SDL_TOPO';
 
@@ -174,7 +174,7 @@ AS
                            SDO_GEOM.sdo_intersection (a.sld_working_geometry,
                                                       b.sld_working_geometry,
                                                       g_sdo_tol))) t
-             WHERE     a.sld_key != b.sld_key
+             WHERE     a.sld_key < b.sld_key
                    AND a.sld_sfs_id = p_batch_id
                    AND b.sld_sfs_id = p_batch_id
                    AND sdo_relate (a.sld_working_geometry,
