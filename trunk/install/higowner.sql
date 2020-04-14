@@ -1,18 +1,18 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/higowner.sql-arc   2.20   Nov 01 2018 10:14:42   Chris.Baugh  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/higowner.sql-arc   2.21   Apr 14 2020 09:32:20   Chris.Baugh  $
 --       Module Name      : $Workfile:   higowner.sql  $
---       Date into PVCS   : $Date:   Nov 01 2018 10:14:42  $
---       Date fetched Out : $Modtime:   Jul 12 2018 12:59:32  $
---       Version          : $Revision:   2.20  $
+--       Date into PVCS   : $Date:   Apr 14 2020 09:32:20  $
+--       Date fetched Out : $Modtime:   Mar 27 2020 14:34:18  $
+--       Version          : $Revision:   2.21  $
 --
 -----------------------------------------------------------------------------
 --    Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 REM SCCS ID Keyword, do no remove
-define sccsid = '"$Revision::   2.20     $"';
+define sccsid = '"$Revision::   2.21     $"';
 clear screen
 -- creates the following tables
 -- HIG_USERS
@@ -71,6 +71,7 @@ DECLARE
   l_oracle11gr1 boolean;
   l_oracle11gr2 boolean;
   l_oracle12gr2 boolean;
+  l_oracle19c boolean;
 --
 -------------------------------------------------------------------------------
 --
@@ -304,7 +305,7 @@ DECLARE
      
      -- Cannot grant quota on temporary tablespace for 10gR2
 
-    IF l_oracle10gr2 OR l_oracle11gr1 OR l_oracle11gr2 OR l_oracle12gr2 THEN
+    IF l_oracle10gr2 OR l_oracle11gr1 OR l_oracle11gr2 OR l_oracle12gr2 OR l_oracle19c THEN
       EXECUTE IMMEDIATE 'CREATE USER '|| p_user
            || CHR(10) ||' IDENTIFIED BY '||p_pass
            || CHR(10) ||' DEFAULT TABLESPACE '||p_deftab
@@ -778,6 +779,7 @@ BEGIN
   l_oracle11gr1 := check_db_version('%11.1%');
   l_oracle11gr2 := check_db_version('%11.2%');
   l_oracle12gr2 := check_db_version('%12.2%');
+  l_oracle19c := check_db_version('%19.0%');
 --
   check_listener_locks;
 -- 
