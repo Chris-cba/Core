@@ -1,11 +1,11 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/nm3_install.sql-arc   2.52   Jul 16 2019 13:09:42   Chris.Baugh  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/nm3_install.sql-arc   2.53   Apr 14 2020 09:56:54   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm3_install.sql  $
---       Date into PVCS   : $Date:   Jul 16 2019 13:09:42  $
---       Date fetched Out : $Modtime:   Jul 16 2019 13:08:34  $
---       PVCS Version     : $Revision:   2.52  $
+--       Date into PVCS   : $Date:   Apr 14 2020 09:56:54  $
+--       Date fetched Out : $Modtime:   Apr 14 2020 09:56:14  $
+--       PVCS Version     : $Revision:   2.53  $
 --
 --------------------------------------------------------------------------------
 --   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
@@ -57,18 +57,18 @@ DECLARE
   Cursor c_db_version Is
   Select '12gr2' 
   From   v$version
-  Where  banner Like '%12.2.0.1%';
+  Where  banner Like '%19.0.0.0%';
   --
-  l_12gr2 Varchar2(10);
+  l_19c Varchar2(10);
   
   ex_incorrect_db Exception;
 
 BEGIN
    Open  c_db_version;
-   Fetch c_db_version Into l_12gr2;
+   Fetch c_db_version Into l_19c;
    Close c_db_version;
    --
-   If l_12gr2 Is Null
+   If l_19c Is Null
    Then
      Raise ex_incorrect_db;
    End If;
@@ -490,6 +490,24 @@ SET FEEDBACK ON
 start '&&run_file'
 SET FEEDBACK OFF
 --
+--------------------------------------------------------------------------------
+-- Grant privileges to PROXY_OWNER Role
+--------------------------------------------------------------------------------
+
+prompt Grant privileges to PROXY_OWNER Role
+
+DECLARE
+  role_exists EXCEPTION;
+  PRAGMA EXCEPTION_INIT(role_exists, -1921);
+BEGIN
+  EXECUTE IMMEDIATE 'GRANT CREATE SESSION to PROXY_OWNER';
+  EXECUTE IMMEDIATE 'GRANT EXECUTE ON hig_sso_api to PROXY_OWNER';
+EXCEPTION
+  WHEN role_exists
+  THEN NULL;
+END;
+/
+--
 ---------------------------------------------------------------------------------------------------
 --                        ****************   COMPILE SCHEMA   *******************
 SET TERM ON
@@ -761,11 +779,11 @@ SET TERM ON
 Prompt Setting The Version Number...
 SET TERM OFF
 BEGIN
-      hig2.upgrade('HIG','nm3_install.sql','Installed','4.8.0.3');
-      hig2.upgrade('NET','nm3_install.sql','Installed','4.8.0.3');
-      hig2.upgrade('DOC','nm3_install.sql','Installed','4.8.0.3');
-      hig2.upgrade('AST','nm3_install.sql','Installed','4.8.0.3');
-      hig2.upgrade('WMP','nm3_install.sql','Installed','4.8.0.3');
+      hig2.upgrade('HIG','nm3_install.sql','Installed','4.9.0.1');
+      hig2.upgrade('NET','nm3_install.sql','Installed','4.9.0.1');
+      hig2.upgrade('DOC','nm3_install.sql','Installed','4.9.0.1');
+      hig2.upgrade('AST','nm3_install.sql','Installed','4.9.0.1');
+      hig2.upgrade('WMP','nm3_install.sql','Installed','4.9.0.1');
 END;
 /
 COMMIT;
