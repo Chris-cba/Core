@@ -1,13 +1,13 @@
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm3data3.sql-arc   2.34   Mar 20 2020 13:37:06   Chris.Baugh  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm3data3.sql-arc   2.35   Apr 14 2020 09:09:04   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm3data3.sql  $
---       Date into PVCS   : $Date:   Mar 20 2020 13:37:06  $
---       Date fetched Out : $Modtime:   Mar 20 2020 10:21:04  $
---       Version          : $Revision:   2.34  $
+--       Date into PVCS   : $Date:   Apr 14 2020 09:09:04  $
+--       Date fetched Out : $Modtime:   Apr 14 2020 08:56:08  $
+--       Version          : $Revision:   2.35  $
 --       Table Owner      : NM3_METADATA
---       Generation Date  : 20-MAR-2020 10:21
+--       Generation Date  : 14-APR-2020 08:56
 --
 --   Product metadata script
 --   As at Release 4.7.1.0
@@ -294,19 +294,6 @@ SELECT 'PROCESS_USER'
  WHERE NOT EXISTS(SELECT 1
                     FROM HIG_ROLES
                    WHERE HRO_ROLE = 'PROCESS_USER');
---
-INSERT
-  INTO HIG_ROLES
-      (HRO_ROLE
-      ,HRO_PRODUCT
-      ,HRO_DESCR)
-SELECT 'PROXY_OWNER'
-      ,'HIG'
-      ,'Role which allows proxy connections for users, with this user as the Proxy Owner'
-  FROM DUAL
- WHERE NOT EXISTS(SELECT 1
-                    FROM HIG_ROLES
-                   WHERE HRO_ROLE = 'PROXY_OWNER');
 --
 INSERT
   INTO HIG_ROLES
