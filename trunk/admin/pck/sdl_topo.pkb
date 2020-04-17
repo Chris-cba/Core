@@ -1,13 +1,12 @@
-/* Formatted on 01/04/2020 13:40:33 (QP5 v5.336) */
 CREATE OR REPLACE PACKAGE BODY sdl_topo
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_topo.pkb-arc   1.11   Apr 01 2020 13:41:22   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_topo.pkb-arc   1.12   Apr 17 2020 09:51:02   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_topo.pkb  $
-    --       Date into PVCS   : $Date:   Apr 01 2020 13:41:22  $
-    --       Date fetched Out : $Modtime:   Apr 01 2020 13:40:44  $
-    --       PVCS Version     : $Revision:   1.11  $
+    --       Date into PVCS   : $Date:   Apr 17 2020 09:51:02  $
+    --       Date fetched Out : $Modtime:   Apr 17 2020 09:49:58  $
+    --       PVCS Version     : $Revision:   1.12  $
     --
     --   Author : R.A. Coupe
     --
@@ -18,7 +17,7 @@ AS
     ----------------------------------------------------------------------------
     -- The main purpose of this package is for breaking the loaded data into individual connected segments.
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.11  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.12  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'SDL_TOPO';
 
@@ -156,7 +155,7 @@ AS
                                          geom,
                                          relation,
                                          intsct_type)
-            SELECT p_batch_id,
+            SELECT /* +LEADING(A B) INDEX(B SDL_LOAD_DATA_SPIDX) */p_batch_id,
                    sld_intsct_seq.NEXTVAL,
                    a.sld_key,
                    b.sld_key,
@@ -169,8 +168,8 @@ AS
                        SDO_LRS.convert_to_std_geom (b.sld_working_geometry),
                        g_sdo_tol),
                    'LOAD INTERSECTION'
-              FROM sdl_load_data  a,
-                   sdl_load_data  b,
+              FROM sdl_load_data  A,
+                   sdl_load_data  B,
                    TABLE (
                        nm_sdo_geom.extract_id_geom (
                            SDO_GEOM.sdo_intersection (a.sld_working_geometry,
@@ -539,7 +538,7 @@ AS
                    ia,
                    ORA_HASH (ia)     hashcode,
                    CASE WHEN pt_type = 'E' THEN 'Y' ELSE 'N' END
-              FROM (  SELECT /*LEADING(A B) INDEX(B SDL_WIP_PT_GEOM_SPIDX ) */
+              FROM (  SELECT /* +LEADING(A B) INDEX(B SDL_WIP_PT_GEOM_SPIDX ) */
                              a.id,
                              CAST (
                                  COLLECT (b.id ORDER BY b.id) AS int_array_type)
