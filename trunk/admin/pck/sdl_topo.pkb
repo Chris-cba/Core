@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY sdl_topo
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_topo.pkb-arc   1.12   Apr 17 2020 09:51:02   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_topo.pkb-arc   1.13   Apr 21 2020 16:31:20   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_topo.pkb  $
-    --       Date into PVCS   : $Date:   Apr 17 2020 09:51:02  $
-    --       Date fetched Out : $Modtime:   Apr 17 2020 09:49:58  $
-    --       PVCS Version     : $Revision:   1.12  $
+    --       Date into PVCS   : $Date:   Apr 21 2020 16:31:20  $
+    --       Date fetched Out : $Modtime:   Apr 21 2020 16:30:32  $
+    --       PVCS Version     : $Revision:   1.13  $
     --
     --   Author : R.A. Coupe
     --
@@ -17,7 +17,7 @@ AS
     ----------------------------------------------------------------------------
     -- The main purpose of this package is for breaking the loaded data into individual connected segments.
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.12  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.13  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'SDL_TOPO';
 
@@ -155,7 +155,8 @@ AS
                                          geom,
                                          relation,
                                          intsct_type)
-            SELECT /* +LEADING(A B) INDEX(B SDL_LOAD_DATA_SPIDX) */p_batch_id,
+            SELECT            /* +LEADING(A B) INDEX(B SDL_LOAD_DATA_SPIDX) */
+                   p_batch_id,
                    sld_intsct_seq.NEXTVAL,
                    a.sld_key,
                    b.sld_key,
@@ -661,19 +662,47 @@ AS
                                GROUP BY sld_key
                                  HAVING COUNT (*) = 2);
 
+        INSERT INTO sdl_wip_datum_nodes (swd_id,
+                                         batch_id,
+                                         hashcode,
+                                         node_type,
+                                         node_measure)
+            SELECT swd_id,
+                   batch_id,
+                   hashcode,
+                   CASE WHEN rn = 1 THEN 'S' ELSE 'E' END     node_type,
+                   m_val
+              FROM (SELECT t.*, ROW_NUMBER () OVER (partition by swd_id ORDER BY m_val) rn
+                      FROM (SELECT d.swd_id,
+                                   d.batch_id,
+                                   a.hashcode,
+                                   b.node_id,
+                                   SDO_LRS.find_measure (geom, node_geom)    m_val
+                              FROM sdl_wip_datums       d,
+                                   sdl_wip_route_nodes  a,
+                                   sdl_wip_nodes        b
+                             WHERE     a.hashcode = b.hashcode
+                                   AND d.sld_key = a.sld_key
+                                   AND d.batch_id = p_batch_id
+                                   AND a.batch_id = p_batch_id
+                                   AND b.batch_id = p_batch_id) t) t1;
 
+        commit;
+--        raise_application_error(-20001, 'Stop');
         FOR irec IN (SELECT sld_sfs_id batch_id, sld_key
-                       FROM sdl_load_data
-                      WHERE     sld_sfs_id = p_batch_id
-                            AND sld_key IN (  SELECT sld_key
-                                                FROM sdl_wip_route_nodes n
-                                               WHERE batch_id = p_batch_id
-                                            GROUP BY sld_key
-                                              HAVING COUNT (*) <> 2))
+                       FROM sdl_load_data l
+                      WHERE     l.sld_sfs_id = p_batch_id
+                            AND not exists ( select 1 from sdl_wip_datums d where d.sld_key = l.sld_key and d.batch_id = p_batch_id ))
+--                            AND sld_key IN (  SELECT sld_key
+--                                                FROM sdl_wip_route_nodes n
+--                                               WHERE batch_id = p_batch_id
+--                                            GROUP BY sld_key
+--                                              HAVING COUNT (*) <> 2))
         LOOP
             generate_wip_datums (irec.batch_id, irec.sld_key, p_tol_load);
         END LOOP;
-
+        commit;
+--      raise_application_error(-20001, 'Stop');
         cleanup (p_batch_id, 5);
 
         COMMIT;
