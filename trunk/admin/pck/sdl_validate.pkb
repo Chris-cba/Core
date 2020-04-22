@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY sdl_validate
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_validate.pkb-arc   1.12   Mar 12 2020 20:15:54   Vikas.Mhetre  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_validate.pkb-arc   1.13   Apr 22 2020 18:51:02   Vikas.Mhetre  $
     --       Module Name      : $Workfile:   sdl_validate.pkb  $
-    --       Date into PVCS   : $Date:   Mar 12 2020 20:15:54  $
-    --       Date fetched Out : $Modtime:   Mar 12 2020 20:10:28  $
-    --       PVCS Version     : $Revision:   1.12  $
+    --       Date into PVCS   : $Date:   Apr 22 2020 18:51:02  $
+    --       Date fetched Out : $Modtime:   Apr 22 2020 10:02:12  $
+    --       PVCS Version     : $Revision:   1.13  $
     --
     --   Author : R.A. Coupe
     --
@@ -20,7 +20,7 @@ AS
     -- FK based checks
     -- format checks
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.12  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.13  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'SDL_VALIDATE';
 
@@ -209,6 +209,7 @@ AS
                                 AND sam_sp_id = sp_id
                                 AND sam_ne_column_name = column_name
                                 AND network_type = nlt_nt_type
+                                AND group_type = nlt_gty_type
                                 AND domain IS NOT NULL))
         SELECT MAX (sam_id),
                   'insert into sdl_validation_results (svr_sfs_id, svr_sld_key, svr_validation_type, svr_sam_id, svr_column_name, svr_current_value, svr_status_code, svr_message) '
@@ -288,6 +289,7 @@ AS
                                 AND sam_sp_id = sp_id
                                 AND sam_ne_column_name = column_name
                                 AND network_type = nlt_nt_type
+                                AND group_type = nlt_gty_type
                                 AND mandatory = 'Y'))
         SELECT MAX (sam_id),
                   'insert into sdl_validation_results (svr_sfs_id, svr_sld_key, svr_validation_type, svr_sam_id, svr_column_name, svr_current_value, svr_status_code, svr_message) '
