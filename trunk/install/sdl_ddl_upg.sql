@@ -4,11 +4,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/sdl_ddl_upg.sql-arc   1.0   Mar 17 2020 07:26:10   Vikas.Mhetre  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/sdl_ddl_upg.sql-arc   1.1   Apr 22 2020 19:36:06   Vikas.Mhetre  $
 --       Module Name      : $Workfile:   sdl_ddl_upg.sql  $
---       Date into PVCS   : $Date:   Mar 17 2020 07:26:10  $
---       Date fetched Out : $Modtime:   Mar 17 2020 07:21:12  $
---       Version          : $Revision:   1.0  $
+--       Date into PVCS   : $Date:   Apr 22 2020 19:36:06  $
+--       Date fetched Out : $Modtime:   Apr 22 2020 19:09:24  $
+--       Version          : $Revision:   1.1  $
 --
 -----------------------------------------------------------------------------
 --    Copyright (c) 2020 Bentley Systems Incorporated. All rights reserved.
@@ -782,6 +782,28 @@ EXCEPTION
     NULL;
 END;
 /
+PROMPT Creating indexes on 'SDL_WIP_NODES'
+DECLARE
+  obj_exists EXCEPTION;
+  PRAGMA exception_init( obj_exists, -955);
+BEGIN
+  EXECUTE IMMEDIATE 'CREATE INDEX SDL_WIP_NODES_BATCH_IDX ON SDL_WIP_NODES (BATCH_ID)';
+EXCEPTION
+  WHEN obj_exists THEN
+    NULL;
+END;
+/
+PROMPT Creating indexes on 'SDL_WIP_SELF_INTERSECTIONS'
+DECLARE
+  obj_exists EXCEPTION;
+  PRAGMA exception_init( obj_exists, -955);
+BEGIN
+  EXECUTE IMMEDIATE 'CREATE INDEX SDL_WIP_SELF_INTERSECTIONS_IDX ON SDL_WIP_SELF_INTERSECTIONS (SLD_KEY)';
+EXCEPTION
+  WHEN obj_exists THEN
+    NULL;
+END;
+/
 PROMPT Creating index on 'SDL_PLINE_STATISTICS'
 DECLARE
   obj_exists EXCEPTION;
@@ -899,6 +921,16 @@ EXCEPTION
     NULL;
 END;
 /
+DECLARE
+  obj_exists EXCEPTION;
+  PRAGMA exception_init( obj_exists, -955);
+BEGIN
+  EXECUTE IMMEDIATE 'CREATE INDEX SVR_BATCH_IDX ON SDL_VALIDATION_RESULTS (SVR_SFS_ID)';
+EXCEPTION
+  WHEN obj_exists THEN
+    NULL;
+END;
+/
 PROMPT Creating indexes on 'SDL_PROCESS_AUDIT'
 DECLARE
   obj_exists EXCEPTION;
@@ -1005,7 +1037,7 @@ DECLARE
   obj_exists EXCEPTION;
   PRAGMA exception_init( obj_exists, -2260);
 BEGIN
-  EXECUTE IMMEDIATE 'ALTER TABLE SDL_WIP_DATUMS ADD PRIMARY KEY (SWD_ID)';
+  EXECUTE IMMEDIATE 'ALTER TABLE SDL_WIP_DATUMS ADD CONSTRAINT SWD_PK PRIMARY KEY (SWD_ID)';
 EXCEPTION
   WHEN obj_exists THEN
     NULL;
