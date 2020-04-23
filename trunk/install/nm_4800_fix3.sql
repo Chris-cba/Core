@@ -1,11 +1,11 @@
 ----------------------------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm_4800_fix3.sql-arc   1.1   Mar 26 2020 15:21:16   Chris.Baugh  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/nm_4800_fix3.sql-arc   1.2   Apr 23 2020 09:28:28   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm_4800_fix3.sql  $ 
---       Date into PVCS   : $Date:   Mar 26 2020 15:21:16  $
---       Date fetched Out : $Modtime:   Mar 26 2020 15:13:32  $
---       Version     	  : $Revision:   1.1  $
+--       Date into PVCS   : $Date:   Apr 23 2020 09:28:28  $
+--       Date fetched Out : $Modtime:   Apr 23 2020 09:27:50  $
+--       Version     	  : $Revision:   1.2  $
 --
 ----------------------------------------------------------------------------------------------------
 --   Copyright (c) 2020 Bentley Systems Incorporated. All rights reserved.
@@ -838,6 +838,18 @@ SET TERM OFF
 --
 SET FEEDBACK ON
 start sdl_wip_nodes_trg.trg
+SET FEEDBACK OFF
+--
+--------------------------------------------------------------------------------
+-- Refresh Who Triggers
+--------------------------------------------------------------------------------
+--
+SET TERM ON 
+PROMPT Refresh Who Triggers
+SET TERM OFF
+--
+SET FEEDBACK ON
+start who_trg.sql
 SET FEEDBACK OFF
 
 --
