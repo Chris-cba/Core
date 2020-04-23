@@ -1,10 +1,10 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/nm3.con-arc   2.46   Mar 20 2020 10:02:42   Chris.Baugh  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/nm3.con-arc   2.47   Apr 23 2020 09:14:40   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm3.con  $
---       Date into PVCS   : $Date:   Mar 20 2020 10:02:42  $
---       Date fetched Out : $Modtime:   Mar 20 2020 10:00:22  $
---       PVCS Version     : $Revision:   2.46  $
+--       Date into PVCS   : $Date:   Apr 23 2020 09:14:40  $
+--       Date fetched Out : $Modtime:   Apr 23 2020 08:46:22  $
+--       PVCS Version     : $Revision:   2.47  $
 --
 -----------------------------------------------------------------------------
 --    Copyright (c) 2020 Bentley Systems Incorporated. All rights reserved.
@@ -2485,7 +2485,7 @@ ALTER TABLE SDL_VALIDATION_RESULTS
 
 PROMPT Creating Primary Key on 'SDL_WIP_DATUMS'
 ALTER TABLE SDL_WIP_DATUMS
- ADD (CONSTRAINT SDL_WIP_DATUMS_PK PRIMARY KEY 
+ ADD (CONSTRAINT SWD_PK PRIMARY KEY 
   (SWD_ID))
 /
 
@@ -7521,6 +7521,7 @@ ALTER TABLE NM_X_VAL_CONDITIONS ADD (CONSTRAINT
   (NXV_RULE_ID) REFERENCES NM_X_RULES
   (NXR_RULE_ID))
 /
+
 -- The following constraints have been added manually as designer will not gernerate due to datatype inconsistencies
 
 ALTER TABLE NM_LOCATIONS_ALL ADD 
@@ -7552,6 +7553,7 @@ ALTER TABLE LB_ELEMENT_HISTORY ADD (
   ENABLE VALIDATE) 
 /
 --------------------------------------------------------------------------------------------------------
+
 PROMPT Creating Foreign Key on 'SDL_ATTRIBUTE_ADJUSTMENT_AUDIT'
 ALTER TABLE SDL_ATTRIBUTE_ADJUSTMENT_AUDIT ADD (CONSTRAINT
  SAAA_SAAR_FK FOREIGN KEY 
