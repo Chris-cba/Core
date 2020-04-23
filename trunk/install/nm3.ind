@@ -1,10 +1,10 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/nm3.ind-arc   2.34   Mar 20 2020 10:02:44   Chris.Baugh  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/nm3.ind-arc   2.35   Apr 23 2020 09:13:12   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm3.ind  $
---       Date into PVCS   : $Date:   Mar 20 2020 10:02:44  $
---       Date fetched Out : $Modtime:   Mar 20 2020 10:00:40  $
---       PVCS Version     : $Revision:   2.34  $
+--       Date into PVCS   : $Date:   Apr 23 2020 09:13:12  $
+--       Date fetched Out : $Modtime:   Apr 23 2020 08:47:50  $
+--       PVCS Version     : $Revision:   2.35  $
 --
 -----------------------------------------------------------------------------
 --    Copyright (c) 2020 Bentley Systems Incorporated. All rights reserved.
@@ -1763,6 +1763,11 @@ CREATE INDEX SPA_SLD_IDX ON SDL_PROCESS_AUDIT
  (SPA_SLD_KEY)
 /
 
+PROMPT Creating Index 'SVR_BATCH_IDX'
+CREATE INDEX SVR_BATCH_IDX ON SDL_VALIDATION_RESULTS
+ (SVR_SFS_ID)
+/
+
 PROMPT Creating Index 'SVR_SAM_FK_IDX'
 CREATE INDEX SVR_SAM_FK_IDX ON SDL_VALIDATION_RESULTS
  (SVR_SAM_ID)
@@ -1812,6 +1817,11 @@ CREATE INDEX SDL_WIP_INTSCT_GEOM_IDX ON SDL_WIP_INTSCT_GEOM
  (BATCH_ID)
 /
 
+PROMPT Creating Index 'SDL_WIP_NODES_BATCH_IDX'
+CREATE INDEX SDL_WIP_NODES_BATCH_IDX ON SDL_WIP_NODES
+ (BATCH_ID)
+/
+
 PROMPT Creating Index 'SWN_NO_UK'
 CREATE UNIQUE INDEX SWN_NO_UK ON SDL_WIP_NODES
  (NODE_ID)
@@ -1835,6 +1845,11 @@ CREATE INDEX SWRN_NO_IDX ON SDL_WIP_ROUTE_NODES
 
 PROMPT Creating Index 'SWRN_SLD_IDX'
 CREATE INDEX SWRN_SLD_IDX ON SDL_WIP_ROUTE_NODES
+ (SLD_KEY)
+/
+
+PROMPT Creating Index 'SDL_WIP_SELF_INTERSECTIONS_IDX'
+CREATE INDEX SDL_WIP_SELF_INTERSECTIONS_IDX ON SDL_WIP_SELF_INTERSECTIONS
  (SLD_KEY)
 /
 
