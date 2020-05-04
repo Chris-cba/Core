@@ -1,12 +1,13 @@
+/* Formatted on 04/05/2020 09:57:39 (QP5 v5.336) */
 CREATE OR REPLACE PACKAGE BODY sdl_validate
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_validate.pkb-arc   1.13   Apr 22 2020 18:51:02   Vikas.Mhetre  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_validate.pkb-arc   1.14   May 04 2020 11:50:06   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_validate.pkb  $
-    --       Date into PVCS   : $Date:   Apr 22 2020 18:51:02  $
-    --       Date fetched Out : $Modtime:   Apr 22 2020 10:02:12  $
-    --       PVCS Version     : $Revision:   1.13  $
+    --       Date into PVCS   : $Date:   May 04 2020 11:50:06  $
+    --       Date fetched Out : $Modtime:   May 04 2020 11:46:04  $
+    --       PVCS Version     : $Revision:   1.14  $
     --
     --   Author : R.A. Coupe
     --
@@ -20,7 +21,7 @@ AS
     -- FK based checks
     -- format checks
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.13  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.14  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'SDL_VALIDATE';
 
@@ -32,6 +33,7 @@ AS
     BEGIN
         RETURN g_sccsid;
     END get_version;
+
     --
     -----------------------------------------------------------------------------
     --
@@ -41,12 +43,14 @@ AS
     BEGIN
         RETURN g_body_sccsid;
     END get_body_version;
+
     --
     -----------------------------------------------------------------------------
     --
     -- This procedure generates and executes a SQL insert string to log all load records in a batch which have domain-based columns with illegal values.
     --
     PROCEDURE validate_domain_columns (p_batch_id IN NUMBER);
+
     --
     --
     -----------------------------------------------------------------------------
@@ -54,45 +58,51 @@ AS
     -- This procedure generates and executes a SQL insert string to log all load records in a batch which have mandatory columns without a value
     --
     PROCEDURE validate_mandatory_columns (p_batch_id IN NUMBER);
+
     --
     -----------------------------------------------------------------------------
     --
     PROCEDURE validate_datum_domain_columns (p_batch_id       IN NUMBER,
                                              p_profile_id     IN NUMBER,
                                              p_profile_view   IN VARCHAR2);
+
     --
     -----------------------------------------------------------------------------
     --
     PROCEDURE validate_dtm_mand_columns (p_batch_id       IN NUMBER,
                                          p_profile_id     IN NUMBER,
                                          p_profile_view   IN VARCHAR2);
+
     --
     -----------------------------------------------------------------------------
     --
     PROCEDURE validate_dtm_column_len (p_batch_id       IN NUMBER,
                                        p_profile_id     IN NUMBER,
                                        p_profile_view   IN VARCHAR2);
+
     --
     -----------------------------------------------------------------------------
-    --                                       
+    --
     PROCEDURE update_batch_for_adjustment (p_batch_id IN INTEGER)
     IS
         CURSOR c_update IS
-        SELECT 'SLD_COL_' || sam.sam_col_id     load_column_name,
-               sam.sam_id,
-               saar.saar_adjust_to_value
-          FROM sdl_attribute_mapping           sam,
-               sdl_attribute_adjustment_rules  saar,
-               sdl_file_submissions sfs
-         WHERE sam.sam_view_column_name = saar.saar_target_attribute_name
-           AND sam.sam_sp_id = saar.saar_sp_id
-           AND sam.sam_sp_id = sfs.sfs_sp_id
-           AND EXISTS ( SELECT 1 
-                          FROM sdl_attribute_adjustment_audit saaa 
-                         WHERE saaa.saaa_sam_id = sam.sam_id 
-                           AND saaa.saaa_sfs_id = sfs.sfs_id)
-           AND sfs.sfs_id = p_batch_id
-         ORDER BY saar.saar_id;
+              SELECT 'SLD_COL_' || sam.sam_col_id     load_column_name,
+                     sam.sam_id,
+                     saar.saar_adjust_to_value
+                FROM sdl_attribute_mapping         sam,
+                     sdl_attribute_adjustment_rules saar,
+                     sdl_file_submissions          sfs
+               WHERE     sam.sam_view_column_name =
+                         saar.saar_target_attribute_name
+                     AND sam.sam_sp_id = saar.saar_sp_id
+                     AND sam.sam_sp_id = sfs.sfs_sp_id
+                     AND EXISTS
+                             (SELECT 1
+                                FROM sdl_attribute_adjustment_audit saaa
+                               WHERE     saaa.saaa_sam_id = sam.sam_id
+                                     AND saaa.saaa_sfs_id = sfs.sfs_id)
+                     AND sfs.sfs_id = p_batch_id
+            ORDER BY saar.saar_id;
 
         sql_str   VARCHAR2 (4000);
     BEGIN
@@ -120,6 +130,7 @@ AS
             EXECUTE IMMEDIATE sql_str;
         END LOOP;
     END update_batch_for_adjustment;
+
     --
     -----------------------------------------------------------------------------
     --
@@ -181,6 +192,7 @@ AS
                                    AND svr_sld_key = sld_key))
          WHERE sld_sfs_id = p_batch_id;
     END validate_batch;
+
     --
     -----------------------------------------------------------------------------
     --
@@ -261,6 +273,7 @@ AS
             EXECUTE IMMEDIATE sql_str;
         END IF;
     END validate_domain_columns;
+
     --
     -----------------------------------------------------------------------------
     --
@@ -333,6 +346,7 @@ AS
             EXECUTE IMMEDIATE sql_str;
         END IF;
     END validate_mandatory_columns;
+
     --
     -----------------------------------------------------------------------------
     --
@@ -354,20 +368,21 @@ AS
                         saar_id,
                         saar_source_value,
                         saar_adjust_to_value
-                   FROM (SELECT sam.sam_id,
-                                sam.sam_col_id,
-                                sam.sam_view_column_name,
-                                saar.saar_id,
-                                saar.saar_source_value,
-                                saar.saar_adjust_to_value
-                           FROM sdl_attribute_mapping           sam,
-                                sdl_file_submissions            sfs,
-                                sdl_attribute_adjustment_rules  saar
-                          WHERE     sfs.sfs_id = p_batch_id
-                                AND sam.sam_sp_id = sfs.sfs_sp_id
-                                AND sam.sam_sp_id = saar.saar_sp_id
-                                AND sam.sam_view_column_name = saar.saar_target_attribute_name
-                                ORDER BY saar.saar_id))
+                   FROM (  SELECT sam.sam_id,
+                                  sam.sam_col_id,
+                                  sam.sam_view_column_name,
+                                  saar.saar_id,
+                                  saar.saar_source_value,
+                                  saar.saar_adjust_to_value
+                             FROM sdl_attribute_mapping         sam,
+                                  sdl_file_submissions          sfs,
+                                  sdl_attribute_adjustment_rules saar
+                            WHERE     sfs.sfs_id = p_batch_id
+                                  AND sam.sam_sp_id = sfs.sfs_sp_id
+                                  AND sam.sam_sp_id = saar.saar_sp_id
+                                  AND sam.sam_view_column_name =
+                                      saar.saar_target_attribute_name
+                         ORDER BY saar.saar_id))
         SELECT MAX (sam_id),
                   'INSERT INTO sdl_attribute_adjustment_audit ( saaa_sld_key, saaa_sfs_id, saaa_saar_id, saaa_sam_id, saaa_original_value, saaa_adjusted_value) '
                || LISTAGG (
@@ -413,13 +428,32 @@ AS
             update_batch_for_adjustment (p_batch_id);
         END IF;
     END validate_adjustment_rules;
+
     --
     -----------------------------------------------------------------------------
     --
     PROCEDURE validate_profile (p_profile_id IN NUMBER)
     IS
-        l_dummy   NUMBER := 0;
+        l_dummy      NUMBER := 0;
+        l_nt_type    nm_types.nt_type%TYPE;
+        l_meta_row   V_SDL_PROFILE_NW_TYPES%ROWTYPE;
     BEGIN
+        BEGIN
+            SELECT m.*
+              INTO l_meta_row
+              FROM V_SDL_PROFILE_NW_TYPES m, sdl_profiles p
+             WHERE p.sp_id = p_profile_id AND p.sp_id = m.sp_id;
+        EXCEPTION
+            WHEN NO_DATA_FOUND
+            THEN
+                raise_application_error (-20003,
+                                         'No profile metadata exists');
+        END;
+
+        --first check the mandatory columns on the loaded data
+
+        l_nt_type := l_meta_row.profile_nt_type;
+
         BEGIN
             SELECT 1
               INTO l_dummy
@@ -432,15 +466,22 @@ AS
                               FROM sdl_attribute_mapping
                              WHERE     sam_sp_id = p_profile_id
                                    AND column_name = sam_ne_column_name)
-                   AND column_name NOT IN ('NE_ID', -- assigned in upload to main DB
-                                           'NE_NT_TYPE', --defined by the template itself
-                                           --'NE_ADMIN_UNIT', --we need to do something with this
-                                           'NE_TYPE', -- we are only going to load datums (i.e. NE_TYPE = 'S', hard-coded inside the API
-                                           'NE_DATE_CREATED',
-                                           'NE_DATE_MODIFIED',
-                                           'NE_MODIFIED_BY',
-                                           'NE_CREATED_BY' -- handled by the trigger
-                                                          );
+                   AND (   column_name NOT IN ('NE_ID', -- assigned in upload to main DB
+                                               'NE_NT_TYPE', --defined by the template itself
+                                               'NE_ADMIN_UNIT', --we need to do something with this
+                                               'NE_TYPE', -- we are only going to load datums (i.e. NE_TYPE = 'S', hard-coded inside the API
+                                               'NE_DATE_CREATED',
+                                               'NE_DATE_MODIFIED',
+                                               'NE_MODIFIED_BY',
+                                               'NE_CREATED_BY' -- handled by the trigger
+                                                              )
+                        OR     column_name = 'NE_UNIQUE'
+                           AND EXISTS
+                                   (SELECT 1
+                                      FROM nm_types
+                                     WHERE     nt_type = l_nt_type
+                                           AND nt_pop_unique = 'N'))
+                   AND ROWNUM = 1;
         EXCEPTION
             WHEN NO_DATA_FOUND
             THEN
@@ -456,26 +497,26 @@ AS
         ELSE
             l_dummy := 0;
 
+            -- now check to ensure that all the columns that make up the unique key when the
+
             BEGIN
                 SELECT 1
                   INTO l_dummy
-                  FROM dba_tab_columns,
-                       nm_type_columns,
-                       sdl_profiles,
-                       nm_linear_types
+                  FROM dba_tab_columns, nm_type_columns
                  WHERE     owner =
                            SYS_CONTEXT ('NM3CORE', 'APPLICATION_OWNER')
                        AND table_name = 'NM_ELEMENTS_ALL'
-                       AND sp_id = 1
-                       AND ntc_nt_type = nlt_nt_type
-                       AND nlt_id = sp_nlt_id
+                       AND ntc_nt_type = l_nt_type
                        AND ntc_column_name = column_name
                        AND ntc_unique_seq IS NOT NULL
-                       AND NOT EXISTS
-                               (SELECT 1
-                                  FROM sdl_attribute_mapping
-                                 WHERE     sam_sp_id = 1
-                                       AND column_name = sam_ne_column_name)
+                       AND (    NOT EXISTS
+                                    (SELECT 1
+                                       FROM sdl_attribute_mapping
+                                      WHERE     sam_sp_id = p_profile_id
+                                            AND column_name =
+                                                sam_ne_column_name)
+                            AND (    ntc_default IS NOT NULL
+                                 AND ntc_seq_name IS NOT NULL))
                        AND ROWNUM = 1;
             EXCEPTION
                 WHEN NO_DATA_FOUND
@@ -488,10 +529,106 @@ AS
         IF l_dummy != 0
         THEN
             raise_application_error (
-                -20001,
+                -20002,
                 'Columns that are used to construct the unique key are not present in the profile attribute list');
         END IF;
+
+        -- now check if the load data is a route and validate the columns on the datum if needed.
+
+        IF l_meta_row.nlt_g_i_d = 'G'
+        THEN
+            l_nt_type := l_meta_row.datum_nt_type;
+
+            BEGIN
+                SELECT 1
+                  INTO l_dummy
+                  FROM dba_tab_columns
+                 WHERE     owner =
+                           SYS_CONTEXT ('NM3CORE', 'APPLICATION_OWNER')
+                       AND table_name = 'NM_ELEMENTS_ALL'
+                       AND nullable = 'N'
+                       AND NOT EXISTS
+                               (SELECT 1
+                                  FROM sdl_datum_attribute_mapping,
+                                       nm_type_columns
+                                 WHERE     sdam_profile_id = p_profile_id
+                                       AND sdam_nw_type = ntc_nt_type
+                                       AND ntc_nt_type = 'SEGM'
+                                       AND column_name = sdam_column_name)
+                       AND column_name NOT IN ('NE_ID', -- assigned in upload to main DB
+                                               'NE_NT_TYPE', --defined by the template itself
+                                               --                                           'NE_ADMIN_UNIT', --we need to do something with this
+                                               'NE_TYPE', -- we are only going to load datums (i.e. NE_TYPE = 'S', hard-coded inside the API
+                                               'NE_DATE_CREATED',
+                                               'NE_DATE_MODIFIED',
+                                               'NE_MODIFIED_BY',
+                                               'NE_CREATED_BY' -- handled by the trigger
+                                                              )
+                       AND CASE column_name
+                               WHEN 'NE_UNIQUE' THEN 'FALSE'
+                               ELSE '1'
+                           END =
+                           CASE column_name
+                               WHEN 'NE_UNIQUE'
+                               THEN
+                                   user_defined_ne_unique ('SEGM')
+                               ELSE
+                                   '1'
+                           END;
+            EXCEPTION
+                WHEN NO_DATA_FOUND
+                THEN
+                    NULL;
+            END;
+
+
+            IF l_dummy != 0
+            THEN
+                raise_application_error (
+                    -20003,
+                    'Mandatory columns are not catered for in the datum attributes of the load file profile');
+            ELSE
+                l_dummy := 0;
+
+                -- now check to ensure that all the columns that make up the unique key when the
+
+                BEGIN
+                    SELECT 1
+                      INTO l_dummy
+                      FROM dba_tab_columns, nm_type_columns
+                     WHERE     owner =
+                               SYS_CONTEXT ('NM3CORE', 'APPLICATION_OWNER')
+                           AND table_name = 'NM_ELEMENTS_ALL'
+                           AND ntc_nt_type = l_nt_type
+                           AND ntc_column_name = column_name
+                           AND ntc_unique_seq IS NOT NULL
+                           AND (    NOT EXISTS
+                                        (SELECT 1
+                                           FROM sdl_datum_attribute_mapping
+                                          WHERE     sdam_profile_id =
+                                                    p_profile_id
+                                                AND column_name =
+                                                    sdam_column_name)
+                                AND (    ntc_default IS NOT NULL
+                                     AND ntc_seq_name IS NOT NULL))
+                           AND ROWNUM = 1;
+                EXCEPTION
+                    WHEN NO_DATA_FOUND
+                    THEN
+                        NULL;
+                END;
+            END IF;
+
+            --
+            IF l_dummy != 0
+            THEN
+                raise_application_error (
+                    -20004,
+                    'Columns that are used to construct the unique key of the datums are not present in the profile datum attribute list');
+            END IF;
+        END IF;
     END validate_profile;
+
     --
     -----------------------------------------------------------------------------
     --
@@ -556,6 +693,24 @@ AS
                                           p_round,
                                           l_sdo_tol),
                            l_diminfo) != 'TRUE';
+                           
+                           
+        INSERT INTO sdl_validation_results (svr_sfs_id,
+                                            svr_validation_type,
+                                            svr_sld_key,
+                                            svr_column_name,
+                                            svr_status_code,
+                                            svr_message)
+            SELECT p_batch_id,
+                   'S',
+                   sld_key,
+                   'SLD_LOAD_GEOMETRY',
+                   -97,
+                   'Measures must be increasing'
+              FROM sdl_load_data
+             WHERE     sld_sfs_id = p_batch_id
+                   AND SDO_LRS.IS_MEASURE_INCREASING(sld_working_geometry) != 'TRUE';
+                           
 
         --
         UPDATE sdl_load_data a
@@ -581,6 +736,7 @@ AS
          WHERE sfs_id = p_batch_id;
     --
     END set_working_geometry;
+
     --
     -----------------------------------------------------------------------------
     --
@@ -622,6 +778,7 @@ AS
 
         RETURN retval;
     END guess_dim_and_gtype;
+
     --
     -----------------------------------------------------------------------------
     --
@@ -672,6 +829,7 @@ AS
         --
         RETURN retval;
     END sdl_set_gtype;
+
     --
     -----------------------------------------------------------------------------
     --
@@ -745,6 +903,7 @@ AS
     --        check_self_intersections (p_batch_id);
 
     END validate_datum_geometry;
+
     --
     -----------------------------------------------------------------------------
     --
@@ -790,6 +949,7 @@ AS
                        AND p1.id < p2.id - 1;
         END LOOP;
     END check_self_intersections;
+
     --
     -----------------------------------------------------------------------------
     --
@@ -813,7 +973,8 @@ AS
                          WHERE svr_swd_id = swd_id)
                AND batch_id = p_batch_id
                AND status IN ('NEW', 'VALID', 'INVALID');
-    END set_datum_status; 
+    END set_datum_status;
+
     --
     -----------------------------------------------------------------------------
     --
@@ -848,6 +1009,7 @@ AS
 
         set_datum_status (p_batch_id);
     END validate_datums_in_batch;
+
     --
     -----------------------------------------------------------------------------
     --
@@ -914,6 +1076,7 @@ AS
             EXECUTE IMMEDIATE sql_str;
         END IF;
     END validate_datum_domain_columns;
+
     --
     -----------------------------------------------------------------------------
     --
@@ -972,6 +1135,7 @@ AS
             EXECUTE IMMEDIATE sql_str;
         END IF;
     END validate_dtm_mand_columns;
+
     --
     -----------------------------------------------------------------------------
     --
@@ -1035,56 +1199,89 @@ AS
             EXECUTE IMMEDIATE sql_str;
         END IF;
     END validate_dtm_column_len;
+
     --
     -----------------------------------------------------------------------------
     --
     PROCEDURE reset_load_status (p_batch_id IN NUMBER)
     IS
     BEGIN
-       -- reset status of load table to VALID in case when re-executing spatial analysis.
-       -- it won't update status of any load records when it's a fresh run
+        -- reset status of load table to VALID in case when re-executing spatial analysis.
+        -- it won't update status of any load records when it's a fresh run
         UPDATE sdl_load_data
-        SET sld_status = 'VALID'
-        WHERE sld_sfs_id = p_batch_id
-        AND sld_status IN ('LOAD','SKIP','REVIEW');
-
+           SET sld_status = 'VALID'
+         WHERE     sld_sfs_id = p_batch_id
+               AND sld_status IN ('LOAD', 'SKIP', 'REVIEW');
     END reset_load_status;
+
     --
     -----------------------------------------------------------------------------
-    --    
+    --
     PROCEDURE update_load_datum_status (p_batch_id IN NUMBER)
     IS
     BEGIN
+        -- update status of load table VALID records based on profile review levels
+        UPDATE sdl_load_data sld
+           SET sld_status =
+                   NVL (
+                       (SELECT ssrl.ssrl_default_action
+                          FROM sdl_spatial_review_levels  ssrl,
+                               sdl_file_submissions       sfs,
+                               sdl_geom_accuracy          sga
+                         WHERE     ssrl.ssrl_sp_id = sfs.sfs_sp_id
+                               AND sfs.sfs_id = sld.sld_sfs_id
+                               AND sga.slga_sld_key = sld.sld_key
+                               AND NVL (sga.slga_pct_inside, -1) BETWEEN ssrl.ssrl_percent_from
+                                                                     AND ssrl.ssrl_percent_to),
+                       'REVIEW')
+         WHERE sld.sld_sfs_id = p_batch_id AND sld.sld_status = 'VALID';
 
-      -- update status of load table VALID records based on profile review levels
-      UPDATE sdl_load_data sld
-         SET sld_status = NVL((SELECT ssrl.ssrl_default_action
-                             FROM sdl_spatial_review_levels ssrl, 
-                                  sdl_file_submissions sfs,
-                                  sdl_geom_accuracy sga
-                            WHERE ssrl.ssrl_sp_id = sfs.sfs_sp_id
-                              AND sfs.sfs_id = sld.sld_sfs_id
-                              AND sga.slga_sld_key = sld.sld_key
-                              AND NVL(sga.slga_pct_inside,-1) BETWEEN ssrl.ssrl_percent_from
-                                                                  AND ssrl.ssrl_percent_to), 'REVIEW')
-      WHERE sld.sld_sfs_id = p_batch_id
-        AND sld.sld_status = 'VALID';
-
-      -- update status of datum table VALID records based on profile review levels
-      UPDATE sdl_wip_datums swd
-         SET swd.status = NVL((SELECT ssrl.ssrl_default_action
-                             FROM sdl_spatial_review_levels ssrl, 
-                                  sdl_file_submissions sfs
-                            WHERE ssrl.ssrl_sp_id = sfs.sfs_sp_id
-                              AND sfs.sfs_id = swd.batch_id
-                              AND swd.pct_match BETWEEN ssrl.ssrl_percent_from
-                                                    AND ssrl.ssrl_percent_to), 'REVIEW')
-       WHERE swd.batch_id = p_batch_id
-         AND swd.status = 'VALID';
-
+        -- update status of datum table VALID records based on profile review levels
+        UPDATE sdl_wip_datums swd
+           SET swd.status =
+                   NVL (
+                       (SELECT ssrl.ssrl_default_action
+                          FROM sdl_spatial_review_levels  ssrl,
+                               sdl_file_submissions       sfs
+                         WHERE     ssrl.ssrl_sp_id = sfs.sfs_sp_id
+                               AND sfs.sfs_id = swd.batch_id
+                               AND swd.pct_match BETWEEN ssrl.ssrl_percent_from
+                                                     AND ssrl.ssrl_percent_to),
+                       'REVIEW')
+         WHERE swd.batch_id = p_batch_id AND swd.status = 'VALID';
     END update_load_datum_status;
-    --
-    -----------------------------------------------------------------------------
-    --        
+--
+-----------------------------------------------------------------------------
+--
+    FUNCTION user_defined_ne_unique (p_nt_type IN VARCHAR2)
+        RETURN VARCHAR2
+    IS
+        retval   VARCHAR2 (10) := 'FALSE';
+    BEGIN
+        BEGIN
+            SELECT 'TRUE'
+              INTO retval
+              FROM nm_types
+             WHERE nt_type = p_nt_type AND nt_pop_unique = 'Y';
+        EXCEPTION
+            WHEN NO_DATA_FOUND
+            THEN
+                BEGIN
+                    SELECT 'TRUE'
+                      INTO retval
+                      FROM nm_type_columns
+                     WHERE     ntc_nt_type = p_nt_type
+                           AND (   ntc_seq_name IS NOT NULL
+                                OR ntc_default IS NOT NULL);
+                EXCEPTION
+                    WHEN NO_DATA_FOUND
+                    THEN
+                        retval := 'FALSE';
+                END;
+        END;
+
+        RETURN retval;
+    END;
+    
 END sdl_validate;
 /
