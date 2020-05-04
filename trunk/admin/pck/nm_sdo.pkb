@@ -1,12 +1,13 @@
+/* Formatted on 04/05/2020 10:35:09 (QP5 v5.336) */
 CREATE OR REPLACE PACKAGE BODY nm_sdo
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm_sdo.pkb-arc   1.26   Jan 14 2020 17:07:42   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm_sdo.pkb-arc   1.27   May 04 2020 10:46:36   Rob.Coupe  $
     --       Module Name      : $Workfile:   nm_sdo.pkb  $
-    --       Date into PVCS   : $Date:   Jan 14 2020 17:07:42  $
-    --       Date fetched Out : $Modtime:   Jan 14 2020 17:07:00  $
-    --       PVCS Version     : $Revision:   1.26  $
+    --       Date into PVCS   : $Date:   May 04 2020 10:46:36  $
+    --       Date fetched Out : $Modtime:   May 04 2020 10:35:28  $
+    --       PVCS Version     : $Revision:   1.27  $
     --
     --   Author : R.A. Coupe
     --
@@ -18,7 +19,7 @@ AS
     -- The main purpose of this package is to replicate the functions inside the SDO_LRS package as
     -- supplied under the MDSYS schema and licensed under the Oracle Spatial license on EE.
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.26  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.27  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'NM_SDO';
 
@@ -1450,6 +1451,27 @@ AS
         RETURN retval;
     END;
 
+    FUNCTION IS_MEASURE_INCREASING (p_geom IN SDO_GEOMETRY)
+        RETURN VARCHAR2
+    IS
+        retval    VARCHAR2 (10) := 'FALSE';
+        l_dummy   NUMBER;
+    BEGIN
+        BEGIN
+            SELECT 1
+              INTO l_dummy
+              FROM (SELECT id, m, LEAD (m, 1) OVER (ORDER BY id) next_m
+                      FROM (SELECT t.id, t.z m
+                              FROM TABLE (SDO_UTIL.getvertices (p_geom)) t))
+             WHERE m > next_m AND ROWNUM = 1;
+        EXCEPTION
+            WHEN NO_DATA_FOUND
+            THEN
+                retval := 'TRUE';
+        END;
+
+        RETURN retval;
+    END;
 
     FUNCTION find_measure (p_lrs_geom   IN SDO_GEOMETRY,
                            p_pt_geom    IN SDO_GEOMETRY)
