@@ -1,13 +1,12 @@
-/* Formatted on 04/05/2020 10:35:09 (QP5 v5.336) */
 CREATE OR REPLACE PACKAGE BODY nm_sdo
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm_sdo.pkb-arc   1.27   May 04 2020 10:46:36   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm_sdo.pkb-arc   1.28   May 04 2020 11:31:38   Rob.Coupe  $
     --       Module Name      : $Workfile:   nm_sdo.pkb  $
-    --       Date into PVCS   : $Date:   May 04 2020 10:46:36  $
-    --       Date fetched Out : $Modtime:   May 04 2020 10:35:28  $
-    --       PVCS Version     : $Revision:   1.27  $
+    --       Date into PVCS   : $Date:   May 04 2020 11:31:38  $
+    --       Date fetched Out : $Modtime:   May 04 2020 11:26:06  $
+    --       PVCS Version     : $Revision:   1.28  $
     --
     --   Author : R.A. Coupe
     --
@@ -19,7 +18,7 @@ AS
     -- The main purpose of this package is to replicate the functions inside the SDO_LRS package as
     -- supplied under the MDSYS schema and licensed under the Oracle Spatial license on EE.
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.27  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.28  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'NM_SDO';
 
@@ -1451,7 +1450,7 @@ AS
         RETURN retval;
     END;
 
-    FUNCTION IS_MEASURE_INCREASING (p_geom IN SDO_GEOMETRY)
+    FUNCTION IS_MEASURE_INCREASING (geom_segment IN SDO_GEOMETRY, tolerance in NUMBER )
         RETURN VARCHAR2
     IS
         retval    VARCHAR2 (10) := 'FALSE';
@@ -1462,8 +1461,8 @@ AS
               INTO l_dummy
               FROM (SELECT id, m, LEAD (m, 1) OVER (ORDER BY id) next_m
                       FROM (SELECT t.id, t.z m
-                              FROM TABLE (SDO_UTIL.getvertices (p_geom)) t))
-             WHERE m > next_m AND ROWNUM = 1;
+                              FROM TABLE (SDO_UTIL.getvertices (geom_segment)) t))
+             WHERE m > next_m - tolerance AND ROWNUM = 1;
         EXCEPTION
             WHEN NO_DATA_FOUND
             THEN
