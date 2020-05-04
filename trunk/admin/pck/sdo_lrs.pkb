@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY SDO_LRS
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdo_lrs.pkb-arc   1.7   May 07 2019 17:14:38   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdo_lrs.pkb-arc   1.8   May 04 2020 11:43:12   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdo_lrs.pkb  $
-    --       Date into PVCS   : $Date:   May 07 2019 17:14:38  $
-    --       Date fetched Out : $Modtime:   May 07 2019 17:13:28  $
-    --       PVCS Version     : $Revision:   1.7  $
+    --       Date into PVCS   : $Date:   May 04 2020 11:43:12  $
+    --       Date fetched Out : $Modtime:   May 04 2020 11:42:54  $
+    --       PVCS Version     : $Revision:   1.8  $
     --
     --   Author : R.A. Coupe
     --
@@ -18,7 +18,7 @@ AS
     -- The main purpose of this package is to replicate the functions inside the SDO_LRS package as
     -- supplied under the MDSYS schema and licensed under the Oracle Spatial license on EE.
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.7  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.8  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'SDO_LRS';
 
@@ -739,6 +739,38 @@ AS
     IS
     BEGIN
         RETURN NM_SDO.GET_MEASURE (point);
+    END;
+
+    FUNCTION IS_MEASURE_INCREASING (
+        geom_segment   IN SDO_GEOMETRY,
+        dim_array      IN SDO_DIM_ARRAY DEFAULT NULL)
+        RETURN VARCHAR2
+    IS
+        tolerance             NUMBER;
+        l_dim                 NUMBER;
+        invalid_lrs_segment   EXCEPTION;
+        PRAGMA EXCEPTION_INIT (invalid_lrs_segment, -13331);
+    BEGIN
+        IF dim_array IS NULL
+        THEN
+            IF geom_segment.sdo_gtype IN (3302, 3306)
+            THEN
+                tolerance := 0;
+            ELSE
+                RAISE invalid_lrs_segment;
+            END IF;
+        ELSE
+            SELECT COUNT (*) INTO l_dim FROM TABLE (dim_array);
+
+            IF l_dim < 3
+            THEN
+                RAISE invalid_lrs_segment;
+            END IF;
+
+            tolerance := dim_array (3).sdo_tolerance;
+        END IF;
+
+        RETURN nm_sdo.is_measure_increasing (geom_segment, tolerance);
     END;
 END;
 /
