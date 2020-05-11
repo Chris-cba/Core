@@ -6,11 +6,11 @@ CREATE OR REPLACE TRIGGER nm_inv_items_all_b_dt_trg
 DECLARE
 --   SCCS Identifiers :-
 --
---       sccsid           : @(#)nm_inv_items_all_b_dt_trg.trg	1.3 01/07/03
---       Module Name      : nm_inv_items_all_b_dt_trg.trg
---       Date into SCCS   : 03/01/07 16:38:21
---       Date fetched Out : 07/06/13 17:02:53
---       SCCS Version     : 1.3
+--       pvcsid                     : $Header:   //new_vm_latest/archives/nm3/admin/trg/nm_inv_items_all_b_dt_trg.trg-arc   2.6   May 11 2020 10:32:24   Chris.Baugh  $
+--       Module Name                : $Workfile:   nm_inv_items_all_b_dt_trg.trg  $
+--       Date into PVCS             : $Date:   May 11 2020 10:32:24  $
+--       Date fetched Out           : $Modtime:   May 11 2020 10:21:48  $
+--       PVCS Version               : $Revision:   2.6  $
 --
 -- TRIGGER nm_inv_items_all_b_dt_trg
 -- BEFORE INSERT
@@ -19,8 +19,9 @@ DECLARE
 -- FOR EACH ROW
 --
 -----------------------------------------------------------------------------
---   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
+--   Copyright (c) 2020 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
+--
 --
    l_start_date     DATE := :NEW.IIT_START_DATE;
    l_end_date       DATE := :NEW.IIT_END_DATE;
