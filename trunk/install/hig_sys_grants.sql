@@ -1,14 +1,14 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/hig_sys_grants.sql-arc   2.7   Oct 31 2018 10:39:18   Chris.Baugh  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/install/hig_sys_grants.sql-arc   2.8   May 12 2020 09:36:50   Chris.Baugh  $
 --       Module Name      : $Workfile:   hig_sys_grants.sql  $
---       Date into PVCS   : $Date:   Oct 31 2018 10:39:18  $
---       Date fetched Out : $Modtime:   Jul 03 2018 10:21:12  $
---       Version          : $Revision:   2.7  $
+--       Date into PVCS   : $Date:   May 12 2020 09:36:50  $
+--       Date fetched Out : $Modtime:   May 12 2020 09:36:28  $
+--       Version          : $Revision:   2.8  $
 --
 -----------------------------------------------------------------------------
---    Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
+--    Copyright (c) 2020 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
 -- hig_sys_grants.sql
@@ -26,7 +26,7 @@ define sccsid = '"@(#)hig_sys_grants.sql	1.4 11/28/03"';
 --
 prompt
 prompt Highways SYS grants script
-prompt Exor Corporation 2018
+prompt Exor Corporation 2020
 prompt
 --
 BEGIN
