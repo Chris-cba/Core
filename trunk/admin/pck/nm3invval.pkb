@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY nm3invval IS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3invval.pkb-arc   2.24   Jan 14 2020 14:12:12   Chris.Baugh  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/pck/nm3invval.pkb-arc   2.25   May 12 2020 11:19:34   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3invval.pkb  $
---       Date into PVCS   : $Date:   Jan 14 2020 14:12:12  $
---       Date fetched Out : $Modtime:   Jan 10 2020 09:07:32  $
---       Version          : $Revision:   2.24  $
+--       Date into PVCS   : $Date:   May 12 2020 11:19:34  $
+--       Date fetched Out : $Modtime:   May 12 2020 11:17:08  $
+--       Version          : $Revision:   2.25  $
 --       Based on SCCS version : 1.30
 -------------------------------------------------------------------------
 --
@@ -19,7 +19,7 @@ CREATE OR REPLACE PACKAGE BODY nm3invval IS
 --   Copyright (c) 2013 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.24  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.25  $"';
 --  g_body_sccsid is the SCCS ID for the package body
    g_package_name    CONSTANT  varchar2(30)   := 'nm3invval';
 --
@@ -693,8 +693,10 @@ PROCEDURE pc_duplicate_members (pi_parent_ne_id     IN nm_members.nm_ne_id_in%TY
 --
    CURSOR cs_mem (pi_parent_ne_id_in nm_members.nm_ne_id_in%TYPE) IS
    SELECT *
-    FROM  nm_members
+    FROM  nm_members_all
    WHERE  nm_ne_id_in = pi_parent_ne_id_in
+   and nvl(nm_end_date, to_date('31/12/3000', 'DD/MM/YYYY')) > pi_child_start_date
+   and nm_start_date < nvl(pi_child_end_date, to_date('31/12/3000', 'DD/MM/YYYY')) 
    ORDER BY nm_seq_no;
 --
    l_rec_nm nm_members%ROWTYPE;
@@ -709,8 +711,8 @@ BEGIN
       l_rec_nm := cs_rec;
 --
       l_rec_nm.nm_ne_id_in   := pi_child_ne_id;
-      l_rec_nm.nm_start_date := NVL(pi_child_start_date,l_rec_nm.nm_start_date); -- Inherit start date from parent if not passed
-      l_rec_nm.nm_end_date   := NVL(pi_child_end_date,l_rec_nm.nm_end_date);     -- Inherit end date from parent if not passed
+      l_rec_nm.nm_start_date := greatest(NVL(pi_child_start_date,l_rec_nm.nm_start_date), l_rec_nm.nm_start_date); -- Inherit start date from parent if not passed
+      l_rec_nm.nm_end_date   := least(NVL(pi_child_end_date,l_rec_nm.nm_end_date), l_rec_nm.nm_end_date);     -- Inherit end date from parent if not passed
       l_rec_nm.nm_admin_unit := NVL(pi_child_admin_unit,l_rec_nm.nm_admin_unit); -- Inherit AU from parent if not passed
       l_rec_nm.nm_obj_type   := pi_child_inv_type;
 --
