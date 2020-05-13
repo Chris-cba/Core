@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY sdl_validate
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_validate.pkb-arc   1.15   May 13 2020 14:23:38   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_validate.pkb-arc   1.16   May 13 2020 15:23:00   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_validate.pkb  $
-    --       Date into PVCS   : $Date:   May 13 2020 14:23:38  $
-    --       Date fetched Out : $Modtime:   May 13 2020 14:21:16  $
-    --       PVCS Version     : $Revision:   1.15  $
+    --       Date into PVCS   : $Date:   May 13 2020 15:23:00  $
+    --       Date fetched Out : $Modtime:   May 13 2020 15:22:14  $
+    --       PVCS Version     : $Revision:   1.16  $
     --
     --   Author : R.A. Coupe
     --
@@ -20,7 +20,7 @@ AS
     -- FK based checks
     -- format checks
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.15  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.16  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'SDL_VALIDATE';
 
@@ -644,28 +644,35 @@ AS
         l_length_column   VARCHAR2 (30);
         l_lengths         ptr_num_array_type;
 
-        FUNCTION get_length_column(p_batch_id in number)
+        FUNCTION get_length_column (p_batch_id IN NUMBER)
             RETURN VARCHAR2
         IS
             retval   VARCHAR2 (30);
         BEGIN
-            nm_debug.debug('get length column');
+            nm_debug.debug ('get length column');
+
             BEGIN
-                SELECT 'SLD_COL_' || sam_col_id
+                SELECT column_name
                   INTO retval
-                  FROM sdl_attribute_mapping, sdl_file_submissions
+                  FROM sdl_attribute_mapping,
+                       sdl_file_submissions,
+                       dba_tab_columns
                  WHERE     sam_sp_id = sfs_sp_id
                        AND sfs_id = p_batch_id
+                       AND owner =
+                           SYS_CONTEXT ('NM3CORE', 'APPLICATION_OWNER')
+                       AND table_name = 'SDL_LOAD_DATA'
+                       AND column_name = 'SLD_COL_' || sam_col_id
                        AND sam_ne_column_name = 'NE_LENGTH';
             EXCEPTION
                 WHEN NO_DATA_FOUND
                 THEN
                     retval := NULL;
             END;
-            nm_debug.debug('get length column = '||nvl(retval,'NULL'));
-            
-            return '5'; --retval;
 
+            nm_debug.debug ('get length column = ' || NVL (retval, 'NULL'));
+
+            RETURN retval;
         END;
     -----------------------------
 
@@ -691,37 +698,44 @@ AS
         --
         l_gtype := guess_dim_and_gtype (p_batch_id);
 
-        l_length_column := get_length_column(p_batch_id);
-        
---      l_length_column := '5';  -- Test the measure using a constant, a quick test to ensure successful SQL execution
+        l_length_column := get_length_column (p_batch_id);
 
-        nm_debug.debug('Update working geometry');
-      
-        declare
-        l_sql varchar2(4000);
-        begin
-        l_sql := --execute immediate
-         'UPDATE sdl_load_data a '
-      ||'   SET a.sld_working_geometry = '
-      ||'           sdl_validate.configure_sdl_geometry ( '
-      ||'               sld_load_geometry, '
-      ||'               :l_gtype, '
-      ||'               case when :l_length_column is not null then to_number(:l_length_column) '    --sdl_validate.get_length (sld_key, :l_length_column) '
-      ||'               else NULL end, '
-      ||'               :p_unit_factor, '
-      ||'               :p_round, '
-      ||'               :l_sdo_tol, '
-      ||'               :l_srid) '
-      ||' WHERE sld_sfs_id = :p_batch_id ';
-      
-      nm_debug.debug(l_sql);
-      
-      execute immediate l_sql using l_gtype, l_length_column, l_length_column, p_unit_factor, p_round, l_sdo_tol, l_srid, p_batch_id;
-      
-      end;
-      
-        nm_debug.debug('Update working geometry complete');
-      
+        --      l_length_column := '5';  -- Test the measure using a constant, a quick test to ensure successful SQL execution
+
+        nm_debug.debug ('Update working geometry');
+
+        DECLARE
+            l_sql   VARCHAR2 (4000);
+        BEGIN
+            l_sql :=                                       --execute immediate
+                   'UPDATE sdl_load_data a '
+                || '   SET a.sld_working_geometry = '
+                || '           sdl_validate.configure_sdl_geometry ( '
+                || '               sld_load_geometry, '
+                || '               :l_gtype, '
+                || '               case when :l_length_column is not null then to_number(:l_length_column) ' --sdl_validate.get_length (sld_key, :l_length_column) '
+                || '               else NULL end, '
+                || '               :p_unit_factor, '
+                || '               :p_round, '
+                || '               :l_sdo_tol, '
+                || '               :l_srid) '
+                || ' WHERE sld_sfs_id = :p_batch_id ';
+
+            nm_debug.debug (l_sql);
+
+            EXECUTE IMMEDIATE l_sql
+                USING l_gtype,
+                      l_length_column,
+                      l_length_column,
+                      p_unit_factor,
+                      p_round,
+                      l_sdo_tol,
+                      l_srid,
+                      p_batch_id;
+        END;
+
+        nm_debug.debug ('Update working geometry complete');
+
 
         INSERT INTO sdl_validation_results (svr_sfs_id,
                                             svr_validation_type,
@@ -840,9 +854,9 @@ AS
         l_parts   NUMBER;
         qq        CHAR (1) := CHR (39);
     BEGIN
-        l_parts := retval.sdo_elem_info.count/3;
-        
---        SELECT COUNT (*) / 3 INTO l_parts FROM TABLE (retval.sdo_elem_info);
+        l_parts := retval.sdo_elem_info.COUNT / 3;
+
+        --        SELECT COUNT (*) / 3 INTO l_parts FROM TABLE (retval.sdo_elem_info);
 
         IF retval.sdo_gtype IN (3002, 3006)
         THEN
@@ -1341,7 +1355,6 @@ AS
 
         RETURN retval;
     END;
-
 --    FUNCTION get_length (p_sld_key IN NUMBER, p_length_column VARCHAR2)
 --        RETURN NUMBER
 --    IS
