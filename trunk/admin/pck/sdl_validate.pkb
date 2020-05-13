@@ -1,13 +1,12 @@
-/* Formatted on 04/05/2020 09:57:39 (QP5 v5.336) */
 CREATE OR REPLACE PACKAGE BODY sdl_validate
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_validate.pkb-arc   1.14   May 04 2020 11:50:06   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_validate.pkb-arc   1.15   May 13 2020 14:23:38   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_validate.pkb  $
-    --       Date into PVCS   : $Date:   May 04 2020 11:50:06  $
-    --       Date fetched Out : $Modtime:   May 04 2020 11:46:04  $
-    --       PVCS Version     : $Revision:   1.14  $
+    --       Date into PVCS   : $Date:   May 13 2020 14:23:38  $
+    --       Date fetched Out : $Modtime:   May 13 2020 14:21:16  $
+    --       PVCS Version     : $Revision:   1.15  $
     --
     --   Author : R.A. Coupe
     --
@@ -21,7 +20,7 @@ AS
     -- FK based checks
     -- format checks
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.14  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.15  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'SDL_VALIDATE';
 
@@ -636,11 +635,40 @@ AS
                                     p_unit_factor   IN NUMBER,
                                     p_round         IN NUMBER)
     IS
-        l_diminfo    sdo_dim_array;
-        l_gtype      NUMBER;
-        l_unit_str   VARCHAR2 (30);
-        meta_row     V_SDL_PROFILE_NW_TYPES%ROWTYPE;
-        l_sdo_tol    NUMBER;
+        l_diminfo         sdo_dim_array;
+        l_srid            NUMBER;
+        l_gtype           NUMBER;
+        l_unit_str        VARCHAR2 (30);
+        meta_row          V_SDL_PROFILE_NW_TYPES%ROWTYPE;
+        l_sdo_tol         NUMBER;
+        l_length_column   VARCHAR2 (30);
+        l_lengths         ptr_num_array_type;
+
+        FUNCTION get_length_column(p_batch_id in number)
+            RETURN VARCHAR2
+        IS
+            retval   VARCHAR2 (30);
+        BEGIN
+            nm_debug.debug('get length column');
+            BEGIN
+                SELECT 'SLD_COL_' || sam_col_id
+                  INTO retval
+                  FROM sdl_attribute_mapping, sdl_file_submissions
+                 WHERE     sam_sp_id = sfs_sp_id
+                       AND sfs_id = p_batch_id
+                       AND sam_ne_column_name = 'NE_LENGTH';
+            EXCEPTION
+                WHEN NO_DATA_FOUND
+                THEN
+                    retval := NULL;
+            END;
+            nm_debug.debug('get length column = '||nvl(retval,'NULL'));
+            
+            return '5'; --retval;
+
+        END;
+    -----------------------------
+
     BEGIN
         SELECT m.*
           INTO meta_row
@@ -652,8 +680,8 @@ AS
         DELETE FROM sdl_validation_results
               WHERE svr_validation_type = 'S' AND svr_sfs_id = p_batch_id;
 
-        SELECT diminfo
-          INTO l_diminfo
+        SELECT diminfo, srid
+          INTO l_diminfo, l_srid
           FROM user_sdo_geom_metadata
          WHERE     table_name = 'SDL_LOAD_DATA'
                AND column_name = 'SLD_WORKING_GEOMETRY';
@@ -663,7 +691,38 @@ AS
         --
         l_gtype := guess_dim_and_gtype (p_batch_id);
 
-        --
+        l_length_column := get_length_column(p_batch_id);
+        
+--      l_length_column := '5';  -- Test the measure using a constant, a quick test to ensure successful SQL execution
+
+        nm_debug.debug('Update working geometry');
+      
+        declare
+        l_sql varchar2(4000);
+        begin
+        l_sql := --execute immediate
+         'UPDATE sdl_load_data a '
+      ||'   SET a.sld_working_geometry = '
+      ||'           sdl_validate.configure_sdl_geometry ( '
+      ||'               sld_load_geometry, '
+      ||'               :l_gtype, '
+      ||'               case when :l_length_column is not null then to_number(:l_length_column) '    --sdl_validate.get_length (sld_key, :l_length_column) '
+      ||'               else NULL end, '
+      ||'               :p_unit_factor, '
+      ||'               :p_round, '
+      ||'               :l_sdo_tol, '
+      ||'               :l_srid) '
+      ||' WHERE sld_sfs_id = :p_batch_id ';
+      
+      nm_debug.debug(l_sql);
+      
+      execute immediate l_sql using l_gtype, l_length_column, l_length_column, p_unit_factor, p_round, l_sdo_tol, l_srid, p_batch_id;
+      
+      end;
+      
+        nm_debug.debug('Update working geometry complete');
+      
+
         INSERT INTO sdl_validation_results (svr_sfs_id,
                                             svr_validation_type,
                                             svr_sld_key,
@@ -676,25 +735,16 @@ AS
                    'SLD_LOAD_GEOMETRY',
                    -99,
                    SDO_GEOM.validate_geometry_with_context (
-                       sdl_set_gtype (sld_load_geometry,
-                                      l_gtype,
-                                      NULL,
-                                      p_unit_factor,
-                                      p_round,
-                                      l_sdo_tol),
+                       sld_working_geometry,
                        l_diminfo)
               FROM sdl_load_data
              WHERE     sld_sfs_id = p_batch_id
                    AND SDO_GEOM.validate_geometry_with_context (
-                           sdl_set_gtype (sld_load_geometry,
-                                          l_gtype,
-                                          NULL,
-                                          p_unit_factor,
-                                          p_round,
-                                          l_sdo_tol),
-                           l_diminfo) != 'TRUE';
-                           
-                           
+                           sld_working_geometry,
+                           l_diminfo) !=
+                       'TRUE';
+
+
         INSERT INTO sdl_validation_results (svr_sfs_id,
                                             svr_validation_type,
                                             svr_sld_key,
@@ -709,20 +759,15 @@ AS
                    'Measures must be increasing'
               FROM sdl_load_data
              WHERE     sld_sfs_id = p_batch_id
-                   AND SDO_LRS.IS_MEASURE_INCREASING(sld_working_geometry) != 'TRUE';
-                           
+                   AND SDO_LRS.IS_MEASURE_INCREASING (sld_working_geometry) !=
+                       'TRUE';
+
 
         --
         UPDATE sdl_load_data a
-           SET a.sld_working_geometry =
-                   sdl_set_gtype (sld_load_geometry,
-                                  l_gtype,
-                                  NULL,
-                                  p_unit_factor,
-                                  p_round,
-                                  l_sdo_tol)
+           SET a.sld_working_geometry = NULL
          WHERE     sld_sfs_id = p_batch_id
-               AND NOT EXISTS
+               AND EXISTS
                        (SELECT 1
                           FROM sdl_validation_results
                          WHERE     svr_sfs_id = p_batch_id
@@ -782,19 +827,22 @@ AS
     --
     -----------------------------------------------------------------------------
     --
-    FUNCTION sdl_set_gtype (p_geom          IN SDO_GEOMETRY,
-                            p_gtype         IN NUMBER,
-                            p_length        IN NUMBER DEFAULT NULL,
-                            p_unit_factor   IN NUMBER,
-                            p_round         IN NUMBER,
-                            p_sdo_tol       IN NUMBER)
+    FUNCTION CONFIGURE_SDL_GEOMETRY (p_geom          IN SDO_GEOMETRY,
+                                     p_gtype         IN NUMBER,
+                                     p_length        IN NUMBER,
+                                     p_unit_factor   IN NUMBER,
+                                     p_round         IN NUMBER,
+                                     p_sdo_tol       IN NUMBER,
+                                     p_srid          IN NUMBER)
         RETURN SDO_GEOMETRY
     IS
         retval    SDO_GEOMETRY := p_geom;
         l_parts   NUMBER;
         qq        CHAR (1) := CHR (39);
     BEGIN
-        SELECT COUNT (*) / 3 INTO l_parts FROM TABLE (retval.sdo_elem_info);
+        l_parts := retval.sdo_elem_info.count/3;
+        
+--        SELECT COUNT (*) / 3 INTO l_parts FROM TABLE (retval.sdo_elem_info);
 
         IF retval.sdo_gtype IN (3002, 3006)
         THEN
@@ -802,6 +850,16 @@ AS
             THEN
                 retval.sdo_gtype :=
                     CASE WHEN l_parts = 1 THEN 3302 ELSE 3306 END;
+
+                IF p_length IS NOT NULL
+                THEN
+                    retval :=
+                        SDO_LRS.scale_geom_segment (retval,
+                                                    0,
+                                                    p_length,
+                                                    0,
+                                                    p_sdo_tol);
+                END IF;
             ELSIF p_gtype IN (2002, 2206)
             THEN
                 retval.sdo_gtype :=
@@ -814,7 +872,7 @@ AS
                             NVL (
                                 p_length,
                                   SDO_GEOM.sdo_length (retval,
-                                                       0.005,
+                                                       p_sdo_tol,
                                                        'unit=METER')
                                 / p_unit_factor),
                             p_round));
@@ -828,7 +886,7 @@ AS
 
         --
         RETURN retval;
-    END sdl_set_gtype;
+    END configure_sdl_geometry;
 
     --
     -----------------------------------------------------------------------------
@@ -1250,9 +1308,10 @@ AS
                        'REVIEW')
          WHERE swd.batch_id = p_batch_id AND swd.status = 'VALID';
     END update_load_datum_status;
---
------------------------------------------------------------------------------
---
+
+    --
+    -----------------------------------------------------------------------------
+    --
     FUNCTION user_defined_ne_unique (p_nt_type IN VARCHAR2)
         RETURN VARCHAR2
     IS
@@ -1282,6 +1341,19 @@ AS
 
         RETURN retval;
     END;
-    
+
+--    FUNCTION get_length (p_sld_key IN NUMBER, p_length_column VARCHAR2)
+--        RETURN NUMBER
+--    IS
+--        retval   NUMBER;
+--    BEGIN
+--        EXECUTE IMMEDIATE   'select '
+--                         || p_length_column
+--                         || ' from sdl_load_data where sld_key = :p_sld_key'
+--            INTO retval
+--            USING p_sld_key;
+--
+--        RETURN retval;
+--    END;
 END sdl_validate;
 /
