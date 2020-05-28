@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY sdl_validate
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_validate.pkb-arc   1.16   May 13 2020 15:23:00   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_validate.pkb-arc   1.17   May 28 2020 09:48:22   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_validate.pkb  $
-    --       Date into PVCS   : $Date:   May 13 2020 15:23:00  $
-    --       Date fetched Out : $Modtime:   May 13 2020 15:22:14  $
-    --       PVCS Version     : $Revision:   1.16  $
+    --       Date into PVCS   : $Date:   May 28 2020 09:48:22  $
+    --       Date fetched Out : $Modtime:   May 28 2020 09:47:28  $
+    --       PVCS Version     : $Revision:   1.17  $
     --
     --   Author : R.A. Coupe
     --
@@ -20,7 +20,7 @@ AS
     -- FK based checks
     -- format checks
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.16  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.17  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'SDL_VALIDATE';
 
@@ -713,7 +713,7 @@ AS
                 || '           sdl_validate.configure_sdl_geometry ( '
                 || '               sld_load_geometry, '
                 || '               :l_gtype, '
-                || '               case when :l_length_column is not null then to_number(:l_length_column) ' --sdl_validate.get_length (sld_key, :l_length_column) '
+                || '               case when :l_length_column is not null then to_number('||l_length_column||' ) ' 
                 || '               else NULL end, '
                 || '               :p_unit_factor, '
                 || '               :p_round, '
@@ -723,9 +723,17 @@ AS
 
             nm_debug.debug (l_sql);
 
+            nm_debug.debug('Using '||l_gtype||', '||
+                      l_length_column||', '||
+                      p_unit_factor||', '||
+                      p_round||', '||
+                      l_sdo_tol||', '||
+                      l_srid||', '||
+                      p_batch_id );
+
+
             EXECUTE IMMEDIATE l_sql
                 USING l_gtype,
-                      l_length_column,
                       l_length_column,
                       p_unit_factor,
                       p_round,
@@ -1355,18 +1363,6 @@ AS
 
         RETURN retval;
     END;
---    FUNCTION get_length (p_sld_key IN NUMBER, p_length_column VARCHAR2)
---        RETURN NUMBER
---    IS
---        retval   NUMBER;
---    BEGIN
---        EXECUTE IMMEDIATE   'select '
---                         || p_length_column
---                         || ' from sdl_load_data where sld_key = :p_sld_key'
---            INTO retval
---            USING p_sld_key;
---
---        RETURN retval;
---    END;
+
 END sdl_validate;
 /
