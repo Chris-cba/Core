@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY sdl_validate
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_validate.pkb-arc   1.17   May 28 2020 09:48:22   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_validate.pkb-arc   1.18   May 28 2020 23:35:10   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_validate.pkb  $
-    --       Date into PVCS   : $Date:   May 28 2020 09:48:22  $
-    --       Date fetched Out : $Modtime:   May 28 2020 09:47:28  $
-    --       PVCS Version     : $Revision:   1.17  $
+    --       Date into PVCS   : $Date:   May 28 2020 23:35:10  $
+    --       Date fetched Out : $Modtime:   May 28 2020 23:34:24  $
+    --       PVCS Version     : $Revision:   1.18  $
     --
     --   Author : R.A. Coupe
     --
@@ -20,7 +20,7 @@ AS
     -- FK based checks
     -- format checks
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.17  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.18  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'SDL_VALIDATE';
 
@@ -702,6 +702,11 @@ AS
 
         --      l_length_column := '5';  -- Test the measure using a constant, a quick test to ensure successful SQL execution
 
+        IF l_length_column IS NULL
+        THEN
+            l_length_column := 'NULL';
+        END IF;
+
         nm_debug.debug ('Update working geometry');
 
         DECLARE
@@ -713,8 +718,9 @@ AS
                 || '           sdl_validate.configure_sdl_geometry ( '
                 || '               sld_load_geometry, '
                 || '               :l_gtype, '
-                || '               case when :l_length_column is not null then to_number('||l_length_column||' ) ' 
-                || '               else NULL end, '
+                || '               '
+                || l_length_column
+                || ', '
                 || '               :p_unit_factor, '
                 || '               :p_round, '
                 || '               :l_sdo_tol, '
@@ -723,18 +729,23 @@ AS
 
             nm_debug.debug (l_sql);
 
-            nm_debug.debug('Using '||l_gtype||', '||
-                      l_length_column||', '||
-                      p_unit_factor||', '||
-                      p_round||', '||
-                      l_sdo_tol||', '||
-                      l_srid||', '||
-                      p_batch_id );
+            nm_debug.debug (
+                   'Using '
+                || l_gtype
+                || ', '
+                || p_unit_factor
+                || ', '
+                || p_round
+                || ', '
+                || l_sdo_tol
+                || ', '
+                || l_srid
+                || ', '
+                || p_batch_id);
 
 
             EXECUTE IMMEDIATE l_sql
                 USING l_gtype,
-                      l_length_column,
                       p_unit_factor,
                       p_round,
                       l_sdo_tol,
@@ -971,6 +982,7 @@ AS
                                                          l_diminfo)    status
                                                 FROM sdl_wip_datums
                                                WHERE     batch_id = p_batch_id
+                                                     AND geom IS NOT NULL
                                                      AND SDO_GEOM.validate_geometry_with_context (
                                                              geom,
                                                              l_diminfo) !=
@@ -978,7 +990,17 @@ AS
                     GROUP BY sld_key,
                              swd_id,
                              ERROR_CODE,
-                             error_msg);
+                             error_msg)
+            UNION ALL
+            SELECT p_batch_id,
+                   'S',
+                   sld_key,
+                   swd_id,
+                   'GEOM',
+                   -999,
+                   'Geometry is NULL'
+              FROM sdl_wip_datums
+             WHERE geom IS NULL;
     --
     --        check_self_intersections (p_batch_id);
 
@@ -1363,6 +1385,5 @@ AS
 
         RETURN retval;
     END;
-
 END sdl_validate;
 /
