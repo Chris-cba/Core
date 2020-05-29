@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY sdl_validate
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_validate.pkb-arc   1.18   May 28 2020 23:35:10   Rob.Coupe  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_validate.pkb-arc   1.19   May 29 2020 10:28:26   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_validate.pkb  $
-    --       Date into PVCS   : $Date:   May 28 2020 23:35:10  $
-    --       Date fetched Out : $Modtime:   May 28 2020 23:34:24  $
-    --       PVCS Version     : $Revision:   1.18  $
+    --       Date into PVCS   : $Date:   May 29 2020 10:28:26  $
+    --       Date fetched Out : $Modtime:   May 29 2020 10:26:34  $
+    --       PVCS Version     : $Revision:   1.19  $
     --
     --   Author : R.A. Coupe
     --
@@ -20,7 +20,7 @@ AS
     -- FK based checks
     -- format checks
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.18  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.19  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'SDL_VALIDATE';
 
@@ -220,7 +220,7 @@ AS
                                 AND sam_sp_id = sp_id
                                 AND sam_ne_column_name = column_name
                                 AND network_type = nlt_nt_type
-                                AND group_type = nlt_gty_type
+                                AND nvl(group_type, '$%&*') = nvl(nlt_gty_type,  '$%&*')
                                 AND domain IS NOT NULL))
         SELECT MAX (sam_id),
                   'insert into sdl_validation_results (svr_sfs_id, svr_sld_key, svr_validation_type, svr_sam_id, svr_column_name, svr_current_value, svr_status_code, svr_message) '
@@ -301,7 +301,7 @@ AS
                                 AND sam_sp_id = sp_id
                                 AND sam_ne_column_name = column_name
                                 AND network_type = nlt_nt_type
-                                AND group_type = nlt_gty_type
+                                AND nvl(group_type, '$%&*') = nvl(nlt_gty_type,  '$%&*')
                                 AND mandatory = 'Y'))
         SELECT MAX (sam_id),
                   'insert into sdl_validation_results (svr_sfs_id, svr_sld_key, svr_validation_type, svr_sam_id, svr_column_name, svr_current_value, svr_status_code, svr_message) '
