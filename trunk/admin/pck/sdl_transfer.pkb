@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY sdl_transfer
 AS
     --   PVCS Identifiers :-
     --
-    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_transfer.pkb-arc   1.9   Mar 12 2020 17:27:16   Vikas.Mhetre  $
+    --       pvcsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/sdl_transfer.pkb-arc   1.10   May 29 2020 16:12:14   Rob.Coupe  $
     --       Module Name      : $Workfile:   sdl_transfer.pkb  $
-    --       Date into PVCS   : $Date:   Mar 12 2020 17:27:16  $
-    --       Date fetched Out : $Modtime:   Mar 12 2020 07:22:02  $
-    --       PVCS Version     : $Revision:   1.9  $
+    --       Date into PVCS   : $Date:   May 29 2020 16:12:14  $
+    --       Date fetched Out : $Modtime:   May 29 2020 16:10:18  $
+    --       PVCS Version     : $Revision:   1.10  $
     --
     --   Author : R.A. Coupe
     --
@@ -19,11 +19,12 @@ AS
     -- The main purpose of this package is to handle the transfer of data from the SDL repository
     -- into the main database
 
-    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.9  $';
+    g_body_sccsid    CONSTANT VARCHAR2 (2000) := '$Revision:   1.10  $';
 
     g_package_name   CONSTANT VARCHAR2 (30) := 'SDL_DDL';
 
     qq                        CHAR (1) := CHR (39);
+
     --
     ----------------------------------------------------------------------------
     --
@@ -33,6 +34,7 @@ AS
     BEGIN
         RETURN g_sccsid;
     END get_version;
+
     --
     ----------------------------------------------------------------------------
     --
@@ -42,11 +44,13 @@ AS
     BEGIN
         RETURN g_body_sccsid;
     END get_body_version;
+
     --
     ----------------------------------------------------------------------------
     --
     FUNCTION get_ne_data (p_batch_id IN NUMBER, p_view_name IN VARCHAR2)
         RETURN sdl_ne_tab;
+
     --
     ----------------------------------------------------------------------------
     --
@@ -158,6 +162,33 @@ AS
 
         --nm_debug.debug('Have IDs - count = '||ne_ids.count);
 
+        -- Grab the attributes we need:
+
+        WITH
+            attrib_names
+            AS
+                (SELECT sam_ne_column_name
+                   FROM sdl_attribute_mapping
+                  WHERE sam_sp_id = l_sp_id
+                 UNION
+                 SELECT 'NE_START_DATE' FROM DUAL
+                 UNION
+                 SELECT 'NE_END_DATE' FROM DUAL)  --select * from attrib_names
+                                                ,
+            attribs
+            AS
+                (SELECT NVL (s1.sam_id, ROWNUM * (-1))     sam_id,
+                        a.sam_ne_column_name
+                   FROM attrib_names a, sdl_attribute_mapping s1
+                  WHERE     s1.sam_sp_id(+) = l_sp_id
+                        AND s1.sam_ne_column_name(+) = a.sam_ne_column_name)
+        SELECT CAST (
+                   COLLECT (ptr_vc (sam_id, sam_ne_column_name))
+                       AS ptr_vc_array_type)
+          INTO l_attrib_list
+          FROM attribs;
+
+
         --Now, for load files which relate directly to linear routes, grab the conversion
         -- factor so units relating to the route/load data can be converted to the units of the datum.
 
@@ -173,31 +204,6 @@ AS
             --where the route does not exist.
             --It needs dynamic SQL for the view name which derives the unique key of the load file data.
             --It only inserts the rows with valid, transferrable datums
-
-            WITH
-                attrib_names
-                AS
-                    (SELECT sam_ne_column_name
-                       FROM sdl_attribute_mapping
-                      WHERE sam_sp_id = l_sp_id
-                     UNION
-                     SELECT 'NE_START_DATE' FROM DUAL
-                     UNION
-                     SELECT 'NE_END_DATE' FROM DUAL) --select * from attrib_names
-                                                    ,
-                attribs
-                AS
-                    (SELECT NVL (s1.sam_id, ROWNUM * (-1))     sam_id,
-                            a.sam_ne_column_name
-                       FROM attrib_names a, sdl_attribute_mapping s1
-                      WHERE     s1.sam_sp_id(+) = l_sp_id
-                            AND s1.sam_ne_column_name(+) =
-                                a.sam_ne_column_name)
-            SELECT CAST (
-                       COLLECT (ptr_vc (sam_id, sam_ne_column_name))
-                           AS ptr_vc_array_type)
-              INTO l_attrib_list
-              FROM attribs;
 
             SELECT ins_str
               INTO l_ins_str
@@ -310,53 +316,113 @@ AS
 
         --we now have all the nodes we need
 
-        SELECT    'insert into nm_elements ( ne_id, ne_type, ne_nt_type, ne_no_start, ne_no_end, ne_length, '
-               || LISTAGG (sdam_column_name, ',')
+        IF l_group_type IS NOT NULL
+        THEN
+            SELECT    'insert into nm_elements ( ne_id, ne_type, ne_nt_type, ne_no_start, ne_no_end, ne_length, '
+                   || LISTAGG (sdam_column_name, ',')
+                          WITHIN GROUP (ORDER BY sdam_seq_no)
+                   || ')'
+              INTO l_ins_str
+              FROM sdl_datum_attribute_mapping
+             WHERE sdam_profile_id = l_sp_id;
+
+            SELECT    'select t.ptr_value, ne_type, ne_nt_type, start_node, end_node, ne_length, '
+                   || LISTAGG (
+                          CASE sdam_column_name
+                              WHEN 'NE_START_DATE'
+                              THEN
+                                  ' greatest(ne_start_date, nvl(last_date, ne_start_date)) '
+                              ELSE
+                                  sdam_column_name
+                          END,
+                          ',')
                       WITHIN GROUP (ORDER BY sdam_seq_no)
-               || ')'
-          INTO l_ins_str
-          FROM sdl_datum_attribute_mapping
-         WHERE sdam_profile_id = l_sp_id;
+                   || ' from (select d.*, s.existing_node_id start_node, e.existing_node_id end_node, '
+                   || ' ( select last_date from (select max(no_start_date) over (partition by dn.swd_id order by node_type rows between unbounded preceding and unbounded following) last_date '
+                   || ' from sdl_wip_nodes n, sdl_wip_datum_nodes dn, nm_nodes nn '
+                   || ' where n.hashcode=dn.hashcode and n.existing_node_id = nn.no_node_id and dn.SWD_ID = d.swd_id ) where rownum = 1 ) last_date '
+                   || 'from '
+                   || l_datum_view
+                   || ' d, V_SDL_NODE_USAGES n, sdl_wip_nodes s, sdl_wip_nodes e '
+                   || 'where d.swd_id = n.swd_id '
+                   || 'and d.batch_id = :batch_id '
+                   || 'and n.start_node = s.hashcode '
+                   || 'and n.end_node = e.hashcode '
+                   || ') , '
+                   || 'table(:ne_ids) t where batch_id = :batch_id and t.ptr_id = swd_id'
+              INTO l_sel_str
+              FROM sdl_datum_attribute_mapping
+             WHERE sdam_profile_id = l_sp_id;
 
-        SELECT    'select t.ptr_value, ne_type, ne_nt_type, start_node, end_node, ne_length, '
-               || LISTAGG (
-                      CASE sdam_column_name
-                          WHEN 'NE_START_DATE'
-                          THEN
-                              ' greatest(ne_start_date, nvl(last_date, ne_start_date)) '
-                          ELSE
-                              sdam_column_name
-                      END,
-                      ',')
-                  WITHIN GROUP (ORDER BY sdam_seq_no)
-               || ' from (select d.*, s.existing_node_id start_node, e.existing_node_id end_node, '
-               || ' ( select last_date from (select max(no_start_date) over (partition by dn.swd_id order by node_type rows between unbounded preceding and unbounded following) last_date '
-               || ' from sdl_wip_nodes n, sdl_wip_datum_nodes dn, nm_nodes nn '
-               || ' where n.hashcode=dn.hashcode and n.existing_node_id = nn.no_node_id and dn.SWD_ID = d.swd_id ) where rownum = 1 ) last_date '
-               || 'from '
-               || l_datum_view
-               || ' d, V_SDL_NODE_USAGES n, sdl_wip_nodes s, sdl_wip_nodes e '
-               || 'where d.swd_id = n.swd_id '
-               || 'and d.batch_id = :batch_id '
-               || 'and n.start_node = s.hashcode '
-               || 'and n.end_node = e.hashcode '
-               || ') , '
-               || 'table(:ne_ids) t where batch_id = :batch_id and t.ptr_id = swd_id'
-          INTO l_sel_str
-          FROM sdl_datum_attribute_mapping
-         WHERE sdam_profile_id = l_sp_id;
+            /*INSERT INTO ne_id_sav
+                SELECT t.ptr_value, t.ptr_id
+                  FROM TABLE (ne_ids) t;*/
 
-        /*INSERT INTO ne_id_sav 
-            SELECT t.ptr_value, t.ptr_id
-              FROM TABLE (ne_ids) t;*/
 
-        COMMIT;
+            EXECUTE IMMEDIATE l_ins_str || ' ' || l_sel_str
+                USING p_batch_id, ne_ids, p_batch_id;
+        ELSE
+            SELECT ins_str
+              INTO l_ins_str
+              FROM (WITH
+                        attribs
+                        AS
+                            (SELECT ptr_id        sam_id,
+                                    ptr_value     sam_ne_column_name
+                               FROM TABLE (l_attrib_list))
+                    SELECT    'insert into nm_elements ( ne_id, ne_type, ne_nt_type, ne_admin_unit, '
+                           || LISTAGG (sam_ne_column_name, ',')
+                                  WITHIN GROUP (ORDER BY sam_id)
+                           || ')'    ins_str
+                      FROM attribs);
+
+            SELECT sel_str
+              INTO l_sel_str
+              FROM (WITH
+                        attribs
+                        AS
+                            (SELECT ptr_id        sam_id,
+                                    ptr_value     sam_ne_column_name
+                               FROM TABLE (l_attrib_list))
+                    SELECT    ' select ne_id_seq.nextval, '
+                           || ''''
+                           || 'G'
+                           || ''''
+                           || ', :l_datum_nt_type, 1,  '
+                           || LISTAGG (
+                                  CASE
+                                      WHEN sam_id < 0 THEN 'NULL'
+                                      ELSE sam_ne_column_name
+                                  END,
+                                  ',')
+                              WITHIN GROUP (ORDER BY sam_id)
+                           || ' from '
+                           || l_profile_view
+                           || ' ln '
+                           || ' where batch_id = :p_batch_id '
+                           || ' and status = '
+                           || ''''
+                           || 'LOAD'
+                           || ''''
+                           || ' and exists ( select 1 from sdl_wip_datums d, table(:ne_ids) t where t.ptr_id = swd_id and status = '
+                           || ''''
+                           || 'LOAD'
+                           || ''''
+                           || '  and d.sld_key = ln.sld_key )'    sel_str
+                      FROM attribs);
+
+            nm_debug.debug (l_ins_str);
+
+            nm_debug.debug (l_sel_str);
+
+            --raise_application_error(-20001, 'Stop');
+
+            EXECUTE IMMEDIATE l_ins_str || ' ' || l_sel_str
+                USING l_datum_nt_type, p_batch_id, ne_ids;
+        END IF;
 
         --        nm_debug.debug_on;
         --        nm_debug.debug ('RC> INS' || l_ins_str || ' ' || l_sel_str);
-
-        EXECUTE IMMEDIATE l_ins_str || ' ' || l_sel_str
-            USING p_batch_id, ne_ids, p_batch_id;
 
         COMMIT;
 
@@ -522,23 +588,25 @@ AS
                        (SELECT 1
                           FROM nm_elements, TABLE (ne_ids)
                          WHERE ne_id = ptr_value);
-         
-         -- If all the datums of an associated load record are transferred 
-         -- then only update status of the associated load record to TRANSFERRED           
-         UPDATE sdl_load_data sld
-            SET sld.sld_status = 'TRANSFERRED'
-          WHERE sld.sld_sfs_id = p_batch_id
-            AND EXISTS (SELECT 1
+
+        -- If all the datums of an associated load record are transferred
+        -- then only update status of the associated load record to TRANSFERRED
+        UPDATE sdl_load_data sld
+           SET sld.sld_status = 'TRANSFERRED'
+         WHERE     sld.sld_sfs_id = p_batch_id
+               AND EXISTS
+                       (SELECT 1
                           FROM sdl_wip_datums swd
-                         WHERE swd.batch_id = sld.sld_sfs_id
-                           AND swd.status = 'TRANSFERRED'
-                           AND swd.sld_key = sld.sld_key
-                           AND 1 = (SELECT APPROX_COUNT_DISTINCT (s.status)
+                         WHERE     swd.batch_id = sld.sld_sfs_id
+                               AND swd.status = 'TRANSFERRED'
+                               AND swd.sld_key = sld.sld_key
+                               AND 1 =
+                                   (SELECT APPROX_COUNT_DISTINCT (s.status)
                                       FROM sdl_wip_datums s
-                                     WHERE s.batch_id = swd.batch_id
-                                       AND s.sld_key = swd.sld_key));             
-                         
+                                     WHERE     s.batch_id = swd.batch_id
+                                           AND s.sld_key = swd.sld_key));
     END transfer_datums;
+
     --
     ----------------------------------------------------------------------------
     --
@@ -555,8 +623,8 @@ AS
 
         RETURN retval;
     END get_ne_data;
-    --
-    ----------------------------------------------------------------------------
-    --	
+--
+----------------------------------------------------------------------------
+--
 END;
 /
