@@ -1,11 +1,11 @@
---------------------------------------------------------------------------------
+976271--------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/nm3_install.sql-arc   2.53   Apr 14 2020 09:56:54   Chris.Baugh  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/nm3_install.sql-arc   2.54   Jun 01 2020 14:51:58   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm3_install.sql  $
---       Date into PVCS   : $Date:   Apr 14 2020 09:56:54  $
---       Date fetched Out : $Modtime:   Apr 14 2020 09:56:14  $
---       PVCS Version     : $Revision:   2.53  $
+--       Date into PVCS   : $Date:   Jun 01 2020 14:51:58  $
+--       Date fetched Out : $Modtime:   Jun 01 2020 14:48:46  $
+--       PVCS Version     : $Revision:   2.54  $
 --
 --------------------------------------------------------------------------------
 --   Copyright (c) 2018 Bentley Systems Incorporated. All rights reserved.
@@ -17,23 +17,24 @@ set heading off
 set feedback off
 
 --
--- Grab date/time to append to log file names this is standard to all upgrade/install scripts
---
-undefine log_extension
-col      log_extension new_value log_extension noprint
-set term off
-select  TO_CHAR(sysdate,'DDMONYYYY_HH24MISS')||'.LOG' log_extension from dual
-/
-set term on
---
 ---------------------------------------------------------------------------------------------------
 --
---
+undefine nmlogfile1
+undefine nmlogfile2
+col         nmlogfile1 new_value nmlogfile1 noprint
+col         nmlogfile2 new_value nmlogfile2 noprint
+set term off
+SELECT  'core'||REPLACE('&new_version','.')||'_install_1_'||TO_CHAR(sysdate,'DDMONYYYY_HH24MISS')||'.LOG' nmlogfile1 
+       ,'core'||REPLACE('&new_version','.')||'_install_2_'||TO_CHAR(sysdate,'DDMONYYYY_HH24MISS')||'.LOG' nmlogfile2 
+from dual
+/
+set term on
+---------------------------------------------------------------------------------------------------
 -- Spool to Logfile
---
-define logfile1='nm3_install_1_&log_extension'
-define logfile2='nm3_install_2_&log_extension'
-spool &logfile1
+define nmlogfile1='&nmlogfile1'
+define nmlogfile2='&nmlogfile2'
+
+SPOOL &nmlogfile1
 --
 ---------------------------------------------------------------------------------------------------
 --
@@ -42,55 +43,6 @@ select 'Installation Date ' || to_char(sysdate, 'DD-MON-YYYY HH24:MM:SS') from d
 SELECT 'Install Running on ' ||LOWER(USER||'@'||instance_name||'.'||host_name)||' - DB ver : '||version
 FROM v$instance;
 
-WHENEVER SQLERROR EXIT
---
--- Check that NM3 has not already been installed
---
-DECLARE
-  l_version            VARCHAR2(10);
-  ex_already_installed EXCEPTION;
-
-  TYPE                 refcur IS REF CURSOR;
-  rc                   refcur;
-  v_sql                VARCHAR2(1000);
-
-  Cursor c_db_version Is
-  Select '12gr2' 
-  From   v$version
-  Where  banner Like '%19.0.0.0%';
-  --
-  l_19c Varchar2(10);
-  
-  ex_incorrect_db Exception;
-
-BEGIN
-   Open  c_db_version;
-   Fetch c_db_version Into l_19c;
-   Close c_db_version;
-   --
-   If l_19c Is Null
-   Then
-     Raise ex_incorrect_db;
-   End If;
-   --
-   v_sql := 'SELECT hpr_version FROM user_tables,hig_products WHERE hpr_product = ''NET'' AND   table_name = ''NM_ELEMENTS_ALL''';
-   --
-   OPEN rc FOR v_sql;
-   FETCH rc INTO l_version;
-   CLOSE rc;
-
-   IF l_version IS NOT NULL THEN
-       RAISE ex_already_installed;
-   END IF;
-EXCEPTION
-  WHEN ex_incorrect_db THEN
-    RAISE_APPLICATION_ERROR(-20000,'The database version does not comply with the Bentley Exor Release Configuration - contact exor support for further information'); 
-  WHEN ex_already_installed THEN
-    RAISE_APPLICATION_ERROR(-20001,'NM3 version '||l_version||' already installed.');
- WHEN others THEN
-    Null;
-END;
-/
 WHENEVER SQLERROR CONTINUE
 --
 ---------------------------------------------------------------------------------------------------
@@ -200,10 +152,10 @@ SET FEEDBACK OFF
 --
 ---------------------------------------------------------------------------------------------------
 --                        **************** APPLICATION CONTEXTS ****************
---   
+--
 SET TERM ON
 Prompt Application Contexts...
---SET TERM OFF
+SET TERM OFF
 SET DEFINE ON
 select '&exor_base'||'nm3'||'&terminator'||'admin'||
         '&terminator'||'ctx'||'&terminator'||'nm3ctx.sql' run_file
@@ -343,11 +295,11 @@ SET TERM ON
 prompt Apply Policies if using Oracle Enterprise Edition...
 SET TERM OFF
 SET DEFINE ON
-SELECT DECODE(INSTR(UPPER(banner), 'ENTERPRISE'), 
+SELECT DECODE(INSTR(UPPER(banner), 'ENTERPRISE'),
                     0, '&exor_base'||'nm3'||'&terminator'||'install'||'&terminator'||'dummy',
                        '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'ctx'||'&terminator'||'add_policy'
                        ) run_file
-  FROM v$version 
+  FROM v$version
 WHERE UPPER(banner) LIKE '%ORACLE DATABASE%'
 /
 
@@ -437,12 +389,12 @@ SET FEEDBACK OFF
 --
 --
 SET TERM ON
-PROMPT Creating v_geom_on_route View 
+PROMPT Creating v_geom_on_route View
 SET TERM OFF
 SET DEFINE ON
-SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'views'||'&terminator'||'v_geom_on_route.vw ' run_file 
-FROM dual 
-/ 
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'views'||'&terminator'||'v_geom_on_route.vw ' run_file
+FROM dual
+/
 
 SET FEEDBACK ON
 start '&&run_file'
@@ -481,7 +433,7 @@ SET TERM OFF
 
 select decode(count(*), 0 , '&exor_base'||'nm3'||'&terminator'||'install'||'&terminator'||'install_sdo_lrs_replacement',
                             '&exor_base'||'nm3'||'&terminator'||'install'||'&terminator'||'dummy') run_file
-from dba_registry 
+from dba_registry
 where comp_name='Spatial'
 and status = 'VALID'
 /
@@ -522,7 +474,7 @@ FROM dual
 /
 START '&run_file'
 
-spool &logfile2
+spool &nmlogfile2
 
 --get some db info
 select 'Install Date ' || to_char(sysdate, 'DD-MON-YYYY HH24:MM:SS') from dual;
@@ -737,10 +689,10 @@ PROMPT New process to clean up forms parameter table everyday
 SET TERM OFF
 
 ------------------------------------------------------------------
--- 
+--
 -- DEVELOPMENT COMMENTS (STEVEN COOPER)
 -- New process to clean up forms parameter table everyday
--- 
+--
 ------------------------------------------------------------------
 Declare
   l_Process_Id            Hig_Processes.Hp_Process_Id%Type;
@@ -749,9 +701,9 @@ Declare
 Begin
   -- If Process Framework is Down, start it
   IF hig_process_admin.scheduler_disabled = 'TRUE' THEN
-  
+
     hig_process_admin.set_scheduler_state('UP');
-    
+
   END IF;
 --
   Hig_Process_Api.Create_And_Schedule_Process (
@@ -766,10 +718,10 @@ Begin
 	hig_process_admin.set_scheduler_state('UP');
 --
    Commit;
-  Dbms_Output.Put_Line('Created Core Houseleeping Process');                                              
+  Dbms_Output.Put_Line('Created Core Houseleeping Process');
   Dbms_Output.Put_Line('Process_Id:'            || To_Char(l_Process_Id) );
   Dbms_Output.Put_Line('Job_Name:'              || l_Job_Name);
-  Dbms_Output.Put_Line('Scheduled_Start_Date:'  || To_Char(l_Scheduled_Start_Date,'dd-mm-yyyy hh24:mi.ss'));  
+  Dbms_Output.Put_Line('Scheduled_Start_Date:'  || To_Char(l_Scheduled_Start_Date,'dd-mm-yyyy hh24:mi.ss'));
 End;
 /
 --
@@ -779,11 +731,11 @@ SET TERM ON
 Prompt Setting The Version Number...
 SET TERM OFF
 BEGIN
-      hig2.upgrade('HIG','nm3_install.sql','Installed','4.9.0.1');
-      hig2.upgrade('NET','nm3_install.sql','Installed','4.9.0.1');
-      hig2.upgrade('DOC','nm3_install.sql','Installed','4.9.0.1');
-      hig2.upgrade('AST','nm3_install.sql','Installed','4.9.0.1');
-      hig2.upgrade('WMP','nm3_install.sql','Installed','4.9.0.1');
+      hig2.upgrade('HIG','nm3_install.sql','Installed','&new_version');
+      hig2.upgrade('NET','nm3_install.sql','Installed','&new_version');
+      hig2.upgrade('DOC','nm3_install.sql','Installed','&new_version');
+      hig2.upgrade('AST','nm3_install.sql','Installed','&new_version');
+      hig2.upgrade('WMP','nm3_install.sql','Installed','&new_version');
 END;
 /
 COMMIT;
@@ -792,7 +744,5 @@ FROM hig_products
 WHERE hpr_product IN ('HIG','NET','DOC','AST','WMP')
 order by hpr_product;
 --
---
 spool off
 exit
-
