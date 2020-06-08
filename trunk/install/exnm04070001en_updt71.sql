@@ -1,10 +1,10 @@
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/exnm04070001en_updt71.sql-arc   1.0   Jun 08 2020 13:29:56   Rob.Coupe  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/install/exnm04070001en_updt71.sql-arc   1.1   Jun 08 2020 14:33:48   Rob.Coupe  $
 --       Module Name      : $Workfile:   exnm04070001en_updt71.sql  $ 
---       Date into PVCS   : $Date:   Jun 08 2020 13:29:56  $
---       Date fetched Out : $Modtime:   Jun 08 2020 13:01:02  $
---       PVCS Version     : $Revision:   1.0  $
+--       Date into PVCS   : $Date:   Jun 08 2020 14:33:48  $
+--       Date fetched Out : $Modtime:   Jun 08 2020 14:33:26  $
+--       PVCS Version     : $Revision:   1.1  $
 --
 ----------------------------------------------------------------------------
 --   Copyright (c) 2015 Bentley Systems Incorporated.  All rights reserved.
@@ -58,7 +58,7 @@ DECLARE
       WHERE EXISTS
               (SELECT 1
                  FROM hig_upgrades
-                WHERE hup_product = 'NET' AND remarks like 'NET 4700 FIX 62%')
+                WHERE hup_product = 'NET' AND remarks like 'NET 4700 FIX 62%');
 --				
 BEGIN
 --
