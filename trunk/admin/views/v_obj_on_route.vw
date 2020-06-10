@@ -2,11 +2,11 @@
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/views/v_obj_on_route.vw-arc   1.7   Jun 09 2020 16:10:12   Rob.Coupe  $
+--       PVCS id          : $Header:   //new_vm_latest/archives/nm3/admin/views/v_obj_on_route.vw-arc   1.8   Jun 10 2020 12:36:26   Rob.Coupe  $
 --       Module Name      : $Workfile:   v_obj_on_route.vw  $
---       Date into PVCS   : $Date:   Jun 09 2020 16:10:12  $
---       Date fetched Out : $Modtime:   Jun 09 2020 16:07:58  $
---       Version          : $Revision:   1.7  $
+--       Date into PVCS   : $Date:   Jun 10 2020 12:36:26  $
+--       Date fetched Out : $Modtime:   Jun 10 2020 12:29:08  $
+--       Version          : $Revision:   1.8  $
 -------------------------------------------------------------------------
 --
 -----------------------------------------------------------------------------
@@ -92,7 +92,7 @@ AS
            --           select * from inv_types )
            SELECT t.*
              FROM TABLE (
-                     SELECT lb_get.GET_LB_RPT_R_TAB (
+                     SELECT GET_LB_RPT_R_TAB (
                                CAST (
                                   COLLECT (
                                      lb_rpt (
@@ -120,7 +120,7 @@ AS
            UNION ALL
            SELECT t.*
              FROM TABLE (
-                     SELECT lb_get.GET_LB_RPT_R_TAB (
+                     SELECT GET_LB_RPT_R_TAB (
                                CAST (
                                   COLLECT (
                                      lb_rpt (
@@ -148,7 +148,7 @@ AS
            UNION ALL
            SELECT t.*
              FROM TABLE (
-                     SELECT lb_get.GET_LB_RPT_R_TAB (
+                     SELECT GET_LB_RPT_R_TAB (
                                CAST (
                                   COLLECT (
                                      lb_rpt (
@@ -176,7 +176,7 @@ AS
            UNION ALL
            SELECT t.*
              FROM TABLE (
-                     SELECT lb_get.GET_LB_RPT_R_TAB (
+                     SELECT GET_LB_RPT_R_TAB (
                                CAST (
                                   COLLECT (
                                      lb_rpt (
@@ -204,7 +204,7 @@ AS
            UNION ALL
            SELECT t.*
              FROM TABLE (
-                     SELECT lb_get.GET_LB_RPT_R_TAB (
+                     SELECT GET_LB_RPT_R_TAB (
                                CAST (
                                   COLLECT (
                                      lb_rpt (
