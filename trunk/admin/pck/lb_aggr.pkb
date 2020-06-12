@@ -5,11 +5,11 @@ IS
 --
 --   SCCS Identifiers :-
 --
---       sccsid           : $Header:   //new_vm_latest/archives/lb/admin/pck/lb_aggr.pkb-arc   1.0   Apr 09 2015 15:24:28   Chris.Baugh  $
+--       sccsid           : $Header:   //new_vm_latest/archives/nm3/admin/pck/lb_aggr.pkb-arc   1.1   Jun 12 2020 10:53:24   Chris.Baugh  $
 --       Module Name      : $Workfile:   lb_aggr.pkb  $
---       Date into SCCS   : $Date:   Apr 09 2015 15:24:28  $
---       Date fetched Out : $Modtime:   Mar 27 2015 10:30:44  $
---       SCCS Version     : $Revision:   1.0  $
+--       Date into SCCS   : $Date:   Jun 12 2020 10:53:24  $
+--       Date fetched Out : $Modtime:   Jun 12 2020 10:47:16  $
+--       SCCS Version     : $Revision:   1.1  $
 --
 --   Author : Ade Edwards
 --
@@ -21,7 +21,7 @@ IS
 -- Copyright (c) 2015 Bentley Systems Incorporated. All rights reserved.
 -----------------------------------------------------------------------------
 --
-  g_body_sccsid      CONSTANT VARCHAR2(2000)  := '$Revision:   1.0  $';
+  g_body_sccsid      CONSTANT VARCHAR2(2000)  := '$Revision:   1.1  $';
   g_package_name     CONSTANT VARCHAR2(30)    := 'lb_aggr';
 --
 -----------------------------------------------------------------------------
@@ -51,6 +51,8 @@ BEGIN
   nm_debug.debug('V_OBJ_ON_ROUTE refresh started ');
   
   NM3CTX.SET_CONTEXT('MV_ROUTE_TYPE', hig.get_sysopt('SHPJAVARTE'));
+  NM3CTX.SET_CONTEXT('MV_DATUM_NLT_ID', hig.get_sysopt('SHPJAVADTM'));
+  
   Hig_Process_Api.Log_It(pi_Message => 'V_OBJ_ON_ROUTE refresh started - ' || To_Char(Sysdate,'dd-mm-yyyy hh24:mi.ss') );
   
   dbms_snapshot.refresh ('V_OBJ_ON_ROUTE');
